@@ -1,0 +1,84 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on , 21 2003 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Hardware Buffers In OGRE: Locking buffers</TITLE>
+
+<META NAME="description" CONTENT="Hardware Buffers In OGRE: Locking buffers">
+<META NAME="keywords" CONTENT="Hardware Buffers In OGRE: Locking buffers">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC7"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_6.html#SEC6"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_3.html#SEC3"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_8.html#SEC9"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<H2> 2.4 Locking buffers </H2>
+<!--docid::SEC7::-->
+In order to read or update a hardware buffer, you have to 'lock' it. This performs 2 functions - it tells the card that you want access to the buffer (which can have an effect on its rendering queue), and it returns a pointer which you can manipulate. Note that if you've asked to read the buffer (and remember, you really shouldn't unless you've set the buffer up with a shadow buffer), the contents of the hardware buffer will have been copied into system memory somewhere in order for you to get access to it. For the same reason, when you're finished with the buffer you must unlock it; if you locked the buffer for writing this will trigger the process of uploading the modified information to the graphics hardware.
+<BR><BR>
+<A NAME="SEC8"></A>
+<H3> Lock parameters </H3>
+<!--docid::SEC8::-->
+When you lock a buffer, you call one of the following methods:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>// Lock the entire buffer
+pBuffer-&#62;lock(lockType);
+// Lock only part of the buffer
+pBuffer-&#62;lock(start, length, lockType);
+</pre></td></tr></table>The first call locks the entire buffer, the second locks only the section from 'start' (as a byte offset), for 'length' bytes. This could be faster than locking hte entire buffer since less is transferred, but not if you later update the rest of the buffer too, because doing it in small chunks like this means you cannot use HBL_DISCARD (see below).
+<BR><BR>
+The lockType parameter can have a large effect on the performance of your application, especially if you are not using a shadow buffer. 
+<DL COMPACT>
+<DT><CODE>HBL_NORMAL</CODE>
+<DD>This kind of lock allows reading and writing from the buffer - it's also the least optimal because basically you're telling the card you could be doing anything at all. If you're not using a shadow buffer, it requires the buffer to be transferred from the card and back again. If you're using a shadow buffer the effect is minimal.
+<DT><CODE>HBL_READ_ONLY</CODE>
+<DD>This means you only want to read the contents of the buffer. Best used when you created the buffer with a shadow buffer because in that case the data does not have to be downloaded from the card.
+<DT><CODE>HBL_DISCARD</CODE>
+<DD>This means you are happy for the card to discard the <EM>entire current contents</EM> of the buffer. Implicitly this means you are not going to read the data - it also means that the card can avoid any stalls if the buffer is currently being rendered from, because it will actually give you an entirely different one. Use this wherever possible when you are locking a buffer which was not created with a shadow buffer. If you are using a shadow buffer it matters less, although with a shadow buffer it's preferable to lock the entire buffer at once, because that allows the shadow buffer to use HBL_DISCARD when it uploads the updated contents to the real buffer.
+<DT><CODE>HBL_NO_OVERWRITE</CODE>
+<DD>This is useful if you are locking just part of the buffer and thus cannot use HBL_DISCARD. It tells the card that you promise not to modify any section of the buffer which has already been used in a rendering operation this frame. Again this is only useful on buffers with no shadow buffer.
+</DL>
+
+Once you have locked a buffer, you can use the pointer returned however you wish (just don't bother trying to read the data that's there if you've used HBL_DISCARD, or write the data if you've used HBL_READ_ONLY). Modifying the contents depends on the type of buffer, See section <A HREF="vbo-update_9.html#SEC10">2.6 Hardware Vertex Buffers</A> and See section <A HREF="vbo-update_14.html#SEC18">2.7 Hardware Index Buffers</A>
+
+<A NAME="Practical Buffer Tips"></A>
+<HR SIZE=1>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_6.html#SEC6"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_3.html#SEC3"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_8.html#SEC9"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Steve Streeting</I> on <I>, 21 2003</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

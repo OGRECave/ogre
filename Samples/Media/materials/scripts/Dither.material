@@ -1,0 +1,46 @@
+fragment_program Ogre/Compositor/DitherFP cg
+{
+	source DitherFP.cg
+	entry_point Dither_ps
+	profiles ps_2_0 arbfp1
+	
+}
+
+material Ogre/Compositor/Dither
+{
+    technique
+    {
+
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
+			{
+			}
+
+
+			fragment_program_ref Ogre/Compositor/DitherFP
+			{
+
+			}
+
+			texture_unit RT
+			{
+                		tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+			
+			texture_unit noise
+			{
+				texture DitherTex
+				tex_address_mode wrap
+				tex_coord_set 1
+				filtering none
+			}
+		}
+	}
+}

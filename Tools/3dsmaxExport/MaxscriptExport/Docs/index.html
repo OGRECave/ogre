@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>OGRE maxscripts</title>
+</head>
+<body>
+<h2 align="center">3dsmax skeleton and mesh export </h2>
+Here are 3dsmax4/5 scripts which export meshes and skeletons.<br>
+<br>
+<h3>Tutorials</h3>
+<ul>
+  <li> <b>you can find a mesh tutorial <a
+ href="tutorials/skateboard/index.html">here</a>.</b></li>
+  <li> <b>you can find a skeleton tutorial <a
+ href="tutorials/skeleton/index.html">here</a>.</b></li>
+</ul>
+<h3>XMLConverter (OgreXMLConverter)</h3>
+3ds scripts write .xml files. So, in order to have .mesh and .skeleton
+files, XMLConverter.exe should be used.
+It's in Tools/XMLConverter/bin/debug directory.
+<h4>Issues</h4>
+XMLConverter doesn't find the skeleton file when you try to convert
+your mesh file even if it has been created. So there is
+an eror message, but don't care: it works well when an OGRE application
+uses it.
+<h3>Scripts Features</h3>
+<ul>
+  <li> exports meshes.</li>
+  <li> exports bones, vertex assignements and bones animation, using
+the skin modifier.</li>
+  <li> deals with Physique modifier and Biped.</li>
+  <li> exports multi-sub object and Standard materials.</li>
+</ul>
+<h3>How to use the script</h3>
+<ul>
+  <li> <u>Exporting Meshes:</u>
+    <ul>
+      <li> You can choose to export colour information and/or texture
+information. <br>
+        <b>CAUTION: </b>Colour information is not complete. This
+information is not used during rendering and values exported are just
+RGBA (25500255 = 255 0 0 255)</li>
+      <li> You are able to export meshes which are made up of several
+submeshes. Behaviour is unknown if different submeshes are linked to a
+skeleton (it has not been tested but should works). </li>
+    </ul>
+  </li>
+  <li> <u>Exporting skeletons:</u>
+    <ul>
+      <li> There is sometimes a problem with mapping. Try to had a UVW
+map modifier.<br>
+      </li>
+      <li> <b>CAUTION:</b> Always create new bones as children of
+another AND don't unlink and re-link a bone. For example, if you have
+created a leg, copy all the bones and then use position controller in a
+track view to move it and so get the other leg. </li>
+      <li> <b>AND</b> : Don't use mirror when you create your bones
+because results are strange. </li>
+      <li> <b>Biped</b> If you move or rotate the biped rootObject
+during your animation, add keys to the pelvis too at the same frames</li>
+    </ul>
+  </li>
+  <li> <u>Exporting materials:</u>
+    <ul>
+      <li> Only Multi-Sub Object materials can be exported. </li>
+      <li> Press the pick button, choose your material (for example
+from mtlEditor section), and choose "Instance" in order to avoid
+garabages. </li>
+    </ul>
+  </li>
+  <br>
+</ul>
+<h3>Troubleshooting</h3>
+[Thanks to gfactor for these tips]<br>
+<ol>
+  <li><span class="postbody">If the XML converter complains about
+missing bones, then the bones
+probably do not have any vertices assiged to it, and the converter
+'optimises' it by simply not exporting them. So make sure all bones
+have at least one vertex weight.</span></li>
+  <li>If the XML converter complains about Bip01 missing, then you
+will probably need to convert your Physiqued biped to a Skinned biped.
+Don't ask me why but once we did this our models exported without
+problems. The really weird thing is that one of our models exported
+fine about 2 months ago (physiqued) but then failed to work again until
+we converted it to skinnned... weird. The good news is that there is a
+max plugin that does this, which can be found at <a
+ href="http://sparks.discreet.com/downloads/" target="_blank">http://sparks.discreet.com/downloads/</a>&nbsp;</li>
+  <li>If you have a mesh with multiple animations, all the animations
+MUST be based on the same pose because all Ogre does when animating is
+rotate the bones based on the binding pose (does not store positions).
+The easiest way we've managed to do this is to simply export say... an
+idle animation as our first animation (using that pose as the base
+skeleton file), then for each additional animation we import frame 0 of
+Idle into max and start animating our actual animation from frame 1
+onwards. When you export the animation.... export from frame 1 onwards
+(do not export frame 0). This ensures that all animations will be
+rotated from the same reference pose. Then simply edit the XML files
+and cut / paste all additional animations into the idle.skeleton
+file&nbsp;</li>
+  <li>Animations can do weird things unless you
+flatten the footsteps (creating a key frame for every frame)&nbsp;</li>
+  <li>If the XML converter says that it cannot find the *.skeleton
+file you are trying to convert (despite well.... the skeleton file
+being there) then the XML file is corrupt. One of our programmers
+looked through the XML file and found multiple &lt;animations&gt; tags
+(note: not &lt;animation&gt;) which of course is bad.&nbsp;</li>
+  <li>If you get a weird error that actually breaks in the comments of
+the Max Script when exporting...
+    <br>
+    <pre>" Type error: Call needs function or class, got: undefined "
+    </pre>
+then the object you are exporting (the body...not the bones) has
+spaces in its name. For example.... enemy_NPC will export... but enemy
+NPC will cause the above error. As far as I can tell... bone names with
+spaces are fine... but the actual mesh must NOT have spaces in it.
+    <br>
+  </li>
+</ol>
+<span class="postbody"></span><br>
+<ul>
+</ul>
+If you want to know a little more about <a href="dev.html">how scripts
+have been written...</a> <br>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                      "http://www.w3.org/TR/html40/loose.dtd">
+<HTML>
+<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people <dev@texi2html.cvshome.org>
+Send bugs and suggestions to <users@texi2html.cvshome.org>
+
+-->
+<HEAD>
+<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Unified High-level Programs</TITLE>
+
+<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Unified High-level Programs">
+<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Unified High-level Programs">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.66">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC111"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_21.html#SEC105"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_23.html#SEC112"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<H3> 3.1.8 Unified High-level Programs </H3>
+<!--docid::SEC111::-->
+
+As mentioned above, it can often be useful to write both HLSL and GLSL programs to specifically target each platform, but if you do this via multiple material techniques this can cause a bloated material definition when the only difference is the program language. Well, there is another option. You can 'wrap' multiple programs in a 'unified' program definition, which will automatically choose one of a series of 'delegate' programs depending on the rendersystem and hardware support.
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>vertex_program myVertexProgram unified
+{
+	delegate realProgram1
+	delegate realProgram2
+	... etc
+}
+</pre></td></tr></table>This works for both vertex and fragment programs, and you can list as many delegates as you like - the first one to be supported by the current rendersystem &amp; hardware will be used as the real program. This is almost like a mini-technique system, but for a single program and with a much tighter purpose. You can only use this where the programs take all the same inputs, particularly textures and other pass / sampler state. Where the only difference between the programs is the language (or possibly the target in HLSL - you can include multiple HLSL programs with different targets in a single unified program too if you want, or indeed any number of other high-level programs), this can become a very powerful feature. For example, without this feature here's how you'd have to define a programmable material which supported HLSL and GLSL:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>vertex_program myVertexProgramHLSL hlsl
+{
+	source prog.hlsl
+	entry_point main_vp
+	target vs_2_0
+}
+fragment_program myFragmentProgramHLSL hlsl
+{
+	source prog.hlsl
+	entry_point main_fp
+	target ps_2_0
+}
+vertex_program myVertexProgramGLSL glsl
+{
+	source prog.vert
+}
+fragment_program myFragmentProgramGLSL glsl
+{
+	source prog.frag
+	default_params
+	{
+		param_named tex int 0
+	}
+}
+material SupportHLSLandGLSLwithoutUnified
+{
+	// HLSL technique
+	technique
+	{
+		pass
+		{
+			vertex_program_ref myVertexProgramHLSL
+			{
+				param_named_auto worldViewProj world_view_proj_matrix
+				param_named_auto lightColour light_diffuse_colour 0
+				param_named_auto lightSpecular light_specular_colour 0
+				param_named_auto lightAtten light_attenuation 0
+			}
+			fragment_program_ref myFragmentProgramHLSL
+			{
+			}
+		}
+	}
+	// GLSL technique
+	technique
+	{
+		pass
+		{
+			vertex_program_ref myVertexProgramHLSL
+			{
+				param_named_auto worldViewProj world_view_proj_matrix
+				param_named_auto lightColour light_diffuse_colour 0
+				param_named_auto lightSpecular light_specular_colour 0
+				param_named_auto lightAtten light_attenuation 0
+			}
+			fragment_program_ref myFragmentProgramHLSL
+			{
+			}
+		}
+	}
+}
+</pre></td></tr></table>And that's a really small example. Everything you added to the HLSL technique, you'd have to duplicate in the GLSL technique too. So instead, here's how you'd do it with unified program definitions:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>vertex_program myVertexProgramHLSL hlsl
+{
+	source prog.hlsl
+	entry_point main_vp
+	target vs_2_0
+}
+fragment_program myFragmentProgramHLSL hlsl
+{
+	source prog.hlsl
+	entry_point main_fp
+	target ps_2_0
+}
+vertex_program myVertexProgramGLSL glsl
+{
+	source prog.vert
+}
+fragment_program myFragmentProgramGLSL glsl
+{
+	source prog.frag
+	default_params
+	{
+		param_named tex int 0
+	}
+}
+// Unified definition
+vertex_program myVertexProgram unified
+{
+	delegate myVertexProgramGLSL
+	delegate myVertexProgramHLSL
+}
+fragment_program myFragmentProgram unified
+{
+	delegate myFragmentProgramGLSL
+	delegate myFragmentProgramHLSL
+}
+material SupportHLSLandGLSLwithUnified
+{
+	// HLSL technique
+	technique
+	{
+		pass
+		{
+			vertex_program_ref myVertexProgram
+			{
+				param_named_auto worldViewProj world_view_proj_matrix
+				param_named_auto lightColour light_diffuse_colour 0
+				param_named_auto lightSpecular light_specular_colour 0
+				param_named_auto lightAtten light_attenuation 0
+			}
+			fragment_program_ref myFragmentProgram
+			{
+			}
+		}
+	}
+}
+</pre></td></tr></table>At runtime, when myVertexProgram or myFragmentProgram are used, OGRE automatically picks a real program to delegate to based on what's supported on the current hardware / rendersystem. If none of the delegates are supported, the entire technique referencing the unified program is marked as unsupported and the next technique in the material is checked fro fallback, just like normal. As your materials get larger, and you find you need to support HLSL and GLSL specifically (or need to write multiple interface-compatible versions of a program for whatever other reason), unified programs can really help reduce duplication.
+
+
+<A NAME="Using Vertex and Fragment Programs in a Pass"></A>
+<HR SIZE=1>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_21.html#SEC105"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_23.html#SEC112"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>
+<FONT SIZE="-1">
+This document was generated
+by <I>steve</I> on <I>June 22 2007</I>
+using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
+</FONT>
+
+</BODY>
+</HTML>

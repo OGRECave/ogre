@@ -1,0 +1,147 @@
+format 29
+
+packagecanvas 128351 
+  package_ref 128095 // Scene Management
+    xyzwh 206 57 2000 328 229
+classcanvas 128479 class_ref 128095 // SceneManager
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color yellow
+  xyz 325 106 2005
+packagecanvas 128607 
+  package_ref 128223 // Rendering
+    xyzwh 393 299 2000 307 173
+classcanvas 128735 class_ref 128223 // MovableObject
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color yellow
+  xyz 230 163 2005
+classcanvas 128863 class_ref 128351 // RenderSystem
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color blue
+  xyz 577 397 2005
+classcanvas 128991 class_ref 128479 // Renderable
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color blue
+  xyz 433 342 2005
+classcanvas 129119 class_ref 128607 // Root
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode natural drawing_language default show_context_mode default auto_label_position default shadow default
+  color green
+  xyz 394 7 2005
+classcanvas 129247 class_ref 128735 // ResourceGroupManager
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color lightred
+  xyz 82 340 2005
+packagecanvas 129375 
+  package_ref 128351 // Resource Management
+    xyzwh 69 297 2000 314 172
+classcanvas 129503 class_ref 128863 // HardwareBufferManager
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color blue
+  xyz 409 393 2010
+classcanvas 129631 class_ref 128991 // ResourceManager
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color lightred
+  xyz 87 409 2005
+classcanvas 129759 class_ref 129119 // ArchiveFactory
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color lightred
+  xyz 239 425 2005
+classcanvas 129887 class_ref 129247 // Entity
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color yellow
+  xyz 213 224 2005
+classcanvas 130527 class_ref 129503 // Mesh
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color lightred
+  xyz 233 342 2005
+classcanvas 130655 class_ref 129631 // Texture
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color lightred
+  xyz 299 343 2005
+classcanvas 130783 class_ref 129759 // Camera
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color yellow
+  xyz 268 225 2005
+classcanvas 131039 class_ref 129887 // Light
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color yellow
+  xyz 333 226 2005
+packagecanvas 131295 
+  package_ref 128479 // Plugin
+    xyzwh 602 92 2000 166 97
+classcanvas 131423 class_ref 130015 // GLRenderSystem
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color lightgray
+  xyz 546 552 2005
+classcanvas 131679 class_ref 130143 // OctreeSceneManager
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color lightgray
+  xyz 621 141 2005
+classcanvas 131935 class_ref 130271 // CustomArchiveFactory
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color lightgray
+  xyz 216 551 2010
+classcanvas 132191 class_ref 130399 // CustomMovable
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color lightgray
+  xyz 640 248 2015
+packagecanvas 132447 
+  package_ref 128479 // Plugin
+    xyzwh 406 510 2000 257 96
+packagecanvas 132575 
+  package_ref 128479 // Plugin
+    xyzwh 612 204 2009 173 88
+packagecanvas 132703 
+  package_ref 128479 // Plugin
+    xyzwh 193 514 2009 181 80
+classcanvas 132831 class_ref 130527 // GLTexture
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color lightgray
+  xyz 444 548 2005
+classcanvas 133087 class_ref 130655 // RenderWindow
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color blue
+  xyz 557 344 2010
+classcanvas 133215 class_ref 130783 // Material
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color yellow
+  xyz 420 226 2009
+classcanvas 134623 class_ref 130911 // GpuProgram
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  color lightred
+  xyz 245 386 2010
+classcanvas 134751 class_ref 131039 // SceneNode
+  draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+  xyz 433 155 2005
+relationcanvas 130143 relation_ref 128095 // <generalisation>
+  from ref 129887 z 2004 to ref 128735
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+relationcanvas 130911 relation_ref 128351 // <generalisation>
+  from ref 130783 z 2004 to ref 128735
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+relationcanvas 131167 relation_ref 128479 // <generalisation>
+  from ref 131039 z 2004 to ref 128735
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+relationcanvas 131551 relation_ref 128607 // <generalisation>
+  from ref 131423 z 2004 to ref 128863
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+relationcanvas 131807 relation_ref 128735 // <generalisation>
+  from ref 131679 z 2004 to ref 128479
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+relationcanvas 132063 relation_ref 128863 // <generalisation>
+  from ref 131935 z 2004 to ref 129759
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+relationcanvas 132319 relation_ref 128991 // <generalisation>
+  from ref 132191 z 2004 to ref 128735
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+relationcanvas 132959 relation_ref 129119 // <generalisation>
+  from ref 132831 z 2004 to ref 130655
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end

@@ -1,0 +1,6 @@
+Several 3DS Max exporters for OGRE are actually maintained separately from the OGRE repository:
+
+LEXIExporter: http://sourceforge.net/projects/lexiexporter
+OgreMax: http://www.gameprojects.com/project/?id=ceba21965d
+oFusion: http://www.ofusiontechnologies.com/
+

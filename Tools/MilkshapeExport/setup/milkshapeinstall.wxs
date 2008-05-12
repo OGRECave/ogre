@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2003/01/wi'>
+
+	<Product 
+		Name='OGRE Milkshape Exporter' 
+		Id='CFE34964-1DAB-43b3-9540-07A0B77CC6FB'
+		Language='1033' Codepage='1252' 
+		Version='1.5.0' Manufacturer='OGRE Project'>
+
+    	<Package Id='????????-????-????-????-????????????' Keywords='Installer'
+      		Description="OGREMilkshape Exporter Installer"
+			Comments='Milkshape Exporter for OGRE' Manufacturer='OGRE Project'
+      		InstallerVersion='100' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
+
+		<Media Id='1' Cabinet='1.cab' EmbedCab='yes' DiskPrompt="CD 1" />
+		<Property Id='DiskPrompt' Value="OGRE Milkshape Exporter Installer [1]" />
+
+		<Directory Id='TARGETDIR' Name='SourceDir'>
+			<!-- VC runtimes -->
+			<Merge Id='CRT' Language='0' src='C:\Program Files\Common Files\Merge Modules\microsoft_vc80_crt_x86.msm' DiskId='1' />
+			<Merge Id='CRT Policy' Language='0' src='C:\Program Files\Common Files\Merge Modules\policy_8_0_Microsoft_VC80_CRT_x86.msm' DiskId='1' />
+			<!-- Exporter files -->
+			<Directory Id='INSTALLDIR' Name='Milkshpe' LongName='Milkshape'>
+				<Component Id='PluginDLLComp' Guid='30C1A63B-6BB4-4e14-A0B3-F04DABD107BB'>
+					<File Id='ExporterDLL' Name='msOGRE.dll' LongName="msOGREExporter.dll" DiskId='1'
+						src='..\bin\release\msOGREExporter.dll' Vital='yes' />
+				</Component>
+				<Component Id='OgreMainComp' Guid='D6E2E086-01E9-427b-8B4A-59DE2801B5A8'>
+					<File Id='OgreMainDLL' Name='OgreMain.dll' DiskId='1'
+						src='..\..\..\Samples\Common\bin\release\OgreMain.dll' Vital='yes' />
+				</Component>
+			</Directory>
+			<!-- Docs -->
+			<Directory Id="ProgramFilesFolder" Name="PFiles">
+				<Directory Id="OGREFolder" Name="OGRE">
+					<Directory Id="OGREMILKSHAPEFOLDER" Name="Milkshpe" LongName="Milkshape Exporter">
+						<Component Id="DocsComp" Guid="5FE6ADE1-C902-4d63-93D7-BEE618757055">
+							<File Id="ReadmeFile" Name="Readme.htm" DiskId="1"
+								src="..\ReadMe.html" Vital="no">
+								<Shortcut Id="ReadmeShortcut" Directory="OGREMilkshapeProgMenuDir" Name="Readme"/>
+							</File>								
+						</Component>
+					</Directory>
+				</Directory>
+			</Directory>
+			<!-- Start menu -->
+			<Directory Id="ProgramMenuFolder" Name="PMenu" LongName="Programs">
+				<Directory Id="OGREProgramMenuDir" Name='OGRE'>
+					<Directory Id="OGREMilkshapeProgMenuDir" Name="Milkshpe" LongName="Milkshape Exporter"/>
+				</Directory>
+			</Directory>
+			
+
+		</Directory>
+
+		<Feature Id='ExporterFeature' Level='1' ConfigurableDirectory="INSTALLDIR" Title='Exporter' 
+			Description='The main exporter files; THIS MUST BE INSTALLED IN YOUR MILKSHAPE FOLDER.' 
+			Absent='disallow' AllowAdvertise='no'>
+			<ComponentRef Id='PluginDLLComp' />
+			<ComponentRef Id='OgreMainComp' />
+			<MergeRef Id='CRT' />
+			<MergeRef Id='CRT Policy' />
+			<Condition Level="0">FILEEXISTS</Condition>
+		</Feature>
+		<Feature Id="DocsFeature" Level='1' ConfigurableDirectory="OGREMILKSHAPEFOLDER" Title='Documentation'
+			AllowAdvertise='no'>
+			<ComponentRef Id="DocsComp" />
+		</Feature>
+		<!-- enable UI -->
+		<UIRef Id="WixUI" />
+	</Product>
+</Wix>
+
+	
+

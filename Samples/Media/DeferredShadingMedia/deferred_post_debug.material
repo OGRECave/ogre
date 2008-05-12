@@ -1,0 +1,172 @@
+material DeferredShading/Post/ShowNormal
+{
+    technique
+    {
+    	pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			fragment_program_ref DeferredShading/post/hlsl/ShowNormal_ps
+			{
+			}
+			vertex_program_ref DeferredShading/post/hlsl/vs
+			{
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+			texture_unit
+			{
+				tex_coord_set 1
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+	technique
+    {
+    	pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			fragment_program_ref DeferredShading/post/glsl/ShowNormal_ps
+			{
+			}
+			vertex_program_ref DeferredShading/post/glsl/vs
+			{
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+			texture_unit
+			{
+				tex_coord_set 1
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+}
+
+material DeferredShading/Post/ShowDS
+{
+    technique
+    {
+    	pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			fragment_program_ref DeferredShading/post/hlsl/ShowDS_ps
+			{
+			}
+			vertex_program_ref DeferredShading/post/hlsl/vs
+			{
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+			texture_unit
+			{
+				tex_coord_set 1
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+	technique
+    {
+    	pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			fragment_program_ref DeferredShading/post/glsl/ShowDS_ps
+			{
+			}
+			vertex_program_ref DeferredShading/post/glsl/vs
+			{
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+			texture_unit
+			{
+				tex_coord_set 1
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+}
+material DeferredShading/Post/ShowColour
+{
+    technique
+    {
+    	pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			fragment_program_ref DeferredShading/post/hlsl/ShowColour_ps
+			{
+			}
+			vertex_program_ref DeferredShading/post/hlsl/vs
+			{
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+			texture_unit
+			{
+				tex_coord_set 1
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+	technique
+    {
+    	pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			fragment_program_ref DeferredShading/post/glsl/ShowColour_ps
+			{
+			}
+			vertex_program_ref DeferredShading/post/glsl/vs
+			{
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+			texture_unit
+			{
+				tex_coord_set 1
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+}

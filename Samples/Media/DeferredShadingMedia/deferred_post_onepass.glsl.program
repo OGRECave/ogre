@@ -1,0 +1,27 @@
+// Post processors
+
+vertex_program DeferredShading/post/glsl/vs glsl
+{
+	source DeferredShading/post/glsl/vs.glsl
+	default_params
+	{
+		param_named_auto invProj inverse_projection_matrix
+	}
+}
+fragment_program DeferredShading/post/glsl/SinglePass_ps glsl
+{
+	source DeferredShading/post/glsl/SinglePass_ps.glsl
+	default_params
+	{
+		param_named_auto proj projection_matrix
+		param_named_auto ambientColor ambient_light_colour 0
+		param_named_auto lightPos0 light_position_view_space 0
+		param_named_auto lightDiffuseColor0 light_diffuse_colour 0
+		param_named_auto lightSpecularColor0 light_specular_colour 0
+		param_named_auto lightPos1 light_position_view_space 1
+		param_named_auto lightDiffuseColor1 light_diffuse_colour 1
+		param_named_auto lightSpecularColor1 light_specular_colour 1
+		param_named tex0 int 0
+		param_named tex1 int 1
+	}
+}

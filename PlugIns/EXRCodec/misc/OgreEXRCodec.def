@@ -1,0 +1,4 @@
+LIBRARY Plugin_EXRCodec
+EXPORTS	
+	dllStartPlugin
+	dllStopPlugin

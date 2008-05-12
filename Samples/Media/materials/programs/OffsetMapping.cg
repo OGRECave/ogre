@@ -1,0 +1,84 @@
+/* Bump mapping with Parallax offset vertex program 
+   In this program, we want to calculate the tangent space light end eye vectors 
+   which will get passed to the fragment program to produce the per-pixel bump map 
+   with parallax offset effect. 
+*/
+
+#include "Common.cg"
+
+float4 lightPosition;
+float3 eyePosition;
+float4x4 worldViewProj;
+
+float3 lightDiffuse;
+float3 lightSpecular;
+float4 scaleBias;
+sampler2D normalHeightMap;
+sampler2D diffuseMap;
+
+struct app2vertOffsetMapping
+{
+    float4 position	: POSITION;
+    float3 normal	: NORMAL;
+    float2 uv		: TEXCOORD0;
+    float3 tangent      : TANGENT0;
+};
+
+struct vert2fragOffsetMapping
+{
+    float4 position     : POSITION;
+    float2 uv		: TEXCOORD0;
+    float3 lightDir     : TEXCOORD1;
+    float3 eyeDir       : TEXCOORD2;
+    float3 halfAngle    : TEXCOORD3;
+};
+
+/* Vertex program that moves light and eye vectors into texture tangent space at vertex */ 
+
+vert2fragOffsetMapping main_vp(app2vertOffsetMapping IN) 
+{
+    vert2fragOffsetMapping OUT;
+
+    // calculate output position 
+    OUT.position = mul(worldViewProj, IN.position); 
+
+    // pass the main uvs straight through unchanged 
+    OUT.uv = IN.uv; 
+
+    half3 lightDir = getLightDirection(lightPosition, IN.position);
+    half3 eyeDir = getEyeDirection(eyePosition, IN.position);
+    
+    // Form a rotation matrix out of the vectors 
+    half3x3 TBN = getTBNMatrix(IN.tangent, IN.normal); 
+    
+    // Transform the light vector according to this matrix 
+    OUT.lightDir = normalize(mul(TBN, lightDir)); 
+    OUT.eyeDir = normalize(mul(TBN, eyeDir)); 
+
+    OUT.halfAngle = normalize(OUT.eyeDir + OUT.lightDir);
+
+    return OUT;
+}
+
+outPixel main_fp(vert2fragOffsetMapping IN)
+{
+    outPixel OUT;
+
+    half displacement = getDisplacement(normalHeightMap, IN.uv, scaleBias.x, scaleBias.y);
+	
+    float3 uv2 = float3(IN.uv, 1);
+	
+    // calculate the new tex coord to use for normal and diffuse
+    float2 newTexCoord = ((IN.eyeDir * displacement) + uv2).xy;
+	
+    // get the new normal and diffuse values
+    half3 normal = getNormalMapVector(normalHeightMap, newTexCoord);
+    half3 diffuse = tex2D(diffuseMap, newTexCoord).xyz;
+	
+    half3 specular = getSpecularComponent(normal, IN.halfAngle, lightSpecular, 32);
+    half3 col = diffuse * getLightingComponent(normal, IN.lightDir, lightDiffuse) + specular;
+		
+    OUT.colour = float4(col, 1);
+
+    return OUT;
+}

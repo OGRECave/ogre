@@ -1,0 +1,86 @@
+
+material Examples/DynaTest
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture DynaTex 2d
+			}
+			depth_write off
+			scene_blend alpha_blend
+			lighting off
+		}
+	}
+}
+
+
+material Examples/DynaTest2
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture DynaTex 2d
+			}
+			diffuse 0.8 0.8 0.8
+			specular 0.7 0.7 0.7 40.0
+			ambient 0.5 0.5 0.5
+		}
+	}
+}
+
+material Examples/DynaTest3
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture DynaTex 2d
+			}
+			diffuse 0.2 0.8 0.8
+			specular 0.4 0.7 0.7 30.0
+			ambient 0.2 0.5 1.0
+			depth_write off
+			scene_blend alpha_blend
+		}
+	}
+}
+
+material Examples/DynaTest4
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture DynaTex 2d
+			}
+			diffuse 0.8 0.8 0.8
+			specular 0.7 0.7 0.4 20.0
+			ambient 1.0 0.5 0.2
+		}
+	}
+}
+
+material Examples/VTDarkStuff
+{
+	technique
+	{
+		pass
+		{
+			diffuse 0.0 0.0 0.0
+			ambient 0.1 0.1 0.15
+			cull_hardware none
+			lighting on
+		}
+		
+	}
+}

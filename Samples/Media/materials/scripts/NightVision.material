@@ -1,0 +1,49 @@
+fragment_program Ogre/Compositor/NightVisionFP cg
+{
+	source NightVisionFP.cg
+	entry_point NightVision_ps
+	profiles ps_2_0 arbfp1
+	
+	default_params
+	{
+		param_named lum float4 0.30 0.59 0.11 0.0
+		param_named_auto time time_0_1 1
+	}
+}
+
+material Ogre/Compositor/NightVision
+{
+    technique
+    {
+
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
+			{
+			}
+
+			fragment_program_ref Ogre/Compositor/NightVisionFP
+			{
+			
+			}
+
+			texture_unit RT
+			{
+                		tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+			
+			texture_unit noise
+			{
+				texture Random3D.dds 3d
+				tex_address_mode wrap
+				tex_coord_set 1
+			}
+		}
+	}
+}

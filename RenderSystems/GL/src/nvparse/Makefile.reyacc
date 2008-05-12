@@ -1,0 +1,19 @@
+MAIN=../libnvparse.a
+
+$(MAIN):
+	-bison -d -o _ps1.0_parser.c ps1.0_grammar.y
+	-mv -f _ps1.0_parser.c _ps1.0_parser.cpp
+	-bison -d -o _rc1.0_parser.c  rc1.0_grammar.y
+	-mv -f _rc1.0_parser.c _rc1.0_parser.cpp
+	-bison -d -o _ts1.0_parser.c  ts1.0_grammar.y
+	-mv -f _ts1.0_parser.c _ts1.0_parser.cpp
+	-bison -d -o _vs1.0_parser.c  vs1.0_grammar.y
+	-mv -f _vs1.0_parser.c _vs1.0_parser.cpp
+	-flex -o_rc1.0_lexer.cpp rc1.0_tokens.l
+	-flex -o_ps1.0_lexer.cpp ps1.0_tokens.l
+	-flex -o_ts1.0_lexer.cpp ts1.0_tokens.l
+	-flex -o_vs1.0_lexer.cpp vs1.0_tokens.l
+
+all: $(MAIN)
+
+install:

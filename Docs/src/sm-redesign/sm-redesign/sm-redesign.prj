@@ -1,0 +1,436 @@
+format 30
+"sm-redesign"
+  revision 1
+  modified_by 12 "Steve"
+
+
+  
+  // class settings
+  default_attribute_visibility protected default_relation_visibility protected default_operation_visibility public
+  //class diagram settings
+  draw_all_relations yes hide_attributes no hide_operations no show_members_full_definition no show_members_visibility no show_parameter_dir yes package_name_in_tab no class_drawing_mode natural drawing_language uml show_context_mode no auto_label_position yes shadow yes
+  //use case diagram settings
+  package_name_in_tab no show_context no auto_label_position yes draw_all_relations yes shadow yes
+  //sequence diagram settings
+  show_full_operations_definition no write_horizontally yes drawing_language uml draw_all_relations yes shadow yes
+  //collaboration diagram settings
+  show_full_operations_definition no show_hierarchical_rank no write_horizontally yes drawing_language uml package_name_in_tab no show_context no draw_all_relations yes shadow yes
+  //object diagram settings
+   write_horizontally yes package_name_in_tab no show_context no auto_label_position yes draw_all_relations yes shadow yes
+  //component diagram settings
+  package_name_in_tab no show_context no auto_label_position yes draw_all_relations yes shadow yes
+  draw_component_as_icon no show_component_req_prov no show_component_rea no
+  //deployment diagram settings
+  package_name_in_tab no show_context no write_horizontally yes auto_label_position yes draw_all_relations yes shadow yes
+  draw_component_as_icon no show_component_req_prov no show_component_rea no
+  //state diagram settings
+  package_name_in_tab no show_context no auto_label_position yes write_trans_label_horizontally yes show_trans_definition no draw_all_relations yes shadow yes
+  show_activities yes region_horizontally yes drawing_language uml
+  //activity diagram settings
+  package_name_in_tab no show_context no show_opaque_action_definition no auto_label_position yes write_flow_label_horizontally no draw_all_relations yes shadow yes
+  show_infonote yes drawing_language uml
+  
+  class_color yellow duration_color transparent continuation_color gray note_color blue fragment_color transparent subject_color transparent usecase_color yellow package_color transparent component_color green artifact_color green deploymentnode_color gray state_color yellow stateaction_color transparent activity_color transparent activityregion_color transparent activityaction_color transparent parameterpin_color white 
+  font_size 8
+  diagram_format A4
+
+  mark_for_import
+  
+  classview 128012 "Class view2"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default show_parameter_dir default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default drawing_language default draw_all_relations default shadow default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default
+    
+    classdiagram 128012 "Static Diagram"
+      draw_all_relations default hide_attributes default hide_operations default show_members_full_definition default show_members_visibility default show_parameter_dir default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default shadow default
+      size A4
+    end
+
+    class 128012 "TransformSource"cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "Provides a generic source of world transform information. This class is responsible
+for cacheing a world transform for one or more MovableObject instances. It must 
+be able to update its own transform based on a frame time (which may involve 
+some interpolation / extrapolation in some cases), and then provide that cached
+transform again one or more times during the render loop without recalculation.
+"
+      classrelation 128012 // <association>
+	relation 128012 ----
+	  a role_name "" multiplicity "*" protected
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	    classrelation_ref 128012 // <association>
+	  b role_name "" multiplicity "0..1" protected
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	    classrelation_ref 128140 // <association>
+      end
+
+      attribute 128012 "cachedTransform"
+	protected explicit_type "Matrix4"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	idl_decl ""
+      end
+
+      attribute 128140 "frameLastUpdated"
+	protected explicit_type ""
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	idl_decl ""
+      end
+
+      classrelation 128396 // <unidirectional association>
+	relation 128268 --->
+	  a role_name "" multiplicity "1" protected
+	    cpp default "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+"
+	    classrelation_ref 128396 // <unidirectional association>
+	  b parent class_ref 129292 // Locality
+      end
+    end
+
+    class 128140 "MovableObject"cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 128140 // <association>
+	relation_ref 128012 // <association>
+      end
+    end
+
+    class 128268 "SceneNode"cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 128268 // <generalisation>
+	relation 128140 ---|>
+	  a public
+	    cpp default "${type}"
+	    classrelation_ref 128268 // <generalisation>
+	  b parent class_ref 128012 // TransformSource
+      end
+    end
+
+    class 128396 "AbsoluteTime"cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class measures absolute time from a given epoch. The meaning of this time 
+is application specific but it might mean time since the application started, or might
+be relative to an external epoch. The main point is that this time value must stay
+precise even when very large values are used, which may also mean that it is 
+more expensive to calculate than RelativeTime."
+    end
+
+    class 128524 "RelativeTime"cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This type represents relative time since a previous event. It is assumed that this
+time value will not be large in proportion to the precision required and thus it will
+be cheaper to manipulate than AbsoluteTime."
+    end
+
+    sequencediagram 128140 "World Tick (using SceneNode)"
+      show_full_operations_definition default write_horizontally default drawing_language default draw_all_relations default shadow default
+      size A4
+    end
+
+    sequencediagram 128268 "Frame World Update Tick (SceneNode use)"
+      show_full_operations_definition default write_horizontally default drawing_language default draw_all_relations default shadow default
+      size A4
+    end
+
+    class 128652 "stubApplicationCode"cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 128780 "EventQueue"cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 128908 "stubRenderLoop"cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 129036 "TransformUpdater"cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 129164 "LocalityUpdater"cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 129292 "Locality"cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 128268 "origin"
+	protected explicit_type "Vector3"
+	cpp_decl "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+"
+	java_decl ""
+	idl_decl ""
+      end
+    end
+
+    sequencediagram 128396 "World Tick (multithreaded locking)"
+      show_full_operations_definition default write_horizontally default drawing_language default draw_all_relations default shadow default
+      size A4
+    end
+
+    class 129420 "CustomTransformSource"cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 129548 "CustomSceneGraph"cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    activity 128012 "Threaded World Tick"
+      activitydiagram 128524 "Immediate & Locking"
+	package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+	show_infonote default drawing_language default
+	size A4
+      end
+
+      activitynode 128012 initial ""
+	flow 128012 "<flow>"
+	  on activitynode_ref 128268 // fork
+	end
+      end
+
+      activitynode 128268 fork ""
+	flow 128140 "<flow>"
+	  on activityaction_ref 128012 // activity action Update World
+	end
+
+	flow 128908 "<flow>"
+	  on activityaction_ref 128396 // activity action Process Events
+	end
+      end
+
+      activityaction 128012 "Update World"
+	opaque_action
+	simplerelation 128012
+	  -_->
+	    on activityobject_ref 128012 // activity object WorldState
+	end
+
+	flow 128268 "<flow>"
+	  on activityaction_ref 128268 // activity action Queue TransformEvent with data
+	end
+
+	flow 129676 "<flow>"
+	  on activityaction_ref 128652 // activity action Queue Custom Move Event
+	end
+
+	flow 130316 "<flow>"
+	  on activityaction_ref 128268 // activity action Queue TransformEvent with data
+	end
+      end
+
+      activityobject 128012 "WorldState"
+	 explicit_type ""
+	unordered 
+      end
+
+      activityaction 128140 "Update TransformSource"
+	opaque_action
+	flow 129036 "<flow>"
+	  on activityaction_ref 128524 // activity action Render
+	end
+
+	simplerelation 128396
+	  -_->
+	    on activityobject_ref 128012 // activity object WorldState
+	end
+      end
+
+      activityaction 128268 "Queue TransformEvent with data"
+	opaque_action
+	simplerelation 128140
+	  -_->
+	    on activityobject_ref 128140 // activity object EventQueue
+	end
+
+	flow 128396 "<flow>"
+	  on activitynode_ref 128396 // decision
+	end
+
+	flow 130188 "<flow>"
+	  on activitynode_ref 128396 // decision
+	end
+      end
+
+      activityobject 128140 "EventQueue"
+	 explicit_type ""
+	unordered 
+      end
+
+      activitynode 128396 decision ""
+	flow 128524 "<flow>"
+	  on activitynode_ref 128652 // join
+	end
+
+	flow 128780 "<flow>"
+	  on activityaction_ref 128012 // activity action Update World
+	end
+      end
+
+      activitynode 128524 merge ""
+      end
+
+      activitynode 128652 join ""
+	flow 128652 "<flow>"
+	  on activitynode_ref 128780 // activity_final
+	end
+      end
+
+      activitynode 128780 activity_final ""
+      end
+
+      activityaction 128396 "Process Events"
+	opaque_action
+	simplerelation 128268
+	  -_->
+	    on activityobject_ref 128140 // activity object EventQueue
+	end
+
+	flow 129164 "<flow>"
+	  on activityaction_ref 128140 // activity action Update TransformSource
+	end
+
+	flow 129932 "<flow>"
+	  on activityaction_ref 128780 // activity action Update World View
+	end
+      end
+
+      activityaction 128524 "Render"
+	opaque_action
+	flow 129292 "<flow>"
+	  on activitynode_ref 128908 // decision
+	end
+      end
+
+      activitynode 128908 decision ""
+	flow 129420 "<flow>"
+	  on activitynode_ref 128652 // join
+	end
+
+	flow 129548 "<flow>"
+	  on activityaction_ref 128396 // activity action Process Events
+	end
+      end
+
+      activitydiagram 128652 "Deferred & Lock-free"
+	package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations no shadow default
+	show_infonote default drawing_language default
+	size A4
+      end
+
+      activityaction 128652 "Queue Custom Move Event"
+	opaque_action
+	flow 129804 "<flow>"
+	  on activityaction_ref 128268 // activity action Queue TransformEvent with data
+	end
+
+	simplerelation 128524
+	  -_->
+	    on activityobject_ref 128140 // activity object EventQueue
+	end
+      end
+
+      activityaction 128780 "Update World View"
+	opaque_action
+	flow 130060 "<flow>"
+	  on activityaction_ref 128140 // activity action Update TransformSource
+	end
+      end
+    end
+
+  end
+end

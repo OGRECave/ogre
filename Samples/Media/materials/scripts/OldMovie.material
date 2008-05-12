@@ -1,0 +1,67 @@
+fragment_program Ogre/Compositor/OldMovieFP cg
+{
+	source OldMovieFP.cg
+	entry_point OldMovie_ps
+	profiles ps_2_0 arbfp1
+}
+
+material Ogre/Compositor/OldMovie
+{
+    technique
+    {
+
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
+			{
+			}
+
+			fragment_program_ref Ogre/Compositor/OldMovieFP
+			{
+				param_named_auto time_cycle_period time 20
+				param_named flicker float 0.4
+				param_named DirtFrequency float 0.0005
+				param_named luminance float3 0.30 0.59 0.11
+				param_named frameJitter float 0.004
+				param_named lumiShift float 0.03
+			}
+
+			texture_unit RT
+			{
+                tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+
+			texture_unit SplotchesTx
+			{
+				texture 8x8PagesSplotches2.png 2d
+                tex_coord_set 1
+				tex_address_mode wrap
+				filtering trilinear
+			}
+
+			texture_unit
+			{
+				texture 1D_Noise.png 1d
+                tex_coord_set 2
+				tex_address_mode wrap
+				filtering point point none
+			}
+
+
+			texture_unit SepiaTx
+			{
+				texture Sepia1D.tga 1d
+                tex_coord_set 3
+				tex_address_mode mirror
+				filtering point point none
+			}
+
+		}
+	}
+}

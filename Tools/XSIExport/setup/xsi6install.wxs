@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2003/01/wi'>
+
+	<Product 
+		Name='OGRE XSI v6.x Exporter' 
+		Id='5F080D9B-BFE5-4aff-9105-E1DECFBA208F'
+		Language='1033' Codepage='1252' 
+		Version='1.5.0' Manufacturer='OGRE Project'>
+
+    	<Package Id='????????-????-????-????-????????????' Keywords='Installer'
+      		Description="OGRE XSI v6.x Exporter Installer"
+			Comments='Softimage XSI v6.x Exporter for OGRE' Manufacturer='OGRE Project'
+      		InstallerVersion='100' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
+
+		<Media Id='1' Cabinet='1.cab' EmbedCab='yes' DiskPrompt="CD 1" />
+		<Property Id='DiskPrompt' Value="OGRE XSI v6.x Exporter Installer [1]" />
+		<!-- Can't automatically determine XSI v5 location 
+		This is because Softimage have made the path to the 'InstallRoot' property include a key with
+		the name of the install folder in it!! RegistrySearch doesn't support wildcards.
+		Therefore all we can do is validate what the user selects. Searching the entire system takes too long.
+		-->
+
+		<!-- Try to validate (doesn't work yet?) -->
+		<Property Id="FILEEXISTS">
+			<DirectorySearch Id="CheckFileDir" Path="[INSTALLDIR]\bin" Depth="0">
+			  <FileSearch Id="CheckFile" Name="xsi.exe" />
+		  </DirectorySearch>
+		</Property>
+
+		<Directory Id='TARGETDIR' Name='SourceDir'>
+			<!-- VC runtimes -->
+			<Merge Id='CRT' Language='0' src='C:\Program Files\Common Files\Merge Modules\microsoft_vc80_crt_x86.msm' DiskId='1' />
+			<Merge Id='CRT Policy' Language='0' src='C:\Program Files\Common Files\Merge Modules\policy_8_0_Microsoft_VC80_CRT_x86.msm' DiskId='1' />
+			<!-- Exporter files -->
+			<Directory Id="SoftimageFolder" LongName="Softimage" Name="Softimg">
+				<Directory Id='INSTALLDIR' Name='XSI_6.0'>
+					<Directory Id='XSIAppDir' Name="App" LongName="Application">
+						<Directory Id='XSIBinDir' Name="bin">
+							<Component Id='OgreMainComp' Guid='B79A13E2-E64C-47F0-B412-F0D543639161'>
+								<File Id='OgreMainDLL' Name='OgreMain.dll' DiskId='1'
+									src='..\..\Common\bin\release\OgreMain.dll' Vital='yes' />
+							</Component>
+						</Directory>
+						<Directory Id='XSIPluginDir' Name="Plugins">
+							<Component Id='PluginDLLComp' Guid='F98C0110-D997-4770-B72F-F3125D309259'>
+								<File Id='OgreXSIPlugin' Name='OgreExp.dll' LongName='OgreXSIExporter.dll' DiskId='1'
+									src='..\bin\release\OgreXSIExporter.dll' Vital='yes' />
+							</Component>
+						</Directory>
+					</Directory>
+				</Directory>
+			</Directory>
+			<!-- Docs -->
+			<Directory Id="ProgramFilesFolder" Name="PFiles">
+				<Directory Id="OGREFolder" Name="OGRE">
+					<Directory Id="OGREXSIFOLDER" Name="XSI6Exp" LongName="XSI v6 Exporter">
+						<Component Id="DocsComp" Guid="60A46847-04AA-4de8-BFE8-0B7AACCE8CF6">
+							<File Id="ReadmeFile" Name="Readme.htm" DiskId="1"
+								src="..\OGREXSI_Readme.html" Vital="no">
+								<Shortcut Id="ReadmeShortcut" Directory="OGREXSI6ProgMenuDir" Name="Readme"/>
+							</File>
+							<File Id="ScreenshotPage1" Name="page1.gif" DiskId="1"
+								src="..\page1.gif" Vital="no"/>
+							<File Id="ScreenshotPage2" Name="page2.gif" DiskId="1"
+								src="..\page2.gif" Vital="no"/>
+							<File Id="ScreenshotPage3" Name="page3.gif" DiskId="1"
+								src="..\page3.gif" Vital="no"/>
+								
+						</Component>
+					</Directory>
+				</Directory>
+			</Directory>
+			<!-- Start menu -->
+			<Directory Id="ProgramMenuFolder" Name="PMenu" LongName="Programs">
+				<Directory Id="OGREProgramMenuDir" Name='OGRE'>
+					<Directory Id="OGREXSI6ProgMenuDir" Name="XSI6" LongName="XSI v6 Exporter"/>
+				</Directory>
+			</Directory>
+			
+
+		</Directory>
+
+		<Feature Id='ExporterFeature' Level='1' ConfigurableDirectory="INSTALLDIR" Title='Exporter' 
+			Description='The main exporter files; THIS MUST BE INSTALLED IN YOUR XSI_6.0 folder.' 
+			Absent='disallow' AllowAdvertise='no'>
+			<ComponentRef Id='PluginDLLComp' />
+			<ComponentRef Id='OgreMainComp' />
+			<MergeRef Id='CRT' />
+			<MergeRef Id='CRT Policy' />
+			<Condition Level="0">FILEEXISTS</Condition>
+		</Feature>
+		<Feature Id="DocsFeature" Level='1' ConfigurableDirectory="OGREXSIFOLDER" Title='Documentation'
+			AllowAdvertise='no'>
+			<ComponentRef Id="DocsComp" />
+		</Feature>
+		<!-- enable UI -->
+		<UIRef Id="WixUI" />
+	</Product>
+</Wix>
+
+	
+

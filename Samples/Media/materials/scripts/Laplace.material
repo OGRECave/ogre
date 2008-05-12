@@ -1,0 +1,39 @@
+fragment_program Ogre/Compositor/LaplaceFP cg
+{
+	source LaplaceFP.cg
+	entry_point Laplace_ps
+	profiles ps_2_0 arbfp1
+}
+
+material Ogre/Compositor/Laplace
+{
+    technique
+    {
+
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
+			{
+			}
+
+			fragment_program_ref Ogre/Compositor/LaplaceFP
+			{
+				param_named pixelSize float 0.0031
+				param_named scale float 1.0
+			}
+
+
+			texture_unit RT
+			{
+                tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+
+		}
+	}
+}

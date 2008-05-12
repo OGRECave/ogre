@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual C++ Express 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MaterialEditor", "MaterialEditor\build\MaterialEditor.vcproj", "{8046B14F-8C1C-4A8A-ADC7-945A22099495}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		DebugDev|Win32 = DebugDev|Win32
+		DebugUnicode|Win32 = DebugUnicode|Win32
+		DebugUniv|Win32 = DebugUniv|Win32
+		Release|Win32 = Release|Win32
+		ReleaseDev|Win32 = ReleaseDev|Win32
+		ReleaseUnicode|Win32 = ReleaseUnicode|Win32
+		ReleaseUniv|Win32 = ReleaseUniv|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.Debug|Win32.Build.0 = Debug|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.DebugDev|Win32.ActiveCfg = Debug|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.DebugDev|Win32.Build.0 = Debug|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.DebugUnicode|Win32.ActiveCfg = Debug|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.DebugUnicode|Win32.Build.0 = Debug|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.DebugUniv|Win32.ActiveCfg = Debug|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.DebugUniv|Win32.Build.0 = Debug|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.Release|Win32.ActiveCfg = Release|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.Release|Win32.Build.0 = Release|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.ReleaseDev|Win32.ActiveCfg = Release|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.ReleaseDev|Win32.Build.0 = Release|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.ReleaseUnicode|Win32.ActiveCfg = Release|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.ReleaseUnicode|Win32.Build.0 = Release|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.ReleaseUniv|Win32.ActiveCfg = Release|Win32
+		{8046B14F-8C1C-4A8A-ADC7-945A22099495}.ReleaseUniv|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

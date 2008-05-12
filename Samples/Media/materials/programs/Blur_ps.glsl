@@ -1,0 +1,14 @@
+uniform sampler2D tex0;
+
+varying vec2 texCoord[5];
+
+void main()
+{
+	vec4 sum = texture2D(tex0, texCoord[0]) + 
+			   texture2D(tex0, texCoord[1]) +
+			   texture2D(tex0, texCoord[2]) + 
+			   texture2D(tex0, texCoord[3]) +
+			   texture2D(tex0, texCoord[4]);
+	gl_FragColor = sum / 5.0;
+}
+

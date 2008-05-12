@@ -1,0 +1,28 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OgreMain", "..\..\OgreMain\scripts\OgreMain.vcproj", "{35AFBABB-DF05-43DE-91A7-BB828A874015}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XSIExport", "scripts\XSIExport.vcproj", "{E7E7662C-4EBD-47A7-9EA6-CBA40FE63463}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+		{E7E7662C-4EBD-47A7-9EA6-CBA40FE63463}.0 = {35AFBABB-DF05-43DE-91A7-BB828A874015}
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.Debug.ActiveCfg = Debug|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.Debug.Build.0 = Debug|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.Release.ActiveCfg = Release|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.Release.Build.0 = Release|Win32
+		{E7E7662C-4EBD-47A7-9EA6-CBA40FE63463}.Debug.ActiveCfg = Debug|Win32
+		{E7E7662C-4EBD-47A7-9EA6-CBA40FE63463}.Debug.Build.0 = Debug|Win32
+		{E7E7662C-4EBD-47A7-9EA6-CBA40FE63463}.Release.ActiveCfg = Release|Win32
+		{E7E7662C-4EBD-47A7-9EA6-CBA40FE63463}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

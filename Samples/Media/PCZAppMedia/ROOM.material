@@ -1,0 +1,132 @@
+material SketchupDefault
+{
+   technique
+   {
+      pass
+      {
+         diffuse 0.882352941176471 0.882352941176471 0.784313725490196
+      }
+   }
+}
+material Metal_Brass_Ceiling
+{
+   technique
+   {
+      pass
+      {
+         diffuse 1 1 1 1.0
+         texture_unit
+         {
+            texture Metal_Brass_Ceiling.jpg
+         }
+      }
+   }
+}
+material Metal_Embossed
+{
+   technique
+   {
+      pass
+      {
+         diffuse 1 1 1 1.0
+         texture_unit
+         {
+            texture Metal_Embossed.jpg
+         }
+      }
+   }
+}
+material Metal_Steel_Textured_White
+{
+   technique
+   {
+      pass
+      {
+         diffuse 1 1 1 1.0
+         texture_unit
+         {
+            texture Metal_Steel_Textured_White.jpg
+         }
+      }
+   }
+}
+material Metal_Steel_Textured
+{
+   technique
+   {
+      pass
+      {
+         diffuse 1 1 1 1.0
+         texture_unit
+         {
+            texture Metal_Steel_Textured.jpg
+         }
+      }
+   }
+}
+material Metal_Rusted
+{
+   technique
+   {
+      pass
+      {
+         diffuse 1 1 1 1.0
+         texture_unit
+         {
+            texture Metal_Rusted.jpg
+         }
+      }
+   }
+}
+material Material1
+{
+   technique
+   {
+      pass
+      {
+         diffuse 0.250980392156863 0.250980392156863 0.250980392156863 1.0
+      }
+   }
+}
+material [Metal_Rusted]1
+{
+   technique
+   {
+      pass
+      {
+         diffuse 1 1 1 1.0
+         texture_unit
+         {
+            texture Metal_Rusted.jpg
+         }
+      }
+   }
+}
+material Carpet_Diamond_Olive
+{
+   technique
+   {
+      pass
+      {
+         diffuse 1 1 1 1.0
+         texture_unit
+         {
+            texture Carpet_Diamond_Olive.jpg
+         }
+      }
+   }
+}
+material Roofing_Tile_Spanish
+{
+   technique
+   {
+      pass
+      {
+         diffuse 1 1 1 1.0
+         texture_unit
+         {
+            texture Roofing_Tile_Spanish.jpg
+         }
+      }
+   }
+}

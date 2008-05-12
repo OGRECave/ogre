@@ -1,0 +1,49 @@
+<HTML>
+
+<HEAD>
+</HEAD>
+<TITLE> OGRE maxscripts
+</TITLE>
+<BODY>
+
+Just a few words which could help to know how the script works:
+
+<H3> EXPORTING MESHES: </H3>
+
+<H4> Vertices and TVertices:</H4>
+
+Vertices describes where faces are and tvertices how faces will be mapped.
+<U>There is no link between their numbers in 3dsmax.</U>
+But as it is said in the Maxscript Reference there are as many face as TVface. <BR>
+In order to retrieve information, getFace() and getTVFace() link vertices and tvertices.
+<BR>
+This is the same problem with colour vertices ( function is caled getVCFace() ).
+
+<H4> Bone assignements: </H4>
+
+Skinops provides lots of functions in order to deal with bone assignement.
+So the mesh MUST have a Skin modifier.<BR>
+
+<B>NOTA</B>: In order to increase speed when this skeleton is used with OGRE, if a weight is < 0.1, there will not be a bone assignement.
+
+
+<H3>EXPORTING SKELETONS</H3>
+
+<H4>Key controllers:</H4>
+
+Script reads controllers of bones which are in skeleton, in order to knwo when it should set a keyframe.<BR>
+
+<H4>Position and rotation in XML file</H4>
+
+Bones position always refers to parent coordinates. Initial rotation must be set in parent coordinates too.<BR>
+But then, in tracks, rotation and position are relative to their first value. (Hmmm, sorry I don't find the words to explain that...)
+
+<H3>OTHERS</H3>
+
+<H4>3ds max objects name</H4>
+
+Caution: When a name is "Left Arm", the name to select this object is Left_Arm.
+So there is a function in usefulfns.ms which does replacement.
+
+</BODY>
+</HTML>

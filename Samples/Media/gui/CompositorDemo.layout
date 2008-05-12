@@ -1,0 +1,182 @@
+<?xml version="1.0" ?>
+<GUILayout>
+<Window Type="DefaultGUISheet" Name="root">
+
+	<Window Type="DefaultGUISheet" Name="debug_overlay">
+		<Property Name="AlwaysOnTop" Value="True" />
+		<Property Name="Disabled" Value="True" />
+		
+		<Window Type="TaharezLook/StaticText" Name="Panel 1">
+			<Property Name="UnifiedPosition" Value="{{0,0},{0.83,0}}" />
+			<Property Name="UnifiedSize" Value="{{0.23,0},{0.17,0}}" />
+			<Property Name="TopLeftFrameImage" Value="set:OgreGuiImagery image:BoxTopLeft" />
+			<Property Name="TopRightFrameImage" Value="set:OgreGuiImagery image:BoxTopRight" />
+			<Property Name="BottomLeftFrameImage" Value="set:OgreGuiImagery image:BoxBottomLeft" />
+			<Property Name="BottomRightFrameImage" Value="set:OgreGuiImagery image:BoxBottomRight" />
+			<Property Name="LeftFrameImage" Value="set:OgreGuiImagery image:BoxLeft" />
+			<Property Name="TopFrameImage" Value="set:OgreGuiImagery image:BoxTop" />
+			<Property Name="RightFrameImage" Value="set:OgreGuiImagery image:BoxRight" />
+			<Property Name="BottomFrameImage" Value="set:OgreGuiImagery image:BoxBottom" />
+			<Property Name="BackgroundImage" Value="set:OgreGuiImagery image:BoxBack" />
+			<Property Name="Alpha" Value="0.9" />
+			<Property Name="InheritsAlpha" Value="False" />
+	
+			<Window Type="TaharezLook/StaticText" Name="OPCurrentFPS">
+				<Property Name="FrameEnabled" Value="False" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="Font" Value="BlueHighway-10" />
+				<Property Name="UnifiedPosition" Value="{{0.075,0},{0.12,0}}" />
+				<Property Name="UnifiedSize" Value="{{0.85,0},{0.25,0}}" />
+				<Property Name="TextColours" Value="tl:FF4FF06F tr:FF4FF06F bl:FF4FF06F br:FF4FF06F" />
+				<Property Name="HorzFormatting" Value="HorzCentred" />
+				<Property Name="Text" Value="Current FPS: " />
+			</Window>
+
+			<Window Type="TaharezLook/StaticImage" Name="OPBar1">
+				<Property Name="FrameEnabled" Value="False" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="UnifiedPosition" Value="{{0.2,0},{0.27,0}}" />
+				<Property Name="UnifiedSize" Value="{{0.6,0},{0.025,0}}" />
+				<Property Name="Image" Value="set:OgreGuiImagery image:Bar" />
+			</Window>
+
+			<Window Type="TaharezLook/StaticText" Name="OPAverageFPS">
+				<Property Name="FrameEnabled" Value="False" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="Font" Value="BlueHighway-10" />
+				<Property Name="UnifiedPosition" Value="{{0.075,0},{0.32,0}}" />
+				<Property Name="UnifiedSize" Value="{{1.0,0},{0.25,0}}" />
+				<Property Name="TextColours" Value="tl:FFFFF5F0 tr:FFFFF5F0 bl:FFFFF510 br:FFFFF5F0" />
+				<Property Name="Text" Value="Average FPS: " />
+			</Window>
+
+			<Window Type="TaharezLook/StaticText" Name="OPWorstFPS">
+				<Property Name="FrameEnabled" Value="False" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="Font" Value="BlueHighway-10" />
+				<Property Name="UnifiedPosition" Value="{{0.075,0},{0.45,0}}" />
+				<Property Name="UnifiedSize" Value="{{1.0,0},{0.25,0}}" />
+				<Property Name="TextColours" Value="tl:FFFFF5F0 tr:FFFFF5F0 bl:FFFFF510 br:FFFFF5F0" />
+				<Property Name="Text" Value="Worst FPS: " />
+			</Window>
+
+			<Window Type="TaharezLook/StaticText" Name="OPBestFPS">
+				<Property Name="FrameEnabled" Value="False" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="Font" Value="BlueHighway-10" />
+				<Property Name="UnifiedPosition" Value="{{0.075,0},{0.58,0}}" />
+				<Property Name="UnifiedSize" Value="{{1.0,0},{0.25,0}}" />
+				<Property Name="TextColours" Value="tl:FFFFF5F0 tr:FFFFF5F0 bl:FFFFF510 br:FFFFF5F0" />
+				<Property Name="Text" Value="Best FPS: " />
+			</Window>
+
+			<Window Type="TaharezLook/StaticText" Name="OPTriCount">
+				<Property Name="FrameEnabled" Value="False" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="Font" Value="BlueHighway-10" />
+				<Property Name="UnifiedPosition" Value="{{0.075,0},{0.71,0}}" />
+				<Property Name="UnifiedSize" Value="{{1.0,0},{0.25,0}}" />
+				<Property Name="TextColours" Value="tl:FFFFF5F0 tr:FFFFF5F0 bl:FFFFF510 br:FFFFF5F0" />
+				<Property Name="Text" Value="Triangle Count: " />
+			</Window>
+
+		</Window>
+
+		<Window Type="TaharezLook/StaticText" Name="OPDebugMsg">
+			<Property Name="FrameEnabled" Value="False" />
+			<Property Name="BackgroundEnabled" Value="False" />
+			<Property Name="Font" Value="BlueHighway-10" />
+			<Property Name="UnifiedPosition" Value="{{0.25,0},{0.93,0}}" />
+			<Property Name="UnifiedSize" Value="{{0.65,0},{0.07,0}}" />
+			<Property Name="TextColours" Value="tl:A0FFFFFF tr:A0FFFFFF bl:A0FFFFFF br:A0FFFFFF" />
+			<Property Name="InheritsAlpha" Value="False" />
+			<Property Name="VertFormatting" Value="VertCentred" />
+			<Property Name="HorzFormatting" Value="WordWrapCentred" />
+		</Window>
+
+		<Window Type="TaharezLook/StaticImage" Name="OgreLogo">
+			<Property Name="FrameEnabled" Value="False" />
+			<Property Name="BackgroundEnabled" Value="False" />
+			<Property Name="UnifiedPosition" Value="{{0.9,0},{0.95,0}}" />
+			<Property Name="UnifiedSize" Value="{{0.1,0},{0.05,0}}" />
+			<Property Name="Image" Value="set:OgreGuiImagery image:OgreLogo" />
+			<Property Name="Alpha" Value="0.75" />
+			<Property Name="InheritsAlpha" Value="False" />
+		</Window>
+
+		<Window Type="TaharezLook/StaticImage" Name="CeguiLogo">
+			<Property Name="FrameEnabled" Value="False" />
+			<Property Name="BackgroundEnabled" Value="False" />
+			<Property Name="UnifiedPosition" Value="{{0.9125,0},{0.9115,0}}" />
+			<Property Name="UnifiedSize" Value="{{0.075,0},{0.0385,0}}" />
+			<Property Name="Image" Value="set:OgreGuiImagery image:CeguiLogo" />
+			<Property Name="Alpha" Value="0.75" />
+			<Property Name="InheritsAlpha" Value="False" />
+		</Window>
+
+	</Window>
+
+	<Window Type="DefaultGUISheet" Name="CompositorDemo">
+
+		<Property Name="UnifiedMaxSize" Value="{{1,0},{2,0}}" />
+		<Property Name="UnifiedSize" Value="{{1,0},{2,0}}" />
+
+
+		<Window Type="TaharezLook/StaticText" Name="HelpTxt">
+			<Property Name="UnifiedPosition" Value="{{0.6,0},{0.8,0}}" />
+			<Property Name="UnifiedMinSize" Value="{{0.5,0},{0.3,0}}" />
+			<Property Name="UnifiedSize" Value="{{0.5,0},{0.3,0}}" />
+			<Property Name="Text" Value="Use the Combo boxes to select a shader and a model" />
+			<Property Name="InheritsAlpha" Value="False" />
+		</Window>
+		
+		<Window Type="TaharezLook/FrameWindow" Name="CompositorSelectorWin">
+			<Property Name="UnifiedPosition" Value="{{0,0},{0,0}}" />
+			<Property Name="UnifiedMinSize" Value="{{0.16,0},{0.22,0}}" />
+			<Property Name="UnifiedMaxSize" Value="{{0.16,0},{0.75,0}}" />
+			<Property Name="UnifiedSize" Value="{{0.16,0},{0.3,0}}" />
+			<Property Name="Text" Value="Compositors" />
+			<Property Name="Alpha" Value="0.75" />
+			<Property Name="CloseButtonEnabled" Value="False" />
+
+			<Window Type="TaharezLook/Button" Name="ExitDemoBtn">
+				<Property Name="VerticalAlignment" Value="Bottom" />
+				<Property Name="HorizontalAlignment" Value="Centre" />
+				<Property Name="UnifiedPosition" Value="{{0,0},{0,0}}" />
+				<Property Name="UnifiedMaxSize" Value="{{0.12,0},{0.03,0}}" />
+				<Property Name="UnifiedMinSize" Value="{{0.12,0},{0.03,0}}" />
+				<Property Name="UnifiedSize" Value="{{0.33,0},{0.03,0}}" />
+				<Property Name="Text" Value="Exit Demo" />
+				<Property Name="InheritsAlpha" Value="False" />
+			</Window>
+
+		</Window>
+		<Window Type="TaharezLook/FrameWindow" Name="DebugRTTs">
+			<Property Name="RollUpState" Value="True" />
+			<Property Name="UnifiedPosition" Value="{{0.70,0},{0,0}}" />
+			<Property Name="UnifiedMinSize" Value="{{0.3,0},{0.3,0}}" />
+			<Property Name="UnifiedMaxSize" Value="{{0.3,0},{0.3,0}}" />
+			<Property Name="UnifiedSize" Value="{{0.3,0},{0.3,0}}" />
+			<Property Name="Text" Value="Debug RTTs" />
+			<Property Name="Alpha" Value="0.75" />
+			<Property Name="CloseButtonEnabled" Value="False" />
+
+			<Window Type="TaharezLook/Listbox" Name="DebugRTTListbox">
+				<Property Name="UnifiedPosition" Value="{{0.02,0},{0.1,0}}" />
+				<Property Name="UnifiedMinSize" Value="{{0.1,0},{0.25,0}}" />
+				<Property Name="UnifiedMaxSize" Value="{{0.1,0},{0.25,0}}" />
+				<Property Name="UnifiedSize" Value="{{0.1,0},{0.25,0}}" />
+			</Window>
+			<Window Type="TaharezLook/StaticImage" Name="DebugRTTImage">
+				<Property Name="UnifiedPosition" Value="{{0.36,0},{0.1,0}}" />
+				<Property Name="UnifiedMinSize" Value="{{0.2,0},{0.25,0}}" />
+				<Property Name="UnifiedMaxSize" Value="{{0.2,0},{0.25,0}}" />
+				<Property Name="UnifiedSize" Value="{{0.2,0},{0.25,0}}" />
+			</Window>
+		</Window>
+	</Window>
+
+
+</Window>
+
+</GUILayout>

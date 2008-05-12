@@ -1,0 +1,114 @@
+// Scene material
+// MRT testing
+fragment_program Ogre/MRTtest/scenefp/HLSL hlsl
+{
+	source mrttestfp.hlsl
+	entry_point mainfp_scene
+	target ps_2_0
+}
+
+fragment_program Ogre/MRTtest/scenefp/GLSL glsl
+{
+	source mrttestfp_scene.glsl
+}
+
+fragment_program Ogre/MRTtest/scenefp unified
+{
+	delegate Ogre/MRTtest/scenefp/HLSL
+	delegate Ogre/MRTtest/scenefp/GLSL
+}
+
+material Ogre/MRTtest/scene
+{
+	technique
+	{
+		scheme MRT
+		pass
+		{
+			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
+			{
+				param_named_auto worldViewProj worldviewproj_matrix
+				param_named ambient float4 1 1 1 1
+			}
+			fragment_program_ref Ogre/MRTtest/scenefp
+			{
+			}
+
+			texture_unit
+			{
+				texture egyptrockyfull.jpg 
+			}
+			
+		}
+	}
+}
+
+
+fragment_program Ogre/MRTtest/quadfp/HLSL hlsl
+{
+	source mrttestfp.hlsl
+	entry_point mainfp_quad
+	target ps_2_0
+}
+
+fragment_program Ogre/MRTtest/quadfp/GLSL glsl
+{
+	source mrttestfp_quad.glsl
+
+	default_params
+	{
+		param_named rt0 int 0
+		param_named rt1 int 1
+		param_named rt2 int 2
+		param_named rt3 int 3
+	}
+}
+
+fragment_program Ogre/MRTtest/quadfp unified
+{
+	delegate Ogre/MRTtest/quadfp/HLSL
+	delegate Ogre/MRTtest/quadfp/GLSL
+}
+
+
+// Quad material
+material Ogre/MRTtest/quad
+{
+    technique
+    {
+
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			{
+			}
+
+			fragment_program_ref Ogre/MRTtest/quadfp
+			{
+			}
+
+			texture_unit RT0
+			{
+				tex_address_mode clamp
+			}
+			texture_unit RT1
+			{
+				tex_address_mode clamp
+			}
+			texture_unit RT2
+			{
+				tex_address_mode clamp
+			}
+			texture_unit RT3
+			{
+				tex_address_mode clamp
+			}
+
+
+		}
+	}
+}

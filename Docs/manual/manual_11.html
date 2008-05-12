@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                      "http://www.w3.org/TR/html40/loose.dtd">
+<HTML>
+<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people <dev@texi2html.cvshome.org>
+Send bugs and suggestions to <users@texi2html.cvshome.org>
+
+-->
+<HEAD>
+<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Materials</TITLE>
+
+<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Materials">
+<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Materials">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.66">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC14"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_10.html#SEC13"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_12.html#SEC15"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<H2> 2.7 Materials </H2>
+<!--docid::SEC14::-->
+
+The Material object controls how objects in the scene are rendered. It specifies what basic surface properties objects have such as reflectance of colours, shininess etc, how many texture layers are present, what images are on them and how they are blended together, what special effects are applied such as environment mapping, what culling mode is used, how the textures are filtered etc.<BR><BR>
+
+Materials can either be set up programmatically, by calling SceneManager::createMaterial and tweaking the settings, or by specifying it in a 'script' which is loaded at runtime. See section <A HREF="manual_14.html#SEC23">3.1 Material Scripts</A> for more info.<BR><BR>
+
+Basically everything about the appearance of an object apart from it's shape is controlled by the Material class.<BR><BR>
+
+The SceneManager class manages the master list of materials available to the scene. The list can be added to by the application by calling SceneManager::createMaterial, or by loading a Mesh (which will in turn load material properties). Whenever materials are added to the SceneManager, they start off with a default set of properties; these are defined by OGRE as the following:<BR><BR>
+
+<UL>
+<LI>
+ambient reflectance = ColourValue::White (full)
+<LI>
+diffuse reflectance = ColourValue::White (full)
+<LI>
+specular reflectance = ColourValue::Black (none)
+<LI>
+emmissive = ColourValue::Black (none)
+<LI>
+shininess = 0 (not shiny)
+<LI>
+No texture layers (&amp; hence no textures)
+<LI>
+SourceBlendFactor = SBF_ONE, DestBlendFactor = SBF_ZERO (opaque)
+<LI>
+Depth buffer checking on
+<LI>
+Depth buffer writing on
+<LI>
+Depth buffer comparison function = CMPF_LESS_EQUAL
+<LI>
+Culling mode = CULL_CLOCKWISE
+<LI>
+Ambient lighting in scene = ColourValue(0.5, 0.5, 0.5) (mid-grey)
+<LI>
+Dynamic lighting enabled
+<LI>
+Gourad shading mode
+<LI>
+Solid polygon mode
+<LI>
+Bilinear texture filtering
+</UL>
+
+You can alter these settings by calling SceneManager::getDefaultMaterialSettings() and making the required changes to the Material which is returned.
+
+Entities automatically have Material's associated with them if they use a Mesh object, since the Mesh object typically sets up it's required materials on loading. You can also customise the material used by an entity as described in <A HREF="manual_10.html#SEC13">2.6 Entities</A>. Just create a new Material, set it up how you like (you can copy an existing material into it if you like using a standard assignment statement) and point the SubEntity entries at it using SubEntity::setMaterialName().
+
+
+<A NAME="Overlays"></A>
+<HR SIZE=1>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_10.html#SEC13"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_12.html#SEC15"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>
+<FONT SIZE="-1">
+This document was generated
+by <I>steve</I> on <I>June 22 2007</I>
+using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
+</FONT>
+
+</BODY>
+</HTML>

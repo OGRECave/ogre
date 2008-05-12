@@ -1,0 +1,42 @@
+
+
+sampler Image: register(s0);
+sampler Rand: register(s1);
+sampler Noise: register(s2);
+
+float4 OldTV_ps(float2 pos: TEXCOORD1, float2 img: TEXCOORD0,
+    uniform float distortionFreq: register(c3),
+    uniform float distortionScale: register(c4),
+    uniform float distortionRoll: register(c5),
+    uniform float interference: register(c7),
+    uniform float frameLimit: register(c8),
+    uniform float frameShape: register(c0),
+    uniform float frameSharpness: register(c1),
+    uniform float time_0_X: register(c2),
+    uniform float sin_time_0_X: register(c6)
+
+) : COLOR {
+   // Define a frame shape
+   float f = (1 - pos.x * pos.x) * (1 - pos.y * pos.y);
+   float frame = saturate(frameSharpness * (pow(f, frameShape) - frameLimit));
+
+   // Interference ... just a texture filled with rand()
+   float rand = tex3D(Rand, float3(1.5 * pos, time_0_X)) - 0.2;
+
+   // Some signed noise for the distortion effect
+   float noisy = tex3D(Noise, float3(0, 0.5 * pos.y, 0.1 * time_0_X)) - 0.5;
+
+   // Repeat a 1 - x^2 (0 < x < 1) curve and roll it with sinus.
+   float dst = frac(pos.y * distortionFreq + distortionRoll * sin_time_0_X);
+   dst *= (1 - dst);
+   // Make sure distortion is highest in the center of the image
+   dst /= 1 + distortionScale * abs(pos.y);
+
+   // ... and finally distort
+   img.x += distortionScale * noisy * dst;
+   float4 image = tex2D(Image, img);
+
+   // Combine frame, distorted image and interference
+   return frame * (interference * rand + image);
+}
+

@@ -1,0 +1,48 @@
+render_system_capabilities "TestCaps Blank"
+{
+	 // there is absolutely nothing here
+}
+
+render_system_capabilities "TestCaps enum Capabilities"
+{
+	 // this rsc definition only contains RSC_XXX style caps
+	 automipmap true
+	 fbo_arb true
+}
+
+render_system_capabilities "TestCaps set String"
+{
+	 // this rsc definition contains only caps set with a method, like:
+	 // void setXXX(String& val)
+
+	 max_vertex_program_version vs99
+}
+
+render_system_capabilities "TestCaps set bool (true)"
+{
+	 vertex_texture_units_shared true
+}
+
+render_system_capabilities "TestCaps set bool (false)"
+{
+	 vertex_texture_units_shared false
+}
+
+render_system_capabilities "TestCaps set int"
+{
+	 num_multi_render_targets 99
+}
+
+render_system_capabilities "TestCaps set Real"
+{
+	 max_point_size 99.5
+}
+
+render_system_capabilities "TestCaps addShaderProfile"
+{
+	 shader_profile vp1
+	 shader_profile vs_1_1
+	 shader_profile ps_99
+}
+
+

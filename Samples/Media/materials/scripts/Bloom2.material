@@ -1,0 +1,276 @@
+//---------------------------------------------------
+//Bloom2: Dark Sylinc's Bloom implementation
+//     Ogre/Compositor/BloomBlend is the final material applied.
+//     it has 2 parameters:
+//             OriginalImageWeight float
+//             BlurWeight float
+//  Usually they range from 0.0 to 1.0; but it can be any number
+//  higher numbers will result in a brighter scene. Increment BlurWeight
+//  to obtain increase Bloom effect.
+//  Works faster on my GeForce 6200 256 MB AGP 8x (Chip NV 43 Rev a1)
+//  than Manuel's bloom. (And at my opinion, looks nicer ;)
+//  Unlike Manuel's bloom, we apply a bright high-filter pass
+//Copyright (C) Dark Sylinc 2007-2008
+//---------------------------------------------------
+
+// NB not using GLSL versions since ATI GLSL compiler has a problem with 
+// BlurV_ps20
+//------------------------
+//OpenGL GLSL Definitions
+//------------------------
+vertex_program Blur_vs_glsl glsl
+{
+	source Blur_vs.glsl
+}
+fragment_program BlurV_ps20_glsl glsl
+{
+	source BlurV_ps20.glsl
+}
+fragment_program BlurH_ps20_glsl glsl
+{
+	source BlurH_ps20.glsl
+}
+fragment_program BrightBloom2_ps20_glsl glsl
+{
+	source BrightBloom2_ps20.glsl
+}
+fragment_program Bloom2_ps20_glsl glsl
+{
+	source Bloom2_ps20.glsl
+	default_params
+	{
+		param_named RT int 0
+		param_named Blur1 int 1
+	}
+}
+
+//------------------------
+//DirectX 9.0 HLSL Definitions
+//------------------------	
+//DirectX 9.0 HLSL Vertex Shader vs_1_1
+vertex_program Blur_vs11_hlsl hlsl
+{
+	source Blur_vs11.hlsl
+	target vs_1_1
+	entry_point main
+}
+
+//DirectX 9.0 HLSL Pixel Shader ps_2_0
+fragment_program BlurV_ps20_hlsl hlsl
+{
+	source BlurV_ps20.hlsl
+	target ps_2_0
+	entry_point main
+}
+fragment_program BlurH_ps20_hlsl hlsl
+{
+	source BlurH_ps20.hlsl
+	target ps_2_0
+	entry_point main
+}
+
+//DirectX 9.0 HLSL Pixel Shader ps_2_0
+fragment_program Bloom2_ps20_hlsl hlsl
+{
+	source Bloom2_ps20.hlsl
+	target ps_2_0
+	entry_point main
+}
+
+//DirectX 9.0 HLSL Pixel Shader ps_2_0
+fragment_program BrightBloom2_ps20_hlsl hlsl
+{
+	source BrightBloom2_ps20.hlsl
+	target ps_2_0
+	entry_point main
+}
+
+//------------------------
+//NVIDIA Cg Definitions
+//------------------------	
+//NV Cg Vertex Shader vs_1_1
+vertex_program Blur_vs11_cg cg
+{
+	source Blur_vs11.hlsl
+	profiles vs_1_1 arbvp1
+	entry_point main
+}
+
+//NV Cg HLSL Pixel Shader ps_2_0
+fragment_program BlurV_ps20_cg cg
+{
+	source BlurV_ps20.hlsl
+	profiles ps_2_0 arbfp1
+	entry_point main
+}
+fragment_program BlurH_ps20_cg cg
+{
+	source BlurH_ps20.hlsl
+	profiles ps_2_0 arbfp1
+	entry_point main
+}
+
+//NV Cg Pixel Shader ps_2_0
+fragment_program Bloom2_ps20_cg cg
+{
+	source Bloom2_ps20.hlsl
+	profiles ps_2_0 arbfp1
+	entry_point main
+}
+
+//NV Cg Pixel Shader ps_2_0
+fragment_program BrightBloom2_ps20_cg cg
+{
+	source BrightBloom2_ps20.hlsl
+	profiles ps_2_0 arbfp1
+	entry_point main
+}
+
+//------------------------
+//Unified Definitions
+//------------------------
+vertex_program Blur_vs unified
+{
+	delegate Blur_vs11_hlsl
+	//delegate Blur_vs_glsl
+	delegate Blur_vs11_cg
+}
+
+fragment_program Bloom2_ps unified
+{
+	delegate Bloom2_ps20_hlsl
+	//delegate Bloom2_ps20_glsl
+	delegate Bloom2_ps20_cg
+}
+fragment_program BlurV_ps unified
+{
+	delegate BlurV_ps20_hlsl
+	//delegate BlurV_ps20_glsl
+	delegate BlurV_ps20_cg
+}
+fragment_program BlurH_ps unified
+{
+	delegate BlurH_ps20_hlsl
+	//delegate BlurH_ps20_glsl
+	delegate BlurH_ps20_cg
+}
+fragment_program BrightBloom2_ps unified
+{
+	delegate BrightBloom2_ps20_hlsl
+	//delegate BrightBloom2_ps20_glsl
+	delegate BrightBloom2_ps20_cg
+}
+
+
+//Blur: Horizontal Gaussian pass
+material Ogre/Compositor/BlurH
+{
+	technique
+	{
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_check off
+
+			fragment_program_ref BlurH_ps
+			{
+			}
+			vertex_program_ref Blur_vs
+			{
+			}
+			texture_unit
+			{
+				tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+		}
+	}
+}
+
+//Blur: Vertical Gaussian pass
+material Ogre/Compositor/BlurV
+{
+	technique
+	{
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_check off
+
+			fragment_program_ref BlurV_ps
+			{
+			}
+			vertex_program_ref Blur_vs
+			{
+			}
+			texture_unit
+			{
+				tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+		}
+	}
+}
+
+//Final Bloom pass: Blends the blurred with the sharp image
+material Ogre/Compositor/BloomBlend2
+{
+    technique
+    {
+        pass
+        {
+		cull_hardware none
+		cull_software none
+		depth_check off
+
+		fragment_program_ref Bloom2_ps
+		{
+			param_named OriginalImageWeight float 1.0
+			param_named BlurWeight float 0.65
+		}
+		//vertex_program_ref Blur_vs
+		//	{
+		//	}
+            texture_unit
+            {
+			tex_coord_set 0
+			tex_address_mode clamp
+			filtering none
+            }
+		texture_unit
+		{
+			tex_coord_set 0
+			tex_address_mode clamp
+			filtering trilinear
+		}
+        }
+    }
+}
+
+//High-pass Bright filter
+//First pass
+material Ogre/Compositor/BrightPass2
+{
+    technique
+    {
+        pass
+        {
+			cull_hardware none
+			cull_software none
+			depth_check off
+
+			fragment_program_ref BrightBloom2_ps
+			{
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+  				filtering none
+			}
+        }
+    }
+}

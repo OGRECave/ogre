@@ -1,0 +1,178 @@
+//DirectX 9.0 HLSL Vertex Shader vs_1_1
+vertex_program Blur0_vs11 hlsl
+{
+	source Blur0_vs11.hlsl
+	target vs_1_1
+	entry_point main
+}
+
+//DirectX 9.0 HLSL Pixel Shader ps_2_0
+fragment_program Blur0_ps20 hlsl
+{
+	source Blur0_ps20.hlsl
+	target ps_2_0
+	entry_point main
+}
+
+//DirectX 9.0 HLSL Vertex Shader vs_1_1
+vertex_program Blur1_vs11 hlsl
+{
+	source Blur1_vs11.hlsl
+	target vs_1_1
+	entry_point main
+}
+
+//DirectX 9.0 HLSL Pixel Shader ps_2_0
+fragment_program Blur1_ps20 hlsl
+{
+	source Blur1_ps20.hlsl
+	target ps_2_0
+	entry_point main
+}
+
+vertex_program Blur0_vs_glsl glsl
+{
+	source Blur0_vs.glsl
+}
+vertex_program Blur1_vs_glsl glsl
+{
+	source Blur1_vs.glsl
+}
+fragment_program Blur_ps_glsl glsl
+{
+	source Blur_ps.glsl
+	default_params
+	{
+		param_named tex0 int 0
+	}
+}
+
+//Effect: Bloom
+material Ogre/Compositor/Blur0
+{
+	technique
+	{
+		//Rendering Pass: Blur0 (pass index: #1 )
+		pass
+		{
+			//State: D3DRS_CULLMODE, Value : D3DCULL_NONE
+			cull_hardware none
+			cull_software none
+			depth_check off
+
+			fragment_program_ref Blur0_ps20
+			{
+			}
+			vertex_program_ref Blur0_vs11
+			{
+			}
+			texture_unit RT
+			{
+                tex_coord_set 0
+				tex_address_mode clamp
+				filtering linear linear linear
+			}
+		}
+	}
+	technique
+	{
+		//Rendering Pass: Blur0 (pass index: #1 )
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_check off
+
+			fragment_program_ref Blur_ps_glsl
+			{
+			}
+			vertex_program_ref Blur0_vs_glsl
+			{
+			}
+			texture_unit RT
+			{
+                tex_coord_set 0
+				tex_address_mode clamp
+				filtering linear linear linear
+			}
+		}
+	}
+}
+
+material Ogre/Compositor/Blur1
+{
+	technique
+	{
+
+		//Rendering Pass: Blur1 (pass index: #2 )
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_check off
+
+			fragment_program_ref Blur1_ps20
+			{
+			}
+			vertex_program_ref Blur1_vs11
+			{
+			}
+			texture_unit
+			{
+                tex_coord_set 0
+				tex_address_mode clamp
+				filtering linear linear linear
+			}
+		}
+	}
+	technique
+	{
+
+		//Rendering Pass: Blur1 (pass index: #2 )
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			fragment_program_ref Blur_ps_glsl
+			{
+			}
+			vertex_program_ref Blur1_vs_glsl
+			{
+			}
+			texture_unit
+			{
+                tex_coord_set 0
+				tex_address_mode clamp
+				filtering linear linear linear
+			}
+		}
+	}
+}
+
+/// Overlay quad
+material Ogre/Compositor/BloomBlend
+{
+    technique
+    {
+        pass
+        {
+            lighting on
+            diffuse 0.0 0.0 0.0 0.6
+            specular 0.0 0.0 0.0 0.0
+            ambient 0.0 0.0 0.0
+            emissive 1.0 1.0 1.0
+            cull_hardware none
+            depth_check off
+            scene_blend alpha_blend
+
+            texture_unit
+            {
+                tex_coord_set 0
+				tex_address_mode clamp
+				filtering linear linear linear
+            }
+        }
+    }
+}

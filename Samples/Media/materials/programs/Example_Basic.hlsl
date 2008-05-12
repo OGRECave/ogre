@@ -1,0 +1,273 @@
+/*
+  Basic ambient lighting vertex program
+*/
+void ambientOneTexture_vp(float4 position : POSITION,
+						  float2 uv		  : TEXCOORD0,
+						  
+						  out float4 oPosition : POSITION,
+						  out float2 oUv	   : TEXCOORD0,
+						  out float4 colour    : COLOR,
+
+						  uniform float4x4 worldViewProj,
+						  uniform float4 ambient)
+{
+	oPosition = mul(worldViewProj, position);
+	oUv = uv;
+	colour = ambient;
+}
+
+/*
+  Single-weight-per-vertex hardware skinning, 2 lights
+  The trouble with vertex programs is they're not general purpose, but
+  fixed function hardware skinning is very poorly supported
+*/
+void hardwareSkinningOneWeight_vp(
+	float4 position : POSITION,
+	float3 normal   : NORMAL,
+	float2 uv       : TEXCOORD0,
+	float  blendIdx : BLENDINDICES,
+	
+
+	out float4 oPosition : POSITION,
+	out float2 oUv       : TEXCOORD0,
+	out float4 colour           : COLOR,
+	// Support up to 24 bones of float3x4
+	// vs_1_1 only supports 96 params so more than this is not feasible
+	uniform float3x4   worldMatrix3x4Array[24],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   lightPos[2],
+	uniform float4   lightDiffuseColour[2],
+	uniform float4   ambient)
+{
+	// transform by indexed matrix
+	float4 blendPos = float4(mul(worldMatrix3x4Array[blendIdx], position).xyz, 1.0);
+	// view / projection
+	oPosition = mul(viewProjectionMatrix, blendPos);
+	// transform normal
+	float3 norm = mul((float3x3)worldMatrix3x4Array[blendIdx], normal);
+	// Lighting - support point and directional
+	float3 lightDir0 = 	normalize(
+		lightPos[0].xyz -  (blendPos.xyz * lightPos[0].w));
+	float3 lightDir1 = 	normalize(
+		lightPos[1].xyz -  (blendPos.xyz * lightPos[1].w));
+
+	oUv = uv;
+	colour = ambient + 
+		(saturate(dot(lightDir0, norm)) * lightDiffuseColour[0]) + 
+		(saturate(dot(lightDir1, norm)) * lightDiffuseColour[1]);
+	
+}	
+
+/*
+  Single-weight-per-vertex hardware skinning, shadow-caster pass
+*/
+void hardwareSkinningOneWeightCaster_vp(
+	float4 position : POSITION,
+	float3 normal   : NORMAL,
+	float  blendIdx : BLENDINDICES,
+	
+
+	out float4 oPosition : POSITION,
+	out float4 colour    : COLOR,
+	// Support up to 24 bones of float3x4
+	// vs_1_1 only supports 96 params so more than this is not feasible
+	uniform float3x4   worldMatrix3x4Array[24],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   ambient)
+{
+	// transform by indexed matrix
+	float4 blendPos = float4(mul(worldMatrix3x4Array[blendIdx], position).xyz, 1.0);
+	// view / projection
+	oPosition = mul(viewProjectionMatrix, blendPos);
+	
+	colour = ambient;
+	
+}	
+
+/*
+  Two-weight-per-vertex hardware skinning, 2 lights
+  The trouble with vertex programs is they're not general purpose, but
+  fixed function hardware skinning is very poorly supported
+*/
+void hardwareSkinningTwoWeights_vp(
+	float4 position : POSITION,
+	float3 normal   : NORMAL,
+	float2 uv       : TEXCOORD0,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+
+	out float4 oPosition : POSITION,
+	out float2 oUv       : TEXCOORD0,
+	out float4 colour           : COLOR,
+	// Support up to 24 bones of float3x4
+	// vs_1_1 only supports 96 params so more than this is not feasible
+	uniform float3x4   worldMatrix3x4Array[24],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   lightPos[2],
+	uniform float4   lightDiffuseColour[2],
+	uniform float4   ambient)
+{
+	// transform by indexed matrix
+	float4 blendPos = float4(0,0,0,0);
+	int i;
+	for (i = 0; i < 2; ++i)
+	{
+		blendPos += float4(mul(worldMatrix3x4Array[blendIdx[i]], position).xyz, 1.0) * blendWgt[i];
+	}
+	// view / projection
+	oPosition = mul(viewProjectionMatrix, blendPos);
+	// transform normal
+	float3 norm = float3(0,0,0);
+	for (i = 0; i < 2; ++i)
+	{
+		norm += mul((float3x3)worldMatrix3x4Array[blendIdx[i]], normal) * 
+		blendWgt[i];
+	}
+	norm = normalize(norm);
+	// Lighting - support point and directional
+	float3 lightDir0 = 	normalize(
+		lightPos[0].xyz -  (blendPos.xyz * lightPos[0].w));
+	float3 lightDir1 = 	normalize(
+		lightPos[1].xyz -  (blendPos.xyz * lightPos[1].w));
+
+	
+	oUv = uv;
+	colour = ambient + 
+		(saturate(dot(lightDir0, norm)) * lightDiffuseColour[0]) + 
+		(saturate(dot(lightDir1, norm)) * lightDiffuseColour[1]);
+	
+}
+
+/*
+  Two-weight-per-vertex hardware skinning, shadow caster pass
+*/
+void hardwareSkinningTwoWeightsCaster_vp(
+	float4 position : POSITION,
+	float3 normal   : NORMAL,
+	float2 uv       : TEXCOORD0,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+
+	out float4 oPosition : POSITION,
+	out float4 colour           : COLOR,
+	// Support up to 24 bones of float3x4
+	// vs_1_1 only supports 96 params so more than this is not feasible
+	uniform float3x4   worldMatrix3x4Array[24],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   ambient)
+{
+	// transform by indexed matrix
+	float4 blendPos = float4(0,0,0,0);
+	int i;
+	for (i = 0; i < 2; ++i)
+	{
+		blendPos += float4(mul(worldMatrix3x4Array[blendIdx[i]], position).xyz, 1.0) * blendWgt[i];
+	}
+	// view / projection
+	oPosition = mul(viewProjectionMatrix, blendPos);
+	
+
+	colour = ambient;
+		
+	
+}
+
+
+/*
+  Four-weight-per-vertex hardware skinning, 2 lights
+  The trouble with vertex programs is they're not general purpose, but
+  fixed function hardware skinning is very poorly supported
+*/
+void hardwareSkinningFourWeights_vp(
+	float4 position : POSITION,
+	float3 normal   : NORMAL,
+	float2 uv       : TEXCOORD0,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+
+	out float4 oPosition : POSITION,
+	out float2 oUv       : TEXCOORD0,
+	out float4 colour           : COLOR,
+	// Support up to 24 bones of float3x4
+	// vs_1_1 only supports 96 params so more than this is not feasible
+	uniform float3x4   worldMatrix3x4Array[24],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   lightPos[2],
+	uniform float4   lightDiffuseColour[2],
+	uniform float4   ambient)
+{
+	// transform by indexed matrix
+	float4 blendPos = float4(0,0,0,0);
+	int i;
+	for (i = 0; i < 4; ++i)
+	{
+		blendPos += float4(mul(worldMatrix3x4Array[blendIdx[i]], position).xyz, 1.0) * blendWgt[i];
+	}
+	// view / projection
+	oPosition = mul(viewProjectionMatrix, blendPos);
+	// transform normal
+	float3 norm = float3(0,0,0);
+	for (i = 0; i < 4; ++i)
+	{
+		norm += mul((float3x3)worldMatrix3x4Array[blendIdx[i]], normal) * 
+		blendWgt[i];
+	}
+	norm = normalize(norm);
+	// Lighting - support point and directional
+	float3 lightDir0 = 	normalize(
+		lightPos[0].xyz -  (blendPos.xyz * lightPos[0].w));
+	float3 lightDir1 = 	normalize(
+		lightPos[1].xyz -  (blendPos.xyz * lightPos[1].w));
+
+	
+	oUv = uv;
+	colour = ambient + 
+		(saturate(dot(lightDir0, norm)) * lightDiffuseColour[0]) + 
+		(saturate(dot(lightDir1, norm)) * lightDiffuseColour[1]);
+	
+}
+
+void hardwareMorphAnimation(float3 pos1 : POSITION,
+			  float4 normal		: NORMAL,
+			  float2 uv		  : TEXCOORD0,
+			  float3 pos2	  : TEXCOORD1,
+						  
+			  out float4 oPosition : POSITION,
+			  out float2 oUv	   : TEXCOORD0,
+			  out float4 colour    : COLOR,
+
+			  uniform float4x4 worldViewProj, 
+			  uniform float4 anim_t)
+{
+	// interpolate
+	float4 interp = float4(pos1 + anim_t.x*(pos2 - pos1), 1.0f);
+	
+	oPosition = mul(worldViewProj, interp);
+	oUv = uv;
+	colour = float4(1,0,0,1);
+}
+
+void hardwarePoseAnimation(float3 pos : POSITION,
+			  float4 normal		: NORMAL,
+			  float2 uv		  : TEXCOORD0,
+			  float3 pose1	  : TEXCOORD1,
+			  float3 pose2	  : TEXCOORD2,
+						  
+			  out float4 oPosition : POSITION,
+			  out float2 oUv	   : TEXCOORD0,
+			  out float4 colour    : COLOR,
+
+			  uniform float4x4 worldViewProj, 
+			  uniform float4 anim_t)
+{
+	// interpolate
+	float4 interp = float4(pos + anim_t.x*pose1 + anim_t.y*pose2, 1.0f);
+	
+	oPosition = mul(worldViewProj, interp);
+	oUv = uv;
+	colour = float4(1,0,0,1);
+}
+
