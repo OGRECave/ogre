@@ -1,0 +1,35 @@
+//Cg Pixel Shader ps_2_0
+fragment_program Radial_Blur_ps_cg cg
+{
+	source Radial_Blur_FP.cg
+	profiles ps_2_0 arbfp1
+	entry_point main
+}
+
+
+//Effect: Radial Blur
+material Ogre/Compositor/Radial_Blur
+{
+	technique
+	{
+		pass
+		{
+			//State: D3DRS_CULLMODE, Value : D3DCULL_NONE
+			cull_hardware none
+			cull_software none
+			depth_check off
+
+			fragment_program_ref Radial_Blur_ps_cg
+			{
+	            param_named sampleDist float 1.0
+	            param_named sampleStrength float 2.2
+			}
+			texture_unit
+			{
+                tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+		}
+	}
+}

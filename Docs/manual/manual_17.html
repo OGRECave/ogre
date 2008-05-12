@@ -1,0 +1,657 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                      "http://www.w3.org/TR/html40/loose.dtd">
+<HTML>
+<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people <dev@texi2html.cvshome.org>
+Send bugs and suggestions to <users@texi2html.cvshome.org>
+
+-->
+<HEAD>
+<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Texture Units</TITLE>
+
+<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Texture Units">
+<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Texture Units">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.66">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC68"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_16.html#SEC35"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_18.html#SEC95"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<H3> 3.1.3 Texture Units </H3>
+<!--docid::SEC68::-->
+
+Here are the attributes you can use in a 'texture_unit' section of a .material script:
+
+<A NAME="SEC69"></A>
+<H2> Available Texture Layer Attributes </H2>
+<!--docid::SEC69::-->
+<UL>
+<LI>
+<A HREF="manual_17.html#SEC71">texture_alias</A>
+<LI>
+<A HREF="manual_17.html#SEC72">texture</A>
+<LI>
+<A HREF="manual_17.html#SEC73">anim_texture</A>
+<LI>
+<A HREF="manual_17.html#SEC74">cubic_texture</A>
+<LI>
+<A HREF="manual_17.html#SEC77">tex_coord_set</A>
+<LI>
+<A HREF="manual_17.html#SEC78">tex_address_mode</A>
+<LI>
+<A HREF="manual_17.html#SEC79">tex_border_colour</A>
+<LI>
+<A HREF="manual_17.html#SEC80">filtering</A>
+<LI>
+<A HREF="manual_17.html#SEC81">max_anisotropy</A>
+<LI>
+<A HREF="manual_17.html#SEC82">mipmap_bias</A>
+<LI>
+<A HREF="manual_17.html#SEC83">colour_op</A>
+<LI>
+<A HREF="manual_17.html#SEC84">colour_op_ex</A>
+<LI>
+<A HREF="manual_17.html#SEC85">colour_op_multipass_fallback</A>
+<LI>
+<A HREF="manual_17.html#SEC86">alpha_op_ex</A>
+<LI>
+<A HREF="manual_17.html#SEC87">env_map</A>
+<LI>
+<A HREF="manual_17.html#SEC88">scroll</A>
+<LI>
+<A HREF="manual_17.html#SEC89">scroll_anim</A>
+<LI>
+<A HREF="manual_17.html#SEC90">rotate</A>
+<LI>
+<A HREF="manual_17.html#SEC91">rotate_anim</A>
+<LI>
+<A HREF="manual_17.html#SEC92">scale</A>
+<LI>
+<A HREF="manual_17.html#SEC93">wave_xform</A>
+<LI>
+<A HREF="manual_17.html#SEC94">transform</A>
+<LI>
+<A HREF="manual_17.html#SEC75">binding_type</A>
+<LI>
+<A HREF="manual_17.html#SEC76">content_type</A>
+</UL>
+
+You can also use a nested 'texture_source' section in order to use a special add-in as a source of texture data, See section <A HREF="manual_66.html#SEC285">6. External Texture Sources</A> for details.
+
+<A NAME="SEC70"></A>
+<H2> Attribute Descriptions  </H2>
+<!--docid::SEC70::-->
+<A NAME="texture_alias"></A>
+<A NAME="SEC71"></A>
+<H3> texture_alias </H3>
+<!--docid::SEC71::-->
+
+Sets the alias name for this texture unit.<BR><BR>
+
+Format: texture_alias &lt;name&gt;<BR><BR>
+
+Example: texture_alias NormalMap<BR><BR>
+
+Setting the texture alias name is usefull if this material is to be copied by other other materials and only the textures will be changed in the new material.(See section <A HREF="manual_25.html#SEC125">3.1.11 Copying Materials</A>)<BR><BR>
+Default: If a texture_unit has a name then the texture_alias defaults to the texture_unit name.
+
+<A NAME="texture"></A>
+<A NAME="SEC72"></A>
+<H3> texture </H3>
+<!--docid::SEC72::-->
+
+Sets the name of the static texture image this layer will use.<BR><BR>
+
+Format: texture &lt;texturename&gt; [&lt;type&gt;] [unlimited | numMipMaps] [alpha] [&lt;PixelFormat&gt;]<BR><BR>
+
+Example: texture funkywall.jpg<BR><BR>
+
+This setting is mutually exclusive with the anim_texture attribute. Note that the texture file cannot include spaces. Those of you Windows users who like spaces in filenames, please get over it and use underscores instead.<BR><BR>
+The 'type' parameter allows you to specify a the type of texture to create - the default is '2d', but you can override this; here's the full list:
+<DL COMPACT>
+<DT>1d
+<DD>A 1-dimensional texture; that is, a texture which is only 1 pixel high. These kinds of textures can be useful when you need to encode a function in a texture and use it as a simple lookup, perhaps in a fragment program. It is important that you use this setting when you use a fragment program which uses 1-dimensional texture coordinates, since GL requires you to use a texture type that matches (D3D will let you get away with it, but you ought to plan for cross-compatibility). Your texture widths should still be a power of 2 for best compatibility and performance.
+<DT>2d
+<DD>The default type which is assumed if you omit it, your texture has a width and a height, both of which should preferably be powers of 2, and if you can, make them square because this will look best on the most hardware. These can be addressed with 2D texture coordinates.
+<DT>3d
+<DD>A 3 dimensional texture ie volume texture. Your texture has a width, a height, both of which should be powers of 2, and has depth. These can be addressed with 3d texture coordinates ie through a pixel shader.
+<DT>cubic
+<DD>This texture is made up of 6 2D textures which are pasted around the inside of a cube. Can be addressed with 3D texture coordinates and are useful for cubic reflection maps and normal maps.
+</DL>
+The 'numMipMaps' option allows you to specify the number of mipmaps to generate for this texture. The default is 'unlimited' which means mips down to 1x1 size are generated. You can specify a fixed number (even 0) if you like instead. Note that if you use the same texture in many material scripts, the number of mipmaps generated will conform to the number specified in the first texture_unit used to load the texture - so be consistent with your usage.<BR><BR>
+
+The 'alpha' option allows you to specify that a single channel (luminence) texture should be loaded as alpha, rather than the default which is to load it into the red channel. This can be helpful if you want to use alpha-only textures in the fixed function pipeline.
+
+Default: none<BR><BR>
+
+The &lt;PixelFormat&gt; option allows you to specify the desired pixel format of the texture to create, which may be different to the pixel format of the texture file being loaded. Bear in mind that the final pixel format will be constrained by hardware capabilities so you may not get exactly what you ask for. The available options are:
+<DL COMPACT>
+<DT>PF_L8
+<DD>8-bit pixel format, all bits luminace.
+<DT>PF_L16
+<DD>16-bit pixel format, all bits luminace.
+<DT>PF_A8
+<DD>8-bit pixel format, all bits alpha.
+<DT>PF_A4L4
+<DD>8-bit pixel format, 4 bits alpha, 4 bits luminace.
+<DT>PF_BYTE_LA
+<DD>2 byte pixel format, 1 byte luminance, 1 byte alpha
+<DT>PF_R5G6B5
+<DD>16-bit pixel format, 5 bits red, 6 bits green, 5 bits blue.
+<DT>PF_B5G6R5
+<DD>16-bit pixel format, 5 bits blue, 6 bits green, 5 bits red.
+<DT>PF_R3G3B2
+<DD>8-bit pixel format, 3 bits red, 3 bits green, 2 bits blue.
+<DT>PF_A4R4G4B4
+<DD>16-bit pixel format, 4 bits for alpha, red, green and blue.
+<DT>PF_A1R5G5B5
+<DD>16-bit pixel format, 1 bit for alpha, 5 bits for red, green and blue.
+<DT>PF_R8G8B8
+<DD>24-bit pixel format, 8 bits for red, green and blue.
+<DT>PF_B8G8R8
+<DD>24-bit pixel format, 8 bits for blue, green and red.
+<DT>PF_A8R8G8B8
+<DD>32-bit pixel format, 8 bits for alpha, red, green and blue.
+<DT>PF_A8B8G8R8
+<DD>32-bit pixel format, 8 bits for alpha, blue, green and red.
+<DT>PF_B8G8R8A8
+<DD>32-bit pixel format, 8 bits for blue, green, red and alpha.
+<DT>PF_R8G8B8A8
+<DD>32-bit pixel format, 8 bits for red, green, blue and alpha.
+<DT>PF_X8R8G8B8
+<DD>32-bit pixel format, 8 bits for red, 8 bits for green, 8 bits for blue
+like PF_A8R8G8B8, but alpha will get discarded
+<DT>PF_X8B8G8R8
+<DD>32-bit pixel format, 8 bits for blue, 8 bits for green, 8 bits for red
+like PF_A8B8G8R8, but alpha will get discarded
+<DT>PF_A2R10G10B10
+<DD>32-bit pixel format, 2 bits for alpha, 10 bits for red, green and blue.
+<DT>PF_A2B10G10R10
+<DD>32-bit pixel format, 2 bits for alpha, 10 bits for blue, green and red.
+<DT>PF_FLOAT16_R
+<DD>16-bit pixel format, 16 bits (float) for red
+<DT>PF_FLOAT16_RGB
+<DD>48-bit pixel format, 16 bits (float) for red, 16 bits (float) for green, 16 bits (float) for blue
+<DT>PF_FLOAT16_RGBA
+<DD>64-bit pixel format, 16 bits (float) for red, 16 bits (float) for green, 16 bits (float) for blue, 16 bits (float) for alpha
+<DT>PF_FLOAT32_R
+<DD>16-bit pixel format, 16 bits (float) for red
+<DT>PF_FLOAT32_RGB
+<DD>96-bit pixel format, 32 bits (float) for red, 32 bits (float) for green, 32 bits (float) for blue
+<DT>PF_FLOAT32_RGBA
+<DD>128-bit pixel format, 32 bits (float) for red, 32 bits (float) for green, 32 bits (float) for blue, 32 bits (float) for alpha
+<DT>PF_SHORT_RGBA
+<DD>64-bit pixel format, 16 bits for red, green, blue and alpha
+</DL>
+
+<A NAME="anim_texture"></A>
+<A NAME="SEC73"></A>
+<H3> anim_texture </H3>
+<!--docid::SEC73::-->
+
+Sets the images to be used in an animated texture layer. In this case an animated texture layer means one which has multiple frames, each of which is a separate image file. There are 2 formats, one for implicitly determined image names, one for explicitly named images.<BR><BR>
+
+Format1 (short): anim_texture &lt;base_name&gt; &lt;num_frames&gt; &lt;duration&gt;<BR><BR>
+
+Example: anim_texture flame.jpg 5 2.5<BR><BR>
+
+This sets up an animated texture layer made up of 5 frames named flame_0.jpg, flame_1.jpg, flame_2.jpg etc, with an animation length of 2.5 seconds (2fps). If duration is set to 0, then no automatic transition takes place and frames must be changed manually in code.<BR><BR>
+
+Format2 (long): anim_texture &lt;frame1&gt; &lt;frame2&gt; ... &lt;duration&gt;<BR><BR>
+
+Example: anim_texture flamestart.jpg flamemore.png flameagain.jpg moreflame.jpg lastflame.tga 2.5<BR><BR>
+
+This sets up the same duration animation but from 5 separately named image files. The first format is more concise, but the second is provided if you cannot make your images conform to the naming standard required for it. <BR><BR>
+
+Default: none<BR><BR>
+
+<A NAME="cubic_texture"></A>
+<A NAME="SEC74"></A>
+<H3> cubic_texture </H3>
+<!--docid::SEC74::-->
+
+Sets the images used in a cubic texture, i.e. one made up of 6 individual images making up the faces of a cube. These kinds of textures are used for reflection maps (if hardware supports cubic reflection maps) or skyboxes. There are 2 formats, a brief format expecting image names of a particular format and a more flexible but longer format for arbitrarily named textures.<BR><BR>
+
+Format1 (short): cubic_texture &lt;base_name&gt; &lt;combinedUVW|separateUV&gt;<BR><BR>
+
+The base_name in this format is something like 'skybox.jpg', and the system will expect you to provide skybox_fr.jpg, skybox_bk.jpg, skybox_up.jpg, skybox_dn.jpg, skybox_lf.jpg, and skybox_rt.jpg for the individual faces.<BR><BR>
+
+Format2 (long): cubic_texture &lt;front&gt; &lt;back&gt; &lt;left&gt; &lt;right&gt; &lt;up&gt; &lt;down&gt; separateUV<BR><BR>
+
+In this case each face is specified explicitly, incase you don't want to conform to the image naming standards above. You can only use this for the separateUV version since the combinedUVW version requires a single texture name to be assigned to the combined 3D texture (see below).<BR><BR>
+
+In both cases the final parameter means the following:
+<DL COMPACT>
+<DT>combinedUVW
+<DD>	The 6 textures are combined into a single 'cubic' texture map which is then addressed using 3D texture coordinates with U, V and W components. Necessary for reflection maps since you never know which face of the box you are going to need. Note that not all cards support cubic environment mapping.
+<DT>separateUV
+<DD>	The 6 textures are kept separate but are all referenced by this single texture layer. One texture at a time is active (they are actually stored as 6 frames), and they are addressed using standard 2D UV coordinates. This type is good for skyboxes since only one face is rendered at one time and this has more guaranteed hardware support on older cards.
+</DL>
+<BR>
+Default: none
+
+<A NAME="binding_type"></A>
+<A NAME="SEC75"></A>
+<H3> binding_type </H3>
+<!--docid::SEC75::-->
+
+Tells this texture unit to bind to either the fragment processing unit or the vertex processing unit (for <A HREF="manual_24.html#SEC119">3.1.10 Vertex Texture Fetch</A>). <BR><BR>
+
+Format: binding_type &lt;vertex|fragment&gt;
+Default: binding_type fragment
+
+<A NAME="content_type"></A>
+<A NAME="SEC76"></A>
+<H3> content_type </H3>
+<!--docid::SEC76::-->
+
+Tells this texture unit where it should get its content from. The default is to get texture content from a named texture, as defined with the <A HREF="manual_17.html#SEC72">texture</A>, <A HREF="manual_17.html#SEC74">cubic_texture</A>, <A HREF="manual_17.html#SEC73">anim_texture</A> attributes. However you can also pull texture information from other automated sources. The options are:
+
+<DL COMPACT>
+<DT>named
+<DD>	The default option, this derives texture content from a texture name, loaded by ordinary means from a file or having been manually created with a given name.
+<DT>shadow
+<DD>	This option allows you to pull in a shadow texture, and is only valid when you use texture shadows and one of the 'custom sequence' shadowing types (See section <A HREF="manual_67.html#SEC292">7. Shadows</A>). The shadow texture in question will be from the 'n'th closest light that casts shadows, unless you use light-based pass iteration or the light_start option which may start the light index higher. When you use this option in multiple texture units within the same pass, each one references the next shadow texture. The shadow texture index is reset in the next pass, in case you want to take into account the same shadow textures again in another pass (e.g. a separate specular / gloss pass). By using this option, the correct light frustum projection is set up for you for use in fixed-function, if you use shaders just reference the texture_viewproj_matrix auto parameter in your shader.
+</DL>
+
+Format: content_type &lt;named|shadow&gt;
+Default: content_type named
+
+<A NAME="tex_coord_set"></A>
+<A NAME="SEC77"></A>
+<H3> tex_coord_set </H3>
+<!--docid::SEC77::-->
+
+Sets which texture coordinate set is to be used for this texture layer. A mesh can define multiple sets of texture coordinates, this sets which one this material uses.<BR><BR>
+
+Format: tex_coord_set &lt;set_num&gt;<BR><BR>
+
+Example: tex_coord_set 2<BR><BR>
+
+Default: tex_coord_set 0<BR><BR>
+
+<A NAME="tex_address_mode"></A>
+<A NAME="SEC78"></A>
+<H3> tex_address_mode </H3>
+<!--docid::SEC78::-->
+Defines what happens when texture coordinates exceed 1.0 for this texture layer.You can use the simple format to specify the addressing mode for all 3 potential texture coordinates at once, or you can use the 2/3 parameter extended format to specify a different mode per texture coordinate. <BR><BR>
+
+Simple Format: tex_address_mode &lt;uvw_mode&gt; <BR>
+Extended Format: tex_address_mode &lt;u_mode&gt; &lt;v_mode&gt; [&lt;w_mode&gt;]
+<DL COMPACT>
+<DT>wrap
+<DD>	Any value beyond 1.0 wraps back to 0.0. Texture is repeated.
+<DT>clamp
+<DD>	Values beyond 1.0 are clamped to 1.0. Texture 'streaks' beyond 1.0 since last line of pixels is used across the rest of the address space. Useful for textures which need exact coverage from 0.0 to 1.0 without the 'fuzzy edge' wrap gives when combined with filtering.
+<DT>mirror
+<DD>	Texture flips every boundary, meaning texture is mirrored every 1.0 u or v
+<DT>border
+<DD>	Values outside the range [0.0, 1.0] are set to the border colour, you might also set the <A HREF="manual_17.html#SEC79">tex_border_colour</A> attribute too.
+</DL>
+<BR>
+Default: tex_address_mode wrap<BR><BR>
+
+<A NAME="tex_border_colour"></A>
+<A NAME="SEC79"></A>
+<H3> tex_border_colour </H3>
+<!--docid::SEC79::-->
+
+Sets the border colour of border texture address mode (see <A HREF="manual_17.html#SEC78">tex_address_mode</A>). <BR><BR>
+
+Format: tex_border_colour &lt;red&gt; &lt;green&gt; &lt;blue&gt; [&lt;alpha&gt;]<BR>
+NB valid colour values are between 0.0 and 1.0.<BR><BR>
+
+Example: tex_border_colour 0.0 1.0 0.3<BR><BR>
+
+Default: tex_border_colour 0.0 0.0 0.0 1.0<BR><BR>
+
+<A NAME="filtering"></A>
+<A NAME="SEC80"></A>
+<H3> filtering </H3>
+<!--docid::SEC80::-->
+
+Sets the type of texture filtering used when magnifying or minifying a texture. There are 2 formats to this attribute, the simple format where you simply specify the name of a predefined set of filtering options, and the complex format, where you individually set the minification, magnification, and mip filters yourself.<BR><BR>
+<STRONG>Simple Format</STRONG><BR>
+Format: filtering &lt;none|bilinear|trilinear|anisotropic&gt;<BR>
+Default: filtering bilinear<BR><BR>
+With this format, you only need to provide a single parameter which is one of the following:
+<DL COMPACT>
+<DT>none
+<DD>	No filtering or mipmapping is used. This is equivalent to the complex format 'filtering point point none'.
+<DT>bilinear
+<DD>	2x2 box filtering is performed when magnifying or reducing a texture, and a mipmap is picked from the list but no filtering is done between the levels of the mipmaps. This is equivalent to the complex format 'filtering linear linear point'.
+<DT>trilinear
+<DD>	2x2 box filtering is performed when magnifying and reducing a texture, and the closest 2 mipmaps are filtered together. This is equivalent to the complex format 'filtering linear linear linear'.
+<DT>anisotropic
+<DD>	This is the same as 'trilinear', except the filtering algorithm takes account of the slope of the triangle in relation to the camera rather than simply doing a 2x2 pixel filter in all cases. This makes triangles at acute angles look less fuzzy. Equivalent to the complex format 'filtering anisotropic anisotropic linear'. Note that in order for this to make any difference, you must also set the <A HREF="manual_17.html#SEC81">max_anisotropy</A> attribute too.
+</DL>
+<BR><BR>
+<STRONG>Complex Format</STRONG><BR>
+Format: filtering &lt;minification&gt; &lt;magnification&gt; &lt;mip&gt;<BR>
+Default: filtering linear linear point<BR><BR>
+This format gives you complete control over the minification, magnification, and mip filters. Each parameter can be one of the following:
+<DL COMPACT>
+<DT>none
+<DD>	Nothing - only a valid option for the 'mip' filter , since this turns mipmapping off completely. The lowest setting for min and mag is 'point'. 
+<DT>point
+<DD>	Pick the closet pixel in min or mag modes. In mip mode, this picks the closet matching mipmap.
+<DT>linear
+<DD>	Filter a 2x2 box of pixels around the closest one. In the 'mip' filter this enables filtering between mipmap levels.
+<DT>anisotropic
+<DD>	Only valid for min and mag modes, makes the filter compensate for camera-space slope of the triangles. Note that in order for this to make any difference, you must also set the <A HREF="manual_17.html#SEC81">max_anisotropy</A> attribute too.
+</DL>
+
+<A NAME="max_anisotropy"></A>
+<A NAME="SEC81"></A>
+<H3> max_anisotropy </H3>
+<!--docid::SEC81::-->
+
+Sets the maximum degree of anisotropy that the renderer will try to compensate for when filtering textures. The degree of anisotropy is the ratio between the height of the texture segment visible in a screen space region versus the width - so for example a floor plane, which stretches on into the distance and thus the vertical texture coordinates change much faster than the horizontal ones, has a higher anisotropy than a wall which is facing you head on (which has an anisotropy of 1 if your line of sight is perfectly perpendicular to it). You should set the max_anisotropy value to something greater than 1 to begin compensating; higher values can compensate for more acute angles. The maximum value is determined by the hardware, but it is usually 8 or 16. <BR><BR>
+In order for this to be used, you have to set the minification and/or the magnification <A HREF="manual_17.html#SEC80">filtering</A> option on this texture to anisotropic.
+
+Format: max_anisotropy &lt;value&gt;<BR>
+Default: max_anisotropy 1
+
+<A NAME="mipmap_bias"></A>
+<A NAME="SEC82"></A>
+<H3> mipmap_bias </H3>
+<!--docid::SEC82::-->
+
+Sets the bias value applied to the mipmapping calculation, thus allowing you to alter the decision of which level of detail of the texture to use at any distance. The bias value is applied after the regular distance calculation, and adjusts the mipmap level by 1 level for each unit of bias. Negative bias values force larger mip levels to be used, positive bias values force smaller mip levels to be used. The bias is a floating point value so you can use values in between whole numbers for fine tuning.<BR><BR>
+In order for this option to be used, your hardware has to support mipmap biasing (exposed through the render system capabilities), and your minification <A HREF="manual_17.html#SEC80">filtering</A> has to be set to point or linear.
+
+Format: mipmap_bias &lt;value&gt;<BR>
+Default: mipmap_bias 0
+
+
+<A NAME="colour_op"></A>
+<A NAME="SEC83"></A>
+<H3> colour_op </H3>
+<!--docid::SEC83::-->
+
+Determines how the colour of this texture layer is combined with the one below it (or the lighting effect on the geometry if this is the first layer).<BR><BR>
+
+Format: colour_op &lt;replace|add|modulate|alpha_blend&gt;<BR><BR>
+
+This method is the simplest way to blend texture layers, because it requires only one parameter, gives you the most common blending types, and automatically sets up 2 blending methods: one for if single-pass multitexturing hardware is available, and another for if it is not and the blending must be achieved through multiple rendering passes. It is, however, quite limited and does not expose the more flexible multitexturing operations, simply because these can't be automatically supported in multipass fallback mode. If want to use the fancier options, use <A HREF="manual_17.html#SEC84">colour_op_ex</A>, but you'll either have to be sure that enough multitexturing units will be available, or you should explicitly set a fallback using <A HREF="manual_17.html#SEC85">colour_op_multipass_fallback</A>.<BR>
+<DL COMPACT>
+<DT>replace
+<DD>	Replace all colour with texture with no adjustment.
+<DT>add
+<DD>	Add colour components together.
+<DT>modulate
+<DD>	Multiply colour components together.
+<DT>alpha_blend
+<DD>	Blend based on texture alpha.
+</DL>
+<BR>
+Default: colour_op modulate
+
+<A NAME="colour_op_ex"></A>
+<A NAME="SEC84"></A>
+<H3> colour_op_ex </H3>
+<!--docid::SEC84::-->
+
+This is an extended version of the <A HREF="manual_17.html#SEC83">colour_op</A> attribute which allows extremely detailed control over the blending applied between this and earlier layers. Multitexturing hardware can apply more complex blending operations that multipass blendind, but you are limited to the number of texture units which are available in hardware.<BR><BR>
+
+Format: colour_op_ex &lt;operation&gt; &lt;source1&gt; &lt;source2&gt; [&lt;manual_factor&gt;] [&lt;manual_colour1&gt;] [&lt;manual_colour2&gt;]<BR><BR>
+
+Example colour_op_ex add_signed src_manual src_current 0.5<BR><BR>
+
+See the IMPORTANT note below about the issues between mulitpass and multitexturing that using this method can create. Texture colour operations determine how the final colour of the surface appears when rendered. Texture units are used to combine colour values from various sources (e.g. the diffuse colour of the surface from lighting calculations, combined with the colour of the texture). This method allows you to specify the 'operation' to be used, i.e. the calculation such as adds or multiplies, and which values to use as arguments, such as a fixed value or a value from a previous calculation.<BR><BR>
+
+<DL COMPACT>
+<DT>Operation options
+<DD><DL COMPACT>
+<DT>source1
+<DD>	Use source1 without modification
+<DT>source2
+<DD>	Use source2 without modification
+<DT>modulate
+<DD>	Multiply source1 and source2 together.
+<DT>modulate_x2
+<DD>	Multiply source1 and source2 together, then by 2 (brightening).
+<DT>modulate_x4
+<DD>	Multiply source1 and source2 together, then by 4 (brightening).
+<DT>add
+<DD>	Add source1 and source2 together.
+<DT>add_signed
+<DD>	Add source1 and source2 then subtract 0.5.
+<DT>add_smooth
+<DD>	Add source1 and source2, subtract the product
+<DT>subtract
+<DD>	Subtract source2 from source1
+<DT>blend_diffuse_alpha
+<DD>	Use interpolated alpha value from vertices to scale source1, then add source2 scaled by (1-alpha).
+<DT>blend_texture_alpha
+<DD>	As blend_diffuse_alpha but use alpha from texture
+<DT>blend_current_alpha
+<DD>	As blend_diffuse_alpha but use current alpha from previous stages (same as blend_diffuse_alpha for first layer)
+<DT>blend_manual
+<DD>	As blend_diffuse_alpha but use a constant manual alpha value specified in &lt;manual&gt;
+<DT>dotproduct
+<DD>	The dot product of source1 and source2
+<DT>blend_diffuse_colour
+<DD>	Use interpolated colour value from vertices to scale source1, then add source2 scaled by (1-colour).
+</DL>
+<DT>Source1 and source2 options
+<DD><DL COMPACT>
+<DT>src_current
+<DD>	The colour as built up from previous stages.
+<DT>src_texture
+<DD>	The colour derived from the texture assigned to this layer.
+<DT>src_diffuse
+<DD>	The interpolated diffuse colour from the vertices (same as 'src_current' for first layer).
+<DT>src_specular
+<DD>	The interpolated specular colour from the vertices.
+<DT>src_manual
+<DD>	The manual colour specified at the end of the command.
+</DL>
+</DL>
+<BR>
+For example 'modulate' takes the colour results of the previous layer, and multiplies them with the new texture being applied. Bear in mind that colours are RGB values from 0.0-1.0 so multiplying them together will result in values in the same range, 'tinted' by the multiply. Note however that a straight multiply normally has the effect of darkening the textures - for this reason there are brightening operations like modulate_x2. Note that because of the limitations on some underlying APIs (Direct3D included) the 'texture' argument can only be used as the first argument, not the second. <BR><BR>
+
+Note that the last parameter is only required if you decide to pass a value manually into the operation. Hence you only need to fill these in if you use the 'blend_manual' operation.<BR><BR>
+
+IMPORTANT: Ogre tries to use multitexturing hardware to blend texture layers together. However, if it runs out of texturing units (e.g. 2 of a GeForce2, 4 on a GeForce3) it has to fall back on multipass rendering, i.e. rendering the same object multiple times with different textures. This is both less efficient and there is a smaller range of blending operations which can be performed. For this reason, if you use this method you really should set the colour_op_multipass_fallback attribute to specify which effect you want to fall back on if sufficient hardware is not available (the default is just 'modulate' which is unlikely to be what you want if you're doing swanky blending here). If you wish to avoid having to do this, use the simpler colour_op attribute which allows less flexible blending options but sets up the multipass fallback automatically, since it only allows operations which have direct multipass equivalents.<BR><BR>
+
+Default: none (colour_op modulate)<BR>
+
+<A NAME="colour_op_multipass_fallback"></A>
+<A NAME="SEC85"></A>
+<H3> colour_op_multipass_fallback </H3>
+<!--docid::SEC85::-->
+
+Sets the multipass fallback operation for this layer, if you used colour_op_ex and not enough multitexturing hardware is available.<BR><BR>
+
+Format: colour_op_multipass_fallback &lt;src_factor&gt; &lt;dest_factor&gt;<BR><BR>
+
+Example: colour_op_mulitpass_fallback one one_minus_dest_alpha<BR><BR>
+
+Because some of the effects you can create using colour_op_ex are only supported under multitexturing hardware, if the hardware is lacking the system must fallback on multipass rendering, which unfortunately doesn't support as many effects. This attribute is for you to specify the fallback operation which most suits you.<BR><BR>
+
+The parameters are the same as in the scene_blend attribute; this is because multipass rendering IS effectively scene blending, since each layer is rendered on top of the last using the same mechanism as making an object transparent, it's just being rendered in the same place repeatedly to get the multitexture effect. If you use the simpler (and less flexible) colour_op attribute you don't need to call this as the system sets up the fallback for you.<BR><BR>
+
+<A NAME="alpha_op_ex"></A>
+<A NAME="SEC86"></A>
+<H3> alpha_op_ex </H3>
+<!--docid::SEC86::-->
+
+Behaves in exactly the same away as <A HREF="manual_17.html#SEC84">colour_op_ex</A> except that it determines how alpha values are combined between texture layers rather than colour values.The only difference is that the 2 manual colours at the end of colour_op_ex are just single floating-point values in alpha_op_ex.
+
+<A NAME="env_map"></A>
+<A NAME="SEC87"></A>
+<H3> env_map </H3>
+<!--docid::SEC87::-->
+
+Turns on/off texture coordinate effect that makes this layer an environment map.<BR><BR>
+
+Format: env_map &lt;off|spherical|planar|cubic_reflection|cubic_normal&gt;<BR><BR>
+
+Environment maps make an object look reflective by using automatic texture coordinate generation depending on the relationship between the objects vertices or normals and the eye.<BR><BR>
+<DL COMPACT>
+<DT>spherical
+<DD>	A spherical environment map. Requires a single texture which is either a fish-eye lens view of the reflected scene, or some other texture which looks good as a spherical map (a texture of glossy highlights is popular especially in car sims). This effect is based on the relationship between the eye direction and the vertex normals of the object, so works best when there are a lot of gradually changing normals, i.e. curved objects.
+<DT>planar
+<DD>	Similar to the spherical environment map, but the effect is based on the position of the vertices in the viewport rather than vertex normals. This effect is therefore useful for planar geometry (where a spherical env_map would not look good because the normals are all the same) or objects without normals.
+<DT>cubic_reflection
+<DD>	A more advanced form of reflection mapping which uses a group of 6 textures making up the inside of a cube, each of which is a view if the scene down each axis. Works extremely well in all cases but has a higher technical requirement from the card than spherical mapping. Requires that you bind a <A HREF="manual_17.html#SEC74">cubic_texture</A> to this texture unit and use the 'combinedUVW' option.
+<DT>cubic_normal
+<DD>	Generates 3D texture coordinates containing the camera space normal vector from the normal information held in the vertex data. Again, full use of this feature requires a <A HREF="manual_17.html#SEC74">cubic_texture</A> with the 'combinedUVW' option.
+	
+</DL>
+<BR>
+Default: env_map off<BR>
+
+<A NAME="scroll"></A>
+<A NAME="SEC88"></A>
+<H3> scroll </H3>
+<!--docid::SEC88::-->
+
+
+Sets a fixed scroll offset for the texture.<BR><BR>
+
+Format: scroll &lt;x&gt; &lt;y&gt;<BR><BR>
+
+This method offsets the texture in this layer by a fixed amount. Useful for small adjustments without altering texture coordinates in models. However if you wish to have an animated scroll effect, see the <A HREF="manual_17.html#SEC89">scroll_anim</A> attribute.<BR><BR>
+
+<A NAME="scroll_anim"></A>
+<A NAME="SEC89"></A>
+<H3> scroll_anim </H3>
+<!--docid::SEC89::-->
+
+Sets up an animated scroll for the texture layer. Useful for creating fixed-speed scrolling effects on a texture layer (for varying scroll speeds, see <A HREF="manual_17.html#SEC93">wave_xform</A>).<BR><BR>
+
+Format: scroll_anim &lt;xspeed&gt; &lt;yspeed&gt;<BR>
+
+<A NAME="rotate"></A>
+<A NAME="SEC90"></A>
+<H3> rotate </H3>
+<!--docid::SEC90::-->
+
+Rotates a texture to a fixed angle. This attribute changes the rotational orientation of a texture to a fixed angle, useful for fixed adjustments. If you wish to animate the rotation, see <A HREF="manual_17.html#SEC91">rotate_anim</A>.<BR><BR>
+
+Format: rotate &lt;angle&gt;<BR><BR>
+
+The parameter is a anticlockwise angle in degrees.<BR><BR>
+
+<A NAME="rotate_anim"></A>
+<A NAME="SEC91"></A>
+<H3> rotate_anim </H3>
+<!--docid::SEC91::-->
+
+Sets up an animated rotation effect of this layer. Useful for creating fixed-speed rotation animations (for varying speeds, see <A HREF="manual_17.html#SEC93">wave_xform</A>).<BR><BR>
+
+Format: rotate_anim &lt;revs_per_second&gt;<BR><BR>
+
+The parameter is a number of anticlockwise revolutions per second.<BR><BR>
+
+<A NAME="scale"></A>
+<A NAME="SEC92"></A>
+<H3> scale </H3>
+<!--docid::SEC92::-->
+
+Adjusts the scaling factor applied to this texture layer. Useful for adjusting the size of textures without making changes to geometry. This is a fixed scaling factor, if you wish to animate this see <A HREF="manual_17.html#SEC93">wave_xform</A>.<BR><BR>
+
+Format: scale &lt;x_scale&gt; &lt;y_scale&gt;<BR><BR>
+
+Valid scale values are greater than 0, with a scale factor of 2 making the texture twice as big in that dimension etc.<BR><BR>
+
+<A NAME="wave_xform"></A>
+<A NAME="SEC93"></A>
+<H3> wave_xform </H3>
+<!--docid::SEC93::-->
+
+Sets up a transformation animation based on a wave function. Useful for more advanced texture layer transform effects. You can add multiple instances of this attribute to a single texture layer if you wish.<BR><BR>
+
+Format: wave_xform &lt;xform_type&gt; &lt;wave_type&gt; &lt;base&gt; &lt;frequency&gt; &lt;phase&gt; &lt;amplitude&gt;<BR><BR>
+
+Example: wave_xform scale_x sine 1.0 0.2 0.0 5.0<BR><BR>
+<DL COMPACT>
+<DT>xform_type
+<DD><DL COMPACT>
+<DT>scroll_x
+<DD>	Animate the x scroll value
+<DT>scroll_y
+<DD>	Animate the y scroll value
+<DT>rotate
+<DD>	Animate the rotate value
+<DT>scale_x
+<DD>	Animate the x scale value
+<DT>scale_y
+<DD>	Animate the y scale value
+</DL>
+<DT>wave_type
+<DD><DL COMPACT>
+<DT>sine
+<DD>	A typical sine wave which smoothly loops between min and max values
+<DT>triangle
+<DD>	An angled wave which increases &amp; decreases at constant speed, changing instantly at the extremes
+<DT>square
+<DD>	Max for half the wavelength, min for the rest with instant transition between
+<DT>sawtooth
+<DD>	Gradual steady increase from min to max over the period with an instant return to min at the end.
+<DT>inverse_sawtooth
+<DD>	Gradual steady decrease from max to min over the period, with an instant return to max at the end.
+</DL>
+<DT>base
+<DD>	The base value, the minimum if amplitude &gt; 0, the maximum if amplitdue &lt; 0
+<DT>frequency
+<DD>	The number of wave iterations per second, i.e. speed
+<DT>phase
+<DD>	Offset of the wave start
+<DT>amplitude
+<DD>	The size of the wave
+</DL>
+<BR>
+The range of the output of the wave will be {base, base+amplitude}. So the example above scales the texture in the x direction between 1 (normal size) and 5 along a sine wave at one cycle every 5 second (0.2 waves per second).<BR><BR>
+
+<A NAME="transform"></A>
+<A NAME="SEC94"></A>
+<H3> transform </H3>
+<!--docid::SEC94::-->
+
+This attribute allows you to specify a static 4x4 transformation matrix for the texture unit, thus replacing the individual scroll, rotate and scale attributes mentioned above. <BR><BR>
+
+Format: transform m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m33<BR><BR>
+
+The indexes of the 4x4 matrix value above are expressed as m&lt;row&gt;&lt;col&gt;.
+
+<A NAME="Declaring Vertex and Fragment Programs"></A>
+<HR SIZE=1>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_16.html#SEC35"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_18.html#SEC95"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>
+<FONT SIZE="-1">
+This document was generated
+by <I>steve</I> on <I>June 22 2007</I>
+using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
+</FONT>
+
+</BODY>
+</HTML>

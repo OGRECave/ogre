@@ -1,0 +1,31 @@
+sampler RT : register(s0);
+sampler pattern : register(s1);
+
+float4 ASCII_ps(	float2 TexCoord : TEXCOORD0,
+			uniform float2 numTiles,
+			uniform float2 iNumTiles,
+			uniform float2 iNumTiles2,
+			uniform float4 lum,
+			uniform float charBias) : COLOR
+{
+    float3 local;
+
+	//sample RT
+	local.xy = fmod(TexCoord, iNumTiles);
+	float2 middle = TexCoord - local.xy;
+	local.xy = local.xy * numTiles;
+	
+	//iNumTiles2 = iNumTiles / 2
+	middle = middle + iNumTiles2;
+	float4 c = tex2D(RT, middle );
+	
+	//multiply luminance by charbias , beacause not all slices of the ascii
+	//volume texture are used
+	local.z = dot(c , lum)*charBias;
+	
+	//fix to brighten the dark pixels with small characters
+	//c *= lerp(2.0,1.0, local.z);
+	
+	c *= tex3D(pattern,local);
+	return c;
+}

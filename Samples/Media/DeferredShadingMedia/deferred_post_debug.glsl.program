@@ -1,0 +1,27 @@
+fragment_program DeferredShading/post/glsl/ShowNormal_ps glsl
+{
+	source DeferredShading/post/glsl/ShowNormal_ps.glsl
+	default_params
+	{
+		param_named tex0 int 0
+		param_named tex1 int 1
+	}
+}
+fragment_program DeferredShading/post/glsl/ShowDS_ps glsl
+{
+	source DeferredShading/post/glsl/ShowDS_ps.glsl
+	default_params
+	{
+		param_named tex0 int 0
+		param_named tex1 int 1
+	}
+}
+fragment_program DeferredShading/post/glsl/ShowColour_ps glsl
+{
+	source DeferredShading/post/glsl/ShowColour_ps.glsl
+	default_params
+	{
+		param_named tex0 int 0
+		param_named tex1 int 1
+	}
+}

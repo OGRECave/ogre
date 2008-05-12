@@ -1,0 +1,64 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on , 21 2003 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Hardware Buffers In OGRE: The VertexData class</TITLE>
+
+<META NAME="description" CONTENT="Hardware Buffers In OGRE: The VertexData class">
+<META NAME="keywords" CONTENT="Hardware Buffers In OGRE: The VertexData class">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC11"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_9.html#SEC10"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_9.html#SEC10"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_11.html#SEC12"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<H3> 2.6.1 The VertexData class </H3>
+<!--docid::SEC11::-->
+The VertexData class collects together all the vertex-related information used to render geometry. The new RenderOperation requires a pointer to a VertexData object, and it is also used in Mesh and SubMesh to store the vertex positions, normals, texture coordinates etc. VertexData can either be used alone (in order to render unindexed geometry, where the stream of vertices defines the triangles), or in combination with IndexData where the triangles are defined by indexes which refer to the entries in VertexData.
+<BR><BR>
+It's worth noting that you don't necessarily have to use VertexData to store your applications geometry; all that is required is that you can build a VertexData structure when it comes to rendering. This is pretty easy since all of VertexData's members are pointers, so you could maintain your vertex buffers and declarations in alternative structures if you like, so long as you can convert them for rendering.<BR><BR>
+The VertexData class has a number of important members:
+<DL COMPACT>
+<DT>vertexStart
+<DD>The position in the bound buffers to start reading vertex data from. This allows you to use a single buffer for many different renderables.
+<DT>vertexCount
+<DD>The number of vertices to process in this particular rendering group
+<DT>vertexDeclaration
+<DD>A pointer to a VertexDeclaration object which defines the format of the vertex input; note this is created for you by VertexData. See section <A HREF="vbo-update_11.html#SEC12">2.6.2 Vertex Declarations</A> 
+<DT>vertexBufferBinding
+<DD>A pointer to a VertexBufferBinding object which defines which vertex buffers are bound to which sources - again, this is created for you by VertexData. See section <A HREF="vbo-update_12.html#SEC14">2.6.3 Vertex Buffer Bindings</A>
+</DL>
+
+<A NAME="Vertex Declarations"></A>
+<HR SIZE=1>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Steve Streeting</I> on <I>, 21 2003</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

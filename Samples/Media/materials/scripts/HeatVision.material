@@ -1,0 +1,209 @@
+///////////////////////////////////
+//			 PASS 0
+//		HEAT CASTERS PASS
+///////////////////////////////////
+
+vertex_program Fury/HeatVision/HeatCaster_vp cg
+{
+   source HeatVision.cg
+   entry_point HeatCaster_vp
+   profiles vs_1_1 arbvp1
+}
+
+fragment_program Fury/HeatVision/HeatCaster_fp cg
+{
+   source HeatVision.cg
+   entry_point HeatCaster_fp
+   profiles ps_2_0 arbfp1
+}
+
+material Fury/HeatVision/HeatCaster
+{
+    technique
+    {
+        pass
+        {
+            vertex_program_ref Fury/HeatVision/HeatCaster_vp
+            {
+                param_named_auto eyePosition camera_position_object_space
+                param_named_auto worldViewProj worldviewproj_matrix
+            }
+
+            fragment_program_ref Fury/HeatVision/HeatCaster_fp
+            {
+            }
+        }
+    }
+}
+
+///////////////////////////////////
+//			 PASS 0
+//		HEAT CASTERS PASS
+///////////////////////////////////
+
+vertex_program Fury/HeatVision/ColdCaster_vp cg
+{
+   source HeatVision.cg
+   entry_point ColdCaster_vp
+   profiles vs_1_1 arbvp1
+}
+
+fragment_program Fury/HeatVision/ColdCaster_fp cg
+{
+   source HeatVision.cg
+   entry_point ColdCaster_fp
+   profiles ps_2_0 arbfp1
+}
+
+material Fury/HeatVision/ColdCaster
+{
+    technique
+    {
+        pass
+        {
+            vertex_program_ref Fury/HeatVision/ColdCaster_vp
+            {
+                param_named_auto eyePosition camera_position_object_space
+                param_named_auto worldViewProj worldviewproj_matrix
+            }
+
+            fragment_program_ref Fury/HeatVision/ColdCaster_fp
+            {
+            }
+        }
+    }
+}
+
+///////////////////////////////////
+//			  PASS 1
+//  LIGHT TO HEAT CONVERSION PASS
+///////////////////////////////////
+
+vertex_program Fury/HeatVision/LightToHeat_vp cg
+{
+   source HeatVision.cg
+   entry_point LightToHeat_vp
+   profiles vs_1_1 arbvp1
+
+    default_params
+    {
+        param_named_auto flipping render_target_flipping
+    }
+}
+
+fragment_program Fury/HeatVision/LightToHeat_fp cg
+{
+   source HeatVision.cg
+   entry_point LightToHeat_fp
+   profiles ps_2_0 arbfp1
+}
+
+material Fury/HeatVision/LightToHeat
+{
+    technique
+    {
+        // pass 1
+        pass
+        {
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+            vertex_program_ref Fury/HeatVision/LightToHeat_vp
+            {
+            }
+
+            fragment_program_ref Fury/HeatVision/LightToHeat_fp
+            {
+                // these should be *really* random!
+                param_named random_fractions float4 0.3 0.7 0 0
+
+                param_named depth_modulator float4 0.6 0 0 0
+
+                // this one can be fixed
+                param_named heatBiasScale float4 0.0 1.0 0 0
+            }
+
+            // INPUT (from scene, where entities has "Fury/HeatVision/Caster" material for heat emanation)
+            texture_unit
+            {
+                tex_coord_set 0
+                filtering linear linear none
+                tex_address_mode clamp
+            }
+
+            // Noise map
+            texture_unit
+            {
+                texture HeatNoise.tga
+                tex_coord_set 0
+            }
+
+            // heat conversion texture
+            texture_unit
+            {
+                texture HeatLookup.tga
+                tex_coord_set 0
+                filtering point point none
+            }
+        }
+    }
+
+}
+
+
+///////////////////////////////////
+//			  PASS 2
+//			 BLUR PASS
+///////////////////////////////////
+
+vertex_program Fury/HeatVision/Blur_vp cg
+{
+   source HeatVision.cg
+   entry_point Blur_vp
+   profiles vs_1_1 arbvp1
+
+    default_params
+    {
+        param_named_auto flipping render_target_flipping
+    }
+}
+
+fragment_program Fury/HeatVision/Blur_fp cg
+{
+   source HeatVision.cg
+   entry_point Blur_fp
+   profiles ps_2_0 arbfp1
+}
+
+material Fury/HeatVision/Blur
+{
+    technique
+    {
+        // pass 1
+        pass
+        {
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+            vertex_program_ref Fury/HeatVision/Blur_vp
+            {
+            }
+
+            fragment_program_ref Fury/HeatVision/Blur_fp
+            {
+                param_named blurAmount float4 0.5 0 0 0
+            }
+
+            // INPUT (from previous)
+            texture_unit
+            {
+                texture Input
+                tex_coord_set 0
+                filtering linear linear none
+                tex_address_mode clamp
+            }
+        }
+    }
+}

@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                      "http://www.w3.org/TR/html40/loose.dtd">
+<HTML>
+<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people <dev@texi2html.cvshome.org>
+Send bugs and suggestions to <users@texi2html.cvshome.org>
+
+-->
+<HEAD>
+<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Pixel boxes</TITLE>
+
+<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Pixel boxes">
+<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Pixel boxes">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.66">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC284"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_64.html#SEC281"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_60.html#SEC271"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_66.html#SEC285"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<H3> 5.8.5 Pixel boxes </H3>
+<!--docid::SEC284::-->
+
+All methods in Ogre that take or return raw image data return a PixelBox object.
+
+A PixelBox is a primitive describing a volume (3D), image (2D) or line (1D) of pixels in CPU memory. It describes the location and data format of a region of memory used for image data, but does not do any memory management in itself.
+
+Inside the memory pointed to by the <EM>data</EM> member of a pixel box, pixels are stored as a succession of &quot;depth&quot; slices (in Z), each containing &quot;height&quot; rows (Y) of &quot;width&quot; pixels (X).
+
+Dimensions that are not used must be 1. For example, a one dimensional image will have extents (width,1,1). A two dimensional image has extents (width,height,1).
+
+A PixelBox has the following members:
+<DL COMPACT>
+<DT>data
+<DD>The pointer to the first component of the image data in memory.
+<DT>format
+<DD>The pixel format (See section <A HREF="manual_64.html#SEC281">5.8.4 Pixel Formats</A>) of the image data.
+<DT>rowPitch
+<DD>The number of elements between the leftmost pixel of one row and the left pixel of the next. This value must always be equal to getWidth() (consecutive) for compressed formats.
+<DT>slicePitch
+<DD>The number of elements between the top left pixel of one (depth) slice and the top left pixel of the next. Must be a multiple of  rowPitch. This value must always be equal to getWidth()*getHeight() (consecutive)
+for compressed formats.
+<DT>left, top, right, bottom, front, back
+<DD>Extents of the box in three dimensional integer space. Note that the left, top, and front edges are included but the right, bottom and top ones are not. <EM>left</EM> must always be smaller or equal to <EM>right</EM>, <EM>top</EM> must always be smaller or equal to <EM>bottom</EM>, and <EM>front</EM> must always be smaller or equal to <EM>back</EM>.
+</DL>
+
+It also has some useful methods:
+<DL COMPACT>
+<DT>getWidth()
+<DD>Get the width of this box
+<DT>getHeight()
+<DD>Get the height of this box. This is 1 for one dimensional images.
+<DT>getDepth()
+<DD>Get the depth of this box. This is 1 for one and two dimensional images.
+<DT>setConsecutive()
+<DD>Set the rowPitch and slicePitch so that the buffer is laid out consecutive in memory.
+<DT>getRowSkip()
+<DD>Get the number of elements between one past the rightmost pixel of one row and the leftmost pixel of the next row. This is zero if rows are consecutive.
+<DT>getSliceSkip()
+<DD>Get the number of elements between one past the right bottom pixel of one slice and the left top pixel of the next slice. This is zero if slices are consecutive.
+<DT>isConsecutive()
+<DD>Return whether this buffer is laid out consecutive in memory (ie the pitches are equal to the dimensions)
+<DT>getConsecutiveSize()
+<DD>Return the size (in bytes) this image would take if it was laid out consecutive in memory
+<DT>getSubVolume(const Box &amp;def)
+<DD>Return a subvolume of this PixelBox, as a PixelBox.
+</DL>
+
+For more information about these methods consult the API documentation.
+
+<A NAME="External Texture Sources"></A>
+<HR SIZE=1>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_64.html#SEC281"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_60.html#SEC271"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_66.html#SEC285"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>
+<FONT SIZE="-1">
+This document was generated
+by <I>steve</I> on <I>June 22 2007</I>
+using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
+</FONT>
+
+</BODY>
+</HTML>

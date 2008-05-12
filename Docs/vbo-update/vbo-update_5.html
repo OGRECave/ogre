@@ -1,0 +1,79 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on , 21 2003 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Hardware Buffers In OGRE: Buffer Usage</TITLE>
+
+<META NAME="description" CONTENT="Hardware Buffers In OGRE: Buffer Usage">
+<META NAME="keywords" CONTENT="Hardware Buffers In OGRE: Buffer Usage">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC5"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_4.html#SEC4"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_3.html#SEC3"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_6.html#SEC6"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<H2> 2.2 Buffer Usage </H2>
+<!--docid::SEC5::-->
+Because the memory in a hardware buffer is likely to be under significant contention during the rendering of a scene, the kind of access you need to the buffer over the time it is used is extremely important; whether you need to update the contents of the buffer regularly, whether you need to be able to read information back from it, these are all important factors to how the graphics card manages the buffer. The method and exact parameters used to create a buffer depends on whether you are creating an index or vertex buffer (See section <A HREF="vbo-update_9.html#SEC10">2.6 Hardware Vertex Buffers</A> and See section <A HREF="vbo-update_14.html#SEC18">2.7 Hardware Index Buffers</A>), however one creation parameter is common to them both - the 'usage'. 
+<BR><BR>
+The most optimal type of hardware buffer is one which is not updated often, and is never read from. The usage parameter of createVertexBuffer or createIndexBuffer can be one of the following:
+<DL COMPACT>
+<DT><CODE>HBU_STATIC</CODE>
+<DD>This means you do not need to update the buffer very often, but you might occasionally want to read from it.
+
+<DT><CODE>HBU_STATIC_WRITE_ONLY</CODE>
+<DD>This means you do not need to update the buffer very often, and you do not need to read from it. However, you may read from it's shadow buffer if you set one up (See section <A HREF="vbo-update_6.html#SEC6">2.3 Shadow Buffers</A>). This is the optimal buffer usage setting.
+
+<DT><CODE>HBU_DYNAMIC</CODE>
+<DD>This means you expect to update the buffer often, and that you may wish to read from it. This is the least optimal buffer setting.
+
+<DT><CODE>HBU_DYNAMIC_WRITE_ONLY</CODE>
+<DD>This means you expect to update the buffer often, but that you never want to read from it. However, you may read from it's shadow buffer if you set one up (See section <A HREF="vbo-update_6.html#SEC6">2.3 Shadow Buffers</A>).
+
+</DL>
+Choosing the usage of your buffers carefully is important to getting optimal performance out of your geometry. If you have a situation where you need to update a vertex buffer often, consider whether you actually need to update <STRONG>all</STRONG> the parts of it, or just some. If it's the latter, consider using more than one buffer, with only the data you need to modify in the HBU_DYNAMIC buffer.
+<BR><BR>
+Always try to use the _WRITE_ONLY forms. This just means that you cannot read <EM>directly</EM> from the hardware buffer, which is good practice because reading from hardware buffers is very slow. If you really need to read data back, use a shadow buffer, described in the next section.
+
+<A NAME="Shadow Buffers"></A>
+<HR SIZE=1>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_4.html#SEC4"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_3.html#SEC3"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_6.html#SEC6"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Steve Streeting</I> on <I>, 21 2003</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

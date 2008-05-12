@@ -1,0 +1,39 @@
+fragment_program Ogre/Compositor/TilingFP cg
+{
+	source TilingFP.cg
+	entry_point Tiling_ps
+	profiles ps_2_0 arbfp1
+}
+
+material Ogre/Compositor/Tiling
+{
+    technique
+    {
+
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
+			{
+			}
+
+			//DirectX 9.0 HLSL Pixel Shader ps_2_0
+			fragment_program_ref Ogre/Compositor/TilingFP
+			{
+				param_named NumTiles float 75.0
+				param_named Threshhold float 0.15
+			}
+
+			texture_unit RT
+			{
+                tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+
+		}
+	}
+}

@@ -1,0 +1,67 @@
+\input texinfo   @c -*-texinfo-*-
+@c %**start of header
+@setfilename vbo-update.info
+@settitle Hardware Buffers In OGRE
+@c %**end of header
+   
+@titlepage
+@title Geometry Changes In OGRE 0.12
+@author Steve Streeting
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} The OGRE Team@*
+
+Permission is granted to make and distribute verbatim
+copies of this manual provided the copyright notice and
+this permission notice are preserved on all copies.
+
+Permission is granted to copy and distribute modified
+versions of this manual under the conditions for verbatim
+copying, provided that the entire resulting derived work is
+distributed under the terms of a permission notice
+identical to this one.
+@end titlepage
+
+@node Top
+@top Geometry Changes In OGRE 0.12
+This manual covers the changes which have been made in the core geometry 
+and rendering operation classes in OGRE v0.12.
+
+@ifinfo
+@menu
+* Introduction::                What's all this about anyway?
+* Hardware Buffers::				All about hardware buffers
+* Hardware Vertex Buffers::     The stuff that vertices are made of
+* Hardware Index Buffers::      Indirect rendering through indexes
+
+@detailmenu
+@end detailmenu
+@end menu
+@end ifinfo
+
+
+@node Introduction
+@chapter Introduction
+
+Geometry handling, for obvious reasons, is at the centre of any 3D engine. OGRE inherited much of its core geometry structures from a previous engine I 
+designed for DirectX 6 / OpenGL, and it has worked quite well. It was based around the historical premise that applications wanted to construct a lot
+of geometry in main memory, manipulate it on the CPU, and upload it in small chunks for the hardware to process every frame. This was fine because the card
+couldn't handle enormous amounts of polys anyway, so it was up to the application to pick the most appropriate subset to upload. 
+@*@*
+Times changed, however, with graphics processors beginning to have more and more of their own memory, and being able to process the transformation and lighting on the card itself, or in AGP memory, rather than main memory. This made it feasible to upload static geometry to the card and keep it there, avoiding the bandwidth requirements of the per-frame upload. The advent of vertex shaders has allowed programs to process the vertices in custom ways without having to shuffle them between main memory and the card. We'll call these GPU and AGP-based buffers 'Hardware Buffers'. We often refer to them as 'VBOs' (Vertex Buffer Objects) for speed, although the term is not exactly accurate since they can hold both vertex and index data. The use of hardware buffers can significantly improve the rendering speed of a scene, especially one with a large amount of repeating geometry or one which uses lots of multipass effects.
+
+@*@*
+So why did we wait until now? After all, the APIs have supported hardware buffers in some shape or form for some time. Well, there were a few reasons. Firstly, it's a large and disruptive change (to do it properly and use it to it's full) so we had to find time in our schedule. We worked on a separate CVS branch to avoid disturbing regular developers for some time. Secondly, it's actually only in the past 6-12 months that both APIs have exposed these functions in such a way that makes them practical to implement in a generic engine like OGRE. Whilst DirectX has had VBOs since D3D7, version 7 was so simplistic as to be almost useless, and version 8 has a serious design flaw which tied a buffer to a single vertex format, a restriction which would have crippled our design. D3D9 is the first version to have a genuinely useful VBO design. As for OpenGL, nVidia and ATI has their own, very separate extensions to the GL API to manage VBOs - these have only recently been standardised (Feb 2003) into the ARB_vertex_buffer_object extension. So we saw this as the best possible time to bring this new feature into OGRE.
+
+@section More than just hardware buffers
+Besides allowing buffers to be held on the GPU / AGP memory, we also took the opportunity to completely overhaul the way we represent geometry formats in the engine. Previously, the GeometryData and RenderOperation classes held explicit pointers to elements of the vertex, e.g. a pointer to the positions, a pointer to the normals etc. The type and format of the vertex elements was fixed (positions always had to be 3 floats for example), because that's how cards used too work. The latest generation of cards allow a lot more flexibility around what data you feed into them - for example if you like you can omit positions and generate them in the vertex shader, or use a 4D normal vector, among many other things. 
+@*@*
+In addition, since hardware buffers can be very large, there is more incentive to try to reuse and share buffers between meshes, perhaps using subsets of the same buffer for different purposes, perhaps even changing vertex format half way through the buffer - this sharing can be beneficial to performance because changing the source of the 'streams' of vertex data coming into the card can be comparatively expensive.
+@*@*
+Finally, we also wanted to make it easier to switch the vertex sources used by a given piece of geometry, without changing the information held about the format of the vertex. Therefore we have the concept of buffer bindings - vertex elements (a position for example) are bound to a 'source index' which is not a pointer to a buffer, it's just an identifier. You then 'bind' this index to a real vertex buffer, and you can rebind it to another buffer if you wish later.
+@*
+
+@include vbos.inc
+
+
+@bye

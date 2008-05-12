@@ -1,0 +1,84 @@
+fragment_program Ogre/Compositor/Combine_fp cg
+{
+	source Combine_fp.cg
+	profiles ps_2_0 arbfp1
+	entry_point Combine_fp
+
+	default_params
+	{
+		param_named blur float 0.8
+	}
+}
+
+material Ogre/Compositor/Combine
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+
+			fragment_program_ref Ogre/Compositor/Combine_fp
+			{
+			}
+
+			vertex_program_ref Ogre/Compositor/StdQuad_Cg_vp
+			{
+			}
+
+			texture_unit RT
+			{
+				tex_address_mode clamp
+				filtering linear linear none
+                tex_coord_set 0
+			}
+
+			texture_unit SUM
+			{
+				tex_address_mode clamp
+				filtering linear linear none
+                tex_coord_set 0
+			}
+		}
+	}
+}
+
+material Ogre/Compositor/Copyback
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_check off
+
+			texture_unit Temp
+			{
+				tex_address_mode clamp
+				filtering linear linear none
+				colour_op replace
+                tex_coord_set 0
+			}
+		}
+	}
+}
+
+material Ogre/Compositor/MotionBlur
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_check off
+
+			texture_unit Sum
+			{
+				tex_address_mode clamp
+				filtering linear linear none
+				colour_op replace
+                tex_coord_set 0
+			}
+		}
+	}
+}

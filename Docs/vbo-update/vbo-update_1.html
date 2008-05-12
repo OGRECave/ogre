@@ -1,0 +1,69 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on , 21 2003 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Hardware Buffers In OGRE: Introduction</TITLE>
+
+<META NAME="description" CONTENT="Hardware Buffers In OGRE: Introduction">
+<META NAME="keywords" CONTENT="Hardware Buffers In OGRE: Introduction">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC1"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_2.html#SEC2"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<A NAME="Introduction"></A>
+<H1> 1. Introduction </H1>
+<!--docid::SEC1::-->
+
+Geometry handling, for obvious reasons, is at the centre of any 3D engine. OGRE inherited much of its core geometry structures from a previous engine I 
+designed for DirectX 6 / OpenGL, and it has worked quite well. It was based around the historical premise that applications wanted to construct a lot
+of geometry in main memory, manipulate it on the CPU, and upload it in small chunks for the hardware to process every frame. This was fine because the card
+couldn't handle enormous amounts of polys anyway, so it was up to the application to pick the most appropriate subset to upload. 
+<BR><BR>
+Times changed, however, with graphics processors beginning to have more and more of their own memory, and being able to process the transformation and lighting on the card itself, or in AGP memory, rather than main memory. This made it feasible to upload static geometry to the card and keep it there, avoiding the bandwidth requirements of the per-frame upload. The advent of vertex shaders has allowed programs to process the vertices in custom ways without having to shuffle them between main memory and the card. We'll call these GPU and AGP-based buffers 'Hardware Buffers'. We often refer to them as 'VBOs' (Vertex Buffer Objects) for speed, although the term is not exactly accurate since they can hold both vertex and index data. The use of hardware buffers can significantly improve the rendering speed of a scene, especially one with a large amount of repeating geometry or one which uses lots of multipass effects.
+
+<BR><BR>
+So why did we wait until now? After all, the APIs have supported hardware buffers in some shape or form for some time. Well, there were a few reasons. Firstly, it's a large and disruptive change (to do it properly and use it to it's full) so we had to find time in our schedule. We worked on a separate CVS branch to avoid disturbing regular developers for some time. Secondly, it's actually only in the past 6-12 months that both APIs have exposed these functions in such a way that makes them practical to implement in a generic engine like OGRE. Whilst DirectX has had VBOs since D3D7, version 7 was so simplistic as to be almost useless, and version 8 has a serious design flaw which tied a buffer to a single vertex format, a restriction which would have crippled our design. D3D9 is the first version to have a genuinely useful VBO design. As for OpenGL, nVidia and ATI has their own, very separate extensions to the GL API to manage VBOs - these have only recently been standardised (Feb 2003) into the ARB_vertex_buffer_object extension. So we saw this as the best possible time to bring this new feature into OGRE.
+
+<HR SIZE=1>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_2.html#SEC2"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Steve Streeting</I> on <I>, 21 2003</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

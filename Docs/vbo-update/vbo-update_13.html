@@ -1,0 +1,88 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on , 21 2003 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Hardware Buffers In OGRE: Updating Vertex Buffers</TITLE>
+
+<META NAME="description" CONTENT="Hardware Buffers In OGRE: Updating Vertex Buffers">
+<META NAME="keywords" CONTENT="Hardware Buffers In OGRE: Updating Vertex Buffers">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC17"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_12.html#SEC14"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_9.html#SEC10"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_14.html#SEC18"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<H3> 2.6.4 Updating Vertex Buffers </H3>
+<!--docid::SEC17::-->
+The complexity of updating a vertex buffer entirely depends on how its contents are laid out. You can lock a buffer (See section <A HREF="vbo-update_7.html#SEC7">2.4 Locking buffers</A>), but how you write data into it vert much depends on what it contains.<BR><BR>
+Lets start with a vert simple example. Lets say you have a buffer which only contains vertex positions, so it only contains sets of 3 floating point numbers per vertex. In this case, all you need to do to write data into it is:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>Real* pReal = static_cast&#60;Real*&#62;(vbuf-&#62;lock(HardwareBuffer::HBL_DISCARD));
+</pre></td></tr></table>... then you just write positions in chunks of 3 reals. If you have other floating point data in there, it's a little more complex but the principle is largely the same, you just need to write alternate elements. But what if you have elements of different types, or you need to derive how to write the vertex data from the elements themselves? Well, there are some useful methods on the VertexElement class to help you out.<BR><BR>
+Firstly, you lock the buffer but assign the result to a unsigned char* rather than a specific type. Then, for each element whcih is sourcing from this buffer (which you can find out by calling VertexDeclaration::findElementsBySource) you call VertexElement::baseVertexPointerToElement. This offsets a pointer which points at the base of a vertex in a buffer to the beginning of the element in question, and allows you to use a pointer of the right type to boot. Here's a full example:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>// Get base pointer
+unsigned char* pVert = static_cast&#60;unsigned char*&#62;(vbuf-&#62;lock(HardwareBuffer::HBL_READ_ONLY));
+Real* pReal;
+// Get elements
+VertexDeclaration::VertexElementList elems = decl-&#62;findElementsBySource(bufferIdx);
+VertexDeclaration::VertexElementList::iterator i, iend;
+for (i = elems.begin(); i != elems.end(); ++i)
+{
+	VertexElement&#38; elem = *i;
+	if (elem.getSemantic() == VES_POSITION)
+	{
+		elem.baseVertexPointerToElement(pVert, &#38;pReal);
+		// write position using pReal
+
+	}
+	
+	...
+	
+	pVert += vbuf-&#62;getVertexSize();
+	
+}
+vbuf-&#62;unlock();
+</pre></td></tr></table>
+See the API docs for full details of all the helper methods on VertexDeclaration and VertexElement to assist you in manipulating vertex buffer data pointers.
+
+<A NAME="Hardware Index Buffers"></A>
+<HR SIZE=1>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_12.html#SEC14"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_9.html#SEC10"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_14.html#SEC18"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Steve Streeting</I> on <I>, 21 2003</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

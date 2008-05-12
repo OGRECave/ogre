@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>Using the 3DS Max exporter</title>
+</head>
+<body>
+<div style="text-align: left;">
+<div style="text-align: center;"><span
+ style="font-weight: bold; text-decoration: underline;">OGRE 3D Studio
+Max Exporter<br>
+</span><a href="http://www.ogre3d.org">http://www.ogre3d.org</a><span
+ style="font-weight: bold; text-decoration: underline;"><br>
+</span></div>
+<span style="font-weight: bold; text-decoration: underline;"></span></div>
+<span style="font-weight: bold; text-decoration: underline;"><br>
+How to use the 3DS exporter</span><br>
+<br>
+Please read '<a href="install.txt">install.txt</a>' for information on
+how to install the exporter.<br>
+<br>
+Features of the exporter:<br>
+<ul>
+  <li>exports meshes</li>
+  <li>exports bones, vertex assignements and bones animation, using the
+skin modifier</li>
+  <li>exports .material files, however you are
+better to use an OGRE .material script
+to define them, since you can then use the full OGRE material
+properties.</li>
+  <li>exports everything to XML, which allows you to review or alter
+the exported details if you wish. The XML must be converted to OGRE
+binary format using XMLConverter before runtime use.<br>
+  </li>
+</ul>
+<span style="font-weight: bold; text-decoration: underline;">How to use
+it</span><br>
+<ol>
+  <li>In the 'Ogre Tools' toolbar, click the 'Export to OGRE' button</li>
+  <li>Click the 'Select A Mesh' button and pick the mesh you wish to
+export</li>
+  <li>Tick the'Export Mesh' checkbox if you want to export the geometry
+of the object</li>
+  <li>Tick the 'Export Skeleton' box if you want to export the skeleton
+and animations. Specify the name you want to give the animation, the
+range and duration.<br>
+  </li>
+  <li>Specify an output file name which will be used as a base for all
+exported files</li>
+  <li>Click 'Export'</li>
+</ol>
+This will create XML files called &lt;outputfile&gt;.mesh.xml and
+&lt;outputfile&gt;.skeleton.xml. The former contains the geometry,
+material links and bone assignments, the latter contains the definition
+of the skeleton and the animation which was exported. Note that it is
+possible to have more than one animation for the skeleton in the same
+skeleton file, all you have to do is export the animations to separate
+files, and combine the extra animations in one XML file by adding the
+&lt;animation&gt; node&nbsp; and all it's children to the one
+&lt;animations&gt; node on the combined file, with a text editor.<br>
+<br>
+<span style="font-weight: bold; text-decoration: underline;">Converting
+XML to binary files</span><br>
+Once you're happy with the files, you need to convert them to OGRE's
+binary formats to use them at runtime (XML is too inefficient to use
+for
+large data structures like meshes at runtime).<br>
+<br>
+To do this, you need to use the XMLConverter tool, provided in the Ogre
+source tree under ogrenew/Tools/XMLConverter, or available as a
+precompiled binary if required. Simply run:<br>
+<pre>XMLConverter &lt;xml filename&gt;</pre>
+.. on both the .mesh.xml and .skeleton.xml files, and XMLConverter will
+produce .mesh and .skeleton binary files out of the XML. These can then
+be placed into your OGRE resource locations for runtime use.<br>
+<br>
+<span style="font-weight: bold; text-decoration: underline;">More
+information and tutorials</span><br>
+In samples directory, you can found 4 max files which show exporter
+features.
+Even if standard Ogre maps have been chosen, you may have to specify
+where are the bitmaps in the material editor.<br>
+<br>
+But before using these examples, please read the 2 tutorials you can
+found <a href="Docs/index.html">here</a>.<br>
+<br>
+The OGRE team would like to thank Etienne 'earthquakeProof' Mallard for
+developing this exporter.<br>
+<br>
+</body>
+</html>

@@ -1,0 +1,6 @@
+#ifdef __OBJC__
+#   include <Cocoa/Cocoa.h>
+#endif
+#include <Carbon/Carbon.h>
+
+#include <OgreStableHeaders.h>

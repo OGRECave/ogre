@@ -1,0 +1,12 @@
+# Defines plugins to load
+
+# Define plugin folder
+PluginFolder=@OGRE_PLUGINDIR@
+
+# Define D3D rendering implementation plugin
+Plugin=RenderSystem_GL.so
+Plugin=Plugin_ParticleFX.so
+Plugin=Plugin_BSPSceneManager.so
+Plugin=Plugin_OctreeSceneManager.so
+Plugin=Plugin_CgProgramManager.so
+

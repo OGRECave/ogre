@@ -1,0 +1,18 @@
+sampler RT : register(s0);
+sampler pattern : register(s1);
+
+half4 Dither_ps(	float2 TexCoord : TEXCOORD0) : COLOR
+{	
+	half c = dot(tex2D(RT, TexCoord),half4(0.30,0.11,0.59,0.00));
+	half n = tex2D(pattern, TexCoord).a*2 - 1.0;
+	c += n;
+	if (c > 0.5)
+	{
+		c = 0.0;
+	}
+	else
+	{
+		c = 1.0;
+	}   
+	return half4(c,c,c,1.0);
+}

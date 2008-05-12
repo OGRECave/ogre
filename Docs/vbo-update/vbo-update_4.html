@@ -1,0 +1,60 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on , 21 2003 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Hardware Buffers In OGRE: The Hardware Buffer Manager</TITLE>
+
+<META NAME="description" CONTENT="Hardware Buffers In OGRE: The Hardware Buffer Manager">
+<META NAME="keywords" CONTENT="Hardware Buffers In OGRE: The Hardware Buffer Manager">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC4"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_3.html#SEC3"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_3.html#SEC3"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_5.html#SEC5"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<H2> 2.1 The Hardware Buffer Manager </H2>
+<!--docid::SEC4::-->
+The HardwareBufferManager class is the factory hub of all the objects in the new geometry system. You create and destroy the majority of the objects you use to define geometry through this class. It's a Singleton, so you access it by doing HardwareBufferManager::getSingleton() - however be aware that it is only guaranteed to exist after the RenderSystem has been initialised (after you call Root::initialise); this is because the objects created are invariably API-specific, although you will deal with them through one common interface. 
+<BR><BR>
+For example:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>VertexDeclaration* decl = HardwareBufferManager::getSingleton().createVertexDeclaration();
+</pre></td></tr></table><TABLE><tr><td>&nbsp;</td><td class=example><pre>HardwareVertexBufferSharedPtr vbuf = 
+	HardwareBufferManager::getSingleton().createVertexBuffer(
+		3*sizeof(Real), // size of one whole vertex
+		numVertices, // number of vertices
+		HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
+		false); // no shadow buffer
+</pre></td></tr></table>Don't worry about the details of the above, we'll cover that in the later sections. The important thing to remember is to always create objects through the HardwareBufferManager, don't use 'new' (it won't work anyway in most cases).
+<A NAME="Buffer Usage"></A>
+<HR SIZE=1>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Steve Streeting</I> on <I>, 21 2003</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

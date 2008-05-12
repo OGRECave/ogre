@@ -1,0 +1,1392 @@
+# -*-perl-*-
+######################################################################
+# File: texi2html.init
+#
+# Sets default values for command-line arguments and for various customizable
+# procedures
+#
+# A copy of this file is pasted into the beginning of texi2html by
+# 'make texi2html'
+#
+# Copy this file and make changes to it, if you like.
+# Afterwards, either, load it with command-line option -init_file <your_init_file>
+#
+# $Id: ogretexi2html.init,v 1.3 2006-05-07 21:23:35 sinbad Exp $
+
+######################################################################
+# stuff which can also be set by command-line options
+#
+#
+# Note: values set here, overwrite values set by the command-line
+# options before -init_file and might still be overwritten by
+# command-line arguments following the -init_file option
+#
+
+# T2H_OPTIONS is a hash whose keys are the (long) names of valid
+# command-line options and whose values are a hash with the following keys:
+# type    ==> one of !|=i|:i|=s|:s (see GetOpt::Long for more info)
+# linkage ==> ref to scalar, array, or subroutine (see GetOpt::Long for more info)
+# verbose ==> short description of option (displayed by -h)
+# noHelp  ==> if 1 -> for "not so important options": only print description on -h 1
+#                2 -> for obsolete options: only print description on -h 2
+
+$T2H_DEBUG = 0;
+$T2H_OPTIONS -> {debug} =
+{
+ type => '=i',
+ linkage => \$main::T2H_DEBUG,
+ verbose => 'output HTML with debuging information',
+};
+
+$T2H_DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'; 
+$T2H_OPTIONS -> {doctype} = 
+{
+ type => '=s',
+ linkage => \$main::T2H_DOCTYPE,
+ verbose => 'document type which is output in header of HTML files',
+ noHelp => 1
+};
+
+$T2H_CHECK = 0;
+$T2H_OPTIONS -> {check} =
+{
+ type => '!',
+ linkage => \$main::T2H_CHECK,
+ verbose => 'if set, only check files and output all things that may be Texinfo commands',
+ noHelp => 1
+};
+
+# -expand
+# if set to "tex" (or, "info") expand @iftex and @tex (or, @ifinfo) sections
+# else, neither expand @iftex, @tex, nor @ifinfo sections
+$T2H_EXPAND = "info";
+$T2H_OPTIONS -> {expand} = 
+{
+ type => '=s',
+ linkage => \$T2H_EXPAND,
+ verbose => 'Expand info|tex|none section of texinfo source',
+};
+
+# - glossary
+#if set, uses section named `Footnotes' for glossary
+$T2H_USE_GLOSSARY = 0;
+T2H_OPTIONS -> {glossary} =
+{
+ type => '!',
+ linkage => \$T2H_USE_GLOSSARY,
+ verbose => "if set, uses section named `Footnotes' for glossary",
+ noHelp  => 1,
+};
+
+
+# -invisible
+# $T2H_INVISIBLE_MARK is the text used to create invisible destination
+# anchors for index links (you can for instance use the invisible.xbm
+# file shipped with this program). This is a workaround for a known
+# bug of many WWW browsers, including netscape.
+# For me, it works fine without it -- on the contrary: if there, it
+# inserts space between headers and start of text (obachman 3/99)
+$T2H_INVISIBLE_MARK = '';
+# $T2H_INVISIBLE_MARK = '&#160;';
+$T2H_OPTIONS -> {invisible} =
+{
+ type => '=s',
+ linkage => \$T2H_INVISIBLE_MARK,
+ verbose => 'use text in invisble anchot',
+ noHelp  => 1,
+};
+
+# -iso
+# if set, ISO8879 characters are used for special symbols (like copyright, etc)
+$T2H_USE_ISO = 0;
+$T2H_OPTIONS -> {iso} =
+{
+ type => 'iso',
+ linkage => \$T2H_USE_ISO,
+ verbose => 'if set, ISO8879 characters are used for special symbols (like copyright, etc)',
+ noHelp => 1,
+};
+
+# -I
+# list directories where @include files are searched for (besides the
+# directory of the doc file) additional '-I' args add to this list
+@T2H_INCLUDE_DIRS = (".");
+$T2H_OPTIONS -> {I} =
+{
+ type => '=s',
+ linkage => \@T2H_INCLUDE_DIRS,
+ verbose => 'append $s to the @include search path',
+};
+
+# -top_file
+# uses file of this name for top-level file
+# extension is manipulated appropriately, if necessary.
+# If empty, <basename of document>.html is used
+# Typically, you would set this to "index.html".
+$T2H_TOP_FILE = 'index.html';
+$T2H_OPTIONS -> {top_file} =
+{
+ type => '=s',
+ linkage => \$T2H_TOP_FILE,
+ verbose => 'use $s as top file, instead of <docname>.html',
+};
+
+
+# -toc_file
+# uses file of this name for table of contents file
+# extension is manipulated appropriately, if necessary.
+# If empty, <basename of document>_toc.html is used
+$T2H_TOC_FILE = '';
+$T2H_OPTIONS -> {toc_file} =
+{
+ type => '=s',
+ linkage => \$T2H_TOC_FILE,
+ verbose => 'use $s as ToC file, instead of <docname>_toc.html',
+};
+
+# -frames
+# if set, output two additional files which use HTML 4.0 "frames".
+$T2H_FRAMES = 0;
+$T2H_OPTIONS -> {frames} =
+{
+ type => '!',
+ linkage => \$T2H_FRAMES,
+ verbose => 'output files which use HTML 4.0 frames (experimental)',
+ noHelp => 1,
+};
+
+
+# -menu | -nomenu
+# if set, show the Texinfo menus
+$T2H_SHOW_MENU = 1;
+$T2H_OPTIONS -> {menu} =
+{
+ type => '!',
+ linkage => \$T2H_SHOW_MENU,
+ verbose => 'ouput Texinfo menus',
+};
+
+# -number | -nonumber
+# if set, number sections and show section names and numbers in references 
+# and menus
+$T2H_NUMBER_SECTIONS = 1;
+$T2H_OPTIONS -> {number} =
+{
+ type => '!',
+ linkage => \$T2H_NUMBER_SECTIONS,
+ verbose => 'use numbered sections'
+};
+
+# if set, and T2H_NUMBER_SECTIONS is set, then use node names in menu
+# entries, instead of section names
+$T2H_NODE_NAME_IN_MENU = 0;
+
+# if set and menu entry equals menu descr, then do not print menu descr.
+# Likewise, if node name equals entry name, do not print entry name.
+$T2H_AVOID_MENU_REDUNDANCY = 1;
+
+# -split section|chapter|none 
+# if set to 'section' (resp. 'chapter') create one html file per (sub)section
+# (resp. chapter) and separate pages for Top, ToC, Overview, Index,
+# Glossary, About.
+# otherwise, create monolithic html file which contains whole document
+$T2H_SPLIT = 'section';
+$T2H_SPLIT = '';
+$T2H_OPTIONS -> {split} =
+{
+ type => '=s',
+ linkage => \$T2H_SPLIT,
+ verbose => 'split document on section|chapter else no splitting',
+};
+
+# -section_navigation|-no-section_navigation
+# if set, then navigation panels are printed at the beginning of each section
+# and, possibly at the end (depending on whether or not there were more than 
+# $T2H_WORDS_IN_PAGE  words on page
+# This is most useful if you do not want to have section navigation 
+# on -split chapter
+$T2H_SECTION_NAVIGATION = 1;
+$T2H_OPTIONS -> {sec_nav} =
+{
+ type => '!',
+ linkage => \$T2H_SECTION_NAVIGATION,
+ verbose => 'output navigation panels for each section',
+};
+
+# -subdir
+# if set put result files in this directory
+# if not set result files are put into current directory
+#$T2H_SUBDIR = 'html';
+$T2H_SUBDIR = '';
+$T2H_OPTIONS -> {subdir} =
+{
+ type => '=s',
+ linkage => \$T2H_SUBDIR,
+ verbose => 'put HTML files in directory $s, instead of $cwd',
+};
+
+# -short_extn
+# If this is set all HTML file will have extension ".htm" instead of
+# ".html". This is helpful when shipping the document to PC systems.
+$T2H_SHORTEXTN = 0;
+$T2H_OPTIONS -> {short_ext} =
+{
+ type => '!',
+ linkage => \$T2H_SHORTEXTN,
+ verbose => 'use "htm" extension for output HTML files',
+};
+
+
+# -prefix
+# Set the output file prefix, prepended to all .html, .gif and .pl files.
+# By default, this is the basename of the document
+$T2H_PREFIX = '';
+$T2H_OPTIONS -> {prefix} =
+{
+ type => '=s',
+ linkage => \$T2H_PREFIX,
+ verbose => 'use as prefix for output files, instead of <docname>',
+};
+
+# -o filename
+# If set, generate monolithic document output html into $filename
+$T2H_OUT = '';
+$T2H_OPTIONS -> {out_file} =
+{
+ type => '=s',
+ linkage => sub {$main::T2H_OUT = @_[1]; $T2H_SPLIT = '';},
+ verbose => 'if set, all HTML output goes into file $s',
+};
+
+# -short_ref
+#if set cross-references are given without section numbers
+$T2H_SHORT_REF = '';
+$T2H_OPTIONS -> {short_ref} =
+{
+ type => '!',
+ linkage => \$T2H_SHORT_REF,
+ verbose => 'if set, references are without section numbers',
+};
+
+# -idx_sum
+# if value is set, then for each @prinindex $what
+# $docu_name_$what.idx is created which contains lines of the form
+# $key\t$ref sorted alphabetically (case matters)
+$T2H_IDX_SUMMARY = 0;
+$T2H_OPTIONS -> {idx_sum} =
+{
+ type => '!',
+ linkage => \$T2H_IDX_SUMMARY,
+ verbose => 'if set, also output index summary',
+ noHelp  => 1,
+};
+
+# -verbose
+# if set, chatter about what we are doing
+$T2H_VERBOSE = '';
+$T2H_OPTIONS -> {Verbose} =
+{
+ type => '!',
+ linkage => \$T2H_VERBOSE,
+ verbose => 'print progress info to stdout',
+};
+
+# -lang
+# For page titles use $T2H_WORDS->{$T2H_LANG}->{...} as title.
+# To add a new language, supply list of titles (see $T2H_WORDS below).
+# and use ISO 639 language codes (see e.g. perl module Locale-Codes-1.02 
+# for  definitions)
+# Default's to 'en' if not set or no @documentlanguage is specified
+$T2H_LANG = 'en';
+$T2H_OPTIONS -> {lang} =
+{
+ type => '=s',
+ linkage => sub {SetDocumentLanguage($_[1])},
+ verbose => 'use $s as document language (ISO 639 encoding)',
+};
+
+# -l2h
+# if set, uses latex2html for generation of math content 
+$T2H_L2H = '';
+$T2H_OPTIONS -> {l2h} =
+{
+ type => '!',
+ linkage => \$T2H_L2H,
+ verbose => 'if set, uses latex2html for @math and @tex',
+};
+
+######################
+# The following options are only relevant if $T2H_L2H is set
+#
+# -l2h_l2h
+# name/location of latex2html progam
+$T2H_L2H_L2H = "latex2html";
+$T2H_OPTIONS -> {l2h_l2h} =
+{
+ type => '=s',
+ linkage => \$T2H_L2H_L2H,
+ verbose => 'program to use for latex2html translation',
+ noHelp => 1,
+};
+
+# -l2h_skip
+# if set, skips actual call to latex2html tries to reuse previously generated 
+# content, instead
+$T2H_L2H_SKIP = '';
+$T2H_OPTIONS -> {l2h_skip} =
+{
+ type => '!',
+ linkage => \$T2H_L2H_SKIP,
+ verbose => 'if set, tries to reuse previously latex2html output',
+ noHelp => 1,
+};
+
+# -l2h_tmp
+# if set, l2h uses this directory for temporarary files. The path
+# leading to this directory may not contain a dot (i.e., a "."),
+# otherwise, l2h will fail
+$T2H_L2H_TMP = '';
+$T2H_OPTIONS -> {l2h_tmp} =
+{
+ type => '=s',
+ linkage => \$T2H_L2H_TMP,
+ verbose => 'if set, uses $s as temporary latex2html directory',
+ noHelp => 1,
+};
+
+# if set, cleans intermediate files (they all have the prefix $doc_l2h_) 
+# of l2h 
+$T2H_L2H_CLEAN = 1;
+$T2H_OPTIONS -> {l2h_clean} =
+{
+ type => '!',
+ linkage => \$T2H_L2H_CLEAN,
+ verbose => 'if set, do not keep intermediate latex2html files for later reuse',
+ noHelp => 1,
+};
+
+$T2H_OPTIONS -> {D} =
+{
+ type => '=s',
+ linkage => sub {$main::value{@_[1]} = 1;},
+ verbose => 'equivalent to Texinfo "@set $s 1"',
+ noHelp => 1,
+};
+
+$T2H_OPTIONS -> {init_file} =
+{
+ type => '=s',
+ linkage => \&LoadInitFile,
+ verbose => 'load init file $s'
+};
+
+
+##############################################################################
+#
+# The following can only be set in the init file
+#
+##############################################################################
+
+# if set, center @image by default
+# otherwise, do not center by default
+$T2H_CENTER_IMAGE = 1;
+
+# used as identation for block enclosing command @example, etc
+# If not empty, must be enclosed in <td></td>
+$T2H_EXAMPLE_INDENT_CELL = '<td>&nbsp;</td>';
+# same as above, only for @small
+$T2H_SMALL_EXAMPLE_INDENT_CELL = '<td>&nbsp;</td>';
+# font size for @small
+$T2H_SMALL_FONT_SIZE = '-1';
+
+# if non-empty, and no @..heading appeared in Top node, then
+# use this as header for top node/section, otherwise use value of 
+# @settitle or @shorttitle (in that order)
+$T2H_TOP_HEADING = '';
+
+# if set, use this chapter for 'Index' button, else
+# use first chapter whose name matches 'index' (case insensitive)
+$T2H_INDEX_CHAPTER = '';
+
+# if set and $T2H_SPLIT is set, then split index pages at the next letter
+# after they have more than that many entries
+$T2H_SPLIT_INDEX = 100;
+
+# if set (e.g., to index.html) replace hrefs to this file 
+# (i.e., to index.html) by ./
+$T2H_HREF_DIR_INSTEAD_FILE = '';
+
+########################################################################
+# Language dependencies: 
+# To add a new language extend T2H_WORDS hash and create $T2H_<...>_WORDS hash
+# To redefine one word, simply do:
+# $T2H_WORDS->{<language>}->{<word>} = 'whatever' in your personal init file.
+#
+$T2H_WORDS_EN =
+{
+ # titles  of pages
+ 'ToC_Title' => 'Table of Contents',
+ 'Overview_Title' => 'Short Table of Contents',
+ 'Index_Title' => 'Index',
+ 'About_Title' => 'About this document',
+ 'Footnotes_Title' => 'Footnotes',
+ 'See' => 'See',
+ 'see' => 'see',
+ 'section' => 'section',
+# If necessary, we could extend this as follows: 
+#  # text for buttons
+  'Top_Button' => 'Top',
+  'ToC_Button' => 'Contents',
+  'Overview_Button' => 'Overview',
+  'Index_button' => 'Index',
+  'Back_Button' => 'Back',
+  'FastBack_Button' => 'FastBack',
+  'Prev_Button' => 'Prev',
+  'Up_Button' => 'Up',
+  'Next_Button' => 'Next',
+  'Forward_Button' =>'Forward',
+  'FastWorward_Button' => 'FastForward',
+  'First_Button' => 'First',
+  'Last_Button' => 'Last',
+  'About_Button' => 'About'
+};
+
+$T2H_WORD_DE =
+{
+ 'ToC_Title' => 'Inhaltsverzeichniss',
+ 'Overview_Title' => 'Kurzes Inhaltsverzeichniss',
+ 'Index_Title' => 'Index',
+ 'About_Title' => '&Uuml;ber dieses Dokument',
+ 'Footnotes_Title' => 'Fu&szlig;noten',
+ 'See' => 'Siehe',
+ 'see' => 'siehe',
+ 'section' => 'Abschnitt',
+};
+
+$T2H_WORD_NL =
+{
+ 'ToC_Title' => 'Inhoudsopgave',
+ 'Overview_Title' => 'Korte inhoudsopgave',
+ 'Index_Title' => 'Index', #Not sure ;-)
+ 'About_Title' => 'No translation available!', #No translation available!
+ 'Footnotes_Title' => 'No translation available!', #No translation available!
+ 'See' => 'Zie',
+ 'see' => 'zie',
+ 'section' => 'sectie',
+};
+
+$T2H_WORD_ES =
+{
+ 'ToC_Title' => '&iacute;ndice General',
+ 'Overview_Title' => 'Resumen del Contenido',
+ 'Index_Title' => 'Index', #Not sure ;-)
+ 'About_Title' => 'No translation available!', #No translation available!
+ 'Footnotes_Title' => 'Fu&szlig;noten',
+ 'See' => 'V&eacute;ase',
+ 'see' => 'v&eacute;ase',
+ 'section' => 'secci&oacute;n',
+};
+
+$T2H_WORD_NO =
+{
+ 'ToC_Title' => 'Innholdsfortegnelse',
+ 'Overview_Title' => 'Kort innholdsfortegnelse',
+ 'Index_Title' => 'Indeks', #Not sure ;-)
+ 'About_Title' => 'No translation available!', #No translation available!
+ 'Footnotes_Title' => 'No translation available!',
+ 'See' => 'Se',
+ 'see' => 'se',
+ 'section' => 'avsnitt',
+};
+
+$T2H_WORD_PT =
+{
+ 'ToC_Title' => 'Sum&aacute;rio',
+ 'Overview_Title' => 'Breve Sum&aacute;rio',
+ 'Index_Title' => '&Iacute;ndice', #Not sure ;-)
+ 'About_Title' => 'No translation available!', #No translation available!
+ 'Footnotes_Title' => 'No translation available!',
+ 'See' => 'Veja',
+ 'see' => 'veja',
+ 'section' => 'Se&ccedil;&atilde;o',
+};
+
+$T2H_WORDS =
+{
+ 'en' => $T2H_WORDS_EN,
+ 'de' => $T2H_WORDS_DE,
+ 'nl' => $T2H_WORDS_NL,
+ 'es' => $T2H_WORDS_ES,
+ 'no' => $T2H_WORDS_NO,
+ 'pt' => $T2H_WORDS_PT
+};
+
+@MONTH_NAMES_EN =
+(
+ 'January', 'February', 'March', 'April', 'May',
+ 'June', 'July', 'August', 'September', 'October',
+ 'November', 'December'
+);
+
+@MONTH_NAMES_DE =
+(
+ 'Januar', 'Februar', 'M&auml;rz', 'April', 'Mai',
+ 'Juni', 'Juli', 'August', 'September', 'Oktober',
+ 'November', 'Dezember'
+);
+
+@MONTH_NAMES_NL =
+(
+ 'Januari', 'Februari', 'Maart', 'April', 'Mei',
+ 'Juni', 'Juli', 'Augustus', 'September', 'Oktober',
+ 'November', 'December'
+);
+
+@MONTH_NAMES_ES =
+(
+ 'enero', 'febrero', 'marzo', 'abril', 'mayo',
+ 'junio', 'julio', 'agosto', 'septiembre', 'octubre',
+ 'noviembre', 'diciembre'
+);
+
+@MONTH_NAMES_NO =
+(
+
+ 'januar', 'februar', 'mars', 'april', 'mai',
+ 'juni', 'juli', 'august', 'september', 'oktober',
+ 'november', 'desember'
+);
+
+@MONTH_NAMES_PT =
+(
+ 'Janeiro', 'Fevereiro', 'Mar&ccedil;o', 'Abril', 'Maio',
+ 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro',
+ 'Novembro', 'Dezembro'
+);
+
+
+$MONTH_NAMES =
+{
+    'en' => \@MONTH_NAMES_EN,
+    'de' => \@MONTH_NAMES_DE,
+    'es' => \@MONTH_NAMES_ES,
+    'nl' => \@MONTH_NAMES_NL,
+    'no' => \@MONTH_NAMES_NO,
+    'pt' => \@MONTH_NAMES_PT
+};
+########################################################################
+# Control of Page layout:
+# You can make changes of the Page layout at two levels:
+# 1.) For small changes, it is often enough to change the value of
+#     some global string/hash/array variables
+# 2.) For larger changes, reimplement one of the T2H_DEFAULT_<fnc>* routines,
+#     give them another name, and assign them to the respective
+#     $T2H_<fnc> variable.
+
+# As a general interface, the hashes T2H_HREF, T2H_NAME, T2H_NODE hold 
+# href, html-name, node-name of
+# This     -- current section (resp. html page)
+# Top      -- top page ($T2H_TOP_FILE)
+# Contents -- Table of contents
+# Overview -- Short table of contents
+# Index    -- Index page
+# About    -- page which explain "navigation buttons"
+# First    -- first node 
+# Last     -- last node
+#
+# Whether or not the following hash values are set, depends on the context 
+# (all values are w.r.t. 'This' section)
+# Next        -- next node of texinfo
+# Prev        -- previous node of texinfo
+# Up          -- up node of texinfo
+# Forward     -- next node in reading order
+# Back        -- previous node in reading order
+# FastForward -- if leave node, up and next, else next node
+# FastBackward-- if leave node, up and prev, else prev node
+#
+# Furthermore, the following global variabels are set:
+# $T2H_THISDOC{title}     -- title as set by @setttile
+# $T2H_THISDOC{fulltitle} -- full title as set by @title...
+# $T2H_THISDOC{subtitle}  -- subtitle as set by @subtitle
+# $T2H_THISDOC{author}    -- author as set by @author
+# 
+# and pointer to arrays of lines which need to be printed by t2h_print_lines 
+# $T2H_OVERVIEW      -- lines of short table of contents
+# $T2H_TOC           -- lines of table of contents
+# $T2H_TOP           -- lines of Top texinfo node 
+# $T2H_THIS_SECTION  -- lines of 'This' section
+
+#
+# There are the following subs which control the layout:
+#
+$T2H_print_section            = \&T2H_DEFAULT_print_section;
+$T2H_print_Top_header         = \&T2H_DEFAULT_print_Top_header;       
+$T2H_print_Top_footer	      = \&T2H_DEFAULT_print_Top_footer;       
+$T2H_print_Top		      = \&T2H_DEFAULT_print_Top;              
+$T2H_print_Toc		      = \&T2H_DEFAULT_print_Toc;              
+$T2H_print_Overview	      = \&T2H_DEFAULT_print_Overview;         
+$T2H_print_Footnotes	      = \&T2H_DEFAULT_print_Footnotes;        
+$T2H_print_About	      = \&T2H_DEFAULT_print_About;            
+$T2H_print_misc_header	      = \&T2H_DEFAULT_print_misc_header;      
+$T2H_print_misc_footer	      = \&T2H_DEFAULT_print_misc_footer;      
+$T2H_print_misc		      = \&T2H_DEFAULT_print_misc;
+$T2H_print_chapter_header     = \&T2H_DEFAULT_print_chapter_header;      
+$T2H_print_chapter_footer     = \&T2H_DEFAULT_print_chapter_footer;      
+$T2H_print_page_head	      = \&T2H_DEFAULT_print_page_head;        
+$T2H_print_page_foot	      = \&T2H_DEFAULT_print_page_foot;        
+$T2H_print_head_navigation    = \&T2H_DEFAULT_print_head_navigation;  
+$T2H_print_foot_navigation    = \&T2H_DEFAULT_print_foot_navigation;  
+$T2H_button_icon_img	      = \&T2H_DEFAULT_button_icon_img;        
+$T2H_print_navigation	      = \&T2H_DEFAULT_print_navigation;       
+$T2H_about_body		      = \&T2H_DEFAULT_about_body;            
+$T2H_print_frame              = \&T2H_DEFAULT_print_frame;
+$T2H_print_toc_frame          = \&T2H_DEFAULT_print_toc_frame;
+
+########################################################################
+# Layout for html for every sections
+#
+sub T2H_DEFAULT_print_section
+{
+  my $fh = shift;
+  local $T2H_BUTTONS = \@T2H_SECTION_BUTTONS;
+  &$T2H_print_head_navigation($fh) if $T2H_SECTION_NAVIGATION;
+  my $nw = t2h_print_lines($fh);
+  if ($T2H_SPLIT eq 'section' && $T2H_SECTION_NAVIGATION)
+  {
+    &$T2H_print_foot_navigation($fh, $nw);
+  }
+  else
+  {
+    print $fh '<HR SIZE="6">' . "\n";
+  }
+}
+
+###################################################################
+# Layout of top-page I recommend that you use @ifnothtml, @ifhtml,
+# @html within the Top texinfo node to specify content of top-level
+# page. 
+#
+# If you enclose everything in @ifnothtml, then title, subtitle,
+# author and overview is printed
+# T2H_HREF of Next, Prev, Up, Forward, Back are not defined
+# if $T2H_SPLIT then Top page is in its own html file
+sub T2H_DEFAULT_print_Top_header
+{
+  &$T2H_print_page_head(@_) if $T2H_SPLIT;
+  t2h_print_label(@_); # this needs to be called, otherwise no label set
+  &$T2H_print_head_navigation(@_);
+}
+sub T2H_DEFAULT_print_Top_footer
+{
+  &$T2H_print_foot_navigation(@_);
+  &$T2H_print_page_foot(@_) if $T2H_SPLIT; 
+}
+sub T2H_DEFAULT_print_Top
+{
+  my $fh = shift;
+
+  # for redefining navigation buttons use:
+  # local $T2H_BUTTONS = [...];
+  # as it is, 'Top', 'Contents', 'Index', 'About' are printed
+  local $T2H_BUTTONS = \@T2H_MISC_BUTTONS;
+  &$T2H_print_Top_header($fh);
+  if ($T2H_THIS_SECTION)
+  {
+    # if top-level node has content, then print it with extra header
+    print $fh "<H1>$T2H_NAME{Top}</H1>"
+      unless ($T2H_HAS_TOP_HEADING);
+    t2h_print_lines($fh, $T2H_THIS_SECTION)
+  }
+  else
+  {
+    # top-level node is fully enclosed in @ifnothtml
+    # print fulltitle, subtitle, author, Overview
+    print $fh 
+      "<CENTER>\n<H1>" .
+      join("</H1>\n<H1>", split(/\n/,  $T2H_THISDOC{fulltitle})) .
+      "</H1>\n";
+    print $fh "<H2>$T2H_THISDOC{subtitle}</H2>\n" if $T2H_THISDOC{subtitle};
+    print $fh "$T2H_THISDOC{author}\n" if $T2H_THISDOC{author};
+    print $fh <<EOT;
+</CENTER>
+<HR>
+<P></P>  
+<H2> Overview: </H2>
+<BLOCKQUOTE>  
+EOT
+    t2h_print_lines($fh, $T2H_OVERVIEW);
+    print $fh "</BLOCKQUOTE>\n";
+  }
+  &$T2H_print_Top_footer($fh);
+}
+
+###################################################################
+# Layout of Toc, Overview, and Footnotes pages
+# By default, we use "normal" layout 
+# T2H_HREF of Next, Prev, Up, Forward, Back, etc are not defined
+# use: local $T2H_BUTTONS = [...] to redefine navigation buttons
+sub T2H_DEFAULT_print_Toc
+{
+  return &$T2H_print_misc(@_);
+}
+sub T2H_DEFAULT_print_Overview
+{
+  return &$T2H_print_misc(@_);
+}
+sub T2H_DEFAULT_print_Footnotes
+{
+  return &$T2H_print_misc(@_);
+}
+sub T2H_DEFAULT_print_About
+{
+  return &$T2H_print_misc(@_);
+}
+
+sub T2H_DEFAULT_print_misc_header
+{
+  &$T2H_print_page_head(@_) if $T2H_SPLIT;
+  # this needs to be called, otherwise, no labels are set
+  t2h_print_label(@_); 
+  &$T2H_print_head_navigation(@_);
+}
+sub T2H_DEFAULT_print_misc_footer
+{
+  &$T2H_print_foot_navigation(@_);
+  &$T2H_print_page_foot(@_) if $T2H_SPLIT; 
+}
+sub T2H_DEFAULT_print_misc
+{
+  my $fh = shift;
+  local $T2H_BUTTONS = \@T2H_MISC_BUTTONS;
+  &$T2H_print_misc_header($fh);
+  print $fh "<H1>$T2H_NAME{This}</H1>\n";
+  t2h_print_lines($fh);
+  &$T2H_print_misc_footer($fh);
+}
+
+###################################################################
+# chapter_header and chapter_footer are only called if
+# T2H_SPLIT eq 'chapter'
+# chapter_header: after print_page_header, before print_section
+# chapter_footer: after print_section of last section, before print_page_footer
+# 
+# If you want to get rid of navigation stuff after each section,
+# redefine print_section such that it does not call print_navigation,
+# and put print_navigation into print_chapter_header
+@T2H_CHAPTER_BUTTONS =
+  (
+   'FastBack', 'FastForward', ' ', 
+   ' ', ' ', ' ', ' ',
+   'Top', 'Contents', 'Index', 'About', 
+  );
+
+sub T2H_DEFAULT_print_chapter_header
+{
+  # nothing to do there, by default
+  if (! $T2H_SECTION_NAVIGATION)
+  {
+    my $fh = shift;
+    local $T2H_BUTTONS = \@T2H_CHAPTER_BUTTONS;
+    &$T2H_print_navigation($fh);
+    print $fh "\n<HR SIZE=2>\n";
+  }
+}
+
+sub T2H_DEFAULT_print_chapter_footer
+{
+  local $T2H_BUTTONS = \@T2H_CHAPTER_BUTTONS;
+  &$T2H_print_navigation(@_);
+}
+###################################################################
+$T2H_TODAY = &pretty_date;		# like "20 September 1993"
+
+sub pretty_date {
+    local($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst);
+
+    ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime(time);
+    $year += ($year < 70) ? 2000 : 1900;
+    # obachman: Let's do it as the Americans do
+    return($MONTH_NAMES->{$T2H_LANG}[$mon] . " " . $mday . " " . $year);
+}
+
+
+###################################################################
+# Layout of standard header and footer
+#
+
+# Set the default body text, inserted between <BODY ... > 
+###$T2H_BODYTEXT = 'LANG="EN" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000"';
+$T2H_BODYTEXT = 'LANG="' . $T2H_LANG . '" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000"';
+# text inserted after <BODY ...>
+$T2H_AFTER_BODY_OPEN = '';
+#text inserted before </BODY>
+$T2H_PRE_BODY_CLOSE = '';
+# this is used in footer
+$T2H_ADDRESS = "by <I>$T2H_USER</I> " if $T2H_USER;
+$T2H_ADDRESS .= "on <I>$T2H_TODAY</I>";
+# this is added inside <HEAD></HEAD> after <TITLE> and some META NAME stuff
+# can be used for <style> <script>, <meta> tags
+$T2H_EXTRA_HEAD = '<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> ';
+
+sub T2H_DEFAULT_print_page_head
+{
+  my $fh = shift; 
+  my $longtitle = "$T2H_THISDOC{title}: $T2H_NAME{This}";
+  print $fh <<EOT;
+<HTML>
+$T2H_DOCTYPE
+<!-- Created on $T2H_TODAY by $THISPROG -->
+<!-- 
+$T2H_AUTHORS 
+-->
+<HEAD>
+<TITLE>$longtitle</TITLE>
+
+<META NAME="description" CONTENT="$longtitle">
+<META NAME="keywords" CONTENT="$longtitle">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="$THISPROG">
+$T2H_EXTRA_HEAD
+</HEAD>
+
+<BODY $T2H_BODYTEXT>
+$T2H_AFTER_BODY_OPEN
+EOT
+}
+
+sub T2H_DEFAULT_print_page_foot
+{
+  my $fh = shift;
+  print $fh <<EOT;
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+$T2H_ADDRESS
+using <A HREF="$T2H_HOMEPAGE"><I>texi2html</I></A>
+$T2H_PRE_BODY_CLOSE
+</BODY>
+</HTML>
+EOT
+}
+
+###################################################################
+# Layout of navigation panel
+
+# if this is set, then a vertical navigation panel is used
+$T2H_VERTICAL_HEAD_NAVIGATION = 0;
+sub T2H_DEFAULT_print_head_navigation
+{
+  my $fh = shift;
+  if ($T2H_VERTICAL_HEAD_NAVIGATION)
+  {
+    print $fh <<EOT;
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+<TR VALIGN="TOP">
+<TD ALIGN="LEFT">
+EOT
+  }
+  &$T2H_print_navigation($fh, $T2H_VERTICAL_HEAD_NAVIGATION);
+  if ($T2H_VERTICAL_HEAD_NAVIGATION)
+  {
+    print $fh <<EOT;
+</TD>
+<TD ALIGN="LEFT">
+EOT
+  }
+  elsif ($T2H_SPLIT eq 'section')
+  {
+    print $fh "<HR SIZE=1>\n";
+  }
+}
+
+# Specifies the minimum page length required before a navigation panel
+# is placed at the bottom of a page (the default is that of latex2html)
+# T2H_THIS_WORDS_IN_PAGE holds number of words of current page
+$T2H_WORDS_IN_PAGE = 300;
+sub T2H_DEFAULT_print_foot_navigation
+{
+  my $fh = shift;
+  my $nwords = shift;
+  if ($T2H_VERTICAL_HEAD_NAVIGATION)
+  {
+    print $fh <<EOT;
+</TD>
+</TR>
+</TABLE>
+EOT
+  }
+  print $fh "<HR SIZE=1>\n";
+  &$T2H_print_navigation($fh) if ($nwords >= $T2H_WORDS_IN_PAGE)
+}
+
+######################################################################
+# navigation panel
+#
+# specify in this array which "buttons" should appear in which order
+# in the navigation panel for sections; use ' ' for empty buttons (space)
+@T2H_SECTION_BUTTONS =
+  (
+   'Back', 'Up', 'Forward', ' ', ' ', ' ',  
+   ' ', ' ', ' ', ' ',
+   'Top', 'Contents', 'Index', 'About', 
+  );
+
+# buttons for misc stuff
+@T2H_MISC_BUTTONS = ('Top', 'Contents', 'Index', 'About');
+
+# insert here name of icon images for buttons 
+# Icons are used, if $T2H_ICONS and resp. value are set
+%T2H_ACTIVE_ICONS =
+  (
+   'Top',      '',
+   'Contents', '',
+   'Overview', '',
+   'Index',    '',
+   'Back',     '',
+   'FastBack', '',
+   'Prev',     '',
+   'Up',       '',
+   'Next',     '',
+   'Forward',  '',
+   'FastForward', '',
+   'About' ,    '',
+   'First',    '',
+   'Last',     '',
+   ' ',        ''
+  );
+
+# insert here name of icon images for these, if button is inactive
+%T2H_PASSIVE_ICONS =
+  (
+   'Top',      '',
+   'Contents', '',
+   'Overview', '',
+   'Index',    '',
+   'Back',     '',
+   'FastBack', '',
+   'Prev',     '',
+   'Up',       '',
+   'Next',     '',
+   'Forward',  '',
+   'FastForward', '',
+   'About',     '',
+   'First',    '',
+   'Last',     '',
+  );
+
+# how to create IMG tag
+sub T2H_DEFAULT_button_icon_img
+{
+  my $button = shift;
+  my $icon = shift;
+  my $name = shift;
+  return qq{<IMG SRC="$icon" BORDER="0" ALT="$button: $name" ALIGN="MIDDLE">};
+}
+
+# Names of text as alternative for icons
+%T2H_NAVIGATION_TEXT =
+  (
+   'Top',      'Top',
+   'Contents', 'Contents',
+   'Overview', 'Overview',
+   'Index',    'Index',
+   ' ',        ' &nbsp; ',
+   'Back',     ' &lt; ',
+   'FastBack', ' &lt;&lt; ',
+   'Prev',     'Prev',
+   'Up',       ' Up ',
+   'Next',     'Next',
+   'Forward',  ' &gt; ',
+   'FastForward',  ' &gt;&gt; ',
+   'About',     ' ? ',
+   'First',    ' |&lt; ',
+   'Last',     ' &gt;| '
+  );
+
+sub T2H_DEFAULT_print_navigation
+{
+  my $fh = shift;
+  my $vertical = shift;
+  my $spacing = 1;
+  print $fh "<TABLE CELLPADDING=$spacing CELLSPACING=$spacing BORDER=0>\n";
+
+  print $fh "<TR>" unless $vertical;
+  for $button (@$T2H_BUTTONS)
+  {
+    print $fh qq{<TR VALIGN="TOP" ALIGN="LEFT">\n} if $vertical;
+    print $fh qq{<TD VALIGN="MIDDLE" ALIGN="LEFT">};
+
+    if (ref($button) eq 'CODE')
+    {
+      &$button($fh, $vertical);
+    }
+    elsif ($button eq ' ')
+    { # handle space button
+      print $fh 
+	$T2H_ICONS && $T2H_ACTIVE_ICONS{' '} ? 
+	 &$T2H_button_icon_img($button, $T2H_ACTIVE_ICONS{' '}) :
+	 $T2H_NAVIGATION_TEXT{' '};
+      next;
+    }
+    elsif ($T2H_HREF{$button})
+    { # button is active
+      print $fh   
+	 $T2H_ICONS && $T2H_ACTIVE_ICONS{$button} ? # use icon ? 
+	   t2h_anchor('', $T2H_HREF{$button},  # yes
+		    &$T2H_button_icon_img($button,
+					$T2H_ACTIVE_ICONS{$button},
+					$T2H_NAME{$button})) 
+	 : # use text
+	 "[" . 
+	 t2h_anchor('', $T2H_HREF{$button}, $T2H_NAVIGATION_TEXT{$button}) .
+	 "]";  
+    }
+    else
+    { # button is passive 
+      print $fh 
+	$T2H_ICONS && $T2H_PASSIVE_ICONS{$button} ?
+	 &$T2H_button_icon_img($button,
+			       $T2H_PASSIVE_ICONS{$button},
+			       $T2H_NAME{$button}) :
+	 
+	 "[" . $T2H_NAVIGATION_TEXT{$button} . "]";
+    }
+    print $fh "</TD>\n";
+    print $fh "</TR>\n" if $vertical;
+  }
+  print $fh "</TR>" unless $vertical;
+  print $fh "</TABLE>\n";
+}
+
+######################################################################
+# Frames: this is from "Richard Y. Kim" <ryk@coho.net>
+# Should be improved to be more conforming to other _print* functions
+
+sub T2H_DEFAULT_print_frame
+{
+  my $fh = shift;
+  print $fh <<EOT;
+<HTML>
+<HEAD><TITLE>$T2H_THISDOC{title}</TITLE></HEAD>
+<FRAMESET cols="140,*"> 
+  <FRAME name=toc  src="$docu_toc_frame_file">
+  <FRAME name=main src="$docu_doc">
+</FRAMESET> 
+</HTML>
+EOT
+}
+
+sub T2H_DEFAULT_print_toc_frame
+{
+  my $fh = shift;
+  &$T2H_print_page_head($fh);
+  print $fh <<EOT;
+<H2>Content</H2>
+EOT
+  print $fh map {s/HREF=/target=\"main\" HREF=/; $_;} @stoc_lines;
+  print $fh "</BODY></HTML>\n";
+}
+
+######################################################################
+# About page
+#
+
+# T2H_PRE_ABOUT might be a function
+$T2H_PRE_ABOUT = <<EOT;
+This document was generated $T2H_ADDRESS
+using <A HREF="$T2H_HOMEPAGE"><I>texi2html</I></A>
+<P></P>  
+EOT
+$T2H_AFTER_ABOUT = '';
+
+sub T2H_DEFAULT_about_body
+{
+  my $about;
+  if (ref($T2H_PRE_ABOUT) eq 'CODE')
+  {
+    $about = &$T2H_PRE_ABOUT();
+  }
+  else
+  {
+    $about = $T2H_PRE_ABOUT;
+  }
+  $about .= <<EOT;
+The buttons in the navigation panels have the following meaning:
+<P></P>
+<table border = "1">
+<TR>
+<TH> Button </TH>
+<TH> Name </TH>
+<TH> Go to </TH>
+<TH> From 1.2.3 go to</TH>
+</TR>
+EOT
+  
+  for $button (@T2H_SECTION_BUTTONS)
+  {
+    next if $button eq ' ' || ref($button) eq 'CODE';
+    $about .= <<EOT;
+<TR>
+<TD ALIGN="CENTER">
+EOT
+    $about .= 	
+      ($T2H_ICONS && $T2H_ACTIVE_ICONS{$button} ?
+       &$T2H_button_icon_img($button, $T2H_ACTIVE_ICONS{$button}) :
+       " [" . $T2H_NAVIGATION_TEXT{$button} . "] ");
+    $about .= <<EOT;
+</TD>
+<TD ALIGN="CENTER">
+$button
+</TD>
+<TD>
+$T2H_BUTTONS_GOTO{$button}
+</TD>
+<TD>
+$T2H_BUTTONS_EXAMPLE{$button}
+</TD>
+</TR>
+EOT
+  }
+
+  $about .= <<EOT;
+</TABLE>
+<P></P>
+where the <STRONG> Example </STRONG> assumes that the current position 
+is at <STRONG> Subsubsection One-Two-Three </STRONG> of a document of 
+the following structure:
+<UL>
+<LI> 1. Section One  </LI>
+<UL>
+<LI>1.1 Subsection One-One</LI>
+<UL>
+<LI> ... </LI>
+</UL>
+<LI>1.2 Subsection One-Two</LI>
+<UL>
+<LI>1.2.1 Subsubsection One-Two-One
+</LI><LI>1.2.2 Subsubsection One-Two-Two
+</LI><LI>1.2.3 Subsubsection One-Two-Three &nbsp; &nbsp; <STRONG>
+&lt;== Current Position </STRONG>
+</LI><LI>1.2.4 Subsubsection One-Two-Four
+</LI></UL>
+<LI>1.3 Subsection One-Three</LI>
+<UL>
+<LI> ... </LI>
+</UL>
+<LI>1.4 Subsection One-Four</LI>
+</UL>
+</UL>
+$T2H_AFTER_ABOUT
+EOT
+  return $about;  
+}
+
+  
+%T2H_BUTTONS_GOTO =
+  (
+   'Top',      'cover (top) of document',
+   'Contents', 'table of contents',
+   'Overview', 'short table of contents',
+   'Index',    'concept index',
+   'Back',     'previous section in reading order',
+   'FastBack', 'previous or up-and-previous section ',
+   'Prev',     'previous section same level',
+   'Up',       'up section',
+   'Next',     'next section same level',
+   'Forward',  'next section in reading order',
+   'FastForward', 'next or up-and-next section',
+   'About' ,    'this page',
+   'First',    'first section in reading order',
+   'Last',     'last section in reading order',
+  );
+
+%T2H_BUTTONS_EXAMPLE = 
+(
+   'Top',      ' &nbsp; ',
+   'Contents', ' &nbsp; ',
+   'Overview', ' &nbsp; ',
+   'Index',    ' &nbsp; ',
+   'Back',     '1.2.2',
+   'FastBack', '1.1',
+   'Prev',     '1.2.2',
+   'Up',       '1.2',
+   'Next',     '1.2.4',
+   'Forward',  '1.2.4',
+   'FastForward', '1.3',
+   'About',     ' &nbsp; ',
+   'First',    '1.',
+   'Last',     '1.2.4',
+);
+
+
+######################################################################
+# from here on, its l2h init stuff 
+#
+
+## initialization for latex2html as for Singular manual generation
+## obachman 3/99
+
+#
+# Options controlling Titles, File-Names, Tracing and Sectioning
+#
+$TITLE = '';
+
+$SHORTEXTN = 0;
+
+$LONG_TITLES = 0;
+
+$DESTDIR = ''; # should be overwritten by cmd-line argument
+
+$NO_SUBDIR = 0;# should be overwritten by cmd-line argument
+
+$PREFIX = '';  # should be overwritten by cmd-line argument
+
+$AUTO_PREFIX = 0; # this is needed, so that prefix settings are used
+
+$AUTO_LINK = 0; 
+
+$SPLIT = 0;
+
+$MAX_LINK_DEPTH = 0;
+
+$TMP = ''; # should be overwritten by cmd-line argument
+
+$DEBUG = 0;
+
+$VERBOSE = 1;
+
+#
+# Options controlling Extensions and Special Features 
+#
+$HTML_VERSION = "3.2";
+
+$TEXDEFS = 1; # we absolutely need that
+
+$EXTERNAL_FILE = '';
+
+$SCALABLE_FONTS = 1;
+
+$NO_SIMPLE_MATH = 1;
+
+$LOCAL_ICONS = 1;
+
+$SHORT_INDEX = 0;
+
+$NO_FOOTNODE = 1;
+
+$ADDRESS = '';
+
+$INFO = '';
+
+#
+# Switches controlling Image Generation 
+#
+$ASCII_MODE = 0;
+
+$NOLATEX = 0;
+
+$EXTERNAL_IMAGES = 0;
+
+$PS_IMAGES = 0;
+
+$NO_IMAGES = 0;
+
+$IMAGES_ONLY = 0;
+
+$REUSE = 2;
+
+$ANTI_ALIAS = 1;
+
+$ANTI_ALIAS_TEXT = 1;
+
+#
+#Switches controlling Navigation Panels
+#
+$NO_NAVIGATION = 1;
+$ADDRESS = '';
+$INFO = 0;              # 0 = do not make a "About this document..." section 
+
+#
+#Switches for Linking to other documents 
+#
+# actuall -- we don't care
+
+$MAX_SPLIT_DEPTH = 0;	# Stop making separate files at this depth
+
+$MAX_LINK_DEPTH = 0;    # Stop showing child nodes at this depth   
+
+$NOLATEX = 0;           # 1 = do not pass unknown environments to Latex
+
+$EXTERNAL_IMAGES = 0;   # 1 = leave the images outside the document 
+
+$ASCII_MODE = 0;        # 1 = do not use any icons or internal images
+
+# 1 =  use links to external postscript images rather than inlined bitmap
+# images.
+$PS_IMAGES = 0;
+$SHOW_SECTION_NUMBERS = 0;
+
+### Other global variables ###############################################
+$CHILDLINE = "";
+
+# This is the line width measured in pixels and it is used to right justify
+# equations and equation arrays; 
+$LINE_WIDTH = 500;		
+
+# Used in conjunction with AUTO_NAVIGATION
+$WORDS_IN_PAGE = 300;	
+
+# Affects ONLY the way accents are processed 
+$default_language = 'english';	
+
+# The value of this variable determines how many words to use in each 
+# title that is added to the navigation panel (see below)
+# 
+$WORDS_IN_NAVIGATION_PANEL_TITLES = 1;
+
+# This number will determine the size of the equations, special characters,
+# and anything which will be converted into an inlined image
+# *except* "image generating environments" such as "figure", "table" 
+# or "minipage".
+# Effective values are those greater than 0.
+# Sensible values are between 0.1 - 4.
+$MATH_SCALE_FACTOR = 1.5;
+
+# This number will determine the size of 
+# image generating environments such as "figure", "table" or "minipage".
+# Effective values are those greater than 0.
+# Sensible values are between 0.1 - 4.
+$FIGURE_SCALE_FACTOR = 1.6;
+
+
+#  If both of the following two variables are set then the "Up" button
+#  of the navigation panel in the first node/page of a converted document
+#  will point to $EXTERNAL_UP_LINK. $EXTERNAL_UP_TITLE should be set
+#  to some text which describes this external link.
+$EXTERNAL_UP_LINK = "../Readme.html";
+$EXTERNAL_UP_TITLE = "Up to OGRE Readme";
+
+# If this is set then the resulting HTML will look marginally better if viewed 
+# with Netscape.
+$NETSCAPE_HTML = 1;
+
+# Valid paper sizes are "letter", "legal", "a4","a3","a2" and "a0"
+# Paper sizes has no effect other than in the time it takes to create inlined
+# images and in whether large images can be created at all ie
+#  - larger paper sizes *MAY* help with large image problems 
+#  - smaller paper sizes are quicker to handle
+$PAPERSIZE = "a4";
+
+# Replace "english" with another language in order to tell LaTeX2HTML that you 
+# want some generated section titles (eg "Table of Contents" or "References")
+# to appear in a different language. Currently only "english" and "french"
+# is supported but it is very easy to add your own. See the example in the
+# file "latex2html.config" 
+$TITLES_LANGUAGE = "english";
+
+1;	# This must be the last non-comment line
+
+# End File texi2html.init
+######################################################################
+

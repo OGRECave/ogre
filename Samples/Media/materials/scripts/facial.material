@@ -1,0 +1,85 @@
+
+material drbunsen_head
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.25 0.25 0.25
+			diffuse 1.0 1.0 1.0
+
+			texture_unit
+			{
+				texture Dr_Bunsen_Head.jpg
+			}
+		}
+	}
+}
+
+material drbunsen_teeth
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.25 0.25 0.25
+			diffuse 1.0 1.0 1.0
+
+		}
+	}
+}
+
+material drbunsen_tongue
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.25 0.25 0.25
+			diffuse 1.0 0.1 0.1
+
+		}
+	}
+}
+
+material drbunsen_gums
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.25 0.25 0.25
+			diffuse 1.0 0.1 0.1
+
+		}
+	}
+}
+
+material drbunsen_glasses
+{
+	technique
+	{
+		pass
+		{
+			depth_write off
+			scene_blend modulate
+			ambient 0.25 0.25 0.25
+			diffuse 0.75 0.75 0.75
+
+		}
+	}
+}
+
+material drbunsen_glasses_frame
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.25 0.25 0.25
+			diffuse 0.35 0.18 0 1
+
+		}
+	}
+}
+

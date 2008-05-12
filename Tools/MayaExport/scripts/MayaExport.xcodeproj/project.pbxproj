@@ -1,0 +1,438 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		012D5E370B632F7C00BAAF45 /* _singleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 012D5E2A0B632F7C00BAAF45 /* _singleton.h */; };
+		012D5E380B632F7C00BAAF45 /* animation.h in Headers */ = {isa = PBXBuildFile; fileRef = 012D5E2B0B632F7C00BAAF45 /* animation.h */; };
+		012D5E390B632F7C00BAAF45 /* blendshape.h in Headers */ = {isa = PBXBuildFile; fileRef = 012D5E2C0B632F7C00BAAF45 /* blendshape.h */; };
+		012D5E3A0B632F7C00BAAF45 /* material.h in Headers */ = {isa = PBXBuildFile; fileRef = 012D5E2D0B632F7C00BAAF45 /* material.h */; };
+		012D5E3B0B632F7C00BAAF45 /* materialSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 012D5E2E0B632F7C00BAAF45 /* materialSet.h */; };
+		012D5E3C0B632F7C00BAAF45 /* mayaExportLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 012D5E2F0B632F7C00BAAF45 /* mayaExportLayer.h */; };
+		012D5E3D0B632F7C00BAAF45 /* mesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 012D5E300B632F7C00BAAF45 /* mesh.h */; };
+		012D5E3E0B632F7C00BAAF45 /* ogreExporter.h in Headers */ = {isa = PBXBuildFile; fileRef = 012D5E310B632F7C00BAAF45 /* ogreExporter.h */; };
+		012D5E3F0B632F7C00BAAF45 /* paramlist.h in Headers */ = {isa = PBXBuildFile; fileRef = 012D5E320B632F7C00BAAF45 /* paramlist.h */; };
+		012D5E400B632F7C00BAAF45 /* particles.h in Headers */ = {isa = PBXBuildFile; fileRef = 012D5E330B632F7C00BAAF45 /* particles.h */; };
+		012D5E410B632F7C00BAAF45 /* skeleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 012D5E340B632F7C00BAAF45 /* skeleton.h */; };
+		012D5E420B632F7C00BAAF45 /* submesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 012D5E350B632F7C00BAAF45 /* submesh.h */; };
+		012D5E430B632F7C00BAAF45 /* vertex.h in Headers */ = {isa = PBXBuildFile; fileRef = 012D5E360B632F7C00BAAF45 /* vertex.h */; };
+		012D5E4C0B632F9E00BAAF45 /* blendshape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 012D5E440B632F9E00BAAF45 /* blendshape.cpp */; };
+		012D5E4D0B632F9E00BAAF45 /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 012D5E450B632F9E00BAAF45 /* material.cpp */; };
+		012D5E4E0B632F9E00BAAF45 /* mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 012D5E460B632F9E00BAAF45 /* mesh.cpp */; };
+		012D5E4F0B632F9E00BAAF45 /* ogreExporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 012D5E470B632F9E00BAAF45 /* ogreExporter.cpp */; };
+		012D5E500B632F9E00BAAF45 /* paramlist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 012D5E480B632F9E00BAAF45 /* paramlist.cpp */; };
+		012D5E510B632F9E00BAAF45 /* particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 012D5E490B632F9E00BAAF45 /* particles.cpp */; };
+		012D5E520B632F9E00BAAF45 /* skeleton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 012D5E4A0B632F9E00BAAF45 /* skeleton.cpp */; };
+		012D5E530B632F9E00BAAF45 /* submesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 012D5E4B0B632F9E00BAAF45 /* submesh.cpp */; };
+		012D5F4C0B6336A400BAAF45 /* materialSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 012D5F4B0B6336A400BAAF45 /* materialSet.cpp */; };
+		012D5F890B6337C200BAAF45 /* Ogre.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 012D5F880B6337C200BAAF45 /* Ogre.framework */; };
+		012D606B0B63384500BAAF45 /* libOpenMayaRender.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 012D606A0B63384500BAAF45 /* libOpenMayaRender.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		012D5E2A0B632F7C00BAAF45 /* _singleton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = _singleton.h; path = ../include/_singleton.h; sourceTree = SOURCE_ROOT; };
+		012D5E2B0B632F7C00BAAF45 /* animation.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = animation.h; path = ../include/animation.h; sourceTree = SOURCE_ROOT; };
+		012D5E2C0B632F7C00BAAF45 /* blendshape.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = blendshape.h; path = ../include/blendshape.h; sourceTree = SOURCE_ROOT; };
+		012D5E2D0B632F7C00BAAF45 /* material.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = material.h; path = ../include/material.h; sourceTree = SOURCE_ROOT; };
+		012D5E2E0B632F7C00BAAF45 /* materialSet.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = materialSet.h; path = ../include/materialSet.h; sourceTree = SOURCE_ROOT; };
+		012D5E2F0B632F7C00BAAF45 /* mayaExportLayer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mayaExportLayer.h; path = ../include/mayaExportLayer.h; sourceTree = SOURCE_ROOT; };
+		012D5E300B632F7C00BAAF45 /* mesh.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mesh.h; path = ../include/mesh.h; sourceTree = SOURCE_ROOT; };
+		012D5E310B632F7C00BAAF45 /* ogreExporter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ogreExporter.h; path = ../include/ogreExporter.h; sourceTree = SOURCE_ROOT; };
+		012D5E320B632F7C00BAAF45 /* paramlist.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = paramlist.h; path = ../include/paramlist.h; sourceTree = SOURCE_ROOT; };
+		012D5E330B632F7C00BAAF45 /* particles.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = particles.h; path = ../include/particles.h; sourceTree = SOURCE_ROOT; };
+		012D5E340B632F7C00BAAF45 /* skeleton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = skeleton.h; path = ../include/skeleton.h; sourceTree = SOURCE_ROOT; };
+		012D5E350B632F7C00BAAF45 /* submesh.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = submesh.h; path = ../include/submesh.h; sourceTree = SOURCE_ROOT; };
+		012D5E360B632F7C00BAAF45 /* vertex.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = vertex.h; path = ../include/vertex.h; sourceTree = SOURCE_ROOT; };
+		012D5E440B632F9E00BAAF45 /* blendshape.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = blendshape.cpp; path = ../src/blendshape.cpp; sourceTree = SOURCE_ROOT; };
+		012D5E450B632F9E00BAAF45 /* material.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = material.cpp; path = ../src/material.cpp; sourceTree = SOURCE_ROOT; };
+		012D5E460B632F9E00BAAF45 /* mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = mesh.cpp; path = ../src/mesh.cpp; sourceTree = SOURCE_ROOT; };
+		012D5E470B632F9E00BAAF45 /* ogreExporter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ogreExporter.cpp; path = ../src/ogreExporter.cpp; sourceTree = SOURCE_ROOT; };
+		012D5E480B632F9E00BAAF45 /* paramlist.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = paramlist.cpp; path = ../src/paramlist.cpp; sourceTree = SOURCE_ROOT; };
+		012D5E490B632F9E00BAAF45 /* particles.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = particles.cpp; path = ../src/particles.cpp; sourceTree = SOURCE_ROOT; };
+		012D5E4A0B632F9E00BAAF45 /* skeleton.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = skeleton.cpp; path = ../src/skeleton.cpp; sourceTree = SOURCE_ROOT; };
+		012D5E4B0B632F9E00BAAF45 /* submesh.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = submesh.cpp; path = ../src/submesh.cpp; sourceTree = SOURCE_ROOT; };
+		012D5F4B0B6336A400BAAF45 /* materialSet.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = materialSet.cpp; path = ../src/materialSet.cpp; sourceTree = SOURCE_ROOT; };
+		012D5F880B6337C200BAAF45 /* Ogre.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ogre.framework; path = /Library/Frameworks/Ogre.framework; sourceTree = "<absolute>"; };
+		012D606A0B63384500BAAF45 /* libOpenMayaRender.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpenMayaRender.dylib; path = /Applications/Autodesk/maya8.5/Maya.app/Contents/MacOS/libOpenMayaRender.dylib; sourceTree = "<absolute>"; };
+		012D60700B63387100BAAF45 /* ogreExporter.mel */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = ogreExporter.mel; path = ../mel/ogreExporter.mel; sourceTree = SOURCE_ROOT; };
+		012D60710B63387100BAAF45 /* userSetup.mel */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = userSetup.mel; path = ../mel/userSetup.mel; sourceTree = SOURCE_ROOT; };
+		D2AAC0630554660B00DB518D /* ogreExporter.bundle */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = ogreExporter.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D289988505E68E00004EDB86 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				012D5F890B6337C200BAAF45 /* Ogre.framework in Frameworks */,
+				012D606B0B63384500BAAF45 /* libOpenMayaRender.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		012D5F870B63377200BAAF45 /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				012D5F880B6337C200BAAF45 /* Ogre.framework */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		08FB7794FE84155DC02AAC07 /* exportJointClusterDataCmdPlugin */ = {
+			isa = PBXGroup;
+			children = (
+				012D5F870B63377200BAAF45 /* External Frameworks and Libraries */,
+				08FB7795FE84155DC02AAC07 /* Source */,
+				8A7F063208688F460064D097 /* Mel */,
+				8A7F063308688F580064D097 /* Resources */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = exportJointClusterDataCmdPlugin;
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				012D5F4B0B6336A400BAAF45 /* materialSet.cpp */,
+				012D5E440B632F9E00BAAF45 /* blendshape.cpp */,
+				012D5E450B632F9E00BAAF45 /* material.cpp */,
+				012D5E460B632F9E00BAAF45 /* mesh.cpp */,
+				012D5E470B632F9E00BAAF45 /* ogreExporter.cpp */,
+				012D5E480B632F9E00BAAF45 /* paramlist.cpp */,
+				012D5E490B632F9E00BAAF45 /* particles.cpp */,
+				012D5E4A0B632F9E00BAAF45 /* skeleton.cpp */,
+				012D5E4B0B632F9E00BAAF45 /* submesh.cpp */,
+				012D5E2A0B632F7C00BAAF45 /* _singleton.h */,
+				012D5E2B0B632F7C00BAAF45 /* animation.h */,
+				012D5E2C0B632F7C00BAAF45 /* blendshape.h */,
+				012D5E2D0B632F7C00BAAF45 /* material.h */,
+				012D5E2E0B632F7C00BAAF45 /* materialSet.h */,
+				012D5E2F0B632F7C00BAAF45 /* mayaExportLayer.h */,
+				012D5E300B632F7C00BAAF45 /* mesh.h */,
+				012D5E310B632F7C00BAAF45 /* ogreExporter.h */,
+				012D5E320B632F7C00BAAF45 /* paramlist.h */,
+				012D5E330B632F7C00BAAF45 /* particles.h */,
+				012D5E340B632F7C00BAAF45 /* skeleton.h */,
+				012D5E350B632F7C00BAAF45 /* submesh.h */,
+				012D5E360B632F7C00BAAF45 /* vertex.h */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				012D606A0B63384500BAAF45 /* libOpenMayaRender.dylib */,
+				D2AAC0630554660B00DB518D /* ogreExporter.bundle */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8A7F063208688F460064D097 /* Mel */ = {
+			isa = PBXGroup;
+			children = (
+				012D60700B63387100BAAF45 /* ogreExporter.mel */,
+				012D60710B63387100BAAF45 /* userSetup.mel */,
+			);
+			name = Mel;
+			sourceTree = "<group>";
+		};
+		8A7F063308688F580064D097 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D2AAC0600554660B00DB518D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				012D5E370B632F7C00BAAF45 /* _singleton.h in Headers */,
+				012D5E380B632F7C00BAAF45 /* animation.h in Headers */,
+				012D5E390B632F7C00BAAF45 /* blendshape.h in Headers */,
+				012D5E3A0B632F7C00BAAF45 /* material.h in Headers */,
+				012D5E3B0B632F7C00BAAF45 /* materialSet.h in Headers */,
+				012D5E3C0B632F7C00BAAF45 /* mayaExportLayer.h in Headers */,
+				012D5E3D0B632F7C00BAAF45 /* mesh.h in Headers */,
+				012D5E3E0B632F7C00BAAF45 /* ogreExporter.h in Headers */,
+				012D5E3F0B632F7C00BAAF45 /* paramlist.h in Headers */,
+				012D5E400B632F7C00BAAF45 /* particles.h in Headers */,
+				012D5E410B632F7C00BAAF45 /* skeleton.h in Headers */,
+				012D5E420B632F7C00BAAF45 /* submesh.h in Headers */,
+				012D5E430B632F7C00BAAF45 /* vertex.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D2AAC0620554660B00DB518D /* MayaExport */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8A7F05ED086863A70064D097 /* Build configuration list for PBXNativeTarget "MayaExport" */;
+			buildPhases = (
+				D2AAC0600554660B00DB518D /* Headers */,
+				D2AAC0610554660B00DB518D /* Sources */,
+				D289988505E68E00004EDB86 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MayaExport;
+			productName = exportJointClusterDataCmdPlugin;
+			productReference = D2AAC0630554660B00DB518D /* ogreExporter.bundle */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 8A7F05F1086863A70064D097 /* Build configuration list for PBXProject "MayaExport" */;
+			hasScannedForEncodings = 1;
+			mainGroup = 08FB7794FE84155DC02AAC07 /* exportJointClusterDataCmdPlugin */;
+			projectDirPath = "";
+			targets = (
+				D2AAC0620554660B00DB518D /* MayaExport */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D2AAC0610554660B00DB518D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				012D5E4C0B632F9E00BAAF45 /* blendshape.cpp in Sources */,
+				012D5E4D0B632F9E00BAAF45 /* material.cpp in Sources */,
+				012D5E4E0B632F9E00BAAF45 /* mesh.cpp in Sources */,
+				012D5E4F0B632F9E00BAAF45 /* ogreExporter.cpp in Sources */,
+				012D5E500B632F9E00BAAF45 /* paramlist.cpp in Sources */,
+				012D5E510B632F9E00BAAF45 /* particles.cpp in Sources */,
+				012D5E520B632F9E00BAAF45 /* skeleton.cpp in Sources */,
+				012D5E530B632F9E00BAAF45 /* submesh.cpp in Sources */,
+				012D5F4C0B6336A400BAAF45 /* materialSet.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		8A7F05EE086863A70064D097 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = bundle;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_MASTER_OBJECT_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(MAYA_DIRECTORY)/devkit/include/",
+					../../../OgreMain/include,
+					../../../Mac/Ogre/include,
+				);
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SYSTEM_APPS_DIR)/Autodesk/maya8.5/Maya.app/Contents/MacOS\"";
+				LIBRARY_STYLE = BUNDLE;
+				MACH_O_TYPE = mh_bundle;
+				PREBINDING = NO;
+				PRODUCT_NAME = ogreExporter;
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
+		8A7F05EF086863A70064D097 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				COPY_PHASE_STRIP = YES;
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = bundle;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_MASTER_OBJECT_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(MAYA_DIRECTORY)/devkit/include/",
+					../../../OgreMain/include,
+					../../../Mac/Ogre/include,
+				);
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SYSTEM_APPS_DIR)/Autodesk/maya8.5/Maya.app/Contents/MacOS\"";
+				LIBRARY_STYLE = BUNDLE;
+				MACH_O_TYPE = mh_bundle;
+				PREBINDING = NO;
+				PRODUCT_NAME = ogreExporter;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		8A7F05F0086863A70064D097 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				EXECUTABLE_EXTENSION = bundle;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(MAYA_DIRECTORY)/devkit/include/",
+					../../../OgreMain/include,
+					../../../Mac/Ogre/include,
+				);
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SYSTEM_APPS_DIR)/Autodesk/maya8.5/Maya.app/Contents/MacOS\"";
+				LIBRARY_STYLE = BUNDLE;
+				MACH_O_TYPE = mh_bundle;
+				PREBINDING = NO;
+				PRODUCT_NAME = ogreExporter;
+				ZERO_LINK = NO;
+			};
+			name = Default;
+		};
+		8A7F05F2086863A70064D097 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(MAYA_DIRECTORY)/devkit/include/maya/OpenMayaMac.h";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					MAC_PLUGIN,
+					_BOOL,
+					REQUIRE_IOSTREAM,
+				);
+				HEADER_SEARCH_PATHS = "$(MAYA_DIRECTORY)/devkit/include/";
+				LIBRARY_SEARCH_PATHS = "$(MAYA_DIRECTORY)/Maya.app/Contents/MacOS";
+				LIBRARY_STYLE = BUNDLE;
+				MAYA_DIRECTORY = /Applications/Autodesk/maya8.5;
+				OTHER_LDFLAGS = (
+					"-lOpenMaya",
+					"-lFoundation",
+					"-Wl,-executable_path,$(MAYA_DIRECTORY)/Maya.app/Contents/MacOS",
+					"-lOpenMayaAnim",
+					"-lOpenMaya",
+					"-lFoundation",
+				);
+			};
+			name = Debug;
+		};
+		8A7F05F3086863A70064D097 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(MAYA_DIRECTORY)/devkit/include/maya/OpenMayaMac.h";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					MAC_PLUGIN,
+					_BOOL,
+					REQUIRE_IOSTREAM,
+				);
+				HEADER_SEARCH_PATHS = "$(MAYA_DIRECTORY)/devkit/include/";
+				LIBRARY_SEARCH_PATHS = "$(MAYA_DIRECTORY)/Maya.app/Contents/MacOS";
+				LIBRARY_STYLE = BUNDLE;
+				MAYA_DIRECTORY = /Applications/Autodesk/maya8.5;
+				OTHER_LDFLAGS = (
+					"-lOpenMaya",
+					"-lFoundation",
+					"-Wl,-executable_path,$(MAYA_DIRECTORY)/Maya.app/Contents/MacOS",
+					"-lOpenMayaAnim",
+					"-lOpenMaya",
+					"-lFoundation",
+				);
+			};
+			name = Release;
+		};
+		8A7F05F4086863A70064D097 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(MAYA_DIRECTORY)/devkit/include/maya/OpenMayaMac.h";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					MAC_PLUGIN,
+					_BOOL,
+					REQUIRE_IOSTREAM,
+				);
+				HEADER_SEARCH_PATHS = "$(MAYA_DIRECTORY)/devkit/include/";
+				LIBRARY_SEARCH_PATHS = "$(MAYA_DIRECTORY)/Maya.app/Contents/MacOS";
+				MAYA_DIRECTORY = /Applications/Autodesk/maya8.5;
+				OTHER_LDFLAGS = (
+					"-lOpenMaya",
+					"-lFoundation",
+					"-Wl,-executable_path,$(MAYA_DIRECTORY)/Maya.app/Contents/MacOS",
+					"-lOpenMayaAnim",
+					"-lOpenMaya",
+					"-lFoundation",
+				);
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8A7F05ED086863A70064D097 /* Build configuration list for PBXNativeTarget "MayaExport" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8A7F05EE086863A70064D097 /* Debug */,
+				8A7F05EF086863A70064D097 /* Release */,
+				8A7F05F0086863A70064D097 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		8A7F05F1086863A70064D097 /* Build configuration list for PBXProject "MayaExport" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8A7F05F2086863A70064D097 /* Debug */,
+				8A7F05F3086863A70064D097 /* Release */,
+				8A7F05F4086863A70064D097 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

@@ -1,0 +1,56 @@
+fragment_program Ogre/Compositor/HalftoneFP cg
+{
+	source HalftoneFP.cg
+	entry_point Halftone_ps
+	profiles ps_2_0 arbfp1
+	
+	default_params
+	{
+	    param_named numTiles float2 133.3 100
+	    param_named iNumTiles float2 0.00750750 0.01
+	    param_named iNumTiles2 float2 0.00375375 0.005
+	    param_named lum float4 0.30 0.59 0.11 0.0
+	}
+}
+
+material Ogre/Compositor/Halftone
+{
+    technique
+    {
+
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
+			{
+			}
+
+
+			fragment_program_ref Ogre/Compositor/HalftoneFP
+			{
+
+			}
+
+			texture_unit RT
+			{
+                		tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+
+			texture_unit noise
+			{
+				texture HalftoneVolume
+				tex_coord_set 0
+				filtering trilinear
+				tex_address_mode clamp
+				tex_border_colour 1.0 0.0 0.0
+			}
+
+		}
+	}
+}
+

@@ -1,0 +1,90 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on , 21 2003 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Hardware Buffers In OGRE: The IndexData class</TITLE>
+
+<META NAME="description" CONTENT="Hardware Buffers In OGRE: The IndexData class">
+<META NAME="keywords" CONTENT="Hardware Buffers In OGRE: The IndexData class">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC19"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_14.html#SEC18"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_14.html#SEC18"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_16.html#SEC21"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<H3> 2.7.1 The IndexData class </H3>
+<!--docid::SEC19::-->
+This class summarises the information required to use a set of indexes to render geometry. It's members are as follows:
+<DL COMPACT>
+<DT>indexStart
+<DD>The first index used by this piece of geometry; this can be useful for sharing a single index buffer among several geometry pieces.
+<DT>indexCount
+<DD>The number of indexes used by this particular renderable.
+<DT>indexBuffer
+<DD>The index buffer which is used to source the indexes. 
+</DL>
+
+<A NAME="SEC20"></A>
+<H3> Creating an Index Buffer </H3>
+<!--docid::SEC20::-->
+Index buffers are created using See section <A HREF="vbo-update_4.html#SEC4">2.1 The Hardware Buffer Manager</A> just like vertex buffers, here's how:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().
+	createIndexBuffer(
+		HardwareIndexBuffer::IT_16BIT, // type of index
+		numIndexes, // number of indexes
+		HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
+		false); // no shadow buffer	
+</pre></td></tr></table>Once again, notice that the return type is a class rather than a pointer; this is reference counted so that the buffer is automatically destroyed when no more references are made to it. The parameters to the index buffer creation are:
+<DL COMPACT>
+<DT>indexType
+<DD>There are 2 types of index; 16-bit and 32-bit. They both perform the same way, except that the latter can address larger vertex buffers. If your buffer includes more than 65526 vertices, then you will need to use 32-bit indexes. Note that you should only use 32-bit indexes when you need to, since they incur more overhead than 16-bit vertices, and are not supported on some older hardware.
+<DT>numIndexes
+<DD>The number of indexes in the buffer. As with vertex buffers, you should consider whether you can use a shared index buffer which is used by multiple pieces of geometry, since there can be performance advantages to switching index buffers less often. 
+<DT>usage
+<DD>This tells the system how you intend to use the buffer. See section <A HREF="vbo-update_5.html#SEC5">2.2 Buffer Usage</A>
+<DT>useShadowBuffer
+<DD>Tells the system whether you want this buffer backed by a system-memory copy. See section <A HREF="vbo-update_6.html#SEC6">2.3 Shadow Buffers</A>
+</DL>
+
+<A NAME="Updating Index Buffers"></A>
+<HR SIZE=1>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_14.html#SEC18"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_14.html#SEC18"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_16.html#SEC21"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Steve Streeting</I> on <I>, 21 2003</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

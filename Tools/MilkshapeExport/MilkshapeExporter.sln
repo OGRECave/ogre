@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MilkshapeExport", "scripts\MilkshapeExport_vc8.vcproj", "{D4929E45-2A25-4F53-96A1-E1BCD91D9B6A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{35AFBABB-DF05-43DE-91A7-BB828A874015} = {35AFBABB-DF05-43DE-91A7-BB828A874015}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OgreMain", "..\..\OgreMain\scripts\OgreMain_vc8.vcproj", "{35AFBABB-DF05-43DE-91A7-BB828A874015}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		DebugStaticLib|Win32 = DebugStaticLib|Win32
+		Release|Win32 = Release|Win32
+		ReleaseStaticLib|Win32 = ReleaseStaticLib|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D4929E45-2A25-4F53-96A1-E1BCD91D9B6A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D4929E45-2A25-4F53-96A1-E1BCD91D9B6A}.Debug|Win32.Build.0 = Debug|Win32
+		{D4929E45-2A25-4F53-96A1-E1BCD91D9B6A}.DebugStaticLib|Win32.ActiveCfg = Debug|Win32
+		{D4929E45-2A25-4F53-96A1-E1BCD91D9B6A}.DebugStaticLib|Win32.Build.0 = Debug|Win32
+		{D4929E45-2A25-4F53-96A1-E1BCD91D9B6A}.Release|Win32.ActiveCfg = Release|Win32
+		{D4929E45-2A25-4F53-96A1-E1BCD91D9B6A}.Release|Win32.Build.0 = Release|Win32
+		{D4929E45-2A25-4F53-96A1-E1BCD91D9B6A}.ReleaseStaticLib|Win32.ActiveCfg = Release|Win32
+		{D4929E45-2A25-4F53-96A1-E1BCD91D9B6A}.ReleaseStaticLib|Win32.Build.0 = Release|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.Debug|Win32.ActiveCfg = Debug|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.Debug|Win32.Build.0 = Debug|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.DebugStaticLib|Win32.ActiveCfg = DebugStaticLib|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.DebugStaticLib|Win32.Build.0 = DebugStaticLib|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.Release|Win32.ActiveCfg = Release|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.Release|Win32.Build.0 = Release|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.ReleaseStaticLib|Win32.ActiveCfg = ReleaseStaticLib|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.ReleaseStaticLib|Win32.Build.0 = ReleaseStaticLib|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

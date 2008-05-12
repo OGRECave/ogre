@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                      "http://www.w3.org/TR/html40/loose.dtd">
+<HTML>
+<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people <dev@texi2html.cvshome.org>
+Send bugs and suggestions to <users@texi2html.cvshome.org>
+
+-->
+<HEAD>
+<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Material Scripts</TITLE>
+
+<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Material Scripts">
+<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Material Scripts">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.66">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC23"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_15.html#SEC31"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<H2> 3.1 Material Scripts </H2>
+<!--docid::SEC23::-->
+
+Material scripts offer you the ability to define complex materials in a script which can be reused easily. Whilst you could set up all materials for a scene in code using the methods of the Material and TextureLayer classes, in practice it's a bit unwieldy. Instead you can store material definitions in text files which can then be loaded whenever required.<BR><BR>
+
+<A NAME="SEC24"></A>
+<H2> Loading scripts </H2>
+<!--docid::SEC24::-->
+
+Material scripts are loaded when resource groups are initialised: OGRE looks in all resource locations associated with the group (see Root::addResourceLocation) for files with the '.material' extension and parses them. If you want to parse files manually, use MaterialSerializer::parseScript.<BR><BR>
+
+It's important to realise that materials are not loaded completely by this parsing process: only the definition is loaded, no textures or other resources are loaded. This is because it is common to have a large library of materials, but only use a relatively small subset of them in any one scene. To load every material completely in every script would therefore cause unnecessary memory overhead. You can access a 'deferred load' Material in the normal way (MaterialManager::getSingleton().getByName()), but you must call the 'load' method before trying to use it. Ogre does this for you when using the normal material assignment methods of entities etc.<BR><BR>
+
+Another important factor is that material names must be unique throughout ALL scripts loaded by the system, since materials are always identified by name.<BR><BR>
+
+<A NAME="SEC25"></A>
+<H2> Format </H2>
+<!--docid::SEC25::-->
+
+Several materials may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ('{', '}'), and comments indicated by starting a line with '//' (note, no nested form comments allowed). The general format is shown below in the example below (note that to start with, we only consider fixed-function materials which don't use vertex or fragment programs, these are covered later):<BR><BR>
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>// This is a comment
+material walls/funkywall1
+{
+    // first, preferred technique
+    technique
+    {
+        // first pass
+        pass
+        {
+            ambient 0.5 0.5 0.5
+            diffuse 1.0 1.0 1.0
+			
+            // Texture unit 0
+            texture_unit 
+            {
+                texture wibbly.jpg
+                scroll_anim 0.1 0.0
+                wave_xform scale sine 0.0 0.7 0.0 1.0
+            }
+            // Texture unit 1 (this is a multitexture pass)
+            texture_unit
+            {
+                texture wobbly.png
+                rotate_anim 0.25
+                colour_op add
+            }
+        }
+    }
+
+    // Second technique, can be used as a fallback or LOD level
+    technique
+    {
+        // .. and so on
+    }
+		
+}
+</pre></td></tr></table>
+Every material in the script must be given a name, which is the line 'material &lt;blah&gt;' before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your materials, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string.<BR><BR>
+
+<STRONG> NOTE: ':' is the delimiter for specifying material copy in the script so it can't be used as part of the material name.</STRONG>
+<BR><BR>
+
+A material can copy from a previously defined material by using a <EM>colon</EM> <STRONG>:</STRONG> after the material name followed by the name of the reference material to copy. If the reference material can not be found then it is ignored.  (See section <A HREF="manual_25.html#SEC125">3.1.11 Copying Materials</A>)<BR><BR>
+
+A material can be made up of many techniques (See section <A HREF="manual_15.html#SEC31">3.1.1 Techniques</A>)- a technique is one way of achieving the effect you are looking for. You can supply more than one technique in order to provide fallback approaches where a card does not have the ability to render the preferred technique, or where you wish to define lower level of detail versions of the material in order to conserve rendering power when objects are more distant. <BR><BR>
+
+Each technique can be made up of many passes (See section <A HREF="manual_16.html#SEC35">3.1.2 Passes</A>), that is a complete render of the object can be performed multiple times with different settings in order to produce composite effects. Ogre may also split the passes you have defined into many passes at runtime, if you define a pass which uses too many texture units for the card you are currently running on (note that it can only do this if you are not using a fragment program). Each pass has a number of top-level attributes such as 'ambient' to set the amount &amp; colour of the ambient light reflected by the material. Some of these options do not apply if you are using vertex programs, See section <A HREF="manual_16.html#SEC35">3.1.2 Passes</A> for more details. <BR><BR>
+
+Within each pass, there can be zero or many texture units in use (See section <A HREF="manual_17.html#SEC68">3.1.3 Texture Units</A>). These define the texture to be used, and optionally some blending operations (which use multitexturing) and texture effects.<BR><BR>
+
+You can also reference vertex and fragment programs (or vertex and pixel shaders, if you want to use that terminology) in a pass with a given set of parameters. Programs themselves are declared in separate .program scripts (See section <A HREF="manual_18.html#SEC95">3.1.4 Declaring Vertex and Fragment Programs</A>) and are used as described in <A HREF="manual_23.html#SEC112">3.1.9 Using Vertex and Fragment Programs in a Pass</A>.
+
+<A NAME="SEC26"></A>
+<H3> Top-level material attributes </H3>
+<!--docid::SEC26::-->
+The outermost section of a material definition does not have a lot of attributes of its own (most of the configurable parameters are within the child sections. However, it does have some, and here they are:<BR><BR>
+<A NAME="lod_distances"></A>
+<A NAME="SEC27"></A>
+<H3> lod_distances </H3>
+<!--docid::SEC27::-->
+This attribute controls the distances at which different Techniques can come into effect. See section <A HREF="manual_15.html#SEC31">3.1.1 Techniques</A> for a full discussion of this option.
+<BR><BR>
+<A NAME="receive_shadows"></A>
+<A NAME="SEC28"></A>
+<H3> receive_shadows </H3>
+<!--docid::SEC28::-->
+This attribute controls whether objects using this material can have shadows cast upon them.<BR><BR> 
+
+Format: receive_shadows &lt;on|off&gt;<BR>
+Default: on<BR><BR>
+
+Whether or not an object receives a shadow is the combination of a number of factors, See section <A HREF="manual_67.html#SEC292">7. Shadows</A> for full details; however this allows you to make a material opt-out of receiving shadows if required. Note that transparent materials never receive shadows so this option only has an effect on solid materials.
+
+<A NAME="transparency_casts_shadows"></A>
+<A NAME="SEC29"></A>
+<H3> transparency_casts_shadows </H3>
+<!--docid::SEC29::-->
+This attribute controls whether transparent materials can cast certain kinds of shadow.<BR><BR> 
+
+Format: transparency_casts_shadows &lt;on|off&gt;<BR>
+Default: off<BR><BR>
+Whether or not an object casts a shadow is the combination of a number of factors, See section <A HREF="manual_67.html#SEC292">7. Shadows</A> for full details; however this allows you to make a transparent material cast shadows, when it would otherwise not. For example, when using texture shadows, transparent materials are normally not rendered into the shadow texture because they should not block light. This flag overrides that.
+
+<A NAME="set_texture_alias"></A>
+<A NAME="SEC30"></A>
+<H3> set_texture_alias </H3>
+<!--docid::SEC30::-->
+This attribute associates a texture alias with a texture name.<BR><BR>
+
+Format: set_texture_alias &lt;alias name&gt; &lt;texture name&gt;<BR><BR>
+
+This attribute is used to set the textures used in texture unit states that were copied from another material.(See section <A HREF="manual_25.html#SEC125">3.1.11 Copying Materials</A>)<BR><BR>
+
+<A NAME="Techniques"></A>
+<HR SIZE=1>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_15.html#SEC31"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>
+<FONT SIZE="-1">
+This document was generated
+by <I>steve</I> on <I>June 22 2007</I>
+using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
+</FONT>
+
+</BODY>
+</HTML>

@@ -1,0 +1,15 @@
+
+material RZR-002
+{
+	technique
+	{
+		pass
+		{
+
+			texture_unit
+			{
+				texture RZR-002.png
+			}
+		}
+	}
+}

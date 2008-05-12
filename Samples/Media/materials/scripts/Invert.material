@@ -1,0 +1,36 @@
+fragment_program Ogre/Compositor/InvertFP cg
+{
+	source InvertFP.cg
+	entry_point Invert_ps
+	profiles ps_2_0 arbfp1
+}
+
+material Ogre/Compositor/Invert
+{
+	technique
+	{
+
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
+			{
+			}
+
+			fragment_program_ref Ogre/Compositor/InvertFP
+			{
+			}
+
+			texture_unit RT
+			{
+                tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+
+		}
+	}
+}

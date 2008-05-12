@@ -1,0 +1,29 @@
+format 30
+
+classinstance 128012 class_ref 128652 // stubApplicationCode
+  name "" xyz 14 4 2000 life_line_z 2000
+classinstance 128140 class_ref 129420 // CustomTransformSource
+  name "" xyz 442 4 2000 life_line_z 2000
+classinstance 128268 class_ref 129548 // CustomSceneGraph
+  name "" xyz 149 4 2005 life_line_z 2000
+classinstance 128780 class_ref 128780 // EventQueue
+  name "" xyz 301 4 2000 life_line_z 2000
+durationcanvas 128396 classinstance_ref 128012 // :stubApplicationCode
+  xyzwh 65 74 2010 11 158
+durationcanvas 128524 classinstance_ref 128268 // :CustomSceneGraph
+  xyzwh 199 74 2010 11 89
+durationcanvas 128908 classinstance_ref 128780 // :EventQueue
+  xyzwh 332 90 2010 11 25
+msg 128652 synchronous
+  from durationcanvas_ref 128396 // 128012
+  to durationcanvas_ref 128524 // 128268
+  yz 74 2000 explicitmsg "transform update"
+  show_full_operations_definition default drawing_language default
+  label_xy 94 62
+msg 129036 synchronous
+  from durationcanvas_ref 128524 // 128268
+  to durationcanvas_ref 128908 // 128780
+  yz 90 2000 explicitmsg "add TransformEvent"
+  show_full_operations_definition default drawing_language default
+  label_xy 220 80
+end

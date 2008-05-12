@@ -1,0 +1,92 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on , 21 2003 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>Hardware Buffers In OGRE: Vertex Buffer Bindings</TITLE>
+
+<META NAME="description" CONTENT="Hardware Buffers In OGRE: Vertex Buffer Bindings">
+<META NAME="keywords" CONTENT="Hardware Buffers In OGRE: Vertex Buffer Bindings">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC14"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_11.html#SEC12"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_9.html#SEC10"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_13.html#SEC17"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<H3> 2.6.3 Vertex Buffer Bindings </H3>
+<!--docid::SEC14::-->
+Vertex buffer bindings are about associating a vertex buffer with a source index used in <A HREF="vbo-update_11.html#SEC12">2.6.2 Vertex Declarations</A>. 
+<A NAME="SEC15"></A>
+<H3> Creating the Vertex Buffer </H3>
+<!--docid::SEC15::-->
+Firstly, lets look at how you create a vertex buffer:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>HardwareVertexBufferSharedPtr vbuf = 
+	HardwareBufferManager::getSingleton().createVertexBuffer(
+		3*sizeof(Real), // size of one whole vertex
+		numVertices, // number of vertices
+		HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
+		false); // no shadow buffer
+</pre></td></tr></table>
+Notice that we use <A HREF="vbo-update_4.html#SEC4">2.1 The Hardware Buffer Manager</A> to create our vertex buffer, and that a class called HardwareVertexBufferSharedPtr is returned from the method, rather than a raw pointer. This is because vertex buffers are reference counted - you are able to use a single vertex buffer as a source for multiple pieces of geometry therefore a standard pointer would not be good enough, because you would not know when all the different users of it had finished with it. The HardwareVertexBufferSharedPtr class manages its own destruction by keeping a reference count of the number of times it is being used - when the last HardwareVertexBufferSharedPtr is destroyed, the buffer itself automatically destroys itself.<BR><BR>
+
+The parameters to the creation of a vertex buffer are as follows:
+<DL COMPACT>
+<DT>vertexSize
+<DD>The size in bytes of a whole vertex in this buffer. A vertex may include multiple elements, and in fact the contents of the vertex data may be reinterpreted by different vertex declarations if you wish. Therefore you must tell the buffer manager how large a whole vertex is, but not the internal format of the vertex, since that is down to the declaration to interpret. In the above example, the size is set to the size of 3 floating point values - this would be enough to hold a standard 3D position or normal, or a 3D texture coordinate, per vertex. 
+<DT>numVertices
+<DD>The number of vertices in this buffer. Remember, not all the vertices have to be used at once - it can be beneficial to create large buffers which are shared between many chunks of geometry because changing vertex buffer bindings is a render state switch, and those are best minimised.
+<DT>usage
+<DD>This tells the system how you intend to use the buffer. See section <A HREF="vbo-update_5.html#SEC5">2.2 Buffer Usage</A>
+<DT>useShadowBuffer
+<DD>Tells the system whether you want this buffer backed by a system-memory copy. See section <A HREF="vbo-update_6.html#SEC6">2.3 Shadow Buffers</A>
+</DL>
+
+<A NAME="SEC16"></A>
+<H3> Binding the Vertex Buffer </H3>
+<!--docid::SEC16::-->
+The second part of the process is to bind this buffer which you have created to a source index. To do this, you call:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>vertexBufferBinding-&#62;setBinding(0, vbuf);
+</pre></td></tr></table>This results in the vertex buffer you created earlier being bound to source index 0, so any vertex element which is pulling its data from source index 0 will retrieve data from this buffer. <BR><BR>
+There are also methods for retrieving buffers from the binding data - see the API reference for full details.
+
+<A NAME="Updating Vertex Buffers"></A>
+<HR SIZE=1>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_11.html#SEC12"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_9.html#SEC10"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_13.html#SEC17"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="vbo-update_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+by <I>Steve Streeting</I> on <I>, 21 2003</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

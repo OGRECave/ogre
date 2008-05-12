@@ -1,0 +1,55 @@
+fragment_program Ogre/Compositor/ASCIIFP cg
+{
+	source ASCIIFP.cg
+	entry_point ASCII_ps
+	profiles ps_2_0 arbfp1
+	
+	default_params
+	{
+	    param_named iNumTiles float2 0.010 0.02
+	    param_named iNumTiles2 float2 0.005 0.01
+	    param_named numTiles float2 100 50
+	    param_named lum float4 0.30 0.59 0.11 0.0
+	    param_named charBias float 0.734375
+	}
+}
+
+material Ogre/Compositor/ASCII
+{
+    technique
+    {
+
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
+			{
+			}
+
+
+			fragment_program_ref Ogre/Compositor/ASCIIFP
+			{
+
+			}
+
+			texture_unit RT
+			{
+				tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+
+			texture_unit chars
+			{
+				texture ASCII.dds 3d
+				filtering none
+				tex_address_mode clamp
+			}
+
+		}
+	}
+}
+

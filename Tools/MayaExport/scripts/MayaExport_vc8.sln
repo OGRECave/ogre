@@ -1,0 +1,38 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MayaExport", "MayaExport_vc8.vcproj", "{B8E79576-F7E4-4E50-97DB-08FF62F206AD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{35AFBABB-DF05-43DE-91A7-BB828A874015} = {35AFBABB-DF05-43DE-91A7-BB828A874015}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OgreMain", "..\..\..\OgreMain\scripts\OgreMain_vc8.vcproj", "{35AFBABB-DF05-43DE-91A7-BB828A874015}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		DebugStaticLib|Win32 = DebugStaticLib|Win32
+		Release|Win32 = Release|Win32
+		ReleaseStaticLib|Win32 = ReleaseStaticLib|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8E79576-F7E4-4E50-97DB-08FF62F206AD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B8E79576-F7E4-4E50-97DB-08FF62F206AD}.Debug|Win32.Build.0 = Debug|Win32
+		{B8E79576-F7E4-4E50-97DB-08FF62F206AD}.DebugStaticLib|Win32.ActiveCfg = Debug|Win32
+		{B8E79576-F7E4-4E50-97DB-08FF62F206AD}.DebugStaticLib|Win32.Build.0 = Debug|Win32
+		{B8E79576-F7E4-4E50-97DB-08FF62F206AD}.Release|Win32.ActiveCfg = Release|Win32
+		{B8E79576-F7E4-4E50-97DB-08FF62F206AD}.Release|Win32.Build.0 = Release|Win32
+		{B8E79576-F7E4-4E50-97DB-08FF62F206AD}.ReleaseStaticLib|Win32.ActiveCfg = Release 7.0|Win32
+		{B8E79576-F7E4-4E50-97DB-08FF62F206AD}.ReleaseStaticLib|Win32.Build.0 = Release 7.0|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.Debug|Win32.ActiveCfg = Debug|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.Debug|Win32.Build.0 = Debug|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.DebugStaticLib|Win32.ActiveCfg = DebugStaticLib|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.DebugStaticLib|Win32.Build.0 = DebugStaticLib|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.Release|Win32.ActiveCfg = Release|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.Release|Win32.Build.0 = Release|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.ReleaseStaticLib|Win32.ActiveCfg = ReleaseStaticLib|Win32
+		{35AFBABB-DF05-43DE-91A7-BB828A874015}.ReleaseStaticLib|Win32.Build.0 = ReleaseStaticLib|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,151 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.K.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_OPTIONS DIALOGEX 0, 0, 387, 182
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "OGRE Export Options"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,277,157,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,330,157,50,14
+    CONTROL         "Export Mesh",IDC_EXPORT_MESH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,16,56,10
+    CONTROL         "Export Skeleton && Animation",IDC_EXPORT_SKEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,197,17,107,10
+    CONTROL         "Split keyframe sequence into multiple animations",IDC_SPLIT_ANIMATION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,197,53,165,10
+    EDITTEXT        IDC_FPS,261,30,23,13,ES_AUTOHSCROLL
+    LTEXT           "Frame Rate:",IDC_STATIC,215,33,41,10
+    LTEXT           "(frames per second)",IDC_STATIC,289,33,75,10
+    GROUPBOX        "Mesh Export",IDC_GRP_MESH,7,7,180,150
+    CONTROL         "Generate Automatic Level Of Detail (LOD)",IDC_GENERATE_LOD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,32,164,10
+    EDITTEXT        IDC_LOD_DEPTH,99,57,30,13,ES_AUTOHSCROLL
+    RTEXT           "Depth between LODs:",IDC_STATIC,25,59,72,10
+    RTEXT           "Reduce each level by:",IDC_STATIC,25,74,72,10
+    EDITTEXT        IDC_LOD_VRQ,99,72,30,13,ES_AUTOHSCROLL
+    COMBOBOX        IDC_CBO_LOD_STYLE,132,72,45,13,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Skeleton / Animation Export",IDC_GRP_SKELETON,189,7,191,137
+    LTEXT           "To use the 'split' feature you have to supply a simple comma-separated text file to record which frames are for which animation, which you will be prompted for the location of. See Readme.html for more info.",IDC_STATIC,205,66,165,44
+    EDITTEXT        IDC_NUM_LODS,99,42,30,13,ES_AUTOHSCROLL
+    RTEXT           "Number of lower LODs:",IDC_STATIC,16,44,81,10
+    CONTROL         "Generate Edge Lists (Allow Stencil Shadows)",IDC_EDGE_LISTS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,89,165,10
+    CONTROL         "Generate Tangents (Allow Normal Maps)",IDC_TANGENT_VECTORS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,103,149,10
+    CONTROL         "Export Materials",IDC_EXPORT_MATERIALS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,161,92,10
+    COMBOBOX        IDC_TANGENTS_TARGET,60,115,119,12,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    RTEXT           "Target:",IDC_STATIC,15,117,42,10
+    CONTROL         "Split Mirrored",IDC_TANG_SPLIT_MIRR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,132,53,10
+    CONTROL         "Split Rotated",IDC_TANG_SPLIT_ROT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,133,53,10
+    CONTROL         "4D Tangents",IDC_4D_TANGENTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,144,53,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_OPTIONS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 380
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 171
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_OPTIONS DLGINIT
+BEGIN
+    IDC_CBO_LOD_STYLE, 0x403, 1, 0
+"\000" 
+    0
+END
+
+#endif    // English (U.K.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

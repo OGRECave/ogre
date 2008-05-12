@@ -1,0 +1,36 @@
+/** 
+  @mainpage API Reference Start Page
+  
+  @section intro Introduction
+  
+  @subsection s1 What is this?
+  This is the complete API reference for OGRE; contained within are the 
+  specifications for each class and the methods on those classes which you can 
+  refer to when writing code which uses OGRE. 
+  
+  @subsection s2 It's so BIG!
+  
+  Yes, yes it is (and thank you for noticing). OGRE is a large and complex 
+  system so the API documentation, whilst fully inclusive and the most 
+  complete reference to OGRE that you'll find, is not the recommended way to 
+  start learning. You will certainly want
+  to refer to this documentation once you have found your feet, and pretty soon
+  referring to it will become second nature. Until then, you should begin with 
+  more discussive documentation such as:
+  @li <a href="http://www.ogre3d.org/docs/manual/">The Manual</a> You should 
+    also have a local copy of this in your distribution; the OGRE manual is a
+	general introduction to the OGRE principles and core components, and a 
+	reference to various important parts of the OGRE system, especially the
+	script syntax for materials, particle systems, and overlays. 
+  @li <a href="http://www.ogre3d.org/wiki">The OGRE Wiki</a> A Wiki is a 
+  	collaborative web-based documentation system where people in the whole 
+	OGRE community can contribute tips, tutorials and sample code, among other 
+	things. This is a gold mine for new and experienced users alike.
+
+  We make an effort to document our classes fully so we hope you can find what
+  you need here. However, if you can't find it, or you're not sure where to 
+  start looking, visit the main OGRE website and dip into the community areas
+  like the wiki and the forums to get some assistance. 
+  
+*/
+

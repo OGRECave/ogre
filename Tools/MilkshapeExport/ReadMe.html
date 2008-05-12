@@ -1,0 +1,87 @@
+<html>
+	<head>
+		<title>OGRE Readme</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<STYLE TYPE="text/css"> <!-- .MainHeader { font-weight: bold; color: #FFFF33; background-color: #006600; font-size: 10pt}
+	body { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; color: #CCFFCC; background-color: #003300}
+	.BorderHeader { background-color: #999900; font-size: 8pt; font-weight: bold; color: #333300; text-align: center}
+	.MainContent { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; color: #CCFFCC }
+	.BorderContent { font-size: 8pt; color: #66CC33; border-color: black #666600 #666600; padding-top: 2px; padding-right: 2px; padding-bottom: 10px; padding-left: 2px; margin-bottom: 2px; border-style: solid; border-top-width: 0px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px}
+	a:link { color: #FFFF00; text-decoration: underline}
+	a:hover { color: #FFFFFF; text-decoration: underline}
+	a:visited { color: #FFCC66; text-decoration: underline}
+	li { color: #66CC33; list-style-type: circle; position: relative; left: -15px; clip: rect( )}
+	.NewsDate { color: #CCFFCC; font-weight: bold}
+	td { font-size: 10pt}
+	th { font-size: 10pt}
+	.Annotation { font-size: 10px}
+	H1 { text-align: center; }
+	A.qindex {}
+	A.qindexRef {}
+	A.el { text-decoration: none; font-weight: bold }
+	A.elRef { font-weight: bold }
+	A.code { text-decoration: none; font-weight: normal; color: #4444ee }
+	A.codeRef { font-weight: normal; color: #4444ee }
+	DL.el { margin-left: -1cm }
+	DIV.fragment { width: 100%; border: none; background-color: #003300 }
+	DIV.ah { background-color: black; margin-bottom: 3; margin-top: 3 }
+	TD.md { background-color: #006600 }
+	DIV.groupHeader { margin-left: 16; margin-top: 12; margin-bottom: 6; font-weight: bold }
+	DIV.groupText { margin-left: 16; font-style: italic; font-size: smaller }
+	FONT.keyword { color: #008000 }
+	FONT.keywordtype { color: #999920 }
+	FONT.keywordflow { color: #e0FF00 }
+	FONT.comment { color: #009900 }
+	FONT.preprocessor { color: #809020 }
+	FONT.stringliteral { color: #002080 }
+	FONT.charliteral { color: #008080 }
+	H3 { FONT-FAMILY: trebuchet ms,helvetica,arial }
+	.ex { FONT-SIZE: 8pt; FONT-FAMILY: tahoma }
+	CODE.keywordtype { COLOR: #00ccff }
+	CODE.keyword { FONT-WEIGHT: bold; COLOR: #00ccff }
+	CODE.fn { COLOR: white; FONT-WEIGHT: bold; }
+	CODE.var { COLOR: #dcdcdc; }
+	CODE.macro { COLOR: #809020; FONT-WEIGHT: bold; }
+	CODE.comm { COLOR: lime }
+	CODE.num { COLOR: purple }
+	CODE.str { COLOR: #ffcc33; font-style: italic }
+	.SectionHeader { font-size: 14px; color: #FFFFCC; font-weight: bold}
+	.header { font-size: 16px; font-weight: bold; color: #FFFFCC}
+	--></STYLE>
+	</head>
+	<body bgcolor="#ffffff" text="#000000">
+<p align="center" class="header">OGRE (Object-Oriented Graphics Rendering Engine)</p><p align="center" class="header">Milkshape 
+Exporter README file</p><p align="center" class="header"><A HREF="http://www.ogre3d.org">http://www.ogre3d.org</A></p><p align="left" class="MainHeader">Summary</p><p>OGRE 
+(Object-Oriented Graphics Rendering Engine) is a scene-oriented, flexible 3D engine 
+written in C++ designed to make it easier and more intuitive for developers to 
+produce games and demos utilising 3D hardware. The class library abstracts all 
+the details of using the underlying system libraries like Direct3D and OpenGL 
+and provides an interface based on world objects and other intuitive classes. 
+</p><p>This distribution contains the bare files required to export OGRE .mesh 
+files from the shareware modelling tool <A HREF="http://www.milkshape3d.com">Milkshape3d</A>.</p><p align="left" class="MainHeader">How 
+to Install</p><P>If you are using the prebuilt archive, just extract it into the 
+folder you installed Milkshape3D into (e.g. C:\Program Files\Milkshape3d). If 
+you are building the exporter yourself, copy the msOGREExporter.dll into the Milkshape 
+folder, and either copy OgreMain.dll from the 'Release' build of OgreMain into 
+the Milkshape folder too, or make sure it is somewhere on your path. </P><P ALIGN="left" CLASS="MainHeader">How 
+to Use</P><P>Select an object and click File|Export|OGRE Mesh / Skeleton...</P><P>It's 
+possible to export Material definitions from Milkshape into the .mesh file, but 
+because Milkshape only supports very basic material types, I recommend you don't 
+do this. Instead, create materials in Milkshape and use them for skinning purposes, 
+but don't check the 'Export Materials' box in the OGRE export dialog. Make sure 
+you note down the names of the materials you defined in Milkshape, then write 
+definitions for the materials in OGRE .material scripts instead, using the same 
+names. The meshes exported will still have a reference to the material name defined 
+in Milkshape, but the superior OGRE material will be used at runtime.</P><P>Skeletons 
+can be exported too: if you choose not to export a skeleton and there are bones 
+in the model, you must link the mesh to it's target skeleton.</P><P>You can optionally 
+choose to split the single animation sequence in Milkshape into multiple separate 
+animations. To do this you have to supply a simple comma-separated text file to 
+record which frames are for which animation, e.g:</P><P>1,30,Walk<BR>31,40,Wave<BR>41,80,Run</P><P>These 
+3 animations would then show up under Skeleton::getAnimation(&quot;Walk&quot;), 
+Skeleton::getAnimation(&quot;Run&quot;) etc as well as Entity::getAnimationState(&quot;Walk&quot;) 
+etc. </P><P>&nbsp;</P><P ALIGN="left" CLASS="MainHeader">To get more information </P><P>To 
+obtain more information and to download the OGRE source code, go to <A HREF="http://www.ogre3d.org"> 
+http://www.ogre3d.org</A>.</P><P></P><P>&nbsp;</P>
+	</body>
+</html>

@@ -1,0 +1,59 @@
+fragment_program Ogre/Compositor/OldTV_FP cg
+{
+	source OldTV.cg
+	entry_point OldTV_ps
+	profiles ps_2_0 arbfp1
+}
+
+material Ogre/Compositor/OldTV
+{
+	technique
+	{
+
+		pass
+		{
+			depth_check off
+
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
+			{
+			}
+
+			fragment_program_ref Ogre/Compositor/OldTV_FP
+			{
+                param_named_auto time_0_X time_0_x 120
+                param_named_auto sin_time_0_X sintime_0_x 120
+
+                param_named distortionFreq float 2.7
+                param_named distortionScale float 2.5
+                param_named distortionRoll float 0.93
+                param_named interference float 0.5
+                param_named frameLimit float 0.40
+                param_named frameShape float 0.26
+                param_named frameSharpness float 6.0
+			}
+
+			texture_unit 0
+			{
+                tex_coord_set 0
+				tex_address_mode clamp
+				filtering linear linear linear
+			}
+
+			texture_unit 1
+			{
+				texture Random3D.dds 3d
+                tex_coord_set 1
+				tex_address_mode wrap
+				filtering linear linear linear
+			}
+
+			texture_unit 2
+			{
+				texture NoiseVolume.dds 3d
+                tex_coord_set 2
+				tex_address_mode wrap
+				filtering linear linear linear
+			}
+		}
+	}
+}

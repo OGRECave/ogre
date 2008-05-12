@@ -1,0 +1,18 @@
+sampler RT : register(s0);
+sampler pattern : register(s1);
+
+float4 Halftone_ps(	float2 TexCoord : TEXCOORD0,
+			uniform float2 numTiles,
+			uniform float2 iNumTiles,
+			uniform float2 iNumTiles2,
+			uniform float4 lum) : COLOR
+{	
+	float3 local;
+	local.xy = fmod(TexCoord, iNumTiles);
+	float2 middle = TexCoord - local.xy;
+	local.xy = local.xy * numTiles;
+	middle +=  iNumTiles2;
+	local.z = dot(tex2D(RT, middle ) , lum);
+	float4 c = tex3D(pattern,local).a;
+	return c;
+}

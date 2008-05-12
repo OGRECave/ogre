@@ -1,0 +1,10 @@
+EXPORTS
+	XSILoadPlugin		@1 PRIVATE
+	XSIUnloadPlugin     @2 PRIVATE
+	OgreMeshExportCommand_Init	@3 PRIVATE
+	OgreMeshExportCommand_Execute @4 PRIVATE
+	OgreMeshExportMenu_Init		@5 PRIVATE
+	OnOgreMeshExportMenu				@6 PRIVATE
+	OgreMeshExportOptions_Define		@7 PRIVATE
+	OgreMeshExportOptions_DefineLayout @8 PRIVATE
+	OgreMeshExportOptions_PPGEvent	@9 PRIVATE

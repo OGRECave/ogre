@@ -1,0 +1,131 @@
+
+vertex_program InstancingCg cg
+{
+	source instancing.cg
+	profiles vs_2_0
+	entry_point instancing_vp
+
+	default_params
+	{
+		param_named_auto ambient ambient_light_colour
+		param_named_auto lightDiffuseColour light_diffuse_colour 0
+		param_named_auto lightPos light_position 0
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+	}
+}
+vertex_program InstancingShadowCasterCg cg
+{
+   	source instancing.cg
+	profiles vs_2_0
+	entry_point instancingCaster_vp
+	default_params
+	{
+		param_named_auto ambient ambient_light_colour
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+	}
+}
+vertex_program CrowdCg cg
+{
+	source instancing.cg
+	profiles vs_2_0
+	entry_point crowd_vp
+	default_params
+	{
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto numBones custom 0
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+		param_named_auto lightPos light_position 0
+		param_named_auto lightDiffuseColour light_diffuse_colour 0
+		param_named_auto ambient ambient_light_colour
+	}
+}
+vertex_program CrowdShadowCasterCg cg
+{
+	source instancing.cg
+	profiles vs_2_0
+	entry_point crowdCaster_vp
+	default_params
+	{
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto numBones custom 0
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+		param_named_auto ambient ambient_light_colour
+	}
+}
+
+
+vertex_program InstancingGLSL glsl
+{
+	source instancingVp.glsl
+	preprocessor_defines SHADOW_CASTER=0
+	default_params
+	{
+		param_named_auto ambient ambient_light_colour
+		param_named_auto lightDiffuseColour light_diffuse_colour 0
+		param_named_auto lightPos light_position 0
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+	}
+}
+vertex_program InstancingShadowCasterGLSL glsl
+{
+   	source instancingVp.glsl
+	preprocessor_defines SHADOW_CASTER=1
+	default_params
+	{
+		param_named_auto ambient ambient_light_colour
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+	}
+}
+vertex_program CrowdGLSL glsl
+{
+	source crowdVp.glsl
+	preprocessor_defines SHADOW_CASTER=0
+	default_params
+	{
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto numBones custom 0
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+		param_named_auto lightPos light_position 0
+		param_named_auto lightDiffuseColour light_diffuse_colour 0
+		param_named_auto ambient ambient_light_colour
+	}
+}
+vertex_program CrowdShadowCasterGLSL glsl
+{
+	source crowdVp.glsl
+	preprocessor_defines SHADOW_CASTER=1
+	default_params
+	{
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto numBones custom 0
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+		param_named_auto ambient ambient_light_colour
+	}
+}
+
+
+vertex_program Instancing unified
+{
+	delegate InstancingGLSL
+	delegate InstancingCg
+}
+vertex_program InstancingShadowCaster unified
+{
+	delegate InstancingShadowCasterGLSL
+	delegate InstancingShadowCasterCg
+}
+vertex_program Crowd unified
+{
+	delegate CrowdGLSL
+	delegate CrowdCg
+}
+vertex_program CrowdShadowCaster unified
+{
+	delegate CrowdShadowCasterGLSL
+	delegate CrowdShadowCasterCg
+}
+
