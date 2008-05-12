@@ -4,7 +4,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "OGRE SDK"
-!define PRODUCT_VERSION "1.5.0"
+!define PRODUCT_VERSION "1.7.0"
 !define PRODUCT_PUBLISHER "The OGRE Team"
 !define PRODUCT_WEB_SITE "http://www.ogre3d.org"
 !ifdef MINGW

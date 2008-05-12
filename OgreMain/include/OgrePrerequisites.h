@@ -86,10 +86,10 @@ http://www.gnu.org/copyleft/lesser.txt
 namespace Ogre {
     // Define ogre version
     #define OGRE_VERSION_MAJOR 1
-    #define OGRE_VERSION_MINOR 5
+    #define OGRE_VERSION_MINOR 7
     #define OGRE_VERSION_PATCH 0
 	#define OGRE_VERSION_SUFFIX ""
-    #define OGRE_VERSION_NAME "Shoggoth"
+    #define OGRE_VERSION_NAME "Cthugha"
 
     #define OGRE_VERSION    ((OGRE_VERSION_MAJOR << 16) | (OGRE_VERSION_MINOR << 8) | OGRE_VERSION_PATCH)
 

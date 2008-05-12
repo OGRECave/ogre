@@ -1,7 +1,7 @@
 \input texinfo   @c -*-texinfo-*-
 @c %**start of header
 @setfilename manual.info
-@settitle OGRE Manual v1.5 ('Shoggoth')
+@settitle OGRE Manual v1.7 ('Cthugha')
 @c %**end of header
    
 @titlepage

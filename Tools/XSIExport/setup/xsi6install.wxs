@@ -5,7 +5,7 @@
 		Name='OGRE XSI v6.x Exporter' 
 		Id='5F080D9B-BFE5-4aff-9105-E1DECFBA208F'
 		Language='1033' Codepage='1252' 
-		Version='1.5.0' Manufacturer='OGRE Project'>
+		Version='1.7.0' Manufacturer='OGRE Project'>
 
     	<Package Id='????????-????-????-????-????????????' Keywords='Installer'
       		Description="OGRE XSI v6.x Exporter Installer"
