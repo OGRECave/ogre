@@ -40,6 +40,7 @@ Torus Knot Software Ltd.
 #include "OgreGLXUtils.h"
 #include "OgreGLXGLSupport.h"
 #include <iostream>
+#include <climits>
 
 namespace Ogre
 {
