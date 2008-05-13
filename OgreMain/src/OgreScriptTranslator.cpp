@@ -887,7 +887,7 @@ namespace Ogre{
 								i1 = getNodeAt(prop->values, 1),
 								i2 = getNodeAt(prop->values, 2);
 							ColourValue val(0.0f, 0.0f, 0.0f, 1.0f);
-							if(getReal(*i0, &val.r) && getReal(*i1, &val.g) && getReal(*i2, &val.b))
+							if(getFloat(*i0, &val.r) && getFloat(*i1, &val.g) && getFloat(*i2, &val.b))
 							{
 								if(prop->values.size() == 4)
 								{
@@ -904,7 +904,7 @@ namespace Ogre{
 								else
 								{
 									AbstractNodeList::const_iterator i3 = getNodeAt(prop->values, 3);
-									if(!getReal(*i3, &val.a))
+									if(!getFloat(*i3, &val.a))
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 											"specular fourth argument must be a valid color component value");
 									else
