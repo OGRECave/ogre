@@ -883,10 +883,17 @@ namespace Ogre {
 			    // Iterate over each item in the list
 			    for (FileInfoList::iterator fii = (*flli)->begin(); fii != (*flli)->end(); ++fii)
 			    {
-                    LogManager::getSingleton().logMessage(
-                        "Parsing script " + fii->filename);
-                    fireScriptStarted(fii->filename);
-                    {
+					bool skipScript = false;
+                    fireScriptStarted(fii->filename, skipScript);
+					if(skipScript)
+					{
+						LogManager::getSingleton().logMessage(
+							"Skipping script " + fii->filename);
+					}
+					else
+					{
+						LogManager::getSingleton().logMessage(
+							"Parsing script " + fii->filename);
                         DataStreamPtr stream = fii->archive->open(fii->filename);
                         if (!stream.isNull())
                         {
@@ -895,7 +902,7 @@ namespace Ogre {
                             su->parseScript(stream, grp->name);
                         }
                     }
-				    fireScriptEnded(fii->filename);
+					fireScriptEnded(fii->filename, skipScript);
 			    }
             }
 		}
@@ -1166,23 +1173,26 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
-	void ResourceGroupManager::fireScriptStarted(const String& scriptName)
+	void ResourceGroupManager::fireScriptStarted(const String& scriptName, bool &skipScript)
 	{
 		OGRE_LOCK_AUTO_MUTEX
 		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
 			l != mResourceGroupListenerList.end(); ++l)
 		{
-			(*l)->scriptParseStarted(scriptName);
+			bool temp = false;
+			(*l)->scriptParseStarted(scriptName, temp);
+			if(temp)
+				skipScript = true;
 		}
 	}
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::fireScriptEnded(const String& scriptName)
+    void ResourceGroupManager::fireScriptEnded(const String& scriptName, bool skipped)
     {
         OGRE_LOCK_AUTO_MUTEX
             for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
                 l != mResourceGroupListenerList.end(); ++l)
             {
-                (*l)->scriptParseEnded(scriptName);
+                (*l)->scriptParseEnded(scriptName, skipped);
             }
     }
 	//-----------------------------------------------------------------------

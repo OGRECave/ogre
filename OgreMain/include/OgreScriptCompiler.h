@@ -334,6 +334,14 @@ namespace Ogre
 		virtual ConcreteNodeListPtr importFile(ScriptCompiler *compiler, const String &name);
 		/// Allows for responding to and overriding behavior before a CST is translated into an AST
 		virtual void preConversion(ScriptCompiler *compiler, ConcreteNodeListPtr nodes);
+		/// Allows vetoing of continued compilation after the entire AST conversion process finishes
+		/**
+		 @remarks	Once the script is turned completely into an AST, including import
+					and override handling, this function allows a listener to exit
+					the compilation process.
+		 @return True continues compilation, false aborts
+		 */
+		virtual bool postConversion(ScriptCompiler *compiler, const AbstractNodeListPtr&);
 		/// Called when an error occurred
 		virtual void handleError(ScriptCompiler *compiler, uint32 code, const String &file, int line, const String &msg);
 		/// Called when an event occurs during translation, return true if handled

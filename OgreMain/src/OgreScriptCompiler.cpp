@@ -222,6 +222,11 @@ namespace Ogre
 		
 	}
 
+	bool ScriptCompilerListener::postConversion(ScriptCompiler *compiler, const AbstractNodeListPtr &nodes)
+	{
+		return true;
+	}
+
 	void ScriptCompilerListener::handleError(ScriptCompiler *compiler, uint32 code, const String &file, int line, const String &msg)
 	{
 		Ogre::String str = "Compiler error: ";
@@ -358,6 +363,10 @@ namespace Ogre
 		processObjects(ast.get(), ast);
 		// Process variable expansion
 		processVariables(ast.get());
+
+		// Allows early bail-out through the listener
+		if(mListener && !mListener->postConversion(this, ast))
+			return mErrors.empty();
 
 		// Translate the nodes
 		for(AbstractNodeList::iterator i = ast->begin(); i != ast->end(); ++i)

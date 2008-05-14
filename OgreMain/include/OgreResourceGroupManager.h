@@ -85,12 +85,17 @@ namespace Ogre {
 		*/
 		virtual void resourceGroupScriptingStarted(const String& groupName, size_t scriptCount) = 0;
 		/** This event is fired when a script is about to be parsed.
-		@param scriptName Name of the to be parsed
+			@param scriptName Name of the to be parsed
+			@param skipThisScript A boolean passed by reference which is by default set to 
+			false. If the event sets this to true, the script will be skipped and not
+			parsed. Note that in this case the scriptParseEnded event will not be raised
+			for this script.
 		*/
-		virtual void scriptParseStarted(const String& scriptName) = 0;
+		virtual void scriptParseStarted(const String& scriptName, bool& skipThisScript) = 0;
+
 		/** This event is fired when the script has been fully parsed.
 		*/
-		virtual void scriptParseEnded(const String& scriptName) = 0;
+		virtual void scriptParseEnded(const String& scriptName, bool skipped) = 0;
 		/** This event is fired when a resource group finished parsing scripts. */
 		virtual void resourceGroupScriptingEnded(const String& groupName) = 0;
 
@@ -344,9 +349,9 @@ namespace Ogre {
 		/// Internal event firing method
 		void fireResourceGroupScriptingStarted(const String& groupName, size_t scriptCount);
 		/// Internal event firing method
-		void fireScriptStarted(const String& scriptName);
+		void fireScriptStarted(const String& scriptName, bool &skipScript);
         /// Internal event firing method
-        void fireScriptEnded(const String& scriptName);
+        void fireScriptEnded(const String& scriptName, bool skipped);
 		/// Internal event firing method
 		void fireResourceGroupScriptingEnded(const String& groupName);
         /// Internal event firing method
