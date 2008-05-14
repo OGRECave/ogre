@@ -154,10 +154,10 @@ namespace Ogre{
 		return true;
 	}
 	//-------------------------------------------------------------------------
-	bool ScriptTranslator::getColour(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, ColourValue *result)
+	bool ScriptTranslator::getColour(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, ColourValue *result, int maxEntries)
 	{
 		int n = 0;
-		while(i != end && n < 4)
+		while(i != end && n < maxEntries)
 		{
 			float v = 0;
 			if(getFloat(*i, &v))
@@ -2742,10 +2742,10 @@ namespace Ogre{
 						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
 							"colour_op_ex must have at least 3 arguments");
 					}
-					else if(prop->values.size() > 6)
+					else if(prop->values.size() > 10)
 					{
 						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-							"colour_op_ex must have at most 6 arguments");
+							"colour_op_ex must have at most 10 arguments");
 					}
 					else
 					{
@@ -2759,7 +2759,7 @@ namespace Ogre{
 								*atom2 = (AtomAbstractNode*)(*i2).get();
 							LayerBlendOperationEx op = LBX_ADD;
 							LayerBlendSource source1 = LBS_CURRENT, source2 = LBS_TEXTURE;
-							ColourValue arg1, arg2;
+							ColourValue arg1 = ColourValue::White, arg2 = ColourValue::White;
 							Real manualBlend = 0.0f;
 
 							switch(atom0->id)
@@ -2881,7 +2881,7 @@ namespace Ogre{
 							{
 								if(j != prop->values.end())
 								{
-									if(!getColour(j, prop->values.end(), &arg1))
+									if(!getColour(j, prop->values.end(), &arg1, 3))
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 											"valid colour expected when src_manual is used");
 								}
@@ -2895,7 +2895,7 @@ namespace Ogre{
 							{
 								if(j != prop->values.end())
 								{
-									if(!getColour(j, prop->values.end(), &arg2))
+									if(!getColour(j, prop->values.end(), &arg2, 3))
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 											"valid colour expected when src_manual is used");
 								}
