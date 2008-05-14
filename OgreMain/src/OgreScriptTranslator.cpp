@@ -3166,7 +3166,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 2)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"scroll must have at most 2 arguments");
 					}
 					else
 					{
@@ -3175,7 +3176,8 @@ namespace Ogre{
 						if(getReal(*i0, &x) && getReal(*i1, &y))
 							mUnit->setTextureScroll(x, y);
 						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								(*i0)->getValue() + " and/or " + (*i1)->getValue() + " is invalid; both must be numbers");
 					}
 					break;
 				case ID_SCROLL_ANIM:
@@ -3185,7 +3187,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 2)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"scroll_anim must have at most 2 arguments");
 					}
 					else
 					{
@@ -3194,7 +3197,8 @@ namespace Ogre{
 						if(getReal(*i0, &x) && getReal(*i1, &y))
 							mUnit->setScrollAnimation(x, y);
 						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								(*i0)->getValue() + " and/or " + (*i1)->getValue() + " is invalid; both must be numbers");
 					}
 					break;
 				case ID_ROTATE:
@@ -3204,7 +3208,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 1)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"rotate must have at most 1 argument");
 					}
 					else
 					{
@@ -3212,7 +3217,8 @@ namespace Ogre{
 						if(getReal(prop->values.front(), &angle))
 							mUnit->setTextureRotate(Degree(angle));
 						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								prop->values.front()->getValue() + " is not a valid number value");
 					}
 					break;
 				case ID_ROTATE_ANIM:
@@ -3222,7 +3228,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 1)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"rotate_anim must have at most 1 argument");
 					}
 					else
 					{
@@ -3230,7 +3237,8 @@ namespace Ogre{
 						if(getReal(prop->values.front(), &angle))
 							mUnit->setRotateAnimation(angle);
 						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								prop->values.front()->getValue() + " is not a valid number value");
 					}
 					break;
 				case ID_SCALE:
@@ -3240,7 +3248,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 2)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"scale must have at most 2 arguments");
 					}
 					else
 					{
@@ -3249,7 +3258,8 @@ namespace Ogre{
 						if(getReal(*i0, &x) && getReal(*i1, &y))
 							mUnit->setTextureScale(x, y);
 						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+							"first and second arguments must both be valid number values (received " + (*i0)->getValue() + ", " + (*i1)->getValue() + ")");
 					}
 					break;
 				case ID_WAVE_XFORM:
@@ -3259,7 +3269,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 6)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"wave_xform must have at most 6 arguments");
 					}
 					else
 					{
@@ -3292,7 +3303,8 @@ namespace Ogre{
 								type = TextureUnitState::TT_ROTATE;
 								break;
 							default:
-								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									atom0->value + " is not a valid transform type (must be \"scroll_x\", \"scroll_y\", \"scale_x\", \"scale_y\", or \"rotate\")");
 							}
 
 							switch(atom1->id)
@@ -3313,11 +3325,13 @@ namespace Ogre{
 								wave = WFT_INVERSE_SAWTOOTH;
 								break;
 							default:
-								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									atom1->value + " is not a valid waveform type (must be \"sine\", \"triangle\", \"square\", \"sawtooth\", or \"inverse_sawtooth\")");
 							}
 
 							if(!getReal(*i2, &base) || !getReal(*i3, &freq) || !getReal(*i4, &phase) || !getReal(*i5, &amp))
-								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									"arguments 3, 4, 5, and 6 must be valid numbers; received " + (*i2)->getValue() + ", " + (*i3)->getValue() + ", " + (*i4)->getValue() + ", " + (*i5)->getValue());
 
 							mUnit->setTransformAnimation(type, wave, base, freq, phase, amp);
 						}
@@ -3343,7 +3357,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 1)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"binding_type must have at most 1 argument");
 					}
 					else
 					{
@@ -3359,12 +3374,14 @@ namespace Ogre{
 								mUnit->setBindingType(TextureUnitState::BT_FRAGMENT);
 								break;
 							default:
-								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									atom->value + " is not a valid binding type (must be \"vertex\" or \"fragment\")");
 							}
 						}
 						else
 						{
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								prop->values.front()->getValue() + " is not a valid binding type");
 						}
 					}
 					break;
@@ -3375,7 +3392,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 1)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"content_type must have at most 1 argument");
 					}
 					else
 					{
@@ -3391,12 +3409,14 @@ namespace Ogre{
 								mUnit->setContentType(TextureUnitState::CONTENT_SHADOW);
 								break;
 							default:
-								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									atom->value + " is not a valid content type (must be \"named\" or \"shadows\")");
 							}
 						}
 						else
 						{
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								prop->values.front()->getValue() + " is not a valid content type");
 						}
 					}
 					break;
