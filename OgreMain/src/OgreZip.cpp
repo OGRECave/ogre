@@ -263,7 +263,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     size_t ZipDataStream::read(void* buf, size_t count)
     {
-        zzip_ssize_t r = zzip_file_read(mZzipFile, buf, count);
+        zzip_ssize_t r = zzip_file_read(mZzipFile, (char*)buf, count);
         if (r<0) {
             ZZIP_DIR *dir = zzip_dirhandle(mZzipFile);
             String msg = zzip_strerror_of(dir);
