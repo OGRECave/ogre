@@ -80,7 +80,6 @@ http://www.gnu.org/copyleft/lesser.txt
 */
 //#include "OgreStdHeaders.h"
 
-
 #include "OgreMemoryManager.h"
 
 namespace Ogre {
@@ -129,8 +128,8 @@ namespace Ogre {
 	typedef unsigned long ulong;
 
     /// Useful macros
-    #define OGRE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
-    #define OGRE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
+    #define OGRE_SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
+    #define OGRE_SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
 
 	#if OGRE_WCHAR_T_STRINGS
 		typedef std::wstring _StringBase;
@@ -384,6 +383,8 @@ namespace Ogre {
     class CompositionPass;
     class CompositionTargetPass;
 }
+
+#include "OgreMemoryAllocatorConfig.h"
 
 #endif // __OgrePrerequisites_H__
 

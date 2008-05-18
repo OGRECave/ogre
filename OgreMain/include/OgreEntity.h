@@ -72,7 +72,7 @@ namespace Ogre {
 	@note
 	No functions were declared virtual to improve performance.
 	*/
-	class _OgreExport Entity: public MovableObject, public Resource::Listener
+	class _OgreExport Entity: public MovableObject, public Resource::Listener, public EntityAlloc
 	{
 		// Allow EntityFactory full access
 		friend class EntityFactory;

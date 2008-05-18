@@ -82,6 +82,13 @@ Torus Knot Software Ltd.
 //#define OGRE_STATIC_LIB
 
 
+// define the memory allocator configuration to use
+#define OGRE_MEMORY_ALLOCATOR_STD 1
+#define OGRE_MEMORY_ALLOCATOR_NED 2			 // you need to have nedmalloc on your path for this
+#define OGRE_MEMORY_ALLOCATOR_USER 3
+
+#define OGRE_MEMORY_ALLOCATOR OGRE_MEMORY_ALLOCATOR_STD
+
 /** Set this to 0 if you want to use the standard memory manager in Debug builds
     Release builds always use the standard memory manager
 */

@@ -29,7 +29,9 @@ Torus Knot Software Ltd.
 #ifndef __AlignedAllocator_H__
 #define __AlignedAllocator_H__
 
-#include "OgrePrerequisites.h"
+// Now we're only including this within OgreMemoryAllocatorConfig.h which is already in
+// the prerequisites header (circlar reference)
+//#include "OgrePrerequisites.h"
 
 namespace Ogre {
 
@@ -90,92 +92,6 @@ namespace Ogre {
         static void deallocate(void* p);
 	};
 
-    /** STL compatible allocator with aligned memory allocate, used for tweak
-        STL containers work with aligned memory.
-    @remarks
-        This class designed for work with STL containers, by use this
-        class instead of std::allocator, the STL containers can work
-        with aligned memory allocate seamless.
-    @note
-        template parameter Alignment equal to zero means use default
-        platform dependent alignment.
-    */
-    template <typename T, unsigned Alignment = 0>
-    class AlignedAllocator
-    {
-        // compile-time check alignment is available.
-        typedef int IsValidAlignment
-            [Alignment <= 128 && ((Alignment & (Alignment-1)) == 0) ? +1 : -1];
-
-    public:
-        //--- typedefs for STL compatible
-
-        typedef T value_type;
-
-        typedef value_type * pointer;
-        typedef const value_type * const_pointer;
-        typedef value_type & reference;
-        typedef const value_type & const_reference;
-        typedef std::size_t size_type;
-        typedef std::ptrdiff_t difference_type;
-
-        template <typename U>
-        struct rebind
-        {
-            typedef AlignedAllocator<U, Alignment> other;
-        };
-
-    public:
-        AlignedAllocator() { /* nothing to do */ }
-
-        // default copy constructor
-
-        // default assignment operator
-
-        // not explicit, mimicking std::allocator [20.4.1]
-        template <typename U, unsigned A>
-        AlignedAllocator(const AlignedAllocator<U, A> &) { /* nothing to do */ }
-
-        // default destructor
-
-        //--- functions for STL compatible
-
-        static pointer address(reference r)
-        { return &r; }
-        static const_pointer address(const_reference s)
-        { return &s; }
-        static size_type max_size()
-        { return (std::numeric_limits<size_type>::max)(); }
-        static void construct(const pointer ptr, const value_type & t)
-        { new (ptr) T(t); }
-        static void destroy(const pointer ptr)
-        {
-            ptr->~T();
-            (void) ptr; // avoid unused variable warning
-        }
-
-        bool operator==(const AlignedAllocator &) const
-        { return true; }
-        bool operator!=(const AlignedAllocator &) const
-        { return false; }
-
-        static pointer allocate(const size_type n)
-        {
-            // use default platform dependent alignment if 'Alignment' equal to zero.
-            const pointer ret = static_cast<pointer>(Alignment ?
-                AlignedMemory::allocate(sizeof(T) * n, Alignment) :
-                AlignedMemory::allocate(sizeof(T) * n));
-            return ret;
-        }
-        static pointer allocate(const size_type n, const void * const)
-        {
-            return allocate(n);
-        }
-        static void deallocate(const pointer ptr, const size_type)
-        {
-            AlignedMemory::deallocate(ptr);
-        }
-    };
 }
 
 #endif  // __AlignedAllocator_H__

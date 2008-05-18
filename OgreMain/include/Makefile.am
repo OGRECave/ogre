@@ -82,8 +82,13 @@ pkginclude_HEADERS = Ogre.h \
                      OgreMath.h \
                      OgreMatrix3.h \
                      OgreMatrix4.h \
+					 OgreMemoryAllocatedObject.h \
+					 OgreMemoryAllocatorConfig.h \
                      OgreMemoryMacros.h \
                      OgreMemoryManager.h \
+					 OgreMemoryNedAlloc.h \
+					 OgreMemoryStdAlloc.h \
+					 OgreMemorySTLAllocator.h \
                      OgreMesh.h \
                      OgreMeshFileFormat.h \
                      OgreMeshManager.h \
