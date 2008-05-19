@@ -178,8 +178,13 @@
 		<Unit filename="..\include\OgreMath.h" />
 		<Unit filename="..\include\OgreMatrix3.h" />
 		<Unit filename="..\include\OgreMatrix4.h" />
+		<Unit filename="..\include\OgreMemoryAllocatedObject.h" />
+		<Unit filename="..\include\OgreMemoryAllocatorConfig.h" />
 		<Unit filename="..\include\OgreMemoryMacros.h" />
 		<Unit filename="..\include\OgreMemoryManager.h" />
+		<Unit filename="..\include\OgreMemoryNedAlloc.h" />
+		<Unit filename="..\include\OgreMemoryStdAlloc.h" />
+		<Unit filename="..\include\OgreMemorySTLAllocator.h" />
 		<Unit filename="..\include\OgreMesh.h" />
 		<Unit filename="..\include\OgreMeshFileFormat.h" />
 		<Unit filename="..\include\OgreMeshManager.h" />
@@ -388,6 +393,7 @@
 		<Unit filename="..\src\OgreMatrix3.cpp" />
 		<Unit filename="..\src\OgreMatrix4.cpp" />
 		<Unit filename="..\src\OgreMemoryManager.cpp" />
+		<Unit filename="..\src\OgreMemoryNedAlloc.cpp" />
 		<Unit filename="..\src\OgreMesh.cpp" />
 		<Unit filename="..\src\OgreMeshManager.cpp" />
 		<Unit filename="..\src\OgreMeshSerializer.cpp" />
