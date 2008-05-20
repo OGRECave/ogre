@@ -32,6 +32,15 @@ Torus Knot Software Ltd
 
 #include "OgrePrerequisites.h"
 
+// Anything that has done a #define new <blah> will screw operator new definitions up
+// so undefine
+#ifdef new
+#  undef new
+#endif
+#ifdef delete
+#  undef delete
+#endif
+
 namespace Ogre
 {
 	/** Superclass for all objects that wish to use custom memory allocators
