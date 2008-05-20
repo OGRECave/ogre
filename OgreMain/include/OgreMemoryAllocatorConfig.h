@@ -32,13 +32,15 @@ Torus Knot Software Ltd
 
 #include "OgrePrerequisites.h"
 
-/*
-	This file lists hooks up all the allocators. You can modify this
+/** @file
+
+	This file configures Ogre's memory allocators. You can modify this
 	file to alter the allocation routines used for Ogre's main objects.
 
 	When customising memory allocation, all you need to do is provide one or
 	more custom allocation policy classes. These classes need to implement:
 
+	@code
 	// Allocate bytes - file/line/func information should be optional, 
 	// will be provided when available but not everywhere (e.g. release mode, STL allocations)
 	static inline void* allocateBytes(size_t count, const char* file = 0, int line = 0, const char* func = 0);
@@ -46,11 +48,21 @@ Torus Knot Software Ltd
 	static inline void deallocateBytes(void* ptr);
 	// Return the max number of bytes available to be allocated in a single allocation
 	static inline size_t getMaxAllocationSize();
+	@endcode
 
-	Ogre provides a few examples of alternative allocation schemes, and in each 
-	case provides an aligned version of the policies too. You should at the
-	least provide both and make sure the default policies are defined, as
-	shown below.
+	Policies are then used as implementations for the wrapper classes and macros 
+	which call them. AllocatedObject for example provides the hooks to override
+	the new and delete operators for a class and redirect the functionality to the
+	policy. STLAllocator is a class which is provided to STL containers in order
+	to hook up allocation of the containers members to the allocation policy.
+	@par
+	In addition to linking allocations to policies, this class also defines
+	a number of macros to allow debugging information to be passed along with
+	allocations, such as the file and line number they originate from. It's
+	important to realise that we do not redefine the 'new' and 'delete' symbols 
+	with macros, because that's very difficult to consistently do when other
+	libraries are also trying to do the same thing; instead we use dedicated
+	'OGRE_' prefixed macros. See OGRE_NEW and related items.
 
 */
 
@@ -158,14 +170,26 @@ namespace Ogre
 
 #if OGRE_DEBUG_MODE
 
+/// Allocate a block of raw memory, and indicate the category of usage
 #	define OGRE_MALLOC(bytes, category) ::Ogre::CategorisedAllocPolicy<category>::allocateBytes(bytes, __FILE__, __LINE__, __FUNCTION__)
+/// Allocate a block of memory for 'count' primitive types - do not use for classes that inherit from AllocatedObject
+#	define OGRE_ALLOC_T(T, count, category) ::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)
+/// Free the memory allocated with either OGRE_MALLOC or OGRE_ALLOC_T. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_FREE(ptr, category) ::Ogre::CategorisedAllocPolicy<category>::deallocateBytes(ptr)
 
 // aligned allocation
-#	define OGRE_MALLOC_ALIGNED_SIMD(bytes, category) ::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(bytes, __FILE__, __LINE__, __FUNCTION__)
-#	define OGRE_FREE_ALIGNED_SIMD(ptr, category) ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
-#	define OGRE_MALLOC_ALIGNED(bytes, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(bytes, __FILE__, __LINE__, __FUNCTION__)
-#	define OGRE_FREE_ALIGNED(ptr, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr)
+/// Allocate a block of raw memory aligned to SIMD boundaries, and indicate the category of usage
+#	define OGRE_MALLOC_SIMD(bytes, category) ::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(bytes, __FILE__, __LINE__, __FUNCTION__)
+/// Allocate a block of memory for 'count' primitive types aligned to SIMD boundaries - do not use for classes that inherit from AllocatedObject
+#	define OGRE_ALLOC_T_SIMD(T, count, category) ::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)
+/// Free the memory allocated with either OGRE_MALLOC_SIMD or OGRE_ALLOC_T_SIMD. Category is required to be restated to ensure the matching policy is used
+#	define OGRE_FREE_SIMD(ptr, category) ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
+/// Allocate a block of raw memory aligned to user defined boundaries, and indicate the category of usage
+#	define OGRE_MALLOC_ALIGN(bytes, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(bytes, __FILE__, __LINE__, __FUNCTION__)
+/// Allocate a block of memory for 'count' primitive types aligned to user defined boundaries - do not use for classes that inherit from AllocatedObject
+#	define OGRE_ALLOC_T_ALIGN(T, count, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)
+/// Free the memory allocated with either OGRE_MALLOC_ALIGN or OGRE_ALLOC_T_ALIGN. Category is required to be restated to ensure the matching policy is used
+#	define OGRE_FREE_ALIGN(ptr, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr)
 
 // new / delete (alignment determined by per-class policy)
 #	define OGRE_NEW new (__FILE__, __LINE__, __FUNCTION__)
@@ -173,14 +197,26 @@ namespace Ogre
 
 #else // !OGRE_DEBUG_MODE
 
+/// Allocate a block of raw memory, and indicate the category of usage
 #	define OGRE_MALLOC(bytes, category) ::Ogre::CategorisedAllocPolicy<category>::allocateBytes(bytes)
+/// Allocate a block of memory for 'count' primitive types - do not use for classes that inherit from AllocatedObject
+#	define OGRE_ALLOC_T(T, count, category) ::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count)
+/// Free the memory allocated with either OGRE_MALLOC or OGRE_ALLOC_T. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_FREE(ptr, category) ::Ogre::CategorisedAllocPolicy<category>::deallocateBytes(ptr)
 
 // aligned allocation
-#	define OGRE_MALLOC_ALIGNED_SIMD(bytes, category) ::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(bytes)
-#	define OGRE_FREE_ALIGNED_SIMD(ptr, category) ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
-#	define OGRE_MALLOC_ALIGNED(bytes, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(bytes)
-#	define OGRE_FREE_ALIGNED(ptr, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr)
+/// Allocate a block of raw memory aligned to SIMD boundaries, and indicate the category of usage
+#	define OGRE_MALLOC_SIMD(bytes, category) ::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(bytes)
+/// Allocate a block of memory for 'count' primitive types aligned to SIMD boundaries - do not use for classes that inherit from AllocatedObject
+#	define OGRE_ALLOC_T_SIMD(T, count, category) ::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count)
+/// Free the memory allocated with either OGRE_MALLOC_SIMD or OGRE_ALLOC_T_SIMD. Category is required to be restated to ensure the matching policy is used
+#	define OGRE_FREE_SIMD(ptr, category) ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
+/// Allocate a block of raw memory aligned to user defined boundaries, and indicate the category of usage
+#	define OGRE_MALLOC_ALIGN(bytes, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(bytes)
+/// Allocate a block of memory for 'count' primitive types aligned to user defined boundaries - do not use for classes that inherit from AllocatedObject
+#	define OGRE_ALLOC_T_ALIGN(T, count, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count)
+/// Free the memory allocated with either OGRE_MALLOC_ALIGN or OGRE_ALLOC_T_ALIGN. Category is required to be restated to ensure the matching policy is used
+#	define OGRE_FREE_ALIGN(ptr, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr)
 
 // new / delete (alignment determined by per-class policy)
 #	define OGRE_NEW new 

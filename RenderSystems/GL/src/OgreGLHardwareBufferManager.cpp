@@ -49,7 +49,7 @@ namespace Ogre {
 		// Init scratch pool
 		// TODO make it a configurable size?
 		// 32-bit aligned buffer
-		mScratchBufferPool = static_cast<char*>(OGRE_MALLOC_ALIGNED(SCRATCH_POOL_SIZE, MEMCATEGORY_GEOMETRY, SCRATCH_ALIGNMENT));
+		mScratchBufferPool = static_cast<char*>(OGRE_MALLOC_ALIGN(SCRATCH_POOL_SIZE, MEMCATEGORY_GEOMETRY, SCRATCH_ALIGNMENT));
 		GLScratchBufferAlloc* ptrAlloc = (GLScratchBufferAlloc*)mScratchBufferPool;
 		ptrAlloc->size = SCRATCH_POOL_SIZE - sizeof(GLScratchBufferAlloc);
 		ptrAlloc->free = 1;
@@ -60,7 +60,7 @@ namespace Ogre {
         destroyAllDeclarations();
         destroyAllBindings();
 
-		OGRE_FREE_ALIGNED(mScratchBufferPool, MEMCATEGORY_GEOMETRY, SCRATCH_ALIGNMENT);
+		OGRE_FREE_ALIGN(mScratchBufferPool, MEMCATEGORY_GEOMETRY, SCRATCH_ALIGNMENT);
     }
     //-----------------------------------------------------------------------
     HardwareVertexBufferSharedPtr GLHardwareBufferManager::createVertexBuffer(

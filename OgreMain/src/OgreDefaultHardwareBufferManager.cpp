@@ -36,12 +36,12 @@ namespace Ogre {
         : HardwareVertexBuffer(vertexSize, numVertices, usage, true, false) // always software, never shadowed
 	{
         // Allocate aligned memory for better SIMD processing friendly.
-        mpData = static_cast<unsigned char*>(OGRE_MALLOC_ALIGNED_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
+        mpData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
 	}
 	//-----------------------------------------------------------------------
     DefaultHardwareVertexBuffer::~DefaultHardwareVertexBuffer()
 	{
-		OGRE_FREE_ALIGNED_SIMD(mpData, MEMCATEGORY_GEOMETRY);
+		OGRE_FREE_SIMD(mpData, MEMCATEGORY_GEOMETRY);
 	}
 	//-----------------------------------------------------------------------
     void* DefaultHardwareVertexBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
