@@ -619,7 +619,7 @@
 		000E27B80B39AB18004EA2DF /* EnvMapping-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "EnvMapping-Info.plist"; path = "plist/EnvMapping-Info.plist"; sourceTree = "<group>"; };
 		000E27BE0B39ABE3004EA2DF /* EnvMapping.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = EnvMapping.h; path = ../../Samples/EnvMapping/include/EnvMapping.h; sourceTree = SOURCE_ROOT; };
 		000E27BF0B39ABED004EA2DF /* EnvMapping.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = EnvMapping.cpp; path = ../../Samples/EnvMapping/src/EnvMapping.cpp; sourceTree = SOURCE_ROOT; };
-		000E27CE0B39AD1D004EA2DF /* FacialAnimation.app */ = {isa = PBXFileReference; includeInIndex = 0; path = FacialAnimation.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000E27CE0B39AD1D004EA2DF /* FacialAnimation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FacialAnimation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		000E27D00B39AD1D004EA2DF /* FacialAnimation-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "FacialAnimation-Info.plist"; path = "plist/FacialAnimation-Info.plist"; sourceTree = "<group>"; };
 		000E27E60B39ADE3004EA2DF /* FacialAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = FacialAnimation.cpp; path = ../../Samples/FacialAnimation/src/FacialAnimation.cpp; sourceTree = SOURCE_ROOT; };
 		000E27F30B39AE59004EA2DF /* Fresnel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fresnel.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3568,6 +3568,7 @@
 				);
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = ../../Dependencies;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				HEADER_SEARCH_PATHS = (
 					"../../OgreMain/include/**",
 					../../Dependencies/include,
@@ -3587,6 +3588,7 @@
 				);
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = ../../Dependencies;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
 					"../../OgreMain/include/**",
 					../../Dependencies/include,

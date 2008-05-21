@@ -80,15 +80,18 @@ namespace Ogre
 	enum MemoryCategory
 	{
 		/// Geometry held in main memory
-		MEMCATEGORY_GEOMETRY, 
+		MEMCATEGORY_GEOMETRY = 0, 
 		/// Animation data like tracks, bone matrices
-		MEMCATEGORY_ANIMATION, 
+		MEMCATEGORY_ANIMATION = 1, 
 		/// Nodes, control data
-		MEMCATEGORY_SCENE_CONTROL,
+		MEMCATEGORY_SCENE_CONTROL = 2,
 		/// Scene object instances
-		MEMCATEGORY_SCENE_OBJECTS,
+		MEMCATEGORY_SCENE_OBJECTS = 3,
 		/// General purpose
-		MEMCATEGORY_GENERAL
+		MEMCATEGORY_GENERAL = 4,
+		
+		// sentinel value, do not use 
+		MEMCATEGORY_COUNT = 5
 	};
 }
 

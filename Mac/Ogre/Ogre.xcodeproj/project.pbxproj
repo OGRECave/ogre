@@ -588,6 +588,8 @@
 		AAA8B9710CC6A4FC001AD86E /* OgreScriptParser.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */; };
 		AAD22CA50D7D708600928C53 /* OgreScriptTranslator.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD22CA40D7D708600928C53 /* OgreScriptTranslator.h */; };
 		AAD22CA70D7D70B400928C53 /* OgreScriptTranslator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD22CA60D7D70B400928C53 /* OgreScriptTranslator.cpp */; };
+		AAF4F54A0DE4C73D0073D0FD /* OgreMemoryTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAF4F5480DE4C73D0073D0FD /* OgreMemoryTracker.cpp */; };
+		AAF4F5CB0DE4D6AD0073D0FD /* OgreMemoryTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = AAF4F5320DE4C48C0073D0FD /* OgreMemoryTracker.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1356,6 +1358,8 @@
 		AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptParser.h; path = ../../OgreMain/include/OgreScriptParser.h; sourceTree = SOURCE_ROOT; };
 		AAD22CA40D7D708600928C53 /* OgreScriptTranslator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptTranslator.h; path = ../../OgreMain/include/OgreScriptTranslator.h; sourceTree = SOURCE_ROOT; };
 		AAD22CA60D7D70B400928C53 /* OgreScriptTranslator.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreScriptTranslator.cpp; path = ../../OgreMain/src/OgreScriptTranslator.cpp; sourceTree = SOURCE_ROOT; };
+		AAF4F5320DE4C48C0073D0FD /* OgreMemoryTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreMemoryTracker.h; path = ../../OgreMain/include/OgreMemoryTracker.h; sourceTree = SOURCE_ROOT; };
+		AAF4F5480DE4C73D0073D0FD /* OgreMemoryTracker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMemoryTracker.cpp; path = ../../OgreMain/src/OgreMemoryTracker.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1615,6 +1619,7 @@
 				000E1F3C0B38D5AA004EA2DF /* OgreMatrix4.cpp */,
 				000E1F3D0B38D5AA004EA2DF /* OgreMemoryManager.cpp */,
 				AA0405750DE0D7B60000EEFF /* OgreMemoryNedAlloc.cpp */,
+				AAF4F5480DE4C73D0073D0FD /* OgreMemoryTracker.cpp */,
 				000E1F3E0B38D5AA004EA2DF /* OgreMesh.cpp */,
 				000E1F3F0B38D5AA004EA2DF /* OgreMeshManager.cpp */,
 				000E1F400B38D5AA004EA2DF /* OgreMeshSerializer.cpp */,
@@ -1821,6 +1826,7 @@
 				000E1DA30B38D566004EA2DF /* OgreMemoryManager.h */,
 				AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */,
 				AA7510660DDE20FE009D23BA /* OgreMemorySTLAllocator.h */,
+				AAF4F5320DE4C48C0073D0FD /* OgreMemoryTracker.h */,
 				000E1DA40B38D566004EA2DF /* OgreMesh.h */,
 				000E1DA50B38D566004EA2DF /* OgreMeshFileFormat.h */,
 				000E1DA60B38D566004EA2DF /* OgreMeshManager.h */,
@@ -2563,6 +2569,7 @@
 				AA7510680DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h in Headers */,
 				AA7510690DDE20FE009D23BA /* OgreMemoryStdAlloc.h in Headers */,
 				AA75106A0DDE20FE009D23BA /* OgreMemorySTLAllocator.h in Headers */,
+				AAF4F5CB0DE4D6AD0073D0FD /* OgreMemoryTracker.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2928,6 +2935,7 @@
 				AA06EFE80CEE58080013023A /* OgreScriptParser.cpp in Sources */,
 				AAD22CA70D7D70B400928C53 /* OgreScriptTranslator.cpp in Sources */,
 				AA0405760DE0D7B60000EEFF /* OgreMemoryNedAlloc.cpp in Sources */,
+				AAF4F54A0DE4C73D0073D0FD /* OgreMemoryTracker.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3125,6 +3133,7 @@
 					i386,
 				);
 				COPY_PHASE_STRIP = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				SHARED_PRECOMPS_DIR = ../build/PCH;
 			};
@@ -3138,7 +3147,7 @@
 					i386,
 				);
 				COPY_PHASE_STRIP = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = NDEBUG;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				SHARED_PRECOMPS_DIR = ../build/PCH;
 			};
