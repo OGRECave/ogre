@@ -67,7 +67,7 @@ namespace Ogre
 	//--------------------------------------------------------------------------
 	size_t MemoryTracker::getMemoryAllocatedForCat(MemoryCategory cat) const
 	{
-		
+		return mAllocationsByCategory[cat];
 	}
 	//--------------------------------------------------------------------------
 	void MemoryTracker::reportLeaks()

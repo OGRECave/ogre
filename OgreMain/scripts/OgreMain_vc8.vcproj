@@ -676,6 +676,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\OgreMemoryTracker.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\OgreMesh.cpp"
 				>
 			</File>
@@ -1510,6 +1514,10 @@
 			</File>
 			<File
 				RelativePath="..\include\OgreMemorySTLAllocator.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\OgreMemoryTracker.h"
 				>
 			</File>
 			<File

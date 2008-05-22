@@ -185,6 +185,7 @@
 		<Unit filename="..\include\OgreMemoryNedAlloc.h" />
 		<Unit filename="..\include\OgreMemoryStdAlloc.h" />
 		<Unit filename="..\include\OgreMemorySTLAllocator.h" />
+		<Unit filename="..\include\OgreMemoryTracker.h" />
 		<Unit filename="..\include\OgreMesh.h" />
 		<Unit filename="..\include\OgreMeshFileFormat.h" />
 		<Unit filename="..\include\OgreMeshManager.h" />
@@ -394,6 +395,7 @@
 		<Unit filename="..\src\OgreMatrix4.cpp" />
 		<Unit filename="..\src\OgreMemoryManager.cpp" />
 		<Unit filename="..\src\OgreMemoryNedAlloc.cpp" />
+		<Unit filename="..\src\OgreMemoryTracker.cpp" />
 		<Unit filename="..\src\OgreMesh.cpp" />
 		<Unit filename="..\src\OgreMeshManager.cpp" />
 		<Unit filename="..\src\OgreMeshSerializer.cpp" />
