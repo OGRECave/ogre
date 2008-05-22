@@ -3991,82 +3991,153 @@ namespace Ogre{
 						String name;
 						size_t index = 0;
 
-						AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
-							i1 = getNodeAt(prop->values, 1), i2 = getNodeAt(prop->values, 2);
-						if((*i0)->type != ANT_ATOM || (*i1)->type != ANT_ATOM)
+						if(prop->values.size() >= 2)
 						{
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-							return;
-						}
-						AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
-						if(!named && !StringConverter::isNumber(atom0->value))
-						{
-							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-							return;
-						}
-
-						if(named)
-							name = atom0->value;
-						else
-							index = StringConverter::parseInt(atom0->value);
-
-						// Look up the auto constant
-						StringUtil::toLowerCase(atom1->value);
-						const GpuProgramParameters::AutoConstantDefinition *def =
-							GpuProgramParameters::getAutoConstantDefinition(atom1->value);
-						if(def)
-						{
-							switch(def->dataType)
+							AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
+								i1 = getNodeAt(prop->values, 1), i2 = getNodeAt(prop->values, 2);
+							if((*i0)->type != ANT_ATOM || (*i1)->type != ANT_ATOM)
 							{
-							case GpuProgramParameters::ACDT_NONE:
-								// Set the auto constant
-								try
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								return;
+							}
+							AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
+							if(!named && !StringConverter::isNumber(atom0->value))
+							{
+								compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+								return;
+							}
+
+							if(named)
+								name = atom0->value;
+							else
+								index = StringConverter::parseInt(atom0->value);
+
+							// Look up the auto constant
+							StringUtil::toLowerCase(atom1->value);
+							const GpuProgramParameters::AutoConstantDefinition *def =
+								GpuProgramParameters::getAutoConstantDefinition(atom1->value);
+							if(def)
+							{
+								switch(def->dataType)
 								{
-									if(named)
-										params->setNamedAutoConstant(name, def->acType);
-									else
-										params->setAutoConstant(index, def->acType);
-								}
-								catch(...)
-								{
-									compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-								}
-								break;
-							case GpuProgramParameters::ACDT_INT:
-								if(def->acType == GpuProgramParameters::ACT_ANIMATION_PARAMETRIC)
-								{
+								case GpuProgramParameters::ACDT_NONE:
+									// Set the auto constant
 									try
 									{
 										if(named)
-											params->setNamedAutoConstant(name, def->acType, animParametricsCount++);
+											params->setNamedAutoConstant(name, def->acType);
 										else
-											params->setAutoConstant(index, def->acType, animParametricsCount++);
+											params->setAutoConstant(index, def->acType);
 									}
 									catch(...)
 									{
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 									}
-								}
-								else
-								{
-									// Only certain texture projection auto params will assume 0
-									// Otherwise we will expect that 3rd parameter
-									if(i2 == prop->values.end())
+									break;
+								case GpuProgramParameters::ACDT_INT:
+									if(def->acType == GpuProgramParameters::ACT_ANIMATION_PARAMETRIC)
 									{
-										if(def->acType == GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX ||
-											def->acType == GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX ||
-											def->acType == GpuProgramParameters::ACT_SPOTLIGHT_VIEWPROJ_MATRIX ||
-											def->acType == GpuProgramParameters::ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX
-											)
+										try
 										{
-											try
+											if(named)
+												params->setNamedAutoConstant(name, def->acType, animParametricsCount++);
+											else
+												params->setAutoConstant(index, def->acType, animParametricsCount++);
+										}
+										catch(...)
+										{
+											compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+										}
+									}
+									else
+									{
+										// Only certain texture projection auto params will assume 0
+										// Otherwise we will expect that 3rd parameter
+										if(i2 == prop->values.end())
+										{
+											if(def->acType == GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX ||
+												def->acType == GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX ||
+												def->acType == GpuProgramParameters::ACT_SPOTLIGHT_VIEWPROJ_MATRIX ||
+												def->acType == GpuProgramParameters::ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX
+												)
 											{
-												if(named)
-													params->setNamedAutoConstant(name, def->acType, 0);
-												else
-													params->setAutoConstant(index, def->acType, 0);
+												try
+												{
+													if(named)
+														params->setNamedAutoConstant(name, def->acType, 0);
+													else
+														params->setAutoConstant(index, def->acType, 0);
+												}
+												catch(...)
+												{
+													compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+												}
 											}
-											catch(...)
+											else
+											{
+												compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+											}
+										}
+										else
+										{
+											uint32 extraInfo = 0;
+											if(getUInt(*i2, &extraInfo))
+											{
+												try
+												{
+													if(named)
+														params->setNamedAutoConstant(name, def->acType, extraInfo);
+													else
+														params->setAutoConstant(index, def->acType, extraInfo);
+												}
+												catch(...)
+												{
+													compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+												}
+											}
+										}
+									}
+									break;
+								case GpuProgramParameters::ACDT_REAL:
+									if(def->acType == GpuProgramParameters::ACT_TIME ||
+										def->acType == GpuProgramParameters::ACT_FRAME_TIME)
+									{
+										Real f = 1.0f;
+										if(i2 != prop->values.end())
+											getReal(*i2, &f);
+										
+										try
+										{
+											if(named)
+												params->setNamedAutoConstantReal(name, def->acType, f);
+											else
+												params->setAutoConstantReal(index, def->acType, f);
+										}
+										catch(...)
+										{
+											compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+										}
+									}
+									else
+									{
+										if(i2 != prop->values.end())
+										{
+											Real extraInfo = 0.0f;
+											if(getReal(*i2, &extraInfo))
+											{
+												try
+												{
+													if(named)
+														params->setNamedAutoConstantReal(name, def->acType, extraInfo);
+													else
+														params->setAutoConstantReal(index, def->acType, extraInfo);
+												}
+												catch(...)
+												{
+													compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+												}
+											}
+											else
 											{
 												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 											}
@@ -4076,76 +4147,12 @@ namespace Ogre{
 											compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
 										}
 									}
-									else
-									{
-										uint32 extraInfo = 0;
-										if(getUInt(*i2, &extraInfo))
-										{
-											try
-											{
-												if(named)
-													params->setNamedAutoConstant(name, def->acType, extraInfo);
-												else
-													params->setAutoConstant(index, def->acType, extraInfo);
-											}
-											catch(...)
-											{
-												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-											}
-										}
-									}
+									break;
 								}
-								break;
-							case GpuProgramParameters::ACDT_REAL:
-								if(def->acType == GpuProgramParameters::ACT_TIME ||
-									def->acType == GpuProgramParameters::ACT_FRAME_TIME)
-								{
-									Real f = 1.0f;
-									if(i2 != prop->values.end())
-										getReal(*i2, &f);
-									
-									try
-									{
-										if(named)
-											params->setNamedAutoConstantReal(name, def->acType, f);
-										else
-											params->setAutoConstantReal(index, def->acType, f);
-									}
-									catch(...)
-									{
-										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-									}
-								}
-								else
-								{
-									if(i2 != prop->values.end())
-									{
-										Real extraInfo = 0.0f;
-										if(getReal(*i2, &extraInfo))
-										{
-											try
-											{
-												if(named)
-													params->setNamedAutoConstantReal(name, def->acType, extraInfo);
-												else
-													params->setAutoConstantReal(index, def->acType, extraInfo);
-											}
-											catch(...)
-											{
-												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-											}
-										}
-										else
-										{
-											compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-										}
-									}
-									else
-									{
-										compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-									}
-								}
-								break;
+							}
+							else
+							{
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 							}
 						}
 						else
