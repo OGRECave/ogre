@@ -668,10 +668,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\OgreMemoryManager.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\OgreMemoryNedAlloc.cpp"
 				>
 			</File>
@@ -1497,14 +1493,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\OgreMemoryMacros.h"
-				>
-			</File>
-			<File
-				RelativePath="..\include\OgreMemoryManager.h"
-				>
-			</File>
-			<File
 				RelativePath="..\include\OgreMemoryNedAlloc.h"
 				>
 			</File>
@@ -1550,10 +1538,6 @@
 			</File>
 			<File
 				RelativePath="..\include\OgreNode.h"
-				>
-			</File>
-			<File
-				RelativePath="..\include\OgreNoMemoryMacros.h"
 				>
 			</File>
 			<File

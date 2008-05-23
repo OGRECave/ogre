@@ -123,8 +123,6 @@
 		000E1E6F0B38D566004EA2DF /* OgreMath.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1D9F0B38D566004EA2DF /* OgreMath.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E700B38D566004EA2DF /* OgreMatrix3.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA00B38D566004EA2DF /* OgreMatrix3.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E710B38D566004EA2DF /* OgreMatrix4.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA10B38D566004EA2DF /* OgreMatrix4.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		000E1E720B38D566004EA2DF /* OgreMemoryMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA20B38D566004EA2DF /* OgreMemoryMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		000E1E730B38D566004EA2DF /* OgreMemoryManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA30B38D566004EA2DF /* OgreMemoryManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E740B38D566004EA2DF /* OgreMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA40B38D566004EA2DF /* OgreMesh.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E750B38D566004EA2DF /* OgreMeshFileFormat.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA50B38D566004EA2DF /* OgreMeshFileFormat.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E760B38D566004EA2DF /* OgreMeshManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA60B38D566004EA2DF /* OgreMeshManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -133,7 +131,6 @@
 		000E1E790B38D566004EA2DF /* OgreMovableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA90B38D566004EA2DF /* OgreMovableObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E7A0B38D566004EA2DF /* OgreMovablePlane.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DAA0B38D566004EA2DF /* OgreMovablePlane.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E7B0B38D566004EA2DF /* OgreNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DAB0B38D566004EA2DF /* OgreNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		000E1E7C0B38D566004EA2DF /* OgreNoMemoryMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DAC0B38D566004EA2DF /* OgreNoMemoryMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E7D0B38D566004EA2DF /* OgreNumerics.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DAD0B38D566004EA2DF /* OgreNumerics.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E7E0B38D566004EA2DF /* OgreOptimisedUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DAE0B38D566004EA2DF /* OgreOptimisedUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E7F0B38D566004EA2DF /* OgreOverlay.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DAF0B38D566004EA2DF /* OgreOverlay.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -315,7 +312,6 @@
 		000E1FE70B38D5AA004EA2DF /* OgreMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F3A0B38D5AA004EA2DF /* OgreMath.cpp */; };
 		000E1FE80B38D5AA004EA2DF /* OgreMatrix3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F3B0B38D5AA004EA2DF /* OgreMatrix3.cpp */; };
 		000E1FE90B38D5AA004EA2DF /* OgreMatrix4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F3C0B38D5AA004EA2DF /* OgreMatrix4.cpp */; };
-		000E1FEA0B38D5AA004EA2DF /* OgreMemoryManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F3D0B38D5AA004EA2DF /* OgreMemoryManager.cpp */; };
 		000E1FEB0B38D5AA004EA2DF /* OgreMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F3E0B38D5AA004EA2DF /* OgreMesh.cpp */; };
 		000E1FEC0B38D5AA004EA2DF /* OgreMeshManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F3F0B38D5AA004EA2DF /* OgreMeshManager.cpp */; };
 		000E1FED0B38D5AA004EA2DF /* OgreMeshSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F400B38D5AA004EA2DF /* OgreMeshSerializer.cpp */; };
@@ -775,8 +771,6 @@
 		000E1D9F0B38D566004EA2DF /* OgreMath.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMath.h; path = ../../OgreMain/include/OgreMath.h; sourceTree = SOURCE_ROOT; };
 		000E1DA00B38D566004EA2DF /* OgreMatrix3.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMatrix3.h; path = ../../OgreMain/include/OgreMatrix3.h; sourceTree = SOURCE_ROOT; };
 		000E1DA10B38D566004EA2DF /* OgreMatrix4.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMatrix4.h; path = ../../OgreMain/include/OgreMatrix4.h; sourceTree = SOURCE_ROOT; };
-		000E1DA20B38D566004EA2DF /* OgreMemoryMacros.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryMacros.h; path = ../../OgreMain/include/OgreMemoryMacros.h; sourceTree = SOURCE_ROOT; };
-		000E1DA30B38D566004EA2DF /* OgreMemoryManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryManager.h; path = ../../OgreMain/include/OgreMemoryManager.h; sourceTree = SOURCE_ROOT; };
 		000E1DA40B38D566004EA2DF /* OgreMesh.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMesh.h; path = ../../OgreMain/include/OgreMesh.h; sourceTree = SOURCE_ROOT; };
 		000E1DA50B38D566004EA2DF /* OgreMeshFileFormat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMeshFileFormat.h; path = ../../OgreMain/include/OgreMeshFileFormat.h; sourceTree = SOURCE_ROOT; };
 		000E1DA60B38D566004EA2DF /* OgreMeshManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMeshManager.h; path = ../../OgreMain/include/OgreMeshManager.h; sourceTree = SOURCE_ROOT; };
@@ -785,7 +779,6 @@
 		000E1DA90B38D566004EA2DF /* OgreMovableObject.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMovableObject.h; path = ../../OgreMain/include/OgreMovableObject.h; sourceTree = SOURCE_ROOT; };
 		000E1DAA0B38D566004EA2DF /* OgreMovablePlane.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMovablePlane.h; path = ../../OgreMain/include/OgreMovablePlane.h; sourceTree = SOURCE_ROOT; };
 		000E1DAB0B38D566004EA2DF /* OgreNode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreNode.h; path = ../../OgreMain/include/OgreNode.h; sourceTree = SOURCE_ROOT; };
-		000E1DAC0B38D566004EA2DF /* OgreNoMemoryMacros.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreNoMemoryMacros.h; path = ../../OgreMain/include/OgreNoMemoryMacros.h; sourceTree = SOURCE_ROOT; };
 		000E1DAD0B38D566004EA2DF /* OgreNumerics.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreNumerics.h; path = ../../OgreMain/include/OgreNumerics.h; sourceTree = SOURCE_ROOT; };
 		000E1DAE0B38D566004EA2DF /* OgreOptimisedUtil.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreOptimisedUtil.h; path = ../../OgreMain/include/OgreOptimisedUtil.h; sourceTree = SOURCE_ROOT; };
 		000E1DAF0B38D566004EA2DF /* OgreOverlay.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreOverlay.h; path = ../../OgreMain/include/OgreOverlay.h; sourceTree = SOURCE_ROOT; };
@@ -967,7 +960,6 @@
 		000E1F3A0B38D5AA004EA2DF /* OgreMath.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMath.cpp; path = ../../OgreMain/src/OgreMath.cpp; sourceTree = SOURCE_ROOT; };
 		000E1F3B0B38D5AA004EA2DF /* OgreMatrix3.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMatrix3.cpp; path = ../../OgreMain/src/OgreMatrix3.cpp; sourceTree = SOURCE_ROOT; };
 		000E1F3C0B38D5AA004EA2DF /* OgreMatrix4.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMatrix4.cpp; path = ../../OgreMain/src/OgreMatrix4.cpp; sourceTree = SOURCE_ROOT; };
-		000E1F3D0B38D5AA004EA2DF /* OgreMemoryManager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMemoryManager.cpp; path = ../../OgreMain/src/OgreMemoryManager.cpp; sourceTree = SOURCE_ROOT; };
 		000E1F3E0B38D5AA004EA2DF /* OgreMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMesh.cpp; path = ../../OgreMain/src/OgreMesh.cpp; sourceTree = SOURCE_ROOT; };
 		000E1F3F0B38D5AA004EA2DF /* OgreMeshManager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMeshManager.cpp; path = ../../OgreMain/src/OgreMeshManager.cpp; sourceTree = SOURCE_ROOT; };
 		000E1F400B38D5AA004EA2DF /* OgreMeshSerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMeshSerializer.cpp; path = ../../OgreMain/src/OgreMeshSerializer.cpp; sourceTree = SOURCE_ROOT; };
@@ -1617,7 +1609,6 @@
 				000E1F3A0B38D5AA004EA2DF /* OgreMath.cpp */,
 				000E1F3B0B38D5AA004EA2DF /* OgreMatrix3.cpp */,
 				000E1F3C0B38D5AA004EA2DF /* OgreMatrix4.cpp */,
-				000E1F3D0B38D5AA004EA2DF /* OgreMemoryManager.cpp */,
 				AA0405750DE0D7B60000EEFF /* OgreMemoryNedAlloc.cpp */,
 				AAF4F5480DE4C73D0073D0FD /* OgreMemoryTracker.cpp */,
 				000E1F3E0B38D5AA004EA2DF /* OgreMesh.cpp */,
@@ -1822,8 +1813,6 @@
 				000E1DA10B38D566004EA2DF /* OgreMatrix4.h */,
 				AA7510630DDE20FE009D23BA /* OgreMemoryAllocatedObject.h */,
 				AA7510640DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h */,
-				000E1DA20B38D566004EA2DF /* OgreMemoryMacros.h */,
-				000E1DA30B38D566004EA2DF /* OgreMemoryManager.h */,
 				AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */,
 				AA7510660DDE20FE009D23BA /* OgreMemorySTLAllocator.h */,
 				AAF4F5320DE4C48C0073D0FD /* OgreMemoryTracker.h */,
@@ -1835,7 +1824,6 @@
 				000E1DA90B38D566004EA2DF /* OgreMovableObject.h */,
 				000E1DAA0B38D566004EA2DF /* OgreMovablePlane.h */,
 				000E1DAB0B38D566004EA2DF /* OgreNode.h */,
-				000E1DAC0B38D566004EA2DF /* OgreNoMemoryMacros.h */,
 				000E1DAD0B38D566004EA2DF /* OgreNumerics.h */,
 				000E1DAE0B38D566004EA2DF /* OgreOptimisedUtil.h */,
 				000E1DAF0B38D566004EA2DF /* OgreOverlay.h */,
@@ -2421,8 +2409,6 @@
 				000E1E6F0B38D566004EA2DF /* OgreMath.h in Headers */,
 				000E1E700B38D566004EA2DF /* OgreMatrix3.h in Headers */,
 				000E1E710B38D566004EA2DF /* OgreMatrix4.h in Headers */,
-				000E1E720B38D566004EA2DF /* OgreMemoryMacros.h in Headers */,
-				000E1E730B38D566004EA2DF /* OgreMemoryManager.h in Headers */,
 				000E1E740B38D566004EA2DF /* OgreMesh.h in Headers */,
 				000E1E750B38D566004EA2DF /* OgreMeshFileFormat.h in Headers */,
 				000E1E760B38D566004EA2DF /* OgreMeshManager.h in Headers */,
@@ -2431,7 +2417,6 @@
 				000E1E790B38D566004EA2DF /* OgreMovableObject.h in Headers */,
 				000E1E7A0B38D566004EA2DF /* OgreMovablePlane.h in Headers */,
 				000E1E7B0B38D566004EA2DF /* OgreNode.h in Headers */,
-				000E1E7C0B38D566004EA2DF /* OgreNoMemoryMacros.h in Headers */,
 				000E1E7D0B38D566004EA2DF /* OgreNumerics.h in Headers */,
 				000E1E7E0B38D566004EA2DF /* OgreOptimisedUtil.h in Headers */,
 				000E1E7F0B38D566004EA2DF /* OgreOverlay.h in Headers */,
@@ -2826,7 +2811,6 @@
 				000E1FE70B38D5AA004EA2DF /* OgreMath.cpp in Sources */,
 				000E1FE80B38D5AA004EA2DF /* OgreMatrix3.cpp in Sources */,
 				000E1FE90B38D5AA004EA2DF /* OgreMatrix4.cpp in Sources */,
-				000E1FEA0B38D5AA004EA2DF /* OgreMemoryManager.cpp in Sources */,
 				000E1FEB0B38D5AA004EA2DF /* OgreMesh.cpp in Sources */,
 				000E1FEC0B38D5AA004EA2DF /* OgreMeshManager.cpp in Sources */,
 				000E1FED0B38D5AA004EA2DF /* OgreMeshSerializer.cpp in Sources */,

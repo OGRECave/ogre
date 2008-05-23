@@ -17,7 +17,6 @@ LGPL like the rest of the engine.
 
 #include "OgreString.h"
 
-#include "OgreNoMemoryMacros.h"
 #include <CEGUI/CEGUIImageset.h>
 #include <CEGUI/CEGUISystem.h>
 #include <CEGUI/CEGUILogger.h>
@@ -31,7 +30,6 @@ LGPL like the rest of the engine.
 #include <CEGUI/elements/CEGUIPushButton.h>
 #include <CEGUI/elements/CEGUIScrollbar.h>
 #include <CEGUI/elements/CEGUIScrollablePane.h>
-#include "OgreMemoryMacros.h"
 
     /** Provides interface between a View and a Controller.
     */

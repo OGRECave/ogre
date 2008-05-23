@@ -37,20 +37,6 @@ Torus Knot Software Ltd.
 #include "OgreStringVector.h"
 #include "OgreMaterialSerializer.h"
 
-#if OGRE_THREAD_SUPPORT
-// boost::thread_specific_ptr has 'new' in header but delete in lib
-// so if we use our memory manager it reports leaks incorrectly
-#	include "OgreNoMemoryMacros.h"
-#   ifndef NOMINMAX
-#       define NOMINMAX
-#	    include <boost/thread/tss.hpp>
-#       undef NOMINMAX
-#   else
-#	    include <boost/thread/tss.hpp>
-#   endif
-#	include "OgreMemoryMacros.h"
-#endif
-
 namespace Ogre {
 
 

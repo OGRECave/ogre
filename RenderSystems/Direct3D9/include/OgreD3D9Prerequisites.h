@@ -40,13 +40,11 @@ Torus Knot Software Ltd.
 #define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
 
 
-#include "OgreNoMemoryMacros.h"
 #undef NOMINMAX
 #define NOMINMAX // required to stop windows.h screwing up std::min definition
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <dxerr9.h>
-#include "OgreMemoryMacros.h"
 
 
 namespace Ogre

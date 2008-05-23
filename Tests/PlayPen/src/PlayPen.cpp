@@ -56,15 +56,12 @@ Description: Somewhere to play in the sand...
 #include "StaticPluginLoader.h"
 
 /*
-#include "OgreNoMemoryMacros.h"
 #include <ode/odecpp.h>
 #include <ode/odecpp_collision.h>
-#include "OgreMemoryMacros.h"
 */
 
 /*
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#include "OgreNoMemoryMacros.h"
 #include <crtdbg.h>
 #endi*/
 

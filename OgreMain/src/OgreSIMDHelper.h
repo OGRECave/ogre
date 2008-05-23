@@ -88,9 +88,7 @@ Torus Knot Software Ltd.
 #if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_X86
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC || defined(__INTEL_COMPILER)
-#include "OgreNoMemoryMacros.h"
 #include <xmmintrin.h>
-#include "OgreMemoryMacros.h"
 
 #elif OGRE_COMPILER == OGRE_COMPILER_GNUC
 // Don't define ourself version SSE intrinsics if "xmmintrin.h" already included.

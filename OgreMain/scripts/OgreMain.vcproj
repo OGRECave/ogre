@@ -1141,12 +1141,6 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 				RelativePath="..\include\OgreMemoryAllocatorConfig.h">
 			</File>
 			<File
-				RelativePath="..\include\OgreMemoryMacros.h">
-			</File>
-			<File
-				RelativePath="..\include\OgreMemoryManager.h">
-			</File>
-			<File
 				RelativePath="..\include\OgreMemoryNedAlloc.h">
 			</File>
 			<File
@@ -1181,9 +1175,6 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 			</File>
 			<File
 				RelativePath="..\include\OgreNode.h">
-			</File>
-			<File
-				RelativePath="..\include\OgreNoMemoryMacros.h">
 			</File>
 			<File
 				RelativePath="..\include\OgreNumerics.h">

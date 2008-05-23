@@ -43,6 +43,8 @@ namespace Ogre
 	void MemoryTracker::_recordAlloc(void* ptr, size_t sz, MemoryCategory cat, 
 					  const String file, size_t ln, const String& func)
 	{
+		OGRE_LOCK_AUTO_MUTEX
+
 		assert(mAllocations.find(ptr) == mAllocations.end() && "Double allocation with same address");
 		mAllocations[ptr] = Alloc(sz, cat, file, ln, func);
 		mAllocationsByCategory[cat] += sz;
@@ -51,6 +53,8 @@ namespace Ogre
 	//--------------------------------------------------------------------------
 	void MemoryTracker::_recordDealloc(void* ptr)
 	{
+		OGRE_LOCK_AUTO_MUTEX
+
 		AllocationMap::iterator i = mAllocations.find(ptr);
 		assert(i != mAllocations.end() && "Unable to locate allocation unit");
 		// update category stats
