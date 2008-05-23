@@ -299,7 +299,7 @@ namespace Ogre {
 			/// Group name
 			String name;
 			/// Group status
-			bool initialised;
+			Status groupStatus;
 			/// List of possible locations to search
 			LocationList locationList;
 			/// Index of resource names to locations, built for speedy access (case sensitive archives)
@@ -549,6 +549,24 @@ namespace Ogre {
         @param name The name of the resource group to destroy.
         */
         void destroyResourceGroup(const String& name);
+
+		/** Checks the status of a resource group.
+		@remarks
+			Looks at the state of a resource group.
+			If initialiseResourceGroup has been called for the resource
+			group return true, otherwise return false.
+		@param name The name to of the resource group to access.
+		*/
+		bool isResourceGroupInitialised(const String& name);
+
+		/** Checks the status of a resource group.
+		@remarks
+			Looks at the state of a resource group.
+			If loadResourceGroup has been called for the resource
+			group return true, otherwise return false.
+		@param name The name to of the resource group to access.
+		*/
+		bool isResourceGroupLoaded(const String& name);
 
         /** Method to add a resource location to for a given resource group. 
         @remarks
