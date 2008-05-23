@@ -166,6 +166,24 @@ namespace Ogre
 	{
 		return false;
 	}
+	/// determine equality, can memory from another allocator
+	/// be released by this allocator, (ISO C++)
+	template<typename T, typename T2, typename P>
+	inline bool operator!=(STLAllocator<T,P> const&,
+		STLAllocator<T2,P> const&)
+	{
+		// same alloc policy (P), memory can be freed
+		return false;
+	}
+
+	/// determine equality, can memory from another allocator
+	/// be released by this allocator, (ISO C++)
+	template<typename T, typename P, typename OtherAllocator>
+	inline bool operator!=(STLAllocator<T,P> const&,
+		OtherAllocator const&)
+	{
+		return true;
+	}
 
 
 
