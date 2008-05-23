@@ -3,8 +3,9 @@
 // bring in shared material definitions
 import * from "deferred.material"
 
+// Materials for deferred shading test
 // Sky box
-material Test13/SkyBox
+material DeferredDemo/SkyBox
 {
 	technique
 	{
@@ -20,21 +21,10 @@ material Test13/SkyBox
 		}
 	}
 }
-
 // Ground plane
-material Test13/Ground: DeferredShading/Material/TexturedPhong
+material DeferredDemo/Ground : DeferredShading/Material/TexturedPhong
 {
-	technique hlsl
-	{
-		pass main
-		{
-			texture_unit
-			{
-				texture grass_1024.jpg
-			}
-		}
-	}
-	technique glsl
+	technique
 	{
 		pass main
 		{
@@ -45,25 +35,10 @@ material Test13/Ground: DeferredShading/Material/TexturedPhong
 		}
 	}
 }
-
 // Rock wall texture [bumpmapped]
-material Test13/RockWall: DeferredShading/Material/TexturedNormalMapped
+material DeferredDemo/RockWall : DeferredShading/Material/TexturedNormalMapped
 {
-	technique hlsl
-	{
-		pass main
-		{
-			texture_unit
-			{
-				texture rockwall.tga
-			}
-			texture_unit
-			{
-				texture rockwall_NH.tga
-			}
-		}
-	}
-	technique glsl
+	technique
 	{
 		pass main
 		{
@@ -78,57 +53,29 @@ material Test13/RockWall: DeferredShading/Material/TexturedNormalMapped
 		}
 	}
 }
-
 
 // Athena texture [bumpmapped, untextured]
-material Test13/DeferredAthena: DeferredShading/Material/UntexturedNormalMapped
+material DeferredDemo/DeferredAthena  : DeferredShading/Material/UntexturedNormalMapped
 {
-	technique hlsl
+	technique
 	{
 		pass main
 		{
-			texture_unit
-			{
-				texture atheneNormalMap.png
-			}
-			fragment_program_ref DeferredShading/material/hlsl/nm_notex_ps
+			fragment_program_ref DeferredShading/material/nm_notex_ps
 			{
 				param_named specularity float 0.5
 			}
-		}
-	}
-	technique glsl
-	{
-		pass main
-		{
 			texture_unit
 			{
 				texture atheneNormalMap.png
-			}
-			fragment_program_ref DeferredShading/material/glsl/nm_notex_ps
-			{
-				param_named specularity float 0.5
 			}
 		}
 	}
 }
-
 /// Ogre parts
-material Test13/DeferredOgre/Skin: DeferredShading/Material/TexturedPhong
+material DeferredDemo/Ogre/Skin : DeferredShading/Material/TexturedPhong
 {
-	technique hlsl
-	{
-		pass main
-		{
-			cull_hardware none
-			texture_unit
-			{
-				texture GreenSkin.jpg
-				tex_address_mode mirror
-			}
-		}
-	}
-	technique glsl
+	technique
 	{
 		pass main
 		{
@@ -141,24 +88,13 @@ material Test13/DeferredOgre/Skin: DeferredShading/Material/TexturedPhong
 		}
 	}
 }
-material Test13/DeferredOgre/EarRing: DeferredShading/Material/UntexturedPhong
+material DeferredDemo/Ogre/EarRing : DeferredShading/Material/UntexturedPhong
 {
-	technique hlsl
+	technique
 	{
 		pass main
 		{
-			fragment_program_ref DeferredShading/material/hlsl/notex_ps
-			{
-				param_named specularity float 1.5
-				param_named colour float3 0.5 0.5 0
-			}
-		}
-	}
-	technique glsl
-	{
-		pass main
-		{
-			fragment_program_ref DeferredShading/material/glsl/notex_ps
+			fragment_program_ref DeferredShading/material/notex_ps
 			{
 				param_named specularity float 1.5
 				param_named colour float3 0.5 0.5 0
@@ -166,27 +102,13 @@ material Test13/DeferredOgre/EarRing: DeferredShading/Material/UntexturedPhong
 		}
 	}
 }
-material Test13/DeferredOgre/Tusks: DeferredShading/Material/TexturedPhong
+material DeferredDemo/Ogre/Tusks : DeferredShading/Material/TexturedPhong
 {
-	technique hlsl
+	technique
 	{
 		pass main
 		{
-			fragment_program_ref DeferredShading/material/hlsl/ps
-			{
-				param_named specularity float 0.5
-			}
-			texture_unit
-			{
-				texture dirt01.jpg
-			}
-		}
-	}
-	technique glsl
-	{
-		pass main
-		{
-			fragment_program_ref DeferredShading/material/glsl/ps
+			fragment_program_ref DeferredShading/material/ps
 			{
 				param_named specularity float 0.5
 			}
@@ -197,27 +119,13 @@ material Test13/DeferredOgre/Tusks: DeferredShading/Material/TexturedPhong
 		}
 	}
 }
-material Test13/DeferredOgre/Eyes: DeferredShading/Material/TexturedPhong
+material DeferredDemo/Ogre/Eyes  : DeferredShading/Material/TexturedPhong
 {
-	technique hlsl
+	technique
 	{
 		pass main
 		{
-			fragment_program_ref DeferredShading/material/hlsl/ps
-			{
-				param_named specularity float 1.0
-			}
-			texture_unit
-			{
-				texture WeirdEye.png
-			}
-		}
-	}
-	technique glsl
-	{
-		pass main
-		{
-			fragment_program_ref DeferredShading/material/glsl/ps
+			fragment_program_ref DeferredShading/material/ps
 			{
 				param_named specularity float 1.0
 			}
@@ -228,4 +136,3 @@ material Test13/DeferredOgre/Eyes: DeferredShading/Material/TexturedPhong
 		}
 	}
 }
-

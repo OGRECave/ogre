@@ -140,7 +140,10 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
-				RelativePath="..\include\CreateSphere.h">
+				RelativePath="..\include\AmbientLight.h">
+			</File>
+			<File
+				RelativePath="..\src\AmbientLight.cpp">
 			</File>
 			<File
 				RelativePath="..\src\DeferredShading.cpp">
@@ -150,6 +153,12 @@
 			</File>
 			<File
 				RelativePath="..\src\DeferredShadingDemo.cpp">
+			</File>
+			<File
+				RelativePath="..\include\GeomUtils.h">
+			</File>
+			<File
+				RelativePath="..\src\GeomUtils.cpp">
 			</File>
 			<File
 				RelativePath="..\src\LightMaterialGenerator.cpp">

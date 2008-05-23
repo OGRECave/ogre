@@ -9,7 +9,7 @@ are dealing with many outputs which get written into multiple render textures in
 
 After rendering the scene in this format, the shading (lighting) can be done as a post process. 
 This means that lighting is done in screen space. Adding them requires nothing more than rendering 
-a screenful quad; thus the method allows for an enormous amount of lights without noticable 
+a screenful quad; thus the method allows for an enormous amount of lights without noticeable 
 performance loss.
 
 Little lights affecting small area ("Minilights") can be even further optimised by rendering 
@@ -49,6 +49,7 @@ class LightMaterialGenerator: public MaterialGenerator
 {
 public:
 	LightMaterialGenerator(const Ogre::String &language);
+	virtual ~LightMaterialGenerator();
 };
 
 #endif

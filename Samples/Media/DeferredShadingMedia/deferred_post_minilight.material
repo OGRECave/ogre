@@ -1,6 +1,6 @@
 // Auxilary lights
 
-/// Reference material [geometry]
+// Reference material [geometry]
 material DeferredShading/LightMaterial
 {
     technique
@@ -28,7 +28,7 @@ material DeferredShading/LightMaterial
 		}
 	}
 }
-/// Reference material [quad]
+// Reference material [quad]
 material DeferredShading/LightMaterialQuad
 {
     technique

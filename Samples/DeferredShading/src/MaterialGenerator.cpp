@@ -41,7 +41,7 @@ MaterialGenerator::~MaterialGenerator()
 	delete mImpl;
 }
 
-const Ogre::MaterialPtr &MaterialGenerator::getMaterial(Perm permutation)
+const MaterialPtr &MaterialGenerator::getMaterial(Perm permutation)
 {
 	/// Check input validity
 	size_t totalBits = bitNames.size();
@@ -57,9 +57,9 @@ const Ogre::MaterialPtr &MaterialGenerator::getMaterial(Perm permutation)
 	else
 	{
 		/// Create it
-		Ogre::MaterialPtr templ = getTemplateMaterial(permutation & matMask);
-		Ogre::GpuProgramPtr vs = getVertexShader(permutation & vsMask);
-		Ogre::GpuProgramPtr fs = getFragmentShader(permutation & fsMask);
+		MaterialPtr templ = getTemplateMaterial(permutation & matMask);
+		GpuProgramPtr vs = getVertexShader(permutation & vsMask);
+		GpuProgramPtr fs = getFragmentShader(permutation & fsMask);
 		
 		/// Create material name
 		String name=materialBaseName;
@@ -74,14 +74,14 @@ const Ogre::MaterialPtr &MaterialGenerator::getMaterial(Perm permutation)
 		Pass *pass = tech->getPass(0);
 		pass->setFragmentProgram(fs->getName());
 		pass->setVertexProgram(vs->getName());
-
+	
 		/// And store it
 		mMaterials[permutation] = mat;
 		return mMaterials[permutation];
 	}
 }
 
-const Ogre::GpuProgramPtr &MaterialGenerator::getVertexShader(Perm permutation)
+const GpuProgramPtr &MaterialGenerator::getVertexShader(Perm permutation)
 {
 	ProgramMap::iterator i = mVs.find(permutation);
 	if(i != mVs.end())
@@ -96,7 +96,7 @@ const Ogre::GpuProgramPtr &MaterialGenerator::getVertexShader(Perm permutation)
 	}
 }
 
-const Ogre::GpuProgramPtr &MaterialGenerator::getFragmentShader(Perm permutation)
+const GpuProgramPtr &MaterialGenerator::getFragmentShader(Perm permutation)
 {
 	ProgramMap::iterator i = mFs.find(permutation);
 	if(i != mFs.end())
@@ -111,7 +111,7 @@ const Ogre::GpuProgramPtr &MaterialGenerator::getFragmentShader(Perm permutation
 	}
 }
 
-const Ogre::MaterialPtr &MaterialGenerator::getTemplateMaterial(Perm permutation)
+const MaterialPtr &MaterialGenerator::getTemplateMaterial(Perm permutation)
 {
 	MaterialMap::iterator i = mTemplateMat.find(permutation);
 	if(i != mTemplateMat.end())

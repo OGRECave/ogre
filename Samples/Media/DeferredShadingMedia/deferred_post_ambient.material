@@ -1,0 +1,34 @@
+material DeferredShading/AmbientLight
+{
+    technique
+    {
+		pass
+		{
+			lighting off
+			
+			depth_write on
+			depth_check on
+			
+			vertex_program_ref DeferredShading/post/vs
+			{
+			
+			}
+			fragment_program_ref DeferredShading/post/Ambient_ps
+			{
+			
+			}
+			
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+
+	}
+}

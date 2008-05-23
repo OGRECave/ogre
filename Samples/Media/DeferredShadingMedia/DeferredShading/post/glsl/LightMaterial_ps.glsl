@@ -40,46 +40,44 @@ uniform vec3 lightFalloff;
 void main()
 {
 	vec4 a0 = texture2D(tex0, texCoord); // Attribute 0: Diffuse color+shininess
-    vec4 a1 = texture2D(tex1, texCoord); // Attribute 1: Normal+depth
+	vec4 a1 = texture2D(tex1, texCoord); // Attribute 1: Normal+depth
 
-    // Attributes
-    vec3 colour = a0.rgb;
-    float alpha = a0.a;		// Specularity
-    float distance = a1.w;  // Distance from viewer (w)
-    vec3 normal = a1.xyz;
+	// Attributes
+	vec3 colour = a0.rgb;
+	float alpha = a0.a;		// Specularity
+	float distance = a1.w;  // Distance from viewer (w)
+	vec3 normal = a1.xyz;
 
 	// Calculate position of texel in view space
-    vec3 position = projCoord*distance;
-	
+	vec3 position = projCoord*distance;
+
 	// Extract position in view space from worldView matrix
-	//vec3 lightPos = vec3(worldView[0][3],worldView[1][3],worldView[2][3]);
 	vec3 lightPos = vec3(worldView[3][0],worldView[3][1],worldView[3][2]);
-	
-    // Calculate light direction and distance
-    vec3 lightVec = lightPos - position;
-    float len_sq = dot(lightVec, lightVec);
-    float len = sqrt(len_sq);
-    vec3 lightDir = lightVec/len;
-    
-    /// Calculate attenuation    
-    float attenuation = dot(lightFalloff, vec3(1, len, len_sq));
-    
-    /// Calculate diffuse colour
-    vec3 light_diffuse = max(0.0,dot(lightDir, normal)) * lightDiffuseColor;
-    
-    /// Calculate specular component
-    vec3 viewDir = -normalize(position);
-    vec3 h = normalize(viewDir + lightDir);
-    vec3 light_specular = pow(dot(normal, h),32.0) * lightSpecularColor;
-    
-    // Calcalate total lighting for this fragment
-    vec3 total_light_contrib;
-    total_light_contrib = light_diffuse;
-	// Uncomment next line if specular desired
-	//total_light_contrib += alpha * light_specular;
-	
-    gl_FragColor = vec4(total_light_contrib*colour/attenuation, 0);
-    //gl_FragColor = vec4(1.0/attenuation, 0.0,0.0,0.0);
-    //gl_FragColor = vec4(a1.xyz,  0.0);
+
+	// Calculate light direction and distance
+	vec3 lightVec = lightPos - position;
+	float len_sq = dot(lightVec, lightVec);
+	float len = sqrt(len_sq);
+	vec3 lightDir = lightVec/len;
+
+	// Calculate diffuse colour
+	vec3 total_light_contrib;
+	total_light_contrib = max(0.0,dot(lightDir, normal)) * lightDiffuseColor;
+
+#if IS_SPECULAR
+	// Calculate specular component
+	vec3 viewDir = -normalize(position);
+	vec3 h = normalize(viewDir + lightDir);
+	vec3 light_specular = pow(dot(normal, h),32.0) * lightSpecularColor;
+
+	total_light_contrib += alpha * light_specular;
+#endif
+
+#if IS_ATTENUATED
+	// Calculate attenuation    
+	float attenuation = dot(lightFalloff, vec3(1.0, len, len_sq));
+	total_light_contrib /= attenuation;
+#endif
+	gl_FragColor = vec4(total_light_contrib*colour, 0.0);
 }
 

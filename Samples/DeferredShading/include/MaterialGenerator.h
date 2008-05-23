@@ -30,7 +30,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	generates and stores different permutations of a material, and its shaders. 
 	It can be used if you have a material that has lots of slightly different 
 	variations, like whether to use a specular light, skinning, normal mapping 
-	and other options. Writing all these out is a tedioius job. Of course it is 
+	and other options. Writing all these out is a tedious job. Of course it is 
 	possible to always use the material with all features, but that might result 
 	in large, slow shader programs. This class provides an efficient solution
 	to that.
@@ -40,7 +40,7 @@ class MaterialGenerator
 public:
 	/** Bitfield used to signify a material permutations */
 	typedef Ogre::uint32 Perm;
-	~MaterialGenerator();
+	virtual ~MaterialGenerator();
 
 	const Ogre::MaterialPtr &getMaterial(Perm permutation);
 

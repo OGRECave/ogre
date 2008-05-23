@@ -64,13 +64,16 @@
 			<Add option="-Wl,--add-stdcall-alias" />
 			<Add directory="..\..\Common\bin\$(TARGET_NAME)" />
 		</Linker>
-		<Unit filename="..\include\CreateSphere.h" />
+		<Unit filename="..\include\AmbientLight.h" />
 		<Unit filename="..\include\DeferredShading.h" />
+		<Unit filename="..\include\GeomUtils.h" />
 		<Unit filename="..\include\LightMaterialGenerator.h" />
 		<Unit filename="..\include\MLight.h" />
 		<Unit filename="..\include\MaterialGenerator.h" />
+		<Unit filename="..\src\AmbientLight.cpp" />
 		<Unit filename="..\src\DeferredShading.cpp" />
 		<Unit filename="..\src\DeferredShadingDemo.cpp" />
+		<Unit filename="..\src\GeomUtils.cpp" />
 		<Unit filename="..\src\LightMaterialGenerator.cpp" />
 		<Unit filename="..\src\MLight.cpp" />
 		<Unit filename="..\src\MaterialGenerator.cpp" />

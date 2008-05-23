@@ -23,34 +23,36 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	Post shader: Generic fullscreen quad
 */
-struct VS_OUTPUT {
+struct VS_OUTPUT 
+{
    float4 Pos: POSITION;
    float2 texCoord: TEXCOORD0;
    float3 projCoord: TEXCOORD1;
 };
 float4x4 invProj;
 
-VS_OUTPUT main(float4 Pos: POSITION){
-   VS_OUTPUT Out;
+VS_OUTPUT main(float4 Pos: POSITION)
+{
+	VS_OUTPUT Out;
 
 	// Clean up inaccuracies
 	Pos.xy = sign(Pos.xy);
 
 	Out.Pos = float4(Pos.xy, 0, 1);
-	
+
 	// Image-space
 	Out.texCoord.x = 0.5 * (1 + Pos.x);
 	Out.texCoord.y = 0.5 * (1 - Pos.y);
-   
+
 	// Projection coordinates
 	// Inverted projection matrix
 	// These interpolate over the frustrum plane for w=1
-    Out.projCoord = float3(Pos.x, Pos.y, 1) *
+	Out.projCoord = float3(Pos.x, Pos.y, 1) *
 		float3(
-			invProj[0][0], // X vector component from X
-			invProj[1][1], // Y vector component from Y
-			invProj[2][3]  // Z vector component from W
-		);
+		invProj[0][0], // X vector component from X
+		invProj[1][1], // Y vector component from Y
+		invProj[2][3]  // Z vector component from W
+	);
 
 	return Out;
 }

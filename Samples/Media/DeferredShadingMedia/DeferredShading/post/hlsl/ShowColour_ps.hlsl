@@ -28,9 +28,9 @@ sampler Tex1: register(s1);
 
 float4 main(float2 texCoord: TEXCOORD0, float2 projCoord: TEXCOORD1) : COLOR 
 {
-    float4 a0 = tex2D(Tex0, texCoord); // Attribute 0: Diffuse color+shininess
-    float4 a1 = tex2D(Tex1, texCoord); // Attribute 1: Normal+depth
-    
-    return float4(a0.xyz, 0);
+	float4 a0 = tex2D(Tex0, texCoord); // Attribute 0: Diffuse color+shininess
+	float4 a1 = tex2D(Tex1, texCoord); // Attribute 1: Normal+depth
+
+	return float4(a0.xyz, 0);
 }
 

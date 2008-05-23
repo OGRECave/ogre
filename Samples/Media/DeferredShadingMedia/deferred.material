@@ -3,30 +3,14 @@
 // Textured Phong shading material
 material DeferredShading/Material/TexturedPhong
 {
-	technique hlsl
+	technique default
 	{
 		pass main
 		{
-			vertex_program_ref DeferredShading/material/hlsl/vs
+			vertex_program_ref DeferredShading/material/vs
 			{
 			}
-			fragment_program_ref DeferredShading/material/hlsl/ps
-			{
-			}
-
-			texture_unit
-			{
-			}
-		}
-	}
-	technique glsl
-	{
-		pass main
-		{
-			vertex_program_ref DeferredShading/material/glsl/vs
-			{
-			}
-			fragment_program_ref DeferredShading/material/glsl/ps
+			fragment_program_ref DeferredShading/material/ps
 			{
 			}
 
@@ -40,26 +24,14 @@ material DeferredShading/Material/TexturedPhong
 // Untextured Phong shading material
 material DeferredShading/Material/UntexturedPhong
 {
-	technique hlsl
+	technique default
 	{
 		pass main
 		{
-			vertex_program_ref DeferredShading/material/hlsl/vs
+			vertex_program_ref DeferredShading/material/vs
 			{
 			}
-			fragment_program_ref DeferredShading/material/hlsl/notex_ps
-			{
-			}
-		}
-	}
-	technique glsl
-	{
-		pass main
-		{
-			vertex_program_ref DeferredShading/material/glsl/vs
-			{
-			}
-			fragment_program_ref DeferredShading/material/glsl/notex_ps
+			fragment_program_ref DeferredShading/material/notex_ps
 			{
 			}
 		}
@@ -69,34 +41,14 @@ material DeferredShading/Material/UntexturedPhong
 // Textured normal mapped material
 material DeferredShading/Material/TexturedNormalMapped
 {
-	technique hlsl
+	technique default
 	{
 		pass main
 		{
-			vertex_program_ref DeferredShading/material/hlsl/nm_vs
+			vertex_program_ref DeferredShading/material/nm_vs
 			{
 			}
-			fragment_program_ref DeferredShading/material/hlsl/nm_ps
-			{
-			}
-
-			texture_unit
-			{
-			}
-			texture_unit
-			{
-				tex_coord_set 1
-			}
-		}
-	}
-	technique glsl
-	{
-		pass main
-		{
-			vertex_program_ref DeferredShading/material/glsl/nm_vs
-			{
-			}
-			fragment_program_ref DeferredShading/material/glsl/nm_ps
+			fragment_program_ref DeferredShading/material/nm_ps
 			{
 			}
 
@@ -114,38 +66,18 @@ material DeferredShading/Material/TexturedNormalMapped
 // Untextured normal mapped material
 material DeferredShading/Material/UntexturedNormalMapped
 {
-	technique hlsl
+	technique default
 	{
 		pass main
 		{
-			vertex_program_ref DeferredShading/material/hlsl/nm_vs
+			vertex_program_ref DeferredShading/material/nm_vs
 			{
 			}
-			fragment_program_ref DeferredShading/material/hlsl/nm_notex_ps
-			{
-			}
-			texture_unit
-			{
-			}
-		}
-	}
-	technique glsl
-	{
-		pass main
-		{
-			vertex_program_ref DeferredShading/material/glsl/nm_vs
-			{
-			}
-			fragment_program_ref DeferredShading/material/glsl/nm_notex_ps
+			fragment_program_ref DeferredShading/material/nm_notex_ps
 			{
 			}
 			texture_unit
 			{
-				tex_coord_set 0
-			}
-			texture_unit
-			{
-				tex_coord_set 1
 			}
 		}
 	}

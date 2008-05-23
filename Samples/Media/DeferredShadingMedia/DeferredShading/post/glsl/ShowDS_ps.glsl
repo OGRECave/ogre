@@ -31,9 +31,9 @@ varying vec3 projCoord;
 
 void main()
 {
-    vec4 a0 = texture2D(tex0, texCoord); // Attribute 0: Diffuse color+shininess
-    vec4 a1 = texture2D(tex1, texCoord); // Attribute 1: Normal+depth
-    
-    gl_FragColor=vec4(a0.w, 0, a1.w/1000.0, 0);
+	vec4 a0 = texture2D(tex0, texCoord); // Attribute 0: Diffuse color+shininess
+	vec4 a1 = texture2D(tex1, texCoord); // Attribute 1: Normal+depth
+
+	gl_FragColor=vec4(a0.w, 0, a1.w/1000.0, 0);
 }
 
