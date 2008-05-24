@@ -5314,8 +5314,9 @@ protected:
 
         // Hardware animation
         pEnt = mSceneMgr->createEntity( "1", "robot.mesh" );
-        mAnimState = pEnt->getAnimationState("Walk");
-        mAnimState->setEnabled(true);
+        AnimationState* a = pEnt->getAnimationState("Walk");
+        a->setEnabled(true);
+		mAnimStateList.push_back(a);
         mTestNode[0] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         mTestNode[0]->attachObject( pEnt );
         mTestNode[0]->translate(+100,-100,0);
@@ -5323,13 +5324,11 @@ protected:
         // Software animation
         pEnt = mSceneMgr->createEntity( "2", "robot.mesh" );
         pEnt->setMaterialName("BaseWhite");
-/*/
-        mAnimState = pEnt->getAnimationState("Walk");
-        mAnimState->setEnabled(true);
-/*/
-        pEnt->getAnimationState("Walk")->setEnabled(true);
-//*/
-        mTestNode[1] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        a = pEnt->getAnimationState("Walk");
+        a->setEnabled(true);
+		mAnimStateList.push_back(a);
+
+		mTestNode[1] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         mTestNode[1]->attachObject( pEnt );
         mTestNode[1]->translate(-100,-100,0);
 
@@ -6891,7 +6890,7 @@ protected:
 		//testBlendDiffuseColour();
 
         //testRaySceneQuery();
-		testNegativeScale();
+		//testNegativeScale();
 		//testMaterialSerializer();
         //testIntersectionSceneQuery();
 
@@ -6944,7 +6943,7 @@ protected:
 		//testMaterialSchemesListener();
 		//testMaterialSchemesWithLOD();
 		//testMaterialSchemesWithMismatchedLOD();
-        //testSkeletonAnimationOptimise();
+        testSkeletonAnimationOptimise();
         //testBuildTangentOnAnimatedMesh();
 		//testOverlayRelativeMode();
 
