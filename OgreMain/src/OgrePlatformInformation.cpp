@@ -111,6 +111,10 @@ namespace Ogre {
         }
 	#endif
 #elif OGRE_COMPILER == OGRE_COMPILER_GNUC
+        #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
+           return true;
+       #else
+
         unsigned oldFlags, newFlags;
         __asm__
         (
@@ -128,7 +132,7 @@ namespace Ogre {
             : "n" (0x200000)
         );
         return oldFlags != newFlags;
-
+       #endif // 64
 #else
         // TODO: Supports other compiler
         return false;
@@ -162,6 +166,12 @@ namespace Ogre {
         }
 	#endif
 #elif OGRE_COMPILER == OGRE_COMPILER_GNUC
+        #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
+        __asm__
+        (
+            "cpuid": "=a" (result._eax), "=b" (result._ebx), "=c" (result._ecx), "=d" (result._edx) : "a" (query)
+        );
+        #else
         __asm__
         (
             "pushl  %%ebx           \n\t"
@@ -171,6 +181,7 @@ namespace Ogre {
             : "=a" (result._eax), "=D" (result._ebx), "=c" (result._ecx), "=d" (result._edx)
             : "a" (query)
         );
+       #endif // OGRE_ARCHITECTURE_64
         return result._eax;
 
 #else
@@ -227,6 +238,9 @@ namespace Ogre {
         }
 	#endif
 #elif OGRE_COMPILER == OGRE_COMPILER_GNUC
+        #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
+            return true;
+        #else
         // Does gcc have __try/__except similar mechanism?
         // Use signal, setjmp/longjmp instead.
         void (*oldHandler)(int);
@@ -243,7 +257,7 @@ namespace Ogre {
             signal(SIGILL, oldHandler);
             return true;
         }
-
+       #endif
 #else
         // TODO: Supports other compiler, assumed is supported by default
         return true;

@@ -64,6 +64,8 @@ Torus Knot Software Ltd.
 // alignment the result that the code is now pessimally aligned
 // instead of having a 50% chance of being correct.
 //
+#if OGRE_ARCH_TYPE != OGRE_ARCHITECTURE_64
+
 #define __OGRE_SIMD_ALIGN_STACK()                                   \
     {                                                               \
         /* Use alloca to allocate some memory on the stack.  */     \
@@ -73,6 +75,18 @@ Torus Knot Software Ltd.
         /* Now align the stack pointer */                           \
         __asm__ __volatile__ ("andl $-16, %esp");                   \
     }
+
+#else // 64
+#define __OGRE_SIMD_ALIGN_STACK()                                   \
+    {                                                               \
+        /* Use alloca to allocate some memory on the stack.  */     \
+        /* This alerts gcc that something funny is going on, */     \
+        /* so that it does not omit the frame pointer etc.   */     \
+        (void)__builtin_alloca(16);                                 \
+        /* Now align the stack pointer */                           \
+        __asm__ __volatile__ ("andq $-16, %rsp");                   \
+    }
+#endif //64
 
 #elif defined(_MSC_VER)
 // Fortunately, MSVC will align the stack automatically
