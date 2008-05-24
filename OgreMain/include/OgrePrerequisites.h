@@ -78,8 +78,6 @@ http://www.gnu.org/copyleft/lesser.txt
 
 #endif
 
-#include "OgreMemoryManager.h"
-
 namespace Ogre {
     // Define ogre version
     #define OGRE_VERSION_MAJOR 1
