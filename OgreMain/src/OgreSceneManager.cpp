@@ -131,8 +131,8 @@ mShadowAdditiveLightClip(false),
 mLightClippingInfoMapFrameNumber(999),
 mShadowCasterSphereQuery(0),
 mShadowCasterAABBQuery(0),
-mShadowFarDist(0),
-mShadowFarDistSquared(0),
+mDefaultShadowFarDist(0),
+mDefaultShadowFarDistSquared(0),
 mShadowTextureOffset(0.6), 
 mShadowTextureFadeStart(0.7), 
 mShadowTextureFadeEnd(0.9),
@@ -4098,7 +4098,7 @@ const SceneManager::ShadowCasterList& SceneManager::findShadowCastersForLight(
         // Execute, use callback
         mShadowCasterQueryListener->prepare(false, 
             &(light->_getFrustumClipVolumes(camera)), 
-            light, camera, &mShadowCasterList, mShadowFarDistSquared);
+            light, camera, &mShadowCasterList, light->getShadowFarDistanceSquared());
         mShadowCasterAABBQuery->execute(mShadowCasterQueryListener);
 
 
@@ -4126,7 +4126,7 @@ const SceneManager::ShadowCasterList& SceneManager::findShadowCastersForLight(
 
             // Execute, use callback
             mShadowCasterQueryListener->prepare(lightInFrustum, 
-                volList, light, camera, &mShadowCasterList, mShadowFarDistSquared);
+                volList, light, camera, &mShadowCasterList, light->getShadowFarDistanceSquared());
             mShadowCasterSphereQuery->execute(mShadowCasterQueryListener);
 
         }
@@ -5262,8 +5262,8 @@ const ColourValue& SceneManager::getShadowColour(void) const
 //---------------------------------------------------------------------
 void SceneManager::setShadowFarDistance(Real distance)
 {
-    mShadowFarDist = distance;
-    mShadowFarDistSquared = distance * distance;
+    mDefaultShadowFarDist = distance;
+    mDefaultShadowFarDistSquared = distance * distance;
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowDirectionalLightExtrusionDistance(Real dist)
@@ -5643,7 +5643,7 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
     mIlluminationStage = IRS_RENDER_TO_TEXTURE;
 
     // Determine far shadow distance
-    Real shadowDist = mShadowFarDist;
+    Real shadowDist = mDefaultShadowFarDist;
     if (!shadowDist)
     {
         // need a shadow distance, make one up

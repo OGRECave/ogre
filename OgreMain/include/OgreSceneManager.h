@@ -728,8 +728,8 @@ namespace Ogre {
         ShadowCasterList mShadowCasterList;
         SphereSceneQuery* mShadowCasterSphereQuery;
         AxisAlignedBoxSceneQuery* mShadowCasterAABBQuery;
-        Real mShadowFarDist;
-        Real mShadowFarDistSquared;
+        Real mDefaultShadowFarDist;
+        Real mDefaultShadowFarDistSquared;
         Real mShadowTextureOffset; // proportion of texture offset in view direction e.g. 0.4
         Real mShadowTextureFadeStart; // as a proportion e.g. 0.6
         Real mShadowTextureFadeEnd; // as a proportion e.g. 0.9
@@ -2451,8 +2451,9 @@ namespace Ogre {
         /** Gets the distance a shadow volume is extruded for a directional light.
         */
         virtual Real getShadowDirectionalLightExtrusionDistance(void) const;
-        /** Sets the maximum distance away from the camera that shadows
-        will be visible.
+        /** Sets the default maximum distance away from the camera that shadows
+        will be visible. You have to call this function before you create lights
+        or the default distance of zero will be used.
         @remarks
         Shadow techniques can be expensive, therefore it is a good idea
         to limit them to being rendered close to the camera if possible,
@@ -2467,11 +2468,13 @@ namespace Ogre {
         and scene setup.
         */
         virtual void setShadowFarDistance(Real distance);
-        /** Gets the maximum distance away from the camera that shadows
+        /** Gets the default maximum distance away from the camera that shadows
         will be visible.
         */
         virtual Real getShadowFarDistance(void) const
-        { return mShadowFarDist; }
+        { return mDefaultShadowFarDist; }
+        virtual Real getShadowFarDistanceSquared(void) const
+        { return mDefaultShadowFarDistSquared; }
 
 		/** Sets the maximum size of the index buffer used to render shadow
 		 	primitives.

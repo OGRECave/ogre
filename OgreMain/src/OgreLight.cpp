@@ -51,6 +51,9 @@ namespace Ogre {
           mAttenuationQuad(0.0f),
 		  mPowerScale(1.0f),
 		  mIndexInFrame(0),
+		  mOwnShadowFarDist(false),
+		  mShadowFarDist(0),
+		  mShadowFarDistSquared(0),
           mDerivedPosition(Vector3::ZERO),
           mDerivedDirection(Vector3::UNIT_Z),
           mDerivedTransformDirty(false),
@@ -73,6 +76,9 @@ namespace Ogre {
         mAttenuationQuad(0.0f),
 		mPowerScale(1.0f),
 		mIndexInFrame(0),
+		mOwnShadowFarDist(false),
+		mShadowFarDist(0),
+		mShadowFarDistSquared(0),
         mDerivedPosition(Vector3::ZERO),
         mDerivedDirection(Vector3::UNIT_Z),
         mDerivedTransformDirty(false),
@@ -738,6 +744,34 @@ namespace Ogre {
 	const ShadowCameraSetupPtr& Light::getCustomShadowCameraSetup() const
 	{
 		return mCustomShadowCameraSetup;
+	}
+	//-----------------------------------------------------------------------
+	void Light::setShadowFarDistance(Real distance)
+	{
+		mOwnShadowFarDist = true;
+		mShadowFarDist = distance;
+		mShadowFarDistSquared = distance * distance;
+	}
+	//-----------------------------------------------------------------------
+	void Light::resetShadowFarDistance(void)
+	{
+		mOwnShadowFarDist = false;
+	}
+	//-----------------------------------------------------------------------
+	Real Light::getShadowFarDistance(void) const
+	{
+		if (mOwnShadowFarDist)
+			return mShadowFarDist;
+		else
+			return mManager->getShadowFarDistance ();
+	}
+	//-----------------------------------------------------------------------
+	Real Light::getShadowFarDistanceSquared(void) const
+	{
+		if (mOwnShadowFarDist)
+			return mShadowFarDistSquared;
+		else
+			return mManager->getShadowFarDistanceSquared ();
 	}
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------

@@ -75,7 +75,7 @@ namespace Ogre
 		const Vector3& camDir = cam.getDerivedDirection();
 
 		// get the shadow frustum's far distance
-		Real shadowDist = sm.getShadowFarDistance();
+		Real shadowDist = light.getShadowFarDistance();
 		if (!shadowDist)
 		{
 			// need a shadow distance, make one up
@@ -244,7 +244,7 @@ namespace Ogre
 			mBodyB.clip(sceneBB);
 
 			// Also clip based on shadow far distance if appropriate
-			Real farDist = sm.getShadowFarDistance();
+			Real farDist = light.getShadowFarDistance();
 			if (farDist)
 			{
 				Vector3 pointOnPlane = cam.getDerivedPosition() + 
