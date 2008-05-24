@@ -44,7 +44,7 @@ public:
 	{
 
 	}
-	virtual LightMaterialGeneratorImpl::~LightMaterialGeneratorImpl()
+	virtual ~LightMaterialGeneratorImpl()
 	{
 
 	}
@@ -59,7 +59,7 @@ public:
 		{
 			strUnifiedProgram = "DeferredShading/post/LightMaterial_vs";
 		}
-		HighLevelGpuProgramPtr ptr = HighLevelGpuProgramManager::getSingleton().getByName(strUnifiedProgram);
+		GpuProgramPtr ptr = HighLevelGpuProgramManager::getSingleton().getByName(strUnifiedProgram);
 		assert(ptr->getLanguage()=="unified");
 		return ptr;
 	}
@@ -104,7 +104,7 @@ public:
 			}
 			return strPPD;
 		}
-		void setUpBaseParameters(GpuProgramParametersSharedPtr& params)
+		void setUpBaseParameters(const GpuProgramParametersSharedPtr& params)
 		{
 			assert(params.isNull()==false);
 
@@ -139,7 +139,7 @@ public:
 	  {
 
 	  }
-	  virtual LightMaterialGeneratorHLSL::~LightMaterialGeneratorHLSL()
+	  virtual ~LightMaterialGeneratorHLSL()
 	  {
 
 	  }
@@ -176,7 +176,7 @@ public:
 
 		setUpBaseParameters(ptrProgram->getDefaultParameters());
 
-		return ptrProgram;
+		return GpuProgramPtr(ptrProgram);
 	}
 protected:
 
@@ -193,7 +193,7 @@ public:
 	  {
 
 	  }
-	  virtual LightMaterialGeneratorGLSL::~LightMaterialGeneratorGLSL()
+	  virtual ~LightMaterialGeneratorGLSL()
 	  {
 
 	  }
@@ -232,7 +232,7 @@ public:
 		ptrProgram->getDefaultParameters()->setNamedConstant("tex0", 0);
 		ptrProgram->getDefaultParameters()->setNamedConstant("tex1", 1);
 
-		return ptrProgram;
+		return GpuProgramPtr(ptrProgram);
 	}
 protected:
 	static String mMasterSource;
