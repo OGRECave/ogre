@@ -79,19 +79,24 @@ namespace Ogre
 	*/
 	enum MemoryCategory
 	{
-		/// Geometry held in main memory
-		MEMCATEGORY_GEOMETRY = 0, 
-		/// Animation data like tracks, bone matrices
-		MEMCATEGORY_ANIMATION = 1, 
-		/// Nodes, control data
-		MEMCATEGORY_SCENE_CONTROL = 2,
-		/// Scene object instances
-		MEMCATEGORY_SCENE_OBJECTS = 3,
 		/// General purpose
-		MEMCATEGORY_GENERAL = 4,
+		MEMCATEGORY_GENERAL = 0,
+		/// Geometry held in main memory
+		MEMCATEGORY_GEOMETRY = 1, 
+		/// Animation data like tracks, bone matrices
+		MEMCATEGORY_ANIMATION = 2, 
+		/// Nodes, control data
+		MEMCATEGORY_SCENE_CONTROL = 3,
+		/// Scene object instances
+		MEMCATEGORY_SCENE_OBJECTS = 4,
+		/// Other resources
+		MEMCATEGORY_RESOURCE = 5,
+		/// Scripting
+		MEMCATEGORY_SCRIPTING = 6,
+
 		
 		// sentinel value, do not use 
-		MEMCATEGORY_COUNT = 5
+		MEMCATEGORY_COUNT = 7
 	};
 }
 
@@ -148,6 +153,8 @@ namespace Ogre
 	typedef CategorisedAllocPolicy<MEMCATEGORY_ANIMATION> AnimationAllocPolicy;
 	typedef CategorisedAllocPolicy<MEMCATEGORY_SCENE_CONTROL> SceneCtlAllocPolicy;
 	typedef CategorisedAllocPolicy<MEMCATEGORY_SCENE_OBJECTS> SceneObjAllocPolicy;
+	typedef CategorisedAllocPolicy<MEMCATEGORY_RESOURCE> ResourceAllocPolicy;
+	typedef CategorisedAllocPolicy<MEMCATEGORY_SCRIPTING> ScriptingAllocPolicy;
 
 	// Now define all the base classes for each allocation
 	typedef AllocatedObject<GeneralAllocPolicy> GeneralAllocatedObject;
@@ -155,10 +162,23 @@ namespace Ogre
 	typedef AllocatedObject<AnimationAllocPolicy> AnimationAllocatedObject;
 	typedef AllocatedObject<SceneCtlAllocPolicy> SceneCtlAllocatedObject;
 	typedef AllocatedObject<SceneObjAllocPolicy> SceneObjAllocatedObject;
+	typedef AllocatedObject<ResourceAllocPolicy> ResourceAllocatedObject;
+	typedef AllocatedObject<ScriptingAllocPolicy> ScriptingAllocatedObject;
 
 	// Per-class allocators defined here
-	typedef SceneObjAllocatedObject EntityAlloc;
-	typedef SceneCtlAllocatedObject NodeAlloc;
+	// NOTE: small, non-virtual classes should not subclass an allocator
+	// the virtual function table could double their size and make them less efficient
+	// use primitive or STL allocators / deallocators for those
+	typedef ScriptingAllocatedObject	AbstractNodeAlloc;
+	typedef AnimationAllocatedObject	AnimableAlloc;
+	typedef AnimationAllocatedObject	AnimationAlloc;
+	typedef GeneralAllocatedObject		AnyAlloc;
+	typedef GeneralAllocatedObject		ArchiveAlloc;
+	typedef GeneralAllocatedObject		ControllerAlloc;
+	typedef SceneObjAllocatedObject		FXAlloc;
+	typedef SceneObjAllocatedObject		MovableAlloc;
+	typedef SceneCtlAllocatedObject		NodeAlloc;
+	typedef SceneCtlAllocatedObject		SceneMgtAlloc;
 
 	// Containers (by-value only)
 	// Will  be of the form:

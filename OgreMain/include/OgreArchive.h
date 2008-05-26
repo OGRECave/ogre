@@ -77,7 +77,7 @@ namespace Ogre {
         to benefit from OGRE's automatic searching of multiple file locations 
         for the resources you are looking for.
     */
-    class _OgreExport Archive  
+	class _OgreExport Archive : public ArchiveAlloc
     {
     protected:
         /// Archive name

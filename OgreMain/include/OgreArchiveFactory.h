@@ -51,7 +51,7 @@ namespace Ogre {
             Each Archive and ArchiveFactory subclass pair deal with a
             single archive type (identified by a string).
     */
-    class _OgreExport ArchiveFactory : public FactoryObj< Archive >
+    class _OgreExport ArchiveFactory : public FactoryObj< Archive >, public ArchiveAlloc
     {
     public:
         virtual ~ArchiveFactory() {}

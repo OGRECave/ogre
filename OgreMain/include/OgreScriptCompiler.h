@@ -82,7 +82,7 @@ namespace Ogre
 	typedef std::list<AbstractNodePtr> AbstractNodeList;
 	typedef SharedPtr<AbstractNodeList> AbstractNodeListPtr;
 
-	class _OgreExport AbstractNode
+	class _OgreExport AbstractNode : public AbstractNodeAlloc
 	{
 	public:
 		String file;

@@ -43,7 +43,7 @@ namespace Ogre {
         Other classes can hold instances of this class to store the state of any animations
         they are using.
     */
-    class _OgreExport AnimationState 
+	class _OgreExport AnimationState : public AnimationAlloc
     {
     public:
 
@@ -174,7 +174,7 @@ namespace Ogre {
 
 	/** Class encapsulating a set of AnimationState objects.
 	*/
-	class _OgreExport AnimationStateSet
+	class _OgreExport AnimationStateSet : public AnimationAlloc
 	{
 	public:
 		/// Mutex, public for external locking if needed

@@ -48,7 +48,7 @@ namespace Ogre
 {
 	/** Variant type that can hold Any other type.
 	*/
-    class Any
+	class Any : public AnyAlloc
     {
     public: // constructors
 
@@ -117,7 +117,7 @@ namespace Ogre
 
     protected: // types
 
-        class placeholder
+		class placeholder : public AnyAlloc
         {
         public: // structors
     

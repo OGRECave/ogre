@@ -38,7 +38,7 @@ namespace Ogre {
 
     /** This class manages the available ArchiveFactory plugins. 
     */
-    class _OgreExport ArchiveManager : public Singleton<ArchiveManager>
+    class _OgreExport ArchiveManager : public Singleton<ArchiveManager>, public ArchiveAlloc
     {
     protected:
         typedef std::map<String, ArchiveFactory*> ArchiveFactoryMap;
