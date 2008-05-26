@@ -78,6 +78,24 @@ http://www.gnu.org/copyleft/lesser.txt
 
 #endif
 
+// configure memory tracking
+#if OGRE_DEBUG_MODE 
+#	if OGRE_MEMORY_TRACKER_DEBUG_MODE
+#		define OGRE_MEMORY_TRACKER 1
+#	else
+#		define OGRE_MEMORY_TRACKER 0
+#	endif
+#else
+#	if OGRE_MEMORY_TRACKER_RELEASE_MODE
+#		define OGRE_MEMORY_TRACKER 1
+#	else
+#		define OGRE_MEMORY_TRACKER 0
+#	endif
+#endif
+
+
+
+
 namespace Ogre {
     // Define ogre version
     #define OGRE_VERSION_MAJOR 1

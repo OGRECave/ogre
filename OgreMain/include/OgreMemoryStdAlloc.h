@@ -34,6 +34,7 @@ Torus Knot Software Ltd.
 #include <limits>
 
 #include "OgreAlignedAllocator.h"
+#include "OgreMemoryTracker.h"
 
 namespace Ogre
 {
@@ -51,11 +52,19 @@ namespace Ogre
 		static inline void* allocateBytes(size_t count, 
 			const char* file = 0, int line = 0, const char* func = 0)
 		{
-			return malloc(count);
+			void* ptr = malloc(count);
+#if OGRE_MEMORY_TRACKER
+			// this alloc policy doesn't do pools
+			MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
+#endif
+			return ptr;
 		}
 
 		static inline void deallocateBytes(void* ptr)
 		{
+#if OGRE_MEMORY_TRACKER
+			MemoryTracker::get()._recordDealloc(ptr);
+#endif
 			free(ptr);
 		}
 
@@ -93,12 +102,20 @@ namespace Ogre
 		static inline void* allocateBytes(size_t count, 
 			const char* file = 0, int line = 0, const char* func = 0)
 		{
-			return Alignment ? AlignedMemory::allocate(count, Alignment)
+			void* ptr = Alignment ? AlignedMemory::allocate(count, Alignment)
 				: AlignedMemory::allocate(count);
+#if OGRE_MEMORY_TRACKER
+			// this alloc policy doesn't do pools
+			MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
+#endif
+			return ptr;
 		}
 
 		static inline void deallocateBytes(void* ptr)
 		{
+#if OGRE_MEMORY_TRACKER
+			MemoryTracker::get()._recordDealloc(ptr);
+#endif
 			AlignedMemory::deallocate(ptr);
 		}
 

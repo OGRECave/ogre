@@ -32,7 +32,7 @@ Torus Knot Software Ltd
 namespace Ogre
 {
 	
-#if OGRE_DEBUG_MODE
+#if OGRE_MEMORY_TRACKER
 	//--------------------------------------------------------------------------
 	MemoryTracker& MemoryTracker::get()
 	{
@@ -40,25 +40,31 @@ namespace Ogre
 		return tracker;
 	}
 	//--------------------------------------------------------------------------
-	void MemoryTracker::_recordAlloc(void* ptr, size_t sz, MemoryCategory cat, 
-					  const String file, size_t ln, const String& func)
+	void MemoryTracker::_recordAlloc(void* ptr, size_t sz, unsigned int pool, 
+					  const char* file, size_t ln, const char* func)
 	{
 		OGRE_LOCK_AUTO_MUTEX
 
 		assert(mAllocations.find(ptr) == mAllocations.end() && "Double allocation with same address");
-		mAllocations[ptr] = Alloc(sz, cat, file, ln, func);
-		mAllocationsByCategory[cat] += sz;
+		mAllocations[ptr] = Alloc(sz, pool, file, ln, func);
+		if(pool >= mAllocationsByPool.size())
+			mAllocationsByPool.resize(pool+1, 0);
+		mAllocationsByPool[pool] += sz;
 		mTotalAllocations += sz;
 	}
 	//--------------------------------------------------------------------------
 	void MemoryTracker::_recordDealloc(void* ptr)
 	{
+		// deal cleanly with null pointers
+		if (!ptr)
+			return;
+
 		OGRE_LOCK_AUTO_MUTEX
 
 		AllocationMap::iterator i = mAllocations.find(ptr);
 		assert(i != mAllocations.end() && "Unable to locate allocation unit");
 		// update category stats
-		mAllocationsByCategory[i->second.cat] -= i->second.bytes;
+		mAllocationsByPool[i->second.pool] -= i->second.bytes;
 		// global stats
 		mTotalAllocations -= i->second.bytes;
 		mAllocations.erase(i);
@@ -69,9 +75,9 @@ namespace Ogre
 		return mTotalAllocations;
 	}
 	//--------------------------------------------------------------------------
-	size_t MemoryTracker::getMemoryAllocatedForCat(MemoryCategory cat) const
+	size_t MemoryTracker::getMemoryAllocatedForPool(unsigned int pool) const
 	{
-		return mAllocationsByCategory[cat];
+		return mAllocationsByPool[pool];
 	}
 	//--------------------------------------------------------------------------
 	void MemoryTracker::reportLeaks()
@@ -87,8 +93,12 @@ namespace Ogre
 			for (AllocationMap::const_iterator i = mAllocations.begin(); i != mAllocations.end(); ++i)
 			{
 				const Alloc& alloc = i->second;
-				os << alloc.filename << "(" << alloc.line << ", " << alloc.function << "): "
-					<< alloc.bytes << " bytes" << std::endl;
+				if (alloc.filename)
+					os << alloc.filename << "(" << alloc.line << ", " << alloc.function << "): ";
+				else
+					os << "(unknown source): ";
+				os << alloc.bytes << " bytes";
+				os << std::endl;
 				totalMem += alloc.bytes;
 			}
 			

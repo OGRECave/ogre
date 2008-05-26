@@ -52,7 +52,7 @@ namespace __gnu_cxx
 namespace Ogre
 {
 
-#if OGRE_DEBUG_MODE
+#if OGRE_MEMORY_TRACKER
 
 	/** This class tracks the allocations and deallocations made, and
 		is able to report memory statistics and leaks.
@@ -68,14 +68,14 @@ namespace Ogre
 		struct Alloc
 		{
 			size_t bytes;
-			MemoryCategory cat;
-			String filename;
+			unsigned int pool;
+			const char* filename;
 			size_t line;
-			String function;
+			const char* function;
 
 			Alloc() :line(0), bytes(0) {}
-			Alloc(size_t sz, MemoryCategory c, const String& file, size_t ln, const String& func)
-				:bytes(sz), cat(c), filename(file), line(ln), function(func) {}
+			Alloc(size_t sz, unsigned int p, const char* file, size_t ln, const char* func)
+				:bytes(sz), pool(p), filename(file), line(ln), function(func) {}
 		};
 		
 		String mLeakFileName;
@@ -84,17 +84,16 @@ namespace Ogre
 		AllocationMap mAllocations;
 		
 		size_t mTotalAllocations;
-		typedef std::vector<size_t> AllocationsByCategory;
-		AllocationsByCategory mAllocationsByCategory;
+		typedef std::vector<size_t> AllocationsByPool;
+		AllocationsByPool mAllocationsByPool;
 
 		void reportLeaks();
 
 		// protected ctor
 		MemoryTracker()
-			: mLeakFileName("leaks.log"), mDumpToStdOut(true),
+			: mLeakFileName("OgreLeaks.log"), mDumpToStdOut(true),
 			mTotalAllocations(0)
 		{
-			mAllocationsByCategory.resize(MEMCATEGORY_COUNT, 0);
 		}
 	public:
 
@@ -121,21 +120,21 @@ namespace Ogre
 		
 		/// Get the total amount of memory allocated currently.
 		size_t getTotalMemoryAllocated() const;
-		/// Get the amount of memory allocated to a given category currently
-		size_t getMemoryAllocatedForCat(MemoryCategory cat) const;
+		/// Get the amount of memory allocated in a given pool 
+		size_t getMemoryAllocatedForPool(unsigned int pool) const;
 		
 
 		/** Record an allocation that has been made. Only to be called by
 			the memory management subsystem.
 			@param ptr The pointer to the memory
 			@param sz The size of the memory in bytes
-			@param cat The category of memory being allocated
+			@param pool The memory pool this allocation is occurring from
 			@param file The file in which the allocation is being made
 			@param ln The line on which the allocation is being made
 			@param func The function in which the allocation is being made
 		*/
-		void _recordAlloc(void* ptr, size_t sz, MemoryCategory cat = MEMCATEGORY_GENERAL, 
-						  const String file = "??", size_t ln = 0, const String& func = "??");
+		void _recordAlloc(void* ptr, size_t sz, unsigned int pool = 0, 
+						  const char* file = 0, size_t ln = 0, const char* func = 0);
 		/** Record the deallocation of memory. */
 		void _recordDealloc(void* ptr);
 

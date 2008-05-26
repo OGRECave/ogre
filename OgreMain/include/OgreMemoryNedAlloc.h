@@ -30,6 +30,8 @@ Torus Knot Software Ltd.
 #ifndef __MemoryNedAlloc_H__
 #define __MemoryNedAlloc_H__
 
+#include "OgreMemoryTracker.h"
+
 // This is an example of using a non-standard allocator with Ogre
 // Note, you need nedmalloc available on your build path to support this
 // See http://nedprod.com/programs/portable/nedmalloc/index.html
@@ -53,11 +55,19 @@ namespace Ogre
 		static inline void* allocateBytes(size_t count, 
 			const char* file = 0, int line = 0, const char* func = 0)
 		{
-			return nedalloc::nedmalloc(count);
+			void* ptr = nedalloc::nedmalloc(count);
+#if OGRE_MEMORY_TRACKER
+			// this alloc policy doesn't do pools (yet, ned can do it)
+			MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
+#endif
+			return ptr;
 		}
 
 		static inline void deallocateBytes(void* ptr)
 		{
+#if OGRE_MEMORY_TRACKER
+			MemoryTracker::get()._recordDealloc(ptr);
+#endif
 			nedalloc::nedfree(ptr);
 		}
 
@@ -97,12 +107,21 @@ namespace Ogre
 			const char* file = 0, int line = 0, const char* func = 0)
 		{
 			// default to platform SIMD alignment if none specified
-			return Alignment ? nedalloc::nedmemalign(Alignment, count)
+			void* ptr =  Alignment ? nedalloc::nedmemalign(Alignment, count)
 				: nedalloc::nedmemalign(OGRE_SIMD_ALIGNMENT, count);
+#if OGRE_MEMORY_TRACKER
+			// this alloc policy doesn't do pools (yet, ned can do it)
+			MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
+#endif
+			return ptr;
 		}
 
 		static inline void deallocateBytes(void* ptr)
 		{
+#if OGRE_MEMORY_TRACKER
+			// this alloc policy doesn't do pools (yet, ned can do it)
+			MemoryTracker::get()._recordDealloc(ptr);
+#endif
 			nedalloc::nedfree(ptr);
 		}
 
