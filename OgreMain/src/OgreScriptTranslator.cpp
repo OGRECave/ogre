@@ -822,7 +822,7 @@ namespace Ogre{
 								mPass->setAmbient(val);
 							else
 								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-									"ambient support only number arguments or \"vertexcolor\" directive");
+									"ambient support only number arguments or \"vertexcolour\" directive");
 						}
 					}
 					break;
