@@ -20,7 +20,6 @@ LGPL like the rest of the engine.
 #include "OgreException.h"
 #include "ItemSelectorViewManager.h"
 
-#include "OgreNoMemoryMacros.h"
 #include <CEGUI/CEGUIImageset.h>
 #include <CEGUI/CEGUISystem.h>
 #include <CEGUI/CEGUILogger.h>
@@ -32,7 +31,6 @@ LGPL like the rest of the engine.
 #include <CEGUI/elements/CEGUIListboxTextItem.h>
 #include <CEGUI/elements/CEGUIPushButton.h>
 #include <CEGUI/elements/CEGUIScrollbar.h>
-#include "OgreMemoryMacros.h"
 
 #include "OgreCEGUIRenderer.h"
 

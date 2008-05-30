@@ -1,0 +1,28 @@
+// HLSL
+vertex_program DeferredShading/post/hlsl/vs hlsl
+{
+	source DeferredShading/post/hlsl/vs.hlsl
+	target vs_1_1
+	entry_point main
+	default_params
+	{
+		param_named_auto invProj inverse_projection_matrix
+	}
+}
+
+// GLSL
+vertex_program DeferredShading/post/glsl/vs glsl
+{
+	source DeferredShading/post/glsl/vs.glsl
+	default_params
+	{
+		param_named_auto invProj inverse_projection_matrix
+	}
+}
+
+// Unified
+vertex_program DeferredShading/post/vs unified
+{
+	delegate DeferredShading/post/hlsl/vs
+	delegate DeferredShading/post/glsl/vs
+}

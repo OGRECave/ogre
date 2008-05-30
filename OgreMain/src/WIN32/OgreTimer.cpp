@@ -86,6 +86,11 @@ void Timer::reset()
 	GetProcessAffinityMask(GetCurrentProcess(), &procMask, &sysMask);
 #endif
 
+	// If procMask is 0, consider there is only one core available
+	// (using 0 as procMask will cause an infinite loop below)
+	if (procMask == 0)
+		procMask = 1;
+
 	// Find the lowest core that this process uses
 	if( mTimerMask == 0 )
 	{

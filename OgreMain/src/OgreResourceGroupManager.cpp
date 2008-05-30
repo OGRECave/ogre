@@ -93,7 +93,7 @@ namespace Ogre {
                 "ResourceGroupManager::createResourceGroup");
         }
         ResourceGroup* grp = new ResourceGroup();
-		grp->initialised = false;
+		grp->groupStatus = ResourceGroup::UNINITIALSED;
         grp->name = name;
         grp->worldGeometrySceneManager = 0;
         mResourceGroupMap.insert(
@@ -113,13 +113,15 @@ namespace Ogre {
 		}
 		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME) // lock group mutex
 
-		if (!grp->initialised)
+		if (grp->groupStatus == ResourceGroup::UNINITIALSED)
 		{
+			// in the process of initialising
+			grp->groupStatus = ResourceGroup::INITIALISING;
 			// Set current group
 			parseResourceGroupScripts(grp);
 			mCurrentGroup = grp;
 			createDeclaredResources(grp);
-			grp->initialised = true;
+			grp->groupStatus = ResourceGroup::INITIALISED;
 
 			// Reset current group
 			mCurrentGroup = 0;
@@ -137,13 +139,15 @@ namespace Ogre {
 		{
 			ResourceGroup* grp = i->second;
 			OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME) // lock group mutex
-			if (!grp->initialised)
+			if (grp->groupStatus == ResourceGroup::UNINITIALSED)
 			{
+				// in the process of initialising
+				grp->groupStatus = ResourceGroup::INITIALISING;
 				// Set current group
 				mCurrentGroup = grp;
 				parseResourceGroupScripts(grp);
 				createDeclaredResources(grp);
-				grp->initialised = true;
+				grp->groupStatus = ResourceGroup::INITIALISED;
 				// Reset current group
 				mCurrentGroup = 0;
 			}
@@ -326,6 +330,9 @@ namespace Ogre {
         }
 		fireResourceGroupLoadEnded(name);
 
+		// group is loaded
+		grp->groupStatus = ResourceGroup::LOADED;
+
 		// reset current group
 		mCurrentGroup = 0;
 		
@@ -364,6 +371,8 @@ namespace Ogre {
 				}
 			}
 		}
+
+		grp->groupStatus = ResourceGroup::INITIALISED;
 
 		// reset current group
 		mCurrentGroup = 0;
@@ -408,6 +417,8 @@ namespace Ogre {
 			}
 		}
 
+		grp->groupStatus = ResourceGroup::INITIALISED;
+
 		// reset current group
 		mCurrentGroup = 0;
 		LogManager::getSingleton().logMessage(
@@ -431,7 +442,7 @@ namespace Ogre {
 		mCurrentGroup = grp;
 		dropGroupContents(grp);
 		// clear initialised flag
-		grp->initialised = false;
+		grp->groupStatus = ResourceGroup::UNINITIALSED;
 		// reset current group
 		mCurrentGroup = 0;
 		LogManager::getSingleton().logMessage("Finished clearing resource group " + name);
@@ -458,6 +469,37 @@ namespace Ogre {
         mResourceGroupMap.erase(mResourceGroupMap.find(name));
 		// reset current group
 		mCurrentGroup = 0;
+    }
+	//-----------------------------------------------------------------------
+	bool ResourceGroupManager::isResourceGroupInitialised(const String& name)
+    {
+		// Can only bulk-destroy one group at a time (reasonable limitation I think)
+		OGRE_LOCK_AUTO_MUTEX
+
+		ResourceGroup* grp = getResourceGroup(name);
+		if (!grp)
+		{
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+				"Cannot find a group named " + name, 
+				"ResourceGroupManager::isResourceGroupInitialised");
+		}
+		return (grp->groupStatus != ResourceGroup::UNINITIALSED &&
+			grp->groupStatus != ResourceGroup::INITIALISING);
+    }
+	//-----------------------------------------------------------------------
+	bool ResourceGroupManager::isResourceGroupLoaded(const String& name)
+    {
+		// Can only bulk-destroy one group at a time (reasonable limitation I think)
+		OGRE_LOCK_AUTO_MUTEX
+
+		ResourceGroup* grp = getResourceGroup(name);
+		if (!grp)
+		{
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+				"Cannot find a group named " + name, 
+				"ResourceGroupManager::isResourceGroupInitialised");
+		}
+		return (grp->groupStatus == ResourceGroup::LOADED);
     }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::addResourceLocation(const String& name, 
@@ -883,10 +925,17 @@ namespace Ogre {
 			    // Iterate over each item in the list
 			    for (FileInfoList::iterator fii = (*flli)->begin(); fii != (*flli)->end(); ++fii)
 			    {
-                    LogManager::getSingleton().logMessage(
-                        "Parsing script " + fii->filename);
-                    fireScriptStarted(fii->filename);
-                    {
+					bool skipScript = false;
+                    fireScriptStarted(fii->filename, skipScript);
+					if(skipScript)
+					{
+						LogManager::getSingleton().logMessage(
+							"Skipping script " + fii->filename);
+					}
+					else
+					{
+						LogManager::getSingleton().logMessage(
+							"Parsing script " + fii->filename);
                         DataStreamPtr stream = fii->archive->open(fii->filename);
                         if (!stream.isNull())
                         {
@@ -895,7 +944,7 @@ namespace Ogre {
                             su->parseScript(stream, grp->name);
                         }
                     }
-				    fireScriptEnded(fii->filename);
+					fireScriptEnded(fii->filename, skipScript);
 			    }
             }
 		}
@@ -1166,23 +1215,26 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
-	void ResourceGroupManager::fireScriptStarted(const String& scriptName)
+	void ResourceGroupManager::fireScriptStarted(const String& scriptName, bool &skipScript)
 	{
 		OGRE_LOCK_AUTO_MUTEX
 		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
 			l != mResourceGroupListenerList.end(); ++l)
 		{
-			(*l)->scriptParseStarted(scriptName);
+			bool temp = false;
+			(*l)->scriptParseStarted(scriptName, temp);
+			if(temp)
+				skipScript = true;
 		}
 	}
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::fireScriptEnded(const String& scriptName)
+    void ResourceGroupManager::fireScriptEnded(const String& scriptName, bool skipped)
     {
         OGRE_LOCK_AUTO_MUTEX
             for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
                 l != mResourceGroupListenerList.end(); ++l)
             {
-                (*l)->scriptParseEnded(scriptName);
+                (*l)->scriptParseEnded(scriptName, skipped);
             }
     }
 	//-----------------------------------------------------------------------

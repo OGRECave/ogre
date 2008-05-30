@@ -668,7 +668,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\OgreMemoryManager.cpp"
+				RelativePath="..\src\OgreMemoryNedAlloc.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\OgreMemoryTracker.cpp"
 				>
 			</File>
 			<File
@@ -1481,11 +1485,27 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\OgreMemoryMacros.h"
+				RelativePath="..\include\OgreMemoryAllocatedObject.h"
 				>
 			</File>
 			<File
-				RelativePath="..\include\OgreMemoryManager.h"
+				RelativePath="..\include\OgreMemoryAllocatorConfig.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\OgreMemoryNedAlloc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\OgreMemoryStdAlloc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\OgreMemorySTLAllocator.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\OgreMemoryTracker.h"
 				>
 			</File>
 			<File
@@ -1518,10 +1538,6 @@
 			</File>
 			<File
 				RelativePath="..\include\OgreNode.h"
-				>
-			</File>
-			<File
-				RelativePath="..\include\OgreNoMemoryMacros.h"
 				>
 			</File>
 			<File

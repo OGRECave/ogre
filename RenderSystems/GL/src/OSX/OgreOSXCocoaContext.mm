@@ -47,7 +47,7 @@ namespace Ogre
 		
 	void OSXCocoaContext::endCurrent()
 	{
-        [mNSGLContext clearCurrentContext]; 
+        [NSOpenGLContext clearCurrentContext]; 
 	}
 	
 	GLContext* OSXCocoaContext::clone() const

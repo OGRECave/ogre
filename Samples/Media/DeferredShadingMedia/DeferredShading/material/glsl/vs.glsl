@@ -29,9 +29,8 @@ varying float depth;
 
 void main()                    
 {
-
    vec4 projPos = gl_ModelViewProjectionMatrix * gl_Vertex;
-   
+
    gl_Position = projPos;
    depth = projPos.w;
    texCoord0 = vec2(gl_MultiTexCoord0);

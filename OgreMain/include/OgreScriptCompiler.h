@@ -37,22 +37,6 @@ Torus Knot Software Ltd.
 #include "OgreCompositionPass.h"
 #include "OgreAny.h"
 
-#if OGRE_THREAD_SUPPORT
-// boost::thread_specific_ptr has 'new' in header but delete in lib
-// so if we use our memory manager it reports leaks incorrectly
-// boost::thread_specific_ptr has 'new' in header but delete in lib
-// so if we use our memory manager it reports leaks incorrectly
-#	include "OgreNoMemoryMacros.h"
-#   ifndef NOMINMAX
-#       define NOMINMAX
-#	    include <boost/thread/tss.hpp>
-#       undef NOMINMAX
-#   else
-#	    include <boost/thread/tss.hpp>
-#   endif
-#	include "OgreMemoryMacros.h"
-#endif
-
 namespace Ogre
 {
 	/** These enums hold the types of the concrete parsed nodes */
@@ -98,7 +82,7 @@ namespace Ogre
 	typedef std::list<AbstractNodePtr> AbstractNodeList;
 	typedef SharedPtr<AbstractNodeList> AbstractNodeListPtr;
 
-	class _OgreExport AbstractNode
+	class _OgreExport AbstractNode : public AbstractNodeAlloc
 	{
 	public:
 		String file;
@@ -334,6 +318,14 @@ namespace Ogre
 		virtual ConcreteNodeListPtr importFile(ScriptCompiler *compiler, const String &name);
 		/// Allows for responding to and overriding behavior before a CST is translated into an AST
 		virtual void preConversion(ScriptCompiler *compiler, ConcreteNodeListPtr nodes);
+		/// Allows vetoing of continued compilation after the entire AST conversion process finishes
+		/**
+		 @remarks	Once the script is turned completely into an AST, including import
+					and override handling, this function allows a listener to exit
+					the compilation process.
+		 @return True continues compilation, false aborts
+		 */
+		virtual bool postConversion(ScriptCompiler *compiler, const AbstractNodeListPtr&);
 		/// Called when an error occurred
 		virtual void handleError(ScriptCompiler *compiler, uint32 code, const String &file, int line, const String &msg);
 		/// Called when an event occurs during translation, return true if handled

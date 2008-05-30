@@ -29,11 +29,9 @@ http://www.gnu.org/copyleft/lesser.txt.
 #include "OgreMaxConfig.h"
 #include "OgreMaxExport.h"
 
-#include "OgreNoMemoryMacros.h"
 #include "max.h"
 #include "INode.h"
 #include <list>
-#include "OgreMemoryMacros.h"
 
 typedef std::list<INode*> NodeList;
 

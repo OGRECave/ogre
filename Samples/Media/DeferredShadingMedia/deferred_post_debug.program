@@ -1,0 +1,65 @@
+// HLSL
+fragment_program DeferredShading/post/hlsl/ShowNormal_ps hlsl
+{
+	source DeferredShading/post/hlsl/ShowNormal_ps.hlsl
+	target ps_2_0
+	entry_point main
+}
+fragment_program DeferredShading/post/hlsl/ShowDS_ps hlsl
+{
+	source DeferredShading/post/hlsl/ShowDS_ps.hlsl
+	target ps_2_0
+	entry_point main
+}
+fragment_program DeferredShading/post/hlsl/ShowColour_ps hlsl
+{
+	source DeferredShading/post/hlsl/ShowColour_ps.hlsl
+	target ps_2_0
+	entry_point main
+}
+
+// GLSL
+fragment_program DeferredShading/post/glsl/ShowNormal_ps glsl
+{
+	source DeferredShading/post/glsl/ShowNormal_ps.glsl
+	default_params
+	{
+		param_named tex0 int 0
+		param_named tex1 int 1
+	}
+}
+fragment_program DeferredShading/post/glsl/ShowDS_ps glsl
+{
+	source DeferredShading/post/glsl/ShowDS_ps.glsl
+	default_params
+	{
+		param_named tex0 int 0
+		param_named tex1 int 1
+	}
+}
+fragment_program DeferredShading/post/glsl/ShowColour_ps glsl
+{
+	source DeferredShading/post/glsl/ShowColour_ps.glsl
+	default_params
+	{
+		param_named tex0 int 0
+		param_named tex1 int 1
+	}
+}
+
+// Unified
+fragment_program DeferredShading/post/ShowNormal_ps unified
+{
+	delegate DeferredShading/post/hlsl/ShowNormal_ps
+	delegate DeferredShading/post/glsl/ShowNormal_ps
+}
+fragment_program DeferredShading/post/ShowDS_ps unified
+{
+	delegate DeferredShading/post/hlsl/ShowDS_ps
+	delegate DeferredShading/post/glsl/ShowDS_ps
+}
+fragment_program DeferredShading/post/ShowColour_ps unified
+{
+	delegate DeferredShading/post/hlsl/ShowColour_ps
+	delegate DeferredShading/post/glsl/ShowColour_ps
+}

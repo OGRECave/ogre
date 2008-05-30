@@ -202,7 +202,7 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm"
 			>
 			<File
-				RelativePath="..\include\CreateSphere.h"
+				RelativePath="..\src\AmbientLight.cpp"
 				>
 			</File>
 			<File
@@ -210,11 +210,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\DeferredShading.h"
+				RelativePath="..\src\DeferredShadingDemo.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\DeferredShadingDemo.cpp"
+				RelativePath="..\src\GeomUtils.cpp"
 				>
 			</File>
 			<File
@@ -222,23 +222,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\LightMaterialGenerator.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\MaterialGenerator.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\include\MaterialGenerator.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\MLight.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\MLight.h"
 				>
 			</File>
 		</Filter>
@@ -246,6 +234,30 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc"
 			>
+			<File
+				RelativePath="..\include\AmbientLight.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DeferredShading.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\GeomUtils.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\LightMaterialGenerator.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\MaterialGenerator.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\MLight.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

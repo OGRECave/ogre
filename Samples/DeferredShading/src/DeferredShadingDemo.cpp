@@ -9,7 +9,7 @@ are dealing with many outputs which get written into multiple render textures in
 
 After rendering the scene in this format, the shading (lighting) can be done as a post process. 
 This means that lighting is done in screen space. Adding them requires nothing more than rendering 
-a screenful quad; thus the method allows for an enormous amount of lights without noticable 
+a screenful quad; thus the method allows for an enormous amount of lights without noticeable 
 performance loss.
 
 Little lights affecting small area ("Minilights") can be even further optimised by rendering 
@@ -32,7 +32,7 @@ This demo source file is in the public domain.
 
 #include "DeferredShading.h"
 #include "MLight.h"
-#include "CreateSphere.h"
+#include "GeomUtils.h"
 class SharedData : public Ogre::Singleton<SharedData> {
 
 public:
@@ -43,7 +43,7 @@ public:
 		  iWindow(0),
 		  mAnimState(0),
 		  mMLAnimState(0),
-		  iLight1(0), iLight2(0)
+		  iMainLight(0)
 	{
 		iActivate = false;
 	}
@@ -65,11 +65,7 @@ public:
 		// Animation state for light swarm
 		AnimationState* mMLAnimState;
 
-		// overlay stuff.. too lazy to do a good thing for it
-		SceneManager *iSceneMgr;
-		RenderTarget *iSceneTarget;
-
-		MLight *iLight1, *iLight2;
+		MLight *iMainLight;
 
 		std::vector<Node*> mLightNodes;
 
@@ -82,7 +78,6 @@ protected:
 	Real timeoutDelay ;
 	Vector3 oldCamPos;
 	Quaternion oldCamOri;
-	DeferredShadingSystem::DSMode mode;
 public:
 	RenderToTextureFrameListener(RenderWindow* window, Camera* maincam)
 		:ExampleFrameListener(window, maincam), 
@@ -90,32 +85,18 @@ public:
 	{
 		timeoutDelay = 0;
 		mMoveSpeed = 200;
-		mode = (DeferredShadingSystem::DSMode)1;
 	}
 
 	bool frameRenderingQueued(const FrameEvent& evt)
 	{
 		if( ExampleFrameListener::frameRenderingQueued(evt) == false )
 			return false;
-
 		SharedData::getSingleton().iLastFrameTime = evt.timeSinceLastFrame;
 
 		if (SharedData::getSingleton().mAnimState)
-            SharedData::getSingleton().mAnimState->addTime(evt.timeSinceLastFrame);
+			SharedData::getSingleton().mAnimState->addTime(evt.timeSinceLastFrame);
 		if (SharedData::getSingleton().mMLAnimState)
-            SharedData::getSingleton().mMLAnimState->addTime(evt.timeSinceLastFrame);
-		
-		// Only update fat buffer if something changed
-		bool somethingChanged = false;
-		if(mCamera->getPosition()!=oldCamPos || mCamera->getOrientation()!=oldCamOri)
-		{
-			somethingChanged = true;
-			oldCamPos = mCamera->getPosition();
-			oldCamOri = mCamera->getOrientation();
-		}
-		
-		if(somethingChanged)
-			SharedData::getSingleton().iSystem->update();
+			SharedData::getSingleton().mMLAnimState->addTime(evt.timeSinceLastFrame);
 		return true;
 	}
 
@@ -128,11 +109,12 @@ public:
 		{
 			timeoutDelay = 0.5f;
 
-			mode = (DeferredShadingSystem::DSMode)((int)mode+1);
-			if(mode == DeferredShadingSystem::DSM_COUNT)
-				mode = (DeferredShadingSystem::DSMode)1;
+			DeferredShadingSystem* iSystem = SharedData::getSingleton().iSystem;
 
-			SharedData::getSingleton().iSystem->setMode( mode );
+			iSystem->setMode(
+				(DeferredShadingSystem::DSMode)
+				((iSystem->getMode() + 1)%DeferredShadingSystem::DSM_COUNT)
+				);
 
 			updateOverlays();
 		}
@@ -157,8 +139,7 @@ public:
 		{
 			timeoutDelay = 0.5f;
 			SharedData::getSingleton().iGlobalActivate = !SharedData::getSingleton().iGlobalActivate;
-			SharedData::getSingleton().iLight1->setVisible(SharedData::getSingleton().iGlobalActivate);
-			SharedData::getSingleton().iLight2->setVisible(SharedData::getSingleton().iGlobalActivate);
+			SharedData::getSingleton().iMainLight->setVisible(SharedData::getSingleton().iGlobalActivate);
 			updateOverlays();
 		}
 
@@ -170,7 +151,6 @@ public:
 
 	void updateOverlays() 
 	{
-
 		OverlayManager::getSingleton().getOverlayElement( "Example/Shadows/ShadowTechniqueInfo" )
 			->setCaption( "" );
 
@@ -181,21 +161,21 @@ public:
 			->setCaption( "[B] MiniLights active: " + StringConverter::toString( SharedData::getSingleton().iActivate ) );
 
 		std::string name;
-		switch(mode)
+		switch(SharedData::getSingleton().iSystem->getMode())
 		{
-		case DeferredShadingSystem::DSM_SINGLEPASS:
-			name="SinglePass"; break;
-		case DeferredShadingSystem::DSM_MULTIPASS:
-			name="MultiPass"; break;
+		case DeferredShadingSystem::DSM_SHOWLIT:
+			name="ShowLit"; break;
 		case DeferredShadingSystem::DSM_SHOWCOLOUR:
 			name="ShowColour"; break;
 		case DeferredShadingSystem::DSM_SHOWNORMALS:
 			name="ShowNormals"; break;
 		case DeferredShadingSystem::DSM_SHOWDSP:
-			name="ShowDSP"; break;
+			name="ShowDepthSpecular"; break;
 		}
 		OverlayManager::getSingleton().getOverlayElement( "Example/Shadows/Materials" )
-			->setCaption( "[C] Change mode, current is \"" + name + "\"");
+			->setCaption( "[C] Change mode, current is \"" 
+			+ name 
+			+ "\"");
 
 		OverlayManager::getSingleton().getOverlayElement( "Example/Shadows/Info" )
 			->setCaption( "[G] Global lights active: " + StringConverter::toString( SharedData::getSingleton().iGlobalActivate ) );
@@ -241,12 +221,11 @@ protected:
         }
 		if (caps->getNumMultiRenderTargets()<2)
         {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support at least two simulataneous render targets, so cannot "
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support at least two simultaneous render targets, so cannot "
                 "run this demo. Sorry!", 
                 "DeferredShading::createScene");
         }
-		MovableObject::setDefaultVisibilityFlags(0x00000001);
-		mSceneMgr->setVisibilityMask(0x00000001);
+
 		// Prepare athene mesh for normalmapping
         MeshPtr pAthene = MeshManager::getSingleton().load("athene.mesh", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -262,73 +241,73 @@ protected:
         // Set ambient light
         mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.15));
         // Skybox
-        mSceneMgr->setSkyBox(true, "Test13/SkyBox");
+        mSceneMgr->setSkyBox(true, "DeferredDemo/SkyBox");
 
 		// Create "root" node
 		SceneNode* rootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 
-        // Create a prefab plane
-        mPlane = new MovablePlane("ReflectPlane");
-        mPlane->d = 0;
-        mPlane->normal = Vector3::UNIT_Y;
-        MeshManager::getSingleton().createCurvedPlane("ReflectionPlane", 
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-			*mPlane,
-			2000, 2000, -1000,
-            20, 20, 
-			true, 1, 10, 10, Vector3::UNIT_Z);
-        mPlaneEnt = mSceneMgr->createEntity( "Plane", "ReflectionPlane" );
-		mPlaneNode = rootNode->createChildSceneNode();
-        mPlaneNode->attachObject(mPlaneEnt);
-        mPlaneNode->translate(-5, -30, 0);
-        //mPlaneNode->roll(Degree(5));
-        mPlaneEnt->setMaterialName("Test13/Ground");
-
-        // Create an entity from a model (will be loaded automatically)
-        Entity* knotEnt = mSceneMgr->createEntity("Knot", "knot.mesh");
-		knotEnt->setMaterialName("Test13/RockWall");
-		knotEnt->setMeshLodBias(0.25f);
-
-        // Create an entity from a model (will be loaded automatically)
-        Entity* ogreHead = mSceneMgr->createEntity("Head", "ogrehead.mesh");
-		ogreHead->getSubEntity(0)->setMaterialName("Test13/DeferredOgre/Eyes");// eyes
-		ogreHead->getSubEntity(1)->setMaterialName("Test13/DeferredOgre/Skin"); 
-		ogreHead->getSubEntity(2)->setMaterialName("Test13/DeferredOgre/EarRing"); // earrings
-		ogreHead->getSubEntity(3)->setMaterialName("Test13/DeferredOgre/Tusks"); // tusks
-		rootNode->createChildSceneNode( "Head" )->attachObject( ogreHead );
-
-        Entity* athena = mSceneMgr->createEntity("Athena", "athene.mesh");
-		athena->setMaterialName("Test13/DeferredAthena");
+		Entity* athena = mSceneMgr->createEntity("Athena", "athene.mesh");
+		athena->setMaterialName("DeferredDemo/DeferredAthena");
 		SceneNode *aNode = rootNode->createChildSceneNode();
 		aNode->attachObject( athena );
 		aNode->setPosition(-100, 40, 100);
 
-        // Add a whole bunch of extra entities to fill the scene a bit
-        Entity *cloneEnt;
+		// Create a prefab plane
+		mPlane = new MovablePlane("ReflectPlane");
+		mPlane->d = 0;
+		mPlane->normal = Vector3::UNIT_Y;
+		MeshManager::getSingleton().createCurvedPlane("ReflectionPlane", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+			*mPlane,
+			2000, 2000, -1000,
+			20, 20, 
+			true, 1, 10, 10, Vector3::UNIT_Z);
+		mPlaneEnt = mSceneMgr->createEntity( "Plane", "ReflectionPlane" );
+		mPlaneNode = rootNode->createChildSceneNode();
+		mPlaneNode->attachObject(mPlaneEnt);
+		mPlaneNode->translate(-5, -30, 0);
+		//mPlaneNode->roll(Degree(5));
+		mPlaneEnt->setMaterialName("DeferredDemo/Ground");
+
+		// Create an entity from a model (will be loaded automatically)
+		Entity* knotEnt = mSceneMgr->createEntity("Knot", "knot.mesh");
+		knotEnt->setMaterialName("DeferredDemo/RockWall");
+		knotEnt->setMeshLodBias(0.25f);
+
+		// Create an entity from a model (will be loaded automatically)
+		Entity* ogreHead = mSceneMgr->createEntity("Head", "ogrehead.mesh");
+		ogreHead->getSubEntity(0)->setMaterialName("DeferredDemo/Ogre/Eyes");// eyes
+		ogreHead->getSubEntity(1)->setMaterialName("DeferredDemo/Ogre/Skin"); 
+		ogreHead->getSubEntity(2)->setMaterialName("DeferredDemo/Ogre/EarRing"); // earrings
+		ogreHead->getSubEntity(3)->setMaterialName("DeferredDemo/Ogre/Tusks"); // tusks
+		rootNode->createChildSceneNode( "Head" )->attachObject( ogreHead );
+
+		// Add a whole bunch of extra entities to fill the scene a bit
+		Entity *cloneEnt;
 		int N=4;
-        for (int n = 0; n < N; ++n)
-        {
+		for (int n = 0; n < N; ++n)
+		{
 			float theta = 2.0f*Math::PI*(float)n/(float)N;
-            // Create a new node under the root
-            SceneNode* node = mSceneMgr->createSceneNode();
-            // Random translate
-            Vector3 nodePos;
-            nodePos.x = Math::SymmetricRandom() * 40.0 + Math::Sin(theta) * 500.0;
-            nodePos.y = Math::SymmetricRandom() * 20.0 - 40.0;
-            nodePos.z = Math::SymmetricRandom() * 40.0 + Math::Cos(theta) * 500.0;
-            node->setPosition(nodePos);
+			// Create a new node under the root
+			SceneNode* node = mSceneMgr->createSceneNode();
+			// Random translate
+			Vector3 nodePos;
+			nodePos.x = Math::SymmetricRandom() * 40.0 + Math::Sin(theta) * 500.0;
+			nodePos.y = Math::SymmetricRandom() * 20.0 - 40.0;
+			nodePos.z = Math::SymmetricRandom() * 40.0 + Math::Cos(theta) * 500.0;
+			node->setPosition(nodePos);
 			Quaternion orientation(Math::SymmetricRandom(),Math::SymmetricRandom(),Math::SymmetricRandom(),Math::SymmetricRandom());
 			orientation.normalise();
 			node->setOrientation(orientation);
-            rootNode->addChild(node);
-            // Clone knot
-            char cloneName[12];
-            sprintf(cloneName, "Knot%d", n);
-            cloneEnt = knotEnt->clone(cloneName);
-            // Attach to new node
-            node->attachObject(cloneEnt);
+			rootNode->addChild(node);
+			// Clone knot
+			char cloneName[12];
+			sprintf(cloneName, "Knot%d", n);
+			cloneEnt = knotEnt->clone(cloneName);
+			// Attach to new node
+			node->attachObject(cloneEnt);
 
-        }
+		}
 
         mCamera->setPosition(-50, 100, 500);
         mCamera->lookAt(0,0,0);
@@ -339,24 +318,13 @@ protected:
 
 		mSystem = new DeferredShadingSystem(mWindow->getViewport(0), mSceneMgr, mCamera);
 
-		
-		// Create a light
-        MLight* l = mSystem->createMLight();//"SunLight");
-        //l->setType(Light::LT_POINT);
-        //l->setPosition(600.0, 1000.0, 200.0);
-        l->setDiffuseColour(1.0f, 0.6f, 0.2f);
-        l->setSpecularColour(0.3f, 0.15f, 0.06f);
-		//l->setDiffuseColour(0.0f, 0.0f, 0.0f);
-		//l->setSpecularColour(0.0f, 0.0f, 0.0f);
-		
-		// Create moving light
-		MLight* l2 = mSystem->createMLight();//"MainLight2");
-        //l2->setType(Light::LT_POINT);
-        l2->setDiffuseColour(0.75f, 0.7f, 0.8f);
-		l2->setSpecularColour(0.85f, 0.9f, 1.0f);
+		// Create main, moving light
+		MLight* l1 = mSystem->createMLight();//"MainLight");
+        l1->setDiffuseColour(0.75f, 0.7f, 0.8f);
+		l1->setSpecularColour(0.85f, 0.9f, 1.0f);
 		
 		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		lightNode->attachObject(l2);
+		lightNode->attachObject(l1);
 
 		// Create a track for the light
         Animation* anim = mSceneMgr->createAnimation("LightTrack", 16);
@@ -365,7 +333,7 @@ protected:
         // Create a track to animate the camera's node
         NodeAnimationTrack* track = anim->createNodeTrack(0, lightNode);
         // Setup keyframes
-        TransformKeyFrame* key = track->createNodeKeyFrame(0); // A startposition
+        TransformKeyFrame* key = track->createNodeKeyFrame(0); // A start position
         key->setTranslate(Vector3(300,300,-300));
         key = track->createNodeKeyFrame(4);//B
         key->setTranslate(Vector3(300,300,300));
@@ -388,10 +356,8 @@ protected:
 		SharedData::getSingleton().iWindow = mWindow;
 		SharedData::getSingleton().iActivate = true;
 		SharedData::getSingleton().iGlobalActivate = true;
-		SharedData::getSingleton().iSceneMgr = mSceneMgr;
 		SharedData::getSingleton().iSystem = mSystem;
-		SharedData::getSingleton().iLight1 = l;
-		SharedData::getSingleton().iLight2 = l2;
+		SharedData::getSingleton().iMainLight = l1;
 	}
 
     void createFrameListener(void)
@@ -473,22 +439,23 @@ protected:
 
 		// Create marker meshes to show user where the lights are
 		Entity *ent;
-		createSphere("PointLightMesh", 1.0f, 5, 5);
+		GeomUtils::createSphere("PointLightMesh", 1.0f, 5, 5, true, true);
 		for(std::vector<MLight*>::iterator i=lights.begin(); i!=lights.end(); ++i)
 		{
-			ent = mSceneMgr->createEntity((*i)->getName()+"v", "PointLightMesh");
-			String matname = (*i)->getName()+"m";
+			MLight* light = *i;
+			ent = mSceneMgr->createEntity(light->getName()+"v", "PointLightMesh");
+			String matname = light->getName()+"m";
 			// Create coloured material
 			MaterialPtr mat = MaterialManager::getSingleton().create(matname,
                 ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
             Pass* pass = mat->getTechnique(0)->getPass(0);
             pass->setDiffuse(0.0f,0.0f,0.0f,1.0f);
 			pass->setAmbient(0.0f,0.0f,0.0f);
-			pass->setSelfIllumination((*i)->getDiffuseColour());
+			pass->setSelfIllumination(light->getDiffuseColour());
 
 			ent->setMaterialName(matname);
-			ent->setVisibilityFlags(DeferredShadingSystem::PostVisibilityMask);
-			static_cast<SceneNode*>((*i)->getParentNode())->attachObject(ent);
+			ent->setRenderQueueGroup(light->getRenderQueueGroup());
+			static_cast<SceneNode*>(light->getParentNode())->attachObject(ent);
 		}		
 
 		// Store nodes for hiding/showing
@@ -529,7 +496,7 @@ protected:
 			for(int y=0; y<=stations; ++y)
 			{
 				// Setup keyframes
-				TransformKeyFrame* key = track->createNodeKeyFrame(y*seconds_per_station); // A startposition
+				TransformKeyFrame* key = track->createNodeKeyFrame(y*seconds_per_station); // A start position
 				key->setTranslate(station_pos[(x*skip+y)%stations]);
 				// Make sure size of light doesn't change
 				key->setScale(nodes[x]->getScale());
@@ -563,9 +530,9 @@ extern "C" {
 			app.go();
 		} catch( Ogre::Exception& e ) {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-			MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
+			MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occurred!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
 #else
-			std::cerr << "An exception has occured: " <<
+			std::cerr << "An exception has occurred: " <<
 				e.getFullDescription().c_str() << std::endl;
 #endif
 		}

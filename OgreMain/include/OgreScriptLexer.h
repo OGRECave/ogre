@@ -31,7 +31,6 @@ Torus Knot Software Ltd.
 #define __ScriptLexer_H_
 
 #include "OgrePrerequisites.h"
-#include "OgreStdHeaders.h"
 #include "OgreSharedPtr.h"
 #include "OgreDataStream.h"
 #include "OgreStringConverter.h"

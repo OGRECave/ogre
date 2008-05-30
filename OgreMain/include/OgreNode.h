@@ -51,7 +51,7 @@ namespace Ogre {
             This is an abstract class - concrete classes are based on this for specific purposes,
             e.g. SceneNode, Bone
     */
-    class _OgreExport Node : public Renderable
+    class _OgreExport Node : public Renderable, public NodeAlloc
     {
     public:
         /** Enumeration denoting the spaces which a transform can be relative to.

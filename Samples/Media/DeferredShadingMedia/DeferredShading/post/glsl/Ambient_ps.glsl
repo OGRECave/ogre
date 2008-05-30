@@ -36,21 +36,16 @@ uniform vec3 ambientColor;
 void main()
 {
 	vec4 a0 = texture2D(tex0, texCoord); // Attribute 0: Diffuse color+shininess
-    vec4 a1 = texture2D(tex1, texCoord); // Attribute 1: Normal+depth
-    
-    // Clip fragment if depth is too far, so the skybox can be rendered on the background
-    if(a1.w==0.0)
+	vec4 a1 = texture2D(tex1, texCoord); // Attribute 1: Normal+depth
+
+	// Clip fragment if depth is too far, so the skybox can be rendered on the background
+	if(a1.w==0.0)
 		discard;
-      
-    // Attributes
-    vec3 colour = a0.rgb;
-    float alpha = a0.a;		// Specularity
-    float distance = a1.w;  // Distance from viewer -- is zero if no lighting wanted
-    
+
 	// Calculate ambient colour of fragment
-    gl_FragColor = vec4( ambientColor*colour ,0);
-    
-    // Calculate depth of fragment; GL requires a 2.0* here as the range is [-1, 1]
-    // Also, see again how matrix is transposed ([3][2] instead of [2][3])
-    gl_FragDepth = projCoord.z*proj[2][2] + proj[3][2]/(2.0*distance);
+	gl_FragColor = vec4( ambientColor*a0.rgb ,0);
+
+	// Calculate depth of fragment; GL requires a 2.0* here as the range is [-1, 1]
+	// Also, see again how matrix is transposed ([3][2] instead of [2][3])
+	gl_FragDepth = projCoord.z*proj[2][2] + proj[3][2]/(2.0*a1.w);
 }

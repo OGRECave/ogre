@@ -230,10 +230,23 @@ namespace Ogre {
         // Check for hardware mipmapping support.
         if(GLEW_VERSION_1_4 || GLEW_SGIS_generate_mipmap)
         {
+			bool disableAutoMip = false;
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 			// Apple ATI drivers have faults in hardware mipmap generation
-			if (mGLSupport->getGLVendor().find("ATI") == std::string::npos)
+			if (rsc->getVendor() == GPU_ATI)
+				disableAutoMip = true;
 #endif
+			// NVIDIA 175.16 drivers break hardware mip generation
+			// disable until fixed
+			// However DON'T do this on Apple, their drivers aren't subject to this
+			// problem yet and in fact software generation appears to cause a crash 
+			// in some cases which I've yet to track down
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE
+			if (rsc->getVendor() == GPU_NVIDIA)
+				disableAutoMip = true;
+#endif
+
+			if (!disableAutoMip)
 				rsc->setCapability(RSC_AUTOMIPMAP);
         }
 

@@ -316,6 +316,8 @@
 		AA88695A0D2BDBF900C08A49 /* OgreCEGUIResourceProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA8869570D2BDBF900C08A49 /* OgreCEGUIResourceProvider.cpp */; };
 		AA88695B0D2BDBF900C08A49 /* OgreCEGUITexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA8869580D2BDBF900C08A49 /* OgreCEGUITexture.cpp */; };
 		AA8869840D2BDF3200C08A49 /* Ogre.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 000E25230B392BAA004EA2DF /* Ogre.framework */; };
+		AA9881820DE85EF0004A5F9F /* AmbientLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9881800DE85EF0004A5F9F /* AmbientLight.cpp */; };
+		AA9881830DE85EF0004A5F9F /* GeomUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9881810DE85EF0004A5F9F /* GeomUtils.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -599,7 +601,6 @@
 		000E275B0B39A153004EA2DF /* CubeMapping.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CubeMapping.cpp; path = ../../Samples/CubeMapping/src/CubeMapping.cpp; sourceTree = SOURCE_ROOT; };
 		000E27690B39A2C1004EA2DF /* DeferredShading.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeferredShading.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		000E276B0B39A2C1004EA2DF /* DeferredShading-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "DeferredShading-Info.plist"; path = "plist/DeferredShading-Info.plist"; sourceTree = "<group>"; };
-		000E27770B39A40B004EA2DF /* CreateSphere.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CreateSphere.h; path = ../../Samples/DeferredShading/include/CreateSphere.h; sourceTree = SOURCE_ROOT; };
 		000E27780B39A40B004EA2DF /* LightMaterialGenerator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = LightMaterialGenerator.h; path = ../../Samples/DeferredShading/include/LightMaterialGenerator.h; sourceTree = SOURCE_ROOT; };
 		000E27790B39A40B004EA2DF /* MLight.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MLight.h; path = ../../Samples/DeferredShading/include/MLight.h; sourceTree = SOURCE_ROOT; };
 		000E277A0B39A40B004EA2DF /* DeferredShading.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DeferredShading.h; path = ../../Samples/DeferredShading/include/DeferredShading.h; sourceTree = SOURCE_ROOT; };
@@ -619,7 +620,7 @@
 		000E27B80B39AB18004EA2DF /* EnvMapping-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "EnvMapping-Info.plist"; path = "plist/EnvMapping-Info.plist"; sourceTree = "<group>"; };
 		000E27BE0B39ABE3004EA2DF /* EnvMapping.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = EnvMapping.h; path = ../../Samples/EnvMapping/include/EnvMapping.h; sourceTree = SOURCE_ROOT; };
 		000E27BF0B39ABED004EA2DF /* EnvMapping.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = EnvMapping.cpp; path = ../../Samples/EnvMapping/src/EnvMapping.cpp; sourceTree = SOURCE_ROOT; };
-		000E27CE0B39AD1D004EA2DF /* FacialAnimation.app */ = {isa = PBXFileReference; includeInIndex = 0; path = FacialAnimation.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000E27CE0B39AD1D004EA2DF /* FacialAnimation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FacialAnimation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		000E27D00B39AD1D004EA2DF /* FacialAnimation-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "FacialAnimation-Info.plist"; path = "plist/FacialAnimation-Info.plist"; sourceTree = "<group>"; };
 		000E27E60B39ADE3004EA2DF /* FacialAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = FacialAnimation.cpp; path = ../../Samples/FacialAnimation/src/FacialAnimation.cpp; sourceTree = SOURCE_ROOT; };
 		000E27F30B39AE59004EA2DF /* Fresnel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fresnel.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -667,7 +668,7 @@
 		000E29390B39DF23004EA2DF /* SkyPlane-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "SkyPlane-Info.plist"; path = "plist/SkyPlane-Info.plist"; sourceTree = "<group>"; };
 		000E29490B39DF84004EA2DF /* SkyPlane.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SkyPlane.h; path = ../../Samples/SkyPlane/include/SkyPlane.h; sourceTree = SOURCE_ROOT; };
 		000E294A0B39DF8E004EA2DF /* SkyPlane.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = SkyPlane.cpp; path = ../../Samples/SkyPlane/src/SkyPlane.cpp; sourceTree = SOURCE_ROOT; };
-		000E29520B39E019004EA2DF /* Smoke.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Smoke.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000E29520B39E019004EA2DF /* Smoke.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Smoke.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		000E29540B39E01A004EA2DF /* Smoke-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "Smoke-Info.plist"; path = "plist/Smoke-Info.plist"; sourceTree = "<group>"; };
 		000E29600B39E08B004EA2DF /* Smoke.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Smoke.h; path = ../../Samples/Smoke/include/Smoke.h; sourceTree = SOURCE_ROOT; };
 		000E29610B39E0A5004EA2DF /* Smoke.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Smoke.cpp; path = ../../Samples/Smoke/src/Smoke.cpp; sourceTree = SOURCE_ROOT; };
@@ -720,6 +721,10 @@
 		AA8869560D2BDBF900C08A49 /* OgreCEGUIRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreCEGUIRenderer.cpp; path = ../../Samples/Common/CEGUIRenderer/src/OgreCEGUIRenderer.cpp; sourceTree = SOURCE_ROOT; };
 		AA8869570D2BDBF900C08A49 /* OgreCEGUIResourceProvider.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreCEGUIResourceProvider.cpp; path = ../../Samples/Common/CEGUIRenderer/src/OgreCEGUIResourceProvider.cpp; sourceTree = SOURCE_ROOT; };
 		AA8869580D2BDBF900C08A49 /* OgreCEGUITexture.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreCEGUITexture.cpp; path = ../../Samples/Common/CEGUIRenderer/src/OgreCEGUITexture.cpp; sourceTree = SOURCE_ROOT; };
+		AA9881800DE85EF0004A5F9F /* AmbientLight.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = AmbientLight.cpp; path = ../../Samples/DeferredShading/src/AmbientLight.cpp; sourceTree = SOURCE_ROOT; };
+		AA9881810DE85EF0004A5F9F /* GeomUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = GeomUtils.cpp; path = ../../Samples/DeferredShading/src/GeomUtils.cpp; sourceTree = SOURCE_ROOT; };
+		AA9881840DE85F11004A5F9F /* AmbientLight.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AmbientLight.h; path = ../../Samples/DeferredShading/include/AmbientLight.h; sourceTree = SOURCE_ROOT; };
+		AA9881850DE85F11004A5F9F /* GeomUtils.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = GeomUtils.h; path = ../../Samples/DeferredShading/include/GeomUtils.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1138,7 +1143,10 @@
 		000E25070B392932004EA2DF /* DeferredShading */ = {
 			isa = PBXGroup;
 			children = (
-				000E27770B39A40B004EA2DF /* CreateSphere.h */,
+				AA9881840DE85F11004A5F9F /* AmbientLight.h */,
+				AA9881850DE85F11004A5F9F /* GeomUtils.h */,
+				AA9881800DE85EF0004A5F9F /* AmbientLight.cpp */,
+				AA9881810DE85EF0004A5F9F /* GeomUtils.cpp */,
 				000E27780B39A40B004EA2DF /* LightMaterialGenerator.h */,
 				000E27790B39A40B004EA2DF /* MLight.h */,
 				000E277A0B39A40B004EA2DF /* DeferredShading.h */,
@@ -3039,6 +3047,8 @@
 				000E27830B39A429004EA2DF /* MaterialGenerator.cpp in Sources */,
 				000E27840B39A429004EA2DF /* MLight.cpp in Sources */,
 				000E27850B39A429004EA2DF /* LightMaterialGenerator.cpp in Sources */,
+				AA9881820DE85EF0004A5F9F /* AmbientLight.cpp in Sources */,
+				AA9881830DE85EF0004A5F9F /* GeomUtils.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3568,6 +3578,7 @@
 				);
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = ../../Dependencies;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				HEADER_SEARCH_PATHS = (
 					"../../OgreMain/include/**",
 					../../Dependencies/include,
@@ -3587,6 +3598,7 @@
 				);
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = ../../Dependencies;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
 					"../../OgreMain/include/**",
 					../../Dependencies/include,

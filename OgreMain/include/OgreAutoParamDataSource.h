@@ -52,7 +52,7 @@ namespace Ogre {
         matrices when they are requested more than once when the underlying information has
         not altered.
     */
-    class _OgreExport AutoParamDataSource
+	class _OgreExport AutoParamDataSource : public SceneMgtAlloc
     {
     protected:
 		const Light& getLight(size_t index) const;

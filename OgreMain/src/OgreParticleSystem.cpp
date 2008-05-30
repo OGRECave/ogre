@@ -936,21 +936,24 @@ namespace Ogre {
 		MovableObject::_notifyCurrentCamera(cam);
 
 		// Record visible
-		mLastVisibleFrame = Root::getSingleton().getNextFrameNumber();
-		mTimeSinceLastVisible = 0.0f;
+		if (isVisible())
+		{			
+			mLastVisibleFrame = Root::getSingleton().getNextFrameNumber();
+			mTimeSinceLastVisible = 0.0f;
 
-        if (mSorted)
-		{
-			_sortParticles(cam);
+			if (mSorted)
+			{
+				_sortParticles(cam);
+			}
+
+			if (mRenderer)
+			{
+				if (!mIsRendererConfigured)
+					configureRenderer();
+
+				mRenderer->_notifyCurrentCamera(cam);
+			}
 		}
-
-		if (mRenderer)
-        {
-			if (!mIsRendererConfigured)
-				configureRenderer();
-
-            mRenderer->_notifyCurrentCamera(cam);
-        }
     }
     //-----------------------------------------------------------------------
     void ParticleSystem::_notifyAttached(Node* parent, bool isTagPoint)

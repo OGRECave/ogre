@@ -37,7 +37,6 @@ Torus Knot Software Ltd.
 /* Win32 directory operations emulation */
 #if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
 
-#include "OgreNoMemoryMacros.h"
 
 struct _find_search_t
 {
@@ -160,5 +159,4 @@ int _findclose(long id)
     return ret;
 }
 
-#include "OgreMemoryMacros.h"
 #endif

@@ -51,7 +51,7 @@ namespace Ogre {
             Instances of this class are discrete, relatively small, movable objects
             which are attached to SceneNode objects to define their position.
     */
-    class _OgreExport MovableObject : public ShadowCaster, public AnimableObject
+    class _OgreExport MovableObject : public ShadowCaster, public AnimableObject, public MovableAlloc
     {
     public:
         /** Listener which gets called back on MovableObject events.
@@ -504,7 +504,7 @@ namespace Ogre {
 		to allow all clients to produce new instances of this object, integrated
 		with the standard Ogre processing.
 	*/
-	class _OgreExport MovableObjectFactory 
+	class _OgreExport MovableObjectFactory : public MovableAlloc
 	{
 	protected:
 		/// Type flag, allocated if requested

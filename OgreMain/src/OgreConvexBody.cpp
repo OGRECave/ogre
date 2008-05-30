@@ -681,7 +681,7 @@ namespace Ogre
 
 			if ( bFound == false )
 			{
-				OGRE_DELETE_ARRAY( bChecked );
+				OGRE_SAFE_DELETE_ARRAY( bChecked );
 				return false;
 			}
 		}
@@ -690,12 +690,12 @@ namespace Ogre
 		{
 			if ( bChecked[ i ] != true )
 			{
-				OGRE_DELETE_ARRAY( bChecked );
+				OGRE_SAFE_DELETE_ARRAY( bChecked );
 				return false;
 			}
 		}
 
-		OGRE_DELETE_ARRAY( bChecked );
+		OGRE_SAFE_DELETE_ARRAY( bChecked );
 		return true;
 	}
 	//-----------------------------------------------------------------------
@@ -1072,7 +1072,7 @@ namespace Ogre
 			pIntersect = 0;
 
 			// delete side info
-			OGRE_DELETE_ARRAY( side );
+			OGRE_SAFE_DELETE_ARRAY( side );
 		}
 
 		// if the polygon was partially clipped, close it

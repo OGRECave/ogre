@@ -113,7 +113,7 @@ namespace Ogre
 		It is possible to change this behaviour using
 		setUseShortestRotationPath() method.
     */
-    class _OgreExport AnimationTrack
+	class _OgreExport AnimationTrack : public AnimationAlloc
     {
     public:
 

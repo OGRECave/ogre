@@ -213,12 +213,16 @@ namespace Ogre {
         bool cas (const T &old, const T &nu)
         {
             if (sizeof(T)==2) {
-                return InterlockedCompareExchange16((SHORT*)&mField, static_cast<SHORT>(nu), static_cast<SHORT>(old)) == static_cast<SHORT>(old);
-            } else if (sizeof(T)==4) {
-                return InterlockedCompareExchange((LONG*)&mField, static_cast<LONG>(nu), static_cast<LONG>(old)) == static_cast<LONG>(old);
-            } else if (sizeof(T)==2) {
-                return InterlockedCompareExchange64((LONGLONG*)&mField, static_cast<LONGLONG>(nu), static_cast<LONGLONG>(old)) == static_cast<LONGLONG>(old);
-            } else {
+                return _InterlockedCompareExchange16((SHORT*)&mField, static_cast<SHORT>(nu), static_cast<SHORT>(old)) == static_cast<SHORT>(old);
+            } 
+			else if (sizeof(T)==4) 
+			{
+                return _InterlockedCompareExchange((LONG*)&mField, static_cast<LONG>(nu), static_cast<LONG>(old)) == static_cast<LONG>(old);
+			} 
+			else if (sizeof(T)==8) {
+                return _InterlockedCompareExchange64((LONGLONG*)&mField, static_cast<LONGLONG>(nu), static_cast<LONGLONG>(old)) == static_cast<LONGLONG>(old);
+            } 
+			else {
                 OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,"Only 16, 32, and 64 bit scalars supported in win32.","AtomicScalar::cas");
             }
         }
@@ -229,7 +233,7 @@ namespace Ogre {
                 return InterlockedIncrement16((SHORT*)&mField);
             } else if (sizeof(T)==4) {
                 return InterlockedIncrement((LONG*)&mField);
-            } else if (sizeof(T)==2) {
+            } else if (sizeof(T)==8) {
                 return InterlockedIncrement64((LONGLONG*)&mField);
             } else {
                 OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,"Only 16, 32, and 64 bit scalars supported in win32.","AtomicScalar::operator++(prefix)");
@@ -242,7 +246,7 @@ namespace Ogre {
                 return InterlockedDecrement16((SHORT*)&mField);
             } else if (sizeof(T)==4) {
                 return InterlockedDecrement((LONG*)&mField);
-            } else if (sizeof(T)==2) {
+            } else if (sizeof(T)==8) {
                 return InterlockedDecrement64((LONGLONG*)&mField);
             } else {
                 OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,"Only 16, 32, and 64 bit scalars supported in win32.","AtomicScalar::operator--(prefix)");
@@ -255,7 +259,7 @@ namespace Ogre {
                 return InterlockedIncrement16((SHORT*)&mField)-1;
             } else if (sizeof(T)==4) {
                 return InterlockedIncrement((LONG*)&mField)-1;
-            } else if (sizeof(T)==2) {
+            } else if (sizeof(T)==8) {
                 return InterlockedIncrement64((LONGLONG*)&mField)-1;
             } else {
                 OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,"Only 16, 32, and 64 bit scalars supported in win32.","AtomicScalar::operator++(postfix)");
@@ -268,7 +272,7 @@ namespace Ogre {
                 return InterlockedDecrement16((SHORT*)&mField)+1;
             } else if (sizeof(T)==4) {
                 return InterlockedDecrement((LONG*)&mField)+1;
-            } else if (sizeof(T)==2) {
+            } else if (sizeof(T)==8) {
                 return InterlockedDecrement64((LONGLONG*)&mField)+1;
             } else {
                 OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,"Only 16, 32, and 64 bit scalars supported in win32.","AtomicScalar::operator--(postfix)");

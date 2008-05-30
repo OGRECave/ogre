@@ -28,7 +28,6 @@ Torus Knot Software Ltd.
 */
 #include "OgreStableHeaders.h"
 #include "OgreDefaultHardwareBufferManager.h"
-#include "OgreAlignedAllocator.h"
 
 namespace Ogre {
 
@@ -37,12 +36,12 @@ namespace Ogre {
         : HardwareVertexBuffer(vertexSize, numVertices, usage, true, false) // always software, never shadowed
 	{
         // Allocate aligned memory for better SIMD processing friendly.
-        mpData = static_cast<unsigned char*>(AlignedMemory::allocate(mSizeInBytes));
+        mpData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
 	}
 	//-----------------------------------------------------------------------
     DefaultHardwareVertexBuffer::~DefaultHardwareVertexBuffer()
 	{
-		AlignedMemory::deallocate(mpData);
+		OGRE_FREE_SIMD(mpData, MEMCATEGORY_GEOMETRY);
 	}
 	//-----------------------------------------------------------------------
     void* DefaultHardwareVertexBuffer::lockImpl(size_t offset, size_t length, LockOptions options)

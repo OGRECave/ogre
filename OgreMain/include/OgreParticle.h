@@ -43,7 +43,7 @@ namespace Ogre {
 		class. If that's the case, then you should define a subclass of this class, 
 		and construct it when asked in your custom ParticleSystemRenderer class.
 	*/
-	class _OgreExport ParticleVisualData
+	class _OgreExport ParticleVisualData : public FXAlloc
 	{
 	public:
 		ParticleVisualData() {}
@@ -52,7 +52,7 @@ namespace Ogre {
 	};
 
 	/** Class representing a single particle instance. */
-    class _OgreExport Particle 
+	class _OgreExport Particle : public FXAlloc
     {
     protected:
         /// Parent ParticleSystem

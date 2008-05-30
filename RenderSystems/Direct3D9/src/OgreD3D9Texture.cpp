@@ -36,10 +36,8 @@ Torus Knot Software Ltd.
 #include "OgreD3D9RenderSystem.h"
 #include "OgreRoot.h"
 
-#include "OgreNoMemoryMacros.h"
 #include <d3dx9.h>
 #include <dxerr9.h>
-#include "OgreMemoryMacros.h"
 
 namespace Ogre 
 {

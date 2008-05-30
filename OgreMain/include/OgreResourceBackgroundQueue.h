@@ -35,18 +35,6 @@ Torus Knot Software Ltd.
 #include "OgreSingleton.h"
 #include "OgreResource.h"
 
-#if OGRE_THREAD_SUPPORT
-#   ifndef NOMINMAX
-#       define NOMINMAX
-#	    include <boost/thread/thread.hpp>
-#	    include <boost/thread/condition.hpp>
-#       undef NOMINMAX
-#   else
-#	    include <boost/thread/thread.hpp>
-#	    include <boost/thread/condition.hpp>
-#   endif
-#endif
-
 namespace Ogre {
 
 	/// Identifier of a background process

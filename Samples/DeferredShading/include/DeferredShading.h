@@ -9,7 +9,7 @@ are dealing with many outputs which get written into multiple render textures in
 
 After rendering the scene in this format, the shading (lighting) can be done as a post process. 
 This means that lighting is done in screen space. Adding them requires nothing more than rendering 
-a screenful quad; thus the method allows for an enormous amount of lights without noticable 
+a screenful quad; thus the method allows for an enormous amount of lights without noticeable 
 performance loss.
 
 Little lights affecting small area ("Minilights") can be even further optimised by rendering 
@@ -45,12 +45,15 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreSceneNode.h"
 #include "OgreMaterial.h"
+#include "OgreRenderTargetListener.h"
+
 class MLight;
+class AmbientLight;
 class MaterialGenerator;
 
 /** System to manage Deferred Shading for a camera/render target.
  */
-class DeferredShadingSystem: public Ogre::CompositorInstance::Listener
+class DeferredShadingSystem : public Ogre::RenderTargetListener
 {
 public:
 	DeferredShadingSystem(Ogre::Viewport *vp, Ogre::SceneManager *sm, Ogre::Camera *cam);
@@ -58,17 +61,18 @@ public:
 
 	enum DSMode
 	{
-		DSM_SINGLEPASS = 0,  // Single pass + two lights
-		DSM_MULTIPASS = 1,   // Multi pass
-		DSM_SHOWCOLOUR = 2,  // Show diffuse (for debugging)
-		DSM_SHOWNORMALS = 3, // Show normals (for debugging)
-		DSM_SHOWDSP = 4,	 // Show depth and specular channel (for debugging)
-		DSM_COUNT = 5
+		DSM_SHOWLIT = 0,     // The deferred shading mode
+		DSM_SHOWCOLOUR = 1,  // Show diffuse (for debugging)
+		DSM_SHOWNORMALS = 2, // Show normals (for debugging)
+		DSM_SHOWDSP = 3,	 // Show depth and specular channel (for debugging)
+		DSM_COUNT = 4
 	};
 
 	/** Set rendering mode (one of DSMode)
 	 */
 	void setMode(DSMode mode);
+
+	DSMode getMode(void) const;
 
 	/** Activate or deactivate system
 	 */
@@ -82,39 +86,52 @@ public:
 	 */
 	void destroyMLight(MLight *m);
 
-	/** Update fat (origin) render target
-	*/
-	void update();
-
 	/// Visibility mask for scene
 	static const Ogre::uint32 SceneVisibilityMask = 0x00000001;
 	/// Visibility mask for post-processing geometry (lights, unlit particles)
 	static const Ogre::uint32 PostVisibilityMask = 0x00000002;
 
-	/** @copydoc CompositorInstance::Listener::notifyMaterialSetup
-	 */
-	virtual void notifyMaterialSetup(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat);
+	// Render Target Listener overrides
+	virtual void preRenderTargetUpdate(const Ogre::RenderTargetEvent& evt);
 protected:
 	Ogre::Viewport *mViewport;
 	Ogre::SceneManager *mSceneMgr;
 	Ogre::Camera *mCamera;
 	
-	// Fat render target
-	Ogre::MultiRenderTarget *rttTex;
 	// Filters
 	Ogre::CompositorInstance *mInstance[DSM_COUNT];
 	// Active/inactive
 	bool mActive;
 	DSMode mCurrentMode;
 
-	std::set<MLight*> mLights;
-	Ogre::TexturePtr mTexture0, mTexture1;
+	typedef std::set<MLight*> LightList;
+
+	LightList mLights;
+
+	bool mLightMaterialsDirty;
+	LightList mDirtyLightList;
 
 	MaterialGenerator *mLightMaterialGenerator;
 
+	void createAmbientLight(void);
+	void setUpAmbientLightMaterial(void);
+	AmbientLight* mAmbientLight;
+
     void createResources();
 	void initialiseLightGeometry();
-	void setupMaterial(const Ogre::MaterialPtr &mat);
+
+	// iterates through all the lights and sets up their materials
+
+	// when you enable the compositor, if the compositor is the lit mode, we have to set up the light materials 
+	// to that of the mrt
+	void setupLightMaterials(void);
+
+	// sets up the materials' pass' texture units 0 and 1 to texName0 and texName1
+	void setupMaterial(const Ogre::MaterialPtr &mat
+		, const Ogre::String& texName0
+		, const Ogre::String& texName1);
+
+	void logCurrentMode(void);
 };
 
 #endif

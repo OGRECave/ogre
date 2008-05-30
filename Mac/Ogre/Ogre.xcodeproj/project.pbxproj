@@ -123,8 +123,6 @@
 		000E1E6F0B38D566004EA2DF /* OgreMath.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1D9F0B38D566004EA2DF /* OgreMath.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E700B38D566004EA2DF /* OgreMatrix3.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA00B38D566004EA2DF /* OgreMatrix3.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E710B38D566004EA2DF /* OgreMatrix4.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA10B38D566004EA2DF /* OgreMatrix4.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		000E1E720B38D566004EA2DF /* OgreMemoryMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA20B38D566004EA2DF /* OgreMemoryMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		000E1E730B38D566004EA2DF /* OgreMemoryManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA30B38D566004EA2DF /* OgreMemoryManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E740B38D566004EA2DF /* OgreMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA40B38D566004EA2DF /* OgreMesh.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E750B38D566004EA2DF /* OgreMeshFileFormat.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA50B38D566004EA2DF /* OgreMeshFileFormat.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E760B38D566004EA2DF /* OgreMeshManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA60B38D566004EA2DF /* OgreMeshManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -133,7 +131,6 @@
 		000E1E790B38D566004EA2DF /* OgreMovableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DA90B38D566004EA2DF /* OgreMovableObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E7A0B38D566004EA2DF /* OgreMovablePlane.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DAA0B38D566004EA2DF /* OgreMovablePlane.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E7B0B38D566004EA2DF /* OgreNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DAB0B38D566004EA2DF /* OgreNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		000E1E7C0B38D566004EA2DF /* OgreNoMemoryMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DAC0B38D566004EA2DF /* OgreNoMemoryMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E7D0B38D566004EA2DF /* OgreNumerics.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DAD0B38D566004EA2DF /* OgreNumerics.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E7E0B38D566004EA2DF /* OgreOptimisedUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DAE0B38D566004EA2DF /* OgreOptimisedUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		000E1E7F0B38D566004EA2DF /* OgreOverlay.h in Headers */ = {isa = PBXBuildFile; fileRef = 000E1DAF0B38D566004EA2DF /* OgreOverlay.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -315,7 +312,6 @@
 		000E1FE70B38D5AA004EA2DF /* OgreMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F3A0B38D5AA004EA2DF /* OgreMath.cpp */; };
 		000E1FE80B38D5AA004EA2DF /* OgreMatrix3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F3B0B38D5AA004EA2DF /* OgreMatrix3.cpp */; };
 		000E1FE90B38D5AA004EA2DF /* OgreMatrix4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F3C0B38D5AA004EA2DF /* OgreMatrix4.cpp */; };
-		000E1FEA0B38D5AA004EA2DF /* OgreMemoryManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F3D0B38D5AA004EA2DF /* OgreMemoryManager.cpp */; };
 		000E1FEB0B38D5AA004EA2DF /* OgreMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F3E0B38D5AA004EA2DF /* OgreMesh.cpp */; };
 		000E1FEC0B38D5AA004EA2DF /* OgreMeshManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F3F0B38D5AA004EA2DF /* OgreMeshManager.cpp */; };
 		000E1FED0B38D5AA004EA2DF /* OgreMeshSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 000E1F400B38D5AA004EA2DF /* OgreMeshSerializer.cpp */; };
@@ -566,6 +562,7 @@
 		00DDBBD80B4CEEE100E8E1C9 /* OgreOSXContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 00DDBB9C0B4CE1C700E8E1C9 /* OgreOSXContext.cpp */; };
 		00DDBBD90B4CEEEF00E8E1C9 /* OgreOSXCarbonContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 00DDBB790B4CDB7000E8E1C9 /* OgreOSXCarbonContext.cpp */; };
 		00DDBBDA0B4CEEFA00E8E1C9 /* OgreOSXCGLContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 00DDBB980B4CE0E500E8E1C9 /* OgreOSXCGLContext.cpp */; };
+		AA0405760DE0D7B60000EEFF /* OgreMemoryNedAlloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA0405750DE0D7B60000EEFF /* OgreMemoryNedAlloc.cpp */; };
 		AA06EFE60CEE58080013023A /* OgreScriptCompiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA06EFE30CEE58080013023A /* OgreScriptCompiler.cpp */; };
 		AA06EFE70CEE58080013023A /* OgreScriptLexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA06EFE40CEE58080013023A /* OgreScriptLexer.cpp */; };
 		AA06EFE80CEE58080013023A /* OgreScriptParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA06EFE50CEE58080013023A /* OgreScriptParser.cpp */; };
@@ -579,10 +576,16 @@
 		AA42976D0DB2B1940099A7F0 /* OgreAtomicWrappers.h in Headers */ = {isa = PBXBuildFile; fileRef = AA42976C0DB2B1940099A7F0 /* OgreAtomicWrappers.h */; };
 		AA508FB50C972C1B00D6EAD0 /* OgreTangentSpaceCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA508FB40C972C1B00D6EAD0 /* OgreTangentSpaceCalc.cpp */; };
 		AA508FB70C972C9000D6EAD0 /* OgreTangentSpaceCalc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA508FB60C972C8F00D6EAD0 /* OgreTangentSpaceCalc.h */; };
+		AA7510670DDE20FE009D23BA /* OgreMemoryAllocatedObject.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510630DDE20FE009D23BA /* OgreMemoryAllocatedObject.h */; };
+		AA7510680DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510640DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h */; };
+		AA7510690DDE20FE009D23BA /* OgreMemoryStdAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */; };
+		AA75106A0DDE20FE009D23BA /* OgreMemorySTLAllocator.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510660DDE20FE009D23BA /* OgreMemorySTLAllocator.h */; };
 		AAA8B9700CC6A4FC001AD86E /* OgreScriptCompiler.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96E0CC6A4FC001AD86E /* OgreScriptCompiler.h */; };
 		AAA8B9710CC6A4FC001AD86E /* OgreScriptParser.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */; };
 		AAD22CA50D7D708600928C53 /* OgreScriptTranslator.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD22CA40D7D708600928C53 /* OgreScriptTranslator.h */; };
 		AAD22CA70D7D70B400928C53 /* OgreScriptTranslator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD22CA60D7D70B400928C53 /* OgreScriptTranslator.cpp */; };
+		AAF4F54A0DE4C73D0073D0FD /* OgreMemoryTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAF4F5480DE4C73D0073D0FD /* OgreMemoryTracker.cpp */; };
+		AAF4F5CB0DE4D6AD0073D0FD /* OgreMemoryTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = AAF4F5320DE4C48C0073D0FD /* OgreMemoryTracker.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -768,8 +771,6 @@
 		000E1D9F0B38D566004EA2DF /* OgreMath.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMath.h; path = ../../OgreMain/include/OgreMath.h; sourceTree = SOURCE_ROOT; };
 		000E1DA00B38D566004EA2DF /* OgreMatrix3.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMatrix3.h; path = ../../OgreMain/include/OgreMatrix3.h; sourceTree = SOURCE_ROOT; };
 		000E1DA10B38D566004EA2DF /* OgreMatrix4.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMatrix4.h; path = ../../OgreMain/include/OgreMatrix4.h; sourceTree = SOURCE_ROOT; };
-		000E1DA20B38D566004EA2DF /* OgreMemoryMacros.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryMacros.h; path = ../../OgreMain/include/OgreMemoryMacros.h; sourceTree = SOURCE_ROOT; };
-		000E1DA30B38D566004EA2DF /* OgreMemoryManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryManager.h; path = ../../OgreMain/include/OgreMemoryManager.h; sourceTree = SOURCE_ROOT; };
 		000E1DA40B38D566004EA2DF /* OgreMesh.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMesh.h; path = ../../OgreMain/include/OgreMesh.h; sourceTree = SOURCE_ROOT; };
 		000E1DA50B38D566004EA2DF /* OgreMeshFileFormat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMeshFileFormat.h; path = ../../OgreMain/include/OgreMeshFileFormat.h; sourceTree = SOURCE_ROOT; };
 		000E1DA60B38D566004EA2DF /* OgreMeshManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMeshManager.h; path = ../../OgreMain/include/OgreMeshManager.h; sourceTree = SOURCE_ROOT; };
@@ -778,7 +779,6 @@
 		000E1DA90B38D566004EA2DF /* OgreMovableObject.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMovableObject.h; path = ../../OgreMain/include/OgreMovableObject.h; sourceTree = SOURCE_ROOT; };
 		000E1DAA0B38D566004EA2DF /* OgreMovablePlane.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMovablePlane.h; path = ../../OgreMain/include/OgreMovablePlane.h; sourceTree = SOURCE_ROOT; };
 		000E1DAB0B38D566004EA2DF /* OgreNode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreNode.h; path = ../../OgreMain/include/OgreNode.h; sourceTree = SOURCE_ROOT; };
-		000E1DAC0B38D566004EA2DF /* OgreNoMemoryMacros.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreNoMemoryMacros.h; path = ../../OgreMain/include/OgreNoMemoryMacros.h; sourceTree = SOURCE_ROOT; };
 		000E1DAD0B38D566004EA2DF /* OgreNumerics.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreNumerics.h; path = ../../OgreMain/include/OgreNumerics.h; sourceTree = SOURCE_ROOT; };
 		000E1DAE0B38D566004EA2DF /* OgreOptimisedUtil.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreOptimisedUtil.h; path = ../../OgreMain/include/OgreOptimisedUtil.h; sourceTree = SOURCE_ROOT; };
 		000E1DAF0B38D566004EA2DF /* OgreOverlay.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreOverlay.h; path = ../../OgreMain/include/OgreOverlay.h; sourceTree = SOURCE_ROOT; };
@@ -960,7 +960,6 @@
 		000E1F3A0B38D5AA004EA2DF /* OgreMath.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMath.cpp; path = ../../OgreMain/src/OgreMath.cpp; sourceTree = SOURCE_ROOT; };
 		000E1F3B0B38D5AA004EA2DF /* OgreMatrix3.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMatrix3.cpp; path = ../../OgreMain/src/OgreMatrix3.cpp; sourceTree = SOURCE_ROOT; };
 		000E1F3C0B38D5AA004EA2DF /* OgreMatrix4.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMatrix4.cpp; path = ../../OgreMain/src/OgreMatrix4.cpp; sourceTree = SOURCE_ROOT; };
-		000E1F3D0B38D5AA004EA2DF /* OgreMemoryManager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMemoryManager.cpp; path = ../../OgreMain/src/OgreMemoryManager.cpp; sourceTree = SOURCE_ROOT; };
 		000E1F3E0B38D5AA004EA2DF /* OgreMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMesh.cpp; path = ../../OgreMain/src/OgreMesh.cpp; sourceTree = SOURCE_ROOT; };
 		000E1F3F0B38D5AA004EA2DF /* OgreMeshManager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMeshManager.cpp; path = ../../OgreMain/src/OgreMeshManager.cpp; sourceTree = SOURCE_ROOT; };
 		000E1F400B38D5AA004EA2DF /* OgreMeshSerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMeshSerializer.cpp; path = ../../OgreMain/src/OgreMeshSerializer.cpp; sourceTree = SOURCE_ROOT; };
@@ -1328,6 +1327,7 @@
 		00DDBB8C0B4CDE9100E8E1C9 /* OgreOSXCGLContext.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreOSXCGLContext.h; path = ../../RenderSystems/GL/include/OSX/OgreOSXCGLContext.h; sourceTree = SOURCE_ROOT; };
 		00DDBB980B4CE0E500E8E1C9 /* OgreOSXCGLContext.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreOSXCGLContext.cpp; path = ../../RenderSystems/GL/src/OSX/OgreOSXCGLContext.cpp; sourceTree = SOURCE_ROOT; };
 		00DDBB9C0B4CE1C700E8E1C9 /* OgreOSXContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreOSXContext.cpp; path = ../../RenderSystems/GL/src/OSX/OgreOSXContext.cpp; sourceTree = SOURCE_ROOT; };
+		AA0405750DE0D7B60000EEFF /* OgreMemoryNedAlloc.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMemoryNedAlloc.cpp; path = ../../OgreMain/src/OgreMemoryNedAlloc.cpp; sourceTree = SOURCE_ROOT; };
 		AA06EFE30CEE58080013023A /* OgreScriptCompiler.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreScriptCompiler.cpp; path = ../../OgreMain/src/OgreScriptCompiler.cpp; sourceTree = SOURCE_ROOT; };
 		AA06EFE40CEE58080013023A /* OgreScriptLexer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreScriptLexer.cpp; path = ../../OgreMain/src/OgreScriptLexer.cpp; sourceTree = SOURCE_ROOT; };
 		AA06EFE50CEE58080013023A /* OgreScriptParser.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreScriptParser.cpp; path = ../../OgreMain/src/OgreScriptParser.cpp; sourceTree = SOURCE_ROOT; };
@@ -1342,10 +1342,16 @@
 		AA42976C0DB2B1940099A7F0 /* OgreAtomicWrappers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreAtomicWrappers.h; path = ../../OgreMain/include/OgreAtomicWrappers.h; sourceTree = SOURCE_ROOT; };
 		AA508FB40C972C1B00D6EAD0 /* OgreTangentSpaceCalc.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreTangentSpaceCalc.cpp; path = ../../OgreMain/src/OgreTangentSpaceCalc.cpp; sourceTree = SOURCE_ROOT; };
 		AA508FB60C972C8F00D6EAD0 /* OgreTangentSpaceCalc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreTangentSpaceCalc.h; path = ../../OgreMain/include/OgreTangentSpaceCalc.h; sourceTree = SOURCE_ROOT; };
+		AA7510630DDE20FE009D23BA /* OgreMemoryAllocatedObject.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryAllocatedObject.h; path = ../../OgreMain/include/OgreMemoryAllocatedObject.h; sourceTree = SOURCE_ROOT; };
+		AA7510640DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryAllocatorConfig.h; path = ../../OgreMain/include/OgreMemoryAllocatorConfig.h; sourceTree = SOURCE_ROOT; };
+		AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryStdAlloc.h; path = ../../OgreMain/include/OgreMemoryStdAlloc.h; sourceTree = SOURCE_ROOT; };
+		AA7510660DDE20FE009D23BA /* OgreMemorySTLAllocator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemorySTLAllocator.h; path = ../../OgreMain/include/OgreMemorySTLAllocator.h; sourceTree = SOURCE_ROOT; };
 		AAA8B96E0CC6A4FC001AD86E /* OgreScriptCompiler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptCompiler.h; path = ../../OgreMain/include/OgreScriptCompiler.h; sourceTree = SOURCE_ROOT; };
 		AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptParser.h; path = ../../OgreMain/include/OgreScriptParser.h; sourceTree = SOURCE_ROOT; };
 		AAD22CA40D7D708600928C53 /* OgreScriptTranslator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptTranslator.h; path = ../../OgreMain/include/OgreScriptTranslator.h; sourceTree = SOURCE_ROOT; };
 		AAD22CA60D7D70B400928C53 /* OgreScriptTranslator.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreScriptTranslator.cpp; path = ../../OgreMain/src/OgreScriptTranslator.cpp; sourceTree = SOURCE_ROOT; };
+		AAF4F5320DE4C48C0073D0FD /* OgreMemoryTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreMemoryTracker.h; path = ../../OgreMain/include/OgreMemoryTracker.h; sourceTree = SOURCE_ROOT; };
+		AAF4F5480DE4C73D0073D0FD /* OgreMemoryTracker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMemoryTracker.cpp; path = ../../OgreMain/src/OgreMemoryTracker.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1603,7 +1609,8 @@
 				000E1F3A0B38D5AA004EA2DF /* OgreMath.cpp */,
 				000E1F3B0B38D5AA004EA2DF /* OgreMatrix3.cpp */,
 				000E1F3C0B38D5AA004EA2DF /* OgreMatrix4.cpp */,
-				000E1F3D0B38D5AA004EA2DF /* OgreMemoryManager.cpp */,
+				AA0405750DE0D7B60000EEFF /* OgreMemoryNedAlloc.cpp */,
+				AAF4F5480DE4C73D0073D0FD /* OgreMemoryTracker.cpp */,
 				000E1F3E0B38D5AA004EA2DF /* OgreMesh.cpp */,
 				000E1F3F0B38D5AA004EA2DF /* OgreMeshManager.cpp */,
 				000E1F400B38D5AA004EA2DF /* OgreMeshSerializer.cpp */,
@@ -1804,8 +1811,11 @@
 				000E1D9F0B38D566004EA2DF /* OgreMath.h */,
 				000E1DA00B38D566004EA2DF /* OgreMatrix3.h */,
 				000E1DA10B38D566004EA2DF /* OgreMatrix4.h */,
-				000E1DA20B38D566004EA2DF /* OgreMemoryMacros.h */,
-				000E1DA30B38D566004EA2DF /* OgreMemoryManager.h */,
+				AA7510630DDE20FE009D23BA /* OgreMemoryAllocatedObject.h */,
+				AA7510640DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h */,
+				AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */,
+				AA7510660DDE20FE009D23BA /* OgreMemorySTLAllocator.h */,
+				AAF4F5320DE4C48C0073D0FD /* OgreMemoryTracker.h */,
 				000E1DA40B38D566004EA2DF /* OgreMesh.h */,
 				000E1DA50B38D566004EA2DF /* OgreMeshFileFormat.h */,
 				000E1DA60B38D566004EA2DF /* OgreMeshManager.h */,
@@ -1814,7 +1824,6 @@
 				000E1DA90B38D566004EA2DF /* OgreMovableObject.h */,
 				000E1DAA0B38D566004EA2DF /* OgreMovablePlane.h */,
 				000E1DAB0B38D566004EA2DF /* OgreNode.h */,
-				000E1DAC0B38D566004EA2DF /* OgreNoMemoryMacros.h */,
 				000E1DAD0B38D566004EA2DF /* OgreNumerics.h */,
 				000E1DAE0B38D566004EA2DF /* OgreOptimisedUtil.h */,
 				000E1DAF0B38D566004EA2DF /* OgreOverlay.h */,
@@ -2400,8 +2409,6 @@
 				000E1E6F0B38D566004EA2DF /* OgreMath.h in Headers */,
 				000E1E700B38D566004EA2DF /* OgreMatrix3.h in Headers */,
 				000E1E710B38D566004EA2DF /* OgreMatrix4.h in Headers */,
-				000E1E720B38D566004EA2DF /* OgreMemoryMacros.h in Headers */,
-				000E1E730B38D566004EA2DF /* OgreMemoryManager.h in Headers */,
 				000E1E740B38D566004EA2DF /* OgreMesh.h in Headers */,
 				000E1E750B38D566004EA2DF /* OgreMeshFileFormat.h in Headers */,
 				000E1E760B38D566004EA2DF /* OgreMeshManager.h in Headers */,
@@ -2410,7 +2417,6 @@
 				000E1E790B38D566004EA2DF /* OgreMovableObject.h in Headers */,
 				000E1E7A0B38D566004EA2DF /* OgreMovablePlane.h in Headers */,
 				000E1E7B0B38D566004EA2DF /* OgreNode.h in Headers */,
-				000E1E7C0B38D566004EA2DF /* OgreNoMemoryMacros.h in Headers */,
 				000E1E7D0B38D566004EA2DF /* OgreNumerics.h in Headers */,
 				000E1E7E0B38D566004EA2DF /* OgreOptimisedUtil.h in Headers */,
 				000E1E7F0B38D566004EA2DF /* OgreOverlay.h in Headers */,
@@ -2544,6 +2550,11 @@
 				AA06EFEC0CEE58310013023A /* OgreScriptLoader.h in Headers */,
 				AAD22CA50D7D708600928C53 /* OgreScriptTranslator.h in Headers */,
 				AA42976D0DB2B1940099A7F0 /* OgreAtomicWrappers.h in Headers */,
+				AA7510670DDE20FE009D23BA /* OgreMemoryAllocatedObject.h in Headers */,
+				AA7510680DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h in Headers */,
+				AA7510690DDE20FE009D23BA /* OgreMemoryStdAlloc.h in Headers */,
+				AA75106A0DDE20FE009D23BA /* OgreMemorySTLAllocator.h in Headers */,
+				AAF4F5CB0DE4D6AD0073D0FD /* OgreMemoryTracker.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2800,7 +2811,6 @@
 				000E1FE70B38D5AA004EA2DF /* OgreMath.cpp in Sources */,
 				000E1FE80B38D5AA004EA2DF /* OgreMatrix3.cpp in Sources */,
 				000E1FE90B38D5AA004EA2DF /* OgreMatrix4.cpp in Sources */,
-				000E1FEA0B38D5AA004EA2DF /* OgreMemoryManager.cpp in Sources */,
 				000E1FEB0B38D5AA004EA2DF /* OgreMesh.cpp in Sources */,
 				000E1FEC0B38D5AA004EA2DF /* OgreMeshManager.cpp in Sources */,
 				000E1FED0B38D5AA004EA2DF /* OgreMeshSerializer.cpp in Sources */,
@@ -2908,6 +2918,8 @@
 				AA06EFE70CEE58080013023A /* OgreScriptLexer.cpp in Sources */,
 				AA06EFE80CEE58080013023A /* OgreScriptParser.cpp in Sources */,
 				AAD22CA70D7D70B400928C53 /* OgreScriptTranslator.cpp in Sources */,
+				AA0405760DE0D7B60000EEFF /* OgreMemoryNedAlloc.cpp in Sources */,
+				AAF4F54A0DE4C73D0073D0FD /* OgreMemoryTracker.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3105,6 +3117,8 @@
 					i386,
 				);
 				COPY_PHASE_STRIP = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				SHARED_PRECOMPS_DIR = ../build/PCH;
 			};
@@ -3118,7 +3132,7 @@
 					i386,
 				);
 				COPY_PHASE_STRIP = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = NDEBUG;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				SHARED_PRECOMPS_DIR = ../build/PCH;
 			};

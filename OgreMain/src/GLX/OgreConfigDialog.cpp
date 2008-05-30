@@ -30,7 +30,6 @@ Torus Knot Software Ltd.
 #include "OgreException.h"
 #include "OgreImage.h"
 #include "OgreLogManager.h"
-#include "OgreNoMemoryMacros.h"
 
 #include <cstdlib>
 #include <iostream>

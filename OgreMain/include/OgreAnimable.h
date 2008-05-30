@@ -62,7 +62,7 @@ namespace Ogre {
 		are often comprised of multiple properties it helps to be able to deal
 		with all values through a single class.
 	*/
-	class _OgreExport AnimableValue
+	class _OgreExport AnimableValue : public AnimableAlloc
 	{
 	public:
 		/// The type of the value being animated
@@ -74,7 +74,9 @@ namespace Ogre {
 			VECTOR3,
 			VECTOR4,
 			QUATERNION,
-			COLOUR
+			COLOUR,
+			RADIAN,
+			DEGREE
 		};
 	protected:
 		/// Value type
@@ -112,6 +114,16 @@ namespace Ogre {
 			mBaseValueReal[1] = val.g;
 			mBaseValueReal[2] = val.b;
 			mBaseValueReal[3] = val.a;
+		}
+		/// Internal method to set a value as base
+		virtual void setAsBaseValue(const Radian& val)
+		{ 
+			mBaseValueReal[0] = val.valueRadians();
+		}
+		/// Internal method to set a value as base
+		virtual void setAsBaseValue(const Degree& val)
+		{ 
+			mBaseValueReal[0] = val.valueRadians();
 		}
 
 
@@ -154,6 +166,14 @@ namespace Ogre {
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "", "");
 		}
 		/// Set value 
+		virtual void setValue(const Radian&) {
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "", "");
+		}
+		/// Set value 
+		virtual void setValue(const Degree&) {
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "", "");
+		}
+		/// Set value 
 		virtual void setValue(const Any& val);
 
 		// reset to base value
@@ -185,6 +205,14 @@ namespace Ogre {
 		}
 		/// Apply delta value 
 		virtual void applyDeltaValue(const ColourValue&) {
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "", "");
+		}
+		/// Apply delta value 
+		virtual void applyDeltaValue(const Degree&) {
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "", "");
+		}
+		/// Apply delta value 
+		virtual void applyDeltaValue(const Radian&) {
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "", "");
 		}
 		/// Apply delta value 

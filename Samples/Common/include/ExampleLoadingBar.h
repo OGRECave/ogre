@@ -131,12 +131,12 @@ public:
 		mLoadingDescriptionElement->setCaption("Parsing scripts...");
 		mWindow->update();
 	}
-	void scriptParseStarted(const String& scriptName)
+	void scriptParseStarted(const String& scriptName, bool &skipThisScript)
 	{
 		mLoadingCommentElement->setCaption(scriptName);
 		mWindow->update();
 	}
-	void scriptParseEnded(const String& scriptName)
+	void scriptParseEnded(const String& scriptName, bool skipped)
 	{
 		mLoadingBarElement->setWidth(
 			mLoadingBarElement->getWidth() + mProgressBarInc);

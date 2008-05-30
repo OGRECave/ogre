@@ -36,9 +36,7 @@ Torus Knot Software Ltd.
 #include "OgreImageCodec.h"
 #include "OgreStringConverter.h"
 
-#include "OgreNoMemoryMacros.h"
 #include <d3d9.h>
-#include "OgreMemoryMacros.h"
 #include "OgreRoot.h"
 #include "OgreWindowEventUtilities.h"
 

@@ -1,0 +1,153 @@
+// Postfilter doing full deferred shading
+
+compositor DeferredShading/ShowLit
+{
+	technique
+	{
+		// temporary textures
+		texture mrt_output target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_RGBA		
+		
+		target mrt_output
+        {
+            input none
+        	pass clear
+			{
+			}
+			
+			// everything but the lights and their meshes
+			// could do this with something like a visibility mask too
+			pass render_scene
+			{
+				first_render_queue 22
+				last_render_queue  90	
+			}
+        }
+	
+        target_output
+        {
+			input none
+			
+			// render skies
+			pass render_scene
+			{
+				first_render_queue 5
+				last_render_queue  5			
+			}
+						
+			// just the lights and their meshes
+			pass render_scene
+			{
+				first_render_queue 20
+				last_render_queue 21
+			}
+		}
+	}
+}
+
+// Postfilter that shows the colour channel
+compositor DeferredShading/ShowColour
+{
+	technique 
+	{
+		// temporary textures
+		texture mrt_output target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_RGBA		
+		
+		target mrt_output
+        {
+            input none
+        	pass clear
+			{
+			}
+			
+			pass render_scene
+			{
+				first_render_queue 22
+				last_render_queue  90	
+			}
+        }
+
+		target_output
+        {
+			input none
+			
+			pass render_quad
+			{
+				material DeferredShading/Post/ShowColour
+				input 0 mrt_output 0
+				input 1 mrt_output 1
+			}
+        }
+	}
+}
+
+// Postfilter that shows the normal channel
+compositor DeferredShading/ShowNormals
+{
+	technique 
+	{
+		// temporary textures
+		texture mrt_output target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_RGBA		
+		
+		target mrt_output
+        {
+            input none
+        	pass clear
+			{
+			}
+			
+			pass render_scene
+			{
+				first_render_queue 22
+				last_render_queue  90	
+			}
+        }
+
+		target_output
+        {
+			input none
+			
+			pass render_quad
+			{
+				material DeferredShading/Post/ShowNormal
+				input 0 mrt_output 0
+				input 1 mrt_output 1
+			}
+        }
+	}
+}
+
+// Postfilter that shows the depth and specular channel
+compositor DeferredShading/ShowDepthSpecular
+{
+	technique 
+	{
+		// temporary textures
+		texture mrt_output target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_RGBA		
+		
+		target mrt_output
+        {
+            input none
+        	pass clear
+			{
+			}
+			
+			pass render_scene
+			{
+				first_render_queue 22
+				last_render_queue  90	
+			}
+        }
+
+		target_output
+        {
+			input none
+			
+			pass render_quad
+			{
+				material DeferredShading/Post/ShowDS
+				input 0 mrt_output 0
+				input 1 mrt_output 1
+			}
+        }
+	}
+}

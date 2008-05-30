@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2006 Torus Knot Software Ltd
+Copyright (c) 2000-2008 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 This program is free software; you can redistribute it and/or modify it under
@@ -26,17 +26,11 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
+#include "OgreStableHeaders.h"
 
-//-----------------------------------------------------------------------------
-// If you want to use the real C(++) *alloc/free/new/delete functions, you must
-// include this header before the section that uses them.
-#ifdef OGRE_MEMORY_MACROS
-#undef OGRE_MEMORY_MACROS
-#undef new
-#undef delete
-#undef malloc
-#undef calloc
-#undef realloc
-#undef free
+#if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_NED
+
+// include implementation
+#include <nedmalloc.c>
+
 #endif
-//-----------------------------------------------------------------------------

@@ -45,7 +45,7 @@ namespace Ogre {
 /* Find CPU type
 */
 #if (defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))) || \
-    (defined(__GNUC__) && (defined(__i386__) /*|| defined(__x86_64__)*/))
+    (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
 #   define OGRE_CPU OGRE_CPU_X86
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__BIG_ENDIAN__)

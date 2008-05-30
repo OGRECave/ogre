@@ -154,10 +154,10 @@ namespace Ogre{
 		return true;
 	}
 	//-------------------------------------------------------------------------
-	bool ScriptTranslator::getColour(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, ColourValue *result)
+	bool ScriptTranslator::getColour(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, ColourValue *result, int maxEntries)
 	{
 		int n = 0;
-		while(i != end && n < 4)
+		while(i != end && n < maxEntries)
 		{
 			float v = 0;
 			if(getFloat(*i, &v))
@@ -822,7 +822,7 @@ namespace Ogre{
 								mPass->setAmbient(val);
 							else
 								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-									"ambient support only number arguments or \"vertexcolor\" directive");
+									"ambient support only number arguments or \"vertexcolour\" directive");
 						}
 					}
 					break;
@@ -887,7 +887,7 @@ namespace Ogre{
 								i1 = getNodeAt(prop->values, 1),
 								i2 = getNodeAt(prop->values, 2);
 							ColourValue val(0.0f, 0.0f, 0.0f, 1.0f);
-							if(getReal(*i0, &val.r) && getReal(*i1, &val.g) && getReal(*i2, &val.b))
+							if(getFloat(*i0, &val.r) && getFloat(*i1, &val.g) && getFloat(*i2, &val.b))
 							{
 								if(prop->values.size() == 4)
 								{
@@ -904,7 +904,7 @@ namespace Ogre{
 								else
 								{
 									AbstractNodeList::const_iterator i3 = getNodeAt(prop->values, 3);
-									if(!getReal(*i3, &val.a))
+									if(!getFloat(*i3, &val.a))
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 											"specular fourth argument must be a valid color component value");
 									else
@@ -2742,10 +2742,10 @@ namespace Ogre{
 						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
 							"colour_op_ex must have at least 3 arguments");
 					}
-					else if(prop->values.size() > 6)
+					else if(prop->values.size() > 10)
 					{
 						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-							"colour_op_ex must have at most 6 arguments");
+							"colour_op_ex must have at most 10 arguments");
 					}
 					else
 					{
@@ -2759,7 +2759,7 @@ namespace Ogre{
 								*atom2 = (AtomAbstractNode*)(*i2).get();
 							LayerBlendOperationEx op = LBX_ADD;
 							LayerBlendSource source1 = LBS_CURRENT, source2 = LBS_TEXTURE;
-							ColourValue arg1, arg2;
+							ColourValue arg1 = ColourValue::White, arg2 = ColourValue::White;
 							Real manualBlend = 0.0f;
 
 							switch(atom0->id)
@@ -2881,7 +2881,7 @@ namespace Ogre{
 							{
 								if(j != prop->values.end())
 								{
-									if(!getColour(j, prop->values.end(), &arg1))
+									if(!getColour(j, prop->values.end(), &arg1, 3))
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 											"valid colour expected when src_manual is used");
 								}
@@ -2895,7 +2895,7 @@ namespace Ogre{
 							{
 								if(j != prop->values.end())
 								{
-									if(!getColour(j, prop->values.end(), &arg2))
+									if(!getColour(j, prop->values.end(), &arg2, 3))
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 											"valid colour expected when src_manual is used");
 								}
@@ -3166,7 +3166,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 2)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"scroll must have at most 2 arguments");
 					}
 					else
 					{
@@ -3175,7 +3176,8 @@ namespace Ogre{
 						if(getReal(*i0, &x) && getReal(*i1, &y))
 							mUnit->setTextureScroll(x, y);
 						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								(*i0)->getValue() + " and/or " + (*i1)->getValue() + " is invalid; both must be numbers");
 					}
 					break;
 				case ID_SCROLL_ANIM:
@@ -3185,7 +3187,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 2)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"scroll_anim must have at most 2 arguments");
 					}
 					else
 					{
@@ -3194,7 +3197,8 @@ namespace Ogre{
 						if(getReal(*i0, &x) && getReal(*i1, &y))
 							mUnit->setScrollAnimation(x, y);
 						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								(*i0)->getValue() + " and/or " + (*i1)->getValue() + " is invalid; both must be numbers");
 					}
 					break;
 				case ID_ROTATE:
@@ -3204,7 +3208,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 1)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"rotate must have at most 1 argument");
 					}
 					else
 					{
@@ -3212,7 +3217,8 @@ namespace Ogre{
 						if(getReal(prop->values.front(), &angle))
 							mUnit->setTextureRotate(Degree(angle));
 						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								prop->values.front()->getValue() + " is not a valid number value");
 					}
 					break;
 				case ID_ROTATE_ANIM:
@@ -3222,7 +3228,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 1)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"rotate_anim must have at most 1 argument");
 					}
 					else
 					{
@@ -3230,7 +3237,8 @@ namespace Ogre{
 						if(getReal(prop->values.front(), &angle))
 							mUnit->setRotateAnimation(angle);
 						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								prop->values.front()->getValue() + " is not a valid number value");
 					}
 					break;
 				case ID_SCALE:
@@ -3240,7 +3248,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 2)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"scale must have at most 2 arguments");
 					}
 					else
 					{
@@ -3249,7 +3258,8 @@ namespace Ogre{
 						if(getReal(*i0, &x) && getReal(*i1, &y))
 							mUnit->setTextureScale(x, y);
 						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+							"first and second arguments must both be valid number values (received " + (*i0)->getValue() + ", " + (*i1)->getValue() + ")");
 					}
 					break;
 				case ID_WAVE_XFORM:
@@ -3259,7 +3269,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 6)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"wave_xform must have at most 6 arguments");
 					}
 					else
 					{
@@ -3292,7 +3303,8 @@ namespace Ogre{
 								type = TextureUnitState::TT_ROTATE;
 								break;
 							default:
-								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									atom0->value + " is not a valid transform type (must be \"scroll_x\", \"scroll_y\", \"scale_x\", \"scale_y\", or \"rotate\")");
 							}
 
 							switch(atom1->id)
@@ -3313,11 +3325,13 @@ namespace Ogre{
 								wave = WFT_INVERSE_SAWTOOTH;
 								break;
 							default:
-								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									atom1->value + " is not a valid waveform type (must be \"sine\", \"triangle\", \"square\", \"sawtooth\", or \"inverse_sawtooth\")");
 							}
 
 							if(!getReal(*i2, &base) || !getReal(*i3, &freq) || !getReal(*i4, &phase) || !getReal(*i5, &amp))
-								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									"arguments 3, 4, 5, and 6 must be valid numbers; received " + (*i2)->getValue() + ", " + (*i3)->getValue() + ", " + (*i4)->getValue() + ", " + (*i5)->getValue());
 
 							mUnit->setTransformAnimation(type, wave, base, freq, phase, amp);
 						}
@@ -3343,7 +3357,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 1)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"binding_type must have at most 1 argument");
 					}
 					else
 					{
@@ -3359,12 +3374,14 @@ namespace Ogre{
 								mUnit->setBindingType(TextureUnitState::BT_FRAGMENT);
 								break;
 							default:
-								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									atom->value + " is not a valid binding type (must be \"vertex\" or \"fragment\")");
 							}
 						}
 						else
 						{
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								prop->values.front()->getValue() + " is not a valid binding type");
 						}
 					}
 					break;
@@ -3375,7 +3392,8 @@ namespace Ogre{
 					}
 					else if(prop->values.size() > 1)
 					{
-						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"content_type must have at most 1 argument");
 					}
 					else
 					{
@@ -3391,12 +3409,14 @@ namespace Ogre{
 								mUnit->setContentType(TextureUnitState::CONTENT_SHADOW);
 								break;
 							default:
-								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									atom->value + " is not a valid content type (must be \"named\" or \"shadows\")");
 							}
 						}
 						else
 						{
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								prop->values.front()->getValue() + " is not a valid content type");
 						}
 					}
 					break;
@@ -3971,82 +3991,153 @@ namespace Ogre{
 						String name;
 						size_t index = 0;
 
-						AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
-							i1 = getNodeAt(prop->values, 1), i2 = getNodeAt(prop->values, 2);
-						if((*i0)->type != ANT_ATOM || (*i1)->type != ANT_ATOM)
+						if(prop->values.size() >= 2)
 						{
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-							return;
-						}
-						AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
-						if(!named && !StringConverter::isNumber(atom0->value))
-						{
-							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-							return;
-						}
-
-						if(named)
-							name = atom0->value;
-						else
-							index = StringConverter::parseInt(atom0->value);
-
-						// Look up the auto constant
-						StringUtil::toLowerCase(atom1->value);
-						const GpuProgramParameters::AutoConstantDefinition *def =
-							GpuProgramParameters::getAutoConstantDefinition(atom1->value);
-						if(def)
-						{
-							switch(def->dataType)
+							AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
+								i1 = getNodeAt(prop->values, 1), i2 = getNodeAt(prop->values, 2);
+							if((*i0)->type != ANT_ATOM || (*i1)->type != ANT_ATOM)
 							{
-							case GpuProgramParameters::ACDT_NONE:
-								// Set the auto constant
-								try
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								return;
+							}
+							AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
+							if(!named && !StringConverter::isNumber(atom0->value))
+							{
+								compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+								return;
+							}
+
+							if(named)
+								name = atom0->value;
+							else
+								index = StringConverter::parseInt(atom0->value);
+
+							// Look up the auto constant
+							StringUtil::toLowerCase(atom1->value);
+							const GpuProgramParameters::AutoConstantDefinition *def =
+								GpuProgramParameters::getAutoConstantDefinition(atom1->value);
+							if(def)
+							{
+								switch(def->dataType)
 								{
-									if(named)
-										params->setNamedAutoConstant(name, def->acType);
-									else
-										params->setAutoConstant(index, def->acType);
-								}
-								catch(...)
-								{
-									compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-								}
-								break;
-							case GpuProgramParameters::ACDT_INT:
-								if(def->acType == GpuProgramParameters::ACT_ANIMATION_PARAMETRIC)
-								{
+								case GpuProgramParameters::ACDT_NONE:
+									// Set the auto constant
 									try
 									{
 										if(named)
-											params->setNamedAutoConstant(name, def->acType, animParametricsCount++);
+											params->setNamedAutoConstant(name, def->acType);
 										else
-											params->setAutoConstant(index, def->acType, animParametricsCount++);
+											params->setAutoConstant(index, def->acType);
 									}
 									catch(...)
 									{
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 									}
-								}
-								else
-								{
-									// Only certain texture projection auto params will assume 0
-									// Otherwise we will expect that 3rd parameter
-									if(i2 == prop->values.end())
+									break;
+								case GpuProgramParameters::ACDT_INT:
+									if(def->acType == GpuProgramParameters::ACT_ANIMATION_PARAMETRIC)
 									{
-										if(def->acType == GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX ||
-											def->acType == GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX ||
-											def->acType == GpuProgramParameters::ACT_SPOTLIGHT_VIEWPROJ_MATRIX ||
-											def->acType == GpuProgramParameters::ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX
-											)
+										try
 										{
-											try
+											if(named)
+												params->setNamedAutoConstant(name, def->acType, animParametricsCount++);
+											else
+												params->setAutoConstant(index, def->acType, animParametricsCount++);
+										}
+										catch(...)
+										{
+											compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+										}
+									}
+									else
+									{
+										// Only certain texture projection auto params will assume 0
+										// Otherwise we will expect that 3rd parameter
+										if(i2 == prop->values.end())
+										{
+											if(def->acType == GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX ||
+												def->acType == GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX ||
+												def->acType == GpuProgramParameters::ACT_SPOTLIGHT_VIEWPROJ_MATRIX ||
+												def->acType == GpuProgramParameters::ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX
+												)
 											{
-												if(named)
-													params->setNamedAutoConstant(name, def->acType, 0);
-												else
-													params->setAutoConstant(index, def->acType, 0);
+												try
+												{
+													if(named)
+														params->setNamedAutoConstant(name, def->acType, 0);
+													else
+														params->setAutoConstant(index, def->acType, 0);
+												}
+												catch(...)
+												{
+													compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+												}
 											}
-											catch(...)
+											else
+											{
+												compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+											}
+										}
+										else
+										{
+											uint32 extraInfo = 0;
+											if(getUInt(*i2, &extraInfo))
+											{
+												try
+												{
+													if(named)
+														params->setNamedAutoConstant(name, def->acType, extraInfo);
+													else
+														params->setAutoConstant(index, def->acType, extraInfo);
+												}
+												catch(...)
+												{
+													compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+												}
+											}
+										}
+									}
+									break;
+								case GpuProgramParameters::ACDT_REAL:
+									if(def->acType == GpuProgramParameters::ACT_TIME ||
+										def->acType == GpuProgramParameters::ACT_FRAME_TIME)
+									{
+										Real f = 1.0f;
+										if(i2 != prop->values.end())
+											getReal(*i2, &f);
+										
+										try
+										{
+											if(named)
+												params->setNamedAutoConstantReal(name, def->acType, f);
+											else
+												params->setAutoConstantReal(index, def->acType, f);
+										}
+										catch(...)
+										{
+											compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+										}
+									}
+									else
+									{
+										if(i2 != prop->values.end())
+										{
+											Real extraInfo = 0.0f;
+											if(getReal(*i2, &extraInfo))
+											{
+												try
+												{
+													if(named)
+														params->setNamedAutoConstantReal(name, def->acType, extraInfo);
+													else
+														params->setAutoConstantReal(index, def->acType, extraInfo);
+												}
+												catch(...)
+												{
+													compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+												}
+											}
+											else
 											{
 												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 											}
@@ -4056,76 +4147,12 @@ namespace Ogre{
 											compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
 										}
 									}
-									else
-									{
-										uint32 extraInfo = 0;
-										if(getUInt(*i2, &extraInfo))
-										{
-											try
-											{
-												if(named)
-													params->setNamedAutoConstant(name, def->acType, extraInfo);
-												else
-													params->setAutoConstant(index, def->acType, extraInfo);
-											}
-											catch(...)
-											{
-												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-											}
-										}
-									}
+									break;
 								}
-								break;
-							case GpuProgramParameters::ACDT_REAL:
-								if(def->acType == GpuProgramParameters::ACT_TIME ||
-									def->acType == GpuProgramParameters::ACT_FRAME_TIME)
-								{
-									Real f = 1.0f;
-									if(i2 != prop->values.end())
-										getReal(*i2, &f);
-									
-									try
-									{
-										if(named)
-											params->setNamedAutoConstantReal(name, def->acType, f);
-										else
-											params->setAutoConstantReal(index, def->acType, f);
-									}
-									catch(...)
-									{
-										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-									}
-								}
-								else
-								{
-									if(i2 != prop->values.end())
-									{
-										Real extraInfo = 0.0f;
-										if(getReal(*i2, &extraInfo))
-										{
-											try
-											{
-												if(named)
-													params->setNamedAutoConstantReal(name, def->acType, extraInfo);
-												else
-													params->setAutoConstantReal(index, def->acType, extraInfo);
-											}
-											catch(...)
-											{
-												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-											}
-										}
-										else
-										{
-											compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-										}
-									}
-									else
-									{
-										compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-									}
-								}
-								break;
+							}
+							else
+							{
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 							}
 						}
 						else

@@ -519,6 +519,12 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 				RelativePath="..\src\OgreMemoryManager.cpp">
 			</File>
 			<File
+				RelativePath="..\src\OgreMemoryNedAlloc.cpp">
+			</File>
+			<File
+				RelativePath="..\src\OgreMemoryTracker.cpp">
+			</File>
+			<File
 				RelativePath="..\src\OgreMesh.cpp">
 			</File>
 			<File
@@ -1129,10 +1135,22 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 				RelativePath="..\include\OgreMatrix4.h">
 			</File>
 			<File
-				RelativePath="..\include\OgreMemoryMacros.h">
+				RelativePath="..\include\OgreMemoryAllocatedObject.h">
 			</File>
 			<File
-				RelativePath="..\include\OgreMemoryManager.h">
+				RelativePath="..\include\OgreMemoryAllocatorConfig.h">
+			</File>
+			<File
+				RelativePath="..\include\OgreMemoryNedAlloc.h">
+			</File>
+			<File
+				RelativePath="..\include\OgreMemoryStdAlloc.h">
+			</File>
+			<File
+				RelativePath="..\include\OgreMemorySTLAllocator.h">
+			</File>
+			<File
+				RelativePath="..\include\OgreMemoryTracker.h">
 			</File>
 			<File
 				RelativePath="..\include\OgreMesh.h">
@@ -1157,9 +1175,6 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 			</File>
 			<File
 				RelativePath="..\include\OgreNode.h">
-			</File>
-			<File
-				RelativePath="..\include\OgreNoMemoryMacros.h">
 			</File>
 			<File
 				RelativePath="..\include\OgreNumerics.h">

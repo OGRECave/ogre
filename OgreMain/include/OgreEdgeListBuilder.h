@@ -33,7 +33,6 @@ Torus Knot Software Ltd.
 #include "OgreVector4.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreRenderOperation.h"
-#include "OgreAlignedAllocator.h"
 
 namespace Ogre {
 
@@ -75,8 +74,8 @@ namespace Ogre {
 
         // Array of 4D vector of triangle face normal, which is unit vector orthogonal
         // to the triangles, plus distance from origin.
-        // Use aligned allocator here because we are intended to use in SIMD optimised routines .
-        typedef std::vector<Vector4, AlignedAllocator<Vector4> > TriangleFaceNormalList;
+        // Use aligned policy here because we are intended to use in SIMD optimised routines .
+        typedef std::vector<Vector4, STLAllocator<Vector4, CategorisedAlignAllocPolicy<MEMCATEGORY_GEOMETRY> > > TriangleFaceNormalList;
 
         // Working vector used when calculating the silhouette.
         // Use std::vector<char> instead of std::vector<bool> which might implemented

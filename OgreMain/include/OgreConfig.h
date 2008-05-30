@@ -82,11 +82,22 @@ Torus Knot Software Ltd.
 //#define OGRE_STATIC_LIB
 
 
-/** Set this to 0 if you want to use the standard memory manager in Debug builds
-    Release builds always use the standard memory manager
-*/
-#ifndef OGRE_DEBUG_MEMORY_MANAGER
-#define OGRE_DEBUG_MEMORY_MANAGER 0
+// define the memory allocator configuration to use
+#define OGRE_MEMORY_ALLOCATOR_STD 1
+#define OGRE_MEMORY_ALLOCATOR_NED 2			 // you need to have nedmalloc on your path for this
+#define OGRE_MEMORY_ALLOCATOR_USER 3
+
+#define OGRE_MEMORY_ALLOCATOR OGRE_MEMORY_ALLOCATOR_STD
+
+// enable or disable the memory tracker, recording the memory allocations & tracking leaks
+// default is to enable only in debug builds
+
+#ifndef OGRE_MEMORY_TRACKER_DEBUG_MODE
+#  define OGRE_MEMORY_TRACKER_DEBUG_MODE 1
+#endif
+
+#ifndef OGRE_MEMORY_TRACKER_RELEASE_MODE
+#  define OGRE_MEMORY_TRACKER_RELEASE_MODE 0
 #endif
 /** Define max number of multiple render targets (MRTs) to render to at once.
 */
