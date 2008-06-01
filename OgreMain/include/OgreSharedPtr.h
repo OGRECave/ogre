@@ -41,7 +41,8 @@ namespace Ogre {
 	@par
 		If OGRE_THREAD_SUPPORT is defined to be 1, use of this class is thread-safe.
     */
-    template<class T> class SharedPtr {
+	template<class T> class SharedPtr : public SharedPtrAlloc
+	{
 	protected:
 		T* pRep;
 		unsigned int* pUseCount;

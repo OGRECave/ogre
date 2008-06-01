@@ -46,7 +46,7 @@ namespace Ogre {
             The codec concept is a pretty generic one - you can easily understand
             how it can be used for images, sounds, archives, even compressed data.
     */
-    class _OgreExport Codec
+	class _OgreExport Codec : public CodecAlloc
     {
     protected:
         typedef std::map< String, Codec* > CodecList; 

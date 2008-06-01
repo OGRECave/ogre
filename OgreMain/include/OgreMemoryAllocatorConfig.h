@@ -174,11 +174,17 @@ namespace Ogre
 	typedef AnimationAllocatedObject	AnimationAlloc;
 	typedef GeneralAllocatedObject		AnyAlloc;
 	typedef GeneralAllocatedObject		ArchiveAlloc;
+	typedef GeneralAllocatedObject		CodecAlloc;
+	typedef ResourceAllocatedObject		CompositorAlloc;
+	typedef GeneralAllocatedObject		ConfigAlloc;
 	typedef GeneralAllocatedObject		ControllerAlloc;
 	typedef SceneObjAllocatedObject		FXAlloc;
 	typedef SceneObjAllocatedObject		MovableAlloc;
 	typedef SceneCtlAllocatedObject		NodeAlloc;
+	typedef SceneObjAllocatedObject		OverlayAlloc;
 	typedef SceneCtlAllocatedObject		SceneMgtAlloc;
+	typedef ScriptingAllocatedObject    ScriptTranslatorAlloc;
+	typedef GeneralAllocatedObject		SharedPtrAlloc;
 
 	// Containers (by-value only)
 	// Will  be of the form:

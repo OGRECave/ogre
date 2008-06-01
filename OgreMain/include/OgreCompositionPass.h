@@ -38,7 +38,7 @@ namespace Ogre {
 	/** Object representing one pass or operation in a composition sequence. This provides a 
 		method to conveniently interleave RenderSystem commands between Render Queues.
 	 */
-    class _OgreExport CompositionPass
+	class _OgreExport CompositionPass : public CompositorAlloc
     {
     public:
         CompositionPass(CompositionTargetPass *parent);

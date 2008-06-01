@@ -38,7 +38,7 @@ namespace Ogre {
     
     /** Chain of compositor effects applying to one viewport.
      */
-    class _OgreExport CompositorChain: public RenderTargetListener
+    class _OgreExport CompositorChain: public RenderTargetListener, public CompositorAlloc
     {
     public:
         CompositorChain(Viewport *vp);
