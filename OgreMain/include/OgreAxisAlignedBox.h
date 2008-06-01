@@ -135,7 +135,7 @@ namespace Ogre {
 		~AxisAlignedBox()
 		{
 			if (mpCorners)
-				delete [] mpCorners;
+				OGRE_FREE(mpCorners, MEMCATEGORY_SCENE_CONTROL);
 		}
 
 
@@ -304,7 +304,7 @@ namespace Ogre {
 			//   around face (looking onto the face)
 			// Only for optimization/compatibility.
 			if (!mpCorners)
-				mpCorners = new Vector3[8];
+				mpCorners = OGRE_ALLOC_T(Vector3, 8, MEMCATEGORY_SCENE_CONTROL);
 
 			mpCorners[0] = mMinimum;
 			mpCorners[1].x = mMinimum.x; mpCorners[1].y = mMaximum.y; mpCorners[1].z = mMinimum.z;
