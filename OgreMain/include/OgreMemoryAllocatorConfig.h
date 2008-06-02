@@ -184,7 +184,6 @@ namespace Ogre
 	typedef SceneObjAllocatedObject		OverlayAlloc;
 	typedef SceneCtlAllocatedObject		SceneMgtAlloc;
 	typedef ScriptingAllocatedObject    ScriptTranslatorAlloc;
-	typedef GeneralAllocatedObject		SharedPtrAlloc;
 
 	// Containers (by-value only)
 	// Will  be of the form:
