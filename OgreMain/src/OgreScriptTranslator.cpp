@@ -185,7 +185,8 @@ namespace Ogre{
 			++n;
 			++i;
 		}
-		return true;
+		// return error if we found less than rgb before end, unless constrained
+		return (n >= 3 || n == maxEntries);
 	}
 	//-------------------------------------------------------------------------
 	bool ScriptTranslator::getSceneBlendFactor(const Ogre::AbstractNodePtr &node, Ogre::SceneBlendFactor *sbf)
@@ -822,7 +823,7 @@ namespace Ogre{
 								mPass->setAmbient(val);
 							else
 								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-									"ambient support only number arguments or \"vertexcolour\" directive");
+									"ambient requires 3 or 4 colour arguments, or a \"vertexcolour\" directive");
 						}
 					}
 					break;
@@ -850,7 +851,7 @@ namespace Ogre{
 								mPass->setDiffuse(val);
 							else
 								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-									"ambient support only number arguments or \"vertexcolour\" directive");
+									"diffuse requires 3 or 4 colour arguments, or a \"vertexcolour\" directive");
 						}
 					}
 					break;
@@ -901,7 +902,7 @@ namespace Ogre{
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 											"specular fourth argument must be a valid number for shininess attribute");
 								}
-								else
+								else if(prop->values.size() > 4)
 								{
 									AbstractNodeList::const_iterator i3 = getNodeAt(prop->values, 3);
 									if(!getFloat(*i3, &val.a))
@@ -918,6 +919,10 @@ namespace Ogre{
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 											"specular fourth argument must be a valid number for shininess attribute"); 
 								}
+								else
+									compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+										"specular expects at least 4 arguments"); 
+
 							}
 							else
 							{
@@ -951,7 +956,7 @@ namespace Ogre{
 								mPass->setSelfIllumination(val);
 							else
 								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-									"emissive supports only numbers as arguments or \"vertexcolour\" directive");
+									"emissive requires 3 or 4 colour arguments, or a \"vertexcolour\" directive");
 						}
 					}
 					break;

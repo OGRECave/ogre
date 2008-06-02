@@ -230,10 +230,10 @@ namespace Ogre
 	void ScriptCompilerListener::handleError(ScriptCompiler *compiler, uint32 code, const String &file, int line, const String &msg)
 	{
 		Ogre::String str = "Compiler error: ";
-		str = str + ScriptCompiler::formatErrorCode(code) + " in " + file + " " +
-			Ogre::StringConverter::toString(line);
+		str = str + ScriptCompiler::formatErrorCode(code) + " in " + file + "(" +
+			Ogre::StringConverter::toString(line) + ")";
 		if(!msg.empty())
-			str = str + " " + msg;
+			str = str + ": " + msg;
 		Ogre::LogManager::getSingleton().logMessage(str);
 	}
 
@@ -397,10 +397,10 @@ namespace Ogre
 		else
 		{
 			Ogre::String str = "Compiler error: ";
-			str = str + formatErrorCode(code) + " in " + file + " " +
-				Ogre::StringConverter::toString(line);
+			str = str + formatErrorCode(code) + " in " + file + "(" +
+				Ogre::StringConverter::toString(line) + ")";
 			if(!msg.empty())
-				str = str + " " + msg;
+				str = str + ": " + msg;
 			Ogre::LogManager::getSingleton().logMessage(str);
 		}
 
