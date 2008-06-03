@@ -56,6 +56,9 @@ namespace Ogre
 #if OGRE_MEMORY_TRACKER
 			// this alloc policy doesn't do pools
 			MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
+#else
+			// avoid unused params warning
+			file;line;func;
 #endif
 			return ptr;
 		}
@@ -107,6 +110,9 @@ namespace Ogre
 #if OGRE_MEMORY_TRACKER
 			// this alloc policy doesn't do pools
 			MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
+#else
+			// avoid unused params warning
+			file;line;func;
 #endif
 			return ptr;
 		}
