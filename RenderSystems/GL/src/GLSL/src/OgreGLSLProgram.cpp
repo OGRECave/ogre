@@ -143,10 +143,13 @@ namespace Ogre {
 			free (out);
 
 		// Add preprocessor extras and main source
-		const char *source = mSource.c_str();
-		glShaderSourceARB(mGLHandle, 1, &source, NULL);
-		// check for load errors
-		checkForGLSLError( "GLSLProgram::loadFromSource", "Cannot load GLSL high-level shader source : " + mName, 0 );
+		if (!mSource.empty())
+		{
+			const char *source = mSource.c_str();
+			glShaderSourceARB(mGLHandle, 1, &source, NULL);
+			// check for load errors
+			checkForGLSLError( "GLSLProgram::loadFromSource", "Cannot load GLSL high-level shader source : " + mName, 0 );
+		}
 
 		compile();
 	}
