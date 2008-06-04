@@ -250,9 +250,45 @@ else:
 				layout = VerticalLayout(frame)
 				cbox = Box(layout, L("OgreXMLConverter"), 0 , 10)
 				cbLayout = VerticalLayout(cbox)
+				locationLayout = VerticalLayout(cbLayout, True)
+				Spacer(cbLayout, Size([0, 20]))
+				optionLayout = VerticalLayout(cbLayout, True)
 				# converter location
-				self.locationView = PreferencesScreen.ConverterLocationView(cbLayout, self.converter)
+				self.locationView = PreferencesScreen.ConverterLocationView(locationLayout, self.converter)
 				# additional arguments
+				self.nuextremityPoints = BoundedValueModel(0, 65536, OgreXMLConverter.getSingleton().getNuExtremityPoints())
+				self.generateEdgeLists = ToggleModel(OgreXMLConverter.getSingleton().getGenerateEdgeLists())
+				self.generateTangents = ToggleModel(OgreXMLConverter.getSingleton().getGenerateTangents())
+				self.tangentSemantic = ValueModel(OgreXMLConverter.getSingleton().getTangentSemantic())
+				self.tangentUseParity = ValueModel(OgreXMLConverter.getSingleton().getTangentUseParity())
+				self.tangentSplitMirrored = ToggleModel(OgreXMLConverter.getSingleton().getTangentSplitMirrored())
+				self.tangentSplitRotated = ToggleModel(OgreXMLConverter.getSingleton().getTangentSplitRotated())
+				self.reorganiseBuffers = ToggleModel(OgreXMLConverter.getSingleton().getReorganiseBuffers())
+				self.optimiseAnimations = ToggleModel(OgreXMLConverter.getSingleton().getOptimiseAnimations())
+				LabelView(optionLayout, L("Export options:"))
+				arg1Layout = HorizontalLayout(optionLayout)
+				NumberView(arg1Layout, Size([Size.INFINITY, 20], [100, 20]), self.nuextremityPoints, T("Extremity Points: "))
+				ToggleView(arg1Layout, Size([Size.INFINITY, 20], [100, 20]), self.generateEdgeLists, T("Edge Lists"))
+				ToggleView(arg1Layout, Size([Size.INFINITY, 20], [101, 20]), self.generateTangents, T("Tangent"))
+				arg2Layout = HorizontalLayout(optionLayout)
+				tangentSemanticMenu = Menu(arg2Layout, Size([Size.INFINITY, 20], [75, 20]), T("Selects the tangent semantic destination"))
+				tangentSemanticMenu.appendItem(MenuTitle("Tangent semantic"))
+				tangentSemanticMenu.appendItem(MenuItem("tangent", PreferencesScreen.OptionMenuSelectAction(self.tangentSemantic, 'tangent')), \
+					self.tangentSemantic.getValue() == 'tangent')
+				tangentSemanticMenu.appendItem(MenuItem("uvw", PreferencesScreen.OptionMenuSelectAction(self.tangentSemantic, 'uvw')), \
+					self.tangentSemantic.getValue() != 'tangent')
+				tangentParityMenu = Menu(arg2Layout, Size([Size.INFINITY, 20], [75, 20]), T("Selects the tangent size"))
+				tangentParityMenu.appendItem(MenuTitle("Tangent size"))
+				tangentParityMenu.appendItem(MenuItem("3 component", PreferencesScreen.OptionMenuSelectAction(self.tangentUseParity, '3')), \
+					self.tangentUseParity.getValue() == '3')
+				tangentParityMenu.appendItem(MenuItem("4 component (parity)", PreferencesScreen.OptionMenuSelectAction(self.tangentUseParity, '4')), \
+					self.tangentUseParity.getValue() != '3')
+				ToggleView(arg2Layout, Size([Size.INFINITY, 20], [75, 20]), self.tangentSplitMirrored, T("Split Mirrored"))
+				ToggleView(arg2Layout, Size([Size.INFINITY, 20], [75, 20]), self.tangentSplitRotated, T("Split Rotated"))
+				arg3Layout = HorizontalLayout(optionLayout)
+				ToggleView(arg3Layout, Size([Size.INFINITY, 20], [150, 20]), self.reorganiseBuffers, T("Reorganise vertex buffers"))
+				ToggleView(arg3Layout, Size([Size.INFINITY, 20], [150, 20]), self.optimiseAnimations, T("Optimise animations"))
+
 				Spacer(cbLayout, Size([0, 20]))
 				LabelView(cbLayout, L("Additional arguments:"))
 				StringView(cbLayout, Size([Size.INFINITY, 20], [200, 20]), self.converterArgs, T("Arguments: "), \
@@ -279,11 +315,28 @@ else:
 				"""Apply settings.
 				"""
 				OgreXMLConverter.getSingleton().setConverter(self.converter.getValue())
+				OgreXMLConverter.getSingleton().setNuExtremityPoints(self.nuextremityPoints.getValue())
+				OgreXMLConverter.getSingleton().setGenerateEdgeLists(self.generateEdgeLists.getValue())
+				OgreXMLConverter.getSingleton().setGenerateTangents(self.generateTangents.getValue())
+				OgreXMLConverter.getSingleton().setTangentSemantic(self.tangentSemantic.getValue())
+				OgreXMLConverter.getSingleton().setTangentUseParity(self.tangentUseParity.getValue())
+				OgreXMLConverter.getSingleton().setTangentSplitMirrored(self.tangentSplitMirrored.getValue())
+				OgreXMLConverter.getSingleton().setTangentSplitRotated(self.tangentSplitRotated.getValue())
+				OgreXMLConverter.getSingleton().setReorganiseBuffers(self.reorganiseBuffers.getValue())
+				OgreXMLConverter.getSingleton().setOptimiseAnimations(self.optimiseAnimations.getValue())
 				OgreXMLConverter.getSingleton().setAdditionalArguments(self.converterArgs.getValue())
 				return
 			def discardSettings(self):
 				self.locationView.discardSettings()
 				return
+			class OptionMenuSelectAction(Action):
+				def __init__(self, valueModel, value):
+					self.valueModel = valueModel
+					self.value = value
+					return
+				def execute(self):
+					self.valueModel.setValue(self.value)
+					return
 			class ConverterLocationView(View):
 				def __init__(self, layout, converterModel):
 					self.converter = converterModel
@@ -298,7 +351,7 @@ else:
 					cthLayout = HorizontalLayout(layout)
 					ToggleView(cthLayout, Size([Size.INFINITY, 20], [100, 20]), self.cAutoToggle, T("Auto"), \
 						T("Use OgreXMLConverter in Path."))
-					ToggleView(cthLayout, Size([Size.INFINITY, 20], [100, 20]), self.cManualToggle, T("Manual"), \
+					ToggleView(cthLayout, Size([Size.INFINITY, 20], [101, 20]), self.cManualToggle, T("Manual"), \
 						T("Specifiy OgreXMLConverter location manually."))
 					# save choosen path temporarily,
 					# so clicking on Auto and back on Manual does not clear it
@@ -580,7 +633,7 @@ else:
 		
 		class AnimationProxyView(HorizontalLayout, View):
 			def __init__(self, parent, model, deleteAction):
-				HorizontalLayout.__init__(self, parent)
+				HorizontalLayout.__init__(self, parent, True)
 				View.__init__(self, model)
 				NumberView(self, Size([100, 20]), self.model.startFrameModel, T("Start: "), T("Start frame"))
 				NumberView(self, Size([100, 20]), self.model.endFrameModel, T("End: "), T("End frame"))
@@ -669,7 +722,7 @@ else:
 		
 		class ArmatureAnimationProxyView(HorizontalLayout, View):
 			def __init__(self, parent, model, deleteAction):
-				HorizontalLayout.__init__(self, parent)
+				HorizontalLayout.__init__(self, parent, True)
 				View.__init__(self, model)
 				# action menu
 				self.menu = Menu(self, Size([100, 20]), T("Blender Action"))
@@ -1036,7 +1089,7 @@ else:
 							# add animiation
 							action = self.actionManager.getAction(animation[0])
 							if action:
-						 		self.addProxy(ArmatureAnimationProxy(self, action, animation[1], animation[2], animation[3]))					 
+						 		self.addProxy(ArmatureAnimationProxy(self, action, animation[1], animation[2], animation[3]))
 				self._notify()
 				return
 			def savePackageSettings(self):
@@ -1284,7 +1337,7 @@ else:
 			def __init__(self, parent, model):
 				VerticalLayout.__init__(self, parent)
 				View.__init__(self, model)
-				hLayout = HorizontalLayout(self)
+				hLayout = HorizontalLayout(self, True)
 				LabelView(hLayout, L("Selected: "))
 				self.menu = Menu(hLayout, Size([Size.INFINITY, 20], [150, 20]), T("Objects selected for export."))
 				Button(hLayout, Size([70, 20]), SelectedObjectManagerView.UpdateAction(self.model), T("Update"), \
@@ -1372,11 +1425,11 @@ else:
 					self.toggleList = [None, None, None] # models
 					self.toggleList[0] = ToggleModel(False)
 					self.toggleList[1] = ToggleModel(False)
-					self.toggleList[2] = ToggleModel(False)				
+					self.toggleList[2] = ToggleModel(False)
 					# self.model = ToggleGroup()
 					View.__init__(self, ToggleGroup())	
 					vLayout = VerticalLayout(self)
-					hLayout = HorizontalLayout(vLayout)
+					hLayout = HorizontalLayout(vLayout, True)
 					self.alternativesList = [None, None, None]
 					self.alternativesList[0] = AlternativesLayout(hLayout)
 					self.alternativesList[1] = AlternativesLayout(hLayout)
@@ -1591,7 +1644,7 @@ else:
 				## material settings
 				Spacer(vLayout, Size([0, 10]))
 				mbox = Box(vLayout, L("Material Settings"), 0 , 10)
-				mvLayout = VerticalLayout(mbox)
+				mvLayout = VerticalLayout(mbox, True)
 				mvhLayout1 = HorizontalLayout(mvLayout)
 				ToggleView(mvhLayout1, Size([150, 20]), self.exportMaterial, \
 					T("Export Materials"), \
@@ -1602,27 +1655,29 @@ else:
 				ToggleView(mvhLayout2, Size([Size.INFINITY, 20], [150, 20]), self.colouredAmbient, \
 					T("Coloured Ambient"), \
 					T("Use Amb factor times diffuse colour as ambient instead of Amb factor times white."))
-				ToggleView(mvhLayout2, Size([Size.INFINITY, 20], [150, 20]), self.gameEngineMaterials, \
+				ToggleView(mvhLayout2, Size([Size.INFINITY, 20], [151, 20]), self.gameEngineMaterials, \
 					T("Game Engine Materials"), \
 					T("Export game engine materials instead of rendering materials."))
-				ToggleView(mvLayout, Size([Size.INFINITY, 20], [200, 20]), self.copyTextures, \
+				ToggleView(mvLayout, Size([Size.INFINITY, 20], [300, 20]), self.copyTextures, \
 					T("Copy Textures"), \
 					T("Copy texture files into export path."))
 				## global settings
 				Spacer(vLayout, Size([0, 10]))
-				ToggleView(vLayout, Size([Size.INFINITY, 20], [150, 20]), self.fixUpAxis, T("Fix Up Axis to Y"), \
+				globalSettingLayout = VerticalLayout(vLayout, True)
+				globalSettingLayout1 = HorizontalLayout(globalSettingLayout)
+				ToggleView(globalSettingLayout1, Size([Size.INFINITY, 20], [150, 20]), self.fixUpAxis, T("Fix Up Axis to Y"), \
 					T("Fix up axis as Y instead of Z."))
-				ToggleView(vLayout, Size([Size.INFINITY, 20], [150, 20]), self.convertXML, T("OgreXMLConverter"), \
+				ToggleView(globalSettingLayout1, Size([Size.INFINITY, 20], [151, 20]), self.convertXML, T("OgreXMLConverter"), \
 					T("Run OgreXMLConverter on the exported XML files."))
 				# path panel
-				phLayout = HorizontalLayout(vLayout)
+				phLayout = HorizontalLayout(globalSettingLayout)
 				StringView(phLayout, Size([Size.INFINITY, 20], [200, 20]), self.exportPath, T("Path: "), \
 					T("The directory where the exported files are saved."))
 				Button(phLayout, Size([70, 20]), MeshExporterApplication.SelectAction(self), T("Select"), \
 					T("Select the export directory."))				
 				## buttons
 				Spacer(vLayout, Size([0, 10]))
-				bhLayout = HorizontalLayout(vLayout)
+				bhLayout = HorizontalLayout(vLayout, True)
 				bSize = Size([Size.INFINITY, 30], [Blender.Draw.GetStringWidth('Preferences')+10, 30])
 				Button(bhLayout, bSize, MeshExporterApplication.ExportAction(self), T("Export"), \
 					T("Export selected mesh objects."))

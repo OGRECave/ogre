@@ -1419,6 +1419,12 @@ class DirectionalLayout(Widget):
 class HorizontalLayout(DirectionalLayout):
 	"""Widget that manages horizontally stacked child widgets.
 	"""
+	def __init__(self, parent, aligned = False):
+		"""Constructor.
+		"""
+		DirectionalLayout.__init__(self, parent)
+		self.aligned = aligned
+		return
 	def draw(self, screenRectangle):
 		# split height for the child widgets
 		minimumSize = self.size.getMinimumSize()
@@ -1435,12 +1441,14 @@ class HorizontalLayout(DirectionalLayout):
 		# draw widgets with minimum or minimum plus extra size
 		x = screenRectangle[0]
 		dx = 0
+		if (self.aligned): Blender.Draw.BeginAlign()
 		for widget in self.widgetList:
 			dx = widget.getSize().getMinimumSize()[0]
 			if (widget in stretchWidgetList):
 				dx += extraWidth
 			widget.draw([x, screenRectangle[1], x+dx, screenRectangle[3]])
 			x += dx
+		if (self.aligned): Blender.Draw.EndAlign()
 		return
 	def _addWidgetSize(self, widget):
 		"""Adds size of a widget but does not notify parent.
@@ -1473,6 +1481,12 @@ class HorizontalLayout(DirectionalLayout):
 class VerticalLayout(DirectionalLayout):
 	"""Widget that manages vertically stacked child widgets.
 	"""
+	def __init__(self, parent, aligned = False):
+		"""Constructor.
+		"""
+		DirectionalLayout.__init__(self, parent)
+		self.aligned = aligned
+		return
 	def draw(self, screenRectangle):
 		# split height for the child widgets
 		minimumSize = self.getSize().getMinimumSize()
@@ -1489,12 +1503,14 @@ class VerticalLayout(DirectionalLayout):
 		# draw widgets with minimum or minimum plus extra size
 		y = screenRectangle[3]
 		dy = 0
+		if (self.aligned): Blender.Draw.BeginAlign()
 		for widget in self.widgetList:
 			dy = widget.getSize().getMinimumSize()[1]
 			if (widget in stretchWidgetList):
 				dy += extraHeight
 			widget.draw([screenRectangle[0], y-dy, screenRectangle[2], y])
 			y -= dy
+		if (self.aligned): Blender.Draw.EndAlign()
 		return
 	def _addWidgetSize(self, widget):
 		"""Adds size of a widget but does not notify parent.
