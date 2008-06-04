@@ -70,7 +70,7 @@ namespace Ogre
 
         virtual ~Any()
         {
-            delete mContent;
+            OGRE_DELETE mContent;
         }
 
     public: // modifiers
@@ -224,7 +224,7 @@ namespace Ogre
 		AnyNumeric(const ValueType & value)
 			
 		{
-			mContent = new numholder<ValueType>(value);
+			mContent = OGRE_NEW numholder<ValueType>(value);
 		}
 
 		AnyNumeric(const AnyNumeric & other)

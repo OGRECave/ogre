@@ -174,11 +174,16 @@ namespace Ogre
 	typedef AnimationAllocatedObject	AnimationAlloc;
 	typedef GeneralAllocatedObject		AnyAlloc;
 	typedef GeneralAllocatedObject		ArchiveAlloc;
+	typedef GeneralAllocatedObject		CodecAlloc;
+	typedef ResourceAllocatedObject		CompositorAlloc;
+	typedef GeneralAllocatedObject		ConfigAlloc;
 	typedef GeneralAllocatedObject		ControllerAlloc;
 	typedef SceneObjAllocatedObject		FXAlloc;
 	typedef SceneObjAllocatedObject		MovableAlloc;
 	typedef SceneCtlAllocatedObject		NodeAlloc;
+	typedef SceneObjAllocatedObject		OverlayAlloc;
 	typedef SceneCtlAllocatedObject		SceneMgtAlloc;
+	typedef ScriptingAllocatedObject    ScriptTranslatorAlloc;
 
 	// Containers (by-value only)
 	// Will  be of the form:
@@ -196,7 +201,7 @@ namespace Ogre
 /// Allocate a block of raw memory, and indicate the category of usage
 #	define OGRE_MALLOC(bytes, category) ::Ogre::CategorisedAllocPolicy<category>::allocateBytes(bytes, __FILE__, __LINE__, __FUNCTION__)
 /// Allocate a block of memory for 'count' primitive types - do not use for classes that inherit from AllocatedObject
-#	define OGRE_ALLOC_T(T, count, category) ::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)
+#	define OGRE_ALLOC_T(T, count, category) static_cast<T*>(::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__))
 /// Free the memory allocated with either OGRE_MALLOC or OGRE_ALLOC_T. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_FREE(ptr, category) ::Ogre::CategorisedAllocPolicy<category>::deallocateBytes(ptr)
 
@@ -204,17 +209,19 @@ namespace Ogre
 /// Allocate a block of raw memory aligned to SIMD boundaries, and indicate the category of usage
 #	define OGRE_MALLOC_SIMD(bytes, category) ::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(bytes, __FILE__, __LINE__, __FUNCTION__)
 /// Allocate a block of memory for 'count' primitive types aligned to SIMD boundaries - do not use for classes that inherit from AllocatedObject
-#	define OGRE_ALLOC_T_SIMD(T, count, category) ::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)
+#	define OGRE_ALLOC_T_SIMD(T, count, category) static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__))
 /// Free the memory allocated with either OGRE_MALLOC_SIMD or OGRE_ALLOC_T_SIMD. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_FREE_SIMD(ptr, category) ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
 /// Allocate a block of raw memory aligned to user defined boundaries, and indicate the category of usage
 #	define OGRE_MALLOC_ALIGN(bytes, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(bytes, __FILE__, __LINE__, __FUNCTION__)
 /// Allocate a block of memory for 'count' primitive types aligned to user defined boundaries - do not use for classes that inherit from AllocatedObject
-#	define OGRE_ALLOC_T_ALIGN(T, count, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)
+#	define OGRE_ALLOC_T_ALIGN(T, count, category, align) static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__))
 /// Free the memory allocated with either OGRE_MALLOC_ALIGN or OGRE_ALLOC_T_ALIGN. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_FREE_ALIGN(ptr, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr)
 
 // new / delete (alignment determined by per-class policy)
+// Also hooks up the file/line/function params
+// Can only be used with classes that derive from AllocatedObject since customised new/delete needed
 #	define OGRE_NEW new (__FILE__, __LINE__, __FUNCTION__)
 #	define OGRE_DELETE delete
 
@@ -223,7 +230,7 @@ namespace Ogre
 /// Allocate a block of raw memory, and indicate the category of usage
 #	define OGRE_MALLOC(bytes, category) ::Ogre::CategorisedAllocPolicy<category>::allocateBytes(bytes)
 /// Allocate a block of memory for 'count' primitive types - do not use for classes that inherit from AllocatedObject
-#	define OGRE_ALLOC_T(T, count, category) ::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count)
+#	define OGRE_ALLOC_T(T, count, category) static_cast<T*>(::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count))
 /// Free the memory allocated with either OGRE_MALLOC or OGRE_ALLOC_T. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_FREE(ptr, category) ::Ogre::CategorisedAllocPolicy<category>::deallocateBytes(ptr)
 
@@ -231,13 +238,13 @@ namespace Ogre
 /// Allocate a block of raw memory aligned to SIMD boundaries, and indicate the category of usage
 #	define OGRE_MALLOC_SIMD(bytes, category) ::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(bytes)
 /// Allocate a block of memory for 'count' primitive types aligned to SIMD boundaries - do not use for classes that inherit from AllocatedObject
-#	define OGRE_ALLOC_T_SIMD(T, count, category) ::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count)
+#	define OGRE_ALLOC_T_SIMD(T, count, category) static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count))
 /// Free the memory allocated with either OGRE_MALLOC_SIMD or OGRE_ALLOC_T_SIMD. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_FREE_SIMD(ptr, category) ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
 /// Allocate a block of raw memory aligned to user defined boundaries, and indicate the category of usage
 #	define OGRE_MALLOC_ALIGN(bytes, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(bytes)
 /// Allocate a block of memory for 'count' primitive types aligned to user defined boundaries - do not use for classes that inherit from AllocatedObject
-#	define OGRE_ALLOC_T_ALIGN(T, count, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count)
+#	define OGRE_ALLOC_T_ALIGN(T, count, category, align) static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count))
 /// Free the memory allocated with either OGRE_MALLOC_ALIGN or OGRE_ALLOC_T_ALIGN. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_FREE_ALIGN(ptr, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr)
 

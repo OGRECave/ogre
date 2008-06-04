@@ -39,7 +39,7 @@ namespace Ogre{
 	 *  which perform the actual translation.
 	 */
 
-	class _OgreExport ScriptTranslator
+	class _OgreExport ScriptTranslator : public ScriptTranslatorAlloc
 	{
 	public:
 		/**

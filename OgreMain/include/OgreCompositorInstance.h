@@ -39,7 +39,7 @@ namespace Ogre {
     /** An instance of a Compositor object for one Viewport. It is part of the CompositorChain
 		for a Viewport.
      */
-    class _OgreExport CompositorInstance
+	class _OgreExport CompositorInstance : public CompositorAlloc
     {
     public:
         CompositorInstance(Compositor *filter, CompositionTechnique *technique, CompositorChain *chain);

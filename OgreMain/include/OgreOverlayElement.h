@@ -101,7 +101,7 @@ namespace Ogre {
     Because this class is designed to be extensible, it subclasses from StringInterface
     so its parameters can be set in a generic way.
     */
-    class _OgreExport OverlayElement : public StringInterface, public Renderable
+    class _OgreExport OverlayElement : public StringInterface, public Renderable, public OverlayAlloc
     {
     public:
 

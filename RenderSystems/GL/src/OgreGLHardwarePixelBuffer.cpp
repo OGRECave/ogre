@@ -381,7 +381,19 @@ void GLTextureBuffer::upload(const PixelBox &data)
 	else if(mSoftwareMipmap)
 	{
 		GLint internalFormat;
-		glGetTexLevelParameteriv(mTarget, mLevel, GL_TEXTURE_INTERNAL_FORMAT, &internalFormat);
+		glGetTexLevelParameteriv(mFaceTarget, mLevel, GL_TEXTURE_INTERNAL_FORMAT, &internalFormat);
+		GLenum glErr = glGetError();
+		if (glErr != GL_NO_ERROR)
+		{
+			const char* glerrStr = (const char*)gluErrorString(glErr);
+			if (glerrStr)
+			{
+				throw Exception(Exception::ERR_RENDERINGAPI_ERROR, 
+					String("Error getting texture format: ") + glerrStr, 
+					"GLTextureBuffer::upload");
+			}
+
+		}		
 		if(data.getWidth() != data.rowPitch)
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch);
 		if(data.getHeight()*data.getWidth() != data.slicePitch)

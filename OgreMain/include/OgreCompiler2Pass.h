@@ -148,7 +148,7 @@ namespace Ogre {
              representation but based on the context of no other rules matching and <Special_Label> parsing, 'external_command' is
              considered parsed.
     */
-    class _OgreExport Compiler2Pass
+class _OgreExport Compiler2Pass : public ScriptTranslatorAlloc
     {
 
     protected:

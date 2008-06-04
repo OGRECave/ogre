@@ -264,6 +264,53 @@ class OgreXMLConverter(Singleton):
 		if registryDict:
 			if registryDict.has_key('OgreXMLConverter'):
 				self.converter = registryDict['OgreXMLConverter']
+		# basic converter arguements
+		nuextremityPoints = PackageSettings.getSingleton().getSetting('OgreXMLConverterNuExtremityPoints')
+		if nuextremityPoints:
+			self.nuextremityPoints = nuextremityPoints
+		else:
+			self.nuextremityPoints = 0
+		generateEdgeLists = PackageSettings.getSingleton().getSetting('OgreXMLConverterGenerateEdgeLists')
+		if generateEdgeLists:
+			self.generateEdgeLists = generateEdgeLists
+		else:
+			self.generateEdgeLists = True
+		generateTangents = PackageSettings.getSingleton().getSetting('OgreXMLConverterGenerateTangents')
+		if generateTangents:
+			self.generateTangents = generateTangents
+		else:
+			self.generateTangents = False
+		tangentSemantic = PackageSettings.getSingleton().getSetting('OgreXMLConverterTangentSemantic')
+		if tangentSemantic:
+			self.tangentSemantic = tangentSemantic
+		else:
+			self.tangentSemantic = 'tangent'
+		tangentUseParity = PackageSettings.getSingleton().getSetting('OgreXMLConverterTangentUseParity')
+		if tangentUseParity:
+			self.tangentUseParity = tangentUseParity
+		else:
+			self.tangentUseParity = '3'
+		tangentSplitMirrored = PackageSettings.getSingleton().getSetting('OgreXMLConverterTangentSplitMirrored')
+		if tangentSplitMirrored:
+			self.tangentSplitMirrored = tangentSplitMirrored
+		else:
+			self.tangentSplitMirrored = False
+		tangentSplitRotated = PackageSettings.getSingleton().getSetting('OgreXMLConverterTangentSplitRotated')
+		if tangentSplitRotated:
+			self.tangentSplitRotated = tangentSplitRotated
+		else:
+			self.tangentSplitRotated = False
+		reorganiseBuffers = PackageSettings.getSingleton().getSetting('OgreXMLConverterReorganiseBuffers')
+		if reorganiseBuffers:
+			self.reorganiseBuffers = reorganiseBuffers
+		else:
+			self.reorganiseBuffers = True
+		optimiseAnimations = PackageSettings.getSingleton().getSetting('OgreXMLConverterOptimiseAnimations')
+		if optimiseAnimations:
+			self.optimiseAnimations = optimiseAnimations
+		else:
+			self.optimiseAnimations = True
+
 		# additional converter arguments
 		converterArgs = PackageSettings.getSingleton().getSetting('OgreXMLConverterArgs')
 		if converterArgs:
@@ -271,6 +318,61 @@ class OgreXMLConverter(Singleton):
 		else:
 			self.converterArgs = ''
 		return
+	def setNuExtremityPoints(self, nuextremityPoints):
+		self.nuextremityPoints = nuextremityPoints
+		PackageSettings.getSingleton().setSetting('OgreXMLConverterNuExtremityPoints', self.nuextremityPoints)
+		return
+	def getNuExtremityPoints(self):
+		return self.nuextremityPoints
+	def setGenerateEdgeLists(self, generateEdgeLists):
+		self.generateEdgeLists = generateEdgeLists
+		PackageSettings.getSingleton().setSetting('OgreXMLConverterGenerateEdgeLists', self.generateEdgeLists)
+		return
+	def getGenerateEdgeLists(self):
+		return self.generateEdgeLists
+	def setGenerateTangents(self, generateTangents):
+		self.generateTangents = generateTangents
+		PackageSettings.getSingleton().setSetting('OgreXMLConverterGenerateTangents', self.generateTangents)
+		return
+	def getGenerateTangents(self):
+		return self.generateTangents
+	def setTangentSemantic(self, tangentSemantic):
+		self.tangentSemantic = tangentSemantic
+		PackageSettings.getSingleton().setSetting('OgreXMLConverterTangentSemantic', self.tangentSemantic)
+		return
+	def getTangentSemantic(self):
+		return self.tangentSemantic
+	def setTangentUseParity(self, tangentUseParity):
+		self.tangentUseParity = tangentUseParity
+		PackageSettings.getSingleton().setSetting('OgreXMLConverterTangentUseParity', self.tangentUseParity)
+		return
+	def getTangentUseParity(self):
+		return self.tangentUseParity
+	def setTangentSplitMirrored(self, tangentSplitMirrored):
+		self.tangentSplitMirrored = tangentSplitMirrored
+		PackageSettings.getSingleton().setSetting('OgreXMLConverterTangentSplitMirrored', self.tangentSplitMirrored)
+		return
+	def getTangentSplitMirrored(self):
+		return self.tangentSplitMirrored
+	def setTangentSplitRotated(self, tangentSplitRotated):
+		self.tangentSplitRotated = tangentSplitRotated
+		PackageSettings.getSingleton().setSetting('OgreXMLConverterTangentSplitRotated', self.tangentSplitRotated)
+		return
+	def getTangentSplitRotated(self):
+		return self.tangentSplitRotated
+	def setReorganiseBuffers(self, reorganiseBuffers):
+		self.reorganiseBuffers = reorganiseBuffers
+		PackageSettings.getSingleton().setSetting('OgreXMLConverterReorganiseBuffers', self.reorganiseBuffers)
+		return
+	def getReorganiseBuffers(self):
+		return self.reorganiseBuffers
+	def setOptimiseAnimations(self, optimiseAnimations):
+		self.optimiseAnimations = optimiseAnimations
+		PackageSettings.getSingleton().setSetting('OgreXMLConverterOptimiseAnimations', self.optimiseAnimations)
+		return
+	def getOptimiseAnimations(self):
+		return self.optimiseAnimations
+
 	def setAdditionalArguments(self, arguments):
 		self.converterArgs = arguments
 		PackageSettings.getSingleton().setSetting('OgreXMLConverterArgs', self.converterArgs)
@@ -341,10 +443,30 @@ class OgreXMLConverter(Singleton):
 			# Does only work for full path!
 			# Testcase: Preferences->Manual->"OgreXMLConverter"
 			if True:
+				# build basic arguments
+				basicArguments = ''
+				if self.nuextremityPoints > 0:
+					basicArguments += ' -x ' + self.nuextremityPoints
+				if not self.generateEdgeLists:
+					basicArguments += ' -e'
+				if self.generateTangents:
+					basicArguments += ' -t'
+				if self.tangentSemantic == 'uvw':
+					basicArguments += ' -td uvw'
+				if self.tangentUseParity == '4':
+					basicArguments += ' -ts 4'
+				if self.tangentSplitMirrored:
+					basicArguments += ' -tm'
+				if self.tangentSplitRotated:
+					basicArguments += ' -tr'
+				if not self.reorganiseBuffers:
+					basicArguments += ' -r'
+				if not self.optimiseAnimations:
+					basicArguments += ' -o'
 				# call the converter
 				commandLine = '"' + encodedConverter + '" -log "' \
 					 + os.path.join(encodedDir, 'OgreXMLConverter.log') \
-					 + '" ' + self.converterArgs + ' ' + arguments \
+					 + '" ' + self.converterArgs + basicArguments + ' ' + arguments \
 					 + ' "' + encodedFilename + '"'
 				if os.name == "nt":
 					# workaround for popen windows bug
