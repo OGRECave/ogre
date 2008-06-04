@@ -130,6 +130,20 @@ namespace Ogre {
 		// If we can do automip generation and the user desires this, do so
 		mMipmapsHardwareGenerated = 
 			Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP);
+		// NVIDIA 175.16 drivers break hardware mip generation for non-compressed
+		// textures - disable until fixed
+		// Leave hardware gen on compressed textures since that's the only way we
+		// can realistically do it since GLU doesn't support DXT
+		// However DON'T do this on Apple, their drivers aren't subject to this
+		// problem yet and in fact software generation appears to cause a crash 
+		// in some cases which I've yet to track down
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE
+		if (Root::getSingleton().getRenderSystem()->getCapabilities()->getVendor() == GPU_NVIDIA
+			&& !PixelUtil::isCompressed(mFormat))
+		{
+			mMipmapsHardwareGenerated = false;
+		}
+#endif
 		if((mUsage & TU_AUTOMIPMAP) &&
 		    mNumRequestedMipmaps && mMipmapsHardwareGenerated)
         {
