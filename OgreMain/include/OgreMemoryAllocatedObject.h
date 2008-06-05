@@ -90,11 +90,21 @@ namespace Ogre
 			Alloc::deallocateBytes(ptr);
 		}
 
+		// only called if there is an exception in corresponding 'new'
+		inline void operator delete( void* ptr, const char* file, int line, const char* func )
+		{
+			Alloc::deallocateBytes(ptr);
+		}
+
 		inline void operator delete[] ( void* ptr )
 		{
 			Alloc::deallocateBytes(ptr);
 		}
 
+		inline void operator delete[] ( void* ptr, const char* file, int line, const char* func )
+		{
+			Alloc::deallocateBytes(ptr);
+		}
 	};
 }
 #endif
