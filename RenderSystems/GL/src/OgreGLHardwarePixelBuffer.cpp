@@ -380,20 +380,7 @@ void GLTextureBuffer::upload(const PixelBox &data)
 	} 
 	else if(mSoftwareMipmap)
 	{
-		GLint internalFormat;
-		glGetTexLevelParameteriv(mFaceTarget, mLevel, GL_TEXTURE_INTERNAL_FORMAT, &internalFormat);
-		GLenum glErr = glGetError();
-		if (glErr != GL_NO_ERROR)
-		{
-			const char* glerrStr = (const char*)gluErrorString(glErr);
-			if (glerrStr)
-			{
-				throw Exception(Exception::ERR_RENDERINGAPI_ERROR, 
-					String("Error getting texture format: ") + glerrStr, 
-					"GLTextureBuffer::upload");
-			}
-
-		}		
+		GLint components = PixelUtil::getComponentCount(mFormat);
 		if(data.getWidth() != data.rowPitch)
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch);
 		if(data.getHeight()*data.getWidth() != data.slicePitch)
@@ -404,7 +391,7 @@ void GLTextureBuffer::upload(const PixelBox &data)
 		{
 		case GL_TEXTURE_1D:
 			gluBuild1DMipmaps(
-				GL_TEXTURE_1D, internalFormat,
+				GL_TEXTURE_1D, components,
 				data.getWidth(),
 				GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format),
 				data.data);
@@ -413,7 +400,7 @@ void GLTextureBuffer::upload(const PixelBox &data)
 		case GL_TEXTURE_CUBE_MAP:
 			gluBuild2DMipmaps(
 				mFaceTarget,
-				internalFormat, data.getWidth(), data.getHeight(), 
+				components, data.getWidth(), data.getHeight(), 
 				GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format), 
 				data.data);
 			break;		
@@ -427,7 +414,7 @@ void GLTextureBuffer::upload(const PixelBox &data)
 				data.data);
 			*/
 			glTexImage3D(
-				GL_TEXTURE_3D, 0, internalFormat, 
+				GL_TEXTURE_3D, 0, components, 
 				data.getWidth(), data.getHeight(), data.getDepth(), 0, 
 				GLPixelUtil::getGLOriginFormat(data.format), GLPixelUtil::getGLOriginDataType(data.format),
 				data.data );
