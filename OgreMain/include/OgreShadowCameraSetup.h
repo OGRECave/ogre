@@ -60,7 +60,7 @@ namespace Ogre {
 		degrees of freedom.  This class is meant to allow custom methods for 
 		handling optimization.
     */
-	class _OgreExport ShadowCameraSetup
+	class _OgreExport ShadowCameraSetup : public ShadowCameraAlloc
 	{
 	public:
 		/// Function to implement -- must set the shadow camera properties

@@ -39,7 +39,7 @@ namespace Ogre {
     /** An instance of a Compositor object for one Viewport. It is part of the CompositorChain
 		for a Viewport.
      */
-	class _OgreExport CompositorInstance : public CompositorAlloc
+	class _OgreExport CompositorInstance : public CompositorInstAlloc
     {
     public:
         CompositorInstance(Compositor *filter, CompositionTechnique *technique, CompositorChain *chain);
@@ -77,7 +77,7 @@ namespace Ogre {
 		    between render queues like rendering a quad, clearing the frame buffer or 
 			setting stencil state.
 		*/
-		class RenderSystemOperation
+		class RenderSystemOperation : public CompositorInstAlloc
 		{
 		public:
 			virtual ~RenderSystemOperation();

@@ -36,7 +36,7 @@ namespace Ogre {
 	/** Object representing one render to a RenderTarget or Viewport in the Ogre Composition
 		framework.
 	 */
-	class _OgreExport CompositionTargetPass : public CompositorAlloc
+	class _OgreExport CompositionTargetPass : public CompositorInstAlloc
     {
     public:
         CompositionTargetPass(CompositionTechnique *parent);

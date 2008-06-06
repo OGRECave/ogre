@@ -69,7 +69,7 @@ namespace Ogre {
 				through a generic interface.</li>
 			</ol>
     */
-	class _OgreExport Resource : public StringInterface
+	class _OgreExport Resource : public StringInterface, public ResourceAlloc
     {
 	public:
 		OGRE_AUTO_MUTEX // public to allow external locking

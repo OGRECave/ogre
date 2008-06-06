@@ -206,7 +206,7 @@ namespace Ogre
 	This class stores the capabilities of the graphics card.  This
 	information is set by the individual render systems.
 	*/
-	class _OgreExport RenderSystemCapabilities 
+	class _OgreExport RenderSystemCapabilities : public RenderSysAlloc
 	{
 
 	public:

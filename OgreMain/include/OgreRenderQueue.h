@@ -79,7 +79,7 @@ namespace Ogre {
             backgrounds and overlays, and also could be used in the future for more
             complex multipass routines like stenciling.
     */
-    class _OgreExport RenderQueue
+    class _OgreExport RenderQueue : public RenderQueueAlloc
     {
     public:
         typedef std::map< uint8, RenderQueueGroup* > RenderQueueGroupMap;

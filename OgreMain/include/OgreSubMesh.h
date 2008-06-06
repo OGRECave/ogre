@@ -53,7 +53,7 @@ namespace Ogre {
             their material differences on a per-object basis if required.
             See the SubEntity class for more information.
     */
-    class _OgreExport SubMesh
+	class _OgreExport SubMesh : public SubMeshAlloc
     {
         friend class Mesh;
         friend class MeshSerializerImpl;

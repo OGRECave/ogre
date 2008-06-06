@@ -40,7 +40,7 @@ namespace Ogre {
 
 
 	/** Summary class collecting together vertex source information. */
-	class _OgreExport VertexData
+	class _OgreExport VertexData : public VertexDataAlloc
 	{
     private:
         /// Protected copy constructor, to prevent misuse
@@ -205,7 +205,7 @@ namespace Ogre {
 	};
 
 	/** Summary class collecting together index data source information. */
-	class _OgreExport IndexData 
+	class _OgreExport IndexData : public IndexDataAlloc
 	{
     protected:
         /// Protected copy constructor, to prevent misuse

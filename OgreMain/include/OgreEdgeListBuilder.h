@@ -43,7 +43,7 @@ namespace Ogre {
         This information is built using the EdgeListBuilder class. Note that for a given mesh,
         which can be made up of multiple submeshes, there are separate edge lists for when 
     */
-    class _OgreExport EdgeData
+	class _OgreExport EdgeData : public EdgeDataAlloc
     {
     public:
         /** Basic triangle structure. */

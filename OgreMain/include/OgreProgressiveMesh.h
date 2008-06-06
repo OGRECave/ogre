@@ -56,7 +56,7 @@ namespace Ogre {
         NB the interface of this class will certainly change when compiled vertex buffers are
         supported.
     */
-    class _OgreExport ProgressiveMesh
+	class _OgreExport ProgressiveMesh : public ProgMeshAlloc
     {
     public:
 

@@ -40,7 +40,7 @@ namespace Ogre {
         it possible to apply postfilter effects, HDRI postprocessing, and shadow 
         effects to a Viewport.
      */
-    class _OgreExport Compositor: public Resource, public CompositorAlloc
+    class _OgreExport Compositor: public Resource
     {
     public:
         Compositor(ResourceManager* creator, const String& name, ResourceHandle handle,

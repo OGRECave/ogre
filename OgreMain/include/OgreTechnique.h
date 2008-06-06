@@ -44,7 +44,7 @@ namespace Ogre {
         unless you specifically request a lower detail technique (say for distant
         rendering).
     */
-    class _OgreExport Technique
+	class _OgreExport Technique : public TechniqueAlloc
     {
     protected:
         // illumination pass state type

@@ -53,7 +53,7 @@ namespace Ogre {
             when extra processing needs to be done on an image before it is
             loaded or when you want to blit to an existing texture.
     */
-    class _OgreExport Image
+	class _OgreExport Image : public ImageAlloc
     {
     public:
     	typedef Ogre::Box Box;

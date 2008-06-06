@@ -55,7 +55,7 @@ namespace Ogre {
 		If you wish to access stream data asynchronously then you should
 		organise your own mutexes to avoid race conditions. 
 	*/
-	class _OgreExport DataStream
+	class _OgreExport DataStream : public StreamAlloc
 	{
 	protected:
 		/// The name (e.g. resource name) that can be used to identify the source fot his data (optional)

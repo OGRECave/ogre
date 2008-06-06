@@ -110,7 +110,7 @@ namespace Ogre
 			std::cout << os.str();
 		
 		std::ofstream of;
-		of.open(mLeakFileName.c_str());
+		of.open(mLeakFileName);
 		of << os.str();
 		of.close();
 	}
