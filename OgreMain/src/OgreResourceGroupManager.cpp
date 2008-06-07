@@ -597,6 +597,9 @@ namespace Ogre {
 				// Erase list entry
 				delete *li;
 				grp->locationList.erase(li);
+
+				ArchiveManager::getSingleton().unload(pArch);
+
 				break;
 			}
 
