@@ -62,7 +62,7 @@ namespace Ogre {
 
 
         // Write closing message
-		LogManager::getSingleton().stream()
+		LogManager::getSingleton().stream(LML_TRIVIAL)
 			<< "Render Target '" << mName << "' "
 			<< "Average FPS: " << mStats.avgFPS << " "
 			<< "Best FPS: " << mStats.bestFPS << " "
