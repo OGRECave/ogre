@@ -49,7 +49,7 @@ namespace Ogre
 		to use (e.g. see StdAllocPolicy). 
 	*/
 	template <class Alloc>
-	class AllocatedObject
+	class _OgreExport AllocatedObject
 	{
 	public:
 		inline explicit AllocatedObject()
