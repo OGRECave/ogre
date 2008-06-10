@@ -110,7 +110,7 @@ namespace Ogre {
 		Warning: this class only works with triangle lists at the moment,
 		do not pass it triangle strips, fans or lines / points.
 	*/
-	class _OgreExport StaticGeometry
+	class _OgreExport StaticGeometry : public BatchedGeometryAlloc
 	{
 	public:
 		/** Struct holding geometry optimised per SubMesh / lod level, ready
@@ -125,7 +125,7 @@ namespace Ogre {
 			a given LOD has wastage, we create an optimised version of it's
 			geometry which is ready for copying with no wastage.
 		*/
-		class _OgrePrivate OptimisedSubMeshGeometry
+		class _OgrePrivate OptimisedSubMeshGeometry : public BatchedGeometryAlloc
 		{
 		public:
 			OptimisedSubMeshGeometry() :vertexData(0), indexData(0) {}
@@ -148,7 +148,7 @@ namespace Ogre {
 		typedef std::vector<SubMeshLodGeometryLink> SubMeshLodGeometryLinkList;
 		typedef std::map<SubMesh*, SubMeshLodGeometryLinkList*> SubMeshGeometryLookup;
 		/// Structure recording a queued submesh for the build
-		struct QueuedSubMesh
+		struct QueuedSubMesh : public BatchedGeometryAlloc
 		{
 			SubMesh* submesh;
 			/// Link to LOD list of geometry, potentially optimised
@@ -162,7 +162,7 @@ namespace Ogre {
 		};
 		typedef std::vector<QueuedSubMesh*> QueuedSubMeshList;
 		/// Structure recording a queued geometry for low level builds
-		struct QueuedGeometry
+		struct QueuedGeometry : public BatchedGeometryAlloc
 		{
 			SubMeshLodGeometryLink* geometry;
 			Vector3 position;
@@ -180,7 +180,7 @@ namespace Ogre {
 			the same vertex & index format is stored. It also acts as the 
 			renderable.
 		*/
-		class _OgreExport GeometryBucket :	public Renderable
+		class _OgreExport GeometryBucket :	public Renderable,  public BatchedGeometryAlloc
 		{
 		protected:
 			/// Geometry which has been queued up pre-build (not for deallocation)
@@ -244,7 +244,7 @@ namespace Ogre {
 		};
 		/** A MaterialBucket is a collection of smaller buckets with the same 
 			Material (and implicitly the same LOD). */
-		class _OgreExport MaterialBucket
+		class _OgreExport MaterialBucket : public BatchedGeometryAlloc
 		{
 		public:
 			/// list of Geometry Buckets in this region
@@ -297,7 +297,7 @@ namespace Ogre {
 			LOD refers to Mesh LOD here. Material LOD can change separately
 			at the next bucket down from this.
 		*/
-		class _OgreExport LODBucket
+		class _OgreExport LODBucket : public BatchedGeometryAlloc
 		{
 		public:
 			/// Lookup of Material Buckets in this region

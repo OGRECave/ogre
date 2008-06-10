@@ -60,7 +60,7 @@ namespace Ogre {
 		, mMaterialSchemeName(MaterialManager::DEFAULT_SCHEME_NAME)
     {
 
-		LogManager::getSingleton().stream()
+		LogManager::getSingleton().stream(LML_TRIVIAL)
 			<< "Creating viewport on target '" << target->getName() << "'"
 			<< ", rendering from camera '" << (cam != 0 ? cam->getName() : "NULL") << "'"
 			<< ", relative dimensions "	<< std::fixed << std::setprecision(2) 

@@ -1211,7 +1211,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void ConvexBody::logInfo( void ) const
 	{
-		std::stringstream ssOut( std::stringstream::out );
+		StringUtil::StrStreamType ssOut( std::stringstream::out );
 		ssOut << *this;
 		
 		Ogre::LogManager::getSingleton().logMessage( Ogre::LML_NORMAL, ssOut.str()  );

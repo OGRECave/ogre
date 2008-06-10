@@ -82,11 +82,11 @@ namespace Ogre
 				else
 				{
 					// Warn that this resource is not reloadable
-					LogManager::getSingleton().logMessage(
-						"WARNING: " + mCreator->getResourceType() + 
-						" instance '" + mName + "' was defined as manually "
-						"loaded, but no manual loader was provided. This Resource "
-						"will be lost if it has to be reloaded.");
+					LogManager::getSingleton().stream(LML_TRIVIAL) 
+						<< "WARNING: " << mCreator->getResourceType()  
+						<< " instance '" << mName << "' was defined as manually "
+						<< "loaded, but no manual loader was provided. This Resource "
+						<< "will be lost if it has to be reloaded.";
 				}
 			}
 			else
@@ -158,11 +158,11 @@ namespace Ogre
 				else
 				{
 					// Warn that this resource is not reloadable
-					LogManager::getSingleton().logMessage(
-						"WARNING: " + mCreator->getResourceType() + 
-						" instance '" + mName + "' was defined as manually "
-						"loaded, but no manual loader was provided. This Resource "
-						"will be lost if it has to be reloaded.");
+					LogManager::getSingleton().stream(LML_TRIVIAL) 
+						<< "WARNING: " << mCreator->getResourceType()  
+						<< " instance '" << mName << "' was defined as manually "
+						<< "loaded, but no manual loader was provided. This Resource "
+						<< "will be lost if it has to be reloaded.";
 				}
                 postLoadImpl();
 			}

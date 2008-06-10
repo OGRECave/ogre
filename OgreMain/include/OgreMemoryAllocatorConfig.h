@@ -93,10 +93,12 @@ namespace Ogre
 		MEMCATEGORY_RESOURCE = 5,
 		/// Scripting
 		MEMCATEGORY_SCRIPTING = 6,
+		/// Rendersystem structures
+		MEMCATEGORY_RENDERSYS = 7,
 
 		
 		// sentinel value, do not use 
-		MEMCATEGORY_COUNT = 7
+		MEMCATEGORY_COUNT = 8
 	};
 }
 
@@ -155,6 +157,7 @@ namespace Ogre
 	typedef CategorisedAllocPolicy<MEMCATEGORY_SCENE_OBJECTS> SceneObjAllocPolicy;
 	typedef CategorisedAllocPolicy<MEMCATEGORY_RESOURCE> ResourceAllocPolicy;
 	typedef CategorisedAllocPolicy<MEMCATEGORY_SCRIPTING> ScriptingAllocPolicy;
+	typedef CategorisedAllocPolicy<MEMCATEGORY_RENDERSYS> RenderSysAllocPolicy;
 
 	// Now define all the base classes for each allocation
 	typedef AllocatedObject<GeneralAllocPolicy> GeneralAllocatedObject;
@@ -164,6 +167,7 @@ namespace Ogre
 	typedef AllocatedObject<SceneObjAllocPolicy> SceneObjAllocatedObject;
 	typedef AllocatedObject<ResourceAllocPolicy> ResourceAllocatedObject;
 	typedef AllocatedObject<ScriptingAllocPolicy> ScriptingAllocatedObject;
+	typedef AllocatedObject<RenderSysAllocPolicy> RenderSysAllocatedObject;
 
 	// Per-class allocators defined here
 	// NOTE: small, non-virtual classes should not subclass an allocator
@@ -174,16 +178,36 @@ namespace Ogre
 	typedef AnimationAllocatedObject	AnimationAlloc;
 	typedef GeneralAllocatedObject		AnyAlloc;
 	typedef GeneralAllocatedObject		ArchiveAlloc;
+	typedef GeometryAllocatedObject		BatchedGeometryAlloc;
+	typedef RenderSysAllocatedObject	BufferAlloc;
 	typedef GeneralAllocatedObject		CodecAlloc;
-	typedef ResourceAllocatedObject		CompositorAlloc;
+	typedef ResourceAllocatedObject		CompositorInstAlloc;
 	typedef GeneralAllocatedObject		ConfigAlloc;
 	typedef GeneralAllocatedObject		ControllerAlloc;
+	typedef GeometryAllocatedObject		EdgeDataAlloc;
 	typedef SceneObjAllocatedObject		FXAlloc;
+	typedef GeneralAllocatedObject		ImageAlloc;
+	typedef GeometryAllocatedObject		IndexDataAlloc;
 	typedef SceneObjAllocatedObject		MovableAlloc;
 	typedef SceneCtlAllocatedObject		NodeAlloc;
 	typedef SceneObjAllocatedObject		OverlayAlloc;
+	typedef ResourceAllocatedObject		PassAlloc;
+	typedef GeometryAllocatedObject		PatchAlloc;
+	typedef GeometryAllocatedObject		ProgMeshAlloc;
+	typedef SceneCtlAllocatedObject		RenderQueueAlloc;
+	typedef RenderSysAllocatedObject	RenderSysAlloc;
+	typedef ResourceAllocatedObject		ResourceAlloc;
 	typedef SceneCtlAllocatedObject		SceneMgtAlloc;
 	typedef ScriptingAllocatedObject    ScriptTranslatorAlloc;
+	typedef SceneCtlAllocatedObject		ShadowCameraAlloc;
+	typedef SceneCtlAllocatedObject		ShadowRenderableAlloc;
+	typedef SceneCtlAllocatedObject		SplineAlloc;
+	typedef GeneralAllocatedObject		StreamAlloc;
+	typedef SceneObjAllocatedObject		SubEntityAlloc;
+	typedef ResourceAllocatedObject		SubMeshAlloc;
+	typedef ResourceAllocatedObject		TechniqueAlloc;
+	typedef ResourceAllocatedObject		TextureUnitStateAlloc;
+	typedef GeometryAllocatedObject		VertexDataAlloc;
 
 	// Containers (by-value only)
 	// Will  be of the form:

@@ -44,7 +44,7 @@ namespace Ogre {
         vertex buffers (not necessarily one buffer, but the positions for the entire geometry 
         should come from one buffer if possible)
     */
-    class _OgreExport ShadowRenderable : public Renderable
+    class _OgreExport ShadowRenderable : public Renderable, public ShadowRenderableAlloc
     {
     protected:
         MaterialPtr mMaterial;

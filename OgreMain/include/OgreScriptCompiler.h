@@ -123,6 +123,7 @@ namespace Ogre
 		bool abstract;
 		AbstractNodeList children;
 		AbstractNodeList values;
+		AbstractNodeList overrides; // For use when processing object inheritance and overriding
 	public:
 		ObjectAbstractNode(AbstractNode *ptr);
 		AbstractNode *clone() const;
@@ -217,6 +218,8 @@ namespace Ogre
 		bool compile(const String &str, const String &source, const String &group);
 		/// Compiles resources from the given concrete node list
 		bool compile(const ConcreteNodeListPtr &nodes, const String &group);
+		/// Compiles the given abstract syntax tree
+		bool _compile(AbstractNodeListPtr nodes, const String &group);
 		/// Adds the given error to the compiler's list of errors
 		void addError(uint32 code, const String &file, int line, const String &msg = "");
 		/// Sets the listener used by the compiler

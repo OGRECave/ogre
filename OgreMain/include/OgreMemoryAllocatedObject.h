@@ -49,7 +49,7 @@ namespace Ogre
 		to use (e.g. see StdAllocPolicy). 
 	*/
 	template <class Alloc>
-	class AllocatedObject
+	class _OgreExport AllocatedObject
 	{
 	public:
 		inline explicit AllocatedObject()
@@ -90,11 +90,21 @@ namespace Ogre
 			Alloc::deallocateBytes(ptr);
 		}
 
+		// only called if there is an exception in corresponding 'new'
+		inline void operator delete( void* ptr, const char* , int , const char*  )
+		{
+			Alloc::deallocateBytes(ptr);
+		}
+
 		inline void operator delete[] ( void* ptr )
 		{
 			Alloc::deallocateBytes(ptr);
 		}
 
+		inline void operator delete[] ( void* ptr, const char* , int , const char*  )
+		{
+			Alloc::deallocateBytes(ptr);
+		}
 	};
 }
 #endif

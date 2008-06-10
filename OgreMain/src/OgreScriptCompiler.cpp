@@ -382,6 +382,38 @@ namespace Ogre
 		return mErrors.empty();
 	}
 
+	bool ScriptCompiler::_compile(AbstractNodeListPtr nodes, const String &group)
+	{
+		// Set up the compilation context
+		mGroup = group;
+
+		// Clear the past errors
+		mErrors.clear();
+
+		// Clear the environment
+		mEnv.clear();
+
+		// Processes the imports for this script
+		processImports(nodes);
+		// Process object inheritance
+		processObjects(nodes.get(), nodes);
+		// Process variable expansion
+		processVariables(nodes.get());
+
+		// Translate the nodes
+		for(AbstractNodeList::iterator i = nodes->begin(); i != nodes->end(); ++i)
+		{
+			//logAST(0, *i);
+			if((*i)->type == ANT_OBJECT && reinterpret_cast<ObjectAbstractNode*>((*i).get())->abstract)
+				continue;
+			ScriptTranslator *translator = ScriptCompilerManager::getSingleton().getTranslator(*i);
+			if(translator)
+				translator->translate(this, *i);
+		}
+
+		return mErrors.empty();
+	}
+
 	void ScriptCompiler::addError(uint32 code, const Ogre::String &file, int line, const String &msg)
 	{
 		ErrorPtr err(new Error());
@@ -602,6 +634,11 @@ namespace Ogre
 
 				// Recurse into children
 				processObjects(&obj->children, top);
+
+				// Overrides now exist in obj's overrides list. These are non-object nodes which must now
+				// Be placed in the children section of the object node such that overriding from parents
+				// into children works properly.
+				obj->children.insert(obj->children.begin(), obj->overrides.begin(), obj->overrides.end());
 			}
 		}
 	}
@@ -629,7 +666,7 @@ namespace Ogre
 			std::map<ObjectAbstractNode*,bool> overridden;
 
 			// Fill the vector with objects from the source node (base)
-			// And insert none objects into the front of the destination node
+			// And insert non-objects into the overrides list of the destination
 			AbstractNodeList::iterator insertPos = dest->children.begin();
 			for(AbstractNodeList::const_iterator i = src->children.begin(); i != src->children.end(); ++i)
 			{
@@ -641,7 +678,7 @@ namespace Ogre
 				{
 					AbstractNodePtr newNode((*i)->clone());
 					newNode->parent = dest;
-					dest->children.insert(insertPos, newNode);
+					dest->overrides.push_back(newNode);
 				}
 			}
 

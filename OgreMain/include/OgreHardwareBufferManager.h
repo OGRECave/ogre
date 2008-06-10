@@ -59,7 +59,7 @@ namespace Ogre {
     };
 
     /** Structure for recording the use of temporary blend buffers */
-    class _OgreExport TempBlendedBufferInfo : public HardwareBufferLicensee
+    class _OgreExport TempBlendedBufferInfo : public HardwareBufferLicensee, public BufferAlloc
     {
     private:
         // Pre-blended 

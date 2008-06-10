@@ -63,7 +63,7 @@ namespace Ogre {
         // Log library load
         LogManager::getSingleton().logMessage("Loading library " + mName);
 
-		std::string name = mName;
+		String name = mName;
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
         // dlopen() does not add .so to the filename, like windows does for .dll
         if (name.substr(name.length() - 3, 3) != ".so")

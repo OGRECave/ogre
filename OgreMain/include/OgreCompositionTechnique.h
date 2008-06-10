@@ -36,7 +36,7 @@ Torus Knot Software Ltd.
 namespace Ogre {
     /** Base composition technique, can be subclassed in plugins.
      */
-	class _OgreExport CompositionTechnique : public CompositorAlloc
+	class _OgreExport CompositionTechnique : public CompositorInstAlloc
     {
     public:
         CompositionTechnique(Compositor *parent);

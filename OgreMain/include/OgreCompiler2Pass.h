@@ -227,7 +227,7 @@ class _OgreExport Compiler2Pass : public ScriptTranslatorAlloc
         typedef std::vector<LexemeTokenDef> LexemeTokenDefContainer;
         typedef LexemeTokenDefContainer::iterator LexemeTokenDefIterator;
 
-        typedef std::map<std::string, size_t> LexemeTokenMap;
+        typedef std::map<String, size_t> LexemeTokenMap;
         typedef LexemeTokenMap::iterator TokenKeyIterator;
         /// map used to lookup client token based on previously defined lexeme
 

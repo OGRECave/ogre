@@ -78,7 +78,7 @@ namespace Ogre
 				:bytes(sz), pool(p), filename(file), line(ln), function(func) {}
 		};
 		
-		String mLeakFileName;
+		const char* mLeakFileName;
 		bool mDumpToStdOut;
 		typedef HashMap<void*, Alloc> AllocationMap;
 		AllocationMap mAllocations;
@@ -98,12 +98,12 @@ namespace Ogre
 	public:
 
 		/** Set the name of the report file that will be produced on exit. */
-		void setReportFileName(const String& name)
+		void setReportFileName(const char* name)
 		{
 			mLeakFileName = name;
 		}
 		/// Return the name of the file which will contain the report at exit
-		const String& getReportFileName() const
+		const char* getReportFileName() const
 		{
 			return mLeakFileName;
 		}

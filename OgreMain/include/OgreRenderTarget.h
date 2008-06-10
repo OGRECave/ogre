@@ -56,7 +56,7 @@ namespace Ogre {
         @version
             1.0
      */
-    class _OgreExport RenderTarget
+    class _OgreExport RenderTarget : public RenderSysAlloc
     {
     public:
         enum StatFlags

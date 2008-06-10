@@ -82,9 +82,9 @@ class Vertex:
 			if (bKey and len(bKey.blocks)):
 				# first shape key is rest position
 				blockData = bKey.blocks[0].data
-				v1 = self._applyfixUpAxis(blockData[bMFace.v[0].index].co)
-				v2 = self._applyfixUpAxis(blockData[bMFace.v[1].index].co)
-				v3 = self._applyfixUpAxis(blockData[bMFace.v[2].index].co)
+				v1 = self._applyfixUpAxis(blockData[bMFace.v[0].index])
+				v2 = self._applyfixUpAxis(blockData[bMFace.v[1].index])
+				v3 = self._applyfixUpAxis(blockData[bMFace.v[2].index])
 			else:
 				# self.normal = CrossVecs(bMFace.v[1].co - bMFace.v[0].co, bMFace.v[2].co - bMFace.v[0].co)
 				v1 = self._applyfixUpAxis(bMFace.v[0].co)

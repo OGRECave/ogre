@@ -53,7 +53,7 @@ namespace Ogre {
             the same time as their parent Entity by the SceneManager method
             createEntity.
     */
-    class _OgreExport SubEntity: public Renderable
+    class _OgreExport SubEntity: public Renderable, public SubEntityAlloc
     {
         // Note no virtual functions for efficiency
         friend class Entity;
