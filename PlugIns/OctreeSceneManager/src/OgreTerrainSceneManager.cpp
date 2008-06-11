@@ -373,6 +373,11 @@ namespace Ogre
 				params->setAutoConstant(8, GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX);
 				// morph factor
 				params->setAutoConstant(12, GpuProgramParameters::ACT_CUSTOM, MORPH_CUSTOM_PARAM_ID);
+				
+				if (mDetailTextureName != "")
+				{
+					pass->getTextureUnitState(1)->setTextureCoordSet(1);
+				}
 
 
                 // Set param index
