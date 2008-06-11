@@ -169,6 +169,16 @@ namespace Ogre
 	typedef AllocatedObject<ScriptingAllocPolicy> ScriptingAllocatedObject;
 	typedef AllocatedObject<RenderSysAllocPolicy> RenderSysAllocatedObject;
 
+	typedef AllocatedObjectTemplated<GeneralAllocPolicy> GeneralAllocatedObjectTemplated;
+	typedef AllocatedObjectTemplated<GeometryAllocPolicy> GeometryAllocatedObjectTemplated;
+	typedef AllocatedObjectTemplated<AnimationAllocPolicy> AnimationAllocatedObjectTemplated;
+	typedef AllocatedObjectTemplated<SceneCtlAllocPolicy> SceneCtlAllocatedObjectTemplated;
+	typedef AllocatedObjectTemplated<SceneObjAllocPolicy> SceneObjAllocatedObjectTemplated;
+	typedef AllocatedObjectTemplated<ResourceAllocPolicy> ResourceAllocatedObjectTemplated;
+	typedef AllocatedObjectTemplated<ScriptingAllocPolicy> ScriptingAllocatedObjectTemplated;
+	typedef AllocatedObjectTemplated<RenderSysAllocPolicy> RenderSysAllocatedObjectTemplated;
+
+
 	// Per-class allocators defined here
 	// NOTE: small, non-virtual classes should not subclass an allocator
 	// the virtual function table could double their size and make them less efficient
@@ -177,6 +187,7 @@ namespace Ogre
 	typedef AnimationAllocatedObject	AnimableAlloc;
 	typedef AnimationAllocatedObject	AnimationAlloc;
 	typedef GeneralAllocatedObject		AnyAlloc;
+	typedef GeneralAllocatedObjectTemplated		AnyHolderAlloc;
 	typedef GeneralAllocatedObject		ArchiveAlloc;
 	typedef GeometryAllocatedObject		BatchedGeometryAlloc;
 	typedef RenderSysAllocatedObject	BufferAlloc;

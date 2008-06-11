@@ -117,7 +117,7 @@ namespace Ogre
 
     protected: // types
 
-		class placeholder : public AnyAlloc
+		class placeholder : public AnyHolderAlloc
         {
         public: // structors
     
