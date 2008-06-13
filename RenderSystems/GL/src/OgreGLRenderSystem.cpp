@@ -2774,6 +2774,14 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		size_t numClipPlanes;
 		GLdouble clipPlane[4];
 
+		// Save previous modelview
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		// just load view matrix (identity world)
+		GLfloat mat[16];
+		makeGLMatrix(mat, mViewMatrix);
+		glLoadMatrixf(mat);
+
 		numClipPlanes = clipPlanes.size();
 		for (i = 0; i < numClipPlanes; ++i)
 		{
@@ -2800,6 +2808,9 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		{
 			glDisable(static_cast<GLenum>(GL_CLIP_PLANE0 + i));
 		}
+
+		// restore matrices
+		glPopMatrix();
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::setScissorTest(bool enabled, size_t left, 

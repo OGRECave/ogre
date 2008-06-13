@@ -106,5 +106,67 @@ namespace Ogre
 			Alloc::deallocateBytes(ptr);
 		}
 	};
+
+	/** Same as AllocatedObject, but non-exported. Base for templated classes.
+	*/
+	template <class Alloc>
+	class AllocatedObjectTemplated
+	{
+	public:
+		inline explicit AllocatedObjectTemplated()
+		{ }
+
+		virtual ~AllocatedObjectTemplated()
+		{ }
+
+		/// operator new, with debug line info
+		inline void* operator new(size_t sz, const char* file, int line, const char* func)
+		{
+			return Alloc::allocateBytes(sz, file, line, func);
+		}
+		inline void* operator new(size_t sz)
+		{
+			return Alloc::allocateBytes(sz);
+		}
+
+		/// placement operator new
+		inline void* operator new(size_t sz, void* ptr)
+		{
+			return ptr;
+		}
+
+		/// array operator new, with debug line info
+		inline void* operator new[] ( size_t sz, const char* file, int line, const char* func )
+		{
+			return Alloc::allocateBytes(sz, file, line, func);
+		}
+
+		inline void* operator new[] ( size_t sz )
+		{
+			return Alloc::allocateBytes(sz);
+		}
+
+		inline void operator delete( void* ptr )
+		{
+			Alloc::deallocateBytes(ptr);
+		}
+
+		// only called if there is an exception in corresponding 'new'
+		inline void operator delete( void* ptr, const char* , int , const char*  )
+		{
+			Alloc::deallocateBytes(ptr);
+		}
+
+		inline void operator delete[] ( void* ptr )
+		{
+			Alloc::deallocateBytes(ptr);
+		}
+
+		inline void operator delete[] ( void* ptr, const char* , int , const char*  )
+		{
+			Alloc::deallocateBytes(ptr);
+		}
+	};
+
 }
 #endif
