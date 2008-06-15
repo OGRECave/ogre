@@ -2334,7 +2334,7 @@ namespace Ogre{
 						{
 							// Long form has n number of frames
 							Real duration = 0;
-							AbstractNodeList::const_iterator in = getNodeAt(prop->values, prop->values.size() - 1);
+							AbstractNodeList::const_iterator in = getNodeAt(prop->values, static_cast<int>(prop->values.size()) - 1);
 							if(getReal(*in, &duration))
 							{
 								String *names = new String[prop->values.size() - 1];
@@ -4549,7 +4549,7 @@ namespace Ogre{
 
 						while (atomIndex < prop->values.size())
 						{
-							i = getNodeAt(prop->values, atomIndex++);
+							i = getNodeAt(prop->values, static_cast<int>(atomIndex++));
 							if((*i)->type != ANT_ATOM)
 							{
 								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
@@ -4586,7 +4586,7 @@ namespace Ogre{
 										pFactor = &heightFactor;
 									}
 									// advance to next to get scaling
-									i = getNodeAt(prop->values, atomIndex++);
+									i = getNodeAt(prop->values, static_cast<int>(atomIndex++));
 									if((*i)->type != ANT_ATOM)
 									{
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
