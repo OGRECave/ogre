@@ -67,7 +67,7 @@ namespace Ogre {
 		// read header id manually (no conversion)
         size_t actually_read = stream->read(&dest, sizeof(uint16));
 		// skip back
-        stream->skip(0 - actually_read);
+        stream->skip(0 - (long)actually_read);
         if (actually_read != sizeof(uint16))
         {
             // end of file?
