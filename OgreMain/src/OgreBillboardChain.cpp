@@ -75,8 +75,8 @@ namespace Ogre {
 		mRadius(0.0f),
 		mTexCoordDir(TCD_U)
 	{
-		mVertexData = new VertexData();
-		mIndexData = new IndexData();
+		mVertexData = OGRE_NEW VertexData();
+		mIndexData = OGRE_NEW IndexData();
 
 		mOtherTexCoordRange[0] = 0.0f;
 		mOtherTexCoordRange[1] = 1.0f;
@@ -92,8 +92,8 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	BillboardChain::~BillboardChain()
 	{
-		delete mVertexData;
-		delete mIndexData;
+		OGRE_DELETE mVertexData;
+		OGRE_DELETE mIndexData;
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::setupChainContainers(void)
@@ -809,13 +809,13 @@ namespace Ogre {
 
 		}
 
-		return new BillboardChain(name, maxElements, numberOfChains, useTex, useCol, dynamic);
+		return OGRE_NEW BillboardChain(name, maxElements, numberOfChains, useTex, useCol, dynamic);
 
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChainFactory::destroyInstance( MovableObject* obj)
 	{
-		delete obj;
+		OGRE_DELETE  obj;
 	}
 
 }

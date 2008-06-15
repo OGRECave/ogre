@@ -34,12 +34,12 @@ namespace Ogre {
 //-----------------------------------------------------------------------
 	CompositorSerializer::CompositorSerializer()
 	{
-        mScriptCompiler = new CompositorScriptCompiler();
+        mScriptCompiler = OGRE_NEW CompositorScriptCompiler();
 	}
 //-----------------------------------------------------------------------
 	CompositorSerializer::~CompositorSerializer()
 	{
-	    delete mScriptCompiler;
+	    OGRE_DELETE mScriptCompiler;
 	}
 //-----------------------------------------------------------------------
     void CompositorSerializer::parseScript(DataStreamPtr& stream, const String& groupName)

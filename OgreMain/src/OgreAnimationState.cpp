@@ -311,7 +311,7 @@ namespace Ogre
 				"AnimationStateSet::createAnimationState");
 		}
 
-		AnimationState* newState = new AnimationState(name, this, timePos, 
+		AnimationState* newState = OGRE_NEW AnimationState(name, this, timePos, 
 			length, weight, enabled);
 		mAnimationStates[name] = newState;
 

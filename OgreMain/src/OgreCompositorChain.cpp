@@ -296,7 +296,7 @@ void CompositorChain::clearCompiledState()
 	for (RenderSystemOperations::iterator i = mRenderSystemOperations.begin();
 		i != mRenderSystemOperations.end(); ++i)
 	{
-		delete *i;
+		OGRE_DELETE *i;
 	}
 	mRenderSystemOperations.clear();
 

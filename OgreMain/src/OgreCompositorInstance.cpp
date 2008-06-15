@@ -306,7 +306,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
 				}
 			}
 
-            RSQuadOperation * rsQuadOperation = new RSQuadOperation(this,pass->getIdentifier(),mat);
+            RSQuadOperation * rsQuadOperation = OGRE_NEW RSQuadOperation(this,pass->getIdentifier(),mat);
             Real left,top,right,bottom;
             if (pass->getQuadCorners(left,top,right,bottom))
                 rsQuadOperation->setQuadCorners(left,top,right,bottom);

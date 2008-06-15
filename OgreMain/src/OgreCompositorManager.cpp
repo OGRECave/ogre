@@ -73,7 +73,7 @@ CompositorManager::CompositorManager():
 CompositorManager::~CompositorManager()
 {
     freeChains();
-	delete mRectangle;
+	OGRE_DELETE  mRectangle;
 
 	OGRE_THREAD_POINTER_DELETE(mSerializer);
 
@@ -87,7 +87,7 @@ Resource* CompositorManager::createImpl(const String& name, ResourceHandle handl
     const String& group, bool isManual, ManualResourceLoader* loader,
     const NameValuePairList* params)
 {
-    return new Compositor(this, name, handle, group, isManual, loader);
+    return OGRE_NEW Compositor(this, name, handle, group, isManual, loader);
 }
 //-----------------------------------------------------------------------
 void CompositorManager::initialise(void)
@@ -159,7 +159,7 @@ CompositorChain *CompositorManager::getCompositorChain(Viewport *vp)
     }
     else
     {
-        CompositorChain *chain = new CompositorChain(vp);
+        CompositorChain *chain = OGRE_NEW CompositorChain(vp);
         mChains[vp] = chain;
         return chain;
     }
@@ -175,7 +175,7 @@ void CompositorManager::removeCompositorChain(Viewport *vp)
     Chains::iterator i = mChains.find(vp);
     if (i != mChains.end())
     {
-        delete i->second;
+        OGRE_DELETE  i->second;
         mChains.erase(i);
     }
 }
@@ -191,7 +191,7 @@ void CompositorManager::freeChains()
     Chains::iterator i, iend=mChains.end();
     for(i=mChains.begin(); i!=iend;++i)
     {
-        delete i->second;
+        OGRE_DELETE  i->second;
     }
     mChains.clear();
 }
@@ -201,7 +201,7 @@ Renderable *CompositorManager::_getTexturedRectangle2D()
 	if(!mRectangle)
 	{
 		/// 2D rectangle, to use for render_quad passes
-		mRectangle = new Rectangle2D(true);
+		mRectangle = OGRE_NEW Rectangle2D(true);
 	}
 	RenderSystem* rs = Root::getSingleton().getRenderSystem();
 	Viewport* vp = rs->_getViewport();

@@ -43,7 +43,7 @@ namespace Ogre {
         virtual ~CompositionTechnique();
     
         /// Local texture definition
-        class TextureDefinition
+        class TextureDefinition : public CompositorInstAlloc
         {
         public:
             String name;
