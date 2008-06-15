@@ -69,7 +69,7 @@ namespace Ogre
 		not be consistent - if it is, it is good to centrally manage the textures
 		so that creation and destruction responsibility is clear.
 	*/
-	class _OgreExport ShadowTextureManager : public Singleton<ShadowTextureManager>
+	class _OgreExport ShadowTextureManager : public Singleton<ShadowTextureManager>, public ShadowDataAlloc
 	{
 	protected:
 		ShadowTextureList mTextureList;

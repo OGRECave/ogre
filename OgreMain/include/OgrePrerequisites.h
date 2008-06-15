@@ -374,7 +374,6 @@ namespace Ogre {
     class TextureUnitState;
     class Texture;
     class TexturePtr;
-	class TextureFont;
     class TextureManager;
     class TransformKeyFrame;
 	class Timer;

@@ -63,7 +63,17 @@ Torus Knot Software Ltd
 	with macros, because that's very difficult to consistently do when other
 	libraries are also trying to do the same thing; instead we use dedicated
 	'OGRE_' prefixed macros. See OGRE_NEW and related items.
-
+	@par
+	There are a set of 'pseudo primitive' classes in Ogre, such as Vector3, 
+	Plane, Quaternion etc. These classes are deliberately non-virtual since
+	they may be used in bulk and the individual size of the classes is paramount, 
+	thus the lack of a virtual function table is actually important. These classes 
+	will not extend an AllocatedObject type, because to do so would require them
+	to have at least a virtual destructor, and hence a virtual function table. 
+	Instead, all allocations of these types should be done via OGRE_ALLOC_T (and
+	released using OGRE_FREE) which is able to use custom allocators and also 
+	the memory debug facilities. OGRE_ALLOC_T is also the route to go for 
+	allocating real primitive types like int & float. 
 */
 
 namespace Ogre
@@ -195,6 +205,7 @@ namespace Ogre
 	typedef ResourceAllocatedObject		CompositorInstAlloc;
 	typedef GeneralAllocatedObject		ConfigAlloc;
 	typedef GeneralAllocatedObject		ControllerAlloc;
+	typedef GeometryAllocatedObject		DebugGeomAlloc;
 	typedef GeometryAllocatedObject		EdgeDataAlloc;
 	typedef SceneObjAllocatedObject		FXAlloc;
 	typedef GeneralAllocatedObject		ImageAlloc;
@@ -207,18 +218,21 @@ namespace Ogre
 	typedef GeometryAllocatedObject		ProgMeshAlloc;
 	typedef SceneCtlAllocatedObject		RenderQueueAlloc;
 	typedef RenderSysAllocatedObject	RenderSysAlloc;
+	typedef GeneralAllocatedObject		RootAlloc;
 	typedef ResourceAllocatedObject		ResourceAlloc;
+	typedef GeneralAllocatedObject		SerializerAlloc;
 	typedef SceneCtlAllocatedObject		SceneMgtAlloc;
+	typedef ScriptingAllocatedObject    ScriptCompilerAlloc;
 	typedef ScriptingAllocatedObject    ScriptTranslatorAlloc;
-	typedef SceneCtlAllocatedObject		ShadowCameraAlloc;
-	typedef SceneCtlAllocatedObject		ShadowRenderableAlloc;
-	typedef SceneCtlAllocatedObject		SplineAlloc;
+	typedef SceneCtlAllocatedObject		ShadowDataAlloc;
 	typedef GeneralAllocatedObject		StreamAlloc;
 	typedef SceneObjAllocatedObject		SubEntityAlloc;
 	typedef ResourceAllocatedObject		SubMeshAlloc;
 	typedef ResourceAllocatedObject		TechniqueAlloc;
+	typedef GeneralAllocatedObject		TimerAlloc;
 	typedef ResourceAllocatedObject		TextureUnitStateAlloc;
 	typedef GeometryAllocatedObject		VertexDataAlloc;
+	typedef RenderSysAllocatedObject	ViewportAlloc;
 
 	// Containers (by-value only)
 	// Will  be of the form:

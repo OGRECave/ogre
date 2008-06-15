@@ -246,7 +246,7 @@ namespace Ogre {
 		Utility class for evaluating the effectiveness of the use of the vertex
 		cache by a given index buffer.
 	*/
-	class _OgreExport VertexCacheProfiler
+	class _OgreExport VertexCacheProfiler : public BufferAlloc
     {
 		public:
 			enum CacheType {

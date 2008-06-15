@@ -65,7 +65,7 @@ namespace Ogre {
     @note
         If OGRE_THREAD_SUPPORT is 1, this class is thread-safe.
     */
-	class _OgreExport ResourceManager : public ScriptLoader
+	class _OgreExport ResourceManager : public ScriptLoader, public ResourceAlloc
     {
     public:
 		OGRE_AUTO_MUTEX // public to allow external locking

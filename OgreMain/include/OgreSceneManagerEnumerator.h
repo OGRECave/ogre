@@ -79,7 +79,7 @@ namespace Ogre {
 			using a factory, should you choose, it's just not as flexible that way.
 			Just instantiate your own SceneManager manually and use it directly.
     */
-    class _OgreExport SceneManagerEnumerator : public Singleton<SceneManagerEnumerator>
+    class _OgreExport SceneManagerEnumerator : public Singleton<SceneManagerEnumerator>, public SceneMgtAlloc
     {
 	public:
 		/// Scene manager instances, indexed by instance name

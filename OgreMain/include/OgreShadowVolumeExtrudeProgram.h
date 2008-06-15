@@ -127,7 +127,7 @@ namespace Ogre {
         }		
     @endcode
     */
-    class _OgreExport ShadowVolumeExtrudeProgram
+	class _OgreExport ShadowVolumeExtrudeProgram : public ShadowDataAlloc
     {
     private:
         static String mPointArbvp1;

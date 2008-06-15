@@ -70,7 +70,7 @@ namespace Ogre {
 	typedef std::vector<ScriptTokenPtr> ScriptTokenList;
 	typedef SharedPtr<ScriptTokenList> ScriptTokenListPtr;
 
-	class _OgreExport ScriptLexer
+	class _OgreExport ScriptLexer : public ScriptCompilerAlloc
 	{
 	public:
 		ScriptLexer();

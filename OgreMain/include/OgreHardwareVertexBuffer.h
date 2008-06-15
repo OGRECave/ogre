@@ -122,7 +122,7 @@ namespace Ogre {
         define the semantics (position, normal etc), the VertexElement
         class does.
     */
-    class _OgreExport VertexElement
+	class _OgreExport VertexElement : public VertexDataAlloc
     {
     protected:
         /// The source vertex buffer, as bound to an index using VertexBufferBinding
@@ -288,7 +288,7 @@ namespace Ogre {
 	Like the other classes in this functional area, these declarations should be created and
 	destroyed using the HardwareBufferManager.
     */
-    class _OgreExport VertexDeclaration
+	class _OgreExport VertexDeclaration : public VertexDataAlloc
     {
     public:
 		/// Defines the list of vertex elements that makes up this declaration
@@ -463,7 +463,7 @@ namespace Ogre {
 		Like the other classes in this functional area, these binding maps should be created and
 		destroyed using the HardwareBufferManager.
 	*/
-	class _OgreExport VertexBufferBinding
+	class _OgreExport VertexBufferBinding : public VertexDataAlloc
 	{
 	public:
 		/// Defines the vertex buffer bindings used as source for vertex declarations

@@ -58,7 +58,7 @@ namespace Ogre {
 		them being rendered - for example special-case render queues and
 		render queue listeners that dictate this.
 	*/
-	class _OgreExport RenderQueueInvocation
+	class _OgreExport RenderQueueInvocation : public RenderQueueAlloc
 	{
 	protected:
 		/// Target queue group
@@ -165,7 +165,7 @@ namespace Ogre {
 		that any invocation instances you give to this class will be deleted
 		by it when it is cleared / destroyed.
 	*/
-	class _OgreExport RenderQueueInvocationSequence
+	class _OgreExport RenderQueueInvocationSequence : public RenderQueueAlloc
 	{
 	protected:
 		String mName;

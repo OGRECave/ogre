@@ -37,7 +37,7 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-	class _OgreExport ScriptParser
+	class _OgreExport ScriptParser : public ScriptCompilerAlloc
 	{
 	public:
 		ScriptParser();

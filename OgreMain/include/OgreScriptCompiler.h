@@ -176,7 +176,7 @@ namespace Ogre
 		and processes the CST into an AST and then uses translators
 		to translate the AST into the final resources.
 	*/
-	class _OgreExport ScriptCompiler
+	class _OgreExport ScriptCompiler : public ScriptCompilerAlloc
 	{
 	public: // Externally accessible types
 		typedef std::map<String,uint32> IdMap;
@@ -410,7 +410,7 @@ namespace Ogre
 	/** Manages threaded compilation of scripts. This script loader forwards
 		scripts compilations to a specific compiler instance.
 	*/
-	class _OgreExport ScriptCompilerManager : public Singleton<ScriptCompilerManager>, public ScriptLoader
+	class _OgreExport ScriptCompilerManager : public Singleton<ScriptCompilerManager>, public ScriptLoader, public ScriptCompilerAlloc
 	{
 	private:
 		OGRE_AUTO_MUTEX
