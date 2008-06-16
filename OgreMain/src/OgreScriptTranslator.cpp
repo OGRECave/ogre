@@ -286,6 +286,8 @@ namespace Ogre{
 			{
 				return false;
 			}
+			++i;
+			++n;
 		}
 		return true;
 	}
