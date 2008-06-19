@@ -273,7 +273,12 @@ namespace Ogre {
         if (ret && is_absolute_path(filename.c_str()))
 		{
 			// only valid if full path starts with our base
-			ret = Ogre::StringUtil::startsWith(full_path, mName);
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+			bool caseInsensitive = true;
+#else
+			bool caseInsensitive = false;
+#endif
+			ret = Ogre::StringUtil::startsWith(full_path, mName, caseInsensitive);
 		}
 
 		return ret;
