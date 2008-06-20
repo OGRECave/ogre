@@ -378,7 +378,7 @@ namespace Ogre {
 			i != mAnimationsList.end(); ++i)
 		{
 			Animation *newAnim = i->second->clone(i->second->getName());
-			newMesh->mAnimationsList[newName] = newAnim;
+			newMesh->mAnimationsList[i->second->getName()] = newAnim;
 		}
 		// Clone pose list
 		for (PoseList::iterator i = mPoseList.begin(); i != mPoseList.end(); ++i)
@@ -387,7 +387,7 @@ namespace Ogre {
 			newMesh->mPoseList.push_back(newPose);
 		}
 		newMesh->mSharedVertexDataAnimationType = mSharedVertexDataAnimationType;
-		newMesh->mAnimationTypesDirty = mAnimationTypesDirty;
+		newMesh->mAnimationTypesDirty = true;
 
 
         newMesh->load();
