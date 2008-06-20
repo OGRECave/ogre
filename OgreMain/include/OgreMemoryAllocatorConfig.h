@@ -70,10 +70,14 @@ Torus Knot Software Ltd
 	thus the lack of a virtual function table is actually important. These classes 
 	will not extend an AllocatedObject type, because to do so would require them
 	to have at least a virtual destructor, and hence a virtual function table. 
-	Instead, all allocations of these types should be done via OGRE_ALLOC_T (and
-	released using OGRE_FREE) which is able to use custom allocators and also 
-	the memory debug facilities. OGRE_ALLOC_T is also the route to go for 
-	allocating real primitive types like int & float. 
+	Instead, all allocations of these types should be done via either 
+	OGRE_NEW_T (for single instance construction with parameters), or OGRE_ALLOC_T 
+	(for array construction or where constructor arguments aren't needed) - 
+	both of these are able to use custom allocators and also 
+	the memory debug facilities. OGRE_NEW_T and OGRE_ALLOC_T are also the route to go for 
+	allocating real primitive types like int & float. You free the memory using 
+	OGRE_FREE for both of these types. Both have SIMD
+	and custom alignment variants.
 */
 
 namespace Ogre
@@ -273,6 +277,11 @@ namespace Ogre
 // Can only be used with classes that derive from AllocatedObject since customised new/delete needed
 #	define OGRE_NEW new (__FILE__, __LINE__, __FUNCTION__)
 #	define OGRE_DELETE delete
+// placement new variants, for allocating primitive types, external types or non-virtual types with constructor parameters
+#	define OGRE_NEW_T(T, category) new (::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T), __FILE__, __LINE__, __FUNCTION__))
+#	define OGRE_NEW_T_SIMD(T, category) new (::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T), __FILE__, __LINE__, __FUNCTION__))
+#	define OGRE_NEW_T_ALIGN(T, category, align) new (::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T), __FILE__, __LINE__, __FUNCTION__))
+
 
 #else // !OGRE_DEBUG_MODE
 
@@ -300,6 +309,10 @@ namespace Ogre
 // new / delete (alignment determined by per-class policy)
 #	define OGRE_NEW new 
 #	define OGRE_DELETE delete
+// placement new variants, for allocating primitive types, external types or non-virtual types with constructor parameters
+#	define OGRE_NEW_T(T, category) new (::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)))
+#	define OGRE_NEW_T_SIMD(T, category) new (::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)))
+#	define OGRE_NEW_T_ALIGN(T, category, align) new (::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)))
 
 #endif // OGRE_DEBUG_MODE
 
