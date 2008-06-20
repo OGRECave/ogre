@@ -274,11 +274,14 @@ namespace Ogre {
 		{
 			// only valid if full path starts with our base
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-			bool caseInsensitive = true;
+			// case insensitive on windows
+			String lowerCaseName = mName;
+			StringUtil::toLowerCase(lowerCaseName);
+			ret = Ogre::StringUtil::startsWith(full_path, lowerCaseName, true);
 #else
-			bool caseInsensitive = false;
+			// case sensitive
+			ret = Ogre::StringUtil::startsWith(full_path, mName, false);
 #endif
-			ret = Ogre::StringUtil::startsWith(full_path, mName, caseInsensitive);
 		}
 
 		return ret;
