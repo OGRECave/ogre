@@ -58,7 +58,7 @@ namespace Ogre {
         }
 
         template< class Y>
-		explicit SharedPtr(Y* rep) : pRep(rep), pUseCount(OGRE_NEW_T(unsigned int, MEMCATEGORY_GENERAL) unsigned int(1))
+		explicit SharedPtr(Y* rep) : pRep(rep), pUseCount(OGRE_ALLOC_ONE_T(unsigned int, MEMCATEGORY_GENERAL)(1))
 		{
             OGRE_SET_AUTO_SHARED_MUTEX_NULL
 			OGRE_NEW_AUTO_SHARED_MUTEX
@@ -139,7 +139,7 @@ namespace Ogre {
 			assert(!pRep && !pUseCount);
             OGRE_NEW_AUTO_SHARED_MUTEX
 			OGRE_LOCK_AUTO_SHARED_MUTEX
-			pUseCount = OGRE_NEW_T(unsigned int, MEMCATEGORY_GENERAL) unsigned int(1);
+			pUseCount = OGRE_ALLOC_ONE_T(unsigned int, MEMCATEGORY_GENERAL)(1);
 			pRep = rep;
 		}
 
