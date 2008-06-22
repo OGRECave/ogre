@@ -183,7 +183,10 @@ namespace Ogre {
 		@param pMem Pointer to the existing memory
 		@param size The size of the memory chunk in bytes
 		@param freeOnClose If true, the memory associated will be destroyed
-			when the stream is destroyed.
+			when the stream is destroyed. Note: it's important that if you set
+			this option to true, that you allocated the memory using OGRE_ALLOC_T
+			with a category of MEMCATEGORY_GENERAL ensure the freeing of memory 
+			matches up.
 		*/
 		MemoryDataStream(void* pMem, size_t size, bool freeOnClose = false);
 		
@@ -192,7 +195,10 @@ namespace Ogre {
 		@param pMem Pointer to the existing memory
 		@param size The size of the memory chunk in bytes
 		@param freeOnClose If true, the memory associated will be destroyed
-			when the stream is destroyed.
+			when the stream is destroyed. Note: it's important that if you set
+			this option to true, that you allocated the memory using OGRE_ALLOC_T
+			with a category of MEMCATEGORY_GENERAL ensure the freeing of memory 
+			matches up.
 		*/
 		MemoryDataStream(const String& name, void* pMem, size_t size, 
 				bool freeOnClose = false);

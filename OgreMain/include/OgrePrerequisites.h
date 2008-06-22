@@ -141,10 +141,6 @@ namespace Ogre {
     typedef unsigned int uint;
 	typedef unsigned long ulong;
 
-    /// Useful macros
-    #define OGRE_SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
-    #define OGRE_SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
-
 	#if OGRE_WCHAR_T_STRINGS
 		typedef std::wstring _StringBase;
 	#else

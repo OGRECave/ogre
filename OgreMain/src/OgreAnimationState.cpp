@@ -213,26 +213,26 @@ namespace Ogre
       _setBlendMaskData(&(*blendMask)[0]);
     }
 	//---------------------------------------------------------------------
-    void AnimationState::createBlendMask(size_t blendMaskSizeHint, float initialWeight)
-    {
-      if(!mBlendMask)
-      {
-        if(initialWeight >= 0)
-        {
-          mBlendMask = new BoneBlendMask(blendMaskSizeHint, initialWeight);
-        }
-        else
-        {
-          mBlendMask = new BoneBlendMask(blendMaskSizeHint);
-        }
-      }
-    }
+	void AnimationState::createBlendMask(size_t blendMaskSizeHint, float initialWeight)
+	{
+		if(!mBlendMask)
+		{
+			if(initialWeight >= 0)
+			{
+				mBlendMask = OGRE_ALLOC_ONE_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint, initialWeight);
+			}
+			else
+			{
+				mBlendMask = OGRE_ALLOC_ONE_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint);
+			}
+		}
+	}
 	//---------------------------------------------------------------------
-    void AnimationState::destroyBlendMask()
-    {
-      delete mBlendMask;
-      mBlendMask = 0;
-    }
+	void AnimationState::destroyBlendMask()
+	{
+		OGRE_FREE(mBlendMask, MEMCATEGORY_ANIMATION);
+		mBlendMask = 0;
+	}
 	//---------------------------------------------------------------------
 
 	//---------------------------------------------------------------------

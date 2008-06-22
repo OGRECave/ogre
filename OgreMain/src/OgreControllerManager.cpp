@@ -62,7 +62,7 @@ namespace Ogre {
         const ControllerValueRealPtr& src, const ControllerValueRealPtr& dest,
         const ControllerFunctionRealPtr& func)
     {
-        Controller<Real>* c = new Controller<Real>(src, dest, func);
+        Controller<Real>* c = OGRE_NEW Controller<Real>(src, dest, func);
 
         mControllers.insert(c);
         return c;
@@ -94,7 +94,7 @@ namespace Ogre {
         ControllerList::iterator ci;
         for (ci = mControllers.begin(); ci != mControllers.end(); ++ci)
         {
-            delete *ci;
+            OGRE_DELETE *ci;
         }
         mControllers.clear();
     }
@@ -242,7 +242,7 @@ namespace Ogre {
         if (i != mControllers.end())
         {
             mControllers.erase(i);
-            delete controller;
+            OGRE_DELETE controller;
         }
     }
 	//-----------------------------------------------------------------------

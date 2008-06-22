@@ -55,7 +55,7 @@ namespace Ogre {
         static CodecList ms_mapCodecs;
 
     public:
-        class _OgrePrivate CodecData 
+        class _OgrePrivate CodecData : public CodecAlloc
         {
         public:
             virtual ~CodecData() {};

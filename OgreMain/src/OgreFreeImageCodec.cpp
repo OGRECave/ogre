@@ -339,7 +339,8 @@ namespace Ogre {
 		DWORD size;
 		FreeImage_AcquireMemory(mem, &data, &size);
 		// Copy data into our own buffer
-		BYTE* ourData = new BYTE[size];
+		// Because we're asking MemoryDataStream to free this, must create in a compatible way
+		BYTE* ourData = OGRE_ALLOC_T(BYTE, size, MEMCATEGORY_GENERAL);
 		memcpy(ourData, data, size);
 		// Wrap data in stream, tell it to free on close 
 		DataStreamPtr outstream(new MemoryDataStream(ourData, size, true));
@@ -382,7 +383,7 @@ namespace Ogre {
 		}
 
 
-		ImageData* imgData = new ImageData();
+		ImageData* imgData = OGRE_NEW ImageData();
 		MemoryDataStreamPtr output;
 
 		imgData->depth = 1; // only 2D formats handled by this codec

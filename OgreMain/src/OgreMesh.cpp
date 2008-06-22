@@ -981,7 +981,7 @@ namespace Ogre {
 
 		lod->manualName = meshName;
 		lod->manualMesh.setNull();
-        if (lod->edgeData) delete lod->edgeData;
+        if (lod->edgeData) OGRE_DELETE lod->edgeData;
         lod->edgeData = 0;
 	}
     //---------------------------------------------------------------------
@@ -1519,7 +1519,7 @@ namespace Ogre {
             {
                 // Only delete if we own this data
                 // Manual LODs > 0 own their own
-                delete usage.edgeData;
+                OGRE_DELETE usage.edgeData;
             }
             usage.edgeData = NULL;
         }

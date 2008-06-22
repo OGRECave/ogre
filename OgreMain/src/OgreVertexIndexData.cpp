@@ -62,7 +62,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	VertexData* VertexData::clone(bool copyData) const
 	{
-		VertexData* dest = new VertexData();
+		VertexData* dest = OGRE_NEW VertexData();
 
 		// Copy vertex buffers in turn
 		const VertexBufferBinding::VertexBufferBindingMap& bindings = 
@@ -694,7 +694,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	IndexData* IndexData::clone(bool copyData) const
 	{
-		IndexData* dest = new IndexData();
+		IndexData* dest = OGRE_NEW IndexData();
 		if (indexBuffer.get())
 		{
             if (copyData)

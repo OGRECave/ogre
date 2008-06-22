@@ -217,6 +217,7 @@ namespace Ogre
 	typedef GeneralAllocatedObject		ConfigAlloc;
 	typedef GeneralAllocatedObject		ControllerAlloc;
 	typedef GeometryAllocatedObject		DebugGeomAlloc;
+	typedef GeneralAllocatedObject		DynLibAlloc;
 	typedef GeometryAllocatedObject		EdgeDataAlloc;
 	typedef SceneObjAllocatedObject		FXAlloc;
 	typedef GeneralAllocatedObject		ImageAlloc;

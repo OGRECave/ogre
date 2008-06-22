@@ -73,7 +73,7 @@ namespace Ogre {
 		mSectionList.clear();
 		mRadius = 0;
 		mAABB.setNull();
-		delete mEdgeList;
+		OGRE_DELETE mEdgeList;
 		mEdgeList = 0;
 		mAnyIndexed = false;
 		for (ShadowRenderableList::iterator s = mShadowRenderables.begin();

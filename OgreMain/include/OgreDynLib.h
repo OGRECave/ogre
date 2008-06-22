@@ -66,7 +66,7 @@ namespace Ogre {
         @see
             Resource
     */
-    class _OgreExport DynLib
+	class _OgreExport DynLib : public DynLibAlloc
     {
 	protected:
 		String mName;
