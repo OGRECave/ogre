@@ -427,7 +427,7 @@ namespace Ogre {
 			for (irend = rendList->begin(); irend != irendend; ++irend)
 			{
 				// Visit Renderable
-				visitor->visit(*irend);
+				visitor->visit(const_cast<Renderable*>(*irend));
 			}
 		} 
 
@@ -442,7 +442,7 @@ namespace Ogre {
 		iend = mSortedDescending.end();
 		for (i = mSortedDescending.begin(); i != iend; ++i)
 		{
-			visitor->visit(&(*i));
+			visitor->visit(const_cast<RenderablePass*>(&(*i)));
 		}
 	}
     //-----------------------------------------------------------------------
@@ -455,7 +455,7 @@ namespace Ogre {
 		iend = mSortedDescending.rend();
 		for (i = mSortedDescending.rbegin(); i != iend; ++i)
 		{
-			visitor->visit(&(*i));
+			visitor->visit(const_cast<RenderablePass*>(&(*i)));
 		}
 
 	}

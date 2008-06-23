@@ -73,7 +73,7 @@ namespace Ogre {
 			If this is called, neither of the other 2 visit methods
 			will be called.
 		*/
-		virtual void visit(const RenderablePass* rp) = 0;
+		virtual void visit(RenderablePass* rp) = 0;
 
 		/* When visiting a collection grouped by pass, this is
 			called when the grouping pass changes.
@@ -91,7 +91,7 @@ namespace Ogre {
 			If this method is called, the RenderablePass visit 
 			method will not be called for this collection. 
 		*/
-		virtual void visit(const Renderable* r) = 0;
+		virtual void visit(Renderable* r) = 0;
 		
 		
 	};

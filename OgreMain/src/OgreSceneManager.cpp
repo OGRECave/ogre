@@ -2614,7 +2614,7 @@ void SceneManager::renderTextureShadowReceiverQueueGroupObjects(
 
 }
 //-----------------------------------------------------------------------
-void SceneManager::SceneMgrQueuedRenderableVisitor::visit(const Renderable* r)
+void SceneManager::SceneMgrQueuedRenderableVisitor::visit(Renderable* r)
 {
 	// Give SM a chance to eliminate
 	if (targetSceneMgr->validateRenderableForRendering(mUsedPass, r))
@@ -2637,7 +2637,7 @@ bool SceneManager::SceneMgrQueuedRenderableVisitor::visit(const Pass* p)
 	return true;
 }
 //-----------------------------------------------------------------------
-void SceneManager::SceneMgrQueuedRenderableVisitor::visit(const RenderablePass* rp)
+void SceneManager::SceneMgrQueuedRenderableVisitor::visit(RenderablePass* rp)
 {
 	// Skip this one if we're in transparency cast shadows mode & it doesn't
 	// Don't need to implement this one in the other visit methods since
@@ -2817,7 +2817,7 @@ void SceneManager::renderTransparentShadowCasterObjects(
 	mActiveQueuedRenderableVisitor->transparentShadowCastersMode = false;
 }
 //-----------------------------------------------------------------------
-void SceneManager::renderSingleObject(const Renderable* rend, const Pass* pass, 
+void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass, 
                                       bool lightScissoringClipping, bool doLightIteration, 
 									  const LightList* manualLightList)
 {
@@ -3140,7 +3140,9 @@ void SceneManager::renderSingleObject(const Renderable* rend, const Pass* pass,
 				}
 				depthInc += pass->getPassIterationCount();
 
-				mDestRenderSystem->_render(ro);
+				if (rend->preRender(this, mDestRenderSystem))
+					mDestRenderSystem->_render(ro);
+				rend->postRender(this, mDestRenderSystem);
 
 				if (scissored == CLIPPED_SOME)
 					resetScissor();
@@ -3212,7 +3214,9 @@ void SceneManager::renderSingleObject(const Renderable* rend, const Pass* pass,
 					// issue the render op		
 					// nfz: set up multipass rendering
 					mDestRenderSystem->setCurrentPassIterationCount(pass->getPassIterationCount());
-					mDestRenderSystem->_render(ro);
+					if (rend->preRender(this, mDestRenderSystem))
+						mDestRenderSystem->_render(ro);
+					rend->postRender(this, mDestRenderSystem);
 				}
 				if (scissored == CLIPPED_SOME)
 					resetScissor();
@@ -3227,7 +3231,9 @@ void SceneManager::renderSingleObject(const Renderable* rend, const Pass* pass,
 	{
 		// Just render
 		mDestRenderSystem->setCurrentPassIterationCount(1);
-		mDestRenderSystem->_render(ro);
+		if (rend->preRender(this, mDestRenderSystem))
+			mDestRenderSystem->_render(ro);
+		rend->postRender(this, mDestRenderSystem);
 	}
 	
     // Reset view / projection changes if any
