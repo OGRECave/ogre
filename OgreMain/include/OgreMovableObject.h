@@ -89,6 +89,9 @@ namespace Ogre {
 				list (up to the number of shadow textures available) are the same 
 				lights that were used to generate the shadow textures, 
 				and they are in the same order (particularly for additive effects).
+			@note
+				This method will not be called for additive stencil shadows since the
+				light list cannot be varied per object with this technique.
             @returns
                 A pointer to a light list if you populated the light list yourself, or
                 NULL to fall back on the default finding process.
