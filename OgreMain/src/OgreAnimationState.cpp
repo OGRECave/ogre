@@ -219,18 +219,18 @@ namespace Ogre
 		{
 			if(initialWeight >= 0)
 			{
-				mBlendMask = OGRE_ALLOC_ONE_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint, initialWeight);
+				mBlendMask = OGRE_NEW_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint, initialWeight);
 			}
 			else
 			{
-				mBlendMask = OGRE_ALLOC_ONE_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint);
+				mBlendMask = OGRE_NEW_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint);
 			}
 		}
 	}
 	//---------------------------------------------------------------------
 	void AnimationState::destroyBlendMask()
 	{
-		OGRE_FREE(mBlendMask, MEMCATEGORY_ANIMATION);
+		OGRE_DELETE_T(mBlendMask, BoneBlendMask, MEMCATEGORY_ANIMATION);
 		mBlendMask = 0;
 	}
 	//---------------------------------------------------------------------

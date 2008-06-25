@@ -61,7 +61,7 @@ namespace Ogre
 			msFreePolygons.resize(initialSize);
 			for (size_t i = 0; i < initialSize; ++i)
 			{
-				msFreePolygons[i] = OGRE_ALLOC_ONE_T(Polygon, MEMCATEGORY_SCENE_CONTROL)();
+				msFreePolygons[i] = OGRE_NEW_T(Polygon, MEMCATEGORY_SCENE_CONTROL)();
 			}
 		}
 	}
@@ -73,7 +73,7 @@ namespace Ogre
 		for (PolygonList::iterator i = msFreePolygons.begin(); 
 			i != msFreePolygons.end(); ++i)
 		{
-			OGRE_FREE(*i, MEMCATEGORY_SCENE_CONTROL);
+			OGRE_DELETE_T(*i, Polygon, MEMCATEGORY_SCENE_CONTROL);
 		}
 		msFreePolygons.clear();
 	}

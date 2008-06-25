@@ -47,7 +47,7 @@ namespace Ogre
 
 		assert(mAllocations.find(ptr) == mAllocations.end() && "Double allocation with same address - "
 			"this probably means you have a mismatched allocation / deallocation style, "
-			"check if you're are using OGRE_ALLOC_T and OGRE_FREE consistently");
+			"check if you're are using OGRE_ALLOC_T / OGRE_FREE and OGRE_NEW_T / OGRE_DELETE_T consistently");
 
 		mAllocations[ptr] = Alloc(sz, pool, file, ln, func);
 		if(pool >= mAllocationsByPool.size())
@@ -67,7 +67,7 @@ namespace Ogre
 		AllocationMap::iterator i = mAllocations.find(ptr);
 		assert(i != mAllocations.end() && "Unable to locate allocation unit - "
 			"this probably means you have a mismatched allocation / deallocation style, "
-			"check if you're are using OGRE_ALLOC_T and OGRE_FREE consistently");
+			"check if you're are using OGRE_ALLOC_T / OGRE_FREE and OGRE_NEW_T / OGRE_DELETE_T consistently");
 		// update category stats
 		mAllocationsByPool[i->second.pool] -= i->second.bytes;
 		// global stats

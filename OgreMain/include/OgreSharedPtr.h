@@ -58,7 +58,7 @@ namespace Ogre {
         }
 
         template< class Y>
-		explicit SharedPtr(Y* rep) : pRep(rep), pUseCount(OGRE_ALLOC_ONE_T(unsigned int, MEMCATEGORY_GENERAL)(1))
+		explicit SharedPtr(Y* rep) : pRep(rep), pUseCount(OGRE_NEW_T(unsigned int, MEMCATEGORY_GENERAL)(1))
 		{
             OGRE_SET_AUTO_SHARED_MUTEX_NULL
 			OGRE_NEW_AUTO_SHARED_MUTEX
@@ -139,7 +139,7 @@ namespace Ogre {
 			assert(!pRep && !pUseCount);
             OGRE_NEW_AUTO_SHARED_MUTEX
 			OGRE_LOCK_AUTO_SHARED_MUTEX
-			pUseCount = OGRE_ALLOC_ONE_T(unsigned int, MEMCATEGORY_GENERAL)(1);
+			pUseCount = OGRE_NEW_T(unsigned int, MEMCATEGORY_GENERAL)(1);
 			pRep = rep;
 		}
 
@@ -196,6 +196,8 @@ namespace Ogre {
             // Use setNull() before shutdown or make sure your pointer goes
             // out of scope before OGRE shuts down to avoid this.
             OGRE_DELETE pRep;
+			// use OGRE_FREE instead of OGRE_DELETE_T since 'unsigned int' isn't a destructor
+			// we only used OGRE_NEW_T to be able to use constructor
             OGRE_FREE(pUseCount, MEMCATEGORY_GENERAL);
 			OGRE_DELETE_AUTO_SHARED_MUTEX
         }

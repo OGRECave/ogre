@@ -184,7 +184,7 @@ namespace Ogre {
 		// Initialise the AnimationState, if Mesh has animation
 		if (hasSkeleton())
 		{
-			mFrameBonesLastUpdated = OGRE_ALLOC_ONE_T(unsigned long, MEMCATEGORY_ANIMATION)(std::numeric_limits<unsigned long>::max());
+			mFrameBonesLastUpdated = OGRE_NEW_T(unsigned long, MEMCATEGORY_ANIMATION)(std::numeric_limits<unsigned long>::max());
 			mNumBoneMatrices = mSkeletonInstance->getNumBones();
 			mBoneMatrices = static_cast<Matrix4*>(OGRE_MALLOC_SIMD(sizeof(Matrix4) * mNumBoneMatrices, MEMCATEGORY_ANIMATION));
 		}
@@ -259,14 +259,16 @@ namespace Ogre {
                 // Should never occuring, just in case
                 else if (mSharedSkeletonEntities->empty())
                 {
-                    OGRE_FREE(mSharedSkeletonEntities, MEMCATEGORY_ANIMATION);
+                    OGRE_DELETE_T(mSharedSkeletonEntities, EntitySet, MEMCATEGORY_ANIMATION);
+					// using OGRE_FREE since unsigned long is not a destructor
                     OGRE_FREE(mFrameBonesLastUpdated, MEMCATEGORY_ANIMATION);
                     OGRE_DELETE mSkeletonInstance;
                     OGRE_FREE_SIMD(mBoneMatrices, MEMCATEGORY_ANIMATION);
                     OGRE_DELETE mAnimationState;
                 }
             } else {
-                OGRE_FREE(mFrameBonesLastUpdated, MEMCATEGORY_ANIMATION);
+				// using OGRE_FREE since unsigned long is not a destructor
+				OGRE_FREE(mFrameBonesLastUpdated, MEMCATEGORY_ANIMATION);
                 OGRE_DELETE mSkeletonInstance;
                 OGRE_FREE_SIMD(mBoneMatrices, MEMCATEGORY_ANIMATION);
                 OGRE_DELETE mAnimationState;
@@ -1886,7 +1888,8 @@ namespace Ogre {
             OGRE_DELETE mSkeletonInstance;
             OGRE_FREE_SIMD(mBoneMatrices, MEMCATEGORY_ANIMATION);
             OGRE_DELETE mAnimationState;
-            OGRE_FREE(mFrameBonesLastUpdated, MEMCATEGORY_ANIMATION);
+			// using OGRE_FREE since unsigned long is not a destructor
+			OGRE_FREE(mFrameBonesLastUpdated, MEMCATEGORY_ANIMATION);
             mSkeletonInstance = entity->mSkeletonInstance;
             mNumBoneMatrices = entity->mNumBoneMatrices;
             mBoneMatrices = entity->mBoneMatrices;
@@ -1894,7 +1897,7 @@ namespace Ogre {
             mFrameBonesLastUpdated = entity->mFrameBonesLastUpdated;
             if (entity->mSharedSkeletonEntities == NULL)
             {
-                entity->mSharedSkeletonEntities = OGRE_ALLOC_ONE_T(EntitySet, MEMCATEGORY_ANIMATION)();
+                entity->mSharedSkeletonEntities = OGRE_NEW_T(EntitySet, MEMCATEGORY_ANIMATION)();
                 entity->mSharedSkeletonEntities->insert(entity);
             }
             mSharedSkeletonEntities = entity->mSharedSkeletonEntities;
@@ -1914,7 +1917,7 @@ namespace Ogre {
         if (mSharedSkeletonEntities->size() == 1)
         {
             //just reset
-            OGRE_FREE(mSharedSkeletonEntities, MEMCATEGORY_ANIMATION);
+            OGRE_DELETE_T(mSharedSkeletonEntities, EntitySet, MEMCATEGORY_ANIMATION);
             mSharedSkeletonEntities = 0;
         }
         else
@@ -1923,7 +1926,7 @@ namespace Ogre {
             mSkeletonInstance->load();
             mAnimationState = OGRE_NEW AnimationStateSet();
             mMesh->_initAnimationState(mAnimationState);
-            mFrameBonesLastUpdated = OGRE_ALLOC_ONE_T(unsigned long, MEMCATEGORY_ANIMATION)(std::numeric_limits<unsigned long>::max());
+            mFrameBonesLastUpdated = OGRE_NEW_T(unsigned long, MEMCATEGORY_ANIMATION)(std::numeric_limits<unsigned long>::max());
             mNumBoneMatrices = mSkeletonInstance->getNumBones();
             mBoneMatrices = static_cast<Matrix4*>(OGRE_MALLOC_SIMD(sizeof(Matrix4) * mNumBoneMatrices, MEMCATEGORY_ANIMATION));
 

@@ -373,7 +373,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     NodeAnimationTrack::~NodeAnimationTrack()
     {
-        OGRE_FREE(mSplines, MEMCATEGORY_ANIMATION);
+        OGRE_DELETE_T(mSplines, Splines, MEMCATEGORY_ANIMATION);
     }
 	//---------------------------------------------------------------------
     void NodeAnimationTrack::getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const
@@ -520,7 +520,7 @@ namespace Ogre {
         // Allocate splines if not exists
         if (!mSplines)
         {
-            mSplines = OGRE_ALLOC_ONE_T(Splines, MEMCATEGORY_ANIMATION);
+            mSplines = OGRE_NEW_T(Splines, MEMCATEGORY_ANIMATION);
         }
 
         // Cache to register for optimisation
