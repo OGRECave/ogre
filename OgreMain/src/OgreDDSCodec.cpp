@@ -553,7 +553,7 @@ namespace Ogre {
 			imgData->width, imgData->height, imgData->depth, imgData->format);
 
 		// Bind output buffer
-		output.bind(new MemoryDataStream(imgData->size));
+		output.bind(OGRE_NEW MemoryDataStream(imgData->size));
 
 		
 		// Now deal with the data

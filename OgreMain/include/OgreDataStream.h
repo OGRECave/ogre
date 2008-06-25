@@ -359,7 +359,9 @@ namespace Ogre {
         @param s Pointer to source stream
         @param size Size of the stream contents in bytes
         @param freeOnClose Whether to delete the underlying stream on 
-            destruction of this class
+            destruction of this class. If you specify 'true' for this you
+			must ensure that the stream was allocated using OGRE_NEW_T with 
+			MEMCATEGRORY_GENERAL.
         */
 		FileStreamDataStream(const String& name, 
             std::ifstream* s, 

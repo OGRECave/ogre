@@ -406,7 +406,7 @@ namespace Ogre
 		}
 
         DataStreamPtr memStream(
-			new MemoryDataStream(imageData, data_size, true));
+			OGRE_NEW MemoryDataStream(imageData, data_size, true));
 
         Image img;
 		img.loadRawData( memStream, finalWidth, finalHeight, PF_BYTE_LA );

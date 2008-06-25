@@ -545,7 +545,7 @@ namespace Ogre {
             if (mFreeOnClose)
             {
                 // delete the stream too
-                delete mpStream;
+                OGRE_DELETE_T(mpStream, basic_ifstream, MEMCATEGORY_GENERAL);
                 mpStream = 0;
             }
         }

@@ -86,7 +86,7 @@ namespace Ogre
 		{
 			// if we ran out of polys to use, create a new one
 			// hopefully this one will return to the pool in due course
-			return new Polygon();
+			return OGRE_NEW_T(Polygon, MEMCATEGORY_SCENE_CONTROL)();
 		}
 		else
 		{

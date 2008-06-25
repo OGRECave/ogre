@@ -197,7 +197,7 @@ namespace Ogre {
 		#define OGRE_THREAD_NOTIFY_ALL(sync) 
 		#define OGRE_THREAD_POINTER(T, var) T* var
 		#define OGRE_THREAD_POINTER_SET(var, expr) var = expr
-		#define OGRE_THREAD_POINTER_DELETE(var) delete var; var = 0
+		#define OGRE_THREAD_POINTER_DELETE(var) OGRE_DELETE var; var = 0
 		#define OGRE_THREAD_POINTER_GET(var) var
 	#endif
 

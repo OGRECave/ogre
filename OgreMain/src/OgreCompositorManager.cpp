@@ -63,7 +63,7 @@ CompositorManager::CompositorManager():
 	mResourceType = "Compositor";
 
 	// Create default thread serializer instance (also non-threaded)
-	OGRE_THREAD_POINTER_SET(mSerializer, new CompositorSerializer());
+	OGRE_THREAD_POINTER_SET(mSerializer, OGRE_NEW CompositorSerializer());
 
 	// Register with resource group manager
 	ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
@@ -73,7 +73,7 @@ CompositorManager::CompositorManager():
 CompositorManager::~CompositorManager()
 {
     freeChains();
-	OGRE_DELETE  mRectangle;
+	OGRE_DELETE mRectangle;
 
 	OGRE_THREAD_POINTER_DELETE(mSerializer);
 

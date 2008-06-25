@@ -100,22 +100,22 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     VertexDeclaration* HardwareBufferManager::createVertexDeclarationImpl(void)
     {
-        return new VertexDeclaration();
+        return OGRE_NEW VertexDeclaration();
     }
     //-----------------------------------------------------------------------
     void HardwareBufferManager::destroyVertexDeclarationImpl(VertexDeclaration* decl)
     {
-        delete decl;
+        OGRE_DELETE decl;
     }
     //-----------------------------------------------------------------------
 	VertexBufferBinding* HardwareBufferManager::createVertexBufferBindingImpl(void)
 	{
-		return new VertexBufferBinding();
+		return OGRE_NEW VertexBufferBinding();
 	}
     //-----------------------------------------------------------------------
 	void HardwareBufferManager::destroyVertexBufferBindingImpl(VertexBufferBinding* binding)
 	{
-		delete binding;
+		OGRE_DELETE binding;
 	}
     //-----------------------------------------------------------------------
     void HardwareBufferManager::destroyAllDeclarations(void)

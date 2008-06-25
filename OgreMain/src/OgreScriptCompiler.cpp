@@ -1496,7 +1496,7 @@ namespace Ogre
         mScriptPatterns.push_back("*.os");
 		ResourceGroupManager::getSingleton()._registerScriptLoader(this);
 
-		OGRE_THREAD_POINTER_SET(mScriptCompiler, new ScriptCompiler());
+		OGRE_THREAD_POINTER_SET(mScriptCompiler, OGRE_NEW ScriptCompiler());
 
 		mBuiltinTranslatorManager = new BuiltinScriptTranslatorManager();
 		mManagers.push_back(mBuiltinTranslatorManager);

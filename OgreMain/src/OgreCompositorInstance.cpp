@@ -221,7 +221,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
         switch(pass->getType())
         {
         case CompositionPass::PT_CLEAR:
-			queueRenderSystemOp(finalState, new RSClearOperation(
+			queueRenderSystemOp(finalState, OGRE_NEW RSClearOperation(
 				pass->getClearBuffers(),
 				pass->getClearColour(),
 				pass->getClearDepth(),
@@ -229,7 +229,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
 				));
             break;
 		case CompositionPass::PT_STENCIL:
-			queueRenderSystemOp(finalState, new RSStencilOperation(
+			queueRenderSystemOp(finalState, OGRE_NEW RSStencilOperation(
 				pass->getStencilCheck(),pass->getStencilFunc(), pass->getStencilRefValue(),
 				pass->getStencilMask(), pass->getStencilFailOp(), pass->getStencilDepthFailOp(),
 				pass->getStencilPassOp(), pass->getStencilTwoSidedOperation()

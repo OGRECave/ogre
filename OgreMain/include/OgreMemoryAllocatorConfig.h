@@ -262,12 +262,14 @@ namespace Ogre
 	typedef GeometryAllocatedObject		DebugGeomAlloc;
 	typedef GeneralAllocatedObject		DynLibAlloc;
 	typedef GeometryAllocatedObject		EdgeDataAlloc;
+	typedef GeneralAllocatedObject		FactoryAlloc;
 	typedef SceneObjAllocatedObject		FXAlloc;
 	typedef GeneralAllocatedObject		ImageAlloc;
 	typedef GeometryAllocatedObject		IndexDataAlloc;
 	typedef SceneObjAllocatedObject		MovableAlloc;
 	typedef SceneCtlAllocatedObject		NodeAlloc;
 	typedef SceneObjAllocatedObject		OverlayAlloc;
+	typedef RenderSysAllocatedObject	GpuParamsAlloc;
 	typedef ResourceAllocatedObject		PassAlloc;
 	typedef GeometryAllocatedObject		PatchAlloc;
 	typedef GeometryAllocatedObject		ProgMeshAlloc;

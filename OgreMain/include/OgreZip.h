@@ -97,10 +97,10 @@ namespace Ogre {
         /// @copydoc FactoryObj::createInstance
         Archive *createInstance( const String& name ) 
         {
-            return new ZipArchive(name, "Zip");
+            return OGRE_NEW ZipArchive(name, "Zip");
         }
         /// @copydoc FactoryObj::destroyInstance
-        void destroyInstance( Archive* arch) { delete arch; }
+        void destroyInstance( Archive* arch) { OGRE_DELETE arch; }
     };
 
     /** Specialisation of DataStream to handle streaming data from zip archives. */

@@ -63,7 +63,7 @@ namespace Ogre {
 
 		// Create primary thread copies of script compiler / serializer
 		// other copies for other threads may also be instantiated
-		OGRE_THREAD_POINTER_SET(mSerializer, new MaterialSerializer());
+		OGRE_THREAD_POINTER_SET(mSerializer, OGRE_NEW MaterialSerializer());
 
         // Loading order
         mLoadOrder = 100.0f;

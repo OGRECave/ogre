@@ -252,7 +252,7 @@ namespace Ogre
 		{
 			AnimationState* src = i->second;
 			mAnimationStates[src->getAnimationName()] = 
-				new AnimationState(this, *src);
+				OGRE_NEW AnimationState(this, *src);
 		}
 
         // Clone enabled animation state list
@@ -279,7 +279,7 @@ namespace Ogre
 		{
             mEnabledAnimationStates.remove(i->second);
 
-			delete i->second;
+			OGRE_DELETE i->second;
 			mAnimationStates.erase(i);
 		}
 	}
@@ -291,7 +291,7 @@ namespace Ogre
 		for (AnimationStateMap::iterator i = mAnimationStates.begin();
 			i != mAnimationStates.end(); ++i)
 		{
-			delete i->second;
+			OGRE_DELETE i->second;
 		}
 		mAnimationStates.clear();
         mEnabledAnimationStates.clear();

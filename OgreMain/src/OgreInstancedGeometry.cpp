@@ -89,7 +89,7 @@ namespace Ogre {
 			StringUtil::StrStreamType str;
 			str << mName << ":" << index;
 
-			mInstancedGeometryInstance = new BatchInstance(this, str.str(), mOwner, index);
+			mInstancedGeometryInstance = OGRE_NEW BatchInstance(this, str.str(), mOwner, index);
 			mOwner->injectMovableObject(mInstancedGeometryInstance);
 			mInstancedGeometryInstance->setVisible(mVisible);
 			mInstancedGeometryInstance->setCastShadows(mCastShadows);
