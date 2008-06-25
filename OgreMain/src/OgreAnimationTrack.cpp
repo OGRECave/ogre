@@ -520,7 +520,7 @@ namespace Ogre {
         // Allocate splines if not exists
         if (!mSplines)
         {
-            mSplines = OGRE_ALLOC_T(Splines, 1, MEMCATEGORY_ANIMATION);
+            mSplines = OGRE_ALLOC_ONE_T(Splines, MEMCATEGORY_ANIMATION);
         }
 
         // Cache to register for optimisation
