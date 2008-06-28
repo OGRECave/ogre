@@ -38,6 +38,9 @@ Torus Knot Software Ltd.
 #include "OgreParticleSystemRenderer.h"
 #include "OgreBillboardParticleRenderer.h"
 #include "OgreStringConverter.h"
+#if OGRE_USE_NEW_COMPILERS == 1
+#  include "OgreScriptCompiler.h"
+#endif
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -107,6 +110,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystemManager::parseScript(DataStreamPtr& stream, const String& groupName)
     {
+#if OGRE_USE_NEW_COMPILERS == 1
+		ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
+#else // OGRE_USE_NEW_COMPILERS
         String line;
         ParticleSystem* pSys;
         std::vector<String> vecparams;
@@ -186,6 +192,7 @@ namespace Ogre {
 
 
         }
+#endif // OGRE_USE_NEW_COMPILERS
     }
     //-----------------------------------------------------------------------
     void ParticleSystemManager::addEmitterFactory(ParticleEmitterFactory* factory)

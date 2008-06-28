@@ -34,6 +34,9 @@ Torus Knot Software Ltd.
 #include "OgreCompositionTargetPass.h"
 #include "OgreCompositionTechnique.h"
 #include "OgreRoot.h"
+#if OGRE_USE_NEW_COMPILERS == 1
+#  include "OgreScriptCompiler.h"
+#endif
 
 namespace Ogre {
 
@@ -134,7 +137,10 @@ void CompositorManager::initialise(void)
 //-----------------------------------------------------------------------
 void CompositorManager::parseScript(DataStreamPtr& stream, const String& groupName)
 {
-#if OGRE_THREAD_SUPPORT
+#if OGRE_USE_NEW_COMPILERS == 1
+	ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
+#else // OGRE_USE_NEW_COMPILERS
+#  if OGRE_THREAD_SUPPORT
 	// check we have an instance for this thread 
 	if (!mSerializer.get())
 	{
@@ -142,8 +148,10 @@ void CompositorManager::parseScript(DataStreamPtr& stream, const String& groupNa
 		// the thread dies
 		mSerializer.reset(new CompositorSerializer());
 	}
-#endif
+#  endif
     mSerializer->parseScript(stream, groupName);
+#endif // OGRE_USE_NEW_COMPILERS
+
 }
 //-----------------------------------------------------------------------
 CompositorChain *CompositorManager::getCompositorChain(Viewport *vp)

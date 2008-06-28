@@ -39,6 +39,9 @@ Torus Knot Software Ltd.
 #include "OgrePass.h"
 #include "OgreTextureUnitState.h"
 #include "OgreException.h"
+#if OGRE_USE_NEW_COMPILERS == 1
+#  include "OgreScriptCompiler.h"
+#endif
 
 namespace Ogre {
 
@@ -126,8 +129,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void MaterialManager::parseScript(DataStreamPtr& stream, const String& groupName)
     {
-        // Delegate to serializer
-#if OGRE_THREAD_SUPPORT
+#if OGRE_USE_NEW_COMPILERS == 1
+		ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
+#else // OGRE_USE_NEW_COMPILERS
+#  if OGRE_THREAD_SUPPORT
+		// Delegate to serializer
 		// check we have an instance for this thread (should always have one for main thread)
 		if (!mSerializer.get())
 		{
@@ -135,8 +141,10 @@ namespace Ogre {
 			// the thread dies
 			mSerializer.reset(new MaterialSerializer());
 		}
-#endif
+#  endif
         mSerializer->parseScript(stream, groupName);
+#endif // OGRE_USE_NEW_COMPILERS
+
     }
     //-----------------------------------------------------------------------
 	void MaterialManager::setDefaultTextureFiltering(TextureFilterOptions fo)
