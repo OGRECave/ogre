@@ -120,7 +120,7 @@ Torus Knot Software Ltd
 	OGRE_FREE(pLong, MEMCATEGORY_GENERAL);
 	/// Primitive type with constructor (you can mismatch OGRE_NEW_T and OGRE_FREE because no destructor)
 	long* pLong = OGRE_NEW_T(long, MEMCATEGORY_GENERAL)(0);
-	OGRE_FREE(pLong);
+	OGRE_FREE(pLong, MEMCATEGORY_GENERAL);
 	/// Raw memory
 	void* pVoid = OGRE_MALLOC(1024, MEMCATEGORY_GENERAL);
 	OGRE_FREE(pVoid, MEMCATEGORY_GENERAL);
