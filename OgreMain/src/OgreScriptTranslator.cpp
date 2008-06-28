@@ -3596,7 +3596,6 @@ namespace Ogre{
 		{
 			GpuProgramParametersSharedPtr ptr = prog->getDefaultParameters();
 			GpuProgramTranslator::translateProgramParameters(compiler, ptr, reinterpret_cast<ObjectAbstractNode*>(params.get()));
-			prog->touch();
 		}
 	}
 	//-------------------------------------------------------------------------
@@ -3696,7 +3695,6 @@ namespace Ogre{
 		{
 			GpuProgramParametersSharedPtr ptr = prog->getDefaultParameters();
 			GpuProgramTranslator::translateProgramParameters(compiler, ptr, reinterpret_cast<ObjectAbstractNode*>(params.get()));
-			prog->touch();
 		}
 
 	}
@@ -3826,7 +3824,6 @@ namespace Ogre{
 		{
 			GpuProgramParametersSharedPtr ptr = prog->getDefaultParameters();
 			GpuProgramTranslator::translateProgramParameters(compiler, ptr, reinterpret_cast<ObjectAbstractNode*>(params.get()));
-			prog->touch();
 		}	
 
 	}
