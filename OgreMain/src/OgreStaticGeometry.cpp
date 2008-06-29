@@ -167,7 +167,7 @@ namespace Ogre {
 			str << mName << ":" << index;
 			// Calculate the region centre
 			Vector3 centre = getRegionCentre(x, y, z);
-			ret = new Region(this, str.str(), mOwner, index, centre);
+			ret = OGRE_NEW Region(this, str.str(), mOwner, index, centre);
 			mOwner->injectMovableObject(ret);
 			ret->setVisible(mVisible);
 			ret->setCastShadows(mCastShadows);
@@ -298,7 +298,7 @@ namespace Ogre {
 		for (uint i = 0; i < ent->getNumSubEntities(); ++i)
 		{
 			SubEntity* se = ent->getSubEntity(i);
-			QueuedSubMesh* q = new QueuedSubMesh();
+			QueuedSubMesh* q = OGRE_NEW QueuedSubMesh();
 
 			// Get the geometry for this SubMesh
 			q->submesh = se->getSubMesh();
@@ -327,7 +327,7 @@ namespace Ogre {
 			return i->second;
 		}
 		// Otherwise, we have to create a new one
-		SubMeshLodGeometryLinkList* lodList = new SubMeshLodGeometryLinkList();
+		SubMeshLodGeometryLinkList* lodList = OGRE_NEW_T(SubMeshLodGeometryLinkList, MEMCATEGORY_GEOMETRY)();
 		mSubMeshGeometryLookup[sm] = lodList;
 		ushort numLods = sm->parent->isLodManual() ? 1 :
 			sm->parent->getNumLodLevels();
@@ -508,13 +508,13 @@ namespace Ogre {
 			ibuf->unlock();
 		}
 
-		targetGeomLink->indexData = new IndexData();
+		targetGeomLink->indexData = OGRE_NEW IndexData();
 		targetGeomLink->indexData->indexStart = 0;
 		targetGeomLink->indexData->indexCount = id->indexCount;
 		targetGeomLink->indexData->indexBuffer = ibuf;
 
 		// Store optimised geometry for deallocation later
-		OptimisedSubMeshGeometry *optGeom = new OptimisedSubMeshGeometry();
+		OptimisedSubMeshGeometry *optGeom = OGRE_NEW OptimisedSubMeshGeometry();
 		optGeom->indexData = targetGeomLink->indexData;
 		optGeom->vertexData = targetGeomLink->vertexData;
 		mOptimisedSubMeshGeometryList.push_back(optGeom);
@@ -580,7 +580,7 @@ namespace Ogre {
 			i != mRegionMap.end(); ++i)
 		{
 			mOwner->extractMovableObject(i->second);
-			delete i->second;
+			OGRE_DELETE i->second;
 		}
 		mRegionMap.clear();
 	}
@@ -591,21 +591,21 @@ namespace Ogre {
 		for (QueuedSubMeshList::iterator i = mQueuedSubMeshes.begin();
 			i != mQueuedSubMeshes.end(); ++i)
 		{
-			delete *i;
+			OGRE_DELETE *i;
 		}
 		mQueuedSubMeshes.clear();
 		// Delete precached geoemtry lists
 		for (SubMeshGeometryLookup::iterator l = mSubMeshGeometryLookup.begin();
 			l != mSubMeshGeometryLookup.end(); ++l)
 		{
-			delete l->second;
+			OGRE_DELETE_T(l->second, SubMeshLodGeometryLinkList, MEMCATEGORY_GEOMETRY);
 		}
 		mSubMeshGeometryLookup.clear();
 		// Delete optimised geometry
 		for (OptimisedSubMeshGeometryList::iterator o = mOptimisedSubMeshGeometryList.begin();
 			o != mOptimisedSubMeshGeometryList.end(); ++o)
 		{
-			delete *o;
+			OGRE_DELETE *o;
 		}
 		mOptimisedSubMeshGeometryList.clear();
 
@@ -711,17 +711,17 @@ namespace Ogre {
 		for (LODBucketList::iterator i = mLodBucketList.begin();
 			i != mLodBucketList.end(); ++i)
 		{
-			delete *i;
+			OGRE_DELETE *i;
 		}
 		mLodBucketList.clear();
 
 		for (ShadowRenderableList::iterator s = mShadowRenderables.begin();
 			s != mShadowRenderables.end(); ++s)
 		{
-			delete *s;
+			OGRE_DELETE *s;
 		}
 		mShadowRenderables.clear();
-		delete mEdgeList;
+		OGRE_DELETE mEdgeList;
 
 		// no need to delete queued meshes, these are managed in StaticGeometry
 
@@ -774,7 +774,7 @@ namespace Ogre {
 		for (ushort lod = 0; lod < mLodSquaredDistances.size(); ++lod)
 		{
 			LODBucket* lodBucket =
-				new LODBucket(this, lod, mLodSquaredDistances[lod]);
+				OGRE_NEW LODBucket(this, lod, mLodSquaredDistances[lod]);
 			mLodBucketList.push_back(lodBucket);
 			// Now iterate over the meshes and assign to LODs
 			// LOD bucket will pick the right LOD to use
@@ -967,7 +967,7 @@ namespace Ogre {
 				// for extruding the shadow volume) since otherwise we can
 				// get depth-fighting on the light cap
 
-				*si = new RegionShadowRenderable(this, indexBuffer,
+				*si = OGRE_NEW RegionShadowRenderable(this, indexBuffer,
 					egi->vertexData, mVertexProgramInUse || !extrude);
 			}
 			// Get shadow renderable
@@ -1031,13 +1031,13 @@ namespace Ogre {
 		: mParent(parent)
 	{
 		// Initialise render op
-		mRenderOp.indexData = new IndexData();
+		mRenderOp.indexData = OGRE_NEW IndexData();
 		mRenderOp.indexData->indexBuffer = *indexBuffer;
 		mRenderOp.indexData->indexStart = 0;
 		// index start and count are sorted out later
 
 		// Create vertex data which just references position component (and 2 component)
-		mRenderOp.vertexData = new VertexData();
+		mRenderOp.vertexData = OGRE_NEW VertexData();
 		// Map in position data
 		mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT3, VES_POSITION);
 		ushort origPosBind =
@@ -1068,7 +1068,7 @@ namespace Ogre {
 			if (createSeparateLightCap)
 			{
 				// Create child light cap
-				mLightCap = new RegionShadowRenderable(parent,
+				mLightCap = OGRE_NEW RegionShadowRenderable(parent,
 					indexBuffer, vertexData, false, true);
 			}
 		}
@@ -1076,8 +1076,8 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	StaticGeometry::Region::RegionShadowRenderable::~RegionShadowRenderable()
 	{
-		delete mRenderOp.indexData;
-		delete mRenderOp.vertexData;
+		OGRE_DELETE mRenderOp.indexData;
+		OGRE_DELETE mRenderOp.vertexData;
 	}
 	//--------------------------------------------------------------------------
 	void StaticGeometry::Region::RegionShadowRenderable::getWorldTransforms(
@@ -1100,13 +1100,13 @@ namespace Ogre {
 		for (MaterialBucketMap::iterator i = mMaterialBucketMap.begin();
 			i != mMaterialBucketMap.end(); ++i)
 		{
-			delete i->second;
+			OGRE_DELETE i->second;
 		}
 		mMaterialBucketMap.clear();
 		for(QueuedGeometryList::iterator qi = mQueuedGeometryList.begin();
 			qi != mQueuedGeometryList.end(); ++qi)
 		{
-			delete *qi;
+			OGRE_DELETE *qi;
 		}
 		mQueuedGeometryList.clear();
 
@@ -1115,7 +1115,7 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	void StaticGeometry::LODBucket::assign(QueuedSubMesh* qmesh, ushort atLod)
 	{
-		QueuedGeometry* q = new QueuedGeometry();
+		QueuedGeometry* q = OGRE_NEW QueuedGeometry();
 		mQueuedGeometryList.push_back(q);
 		q->position = qmesh->position;
 		q->orientation = qmesh->orientation;
@@ -1141,7 +1141,7 @@ namespace Ogre {
 		}
 		else
 		{
-			mbucket = new MaterialBucket(this, qmesh->materialName);
+			mbucket = OGRE_NEW MaterialBucket(this, qmesh->materialName);
 			mMaterialBucketMap[qmesh->materialName] = mbucket;
 		}
 		mbucket->assign(q);
@@ -1215,7 +1215,7 @@ namespace Ogre {
 		for (GeometryBucketList::iterator i = mGeometryBucketList.begin();
 			i != mGeometryBucketList.end(); ++i)
 		{
-			delete *i;
+			OGRE_DELETE *i;
 		}
 		mGeometryBucketList.clear();
 
@@ -1238,7 +1238,7 @@ namespace Ogre {
 		// Do we need to create a new one?
 		if (newBucket)
 		{
-			GeometryBucket* gbucket = new GeometryBucket(this, formatString,
+			GeometryBucket* gbucket = OGRE_NEW GeometryBucket(this, formatString,
 				qgeom->geometry->vertexData, qgeom->geometry->indexData);
 			// Add to main list
 			mGeometryBucketList.push_back(gbucket);
@@ -1404,8 +1404,8 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	StaticGeometry::GeometryBucket::~GeometryBucket()
 	{
-		delete mVertexData;
-		delete mIndexData;
+		OGRE_DELETE mVertexData;
+		OGRE_DELETE mIndexData;
 	}
 	//--------------------------------------------------------------------------
 	const MaterialPtr& StaticGeometry::GeometryBucket::getMaterial(void) const

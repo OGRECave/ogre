@@ -183,7 +183,7 @@ namespace Ogre {
 
         i += index;
 
-        delete *i;
+        OGRE_DELETE *i;
 
         mKeyFrames.erase(i);
 
@@ -199,7 +199,7 @@ namespace Ogre {
 
         for (; i != mKeyFrames.end(); ++i)
         {
-            delete *i;
+            OGRE_DELETE *i;
         }
 
         _keyFrameDataChanged();

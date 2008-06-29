@@ -200,7 +200,7 @@ namespace Ogre {
     typedef std::list<MovableObject*> SceneQueryResultMovableList;
     typedef std::list<SceneQuery::WorldFragment*> SceneQueryResultWorldFragmentList;
     /** Holds the results of a scene query. */
-    struct _OgreExport SceneQueryResult
+	struct _OgreExport SceneQueryResult : public SceneMgtAlloc
     {
         /// List of movable objects in the query (entities, particle systems etc)
         SceneQueryResultMovableList movables;
@@ -484,7 +484,7 @@ namespace Ogre {
     typedef std::list<SceneQueryMovableObjectPair> SceneQueryMovableIntersectionList;
     typedef std::list<SceneQueryMovableObjectWorldFragmentPair> SceneQueryMovableWorldFragmentIntersectionList;
     /** Holds the results of an intersection scene query (pair values). */
-    struct _OgreExport IntersectionSceneQueryResult
+	struct _OgreExport IntersectionSceneQueryResult : public SceneMgtAlloc
     {
         /// List of movable / movable intersections (entities, particle systems etc)
         SceneQueryMovableIntersectionList movables2movables;

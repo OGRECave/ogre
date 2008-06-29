@@ -378,12 +378,12 @@ namespace Ogre
 		const String& name, ResourceHandle handle,
 		const String& group, bool isManual, ManualResourceLoader* loader)
 	{
-		return new UnifiedHighLevelGpuProgram(creator, name, handle, group, isManual, loader);
+		return OGRE_NEW UnifiedHighLevelGpuProgram(creator, name, handle, group, isManual, loader);
 	}
 	//-----------------------------------------------------------------------
 	void UnifiedHighLevelGpuProgramFactory::destroy(HighLevelGpuProgram* prog)
 	{
-		delete prog;
+		OGRE_DELETE prog;
 	}
 	//-----------------------------------------------------------------------
 

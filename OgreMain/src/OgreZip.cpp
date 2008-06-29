@@ -151,13 +151,13 @@ namespace Ogre {
 		zzip_dir_stat(mZzipDir, filename.c_str(), &zstat, ZZIP_CASEINSENSITIVE);
 
         // Construct & return stream
-        return DataStreamPtr(new ZipDataStream(filename, zzipFile, static_cast<size_t>(zstat.st_size)));
+        return DataStreamPtr(OGRE_NEW ZipDataStream(filename, zzipFile, static_cast<size_t>(zstat.st_size)));
 
     }
     //-----------------------------------------------------------------------
     StringVectorPtr ZipArchive::list(bool recursive, bool dirs)
     {
-        StringVectorPtr ret = StringVectorPtr(new StringVector());
+        StringVectorPtr ret = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         FileInfoList::iterator i, iend;
         iend = mFileList.end();
@@ -171,7 +171,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     FileInfoListPtr ZipArchive::listFileInfo(bool recursive, bool dirs)
     {
-        FileInfoList* fil = new FileInfoList();
+        FileInfoList* fil = OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)();
         FileInfoList::const_iterator i, iend;
         iend = mFileList.end();
         for (i = mFileList.begin(); i != iend; ++i)
@@ -179,12 +179,12 @@ namespace Ogre {
                 (recursive || i->path.empty()))
                 fil->push_back(*i);
 
-        return FileInfoListPtr(fil);
+        return FileInfoListPtr(fil, SPFM_DELETE_T);
     }
     //-----------------------------------------------------------------------
     StringVectorPtr ZipArchive::find(const String& pattern, bool recursive, bool dirs)
     {
-        StringVectorPtr ret = StringVectorPtr(new StringVector());
+        StringVectorPtr ret = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
                           (pattern.find ('\\') != String::npos);
@@ -204,7 +204,7 @@ namespace Ogre {
 	FileInfoListPtr ZipArchive::findFileInfo(const String& pattern, 
         bool recursive, bool dirs)
     {
-        FileInfoListPtr ret = FileInfoListPtr(new FileInfoList());
+        FileInfoListPtr ret = FileInfoListPtr(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
         // If pattern contains a directory name, do a full match
         bool full_match = (pattern.find ('/') != String::npos) ||
                           (pattern.find ('\\') != String::npos);

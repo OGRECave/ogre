@@ -87,7 +87,7 @@ namespace Ogre {
 			// Set up the render op
 			// Combine positions and texture coords since they tend to change together
 			// since character sizes are different
-			mRenderOp.vertexData = new VertexData();
+			mRenderOp.vertexData = OGRE_NEW VertexData();
 			VertexDeclaration* decl = mRenderOp.vertexData->vertexDeclaration;
 			size_t offset = 0;
 			// Positions
@@ -423,7 +423,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     TextAreaOverlayElement::~TextAreaOverlayElement()
     {
-        delete mRenderOp.vertexData;
+        OGRE_DELETE mRenderOp.vertexData;
     }
     //---------------------------------------------------------------------
     const String& TextAreaOverlayElement::getTypeName(void) const

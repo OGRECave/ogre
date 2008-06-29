@@ -54,8 +54,8 @@ namespace Ogre
 		0,  0,  0,  1);	// w
 
 	FocusedShadowCameraSetup::FocusedShadowCameraSetup(void)
-		: mTempFrustum(new Frustum())
-		, mLightFrustumCamera(new Camera("TEMP LIGHT INTERSECT CAM", NULL))
+		: mTempFrustum(OGRE_NEW Frustum())
+		, mLightFrustumCamera(OGRE_NEW Camera("TEMP LIGHT INTERSECT CAM", NULL))
 		, mLightFrustumCameraCalculated(false)
 		, mUseAggressiveRegion(true)
 	{
@@ -64,8 +64,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	FocusedShadowCameraSetup::~FocusedShadowCameraSetup(void)
 	{
-		delete mTempFrustum;
-		delete mLightFrustumCamera;
+		OGRE_DELETE mTempFrustum;
+		OGRE_DELETE mLightFrustumCamera;
 	}
 	//-----------------------------------------------------------------------
 	void FocusedShadowCameraSetup::calculateShadowMappingMatrix(const SceneManager& sm,

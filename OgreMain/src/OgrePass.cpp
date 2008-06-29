@@ -262,7 +262,7 @@ namespace Ogre {
 
 		if (oth.mVertexProgramUsage)
 		{
-			mVertexProgramUsage = new GpuProgramUsage(*(oth.mVertexProgramUsage));
+			mVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mVertexProgramUsage));
 		}
 		else
 		{
@@ -270,7 +270,7 @@ namespace Ogre {
 		}
         if (oth.mShadowCasterVertexProgramUsage)
         {
-            mShadowCasterVertexProgramUsage = new GpuProgramUsage(*(oth.mShadowCasterVertexProgramUsage));
+            mShadowCasterVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowCasterVertexProgramUsage));
         }
         else
         {
@@ -278,7 +278,7 @@ namespace Ogre {
         }
         if (oth.mShadowReceiverVertexProgramUsage)
         {
-            mShadowReceiverVertexProgramUsage = new GpuProgramUsage(*(oth.mShadowReceiverVertexProgramUsage));
+            mShadowReceiverVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowReceiverVertexProgramUsage));
         }
         else
         {
@@ -286,7 +286,7 @@ namespace Ogre {
         }
 		if (oth.mFragmentProgramUsage)
 		{
-		    mFragmentProgramUsage = new GpuProgramUsage(*(oth.mFragmentProgramUsage));
+		    mFragmentProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mFragmentProgramUsage));
         }
         else
         {
@@ -294,7 +294,7 @@ namespace Ogre {
         }
 		if (oth.mShadowReceiverFragmentProgramUsage)
 		{
-			mShadowReceiverFragmentProgramUsage = new GpuProgramUsage(*(oth.mShadowReceiverFragmentProgramUsage));
+			mShadowReceiverFragmentProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowReceiverFragmentProgramUsage));
 		}
 		else
 		{
@@ -308,7 +308,7 @@ namespace Ogre {
         iend = mTextureUnitStates.end();
         for (i = mTextureUnitStates.begin(); i != iend; ++i)
         {
-            delete *i;
+            OGRE_DELETE *i;
         }
 
         mTextureUnitStates.clear();
@@ -317,7 +317,7 @@ namespace Ogre {
 		iend = oth.mTextureUnitStates.end();
 		for (i = oth.mTextureUnitStates.begin(); i != iend; ++i)
 		{
-			TextureUnitState* t = new TextureUnitState(this, *(*i));
+			TextureUnitState* t = OGRE_NEW TextureUnitState(this, *(*i));
 			mTextureUnitStates.push_back(t);
 		}
 
@@ -494,7 +494,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     TextureUnitState* Pass::createTextureUnitState(void)
     {
-        TextureUnitState *t = new TextureUnitState(this);
+        TextureUnitState *t = OGRE_NEW TextureUnitState(this);
         addTextureUnitState(t);
 		mContentTypeLookupBuilt = false;
 	    return t;
@@ -503,7 +503,7 @@ namespace Ogre {
     TextureUnitState* Pass::createTextureUnitState(
         const String& textureName, unsigned short texCoordSet)
     {
-        TextureUnitState *t = new TextureUnitState(this);
+        TextureUnitState *t = OGRE_NEW TextureUnitState(this);
 	    t->setTextureName(textureName);
 	    t->setTextureCoordSet(texCoordSet);
         addTextureUnitState(t);
@@ -640,7 +640,7 @@ namespace Ogre {
         assert (index < mTextureUnitStates.size() && "Index out of bounds");
 
         TextureUnitStates::iterator i = mTextureUnitStates.begin() + index;
-        delete *i;
+        OGRE_DELETE *i;
 	    mTextureUnitStates.erase(i);
         if (!mQueuedForDeletion)
         {
@@ -657,7 +657,7 @@ namespace Ogre {
         iend = mTextureUnitStates.end();
         for (i = mTextureUnitStates.begin(); i != iend; ++i)
         {
-            delete *i;
+            OGRE_DELETE *i;
         }
         mTextureUnitStates.clear();
         if (!mQueuedForDeletion)
@@ -1164,14 +1164,14 @@ namespace Ogre {
         // Turn off vertex program if name blank
         if (name.empty())
         {
-            if (mVertexProgramUsage) delete mVertexProgramUsage;
+            if (mVertexProgramUsage) OGRE_DELETE mVertexProgramUsage;
             mVertexProgramUsage = NULL;
         }
         else
         {
             if (!mVertexProgramUsage)
             {
-                mVertexProgramUsage = new GpuProgramUsage(GPT_VERTEX_PROGRAM);
+                mVertexProgramUsage = OGRE_NEW GpuProgramUsage(GPT_VERTEX_PROGRAM);
             }
 		    mVertexProgramUsage->setProgramName(name, resetParams);
         }
@@ -1195,14 +1195,14 @@ namespace Ogre {
         // Turn off fragment program if name blank
         if (name.empty())
         {
-            if (mFragmentProgramUsage) delete mFragmentProgramUsage;
+            if (mFragmentProgramUsage) OGRE_DELETE mFragmentProgramUsage;
             mFragmentProgramUsage = NULL;
         }
         else
         {
             if (!mFragmentProgramUsage)
             {
-                mFragmentProgramUsage = new GpuProgramUsage(GPT_FRAGMENT_PROGRAM);
+                mFragmentProgramUsage = OGRE_NEW GpuProgramUsage(GPT_FRAGMENT_PROGRAM);
             }
 		    mFragmentProgramUsage->setProgramName(name, resetParams);
         }
@@ -1360,7 +1360,7 @@ namespace Ogre {
 			iend = msPassGraveyard.end();
 			for (i = msPassGraveyard.begin(); i != iend; ++i)
 			{
-				delete *i;
+				OGRE_DELETE *i;
 			}
 			msPassGraveyard.clear();
 		}
@@ -1387,27 +1387,27 @@ namespace Ogre {
         removeAllTextureUnitStates();
         if (mVertexProgramUsage)
         {
-            delete mVertexProgramUsage;
+            OGRE_DELETE mVertexProgramUsage;
             mVertexProgramUsage = 0;
         }
         if (mShadowCasterVertexProgramUsage)
         {
-            delete mShadowCasterVertexProgramUsage;
+            OGRE_DELETE mShadowCasterVertexProgramUsage;
             mShadowCasterVertexProgramUsage = 0;
         }
         if (mShadowReceiverVertexProgramUsage)
         {
-            delete mShadowReceiverVertexProgramUsage;
+            OGRE_DELETE mShadowReceiverVertexProgramUsage;
             mShadowReceiverVertexProgramUsage = 0;
         }
         if (mFragmentProgramUsage)
         {
-            delete mFragmentProgramUsage;
+            OGRE_DELETE mFragmentProgramUsage;
             mFragmentProgramUsage = 0;
         }
 		if (mShadowReceiverFragmentProgramUsage)
 		{
-			delete mShadowReceiverFragmentProgramUsage;
+			OGRE_DELETE mShadowReceiverFragmentProgramUsage;
 			mShadowReceiverFragmentProgramUsage = 0;
 		}
         // remove from dirty list, if there
@@ -1439,14 +1439,14 @@ namespace Ogre {
         // Turn off vertex program if name blank
         if (name.empty())
         {
-            if (mShadowCasterVertexProgramUsage) delete mShadowCasterVertexProgramUsage;
+            if (mShadowCasterVertexProgramUsage) OGRE_DELETE mShadowCasterVertexProgramUsage;
             mShadowCasterVertexProgramUsage = NULL;
         }
         else
         {
             if (!mShadowCasterVertexProgramUsage)
             {
-                mShadowCasterVertexProgramUsage = new GpuProgramUsage(GPT_VERTEX_PROGRAM);
+                mShadowCasterVertexProgramUsage = OGRE_NEW GpuProgramUsage(GPT_VERTEX_PROGRAM);
             }
             mShadowCasterVertexProgramUsage->setProgramName(name);
         }
@@ -1494,14 +1494,14 @@ namespace Ogre {
         // Turn off vertex program if name blank
         if (name.empty())
         {
-            if (mShadowReceiverVertexProgramUsage) delete mShadowReceiverVertexProgramUsage;
+            if (mShadowReceiverVertexProgramUsage) OGRE_DELETE mShadowReceiverVertexProgramUsage;
             mShadowReceiverVertexProgramUsage = NULL;
         }
         else
         {
             if (!mShadowReceiverVertexProgramUsage)
             {
-                mShadowReceiverVertexProgramUsage = new GpuProgramUsage(GPT_VERTEX_PROGRAM);
+                mShadowReceiverVertexProgramUsage = OGRE_NEW GpuProgramUsage(GPT_VERTEX_PROGRAM);
             }
             mShadowReceiverVertexProgramUsage->setProgramName(name);
         }
@@ -1549,14 +1549,14 @@ namespace Ogre {
 		// Turn off Fragment program if name blank
 		if (name.empty())
 		{
-			if (mShadowReceiverFragmentProgramUsage) delete mShadowReceiverFragmentProgramUsage;
+			if (mShadowReceiverFragmentProgramUsage) OGRE_DELETE mShadowReceiverFragmentProgramUsage;
 			mShadowReceiverFragmentProgramUsage = NULL;
 		}
 		else
 		{
 			if (!mShadowReceiverFragmentProgramUsage)
 			{
-				mShadowReceiverFragmentProgramUsage = new GpuProgramUsage(GPT_FRAGMENT_PROGRAM);
+				mShadowReceiverFragmentProgramUsage = OGRE_NEW GpuProgramUsage(GPT_FRAGMENT_PROGRAM);
 			}
 			mShadowReceiverFragmentProgramUsage->setProgramName(name);
 		}

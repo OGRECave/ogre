@@ -63,7 +63,7 @@ namespace Ogre
         Just incase it wasn't clear from the above, this class provides linkage to both 
         GpuProgram and HighLevelGpuProgram, despite its name.
     */
-    class _OgreExport GpuProgramUsage
+	class _OgreExport GpuProgramUsage : public PassAlloc
     {
     protected:
         GpuProgramType mType;

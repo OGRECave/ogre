@@ -84,7 +84,7 @@ namespace Ogre {
     @note
         <br>Should not be used directly, but trough the LogManager class.
     */
-    class _OgreExport Log
+	class _OgreExport Log : public LogAlloc
     {
     protected:
         std::ofstream	mfpLog;

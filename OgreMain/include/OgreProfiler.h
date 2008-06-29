@@ -75,7 +75,7 @@ namespace Ogre {
             outside of a scope (i.e. the main game loop).
         @author Amit Mathew (amitmathew (at) yahoo (dot) com)
     */
-    class _OgreExport Profile {
+	class _OgreExport Profile : public ProfilerAlloc {
 
         public:
             Profile(const String& profileName);
@@ -100,7 +100,7 @@ namespace Ogre {
         @todo resolve artificial cap on number of profiles displayed
         @todo fix display ordering of profiles not called every frame
     */
-    class _OgreExport Profiler : public Singleton<Profiler> {
+    class _OgreExport Profiler : public Singleton<Profiler>, public ProfilerAlloc {
 
         public:
             Profiler();

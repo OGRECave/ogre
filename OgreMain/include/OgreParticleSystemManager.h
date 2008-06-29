@@ -69,7 +69,7 @@ namespace Ogre {
         then be created easily through the createParticleSystem method.
     */
     class _OgreExport ParticleSystemManager: 
-		public Singleton<ParticleSystemManager>, public ScriptLoader
+		public Singleton<ParticleSystemManager>, public ScriptLoader, public FXAlloc
     {
 		friend class ParticleSystemFactory;
 	public:

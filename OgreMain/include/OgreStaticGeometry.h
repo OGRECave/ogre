@@ -131,8 +131,8 @@ namespace Ogre {
 			OptimisedSubMeshGeometry() :vertexData(0), indexData(0) {}
 			~OptimisedSubMeshGeometry() 
 			{
-				delete vertexData;
-				delete indexData;
+				OGRE_DELETE vertexData;
+				OGRE_DELETE indexData;
 			}
 			VertexData *vertexData;
 			IndexData *indexData;

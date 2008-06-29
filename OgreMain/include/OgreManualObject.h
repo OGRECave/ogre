@@ -377,7 +377,7 @@ namespace Ogre
 
 
 		/// Built, renderable section of geometry
-		class _OgreExport ManualObjectSection : public Renderable
+		class _OgreExport ManualObjectSection : public Renderable, public MovableAlloc
 		{
 		protected:
 			ManualObject* mParent;

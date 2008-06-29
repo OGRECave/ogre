@@ -239,7 +239,7 @@ namespace Ogre {
 
 		if( m_pBuffer && m_bAutoDelete )
 		{
-			delete[] m_pBuffer;
+			OGRE_FREE(m_pBuffer, MEMCATEGORY_GENERAL);
 			m_pBuffer = NULL;
 		}
 		// Set image metadata

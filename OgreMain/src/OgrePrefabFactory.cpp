@@ -75,7 +75,7 @@ namespace Ogre {
 			0,0,1,
 			0,0 
 		};
-		mesh->sharedVertexData = new VertexData();
+		mesh->sharedVertexData = OGRE_NEW VertexData();
 		mesh->sharedVertexData->vertexCount = 4;
 		VertexDeclaration* decl = mesh->sharedVertexData->vertexDeclaration;
 		VertexBufferBinding* bind = mesh->sharedVertexData->vertexBufferBinding;
@@ -214,7 +214,7 @@ namespace Ogre {
 			0,0 
 		};
 
-		mesh->sharedVertexData = new VertexData();
+		mesh->sharedVertexData = OGRE_NEW VertexData();
 		mesh->sharedVertexData->vertexCount = NUM_VERTICES;
 		VertexDeclaration* decl = mesh->sharedVertexData->vertexDeclaration;
 		VertexBufferBinding* bind = mesh->sharedVertexData->vertexBufferBinding;
@@ -287,7 +287,7 @@ namespace Ogre {
 		const int NUM_RINGS = 16;
 		const Real SPHERE_RADIUS = 50.0;
 
-		mesh->sharedVertexData = new VertexData();
+		mesh->sharedVertexData = OGRE_NEW VertexData();
 		VertexData* vertexData = mesh->sharedVertexData;
 
 		// define the vertex format

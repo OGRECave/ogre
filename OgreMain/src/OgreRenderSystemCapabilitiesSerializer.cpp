@@ -220,7 +220,7 @@ namespace Ogre
                             rscName = rscName.substr(0, rscName.size() - 1);
 
                             // create RSC
-                            mCurrentCapabilities = new RenderSystemCapabilities();
+                            mCurrentCapabilities = OGRE_NEW RenderSystemCapabilities();
                             // RSCManager is responsible for deleting mCurrentCapabilities
                             RenderSystemCapabilitiesManager::getSingleton()._addRenderSystemCapabilities(rscName, mCurrentCapabilities);
 

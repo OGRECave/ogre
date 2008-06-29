@@ -698,32 +698,32 @@ namespace Ogre {
 		if (valueName == "diffuseColour")
 		{
 			return AnimableValuePtr(
-				new LightDiffuseColourValue(this));
+				OGRE_NEW LightDiffuseColourValue(this));
 		}
 		else if(valueName == "specularColour")
 		{
 			return AnimableValuePtr(
-				new LightSpecularColourValue(this));
+				OGRE_NEW LightSpecularColourValue(this));
 		}
 		else if (valueName == "attenuation")
 		{
 			return AnimableValuePtr(
-				new LightAttenuationValue(this));
+				OGRE_NEW LightAttenuationValue(this));
 		}
 		else if (valueName == "spotlightInner")
 		{
 			return AnimableValuePtr(
-				new LightSpotlightInnerValue(this));
+				OGRE_NEW LightSpotlightInnerValue(this));
 		}
 		else if (valueName == "spotlightOuter")
 		{
 			return AnimableValuePtr(
-				new LightSpotlightOuterValue(this));
+				OGRE_NEW LightSpotlightOuterValue(this));
 		}
 		else if (valueName == "spotlightFalloff")
 		{
 			return AnimableValuePtr(
-				new LightSpotlightFalloffValue(this));
+				OGRE_NEW LightSpotlightFalloffValue(this));
 		}
 		else
 		{
@@ -786,13 +786,13 @@ namespace Ogre {
 		const NameValuePairList* params)
 	{
 
-		return new Light(name);
+		return OGRE_NEW Light(name);
 
 	}
 	//-----------------------------------------------------------------------
 	void LightFactory::destroyInstance( MovableObject* obj)
 	{
-		delete obj;
+		OGRE_DELETE obj;
 	}
 
 

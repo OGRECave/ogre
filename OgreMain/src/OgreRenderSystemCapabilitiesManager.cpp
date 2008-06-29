@@ -56,7 +56,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     RenderSystemCapabilitiesManager::RenderSystemCapabilitiesManager() : mScriptPattern("*.rendercaps"), mSerializer(0)
     {
-        mSerializer = new RenderSystemCapabilitiesSerializer();
+        mSerializer = OGRE_NEW RenderSystemCapabilitiesSerializer();
     }
     //-----------------------------------------------------------------------
     RenderSystemCapabilitiesManager::~RenderSystemCapabilitiesManager()
@@ -64,10 +64,10 @@ namespace Ogre {
         for (CapabilitiesMap::iterator it = mCapabilitiesMap.begin(), end = mCapabilitiesMap.end(); it != end; it++)
         {
         // free memory in RenderSystemCapabilities*
-            delete it->second;
+            OGRE_DELETE it->second;
         }
 
-        delete mSerializer;
+        OGRE_DELETE mSerializer;
     }
 
     //-----------------------------------------------------------------------

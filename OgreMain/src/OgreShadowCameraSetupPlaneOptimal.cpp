@@ -61,14 +61,14 @@ namespace Ogre
 		PreciseReal **mat = NULL;
 		PreciseReal **backmat = NULL;
 		{
-			mat = new PreciseReal*[11];
+			mat = OGRE_ALLOC_T(PreciseReal*, 11, MEMCATEGORY_SCENE_CONTROL);
 			if(incrPrecision)
-				backmat = new PreciseReal*[11];
+				backmat = OGRE_ALLOC_T(PreciseReal*, 11, MEMCATEGORY_SCENE_CONTROL);
 			for(i=0; i<11; i++) 
 			{
-				mat[i] = new PreciseReal[11];
+				mat[i] = OGRE_ALLOC_T(PreciseReal, 11, MEMCATEGORY_SCENE_CONTROL);
 				if(incrPrecision)
-					backmat[i] = new PreciseReal[11];
+					backmat[i] = OGRE_ALLOC_T(PreciseReal, 11, MEMCATEGORY_SCENE_CONTROL);
 			}
 		}
 
@@ -261,13 +261,13 @@ namespace Ogre
 		for (i=0; i<11; i++)
 		{
 			if (mat[i])
-				delete [] mat[i];
+				OGRE_FREE(mat[i], MEMCATEGORY_SCENE_CONTROL);
 			if (incrPrecision)
-				delete [] backmat[i];
+				OGRE_FREE(backmat[i], MEMCATEGORY_SCENE_CONTROL);
 		}
-		delete [] mat;
+		OGRE_FREE(mat, MEMCATEGORY_SCENE_CONTROL);
 		if(incrPrecision)
-			delete [] backmat;
+			OGRE_FREE(backmat, MEMCATEGORY_SCENE_CONTROL);
 
 		return ret;
 

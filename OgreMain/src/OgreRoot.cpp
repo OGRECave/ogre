@@ -132,68 +132,68 @@ namespace Ogre {
 		// Create log manager and default log file if there is no log manager yet
 		if(LogManager::getSingletonPtr() == 0)
 		{
-			mLogManager = new LogManager();
+			mLogManager = OGRE_NEW LogManager();
 			mLogManager->createLog(logFileName, true, true);
 		}
 
         // Dynamic library manager
-        mDynLibManager = new DynLibManager();
+        mDynLibManager = OGRE_NEW DynLibManager();
 
-        mArchiveManager = new ArchiveManager();
+        mArchiveManager = OGRE_NEW ArchiveManager();
 
 		// ResourceGroupManager
-		mResourceGroupManager = new ResourceGroupManager();
+		mResourceGroupManager = OGRE_NEW ResourceGroupManager();
 
 		// ResourceBackgroundQueue
-		mResourceBackgroundQueue = new ResourceBackgroundQueue();
+		mResourceBackgroundQueue = OGRE_NEW ResourceBackgroundQueue();
 
 		// Create SceneManager enumerator (note - will be managed by singleton)
-        mSceneManagerEnum = new SceneManagerEnumerator();
+        mSceneManagerEnum = OGRE_NEW SceneManagerEnumerator();
         mCurrentSceneManager = NULL;
 
-		mShadowTextureManager = new ShadowTextureManager();
+		mShadowTextureManager = OGRE_NEW ShadowTextureManager();
 
-		mRenderSystemCapabilitiesManager = new RenderSystemCapabilitiesManager();
+		mRenderSystemCapabilitiesManager = OGRE_NEW RenderSystemCapabilitiesManager();
 
         // ..material manager
-        mMaterialManager = new MaterialManager();
+        mMaterialManager = OGRE_NEW MaterialManager();
 
         // Mesh manager
-        mMeshManager = new MeshManager();
+        mMeshManager = OGRE_NEW MeshManager();
 
         // Skeleton manager
-        mSkeletonManager = new SkeletonManager();
+        mSkeletonManager = OGRE_NEW SkeletonManager();
 
         // ..particle system manager
-        mParticleManager = new ParticleSystemManager();
+        mParticleManager = OGRE_NEW ParticleSystemManager();
 
 		// Compiler manager
-		//mCompilerManager = new ScriptCompilerManager();
+		//mCompilerManager = OGRE_NEW ScriptCompilerManager();
 
-        mTimer = new Timer();
+        mTimer = OGRE_NEW Timer();
 
         // Overlay manager
-        mOverlayManager = new OverlayManager();
+        mOverlayManager = OGRE_NEW OverlayManager();
 
-        mPanelFactory = new PanelOverlayElementFactory();
+        mPanelFactory = OGRE_NEW PanelOverlayElementFactory();
         mOverlayManager->addOverlayElementFactory(mPanelFactory);
 
-        mBorderPanelFactory = new BorderPanelOverlayElementFactory();
+        mBorderPanelFactory = OGRE_NEW BorderPanelOverlayElementFactory();
         mOverlayManager->addOverlayElementFactory(mBorderPanelFactory);
 
-        mTextAreaFactory = new TextAreaOverlayElementFactory();
+        mTextAreaFactory = OGRE_NEW TextAreaOverlayElementFactory();
         mOverlayManager->addOverlayElementFactory(mTextAreaFactory);
         // Font manager
-        mFontManager = new FontManager();
+        mFontManager = OGRE_NEW FontManager();
 
 #if OGRE_PROFILING
         // Profiler
-        mProfiler = new Profiler();
+        mProfiler = OGRE_NEW Profiler();
 		Profiler::getSingleton().setTimer(mTimer);
 #endif
-        mFileSystemArchiveFactory = new FileSystemArchiveFactory();
+        mFileSystemArchiveFactory = OGRE_NEW FileSystemArchiveFactory();
         ArchiveManager::getSingleton().addArchiveFactory( mFileSystemArchiveFactory );
-        mZipArchiveFactory = new ZipArchiveFactory();
+        mZipArchiveFactory = OGRE_NEW ZipArchiveFactory();
         ArchiveManager::getSingleton().addArchiveFactory( mZipArchiveFactory );
 #if OGRE_NO_FREEIMAGE == 0
 		// Register image codecs
@@ -208,28 +208,28 @@ namespace Ogre {
 		DDSCodec::startup();
 #endif
 
-        mHighLevelGpuProgramManager = new HighLevelGpuProgramManager();
+        mHighLevelGpuProgramManager = OGRE_NEW HighLevelGpuProgramManager();
 
-		mExternalTextureSourceManager = new ExternalTextureSourceManager();
-        mCompositorManager = new CompositorManager();
+		mExternalTextureSourceManager = OGRE_NEW ExternalTextureSourceManager();
+        mCompositorManager = OGRE_NEW CompositorManager();
 
-		mCompilerManager = new ScriptCompilerManager();
+		mCompilerManager = OGRE_NEW ScriptCompilerManager();
 
         // Auto window
         mAutoWindow = 0;
 
 		// instantiate and register base movable factories
-		mEntityFactory = new EntityFactory();
+		mEntityFactory = OGRE_NEW EntityFactory();
 		addMovableObjectFactory(mEntityFactory);
-		mLightFactory = new LightFactory();
+		mLightFactory = OGRE_NEW LightFactory();
 		addMovableObjectFactory(mLightFactory);
-		mBillboardSetFactory = new BillboardSetFactory();
+		mBillboardSetFactory = OGRE_NEW BillboardSetFactory();
 		addMovableObjectFactory(mBillboardSetFactory);
-		mManualObjectFactory = new ManualObjectFactory();
+		mManualObjectFactory = OGRE_NEW ManualObjectFactory();
 		addMovableObjectFactory(mManualObjectFactory);
-		mBillboardChainFactory = new BillboardChainFactory();
+		mBillboardChainFactory = OGRE_NEW BillboardChainFactory();
 		addMovableObjectFactory(mBillboardChainFactory);
-		mRibbonTrailFactory = new RibbonTrailFactory();
+		mRibbonTrailFactory = OGRE_NEW RibbonTrailFactory();
 		addMovableObjectFactory(mRibbonTrailFactory);
 
 		// Load plugins
@@ -251,13 +251,13 @@ namespace Ogre {
     Root::~Root()
     {
         shutdown();
-        delete mSceneManagerEnum;
-		delete mShadowTextureManager;
-		delete mRenderSystemCapabilitiesManager;
+        OGRE_DELETE mSceneManagerEnum;
+		OGRE_DELETE mShadowTextureManager;
+		OGRE_DELETE mRenderSystemCapabilitiesManager;
 
 		destroyAllRenderQueueInvocationSequences();
-        delete mCompositorManager;
-		delete mExternalTextureSourceManager;
+        OGRE_DELETE mCompositorManager;
+		OGRE_DELETE mExternalTextureSourceManager;
 #if OGRE_NO_FREEIMAGE == 0
 		FreeImageCodec::shutdown();
 #endif
@@ -268,46 +268,46 @@ namespace Ogre {
 		DDSCodec::shutdown();
 #endif
 #if OGRE_PROFILING
-        delete mProfiler;
+        OGRE_DELETE mProfiler;
 #endif
-        delete mOverlayManager;
-        delete mFontManager;
-        delete mArchiveManager;
-        delete mZipArchiveFactory;
-        delete mFileSystemArchiveFactory;
-        delete mSkeletonManager;
-        delete mMeshManager;
-        delete mParticleManager;
-		//delete mCompilerManager;
+        OGRE_DELETE mOverlayManager;
+        OGRE_DELETE mFontManager;
+        OGRE_DELETE mArchiveManager;
+        OGRE_DELETE mZipArchiveFactory;
+        OGRE_DELETE mFileSystemArchiveFactory;
+        OGRE_DELETE mSkeletonManager;
+        OGRE_DELETE mMeshManager;
+        OGRE_DELETE mParticleManager;
+		//OGRE_DELETE mCompilerManager;
 
         if( mControllerManager )
-            delete mControllerManager;
+            OGRE_DELETE mControllerManager;
         if (mHighLevelGpuProgramManager)
-            delete mHighLevelGpuProgramManager;
+            OGRE_DELETE mHighLevelGpuProgramManager;
 
-        delete mTextAreaFactory;
-        delete mBorderPanelFactory;
-        delete mPanelFactory;
+        OGRE_DELETE mTextAreaFactory;
+        OGRE_DELETE mBorderPanelFactory;
+        OGRE_DELETE mPanelFactory;
 
         unloadPlugins();
-        delete mMaterialManager;
+        OGRE_DELETE mMaterialManager;
         Pass::processPendingPassUpdates(); // make sure passes are cleaned
-		delete mResourceBackgroundQueue;
-        delete mResourceGroupManager;
+		OGRE_DELETE mResourceBackgroundQueue;
+        OGRE_DELETE mResourceGroupManager;
 
-		delete mEntityFactory;
-		delete mLightFactory;
-		delete mBillboardSetFactory;
-		delete mManualObjectFactory;
-		delete mBillboardChainFactory;
-		delete mRibbonTrailFactory;
+		OGRE_DELETE mEntityFactory;
+		OGRE_DELETE mLightFactory;
+		OGRE_DELETE mBillboardSetFactory;
+		OGRE_DELETE mManualObjectFactory;
+		OGRE_DELETE mBillboardChainFactory;
+		OGRE_DELETE mRibbonTrailFactory;
 
-	delete mTimer;
+		OGRE_DELETE mTimer;
 
-        delete mDynLibManager;
-        delete mLogManager;
+        OGRE_DELETE mDynLibManager;
+        OGRE_DELETE mLogManager;
 
-		delete mCompilerManager;
+		OGRE_DELETE mCompilerManager;
 
 		mAutoWindow = 0;
 		mFirstTimePostWindowInit = false;
@@ -425,12 +425,12 @@ namespace Ogre {
 
         restoreConfig();
 
-        dlg = new ConfigDialog();
+        dlg = OGRE_NEW ConfigDialog();
 
         if ((isOk = dlg->display()))
             saveConfig();
 
-        delete dlg;
+        OGRE_DELETE dlg;
         return isOk;
     }
 
@@ -510,7 +510,7 @@ namespace Ogre {
             "system has been selected.", "Root::initialise");
 
         if (!mControllerManager)
-			mControllerManager = new ControllerManager();
+			mControllerManager = OGRE_NEW ControllerManager();
 
         // .rendercaps manager
         RenderSystemCapabilitiesManager& rscManager = RenderSystemCapabilitiesManager::getSingleton();
@@ -1236,7 +1236,7 @@ namespace Ogre {
 					" already exists.",
 				"Root::createRenderQueueInvocationSequence");
 		}
-		RenderQueueInvocationSequence* ret = new RenderQueueInvocationSequence(name);
+		RenderQueueInvocationSequence* ret = OGRE_NEW RenderQueueInvocationSequence(name);
 		mRQSequenceMap[name] = ret;
 		return ret;
 	}
@@ -1263,7 +1263,7 @@ namespace Ogre {
 			mRQSequenceMap.find(name);
 		if (i != mRQSequenceMap.end())
 		{
-			delete i->second;
+			OGRE_DELETE i->second;
 			mRQSequenceMap.erase(i);
 		}
 	}
@@ -1273,7 +1273,7 @@ namespace Ogre {
 		for (RenderQueueInvocationSequenceMap::iterator i = mRQSequenceMap.begin();
 			i != mRQSequenceMap.end(); ++i)
 		{
-			delete i->second;
+			OGRE_DELETE i->second;
 		}
 		mRQSequenceMap.clear();
 	}

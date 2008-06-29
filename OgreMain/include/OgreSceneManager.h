@@ -757,7 +757,7 @@ namespace Ogre {
         GpuProgramParametersSharedPtr mFiniteExtrusionParams;
 
         /// Inner class to use as callback for shadow caster scene query
-        class _OgreExport ShadowCasterSceneQueryListener : public SceneQueryListener
+        class _OgreExport ShadowCasterSceneQueryListener : public SceneQueryListener, public SceneMgtAlloc
         {
         protected:
 			SceneManager* mSceneMgr;

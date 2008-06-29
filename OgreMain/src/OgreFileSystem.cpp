@@ -209,7 +209,7 @@ namespace Ogre {
         // Should check ensure open succeeded, in case fail for some reason.
         if (origStream->fail())
         {
-            delete origStream;
+            OGRE_DELETE_T(origStream, basic_ifstream, MEMCATEGORY_GENERAL);
             OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
                 "Cannot open file: " + filename,
                 "FileSystemArchive::open");

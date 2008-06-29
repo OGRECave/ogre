@@ -105,7 +105,7 @@ namespace Ogre {
     {
         if (mLastResult)
         {
-            delete mLastResult;
+            OGRE_DELETE mLastResult;
         }
         mLastResult = NULL;
     }
@@ -114,7 +114,7 @@ namespace Ogre {
     RegionSceneQuery::execute(void)
     {
         clearResults();
-        mLastResult = new SceneQueryResult();
+        mLastResult = OGRE_NEW SceneQueryResult();
         // Call callback version with self as listener
         execute(this);
         return *mLastResult;
@@ -323,7 +323,7 @@ namespace Ogre {
     {
         if (mLastResult)
         {
-            delete mLastResult;
+            OGRE_DELETE mLastResult;
         }
         mLastResult = NULL;
     }
@@ -332,7 +332,7 @@ namespace Ogre {
     IntersectionSceneQuery::execute(void)
     {
         clearResults();
-        mLastResult = new IntersectionSceneQueryResult();
+        mLastResult = OGRE_NEW IntersectionSceneQueryResult();
         // Call callback version with self as listener
         execute(this);
         return *mLastResult;

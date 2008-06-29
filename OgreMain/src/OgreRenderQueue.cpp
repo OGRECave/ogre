@@ -50,7 +50,7 @@ namespace Ogre {
         mGroups.insert(
             RenderQueueGroupMap::value_type(
                 RENDER_QUEUE_MAIN, 
-                new RenderQueueGroup(this,
+                OGRE_NEW RenderQueueGroup(this,
                     mSplitPassesByLightingType,
                     mSplitNoShadowPasses,
                     mShadowCastersCannotBeReceivers)
@@ -75,7 +75,7 @@ namespace Ogre {
         iend = mGroups.end();
         for (; i != iend; ++i)
         {
-            delete i->second;
+            OGRE_DELETE i->second;
         }
         mGroups.clear();
 
@@ -187,7 +187,7 @@ namespace Ogre {
 		if (groupIt == mGroups.end())
 		{
 			// Insert new
-			pGroup = new RenderQueueGroup(this,
+			pGroup = OGRE_NEW RenderQueueGroup(this,
                 mSplitPassesByLightingType,
                 mSplitNoShadowPasses,
                 mShadowCastersCannotBeReceivers);

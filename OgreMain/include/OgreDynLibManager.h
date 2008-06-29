@@ -39,7 +39,7 @@ namespace Ogre {
             libraries, opens them and returns references to already-open
             libraries.
     */
-    class _OgreExport DynLibManager: public Singleton<DynLibManager>
+    class _OgreExport DynLibManager: public Singleton<DynLibManager>, public DynLibAlloc
     {
 	protected:
 		typedef std::map<String, DynLib*> DynLibList;

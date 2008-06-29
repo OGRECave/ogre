@@ -52,7 +52,7 @@ namespace Ogre{
 
 		String lexeme;
 		uint32 line = 1, state = READY, lastQuote = 0;
-		ScriptTokenListPtr tokens(new ScriptTokenList());
+		ScriptTokenListPtr tokens(OGRE_NEW_T(ScriptTokenList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
 		// Iterate over the input
 		String::const_iterator i = str.begin(), end = str.end();
@@ -223,7 +223,7 @@ namespace Ogre{
 			quote = '\"', var = '$';
 #endif
 
-		ScriptTokenPtr token(new ScriptToken());
+		ScriptTokenPtr token(OGRE_NEW_T(ScriptToken, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 		token->lexeme = lexeme;
 		token->line = line;
 		token->file = source;

@@ -57,7 +57,7 @@ namespace Ogre
 	typedef SharedPtr<ConcreteNode> ConcreteNodePtr;
 	typedef std::list<ConcreteNodePtr> ConcreteNodeList;
 	typedef SharedPtr<ConcreteNodeList> ConcreteNodeListPtr;
-	struct ConcreteNode
+	struct ConcreteNode : public ScriptCompilerAlloc
 	{
 		String token, file;
 		unsigned int line;
@@ -182,7 +182,7 @@ namespace Ogre
 		typedef std::map<String,uint32> IdMap;
 
 		// The container for errors
-		struct Error
+		struct Error : public ScriptCompilerAlloc
 		{
 			String file, message;
 			int line;

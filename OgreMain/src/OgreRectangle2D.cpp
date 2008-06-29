@@ -43,7 +43,7 @@ namespace Ogre {
         mUseIdentityProjection = true;
         mUseIdentityView = true;
 
-        mRenderOp.vertexData = new VertexData();
+        mRenderOp.vertexData = OGRE_NEW VertexData();
 
         mRenderOp.indexData = 0;
         mRenderOp.vertexData->vertexCount = 4; 
@@ -103,7 +103,7 @@ namespace Ogre {
 
     Rectangle2D::~Rectangle2D() 
     {
-        delete mRenderOp.vertexData;
+        OGRE_DELETE mRenderOp.vertexData;
     }
 
     void Rectangle2D::setCorners(Real left, Real top, Real right, Real bottom) 

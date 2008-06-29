@@ -139,7 +139,7 @@ namespace Ogre {
 		{
 			// create a new instance for this thread - will get deleted when
 			// the thread dies
-			mSerializer.reset(new MaterialSerializer());
+			mSerializer.reset(OGRE_NEW MaterialSerializer());
 		}
 #  endif
         mSerializer->parseScript(stream, groupName);

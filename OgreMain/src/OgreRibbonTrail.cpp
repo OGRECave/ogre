@@ -59,7 +59,7 @@ namespace Ogre
 	{
 		setTrailLength(100);
 		setNumberOfChains(numberOfChains);
-		mTimeControllerValue = ControllerValueRealPtr(new TimeControllerValue(this));
+		mTimeControllerValue = ControllerValueRealPtr(OGRE_NEW TimeControllerValue(this));
 
 		// use V as varying texture coord, so we can use 1D textures to 'smear'
 		setTextureCoordDirection(TCD_V);
@@ -541,13 +541,13 @@ namespace Ogre
 
 		}
 
-		return new RibbonTrail(name, maxElements, numberOfChains, useTex, useCol);
+		return OGRE_NEW RibbonTrail(name, maxElements, numberOfChains, useTex, useCol);
 
 	}
 	//-----------------------------------------------------------------------
 	void RibbonTrailFactory::destroyInstance( MovableObject* obj)
 	{
-		delete obj;
+		OGRE_DELETE obj;
 	}
 
 

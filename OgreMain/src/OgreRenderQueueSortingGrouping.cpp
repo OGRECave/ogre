@@ -280,7 +280,7 @@ namespace Ogre {
         for (i = mGrouped.begin(); i != iend; ++i)
         {
             // Free the list associated with this pass
-            delete i->second;
+            OGRE_DELETE_T(i->second, RenderableList, MEMCATEGORY_SCENE_CONTROL);
         }
 		
 	}
@@ -307,7 +307,7 @@ namespace Ogre {
         if (i != mGrouped.end())
         {
             // free memory
-            delete i->second;
+            OGRE_DELETE i->second;
             // erase from map
             mGrouped.erase(i);
         }
@@ -369,7 +369,7 @@ namespace Ogre {
 				// recalculated, although the lists will be cleared
                 retPair = mGrouped.insert(
                     PassGroupRenderableMap::value_type(
-						pass, new RenderableList() ));
+						pass, OGRE_NEW_T(RenderableList, MEMCATEGORY_SCENE_CONTROL)() ));
                 assert(retPair.second && 
 					"Error inserting new pass entry into PassGroupRenderableMap");
                 i = retPair.first;

@@ -87,7 +87,7 @@ namespace Ogre {
 				rs->preExtraThreadsStarted();
 #endif
 
-				mThread = new boost::thread(
+				mThread = OGRE_NEW_T(boost::thread, MEMCATEGORY_RESOURCE)(
 					boost::function0<void>(&ResourceBackgroundQueue::threadFunc));
 				// Wait for init to finish before allowing main thread to continue
 				// this releases the initMutex until notified
@@ -122,7 +122,7 @@ namespace Ogre {
 			addRequest(req);
 			// Wait for thread to finish
 			mThread->join();
-			delete mThread;
+			OGRE_DELETE_T(mThread, boost::thread, MEMCATEGORY_RESOURCE);
 			mThread = 0;
 			mRequestQueue.clear();
 			mRequestTicketMap.clear();

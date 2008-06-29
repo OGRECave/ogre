@@ -61,7 +61,7 @@ namespace Ogre
         const String& group, bool isManual, ManualResourceLoader* loader, 
         const NameValuePairList* createParams)
     {
-        return new Skeleton(this, name, handle, group, isManual, loader);
+        return OGRE_NEW Skeleton(this, name, handle, group, isManual, loader);
     }
 
 
