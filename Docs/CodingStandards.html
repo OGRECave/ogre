@@ -14,14 +14,17 @@ BLOCKQUOTE { color: #000000; font-family: "Verdana", "Arial", "Helvetica", sans-
 A:link { color: #003300 }
 -->
   </style>
-
 </head>
+
 <body style="direction: ltr; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);" lang="en-GB" link="#003300">
+
 <h1>OGRE Coding Standards</h1>
+
 
 This document describes the coding standards all developers are expected to adhere to when writing code for the OGRE project.
 
 <h2>Top-level organisation issues</h2>
+
 <ol>
 	<li>All source files must begin with the standard OGRE copyright statement:    <pre>/*
 -----------------------------------------------------------------------------
@@ -57,18 +60,26 @@ Torus Knot Software Ltd.
 
 <li>Everything must be declared inside the namespace 'Ogre'.</li>
 </ol>
+
 <h2>Portablity</h2>
+
 <ol>
 <li>All code must be cross platform, ANSI C++. No dependencies on platform-specific headers and / or types are allowed (the only exception is when dealing with platform-specific features like windowing, which must be implemented for each platform separately).</li>
 <li>If you serialise / deserialise any data, subclass from Serializer and use its methods, it will insulate you from endianness issues. If you need to serialise any types it doesn't already handle, make sure you deal with endianness issues in the same way Serializer does (ie use native endianness by default but detect the inverse on reading and perform flipping if required).</li>
 </ol>
+
 <h2>C++ Standards compliance</h2>
+
 <ol>
+
 	<li>Always prefer the STL over custom containers / algorithms.</li>
+
 	<li>Always prefer C++ techniques over C. 
 	<ul><li>Avoid C-strings (char* and functions like sprintf, strcpy, use Ogre::String)</li>
 		<li>Avoid old I/O routines (fopen et al, use &lt;iostream&gt;)</li>
+
 		<li>Use abstract classes or templates not void*</li>
+
 		<li>Use overloaded methods not varargs.</li>
 	</ul></li>
 	<li>Minimum C++ compiler level is MSVC 7.1 or gcc 3.1. Compilers which do not support things like partial template specialisation properly (such as older versions of MSVC) are not supported.</li>
@@ -82,19 +93,52 @@ Torus Knot Software Ltd.
 
 <li>Avoid non-const by-ref parameters unless you have no other option. We prefer not to have in/our parameters since they are less intuitive.</li>
 </ol>
+
 	
 <h2>Naming conventions &amp; Documentation</h2>
+
 <ol>
+
 	<li>Classes, types and structures must be title case (MyNewClass). </li>
+
 	<li>Methods and local variables must be camel case (myNewMethod). </li>
 	<li>Member variables should be prefixed with 'm' (mInstanceVar), static member variables should be prefixed 'ms' (msStaticMemberVar). Do not use any other prefixing such as Hungarian notation.</li>
 	<li>Preprocessor macros must be all upper case and prefixed with OGRE_</li>
+
 	<li>Enums should be named in title case, enum values should be all upper case</li>
 	<li>All classes and methods must be fully documented in English using Doxygen-compatible comments. Use the @param and @returns directives to define inputs and outputs clearly, and @note to indicate points of interest.</li>
 	<li>Use verbose, descriptive names for classes, methods, variables - everything except trival counters. Code should be self-describing, don't be obtuse.</li>
 </ol>
 
+
+<h2>Memory Management</h2>
+<ol>
+  <li>Full virtual classes should derive from an AllocatiedObject
+template instantiation typedef'ed in OgreMemoryAllocatorConfig.h. This
+will define custom new/delete operators on the class. Small,
+non-virtual value classes like Vector3 should not.</li>
+  <li>Never use new/delete directly.&nbsp;</li>
+  <ol>
+    <li>For&nbsp;classes derived from AllocatedObject, use OGRE_NEW / OGRE_DELETE as drop-in replacements for new/delete</li>
+    <li>For &nbsp;other classes which need a constructor / destructor,
+use OGRE_NEW_T and OGRE_DELETE_T. If you know there is no destructor,
+you may use OGRE_NEW_T and free with&nbsp;OGRE_FREE for speed</li>
+    <li>For primitive types, use OGRE_ALLOC_T and OGRE_FREE</li>
+  </ol>
+  <li>Be aware of allocator issues when using SharedPtr</li>
+  <ol>
+    <li>Classes derived from AllocatedObject can just be constructed using OGRE_NEW and wrapped, no special behaviour</li>
+    <li>Classes constructed using OGRE_NEW_T must be allocated using
+MEMCATEGORY_GENERAL, and you must set the SharedPtrFreeMethod parameter
+to SPFM_DELETE_T</li>
+    <li>Instances constructed using OGRE_ALLOC_T must be allocated using MEMCATEGORY_GENERAL, and you must set the SharedPtrFreeMethod parameter to SPFM_FREE</li>
+  </ol>
+  <li>When defining STL containers, provide a custom allocator based on
+STLAllocator&lt;AllocPolicy&gt;. The AllocPolicy should be one of those
+typedef'ed inOgreMemoryAllocatorConfig.h, e.g. GeometryAllocPolicy </li>
+</ol>
 <h2>Style issues</h2>
+
 <ol>
 
 <li>Insert a newline before an open brace (contentious I know!)</li>
@@ -103,21 +147,31 @@ Torus Knot Software Ltd.
 <li>Use parenthesis to make the operator precedence unambiguous, even when it is not required ((x * y) + 1, not x * y + 1)</li>
 </ol>
 
+
 <h2>Error handling</h2>
+
 <ol>
+
 	<li>Fatal errors should always be dealt with though exception handling. No return-value error reporting.</li>
+
 	<li>Whenever you make an assumption in your code, verify it with an assert().</li>
+
 </ol>
 
+
 <h2>Design issues</h2>
+
 <ol>
+
 	<li>Use existing design patterns and identify them by their well known names. A good starting reference is the 'Gang of Four' book.</li>
 	<li>Use strong encapsulation. Top-level interfaces should hide implementations and not require the user of the library to understand internals. Avoid public attributes except in structs.</li>
 	<li>Don't use 'friend' if you can avoid it. Where classes need to collaborate on an internal implementation, prefix the methods they use to communicate with '_' (this is our demarcation for 'recommended for internal use only'). This can also be used to expose advanced functionality only intended for very skilled users.</li>
 
 </ol>
 
+
 <h2>Final words</h2>
+
 If in doubt, do as the existing code does!
 
 </body>
