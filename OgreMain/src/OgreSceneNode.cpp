@@ -78,7 +78,7 @@ namespace Ogre {
         mObjectsByName.clear();
 
         if (mWireBoundingBox) {
-			delete mWireBoundingBox;
+			OGRE_DELETE mWireBoundingBox;
 		}
     }
     //-----------------------------------------------------------------------
@@ -340,7 +340,7 @@ namespace Ogre {
 	void SceneNode::_addBoundingBoxToQueue(RenderQueue* queue) {
 		// Create a WireBoundingBox if needed.
 		if (mWireBoundingBox == NULL) {
-			mWireBoundingBox = new WireBoundingBox();
+			mWireBoundingBox = OGRE_NEW WireBoundingBox();
 		}
 		mWireBoundingBox->setupBoundingBox(mWorldAABB);
 		queue->addRenderable(mWireBoundingBox);

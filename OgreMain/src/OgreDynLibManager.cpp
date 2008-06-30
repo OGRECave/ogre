@@ -59,7 +59,7 @@ namespace Ogre
 		}
 		else
 		{
-	        DynLib* pLib = new DynLib(filename);
+	        DynLib* pLib = OGRE_NEW DynLib(filename);
 			pLib->load();        
         	mLibList[filename] = pLib;
 	        return pLib;
@@ -74,7 +74,7 @@ namespace Ogre
 			mLibList.erase(i);
 		}
 		lib->unload();
-		delete lib;
+		OGRE_DELETE lib;
 	}
 	//-----------------------------------------------------------------------
     DynLibManager::~DynLibManager()
@@ -83,7 +83,7 @@ namespace Ogre
         for( DynLibList::iterator it = mLibList.begin(); it != mLibList.end(); ++it )
         {
             it->second->unload();
-            delete it->second;
+            OGRE_DELETE it->second;
         }
 
         // Empty the list

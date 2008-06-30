@@ -47,7 +47,7 @@ namespace Ogre {
         secend = mSettings.end();
         for (seci = mSettings.begin(); seci != secend; ++seci)
         {
-            delete seci->second;
+            OGRE_DELETE_T(seci->second, SettingsMultiMap, MEMCATEGORY_GENERAL);
         }
     }
     //-----------------------------------------------------------------------
@@ -56,7 +56,7 @@ namespace Ogre {
         for (SettingsBySection::iterator seci = mSettings.begin(); 
             seci != mSettings.end(); ++seci)
         {
-            delete seci->second;
+             OGRE_DELETE_T(seci->second, SettingsMultiMap, MEMCATEGORY_GENERAL);
         }
         mSettings.clear();
     }
@@ -104,7 +104,7 @@ namespace Ogre {
         clear();
 
         String currentSection = StringUtil::BLANK;
-        SettingsMultiMap* currentSettings = new SettingsMultiMap();
+        SettingsMultiMap* currentSettings = OGRE_NEW_T(SettingsMultiMap, MEMCATEGORY_GENERAL)();
         mSettings[currentSection] = currentSettings;
 
 
@@ -123,7 +123,7 @@ namespace Ogre {
 					SettingsBySection::const_iterator seci = mSettings.find(currentSection);
 					if (seci == mSettings.end())
 					{
-						currentSettings = new SettingsMultiMap();
+						currentSettings = OGRE_NEW_T(SettingsMultiMap, MEMCATEGORY_GENERAL)();
 						mSettings[currentSection] = currentSettings;
 					}
 					else

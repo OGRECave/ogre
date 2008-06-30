@@ -305,7 +305,7 @@ namespace Ogre {
                     // Apply gamma correction
                     // Do not overwrite original image but do gamma correction in temporary buffer
                     MemoryDataStreamPtr buf; // for scoped deletion of conversion buffer
-                    buf.bind(new MemoryDataStream(
+                    buf.bind(OGRE_NEW MemoryDataStream(
                         PixelUtil::getMemorySize(
                             src.getWidth(), src.getHeight(), src.getDepth(), src.format)));
                     

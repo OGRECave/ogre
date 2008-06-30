@@ -168,7 +168,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	GpuProgramParametersSharedPtr GpuProgramManager::createParameters(void)
 	{
-		return GpuProgramParametersSharedPtr(new GpuProgramParameters());
+		return GpuProgramParametersSharedPtr(OGRE_NEW GpuProgramParameters());
 	}
 
 }

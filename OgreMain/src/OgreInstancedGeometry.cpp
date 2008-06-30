@@ -75,7 +75,7 @@ namespace Ogre {
 	{
 		reset();
 		if(mSkeletonInstance)
-			delete mSkeletonInstance;
+			OGRE_DELETE mSkeletonInstance;
 
 			
 	}
@@ -89,7 +89,7 @@ namespace Ogre {
 			StringUtil::StrStreamType str;
 			str << mName << ":" << index;
 
-			mInstancedGeometryInstance = new BatchInstance(this, str.str(), mOwner, index);
+			mInstancedGeometryInstance = OGRE_NEW BatchInstance(this, str.str(), mOwner, index);
 			mOwner->injectMovableObject(mInstancedGeometryInstance);
 			mInstancedGeometryInstance->setVisible(mVisible);
 			mInstancedGeometryInstance->setCastShadows(mCastShadows);
@@ -200,7 +200,7 @@ namespace Ogre {
 			str << mName << ":" << index;
 			// Calculate the BatchInstance centre
 			Vector3 centre(0,0,0);// = getBatchInstanceCentre(x, y, z);
-			ret = new BatchInstance(this, str.str(), mOwner, index/*, centre*/);
+			ret = OGRE_NEW BatchInstance(this, str.str(), mOwner, index/*, centre*/);
 			mOwner->injectMovableObject(ret);
 			ret->setVisible(mVisible);
 			ret->setCastShadows(mCastShadows);
@@ -330,7 +330,7 @@ namespace Ogre {
 		if(!ent->getMesh()->getSkeleton().isNull()&&mBaseSkeleton.isNull())
 		{
 			mBaseSkeleton=ent->getMesh()->getSkeleton();
-			mSkeletonInstance=new SkeletonInstance(mBaseSkeleton);
+			mSkeletonInstance= OGRE_NEW SkeletonInstance(mBaseSkeleton);
 			mSkeletonInstance->load();
 			mAnimationState=ent->getAllAnimationStates();
 		}
@@ -342,7 +342,7 @@ namespace Ogre {
 		for (uint i = 0; i < ent->getNumSubEntities(); ++i)
 		{
 			SubEntity* se = ent->getSubEntity(i);
-			QueuedSubMesh* q = new QueuedSubMesh();
+			QueuedSubMesh* q = OGRE_NEW QueuedSubMesh();
 
 			// Get the geometry for this SubMesh
 			q->submesh = se->getSubMesh();
@@ -374,7 +374,7 @@ namespace Ogre {
 			return i->second;
 		}
 		// Otherwise, we have to create a new one
-		SubMeshLodGeometryLinkList* lodList = new SubMeshLodGeometryLinkList();
+		SubMeshLodGeometryLinkList* lodList = OGRE_NEW_T(SubMeshLodGeometryLinkList, MEMCATEGORY_GEOMETRY)();
 		mSubMeshGeometryLookup[sm] = lodList;
 		ushort numLods = sm->parent->isLodManual() ? 1 :
 			sm->parent->getNumLodLevels();
@@ -553,13 +553,13 @@ namespace Ogre {
 			ibuf->unlock();
 		}
 
-		targetGeomLink->indexData = new IndexData();
+		targetGeomLink->indexData = OGRE_NEW IndexData();
 		targetGeomLink->indexData->indexStart = 0;
 		targetGeomLink->indexData->indexCount = id->indexCount;
 		targetGeomLink->indexData->indexBuffer = ibuf;
 
 		// Store optimised geometry for deallocation later
-		OptimisedSubMeshGeometry *optGeom = new OptimisedSubMeshGeometry();
+		OptimisedSubMeshGeometry *optGeom = OGRE_NEW OptimisedSubMeshGeometry();
 		optGeom->indexData = targetGeomLink->indexData;
 		optGeom->vertexData = targetGeomLink->vertexData;
 		mOptimisedSubMeshGeometryList.push_back(optGeom);
@@ -628,7 +628,7 @@ namespace Ogre {
 		uint32 index=(lastBatchInstance)?lastBatchInstance->getID()+1:0;
 		//create a new BatchInstance
 
-		BatchInstance*ret = new BatchInstance(this, mName+":"+StringConverter::toString(index),
+		BatchInstance*ret = OGRE_NEW BatchInstance(this, mName+":"+StringConverter::toString(index),
 			mOwner, index);
 
 		ret->attachToScene();
@@ -667,11 +667,11 @@ namespace Ogre {
 			{
 				if(mBaseSkeleton.isNull())
 				{
-					instancedObject=new InstancedObject(objIt->first);
+					instancedObject= OGRE_NEW InstancedObject(objIt->first);
 				}
 				else
 				{
-					instancedObject=new InstancedObject(objIt->first,mSkeletonInstance,mAnimationState);
+					instancedObject= OGRE_NEW InstancedObject(objIt->first,mSkeletonInstance,mAnimationState);
 				}
 				ret->addInstancedObject(objIt->first,instancedObject);
 			}
@@ -687,7 +687,7 @@ namespace Ogre {
 		
 			LODBucket* lod = lodIterator.getNext();
 			//create a new lod bucket for the new BatchInstance
-			LODBucket* lodBucket= new LODBucket(ret,lod->getLod(),lod->getSquaredDistance());
+			LODBucket* lodBucket= OGRE_NEW LODBucket(ret,lod->getLod(),lod->getSquaredDistance());
 
 			//add the lod bucket to the BatchInstance list
 			ret->updateContainers(lodBucket);
@@ -700,7 +700,7 @@ namespace Ogre {
 				MaterialBucket*mat = matIt.getNext();
 				//create a new material bucket
 				String materialName=mat->getMaterialName();
-				MaterialBucket* matBucket = new MaterialBucket(lodBucket,materialName);
+				MaterialBucket* matBucket = OGRE_NEW MaterialBucket(lodBucket,materialName);
 
 				//add the material bucket to the lod buckets list and map
 				lodBucket->updateContainers(matBucket, materialName);
@@ -712,7 +712,7 @@ namespace Ogre {
 					//get the source geometry bucket
 					GeometryBucket *geom = geomIt.getNext();
 					//create a new geometry bucket 
-					GeometryBucket *geomBucket = new GeometryBucket(matBucket,geom->getFormatString(),geom);
+					GeometryBucket *geomBucket = OGRE_NEW GeometryBucket(matBucket,geom->getFormatString(),geom);
 			
 					//update the material bucket map of the material bucket
 					matBucket->updateContainers(geomBucket, geomBucket->getFormatString() );
@@ -776,8 +776,8 @@ namespace Ogre {
 		RenderOperationVector::iterator it;
 		for(it=mRenderOps.begin();it!=mRenderOps.end();++it)
 		{
-			delete (*it)->vertexData;
-			delete (*it)->indexData;
+			OGRE_DELETE (*it)->vertexData;
+			OGRE_DELETE (*it)->indexData;
 	
 		}
 		// delete the BatchInstances
@@ -785,7 +785,7 @@ namespace Ogre {
 			i != mBatchInstanceMap.end(); ++i)
 		{
 			mOwner->extractMovableObject(i->second);
-			delete i->second;
+			OGRE_DELETE i->second;
 
 		}
 		mBatchInstanceMap.clear();
@@ -798,7 +798,7 @@ namespace Ogre {
 		for (QueuedSubMeshList::iterator i = mQueuedSubMeshes.begin();
 			i != mQueuedSubMeshes.end(); ++i)
 		{
-			delete *i;
+			OGRE_DELETE *i;
 			
 		}
 		mQueuedSubMeshes.clear();
@@ -806,7 +806,7 @@ namespace Ogre {
 		for (SubMeshGeometryLookup::iterator l = mSubMeshGeometryLookup.begin();
 			l != mSubMeshGeometryLookup.end(); ++l)
 		{
-			delete l->second;
+			OGRE_DELETE_T(l->second, SubMeshLodGeometryLinkList, MEMCATEGORY_GEOMETRY);
 		
 		}
 		mSubMeshGeometryLookup.clear();
@@ -814,7 +814,7 @@ namespace Ogre {
 		for (OptimisedSubMeshGeometryList::iterator o = mOptimisedSubMeshGeometryList.begin();
 			o != mOptimisedSubMeshGeometryList.end(); ++o)
 		{
-			delete *o;
+			OGRE_DELETE *o;
 			
 		}
 		mOptimisedSubMeshGeometryList.clear();
@@ -911,9 +911,9 @@ namespace Ogre {
 			
 			mSkeletonInstance->load();
 		
-			mAnimationState = new AnimationStateSet();
+			mAnimationState = OGRE_NEW AnimationStateSet();
 			mNumBoneMatrices = mSkeletonInstance->getNumBones();
-			mBoneMatrices = new Matrix4[mNumBoneMatrices];
+			mBoneMatrices = OGRE_ALLOC_T(Matrix4, mNumBoneMatrices, MEMCATEGORY_ANIMATION);
 			AnimationStateIterator it=animations->getAnimationStateIterator();
 			while (it.hasMoreElements())
 			{
@@ -942,9 +942,9 @@ namespace Ogre {
 	InstancedGeometry::InstancedObject::~InstancedObject()
 	{
 		mGeometryBucketList.clear();
-		delete mAnimationState;
-		delete[] mBoneMatrices;
-		delete[] mBoneWorldMatrices;
+		OGRE_DELETE mAnimationState;
+		OGRE_FREE(mBoneMatrices, MEMCATEGORY_ANIMATION);
+		OGRE_FREE(mBoneWorldMatrices, MEMCATEGORY_ANIMATION);
 	}
 	//--------------------------------------------------------------------------
 	void InstancedGeometry::InstancedObject::addBucketToList(GeometryBucket*bucket)
@@ -1052,7 +1052,7 @@ namespace Ogre {
             // when using software animation.
             if (!mBoneWorldMatrices)
             {
-                mBoneWorldMatrices = new Matrix4[mNumBoneMatrices];
+                mBoneWorldMatrices = OGRE_ALLOC_T(Matrix4, mNumBoneMatrices, MEMCATEGORY_ANIMATION);
             }
 
             for (unsigned short i = 0; i < mNumBoneMatrices; ++i)
@@ -1111,14 +1111,14 @@ namespace Ogre {
 		for (LODBucketList::iterator i = mLodBucketList.begin();
 			i != mLodBucketList.end(); ++i)
 		{
-			delete *i;
+			OGRE_DELETE *i;
 		}
 		mLodBucketList.clear();
 		ObjectsMap::iterator o;
 
 		for(o=mInstancesMap.begin();o!=mInstancesMap.end();o++)
 		{
-			delete o->second;
+			OGRE_DELETE o->second;
 		}
 		mInstancesMap.clear();
 		// no need to delete queued meshes, these are managed in InstancedGeometry
@@ -1165,7 +1165,7 @@ namespace Ogre {
 		for (ushort lod = 0; lod < mLodSquaredDistances.size(); ++lod)
 		{
 			LODBucket* lodBucket =
-				new LODBucket(this, lod, mLodSquaredDistances[lod]);
+				OGRE_NEW LODBucket(this, lod, mLodSquaredDistances[lod]);
 			mLodBucketList.push_back(lodBucket);
 			// Now iterate over the meshes and assign to LODs
 			// LOD bucket will pick the right LOD to use
@@ -1186,7 +1186,7 @@ namespace Ogre {
 	void InstancedGeometry::BatchInstance::updateBoundingBox()
 	{
 
-			Vector3 *Positions = new Vector3[mInstancesMap.size()];
+			Vector3 *Positions = OGRE_ALLOC_T(Vector3, mInstancesMap.size(), MEMCATEGORY_GEOMETRY);
 
 			ObjectsMap::iterator objIt;
 			size_t k = 0;
@@ -1240,7 +1240,7 @@ namespace Ogre {
 				}
 			}
 
-			delete [] Positions;		
+			OGRE_FREE(Positions, MEMCATEGORY_GEOMETRY);		
 	}
 	
 	
@@ -1263,21 +1263,12 @@ namespace Ogre {
 		else return NULL;
 	}
 	//--------------------------------------------------------------------------
-	InstancedGeometry::InstancedObject** InstancedGeometry::BatchInstance::getObjectsAsArray(unsigned short & size)
+	InstancedGeometry::BatchInstance::InstancedObjectIterator 
+	InstancedGeometry::BatchInstance::getObjectIterator()
 	{
-		size = static_cast <unsigned short> (mInstancesMap.size());
-		ObjectsMap::iterator it;
-		InstancedObject** array=new InstancedObject*[size];
-		int i=0;
-		for(it=mInstancesMap.begin();it!=mInstancesMap.end();it++)
-		{
-			array[i]=it->second;
-			i++;
-		}
-		return array;
-	}
+		return InstancedObjectIterator(mInstancesMap.begin(), mInstancesMap.end());
+	} 
 	//--------------------------------------------------------------------------
-
 	const String& InstancedGeometry::BatchInstance::getMovableType(void) const
 	{
 		static String sType = "InstancedGeometry";
@@ -1411,13 +1402,13 @@ namespace Ogre {
 		for (MaterialBucketMap::iterator i = mMaterialBucketMap.begin();
 			i != mMaterialBucketMap.end(); ++i)
 		{
-			delete i->second;
+			OGRE_DELETE i->second;
 		}
 		mMaterialBucketMap.clear();
 		for(QueuedGeometryList::iterator qi = mQueuedGeometryList.begin();
 			qi != mQueuedGeometryList.end(); ++qi)
 		{
-			delete *qi;
+			OGRE_DELETE *qi;
 		}
 		mQueuedGeometryList.clear();
 		// no need to delete queued meshes, these are managed in InstancedGeometry
@@ -1425,7 +1416,7 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	void InstancedGeometry::LODBucket::assign(QueuedSubMesh* qmesh, ushort atLod)
 	{
-		QueuedGeometry* q = new QueuedGeometry();
+		QueuedGeometry* q = OGRE_NEW QueuedGeometry();
 		mQueuedGeometryList.push_back(q);
 		q->position = qmesh->position;
 		q->orientation = qmesh->orientation;
@@ -1452,7 +1443,7 @@ namespace Ogre {
 		}
 		else
 		{
-			mbucket = new MaterialBucket(this, qmesh->materialName);
+			mbucket = OGRE_NEW MaterialBucket(this, qmesh->materialName);
 			mMaterialBucketMap[qmesh->materialName] = mbucket;
 		}
 		mbucket->assign(q);
@@ -1529,7 +1520,7 @@ namespace Ogre {
 		for (GeometryBucketList::iterator i = mGeometryBucketList.begin();
 			i != mGeometryBucketList.end(); ++i)
 		{
-			delete *i;
+			OGRE_DELETE *i;
 		}
 		mGeometryBucketList.clear();
 		// no need to delete queued meshes, these are managed in InstancedGeometry
@@ -1553,7 +1544,7 @@ namespace Ogre {
 		// Do we need to create a new one?
 		if (newBucket)
 		{
-			GeometryBucket* gbucket = new GeometryBucket(this, formatString,
+			GeometryBucket* gbucket = OGRE_NEW GeometryBucket(this, formatString,
 				qgeom->geometry->vertexData, qgeom->geometry->indexData);
 			// Add to main list
 			mGeometryBucketList.push_back(gbucket);
@@ -1682,16 +1673,16 @@ namespace Ogre {
 	   	mBatch=mParent->getParent()->getParent()->getParent();
 		if(!mBatch->getBaseSkeleton().isNull())
 			setCustomParameter(0,Vector4(mBatch->getBaseSkeleton()->getNumBones(),0,0,0));
-		//mRenderOperation=new RenderOperation();
+		//mRenderOperation=OGRE_NEW RenderOperation();
 		// Clone the structure from the example
 		mVertexData = vData->clone(false);
 
 		mRenderOp.useIndexes = true;
-		mRenderOp.indexData = new IndexData();
+		mRenderOp.indexData = OGRE_NEW IndexData();
 
 		mRenderOp.indexData->indexCount = 0;
 		mRenderOp.indexData->indexStart = 0;
-		mRenderOp.vertexData = new VertexData();
+		mRenderOp.vertexData = OGRE_NEW VertexData();
 		mRenderOp.vertexData->vertexCount = 0;
 
 		mRenderOp.vertexData->vertexDeclaration = vData->vertexDeclaration->clone();
@@ -1946,11 +1937,11 @@ namespace Ogre {
 			{
 				if(mBatch->getBaseSkeleton().isNull())
 				{
-					instancedObject=new InstancedObject(index);
+					instancedObject= OGRE_NEW InstancedObject(index);
 				}
 				else
 				{
-					instancedObject=new InstancedObject(index,mBatch->getBaseSkeletonInstance(),
+					instancedObject= OGRE_NEW InstancedObject(index,mBatch->getBaseSkeletonInstance(),
 						mBatch->getBaseAnimationState());
 				}
 				mParent->getParent()->getParent()->addInstancedObject(index,instancedObject);
@@ -2094,8 +2085,8 @@ namespace Ogre {
 			binds->getBuffer(b)->unlock();
 		}
 	
-	delete mVertexData;
-	delete mIndexData;
+	OGRE_DELETE mVertexData;
+	OGRE_DELETE mIndexData;
 	
 	mVertexData=mRenderOp.vertexData;
 	mIndexData=mRenderOp.indexData;

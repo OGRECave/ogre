@@ -49,7 +49,7 @@ namespace Ogre {
         generate an extra quaternion in between each actual quaternion which when take with 
         the original quaternion forms the 'tangent' of that quaternion.
     */
-	class _OgreExport RotationalSpline : public SplineAlloc
+	class _OgreExport RotationalSpline
     {
     public:
         RotationalSpline();

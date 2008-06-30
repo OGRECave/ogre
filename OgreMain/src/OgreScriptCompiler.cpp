@@ -49,7 +49,7 @@ namespace Ogre
 
 	AbstractNode *AtomAbstractNode::clone() const
 	{
-		AtomAbstractNode *node = new AtomAbstractNode(parent);
+		AtomAbstractNode *node = OGRE_NEW AtomAbstractNode(parent);
 		node->file = file;
 		node->line = line;
 		node->id = id;
@@ -72,7 +72,7 @@ namespace Ogre
 
 	AbstractNode *ObjectAbstractNode::clone() const
 	{
-		ObjectAbstractNode *node = new ObjectAbstractNode(parent);
+		ObjectAbstractNode *node = OGRE_NEW ObjectAbstractNode(parent);
 		node->file = file;
 		node->line = line;
 		node->type = type;
@@ -142,7 +142,7 @@ namespace Ogre
 
 	AbstractNode *PropertyAbstractNode::clone() const
 	{
-		PropertyAbstractNode *node = new PropertyAbstractNode(parent);
+		PropertyAbstractNode *node = OGRE_NEW PropertyAbstractNode(parent);
 		node->file = file;
 		node->line = line;
 		node->type = type;
@@ -171,7 +171,7 @@ namespace Ogre
 
 	AbstractNode *ImportAbstractNode::clone() const
 	{
-		ImportAbstractNode *node = new ImportAbstractNode();
+		ImportAbstractNode *node = OGRE_NEW ImportAbstractNode();
 		node->file = file;
 		node->line = line;
 		node->type = type;
@@ -194,7 +194,7 @@ namespace Ogre
 
 	AbstractNode *VariableAccessAbstractNode::clone() const
 	{
-		VariableAccessAbstractNode *node = new VariableAccessAbstractNode(parent);
+		VariableAccessAbstractNode *node = OGRE_NEW VariableAccessAbstractNode(parent);
 		node->file = file;
 		node->line = line;
 		node->type = type;
@@ -416,7 +416,7 @@ namespace Ogre
 
 	void ScriptCompiler::addError(uint32 code, const Ogre::String &file, int line, const String &msg)
 	{
-		ErrorPtr err(new Error());
+		ErrorPtr err(OGRE_NEW Error());
 		err->code = code;
 		err->file = file;
 		err->line = line;
@@ -596,7 +596,8 @@ namespace Ogre
 			}
 		}
 
-		AbstractNodeListPtr newNodes(new AbstractNodeList());
+		// MEMCATEGORY_GENERAL is the only category supported for SharedPtr
+		AbstractNodeListPtr newNodes(OGRE_NEW_T(AbstractNodeList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 		if(iter != nodes->end())
 		{
 			newNodes->push_back(*iter);
@@ -1203,7 +1204,7 @@ namespace Ogre
 
 	// AbstractTreeeBuilder
 	ScriptCompiler::AbstractTreeBuilder::AbstractTreeBuilder(ScriptCompiler *compiler)
-		:mCurrent(0), mNodes(new AbstractNodeList()), mCompiler(compiler)
+		:mCurrent(0), mNodes(OGRE_NEW_T(AbstractNodeList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T), mCompiler(compiler)
 	{
 	}
 
@@ -1230,7 +1231,7 @@ namespace Ogre
 				goto fail;
 			}
 
-			ImportAbstractNode *impl = new ImportAbstractNode();
+			ImportAbstractNode *impl = OGRE_NEW ImportAbstractNode();
 			impl->line = node->line;
 			impl->file = node->file;
 			
@@ -1286,7 +1287,7 @@ namespace Ogre
 				goto fail;
 			}
 
-			VariableAccessAbstractNode *impl = new VariableAccessAbstractNode(mCurrent);
+			VariableAccessAbstractNode *impl = OGRE_NEW VariableAccessAbstractNode(mCurrent);
 			impl->line = node->line;
 			impl->file = node->file;
 			impl->name = node->token;
@@ -1317,7 +1318,7 @@ namespace Ogre
 					goto fail;
 				}
 
-				ObjectAbstractNode *impl = new ObjectAbstractNode(mCurrent);
+				ObjectAbstractNode *impl = OGRE_NEW ObjectAbstractNode(mCurrent);
 				impl->line = node->line;
 				impl->file = node->file;
 				impl->abstract = false;
@@ -1356,7 +1357,7 @@ namespace Ogre
 				{
 					if((*iter)->type == CNT_VARIABLE)
 					{
-						VariableAccessAbstractNode *var = new VariableAccessAbstractNode(impl);
+						VariableAccessAbstractNode *var = OGRE_NEW VariableAccessAbstractNode(impl);
 						var->file = (*iter)->file;
 						var->line = (*iter)->line;
 						var->type = ANT_VARIABLE_ACCESS;
@@ -1365,7 +1366,7 @@ namespace Ogre
 					}
 					else
 					{
-						AtomAbstractNode *atom = new AtomAbstractNode(impl);
+						AtomAbstractNode *atom = OGRE_NEW AtomAbstractNode(impl);
 						atom->file = (*iter)->file;
 						atom->line = (*iter)->line;
 						atom->type = ANT_ATOM;
@@ -1403,7 +1404,7 @@ namespace Ogre
 			// Otherwise, it is a property
 			else
 			{
-				PropertyAbstractNode *impl = new PropertyAbstractNode(mCurrent);
+				PropertyAbstractNode *impl = OGRE_NEW PropertyAbstractNode(mCurrent);
 				impl->line = node->line;
 				impl->file = node->file;
 				impl->name = node->token;
@@ -1425,7 +1426,7 @@ namespace Ogre
 		// Otherwise, it is a standard atom
 		else
 		{
-			AtomAbstractNode *impl = new AtomAbstractNode(mCurrent);
+			AtomAbstractNode *impl = OGRE_NEW AtomAbstractNode(mCurrent);
 			impl->line = node->line;
 			impl->file = node->file;
 			impl->value = node->token;
@@ -1496,16 +1497,16 @@ namespace Ogre
         mScriptPatterns.push_back("*.os");
 		ResourceGroupManager::getSingleton()._registerScriptLoader(this);
 
-		OGRE_THREAD_POINTER_SET(mScriptCompiler, new ScriptCompiler());
+		OGRE_THREAD_POINTER_SET(mScriptCompiler, OGRE_NEW ScriptCompiler());
 
-		mBuiltinTranslatorManager = new BuiltinScriptTranslatorManager();
+		mBuiltinTranslatorManager = OGRE_NEW BuiltinScriptTranslatorManager();
 		mManagers.push_back(mBuiltinTranslatorManager);
 	}
 	//-----------------------------------------------------------------------
 	ScriptCompilerManager::~ScriptCompilerManager()
 	{
 		OGRE_THREAD_POINTER_DELETE(mScriptCompiler);
-		delete mBuiltinTranslatorManager;
+		OGRE_DELETE mBuiltinTranslatorManager;
 	}
 	//-----------------------------------------------------------------------
 	void ScriptCompilerManager::setListener(ScriptCompilerListener *listener)
@@ -1580,7 +1581,7 @@ namespace Ogre
 		{
 			// create a new instance for this thread - will get deleted when
 			// the thread dies
-			mScriptCompiler.reset(new ScriptCompiler());
+			mScriptCompiler.reset(OGRE_NEW ScriptCompiler());
 		}
 #endif
 		// Set the listener on the compiler before we continue

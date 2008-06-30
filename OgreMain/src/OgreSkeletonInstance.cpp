@@ -169,13 +169,13 @@ namespace Ogre {
             // ignore it:
             //   1. The parent node of the tagPoint already deleted by Skeleton::unload(), nothing need to do now
             //   2. And the child object relationship already detached by Entity::~Entity()
-            delete tagPoint;
+            OGRE_DELETE tagPoint;
         }
         mActiveTagPoints.clear();
         for (TagPointList::const_iterator it2 = mFreeTagPoints.begin(); it2 != mFreeTagPoints.end(); ++it2)
         {
             TagPoint* tagPoint = *it2;
-            delete tagPoint;
+            OGRE_DELETE tagPoint;
         }
         mFreeTagPoints.clear();
     }
@@ -187,7 +187,7 @@ namespace Ogre {
     {
         TagPoint* ret;
         if (mFreeTagPoints.empty()) {
-            ret = new TagPoint(mNextTagPointAutoHandle++, this);
+            ret = OGRE_NEW TagPoint(mNextTagPointAutoHandle++, this);
             mActiveTagPoints.push_back(ret);
         } else {
             ret = mFreeTagPoints.front();

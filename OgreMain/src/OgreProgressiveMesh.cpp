@@ -163,7 +163,7 @@ namespace Ogre {
 #endif
 
             // Bake a new LOD and add it to the list
-            newLod = new IndexData();
+            newLod = OGRE_NEW IndexData();
             bakeNewLOD(newLod);
             outList->push_back(newLod);
 			

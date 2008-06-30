@@ -68,7 +68,7 @@ namespace Ogre {
 		//Only delete if this was not a dynamic image (meaning app holds & destroys buffer)
 		if( m_pBuffer && m_bAutoDelete )
 		{
-			delete[] m_pBuffer;
+			OGRE_FREE(m_pBuffer, MEMCATEGORY_GENERAL);
 			m_pBuffer = NULL;
 		}
 	}
@@ -78,7 +78,7 @@ namespace Ogre {
 	{
 		if( m_pBuffer && m_bAutoDelete )
 		{
-			delete[] m_pBuffer;
+			OGRE_FREE(m_pBuffer, MEMCATEGORY_GENERAL);
 			m_pBuffer = NULL;
 		}
 		m_uWidth = img.m_uWidth;
@@ -93,7 +93,7 @@ namespace Ogre {
 		//Only create/copy when previous data was not dynamic data
 		if( m_bAutoDelete )
 		{
-			m_pBuffer = new uchar[ m_uSize ];
+			m_pBuffer = OGRE_ALLOC_T(uchar, m_uSize, MEMCATEGORY_GENERAL);
 			memcpy( m_pBuffer, img.m_pBuffer, m_uSize );
 		}
 		else
@@ -131,7 +131,7 @@ namespace Ogre {
 		switch (m_ucPixelSize)
 		{
 		case 1:
-			pTempBuffer1 = new uchar[m_uWidth * m_uHeight];
+			pTempBuffer1 = OGRE_ALLOC_T(uchar, m_uWidth * m_uHeight, MEMCATEGORY_GENERAL);
 			for (y = 0; y < m_uHeight; y++)
 			{
 				dst1 = (pTempBuffer1 + ((y * m_uWidth) + m_uWidth - 1));
@@ -140,11 +140,11 @@ namespace Ogre {
 			}
 
 			memcpy(m_pBuffer, pTempBuffer1, m_uWidth * m_uHeight * sizeof(uchar));
-			delete [] pTempBuffer1;
+			OGRE_FREE(pTempBuffer1, MEMCATEGORY_GENERAL);
 			break;
 
 		case 2:
-			pTempBuffer2 = new ushort[m_uWidth * m_uHeight];
+			pTempBuffer2 = OGRE_ALLOC_T(ushort, m_uWidth * m_uHeight, MEMCATEGORY_GENERAL);
 			for (y = 0; y < m_uHeight; y++)
 			{
 				dst2 = (pTempBuffer2 + ((y * m_uWidth) + m_uWidth - 1));
@@ -153,11 +153,11 @@ namespace Ogre {
 			}
 
 			memcpy(m_pBuffer, pTempBuffer2, m_uWidth * m_uHeight * sizeof(ushort));
-			delete [] pTempBuffer2;
+			OGRE_FREE(pTempBuffer2, MEMCATEGORY_GENERAL);
 			break;
 
 		case 3:
-			pTempBuffer3 = new uchar[m_uWidth * m_uHeight * 3];
+			pTempBuffer3 = OGRE_ALLOC_T(uchar, m_uWidth * m_uHeight * 3, MEMCATEGORY_GENERAL);
 			for (y = 0; y < m_uHeight; y++)
 			{
 				size_t offset = ((y * m_uWidth) + (m_uWidth - 1)) * 3;
@@ -171,11 +171,11 @@ namespace Ogre {
 			}
 
 			memcpy(m_pBuffer, pTempBuffer3, m_uWidth * m_uHeight * sizeof(uchar) * 3);
-			delete [] pTempBuffer3;
+			OGRE_FREE(pTempBuffer3, MEMCATEGORY_GENERAL);
 			break;
 
 		case 4:
-			pTempBuffer4 = new uint[m_uWidth * m_uHeight];
+			pTempBuffer4 = OGRE_ALLOC_T(uint, m_uWidth * m_uHeight, MEMCATEGORY_GENERAL);
 			for (y = 0; y < m_uHeight; y++)
 			{
 				dst4 = (pTempBuffer4 + ((y * m_uWidth) + m_uWidth - 1));
@@ -184,7 +184,7 @@ namespace Ogre {
 			}
 
 			memcpy(m_pBuffer, pTempBuffer4, m_uWidth * m_uHeight * sizeof(uint));
-			delete [] pTempBuffer4;
+			OGRE_FREE(pTempBuffer4, MEMCATEGORY_GENERAL);
 			break;
 
 		default:
@@ -214,7 +214,7 @@ namespace Ogre {
 
 		size_t rowSpan = m_uWidth * m_ucPixelSize;
 
-		uchar *pTempBuffer = new uchar[ rowSpan * m_uHeight ];
+		uchar *pTempBuffer = OGRE_ALLOC_T(uchar, rowSpan * m_uHeight, MEMCATEGORY_GENERAL);
 		uchar *ptr1 = m_pBuffer, *ptr2 = pTempBuffer + ( ( m_uHeight - 1 ) * rowSpan );
 
 		for( ushort i = 0; i < m_uHeight; i++ )
@@ -225,7 +225,7 @@ namespace Ogre {
 
 		memcpy( m_pBuffer, pTempBuffer, rowSpan * m_uHeight);
 
-		delete [] pTempBuffer;
+		OGRE_FREE(pTempBuffer, MEMCATEGORY_GENERAL);
 
 		return *this;
 	}
@@ -239,7 +239,7 @@ namespace Ogre {
 
 		if( m_pBuffer && m_bAutoDelete )
 		{
-			delete[] m_pBuffer;
+			OGRE_FREE(m_pBuffer, MEMCATEGORY_GENERAL);
 			m_pBuffer = NULL;
 		}
 		// Set image metadata
@@ -286,7 +286,7 @@ namespace Ogre {
 				"Image::loadRawData");
 		}
 
-		uchar *buffer = new uchar[ size ];
+		uchar *buffer = OGRE_ALLOC_T(uchar, size, MEMCATEGORY_GENERAL);
 		stream->read(buffer, size);
 
 		return loadDynamicImage(buffer,
@@ -337,7 +337,7 @@ namespace Ogre {
 			"Unable to save image file '" + filename + "' - invalid extension.",
 			"Image::save" );
 
-		ImageCodec::ImageData* imgData = new ImageCodec::ImageData();
+		ImageCodec::ImageData* imgData = OGRE_NEW ImageCodec::ImageData();
 		imgData->format = m_eFormat;
 		imgData->height = m_uHeight;
 		imgData->width = m_uWidth;
@@ -345,7 +345,7 @@ namespace Ogre {
 		// Wrap in CodecDataPtr, this will delete
 		Codec::CodecDataPtr codeDataPtr(imgData);
 		// Wrap memory, be sure not to delete when stream destroyed
-		MemoryDataStreamPtr wrapper(new MemoryDataStream(m_pBuffer, m_uSize, false));
+		MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(m_pBuffer, m_uSize, false));
 
 		pCodec->codeToFile(wrapper, filename, codeDataPtr);
 	}
@@ -365,7 +365,7 @@ namespace Ogre {
 			"Unable to encode image data as '" + formatextension + "' - invalid extension.",
 			"Image::encode" );
 
-		ImageCodec::ImageData* imgData = new ImageCodec::ImageData();
+		ImageCodec::ImageData* imgData = OGRE_NEW ImageCodec::ImageData();
 		imgData->format = m_eFormat;
 		imgData->height = m_uHeight;
 		imgData->width = m_uWidth;
@@ -373,7 +373,7 @@ namespace Ogre {
 		// Wrap in CodecDataPtr, this will delete
 		Codec::CodecDataPtr codeDataPtr(imgData);
 		// Wrap memory, be sure not to delete when stream destroyed
-		MemoryDataStreamPtr wrapper(new MemoryDataStream(m_pBuffer, m_uSize, false));
+		MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(m_pBuffer, m_uSize, false));
 
 		return pCodec->code(wrapper, codeDataPtr);
 	}
@@ -382,7 +382,7 @@ namespace Ogre {
 	{
 		if( m_pBuffer && m_bAutoDelete )
 		{
-			delete[] m_pBuffer;
+			OGRE_FREE(m_pBuffer, MEMCATEGORY_GENERAL);
 			m_pBuffer = NULL;
 		}
 
@@ -589,7 +589,7 @@ namespace Ogre {
 		m_uWidth = width;
 		m_uHeight = height;
 		m_uSize = PixelUtil::getMemorySize(m_uWidth, m_uHeight, 1, m_eFormat);
-		m_pBuffer = new uchar[m_uSize];
+		m_pBuffer = OGRE_ALLOC_T(uchar, m_uSize, MEMCATEGORY_GENERAL);
         m_uNumMipmaps = 0; // Loses precomputed mipmaps
 
 		// scale the image from temp into our resized buffer
@@ -615,7 +615,7 @@ namespace Ogre {
 			{
 				// Allocate temporary buffer of destination size in source format 
 				temp = PixelBox(scaled.getWidth(), scaled.getHeight(), scaled.getDepth(), src.format);
-				buf.bind(new MemoryDataStream(temp.getConsecutiveSize()));
+				buf.bind(OGRE_NEW MemoryDataStream(temp.getConsecutiveSize()));
 				temp.data = buf->getPtr();
 			}
 			// super-optimized: no conversion
@@ -658,7 +658,7 @@ namespace Ogre {
 				{
 					// Allocate temp buffer of destination size in source format 
 					temp = PixelBox(scaled.getWidth(), scaled.getHeight(), scaled.getDepth(), src.format);
-					buf.bind(new MemoryDataStream(temp.getConsecutiveSize()));
+					buf.bind(OGRE_NEW MemoryDataStream(temp.getConsecutiveSize()));
 					temp.data = buf->getPtr();
 				}
 				// super-optimized: byte-oriented math, no conversion

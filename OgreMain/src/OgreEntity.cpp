@@ -157,7 +157,7 @@ namespace Ogre {
 		// Is mesh skeletally animated?
 		if (mMesh->hasSkeleton() && !mMesh->getSkeleton().isNull())
 		{
-			mSkeletonInstance = new SkeletonInstance(mMesh->getSkeleton());
+			mSkeletonInstance = OGRE_NEW SkeletonInstance(mMesh->getSkeleton());
 			mSkeletonInstance->load();
 		}
 
@@ -174,7 +174,7 @@ namespace Ogre {
 			{
 				const MeshLodUsage& usage = mMesh->getLodLevel(i);
 				// Manually create entity
-				Entity* lodEnt = new Entity(mName + "Lod" + StringConverter::toString(i),
+				Entity* lodEnt = OGRE_NEW Entity(mName + "Lod" + StringConverter::toString(i),
 					usage.manualMesh);
 				mLodEntityList.push_back(lodEnt);
 			}
@@ -184,13 +184,13 @@ namespace Ogre {
 		// Initialise the AnimationState, if Mesh has animation
 		if (hasSkeleton())
 		{
-			mFrameBonesLastUpdated = new unsigned long(std::numeric_limits<unsigned long>::max());
+			mFrameBonesLastUpdated = OGRE_NEW_T(unsigned long, MEMCATEGORY_ANIMATION)(std::numeric_limits<unsigned long>::max());
 			mNumBoneMatrices = mSkeletonInstance->getNumBones();
 			mBoneMatrices = static_cast<Matrix4*>(OGRE_MALLOC_SIMD(sizeof(Matrix4) * mNumBoneMatrices, MEMCATEGORY_ANIMATION));
 		}
 		if (hasSkeleton() || hasVertexAnimation())
 		{
-			mAnimationState = new AnimationStateSet();
+			mAnimationState = OGRE_NEW AnimationStateSet();
 			mMesh->_initAnimationState(mAnimationState);
 			prepareTempBlendBuffers();
 		}
@@ -220,7 +220,7 @@ namespace Ogre {
 		for (i = mSubEntityList.begin(); i != iend; ++i)
 		{
 			// Delete SubEntity
-			delete *i;
+			OGRE_DELETE *i;
 		}
 		mSubEntityList.clear();
 		
@@ -230,7 +230,7 @@ namespace Ogre {
 		for (li = mLodEntityList.begin(); li != liend; ++li)
 		{
 			// Delete
-			delete (*li);
+			OGRE_DELETE (*li);
 		}
         mLodEntityList.clear();
         
@@ -239,7 +239,7 @@ namespace Ogre {
 		siend = mShadowRenderables.end();
 		for (si = mShadowRenderables.begin(); si != siend; ++si)
 		{
-			delete *si;
+			OGRE_DELETE *si;
 		}
         mShadowRenderables.clear();
         
@@ -259,27 +259,29 @@ namespace Ogre {
                 // Should never occuring, just in case
                 else if (mSharedSkeletonEntities->empty())
                 {
-                    delete mSharedSkeletonEntities;
-                    delete mFrameBonesLastUpdated;
-                    delete mSkeletonInstance;
+                    OGRE_DELETE_T(mSharedSkeletonEntities, EntitySet, MEMCATEGORY_ANIMATION);
+					// using OGRE_FREE since unsigned long is not a destructor
+                    OGRE_FREE(mFrameBonesLastUpdated, MEMCATEGORY_ANIMATION);
+                    OGRE_DELETE mSkeletonInstance;
                     OGRE_FREE_SIMD(mBoneMatrices, MEMCATEGORY_ANIMATION);
-                    delete mAnimationState;
+                    OGRE_DELETE mAnimationState;
                 }
             } else {
-                delete mFrameBonesLastUpdated;
-                delete mSkeletonInstance;
+				// using OGRE_FREE since unsigned long is not a destructor
+				OGRE_FREE(mFrameBonesLastUpdated, MEMCATEGORY_ANIMATION);
+                OGRE_DELETE mSkeletonInstance;
                 OGRE_FREE_SIMD(mBoneMatrices, MEMCATEGORY_ANIMATION);
-                delete mAnimationState;
+                OGRE_DELETE mAnimationState;
             }
         }
 		else if (hasVertexAnimation())
 		{
-			delete mAnimationState;
+			OGRE_DELETE mAnimationState;
 		}
 
-		delete mSkelAnimVertexData;
-		delete mSoftwareVertexAnimVertexData;
-		delete mHardwareVertexAnimVertexData;
+		OGRE_DELETE mSkelAnimVertexData;
+		OGRE_DELETE mSoftwareVertexAnimVertexData;
+		OGRE_DELETE mHardwareVertexAnimVertexData;
 
 		mInitialised = false;
 	}
@@ -342,8 +344,8 @@ namespace Ogre {
 			}
 			if (mAnimationState)
 			{
-				delete newEnt->mAnimationState;
-				newEnt->mAnimationState = new AnimationStateSet(*mAnimationState);
+				OGRE_DELETE newEnt->mAnimationState;
+				newEnt->mAnimationState = OGRE_NEW AnimationStateSet(*mAnimationState);
 			}
 		}
 
@@ -1119,7 +1121,7 @@ namespace Ogre {
         for (i = 0; i < numSubMeshes; ++i)
         {
             subMesh = mesh->getSubMesh(i);
-            subEnt = new SubEntity(this, subMesh);
+            subEnt = OGRE_NEW SubEntity(this, subMesh);
             if (subMesh->isMatInitialised())
                 subEnt->setMaterialName(subMesh->getMaterialName());
             sublist->push_back(subEnt);
@@ -1277,17 +1279,17 @@ namespace Ogre {
     {
         if (mSkelAnimVertexData)
         {
-            delete mSkelAnimVertexData;
+            OGRE_DELETE mSkelAnimVertexData;
             mSkelAnimVertexData = 0;
         }
 		if (mSoftwareVertexAnimVertexData)
 		{
-			delete mSoftwareVertexAnimVertexData;
+			OGRE_DELETE mSoftwareVertexAnimVertexData;
 			mSoftwareVertexAnimVertexData = 0;
 		}
 		if (mHardwareVertexAnimVertexData)
 		{
-			delete mHardwareVertexAnimVertexData;
+			OGRE_DELETE mHardwareVertexAnimVertexData;
 			mHardwareVertexAnimVertexData = 0;
 		}
 
@@ -1600,7 +1602,7 @@ namespace Ogre {
                 // for extruding the shadow volume) since otherwise we can
                 // get depth-fighting on the light cap
 
-                *si = new EntityShadowRenderable(this, indexBuffer, pVertData,
+                *si = OGRE_NEW EntityShadowRenderable(this, indexBuffer, pVertData,
                     mVertexProgramInUse || !extrude, subent);
             }
             else
@@ -1756,13 +1758,13 @@ namespace Ogre {
         mCurrentVertexData = vertexData;
 
         // Initialise render op
-        mRenderOp.indexData = new IndexData();
+        mRenderOp.indexData = OGRE_NEW IndexData();
         mRenderOp.indexData->indexBuffer = *indexBuffer;
         mRenderOp.indexData->indexStart = 0;
         // index start and count are sorted out later
 
         // Create vertex data which just references position component (and 2 component)
-        mRenderOp.vertexData = new VertexData();
+        mRenderOp.vertexData = OGRE_NEW VertexData();
         // Map in position data
         mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT3, VES_POSITION);
         mOriginalPosBufferBinding =
@@ -1793,7 +1795,7 @@ namespace Ogre {
             if (createSeparateLightCap)
             {
                 // Create child light cap
-                mLightCap = new EntityShadowRenderable(parent,
+                mLightCap = OGRE_NEW EntityShadowRenderable(parent,
                     indexBuffer, vertexData, false, subent, true);
             }
         }
@@ -1802,8 +1804,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Entity::EntityShadowRenderable::~EntityShadowRenderable()
     {
-        delete mRenderOp.indexData;
-        delete mRenderOp.vertexData;
+        OGRE_DELETE mRenderOp.indexData;
+        OGRE_DELETE mRenderOp.vertexData;
     }
     //-----------------------------------------------------------------------
     void Entity::EntityShadowRenderable::getWorldTransforms(Matrix4* xform) const
@@ -1883,10 +1885,11 @@ namespace Ogre {
         }
         else
         {
-            delete mSkeletonInstance;
+            OGRE_DELETE mSkeletonInstance;
             OGRE_FREE_SIMD(mBoneMatrices, MEMCATEGORY_ANIMATION);
-            delete mAnimationState;
-            delete mFrameBonesLastUpdated;
+            OGRE_DELETE mAnimationState;
+			// using OGRE_FREE since unsigned long is not a destructor
+			OGRE_FREE(mFrameBonesLastUpdated, MEMCATEGORY_ANIMATION);
             mSkeletonInstance = entity->mSkeletonInstance;
             mNumBoneMatrices = entity->mNumBoneMatrices;
             mBoneMatrices = entity->mBoneMatrices;
@@ -1894,7 +1897,7 @@ namespace Ogre {
             mFrameBonesLastUpdated = entity->mFrameBonesLastUpdated;
             if (entity->mSharedSkeletonEntities == NULL)
             {
-                entity->mSharedSkeletonEntities = new EntitySet();
+                entity->mSharedSkeletonEntities = OGRE_NEW_T(EntitySet, MEMCATEGORY_ANIMATION)();
                 entity->mSharedSkeletonEntities->insert(entity);
             }
             mSharedSkeletonEntities = entity->mSharedSkeletonEntities;
@@ -1914,16 +1917,16 @@ namespace Ogre {
         if (mSharedSkeletonEntities->size() == 1)
         {
             //just reset
-            delete mSharedSkeletonEntities;
+            OGRE_DELETE_T(mSharedSkeletonEntities, EntitySet, MEMCATEGORY_ANIMATION);
             mSharedSkeletonEntities = 0;
         }
         else
         {
-            mSkeletonInstance = new SkeletonInstance(mMesh->getSkeleton());
+            mSkeletonInstance = OGRE_NEW SkeletonInstance(mMesh->getSkeleton());
             mSkeletonInstance->load();
-            mAnimationState = new AnimationStateSet();
+            mAnimationState = OGRE_NEW AnimationStateSet();
             mMesh->_initAnimationState(mAnimationState);
-            mFrameBonesLastUpdated = new unsigned long(std::numeric_limits<unsigned long>::max());
+            mFrameBonesLastUpdated = OGRE_NEW_T(unsigned long, MEMCATEGORY_ANIMATION)(std::numeric_limits<unsigned long>::max());
             mNumBoneMatrices = mSkeletonInstance->getNumBones();
             mBoneMatrices = static_cast<Matrix4*>(OGRE_MALLOC_SIMD(sizeof(Matrix4) * mNumBoneMatrices, MEMCATEGORY_ANIMATION));
 
@@ -2062,13 +2065,13 @@ namespace Ogre {
 				"EntityFactory::createInstance");
 		}
 
-		return new Entity(name, pMesh);
+		return OGRE_NEW Entity(name, pMesh);
 
 	}
 	//-----------------------------------------------------------------------
 	void EntityFactory::destroyInstance( MovableObject* obj)
 	{
-		delete obj;
+		OGRE_DELETE obj;
 	}
 
 

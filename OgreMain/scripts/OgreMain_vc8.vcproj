@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\include;..\..\Dependencies\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_USRDLL;_MT;OGRE_NONCLIENT_BUILD;FREEIMAGE_LIB"
 				MinimalRebuild="true"
@@ -239,6 +240,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\include;..\..\Dependencies\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_USRDLL;_MT;OGRE_NONCLIENT_BUILD;FREEIMAGE_LIB;OGRE_STATIC_LIB"
 				MinimalRebuild="true"

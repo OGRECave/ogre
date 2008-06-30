@@ -38,7 +38,7 @@ namespace Ogre {
 
 	WireBoundingBox::WireBoundingBox() 
     {
-        mRenderOp.vertexData = new VertexData();
+        mRenderOp.vertexData = OGRE_NEW VertexData();
 
         mRenderOp.indexData = 0;
 		mRenderOp.vertexData->vertexCount = 24; 
@@ -70,7 +70,7 @@ namespace Ogre {
 	
 	WireBoundingBox::~WireBoundingBox() 
     {
-        delete mRenderOp.vertexData;
+        OGRE_DELETE mRenderOp.vertexData;
 	}
 
 	void WireBoundingBox::setupBoundingBox(const AxisAlignedBox& aabb) 

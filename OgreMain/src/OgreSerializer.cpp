@@ -67,7 +67,7 @@ namespace Ogre {
 		// read header id manually (no conversion)
         size_t actually_read = stream->read(&dest, sizeof(uint16));
 		// skip back
-        stream->skip(0 - actually_read);
+        stream->skip(0 - (long)actually_read);
         if (actually_read != sizeof(uint16))
         {
             // end of file?
@@ -153,7 +153,7 @@ namespace Ogre {
     void Serializer::writeFloats(const double* const pDouble, size_t count)
     {
 		// Convert to float, then write
-		float* tmp = new float[count];
+		float* tmp = OGRE_ALLOC_T(float, count, MEMCATEGORY_GENERAL);
 		for (unsigned int i = 0; i < count; ++i)
 		{
 			tmp[i] = static_cast<float>(pDouble[i]);
@@ -167,7 +167,7 @@ namespace Ogre {
 		{
             writeData(tmp, sizeof(float), count);
 		}
-		delete [] tmp;
+		OGRE_FREE(tmp, MEMCATEGORY_GENERAL);
     }
     //---------------------------------------------------------------------
     void Serializer::writeShorts(const uint16* const pShort, size_t count = 1)
@@ -301,7 +301,7 @@ namespace Ogre {
     void Serializer::readFloats(DataStreamPtr& stream, double* pDest, size_t count)
     {
 		// Read from float, convert to double
-		float* tmp = new float[count];
+		float* tmp = OGRE_ALLOC_T(float, count, MEMCATEGORY_GENERAL);
 		float* ptmp = tmp;
         stream->read(tmp, sizeof(float) * count);
         flipFromLittleEndian(tmp, sizeof(float), count);
@@ -310,7 +310,7 @@ namespace Ogre {
 		{
 			*pDest++ = *ptmp++;
 		}
-		delete [] tmp;
+		OGRE_FREE(tmp, MEMCATEGORY_GENERAL);
     }
     //---------------------------------------------------------------------
     void Serializer::readShorts(DataStreamPtr& stream, unsigned short* pDest, size_t count)

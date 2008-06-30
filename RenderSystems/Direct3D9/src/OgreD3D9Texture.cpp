@@ -421,7 +421,8 @@ namespace Ogre
 
 			for(size_t i = 0; i < 6; i++)
 			{
-				images[i].load(DataStreamPtr((*loadedStreams)[i]), ext);
+				DataStreamPtr stream((*loadedStreams)[i]);
+				images[i].load(stream, ext);
 
 				imagePtrs.push_back(&images[i]);
 			}
@@ -512,7 +513,8 @@ namespace Ogre
 			if ( pos != String::npos )
 				ext = mName.substr(pos+1);
 	
-			img.load(DataStreamPtr((*loadedStreams)[0]), ext);
+			DataStreamPtr stream((*loadedStreams)[0]);
+			img.load(stream, ext);
 			// Call internal _loadImages, not loadImage since that's external and 
 			// will determine load status etc again
 			ConstImagePtrList imagePtrs;
@@ -603,8 +605,9 @@ namespace Ogre
 			String ext; 
 			if ( pos != String::npos )
 				ext = mName.substr(pos+1);
-			
-			img.load(DataStreamPtr((*loadedStreams)[0]), ext);
+
+			DataStreamPtr stream((*loadedStreams)[0]);
+			img.load(stream, ext);
 			// Call internal _loadImages, not loadImage since that's external and 
 			// will determine load status etc again
 			ConstImagePtrList imagePtrs;

@@ -50,13 +50,13 @@ namespace Ogre {
         mZOrder(100), mVisible(false), mInitialised(false)
 
     {
-        mRootNode = new SceneNode(NULL);
+        mRootNode = OGRE_NEW SceneNode(NULL);
 
     }
     //---------------------------------------------------------------------
     Overlay::~Overlay()
     {
-        delete mRootNode;
+        OGRE_DELETE mRootNode;
     }
     //---------------------------------------------------------------------
     const String& Overlay::getName(void) const

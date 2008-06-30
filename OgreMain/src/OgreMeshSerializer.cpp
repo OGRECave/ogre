@@ -47,19 +47,19 @@ namespace Ogre {
         // Set up map
         mImplementations.insert(
             MeshSerializerImplMap::value_type("[MeshSerializer_v1.10]", 
-            new MeshSerializerImpl_v1_1() ) );
+            OGRE_NEW MeshSerializerImpl_v1_1() ) );
 
         mImplementations.insert(
             MeshSerializerImplMap::value_type("[MeshSerializer_v1.20]", 
-            new MeshSerializerImpl_v1_2() ) );
+            OGRE_NEW MeshSerializerImpl_v1_2() ) );
 
         mImplementations.insert(
             MeshSerializerImplMap::value_type("[MeshSerializer_v1.30]", 
-            new MeshSerializerImpl_v1_3() ) );
+            OGRE_NEW MeshSerializerImpl_v1_3() ) );
 
         mImplementations.insert(
             MeshSerializerImplMap::value_type(msCurrentVersion, 
-            new MeshSerializerImpl() ) );
+            OGRE_NEW MeshSerializerImpl() ) );
     }
     //---------------------------------------------------------------------
     MeshSerializer::~MeshSerializer()
@@ -68,7 +68,7 @@ namespace Ogre {
         for (MeshSerializerImplMap::iterator i = mImplementations.begin();
             i != mImplementations.end(); ++i)
         {
-            delete i->second;
+            OGRE_DELETE i->second;
         }
         mImplementations.clear();
 

@@ -151,7 +151,7 @@ mSuppressShadows(false)
         mSkyDomeEntity[i] = 0;
     }
 
-	mShadowCasterQueryListener = new ShadowCasterSceneQueryListener(this);
+	mShadowCasterQueryListener = OGRE_NEW ShadowCasterSceneQueryListener(this);
 
     Root *root = Root::getSingletonPtr();
     if (root)
@@ -161,7 +161,7 @@ mSuppressShadows(false)
 	mActiveQueuedRenderableVisitor = &mDefaultQueuedRenderableVisitor;
 
 	// set up default shadow camera setup
-	mDefaultShadowCameraSetup.bind(new DefaultShadowCameraSetup);
+	mDefaultShadowCameraSetup.bind(OGRE_NEW DefaultShadowCameraSetup());
 
 	// init shadow texture config
 	setShadowTextureCount(1);
@@ -182,18 +182,18 @@ SceneManager::~SceneManager()
 		for (MovableObjectCollectionMap::iterator i = mMovableObjectCollectionMap.begin();
 			i != mMovableObjectCollectionMap.end(); ++i)
 		{
-			delete i->second;
+			OGRE_DELETE_T(i->second, MovableObjectCollection, MEMCATEGORY_SCENE_CONTROL);
 		}
 		mMovableObjectCollectionMap.clear();
 	}
 
-	delete mShadowCasterQueryListener;
-    delete mSceneRoot;
-    delete mFullScreenQuad;
-    delete mShadowCasterSphereQuery;
-    delete mShadowCasterAABBQuery;
-    delete mRenderQueue;
-	delete mAutoParamDataSource;
+	OGRE_DELETE mShadowCasterQueryListener;
+    OGRE_DELETE mSceneRoot;
+    OGRE_DELETE mFullScreenQuad;
+    OGRE_DELETE mShadowCasterSphereQuery;
+    OGRE_DELETE mShadowCasterAABBQuery;
+    OGRE_DELETE mRenderQueue;
+	OGRE_DELETE mAutoParamDataSource;
 }
 //-----------------------------------------------------------------------
 RenderQueue* SceneManager::getRenderQueue(void)
@@ -207,7 +207,7 @@ RenderQueue* SceneManager::getRenderQueue(void)
 //-----------------------------------------------------------------------
 void SceneManager::initRenderQueue(void)
 {
-    mRenderQueue = new RenderQueue();
+    mRenderQueue = OGRE_NEW RenderQueue();
     // init render queues that do not need shadows
     mRenderQueue->getQueueGroup(RENDER_QUEUE_BACKGROUND)->setShadowsEnabled(false);
     mRenderQueue->getQueueGroup(RENDER_QUEUE_OVERLAY)->setShadowsEnabled(false);
@@ -268,7 +268,7 @@ Camera* SceneManager::createCamera(const String& name)
             "SceneManager::createCamera" );
     }
 
-    Camera *c = new Camera(name, this);
+    Camera *c = OGRE_NEW Camera(name, this);
     mCameras.insert(CameraList::value_type(name, c));
 
 	// create visible bounds aab map entry
@@ -324,7 +324,7 @@ void SceneManager::destroyCamera(const String& name)
 
 		// Notify render system
         mDestRenderSystem->_notifyCameraRemoved(i->second);
-        delete i->second;
+        OGRE_DELETE i->second;
         mCameras.erase(i);
     }
 
@@ -339,7 +339,7 @@ void SceneManager::destroyAllCameras(void)
     {
         // Notify render system
         mDestRenderSystem->_notifyCameraRemoved(i->second);
-        delete i->second;
+        OGRE_DELETE i->second;
     }
     mCameras.clear();
 	mCamVisibleObjectsMap.clear();
@@ -692,7 +692,7 @@ void SceneManager::clearScene(void)
 	for (SceneNodeList::iterator i = mSceneNodes.begin();
 		i != mSceneNodes.end(); ++i)
 	{
-		delete i->second;
+		OGRE_DELETE i->second;
 	}
 	mSceneNodes.clear();
 	mAutoTrackingSceneNodes.clear();
@@ -714,12 +714,12 @@ void SceneManager::clearScene(void)
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::createSceneNodeImpl(void)
 {
-    return new SceneNode(this);
+    return OGRE_NEW SceneNode(this);
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::createSceneNodeImpl(const String& name)
 {
-    return new SceneNode(this, name);
+    return OGRE_NEW SceneNode(this, name);
 }//-----------------------------------------------------------------------
 SceneNode* SceneManager::createSceneNode(void)
 {
@@ -783,7 +783,7 @@ void SceneManager::destroySceneNode(const String& name)
 	{
 		parentNode->removeChild(i->second);
 	}
-    delete i->second;
+    OGRE_DELETE i->second;
     mSceneNodes.erase(i);
 }
 //---------------------------------------------------------------------
@@ -2614,7 +2614,7 @@ void SceneManager::renderTextureShadowReceiverQueueGroupObjects(
 
 }
 //-----------------------------------------------------------------------
-void SceneManager::SceneMgrQueuedRenderableVisitor::visit(const Renderable* r)
+void SceneManager::SceneMgrQueuedRenderableVisitor::visit(Renderable* r)
 {
 	// Give SM a chance to eliminate
 	if (targetSceneMgr->validateRenderableForRendering(mUsedPass, r))
@@ -2637,7 +2637,7 @@ bool SceneManager::SceneMgrQueuedRenderableVisitor::visit(const Pass* p)
 	return true;
 }
 //-----------------------------------------------------------------------
-void SceneManager::SceneMgrQueuedRenderableVisitor::visit(const RenderablePass* rp)
+void SceneManager::SceneMgrQueuedRenderableVisitor::visit(RenderablePass* rp)
 {
 	// Skip this one if we're in transparency cast shadows mode & it doesn't
 	// Don't need to implement this one in the other visit methods since
@@ -2817,7 +2817,7 @@ void SceneManager::renderTransparentShadowCasterObjects(
 	mActiveQueuedRenderableVisitor->transparentShadowCastersMode = false;
 }
 //-----------------------------------------------------------------------
-void SceneManager::renderSingleObject(const Renderable* rend, const Pass* pass, 
+void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass, 
                                       bool lightScissoringClipping, bool doLightIteration, 
 									  const LightList* manualLightList)
 {
@@ -3140,7 +3140,9 @@ void SceneManager::renderSingleObject(const Renderable* rend, const Pass* pass,
 				}
 				depthInc += pass->getPassIterationCount();
 
-				mDestRenderSystem->_render(ro);
+				if (rend->preRender(this, mDestRenderSystem))
+					mDestRenderSystem->_render(ro);
+				rend->postRender(this, mDestRenderSystem);
 
 				if (scissored == CLIPPED_SOME)
 					resetScissor();
@@ -3212,7 +3214,9 @@ void SceneManager::renderSingleObject(const Renderable* rend, const Pass* pass,
 					// issue the render op		
 					// nfz: set up multipass rendering
 					mDestRenderSystem->setCurrentPassIterationCount(pass->getPassIterationCount());
-					mDestRenderSystem->_render(ro);
+					if (rend->preRender(this, mDestRenderSystem))
+						mDestRenderSystem->_render(ro);
+					rend->postRender(this, mDestRenderSystem);
 				}
 				if (scissored == CLIPPED_SOME)
 					resetScissor();
@@ -3227,7 +3231,9 @@ void SceneManager::renderSingleObject(const Renderable* rend, const Pass* pass,
 	{
 		// Just render
 		mDestRenderSystem->setCurrentPassIterationCount(1);
-		mDestRenderSystem->_render(ro);
+		if (rend->preRender(this, mDestRenderSystem))
+			mDestRenderSystem->_render(ro);
+		rend->postRender(this, mDestRenderSystem);
 	}
 	
     // Reset view / projection changes if any
@@ -3336,7 +3342,7 @@ Animation* SceneManager::createAnimation(const String& name, Real length)
             "SceneManager::createAnimation" );
     }
 
-    Animation* pAnim = new Animation(name, length);
+    Animation* pAnim = OGRE_NEW Animation(name, length);
     mAnimationsList[name] = pAnim;
     return pAnim;
 }
@@ -3377,7 +3383,7 @@ void SceneManager::destroyAnimation(const String& name)
 	}
 
 	// Free memory
-	delete i->second;
+	OGRE_DELETE i->second;
 
 	mAnimationsList.erase(i);
 
@@ -3393,7 +3399,7 @@ void SceneManager::destroyAllAnimations(void)
 	for (i = mAnimationsList.begin(); i != mAnimationsList.end(); ++i)
 	{
 		// destroy
-		delete i->second;
+		OGRE_DELETE i->second;
 	}
 	mAnimationsList.clear();
 }
@@ -4274,7 +4280,7 @@ void SceneManager::initShadowVolumeMaterials(void)
     // Also init full screen quad while we're at it
     if (!mFullScreenQuad)
     {
-        mFullScreenQuad = new Rectangle2D();
+        mFullScreenQuad = OGRE_NEW Rectangle2D();
         mFullScreenQuad->setCorners(-1,1,1,-1);
     }
 
@@ -4335,7 +4341,7 @@ void SceneManager::initShadowVolumeMaterials(void)
     {
         // Load the manual buffer into an image (don't destroy memory!
         DataStreamPtr stream(
-			new MemoryDataStream(SPOT_SHADOW_FADE_PNG, SPOT_SHADOW_FADE_PNG_SIZE, false));
+			OGRE_NEW MemoryDataStream(SPOT_SHADOW_FADE_PNG, SPOT_SHADOW_FADE_PNG_SIZE, false));
         Image img;
         img.load(stream, "png");
         spotShadowFadeTex = 
@@ -5735,7 +5741,7 @@ StaticGeometry* SceneManager::createStaticGeometry(const String& name)
 			"StaticGeometry with name '" + name + "' already exists!", 
 			"SceneManager::createStaticGeometry");
 	}
-	StaticGeometry* ret = new StaticGeometry(this, name);
+	StaticGeometry* ret = OGRE_NEW StaticGeometry(this, name);
 	mStaticGeometryList[name] = ret;
 	return ret;
 }
@@ -5768,7 +5774,7 @@ void SceneManager::destroyStaticGeometry(const String& name)
 	StaticGeometryList::iterator i = mStaticGeometryList.find(name);
 	if (i != mStaticGeometryList.end())
 	{
-		delete i->second;
+		OGRE_DELETE i->second;
 		mStaticGeometryList.erase(i);
 	}
 
@@ -5780,7 +5786,7 @@ void SceneManager::destroyAllStaticGeometry(void)
 	iend = mStaticGeometryList.end();
 	for (i = mStaticGeometryList.begin(); i != iend; ++i)
 	{
-		delete i->second;
+		OGRE_DELETE i->second;
 	}
 	mStaticGeometryList.clear();
 }
@@ -5794,7 +5800,7 @@ InstancedGeometry* SceneManager::createInstancedGeometry(const String& name)
 			"InstancedGeometry with name '" + name + "' already exists!", 
 			"SceneManager::createInstancedGeometry");
 	}
-	InstancedGeometry* ret = new InstancedGeometry(this, name);
+	InstancedGeometry* ret = OGRE_NEW InstancedGeometry(this, name);
 	mInstancedGeometryList[name] = ret;
 	return ret;
 }
@@ -5821,7 +5827,7 @@ void SceneManager::destroyInstancedGeometry(const String& name)
 	InstancedGeometryList::iterator i = mInstancedGeometryList.find(name);
 	if (i != mInstancedGeometryList.end())
 	{
-		delete i->second;
+		OGRE_DELETE i->second;
 		mInstancedGeometryList.erase(i);
 	}
 
@@ -5833,7 +5839,7 @@ void SceneManager::destroyAllInstancedGeometry(void)
 	iend = mInstancedGeometryList.end();
 	for (i = mInstancedGeometryList.begin(); i != iend; ++i)
 	{
-		delete i->second;
+		OGRE_DELETE i->second;
 	}
 	mInstancedGeometryList.clear();
 }
@@ -5841,7 +5847,7 @@ void SceneManager::destroyAllInstancedGeometry(void)
 AxisAlignedBoxSceneQuery* 
 SceneManager::createAABBQuery(const AxisAlignedBox& box, unsigned long mask)
 {
-    DefaultAxisAlignedBoxSceneQuery* q = new DefaultAxisAlignedBoxSceneQuery(this);
+    DefaultAxisAlignedBoxSceneQuery* q = OGRE_NEW DefaultAxisAlignedBoxSceneQuery(this);
     q->setBox(box);
     q->setQueryMask(mask);
     return q;
@@ -5850,7 +5856,7 @@ SceneManager::createAABBQuery(const AxisAlignedBox& box, unsigned long mask)
 SphereSceneQuery* 
 SceneManager::createSphereQuery(const Sphere& sphere, unsigned long mask)
 {
-    DefaultSphereSceneQuery* q = new DefaultSphereSceneQuery(this);
+    DefaultSphereSceneQuery* q = OGRE_NEW DefaultSphereSceneQuery(this);
     q->setSphere(sphere);
     q->setQueryMask(mask);
     return q;
@@ -5860,7 +5866,7 @@ PlaneBoundedVolumeListSceneQuery*
 SceneManager::createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volumes, 
                                             unsigned long mask)
 {
-    DefaultPlaneBoundedVolumeListSceneQuery* q = new DefaultPlaneBoundedVolumeListSceneQuery(this);
+    DefaultPlaneBoundedVolumeListSceneQuery* q = OGRE_NEW DefaultPlaneBoundedVolumeListSceneQuery(this);
     q->setVolumes(volumes);
     q->setQueryMask(mask);
     return q;
@@ -5870,7 +5876,7 @@ SceneManager::createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volume
 RaySceneQuery* 
 SceneManager::createRayQuery(const Ray& ray, unsigned long mask)
 {
-    DefaultRaySceneQuery* q = new DefaultRaySceneQuery(this);
+    DefaultRaySceneQuery* q = OGRE_NEW DefaultRaySceneQuery(this);
     q->setRay(ray);
     q->setQueryMask(mask);
     return q;
@@ -5880,14 +5886,14 @@ IntersectionSceneQuery*
 SceneManager::createIntersectionQuery(unsigned long mask)
 {
 
-    DefaultIntersectionSceneQuery* q = new DefaultIntersectionSceneQuery(this);
+    DefaultIntersectionSceneQuery* q = OGRE_NEW DefaultIntersectionSceneQuery(this);
     q->setQueryMask(mask);
     return q;
 }
 //---------------------------------------------------------------------
 void SceneManager::destroyQuery(SceneQuery* query)
 {
-    delete query;
+    OGRE_DELETE query;
 }
 //---------------------------------------------------------------------
 SceneManager::MovableObjectCollection* 
@@ -5901,7 +5907,7 @@ SceneManager::getMovableObjectCollection(const String& typeName)
 	if (i == mMovableObjectCollectionMap.end())
 	{
 		// create
-		MovableObjectCollection* newCollection = new MovableObjectCollection();
+		MovableObjectCollection* newCollection = OGRE_NEW_T(MovableObjectCollection, MEMCATEGORY_SCENE_CONTROL)();
 		mMovableObjectCollectionMap[typeName] = newCollection;
 		return newCollection;
 	}

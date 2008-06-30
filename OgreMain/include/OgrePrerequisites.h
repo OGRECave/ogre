@@ -141,10 +141,6 @@ namespace Ogre {
     typedef unsigned int uint;
 	typedef unsigned long ulong;
 
-    /// Useful macros
-    #define OGRE_SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
-    #define OGRE_SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
-
 	#if OGRE_WCHAR_T_STRINGS
 		typedef std::wstring _StringBase;
 	#else
@@ -201,7 +197,7 @@ namespace Ogre {
 		#define OGRE_THREAD_NOTIFY_ALL(sync) 
 		#define OGRE_THREAD_POINTER(T, var) T* var
 		#define OGRE_THREAD_POINTER_SET(var, expr) var = expr
-		#define OGRE_THREAD_POINTER_DELETE(var) delete var; var = 0
+		#define OGRE_THREAD_POINTER_DELETE(var) OGRE_DELETE var; var = 0
 		#define OGRE_THREAD_POINTER_GET(var) var
 	#endif
 
@@ -374,7 +370,6 @@ namespace Ogre {
     class TextureUnitState;
     class Texture;
     class TexturePtr;
-	class TextureFont;
     class TextureManager;
     class TransformKeyFrame;
 	class Timer;

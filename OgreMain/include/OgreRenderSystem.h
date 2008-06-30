@@ -112,7 +112,7 @@ namespace Ogre
 	@version
 	1.0
 	*/
-	class _OgreExport RenderSystem
+	class _OgreExport RenderSystem : public RenderSysAlloc
 	{
 	public:
 		/** Default Constructor.

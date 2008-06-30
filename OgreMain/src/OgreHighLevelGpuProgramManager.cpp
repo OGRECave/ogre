@@ -90,11 +90,11 @@ namespace Ogre {
 			const String& name, ResourceHandle handle,
 			const String& group, bool isManual, ManualResourceLoader* loader)
 		{
-			return new NullProgram(creator, name, handle, group, isManual, loader);
+			return OGRE_NEW NullProgram(creator, name, handle, group, isManual, loader);
 		}
 		void destroy(HighLevelGpuProgram* prog)
 		{
-			delete prog;
+			OGRE_DELETE prog;
 		}
 
 	};
@@ -119,16 +119,16 @@ namespace Ogre {
 
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);    
 
-		mNullFactory = new NullProgramFactory();
+		mNullFactory = OGRE_NEW NullProgramFactory();
 		addFactory(mNullFactory);
-		mUnifiedFactory = new UnifiedHighLevelGpuProgramFactory();
+		mUnifiedFactory = OGRE_NEW UnifiedHighLevelGpuProgramFactory();
 		addFactory(mUnifiedFactory);
 	}
 	//-----------------------------------------------------------------------
 	HighLevelGpuProgramManager::~HighLevelGpuProgramManager()
 	{
-		delete mUnifiedFactory;
-		delete mNullFactory;
+		OGRE_DELETE mUnifiedFactory;
+		OGRE_DELETE mNullFactory;
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);    
 	}
     //---------------------------------------------------------------------------

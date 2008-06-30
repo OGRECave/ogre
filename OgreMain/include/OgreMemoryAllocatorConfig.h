@@ -63,7 +63,71 @@ Torus Knot Software Ltd
 	with macros, because that's very difficult to consistently do when other
 	libraries are also trying to do the same thing; instead we use dedicated
 	'OGRE_' prefixed macros. See OGRE_NEW and related items.
-
+	@par
+	The base macros you can use are listed below, in order of preference and 
+	with their conditions stated:
+	<ul>
+	<li>OGRE_NEW - use to allocate an object which have custom new/delete operators
+		to handle custom allocations, usually this means it's derived from Ogre::AllocatedObject. 
+		Free the memory using OGRE_DELETE. You can in fact use the regular new/delete
+		for these classes but you won't get any line number debugging if you do.
+		The memory category is automatically derived for these classes; for all other
+		allocations you have to specify it.
+	</li>
+	<li>OGRE_NEW_T - use to allocate a single class / struct that does not have custom
+		new/delete operators, either because it is non-virtual (Vector3, Quaternion),
+		or because it is from an external library (e.g. STL). You must
+		deallocate with OGRE_DELETE_T if you expect the destructor to be called. 
+		You may free the memory using OGRE_FREE if you are absolutely sure there
+		is no destructor to be called. 
+		These macros ensure that constructors and destructors are called correctly 
+		even though the memory originates externally (via placement new). Also note 
+		that you have to specify the type and memory category so that the correct 
+		allocator can be derived, when both allocating
+		and freeing.
+	</li>
+	<li>OGRE_NEW_ARRAY_T - as OGRE_NEW_T except with an extra parameter to construct
+		multiple instances in contiguous memory. Again constructors and destructors
+		are called. Free with OGRE_DELETE_ARRAY_T.
+	</li>
+	<li>OGRE_ALLOC_T - use to allocate a set of primitive types conveniently with type safety. 
+	This <i>can</i> also be used for classes and structs but it is <b>imperative</b> that
+	you understand that neither the constructor nor the destructor will be called. 
+	Sometimes you want this because it's more efficient just to grab/free a chunk of
+	memory without having to iterate over each element constructing / destructing.
+	Free the memory with OGRE_FREE. </li>
+	<li>OGRE_MALLOC - the most raw form of allocation, just a set of bytes. 
+		Use OGRE_FREE to release.</li>
+	<li>_SIMD and _ALIGN variants - all of the above have variations which allow
+		aligned memory allocations. The _SIMD versions align automatically to the
+		SIMD requirements of your platform, the _ALIGN variants allow user-defined
+		alignment to be specified. </li>
+	</ul>
+	Here are some examples:
+	@code
+	/// AllocatedObject subclass, with custom operator new / delete
+	AllocatedClass* obj = OGRE_NEW AllocatedClass();
+	OGRE_DELETE obj;
+	AllocatedClass* array = OGRE_NEW AllocatedClass[10];
+	OGRE_DELETE [] obj;
+	/// Non-virtual or external class, constructors / destructors called
+	ExternalClass* obj = OGRE_NEW_T(ExternalClass, MEMCATEGORY_GENERAL)(constructorArgs);
+	OGRE_DELETE_T(obj, ExternalClass, MEMCATEGORY_GENERAL);
+	ExternalClass* obj = OGRE_NEW_ARRAY_T(ExternalClass, 10, MEMCATEGORY_GENERAL);
+	OGRE_DELETE_ARRAY_T(obj, NonVirtualClass, 10, MEMCATEGORY_GENERAL);
+	/// Primitive types
+	long* pLong = OGRE_ALLOC_T(long, 10, MEMCATEGORY_GENERAL);
+	OGRE_FREE(pLong, MEMCATEGORY_GENERAL);
+	/// Primitive type with constructor (you can mismatch OGRE_NEW_T and OGRE_FREE because no destructor)
+	long* pLong = OGRE_NEW_T(long, MEMCATEGORY_GENERAL)(0);
+	OGRE_FREE(pLong, MEMCATEGORY_GENERAL);
+	/// Raw memory
+	void* pVoid = OGRE_MALLOC(1024, MEMCATEGORY_GENERAL);
+	OGRE_FREE(pVoid, MEMCATEGORY_GENERAL);
+	@endcode
+	OGRE_ALLOC_T is also the route to go for allocating real primitive types like 
+	int & float. You free the memory using OGRE_FREE, and both variants have SIMD
+	and custom alignment variants.
 */
 
 namespace Ogre
@@ -169,15 +233,6 @@ namespace Ogre
 	typedef AllocatedObject<ScriptingAllocPolicy> ScriptingAllocatedObject;
 	typedef AllocatedObject<RenderSysAllocPolicy> RenderSysAllocatedObject;
 
-	typedef AllocatedObjectTemplated<GeneralAllocPolicy> GeneralAllocatedObjectTemplated;
-	typedef AllocatedObjectTemplated<GeometryAllocPolicy> GeometryAllocatedObjectTemplated;
-	typedef AllocatedObjectTemplated<AnimationAllocPolicy> AnimationAllocatedObjectTemplated;
-	typedef AllocatedObjectTemplated<SceneCtlAllocPolicy> SceneCtlAllocatedObjectTemplated;
-	typedef AllocatedObjectTemplated<SceneObjAllocPolicy> SceneObjAllocatedObjectTemplated;
-	typedef AllocatedObjectTemplated<ResourceAllocPolicy> ResourceAllocatedObjectTemplated;
-	typedef AllocatedObjectTemplated<ScriptingAllocPolicy> ScriptingAllocatedObjectTemplated;
-	typedef AllocatedObjectTemplated<RenderSysAllocPolicy> RenderSysAllocatedObjectTemplated;
-
 
 	// Per-class allocators defined here
 	// NOTE: small, non-virtual classes should not subclass an allocator
@@ -187,7 +242,7 @@ namespace Ogre
 	typedef AnimationAllocatedObject	AnimableAlloc;
 	typedef AnimationAllocatedObject	AnimationAlloc;
 	typedef GeneralAllocatedObject		AnyAlloc;
-	typedef GeneralAllocatedObjectTemplated		AnyHolderAlloc;
+	typedef GeneralAllocatedObject		AnyHolderAlloc;
 	typedef GeneralAllocatedObject		ArchiveAlloc;
 	typedef GeometryAllocatedObject		BatchedGeometryAlloc;
 	typedef RenderSysAllocatedObject	BufferAlloc;
@@ -195,30 +250,40 @@ namespace Ogre
 	typedef ResourceAllocatedObject		CompositorInstAlloc;
 	typedef GeneralAllocatedObject		ConfigAlloc;
 	typedef GeneralAllocatedObject		ControllerAlloc;
+	typedef GeometryAllocatedObject		DebugGeomAlloc;
+	typedef GeneralAllocatedObject		DynLibAlloc;
 	typedef GeometryAllocatedObject		EdgeDataAlloc;
+	typedef GeneralAllocatedObject		FactoryAlloc;
 	typedef SceneObjAllocatedObject		FXAlloc;
 	typedef GeneralAllocatedObject		ImageAlloc;
 	typedef GeometryAllocatedObject		IndexDataAlloc;
+	typedef GeneralAllocatedObject		LogAlloc;
 	typedef SceneObjAllocatedObject		MovableAlloc;
 	typedef SceneCtlAllocatedObject		NodeAlloc;
 	typedef SceneObjAllocatedObject		OverlayAlloc;
+	typedef RenderSysAllocatedObject	GpuParamsAlloc;
 	typedef ResourceAllocatedObject		PassAlloc;
 	typedef GeometryAllocatedObject		PatchAlloc;
+	typedef GeneralAllocatedObject		ProfilerAlloc;
 	typedef GeometryAllocatedObject		ProgMeshAlloc;
 	typedef SceneCtlAllocatedObject		RenderQueueAlloc;
 	typedef RenderSysAllocatedObject	RenderSysAlloc;
+	typedef GeneralAllocatedObject		RootAlloc;
 	typedef ResourceAllocatedObject		ResourceAlloc;
+	typedef GeneralAllocatedObject		SerializerAlloc;
 	typedef SceneCtlAllocatedObject		SceneMgtAlloc;
+	typedef ScriptingAllocatedObject    ScriptCompilerAlloc;
 	typedef ScriptingAllocatedObject    ScriptTranslatorAlloc;
-	typedef SceneCtlAllocatedObject		ShadowCameraAlloc;
-	typedef SceneCtlAllocatedObject		ShadowRenderableAlloc;
-	typedef SceneCtlAllocatedObject		SplineAlloc;
+	typedef SceneCtlAllocatedObject		ShadowDataAlloc;
 	typedef GeneralAllocatedObject		StreamAlloc;
 	typedef SceneObjAllocatedObject		SubEntityAlloc;
 	typedef ResourceAllocatedObject		SubMeshAlloc;
 	typedef ResourceAllocatedObject		TechniqueAlloc;
+	typedef GeneralAllocatedObject		TimerAlloc;
 	typedef ResourceAllocatedObject		TextureUnitStateAlloc;
+	typedef GeneralAllocatedObject		UtilityAlloc;
 	typedef GeometryAllocatedObject		VertexDataAlloc;
+	typedef RenderSysAllocatedObject	ViewportAlloc;
 
 	// Containers (by-value only)
 	// Will  be of the form:
@@ -235,55 +300,108 @@ namespace Ogre
 
 /// Allocate a block of raw memory, and indicate the category of usage
 #	define OGRE_MALLOC(bytes, category) ::Ogre::CategorisedAllocPolicy<category>::allocateBytes(bytes, __FILE__, __LINE__, __FUNCTION__)
-/// Allocate a block of memory for 'count' primitive types - do not use for classes that inherit from AllocatedObject
+/// Allocate a block of memory for a primitive type, and indicate the category of usage
 #	define OGRE_ALLOC_T(T, count, category) static_cast<T*>(::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__))
-/// Free the memory allocated with either OGRE_MALLOC or OGRE_ALLOC_T. Category is required to be restated to ensure the matching policy is used
+/// Free the memory allocated with OGRE_MALLOC or OGRE_ALLOC_T. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_FREE(ptr, category) ::Ogre::CategorisedAllocPolicy<category>::deallocateBytes(ptr)
+
+/// Allocate space for one primitive type, external type or non-virtual type with constructor parameters
+#	define OGRE_NEW_T(T, category) new (::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T), __FILE__, __LINE__, __FUNCTION__)) T
+/// Allocate a block of memory for 'count' primitive types - do not use for classes that inherit from AllocatedObject
+#	define OGRE_NEW_ARRAY_T(T, count, category) new (::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)) T [count]
+/// Free the memory allocated with OGRE_NEW_T. Category is required to be restated to ensure the matching policy is used
+#	define OGRE_DELETE_T(ptr, T, category) (ptr)->~T(); ::Ogre::CategorisedAllocPolicy<category>::deallocateBytes(ptr)
+/// Free the memory allocated with OGRE_NEW_ARRAY_T. Category is required to be restated to ensure the matching policy is used, count and type to call destructor
+#	define OGRE_DELETE_ARRAY_T(ptr, T, count, category) for (size_t b = 0; b < count; ++b) { ((T*)ptr)[b].~T();} ::Ogre::CategorisedAllocPolicy<category>::deallocateBytes(ptr)
 
 // aligned allocation
 /// Allocate a block of raw memory aligned to SIMD boundaries, and indicate the category of usage
 #	define OGRE_MALLOC_SIMD(bytes, category) ::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(bytes, __FILE__, __LINE__, __FUNCTION__)
-/// Allocate a block of memory for 'count' primitive types aligned to SIMD boundaries - do not use for classes that inherit from AllocatedObject
-#	define OGRE_ALLOC_T_SIMD(T, count, category) static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__))
-/// Free the memory allocated with either OGRE_MALLOC_SIMD or OGRE_ALLOC_T_SIMD. Category is required to be restated to ensure the matching policy is used
-#	define OGRE_FREE_SIMD(ptr, category) ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
 /// Allocate a block of raw memory aligned to user defined boundaries, and indicate the category of usage
 #	define OGRE_MALLOC_ALIGN(bytes, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(bytes, __FILE__, __LINE__, __FUNCTION__)
-/// Allocate a block of memory for 'count' primitive types aligned to user defined boundaries - do not use for classes that inherit from AllocatedObject
+/// Allocate a block of memory for a primitive type aligned to SIMD boundaries, and indicate the category of usage
+#	define OGRE_ALLOC_T_SIMD(T, count, category) static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__))
+/// Allocate a block of memory for a primitive type aligned to user defined boundaries, and indicate the category of usage
 #	define OGRE_ALLOC_T_ALIGN(T, count, category, align) static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__))
+/// Free the memory allocated with either OGRE_MALLOC_SIMD or OGRE_ALLOC_T_SIMD. Category is required to be restated to ensure the matching policy is used
+#	define OGRE_FREE_SIMD(ptr, category) ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
 /// Free the memory allocated with either OGRE_MALLOC_ALIGN or OGRE_ALLOC_T_ALIGN. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_FREE_ALIGN(ptr, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr)
 
-// new / delete (alignment determined by per-class policy)
+/// Allocate space for one primitive type, external type or non-virtual type aligned to SIMD boundaries
+#	define OGRE_NEW_T_SIMD(T, category) new (::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T), __FILE__, __LINE__, __FUNCTION__)) T
+/// Allocate a block of memory for 'count' primitive types aligned to SIMD boundaries - do not use for classes that inherit from AllocatedObject
+#	define OGRE_NEW_ARRAY_T_SIMD(T, count, category) new (::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)) T [count]
+/// Free the memory allocated with OGRE_NEW_T_SIMD. Category is required to be restated to ensure the matching policy is used
+#	define OGRE_DELETE_T_SIMD(ptr, T, category) (ptr)->~T(); ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
+/// Free the memory allocated with OGRE_NEW_ARRAY_T_SIMD. Category is required to be restated to ensure the matching policy is used, count and type to call destructor
+#	define OGRE_DELETE_ARRAY_T_SIMD(ptr, T, count, category) for (size_t b = 0; b < count; ++b) { ((T*)ptr)[b].~T();} ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
+/// Allocate space for one primitive type, external type or non-virtual type aligned to user defined boundaries
+#	define OGRE_NEW_T_ALIGN(T, category, align) new (::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T), __FILE__, __LINE__, __FUNCTION__)) T
+/// Allocate a block of memory for 'count' primitive types aligned to user defined boundaries - do not use for classes that inherit from AllocatedObject
+#	define OGRE_NEW_ARRAY_T_ALIGN(T, count, category, align) new (::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)) T [count]
+/// Free the memory allocated with OGRE_NEW_T_ALIGN. Category is required to be restated to ensure the matching policy is used
+#	define OGRE_DELETE_T_ALIGN(ptr, T, category, align) (ptr)->~T(); ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr)
+/// Free the memory allocated with OGRE_NEW_ARRAY_T_ALIGN. Category is required to be restated to ensure the matching policy is used, count and type to call destructor
+#	define OGRE_DELETE_ARRAY_T_ALIGN(ptr, T, count, category, align) for (size_t _b = 0; _b < count; ++_b) { ((T*)ptr)[_b].~T();} ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr)
+
+// new / delete for classes deriving from AllocatedObject (alignment determined by per-class policy)
 // Also hooks up the file/line/function params
 // Can only be used with classes that derive from AllocatedObject since customised new/delete needed
 #	define OGRE_NEW new (__FILE__, __LINE__, __FUNCTION__)
 #	define OGRE_DELETE delete
 
+
 #else // !OGRE_DEBUG_MODE
 
 /// Allocate a block of raw memory, and indicate the category of usage
 #	define OGRE_MALLOC(bytes, category) ::Ogre::CategorisedAllocPolicy<category>::allocateBytes(bytes)
-/// Allocate a block of memory for 'count' primitive types - do not use for classes that inherit from AllocatedObject
+/// Allocate a block of memory for a primitive type, and indicate the category of usage
 #	define OGRE_ALLOC_T(T, count, category) static_cast<T*>(::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count))
-/// Free the memory allocated with either OGRE_MALLOC or OGRE_ALLOC_T. Category is required to be restated to ensure the matching policy is used
+/// Free the memory allocated with OGRE_MALLOC or OGRE_ALLOC_T. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_FREE(ptr, category) ::Ogre::CategorisedAllocPolicy<category>::deallocateBytes(ptr)
+
+/// Allocate space for one primitive type, external type or non-virtual type with constructor parameters
+#	define OGRE_NEW_T(T, category) new (::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T))) T
+/// Allocate a block of memory for 'count' primitive types - do not use for classes that inherit from AllocatedObject
+#	define OGRE_NEW_ARRAY_T(T, count, category) new (::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count)) T [count]
+/// Free the memory allocated with OGRE_NEW_T. Category is required to be restated to ensure the matching policy is used
+#	define OGRE_DELETE_T(ptr, T, category) (ptr)->~T(); ::Ogre::CategorisedAllocPolicy<category>::deallocateBytes(ptr)
+/// Free the memory allocated with OGRE_NEW_ARRAY_T. Category is required to be restated to ensure the matching policy is used, count and type to call destructor
+#	define OGRE_DELETE_ARRAY_T(ptr, T, count, category) for (size_t b = 0; b < count; ++b) { ((T*)ptr)[b].~T();} ::Ogre::CategorisedAllocPolicy<category>::deallocateBytes(ptr)
 
 // aligned allocation
 /// Allocate a block of raw memory aligned to SIMD boundaries, and indicate the category of usage
 #	define OGRE_MALLOC_SIMD(bytes, category) ::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(bytes)
-/// Allocate a block of memory for 'count' primitive types aligned to SIMD boundaries - do not use for classes that inherit from AllocatedObject
-#	define OGRE_ALLOC_T_SIMD(T, count, category) static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count))
-/// Free the memory allocated with either OGRE_MALLOC_SIMD or OGRE_ALLOC_T_SIMD. Category is required to be restated to ensure the matching policy is used
-#	define OGRE_FREE_SIMD(ptr, category) ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
 /// Allocate a block of raw memory aligned to user defined boundaries, and indicate the category of usage
 #	define OGRE_MALLOC_ALIGN(bytes, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(bytes)
-/// Allocate a block of memory for 'count' primitive types aligned to user defined boundaries - do not use for classes that inherit from AllocatedObject
+/// Allocate a block of memory for a primitive type aligned to SIMD boundaries, and indicate the category of usage
+#	define OGRE_ALLOC_T_SIMD(T, count, category) static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count))
+/// Allocate a block of memory for a primitive type aligned to user defined boundaries, and indicate the category of usage
 #	define OGRE_ALLOC_T_ALIGN(T, count, category, align) static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count))
+/// Free the memory allocated with either OGRE_MALLOC_SIMD or OGRE_ALLOC_T_SIMD. Category is required to be restated to ensure the matching policy is used
+#	define OGRE_FREE_SIMD(ptr, category) ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
 /// Free the memory allocated with either OGRE_MALLOC_ALIGN or OGRE_ALLOC_T_ALIGN. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_FREE_ALIGN(ptr, category, align) ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr)
 
-// new / delete (alignment determined by per-class policy)
+/// Allocate space for one primitive type, external type or non-virtual type aligned to SIMD boundaries
+#	define OGRE_NEW_T_SIMD(T, category) new (::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T))) T
+/// Allocate a block of memory for 'count' primitive types aligned to SIMD boundaries - do not use for classes that inherit from AllocatedObject
+#	define OGRE_NEW_ARRAY_T_SIMD(T, count, category) new (::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count)) T [count]
+/// Free the memory allocated with OGRE_NEW_T_SIMD. Category is required to be restated to ensure the matching policy is used
+#	define OGRE_DELETE_T_SIMD(ptr, T, category) (ptr)->~T(); ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
+/// Free the memory allocated with OGRE_NEW_ARRAY_T_SIMD. Category is required to be restated to ensure the matching policy is used, count and type to call destructor
+#	define OGRE_DELETE_ARRAY_T_SIMD(ptr, T, count, category) for (size_t b = 0; b < count; ++b) { ((T*)ptr)[b].~T();} ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr)
+/// Allocate space for one primitive type, external type or non-virtual type aligned to user defined boundaries
+#	define OGRE_NEW_T_ALIGN(T, category, align) new (::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T))) T
+/// Allocate a block of memory for 'count' primitive types aligned to user defined boundaries - do not use for classes that inherit from AllocatedObject
+#	define OGRE_NEW_ARRAY_T_ALIGN(T, count, category, align) new (::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count)) T [count]
+/// Free the memory allocated with OGRE_NEW_T_ALIGN. Category is required to be restated to ensure the matching policy is used
+#	define OGRE_DELETE_T_ALIGN(ptr, T, category, align) (ptr)->~T(); ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr)
+/// Free the memory allocated with OGRE_NEW_ARRAY_T_ALIGN. Category is required to be restated to ensure the matching policy is used, count and type to call destructor
+#	define OGRE_DELETE_ARRAY_T_ALIGN(ptr, T, count, category, align) for (size_t _b = 0; _b < count; ++_b) { ((T*)ptr)[_b].~T();} ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr)
+
+// new / delete for classes deriving from AllocatedObject (alignment determined by per-class policy)
 #	define OGRE_NEW new 
 #	define OGRE_DELETE delete
 

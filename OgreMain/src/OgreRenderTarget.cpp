@@ -57,7 +57,7 @@ namespace Ogre {
             i != mViewportList.end(); ++i)
         {
             fireViewportRemoved(i->second);
-            delete (*i).second;
+            OGRE_DELETE (*i).second;
         }
 
 
@@ -142,7 +142,7 @@ namespace Ogre {
         }
         // Add viewport to list
         // Order based on Z-Order
-        Viewport* vp = new Viewport(cam, this, left, top, width, height, ZOrder);
+        Viewport* vp = OGRE_NEW Viewport(cam, this, left, top, width, height, ZOrder);
 
         mViewportList.insert(ViewportList::value_type(ZOrder, vp));
 
@@ -158,7 +158,7 @@ namespace Ogre {
         if (it != mViewportList.end())
         {
 			fireViewportRemoved((*it).second);
-            delete (*it).second;
+            OGRE_DELETE (*it).second;
             mViewportList.erase(ZOrder);
         }
     }
@@ -170,7 +170,7 @@ namespace Ogre {
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
         {
             fireViewportRemoved(it->second);
-            delete (*it).second;
+            OGRE_DELETE (*it).second;
         }
 
         mViewportList.clear();
@@ -449,14 +449,14 @@ namespace Ogre {
 	{
 		PixelFormat pf = suggestPixelFormat();
 
-		uchar *data = new uchar[mWidth * mHeight * PixelUtil::getNumElemBytes(pf)];
+		uchar *data = OGRE_ALLOC_T(uchar, mWidth * mHeight * PixelUtil::getNumElemBytes(pf), MEMCATEGORY_RENDERSYS);
 		PixelBox pb(mWidth, mHeight, 1, pf, data);
 
 		copyContentsToMemory(pb);
 
 		Image().loadDynamicImage(data, mWidth, mHeight, 1, pf, false, 1, 0).save(filename);
 
-		delete [] data;
+		OGRE_FREE(data, MEMCATEGORY_RENDERSYS);
 	}
     //-----------------------------------------------------------------------
     void RenderTarget::_notifyCameraRemoved(const Camera* cam)

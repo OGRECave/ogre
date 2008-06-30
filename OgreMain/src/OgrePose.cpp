@@ -104,7 +104,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	Pose* Pose::clone(void) const
 	{
-		Pose* newPose = new Pose(mTarget, mName);
+		Pose* newPose = OGRE_NEW Pose(mTarget, mName);
 		newPose->mVertexOffsetMap = mVertexOffsetMap;
 		// Allow buffer to recreate itself, contents may change anyway
 		return newPose;

@@ -227,7 +227,7 @@ namespace Ogre {
 		@see ResourceGroupManager::unloadResourceGroup
 		@see ResourceGroupManager::clearResourceGroup
     */
-    class _OgreExport ResourceGroupManager : public Singleton<ResourceGroupManager>
+    class _OgreExport ResourceGroupManager : public Singleton<ResourceGroupManager>, public ResourceAlloc
     {
     public:
 		OGRE_AUTO_MUTEX // public to allow external locking

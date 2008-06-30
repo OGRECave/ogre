@@ -42,7 +42,7 @@ namespace Ogre {
 		OverlayContainers and OverlayElements, used for non-interactive 2D 
 		elements such as HUDs.
     */
-    class _OgreExport OverlayManager : public Singleton<OverlayManager>, public ScriptLoader
+    class _OgreExport OverlayManager : public Singleton<OverlayManager>, public ScriptLoader, public OverlayAlloc
     {
     public:
         typedef std::map<String, Overlay*> OverlayMap;

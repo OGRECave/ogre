@@ -96,7 +96,7 @@ namespace Ogre {
     typedef bool (*ATTRIBUTE_PARSER)(String& params, MaterialScriptContext& context);
 
     /** Class for serializing Materials to / from a .material script.*/
-    class _OgreExport MaterialSerializer
+	class _OgreExport MaterialSerializer : public SerializerAlloc
     {
     protected:
         /// Keyword-mapped attribute parsers.

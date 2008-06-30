@@ -170,7 +170,7 @@ namespace Ogre {
         ParticlePool::iterator i;
         for (i = mParticlePool.begin(); i != mParticlePool.end(); ++i)
         {
-            delete *i;
+            OGRE_DELETE *i;
         }
 
         if (mRenderer)
@@ -643,7 +643,7 @@ namespace Ogre {
         // Create new particles
         for( size_t i = oldSize; i < size; i++ )
 		{
-            mParticlePool[i] = new Particle();
+            mParticlePool[i] = OGRE_NEW Particle();
 		}
 
 		if (mIsRendererConfigured)
@@ -972,7 +972,7 @@ namespace Ogre {
 
             // Create time controller when attached
             ControllerManager& mgr = ControllerManager::getSingleton(); 
-            ControllerValueRealPtr updValue(new ParticleSystemUpdateValue(this));
+            ControllerValueRealPtr updValue(OGRE_NEW ParticleSystemUpdateValue(this));
             mTimeController = mgr.createFrameTimePassthroughController(updValue);
         }
         else if (!parent && mTimeController)
@@ -1576,7 +1576,7 @@ namespace Ogre {
         std::vector<ParticleAffector*>::iterator i;
         for (i = mAffectors.begin(); i != mAffectors.end(); ++i)
         {
-            delete (*i);
+            OGRE_DELETE (*i);
         }
             
         mAffectors.clear();
@@ -1591,7 +1591,7 @@ namespace Ogre {
             if ((*i) == e)
             {
                 mAffectors.erase(i);
-                delete e;
+                OGRE_DELETE e;
                 break;
             }
         }

@@ -34,6 +34,9 @@ Torus Knot Software Ltd.
 #include "OgreCompositionTargetPass.h"
 #include "OgreCompositionTechnique.h"
 #include "OgreRoot.h"
+#if OGRE_USE_NEW_COMPILERS == 1
+#  include "OgreScriptCompiler.h"
+#endif
 
 namespace Ogre {
 
@@ -63,7 +66,7 @@ CompositorManager::CompositorManager():
 	mResourceType = "Compositor";
 
 	// Create default thread serializer instance (also non-threaded)
-	OGRE_THREAD_POINTER_SET(mSerializer, new CompositorSerializer());
+	OGRE_THREAD_POINTER_SET(mSerializer, OGRE_NEW CompositorSerializer());
 
 	// Register with resource group manager
 	ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
@@ -73,7 +76,7 @@ CompositorManager::CompositorManager():
 CompositorManager::~CompositorManager()
 {
     freeChains();
-	delete mRectangle;
+	OGRE_DELETE mRectangle;
 
 	OGRE_THREAD_POINTER_DELETE(mSerializer);
 
@@ -87,7 +90,7 @@ Resource* CompositorManager::createImpl(const String& name, ResourceHandle handl
     const String& group, bool isManual, ManualResourceLoader* loader,
     const NameValuePairList* params)
 {
-    return new Compositor(this, name, handle, group, isManual, loader);
+    return OGRE_NEW Compositor(this, name, handle, group, isManual, loader);
 }
 //-----------------------------------------------------------------------
 void CompositorManager::initialise(void)
@@ -134,7 +137,10 @@ void CompositorManager::initialise(void)
 //-----------------------------------------------------------------------
 void CompositorManager::parseScript(DataStreamPtr& stream, const String& groupName)
 {
-#if OGRE_THREAD_SUPPORT
+#if OGRE_USE_NEW_COMPILERS == 1
+	ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
+#else // OGRE_USE_NEW_COMPILERS
+#  if OGRE_THREAD_SUPPORT
 	// check we have an instance for this thread 
 	if (!mSerializer.get())
 	{
@@ -142,8 +148,10 @@ void CompositorManager::parseScript(DataStreamPtr& stream, const String& groupNa
 		// the thread dies
 		mSerializer.reset(new CompositorSerializer());
 	}
-#endif
+#  endif
     mSerializer->parseScript(stream, groupName);
+#endif // OGRE_USE_NEW_COMPILERS
+
 }
 //-----------------------------------------------------------------------
 CompositorChain *CompositorManager::getCompositorChain(Viewport *vp)
@@ -159,7 +167,7 @@ CompositorChain *CompositorManager::getCompositorChain(Viewport *vp)
     }
     else
     {
-        CompositorChain *chain = new CompositorChain(vp);
+        CompositorChain *chain = OGRE_NEW CompositorChain(vp);
         mChains[vp] = chain;
         return chain;
     }
@@ -175,7 +183,7 @@ void CompositorManager::removeCompositorChain(Viewport *vp)
     Chains::iterator i = mChains.find(vp);
     if (i != mChains.end())
     {
-        delete i->second;
+        OGRE_DELETE  i->second;
         mChains.erase(i);
     }
 }
@@ -191,7 +199,7 @@ void CompositorManager::freeChains()
     Chains::iterator i, iend=mChains.end();
     for(i=mChains.begin(); i!=iend;++i)
     {
-        delete i->second;
+        OGRE_DELETE  i->second;
     }
     mChains.clear();
 }
@@ -201,7 +209,7 @@ Renderable *CompositorManager::_getTexturedRectangle2D()
 	if(!mRectangle)
 	{
 		/// 2D rectangle, to use for render_quad passes
-		mRectangle = new Rectangle2D(true);
+		mRectangle = OGRE_NEW Rectangle2D(true);
 	}
 	RenderSystem* rs = Root::getSingleton().getRenderSystem();
 	Viewport* vp = rs->_getViewport();

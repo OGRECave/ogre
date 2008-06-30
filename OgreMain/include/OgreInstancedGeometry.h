@@ -36,6 +36,7 @@ Torus Knot Software Ltd.
 #include "OgreSkeletonInstance.h"
 #include "OgreAnimationTrack.h"
 #include "OgreBone.h"
+#include "OgreIteratorWrappers.h"
 
 namespace Ogre {
 
@@ -418,6 +419,7 @@ namespace Ogre {
 			/// list of LOD Buckets in this BatchInstance
 			typedef std::vector<LODBucket*> LODBucketList;
 			typedef std::map<int, InstancedObject*> ObjectsMap;
+			typedef MapIterator<ObjectsMap> InstancedObjectIterator;
 		protected:
 			
 			/// Parent static geometry
@@ -491,9 +493,9 @@ namespace Ogre {
 			void attachToScene();
 			void addInstancedObject(int index, InstancedObject* object);
 			InstancedObject*  isInstancedObjectPresent(int index);
-			InstancedObject** getObjectsAsArray(unsigned short & size);
+			InstancedObjectIterator getObjectIterator();
 			SceneNode*getSceneNode(void){return mNode;}
-			ObjectsMap&getInstancesMap(void){return  mInstancesMap;};
+			ObjectsMap& getInstancesMap(void){return  mInstancesMap;}
 			/// change the shader used to render the batch instance
 			
 		};

@@ -234,11 +234,11 @@ int main(int argc, char **argv)
 		{
 
 			InstancedGeometry::BatchInstance *r = regIt.getNext();
-			unsigned short objectCount;
 
-			InstancedGeometry::InstancedObject **objects= r->getObjectsAsArray(objectCount);
-			for(size_t j = 0; j < objectCount; j++)
+			InstancedGeometry::BatchInstance::InstancedObjectIterator bit = r->getObjectIterator();
+			while(bit.hasMoreElements())
 			{
+				InstancedGeometry::InstancedObject* obj = bit.getNext();
 				Vector3 position;
 				
 				position.x=10*k+500;
@@ -252,9 +252,9 @@ int main(int argc, char **argv)
 					position.y =  it->worldFragment->singleIntersection.y;
 				
 										
-				objects[j]->setPosition(position);
-				objects[j]->setScale(Vector3(0.1,0.1,0.1));
-				AnimationState*anim=objects[j]->getAnimationState("Walk");
+				obj->setPosition(position);
+				obj->setScale(Vector3(0.1,0.1,0.1));
+				AnimationState*anim=obj->getAnimationState("Walk");
 				animations.push_back(anim);
 				//offset the animation time, to show that all objects are independently animated.
 				anim->setTimePosition(i+k);
@@ -267,7 +267,7 @@ int main(int argc, char **argv)
 				k=0;
 			    i++;
 			}
-			delete[] objects;	
+			
 		}
 		batch->setVisible(true);
 		renderInstance[0] = batch;

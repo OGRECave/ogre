@@ -330,7 +330,7 @@ namespace Ogre {
 
         // Create mesh
         mMesh = MeshManager::getSingleton().createManual(mMeshName);
-        mMesh->sharedVertexData = new VertexData();
+        mMesh->sharedVertexData = OGRE_NEW VertexData();
         // Copy all vertex parameters
         mMesh->sharedVertexData->vertexStart = 0;
         // Vertex count will be set on build() because it depends on current level

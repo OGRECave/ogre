@@ -105,14 +105,14 @@ namespace Ogre {
         }
 
         // Create billboard set
-        mBillboardSet = new BillboardSet("", 0, true);
+        mBillboardSet = OGRE_NEW BillboardSet("", 0, true);
         // World-relative axes
         mBillboardSet->setBillboardsInWorldSpace(true);
     }
     //-----------------------------------------------------------------------
     BillboardParticleRenderer::~BillboardParticleRenderer()
     {
-        delete mBillboardSet;
+        OGRE_DELETE  mBillboardSet;
     }
     //-----------------------------------------------------------------------
     const String& BillboardParticleRenderer::getType(void) const
@@ -285,13 +285,13 @@ namespace Ogre {
     ParticleSystemRenderer* BillboardParticleRendererFactory::createInstance( 
         const String& name )
     {
-        return new BillboardParticleRenderer();
+        return OGRE_NEW BillboardParticleRenderer();
     }
     //-----------------------------------------------------------------------
     void BillboardParticleRendererFactory::destroyInstance( 
         ParticleSystemRenderer* inst)
     {
-        delete inst;
+        OGRE_DELETE  inst;
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------

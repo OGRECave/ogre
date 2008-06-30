@@ -286,6 +286,8 @@ namespace Ogre{
 			{
 				return false;
 			}
+			++i;
+			++n;
 		}
 		return true;
 	}
@@ -2334,10 +2336,10 @@ namespace Ogre{
 						{
 							// Long form has n number of frames
 							Real duration = 0;
-							AbstractNodeList::const_iterator in = getNodeAt(prop->values, prop->values.size() - 1);
+							AbstractNodeList::const_iterator in = getNodeAt(prop->values, static_cast<int>(prop->values.size()) - 1);
 							if(getReal(*in, &duration))
 							{
-								String *names = new String[prop->values.size() - 1];
+								String *names = OGRE_NEW_ARRAY_T(String, prop->values.size() - 1, MEMCATEGORY_SCRIPTING);
 								int n = 0;
 
 								AbstractNodeList::iterator j = prop->values.begin();
@@ -2357,6 +2359,8 @@ namespace Ogre{
 								compiler->_fireEvent("processTextureNames", args, 0);
 
 								mUnit->setAnimatedTextureName(names, n, duration);
+
+								OGRE_DELETE_ARRAY_T(names, String, prop->values.size() - 1, MEMCATEGORY_SCRIPTING);
 							}
 							else
 							{
@@ -3594,7 +3598,6 @@ namespace Ogre{
 		{
 			GpuProgramParametersSharedPtr ptr = prog->getDefaultParameters();
 			GpuProgramTranslator::translateProgramParameters(compiler, ptr, reinterpret_cast<ObjectAbstractNode*>(params.get()));
-			prog->touch();
 		}
 	}
 	//-------------------------------------------------------------------------
@@ -3694,7 +3697,6 @@ namespace Ogre{
 		{
 			GpuProgramParametersSharedPtr ptr = prog->getDefaultParameters();
 			GpuProgramTranslator::translateProgramParameters(compiler, ptr, reinterpret_cast<ObjectAbstractNode*>(params.get()));
-			prog->touch();
 		}
 
 	}
@@ -3824,7 +3826,6 @@ namespace Ogre{
 		{
 			GpuProgramParametersSharedPtr ptr = prog->getDefaultParameters();
 			GpuProgramTranslator::translateProgramParameters(compiler, ptr, reinterpret_cast<ObjectAbstractNode*>(params.get()));
-			prog->touch();
 		}	
 
 	}
@@ -3936,7 +3937,7 @@ namespace Ogre{
 									int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
 									if(type == GpuProgramParameters::ET_INT)
 									{
-										int *vals = new int[roundedCount];
+										int *vals = OGRE_ALLOC_T(int, roundedCount, MEMCATEGORY_SCRIPTING);
 										if(getInts(k, prop->values.end(), vals, roundedCount))
 										{
 											try
@@ -3955,11 +3956,11 @@ namespace Ogre{
 										{
 											compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
 										}
-										delete[] vals;
+										OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
 									}
 									else
 									{
-										float *vals = new float[roundedCount];
+										float *vals = OGRE_ALLOC_T(float, roundedCount, MEMCATEGORY_SCRIPTING);
 										if(getFloats(k, prop->values.end(), vals, roundedCount))
 										{
 											try
@@ -3978,7 +3979,7 @@ namespace Ogre{
 										{
 											compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
 										}
-										delete[] vals;
+										OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
 									}
 								}
 							}
@@ -4549,7 +4550,7 @@ namespace Ogre{
 
 						while (atomIndex < prop->values.size())
 						{
-							i = getNodeAt(prop->values, atomIndex++);
+							i = getNodeAt(prop->values, static_cast<int>(atomIndex++));
 							if((*i)->type != ANT_ATOM)
 							{
 								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
@@ -4586,7 +4587,7 @@ namespace Ogre{
 										pFactor = &heightFactor;
 									}
 									// advance to next to get scaling
-									i = getNodeAt(prop->values, atomIndex++);
+									i = getNodeAt(prop->values, static_cast<int>(atomIndex++));
 									if((*i)->type != ANT_ATOM)
 									{
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);

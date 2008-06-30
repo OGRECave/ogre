@@ -247,7 +247,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Technique* Material::createTechnique(void)
     {
-        Technique *t = new Technique(this);
+        Technique *t = OGRE_NEW Technique(this);
         mTechniques.push_back(t);
         mCompilationRequired = true;
         return t;
@@ -329,7 +329,7 @@ namespace Ogre {
 		LodTechniques* lodtechs = 0;
 		if (i == mBestTechniquesBySchemeList.end())
 		{
-			lodtechs = new LodTechniques();
+			lodtechs = OGRE_NEW_T(LodTechniques, MEMCATEGORY_RESOURCE);
 			mBestTechniquesBySchemeList[schemeIndex] = lodtechs;
 		}
 		else
@@ -409,7 +409,7 @@ namespace Ogre {
     {
         assert (index < mTechniques.size() && "Index out of bounds.");
         Techniques::iterator i = mTechniques.begin() + index;
-        delete(*i);
+        OGRE_DELETE(*i);
         mTechniques.erase(i);
         mSupportedTechniques.clear();
 		clearBestTechniqueList();
@@ -422,7 +422,7 @@ namespace Ogre {
         iend = mTechniques.end();
         for (i = mTechniques.begin(); i != iend; ++i)
         {
-            delete(*i);
+            OGRE_DELETE(*i);
         }
         mTechniques.clear();
         mSupportedTechniques.clear();
@@ -500,7 +500,7 @@ namespace Ogre {
 		for (BestTechniquesBySchemeList::iterator i = mBestTechniquesBySchemeList.begin();
 			i != mBestTechniquesBySchemeList.end(); ++i)
 		{
-			delete i->second;
+			OGRE_DELETE_T(i->second, LodTechniques, MEMCATEGORY_RESOURCE);
 		}
 		mBestTechniquesBySchemeList.clear();
 	}

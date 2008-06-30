@@ -133,7 +133,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SubMesh* Mesh::createSubMesh()
     {
-        SubMesh* sub = new SubMesh();
+        SubMesh* sub = OGRE_NEW SubMesh();
         sub->parent = this;
 
         mSubMeshList.push_back(sub);
@@ -209,7 +209,7 @@ namespace Ogre {
 				mName, mGroup, true, this);
  
         // fully prebuffer into host RAM
-        mFreshFromDisk = DataStreamPtr(new MemoryDataStream(mName,mFreshFromDisk));
+        mFreshFromDisk = DataStreamPtr(OGRE_NEW MemoryDataStream(mName,mFreshFromDisk));
     }
     //-----------------------------------------------------------------------
     void Mesh::unprepareImpl()
@@ -249,11 +249,11 @@ namespace Ogre {
         for (SubMeshList::iterator i = mSubMeshList.begin();
             i != mSubMeshList.end(); ++i)
         {
-            delete *i;
+            OGRE_DELETE *i;
         }
         if (sharedVertexData)
         {
-            delete sharedVertexData;
+            OGRE_DELETE sharedVertexData;
             sharedVertexData = NULL;
         }
 		// Clear SubMesh lists
@@ -314,7 +314,7 @@ namespace Ogre {
             }
 
             // Copy index data
-            delete newSub->indexData;
+            OGRE_DELETE newSub->indexData;
 			newSub->indexData = (*subi)->indexData->clone();
             // Copy any bone assignments
             newSub->mBoneAssignments = (*subi)->mBoneAssignments;
@@ -378,7 +378,7 @@ namespace Ogre {
 			i != mAnimationsList.end(); ++i)
 		{
 			Animation *newAnim = i->second->clone(i->second->getName());
-			newMesh->mAnimationsList[newName] = newAnim;
+			newMesh->mAnimationsList[i->second->getName()] = newAnim;
 		}
 		// Clone pose list
 		for (PoseList::iterator i = mPoseList.begin(); i != mPoseList.end(); ++i)
@@ -387,7 +387,7 @@ namespace Ogre {
 			newMesh->mPoseList.push_back(newPose);
 		}
 		newMesh->mSharedVertexDataAnimationType = mSharedVertexDataAnimationType;
-		newMesh->mAnimationTypesDirty = mAnimationTypesDirty;
+		newMesh->mAnimationTypesDirty = true;
 
 
         newMesh->load();
@@ -981,7 +981,7 @@ namespace Ogre {
 
 		lod->manualName = meshName;
 		lod->manualMesh.setNull();
-        if (lod->edgeData) delete lod->edgeData;
+        if (lod->edgeData) OGRE_DELETE lod->edgeData;
         lod->edgeData = 0;
 	}
     //---------------------------------------------------------------------
@@ -1519,7 +1519,7 @@ namespace Ogre {
             {
                 // Only delete if we own this data
                 // Manual LODs > 0 own their own
-                delete usage.edgeData;
+                OGRE_DELETE usage.edgeData;
             }
             usage.edgeData = NULL;
         }
@@ -1931,7 +1931,7 @@ namespace Ogre {
 				"Mesh::createAnimation");
 		}
 
-		Animation* ret = new Animation(name, length);
+		Animation* ret = OGRE_NEW Animation(name, length);
 
 		// Add to list
 		mAnimationsList[name] = ret;
@@ -2003,7 +2003,7 @@ namespace Ogre {
 				"Mesh::getAnimation");
 		}
 
-		delete i->second;
+		OGRE_DELETE i->second;
 
 		mAnimationsList.erase(i);
 
@@ -2015,7 +2015,7 @@ namespace Ogre {
 		AnimationList::iterator i = mAnimationsList.begin();
 		for (; i != mAnimationsList.end(); ++i)
 		{
-			delete i->second;
+			OGRE_DELETE i->second;
 		}
 		mAnimationsList.clear();
 		mAnimationTypesDirty = true;
@@ -2035,7 +2035,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	Pose* Mesh::createPose(ushort target, const String& name)
 	{
-		Pose* retPose = new Pose(target, name);
+		Pose* retPose = OGRE_NEW Pose(target, name);
 		mPoseList.push_back(retPose);
 		return retPose;
 	}
@@ -2078,7 +2078,7 @@ namespace Ogre {
 		}
 		PoseList::iterator i = mPoseList.begin();
 		std::advance(i, index);
-		delete *i;
+		OGRE_DELETE *i;
 		mPoseList.erase(i);
 
 	}
@@ -2089,7 +2089,7 @@ namespace Ogre {
 		{
 			if ((*i)->getName() == name)
 			{
-				delete *i;
+				OGRE_DELETE *i;
 				mPoseList.erase(i);
 				return;
 			}
@@ -2105,7 +2105,7 @@ namespace Ogre {
 	{
 		for (PoseList::iterator i = mPoseList.begin(); i != mPoseList.end(); ++i)
 		{
-			delete *i;
+			OGRE_DELETE *i;
 		}
 		mPoseList.clear();
 	}

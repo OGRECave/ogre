@@ -624,7 +624,7 @@ namespace Ogre {
             method allows you to pass in a previously determined set of lights
             which will be used for a single render of this object.
         */
-        virtual void renderSingleObject(const Renderable* rend, const Pass* pass, 
+        virtual void renderSingleObject(Renderable* rend, const Pass* pass, 
 			bool lightScissoringClipping, bool doLightIteration, const LightList* manualLightList = 0);
 
 		/** Internal method for creating the AutoParamDataSource instance. */
@@ -757,7 +757,7 @@ namespace Ogre {
         GpuProgramParametersSharedPtr mFiniteExtrusionParams;
 
         /// Inner class to use as callback for shadow caster scene query
-        class _OgreExport ShadowCasterSceneQueryListener : public SceneQueryListener
+        class _OgreExport ShadowCasterSceneQueryListener : public SceneQueryListener, public SceneMgtAlloc
         {
         protected:
 			SceneManager* mSceneMgr;
@@ -864,9 +864,9 @@ namespace Ogre {
 			SceneMgrQueuedRenderableVisitor() 
 				:transparentShadowCastersMode(false) {}
 			~SceneMgrQueuedRenderableVisitor() {}
-			void visit(const Renderable* r);
+			void visit(Renderable* r);
 			bool visit(const Pass* p);
-			void visit(const RenderablePass* rp);
+			void visit(RenderablePass* rp);
 
 			/// Target SM to send renderables to
 			SceneManager* targetSceneMgr;

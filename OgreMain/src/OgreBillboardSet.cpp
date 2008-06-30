@@ -115,7 +115,7 @@ namespace Ogre {
         BillboardPool::iterator i;
         for (i = mBillboardPool.begin(); i != mBillboardPool.end(); ++i)
         {
-            delete *i;
+            OGRE_DELETE *i;
         }
 
         // Delete shared buffers
@@ -739,7 +739,7 @@ namespace Ogre {
 				"expect.");
 		}
 
-        mVertexData = new VertexData();
+        mVertexData = OGRE_NEW VertexData();
 		if (mPointRendering)
 			mVertexData->vertexCount = mPoolSize;
 		else
@@ -773,7 +773,7 @@ namespace Ogre {
 
 		if (!mPointRendering)
 		{
-			mIndexData  = new IndexData();
+			mIndexData  = OGRE_NEW IndexData();
 			mIndexData->indexStart = 0;
 			mIndexData->indexCount = mPoolSize * 6;
 
@@ -826,12 +826,12 @@ namespace Ogre {
 	{
         if (mVertexData)
         {
-            delete mVertexData;
+            OGRE_DELETE mVertexData;
             mVertexData = 0;
         }
         if (mIndexData)
         {
-            delete mIndexData;
+            OGRE_DELETE mIndexData;
             mIndexData = 0;
         }
 
@@ -975,7 +975,7 @@ namespace Ogre {
 
         // Create new billboards
         for( size_t i = oldSize; i < size; ++i )
-            mBillboardPool[i] = new Billboard();
+            mBillboardPool[i] = OGRE_NEW Billboard();
 
     }
     //-----------------------------------------------------------------------
@@ -1471,18 +1471,18 @@ namespace Ogre {
 
 		if (poolSize > 0)
 		{
-			return new BillboardSet(name, poolSize, externalData);
+			return OGRE_NEW BillboardSet(name, poolSize, externalData);
 		}
 		else
 		{
-			return new BillboardSet(name);
+			return OGRE_NEW BillboardSet(name);
 		}
 
 	}
 	//-----------------------------------------------------------------------
 	void BillboardSetFactory::destroyInstance( MovableObject* obj)
 	{
-		delete obj;
+		OGRE_DELETE obj;
 	}
 
 

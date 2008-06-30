@@ -73,7 +73,7 @@ namespace Ogre {
                 "Animation::createNodeTrack");
         }
 
-        NodeAnimationTrack* ret = new NodeAnimationTrack(this, handle);
+        NodeAnimationTrack* ret = OGRE_NEW NodeAnimationTrack(this, handle);
 
         mNodeTrackList[handle] = ret;
         return ret;
@@ -120,7 +120,7 @@ namespace Ogre {
 
 		if (i != mNodeTrackList.end())
 		{
-			delete i->second;
+			OGRE_DELETE i->second;
 			mNodeTrackList.erase(i);
             _keyFrameListChanged();
 		}
@@ -131,7 +131,7 @@ namespace Ogre {
         NodeTrackList::iterator i;
         for (i = mNodeTrackList.begin(); i != mNodeTrackList.end(); ++i)
         {
-            delete i->second;
+            OGRE_DELETE i->second;
         }
         mNodeTrackList.clear();
         _keyFrameListChanged();
@@ -147,7 +147,7 @@ namespace Ogre {
                 "Animation::createNumericTrack");
         }
 
-		NumericAnimationTrack* ret = new NumericAnimationTrack(this, handle);
+		NumericAnimationTrack* ret = OGRE_NEW NumericAnimationTrack(this, handle);
 
 		mNumericTrackList[handle] = ret;
 		return ret;
@@ -195,7 +195,7 @@ namespace Ogre {
 
 		if (i != mNumericTrackList.end())
 		{
-			delete i->second;
+			OGRE_DELETE i->second;
 			mNumericTrackList.erase(i);
             _keyFrameListChanged();
 		}
@@ -206,7 +206,7 @@ namespace Ogre {
 		NumericTrackList::iterator i;
 		for (i = mNumericTrackList.begin(); i != mNumericTrackList.end(); ++i)
 		{
-			delete i->second;
+			OGRE_DELETE i->second;
 		}
 		mNumericTrackList.clear();
         _keyFrameListChanged();
@@ -223,7 +223,7 @@ namespace Ogre {
                 "Animation::createVertexTrack");
         }
 
-		VertexAnimationTrack* ret = new VertexAnimationTrack(this, handle, animType);
+		VertexAnimationTrack* ret = OGRE_NEW VertexAnimationTrack(this, handle, animType);
 
 		mVertexTrackList[handle] = ret;
 		return ret;
@@ -272,7 +272,7 @@ namespace Ogre {
 
 		if (i != mVertexTrackList.end())
 		{
-			delete i->second;
+			OGRE_DELETE  i->second;
 			mVertexTrackList.erase(i);
             _keyFrameListChanged();
 		}
@@ -283,7 +283,7 @@ namespace Ogre {
 		VertexTrackList::iterator i;
 		for (i = mVertexTrackList.begin(); i != mVertexTrackList.end(); ++i)
 		{
-			delete i->second;
+			OGRE_DELETE  i->second;
 		}
 		mVertexTrackList.clear();
         _keyFrameListChanged();
@@ -571,7 +571,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	Animation* Animation::clone(const String& newName) const
 	{
-		Animation* newAnim = new Animation(newName, mLength);
+		Animation* newAnim = OGRE_NEW Animation(newName, mLength);
         newAnim->mInterpolationMode = mInterpolationMode;
         newAnim->mRotationInterpolationMode = mRotationInterpolationMode;
 		

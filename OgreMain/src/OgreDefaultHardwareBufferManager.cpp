@@ -87,12 +87,12 @@ namespace Ogre {
 		size_t numIndexes, HardwareBuffer::Usage usage) 
 		: HardwareIndexBuffer(idxType, numIndexes, usage, true, false) // always software, never shadowed
 	{
-		mpData = new unsigned char[mSizeInBytes];
+		mpData = OGRE_ALLOC_T(unsigned char, mSizeInBytes, MEMCATEGORY_GEOMETRY);
 	}
 	//-----------------------------------------------------------------------
     DefaultHardwareIndexBuffer::~DefaultHardwareIndexBuffer()
 	{
-		delete [] mpData;
+		OGRE_FREE(mpData, MEMCATEGORY_GEOMETRY);
 	}
 	//-----------------------------------------------------------------------
     void* DefaultHardwareIndexBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
@@ -148,7 +148,7 @@ namespace Ogre {
         DefaultHardwareBufferManager::createVertexBuffer(size_t vertexSize, 
 		size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer)
 	{
-        DefaultHardwareVertexBuffer* vb = new DefaultHardwareVertexBuffer(vertexSize, numVerts, usage);
+        DefaultHardwareVertexBuffer* vb = OGRE_NEW DefaultHardwareVertexBuffer(vertexSize, numVerts, usage);
         return HardwareVertexBufferSharedPtr(vb);
 	}
     //-----------------------------------------------------------------------
@@ -156,7 +156,7 @@ namespace Ogre {
         DefaultHardwareBufferManager::createIndexBuffer(HardwareIndexBuffer::IndexType itype, 
 		size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer)
 	{
-        DefaultHardwareIndexBuffer* ib = new DefaultHardwareIndexBuffer(itype, numIndexes, usage);
+        DefaultHardwareIndexBuffer* ib = OGRE_NEW DefaultHardwareIndexBuffer(itype, numIndexes, usage);
 		return HardwareIndexBufferSharedPtr(ib);
 	}
 }

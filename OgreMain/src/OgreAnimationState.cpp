@@ -213,26 +213,26 @@ namespace Ogre
       _setBlendMaskData(&(*blendMask)[0]);
     }
 	//---------------------------------------------------------------------
-    void AnimationState::createBlendMask(size_t blendMaskSizeHint, float initialWeight)
-    {
-      if(!mBlendMask)
-      {
-        if(initialWeight >= 0)
-        {
-          mBlendMask = new BoneBlendMask(blendMaskSizeHint, initialWeight);
-        }
-        else
-        {
-          mBlendMask = new BoneBlendMask(blendMaskSizeHint);
-        }
-      }
-    }
+	void AnimationState::createBlendMask(size_t blendMaskSizeHint, float initialWeight)
+	{
+		if(!mBlendMask)
+		{
+			if(initialWeight >= 0)
+			{
+				mBlendMask = OGRE_NEW_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint, initialWeight);
+			}
+			else
+			{
+				mBlendMask = OGRE_NEW_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint);
+			}
+		}
+	}
 	//---------------------------------------------------------------------
-    void AnimationState::destroyBlendMask()
-    {
-      delete mBlendMask;
-      mBlendMask = 0;
-    }
+	void AnimationState::destroyBlendMask()
+	{
+		OGRE_DELETE_T(mBlendMask, BoneBlendMask, MEMCATEGORY_ANIMATION);
+		mBlendMask = 0;
+	}
 	//---------------------------------------------------------------------
 
 	//---------------------------------------------------------------------
@@ -252,7 +252,7 @@ namespace Ogre
 		{
 			AnimationState* src = i->second;
 			mAnimationStates[src->getAnimationName()] = 
-				new AnimationState(this, *src);
+				OGRE_NEW AnimationState(this, *src);
 		}
 
         // Clone enabled animation state list
@@ -279,7 +279,7 @@ namespace Ogre
 		{
             mEnabledAnimationStates.remove(i->second);
 
-			delete i->second;
+			OGRE_DELETE i->second;
 			mAnimationStates.erase(i);
 		}
 	}
@@ -291,7 +291,7 @@ namespace Ogre
 		for (AnimationStateMap::iterator i = mAnimationStates.begin();
 			i != mAnimationStates.end(); ++i)
 		{
-			delete i->second;
+			OGRE_DELETE i->second;
 		}
 		mAnimationStates.clear();
         mEnabledAnimationStates.clear();
@@ -311,7 +311,7 @@ namespace Ogre
 				"AnimationStateSet::createAnimationState");
 		}
 
-		AnimationState* newState = new AnimationState(name, this, timePos, 
+		AnimationState* newState = OGRE_NEW AnimationState(name, this, timePos, 
 			length, weight, enabled);
 		mAnimationStates[name] = newState;
 

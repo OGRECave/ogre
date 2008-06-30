@@ -44,7 +44,7 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
-    class _OgreExport Timer
+	class _OgreExport Timer : public TimerAlloc
     {
     private:
 		clock_t mZeroClock;

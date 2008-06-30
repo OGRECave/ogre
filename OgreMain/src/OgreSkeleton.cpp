@@ -101,7 +101,7 @@ namespace Ogre {
         BoneList::iterator i;
         for (i = mBoneList.begin(); i != mBoneList.end(); ++i)
         {
-            delete *i;
+            OGRE_DELETE *i;
         }
         mBoneList.clear();
         mBoneListByName.clear();
@@ -113,7 +113,7 @@ namespace Ogre {
         AnimationList::iterator ai;
         for (ai = mAnimationsList.begin(); ai != mAnimationsList.end(); ++ai)
         {
-            delete ai->second;
+            OGRE_DELETE ai->second;
         }
         mAnimationsList.clear();
 
@@ -147,7 +147,7 @@ namespace Ogre {
                 "A bone with the handle " + StringConverter::toString(handle) + " already exists",
                 "Skeleton::createBone" );
         }
-        Bone* ret = new Bone(handle, this);
+        Bone* ret = OGRE_NEW Bone(handle, this);
         assert(mBoneListByName.find(ret->getName()) == mBoneListByName.end());
         if (mBoneList.size() <= handle)
         {
@@ -182,7 +182,7 @@ namespace Ogre {
                 "A bone with the name " + name + " already exists",
                 "Skeleton::createBone" );
         }
-        Bone* ret = new Bone(name, handle, this);
+        Bone* ret = OGRE_NEW Bone(name, handle, this);
         if (mBoneList.size() <= handle)
         {
             mBoneList.resize(handle+1);
@@ -302,7 +302,7 @@ namespace Ogre {
                 "Skeleton::createAnimation");
         }
 
-        Animation* ret = new Animation(name, length);
+        Animation* ret = OGRE_NEW Animation(name, length);
 
         // Add to list
         mAnimationsList[name] = ret;
@@ -374,7 +374,7 @@ namespace Ogre {
             "Skeleton::getAnimation");
         }
 
-        delete i->second;
+        OGRE_DELETE i->second;
 
         mAnimationsList.erase(i);
 

@@ -1892,7 +1892,7 @@ namespace Ogre
 		// Now parse all the values
         if (isReal)
         {
-            Real* realBuffer = new Real[roundedDims];
+            Real* realBuffer = OGRE_ALLOC_T(Real, roundedDims, MEMCATEGORY_SCRIPTING);
             // Do specified values
             for (i = 0; i < dims; ++i)
             {
@@ -1941,11 +1941,11 @@ namespace Ogre
             }
 
 
-            delete [] realBuffer;
+            OGRE_FREE(realBuffer, MEMCATEGORY_SCRIPTING);
         }
         else
         {
-            int* intBuffer = new int[roundedDims];
+            int* intBuffer = OGRE_ALLOC_T(int, roundedDims, MEMCATEGORY_SCRIPTING);
             // Do specified values
             for (i = 0; i < dims; ++i)
             {
@@ -1971,7 +1971,7 @@ namespace Ogre
 				context.programParams->setConstant(index, intBuffer,
 					static_cast<size_t>(roundedDims * 0.25));
 			}
-            delete [] intBuffer;
+            OGRE_FREE(intBuffer, MEMCATEGORY_SCRIPTING);
         }
     }
     //-----------------------------------------------------------------------
@@ -2612,7 +2612,7 @@ namespace Ogre
         context.section = MSS_PROGRAM;
 
 		// Create new program definition-in-progress
-		context.programDef = new MaterialScriptProgramDefinition();
+		context.programDef = OGRE_NEW_T(MaterialScriptProgramDefinition, MEMCATEGORY_SCRIPTING)();
 		context.programDef->progType = GPT_VERTEX_PROGRAM;
         context.programDef->supportsSkeletalAnimation = false;
 		context.programDef->supportsMorphAnimation = false;
@@ -2643,7 +2643,7 @@ namespace Ogre
         context.section = MSS_PROGRAM;
 
 		// Create new program definition-in-progress
-		context.programDef = new MaterialScriptProgramDefinition();
+		context.programDef = OGRE_NEW_T(MaterialScriptProgramDefinition, MEMCATEGORY_SCRIPTING)();
 		context.programDef->progType = GPT_FRAGMENT_PROGRAM;
 		context.programDef->supportsSkeletalAnimation = false;
 		context.programDef->supportsMorphAnimation = false;
@@ -3139,7 +3139,7 @@ namespace Ogre
                 // End of program
 				finishProgramDefinition();
                 mScriptContext.section = MSS_NONE;
-                delete mScriptContext.programDef;
+                OGRE_DELETE_T(mScriptContext.programDef, MaterialScriptProgramDefinition, MEMCATEGORY_SCRIPTING);
                 mScriptContext.defaultParamLines.clear();
                 mScriptContext.programDef = NULL;
             }

@@ -280,7 +280,7 @@ namespace Ogre {
         for (i = mGrouped.begin(); i != iend; ++i)
         {
             // Free the list associated with this pass
-            delete i->second;
+            OGRE_DELETE_T(i->second, RenderableList, MEMCATEGORY_SCENE_CONTROL);
         }
 		
 	}
@@ -307,7 +307,7 @@ namespace Ogre {
         if (i != mGrouped.end())
         {
             // free memory
-            delete i->second;
+            OGRE_DELETE_T(i->second, RenderableList, MEMCATEGORY_SCENE_CONTROL);
             // erase from map
             mGrouped.erase(i);
         }
@@ -369,7 +369,7 @@ namespace Ogre {
 				// recalculated, although the lists will be cleared
                 retPair = mGrouped.insert(
                     PassGroupRenderableMap::value_type(
-						pass, new RenderableList() ));
+						pass, OGRE_NEW_T(RenderableList, MEMCATEGORY_SCENE_CONTROL)() ));
                 assert(retPair.second && 
 					"Error inserting new pass entry into PassGroupRenderableMap");
                 i = retPair.first;
@@ -427,7 +427,7 @@ namespace Ogre {
 			for (irend = rendList->begin(); irend != irendend; ++irend)
 			{
 				// Visit Renderable
-				visitor->visit(*irend);
+				visitor->visit(const_cast<Renderable*>(*irend));
 			}
 		} 
 
@@ -442,7 +442,7 @@ namespace Ogre {
 		iend = mSortedDescending.end();
 		for (i = mSortedDescending.begin(); i != iend; ++i)
 		{
-			visitor->visit(&(*i));
+			visitor->visit(const_cast<RenderablePass*>(&(*i)));
 		}
 	}
     //-----------------------------------------------------------------------
@@ -455,7 +455,7 @@ namespace Ogre {
 		iend = mSortedDescending.rend();
 		for (i = mSortedDescending.rbegin(); i != iend; ++i)
 		{
-			visitor->visit(&(*i));
+			visitor->visit(const_cast<RenderablePass*>(&(*i)));
 		}
 
 	}

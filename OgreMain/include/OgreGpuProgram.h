@@ -263,7 +263,7 @@ namespace Ogre {
 		any of this unless you intend to read parameters back from this structure
 		rather than just setting them.
     */
-    class _OgreExport GpuProgramParameters
+	class _OgreExport GpuProgramParameters : public GpuParamsAlloc
     {
     public:
         /** Defines the types of automatically updated values that may be bound to GpuProgram

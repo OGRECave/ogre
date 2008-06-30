@@ -246,7 +246,7 @@ namespace Ogre {
 		Utility class for evaluating the effectiveness of the use of the vertex
 		cache by a given index buffer.
 	*/
-	class _OgreExport VertexCacheProfiler
+	class _OgreExport VertexCacheProfiler : public BufferAlloc
     {
 		public:
 			enum CacheType {
@@ -256,12 +256,12 @@ namespace Ogre {
 			VertexCacheProfiler(unsigned int cachesize = 16, CacheType cachetype = FIFO )
 				: size ( cachesize ), type ( cachetype ), tail (0), buffersize (0), hit (0), miss (0)
 			{
-				cache = new uint32[size];
+				cache = OGRE_ALLOC_T(uint32, size, MEMCATEGORY_GEOMETRY);
 			};
 
 			~VertexCacheProfiler()
 			{
-				delete[] cache;
+				OGRE_FREE(cache, MEMCATEGORY_GEOMETRY);
 			}
 
 			void profile(const HardwareIndexBufferSharedPtr& indexBuffer);

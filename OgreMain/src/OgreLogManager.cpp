@@ -56,7 +56,7 @@ namespace Ogre {
         LogList::iterator i;
         for (i = mLogs.begin(); i != mLogs.end(); ++i)
         {
-            delete i->second;
+            OGRE_DELETE i->second;
         }
     }
     //-----------------------------------------------------------------------
@@ -65,7 +65,7 @@ namespace Ogre {
     {
 		OGRE_LOCK_AUTO_MUTEX
 
-        Log* newLog = new Log(name, debuggerOutput, suppressFileOutput);
+        Log* newLog = OGRE_NEW Log(name, debuggerOutput, suppressFileOutput);
 
         if( !mDefaultLog || defaultLog )
         {
@@ -112,7 +112,7 @@ namespace Ogre {
 			{
 				mDefaultLog = 0;
 			}
-			delete i->second;
+			OGRE_DELETE i->second;
 			mLogs.erase(i);
 		}
 

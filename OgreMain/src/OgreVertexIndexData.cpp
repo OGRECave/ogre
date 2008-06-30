@@ -62,7 +62,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	VertexData* VertexData::clone(bool copyData) const
 	{
-		VertexData* dest = new VertexData();
+		VertexData* dest = OGRE_NEW VertexData();
 
 		// Copy vertex buffers in turn
 		const VertexBufferBinding::VertexBufferBindingMap& bindings = 
@@ -694,7 +694,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	IndexData* IndexData::clone(bool copyData) const
 	{
-		IndexData* dest = new IndexData();
+		IndexData* dest = OGRE_NEW IndexData();
 		if (indexBuffer.get())
 		{
             if (copyData)
@@ -823,7 +823,7 @@ namespace Ogre {
 
 		if (indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT)
 		{
-			triangles = new Triangle[nTriangles];
+			triangles = OGRE_ALLOC_T(Triangle, nTriangles, MEMCATEGORY_GEOMETRY);
 			source = (uint16 *)buffer;
 			dest = (uint32 *)triangles;
 			for (i = 0; i < nIndexes; ++i) dest[i] = source[i];
@@ -832,8 +832,8 @@ namespace Ogre {
 			triangles = (Triangle*)buffer;
 
 		// sort triangles based on shared edges
-		uint32 *destlist = new uint32[nTriangles];
-		unsigned char *visited = new unsigned char[nTriangles];
+		uint32 *destlist = OGRE_ALLOC_T(uint32, nTriangles, MEMCATEGORY_GEOMETRY);
+		unsigned char *visited = OGRE_ALLOC_T(unsigned char, nTriangles, MEMCATEGORY_GEOMETRY);
 
 		for (i = 0; i < nTriangles; ++i) visited[i] = 0;
 
@@ -877,11 +877,11 @@ namespace Ogre {
 				source[j++] = t->b;
 				source[j++] = t->c;
 			}
-			delete[] triangles;
+			OGRE_FREE(triangles, MEMCATEGORY_GEOMETRY);
 		}
 		else
 		{
-			uint32 *reflist = new uint32[nTriangles];
+			uint32 *reflist = OGRE_ALLOC_T(uint32, nTriangles, MEMCATEGORY_GEOMETRY);
 
 			// fill the referencebuffer
 			for (i = 0; i < nTriangles; ++i)
@@ -904,11 +904,11 @@ namespace Ogre {
 				// destlist[i] = i; // not needed, it will not be used
 			}
 
-			delete[] reflist;
+			OGRE_FREE(reflist, MEMCATEGORY_GEOMETRY);
 		}
 
-		delete[] destlist;
-		delete[] visited;
+		OGRE_FREE(destlist, MEMCATEGORY_GEOMETRY);
+		OGRE_FREE(visited, MEMCATEGORY_GEOMETRY);
 					
 		indexBuffer->unlock();
 	}

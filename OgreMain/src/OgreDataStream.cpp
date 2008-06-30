@@ -173,14 +173,14 @@ namespace Ogre {
     String DataStream::getAsString(void)
     {
         // Read the entire buffer
-        char* pBuf = new char[mSize+1];
+        char* pBuf = OGRE_ALLOC_T(char, mSize+1, MEMCATEGORY_GENERAL);
         // Ensure read from begin of stream
         seek(0);
         read(pBuf, mSize);
         pBuf[mSize] = '\0';
         String str;
         str.insert(0, pBuf, mSize);
-        delete [] pBuf;
+        OGRE_FREE(pBuf, MEMCATEGORY_GENERAL);
         return str;
     }
     //-----------------------------------------------------------------------
@@ -212,7 +212,7 @@ namespace Ogre {
     {
         // Copy data from incoming stream
         mSize = sourceStream.size();
-        mData = new uchar[mSize];
+        mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
         mPos = mData;
         mEnd = mData + sourceStream.read(mData, mSize);
         mFreeOnClose = freeOnClose;
@@ -225,7 +225,7 @@ namespace Ogre {
     {
         // Copy data from incoming stream
         mSize = sourceStream->size();
-        mData = new uchar[mSize];
+        mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
         mPos = mData;
         mEnd = mData + sourceStream->read(mData, mSize);
         mFreeOnClose = freeOnClose;
@@ -238,7 +238,7 @@ namespace Ogre {
     {
         // Copy data from incoming stream
         mSize = sourceStream.size();
-        mData = new uchar[mSize];
+        mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
         mPos = mData;
         mEnd = mData + sourceStream.read(mData, mSize);
         mFreeOnClose = freeOnClose;
@@ -251,7 +251,7 @@ namespace Ogre {
     {
         // Copy data from incoming stream
         mSize = sourceStream->size();
-        mData = new uchar[mSize];
+        mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
         mPos = mData;
         mEnd = mData + sourceStream->read(mData, mSize);
         mFreeOnClose = freeOnClose;
@@ -263,7 +263,7 @@ namespace Ogre {
     {
         mSize = size;
         mFreeOnClose = freeOnClose;
-        mData = new uchar[size];
+        mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
         mPos = mData;
         mEnd = mData + mSize;
         assert(mEnd >= mPos);
@@ -275,7 +275,7 @@ namespace Ogre {
     {
         mSize = size;
         mFreeOnClose = freeOnClose;
-        mData = new uchar[size];
+        mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
         mPos = mData;
         mEnd = mData + mSize;
         assert(mEnd >= mPos);
@@ -388,7 +388,7 @@ namespace Ogre {
     {
         if (mFreeOnClose && mData)
         {
-            delete [] mData;
+            OGRE_FREE(mData, MEMCATEGORY_GENERAL);
             mData = 0;
         }
 
@@ -545,7 +545,7 @@ namespace Ogre {
             if (mFreeOnClose)
             {
                 // delete the stream too
-                delete mpStream;
+                OGRE_DELETE_T(mpStream, basic_ifstream, MEMCATEGORY_GENERAL);
                 mpStream = 0;
             }
         }

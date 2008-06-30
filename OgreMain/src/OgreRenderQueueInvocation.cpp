@@ -80,7 +80,7 @@ namespace Ogre
 		const String& invocationName)
 	{
 		RenderQueueInvocation* ret = 
-			new RenderQueueInvocation(renderQueueGroupID, invocationName);
+			OGRE_NEW RenderQueueInvocation(renderQueueGroupID, invocationName);
 
 		mInvocations.push_back(ret);
 
@@ -98,7 +98,7 @@ namespace Ogre
 		for (RenderQueueInvocationList::iterator i = mInvocations.begin();
 			i != mInvocations.end(); ++i)
 		{
-			delete *i;
+			OGRE_DELETE *i;
 		}
 		mInvocations.clear();
 	}
@@ -122,7 +122,7 @@ namespace Ogre
 		
 		RenderQueueInvocationList::iterator i = mInvocations.begin();
 		std::advance(i, index);
-		delete *i;
+		OGRE_DELETE *i;
 		mInvocations.erase(i);
 		
 	}

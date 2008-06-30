@@ -88,6 +88,36 @@ namespace Ogre {
         /** Gets the render operation required to send this object to the frame buffer.
         */
         virtual void getRenderOperation(RenderOperation& op) = 0;
+
+		/** Called just prior to the Renderable being rendered. 
+		@remarks
+			OGRE is a queued renderer, so the actual render commands are executed 
+			at a later time than the point at which an object is discovered to be
+			visible. This allows ordering & grouping of renders without the discovery
+			process having to be aware of it. It also means OGRE uses declarative
+			render information rather than immediate mode rendering - this is very useful
+			in that certain effects and processes can automatically be applied to 
+			a wide range of scenes, but the downside is that special cases are
+			more difficult to handle, because there is not the declared state to 
+			cope with it. 
+		@par
+			This method allows a Renderable to do something special at the actual
+			point of rendering if it wishes to. When this method is called, all the
+			material render state as declared by this Renderable has already been set, 
+			all that is left to do is to bind the buffers and perform the render. 
+			The Renderable may modify render state itself if it wants to (and restore it in the 
+			postRender call) before the automated render happens, or by returning
+			'false' from this method can actually suppress the automatic render
+			and perform one of its own.
+		@return
+			true if the automatic render should proceed, false to skip it on 
+			the assumption that the Renderable has done it manually.
+		*/
+		virtual bool preRender(SceneManager* sm, RenderSystem* rsys) { return true; }
+		/** Called immediately after the Renderable has been rendered. 
+		*/
+		virtual void postRender(SceneManager* sm, RenderSystem* rsys) {}
+
         /** Gets the world transform matrix / matrices for this renderable object.
             @remarks
                 If the object has any derived transforms, these are expected to be up to date as long as

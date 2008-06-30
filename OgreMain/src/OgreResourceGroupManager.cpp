@@ -92,7 +92,7 @@ namespace Ogre {
                 "Resource group with name '" + name + "' already exists!", 
                 "ResourceGroupManager::createResourceGroup");
         }
-        ResourceGroup* grp = new ResourceGroup();
+        ResourceGroup* grp = OGRE_NEW_T(ResourceGroup, MEMCATEGORY_RESOURCE)();
 		grp->groupStatus = ResourceGroup::UNINITIALSED;
         grp->name = name;
         grp->worldGeometrySceneManager = 0;
@@ -517,7 +517,7 @@ namespace Ogre {
         // Get archive
         Archive* pArch = ArchiveManager::getSingleton().load( name, locType );
         // Add to location list
-		ResourceLocation* loc = new ResourceLocation();
+		ResourceLocation* loc = OGRE_NEW_T(ResourceLocation, MEMCATEGORY_RESOURCE);
 		loc->archive = pArch;
 		loc->recursive = recursive;
         grp->locationList.push_back(loc);
@@ -595,7 +595,7 @@ namespace Ogre {
                     }
                 }
 				// Erase list entry
-				delete *li;
+				OGRE_DELETE_T(*li, ResourceLocation, MEMCATEGORY_RESOURCE);
 				grp->locationList.erase(li);
 
 				ArchiveManager::getSingleton().unload(pArch);
@@ -781,7 +781,8 @@ namespace Ogre {
 
 		// Iterate through all the archives and build up a combined list of
 		// streams
-		DataStreamListPtr ret = DataStreamListPtr(new DataStreamList());
+		// MEMCATEGORY_GENERAL is the only category supported for SharedPtr
+		DataStreamListPtr ret = DataStreamListPtr(OGRE_NEW_T(DataStreamList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
 		LocationList::iterator li, liend;
 		liend = grp->locationList.end();
@@ -900,7 +901,8 @@ namespace Ogre {
 			oi != mScriptLoaderOrderMap.end(); ++oi)
 		{
 			ScriptLoader* su = oi->second;
-            FileListListPtr fileListList(new FileListList);
+			// MEMCATEGORY_GENERAL is the only category supported for SharedPtr
+            FileListListPtr fileListList(OGRE_NEW_T(FileListList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
 			// Get all the patterns and search them
 			const StringVector& patterns = su->getScriptPatterns();
@@ -975,7 +977,7 @@ namespace Ogre {
 			LoadUnloadResourceList* loadList;
 			if (li == grp->loadResourceOrderMap.end())
 			{
-				loadList = new LoadUnloadResourceList();
+				loadList = OGRE_NEW_T(LoadUnloadResourceList, MEMCATEGORY_RESOURCE)();
 				grp->loadResourceOrderMap[mgr->getLoadingOrder()] = loadList;
 			}
 			else
@@ -1113,7 +1115,7 @@ namespace Ogre {
 		LoadUnloadResourceList* loadList;
 		if (i == grp.loadResourceOrderMap.end())
 		{
-			loadList = new LoadUnloadResourceList();
+			loadList = OGRE_NEW_T(LoadUnloadResourceList, MEMCATEGORY_RESOURCE)();
 			grp.loadResourceOrderMap[order] = loadList;
 		}
 		else
@@ -1173,7 +1175,7 @@ namespace Ogre {
 			{
 				(*k)->getCreator()->remove((*k)->getHandle());
 			}
-			delete j->second;
+			OGRE_DELETE_T(j->second, LoadUnloadResourceList, MEMCATEGORY_RESOURCE);
 		}
         grp->loadResourceOrderMap.clear();
 
@@ -1194,18 +1196,18 @@ namespace Ogre {
 		    {
 			    // Don't iterate over resources to drop with ResourceManager
 			    // Assume this is being done anyway since this is a shutdown method
-			    delete j->second;
+			    OGRE_DELETE_T(j->second, LoadUnloadResourceList, MEMCATEGORY_RESOURCE);
 		    }
 		    // Drop location list
 		    for (LocationList::iterator ll = grp->locationList.begin();
 			    ll != grp->locationList.end(); ++ll)
 		    {
-			    delete *ll;
+			    OGRE_DELETE_T(*ll, ResourceLocation, MEMCATEGORY_RESOURCE);
 		    }
         }
 
 		// delete ResourceGroup
-		delete grp;
+		OGRE_DELETE_T(grp, ResourceGroup, MEMCATEGORY_RESOURCE);
 	}
 	//-----------------------------------------------------------------------
 	void ResourceGroupManager::fireResourceGroupScriptingStarted(const String& groupName, size_t scriptCount)
@@ -1366,7 +1368,8 @@ namespace Ogre {
     StringVectorPtr ResourceGroupManager::listResourceNames(const String& groupName, bool dirs)
     {
         OGRE_LOCK_AUTO_MUTEX
-        StringVectorPtr vec(new StringVector());
+		// MEMCATEGORY_GENERAL is the only category supported for SharedPtr
+        StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName);
@@ -1396,7 +1399,8 @@ namespace Ogre {
     FileInfoListPtr ResourceGroupManager::listResourceFileInfo(const String& groupName, bool dirs)
     {
         OGRE_LOCK_AUTO_MUTEX
-        FileInfoListPtr vec(new FileInfoList());
+		// MEMCATEGORY_GENERAL is the only category supported for SharedPtr
+        FileInfoListPtr vec(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName);
@@ -1426,7 +1430,8 @@ namespace Ogre {
         const String& pattern, bool dirs)
     {
         OGRE_LOCK_AUTO_MUTEX
-        StringVectorPtr vec(new StringVector());
+		// MEMCATEGORY_GENERAL is the only category supported for SharedPtr
+		StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName);
@@ -1455,7 +1460,8 @@ namespace Ogre {
         const String& pattern, bool dirs)
     {
         OGRE_LOCK_AUTO_MUTEX
-        FileInfoListPtr vec(new FileInfoList());
+		// MEMCATEGORY_GENERAL is the only category supported for SharedPtr
+        FileInfoListPtr vec(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName);

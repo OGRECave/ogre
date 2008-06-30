@@ -41,7 +41,7 @@ namespace Ogre {
 CompositionTechnique::CompositionTechnique(Compositor *parent):
     mParent(parent)
 {
-    mOutputTarget = new CompositionTargetPass(this);
+    mOutputTarget = OGRE_NEW CompositionTargetPass(this);
 }
 //-----------------------------------------------------------------------
 CompositionTechnique::~CompositionTechnique()
@@ -54,12 +54,12 @@ CompositionTechnique::~CompositionTechnique()
 
     removeAllTextureDefinitions();
     removeAllTargetPasses();
-    delete mOutputTarget;
+    OGRE_DELETE  mOutputTarget;
 }
 //-----------------------------------------------------------------------
 CompositionTechnique::TextureDefinition *CompositionTechnique::createTextureDefinition(const String &name)
 {
-    TextureDefinition *t = new TextureDefinition();
+    TextureDefinition *t = OGRE_NEW TextureDefinition();
     t->name = name;
     mTextureDefinitions.push_back(t);
     return t;
@@ -70,7 +70,7 @@ void CompositionTechnique::removeTextureDefinition(size_t index)
 {
     assert (index < mTextureDefinitions.size() && "Index out of bounds.");
     TextureDefinitions::iterator i = mTextureDefinitions.begin() + index;
-    delete(*i);
+    OGRE_DELETE (*i);
     mTextureDefinitions.erase(i);
 }
 //-----------------------------------------------------------------------
@@ -93,7 +93,7 @@ void CompositionTechnique::removeAllTextureDefinitions()
     iend = mTextureDefinitions.end();
     for (i = mTextureDefinitions.begin(); i != iend; ++i)
     {
-        delete(*i);
+        OGRE_DELETE (*i);
     }
     mTextureDefinitions.clear();
 }
@@ -106,7 +106,7 @@ CompositionTechnique::TextureDefinitionIterator CompositionTechnique::getTexture
 //-----------------------------------------------------------------------
 CompositionTargetPass *CompositionTechnique::createTargetPass()
 {
-    CompositionTargetPass *t = new CompositionTargetPass(this);
+    CompositionTargetPass *t = OGRE_NEW CompositionTargetPass(this);
     mTargetPasses.push_back(t);
     return t;
 }
@@ -116,7 +116,7 @@ void CompositionTechnique::removeTargetPass(size_t index)
 {
     assert (index < mTargetPasses.size() && "Index out of bounds.");
     TargetPasses::iterator i = mTargetPasses.begin() + index;
-    delete(*i);
+    OGRE_DELETE (*i);
     mTargetPasses.erase(i);
 }
 //-----------------------------------------------------------------------
@@ -139,7 +139,7 @@ void CompositionTechnique::removeAllTargetPasses()
     iend = mTargetPasses.end();
     for (i = mTargetPasses.begin(); i != iend; ++i)
     {
-        delete(*i);
+        OGRE_DELETE (*i);
     }
     mTargetPasses.clear();
 }
@@ -225,7 +225,7 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
 //-----------------------------------------------------------------------
 CompositorInstance *CompositionTechnique::createInstance(CompositorChain *chain)
 {
-	CompositorInstance *mew = new CompositorInstance(mParent, this, chain);
+	CompositorInstance *mew = OGRE_NEW CompositorInstance(mParent, this, chain);
 	mInstances.push_back(mew);
     return mew;
 }
@@ -235,7 +235,7 @@ void CompositionTechnique::destroyInstance(CompositorInstance *instance)
     assert(instance->getTechnique() == this);
 	/// Erase from list of instances
 	mInstances.erase(std::find(mInstances.begin(), mInstances.end(), instance));
-    delete instance;
+    OGRE_DELETE  instance;
 }
 //-----------------------------------------------------------------------
 Compositor *CompositionTechnique::getParent()

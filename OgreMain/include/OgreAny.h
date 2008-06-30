@@ -154,7 +154,7 @@ namespace Ogre
 
             virtual placeholder * clone() const
             {
-                return new holder(held);
+                return OGRE_NEW holder(held);
             }
 
 			virtual void writeToStream(std::ostream& o)
@@ -266,28 +266,28 @@ namespace Ogre
 
 			virtual placeholder * clone() const
 			{
-				return new numholder(held);
+				return OGRE_NEW numholder(held);
 			}
 
 			virtual placeholder* add(placeholder* rhs)
 			{
-				return new numholder(held + static_cast<numholder*>(rhs)->held);
+				return OGRE_NEW numholder(held + static_cast<numholder*>(rhs)->held);
 			}
 			virtual placeholder* subtract(placeholder* rhs)
 			{
-				return new numholder(held - static_cast<numholder*>(rhs)->held);
+				return OGRE_NEW numholder(held - static_cast<numholder*>(rhs)->held);
 			}
 			virtual placeholder* multiply(placeholder* rhs)
 			{
-				return new numholder(held * static_cast<numholder*>(rhs)->held);
+				return OGRE_NEW numholder(held * static_cast<numholder*>(rhs)->held);
 			}
 			virtual placeholder* multiply(Real factor)
 			{
-				return new numholder(held * factor);
+				return OGRE_NEW numholder(held * factor);
 			}
 			virtual placeholder* divide(placeholder* rhs)
 			{
-				return new numholder(held / static_cast<numholder*>(rhs)->held);
+				return OGRE_NEW numholder(held / static_cast<numholder*>(rhs)->held);
 			}
 			virtual void writeToStream(std::ostream& o)
 			{

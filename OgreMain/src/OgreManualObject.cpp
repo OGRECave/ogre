@@ -68,18 +68,18 @@ namespace Ogre {
 		resetTempAreas();
 		for (SectionList::iterator i = mSectionList.begin(); i != mSectionList.end(); ++i)
 		{
-			delete *i;
+			OGRE_DELETE *i;
 		}
 		mSectionList.clear();
 		mRadius = 0;
 		mAABB.setNull();
-		delete mEdgeList;
+		OGRE_DELETE mEdgeList;
 		mEdgeList = 0;
 		mAnyIndexed = false;
 		for (ShadowRenderableList::iterator s = mShadowRenderables.begin();
 			s != mShadowRenderables.end(); ++s)
 		{
-			delete *s;
+			OGRE_DELETE *s;
 		}
 		mShadowRenderables.clear();
 
@@ -88,8 +88,8 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void ManualObject::resetTempAreas(void)
 	{
-		delete [] mTempVertexBuffer;
-		delete [] mTempIndexBuffer;
+		OGRE_FREE(mTempVertexBuffer, MEMCATEGORY_GEOMETRY);
+		OGRE_FREE(mTempIndexBuffer, MEMCATEGORY_GEOMETRY);
 		mTempVertexBuffer = 0;
 		mTempIndexBuffer = 0;
 		mTempVertexSize = TEMP_INITIAL_VERTEX_SIZE;
@@ -124,12 +124,12 @@ namespace Ogre {
 			}
 			// copy old data
 			char* tmp = mTempVertexBuffer;
-			mTempVertexBuffer = new char[newSize];
+			mTempVertexBuffer = OGRE_ALLOC_T(char, newSize, MEMCATEGORY_GEOMETRY);
 			if (tmp)
 			{
 				memcpy(mTempVertexBuffer, tmp, mTempVertexSize);
 				// delete old buffer
-				delete [] tmp;
+				OGRE_FREE(tmp, MEMCATEGORY_GEOMETRY);
 			}
 			mTempVertexSize = newSize;
 		}
@@ -152,11 +152,11 @@ namespace Ogre {
 			}
 			numInds = newSize / sizeof(uint16);
 			uint16* tmp = mTempIndexBuffer;
-			mTempIndexBuffer = new uint16[numInds];
+			mTempIndexBuffer = OGRE_ALLOC_T(uint16, numInds, MEMCATEGORY_GEOMETRY);
 			if (tmp)
 			{
 				memcpy(mTempIndexBuffer, tmp, mTempIndexSize);
-				delete [] tmp;
+				OGRE_FREE(tmp, MEMCATEGORY_GEOMETRY);
 			}
 			mTempIndexSize = newSize;
 		}
@@ -184,7 +184,7 @@ namespace Ogre {
 				"You cannot call begin() again until after you call end()",
 				"ManualObject::begin");
 		}
-		mCurrentSection = new ManualObjectSection(this, materialName, opType);
+		mCurrentSection = OGRE_NEW ManualObjectSection(this, materialName, opType);
 		mCurrentUpdating = false;
 		mCurrentSection->setUseIdentityProjection(mUseIdentityProjection);
 		mCurrentSection->setUseIdentityView(mUseIdentityView);
@@ -434,7 +434,7 @@ namespace Ogre {
 		RenderOperation* rop = mCurrentSection->getRenderOperation();
 		if (!rop->indexData)
 		{
-			rop->indexData = new IndexData();
+			rop->indexData = OGRE_NEW IndexData();
 			rop->indexData->indexCount = 0;
 		}
 		rop->useIndexes = true;
@@ -585,7 +585,7 @@ namespace Ogre {
 				// First creation, can really undo
 				// Has already been added to section list end, so remove
 				mSectionList.pop_back();
-				delete mCurrentSection;
+				OGRE_DELETE mCurrentSection;
 
 			}
 		}
@@ -723,7 +723,7 @@ namespace Ogre {
 			// Copy vertex data; replicate buffers too
 			sm->vertexData = rop->vertexData->clone(true);
 			// Copy index data; replicate buffers too; delete the default, old one to avoid memory leaks
-			delete sm->indexData;
+			OGRE_DELETE sm->indexData;
 			sm->indexData = rop->indexData->clone(true);
 		}
         // update bounds
@@ -918,7 +918,7 @@ namespace Ogre {
 						break;
 					}
 				}
-				*si = new ManualObjectSectionShadowRenderable(this, indexBuffer,
+				*si = OGRE_NEW ManualObjectSectionShadowRenderable(this, indexBuffer,
 					egi->vertexData, vertexProgram || !extrude);
 			}
 			// Get shadow renderable
@@ -959,15 +959,15 @@ namespace Ogre {
 		mRenderOperation.operationType = opType;
 		// default to no indexes unless we're told
 		mRenderOperation.useIndexes = false;
-		mRenderOperation.vertexData = new VertexData();
+		mRenderOperation.vertexData = OGRE_NEW VertexData();
 		mRenderOperation.vertexData->vertexCount = 0;
 
 	}
 	//-----------------------------------------------------------------------------
 	ManualObject::ManualObjectSection::~ManualObjectSection()
 	{
-		delete mRenderOperation.vertexData;
-		delete mRenderOperation.indexData; // ok to delete 0
+		OGRE_DELETE mRenderOperation.vertexData;
+		OGRE_DELETE mRenderOperation.indexData; // ok to delete 0
 	}
 	//-----------------------------------------------------------------------------
 	RenderOperation* ManualObject::ManualObjectSection::getRenderOperation(void)
@@ -1027,13 +1027,13 @@ namespace Ogre {
 		: mParent(parent)
 	{
 		// Initialise render op
-		mRenderOp.indexData = new IndexData();
+		mRenderOp.indexData = OGRE_NEW IndexData();
 		mRenderOp.indexData->indexBuffer = *indexBuffer;
 		mRenderOp.indexData->indexStart = 0;
 		// index start and count are sorted out later
 
 		// Create vertex data which just references position component (and 2 component)
-		mRenderOp.vertexData = new VertexData();
+		mRenderOp.vertexData = OGRE_NEW VertexData();
 		// Map in position data
 		mRenderOp.vertexData->vertexDeclaration->addElement(0,0,VET_FLOAT3, VES_POSITION);
 		ushort origPosBind =
@@ -1064,7 +1064,7 @@ namespace Ogre {
 			if (createSeparateLightCap)
 			{
 				// Create child light cap
-				mLightCap = new ManualObjectSectionShadowRenderable(parent,
+				mLightCap = OGRE_NEW ManualObjectSectionShadowRenderable(parent,
 					indexBuffer, vertexData, false, true);
 			}
 		}
@@ -1072,8 +1072,8 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	ManualObject::ManualObjectSectionShadowRenderable::~ManualObjectSectionShadowRenderable()
 	{
-		delete mRenderOp.indexData;
-		delete mRenderOp.vertexData;
+		OGRE_DELETE mRenderOp.indexData;
+		OGRE_DELETE mRenderOp.vertexData;
 	}
 	//--------------------------------------------------------------------------
 	void ManualObject::ManualObjectSectionShadowRenderable::getWorldTransforms(
@@ -1094,12 +1094,12 @@ namespace Ogre {
 	MovableObject* ManualObjectFactory::createInstanceImpl(
 		const String& name, const NameValuePairList* params)
 	{
-		return new ManualObject(name);
+		return OGRE_NEW ManualObject(name);
 	}
 	//-----------------------------------------------------------------------------
 	void ManualObjectFactory::destroyInstance( MovableObject* obj)
 	{
-		delete obj;
+		OGRE_DELETE obj;
 	}
 
 

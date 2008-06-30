@@ -42,7 +42,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	KeyFrame* KeyFrame::_clone(AnimationTrack* newParent) const
 	{
-		return new KeyFrame(newParent, mTime);
+		return OGRE_NEW KeyFrame(newParent, mTime);
 	}
 	//---------------------------------------------------------------------
 	NumericKeyFrame::NumericKeyFrame(const AnimationTrack* parent, Real time)
@@ -62,7 +62,7 @@ namespace Ogre
     //---------------------------------------------------------------------
 	KeyFrame* NumericKeyFrame::_clone(AnimationTrack* newParent) const
 	{
-		NumericKeyFrame* newKf = new NumericKeyFrame(newParent, mTime);
+		NumericKeyFrame* newKf = OGRE_NEW NumericKeyFrame(newParent, mTime);
 		newKf->mValue = mValue;
 		return newKf;
 	}
@@ -111,7 +111,7 @@ namespace Ogre
     //---------------------------------------------------------------------
 	KeyFrame* TransformKeyFrame::_clone(AnimationTrack* newParent) const
 	{
-		TransformKeyFrame* newKf = new TransformKeyFrame(newParent, mTime);
+		TransformKeyFrame* newKf = OGRE_NEW TransformKeyFrame(newParent, mTime);
 		newKf->mTranslate = mTranslate;
 		newKf->mScale = mScale;
 		newKf->mRotate = mRotate;
@@ -136,7 +136,7 @@ namespace Ogre
     //---------------------------------------------------------------------
 	KeyFrame* VertexMorphKeyFrame::_clone(AnimationTrack* newParent) const
 	{
-		VertexMorphKeyFrame* newKf = new VertexMorphKeyFrame(newParent, mTime);
+		VertexMorphKeyFrame* newKf = OGRE_NEW VertexMorphKeyFrame(newParent, mTime);
 		newKf->mBuffer = mBuffer;
 		return newKf;
 	}	
@@ -203,7 +203,7 @@ namespace Ogre
     //---------------------------------------------------------------------
 	KeyFrame* VertexPoseKeyFrame::_clone(AnimationTrack* newParent) const
 	{
-		VertexPoseKeyFrame* newKf = new VertexPoseKeyFrame(newParent, mTime);
+		VertexPoseKeyFrame* newKf = OGRE_NEW VertexPoseKeyFrame(newParent, mTime);
 		// By-value copy ok
 		newKf->mPoseRefs = mPoseRefs;
 		return newKf;

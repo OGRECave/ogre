@@ -73,7 +73,7 @@ namespace Ogre {
 		OGRE_THREAD_SUPPORT is defined to be 1. Otherwise, all methods will
 		call their exact equivalents in ResourceGroupManager synchronously. 
 	*/
-	class _OgreExport ResourceBackgroundQueue : public Singleton<ResourceBackgroundQueue>
+	class _OgreExport ResourceBackgroundQueue : public Singleton<ResourceBackgroundQueue>, public ResourceAlloc
 	{
 	public:
 		/** This abstract listener interface lets you get notifications of

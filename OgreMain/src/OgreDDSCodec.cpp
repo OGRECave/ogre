@@ -165,7 +165,7 @@ namespace Ogre {
 				LML_NORMAL,
 				"DDS codec registering");
 
-			msInstance = new DDSCodec();
+			msInstance = OGRE_NEW DDSCodec();
 			Codec::registerCodec(msInstance);
 		}
 
@@ -176,7 +176,7 @@ namespace Ogre {
 		if(msInstance)
 		{
 			Codec::unRegisterCodec(msInstance);
-			delete msInstance;
+			OGRE_DELETE msInstance;
 			msInstance = 0;
 		}
 
@@ -441,7 +441,7 @@ namespace Ogre {
 				"DDS header size mismatch!", "DDSCodec::decode");
 		}
 
-		ImageData* imgData = new ImageData();
+		ImageData* imgData = OGRE_NEW ImageData();
 		MemoryDataStreamPtr output;
 
 		imgData->depth = 1; // (deal with volume later)
@@ -553,7 +553,7 @@ namespace Ogre {
 			imgData->width, imgData->height, imgData->depth, imgData->format);
 
 		// Bind output buffer
-		output.bind(new MemoryDataStream(imgData->size));
+		output.bind(OGRE_NEW MemoryDataStream(imgData->size));
 
 		
 		// Now deal with the data

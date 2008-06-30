@@ -39,6 +39,9 @@ Torus Knot Software Ltd.
 #include "OgrePass.h"
 #include "OgreTextureUnitState.h"
 #include "OgreException.h"
+#if OGRE_USE_NEW_COMPILERS == 1
+#  include "OgreScriptCompiler.h"
+#endif
 
 namespace Ogre {
 
@@ -63,7 +66,7 @@ namespace Ogre {
 
 		// Create primary thread copies of script compiler / serializer
 		// other copies for other threads may also be instantiated
-		OGRE_THREAD_POINTER_SET(mSerializer, new MaterialSerializer());
+		OGRE_THREAD_POINTER_SET(mSerializer, OGRE_NEW MaterialSerializer());
 
         // Loading order
         mLoadOrder = 100.0f;
@@ -126,17 +129,22 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void MaterialManager::parseScript(DataStreamPtr& stream, const String& groupName)
     {
-        // Delegate to serializer
-#if OGRE_THREAD_SUPPORT
+#if OGRE_USE_NEW_COMPILERS == 1
+		ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
+#else // OGRE_USE_NEW_COMPILERS
+#  if OGRE_THREAD_SUPPORT
+		// Delegate to serializer
 		// check we have an instance for this thread (should always have one for main thread)
 		if (!mSerializer.get())
 		{
 			// create a new instance for this thread - will get deleted when
 			// the thread dies
-			mSerializer.reset(new MaterialSerializer());
+			mSerializer.reset(OGRE_NEW MaterialSerializer());
 		}
-#endif
+#  endif
         mSerializer->parseScript(stream, groupName);
+#endif // OGRE_USE_NEW_COMPILERS
+
     }
     //-----------------------------------------------------------------------
 	void MaterialManager::setDefaultTextureFiltering(TextureFilterOptions fo)

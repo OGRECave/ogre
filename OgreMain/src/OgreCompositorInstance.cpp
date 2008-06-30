@@ -221,7 +221,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
         switch(pass->getType())
         {
         case CompositionPass::PT_CLEAR:
-			queueRenderSystemOp(finalState, new RSClearOperation(
+			queueRenderSystemOp(finalState, OGRE_NEW RSClearOperation(
 				pass->getClearBuffers(),
 				pass->getClearColour(),
 				pass->getClearDepth(),
@@ -229,7 +229,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
 				));
             break;
 		case CompositionPass::PT_STENCIL:
-			queueRenderSystemOp(finalState, new RSStencilOperation(
+			queueRenderSystemOp(finalState, OGRE_NEW RSStencilOperation(
 				pass->getStencilCheck(),pass->getStencilFunc(), pass->getStencilRefValue(),
 				pass->getStencilMask(), pass->getStencilFailOp(), pass->getStencilDepthFailOp(),
 				pass->getStencilPassOp(), pass->getStencilTwoSidedOperation()
@@ -306,7 +306,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
 				}
 			}
 
-            RSQuadOperation * rsQuadOperation = new RSQuadOperation(this,pass->getIdentifier(),mat);
+            RSQuadOperation * rsQuadOperation = OGRE_NEW RSQuadOperation(this,pass->getIdentifier(),mat);
             Real left,top,right,bottom;
             if (pass->getQuadCorners(left,top,right,bottom))
                 rsQuadOperation->setQuadCorners(left,top,right,bottom);

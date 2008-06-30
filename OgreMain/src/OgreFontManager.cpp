@@ -75,7 +75,7 @@ namespace Ogre
 		const String& group, bool isManual, ManualResourceLoader* loader,
         const NameValuePairList* params)
 	{
-		return new Font(this, name, handle, group, isManual, loader);
+		return OGRE_NEW Font(this, name, handle, group, isManual, loader);
 	}
 	//---------------------------------------------------------------------
     void FontManager::parseScript(DataStreamPtr& stream, const String& groupName)

@@ -73,7 +73,7 @@ namespace Ogre {
 			If this is called, neither of the other 2 visit methods
 			will be called.
 		*/
-		virtual void visit(const RenderablePass* rp) = 0;
+		virtual void visit(RenderablePass* rp) = 0;
 
 		/* When visiting a collection grouped by pass, this is
 			called when the grouping pass changes.
@@ -91,7 +91,7 @@ namespace Ogre {
 			If this method is called, the RenderablePass visit 
 			method will not be called for this collection. 
 		*/
-		virtual void visit(const Renderable* r) = 0;
+		virtual void visit(Renderable* r) = 0;
 		
 		
 	};
@@ -485,7 +485,7 @@ namespace Ogre {
             PriorityMap::iterator i;
             for (i = mPriorityGroups.begin(); i != mPriorityGroups.end(); ++i)
             {
-                delete i->second;
+                OGRE_DELETE i->second;
             }
         }
 
@@ -504,7 +504,7 @@ namespace Ogre {
             if (i == mPriorityGroups.end())
             {
                 // Missing, create
-                pPriorityGrp = new RenderPriorityGroup(this, 
+                pPriorityGrp = OGRE_NEW RenderPriorityGroup(this, 
                     mSplitPassesByLightingType,
                     mSplitNoShadowPasses, 
 					mShadowCastersNotReceivers);
@@ -534,7 +534,7 @@ namespace Ogre {
             for (i = mPriorityGroups.begin(); i != iend; ++i)
             {
 				if (destroy)
-					delete i->second;
+					OGRE_DELETE i->second;
 				else
 					i->second->clear();
             }

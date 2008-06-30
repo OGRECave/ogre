@@ -267,19 +267,20 @@ void InstancingListener::createInstanceGeom()
 	{
 
 		InstancedGeometry::BatchInstance *r = regIt.getNext();
-		unsigned short objectCount;
 
-		InstancedGeometry::InstancedObject **objects= r->getObjectsAsArray(objectCount);
-		for(size_t j = 0; j < objectCount; j++)
+		InstancedGeometry::BatchInstance::InstancedObjectIterator bit = r->getObjectIterator();
+		int j = 0;
+		while(bit.hasMoreElements())
 		{
-
+			InstancedGeometry::InstancedObject* obj = bit.getNext();
 
 			const Vector3 position (posMatrices[k][j]);								
-			objects[j]->setPosition(position);
+			obj->setPosition(position);
+			++j;
 
 		}
 		k++;
-		delete[] objects;	
+		
 	}
 	batch->setVisible(true);
 	renderInstance[0] = batch;

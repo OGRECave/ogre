@@ -97,7 +97,7 @@ namespace Ogre {
 			StringVector extsVector = StringUtil::split(exts, ",");
 			for (StringVector::iterator v = extsVector.begin(); v != extsVector.end(); ++v)
 			{
-				ImageCodec* codec = new FreeImageCodec(*v, i);
+				ImageCodec* codec = OGRE_NEW FreeImageCodec(*v, i);
 				msCodecList.push_back(codec);
 				Codec::registerCodec(codec);
 			}
@@ -122,7 +122,7 @@ namespace Ogre {
 			i != msCodecList.end(); ++i)
 		{
 			Codec::unRegisterCodec(*i);
-			delete *i;
+			OGRE_DELETE *i;
 		}
 		msCodecList.clear();
 
@@ -278,7 +278,7 @@ namespace Ogre {
 		{
 			conversionRequired = true;
 			// Allocate memory
-			convBox.data = new uchar[convBox.getConsecutiveSize()];
+			convBox.data = OGRE_ALLOC_T(uchar, convBox.getConsecutiveSize(), MEMCATEGORY_GENERAL);
 			// perform conversion and reassign source
 			PixelBox src(pImgData->width, pImgData->height, 1, pImgData->format, input->getPtr());
 			PixelUtil::bulkPixelConversion(src, convBox);
@@ -320,7 +320,7 @@ namespace Ogre {
 		if (conversionRequired)
 		{
 			// delete temporary conversion area
-			delete [] static_cast<uchar*>(convBox.data);
+			OGRE_FREE(convBox.data, MEMCATEGORY_GENERAL);
 		}
 
 		return ret;
@@ -339,10 +339,11 @@ namespace Ogre {
 		DWORD size;
 		FreeImage_AcquireMemory(mem, &data, &size);
 		// Copy data into our own buffer
-		BYTE* ourData = new BYTE[size];
+		// Because we're asking MemoryDataStream to free this, must create in a compatible way
+		BYTE* ourData = OGRE_ALLOC_T(BYTE, size, MEMCATEGORY_GENERAL);
 		memcpy(ourData, data, size);
 		// Wrap data in stream, tell it to free on close 
-		DataStreamPtr outstream(new MemoryDataStream(ourData, size, true));
+		DataStreamPtr outstream(OGRE_NEW MemoryDataStream(ourData, size, true));
 		// Now free FreeImage memory buffers
 		FreeImage_CloseMemory(mem);
 		// Unload bitmap
@@ -382,7 +383,7 @@ namespace Ogre {
 		}
 
 
-		ImageData* imgData = new ImageData();
+		ImageData* imgData = OGRE_NEW ImageData();
 		MemoryDataStreamPtr output;
 
 		imgData->depth = 1; // only 2D formats handled by this codec
@@ -507,7 +508,7 @@ namespace Ogre {
 		size_t dstPitch = imgData->width * PixelUtil::getNumElemBytes(imgData->format);
 		imgData->size = dstPitch * imgData->height;
         // Bind output buffer
-        output.bind(new MemoryDataStream(imgData->size));
+        output.bind(OGRE_NEW MemoryDataStream(imgData->size));
 
 		uchar* pSrc;
 		uchar* pDst = output->getPtr();

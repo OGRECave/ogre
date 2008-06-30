@@ -94,7 +94,7 @@ namespace Ogre {
 
         if (i == mOverlayMap.end())
         {
-            ret = new Overlay(name);
+            ret = OGRE_NEW Overlay(name);
             assert(ret && "Overlay creation failed");
             mOverlayMap[name] = ret;
         }
@@ -134,7 +134,7 @@ namespace Ogre {
         }
         else
         {
-            delete i->second;
+            OGRE_DELETE i->second;
             mOverlayMap.erase(i);
         }
     }
@@ -146,7 +146,7 @@ namespace Ogre {
         {
             if (i->second == overlay)
             {
-                delete i->second;
+                OGRE_DELETE i->second;
                 mOverlayMap.erase(i);
                 return;
             }
@@ -162,7 +162,7 @@ namespace Ogre {
         for (OverlayMap::iterator i = mOverlayMap.begin();
             i != mOverlayMap.end(); ++i)
         {
-            delete i->second;
+            OGRE_DELETE i->second;
         }
         mOverlayMap.clear();
 		mLoadedScripts.clear();

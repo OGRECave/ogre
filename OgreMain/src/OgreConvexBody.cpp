@@ -61,7 +61,7 @@ namespace Ogre
 			msFreePolygons.resize(initialSize);
 			for (size_t i = 0; i < initialSize; ++i)
 			{
-				msFreePolygons[i] = new Polygon();
+				msFreePolygons[i] = OGRE_NEW_T(Polygon, MEMCATEGORY_SCENE_CONTROL)();
 			}
 		}
 	}
@@ -73,7 +73,7 @@ namespace Ogre
 		for (PolygonList::iterator i = msFreePolygons.begin(); 
 			i != msFreePolygons.end(); ++i)
 		{
-			delete *i;
+			OGRE_DELETE_T(*i, Polygon, MEMCATEGORY_SCENE_CONTROL);
 		}
 		msFreePolygons.clear();
 	}
@@ -86,7 +86,7 @@ namespace Ogre
 		{
 			// if we ran out of polys to use, create a new one
 			// hopefully this one will return to the pool in due course
-			return new Polygon();
+			return OGRE_NEW_T(Polygon, MEMCATEGORY_SCENE_CONTROL)();
 		}
 		else
 		{
@@ -656,7 +656,7 @@ namespace Ogre
 
 		// Compare the polygons. They may not be in correct order.
 		// A correct convex body does not have identical polygons in its body.
-		bool *bChecked = new bool[ getPolygonCount() ];
+		bool *bChecked = OGRE_ALLOC_T(bool, getPolygonCount(), MEMCATEGORY_SCENE_CONTROL);
 		for ( size_t i=0; i<getPolygonCount(); ++i )
 		{
 			bChecked[ i ] = false;
@@ -681,7 +681,8 @@ namespace Ogre
 
 			if ( bFound == false )
 			{
-				OGRE_SAFE_DELETE_ARRAY( bChecked );
+				OGRE_FREE(bChecked, MEMCATEGORY_SCENE_CONTROL);
+				bChecked = 0;
 				return false;
 			}
 		}
@@ -690,12 +691,14 @@ namespace Ogre
 		{
 			if ( bChecked[ i ] != true )
 			{
-				OGRE_SAFE_DELETE_ARRAY( bChecked );
+				OGRE_FREE(bChecked, MEMCATEGORY_SCENE_CONTROL);
+				bChecked = 0;
 				return false;
 			}
 		}
 
-		OGRE_SAFE_DELETE_ARRAY( bChecked );
+		OGRE_FREE(bChecked, MEMCATEGORY_SCENE_CONTROL);
+		bChecked = 0;
 		return true;
 	}
 	//-----------------------------------------------------------------------
@@ -947,7 +950,7 @@ namespace Ogre
 			// - side is clipSide: vertex will be clipped
 			// - side is !clipSide: vertex will be untouched
 			// - side is NOSIDE:   vertex will be untouched
-			Plane::Side *side = new Plane::Side[ vertexCount ];
+			Plane::Side *side = OGRE_ALLOC_T(Plane::Side, vertexCount, MEMCATEGORY_SCENE_CONTROL);
 			for ( size_t iVertex = 0; iVertex < vertexCount; ++iVertex )
 			{
 				side[ iVertex ] = pl.getSide( p.getVertex( iVertex ) );
@@ -1072,7 +1075,8 @@ namespace Ogre
 			pIntersect = 0;
 
 			// delete side info
-			OGRE_SAFE_DELETE_ARRAY( side );
+			OGRE_FREE(side, MEMCATEGORY_SCENE_CONTROL);
+			side = 0;
 		}
 
 		// if the polygon was partially clipped, close it

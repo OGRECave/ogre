@@ -80,9 +80,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     BorderPanelOverlayElement::~BorderPanelOverlayElement()
     {
-        delete mRenderOp2.vertexData;
-        delete mRenderOp2.indexData;
-        delete mBorderRenderable;
+        OGRE_DELETE mRenderOp2.vertexData;
+        OGRE_DELETE mRenderOp2.indexData;
+        OGRE_DELETE mBorderRenderable;
     }
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::initialise(void)
@@ -96,7 +96,7 @@ namespace Ogre {
         if (init)
 		{
 			// Setup render op in advance
-			mRenderOp2.vertexData = new VertexData();
+			mRenderOp2.vertexData = OGRE_NEW VertexData();
 			mRenderOp2.vertexData->vertexCount = 4 * 8; // 8 cells, can't necessarily share vertices cos
 														// texcoords may differ
 			mRenderOp2.vertexData->vertexStart = 0;
@@ -130,7 +130,7 @@ namespace Ogre {
 			mRenderOp2.operationType = RenderOperation::OT_TRIANGLE_LIST;
 			mRenderOp2.useIndexes = true;
 			// Index data
-			mRenderOp2.indexData = new IndexData();
+			mRenderOp2.indexData = OGRE_NEW IndexData();
 			mRenderOp2.indexData->indexCount = 8 * 6;
 			mRenderOp2.indexData->indexStart = 0;
 
@@ -168,7 +168,7 @@ namespace Ogre {
 			mRenderOp2.indexData->indexBuffer->unlock();
 
 			// Create sub-object for rendering border
-			mBorderRenderable = new BorderRenderable(this);
+			mBorderRenderable = OGRE_NEW BorderRenderable(this);
 
 			mInitialised = true;
 		}

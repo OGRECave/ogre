@@ -87,7 +87,7 @@ namespace Ogre{
 	 *  ScriptCompilerManager tied to specific object types.
 	 *  Each manager may manage multiple types.
 	 */
-	class ScriptTranslatorManager
+	class ScriptTranslatorManager : public ScriptTranslatorAlloc
 	{
 	public:
 		/// Returns the number of translators being managed

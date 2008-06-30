@@ -77,7 +77,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     PanelOverlayElement::~PanelOverlayElement()
     {
-        delete mRenderOp.vertexData;
+        OGRE_DELETE mRenderOp.vertexData;
     }
     //---------------------------------------------------------------------
     void PanelOverlayElement::initialise(void)
@@ -88,7 +88,7 @@ namespace Ogre {
 		if (init)
 		{
 			// Setup render op in advance
-			mRenderOp.vertexData = new VertexData();
+			mRenderOp.vertexData = OGRE_NEW VertexData();
 			// Vertex declaration: 1 position, add texcoords later depending on #layers
 			// Create as separate buffers so we can lock & discard separately
 			VertexDeclaration* decl = mRenderOp.vertexData->vertexDeclaration;

@@ -65,8 +65,8 @@ namespace Ogre
         mTrigTableSize = trigTableSize;
         mTrigTableFactor = mTrigTableSize / Math::TWO_PI;
 
-        mSinTable = new Real[mTrigTableSize];
-        mTanTable = new Real[mTrigTableSize];
+        mSinTable = OGRE_ALLOC_T(Real, mTrigTableSize, MEMCATEGORY_GENERAL);
+        mTanTable = OGRE_ALLOC_T(Real, mTrigTableSize, MEMCATEGORY_GENERAL);
 
         buildTrigTables();
     }
@@ -74,8 +74,8 @@ namespace Ogre
     //-----------------------------------------------------------------------
     Math::~Math()
     {
-        delete [] mSinTable;
-        delete [] mTanTable;
+        OGRE_FREE(mSinTable, MEMCATEGORY_GENERAL);
+        OGRE_FREE(mTanTable, MEMCATEGORY_GENERAL);
     }
 
     //-----------------------------------------------------------------------

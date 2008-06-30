@@ -46,13 +46,13 @@ namespace Ogre {
 		, mVertexAnimationType(VAT_NONE)
 		, mBuildEdgesEnabled(true)
     {
-		indexData = new IndexData();
+		indexData = OGRE_NEW IndexData();
     }
     //-----------------------------------------------------------------------
     SubMesh::~SubMesh()
     {
-        delete vertexData;
-		delete indexData;
+        OGRE_DELETE vertexData;
+		OGRE_DELETE indexData;
 
 		removeLodLevels();
     }
@@ -217,7 +217,7 @@ namespace Ogre {
 		lodend = mLodFaceList.end();
 		for (lodi = mLodFaceList.begin(); lodi != lodend; ++lodi)
 		{
-			delete *lodi;
+			OGRE_DELETE *lodi;
 		}
 
         mLodFaceList.clear();

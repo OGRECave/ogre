@@ -44,7 +44,7 @@ namespace Ogre
         : mType(oth.mType)
         , mProgram(oth.mProgram)
         // nfz: parameters should be copied not just use a shared ptr to the original
-		, mParameters(new GpuProgramParameters(*oth.mParameters))
+		, mParameters(OGRE_NEW GpuProgramParameters(*oth.mParameters))
 	{
 	}
 	//-----------------------------------------------------------------------------

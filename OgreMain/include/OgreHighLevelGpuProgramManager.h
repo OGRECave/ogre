@@ -38,7 +38,7 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 	/** Interface definition for factories of HighLevelGpuProgram. */
-	class _OgreExport HighLevelGpuProgramFactory
+	class _OgreExport HighLevelGpuProgramFactory : public FactoryAlloc
 	{
 	public:
         HighLevelGpuProgramFactory() {}

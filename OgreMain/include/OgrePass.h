@@ -1531,7 +1531,7 @@ namespace Ogre {
         may require splitting into its component parts in order to be categorised
         properly.
     */
-    struct IlluminationPass
+	struct IlluminationPass : public PassAlloc
     {
         IlluminationStage stage;
         /// The pass to use in this stage
@@ -1540,6 +1540,8 @@ namespace Ogre {
         bool destroyOnShutdown;
         /// The original pass which spawned this one
         Pass* originalPass;
+
+		IlluminationPass() {}
     };
 
     typedef std::vector<IlluminationPass*> IlluminationPassList;

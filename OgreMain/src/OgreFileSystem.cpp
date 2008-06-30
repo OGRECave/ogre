@@ -203,20 +203,20 @@ namespace Ogre {
         assert(ret == 0 && "Problem getting file size" );
 
         // Always open in binary mode
-        std::ifstream *origStream = new std::ifstream();
+        std::ifstream *origStream = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL)();
         origStream->open(full_path.c_str(), std::ios::in | std::ios::binary);
 
         // Should check ensure open succeeded, in case fail for some reason.
         if (origStream->fail())
         {
-            delete origStream;
+            OGRE_DELETE_T(origStream, basic_ifstream, MEMCATEGORY_GENERAL);
             OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
                 "Cannot open file: " + filename,
                 "FileSystemArchive::open");
         }
 
         /// Construct return stream, tell it to delete on destroy
-        FileStreamDataStream* stream = new FileStreamDataStream(filename,
+        FileStreamDataStream* stream = OGRE_NEW FileStreamDataStream(filename,
             origStream, tagStat.st_size, true);
         return DataStreamPtr(stream);
     }
@@ -224,7 +224,8 @@ namespace Ogre {
     StringVectorPtr FileSystemArchive::list(bool recursive, bool dirs)
     {
 		// directory change requires locking due to saved returns
-        StringVectorPtr ret(new StringVector());
+		// Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
+		StringVectorPtr ret(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         findFiles("*", recursive, dirs, ret.getPointer(), 0);
 
@@ -233,7 +234,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     FileInfoListPtr FileSystemArchive::listFileInfo(bool recursive, bool dirs)
     {
-        FileInfoListPtr ret(new FileInfoList());
+		// Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
+        FileInfoListPtr ret(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         findFiles("*", recursive, dirs, 0, ret.getPointer());
 
@@ -243,7 +245,8 @@ namespace Ogre {
     StringVectorPtr FileSystemArchive::find(const String& pattern,
                                             bool recursive, bool dirs)
     {
-        StringVectorPtr ret(new StringVector());
+		// Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
+		StringVectorPtr ret(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         findFiles(pattern, recursive, dirs, ret.getPointer(), 0);
 
@@ -254,7 +257,8 @@ namespace Ogre {
     FileInfoListPtr FileSystemArchive::findFileInfo(const String& pattern, 
         bool recursive, bool dirs)
     {
-        FileInfoListPtr ret(new FileInfoList());
+		// Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
+		FileInfoListPtr ret(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         findFiles(pattern, recursive, dirs, 0, ret.getPointer());
 
@@ -273,7 +277,15 @@ namespace Ogre {
         if (ret && is_absolute_path(filename.c_str()))
 		{
 			// only valid if full path starts with our base
-			ret = Ogre::StringUtil::startsWith(full_path, mName);
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+			// case insensitive on windows
+			String lowerCaseName = mName;
+			StringUtil::toLowerCase(lowerCaseName);
+			ret = Ogre::StringUtil::startsWith(full_path, lowerCaseName, true);
+#else
+			// case sensitive
+			ret = Ogre::StringUtil::startsWith(full_path, mName, false);
+#endif
 		}
 
 		return ret;

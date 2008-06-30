@@ -37,7 +37,7 @@ namespace Ogre {
     class CompositorScriptCompiler;
 
     /** Class for serializing Compositors to / from a .compositor script.*/
-    class _OgreExport CompositorSerializer
+	class _OgreExport CompositorSerializer : public SerializerAlloc
     {
 
     public:
