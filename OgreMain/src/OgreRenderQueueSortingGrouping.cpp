@@ -307,7 +307,7 @@ namespace Ogre {
         if (i != mGrouped.end())
         {
             // free memory
-            OGRE_DELETE i->second;
+            OGRE_DELETE_T(i->second, RenderableList, MEMCATEGORY_SCENE_CONTROL);
             // erase from map
             mGrouped.erase(i);
         }
