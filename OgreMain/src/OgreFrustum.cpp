@@ -66,6 +66,7 @@ namespace Ogre {
         mRecalcVertexData(true),
 		mCustomViewMatrix(false),
 		mCustomProjMatrix(false),
+		mFrustumExtentsManuallySet(false),
         mReflect(false), 
         mLinkedReflectPlane(0),
         mObliqueDepthProjection(false), 
@@ -340,8 +341,15 @@ namespace Ogre {
 		}
 		else
 		{
+			if (mFrustumExtentsManuallySet)
+			{
+				left = mLeft;
+				right = mRight;
+				top = mTop;
+				bottom = mBottom;
+			}
 			// Calculate general projection parameters
-			if (mProjType == PT_PERSPECTIVE)
+			else if (mProjType == PT_PERSPECTIVE)
 			{
 				Radian thetaY (mFOVy * 0.5f);
 				Real tanThetaY = Math::Tan(thetaY);
@@ -357,6 +365,11 @@ namespace Ogre {
 				right  = + half_w + nearOffsetX;
 				bottom = - half_h + nearOffsetY;
 				top    = + half_h + nearOffsetY;
+
+				mLeft = left;
+				mRight = right;
+				mTop = top;
+				mBottom = bottom;
 			}
 			else
 			{
@@ -368,6 +381,11 @@ namespace Ogre {
 				right  = + half_w;
 				bottom = - half_h;
 				top    = + half_h;
+
+				mLeft = left;
+				mRight = right;
+				mTop = top;
+				mBottom = bottom;
 			}
 
 		}
@@ -1305,6 +1323,33 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
+	void Frustum::setFrustumExtents(Real left, Real right, Real top, Real bottom)
+	{
+		mFrustumExtentsManuallySet = true;
+		mLeft = left;
+		mRight = right;
+		mTop = top;
+		mBottom = bottom;
+
+		invalidateFrustum();
+	}
+	//---------------------------------------------------------------------
+	void Frustum::resetFrustumExtents()
+	{
+		mFrustumExtentsManuallySet = false;
+		invalidateFrustum();
+	}
+	//---------------------------------------------------------------------
+	void Frustum::getFrustumExtents(Real& outleft, Real& outright, Real& outtop, Real& outbottom) const
+	{
+		updateFrustum();
+		outleft = mLeft;
+		outright = mRight;
+		outtop = mTop;
+		outbottom = mBottom;
+	}
+	//---------------------------------------------------------------------
+
 
 
 

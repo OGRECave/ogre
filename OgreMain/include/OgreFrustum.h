@@ -112,6 +112,10 @@ namespace Ogre
 		bool mCustomViewMatrix;
 		/// Are we using a custom projection matrix?
 		bool mCustomProjMatrix;
+		/// Have the frustum extents been manually set?
+		bool mFrustumExtentsManuallySet;
+		/// Frustum extents
+		mutable Real mLeft, mRight, mTop, mBottom;
 
 		
         // Internal functions for calcs
@@ -294,6 +298,17 @@ namespace Ogre
         /** Returns focal length of frustum.
         */
         virtual Real getFocalLength() const;
+
+		/** Manually set the extents of the frustum.
+		@param left, right, top, bottom The position where the side clip planes intersect
+			the near clip plane, in eye space
+		*/
+		virtual void setFrustumExtents(Real left, Real right, Real top, Real bottom);
+		/** Reset the frustum extents to be automatically derived from other params. */
+		virtual void resetFrustumExtents(); 
+		/** Get the extents of the frustum in view space. */
+		virtual void getFrustumExtents(Real& outleft, Real& outright, Real& outtop, Real& outbottom) const;
+
 
         /** Gets the projection matrix for this frustum adjusted for the current
 			rendersystem specifics (may be right or left-handed, depth range
