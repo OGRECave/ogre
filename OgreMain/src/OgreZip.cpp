@@ -296,7 +296,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ZipDataStream::close(void)
     {
-        zzip_file_close(mZzipFile);
+		// allow repeat calls
+		if (mZzipFile)
+		{
+			zzip_file_close(mZzipFile);
+			mZzipFile = 0;
+		}
     }
     //-----------------------------------------------------------------------
     const String& ZipArchiveFactory::getType(void) const
