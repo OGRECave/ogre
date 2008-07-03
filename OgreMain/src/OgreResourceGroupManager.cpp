@@ -598,8 +598,6 @@ namespace Ogre {
 				OGRE_DELETE_T(*li, ResourceLocation, MEMCATEGORY_RESOURCE);
 				grp->locationList.erase(li);
 
-				ArchiveManager::getSingleton().unload(pArch);
-
 				break;
 			}
 
