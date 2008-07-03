@@ -605,47 +605,46 @@ compositor "Gaussian Blur"
 }
 
 // Testing MRT
-//compositor TestMRT
-//{
-//	technique
-//	{
-//		// temporary texture (MRT!)
-//		// 4 sub-surfaces, all 32-bit
-//		// NB GL FBO doesn't seem to like binding different formats, but D3D is happy with same bitdepths / different format
-//		texture mrt0 target_width target_height PF_A8R8G8B8 PF_A8R8G8B8 PF_A8R8G8B8 PF_A8R8G8B8
-//
-//        target mrt0
-//        {
-//            // Render scene using MRT-compatible material scheme
-//          input none
-//			material_scheme MRT			
-//			pass clear
-//			{
-//				
-//			}
-//			pass render_scene
-//			{
-//			}
-//        }
-//
-//		target_output
-//		{
-//			input none
-//            pass render_quad
-//            {
-//                // Renders a fullscreen quad 
-//				material Ogre/MRTtest/quad
-//				// bind 4 MRT surfaces as texture inputs
-//                input 0 mrt0 0
-//                input 1 mrt0 1
-//				input 2 mrt0 2
-//                input 3 mrt0 3
-//          }
-//			
-//		}
-//
-//	}
-//}
+compositor TestMRT
+{
+	technique
+	{
+		// temporary texture (MRT!)
+		// 4 sub-surfaces, all 32-bit
+		texture mrt0 target_width target_height PF_A8R8G8B8 PF_A8R8G8B8 PF_A8R8G8B8 PF_A8R8G8B8
+
+        target mrt0
+        {
+            // Render scene using MRT-compatible material scheme
+          input none
+			material_scheme MRT			
+			pass clear
+			{
+				
+			}
+			pass render_scene
+			{
+			}
+        }
+
+		target_output
+		{
+			input none
+            pass render_quad
+            {
+                // Renders a fullscreen quad 
+				material Ogre/MRTtest/quad
+				// bind 4 MRT surfaces as texture inputs
+                input 0 mrt0 0
+                input 1 mrt0 1
+				input 2 mrt0 2
+                input 3 mrt0 3
+          }
+			
+		}
+
+	}
+}
 
 //Radial blur effect
 compositor "Radial Blur"
