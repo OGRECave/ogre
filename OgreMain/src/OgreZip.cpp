@@ -229,6 +229,24 @@ namespace Ogre {
 		return (res == ZZIP_NO_ERROR);
 
 	}
+	//---------------------------------------------------------------------
+	time_t ZipArchive::getModifiedTime(const String& filename)
+	{
+		// Zziplib doesn't yet support getting the modification time of individual files
+		// so just check the mod time of the zip itself
+		struct stat tagStat;
+		bool ret = (stat(mName.c_str(), &tagStat) == 0);
+
+		if (ret)
+		{
+			return tagStat.st_mtime;
+		}
+		else
+		{
+			return 0;
+		}
+
+	}
 	//-----------------------------------------------------------------------
     void ZipArchive::checkZzipError(int zzipError, const String& operation) const
     {
@@ -296,12 +314,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ZipDataStream::close(void)
     {
-		// allow repeat calls
-		if (mZzipFile)
-		{
-			zzip_file_close(mZzipFile);
-			mZzipFile = 0;
-		}
+        zzip_file_close(mZzipFile);
     }
     //-----------------------------------------------------------------------
     const String& ZipArchiveFactory::getType(void) const

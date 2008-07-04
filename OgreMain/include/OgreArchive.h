@@ -34,6 +34,7 @@ Torus Knot Software Ltd.
 #include "OgreDataStream.h"
 #include "OgreSharedPtr.h"
 #include "OgreStringVector.h"
+#include <ctime>
 
 namespace Ogre {
 
@@ -168,6 +169,10 @@ namespace Ogre {
 
         /** Find out if the named file exists (note: fully qualified filename required) */
         virtual bool exists(const String& filename) = 0; 
+
+		/** Retrieve the modification time of a given file */
+		virtual time_t getModifiedTime(const String& filename) = 0; 
+
 
         /** Find all files or directories matching a given pattern in this
             archive and get some detailed information about them.

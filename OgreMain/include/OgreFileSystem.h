@@ -87,6 +87,9 @@ namespace Ogre {
         /// @copydoc Archive::exists
         bool exists(const String& filename);
 
+		/// @copydoc Archive::getModifiedTime
+		time_t getModifiedTime(const String& filename);
+
 		/// Set whether filesystem enumeration will include hidden files or not.
 		/// This should be called prior to declaring and/or initializing filesystem
 		/// resource locations. The default is true (ignore hidden files).

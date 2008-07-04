@@ -36,6 +36,7 @@ Torus Knot Software Ltd.
 #include "OgreResource.h"
 #include "OgreArchive.h"
 #include "OgreIteratorWrappers.h"
+#include <ctime>
 
 namespace Ogre {
 
@@ -786,8 +787,13 @@ namespace Ogre {
         FileInfoListPtr findResourceFileInfo(const String& group, const String& pattern,
             bool dirs = false);
 
+		/** Retrieve the modification time of a given file */
+		time_t resourceModifiedTime(const String& group, const String& filename); 
         
-        /** Adds a ResourceGroupListener which will be called back during 
+		/** Retrieve the modification time of a given file */
+		time_t resourceModifiedTime(ResourceGroup* group, const String& filename); 
+
+		/** Adds a ResourceGroupListener which will be called back during 
             resource loading events. 
         */
         void addResourceGroupListener(ResourceGroupListener* l);

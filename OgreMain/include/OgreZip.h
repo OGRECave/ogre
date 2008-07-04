@@ -85,6 +85,9 @@ namespace Ogre {
 
         /// @copydoc Archive::exists
         bool exists(const String& filename);
+
+		/// @copydoc Archive::getModifiedTime
+		time_t getModifiedTime(const String& filename);
     };
 
     /** Specialisation of ArchiveFactory for Zip files. */
