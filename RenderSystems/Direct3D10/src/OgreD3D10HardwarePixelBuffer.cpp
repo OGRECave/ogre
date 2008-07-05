@@ -65,6 +65,10 @@ namespace Ogre {
 	}
 	D3D10HardwarePixelBuffer::~D3D10HardwarePixelBuffer()
 	{
+		for(size_t i = 0 ; i < mSliceTRT.size() ; i++)
+		{
+			delete mSliceTRT[i];
+		}
 	}
 	//-----------------------------------------------------------------------------  
 	// Util functions to convert a D3D locked box to a pixel box

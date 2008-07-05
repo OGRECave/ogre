@@ -2311,14 +2311,6 @@ namespace Ogre
 
 			mFixedFuncState.setTextureLayerStateList(opState->mTextureLayerStateList);
 
-			const VertexBufferDeclaration &  vertexBufferDeclaration = 
-				(static_cast<D3D10VertexDeclaration *>(op.vertexData->vertexDeclaration))->getVertexBufferDeclaration();
-
-			opState->mFixedFuncPrograms = mFixedFuncEmuShaderManager.getShaderPrograms("hlsl4", 
-				vertexBufferDeclaration,
-				mFixedFuncState
-				);
-
 
 			if (!unstandardRenderOperation)
 			{
@@ -2401,33 +2393,52 @@ namespace Ogre
 
 
 
-		// well, in D3D10 we have to make sure that we have a vertex and fagmant shader
+		// well, in D3D10 we have to make sure that we have a vertex and fragment shader
 		// bound before we start rendering, so we do that first...
-		bool needToUnmapVS = false;
 		bool needToUnmapFS = false;
-	 	if (!mBoundVertexProgram) // I know this is bad code - but I want to get things going
+		bool needToUnmapVS = false;
+	 	if (!mBoundVertexProgram || !mBoundFragmentProgram) // I know this is bad code - but I want to get things going
 		{
-			assert (!mBoundFragmentProgram); // not allowed for now
+			
+
+	
+			{
+				const VertexBufferDeclaration &  vertexBufferDeclaration = 
+					(static_cast<D3D10VertexDeclaration *>(op.vertexData->vertexDeclaration))->getVertexBufferDeclaration();
+
+				opState->mFixedFuncPrograms = mFixedFuncEmuShaderManager.getShaderPrograms("hlsl4", 
+					vertexBufferDeclaration,
+					mFixedFuncState
+					);
+			}
+
+
 
 			FixedFuncPrograms * fixedFuncPrograms = opState->mFixedFuncPrograms;
-
-
-
-
-				needToUnmapVS = true;
-				needToUnmapFS = true;
 				
-				fixedFuncPrograms->setFixedFuncProgramsParameters(mFixedFuncProgramsParameters);
+			
+			fixedFuncPrograms->setFixedFuncProgramsParameters(mFixedFuncProgramsParameters);
 
+			if (!mBoundVertexProgram)
+			{
+				needToUnmapVS = true;
 				// Bind Vertex Program
 				bindGpuProgram(fixedFuncPrograms->getVertexProgramUsage()->getProgram().get());
 				bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
 					fixedFuncPrograms->getVertexProgramUsage()->getParameters());
-				
+
+			}
+
+			if (!mBoundFragmentProgram)
+			{
+				needToUnmapFS = true;
 				// Bind Fragment Program 
 				bindGpuProgram(fixedFuncPrograms->getFragmentProgramUsage()->getProgram().get());
 				bindGpuProgramParameters(GPT_FRAGMENT_PROGRAM, 
 					fixedFuncPrograms->getFragmentProgramUsage()->getParameters());
+			}
+				
+
 		
 		}
 
@@ -2587,6 +2598,13 @@ namespace Ogre
 	//---------------------------------------------------------------------
     void D3D10RenderSystem::bindGpuProgram(GpuProgram* prg)
     {
+		if (!prg)
+		{
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Null program bound.",
+				"D3D10RenderSystem::bindGpuProgram");
+		}
+
 		switch (prg->getType())
 		{
 		case GPT_VERTEX_PROGRAM:
@@ -2660,15 +2678,19 @@ namespace Ogre
 			{
 				//	if (params->getAutoConstantCount() > 0)
 				//{
-				pBuffers[0] = mBoundVertexProgram->getConstantBuffer(params);
-				mDevice->VSSetConstantBuffers( 0, 1, pBuffers );
-				if (mDevice.isError())
+				if (mBoundVertexProgram)
 				{
-					String errorDescription = mDevice.getErrorDescription();
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-						"D3D10 device cannot set vertex shader constant buffers\nError Description:" + errorDescription,
-						"D3D10RenderSystem::bindGpuProgramParameters");
-				}		
+					pBuffers[0] = mBoundVertexProgram->getConstantBuffer(params);
+					mDevice->VSSetConstantBuffers( 0, 1, pBuffers );
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D10 device cannot set vertex shader constant buffers\nError Description:" + errorDescription,
+							"D3D10RenderSystem::bindGpuProgramParameters");
+					}		
+
+				}
 				//}
 				//else
 				//{
@@ -2680,15 +2702,19 @@ namespace Ogre
 			{
 				//if (params->getAutoConstantCount() > 0)
 				//{
-				pBuffers[0] = mBoundFragmentProgram->getConstantBuffer(params);
-				mDevice->PSSetConstantBuffers( 0, 1, pBuffers );
-				if (mDevice.isError())
+				if (mBoundFragmentProgram)
 				{
-					String errorDescription = mDevice.getErrorDescription();
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-						"D3D10 device cannot set fragment shader constant buffers\nError Description:" + errorDescription,
-						"D3D10RenderSystem::bindGpuProgramParameters");
-				}		
+					pBuffers[0] = mBoundFragmentProgram->getConstantBuffer(params);
+					mDevice->PSSetConstantBuffers( 0, 1, pBuffers );
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D10 device cannot set fragment shader constant buffers\nError Description:" + errorDescription,
+							"D3D10RenderSystem::bindGpuProgramParameters");
+					}		
+
+				}
 				//}
 				//else
 				//{

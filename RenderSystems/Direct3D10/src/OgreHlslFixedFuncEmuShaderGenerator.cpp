@@ -57,6 +57,8 @@ namespace Ogre
 
 		shaderSource = shaderSource + "struct VS_INPUT { ";
 
+		std::map<uint8, VertexElementType> texCordVecType;
+
 		uint8 semanticCount[100];
 		ZeroMemory(semanticCount, sizeof(uint8) * 100);
 		const VertexBufferElementList & vertexBufferElementList = vertexBufferDeclaration.getVertexBufferElementList();
@@ -139,6 +141,7 @@ namespace Ogre
 				break;
 			case VES_TEXTURE_COORDINATES:
 				parameterName = "Texcoord";
+				texCordVecType[semanticCount[semantic]-1] = type;
 				parameterShaderTypeName = "TEXCOORD";
 				break;
 			case VES_BINORMAL:
@@ -236,16 +239,15 @@ namespace Ogre
 
 			const TextureLayerState & curTextureLayerState = fixedFuncState.getTextureLayerStateList()[i];
 
-			switch(curTextureLayerState.getTextureType())
+			switch(texCordVecType[i])
 			{
-			case TEX_TYPE_1D:
+			case VET_FLOAT1:
 				shaderSource = shaderSource + "float1 Texcoord" + layerCounter + " : TEXCOORD" + layerCounter + ";\n";
 				break;
-			case TEX_TYPE_2D:
+			case VET_FLOAT2:
 				shaderSource = shaderSource + "float2 Texcoord" + layerCounter + " : TEXCOORD" + layerCounter + ";\n";
 				break;
-			case TEX_TYPE_CUBE_MAP:
-			case TEX_TYPE_3D:
+			case VET_FLOAT3:
 				shaderSource = shaderSource + "float3 Texcoord" + layerCounter + " : TEXCOORD" + layerCounter + ";\n";
 				break;
 			}
@@ -294,17 +296,17 @@ namespace Ogre
 				if (curTextureLayerState.getCoordIndex() < texcoordCount)
 				{
 
-					switch(curTextureLayerState.getTextureType())
+					switch(texCordVecType[i])
 					{
-					case TEX_TYPE_1D:
+					case VET_FLOAT1:
 						shaderSource = shaderSource + "output.Texcoord" + layerCounter + " = input.Texcoord" + coordIdx + ";\n";		
 						break;
-					case TEX_TYPE_2D:
+					case VET_FLOAT2:
 						shaderSource = shaderSource + "float4 texCordWithMatrix = float4(input.Texcoord" + coordIdx + ".x, input.Texcoord" + coordIdx + ".y, 0, 1);\n";
 						shaderSource = shaderSource + "texCordWithMatrix = mul(texCordWithMatrix, TextureMatrix" + layerCounter + " );\n";
 						shaderSource = shaderSource + "output.Texcoord" + layerCounter + " = texCordWithMatrix.xy;\n";		
 						break;
-					case TEX_TYPE_3D:
+					case VET_FLOAT3:
 						shaderSource = shaderSource + "output.Texcoord" + layerCounter + " = input.Texcoord" + coordIdx + ";\n";		
 						break;
 					}
@@ -313,16 +315,16 @@ namespace Ogre
 				else
 				{
 
-					switch(curTextureLayerState.getTextureType())
+					switch(texCordVecType[i])
 					{
-					case TEX_TYPE_1D:
-						shaderSource = shaderSource + "output.Texcoord" + layerCounter + " = float1(0.0, 0.0);\n"; // so no error
+					case VET_FLOAT1:
+						shaderSource = shaderSource + "output.Texcoord" + layerCounter + " = 0.0;\n"; // so no error
 						break;
-					case TEX_TYPE_2D:
+					case VET_FLOAT2:
 						shaderSource = shaderSource + "output.Texcoord" + layerCounter + " = float2(0.0, 0.0);\n"; // so no error
 						break;
-					case TEX_TYPE_3D:
-						shaderSource = shaderSource + "output.Texcoord" + layerCounter + " = float3(0.0, 0.0);\n"; // so no error
+					case VET_FLOAT3:
+						shaderSource = shaderSource + "output.Texcoord" + layerCounter + " = float3(0.0, 0.0, 0.0);\n"; // so no error
 						break;
 					}
 				}
@@ -348,11 +350,23 @@ namespace Ogre
 			case TEXCALC_ENVIRONMENT_MAP_NORMAL:
 				break;
 			case TEXCALC_PROJECTIVE_TEXTURE:
-				shaderSource = shaderSource + "{\n";	
-				shaderSource = shaderSource + "	float4 cameraPosNorm = normalize(cameraPos);\n";	
-				shaderSource = shaderSource + "output.Texcoord" + layerCounter + ".x = 0.5 + cameraPosNorm.x;\n";	
-				shaderSource = shaderSource + "output.Texcoord" + layerCounter + ".y = 0.5 - cameraPosNorm.y;\n";	
-				shaderSource = shaderSource + "}\n";
+
+				switch(texCordVecType[i])
+				{
+				case VET_FLOAT1:
+					shaderSource = shaderSource + "{\n";	
+					shaderSource = shaderSource + "	float4 cameraPosNorm = normalize(cameraPos);\n";	
+					shaderSource = shaderSource + "output.Texcoord" + layerCounter + ".x = 0.5 + cameraPosNorm.x;\n";	
+					shaderSource = shaderSource + "}\n";					break;
+				case VET_FLOAT2:
+				case VET_FLOAT3:
+					shaderSource = shaderSource + "{\n";	
+					shaderSource = shaderSource + "	float4 cameraPosNorm = normalize(cameraPos);\n";	
+					shaderSource = shaderSource + "output.Texcoord" + layerCounter + ".x = 0.5 + cameraPosNorm.x;\n";	
+					shaderSource = shaderSource + "output.Texcoord" + layerCounter + ".y = 0.5 - cameraPosNorm.y;\n";	
+					shaderSource = shaderSource + "}\n";					break;
+					break;
+				}
 				break;
 			}
 			shaderSource = shaderSource + "}\n";
@@ -445,22 +459,22 @@ namespace Ogre
 				shaderSource = shaderSource + "  float3 PosDiff = " + prefix + "Position-(float3)mul(input.Position0, World);\n";
 				shaderSource = shaderSource + "   float3 L = mul(normalize(PosDiff), (float3x3)ViewIT);\n";
 				shaderSource = shaderSource + "   float NdotL = dot(N, L);\n";
-				shaderSource = shaderSource + "   Out.Color = " + prefix + "Ambient;\n";
-				shaderSource = shaderSource + "   Out.ColorSpec = 0;\n";
+				shaderSource = shaderSource + "   float4 Color = " + prefix + "Ambient;\n";
+				shaderSource = shaderSource + "   float4 ColorSpec = 0;\n";
 				shaderSource = shaderSource + "   float fAttenSpot = 1.f;\n";
 				shaderSource = shaderSource + "   if(NdotL >= 0.f)\n";
 				shaderSource = shaderSource + "   {\n";
 				shaderSource = shaderSource + "      //compute diffuse color\n";
-				shaderSource = shaderSource + "      Out.Color += NdotL * " + prefix + "Diffuse;\n";
+				shaderSource = shaderSource + "      output.Color += NdotL * " + prefix + "Diffuse;\n";
 				shaderSource = shaderSource + "      //add specular component\n";
 				shaderSource = shaderSource + "       float3 H = normalize(L + V);   //half vector\n";
-				shaderSource = shaderSource + "       Out.ColorSpec = pow(max(0, dot(H, N)), fMaterialPower) * " + prefix + "Specular;\n";
+				shaderSource = shaderSource + "       output.ColorSpec = pow(max(0, dot(H, N)), fMaterialPower) * " + prefix + "Specular;\n";
 				shaderSource = shaderSource + "      float LD = length(PosDiff);\n";
-				shaderSource = shaderSource + "      if(LD > lights[i].fRange)\n";
-				shaderSource = shaderSource + "      {\n";
-				shaderSource = shaderSource + "         fAttenSpot = 0.f;\n";
-				shaderSource = shaderSource + "      }\n";
-				shaderSource = shaderSource + "      else\n";
+				//shaderSource = shaderSource + "      if(LD > lights[i].fRange)\n";
+				//shaderSource = shaderSource + "      {\n";
+				//shaderSource = shaderSource + "         fAttenSpot = 0.f;\n";
+				//shaderSource = shaderSource + "      }\n";
+				//shaderSource = shaderSource + "      else\n";
 				shaderSource = shaderSource + "      {\n";
 				shaderSource = shaderSource + "         fAttenSpot *= 1.f/(" + prefix + "Attenuation.x + " + prefix + "Attenuation.y*LD + " + prefix + "Attenuation.z*LD*LD);\n";
 				shaderSource = shaderSource + "      }\n";
@@ -541,6 +555,7 @@ namespace Ogre
 
 		shaderSource = shaderSource + "float4 finalColor = input.Color + input.ColorSpec;\n";
 
+
 		for(size_t i = 0 ; i < fixedFuncState.getTextureLayerStateList().size() ; i++)
 		{
 			const TextureLayerState & curTextureLayerState = fixedFuncState.getTextureLayerStateList()[i];
@@ -549,16 +564,46 @@ namespace Ogre
 			switch(curTextureLayerState.getTextureType())
 			{
 			case TEX_TYPE_1D:
-				shaderSource = shaderSource + "float4 texColor = tex1D(Texture" + layerCounter + ", input.Texcoord" + layerCounter + ");\n";
+				{
+					switch(texCordVecType[i])
+					{
+					case VET_FLOAT1:
+						shaderSource = shaderSource + "float4 texColor = tex1D(Texture" + layerCounter + ", input.Texcoord" + layerCounter + ");\n";
+						break;
+					case VET_FLOAT2:
+						shaderSource = shaderSource + "float4 texColor = tex1D(Texture" + layerCounter + ", input.Texcoord" + layerCounter + ".x);\n";
+						break;
+					}
+				}
+				
 				break;
 			case TEX_TYPE_2D:
-				shaderSource = shaderSource + "float4 texColor = tex2D(Texture" + layerCounter + ", input.Texcoord" + layerCounter + ");\n";
-				break;
-			case TEX_TYPE_3D:
-				shaderSource = shaderSource + "float4 texColor = tex3D(Texture" + layerCounter + ", input.Texcoord" + layerCounter + ");\n";
+				{
+					switch(texCordVecType[i])
+					{
+					case VET_FLOAT1:
+						shaderSource = shaderSource + "float4 texColor = tex2D(Texture" + layerCounter + ", float2(input.Texcoord" + layerCounter + ", 0.0));\n";
+						break;
+					case VET_FLOAT2:
+						shaderSource = shaderSource + "float4 texColor = tex2D(Texture" + layerCounter + ", input.Texcoord" + layerCounter + ");\n";
+						break;
+					}
+				}
+
 				break;
 			case TEX_TYPE_CUBE_MAP:
-				shaderSource = shaderSource + "float4 texColor = texCUBE(Texture" + layerCounter + ", input.Texcoord" + layerCounter + ");\n";
+			case TEX_TYPE_3D:
+				switch(texCordVecType[i])
+				{
+				case VET_FLOAT1:
+					shaderSource = shaderSource + "float4 texColor = tex3D(Texture" + layerCounter + ", float3(input.Texcoord" + layerCounter + ", 0.0, 0.0));\n";
+					break;
+				case VET_FLOAT2:
+					shaderSource = shaderSource + "float4 texColor = tex3D(Texture" + layerCounter + ", float3(input.Texcoord" + layerCounter + ".x, input.Texcoord" + layerCounter + ".y, 0.0));\n";
+					break;
+				case VET_FLOAT3:
+					shaderSource = shaderSource + "float4 texColor = tex3D(Texture" + layerCounter + ", input.Texcoord" + layerCounter + ");\n";
+				}
 				break;
 			}
 			LayerBlendModeEx blend = curTextureLayerState.getLayerBlendModeEx();

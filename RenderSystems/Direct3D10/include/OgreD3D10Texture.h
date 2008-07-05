@@ -225,7 +225,7 @@ namespace Ogre {
 		ID3D10DepthStencilView * mDepthStencilView;
 	public:
 		D3D10RenderTexture(const String &name, D3D10HardwarePixelBuffer *buffer, D3D10Device & device );
-		~D3D10RenderTexture() {}
+		virtual ~D3D10RenderTexture();
 
 		void rebind(D3D10HardwarePixelBuffer *buffer);
 
