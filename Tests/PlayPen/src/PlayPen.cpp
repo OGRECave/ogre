@@ -6157,7 +6157,7 @@ protected:
 		Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
 		pPlaneEnt->setMaterialName("Examples/GrassFloor");
 		pPlaneEnt->setCastShadows(false);
-		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
+		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(150,0,100))->attachObject(pPlaneEnt);
 
 		Real lightRange = 1000;
 		Real spotWidth = 300;
@@ -6761,43 +6761,11 @@ protected:
 
 	void testBug()
 	{
-		// NOTE: enable flag only turns on SRGB for texture sampling, you may
-		// need to configure the window for the reverse conversion for consistency!
-		HighLevelGpuProgramPtr vp = HighLevelGpuProgramManager::getSingleton().createProgram("vp", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, "hlsl", GPT_VERTEX_PROGRAM);
-		vp->setSourceFile("Example_Basic.hlsl");
-		vp->setParameter("target", "vs_3_0");
-		vp->setParameter("entry_point", "ambientOneTexture_vp");
-		vp->getDefaultParameters()->setNamedAutoConstant("worldViewProj", GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-		vp->load();
-		HighLevelGpuProgramPtr fp = HighLevelGpuProgramManager::getSingleton().createProgram("fp", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, "hlsl", GPT_FRAGMENT_PROGRAM);
-		fp->setSource(" \
-			uniform int numLoop;  \
-			float4 ps_main() : COLOR0  \
-		{      \
-			float accum = 0.0; \
-			for (int i = 0; i < numLoop; ++i) \
-			{ \
-				accum += 0.2; \
-			} \
-			return( float4( accum, accum, accum, 1.0f ) ); \
-		} \
-		");
-		fp->setParameter("target", "ps_3_0");
-		fp->setParameter("entry_point", "ps_main");
-		fp->load();
+		const_cast<RenderSystemCapabilities*>(mRoot->getRenderSystem()->getCapabilities())->setCapability(RSC_AUTOMIPMAP);
 
-		fp->reload();
 
-		MaterialPtr mat = MaterialManager::getSingleton().create("testint", 
-			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		Pass* p = mat->getTechnique(0)->getPass(0);
-		p->setLightingEnabled(false);
-		p->setCullingMode(CULL_NONE);
-		p->setVertexProgram(vp->getName());
-		p->setFragmentProgram(fp->getName());
-		mat->load();
-
-		p->getFragmentProgramParameters()->setNamedConstant("numLoop", (int)3);
+		MaterialPtr mat = MaterialManager::getSingleton().create("uncompressed2d", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		mat->getTechnique(0)->getPass(0)->createTextureUnitState("ogrelogo.png");
 
 		Entity *e = mSceneMgr->createEntity("Plane", SceneManager::PT_PLANE);
 		e->setMaterialName(mat->getName());
@@ -6807,6 +6775,31 @@ protected:
 		mCamera->setPosition(0,0,300);
 		mCamera->lookAt(Vector3::ZERO);
 
+	}
+
+	void testManualObject2D()
+	{
+		ManualObject* man = mSceneMgr->createManualObject("1");
+		man->begin("Examples/OgreLogo");
+		man->position( 0.0, 0.0, 0.0);  man->textureCoord( 0, 1 );
+		man->position( 0.1, 0.0, 0.0);  man->textureCoord( 1, 1 );
+		man->position( 0.1, 0.1, 0.0);  man->textureCoord( 1, 0 );
+		man->position( 0.0, 0.1, 0.0);  man->textureCoord( 0, 0 );
+
+		man->triangle( 0, 1, 2 );
+		man->triangle( 0, 2, 3 );
+
+		man->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY -1); 
+		man->end();
+		man->setUseIdentityProjection(true);
+		man->setUseIdentityView(true);
+		AxisAlignedBox aabb;
+		aabb.setInfinite();
+		man->setBoundingBox(aabb);
+
+		SceneNode* sn = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		sn->setScale(5,5,1);
+		sn->attachObject(man);
 	}
 
 
@@ -6830,7 +6823,7 @@ protected:
 		String typ = Image::getFileExtFromMagic(stream);
 
 		std::cout << pos;
-		/*
+
 		AnyNumeric anyInt1(43);
 		AnyNumeric anyInt2(5);
 		AnyNumeric anyInt3 = anyInt1 + anyInt2;
@@ -6846,8 +6839,7 @@ protected:
 
 		std::cout << anyInt3;
 
-		//Any anyString("test");
-		*/
+		Any anyString(String("test"));
 
 		//testBug();
 		//testSharedPtrBug();
@@ -6912,7 +6904,7 @@ protected:
 		//testPoseAnimation();
 		//testPoseAnimation2();
 		//testNormalMapMirroredUVs();
-		//testMRTCompositorScript();
+		testMRTCompositorScript();
 		//testSpotlightViewProj(true);
 		//test16Textures();
 		//testProjectSphere();
@@ -6927,6 +6919,7 @@ protected:
 		//testManualObjectNonIndexedUpdateLarger();
 		//testManualObjectIndexedUpdateSmaller();
 		//testManualObjectIndexedUpdateLarger();
+		//testManualObject2D();
 		//testCustomProjectionMatrix();
 		//testPointSprites();
 		//testFallbackResourceGroup();
@@ -6943,7 +6936,7 @@ protected:
 		//testMaterialSchemesListener();
 		//testMaterialSchemesWithLOD();
 		//testMaterialSchemesWithMismatchedLOD();
-        testSkeletonAnimationOptimise();
+        //testSkeletonAnimationOptimise();
         //testBuildTangentOnAnimatedMesh();
 		//testOverlayRelativeMode();
 

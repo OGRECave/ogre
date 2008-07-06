@@ -33,7 +33,7 @@ Torus Knot Software Ltd.
 using namespace Ogre;
 
 // subclass from MaterialScriptCompiler class so protected methods can be tested
-class CompositorScriptCompilerTests : public CppUnit::TestFixture, CompositorScriptCompiler
+class CompositorScriptCompilerTests : public CppUnit::TestFixture, public CompositorScriptCompiler
 {
     // CppUnit macros for setting up the test suite
     CPPUNIT_TEST_SUITE( CompositorScriptCompilerTests );

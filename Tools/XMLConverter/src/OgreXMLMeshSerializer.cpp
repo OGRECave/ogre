@@ -229,7 +229,8 @@ namespace Ogre {
         subMeshNode->SetAttribute("usesharedvertices", 
             StringConverter::toString(s->useSharedVertices) );
         // bool use32BitIndexes
-		bool use32BitIndexes = (s->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
+		bool use32BitIndexes = (!s->indexData->indexBuffer.isNull() && 
+			s->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
         subMeshNode->SetAttribute("use32bitindexes", 
             StringConverter::toString( use32BitIndexes ));
 
@@ -237,10 +238,13 @@ namespace Ogre {
         switch(s->operationType)
         {
         case RenderOperation::OT_LINE_LIST:
+            subMeshNode->SetAttribute("operationtype", "line_list");
+            break;
         case RenderOperation::OT_LINE_STRIP:
+            subMeshNode->SetAttribute("operationtype", "line_strip");
+            break;
         case RenderOperation::OT_POINT_LIST:
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Unsupported operation type, only "
-                "triangle types are allowed.", "XMLMeshSerializer::writeSubMesh");
+            subMeshNode->SetAttribute("operationtype", "point_list");
             break;
         case RenderOperation::OT_TRIANGLE_FAN:
             subMeshNode->SetAttribute("operationtype", "triangle_fan");
@@ -253,60 +257,63 @@ namespace Ogre {
             break;
         }
 
-        // Faces
-        TiXmlElement* facesNode = 
-            subMeshNode->InsertEndChild(TiXmlElement("faces"))->ToElement();
-        if (s->operationType == RenderOperation::OT_TRIANGLE_LIST)
+        if (s->indexData->indexCount > 0)
         {
-            // tri list
-            numFaces = s->indexData->indexCount / 3;
-        }
-        else
-        {
-            // triangle fan or triangle strip
-            numFaces = s->indexData->indexCount - 2;
-        }
-        facesNode->SetAttribute("count", 
-            StringConverter::toString(numFaces));
-        // Write each face in turn
-        size_t i;
-		unsigned int* pInt;
-		unsigned short* pShort;
-		HardwareIndexBufferSharedPtr ibuf = s->indexData->indexBuffer;
-		if (use32BitIndexes)
-		{
-			pInt = static_cast<unsigned int*>(
-				ibuf->lock(HardwareBuffer::HBL_READ_ONLY)); 
-		}
-		else
-		{
-			pShort = static_cast<unsigned short*>(
-				ibuf->lock(HardwareBuffer::HBL_READ_ONLY)); 
-		}
-        for (i = 0; i < numFaces; ++i)
-        {
-            TiXmlElement* faceNode = 
-                facesNode->InsertEndChild(TiXmlElement("face"))->ToElement();
-			if (use32BitIndexes)
-			{
-				faceNode->SetAttribute("v1", StringConverter::toString(*pInt++));
-                /// Only need all 3 vertex indices if trilist or first face
-                if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
-                {
-				    faceNode->SetAttribute("v2", StringConverter::toString(*pInt++));
-				    faceNode->SetAttribute("v3", StringConverter::toString(*pInt++));
-                }
-			}
-			else
-			{
-				faceNode->SetAttribute("v1", StringConverter::toString(*pShort++));
-                /// Only need all 3 vertex indices if trilist or first face
-                if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
-                {
-				    faceNode->SetAttribute("v2", StringConverter::toString(*pShort++));
-				    faceNode->SetAttribute("v3", StringConverter::toString(*pShort++));
-                }
-			}
+            // Faces
+            TiXmlElement* facesNode = 
+                subMeshNode->InsertEndChild(TiXmlElement("faces"))->ToElement();
+            if (s->operationType == RenderOperation::OT_TRIANGLE_LIST)
+            {
+                // tri list
+                numFaces = s->indexData->indexCount / 3;
+            }
+            else
+            {
+                // triangle fan or triangle strip
+                numFaces = s->indexData->indexCount - 2;
+            }
+            facesNode->SetAttribute("count", 
+                StringConverter::toString(numFaces));
+            // Write each face in turn
+            size_t i;
+		    unsigned int* pInt;
+		    unsigned short* pShort;
+		    HardwareIndexBufferSharedPtr ibuf = s->indexData->indexBuffer;
+		    if (use32BitIndexes)
+		    {
+			    pInt = static_cast<unsigned int*>(
+				    ibuf->lock(HardwareBuffer::HBL_READ_ONLY)); 
+		    }
+		    else
+		    {
+			    pShort = static_cast<unsigned short*>(
+				    ibuf->lock(HardwareBuffer::HBL_READ_ONLY)); 
+		    }
+            for (i = 0; i < numFaces; ++i)
+            {
+                TiXmlElement* faceNode = 
+                    facesNode->InsertEndChild(TiXmlElement("face"))->ToElement();
+			    if (use32BitIndexes)
+			    {
+				    faceNode->SetAttribute("v1", StringConverter::toString(*pInt++));
+                    /// Only need all 3 vertex indices if trilist or first face
+                    if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
+                    {
+				        faceNode->SetAttribute("v2", StringConverter::toString(*pInt++));
+				        faceNode->SetAttribute("v3", StringConverter::toString(*pInt++));
+                    }
+			    }
+			    else
+			    {
+				    faceNode->SetAttribute("v1", StringConverter::toString(*pShort++));
+                    /// Only need all 3 vertex indices if trilist or first face
+                    if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
+                    {
+				        faceNode->SetAttribute("v2", StringConverter::toString(*pShort++));
+				        faceNode->SetAttribute("v3", StringConverter::toString(*pShort++));
+                    }
+			    }
+            }
         }
 
         // M_GEOMETRY chunk (Optional: present only if useSharedVertices = false)
@@ -589,6 +596,7 @@ namespace Ogre {
                 sm->setMaterialName(mat);
 
             // Read operation type
+            bool readFaces = true;
             const char* optype = smElem->Attribute("operationtype");
             if (optype)
             {
@@ -604,6 +612,21 @@ namespace Ogre {
                 {
                     sm->operationType = RenderOperation::OT_TRIANGLE_STRIP;
                 }
+                else if (!strcmp(optype, "line_strip"))
+                {
+                    sm->operationType = RenderOperation::OT_LINE_STRIP;
+                    readFaces = false;
+                }
+                else if (!strcmp(optype, "line_list"))
+                {
+                    sm->operationType = RenderOperation::OT_LINE_LIST;
+                    readFaces = false;
+                }
+                else if (!strcmp(optype, "point_list"))
+                {
+                    sm->operationType = RenderOperation::OT_POINT_LIST;
+                    readFaces = false;
+                }
 
             }
 
@@ -616,79 +639,85 @@ namespace Ogre {
                 use32BitIndexes = StringConverter::parseBool(tmp);
             
             // Faces
-            TiXmlElement* faces = smElem->FirstChildElement("faces");
-            size_t actualCount = 0;
-            for (TiXmlElement *faceElem = faces->FirstChildElement(); faceElem != 0; faceElem = faceElem->NextSiblingElement())
+            if (readFaces)
             {
-                    actualCount++;
-            }
-            const char *claimedCount_ = faces->Attribute("count");
-            if (claimedCount_ && StringConverter::parseInt(claimedCount_)!=actualCount)
-            {
-				LogManager::getSingleton().stream()
-					<< "WARNING: face count (" << actualCount << ") " <<
-					"is not as claimed (" << claimedCount_ << ")";
-            }
-
-
-            // Faces
-            if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST)
-            {
-                    // tri list
-                    sm->indexData->indexCount = actualCount * 3;
-            } else {
-                    // tri strip or fan
-                    sm->indexData->indexCount = actualCount + 2;
-            }
-
-            // Allocate space
-            HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().
-                createIndexBuffer(
-                    use32BitIndexes? HardwareIndexBuffer::IT_32BIT : HardwareIndexBuffer::IT_16BIT, 
-                    sm->indexData->indexCount, 
-                    HardwareBuffer::HBU_DYNAMIC,
-                    false);
-            sm->indexData->indexBuffer = ibuf;
-            unsigned int *pInt;
-            unsigned short *pShort;
-            if (use32BitIndexes)
-            {
-                pInt = static_cast<unsigned int*>(
-                    ibuf->lock(HardwareBuffer::HBL_DISCARD));
-            }
-            else
-            {
-                pShort = static_cast<unsigned short*>(
-                    ibuf->lock(HardwareBuffer::HBL_DISCARD));
-            }
-            TiXmlElement* faceElem;
-            bool firstTri = true;
-            for (faceElem = faces->FirstChildElement();
-                faceElem != 0; faceElem = faceElem->NextSiblingElement())
-            {
-                if (use32BitIndexes)
+                TiXmlElement* faces = smElem->FirstChildElement("faces");
+                size_t actualCount = 0;
+                for (TiXmlElement *faceElem = faces->FirstChildElement(); faceElem != 0; faceElem = faceElem->NextSiblingElement())
                 {
-                    *pInt++ = StringConverter::parseInt(faceElem->Attribute("v1"));
-                    // only need all 3 vertices if it's a trilist or first tri
-                    if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
-                    {
-                        *pInt++ = StringConverter::parseInt(faceElem->Attribute("v2"));
-                        *pInt++ = StringConverter::parseInt(faceElem->Attribute("v3"));
-                    }
+                        actualCount++;
                 }
-                else
+                const char *claimedCount_ = faces->Attribute("count");
+                if (claimedCount_ && StringConverter::parseInt(claimedCount_)!=actualCount)
                 {
-                    *pShort++ = StringConverter::parseInt(faceElem->Attribute("v1"));
-                    // only need all 3 vertices if it's a trilist or first tri
-                    if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
-                    {
-                        *pShort++ = StringConverter::parseInt(faceElem->Attribute("v2"));
-                        *pShort++ = StringConverter::parseInt(faceElem->Attribute("v3"));
-                    }
+				    LogManager::getSingleton().stream()
+					    << "WARNING: face count (" << actualCount << ") " <<
+					    "is not as claimed (" << claimedCount_ << ")";
                 }
-                firstTri = false;
+
+
+                if (actualCount > 0)
+				{
+					// Faces
+					if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST)
+					{
+							// tri list
+							sm->indexData->indexCount = actualCount * 3;
+					} else {
+							// tri strip or fan
+							sm->indexData->indexCount = actualCount + 2;
+					}
+
+					// Allocate space
+					HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().
+						createIndexBuffer(
+							use32BitIndexes? HardwareIndexBuffer::IT_32BIT : HardwareIndexBuffer::IT_16BIT, 
+							sm->indexData->indexCount, 
+							HardwareBuffer::HBU_DYNAMIC,
+							false);
+					sm->indexData->indexBuffer = ibuf;
+					unsigned int *pInt;
+					unsigned short *pShort;
+					if (use32BitIndexes)
+					{
+						pInt = static_cast<unsigned int*>(
+							ibuf->lock(HardwareBuffer::HBL_DISCARD));
+					}
+					else
+					{
+						pShort = static_cast<unsigned short*>(
+							ibuf->lock(HardwareBuffer::HBL_DISCARD));
+					}
+					TiXmlElement* faceElem;
+					bool firstTri = true;
+					for (faceElem = faces->FirstChildElement();
+						faceElem != 0; faceElem = faceElem->NextSiblingElement())
+					{
+						if (use32BitIndexes)
+						{
+							*pInt++ = StringConverter::parseInt(faceElem->Attribute("v1"));
+							// only need all 3 vertices if it's a trilist or first tri
+							if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
+							{
+								*pInt++ = StringConverter::parseInt(faceElem->Attribute("v2"));
+								*pInt++ = StringConverter::parseInt(faceElem->Attribute("v3"));
+							}
+						}
+						else
+						{
+							*pShort++ = StringConverter::parseInt(faceElem->Attribute("v1"));
+							// only need all 3 vertices if it's a trilist or first tri
+							if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
+							{
+								*pShort++ = StringConverter::parseInt(faceElem->Attribute("v2"));
+								*pShort++ = StringConverter::parseInt(faceElem->Attribute("v3"));
+							}
+						}
+						firstTri = false;
+					}
+					ibuf->unlock();
+				}
             }
-            ibuf->unlock();
 
             // Geometry
             if (!sm->useSharedVertices)
@@ -1223,44 +1252,45 @@ namespace Ogre {
 		    IndexData* facedata = sub->mLodFaceList[levelNum - 1];
 			subNode->SetAttribute("numfaces", StringConverter::toString(facedata->indexCount / 3));
 
-			// Write each face in turn
-		    bool use32BitIndexes = (facedata->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
-
-            // Write each face in turn
-		    unsigned int* pInt;
-		    unsigned short* pShort;
-		    HardwareIndexBufferSharedPtr ibuf = facedata->indexBuffer;
-		    if (use32BitIndexes)
-		    {
-			    pInt = static_cast<unsigned int*>(
-				    ibuf->lock(HardwareBuffer::HBL_READ_ONLY)); 
-		    }
-		    else
-		    {
-			    pShort = static_cast<unsigned short*>(
-				    ibuf->lock(HardwareBuffer::HBL_READ_ONLY)); 
-		    }
-			
-			for (size_t f = 0; f < facedata->indexCount; f += 3)
+			if (facedata->indexCount > 0)
 			{
-				TiXmlElement* faceNode = 
-					subNode->InsertEndChild(TiXmlElement("face"))->ToElement();
-                if (use32BitIndexes)
-                {
-				    faceNode->SetAttribute("v1", StringConverter::toString(*pInt++));
-				    faceNode->SetAttribute("v2", StringConverter::toString(*pInt++));
-				    faceNode->SetAttribute("v3", StringConverter::toString(*pInt++));
-                }
-                else
-                {
-				    faceNode->SetAttribute("v1", StringConverter::toString(*pShort++));
-				    faceNode->SetAttribute("v2", StringConverter::toString(*pShort++));
-				    faceNode->SetAttribute("v3", StringConverter::toString(*pShort++));
-                }
+				// Write each face in turn
+				bool use32BitIndexes = (facedata->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
 
+				// Write each face in turn
+				unsigned int* pInt;
+				unsigned short* pShort;
+				HardwareIndexBufferSharedPtr ibuf = facedata->indexBuffer;
+				if (use32BitIndexes)
+				{
+					pInt = static_cast<unsigned int*>(
+						ibuf->lock(HardwareBuffer::HBL_READ_ONLY)); 
+				}
+				else
+				{
+					pShort = static_cast<unsigned short*>(
+						ibuf->lock(HardwareBuffer::HBL_READ_ONLY)); 
+				}
+				
+				for (size_t f = 0; f < facedata->indexCount; f += 3)
+				{
+					TiXmlElement* faceNode = 
+						subNode->InsertEndChild(TiXmlElement("face"))->ToElement();
+					if (use32BitIndexes)
+					{
+						faceNode->SetAttribute("v1", StringConverter::toString(*pInt++));
+						faceNode->SetAttribute("v2", StringConverter::toString(*pInt++));
+						faceNode->SetAttribute("v3", StringConverter::toString(*pInt++));
+					}
+					else
+					{
+						faceNode->SetAttribute("v1", StringConverter::toString(*pShort++));
+						faceNode->SetAttribute("v2", StringConverter::toString(*pShort++));
+						faceNode->SetAttribute("v3", StringConverter::toString(*pShort++));
+					}
+
+				}
 			}
-
-
 
 		}
 
@@ -1366,59 +1396,63 @@ namespace Ogre {
 
 		// Read submesh face lists
 		TiXmlElement* faceListElem = genNode->FirstChildElement("lodfacelist");
+		HardwareIndexBufferSharedPtr ibuf;
 		while (faceListElem)
 		{
 			val = faceListElem->Attribute("submeshindex");
 			unsigned short subidx = StringConverter::parseUnsignedInt(val);
 			val = faceListElem->Attribute("numfaces");
 			unsigned short numFaces = StringConverter::parseUnsignedInt(val);
-            // use of 32bit indexes depends on submesh
-            HardwareIndexBuffer::IndexType itype = 
-                mpMesh->getSubMesh(subidx)->indexData->indexBuffer->getType();
-            bool use32bitindexes = (itype == HardwareIndexBuffer::IT_32BIT);
-
-            // Assign memory: this will be deleted by the submesh 
-            HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().
-                createIndexBuffer(
-                    itype, numFaces * 3, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-
-            unsigned short *pShort;
-            unsigned int *pInt;
-            if (use32bitindexes)
-            {
-                pInt = static_cast<unsigned int*>(
-                    ibuf->lock(HardwareBuffer::HBL_DISCARD));
-            }
-            else
-            {
-                pShort = static_cast<unsigned short*>(
-                    ibuf->lock(HardwareBuffer::HBL_DISCARD));
-            }
-            TiXmlElement* faceElem = faceListElem->FirstChildElement("face");
-			for (unsigned int face = 0; face < numFaces; ++face, faceElem = faceElem->NextSiblingElement())
+			if (numFaces)
 			{
-                if (use32bitindexes)
-                {
-                    val = faceElem->Attribute("v1");
-				    *pInt++ = StringConverter::parseUnsignedInt(val);
-				    val = faceElem->Attribute("v2");
-				    *pInt++ = StringConverter::parseUnsignedInt(val);
-				    val = faceElem->Attribute("v3");
-				    *pInt++ = StringConverter::parseUnsignedInt(val);
-                }
-                else
-                {
-                    val = faceElem->Attribute("v1");
-				    *pShort++ = StringConverter::parseUnsignedInt(val);
-				    val = faceElem->Attribute("v2");
-				    *pShort++ = StringConverter::parseUnsignedInt(val);
-				    val = faceElem->Attribute("v3");
-				    *pShort++ = StringConverter::parseUnsignedInt(val);
-                }
+				// use of 32bit indexes depends on submesh
+				HardwareIndexBuffer::IndexType itype = 
+					mpMesh->getSubMesh(subidx)->indexData->indexBuffer->getType();
+				bool use32bitindexes = (itype == HardwareIndexBuffer::IT_32BIT);
 
+				// Assign memory: this will be deleted by the submesh 
+				ibuf = HardwareBufferManager::getSingleton().
+					createIndexBuffer(
+						itype, numFaces * 3, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+
+				unsigned short *pShort;
+				unsigned int *pInt;
+				if (use32bitindexes)
+				{
+					pInt = static_cast<unsigned int*>(
+						ibuf->lock(HardwareBuffer::HBL_DISCARD));
+				}
+				else
+				{
+					pShort = static_cast<unsigned short*>(
+						ibuf->lock(HardwareBuffer::HBL_DISCARD));
+				}
+				TiXmlElement* faceElem = faceListElem->FirstChildElement("face");
+				for (unsigned int face = 0; face < numFaces; ++face, faceElem = faceElem->NextSiblingElement())
+				{
+					if (use32bitindexes)
+					{
+						val = faceElem->Attribute("v1");
+						*pInt++ = StringConverter::parseUnsignedInt(val);
+						val = faceElem->Attribute("v2");
+						*pInt++ = StringConverter::parseUnsignedInt(val);
+						val = faceElem->Attribute("v3");
+						*pInt++ = StringConverter::parseUnsignedInt(val);
+					}
+					else
+					{
+						val = faceElem->Attribute("v1");
+						*pShort++ = StringConverter::parseUnsignedInt(val);
+						val = faceElem->Attribute("v2");
+						*pShort++ = StringConverter::parseUnsignedInt(val);
+						val = faceElem->Attribute("v3");
+						*pShort++ = StringConverter::parseUnsignedInt(val);
+					}
+
+				}
+
+				ibuf->unlock();
 			}
-
-            ibuf->unlock();
 			IndexData* facedata = new IndexData(); // will be deleted by SubMesh
 			facedata->indexCount = numFaces * 3;
             facedata->indexStart = 0;

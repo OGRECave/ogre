@@ -117,13 +117,11 @@ void checkCaps(const Ogre::RenderSystemCapabilities* caps)
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION), true);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT), true);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION_VTC), false);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_GLEW1_5_NOVBO), false);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_FBO), true);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_FBO_ARB), false);
 
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_FBO_ATI), false);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_PBUFFER), false);
-    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_GLEW1_5_NOHWOCCLUSION), false);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_PERSTAGECONSTANT), false);
 
     CPPUNIT_ASSERT(caps->isShaderProfileSupported("arbfp1"));
@@ -218,8 +216,6 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 		// clean up root, in case of error, and let cppunit to handle the exception
 		catch(...)
 		{
-			delete root;
-			throw;
 		}
 	}
     delete root;
@@ -275,8 +271,6 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 		// clean up root, in case of error, and let cppunit to handle the exception
 		catch(...)
 		{
-			delete root;
-			throw;
 		}
 	}
 

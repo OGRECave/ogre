@@ -878,15 +878,27 @@ namespace Ogre {
         isubend = mSubMeshList.end();
         for (isub = mSubMeshList.begin(); isub != isubend; ++isub)
         {
-            // Set up data for reduction
-            VertexData* pVertexData = (*isub)->useSharedVertices ? sharedVertexData : (*isub)->vertexData;
+            // check if triangles are present
+            if ((*isub)->indexData->indexCount > 0)
+            {
+                // Set up data for reduction
+                VertexData* pVertexData = (*isub)->useSharedVertices ? sharedVertexData : (*isub)->vertexData;
 
-            ProgressiveMesh pm(pVertexData, (*isub)->indexData);
-            pm.build(
-            static_cast<ushort>(lodDistances.size()),
-                &((*isub)->mLodFaceList),
-                reductionMethod, reductionValue);
+                ProgressiveMesh pm(pVertexData, (*isub)->indexData);
+                pm.build(
+                static_cast<ushort>(lodDistances.size()),
+                    &((*isub)->mLodFaceList),
+                    reductionMethod, reductionValue);
 
+            }
+            else
+            {
+                // create empty index data for each lod
+                for (size_t i = 0; i < lodDistances.size(); ++i)
+                {
+                    (*isub)->mLodFaceList.push_back(new IndexData);
+                }
+            }
         }
 
         // Iterate over the lods and record usage
@@ -1445,8 +1457,9 @@ namespace Ogre {
 						s->operationType != RenderOperation::OT_TRIANGLE_LIST && 
 						s->operationType != RenderOperation::OT_TRIANGLE_STRIP)
 					{
-						// Skip this submesh
-						continue;
+                        // create empty edge data and skip
+						usage.edgeData = new EdgeData();
+                        continue;
 					}
                     if (s->useSharedVertices)
                     {
