@@ -168,6 +168,10 @@ namespace Ogre {
         else
             compileFlags |= D3DXSHADER_PACKMATRIX_ROWMAJOR;
 
+#if OGRE_DEBUG_MODE
+		compileFlags |= D3DXSHADER_DEBUG;
+#endif
+
         LPD3DXBUFFER errors = 0;
 
 		// include handler
