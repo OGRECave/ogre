@@ -668,7 +668,7 @@
 		000E29390B39DF23004EA2DF /* SkyPlane-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "SkyPlane-Info.plist"; path = "plist/SkyPlane-Info.plist"; sourceTree = "<group>"; };
 		000E29490B39DF84004EA2DF /* SkyPlane.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SkyPlane.h; path = ../../Samples/SkyPlane/include/SkyPlane.h; sourceTree = SOURCE_ROOT; };
 		000E294A0B39DF8E004EA2DF /* SkyPlane.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = SkyPlane.cpp; path = ../../Samples/SkyPlane/src/SkyPlane.cpp; sourceTree = SOURCE_ROOT; };
-		000E29520B39E019004EA2DF /* Smoke.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Smoke.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000E29520B39E019004EA2DF /* Smoke.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Smoke.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		000E29540B39E01A004EA2DF /* Smoke-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "Smoke-Info.plist"; path = "plist/Smoke-Info.plist"; sourceTree = "<group>"; };
 		000E29600B39E08B004EA2DF /* Smoke.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Smoke.h; path = ../../Samples/Smoke/include/Smoke.h; sourceTree = SOURCE_ROOT; };
 		000E29610B39E0A5004EA2DF /* Smoke.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Smoke.cpp; path = ../../Samples/Smoke/src/Smoke.cpp; sourceTree = SOURCE_ROOT; };
@@ -2174,10 +2174,12 @@
 		000E24E00B3924F0004EA2DF /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 000E24E10B3924F0004EA2DF /* Build configuration list for PBXProject "Samples" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 0;
 			mainGroup = 000E24DE0B3924F0004EA2DF;
 			productRefGroup = 000E252C0B392BE5004EA2DF /* Products */;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				000E29F70B39E7C5004EA2DF /* Ogre Samples */,
 				00ABECAB0B4EC1600059129A /* Cocoa Samples */,
