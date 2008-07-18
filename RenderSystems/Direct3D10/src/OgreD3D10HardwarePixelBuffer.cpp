@@ -325,6 +325,11 @@ namespace Ogre {
 			PixelUtil::bulkPixelConversion(src, converted);
 		}
 
+		// In d3d10 the Row Pitch is defined as: "The size of one row of the source data" and not 
+		// the same as the OGRE row pitch - meaning that we need to multiple the OGRE row pitch 
+		// with the size in bytes of the element to get the d3d10 row pitch. 
+		UINT d3dRowPitch = static_cast<UINT>(converted.rowPitch) * static_cast<UINT>(PixelUtil::getNumElemBytes(mFormat));
+
 
 		switch(mParentTexture->getTextureType()) {
 		case TEX_TYPE_1D:
@@ -354,7 +359,7 @@ namespace Ogre {
 					static_cast<UINT>(mSubresourceIndex),
 					&dstBoxDx10,
 					converted.data,
-					static_cast<UINT>(converted.rowPitch),
+					d3dRowPitch,
 					mFace );
 				if (mDevice.isError())
 				{
@@ -372,7 +377,7 @@ namespace Ogre {
 					static_cast<UINT>(mSubresourceIndex),
 					&dstBoxDx10,
 					converted.data,
-					static_cast<UINT>(converted.rowPitch),
+					d3dRowPitch,
 					static_cast<UINT>(converted.slicePitch)
 					);
 				if (mDevice.isError())
