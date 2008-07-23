@@ -241,8 +241,6 @@ namespace Ogre
 	typedef ScriptingAllocatedObject	AbstractNodeAlloc;
 	typedef AnimationAllocatedObject	AnimableAlloc;
 	typedef AnimationAllocatedObject	AnimationAlloc;
-	typedef GeneralAllocatedObject		AnyAlloc;
-	typedef GeneralAllocatedObject		AnyHolderAlloc;
 	typedef GeneralAllocatedObject		ArchiveAlloc;
 	typedef GeometryAllocatedObject		BatchedGeometryAlloc;
 	typedef RenderSysAllocatedObject	BufferAlloc;

@@ -55,7 +55,7 @@ namespace Ogre
 		inline explicit AllocatedObject()
 		{ }
 
-		virtual ~AllocatedObject()
+		~AllocatedObject()
 		{ }
 
 		/// operator new, with debug line info
