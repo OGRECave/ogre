@@ -3336,6 +3336,7 @@ namespace Ogre
 		static_cast<D3D9HardwareBufferManager*>(mHardwareBufferManager)
 			->releaseDefaultPoolResources();
 
+		mPrimaryWindow->destroyD3DResources();
 		// release additional swap chains (secondary windows)
 		SecondaryWindowList::iterator sw;
 		for (sw = mSecondaryWindows.begin(); sw != mSecondaryWindows.end(); ++sw)
@@ -3376,6 +3377,7 @@ namespace Ogre
 		mFragmentProgramBound = false;
 
 
+
 		// recreate additional swap chains
 		for (sw = mSecondaryWindows.begin(); sw != mSecondaryWindows.end(); ++sw)
 		{
@@ -3383,6 +3385,7 @@ namespace Ogre
 		}
 
 		// Recreate all non-managed resources
+		mPrimaryWindow->createD3DResources();
 		static_cast<D3D9TextureManager*>(mTextureManager)
 			->recreateDefaultPoolResources();
 		static_cast<D3D9HardwareBufferManager*>(mHardwareBufferManager)
@@ -3412,7 +3415,18 @@ namespace Ogre
 		// will have lost basic states
 		mBasicStatesInitialised = false;
 
-		fireEvent("DeviceLost");
+		fireEvent("DeviceLost"); // you need to stop the physics or game engines after this event
+
+		// here the render system waits until the device is not lost - else the user will get crashes after trying to lock a buffer
+		HRESULT hr = mpD3DDevice->TestCooperativeLevel();
+		while (hr == D3DERR_DEVICELOST)
+		{
+			Sleep(50);
+			hr = mpD3DDevice->TestCooperativeLevel();
+		}
+
+		fireEvent("DeviceNotLost"); // start over the physics or game engines after this event
+
 	}
 
 	//---------------------------------------------------------------------

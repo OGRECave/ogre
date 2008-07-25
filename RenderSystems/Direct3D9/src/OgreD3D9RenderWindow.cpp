@@ -46,6 +46,7 @@ namespace Ogre
         : mInstance(instance)
         , mDriver(driver)
         , mpRenderSurface(0)
+		, mpRenderZBuffer(0)
 	{
 		mIsFullScreen = false;
 		mIsSwapChain = (deviceIfSwapChain != NULL);
@@ -500,11 +501,13 @@ namespace Ogre
 					"D3D9RenderWindow::createD3DResources");
 			}
 			// Store references to buffers for convenience
+			SAFE_RELEASE(mpRenderSurface);
 			mpSwapChain->GetBackBuffer( 0, D3DBACKBUFFER_TYPE_MONO, &mpRenderSurface );
 			// Additional swap chains need their own depth buffer
 			// to support resizing them
 			if (mIsDepthBuffered) 
 			{
+				SAFE_RELEASE(mpRenderZBuffer);
 				hr = mpD3DDevice->CreateDepthStencilSurface(
 					mWidth, mHeight,
 					md3dpp.AutoDepthStencilFormat,
@@ -597,7 +600,9 @@ namespace Ogre
 			// update device in driver
 			mDriver->setD3DDevice( mpD3DDevice );
 			// Store references to buffers for convenience
+			SAFE_RELEASE(mpRenderSurface);
 			mpD3DDevice->GetRenderTarget( 0, &mpRenderSurface );
+			SAFE_RELEASE(mpRenderZBuffer);
 			mpD3DDevice->GetDepthStencilSurface( &mpRenderZBuffer );
 			// release immediately so we don't hog them
 			mpRenderZBuffer->Release();
@@ -717,8 +722,10 @@ namespace Ogre
 
 				mWidth = width;
 				mHeight = height;
-
+				
+				SAFE_RELEASE(mpRenderSurface);
 				hr = mpSwapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &mpRenderSurface);
+				SAFE_RELEASE(mpRenderZBuffer);
 				hr = mDriver->getD3DDevice()->CreateDepthStencilSurface(
 					mWidth, mHeight,
 					md3dpp.AutoDepthStencilFormat,
@@ -937,6 +944,7 @@ namespace Ogre
 		}
 		else
 		{
+			SAFE_RELEASE(pSurf);
 			if(FAILED(hr = mpD3DDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pSurf)))
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
@@ -1096,7 +1104,9 @@ namespace Ogre
 				if (!mIsSwapChain) 
 				{
 					// re-qeuery buffers
+					SAFE_RELEASE(mpRenderSurface);
 					mpD3DDevice->GetRenderTarget( 0, &mpRenderSurface );
+					SAFE_RELEASE(mpRenderZBuffer);
 					mpD3DDevice->GetDepthStencilSurface( &mpRenderZBuffer );
 					// release immediately so we don't hog them
 					mpRenderZBuffer->Release();
