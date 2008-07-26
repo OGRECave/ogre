@@ -2339,11 +2339,7 @@ namespace Ogre{
 							AbstractNodeList::const_iterator in = getNodeAt(prop->values, static_cast<int>(prop->values.size()) - 1);
 							if(getReal(*in, &duration))
 							{
-								// OGRE_NEW_ARRAY_T is trying to allocate 4 bytes extra at the start of the
-								// buffer, looks like a weird placement new [] issue
-								// for the moment, avoid
-								//String *names = OGRE_NEW_ARRAY_T(String, prop->values.size() - 1, MEMCATEGORY_SCRIPTING);
-								String* names = new String[prop->values.size() - 1];
+								String *names = OGRE_NEW_ARRAY_T(String, prop->values.size() - 1, MEMCATEGORY_SCRIPTING);
 								int n = 0;
 
 								AbstractNodeList::iterator j = prop->values.begin();
@@ -2364,8 +2360,7 @@ namespace Ogre{
 
 								mUnit->setAnimatedTextureName(names, n, duration);
 
-								delete [] names;
-								//OGRE_DELETE_ARRAY_T(names, String, prop->values.size() - 1, MEMCATEGORY_SCRIPTING);
+								OGRE_DELETE_ARRAY_T(names, String, prop->values.size() - 1, MEMCATEGORY_SCRIPTING);
 							}
 							else
 							{
