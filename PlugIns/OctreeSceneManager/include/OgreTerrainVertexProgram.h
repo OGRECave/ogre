@@ -199,7 +199,7 @@ namespace Ogre {
 
     @endcode
     */
-    class TerrainVertexProgram
+class TerrainVertexProgram : public ResourceAlloc
     {
     private:
         static String mNoFogArbvp1;

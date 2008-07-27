@@ -51,7 +51,7 @@ namespace Ogre {
     void HeightmapTerrainPageSource::shutdown(void)
     {
         // Image will destroy itself
-        delete mPage;
+        OGRE_DELETE mPage;
         mPage = 0;
     }
     //-------------------------------------------------------------------------
@@ -69,7 +69,7 @@ namespace Ogre {
             DataStreamPtr stream = 
                 ResourceGroupManager::getSingleton().openResource(
                     mSource, ResourceGroupManager::getSingleton().getWorldResourceGroupName());
-            mRawData = MemoryDataStreamPtr(new MemoryDataStream(mSource, stream));
+            mRawData = MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(mSource, stream));
 
             // Validate size
             size_t numBytes = imgSize * imgSize * mRawBpp;
@@ -189,7 +189,7 @@ namespace Ogre {
         {
             // Convert the image data to unscaled floats
             ulong totalPageSize = mPageSize * mPageSize; 
-            Real *heightData = new Real[totalPageSize];
+            Real *heightData = OGRE_ALLOC_T(Real, totalPageSize, MEMCATEGORY_RESOURCE);
             const uchar* pOrigSrc, *pSrc;
             Real* pDest = heightData;
             Real invScale;
@@ -266,7 +266,7 @@ namespace Ogre {
             }
 
             // Free temp store
-            delete [] heightData;
+            OGRE_FREE(heightData, MEMCATEGORY_RESOURCE);
         }
     }
     //-------------------------------------------------------------------------
@@ -275,7 +275,7 @@ namespace Ogre {
         // Single page
         if (x == 0 && y == 0 && mPage)
         {
-            delete mPage;
+            OGRE_DELETE mPage;
             mPage = 0;
         }
 

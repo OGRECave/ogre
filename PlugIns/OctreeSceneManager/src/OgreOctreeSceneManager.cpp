@@ -318,9 +318,9 @@ void OctreeSceneManager::init( AxisAlignedBox &box, int depth )
 {
 
     if ( mOctree != 0 )
-        delete mOctree;
+        OGRE_DELETE mOctree;
 
-    mOctree = new Octree( 0 );
+    mOctree = OGRE_NEW Octree( 0 );
 
     mMaxDepth = depth;
     mBox = box;
@@ -357,14 +357,14 @@ OctreeSceneManager::~OctreeSceneManager()
 
     if ( mOctree )
 	{
-        delete mOctree;
+        OGRE_DELETE mOctree;
 		mOctree = 0;
 	}
 }
 
 Camera * OctreeSceneManager::createCamera( const String &name )
 {
-    Camera * c = new OctreeCamera( name, this );
+    Camera * c = OGRE_NEW OctreeCamera( name, this );
     mCameras.insert( CameraList::value_type( name, c ) );
 
 	// create visible bounds aab map entry
@@ -470,7 +470,7 @@ void OctreeSceneManager::_addOctreeNode( OctreeNode * n, Octree *octant, int dep
 
         if ( octant -> mChildren[ x ][ y ][ z ] == 0 )
         {
-            octant -> mChildren[ x ][ y ][ z ] = new Octree( octant );
+            octant -> mChildren[ x ][ y ][ z ] = OGRE_NEW Octree( octant );
             const Vector3& octantMin = octant -> mBox.getMinimum();
             const Vector3& octantMax = octant -> mBox.getMaximum();
             Vector3 min, max;
@@ -528,12 +528,12 @@ void OctreeSceneManager::_addOctreeNode( OctreeNode * n, Octree *octant, int dep
 
 SceneNode * OctreeSceneManager::createSceneNodeImpl( void )
 {
-    return new OctreeNode( this );
+    return OGRE_NEW OctreeNode( this );
 }
 
 SceneNode * OctreeSceneManager::createSceneNodeImpl( const String &name )
 {
-    return new OctreeNode( this, name );
+    return OGRE_NEW OctreeNode( this, name );
 }
 
 void OctreeSceneManager::_updateSceneGraph( Camera * cam )
@@ -1004,9 +1004,9 @@ void OctreeSceneManager::resize( const AxisAlignedBox &box )
 
     _findNodes( mOctree->mBox, nodes, 0, true, mOctree );
 
-    delete mOctree;
+    OGRE_DELETE mOctree;
 
-    mOctree = new Octree( 0 );
+    mOctree = OGRE_NEW Octree( 0 );
     mOctree->mBox = box;
 
 	const Vector3 min = box.getMinimum();
@@ -1092,7 +1092,7 @@ void OctreeSceneManager::clearScene(void)
 AxisAlignedBoxSceneQuery*
 OctreeSceneManager::createAABBQuery(const AxisAlignedBox& box, unsigned long mask)
 {
-    OctreeAxisAlignedBoxSceneQuery* q = new OctreeAxisAlignedBoxSceneQuery(this);
+    OctreeAxisAlignedBoxSceneQuery* q = OGRE_NEW OctreeAxisAlignedBoxSceneQuery(this);
     q->setBox(box);
     q->setQueryMask(mask);
     return q;
@@ -1101,7 +1101,7 @@ OctreeSceneManager::createAABBQuery(const AxisAlignedBox& box, unsigned long mas
 SphereSceneQuery*
 OctreeSceneManager::createSphereQuery(const Sphere& sphere, unsigned long mask)
 {
-    OctreeSphereSceneQuery* q = new OctreeSphereSceneQuery(this);
+    OctreeSphereSceneQuery* q = OGRE_NEW OctreeSphereSceneQuery(this);
     q->setSphere(sphere);
     q->setQueryMask(mask);
     return q;
@@ -1111,7 +1111,7 @@ PlaneBoundedVolumeListSceneQuery*
 OctreeSceneManager::createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volumes,
         unsigned long mask)
 {
-    OctreePlaneBoundedVolumeListSceneQuery* q = new OctreePlaneBoundedVolumeListSceneQuery(this);
+    OctreePlaneBoundedVolumeListSceneQuery* q = OGRE_NEW OctreePlaneBoundedVolumeListSceneQuery(this);
     q->setVolumes(volumes);
     q->setQueryMask(mask);
     return q;
@@ -1121,7 +1121,7 @@ OctreeSceneManager::createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& 
 RaySceneQuery*
 OctreeSceneManager::createRayQuery(const Ray& ray, unsigned long mask)
 {
-    OctreeRaySceneQuery* q = new OctreeRaySceneQuery(this);
+    OctreeRaySceneQuery* q = OGRE_NEW OctreeRaySceneQuery(this);
     q->setRay(ray);
     q->setQueryMask(mask);
     return q;
@@ -1133,8 +1133,8 @@ OctreeSceneManager::createIntersectionQuery(unsigned long mask)
 
     // Octree implementation performs WORSE for < 500 objects
     // TODO: optimise it so it's better in all cases
-    //OctreeIntersectionSceneQuery* q = new OctreeIntersectionSceneQuery(this);
-    DefaultIntersectionSceneQuery* q = new DefaultIntersectionSceneQuery(this);
+    //OctreeIntersectionSceneQuery* q = OGRE_NEW OctreeIntersectionSceneQuery(this);
+    DefaultIntersectionSceneQuery* q = OGRE_NEW DefaultIntersectionSceneQuery(this);
     q->setQueryMask(mask);
     return q;
 }
@@ -1152,12 +1152,12 @@ void OctreeSceneManagerFactory::initMetaData(void) const
 SceneManager* OctreeSceneManagerFactory::createInstance(
 	const String& instanceName)
 {
-	return new OctreeSceneManager(instanceName);
+	return OGRE_NEW OctreeSceneManager(instanceName);
 }
 //-----------------------------------------------------------------------
 void OctreeSceneManagerFactory::destroyInstance(SceneManager* instance)
 {
-	delete instance;
+	OGRE_DELETE instance;
 }
 
 

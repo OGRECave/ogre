@@ -896,7 +896,7 @@ namespace Ogre {
                 // create empty index data for each lod
                 for (size_t i = 0; i < lodDistances.size(); ++i)
                 {
-                    (*isub)->mLodFaceList.push_back(new IndexData);
+                    (*isub)->mLodFaceList.push_back(OGRE_NEW IndexData);
                 }
             }
         }
@@ -1458,7 +1458,7 @@ namespace Ogre {
 						s->operationType != RenderOperation::OT_TRIANGLE_STRIP)
 					{
                         // create empty edge data and skip
-						usage.edgeData = new EdgeData();
+						usage.edgeData = OGRE_NEW EdgeData();
                         continue;
 					}
                     if (s->useSharedVertices)

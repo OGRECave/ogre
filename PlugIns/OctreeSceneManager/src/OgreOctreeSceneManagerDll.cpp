@@ -37,7 +37,7 @@ OctreePlugin* octreePlugin;
 extern "C" void _OgreOctreePluginExport dllStartPlugin( void )
 {
     // Create new scene manager
-    octreePlugin = new OctreePlugin();
+    octreePlugin = OGRE_NEW OctreePlugin();
 
     // Register
     Root::getSingleton().installPlugin(octreePlugin);
@@ -46,6 +46,6 @@ extern "C" void _OgreOctreePluginExport dllStartPlugin( void )
 extern "C" void _OgreOctreePluginExport dllStopPlugin( void )
 {
 	Root::getSingleton().uninstallPlugin(octreePlugin);
-	delete octreePlugin;
+	OGRE_DELETE octreePlugin;
 }
 }

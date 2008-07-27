@@ -516,6 +516,9 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 				RelativePath="..\src\OgreMatrix4.cpp">
 			</File>
 			<File
+				RelativePath="..\src\OgreMemoryAllocatedObject.cpp">
+			</File>
+			<File
 				RelativePath="..\src\OgreMemoryManager.cpp">
 			</File>
 			<File

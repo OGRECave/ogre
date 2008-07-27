@@ -83,7 +83,7 @@ namespace Ogre {
         String name;
 
         // Create a Terrain Page
-        TerrainPage* page = new TerrainPage((mPageSize-1) / (mTileSize-1));
+        TerrainPage* page = OGRE_NEW TerrainPage((mPageSize-1) / (mTileSize-1));
         // Create a node for all tiles to be attached to
         // Note we sequentially name since page can be attached at different points
         // so page x/z is not appropriate
@@ -126,7 +126,7 @@ namespace Ogre {
 					c = page->pageSceneNode->createChildSceneNode( name );
 				}
 
-				TerrainRenderable *tile = new TerrainRenderable(name, mSceneManager);
+				TerrainRenderable *tile = OGRE_NEW TerrainRenderable(name, mSceneManager);
 				// set queue
 				tile->setRenderQueueGroup(mSceneManager->getWorldGeometryRenderQueue());
                 // Initialise the tile

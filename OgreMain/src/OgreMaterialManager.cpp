@@ -108,7 +108,7 @@ namespace Ogre {
 		const String& group, bool isManual, ManualResourceLoader* loader,
         const NameValuePairList* params)
 	{
-		return new Material(this, name, handle, group, isManual, loader);
+		return OGRE_NEW Material(this, name, handle, group, isManual, loader);
 	}
     //-----------------------------------------------------------------------
 	void MaterialManager::initialise(void)

@@ -117,13 +117,13 @@ Octree::~Octree()
             for ( int k = 0; k < 2; k++ )
             {
                 if ( mChildren[ i ][ j ][ k ] != 0 )
-                    delete mChildren[ i ][ j ][ k ];
+                    OGRE_DELETE mChildren[ i ][ j ][ k ];
             }
         }
     }
 
     if(mWireBoundingBox)
-        delete mWireBoundingBox;
+        OGRE_DELETE mWireBoundingBox;
 
     mParent = 0;
 }
@@ -156,7 +156,7 @@ WireBoundingBox* Octree::getWireBoundingBox()
 {
     // Create a WireBoundingBox if needed
     if(mWireBoundingBox == 0)
-        mWireBoundingBox = new WireBoundingBox();
+        mWireBoundingBox = OGRE_NEW WireBoundingBox();
 
     mWireBoundingBox->setupBoundingBox(mBox);
     return mWireBoundingBox;
