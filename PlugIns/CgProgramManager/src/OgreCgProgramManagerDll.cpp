@@ -38,7 +38,7 @@ namespace Ogre {
     extern "C" void _OgreCgPluginExport dllStartPlugin(void)
     {
         // Create new plugin
-        cgPlugin = new CgPlugin();
+        cgPlugin = OGRE_NEW CgPlugin();
 
         // Register
         Root::getSingleton().installPlugin(cgPlugin);
@@ -48,7 +48,7 @@ namespace Ogre {
     extern "C" void _OgreCgPluginExport dllStopPlugin(void)
     {
 		Root::getSingleton().uninstallPlugin(cgPlugin);
-		delete cgPlugin;
+		OGRE_DELETE cgPlugin;
     }
 
     void checkForCgError(const String& ogreMethod, const String& errorTextPrefix, CGcontext context)
