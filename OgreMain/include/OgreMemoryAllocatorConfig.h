@@ -241,8 +241,6 @@ namespace Ogre
 	typedef ScriptingAllocatedObject	AbstractNodeAlloc;
 	typedef AnimationAllocatedObject	AnimableAlloc;
 	typedef AnimationAllocatedObject	AnimationAlloc;
-	typedef GeneralAllocatedObject		AnyAlloc;
-	typedef GeneralAllocatedObject		AnyHolderAlloc;
 	typedef GeneralAllocatedObject		ArchiveAlloc;
 	typedef GeometryAllocatedObject		BatchedGeometryAlloc;
 	typedef RenderSysAllocatedObject	BufferAlloc;
@@ -294,6 +292,23 @@ namespace Ogre
 
 }
 
+// Util functions
+namespace Ogre
+{
+	/** Utility function for constructing an array of objects with placement new,
+		without using new[] (which allocates an undocumented amount of extra memory
+		and so isn't appropriate for custom allocators).
+	*/
+	template<typename T>
+	T* constructN(T* basePtr, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i)
+		{
+			new ((void*)(basePtr+i)) T();
+		}
+		return basePtr;
+	}
+}
 // define macros 
 
 #if OGRE_DEBUG_MODE
@@ -308,7 +323,7 @@ namespace Ogre
 /// Allocate space for one primitive type, external type or non-virtual type with constructor parameters
 #	define OGRE_NEW_T(T, category) new (::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T), __FILE__, __LINE__, __FUNCTION__)) T
 /// Allocate a block of memory for 'count' primitive types - do not use for classes that inherit from AllocatedObject
-#	define OGRE_NEW_ARRAY_T(T, count, category) new (::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)) T [count]
+#	define OGRE_NEW_ARRAY_T(T, count, category) ::Ogre::constructN(static_cast<T*>(::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)), count) 
 /// Free the memory allocated with OGRE_NEW_T. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_DELETE_T(ptr, T, category) if(ptr){(ptr)->~T(); ::Ogre::CategorisedAllocPolicy<category>::deallocateBytes(ptr);}
 /// Free the memory allocated with OGRE_NEW_ARRAY_T. Category is required to be restated to ensure the matching policy is used, count and type to call destructor
@@ -331,7 +346,7 @@ namespace Ogre
 /// Allocate space for one primitive type, external type or non-virtual type aligned to SIMD boundaries
 #	define OGRE_NEW_T_SIMD(T, category) new (::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T), __FILE__, __LINE__, __FUNCTION__)) T
 /// Allocate a block of memory for 'count' primitive types aligned to SIMD boundaries - do not use for classes that inherit from AllocatedObject
-#	define OGRE_NEW_ARRAY_T_SIMD(T, count, category) new (::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)) T [count]
+#	define OGRE_NEW_ARRAY_T_SIMD(T, count, category) ::Ogre::constructN(static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)), count) 
 /// Free the memory allocated with OGRE_NEW_T_SIMD. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_DELETE_T_SIMD(ptr, T, category) if(ptr){(ptr)->~T(); ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr);}
 /// Free the memory allocated with OGRE_NEW_ARRAY_T_SIMD. Category is required to be restated to ensure the matching policy is used, count and type to call destructor
@@ -339,7 +354,7 @@ namespace Ogre
 /// Allocate space for one primitive type, external type or non-virtual type aligned to user defined boundaries
 #	define OGRE_NEW_T_ALIGN(T, category, align) new (::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T), __FILE__, __LINE__, __FUNCTION__)) T
 /// Allocate a block of memory for 'count' primitive types aligned to user defined boundaries - do not use for classes that inherit from AllocatedObject
-#	define OGRE_NEW_ARRAY_T_ALIGN(T, count, category, align) new (::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)) T [count]
+#	define OGRE_NEW_ARRAY_T_ALIGN(T, count, category, align) ::Ogre::constructN(static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count, __FILE__, __LINE__, __FUNCTION__)), count) 
 /// Free the memory allocated with OGRE_NEW_T_ALIGN. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_DELETE_T_ALIGN(ptr, T, category, align) if(ptr){(ptr)->~T(); ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr);}
 /// Free the memory allocated with OGRE_NEW_ARRAY_T_ALIGN. Category is required to be restated to ensure the matching policy is used, count and type to call destructor
@@ -364,7 +379,7 @@ namespace Ogre
 /// Allocate space for one primitive type, external type or non-virtual type with constructor parameters
 #	define OGRE_NEW_T(T, category) new (::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T))) T
 /// Allocate a block of memory for 'count' primitive types - do not use for classes that inherit from AllocatedObject
-#	define OGRE_NEW_ARRAY_T(T, count, category) new (::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count)) T [count]
+#	define OGRE_NEW_ARRAY_T(T, count, category) ::Ogre::constructN(static_cast<T*>(::Ogre::CategorisedAllocPolicy<category>::allocateBytes(sizeof(T)*count)), count) 
 /// Free the memory allocated with OGRE_NEW_T. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_DELETE_T(ptr, T, category) if(ptr){(ptr)->~T(); ::Ogre::CategorisedAllocPolicy<category>::deallocateBytes(ptr);}
 /// Free the memory allocated with OGRE_NEW_ARRAY_T. Category is required to be restated to ensure the matching policy is used, count and type to call destructor
@@ -387,7 +402,7 @@ namespace Ogre
 /// Allocate space for one primitive type, external type or non-virtual type aligned to SIMD boundaries
 #	define OGRE_NEW_T_SIMD(T, category) new (::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T))) T
 /// Allocate a block of memory for 'count' primitive types aligned to SIMD boundaries - do not use for classes that inherit from AllocatedObject
-#	define OGRE_NEW_ARRAY_T_SIMD(T, count, category) new (::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count)) T [count]
+#	define OGRE_NEW_ARRAY_T_SIMD(T, count, category) ::Ogre::constructN(static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category>::allocateBytes(sizeof(T)*count)), count) 
 /// Free the memory allocated with OGRE_NEW_T_SIMD. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_DELETE_T_SIMD(ptr, T, category) if(ptr){(ptr)->~T(); ::Ogre::CategorisedAlignAllocPolicy<category>::deallocateBytes(ptr);}
 /// Free the memory allocated with OGRE_NEW_ARRAY_T_SIMD. Category is required to be restated to ensure the matching policy is used, count and type to call destructor
@@ -395,7 +410,7 @@ namespace Ogre
 /// Allocate space for one primitive type, external type or non-virtual type aligned to user defined boundaries
 #	define OGRE_NEW_T_ALIGN(T, category, align) new (::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T))) T
 /// Allocate a block of memory for 'count' primitive types aligned to user defined boundaries - do not use for classes that inherit from AllocatedObject
-#	define OGRE_NEW_ARRAY_T_ALIGN(T, count, category, align) new (::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count)) T [count]
+#	define OGRE_NEW_ARRAY_T_ALIGN(T, count, category, align) ::Ogre::constructN(static_cast<T*>(::Ogre::CategorisedAlignAllocPolicy<category, align>::allocateBytes(sizeof(T)*count)), count) 
 /// Free the memory allocated with OGRE_NEW_T_ALIGN. Category is required to be restated to ensure the matching policy is used
 #	define OGRE_DELETE_T_ALIGN(ptr, T, category, align) if(ptr){(ptr)->~T(); ::Ogre::CategorisedAlignAllocPolicy<category, align>::deallocateBytes(ptr);}
 /// Free the memory allocated with OGRE_NEW_ARRAY_T_ALIGN. Category is required to be restated to ensure the matching policy is used, count and type to call destructor

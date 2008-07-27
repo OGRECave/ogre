@@ -2672,10 +2672,12 @@
 		000E1D240B38D32C004EA2DF /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 000E1D250B38D32C004EA2DF /* Build configuration list for PBXProject "Ogre" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 0;
 			mainGroup = 000E1D220B38D32C004EA2DF;
 			productRefGroup = 000E1D360B38D380004EA2DF /* Products */;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				000E22040B38E022004EA2DF /* Ogre Framework */,
 				000E1D340B38D380004EA2DF /* Ogre */,

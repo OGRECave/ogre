@@ -271,6 +271,11 @@ namespace Ogre {
 #endif
 				bpp = 24;
 			}
+			else if (bpp == 128 && PixelUtil::hasAlpha(pImgData->format) && FreeImage_FIFSupportsExportBPP((FREE_IMAGE_FORMAT)mFreeImageType, 96))
+			{
+				// drop to 96-bit floating point
+				requiredFormat = PF_FLOAT32_RGB;
+			}
 		}
 
 		PixelBox convBox(pImgData->width, pImgData->height, 1, requiredFormat);

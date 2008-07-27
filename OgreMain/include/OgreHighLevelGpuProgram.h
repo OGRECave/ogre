@@ -116,6 +116,10 @@ namespace Ogre {
 		*/
 		const GpuNamedConstants& getConstantDefinitions() const;
 
+		/// Override GpuProgram::getNamedConstants to ensure built
+		const GpuNamedConstants& getNamedConstants() const { return getConstantDefinitions(); }
+
+
 
 
 

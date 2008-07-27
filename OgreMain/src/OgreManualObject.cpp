@@ -700,16 +700,6 @@ namespace Ogre {
 				"No data defined to convert to a mesh.",
 				"ManualObject::convertToMesh");
 		}
-		for (SectionList::iterator i = mSectionList.begin(); i != mSectionList.end(); ++i)
-		{
-			ManualObjectSection* sec = *i;
-			if (!sec->getRenderOperation()->useIndexes)
-			{
-				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-					"Only indexed geometry may be converted to a mesh.",
-					"ManualObject::convertToMesh");
-			}
-		}
 		MeshPtr m = MeshManager::getSingleton().createManual(meshName, groupName);
 
 		for (SectionList::iterator i = mSectionList.begin(); i != mSectionList.end(); ++i)
@@ -723,8 +713,14 @@ namespace Ogre {
 			// Copy vertex data; replicate buffers too
 			sm->vertexData = rop->vertexData->clone(true);
 			// Copy index data; replicate buffers too; delete the default, old one to avoid memory leaks
-			OGRE_DELETE sm->indexData;
-			sm->indexData = rop->indexData->clone(true);
+
+			// check if index data is present
+			if (rop->indexData)
+			{
+				// Copy index data; replicate buffers too; delete the default, old one to avoid memory leaks
+				OGRE_DELETE sm->indexData;
+				sm->indexData = rop->indexData->clone(true);
+			}
 		}
         // update bounds
 		m->_setBounds(mAABB);

@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2006 Torus Knot Software Ltd
@@ -26,29 +26,47 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#include "OgreMaterialScriptCompiler.h"
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
+#include "OgreLogManager.h"
 
 using namespace Ogre;
 
-// subclass from MaterialScriptCompiler class so protected methods can be tested
-class MaterialScriptCompilerTests : public CppUnit::TestFixture, MaterialScriptCompiler
+class MeshWithoutIndexDataTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE( MaterialScriptCompilerTests );
-        CPPUNIT_TEST(testPositionToNextSymbol);
-        CPPUNIT_TEST(testIsFloatValue);
-        CPPUNIT_TEST(testIsLexemeMatch);
-        CPPUNIT_TEST(testCompileMaterialScript);
+    CPPUNIT_TEST_SUITE( MeshWithoutIndexDataTests );
+    CPPUNIT_TEST(testCreateSimpleLine);
+    CPPUNIT_TEST(testCreateLineList);
+    CPPUNIT_TEST(testCreateLineStrip);
+    CPPUNIT_TEST(testCreatePointList);
+    CPPUNIT_TEST(testCreateLineWithMaterial);
+    CPPUNIT_TEST(testCreateMesh);
+    CPPUNIT_TEST(testCloneMesh);
+    CPPUNIT_TEST(testEdgeList);
+    CPPUNIT_TEST(testGenerateExtremes);
+    CPPUNIT_TEST(testBuildTangentVectors);
+    CPPUNIT_TEST(testGenerateLodLevels);
     CPPUNIT_TEST_SUITE_END();
+
 protected:
+    HardwareBufferManager* mBufMgr;
+    MeshManager* mMeshMgr;
+    ArchiveManager* archiveMgr;
+
 public:
     void setUp();
     void tearDown();
+    void testCreateSimpleLine();
+    void testCreateLineList();
+    void testCreateLineStrip();
+    void testCreatePointList();
+    void testCreateLineWithMaterial();
+    void testCreateMesh();
+    void testCloneMesh();
+    void testEdgeList();
+    void testGenerateExtremes();
+    void testBuildTangentVectors();
+    void testGenerateLodLevels();
 
-    void testPositionToNextSymbol();
-    void testIsFloatValue();
-    void testIsLexemeMatch();
-    void testCompileMaterialScript();
 };

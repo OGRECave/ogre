@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="TestOgreMain"
 	ProjectGUID="{0DC410D4-73C1-46F5-9A23-F4026B0B08F7}"
 	RootNamespace="TestOgreMain"
@@ -17,7 +17,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\lib\$(ConfigurationName)"
+			OutputDirectory="..\Samples\Common\bin\$(ConfigurationName)"
 			IntermediateDirectory="..\obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
@@ -102,12 +102,12 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(OutDir)\$(TargetFileName) ..\Samples\Common\bin\$(ConfigurationName)&#x0D;&#x0A;xcopy  $(ProjectDir)\Media\*  ..\Samples\Media\ /Y /S&#x0D;&#x0A;"
+				CommandLine="xcopy  /Y /S $(ProjectDir)\Media\*  ..\Samples\Media\ &#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\lib\$(ConfigurationName)"
+			OutputDirectory="..\Samples\Common\bin\$(ConfigurationName)"
 			IntermediateDirectory="..\obj\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
@@ -198,7 +198,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(OutDir)\$(TargetFileName) ..\Samples\Common\bin\$(ConfigurationName)&#x0D;&#x0A;xcopy /S $(ProjectDir)\Media\*  ..\Samples\Media\&#x0D;&#x0A;"
+				CommandLine="xcopy /Y /S $(ProjectDir)\Media\*  ..\Samples\Media\&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -230,7 +230,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\OgreMain\src\MaterialScriptCompilerTests.cpp"
+				RelativePath=".\OgreMain\src\MeshWithoutIndexDataTests.cpp"
 				>
 			</File>
 			<File
@@ -287,7 +287,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\OgreMain\include\MaterialScriptCompilerTests.h"
+				RelativePath=".\OgreMain\include\MeshWithoutIndexDataTests.h"
 				>
 			</File>
 			<File

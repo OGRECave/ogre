@@ -384,7 +384,7 @@ namespace Ogre {
         /* Bytes per element */
         8,
         /* Flags */
-        PFF_FLOAT,
+        PFF_FLOAT | PFF_HASALPHA,
         /* Component type and count */
         PCT_FLOAT16, 4,
         /* rbits, gbits, bbits, abits */
@@ -410,7 +410,7 @@ namespace Ogre {
         /* Bytes per element */
         16,
         /* Flags */
-        PFF_FLOAT,
+        PFF_FLOAT | PFF_HASALPHA,
         /* Component type and count */
         PCT_FLOAT32, 4,
         /* rbits, gbits, bbits, abits */

@@ -103,30 +103,25 @@ void RenderSystemCapabilitiesTests::testHasCapability()
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_MIPMAP_LOD_BIAS));
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION));
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION_VTC));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_GLEW1_5_NOVBO));
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_FBO_ATI));
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_PBUFFER));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_GLEW1_5_NOHWOCCLUSION));
 
     // add support for few caps from each category
     rsc.setCapability(RSC_AUTOMIPMAP);
     rsc.setCapability(RSC_FRAGMENT_PROGRAM);
     rsc.setCapability(RSC_TEXTURE_COMPRESSION);
     rsc.setCapability(RSC_FBO_ATI);
-    rsc.setCapability(RSC_GLEW1_5_NOHWOCCLUSION);
 
     // check that the newly set caps are supported
     CPPUNIT_ASSERT(rsc.hasCapability(RSC_AUTOMIPMAP));
     CPPUNIT_ASSERT(rsc.hasCapability(RSC_FRAGMENT_PROGRAM));
     CPPUNIT_ASSERT(rsc.hasCapability(RSC_TEXTURE_COMPRESSION));
     CPPUNIT_ASSERT(rsc.hasCapability(RSC_FBO_ATI));
-    CPPUNIT_ASSERT(rsc.hasCapability(RSC_GLEW1_5_NOHWOCCLUSION));
     // check that the non-set caps are NOT supported
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_BLENDING));
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_TWO_SIDED_STENCIL));
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_MIPMAP_LOD_BIAS));
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION_VTC));
-    CPPUNIT_ASSERT(!rsc.hasCapability(RSC_GLEW1_5_NOVBO));
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_PBUFFER));
 }
 
@@ -353,13 +348,11 @@ void RenderSystemCapabilitiesTests::testWriteAllFalseCapabilities()
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "texture_compression false") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "texture_compression_dxt false") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "texture_compression_vtc false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "glew1_5_novbo false") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "fbo false") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "fbo_arb false") != lines.end());
 
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "fbo_ati false") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "pbuffer false") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "glew1_5_nohwocclusion false") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "perstageconstant false") != lines.end());
 
     // bool caps
@@ -413,13 +406,11 @@ void RenderSystemCapabilitiesTests::testWriteAllTrueCapabilities()
     caps.setCapability(RSC_TEXTURE_COMPRESSION);
     caps.setCapability(RSC_TEXTURE_COMPRESSION_DXT);
     caps.setCapability(RSC_TEXTURE_COMPRESSION_VTC);
-    caps.setCapability(RSC_GLEW1_5_NOVBO);
     caps.setCapability(RSC_FBO);
     caps.setCapability(RSC_FBO_ARB);
 
     caps.setCapability(RSC_FBO_ATI);
     caps.setCapability(RSC_PBUFFER);
-    caps.setCapability(RSC_GLEW1_5_NOHWOCCLUSION);
     caps.setCapability(RSC_PERSTAGECONSTANT);
 
 
@@ -480,13 +471,11 @@ void RenderSystemCapabilitiesTests::testWriteAllTrueCapabilities()
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "texture_compression true") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "texture_compression_dxt true") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "texture_compression_vtc true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "glew1_5_novbo true") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "fbo true") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "fbo_arb true") != lines.end());
 
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "fbo_ati true") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "pbuffer true") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "glew1_5_nohwocclusion true") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "perstageconstant true") != lines.end());
 
     // bool caps
@@ -528,8 +517,6 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
     caps.setCapability(RSC_TEXTURE_COMPRESSION);
     caps.setCapability(RSC_TEXTURE_COMPRESSION_DXT);
     caps.setCapability(RSC_TEXTURE_COMPRESSION_VTC);
-    caps.setCapability(RSC_GLEW1_5_NOVBO);
-    caps.setCapability(RSC_GLEW1_5_NOHWOCCLUSION);
     caps.setCapability(RSC_PERSTAGECONSTANT);
 
     caps.setNumWorldMatrices(11);
@@ -554,30 +541,20 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
     caps.setNonPOW2TexturesLimited(true);
     caps.setVertexTextureUnitsShared(true);
 
-	DriverVersion versionD3D9;
-	versionD3D9.major = 2;
-	versionD3D9.minor = 3;
-	versionD3D9.release = 5;
-	versionD3D9.build = 7;
+	DriverVersion driverversion;
+	driverversion.major = 11;
+	driverversion.minor = 13;
+	driverversion.release = 17;
+	driverversion.build = 0;
 
-	DriverVersion versionGL;
-	versionGL.major = 11;
-	versionGL.minor = 13;
-	versionGL.release = 17;
-	versionGL.build = 0;
-
-	caps.setD3D9Version(versionD3D9);
-	caps.setGLVersion(versionGL);
-
-	caps.setCapabilitiesValidForD3D9(true);
-	caps.setCapabilitiesValidForGL(false);
+	caps.setDriverVersion(driverversion);
 
 
      // write them to file
     serializer.writeScript(&caps, name, filename);
 
     FileStreamDataStream* fdatastream = new FileStreamDataStream(filename,
-            new ifstream(filename.c_str()));
+            OGRE_NEW_T(ifstream, MEMCATEGORY_GENERAL)(filename.c_str()));
 
     DataStreamPtr dataStreamPtr(fdatastream);
 
@@ -624,13 +601,11 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
     CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_TEXTURE_COMPRESSION), caps2.hasCapability(RSC_TEXTURE_COMPRESSION));
     CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_TEXTURE_COMPRESSION_DXT), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_DXT));
     CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_TEXTURE_COMPRESSION_VTC), caps2.hasCapability(RSC_TEXTURE_COMPRESSION_VTC));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_GLEW1_5_NOVBO), caps2.hasCapability(RSC_GLEW1_5_NOVBO));
     CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_FBO), caps2.hasCapability(RSC_FBO));
     CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_FBO_ARB), caps2.hasCapability(RSC_FBO_ARB));
 
     CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_FBO_ATI), caps2.hasCapability(RSC_FBO_ATI));
     CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_PBUFFER), caps2.hasCapability(RSC_PBUFFER));
-    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_GLEW1_5_NOHWOCCLUSION), caps2.hasCapability(RSC_GLEW1_5_NOHWOCCLUSION));
     CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_PERSTAGECONSTANT), caps2.hasCapability(RSC_PERSTAGECONSTANT));
 
     CPPUNIT_ASSERT_EQUAL(caps.getNumWorldMatrices(), caps2.getNumWorldMatrices());
@@ -652,20 +627,10 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
     CPPUNIT_ASSERT_EQUAL(caps.getVertexTextureUnitsShared(), caps2.getVertexTextureUnitsShared());
 	
 	// test versions
-	CPPUNIT_ASSERT_EQUAL(caps.getGLVersion().major, caps2.getGLVersion().major);
-	CPPUNIT_ASSERT_EQUAL(caps.getGLVersion().minor, caps2.getGLVersion().minor);
-	CPPUNIT_ASSERT_EQUAL(caps.getGLVersion().release, caps2.getGLVersion().release);
-	CPPUNIT_ASSERT_EQUAL(0, caps2.getGLVersion().build);
-
-	// test versions
-	CPPUNIT_ASSERT_EQUAL(caps.getD3D9Version().major, caps2.getD3D9Version().major);
-	CPPUNIT_ASSERT_EQUAL(caps.getD3D9Version().minor, caps2.getD3D9Version().minor);
-	CPPUNIT_ASSERT_EQUAL(caps.getD3D9Version().release, caps2.getD3D9Version().release);
-	CPPUNIT_ASSERT_EQUAL(caps.getD3D9Version().build, caps2.getD3D9Version().build);
-
-	// test D3D9 support and GL support
-	CPPUNIT_ASSERT_EQUAL(caps.getCapabilitiesValidForGL(), caps2.getCapabilitiesValidForGL());
-	CPPUNIT_ASSERT_EQUAL(caps.getCapabilitiesValidForD3D9(), caps2.getCapabilitiesValidForD3D9());
+	CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().major, caps2.getDriverVersion().major);
+	CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().minor, caps2.getDriverVersion().minor);
+	CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().release, caps2.getDriverVersion().release);
+	CPPUNIT_ASSERT_EQUAL(0, caps2.getDriverVersion().build);
 
     dataStreamPtr.setNull();
 }

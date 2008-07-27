@@ -5658,80 +5658,90 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
     IlluminationRenderStage savedStage = mIlluminationStage;
     mIlluminationStage = IRS_RENDER_TO_TEXTURE;
 
-    // Determine far shadow distance
-    Real shadowDist = mDefaultShadowFarDist;
-    if (!shadowDist)
-    {
-        // need a shadow distance, make one up
-        shadowDist = cam->getNearClipDistance() * 300;
-    }
-	Real shadowOffset = shadowDist * mShadowTextureOffset;
-    // Precalculate fading info
-	Real shadowEnd = shadowDist + shadowOffset;
-	Real fadeStart = shadowEnd * mShadowTextureFadeStart;
-	Real fadeEnd = shadowEnd * mShadowTextureFadeEnd;
-	// Additive lighting should not use fogging, since it will overbrighten; use border clamp
-	if (!isShadowTechniqueAdditive())
+	try
 	{
-		// set fogging to hide the shadow edge 
-		mShadowReceiverPass->setFog(true, FOG_LINEAR, ColourValue::White, 
-			0, fadeStart, fadeEnd);
-	}
-    else
-    {
-        // disable fogging explicitly
-        mShadowReceiverPass->setFog(true, FOG_NONE);
-    }
-
-    // Iterate over the lights we've found, max out at the limit of light textures
-	// Note that the light sorting must now place shadow casting lights at the
-	// start of the light list, therefore we do not need to deal with potential
-	// mismatches in the light<->shadow texture list any more
-
-    LightList::iterator i, iend;
-    ShadowTextureList::iterator si, siend;
-	ShadowTextureCameraList::iterator ci;
-    iend = mLightsAffectingFrustum.end();
-    siend = mShadowTextures.end();
-	ci = mShadowTextureCameras.begin();
-    for (i = mLightsAffectingFrustum.begin(), si = mShadowTextures.begin();
-        i != iend && si != siend; ++i)
-    {
-        Light* light = *i;
-
-		// skip light if shadows are disabled
-		if (!light->getCastShadows())
-			continue;
-
-		TexturePtr &shadowTex = *si;
-        RenderTarget *shadowRTT = shadowTex->getBuffer()->getRenderTarget();
-        Viewport *shadowView = shadowRTT->getViewport(0);
-        Camera *texCam = *ci;
-		// rebind camera, incase another SM in use which has switched to its cam
-		shadowView->setCamera(texCam);
-        
-		// update shadow cam - light mapping
-		ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );
-		assert(camLightIt != mShadowCamLightMapping.end());
-		camLightIt->second = light;
-
-		if (light->getCustomShadowCameraSetup().isNull())
-			mDefaultShadowCameraSetup->getShadowCamera(this, cam, vp, light, texCam);
+		
+		// Determine far shadow distance
+		Real shadowDist = mDefaultShadowFarDist;
+		if (!shadowDist)
+		{
+			// need a shadow distance, make one up
+			shadowDist = cam->getNearClipDistance() * 300;
+		}
+		Real shadowOffset = shadowDist * mShadowTextureOffset;
+		// Precalculate fading info
+		Real shadowEnd = shadowDist + shadowOffset;
+		Real fadeStart = shadowEnd * mShadowTextureFadeStart;
+		Real fadeEnd = shadowEnd * mShadowTextureFadeEnd;
+		// Additive lighting should not use fogging, since it will overbrighten; use border clamp
+		if (!isShadowTechniqueAdditive())
+		{
+			// set fogging to hide the shadow edge 
+			mShadowReceiverPass->setFog(true, FOG_LINEAR, ColourValue::White, 
+				0, fadeStart, fadeEnd);
+		}
 		else
-			light->getCustomShadowCameraSetup()->getShadowCamera(this, cam, vp, light, texCam);
+		{
+			// disable fogging explicitly
+			mShadowReceiverPass->setFog(true, FOG_NONE);
+		}
 
-        // Setup background colour
-        shadowView->setBackgroundColour(ColourValue::White);
+		// Iterate over the lights we've found, max out at the limit of light textures
+		// Note that the light sorting must now place shadow casting lights at the
+		// start of the light list, therefore we do not need to deal with potential
+		// mismatches in the light<->shadow texture list any more
 
-		// Fire shadow caster update, callee can alter camera settings
-		fireShadowTexturesPreCaster(light, texCam);
+		LightList::iterator i, iend;
+		ShadowTextureList::iterator si, siend;
+		ShadowTextureCameraList::iterator ci;
+		iend = mLightsAffectingFrustum.end();
+		siend = mShadowTextures.end();
+		ci = mShadowTextureCameras.begin();
+		for (i = mLightsAffectingFrustum.begin(), si = mShadowTextures.begin();
+			i != iend && si != siend; ++i)
+		{
+			Light* light = *i;
 
-        // Update target
-        shadowRTT->update();
+			// skip light if shadows are disabled
+			if (!light->getCastShadows())
+				continue;
 
-        ++si; // next shadow texture
-		++ci; // next camera
-    }
+			TexturePtr &shadowTex = *si;
+			RenderTarget *shadowRTT = shadowTex->getBuffer()->getRenderTarget();
+			Viewport *shadowView = shadowRTT->getViewport(0);
+			Camera *texCam = *ci;
+			// rebind camera, incase another SM in use which has switched to its cam
+			shadowView->setCamera(texCam);
+			
+			// update shadow cam - light mapping
+			ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );
+			assert(camLightIt != mShadowCamLightMapping.end());
+			camLightIt->second = light;
+
+			if (light->getCustomShadowCameraSetup().isNull())
+				mDefaultShadowCameraSetup->getShadowCamera(this, cam, vp, light, texCam);
+			else
+				light->getCustomShadowCameraSetup()->getShadowCamera(this, cam, vp, light, texCam);
+
+			// Setup background colour
+			shadowView->setBackgroundColour(ColourValue::White);
+
+			// Fire shadow caster update, callee can alter camera settings
+			fireShadowTexturesPreCaster(light, texCam);
+
+			// Update target
+			shadowRTT->update();
+
+			++si; // next shadow texture
+			++ci; // next camera
+		}
+	}
+	catch (Exception& e) 
+	{
+		// we must reset the illumination stage if an exception occurs
+		mIlluminationStage = savedStage;
+		throw e;
+	}
     // Set the illumination stage, prevents recursive calls
     mIlluminationStage = savedStage;
 

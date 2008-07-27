@@ -122,7 +122,7 @@ namespace Ogre {
 			addRequest(req);
 			// Wait for thread to finish
 			mThread->join();
-			OGRE_DELETE_T(mThread, boost::thread, MEMCATEGORY_RESOURCE);
+			OGRE_DELETE_T(mThread, thread, MEMCATEGORY_RESOURCE);
 			mThread = 0;
 			mRequestQueue.clear();
 			mRequestTicketMap.clear();

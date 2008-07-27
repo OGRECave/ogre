@@ -78,8 +78,7 @@ namespace Ogre {
     void SubMesh::_getRenderOperation(RenderOperation& ro, ushort lodIndex)
     {
 
-		// SubMeshes always use indexes
-        ro.useIndexes = true;
+        ro.useIndexes = indexData->indexCount != 0;
 		if (lodIndex > 0 && static_cast< size_t >( lodIndex - 1 ) < mLodFaceList.size())
 		{
 			// lodIndex - 1 because we don't store full detail version in mLodFaceList
@@ -325,12 +324,6 @@ namespace Ogre {
          * detailed as it's possible.
          */
 
-        uint elsz = indexData->indexBuffer->getType () == HardwareIndexBuffer::IT_32BIT ?
-            4 : 2;
-        uint8 *idata = (uint8 *)indexData->indexBuffer->lock (
-            indexData->indexStart * elsz, indexData->indexCount * elsz,
-            HardwareIndexBuffer::HBL_READ_ONLY);
-
         VertexData *vert = useSharedVertices ?
             parent->sharedVertexData : vertexData;
         const VertexElement *poselem = vert->vertexDeclaration->
@@ -343,13 +336,35 @@ namespace Ogre {
         std::vector<Cluster> boxes;
         boxes.reserve (count);
 
-        // First of all, find min and max bounding box of the submesh
-        boxes.push_back (Cluster ());
-        for (size_t i = 0; i < indexData->indexCount; i++)
-        {
-            int idx = (elsz == 2) ? ((uint16 *)idata) [i] : ((uint32 *)idata) [i];
-            boxes [0].mIndices.insert (idx);
-        }
+		// First of all, find min and max bounding box of the submesh
+		boxes.push_back (Cluster ());
+
+		if (indexData->indexCount > 0)
+		{
+
+			uint elsz = indexData->indexBuffer->getType () == HardwareIndexBuffer::IT_32BIT ?
+				4 : 2;
+			uint8 *idata = (uint8 *)indexData->indexBuffer->lock (
+				indexData->indexStart * elsz, indexData->indexCount * elsz,
+				HardwareIndexBuffer::HBL_READ_ONLY);
+
+			for (size_t i = 0; i < indexData->indexCount; i++)
+			{
+				int idx = (elsz == 2) ? ((uint16 *)idata) [i] : ((uint32 *)idata) [i];
+				boxes [0].mIndices.insert (idx);
+			}
+			indexData->indexBuffer->unlock ();
+
+		}
+		else
+		{
+			// just insert all indexes
+			for (size_t i = vertexData->vertexStart; i < vertexData->vertexCount; i++)
+			{
+				boxes [0].mIndices.insert (i);
+			}
+
+		}
 
         boxes [0].computeBBox (poselem, vdata, vsz);
 
@@ -428,7 +443,6 @@ namespace Ogre {
         }
 
         vbuf->unlock ();
-        indexData->indexBuffer->unlock ();
     }
 	 //---------------------------------------------------------------------
 	void SubMesh::setBuildEdgesEnabled(bool b)

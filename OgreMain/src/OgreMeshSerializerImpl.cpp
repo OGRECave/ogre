@@ -245,23 +245,27 @@ namespace Ogre {
         writeInts(&indexCount, 1);
 
         // bool indexes32Bit
-        bool idx32bit = (s->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
+        bool idx32bit = (!s->indexData->indexBuffer.isNull() &&
+			s->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
         writeBools(&idx32bit, 1);
 
-        // unsigned short* faceVertexIndices ((indexCount)
-        HardwareIndexBufferSharedPtr ibuf = s->indexData->indexBuffer;
-        void* pIdx = ibuf->lock(HardwareBuffer::HBL_READ_ONLY);
-        if (idx32bit)
-        {
-            unsigned int* pIdx32 = static_cast<unsigned int*>(pIdx);
-            writeInts(pIdx32, s->indexData->indexCount);
-        }
-        else
-        {
-            unsigned short* pIdx16 = static_cast<unsigned short*>(pIdx);
-            writeShorts(pIdx16, s->indexData->indexCount);
-        }
-        ibuf->unlock();
+		if (indexCount > 0)
+		{
+			// unsigned short* faceVertexIndices ((indexCount)
+			HardwareIndexBufferSharedPtr ibuf = s->indexData->indexBuffer;
+			void* pIdx = ibuf->lock(HardwareBuffer::HBL_READ_ONLY);
+			if (idx32bit)
+			{
+				unsigned int* pIdx32 = static_cast<unsigned int*>(pIdx);
+				writeInts(pIdx32, s->indexData->indexCount);
+			}
+			else
+			{
+				unsigned short* pIdx16 = static_cast<unsigned short*>(pIdx);
+				writeShorts(pIdx16, s->indexData->indexCount);
+			}
+			ibuf->unlock();
+		}
 
         // M_GEOMETRY stream (Optional: present only if useSharedVertices = false)
         if (!s->useSharedVertices)
@@ -1238,7 +1242,8 @@ namespace Ogre {
             // bool indexes32Bit
 			size += sizeof(bool);
 			// unsigned short*/int* faceIndexes;
-            if (indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT)
+            if (!indexData->indexBuffer.isNull() &&
+				indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT)
             {
 			    size += static_cast<unsigned long>(
                     sizeof(unsigned int) * indexData->indexCount);
@@ -1265,8 +1270,12 @@ namespace Ogre {
             const IndexData* indexData = sm->mLodFaceList[lodNum - 1];
             // bool indexes32Bit
 			size += sizeof(bool);
+			// Lock index buffer to write
+			HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
+			// bool indexes32bit
+			bool idx32 = (!ibuf.isNull() && ibuf->getType() == HardwareIndexBuffer::IT_32BIT);
 			// unsigned short*/int* faceIndexes;
-            if (indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT)
+            if (idx32)
             {
 			    size += static_cast<unsigned long>(
                     sizeof(unsigned int) * indexData->indexCount);
@@ -1280,25 +1289,25 @@ namespace Ogre {
 			writeChunkHeader(M_MESH_LOD_GENERATED, size);
 			unsigned int idxCount = static_cast<unsigned int>(indexData->indexCount);
 			writeInts(&idxCount, 1);
-            // Lock index buffer to write
-            HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
-			// bool indexes32bit
-			bool idx32 = (ibuf->getType() == HardwareIndexBuffer::IT_32BIT);
 			writeBools(&idx32, 1);
-            if (idx32)
-            {
-                unsigned int* pIdx = static_cast<unsigned int*>(
-                    ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
-			    writeInts(pIdx, indexData->indexCount);
-                ibuf->unlock();
-            }
-            else
-            {
-                unsigned short* pIdx = static_cast<unsigned short*>(
-                    ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
-			    writeShorts(pIdx, indexData->indexCount);
-                ibuf->unlock();
-            }
+
+			if (idxCount > 0)
+			{
+				if (idx32)
+				{
+					unsigned int* pIdx = static_cast<unsigned int*>(
+						ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+					writeInts(pIdx, indexData->indexCount);
+					ibuf->unlock();
+				}
+				else
+				{
+					unsigned short* pIdx = static_cast<unsigned short*>(
+						ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+					writeShorts(pIdx, indexData->indexCount);
+					ibuf->unlock();
+				}
+			}
 		}
 
 

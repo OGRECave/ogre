@@ -285,9 +285,13 @@ void CompositorChain::postViewportUpdate(const RenderTargetViewportEvent& evt)
 //-----------------------------------------------------------------------
 void CompositorChain::viewportRemoved(const RenderTargetViewportEvent& evt)
 {
-	// this chain is now orphaned
-	// can't delete it since held from outside, but release all resources being used
-	destroyResources();
+	// check this is the viewport we're attached to (multi-viewport targets)
+	if (evt.source == mViewport) 
+	{
+		// this chain is now orphaned
+		// can't delete it since held from outside, but release all resources being used
+		destroyResources();
+	}
 
 }
 //-----------------------------------------------------------------------

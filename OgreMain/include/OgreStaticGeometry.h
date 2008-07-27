@@ -107,8 +107,8 @@ namespace Ogre {
 		wishes, and also handles the memory management for you like other 
 		classes.
 	@note
-		Warning: this class only works with triangle lists at the moment,
-		do not pass it triangle strips, fans or lines / points.
+		Warning: this class only works with indexed triangle lists at the moment,
+		do not pass it triangle strips, fans or lines / points, or unindexed geometry.
 	*/
 	class _OgreExport StaticGeometry : public BatchedGeometryAlloc
 	{

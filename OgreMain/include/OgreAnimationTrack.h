@@ -226,6 +226,8 @@ namespace Ogre
 		/** Set a listener for this track. */
 		virtual void setListener(Listener* l) { mListener = l; }
 
+		/** Returns the parent Animation object for this track. */
+		Animation *getParent() const { return mParent; }
     protected:
         typedef std::vector<KeyFrame*> KeyFrameList;
         KeyFrameList mKeyFrames;
