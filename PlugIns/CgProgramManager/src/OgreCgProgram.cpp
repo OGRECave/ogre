@@ -264,6 +264,7 @@ namespace Ogre {
 							"Problem parsing the following Cg Uniform: '"
 							+ paramName + "' in file " + mName);
 						// next uniform
+						parameter = cgGetNextParameter(parameter);
 						continue;
 					}
 					if (isRegisterCombiner)
