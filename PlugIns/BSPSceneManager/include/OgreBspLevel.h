@@ -118,6 +118,7 @@ namespace Ogre {
         BspNode* mRootNode;
         int mNumNodes;
         int mNumLeaves;
+		int mNumBrushes;
         int mLeafStart; // the index at which leaf nodes begin
 
         /** Vertex format for fixed geometry.

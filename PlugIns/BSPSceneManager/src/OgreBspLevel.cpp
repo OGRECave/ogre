@@ -127,18 +127,18 @@ namespace Ogre {
     void BspLevel::unloadImpl()
     {
         if (mVertexData)
-            delete mVertexData;
+            OGRE_DELETE mVertexData;
         mIndexes.setNull();
         if (mFaceGroups)
-            delete [] mFaceGroups;
+            OGRE_DELETE_ARRAY_T(mFaceGroups, StaticFaceGroup, (size_t)mNumFaceGroups, MEMCATEGORY_GEOMETRY);
         if (mLeafFaceGroups)
-            delete [] mLeafFaceGroups;
+            OGRE_FREE(mLeafFaceGroups, MEMCATEGORY_GEOMETRY);
         if (mRootNode)
-            delete [] mRootNode;
+            OGRE_DELETE [] mRootNode;
         if (mVisData.tableData)
-            delete [] mVisData.tableData;
+            OGRE_FREE(mVisData.tableData, MEMCATEGORY_GEOMETRY);
         if (mBrushes)
-            delete [] mBrushes;
+			OGRE_DELETE_ARRAY_T(mBrushes, Brush, (size_t)mNumBrushes, MEMCATEGORY_GEOMETRY);
 
         mVertexData = 0;
         mRootNode = 0;
@@ -148,7 +148,7 @@ namespace Ogre {
         mVisData.tableData = 0;
         for (PatchMap::iterator pi = mPatches.begin(); pi != mPatches.end(); ++pi)
         {
-            delete pi->second;
+            OGRE_DELETE pi->second;
         }
         mPatches.clear();
     }
@@ -219,7 +219,7 @@ namespace Ogre {
         // Vertices
         //-----------------------------------------------------------------------
         // Allocate memory for vertices & copy
-        mVertexData = new VertexData();
+        mVertexData = OGRE_NEW VertexData();
 
         /// Create vertex declaration
         VertexDeclaration* decl = mVertexData->vertexDeclaration;
@@ -272,16 +272,16 @@ namespace Ogre {
         // --------
         rgm._notifyWorldGeometryStageStarted("Setting up face data");
         mNumLeafFaceGroups = q3lvl.mNumLeafFaces;
-        mLeafFaceGroups = new int[mNumLeafFaceGroups];
+        mLeafFaceGroups = OGRE_ALLOC_T(int, mNumLeafFaceGroups, MEMCATEGORY_GEOMETRY);
         memcpy(mLeafFaceGroups, q3lvl.mLeafFaces, sizeof(int)*mNumLeafFaceGroups);
         mNumFaceGroups = q3lvl.mNumFaces;
-        mFaceGroups = new StaticFaceGroup[mNumFaceGroups];
+        mFaceGroups = OGRE_NEW_ARRAY_T(StaticFaceGroup, mNumFaceGroups, MEMCATEGORY_GEOMETRY);
         // Set up index buffer
         // NB Quake3 indexes are 32-bit
         // Copy the indexes into a software area for staging
         mNumIndexes = q3lvl.mNumElements + mPatchIndexCount;
         // Create an index buffer manually in system memory, allow space for patches
-        mIndexes.bind(new DefaultHardwareIndexBuffer(
+        mIndexes.bind(OGRE_NEW DefaultHardwareIndexBuffer(
             HardwareIndexBuffer::IT_32BIT, 
             mNumIndexes, 
             HardwareBuffer::HBU_DYNAMIC));
@@ -499,7 +499,7 @@ namespace Ogre {
         mNumNodes = q3lvl.mNumNodes + q3lvl.mNumLeaves;
         mNumLeaves = q3lvl.mNumLeaves;
         mLeafStart = q3lvl.mNumNodes;
-        mRootNode = new BspNode[mNumNodes];
+        mRootNode = OGRE_NEW BspNode[mNumNodes];
         int i;
         // Convert nodes
         // In our array, first q3lvl.mNumNodes are non-leaf, others are leaves
@@ -577,7 +577,8 @@ namespace Ogre {
         // Brushes
         //-----------------------------------------------------------------------
         // Reserve enough memory for all brushes, solid or not (need to maintain indexes)
-        mBrushes = new BspNode::Brush[q3lvl.mNumBrushes];
+		mNumBrushes = q3lvl.mNumBrushes;
+        mBrushes = OGRE_NEW_ARRAY_T(BspNode::Brush, mNumBrushes, MEMCATEGORY_GEOMETRY);
         progressCountdown = NUM_BRUSHES_PER_PROGRESS_REPORT;
         progressCount = 0;
 
@@ -707,7 +708,7 @@ namespace Ogre {
         rgm._notifyWorldGeometryStageStarted("Copying Vis data");
         mVisData.numClusters = q3lvl.mVis->cluster_count;
         mVisData.rowLength = q3lvl.mVis->row_size;
-        mVisData.tableData = new unsigned char[q3lvl.mVis->row_size * q3lvl.mVis->cluster_count];
+        mVisData.tableData = OGRE_ALLOC_T(unsigned char, q3lvl.mVis->row_size * q3lvl.mVis->cluster_count, MEMCATEGORY_GEOMETRY);
         memcpy(mVisData.tableData, q3lvl.mVis->data, q3lvl.mVis->row_size * q3lvl.mVis->cluster_count);
         rgm._notifyWorldGeometryStageEnded();
 
@@ -738,11 +739,11 @@ namespace Ogre {
                 {
                     continue;
                 }
-                PatchSurface* ps = new PatchSurface();
+                PatchSurface* ps = OGRE_NEW PatchSurface();
                 // Set up control points & format
                 // Reuse the vertex declaration 
                 // Copy control points into a buffer so we can convert their format
-                BspVertex* pControlPoints = new BspVertex[src->vert_count];
+                BspVertex* pControlPoints = OGRE_ALLOC_T(BspVertex, src->vert_count, MEMCATEGORY_GEOMETRY);
                 bsp_vertex_t* pSrc = q3lvl.mVertices + src->vert_start;
                 for (int v = 0; v < src->vert_count; ++v)
                 {
@@ -787,7 +788,7 @@ namespace Ogre {
 
             // No need for control points anymore
             BspVertex* pCP = static_cast<BspVertex*>(ps->getControlPointBuffer());
-            delete [] pCP;
+            OGRE_FREE(pCP, MEMCATEGORY_GEOMETRY);
             ps->notifyControlPointBufferDeallocated();
 
             currVertOffset += ps->getRequiredVertexCount();

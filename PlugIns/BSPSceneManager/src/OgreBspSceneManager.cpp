@@ -132,7 +132,7 @@ namespace Ogre {
         // Init static render operation
         mRenderOp.vertexData = mLevel->mVertexData;
         // index data is per-frame
-        mRenderOp.indexData = new IndexData();
+        mRenderOp.indexData = OGRE_NEW IndexData();
         mRenderOp.indexData->indexStart = 0;
         mRenderOp.indexData->indexCount = 0;
         // Create enough index space to render whole level
@@ -174,7 +174,7 @@ namespace Ogre {
         // Init static render operation
         mRenderOp.vertexData = mLevel->mVertexData;
         // index data is per-frame
-        mRenderOp.indexData = new IndexData();
+        mRenderOp.indexData = OGRE_NEW IndexData();
         mRenderOp.indexData->indexStart = 0;
         mRenderOp.indexData->indexCount = 0;
         // Create enough index space to render whole level
@@ -504,7 +504,7 @@ namespace Ogre {
     void BspSceneManager::freeMemory(void)
     {
         // no need to delete index buffer, will be handled by shared pointer
-        delete mRenderOp.indexData;
+        OGRE_DELETE mRenderOp.indexData;
 		mRenderOp.indexData = 0;
     }
     //-----------------------------------------------------------------------
@@ -611,12 +611,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SceneNode * BspSceneManager::createSceneNodeImpl( void )
     {
-        return new BspSceneNode( this );
+        return OGRE_NEW BspSceneNode( this );
     }
     //-----------------------------------------------------------------------
     SceneNode * BspSceneManager::createSceneNodeImpl( const String &name )
     {
-        return new BspSceneNode( this, name );
+        return OGRE_NEW BspSceneNode( this, name );
     }
     //-----------------------------------------------------------------------
     void BspSceneManager::_notifyObjectMoved(const MovableObject* mov, 
@@ -663,7 +663,7 @@ namespace Ogre {
     RaySceneQuery* BspSceneManager::
     createRayQuery(const Ray& ray, unsigned long mask)
     {
-        BspRaySceneQuery* q = new BspRaySceneQuery(this);
+        BspRaySceneQuery* q = OGRE_NEW BspRaySceneQuery(this);
         q->setRay(ray);
         q->setQueryMask(mask);
         return q;
@@ -672,7 +672,7 @@ namespace Ogre {
     IntersectionSceneQuery* BspSceneManager::
     createIntersectionQuery(unsigned long mask)
     {
-        BspIntersectionSceneQuery* q = new BspIntersectionSceneQuery(this);
+        BspIntersectionSceneQuery* q = OGRE_NEW BspIntersectionSceneQuery(this);
         q->setQueryMask(mask);
         return q;
     }
@@ -818,7 +818,7 @@ namespace Ogre {
         std::vector<WorldFragment*>::iterator i;
         for (i = mSingleIntersections.begin(); i != mSingleIntersections.end(); ++i)
         {
-            delete *i;
+            OGRE_FREE(*i, MEMCATEGORY_SCENE_CONTROL);
         }
         mSingleIntersections.clear();
     }
@@ -931,7 +931,7 @@ namespace Ogre {
                     {
                         // We're interested in a single intersection
                         // Have to create these 
-                        SceneQuery::WorldFragment* wf = new SceneQuery::WorldFragment();
+                        SceneQuery::WorldFragment* wf = OGRE_ALLOC_T(SceneQuery::WorldFragment, 1, MEMCATEGORY_SCENE_CONTROL);
                         wf->fragmentType = SceneQuery::WFT_SINGLE_INTERSECTION;
                         wf->singleIntersection = tracingRay.getPoint(result.second);
                         // save this so we can clean up later
@@ -974,12 +974,12 @@ namespace Ogre {
 	SceneManager* BspSceneManagerFactory::createInstance(
 		const String& instanceName)
 	{
-		return new BspSceneManager(instanceName);
+		return OGRE_NEW BspSceneManager(instanceName);
 	}
 	//-----------------------------------------------------------------------
 	void BspSceneManagerFactory::destroyInstance(SceneManager* instance)
 	{
-		delete instance;
+		OGRE_DELETE instance;
 	}
 
 }

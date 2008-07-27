@@ -60,7 +60,7 @@ namespace Ogre {
     be valid after the original call. This is why it has no accessor methods
     for reading it's internal state.
     */
-    class Quake3Level
+	class Quake3Level : public ResourceAlloc
     {
     public:
         Quake3Level();

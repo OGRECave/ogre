@@ -37,7 +37,7 @@ namespace Ogre
 {
 
 	/** Plugin instance for BSPSceneManager */
-	class BspSceneManagerPlugin : public Plugin
+	class BspSceneManagerPlugin : public Plugin, public GeneralAllocatedObject
 	{
 	public:
 		BspSceneManagerPlugin();
