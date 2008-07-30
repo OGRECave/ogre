@@ -1278,7 +1278,7 @@ namespace Ogre {
 	void InstancedGeometry::BatchInstance::_notifyCurrentCamera(Camera* cam)
 	{
 		// Calculate squared view depth
-		Vector3 diff = cam->getDerivedPosition() ;
+		Vector3 diff = cam->getLodCamera()->getDerivedPosition() ;
 		Real squaredDepth = diff.squaredLength();
 
 		// Determine whether to still render

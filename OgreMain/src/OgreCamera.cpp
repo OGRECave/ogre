@@ -58,7 +58,8 @@ namespace Ogre {
 		mLastViewport(0),
 		mAutoAspectRatio(false),
 		mCullFrustum(0),
-		mUseRenderingDistance(true)
+		mUseRenderingDistance(true),
+		mLodCamera(0)
 
     {
 
@@ -567,6 +568,19 @@ namespace Ogre {
 	Real Camera::_getLodBiasInverse(void) const
 	{
 		return mSceneLodFactorInv;
+	}
+	//-----------------------------------------------------------------------
+	void Camera::setLodCamera(const Camera* lodCam)
+	{
+		if (lodCam == this)
+			mLodCamera = 0;
+		else
+			mLodCamera = lodCam;
+	}
+	//---------------------------------------------------------------------
+	const Camera* Camera::getLodCamera() const
+	{
+		return mLodCamera? mLodCamera : this;
 	}
     //-----------------------------------------------------------------------
 	Ray Camera::getCameraToViewportRay(Real screenX, Real screenY) const

@@ -6802,6 +6802,124 @@ protected:
 		sn->attachObject(man);
 	}
 
+	void testShadowLod(bool directional, ShadowTechnique tech)
+	{
+		// Test that LOD is based on main camera, not shadow camera
+
+		mSceneMgr->setShadowTextureSize(1024);
+		mSceneMgr->setShadowTechnique(tech);
+
+		//FocusedShadowCameraSetup* lispsmSetup = new FocusedShadowCameraSetup();
+		//LiSPSMShadowCameraSetup* lispsmSetup = new LiSPSMShadowCameraSetup();
+		//lispsmSetup->setOptimalAdjustFactor(1.5);
+		//mSceneMgr->setShadowCameraSetup(ShadowCameraSetupPtr(lispsmSetup));
+
+		mSceneMgr->setShadowColour(ColourValue(0.35, 0.35, 0.35));
+		// Set ambient light
+		mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
+
+		mLight = mSceneMgr->createLight("MainLight");
+
+		// Directional test
+		if (directional)
+		{
+			mLight->setType(Light::LT_DIRECTIONAL);
+			Vector3 vec(-1,-1,0);
+			vec.normalise();
+			mLight->setDirection(vec);
+		}
+		// Spotlight test
+		else
+		{
+			mLight->setType(Light::LT_SPOTLIGHT);
+			mLight->setAttenuation(10000, 1, 0, 0);
+			mLight->setDiffuseColour(1.0, 1.0, 0.8);
+			mTestNode[0] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+			mTestNode[0]->setPosition(400,300,0);
+			mTestNode[0]->lookAt(Vector3(0,0,0), Node::TS_WORLD, Vector3::UNIT_Z);
+			mTestNode[0]->attachObject(mLight);
+		}
+
+		mTestNode[1] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+
+
+		Entity* pEnt;
+		pEnt = mSceneMgr->createEntity( "1", "knot.mesh" );
+		// rendering distance should also be based on main cam
+		//pEnt->setRenderingDistance(100);
+		//pEnt->setMaterialName("2 - Default");
+		mTestNode[1]->attachObject( pEnt );
+		//mTestNode[1]->translate(0,-100,0);
+/*
+		pEnt = mSceneMgr->createEntity( "3", "knot.mesh" );
+		mTestNode[2] = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-200, 0, -200));
+		mTestNode[2]->attachObject( pEnt );
+
+		
+		createRandomEntityClones(pEnt, 20, Vector3(-1000,0,-1000), Vector3(1000,0,1000));
+
+
+		// Transparent object (can force cast shadows)
+		pEnt = mSceneMgr->createEntity( "3.5", "knot.mesh" );
+		MaterialPtr tmat = MaterialManager::getSingleton().create("TestAlphaTransparency", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		tmat->setTransparencyCastsShadows(true);
+		Pass* tpass = tmat->getTechnique(0)->getPass(0);
+		tpass->setAlphaRejectSettings(CMPF_GREATER, 150);
+		tpass->setSceneBlending(SBT_TRANSPARENT_ALPHA);
+		tpass->createTextureUnitState("gras_02.png");
+		tpass->setCullingMode(CULL_NONE);
+
+		pEnt->setMaterialName("TestAlphaTransparency");
+		mTestNode[3] = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(350, 0, -200));
+		mTestNode[3]->attachObject( pEnt );
+
+		MeshPtr msh = MeshManager::getSingleton().load("knot.mesh",
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		msh->buildTangentVectors(VES_TANGENT, 0, 0);
+		pEnt = mSceneMgr->createEntity( "4", "knot.mesh" );
+		//pEnt->setMaterialName("Examples/BumpMapping/MultiLightSpecular");
+		mTestNode[2] = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(100, 0, 200));
+		mTestNode[2]->attachObject( pEnt );
+
+		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
+*/
+
+
+		movablePlane.normal = Vector3::UNIT_Y;
+		movablePlane.d = 100;
+		MeshManager::getSingleton().createPlane("Myplane",
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, movablePlane,
+			2500,2500,10,10,true,1,5,5,Vector3::UNIT_Z);
+		Entity* pPlaneEnt;
+		pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+		if (tech & SHADOWDETAILTYPE_INTEGRATED)
+		{
+			pPlaneEnt->setMaterialName("Examples/Plane/IntegratedShadows");
+		}
+		else
+		{
+			pPlaneEnt->setMaterialName("2 - Default");
+		}
+		pPlaneEnt->setCastShadows(false);
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
+
+		addTextureShadowDebugOverlay(1);
+
+
+		/*
+		ParticleSystem* pSys2 = mSceneMgr->createParticleSystem("smoke", 
+		"Examples/Smoke");
+		mTestNode[4] = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-300, -100, 200));
+		mTestNode[4]->attachObject(pSys2);
+		*/
+
+		mCamera->setPosition(0, 1000, 500);
+		mCamera->lookAt(0,0,0);
+		mCamera->setFarClipDistance(10000);
+
+	}
+
 
     void createScene(void)
     {
@@ -6904,7 +7022,7 @@ protected:
 		//testPoseAnimation();
 		//testPoseAnimation2();
 		//testNormalMapMirroredUVs();
-		testMRTCompositorScript();
+		//testMRTCompositorScript();
 		//testSpotlightViewProj(true);
 		//test16Textures();
 		//testProjectSphere();
@@ -6939,6 +7057,7 @@ protected:
         //testSkeletonAnimationOptimise();
         //testBuildTangentOnAnimatedMesh();
 		//testOverlayRelativeMode();
+		testShadowLod(false, SHADOWTYPE_TEXTURE_MODULATIVE);
 
 		//testCubeDDS();
 		//testDxt1();

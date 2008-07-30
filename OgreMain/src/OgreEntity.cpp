@@ -370,13 +370,14 @@ namespace Ogre {
         // Calculate the LOD
         if (mParentNode)
         {
-            Real squaredDepth = mParentNode->getSquaredViewDepth(cam);
+			const Camera* lodCamera = cam->getLodCamera();
+            Real squaredDepth = mParentNode->getSquaredViewDepth(lodCamera);
 
             // Do Mesh LOD
             // Adjust this depth by the entity bias factor
             Real tmp = squaredDepth * mMeshLodFactorInv;
             // Now adjust it by the camera bias
-            tmp = tmp * cam->_getLodBiasInverse();
+            tmp = tmp * lodCamera->_getLodBiasInverse();
             // Get the index at this biased depth
             mMeshLodIndex = mMesh->getLodIndexSquaredDepth(tmp);
             // Apply maximum detail restriction (remember lower = higher detail)
@@ -388,7 +389,7 @@ namespace Ogre {
             // Adjust this depth by the entity bias factor
             tmp = squaredDepth * mMaterialLodFactorInv;
             // Now adjust it by the camera bias
-            tmp = tmp * cam->_getLodBiasInverse();
+            tmp = tmp * lodCamera->_getLodBiasInverse();
             SubEntityList::iterator i, iend;
             iend = mSubEntityList.end();
             for (i = mSubEntityList.begin(); i != iend; ++i)

@@ -5705,6 +5705,9 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
 			// rebind camera, incase another SM in use which has switched to its cam
 			shadowView->setCamera(texCam);
 			
+			// Associate main view camera as LOD camera
+			texCam->setLodCamera(cam);
+
 			// update shadow cam - light mapping
 			ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );
 			assert(camLightIt != mShadowCamLightMapping.end());

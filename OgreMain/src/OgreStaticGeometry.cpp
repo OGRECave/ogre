@@ -849,7 +849,7 @@ namespace Ogre {
 	void StaticGeometry::Region::_notifyCurrentCamera(Camera* cam)
 	{
 		// Calculate squared view depth
-		Vector3 diff = cam->getDerivedPosition() - mCentre;
+		Vector3 diff = cam->getLodCamera()->getDerivedPosition() - mCentre;
 		Real squaredDepth = diff.squaredLength();
 
 		// Determine whether to still render
