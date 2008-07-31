@@ -3416,17 +3416,6 @@ namespace Ogre
 		mBasicStatesInitialised = false;
 
 		fireEvent("DeviceLost"); // you need to stop the physics or game engines after this event
-
-		// here the render system waits until the device is not lost - else the user will get crashes after trying to lock a buffer
-		HRESULT hr = mpD3DDevice->TestCooperativeLevel();
-		while (hr == D3DERR_DEVICELOST)
-		{
-			Sleep(50);
-			hr = mpD3DDevice->TestCooperativeLevel();
-		}
-
-		fireEvent("DeviceNotLost"); // start over the physics or game engines after this event
-
 	}
 
 	//---------------------------------------------------------------------
