@@ -43,9 +43,10 @@ Torus Knot Software Ltd.
 namespace Ogre
 {
 	D3D9RenderWindow::D3D9RenderWindow(HINSTANCE instance, D3D9Driver *driver, LPDIRECT3DDEVICE9 deviceIfSwapChain)
-        : mInstance(instance)
-        , mDriver(driver)
-        , mpRenderSurface(0)
+		: mInstance(instance)
+		, mDriver(driver)
+		, mpRenderSurface(0)
+		, mpRenderZBuffer(0)
 	{
 		mIsFullScreen = false;
 		mIsSwapChain = (deviceIfSwapChain != NULL);
@@ -143,7 +144,7 @@ namespace Ogre
 				mFSAA = StringConverter::parseUnsignedInt(opt->second);
 				mFSAAType = (D3DMULTISAMPLE_TYPE)mFSAA;
 			}
-				
+
 			// FSAA quality
 			opt = miscParams->find("FSAAQuality");
 			if(opt != miscParams->end())
@@ -165,7 +166,7 @@ namespace Ogre
 			if(opt != miscParams->end())
 				mHwGamma = StringConverter::parseBool(opt->second);
 
-			 
+
 		}
 
 		// Destroy current window if any
@@ -239,7 +240,7 @@ namespace Ogre
 			mIsExternal = false;
 			mHWnd = CreateWindow("OgreD3D9Wnd", title.c_str(), dwStyle,
 				mLeft, mTop, mWidth, mHeight, parentHWnd, 0, hInst, this);
-			
+
 			WindowEventUtilities::_addRenderWindow(this);
 		}
 		else
@@ -403,7 +404,7 @@ namespace Ogre
 		md3dpp.BackBufferWidth			= mWidth;
 		md3dpp.BackBufferHeight			= mHeight;
 		md3dpp.FullScreen_RefreshRateInHz = mIsFullScreen ? mDisplayFrequency : 0;
-		
+
 
 		if (mVSync)
 		{
@@ -470,11 +471,11 @@ namespace Ogre
 		{
 			/* hmm, this never succeeds even when device does support??
 			if(FAILED(pD3D->CheckDeviceFormat(mDriver->getAdapterNumber(),
-				devType, md3dpp.BackBufferFormat, D3DUSAGE_QUERY_SRGBWRITE, 
-				D3DRTYPE_SURFACE, md3dpp.BackBufferFormat )))
+			devType, md3dpp.BackBufferFormat, D3DUSAGE_QUERY_SRGBWRITE, 
+			D3DRTYPE_SURFACE, md3dpp.BackBufferFormat )))
 			{
-				// disable - not supported
-				mHwGamma = false;
+			// disable - not supported
+			mHwGamma = false;
 			}
 			*/
 
@@ -500,11 +501,13 @@ namespace Ogre
 					"D3D9RenderWindow::createD3DResources");
 			}
 			// Store references to buffers for convenience
+			SAFE_RELEASE(mpRenderSurface);
 			mpSwapChain->GetBackBuffer( 0, D3DBACKBUFFER_TYPE_MONO, &mpRenderSurface );
 			// Additional swap chains need their own depth buffer
 			// to support resizing them
 			if (mIsDepthBuffered) 
 			{
+				SAFE_RELEASE(mpRenderZBuffer);
 				hr = mpD3DDevice->CreateDepthStencilSurface(
 					mWidth, mHeight,
 					md3dpp.AutoDepthStencilFormat,
@@ -597,7 +600,9 @@ namespace Ogre
 			// update device in driver
 			mDriver->setD3DDevice( mpD3DDevice );
 			// Store references to buffers for convenience
+			SAFE_RELEASE(mpRenderSurface);
 			mpD3DDevice->GetRenderTarget( 0, &mpRenderSurface );
+			SAFE_RELEASE(mpRenderZBuffer);
 			mpD3DDevice->GetDepthStencilSurface( &mpRenderZBuffer );
 			// release immediately so we don't hog them
 			mpRenderZBuffer->Release();
@@ -718,7 +723,9 @@ namespace Ogre
 				mWidth = width;
 				mHeight = height;
 
+				SAFE_RELEASE(mpRenderSurface);
 				hr = mpSwapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &mpRenderSurface);
+				SAFE_RELEASE(mpRenderZBuffer);
 				hr = mDriver->getD3DDevice()->CreateDepthStencilSurface(
 					mWidth, mHeight,
 					md3dpp.AutoDepthStencilFormat,
@@ -829,8 +836,8 @@ namespace Ogre
 			(dst.front != 0) || (dst.back != 1))
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-						"Invalid box.",
-						"D3D9RenderWindow::copyContentsToMemory" );
+				"Invalid box.",
+				"D3D9RenderWindow::copyContentsToMemory" );
 		}
 
 		HRESULT hr;
@@ -855,30 +862,30 @@ namespace Ogre
 			if (FAILED(hr = mpD3DDevice->GetDisplayMode(0, &dm)))
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-							"Can't get display mode: " + Root::getSingleton().getErrorDescription(hr),
-							"D3D9RenderWindow::copyContentsToMemory");
+					"Can't get display mode: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9RenderWindow::copyContentsToMemory");
 			}
 
 			desc.Width = dm.Width;
 			desc.Height = dm.Height;
 			desc.Format = D3DFMT_A8R8G8B8;
 			if (FAILED(hr = mpD3DDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height,
-																	 desc.Format,
-																	 D3DPOOL_SYSTEMMEM,
-																	 &pTempSurf,
-																	 0)))
+				desc.Format,
+				D3DPOOL_SYSTEMMEM,
+				&pTempSurf,
+				0)))
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-							"Can't create offscreen buffer: " + Root::getSingleton().getErrorDescription(hr),
-							"D3D9RenderWindow::copyContentsToMemory");
+					"Can't create offscreen buffer: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9RenderWindow::copyContentsToMemory");
 			}
 
 			if (FAILED(hr = mpD3DDevice->GetFrontBufferData(0, pTempSurf)))
 			{
 				SAFE_RELEASE(pTempSurf);
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-							"Can't get front buffer: " + Root::getSingleton().getErrorDescription(hr),
-							"D3D9RenderWindow::copyContentsToMemory");
+					"Can't get front buffer: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9RenderWindow::copyContentsToMemory");
 			}
 
 			if(mIsFullScreen)
@@ -902,8 +909,8 @@ namespace Ogre
 				{
 					SAFE_RELEASE(pTempSurf);
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-								"Can't lock rect: " + Root::getSingleton().getErrorDescription(hr),
-								"D3D9RenderWindow::copyContentsToMemory");
+						"Can't lock rect: " + Root::getSingleton().getErrorDescription(hr),
+						"D3D9RenderWindow::copyContentsToMemory");
 				} 
 			}
 			else
@@ -930,36 +937,37 @@ namespace Ogre
 				{
 					SAFE_RELEASE(pTempSurf);
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-								"Can't lock rect: " + Root::getSingleton().getErrorDescription(hr),
-								"D3D9RenderWindow::copyContentsToMemory");
+						"Can't lock rect: " + Root::getSingleton().getErrorDescription(hr),
+						"D3D9RenderWindow::copyContentsToMemory");
 				} 
 			}
 		}
 		else
 		{
+			SAFE_RELEASE(pSurf);
 			if(FAILED(hr = mpD3DDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pSurf)))
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-							"Can't get back buffer: " + Root::getSingleton().getErrorDescription(hr),
-							"D3D9RenderWindow::copyContentsToMemory");
+					"Can't get back buffer: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9RenderWindow::copyContentsToMemory");
 			}
 
 			if(FAILED(hr = pSurf->GetDesc(&desc)))
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-							"Can't get description: " + Root::getSingleton().getErrorDescription(hr),
-							"D3D9RenderWindow::copyContentsToMemory");
+					"Can't get description: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9RenderWindow::copyContentsToMemory");
 			}
 
 			if (FAILED(hr = mpD3DDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height,
-																	 desc.Format,
-																	 D3DPOOL_SYSTEMMEM,
-																	 &pTempSurf,
-																	 0)))
+				desc.Format,
+				D3DPOOL_SYSTEMMEM,
+				&pTempSurf,
+				0)))
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-							"Can't create offscreen surface: " + Root::getSingleton().getErrorDescription(hr),
-							"D3D9RenderWindow::copyContentsToMemory");
+					"Can't create offscreen surface: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9RenderWindow::copyContentsToMemory");
 			}
 
 			if (desc.MultiSampleType == D3DMULTISAMPLE_NONE)
@@ -968,8 +976,8 @@ namespace Ogre
 				{
 					SAFE_RELEASE(pTempSurf);
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-								"Can't get render target data: " + Root::getSingleton().getErrorDescription(hr),
-								"D3D9RenderWindow::copyContentsToMemory");
+						"Can't get render target data: " + Root::getSingleton().getErrorDescription(hr),
+						"D3D9RenderWindow::copyContentsToMemory");
 				}
 			}
 			else
@@ -977,17 +985,17 @@ namespace Ogre
 				LPDIRECT3DSURFACE9 pStretchSurf = 0;
 
 				if (FAILED(hr = mpD3DDevice->CreateRenderTarget(desc.Width, desc.Height,
-																desc.Format,
-																D3DMULTISAMPLE_NONE,
-																0,
-																false,
-																&pStretchSurf,
-																0)))
+					desc.Format,
+					D3DMULTISAMPLE_NONE,
+					0,
+					false,
+					&pStretchSurf,
+					0)))
 				{
 					SAFE_RELEASE(pTempSurf);
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-								"Can't create render target: " + Root::getSingleton().getErrorDescription(hr),
-								"D3D9RenderWindow::copyContentsToMemory");
+						"Can't create render target: " + Root::getSingleton().getErrorDescription(hr),
+						"D3D9RenderWindow::copyContentsToMemory");
 				}
 
 				if (FAILED(hr = mpD3DDevice->StretchRect(pSurf, 0, pStretchSurf, 0, D3DTEXF_NONE)))
@@ -995,16 +1003,16 @@ namespace Ogre
 					SAFE_RELEASE(pTempSurf);
 					SAFE_RELEASE(pStretchSurf);
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-								"Can't stretch rect: " + Root::getSingleton().getErrorDescription(hr),
-								"D3D9RenderWindow::copyContentsToMemory");
+						"Can't stretch rect: " + Root::getSingleton().getErrorDescription(hr),
+						"D3D9RenderWindow::copyContentsToMemory");
 				}
 				if (FAILED(hr = mpD3DDevice->GetRenderTargetData(pStretchSurf, pTempSurf)))
 				{
 					SAFE_RELEASE(pTempSurf);
 					SAFE_RELEASE(pStretchSurf);
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-								"Can't get render target data: " + Root::getSingleton().getErrorDescription(hr),
-								"D3D9RenderWindow::copyContentsToMemory");
+						"Can't get render target data: " + Root::getSingleton().getErrorDescription(hr),
+						"D3D9RenderWindow::copyContentsToMemory");
 				}
 				SAFE_RELEASE(pStretchSurf);
 			}
@@ -1028,8 +1036,8 @@ namespace Ogre
 			{
 				SAFE_RELEASE(pTempSurf);
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-							"Can't lock rect: " + Root::getSingleton().getErrorDescription(hr),
-							"D3D9RenderWindow::copyContentsToMemory");
+					"Can't lock rect: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9RenderWindow::copyContentsToMemory");
 			}
 		}
 
@@ -1039,7 +1047,7 @@ namespace Ogre
 		{
 			SAFE_RELEASE(pTempSurf);
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-						"Unsupported format", "D3D9RenderWindow::copyContentsToMemory");
+				"Unsupported format", "D3D9RenderWindow::copyContentsToMemory");
 		}
 
 		PixelBox src(dst.getWidth(), dst.getHeight(), 1, format, lockedRect.pBits);
@@ -1096,17 +1104,19 @@ namespace Ogre
 				if (!mIsSwapChain) 
 				{
 					// re-qeuery buffers
+					SAFE_RELEASE(mpRenderSurface);
 					mpD3DDevice->GetRenderTarget( 0, &mpRenderSurface );
+					SAFE_RELEASE(mpRenderZBuffer);
 					mpD3DDevice->GetDepthStencilSurface( &mpRenderZBuffer );
 					// release immediately so we don't hog them
 					mpRenderZBuffer->Release();
 				}
 				else 
 				{
-				    // Update dimensions incase changed
-		            ViewportList::iterator it = mViewportList.begin();
-		            while( it != mViewportList.end() )
-			            (*it++).second->_updateDimensions();
+					// Update dimensions incase changed
+					ViewportList::iterator it = mViewportList.begin();
+					while( it != mViewportList.end() )
+						(*it++).second->_updateDimensions();
 					// Actual restoration of surfaces will happen in 
 					// D3D9RenderSystem::restoreLostDevice when it calls
 					// createD3DResources for each secondary window

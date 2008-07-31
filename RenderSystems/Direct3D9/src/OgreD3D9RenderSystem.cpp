@@ -566,7 +566,7 @@ namespace Ogre
 				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find sRGB option!", "D3D9RenderSystem::initialise" );
 			hwGamma = opt->second.currentValue == "Yes";
 
-			
+
 
 			NameValuePairList miscParams;
 			miscParams["colourDepth"] = StringConverter::toString(videoMode->getColourDepth());
@@ -2494,7 +2494,7 @@ namespace Ogre
 	{
 		HRESULT hr;
 		DWORD oldVal;
-		
+
 		// can only set fixed-function texture stage state
 		if (stage < 8)
 		{
@@ -3336,6 +3336,7 @@ namespace Ogre
 		static_cast<D3D9HardwareBufferManager*>(mHardwareBufferManager)
 			->releaseDefaultPoolResources();
 
+		mPrimaryWindow->destroyD3DResources();
 		// release additional swap chains (secondary windows)
 		SecondaryWindowList::iterator sw;
 		for (sw = mSecondaryWindows.begin(); sw != mSecondaryWindows.end(); ++sw)
@@ -3376,6 +3377,7 @@ namespace Ogre
 		mFragmentProgramBound = false;
 
 
+
 		// recreate additional swap chains
 		for (sw = mSecondaryWindows.begin(); sw != mSecondaryWindows.end(); ++sw)
 		{
@@ -3383,6 +3385,7 @@ namespace Ogre
 		}
 
 		// Recreate all non-managed resources
+		mPrimaryWindow->createD3DResources();
 		static_cast<D3D9TextureManager*>(mTextureManager)
 			->recreateDefaultPoolResources();
 		static_cast<D3D9HardwareBufferManager*>(mHardwareBufferManager)
@@ -3412,7 +3415,7 @@ namespace Ogre
 		// will have lost basic states
 		mBasicStatesInitialised = false;
 
-		fireEvent("DeviceLost");
+		fireEvent("DeviceLost"); // you need to stop the physics or game engines after this event
 	}
 
 	//---------------------------------------------------------------------
