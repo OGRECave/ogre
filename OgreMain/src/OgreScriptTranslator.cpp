@@ -1795,7 +1795,7 @@ namespace Ogre{
 												break;
 											default:
 												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-													prop->values.front()->getValue() + " is not a valid light type (point, directional, or spot)");
+													(*i2)->getValue() + " is not a valid light type (point, directional, or spot)");
 											}
 										}
 										else
@@ -1816,7 +1816,7 @@ namespace Ogre{
 												AbstractNodeList::const_iterator i3 = getNodeAt(prop->values, 3);
 												if(i3 != prop->values.end() && (*i3)->type == ANT_ATOM)
 												{
-													atom = (AtomAbstractNode*)(*i2).get();
+													atom = (AtomAbstractNode*)(*i3).get();
 													switch(atom->id)
 													{
 													case ID_POINT:
@@ -1830,7 +1830,7 @@ namespace Ogre{
 														break;
 													default:
 														compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-															prop->values.front()->getValue() + " is not a valid light type (point, directional, or spot)");
+															(*i3)->getValue() + " is not a valid light type (point, directional, or spot)");
 													}
 												}
 												else
@@ -1841,7 +1841,7 @@ namespace Ogre{
 											else
 											{
 												compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-													prop->values.front()->getValue() + " is not a valid number");
+													(*i2)->getValue() + " is not a valid number");
 											}
 										}
 										else
