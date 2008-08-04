@@ -379,6 +379,10 @@ namespace Ogre
 				translator->translate(this, *i);
 		}
 
+		mImports.clear();
+		mImportRequests.clear();
+		mImportTable.clear();
+
 		return mErrors.empty();
 	}
 
@@ -1223,12 +1227,12 @@ namespace Ogre
 			if(node->children.size() > 2)
 			{
 				mCompiler->addError(CE_FEWERPARAMETERSEXPECTED, node->file, node->line);
-				goto fail;
+				return;
 			}
 			if(node->children.size() < 2)
 			{
 				mCompiler->addError(CE_STRINGEXPECTED, node->file, node->line);
-				goto fail;
+				return;
 			}
 
 			ImportAbstractNode *impl = OGRE_NEW ImportAbstractNode();
@@ -1249,17 +1253,17 @@ namespace Ogre
 			if(node->children.size() > 2)
 			{
 				mCompiler->addError(CE_FEWERPARAMETERSEXPECTED, node->file, node->line);
-				goto fail;
+				return;
 			}
 			if(node->children.size() < 2)
 			{
 				mCompiler->addError(CE_STRINGEXPECTED, node->file, node->line);
-				goto fail;
+				return;
 			}
 			if(node->children.front()->type != CNT_VARIABLE)
 			{
 				mCompiler->addError(CE_VARIABLEEXPECTED, node->children.front()->file, node->children.front()->line);
-				goto fail;
+				return;
 			}
 
 			ConcreteNodeList::iterator i = node->children.begin();
@@ -1284,7 +1288,7 @@ namespace Ogre
 			if(!node->children.empty())
 			{
 				mCompiler->addError(CE_FEWERPARAMETERSEXPECTED, node->file, node->line);
-				goto fail;
+				return;
 			}
 
 			VariableAccessAbstractNode *impl = OGRE_NEW VariableAccessAbstractNode(mCurrent);
@@ -1315,7 +1319,7 @@ namespace Ogre
 				if(node->children.size() < 2)
 				{
 					mCompiler->addError(CE_STRINGEXPECTED, node->file, node->line);
-					goto fail;
+					return;
 				}
 
 				ObjectAbstractNode *impl = OGRE_NEW ObjectAbstractNode(mCurrent);
@@ -1382,7 +1386,7 @@ namespace Ogre
 					if((*iter)->children.empty())
 					{
 						mCompiler->addError(CE_STRINGEXPECTED, (*iter)->file, (*iter)->line);
-						goto fail;
+						return;
 					}
 					impl->base = (*iter)->children.front()->token;
 				}
@@ -1459,9 +1463,6 @@ namespace Ogre
 				mNodes->push_back(asn);
 			}
 		}
-
-		// Failure point
-		fail:;
 	}
 
 	void ScriptCompiler::AbstractTreeBuilder::visit(AbstractTreeBuilder *visitor, const ConcreteNodeList &nodes)
