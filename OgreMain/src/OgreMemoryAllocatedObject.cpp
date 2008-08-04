@@ -101,67 +101,16 @@ namespace Ogre
 		Alloc::deallocateBytes(ptr);
 	}
 
-	/*
-	Now, we have to ensure that the new/delete methods are actually instantiated, 
-	which means we have to call them. Do this via some static code which will
-	never actually be called but it forces the code generation.
-	*/
-	void AllocatorInst::init()
-	{
-		// single-instance
-		GeneralAllocatedObject* a1 = OGRE_NEW GeneralAllocatedObject();
-		OGRE_DELETE a1;
-		GeometryAllocatedObject* a2 = OGRE_NEW GeometryAllocatedObject();
-		OGRE_DELETE a2;
-		AnimationAllocatedObject* a3 = OGRE_NEW AnimationAllocatedObject();
-		OGRE_DELETE a3;
-		SceneCtlAllocatedObject* a4 = OGRE_NEW SceneCtlAllocatedObject();
-		OGRE_DELETE a4;
-		SceneObjAllocatedObject* a5 = OGRE_NEW SceneObjAllocatedObject();
-		OGRE_DELETE a5;
-		ResourceAllocatedObject* a6 = OGRE_NEW ResourceAllocatedObject();
-		OGRE_DELETE a6;
-		ScriptingAllocatedObject* a7 = OGRE_NEW ScriptingAllocatedObject();
-		OGRE_DELETE a7;
-		RenderSysAllocatedObject* a8 = OGRE_NEW RenderSysAllocatedObject();
-		OGRE_DELETE a8;
 
-		// array
-		a1 = OGRE_NEW GeneralAllocatedObject[1];
-		OGRE_DELETE [] a1;
-		a2 = OGRE_NEW GeometryAllocatedObject[1];
-		OGRE_DELETE [] a2;
-		a3 = OGRE_NEW AnimationAllocatedObject[1];
-		OGRE_DELETE [] a3;
-		a4 = OGRE_NEW SceneCtlAllocatedObject[1];
-		OGRE_DELETE [] a4;
-		a5 = OGRE_NEW SceneObjAllocatedObject[1];
-		OGRE_DELETE [] a5;
-		a6 = OGRE_NEW ResourceAllocatedObject[1];
-		OGRE_DELETE [] a6;
-		a7 = OGRE_NEW ScriptingAllocatedObject[1];
-		OGRE_DELETE [] a7;
-		a8 = OGRE_NEW RenderSysAllocatedObject[1];
-		OGRE_DELETE [] a8;
+	template class AllocatedObject<GeneralAllocPolicy>;
+	template class AllocatedObject<GeometryAllocPolicy>;
+	template class AllocatedObject<AnimationAllocPolicy>;
+	template class AllocatedObject<SceneCtlAllocPolicy>;
+	template class AllocatedObject<SceneObjAllocPolicy>;
+	template class AllocatedObject<ResourceAllocPolicy>;
+	template class AllocatedObject<ScriptingAllocPolicy>;
+	template class AllocatedObject<RenderSysAllocPolicy>; 
 
-		// just incase anyone uses new instead of OGRE_NEW, don't fail, be nice
-		a1 = new GeneralAllocatedObject();
-		delete a1;
-		a2 = new GeometryAllocatedObject();
-		delete a2;
-		a3 = new AnimationAllocatedObject();
-		delete a3;
-		a4 = new SceneCtlAllocatedObject();
-		delete a4;
-		a5 = new SceneObjAllocatedObject();
-		delete a5;
-		a6 = new ResourceAllocatedObject();
-		delete a6;
-		a7 = new ScriptingAllocatedObject();
-		delete a7;
-		a8 = new RenderSysAllocatedObject();
-		delete a8;
-	}
 
 
 }

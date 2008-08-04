@@ -76,12 +76,6 @@ namespace Ogre
 		void operator delete[] ( void* ptr, const char* , int , const char*  );
 	};
 
-	/// This is a simple class to force the construction of template functions - internal use
-	class AllocatorInst
-	{
-	public:
-		static void init();
-	};
 
 
 }
