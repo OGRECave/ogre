@@ -630,7 +630,7 @@ namespace Ogre {
 		/** Internal method for creating the AutoParamDataSource instance. */
 		virtual AutoParamDataSource* createAutoParamDataSource(void) const
 		{
-			return new AutoParamDataSource();
+			return OGRE_NEW AutoParamDataSource();
 		}
 
         /// Utility class for calculating automatic parameters for gpu programs

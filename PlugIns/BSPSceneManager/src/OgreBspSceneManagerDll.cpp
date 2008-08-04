@@ -35,7 +35,7 @@ Ogre::BspSceneManagerPlugin* bspPlugin;
 extern "C" void _OgreBspPluginExport dllStartPlugin(void)
 {
     // Create new scene manager
-    bspPlugin = new Ogre::BspSceneManagerPlugin();
+    bspPlugin = OGRE_NEW Ogre::BspSceneManagerPlugin();
 
     // Register
     Ogre::Root::getSingleton().installPlugin(bspPlugin);
@@ -45,5 +45,5 @@ extern "C" void _OgreBspPluginExport dllStartPlugin(void)
 extern "C" void _OgreBspPluginExport dllStopPlugin(void)
 {
 	Ogre::Root::getSingleton().uninstallPlugin(bspPlugin);
-    delete bspPlugin;
+    OGRE_DELETE bspPlugin;
 }

@@ -62,14 +62,14 @@ namespace Ogre
     * A cache of TerrainIndexBuffers.  Used to keep track of the buffers, and
     * delete them when the program finishes.
     */
-    class TerrainBufferCache
+	class TerrainBufferCache : public ResourceAlloc
     {
     public:
         void shutdown(void)
         {
             for( size_t i=0; i<mCache.size(); i++ )
             {
-                delete mCache[i];
+                OGRE_DELETE mCache[i];
             }
             mCache.clear();
         }
@@ -89,7 +89,7 @@ namespace Ogre
     /** A simple class for encapsulating parameters which are commonly needed by 
     both TerrainSceneManager and TerrainRenderable.
     */
-    class TerrainOptions
+	class TerrainOptions : public GeneralAllocatedObject
     {
     public:
         TerrainOptions()
@@ -375,7 +375,8 @@ namespace Ogre
         /// The buffer with all the renderable geometry in it
         HardwareVertexBufferSharedPtr mMainBuffer;
         /// Optional set of delta buffers, used to morph from one LOD to the next
-        HardwareVertexBufferSharedPtr* mDeltaBuffers;
+		typedef std::vector<HardwareVertexBufferSharedPtr> VertexBufferList;
+        VertexBufferList mDeltaBuffers;
         /// System-memory buffer with just positions in it, for CPU operations
         float* mPositionBuffer;
         /// Forced rendering LOD level, optional

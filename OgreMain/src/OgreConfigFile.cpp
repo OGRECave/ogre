@@ -84,7 +84,7 @@ namespace Ogre {
 			Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!", "ConfigFile::load" );
 
 		// Wrap as a stream
-		DataStreamPtr stream(new FileStreamDataStream(filename, &fp, false));
+		DataStreamPtr stream(OGRE_NEW FileStreamDataStream(filename, &fp, false));
 		load(stream, separators, trimWhitespace);
 
 	}

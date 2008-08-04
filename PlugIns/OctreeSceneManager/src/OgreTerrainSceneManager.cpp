@@ -221,61 +221,6 @@ namespace Ogre
 
     }
     //-------------------------------------------------------------------------
-    /*
-    void TerrainSceneManager::loadHeightmap(void)
-    {
-        Image image;
-
-        image.load( mHeightmapName );
-
-        //check to make sure it's 2^n + 1 size.
-        if ( image.getWidth() != image.getHeight() ||
-            ! _checkSize( image.getWidth() ) )
-        {
-            String err = "Error: Invalid heightmap size : " +
-                StringConverter::toString( image.getWidth() ) +
-                "," + StringConverter::toString( image.getHeight() ) +
-                ". Should be 2^n+1, 2^n+1";
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, err, "TerrainSceneManager::loadHeightmap" );
-        }
-
-        int upperRange = 0;
-        int size = image.getWidth();
-
-        if ( image.getFormat() == PF_L8 )
-        {
-            upperRange = 255;
-
-            // Parse the char data into floats
-            mOptions.heightData = new Real[size*size];
-            const uchar* pSrc = image. getData();
-            Real* pDest = mOptions.heightData;
-            for (int i = 0; i < size*size; ++i)
-            {
-                *pDest++ = *pSrc++ * mOptions.scale.y;
-            }
-        }
-        else
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Error: Image is not a grayscale image.",
-                "TerrainSceneManager::setWorldGeometry" );
-        }
-
-
-        // set up the octree size.
-        float max_x = mOptions.scale.x * size;
-
-        float max_y = upperRange * mOptions.scale.y;
-
-        float max_z = mOptions.scale.z * size;
-
-        resize( AxisAlignedBox( 0, 0, 0, max_x, max_y, max_z ) );
-
-        mOptions.pageSize = size;
-
-    }
-    */
-    //-------------------------------------------------------------------------
     void TerrainSceneManager::setupTerrainMaterial(void)
     {
         if (mCustomMaterialName == "")
@@ -481,7 +426,7 @@ namespace Ogre
 		{
 			// Wrap as a stream
 			DataStreamPtr stream(
-				new FileStreamDataStream(filename, &fs, false));
+				OGRE_NEW FileStreamDataStream(filename, &fs, false));
 			setWorldGeometry(stream);
 		}
 		else
@@ -902,7 +847,7 @@ namespace Ogre
 			for ( int i = 0; i < 16; i++ )
 			{
 
-				mLevelIndex.push_back( new IndexMap() );
+				mLevelIndex.push_back( OGRE_NEW_T(IndexMap, MEMCATEGORY_GEOMETRY)() );
 
 			}
 
@@ -913,7 +858,7 @@ namespace Ogre
 	{
 		for ( int i = 0; i < mLevelIndex.size(); i++ )
 		{
-			delete mLevelIndex[i];
+			OGRE_DELETE_T(mLevelIndex[i], IndexMap, MEMCATEGORY_GEOMETRY);
 		}
 		mLevelIndex.clear();
 	}
@@ -922,7 +867,7 @@ namespace Ogre
     RaySceneQuery* 
         TerrainSceneManager::createRayQuery(const Ray& ray, unsigned long mask)
     {
-        TerrainRaySceneQuery *trsq = new TerrainRaySceneQuery(this);
+        TerrainRaySceneQuery *trsq = OGRE_NEW TerrainRaySceneQuery(this);
         trsq->setRay(ray);
         trsq->setQueryMask(mask);
         return trsq;
@@ -1018,7 +963,7 @@ namespace Ogre
 		for (TerrainPageSources::iterator i = mTerrainPageSources.begin();
 			i != mTerrainPageSources.end(); ++i)
 		{
-			delete *i;
+			OGRE_DELETE *i;
 		}
 		mTerrainPageSources.clear();
 	}
@@ -1035,9 +980,9 @@ namespace Ogre
 	SceneManager* TerrainSceneManagerFactory::createInstance(
 		const String& instanceName)
 	{
-		TerrainSceneManager* tsm = new TerrainSceneManager(instanceName);
+		TerrainSceneManager* tsm = OGRE_NEW TerrainSceneManager(instanceName);
 		// Create & register default sources (one per manager)
-		HeightmapTerrainPageSource* ps = new HeightmapTerrainPageSource();
+		HeightmapTerrainPageSource* ps = OGRE_NEW HeightmapTerrainPageSource();
 		mTerrainPageSources.push_back(ps);
 		tsm->registerPageSource("Heightmap", ps);
 
@@ -1047,7 +992,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void TerrainSceneManagerFactory::destroyInstance(SceneManager* instance)
 	{
-		delete instance;
+		OGRE_DELETE instance;
 	}
 
 

@@ -49,7 +49,7 @@ namespace Ogre
 	void CgPlugin::install()
 	{
 		// Create new factory
-		mCgProgramFactory = new CgProgramFactory();
+		mCgProgramFactory = OGRE_NEW CgProgramFactory();
 		// Register
 		HighLevelGpuProgramManager::getSingleton().addFactory(mCgProgramFactory);
 	}
@@ -71,7 +71,7 @@ namespace Ogre
             // Remove from manager safely
             if (HighLevelGpuProgramManager::getSingletonPtr())
                 HighLevelGpuProgramManager::getSingleton().removeFactory(mCgProgramFactory);
-		    delete mCgProgramFactory;
+		    OGRE_DELETE mCgProgramFactory;
 		    mCgProgramFactory = 0;
         }
 	}

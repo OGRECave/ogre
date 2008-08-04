@@ -149,6 +149,8 @@ namespace Ogre {
 		Frustum *mCullFrustum;
 		/// Whether or not the rendering distance of objects should take effect for this camera
 		bool mUseRenderingDistance;
+		/// Camera to use for LOD calculation
+		const Camera* mLodCamera;
 
 
         // Internal functions for calcs
@@ -427,6 +429,27 @@ namespace Ogre {
 		*/
 		Real getLodBias(void) const;
 
+		/** Get a pointer to the camera which should be used to determine 
+			LOD settings. 
+		@remarks
+			Sometimes you don't want the LOD of a render to be based on the camera
+			that's doing the rendering, you want it to be based on a different
+			camera. A good example is when rendering shadow maps, since they will 
+			be viewed from the perspective of another camera. Therefore this method
+			lets you associate a different camera instance to use to determine the LOD.
+		@par
+			To revert the camera to determining LOD based on itself, call this method with 
+			a pointer to itself. 
+		*/
+		virtual void setLodCamera(const Camera* lodCam);
+
+		/** Get a pointer to the camera which should be used to determine 
+			LOD settings. 
+		@remarks
+			If setLodCamera hasn't been called with a different camera, this
+			method will return 'this'. 
+		*/
+		virtual const Camera* getLodCamera() const;
 
 
         /** Gets a world space ray as cast from the camera through a viewport position.

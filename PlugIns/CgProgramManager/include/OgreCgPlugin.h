@@ -36,7 +36,7 @@ namespace Ogre
 {
 
 	/** Plugin instance for Cg Program Manager */
-	class CgPlugin : public Plugin
+	class CgPlugin : public Plugin, public GeneralAllocatedObject
 	{
 	public:
 		CgPlugin();

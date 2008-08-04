@@ -50,14 +50,14 @@ namespace Ogre {
     {
         mResourceType = "BspLevel";
         // Also create related shader manager (singleton managed)
-        mShaderMgr = new Quake3ShaderManager();
+        mShaderMgr = OGRE_NEW Quake3ShaderManager();
 
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
     }
     //-----------------------------------------------------------------------
     BspResourceManager::~BspResourceManager()
     {
-        delete mShaderMgr;
+        OGRE_DELETE mShaderMgr;
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
     }
     //-----------------------------------------------------------------------
@@ -90,7 +90,7 @@ namespace Ogre {
         const String& group, bool isManual, ManualResourceLoader* loader, 
         const NameValuePairList* createParams)
     {
-        return new BspLevel(this, name, handle, group, isManual, loader);
+        return OGRE_NEW BspLevel(this, name, handle, group, isManual, loader);
     }
 
 

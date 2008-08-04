@@ -60,12 +60,12 @@ namespace Ogre {
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
     {
-        return new CgProgram(creator, name, handle, group, isManual, loader, mCgContext);
+        return OGRE_NEW CgProgram(creator, name, handle, group, isManual, loader, mCgContext);
     }
     //-----------------------------------------------------------------------
 	void CgProgramFactory::destroy(HighLevelGpuProgram* prog)
     {
-        delete prog;
+        OGRE_DELETE prog;
     }
     //-----------------------------------------------------------------------
 

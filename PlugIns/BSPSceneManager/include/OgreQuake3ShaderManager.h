@@ -52,7 +52,7 @@ namespace Ogre {
         Because this is a subclass of ScriptLoader, any files mentioned will be searched for in any path or
         archive added to the ResourceGroupManager::WORLD_GROUP_NAME group. See ResourceGroupManager for details.
     */
-    class Quake3ShaderManager : public ScriptLoader, public Singleton<Quake3ShaderManager>
+    class Quake3ShaderManager : public ScriptLoader, public Singleton<Quake3ShaderManager>, public ResourceAlloc
     {
     protected:
         void parseNewShaderPass(DataStreamPtr& stream, Quake3Shader* pShader);

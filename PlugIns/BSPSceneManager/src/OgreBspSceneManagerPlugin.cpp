@@ -48,7 +48,7 @@ namespace Ogre
 	void BspSceneManagerPlugin::install()
 	{
 		// Create new scene manager
-		mBspFactory = new BspSceneManagerFactory();
+		mBspFactory = OGRE_NEW BspSceneManagerFactory();
 
 	}
 	//---------------------------------------------------------------------
@@ -57,7 +57,7 @@ namespace Ogre
 		// Register (factory not dependent on rsys resources)
 		Root::getSingleton().addSceneManagerFactory(mBspFactory);
 		// Create resource manager (registers itself)
-		mBspResourceManager = new BspResourceManager();
+		mBspResourceManager = OGRE_NEW BspResourceManager();
 	}
 	//---------------------------------------------------------------------
 	void BspSceneManagerPlugin::shutdown()
@@ -66,7 +66,7 @@ namespace Ogre
 		Root::getSingleton().removeSceneManagerFactory(mBspFactory);
 
 		// delete resource manager, will unregister itself
-		delete mBspResourceManager;
+		OGRE_DELETE mBspResourceManager;
 		mBspResourceManager = 0;
 
 	}
@@ -74,7 +74,7 @@ namespace Ogre
 	void BspSceneManagerPlugin::uninstall()
 	{
 
-		delete mBspFactory;
+		OGRE_DELETE mBspFactory;
 		mBspFactory = 0;
 
 	}

@@ -3034,7 +3034,9 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					if (pass->getStartLight() || pass->getMaxSimultaneousLights() != OGRE_MAX_SIMULTANEOUS_LIGHTS)
 					{
 						// out of lights?
-						if (pass->getStartLight() >= rendLightList.size())
+						// skip manual 2nd lighting passes onwards if we run out of lights, but never the first one
+						if (pass->getStartLight() > 0 &&
+							pass->getStartLight() >= rendLightList.size())
 						{
 							lightsLeft = 0;
 							break;
@@ -5713,6 +5715,9 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
 			// rebind camera, incase another SM in use which has switched to its cam
 			shadowView->setCamera(texCam);
 			
+			// Associate main view camera as LOD camera
+			texCam->setLodCamera(cam);
+
 			// update shadow cam - light mapping
 			ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );
 			assert(camLightIt != mShadowCamLightMapping.end());

@@ -74,7 +74,7 @@ namespace Ogre {
         for (Quake3ShaderMap::iterator i = mShaderMap.begin();
             i != mShaderMap.end(); ++i)
         {
-            delete i->second;
+            OGRE_DELETE i->second;
         }
         mShaderMap.clear();
     }
@@ -131,7 +131,7 @@ namespace Ogre {
                         // Finished shader
                         if (dummy && pShader)
                         {
-                            delete pShader;
+                            OGRE_DELETE pShader;
                         }
                         pShader = 0;
                     }
@@ -160,7 +160,7 @@ namespace Ogre {
     Quake3Shader* Quake3ShaderManager::create( const String& name)
     {
         // Gah, Q3A shader scripts include some duplicates - grr
-        Quake3Shader* s = new Quake3Shader(name);
+        Quake3Shader* s = OGRE_NEW Quake3Shader(name);
         if (mShaderMap.find(name) == mShaderMap.end())
         {
             mShaderMap[name] = s;

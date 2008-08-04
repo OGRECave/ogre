@@ -87,11 +87,11 @@ namespace Ogre {
         }
         // Now split args into that god-awful char** that Cg insists on
         freeCgArgs();
-        mCgArguments = new char*[args.size() + 1];
+        mCgArguments = OGRE_ALLOC_T(char*, args.size() + 1, MEMCATEGORY_RESOURCE);
         int index = 0;
         for (i = args.begin(); i != args.end(); ++i, ++index)
         {
-            mCgArguments[index] = new char[i->length() + 1];
+            mCgArguments[index] = OGRE_ALLOC_T(char, i->length() + 1, MEMCATEGORY_RESOURCE);
             strcpy(mCgArguments[index], i->c_str());
         }
         // Null terminate list
@@ -108,10 +108,11 @@ namespace Ogre {
             char* current = mCgArguments[index];
             while (current)
             {
-                delete [] current;
+                OGRE_FREE(current, MEMCATEGORY_RESOURCE);
+				mCgArguments[index] = 0;
                 current = mCgArguments[++index];
             }
-            delete [] mCgArguments;
+            OGRE_FREE(mCgArguments, MEMCATEGORY_RESOURCE);
             mCgArguments = 0;
         }
     }
@@ -264,6 +265,7 @@ namespace Ogre {
 							"Problem parsing the following Cg Uniform: '"
 							+ paramName + "' in file " + mName);
 						// next uniform
+						parameter = cgGetNextParameter(parameter);
 						continue;
 					}
 					if (isRegisterCombiner)

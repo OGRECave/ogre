@@ -49,63 +49,33 @@ namespace Ogre
 		to use (e.g. see StdAllocPolicy). 
 	*/
 	template <class Alloc>
-	class AllocatedObject
+	class _OgreExport AllocatedObject
 	{
 	public:
-		inline explicit AllocatedObject()
+		explicit AllocatedObject()
 		{ }
 
 		~AllocatedObject()
 		{ }
 
 		/// operator new, with debug line info
-		inline void* operator new(size_t sz, const char* file, int line, const char* func)
-		{
-			return Alloc::allocateBytes(sz, file, line, func);
-		}
-		inline void* operator new(size_t sz)
-		{
-			return Alloc::allocateBytes(sz);
-		}
-
+		void* operator new(size_t sz, const char* file, int line, const char* func);
+		void* operator new(size_t sz);
 		/// placement operator new
-		inline void* operator new(size_t sz, void* ptr)
-		{
-			return ptr;
-		}
-
+		void* operator new(size_t sz, void* ptr);
 		/// array operator new, with debug line info
-		inline void* operator new[] ( size_t sz, const char* file, int line, const char* func )
-		{
-			return Alloc::allocateBytes(sz, file, line, func);
-		}
-
-		inline void* operator new[] ( size_t sz )
-		{
-			return Alloc::allocateBytes(sz);
-		}
-
-		inline void operator delete( void* ptr )
-		{
-			Alloc::deallocateBytes(ptr);
-		}
+		void* operator new[] ( size_t sz, const char* file, int line, const char* func );
+		void* operator new[] ( size_t sz );
+		void operator delete( void* ptr );
 
 		// only called if there is an exception in corresponding 'new'
-		inline void operator delete( void* ptr, const char* , int , const char*  )
-		{
-			Alloc::deallocateBytes(ptr);
-		}
+		void operator delete( void* ptr, const char* , int , const char*  );
 
-		inline void operator delete[] ( void* ptr )
-		{
-			Alloc::deallocateBytes(ptr);
-		}
+		void operator delete[] ( void* ptr );
 
-		inline void operator delete[] ( void* ptr, const char* , int , const char*  )
-		{
-			Alloc::deallocateBytes(ptr);
-		}
+		void operator delete[] ( void* ptr, const char* , int , const char*  );
 	};
+
 
 
 }

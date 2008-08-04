@@ -670,6 +670,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\OgreMemoryAllocatedObject.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\OgreMemoryNedAlloc.cpp"
 				>
 			</File>

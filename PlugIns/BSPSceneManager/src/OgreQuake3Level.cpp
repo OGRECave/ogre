@@ -41,21 +41,21 @@ namespace Ogre {
     void Quake3Level::loadHeaderFromStream(DataStreamPtr& inStream)
     {
         // Load just the header
-        bsp_header_t* pHeader =  new bsp_header_t();
+        bsp_header_t* pHeader =  OGRE_ALLOC_T(bsp_header_t, 1, MEMCATEGORY_RESOURCE);
         inStream->read(pHeader, sizeof(bsp_header_t));
         mChunk = MemoryDataStreamPtr(
-            new MemoryDataStream(pHeader, sizeof(bsp_header_t), false));
+            OGRE_NEW MemoryDataStream(pHeader, sizeof(bsp_header_t), false));
         // Grab all the counts, header only
         initialise(true);
 		// Delete manually since delete and delete[] (as used by MemoryDataStream)
 		// are not compatible
-		delete pHeader;
+		OGRE_FREE(pHeader, MEMCATEGORY_RESOURCE);
 
     }
     //-----------------------------------------------------------------------
     void Quake3Level::loadFromStream(DataStreamPtr& stream)
     {
-        mChunk = MemoryDataStreamPtr(new MemoryDataStream(stream));
+        mChunk = MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(stream));
         initialise();
 
 #ifdef _DEBUG
@@ -247,7 +247,7 @@ namespace Ogre {
             name << "@lightmap" << i;
 
             // Load, no mipmaps, brighten by factor 2.5
-			DataStreamPtr stream(new MemoryDataStream(pLightmap, 128 * 128 * 3, false));
+			DataStreamPtr stream(OGRE_NEW MemoryDataStream(pLightmap, 128 * 128 * 3, false));
             Image img; 
 			img.loadRawData( stream, 128, 128, PF_BYTE_RGB );
             TextureManager::getSingleton().loadImage( name.str(), 

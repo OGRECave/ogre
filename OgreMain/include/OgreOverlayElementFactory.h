@@ -70,7 +70,7 @@ namespace Ogre {
         /** See OverlayElementFactory */
         OverlayElement* createOverlayElement(const String& instanceName)
         {
-            return new PanelOverlayElement(instanceName);
+            return OGRE_NEW PanelOverlayElement(instanceName);
         }
         /** See OverlayElementFactory */
         const String& getTypeName(void) const
@@ -87,7 +87,7 @@ namespace Ogre {
         /** See OverlayElementFactory */
         OverlayElement* createOverlayElement(const String& instanceName)
         {
-            return new BorderPanelOverlayElement(instanceName);
+            return OGRE_NEW BorderPanelOverlayElement(instanceName);
         }
         /** See OverlayElementFactory */
         const String& getTypeName(void) const
@@ -104,7 +104,7 @@ namespace Ogre {
         /** See OverlayElementFactory */
         OverlayElement* createOverlayElement(const String& instanceName)
         {
-            return new TextAreaOverlayElement(instanceName);
+            return OGRE_NEW TextAreaOverlayElement(instanceName);
         }
         /** See OverlayElementFactory */
         const String& getTypeName(void) const

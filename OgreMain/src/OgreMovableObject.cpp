@@ -239,7 +239,7 @@ namespace Ogre {
 			if (cam->getUseRenderingDistance() && mUpperDistance > 0)
 			{
 				Real rad = getBoundingRadius();
-				Real squaredDepth = mParentNode->getSquaredViewDepth(cam);
+				Real squaredDepth = mParentNode->getSquaredViewDepth(cam->getLodCamera());
 				// Max distance to still render
 				Real maxDist = mUpperDistance + rad;
 				if (squaredDepth > Math::Sqr(maxDist))

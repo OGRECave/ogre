@@ -49,7 +49,7 @@ namespace Ogre {
         getBack() return null pointers. If the node is a partitioning plane isLeaf() returns false and getFront()
         and getBack() will return the corresponding BspNode objects.
     */
-    class BspNode
+	class BspNode : public NodeAlloc
     {
         friend class BspLevel;
 

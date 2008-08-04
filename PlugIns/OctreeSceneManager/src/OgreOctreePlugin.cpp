@@ -48,9 +48,9 @@ namespace Ogre
 	void OctreePlugin::install()
 	{
 		// Create objects
-		mOctreeSMFactory = new OctreeSceneManagerFactory();
-		mTerrainSMFactory = new TerrainSceneManagerFactory();
-		mTerrainPSListenerManager = new TerrainPageSourceListenerManager();
+		mOctreeSMFactory = OGRE_NEW OctreeSceneManagerFactory();
+		mTerrainSMFactory = OGRE_NEW TerrainSceneManagerFactory();
+		mTerrainPSListenerManager = OGRE_NEW TerrainPageSourceListenerManager();
 
 	}
 	//---------------------------------------------------------------------
@@ -71,11 +71,11 @@ namespace Ogre
 	void OctreePlugin::uninstall()
 	{
 		// destroy 
-		delete mTerrainPSListenerManager;
+		OGRE_DELETE mTerrainPSListenerManager;
 		mTerrainPSListenerManager = 0;
-		delete mTerrainSMFactory;
+		OGRE_DELETE mTerrainSMFactory;
 		mTerrainSMFactory = 0;
-		delete mOctreeSMFactory;
+		OGRE_DELETE mOctreeSMFactory;
 		mOctreeSMFactory = 0;
 
 

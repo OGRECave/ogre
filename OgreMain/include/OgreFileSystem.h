@@ -118,7 +118,7 @@ namespace Ogre {
         /// @copydoc FactoryObj::createInstance
         Archive *createInstance( const String& name ) 
         {
-            return new FileSystemArchive(name, "FileSystem");
+            return OGRE_NEW FileSystemArchive(name, "FileSystem");
         }
         /// @copydoc FactoryObj::destroyInstance
         void destroyInstance( Archive* arch) { delete arch; }

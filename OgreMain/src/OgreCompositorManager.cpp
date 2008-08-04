@@ -146,7 +146,7 @@ void CompositorManager::parseScript(DataStreamPtr& stream, const String& groupNa
 	{
 		// create a new instance for this thread - will get deleted when
 		// the thread dies
-		mSerializer.reset(new CompositorSerializer());
+		mSerializer.reset(OGRE_NEW CompositorSerializer());
 	}
 #  endif
     mSerializer->parseScript(stream, groupName);

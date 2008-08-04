@@ -65,6 +65,7 @@ libOgreMain_la_SOURCES = OgreAlignedAllocator.cpp \
                          OgreMath.cpp \
                          OgreMatrix3.cpp \
                          OgreMatrix4.cpp \
+                         OgreMemoryAllocatedObject.cpp \
 						 OgreMemoryNedAlloc.cpp \
 						 OgreMemoryTracker.cpp \
                          OgreMesh.cpp \
