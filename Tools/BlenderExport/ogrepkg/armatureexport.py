@@ -442,7 +442,7 @@ class ArmatureExporter:
 	
 	   Only bones with enabled deform button get exported.
 	"""
-	def __init__(self, bMeshObject, bArmatureObject):
+	def __init__(self, bMeshObject, bArmatureObject, skeletonUseMeshName):
 		"""Constructor.
 		"""
 		# Note: getName() and getBoneIndex(boneName) already work prior to export.
@@ -453,7 +453,10 @@ class ArmatureExporter:
 		# name, needed as mesh's skeletonlink name
 		# As there may be an additional transformation between bMeshObject and bArmatureObject,
 		# it is generally not possible to share the armature between several meshes.
-		self.name = self.bMeshObject.getName() + "-" + self.bArmatureObject.getData(True)
+		if (skeletonUseMeshName):
+			self.name = self.bMeshObject.getName()
+		else:
+			self.name = self.bArmatureObject.getData(True)
 		# boneindices, needed for mesh's vertexboneassignments
 		# key = boneName, value = boneIndex
 		boneNameList = [bone.name for bone in self.bArmature.bones.values() if (Blender.Armature.NO_DEFORM not in bone.options)]

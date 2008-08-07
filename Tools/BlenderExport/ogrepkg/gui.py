@@ -1432,12 +1432,14 @@ class HorizontalLayout(DirectionalLayout):
 		additionalWidth = width - minimumSize[0]
 		stretchWidgetList = []
 		extraWidth = 0
+		lastExtraWidth = 0
 		# get widgets with unlimited preferred height
 		if (additionalWidth > 0):
 			stretchWidgetList = [w for w in self.widgetList if w.getSize().getPreferredSize()[0] >= Size.INFINITY]
 			if (len(stretchWidgetList) > 0):
 				# give equal extra height to widgets with unlimited preferred height
 				extraWidth = additionalWidth / len(stretchWidgetList)
+				lastExtraWidth = extraWidth + additionalWidth - (extraWidth * len(stretchWidgetList))
 		# draw widgets with minimum or minimum plus extra size
 		x = screenRectangle[0]
 		dx = 0
@@ -1445,7 +1447,10 @@ class HorizontalLayout(DirectionalLayout):
 		for widget in self.widgetList:
 			dx = widget.getSize().getMinimumSize()[0]
 			if (widget in stretchWidgetList):
-				dx += extraWidth
+				if (widget is stretchWidgetList[-1]):
+					dx += lastExtraWidth
+				else:
+					dx += extraWidth
 			widget.draw([x, screenRectangle[1], x+dx, screenRectangle[3]])
 			x += dx
 		if (self.aligned): Blender.Draw.EndAlign()
@@ -1494,12 +1499,14 @@ class VerticalLayout(DirectionalLayout):
 		additionalHeight = height - minimumSize[1]
 		stretchWidgetList = []
 		extraHeight = 0
+		lastExtraHeight = 0
 		# get widgets with unlimited preferred height
 		if (additionalHeight > 0):
 			stretchWidgetList = [w for w in self.widgetList if w.getSize().getPreferredSize()[1] >= Size.INFINITY]
 			if (len(stretchWidgetList) > 0):
 				# give equal extra height to widgets with unlimited preferred height
 				extraHeight = additionalHeight / len(stretchWidgetList)
+				lastExtraHeight = extraHeight + additionalHeight - (extraHeight * len(stretchWidgetList))
 		# draw widgets with minimum or minimum plus extra size
 		y = screenRectangle[3]
 		dy = 0
@@ -1507,7 +1514,11 @@ class VerticalLayout(DirectionalLayout):
 		for widget in self.widgetList:
 			dy = widget.getSize().getMinimumSize()[1]
 			if (widget in stretchWidgetList):
-				dy += extraHeight
+				if (widget is stretchWidgetList[-1]):
+					dy += lastExtraHeight
+				else:
+					dy += extraHeight
+
 			widget.draw([screenRectangle[0], y-dy, screenRectangle[2], y])
 			y -= dy
 		if (self.aligned): Blender.Draw.EndAlign()
