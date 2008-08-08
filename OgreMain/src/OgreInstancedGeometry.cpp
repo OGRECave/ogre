@@ -1029,6 +1029,28 @@ namespace Ogre {
 			 needUpdate();
 	}
 	//--------------------------------------------------------------------------
+	void InstancedGeometry::InstancedObject::setOrientation(const Quaternion& q)
+	{	
+        mOrientation = q;
+		needUpdate();
+	}
+	//--------------------------------------------------------------------------
+	void InstancedGeometry::InstancedObject::setPositionAndOrientation(Vector3 p, const Quaternion& q)
+	{	
+		mPosition = p;
+        mOrientation = q;
+        needUpdate();
+		BatchInstance* parentBatchInstance=(*(mGeometryBucketList.begin()))->getParent()->getParent()->getParent();
+		parentBatchInstance->updateBoundingBox();
+	}
+
+    //--------------------------------------------------------------------------
+    Quaternion &InstancedGeometry::InstancedObject::getOrientation(void)
+    {
+        return mOrientation;
+    }
+
+	//--------------------------------------------------------------------------
 	void InstancedGeometry::InstancedObject::needUpdate()
 	{
 		 mTransformation.makeTransform(
@@ -1232,6 +1254,7 @@ namespace Ogre {
 								Zmax = Positions[i].z;
 						}
 						geom->setBoundingBox(AxisAlignedBox(Xmin,Ymin,Zmin,Xmax,Ymax,Zmax));						
+                        this->mNode->_updateBounds();
 						mAABB=AxisAlignedBox(
 							Vector3(Xmin,Ymin,Zmin) + geom->getAABB().getMinimum(),
 							Vector3(Xmax,Ymax,Zmax) + geom->getAABB().getMaximum());
