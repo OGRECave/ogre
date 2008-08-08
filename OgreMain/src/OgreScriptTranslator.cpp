@@ -3455,14 +3455,16 @@ namespace Ogre{
 		// Must have a name
 		if(obj->name.empty())
 		{
-			compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line);
+			compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line,
+				"gpu program object must have names");
 			return;
 		}
 
 		// Must have a language type
 		if(obj->values.empty())
 		{
-			compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, obj->file, obj->line);
+			compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, obj->file, obj->line,
+				"gpu program object require language declarations");
 			return;
 		}
 
@@ -3499,11 +3501,13 @@ namespace Ogre{
 						if(prop->values.front()->type == ANT_ATOM)
 							source = ((AtomAbstractNode*)prop->values.front().get())->value;
 						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								"source file expected");
 					}
 					else
 					{
-						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
+							"source file expected");
 					}
 				}
 				else if(prop->id == ID_SYNTAX)
@@ -3513,11 +3517,13 @@ namespace Ogre{
 						if(prop->values.front()->type == ANT_ATOM)
 							syntax = ((AtomAbstractNode*)prop->values.front().get())->value;
 						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								"syntax string expected");
 					}
 					else
 					{
-						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
+							"syntax string expected");
 					}
 				}
 				else
@@ -3569,7 +3575,8 @@ namespace Ogre{
 			try{
 				prog = any_cast<GpuProgram*>(retval);
 			}catch(...){
-				compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+				compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line,
+					"gpu program \"" + obj->name + "\" could not be created");
 				return;
 			}
 		}
@@ -3577,7 +3584,8 @@ namespace Ogre{
 		// Check that allocation worked
 		if(prog == 0)
 		{
-			compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+			compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line,
+				"gpu program \"" + obj->name + "\" could not be created");
 			return;
 		}
 
@@ -3668,7 +3676,8 @@ namespace Ogre{
 			try{
 				prog = any_cast<HighLevelGpuProgram*>(retval);
 			}catch(...){
-				compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+				compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line,
+					"gpu program \"" + obj->name + "\" could not be created");
 				return;
 			}
 		}
@@ -3676,7 +3685,8 @@ namespace Ogre{
 		// Check that allocation worked
 		if(prog == 0)
 		{
-			compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+			compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line,
+				"gpu program \"" + obj->name + "\" could not be created");
 			return;
 		}
 
@@ -3730,11 +3740,13 @@ namespace Ogre{
 						if(prop->values.front()->type == ANT_ATOM)
 							source = ((AtomAbstractNode*)prop->values.front().get())->value;
 						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								"source file expected");
 					}
 					else
 					{
-						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
+							"source file expected");
 					}
 				}
 				else if(prop->name == "attach")
@@ -3797,7 +3809,8 @@ namespace Ogre{
 			try{
 				prog = any_cast<HighLevelGpuProgram*>(retval);
 			}catch(...){
-				compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+				compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line,
+					"gpu program \"" + obj->name + "\" could not be created");
 				return;
 			}
 		}
@@ -3805,7 +3818,8 @@ namespace Ogre{
 		// Check that allocation worked
 		if(prog == 0)
 		{
-			compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+			compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line,
+				"gpu program \"" + obj->name + "\" could not be created");
 			return;
 		}
 
@@ -3852,14 +3866,16 @@ namespace Ogre{
 
 							if((*i0)->type != ANT_ATOM || (*i1)->type != ANT_ATOM)
 							{
-								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									"name or index and parameter type expected");
 								return;
 							}
 
 							AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
 							if(!named && !StringConverter::isNumber(atom0->value))
 							{
-								compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+									"parameter index expected");
 								return;
 							}
 
@@ -3886,12 +3902,14 @@ namespace Ogre{
 									}
 									catch(...)
 									{
-										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+											"setting matrix4x4 parameter failed");
 									}
 								}
 								else
 								{
-									compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+									compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+										"incorrect matrix4x4 declaration");
 								}
 							}
 							else
@@ -3922,7 +3940,8 @@ namespace Ogre{
 								}
 								else
 								{
-									compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+									compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+										"incorrect type specified; only variants of int and float allowed");
 									isValid = false;
 								}
 
@@ -3949,12 +3968,14 @@ namespace Ogre{
 											}
 											catch(...)
 											{
-												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+													"setting of constant failed");
 											}
 										}
 										else
 										{
-											compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+											compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+												"incorrect integer constant declaration");
 										}
 										OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
 									}
@@ -3972,12 +3993,14 @@ namespace Ogre{
 											}
 											catch(...)
 											{
-												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+													"setting of constant failed");
 											}
 										}
 										else
 										{
-											compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+											compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+												"incorrect float constant declaration");
 										}
 										OGRE_FREE(vals, MEMCATEGORY_SCRIPTING);
 									}
@@ -3986,7 +4009,8 @@ namespace Ogre{
 						}
 						else
 						{
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								"param_named and param_indexed properties requires at least 3 arguments");
 						}
 					}
 					break;
@@ -4003,13 +4027,15 @@ namespace Ogre{
 								i1 = getNodeAt(prop->values, 1), i2 = getNodeAt(prop->values, 2);
 							if((*i0)->type != ANT_ATOM || (*i1)->type != ANT_ATOM)
 							{
-								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									"name or index and auto constant type expected");
 								return;
 							}
 							AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
 							if(!named && !StringConverter::isNumber(atom0->value))
 							{
-								compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+								compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+									"parameter index expected");
 								return;
 							}
 
@@ -4037,7 +4063,8 @@ namespace Ogre{
 									}
 									catch(...)
 									{
-										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+											"setting of constant failed");
 									}
 									break;
 								case GpuProgramParameters::ACDT_INT:
@@ -4052,7 +4079,8 @@ namespace Ogre{
 										}
 										catch(...)
 										{
-											compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+											compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+												"setting of constant failed");
 										}
 									}
 									else
@@ -4076,12 +4104,14 @@ namespace Ogre{
 												}
 												catch(...)
 												{
-													compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+													compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+														"setting of constant failed");
 												}
 											}
 											else
 											{
-												compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+												compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+													"extra parameters required by constant definition " + atom1->value);
 											}
 										}
 										else
@@ -4098,7 +4128,8 @@ namespace Ogre{
 												}
 												catch(...)
 												{
-													compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+													compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+														"setting of constant failed");
 												}
 											}
 										}
@@ -4121,7 +4152,8 @@ namespace Ogre{
 										}
 										catch(...)
 										{
-											compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+											compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+												"setting of constant failed");
 										}
 									}
 									else
@@ -4140,17 +4172,20 @@ namespace Ogre{
 												}
 												catch(...)
 												{
-													compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+													compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+														"setting of constant failed");
 												}
 											}
 											else
 											{
-												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+													"incorrect float argument definition in extra parameters");
 											}
 										}
 										else
 										{
-											compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+											compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+												"extra parameters required by constant definition " + atom1->value);
 										}
 									}
 									break;
