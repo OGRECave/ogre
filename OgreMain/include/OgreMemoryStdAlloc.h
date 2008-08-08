@@ -58,7 +58,7 @@ namespace Ogre
 			MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
 #else
 			// avoid unused params warning
-			file;line;func;
+			count=file+line-func;
 #endif
 			return ptr;
 		}
