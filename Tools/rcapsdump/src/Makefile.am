@@ -1,4 +1,4 @@
-INCLUDES=-I$(top_srcdir)/OgreMain/include
+INCLUDES=$(STLPORT_CFLAGS) -I$(top_srcdir)/OgreMain/include
 bin_PROGRAMS=rcapsdump
 
 rcapsdump_SOURCES= main.cpp 
