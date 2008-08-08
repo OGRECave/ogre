@@ -30,7 +30,7 @@ Torus Knot Software Ltd.
 #include "OgreGLGpuProgram.h"
 #include "OgreException.h"
 #include "OgreStringConverter.h"
-
+#include "OgreLogManager.h"
 using namespace Ogre;
 
 GLGpuProgram::GLGpuProgram(ResourceManager* creator, const String& name, 
@@ -204,6 +204,10 @@ void GLArbGpuProgram::unloadImpl(void)
 
 void GLArbGpuProgram::loadFromSource(void)
 {
+    if (GL_INVALID_OPERATION == glGetError()) {
+        LogManager::getSingleton().logMessage("Invalid Operation before loading program "+mName);
+
+    }
     glBindProgramARB(mProgramType, mProgramID);
     glProgramStringARB(mProgramType, GL_PROGRAM_FORMAT_ASCII_ARB, (GLsizei)mSource.length(), mSource.c_str());
 
