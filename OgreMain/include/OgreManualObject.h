@@ -224,29 +224,29 @@ namespace Ogre
 			or use the alternative 3-parameter version. Other operation types
 			require different numbers of indexes, @see RenderOperation::OperationType.
 		@note
-			32-bit indexes are not supported on all cards which is why this 
-			class only allows 16-bit indexes, for simplicity and ease of use.
-		@param idx A vertex index from 0 to 65535. 
+			32-bit indexes are not supported on all cards and will only be used
+            when required, if an index is > 65535.
+		@param idx A vertex index from 0 to 4294967295. 
 		*/
-		virtual void index(uint16 idx);
+		virtual void index(uint32 idx);
 		/** Add a set of 3 vertex indices to construct a triangle; this is a
 			shortcut to calling index() 3 times. It is only valid for triangle 
 			lists.
 		@note
-			32-bit indexes are not supported on all cards which is why this 
-			class only allows 16-bit indexes, for simplicity and ease of use.
-		@param i1, i2, i3 3 vertex indices from 0 to 65535 defining a face. 
+			32-bit indexes are not supported on all cards and will only be used
+            when required, if an index is > 65535.
+		@param i1, i2, i3 3 vertex indices from 0 to 4294967295 defining a face. 
 		*/
-		virtual void triangle(uint16 i1, uint16 i2, uint16 i3);
+		virtual void triangle(uint32 i1, uint32 i2, uint32 i3);
 		/** Add a set of 4 vertex indices to construct a quad (out of 2 
 			triangles); this is a shortcut to calling index() 6 times, 
 			or triangle() twice. It's only valid for triangle list operations.
 		@note
-			32-bit indexes are not supported on all cards which is why this 
-			class only allows 16-bit indexes, for simplicity and ease of use.
-		@param i1, i2, i3 3 vertex indices from 0 to 65535 defining a face. 
+			32-bit indexes are not supported on all cards and will only be used
+            when required, if an index is > 65535.
+		@param i1, i2, i3 3 vertex indices from 0 to 4294967295 defining a face. 
 		*/
-		virtual void quad(uint16 i1, uint16 i2, uint16 i3, uint16 i4);
+		virtual void quad(uint32 i1, uint32 i2, uint32 i3, uint32 i4);
 
 		/** Finish defining the object and compile the final renderable version. 
 		@note
@@ -384,6 +384,8 @@ namespace Ogre
 			String mMaterialName;
 			mutable MaterialPtr mMaterial;
 			RenderOperation mRenderOperation;
+			bool m32BitIndices;
+
 			
 		public:
 			ManualObjectSection(ManualObject* parent, const String& materialName,
@@ -396,6 +398,10 @@ namespace Ogre
 			const String& getMaterialName(void) const { return mMaterialName; }
 			/// update the material name in use
 			void setMaterialName(const String& name);
+			/// Set whether we need 32-bit indices
+			void set32BitIndices(bool n32) { m32BitIndices = n32; }
+			/// Get whether we need 32-bit indices
+			bool get32BitIndices() const { return m32BitIndices; }
 			
 			// Renderable overrides
 			/** @copydoc Renderable::getMaterial. */
@@ -408,6 +414,8 @@ namespace Ogre
 			Real getSquaredViewDepth(const Ogre::Camera *) const;
 			/** @copydoc Renderable::getLights. */
 			const LightList &getLights(void) const;
+
+
 					
 		};
 		/** Nested class to allow shadows. */
@@ -468,7 +476,7 @@ namespace Ogre
 		/// System memory allocation size, in bytes
 		size_t mTempVertexSize;
 		/// System-memory buffer whilst we establish the size required
-		uint16* mTempIndexBuffer;
+		uint32* mTempIndexBuffer;
 		/// System memory allocation size, in bytes
 		size_t mTempIndexSize;
 		/// Current declaration vertex size
