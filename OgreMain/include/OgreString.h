@@ -144,8 +144,13 @@ namespace Ogre {
         static bool match(const String& str, const String& pattern, bool caseSensitive = true);
 
 
-
-
+		/** replace all instances of a sub-string with a another sub-string.
+		@param source Source string
+		@param replaceWhat Sub-string to find and replace
+		@param replaceWithWhat Sub-string to replace with (the new sub-string)
+		@returns An updated string with the sub-string replaced
+		*/
+		static const String replaceAll(const String& source, const String& replaceWhat, const String& replaceWithWhat);
 
         /// Constant blank string, useful for returning by ref where local does not exist
         static const String BLANK;
