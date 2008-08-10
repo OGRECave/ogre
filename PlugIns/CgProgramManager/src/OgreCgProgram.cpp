@@ -28,8 +28,15 @@ Torus Knot Software Ltd.
 */
 #include "OgreCgProgram.h"
 #include "OgreGpuProgramManager.h"
+#include "OgreHighLevelGpuProgramManager.h"
 #include "OgreStringConverter.h"
 #include "OgreLogManager.h"
+
+#define FIRST_CG_VERSION_TO_SUPPORT_HLSL4 2100
+
+#if(CG_VERSION_NUM >= FIRST_CG_VERSION_TO_SUPPORT_HLSL4)
+#define CG_SUPPORTS_HLSL4
+#endif
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -148,15 +155,41 @@ namespace Ogre {
 		// ignore any previous error
 		if (mSelectedCgProfile != CG_PROFILE_UNKNOWN && !mCompileError)
 		{
+#ifdef CG_SUPPORTS_HLSL4
+			if (mSelectedCgProfile == CG_PROFILE_VS_4_0 || mSelectedCgProfile == CG_PROFILE_PS_4_0)
+			{
+				// Create a high-level program, give it the same name as us
+				HighLevelGpuProgramPtr vp = 
+					HighLevelGpuProgramManager::getSingleton().createProgram(
+					mName, mGroup, "hlsl", mType);
+				String hlslSourceFromCg = cgGetProgramString(mCgProgram, CG_COMPILED_PROGRAM);
+				// HACK START
+				// Assaf: This is a hack - in Cg ver 2.1 all the parameters had a strange prefix 
+				// that needed to be deleted
+				hlslSourceFromCg = StringUtil::replaceAll(hlslSourceFromCg, "_ZZ4S", ""); 
+				// HACK END
+				vp->setSource(hlslSourceFromCg);
+				vp->setParameter("target", mSelectedProfile);
+				vp->setParameter("entry_point", "main");
 
-			// Create a low-level program, give it the same name as us
-			mAssemblerProgram = 
-				GpuProgramManager::getSingleton().createProgramFromString(
+				vp->load();
+
+				mAssemblerProgram = vp;
+			}
+			else
+#endif
+			{
+
+				String shaderAssemblerCode = cgGetProgramString(mCgProgram, CG_COMPILED_PROGRAM);
+				// Create a low-level program, give it the same name as us
+				mAssemblerProgram = 
+					GpuProgramManager::getSingleton().createProgramFromString(
 					mName, 
 					mGroup,
-					cgGetProgramString(mCgProgram, CG_COMPILED_PROGRAM),
+					shaderAssemblerCode,
 					mType, 
 					mSelectedProfile);
+			}
 		}
     }
     //-----------------------------------------------------------------------
