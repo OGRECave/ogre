@@ -105,7 +105,7 @@ namespace Ogre
 				parameterType = "short4";		
 				break;
 			case VET_UBYTE4:
-				parameterType = "char4";
+				parameterType = "float4";
 				break;
 
 			}
