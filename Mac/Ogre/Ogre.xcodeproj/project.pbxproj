@@ -584,6 +584,7 @@
 		AAA8B9710CC6A4FC001AD86E /* OgreScriptParser.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */; };
 		AAD22CA50D7D708600928C53 /* OgreScriptTranslator.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD22CA40D7D708600928C53 /* OgreScriptTranslator.h */; };
 		AAD22CA70D7D70B400928C53 /* OgreScriptTranslator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD22CA60D7D70B400928C53 /* OgreScriptTranslator.cpp */; };
+		AAE36CDF0E50EB8100ED4B76 /* OgreMemoryAllocatedObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAE36CDE0E50EB8100ED4B76 /* OgreMemoryAllocatedObject.cpp */; };
 		AAF4F54A0DE4C73D0073D0FD /* OgreMemoryTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAF4F5480DE4C73D0073D0FD /* OgreMemoryTracker.cpp */; };
 		AAF4F5CB0DE4D6AD0073D0FD /* OgreMemoryTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = AAF4F5320DE4C48C0073D0FD /* OgreMemoryTracker.h */; };
 /* End PBXBuildFile section */
@@ -1350,6 +1351,7 @@
 		AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptParser.h; path = ../../OgreMain/include/OgreScriptParser.h; sourceTree = SOURCE_ROOT; };
 		AAD22CA40D7D708600928C53 /* OgreScriptTranslator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptTranslator.h; path = ../../OgreMain/include/OgreScriptTranslator.h; sourceTree = SOURCE_ROOT; };
 		AAD22CA60D7D70B400928C53 /* OgreScriptTranslator.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreScriptTranslator.cpp; path = ../../OgreMain/src/OgreScriptTranslator.cpp; sourceTree = SOURCE_ROOT; };
+		AAE36CDE0E50EB8100ED4B76 /* OgreMemoryAllocatedObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMemoryAllocatedObject.cpp; path = ../../OgreMain/src/OgreMemoryAllocatedObject.cpp; sourceTree = SOURCE_ROOT; };
 		AAF4F5320DE4C48C0073D0FD /* OgreMemoryTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreMemoryTracker.h; path = ../../OgreMain/include/OgreMemoryTracker.h; sourceTree = SOURCE_ROOT; };
 		AAF4F5480DE4C73D0073D0FD /* OgreMemoryTracker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreMemoryTracker.cpp; path = ../../OgreMain/src/OgreMemoryTracker.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -1536,6 +1538,7 @@
 		000E1D4A0B38D531004EA2DF /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				AAE36CDE0E50EB8100ED4B76 /* OgreMemoryAllocatedObject.cpp */,
 				000E1EF20B38D5AA004EA2DF /* OgreAlignedAllocator.cpp */,
 				000E1EF30B38D5AA004EA2DF /* OgreAnimable.cpp */,
 				000E1EF40B38D5AA004EA2DF /* OgreAnimation.cpp */,
@@ -2922,6 +2925,7 @@
 				AAD22CA70D7D70B400928C53 /* OgreScriptTranslator.cpp in Sources */,
 				AA0405760DE0D7B60000EEFF /* OgreMemoryNedAlloc.cpp in Sources */,
 				AAF4F54A0DE4C73D0073D0FD /* OgreMemoryTracker.cpp in Sources */,
+				AAE36CDF0E50EB8100ED4B76 /* OgreMemoryAllocatedObject.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
