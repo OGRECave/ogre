@@ -669,6 +669,7 @@ namespace Ogre {
                     {
                         *pIdx++ = static_cast<uint16>(*pSrc++);
                     }
+					rop->indexData->indexBuffer->unlock();
 
                 }
 			}
