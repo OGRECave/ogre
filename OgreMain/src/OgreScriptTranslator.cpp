@@ -2069,12 +2069,7 @@ namespace Ogre{
 
 		String name = node->name;
 
-		if (!GpuProgramManager::getSingleton().resourceExists(name))
-		{
-			compiler->addError(ScriptCompiler::C_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-			return;
-		}
-
+	
 		std::vector<Any> args;
 		args.push_back(Any(&name));
 		compiler->_fireEvent("processGpuProgramName", args, 0);
