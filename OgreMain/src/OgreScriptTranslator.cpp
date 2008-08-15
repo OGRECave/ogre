@@ -2068,7 +2068,12 @@ namespace Ogre{
 		}
 
 		String name = node->name;
-
+		
+		if (GpuProgramManager::getSingleton().getByName(name).isNull())
+		{
+			compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+			return;
+		}
 	
 		std::vector<Any> args;
 		args.push_back(Any(&name));
