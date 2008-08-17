@@ -270,6 +270,10 @@ namespace Ogre
 			return "invalid parameters";
 		case ScriptCompiler::CE_DUPLICATEOVERRIDE:
 			return "duplicate object override";
+		case ScriptCompiler::CE_UNSUPPORTEDBYRENDERSYSTEM:
+			return "object unsupported by render system";
+		case ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT:
+			return "reference to a non existing object";
 		default:
 			return "unknown error";
 		}
