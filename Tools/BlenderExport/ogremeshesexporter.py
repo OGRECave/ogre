@@ -1309,15 +1309,15 @@ else:
 				for proxyManager in self.armatureAnimationProxyManagerDict.values():
 					proxyManager.savePackageSettings()
 				return
-			def export(self, exportPath, exportMaterial, materialScriptName, colouredAmbient, gameEngineMaterials, fixUpAxis, convertXML, copyTextures):
+			def export(self, exportPath, exportMaterial, materialScriptName, customMaterial, customMaterialTplPath, colouredAmbient, gameEngineMaterials, exportMesh, fixUpAxis, skeletonUseMeshName, convertXML, copyTextures):
 				# create MaterialManager
 				if len(self.selectedList):
-					materialManager = MaterialManager(exportPath, materialScriptName)
+					materialManager = MaterialManager(exportPath, materialScriptName, gameEngineMaterials, customMaterial, customMaterialTplPath)
 					Log.getSingleton().logInfo("Output to directory \"%s\"" % exportPath)
 					for name in self.selectedList:
 						Log.getSingleton().logInfo("Processing Object \"%s\"" % name)
 						# create MeshExporter
-						meshExporter = MeshExporter(self.selectedDict[name])
+						meshExporter = MeshExporter(self.selectedDict[name], skeletonUseMeshName)
 						if self.morphAnimationProxyManagerDict.has_key(name):
 							self.morphAnimationProxyManagerDict[name].toAnimations(meshExporter.getVertexAnimationExporter())
 						if self.poseAnimationProxyManagerDict.has_key(name):
@@ -1325,7 +1325,7 @@ else:
 						if self.armatureAnimationProxyManagerDict.has_key(name):
 							self.armatureAnimationProxyManagerDict[name].toAnimations(meshExporter.getArmatureExporter())
 						# export
-						meshExporter.export(exportPath, materialManager, fixUpAxis, colouredAmbient, gameEngineMaterials, convertXML)
+						meshExporter.export(exportPath, materialManager, fixUpAxis, exportMesh, colouredAmbient, convertXML)
 					# export materials
 					if (exportMaterial):
 						materialManager.export(exportPath, materialScriptName, copyTextures)
@@ -1624,11 +1624,21 @@ else:
 				self.exportMaterial = ToggleModel(True)
 				self.materalScriptName = BasenameModel(Blender.Scene.GetCurrent().getName() + '.material')
 				self.exportPath = DirnameModel(Blender.Get('filename'))
+				self.renderingMaterial = ToggleModel(True)
+				self.gameEngineMaterials = ToggleModel(False)
+				self.customMaterial = ToggleModel(False)
+				self.customMaterialTplPath = DirnameModel(Blender.Get('filename'))
 				self.colouredAmbient = ToggleModel(0)
-				self.gameEngineMaterials = ToggleModel(0)
+				self.exportMesh = ToggleModel(True)
 				self.fixUpAxis = ToggleModel(0)
 				self.convertXML = ToggleModel(0)
 				self.copyTextures = ToggleModel(0)
+				self.skeletonUseMeshName = ToggleModel(1)
+
+				matTglGrp = ToggleGroup()
+				matTglGrp.addToggle(self.renderingMaterial)
+				matTglGrp.addToggle(self.gameEngineMaterials)
+				matTglGrp.addToggle(self.customMaterial)
 				# load package settings if applicable
 				self._loadPackageSettings()
 				# manager for selected objects
@@ -1646,7 +1656,7 @@ else:
 				mbox = Box(vLayout, L("Material Settings"), 0 , 10)
 				mvLayout = VerticalLayout(mbox, True)
 				mvhLayout1 = HorizontalLayout(mvLayout)
-				ToggleView(mvhLayout1, Size([150, 20]), self.exportMaterial, \
+				ToggleView(mvhLayout1, Size([100, 20]), self.exportMaterial, \
 					T("Export Materials"), \
 					T("Uncheck this to not export materials when exporting mesh."))
 				StringView(mvhLayout1, Size([Size.INFINITY, 20], [150, 20]), self.materalScriptName, T("Material File: "), \
@@ -1655,26 +1665,49 @@ else:
 				ToggleView(mvhLayout2, Size([Size.INFINITY, 20], [150, 20]), self.colouredAmbient, \
 					T("Coloured Ambient"), \
 					T("Use Amb factor times diffuse colour as ambient instead of Amb factor times white."))
-				ToggleView(mvhLayout2, Size([Size.INFINITY, 20], [151, 20]), self.gameEngineMaterials, \
-					T("Game Engine Materials"), \
-					T("Export game engine materials instead of rendering materials."))
-				ToggleView(mvLayout, Size([Size.INFINITY, 20], [300, 20]), self.copyTextures, \
+				ToggleView(mvhLayout2, Size([Size.INFINITY, 20], [150, 20]), self.copyTextures, \
 					T("Copy Textures"), \
 					T("Copy texture files into export path."))
+
+				mvhLayout3 = HorizontalLayout(mvLayout)
+				ToggleView(mvhLayout3, Size([Size.INFINITY, 20], [100, 20]), self.renderingMaterial, \
+					T("Rendering Materials"), \
+					T("Export rendering materials."))
+				ToggleView(mvhLayout3, Size([Size.INFINITY, 20], [100, 20]), self.gameEngineMaterials, \
+					T("Game Engine Materials"), \
+					T("Export game engine materials instead of rendering materials."))
+				ToggleView(mvhLayout3, Size([Size.INFINITY, 20], [100, 20]), self.customMaterial, \
+					T("Custom Materials"), \
+					T("Export using custom material templates."))
+				self.customMaterial.addView(self)
+
+				self.matAlternatives = AlternativesLayout(mvLayout)
+				self.matAltDefault = Spacer(self.matAlternatives, Size([0, 20]))
+				self.matAltCustom = HorizontalLayout(self.matAlternatives)
+				self.update()
+				StringView(self.matAltCustom, Size([Size.INFINITY, 20], [230, 20]), self.customMaterialTplPath, T("Template Path: "), \
+					T("Path to the material template files for generating custom materials."))
+				Button(self.matAltCustom, Size([70, 20]), MeshExporterApplication.SelectAction(self.customMaterialTplPath, "Template Directory"), T("Select"), \
+					T("Select the material template directory."))
 				## global settings
 				Spacer(vLayout, Size([0, 10]))
 				globalSettingLayout = VerticalLayout(vLayout, True)
-				globalSettingLayout1 = HorizontalLayout(globalSettingLayout)
-				ToggleView(globalSettingLayout1, Size([Size.INFINITY, 20], [150, 20]), self.fixUpAxis, T("Fix Up Axis to Y"), \
-					T("Fix up axis as Y instead of Z."))
-				ToggleView(globalSettingLayout1, Size([Size.INFINITY, 20], [151, 20]), self.convertXML, T("OgreXMLConverter"), \
-					T("Run OgreXMLConverter on the exported XML files."))
 				# path panel
 				phLayout = HorizontalLayout(globalSettingLayout)
+				ToggleView(phLayout, Size([100, 20]), self.exportMesh, T("Export Meshes"), \
+					T("Export the selected meshes. Uncheck this if you only want to export the materials."))
 				StringView(phLayout, Size([Size.INFINITY, 20], [200, 20]), self.exportPath, T("Path: "), \
 					T("The directory where the exported files are saved."))
-				Button(phLayout, Size([70, 20]), MeshExporterApplication.SelectAction(self), T("Select"), \
+				Button(phLayout, Size([70, 20]), MeshExporterApplication.SelectAction(self.exportPath, "Export Directory"), T("Select"), \
 					T("Select the export directory."))				
+				# mesh settings
+				globalSettingLayout1 = HorizontalLayout(globalSettingLayout)
+				ToggleView(globalSettingLayout1, Size([Size.INFINITY, 20], [100, 20]), self.fixUpAxis, T("Fix Up Axis to Y"), \
+					T("Fix up axis as Y instead of Z."))
+				ToggleView(globalSettingLayout1, Size([Size.INFINITY, 20], [100, 20]), self.skeletonUseMeshName, T("Skeleton name follow mesh"), \
+					T("Use mesh name for the exported skeleton name instead of the armature name."))
+				ToggleView(globalSettingLayout1, Size([Size.INFINITY, 20], [100, 20]), self.convertXML, T("OgreXMLConverter"), \
+					T("Run OgreXMLConverter on the exported XML files."))
 				## buttons
 				Spacer(vLayout, Size([0, 10]))
 				bhLayout = HorizontalLayout(vLayout, True)
@@ -1688,6 +1721,14 @@ else:
 				Button(bhLayout, bSize, MeshExporterApplication.QuitAction(self), T("Quit"), \
 					T("Quit without exporting."))
 				return
+			def update(self):
+				"""Called by customMaterial.
+				"""
+				if self.customMaterial.getValue():
+					self.matAlternatives.setCurrent(self.matAltCustom)
+				else:
+					self.matAlternatives.setCurrent(self.matAltDefault)
+				return
 			def go(self):
 				self.mainScreen.activate()
 				return
@@ -1698,6 +1739,12 @@ else:
 				materalScriptName = PackageSettings.getSingleton().getSetting('materalScriptName')
 				if materalScriptName is not None:
 					self.materalScriptName.setValue(materalScriptName)
+				customMaterial = PackageSettings.getSingleton().getSetting('customMaterial')
+				if customMaterial is not None:
+					self.customMaterial.setValue(customMaterial)
+				customMaterialTplPath = PackageSettings.getSingleton().getSetting('customMaterialTplPath')
+				if customMaterialTplPath is not None:
+					self.customMaterialTplPath.setValue(customMaterialTplPath)
 				colouredAmbient = PackageSettings.getSingleton().getSetting('colouredAmbient')
 				if colouredAmbient is not None:
 					self.colouredAmbient.setValue(colouredAmbient)
@@ -1707,9 +1754,15 @@ else:
 				copyTextures = PackageSettings.getSingleton().getSetting('copyTextures')
 				if copyTextures is not None:
 					self.copyTextures.setValue(copyTextures)
+				exportMesh = PackageSettings.getSingleton().getSetting('exportMesh')
+				if exportMesh is not None:
+					self.exportMesh.setValue(exportMesh)
 				fixUpAxis = PackageSettings.getSingleton().getSetting('fixUpAxis')
 				if fixUpAxis is not None:
 					self.fixUpAxis.setValue(fixUpAxis)
+				skeletonUseMeshName = PackageSettings.getSingleton().getSetting('skeletonUseMeshName')
+				if skeletonUseMeshName is not None:
+					self.skeletonUseMeshName.setValue(skeletonUseMeshName)
 				convertXML = PackageSettings.getSingleton().getSetting('convertXML')
 				if convertXML is not None:
 					self.convertXML.setValue(convertXML)
@@ -1721,10 +1774,14 @@ else:
 				self.selectedObjectManager.savePackageSettings()
 				PackageSettings.getSingleton().setSetting('exportMaterial', self.exportMaterial.getValue())
 				PackageSettings.getSingleton().setSetting('materalScriptName', self.materalScriptName.getValue())
+				PackageSettings.getSingleton().setSetting('customMaterial', self.customMaterial.getValue())
+				PackageSettings.getSingleton().setSetting('customMaterialTplPath', self.customMaterialTplPath.getValue())
 				PackageSettings.getSingleton().setSetting('colouredAmbient', self.colouredAmbient.getValue())
 				PackageSettings.getSingleton().setSetting('gameEngineMaterials', self.gameEngineMaterials.getValue())
 				PackageSettings.getSingleton().setSetting('copyTextures', self.copyTextures.getValue())
+				PackageSettings.getSingleton().setSetting('exportMesh', self.exportMesh.getValue())
 				PackageSettings.getSingleton().setSetting('fixUpAxis', self.fixUpAxis.getValue())
+				PackageSettings.getSingleton().setSetting('skeletonUseMeshName', self.skeletonUseMeshName.getValue())
 				PackageSettings.getSingleton().setSetting('convertXML', self.convertXML.getValue())
 				PackageSettings.getSingleton().setSetting('exportPath', self.exportPath.getValue())
 				PackageSettings.getSingleton().save()
@@ -1757,11 +1814,12 @@ else:
 					self.app = app
 					return
 			class SelectAction(Action):
-				def __init__(self, app):
-					self.app = app
+				def __init__(self, pathObject, title):
+					self.pathObject = pathObject
+					self.title = title
 					return
 				def execute(self):
-					Blender.Window.FileSelector(self.app.exportPath.setValue, "Export Directory", self.app.exportPath.getValue())
+					Blender.Window.FileSelector(self.pathObject.setValue, self.title, self.pathObject.getValue())
 					return
 			class ExportAction(Action):
 				def __init__(self, app):
@@ -1792,9 +1850,13 @@ else:
 					self.app.selectedObjectManager.export(self.app.exportPath.getValue(), \
 						self.app.exportMaterial.getValue(), \
 						self.app.materalScriptName.getValue(), \
+						self.app.customMaterial.getValue(), \
+						self.app.customMaterialTplPath.getValue(), \
 						self.app.colouredAmbient.getValue(), \
 						self.app.gameEngineMaterials.getValue(), \
+						self.app.exportMesh.getValue(), \
 						self.app.fixUpAxis.getValue(), \
+						self.app.skeletonUseMeshName.getValue(), \
 						self.app.convertXML.getValue(), \
 						self.app.copyTextures.getValue())
 					Log.getSingleton().logInfo("Done.")

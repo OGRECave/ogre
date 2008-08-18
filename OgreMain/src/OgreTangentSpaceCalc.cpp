@@ -554,7 +554,7 @@ namespace Ogre
 
 		// find position
 		const VertexElement *posElem = dcl->findElementBySemantic(VES_POSITION);
-		if (posElem->getSource() == posElem->getSource())
+		if (posElem->getSource() == uvElem->getSource())
 		{
 			pPosBase = pUvBase;
 			posInc = uvInc;

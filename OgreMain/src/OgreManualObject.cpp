@@ -44,7 +44,7 @@ namespace Ogre {
 #define TEMP_INITIAL_SIZE 50
 #define TEMP_VERTEXSIZE_GUESS sizeof(float) * 12
 #define TEMP_INITIAL_VERTEX_SIZE TEMP_VERTEXSIZE_GUESS * TEMP_INITIAL_SIZE
-#define TEMP_INITIAL_INDEX_SIZE sizeof(uint16) * TEMP_INITIAL_SIZE
+#define TEMP_INITIAL_INDEX_SIZE sizeof(uint32) * TEMP_INITIAL_SIZE
 	//-----------------------------------------------------------------------------
 	ManualObject::ManualObject(const String& name)
 		: MovableObject(name),
@@ -137,7 +137,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void ManualObject::resizeTempIndexBufferIfNeeded(size_t numInds)
 	{
-		size_t newSize = numInds * sizeof(uint16);
+		size_t newSize = numInds * sizeof(uint32);
 		if (newSize > mTempIndexSize || !mTempIndexBuffer)
 		{
 			if (!mTempIndexBuffer)
@@ -150,9 +150,9 @@ namespace Ogre {
 				// increase to at least double current
 				newSize = std::max(newSize, mTempIndexSize*2);
 			}
-			numInds = newSize / sizeof(uint16);
-			uint16* tmp = mTempIndexBuffer;
-			mTempIndexBuffer = OGRE_ALLOC_T(uint16, numInds, MEMCATEGORY_GEOMETRY);
+			numInds = newSize / sizeof(uint32);
+			uint32* tmp = mTempIndexBuffer;
+			mTempIndexBuffer = OGRE_ALLOC_T(uint32, numInds, MEMCATEGORY_GEOMETRY);
 			if (tmp)
 			{
 				memcpy(mTempIndexBuffer, tmp, mTempIndexSize);
@@ -421,7 +421,7 @@ namespace Ogre {
 
 	}
 	//-----------------------------------------------------------------------------
-	void ManualObject::index(uint16 idx)
+	void ManualObject::index(uint32 idx)
 	{
 		if (!mCurrentSection)
 		{
@@ -430,6 +430,9 @@ namespace Ogre {
 				"ManualObject::index");
 		}
 		mAnyIndexed = true;
+		if (idx >= 65536)
+			mCurrentSection->set32BitIndices(true);
+
 		// make sure we have index data
 		RenderOperation* rop = mCurrentSection->getRenderOperation();
 		if (!rop->indexData)
@@ -443,7 +446,7 @@ namespace Ogre {
 		mTempIndexBuffer[rop->indexData->indexCount - 1] = idx;
 	}
 	//-----------------------------------------------------------------------------
-	void ManualObject::triangle(uint16 i1, uint16 i2, uint16 i3)
+	void ManualObject::triangle(uint32 i1, uint32 i2, uint32 i3)
 	{
 		if (!mCurrentSection)
 		{
@@ -464,7 +467,7 @@ namespace Ogre {
 		index(i3);
 	}
 	//-----------------------------------------------------------------------------
-	void ManualObject::quad(uint16 i1, uint16 i2, uint16 i3, uint16 i4)
+	void ManualObject::quad(uint32 i1, uint32 i2, uint32 i3, uint32 i4)
 	{
 		// first tri
 		triangle(i1, i2, i3);
@@ -597,6 +600,9 @@ namespace Ogre {
 			// Check buffer sizes
 			bool vbufNeedsCreating = true;
 			bool ibufNeedsCreating = rop->useIndexes;
+            // Work out if we require 16 or 32-bit index buffers
+            HardwareIndexBuffer::IndexType indexType = mCurrentSection->get32BitIndices()?  
+				HardwareIndexBuffer::IT_32BIT : HardwareIndexBuffer::IT_16BIT;
 			if (mCurrentUpdating)
 			{
 				// May be able to reuse buffers, check sizes
@@ -606,8 +612,8 @@ namespace Ogre {
 
 				if (rop->useIndexes)
 				{
-					if (rop->indexData->indexBuffer->getNumIndexes() >= 
-						rop->indexData->indexCount)
+					if ((rop->indexData->indexBuffer->getNumIndexes() >= rop->indexData->indexCount) &&
+                        (indexType == rop->indexData->indexBuffer->getType()))
 						ibufNeedsCreating = false;
 				}
 
@@ -634,7 +640,7 @@ namespace Ogre {
 					mEstIndexCount);
 				rop->indexData->indexBuffer =
 					HardwareBufferManager::getSingleton().createIndexBuffer(
-						HardwareIndexBuffer::IT_16BIT,
+						indexType,
 						indexCount,
 						mDynamic? HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY : 
 							HardwareBuffer::HBU_STATIC_WRITE_ONLY);
@@ -646,11 +652,26 @@ namespace Ogre {
 			// Write index data
 			if(rop->useIndexes)
 			{
-				rop->indexData->indexBuffer->writeData(
-					0, 
-					rop->indexData->indexCount 
-						* rop->indexData->indexBuffer->getIndexSize(),
-					mTempIndexBuffer, true);
+                if (HardwareIndexBuffer::IT_32BIT == indexType)
+                {
+                    // direct copy from the mTempIndexBuffer
+				    rop->indexData->indexBuffer->writeData(
+					    0, 
+					    rop->indexData->indexCount 
+						    * rop->indexData->indexBuffer->getIndexSize(),
+					    mTempIndexBuffer, true);
+                }
+                else //(HardwareIndexBuffer::IT_16BIT == indexType)
+                {
+					uint16* pIdx = static_cast<uint16*>(rop->indexData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+					uint32* pSrc = mTempIndexBuffer;
+                    for (size_t i = 0; i < rop->indexData->indexCount; i++)
+                    {
+                        *pIdx++ = static_cast<uint16>(*pSrc++);
+                    }
+					rop->indexData->indexBuffer->unlock();
+
+                }
 			}
 
 			// return the finished section
@@ -857,9 +878,7 @@ namespace Ogre {
 		HardwareIndexBufferSharedPtr* indexBuffer,
 		bool extrude, Real extrusionDistance, unsigned long flags)
 	{
-		assert(indexBuffer && "Only external index buffers are supported right now");
-		assert((*indexBuffer)->getType() == HardwareIndexBuffer::IT_16BIT &&
-			"Only 16-bit indexes supported for now");
+		assert(indexBuffer && "Only external index buffers are supported right now");		
 
         EdgeData* edgeList = getEdgeList();
         if (!edgeList)
@@ -950,7 +969,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	ManualObject::ManualObjectSection::ManualObjectSection(ManualObject* parent,
 		const String& materialName,	RenderOperation::OperationType opType)
-		: mParent(parent), mMaterialName(materialName)
+		: mParent(parent), mMaterialName(materialName), m32BitIndices(false)
 	{
 		mRenderOperation.operationType = opType;
 		// default to no indexes unless we're told

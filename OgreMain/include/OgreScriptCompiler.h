@@ -92,6 +92,7 @@ namespace Ogre
 		Any context; // A holder for translation context data
 	public:
 		AbstractNode(AbstractNode *ptr);
+		virtual ~AbstractNode(){}
 		/// Returns a new AbstractNode which is a replica of this one.
 		virtual AbstractNode *clone() const = 0;
 		/// Returns a string value depending on the type of the AbstractNode.

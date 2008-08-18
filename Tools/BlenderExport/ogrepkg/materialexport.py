@@ -716,11 +716,184 @@ class RenderingMaterial(DefaultMaterial):
 		NONHALO|IMAGEUVCOL|IMAGEUVNOR|VCOLLIGHT|VCOLPAINT|TEXFACE|IMAGEUVCSP : writeNormalMap
 		}
 
+class CustomMaterial(RenderingMaterial):
+	def __init__(self, manager, blenderMesh, blenderFace, colouredAmbient, customMaterialTemplate):
+		self.mesh = blenderMesh
+		self.face = blenderFace
+		self.colouredAmbient = colouredAmbient
+		self.customMaterialTemplate = customMaterialTemplate
+		self.key = 0
+		self.mTexUVCol = None
+		self.mTexUVNor = None
+		self.mTexUVCsp = None
+		self.material = None
+		self.template = None
+		try:
+			self.material = self.mesh.materials[self.face.mat]
+		except IndexError:
+			Log.getSingleton().logWarning("Can't get material for mesh \"%s\"! Are any materials linked to object instead of linked to mesh?" % self.mesh.name)
+		if self.material:
+			self._generateKey()
+			DefaultMaterial.__init__(self, manager, self._createName())
+		else:
+			DefaultMaterial.__init__(self, manager, 'None')
+		self.properties = self.material.properties
+		return
+	class Template(string.Template):
+		delimiter = '%'
+		idpattern = '[_a-z][_a-z0-9.]*'
+	def setupTemplate(self, templateString):
+		self.template = self.Template(templateString)
+		return
+	def write(self, f):
+		# skip if we don't have a valid template set.
+		if not(self.template):
+			return
+
+		# do alpha check for scene blend and depth write flag.
+		self.hasAlpha = 0
+		if (self.material.alpha < 1.0):
+			self.hasAlpha = 1
+		else:
+			for mtex in self.material.getTextures():
+				if mtex:
+					if ((mtex.tex.type == Blender.Texture.Types['IMAGE'])
+						and (mtex.mapto & Blender.Texture.MapTo['ALPHA'])):
+						self.hasAlpha = 1
+
+		# setup dictionary.
+		templateDict = { \
+			'_materialName' : self.name, \
+			'_ambient' : self._getAmbient(), \
+			'_diffuse' : self._getDiffuse(), \
+			'_specular' : self._getSpecular(), \
+			'_emisive' : self._getEmisive(), \
+			'_scene_blend' : self._getSceneBlend(), \
+			'_depth_write' : self._getDepthWrite(), \
+			'_depth_func' : self._getDepthFunc(), \
+			'_receive_shadows' : self._getReceiveShadows(), \
+			'_culling' : self._getCulling(), \
+			'_lighting' : self._getLighting(), \
+			'_fog_override' : self._getFogOverride()}
+
+		for mtex in self.material.getTextures():
+			if mtex:
+				if (mtex.tex.type == Blender.Texture.Types['IMAGE']):
+					textureName = mtex.tex.getName()
+					name, ext = Blender.sys.splitext(textureName)
+					if ext.lstrip('.').isdigit() : textureName = name
+					if mtex.tex.getImage():
+						textureFilename = self.manager.registerTextureFile(mtex.tex.getImage().getFilename())
+						templateDict[textureName + '._texture'] = textureFilename
+					if mtex.tex.extend & Blender.Texture.ExtendModes['REPEAT']:
+						templateDict[textureName + '._tex_address_mode'] = 'wrap'
+					else:
+						templateDict[textureName + '._tex_address_mode'] = 'clamp'
+					if (mtex.tex.imageFlags & Blender.Texture.ImageFlags['INTERPOL']):
+						if (mtex.tex.imageFlags & Blender.Texture.ImageFlags['MIPMAP']):
+							templateDict[textureName + '._filtering'] = 'trilinear'
+						else:
+							templateDict[textureName + '._filtering'] = 'linear linear none'
+					else:
+						if (mtex.tex.imageFlags & Blender.Texture.ImageFlags['MIPMAP']):
+							templateDict[textureName + '._filtering'] = 'bilinear'
+						else:
+							templateDict[textureName + '._filtering'] = 'none'
+					if ((mtex.tex.imageFlags & Blender.Texture.ImageFlags['USEALPHA'])
+						and not(mtex.mapto & Blender.Texture.MapTo['ALPHA'])):
+						templateDict[textureName + '._colour_op'] = 'alpha_blend'
+					else:
+						templateDict[textureName + '._colour_op'] = 'modulate'
+
+		try:
+			propertyGroup = self.material.properties['properties']
+			self._parseProperties(templateDict, propertyGroup)
+		except KeyError:
+			pass
+
+		f.write(self.template.safe_substitute(templateDict));
+
+		return
+	def _getAmbient(self):
+		if self.colouredAmbient:
+			amb = self.material.amb
+			ambR = clamp(self.material.R * amb)
+			ambG = clamp(self.material.G * amb)
+			ambB = clamp(self.material.B * amb)
+			return "%.6g %.6g %.6g" % (ambR, ambG, ambB)
+		amb = self.material.amb
+		return "%.6g %.6g %.6g" % (amb, amb, amb)
+	def _getDiffuse(self):
+		return "%.6g %.6g %.6g %.6g" % (self.material.R, self.material.G, self.material.B, self.material.alpha)
+	def _getSpecular(self):
+		spec = self.material.spec
+		specR = clamp(self.material.specR * spec)
+		specG = clamp(self.material.specG * spec)
+		specB = clamp(self.material.specB * spec)
+		shininess = self.material.getHardness() / 4.0
+		return "%.6g %.6g %.6g %.6g" % (specR, specG, specB, shininess)
+	def _getEmisive(self):
+		emit = self.material.emit
+		emitR = clamp(self.material.R * emit)
+		emitG = clamp(self.material.G * emit)
+		emitB = clamp(self.material.B * emit)
+		return "%.6g %.6g %.6g" % (emitR, emitG, emitB)
+	def _getSceneBlend(self):
+		if (self.hasAlpha):
+			return 'alpha_blend'
+		return 'one zero'
+	def _getDepthWrite(self):
+		if (self.hasAlpha):
+			return 'off'
+		return 'on'
+	def _getDepthFunc(self):
+		if (self.material.mode & Blender.Material.Modes['ENV']):
+			return 'always_fail'
+		elif (self.material.mode & Blender.Material.Modes['ZINVERT']):
+			return 'greater_equal'
+		return 'less_equal'
+	def _getReceiveShadows(self):
+		if (self.material.mode & Blender.Material.Modes["SHADOW"]):
+			return 'on'
+		return 'off'
+	def _getCulling(self):
+		if self.mesh.faceUV and (self.face.mode & Blender.Mesh.FaceModes['TWOSIDE']):
+			return 'none'
+		return 'clockwise'
+	def _getLighting(self):
+		if (self.material.mode & Blender.Material.Modes['SHADELESS']):
+			return 'off'
+		return 'on'
+	def _getFogOverride(self):
+		if (self.material.mode & Blender.Material.Modes['NOMIST']):
+			return 'true'
+		return 'false'
+	def _parseProperties(self, templateDict, propertyGroup, parent=None):
+		if type(propertyGroup) is Blender.Types.IDGroupType:
+			for propName, propValue in propertyGroup.iteritems():
+				if parent : propName = parent + '.' + propName
+				propType = type(propValue)
+				if propType is Blender.Types.IDArrayType:
+					arraySize = propValue.__len__()
+					propValueString = "%.6g" % propValue.__getitem__(0)
+					i = 1
+					while i < arraySize:
+						propValueString += " %.6g" % propValue.__getitem__(i)
+						i += 1
+					templateDict[propName] = propValueString
+				elif propType is Blender.Types.IDGroupType:
+					self._parseProperties(templateDict, propValue, propName)
+				elif propType is float:
+					templateDict[propName] = "%.6g" % propValue
+				else:
+					templateDict[propName] = propValue
+		return
+
 class MaterialManager:
 	"""Manages database of material definitions.
 	"""
 	#TODO append to existing material script
-	def __init__(self, dir=None, file=None):
+	def __init__(self, dir=None, file=None, gameEngineMaterial=False, customMaterial=False, customMaterialTplPath=None):
 		"""Constructor.
 		
 		   @param path Directory to the material file. Default is directory of the last file read or written with Blender.
@@ -728,17 +901,20 @@ class MaterialManager:
 		"""
 		self.dir = dir or Blender.sys.dirname(Blender.Get('filename'))
 		self.file = file or (Blender.Scene.GetCurrent().getName() + ".material")
+		self.gameEngineMaterial = gameEngineMaterial;
+		self.customMaterial = customMaterial;
+		self.customMaterialTplPath = customMaterialTplPath;
 		# key=name, value=material
 		self.materialsDict = {}
 		# key=basename, value=path
 		self.textureFilesDict = {}
 		return
-	def getMaterial(self, bMesh, bMFace, colouredAmbient, gameEngineMaterial):
+	def getMaterial(self, bMesh, bMFace, colouredAmbient):
 		"""Returns material of a given face or <code>None</code>.
 		"""
 		## get name of export material for Blender's material settings of that face.
 		faceMaterial = None
-		if gameEngineMaterial:
+		if self.gameEngineMaterial:
 			if bMesh.faceUV and not(bMFace.mode & Blender.Mesh.FaceModes['INVISIBLE']):
 				if (bMFace.image and (bMFace.mode & Blender.Mesh.FaceModes['TEX'])):
 					# image texture
@@ -754,6 +930,16 @@ class MaterialManager:
 					faceMaterial = GameEngineMaterial(self, bMesh, bMFace, colouredAmbient)
 				else:
 					faceMaterial = DefaultMaterial(self, 'default')
+		elif self.customMaterial:
+			bMaterial = None
+			try:
+				bMaterial = bMesh.materials[bMFace.mat]
+			except:
+				Log.getSingleton().logError("Face without material assignment in mesh \"%s\"!" % bMesh.name)
+			if bMaterial:
+				faceMaterial = CustomMaterial(self, bMesh, bMFace, colouredAmbient, self.customMaterialTplPath)
+			else:
+				faceMaterial = DefaultMaterial(self, 'default')
 		else:
 			# rendering material
 			bMaterial = None
@@ -792,6 +978,38 @@ class MaterialManager:
 		exportFile = file or self.file
 		Log.getSingleton().logInfo("Exporting materials \"%s\"" % exportFile)
 		f = open(Blender.sys.join(exportDir, exportFile), "w")
+
+		if self.customMaterial :
+			# set of material import lines.
+			templateImportSet = set()
+			# map of template strings.
+			templateStringDict = {}
+			for material in self.materialsDict.values():
+				if isinstance(material, CustomMaterial):
+					try:
+						template = material.properties['template']
+						if type(template) is not str:
+							Log.getSingleton().logWarning("Material \"%s\" not assigned to a valid template!" % material.getName())
+						else:
+							if not(templateStringDict.has_key(template)) :
+								Log.getSingleton().logInfo("Loading template \"%s\"" % template)
+								templateFile = Blender.sys.join(self.customMaterialTplPath, template + '.tpl')
+								if not(Blender.sys.exists(templateFile) == 1):
+									Log.getSingleton().logWarning("Material \"%s\" assigned to unknown template \"%s\"!" % (material.getName(), template))
+									Log.getSingleton().logWarning("The template file \"%s\" does not exist." % templateFile)
+									templateStringDict[template] = ''
+								else:
+									t = open(templateFile, 'r')
+									templateImportSet.add(t.readline())
+									templateStringDict[template] = t.read()
+									t.close()
+							material.setupTemplate(templateStringDict[template])
+					except KeyError:
+						Log.getSingleton().logWarning("Material \"%s\" is not assigned to a template! It will not be exported!" % (material.getName()))
+			# write import lines.
+			for importString in templateImportSet:
+				f.write(importString)
+
 		for material in self.materialsDict.values():
 			material.write(f)
 		f.close()

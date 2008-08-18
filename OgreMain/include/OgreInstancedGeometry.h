@@ -287,6 +287,9 @@ namespace Ogre {
 			void roll(const Radian& angle);
 			void rotate(const Quaternion& q);
 			void setScale(const Vector3& scale);
+	        void setOrientation(const Quaternion& q);
+	        void setPositionAndOrientation(Vector3 p, const Quaternion& q);
+            Quaternion & getOrientation(void);
 			void addBucketToList(GeometryBucket* bucket);
 			void needUpdate();
 			GeometryBucketList&getGeometryBucketList(void){return mGeometryBucketList;}

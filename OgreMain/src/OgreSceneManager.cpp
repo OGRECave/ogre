@@ -5723,6 +5723,10 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
 			assert(camLightIt != mShadowCamLightMapping.end());
 			camLightIt->second = light;
 
+			// set base
+			texCam->setDirection(light->getDerivedDirection());
+			texCam->setPosition(light->getDerivedPosition());
+
 			if (light->getCustomShadowCameraSetup().isNull())
 				mDefaultShadowCameraSetup->getShadowCamera(this, cam, vp, light, texCam);
 			else

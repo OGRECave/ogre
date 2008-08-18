@@ -613,7 +613,26 @@ namespace Ogre {
 			if (newLineBefore != String::npos && newLineBefore >= startMarker)
 				outSource.append(inSource.substr(startMarker, newLineBefore-startMarker+1));
 
+			size_t lineCount = 0;
+			size_t lineCountPos = 0;
+			
+			// Count the line number of #include statement
+			lineCountPos = outSource.find('\n');
+			while(lineCountPos != String::npos)
+			{
+				lineCountPos = outSource.find('\n', lineCountPos+1);
+				lineCount++;
+			}
+
+			// Add #line to the start of the included file to correct the line count
+			outSource.append("#line 1 \"" + filename + "\"\n");
+
 			outSource.append(resource->getAsString());
+
+			// Add #line to the end of the included file to correct the line count
+			outSource.append("\n#line " + Ogre::StringConverter::toString(lineCount) + 
+				"\"" + this->getSourceFile() + "\"\n");
+
 			startMarker = newLineAfter;
 
 			if (startMarker != String::npos)

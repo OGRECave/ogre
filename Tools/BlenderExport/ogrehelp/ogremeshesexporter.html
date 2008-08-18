@@ -52,6 +52,9 @@ Blender is an open source 3D content creation suite for modeling, animation, ren
     <li>
       <a href="#Game Engine Materials">Game Engine Materials</a>
     </li>
+    <li>
+      <a href="#Custom Materials">Custom Materials</a>
+    </li>
   </ul>
   </li>
   <li>
@@ -116,7 +119,7 @@ You will get a detailed log of the export process. All files are exported in the
 OgreXMLConverter of your OGRE installation to convert the generated XML files to binary .mesh and .skeleton files.
 </p>
 <p>
-<img style="width: 517px; height: 518px;" src="images/meshesexporter.png" alt="exporter screenshot">
+<img src="images/meshesexporter.png" alt="exporter screenshot">
 </p>
 <p>Screenshot of the exporter interface.</p>
 
@@ -174,14 +177,25 @@ OgreXMLConverter of your OGRE installation to convert the generated XML files to
     <dd>Use scaled diffuse colour as ambient colour instead of scaled white.
 This does only work for materials for which TexFace is not set.</dd>
 
-    <dt>Game Engine Materials</dt>
-    <dd>Export materials as displayed in the game engine. Materials are exported
-as displayed in the rendered results on default.</dd>
-
     <dt>Copy Textures</dt>
     <dd>Copy textures to the export path, if possible</dd>
+
+    <dt>Rendering Materials</dt>
+    <dd>Export materials following the rendered result. (default)</dd>
+
+    <dt>Game Engine Materials</dt>
+    <dd>Export materials as displayed in the game engine.</dd>
+
+    <dt>Custom Materials</dt>
+    <dd>Export materials using specialised material templates.</dd>
   </dl>
   </dd>
+
+  <dt>Fix Up Axis to Y</dt>
+  <dd>Blender uses Z as up axis. This toggle switch allows changing the mesh to use Y as up axis.</dd>
+
+  <dt>Skeleton name follow mesh</dt>
+  <dd>Force skeleton name to follow mesh name. Uncheck to make it use armature name instead.</dd>
 
   <dt>OgreXMLConverter</dt>
   <dd>Convert the XML files to binary files via the OgreXMLConverter. The exporter must be able to find the converter executable. You can specify its location in the preferences.</dd>
@@ -201,10 +215,13 @@ directory. Mesh files are named after the mesh name in Blender with suffix ".mes
     <dl>
       <dt>Auto</dt>
       <dd>OgreXMLConverter is called without specifying its location. Only works if the executable is in the PATH.</dd>
-      
+
       <dt>Manual</dt>
       <dd>Calls the executable specified in Converter.</dd>
-      
+
+      <dt>Export Options</dt>
+      <dd>Please read XMLConverter documentation for more info.</dd>
+
       <dt>Additional arguments</dt>
       <dd>Additional arguments added to the converter call.</dd>
     </dl>
@@ -262,20 +279,14 @@ rendering results and is evaluated on export for convenience only.
 </p>
 
 <p>
-<img src="images/material.png" alt="material panel" height="203" width="288">
-</p>
-
-<p>
-<img src="images/shaders.png" alt="shaders panel" height="203" width="288">
-</p>
-
-<p>
-<img src="images/mirrortransp.png" alt="mirrortransp panel" height="203" width="288">
+<img src="images/material.png" alt="material panel">
+<img src="images/shaders.png" alt="shaders panel">
+<img src="images/linksandpipeline.png" alt="links and pipeline panel">
 </p>
 
 Blender's material settings that affect the exported OGRE material are marked green.
 <p>
-<img src="images/image.png" alt="image panel" height="203" width="288">
+<img src="images/image.png" alt="image panel">
 </p>
 
 <p>The script exports image textures with "Map Input" set to "UV" and
@@ -331,11 +342,139 @@ materials, give you more control over filtering and texture address
 modes.
 
 <p>
-<img src="images/face.png" alt="face options" height="310" width="398">
+<img src="images/face.png" alt="face options">
 </p>
 <p>
 Blender's face settings affect the mesh appearance only in the game
 engine. The properties exported by the script are marked green.
+</p>
+
+<h3><a name="Custom Materials">Custom Materials</a></h3>
+<p>
+The default material export works very well for simple basic materials. However,
+due to it's limitation, it is not feasable for any real projects. Most of the time
+we develope specialized material with specialized shaders for a particular project.
+In these circumstances, we would want to export the material files to our specialized
+material and shader.
+</p>
+
+<p>
+Hence, Custom Materials to the rescue. Custom Materials allows you to
+provide template files which it will base on to generate your ideal material script.
+</p>
+
+<p>
+To use it, first point the Template Path to a directory that is keeping your list of
+material templates.
+</p>
+
+<p>
+Each template file should be named with the .tpl extension
+</p>
+
+I.E. <em>phong.tpl</em>
+<TABLE width="300px"><tr><td>&nbsp;</td><td class="example"><pre>
+#import phong from "phong.material"
+
+material %_materialName : phong
+{
+	set $diffuse %diffuse_tex
+	set $normal %normal_tex
+	set $spec %spec_tex
+}
+</pre></td></tr></table><P>
+
+<p>
+The above example uses the latest Ogre script feature(Shoggoth).
+</p>
+
+<p>
+The format for the template is pretty straight forward. The first line of the template is reserved for import scripts.
+This is done so that the import scripts will be placed at the begining of the generated material files. Duplicated import
+scripts will also be removed.
+</p>
+
+<p>
+The template uses key replacement to replace particular keys. The keys are defined as <code>%key</code> or <code>%{key}</code>.
+The second version is for when you want to concatinate a template key with a fixed constant value; I.E. <code>%{diffuse_tex}.png</code>
+</p>
+
+<p>
+In order to tell the exporter what template to use for each material, each material has to be assigned to a template.
+This is done through the ID Property of the material. To access the ID Property, run "Help &rarr; ID Property Browser".
+For more information about ID Property in blender, see: <a href="http://wiki.blender.org/index.php/BlenderDev/ID_Property">Blender's wiki on ID Property</a>
+</p>
+
+<img src="images/idproperty.png" alt="ID Property panel">
+<p>
+Above is an example of ID Property in use. The most important thing is to select the right context before we edit our ID Property.
+Make sure the "Materials" category is selected. Then select your material (blue). Click on the "New" button to create a new property.
+</p>
+
+<p>
+To make material assigned to a template, create a String property named template. The value of the property will be the template file
+linking to this material. I.E. <em>phong</em> will point to <em>phong.tpl</em>
+</p>
+
+<p>
+There are certain case where Blender's material does not support a particular custom property that is required of our custom material.
+This is where custom properties come into play. As seen from the screen shot, it is possible to add custom properties to a material.
+To do that, make sure you create a "properties" Subgroup.
+</p>
+
+<p>
+What you do inside the "properties" Subgroup is up to you. The hirachy is maintained. To give an example:
+</p>
+<TABLE width="300px"><tr><td>&nbsp;</td><td class="example"><pre>
+properties : Subgroup
+  - someNumber = 123 : Int
+  - someFloat = 0.234 : Float
+  - someString = "Hello world" : String
+  - someGroup : Subgroup
+    - someIntArray = {1 2 3 4} : Int
+    - someFloatArray = {0.1 0.2 0.3} : Float
+</pre></td></tr></table><P>
+<p>
+From the above, to access these custom properties:
+</p>
+<TABLE width="300px"><tr><td>&nbsp;</td><td class="example"><pre>
+%someNumber => 123
+%someFloat => 0.234
+%someString => Hello world
+%someGroup.someIntArray => 1 2 3 4
+%someGroup.someFloatArray => 0.1 0.2 0.3
+</pre></td></tr></table><P>
+
+<p>
+Bellow are a list of default properties based on Blender's material.
+</p>
+<ul>
+	<li>_materialName</li>
+	<li>_ambient</li>
+	<li>_diffuse</li>
+	<li>_specular</li>
+	<li>_emisive</li>
+	<li>_scene_blend</li>
+	<li>_depth_write</li>
+	<li>_depth_func</li>
+	<li>_receive_shadows</li>
+	<li>_culling</li>
+	<li>_lighting</li>
+	<li>_fog_override</li>
+	<li>[textureName]._texture</li>
+	<li>[textureName]._tex_address_mode</li>
+	<li>[textureName]._filtering</li>
+	<li>[textureName]._colour_op</li>
+</ul>
+
+<p>
+An important note on the [textureName]. The texture name is the name defined in the Texture panel in the Material Buttons tab.
+It follows the convension of how it is displayed in the Texture panel; I.E. <em>tex.123</em> gives <em>tex</em> while <em>tex.1a2</em> gives <em>tex.1a2</em>
+</p>
+
+<p>
+Obviously, as the default properties shares the same library as the custom properties, you can actually use the custom properties to override the default properties.
+If you need more default properties that are not provided but can be set from Blender material, please contact Lf3T-Hn4D through the forum.
 </p>
 
 <h2><a name="Animations">Animations</a></h2>
@@ -343,7 +482,7 @@ engine. The properties exported by the script are marked green.
 The animation speed in the export in terms of frames per second is taken from the corresponding scene render button.
 </p>
 <p>
-<img src="images/format.png" alt="format panel" height="203" width="288">
+<img src="images/format.png" alt="format panel">
 </p>
 <p>
 Blender's format setting that affect the exported OGRE animation is marked green.
@@ -360,10 +499,8 @@ vertex.</li>
 <li>Note that OGRE does not inherit parent bone scaling by default.</li>
 </ul>
 <p>
-<img src="images/armaturemodifier.png" alt="modifiers panel" height="203" width="288">
-</p>
-<p>
-<img src="images/armatureparent.png" alt="modifiers panel" height="203" width="288">
+<img src="images/armaturemodifier.png" alt="modifiers panel">
+<img src="images/armatureparent.png" alt="modifiers panel">
 </p>
 <p>
 The script supports a parented armature as well as an armature modifier.
@@ -372,7 +509,7 @@ The script supports a parented armature as well as an armature modifier.
 <h3><a name="Shape Animations">Shape Animations</a></h3>
 Relative shape animations can be exported as pose or morph animations. On export, the script will sample the vertex positions frame by frame.
 <p>
-<img src="images/relativeshape.png" alt="shape panel" height="203" width="288">
+<img src="images/relativeshape.png" alt="shape panel">
 </p>
 <p>
 The script exports relative shape keys.
