@@ -76,11 +76,11 @@ namespace Ogre {
         enum LightTypes
         {
             /// Point light sources give off light equally in all directions, so require only position not direction
-            LT_POINT,
+            LT_POINT = 0,
             /// Directional lights simulate parallel light beams from a distant source, hence have direction but no position
-            LT_DIRECTIONAL,
+            LT_DIRECTIONAL = 1,
             /// Spotlights simulate a cone of light from a source so require position and direction, plus extra values for falloff
-            LT_SPOTLIGHT
+            LT_SPOTLIGHT = 2
         };
 
         /** Default constructor (for Python mainly).

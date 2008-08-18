@@ -2606,7 +2606,7 @@ protected:
 		for (size_t i = 0; i < num; ++i)
 		{
 			TexturePtr shadowTex = mSceneMgr->getShadowTexture(i);
-			addTextureDebugOverlay(shadowTex, num);
+			addTextureDebugOverlay(shadowTex, i);
 
 		}
 

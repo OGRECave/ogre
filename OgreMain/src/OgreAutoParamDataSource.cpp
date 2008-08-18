@@ -60,7 +60,6 @@ namespace Ogre {
          mCameraPositionObjectSpaceDirty(true),
          mCameraPositionDirty(true),
 		 mSceneDepthRangeDirty(true),
-		 mShadowCamDepthRangesDirty(true),
          mCurrentRenderable(0),
          mCurrentCamera(0), 
          mCurrentRenderTarget(0),
@@ -79,6 +78,7 @@ namespace Ogre {
 			mSpotlightViewProjMatrixDirty[i] = true;
 			mSpotlightWorldViewProjMatrixDirty[i] = true;
 			mCurrentTextureProjector[i] = 0;
+			mShadowCamDepthRangesDirty[i] = false;
 		}
 
     }
@@ -141,7 +141,6 @@ namespace Ogre {
     void AutoParamDataSource::setCurrentLightList(const LightList* ll)
     {
         mCurrentLightList = ll;
-		mShadowCamDepthRangesDirty = true;
 		for(size_t i = 0; i < ll->size(); ++i)
 		{
 			mSpotlightViewProjMatrixDirty[i] = true;
@@ -570,6 +569,7 @@ namespace Ogre {
         mCurrentTextureProjector[index] = frust;
         mTextureViewProjMatrixDirty[index] = true;
 		mTextureWorldViewProjMatrixDirty[index] = true;
+		mShadowCamDepthRangesDirty[index] = true;
 
     }
     //-----------------------------------------------------------------------------
@@ -959,45 +959,36 @@ namespace Ogre {
 
 	}
 	//-----------------------------------------------------------------------------
-	const Vector4& AutoParamDataSource::getShadowSceneDepthRange(size_t lightIndex) const
+	const Vector4& AutoParamDataSource::getShadowSceneDepthRange(size_t index) const
 	{
 		static Vector4 dummy(0, 100000, 100000, 1/100000);
 
 		if (!mCurrentSceneManager->isShadowTechniqueTextureBased())
 			return dummy;
 
-		if (mShadowCamDepthRangesDirty)
+		if (mShadowCamDepthRangesDirty[index] && mCurrentTextureProjector[index])
 		{
-			mShadowCamDepthRanges.clear();
-			for (LightList::const_iterator i = mCurrentLightList->begin();
-				i != mCurrentLightList->end(); ++i)
+			const VisibleObjectsBoundsInfo& info = 
+				mCurrentSceneManager->getVisibleObjectsBoundsInfo(
+					(Camera*)mCurrentTextureProjector[index]);
+
+			Real depthRange = info.maxDistance - info.minDistance;
+			if (depthRange > std::numeric_limits<Real>::epsilon())
 			{
-				// Skip non shadow casting lights
-				if (!(*i)->getCastShadows())
-					continue;
-
-				const VisibleObjectsBoundsInfo& info = 
-					mCurrentSceneManager->getShadowCasterBoundsInfo(*i);
-
-				mShadowCamDepthRanges.push_back(Vector4(
-					info.minDistance, 
-					info.maxDistance, 
-					info.maxDistance - info.minDistance,
-					1.0f / (info.maxDistance - info.minDistance)));
+				mShadowCamDepthRanges[index] = Vector4(
+					info.minDistance,
+					info.maxDistance,
+					depthRange,
+					1.0f / depthRange);
+			}
+			else
+			{
+				mShadowCamDepthRanges[index] = dummy;
 			}
 
-			mShadowCamDepthRangesDirty = false;
+			mShadowCamDepthRangesDirty[index] = false;
 		}
-
-		if (lightIndex >= mShadowCamDepthRanges.size())
-		{
-			return dummy;
-		}
-		else
-		{
-			return mShadowCamDepthRanges[lightIndex];
-		}
-
+		return mShadowCamDepthRanges[index];
 	}
 	//---------------------------------------------------------------------
 	const ColourValue& AutoParamDataSource::getShadowColour() const

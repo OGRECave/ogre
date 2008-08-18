@@ -94,7 +94,7 @@ namespace Ogre
 
 		// set up the LiSPSM perspective transformation
 		// build up frustum to map P onto the unit cube with (-1/-1/-1) and (+1/+1/+1)
-		Matrix4 P = buildFrustumProjection(-1, 1, -1, 1, n_opt, n_opt + d);
+		Matrix4 P = buildFrustumProjection(-1, 1, -1, 1, n_opt + d, n_opt);
 
 		return P * lightSpaceTranslation;
 	}
@@ -221,7 +221,7 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------
 	void LiSPSMShadowCameraSetup::getShadowCamera (const SceneManager *sm, const Camera *cam, 
-		const Viewport *vp, const Light *light, Camera *texCam) const
+		const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const
 	{
 		// check availability - viewport not needed
 		OgreAssert(sm != NULL, "SceneManager is NULL");
@@ -236,7 +236,7 @@ namespace Ogre
 		calculateShadowMappingMatrix(*sm, *cam, *light, &LView, &LProj, NULL);
 
 		// build scene bounding box
-		const VisibleObjectsBoundsInfo& visInfo = sm->getShadowCasterBoundsInfo(light);
+		const VisibleObjectsBoundsInfo& visInfo = sm->getVisibleObjectsBoundsInfo(texCam);
 		AxisAlignedBox sceneBB = visInfo.aabb;
 		sceneBB.merge(sm->getVisibleObjectsBoundsInfo(cam).receiverAabb);
 		sceneBB.merge(cam->getDerivedPosition());
