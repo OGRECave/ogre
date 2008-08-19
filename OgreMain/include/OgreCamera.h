@@ -555,7 +555,7 @@ namespace Ogre {
 		*/
 		void setCullingFrustum(Frustum* frustum) { mCullFrustum = frustum; }
 		/** Returns the custom culling frustum in use. */
-		Frustum* getCullingFrustum(void) { return mCullFrustum; }
+		Frustum* getCullingFrustum(void) const { return mCullFrustum; }
 
 		/** Forward projects frustum rays to find forward intersection with plane.
 		 @remarks

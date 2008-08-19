@@ -172,6 +172,7 @@ pkginclude_HEADERS = Ogre.h \
                      OgreShadowCameraSetupFocused.h \
                      OgreShadowCameraSetupLiSPSM.h \
                      OgreShadowCameraSetupPlaneOptimal.h \
+                     OgreShadowCameraSetupPSSM.h \
                      OgreShadowCaster.h \
                      OgreShadowTextureManager.h \
                      OgreShadowVolumeExtrudeProgram.h \

@@ -134,7 +134,7 @@ namespace Ogre
 			// apply uniform shadow mapping
 			return 0.0;
 		}
-		return cam.getNearClipDistance() + Math::Sqrt(z0 * z1) * mOptAdjustFactor;
+		return cam.getNearClipDistance() + Math::Sqrt(z0 * z1) * getOptimalAdjustFactor();
 	}
 	//-----------------------------------------------------------------------
 	Real LiSPSMShadowCameraSetup::calculateNOptSimple(const PointListBody& bodyLVS, 
@@ -152,7 +152,7 @@ namespace Ogre
 		// zn is set to Abs(near eye point)
 		// z0 is set to the near camera clip distance
 		// z1 is set to the far camera clip distance
-		return (Math::Abs(e_es.z) + Math::Sqrt(cam.getNearClipDistance() * cam.getFarClipDistance())) * mOptAdjustFactor;
+		return (Math::Abs(e_es.z) + Math::Sqrt(cam.getNearClipDistance() * cam.getFarClipDistance())) * getOptimalAdjustFactor();
 	}
 	//-----------------------------------------------------------------------
 	Vector3 LiSPSMShadowCameraSetup::calculateZ0_ls(const Matrix4& lightSpace, 

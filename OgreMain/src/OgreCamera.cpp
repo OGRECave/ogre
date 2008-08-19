@@ -1064,6 +1064,10 @@ namespace Ogre {
 		this->setAspectRatio(cam->getAspectRatio());
 		this->setNearClipDistance(cam->getNearClipDistance());
 		this->setFarClipDistance(cam->getFarClipDistance());
+		this->setLodCamera(cam->getLodCamera());
+		this->setUseRenderingDistance(cam->getUseRenderingDistance());
+		this->setCullingFrustum(cam->getCullingFrustum());
+
 
 	}
 
