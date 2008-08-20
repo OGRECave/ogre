@@ -42,7 +42,7 @@ namespace Ogre
 
 	// AtomAbstractNode
 	AtomAbstractNode::AtomAbstractNode(AbstractNode *ptr)
-		:AbstractNode(ptr)
+		:AbstractNode(ptr), id(0)
 	{
 		type = ANT_ATOM;
 	}
