@@ -39,6 +39,18 @@ namespace Ogre {
 
 	/// Identifier of a background process
 	typedef unsigned long BackgroundProcessTicket;
+
+	/** Encapsulates the result of a background queue request */
+	struct BackgroundProcessResult
+	{
+		/// Whether an error occurred
+		bool error;
+		/// Any messages from the process
+		String message;
+
+		BackgroundProcessResult() : error(false) {}
+	};
+
 	
 	/** This class is used to perform Resource operations in a
 		background thread. 
@@ -93,7 +105,7 @@ namespace Ogre {
 				loading thread, it is queued to be sent from the main thread
 				so that you don't have to be concerned about thread safety. 
 			*/
-			virtual void operationCompleted(BackgroundProcessTicket ticket) = 0;
+			virtual void operationCompleted(BackgroundProcessTicket ticket, const BackgroundProcessResult& result) = 0;
 			/** Called when a requested operation completes, immediate in background thread. 
 			@note
 				This is the advanced version of the background operation notification,
@@ -102,7 +114,7 @@ namespace Ogre {
 				you use this version, you have to be aware of thread safety issues
 				and what you can and cannot do in your callback implementation.
 			*/
-			virtual void operationCompletedInThread(BackgroundProcessTicket ticket) {}
+			virtual void operationCompletedInThread(BackgroundProcessTicket ticket, const BackgroundProcessResult& result) {}
 			/// Need virtual destructor in case subclasses use it
 			virtual ~Listener() {}
 
@@ -139,6 +151,7 @@ namespace Ogre {
 			ManualResourceLoader* loader;
 			const NameValuePairList* loadParams;
 			Listener* listener;
+			BackgroundProcessResult result;
 		};
 		typedef std::list<Request> RequestQueue;
 		typedef std::map<BackgroundProcessTicket, Request*> RequestTicketMap;

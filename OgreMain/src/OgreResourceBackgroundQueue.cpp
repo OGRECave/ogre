@@ -459,6 +459,7 @@ namespace Ogre {
 	{
 
 		Request* req;
+
 		// Manual scope block just to define scope of lock
 		{
 			OGRE_LOCK_AUTO_MUTEX
@@ -473,74 +474,83 @@ namespace Ogre {
 		// we only allow one background thread
 
 		ResourceManager* rm = 0;
-		switch (req->type)
+		try
 		{
-		case RT_INITIALISE_GROUP:
-			ResourceGroupManager::getSingleton().initialiseResourceGroup(
-				req->groupName);
-			break;
-		case RT_INITIALISE_ALL_GROUPS:
-			ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-			break;
-		case RT_PREPARE_GROUP:
-			ResourceGroupManager::getSingleton().prepareResourceGroup(
-				req->groupName);
-			break;
-		case RT_LOAD_GROUP:
-#if OGRE_THREAD_SUPPORT == 2
-			ResourceGroupManager::getSingleton().prepareResourceGroup(
-				req->groupName);
-#else
-			ResourceGroupManager::getSingleton().loadResourceGroup(
-				req->groupName);
-#endif
-			break;
-		case RT_UNLOAD_GROUP:
-			ResourceGroupManager::getSingleton().unloadResourceGroup(
-				req->groupName);
-			break;
-		case RT_PREPARE_RESOURCE:
-			rm = ResourceGroupManager::getSingleton()._getResourceManager(
-				req->resourceType);
-			rm->prepare(req->resourceName, req->groupName, req->isManual, 
-				req->loader, req->loadParams);
-			break;
-		case RT_LOAD_RESOURCE:
-			rm = ResourceGroupManager::getSingleton()._getResourceManager(
-				req->resourceType);
-#if OGRE_THREAD_SUPPORT == 2
-			rm->prepare(req->resourceName, req->groupName, req->isManual, 
-				req->loader, req->loadParams);
-#else
-			rm->load(req->resourceName, req->groupName, req->isManual, 
-				req->loader, req->loadParams);
-#endif
-			break;
-		case RT_UNLOAD_RESOURCE:
-			rm = ResourceGroupManager::getSingleton()._getResourceManager(
-				req->resourceType);
-			if (req->resourceName.empty())
-				rm->unload(req->resourceHandle);
-			else
-				rm->unload(req->resourceName);
-			break;
-		case RT_SHUTDOWN:
-			// That's all folks
-#if OGRE_THREAD_SUPPORT
-			mShuttingDown = true;
-#if OGRE_THREAD_SUPPORT == 1
-			Root::getSingleton().getRenderSystem()->unregisterThread();
-#endif
-#endif
-			break;
-		};
+
+			switch (req->type)
+			{
+			case RT_INITIALISE_GROUP:
+				ResourceGroupManager::getSingleton().initialiseResourceGroup(
+					req->groupName);
+				break;
+			case RT_INITIALISE_ALL_GROUPS:
+				ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+				break;
+			case RT_PREPARE_GROUP:
+				ResourceGroupManager::getSingleton().prepareResourceGroup(
+					req->groupName);
+				break;
+			case RT_LOAD_GROUP:
+	#if OGRE_THREAD_SUPPORT == 2
+				ResourceGroupManager::getSingleton().prepareResourceGroup(
+					req->groupName);
+	#else
+				ResourceGroupManager::getSingleton().loadResourceGroup(
+					req->groupName);
+	#endif
+				break;
+			case RT_UNLOAD_GROUP:
+				ResourceGroupManager::getSingleton().unloadResourceGroup(
+					req->groupName);
+				break;
+			case RT_PREPARE_RESOURCE:
+				rm = ResourceGroupManager::getSingleton()._getResourceManager(
+					req->resourceType);
+				rm->prepare(req->resourceName, req->groupName, req->isManual, 
+					req->loader, req->loadParams);
+				break;
+			case RT_LOAD_RESOURCE:
+				rm = ResourceGroupManager::getSingleton()._getResourceManager(
+					req->resourceType);
+	#if OGRE_THREAD_SUPPORT == 2
+				rm->prepare(req->resourceName, req->groupName, req->isManual, 
+					req->loader, req->loadParams);
+	#else
+				rm->load(req->resourceName, req->groupName, req->isManual, 
+					req->loader, req->loadParams);
+	#endif
+				break;
+			case RT_UNLOAD_RESOURCE:
+				rm = ResourceGroupManager::getSingleton()._getResourceManager(
+					req->resourceType);
+				if (req->resourceName.empty())
+					rm->unload(req->resourceHandle);
+				else
+					rm->unload(req->resourceName);
+				break;
+			case RT_SHUTDOWN:
+				// That's all folks
+	#if OGRE_THREAD_SUPPORT
+				mShuttingDown = true;
+	#if OGRE_THREAD_SUPPORT == 1
+				Root::getSingleton().getRenderSystem()->unregisterThread();
+	#endif
+	#endif
+				break;
+			};
+		}
+		catch (Exception& e)
+		{
+			req->result.error = true;
+			req->result.message = e.getFullDescription();
+		}
 
 		// Queue notification (don't do shutdown since not needed & listeners 
 		// might be being destroyed too
 		if (req->listener && req->type != RT_SHUTDOWN)
 		{
 			// Fire in-thread notification first
-			req->listener->operationCompletedInThread(req->ticketID);
+			req->listener->operationCompletedInThread(req->ticketID, req->result);
 			// Then queue main thread notification
 			queueFireBackgroundOperationComplete(req);
 		}
@@ -603,7 +613,7 @@ namespace Ogre {
                     ResourceGroupManager::getSingleton().loadResourceGroup(r.groupName);
                 }
 #endif
-                r.listener->operationCompleted(r.ticketID);
+                r.listener->operationCompleted(r.ticketID, r.result);
             }
 		}
 		mNotificationQueue.clear();
