@@ -894,6 +894,11 @@ namespace Ogre {
 		/// Storage for default renderable visitor
 		SceneMgrQueuedRenderableVisitor mDefaultQueuedRenderableVisitor;
 
+		/// Whether to use camera-relative rendering
+		bool mCameraRelativeRendering;
+		Matrix4 mCachedViewMatrix;
+		Vector3 mCameraRelativePosition;
+
     public:
         /** Constructor.
         */
@@ -3085,6 +3090,27 @@ namespace Ogre {
 
 		/**  Returns the shadow caster AAB for a specific light-camera combination */
 		const VisibleObjectsBoundsInfo& getShadowCasterBoundsInfo(const Light* light, size_t iteration = 0) const;
+
+		/** Set whether to use camera-relative co-ordinates when rendering, ie
+			to always place the camera at the origin and move the world around it.
+		@remarks
+			This is a technique to alleviate some of the precision issues associated with 
+			rendering far from the origin, where single-precision floats as used in most
+			GPUs begin to lose their precision. Instead of including the camera
+			translation in the view matrix, it only includes the rotation, and
+			the world matrices of objects must be expressed relative to this.
+		@note
+			If you need this option, you will probably also need to enable double-precision
+			mode in Ogre (OGRE_DOUBLE_PRECISION), since even though this will 
+			alleviate the rendering precision, the source camera and object positions will still 
+			suffer from precision issues leading to jerky movement. 
+		*/
+		virtual void setCameraRelativeRendering(bool rel) { mCameraRelativeRendering = rel; }
+
+		/** Get whether to use camera-relative co-ordinates when rendering, ie
+			to always place the camera at the origin and move the world around it.
+		*/
+		virtual bool getCameraRelativeRendering() const { return mCameraRelativeRendering; }
     };
 
     /** Default implementation of IntersectionSceneQuery. */

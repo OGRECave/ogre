@@ -151,7 +151,7 @@ public:
     }
 
 	/// Background load completed
-	void operationCompleted(BackgroundProcessTicket ticket)
+	void operationCompleted(BackgroundProcessTicket ticket, const Ogre::BackgroundProcessResult &)
 	{
 		mDebugText = "Background load complete";
 
@@ -6988,6 +6988,79 @@ protected:
 
 	}
 
+	// NOTE: you really need double-precision enabled for this, and even then
+	// the default way of updating the camera position doesn't work at high frame rates
+	// (really the update should be accumulated in a smaller offset variable and not
+	// added each frame to the large existing position)
+	void testFarFromOrigin()
+	{
+		mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
+		mSceneMgr->setShadowTextureSettings(1024, 2);
+		addTextureShadowDebugOverlay(2);
+
+		//Vector3 offset(10000000, 0, 10000000);
+		Vector3 offset(0, 0, 0);
+
+		mSceneMgr->setAmbientLight(ColourValue(0.1, 0.1, 0.1));
+
+
+		// Directional test
+		mLight = mSceneMgr->createLight("MainLight");
+		mLight->setType(Light::LT_DIRECTIONAL);
+		Vector3 vec(-1,-1,0);
+		vec.normalise();
+		mLight->setDirection(vec);
+		mLight->setDiffuseColour(ColourValue(0.5, 0.5, 1.0));
+
+		// Spotlight test
+		mLight = mSceneMgr->createLight("SpotLight");
+		mLight->setType(Light::LT_SPOTLIGHT);
+		mLight->setAttenuation(10000, 1, 0, 0);
+		mLight->setDiffuseColour(1.0, 1.0, 0.5);
+
+		mTestNode[0] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		mTestNode[0]->setPosition(offset + Vector3(-400,300,1000));
+		mTestNode[0]->lookAt(offset, Node::TS_WORLD, Vector3::UNIT_Z);
+		mTestNode[0]->attachObject(mLight);
+
+		
+		mTestNode[1] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		mTestNode[1]->setPosition(offset);
+
+		Entity* pEnt;
+		pEnt = mSceneMgr->createEntity( "1", "knot.mesh" );
+		mTestNode[1]->attachObject( pEnt );
+
+
+		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
+
+
+		Plane plane;
+		plane.normal = Vector3::UNIT_Y;
+		plane.d = 100;
+		MeshManager::getSingleton().createPlane("Myplane",
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+			2500,2500,10,10,true,1,5,5,Vector3::UNIT_Z);
+		Entity* pPlaneEnt;
+		pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+		pPlaneEnt->setMaterialName("2 - Default");
+		pPlaneEnt->setCastShadows(false);
+		mSceneMgr->getRootSceneNode()->createChildSceneNode(offset)->attachObject(pPlaneEnt);
+
+		ParticleSystem* pSys2 = mSceneMgr->createParticleSystem("smoke", 
+		"Examples/Smoke");
+		mTestNode[4] = mSceneMgr->getRootSceneNode()->createChildSceneNode(offset + Vector3(-300, -100, 200));
+		mTestNode[4]->attachObject(pSys2);
+
+		mCamera->setPosition(offset + Vector3(0, 1000, 500));
+		mCamera->lookAt(offset);
+		mCamera->setFarClipDistance(10000);
+
+		mSceneMgr->setCameraRelativeRendering(true);
+
+
+	}
+
 
     void createScene(void)
     {
@@ -7056,7 +7129,7 @@ protected:
         //testTextureShadows(SHADOWTYPE_TEXTURE_ADDITIVE, true);
 		//testTextureShadows(SHADOWTYPE_TEXTURE_MODULATIVE, false);
 		//testTextureShadowsIntegrated();
-		testTextureShadowsIntegratedPSSM();
+		//testTextureShadowsIntegratedPSSM();
 		//testStencilShadowsMixedOpSubMeshes(false, true);
 		//testTextureShadowsTransparentCaster();
 		//testTextureShadowsCustomCasterMat(SHADOWTYPE_TEXTURE_ADDITIVE);
@@ -7148,6 +7221,8 @@ protected:
 		//testReinitialiseEntityAlteredMesh();
 		//testSRGBtexture(true);
 		//testLightClipPlanesMoreLights(true);
+
+		testFarFromOrigin();
 		
     }
     // Create new frame listener

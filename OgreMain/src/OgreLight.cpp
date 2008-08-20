@@ -56,6 +56,9 @@ namespace Ogre {
 		  mShadowFarDistSquared(0),
           mDerivedPosition(Vector3::ZERO),
           mDerivedDirection(Vector3::UNIT_Z),
+		  mDerivedCamRelativePosition(Vector3::ZERO),
+		  mDerivedCamRelativeDirty(false),
+		  mCameraToBeRelativeTo(0),
           mDerivedTransformDirty(false),
 		  mCustomShadowCameraSetup()
     {
@@ -81,6 +84,8 @@ namespace Ogre {
 		mShadowFarDistSquared(0),
         mDerivedPosition(Vector3::ZERO),
         mDerivedDirection(Vector3::UNIT_Z),
+		mDerivedCamRelativeDirty(false),
+		mCameraToBeRelativeTo(0),
         mDerivedTransformDirty(false),
 		mCustomShadowCameraSetup()
     {
@@ -106,6 +111,7 @@ namespace Ogre {
         mPosition.y = y;
         mPosition.z = z;
         mDerivedTransformDirty = true;
+		mDerivedCamRelativeDirty = true;
 
     }
     //-----------------------------------------------------------------------
@@ -113,6 +119,7 @@ namespace Ogre {
     {
         mPosition = vec;
         mDerivedTransformDirty = true;
+		mDerivedCamRelativeDirty = true;
     }
     //-----------------------------------------------------------------------
     const Vector3& Light::getPosition(void) const
@@ -275,6 +282,11 @@ namespace Ogre {
 
             mDerivedTransformDirty = false;
         }
+		if (mCameraToBeRelativeTo && mDerivedCamRelativeDirty)
+		{
+			mDerivedCamRelativePosition = mDerivedPosition - mCameraToBeRelativeTo->getDerivedPosition();
+			mDerivedCamRelativeDirty = false;
+		}
     }
     //-----------------------------------------------------------------------
     void Light::_notifyAttached(Node* parent, bool isTagPoint)
@@ -314,10 +326,17 @@ namespace Ogre {
 		return LightFactory::FACTORY_TYPE_NAME;
     }
     //-----------------------------------------------------------------------
-    const Vector3& Light::getDerivedPosition(void) const
+    const Vector3& Light::getDerivedPosition(bool cameraRelative) const
     {
         update();
-        return mDerivedPosition;
+		if (cameraRelative && mCameraToBeRelativeTo)
+		{
+			return mDerivedCamRelativePosition;
+		}
+		else
+		{
+			return mDerivedPosition;
+		}
     }
     //-----------------------------------------------------------------------
     const Vector3& Light::getDerivedDirection(void) const
@@ -331,7 +350,7 @@ namespace Ogre {
         MovableObject::setVisible(visible);
     }
     //-----------------------------------------------------------------------
-	Vector4 Light::getAs4DVector(void) const
+	Vector4 Light::getAs4DVector(bool cameraRelativeIfSet) const
 	{
 		Vector4 ret;
         if (mLightType == Light::LT_DIRECTIONAL)
@@ -341,7 +360,7 @@ namespace Ogre {
         }	
 		else
         {
-            ret = getDerivedPosition();
+            ret = getDerivedPosition(cameraRelativeIfSet);
             ret.w = 1.0;
         }
 		return ret;
@@ -772,6 +791,12 @@ namespace Ogre {
 			return mShadowFarDistSquared;
 		else
 			return mManager->getShadowFarDistanceSquared ();
+	}
+	//---------------------------------------------------------------------
+	void Light::_setCameraRelative(Camera* cam)
+	{
+		mCameraToBeRelativeTo = cam;
+		mDerivedCamRelativeDirty = true;
 	}
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------

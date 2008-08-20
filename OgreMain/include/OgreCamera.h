@@ -166,10 +166,6 @@ namespace Ogre {
             The method will called on demand.
         */
         virtual void setWindowImpl(void) const;
-        /** Get the derived position of this frustum. */
-        const Vector3& getPositionForViewUpdate(void) const;
-        /** Get the derived orientation of this frustum. */
-        const Quaternion& getOrientationForViewUpdate(void) const;
 
 		/** Helper function for forwardIntersect that intersects rays with canonical plane */
 		virtual std::vector<Vector4> getRayForwardIntersect(const Vector3& anchor, const Vector3 *dir, Real planeOffset) const;
@@ -610,6 +606,10 @@ namespace Ogre {
 		*/
 		virtual void synchroniseBaseSettingsWith(const Camera* cam);
 
+		/** Get the derived position of this frustum. */
+		const Vector3& getPositionForViewUpdate(void) const;
+		/** Get the derived orientation of this frustum. */
+		const Quaternion& getOrientationForViewUpdate(void) const;
      };
 
 } // namespace Ogre

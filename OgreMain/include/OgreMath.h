@@ -547,6 +547,11 @@ namespace Ogre
 			return std::max(std::min(val, maxval), minval);
 		}
 
+		static Matrix4 makeViewMatrix(const Vector3& position, const Quaternion& orientation, 
+			const Matrix4* reflectMatrix = 0);
+
+
+
         static const Real POS_INFINITY;
         static const Real NEG_INFINITY;
         static const Real PI;

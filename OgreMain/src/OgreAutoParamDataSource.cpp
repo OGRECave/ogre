@@ -62,6 +62,7 @@ namespace Ogre {
 		 mSceneDepthRangeDirty(true),
          mCurrentRenderable(0),
          mCurrentCamera(0), 
+		 mCameraRelativeRendering(false),
          mCurrentRenderTarget(0),
          mCurrentViewport(0), 
 		 mCurrentSceneManager(0),
@@ -123,9 +124,11 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------------
-    void AutoParamDataSource::setCurrentCamera(const Camera* cam)
+    void AutoParamDataSource::setCurrentCamera(const Camera* cam, bool useCameraRelative)
     {
         mCurrentCamera = cam;
+		mCameraRelativeRendering = useCameraRelative;
+		mCameraRelativePosition = cam->getDerivedPosition();
         mViewMatrixDirty = true;
         mProjMatrixDirty = true;
         mWorldViewMatrixDirty = true;
@@ -190,12 +193,12 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	const Vector3& AutoParamDataSource::getLightPosition(size_t index) const
 	{
-		return getLight(index).getDerivedPosition();
+		return getLight(index).getDerivedPosition(true);
 	}
 	//-----------------------------------------------------------------------------
 	Vector4 AutoParamDataSource::getLightAs4DVector(size_t index) const
 	{
-		return getLight(index).getAs4DVector();
+		return getLight(index).getAs4DVector(true);
 	}
 	//-----------------------------------------------------------------------------
 	const Vector3& AutoParamDataSource::getLightDirection(size_t index) const
@@ -267,6 +270,13 @@ namespace Ogre {
             mWorldMatrixArray = mWorldMatrix;
             mCurrentRenderable->getWorldTransforms(mWorldMatrix);
             mWorldMatrixCount = mCurrentRenderable->getNumWorldTransforms();
+			if (mCameraRelativeRendering)
+			{
+				for (size_t i = 0; i < mWorldMatrixCount; ++i)
+				{
+					mWorldMatrix[i].setTrans(mWorldMatrix[i].getTrans() - mCameraRelativePosition);
+				}
+			}
             mWorldMatrixDirty = false;
         }
         return mWorldMatrixArray[0];
@@ -274,25 +284,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     size_t AutoParamDataSource::getWorldMatrixCount(void) const
     {
-        if (mWorldMatrixDirty)
-        {
-            mWorldMatrixArray = mWorldMatrix;
-            mCurrentRenderable->getWorldTransforms(mWorldMatrix);
-            mWorldMatrixCount = mCurrentRenderable->getNumWorldTransforms();
-            mWorldMatrixDirty = false;
-        }
+		// trigger derivation
+		getWorldMatrix();
         return mWorldMatrixCount;
     }
     //-----------------------------------------------------------------------------
     const Matrix4* AutoParamDataSource::getWorldMatrixArray(void) const
     {
-        if (mWorldMatrixDirty)
-        {
-            mWorldMatrixArray = mWorldMatrix;
-            mCurrentRenderable->getWorldTransforms(mWorldMatrix);
-            mWorldMatrixCount = mCurrentRenderable->getNumWorldTransforms();
-            mWorldMatrixDirty = false;
-        }
+		// trigger derivation
+		getWorldMatrix();
         return mWorldMatrixArray;
     }
     //-----------------------------------------------------------------------------
@@ -303,7 +303,14 @@ namespace Ogre {
             if (mCurrentRenderable && mCurrentRenderable->getUseIdentityView())
                 mViewMatrix = Matrix4::IDENTITY;
             else
+			{
                 mViewMatrix = mCurrentCamera->getViewMatrix(true);
+				if (mCameraRelativeRendering)
+				{
+					mViewMatrix.setTrans(Vector3::ZERO);
+				}
+
+			}
             mViewMatrixDirty = false;
         }
         return mViewMatrix;
@@ -577,10 +584,30 @@ namespace Ogre {
     {
         if (mTextureViewProjMatrixDirty[index] && mCurrentTextureProjector[index])
         {
-            mTextureViewProjMatrix[index] = 
-                PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
-                mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 
-				mCurrentTextureProjector[index]->getViewMatrix();
+			if (mCameraRelativeRendering)
+			{
+				// World positions are now going to be relative to the camera position
+				// so we need to alter the projector view matrix to compensate
+				// We could do this by moving the point back into worldspace then using the normal
+				// view matrix but this would have the old precision issues, so instead we
+				// want to move the point the difference between the projection position and the camera position
+				Vector3 pos = mCurrentTextureProjector[index]->getPositionForViewUpdate();
+				pos -= mCurrentCamera->getDerivedPosition(); // this includes reflection
+				const Quaternion& orientation = mCurrentTextureProjector[index]->getOrientationForViewUpdate();
+
+				Matrix4 viewMatrix = Math::makeViewMatrix(pos, orientation);
+				mTextureViewProjMatrix[index] = 
+					PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
+					mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 
+					viewMatrix;
+			}
+			else
+			{
+				mTextureViewProjMatrix[index] = 
+					PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
+					mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 
+					mCurrentTextureProjector[index]->getViewMatrix();
+			}
             mTextureViewProjMatrixDirty[index] = false;
         }
         return mTextureViewProjMatrix[index];
@@ -615,8 +642,8 @@ namespace Ogre {
 			// set near clip the same as main camera, since they are likely
 			// to both reflect the nature of the scene
 			frust.setNearClipDistance(mCurrentCamera->getNearClipDistance());
-			// Calculate position, which same as spotlight position
-			dummyNode.setPosition(l.getDerivedPosition());
+			// Calculate position, which same as spotlight position, in camera-relative coords if required
+			dummyNode.setPosition(l.getDerivedPosition(true));
 			// Calculate direction, which same as spotlight direction
 			Vector3 dir = - l.getDerivedDirection(); // backwards since point down -z
 			dir.normalise();
@@ -637,10 +664,13 @@ namespace Ogre {
 			q.FromAxes(left, up, dir);
 			dummyNode.setOrientation(q);
 
+			// The view matrix here already includes camera-relative changes if necessary
+			// since they are built into the frustum position
 			mSpotlightViewProjMatrix[index] = 
 				PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
 				frust.getProjectionMatrixWithRSDepth() * 
 				frust.getViewMatrix();
+
 			mSpotlightViewProjMatrixDirty[index] = false;
 		}
 		return mSpotlightViewProjMatrix[index];
@@ -710,7 +740,7 @@ namespace Ogre {
 		{
 			// Calculate based on object space light distance
 			// compared to light attenuation range
-			Vector3 objPos = getInverseWorldMatrix().transformAffine(l.getDerivedPosition());
+			Vector3 objPos = getInverseWorldMatrix().transformAffine(l.getDerivedPosition(true));
 			return l.getAttenuationRange() - objPos.length();
 		}
 	}

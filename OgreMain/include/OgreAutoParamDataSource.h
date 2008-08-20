@@ -105,6 +105,8 @@ namespace Ogre {
 
         const Renderable* mCurrentRenderable;
         const Camera* mCurrentCamera;
+		bool mCameraRelativeRendering;
+		Vector3 mCameraRelativePosition;
         const LightList* mCurrentLightList;
         const Frustum* mCurrentTextureProjector[OGRE_MAX_SIMULTANEOUS_LIGHTS];
         const RenderTarget* mCurrentRenderTarget;
@@ -122,7 +124,7 @@ namespace Ogre {
         /** Sets the world matrices, avoid query from renderable again */
         virtual void setWorldMatrices(const Matrix4* m, size_t count);
         /** Updates the current camera */
-        virtual void setCurrentCamera(const Camera* cam);
+        virtual void setCurrentCamera(const Camera* cam, bool useCameraRelative);
         /** Sets the light list that should be used, and it's base index from the global list */
         virtual void setCurrentLightList(const LightList* ll);
         /** Sets the current texture projector for a index */

@@ -942,6 +942,12 @@ namespace Ogre
 		    while(it.hasMoreElements())
 		    {
 			    PCZLight* l = static_cast<PCZLight*>(it.getNext());
+
+				if (mCameraRelativeRendering)
+					l->_setCameraRelative(mCameraInProgress);
+				else
+					l->_setCameraRelative(0);
+
 			    if (l->isVisible() &&
                     l->affectsVisibleZone())
 			    {

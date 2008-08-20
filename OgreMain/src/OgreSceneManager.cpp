@@ -142,7 +142,8 @@ mShadowTextureCustomReceiverPass(0),
 mVisibilityMask(0xFFFFFFFF),
 mFindVisibleObjects(true),
 mSuppressRenderStateChanges(false),
-mSuppressShadows(false)
+mSuppressShadows(false),
+mCameraRelativeRendering(false)
 {
 
     // init sky
@@ -1237,7 +1238,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 		setViewport(vp);
 
 		// Tell params about camera
-		mAutoParamDataSource->setCurrentCamera(camera);
+		mAutoParamDataSource->setCurrentCamera(camera, mCameraRelativeRendering);
 		// Set autoparams for finite dir light extrusion
 		mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowDirLightExtrudeDist);
 
@@ -1312,7 +1313,16 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 
 	// Set initial camera state
 	mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());
-	mDestRenderSystem->_setViewMatrix(mCameraInProgress->getViewMatrix(true));
+	
+	mCachedViewMatrix = mCameraInProgress->getViewMatrix(true);
+
+	if (mCameraRelativeRendering)
+	{
+		mCachedViewMatrix.setTrans(Vector3::ZERO);
+		mCameraRelativePosition = mCameraInProgress->getDerivedPosition();
+	}
+
+	mDestRenderSystem->_setViewMatrix(mCachedViewMatrix);
 
     // Render scene content
     _renderVisibleObjects();
@@ -2846,6 +2856,14 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 	if (numMatrices > 0)
 	{
 	    rend->getWorldTransforms(mTempXform);
+
+		if (mCameraRelativeRendering && !rend->getUseIdentityView())
+		{
+			for (unsigned short i = 0; i < numMatrices; ++i)
+			{
+				mTempXform[i].setTrans(mTempXform[i].getTrans() - mCameraRelativePosition);
+			}
+		}
 		
 		if (numMatrices > 1)
 		{
@@ -3569,7 +3587,7 @@ void SceneManager::resetViewProjMode(void)
     if (mResetIdentityView)
     {
         // Coming back to normal from identity view
-        mDestRenderSystem->_setViewMatrix(mCameraInProgress->getViewMatrix(true));
+        mDestRenderSystem->_setViewMatrix(mCachedViewMatrix);
         mResetIdentityView = false;
     }
     
@@ -3953,6 +3971,12 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
 		while(it.hasMoreElements())
 		{
 			Light* l = static_cast<Light*>(it.getNext());
+
+			if (mCameraRelativeRendering)
+				l->_setCameraRelative(mCameraInProgress);
+			else
+				l->_setCameraRelative(0);
+
 			if (l->isVisible())
 			{
 				LightInfo lightInfo;
