@@ -5734,6 +5734,11 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
 
 				// Associate main view camera as LOD camera
 				texCam->setLodCamera(cam);
+				// set base
+				if (light->getType() != Light::LT_POINT)
+					texCam->setDirection(light->getDerivedDirection());
+				if (light->getType() != Light::LT_DIRECTIONAL)
+					texCam->setPosition(light->getDerivedPosition());
 
 				// update shadow cam - light mapping
 				ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );
