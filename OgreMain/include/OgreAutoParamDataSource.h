@@ -72,6 +72,7 @@ namespace Ogre {
 		mutable Matrix4 mTextureWorldViewProjMatrix[OGRE_MAX_SIMULTANEOUS_LIGHTS];
 		mutable Matrix4 mSpotlightViewProjMatrix[OGRE_MAX_SIMULTANEOUS_LIGHTS];
 		mutable Matrix4 mSpotlightWorldViewProjMatrix[OGRE_MAX_SIMULTANEOUS_LIGHTS];
+		mutable Vector4 mShadowCamDepthRanges[OGRE_MAX_SIMULTANEOUS_LIGHTS];
         mutable Matrix4 mViewMatrix;
         mutable Matrix4 mProjectionMatrix;
 		mutable Real mDirLightExtrusionDistance;
@@ -94,18 +95,18 @@ namespace Ogre {
 		mutable bool mTextureWorldViewProjMatrixDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
 		mutable bool mSpotlightViewProjMatrixDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
 		mutable bool mSpotlightWorldViewProjMatrixDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
+		mutable bool mShadowCamDepthRangesDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
 		mutable ColourValue mAmbientLight;
         mutable ColourValue mFogColour;
         mutable Vector4 mFogParams;
         mutable int mPassNumber;
 		mutable Vector4 mSceneDepthRange;
 		mutable bool mSceneDepthRangeDirty;
-		// Ordered by light, populated on demand, dirtied when lights change
-		mutable std::vector<Vector4> mShadowCamDepthRanges;
-		mutable bool mShadowCamDepthRangesDirty;
 
         const Renderable* mCurrentRenderable;
         const Camera* mCurrentCamera;
+		bool mCameraRelativeRendering;
+		Vector3 mCameraRelativePosition;
         const LightList* mCurrentLightList;
         const Frustum* mCurrentTextureProjector[OGRE_MAX_SIMULTANEOUS_LIGHTS];
         const RenderTarget* mCurrentRenderTarget;
@@ -123,7 +124,7 @@ namespace Ogre {
         /** Sets the world matrices, avoid query from renderable again */
         virtual void setWorldMatrices(const Matrix4* m, size_t count);
         /** Updates the current camera */
-        virtual void setCurrentCamera(const Camera* cam);
+        virtual void setCurrentCamera(const Camera* cam, bool useCameraRelative);
         /** Sets the light list that should be used, and it's base index from the global list */
         virtual void setCurrentLightList(const LightList* ll);
         /** Sets the current texture projector for a index */
@@ -197,7 +198,7 @@ namespace Ogre {
         virtual Vector4 getPackedTextureSize(size_t index) const;
 		virtual Real getShadowExtrusionDistance(void) const;
 		virtual const Vector4& getSceneDepthRange() const;
-		virtual const Vector4& getShadowSceneDepthRange(size_t lightIndex) const;
+		virtual const Vector4& getShadowSceneDepthRange(size_t index) const;
 		virtual const ColourValue& getShadowColour() const;
 		virtual Matrix4 getInverseViewProjMatrix(void) const;
 		virtual Matrix4 getInverseTransposeViewProjMatrix() const;

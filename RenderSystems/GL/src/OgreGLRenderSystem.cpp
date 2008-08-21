@@ -2387,7 +2387,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		// Set position / direction
 		Vector4 vec;
 		// Use general 4D vector which is the same as GL's approach
-		vec = lt->getAs4DVector();
+		vec = lt->getAs4DVector(true);
 
 #if OGRE_DOUBLE_PRECISION
 		// Must convert to float*

@@ -142,7 +142,8 @@ mShadowTextureCustomReceiverPass(0),
 mVisibilityMask(0xFFFFFFFF),
 mFindVisibleObjects(true),
 mSuppressRenderStateChanges(false),
-mSuppressShadows(false)
+mSuppressShadows(false),
+mCameraRelativeRendering(false)
 {
 
     // init sky
@@ -165,6 +166,11 @@ mSuppressShadows(false)
 
 	// init shadow texture config
 	setShadowTextureCount(1);
+
+	// init shadow texture count per type.
+	mShadowTextureCountPerType[Light::LT_POINT] = 1;
+	mShadowTextureCountPerType[Light::LT_DIRECTIONAL] = 1;
+	mShadowTextureCountPerType[Light::LT_SPOTLIGHT] = 1;
 
 	// create the auto param data source instance
 	mAutoParamDataSource = createAutoParamDataSource();
@@ -970,7 +976,11 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 		Pass::ConstTextureUnitStateIterator texIter =  pass->getTextureUnitStateIterator();
 		size_t unit = 0;
 		// Reset the shadow texture index for each pass
-		size_t shadowTexIndex = pass->getStartLight(); // all shadow casters are at the start
+		size_t startLightIndex = pass->getStartLight();
+		size_t shadowTexUnitIndex = 0;
+		size_t shadowTexIndex = mShadowTextures.size();
+		if (mShadowTextureIndexLightList.size() > startLightIndex)
+			shadowTexIndex = mShadowTextureIndexLightList[startLightIndex];
 		while(texIter.hasMoreElements())
 		{
 			TextureUnitState* pTex = texIter.getNext();
@@ -998,7 +1008,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 					// Enable projective texturing if fixed-function, but also need to
 					// disable it explicitly for program pipeline.
 					pTex->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
-					mAutoParamDataSource->setTextureProjector(cam, shadowTexIndex);
+					mAutoParamDataSource->setTextureProjector(cam, shadowTexUnitIndex);
 				}
 				else
 				{
@@ -1006,12 +1016,13 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 					// no projection since all uniform colour anyway
 					shadowTex = mNullShadowTexture;
 					pTex->setProjectiveTexturing(false);
-					mAutoParamDataSource->setTextureProjector(0, shadowTexIndex);
+					mAutoParamDataSource->setTextureProjector(0, shadowTexUnitIndex);
 
 				}
 				pTex->_setTexturePtr(shadowTex);
 
 				++shadowTexIndex;
+				++shadowTexUnitIndex;
 			}
 			else if (mIlluminationStage == IRS_NONE && pass->hasVertexProgram())
 			{
@@ -1227,7 +1238,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 		setViewport(vp);
 
 		// Tell params about camera
-		mAutoParamDataSource->setCurrentCamera(camera);
+		mAutoParamDataSource->setCurrentCamera(camera, mCameraRelativeRendering);
 		// Set autoparams for finite dir light extrusion
 		mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowDirLightExtrudeDist);
 
@@ -1302,7 +1313,16 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 
 	// Set initial camera state
 	mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());
-	mDestRenderSystem->_setViewMatrix(mCameraInProgress->getViewMatrix(true));
+	
+	mCachedViewMatrix = mCameraInProgress->getViewMatrix(true);
+
+	if (mCameraRelativeRendering)
+	{
+		mCachedViewMatrix.setTrans(Vector3::ZERO);
+		mCameraRelativePosition = mCameraInProgress->getDerivedPosition();
+	}
+
+	mDestRenderSystem->_setViewMatrix(mCachedViewMatrix);
 
     // Render scene content
     _renderVisibleObjects();
@@ -2836,6 +2856,14 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 	if (numMatrices > 0)
 	{
 	    rend->getWorldTransforms(mTempXform);
+
+		if (mCameraRelativeRendering && !rend->getUseIdentityView())
+		{
+			for (unsigned short i = 0; i < numMatrices; ++i)
+			{
+				mTempXform[i].setTrans(mTempXform[i].getTrans() - mCameraRelativePosition);
+			}
+		}
 		
 		if (numMatrices > 1)
 		{
@@ -2967,6 +2995,11 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				// Determine light list to use
 				if (iteratePerLight)
 				{
+					// Starting shadow texture index.
+					size_t shadowTexIndex = mShadowTextures.size();
+					if (mShadowTextureIndexLightList.size() > lightIndex)
+						shadowTexIndex = mShadowTextureIndexLightList[lightIndex];
+
 					localLightList.resize(pass->getLightCountPerIteration());
 
 					LightList::iterator destit = localLightList.begin();
@@ -2975,40 +3008,46 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 							&& lightIndex < rendLightList.size(); 
 						++lightIndex, --lightsLeft)
 					{
+						Light* currLight = rendLightList[lightIndex];
+
 						// Check whether we need to filter this one out
 						if (pass->getRunOnlyForOneLightType() && 
-							pass->getOnlyLightType() != rendLightList[lightIndex]->getType())
+							pass->getOnlyLightType() != currLight->getType())
 						{
 							// Skip
 							continue;
 						}
 
-						*destit++ = rendLightList[lightIndex];
+						*destit++ = currLight;
+
 						// potentially need to update content_type shadow texunit
 						// corresponding to this light
-						if (isShadowTechniqueTextureBased() && lightIndex < mShadowTextures.size())
+						if (isShadowTechniqueTextureBased())
 						{
-							// link the numShadowTextureLights'th shadow texture unit
-							unsigned short tuindex = 
-								pass->_getTextureUnitWithContentTypeIndex(
-								TextureUnitState::CONTENT_SHADOW, numShadowTextureLights);
-							if (tuindex < pass->getNumTextureUnitStates())
+							size_t textureCountPerLight = mShadowTextureCountPerType[currLight->getType()];
+							for (size_t j = 0; j < textureCountPerLight && shadowTexIndex < mShadowTextures.size(); ++j)
 							{
+								// link the numShadowTextureLights'th shadow texture unit
+								unsigned short tuindex = 
+									pass->_getTextureUnitWithContentTypeIndex(
+									TextureUnitState::CONTENT_SHADOW, numShadowTextureLights);
+								if (tuindex > pass->getNumTextureUnitStates()) break;
+
 								// I know, nasty const_cast
 								TextureUnitState* tu = 
 									const_cast<TextureUnitState*>(
 										pass->getTextureUnitState(tuindex));
-								const TexturePtr& shadowTex = mShadowTextures[lightIndex];
+								const TexturePtr& shadowTex = mShadowTextures[shadowTexIndex];
 								tu->_setTexturePtr(shadowTex);
 								Camera *cam = shadowTex->getBuffer()->getRenderTarget()->getViewport(0)->getCamera();
 								tu->setProjectiveTexturing(!pass->hasVertexProgram(), cam);
 								mAutoParamDataSource->setTextureProjector(cam, numShadowTextureLights);
 								++numShadowTextureLights;
+								++shadowTexIndex;
 								// Have to set TU on rendersystem right now, although
 								// autoparams will be set later
 								mDestRenderSystem->_setTextureUnitSettings(tuindex, *tu);
 							}
-
 						}
 
 
@@ -3548,7 +3587,7 @@ void SceneManager::resetViewProjMode(void)
     if (mResetIdentityView)
     {
         // Coming back to normal from identity view
-        mDestRenderSystem->_setViewMatrix(mCameraInProgress->getViewMatrix(true));
+        mDestRenderSystem->_setViewMatrix(mCachedViewMatrix);
         mResetIdentityView = false;
     }
     
@@ -3680,14 +3719,14 @@ void SceneManager::fireShadowTexturesUpdated(size_t numberOfShadowTextures)
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera)
+void SceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration)
 {
     ListenerList::iterator i, iend;
 
     iend = mListeners.end();
     for (i = mListeners.begin(); i != iend; ++i)
     {
-        (*i)->shadowTextureCasterPreViewProj(light, camera);
+        (*i)->shadowTextureCasterPreViewProj(light, camera, iteration);
     }
 }
 //---------------------------------------------------------------------
@@ -3932,6 +3971,12 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
 		while(it.hasMoreElements())
 		{
 			Light* l = static_cast<Light*>(it.getNext());
+
+			if (mCameraRelativeRendering)
+				l->_setCameraRelative(mCameraInProgress);
+			else
+				l->_setCameraRelative(0);
+
 			if (l->isVisible())
 			{
 				LightInfo lightInfo;
@@ -5699,6 +5744,8 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
 		iend = mLightsAffectingFrustum.end();
 		siend = mShadowTextures.end();
 		ci = mShadowTextureCameras.begin();
+		mShadowTextureIndexLightList.clear();
+		size_t shadowTextureIndex = 0;
 		for (i = mLightsAffectingFrustum.begin(), si = mShadowTextures.begin();
 			i != iend && si != siend; ++i)
 		{
@@ -5708,41 +5755,51 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
 			if (!light->getCastShadows())
 				continue;
 
-			TexturePtr &shadowTex = *si;
-			RenderTarget *shadowRTT = shadowTex->getBuffer()->getRenderTarget();
-			Viewport *shadowView = shadowRTT->getViewport(0);
-			Camera *texCam = *ci;
-			// rebind camera, incase another SM in use which has switched to its cam
-			shadowView->setCamera(texCam);
-			
-			// Associate main view camera as LOD camera
-			texCam->setLodCamera(cam);
+			// texture iteration per light.
+			size_t textureCountPerLight = mShadowTextureCountPerType[light->getType()];
+			for (size_t j = 0; j < textureCountPerLight && si != siend; ++j)
+			{
+				TexturePtr &shadowTex = *si;
+				RenderTarget *shadowRTT = shadowTex->getBuffer()->getRenderTarget();
+				Viewport *shadowView = shadowRTT->getViewport(0);
+				Camera *texCam = *ci;
+				// rebind camera, incase another SM in use which has switched to its cam
+				shadowView->setCamera(texCam);
 
-			// update shadow cam - light mapping
-			ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );
-			assert(camLightIt != mShadowCamLightMapping.end());
-			camLightIt->second = light;
+				// Associate main view camera as LOD camera
+				texCam->setLodCamera(cam);
+				// set base
+				if (light->getType() != Light::LT_POINT)
+					texCam->setDirection(light->getDerivedDirection());
+				if (light->getType() != Light::LT_DIRECTIONAL)
+					texCam->setPosition(light->getDerivedPosition());
 
-			// set base
-			texCam->setDirection(light->getDerivedDirection());
-			texCam->setPosition(light->getDerivedPosition());
+				// update shadow cam - light mapping
+				ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );
+				assert(camLightIt != mShadowCamLightMapping.end());
+				camLightIt->second = light;
 
-			if (light->getCustomShadowCameraSetup().isNull())
-				mDefaultShadowCameraSetup->getShadowCamera(this, cam, vp, light, texCam);
-			else
-				light->getCustomShadowCameraSetup()->getShadowCamera(this, cam, vp, light, texCam);
+				if (light->getCustomShadowCameraSetup().isNull())
+					mDefaultShadowCameraSetup->getShadowCamera(this, cam, vp, light, texCam, j);
+				else
+					light->getCustomShadowCameraSetup()->getShadowCamera(this, cam, vp, light, texCam, j);
 
-			// Setup background colour
-			shadowView->setBackgroundColour(ColourValue::White);
+				// Setup background colour
+				shadowView->setBackgroundColour(ColourValue::White);
 
-			// Fire shadow caster update, callee can alter camera settings
-			fireShadowTexturesPreCaster(light, texCam);
+				// Fire shadow caster update, callee can alter camera settings
+				fireShadowTexturesPreCaster(light, texCam, j);
 
-			// Update target
-			shadowRTT->update();
+				// Update target
+				shadowRTT->update();
 
-			++si; // next shadow texture
-			++ci; // next camera
+				++si; // next shadow texture
+				++ci; // next camera
+			}
+
+			// set the first shadow texture index for this light.
+			mShadowTextureIndexLightList.push_back(shadowTextureIndex);
+			shadowTextureIndex += textureCountPerLight;
 		}
 	}
 	catch (Exception& e) 
@@ -6212,26 +6269,35 @@ SceneManager::getVisibleObjectsBoundsInfo(const Camera* cam) const
 }
 //---------------------------------------------------------------------
 const VisibleObjectsBoundsInfo& 
-SceneManager::getShadowCasterBoundsInfo( const Light* light ) const
+SceneManager::getShadowCasterBoundsInfo( const Light* light, size_t iteration ) const
 {
 	static VisibleObjectsBoundsInfo nullBox;
 
 	// find light
+	int foundCount = 0;
 	ShadowCamLightMapping::const_iterator it; 
 	for ( it = mShadowCamLightMapping.begin() ; it != mShadowCamLightMapping.end(); ++it )
 	{
 		if ( it->second == light )
 		{
-			// search the camera-aab list for the texture cam
-			CamVisibleObjectsMap::const_iterator camIt = mCamVisibleObjectsMap.find( it->first );
-
-			if ( camIt == mCamVisibleObjectsMap.end() )
+			if (foundCount == iteration)
 			{
-				return nullBox;
+				// search the camera-aab list for the texture cam
+				CamVisibleObjectsMap::const_iterator camIt = mCamVisibleObjectsMap.find( it->first );
+
+				if ( camIt == mCamVisibleObjectsMap.end() )
+				{
+					return nullBox;
+				}
+				else
+				{
+					return camIt->second;
+				}
 			}
 			else
 			{
-                return camIt->second;
+				// multiple shadow textures per light, keep searching
+				++foundCount;
 			}
 		}
 	}

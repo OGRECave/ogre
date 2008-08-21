@@ -73,7 +73,7 @@ namespace Ogre {
 
 		/// Returns shadow camera configured to get 1-1 homography between screen and shadow map when restricted to plane
 		virtual void getShadowCamera (const SceneManager *sm, const Camera *cam, 
-									  const Viewport *vp, const Light *light, Camera *texCam) const;
+									  const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const;
 	};
 
 }

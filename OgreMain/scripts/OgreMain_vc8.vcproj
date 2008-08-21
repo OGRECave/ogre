@@ -994,6 +994,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\OgreShadowCameraSetupPSSM.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\OgreShadowCaster.cpp"
 				>
 			</File>
@@ -1840,6 +1844,10 @@
 			</File>
 			<File
 				RelativePath="..\include\OgreShadowCameraSetupPlaneOptimal.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\OgreShadowCameraSetupPSSM.h"
 				>
 			</File>
 			<File

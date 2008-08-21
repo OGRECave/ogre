@@ -125,6 +125,7 @@ Torus Knot Software Ltd.
 #include "OgreShadowCameraSetupFocused.h"
 #include "OgreShadowCameraSetupLiSPSM.h"
 #include "OgreShadowCameraSetupPlaneOptimal.h"
+#include "OgreShadowCameraSetupPSSM.h"
 // .... more to come
 
 #endif

@@ -46,7 +46,7 @@ namespace Ogre
 	
 	/// Default shadow camera setup implementation
 	void DefaultShadowCameraSetup::getShadowCamera (const SceneManager *sm, const Camera *cam, 
-		const Viewport *vp, const Light *light, Camera *texCam) const
+		const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const
 	{
 		Vector3 pos, dir;
 

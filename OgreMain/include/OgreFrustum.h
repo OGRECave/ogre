@@ -171,13 +171,6 @@ namespace Ogre
 		/// Record of the last world-space oblique depth projection plane info used
 		mutable Plane mLastLinkedObliqueProjPlane;
 
-		
-		/** Get the derived position of this frustum. */
-        virtual const Vector3& getPositionForViewUpdate(void) const;
-        /** Get the derived orientation of this frustum. */
-        virtual const Quaternion& getOrientationForViewUpdate(void) const;
-
-
     public:
 
         Frustum();
@@ -619,6 +612,11 @@ namespace Ogre
 
         /// Small constant used to reduce far plane projection to avoid inaccuracies
         static const Real INFINITE_FAR_PLANE_ADJUST;
+
+		/** Get the derived position of this frustum. */
+		virtual const Vector3& getPositionForViewUpdate(void) const;
+		/** Get the derived orientation of this frustum. */
+		virtual const Quaternion& getOrientationForViewUpdate(void) const;
     };
 
 

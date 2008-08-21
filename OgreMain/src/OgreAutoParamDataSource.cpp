@@ -60,9 +60,9 @@ namespace Ogre {
          mCameraPositionObjectSpaceDirty(true),
          mCameraPositionDirty(true),
 		 mSceneDepthRangeDirty(true),
-		 mShadowCamDepthRangesDirty(true),
          mCurrentRenderable(0),
          mCurrentCamera(0), 
+		 mCameraRelativeRendering(false),
          mCurrentRenderTarget(0),
          mCurrentViewport(0), 
 		 mCurrentSceneManager(0),
@@ -79,6 +79,7 @@ namespace Ogre {
 			mSpotlightViewProjMatrixDirty[i] = true;
 			mSpotlightWorldViewProjMatrixDirty[i] = true;
 			mCurrentTextureProjector[i] = 0;
+			mShadowCamDepthRangesDirty[i] = false;
 		}
 
     }
@@ -123,9 +124,11 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------------
-    void AutoParamDataSource::setCurrentCamera(const Camera* cam)
+    void AutoParamDataSource::setCurrentCamera(const Camera* cam, bool useCameraRelative)
     {
         mCurrentCamera = cam;
+		mCameraRelativeRendering = useCameraRelative;
+		mCameraRelativePosition = cam->getDerivedPosition();
         mViewMatrixDirty = true;
         mProjMatrixDirty = true;
         mWorldViewMatrixDirty = true;
@@ -141,7 +144,6 @@ namespace Ogre {
     void AutoParamDataSource::setCurrentLightList(const LightList* ll)
     {
         mCurrentLightList = ll;
-		mShadowCamDepthRangesDirty = true;
 		for(size_t i = 0; i < ll->size(); ++i)
 		{
 			mSpotlightViewProjMatrixDirty[i] = true;
@@ -191,12 +193,12 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	const Vector3& AutoParamDataSource::getLightPosition(size_t index) const
 	{
-		return getLight(index).getDerivedPosition();
+		return getLight(index).getDerivedPosition(true);
 	}
 	//-----------------------------------------------------------------------------
 	Vector4 AutoParamDataSource::getLightAs4DVector(size_t index) const
 	{
-		return getLight(index).getAs4DVector();
+		return getLight(index).getAs4DVector(true);
 	}
 	//-----------------------------------------------------------------------------
 	const Vector3& AutoParamDataSource::getLightDirection(size_t index) const
@@ -268,6 +270,13 @@ namespace Ogre {
             mWorldMatrixArray = mWorldMatrix;
             mCurrentRenderable->getWorldTransforms(mWorldMatrix);
             mWorldMatrixCount = mCurrentRenderable->getNumWorldTransforms();
+			if (mCameraRelativeRendering)
+			{
+				for (size_t i = 0; i < mWorldMatrixCount; ++i)
+				{
+					mWorldMatrix[i].setTrans(mWorldMatrix[i].getTrans() - mCameraRelativePosition);
+				}
+			}
             mWorldMatrixDirty = false;
         }
         return mWorldMatrixArray[0];
@@ -275,25 +284,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     size_t AutoParamDataSource::getWorldMatrixCount(void) const
     {
-        if (mWorldMatrixDirty)
-        {
-            mWorldMatrixArray = mWorldMatrix;
-            mCurrentRenderable->getWorldTransforms(mWorldMatrix);
-            mWorldMatrixCount = mCurrentRenderable->getNumWorldTransforms();
-            mWorldMatrixDirty = false;
-        }
+		// trigger derivation
+		getWorldMatrix();
         return mWorldMatrixCount;
     }
     //-----------------------------------------------------------------------------
     const Matrix4* AutoParamDataSource::getWorldMatrixArray(void) const
     {
-        if (mWorldMatrixDirty)
-        {
-            mWorldMatrixArray = mWorldMatrix;
-            mCurrentRenderable->getWorldTransforms(mWorldMatrix);
-            mWorldMatrixCount = mCurrentRenderable->getNumWorldTransforms();
-            mWorldMatrixDirty = false;
-        }
+		// trigger derivation
+		getWorldMatrix();
         return mWorldMatrixArray;
     }
     //-----------------------------------------------------------------------------
@@ -304,7 +303,14 @@ namespace Ogre {
             if (mCurrentRenderable && mCurrentRenderable->getUseIdentityView())
                 mViewMatrix = Matrix4::IDENTITY;
             else
+			{
                 mViewMatrix = mCurrentCamera->getViewMatrix(true);
+				if (mCameraRelativeRendering)
+				{
+					mViewMatrix.setTrans(Vector3::ZERO);
+				}
+
+			}
             mViewMatrixDirty = false;
         }
         return mViewMatrix;
@@ -570,6 +576,7 @@ namespace Ogre {
         mCurrentTextureProjector[index] = frust;
         mTextureViewProjMatrixDirty[index] = true;
 		mTextureWorldViewProjMatrixDirty[index] = true;
+		mShadowCamDepthRangesDirty[index] = true;
 
     }
     //-----------------------------------------------------------------------------
@@ -577,10 +584,30 @@ namespace Ogre {
     {
         if (mTextureViewProjMatrixDirty[index] && mCurrentTextureProjector[index])
         {
-            mTextureViewProjMatrix[index] = 
-                PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
-                mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 
-				mCurrentTextureProjector[index]->getViewMatrix();
+			if (mCameraRelativeRendering)
+			{
+				// World positions are now going to be relative to the camera position
+				// so we need to alter the projector view matrix to compensate
+				// We could do this by moving the point back into worldspace then using the normal
+				// view matrix but this would have the old precision issues, so instead we
+				// want to move the point the difference between the projection position and the camera position
+				Vector3 pos = mCurrentTextureProjector[index]->getPositionForViewUpdate();
+				pos -= mCurrentCamera->getDerivedPosition(); // this includes reflection
+				const Quaternion& orientation = mCurrentTextureProjector[index]->getOrientationForViewUpdate();
+
+				Matrix4 viewMatrix = Math::makeViewMatrix(pos, orientation);
+				mTextureViewProjMatrix[index] = 
+					PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
+					mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 
+					viewMatrix;
+			}
+			else
+			{
+				mTextureViewProjMatrix[index] = 
+					PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
+					mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 
+					mCurrentTextureProjector[index]->getViewMatrix();
+			}
             mTextureViewProjMatrixDirty[index] = false;
         }
         return mTextureViewProjMatrix[index];
@@ -615,8 +642,8 @@ namespace Ogre {
 			// set near clip the same as main camera, since they are likely
 			// to both reflect the nature of the scene
 			frust.setNearClipDistance(mCurrentCamera->getNearClipDistance());
-			// Calculate position, which same as spotlight position
-			dummyNode.setPosition(l.getDerivedPosition());
+			// Calculate position, which same as spotlight position, in camera-relative coords if required
+			dummyNode.setPosition(l.getDerivedPosition(true));
 			// Calculate direction, which same as spotlight direction
 			Vector3 dir = - l.getDerivedDirection(); // backwards since point down -z
 			dir.normalise();
@@ -637,10 +664,13 @@ namespace Ogre {
 			q.FromAxes(left, up, dir);
 			dummyNode.setOrientation(q);
 
+			// The view matrix here already includes camera-relative changes if necessary
+			// since they are built into the frustum position
 			mSpotlightViewProjMatrix[index] = 
 				PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
 				frust.getProjectionMatrixWithRSDepth() * 
 				frust.getViewMatrix();
+
 			mSpotlightViewProjMatrixDirty[index] = false;
 		}
 		return mSpotlightViewProjMatrix[index];
@@ -710,7 +740,7 @@ namespace Ogre {
 		{
 			// Calculate based on object space light distance
 			// compared to light attenuation range
-			Vector3 objPos = getInverseWorldMatrix().transformAffine(l.getDerivedPosition());
+			Vector3 objPos = getInverseWorldMatrix().transformAffine(l.getDerivedPosition(true));
 			return l.getAttenuationRange() - objPos.length();
 		}
 	}
@@ -959,45 +989,36 @@ namespace Ogre {
 
 	}
 	//-----------------------------------------------------------------------------
-	const Vector4& AutoParamDataSource::getShadowSceneDepthRange(size_t lightIndex) const
+	const Vector4& AutoParamDataSource::getShadowSceneDepthRange(size_t index) const
 	{
 		static Vector4 dummy(0, 100000, 100000, 1/100000);
 
 		if (!mCurrentSceneManager->isShadowTechniqueTextureBased())
 			return dummy;
 
-		if (mShadowCamDepthRangesDirty)
+		if (mShadowCamDepthRangesDirty[index] && mCurrentTextureProjector[index])
 		{
-			mShadowCamDepthRanges.clear();
-			for (LightList::const_iterator i = mCurrentLightList->begin();
-				i != mCurrentLightList->end(); ++i)
+			const VisibleObjectsBoundsInfo& info = 
+				mCurrentSceneManager->getVisibleObjectsBoundsInfo(
+					(Camera*)mCurrentTextureProjector[index]);
+
+			Real depthRange = info.maxDistance - info.minDistance;
+			if (depthRange > std::numeric_limits<Real>::epsilon())
 			{
-				// Skip non shadow casting lights
-				if (!(*i)->getCastShadows())
-					continue;
-
-				const VisibleObjectsBoundsInfo& info = 
-					mCurrentSceneManager->getShadowCasterBoundsInfo(*i);
-
-				mShadowCamDepthRanges.push_back(Vector4(
-					info.minDistance, 
-					info.maxDistance, 
-					info.maxDistance - info.minDistance,
-					1.0f / (info.maxDistance - info.minDistance)));
+				mShadowCamDepthRanges[index] = Vector4(
+					info.minDistance,
+					info.maxDistance,
+					depthRange,
+					1.0f / depthRange);
+			}
+			else
+			{
+				mShadowCamDepthRanges[index] = dummy;
 			}
 
-			mShadowCamDepthRangesDirty = false;
+			mShadowCamDepthRangesDirty[index] = false;
 		}
-
-		if (lightIndex >= mShadowCamDepthRanges.size())
-		{
-			return dummy;
-		}
-		else
-		{
-			return mShadowCamDepthRanges[lightIndex];
-		}
-
+		return mShadowCamDepthRanges[index];
 	}
 	//---------------------------------------------------------------------
 	const ColourValue& AutoParamDataSource::getShadowColour() const

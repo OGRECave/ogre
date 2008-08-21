@@ -747,17 +747,6 @@ namespace Ogre {
 		// Update the view matrix
 		// ----------------------
 
-		// View matrix is:
-		//
-		//  [ Lx  Uy  Dz  Tx  ]
-		//  [ Lx  Uy  Dz  Ty  ]
-		//  [ Lx  Uy  Dz  Tz  ]
-		//  [ 0   0   0   1   ]
-		//
-		// Where T = -(Transposed(Rot) * Pos)
-
-		// This is most efficiently done using 3x3 Matrices
-
 		// Get orientation from quaternion
 
 		if (!mCustomViewMatrix)
@@ -765,24 +754,8 @@ namespace Ogre {
 			Matrix3 rot;
 			const Quaternion& orientation = getOrientationForViewUpdate();
 			const Vector3& position = getPositionForViewUpdate();
-			orientation.ToRotationMatrix(rot);
 
-			// Make the translation relative to new axes
-			Matrix3 rotT = rot.Transpose();
-			Vector3 trans = -rotT * position;
-
-			// Make final matrix
-			mViewMatrix = Matrix4::IDENTITY;
-			mViewMatrix = rotT; // fills upper 3x3
-			mViewMatrix[0][3] = trans.x;
-			mViewMatrix[1][3] = trans.y;
-			mViewMatrix[2][3] = trans.z;
-
-			// Deal with reflections
-			if (mReflect)
-			{
-				mViewMatrix = mViewMatrix * mReflectMatrix;
-			}
+			mViewMatrix = Math::makeViewMatrix(position, orientation, mReflect? &mReflectMatrix : 0);
 		}
 
 		mRecalcView = false;

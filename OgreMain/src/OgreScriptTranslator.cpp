@@ -4636,7 +4636,7 @@ namespace Ogre{
 									}
 									// advance to next to get scaling
 									i = getNodeAt(prop->values, static_cast<int>(atomIndex++));
-									if((*i)->type != ANT_ATOM)
+									if(prop->values.end() == i || (*i)->type != ANT_ATOM)
 									{
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 										return;

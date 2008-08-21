@@ -76,11 +76,11 @@ namespace Ogre {
         enum LightTypes
         {
             /// Point light sources give off light equally in all directions, so require only position not direction
-            LT_POINT,
+            LT_POINT = 0,
             /// Directional lights simulate parallel light beams from a distant source, hence have direction but no position
-            LT_DIRECTIONAL,
+            LT_DIRECTIONAL = 1,
             /// Spotlights simulate a cone of light from a source so require position and direction, plus extra values for falloff
-            LT_SPOTLIGHT
+            LT_SPOTLIGHT = 2
         };
 
         /** Default constructor (for Python mainly).
@@ -301,8 +301,10 @@ namespace Ogre {
         /** Overridden from MovableObject */
         const String& getMovableType(void) const;
 
-        /** Retrieves the position of the light including any transform from nodes it is attached to. */
-        const Vector3& getDerivedPosition(void) const;
+        /** Retrieves the position of the light including any transform from nodes it is attached to. 
+		@param cameraRelativeIfSet If set to true, returns data in camera-relative units if that's been set up (render use)
+		*/
+        const Vector3& getDerivedPosition(bool cameraRelativeIfSet = false) const;
 
         /** Retrieves the direction of the light including any transform from nodes it is attached to. */
         const Vector3& getDerivedDirection(void) const;
@@ -324,8 +326,9 @@ namespace Ogre {
 			example the vector can represent both position lights (w=1.0f)
 			and directional lights (w=0.0f) and be used in the same 
 			calculations.
+		@param cameraRelativeIfSet If set to true, returns data in camera-relative units if that's been set up (render use)
 		*/
-		Vector4 getAs4DVector(void) const;
+		Vector4 getAs4DVector(bool cameraRelativeIfSet = false) const;
 
         /** Internal method for calculating the 'near clip volume', which is
             the volume formed between the near clip rectangle of the 
@@ -408,6 +411,9 @@ namespace Ogre {
         Real getShadowFarDistance(void) const;
         Real getShadowFarDistanceSquared(void) const;
 
+		/// Set the camera which this light should be relative to, for camera-relative rendering
+		void _setCameraRelative(Camera* cam);
+
 
     protected:
         /// internal method for synchronising with parent node (if any)
@@ -441,6 +447,10 @@ namespace Ogre {
 
         mutable Vector3 mDerivedPosition;
         mutable Vector3 mDerivedDirection;
+		// Slightly hacky but unless we separate observed light render state from main Light...
+		mutable Vector3 mDerivedCamRelativePosition;
+		mutable bool mDerivedCamRelativeDirty;
+		Camera* mCameraToBeRelativeTo;
 
         /// Shared class-level name for Movable type
         static String msMovableType;

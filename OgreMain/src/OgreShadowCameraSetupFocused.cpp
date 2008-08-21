@@ -90,14 +90,15 @@ namespace Ogre
 			if (out_view != NULL)
 			{
 				*out_view = buildViewMatrix(cam.getDerivedPosition(), 
-					-light.getDerivedDirection(), 
+					light.getDerivedDirection(), 
 					cam.getDerivedUp());
 			}
 
 			// generate projection matrix if requested
 			if (out_proj != NULL)
 			{
-				*out_proj = Matrix4::IDENTITY;
+				*out_proj = Matrix4::getScale(1, 1, -1);
+				//*out_proj = Matrix4::IDENTITY;
 			}
 
 			// set up camera if requested
@@ -398,7 +399,7 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------
 	void FocusedShadowCameraSetup::getShadowCamera (const SceneManager *sm, const Camera *cam, 
-		const Viewport *vp, const Light *light, Camera *texCam) const
+		const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const
 	{
 		// check availability - viewport not needed
 		OgreAssert(sm != NULL, "SceneManager is NULL");
@@ -412,7 +413,7 @@ namespace Ogre
 		calculateShadowMappingMatrix(*sm, *cam, *light, &LView, &LProj, NULL);
 
 		// build scene bounding box
-		const VisibleObjectsBoundsInfo& visInfo = sm->getShadowCasterBoundsInfo(light);
+		const VisibleObjectsBoundsInfo& visInfo = sm->getVisibleObjectsBoundsInfo(texCam);
 		AxisAlignedBox sceneBB = visInfo.aabb;
 		sceneBB.merge(sm->getVisibleObjectsBoundsInfo(cam).receiverAabb);
 		sceneBB.merge(cam->getDerivedPosition());

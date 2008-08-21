@@ -274,9 +274,10 @@ namespace Ogre {
 				This event will only be fired when texture shadows are in use.
 			@param light Pointer to the light for which shadows are being rendered
 			@param camera Pointer to the camera being used to render
+			@param iteration For lights that use multiple shadow textures, the iteration number
 			*/
 			virtual void shadowTextureCasterPreViewProj(Light* light, 
-				Camera* camera) = 0;
+				Camera* camera, size_t iteration) = 0;
 			/** This event occurs just before the view & projection matrices are
 		 		set for re-rendering a shadow receiver.
 			@remarks
@@ -436,6 +437,12 @@ namespace Ogre {
 		typedef std::map< const Camera*, const Light* > ShadowCamLightMapping;
 		ShadowCamLightMapping mShadowCamLightMapping;
 
+		/// Array defining shadow count per light type.
+		size_t mShadowTextureCountPerType[3];
+
+		/// Array defining shadow texture index in light list.
+		std::vector<size_t> mShadowTextureIndexLightList;
+
         /// Cached light information, used to tracking light's changes
         struct _OgreExport LightInfo
         {
@@ -588,7 +595,7 @@ namespace Ogre {
 		/// Internal method for firing the texture shadows updated event
         virtual void fireShadowTexturesUpdated(size_t numberOfShadowTextures);
 		/// Internal method for firing the pre caster texture shadows event
-        virtual void fireShadowTexturesPreCaster(Light* light, Camera* camera);
+        virtual void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
 		/// Internal method for firing the pre receiver texture shadows event
         virtual void fireShadowTexturesPreReceiver(Light* light, Frustum* f);
 		/// Internal method for firing find visible objects event
@@ -886,6 +893,11 @@ namespace Ogre {
 		SceneMgrQueuedRenderableVisitor* mActiveQueuedRenderableVisitor;
 		/// Storage for default renderable visitor
 		SceneMgrQueuedRenderableVisitor mDefaultQueuedRenderableVisitor;
+
+		/// Whether to use camera-relative rendering
+		bool mCameraRelativeRendering;
+		Matrix4 mCachedViewMatrix;
+		Vector3 mCameraRelativePosition;
 
     public:
         /** Constructor.
@@ -2556,6 +2568,22 @@ namespace Ogre {
         virtual void setShadowTextureCount(size_t count);
         /// Get the number of the textures allocated for texture based shadows
         size_t getShadowTextureCount(void) const {return mShadowTextureConfigList.size(); }
+
+		/** Set the number of shadow textures a light type uses.
+		@remarks
+			The default for all light types is 1. This means that each light uses only 1 shadow
+			texture. Call this if you need more than 1 shadow texture per light, E.G. PSSM. 
+		@note
+			This feature only works with the Integrated shadow technique.
+			Also remember to increase the total number of shadow textures you request
+			appropriately (e.g. via setShadowTextureCount)!!
+		*/
+		void setShadowTextureCountPerLightType(Light::LightTypes type, size_t count)
+		{ mShadowTextureCountPerType[type] = count; }
+		/// Get the number of shadow textures is assigned for the given light type.
+		size_t getShadowTextureCountPerLightType(Light::LightTypes type) const
+		{return mShadowTextureCountPerType[type]; }
+
         /** Sets the size and count of textures used in texture-based shadows. 
         @remarks
             @see setShadowTextureSize and setShadowTextureCount for details, this
@@ -3061,7 +3089,28 @@ namespace Ogre {
 		const VisibleObjectsBoundsInfo& getVisibleObjectsBoundsInfo(const Camera* cam) const;
 
 		/**  Returns the shadow caster AAB for a specific light-camera combination */
-		const VisibleObjectsBoundsInfo& getShadowCasterBoundsInfo(const Light* light) const;
+		const VisibleObjectsBoundsInfo& getShadowCasterBoundsInfo(const Light* light, size_t iteration = 0) const;
+
+		/** Set whether to use camera-relative co-ordinates when rendering, ie
+			to always place the camera at the origin and move the world around it.
+		@remarks
+			This is a technique to alleviate some of the precision issues associated with 
+			rendering far from the origin, where single-precision floats as used in most
+			GPUs begin to lose their precision. Instead of including the camera
+			translation in the view matrix, it only includes the rotation, and
+			the world matrices of objects must be expressed relative to this.
+		@note
+			If you need this option, you will probably also need to enable double-precision
+			mode in Ogre (OGRE_DOUBLE_PRECISION), since even though this will 
+			alleviate the rendering precision, the source camera and object positions will still 
+			suffer from precision issues leading to jerky movement. 
+		*/
+		virtual void setCameraRelativeRendering(bool rel) { mCameraRelativeRendering = rel; }
+
+		/** Get whether to use camera-relative co-ordinates when rendering, ie
+			to always place the camera at the origin and move the world around it.
+		*/
+		virtual bool getCameraRelativeRendering() const { return mCameraRelativeRendering; }
     };
 
     /** Default implementation of IntersectionSceneQuery. */
