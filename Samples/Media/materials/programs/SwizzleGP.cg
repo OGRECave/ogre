@@ -1,0 +1,14 @@
+// Geometry pass-through program for colored triangles
+TRIANGLE void gs_swizzle(AttribArray<float4> position : POSITION)
+{
+  for (int i=0; i<position.length; i++) {
+    emitVertex(position[i], float4(1,0.9,0.8,0.7):COLOR0);
+  }
+  restartStrip();
+  for (int i=0; i<position.length; i++) {
+    float4 newPosition = position[i].yxzw;
+	newPosition.z += 20;
+	emitVertex(newPosition:POSITION, float4(0.3,0.4,0.5,0.6):COLOR0);
+  }
+  restartStrip();
+}
