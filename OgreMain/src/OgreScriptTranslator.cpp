@@ -3602,6 +3602,10 @@ namespace Ogre{
 		if (!GpuProgramManager::getSingleton().isSyntaxSupported(syntax))
 		{
 			compiler->addError(ScriptCompiler::CE_UNSUPPORTEDBYRENDERSYSTEM, obj->file, obj->line);
+			//Register the unsupported program so that materials that use it know that
+			//it exists but is unsupported
+			GpuProgramPtr unsupportedProg = GpuProgramManager::getSingleton().create(obj->name, 
+					compiler->getResourceGroup(), translateIDToGpuProgramType(obj->id), syntax);
 			return;
 		}
 

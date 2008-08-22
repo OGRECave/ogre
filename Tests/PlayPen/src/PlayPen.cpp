@@ -7064,7 +7064,7 @@ protected:
 	void testGeometryShaders(void)
     {
 		const String GLSL_MATERIAL_NAME = "Ogre/GPTest/SwizzleGLSL";
-		//const String ASM_MATERIAL_NAME = "Ogre/GPTest/SwizzleASM";
+		const String ASM_MATERIAL_NAME = "Ogre/GPTest/SwizzleASM";
 		const String CG_MATERIAL_NAME = "Ogre/GPTest/SwizzleCG";
 
         // Check capabilities
@@ -7084,8 +7084,8 @@ protected:
         mCamera->setPosition(20, 0, 100);
         mCamera->lookAt(0,0,0);
 		
-		String materialName = GLSL_MATERIAL_NAME;
-		//String materialName = ASM_MATERIAL_NAME;
+		//String materialName = GLSL_MATERIAL_NAME;
+		String materialName = ASM_MATERIAL_NAME;
 		//String materialName = CG_MATERIAL_NAME;
 
 		// Set all of the material's sub entities to use the new material
