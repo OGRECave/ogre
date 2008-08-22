@@ -116,6 +116,10 @@ namespace Ogre
 		RSC_VERTEX_TEXTURE_FETCH = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 24),
 		/// Supports mipmap LOD biasing
 		RSC_MIPMAP_LOD_BIAS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 25),
+		/// Supports hardware geometry programs
+		RSC_GEOMETRY_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 26),
+		/// Supports rendering to vertex buffers
+		RSC_HWRENDER_TO_VERTEX_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 27),
 
 		/// Supports compressed textures
 		RSC_TEXTURE_COMPRESSION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 0),
@@ -240,11 +244,18 @@ namespace Ogre
 		/// The identifier associated with the render system for which these capabilities are valid
 		String mRenderSystemName;
 
+		/// The number of floating-point constants vertex programs support
 		ushort mVertexProgramConstantFloatCount;           
 		/// The number of integer constants vertex programs support
 		ushort mVertexProgramConstantIntCount;           
 		/// The number of boolean constants vertex programs support
 		ushort mVertexProgramConstantBoolCount;           
+		/// The number of floating-point constats geometry programs support
+		ushort mGeometryProgramConstantFloatCount;           
+		/// The number of integer constants vertex geometry support
+		ushort mGeometryProgramConstantIntCount;           
+		/// The number of boolean constants vertex geometry support
+		ushort mGeometryProgramConstantBoolCount;           
 		/// The number of floating-point constants fragment programs support
 		ushort mFragmentProgramConstantFloatCount;           
 		/// The number of integer constants fragment programs support
@@ -261,6 +272,8 @@ namespace Ogre
 		ushort mNumVertexTextureUnits;
 		/// Are vertex texture units shared with fragment processor?
 		bool mVertexTextureUnitsShared;
+		/// The number of vertices a geometry program can emit in a single run
+		int mGeometryProgramNumOutputVertices;
 
 
 		/// The list of supported shader profiles
@@ -493,6 +506,21 @@ namespace Ogre
 		{
 			return mVertexProgramConstantBoolCount;           
 		}
+		/// The number of floating-point constants geometry programs support
+		ushort getGeometryProgramConstantFloatCount(void) const
+		{
+			return mGeometryProgramConstantFloatCount;           
+		}
+		/// The number of integer constants geometry programs support
+		ushort getGeometryProgramConstantIntCount(void) const
+		{
+			return mGeometryProgramConstantIntCount;           
+		}
+		/// The number of boolean constants geometry programs support
+		ushort getGeometryProgramConstantBoolCount(void) const
+		{
+			return mGeometryProgramConstantBoolCount;           
+		}
 		/// The number of floating-point constants fragment programs support
 		ushort getFragmentProgramConstantFloatCount(void) const
 		{
@@ -535,6 +563,21 @@ namespace Ogre
 		void setVertexProgramConstantBoolCount(ushort c)
 		{
 			mVertexProgramConstantBoolCount = c;           
+		}
+		/// The number of floating-point constants geometry programs support
+		void setGeometryProgramConstantFloatCount(ushort c)
+		{
+			mGeometryProgramConstantFloatCount = c;           
+		}
+		/// The number of integer constants geometry programs support
+		void setGeometryProgramConstantIntCount(ushort c)
+		{
+			mGeometryProgramConstantIntCount = c;           
+		}
+		/// The number of boolean constants geometry programs support
+		void setGeometryProgramConstantBoolCount(ushort c)
+		{
+			mGeometryProgramConstantBoolCount = c;           
 		}
 		/// The number of floating-point constants fragment programs support
 		void setFragmentProgramConstantFloatCount(ushort c)
@@ -598,6 +641,17 @@ namespace Ogre
 		bool getVertexTextureUnitsShared(void) const
 		{
 			return mVertexTextureUnitsShared;
+		}
+
+		/// Set the number of vertices a single geometry program run can emit
+		void setGeometryProgramNumOutputVertices(int numOutputVertices)
+		{
+			mGeometryProgramNumOutputVertices = numOutputVertices;
+		}
+		/// Get the number of vertices a single geometry program run can emit
+		int getGeometryProgramNumOutputVertices(void) const
+		{
+			return mGeometryProgramNumOutputVertices;
 		}
 
 		/// Get the identifier of the rendersystem from which these capabilities were generated

@@ -35,7 +35,7 @@ Torus Knot Software Ltd.
 #include "OgreSingleton.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
-
+#include "OgreRenderToVertexBuffer.h"
 
 namespace Ogre {
 
@@ -245,6 +245,12 @@ namespace Ogre {
 		virtual HardwareIndexBufferSharedPtr 
             createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
 			HardwareBuffer::Usage usage, bool useShadowBuffer = false) = 0;
+
+		/** Create a render to vertex buffer.
+		@remarks The parameters (such as vertex size etc) are determined later
+			and are allocated when needed.
+		*/
+		virtual RenderToVertexBufferSharedPtr createRenderToVertexBuffer() = 0;
 
         /** Creates a new vertex declaration. */
         virtual VertexDeclaration* createVertexDeclaration(void);

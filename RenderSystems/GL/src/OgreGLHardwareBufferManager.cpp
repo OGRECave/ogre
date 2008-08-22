@@ -29,6 +29,7 @@ Torus Knot Software Ltd.
 #include "OgreGLHardwareBufferManager.h"
 #include "OgreGLHardwareVertexBuffer.h"
 #include "OgreGLHardwareIndexBuffer.h"
+#include "OgreGLRenderToVertexBuffer.h"
 #include "OgreHardwareBuffer.h"
 
 namespace Ogre {
@@ -87,6 +88,12 @@ namespace Ogre {
 			mIndexBuffers.insert(buf);
 		}
 		return HardwareIndexBufferSharedPtr(buf);
+    }
+    //---------------------------------------------------------------------
+    RenderToVertexBufferSharedPtr 
+        GLHardwareBufferManager::createRenderToVertexBuffer()
+	{
+        return RenderToVertexBufferSharedPtr(new GLRenderToVertexBuffer);
     }
     //---------------------------------------------------------------------
     GLenum GLHardwareBufferManager::getGLUsage(unsigned int usage)

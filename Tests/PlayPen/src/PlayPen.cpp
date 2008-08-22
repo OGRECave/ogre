@@ -7061,6 +7061,44 @@ protected:
 
 	}
 
+	void testGeometryShaders(void)
+    {
+		const String GLSL_MATERIAL_NAME = "Ogre/GPTest/SwizzleGLSL";
+		//const String ASM_MATERIAL_NAME = "Ogre/GPTest/SwizzleASM";
+		const String CG_MATERIAL_NAME = "Ogre/GPTest/SwizzleCG";
+
+        // Check capabilities
+		const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
+        if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
+        {
+			OGRE_EXCEPT(Ogre::Exception::ERR_NOT_IMPLEMENTED, "Your card does not support geometry programs, so cannot "
+                "run this demo. Sorry!", 
+                "GeometryShading::createScene");
+        }
+		
+		int maxOutputVertices = caps->getGeometryProgramNumOutputVertices();
+		Ogre::LogManager::getSingleton().getDefaultLog()->stream() << 
+			"Num output vertices per geometry shader run : " << maxOutputVertices;
+
+        Entity *ent = mSceneMgr->createEntity("head", "ogrehead.mesh");
+        mCamera->setPosition(20, 0, 100);
+        mCamera->lookAt(0,0,0);
+		
+		String materialName = GLSL_MATERIAL_NAME;
+		//String materialName = ASM_MATERIAL_NAME;
+		//String materialName = CG_MATERIAL_NAME;
+
+		// Set all of the material's sub entities to use the new material
+		for (unsigned int i=0; i<ent->getNumSubEntities(); i++)
+		{
+			ent->getSubEntity(i)->setMaterialName(materialName);
+		}
+        
+        // Add entity to the root scene node
+        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ent);
+
+        mWindow->getViewport(0)->setBackgroundColour(ColourValue::Green);
+    }
 
     void createScene(void)
     {
@@ -7222,7 +7260,8 @@ protected:
 		//testSRGBtexture(true);
 		//testLightClipPlanesMoreLights(true);
 
-		testFarFromOrigin();
+		//testFarFromOrigin();
+		testGeometryShaders();
 		
     }
     // Create new frame listener

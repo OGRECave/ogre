@@ -127,6 +127,7 @@ namespace Ogre{
 		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
 	protected:
 		void translateVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
+		void translateGeometryProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
 		void translateFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
 		void translateShadowCasterVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
 		void translateShadowReceiverVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);

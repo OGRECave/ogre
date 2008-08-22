@@ -27,6 +27,7 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 #include "OgreGLDefaultHardwareBufferManager.h"
+#include "OgreException.h"
 
 namespace Ogre {
 
@@ -158,5 +159,13 @@ namespace Ogre {
 	{
 		return HardwareIndexBufferSharedPtr(
 			new GLDefaultHardwareIndexBuffer(itype, numIndexes, usage) );
+	}
+    //-----------------------------------------------------------------------
+	RenderToVertexBufferSharedPtr 
+		GLDefaultHardwareBufferManager::createRenderToVertexBuffer()
+	{
+		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Cannot create RenderToVertexBuffer in GLDefaultHardwareBufferManager", 
+				"GLDefaultHardwareBufferManager::createRenderToVertexBuffer");
 	}
 }

@@ -86,6 +86,10 @@ Resource* GLGpuProgramManager::createImpl(const String& name, ResourceHandle han
     {
         gpt = GPT_VERTEX_PROGRAM;
     }
+	else if (paramType->second == "geometry_program")
+	{
+		gpt = GPT_GEOMETRY_PROGRAM;
+	}
     else
     {
         gpt = GPT_FRAGMENT_PROGRAM;

@@ -33,6 +33,20 @@ Torus Knot Software Ltd.
 #include "OgreLogManager.h"
 using namespace Ogre;
 
+GLenum getGLShaderType(GpuProgramType programType)
+{
+	switch (programType)
+	{
+		case GPT_VERTEX_PROGRAM:
+		default:
+			return GL_VERTEX_PROGRAM_ARB;
+		case GPT_GEOMETRY_PROGRAM:
+			return GL_GEOMETRY_PROGRAM_NV;
+		case GPT_FRAGMENT_PROGRAM:
+			return GL_FRAGMENT_PROGRAM_ARB;
+	}
+}
+
 GLGpuProgram::GLGpuProgram(ResourceManager* creator, const String& name, 
     ResourceHandle handle, const String& group, bool isManual, 
     ManualResourceLoader* loader) 
@@ -144,7 +158,7 @@ GLArbGpuProgram::~GLArbGpuProgram()
 void GLArbGpuProgram::setType(GpuProgramType t)
 {
     GLGpuProgram::setType(t);
-    mProgramType = (mType == GPT_VERTEX_PROGRAM) ? GL_VERTEX_PROGRAM_ARB : GL_FRAGMENT_PROGRAM_ARB;
+	mProgramType = getGLShaderType(t);
 }
 
 void GLArbGpuProgram::bindProgram(void)
@@ -161,8 +175,7 @@ void GLArbGpuProgram::unbindProgram(void)
 
 void GLArbGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params)
 {
-    GLenum type = (mType == GPT_VERTEX_PROGRAM) ? 
-        GL_VERTEX_PROGRAM_ARB : GL_FRAGMENT_PROGRAM_ARB;
+    GLenum type = getGLShaderType(mType);
     
 	// only supports float constants
 	const GpuLogicalBufferStruct* floatStruct = params->getFloatLogicalBufferStruct();
@@ -186,8 +199,7 @@ void GLArbGpuProgram::bindProgramPassIterationParameters(GpuProgramParametersSha
 {
     if (params->hasPassIterationNumber())
     {
-		GLenum type = (mType == GPT_VERTEX_PROGRAM) ? 
-			GL_VERTEX_PROGRAM_ARB : GL_FRAGMENT_PROGRAM_ARB;
+		GLenum type = getGLShaderType(mType);
 
 		size_t physicalIndex = params->getPassIterationNumberIndex();
 		size_t logicalIndex = params->getFloatLogicalIndexForPhysicalIndex(physicalIndex);

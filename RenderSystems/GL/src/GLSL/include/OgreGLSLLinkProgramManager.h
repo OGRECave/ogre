@@ -37,6 +37,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+// define uint64 type
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+typedef unsigned __int64 uint64;
+#else
+typedef unsigned long long uint64;
+#endif
+
 	/** Ogre assumes that there are seperate vertex and fragment programs to deal with but
 		GLSL has one program object that represents the active vertex and fragment shader objects
 		during a rendering state.  GLSL Vertex and fragment 
@@ -54,7 +61,7 @@ namespace Ogre {
 
 	private:
 	
-		typedef HashMap<GLuint, GLSLLinkProgram*> LinkProgramMap;
+		typedef HashMap<uint64, GLSLLinkProgram*> LinkProgramMap;
 		typedef LinkProgramMap::iterator LinkProgramIterator;
 
 		/// container holding previously created program objects 
@@ -62,6 +69,7 @@ namespace Ogre {
 
 		/// active objects defining the active rendering gpu state
 		GLSLGpuProgram* mActiveVertexGpuProgram;
+		GLSLGpuProgram* mActiveGeometryGpuProgram;
 		GLSLGpuProgram* mActiveFragmentGpuProgram;
 		GLSLLinkProgram* mActiveLinkProgram;
 
@@ -73,7 +81,8 @@ namespace Ogre {
 		/// Find where the data for a specific uniform should come from, populate
 		bool completeParamSource(const String& paramName,
 			const GpuConstantDefinitionMap* vertexConstantDefs, 
-			const GpuConstantDefinitionMap* fragmentConstantDefs, 
+			const GpuConstantDefinitionMap* geometryConstantDefs,
+			const GpuConstantDefinitionMap* fragmentConstantDefs,
 			GLUniformReference& refToUpdate);
 
 	public:
@@ -93,6 +102,11 @@ namespace Ogre {
 			Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
 		*/
 		void setActiveFragmentShader(GLSLGpuProgram* fragmentGpuProgram);
+		/** Set the active geometry shader for the next rendering state.
+			The active program object will be cleared.
+			Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
+		*/
+		void setActiveGeometryShader(GLSLGpuProgram* geometryGpuProgram);
 		/** Set the active vertex shader for the next rendering state.
 			The active program object will be cleared.
 			Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
@@ -104,6 +118,9 @@ namespace Ogre {
 		@param vertexConstantDefs Definition of the constants extracted from the
 			vertex program, used to match up physical buffer indexes with program
 			uniforms. May be null if there is no vertex program.
+		@param geometryConstantDefs Definition of the constants extracted from the
+			geometry program, used to match up physical buffer indexes with program
+			uniforms. May be null if there is no geometry program.
 		@param fragmentConstantDefs Definition of the constants extracted from the
 			fragment program, used to match up physical buffer indexes with program
 			uniforms. May be null if there is no fragment program.
@@ -112,7 +129,8 @@ namespace Ogre {
 		*/
 		void extractUniforms(GLhandleARB programObject, 
 			const GpuConstantDefinitionMap* vertexConstantDefs, 
-			const GpuConstantDefinitionMap* fragmentConstantDefs, 
+			const GpuConstantDefinitionMap* geometryConstantDefs,
+			const GpuConstantDefinitionMap* fragmentConstantDefs,
 			GLUniformReferenceList& list);
 		/** Populate a list of uniforms based on GLSL source.
 		@param src Reference to the source code

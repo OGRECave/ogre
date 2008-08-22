@@ -1197,6 +1197,7 @@ namespace Ogre
 		RenderTarget * mActiveRenderTarget;
 		/** The Active GPU programs and gpu program parameters*/
 		GpuProgramParametersSharedPtr mActiveVertexGpuProgramParameters;
+		GpuProgramParametersSharedPtr mActiveGeometryGpuProgramParameters;
 		GpuProgramParametersSharedPtr mActiveFragmentGpuProgramParameters;
 
 		// Texture manager
@@ -1253,6 +1254,7 @@ namespace Ogre
 		HardwareOcclusionQueryList mHwOcclusionQueries;
 
 		bool mVertexProgramBound;
+		bool mGeometryProgramBound;
 		bool mFragmentProgramBound;
 
 		// Recording user clip planes

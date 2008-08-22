@@ -187,6 +187,8 @@ namespace Ogre {
 		GpuProgramUsage *mFragmentProgramUsage;
 		// Fragment program details
 		GpuProgramUsage *mShadowReceiverFragmentProgramUsage;
+		// Geometry program details
+		GpuProgramUsage *mGeometryProgramUsage;
         // Is this pass queued for deletion?
         bool mQueuedForDeletion;
         // number of pass iterations to perform
@@ -234,11 +236,13 @@ namespace Ogre {
         virtual ~Pass();
 
         /// Returns true if this pass is programmable i.e. includes either a vertex or fragment program.
-        bool isProgrammable(void) const { return mVertexProgramUsage || mFragmentProgramUsage; }
+        bool isProgrammable(void) const { return mVertexProgramUsage || mFragmentProgramUsage || mGeometryProgramUsage; }
         /// Returns true if this pass uses a programmable vertex pipeline
         bool hasVertexProgram(void) const { return mVertexProgramUsage != NULL; }
         /// Returns true if this pass uses a programmable fragment pipeline
         bool hasFragmentProgram(void) const { return mFragmentProgramUsage != NULL; }
+        /// Returns true if this pass uses a programmable geometry pipeline
+        bool hasGeometryProgram(void) const { return mGeometryProgramUsage != NULL; }
         /// Returns true if this pass uses a shadow caster vertex program
         bool hasShadowCasterVertexProgram(void) const { return mShadowCasterVertexProgramUsage != NULL; }
         /// Returns true if this pass uses a shadow receiver vertex program
@@ -1242,6 +1246,35 @@ namespace Ogre {
 		GpuProgramParametersSharedPtr getFragmentProgramParameters(void) const;
 		/** Gets the fragment program used by this pass, only available after _load(). */
 		const GpuProgramPtr& getFragmentProgram(void) const;
+
+		/** Sets the details of the geometry program to use.
+		@remarks
+			Only applicable to programmable passes, this sets the details of
+			the geometry program to use in this pass. The program will not be
+			loaded until the parent Material is loaded.
+		@param name The name of the program - this must have been
+			created using GpuProgramManager by the time that this Pass
+			is loaded. If this parameter is blank, any geometry program in this pass is disabled.
+        @param resetParams
+            If true, this will create a fresh set of parameters from the
+            new program being linked, so if you had previously set parameters
+            you will have to set them again. If you set this to false, you must
+            be absolutely sure that the parameters match perfectly, and in the
+            case of named parameters refers to the indexes underlying them,
+            not just the names.
+		*/
+		void setGeometryProgram(const String& name, bool resetParams = true);
+		/** Sets the geometry program parameters.
+		@remarks
+			Only applicable to programmable passes.
+		*/
+		void setGeometryProgramParameters(GpuProgramParametersSharedPtr params);
+		/** Gets the name of the geometry program used by this pass. */
+		const String& getGeometryProgramName(void) const;
+		/** Gets the geometry program parameters used by this pass. */
+		GpuProgramParametersSharedPtr getGeometryProgramParameters(void) const;
+		/** Gets the geometry program used by this pass, only available after _load(). */
+		const GpuProgramPtr& getGeometryProgram(void) const;
 
 		/** Splits this Pass to one which can be handled in the number of
 			texture units specified.

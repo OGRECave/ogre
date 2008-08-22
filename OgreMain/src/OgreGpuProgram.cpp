@@ -50,6 +50,8 @@ namespace Ogre
 	GpuProgram::CmdPose GpuProgram::msPoseCmd;
 	GpuProgram::CmdVTF GpuProgram::msVTFCmd;
 	GpuProgram::CmdManualNamedConstsFile GpuProgram::msManNamedConstsFileCmd;
+	GpuProgram::CmdAdjacency GpuProgram::msAdjacencyCmd;
+	
 
 
     GpuProgramParameters::AutoConstantDefinition GpuProgramParameters::AutoConstantDictionary[] = {
@@ -241,7 +243,7 @@ namespace Ogre
         :Resource(creator, name, handle, group, isManual, loader),
         mType(GPT_VERTEX_PROGRAM), mLoadFromFile(true), mSkeletalAnimation(false),
         mVertexTextureFetch(false), mPassSurfaceAndLightStates(false), mCompileError(false), 
-		mLoadedManualNamedConstants(false)
+		mLoadedManualNamedConstants(false), mNeedsAdjacencyInfo(false)
     {
     }
     //-----------------------------------------------------------------------------
@@ -427,7 +429,7 @@ namespace Ogre
         ParamDictionary* dict = getParamDictionary();
 
         dict->addParameter(
-            ParameterDef("type", "'vertex_program' or 'fragment_program'",
+            ParameterDef("type", "'vertex_program', 'geometry_program' or 'fragment_program'",
                 PT_STRING), &msTypeCmd);
         dict->addParameter(
             ParameterDef("syntax", "Syntax code, e.g. vs_1_1", PT_STRING), &msSyntaxCmd);
@@ -451,6 +453,10 @@ namespace Ogre
 			ParameterDef("manual_named_constants", 
 			"File containing named parameter mappings for low-level programs.", PT_BOOL), 
 			&msManNamedConstsFileCmd);
+		dict->addParameter(
+			ParameterDef("uses_adjacency_information",
+			"Whether this geometry program requires adjacency information from the input primitives.", PT_BOOL),
+			&msAdjacencyCmd);
     }
 
     //-----------------------------------------------------------------------
@@ -2070,7 +2076,11 @@ namespace Ogre
         {
             return "vertex_program";
         }
-        else
+		else if (t->getType() == GPT_GEOMETRY_PROGRAM)
+		{
+			return "geometry_program";
+		}
+		else
         {
             return "fragment_program";
         }
@@ -2082,7 +2092,11 @@ namespace Ogre
         {
             t->setType(GPT_VERTEX_PROGRAM);
         }
-        else
+        else if (val == "geometry_program")
+		{
+			t->setType(GPT_GEOMETRY_PROGRAM);
+		}
+		else
         {
             t->setType(GPT_FRAGMENT_PROGRAM);
         }
@@ -2152,6 +2166,17 @@ namespace Ogre
 	{
 		GpuProgram* t = static_cast<GpuProgram*>(target);
 		t->setManualNamedConstantsFile(val);
+	}
+    //-----------------------------------------------------------------------
+	String GpuProgram::CmdAdjacency::doGet(const void* target) const
+	{
+		const GpuProgram* t = static_cast<const GpuProgram*>(target);
+		return StringConverter::toString(t->isAdjacencyInfoRequired());
+	}
+	void GpuProgram::CmdAdjacency::doSet(void* target, const String& val)
+	{
+		GpuProgram* t = static_cast<GpuProgram*>(target);
+		t->setAdjacencyInfoRequired(StringConverter::parseBool(val));
 	}
     //-----------------------------------------------------------------------
     GpuProgramPtr& GpuProgramPtr::operator=(const HighLevelGpuProgramPtr& r)

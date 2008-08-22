@@ -159,4 +159,12 @@ namespace Ogre {
         DefaultHardwareIndexBuffer* ib = OGRE_NEW DefaultHardwareIndexBuffer(itype, numIndexes, usage);
 		return HardwareIndexBufferSharedPtr(ib);
 	}
+	//-----------------------------------------------------------------------
+	RenderToVertexBufferSharedPtr
+		DefaultHardwareBufferManager::createRenderToVertexBuffer()
+	{
+		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			"Cannot create RenderToVertexBuffer in DefaultHardwareBufferManager", 
+			"DefaultHardwareBufferManager::createRenderToVertexBuffer");
+	}
 }

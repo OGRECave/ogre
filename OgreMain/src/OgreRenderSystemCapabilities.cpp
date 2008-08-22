@@ -112,6 +112,9 @@ namespace Ogre {
 		pLog->logMessage(
 			" * Fragment programs: "
 			+ StringConverter::toString(hasCapability(RSC_FRAGMENT_PROGRAM), true));
+		pLog->logMessage(
+			" * Geometry programs: "
+			+ StringConverter::toString(hasCapability(RSC_GEOMETRY_PROGRAM), true));
 		String profileList = "";
 		for(ShaderProfiles::iterator iter = mSupportedShaderProfiles.begin(), end = mSupportedShaderProfiles.end();
 			iter != end; ++iter)
@@ -188,6 +191,9 @@ namespace Ogre {
 				+ StringConverter::toString(mVertexTextureUnitsShared, true));
 
 		}
+		pLog->logMessage(
+			" * Render to Vertex Buffer : "
+			+ StringConverter::toString(hasCapability(RSC_HWRENDER_TO_VERTEX_BUFFER), true));
 
 		if (mCategoryRelevant[CAPS_CATEGORY_GL])
 		{

@@ -157,6 +157,9 @@ namespace Ogre {
 					cgGetProgramString(mCgProgram, CG_COMPILED_PROGRAM),
 					mType, 
 					mSelectedProfile);
+
+			// Shader params need to be forwarded to low level implementation
+			mAssemblerProgram->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
 		}
     }
     //-----------------------------------------------------------------------

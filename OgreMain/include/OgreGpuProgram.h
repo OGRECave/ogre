@@ -35,6 +35,7 @@ Torus Knot Software Ltd.
 #include "OgreSharedPtr.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreSerializer.h"
+#include "OgreRenderOperation.h"
 
 namespace Ogre {
 
@@ -42,7 +43,8 @@ namespace Ogre {
 	enum GpuProgramType
 	{
 		GPT_VERTEX_PROGRAM,
-		GPT_FRAGMENT_PROGRAM
+		GPT_FRAGMENT_PROGRAM,
+		GPT_GEOMETRY_PROGRAM
 	};
 
 	/** Enumeration of the types of constant we may encounter in programs. 
@@ -1435,6 +1437,12 @@ namespace Ogre {
 			String doGet(const void* target) const;
 			void doSet(void* target, const String& val);
 		};
+		class _OgreExport CmdAdjacency : public ParamCommand
+		{
+		public:
+			String doGet(const void* target) const;
+			void doSet(void* target, const String& val);
+		};
 		// Command object for setting / getting parameters
 		static CmdType msTypeCmd;
 		static CmdSyntax msSyntaxCmd;
@@ -1443,7 +1451,7 @@ namespace Ogre {
 		static CmdPose msPoseCmd;
 		static CmdVTF msVTFCmd;
 		static CmdManualNamedConstsFile msManNamedConstsFileCmd;
-	
+		static CmdAdjacency msAdjacencyCmd;
 		/// The type of the program
 		GpuProgramType mType;
 		/// The name of the file to load source from (may be blank)
@@ -1462,6 +1470,8 @@ namespace Ogre {
 		ushort mPoseAnimation;
 		/// Does this (vertex) program require support for vertex texture fetch?
 		bool mVertexTextureFetch;
+		/// Does this (geometry) program require adjacency information?
+		bool mNeedsAdjacencyInfo;
 		/// The default parameters for use with this object
 		GpuProgramParametersSharedPtr mDefaultParams;
 		/// Does this program want light states passed through fixed pipeline
@@ -1616,6 +1626,15 @@ namespace Ogre {
 		*/
 		virtual bool isVertexTextureFetchRequired(void) const { return mVertexTextureFetch; }
 
+		/** Sets whether this geometry program requires adjacency information
+			from the input primitives.
+		*/
+		virtual void setAdjacencyInfoRequired(bool r) { mNeedsAdjacencyInfo = r; }
+		/** Returns whether this geometry program requires adjacency information 
+			from the input primitives.
+		*/
+		virtual bool isAdjacencyInfoRequired(void) const { return mNeedsAdjacencyInfo; }
+		
 		/** Get a reference to the default parameters which are to be used for all
 			uses of this program.
 		@remarks

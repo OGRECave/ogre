@@ -873,6 +873,21 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			// Set fixed-function vertex parameters
 		}
 
+		if (pass->hasGeometryProgram())
+		{
+			mDestRenderSystem->bindGpuProgram(pass->getGeometryProgram()->_getBindingDelegate());
+			// bind parameters later since they can be per-object
+		}
+		else
+		{
+			// Unbind program?
+			if (mDestRenderSystem->isGpuProgramBound(GPT_GEOMETRY_PROGRAM))
+			{
+				mDestRenderSystem->unbindGpuProgram(GPT_GEOMETRY_PROGRAM);
+			}
+			// Set fixed-function vertex parameters
+		}
+
 		if (passSurfaceAndLightParams)
 		{
 			// Set surface reflectance properties, only valid if lighting is enabled
@@ -3118,6 +3133,11 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 						mDestRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
 							pass->getVertexProgramParameters());
 					}
+					if (pass->hasGeometryProgram())
+					{
+						mDestRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
+							pass->getGeometryProgramParameters());
+					}
 					if (pass->hasFragmentProgram())
 					{
 						mDestRenderSystem->bindGpuProgramParameters(GPT_FRAGMENT_PROGRAM, 
@@ -3222,6 +3242,11 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					{
 						mDestRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
 							pass->getVertexProgramParameters());
+					}
+					if (pass->hasGeometryProgram())
+					{
+						mDestRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
+							pass->getGeometryProgramParameters());
 					}
 					if (pass->hasFragmentProgram())
 					{
@@ -3543,6 +3568,11 @@ void SceneManager::manualRender(RenderOperation* rend,
 		{
 			mDestRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
 				pass->getVertexProgramParameters());
+		}
+		if (pass->hasGeometryProgram())
+		{
+			mDestRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
+				pass->getGeometryProgramParameters());
 		}
 		if (pass->hasFragmentProgram())
 		{
