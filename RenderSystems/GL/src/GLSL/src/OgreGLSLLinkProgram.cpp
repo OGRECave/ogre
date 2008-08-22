@@ -73,26 +73,40 @@ namespace Ogre {
 		CustomAttribute("binormal", GLGpuProgram::getFixedAttributeIndex(VES_BINORMAL, 0)),
 	};
 
-	GLint renderOperationTypeToGLGeometryPrimitiveType(RenderOperation::OperationType operationType)
+	GLint getGLGeometryInputPrimitiveType(RenderOperation::OperationType operationType, bool requiresAdjacency)
 	{
 		switch (operationType)
 		{
 		case RenderOperation::OT_POINT_LIST:
 			return GL_POINTS;
 		case RenderOperation::OT_LINE_LIST:
-			return GL_LINES;
 		case RenderOperation::OT_LINE_STRIP:
-			return GL_LINE_STRIP;
+			return requiresAdjacency ? GL_LINES_ADJACENCY_EXT : GL_LINES;
 		default:
 		case RenderOperation::OT_TRIANGLE_LIST:
-			return GL_TRIANGLES;
 		case RenderOperation::OT_TRIANGLE_STRIP:
-			return GL_TRIANGLE_STRIP;
 		case RenderOperation::OT_TRIANGLE_FAN:
-			return GL_TRIANGLE_FAN;
+			return requiresAdjacency ? GL_TRIANGLES_ADJACENCY_EXT : GL_TRIANGLES;
 		}
 	}
-
+	//-----------------------------------------------------------------------
+	GLint getGLGeometryOutputPrimitiveType(RenderOperation::OperationType operationType)
+	{
+		switch (operationType)
+		{
+		case RenderOperation::OT_POINT_LIST:
+			return GL_POINTS;
+		case RenderOperation::OT_LINE_STRIP:
+			return GL_LINE_STRIP;
+		case RenderOperation::OT_TRIANGLE_STRIP:
+			return GL_TRIANGLE_STRIP;
+		default:
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+				"Geometry shader output operation type can only be point list,"
+				"line strip or triangle strip",
+				"GLSLLinkProgram::activate");
+		}
+	}
 	//-----------------------------------------------------------------------
 	GLSLLinkProgram::GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram)
         : mVertexProgram(vertexProgram)
@@ -118,6 +132,7 @@ namespace Ogre {
 			if (mGeometryProgram)
 			{
 				mGeometryProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
+				//Don't set adjacency flag. We handle it internally and expose "false"
 			}
 			if (mFragmentProgram)
 			{
@@ -152,14 +167,8 @@ namespace Ogre {
 			if (mGeometryProgram)
 			{
 				RenderOperation::OperationType inputOperationType = mGeometryProgram->getGLSLProgram()->getInputOperationType();
-				if (inputOperationType == RenderOperation::OT_TRIANGLE_FAN)
-				{
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-						"Geometry shader input operation type can not be triangle fan", 
-						"GLSLLinkProgram::activate");
-				}
 				glProgramParameteriEXT(mGLHandle,GL_GEOMETRY_INPUT_TYPE_EXT,
-					renderOperationTypeToGLGeometryPrimitiveType(inputOperationType));
+					getGLGeometryInputPrimitiveType(inputOperationType, mGeometryProgram->isAdjacencyInfoRequired()));
 				
 				RenderOperation::OperationType outputOperationType = mGeometryProgram->getGLSLProgram()->getOutputOperationType();
 				switch (outputOperationType)
@@ -168,13 +177,10 @@ namespace Ogre {
 				case RenderOperation::OT_LINE_STRIP:
 				case RenderOperation::OT_TRIANGLE_STRIP:
 					break;
-				default:
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-						"Geometry shader output operation type can only be point list, line strip or triangle strip",
-						"GLSLLinkProgram::activate");
+				
 				}
 				glProgramParameteriEXT(mGLHandle,GL_GEOMETRY_OUTPUT_TYPE_EXT,
-					renderOperationTypeToGLGeometryPrimitiveType(outputOperationType));
+					getGLGeometryOutputPrimitiveType(outputOperationType));
 
 				glProgramParameteriEXT(mGLHandle,GL_GEOMETRY_VERTICES_OUT_EXT,
 					mGeometryProgram->getGLSLProgram()->getMaxOutputVertices());
