@@ -61,11 +61,11 @@ typedef unsigned long long uint64;
 
 	private:
 	
-		typedef HashMap<uint64, GLSLLinkProgram*> LinkProgramMap;
+		typedef std::map<uint64, GLSLLinkProgram*> LinkProgramMap;
 		typedef LinkProgramMap::iterator LinkProgramIterator;
 
 		/// container holding previously created program objects 
-		LinkProgramMap LinkPrograms; 
+		LinkProgramMap mLinkPrograms; 
 
 		/// active objects defining the active rendering gpu state
 		GLSLGpuProgram* mActiveVertexGpuProgram;

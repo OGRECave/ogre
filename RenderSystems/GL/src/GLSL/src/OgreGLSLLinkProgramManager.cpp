@@ -89,8 +89,8 @@ namespace Ogre {
 	GLSLLinkProgramManager::~GLSLLinkProgramManager(void)
 	{
 		// iterate through map container and delete link programs
-		for (LinkProgramIterator currentProgram = LinkPrograms.begin();
-			currentProgram != LinkPrograms.end(); ++currentProgram)
+		for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
+			currentProgram != mLinkPrograms.end(); ++currentProgram)
 		{
 			delete currentProgram->second;
 		}
@@ -125,12 +125,12 @@ namespace Ogre {
 		if (activeKey > 0)
 		{
 			// find the key in the hash map
-			LinkProgramIterator programFound = LinkPrograms.find(activeKey);
+			LinkProgramIterator programFound = mLinkPrograms.find(activeKey);
 			// program object not found for key so need to create it
-			if (programFound == LinkPrograms.end())
+			if (programFound == mLinkPrograms.end())
 			{
 				mActiveLinkProgram = new GLSLLinkProgram(mActiveVertexGpuProgram, mActiveGeometryGpuProgram,mActiveFragmentGpuProgram);
-				LinkPrograms[activeKey] = mActiveLinkProgram;
+				mLinkPrograms[activeKey] = mActiveLinkProgram;
 			}
 			else
 			{
