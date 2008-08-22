@@ -148,6 +148,7 @@ pkginclude_HEADERS = Ogre.h \
                      OgreRenderTarget.h \
                      OgreRenderTargetListener.h \
                      OgreRenderTexture.h \
+                     OgreRenderToVertexBuffer.h \
                      OgreRenderWindow.h \
                      OgreRenderable.h \
                      OgreResource.h \
