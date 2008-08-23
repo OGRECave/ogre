@@ -298,7 +298,7 @@ namespace Ogre {
         /** See
           RenderSystem
          */
-        void _setAlphaRejectSettings(CompareFunction func, unsigned char value);
+        void _setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage);
         /** See
           RenderSystem
          */

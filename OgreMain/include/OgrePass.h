@@ -131,6 +131,7 @@ namespace Ogre {
 		// Alpha reject settings
 		CompareFunction mAlphaRejectFunc;
 		unsigned char mAlphaRejectVal;
+		bool mAlphaToCoverageEnabled;
 
 		// Transparent depth sorting
 		bool mTransparentSorting;
@@ -949,10 +950,11 @@ namespace Ogre {
 			The default is CMPF_ALWAYS_PASS i.e. alpha is not used to reject pixels.
         @param func The comparison which must pass for the pixel to be written.
         @param value 1 byte value against which alpha values will be tested(0-255)
+		@param alphaToCoverageEnabled Whether to enable alpha to coverage support
         @note
 			This option applies in both the fixed function and the programmable pipeline.
         */
-        void setAlphaRejectSettings(CompareFunction func, unsigned char value);
+        void setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverageEnabled = false);
 
 		/** Sets the alpha reject function. See setAlphaRejectSettings for more information.
 		*/
@@ -969,6 +971,19 @@ namespace Ogre {
         /** Gets the alpha reject value. See setAlphaRejectSettings for more information.
         */
 		unsigned char getAlphaRejectValue(void) const { return mAlphaRejectVal; }
+
+		/** Sets whether to use alpha to coverage (A2C) when blending alpha rejected values. 
+		@remarks
+			Alpha to coverage performs multisampling on the edges of alpha-rejected
+			textures to produce a smoother result. It is only supported when multisampling
+			is already enabled on the render target, and when the hardware supports
+			alpha to coverage (see RenderSystemCapabilities). 
+		*/
+		void setAlphaToCoverageEnabled(bool enabled);
+
+		/** Gets whether to use alpha to coverage (A2C) when blending alpha rejected values. 
+		*/
+		bool isAlphaToCoverageEnabled() const { return mAlphaToCoverageEnabled; }
 
         /** Sets whether or not transparent sorting is enabled.
         @param enabled

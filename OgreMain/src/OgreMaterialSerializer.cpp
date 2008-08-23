@@ -1157,6 +1157,21 @@ namespace Ogre
 
         return false;
     }
+	//---------------------------------------------------------------------
+	bool parseAlphaToCoverage(String& params, MaterialScriptContext& context)
+	{
+		StringUtil::toLowerCase(params);
+		if (params == "on")
+			context.pass->setAlphaToCoverageEnabled(true);
+		else if (params == "off")
+			context.pass->setAlphaToCoverageEnabled(false);
+		else
+			logParseError(
+			"Bad alpha_to_coverage attribute, valid parameters are 'on' or 'off'.",
+			context);
+
+		return false;
+	}
     //-----------------------------------------------------------------------
     bool parseTransparentSorting(String& params, MaterialScriptContext& context)
     {
@@ -2945,6 +2960,7 @@ namespace Ogre
         mPassAttribParsers.insert(AttribParserList::value_type("depth_func", (ATTRIBUTE_PARSER)parseDepthFunc));
 		mPassAttribParsers.insert(AttribParserList::value_type("normalise_normals", (ATTRIBUTE_PARSER)parseNormaliseNormals));
 		mPassAttribParsers.insert(AttribParserList::value_type("alpha_rejection", (ATTRIBUTE_PARSER)parseAlphaRejection));
+		mPassAttribParsers.insert(AttribParserList::value_type("alpha_to_coverage", (ATTRIBUTE_PARSER)parseAlphaToCoverage));
 		mPassAttribParsers.insert(AttribParserList::value_type("transparent_sorting", (ATTRIBUTE_PARSER)parseTransparentSorting));
         mPassAttribParsers.insert(AttribParserList::value_type("colour_write", (ATTRIBUTE_PARSER)parseColourWrite));
 		mPassAttribParsers.insert(AttribParserList::value_type("light_scissor", (ATTRIBUTE_PARSER)parseLightScissor));
@@ -3840,6 +3856,13 @@ namespace Ogre
 				writeAttribute(3, "alpha_rejection");
 				writeCompareFunction(pPass->getAlphaRejectFunction());
 				writeValue(StringConverter::toString(pPass->getAlphaRejectValue()));
+			}
+			// alpha_to_coverage
+			if (mDefaults ||
+				pPass->isAlphaToCoverageEnabled())
+			{
+				writeAttribute(3, "alpha_to_coverage");
+				writeValue(pPass->isAlphaToCoverageEnabled() ? "on" : "off");
 			}
 			// transparent_sorting
 			if (mDefaults ||

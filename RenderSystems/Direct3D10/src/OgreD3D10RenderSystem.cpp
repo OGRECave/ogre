@@ -1698,6 +1698,7 @@ namespace Ogre
 		mBlendDesc.BlendOpAlpha = D3D10_BLEND_OP_ADD ;
 		mBlendDesc.SrcBlendAlpha = D3D10_BLEND_ZERO;
 		mBlendDesc.DestBlendAlpha = D3D10_BLEND_ZERO;
+		mBlendDesc.AlphaToCoverageEnable = mSceneAlphaToCoverage;
 
 		mBlendDesc.RenderTargetWriteMask[0] = 0x0F;
 	}
@@ -1729,10 +1730,11 @@ namespace Ogre
 	*/
 	}
 	//---------------------------------------------------------------------
-	void D3D10RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value )
+	void D3D10RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage )
 	{
 		mSceneAlphaRejectFunc	= func;
 		mSceneAlphaRejectValue	= value;
+		mSceneAlphaToCoverage	= alphaToCoverage;
 	}
 	//---------------------------------------------------------------------
 	void D3D10RenderSystem::_setCullingMode( CullingMode mode )

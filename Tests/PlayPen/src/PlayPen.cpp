@@ -7100,7 +7100,56 @@ protected:
         mWindow->getViewport(0)->setBackgroundColour(ColourValue::Green);
     }
 
-    void createScene(void)
+	void testAlphaToCoverage()
+	{
+
+		MaterialPtr mat = MaterialManager::getSingleton().create("testa2c", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		Pass* p = mat->getTechnique(0)->getPass(0);
+		p->setAlphaRejectSettings(CMPF_GREATER, 96);
+		p->setLightingEnabled(false);
+		p->setCullingMode(CULL_NONE);
+		p->setAlphaToCoverageEnabled(true);
+		TextureUnitState* t = p->createTextureUnitState("leaf.png");
+		t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+		Entity *e = mSceneMgr->createEntity("PlaneA2C", SceneManager::PT_PLANE);
+		e->setMaterialName(mat->getName());
+		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(100, 0, 0))->attachObject(e);
+
+
+		mat = MaterialManager::getSingleton().create("testnoa2c", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		p = mat->getTechnique(0)->getPass(0);
+		p->setAlphaRejectSettings(CMPF_GREATER, 96);
+		p->setLightingEnabled(false);
+		p->setCullingMode(CULL_NONE);
+		p->setAlphaToCoverageEnabled(false);
+		t = p->createTextureUnitState("leaf.png");
+		t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+		e = mSceneMgr->createEntity("PlaneNoA2C", SceneManager::PT_PLANE);
+		e->setMaterialName(mat->getName());
+		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-100, 0, 0))->attachObject(e);
+
+		mat = MaterialManager::getSingleton().create("bg", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		p = mat->getTechnique(0)->getPass(0);
+		p->setLightingEnabled(false);
+		p->setCullingMode(CULL_NONE);
+		t = p->createTextureUnitState();
+		t->setColourOperationEx(LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT, ColourValue::White);
+		e = mSceneMgr->createEntity("PlaneBg", SceneManager::PT_PLANE);
+		e->setMaterialName(mat->getName());
+		e->setRenderQueueGroup(RENDER_QUEUE_BACKGROUND);
+		SceneNode* s = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0, 0, -10));
+		s->setScale(5,5,5);
+		s->attachObject(e);
+
+		mCamera->setPosition(0,0,300);
+		mCamera->lookAt(Vector3::ZERO);
+
+	}
+
+	void createScene(void)
     {
 
 
@@ -7261,7 +7310,8 @@ protected:
 		//testLightClipPlanesMoreLights(true);
 
 		//testFarFromOrigin();
-		testGeometryShaders();
+		//testGeometryShaders();
+		testAlphaToCoverage();
 		
     }
     // Create new frame listener

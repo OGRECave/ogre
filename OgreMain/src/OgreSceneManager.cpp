@@ -1065,7 +1065,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			pass->getDepthBiasSlopeScale());
 		// Alpha-reject settings
 		mDestRenderSystem->_setAlphaRejectSettings(
-			pass->getAlphaRejectFunction(), pass->getAlphaRejectValue());
+			pass->getAlphaRejectFunction(), pass->getAlphaRejectValue(), pass->isAlphaToCoverageEnabled());
 		// Set colour write mode
 		// Right now we only use on/off, not per-channel
 		bool colWrite = pass->getColourWriteEnabled();

@@ -1266,6 +1266,26 @@ namespace Ogre{
 								(*i0)->getValue() + " is not a valid CompareFunction");
 					}
 					break;
+				case ID_ALPHA_TO_COVERAGE:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+					}
+					else if(prop->values.size() > 1)
+					{
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"alpha_to_coverage must have 1 argument");
+					}
+					else
+					{
+						bool val = true;
+						if(getBoolean(prop->values.front(), &val))
+							mPass->setAlphaToCoverageEnabled(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+							"alpha_to_coverage argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
+					}
+					break;
 				case ID_LIGHT_SCISSOR:
 					if(prop->values.empty())
 					{

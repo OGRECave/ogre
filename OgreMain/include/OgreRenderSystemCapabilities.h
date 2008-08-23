@@ -131,6 +131,8 @@ namespace Ogre
 		RSC_FIXED_FUNCTION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 3),
 		/// Supports MRTs with different bit depths
 		RSC_MRT_DIFFERENT_BIT_DEPTHS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 4),
+		/// Supports Alpha to Coverage (A2C)
+		RSC_ALPHA_TO_COVERAGE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 5),
 
 		// ***** DirectX specific caps *****
 		/// Is DirectX feature "per stage constants" supported

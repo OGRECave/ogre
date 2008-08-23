@@ -1034,6 +1034,7 @@ namespace Ogre
 			mIds["greater_equal"] = ID_GREATER_EQUAL;
 			mIds["greater"] = ID_GREATER;
 		mIds["alpha_rejection"] = ID_ALPHA_REJECTION;
+		mIds["alpha_to_coverage"] = ID_ALPHA_TO_COVERAGE;
 		mIds["light_scissor"] = ID_LIGHT_SCISSOR;
 		mIds["light_clip_planes"] = ID_LIGHT_CLIP_PLANES;
 		mIds["transparent_sorting"] = ID_TRANSPARENT_SORTING;

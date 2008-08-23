@@ -584,6 +584,14 @@ namespace Ogre {
 			rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
 		}
 
+		// Alpha to coverage?
+		if (mGLSupport->checkExtension("GL_ARB_multisample"))
+		{
+			// Alpha to coverage always 'supported' when MSAA is available
+			// although card may ignore it if it doesn't specifically support A2C
+			rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
+		}
+
 		return rsc;
 	}
 
@@ -1646,8 +1654,11 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------------
-	void GLRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value)
+	void GLRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
 	{
+		bool a2c = false;
+		static bool lasta2c = false;
+
 		if(func == CMPF_ALWAYS_PASS)
 		{
 			glDisable(GL_ALPHA_TEST);
@@ -1655,8 +1666,20 @@ namespace Ogre {
 		else
 		{
 			glEnable(GL_ALPHA_TEST);
+			a2c = alphaToCoverage;
 			glAlphaFunc(convertCompareFunction(func), value / 255.0f);
 		}
+
+		if (a2c != lasta2c && getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
+		{
+			if (a2c)
+				glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+			else
+				glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+
+			lasta2c = a2c;
+		}
+
 	}
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setViewport(Viewport *vp)
