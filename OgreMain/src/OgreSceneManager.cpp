@@ -5618,9 +5618,6 @@ void SceneManager::ensureShadowTexturesCreated()
 			// in prepareShadowTextures to coexist with multiple SMs
 			Camera* cam = createCamera(camName);
 			cam->setAspectRatio(shadowTex->getWidth() / shadowTex->getHeight());
-			// Don't use rendering distance for light cameras; we don't want shadows
-			// for visible objects disappearing, especially for directional lights
-			cam->setUseRenderingDistance(false);
 			mShadowTextureCameras.push_back(cam);
 
 			// Create a viewport, if not there already
