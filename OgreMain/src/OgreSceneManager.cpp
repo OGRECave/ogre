@@ -1336,6 +1336,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 		mCachedViewMatrix.setTrans(Vector3::ZERO);
 		mCameraRelativePosition = mCameraInProgress->getDerivedPosition();
 	}
+	mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, camera->getDerivedPosition());
 
 	mDestRenderSystem->_setViewMatrix(mCachedViewMatrix);
 

@@ -662,6 +662,11 @@ namespace Ogre
 		@param alphaToCoverage Whether to enable alpha to coverage, if supported
 		*/
 		virtual void _setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage) = 0;
+
+		/** Notify the rendersystem that it should adjust texture projection to be 
+			relative to a different origin.
+		*/
+		virtual void _setTextureProjectionRelativeTo(bool enabled, const Vector3& pos);
 		/**
 		* Signifies the beginning of a frame, i.e. the start of rendering on a single viewport. Will occur
 		* several times per complete frame if multiple viewports exist.
@@ -1276,6 +1281,9 @@ namespace Ogre
 
 
 		DriverVersion mDriverVersion;
+
+		bool mTexProjRelative;
+		Vector3 mTexProjRelativeOrigin;
 
 
 

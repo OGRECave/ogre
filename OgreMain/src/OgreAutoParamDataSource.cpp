@@ -588,14 +588,9 @@ namespace Ogre {
 			{
 				// World positions are now going to be relative to the camera position
 				// so we need to alter the projector view matrix to compensate
-				// We could do this by moving the point back into worldspace then using the normal
-				// view matrix but this would have the old precision issues, so instead we
-				// want to move the point the difference between the projection position and the camera position
-				Vector3 pos = mCurrentTextureProjector[index]->getPositionForViewUpdate();
-				pos -= mCurrentCamera->getDerivedPosition(); // this includes reflection
-				const Quaternion& orientation = mCurrentTextureProjector[index]->getOrientationForViewUpdate();
-
-				Matrix4 viewMatrix = Math::makeViewMatrix(pos, orientation);
+				Matrix4 viewMatrix;
+				mCurrentTextureProjector[index]->calcViewMatrixRelative(
+					mCurrentCamera->getDerivedPosition(), viewMatrix);
 				mTextureViewProjMatrix[index] = 
 					PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
 					mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 

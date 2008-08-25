@@ -71,6 +71,8 @@ namespace Ogre {
 		, mRealCapabilities(0)
 		, mCurrentCapabilities(0)
 		, mUseCustomCapabilities(false)
+		, mTexProjRelative(false)
+		, mTexProjRelativeOrigin(Vector3::ZERO)
     {
     }
 
@@ -667,6 +669,13 @@ namespace Ogre {
 	    }
         // Make compiler happy
         return false;
+	}
+	//---------------------------------------------------------------------
+	void RenderSystem::_setTextureProjectionRelativeTo(bool enabled, const Vector3& pos)
+	{
+		mTexProjRelative = enabled;
+		mTexProjRelativeOrigin = pos;
+
 	}
 
 }

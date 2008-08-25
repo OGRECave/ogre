@@ -1886,7 +1886,16 @@ namespace Ogre
 			// To do this, we need to undo the camera view matrix, then 
 			// apply the projector view & projection matrices
 			newMat = mViewMatrix.inverse();
-			newMat = mTexStageDesc[stage].frustum->getViewMatrix() * newMat;
+			if(mTexProjRelative)
+			{
+				Matrix4 viewMatrix;
+				mTexStageDesc[stage].frustum->calcViewMatrixRelative(mTexProjRelativeOrigin, viewMatrix);
+				newMat = viewMatrix * newMat;
+			}
+			else
+			{
+				newMat = mTexStageDesc[stage].frustum->getViewMatrix() * newMat;
+			}
 			newMat = mTexStageDesc[stage].frustum->getProjectionMatrix() * newMat;
 			newMat = Matrix4::CLIPSPACE2DTOIMAGESPACE * newMat;
 			newMat = xForm * newMat;
@@ -2224,7 +2233,7 @@ namespace Ogre
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set render state D3DRS_ALPHAREF", "D3D9RenderSystem::_setAlphaRejectSettings" );
 
 		// Alpha to coverage
-		if (a2c != lasta2c && getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
+		if (getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
 		{
 			// Vendor-specific hacks on renderstate, gotta love 'em
 			if (getCapabilities()->getVendor() == GPU_NVIDIA)

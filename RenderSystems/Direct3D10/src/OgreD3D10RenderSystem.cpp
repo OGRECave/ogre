@@ -1545,7 +1545,16 @@ namespace Ogre
             // To do this, we need to undo the camera view matrix, then 
             // apply the projector view & projection matrices
             newMat = mViewMatrix.inverse();
-            newMat = mTexStageDesc[stage].frustum->getViewMatrix() * newMat;
+			if(mTexProjRelative)
+			{
+				Matrix4 viewMatrix;
+				mTexStageDesc[stage].frustum->calcViewMatrixRelative(mTexProjRelativeOrigin, viewMatrix);
+				newMat = viewMatrix * newMat;
+			}
+			else
+			{
+				newMat = mTexStageDesc[stage].frustum->getViewMatrix() * newMat;
+			}
             newMat = mTexStageDesc[stage].frustum->getProjectionMatrix() * newMat;
             newMat = Matrix4::CLIPSPACE2DTOIMAGESPACE * newMat;
             newMat = xForm * newMat;

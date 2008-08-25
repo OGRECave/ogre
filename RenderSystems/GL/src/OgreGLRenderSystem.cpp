@@ -1502,7 +1502,16 @@ namespace Ogre {
 			projectionBias = Matrix4::CLIPSPACE2DTOIMAGESPACE;
 
 			projectionBias = projectionBias * frustum->getProjectionMatrix();
-			projectionBias = projectionBias * frustum->getViewMatrix();
+			if(mTexProjRelative)
+			{
+				Matrix4 viewMatrix;
+				frustum->calcViewMatrixRelative(mTexProjRelativeOrigin, viewMatrix);
+				projectionBias = projectionBias * viewMatrix;
+			}
+			else
+			{
+				projectionBias = projectionBias * frustum->getViewMatrix();
+			}
 			projectionBias = projectionBias * mWorldMatrix;
 
 			makeGLMatrix(mAutoTextureMatrix, projectionBias);

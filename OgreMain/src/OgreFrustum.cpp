@@ -771,6 +771,20 @@ namespace Ogre {
 			mRecalcFrustum = true;
 		}
 	}
+	//---------------------------------------------------------------------
+	void Frustum::calcViewMatrixRelative(const Vector3& relPos, Matrix4& matToUpdate) const
+	{
+		if (!mCustomViewMatrix)
+		{
+			const Quaternion& orientation = getOrientationForViewUpdate();
+			const Vector3& position = getPositionForViewUpdate();
+
+			// Make position relative
+			matToUpdate = Math::makeViewMatrix(position - relPos, 
+				orientation, mReflect? &mReflectMatrix : 0);
+		}
+
+	}
 	//-----------------------------------------------------------------------
     void Frustum::updateView(void) const
     {
