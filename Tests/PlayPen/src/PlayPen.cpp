@@ -6998,11 +6998,10 @@ protected:
 		mSceneMgr->setShadowTextureSettings(1024, 2);
 		addTextureShadowDebugOverlay(2);
 
-		//Vector3 offset(10000000, 0, 10000000);
-		Vector3 offset(0, 0, 0);
+		Vector3 offset(100000, 0, 100000);
+		//Vector3 offset(0, 0, 0);
 
 		mSceneMgr->setAmbientLight(ColourValue(0.1, 0.1, 0.1));
-
 
 		// Directional test
 		mLight = mSceneMgr->createLight("MainLight");
@@ -7058,6 +7057,8 @@ protected:
 
 		mSceneMgr->setCameraRelativeRendering(true);
 
+		FocusedShadowCameraSetup* camSetup = new FocusedShadowCameraSetup();
+		mSceneMgr->setShadowCameraSetup(ShadowCameraSetupPtr(camSetup));
 
 	}
 
@@ -7309,9 +7310,9 @@ protected:
 		//testSRGBtexture(true);
 		//testLightClipPlanesMoreLights(true);
 
-		//testFarFromOrigin();
+		testFarFromOrigin();
 		//testGeometryShaders();
-		testAlphaToCoverage();
+		//testAlphaToCoverage();
 		
     }
     // Create new frame listener
