@@ -51,7 +51,7 @@ namespace Ogre
 	{
 	}
 	//---------------------------------------------------------------------
-	void PSSMShadowCameraSetup::calculateSplitPoints(size_t splitCount, Real near, Real far, Real lambda)
+	void PSSMShadowCameraSetup::calculateSplitPoints(size_t splitCount, Real nearDist, Real farDist, Real lambda)
 	{
 		if (splitCount < 2)
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot specify less than 2 splits", 
@@ -61,16 +61,16 @@ namespace Ogre
 		mOptimalAdjustFactors.resize(splitCount);
 		mSplitCount = splitCount;
 
-		mSplitPoints[0] = near;
+		mSplitPoints[0] = nearDist;
 		for (size_t i = 1; i < mSplitCount; i++)
 		{
 			Real fraction = (Real)i / 3.0;
-			Real splitPoint = lambda * near * Math::Pow(far / near, fraction) +
-				(1.0 - lambda) * (near + fraction * (far - near));
+			Real splitPoint = lambda * nearDist * Math::Pow(farDist / nearDist, fraction) +
+				(1.0 - lambda) * (nearDist + fraction * (farDist - nearDist));
 
 			mSplitPoints[i] = splitPoint;
 		}
-		mSplitPoints[splitCount] = far;
+		mSplitPoints[splitCount] = farDist;
 
 	}
 	//---------------------------------------------------------------------
@@ -103,17 +103,17 @@ namespace Ogre
 		const Ogre::Viewport *vp, const Ogre::Light *light, Ogre::Camera *texCam, size_t iteration) const
 	{
 		// apply the right clip distance.
-		Real near = mSplitPoints[iteration];
-		Real far = mSplitPoints[iteration + 1];
+		Real nearDist = mSplitPoints[iteration];
+		Real farDist = mSplitPoints[iteration + 1];
 
 		// Add a padding factor to internal distances so that the connecting split point will not have bad artifacts.
 		if (iteration > 0)
 		{
-			near -= mSplitPadding;
+			nearDist -= mSplitPadding;
 		}
 		if (iteration < mSplitCount - 1)
 		{
-			far += mSplitPadding;
+			farDist += mSplitPadding;
 		}
 
 		mCurrentIteration = iteration;
@@ -123,8 +123,8 @@ namespace Ogre
 		Camera* _cam = const_cast<Camera*>(cam);
 		Real oldNear = _cam->getNearClipDistance();
 		Real oldFar = _cam->getFarClipDistance();
-		_cam->setNearClipDistance(near);
-		_cam->setFarClipDistance(far);
+		_cam->setNearClipDistance(nearDist);
+		_cam->setFarClipDistance(farDist);
 
 		LiSPSMShadowCameraSetup::getShadowCamera(sm, cam, vp, light, texCam, iteration);
 
