@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): Animation State</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): SceneNode Animation</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Animation State">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Animation State">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): SceneNode Animation">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): SceneNode Animation">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,25 +24,25 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC334"></A>
+<A NAME="SEC344"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_76.html#SEC333"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_81.html#SEC341"> &lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_75.html#SEC332"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_78.html#SEC335"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_83.html#SEC345"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H2> 8.2 Animation State </H2>
-<!--docid::SEC334::-->
+<H2> 8.4 SceneNode Animation </H2>
+<!--docid::SEC344::-->
 
-When an entity containing animation of any type is created, it is given an 'animation state' object per animation to allow you to specify the animation state of that single entity (you can animate multiple entities using the same animation definitions, OGRE sorts the reuse out internally).<BR><BR>
+SceneNode animation is created from the SceneManager in order to animate the movement of SceneNodes, to make any attached objects move around automatically. You can see this performing a camera swoop in Demo_CameraTrack, or controlling how the fish move around in the pond in Demo_Fresnel.<BR><BR>
 
-You can retrieve a pointer to the AnimationState object by calling Entity::getAnimationState. You can then call methods on this returned object to update the animation, probably in the frameStarted event. Each AnimationState needs to be enabled using the setEnabled method before the animation it refers to will take effect, and you can set both the weight and the time position (where appropriate) to affect the application of the animation using correlating methods. AnimationState also has a very simple method 'addTime' which allows you to alter the animation position incrementally, and it will automatically loop for you. addTime can take positive or negative values (so you can reverse the animation if you want).<BR><BR>
+At it's heart, scene node animation is mostly the same code which animates the underlying skeleton in skeletal animation. After creating the main Animation using SceneManager::createAnimation you can create a NodeAnimationTrack per SceneNode that you want to animate, and create keyframes which control its position, orientation and scale which can be interpolated linearly or via splines. You use <A HREF="manual_77.html#SEC334">8.2 Animation State</A> in the same way as you do for skeletal/vertex animation, except you obtain the state from SceneManager instead of from an individual Entity.Animations are applied automatically every frame, or the state can be applied manually in advance using the _applySceneAnimations() method on SceneManager. See the API reference for full details of the interface for configuring scene animations.<BR><BR>
 
-<A NAME="Vertex Animation"></A>
+<A NAME="Numeric Value Animation"></A>
 <HR SIZE=1>
 <BR>
 <FONT SIZE="-1">

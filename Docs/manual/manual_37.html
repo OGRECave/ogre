@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Standard Particle Affectors</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Particle Emitter Attributes</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Standard Particle Affectors">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Standard Particle Affectors">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Particle Emitter Attributes">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Particle Emitter Attributes">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,329 +24,206 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC213"></A>
+<A NAME="SEC198"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_36.html#SEC212"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC165"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_38.html#SEC223"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_36.html#SEC196"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC174"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_38.html#SEC213"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H3> 3.3.6 Standard Particle Affectors </H3>
-<!--docid::SEC213::-->
-Ogre comes preconfigured with a few particle affectors. New ones can be added by creating plugins: see the Plugin_ParticleFX project as an example of how you would do this (this is where these affectors are implemented).
+<H3> 3.3.3 Particle Emitter Attributes </H3>
+<!--docid::SEC198::-->
+This section describes the common attributes of all particle emitters. Specific emitter types may also support their own extra attributes.<BR><BR>
 
-<UL>
-<LI>
-<A HREF="manual_37.html#SEC214">Linear Force Affector</A>
-<LI>
-<A HREF="manual_37.html#SEC215">ColourFader Affector</A>
-<LI>
-<A HREF="manual_37.html#SEC216">ColourFader2 Affector</A>
-<LI>
-<A HREF="manual_37.html#SEC217">Scaler Affector</A>
-<LI>
-<A HREF="manual_37.html#SEC218">Rotator Affector</A>
-<LI>
-<A HREF="manual_37.html#SEC219">ColourInterpolator Affector</A>
-<LI>
-<A HREF="manual_37.html#SEC220">ColourImage Affector</A>
-<LI>
-<A HREF="manual_37.html#SEC221">DeflectorPlane Affector</A>
-<LI>
-<A HREF="manual_37.html#SEC222">DirectionRandomiser Affector</A>
-</UL>
+<A NAME="angle"></A>
+<A NAME="SEC199"></A>
+<H3> angle </H3>
+<!--docid::SEC199::-->
 
-<A NAME="Linear Force Affector"></A>
-<A NAME="SEC214"></A>
-<H3> Linear Force Affector </H3>
-<!--docid::SEC214::-->
+Sets the maximum angle (in degrees) which emitted particles may deviate from the direction of the emitter (see direction). Setting this to 10 allows particles to deviate up to 10 degrees in any direction away from the emitter's direction. A value of 180 means emit in any direction, whilst 0 means emit always exactly in the direction of the emitter.<BR><BR>
 
-This affector applies a force vector to all particles to modify their trajectory. Can be used for gravity, wind, or any other linear force. It's extra attributes are:<BR><BR>
-<DL COMPACT>
-<DT>force_vector
-<DD>Sets the vector for the force to be applied to every particle. The magnitude of this vector determines how strong the force is.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: force_vector &lt;x&gt; &lt;y&gt; &lt;z&gt;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;example: force_vector 50 0 -50<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;default: 0 -100 0 (a fair gravity effect)<BR>
-<DT>force_application
-<DD>
-Sets the way in which the force vector is applied to particle momentum.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: force_application &lt;add|average&gt;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;example: force_application average<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;default: add<BR>
-The options are:
-<DL COMPACT>
-<DT>average
-<DD>	The resulting momentum is the average of the force vector and the particle's current motion. Is self-stabilising but the speed at which the particle changes direction is non-linear.
-<DT>add
-<DD>	The resulting momentum is the particle's current motion plus the force vector. This is traditional force acceleration but can potentially result in unlimited velocity.
-</DL>
-</DL>
+format: angle &lt;degrees&gt;<BR>
+example: angle 30<BR>
+default: 0<BR>
+
+<A NAME="colour"></A>
+<A NAME="SEC200"></A>
+<H3> colour </H3>
+<!--docid::SEC200::-->
+
+Sets a static colour for all particle emitted. Also see the colour_range_start and colour_range_end attributes for setting a range of colours. The format of the colour parameter is &quot;r g b a&quot;, where each component is a value from 0 to 1, and the alpha value is optional (assumes 1 if not specified).<BR><BR>
+
+format: colour &lt;r&gt; &lt;g&gt; &lt;b&gt; [&lt;a&gt;]<BR>
+example: colour 1 0 0 1<BR>
+default: 1 1 1 1<BR>
+
+<A NAME="colour_range_start"></A>
+<A NAME="colour_range_end"></A>
+<A NAME="SEC201"></A>
+<H3> colour_range_start &amp; colour_range_end </H3>
+<!--docid::SEC201::-->
+
+As the 'colour' attribute, except these 2 attributes must be specified together, and indicate the range of colours available to emitted particles. The actual colour will be randomly chosen between these 2 values.<BR><BR>
+
+format: as colour<BR>
+example (generates random colours between red and blue):<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;colour_range_start 1 0 0<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;colour_range_end 0 0 1<BR>
+default: both 1 1 1 1<BR>
+
+<A NAME="direction"></A>
+<A NAME="SEC202"></A>
+<H3> direction </H3>
+<!--docid::SEC202::-->
+
+Sets the direction of the emitter. This is relative to the SceneNode which the particle system is attached to, meaning that as with other movable objects changing the orientation of the node will also move the emitter.<BR><BR>
+
+format: direction &lt;x&gt; &lt;y&gt; &lt;z&gt;<BR>
+example: direction 0 1 0<BR>
+default: 1 0 0<BR>
+
+<A NAME="emission_rate"></A>
+<A NAME="SEC203"></A>
+<H3> emission_rate </H3>
+<!--docid::SEC203::-->
+
+Sets how many particles per second should be emitted. The specific emitter does not have to emit these in a continuous burst - this is a relative parameter
+and the emitter may choose to emit all of the second's worth of particles every half-second for example, the behaviour depends on the emitter. The emission rate will also be limited by the particle system's 'quota' setting.<BR><BR>
+
+format: emission_rate &lt;particles_per_second&gt;<BR>
+example: emission_rate 50<BR>
+default: 10<BR>
+
+<A NAME="position"></A>
+<A NAME="SEC204"></A>
+<H3> position </H3>
+<!--docid::SEC204::-->
+
+Sets the position of the emitter relative to the SceneNode the particle system is attached to.<BR><BR>
+
+format: position &lt;x&gt; &lt;y&gt; &lt;z&gt;<BR>
+example: position 10 0 40<BR>
+default: 0 0 0<BR>
+
+<A NAME="velocity"></A>
+<A NAME="SEC205"></A>
+<H3> velocity </H3>
+<!--docid::SEC205::-->
+
+Sets a constant velocity for all particles at emission time. See also the velocity_min and velocity_max attributes which allow you to set a range of velocities instead of a fixed one.<BR><BR>
+
+format: velocity &lt;world_units_per_second&gt;<BR>
+example: velocity 100<BR>
+default: 1<BR>
+
+<A NAME="velocity_min"></A>
+<A NAME="velocity_max"></A>
+<A NAME="SEC206"></A>
+<H3> velocity_min &amp; velocity_max </H3>
+<!--docid::SEC206::-->
+
+As 'velocity' except these attributes set a velocity range and each particle is emitted with a random velocity within this range.<BR><BR>
+
+format: as velocity<BR>
+example:<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;velocity_min 50<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;velocity_max 100<BR>
+default: both 1<BR>
+
+<A NAME="time_to_live"></A>
+<A NAME="SEC207"></A>
+<H3> time_to_live </H3>
+<!--docid::SEC207::-->
+
+Sets the number of seconds each particle will 'live' for before being destroyed. NB it is possible for particle affectors to alter this in flight, but this is the value given to particles on emission. See also the time_to_live_min and time_to_live_max attributes which let you set a lifetime range instead of a fixed one.<BR><BR>
+
+format: time_to_live &lt;seconds&gt;<BR>
+example: time_to_live 10<BR>
+default: 5<BR>
+
+<A NAME="time_to_live_min"></A>
+<A NAME="time_to_live_max"></A>
+<A NAME="SEC208"></A>
+<H3> time_to_live_min &amp; time_to_live_max </H3>
+<!--docid::SEC208::-->
+As time_to_live, except this sets a range of lifetimes and each particle gets a random value inbetween on emission.<BR><BR>
+
+format: as time_to_live<BR>
+example:<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;time_to_live_min 2<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;time_to_live_max 5<BR>
+default: both 5<BR>
 <BR>
-To create a linear force affector, include a section like this within your particle system script:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector LinearForce
-{
-    // Settings go here
-}
-</pre></td></tr></table>Please note that the name of the affector type ('LinearForce') is case-sensitive.
 
-<A NAME="ColourFader Affector"></A>
-<A NAME="SEC215"></A>
-<H3> ColourFader Affector </H3>
-<!--docid::SEC215::-->
+<A NAME="duration"></A>
+<A NAME="SEC209"></A>
+<H3> duration </H3>
+<!--docid::SEC209::-->
 
-This affector modifies the colour of particles in flight. It's extra attributes are:
-<DL COMPACT>
-<DT>red
-<DD>Sets the adjustment to be made to the red component of the particle colour per second.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: red &lt;delta_value&gt;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;example: red -0.1<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
-<DT>green
-<DD>Sets the adjustment to be made to the green component of the particle colour per second.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: green &lt;delta_value&gt;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;example: green -0.1<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
-<DT>blue
-<DD>Sets the adjustment to be made to the blue component of the particle colour per second.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: blue &lt;delta_value&gt;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;example: blue -0.1<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
-<DT>alpha
-<DD>Sets the adjustment to be made to the alpha component of the particle colour per second.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: alpha &lt;delta_value&gt;<BR>
-example: alpha -0.1<BR>
+Sets the number of seconds the emitter is active. The emitter can be started again, see <A HREF="manual_37.html#SEC211">repeat_delay</A>. A value of 0 means infinite duration. See also the duration_min and duration_max attributes which let you set a duration range instead of a fixed one.<BR><BR>
+
+format: duration &lt;seconds&gt;<BR>
+example:<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;duration 2.5<BR>
 default: 0<BR>
-</DL>
-To create a colour fader affector, include a section like this within your particle system script:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector ColourFader
-{
-    // Settings go here
-}
-</pre></td></tr></table>
-<A NAME="ColourFader2 Affector"></A>
-<A NAME="SEC216"></A>
-<H3> ColourFader2 Affector </H3>
-<!--docid::SEC216::-->
+<BR>
 
-This affector is similar to the <A HREF="manual_37.html#SEC215">ColourFader Affector</A>, except it introduces two states of colour changes as opposed to just one. The second colour change state is activated once a specified amount of time remains in the particles life.
-<DL COMPACT>
-<DT>red1
-<DD>Sets the adjustment to be made to the red component of the particle colour per second for the first state.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: red &lt;delta_value&gt;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;example: red -0.1<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
-<DT>green1
-<DD>Sets the adjustment to be made to the green component of the particle colour per second for the first state.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: green &lt;delta_value&gt;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;example: green -0.1<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
-<DT>blue1
-<DD>Sets the adjustment to be made to the blue component of the particle colour per second for the first state.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: blue &lt;delta_value&gt;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;example: blue -0.1<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
-<DT>alpha1
-<DD>Sets the adjustment to be made to the alpha component of the particle colour per second for the first state.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: alpha &lt;delta_value&gt;<BR>
-example: alpha -0.1<BR>
+<A NAME="duration_min"></A>
+<A NAME="duration_max"></A>
+<A NAME="SEC210"></A>
+<H3> duration_min &amp; duration_max </H3>
+<!--docid::SEC210::-->
+
+As duration, except these attributes set a variable time range between the min and max values each time the emitter is started.<BR><BR>
+
+format: as duration<BR>
+example:<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;duration_min 2<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;duration_max 5<BR>
+default: both 0<BR>
+<BR>
+
+<A NAME="repeat_delay"></A>
+<A NAME="SEC211"></A>
+<H3> repeat_delay </H3>
+<!--docid::SEC211::-->
+
+Sets the number of seconds to wait before the emission is repeated when stopped by a limited <A HREF="manual_37.html#SEC209">duration</A>. See also the repeat_delay_min and repeat_delay_max attributes which allow you to set a range of repeat_delays instead of a fixed one.<BR><BR>
+
+format: repeat_delay &lt;seconds&gt;<BR>
+example:<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;repeat_delay 2.5<BR>
 default: 0<BR>
-<DT>red2
-<DD>Sets the adjustment to be made to the red component of the particle colour per second for the second state.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: red &lt;delta_value&gt;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;example: red -0.1<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
-<DT>green2
-<DD>Sets the adjustment to be made to the green component of the particle colour per second for the second state.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: green &lt;delta_value&gt;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;example: green -0.1<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
-<DT>blue2
-<DD>Sets the adjustment to be made to the blue component of the particle colour per second for the second state.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: blue &lt;delta_value&gt;<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;example: blue -0.1<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
-<DT>alpha2
-<DD>Sets the adjustment to be made to the alpha component of the particle colour per second for the second state.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: alpha &lt;delta_value&gt;<BR>
-example: alpha -0.1<BR>
-default: 0<BR>
-<DT>state_change
-<DD>When a particle has this much time left to live, it will switch to state 2.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: state_change &lt;seconds&gt;<BR>
-example: state_change 2<BR>
-default: 1<BR>
-</DL>
-To create a ColourFader2 affector, include a section like this within your particle system script:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector ColourFader2
-{
-    // Settings go here
-}
-</pre></td></tr></table>
-<A NAME="Scaler Affector"></A>
-<A NAME="SEC217"></A>
-<H3> Scaler Affector </H3>
-<!--docid::SEC217::-->
+<BR>
 
-This affector scales particles in flight. It's extra attributes are:
-<DL COMPACT>
-<DT>rate
-<DD>The amount by which to scale the particles in both the x and y direction per second.
-</DL>
-To create a scale affector, include a section like this within your particle system script:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector Scaler
-{
-    // Settings go here
-}
-</pre></td></tr></table>
-<A NAME="Rotator Affector"></A>
-<A NAME="SEC218"></A>
-<H3> Rotator Affector </H3>
-<!--docid::SEC218::-->
+<A NAME="repeat_delay_min"></A>
+<A NAME="repeat_delay_max"></A>
+<A NAME="SEC212"></A>
+<H3> repeat_delay_min &amp; repeat_delay_max </H3>
+<!--docid::SEC212::-->
 
-This affector rotates particles in flight. This is done by rotating the texture. It's extra attributes are:
-<DL COMPACT>
-<DT>rotation_speed_range_start
-<DD>The start of a range of rotation speeds to be assigned to emitted particles.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: rotation_speed_range_start &lt;degrees_per_second&gt;<BR>
-example: rotation_speed_range_start 90<BR>
-default: 0<BR>
-<DT>rotation_speed_range_end
-<DD>The end of a range of rotation speeds to be assigned to emitted particles.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: rotation_speed_range_end &lt;degrees_per_second&gt;<BR>
-example: rotation_speed_range_end 180<BR>
-default: 0<BR>
-<DT>rotation_range_start
-<DD>The start of a range of rotation angles to be assigned to emitted particles.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: rotation_range_start &lt;degrees&gt;<BR>
-example: rotation_range_start 0<BR>
-default: 0<BR>
-<DT>rotation_range_end
-<DD>The end of a range of rotation angles to be assigned to emitted particles.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: rotation_range_end &lt;degrees&gt;<BR>
-example: rotation_range_end 360<BR>
-default: 0<BR>
-</DL>
-To create a rotate affector, include a section like this within your particle system script:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector Rotator
-{
-    // Settings go here
-}
-</pre></td></tr></table>
-<A NAME="ColourInterpolator Affector"></A>
-<A NAME="SEC219"></A>
-<H3> ColourInterpolator Affector </H3>
-<!--docid::SEC219::-->
+As repeat_delay, except this sets a range of repeat delays and each time the emitter is started it gets a random value inbetween.<BR><BR>
 
-Similar to the ColourFader and ColourFader2 Affector?s, this affector modifies the colour of particles in flight, except it has a variable number of defined stages. It swaps the particle colour for several stages in the life of a particle and interpolates between them. It's extra attributes are:
-<DL COMPACT>
-<DT>time0
-<DD>The point in time of stage 0.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: time0 &lt;0-1 based on lifetime&gt;<BR>
-example: time0 0<BR>
-default: 1<BR>
-<DT>colour0
-<DD>The colour at stage 0.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: colour0 &lt;r&gt; &lt;g&gt; &lt;b&gt; [&lt;a&gt;]<BR>
-example: colour0 1 0 0 1<BR>
-default: 0.5 0.5 0.5 0.0<BR>
-<DT>time1
-<DD>The point in time of stage 1.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: time1 &lt;0-1 based on lifetime&gt;<BR>
-example: time1 0.5<BR>
-default: 1<BR>
-<DT>colour1
-<DD>The colour at stage 1.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: colour1 &lt;r&gt; &lt;g&gt; &lt;b&gt; [&lt;a&gt;]<BR>
-example: colour1 0 1 0 1<BR>
-default: 0.5 0.5 0.5 0.0<BR>
-<DT>time2
-<DD>The point in time of stage 2.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: time2 &lt;0-1 based on lifetime&gt;<BR>
-example: time2 1<BR>
-default: 1<BR>
-<DT>colour2
-<DD>The colour at stage 2.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: colour2 &lt;r&gt; &lt;g&gt; &lt;b&gt; [&lt;a&gt;]<BR>
-example: colour2 0 0 1 1<BR>
-default: 0.5 0.5 0.5 0.0<BR>
-<DT>[...]
-<DD></DL>
-The number of stages is variable. The maximal number of stages is 6; where time5 and colour5 are the last possible parameters.
-To create a colour interpolation affector, include a section like this within your particle system script:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector ColourInterpolator
-{
-    // Settings go here
-}
-</pre></td></tr></table>
-<A NAME="ColourImage Affector"></A>
-<A NAME="SEC220"></A>
-<H3> ColourImage Affector </H3>
-<!--docid::SEC220::-->
+format: as repeat_delay<BR>
+example:<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;repeat_delay 2<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;repeat_delay 5<BR>
+default: both 0<BR>
+<BR>
 
-This is another affector that modifies the colour of particles in flight, but instead of programmatically defining colours, the colours are taken from a specified image file. The range of colour values begins from the left side of the image and move to the right over the lifetime of the particle, therefore only the horizontal dimension of the image is used. Its extra attributes are:
-<DL COMPACT>
-<DT>image
-<DD>The start of a range of rotation speed to be assigned to emitted particles.<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;format: image &lt;image_name&gt;<BR>
-example: image rainbow.png<BR>
-default: none<BR>
-</DL>
-To create a ColourImage affector, include a section like this within your particle system script:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector ColourImage
-{
-    // Settings go here
-}
-</pre></td></tr></table>
-
-<A NAME="DeflectorPlane Affector"></A>
-<A NAME="SEC221"></A>
-<H3> DeflectorPlane Affector </H3>
-<!--docid::SEC221::-->
-This affector defines a plane which deflects particles which collide with it. The attributes are:
-<DL COMPACT>
-<DT>plane_point
-<DD>A point on the deflector plane. Together with the normal vector it defines the plane.<BR>
-default: plane_point 0 0 0<BR>
-<DT>plane_normal
-<DD>The normal vector of the deflector plane. Together with the point it defines the plane.<BR>
-default: plane_normal 0 1 0<BR>
-<DT>bounce
-<DD>The amount of bouncing when a particle is deflected. 0 means no deflection and 1 stands for 100 percent reflection.<BR>
-default: bounce 1.0
-</DL>
+See also: <A HREF="manual_38.html#SEC213">3.3.4 Standard Particle Emitters</A>, <A HREF="manual_34.html#SEC174">3.3 Particle Scripts</A>, <A HREF="manual_39.html#SEC221">3.3.5 Particle Affectors</A>
 
 
-<A NAME="DirectionRandomiser Affector"></A>
-<A NAME="SEC222"></A>
-<H3> DirectionRandomiser Affector </H3>
-<!--docid::SEC222::-->
-This affector applies randomness to the movement of the particles. Its extra attributes are:
-<DL COMPACT>
-<DT>randomness
-<DD>The amount of randomness to introduce in each axial direction.<BR>
-example: randomness 5<BR>
-default: randomness 1<BR>
-<DT>scope
-<DD>The percentage of particles affected in each run of the affector.<BR>
-example: scope 0.5<BR>
-default: scope 1.0<BR>
-<DT>keep_velocity
-<DD>Determines whether the velocity of particles is unchanged.<BR>
-example: keep_velocity true<BR>
-default: keep_velocity false<BR>
-</DL>
-
-<A NAME="Overlay Scripts"></A>
+<A NAME="Standard Particle Emitters"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_36.html#SEC212"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC165"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_38.html#SEC223"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_36.html#SEC196"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC174"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_38.html#SEC213"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -355,7 +232,7 @@ default: keep_velocity false<BR>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

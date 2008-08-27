@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Texture Types</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Hardware Pixel Buffers</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Texture Types">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Texture Types">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Hardware Pixel Buffers">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Hardware Pixel Buffers">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,10 +24,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC279"></A>
+<A NAME="SEC280"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_62.html#SEC276"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_60.html#SEC271"> Up </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_62.html#SEC279"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC261"> Up </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_64.html#SEC281"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
@@ -35,52 +35,20 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H3> 5.8.3 Texture Types </H3>
-<!--docid::SEC279::-->
-
-There are four types of textures supported by current hardware, three of them only differ in the amount of dimensions
-they have (one, two or three). The fourth one is special. The different texture types are:
-
-<DL COMPACT>
-
-<DT>TEX_TYPE_1D
-<DD>One dimensional texture, used in combination with 1D texture coordinates.
-<DT>TEX_TYPE_2D
-<DD>Two dimensional texture, used in combination with 2D texture coordinates.
-<DT>TEX_TYPE_3D
-<DD>Three dimensional volume texture, used in combination with 3D texture coordinates.
-<DT>TEX_TYPE_CUBE_MAP
-<DD>Cube map (six two dimensional textures, one for each cube face), used in combination with 3D texture coordinates.
-
-</DL>
-
-<A NAME="SEC280"></A>
-<H3> Cube map textures </H3>
+<H2> 5.8 Hardware Pixel Buffers </H2>
 <!--docid::SEC280::-->
 
-The cube map texture type (TEX_TYPE_CUBE_MAP) is a different beast from the others; a cube map texture represents a series of six two dimensional images addressed by 3D texture coordinates.
-    
-<DL COMPACT>
-<DT>+X (face 0)
-<DD>Represents the positive x plane (right).
-<DT>-X (face 1)
-<DD>Represents the negative x plane (left).
-<DT>+Y (face 2)
-<DD>Represents the positive y plane (top).
-<DT>-Y (face 3)
-<DD>Represents the negative y plane (bottom).
-<DT>+Z (face 4)
-<DD>Represents the positive z plane (front).
-<DT>-Z (face 5)
-<DD>Represents the negative z plane (back).
-</DL>
+Hardware Pixel Buffers are a special kind of buffer that stores graphical data in graphics card memory, generally
+for use as textures. Pixel buffers can represent a one dimensional, two dimensional or three dimensional image. A texture can consist of a multiple of these buffers.
 
-<A NAME="Pixel Formats"></A>
+In contrary to vertex and index buffers, pixel buffers are not constructed directly. When creating a texture, the necessary pixel buffers to hold its data are constructed automatically.
+
+<A NAME="Textures"></A>
 <HR SIZE=1>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

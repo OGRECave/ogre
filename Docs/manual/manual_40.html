@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Standard OverlayElements</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Standard Particle Affectors</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Standard OverlayElements">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Standard OverlayElements">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Standard Particle Affectors">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Standard Particle Affectors">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,96 +24,329 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC240"></A>
+<A NAME="SEC222"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_39.html#SEC229"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_38.html#SEC223"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC244"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_39.html#SEC221"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC174"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC232"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H3> 3.4.2 Standard OverlayElements </H3>
-<!--docid::SEC240::-->
+<H3> 3.3.6 Standard Particle Affectors </H3>
+<!--docid::SEC222::-->
+Ogre comes preconfigured with a few particle affectors. New ones can be added by creating plugins: see the Plugin_ParticleFX project as an example of how you would do this (this is where these affectors are implemented).
 
-Although OGRE's OverlayElement and OverlayContainer classes are designed to be extended by applications developers, there are a few elements which come as standard with Ogre. These include:
 <UL>
 <LI>
- <A HREF="manual_40.html#Panel">Panel</A>
+<A HREF="manual_40.html#SEC223">Linear Force Affector</A>
 <LI>
- <A HREF="manual_40.html#BorderPanel">BorderPanel</A>
+<A HREF="manual_40.html#SEC224">ColourFader Affector</A>
 <LI>
- <A HREF="manual_40.html#TextArea">TextArea</A>
+<A HREF="manual_40.html#SEC225">ColourFader2 Affector</A>
+<LI>
+<A HREF="manual_40.html#SEC226">Scaler Affector</A>
+<LI>
+<A HREF="manual_40.html#SEC227">Rotator Affector</A>
+<LI>
+<A HREF="manual_40.html#SEC228">ColourInterpolator Affector</A>
+<LI>
+<A HREF="manual_40.html#SEC229">ColourImage Affector</A>
+<LI>
+<A HREF="manual_40.html#SEC230">DeflectorPlane Affector</A>
+<LI>
+<A HREF="manual_40.html#SEC231">DirectionRandomiser Affector</A>
 </UL>
+
+<A NAME="Linear Force Affector"></A>
+<A NAME="SEC223"></A>
+<H3> Linear Force Affector </H3>
+<!--docid::SEC223::-->
+
+This affector applies a force vector to all particles to modify their trajectory. Can be used for gravity, wind, or any other linear force. It's extra attributes are:<BR><BR>
+<DL COMPACT>
+<DT>force_vector
+<DD>Sets the vector for the force to be applied to every particle. The magnitude of this vector determines how strong the force is.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: force_vector &lt;x&gt; &lt;y&gt; &lt;z&gt;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;example: force_vector 50 0 -50<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;default: 0 -100 0 (a fair gravity effect)<BR>
+<DT>force_application
+<DD>
+Sets the way in which the force vector is applied to particle momentum.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: force_application &lt;add|average&gt;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;example: force_application average<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;default: add<BR>
+The options are:
+<DL COMPACT>
+<DT>average
+<DD>	The resulting momentum is the average of the force vector and the particle's current motion. Is self-stabilising but the speed at which the particle changes direction is non-linear.
+<DT>add
+<DD>	The resulting momentum is the particle's current motion plus the force vector. This is traditional force acceleration but can potentially result in unlimited velocity.
+</DL>
+</DL>
 <BR>
-This section describes how you define their custom attributes in an .overlay script, but you can also change these custom properties in code if you wish. You do this by calling setParameter(paramname, value). You may wish to use the StringConverter class to convert your types to and from strings.
+To create a linear force affector, include a section like this within your particle system script:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector LinearForce
+{
+    // Settings go here
+}
+</pre></td></tr></table>Please note that the name of the affector type ('LinearForce') is case-sensitive.
 
-<A NAME="Panel"></A>
-<A NAME="SEC241"></A>
-<H3> Panel (container) </H3>
-<!--docid::SEC241::-->
+<A NAME="ColourFader Affector"></A>
+<A NAME="SEC224"></A>
+<H3> ColourFader Affector </H3>
+<!--docid::SEC224::-->
 
-This is the most bog-standard container you can use. It is a rectangular area which can contain other elements (or containers) and may or may not have a background, which can be tiled however you like. The background material is determined by the material attribute, but is only displayed if transparency is off.<BR><BR>
-
-Attributes:
+This affector modifies the colour of particles in flight. It's extra attributes are:
 <DL COMPACT>
-<DT>transparent &lt;true | false&gt;
-<DD>If set to 'true' the panel is transparent and is not rendered itself, it is just used as a grouping level for it's children.
-<DT>tiling &lt;layer&gt; &lt;x_tile&gt; &lt;y_tile&gt;
-<DD>Sets the number of times the texture(s) of the material are tiled across the panel in the x and y direction. &lt;layer&gt; is the texture layer, from 0 to the number of texture layers in the material minus one. By setting tiling per layer you can create some nice multitextured backdrops for your panels, this works especially well when you animate one of the layers.
-<DT>uv_coords &lt;topleft_u&gt; &lt;topleft_v&gt; &lt;bottomright_u&gt; &lt;bottomright_v&gt;
-<DD>Sets the texture coordinates to use for this panel.
+<DT>red
+<DD>Sets the adjustment to be made to the red component of the particle colour per second.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: red &lt;delta_value&gt;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;example: red -0.1<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
+<DT>green
+<DD>Sets the adjustment to be made to the green component of the particle colour per second.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: green &lt;delta_value&gt;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;example: green -0.1<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
+<DT>blue
+<DD>Sets the adjustment to be made to the blue component of the particle colour per second.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: blue &lt;delta_value&gt;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;example: blue -0.1<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
+<DT>alpha
+<DD>Sets the adjustment to be made to the alpha component of the particle colour per second.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: alpha &lt;delta_value&gt;<BR>
+example: alpha -0.1<BR>
+default: 0<BR>
+</DL>
+To create a colour fader affector, include a section like this within your particle system script:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector ColourFader
+{
+    // Settings go here
+}
+</pre></td></tr></table>
+<A NAME="ColourFader2 Affector"></A>
+<A NAME="SEC225"></A>
+<H3> ColourFader2 Affector </H3>
+<!--docid::SEC225::-->
+
+This affector is similar to the <A HREF="manual_40.html#SEC224">ColourFader Affector</A>, except it introduces two states of colour changes as opposed to just one. The second colour change state is activated once a specified amount of time remains in the particles life.
+<DL COMPACT>
+<DT>red1
+<DD>Sets the adjustment to be made to the red component of the particle colour per second for the first state.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: red &lt;delta_value&gt;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;example: red -0.1<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
+<DT>green1
+<DD>Sets the adjustment to be made to the green component of the particle colour per second for the first state.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: green &lt;delta_value&gt;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;example: green -0.1<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
+<DT>blue1
+<DD>Sets the adjustment to be made to the blue component of the particle colour per second for the first state.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: blue &lt;delta_value&gt;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;example: blue -0.1<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
+<DT>alpha1
+<DD>Sets the adjustment to be made to the alpha component of the particle colour per second for the first state.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: alpha &lt;delta_value&gt;<BR>
+example: alpha -0.1<BR>
+default: 0<BR>
+<DT>red2
+<DD>Sets the adjustment to be made to the red component of the particle colour per second for the second state.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: red &lt;delta_value&gt;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;example: red -0.1<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
+<DT>green2
+<DD>Sets the adjustment to be made to the green component of the particle colour per second for the second state.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: green &lt;delta_value&gt;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;example: green -0.1<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
+<DT>blue2
+<DD>Sets the adjustment to be made to the blue component of the particle colour per second for the second state.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: blue &lt;delta_value&gt;<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;example: blue -0.1<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;default: 0<BR>
+<DT>alpha2
+<DD>Sets the adjustment to be made to the alpha component of the particle colour per second for the second state.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: alpha &lt;delta_value&gt;<BR>
+example: alpha -0.1<BR>
+default: 0<BR>
+<DT>state_change
+<DD>When a particle has this much time left to live, it will switch to state 2.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: state_change &lt;seconds&gt;<BR>
+example: state_change 2<BR>
+default: 1<BR>
+</DL>
+To create a ColourFader2 affector, include a section like this within your particle system script:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector ColourFader2
+{
+    // Settings go here
+}
+</pre></td></tr></table>
+<A NAME="Scaler Affector"></A>
+<A NAME="SEC226"></A>
+<H3> Scaler Affector </H3>
+<!--docid::SEC226::-->
+
+This affector scales particles in flight. It's extra attributes are:
+<DL COMPACT>
+<DT>rate
+<DD>The amount by which to scale the particles in both the x and y direction per second.
+</DL>
+To create a scale affector, include a section like this within your particle system script:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector Scaler
+{
+    // Settings go here
+}
+</pre></td></tr></table>
+<A NAME="Rotator Affector"></A>
+<A NAME="SEC227"></A>
+<H3> Rotator Affector </H3>
+<!--docid::SEC227::-->
+
+This affector rotates particles in flight. This is done by rotating the texture. It's extra attributes are:
+<DL COMPACT>
+<DT>rotation_speed_range_start
+<DD>The start of a range of rotation speeds to be assigned to emitted particles.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: rotation_speed_range_start &lt;degrees_per_second&gt;<BR>
+example: rotation_speed_range_start 90<BR>
+default: 0<BR>
+<DT>rotation_speed_range_end
+<DD>The end of a range of rotation speeds to be assigned to emitted particles.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: rotation_speed_range_end &lt;degrees_per_second&gt;<BR>
+example: rotation_speed_range_end 180<BR>
+default: 0<BR>
+<DT>rotation_range_start
+<DD>The start of a range of rotation angles to be assigned to emitted particles.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: rotation_range_start &lt;degrees&gt;<BR>
+example: rotation_range_start 0<BR>
+default: 0<BR>
+<DT>rotation_range_end
+<DD>The end of a range of rotation angles to be assigned to emitted particles.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: rotation_range_end &lt;degrees&gt;<BR>
+example: rotation_range_end 360<BR>
+default: 0<BR>
+</DL>
+To create a rotate affector, include a section like this within your particle system script:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector Rotator
+{
+    // Settings go here
+}
+</pre></td></tr></table>
+<A NAME="ColourInterpolator Affector"></A>
+<A NAME="SEC228"></A>
+<H3> ColourInterpolator Affector </H3>
+<!--docid::SEC228::-->
+
+Similar to the ColourFader and ColourFader2 Affector?s, this affector modifies the colour of particles in flight, except it has a variable number of defined stages. It swaps the particle colour for several stages in the life of a particle and interpolates between them. It's extra attributes are:
+<DL COMPACT>
+<DT>time0
+<DD>The point in time of stage 0.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: time0 &lt;0-1 based on lifetime&gt;<BR>
+example: time0 0<BR>
+default: 1<BR>
+<DT>colour0
+<DD>The colour at stage 0.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: colour0 &lt;r&gt; &lt;g&gt; &lt;b&gt; [&lt;a&gt;]<BR>
+example: colour0 1 0 0 1<BR>
+default: 0.5 0.5 0.5 0.0<BR>
+<DT>time1
+<DD>The point in time of stage 1.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: time1 &lt;0-1 based on lifetime&gt;<BR>
+example: time1 0.5<BR>
+default: 1<BR>
+<DT>colour1
+<DD>The colour at stage 1.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: colour1 &lt;r&gt; &lt;g&gt; &lt;b&gt; [&lt;a&gt;]<BR>
+example: colour1 0 1 0 1<BR>
+default: 0.5 0.5 0.5 0.0<BR>
+<DT>time2
+<DD>The point in time of stage 2.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: time2 &lt;0-1 based on lifetime&gt;<BR>
+example: time2 1<BR>
+default: 1<BR>
+<DT>colour2
+<DD>The colour at stage 2.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: colour2 &lt;r&gt; &lt;g&gt; &lt;b&gt; [&lt;a&gt;]<BR>
+example: colour2 0 0 1 1<BR>
+default: 0.5 0.5 0.5 0.0<BR>
+<DT>[...]
+<DD></DL>
+The number of stages is variable. The maximal number of stages is 6; where time5 and colour5 are the last possible parameters.
+To create a colour interpolation affector, include a section like this within your particle system script:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector ColourInterpolator
+{
+    // Settings go here
+}
+</pre></td></tr></table>
+<A NAME="ColourImage Affector"></A>
+<A NAME="SEC229"></A>
+<H3> ColourImage Affector </H3>
+<!--docid::SEC229::-->
+
+This is another affector that modifies the colour of particles in flight, but instead of programmatically defining colours, the colours are taken from a specified image file. The range of colour values begins from the left side of the image and move to the right over the lifetime of the particle, therefore only the horizontal dimension of the image is used. Its extra attributes are:
+<DL COMPACT>
+<DT>image
+<DD>The start of a range of rotation speed to be assigned to emitted particles.<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;format: image &lt;image_name&gt;<BR>
+example: image rainbow.png<BR>
+default: none<BR>
+</DL>
+To create a ColourImage affector, include a section like this within your particle system script:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>affector ColourImage
+{
+    // Settings go here
+}
+</pre></td></tr></table>
+
+<A NAME="DeflectorPlane Affector"></A>
+<A NAME="SEC230"></A>
+<H3> DeflectorPlane Affector </H3>
+<!--docid::SEC230::-->
+This affector defines a plane which deflects particles which collide with it. The attributes are:
+<DL COMPACT>
+<DT>plane_point
+<DD>A point on the deflector plane. Together with the normal vector it defines the plane.<BR>
+default: plane_point 0 0 0<BR>
+<DT>plane_normal
+<DD>The normal vector of the deflector plane. Together with the point it defines the plane.<BR>
+default: plane_normal 0 1 0<BR>
+<DT>bounce
+<DD>The amount of bouncing when a particle is deflected. 0 means no deflection and 1 stands for 100 percent reflection.<BR>
+default: bounce 1.0
 </DL>
 
-<A NAME="BorderPanel"></A>
-<A NAME="SEC242"></A>
-<H3> BorderPanel (container) </H3>
-<!--docid::SEC242::-->
 
-This is a slightly more advanced version of Panel, where instead of just a single flat panel, the panel has a separate border which resizes with the panel. It does this by taking an approach very similar to the use of HTML tables for bordered content: the panel is rendered as 9 square areas, with the center area being rendered with the main material (as with Panel) and the outer 8 areas (the 4 corners and the 4 edges) rendered with a separate border material. The advantage of rendering the corners separately from the edges is that the edge textures can be designed so that they can be stretched without distorting them, meaning the single texture can serve any size panel.<BR><BR>
-
-Attributes:
+<A NAME="DirectionRandomiser Affector"></A>
+<A NAME="SEC231"></A>
+<H3> DirectionRandomiser Affector </H3>
+<!--docid::SEC231::-->
+This affector applies randomness to the movement of the particles. Its extra attributes are:
 <DL COMPACT>
-<DT>border_size &lt;left&gt; &lt;right&gt; &lt;top&gt; &lt;bottom&gt;
-<DD>The size of the border at each edge, as a proportion of the size of the screen. This lets you have different size borders at each edge if you like, or you can use the same value 4 times to create a constant size border.
-<DT>border_material &lt;name&gt;
-<DD>The name of the material to use for the border. This is normally a different material to the one used for the center area, because the center area is often tiled which means you can't put border areas in there. You must put all the images you need for all the corners and the sides into a single texture.
-<DT>border_topleft_uv &lt;u1&gt; &lt;v1&gt; &lt;u2&gt; &lt;v2&gt;
-<DD>[also border_topright_uv, border_bottomleft_uv, border_bottomright_uv]; 
-The texture coordinates to be used for the corner areas of the border. 4 coordinates are required, 2 for the top-left corner of the square, 2 for the bottom-right of the square. 
-<DT>border_left_uv &lt;u1&gt; &lt;v1&gt; &lt;u2&gt; &lt;v2&gt;
-<DD>[also border_right_uv, border_top_uv, border_bottom_uv];
-The texture coordinates to be used for the edge areas of the border. 4 coordinates are required, 2 for the top-left corner, 2 for the bottom-right. Note that you should design the texture so that the left &amp; right edges can be stretched / squashed vertically and the top and bottom edges can be stretched / squashed horizontally without detrimental effects.
+<DT>randomness
+<DD>The amount of randomness to introduce in each axial direction.<BR>
+example: randomness 5<BR>
+default: randomness 1<BR>
+<DT>scope
+<DD>The percentage of particles affected in each run of the affector.<BR>
+example: scope 0.5<BR>
+default: scope 1.0<BR>
+<DT>keep_velocity
+<DD>Determines whether the velocity of particles is unchanged.<BR>
+example: keep_velocity true<BR>
+default: keep_velocity false<BR>
 </DL>
 
-
-<A NAME="TextArea"></A>
-<A NAME="SEC243"></A>
-<H3> TextArea (element) </H3>
-<!--docid::SEC243::-->
-
-This is a generic element that you can use to render text. It uses fonts which can be defined in code using the FontManager and Font classes, or which have been predefined in .fontdef files. See the font definitions section for more information.<BR><BR>
-
-Attributes:
-<DL COMPACT>
-<DT>font_name &lt;name&gt;
-<DD>The name of the font to use. This font must be defined in a .fontdef file to ensure it is available at scripting time.
-<DT>char_height &lt;height&gt;
-<DD>The height of the letters as a proportion of the screen height. Character widths may vary because OGRE supports proportional fonts, but will be based on this constant height. 
-<DT>colour &lt;red&gt; &lt;green&gt; &lt;blue&gt;
-<DD>A solid colour to render the text in. Often fonts are defined in monochrome, so this allows you to colour them in nicely and use the same texture for multiple different coloured text areas. The colour elements should all be expressed as values between 0 and 1. If you use predrawn fonts which are already full colour then you don't need this.
-<DT>colour_bottom &lt;red&gt; &lt;green&gt; &lt;blue&gt; / colour_top &lt;red&gt; &lt;green&gt; &lt;blue&gt;
-<DD>As an alternative to a solid colour, you can colour the text differently at the top and bottom to create a gradient colour effect which can be very effective.
-</DL>
-
-<A NAME="Font Definition Scripts"></A>
+<A NAME="Overlay Scripts"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_39.html#SEC229"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_38.html#SEC223"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC244"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_39.html#SEC221"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC174"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC232"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -122,7 +355,7 @@ Attributes:
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

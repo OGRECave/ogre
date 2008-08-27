@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Compositor Techniques</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Script Variables</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Compositor Techniques">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Compositor Techniques">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Script Variables">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Script Variables">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,79 +24,60 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC134"></A>
+<A NAME="SEC137"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_26.html#SEC130"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_26.html#SEC130"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_28.html#SEC136"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_26.html#SEC136"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_28.html#SEC138"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H3> 3.2.1 Techniques </H3>
-<!--docid::SEC134::-->
+<H3> 3.1.13 Script Variables </H3>
+<!--docid::SEC137::-->
+A very powerful new feature in Ogre 1.6 is variables. Variables allow you to parameterize data in materials so that they can become more generalized. This enables greater reuse of scripts by targeting specific customization points. Using variables along with inheritance allows for huge amounts of overrides and easy object reuse.<BR><BR>
 
-A compositor technique is much like a <A HREF="manual_15.html#SEC31">material technique</A> in that it describes one approach to achieving the effect you're looking for. A compositor definition can have more than one technique if you wish to provide some fallback should the hardware not support the technique you'd prefer to use. Techniques are evaluated for hardware support based on 2 things:
-<DL COMPACT>
-<DT>Material support
-<DD>All <A HREF="manual_29.html#SEC143">passes</A> that render a fullscreen quad use a material; for the technique to be supported, all of the materials referenced must have at least one supported material technique. If they don't, the compositor technique is marked as unsupported and won't be used.
-<DT>Texture format support
-<DD>This one is slightly more complicated. When you request a <A HREF="manual_27.html#compositor_texture">texture</A> in your technique, you request a pixel format. Not all formats are natively supported by hardware, especially the floating point formats. However, in this case the hardware will typically downgrade the texture format requested to one that the hardware does support - with compositor effects though, you might want to use a different approach if this is the case. So, when evaluating techniques, the compositor will first look for native support for the exact pixel format you've asked for, and will skip onto the next technique if it is not supported, thus allowing you to define other techniques with simpler pixel formats which use a different approach. If it doesn't find any techniques which are natively supported, it tries again, this time allowing the hardware to downgrade the texture format and thus should find at least some support for what you've asked for.
-</DL>
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>abstract pass ParentPass
+{
+   diffuse $diffuse_colour
+}
 
-As with material techniques, compositor techniques are evaluated in the order you define them in the script, so techniques declared first are preferred over those declared later.
+material Test
+{
+   technique
+   {
+       pass : ParentPass
+       {
+           set $diffuse_colour &quot;1 0 0 1&quot;
+       }
+   }
+}
+</pre></td></tr></table>
+The ParentPass object declares a variable called &quot;diffuse_colour&quot; which is then overridden in the Test material's pass. The &quot;set&quot; keyword is used to set the value of that variable. The variable assignment follows lexical scoping rules, which means that the value of &quot;1 0 0 1&quot; is only valid inside that pass definition. Variable assignment in outer scopes carry over into inner scopes.<BR><BR>
 
-Format: technique { }<BR><BR>
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>material Test
+{
+    set $diffuse_colour &quot;1 0 0 1&quot;
+    technique
+    {
+        pass : ParentPass
+        {
+        }
+    }
+}
+</pre></td></tr></table>
+The $diffuse_colour assignment carries down through the technique and into the pass. <BR><BR>
 
-Techniques can have the following nested elements:
-<UL>
-<LI><A HREF="manual_27.html#compositor_texture">texture</A>
-<LI><A HREF="manual_28.html#SEC136">target</A>
-<LI><A HREF="manual_28.html#SEC136">target_output</A>
-</UL>
 
-<A NAME="compositor_texture"></A>
-<A NAME="SEC135"></A>
-<H3> texture  </H3>
-<!--docid::SEC135::-->
 
-This declares a render texture for use in subsequent <A HREF="manual_28.html#SEC136">target passes</A>.
-
-<BR><BR>
-Format: texture &lt;Name&gt; &lt;Width&gt; &lt;Height&gt; &lt;Pixel Format&gt; [&lt;MRT Pixel Format2&gt;] [&lt;MRT Pixel FormatN&gt;]<BR><BR>
-
-Here is a description of the parameters:
-<DL COMPACT>
-<DT>Name
-<DD>A name to give the render texture, which must be unique within this compositor. This name is used to reference the texture in <A HREF="manual_28.html#SEC136">target passes</A>, when the texture is rendered to, and in <A HREF="manual_29.html#SEC143">passes</A>, when the texture is used as input to a material rendering a fullscreen quad.
-<DT>Width, Height
-<DD>The dimensions of the render texture. You can either specify a fixed width and height, or you can request that the texture matches the physical dimensions of the viewport to which the compositor is attached (specify target_width and target_height instead of numerical dimensions).
-<DT>Pixel Format
-<DD>The pixel format of the render texture. This affects how much memory it will take, what colour channels will be available, and what precision you will have within those channels. The available options are PF_A8R8G8B8, PF_R8G8B8A8, PF_R8G8B8, PF_FLOAT16_RGBA, PF_FLOAT16_RGB, PF_FLOAT16_R, PF_FLOAT32_RGBA, PF_FLOAT32_RGB, and PF_FLOAT32_R.
-</DL>
-
-Example: texture rt0 512 512 PF_R8G8B8A8<BR>
-Example: texture rt1 target_width target_height PF_FLOAT32_RGB<BR><BR>
-
-You can in fact repeat this element if you wish. If you do so, that means that this render texture becomes a Multiple Render Target (MRT), when the GPU writes to multiple textures at once. It is imperative that if you use MRT that the shaders that render to it render to ALL the targets. Not doing so can cause undefined results. It is also important to note that although you can use different pixel formats for each target in a MRT, each one should have the same total bit depth since most cards do not support independent bit depths. If you try to use this feature on cards that do not support the number of MRTs you've asked for, the technique will be skipped (so you ought to write a fallback technique).
-
-<A NAME="Compositor Target Passes"></A>
+<A NAME="Script Import Directive"></A>
 <HR SIZE=1>
-<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_26.html#SEC130"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_26.html#SEC130"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_28.html#SEC136"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
-</TR></TABLE>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

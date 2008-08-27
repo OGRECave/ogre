@@ -9,7 +9,7 @@
 @author Steve Streeting
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} The OGRE Team@*@*
+Copyright @copyright{} Torus Knot Software Ltd@*@*
 
 Permission is granted to make and distribute verbatim
 copies of this manual provided the copyright notice and
@@ -359,12 +359,12 @@ material walls/funkywall1
 }
 @end example
 
-Every material in the script must be given a name, which is the line 'material <blah>' before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your materials, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string.@*@*
+Every material in the script must be given a name, which is the line 'material <blah>' before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your materials, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string. If you include spaces in the name, it must be enclosed in double quotes.@*@*
 
 @strong{ NOTE: ':' is the delimiter for specifying material copy in the script so it can't be used as part of the material name.}
 @*@*
 
-A material can copy from a previously defined material by using a @emph{colon} @strong{:} after the material name followed by the name of the reference material to copy. If the reference material can not be found then it is ignored.  (@xref{Copying Materials})@*@*
+A material can inherit from a previously defined material by using a @emph{colon} @strong{:} after the material name followed by the name of the reference material to inherit from. You can in fact even inherit just @emph{parts} of a material from others; all this is covered in @xref{Script Inheritence}). You can also use variables in your script which can be replaced in inheriting versions, see @xref{Script Variables}.@*@*
 
 A material can be made up of many techniques (@xref{Techniques})- a technique is one way of achieving the effect you are looking for. You can supply more than one technique in order to provide fallback approaches where a card does not have the ability to render the preferred technique, or where you wish to define lower level of detail versions of the material in order to conserve rendering power when objects are more distant. @*@*
 
@@ -403,7 +403,7 @@ This attribute associates a texture alias with a texture name.@*@*
 
 Format: set_texture_alias <alias name> <texture name>@*@*
 
-This attribute is used to set the textures used in texture unit states that were copied from another material.(@xref{Copying Materials})@*@*
+This attribute can be used to set the textures used in texture unit states that were inherited from another material.(@xref{Texture Aliases})@*@*
 
 @node Techniques
 @subsection Techniques
@@ -421,7 +421,7 @@ Note that if the number of texture_unit entries exceeds the number of texture un
 @*
 In a material script, techniques must be listed in order of preference, i.e. the earlier techniques are preferred over the later techniques. This normally means you will list your most advanced, most demanding techniques first in the script, and list fallbacks afterwards.@*@*
 
-To help clearly identify what each technique is used for, the technique can be named but its optional.  Techniques not named within the script will take on a name that is the technique index number.  For example: the first technique in a material is index 0, its name would be "0" if it was not given a name in the script.  The technique name must be unqiue within the material or else the final technique is the resulting merge of all techniques with the same name in the material.  A warning message is posted in the Ogre.log if this occurs.  Named techniques can help when copying a material and modifying an existing technique: (@xref{Copying Materials})@*@*
+To help clearly identify what each technique is used for, the technique can be named but its optional.  Techniques not named within the script will take on a name that is the technique index number.  For example: the first technique in a material is index 0, its name would be "0" if it was not given a name in the script.  The technique name must be unqiue within the material or else the final technique is the resulting merge of all techniques with the same name in the material.  A warning message is posted in the Ogre.log if this occurs.  Named techniques can help when inheriting a material and modifying an existing technique: (@xref{Script Inheritence})@*@*
 
 Format: technique name@*@*
 
@@ -513,7 +513,7 @@ Note that these rules can only mark a technique 'unsupported' when it would othe
 @subsection Passes
 A pass is a single render of the geometry in question; a single call to the rendering API with a certain set of rendering properties. A technique can have between one and 16 passes, although clearly the more passes you use, the more expensive the technique will be to render.@*@*
 
-To help clearly identify what each pass is used for, the pass can be named but its optional.  Passes not named within the script will take on a name that is the pass index number.  For example: the first pass in a technique is index 0 so its name would be "0" if it was not given a name in the script.  The pass name must be unqiue within the technique or else the final pass is the resulting merge of all passes with the same name in the technique.  A warning message is posted in the Ogre.log if this occurs.  Named passes can help when copying a material and modifying an existing pass: (@xref{Copying Materials})@*@*
+To help clearly identify what each pass is used for, the pass can be named but its optional.  Passes not named within the script will take on a name that is the pass index number.  For example: the first pass in a technique is index 0 so its name would be "0" if it was not given a name in the script.  The pass name must be unqiue within the technique or else the final pass is the resulting merge of all passes with the same name in the technique.  A warning message is posted in the Ogre.log if this occurs.  Named passes can help when inheriting a material and modifying an existing pass: (@xref{Script Inheritence})@*@*
 
 Passes have a set of global attributes (described below), zero or more nested texture_unit entries (@xref{Texture Units}), and optionally a reference to a vertex and / or a fragment program (@xref{Using Vertex and Fragment Programs in a Pass}).
 
@@ -1241,7 +1241,7 @@ Format: texture_alias <name>@*@*
 
 Example: texture_alias NormalMap@*@*
 
-Setting the texture alias name is usefull if this material is to be copied by other other materials and only the textures will be changed in the new material.(@xref{Copying Materials})@*@*
+Setting the texture alias name is useful if this material is to be inherited by other other materials and only the textures will be changed in the new material.(@xref{Texture Aliases})@*@*
 Default: If a texture_unit has a name then the texture_alias defaults to the texture_unit name.
 
 @anchor{texture}

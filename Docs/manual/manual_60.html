@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Hardware Pixel Buffers</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Hardware Index Buffers</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Hardware Pixel Buffers">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Hardware Pixel Buffers">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Hardware Index Buffers">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Hardware Index Buffers">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,31 +24,27 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC271"></A>
+<A NAME="SEC276"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_59.html#SEC270"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_46.html#SEC252"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_61.html#SEC272"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_59.html#SEC275"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC261"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_61.html#SEC277"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H2> 5.8 Hardware Pixel Buffers </H2>
-<!--docid::SEC271::-->
+<H2> 5.7 Hardware Index Buffers </H2>
+<!--docid::SEC276::-->
+Index buffers are used to render geometry by building triangles out of vertices indirectly by reference to their position in the buffer, rather than just building triangles by sequentially reading vertices. Index buffers are simpler than vertex buffers, since they are just a list of indexes at the end of the day, howeverthey can be held on the hardware and shared between multiple pieces of geometry in the same way vertex buffers can, so the rules on creation and locking are the same. See section <A HREF="manual_49.html#SEC261">5. Hardware Buffers</A> for information.
 
-Hardware Pixel Buffers are a special kind of buffer that stores graphical data in graphics card memory, generally
-for use as textures. Pixel buffers can represent a one dimensional, two dimensional or three dimensional image. A texture can consist of a multiple of these buffers.
-
-In contrary to vertex and index buffers, pixel buffers are not constructed directly. When creating a texture, the necessary pixel buffers to hold its data are constructed automatically.
-
-<A NAME="Textures"></A>
+<A NAME="The IndexData class"></A>
 <HR SIZE=1>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                      "http://www.w3.org/TR/html40/loose.dtd">
+<HTML>
+<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people <dev@texi2html.cvshome.org>
+Send bugs and suggestions to <users@texi2html.cvshome.org>
+
+-->
+<HEAD>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Numeric Value Animation</TITLE>
+
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Numeric Value Animation">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Numeric Value Animation">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.66">
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+</HEAD>
+
+<BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC345"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_82.html#SEC344"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_75.html#SEC332"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt; ]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<HR SIZE=1>
+<H2> 8.5 Numeric Value Animation </H2>
+<!--docid::SEC345::-->
+Apart from the specific animation types which may well comprise the most common uses of the animation framework, you can also use animations to alter any value which is exposed via the <A HREF="manual_83.html#SEC346">AnimableObject</A> interface. <BR><BR>
+
+<A NAME="AnimableObject"></A>
+<A NAME="SEC346"></A>
+<H2> AnimableObject </H2>
+<!--docid::SEC346::-->
+AnimableObject is an abstract interface that any class can extend in order to provide access to a number of <A HREF="manual_83.html#SEC347">AnimableValue</A>s. It holds a 'dictionary' of the available animable properties which can be enumerated via the getAnimableValueNames method, and when its createAnimableValue method is called, it returns a reference to a value object which forms a bridge between the generic animation interfaces, and the underlying specific object property.<BR><BR>
+
+One example of this is the Light class. It extends AnimableObject and provides AnimableValues for properties such as &quot;diffuseColour&quot; and &quot;attenuation&quot;. Animation tracks can be created for these values and thus properties of the light can be scripted to change. Other objects, including your custom objects, can extend this interface in the same way to provide animation support to their properties.
+
+<A NAME="AnimableValue"></A>
+<A NAME="SEC347"></A>
+<H2> AnimableValue </H2>
+<!--docid::SEC347::-->
+
+When implementing custom animable properties, you have to also implement a number of methods on the AnimableValue interface - basically anything which has been marked as unimplemented. These are not pure virtual methods simply because you only have to implement the methods required for the type of value you're animating. Again, see the examples in Light to see how this is done.
+
+<HR SIZE=1>
+<BR>
+<FONT SIZE="-1">
+This document was generated
+by <I>steve</I> on <I>August 27 2008</I>
+using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
+</FONT>
+
+</BODY>
+</HTML>

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Stencil Shadows</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Pixel boxes</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Stencil Shadows">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Stencil Shadows">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Pixel boxes">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Pixel boxes">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,109 +24,73 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC295"></A>
+<A NAME="SEC293"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_67.html#SEC292"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_67.html#SEC292"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_69.html#SEC303"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_67.html#SEC290"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_63.html#SEC280"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_69.html#SEC294"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H2> 7.1 Stencil Shadows </H2>
-<!--docid::SEC295::-->
+<H3> 5.8.5 Pixel boxes </H3>
+<!--docid::SEC293::-->
 
-Stencil shadows are a method by which a 'mask' is created for the screen using a feature called the stencil buffer. This mask can be used to exclude areas of the screen from subsequent renders, and thus it can be used to either include or exclude areas in shadow. They are enabled by calling SceneManager::setShadowTechnique with a parameter of either <CODE>SHADOWTYPE_STENCIL_ADDITIVE</CODE> or <CODE>SHADOWTYPE_STENCIL_MODULATIVE</CODE>. Because the stencil can only mask areas to be either 'enabled' or 'disabled', stencil shadows have 'hard' edges, that is to say clear dividing lines between light and shadow - it is not possible to soften these edges.<BR><BR>
+All methods in Ogre that take or return raw image data return a PixelBox object.
 
-In order to generate the stencil, 'shadow volumes' are rendered by extruding the silhouette of the shadow caster away from the light. Where these shadow volumes intersect other objects (or the caster, since self-shadowing is supported using this technique), the stencil is updated, allowing subsequent operations to differentiate between light and shadow. How exactly this is used to render the shadows depends on whether <A HREF="manual_70.html#SEC317">7.3 Modulative Shadows</A> or <A HREF="manual_71.html#SEC319">7.4 Additive Light Masking</A> is being used. Objects can both cast and receive stencil shadows, so self-shadowing is inbuilt. <BR><BR>
+A PixelBox is a primitive describing a volume (3D), image (2D) or line (1D) of pixels in CPU memory. It describes the location and data format of a region of memory used for image data, but does not do any memory management in itself.
 
-The advantage of stencil shadows is that they can do self-shadowing simply on low-end hardware, provided you keep your poly count under control. In contrast doing self-shadowing with texture shadows requires a fairly modern machine (See section <A HREF="manual_69.html#SEC303">7.2 Texture-based Shadows</A>). For this reason, you're likely to pick stencil shadows if you need an accurate shadowing solution for an application aimed at older or lower-spec machines.<BR><BR> 
+Inside the memory pointed to by the <EM>data</EM> member of a pixel box, pixels are stored as a succession of &quot;depth&quot; slices (in Z), each containing &quot;height&quot; rows (Y) of &quot;width&quot; pixels (X).
 
-The disadvantages of stencil shadows are numerous though, especially on more modern hardware. Because stencil shadows are a geometric technique, they are inherently more costly the higher the number of polygons you use, meaning you are penalised the more detailed you make your meshes. The fillrate cost, which comes from having to render shadow volumes, also escalates the same way. Since more modern applications are likely to use higher polygon counts, stencil shadows can start to become a bottleneck. In addition, the visual aspects of stencil shadows are pretty primitive - your shadows will always be hard-edged, and you have no possibility of doing clever things with shaders since the stencil is not available for manipulation there. Therefore, if your application is aimed at higher-end machines you should definitely consider switching to texture shadows (See section <A HREF="manual_69.html#SEC303">7.2 Texture-based Shadows</A>).
+Dimensions that are not used must be 1. For example, a one dimensional image will have extents (width,1,1). A two dimensional image has extents (width,height,1).
 
-There are a number of issues to consider which are specific to stencil shadows:
-<UL>
-<LI><A HREF="manual_68.html#SEC296">CPU Overhead</A>
-<LI><A HREF="manual_68.html#SEC297">Extrusion distance</A>
-<LI><A HREF="manual_68.html#SEC298">Camera far plane positioning</A>
-<LI><A HREF="manual_68.html#SEC299">Mesh edge lists</A>
-<LI><A HREF="manual_68.html#SEC300">The Silhouette Edge</A>
-<LI><A HREF="manual_68.html#SEC301">Be realistic</A>
-<LI><A HREF="manual_68.html#SEC302">Stencil Optimisations Performed By Ogre</A>
-</UL>
-
-<A NAME="CPU Overhead"></A>
-<A NAME="SEC296"></A>
-<H3> CPU Overhead </H3>
-<!--docid::SEC296::-->
-Calculating the shadow volume for a mesh can be expensive, and it has to be done on the CPU, it is not a hardware accelerated feature. Therefore, you can find that if you overuse this feature, you can create a CPU bottleneck for your application. Ogre quite aggressively eliminates objects which cannot be casting shadows on the frustum, but there are limits to how much it can do, and large, elgongated shadows (e.g. representing a very low sun position) are very difficult to cull efficiently. Try to avoid having too many shadow casters around at once, and avoid long shadows if you can. Also, make use of the 'shadow far distance' parameter on the SceneManager, this can eliminate distant shadow casters from the shadow volume construction and save you some time, at the expense of only having shadows for closer objects. Lastly, make use of Ogre's Level-Of-Detail (LOD) features; you can generate automatically calculated LODs for your meshes in code (see the Mesh API docs) or when using the mesh tools such as OgreXmlConverter and OgreMeshUpgrader. Alternatively, you can assign your own manual LODs by providing alternative mesh files at lower detail levels. Both methods will cause the shadow volume complexity to decrease as the object gets further away, which saves you valuable volume calculation time. 
-
-<A NAME="Extrusion distance"></A>
-<A NAME="SEC297"></A>
-<H3> Extrusion distance </H3>
-<!--docid::SEC297::-->
-When vertex programs are not available, Ogre can only extrude shadow volumes a finite distance from the object. If an object gets too close to a light, any finite extrusion distance will be inadequate to guarantee all objects will be shadowed properly by this object. Therefore, you are advised not to let shadow casters pass too close to light sources if you can avoid it, unless you can guarantee that your target audience will have vertex program capable hardware (in this case, Ogre extrudes the volume to infinity using a vertex program so the problem does not occur).<BR><BR>
-When infinite extrusion is not possible, Ogre uses finite extrusion, either derived from the attenuation range of a light (in the case of a point light or spotlight), or a fixed extrusion distance set in the application in the case of directional lights. To change the directional light extrustion distance, use SceneManager::setShadowDirectionalLightExtrusionDistance. 
-
-<A NAME="Camera far plane positioning"></A>
-<A NAME="SEC298"></A>
-<H3> Camera far plane positioning </H3>
-<!--docid::SEC298::-->
-Stencil shadow volumes rely very much on not being clipped by the far plane. When you enable stencil shadows, Ogre internally changes the far plane settings of your cameras such that there is no far plane - ie it is placed at infinity (Camera::setFarClipDistance(0)). This avoids artefacts caused by clipping the dark caps on shadow volumes, at the expense of a (very) small amount of depth precision. 
-
-<A NAME="Mesh edge lists"></A>
-<A NAME="SEC299"></A>
-<H3> Mesh edge lists </H3>
-<!--docid::SEC299::-->
-Stencil shadows can only be calculated when an 'edge list' has been built for all the geometry in a mesh. The official exporters and tools automatically build this for you (or have an option to do so), but if you create your own meshes, you must remember to build edge lists for them before using them with stencil shadows - you can do that by using OgreMeshUpgrade or OgreXmlConverter, or by calling Mesh::buildEdgeList before you export or use the mesh. If a mesh doesn't have edge lists, OGRE assumes that it is not supposed to cast stencil shadows.
-
-<A NAME="The Silhouette Edge"></A>
-<A NAME="SEC300"></A>
-<H3> The Silhouette Edge </H3>
-<!--docid::SEC300::-->
-Stencil shadowing is about finding a silhouette of the mesh, and projecting it away to form a volume. What this means is that there is a definite boundary on the shadow caster between light and shadow; a set of edges where where the triangle on one side is facing toward the light, and one is facing away. This produces a sharp edge around the mesh as the transition occurs. Provided there is little or no other light in the scene, and the mesh has smooth normals to produce a gradual light change in its underlying shading, the silhouette edge can be hidden - this works better the higher the tesselation of the mesh. However, if the scene includes ambient light, then the difference is far more marked. This is especially true when using <A HREF="manual_70.html#SEC317">7.3 Modulative Shadows</A>, because the light contribution of each shadowed area is not taken into account by this simplified approach, and so using 2 or more lights in a scene using modulative stencil shadows is not advisable; the silhouette edges will be very marked. Additive lights do not suffer from this as badly because each light is masked individually, meaning that it is only ambient light which can show up the silhouette edges.
-
-<A NAME="Be realistic"></A>
-<A NAME="SEC301"></A>
-<H3> Be realistic </H3>
-<!--docid::SEC301::-->
-Don't expect to be able to throw any scene using any hardware at the stencil shadow algorithm and expect to get perfect, optimum speed results. Shadows are a complex and expensive technique, so you should impose some reasonable limitations on your placing of lights and objects; they're not really that restricting, but you should be aware that this is not a complete free-for-all. 
-<UL>
-<LI>Try to avoid letting objects pass very close (or even through) lights - it might look nice but it's one of the cases where artefacts can occur on machines not cabable of running vertex programs.
-<LI>Be aware that shadow volumes do not respect the 'solidity' of the objects they pass through, and if those objects do not themselves cast shadows (which would hide the effect) then the result will be that you can see shadows on the other side of what should be an occluding object.
-<LI>Make use of SceneManager::setShadowFarDistance to limit the number of shadow volumes constructed
-<LI>Make use of LOD to reduce shadow volume complexity at distance
-<LI>Avoid very long (dusk and dawn) shadows - they exacerbate other issues such as volume clipping, fillrate, and cause many more objects at a greater distance to require volume construction.
-</UL>
-<BR><BR>
-
-<A NAME="Stencil Optimisations Performed By Ogre"></A>
-<A NAME="SEC302"></A>
-<H3> Stencil Optimisations Performed By Ogre </H3>
-<!--docid::SEC302::-->
-Despite all that, stencil shadows can look very nice (especially with <A HREF="manual_71.html#SEC319">7.4 Additive Light Masking</A>) and can be fast if you respect the rules above. In addition, Ogre comes pre-packed with a lot of optimisations which help to make this as quick as possible. This section is more for developers or people interested in knowing something about the 'under the hood' behaviour of Ogre.
+A PixelBox has the following members:
 <DL COMPACT>
-<DT>Vertex program extrusion
-<DD>As previously mentioned, Ogre performs the extrusion of shadow volumes in hardware on vertex program-capable hardware (e.g. GeForce3, Radeon 8500 or better). This has 2 major benefits; the obvious one being speed, but secondly that vertex programs can extrude points to infinity, which the fixed-function pipeline cannot, at least not without performing all calculations in software. This leads to more robust volumes, and also eliminates more than half the volume triangles on directional lights since all points are projected to a single point at infinity.
-<DT>Scissor test optimisation
-<DD>Ogre uses a scissor rectangle to limit the effect of point / spot lights when their range does not cover the entire viewport; that means we save fillrate when rendering stencil volumes, especially with distant lights
-<DT>Z-Pass and Z-Fail algorithms
-<DD>The Z-Fail algorithm, often attributed to John Carmack, is used in Ogre to make sure shadows are robust when the camera passes through the shadow volume. However, the Z-Fail algorithm is more expensive than the traditional Z-Pass; so Ogre detects when Z-Fail is required and only uses it then, Z-Pass is used at all other times.
-<DT>2-Sided stencilling and stencil wrapping
-<DD>Ogre supports the 2-Sided stencilling / stencil wrapping extensions, which when supported allow volumes to be rendered in a single pass instead of having to do one pass for back facing tris and another for front-facing tris. This doesn't save fillrate, since the same number of stencil updates are done, but it does save primitive setup and the overhead incurred in the driver every time a render call is made.
-<DT>Agressive shadow volume culling
-<DD>Ogre is pretty good at detecting which lights could be affecting the frustum, and from that, which objects could be casting a shadow on the frustum. This means we don't waste time constructing shadow geometry we don't need. Setting the shadow far distance is another important way you can reduce stencil shadow overhead since it culls far away shadow volumes even if they are visible, which is beneficial in practice since you're most interested in shadows for close-up objects.
+<DT>data
+<DD>The pointer to the first component of the image data in memory.
+<DT>format
+<DD>The pixel format (See section <A HREF="manual_67.html#SEC290">5.8.4 Pixel Formats</A>) of the image data.
+<DT>rowPitch
+<DD>The number of elements between the leftmost pixel of one row and the left pixel of the next. This value must always be equal to getWidth() (consecutive) for compressed formats.
+<DT>slicePitch
+<DD>The number of elements between the top left pixel of one (depth) slice and the top left pixel of the next. Must be a multiple of  rowPitch. This value must always be equal to getWidth()*getHeight() (consecutive)
+for compressed formats.
+<DT>left, top, right, bottom, front, back
+<DD>Extents of the box in three dimensional integer space. Note that the left, top, and front edges are included but the right, bottom and top ones are not. <EM>left</EM> must always be smaller or equal to <EM>right</EM>, <EM>top</EM> must always be smaller or equal to <EM>bottom</EM>, and <EM>front</EM> must always be smaller or equal to <EM>back</EM>.
 </DL>
 
+It also has some useful methods:
+<DL COMPACT>
+<DT>getWidth()
+<DD>Get the width of this box
+<DT>getHeight()
+<DD>Get the height of this box. This is 1 for one dimensional images.
+<DT>getDepth()
+<DD>Get the depth of this box. This is 1 for one and two dimensional images.
+<DT>setConsecutive()
+<DD>Set the rowPitch and slicePitch so that the buffer is laid out consecutive in memory.
+<DT>getRowSkip()
+<DD>Get the number of elements between one past the rightmost pixel of one row and the leftmost pixel of the next row. This is zero if rows are consecutive.
+<DT>getSliceSkip()
+<DD>Get the number of elements between one past the right bottom pixel of one slice and the left top pixel of the next slice. This is zero if slices are consecutive.
+<DT>isConsecutive()
+<DD>Return whether this buffer is laid out consecutive in memory (ie the pitches are equal to the dimensions)
+<DT>getConsecutiveSize()
+<DD>Return the size (in bytes) this image would take if it was laid out consecutive in memory
+<DT>getSubVolume(const Box &amp;def)
+<DD>Return a subvolume of this PixelBox, as a PixelBox.
+</DL>
 
-<A NAME="Texture-based Shadows"></A>
+For more information about these methods consult the API documentation.
+
+<A NAME="External Texture Sources"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_67.html#SEC292"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_67.html#SEC292"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_69.html#SEC303"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_67.html#SEC290"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_63.html#SEC280"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_69.html#SEC294"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -135,7 +99,7 @@ Despite all that, stencil shadows can look very nice (especially with <A HREF="m
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

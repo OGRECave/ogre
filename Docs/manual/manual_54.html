@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Vertex Declarations</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Practical Buffer Tips</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Vertex Declarations">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Vertex Declarations">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Practical Buffer Tips">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Practical Buffer Tips">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,73 +24,38 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC261"></A>
+<A NAME="SEC267"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_53.html#SEC260"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_52.html#SEC259"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC263"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_53.html#SEC265"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC261"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC268"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H3> 5.6.2 Vertex Declarations </H3>
-<!--docid::SEC261::-->
-Vertex declarations define the vertex inputs used to render the geometry you want to appear on the screen. Basically this means that for each vertex, you want to feed a certain set of data into the graphics pipeling, which (you hope) will affect how it all looks when the triangles are drawn. Vertex declarations let you pull items of data (which we call vertex elements, represented by the VertexElement class) from any number of buffers, both shared and dedicated to that particular element. It's your job to ensure that the contents of the buffers make sense when interpreted in the way that your VertexDeclaration indicates that they should.<BR><BR>
-To add an element to a VertexDeclaration, you call it's addElement method. The parameters to this method are:
-<DL COMPACT>
-<DT>source
-<DD>This tells the declaration which buffer the element is to be pulled from. Note that this is just an index, which may range from 0 to one less than the number of buffers which are being bound as sources of vertex data. See section <A HREF="manual_55.html#SEC263">5.6.3 Vertex Buffer Bindings</A> for information on how a real buffer is bound to a source index. Storing the source of the vertex element this way (rather than using a buffer pointer) allows you to rebind the source of a vertex very easily, without changing the declaration of the vertex format itself.
-<DT>offset
-<DD>Tells the declaration how far in bytes the element is offset from the start of each whole vertex in this buffer. This will be 0 if this is the only element being sourced from this buffer, but if other elements are there then it may be higher. A good way of thinking of this is the size of all vertex elements which precede this element in the buffer.
-<DT>type
-<DD>This defines the data type of the vertex input, including it's size. This is an important element because as GPUs become more advanced, we can no longer assume that position input will always require 3 floating point numbers, because programmable vertex pipelines allow full control over the inputs and outuputs. This part of the element definition covers the basic type and size, e.g. VET_FLOAT3 is 3 floating point numbers - the meaning of the data is dealt with in the next paramter.
-<DT>semantic
-<DD>This defines the meaning of the element - the GPU will use this to determine what to use this input for, and programmable vertex pipelines will use this to identify which semantic to map the input to. This can identify the element as positional data, normal data, texture coordinate data, etc. See the API reference for full details of all the options.
-<DT>index
-<DD>This parameter is only required when you supply more than one element of the same semantic in one vertex declaration. For example, if you supply more than one set of texture coordinates, you would set first sets index to 0, and the second set to 1.
-</DL>
-
-You can repeat the call to addElement for as many elements as you have in your vertex input structures. There are also useful methods on VertexDeclaration for locating elements within a declaration - see the API reference for full details.
-
-<A NAME="SEC262"></A>
-<H3> Important Considerations </H3>
-<!--docid::SEC262::-->
-Whilst in theory you have completely full reign over the format of you vertices, in reality there are some restrictions. Older DirectX hardware imposes a fixed ordering on the elements which are pulled from each buffer; specifically any hardware prior to DirectX 9 may impose the following restrictions:
-<UL>
-<LI>
-VertexElements should be added in the following order, and the order of the elements within any shared buffer should be as follows: 
+<H2> 5.5 Practical Buffer Tips </H2>
+<!--docid::SEC267::-->
+The interplay of usage mode on creation, and locking options when reading / updating is important for performance. Here's some tips:
 <OL>
-<LI>Positions
-<LI>Blending weights
-<LI>Normals
-<LI>Diffuse colours
-<LI>Specular colours
-<LI>Texture coordinates (starting at 0, listed in order, with no gaps)
+<LI>
+Aim for the 'perfect' buffer by creating with HBU_STATIC_WRITE_ONLY, with no shadow buffer, and locking all of it once only with HBL_DISCARD to populate it. Never touch it again.
+<LI>
+If you need to update a buffer regularly, you will have to compromise. Use HBU_DYNAMIC_WRITE_ONLY when creating (still no shadow buffer), and use HBL_DISCARD to lock the entire buffer, or if you can't then use HBL_NO_OVERWRITE to lock parts of it. 
+<LI>
+If you really need to read data from the buffer, create it with a shadow buffer. Make sure you use HBL_READ_ONLY when locking for reading because it will avoid the upload normally associated with unlocking the buffer. You can also combine this with either of the 2 previous points, obviously try for static if you can - remember that the _WRITE_ONLY' part refers to the hardware buffer so can be safely used with a shadow buffer you read from. 
+<LI>
+Split your vertex buffers up if you find that your usage patterns for different elements of the vertex are different. No point having one huge updateable buffer with all the vertex data in it, if all you need to update is the texture coordinates. Split that part out into it's own buffer and make the rest HBU_STATIC_WRITE_ONLY.
 </OL>
-<LI>
-You must not have unused gaps in your buffers which are not referenced by any VertexElement
-<LI>
-You must not cause the buffer &amp; offset settings of 2 VertexElements to overlap
-</UL>
-OpenGL and DirectX 9 compatible hardware are not required to follow these strict limitations, so you might find, for example that if you broke these rules your application would run under OpenGL and under DirectX on recent cards, but it is not guaranteed to run on older hardware under DirectX unless you stick to the above rules. For this reason you're advised to abide by them!
 
-<A NAME="Vertex Buffer Bindings"></A>
+
+<A NAME="Hardware Vertex Buffers"></A>
 <HR SIZE=1>
-<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_53.html#SEC260"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_52.html#SEC259"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC263"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
-</TR></TABLE>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Compositor Passes</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Compositor Scripts</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Compositor Passes">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Compositor Passes">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Compositor Scripts">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Compositor Scripts">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,279 +24,97 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC143"></A>
+<A NAME="SEC139"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_28.html#SEC136"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_26.html#SEC130"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC164"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_28.html#SEC138"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC143"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H3> 3.2.3 Compositor Passes </H3>
-<!--docid::SEC143::-->
+<H2> 3.2 Compositor Scripts </H2>
+<!--docid::SEC139::-->
 
-A pass is a single rendering action to be performed in a target pass. <BR><BR>
-Format: 'pass' (render_quad | clear | stencil | render_scene) { }<BR><BR>
+The compositor framework is a subsection of the OGRE API that allows you to easily define full screen post-processing effects. Compositor scripts offer you the ability to define compositor effects in a script which can be reused and modified easily, rather than having to use the API to define them. You still need to use code to instantiate a compositor against one of your visible viewports, but this is a much simpler process than actually defining the compositor itself. 
 
-There are four types of pass:
+<A NAME="SEC140"></A>
+<H2> Compositor Fundamentals </H2>
+<!--docid::SEC140::-->
+
+Performing post-processing effects generally involves first rendering the scene to a texture, either in addition to or instead of the main window. Once the scene is in a texture, you can then pull the scene image into a fragment program and perform operations on it by rendering it through full screen quad. The target of this post processing render can be the main result (e.g. a window), or it can be another render texture so that you can perform multi-stage convolutions on the image. You can even 'ping-pong' the render back and forth between a couple of render textures to perform convolutions which require many iterations, without using a separate texture for each stage. Eventually you'll want to render the result to the final output, which you do with a full screen quad. This might replace the whole window (thus the main window doesn't need to render the scene itself), or it might be a combinational effect. <BR><BR> 
+
+So that we can discuss how to implement these techniques efficiently, a number of definitions are required:<BR><BR> 
 <DL COMPACT>
-<DT>clear
-<DD>This kind of pass sets the contents of one or more buffers in the target to a fixed value. So this could clear the colour buffer to a fixed colour, set the depth buffer to a certain set of contents, fill the stencil buffer with a value, or any combination of the above.
-<DT>stencil
-<DD>This kind of pass configures stencil operations for the subsequent passes. It can set the stencil compare function, operations and reference values for you to perform your own stencil effects.
-<DT>render_scene
-<DD>This kind of pass performs a regular rendering of the scene. It will use the <A HREF="manual_28.html#SEC140">visibility_mask</A>, <A HREF="manual_28.html#compositor_lod_bias">lod_bias</A>, and <A HREF="manual_28.html#SEC142">material_scheme</A> from the parent target pass.
-<DT>render_quad
-<DD>This kind of pass renders a quad over the entire render target, using a given material. You will undoubtedly want to pull in the results of other target passes into this operation to perform fullscreen effects.
+<DT>Compositor
+<DD>Definition of a fullscreen effect that can be applied to a user viewport. This is what you're defining when writing compositor scripts as detailed in this section.
+<DT>Compositor Instance
+<DD>An instance of a compositor as applied to a single viewport. You create these based on compositor definitions, See section <A HREF="manual_33.html#SEC173">3.2.4 Applying a Compositor</A>.
+<DT>Compositor Chain
+<DD>It is possible to enable more than one compositor instance on a viewport at the same time, with one compositor taking the results of the previous one as input. This is known as a compositor chain. Every viewport which has at least one compositor attached to it has a compositor chain. See section <A HREF="manual_33.html#SEC173">3.2.4 Applying a Compositor</A>
+<DT>Target
+<DD>This is a RenderTarget, ie the place where the result of a series of render operations is sent. A target may be the final output (and this is implicit, you don't have to declare it), or it may be an intermediate render texture, which you declare in your script with the <A HREF="manual_30.html#compositor_texture">texture line</A>. A target which is not the output target has a defined size and pixel format which you can control. 
+<DT>Output Target
+<DD>As Target, but this is the single final result of all operations. The size and pixel format of this target cannot be controlled by the compositor since it is defined by the application using it, thus you don't declare it in your script. However, you do declare a Target Pass for it, see below.
+<DT>Target Pass
+<DD>A Target may be rendered to many times in the course of a composition effect. In particular if you 'ping pong' a convolution between a couple of textures, you will have more than one Target Pass per Target. Target passes are declared in the script using a <A HREF="manual_31.html#SEC145">target or target_output line</A>, the latter being the final output target pass, of which there can be only one.
+<DT>Pass
+<DD>Within a Target Pass, there are one or more individual <A HREF="manual_32.html#SEC152">passes</A>, which perform a very specific action, such as rendering the original scene (or pulling the result from the previous compositor in the chain), rendering a fullscreen quad, or clearing one or more buffers. Typically within a single target pass you will use the either a 'render scene' pass or a 'render quad' pass, not both. Clear can be used with either type. 
 </DL>
 
-Here are the attributes you can use in a 'pass' section of a .compositor script:
+<A NAME="SEC141"></A>
+<H2> Loading scripts  </H2>
+<!--docid::SEC141::-->
 
-<A NAME="SEC144"></A>
-<H2> Available Pass Attributes </H2>
-<!--docid::SEC144::-->
-<UL>
-<LI>
-<A HREF="manual_29.html#SEC145">material</A>
-<LI>
-<A HREF="manual_29.html#compositor_pass_input">input</A>
-<LI>
-<A HREF="manual_29.html#compositor_pass_identifier">identifier</A>
-<LI>
-<A HREF="manual_29.html#SEC148">first_render_queue</A>
-<LI>
-<A HREF="manual_29.html#SEC149">last_render_queue</A>
-<LI>
-<A HREF="manual_29.html#compositor_clear">clear</A>
-<LI>
-<A HREF="manual_29.html#compositor_stencil">stencil</A>
-</UL>
+Compositor scripts are loaded when resource groups are initialised: OGRE looks in all resource locations associated with the group (see Root::addResourceLocation) for files with the '.compositor' extension and parses them. If you want to parse files manually, use CompositorSerializer::parseScript.<BR><BR>
 
-<A NAME="material"></A>
-<A NAME="SEC145"></A>
-<H3> material </H3>
-<!--docid::SEC145::-->
-For passes of type 'render_quad', sets the material used to render the quad. You will want to use shaders in this material to perform fullscreen effects, and use the <A HREF="manual_29.html#compositor_pass_input">input</A> attribute to map other texture targets into the texture bindings needed by this material.<BR><BR>
-Format: material &lt;Name&gt;<BR><BR>
+<A NAME="SEC142"></A>
+<H2> Format  </H2>
+<!--docid::SEC142::-->
 
-<A NAME="compositor_pass_input"></A>
-<A NAME="SEC146"></A>
-<H3> input  </H3>
-<!--docid::SEC146::-->
-For passes of type 'render_quad', this is how you map one or more local render textures (See  <A HREF="manual_27.html#compositor_texture">compositor_texture</A>) into the material you're using to render the fullscreen quad. To bind more than one texture, repeat this attribute with different sampler indexes.<BR><BR>
-Format: input &lt;sampler&gt; &lt;Name&gt; [&lt;MRTIndex&gt;]<BR><BR>
-<DL COMPACT>
-<DT>sampler
-<DD>The texture sampler to set, must be a number in the range [0, OGRE_MAX_TEXTURE_LAYERS-1].
-<DT>Name
-<DD>The name of the local render texture to bind, as declared in  <A HREF="manual_27.html#compositor_texture">compositor_texture</A> and rendered to in one or more <A HREF="manual_28.html#SEC136">target pass</A>.
-<DT>MRTIndex
-<DD>If the local texture that you're referencing is a Multiple Render Target (MRT), this identifies the surface from the MRT that you wish to reference (0 is the first surface, 1 the second etc).
-</DL>
-Example: input 0 rt0
+Several compositors may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ('{', '}'), and comments indicated by starting a line with '//' (note, no nested form comments allowed). The general format is shown below in the example below:<BR><BR>
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>// This is a comment
+// Black and white effect
+compositor B&amp;W
+{
+    technique
+    {
+        // Temporary textures
+        texture rt0 target_width target_height PF_A8R8G8B8
 
-<A NAME="compositor_pass_identifier"></A>
-<A NAME="SEC147"></A>
-<H3> identifier </H3>
-<!--docid::SEC147::-->
-Associates a numeric identifier with the pass. This is useful for registering a listener with the compositor (CompositorInstance::addListener), and being able to identify which pass it is that's being processed when you get events regarding it. Numbers between 0 and 2^32 are allowed.<BR><BR>
-Format: identifier &lt;number&gt;<BR><BR>
-Example: identifier 99945<BR><BR>
-Default: identifier 0<BR><BR>
+        target rt0
+        {
+            // Render output from previous compositor (or original scene)
+            input previous
+        }
 
-<A NAME="first_render_queue"></A>
-<A NAME="SEC148"></A>
-<H3> first_render_queue </H3>
-<!--docid::SEC148::-->
-For passes of type 'render_scene', this sets the first render queue id that is included in the render. Defaults to the value of RENDER_QUEUE_SKIES_EARLY.<BR><BR>
-Format: first_render_queue &lt;id&gt;<BR><BR>
-Default: first_render_queue 5<BR><BR>
+        target_output
+        {
+            // Start with clear output
+            input none
+            // Draw a fullscreen quad with the black and white image
+            pass render_quad
+            {
+                // Renders a fullscreen quad with a material
+                material Ogre/Compositor/BlackAndWhite
+                input 0 rt0
+            }
+        }
+    }
+}
+</pre></td></tr></table>
+Every compositor in the script must be given a name, which is the line 'compositor &lt;name&gt;' before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your compositors, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string.  Names can include spaces but must be surrounded by double quotes ie compositor &quot;My Name&quot;.<BR><BR>
 
-<A NAME="last_render_queue"></A>
-<A NAME="SEC149"></A>
-<H3> last_render_queue </H3>
-<!--docid::SEC149::-->
-For passes of type 'render_scene', this sets the last render queue id that is included in the render. Defaults to the value of RENDER_QUEUE_SKIES_LATE.<BR><BR>
-Format: last_render_queue &lt;id&gt;<BR><BR>
-Default: last_render_queue 95
+The major components of a compositor are the <A HREF="manual_30.html#SEC143">techniques</A>, the <A HREF="manual_31.html#SEC145">target passes</A> and the <A HREF="manual_32.html#SEC152">passes</A>, which are covered in detail in the following sections.<BR><BR>
 
-<A NAME="compositor_clear"></A>
-<A NAME="SEC150"></A>
-<H2> Clear Section </H2>
-<!--docid::SEC150::-->
-For passes of type 'clear', this section defines the buffer clearing parameters. <BR><BR>
-Format: clear { }<BR><BR>
-
-Here are the attributes you can use in a 'clear' section of a .compositor script:
-<UL>
-<LI>
-<A HREF="manual_29.html#compositor_clear_buffers">buffers</A>
-<LI>
-<A HREF="manual_29.html#compositor_clear_colour_value">colour_value</A>
-<LI>
-<A HREF="manual_29.html#compositor_clear_depth_value">depth_value</A>
-<LI>
-<A HREF="manual_29.html#compositor_clear_stencil_value">stencil_value</A>
-
-<A NAME="compositor_clear_buffers"></A>
-<A NAME="SEC151"></A>
-<H3> buffers </H3>
-<!--docid::SEC151::-->
-Sets the buffers cleared by this pass.<BR><BR>
-
-Format: buffers [colour] [depth] [stencil]<BR><BR>
-Default: buffers colour depth<BR><BR>
-
-<A NAME="compositor_clear_colour_value"></A>
-<A NAME="SEC152"></A>
-<H3> colour_value </H3>
-<!--docid::SEC152::-->
-Set the colour used to fill the colour buffer by this pass, if the colour buffer is being cleared (<A HREF="manual_29.html#compositor_clear_buffers">buffers</A>). <BR><BR>
-Format: colour_value &lt;red&gt; &lt;green&gt; &lt;blue&gt; &lt;alpha&gt;<BR><BR>
-Default: colour_value 0 0 0 0<BR><BR>
-
-<A NAME="compositor_clear_depth_value"></A>
-<A NAME="SEC153"></A>
-<H3> depth_value </H3>
-<!--docid::SEC153::-->
-Set the depth value used to fill the depth buffer by this pass, if the depth buffer is being cleared (<A HREF="manual_29.html#compositor_clear_buffers">buffers</A>). <BR><BR>
-Format: depth_value &lt;depth&gt;<BR><BR>
-Default: depth_value 1.0<BR><BR>
-
-<A NAME="compositor_clear_stencil_value"></A>
-<A NAME="SEC154"></A>
-<H3> stencil_value </H3>
-<!--docid::SEC154::-->
-Set the stencil value used to fill the stencil buffer by this pass, if the stencil buffer is being cleared (<A HREF="manual_29.html#compositor_clear_buffers">buffers</A>). <BR><BR>
-Format: stencil_value &lt;value&gt;<BR><BR>
-Default: stencil_value 0.0<BR><BR>
-</UL>
-
-<A NAME="compositor_stencil"></A>
-<A NAME="SEC155"></A>
-<H2> Stencil Section </H2>
-<!--docid::SEC155::-->
-For passes of type 'stencil', this section defines the stencil operation parameters. <BR><BR>
-
-Format: stencil { }<BR><BR>
-
-Here are the attributes you can use in a 'stencil' section of a .compositor script:
-
-<UL>
-<LI>
-<A HREF="manual_29.html#compositor_stencil_check">check</A>
-<LI>
-<A HREF="manual_29.html#compositor_stencil_comp_func">comp_func</A>
-<LI>
-<A HREF="manual_29.html#compositor_stencil_ref_value">ref_value</A>
-<LI>
-<A HREF="manual_29.html#compositor_stencil_mask">mask</A>
-<LI>
-<A HREF="manual_29.html#compositor_stencil_fail_op">fail_op</A>
-<LI>
-<A HREF="manual_29.html#compositor_stencil_depth_fail_op">depth_fail_op</A>
-<LI>
-<A HREF="manual_29.html#compositor_stencil_pass_op">pass_op</A>
-<LI>
-<A HREF="manual_29.html#compositor_stencil_two_sided">two_sided</A>
-
-<A NAME="compositor_stencil_check"></A>
-<A NAME="SEC156"></A>
-<H3> check </H3>
-<!--docid::SEC156::-->
-Enables or disables the stencil check, thus enabling the use of the rest of the features in this section. The rest of the options in this section do nothing if the stencil check is off.
-Format: check (on | off)<BR><BR>
-
-<A NAME="compositor_stencil_comp_func"></A>
-<A NAME="SEC157"></A>
-<H3> comp_func </H3>
-<!--docid::SEC157::-->
-Sets the function used to perform the following comparison:<BR><BR>
-(ref_value &amp; mask) comp_func (Stencil Buffer Value &amp; mask)<BR><BR>
-
-What happens as a result of this comparison will be one of 3 actions on the stencil buffer, depending on whether the test fails, succeeds but with the depth buffer check still failing, or succeeds with the depth buffer check passing too. You set the actions in the <A HREF="manual_29.html#compositor_stencil_fail_op">fail_op</A>, <A HREF="manual_29.html#compositor_stencil_depth_fail_op">depth_fail_op</A> and <A HREF="manual_29.html#compositor_stencil_pass_op">pass_op</A> respectively. If the stencil check fails, no colour or depth are written to the frame buffer.<BR><BR>
-Format: comp_func (always_fail | always_pass | less | less_equal | not_equal | greater_equal | greater)<BR><BR>
-Default: comp_func always_pass<BR><BR>
-
-<A NAME="compositor_stencil_ref_value"></A>
-<A NAME="SEC158"></A>
-<H3> ref_value </H3>
-<!--docid::SEC158::-->
-Sets the reference value used to compare with the stencil buffer as described in <A HREF="manual_29.html#compositor_stencil_comp_func">comp_func</A>.<BR><BR>
-Format: ref_value &lt;value&gt;<BR><BR>
-Default: ref_value 0.0<BR><BR>
-
-<A NAME="compositor_stencil_mask"></A>
-<A NAME="SEC159"></A>
-<H3> mask </H3>
-<!--docid::SEC159::-->
-Sets the mask used to compare with the stencil buffer as described in <A HREF="manual_29.html#compositor_stencil_comp_func">comp_func</A>.<BR><BR>
-Format: mask &lt;value&gt;<BR><BR>
-Default: mask 4294967295<BR><BR>
-
-<A NAME="compositor_stencil_fail_op"></A>
-<A NAME="SEC160"></A>
-<H3> fail_op </H3>
-<!--docid::SEC160::-->
-Sets what to do with the stencil buffer value if the result of the stencil comparison (<A HREF="manual_29.html#compositor_stencil_comp_func">comp_func</A>) and depth comparison is that both fail.<BR><BR>
-Format: fail_op (keep | zero | replace | increment | decrement | increment_wrap | decrement_wrap | invert)<BR><BR>
-Default: depth_fail_op keep<BR><BR>
-These actions mean:
-<DL COMPACT>
-<DT>keep
-<DD>Leave the stencil buffer unchanged.
-<DT>zero
-<DD>Set the stencil value to zero.
-<DT>replace
-<DD>Set the stencil value to the reference value.
-<DT>increment
-<DD>Add one to the stencil value, clamping at the maximum value.
-<DT>decrement
-<DD>Subtract one from the stencil value, clamping at 0.
-<DT>increment_wrap
-<DD>Add one to the stencil value, wrapping back to 0 at the maximum.
-<DT>decrement_wrap
-<DD>Subtract one from the stencil value, wrapping to the maximum below 0.
-<DT>invert
-<DD>invert the stencil value.
-</DL>
-
-
-<A NAME="compositor_stencil_depth_fail_op"></A>
-<A NAME="SEC161"></A>
-<H3> depth_fail_op </H3>
-<!--docid::SEC161::-->
-Sets what to do with the stencil buffer value if the result of the stencil comparison (<A HREF="manual_29.html#compositor_stencil_comp_func">comp_func</A>) passes but the depth comparison fails. <BR><BR>
-
-Format: depth_fail_op (keep | zero | replace | increment | decrement | increment_wrap | decrement_wrap | invert)<BR><BR>
-Default: depth_fail_op keep<BR><BR>
-
-<A NAME="compositor_stencil_pass_op"></A>
-<A NAME="SEC162"></A>
-<H3> pass_op </H3>
-<!--docid::SEC162::-->
-Sets what to do with the stencil buffer value if the result of the stencil comparison (<A HREF="manual_29.html#compositor_stencil_comp_func">comp_func</A>) and the depth comparison pass. <BR><BR>
-Format: pass_op (keep | zero | replace | increment | decrement | increment_wrap | decrement_wrap | invert)<BR><BR>
-Default: pass_op keep<BR><BR>
-
-<A NAME="compositor_stencil_two_sided"></A>
-<A NAME="SEC163"></A>
-<H3> two_sided </H3>
-<!--docid::SEC163::-->
-Enables or disables two-sided stencil operations, which means the inverse of the operations applies to back-facing polygons.<BR><BR>
-Format: two_sided (on | off)<BR><BR>
-Default: two_sided off<BR><BR>
-</UL>
-
-<A NAME="Applying a Compositor"></A>
+<A NAME="Compositor Techniques"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_28.html#SEC136"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_26.html#SEC130"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC164"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_28.html#SEC138"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC143"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -305,7 +123,7 @@ Default: two_sided off<BR><BR>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

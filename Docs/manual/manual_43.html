@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Exporters</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Standard OverlayElements</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Exporters">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Exporters">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Standard OverlayElements">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Standard OverlayElements">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,45 +24,109 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC248"></A>
+<A NAME="SEC249"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_42.html#SEC247"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_42.html#SEC247"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_44.html#SEC250"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_42.html#SEC238"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC232"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_44.html#SEC253"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H2> 4.1 Exporters </H2>
-<!--docid::SEC248::-->
-
-Exporters are plugins to 3D modelling tools which write meshes and skeletal animation to file formats which OGRE can use for realtime rendering. The files the exporters write end in .mesh and .skeleton respectively.<BR><BR>
-
-Each exporter has to be written specifically for the modeller in question, although they all use a common set of facilities provided by the classes MeshSerializer and SkeletonSerializer. They also normally require you to own the modelling tool.<BR><BR>
-
-All the exporters here can be built from the source code, or you can download precompiled versions from the OGRE web site.<BR><BR>
-
-<A NAME="SEC249"></A>
-<H2> A Note About Modelling / Animation For OGRE </H2>
+<H3> 3.4.2 Standard OverlayElements </H3>
 <!--docid::SEC249::-->
-There are a few rules when creating an animated model for OGRE:
+
+Although OGRE's OverlayElement and OverlayContainer classes are designed to be extended by applications developers, there are a few elements which come as standard with Ogre. These include:
 <UL>
-<LI>You must have no more than 4 weighted bone assignments per vertex. If you have more, OGRE will eliminate the lowest weighted assignments and renormalise the other weights. This limit is imposed by hardware blending limitations.
-<LI>All vertices must be assigned to at least one bone - assign static vertices to the root bone.
-<LI>At the very least each bone must have a keyframe at the beginning and end of the animation.
+<LI>
+ <A HREF="manual_43.html#Panel">Panel</A>
+<LI>
+ <A HREF="manual_43.html#BorderPanel">BorderPanel</A>
+<LI>
+ <A HREF="manual_43.html#TextArea">TextArea</A>
 </UL>
-If you're creating unanimated meshes, then you do not need to be concerned with the above.
+<BR>
+This section describes how you define their custom attributes in an .overlay script, but you can also change these custom properties in code if you wish. You do this by calling setParameter(paramname, value). You may wish to use the StringConverter class to convert your types to and from strings.
 
-Full documentation for each exporter is provided along with the exporter itself, and there is a list of the currently supported modelling tools in the OGRE Wiki at <A HREF="http://www.ogre3d.org/wiki/index.php/Exporters">http://www.ogre3d.org/wiki/index.php/Exporters</A>.
+<A NAME="Panel"></A>
+<A NAME="SEC250"></A>
+<H3> Panel (container) </H3>
+<!--docid::SEC250::-->
 
-<A NAME="XmlConverter"></A>
+This is the most bog-standard container you can use. It is a rectangular area which can contain other elements (or containers) and may or may not have a background, which can be tiled however you like. The background material is determined by the material attribute, but is only displayed if transparency is off.<BR><BR>
+
+Attributes:
+<DL COMPACT>
+<DT>transparent &lt;true | false&gt;
+<DD>If set to 'true' the panel is transparent and is not rendered itself, it is just used as a grouping level for it's children.
+<DT>tiling &lt;layer&gt; &lt;x_tile&gt; &lt;y_tile&gt;
+<DD>Sets the number of times the texture(s) of the material are tiled across the panel in the x and y direction. &lt;layer&gt; is the texture layer, from 0 to the number of texture layers in the material minus one. By setting tiling per layer you can create some nice multitextured backdrops for your panels, this works especially well when you animate one of the layers.
+<DT>uv_coords &lt;topleft_u&gt; &lt;topleft_v&gt; &lt;bottomright_u&gt; &lt;bottomright_v&gt;
+<DD>Sets the texture coordinates to use for this panel.
+</DL>
+
+<A NAME="BorderPanel"></A>
+<A NAME="SEC251"></A>
+<H3> BorderPanel (container) </H3>
+<!--docid::SEC251::-->
+
+This is a slightly more advanced version of Panel, where instead of just a single flat panel, the panel has a separate border which resizes with the panel. It does this by taking an approach very similar to the use of HTML tables for bordered content: the panel is rendered as 9 square areas, with the center area being rendered with the main material (as with Panel) and the outer 8 areas (the 4 corners and the 4 edges) rendered with a separate border material. The advantage of rendering the corners separately from the edges is that the edge textures can be designed so that they can be stretched without distorting them, meaning the single texture can serve any size panel.<BR><BR>
+
+Attributes:
+<DL COMPACT>
+<DT>border_size &lt;left&gt; &lt;right&gt; &lt;top&gt; &lt;bottom&gt;
+<DD>The size of the border at each edge, as a proportion of the size of the screen. This lets you have different size borders at each edge if you like, or you can use the same value 4 times to create a constant size border.
+<DT>border_material &lt;name&gt;
+<DD>The name of the material to use for the border. This is normally a different material to the one used for the center area, because the center area is often tiled which means you can't put border areas in there. You must put all the images you need for all the corners and the sides into a single texture.
+<DT>border_topleft_uv &lt;u1&gt; &lt;v1&gt; &lt;u2&gt; &lt;v2&gt;
+<DD>[also border_topright_uv, border_bottomleft_uv, border_bottomright_uv]; 
+The texture coordinates to be used for the corner areas of the border. 4 coordinates are required, 2 for the top-left corner of the square, 2 for the bottom-right of the square. 
+<DT>border_left_uv &lt;u1&gt; &lt;v1&gt; &lt;u2&gt; &lt;v2&gt;
+<DD>[also border_right_uv, border_top_uv, border_bottom_uv];
+The texture coordinates to be used for the edge areas of the border. 4 coordinates are required, 2 for the top-left corner, 2 for the bottom-right. Note that you should design the texture so that the left &amp; right edges can be stretched / squashed vertically and the top and bottom edges can be stretched / squashed horizontally without detrimental effects.
+</DL>
+
+
+<A NAME="TextArea"></A>
+<A NAME="SEC252"></A>
+<H3> TextArea (element) </H3>
+<!--docid::SEC252::-->
+
+This is a generic element that you can use to render text. It uses fonts which can be defined in code using the FontManager and Font classes, or which have been predefined in .fontdef files. See the font definitions section for more information.<BR><BR>
+
+Attributes:
+<DL COMPACT>
+<DT>font_name &lt;name&gt;
+<DD>The name of the font to use. This font must be defined in a .fontdef file to ensure it is available at scripting time.
+<DT>char_height &lt;height&gt;
+<DD>The height of the letters as a proportion of the screen height. Character widths may vary because OGRE supports proportional fonts, but will be based on this constant height. 
+<DT>colour &lt;red&gt; &lt;green&gt; &lt;blue&gt;
+<DD>A solid colour to render the text in. Often fonts are defined in monochrome, so this allows you to colour them in nicely and use the same texture for multiple different coloured text areas. The colour elements should all be expressed as values between 0 and 1. If you use predrawn fonts which are already full colour then you don't need this.
+<DT>colour_bottom &lt;red&gt; &lt;green&gt; &lt;blue&gt; / colour_top &lt;red&gt; &lt;green&gt; &lt;blue&gt;
+<DD>As an alternative to a solid colour, you can colour the text differently at the top and bottom to create a gradient colour effect which can be very effective.
+<DT>alignment &lt;left | center | right&gt;
+<DD>Sets the horizontal alignment of the text. This is different from the horz_align parameter.
+<DT>space_width &lt;width&gt;
+<DD>Sets the width of a space in relation to the screen.
+</DL>
+
+<A NAME="Font Definition Scripts"></A>
 <HR SIZE=1>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_42.html#SEC238"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC232"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_44.html#SEC253"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

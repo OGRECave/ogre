@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Particle Emitter Attributes</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Particle Scripts</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Particle Emitter Attributes">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Particle Emitter Attributes">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Particle Scripts">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Particle Scripts">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,206 +24,127 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC189"></A>
+<A NAME="SEC174"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_33.html#SEC187"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC165"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_35.html#SEC204"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_33.html#SEC173"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_35.html#SEC178"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H3> 3.3.3 Particle Emitter Attributes </H3>
-<!--docid::SEC189::-->
-This section describes the common attributes of all particle emitters. Specific emitter types may also support their own extra attributes.<BR><BR>
+<H2> 3.3 Particle Scripts </H2>
+<!--docid::SEC174::-->
 
-<A NAME="angle"></A>
-<A NAME="SEC190"></A>
-<H3> angle </H3>
-<!--docid::SEC190::-->
+Particle scripts allow you to define particle systems to be instantiated in your code without having to hard-code the settings themselves in your source code, allowing a very quick turnaround on any changes you make. Particle systems which are defined in scripts are used as templates, and multiple actual systems can be created from them at runtime.<BR><BR>
 
-Sets the maximum angle (in degrees) which emitted particles may deviate from the direction of the emitter (see direction). Setting this to 10 allows particles to deviate up to 10 degrees in any direction away from the emitter's direction. A value of 180 means emit in any direction, whilst 0 means emit always exactly in the direction of the emitter.<BR><BR>
+<A NAME="SEC175"></A>
+<H2> Loading scripts   </H2>
+<!--docid::SEC175::-->
 
-format: angle &lt;degrees&gt;<BR>
-example: angle 30<BR>
-default: 0<BR>
+Particle system scripts are loaded at initialisation time by the system: by default it looks in all common resource locations (see Root::addResourceLocation) for files with the '.particle' extension and parses them. If you want to parse files with a different extension, use the ParticleSystemManager::getSingleton().parseAllSources method with your own extension, or if you want to parse an individual file, use ParticleSystemManager::getSingleton().parseScript.<BR><BR>
 
-<A NAME="colour"></A>
-<A NAME="SEC191"></A>
-<H3> colour </H3>
-<!--docid::SEC191::-->
+Once scripts have been parsed, your code is free to instantiate systems based on them using the SceneManager::createParticleSystem() method which can take both a name for the new system, and the name of the template to base it on (this template name is in the script).<BR><BR>
 
-Sets a static colour for all particle emitted. Also see the colour_range_start and colour_range_end attributes for setting a range of colours. The format of the colour parameter is &quot;r g b a&quot;, where each component is a value from 0 to 1, and the alpha value is optional (assumes 1 if not specified).<BR><BR>
+<A NAME="SEC176"></A>
+<H2> Format   </H2>
+<!--docid::SEC176::-->
 
-format: colour &lt;r&gt; &lt;g&gt; &lt;b&gt; [&lt;a&gt;]<BR>
-example: colour 1 0 0 1<BR>
-default: 1 1 1 1<BR>
+Several particle systems may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ({}), and comments indicated by starting a line with '//' (note, no nested form comments allowed). The general format is shown below in a typical example:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>// A sparkly purple fountain
+Examples/PurpleFountain
+{
+    material Examples/Flare2
+    particle_width 20
+    particle_height 20
+    cull_each false
+    quota 10000
+    billboard_type oriented_self
 
-<A NAME="colour_range_start"></A>
-<A NAME="colour_range_end"></A>
-<A NAME="SEC192"></A>
-<H3> colour_range_start &amp; colour_range_end </H3>
-<!--docid::SEC192::-->
+    // Area emitter
+    emitter Point
+    {
+        angle 15
+        emission_rate 75
+        time_to_live 3
+        direction 0 1 0
+        velocity_min 250
+        velocity_max 300
+        colour_range_start 1 0 0
+        colour_range_end 0 0 1
+    }
 
-As the 'colour' attribute, except these 2 attributes must be specified together, and indicate the range of colours available to emitted particles. The actual colour will be randomly chosen between these 2 values.<BR><BR>
+    // Gravity
+    affector LinearForce
+    {
+        force_vector 0 -100 0
+        force_application add
+    }
 
-format: as colour<BR>
-example (generates random colours between red and blue):<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;colour_range_start 1 0 0<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;colour_range_end 0 0 1<BR>
-default: both 1 1 1 1<BR>
+    // Fader
+    affector ColourFader
+    {
+        red -0.25
+        green -0.25
+        blue -0.25
+    }
+}
+</pre></td></tr></table><BR><BR>
+Every particle system in the script must be given a name, which is the line before the first opening '{', in the example this is 'Examples/PurpleFountain'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your particle systems, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string.<BR><BR>
 
-<A NAME="direction"></A>
-<A NAME="SEC193"></A>
-<H3> direction </H3>
-<!--docid::SEC193::-->
+A system can have top-level attributes set using the scripting commands available, such as 'quota' to set the maximum number of particles allowed in the system. Emitters (which create particles) and affectors (which modify particles) are added as nested definitions within the script. The parameters available in the emitter and affector sections are entirely dependent on the type of emitter / affector.<BR><BR>
 
-Sets the direction of the emitter. This is relative to the SceneNode which the particle system is attached to, meaning that as with other movable objects changing the orientation of the node will also move the emitter.<BR><BR>
+For a detailed description of the core particle system attributes, see the list below:
 
-format: direction &lt;x&gt; &lt;y&gt; &lt;z&gt;<BR>
-example: direction 0 1 0<BR>
-default: 1 0 0<BR>
+<A NAME="SEC177"></A>
+<H3> Available Particle System Attributes </H3>
+<!--docid::SEC177::-->
+<UL>
+<LI>
+<A HREF="manual_35.html#SEC179">quota</A>
+<LI>
+<A HREF="manual_35.html#particle_material">material</A>
+<LI>
+<A HREF="manual_35.html#SEC181">particle_width</A>
+<LI>
+<A HREF="manual_35.html#SEC182">particle_height</A>
+<LI>
+<A HREF="manual_35.html#SEC183">cull_each</A>
+<LI>
+<A HREF="manual_35.html#SEC187">billboard_type</A>
+<LI>
+<A HREF="manual_35.html#SEC188">billboard_origin</A>
+<LI>
+<A HREF="manual_35.html#SEC189">billboard_rotation_type</A>
+<LI>
+<A HREF="manual_35.html#SEC190">common_direction</A>
+<LI>
+<A HREF="manual_35.html#SEC191">common_up_vector</A>
+<LI>
+<A HREF="manual_35.html#particle_renderer">renderer</A>
+<LI>
+<A HREF="manual_35.html#particle_sorted">sorted</A>
+<LI>
+<A HREF="manual_35.html#particle_localspace">local_space</A>
+<LI>
+<A HREF="manual_35.html#particle_point_rendering">point_rendering</A>
+<LI>
+<A HREF="manual_35.html#particle_accurate_facing">accurate_facing</A>
+<LI>
+<A HREF="manual_35.html#SEC194">iteration_interval</A>
+<LI>
+<A HREF="manual_35.html#SEC195">nonvisible_update_timeout</A>
+</UL>
+See also: <A HREF="manual_36.html#SEC196">3.3.2 Particle Emitters</A>, <A HREF="manual_39.html#SEC221">3.3.5 Particle Affectors</A>
 
-<A NAME="emission_rate"></A>
-<A NAME="SEC194"></A>
-<H3> emission_rate </H3>
-<!--docid::SEC194::-->
-
-Sets how many particles per second should be emitted. The specific emitter does not have to emit these in a continuous burst - this is a relative parameter
-and the emitter may choose to emit all of the second's worth of particles every half-second for example, the behaviour depends on the emitter. The emission rate will also be limited by the particle system's 'quota' setting.<BR><BR>
-
-format: emission_rate &lt;particles_per_second&gt;<BR>
-example: emission_rate 50<BR>
-default: 10<BR>
-
-<A NAME="position"></A>
-<A NAME="SEC195"></A>
-<H3> position </H3>
-<!--docid::SEC195::-->
-
-Sets the position of the emitter relative to the SceneNode the particle system is attached to.<BR><BR>
-
-format: position &lt;x&gt; &lt;y&gt; &lt;z&gt;<BR>
-example: position 10 0 40<BR>
-default: 0 0 0<BR>
-
-<A NAME="velocity"></A>
-<A NAME="SEC196"></A>
-<H3> velocity </H3>
-<!--docid::SEC196::-->
-
-Sets a constant velocity for all particles at emission time. See also the velocity_min and velocity_max attributes which allow you to set a range of velocities instead of a fixed one.<BR><BR>
-
-format: velocity &lt;world_units_per_second&gt;<BR>
-example: velocity 100<BR>
-default: 1<BR>
-
-<A NAME="velocity_min"></A>
-<A NAME="velocity_max"></A>
-<A NAME="SEC197"></A>
-<H3> velocity_min &amp; velocity_max </H3>
-<!--docid::SEC197::-->
-
-As 'velocity' except these attributes set a velocity range and each particle is emitted with a random velocity within this range.<BR><BR>
-
-format: as velocity<BR>
-example:<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;velocity_min 50<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;velocity_max 100<BR>
-default: both 1<BR>
-
-<A NAME="time_to_live"></A>
-<A NAME="SEC198"></A>
-<H3> time_to_live </H3>
-<!--docid::SEC198::-->
-
-Sets the number of seconds each particle will 'live' for before being destroyed. NB it is possible for particle affectors to alter this in flight, but this is the value given to particles on emission. See also the time_to_live_min and time_to_live_max attributes which let you set a lifetime range instead of a fixed one.<BR><BR>
-
-format: time_to_live &lt;seconds&gt;<BR>
-example: time_to_live 10<BR>
-default: 5<BR>
-
-<A NAME="time_to_live_min"></A>
-<A NAME="time_to_live_max"></A>
-<A NAME="SEC199"></A>
-<H3> time_to_live_min &amp; time_to_live_max </H3>
-<!--docid::SEC199::-->
-As time_to_live, except this sets a range of lifetimes and each particle gets a random value inbetween on emission.<BR><BR>
-
-format: as time_to_live<BR>
-example:<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;time_to_live_min 2<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;time_to_live_max 5<BR>
-default: both 5<BR>
-<BR>
-
-<A NAME="duration"></A>
-<A NAME="SEC200"></A>
-<H3> duration </H3>
-<!--docid::SEC200::-->
-
-Sets the number of seconds the emitter is active. The emitter can be started again, see <A HREF="manual_34.html#SEC202">repeat_delay</A>. A value of 0 means infinite duration. See also the duration_min and duration_max attributes which let you set a duration range instead of a fixed one.<BR><BR>
-
-format: duration &lt;seconds&gt;<BR>
-example:<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;duration 2.5<BR>
-default: 0<BR>
-<BR>
-
-<A NAME="duration_min"></A>
-<A NAME="duration_max"></A>
-<A NAME="SEC201"></A>
-<H3> duration_min &amp; duration_max </H3>
-<!--docid::SEC201::-->
-
-As duration, except these attributes set a variable time range between the min and max values each time the emitter is started.<BR><BR>
-
-format: as duration<BR>
-example:<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;duration_min 2<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;duration_max 5<BR>
-default: both 0<BR>
-<BR>
-
-<A NAME="repeat_delay"></A>
-<A NAME="SEC202"></A>
-<H3> repeat_delay </H3>
-<!--docid::SEC202::-->
-
-Sets the number of seconds to wait before the emission is repeated when stopped by a limited <A HREF="manual_34.html#SEC200">duration</A>. See also the repeat_delay_min and repeat_delay_max attributes which allow you to set a range of repeat_delays instead of a fixed one.<BR><BR>
-
-format: repeat_delay &lt;seconds&gt;<BR>
-example:<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;repeat_delay 2.5<BR>
-default: 0<BR>
-<BR>
-
-<A NAME="repeat_delay_min"></A>
-<A NAME="repeat_delay_max"></A>
-<A NAME="SEC203"></A>
-<H3> repeat_delay_min &amp; repeat_delay_max </H3>
-<!--docid::SEC203::-->
-
-As repeat_delay, except this sets a range of repeat delays and each time the emitter is started it gets a random value inbetween.<BR><BR>
-
-format: as repeat_delay<BR>
-example:<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;repeat_delay 2<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;repeat_delay 5<BR>
-default: both 0<BR>
-<BR>
-
-See also: <A HREF="manual_35.html#SEC204">3.3.4 Standard Particle Emitters</A>, <A HREF="manual_31.html#SEC165">3.3 Particle Scripts</A>, <A HREF="manual_36.html#SEC212">3.3.5 Particle Affectors</A>
-
-
-<A NAME="Standard Particle Emitters"></A>
+<A NAME="Particle System Attributes"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_33.html#SEC187"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC165"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_35.html#SEC204"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_33.html#SEC173"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_35.html#SEC178"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -232,7 +153,7 @@ See also: <A HREF="manual_35.html#SEC204">3.3.4 Standard Particle Emitters</A>, 
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

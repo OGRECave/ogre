@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Shadows</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Pixel Formats</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Shadows">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Shadows">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Pixel Formats">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Pixel Formats">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,62 +24,110 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC292"></A>
+<A NAME="SEC290"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_66.html#SEC285"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_68.html#SEC295"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_66.html#SEC288"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_63.html#SEC280"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_68.html#SEC293"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H1> 7. Shadows </H1>
-<!--docid::SEC292::-->
-Shadows are clearly an important part of rendering a believable scene - they provide a more tangible feel to the objects in the scene, and aid the viewer in understanding the spatial relationship between objects. Unfortunately, shadows are also one of the most challenging aspects of 3D rendering, and they are still very much an active area of research. Whilst there are many techniques to render shadows, none is perfect and they all come with advantages and disadvantages. For this reason, Ogre provides multiple shadow implementations, with plenty of configuration settings, so you can choose which technique is most appropriate for your scene.<BR><BR>
+<H3> 5.8.4 Pixel Formats </H3>
+<!--docid::SEC290::-->
 
-Shadow implementations fall into basically 2 broad categories: <A HREF="manual_68.html#SEC295">7.1 Stencil Shadows</A> and <A HREF="manual_69.html#SEC303">7.2 Texture-based Shadows</A>. This describes the method by which the shape of the shadow is generated. In addition, there is more than one way to render the shadow into the scene: <A HREF="manual_70.html#SEC317">7.3 Modulative Shadows</A>, which darkens the scene in areas of shadow, and <A HREF="manual_71.html#SEC319">7.4 Additive Light Masking</A> which by contrast builds up light contribution in areas which are not in shadow. You also have the option of <A HREF="manual_69.html#SEC316">Integrated Texture Shadows</A> which gives you complete control over texture shadow application, allowing for complex single-pass shadowing shaders. Ogre supports all these combinations.<BR><BR>
+A pixel format described the storage format of pixel data. It defines the way pixels are encoded in memory. The following classes of pixel formats (PF_*) are defined:
 
-<A NAME="SEC293"></A>
-<H3> Enabling shadows </H3>
-<!--docid::SEC293::-->
-Shadows are disabled by default, here's how you turn them on and configure them in the general sense:
-<OL>
-<LI>
-Enable a shadow technique on the SceneManager as the <STRONG>first</STRONG> thing you doin your scene setup. It is important that this is done first because the shadow technique can alter the way meshes are loaded. Here's an example:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>mSceneMgr-&gt;setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
-</pre></td></tr></table><LI>
-Create one or more lights. Note that not all light types are necessarily supported by all shadow techniques, you should check the sections about each technique to check. Note that if certain lights should not cast shadows, you can turn that off by calling setCastShadows(false) on the light, the default is true.
-<LI>
-Disable shadow casting on objects which should not cast shadows. Call setCastShadows(false) on objects you don't want to cast shadows, the default for all objects is to cast shadows.
-<LI>
-Configure shadow far distance. You can limit the distance at which shadows are considered for performance reasons, by calling SceneManager::setShadowFarDistance.
-<LI>
-Turn off the receipt of shadows on materials that should not receive them. You can turn off the receipt of shadows (note, not the casting of shadows - that is done per-object) by calling Material::setReceiveShadows or using the receive_shadows material attribute. This is useful for materials which should be considered self-illuminated for example. Note that transparent materials are typically excluded from receiving and casting shadows, although see the <A HREF="manual_14.html#SEC29">transparency_casts_shadows</A> option for exceptions. 
-</OL>
-
-<A NAME="SEC294"></A>
-<H3> Opting out of shadows </H3>
-<!--docid::SEC294::-->
-By default Ogre treats all non-transparent objects as shadow casters and receivers (depending on the shadow technique they may not be able to be both at once, check the docs for your chosen technique first). You can disable shadows in various ways:
 <DL COMPACT>
-<DT>Turning off shadow casting on the light
-<DD>Calling Light::setCastsShadows(false) will mean this light casts no shadows at all.
-<DT>Turn off shadow receipt on a material
-<DD>Calling Material::setReceiveShadows(false) will prevent any objects using this material from receiving shadows.
-<DT>Turn off shadow casting on individual objects
-<DD>Calling MovableObject::setCastsShadows(false) will disable shadow casting for this object.
-<DT>Turn off shadows on an entire rendering queue group
-<DD>Calling RenderQueueGroup::setShadowsEnabled(false) will turn off both shadow casting and receiving on an entire rendering queue group. This is useful because Ogre has to do light setup tasks per group in order to preserve the inter-group ordering. Ogre automatically disables shadows on a number of groups automatically, such as RENDER_QUEUE_BACKGROUND, RENDER_QUEUE_OVERLAY, RENDER_QUEUE_SKIES_EARLY and RENDER_QUEUE_SKIES_LATE. If you choose to use more rendering queues (and by default, you won't be using any more than this plus the 'standard' queue, so ignore this if you don't know what it means!), be aware that each one can incur a light setup cost, and you should disable shadows on the additional ones you use if you can.
+<DT>Native endian formats (PF_A8R8G8B8 and other formats with bit counts)
+<DD>These are native endian (16, 24 and 32 bit) integers in memory. This means that an image with format PF_A8R8G8B8 can be seen as an array of 32 bit integers, defined as 0xAARRGGBB in hexadecimal. The meaning of the letters is described below.
+
+<DT>Byte formats (PF_BYTE_*)
+<DD>These formats have one byte per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF_BYTE_RGBA consists of blocks of four bytes, one for red, one for green, one for blue, one for alpha.
+
+<DT>Short formats (PF_SHORT_*)
+<DD>These formats have one unsigned short (16 bit integer) per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF_SHORT_RGBA consists of blocks of four 16 bit integers, one for red, one for green, one for blue, one for alpha.
+
+<DT>Float16 formats (PF_FLOAT16_*)
+<DD>These formats have one 16 bit floating point number per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF_FLOAT16_RGBA consists of blocks of four 16 bit floats, one for red, one for green, one for blue, one for alpha. The 16 bit floats, also called half float) are very similar to the IEEE single-precision floating-point standard of the 32 bits floats, except that they have only 5 exponent bits and 10 mantissa. Note that there is no standard C++ data type or CPU support to work with these efficiently, but GPUs can
+calculate with these much more efficiently than with 32 bit floats.
+
+<DT>Float32 formats (PF_FLOAT32_*)
+<DD>These formats have one 32 bit floating point number per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF_FLOAT32_RGBA consists of blocks of four 32 bit floats, one for red, one for green, one for blue, one for alpha. The C++ data type for these 32 bits floats is just &quot;float&quot;.
+
+<DT>Compressed formats (PF_DXT[1-5])
+<DD>S3TC compressed texture formats, a good description can be found at | Wikipedia (http://en.wikipedia.org/wiki/S3TC)
+
 </DL>
 
-<A NAME="Stencil Shadows"></A>
+<A NAME="SEC291"></A>
+<H3> Colour channels </H3>
+<!--docid::SEC291::-->
+
+The meaning of the channels R,G,B,A,L and X is defined as
+
+<DL COMPACT>
+<DT>R
+<DD>Red colour component, usually ranging from 0.0 (no red) to 1.0 (full red).
+<DT>G
+<DD>Green colour component, usually ranging from 0.0 (no green) to 1.0 (full green).
+<DT>B
+<DD>Blue colour component, usually ranging from 0.0 (no blue) to 1.0 (full blue).
+<DT>A
+<DD>Alpha component, usually ranging from 0.0 (entire transparent) to 1.0 (opaque).
+<DT>L
+<DD>Luminance component, usually ranging from 0.0 (black) to 1.0 (white). The luminance component is duplicated in the R, G, and B channels to achieve a greyscale image.
+<DT>X
+<DD>This component is completely ignored.
+</DL>
+
+If none of red, green and blue components, or luminance is defined in a format, these default to 0. For the alpha channel this is different; if no alpha is defined, it defaults to 1. 
+
+<A NAME="SEC292"></A>
+<H3> Complete list of pixel formats </H3>
+<!--docid::SEC292::-->
+
+This pixel formats supported by the current version of Ogre are
+
+<DL COMPACT>
+
+<DT>Byte formats
+<DD>PF_BYTE_RGB, PF_BYTE_BGR, PF_BYTE_BGRA, PF_BYTE_RGBA, PF_BYTE_L, PF_BYTE_LA, PF_BYTE_A
+
+<DT>Short formats
+<DD>PF_SHORT_RGBA
+
+<DT>Float16 formats
+<DD>PF_FLOAT16_R, PF_FLOAT16_RGB, PF_FLOAT16_RGBA
+
+<DT>Float32 formats
+<DD>PF_FLOAT32_R, PF_FLOAT32_RGB, PF_FLOAT32_RGBA
+
+<DT>8 bit native endian formats
+<DD>PF_L8, PF_A8, PF_A4L4, PF_R3G3B2
+
+<DT>16 bit native endian formats
+<DD>PF_L16, PF_R5G6B5, PF_B5G6R5, PF_A4R4G4B4, PF_A1R5G5B5
+
+<DT>24 bit native endian formats
+<DD>PF_R8G8B8, PF_B8G8R8
+
+<DT>32 bit native endian formats
+<DD>PF_A8R8G8B8, PF_A8B8G8R8, PF_B8G8R8A8, PF_R8G8B8A8, PF_X8R8G8B8, PF_X8B8G8R8, PF_A2R10G10B10 PF_A2B10G10R10
+
+<DT>Compressed formats
+<DD>PF_DXT1, PF_DXT2, PF_DXT3, PF_DXT4, PF_DXT5
+
+</DL>
+
+<A NAME="Pixel boxes"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_66.html#SEC285"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_68.html#SEC295"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_66.html#SEC288"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_63.html#SEC280"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_68.html#SEC293"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -88,7 +136,7 @@ By default Ogre treats all non-transparent objects as shadow casters and receive
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

@@ -1,19 +1,17 @@
-@node Copying Materials
-@subsection Copying Materials
+@node Script Inheritence
+@subsection Script Inheritence
 
-When creating new materials scripts that are only slight variations of another material script, the script writer resorts to copy and pasting materials within scripts.  For simple materials, the copy/paste method is acceptable.  Complex materials that use multiple passes along with vertex and pixel shaders become very tedious to edit when many variations are needed.  To reduce the tediousness of making new materials that are just slight variations of previously defined materials, new materials can copy from previously defined materials and modify specific techniques, passes, texture units or add new ones.@*@*
+When creating new script objects that are only slight variations of another object, it's good to avoid copying and pasting between scripts.  Script inheritence lets you do this; in this section we'll use material scripts as an example, but this applies to all scripts parsed with the script compilers in Ogre 1.6 onwards.@*@*
 
-To make a new material that is based on one previously defined, add a @emph{colon} @strong{:} after the new material name followed by the name of the material that is to be copied.@*@*
+For example, to make a new material that is based on one previously defined, add a @emph{colon} @strong{:} after the new material name followed by the name of the material that is to be copied.@*@*
 
 Format: material <NewUniqueChildName> : <ReferanceParentMaterial>@*@*
 
-The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed.  The easiest way to achieve this is to place parents at the begining of the material script file.  After material scripts are loaded into Ogre, materials no longer maintain their copy inheritance structure.  If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.@*@*
+The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed.  The easiest way to achieve this is to either place parents at the begining of the material script file, or to use the 'import' directive (@xref{Script Import Directive}). Note that inheritence is actually a copy - after scripts are loaded into Ogre, objects no longer maintain their copy inheritance structure.  If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.@*@*
 
-Material copying within the script alleviates some drudgery from copy/paste but having the ability to identify specific techniques, passes, and texture units to modify makes material copying easier.  Techniques, passes, texture units can be identified directly in the child material without having to layout previous techniques, passes, texture units by associating a name with them,  Techniques and passes can take a name and texture units can be numbered within the material script.@*@*
+Material copying within the script alleviates some drudgery from copy/paste but having the ability to identify specific techniques, passes, and texture units to modify makes material copying easier.  Techniques, passes, texture units can be identified directly in the child material without having to layout previous techniques, passes, texture units by associating a name with them,  Techniques and passes can take a name and texture units can be numbered within the material script. You can also use variables, @xref{Script Variables}.@*@*
 
-@strong{NOTE:  Using names is optional so older scripts will still work just fine and you can inherit from them as well.}@*@*
-
-Names become very usefull in materials that copy from other materials.  In order to overide values they must be in the correct technique, pass, texture unit etc.  The script could be layed out using the sequence of techniques, passes, texture units in the child material but if only one paramter needs to change in say the 5th pass then the first four passes prior to the fith would have to be placed in the script:@*@*
+Names become very useful in materials that copy from other materials.  In order to overide values they must be in the correct technique, pass, texture unit etc.  The script could be layed out using the sequence of techniques, passes, texture units in the child material but if only one paramter needs to change in say the 5th pass then the first four passes prior to the fith would have to be placed in the script:@*@*
 
 Here is an example:
 @example
@@ -69,32 +67,6 @@ If a new technique or pass needs to be added to a copied material then use a uni
 
 Note:  if passes or techniques aren't given a name, they will take on a default name based on their index.  For example the first pass has index 0 so its name will be 0.
 
-@subheading Dealing with Program References and Shader Parameters:
-
-For a child material that only needs to change some shader parameters within a pass, do the following:@*@*
-
-@example
-material furtest2 : furtest1
-{
-  technique ati8500
-  {
-    pass fur3
-    {
-      fragment_program_ref
-      {
-        param_named furlength float 0.5
-      }
-    }
-  }
-}
-@end example
-
-There is no requirement to give the name of the fragment program reference since the parent material has already done this and the same applies to a vertex program reference, but dropping the program reference name only applies if one is defined in the pass copied from the parent material.  If the parent didn't have a program reference then an exception is generated since the material parser has no clue as to what the script intended.@*@*
-
-Program references can be added to copied passes that had no program references.  The whole program reference will have to be defined with in the pass.@*@*
-
-If a different program ref is to be used in the copied pass then just put in the name of the different vertex/fragment program reference.  This is usefull when you want to inherit from a parent material but want to use a different shader program for one of the passes.@*@*
-
 @subheading Identifying Texture Units to overide values
 
 A specific texture unit state (TUS) can be given a unique name within a pass of a material so that it can be identified later in cloned materials that need to override specified texture unit states in the pass without declaring previous texture units.  Using a unique name for a Texture unit in a pass of a cloned material adds a new texture unit at the end of the texture unit list for the pass.@*@*
@@ -115,9 +87,53 @@ material BumpMap2 : BumpMap1
 }
 @end example
 
-@subheading Texture Aliases
+@subheading Advanced Script Inheritence
+Starting with Ogre 1.6, script objects can now inherit from each other more generally. The previous concept of inheritance, material copying, was restricted only to the top-level material objects. Now, any level of object can take advantage of inheritance (for instance, techniques, passes, and compositor targets).@*@*
 
-Texture aliases are usefull for when only the textures used in texture units need to be specified for a cloned material.  In the source material ie the original material to be cloned, each texture unit can be given a texture alias name.  The cloned material in the script can then specify what textures should be used for each texture alias.@*@*
+@example
+material Test
+{
+    technique
+    {
+        pass : ParentPass
+        {
+        }
+    }
+}
+@end example
+
+Notice that the pass inherits from ParentPass. This allows for the creation of more fine-grained inheritance hierarchies.@*@*
+
+Along with the more generalized inheritance system comes an important new keyword: "abstract." This keyword is used at a top-level object declaration (not inside any other object) to denote that it is not something that the compiler should actually attempt to compile, but rather that it is only for the purpose of inheritance. For example, a material declared with the abstract keyword will never be turned into an actual usable material in the material framework. Objects which cannot be at a top-level in the document (like a pass) but that you would like to declare as such for inheriting purpose must be declared with the abstract keyword.@*@*
+
+@example
+abstract pass ParentPass
+{
+    diffuse 1 0 0 1
+}
+@end example
+
+That declares the ParentPass object which was inherited from in the above example. Notice the abstract keyword which informs the compiler that it should not attempt to actually turn this object into any sort of Ogre resource. If it did attempt to do so, then it would obviously fail, since a pass all on its own like that is not valid.@*@*
+
+The final matching option is based on wildcards. Using the '*' character, you can make a powerful matching scheme and override multiple objects at once, even if you don't know exact names or positions of those objects in the inherited object.@*@*
+
+@example
+abstract technique Overrider
+{
+   pass *color*
+   {
+      diffuse 0 0 0 0
+   }
+} 
+@end example
+
+This technique, when included in a material, will override all passes matching the wildcard "*color*" (color has to appear in the name somewhere) and turn their diffuse properties black. It does not matter their position or exact name in the inherited technique, this will match them. @*@*
+
+
+@node Texture Aliases
+@subsection Texture Aliases
+
+Texture aliases are useful for when only the textures used in texture units need to be specified for a cloned material.  In the source material ie the original material to be cloned, each texture unit can be given a texture alias name.  The cloned material in the script can then specify what textures should be used for each texture alias. Note that texture aliases are a more specific version of @ref{Script Variables} which can be used to easily set other values.@*@*
 
 Using texture aliases within texture units:@*
 Format:@*
@@ -276,3 +292,67 @@ material fxTest3 : TSNormalSpecMapping
 @end example
 
 fxTest3 will end up with the default textures for the normal map and spec map setup in TSNormalSpecMapping material but will have a different diffuse map.  So your base material can define the default textures to use and then the child materials can override specific textures.@*@*
+
+@node Script Variables
+@subsection Script Variables
+A very powerful new feature in Ogre 1.6 is variables. Variables allow you to parameterize data in materials so that they can become more generalized. This enables greater reuse of scripts by targeting specific customization points. Using variables along with inheritance allows for huge amounts of overrides and easy object reuse.@*@*
+
+@example
+abstract pass ParentPass
+{
+   diffuse $diffuse_colour
+}
+
+material Test
+{
+   technique
+   {
+       pass : ParentPass
+       {
+           set $diffuse_colour "1 0 0 1"
+       }
+   }
+}
+@end example
+
+The ParentPass object declares a variable called "diffuse_colour" which is then overridden in the Test material's pass. The "set" keyword is used to set the value of that variable. The variable assignment follows lexical scoping rules, which means that the value of "1 0 0 1" is only valid inside that pass definition. Variable assignment in outer scopes carry over into inner scopes.@*@*
+
+@example
+material Test
+{
+    set $diffuse_colour "1 0 0 1"
+    technique
+    {
+        pass : ParentPass
+        {
+        }
+    }
+}
+@end example
+
+The $diffuse_colour assignment carries down through the technique and into the pass. @*@*
+
+
+
+@node Script Import Directive
+@subsection Script Import Directive
+
+Imports are a feature introduced to remove ambiguity from script dependencies. When using scripts that inherit from each other but which are defined in separate files sometimes errors occur because the scripts are loaded in incorrect order. Using imports removes this issue. The script which is inheriting another can explicitly import its parent's definition which will ensure that no errors occur because the parent's definition was not found.@*@*
+
+@example
+import * from "parent.material"
+material Child : Parent
+{
+}
+@end example
+
+The material "Parent" is defined in parent.material and the import ensures that those definitions are found properly. You can also import specific targets from within a file.
+
+@example
+import Parent from "parent.material"
+@end example
+
+If there were other definitions in the parent.material file, they would not be imported.@*@*
+
+Note, however that importing does not actually cause objects in the imported script to be fully parsed & created, it just makes the definitions available for inheritence. This has a specific ramification for vertex / fragment program definitions, which must be loaded before any parameters can be specified. You should continue to put common program definitions in .program files to ensure they are fully parsed before being referenced in multiple .material files. The 'import' command just makes sure you can resolve dependencies between equivalent script definitions (e.g. material to material).@*@*
+

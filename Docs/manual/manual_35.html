@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Standard Particle Emitters</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Particle System Attributes</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Standard Particle Emitters">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Standard Particle Emitters">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Particle System Attributes">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Particle System Attributes">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,149 +24,274 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC204"></A>
+<A NAME="SEC178"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC189"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC165"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_36.html#SEC212"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC174"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC174"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_36.html#SEC196"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H3> 3.3.4 Standard Particle Emitters </H3>
-<!--docid::SEC204::-->
-Ogre comes preconfigured with a few particle emitters. New ones can be added by creating plugins: see the Plugin_ParticleFX project as an example of how you would do this (this is where these emitters are implemented).
+<H3> 3.3.1 Particle System Attributes </H3>
+<!--docid::SEC178::-->
+This section describes to attributes which you can set on every particle system using scripts. All atributes have default values so all settings are optional in your script.<BR><BR>
 
+<A NAME="quota"></A>
+<A NAME="SEC179"></A>
+<H3> quota </H3>
+<!--docid::SEC179::-->
+
+Sets the maximum number of particles this system is allowed to contain at one time. When this limit is exhausted, the emitters will not be allowed to emit any more particles until some destroyed (e.g. through their time_to_live running out). Note that you will almost always want to change this, since it defaults to a very low value (particle pools are only ever increased in size, never decreased).<BR><BR>
+
+format: quota &lt;max_particles&gt;<BR>
+example: quota 10000<BR>
+default: 10<BR>
+
+<A NAME="particle_material"></A>
+<A NAME="SEC180"></A>
+<H3> material  </H3>
+<!--docid::SEC180::-->
+
+Sets the name of the material which all particles in this system will use. All paticles in a system use the same material, although each particle can tint this material through the use of it's colour property.<BR><BR>
+
+format: material &lt;material_name&gt;<BR>
+example: material Examples/Flare<BR>
+default: none (blank material)<BR>
+
+<A NAME="particle_width"></A>
+<A NAME="SEC181"></A>
+<H3> particle_width </H3>
+<!--docid::SEC181::-->
+
+Sets the width of particles in world coordinates. Note that this property is absolute when billboard_type (see below) is set to 'point' or 'perpendicular_self', but is scaled by the length of the direction vector when billboard_type is 'oriented_common', 'oriented_self' or 'perpendicular_common'.<BR>
+
+format: particle_width &lt;width&gt;<BR>
+example: particle_width 20<BR>
+default: 100<BR>
+
+<A NAME="particle_height"></A>
+<A NAME="SEC182"></A>
+<H3> particle_height </H3>
+<!--docid::SEC182::-->
+
+Sets the height of particles in world coordinates. Note that this property is absolute when billboard_type (see below) is set to 'point' or 'perpendicular_self', but is scaled by the length of the direction vector when billboard_type is 'oriented_common', 'oriented_self' or 'perpendicular_common'.<BR>
+
+format: particle_height &lt;height&gt;<BR>
+example: particle_height 20<BR>
+default: 100<BR>
+
+<A NAME="cull_each"></A>
+<A NAME="SEC183"></A>
+<H3> cull_each </H3>
+<!--docid::SEC183::-->
+
+All particle systems are culled by the bounding box which contains all the particles in the system. This is normally sufficient for fairly locally constrained particle systems where most particles are either visible or not visible together. However, for those that spread particles over a wider area (e.g. a rain system), you may want to actually cull each particle individually to save on time, since it is far more likely that only a subset of the particles will be visible. You do this by setting the cull_each parameter to true.<BR><BR>
+
+format: cull_each &lt;true|false&gt;<BR>
+example: cull_each true<BR>
+default: false<BR>
+
+<A NAME="particle_renderer"></A>
+<A NAME="SEC184"></A>
+<H3> renderer </H3>
+<!--docid::SEC184::-->
+
+Particle systems do not render themselves, they do it through ParticleRenderer classes. Those classes are registered with a manager in order to provide particle systems with a particular 'look'. OGRE comes configured with a default billboard-based renderer, but more can be added through plugins. Particle renders are registered with a unique name, and you can use that name in this attribute to determine the renderer to use. The default is 'billboard'.<BR><BR>
+
+Particle renderers can have attributes, which can be passed by setting them on the root particle system.<BR><BR>
+
+format: renderer &lt;renderer_name&gt;<BR>
+default: billboard<BR>
+
+<A NAME="particle_sorted"></A>
+<A NAME="SEC185"></A>
+<H3> sorted </H3>
+<!--docid::SEC185::-->
+
+By default, particles are not sorted. By setting this attribute to 'true', theparticles will be sorted with respect to the camera, furthest first. This can make certain rendering effects look better at a small sorting expense.<BR><BR>
+
+format: sorted &lt;true|false&gt;<BR>
+default: false<BR>
+
+<A NAME="particle_localspace"></A>
+<A NAME="SEC186"></A>
+<H3> local_space </H3>
+<!--docid::SEC186::-->
+
+By default, particles are emitted into world space, such that if you transform the node to which the system is attached, it will not affect the particles (only the emitters). This tends to give the normal expected behaviour, which is to model how real world particles travel independently from the objects they are emitted from. However, to create some effects you may want the particles to remain attached to the local space the emitter is in and to follow them directly. This option allows you to do that.<BR><BR>
+
+format: local_space &lt;true|false&gt;<BR>
+default: false<BR>
+
+<A NAME="billboard_type"></A>
+<A NAME="SEC187"></A>
+<H3> billboard_type </H3>
+<!--docid::SEC187::-->
+
+This is actually an attribute of the 'billboard' particle renderer (the default), and is an example of passing attributes to a particle renderer by declaring them directly within the system declaration. Particles using the default renderer are rendered using billboards, which are rectangles formed by 2 triangles which rotate to face the given direction. However, there is more than 1 way to orient a billboard. The classic approach is for the billboard to directly face the camera: this is the default behaviour. However this arrangement only looks good for particles which are representing something vaguely spherical like a light flare. For more linear effectd like laser fire, you actually want the particle to have an orientation of it's own.<BR><BR>
+
+format: billboard_type &lt;point|oriented_common|oriented_self|perpendicular_common|perpendicular_self&gt;<BR>
+example: billboard_type oriented_self<BR>
+default: point<BR>
+
+The options for this parameter are:
+<DL COMPACT>
+<DT>point
+<DD>	The default arrangement, this approximates spherical particles and the billboards always fully face the camera.
+<DT>oriented_common
+<DD>	Particles are oriented around a common, typically fixed direction vector (see <A HREF="manual_35.html#SEC190">common_direction</A>), which acts as their local Y axis. The billboard rotates only around this axis, giving the particle some sense of direction. Good for rainstorms, starfields etc where the particles will travelling in one direction - this is slightly faster than oriented_self (see below).
+<DT>oriented_self
+<DD>	Particles are oriented around their own direction vector, which acts as their local Y axis. As the particle changes direction, so the billboard reorients itself to face this way. Good for laser fire, fireworks and other 'streaky' particles that should look like they are travelling in their own direction.
+<DT>perpendicular_common
+<DD>	Particles are perpendicular to a common, typically fixed direction vector (see <A HREF="manual_35.html#SEC190">common_direction</A>), which acts as their local Z axis, and their local Y axis coplanar with common direction and the common up vector (see <A HREF="manual_35.html#SEC191">common_up_vector</A>). The billboard never rotates to face the camera, you might use double-side material to ensure particles never culled by back-facing. Good for aureolas, rings etc where the particles will perpendicular to the ground - this is slightly faster than perpendicular_self (see below).
+<DT>perpendicular_self
+<DD>	Particles are perpendicular to their own direction vector, which acts as their local Z axis, and their local Y axis coplanar with their own direction vector and the common up vector (see <A HREF="manual_35.html#SEC191">common_up_vector</A>). The billboard never rotates to face the camera, you might use double-side material to ensure particles never culled by back-facing. Good for rings stack etc where the particles will perpendicular to their travelling direction.
+</DL>
+
+<A NAME="billboard_origin"></A>
+<A NAME="SEC188"></A>
+<H3> billboard_origin </H3>
+<!--docid::SEC188::-->
+
+Specifying the point which acts as the origin point for all billboard particles, controls the fine tuning of where a billboard particle appears in relation to it's position.<BR><BR>
+
+format: billboard_origin &lt;top_left|top_center|top_right|center_left|center|center_right|bottom_left|bottom_center|bottom_right&gt;<BR>
+example: billboard_origin top_right<BR>
+default: center<BR>
+
+The options for this parameter are:
+<DL COMPACT>
+<DT>top_left
+<DD>	The billboard origin is the top-left corner.
+<DT>top_center
+<DD>	The billboard origin is the center of top edge.
+<DT>top_right
+<DD>	The billboard origin is the top-right corner.
+<DT>center_left
+<DD>	The billboard origin is the center of left edge.
+<DT>center
+<DD>	The billboard origin is the center.
+<DT>center_right
+<DD>	The billboard origin is the center of right edge.
+<DT>bottom_left
+<DD>	The billboard origin is the bottom-left corner.
+<DT>bottom_center
+<DD>	The billboard origin is the center of bottom edge.
+<DT>bottom_right
+<DD>	The billboard origin is the bottom-right corner.
+</DL>
+
+<A NAME="billboard_rotation_type"></A>
+<A NAME="SEC189"></A>
+<H3> billboard_rotation_type </H3>
+<!--docid::SEC189::-->
+
+By default, billboard particles will rotate the texture coordinates to according with particle rotation. But rotate texture coordinates has some disadvantage, e.g. the corners of the texture will lost after rotate, and the corners of the billboard will fill with unwant texture area when using wrap address mode or sub-texture sampling. This settings allow you specifying other rotation type.<BR><BR>
+
+format: billboard_rotation_type &lt;vertex|texcoord&gt;<BR>
+example: billboard_rotation_type vertex<BR>
+default: texcoord<BR>
+
+The options for this parameter are:
+<DL COMPACT>
+<DT>vertex
+<DD>	Billboard particles will rotate the vertices around their facing direction to according with particle rotation. Rotate vertices guarantee texture corners exactly match billboard corners, thus has advantage mentioned above, but should take more time to generate the vertices.
+<DT>texcoord
+<DD>	Billboard particles will rotate the texture coordinates to according with particle rotation. Rotate texture coordinates is faster than rotate vertices, but has some disadvantage mentioned above.
+</DL>
+
+<A NAME="common_direction"></A>
+<A NAME="SEC190"></A>
+<H3> common_direction </H3>
+<!--docid::SEC190::-->
+
+Only required if <A HREF="manual_35.html#SEC187">billboard_type</A> is set to oriented_common or perpendicular_common, this vector is the common direction vector used to orient all particles in the system.<BR><BR>
+
+format: common_direction &lt;x&gt; &lt;y&gt; &lt;z&gt;<BR>
+example: common_direction 0 -1 0<BR>
+default: 0 0 1<BR>
+<BR><BR>
+See also: <A HREF="manual_36.html#SEC196">3.3.2 Particle Emitters</A>, <A HREF="manual_39.html#SEC221">3.3.5 Particle Affectors</A>
+
+<A NAME="common_up_vector"></A>
+<A NAME="SEC191"></A>
+<H3> common_up_vector </H3>
+<!--docid::SEC191::-->
+
+Only required if <A HREF="manual_35.html#SEC187">billboard_type</A> is set to perpendicular_self or perpendicular_common, this vector is the common up vector used to orient all particles in the system.<BR><BR>
+
+format: common_up_vector &lt;x&gt; &lt;y&gt; &lt;z&gt;<BR>
+example: common_up_vector 0 1 0<BR>
+default: 0 1 0<BR>
+<BR><BR>
+See also: <A HREF="manual_36.html#SEC196">3.3.2 Particle Emitters</A>, <A HREF="manual_39.html#SEC221">3.3.5 Particle Affectors</A>
+
+<A NAME="particle_point_rendering"></A>
+<A NAME="SEC192"></A>
+<H3> point_rendering </H3>
+<!--docid::SEC192::-->
+
+This is actually an attribute of the 'billboard' particle renderer (the default), and sets whether or not the billboardset will use point rendering rather than manually generated quads.<BR><BR>
+
+By default a billboardset is rendered by generating geometry for a textured quad in memory, taking into account the size and orientation settings, and uploading it to the video card. The alternative is to use hardware point rendering, which means that	only one position needs to be sent per billboard rather than 4 and	the hardware sorts out how this is rendered based on the render	state.<BR><BR>
+
+Using point rendering is faster than generating quads manually, but	is more restrictive. The following restrictions apply:
 <UL>
-<LI>
-<A HREF="manual_35.html#SEC205">Point Emitter</A>
-<LI>
-<A HREF="manual_35.html#SEC206">Box Emitter</A>
-<LI>
-<A HREF="manual_35.html#SEC207">Cylinder Emitter</A>
-<LI>
-<A HREF="manual_35.html#SEC208">Ellipsoid Emitter</A>
-<LI>
-<A HREF="manual_35.html#SEC209">Hollow Ellipsoid Emitter</A>
-<LI>
-<A HREF="manual_35.html#SEC210">Ring Emitter</A>
+<LI>Only the 'point' orientation type is supported
+<LI>Size and appearance of each particle is controlled by the material pass (<A HREF="manual_16.html#SEC69">point_size</A>, <A HREF="manual_16.html#SEC71">point_size_attenuation</A>, <A HREF="manual_16.html#SEC70">point_sprites</A>)
+<LI>Per-particle size is not supported (stems from the above)
+<LI>Per-particle rotation is not supported, and this can only be controlled through texture unit rotation in the material definition
+<LI>Only 'center' origin is supported
+<LI>Some drivers have an upper limit on the size of points they support - this can even vary between APIs on the same card! Don't rely on point sizes that cause the point sprites to get very large on screen, since they may get clamped on some cards. Upper sizes can range from 64 to 256 pixels.
 </UL>
-<BR><BR>
-<A NAME="Point Emitter"></A>
-<A NAME="SEC205"></A>
-<H3> Point Emitter </H3>
-<!--docid::SEC205::-->
+You will almost certainly want to enable in your material pass both point attenuation and point sprites if you use this option. <BR><BR>
 
-This emitter emits particles from a single point, which is it's position. This emitter has no additional attributes over an above the standard emitter attributes.<BR><BR>
 
-To create a point emitter, include a section like this within your particle system script:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>
-emitter Point
-{
-    // Settings go here
-}
-</pre></td></tr></table><BR>
-Please note that the name of the emitter ('Point') is case-sensitive.
+<A NAME="particle_accurate_facing"></A>
+<A NAME="SEC193"></A>
+<H3> accurate_facing </H3>
+<!--docid::SEC193::-->
 
-<A NAME="Box Emitter"></A>
-<A NAME="SEC206"></A>
-<H3> Box Emitter </H3>
-<!--docid::SEC206::-->
+This is actually an attribute of the 'billboard' particle renderer (the default), and sets whether or not the billboardset will use a slower but more accurate calculation for facing the billboard to the camera. Bt default it uses the camera direction, which is faster but means the billboards don't stay in the same orientation as you rotate the camera. The 'accurate_facing true' option makes the calculation based on a vector from each billboard to the camera, which means the orientation is constant even whilst the camera rotates. <BR><BR>
 
-This emitter emits particles from a random location within a 3-dimensional box. It's extra attributes are:<BR><BR>
-<DL COMPACT>
-<DT>width
-<DD>Sets the width of the box (this is the size of the box along it's local X axis, which is dependent on the 'direction' attribute which forms the box's local Z).<BR>
-format: width &lt;units&gt;<BR>
-example: width 250<BR>
-default: 100<BR>
-<DT>height
-<DD>Sets the height of the box (this is the size of the box along it's local Y axis, which is dependent on the 'direction' attribute which forms the box's local Z).<BR>
-format: height &lt;units&gt;<BR>
-example: height 250<BR>
-default: 100<BR>
-<DT>depth
-<DD>Sets the depth of the box (this is the size of the box along it's local Z axis, which is the same as the 'direction' attribute).<BR>
-format: depth &lt;units&gt;<BR>
-example: depth 250<BR>
-default: 100<BR>
-</DL>
-<BR>
-To create a box emitter, include a section like this within your particle system script:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>emitter Box
-{
-    // Settings go here
-}
-</pre></td></tr></table>
-<A NAME="Cylinder Emitter"></A>
-<A NAME="SEC207"></A>
-<H3> Cylinder Emitter </H3>
-<!--docid::SEC207::-->
-
-This emitter emits particles in a random direction from within a cylinder area, where the cylinder is oriented along the Z-axis. This emitter has exactly the same parameters as the <A HREF="manual_35.html#SEC206">Box Emitter</A> so there are no additional parameters to consider here - the width and height determine the shape of the cylinder along it's axis (if they are different it is an ellipsoid cylinder), the depth determines the length of the cylinder. 
-
-<A NAME="Ellipsoid Emitter"></A>
-<A NAME="SEC208"></A>
-<H3> Ellipsoid Emitter </H3>
-<!--docid::SEC208::-->
-This emitter emits particles from within an ellipsoid shaped area, ie a sphere or squashed-sphere area. The parameters are again identical to the <A HREF="manual_35.html#SEC206">Box Emitter</A>, except that the dimensions describe the widest points along each of the axes.
-
-<A NAME="Hollow Ellipsoid Emitter"></A>
-<A NAME="SEC209"></A>
-<H3> Hollow Ellipsoid Emitter </H3>
-<!--docid::SEC209::-->
-This emitter is just like <A HREF="manual_35.html#SEC208">Ellipsoid Emitter</A> except that there is a hollow area in the centre of the ellipsoid from which no particles are emitted. Therefore it has 3 extra parameters in order to define this area:
-
-<DL COMPACT>
-<DT>inner_width
-<DD>The width of the inner area which does not emit any particles.
-<DT>inner_height
-<DD>The height of the inner area which does not emit any particles.
-<DT>inner_depth
-<DD>The depth of the inner area which does not emit any particles.
-</DL>
-
-<A NAME="Ring Emitter"></A>
-<A NAME="SEC210"></A>
-<H3> Ring Emitter </H3>
-<!--docid::SEC210::-->
-This emitter emits particles from a ring-shaped area, ie a little like <A HREF="manual_35.html#SEC209">Hollow Ellipsoid Emitter</A> except only in 2 dimensions.
-
-<DL COMPACT>
-<DT>inner_width
-<DD>The width of the inner area which does not emit any particles.
-<DT>inner_height
-<DD>The height of the inner area which does not emit any particles.
-</DL>
+format: accurate_facing on|off<BR>
+default: accurate_facing off 0<BR>
 <BR><BR>
 
-See also: <A HREF="manual_31.html#SEC165">3.3 Particle Scripts</A>, <A HREF="manual_33.html#SEC187">3.3.2 Particle Emitters</A>
 
-<A NAME="SEC211"></A>
-<H3> Emitting Emitters </H3>
-<!--docid::SEC211::-->
-<A NAME="Emitting Emitters"></A>
+<A NAME="iteration_interval"></A>
+<A NAME="SEC194"></A>
+<H3> iteration_interval </H3>
+<!--docid::SEC194::-->
+Usually particle systems are updated based on the frame rate; however this can give variable results with more extreme frame rate ranges, particularly at lower frame rates. You can use this option to make the update frequency a fixed interval, whereby at lower frame rates, the particle update will be repeated at the fixed interval until the frame time is used up. A value of 0 means the default frame time iteration. <BR><BR>
 
-It is possible to spawn new emitters on the expiry of particles, for example to product 'firework' style effects. This is controlled via the following directives:
+format: iteration_interval &lt;secs&gt;<BR>
+example: iteration_interval 0.01<BR>
+default: iteration_interval 0<BR>
+<BR><BR>
 
-<DL COMPACT>
-<DT>emit_emitter_quota
-<DD>This parameter is a system-level parameter telling the system how many emitted emitters may be in use at any one time. This is just to allow for the space allocation process.
-<DT>name
-<DD>This parameter is an emitter-level parameter, giving a name to an emitter. This can then be referred to in another emitter as the new emitter type to spawn when an emitted particle dies.
-<DT>emit_emitter
-<DD>This is an emitter-level parameter, and if specified, it means that when particles emitted by this emitter die, they spawn a new emitter of the named type.
-</DL>
+<A NAME="nonvisible_update_timeout"></A>
+<A NAME="SEC195"></A>
+<H3> nonvisible_update_timeout </H3>
+<!--docid::SEC195::-->
+Sets when the particle system should stop updating after it hasn't been visible for a while. By default, visible particle systems update all the time, even when not in view. This means that they are guaranteed to be consistent when they do enter view. However, this comes at a cost, updating particle systems can be expensive, especially if they are perpetual. 
+<BR><BR>
+This option lets you set a 'timeout' on the particle system, so that if it isn't visible for this amount of time, it will stop updating	until it is next visible. A value of 0 disables the timeout and always updates.<BR><BR>
 
+format: nonvisible_update_timeout &lt;secs&gt;<BR>
+example: nonvisible_update_timeout 10<BR>
+default: nonvisible_update_timeout 0<BR>
+<BR><BR>
 
-<A NAME="Particle Affectors"></A>
+<A NAME="Particle Emitters"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC189"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC165"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_36.html#SEC212"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC174"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC174"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_36.html#SEC196"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -175,7 +300,7 @@ It is possible to spawn new emitters on the expiry of particles, for example to 
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 
