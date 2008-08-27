@@ -135,6 +135,7 @@ namespace Ogre {
 		, mColourWrite(true)
 		, mAlphaRejectFunc(CMPF_ALWAYS_PASS)
 		, mAlphaRejectVal(0)
+		, mAlphaToCoverageEnabled(false)
 		, mTransparentSorting(true)
 		, mCullMode(CULL_CLOCKWISE)
 		, mManualCullMode(MANUAL_CULL_BACK)
@@ -159,6 +160,7 @@ namespace Ogre {
 		, mShadowCasterVertexProgramUsage(0)
 		, mShadowReceiverVertexProgramUsage(0)
 		, mFragmentProgramUsage(0)
+		, mGeometryProgramUsage(0)
 		, mShadowReceiverFragmentProgramUsage(0)
 		, mQueuedForDeletion(false)
 		, mPassIterationCount(1)
@@ -227,6 +229,7 @@ namespace Ogre {
 	    mDepthWrite = oth.mDepthWrite;
 		mAlphaRejectFunc = oth.mAlphaRejectFunc;
 		mAlphaRejectVal = oth.mAlphaRejectVal;
+		mAlphaToCoverageEnabled = oth.mAlphaToCoverageEnabled;
 		mTransparentSorting = oth.mTransparentSorting;
         mColourWrite = oth.mColourWrite;
 	    mDepthFunc = oth.mDepthFunc;
@@ -291,6 +294,14 @@ namespace Ogre {
         else
         {
 		    mFragmentProgramUsage = NULL;
+        }
+		if (oth.mGeometryProgramUsage)
+		{
+		    mGeometryProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mGeometryProgramUsage));
+        }
+        else
+        {
+		    mGeometryProgramUsage = NULL;
         }
 		if (oth.mShadowReceiverFragmentProgramUsage)
 		{
@@ -822,10 +833,11 @@ namespace Ogre {
 	    return mDepthFunc;
     }
 	//-----------------------------------------------------------------------
-	void Pass::setAlphaRejectSettings(CompareFunction func, unsigned char value)
+	void Pass::setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
 	{
 		mAlphaRejectFunc = func;
 		mAlphaRejectVal = value;
+		mAlphaToCoverageEnabled = alphaToCoverage;
 	}
 	//-----------------------------------------------------------------------
 	void Pass::setAlphaRejectFunction(CompareFunction func)
@@ -836,6 +848,11 @@ namespace Ogre {
 	void Pass::setAlphaRejectValue(unsigned char val)
 	{
 		mAlphaRejectVal = val;
+	}
+	//---------------------------------------------------------------------
+	void Pass::setAlphaToCoverageEnabled(bool enabled)
+	{
+		mAlphaToCoverageEnabled = enabled;
 	}
 	//-----------------------------------------------------------------------
 	void Pass::setTransparentSortingEnabled(bool enabled)
@@ -1017,7 +1034,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	Pass* Pass::_split(unsigned short numUnits)
 	{
-		if (mVertexProgramUsage || mFragmentProgramUsage)
+		if (mVertexProgramUsage || mGeometryProgramUsage || mFragmentProgramUsage)
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Programmable passes cannot be "
 				"automatically split, define a fallback technique instead.",
@@ -1125,6 +1142,12 @@ namespace Ogre {
             mShadowReceiverVertexProgramUsage->_load();
         }
 
+		if (mGeometryProgramUsage)
+		{
+			// Load vertex program
+            mGeometryProgramUsage->_load();
+        }
+
         if (mFragmentProgramUsage)
         {
 			// Load fragment program
@@ -1150,6 +1173,10 @@ namespace Ogre {
 
 		// Unload programs
 		if (mVertexProgramUsage)
+		{
+			// TODO
+		}
+		if (mGeometryProgramUsage)
 		{
 			// TODO
 		}
@@ -1221,6 +1248,37 @@ namespace Ogre {
 		mFragmentProgramUsage->setParameters(params);
 	}
 	//-----------------------------------------------------------------------
+	void Pass::setGeometryProgram(const String& name, bool resetParams)
+	{
+        // Turn off geometry program if name blank
+        if (name.empty())
+        {
+            if (mGeometryProgramUsage) OGRE_DELETE mGeometryProgramUsage;
+            mGeometryProgramUsage = NULL;
+        }
+        else
+        {
+            if (!mGeometryProgramUsage)
+            {
+                mGeometryProgramUsage = OGRE_NEW GpuProgramUsage(GPT_GEOMETRY_PROGRAM);
+            }
+		    mGeometryProgramUsage->setProgramName(name, resetParams);
+        }
+        // Needs recompilation
+        mParent->_notifyNeedsRecompile();
+	}
+    //-----------------------------------------------------------------------
+	void Pass::setGeometryProgramParameters(GpuProgramParametersSharedPtr params)
+	{
+		if (!mGeometryProgramUsage)
+        {
+            OGRE_EXCEPT (Exception::ERR_INVALIDPARAMS,
+                "This pass does not have a geometry program assigned!",
+                "Pass::setGeometryProgramParameters");
+        }
+		mGeometryProgramUsage->setParameters(params);
+	}
+	//-----------------------------------------------------------------------
 	const String& Pass::getVertexProgramName(void) const
 	{
         if (!mVertexProgramUsage)
@@ -1261,6 +1319,24 @@ namespace Ogre {
 	const GpuProgramPtr& Pass::getFragmentProgram(void) const
 	{
 		return mFragmentProgramUsage->getProgram();
+	}
+	//-----------------------------------------------------------------------
+	const String& Pass::getGeometryProgramName(void) const
+	{
+        if (!mGeometryProgramUsage)
+            return StringUtil::BLANK;
+        else
+    		return mGeometryProgramUsage->getProgramName();
+	}
+	//-----------------------------------------------------------------------
+	GpuProgramParametersSharedPtr Pass::getGeometryProgramParameters(void) const
+	{
+		return mGeometryProgramUsage->getParameters();
+	}
+	//-----------------------------------------------------------------------
+	const GpuProgramPtr& Pass::getGeometryProgram(void) const
+	{
+		return mGeometryProgramUsage->getProgram();
 	}
 	//-----------------------------------------------------------------------
     bool Pass::isLoaded(void) const
@@ -1329,6 +1405,12 @@ namespace Ogre {
             mVertexProgramUsage->getParameters()->_updateAutoParamsNoLights(source);
         }
 
+        if (hasGeometryProgram())
+        {
+            // Update geometry program auto params
+            mGeometryProgramUsage->getParameters()->_updateAutoParamsNoLights(source);
+        }
+
         if (hasFragmentProgram())
         {
             // Update fragment program auto params
@@ -1342,6 +1424,12 @@ namespace Ogre {
         {
             // Update vertex program auto params
             mVertexProgramUsage->getParameters()->_updateAutoParamsLightsOnly(source);
+        }
+
+        if (hasGeometryProgram())
+        {
+            // Update geometry program auto params
+            mGeometryProgramUsage->getParameters()->_updateAutoParamsLightsOnly(source);
         }
 
         if (hasFragmentProgram())
@@ -1399,6 +1487,11 @@ namespace Ogre {
         {
             OGRE_DELETE mShadowReceiverVertexProgramUsage;
             mShadowReceiverVertexProgramUsage = 0;
+        }
+        if (mGeometryProgramUsage)
+        {
+            delete mGeometryProgramUsage;
+            mGeometryProgramUsage = 0;
         }
         if (mFragmentProgramUsage)
         {

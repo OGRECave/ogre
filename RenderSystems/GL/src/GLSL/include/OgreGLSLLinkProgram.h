@@ -60,6 +60,8 @@ namespace Ogre {
 
 		/// Linked vertex program
 		GLSLGpuProgram* mVertexProgram;
+		/// Linked geometry program
+		GLSLGpuProgram* mGeometryProgram;
 		/// Linked fragment program
 		GLSLGpuProgram* mFragmentProgram;
 
@@ -97,7 +99,7 @@ namespace Ogre {
 
 	public:
 		/// constructor should only be used by GLSLLinkProgramManager
-		GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* fragmentProgram);
+		GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram);
 		~GLSLLinkProgram(void);
 
 		/** Makes a program object active by making sure it is linked and then putting it in use.

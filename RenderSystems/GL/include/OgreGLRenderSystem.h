@@ -37,7 +37,6 @@ Torus Knot Software Ltd.
 #include "OgreGLSLProgramFactory.h"
 #include "OgreVector4.h"
 
-
 namespace Ogre {
     /**
       Implementation of GL as a rendering system.
@@ -119,6 +118,7 @@ namespace Ogre {
 
         GLGpuProgram* mCurrentVertexProgram;
         GLGpuProgram* mCurrentFragmentProgram;
+		GLGpuProgram* mCurrentGeometryProgram;
 
 		/* The main GL context - main thread only */
         GLContext *mMainContext;
@@ -298,7 +298,7 @@ namespace Ogre {
         /** See
           RenderSystem
          */
-        void _setAlphaRejectSettings(CompareFunction func, unsigned char value);
+        void _setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage);
         /** See
           RenderSystem
          */

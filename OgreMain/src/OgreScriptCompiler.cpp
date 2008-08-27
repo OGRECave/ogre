@@ -966,11 +966,13 @@ namespace Ogre
 		// Material ids
 		mIds["material"] = ID_MATERIAL;
 		mIds["vertex_program"] = ID_VERTEX_PROGRAM;
+		mIds["geometry_program"] = ID_GEOMETRY_PROGRAM;
 		mIds["fragment_program"] = ID_FRAGMENT_PROGRAM;
 		mIds["technique"] = ID_TECHNIQUE;
 		mIds["pass"] = ID_PASS;
 		mIds["texture_unit"] = ID_TEXTURE_UNIT;
 		mIds["vertex_program_ref"] = ID_VERTEX_PROGRAM_REF;
+		mIds["geometry_program_ref"] = ID_GEOMETRY_PROGRAM_REF;
 		mIds["fragment_program_ref"] = ID_FRAGMENT_PROGRAM_REF;
 		mIds["shadow_caster_vertex_program_ref"] = ID_SHADOW_CASTER_VERTEX_PROGRAM_REF;
 		mIds["shadow_receiver_vertex_program_ref"] = ID_SHADOW_RECEIVER_VERTEX_PROGRAM_REF;
@@ -1032,6 +1034,7 @@ namespace Ogre
 			mIds["greater_equal"] = ID_GREATER_EQUAL;
 			mIds["greater"] = ID_GREATER;
 		mIds["alpha_rejection"] = ID_ALPHA_REJECTION;
+		mIds["alpha_to_coverage"] = ID_ALPHA_TO_COVERAGE;
 		mIds["light_scissor"] = ID_LIGHT_SCISSOR;
 		mIds["light_clip_planes"] = ID_LIGHT_CLIP_PLANES;
 		mIds["transparent_sorting"] = ID_TRANSPARENT_SORTING;

@@ -1,0 +1,57 @@
+geometry_program Ogre/IsoSurf/TessellateTetrahedraGS cg
+{
+	source isosurf.cg
+	entry_point TessellateTetrahedraGS
+	profiles gp4gp gpu_gp
+	uses_adjacency_information true
+	
+	default_params
+	{
+		param_named IsoValue float 1
+	}
+}
+
+vertex_program Ogre/IsoSurf/SampleFieldVS cg
+{
+	source isosurf.cg
+	entry_point SampleFieldVS
+	profiles vp40 vs_2_x
+
+	default_params
+	{
+		param_named IsoValue float 1.0
+		param_named_auto WorldViewProj worldviewproj_matrix
+		param_named_auto origWorldViewIT inverse_transpose_worldview_matrix
+	}
+}
+
+fragment_program Ogre/IsoSurf/MetaballPS cg
+{
+	source isosurf.cg
+	entry_point MetaballPS
+	profiles arbfp1 fp40
+}
+
+material Ogre/IsoSurf/TessellateTetrahedra
+{
+	technique
+	{
+		pass SwizzleCGPass
+		{
+			vertex_program_ref Ogre/IsoSurf/SampleFieldVS
+			{
+			
+			}
+			
+			geometry_program_ref Ogre/IsoSurf/TessellateTetrahedraGS
+			{
+			
+			}
+			
+			fragment_program_ref Ogre/IsoSurf/MetaballPS
+			{
+			
+			}
+		}
+	}
+}

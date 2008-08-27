@@ -90,10 +90,10 @@ Torus Knot Software Ltd.
 #define OGRE_MEMORY_ALLOCATOR OGRE_MEMORY_ALLOCATOR_STD
 
 // enable or disable the memory tracker, recording the memory allocations & tracking leaks
-// default is to enable only in debug builds
+// default is to disable since it's expensive, but you can enable if needed per build target
 
 #ifndef OGRE_MEMORY_TRACKER_DEBUG_MODE
-#  define OGRE_MEMORY_TRACKER_DEBUG_MODE 1
+#  define OGRE_MEMORY_TRACKER_DEBUG_MODE 0
 #endif
 
 #ifndef OGRE_MEMORY_TRACKER_RELEASE_MODE

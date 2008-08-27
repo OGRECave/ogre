@@ -69,16 +69,22 @@ namespace Ogre
 		{
 			size_t bytes;
 			unsigned int pool;
-			const char* filename;
+			std::string filename;
 			size_t line;
-			const char* function;
+			std::string function;
 
 			Alloc() :line(0), bytes(0) {}
 			Alloc(size_t sz, unsigned int p, const char* file, size_t ln, const char* func)
-				:bytes(sz), pool(p), filename(file), line(ln), function(func) {}
+				:bytes(sz), pool(p), line(ln)
+			{
+				if (file)
+					filename = file;
+				if (func)
+					function = func;
+			}
 		};
 		
-		const char* mLeakFileName;
+		std::string mLeakFileName;
 		bool mDumpToStdOut;
 		typedef HashMap<void*, Alloc> AllocationMap;
 		AllocationMap mAllocations;
@@ -98,12 +104,12 @@ namespace Ogre
 	public:
 
 		/** Set the name of the report file that will be produced on exit. */
-		void setReportFileName(const char* name)
+		void setReportFileName(const std::string& name)
 		{
 			mLeakFileName = name;
 		}
 		/// Return the name of the file which will contain the report at exit
-		const char* getReportFileName() const
+		const std::string& getReportFileName() const
 		{
 			return mLeakFileName;
 		}

@@ -873,6 +873,21 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			// Set fixed-function vertex parameters
 		}
 
+		if (pass->hasGeometryProgram())
+		{
+			mDestRenderSystem->bindGpuProgram(pass->getGeometryProgram()->_getBindingDelegate());
+			// bind parameters later since they can be per-object
+		}
+		else
+		{
+			// Unbind program?
+			if (mDestRenderSystem->isGpuProgramBound(GPT_GEOMETRY_PROGRAM))
+			{
+				mDestRenderSystem->unbindGpuProgram(GPT_GEOMETRY_PROGRAM);
+			}
+			// Set fixed-function vertex parameters
+		}
+
 		if (passSurfaceAndLightParams)
 		{
 			// Set surface reflectance properties, only valid if lighting is enabled
@@ -1050,7 +1065,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			pass->getDepthBiasSlopeScale());
 		// Alpha-reject settings
 		mDestRenderSystem->_setAlphaRejectSettings(
-			pass->getAlphaRejectFunction(), pass->getAlphaRejectValue());
+			pass->getAlphaRejectFunction(), pass->getAlphaRejectValue(), pass->isAlphaToCoverageEnabled());
 		// Set colour write mode
 		// Right now we only use on/off, not per-channel
 		bool colWrite = pass->getColourWriteEnabled();
@@ -1321,6 +1336,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 		mCachedViewMatrix.setTrans(Vector3::ZERO);
 		mCameraRelativePosition = mCameraInProgress->getDerivedPosition();
 	}
+	mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, camera->getDerivedPosition());
 
 	mDestRenderSystem->_setViewMatrix(mCachedViewMatrix);
 
@@ -3118,6 +3134,11 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 						mDestRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
 							pass->getVertexProgramParameters());
 					}
+					if (pass->hasGeometryProgram())
+					{
+						mDestRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
+							pass->getGeometryProgramParameters());
+					}
 					if (pass->hasFragmentProgram())
 					{
 						mDestRenderSystem->bindGpuProgramParameters(GPT_FRAGMENT_PROGRAM, 
@@ -3222,6 +3243,11 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					{
 						mDestRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
 							pass->getVertexProgramParameters());
+					}
+					if (pass->hasGeometryProgram())
+					{
+						mDestRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
+							pass->getGeometryProgramParameters());
 					}
 					if (pass->hasFragmentProgram())
 					{
@@ -3543,6 +3569,11 @@ void SceneManager::manualRender(RenderOperation* rend,
 		{
 			mDestRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
 				pass->getVertexProgramParameters());
+		}
+		if (pass->hasGeometryProgram())
+		{
+			mDestRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
+				pass->getGeometryProgramParameters());
 		}
 		if (pass->hasFragmentProgram())
 		{
@@ -5598,9 +5629,6 @@ void SceneManager::ensureShadowTexturesCreated()
 			// in prepareShadowTextures to coexist with multiple SMs
 			Camera* cam = createCamera(camName);
 			cam->setAspectRatio(shadowTex->getWidth() / shadowTex->getHeight());
-			// Don't use rendering distance for light cameras; we don't want shadows
-			// for visible objects disappearing, especially for directional lights
-			cam->setUseRenderingDistance(false);
 			mShadowTextureCameras.push_back(cam);
 
 			// Create a viewport, if not there already

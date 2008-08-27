@@ -140,6 +140,7 @@ namespace Ogre {
 		mMinFilter = FO_LINEAR;
 		mMipFilter = FO_POINT;
 		mCurrentVertexProgram = 0;
+		mCurrentGeometryProgram = 0;
 		mCurrentFragmentProgram = 0;
 
 	}
@@ -350,6 +351,12 @@ namespace Ogre {
 			{
 				rsc->addShaderProfile("vp40");
 			}
+
+			if (GLEW_NV_vertex_program4)
+			{
+				rsc->addShaderProfile("gp4vp");
+				rsc->addShaderProfile("gpu_vp");
+			}
 		}
 
 		if (GLEW_NV_register_combiners2 &&
@@ -409,6 +416,36 @@ namespace Ogre {
 			GLEW_ARB_vertex_shader) )
 		{
 			rsc->addShaderProfile("glsl");
+		}
+
+		// Check if geometry shaders are supported
+		if (GLEW_VERSION_2_0 &&
+			GLEW_EXT_geometry_shader4)
+		{
+			rsc->setCapability(RSC_GEOMETRY_PROGRAM);
+			rsc->addShaderProfile("nvgp4");
+
+			//Also add the CG profiles
+			rsc->addShaderProfile("gpu_gp");
+			rsc->addShaderProfile("gp4gp");
+
+			rsc->setGeometryProgramConstantBoolCount(0);
+			rsc->setGeometryProgramConstantIntCount(0);
+
+			GLint floatConstantCount;
+			glGetProgramivARB(GL_GEOMETRY_PROGRAM_NV, GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB, &floatConstantCount);
+			rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
+
+			GLint maxOutputVertices;
+			glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES_EXT,&maxOutputVertices);
+			rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
+		}
+		
+		//Check if render to vertex buffer (transform feedback in OpenGL)
+		if (GLEW_VERSION_2_0 && 
+			GLEW_NV_transform_feedback)
+		{
+			rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
 		}
 
 		// Check for texture compression
@@ -547,6 +584,14 @@ namespace Ogre {
 			rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
 		}
 
+		// Alpha to coverage?
+		if (mGLSupport->checkExtension("GL_ARB_multisample"))
+		{
+			// Alpha to coverage always 'supported' when MSAA is available
+			// although card may ignore it if it doesn't specifically support A2C
+			rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
+		}
+
 		return rsc;
 	}
 
@@ -609,6 +654,33 @@ namespace Ogre {
 			if(caps->isShaderProfileSupported("vp40"))
 			{
 				mGpuProgramManager->registerProgramFactory("vp40", createGLArbGpuProgram);
+			}
+
+			if(caps->isShaderProfileSupported("gp4vp"))
+			{
+				mGpuProgramManager->registerProgramFactory("gp4vp", createGLArbGpuProgram);
+			}
+
+			if(caps->isShaderProfileSupported("gpu_vp"))
+			{
+				mGpuProgramManager->registerProgramFactory("gpu_vp", createGLArbGpuProgram);
+			}
+		}
+
+		if(caps->hasCapability(RSC_GEOMETRY_PROGRAM))
+		{
+			//TODO : Should these be createGLArbGpuProgram or createGLGpuNVparseProgram?
+			if(caps->isShaderProfileSupported("nvgp4"))
+			{
+				mGpuProgramManager->registerProgramFactory("nvgp4", createGLArbGpuProgram);
+			}
+			if(caps->isShaderProfileSupported("gp4gp"))
+			{
+				mGpuProgramManager->registerProgramFactory("gp4gp", createGLArbGpuProgram);
+			}
+			if(caps->isShaderProfileSupported("gpu_gp"))
+			{
+				mGpuProgramManager->registerProgramFactory("gpu_gp", createGLArbGpuProgram);
 			}
 		}
 
@@ -1430,7 +1502,16 @@ namespace Ogre {
 			projectionBias = Matrix4::CLIPSPACE2DTOIMAGESPACE;
 
 			projectionBias = projectionBias * frustum->getProjectionMatrix();
-			projectionBias = projectionBias * frustum->getViewMatrix();
+			if(mTexProjRelative)
+			{
+				Matrix4 viewMatrix;
+				frustum->calcViewMatrixRelative(mTexProjRelativeOrigin, viewMatrix);
+				projectionBias = projectionBias * viewMatrix;
+			}
+			else
+			{
+				projectionBias = projectionBias * frustum->getViewMatrix();
+			}
 			projectionBias = projectionBias * mWorldMatrix;
 
 			makeGLMatrix(mAutoTextureMatrix, projectionBias);
@@ -1582,8 +1663,11 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------------
-	void GLRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value)
+	void GLRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
 	{
+		bool a2c = false;
+		static bool lasta2c = false;
+
 		if(func == CMPF_ALWAYS_PASS)
 		{
 			glDisable(GL_ALPHA_TEST);
@@ -1591,8 +1675,20 @@ namespace Ogre {
 		else
 		{
 			glEnable(GL_ALPHA_TEST);
+			a2c = alphaToCoverage;
 			glAlphaFunc(convertCompareFunction(func), value / 255.0f);
 		}
+
+		if (a2c != lasta2c && getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
+		{
+			if (a2c)
+				glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+			else
+				glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+
+			lasta2c = a2c;
+		}
+
 	}
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setViewport(Viewport *vp)
@@ -2559,23 +2655,25 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 
 		// Find the correct type to render
 		GLint primType;
+		//Use adjacency if there is a geometry program and it requested adjacency info
+		bool useAdjacency = (mGeometryProgramBound && mCurrentGeometryProgram->isAdjacencyInfoRequired());
 		switch (op.operationType)
 		{
 		case RenderOperation::OT_POINT_LIST:
 			primType = GL_POINTS;
 			break;
 		case RenderOperation::OT_LINE_LIST:
-			primType = GL_LINES;
+			primType = useAdjacency ? GL_LINES_ADJACENCY_EXT : GL_LINES;
 			break;
 		case RenderOperation::OT_LINE_STRIP:
-			primType = GL_LINE_STRIP;
+			primType = useAdjacency ? GL_LINE_STRIP_ADJACENCY_EXT : GL_LINE_STRIP;
 			break;
 		default:
 		case RenderOperation::OT_TRIANGLE_LIST:
-			primType = GL_TRIANGLES;
+			primType = useAdjacency ? GL_TRIANGLES_ADJACENCY_EXT : GL_TRIANGLES;
 			break;
 		case RenderOperation::OT_TRIANGLE_STRIP:
-			primType = GL_TRIANGLE_STRIP;
+			primType = useAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY_EXT : GL_TRIANGLE_STRIP;
 			break;
 		case RenderOperation::OT_TRIANGLE_FAN:
 			primType = GL_TRIANGLE_FAN;
@@ -2707,6 +2805,14 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 				mCurrentFragmentProgram = glprg;
 			}
 			break;
+		case GPT_GEOMETRY_PROGRAM:
+			if (mCurrentGeometryProgram != glprg)
+			{
+				if (mCurrentGeometryProgram)
+					mCurrentGeometryProgram->unbindProgram();
+				mCurrentGeometryProgram = glprg;
+			}
+			break;
 		}
 
 		// Bind the program
@@ -2724,6 +2830,12 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 			mCurrentVertexProgram->unbindProgram();
 			mCurrentVertexProgram = 0;
 		}
+		else if (gptype == GPT_GEOMETRY_PROGRAM && mCurrentGeometryProgram)
+		{
+			mActiveGeometryGpuProgramParameters.setNull();
+			mCurrentGeometryProgram->unbindProgram();
+			mCurrentGeometryProgram = 0;
+		}
 		else if (gptype == GPT_FRAGMENT_PROGRAM && mCurrentFragmentProgram)
 		{
 			mActiveFragmentGpuProgramParameters.setNull();
@@ -2736,27 +2848,36 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	//---------------------------------------------------------------------
 	void GLRenderSystem::bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params)
 	{
-		if (gptype == GPT_VERTEX_PROGRAM)
+		switch (gptype)
 		{
+		case GPT_VERTEX_PROGRAM:
 			mActiveVertexGpuProgramParameters = params;
 			mCurrentVertexProgram->bindProgramParameters(params);
-		}
-		else
-		{
+			break;
+		case GPT_GEOMETRY_PROGRAM:
+			mActiveGeometryGpuProgramParameters = params;
+			mCurrentGeometryProgram->bindProgramParameters(params);
+			break;
+		case GPT_FRAGMENT_PROGRAM:
 			mActiveFragmentGpuProgramParameters = params;
 			mCurrentFragmentProgram->bindProgramParameters(params);
+			break;
 		}
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::bindGpuProgramPassIterationParameters(GpuProgramType gptype)
 	{
-		if (gptype == GPT_VERTEX_PROGRAM)
+		switch (gptype)
 		{
+		case GPT_VERTEX_PROGRAM:
 			mCurrentVertexProgram->bindProgramPassIterationParameters(mActiveVertexGpuProgramParameters);
-		}
-		else
-		{
+			break;
+		case GPT_GEOMETRY_PROGRAM:
+			mCurrentGeometryProgram->bindProgramPassIterationParameters(mActiveGeometryGpuProgramParameters);
+			break;
+		case GPT_FRAGMENT_PROGRAM:
 			mCurrentFragmentProgram->bindProgramPassIterationParameters(mActiveFragmentGpuProgramParameters);
+			break;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -3041,6 +3162,8 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		// cached the GPU programs using state.
 		if (mCurrentVertexProgram)
 			mCurrentVertexProgram->unbindProgram();
+		if (mCurrentGeometryProgram)
+			mCurrentGeometryProgram->unbindProgram();
 		if (mCurrentFragmentProgram)
 			mCurrentFragmentProgram->unbindProgram();
 
@@ -3059,6 +3182,8 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		// Rebind GPU programs to new context
 		if (mCurrentVertexProgram)
 			mCurrentVertexProgram->bindProgram();
+		if (mCurrentGeometryProgram)
+			mCurrentGeometryProgram->bindProgram();
 		if (mCurrentFragmentProgram)
 			mCurrentFragmentProgram->bindProgram();
 

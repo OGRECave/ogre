@@ -46,7 +46,21 @@ Torus Knot Software Ltd.
 #include "OgreCompositionPass.h"
 
 namespace Ogre{
-
+	
+	GpuProgramType translateIDToGpuProgramType(uint32 id)
+	{
+		switch (id)
+		{
+			case ID_VERTEX_PROGRAM:
+			default:
+				return GPT_VERTEX_PROGRAM;
+			case ID_GEOMETRY_PROGRAM:
+				return GPT_GEOMETRY_PROGRAM;
+			case ID_FRAGMENT_PROGRAM:
+				return GPT_FRAGMENT_PROGRAM;
+		}
+	}
+	
 	void ScriptTranslator::processNode(ScriptCompiler *compiler, const AbstractNodePtr &node)
 	{
 		if(node->type != ANT_OBJECT)
@@ -1252,6 +1266,26 @@ namespace Ogre{
 								(*i0)->getValue() + " is not a valid CompareFunction");
 					}
 					break;
+				case ID_ALPHA_TO_COVERAGE:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+					}
+					else if(prop->values.size() > 1)
+					{
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"alpha_to_coverage must have 1 argument");
+					}
+					else
+					{
+						bool val = true;
+						if(getBoolean(prop->values.front(), &val))
+							mPass->setAlphaToCoverageEnabled(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+							"alpha_to_coverage argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
+					}
+					break;
 				case ID_LIGHT_SCISSOR:
 					if(prop->values.empty())
 					{
@@ -2043,6 +2077,9 @@ namespace Ogre{
 				case ID_VERTEX_PROGRAM_REF:
 					translateVertexProgramRef(compiler, child);
 					break;
+				case ID_GEOMETRY_PROGRAM_REF:
+					translateGeometryProgramRef(compiler, child);
+					break;
 				case ID_SHADOW_CASTER_VERTEX_PROGRAM_REF:
 					translateShadowCasterVertexProgramRef(compiler, child);
 					break;
@@ -2106,6 +2143,28 @@ namespace Ogre{
 		if(pass->getVertexProgram()->isSupported())
 		{
 			GpuProgramParametersSharedPtr params = pass->getVertexProgramParameters();
+			GpuProgramTranslator::translateProgramParameters(compiler, params, node);
+		}
+	}
+	//-------------------------------------------------------------------------
+	void PassTranslator::translateGeometryProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
+	{
+		if(node->name.empty())
+		{
+			compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
+			return;
+		}
+
+		String name = node->name;
+		std::vector<Any> args;
+		args.push_back(Any(&name));
+		compiler->_fireEvent("processGpuProgramName", args, 0);
+
+		Pass *pass = any_cast<Pass*>(node->parent->context);
+		pass->setGeometryProgram(name);
+		if(pass->getGeometryProgram()->isSupported())
+		{
+			GpuProgramParametersSharedPtr params = pass->getGeometryProgramParameters();
 			GpuProgramTranslator::translateProgramParameters(compiler, params, node);
 		}
 	}
@@ -3563,25 +3622,29 @@ namespace Ogre{
 		if (!GpuProgramManager::getSingleton().isSyntaxSupported(syntax))
 		{
 			compiler->addError(ScriptCompiler::CE_UNSUPPORTEDBYRENDERSYSTEM, obj->file, obj->line);
+			//Register the unsupported program so that materials that use it know that
+			//it exists but is unsupported
+			GpuProgramPtr unsupportedProg = GpuProgramManager::getSingleton().create(obj->name, 
+					compiler->getResourceGroup(), translateIDToGpuProgramType(obj->id), syntax);
 			return;
 		}
 
 		// Allocate the program
 		GpuProgram *prog = 0;
+		
 		Any retval;
 		std::vector<Any> args;
 		args.push_back(Any(obj->file));
 		args.push_back(Any(obj->name));
 		args.push_back(Any(compiler->getResourceGroup()));
 		args.push_back(Any(source));
-		args.push_back(Any(obj->id == ID_VERTEX_PROGRAM ? GPT_VERTEX_PROGRAM : GPT_FRAGMENT_PROGRAM));
+		args.push_back(Any(translateIDToGpuProgramType(obj->id)));
 		args.push_back(Any(syntax));
 		retval = compiler->_fireCreateObject("GpuProgram", args);
 		if(retval.isEmpty())
 		{
 			prog = reinterpret_cast<GpuProgram*>(GpuProgramManager::getSingleton().createProgram(obj->name, 
-					compiler->getResourceGroup(), source, 
-					obj->id == ID_VERTEX_PROGRAM ? GPT_VERTEX_PROGRAM : GPT_FRAGMENT_PROGRAM, syntax).get());
+					compiler->getResourceGroup(), source, translateIDToGpuProgramType(obj->id), syntax).get());
 		}
 		else
 		{
@@ -3676,13 +3739,13 @@ namespace Ogre{
 		args.push_back(Any(obj->file));
 		args.push_back(Any(obj->name));
 		args.push_back(Any(compiler->getResourceGroup()));
-		args.push_back(Any(obj->id == ID_VERTEX_PROGRAM ? GPT_VERTEX_PROGRAM : GPT_FRAGMENT_PROGRAM));
+		args.push_back(Any(translateIDToGpuProgramType(obj->id)));
 		retval = compiler->_fireCreateObject("UnifiedGpuProgram", args);
 		if(retval.isEmpty())
 		{
 			prog = reinterpret_cast<HighLevelGpuProgram*>(
 				HighLevelGpuProgramManager::getSingleton().createProgram(obj->name, compiler->getResourceGroup(), 
-				"unified", obj->id == ID_VERTEX_PROGRAM ? GPT_VERTEX_PROGRAM : GPT_FRAGMENT_PROGRAM).get());
+				"unified", translateIDToGpuProgramType(obj->id)).get());
 		}
 		else
 		{
@@ -3807,14 +3870,14 @@ namespace Ogre{
 		args.push_back(Any(obj->name));
 		args.push_back(Any(compiler->getResourceGroup()));
 		args.push_back(Any(language));
-		args.push_back(Any(obj->id == ID_VERTEX_PROGRAM ? GPT_VERTEX_PROGRAM : GPT_FRAGMENT_PROGRAM));
+		args.push_back(Any(translateIDToGpuProgramType(obj->id)));
 		args.push_back(Any(source));
 		retval = compiler->_fireCreateObject("HighLevelGpuProgram", args);
 		if(retval.isEmpty())
 		{
 			prog = reinterpret_cast<HighLevelGpuProgram*>(
 				HighLevelGpuProgramManager::getSingleton().createProgram(obj->name, compiler->getResourceGroup(), 
-				language, obj->id == ID_VERTEX_PROGRAM ? GPT_VERTEX_PROGRAM : GPT_FRAGMENT_PROGRAM).get());
+				language, translateIDToGpuProgramType(obj->id)).get());
 			prog->setSourceFile(source);
 		}
 		else
@@ -5314,7 +5377,7 @@ namespace Ogre{
 				translator = &mPassTranslator;
 			else if(obj->id == ID_TEXTURE_UNIT && parent && parent->id == ID_PASS)
 				translator = &mTextureUnitTranslator;
-			else if(obj->id == ID_FRAGMENT_PROGRAM || obj->id == ID_VERTEX_PROGRAM)
+			else if(obj->id == ID_FRAGMENT_PROGRAM || obj->id == ID_VERTEX_PROGRAM || obj->id == ID_GEOMETRY_PROGRAM)
 				translator = &mGpuProgramTranslator;
 			else if(obj->id == ID_PARTICLE_SYSTEM)
 				translator = &mParticleSystemTranslator;

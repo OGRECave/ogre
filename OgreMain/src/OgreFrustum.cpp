@@ -771,6 +771,14 @@ namespace Ogre {
 			mRecalcFrustum = true;
 		}
 	}
+	//---------------------------------------------------------------------
+	void Frustum::calcViewMatrixRelative(const Vector3& relPos, Matrix4& matToUpdate) const
+	{
+		Matrix4 matTrans = Matrix4::IDENTITY;
+		matTrans.setTrans(relPos);
+		matToUpdate = getViewMatrix() * matTrans;
+
+	}
 	//-----------------------------------------------------------------------
     void Frustum::updateView(void) const
     {

@@ -1545,7 +1545,16 @@ namespace Ogre
             // To do this, we need to undo the camera view matrix, then 
             // apply the projector view & projection matrices
             newMat = mViewMatrix.inverse();
-            newMat = mTexStageDesc[stage].frustum->getViewMatrix() * newMat;
+			if(mTexProjRelative)
+			{
+				Matrix4 viewMatrix;
+				mTexStageDesc[stage].frustum->calcViewMatrixRelative(mTexProjRelativeOrigin, viewMatrix);
+				newMat = viewMatrix * newMat;
+			}
+			else
+			{
+				newMat = mTexStageDesc[stage].frustum->getViewMatrix() * newMat;
+			}
             newMat = mTexStageDesc[stage].frustum->getProjectionMatrix() * newMat;
             newMat = Matrix4::CLIPSPACE2DTOIMAGESPACE * newMat;
             newMat = xForm * newMat;
@@ -1698,6 +1707,7 @@ namespace Ogre
 		mBlendDesc.BlendOpAlpha = D3D10_BLEND_OP_ADD ;
 		mBlendDesc.SrcBlendAlpha = D3D10_BLEND_ZERO;
 		mBlendDesc.DestBlendAlpha = D3D10_BLEND_ZERO;
+		mBlendDesc.AlphaToCoverageEnable = mSceneAlphaToCoverage;
 
 		mBlendDesc.RenderTargetWriteMask[0] = 0x0F;
 	}
@@ -1729,10 +1739,11 @@ namespace Ogre
 	*/
 	}
 	//---------------------------------------------------------------------
-	void D3D10RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value )
+	void D3D10RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage )
 	{
 		mSceneAlphaRejectFunc	= func;
 		mSceneAlphaRejectValue	= value;
+		mSceneAlphaToCoverage	= alphaToCoverage;
 	}
 	//---------------------------------------------------------------------
 	void D3D10RenderSystem::_setCullingMode( CullingMode mode )

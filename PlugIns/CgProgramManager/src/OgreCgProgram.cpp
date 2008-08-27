@@ -190,6 +190,8 @@ namespace Ogre {
 					mType, 
 					mSelectedProfile);
 			}
+			// Shader params need to be forwarded to low level implementation
+			mAssemblerProgram->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
 		}
     }
     //-----------------------------------------------------------------------

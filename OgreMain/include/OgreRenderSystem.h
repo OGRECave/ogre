@@ -659,8 +659,14 @@ namespace Ogre
 		By default images are rendered regardless of texture alpha. This method lets you change that.
 		@param func The comparison function which must pass for a pixel to be written.
 		@param val The value to compare each pixels alpha value to (0-255)
+		@param alphaToCoverage Whether to enable alpha to coverage, if supported
 		*/
-		virtual void _setAlphaRejectSettings(CompareFunction func, unsigned char value) = 0;
+		virtual void _setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage) = 0;
+
+		/** Notify the rendersystem that it should adjust texture projection to be 
+			relative to a different origin.
+		*/
+		virtual void _setTextureProjectionRelativeTo(bool enabled, const Vector3& pos);
 		/**
 		* Signifies the beginning of a frame, i.e. the start of rendering on a single viewport. Will occur
 		* several times per complete frame if multiple viewports exist.
@@ -1197,6 +1203,7 @@ namespace Ogre
 		RenderTarget * mActiveRenderTarget;
 		/** The Active GPU programs and gpu program parameters*/
 		GpuProgramParametersSharedPtr mActiveVertexGpuProgramParameters;
+		GpuProgramParametersSharedPtr mActiveGeometryGpuProgramParameters;
 		GpuProgramParametersSharedPtr mActiveFragmentGpuProgramParameters;
 
 		// Texture manager
@@ -1253,6 +1260,7 @@ namespace Ogre
 		HardwareOcclusionQueryList mHwOcclusionQueries;
 
 		bool mVertexProgramBound;
+		bool mGeometryProgramBound;
 		bool mFragmentProgramBound;
 
 		// Recording user clip planes
@@ -1273,6 +1281,9 @@ namespace Ogre
 
 
 		DriverVersion mDriverVersion;
+
+		bool mTexProjRelative;
+		Vector3 mTexProjRelativeOrigin;
 
 
 

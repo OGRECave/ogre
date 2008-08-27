@@ -402,6 +402,10 @@ namespace Ogre {
         */
         size_t getNumManualLodLevels(void) const;
 
+		/** Returns the current LOD used to render
+		*/
+		ushort getCurrentLodIndex() { return mMeshLodIndex; }
+
 		/** Sets a level-of-detail bias for the mesh detail of this entity.
 		@remarks
 		Level of detail reduction is normally applied automatically based on the Mesh

@@ -29,6 +29,7 @@ RenderSystem_GL_la_SOURCES = OgreGLEngineDll.cpp \
                              OgreGLContext.cpp \
                              OgreGLPixelFormat.cpp \
                              OgreGLRenderTexture.cpp \
+							 OgreGLRenderToVertexBuffer.cpp \
                              OgreGLFBORenderTexture.cpp \
                              OgreGLPBRenderTexture.cpp \
                              OgreGLFBOMultiRenderTarget.cpp \

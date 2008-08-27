@@ -1157,6 +1157,21 @@ namespace Ogre
 
         return false;
     }
+	//---------------------------------------------------------------------
+	bool parseAlphaToCoverage(String& params, MaterialScriptContext& context)
+	{
+		StringUtil::toLowerCase(params);
+		if (params == "on")
+			context.pass->setAlphaToCoverageEnabled(true);
+		else if (params == "off")
+			context.pass->setAlphaToCoverageEnabled(false);
+		else
+			logParseError(
+			"Bad alpha_to_coverage attribute, valid parameters are 'on' or 'off'.",
+			context);
+
+		return false;
+	}
     //-----------------------------------------------------------------------
     bool parseTransparentSorting(String& params, MaterialScriptContext& context)
     {
@@ -2463,6 +2478,54 @@ namespace Ogre
         // Return TRUE because this must be followed by a {
         return true;
     }
+	//-----------------------------------------------------------------------
+    bool parseGeometryProgramRef(String& params, MaterialScriptContext& context)
+    {
+        // update section
+        context.section = MSS_PROGRAM_REF;
+
+        // check if pass has a vertex program already
+        if (context.pass->hasGeometryProgram())
+        {
+            // if existing pass vertex program has same name as params
+            // or params is empty then use current vertex program
+            if (params.empty() || (context.pass->getGeometryProgramName() == params))
+            {
+                context.program = context.pass->getGeometryProgram();
+            }
+        }
+
+        // if context.program was not set then try to get the geometry program using the name
+        // passed in params
+        if (context.program.isNull())
+        {
+            context.program = GpuProgramManager::getSingleton().getByName(params);
+            if (context.program.isNull())
+            {
+                // Unknown program
+                logParseError("Invalid geometry_program_ref entry - vertex program "
+                    + params + " has not been defined.", context);
+                return true;
+            }
+
+            // Set the vertex program for this pass
+            context.pass->setGeometryProgram(params);
+        }
+
+        context.isProgramShadowCaster = false;
+        context.isVertexProgramShadowReceiver = false;
+        context.isFragmentProgramShadowReceiver = false;
+
+        // Create params? Skip this if program is not supported
+        if (context.program->isSupported())
+        {
+            context.programParams = context.pass->getGeometryProgramParameters();
+			context.numAnimationParametrics = 0;
+        }
+
+        // Return TRUE because this must be followed by a {
+        return true;
+    }
     //-----------------------------------------------------------------------
     bool parseShadowCasterVertexProgramRef(String& params, MaterialScriptContext& context)
     {
@@ -2624,6 +2687,37 @@ namespace Ogre
 		if (vecparams.size() != 2)
 		{
             logParseError("Invalid vertex_program entry - expected "
+				"2 parameters.", context);
+            return true;
+		}
+		// Name, preserve case
+		context.programDef->name = vecparams[0];
+		// language code, make lower case
+		context.programDef->language = vecparams[1];
+		StringUtil::toLowerCase(context.programDef->language);
+
+        // Return TRUE because this must be followed by a {
+        return true;
+	}
+    //-----------------------------------------------------------------------
+    bool parseGeometryProgram(String& params, MaterialScriptContext& context)
+    {
+        // update section
+        context.section = MSS_PROGRAM;
+
+		// Create new program definition-in-progress
+		context.programDef = OGRE_NEW_T(MaterialScriptProgramDefinition, MEMCATEGORY_SCRIPTING)();
+		context.programDef->progType = GPT_GEOMETRY_PROGRAM;
+        context.programDef->supportsSkeletalAnimation = false;
+		context.programDef->supportsMorphAnimation = false;
+		context.programDef->supportsPoseAnimation = 0;
+		context.programDef->usesVertexTextureFetch = false;
+
+		// Get name and language code
+		StringVector vecparams = StringUtil::split(params, " \t");
+		if (vecparams.size() != 2)
+		{
+            logParseError("Invalid geometry_program entry - expected "
 				"2 parameters.", context);
             return true;
 		}
@@ -2835,6 +2929,7 @@ namespace Ogre
         // Set up root attribute parsers
         mRootAttribParsers.insert(AttribParserList::value_type("material", (ATTRIBUTE_PARSER)parseMaterial));
         mRootAttribParsers.insert(AttribParserList::value_type("vertex_program", (ATTRIBUTE_PARSER)parseVertexProgram));
+		mRootAttribParsers.insert(AttribParserList::value_type("geometry_program", (ATTRIBUTE_PARSER)parseGeometryProgram));
         mRootAttribParsers.insert(AttribParserList::value_type("fragment_program", (ATTRIBUTE_PARSER)parseFragmentProgram));
 
         // Set up material attribute parsers
@@ -2865,6 +2960,7 @@ namespace Ogre
         mPassAttribParsers.insert(AttribParserList::value_type("depth_func", (ATTRIBUTE_PARSER)parseDepthFunc));
 		mPassAttribParsers.insert(AttribParserList::value_type("normalise_normals", (ATTRIBUTE_PARSER)parseNormaliseNormals));
 		mPassAttribParsers.insert(AttribParserList::value_type("alpha_rejection", (ATTRIBUTE_PARSER)parseAlphaRejection));
+		mPassAttribParsers.insert(AttribParserList::value_type("alpha_to_coverage", (ATTRIBUTE_PARSER)parseAlphaToCoverage));
 		mPassAttribParsers.insert(AttribParserList::value_type("transparent_sorting", (ATTRIBUTE_PARSER)parseTransparentSorting));
         mPassAttribParsers.insert(AttribParserList::value_type("colour_write", (ATTRIBUTE_PARSER)parseColourWrite));
 		mPassAttribParsers.insert(AttribParserList::value_type("light_scissor", (ATTRIBUTE_PARSER)parseLightScissor));
@@ -2880,6 +2976,7 @@ namespace Ogre
 		mPassAttribParsers.insert(AttribParserList::value_type("iteration_depth_bias", (ATTRIBUTE_PARSER)parseIterationDepthBias));
         mPassAttribParsers.insert(AttribParserList::value_type("texture_unit", (ATTRIBUTE_PARSER)parseTextureUnit));
         mPassAttribParsers.insert(AttribParserList::value_type("vertex_program_ref", (ATTRIBUTE_PARSER)parseVertexProgramRef));
+		mPassAttribParsers.insert(AttribParserList::value_type("geometry_program_ref", (ATTRIBUTE_PARSER)parseGeometryProgramRef));
         mPassAttribParsers.insert(AttribParserList::value_type("shadow_caster_vertex_program_ref", (ATTRIBUTE_PARSER)parseShadowCasterVertexProgramRef));
         mPassAttribParsers.insert(AttribParserList::value_type("shadow_receiver_vertex_program_ref", (ATTRIBUTE_PARSER)parseShadowReceiverVertexProgramRef));
 		mPassAttribParsers.insert(AttribParserList::value_type("shadow_receiver_fragment_program_ref", (ATTRIBUTE_PARSER)parseShadowReceiverFragmentProgramRef));
@@ -3759,6 +3856,13 @@ namespace Ogre
 				writeAttribute(3, "alpha_rejection");
 				writeCompareFunction(pPass->getAlphaRejectFunction());
 				writeValue(StringConverter::toString(pPass->getAlphaRejectValue()));
+			}
+			// alpha_to_coverage
+			if (mDefaults ||
+				pPass->isAlphaToCoverageEnabled())
+			{
+				writeAttribute(3, "alpha_to_coverage");
+				writeValue(pPass->isAlphaToCoverageEnabled() ? "on" : "off");
 			}
 			// transparent_sorting
 			if (mDefaults ||

@@ -143,6 +143,24 @@ namespace Ogre {
 					return false;
 				}
 			}
+			if (currPass->hasGeometryProgram())
+			{
+				// Check geometry program version
+				if (!currPass->getGeometryProgram()->isSupported() )
+				{
+					// Can't do this one
+					compileErrors << "Pass " << passNum << 
+						": Geometry program " << currPass->getGeometryProgram()->getName()
+						<< " cannot be used - ";
+					if (currPass->getGeometryProgram()->hasCompileError())
+						compileErrors << "compile error.";
+					else
+						compileErrors << "not supported.";
+
+					compileErrors << std::endl;
+					return false;
+				}
+			}
 			if (currPass->hasFragmentProgram())
 			{
 				// Check fragment program version

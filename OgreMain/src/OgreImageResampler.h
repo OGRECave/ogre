@@ -35,13 +35,6 @@ Torus Knot Software Ltd.
 // do not include anywhere else.
 namespace Ogre {
 
-// define uint64 type
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-typedef unsigned __int64 uint64;
-#else
-typedef unsigned long long uint64;
-#endif
-
 // variable name hints:
 // sx_48 = 16/48-bit fixed-point x-position in source
 // stepx = difference between adjacent sx_48 values

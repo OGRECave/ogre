@@ -56,6 +56,8 @@ namespace Ogre {
 		static GLuint mVertexShaderCount;
 		/// keep track of the number of fragment shaders created
 		static GLuint mFragmentShaderCount;
+		/// keep track of the number of geometry shaders created
+		static GLuint mGeometryShaderCount;
 
 	public:
         GLSLGpuProgram(GLSLProgram* parent);

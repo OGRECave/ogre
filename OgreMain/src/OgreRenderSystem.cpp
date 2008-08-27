@@ -65,11 +65,14 @@ namespace Ogre {
         , mCurrentPassIterationCount(0)
 		, mDerivedDepthBias(false)
         , mVertexProgramBound(false)
+		, mGeometryProgramBound(false)
         , mFragmentProgramBound(false)
 		, mClipPlanesDirty(true)
 		, mRealCapabilities(0)
 		, mCurrentCapabilities(0)
 		, mUseCustomCapabilities(false)
+		, mTexProjRelative(false)
+		, mTexProjRelativeOrigin(Vector3::ZERO)
     {
     }
 
@@ -139,6 +142,7 @@ namespace Ogre {
         //   their own initialise() implementations.
         
         mVertexProgramBound = false;
+		mGeometryProgramBound = false;
         mFragmentProgramBound = false;
 
         return 0;
@@ -569,6 +573,11 @@ namespace Ogre {
             mActiveVertexGpuProgramParameters->incPassIterationNumber();
             bindGpuProgramPassIterationParameters(GPT_VERTEX_PROGRAM);
         }
+        if (!mActiveGeometryGpuProgramParameters.isNull())
+        {
+            mActiveGeometryGpuProgramParameters->incPassIterationNumber();
+            bindGpuProgramPassIterationParameters(GPT_GEOMETRY_PROGRAM);
+        }
         if (!mActiveFragmentGpuProgramParameters.isNull())
         {
             mActiveFragmentGpuProgramParameters->incPassIterationNumber();
@@ -619,6 +628,9 @@ namespace Ogre {
 
             mVertexProgramBound = true;
 	        break;
+        case GPT_GEOMETRY_PROGRAM:
+			mGeometryProgramBound = true;
+			break;
         case GPT_FRAGMENT_PROGRAM:
             mFragmentProgramBound = true;
 	        break;
@@ -635,6 +647,9 @@ namespace Ogre {
 				mClipPlanesDirty = true;
             mVertexProgramBound = false;
 	        break;
+        case GPT_GEOMETRY_PROGRAM:
+			mGeometryProgramBound = false;
+			break;
         case GPT_FRAGMENT_PROGRAM:
             mFragmentProgramBound = false;
 	        break;
@@ -647,11 +662,20 @@ namespace Ogre {
 	    {
         case GPT_VERTEX_PROGRAM:
             return mVertexProgramBound;
+        case GPT_GEOMETRY_PROGRAM:
+            return mGeometryProgramBound;
         case GPT_FRAGMENT_PROGRAM:
             return mFragmentProgramBound;
 	    }
         // Make compiler happy
         return false;
+	}
+	//---------------------------------------------------------------------
+	void RenderSystem::_setTextureProjectionRelativeTo(bool enabled, const Vector3& pos)
+	{
+		mTexProjRelative = enabled;
+		mTexProjRelativeOrigin = pos;
+
 	}
 
 }

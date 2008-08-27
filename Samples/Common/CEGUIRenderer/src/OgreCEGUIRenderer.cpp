@@ -454,7 +454,7 @@ void OgreCEGUIRenderer::initRenderStates(void)
 	d_render_sys->_setTextureUnitFiltering(0, FO_LINEAR, FO_LINEAR, FO_POINT);
 	d_render_sys->_setTextureAddressingMode(0, d_uvwAddressMode);
 	d_render_sys->_setTextureMatrix(0, Matrix4::IDENTITY);
-	d_render_sys->_setAlphaRejectSettings(CMPF_ALWAYS_PASS, 0);
+	d_render_sys->_setAlphaRejectSettings(CMPF_ALWAYS_PASS, 0, false);
 	d_render_sys->_setTextureBlendMode(0, d_colourBlendMode);
 	d_render_sys->_setTextureBlendMode(0, d_alphaBlendMode);
 	d_render_sys->_disableTextureUnitsFrom(1);

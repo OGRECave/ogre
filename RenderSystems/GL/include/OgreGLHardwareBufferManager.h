@@ -60,7 +60,8 @@ namespace Ogre {
         HardwareIndexBufferSharedPtr createIndexBuffer(
             HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
             HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-
+        /// Create a render to vertex buffer
+        RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
         /// Utility function to get the correct GL usage based on HBU's
         static GLenum getGLUsage(unsigned int usage);
 

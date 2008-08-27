@@ -98,7 +98,7 @@ namespace Ogre
 			for (AllocationMap::const_iterator i = mAllocations.begin(); i != mAllocations.end(); ++i)
 			{
 				const Alloc& alloc = i->second;
-				if (alloc.filename)
+				if (!alloc.filename.empty())
 					os << alloc.filename << "(" << alloc.line << ", " << alloc.function << "): ";
 				else
 					os << "(unknown source): ";
@@ -115,7 +115,7 @@ namespace Ogre
 			std::cout << os.str();
 		
 		std::ofstream of;
-		of.open(mLeakFileName);
+		of.open(mLeakFileName.c_str());
 		of << os.str();
 		of.close();
 	}

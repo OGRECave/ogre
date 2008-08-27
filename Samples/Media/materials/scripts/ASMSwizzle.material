@@ -1,0 +1,19 @@
+geometry_program Ogre/GPTest/Swizzle_GP_ASM asm
+{
+	source Swizzle.gp
+	syntax nvgp4
+}
+
+material Ogre/GPTest/SwizzleASM
+{
+	technique SwizzleTechnique
+	{
+		pass SwizzleASMPass
+		{
+			geometry_program_ref Ogre/GPTest/Swizzle_GP_ASM
+			{
+			
+			}
+		}
+	}
+}

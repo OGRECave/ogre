@@ -580,6 +580,9 @@
 		AA7510680DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510640DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h */; };
 		AA7510690DDE20FE009D23BA /* OgreMemoryStdAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */; };
 		AA75106A0DDE20FE009D23BA /* OgreMemorySTLAllocator.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510660DDE20FE009D23BA /* OgreMemorySTLAllocator.h */; };
+		AA89775B0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA89775A0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h */; };
+		AA89775E0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA89775D0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp */; };
+		AA8977610E5F4C0100A70BC4 /* OgreGLRenderToVertexBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA8977600E5F4C0100A70BC4 /* OgreGLRenderToVertexBuffer.cpp */; };
 		AAA8B9700CC6A4FC001AD86E /* OgreScriptCompiler.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96E0CC6A4FC001AD86E /* OgreScriptCompiler.h */; };
 		AAA8B9710CC6A4FC001AD86E /* OgreScriptParser.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */; };
 		AAD22CA50D7D708600928C53 /* OgreScriptTranslator.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD22CA40D7D708600928C53 /* OgreScriptTranslator.h */; };
@@ -1349,6 +1352,10 @@
 		AA7510640DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryAllocatorConfig.h; path = ../../OgreMain/include/OgreMemoryAllocatorConfig.h; sourceTree = SOURCE_ROOT; };
 		AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryStdAlloc.h; path = ../../OgreMain/include/OgreMemoryStdAlloc.h; sourceTree = SOURCE_ROOT; };
 		AA7510660DDE20FE009D23BA /* OgreMemorySTLAllocator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemorySTLAllocator.h; path = ../../OgreMain/include/OgreMemorySTLAllocator.h; sourceTree = SOURCE_ROOT; };
+		AA89775A0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreRenderToVertexBuffer.h; path = ../../OgreMain/include/OgreRenderToVertexBuffer.h; sourceTree = SOURCE_ROOT; };
+		AA89775D0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreRenderToVertexBuffer.cpp; path = ../../OgreMain/src/OgreRenderToVertexBuffer.cpp; sourceTree = SOURCE_ROOT; };
+		AA89775F0E5F4BE100A70BC4 /* OgreGLRenderToVertexBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreGLRenderToVertexBuffer.h; path = ../../RenderSystems/GL/include/OgreGLRenderToVertexBuffer.h; sourceTree = SOURCE_ROOT; };
+		AA8977600E5F4C0100A70BC4 /* OgreGLRenderToVertexBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreGLRenderToVertexBuffer.cpp; path = ../../RenderSystems/GL/src/OgreGLRenderToVertexBuffer.cpp; sourceTree = SOURCE_ROOT; };
 		AAA8B96E0CC6A4FC001AD86E /* OgreScriptCompiler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptCompiler.h; path = ../../OgreMain/include/OgreScriptCompiler.h; sourceTree = SOURCE_ROOT; };
 		AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptParser.h; path = ../../OgreMain/include/OgreScriptParser.h; sourceTree = SOURCE_ROOT; };
 		AAD22CA40D7D708600928C53 /* OgreScriptTranslator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptTranslator.h; path = ../../OgreMain/include/OgreScriptTranslator.h; sourceTree = SOURCE_ROOT; };
@@ -1666,6 +1673,7 @@
 				AA261E8B0CA17DC2000A3707 /* OgreRenderSystemCapabilitiesSerializer.cpp */,
 				000E1F690B38D5AA004EA2DF /* OgreRenderTarget.cpp */,
 				000E1F6A0B38D5AA004EA2DF /* OgreRenderTexture.cpp */,
+				AA89775D0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp */,
 				000E1F6B0B38D5AA004EA2DF /* OgreRenderWindow.cpp */,
 				000E1F6C0B38D5AA004EA2DF /* OgreResource.cpp */,
 				000E1F6D0B38D5AA004EA2DF /* OgreResourceBackgroundQueue.cpp */,
@@ -1885,6 +1893,7 @@
 				000E1DDB0B38D566004EA2DF /* OgreRenderTarget.h */,
 				000E1DDC0B38D566004EA2DF /* OgreRenderTargetListener.h */,
 				000E1DDD0B38D566004EA2DF /* OgreRenderTexture.h */,
+				AA89775A0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h */,
 				000E1DDE0B38D566004EA2DF /* OgreRenderWindow.h */,
 				000E1DDF0B38D566004EA2DF /* OgreResource.h */,
 				000E1DE00B38D566004EA2DF /* OgreResourceBackgroundQueue.h */,
@@ -1985,6 +1994,7 @@
 				000E207C0B38D82E004EA2DF /* OgreGLPrerequisites.h */,
 				000E207D0B38D82E004EA2DF /* OgreGLRenderSystem.h */,
 				000E207E0B38D82E004EA2DF /* OgreGLRenderTexture.h */,
+				AA89775F0E5F4BE100A70BC4 /* OgreGLRenderToVertexBuffer.h */,
 				000E207F0B38D82E004EA2DF /* OgreGLSupport.h */,
 				000E20800B38D82E004EA2DF /* OgreGLTexture.h */,
 				000E20810B38D82E004EA2DF /* OgreGLTextureManager.h */,
@@ -2025,6 +2035,7 @@
 				005E5EB40B7F3BA700658C32 /* OgreGLPlugin.cpp */,
 				000E20A60B38D8DB004EA2DF /* OgreGLRenderSystem.cpp */,
 				000E20A70B38D8DB004EA2DF /* OgreGLRenderTexture.cpp */,
+				AA8977600E5F4C0100A70BC4 /* OgreGLRenderToVertexBuffer.cpp */,
 				000E20A80B38D8DB004EA2DF /* OgreGLSupport.cpp */,
 				000E20A90B38D8DB004EA2DF /* OgreGLTexture.cpp */,
 				000E20AA0B38D8DB004EA2DF /* OgreGLTextureManager.cpp */,
@@ -2565,6 +2576,7 @@
 				AA75106A0DDE20FE009D23BA /* OgreMemorySTLAllocator.h in Headers */,
 				AAF4F5CB0DE4D6AD0073D0FD /* OgreMemoryTracker.h in Headers */,
 				AAE048000E5E0C15001D1ADC /* OgreShadowCameraSetupPSSM.h in Headers */,
+				AA89775B0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2934,6 +2946,7 @@
 				AAF4F54A0DE4C73D0073D0FD /* OgreMemoryTracker.cpp in Sources */,
 				AAE36CDF0E50EB8100ED4B76 /* OgreMemoryAllocatedObject.cpp in Sources */,
 				AAE047FD0E5E0BCE001D1ADC /* OgreShadowCameraSetupPSSM.cpp in Sources */,
+				AA89775E0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3006,6 +3019,7 @@
 				003C21120B51AE990090A344 /* OgreOSXWindow.cpp in Sources */,
 				005E5EB50B7F3BA700658C32 /* OgreGLPlugin.cpp in Sources */,
 				AA123E6F0C53FAB9000009B6 /* OgreGLSLPreprocessor.cpp in Sources */,
+				AA8977610E5F4C0100A70BC4 /* OgreGLRenderToVertexBuffer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

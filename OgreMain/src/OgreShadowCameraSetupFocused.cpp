@@ -89,7 +89,16 @@ namespace Ogre
 			// generate view matrix if requested
 			if (out_view != NULL)
 			{
-				*out_view = buildViewMatrix(cam.getDerivedPosition(), 
+				Vector3 pos;
+				if (sm.getCameraRelativeRendering())
+				{
+					pos = Vector3::ZERO;
+				}
+				else
+				{
+					pos = cam.getDerivedPosition();
+				}
+				*out_view = buildViewMatrix(pos, 
 					light.getDerivedDirection(), 
 					cam.getDerivedUp());
 			}

@@ -37,7 +37,7 @@ namespace Ogre {
 
 	GLuint GLSLGpuProgram::mVertexShaderCount = 0;
 	GLuint GLSLGpuProgram::mFragmentShaderCount = 0;
-
+	GLuint GLSLGpuProgram::mGeometryShaderCount = 0;
     //-----------------------------------------------------------------------------
 	GLSLGpuProgram::GLSLGpuProgram(GLSLProgram* parent) : 
         GLGpuProgram(parent->getCreator(), parent->getName(), parent->getHandle(), 
@@ -50,9 +50,13 @@ namespace Ogre {
 		{
 			mProgramID = ++mVertexShaderCount;
 		}
-		else
+		else if (parent->getType() == GPT_FRAGMENT_PROGRAM)
 		{
 			mProgramID = ++mFragmentShaderCount;
+		}
+		else
+		{
+			mProgramID = ++mGeometryShaderCount;
 		}
 
         // transfer skeletal animation status from parent
@@ -90,13 +94,17 @@ namespace Ogre {
 	void GLSLGpuProgram::bindProgram(void)
 	{
 		// tell the Link Program Manager what shader is to become active
-		if (mType == GPT_VERTEX_PROGRAM)
+		switch (mType)
 		{
+		case GPT_VERTEX_PROGRAM:
 			GLSLLinkProgramManager::getSingleton().setActiveVertexShader( this );
-		}
-		else // its a fragment shader
-		{
+			break;
+		case GPT_FRAGMENT_PROGRAM:
 			GLSLLinkProgramManager::getSingleton().setActiveFragmentShader( this );
+			break;
+		case GPT_GEOMETRY_PROGRAM:
+			GLSLLinkProgramManager::getSingleton().setActiveGeometryShader( this );
+			break;
 		}
 	}
 
@@ -107,6 +115,10 @@ namespace Ogre {
 		if (mType == GPT_VERTEX_PROGRAM)
 		{
 			GLSLLinkProgramManager::getSingleton().setActiveVertexShader( NULL );
+		}
+		else if (mType == GPT_GEOMETRY_PROGRAM)
+		{
+			GLSLLinkProgramManager::getSingleton().setActiveGeometryShader( NULL );
 		}
 		else // its a fragment shader
 		{

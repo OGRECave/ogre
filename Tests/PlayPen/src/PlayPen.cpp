@@ -6998,11 +6998,10 @@ protected:
 		mSceneMgr->setShadowTextureSettings(1024, 2);
 		addTextureShadowDebugOverlay(2);
 
-		//Vector3 offset(10000000, 0, 10000000);
-		Vector3 offset(0, 0, 0);
+		Vector3 offset(100000, 0, 100000);
+		//Vector3 offset(0, 0, 0);
 
 		mSceneMgr->setAmbientLight(ColourValue(0.1, 0.1, 0.1));
-
 
 		// Directional test
 		mLight = mSceneMgr->createLight("MainLight");
@@ -7058,11 +7057,100 @@ protected:
 
 		mSceneMgr->setCameraRelativeRendering(true);
 
+		FocusedShadowCameraSetup* camSetup = new FocusedShadowCameraSetup();
+		mSceneMgr->setShadowCameraSetup(ShadowCameraSetupPtr(camSetup));
 
 	}
 
+	void testGeometryShaders(void)
+    {
+		const String GLSL_MATERIAL_NAME = "Ogre/GPTest/SwizzleGLSL";
+		const String ASM_MATERIAL_NAME = "Ogre/GPTest/SwizzleASM";
+		const String CG_MATERIAL_NAME = "Ogre/GPTest/SwizzleCG";
 
-    void createScene(void)
+        // Check capabilities
+		const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
+        if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
+        {
+			OGRE_EXCEPT(Ogre::Exception::ERR_NOT_IMPLEMENTED, "Your card does not support geometry programs, so cannot "
+                "run this demo. Sorry!", 
+                "GeometryShading::createScene");
+        }
+		
+		int maxOutputVertices = caps->getGeometryProgramNumOutputVertices();
+		Ogre::LogManager::getSingleton().getDefaultLog()->stream() << 
+			"Num output vertices per geometry shader run : " << maxOutputVertices;
+
+        Entity *ent = mSceneMgr->createEntity("head", "ogrehead.mesh");
+        mCamera->setPosition(20, 0, 100);
+        mCamera->lookAt(0,0,0);
+		
+		//String materialName = GLSL_MATERIAL_NAME;
+		String materialName = ASM_MATERIAL_NAME;
+		//String materialName = CG_MATERIAL_NAME;
+
+		// Set all of the material's sub entities to use the new material
+		for (unsigned int i=0; i<ent->getNumSubEntities(); i++)
+		{
+			ent->getSubEntity(i)->setMaterialName(materialName);
+		}
+        
+        // Add entity to the root scene node
+        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ent);
+
+        mWindow->getViewport(0)->setBackgroundColour(ColourValue::Green);
+    }
+
+	void testAlphaToCoverage()
+	{
+
+		MaterialPtr mat = MaterialManager::getSingleton().create("testa2c", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		Pass* p = mat->getTechnique(0)->getPass(0);
+		p->setAlphaRejectSettings(CMPF_GREATER, 96);
+		p->setLightingEnabled(false);
+		p->setCullingMode(CULL_NONE);
+		p->setAlphaToCoverageEnabled(true);
+		TextureUnitState* t = p->createTextureUnitState("leaf.png");
+		t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+		Entity *e = mSceneMgr->createEntity("PlaneA2C", SceneManager::PT_PLANE);
+		e->setMaterialName(mat->getName());
+		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(100, 0, 0))->attachObject(e);
+
+
+		mat = MaterialManager::getSingleton().create("testnoa2c", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		p = mat->getTechnique(0)->getPass(0);
+		p->setAlphaRejectSettings(CMPF_GREATER, 96);
+		p->setLightingEnabled(false);
+		p->setCullingMode(CULL_NONE);
+		p->setAlphaToCoverageEnabled(false);
+		t = p->createTextureUnitState("leaf.png");
+		t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+		e = mSceneMgr->createEntity("PlaneNoA2C", SceneManager::PT_PLANE);
+		e->setMaterialName(mat->getName());
+		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-100, 0, 0))->attachObject(e);
+
+		mat = MaterialManager::getSingleton().create("bg", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		p = mat->getTechnique(0)->getPass(0);
+		p->setLightingEnabled(false);
+		p->setCullingMode(CULL_NONE);
+		t = p->createTextureUnitState();
+		t->setColourOperationEx(LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT, ColourValue::White);
+		e = mSceneMgr->createEntity("PlaneBg", SceneManager::PT_PLANE);
+		e->setMaterialName(mat->getName());
+		e->setRenderQueueGroup(RENDER_QUEUE_BACKGROUND);
+		SceneNode* s = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0, 0, -10));
+		s->setScale(5,5,5);
+		s->attachObject(e);
+
+		mCamera->setPosition(0,0,300);
+		mCamera->lookAt(Vector3::ZERO);
+
+	}
+
+	void createScene(void)
     {
 
 
@@ -7223,6 +7311,8 @@ protected:
 		//testLightClipPlanesMoreLights(true);
 
 		testFarFromOrigin();
+		//testGeometryShaders();
+		//testAlphaToCoverage();
 		
     }
     // Create new frame listener

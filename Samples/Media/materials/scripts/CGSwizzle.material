@@ -1,0 +1,20 @@
+geometry_program Ogre/GPTest/Swizzle_GP_CG cg
+{
+	source SwizzleGP.cg
+	entry_point gs_swizzle
+	profiles gp4gp gpu_gp
+}
+
+material Ogre/GPTest/SwizzleCG
+{
+	technique
+	{
+		pass SwizzleCGPass
+		{
+			geometry_program_ref Ogre/GPTest/Swizzle_GP_CG
+			{
+			
+			}
+		}
+	}
+}

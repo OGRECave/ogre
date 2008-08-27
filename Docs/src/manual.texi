@@ -546,6 +546,8 @@ Here are the attributes you can use in a 'pass' section of a .material script:
 @item
 @ref{alpha_rejection}
 @item
+@ref{alpha_to_coverage}
+@item
 @ref{light_scissor}
 @item
 @ref{light_clip_planes}
@@ -804,6 +806,15 @@ Example: alpha_rejection greater_equal 128@*@*
 The function parameter can be any of the options listed in the material depth_function attribute. The value parameter can theoretically be any value between 0 and 255, but is best limited to 0 or 128 for hardware compatibility.@*@*
 
 Default: alpha_rejection always_pass@*@*
+
+@anchor{alpha_to_coverage}
+@subheading alpha_to_coverage
+
+Sets whether this pass will use 'alpha to coverage', a way to multisample alpha texture edges so they blend more seamlessly with the background. This facility is typically only available on cards from around 2006 onwards, but it is safe to enable it anyway - Ogre will just ignore it if the hardware does not support it. The common use for alpha to coverage is foliage rendering and chain-link fence style textures. @*@*
+
+Format: alpha_to_coverage <on|off>@*@*
+
+Default: alpha_to_coverage off@*@*
 @anchor{light_scissor}
 @subheading light_scissor
 

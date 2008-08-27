@@ -110,6 +110,8 @@ namespace Ogre {
 		HardwareIndexBufferSharedPtr 
             createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
 				HardwareBuffer::Usage usage, bool useShadowBuffer = false);
+		/// Create a render to vertex buffer
+		RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
 
     };
 

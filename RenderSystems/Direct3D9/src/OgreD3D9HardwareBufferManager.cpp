@@ -32,7 +32,7 @@ Torus Knot Software Ltd.
 #include "OgreD3D9VertexDeclaration.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-
+#include "OgreException.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -113,6 +113,14 @@ namespace Ogre {
 		return HardwareIndexBufferSharedPtr(idx);
             
     }
+    //-----------------------------------------------------------------------
+    RenderToVertexBufferSharedPtr 
+        D3D9HardwareBufferManager::createRenderToVertexBuffer()
+    {
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+            "Direct3D9 does not support render to vertex buffer objects", 
+            "D3D9HardwareBufferManager::createRenderToVertexBuffer");
+	}
     //-----------------------------------------------------------------------
     VertexDeclaration* D3D9HardwareBufferManager::createVertexDeclarationImpl(void)
     {

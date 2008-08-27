@@ -213,6 +213,13 @@ namespace Ogre {
 typedef unsigned int uint32;
 typedef unsigned short uint16;
 typedef unsigned char uint8;
+// define uint64 type
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+	typedef unsigned __int64 uint64;
+#else
+	typedef unsigned long long uint64;
+#endif
+
 
 }
 

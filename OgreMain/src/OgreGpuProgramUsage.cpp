@@ -54,7 +54,8 @@ namespace Ogre
 
         if (mProgram.isNull())
         {
-            String progType = (mType == GPT_VERTEX_PROGRAM ? "vertex" : "fragment");
+			String progType = (mType == GPT_VERTEX_PROGRAM ? "vertex" : 
+				(mType == GPT_GEOMETRY_PROGRAM ? "geometry" : "fragment"));
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
                 "Unable to locate " + progType + " program called " + name + ".",
                 "GpuProgramUsage::setProgramName");

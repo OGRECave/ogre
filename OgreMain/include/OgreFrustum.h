@@ -340,6 +340,12 @@ namespace Ogre
         */
         virtual const Matrix4& getViewMatrix(void) const;
 
+		/** Calculate a view matrix for this frustum, relative to a potentially dynamic point. 
+			Mainly for use by OGRE internally when using camera-relative rendering
+			for frustums that are not the centre (e.g. texture projection)
+		*/
+		virtual void calcViewMatrixRelative(const Vector3& relPos, Matrix4& matToUpdate) const;
+
 		/** Set whether to use a custom view matrix on this frustum.
 		@remarks
 			This is an advanced method which allows you to manually set

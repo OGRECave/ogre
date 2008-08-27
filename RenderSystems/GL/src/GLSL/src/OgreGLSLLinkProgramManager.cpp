@@ -52,7 +52,7 @@ namespace Ogre {
 
 	//-----------------------------------------------------------------------
 	GLSLLinkProgramManager::GLSLLinkProgramManager(void) : mActiveVertexGpuProgram(NULL),
-		mActiveFragmentGpuProgram(NULL), mActiveLinkProgram(NULL)
+		mActiveGeometryGpuProgram(NULL), mActiveFragmentGpuProgram(NULL), mActiveLinkProgram(NULL)
 	{
 		// Fill in the relationship between type names and enums
 		mTypeEnumMap.insert(StringToEnumMap::value_type("float", GL_FLOAT));
@@ -89,8 +89,8 @@ namespace Ogre {
 	GLSLLinkProgramManager::~GLSLLinkProgramManager(void)
 	{
 		// iterate through map container and delete link programs
-		for (LinkProgramIterator currentProgram = LinkPrograms.begin();
-			currentProgram != LinkPrograms.end(); ++currentProgram)
+		for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
+			currentProgram != mLinkPrograms.end(); ++currentProgram)
 		{
 			delete currentProgram->second;
 		}
@@ -106,28 +106,31 @@ namespace Ogre {
 
 		// no active link program so find one or make a new one
 		// is there an active key?
-		GLuint activeKey = 0;
+		uint64 activeKey = 0;
 
 		if (mActiveVertexGpuProgram)
 		{
-			activeKey = mActiveVertexGpuProgram->getProgramID() << 16;
+			activeKey = static_cast<uint64>(mActiveVertexGpuProgram->getProgramID()) << 32;
 		}
-
+		if (mActiveGeometryGpuProgram)
+		{
+			activeKey += static_cast<uint64>(mActiveGeometryGpuProgram->getProgramID()) << 16;
+		}
 		if (mActiveFragmentGpuProgram)
 		{
-			activeKey += mActiveFragmentGpuProgram->getProgramID();
+			activeKey += static_cast<uint64>(mActiveFragmentGpuProgram->getProgramID());
 		}
 
-		// only return a link program object if a vertex or fragment program exist
+		// only return a link program object if a vertex, geometry or fragment program exist
 		if (activeKey > 0)
 		{
 			// find the key in the hash map
-			LinkProgramIterator programFound = LinkPrograms.find(activeKey);
+			LinkProgramIterator programFound = mLinkPrograms.find(activeKey);
 			// program object not found for key so need to create it
-			if (programFound == LinkPrograms.end())
+			if (programFound == mLinkPrograms.end())
 			{
-				mActiveLinkProgram = new GLSLLinkProgram(mActiveVertexGpuProgram, mActiveFragmentGpuProgram);
-				LinkPrograms[activeKey] = mActiveLinkProgram;
+				mActiveLinkProgram = new GLSLLinkProgram(mActiveVertexGpuProgram, mActiveGeometryGpuProgram,mActiveFragmentGpuProgram);
+				mLinkPrograms[activeKey] = mActiveLinkProgram;
 			}
 			else
 			{
@@ -162,6 +165,18 @@ namespace Ogre {
 		if (vertexGpuProgram != mActiveVertexGpuProgram)
 		{
 			mActiveVertexGpuProgram = vertexGpuProgram;
+			// ActiveLinkProgram is no longer valid
+			mActiveLinkProgram = NULL;
+			// change back to fixed pipeline
+			glUseProgramObjectARB(0);
+		}
+	}
+	//-----------------------------------------------------------------------
+	void GLSLLinkProgramManager::setActiveGeometryShader(GLSLGpuProgram* geometryGpuProgram)
+	{
+		if (geometryGpuProgram != mActiveGeometryGpuProgram)
+		{
+			mActiveGeometryGpuProgram = geometryGpuProgram;
 			// ActiveLinkProgram is no longer valid
 			mActiveLinkProgram = NULL;
 			// change back to fixed pipeline
@@ -285,7 +300,8 @@ namespace Ogre {
 	bool GLSLLinkProgramManager::completeParamSource(
 		const String& paramName,
 		const GpuConstantDefinitionMap* vertexConstantDefs, 
-		const GpuConstantDefinitionMap* fragmentConstantDefs, 
+		const GpuConstantDefinitionMap* geometryConstantDefs,
+		const GpuConstantDefinitionMap* fragmentConstantDefs,
 		GLUniformReference& refToUpdate)
 	{
 		if (vertexConstantDefs)
@@ -295,6 +311,18 @@ namespace Ogre {
 			if (parami != vertexConstantDefs->end())
 			{
 				refToUpdate.mSourceProgType = GPT_VERTEX_PROGRAM;
+				refToUpdate.mConstantDef = &(parami->second);
+				return true;
+			}
+
+		}
+		if (geometryConstantDefs)
+		{
+			GpuConstantDefinitionMap::const_iterator parami = 
+				geometryConstantDefs->find(paramName);
+			if (parami != geometryConstantDefs->end())
+			{
+				refToUpdate.mSourceProgType = GPT_GEOMETRY_PROGRAM;
 				refToUpdate.mConstantDef = &(parami->second);
 				return true;
 			}
@@ -318,7 +346,8 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void GLSLLinkProgramManager::extractUniforms(GLhandleARB programObject, 
 		const GpuConstantDefinitionMap* vertexConstantDefs, 
-		const GpuConstantDefinitionMap* fragmentConstantDefs, 
+		const GpuConstantDefinitionMap* geometryConstantDefs,
+		const GpuConstantDefinitionMap* fragmentConstantDefs,
 		GLUniformReferenceList& list)
 	{
 		// scan through the active uniforms and add them to the reference list
@@ -363,7 +392,7 @@ namespace Ogre {
 
 				// find out which params object this comes from
 				bool foundSource = completeParamSource(paramName,
-						vertexConstantDefs,	fragmentConstantDefs, newGLUniformReference);
+						vertexConstantDefs,	geometryConstantDefs, fragmentConstantDefs, newGLUniformReference);
 
 				// only add this parameter if we found the source
 				if (foundSource)

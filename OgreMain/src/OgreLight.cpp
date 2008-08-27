@@ -811,8 +811,71 @@ namespace Ogre {
 		const NameValuePairList* params)
 	{
 
-		return OGRE_NEW Light(name);
+		Light* light = OGRE_NEW Light(name);
+ 
+		if(params)
+		{
+			NameValuePairList::const_iterator ni;
 
+			// Setting the light type first before any property specific to a certain light type
+			if ((ni = params->find("type")) != params->end())
+			{
+				if (ni->second == "point")
+					light->setType(Light::LT_POINT);
+				else if (ni->second == "directional")
+					light->setType(Light::LT_DIRECTIONAL);
+				else if (ni->second == "spotlight")
+					light->setType(Light::LT_SPOTLIGHT);
+				else
+					OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+						"Invalid light type '" + ni->second + "'.",
+						"LightFactory::createInstance");
+			}
+
+			// Common properties
+			if ((ni = params->find("position")) != params->end())
+				light->setPosition(StringConverter::parseVector3(ni->second));
+
+			if ((ni = params->find("direction")) != params->end())
+				light->setDirection(StringConverter::parseVector3(ni->second));
+
+			if ((ni = params->find("diffuseColour")) != params->end())
+				light->setDiffuseColour(StringConverter::parseColourValue(ni->second));
+
+			if ((ni = params->find("specularColour")) != params->end())
+				light->setSpecularColour(StringConverter::parseColourValue(ni->second));
+
+			if ((ni = params->find("attenuation")) != params->end())
+			{
+				Vector4 attenuation = StringConverter::parseVector4(ni->second);
+				light->setAttenuation(attenuation.x, attenuation.y, attenuation.z, attenuation.w);
+			}
+
+			if ((ni = params->find("castShadows")) != params->end())
+				light->setCastShadows(StringConverter::parseBool(ni->second));
+
+			if ((ni = params->find("visible")) != params->end())
+				light->setVisible(StringConverter::parseBool(ni->second));
+
+			if ((ni = params->find("powerScale")) != params->end())
+				light->setPowerScale(StringConverter::parseReal(ni->second));
+
+			if ((ni = params->find("shadowFarDistance")) != params->end())
+				light->setShadowFarDistance(StringConverter::parseReal(ni->second));
+
+
+			// Spotlight properties
+			if ((ni = params->find("spotlightInner")) != params->end())
+				light->setSpotlightInnerAngle(StringConverter::parseAngle(ni->second));
+
+			if ((ni = params->find("spotlightOuter")) != params->end())
+				light->setSpotlightOuterAngle(StringConverter::parseAngle(ni->second));
+
+			if ((ni = params->find("spotlightFalloff")) != params->end())
+				light->setSpotlightFalloff(StringConverter::parseReal(ni->second));
+		}
+
+		return light;
 	}
 	//-----------------------------------------------------------------------
 	void LightFactory::destroyInstance( MovableObject* obj)

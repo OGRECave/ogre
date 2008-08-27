@@ -959,6 +959,31 @@ namespace Ogre
 		if((mCaps.PrimitiveMiscCaps & D3DPMISCCAPS_PERSTAGECONSTANT) != 0)
 			rsc->setCapability(RSC_PERSTAGECONSTANT);
 
+		// Check alpha to coverage support
+		// this varies per vendor! But at least SM3 is required
+		if (rsc->isShaderProfileSupported("ps_3_0"))
+		{
+			// NVIDIA needs a separate check
+			if (rsc->getVendor() == GPU_NVIDIA)
+			{
+				if (mpD3D->CheckDeviceFormat(
+						D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, 0,D3DRTYPE_SURFACE, 
+						(D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C')) == S_OK)
+				{
+					rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
+				}
+
+			}
+			else if (rsc->getVendor() == GPU_ATI)
+			{
+				// There is no check on ATI, we have to assume SM3 == support
+				rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
+			}
+
+			// no other cards have Dx9 hacks for alpha to coverage, as far as I know
+		}
+
+
 		return rsc;
 
 	}
@@ -1861,7 +1886,16 @@ namespace Ogre
 			// To do this, we need to undo the camera view matrix, then 
 			// apply the projector view & projection matrices
 			newMat = mViewMatrix.inverse();
-			newMat = mTexStageDesc[stage].frustum->getViewMatrix() * newMat;
+			if(mTexProjRelative)
+			{
+				Matrix4 viewMatrix;
+				mTexStageDesc[stage].frustum->calcViewMatrixRelative(mTexProjRelativeOrigin, viewMatrix);
+				newMat = viewMatrix * newMat;
+			}
+			else
+			{
+				newMat = mTexStageDesc[stage].frustum->getViewMatrix() * newMat;
+			}
 			newMat = mTexStageDesc[stage].frustum->getProjectionMatrix() * newMat;
 			newMat = Matrix4::CLIPSPACE2DTOIMAGESPACE * newMat;
 			newMat = xForm * newMat;
@@ -2172,14 +2206,19 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
-	void D3D9RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value )
+	void D3D9RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage )
 	{
 		HRESULT hr;
+		bool a2c = false;
+		static bool lasta2c = false;
+
 		if (func != CMPF_ALWAYS_PASS)
 		{
 			if( FAILED( hr = __SetRenderState( D3DRS_ALPHATESTENABLE,  TRUE ) ) )
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to enable alpha testing", 
 				"D3D9RenderSystem::_setAlphaRejectSettings" );
+
+			a2c = alphaToCoverage;
 		}
 		else
 		{
@@ -2192,6 +2231,43 @@ namespace Ogre
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha reject function", "D3D9RenderSystem::_setAlphaRejectSettings" );
 		if( FAILED( hr = __SetRenderState( D3DRS_ALPHAREF, value ) ) )
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set render state D3DRS_ALPHAREF", "D3D9RenderSystem::_setAlphaRejectSettings" );
+
+		// Alpha to coverage
+		if (getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
+		{
+			// Vendor-specific hacks on renderstate, gotta love 'em
+			if (getCapabilities()->getVendor() == GPU_NVIDIA)
+			{
+				if (a2c)
+				{
+					if( FAILED( hr = __SetRenderState( D3DRS_ADAPTIVETESS_Y,  (D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C') ) ) )
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha to coverage option", "D3D9RenderSystem::_setAlphaRejectSettings" );
+				}
+				else
+				{
+					if( FAILED( hr = __SetRenderState( D3DRS_ADAPTIVETESS_Y,  D3DFMT_UNKNOWN ) ) )
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha to coverage option", "D3D9RenderSystem::_setAlphaRejectSettings" );
+				}
+
+			}
+			else if ((getCapabilities()->getVendor() == GPU_ATI))
+			{
+				if (a2c)
+				{
+					if( FAILED( hr = __SetRenderState( D3DRS_POINTSIZE,  MAKEFOURCC('A','2','M','1') ) ) )
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha to coverage option", "D3D9RenderSystem::_setAlphaRejectSettings" );
+				}
+				else
+				{
+					// discovered this through trial and error, seems to work
+					if( FAILED( hr = __SetRenderState( D3DRS_POINTSIZE,  MAKEFOURCC('A','2','M','0') ) ) )
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha to coverage option", "D3D9RenderSystem::_setAlphaRejectSettings" );
+				}
+			}
+			// no hacks available for any other vendors?
+			lasta2c = a2c;
+		}
+
 	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::_setCullingMode( CullingMode mode )
