@@ -63,7 +63,7 @@ namespace Ogre {
 		LogManager::getSingleton().stream(LML_TRIVIAL)
 			<< "Creating viewport on target '" << target->getName() << "'"
 			<< ", rendering from camera '" << (cam != 0 ? cam->getName() : "NULL") << "'"
-			<< ", relative dimensions "	<< std::fixed << std::setprecision(2) 
+			<< ", relative dimensions "	<< std::ios::fixed << std::setprecision(2) 
 			<< "L: " << left << " T: " << top << " W: " << width << " H: " << height
 			<< " ZOrder: " << ZOrder;
 
@@ -112,7 +112,7 @@ namespace Ogre {
 
 		LogManager::getSingleton().stream(LML_TRIVIAL)
 			<< "Viewport for camera '" << (mCamera != 0 ? mCamera->getName() : "NULL") << "'"
-			<< ", actual dimensions "	<< std::fixed << std::setprecision(2) 
+			<< ", actual dimensions "	<< std::ios::fixed << std::setprecision(2) 
 			<< "L: " << mActLeft << " T: " << mActTop << " W: " << mActWidth << " H: " << mActHeight;
 
 
