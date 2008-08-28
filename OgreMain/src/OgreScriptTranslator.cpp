@@ -2106,15 +2106,15 @@ namespace Ogre{
 
 		String name = node->name;
 
+		std::vector<Any> args;
+		args.push_back(Any(&name));
+		compiler->_fireEvent("processGpuProgramName", args, 0);
+
 		if (GpuProgramManager::getSingleton().getByName(name).isNull())
 		{
 			compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
 			return;
 		}
-
-		std::vector<Any> args;
-		args.push_back(Any(&name));
-		compiler->_fireEvent("processGpuProgramName", args, 0);
 
 		Pass *pass = any_cast<Pass*>(node->parent->context);
 		pass->setFragmentProgram(name);
@@ -4367,7 +4367,8 @@ namespace Ogre{
 								if(mSystem->getRenderer())
 								{
 									if(!mSystem->getRenderer()->setParameter("material", name))
-										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+											"material property could not be set with material \"" + name + "\"");
 								}
 							}
 						}
