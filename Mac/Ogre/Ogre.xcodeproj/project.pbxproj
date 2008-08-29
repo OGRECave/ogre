@@ -566,32 +566,32 @@
 		AA06EFE60CEE58080013023A /* OgreScriptCompiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA06EFE30CEE58080013023A /* OgreScriptCompiler.cpp */; };
 		AA06EFE70CEE58080013023A /* OgreScriptLexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA06EFE40CEE58080013023A /* OgreScriptLexer.cpp */; };
 		AA06EFE80CEE58080013023A /* OgreScriptParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA06EFE50CEE58080013023A /* OgreScriptParser.cpp */; };
-		AA06EFEB0CEE58310013023A /* OgreScriptLexer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA06EFE90CEE58310013023A /* OgreScriptLexer.h */; };
-		AA06EFEC0CEE58310013023A /* OgreScriptLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = AA06EFEA0CEE58310013023A /* OgreScriptLoader.h */; };
+		AA06EFEB0CEE58310013023A /* OgreScriptLexer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA06EFE90CEE58310013023A /* OgreScriptLexer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA06EFEC0CEE58310013023A /* OgreScriptLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = AA06EFEA0CEE58310013023A /* OgreScriptLoader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA123E6F0C53FAB9000009B6 /* OgreGLSLPreprocessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA123E390C53F7F9000009B6 /* OgreGLSLPreprocessor.cpp */; };
-		AA261E870CA17D99000A3707 /* OgreRenderSystemCapabilitiesManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AA261E850CA17D99000A3707 /* OgreRenderSystemCapabilitiesManager.h */; };
-		AA261E880CA17D9A000A3707 /* OgreRenderSystemCapabilitiesSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA261E860CA17D99000A3707 /* OgreRenderSystemCapabilitiesSerializer.h */; };
+		AA261E870CA17D99000A3707 /* OgreRenderSystemCapabilitiesManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AA261E850CA17D99000A3707 /* OgreRenderSystemCapabilitiesManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA261E880CA17D9A000A3707 /* OgreRenderSystemCapabilitiesSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA261E860CA17D99000A3707 /* OgreRenderSystemCapabilitiesSerializer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA261E8C0CA17DC2000A3707 /* OgreRenderSystemCapabilitiesManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA261E8A0CA17DC2000A3707 /* OgreRenderSystemCapabilitiesManager.cpp */; };
 		AA261E8D0CA17DC2000A3707 /* OgreRenderSystemCapabilitiesSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA261E8B0CA17DC2000A3707 /* OgreRenderSystemCapabilitiesSerializer.cpp */; };
-		AA42976D0DB2B1940099A7F0 /* OgreAtomicWrappers.h in Headers */ = {isa = PBXBuildFile; fileRef = AA42976C0DB2B1940099A7F0 /* OgreAtomicWrappers.h */; };
 		AA508FB50C972C1B00D6EAD0 /* OgreTangentSpaceCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA508FB40C972C1B00D6EAD0 /* OgreTangentSpaceCalc.cpp */; };
-		AA508FB70C972C9000D6EAD0 /* OgreTangentSpaceCalc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA508FB60C972C8F00D6EAD0 /* OgreTangentSpaceCalc.h */; };
-		AA7510670DDE20FE009D23BA /* OgreMemoryAllocatedObject.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510630DDE20FE009D23BA /* OgreMemoryAllocatedObject.h */; };
-		AA7510680DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510640DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h */; };
-		AA7510690DDE20FE009D23BA /* OgreMemoryStdAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */; };
-		AA75106A0DDE20FE009D23BA /* OgreMemorySTLAllocator.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510660DDE20FE009D23BA /* OgreMemorySTLAllocator.h */; };
-		AA89775B0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA89775A0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h */; };
+		AA508FB70C972C9000D6EAD0 /* OgreTangentSpaceCalc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA508FB60C972C8F00D6EAD0 /* OgreTangentSpaceCalc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA7510670DDE20FE009D23BA /* OgreMemoryAllocatedObject.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510630DDE20FE009D23BA /* OgreMemoryAllocatedObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA7510680DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510640DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA7510690DDE20FE009D23BA /* OgreMemoryStdAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA75106A0DDE20FE009D23BA /* OgreMemorySTLAllocator.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510660DDE20FE009D23BA /* OgreMemorySTLAllocator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA89775B0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA89775A0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA89775E0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA89775D0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp */; };
 		AA8977610E5F4C0100A70BC4 /* OgreGLRenderToVertexBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA8977600E5F4C0100A70BC4 /* OgreGLRenderToVertexBuffer.cpp */; };
-		AAA8B9700CC6A4FC001AD86E /* OgreScriptCompiler.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96E0CC6A4FC001AD86E /* OgreScriptCompiler.h */; };
-		AAA8B9710CC6A4FC001AD86E /* OgreScriptParser.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */; };
-		AAD22CA50D7D708600928C53 /* OgreScriptTranslator.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD22CA40D7D708600928C53 /* OgreScriptTranslator.h */; };
+		AAA8B9700CC6A4FC001AD86E /* OgreScriptCompiler.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96E0CC6A4FC001AD86E /* OgreScriptCompiler.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AAA8B9710CC6A4FC001AD86E /* OgreScriptParser.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AAD22CA50D7D708600928C53 /* OgreScriptTranslator.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD22CA40D7D708600928C53 /* OgreScriptTranslator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AAD22CA70D7D70B400928C53 /* OgreScriptTranslator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD22CA60D7D70B400928C53 /* OgreScriptTranslator.cpp */; };
 		AAE047FD0E5E0BCE001D1ADC /* OgreShadowCameraSetupPSSM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAE047FC0E5E0BCE001D1ADC /* OgreShadowCameraSetupPSSM.cpp */; };
-		AAE048000E5E0C15001D1ADC /* OgreShadowCameraSetupPSSM.h in Headers */ = {isa = PBXBuildFile; fileRef = AAE047FF0E5E0C15001D1ADC /* OgreShadowCameraSetupPSSM.h */; };
+		AAE048000E5E0C15001D1ADC /* OgreShadowCameraSetupPSSM.h in Headers */ = {isa = PBXBuildFile; fileRef = AAE047FF0E5E0C15001D1ADC /* OgreShadowCameraSetupPSSM.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AAE36CDF0E50EB8100ED4B76 /* OgreMemoryAllocatedObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAE36CDE0E50EB8100ED4B76 /* OgreMemoryAllocatedObject.cpp */; };
+		AAE7DD060E68917000E1371A /* OgreAtomicWrappers.h in Headers */ = {isa = PBXBuildFile; fileRef = AA42976C0DB2B1940099A7F0 /* OgreAtomicWrappers.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AAF4F54A0DE4C73D0073D0FD /* OgreMemoryTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAF4F5480DE4C73D0073D0FD /* OgreMemoryTracker.cpp */; };
-		AAF4F5CB0DE4D6AD0073D0FD /* OgreMemoryTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = AAF4F5320DE4C48C0073D0FD /* OgreMemoryTracker.h */; };
+		AAF4F5CB0DE4D6AD0073D0FD /* OgreMemoryTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = AAF4F5320DE4C48C0073D0FD /* OgreMemoryTracker.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2569,7 +2569,6 @@
 				AA06EFEB0CEE58310013023A /* OgreScriptLexer.h in Headers */,
 				AA06EFEC0CEE58310013023A /* OgreScriptLoader.h in Headers */,
 				AAD22CA50D7D708600928C53 /* OgreScriptTranslator.h in Headers */,
-				AA42976D0DB2B1940099A7F0 /* OgreAtomicWrappers.h in Headers */,
 				AA7510670DDE20FE009D23BA /* OgreMemoryAllocatedObject.h in Headers */,
 				AA7510680DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h in Headers */,
 				AA7510690DDE20FE009D23BA /* OgreMemoryStdAlloc.h in Headers */,
@@ -2577,6 +2576,7 @@
 				AAF4F5CB0DE4D6AD0073D0FD /* OgreMemoryTracker.h in Headers */,
 				AAE048000E5E0C15001D1ADC /* OgreShadowCameraSetupPSSM.h in Headers */,
 				AA89775B0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h in Headers */,
+				AAE7DD060E68917000E1371A /* OgreAtomicWrappers.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
