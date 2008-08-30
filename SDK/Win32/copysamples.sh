@@ -5,7 +5,7 @@ E_NOARGS=65
 E_BADARG=66
 
 # determine the project file extensions to use for each SDK 
-SDKTYPES="[VC7, VC8, CBMINGW, CBMINGW_STLP]"
+SDKTYPES="[VC7, VC8, VC9, CBMINGW, CBMINGW_STLP]"
 case "$1" in
 # if no parameter was passed then exit with usage message
 "") echo "Usage: `basename $0` $SDKTYPES"; exit $E_NOARGS ;;
@@ -17,6 +17,8 @@ case "$1" in
 "VC7") PROJEXT=".vcproj" ; RMEXT="_vc8.vcproj" ;;
 
 "VC8") PROJEXT="_vc8.vcproj" ; RMEXT= ;;
+
+"VC9") PROJEXT="_vc9.vcproj" ; RMEXT= ;;
 
 # parameter is not valid so exit with usage message
 *) echo "SDK: $1 not understood."
@@ -43,6 +45,12 @@ then
 	/bin/find ../../samples -iname *_vc8.vcproj.user -exec cp \{\} samples/scripts \;
 	cp ../../ReferenceApplication/BspCollision/scripts/*_vc8.vcproj.user samples/scripts
 	/bin/find samples/scripts/ -iname *_vc8.vcproj.user -exec sed -i -f altersamples.sed \{\} \;
+fi
+if [[ "$1" == "VC9" ]] 
+then
+	/bin/find ../../samples -iname *_vc9.vcproj.user -exec cp \{\} samples/scripts \;
+	cp ../../ReferenceApplication/BspCollision/scripts/*_vc9.vcproj.user samples/scripts
+	/bin/find samples/scripts/ -iname *_vc9.vcproj.user -exec sed -i -f altersamples.sed \{\} \;
 fi
 cp ../../ReferenceApplication/BspCollision/scripts/*$PROJEXT samples/scripts
 cp ../../ReferenceApplication/ReferenceAppLayer/scripts/*$PROJEXT samples/refapp/scripts
