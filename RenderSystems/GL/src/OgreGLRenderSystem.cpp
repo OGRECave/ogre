@@ -607,6 +607,18 @@ namespace Ogre {
 		// set texture the number of texture units
 		mFixedFunctionTextureUnits = caps->getNumTextureUnits();
 
+		//In GL there can be less fixed function texture units than general
+		//texture units. Get the minimum of the two.
+		if (caps->hasCapability(RSC_FRAGMENT_PROGRAM))
+		{
+			int maxTexCoords = 0;
+			glGetIntegerv(GL_MAX_TEXTURE_COORDS_ARB, &maxTexCoords);
+			if (mFixedFunctionTextureUnits > maxTexCoords)
+			{
+				mFixedFunctionTextureUnits = maxTexCoords;
+			}
+		}
+		
 		if(caps->hasCapability(RSC_GL1_5_NOVBO))
 		{
 			// Assign ARB functions same to GL 1.5 version since

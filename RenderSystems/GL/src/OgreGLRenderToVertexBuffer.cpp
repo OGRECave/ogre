@@ -144,9 +144,7 @@ namespace Ogre {
 		//Set pass before binding buffers to activate the GPU programs
 		sceneMgr->_setPass(r2vbPass);
 		
-		//TODO : We get a GL error after setPass (related to glTexEnvi), but 
-		//everything works fine. Understand why and solve.
-		checkGLError(false, false);
+		checkGLError(true, false);
 
 		bindVerticesOutput(r2vbPass);
 
