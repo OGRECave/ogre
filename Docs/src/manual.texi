@@ -432,9 +432,9 @@ Techniques have only a small number of attributes of their own:
 @item
 @ref{lod_index} (and also see @ref{lod_distances} in the parent material)
 @item
-@ref{shadow_caster_material_name}
+@ref{shadow_caster_material}
 @item
-@ref{shadow_receiver_material_name}
+@ref{shadow_receiver_material}
 @item 
 @ref{gpu_vendor_rule}
 @item 
@@ -481,12 +481,12 @@ The above example would cause the material to use the best Technique at lod_inde
 
 Techniques also contain one or more passes (and there must be at least one), @xref{Passes}.
 
-@anchor{shadow_caster_material_name}
-@subheading shadow_caster_material_name
+@anchor{shadow_caster_material}
+@subheading shadow_caster_material
 When using @xref{Texture-based Shadows} you can specify an alternate material to use when rendering the object using this material into the shadow texture. This is like a more advanced version of using shadow_caster_vertex_program, however note that for the moment you are expected to render the shadow in one pass, ie only the first pass is respected.
 
-@anchor{shadow_receiver_material_name}
-@subheading shadow_receiver_material_name
+@anchor{shadow_receiver_material}
+@subheading shadow_receiver_material
 When using @xref{Texture-based Shadows} you can specify an alternate material to use when performing the receiver shadow pass. Note that this explicit 'receiver' pass is only done when you're @strong{not} using @ref{Integrated Texture Shadows} - ie the shadow rendering is done separately (either as a modulative pass, or a masked light pass). This is like a more advanced version of using shadow_receiver_vertex_program and shadow_receiver_fragment_program, however note that for the moment you are expected to render the shadow in one pass, ie only the first pass is respected.
 
 @anchor{gpu_vendor_rule}
