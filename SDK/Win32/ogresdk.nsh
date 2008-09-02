@@ -101,6 +101,8 @@ Section -Headers
   File "..\..\Plugins\OctreeSceneManager\include\*.h"
   File "..\..\Plugins\BspSceneManager\include\*.h"
   File "..\..\Plugins\ParticleFX\include\*.h"
+  File "..\..\Plugins\PCZSceneManager\include\*.h"
+  File "..\..\Plugins\OctreeZone\include\*.h"
 
 SectionEnd
 
@@ -139,6 +141,10 @@ Section -Libs
     File "..\..\lib\Plugin_BspSceneManager_d.lib"
     File "..\..\lib\Plugin_ParticleFX.lib"
     File "..\..\lib\Plugin_ParticleFX_d.lib"
+	File "..\..\lib\Plugin_PCZSceneManager.lib"
+	File "..\..\lib\Plugin_PCZSceneManager_d.lib"
+	File "..\..\lib\Plugin_OctreeZone.lib"
+	File "..\..\lib\Plugin_OctreeZone_d.lib"
   !endif
 
 SectionEnd
@@ -165,6 +171,8 @@ Section -Binaries
   File "..\..\Samples\Common\bin\Debug\Plugin_CgProgramManager_d.dll"
   File "..\..\Samples\Common\bin\Debug\Plugin_OctreeSceneManager_d.dll"
   File "..\..\Samples\Common\bin\Debug\Plugin_ParticleFX_d.dll"
+  File "..\..\Samples\Common\bin\Debug\Plugin_PCZSceneManager_d.dll"
+  File "..\..\Samples\Common\bin\Debug\Plugin_OctreeZone_d.dll"
   File "..\..\Samples\Common\bin\Debug\RenderSystem_Direct3D9_d.dll"
   File "..\..\Samples\Common\bin\Debug\RenderSystem_GL_d.dll"
   File "..\..\Samples\Common\bin\Debug\OgreGUIRenderer_d.dll"
@@ -193,6 +201,8 @@ Section -Binaries
   File "..\..\Samples\Common\bin\Release\Plugin_CgProgramManager.dll"
   File "..\..\Samples\Common\bin\Release\Plugin_OctreeSceneManager.dll"
   File "..\..\Samples\Common\bin\Release\Plugin_ParticleFX.dll"
+  File "..\..\Samples\Common\bin\Release\Plugin_PCZSceneManager.dll"
+  File "..\..\Samples\Common\bin\Release\Plugin_OctreeZone.dll"
   File "..\..\Samples\Common\bin\Release\RenderSystem_Direct3D9.dll"
   File "..\..\Samples\Common\bin\Release\RenderSystem_GL.dll"
   File "..\..\Samples\Common\bin\Release\OgreGUIRenderer.dll"
