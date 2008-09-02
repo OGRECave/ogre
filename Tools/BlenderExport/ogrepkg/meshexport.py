@@ -131,13 +131,14 @@ class Vertex:
 		## texcoord
 		# origin in OGRE is top-left
 		activeUVLayer = bMesh.activeUVLayer
-		for uvlayer in bMesh.getUVLayerNames():
-			bMesh.activeUVLayer = uvlayer
-			if bMesh.faceUV:
-				self.texcoords.append((bMFace.uv[bIndex][0], 1 - bMFace.uv[bIndex][1]))
-			elif bMesh.vertexUV:
-				self.texcoords.append((self.bMVert.uvco[0], 1 - self.bMVert.uvco[1]))
-		bMesh.activeUVLayer = activeUVLayer
+		if activeUVLayer:
+			for uvlayer in bMesh.getUVLayerNames():
+				bMesh.activeUVLayer = uvlayer
+				if bMesh.faceUV:
+					self.texcoords.append((bMFace.uv[bIndex][0], 1 - bMFace.uv[bIndex][1]))
+				elif bMesh.vertexUV:
+					self.texcoords.append((self.bMVert.uvco[0], 1 - self.bMVert.uvco[1]))
+			bMesh.activeUVLayer = activeUVLayer
 		return
 	def __eq__(self, other):
 		"""Tests if this vertex is equal to another vertex in the Ogre sense.
