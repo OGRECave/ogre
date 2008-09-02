@@ -41,6 +41,7 @@ namespace Ogre {
 	{
 	public:
 		ScriptParser();
+		virtual ~ScriptParser() {}
 
 		ConcreteNodeListPtr parse(const ScriptTokenListPtr &tokens);
 		ConcreteNodeListPtr parseChunk(const ScriptTokenListPtr &tokens);
