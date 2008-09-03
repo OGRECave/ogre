@@ -43,65 +43,6 @@ namespace Ogre
 
 	*/
 
-	/// operator new, with debug line info
-	template <class Alloc>
-	void* AllocatedObject<Alloc >::operator new(size_t sz, const char* file, int line, const char* func)
-	{
-		return Alloc::allocateBytes(sz, file, line, func);
-	}
-
-	template <class Alloc>
-	void* AllocatedObject<Alloc >::operator new(size_t sz)
-	{
-		return Alloc::allocateBytes(sz);
-	}
-
-	/// placement operator new
-	template <class Alloc>
-	void* AllocatedObject<Alloc >::operator new(size_t sz, void* ptr)
-	{
-		return ptr;
-	}
-
-	/// array operator new, with debug line info
-	template <class Alloc>
-	void* AllocatedObject<Alloc >::operator new[] ( size_t sz, const char* file, int line, const char* func )
-	{
-		return Alloc::allocateBytes(sz, file, line, func);
-	}
-
-	template <class Alloc>
-	void* AllocatedObject<Alloc >::operator new[] ( size_t sz )
-	{
-		return Alloc::allocateBytes(sz);
-	}
-
-	template <class Alloc>
-	void AllocatedObject<Alloc >::operator delete( void* ptr )
-	{
-		Alloc::deallocateBytes(ptr);
-	}
-
-	// only called if there is an exception in corresponding 'new'
-	template <class Alloc>
-	void AllocatedObject<Alloc >::operator delete( void* ptr, const char* , int , const char*  )
-	{
-		Alloc::deallocateBytes(ptr);
-	}
-
-	template <class Alloc>
-	void AllocatedObject<Alloc >::operator delete[] ( void* ptr )
-	{
-		Alloc::deallocateBytes(ptr);
-	}
-
-	template <class Alloc>
-	void AllocatedObject<Alloc >::operator delete[] ( void* ptr, const char* , int , const char*  )
-	{
-		Alloc::deallocateBytes(ptr);
-	}
-
-
 	template class AllocatedObject<GeneralAllocPolicy>;
 	template class AllocatedObject<GeometryAllocPolicy>;
 	template class AllocatedObject<AnimationAllocPolicy>;

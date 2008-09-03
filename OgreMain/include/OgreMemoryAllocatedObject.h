@@ -59,21 +59,54 @@ namespace Ogre
 		{ }
 
 		/// operator new, with debug line info
-		void* operator new(size_t sz, const char* file, int line, const char* func);
-		void* operator new(size_t sz);
+		void* operator new(size_t sz, const char* file, int line, const char* func)
+		{
+			return Alloc::allocateBytes(sz, file, line, func);
+		}
+
+		void* operator new(size_t sz)
+		{
+			return Alloc::allocateBytes(sz);
+		}
+
 		/// placement operator new
-		void* operator new(size_t sz, void* ptr);
+		void* operator new(size_t sz, void* ptr)
+		{
+			return ptr;
+		}
+
 		/// array operator new, with debug line info
-		void* operator new[] ( size_t sz, const char* file, int line, const char* func );
-		void* operator new[] ( size_t sz );
-		void operator delete( void* ptr );
+		void* operator new[] ( size_t sz, const char* file, int line, const char* func )
+		{
+			return Alloc::allocateBytes(sz, file, line, func);
+		}
+
+		void* operator new[] ( size_t sz )
+		{
+			return Alloc::allocateBytes(sz);
+		}
+
+		void operator delete( void* ptr )
+		{
+			Alloc::deallocateBytes(ptr);
+		}
 
 		// only called if there is an exception in corresponding 'new'
-		void operator delete( void* ptr, const char* , int , const char*  );
+		void operator delete( void* ptr, const char* , int , const char*  )
+		{
+			Alloc::deallocateBytes(ptr);
+		}
 
-		void operator delete[] ( void* ptr );
+		void operator delete[] ( void* ptr )
+		{
+			Alloc::deallocateBytes(ptr);
+		}
 
-		void operator delete[] ( void* ptr, const char* , int , const char*  );
+
+		void operator delete[] ( void* ptr, const char* , int , const char*  )
+		{
+			Alloc::deallocateBytes(ptr);
+		}
 	};
 
 
