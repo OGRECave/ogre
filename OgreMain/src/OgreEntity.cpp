@@ -87,7 +87,7 @@ namespace Ogre {
     {
     }
     //-----------------------------------------------------------------------
-    Entity::Entity( const String& name, MeshPtr& mesh) :
+    Entity::Entity( const String& name, const MeshPtr& mesh) :
 		MovableObject(name),
         mMesh(mesh),
         mAnimationState(NULL),
