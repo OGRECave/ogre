@@ -221,10 +221,10 @@ GLXConfigurator::~GLXConfigurator() {
 bool GLXConfigurator::CreateWindow() {
 
 
-	char *bla[] = {"Rendering Settings", "-bg", "honeydew3", "-fg", "black","-bd","darkseagreen4"};
+	const char *bla[] = {"Rendering Settings", "-bg", "honeydew3", "-fg", "black","-bd","darkseagreen4"};
 	int argc = sizeof(bla)/sizeof(*bla);
 
-	toplevel = XtVaOpenApplication(&appContext, "OGRE", NULL, 0, &argc, bla, NULL,sessionShellWidgetClass,
+	toplevel = XtVaOpenApplication(&appContext, "OGRE", NULL, 0, &argc, const_cast<char**>(bla), NULL,sessionShellWidgetClass,
 		XtNwidth, mWidth,
 		XtNheight, mHeight,
 		XtNminWidth, mWidth,
