@@ -191,6 +191,8 @@ namespace Ogre
         AutoConstantDefinition(ACT_INVERSE_TEXTURE_SIZE,        "inverse_texture_size",           4, ET_REAL, ACDT_INT),
         AutoConstantDefinition(ACT_PACKED_TEXTURE_SIZE,         "packed_texture_size",            4, ET_REAL, ACDT_INT),
 		AutoConstantDefinition(ACT_TEXTURE_MATRIX,  "texture_matrix", 16, ET_REAL, ACDT_INT),
+		AutoConstantDefinition(ACT_LOD_CAMERA_POSITION,               "lod_camera_position",              3, ET_REAL, ACDT_NONE),
+		AutoConstantDefinition(ACT_LOD_CAMERA_POSITION_OBJECT_SPACE,  "lod_camera_position_object_space", 3, ET_REAL, ACDT_NONE),
     };
 
     bool GpuNamedConstants::msGenerateAllConstantDefinitionArrayEntries = false;
@@ -1523,6 +1525,12 @@ namespace Ogre
             case ACT_TEXTURE_MATRIX:
                 _writeRawConstant(i->physicalIndex, source->getTextureTransformMatrix(i->data));
                 break;
+			case ACT_LOD_CAMERA_POSITION:
+				_writeRawConstant(i->physicalIndex, source->getLodCameraPosition(), i->elementCount);
+				break;
+			case ACT_LOD_CAMERA_POSITION_OBJECT_SPACE:
+				_writeRawConstant(i->physicalIndex, source->getLodCameraPositionObjectSpace(), i->elementCount);
+				break;
             default:
                 break;
             }

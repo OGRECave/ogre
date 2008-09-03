@@ -692,7 +692,20 @@ namespace Ogre {
 			/** Provides the current transform matrix of the texture unit (index determined by setAutoConstant
 				call), as seen by the fixed-function pipeline. 
 			*/
-			ACT_TEXTURE_MATRIX
+			ACT_TEXTURE_MATRIX, 
+
+			/** Provides the position of the LOD camera in world space, allowing you 
+				to perform separate LOD calculations in shaders independent of the rendering
+				camera. If there is no separate LOD camera then this is the real camera
+				position. See Camera::setLodCamera.
+			*/
+			ACT_LOD_CAMERA_POSITION, 
+			/** Provides the position of the LOD camera in object space, allowing you 
+			to perform separate LOD calculations in shaders independent of the rendering
+			camera. If there is no separate LOD camera then this is the real camera
+			position. See Camera::setLodCamera.
+			*/
+			ACT_LOD_CAMERA_POSITION_OBJECT_SPACE, 
         };
 
         /** Defines the type of the extra data item used by the auto constant.

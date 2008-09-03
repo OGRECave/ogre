@@ -2276,6 +2276,10 @@ The parameters of the fog currently set in the scene. Packed as (exp_density, li
 The current cameras position in world space.
 @item camera_position_object_space
 The current cameras position in object space (ie when the object is at (0,0,0)).
+@item lod_camera_position
+The current LOD camera position in world space. A LOD camera is a separate camera associated with the rendering camera which allows LOD calculations to be calculated separately. The classic example is basing the LOD of the shadow texture render on the position of the main camera, not the shadow camera. 
+@item lod_camera_position_object_space
+The current LOD camera position in object space (ie when the object is at (0,0,0)).
 @item time
 The current time, factored by the optional parameter (or 1.0f if not supplied).
 @item time_0_x

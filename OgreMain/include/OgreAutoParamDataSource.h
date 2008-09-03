@@ -67,6 +67,7 @@ namespace Ogre {
         mutable Matrix4 mInverseViewMatrix;
         mutable Matrix4 mInverseTransposeWorldMatrix;
         mutable Matrix4 mInverseTransposeWorldViewMatrix;
+		mutable Vector4 mCameraPosition;
         mutable Vector4 mCameraPositionObjectSpace;
         mutable Matrix4 mTextureViewProjMatrix[OGRE_MAX_SIMULTANEOUS_LIGHTS];
 		mutable Matrix4 mTextureWorldViewProjMatrix[OGRE_MAX_SIMULTANEOUS_LIGHTS];
@@ -76,7 +77,8 @@ namespace Ogre {
         mutable Matrix4 mViewMatrix;
         mutable Matrix4 mProjectionMatrix;
 		mutable Real mDirLightExtrusionDistance;
-        mutable Vector4 mCameraPosition;
+		mutable Vector4 mLodCameraPosition;
+		mutable Vector4 mLodCameraPositionObjectSpace;
 
         mutable bool mWorldMatrixDirty;
         mutable bool mViewMatrixDirty;
@@ -89,8 +91,8 @@ namespace Ogre {
         mutable bool mInverseViewMatrixDirty;
         mutable bool mInverseTransposeWorldMatrixDirty;
         mutable bool mInverseTransposeWorldViewMatrixDirty;
+		mutable bool mCameraPositionDirty;
         mutable bool mCameraPositionObjectSpaceDirty;
-        mutable bool mCameraPositionDirty;
         mutable bool mTextureViewProjMatrixDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
 		mutable bool mTextureWorldViewProjMatrixDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
 		mutable bool mSpotlightViewProjMatrixDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
@@ -102,6 +104,8 @@ namespace Ogre {
         mutable int mPassNumber;
 		mutable Vector4 mSceneDepthRange;
 		mutable bool mSceneDepthRangeDirty;
+		mutable bool mLodCameraPositionDirty;
+		mutable bool mLodCameraPositionObjectSpaceDirty;
 
         const Renderable* mCurrentRenderable;
         const Camera* mCurrentCamera;
@@ -159,6 +163,8 @@ namespace Ogre {
         virtual const Matrix4& getInverseTransposeWorldViewMatrix(void) const;
         virtual const Vector4& getCameraPosition(void) const;
         virtual const Vector4& getCameraPositionObjectSpace(void) const;
+		virtual const Vector4& getLodCameraPosition(void) const;
+		virtual const Vector4& getLodCameraPositionObjectSpace(void) const;
         /** Get the light which is 'index'th closest to the current object */        
 		virtual float getLightNumber(size_t index) const;
 		virtual float getLightCount() const;
