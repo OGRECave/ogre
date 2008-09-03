@@ -1407,17 +1407,17 @@ namespace Ogre {
             // Make sure it's loaded
             m->load();
             Technique* t = m->getBestTechnique(0, sub);
-            if (!t)
-            {
-                // No supported techniques
-                continue;
-            }
+			if (!t)
+			{
+				// No supported techniques
+				continue;
+			}
+			if (t->getNumPasses() == 0)
+			{
+				// No passes, invalid
+				continue;
+			}
             Pass* p = t->getPass(0);
-            if (!p)
-            {
-                // No passes, invalid
-                continue;
-            }
             if (p->hasVertexProgram())
             {
                 // If one material uses a vertex program, set this flag
