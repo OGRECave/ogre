@@ -88,7 +88,7 @@ namespace Ogre {
 class GLXConfigurator {
 	/* GUI constants */
 	static const int wWidth = 400;		// Width of window
-	static const int wHeight = 300;		// Height of window
+	static const int wHeight = 320;		// Height of window
 	static const int col1x = 20;		// Starting x of column 1 (labels)
 	static const int col2x = 180;		// Starting x of column 2 (options)
 	static const int col1w = 150;		// Width of column 1 (labels)
@@ -233,7 +233,7 @@ bool GLXConfigurator::CreateWindow() {
 		XtNmaxHeight, mHeight,
 		XtNallowShellResize, False,
 		XtNborderWidth, 0,
-		XtNoverrideRedirect, True,
+		XtNoverrideRedirect, False,
 		NULL, NULL);
 
 	/* Find out display and screen used */
@@ -333,7 +333,7 @@ Pixmap GLXConfigurator::CreateBackdrop(Window rootWindow, int depth) {
 	/* Find out number of bytes per pixel */
 	switch(depth) {
 	default:
-		LogManager::getSingleton().logMessage("GLX backdrop: Undsupported bit depth");
+		LogManager::getSingleton().logMessage("GLX backdrop: Unsupported bit depth");
 		/* Unsupported bit depth */
 		return 0;
 	case 15:
