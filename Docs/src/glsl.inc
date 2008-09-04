@@ -162,5 +162,23 @@ preprocessor_defines CLEVERTECHNIQUE,NUMTHINGS=2
 @end example
 This way you can use the same source code but still include small variations, each one defined as a different Ogre program name but based on the same source code.
 
+@subheading GLSL Geometry shader specification
+GLSL allows the same shader to run on different types of geometry primitives. In order to properly link the shaders together, you have to specify which primitives it will receive as input, which primitives it will emit and how many vertices a single run of the shader can generate. The GLSL geometry_program definition requires three additional parameters :
+@table @asis
+@item input_operation_type
+The operation type of the geometry that the shader will receive. Can be 'point_list', 'line_list', 'line_strip', 'triangle_list', 'triangle_strip' or 'triangle_fan'.
+@item output_operation_type
+The operation type of the geometry that the shader will emit. Can be 'point_list', 'line_strip' or 'triangle_strip'.
+@item max_output_vertices
+The maximum number of vertices that the shader can emit. There is an upper limit for this value, it is exposed in the render system capabilities.
 
-
+For example:
+@example
+geometry_program Ogre/GPTest/Swizzle_GP_GLSL glsl
+{
+	source SwizzleGP.glsl
+	input_operation_type triangle_list
+	output_operation_type line_strip
+	max_output_vertices 6
+}
+@end example
