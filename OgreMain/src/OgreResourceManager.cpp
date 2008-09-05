@@ -76,7 +76,7 @@ namespace Ogre {
 		// Lock for the whole get / insert
 		OGRE_LOCK_AUTO_MUTEX
 
-		ResourcePtr res = getByName(name);
+		ResourcePtr res = getByName(name, group);
 		bool created = false;
 		if (res.isNull())
 		{
@@ -107,22 +107,48 @@ namespace Ogre {
         return r;
     }
     //-----------------------------------------------------------------------
-    void ResourceManager::addImpl( ResourcePtr& res )
-    {
+	void ResourceManager::addImpl( ResourcePtr& res )
+	{
 		OGRE_LOCK_AUTO_MUTEX
 
-        std::pair<ResourceMap::iterator, bool> result = 
-            mResources.insert( ResourceMap::value_type( res->getName(), res ) );
-        if (!result.second)
-        {
+			std::pair<ResourceMap::iterator, bool> result;
+		if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
+		{
+			result = mResources.insert( ResourceMap::value_type( res->getName(), res ) );
+		}
+		else
+		{
+			ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(res->getGroup());
+
+			// we will create the group if it doesn't exists in our list
+			if( itGroup == mResourcesWithGroup.end())
+			{
+				ResourceMap dummy;
+				mResourcesWithGroup.insert( ResourceWithGroupMap::value_type( res->getGroup(), dummy ) );
+				itGroup = mResourcesWithGroup.find(res->getGroup());
+			}
+			result = itGroup->second.insert( ResourceMap::value_type( res->getName(), res ) );
+
+		}
+
+		if (!result.second)
+		{
 			// Attempt to resolve the collision
 			if(ResourceGroupManager::getSingleton().getLoadingListener())
 			{
 				if(ResourceGroupManager::getSingleton().getLoadingListener()->resourceCollision(res.get(), this))
 				{
 					// Try to do the addition again, no seconds attempts to resolve collisions are allowed
-					std::pair<ResourceMap::iterator, bool> result = 
-						mResources.insert( ResourceMap::value_type( res->getName(), res ) );
+					std::pair<ResourceMap::iterator, bool> result;
+					if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
+					{
+						result = mResources.insert( ResourceMap::value_type( res->getName(), res ) );
+					}
+					else
+					{
+						ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(res->getGroup());
+						result = itGroup->second.insert( ResourceMap::value_type( res->getName(), res ) );
+					}
 					if (!result.second)
 					{
 						OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the name " + res->getName() + 
@@ -139,7 +165,7 @@ namespace Ogre {
 					}
 				}
 			}
-        }
+		}
 		else
 		{
 			// Insert the handle
@@ -152,16 +178,36 @@ namespace Ogre {
 					" already exists.", "ResourceManager::add");
 			}
 		}
-    }
+	}
 	//-----------------------------------------------------------------------
 	void ResourceManager::removeImpl( ResourcePtr& res )
 	{
 		OGRE_LOCK_AUTO_MUTEX
 
-		ResourceMap::iterator nameIt = mResources.find(res->getName());
-		if (nameIt != mResources.end())
+		if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
 		{
-			mResources.erase(nameIt);
+			ResourceMap::iterator nameIt = mResources.find(res->getName());
+			if (nameIt != mResources.end())
+			{
+				mResources.erase(nameIt);
+			}
+		}
+		else
+		{
+			ResourceWithGroupMap::iterator groupIt = mResourcesWithGroup.find(res->getGroup());
+			if (groupIt != mResourcesWithGroup.end())
+			{
+				ResourceMap::iterator nameIt = groupIt->second.find(res->getName());
+				if (nameIt != groupIt->second.end())
+				{
+					groupIt->second.erase(nameIt);
+				}
+
+				if (groupIt->second.empty())
+				{
+					mResourcesWithGroup.erase(groupIt);
+				}
+			}
 		}
 
 		ResourceHandleMap::iterator handleIt = mResourcesByHandle.find(res->getHandle());
@@ -313,25 +359,69 @@ namespace Ogre {
 		OGRE_LOCK_AUTO_MUTEX
 
 		mResources.clear();
+		mResourcesWithGroup.clear();
 		mResourcesByHandle.clear();
 		// Notify resource group manager
 		ResourceGroupManager::getSingleton()._notifyAllResourcesRemoved(this);
 	}
     //-----------------------------------------------------------------------
-    ResourcePtr ResourceManager::getByName(const String& name)
+    ResourcePtr ResourceManager::getByName(const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
 		OGRE_LOCK_AUTO_MUTEX
+		
+		ResourcePtr res;
 
-        ResourceMap::iterator it = mResources.find(name);
-
-        if( it == mResources.end())
+		// if not in the global pool - get it from the grouped pool 
+		if(!ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(groupName))
 		{
-            return ResourcePtr();
+			ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(groupName);
+
+			if( itGroup != mResourcesWithGroup.end())
+			{
+				ResourceMap::iterator it = itGroup->second.find(name);
+
+				if( it != itGroup->second.end())
+				{
+					res = it->second;
+				}
+			}
 		}
-        else
-        {
-            return it->second;
-        }
+
+		// if didn't find it the grouped pool - get it from the global pool 
+		if (res.isNull())
+		{
+
+			ResourceMap::iterator it = mResources.find(name);
+
+			if( it != mResources.end())
+			{
+				res = it->second;
+			}
+			else
+			{
+				// this is the case when we need to search also in the grouped hash
+				if (groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
+				{
+					ResourceWithGroupMap::iterator iter = mResourcesWithGroup.begin();
+					ResourceWithGroupMap::iterator iterE = mResourcesWithGroup.end();
+					for ( ; iter != iterE ; iter++ )
+					{
+						ResourceMap::iterator it = iter->second.find(name);
+
+						if( it != iter->second.end())
+						{
+							res = it->second;
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+
+		return res;
+
+
     }
     //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::getByHandle(ResourceHandle handle)
@@ -382,6 +472,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 
 }
+
 
 
 

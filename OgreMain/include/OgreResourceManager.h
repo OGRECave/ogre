@@ -278,7 +278,7 @@ namespace Ogre {
 
         /** Retrieves a pointer to a resource by name, or null if the resource does not exist.
         */
-        virtual ResourcePtr getByName(const String& name);
+        virtual ResourcePtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
         /** Retrieves a pointer to a resource by handle, or null if the resource does not exist.
         */
         virtual ResourcePtr getByHandle(ResourceHandle handle);
@@ -432,10 +432,12 @@ namespace Ogre {
 
     public:
 		typedef HashMap< String, ResourcePtr > ResourceMap;
+		typedef HashMap< String, ResourceMap > ResourceWithGroupMap;
 		typedef std::map<ResourceHandle, ResourcePtr> ResourceHandleMap;
     protected:
         ResourceHandleMap mResourcesByHandle;
         ResourceMap mResources;
+		ResourceWithGroupMap mResourcesWithGroup;
         ResourceHandle mNextHandle;
         size_t mMemoryBudget; // In bytes
         size_t mMemoryUsage; // In bytes

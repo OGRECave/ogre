@@ -39,6 +39,7 @@ Torus Knot Software Ltd.
 #include "OgreHardwareBufferManager.h"
 #include "OgreMesh.h"
 #include "OgreRenderable.h"
+#include "OgreResourceGroupManager.h"
 
 namespace Ogre {
 	/** Defines an instance of a discrete, movable object based on a Mesh.
@@ -338,7 +339,7 @@ namespace Ogre {
 		is only one. Otherwise call getSubEntity() and call the same
 		method on the individual SubEntity.
 		*/
-		void setMaterialName(const String& name);
+		void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
 		/** Overridden - see MovableObject.
 		*/

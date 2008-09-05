@@ -46,7 +46,7 @@ namespace Ogre {
         : Renderable(), mParentEntity(parent), mMaterialName("BaseWhite"),
 		mSubMesh(subMeshBasis), mCachedCamera(0)
     {
-        mpMaterial = MaterialManager::getSingleton().getByName(mMaterialName);
+        mpMaterial = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
         mMaterialLodIndex = 0;
         mVisible = true;
         mSkelAnimVertexData = 0;
@@ -78,12 +78,12 @@ namespace Ogre {
         return mMaterialName;
     }
     //-----------------------------------------------------------------------
-    void SubEntity::setMaterialName( const String& name)
+    void SubEntity::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
 
         //String oldName = mMaterialName;
         mMaterialName = name;
-        mpMaterial = MaterialManager::getSingleton().getByName(mMaterialName);
+        mpMaterial = MaterialManager::getSingleton().getByName(mMaterialName, groupName);
 
         if (mpMaterial.isNull())
         {

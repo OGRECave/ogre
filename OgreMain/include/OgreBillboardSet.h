@@ -36,6 +36,7 @@ Torus Knot Software Ltd.
 #include "OgreRenderable.h"
 #include "OgreRadixSort.h"
 #include "OgreCommon.h"
+#include "OgreResourceGroupManager.h"
 
 namespace Ogre {
 
@@ -518,7 +519,7 @@ namespace Ogre {
             @param
                 name The new name of the material to use for this set.
         */
-        virtual void setMaterialName(const String& name);
+        virtual void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
         /** Sets the name of the material to be used for this billboard set.
             @returns The name of the material that is used for this set.

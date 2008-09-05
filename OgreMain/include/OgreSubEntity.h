@@ -34,6 +34,7 @@ Torus Knot Software Ltd.
 #include "OgreString.h"
 #include "OgreRenderable.h"
 #include "OgreHardwareBufferManager.h"
+#include "OgreResourceGroupManager.h"
 
 namespace Ogre {
 
@@ -120,7 +121,7 @@ namespace Ogre {
                 uses. This call can alter that so that the Material is different
                 for this instance.
         */
-        void setMaterialName( const String& name );
+        void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
         /** Tells this SubEntity whether to be visible or not. */
         virtual void setVisible(bool visible);

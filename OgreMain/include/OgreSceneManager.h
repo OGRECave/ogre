@@ -1181,7 +1181,7 @@ namespace Ogre {
                 meshName The name of the Mesh it is to be based on (e.g. 'knot.oof'). The
                 mesh will be loaded if it is not already.
         */
-        virtual Entity* createEntity(const String& entityName, const String& meshName);
+        virtual Entity* createEntity(const String& entityName, const String& meshName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
         /** Prefab shapes available without loading a model.
             @note

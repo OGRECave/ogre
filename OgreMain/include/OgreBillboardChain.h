@@ -37,6 +37,7 @@ Torus Knot Software Ltd.
 
 #include "OgreMovableObject.h"
 #include "OgreRenderable.h"
+#include "OgreResourceGroupManager.h"
 
 namespace Ogre {
 
@@ -228,7 +229,7 @@ namespace Ogre {
 		/// Get the material name in use
 		virtual const String& getMaterialName(void) const { return mMaterialName; }
 		/// Set the material name to use for rendering
-		virtual void setMaterialName(const String& name);
+		virtual void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
 
 		// Overridden members follow
@@ -344,4 +345,5 @@ namespace Ogre {
 } // namespace
 
 #endif
+
 

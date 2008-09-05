@@ -318,6 +318,8 @@ namespace Ogre {
             String worldGeometry;
             /// Scene manager to use with linked world geometry
             SceneManager* worldGeometrySceneManager;
+			// in global pool flag - if true the resource will be loaded even a different	group was requested in the load method as a parameter.
+			bool inGlobalPool;
 		};
         /// Map from resource group names to groups
         typedef std::map<String, ResourceGroup*> ResourceGroupMap;
@@ -412,8 +414,10 @@ namespace Ogre {
 			You must remember to call initialiseResourceGroup if you intend to use
 			the first 2 types.
         @param name The name to give the resource group.
+		@param inGlobalPool if true the resource will be loaded even a different
+			group was requested in the load method as a parameter.
         */
-        void createResourceGroup(const String& name);
+        void createResourceGroup(const String& name, const bool inGlobalPool = true);
 
 
         /** Initialises a resource group.
@@ -832,6 +836,15 @@ namespace Ogre {
             Basically undoes a previous call to linkWorldGeometryToResourceGroup.
         */
         void unlinkWorldGeometryFromResourceGroup(const String& group);
+
+			/** Checks the status of a resource group.
+		@remarks
+			Looks at the state of a resource group.
+			If loadResourceGroup has been called for the resource
+			group return true, otherwise return false.
+		@param name The name to of the resource group to access.
+		*/
+		bool isResourceGroupInGlobalPool(const String& name);
 
         /** Shutdown all ResourceManagers, performed as part of clean-up. */
         void shutdownAll(void);

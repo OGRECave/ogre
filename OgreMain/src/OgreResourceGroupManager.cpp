@@ -81,7 +81,7 @@ namespace Ogre {
         mResourceGroupMap.clear();
     }
     //-----------------------------------------------------------------------
-    void ResourceGroupManager::createResourceGroup(const String& name)
+    void ResourceGroupManager::createResourceGroup(const String& name, const bool inGlobalPool /* = true */)
     {
 		OGRE_LOCK_AUTO_MUTEX
 
@@ -95,6 +95,7 @@ namespace Ogre {
         ResourceGroup* grp = OGRE_NEW_T(ResourceGroup, MEMCATEGORY_RESOURCE)();
 		grp->groupStatus = ResourceGroup::UNINITIALSED;
         grp->name = name;
+		grp->inGlobalPool = inGlobalPool;
         grp->worldGeometrySceneManager = 0;
         mResourceGroupMap.insert(
             ResourceGroupMap::value_type(name, grp));
@@ -1667,6 +1668,20 @@ namespace Ogre {
 		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME) // lock group mutex
         grp->worldGeometry = StringUtil::BLANK;
         grp->worldGeometrySceneManager = 0;
+    }
+	//-----------------------------------------------------------------------
+	bool ResourceGroupManager::isResourceGroupInGlobalPool(const String& name)
+    {
+		OGRE_LOCK_AUTO_MUTEX
+
+		ResourceGroup* grp = getResourceGroup(name);
+		if (!grp)
+		{
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+				"Cannot find a group named " + name, 
+				"ResourceGroupManager::isResourceGroupInitialised");
+		}
+		return grp->inGlobalPool;
     }
     //-----------------------------------------------------------------------
 	StringVector ResourceGroupManager::getResourceGroups(void)

@@ -340,7 +340,14 @@ namespace Ogre {
 			unsigned int n = 0;
 			for (i = mSubEntityList.begin(); i != mSubEntityList.end(); ++i, ++n)
 			{
-				newEnt->getSubEntity(n)->setMaterialName((*i)->getMaterialName());
+				if ((*i)->getMaterial().isNull())
+				{
+					newEnt->getSubEntity(n)->setMaterialName((*i)->getMaterialName());
+				}
+				else
+				{
+					newEnt->getSubEntity(n)->setMaterialName((*i)->getMaterial()->getGroup());
+				}
 			}
 			if (mAnimationState)
 			{
@@ -352,7 +359,7 @@ namespace Ogre {
         return newEnt;
     }
     //-----------------------------------------------------------------------
-    void Entity::setMaterialName(const String& name)
+    void Entity::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
         // Set for all subentities
         SubEntityList::iterator i;
@@ -1124,7 +1131,7 @@ namespace Ogre {
             subMesh = mesh->getSubMesh(i);
             subEnt = OGRE_NEW SubEntity(this, subMesh);
             if (subMesh->isMatInitialised())
-                subEnt->setMaterialName(subMesh->getMaterialName());
+                subEnt->setMaterialName(subMesh->getMaterialName(), mesh->getGroup());
             sublist->push_back(subEnt);
         }
     }
@@ -2048,14 +2055,24 @@ namespace Ogre {
 		MeshPtr pMesh;
 		if (params != 0)
 		{
-			NameValuePairList::const_iterator ni = params->find("mesh");
+			String groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
+
+			NameValuePairList::const_iterator ni;
+
+			ni = params->find("resourceGroup");
+			if (ni != params->end())
+			{
+				groupName = ni->second;
+			}
+
+			ni = params->find("mesh");
 			if (ni != params->end())
 			{
 				// Get mesh (load if required)
 				pMesh = MeshManager::getSingleton().load(
 					ni->second,
 					// autodetect group location
-					ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+					groupName );
 			}
 
 		}

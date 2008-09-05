@@ -483,11 +483,13 @@ Entity* SceneManager::createEntity(const String& entityName, PrefabType ptype)
 //-----------------------------------------------------------------------
 Entity* SceneManager::createEntity(
                                    const String& entityName,
-                                   const String& meshName )
+                                   const String& meshName,
+								   const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
 {
 	// delegate to factory implementation
 	NameValuePairList params;
 	params["mesh"] = meshName;
+	params["resourceGroup"] = groupName;
 	return static_cast<Entity*>(
 		createMovableObject(entityName, EntityFactory::FACTORY_TYPE_NAME, 
 			&params));
@@ -1439,7 +1441,7 @@ void SceneManager::_setSkyPlane(
         String meshName = mName + "SkyPlane";
         mSkyPlane = plane;
 
-        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName);
+        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName);
         if (m.isNull())
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
@@ -1489,7 +1491,7 @@ void SceneManager::_setSkyPlane(
         }
         // Create, use the same name for mesh and entity
         mSkyPlaneEntity = createEntity(meshName, meshName);
-        mSkyPlaneEntity->setMaterialName(materialName);
+        mSkyPlaneEntity->setMaterialName(materialName, groupName);
         mSkyPlaneEntity->setCastShadows(false);
 
         // Create node and attach
@@ -1538,7 +1540,7 @@ void SceneManager::_setSkyBox(
 {
     if (enable)
     {
-        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName);
+        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName);
         if (m.isNull())
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
@@ -1670,7 +1672,7 @@ void SceneManager::_setSkyBox(
 				// Used to use combined material but now we're using queue we can't split to change frame
 				// This doesn't use much memory because textures aren't duplicated
 				String matName = mName + "SkyBoxPlane" + StringConverter::toString(i);
-				MaterialPtr boxMat = matMgr.getByName(matName);
+				MaterialPtr boxMat = matMgr.getByName(matName, groupName);
 				if (boxMat.isNull())
 				{
 					// Create new by clone
@@ -1701,7 +1703,7 @@ void SceneManager::_setSkyBox(
 				}
 
 				// section per material
-				mSkyBoxObj->begin(matName);
+				mSkyBoxObj->begin(matName, RenderOperation::OT_TRIANGLE_LIST, groupName);
 				// top left
 				mSkyBoxObj->position(middle + up - right);
 				mSkyBoxObj->textureCoord(0,0);
@@ -1760,7 +1762,7 @@ void SceneManager::_setSkyDome(
 {
     if (enable)
     {
-        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName);
+        MaterialPtr m = MaterialManager::getSingleton().getByName(materialName, groupName);
         if (m.isNull())
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
@@ -1801,7 +1803,7 @@ void SceneManager::_setSkyDome(
                 destroyEntity(entName);
             }
             mSkyDomeEntity[i] = createEntity(entName, planeMesh->getName());
-            mSkyDomeEntity[i]->setMaterialName(m->getName());
+            mSkyDomeEntity[i]->setMaterialName(m->getName(), groupName);
             mSkyDomeEntity[i]->setCastShadows(false);
 
             // Attach to node
@@ -1887,7 +1889,7 @@ MeshPtr SceneManager::createSkyboxPlane(
 
     // Check to see if existing plane
     MeshManager& mm = MeshManager::getSingleton();
-    MeshPtr planeMesh = mm.getByName(meshName);
+    MeshPtr planeMesh = mm.getByName(meshName, groupName);
     if(!planeMesh.isNull())
     {
         // destroy existing
@@ -1959,7 +1961,7 @@ MeshPtr SceneManager::createSkydomePlane(
 
     // Check to see if existing plane
     MeshManager& mm = MeshManager::getSingleton();
-    MeshPtr planeMesh = mm.getByName(meshName);
+    MeshPtr planeMesh = mm.getByName(meshName, groupName);
     if(!planeMesh.isNull())
     {
         // destroy existing
