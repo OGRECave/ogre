@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): The IndexData class</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Vertex Buffer Bindings</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): The IndexData class">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): The IndexData class">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Vertex Buffer Bindings">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Vertex Buffer Bindings">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,57 +24,59 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC268"></A>
+<A NAME="SEC272"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_57.html#SEC267"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_57.html#SEC267"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_59.html#SEC270"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_57.html#SEC270"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC268"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_59.html#SEC275"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H3> 5.7.1 The IndexData class </H3>
-<!--docid::SEC268::-->
-This class summarises the information required to use a set of indexes to render geometry. It's members are as follows:
-<DL COMPACT>
-<DT>indexStart
-<DD>The first index used by this piece of geometry; this can be useful for sharing a single index buffer among several geometry pieces.
-<DT>indexCount
-<DD>The number of indexes used by this particular renderable.
-<DT>indexBuffer
-<DD>The index buffer which is used to source the indexes. 
-</DL>
-
-<A NAME="SEC269"></A>
-<H3> Creating an Index Buffer </H3>
-<!--docid::SEC269::-->
-Index buffers are created using See section <A HREF="manual_47.html#SEC253">5.1 The Hardware Buffer Manager</A> just like vertex buffers, here's how:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().
-	createIndexBuffer(
-		HardwareIndexBuffer::IT_16BIT, // type of index
-		numIndexes, // number of indexes
+<H3> 5.6.3 Vertex Buffer Bindings </H3>
+<!--docid::SEC272::-->
+Vertex buffer bindings are about associating a vertex buffer with a source index used in <A HREF="manual_57.html#SEC270">5.6.2 Vertex Declarations</A>. 
+<A NAME="SEC273"></A>
+<H3> Creating the Vertex Buffer </H3>
+<!--docid::SEC273::-->
+Firstly, lets look at how you create a vertex buffer:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>HardwareVertexBufferSharedPtr vbuf = 
+	HardwareBufferManager::getSingleton().createVertexBuffer(
+		3*sizeof(Real), // size of one whole vertex
+		numVertices, // number of vertices
 		HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
-		false); // no shadow buffer	
-</pre></td></tr></table>Once again, notice that the return type is a class rather than a pointer; this is reference counted so that the buffer is automatically destroyed when no more references are made to it. The parameters to the index buffer creation are:
+		false); // no shadow buffer
+</pre></td></tr></table>
+Notice that we use <A HREF="manual_50.html#SEC262">5.1 The Hardware Buffer Manager</A> to create our vertex buffer, and that a class called HardwareVertexBufferSharedPtr is returned from the method, rather than a raw pointer. This is because vertex buffers are reference counted - you are able to use a single vertex buffer as a source for multiple pieces of geometry therefore a standard pointer would not be good enough, because you would not know when all the different users of it had finished with it. The HardwareVertexBufferSharedPtr class manages its own destruction by keeping a reference count of the number of times it is being used - when the last HardwareVertexBufferSharedPtr is destroyed, the buffer itself automatically destroys itself.<BR><BR>
+
+The parameters to the creation of a vertex buffer are as follows:
 <DL COMPACT>
-<DT>indexType
-<DD>There are 2 types of index; 16-bit and 32-bit. They both perform the same way, except that the latter can address larger vertex buffers. If your buffer includes more than 65526 vertices, then you will need to use 32-bit indexes. Note that you should only use 32-bit indexes when you need to, since they incur more overhead than 16-bit vertices, and are not supported on some older hardware.
-<DT>numIndexes
-<DD>The number of indexes in the buffer. As with vertex buffers, you should consider whether you can use a shared index buffer which is used by multiple pieces of geometry, since there can be performance advantages to switching index buffers less often. 
+<DT>vertexSize
+<DD>The size in bytes of a whole vertex in this buffer. A vertex may include multiple elements, and in fact the contents of the vertex data may be reinterpreted by different vertex declarations if you wish. Therefore you must tell the buffer manager how large a whole vertex is, but not the internal format of the vertex, since that is down to the declaration to interpret. In the above example, the size is set to the size of 3 floating point values - this would be enough to hold a standard 3D position or normal, or a 3D texture coordinate, per vertex. 
+<DT>numVertices
+<DD>The number of vertices in this buffer. Remember, not all the vertices have to be used at once - it can be beneficial to create large buffers which are shared between many chunks of geometry because changing vertex buffer bindings is a render state switch, and those are best minimised.
 <DT>usage
-<DD>This tells the system how you intend to use the buffer. See section <A HREF="manual_48.html#SEC254">5.2 Buffer Usage</A>
+<DD>This tells the system how you intend to use the buffer. See section <A HREF="manual_51.html#SEC263">5.2 Buffer Usage</A>
 <DT>useShadowBuffer
-<DD>Tells the system whether you want this buffer backed by a system-memory copy. See section <A HREF="manual_49.html#SEC255">5.3 Shadow Buffers</A>
+<DD>Tells the system whether you want this buffer backed by a system-memory copy. See section <A HREF="manual_52.html#SEC264">5.3 Shadow Buffers</A>
 </DL>
 
-<A NAME="Updating Index Buffers"></A>
+<A NAME="SEC274"></A>
+<H3> Binding the Vertex Buffer </H3>
+<!--docid::SEC274::-->
+The second part of the process is to bind this buffer which you have created to a source index. To do this, you call:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>vertexBufferBinding-&gt;setBinding(0, vbuf);
+</pre></td></tr></table>This results in the vertex buffer you created earlier being bound to source index 0, so any vertex element which is pulling its data from source index 0 will retrieve data from this buffer. <BR><BR>
+There are also methods for retrieving buffers from the binding data - see the API reference for full details.
+
+<A NAME="Updating Vertex Buffers"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_57.html#SEC267"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_57.html#SEC267"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_59.html#SEC270"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_57.html#SEC270"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC268"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_59.html#SEC275"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -83,7 +85,7 @@ Index buffers are created using See section <A HREF="manual_47.html#SEC253">5.1 
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

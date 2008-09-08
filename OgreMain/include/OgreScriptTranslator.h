@@ -49,6 +49,8 @@ namespace Ogre{
 		 */
 		virtual void translate(ScriptCompiler *compiler, const AbstractNodePtr &node) = 0;
 	protected:
+		// needs virtual destructor
+		virtual ~ScriptTranslator() {}
 		/// Retrieves a new translator from the factories and uses it to process the give node
 		void processNode(ScriptCompiler *compiler, const AbstractNodePtr &node);
 
@@ -90,6 +92,9 @@ namespace Ogre{
 	class ScriptTranslatorManager : public ScriptTranslatorAlloc
 	{
 	public:
+		// required - virtual destructor
+		virtual ~ScriptTranslatorManager() {}
+
 		/// Returns the number of translators being managed
 		virtual size_t getNumTranslators() const = 0;
 		/// Returns a manager for the given object abstract node, or null if it is not supported

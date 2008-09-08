@@ -74,8 +74,8 @@ namespace Ogre {
 #if OGRE_USE_NEW_COMPILERS == 0
 		mScriptPatterns.push_back("*.program");
 		mScriptPatterns.push_back("*.material");
-#endif
 		ResourceGroupManager::getSingleton()._registerScriptLoader(this);
+#endif
 
 		// Resource type
 		mResourceType = "Material";

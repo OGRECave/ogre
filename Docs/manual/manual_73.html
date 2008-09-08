@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Skeletal Animation</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Modulative Shadows</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Skeletal Animation">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Skeletal Animation">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Modulative Shadows">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Modulative Shadows">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,53 +24,37 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC323"></A>
+<A NAME="SEC326"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_72.html#SEC322"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_72.html#SEC322"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_74.html#SEC324"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_72.html#SEC312"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC301"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_74.html#SEC328"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H2> 8.1 Skeletal Animation </H2>
-<!--docid::SEC323::-->
+<H2> 7.3 Modulative Shadows </H2>
+<!--docid::SEC326::-->
+Modulative shadows work by darkening an already rendered scene with a fixed colour. First, the scene is rendered normally containing all the objects which will be shadowed, then a modulative pass is done per light, which darkens areas in shadow. Finally, objects which do not receive shadows are rendered.<BR><BR>
 
-Skeletal animation is a process of animating a mesh by moving a set of hierarchical bones within the mesh, which in turn moves the vertices of the model according to the bone assignments stored in each vertex. An alternative term for this approach is 'skinning'. The usual way of creating these animations is with a modelling tool such as Softimage XSI, Milkshape 3D, Blender, 3D Studio or Maya among others. OGRE provides exporters to allow you to get the data out of these modellers and into the engine See section <A HREF="manual_43.html#SEC248">4.1 Exporters</A>.<BR><BR>
+There are 2 modulative shadow techniques; stencil-based (See section <A HREF="manual_71.html#SEC304">7.1 Stencil Shadows</A> : SHADOWTYPE_STENCIL_MODULATIVE) and texture-based (See section <A HREF="manual_72.html#SEC312">7.2 Texture-based Shadows</A> : SHADOWTYPE_TEXTURE_MODULATIVE). Modulative shadows are an inaccurate lighting model, since they darken the areas of shadow uniformly, irrespective of the amount of light which would have fallen on the shadow area anyway. However, they can give fairly attractive results for a much lower overhead than more 'correct' methods like <A HREF="manual_74.html#SEC328">7.4 Additive Light Masking</A>, and they also combine well with pre-baked static lighting (such as precalculated lightmaps), which additive lighting does not. The main thing to consider is that using multiple light sources can result in overly dark shadows (where shadows overlap, which intuitively looks right in fact, but it's not physically correct) and artefacts when using stencil shadows (See section <A HREF="manual_71.html#SEC309">The Silhouette Edge</A>). <BR><BR>
 
-There are many grades of skeletal animation, and not all engines (or modellers for that matter) support all of them. OGRE supports the following features:
-<UL>
-<LI>Each mesh can be linked to a single skeleton
-<LI>Unlimited bones per skeleton
-<LI>Hierarchical forward-kinematics on bones
-<LI>Multiple named animations per skeleton (e.g. 'Walk', 'Run', 'Jump', 'Shoot' etc)
-<LI>Unlimited keyframes per animation
-<LI>Linear or spline-based interpolation between keyframes
-<LI>A vertex can be assigned to multiple bones and assigned weightings for smoother skinning
-<LI>Multiple animations can be applied to a mesh at the same time, again with a blend weighting
-</UL>
-<BR>
-Skeletons and the animations which go with them are held in .skeleton files, which are produced by the OGRE exporters. These files are loaded automatically when you create an Entity based on a Mesh which is linked to the skeleton in question. You then use <A HREF="manual_74.html#SEC324">8.2 Animation State</A> to set the use of animation on the entity in question.
+<A NAME="Shadow Colour"></A>
+<A NAME="SEC327"></A>
+<H3> Shadow Colour </H3>
+<!--docid::SEC327::-->
+The colour which is used to darken the areas in shadow is set by SceneManager::setShadowColour; it defaults to a dark grey (so that the underlying colour still shows through a bit).<BR><BR>
 
-Skeletal animation can be performed in software, or implemented in shaders (hardware skinning). Clearly the latter is preferable, since it takes some of the work away from the CPU and gives it to the graphics card, and also means that the vertex data does not need to be re-uploaded every frame. This is especially important for large, detailed models. You should try to use hardware skinning wherever possible; this basically means assigning a material which has a vertex program powered technique. See <A HREF="manual_18.html#SEC98">Skeletal Animation in Vertex Programs</A> for more details. Skeletal animation can be combined with vertex animation, See section <A HREF="manual_78.html#SEC331">8.3.3 Combining Skeletal and Vertex Animation</A>.
+Note that if you're using texture shadows you have the additional option of using <A HREF="manual_72.html#SEC325">Integrated Texture Shadows</A> rather than being forced to have a separate pass of the scene to render shadows. In this case the 'modulative' aspect of the shadow technique just affects the colour of the shadow texture. <BR><BR>
 
-<A NAME="Animation State"></A>
+<A NAME="Additive Light Masking"></A>
 <HR SIZE=1>
-<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_72.html#SEC322"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_72.html#SEC322"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_74.html#SEC324"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
-</TR></TABLE>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

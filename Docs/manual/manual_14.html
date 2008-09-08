@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Material Scripts</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Material Scripts</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Material Scripts">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Material Scripts">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Material Scripts">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Material Scripts">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -92,20 +92,20 @@ material walls/funkywall1
 		
 }
 </pre></td></tr></table>
-Every material in the script must be given a name, which is the line 'material &lt;blah&gt;' before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your materials, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string.<BR><BR>
+Every material in the script must be given a name, which is the line 'material &lt;blah&gt;' before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your materials, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string. If you include spaces in the name, it must be enclosed in double quotes.<BR><BR>
 
 <STRONG> NOTE: ':' is the delimiter for specifying material copy in the script so it can't be used as part of the material name.</STRONG>
 <BR><BR>
 
-A material can copy from a previously defined material by using a <EM>colon</EM> <STRONG>:</STRONG> after the material name followed by the name of the reference material to copy. If the reference material can not be found then it is ignored.  (See section <A HREF="manual_25.html#SEC125">3.1.11 Copying Materials</A>)<BR><BR>
+A material can inherit from a previously defined material by using a <EM>colon</EM> <STRONG>:</STRONG> after the material name followed by the name of the reference material to inherit from. You can in fact even inherit just <EM>parts</EM> of a material from others; all this is covered in See section <A HREF="manual_25.html#SEC132">3.1.11 Script Inheritence</A>). You can also use variables in your script which can be replaced in inheriting versions, see See section <A HREF="manual_27.html#SEC137">3.1.13 Script Variables</A>.<BR><BR>
 
 A material can be made up of many techniques (See section <A HREF="manual_15.html#SEC31">3.1.1 Techniques</A>)- a technique is one way of achieving the effect you are looking for. You can supply more than one technique in order to provide fallback approaches where a card does not have the ability to render the preferred technique, or where you wish to define lower level of detail versions of the material in order to conserve rendering power when objects are more distant. <BR><BR>
 
-Each technique can be made up of many passes (See section <A HREF="manual_16.html#SEC35">3.1.2 Passes</A>), that is a complete render of the object can be performed multiple times with different settings in order to produce composite effects. Ogre may also split the passes you have defined into many passes at runtime, if you define a pass which uses too many texture units for the card you are currently running on (note that it can only do this if you are not using a fragment program). Each pass has a number of top-level attributes such as 'ambient' to set the amount &amp; colour of the ambient light reflected by the material. Some of these options do not apply if you are using vertex programs, See section <A HREF="manual_16.html#SEC35">3.1.2 Passes</A> for more details. <BR><BR>
+Each technique can be made up of many passes (See section <A HREF="manual_16.html#SEC38">3.1.2 Passes</A>), that is a complete render of the object can be performed multiple times with different settings in order to produce composite effects. Ogre may also split the passes you have defined into many passes at runtime, if you define a pass which uses too many texture units for the card you are currently running on (note that it can only do this if you are not using a fragment program). Each pass has a number of top-level attributes such as 'ambient' to set the amount &amp; colour of the ambient light reflected by the material. Some of these options do not apply if you are using vertex programs, See section <A HREF="manual_16.html#SEC38">3.1.2 Passes</A> for more details. <BR><BR>
 
-Within each pass, there can be zero or many texture units in use (See section <A HREF="manual_17.html#SEC68">3.1.3 Texture Units</A>). These define the texture to be used, and optionally some blending operations (which use multitexturing) and texture effects.<BR><BR>
+Within each pass, there can be zero or many texture units in use (See section <A HREF="manual_17.html#SEC74">3.1.3 Texture Units</A>). These define the texture to be used, and optionally some blending operations (which use multitexturing) and texture effects.<BR><BR>
 
-You can also reference vertex and fragment programs (or vertex and pixel shaders, if you want to use that terminology) in a pass with a given set of parameters. Programs themselves are declared in separate .program scripts (See section <A HREF="manual_18.html#SEC95">3.1.4 Declaring Vertex and Fragment Programs</A>) and are used as described in <A HREF="manual_23.html#SEC112">3.1.9 Using Vertex and Fragment Programs in a Pass</A>.
+You can also reference vertex and fragment programs (or vertex and pixel shaders, if you want to use that terminology) in a pass with a given set of parameters. Programs themselves are declared in separate .program scripts (See section <A HREF="manual_18.html#SEC101">3.1.4 Declaring Vertex and Fragment Programs</A>) and are used as described in <A HREF="manual_23.html#SEC119">3.1.9 Using Vertex and Fragment Programs in a Pass</A>.
 
 <A NAME="SEC26"></A>
 <H3> Top-level material attributes </H3>
@@ -126,7 +126,7 @@ This attribute controls whether objects using this material can have shadows cas
 Format: receive_shadows &lt;on|off&gt;<BR>
 Default: on<BR><BR>
 
-Whether or not an object receives a shadow is the combination of a number of factors, See section <A HREF="manual_67.html#SEC292">7. Shadows</A> for full details; however this allows you to make a material opt-out of receiving shadows if required. Note that transparent materials never receive shadows so this option only has an effect on solid materials.
+Whether or not an object receives a shadow is the combination of a number of factors, See section <A HREF="manual_70.html#SEC301">7. Shadows</A> for full details; however this allows you to make a material opt-out of receiving shadows if required. Note that transparent materials never receive shadows so this option only has an effect on solid materials.
 
 <A NAME="transparency_casts_shadows"></A>
 <A NAME="SEC29"></A>
@@ -136,7 +136,7 @@ This attribute controls whether transparent materials can cast certain kinds of 
 
 Format: transparency_casts_shadows &lt;on|off&gt;<BR>
 Default: off<BR><BR>
-Whether or not an object casts a shadow is the combination of a number of factors, See section <A HREF="manual_67.html#SEC292">7. Shadows</A> for full details; however this allows you to make a transparent material cast shadows, when it would otherwise not. For example, when using texture shadows, transparent materials are normally not rendered into the shadow texture because they should not block light. This flag overrides that.
+Whether or not an object casts a shadow is the combination of a number of factors, See section <A HREF="manual_70.html#SEC301">7. Shadows</A> for full details; however this allows you to make a transparent material cast shadows, when it would otherwise not. For example, when using texture shadows, transparent materials are normally not rendered into the shadow texture because they should not block light. This flag overrides that.
 
 <A NAME="set_texture_alias"></A>
 <A NAME="SEC30"></A>
@@ -146,7 +146,7 @@ This attribute associates a texture alias with a texture name.<BR><BR>
 
 Format: set_texture_alias &lt;alias name&gt; &lt;texture name&gt;<BR><BR>
 
-This attribute is used to set the textures used in texture unit states that were copied from another material.(See section <A HREF="manual_25.html#SEC125">3.1.11 Copying Materials</A>)<BR><BR>
+This attribute can be used to set the textures used in texture unit states that were inherited from another material.(See section <A HREF="manual_26.html#SEC136">3.1.12 Texture Aliases</A>)<BR><BR>
 
 <A NAME="Techniques"></A>
 <HR SIZE=1>
@@ -162,7 +162,7 @@ This attribute is used to set the textures used in texture unit states that were
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

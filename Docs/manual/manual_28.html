@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Compositor Target Passes</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Script Import Directive</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Compositor Target Passes">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Compositor Target Passes">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Script Import Directive">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Script Import Directive">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,109 +24,42 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC136"></A>
-<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_27.html#SEC134"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_26.html#SEC130"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC143"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
-</TR></TABLE>
-<HR SIZE=1>
-<H3> 3.2.2 Target Passes </H3>
-<!--docid::SEC136::-->
-
-A target pass is the action of rendering to a given target, either a render texture or the final output. You can update the same render texture multiple times by adding more than one target pass to your compositor script - this is very useful for 'ping pong' renders between a couple of render textures to perform complex convolutions that cannot be done in a single render, such as blurring.<BR><BR>
-
-There are two types of target pass, the sort that updates a render texture:<BR><BR>
-Format: target &lt;Name&gt; { }<BR><BR>
-... and the sort that defines the final output render:<BR><BR>
-Format: target_output { }<BR><BR>
-
-The contents of both are identical, the only real difference is that you can only have a single target_output entry, whilst you can have many target entries. Here are the attributes you can use in a 'target' or 'target_output' section of a .compositor script:
-
-<UL>
-<LI>
-<A HREF="manual_28.html#compositor_target_input">input</A>
-<LI>
-<A HREF="manual_28.html#SEC139">only_initial</A>
-<LI>
-<A HREF="manual_28.html#SEC140">visibility_mask</A>
-<LI>
-<A HREF="manual_28.html#compositor_lod_bias">lod_bias</A>
-<LI>
-<A HREF="manual_28.html#SEC142">material_scheme</A>
-<LI>
-<A HREF="manual_29.html#SEC143">pass</A>
-</UL>
-
-<A NAME="SEC137"></A>
-<H2> Attribute Descriptions   </H2>
-<!--docid::SEC137::-->
-<A NAME="compositor_target_input"></A>
 <A NAME="SEC138"></A>
-<H3> input </H3>
-<!--docid::SEC138::-->
-Sets input mode of the target, which tells the target pass what is pulled in before any of its own passes are rendered.<BR><BR>
-Format: input (none | previous)<BR><BR>
-Default: input none<BR><BR>
-<DL COMPACT>
-<DT>none
-<DD>The target will have nothing as input, all the contents of the target must be generated using its own passes. Note this does not mean the target will be empty, just no data will be pulled in. For it to truly be blank you'd need a 'clear' pass within this target.
-<DT>previous
-<DD>The target will pull in the previous contents of the viewport. This will be either the original scene if this is the first compositor in the chain, or it will be the output from the previous compositor in the chain if the viewport has multiple compositors enabled.
-</DL>
-
-<A NAME="only_initial"></A>
-<A NAME="SEC139"></A>
-<H3> only_initial </H3>
-<!--docid::SEC139::-->
-If set to on, this target pass will only execute once initially after the effect has been enabled. This could be useful to perform once-off renders, after which the static contents are used by the rest of the compositor.<BR><BR>
-Format: only_initial (on | off)<BR><BR>
-Default: only_initial off<BR><BR>
-
-
-<A NAME="visibility_mask"></A>
-<A NAME="SEC140"></A>
-<H3> visibility_mask </H3>
-<!--docid::SEC140::-->
-Sets the visibility mask for any render_scene passes performed in this target pass. This is a bitmask (although it must be specified as decimal, not hex) and maps to SceneManager::setVisibilityMask.
-Format: visibility_mask &lt;mask&gt;<BR><BR>
-Default: visibility_mask 4294967295<BR><BR>
-
-<A NAME="compositor_lod_bias"></A>
-<A NAME="SEC141"></A>
-<H3> lod_bias </H3>
-<!--docid::SEC141::-->
-Set the scene LOD bias for any render_scene passes performed in this target pass. The default is 1.0, everything below that means lower quality, higher means higher quality.<BR><BR>
-Format: lod_bias &lt;lodbias&gt;<BR><BR>
-Default: lod_bias 1.0<BR><BR>
-
-<A NAME="material_scheme"></A>
-<A NAME="SEC142"></A>
-<H3> material_scheme </H3>
-<!--docid::SEC142::-->
-Set the material scheme for any render_scene passes performed in this target pass. Material schemes allow you to select alternative rendering paths for all objects in the scene.<BR><BR>
-Format: material_scheme &lt;Name&gt;<BR><BR>
-Default: material_scheme Default<BR><BR>
-
-<A NAME="Compositor Passes"></A>
-<HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_27.html#SEC134"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_26.html#SEC130"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC143"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_27.html#SEC137"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC139"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
+<HR SIZE=1>
+<H3> 3.1.14 Script Import Directive </H3>
+<!--docid::SEC138::-->
+
+Imports are a feature introduced to remove ambiguity from script dependencies. When using scripts that inherit from each other but which are defined in separate files sometimes errors occur because the scripts are loaded in incorrect order. Using imports removes this issue. The script which is inheriting another can explicitly import its parent's definition which will ensure that no errors occur because the parent's definition was not found.<BR><BR>
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>import * from &quot;parent.material&quot;
+material Child : Parent
+{
+}
+</pre></td></tr></table>
+The material &quot;Parent&quot; is defined in parent.material and the import ensures that those definitions are found properly. You can also import specific targets from within a file.
+
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>import Parent from &quot;parent.material&quot;
+</pre></td></tr></table>
+If there were other definitions in the parent.material file, they would not be imported.<BR><BR>
+
+Note, however that importing does not actually cause objects in the imported script to be fully parsed &amp; created, it just makes the definitions available for inheritence. This has a specific ramification for vertex / fragment program definitions, which must be loaded before any parameters can be specified. You should continue to put common program definitions in .program files to ensure they are fully parsed before being referenced in multiple .material files. The 'import' command just makes sure you can resolve dependencies between equivalent script definitions (e.g. material to material).<BR><BR>
+
+
+<A NAME="Compositor Scripts"></A>
+<HR SIZE=1>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

@@ -74,6 +74,7 @@ namespace Ogre {
 	{
 	public:
 		ScriptLexer();
+		virtual ~ScriptLexer() {}
 
 		/** Tokenizes the given input and returns the list of tokens found */
 		ScriptTokenListPtr tokenize(const String &str, const String &source);

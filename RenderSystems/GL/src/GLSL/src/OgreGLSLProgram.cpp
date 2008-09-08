@@ -280,13 +280,13 @@ namespace Ogre {
 			dict->addParameter(
 				ParameterDef("output_operation_type",
 				"The input operation type for this geometry program. \
-				Can be 'point_list', 'line_list', 'line_strip', 'triangle_list', \
-				'triangle_strip' or 'triangle_fan'", PT_STRING),
-				&msOutputOperationTypeCmd);
+				Can be 'point_list', 'line_strip' or 'triangle_strip'",
+				 PT_STRING),
+				 &msOutputOperationTypeCmd);
 			dict->addParameter(
 				ParameterDef("max_output_vertices", 
-				"The maximum number of vertices a single run of this geometry program can output", PT_INT),
-				&msMaxOutputVerticesCmd);
+				"The maximum number of vertices a single run of this geometry program can output",
+				PT_INT),&msMaxOutputVerticesCmd);
         }
         // Manually assign language now since we use it immediately
         mSyntaxCode = "glsl";

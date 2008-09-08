@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Additive Light Masking</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Stencil Shadows</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Additive Light Masking">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Additive Light Masking">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Stencil Shadows">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Stencil Shadows">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,202 +24,109 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC319"></A>
+<A NAME="SEC304"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC317"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_67.html#SEC292"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_72.html#SEC322"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC301"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC301"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_72.html#SEC312"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H2> 7.4 Additive Light Masking </H2>
-<!--docid::SEC319::-->
-Additive light masking is about rendering the scene many times, each time representing a single light contribution whose influence is masked out in areas of shadow. Each pass is combined with (added to) the previous one such that when all the passes are complete, all the light contribution has correctly accumulated in the scene, and each light has been prevented from affecting areas which it should not be able to because of shadow casters. This is an effective technique which results in very realistic looking lighting, but it comes at a price: more rendering passes.<BR><BR>
+<H2> 7.1 Stencil Shadows </H2>
+<!--docid::SEC304::-->
 
-As many technical papers (and game marketing) will tell you, rendering realistic lighting like this requires multiple passes. Being a friendly sort of engine, Ogre frees you from most of the hard work though, and will let you use the exact same material definitions whether you use this lighting technique or not (for the most part, see <A HREF="manual_71.html#SEC320">Pass Classification and Vertex Programs</A>). In order to do this technique, Ogre automatically categorises the <A HREF="manual_16.html#SEC35">3.1.2 Passes</A> you define in your materials into 3 types:
-<OL>
-<LI>ambient
-Passes categorised as 'ambient' include any base pass which is not lit by any particular light, i.e. it occurs even if there is no ambient light in the scene. The ambient pass always happens first, and sets up the initial depth value of the fragments, and the ambient colour if applicable. It also includes any emissive / self illumination contribution. Only textures which affect ambient light (e.g. ambient occlusion maps) should be rendered in this pass.
-<LI>diffuse/specular
-Passes categorised as 'diffuse/specular' (or 'per-light') are rendered once per light, and each pass contributes the diffuse ans specular colour from that single light as reflected by the diffuse / specular terms in the pass. Areas in shadow from that light are masked and are thus not updated. The resulting masked colour is added to the exisiting colour in the scene. Again, no textures are used in this pass (except for textures used for lighting calculations such as normal maps).
-<LI>decal
-Passes categorised as 'decal' add the final texture colour to the scene, which is modulated by the accumulated light built up from all the ambient and diffuse/specular passes. 
-</OL>
+Stencil shadows are a method by which a 'mask' is created for the screen using a feature called the stencil buffer. This mask can be used to exclude areas of the screen from subsequent renders, and thus it can be used to either include or exclude areas in shadow. They are enabled by calling SceneManager::setShadowTechnique with a parameter of either <CODE>SHADOWTYPE_STENCIL_ADDITIVE</CODE> or <CODE>SHADOWTYPE_STENCIL_MODULATIVE</CODE>. Because the stencil can only mask areas to be either 'enabled' or 'disabled', stencil shadows have 'hard' edges, that is to say clear dividing lines between light and shadow - it is not possible to soften these edges.<BR><BR>
 
-In practice, <A HREF="manual_16.html#SEC35">3.1.2 Passes</A> rarely fall nicely into just one of these categories. For each Technique, Ogre compiles a list of 'Illumination Passes', which are derived from the user defined passes, but can be split, to ensure that the divisions between illumination pass categories can be maintained. For example, if we take a very simple material definition:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>material TestIllumination
-{
-	technique
-	{
-		pass
-		{
-			ambient 0.5 0.2 0.2 
-			diffuse 1 0 0  
-			specular 1 0.8 0.8 15
-			texture_unit
-			{
-				texture grass.png
-			}
-		}
-	}
-}
-</pre></td></tr></table>
-Ogre will split this into 3 illumination passes, which will be the equivalent of this:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>material TestIlluminationSplitIllumination
-{
-	technique
-	{
-		// Ambient pass
-		pass
-		{
-			ambient 0.5 0.2 0.2 
-			diffuse 0 0 0
-			specular 0 0 0
-		}
+In order to generate the stencil, 'shadow volumes' are rendered by extruding the silhouette of the shadow caster away from the light. Where these shadow volumes intersect other objects (or the caster, since self-shadowing is supported using this technique), the stencil is updated, allowing subsequent operations to differentiate between light and shadow. How exactly this is used to render the shadows depends on whether <A HREF="manual_73.html#SEC326">7.3 Modulative Shadows</A> or <A HREF="manual_74.html#SEC328">7.4 Additive Light Masking</A> is being used. Objects can both cast and receive stencil shadows, so self-shadowing is inbuilt. <BR><BR>
 
-		// Diffuse / specular pass
-		pass
-		{
-			scene_blend add
-			iteration once_per_light
-			diffuse 1 0 0  
-			specular 1 0.8 0.8 15
-		}
+The advantage of stencil shadows is that they can do self-shadowing simply on low-end hardware, provided you keep your poly count under control. In contrast doing self-shadowing with texture shadows requires a fairly modern machine (See section <A HREF="manual_72.html#SEC312">7.2 Texture-based Shadows</A>). For this reason, you're likely to pick stencil shadows if you need an accurate shadowing solution for an application aimed at older or lower-spec machines.<BR><BR> 
 
-		// Decal pass
-		pass
-		{
-			scene_blend modulate
-			lighting off
-			texture_unit
-			{
-				texture grass.png
-			}
-		}
-	}
-}
-</pre></td></tr></table>So as you can see, even a simple material requires a minimum of 3 passes when using this shadow technique, and in fact it requires (num_lights + 2) passes in the general sense. You can use more passes in your original material and Ogre will cope with that too, but be aware that each pass may turn into multiple ones if it uses more than one type of light contribution (ambient vs diffuse/specular) and / or has texture units. The main nice thing is that you get the full multipass lighting behaviour even if you don't define your materials in terms of it, meaning that your material definitions can remain the same no matter what lighting approach you decide to use.<BR><BR>
+The disadvantages of stencil shadows are numerous though, especially on more modern hardware. Because stencil shadows are a geometric technique, they are inherently more costly the higher the number of polygons you use, meaning you are penalised the more detailed you make your meshes. The fillrate cost, which comes from having to render shadow volumes, also escalates the same way. Since more modern applications are likely to use higher polygon counts, stencil shadows can start to become a bottleneck. In addition, the visual aspects of stencil shadows are pretty primitive - your shadows will always be hard-edged, and you have no possibility of doing clever things with shaders since the stencil is not available for manipulation there. Therefore, if your application is aimed at higher-end machines you should definitely consider switching to texture shadows (See section <A HREF="manual_72.html#SEC312">7.2 Texture-based Shadows</A>).
 
-<A NAME="Pass Classification and Vertex Programs"></A>
-<A NAME="SEC320"></A>
-<H3> Pass Classification and Vertex Programs </H3>
-<!--docid::SEC320::-->
-Ogre is pretty good at classifying and splitting your passes to ensure that the multipass rendering approach required by additive lighting works correctly without you having to change your material definitions. However, there is one exception; when you use vertex programs, the normal lighting attributes ambient, diffuse, specular etc are not used, becuase all of that is determined by the vertex program. Ogre has no way of knowing what you're doing inside that vertex program, so you have to tell it.<BR><BR>
+There are a number of issues to consider which are specific to stencil shadows:
+<UL>
+<LI><A HREF="manual_71.html#SEC305">CPU Overhead</A>
+<LI><A HREF="manual_71.html#SEC306">Extrusion distance</A>
+<LI><A HREF="manual_71.html#SEC307">Camera far plane positioning</A>
+<LI><A HREF="manual_71.html#SEC308">Mesh edge lists</A>
+<LI><A HREF="manual_71.html#SEC309">The Silhouette Edge</A>
+<LI><A HREF="manual_71.html#SEC310">Be realistic</A>
+<LI><A HREF="manual_71.html#SEC311">Stencil Optimisations Performed By Ogre</A>
+</UL>
 
-In practice this is very easy. Even though your vertex program could be doing a lot of complex, highly customised processing, it can still be classified into one of the 3 types listed above. All you need to do to tell Ogre what you're doing is to use the pass attributes ambient, diffuse, specular and self_illumination, just as if you were not using a vertex program. Sure, these attributes do nothing (as far as rendering is concerned) when you're using vertex programs, but it's the easiest way to indicate to Ogre which light components you're using in your vertex program. Ogre will then classify and potentially split your programmable pass based on this information - it will leave the vertex program as-is (so that any split passes will respect any vertex modification that is being done). <BR><BR>
+<A NAME="CPU Overhead"></A>
+<A NAME="SEC305"></A>
+<H3> CPU Overhead </H3>
+<!--docid::SEC305::-->
+Calculating the shadow volume for a mesh can be expensive, and it has to be done on the CPU, it is not a hardware accelerated feature. Therefore, you can find that if you overuse this feature, you can create a CPU bottleneck for your application. Ogre quite aggressively eliminates objects which cannot be casting shadows on the frustum, but there are limits to how much it can do, and large, elgongated shadows (e.g. representing a very low sun position) are very difficult to cull efficiently. Try to avoid having too many shadow casters around at once, and avoid long shadows if you can. Also, make use of the 'shadow far distance' parameter on the SceneManager, this can eliminate distant shadow casters from the shadow volume construction and save you some time, at the expense of only having shadows for closer objects. Lastly, make use of Ogre's Level-Of-Detail (LOD) features; you can generate automatically calculated LODs for your meshes in code (see the Mesh API docs) or when using the mesh tools such as OgreXmlConverter and OgreMeshUpgrader. Alternatively, you can assign your own manual LODs by providing alternative mesh files at lower detail levels. Both methods will cause the shadow volume complexity to decrease as the object gets further away, which saves you valuable volume calculation time. 
 
-Note that when classifying a diffuse/specular programmable pass, Ogre checks to see whether you have indicated the pass can be run once per light (iteration once_per_light). If so, the pass is left intact, including it's vertex and fragment programs. However, if this attribute is not included in the pass, Ogre tries to split off the per-light part, and in doing so it will disable the fragment program, since in the absence of the 'iteration once_per_light' attribute it can only assume that the fragment program is performing decal work and hence must not be used per light.<BR><BR>
+<A NAME="Extrusion distance"></A>
+<A NAME="SEC306"></A>
+<H3> Extrusion distance </H3>
+<!--docid::SEC306::-->
+When vertex programs are not available, Ogre can only extrude shadow volumes a finite distance from the object. If an object gets too close to a light, any finite extrusion distance will be inadequate to guarantee all objects will be shadowed properly by this object. Therefore, you are advised not to let shadow casters pass too close to light sources if you can avoid it, unless you can guarantee that your target audience will have vertex program capable hardware (in this case, Ogre extrudes the volume to infinity using a vertex program so the problem does not occur).<BR><BR>
+When infinite extrusion is not possible, Ogre uses finite extrusion, either derived from the attenuation range of a light (in the case of a point light or spotlight), or a fixed extrusion distance set in the application in the case of directional lights. To change the directional light extrustion distance, use SceneManager::setShadowDirectionalLightExtrusionDistance. 
 
-So clearly, when you use additive light masking as a shadow technique, you need to make sure that programmable passes you use are properly set up so that they can be classified correctly. However, also note that the changes you have to make to ensure the classification is correct does not affect the way the material renders when you choose not to use additive lighting, so the principle that you should be able to use the same material definitions for all lighting scenarios still holds. Here is an example of a programmable material which will be classified correctly by the illumination pass classifier:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>// Per-pixel normal mapping Any number of lights, diffuse and specular
-material Examples/BumpMapping/MultiLightSpecular
-{
+<A NAME="Camera far plane positioning"></A>
+<A NAME="SEC307"></A>
+<H3> Camera far plane positioning </H3>
+<!--docid::SEC307::-->
+Stencil shadow volumes rely very much on not being clipped by the far plane. When you enable stencil shadows, Ogre internally changes the far plane settings of your cameras such that there is no far plane - ie it is placed at infinity (Camera::setFarClipDistance(0)). This avoids artefacts caused by clipping the dark caps on shadow volumes, at the expense of a (very) small amount of depth precision. 
 
-	technique
-	{
-		// Base ambient pass
-		pass
-		{
-			// ambient only, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			ambient 1 1 1
-			diffuse 0 0 0 
-			specular 0 0 0 0
-			// Really basic vertex program
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
-			{
-				param_named_auto worldViewProj worldviewproj_matrix
-				param_named_auto ambient ambient_light_colour
-			}
-			
-		}
-		// Now do the lighting pass
-		// NB we don't do decal texture here because this is repeated per light
-		pass
-		{
-			// set ambient off, not needed for rendering, but as information
-			// to lighting pass categorisation routine
-			ambient 0 0 0 
-			// do this for each light
-			iteration once_per_light
+<A NAME="Mesh edge lists"></A>
+<A NAME="SEC308"></A>
+<H3> Mesh edge lists </H3>
+<!--docid::SEC308::-->
+Stencil shadows can only be calculated when an 'edge list' has been built for all the geometry in a mesh. The official exporters and tools automatically build this for you (or have an option to do so), but if you create your own meshes, you must remember to build edge lists for them before using them with stencil shadows - you can do that by using OgreMeshUpgrade or OgreXmlConverter, or by calling Mesh::buildEdgeList before you export or use the mesh. If a mesh doesn't have edge lists, OGRE assumes that it is not supposed to cast stencil shadows.
 
-		
-			scene_blend add
+<A NAME="The Silhouette Edge"></A>
+<A NAME="SEC309"></A>
+<H3> The Silhouette Edge </H3>
+<!--docid::SEC309::-->
+Stencil shadowing is about finding a silhouette of the mesh, and projecting it away to form a volume. What this means is that there is a definite boundary on the shadow caster between light and shadow; a set of edges where where the triangle on one side is facing toward the light, and one is facing away. This produces a sharp edge around the mesh as the transition occurs. Provided there is little or no other light in the scene, and the mesh has smooth normals to produce a gradual light change in its underlying shading, the silhouette edge can be hidden - this works better the higher the tesselation of the mesh. However, if the scene includes ambient light, then the difference is far more marked. This is especially true when using <A HREF="manual_73.html#SEC326">7.3 Modulative Shadows</A>, because the light contribution of each shadowed area is not taken into account by this simplified approach, and so using 2 or more lights in a scene using modulative stencil shadows is not advisable; the silhouette edges will be very marked. Additive lights do not suffer from this as badly because each light is masked individually, meaning that it is only ambient light which can show up the silhouette edges.
 
-			// Vertex program reference
-			vertex_program_ref Examples/BumpMapVPSpecular
-			{
-				param_named_auto lightPosition light_position_object_space 0
-				param_named_auto eyePosition camera_position_object_space
-				param_named_auto worldViewProj worldviewproj_matrix
-			}
+<A NAME="Be realistic"></A>
+<A NAME="SEC310"></A>
+<H3> Be realistic </H3>
+<!--docid::SEC310::-->
+Don't expect to be able to throw any scene using any hardware at the stencil shadow algorithm and expect to get perfect, optimum speed results. Shadows are a complex and expensive technique, so you should impose some reasonable limitations on your placing of lights and objects; they're not really that restricting, but you should be aware that this is not a complete free-for-all. 
+<UL>
+<LI>Try to avoid letting objects pass very close (or even through) lights - it might look nice but it's one of the cases where artefacts can occur on machines not cabable of running vertex programs.
+<LI>Be aware that shadow volumes do not respect the 'solidity' of the objects they pass through, and if those objects do not themselves cast shadows (which would hide the effect) then the result will be that you can see shadows on the other side of what should be an occluding object.
+<LI>Make use of SceneManager::setShadowFarDistance to limit the number of shadow volumes constructed
+<LI>Make use of LOD to reduce shadow volume complexity at distance
+<LI>Avoid very long (dusk and dawn) shadows - they exacerbate other issues such as volume clipping, fillrate, and cause many more objects at a greater distance to require volume construction.
+</UL>
+<BR><BR>
 
-			// Fragment program
-			fragment_program_ref Examples/BumpMapFPSpecular
-			{
-				param_named_auto lightDiffuse light_diffuse_colour 0 
-				param_named_auto lightSpecular light_specular_colour 0
-			}
-			
-			// Base bump map
-			texture_unit
-			{
-				texture NMBumpsOut.png
-				colour_op replace
-			}
-			// Normalisation cube map
-			texture_unit
-			{
-				cubic_texture nm.png combinedUVW
-				tex_coord_set 1
-				tex_address_mode clamp
-			}
-			// Normalisation cube map #2
-			texture_unit
-			{
-				cubic_texture nm.png combinedUVW
-				tex_coord_set 1
-				tex_address_mode clamp
-			}
-		}
-		
-		// Decal pass
-		pass
-		{
-			lighting off
-			// Really basic vertex program
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
-			{
-				param_named_auto worldViewProj worldviewproj_matrix
-				param_named ambient float4 1 1 1 1
-			}
-			scene_blend dest_colour zero
-			texture_unit
-			{
-				texture RustedMetal.jpg 
-			}
-			
-		}
-	}
-}
-</pre></td></tr></table>
-Note that if you're using texture shadows you have the additional option of using <A HREF="manual_69.html#SEC316">Integrated Texture Shadows</A> rather than being forced to use this explicit sequence - allowing you to compress the number of passes into a much smaller number at the expense of defining an upper number of shadow casting lights. In this case the 'additive' aspect of the shadow technique just affects the colour of the shadow texture and it's up to you to combine the shadow textures in your receivers however you like. <BR><BR>
-
-<A NAME="SEC321"></A>
-<H3> Static Lighting </H3>
-<!--docid::SEC321::-->
-Despite their power, additive lighting techniques have an additional limitation; they do not combine well with pre-calculated static lighting in the scene. This is because they are based on the principle that shadow is an absence of light, but since static lighting in the scene already includes areas of light and shadow, additive lighting cannot remove light to create new shadows. Therefore, if you use the additive lighting technique you must either use it exclusively as your lighting solution (and you can combine it with per-pixel lighting to create a very impressive dynamic lighting solution), or you must use <A HREF="manual_69.html#SEC316">Integrated Texture Shadows</A> to combine the static lighting according to your chosen approach. 
+<A NAME="Stencil Optimisations Performed By Ogre"></A>
+<A NAME="SEC311"></A>
+<H3> Stencil Optimisations Performed By Ogre </H3>
+<!--docid::SEC311::-->
+Despite all that, stencil shadows can look very nice (especially with <A HREF="manual_74.html#SEC328">7.4 Additive Light Masking</A>) and can be fast if you respect the rules above. In addition, Ogre comes pre-packed with a lot of optimisations which help to make this as quick as possible. This section is more for developers or people interested in knowing something about the 'under the hood' behaviour of Ogre.
+<DL COMPACT>
+<DT>Vertex program extrusion
+<DD>As previously mentioned, Ogre performs the extrusion of shadow volumes in hardware on vertex program-capable hardware (e.g. GeForce3, Radeon 8500 or better). This has 2 major benefits; the obvious one being speed, but secondly that vertex programs can extrude points to infinity, which the fixed-function pipeline cannot, at least not without performing all calculations in software. This leads to more robust volumes, and also eliminates more than half the volume triangles on directional lights since all points are projected to a single point at infinity.
+<DT>Scissor test optimisation
+<DD>Ogre uses a scissor rectangle to limit the effect of point / spot lights when their range does not cover the entire viewport; that means we save fillrate when rendering stencil volumes, especially with distant lights
+<DT>Z-Pass and Z-Fail algorithms
+<DD>The Z-Fail algorithm, often attributed to John Carmack, is used in Ogre to make sure shadows are robust when the camera passes through the shadow volume. However, the Z-Fail algorithm is more expensive than the traditional Z-Pass; so Ogre detects when Z-Fail is required and only uses it then, Z-Pass is used at all other times.
+<DT>2-Sided stencilling and stencil wrapping
+<DD>Ogre supports the 2-Sided stencilling / stencil wrapping extensions, which when supported allow volumes to be rendered in a single pass instead of having to do one pass for back facing tris and another for front-facing tris. This doesn't save fillrate, since the same number of stencil updates are done, but it does save primitive setup and the overhead incurred in the driver every time a render call is made.
+<DT>Agressive shadow volume culling
+<DD>Ogre is pretty good at detecting which lights could be affecting the frustum, and from that, which objects could be casting a shadow on the frustum. This means we don't waste time constructing shadow geometry we don't need. Setting the shadow far distance is another important way you can reduce stencil shadow overhead since it culls far away shadow volumes even if they are visible, which is beneficial in practice since you're most interested in shadows for close-up objects.
+</DL>
 
 
-<A NAME="Animation"></A>
+<A NAME="Texture-based Shadows"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC317"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_67.html#SEC292"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_72.html#SEC322"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC301"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC301"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_72.html#SEC312"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -228,7 +135,7 @@ Despite their power, additive lighting techniques have an additional limitation;
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

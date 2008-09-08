@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Locking buffers</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): The Hardware Buffer Manager</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Locking buffers">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Locking buffers">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): The Hardware Buffer Manager">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): The Hardware Buffer Manager">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,60 +24,36 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC256"></A>
+<A NAME="SEC262"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC255"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_46.html#SEC252"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_51.html#SEC258"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC261"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC261"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_51.html#SEC263"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H2> 5.4 Locking buffers </H2>
-<!--docid::SEC256::-->
-In order to read or update a hardware buffer, you have to 'lock' it. This performs 2 functions - it tells the card that you want access to the buffer (which can have an effect on its rendering queue), and it returns a pointer which you can manipulate. Note that if you've asked to read the buffer (and remember, you really shouldn't unless you've set the buffer up with a shadow buffer), the contents of the hardware buffer will have been copied into system memory somewhere in order for you to get access to it. For the same reason, when you're finished with the buffer you must unlock it; if you locked the buffer for writing this will trigger the process of uploading the modified information to the graphics hardware.
+<H2> 5.1 The Hardware Buffer Manager </H2>
+<!--docid::SEC262::-->
+The HardwareBufferManager class is the factory hub of all the objects in the new geometry system. You create and destroy the majority of the objects you use to define geometry through this class. It's a Singleton, so you access it by doing HardwareBufferManager::getSingleton() - however be aware that it is only guaranteed to exist after the RenderSystem has been initialised (after you call Root::initialise); this is because the objects created are invariably API-specific, although you will deal with them through one common interface. 
 <BR><BR>
-<A NAME="SEC257"></A>
-<H3> Lock parameters </H3>
-<!--docid::SEC257::-->
-When you lock a buffer, you call one of the following methods:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>// Lock the entire buffer
-pBuffer-&gt;lock(lockType);
-// Lock only part of the buffer
-pBuffer-&gt;lock(start, length, lockType);
-</pre></td></tr></table>The first call locks the entire buffer, the second locks only the section from 'start' (as a byte offset), for 'length' bytes. This could be faster than locking the entire buffer since less is transferred, but not if you later update the rest of the buffer too, because doing it in small chunks like this means you cannot use HBL_DISCARD (see below).
-<BR><BR>
-The lockType parameter can have a large effect on the performance of your application, especially if you are not using a shadow buffer. 
-<DL COMPACT>
-<DT><CODE>HBL_NORMAL</CODE>
-<DD>This kind of lock allows reading and writing from the buffer - it's also the least optimal because basically you're telling the card you could be doing anything at all. If you're not using a shadow buffer, it requires the buffer to be transferred from the card and back again. If you're using a shadow buffer the effect is minimal.
-<DT><CODE>HBL_READ_ONLY</CODE>
-<DD>This means you only want to read the contents of the buffer. Best used when you created the buffer with a shadow buffer because in that case the data does not have to be downloaded from the card.
-<DT><CODE>HBL_DISCARD</CODE>
-<DD>This means you are happy for the card to discard the <EM>entire current contents</EM> of the buffer. Implicitly this means you are not going to read the data - it also means that the card can avoid any stalls if the buffer is currently being rendered from, because it will actually give you an entirely different one. Use this wherever possible when you are locking a buffer which was not created with a shadow buffer. If you are using a shadow buffer it matters less, although with a shadow buffer it's preferable to lock the entire buffer at once, because that allows the shadow buffer to use HBL_DISCARD when it uploads the updated contents to the real buffer.
-<DT><CODE>HBL_NO_OVERWRITE</CODE>
-<DD>This is useful if you are locking just part of the buffer and thus cannot use HBL_DISCARD. It tells the card that you promise not to modify any section of the buffer which has already been used in a rendering operation this frame. Again this is only useful on buffers with no shadow buffer.
-</DL>
-
-Once you have locked a buffer, you can use the pointer returned however you wish (just don't bother trying to read the data that's there if you've used HBL_DISCARD, or write the data if you've used HBL_READ_ONLY). Modifying the contents depends on the type of buffer, See section <A HREF="manual_52.html#SEC259">5.6 Hardware Vertex Buffers</A> and See section <A HREF="manual_57.html#SEC267">5.7 Hardware Index Buffers</A>
-
-<A NAME="Practical Buffer Tips"></A>
+For example:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>VertexDeclaration* decl = HardwareBufferManager::getSingleton().createVertexDeclaration();
+</pre></td></tr></table><TABLE><tr><td>&nbsp;</td><td class=example><pre>HardwareVertexBufferSharedPtr vbuf = 
+	HardwareBufferManager::getSingleton().createVertexBuffer(
+		3*sizeof(Real), // size of one whole vertex
+		numVertices, // number of vertices
+		HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
+		false); // no shadow buffer
+</pre></td></tr></table>Don't worry about the details of the above, we'll cover that in the later sections. The important thing to remember is to always create objects through the HardwareBufferManager, don't use 'new' (it won't work anyway in most cases).
+<A NAME="Buffer Usage"></A>
 <HR SIZE=1>
-<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC255"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_46.html#SEC252"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_51.html#SEC258"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
-</TR></TABLE>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

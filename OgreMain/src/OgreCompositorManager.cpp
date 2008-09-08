@@ -59,8 +59,8 @@ CompositorManager::CompositorManager():
 	// Scripting is supported by this manager
 #if OGRE_USE_NEW_COMPILERS == 0
 	mScriptPatterns.push_back("*.compositor");
-#endif
 	ResourceGroupManager::getSingleton()._registerScriptLoader(this);
+#endif
 
 	// Resource type
 	mResourceType = "Compositor";

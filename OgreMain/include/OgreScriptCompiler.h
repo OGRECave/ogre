@@ -211,6 +211,7 @@ namespace Ogre
 		static String formatErrorCode(uint32 code);
 	public:
 		ScriptCompiler();
+		virtual ~ScriptCompiler() {}
 
 		/// Takes in a string of script code and compiles it into resources
 		/**
@@ -319,6 +320,7 @@ namespace Ogre
 	{
 	public:
 		ScriptCompilerListener();
+		virtual ~ScriptCompilerListener() {}
 
 		/// Returns the concrete node list from the given file
 		virtual ConcreteNodeListPtr importFile(ScriptCompiler *compiler, const String &name);

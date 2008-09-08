@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Compositor Scripts</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Texture Aliases</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Compositor Scripts">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Compositor Scripts">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Texture Aliases">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Texture Aliases">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,97 +24,176 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC130"></A>
+<A NAME="SEC136"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_25.html#SEC125"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_27.html#SEC134"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_25.html#SEC132"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_27.html#SEC137"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H2> 3.2 Compositor Scripts </H2>
-<!--docid::SEC130::-->
+<H3> 3.1.12 Texture Aliases </H3>
+<!--docid::SEC136::-->
 
-The compositor framework is a subsection of the OGRE API that allows you to easily define full screen post-processing effects. Compositor scripts offer you the ability to define compositor effects in a script which can be reused and modified easily, rather than having to use the API to define them. You still need to use code to instantiate a compositor against one of your visible viewports, but this is a much simpler process than actually defining the compositor itself. 
+Texture aliases are useful for when only the textures used in texture units need to be specified for a cloned material.  In the source material ie the original material to be cloned, each texture unit can be given a texture alias name.  The cloned material in the script can then specify what textures should be used for each texture alias. Note that texture aliases are a more specific version of <A HREF="manual_27.html#SEC137">3.1.13 Script Variables</A> which can be used to easily set other values.<BR><BR>
 
-<A NAME="SEC131"></A>
-<H2> Compositor Fundamentals </H2>
-<!--docid::SEC131::-->
+Using texture aliases within texture units:<BR>
+Format:<BR>
+texture_alias &lt;name&gt;<BR><BR>
 
-Performing post-processing effects generally involves first rendering the scene to a texture, either in addition to or instead of the main window. Once the scene is in a texture, you can then pull the scene image into a fragment program and perform operations on it by rendering it through full screen quad. The target of this post processing render can be the main result (e.g. a window), or it can be another render texture so that you can perform multi-stage convolutions on the image. You can even 'ping-pong' the render back and forth between a couple of render textures to perform convolutions which require many iterations, without using a separate texture for each stage. Eventually you'll want to render the result to the final output, which you do with a full screen quad. This might replace the whole window (thus the main window doesn't need to render the scene itself), or it might be a combinational effect. <BR><BR> 
-
-So that we can discuss how to implement these techniques efficiently, a number of definitions are required:<BR><BR> 
-<DL COMPACT>
-<DT>Compositor
-<DD>Definition of a fullscreen effect that can be applied to a user viewport. This is what you're defining when writing compositor scripts as detailed in this section.
-<DT>Compositor Instance
-<DD>An instance of a compositor as applied to a single viewport. You create these based on compositor definitions, See section <A HREF="manual_30.html#SEC164">3.2.4 Applying a Compositor</A>.
-<DT>Compositor Chain
-<DD>It is possible to enable more than one compositor instance on a viewport at the same time, with one compositor taking the results of the previous one as input. This is known as a compositor chain. Every viewport which has at least one compositor attached to it has a compositor chain. See section <A HREF="manual_30.html#SEC164">3.2.4 Applying a Compositor</A>
-<DT>Target
-<DD>This is a RenderTarget, ie the place where the result of a series of render operations is sent. A target may be the final output (and this is implicit, you don't have to declare it), or it may be an intermediate render texture, which you declare in your script with the <A HREF="manual_27.html#compositor_texture">texture line</A>. A target which is not the output target has a defined size and pixel format which you can control. 
-<DT>Output Target
-<DD>As Target, but this is the single final result of all operations. The size and pixel format of this target cannot be controlled by the compositor since it is defined by the application using it, thus you don't declare it in your script. However, you do declare a Target Pass for it, see below.
-<DT>Target Pass
-<DD>A Target may be rendered to many times in the course of a composition effect. In particular if you 'ping pong' a convolution between a couple of textures, you will have more than one Target Pass per Target. Target passes are declared in the script using a <A HREF="manual_28.html#SEC136">target or target_output line</A>, the latter being the final output target pass, of which there can be only one.
-<DT>Pass
-<DD>Within a Target Pass, there are one or more individual <A HREF="manual_29.html#SEC143">passes</A>, which perform a very specific action, such as rendering the original scene (or pulling the result from the previous compositor in the chain), rendering a fullscreen quad, or clearing one or more buffers. Typically within a single target pass you will use the either a 'render scene' pass or a 'render quad' pass, not both. Clear can be used with either type. 
-</DL>
-
-<A NAME="SEC132"></A>
-<H2> Loading scripts  </H2>
-<!--docid::SEC132::-->
-
-Compositor scripts are loaded when resource groups are initialised: OGRE looks in all resource locations associated with the group (see Root::addResourceLocation) for files with the '.compositor' extension and parses them. If you want to parse files manually, use CompositorSerializer::parseScript.<BR><BR>
-
-<A NAME="SEC133"></A>
-<H2> Format  </H2>
-<!--docid::SEC133::-->
-
-Several compositors may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ('{', '}'), and comments indicated by starting a line with '//' (note, no nested form comments allowed). The general format is shown below in the example below:<BR><BR>
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>// This is a comment
-// Black and white effect
-compositor B&amp;W
+Default: &lt;name&gt; will default to texture_unit &lt;name&gt; if set
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>texture_unit DiffuseTex
 {
-    technique
-    {
-        // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8
+  texture diffuse.jpg
+}
+</pre></td></tr></table>texture_alias defaults to DiffuseTex.<BR>
 
-        target rt0
-        {
-            // Render output from previous compositor (or original scene)
-            input previous
-        }
+Example: The base material to be cloned:<BR>
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>material TSNormalSpecMapping
+{ 
+  technique GLSL
+  { 
+    pass 
+    { 
+      ambient 0.1 0.1 0.1
+      diffuse 0.7 0.7 0.7
+      specular 0.7 0.7 0.7 128
+		
+      vertex_program_ref GLSLDemo/OffsetMappingVS
+      {
+        param_named_auto lightPosition light_position_object_space 0
+        param_named_auto eyePosition camera_position_object_space
+        param_named textureScale float 1.0
+      }
 
-        target_output
-        {
-            // Start with clear output
-            input none
-            // Draw a fullscreen quad with the black and white image
-            pass render_quad
-            {
-                // Renders a fullscreen quad with a material
-                material Ogre/Compositor/BlackAndWhite
-                input 0 rt0
-            }
-        }
-    }
+      fragment_program_ref GLSLDemo/TSNormalSpecMappingFS 
+      { 
+        param_named normalMap int 0
+        param_named diffuseMap int 1
+        param_named fxMap int 2
+      } 
+
+      // Normal map
+      texture_unit NormalMap
+      {
+        texture defaultNM.png
+        tex_coord_set 0
+        filtering trilinear
+      }
+
+      // Base diffuse texture map
+      texture_unit DiffuseMap
+      {
+        texture defaultDiff.png
+        filtering trilinear
+        tex_coord_set 1
+      }
+
+      // spec map for shinnines
+      texture_unit SpecMap
+      {
+        texture defaultSpec.png
+        filtering trilinear
+        tex_coord_set 2
+      }
+
+    } 
+
+  } 
+
+  technique HLSL_DX9
+  { 
+    pass 
+    { 
+			
+      vertex_program_ref FxMap_HLSL_VS
+      {
+        param_named_auto worldViewProj_matrix worldviewproj_matrix 
+        param_named_auto lightPosition light_position_object_space 0
+        param_named_auto eyePosition camera_position_object_space
+      }
+
+      fragment_program_ref FxMap_HLSL_PS 
+      { 
+        param_named ambientColor float4 0.2 0.2 0.2 0.2
+      } 
+
+      // Normal map
+      texture_unit 
+      {
+        texture_alias NormalMap
+        texture defaultNM.png
+        tex_coord_set 0
+        filtering trilinear
+      }
+
+      // Base diffuse texture map
+      texture_unit 
+      {
+        texture_alias DiffuseMap
+        texture defaultDiff.png
+        filtering trilinear
+        tex_coord_set 1
+      }
+
+      // spec map for shinnines
+      texture_unit
+      {
+        texture_alias SpecMap
+        texture defaultSpec.png
+        filtering trilinear
+        tex_coord_set 2
+      }
+
+    } 
+
+  } 
 }
 </pre></td></tr></table>
-Every compositor in the script must be given a name, which is the line 'compositor &lt;name&gt;' before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your compositors, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string.  Names can include spaces but must be surrounded by double quotes ie compositor &quot;My Name&quot;.<BR><BR>
+Note that the GLSL and HLSL techniques use the same textures.  For each texture usage type a texture alias is given that describes what the texture is used for.  So the first texture unit in the GLSL technique has the same alias as the TUS in the HLSL technique since its the same texture used. Same goes for the second and third texture units.<BR>
+For demonstration purposes, the GLSL technique makes use of texture_unit naming and therefore the texture_alias name does not have to be set since it defaults to the texture unit name.  So why not use the default all the time since its less typing?  For most situations you can.  Its when you clone a material that and then want to change the alias that you must use the texture_alias command in the script.  You cannot change the name of a texture_unit in a cloned material so texture_alias provides a facility to assign an alias name.<BR><BR>
 
-The major components of a compositor are the <A HREF="manual_27.html#SEC134">techniques</A>, the <A HREF="manual_28.html#SEC136">target passes</A> and the <A HREF="manual_29.html#SEC143">passes</A>, which are covered in detail in the following sections.<BR><BR>
+Now we want to clone the material but only want to change the textures used.  We could copy and paste the whole material but if we decide to change the base material later then we also have to update the copied material in the script.  With set_texture_alias, copying a material is very easy now.  set_texture_alias is specified at the top of the material definition.  All techniques using the specified texture alias will be effected by set_texture_alias.<BR><BR>
 
-<A NAME="Compositor Techniques"></A>
+Format:<BR>
+set_texture_alias &lt;alias name&gt; &lt;texture name&gt;<BR>
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>material fxTest : TSNormalSpecMapping
+{
+  set_texture_alias NormalMap fxTestNMap.png
+  set_texture_alias DiffuseMap fxTestDiff.png
+  set_texture_alias SpecMap fxTestMap.png
+}
+</pre></td></tr></table>
+The textures in both techniques in the child material will automatically get replaced with the new ones we want to use.<BR><BR>
+
+  The same process can be done in code as long you set up the texture alias names so then there is no need to traverse technique/pass/TUS to change a texture.  You just call myMaterialPtr-&gt;applyTextureAliases(myAliasTextureNameList) which will update all textures in all texture units that match the alias names in the map container reference you passed as a parameter.<BR><BR>
+
+ You don't have to supply all the textures in the copied material.<BR>
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>material fxTest2 : fxTest
+{
+  set_texture_alias DiffuseMap fxTest2Diff.png
+  set_texture_alias SpecMap fxTest2Map.png
+}
+</pre></td></tr></table>
+Material fxTest2 only changes the diffuse and spec maps of material fxTest and uses the same normal map.<BR><BR>
+
+Another example:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>material fxTest3 : TSNormalSpecMapping
+{
+  set_texture_alias DiffuseMap fxTest2Diff.png
+}
+</pre></td></tr></table>
+fxTest3 will end up with the default textures for the normal map and spec map setup in TSNormalSpecMapping material but will have a different diffuse map.  So your base material can define the default textures to use and then the child materials can override specific textures.<BR><BR>
+
+<A NAME="Script Variables"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_25.html#SEC125"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_27.html#SEC134"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_25.html#SEC132"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_27.html#SEC137"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -123,7 +202,7 @@ The major components of a compositor are the <A HREF="manual_27.html#SEC134">tec
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

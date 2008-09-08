@@ -9,7 +9,7 @@
 @author Steve Streeting
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} The OGRE Team@*@*
+Copyright @copyright{} Torus Knot Software Ltd@*@*
 
 Permission is granted to make and distribute verbatim
 copies of this manual provided the copyright notice and
@@ -319,7 +319,7 @@ Another important factor is that material names must be unique throughout ALL sc
 
 @heading Format
 
-Several materials may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ('{', '}'), and comments indicated by starting a line with '//' (note, no nested form comments allowed). The general format is shown below in the example below (note that to start with, we only consider fixed-function materials which don't use vertex or fragment programs, these are covered later):@*@*
+Several materials may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ('{', '}'), and comments indicated by starting a line with '//' (note, no nested form comments allowed). The general format is shown below in the example below (note that to start with, we only consider fixed-function materials which don't use vertex, geometry or fragment programs, these are covered later):@*@*
 @example
 // This is a comment
 material walls/funkywall1
@@ -359,12 +359,12 @@ material walls/funkywall1
 }
 @end example
 
-Every material in the script must be given a name, which is the line 'material <blah>' before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your materials, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string.@*@*
+Every material in the script must be given a name, which is the line 'material <blah>' before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your materials, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string. If you include spaces in the name, it must be enclosed in double quotes.@*@*
 
 @strong{ NOTE: ':' is the delimiter for specifying material copy in the script so it can't be used as part of the material name.}
 @*@*
 
-A material can copy from a previously defined material by using a @emph{colon} @strong{:} after the material name followed by the name of the reference material to copy. If the reference material can not be found then it is ignored.  (@xref{Copying Materials})@*@*
+A material can inherit from a previously defined material by using a @emph{colon} @strong{:} after the material name followed by the name of the reference material to inherit from. You can in fact even inherit just @emph{parts} of a material from others; all this is covered in @xref{Script Inheritence}). You can also use variables in your script which can be replaced in inheriting versions, see @xref{Script Variables}.@*@*
 
 A material can be made up of many techniques (@xref{Techniques})- a technique is one way of achieving the effect you are looking for. You can supply more than one technique in order to provide fallback approaches where a card does not have the ability to render the preferred technique, or where you wish to define lower level of detail versions of the material in order to conserve rendering power when objects are more distant. @*@*
 
@@ -372,7 +372,7 @@ Each technique can be made up of many passes (@xref{Passes}), that is a complete
 
 Within each pass, there can be zero or many texture units in use (@xref{Texture Units}). These define the texture to be used, and optionally some blending operations (which use multitexturing) and texture effects.@*@*
 
-You can also reference vertex and fragment programs (or vertex and pixel shaders, if you want to use that terminology) in a pass with a given set of parameters. Programs themselves are declared in separate .program scripts (@xref{Declaring Vertex and Fragment Programs}) and are used as described in @ref{Using Vertex and Fragment Programs in a Pass}.
+You can also reference vertex and fragment programs (or vertex and pixel shaders, if you want to use that terminology) in a pass with a given set of parameters. Programs themselves are declared in separate .program scripts (@xref{Declaring Vertex@comma{} Geometry and Fragment Programs}) and are used as described in @ref{Using Vertex@comma{} Geometry and Fragment Programs in a Pass}.
 
 @subheading Top-level material attributes
 The outermost section of a material definition does not have a lot of attributes of its own (most of the configurable parameters are within the child sections. However, it does have some, and here they are:@*@*
@@ -403,7 +403,7 @@ This attribute associates a texture alias with a texture name.@*@*
 
 Format: set_texture_alias <alias name> <texture name>@*@*
 
-This attribute is used to set the textures used in texture unit states that were copied from another material.(@xref{Copying Materials})@*@*
+This attribute can be used to set the textures used in texture unit states that were inherited from another material.(@xref{Texture Aliases})@*@*
 
 @node Techniques
 @subsection Techniques
@@ -414,14 +414,14 @@ When a material is used for the first time, it is 'compiled'. That involves scan
 @itemize @bullet
 @item The number of texture_unit entries in each pass@*
 Note that if the number of texture_unit entries exceeds the number of texture units in the current graphics card, the technique may still be supportable so long as a fragment program is not being used. In this case, Ogre will split the pass which has too many entries into multiple passes for the less capable card, and the multitexture blend will be turned into a multipass blend (@xref{colour_op_multipass_fallback}).
-@item Whether vertex or fragment programs are used, and if so which syntax they use (e.g. vs_1_1, ps_2_x, arbfp1 etc)
+@item Whether vertex, geometry or fragment programs are used, and if so which syntax they use (e.g. vs_1_1, ps_2_x, arbfp1 etc)
 @item Other effects like cube mapping and dot3 blending
 @item Whether the vendor or device name of the current graphics card matches some user-specified rules
 @end itemize
 @*
 In a material script, techniques must be listed in order of preference, i.e. the earlier techniques are preferred over the later techniques. This normally means you will list your most advanced, most demanding techniques first in the script, and list fallbacks afterwards.@*@*
 
-To help clearly identify what each technique is used for, the technique can be named but its optional.  Techniques not named within the script will take on a name that is the technique index number.  For example: the first technique in a material is index 0, its name would be "0" if it was not given a name in the script.  The technique name must be unqiue within the material or else the final technique is the resulting merge of all techniques with the same name in the material.  A warning message is posted in the Ogre.log if this occurs.  Named techniques can help when copying a material and modifying an existing technique: (@xref{Copying Materials})@*@*
+To help clearly identify what each technique is used for, the technique can be named but its optional.  Techniques not named within the script will take on a name that is the technique index number.  For example: the first technique in a material is index 0, its name would be "0" if it was not given a name in the script.  The technique name must be unqiue within the material or else the final technique is the resulting merge of all techniques with the same name in the material.  A warning message is posted in the Ogre.log if this occurs.  Named techniques can help when inheriting a material and modifying an existing technique: (@xref{Script Inheritence})@*@*
 
 Format: technique name@*@*
 
@@ -432,9 +432,9 @@ Techniques have only a small number of attributes of their own:
 @item
 @ref{lod_index} (and also see @ref{lod_distances} in the parent material)
 @item
-@ref{shadow_caster_material_name}
+@ref{shadow_caster_material}
 @item
-@ref{shadow_receiver_material_name}
+@ref{shadow_receiver_material}
 @item 
 @ref{gpu_vendor_rule}
 @item 
@@ -481,12 +481,12 @@ The above example would cause the material to use the best Technique at lod_inde
 
 Techniques also contain one or more passes (and there must be at least one), @xref{Passes}.
 
-@anchor{shadow_caster_material_name}
-@subheading shadow_caster_material_name
+@anchor{shadow_caster_material}
+@subheading shadow_caster_material
 When using @xref{Texture-based Shadows} you can specify an alternate material to use when rendering the object using this material into the shadow texture. This is like a more advanced version of using shadow_caster_vertex_program, however note that for the moment you are expected to render the shadow in one pass, ie only the first pass is respected.
 
-@anchor{shadow_receiver_material_name}
-@subheading shadow_receiver_material_name
+@anchor{shadow_receiver_material}
+@subheading shadow_receiver_material
 When using @xref{Texture-based Shadows} you can specify an alternate material to use when performing the receiver shadow pass. Note that this explicit 'receiver' pass is only done when you're @strong{not} using @ref{Integrated Texture Shadows} - ie the shadow rendering is done separately (either as a modulative pass, or a masked light pass). This is like a more advanced version of using shadow_receiver_vertex_program and shadow_receiver_fragment_program, however note that for the moment you are expected to render the shadow in one pass, ie only the first pass is respected.
 
 @anchor{gpu_vendor_rule}
@@ -513,9 +513,9 @@ Note that these rules can only mark a technique 'unsupported' when it would othe
 @subsection Passes
 A pass is a single render of the geometry in question; a single call to the rendering API with a certain set of rendering properties. A technique can have between one and 16 passes, although clearly the more passes you use, the more expensive the technique will be to render.@*@*
 
-To help clearly identify what each pass is used for, the pass can be named but its optional.  Passes not named within the script will take on a name that is the pass index number.  For example: the first pass in a technique is index 0 so its name would be "0" if it was not given a name in the script.  The pass name must be unqiue within the technique or else the final pass is the resulting merge of all passes with the same name in the technique.  A warning message is posted in the Ogre.log if this occurs.  Named passes can help when copying a material and modifying an existing pass: (@xref{Copying Materials})@*@*
+To help clearly identify what each pass is used for, the pass can be named but its optional.  Passes not named within the script will take on a name that is the pass index number.  For example: the first pass in a technique is index 0 so its name would be "0" if it was not given a name in the script.  The pass name must be unqiue within the technique or else the final pass is the resulting merge of all passes with the same name in the technique.  A warning message is posted in the Ogre.log if this occurs.  Named passes can help when inheriting a material and modifying an existing pass: (@xref{Script Inheritence})@*@*
 
-Passes have a set of global attributes (described below), zero or more nested texture_unit entries (@xref{Texture Units}), and optionally a reference to a vertex and / or a fragment program (@xref{Using Vertex and Fragment Programs in a Pass}).
+Passes have a set of global attributes (described below), zero or more nested texture_unit entries (@xref{Texture Units}), and optionally a reference to a vertex and / or a fragment program (@xref{Using Vertex@comma{} Geometry and Fragment Programs in a Pass}).
 
 @*@*
 Here are the attributes you can use in a 'pass' section of a .material script:
@@ -1003,7 +1003,7 @@ Default: start_light 0@*
 Sets the maximum number of lights which will be considered for use with this pass.@*@*
 Format: max_lights <number>@*@*
 
-The maximum number of lights which can be used when rendering fixed-function materials is set by the rendering system, and is typically set at 8. When you are using the programmable pipeline (@xref{Using Vertex and Fragment Programs in a Pass}) this limit is dependent on the program you are running, or, if you use 'iteration once_per_light' or a variant (@xref{iteration}), it effectively only bounded by the number of passes you are willing to use. If you are not using pass iteration, the light limit applies once for this pass. If you are using pass iteration, the light limit applies across all iterations of this pass - for example if you have 12 lights in range with an 'iteration once_per_light' setup but your max_lights is set to 4 for that pass, the pass will only iterate 4 times. @*@*
+The maximum number of lights which can be used when rendering fixed-function materials is set by the rendering system, and is typically set at 8. When you are using the programmable pipeline (@xref{Using Vertex@comma{} Geometry and Fragment Programs in a Pass}) this limit is dependent on the program you are running, or, if you use 'iteration once_per_light' or a variant (@xref{iteration}), it effectively only bounded by the number of passes you are willing to use. If you are not using pass iteration, the light limit applies once for this pass. If you are using pass iteration, the light limit applies across all iterations of this pass - for example if you have 12 lights in range with an 'iteration once_per_light' setup but your max_lights is set to 4 for that pass, the pass will only iterate 4 times. @*@*
 
 Default: max_lights 8@*
 
@@ -1124,7 +1124,7 @@ material Fur
   } 
 }
 @end example
-Note: use gpu program auto parameters @ref{pass_number} and @ref{pass_iteration_number} to tell the vertex or fragment program the pass number and iteration number.@*@*
+Note: use gpu program auto parameters @ref{pass_number} and @ref{pass_iteration_number} to tell the vertex, geometry or fragment program the pass number and iteration number.@*@*
 
 @anchor{point_size}
 @subheading point_size
@@ -1241,7 +1241,7 @@ Format: texture_alias <name>@*@*
 
 Example: texture_alias NormalMap@*@*
 
-Setting the texture alias name is usefull if this material is to be copied by other other materials and only the textures will be changed in the new material.(@xref{Copying Materials})@*@*
+Setting the texture alias name is useful if this material is to be inherited by other other materials and only the textures will be changed in the new material.(@xref{Texture Aliases})@*@*
 Default: If a texture_unit has a name then the texture_alias defaults to the texture_unit name.
 
 @anchor{texture}
@@ -1723,14 +1723,14 @@ Format: transform m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m3
 
 The indexes of the 4x4 matrix value above are expressed as m<row><col>.
 
-@node Declaring Vertex and Fragment Programs
-@subsection Declaring Vertex and Fragment Programs
+@node Declaring Vertex@comma{} Geometry and Fragment Programs
+@subsection Declaring Vertex@comma{} Geometry and Fragment Programs
 
-In order to use a vertex or fragment program in your materials (@xref{Using Vertex and Fragment Programs in a Pass}), you first have to define them. A single program definition can be used by any number of materials, the only prerequisite is that a program must be defined before being referenced in the pass section of a material.@*@*
+In order to use a vertex, geometry or fragment program in your materials (@xref{Using Vertex@comma{} Geometry and Fragment Programs in a Pass}), you first have to define them. A single program definition can be used by any number of materials, the only prerequisite is that a program must be defined before being referenced in the pass section of a material.@*@*
 
 The definition of a program can either be embedded in the .material script itself (in which case it must precede any references to it in the script), or if you wish to use the same program across multiple .material files, you can define it in an external .program script. You define the program in exactly the same way whether you use a .program script or a .material script, the only difference is that all .program scripts are guaranteed to have been parsed before @strong{all} .material scripts, so you can guarantee that your program has been defined before any .material script that might use it. Just like .material scripts, .program scripts will be read from any location which is on your resource path, and you can define many programs in a single script.@*@*
 
-Vertex and fragment programs can be low-level (i.e. assembler code written to the specification of a given low level syntax such as vs_1_1 or arbfp1) or high-level such as DirectX9 HLSL, Open GL Shader Language, or nVidia's Cg language (@xref{High-level Programs}). High level languages give you a number of advantages, such as being able to write more intuitive code, and possibly being able to target multiple architectures in a single program (for example, the same Cg program might be able to be used in both D3D and GL, whilst the equivalent low-level programs would require separate techniques, each targetting a different API). High-level programs also allow you to use named parameters instead of simply indexed ones, although parameters are not defined here, they are used in the Pass.@*@*
+Vertex, geometry and fragment programs can be low-level (i.e. assembler code written to the specification of a given low level syntax such as vs_1_1 or arbfp1) or high-level such as DirectX9 HLSL, Open GL Shader Language, or nVidia's Cg language (@xref{High-level Programs}). High level languages give you a number of advantages, such as being able to write more intuitive code, and possibly being able to target multiple architectures in a single program (for example, the same Cg program might be able to be used in both D3D and GL, whilst the equivalent low-level programs would require separate techniques, each targetting a different API). High-level programs also allow you to use named parameters instead of simply indexed ones, although parameters are not defined here, they are used in the Pass.@*@*
 
 Here is an example of a definition of a low-level vertex program:
 @example
@@ -1740,7 +1740,7 @@ vertex_program myVertexProgram asm
     syntax vs_1_1
 }
 @end example
-As you can see, that's very simple, and defining a fragment program is exactly the same, just with vertex_program replaced with fragment_program. You give the program a name in the header, followed by the word 'asm' to indicate that this is a low-level program. Inside the braces, you specify where the source is going to come from (and this is loaded from any of the resource locations as with other media), and also indicate the syntax being used. You might wonder why the syntax specification is required when many of the assembler syntaxes have a header identifying them anyway - well the reason is that the engine needs to know what syntax the program is in before reading it, because during compilation of the material, we want to skip progams which use an unsupportable syntax quickly, without loading the program first.@*@*
+As you can see, that's very simple, and defining a fragment or geometry program is exactly the same, just with vertex_program replaced with fragment_program or geometry_program, respectively. You give the program a name in the header, followed by the word 'asm' to indicate that this is a low-level program. Inside the braces, you specify where the source is going to come from (and this is loaded from any of the resource locations as with other media), and also indicate the syntax being used. You might wonder why the syntax specification is required when many of the assembler syntaxes have a header identifying them anyway - well the reason is that the engine needs to know what syntax the program is in before reading it, because during compilation of the material, we want to skip progams which use an unsupportable syntax quickly, without loading the program first.@*@*
 
 The current supported syntaxes are:
 @table @asis
@@ -1793,7 +1793,9 @@ This is an nVidia-specific OpenGL fragment syntax which is a superset of ps 1.3.
 Another nVidia-specific OpenGL fragment shader syntax. It is a superset of ps 2.0, which is supported on nVidia GeForce FX 5 series and higher.
 @item fp40
 Another nVidia-specific OpenGL fragment shader syntax. It is a superset of ps 3.0, which is supported on nVidia GeForce FX 6 series and higher.
-
+@item gpu_gp, gp4_gp
+An nVidia-specific OpenGL geometry shader syntax. @*
+Supported cards: nVidia GeForce FX8 series@*
 @end table
 
 You can get a definitive list of the syntaxes supported by the current card by calling GpuProgramManager::getSingleton().getSupportedSyntax().@*@*
@@ -1818,7 +1820,7 @@ In this case myVertexProgram.constants has been created by calling highLevelGpuP
 
 @anchor{Default Program Parameters}
 @subheading Default Program Parameters
-While defining a vertex or fragment program, you can also specify the default parameters to be used for materials which use it, unless they specifically override them. You do this by including a nested 'default_params' section, like so:
+While defining a vertex, geometry or fragment program, you can also specify the default parameters to be used for materials which use it, unless they specifically override them. You do this by including a nested 'default_params' section, like so:
 @example
 vertex_program Ogre/CelShadingVP cg
 {
@@ -1870,7 +1872,12 @@ If your vertex program makes use of @ref{Vertex Texture Fetch}, you should decla
 	uses_vertex_texture_fetch true
 @end example
 	
-
+@subheading Adjacency information in Geometry Programs
+Some geometry programs require adjacency information from the geometry. It means that a geometry shader doesn't only get the information of the primitive it operates on, it also has access to its neighbors (in the case of lines or triangles). This directive will tell Ogre to send the information to the geometry shader.
+@example
+	uses_adjacency_information true
+@end example
+	
 @subheading Vertex Programs With Shadows
 When using shadows (@xref{Shadows}), the use of vertex programs can add some additional complexities, because Ogre can only automatically deal with everything when using the fixed-function pipeline. If you use vertex programs, and you are also using shadows, you may need to make some adjustments. @*@*
 
@@ -2060,10 +2067,10 @@ material SupportHLSLandGLSLwithUnified
 At runtime, when myVertexProgram or myFragmentProgram are used, OGRE automatically picks a real program to delegate to based on what's supported on the current hardware / rendersystem. If none of the delegates are supported, the entire technique referencing the unified program is marked as unsupported and the next technique in the material is checked fro fallback, just like normal. As your materials get larger, and you find you need to support HLSL and GLSL specifically (or need to write multiple interface-compatible versions of a program for whatever other reason), unified programs can really help reduce duplication.
 
 
-@node Using Vertex and Fragment Programs in a Pass
-@subsection Using Vertex and Fragment Programs in a Pass
+@node Using Vertex@comma{} Geometry and Fragment Programs in a Pass
+@subsection Using Vertex@comma{} Geometry and Fragment Programs in a Pass
 
-Within a pass section of a material script, you can reference a vertex and / or a fragment program which is been defined in a .program script (@xref{Declaring Vertex and Fragment Programs}). The programs are defined separately from the usage of them in the pass, since the programs are very likely to be reused between many separate materials, probably across many different .material scripts, so this approach lets you define the program only once and use it many times.@*@*
+Within a pass section of a material script, you can reference a vertex, geometry and / or a fragment program which is been defined in a .program script (@xref{Declaring Vertex@comma{} Geometry and Fragment Programs}). The programs are defined separately from the usage of them in the pass, since the programs are very likely to be reused between many separate materials, probably across many different .material scripts, so this approach lets you define the program only once and use it many times.@*@*
 
 As well as naming the program in question, you can also provide parameters to it. Here's a simple example:
 @example
@@ -2075,11 +2082,11 @@ vertex_program_ref myVertexProgram
 @end example
 In this example, we bind a vertex program called 'myVertexProgram' (which will be defined elsewhere) to the pass, and give it 2 parameters, one is an 'auto' parameter, meaning we do not have to supply a value as such, just a recognised code (in this case it's the world/view/projection matrix which is kept up to date automatically by Ogre). The second parameter is a manually specified parameter, a 4-element float. The indexes are described later.@*@*
 
-The syntax of the link to a vertex program and a fragment program are identical, the only difference is that 'fragment_program_ref' is used instead of 'vertex_program_ref'.@*@*
+The syntax of the link to a vertex program and a fragment or geometry program are identical, the only difference is that 'fragment_program_ref' and 'geometry_program_ref' are used respectively instead of 'vertex_program_ref'.@*@*
 
-For many situations a vertex and fragment program are associated with each other in a pass but this is not cast in stone.  You could have a vertex program that can be used by several different fragment programs.  Another situation that arises is that you can mix fixed pipeline and programmable pipeline (shaders) together. You could use the non-programable vertex fixed function pipeline and then provide a fragment_program_ref in a pass ie there would be no vertex_program_ref section in the pass.  The fragment program referenced in the pass must meet the requirements as defined in the related API in order to read from the outputs of the vertex fixed pipeline.  You could also just have a vertex program that outputs to the fragment fixed function pipeline.@*@*
+For many situations vertex, geometry and fragment programs are associated with each other in a pass but this is not cast in stone.  You could have a vertex program that can be used by several different fragment programs.  Another situation that arises is that you can mix fixed pipeline and programmable pipeline (shaders) together. You could use the non-programable vertex fixed function pipeline and then provide a fragment_program_ref in a pass ie there would be no vertex_program_ref section in the pass.  The fragment program referenced in the pass must meet the requirements as defined in the related API in order to read from the outputs of the vertex fixed pipeline.  You could also just have a vertex program that outputs to the fragment fixed function pipeline.@*@*
 
-The requirements to read from or write to the fixed function pipeline are similar between rendering API's (DirectX and OpenGL) but how its actually done in each type of shader (vertex or fragment) depends on the shader language.  For HLSL (DirectX API) and associated asm consult MSDN at @url{http://msdn.microsoft.com/library/}. For GLSL (OpenGL), consult section 7.6 of the GLSL spec 1.1 available at @url{http://developer.3dlabs.com/documents/index.htm}.  The built in varying variables provided in GLSL allow your program to read/write to the fixed function pipeline varyings.  For Cg consult the Language Profiles section in CgUsersManual.pdf that comes with the Cg Toolkit available at @url{http://developer.nvidia.com/object/cg_toolkit.html}.  For HLSL and Cg its the varying bindings that allow your shader programs to read/write to the fixed function pipeline varyings.@*@*
+The requirements to read from or write to the fixed function pipeline are similar between rendering API's (DirectX and OpenGL) but how its actually done in each type of shader (vertex, geometry or fragment) depends on the shader language.  For HLSL (DirectX API) and associated asm consult MSDN at @url{http://msdn.microsoft.com/library/}. For GLSL (OpenGL), consult section 7.6 of the GLSL spec 1.1 available at @url{http://developer.3dlabs.com/documents/index.htm}.  The built in varying variables provided in GLSL allow your program to read/write to the fixed function pipeline varyings.  For Cg consult the Language Profiles section in CgUsersManual.pdf that comes with the Cg Toolkit available at @url{http://developer.nvidia.com/object/cg_toolkit.html}.  For HLSL and Cg its the varying bindings that allow your shader programs to read/write to the fixed function pipeline varyings.@*@*
 
 @anchor{Program Parameter Specification}
 @subheading Parameter specification
@@ -2276,6 +2283,10 @@ The parameters of the fog currently set in the scene. Packed as (exp_density, li
 The current cameras position in world space.
 @item camera_position_object_space
 The current cameras position in object space (ie when the object is at (0,0,0)).
+@item lod_camera_position
+The current LOD camera position in world space. A LOD camera is a separate camera associated with the rendering camera which allows LOD calculations to be calculated separately. The classic example is basing the LOD of the shadow texture render on the position of the main camera, not the shadow camera. 
+@item lod_camera_position_object_space
+The current LOD camera position in object space (ie when the object is at (0,0,0)).
 @item time
 The current time, factored by the optional parameter (or 1.0f if not supplied).
 @item time_0_x

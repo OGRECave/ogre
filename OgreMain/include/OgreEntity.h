@@ -88,7 +88,7 @@ namespace Ogre {
 		Entity();
 		/** Private constructor - specify name (the usual constructor used).
 		*/
-		Entity( const String& name, MeshPtr& mesh);
+		Entity( const String& name, const MeshPtr& mesh);
 
 		/** The Mesh that this Entity is based on.
 		*/

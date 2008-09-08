@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Modulative Shadows</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Shadows</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Modulative Shadows">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Modulative Shadows">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Shadows">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Shadows">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,37 +24,71 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC317"></A>
+<A NAME="SEC301"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_69.html#SEC303"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_67.html#SEC292"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_71.html#SEC319"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_69.html#SEC294"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_71.html#SEC304"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H2> 7.3 Modulative Shadows </H2>
-<!--docid::SEC317::-->
-Modulative shadows work by darkening an already rendered scene with a fixed colour. First, the scene is rendered normally containing all the objects which will be shadowed, then a modulative pass is done per light, which darkens areas in shadow. Finally, objects which do not receive shadows are rendered.<BR><BR>
+<H1> 7. Shadows </H1>
+<!--docid::SEC301::-->
+Shadows are clearly an important part of rendering a believable scene - they provide a more tangible feel to the objects in the scene, and aid the viewer in understanding the spatial relationship between objects. Unfortunately, shadows are also one of the most challenging aspects of 3D rendering, and they are still very much an active area of research. Whilst there are many techniques to render shadows, none is perfect and they all come with advantages and disadvantages. For this reason, Ogre provides multiple shadow implementations, with plenty of configuration settings, so you can choose which technique is most appropriate for your scene.<BR><BR>
 
-There are 2 modulative shadow techniques; stencil-based (See section <A HREF="manual_68.html#SEC295">7.1 Stencil Shadows</A> : SHADOWTYPE_STENCIL_MODULATIVE) and texture-based (See section <A HREF="manual_69.html#SEC303">7.2 Texture-based Shadows</A> : SHADOWTYPE_TEXTURE_MODULATIVE). Modulative shadows are an inaccurate lighting model, since they darken the areas of shadow uniformly, irrespective of the amount of light which would have fallen on the shadow area anyway. However, they can give fairly attractive results for a much lower overhead than more 'correct' methods like <A HREF="manual_71.html#SEC319">7.4 Additive Light Masking</A>, and they also combine well with pre-baked static lighting (such as precalculated lightmaps), which additive lighting does not. The main thing to consider is that using multiple light sources can result in overly dark shadows (where shadows overlap, which intuitively looks right in fact, but it's not physically correct) and artefacts when using stencil shadows (See section <A HREF="manual_68.html#SEC300">The Silhouette Edge</A>). <BR><BR>
+Shadow implementations fall into basically 2 broad categories: <A HREF="manual_71.html#SEC304">7.1 Stencil Shadows</A> and <A HREF="manual_72.html#SEC312">7.2 Texture-based Shadows</A>. This describes the method by which the shape of the shadow is generated. In addition, there is more than one way to render the shadow into the scene: <A HREF="manual_73.html#SEC326">7.3 Modulative Shadows</A>, which darkens the scene in areas of shadow, and <A HREF="manual_74.html#SEC328">7.4 Additive Light Masking</A> which by contrast builds up light contribution in areas which are not in shadow. You also have the option of <A HREF="manual_72.html#SEC325">Integrated Texture Shadows</A> which gives you complete control over texture shadow application, allowing for complex single-pass shadowing shaders. Ogre supports all these combinations.<BR><BR>
 
-<A NAME="Shadow Colour"></A>
-<A NAME="SEC318"></A>
-<H3> Shadow Colour </H3>
-<!--docid::SEC318::-->
-The colour which is used to darken the areas in shadow is set by SceneManager::setShadowColour; it defaults to a dark grey (so that the underlying colour still shows through a bit).<BR><BR>
+<A NAME="SEC302"></A>
+<H3> Enabling shadows </H3>
+<!--docid::SEC302::-->
+Shadows are disabled by default, here's how you turn them on and configure them in the general sense:
+<OL>
+<LI>
+Enable a shadow technique on the SceneManager as the <STRONG>first</STRONG> thing you doin your scene setup. It is important that this is done first because the shadow technique can alter the way meshes are loaded. Here's an example:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>mSceneMgr-&gt;setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
+</pre></td></tr></table><LI>
+Create one or more lights. Note that not all light types are necessarily supported by all shadow techniques, you should check the sections about each technique to check. Note that if certain lights should not cast shadows, you can turn that off by calling setCastShadows(false) on the light, the default is true.
+<LI>
+Disable shadow casting on objects which should not cast shadows. Call setCastShadows(false) on objects you don't want to cast shadows, the default for all objects is to cast shadows.
+<LI>
+Configure shadow far distance. You can limit the distance at which shadows are considered for performance reasons, by calling SceneManager::setShadowFarDistance.
+<LI>
+Turn off the receipt of shadows on materials that should not receive them. You can turn off the receipt of shadows (note, not the casting of shadows - that is done per-object) by calling Material::setReceiveShadows or using the receive_shadows material attribute. This is useful for materials which should be considered self-illuminated for example. Note that transparent materials are typically excluded from receiving and casting shadows, although see the <A HREF="manual_14.html#SEC29">transparency_casts_shadows</A> option for exceptions. 
+</OL>
 
-Note that if you're using texture shadows you have the additional option of using <A HREF="manual_69.html#SEC316">Integrated Texture Shadows</A> rather than being forced to have a separate pass of the scene to render shadows. In this case the 'modulative' aspect of the shadow technique just affects the colour of the shadow texture. <BR><BR>
+<A NAME="SEC303"></A>
+<H3> Opting out of shadows </H3>
+<!--docid::SEC303::-->
+By default Ogre treats all non-transparent objects as shadow casters and receivers (depending on the shadow technique they may not be able to be both at once, check the docs for your chosen technique first). You can disable shadows in various ways:
+<DL COMPACT>
+<DT>Turning off shadow casting on the light
+<DD>Calling Light::setCastsShadows(false) will mean this light casts no shadows at all.
+<DT>Turn off shadow receipt on a material
+<DD>Calling Material::setReceiveShadows(false) will prevent any objects using this material from receiving shadows.
+<DT>Turn off shadow casting on individual objects
+<DD>Calling MovableObject::setCastsShadows(false) will disable shadow casting for this object.
+<DT>Turn off shadows on an entire rendering queue group
+<DD>Calling RenderQueueGroup::setShadowsEnabled(false) will turn off both shadow casting and receiving on an entire rendering queue group. This is useful because Ogre has to do light setup tasks per group in order to preserve the inter-group ordering. Ogre automatically disables shadows on a number of groups automatically, such as RENDER_QUEUE_BACKGROUND, RENDER_QUEUE_OVERLAY, RENDER_QUEUE_SKIES_EARLY and RENDER_QUEUE_SKIES_LATE. If you choose to use more rendering queues (and by default, you won't be using any more than this plus the 'standard' queue, so ignore this if you don't know what it means!), be aware that each one can incur a light setup cost, and you should disable shadows on the additional ones you use if you can.
+</DL>
 
-<A NAME="Additive Light Masking"></A>
+<A NAME="Stencil Shadows"></A>
 <HR SIZE=1>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_69.html#SEC294"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_71.html#SEC304"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

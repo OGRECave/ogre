@@ -36,7 +36,7 @@ import math
 # OGRE_VERTEXCOLOUR_BGRA
 #  workaround for Ogre's vertex colour conversion bug.
 #  Set to 0 for RGBA, 1 for BGRA.
-OGRE_OPENGL_VERTEXCOLOUR = 1
+OGRE_OPENGL_VERTEXCOLOUR = 0
 
 class Vertex:
 	"""
@@ -130,13 +130,15 @@ class Vertex:
 							self.colourDiffuse = (bMCol.r/255.0, bMCol.g/255.0, bMCol.b/255.0, bMCol.a/255.0)
 		## texcoord
 		# origin in OGRE is top-left
-		for uvlayer in bMesh.getUVLayerNames():
-			bMesh.activeUVLayer = uvlayer
-			if bMesh.faceUV:
-				self.texcoords.append((bMFace.uv[bIndex][0], 1 - bMFace.uv[bIndex][1]))
-			elif bMesh.vertexUV:
-				self.texcoords.append((self.bMVert.uvco[0], 1 - self.bMVert.uvco[1]))
-
+		activeUVLayer = bMesh.activeUVLayer
+		if activeUVLayer:
+			for uvlayer in bMesh.getUVLayerNames():
+				bMesh.activeUVLayer = uvlayer
+				if bMesh.faceUV:
+					self.texcoords.append((bMFace.uv[bIndex][0], 1 - bMFace.uv[bIndex][1]))
+				elif bMesh.vertexUV:
+					self.texcoords.append((self.bMVert.uvco[0], 1 - self.bMVert.uvco[1]))
+			bMesh.activeUVLayer = activeUVLayer
 		return
 	def __eq__(self, other):
 		"""Tests if this vertex is equal to another vertex in the Ogre sense.

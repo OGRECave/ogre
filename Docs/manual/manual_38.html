@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Overlay Scripts</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Standard Particle Emitters</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Overlay Scripts">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Overlay Scripts">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Standard Particle Emitters">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Standard Particle Emitters">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,208 +24,149 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC223"></A>
+<A NAME="SEC213"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_37.html#SEC213"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_39.html#SEC229"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_37.html#SEC198"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC174"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_39.html#SEC221"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H2> 3.4 Overlay Scripts </H2>
-<!--docid::SEC223::-->
+<H3> 3.3.4 Standard Particle Emitters </H3>
+<!--docid::SEC213::-->
+Ogre comes preconfigured with a few particle emitters. New ones can be added by creating plugins: see the Plugin_ParticleFX project as an example of how you would do this (this is where these emitters are implemented).
 
-Overlay scripts offer you the ability to define overlays in a script which can be reused easily. Whilst you could set up all overlays for a scene in code using the methods of the SceneManager, Overlay and OverlayElement classes, in practice it's a bit unwieldy. Instead you can store overlay definitions in text files which can then be loaded whenever required.<BR><BR>
-
-<A NAME="SEC224"></A>
-<H2> Loading scripts    </H2>
-<!--docid::SEC224::-->
-
-Overlay scripts are loaded at initialisation time by the system: by default it looks in all common resource locations (see Root::addResourceLocation) for files with the '.overlay' extension and parses them. If you want to parse files with a different extension, use the OverlayManager::getSingleton().parseAllSources method with your own extension, or if you want to parse an individual file, use OverlayManager::getSingleton().parseScript.<BR><BR>
-
-<A NAME="SEC225"></A>
-<H2> Format    </H2>
-<!--docid::SEC225::-->
-
-Several overlays may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ({}), comments indicated by starting a line with '//' (note, no nested form comments allowed), and inheritance through the use of templates. The general format is shown below in a typical example:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>// The name of the overlay comes first
-MyOverlays/ANewOverlay
-{
-    zorder 200
-
-    container Panel(MyOverlayElements/TestPanel)
-    {
-        // Center it horzontally, put it at the top
-        left 0.25
-        top 0
-        width 0.5
-        height 0.1
-        material MyMaterials/APanelMaterial
-
-        // Another panel nested in this one
-        container Panel(MyOverlayElements/AnotherPanel)
-        {
-             left 0
-             top 0
-             width 0.1
-             height 0.1
-             material MyMaterials/NestedPanel
-        }
-    }
-
-}
-</pre></td></tr></table>
-The above example defines a single overlay called 'MyOverlays/ANewOverlay', with 2 panels in it, one nested under the other. It uses relative metrics (the default if no metrics_mode option is found).<BR><BR>
-
-Every overlay in the script must be given a name, which is the line before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your overlays, and also to avoid duplicate names, but the engine does not treat the name a hierarchical, just as a string. Within the braces are the properties of the overlay, and any nested elements. The overlay itself only has a single property 'zorder' which determines how'high' it is in the stack of overlays if more than one is displayed at the same time. Overlays with higher zorder values are displayed on top.<BR><BR>
-
-<A NAME="SEC226"></A>
-<H2> Adding elements to the overlay </H2>
-<!--docid::SEC226::-->
-
-Within an overlay, you can include any number of 2D or 3D elements. You do this by defining a nested block headed by:
-<DL COMPACT>
-<DT>'element'
-<DD>if you want to define a 2D element which cannot have children of it's own
-<DT>'container'
-<DD>if you want to define a 2D container object (which may itself have nested containers or elements)
-</DL>
-<BR>
-The element and container blocks are pretty identical apart from their ability to store nested blocks.
-
-<A NAME="SEC227"></A>
-<H2> 'container' / 'element' blocks </H2>
-<!--docid::SEC227::-->
-
-These are delimited by curly braces. The format for the header preceding the first brace is:<BR><BR>
-
-[container | element] &lt;type_name&gt; ( &lt;instance_name&gt;) [: &lt;template_name&gt;]<BR>
-{ ...<BR><BR>
-<DL COMPACT>
-<DT>type_name
-<DD>Must resolve to the name of a OverlayElement type which has been registered with the OverlayManager. Plugins register with the OverlayManager to advertise their ability to create elements, and at this time advertise the name of the type. OGRE comes preconfigured with types 'Panel', 'BorderPanel' and 'TextArea'.
-<DT>instance_name
-<DD>Must be a name unique among all other elements / containers by which to identify the element. Note that you can obtain a pointer to any named element by calling OverlayManager::getSingleton().getOverlayElement(name).
-<DT>template_name
-<DD>Optional template on which to base this item. See templates.
-</DL>
-
-The properties which can be included within the braces depend on the custom type. However the following are always valid:
 <UL>
 <LI>
-<A HREF="manual_39.html#SEC230">metrics_mode</A>
+<A HREF="manual_38.html#SEC214">Point Emitter</A>
 <LI>
-<A HREF="manual_39.html#SEC231">horz_align</A>
+<A HREF="manual_38.html#SEC215">Box Emitter</A>
 <LI>
-<A HREF="manual_39.html#SEC232">vert_align</A>
+<A HREF="manual_38.html#SEC216">Cylinder Emitter</A>
 <LI>
-<A HREF="manual_39.html#SEC233">left</A>
+<A HREF="manual_38.html#SEC217">Ellipsoid Emitter</A>
 <LI>
-<A HREF="manual_39.html#SEC234">top</A>
+<A HREF="manual_38.html#SEC218">Hollow Ellipsoid Emitter</A>
 <LI>
-<A HREF="manual_39.html#SEC235">width</A>
-<LI>
-<A HREF="manual_39.html#SEC236">height</A>
-<LI>
-<A HREF="manual_39.html#overlay_material">material</A>
-<LI>
-<A HREF="manual_39.html#SEC238">caption</A>
+<A HREF="manual_38.html#SEC219">Ring Emitter</A>
 </UL>
+<BR><BR>
+<A NAME="Point Emitter"></A>
+<A NAME="SEC214"></A>
+<H3> Point Emitter </H3>
+<!--docid::SEC214::-->
 
+This emitter emits particles from a single point, which is it's position. This emitter has no additional attributes over an above the standard emitter attributes.<BR><BR>
 
-<A NAME="SEC228"></A>
-<H2> Templates </H2>
-<!--docid::SEC228::-->
-
-You can use templates to create numerous elements with the same properties. A template is an abstract element and it is not added to an overlay. It acts as a base class that elements can inherit and get its default properties. To create a template, the keyword 'template' must be the first word in the element definition (before container or element). The template element is created in the topmost scope - it is NOT specified in an Overlay. It is recommended that you define templates in a separate overlay though this is not essential. Having templates defined in a separate file will allow different look &amp; feels to be easily substituted.<BR><BR>
-
-Elements can inherit a template in a similar way to C++ inheritance - by using the : operator on the element definition. The : operator is placed after the closing bracket of the name (separated by a space). The name of the template to inherit is then placed after the : operator (also separated by a space).<BR><BR>
-
-A template can contain template children which are created when the template is subclassed and instantiated. Using the template keyword for the children of a template is optional but recommended for clarity, as the children of a template are always going to be templates themselves.<BR><BR>
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>template container BorderPanel(MyTemplates/BasicBorderPanel)
+To create a point emitter, include a section like this within your particle system script:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>
+emitter Point
 {
-    left 0
-    top 0
-    width 1
-    height 1
-
-// setup the texture UVs for a borderpanel
-
-// do this in a template so it doesn't need to be redone everywhere
-    material Core/StatsBlockCenter
-    border_size 0.05 0.05 0.06665 0.06665
-    border_material Core/StatsBlockBorder
-    border_topleft_uv 0.0000 1.0000 0.1914 0.7969
-    border_top_uv 0.1914 1.0000 0.8086 0.7969
-    border_topright_uv 0.8086 1.0000 1.0000 0.7969
-    border_left_uv 0.0000 0.7969 0.1914 0.2148
-    border_right_uv 0.8086 0.7969 1.0000 0.2148
-    border_bottomleft_uv 0.0000 0.2148 0.1914 0.0000
-    border_bottom_uv 0.1914 0.2148 0.8086 0.0000
-    border_bottomright_uv 0.8086 0.2148 1.0000 0.0000
+    // Settings go here
 }
-template container Button(MyTemplates/BasicButton) : MyTemplates/BasicBorderPanel
+</pre></td></tr></table><BR>
+Please note that the name of the emitter ('Point') is case-sensitive.
+
+<A NAME="Box Emitter"></A>
+<A NAME="SEC215"></A>
+<H3> Box Emitter </H3>
+<!--docid::SEC215::-->
+
+This emitter emits particles from a random location within a 3-dimensional box. It's extra attributes are:<BR><BR>
+<DL COMPACT>
+<DT>width
+<DD>Sets the width of the box (this is the size of the box along it's local X axis, which is dependent on the 'direction' attribute which forms the box's local Z).<BR>
+format: width &lt;units&gt;<BR>
+example: width 250<BR>
+default: 100<BR>
+<DT>height
+<DD>Sets the height of the box (this is the size of the box along it's local Y axis, which is dependent on the 'direction' attribute which forms the box's local Z).<BR>
+format: height &lt;units&gt;<BR>
+example: height 250<BR>
+default: 100<BR>
+<DT>depth
+<DD>Sets the depth of the box (this is the size of the box along it's local Z axis, which is the same as the 'direction' attribute).<BR>
+format: depth &lt;units&gt;<BR>
+example: depth 250<BR>
+default: 100<BR>
+</DL>
+<BR>
+To create a box emitter, include a section like this within your particle system script:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>emitter Box
 {
-    left 0.82
-    top 0.45
-    width 0.16
-    height 0.13
-    material Core/StatsBlockCenter
-    border_up_material Core/StatsBlockBorder/Up
-    border_down_material Core/StatsBlockBorder/Down
+    // Settings go here
 }
-template element TextArea(MyTemplates/BasicText)
-{
-    font_name Ogre
-    char_height 0.08
-    colour_top 1 1 0
-    colour_bottom 1 0.2 0.2
-    left 0.03
-    top 0.02
-    width 0.12
-    height 0.09
-}
+</pre></td></tr></table>
+<A NAME="Cylinder Emitter"></A>
+<A NAME="SEC216"></A>
+<H3> Cylinder Emitter </H3>
+<!--docid::SEC216::-->
 
-MyOverlays/AnotherOverlay
-{
-    zorder 490
-    container BorderPanel(MyElements/BackPanel) : MyTemplates/BasicBorderPanel
-    {
-        left 0
-        top 0
-        width 1
-        height 1
+This emitter emits particles in a random direction from within a cylinder area, where the cylinder is oriented along the Z-axis. This emitter has exactly the same parameters as the <A HREF="manual_38.html#SEC215">Box Emitter</A> so there are no additional parameters to consider here - the width and height determine the shape of the cylinder along it's axis (if they are different it is an ellipsoid cylinder), the depth determines the length of the cylinder. 
 
-        container Button(MyElements/HostButton) : MyTemplates/BasicButton
-        {
-            left 0.82
-            top 0.45
-            caption MyTemplates/BasicText HOST
-        }
+<A NAME="Ellipsoid Emitter"></A>
+<A NAME="SEC217"></A>
+<H3> Ellipsoid Emitter </H3>
+<!--docid::SEC217::-->
+This emitter emits particles from within an ellipsoid shaped area, ie a sphere or squashed-sphere area. The parameters are again identical to the <A HREF="manual_38.html#SEC215">Box Emitter</A>, except that the dimensions describe the widest points along each of the axes.
 
-        container Button(MyElements/JoinButton) : MyTemplates/BasicButton
-        {
-            left 0.82
-            top 0.60
-            caption MyTemplates/BasicText JOIN
-        }
-    }
-}
-</pre></td></tr></table>The above example uses templates to define a button. Note that the button template inherits from the borderPanel template. This reduces the number of attributes needed to instantiate a button.<BR><BR>
+<A NAME="Hollow Ellipsoid Emitter"></A>
+<A NAME="SEC218"></A>
+<H3> Hollow Ellipsoid Emitter </H3>
+<!--docid::SEC218::-->
+This emitter is just like <A HREF="manual_38.html#SEC217">Ellipsoid Emitter</A> except that there is a hollow area in the centre of the ellipsoid from which no particles are emitted. Therefore it has 3 extra parameters in order to define this area:
 
-Also note that the instantiate of a Button needs a template name for the caption attribute. So templates can also be used by elements that need dynamic creation of children elements (the button creates a TextAreaElement in this case for its caption).<BR><BR>
+<DL COMPACT>
+<DT>inner_width
+<DD>The width of the inner area which does not emit any particles.
+<DT>inner_height
+<DD>The height of the inner area which does not emit any particles.
+<DT>inner_depth
+<DD>The depth of the inner area which does not emit any particles.
+</DL>
 
-See section <A HREF="manual_39.html#SEC229">3.4.1 OverlayElement Attributes</A>, <A HREF="manual_40.html#SEC240">3.4.2 Standard OverlayElements</A>
+<A NAME="Ring Emitter"></A>
+<A NAME="SEC219"></A>
+<H3> Ring Emitter </H3>
+<!--docid::SEC219::-->
+This emitter emits particles from a ring-shaped area, ie a little like <A HREF="manual_38.html#SEC218">Hollow Ellipsoid Emitter</A> except only in 2 dimensions.
 
-<A NAME="OverlayElement Attributes"></A>
+<DL COMPACT>
+<DT>inner_width
+<DD>The width of the inner area which does not emit any particles.
+<DT>inner_height
+<DD>The height of the inner area which does not emit any particles.
+</DL>
+<BR><BR>
+
+See also: <A HREF="manual_34.html#SEC174">3.3 Particle Scripts</A>, <A HREF="manual_36.html#SEC196">3.3.2 Particle Emitters</A>
+
+<A NAME="SEC220"></A>
+<H3> Emitting Emitters </H3>
+<!--docid::SEC220::-->
+<A NAME="Emitting Emitters"></A>
+
+It is possible to spawn new emitters on the expiry of particles, for example to product 'firework' style effects. This is controlled via the following directives:
+
+<DL COMPACT>
+<DT>emit_emitter_quota
+<DD>This parameter is a system-level parameter telling the system how many emitted emitters may be in use at any one time. This is just to allow for the space allocation process.
+<DT>name
+<DD>This parameter is an emitter-level parameter, giving a name to an emitter. This can then be referred to in another emitter as the new emitter type to spawn when an emitted particle dies.
+<DT>emit_emitter
+<DD>This is an emitter-level parameter, and if specified, it means that when particles emitted by this emitter die, they spawn a new emitter of the named type.
+</DL>
+
+
+<A NAME="Particle Affectors"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_37.html#SEC213"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_39.html#SEC229"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_37.html#SEC198"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC174"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_39.html#SEC221"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -234,7 +175,7 @@ See section <A HREF="manual_39.html#SEC229">3.4.1 OverlayElement Attributes</A>,
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

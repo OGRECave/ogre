@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Pixel Formats</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Textures</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Pixel Formats">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Pixel Formats">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Textures">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Textures">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -26,108 +26,83 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <A NAME="SEC281"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_63.html#SEC279"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_60.html#SEC271"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_65.html#SEC284"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_63.html#SEC280"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_63.html#SEC280"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_65.html#SEC285"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H3> 5.8.4 Pixel Formats </H3>
+<H3> 5.8.1 Textures </H3>
 <!--docid::SEC281::-->
 
-A pixel format described the storage format of pixel data. It defines the way pixels are encoded in memory. The following classes of pixel formats (PF_*) are defined:
-
-<DL COMPACT>
-<DT>Native endian formats (PF_A8R8G8B8 and other formats with bit counts)
-<DD>These are native endian (16, 24 and 32 bit) integers in memory. This means that an image with format PF_A8R8G8B8 can be seen as an array of 32 bit integers, defined as 0xAARRGGBB in hexadecimal. The meaning of the letters is described below.
-
-<DT>Byte formats (PF_BYTE_*)
-<DD>These formats have one byte per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF_BYTE_RGBA consists of blocks of four bytes, one for red, one for green, one for blue, one for alpha.
-
-<DT>Short formats (PF_SHORT_*)
-<DD>These formats have one unsigned short (16 bit integer) per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF_SHORT_RGBA consists of blocks of four 16 bit integers, one for red, one for green, one for blue, one for alpha.
-
-<DT>Float16 formats (PF_FLOAT16_*)
-<DD>These formats have one 16 bit floating point number per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF_FLOAT16_RGBA consists of blocks of four 16 bit floats, one for red, one for green, one for blue, one for alpha. The 16 bit floats, also called half float) are very similar to the IEEE single-precision floating-point standard of the 32 bits floats, except that they have only 5 exponent bits and 10 mantissa. Note that there is no standard C++ data type or CPU support to work with these efficiently, but GPUs can
-calculate with these much more efficiently than with 32 bit floats.
-
-<DT>Float32 formats (PF_FLOAT32_*)
-<DD>These formats have one 32 bit floating point number per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF_FLOAT32_RGBA consists of blocks of four 32 bit floats, one for red, one for green, one for blue, one for alpha. The C++ data type for these 32 bits floats is just &quot;float&quot;.
-
-<DT>Compressed formats (PF_DXT[1-5])
-<DD>S3TC compressed texture formats, a good description can be found at | Wikipedia (http://en.wikipedia.org/wiki/S3TC)
-
-</DL>
+A texture is an image that can be applied onto the surface of a three dimensional model. In Ogre, textures are represented by the Texture resource class.
 
 <A NAME="SEC282"></A>
-<H3> Colour channels </H3>
+<H3> Creating a texture </H3>
 <!--docid::SEC282::-->
 
-The meaning of the channels R,G,B,A,L and X is defined as
+Textures are created through the TextureManager. In most cases they are created from image files directly by the
+Ogre resource system. If you are reading this, you most probably want to create a texture manually so that you can provide it with image data yourself. This is done through TextureManager::createManual:
 
-<DL COMPACT>
-<DT>R
-<DD>Red colour component, usually ranging from 0.0 (no red) to 1.0 (full red).
-<DT>G
-<DD>Green colour component, usually ranging from 0.0 (no green) to 1.0 (full green).
-<DT>B
-<DD>Blue colour component, usually ranging from 0.0 (no blue) to 1.0 (full blue).
-<DT>A
-<DD>Alpha component, usually ranging from 0.0 (entire transparent) to 1.0 (opaque).
-<DT>L
-<DD>Luminance component, usually ranging from 0.0 (black) to 1.0 (white). The luminance component is duplicated in the R, G, and B channels to achieve a greyscale image.
-<DT>X
-<DD>This component is completely ignored.
-</DL>
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>ptex = TextureManager::getSingleton().createManual(
+    &quot;MyManualTexture&quot;, // Name of texture
+    &quot;General&quot;, // Name of resource group in which the texture should be created
+    TEX_TYPE_2D, // Texture type
+    256, // Width
+    256, // Height
+    1, // Depth (Must be 1 for two dimensional textures)
+    0, // Number of mipmaps
+    PF_A8R8G8B8, // Pixel format
+    TU_DYNAMIC_WRITE_ONLY // usage
+);
+</pre></td></tr></table>
+This example creates a texture named <EM>MyManualTexture</EM> in resource group <EM>General</EM>. It is a
+square <EM>two dimensional</EM> texture, with width 256 and height 256. It has <EM>no mipmaps</EM>, internal
+format <EM>PF_A8R8G8B8</EM> and usage <EM>TU_DYNAMIC_WRITE_ONLY</EM>.
 
-If none of red, green and blue components, or luminance is defined in a format, these default to 0. For the alpha channel this is different; if no alpha is defined, it defaults to 1. 
+The different texture types will be discussed in <A HREF="manual_66.html#SEC288">5.8.3 Texture Types</A>. Pixel formats are summarised in
+<A HREF="manual_67.html#SEC290">5.8.4 Pixel Formats</A>.
 
 <A NAME="SEC283"></A>
-<H3> Complete list of pixel formats </H3>
+<H3> Texture usages </H3>
 <!--docid::SEC283::-->
 
-This pixel formats supported by the current version of Ogre are
-
+In addition to the hardware buffer usages as described in See section <A HREF="manual_51.html#SEC263">5.2 Buffer Usage</A> there are some usage flags specific to textures:
 <DL COMPACT>
-
-<DT>Byte formats
-<DD>PF_BYTE_RGB, PF_BYTE_BGR, PF_BYTE_BGRA, PF_BYTE_RGBA, PF_BYTE_L, PF_BYTE_LA, PF_BYTE_A
-
-<DT>Short formats
-<DD>PF_SHORT_RGBA
-
-<DT>Float16 formats
-<DD>PF_FLOAT16_R, PF_FLOAT16_RGB, PF_FLOAT16_RGBA
-
-<DT>Float32 formats
-<DD>PF_FLOAT32_R, PF_FLOAT32_RGB, PF_FLOAT32_RGBA
-
-<DT>8 bit native endian formats
-<DD>PF_L8, PF_A8, PF_A4L4, PF_R3G3B2
-
-<DT>16 bit native endian formats
-<DD>PF_L16, PF_R5G6B5, PF_B5G6R5, PF_A4R4G4B4, PF_A1R5G5B5
-
-<DT>24 bit native endian formats
-<DD>PF_R8G8B8, PF_B8G8R8
-
-<DT>32 bit native endian formats
-<DD>PF_A8R8G8B8, PF_A8B8G8R8, PF_B8G8R8A8, PF_R8G8B8A8, PF_X8R8G8B8, PF_X8B8G8R8, PF_A2R10G10B10 PF_A2B10G10R10
-
-<DT>Compressed formats
-<DD>PF_DXT1, PF_DXT2, PF_DXT3, PF_DXT4, PF_DXT5
+<DT>TU_AUTOMIPMAP
+<DD>Mipmaps for this texture will be automatically generated by the graphics hardware. The exact algorithm used is not
+defined, but you can assume it to be a 2x2 box filter.
+<DT>TU_RENDERTARGET
+<DD>This texture will be a render target, ie. used as a target for render to texture. Setting this flag will ignore all other texture usages except TU_AUTOMIPMAP.
+<DT>TU_DEFAULT
+<DD>This is actualy a combination of usage flags, and is equivalent to TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY. The resource
+system uses these flags for textures that are loaded from images.
 
 </DL>
 
-<A NAME="Pixel boxes"></A>
+<A NAME="SEC284"></A>
+<H3> Getting a PixelBuffer </H3>
+<!--docid::SEC284::-->
+
+A Texture can consist of multiple PixelBuffers, one for each combo if mipmap level and face number. To get a PixelBuffer from a Texture object the method Texture::getBuffer(face, mipmap) is used:
+
+<EM>face</EM> should be zero for non-cubemap textures. For cubemap textures it identifies the face to use, which is one of the cube faces described in See section <A HREF="manual_66.html#SEC288">5.8.3 Texture Types</A>.
+
+<EM>mipmap</EM> is zero for the zeroth mipmap level, one for the first mipmap level, and so on. On textures that have automatic mipmap generation (TU_AUTOMIPMAP) only level 0 should be accessed, the rest will be taken care of by the rendering API.
+
+A simple example of using getBuffer is
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>// Get the PixelBuffer for face 0, mipmap 0.
+HardwarePixelBufferSharedPtr ptr = tex-&gt;getBuffer(0,0);
+</pre></td></tr></table>
+<A NAME="Updating Pixel Buffers"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_63.html#SEC279"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_60.html#SEC271"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_65.html#SEC284"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_63.html#SEC280"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_63.html#SEC280"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_65.html#SEC285"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -136,7 +111,7 @@ This pixel formats supported by the current version of Ogre are
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

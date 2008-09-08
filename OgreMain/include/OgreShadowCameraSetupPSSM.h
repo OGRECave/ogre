@@ -68,11 +68,11 @@ namespace Ogre
 
 		/** Calculate a new splitting scheme.
 		@param splitCount The number of splits to use
-		@param near The near plane to use for the first split
-		@param far The far plane to use for the last split
+		@param nearDist The near plane to use for the first split
+		@param farDist The far plane to use for the last split
 		@param lambda Factor to use to reduce the split size 
 		*/
-		void calculateSplitPoints(size_t splitCount, Real near, Real far, Real lambda = 0.95);
+		void calculateSplitPoints(size_t splitCount, Real nearDist, Real farDist, Real lambda = 0.95);
 
 		/** Manually configure a new splitting scheme.
 		@param newSplitPoints A list which is splitCount + 1 entries long, containing the

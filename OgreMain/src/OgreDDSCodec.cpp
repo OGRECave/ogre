@@ -581,7 +581,9 @@ namespace Ogre {
 						// 4x4 block of decompressed colour
 						ColourValue tempColours[16];
 						size_t destBpp = PixelUtil::getNumElemBytes(imgData->format);
-						size_t destPitchMinus4 = dstPitch - destBpp * 4;
+						size_t sx = std::min(width, (size_t)4);
+						size_t sy = std::min(height, (size_t)4);
+						size_t destPitchMinus4 = dstPitch - destBpp * sx;
 						// slices are done individually
 						for(size_t z = 0; z < depth; ++z)
 						{
@@ -614,9 +616,9 @@ namespace Ogre {
 									unpackDXTColour(sourceFormat, col, tempColours);
 
 									// write 4x4 block to uncompressed version
-									for (size_t by = 0; by < 4; ++by)
+									for (size_t by = 0; by < sy; ++by)
 									{
-										for (size_t bx = 0; bx < 4; ++bx)
+										for (size_t bx = 0; bx < sx; ++bx)
 										{
 											PixelUtil::packColour(tempColours[by*4+bx],
 												imgData->format, destPtr);
@@ -629,7 +631,7 @@ namespace Ogre {
 									}
 									// next block. Our dest pointer is 4 lines down
 									// from where it started
-									if (x + 4 == width)
+									if (x + 4 >= width)
 									{
 										// Jump back to the start of the line
 										destPtr = static_cast<void*>(
@@ -640,7 +642,7 @@ namespace Ogre {
 										// Jump back up 4 rows and 4 pixels to the
 										// right to be at the next block to the right
 										destPtr = static_cast<void*>(
-											static_cast<uchar*>(destPtr) - dstPitch * 4 + destBpp * 4);
+											static_cast<uchar*>(destPtr) - dstPitch * sy + destBpp * sx);
 
 									}
 

@@ -57,9 +57,11 @@ namespace Ogre {
          mInverseViewMatrixDirty(true),
          mInverseTransposeWorldMatrixDirty(true),
          mInverseTransposeWorldViewMatrixDirty(true),
+		 mCameraPositionDirty(true),
          mCameraPositionObjectSpaceDirty(true),
-         mCameraPositionDirty(true),
 		 mSceneDepthRangeDirty(true),
+		 mLodCameraPositionDirty(true),
+		 mLodCameraPositionObjectSpaceDirty(true),
          mCurrentRenderable(0),
          mCurrentCamera(0), 
 		 mCameraRelativeRendering(false),
@@ -116,6 +118,7 @@ namespace Ogre {
 		mInverseTransposeWorldMatrixDirty = true;
 		mInverseTransposeWorldViewMatrixDirty = true;
 		mCameraPositionObjectSpaceDirty = true;
+		mLodCameraPositionObjectSpaceDirty = true;
 		for(size_t i = 0; i < OGRE_MAX_SIMULTANEOUS_LIGHTS; ++i)
 		{
 			mTextureWorldViewProjMatrixDirty[i] = true;
@@ -139,6 +142,8 @@ namespace Ogre {
         mInverseTransposeWorldViewMatrixDirty = true;
         mCameraPositionObjectSpaceDirty = true;
         mCameraPositionDirty = true;
+		mLodCameraPositionObjectSpaceDirty = true;
+		mLodCameraPositionDirty = true;
     }
     //-----------------------------------------------------------------------------
     void AutoParamDataSource::setCurrentLightList(const LightList* ll)
@@ -449,7 +454,32 @@ namespace Ogre {
             mCameraPositionObjectSpaceDirty = false;
         }
         return mCameraPositionObjectSpace;
-    }    
+    }
+	//-----------------------------------------------------------------------------
+	const Vector4& AutoParamDataSource::getLodCameraPosition(void) const
+	{
+		if(mLodCameraPositionDirty)
+		{
+			Vector3 vec3 = mCurrentCamera->getLodCamera()->getDerivedPosition();
+			mLodCameraPosition[0] = vec3[0];
+			mLodCameraPosition[1] = vec3[1];
+			mLodCameraPosition[2] = vec3[2];
+			mLodCameraPosition[3] = 1.0;
+			mLodCameraPositionDirty = false;
+		}
+		return mLodCameraPosition;
+	}
+	//-----------------------------------------------------------------------------
+	const Vector4& AutoParamDataSource::getLodCameraPositionObjectSpace(void) const
+	{
+		if (mLodCameraPositionObjectSpaceDirty)
+		{
+			mLodCameraPositionObjectSpace = 
+				getInverseWorldMatrix().transformAffine(mCurrentCamera->getLodCamera()->getDerivedPosition());
+			mLodCameraPositionObjectSpaceDirty = false;
+		}
+		return mLodCameraPositionObjectSpace;
+	}
     //-----------------------------------------------------------------------------
 	void AutoParamDataSource::setAmbientLightColour(const ColourValue& ambient)
 	{

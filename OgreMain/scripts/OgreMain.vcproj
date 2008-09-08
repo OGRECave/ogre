@@ -519,9 +519,6 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 				RelativePath="..\src\OgreMemoryAllocatedObject.cpp">
 			</File>
 			<File
-				RelativePath="..\src\OgreMemoryManager.cpp">
-			</File>
-			<File
 				RelativePath="..\src\OgreMemoryNedAlloc.cpp">
 			</File>
 			<File

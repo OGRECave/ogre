@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on June 22 2007 by texi2html 1.66 -->
+<!-- Created on August 27 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.5.0 ('Shoggoth'): Pixel boxes</TITLE>
+<TITLE>OGRE Manual v1.6 ('Shoggoth'): Updating Pixel Buffers</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Pixel boxes">
-<META NAME="keywords" CONTENT="OGRE Manual v1.5.0 ('Shoggoth'): Pixel boxes">
+<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Updating Pixel Buffers">
+<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Updating Pixel Buffers">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,73 +24,78 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC284"></A>
+<A NAME="SEC285"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
 <TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_64.html#SEC281"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_60.html#SEC271"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_66.html#SEC285"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_63.html#SEC280"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_66.html#SEC288"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H3> 5.8.5 Pixel boxes </H3>
-<!--docid::SEC284::-->
+<H3> 5.8.2 Updating Pixel Buffers </H3>
+<!--docid::SEC285::-->
 
-All methods in Ogre that take or return raw image data return a PixelBox object.
+Pixel Buffers can be updated in two different ways; a simple, convient way and a more difficult (but in some cases faster) method. Both methods make use of PixelBox objects (See section <A HREF="manual_68.html#SEC293">5.8.5 Pixel boxes</A>) to represent image data in memory.
 
-A PixelBox is a primitive describing a volume (3D), image (2D) or line (1D) of pixels in CPU memory. It describes the location and data format of a region of memory used for image data, but does not do any memory management in itself.
+<A NAME="SEC286"></A>
+<H3> blitFromMemory </H3>
+<!--docid::SEC286::-->
 
-Inside the memory pointed to by the <EM>data</EM> member of a pixel box, pixels are stored as a succession of &quot;depth&quot; slices (in Z), each containing &quot;height&quot; rows (Y) of &quot;width&quot; pixels (X).
+The easy method to get an image into a PixelBuffer is by using HardwarePixelBuffer::blitFromMemory. This takes a PixelBox object and does all necessary pixel format conversion and scaling for you. For example, to create a manual texture and load an image into it, all you have to do is
 
-Dimensions that are not used must be 1. For example, a one dimensional image will have extents (width,1,1). A two dimensional image has extents (width,height,1).
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>// Manually loads an image and puts the contents in a manually created texture
+Image img;
+img.load(&quot;elephant.png&quot;, &quot;General&quot;);
+// Create RGB texture with 5 mipmaps
+TexturePtr tex = TextureManager::getSingleton().createManual(
+    &quot;elephant&quot;,
+    &quot;General&quot;,
+    TEX_TYPE_2D,
+    img.getWidth(), img.getHeight(),
+    5, PF_X8R8G8B8);
+// Copy face 0 mipmap 0 of the image to face 0 mipmap 0 of the texture.
+tex-&gt;getBuffer(0,0)-&gt;blitFromMemory(img.getPixelBox(0,0));
+</pre></td></tr></table>
+<A NAME="SEC287"></A>
+<H3> Direct memory locking </H3>
+<!--docid::SEC287::-->
 
-A PixelBox has the following members:
-<DL COMPACT>
-<DT>data
-<DD>The pointer to the first component of the image data in memory.
-<DT>format
-<DD>The pixel format (See section <A HREF="manual_64.html#SEC281">5.8.4 Pixel Formats</A>) of the image data.
-<DT>rowPitch
-<DD>The number of elements between the leftmost pixel of one row and the left pixel of the next. This value must always be equal to getWidth() (consecutive) for compressed formats.
-<DT>slicePitch
-<DD>The number of elements between the top left pixel of one (depth) slice and the top left pixel of the next. Must be a multiple of  rowPitch. This value must always be equal to getWidth()*getHeight() (consecutive)
-for compressed formats.
-<DT>left, top, right, bottom, front, back
-<DD>Extents of the box in three dimensional integer space. Note that the left, top, and front edges are included but the right, bottom and top ones are not. <EM>left</EM> must always be smaller or equal to <EM>right</EM>, <EM>top</EM> must always be smaller or equal to <EM>bottom</EM>, and <EM>front</EM> must always be smaller or equal to <EM>back</EM>.
-</DL>
+A more advanced method to transfer image data from and to a PixelBuffer is to use locking. By locking a PixelBuffer
+you can directly access its contents in whatever the internal format of the buffer inside the GPU is.
 
-It also has some useful methods:
-<DL COMPACT>
-<DT>getWidth()
-<DD>Get the width of this box
-<DT>getHeight()
-<DD>Get the height of this box. This is 1 for one dimensional images.
-<DT>getDepth()
-<DD>Get the depth of this box. This is 1 for one and two dimensional images.
-<DT>setConsecutive()
-<DD>Set the rowPitch and slicePitch so that the buffer is laid out consecutive in memory.
-<DT>getRowSkip()
-<DD>Get the number of elements between one past the rightmost pixel of one row and the leftmost pixel of the next row. This is zero if rows are consecutive.
-<DT>getSliceSkip()
-<DD>Get the number of elements between one past the right bottom pixel of one slice and the left top pixel of the next slice. This is zero if slices are consecutive.
-<DT>isConsecutive()
-<DD>Return whether this buffer is laid out consecutive in memory (ie the pitches are equal to the dimensions)
-<DT>getConsecutiveSize()
-<DD>Return the size (in bytes) this image would take if it was laid out consecutive in memory
-<DT>getSubVolume(const Box &amp;def)
-<DD>Return a subvolume of this PixelBox, as a PixelBox.
-</DL>
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>/// Lock the buffer so we can write to it
+buffer-&gt;lock(HardwareBuffer::HBL_DISCARD);
+const PixelBox &amp;pb = buffer-&gt;getCurrentLock();
 
-For more information about these methods consult the API documentation.
+/// Update the contents of pb here
+/// Image data starts at pb.data and has format pb.format
+/// Here we assume data.format is PF_X8R8G8B8 so we can address pixels as uint32.
+uint32 *data = static_cast&lt;uint32*&gt;(pb.data);
+size_t height = pb.getHeight();
+size_t width = pb.getWidth();
+size_t pitch = pb.rowPitch; // Skip between rows of image
+for(size_t y=0; y&lt;height; ++y)
+{
+    for(size_t x=0; x&lt;width; ++x)
+{
+        // 0xRRGGBB -&gt; fill the buffer with yellow pixels
+        data[pitch*y + x] = 0x00FFFF00;
+}
+}
 
-<A NAME="External Texture Sources"></A>
+/// Unlock the buffer again (frees it for use by the GPU)
+buffer-&gt;unlock();
+</pre></td></tr></table>
+
+<A NAME="Texture Types"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
 <TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_64.html#SEC281"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_60.html#SEC271"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_66.html#SEC285"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_63.html#SEC280"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_66.html#SEC288"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -99,7 +104,7 @@ For more information about these methods consult the API documentation.
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>June 22 2007</I>
+by <I>steve</I> on <I>August 27 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 
