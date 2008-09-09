@@ -42,7 +42,7 @@ namespace Ogre {
 	class _OgreExport CompositorInstance : public CompositorInstAlloc
     {
     public:
-        CompositorInstance(Compositor *filter, CompositionTechnique *technique, CompositorChain *chain);
+        CompositorInstance(CompositionTechnique *technique, CompositorChain *chain);
         virtual ~CompositorInstance();
 		/** Provides an interface to "listen in" to to render system operations executed by this 
 			CompositorInstance.

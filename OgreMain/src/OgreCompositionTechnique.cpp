@@ -46,12 +46,6 @@ CompositionTechnique::CompositionTechnique(Compositor *parent):
 //-----------------------------------------------------------------------
 CompositionTechnique::~CompositionTechnique()
 {
-	/// Destroy all instances by removing them from their chain
-	/// CompositorChain::removeInstance also calls destroyInstance
-	Instances copy = mInstances;
-	for(Instances::iterator i=copy.begin(); i!=copy.end(); ++i)
-		(*i)->getChain()->_removeInstance(*i);
-
     removeAllTextureDefinitions();
     removeAllTargetPasses();
     OGRE_DELETE  mOutputTarget;
@@ -221,21 +215,6 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
 	
 	// Must be ok
 	return true;
-}
-//-----------------------------------------------------------------------
-CompositorInstance *CompositionTechnique::createInstance(CompositorChain *chain)
-{
-	CompositorInstance *mew = OGRE_NEW CompositorInstance(mParent, this, chain);
-	mInstances.push_back(mew);
-    return mew;
-}
-//-----------------------------------------------------------------------
-void CompositionTechnique::destroyInstance(CompositorInstance *instance)
-{
-    assert(instance->getTechnique() == this);
-	/// Erase from list of instances
-	mInstances.erase(std::find(mInstances.begin(), mInstances.end(), instance));
-    OGRE_DELETE  instance;
 }
 //-----------------------------------------------------------------------
 Compositor *CompositionTechnique::getParent()

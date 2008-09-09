@@ -117,14 +117,6 @@ namespace Ogre {
          */
         virtual bool isSupported(bool allowTextureDegradation);
         
-        /** Create an instance of this technique.
-         */
-        virtual CompositorInstance *createInstance(CompositorChain *chain);
-        
-        /** Destroy an instance of this technique.
-         */
-        virtual void destroyInstance(CompositorInstance *instance);
-        
         /** Get parent object */
         Compositor *getParent();
     private:
@@ -138,9 +130,6 @@ namespace Ogre {
         /// Output target pass (can be only one)
         CompositionTargetPass *mOutputTarget;    
 
-		/// List of instances
-		typedef std::vector<CompositorInstance *> Instances;
-		Instances mInstances;
     };
 
 }

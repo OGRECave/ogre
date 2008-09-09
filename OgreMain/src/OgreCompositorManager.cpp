@@ -276,4 +276,5 @@ void CompositorManager::_reconstructAllCompositorResources()
 	}
 }
 
+
 }

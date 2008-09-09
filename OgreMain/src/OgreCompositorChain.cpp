@@ -66,7 +66,7 @@ void CompositorChain::destroyResources(void)
 		/// Destroy "original scene" compositor instance
 		if (mOriginalScene)
 		{
-			mOriginalScene->getTechnique()->destroyInstance(mOriginalScene);
+			OGRE_DELETE mOriginalScene;
 			mOriginalScene = 0;
 		}
 		mViewport = 0;
@@ -83,7 +83,7 @@ CompositorInstance* CompositorChain::addCompositor(CompositorPtr filter, size_t 
 		/// Create base "original scene" compositor
 		CompositorPtr base = CompositorManager::getSingleton().load("Ogre/Scene",
 			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-		mOriginalScene = base->getSupportedTechnique(0)->createInstance(this);
+		mOriginalScene = OGRE_NEW CompositorInstance(base->getSupportedTechnique(0), this);
 	}
 
 
@@ -97,7 +97,7 @@ CompositorInstance* CompositorChain::addCompositor(CompositorPtr filter, size_t 
         return 0;
     }
     CompositionTechnique *tech = filter->getSupportedTechnique(technique);
-    CompositorInstance *t = tech->createInstance(this);
+    CompositorInstance *t = OGRE_NEW CompositorInstance(tech, this);
     
     if(addPosition == LAST)
         addPosition = mInstances.size();
@@ -114,7 +114,7 @@ void CompositorChain::removeCompositor(size_t index)
 {
     assert (index < mInstances.size() && "Index out of bounds.");
     Instances::iterator i = mInstances.begin() + index;
-    (*i)->getTechnique()->destroyInstance(*i);
+    OGRE_DELETE *i;
     mInstances.erase(i);
     
     mDirty = true;
@@ -131,7 +131,7 @@ void CompositorChain::removeAllCompositors()
     iend = mInstances.end();
     for (i = mInstances.begin(); i != iend; ++i)
     {
-        (*i)->getTechnique()->destroyInstance(*i);
+		OGRE_DELETE *i;
     }
     mInstances.clear();
     
@@ -141,7 +141,7 @@ void CompositorChain::removeAllCompositors()
 void CompositorChain::_removeInstance(CompositorInstance *i)
 {
 	mInstances.erase(std::find(mInstances.begin(), mInstances.end(), i));
-	i->getTechnique()->destroyInstance(i);
+	OGRE_DELETE i;
 }
 //-----------------------------------------------------------------------
 void CompositorChain::_queuedOperation(CompositorInstance::RenderSystemOperation* op)

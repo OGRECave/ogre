@@ -48,9 +48,9 @@ Torus Knot Software Ltd.
 #include "OgreRenderSystem.h"
 
 namespace Ogre {
-CompositorInstance::CompositorInstance(Compositor *filter, CompositionTechnique *technique,
+CompositorInstance::CompositorInstance(CompositionTechnique *technique,
     CompositorChain *chain):
-    mCompositor(filter), mTechnique(technique), mChain(chain),
+    mCompositor(technique->getParent()), mTechnique(technique), mChain(chain),
 		mEnabled(false)
 {
 }

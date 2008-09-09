@@ -114,6 +114,7 @@ namespace Ogre {
 		/** Internal method for forcing all active compositors to recreate their resources. */
 		void _reconstructAllCompositorResources();
 
+
 		/** Override standard Singleton retrieval.
 		@remarks
 		Why do we do this? Well, it's because the Singleton
@@ -160,7 +161,13 @@ namespace Ogre {
         void freeChains();
 
 		Rectangle2D *mRectangle;
+
+		/// List of instances
+		typedef std::vector<CompositorInstance *> Instances;
+		Instances mInstances;
+
     };
+
 }
 
 #endif
