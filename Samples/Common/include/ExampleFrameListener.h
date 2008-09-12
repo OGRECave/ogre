@@ -89,7 +89,7 @@ public:
 	// Constructor takes a RenderWindow because it uses that to determine input context
 	ExampleFrameListener(RenderWindow* win, Camera* cam, bool bufferedKeys = false, bool bufferedMouse = false,
 			     bool bufferedJoy = false ) :
-		mCamera(cam), mTranslateVector(Vector3::ZERO), mWindow(win), mStatsOn(true), mNumScreenShots(0),
+		mCamera(cam), mTranslateVector(Vector3::ZERO), mCurrentSpeed(0), mWindow(win), mStatsOn(true), mNumScreenShots(0),
 		mMoveScale(0.0f), mRotScale(0.0f), mTimeUntilNextToggle(0), mFiltering(TFO_BILINEAR),
 		mAniso(1), mSceneDetailIndex(0), mMoveSpeed(100), mRotateSpeed(36), mDebugOverlay(0),
 		mInputManager(0), mMouse(0), mKeyboard(0), mJoy(0)
@@ -315,12 +315,16 @@ public:
 
 		if(mWindow->isClosed())	return false;
 
+		mSpeedLimit = mMoveScale * evt.timeSinceLastFrame;
+
 		//Need to capture/update each device
 		mKeyboard->capture();
 		mMouse->capture();
 		if( mJoy ) mJoy->capture();
 
 		bool buffJ = (mJoy) ? mJoy->buffered() : true;
+
+		Vector3 lastMotion = mTranslateVector;
 
 		//Check if one of the devices is not buffered
 		if( !mMouse->buffered() || !mKeyboard->buffered() || !buffJ )
@@ -337,6 +341,7 @@ public:
 			mRotX = 0;
 			mRotY = 0;
 			mTranslateVector = Ogre::Vector3::ZERO;
+
 		}
 
 		//Check to see which device is not buffered, and handle it
@@ -346,6 +351,28 @@ public:
 		if( !mMouse->buffered() )
 			if( processUnbufferedMouseInput(evt) == false )
 				return false;
+
+		// ramp up / ramp down speed
+		if (mTranslateVector == Vector3::ZERO)
+		{
+			// decay (one third speed)
+			mCurrentSpeed -= evt.timeSinceLastFrame * 0.3;
+			mTranslateVector = lastMotion;
+		}
+		else
+		{
+			// ramp up
+			mCurrentSpeed += evt.timeSinceLastFrame;
+
+		}
+		// Limit motion speed
+		if (mCurrentSpeed > 1.0)
+			mCurrentSpeed = 1.0;
+		if (mCurrentSpeed < 0.0)
+			mCurrentSpeed = 0.0;
+
+		mTranslateVector *= mCurrentSpeed;
+
 
 		if( !mMouse->buffered() || !mKeyboard->buffered() || !buffJ )
 			moveCamera();
@@ -363,6 +390,7 @@ protected:
 	Camera* mCamera;
 
 	Vector3 mTranslateVector;
+	Real mCurrentSpeed;
 	RenderWindow* mWindow;
 	bool mStatsOn;
 
@@ -370,6 +398,7 @@ protected:
 
 	unsigned int mNumScreenShots;
 	float mMoveScale;
+	float mSpeedLimit;
 	Degree mRotScale;
 	// just to stop toggles flipping too fast
 	Real mTimeUntilNextToggle ;
