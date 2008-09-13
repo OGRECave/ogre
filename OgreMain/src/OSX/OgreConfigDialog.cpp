@@ -1,4 +1,4 @@
-#include <Quicktime/Quicktime.h>
+#include <QuickTime/QuickTime.h>
 #include "OgreLogManager.h"
 #include "OgreConfigDialog.h"
 
