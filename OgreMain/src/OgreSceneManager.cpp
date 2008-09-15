@@ -5695,13 +5695,11 @@ void SceneManager::ensureShadowTexturesCreated()
 void SceneManager::destroyShadowTextures(void)
 {
 	
-    ShadowTextureList::iterator i, iend;
-    ShadowTextureCameraList::iterator ci;
-    iend = mShadowTextures.end();
-    ci = mShadowTextureCameras.begin();
-    for (i = mShadowTextures.begin(); i != iend; ++i, ++ci)
-    {
-        TexturePtr &shadowTex = *i;
+	ShadowTextureList::iterator i, iend;
+	iend = mShadowTextures.end();
+	for (i = mShadowTextures.begin(); i != iend; ++i)
+	{
+		TexturePtr &shadowTex = *i;
 
 		// Cleanup material that references this texture
 		String matName = shadowTex->getName() + "Mat" + getName();
@@ -5713,6 +5711,12 @@ void SceneManager::destroyShadowTextures(void)
 			MaterialManager::getSingleton().remove(mat->getHandle());
 		}
 
+	}
+
+	ShadowTextureCameraList::iterator ci, ciend;
+	ciend = mShadowTextureCameras.end();
+	for (ci = mShadowTextureCameras.begin(); ci != ciend; ++ci)
+	{
 		// Always destroy camera since they are local to this SM
    		destroyCamera(*ci);
     }

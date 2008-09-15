@@ -611,7 +611,7 @@ namespace Ogre {
 		//texture units. Get the minimum of the two.
 		if (caps->hasCapability(RSC_FRAGMENT_PROGRAM))
 		{
-			int maxTexCoords = 0;
+			GLint maxTexCoords = 0;
 			glGetIntegerv(GL_MAX_TEXTURE_COORDS_ARB, &maxTexCoords);
 			if (mFixedFunctionTextureUnits > maxTexCoords)
 			{
