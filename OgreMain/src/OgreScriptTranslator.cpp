@@ -2301,6 +2301,7 @@ namespace Ogre{
 						{
 							TextureType texType = TEX_TYPE_2D;
 							bool isAlpha = false;
+							bool sRGBRead = false;
 							PixelFormat format = PF_UNKNOWN;
 							int mipmaps = MIP_DEFAULT;
 
@@ -2330,6 +2331,9 @@ namespace Ogre{
 									case ID_ALPHA:
 										isAlpha = true;
 										break;
+									case ID_GAMMA:
+										sRGBRead = true;
+										break;
 									default:
 										if(StringConverter::isNumber(atom->value))
 											mipmaps = StringConverter::parseInt(atom->value);
@@ -2354,6 +2358,7 @@ namespace Ogre{
 							mUnit->setDesiredFormat(format);
 							mUnit->setIsAlpha(isAlpha);
 							mUnit->setNumMipmaps(mipmaps);
+							mUnit->setHardwareGammaEnabled(sRGBRead);
 						}
 						else
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,

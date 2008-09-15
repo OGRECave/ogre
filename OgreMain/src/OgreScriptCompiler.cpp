@@ -1087,6 +1087,7 @@ namespace Ogre
 			mIds["cubic"] = ID_CUBIC;
 			mIds["unlimited"] = ID_UNLIMITED;
 			mIds["alpha"] = ID_ALPHA;
+			mIds["gamma"] = ID_GAMMA;
 		mIds["anim_texture"] = ID_ANIM_TEXTURE;
 		mIds["cubic_texture"] = ID_CUBIC_TEXTURE;
 			mIds["separateUV"] = ID_SEPARATE_UV;
