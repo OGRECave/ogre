@@ -93,7 +93,7 @@ Torus Knot Software Ltd.
 // default is to disable since it's expensive, but you can enable if needed per build target
 
 #ifndef OGRE_MEMORY_TRACKER_DEBUG_MODE
-#  define OGRE_MEMORY_TRACKER_DEBUG_MODE 0
+#  define OGRE_MEMORY_TRACKER_DEBUG_MODE 1
 #endif
 
 #ifndef OGRE_MEMORY_TRACKER_RELEASE_MODE

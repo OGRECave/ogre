@@ -153,6 +153,7 @@ namespace Ogre {
 		// Technique section
 		addLexemeAction("technique", &CompositorScriptCompiler::parseTechnique);
 		addLexemeAction("texture", &CompositorScriptCompiler::parseTexture);
+		addLexemeAction("scheme", &CompositorScriptCompiler::parseScheme);
 		addLexemeToken("target_width_scaled", ID_TARGET_WIDTH_SCALED);
 		addLexemeToken("target_height_scaled", ID_TARGET_HEIGHT_SCALED);
 		addLexemeToken("target_width", ID_TARGET_WIDTH);
@@ -452,6 +453,14 @@ namespace Ogre {
 				break;
 			}
 		}
+	}
+	//-----------------------------------------------------------------------
+	void CompositorScriptCompiler::parseScheme(void)
+	{
+		assert(mScriptContext.technique);
+		const String schemeName = getNextTokenLabel();
+
+		mScriptContext.technique->setSchemeName(schemeName);
 	}
 	//-----------------------------------------------------------------------
 	void CompositorScriptCompiler::parseTarget(void)

@@ -102,9 +102,10 @@ namespace Ogre {
 		@remarks
 			If there is no specific supported technique with this scheme name, 
 			then the first supported technique with no specific scheme will be returned.
-		@param schemeName The scheme name you are looking for.
+		@param schemeName The scheme name you are looking for. Blank means to 
+			look for techniques with no scheme associated
 		*/
-		CompositionTechnique *getSupportedTechnique(const String& schemeName);
+		CompositionTechnique *getSupportedTechnique(const String& schemeName = StringUtil::BLANK);
 
     protected:
         /// @copydoc Resource::loadImpl

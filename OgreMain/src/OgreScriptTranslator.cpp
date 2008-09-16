@@ -4794,6 +4794,27 @@ namespace Ogre{
 						def->shared = shared;
 					}
 					break;
+				case ID_SCHEME:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+					}
+					else if(prop->values.size() > 1)
+					{
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"scheme only supports 1 argument");
+					}
+					else
+					{
+						AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0);
+						String scheme;
+						if(getString(*i0, &scheme))
+							mTechnique->setSchemeName(scheme);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+							"scheme must have 1 string argument");
+					}
+					break;
 				default:
 					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
 						"token \"" + prop->name + "\" is not recognized");

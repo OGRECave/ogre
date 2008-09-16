@@ -60,10 +60,9 @@ namespace Ogre {
         /** Apply a compositor. Initially, the filter is enabled.
         @param filter     Filter to apply
         @param addPosition    Position in filter chain to insert this filter at; defaults to the end (last applied filter)
-        @param technique      Technique to use; CompositorChain::BEST (default) chooses to the best one 
-                            available (first technique supported)
+        @param scheme      Scheme to use (blank means default)
         */
-        CompositorInstance* addCompositor(CompositorPtr filter, size_t addPosition=LAST, size_t technique=BEST);
+		CompositorInstance* addCompositor(CompositorPtr filter, size_t addPosition=LAST, const String& scheme = StringUtil::BLANK);
     
         /** Remove a compositor.
         @param position    Position in filter chain of filter to remove; defaults to the end (last applied filter)

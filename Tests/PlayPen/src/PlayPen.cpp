@@ -104,6 +104,9 @@ AnimationBlender* animBlender = 0;
 String animBlendTarget[2];
 int animBlendTargetIndex;
 MovablePlane movablePlane("APlane");
+CompositorInstance* compositorToSwitch = 0;
+int compositorSchemeIndex = 0;
+StringVector compositorSchemeList;
 
 using namespace OIS;
 
@@ -524,7 +527,15 @@ public:
 			mAnimStateList.push_back(anim);
 		}
         
-        /** Hack to test frustum vols
+		if (compositorToSwitch && mKeyboard->isKeyDown(KC_C) && timeUntilNextToggle <= 0)
+		{
+			++compositorSchemeIndex;
+			compositorSchemeIndex = compositorSchemeIndex % compositorSchemeList.size();
+			compositorToSwitch->setScheme(compositorSchemeList[compositorSchemeIndex]);
+			timeUntilNextToggle = 0.5;		
+		}
+
+		/** Hack to test frustum vols
         if (testCam)
         {
             // reposition the camera planes
@@ -3066,6 +3077,68 @@ protected:
 		gaussianListener.notifyViewportSize(vp->getActualWidth(), vp->getActualHeight());
 
 
+
+
+
+	}
+
+	void testCompositorTechniqueSwitch(bool sharedTextures)
+	{
+		CompositorManager& cmgr = CompositorManager::getSingleton();
+		CompositorPtr compositor = cmgr.create("testtechswitch", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		// technique 1 (Invert)
+		CompositionTechnique* ctech1 = compositor->createTechnique();
+		CompositionTechnique::TextureDefinition* tdef =	ctech1->createTextureDefinition("rt0");
+		tdef->formatList.push_back(PF_A8B8G8R8);
+		tdef->width = tdef->height = 0;
+		tdef->shared = sharedTextures;
+
+		CompositionTargetPass* tpass = ctech1->createTargetPass();
+		tpass->setOutputName("rt0");
+		tpass->setInputMode(CompositionTargetPass::IM_PREVIOUS);
+		CompositionTargetPass* tout = ctech1->getOutputTargetPass();
+		tout->setInputMode(CompositionTargetPass::IM_NONE);
+		CompositionPass* pass = tout->createPass();
+		pass->setType(CompositionPass::PT_RENDERQUAD);
+		pass->setMaterialName("Ogre/Compositor/Invert");
+		pass->setInput(0, "rt0");
+
+		// technique 2 (Tiling)
+		ctech1 = compositor->createTechnique();
+		ctech1->setSchemeName("Tiling");
+		tdef =	ctech1->createTextureDefinition("rt0");
+		tdef->formatList.push_back(PF_A8B8G8R8);
+		tdef->width = tdef->height = 0;
+		tdef->shared = sharedTextures;
+
+		tpass = ctech1->createTargetPass();
+		tpass->setOutputName("rt0");
+		tpass->setInputMode(CompositionTargetPass::IM_PREVIOUS);
+		tout = ctech1->getOutputTargetPass();
+		tout->setInputMode(CompositionTargetPass::IM_NONE);
+		pass = tout->createPass();
+		pass->setType(CompositionPass::PT_RENDERQUAD);
+		pass->setMaterialName("Ogre/Compositor/Tiling");
+		pass->setInput(0, "rt0");
+
+		compositor->load();
+
+		Entity* e = mSceneMgr->createEntity("1", "knot.mesh");
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
+		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox", 1000);
+
+		// enable compositor (should pick first technique)
+		Viewport* vp = mWindow->getViewport(0);
+
+		compositorToSwitch = cmgr.addCompositor(vp, compositor->getName());
+		compositorSchemeList.push_back("");
+		compositorSchemeList.push_back("Tiling");
+
+		cmgr.setCompositorEnabled(vp, compositor->getName(), true);
+
+		mCamera->setPosition(0, 0, -300);
+		mCamera->lookAt(Vector3::ZERO);
 
 
 
@@ -7310,9 +7383,10 @@ protected:
 		//testSRGBtexture(true);
 		//testLightClipPlanesMoreLights(true);
 
-		testFarFromOrigin();
+		//testFarFromOrigin();
 		//testGeometryShaders();
 		//testAlphaToCoverage();
+		testCompositorTechniqueSwitch(true);
 		
     }
     // Create new frame listener

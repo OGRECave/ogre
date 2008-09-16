@@ -86,6 +86,7 @@ Format: technique { }@*@*
 Techniques can have the following nested elements:
 @itemize @bullet
 @item @ref{compositor_texture,texture}
+@item @ref{compositor_scheme,scheme}
 @item @ref{Compositor Target Passes,target}
 @item @ref{Compositor Target Passes,target_output}
 @end itemize
@@ -118,6 +119,15 @@ Example: texture rt0 512 512 PF_R8G8B8A8@*
 Example: texture rt1 target_width target_height PF_FLOAT32_RGB@*@*
 
 You can in fact repeat this element if you wish. If you do so, that means that this render texture becomes a Multiple Render Target (MRT), when the GPU writes to multiple textures at once. It is imperative that if you use MRT that the shaders that render to it render to ALL the targets. Not doing so can cause undefined results. It is also important to note that although you can use different pixel formats for each target in a MRT, each one should have the same total bit depth since most cards do not support independent bit depths. If you try to use this feature on cards that do not support the number of MRTs you've asked for, the technique will be skipped (so you ought to write a fallback technique).
+
+@anchor{compositor_scheme}
+@subheading scheme
+
+This gives a compositor technique a scheme name, allowing you to manually switch between different techniques for this compositor when instantiated on a viewport by calling CompositorInstance::setScheme. 
+
+@*@*
+Format: texture <Name> <Width> <Height> <Pixel Format> [<MRT Pixel Format2>] [<MRT Pixel FormatN>] [shared] [gamma] [no_fsaa]@*@*
+
 
 @node Compositor Target Passes
 @subsection Target Passes

@@ -213,16 +213,21 @@ namespace Ogre {
 		*/
 		void setTechnique(CompositionTechnique* tech, bool reuseTextures = true);
 
-		/** Change the technique we're using to render this compositor, and
-			pick one based on a scheme. 
+		/** Pick a technique to use to render this compositor based on a scheme. 
 		@remarks
 			If there is no specific supported technique with this scheme name, 
 			then the first supported technique with no specific scheme will be used.
+			@see CompositionTechnique::setSchemeName
 		@param schemeName The scheme to use 
 		@param reuseTextures If textures have already been created for the current
 			technique, whether to try to re-use them if sizes & formats match.
+			Note that for this feature to be of benefit, the textures must have been created
+			with the 'shared' option enabled.
 		*/
-		void setTechnique(const String& schemeName, bool reuseTextures = true);
+		void setScheme(const String& schemeName, bool reuseTextures = true);
+
+		/// Returns the name of the scheme this compositor is using
+		const String& getScheme() const { return mActiveScheme; }
 
 		/** Notify this instance that the primary surface has been resized. 
 		@remarks
@@ -283,6 +288,9 @@ namespace Ogre {
         
         /// Previous instance (set by chain)
         CompositorInstance *mPreviousInstance;
+
+		/// The scheme which is being used in this instance
+		String mActiveScheme;
 		
 		/** Collect rendering passes. Here, passes are converted into render target operations
 			and queued with queueRenderSystemOp.

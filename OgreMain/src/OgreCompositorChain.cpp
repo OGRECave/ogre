@@ -73,7 +73,7 @@ void CompositorChain::destroyResources(void)
 	}
 }
 //-----------------------------------------------------------------------
-CompositorInstance* CompositorChain::addCompositor(CompositorPtr filter, size_t addPosition, size_t technique)
+CompositorInstance* CompositorChain::addCompositor(CompositorPtr filter, size_t addPosition, const String& scheme)
 {
 	// Init on demand
 	if (!mOriginalScene)
@@ -83,20 +83,20 @@ CompositorInstance* CompositorChain::addCompositor(CompositorPtr filter, size_t 
 		/// Create base "original scene" compositor
 		CompositorPtr base = CompositorManager::getSingleton().load("Ogre/Scene",
 			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-		mOriginalScene = OGRE_NEW CompositorInstance(base->getSupportedTechnique(0), this);
+		mOriginalScene = OGRE_NEW CompositorInstance(base->getSupportedTechnique(), this);
 	}
 
 
 	filter->touch();
-    if(technique >= filter->getNumSupportedTechniques())
-    {
-        /// Warn user
-        LogManager::getSingleton().logMessage(
-            "CompositorChain: Compositor " + filter->getName() + " has no supported techniques.", LML_CRITICAL
-        );
-        return 0;
-    }
-    CompositionTechnique *tech = filter->getSupportedTechnique(technique);
+    CompositionTechnique *tech = filter->getSupportedTechnique(scheme);
+	if(!tech)
+	{
+		/// Warn user
+		LogManager::getSingleton().logMessage(
+			"CompositorChain: Compositor " + filter->getName() + " has no supported techniques.", LML_CRITICAL
+			);
+		return 0;
+	}
     CompositorInstance *t = OGRE_NEW CompositorInstance(tech, this);
     
     if(addPosition == LAST)

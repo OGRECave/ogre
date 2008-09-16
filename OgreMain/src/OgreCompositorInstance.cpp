@@ -419,7 +419,7 @@ void CompositorInstance::setTechnique(CompositionTechnique* tech, bool reuseText
 	}
 }
 //---------------------------------------------------------------------
-void CompositorInstance::setTechnique(const String& schemeName, bool reuseTextures)
+void CompositorInstance::setScheme(const String& schemeName, bool reuseTextures)
 {
 	CompositionTechnique* tech = mCompositor->getSupportedTechnique(schemeName);
 	if (tech)
