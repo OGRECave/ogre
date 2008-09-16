@@ -801,6 +801,7 @@ LGPL like the rest of the engine.
 			CEGUI::ImagesetManager::getSingleton().destroyImageset(*isIt);
 		}
 		mDebugRTTImageSets.clear();
+		std::set<Ogre::String> uniqueTextureNames;
 		// Add an entry for each render texture for all active compositors
 		Ogre::Viewport* vp = mMain->getRenderWindow()->getViewport(0);
 		Ogre::CompositorChain* chain = Ogre::CompositorManager::getSingleton().getCompositorChain(vp);
@@ -821,20 +822,27 @@ LGPL like the rest of the engine.
 					// Create CEGUI texture from name of OGRE texture
 					CEGUI::Texture* tex = mMain->getGuiRenderer()->createTexture(instName);
 					// Create imageset
-					CEGUI::Imageset* imgSet =
-						CEGUI::ImagesetManager::getSingleton().createImageset(
-							instName, tex);
-					mDebugRTTImageSets.push_back(imgSet);
-					imgSet->defineImage((CEGUI::utf8*)"RttImage",
-						CEGUI::Point(0.0f, 0.0f),
-						CEGUI::Size(tex->getWidth(), tex->getHeight()),
-						CEGUI::Point(0.0f,0.0f));
+					// Note that if we use shared textures in compositor, the same texture name
+					// will occur more than once, so we have to cater for this
+					if (uniqueTextureNames.find(instName) == uniqueTextureNames.end())
+					{
+						CEGUI::Imageset* imgSet =
+							CEGUI::ImagesetManager::getSingleton().createImageset(
+								instName, tex);
+						mDebugRTTImageSets.push_back(imgSet);
+						imgSet->defineImage((CEGUI::utf8*)"RttImage",
+							CEGUI::Point(0.0f, 0.0f),
+							CEGUI::Size(tex->getWidth(), tex->getHeight()),
+							CEGUI::Point(0.0f,0.0f));
 
 
-					CEGUI::ListboxTextItem *item = new CEGUI::ListboxTextItem(texDef->name, 0, imgSet);
-					item->setSelectionBrushImage("TaharezLook", "ListboxSelectionBrush");
-					item->setSelectionColours(CEGUI::colour(0,0,1));
-					mDebugRTTListbox->addItem(item);
+						CEGUI::ListboxTextItem *item = new CEGUI::ListboxTextItem(texDef->name, 0, imgSet);
+						item->setSelectionBrushImage("TaharezLook", "ListboxSelectionBrush");
+						item->setSelectionColours(CEGUI::colour(0,0,1));
+						mDebugRTTListbox->addItem(item);
+
+						uniqueTextureNames.insert(instName);
+					}
 
 				}
 

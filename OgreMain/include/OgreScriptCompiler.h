@@ -703,6 +703,9 @@ namespace Ogre
 				ID_TARGET_HEIGHT,
 				ID_TARGET_WIDTH_SCALED,
 				ID_TARGET_HEIGHT_SCALED,
+			ID_SHARED,
+			//ID_GAMMA, - already registered for material
+			ID_NO_FSAA,
 			ID_ONLY_INITIAL,
 			ID_VISIBILITY_MASK,
 			ID_LOD_BIAS,

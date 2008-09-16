@@ -53,7 +53,7 @@ namespace Ogre {
 		"<Compositor> ::= 'compositor' <Flex_Label> '{' {<Technique>} '}' \n"
 		// Technique
 		"<Technique> ::= 'technique' '{' {<Texture>} {<Target>} <TargetOutput> '}' \n"
-		"<Texture> ::= 'texture' <Label> <WidthOption> <HeightOption> <PixelFormat> {<PixelFormat>} \n"
+		"<Texture> ::= 'texture' <Label> <WidthOption> <HeightOption> <PixelFormat> {<PixelFormat>} [<Shared>] \n"
 		"<WidthOption> ::= <TargetWidthScaled> | 'target_width' | <#width> \n"
 		"<HeightOption> ::= <TargetHeightScaled> | 'target_height' | <#height> \n"
 		"<TargetWidthScaled> ::= 'target_width_scaled' <#scaling> \n"
@@ -61,6 +61,7 @@ namespace Ogre {
 		"<PixelFormat> ::= 'PF_A8R8G8B8' | 'PF_R8G8B8A8' | 'PF_R8G8B8' | 'PF_FLOAT16_RGBA' | \n"
         "   'PF_FLOAT16_RGB' | 'PF_FLOAT16_R' | 'PF_FLOAT32_RGBA' | 'PF_FLOAT32_RGB' | 'PF_FLOAT32_R' | \n"
 		"   'PF_FLOAT16_GR' | 'PF_FLOAT32_GR' \n"
+		"<Shared> ::= 'shared' \n"
 		// Target
 		"<Target> ::= 'target ' <Label> '{' {<TargetOptions>} {<Pass>} '}' \n"
 	    "<TargetOptions> ::=	<TargetInput> | <OnlyInitial> | <VisibilityMask> | \n"
@@ -167,6 +168,9 @@ namespace Ogre {
 		addLexemeToken("PF_FLOAT32_GR", ID_PF_FLOAT32_GR);
 		addLexemeToken("PF_FLOAT32_RGB", ID_PF_FLOAT32_RGB);
 		addLexemeToken("PF_FLOAT32_RGBA", ID_PF_FLOAT32_RGBA);
+		addLexemeToken("shared", ID_SHARED);
+		addLexemeToken("gamma", ID_GAMMA);
+		addLexemeToken("no_fsaa", ID_NO_FSAA);
 
 		// Target section
 		addLexemeAction("target ", &CompositorScriptCompiler::parseTarget);
@@ -395,7 +399,7 @@ namespace Ogre {
         {
             textureDef->height = static_cast<size_t>(getNextTokenValue());
         }
-        // get pixel factor
+        // get pixel factor & shared option
 		while (getRemainingTokensForAction() > 0)
 		{
 			switch (getNextTokenID())
@@ -433,6 +437,15 @@ namespace Ogre {
 				break;
 			case ID_PF_FLOAT32_RGBA:
 				textureDef->formatList.push_back(PF_FLOAT32_RGBA);
+				break;
+			case ID_SHARED:
+				textureDef->shared = true;
+				break;
+			case ID_GAMMA:
+				textureDef->hwGammaWrite = true;
+				break;
+			case ID_NO_FSAA:
+				textureDef->fsaa = false;
 				break;
 			default:
 				// should never get here?

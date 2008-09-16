@@ -57,7 +57,7 @@ CompositorInstance::CompositorInstance(CompositionTechnique *technique,
 //-----------------------------------------------------------------------
 CompositorInstance::~CompositorInstance()
 {
-    freeResources();
+    freeResources(false, true);
 }
 //-----------------------------------------------------------------------
 void CompositorInstance::setEnabled(bool value)
@@ -69,11 +69,11 @@ void CompositorInstance::setEnabled(bool value)
         // Create of free resource.
         if (value)
         {
-            createResources();
+            createResources(false);
         }
         else
         {
-            freeResources();
+            freeResources(false, true);
         }
 
         /// Notify chain state needs recompile.
@@ -378,6 +378,56 @@ CompositionTechnique *CompositorInstance::getTechnique()
     return mTechnique;
 }
 //-----------------------------------------------------------------------
+void CompositorInstance::setTechnique(CompositionTechnique* tech, bool reuseTextures)
+{
+	if (mTechnique != tech)
+	{
+		if (reuseTextures)
+		{
+			// make sure we store all (shared) textures in use in our reserve pool
+			// this will ensure they don't get destroyed as unreferenced
+			// so they're ready to use again later
+			CompositionTechnique::TextureDefinitionIterator it = mTechnique->getTextureDefinitionIterator();
+			CompositorManager::UniqueTextureSet assignedTextures;
+			while(it.hasMoreElements())
+			{
+				CompositionTechnique::TextureDefinition *def = it.getNext();
+				if (def->shared)
+				{
+					LocalTextureMap::iterator i = mLocalTextures.find(def->name);
+					if (i != mLocalTextures.end())
+					{
+						// overwriting duplicates is fine, we only want one entry per def
+						mReserveTextures[def] = i->second;
+					}
+
+				}
+			}
+		}
+		// replace technique
+		mTechnique = tech;
+
+		if (mEnabled)
+		{
+			// free up resources, but keep reserves if reusing
+			freeResources(false, !reuseTextures);
+			createResources(false);
+			/// Notify chain state needs recompile.
+			mChain->_markDirty();
+		}
+
+	}
+}
+//---------------------------------------------------------------------
+void CompositorInstance::setTechnique(const String& schemeName, bool reuseTextures)
+{
+	CompositionTechnique* tech = mCompositor->getSupportedTechnique(schemeName);
+	if (tech)
+	{
+		setTechnique(tech, reuseTextures);
+	}
+}
+//-----------------------------------------------------------------------
 CompositorChain *CompositorInstance::getChain()
 {
 	return mChain;
@@ -387,6 +437,27 @@ const String& CompositorInstance::getTextureInstanceName(const String& name,
 														 size_t mrtIndex)
 {
 	return getSourceForTex(name, mrtIndex);
+}
+//---------------------------------------------------------------------
+TexturePtr CompositorInstance::getTextureInstance(const String& name, size_t mrtIndex)
+{
+	// try simple textures first
+	LocalTextureMap::iterator i = mLocalTextures.find(name);
+	if(i != mLocalTextures.end())
+	{
+		return i->second;
+	}
+
+	// try MRTs - texture (rather than target)
+	i = mLocalTextures.find(getMRTTexLocalName(name, mrtIndex));
+	if (i != mLocalTextures.end())
+	{
+		return i->second;
+	}
+
+	// not present
+	return TexturePtr();
+
 }
 //-----------------------------------------------------------------------
 MaterialPtr CompositorInstance::createLocalMaterial(const String& srcName)
@@ -406,16 +477,22 @@ static size_t dummyCounter = 0;
     mat->getTechnique(0)->removeAllPasses();
     return mat;
 }
-//-----------------------------------------------------------------------
-void CompositorInstance::createResources()
+//---------------------------------------------------------------------
+void CompositorInstance::notifyResized()
 {
-static size_t dummyCounter = 0;
-    freeResources();
+	freeResources(true, true);
+	createResources(true);
+}
+//-----------------------------------------------------------------------
+void CompositorInstance::createResources(bool forResizeOnly)
+{
+	static size_t dummyCounter = 0;
     /// Create temporary textures
     /// In principle, temporary textures could be shared between multiple viewports
     /// (CompositorChains). This will save a lot of memory in case more viewports
     /// are composited.
     CompositionTechnique::TextureDefinitionIterator it = mTechnique->getTextureDefinitionIterator();
+	CompositorManager::UniqueTextureSet assignedTextures;
     while(it.hasMoreElements())
     {
         CompositionTechnique::TextureDefinition *def = it.getNext();
@@ -423,9 +500,14 @@ static size_t dummyCounter = 0;
         size_t width = def->width;
         size_t height = def->height;
 		uint fsaa = 0;
-		bool hwGammaWrite = false;
+		bool hwGamma = false;
 
-		deriveTextureRenderTargetOptions(def->name, &hwGammaWrite, &fsaa);
+		// Skip this one if we're only (re)creating for a resize & it's not derived
+		// from the target size
+		if (forResizeOnly && width != 0 && height != 0)
+			continue;
+
+		deriveTextureRenderTargetOptions(def->name, &hwGamma, &fsaa);
 
         if(width == 0)
             width = static_cast<size_t>(
@@ -433,6 +515,12 @@ static size_t dummyCounter = 0;
         if(height == 0)
 			height = static_cast<size_t>(
 				static_cast<float>(mChain->getViewport()->getActualHeight()) * def->heightFactor);
+
+		// determine options as a combination of selected options and possible options
+		if (!def->fsaa)
+			fsaa = 0;
+		hwGamma = hwGamma || def->hwGammaWrite;
+
         /// Make the tetxure
 		RenderTarget* rendTarget;
 		if (def->formatList.size() > 1)
@@ -449,10 +537,25 @@ static size_t dummyCounter = 0;
 				p != def->formatList.end(); ++p, ++atch)
 			{
 
-				TexturePtr tex = TextureManager::getSingleton().createManual(
-					MRTbaseName + "/" + StringConverter::toString(atch),
-					ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
-					(uint)width, (uint)height, 0, *p, TU_RENDERTARGET ); 
+				String texname = MRTbaseName + "/" + StringConverter::toString(atch);
+				TexturePtr tex;
+				if (def->shared)
+				{
+					// get / create shared texture
+					tex = CompositorManager::getSingleton().getSharedTexture(texname,
+						def->name, 
+						width, height, *p, fsaa, 
+						hwGamma && !PixelUtil::isFloatingPoint(*p), 
+						assignedTextures, this);
+				}
+				else
+				{
+					tex = TextureManager::getSingleton().createManual(
+						texname, 
+						ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
+						(uint)width, (uint)height, 0, *p, TU_RENDERTARGET, 0, 
+						hwGamma && !PixelUtil::isFloatingPoint(*p), fsaa ); 
+				}
 				
 				RenderTexture* rt = tex->getBuffer()->getRenderTarget();
 				rt->setAutoUpdated(false);
@@ -475,11 +578,23 @@ static size_t dummyCounter = 0;
 			// this is an auto generated name - so no spaces can't hart us.
 			std::replace( texName.begin(), texName.end(), ' ', '_' ); 
 
-			TexturePtr tex = TextureManager::getSingleton().createManual(
-				texName, 
-				ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
-				(uint)width, (uint)height, 0, def->formatList[0], TU_RENDERTARGET, 0,
-				hwGammaWrite, fsaa); 
+			TexturePtr tex;
+			if (def->shared)
+			{
+				// get / create shared texture
+				tex = CompositorManager::getSingleton().getSharedTexture(texName, 
+					def->name, width, height, def->formatList[0], fsaa, 
+					hwGamma && !PixelUtil::isFloatingPoint(def->formatList[0]), assignedTextures, 
+					this);
+			}
+			else
+			{
+				tex = TextureManager::getSingleton().createManual(
+					texName, 
+					ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
+					(uint)width, (uint)height, 0, def->formatList[0], TU_RENDERTARGET, 0,
+					hwGamma && !PixelUtil::isFloatingPoint(def->formatList[0]), fsaa); 
+			}
 
 			rendTarget = tex->getBuffer()->getRenderTarget();
 			mLocalTextures[def->name] = tex;
@@ -489,23 +604,27 @@ static size_t dummyCounter = 0;
         /// Set up viewport over entire texture
         rendTarget->setAutoUpdated( false );
 
-        Camera* camera = mChain->getViewport()->getCamera();
+		// We may be sharing / reusing this texture, so test before adding viewport
+		if (rendTarget->getNumViewports() == 0)
+		{
+			Camera* camera = mChain->getViewport()->getCamera();
 
-        // Save last viewport and current aspect ratio
-        Viewport* oldViewport = camera->getViewport();
-        Real aspectRatio = camera->getAspectRatio();
+			// Save last viewport and current aspect ratio
+			Viewport* oldViewport = camera->getViewport();
+			Real aspectRatio = camera->getAspectRatio();
 
-        Viewport* v = rendTarget->addViewport( camera );
-        v->setClearEveryFrame( false );
-        v->setOverlaysEnabled( false );
-        v->setBackgroundColour( ColourValue( 0, 0, 0, 0 ) );
+			Viewport* v = rendTarget->addViewport( camera );
+			v->setClearEveryFrame( false );
+			v->setOverlaysEnabled( false );
+			v->setBackgroundColour( ColourValue( 0, 0, 0, 0 ) );
 
-        // Should restore aspect ratio, in case of auto aspect ratio
-        // enabled, it'll changed when add new viewport.
-        camera->setAspectRatio(aspectRatio);
-        // Should restore last viewport, i.e. never disturb user code
-        // which might based on that.
-        camera->_notifyViewport(oldViewport);
+			// Should restore aspect ratio, in case of auto aspect ratio
+			// enabled, it'll changed when add new viewport.
+			camera->setAspectRatio(aspectRatio);
+			// Should restore last viewport, i.e. never disturb user code
+			// which might based on that.
+			camera->_notifyViewport(oldViewport);
+		}
     }
     
 }
@@ -583,25 +702,89 @@ String CompositorInstance::getMRTTexLocalName(const String& baseName, size_t att
 	return baseName + "/" + StringConverter::toString(attachment);
 }
 //-----------------------------------------------------------------------
-void CompositorInstance::freeResources()
+void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveTextures)
 {
-    /// Remove temporary textures
-    /// LocalTextureMap mLocalTextures;
-    LocalTextureMap::iterator i, iend=mLocalTextures.end();
-    for(i=mLocalTextures.begin(); i!=iend; ++i)
-    {
-        TextureManager::getSingleton().remove(i->second->getName());
-    }
-    mLocalTextures.clear();
+    // Remove temporary textures 
+	// We only remove those that are not shared, shared textures are dealt with
+	// based on their reference count.
+	// We can also only free textures which are derived from the target size, if
+	// required (saves some time & memory thrashing / fragmentation on resize)
 
-	// Remove MRTs
-	LocalMRTMap::iterator mrti, mrtend = mLocalMRTs.end();
-	for (mrti = mLocalMRTs.begin(); mrti != mrtend; ++mrti)
+	CompositionTechnique::TextureDefinitionIterator it = mTechnique->getTextureDefinitionIterator();
+	CompositorManager::UniqueTextureSet assignedTextures;
+	while(it.hasMoreElements())
 	{
-		// remove MRT
-		Root::getSingleton().getRenderSystem()->destroyRenderTarget(mrti->second->getName());
+		CompositionTechnique::TextureDefinition *def = it.getNext();
+		// potentially only remove this one if based on size
+		if (!forResizeOnly || def->width == 0 || def->height == 0)
+		{
+			size_t subSurf = def->formatList.size();
+
+			// Potentially many surfaces
+			for (size_t s = 0; s < subSurf; ++s)
+			{
+				String texName = subSurf > 1 ? getMRTTexLocalName(def->name, subSurf)
+					: def->name;
+
+				LocalTextureMap::iterator i = mLocalTextures.find(texName);
+				if (i != mLocalTextures.end())
+				{
+					if (!def->shared)
+					{
+						// remove myself from central only if not shared
+						TextureManager::getSingleton().remove(i->second->getName());
+					}
+
+					// remove from local
+					// reserves are potentially cleared later
+					mLocalTextures.erase(i);
+
+				}
+
+			} // subSurf
+
+			if (subSurf > 1)
+			{
+				LocalMRTMap::iterator mrti = mLocalMRTs.find(def->name);
+				if (mrti != mLocalMRTs.end())
+				{
+					// remove MRT
+					Root::getSingleton().getRenderSystem()->destroyRenderTarget(mrti->second->getName());
+					mLocalMRTs.erase(mrti);
+				}
+
+			}
+
+		} // not for resize or width/height 0
 	}
-	mLocalMRTs.clear();
+
+	if (clearReserveTextures)
+	{
+		if (forResizeOnly)
+		{
+			// just remove the ones which would be affected by a resize
+			for (ReserveTextureMap::iterator i = mReserveTextures.begin();
+				i != mReserveTextures.end(); )
+			{
+				if (i->first->width == 0 || i->first->height == 0)
+				{
+					i = mReserveTextures.erase(i);
+				}
+				else
+					++i;
+			}
+		}
+		else
+		{
+			// clear all
+			mReserveTextures.clear();
+		}
+	}
+
+	// Now we tell the central list of textures to check if its unreferenced, 
+	// and to remove if necessary. Anything shared that was left in the reserve textures
+	// will not be released here
+	CompositorManager::getSingleton().freeSharedTextures(true);
 }
 //---------------------------------------------------------------------
 RenderTarget* CompositorInstance::getRenderTarget(const String& name)
@@ -691,6 +874,5 @@ void CompositorInstance::Listener::notifyMaterialSetup(uint32 pass_id, MaterialP
 void CompositorInstance::Listener::notifyMaterialRender(uint32 pass_id, MaterialPtr &mat)
 {
 }
-//-----------------------------------------------------------------------
 
 }

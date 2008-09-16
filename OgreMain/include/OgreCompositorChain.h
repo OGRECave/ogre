@@ -128,6 +128,14 @@ namespace Ogre {
 		/** Compile this Composition chain into a series of RenderTarget operations.
 		*/
 		void _compile();
+
+		/** Get the previous instance in this chain to the one specified. 
+		*/
+		CompositorInstance* getPreviousInstance(CompositorInstance* curr, bool activeOnly = true);
+		/** Get the next instance in this chain to the one specified. 
+		*/
+		CompositorInstance* getNextInstance(CompositorInstance* curr, bool activeOnly = true);
+
     protected:    
         /// Viewport affected by this CompositorChain
         Viewport *mViewport;

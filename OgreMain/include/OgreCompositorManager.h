@@ -114,6 +114,25 @@ namespace Ogre {
 		/** Internal method for forcing all active compositors to recreate their resources. */
 		void _reconstructAllCompositorResources();
 
+		typedef std::set<Texture*> UniqueTextureSet;
+
+		/** Utility function to get an existing shared texture matching a given
+			definition, or creating one if one doesn't exist. It also takes into
+			account whether a shared texture has already been supplied to this
+			same requester already, in which case it won't give the same texture
+			twice (this is important for example if you request 2 ping-pong textures, 
+			you don't want to get the same texture for both requests!
+		*/
+		TexturePtr getSharedTexture(const String& name, const String& localName, 
+			size_t w, size_t h, 
+			PixelFormat f, int aa, bool srgb, UniqueTextureSet& texturesAlreadyAssigned, 
+			CompositorInstance* inst);
+
+		/** Free shared textures from the shared pool (compositor instances still 
+			using them will keep them in memory though). 
+		*/
+		void freeSharedTextures(bool onlyIfUnreferenced = true);
+
 
 		/** Override standard Singleton retrieval.
 		@remarks
@@ -165,6 +184,62 @@ namespace Ogre {
 		/// List of instances
 		typedef std::vector<CompositorInstance *> Instances;
 		Instances mInstances;
+
+		typedef std::vector<TexturePtr> TextureList;
+		typedef VectorIterator<TextureList> TextureIterator;
+
+		struct TextureDef
+		{
+			size_t width, height;
+			PixelFormat format;
+			int fsaa;
+			bool sRGBwrite;
+
+			TextureDef(size_t w, size_t h, PixelFormat f, int aa, bool srgb)
+				: width(w), height(h), format(f), fsaa(aa), sRGBwrite(srgb)
+			{
+
+			}
+		};
+		struct TextureDefLess
+		{
+			bool operator()(const TextureDef& x, const TextureDef& y)
+			{
+				if (x.format < y.format)
+					return true;
+				else if (x.format == y.format)
+				{
+					if (x.width < y.width)
+						return true;
+					else if (x.width == y.width)
+					{
+						if (x.height < y.height)
+							return true;
+						else if (x.height == y.height)
+						{
+							if (x.fsaa < y.fsaa)
+								return true;
+							else if (x.fsaa == y.fsaa)
+							{
+								if (!x.sRGBwrite && y.sRGBwrite)
+									return true;
+
+							}
+						}
+					}
+				}
+				return false;
+			}
+			virtual ~TextureDefLess() {}
+		};
+		typedef std::map<TextureDef, TextureList*, TextureDefLess> TexturesByDef;
+		TexturesByDef mTexturesByDef;
+
+
+		bool isInputPreviousTarget(CompositorInstance* inst, const Ogre::String& localName);
+		bool isInputPreviousTarget(CompositorInstance* inst, TexturePtr tex);
+		bool isInputToOutputTarget(CompositorInstance* inst, const Ogre::String& localName);
+		bool isInputToOutputTarget(CompositorInstance* inst, TexturePtr tex);
 
     };
 

@@ -4663,6 +4663,9 @@ namespace Ogre{
 						size_t width = 0, height = 0;
 						float widthFactor = 1.0f, heightFactor = 1.0f;
 						bool widthSet = false, heightSet = false, formatSet = false;
+						bool shared = false;
+						bool hwGammaWrite = false;
+						bool fsaa = true;
 						Ogre::PixelFormatList formats;
 
 						while (atomIndex < prop->values.size())
@@ -4722,6 +4725,15 @@ namespace Ogre{
 									*pSetFlag = true;
 								}
 								break;
+							case ID_SHARED:
+								shared = true;
+								break;
+							case ID_GAMMA:
+								hwGammaWrite = true;
+								break;
+							case ID_NO_FSAA:
+								fsaa = false;
+								break;
 							default:
 								if (StringConverter::isNumber(atom->value))
 								{
@@ -4777,6 +4789,9 @@ namespace Ogre{
 						def->widthFactor = widthFactor;
 						def->heightFactor = heightFactor;
 						def->formatList = formats;
+						def->hwGammaWrite = hwGammaWrite;
+						def->fsaa = fsaa;
+						def->shared = shared;
 					}
 					break;
 				default:

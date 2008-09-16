@@ -97,6 +97,15 @@ namespace Ogre {
             an empty list, try calling Compositor::load.
         */
         TechniqueIterator getSupportedTechniqueIterator(void);
+
+		/** Get a pointer to a supported technique for a given scheme. 
+		@remarks
+			If there is no specific supported technique with this scheme name, 
+			then the first supported technique with no specific scheme will be returned.
+		@param schemeName The scheme name you are looking for.
+		*/
+		CompositionTechnique *getSupportedTechnique(const String& schemeName);
+
     protected:
         /// @copydoc Resource::loadImpl
         void loadImpl(void);

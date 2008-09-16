@@ -166,5 +166,28 @@ void Compositor::compile()
 	}
     mCompilationRequired = false;
 }
+//---------------------------------------------------------------------
+CompositionTechnique* Compositor::getSupportedTechnique(const String& schemeName)
+{
+	for(Techniques::iterator i = mSupportedTechniques.begin(); i != mSupportedTechniques.end(); ++i)
+	{
+		if ((*i)->getSchemeName() == schemeName)
+		{
+			return *i;
+		}
+	}
+
+	// didn't find a matching one
+	for(Techniques::iterator i = mSupportedTechniques.begin(); i != mSupportedTechniques.end(); ++i)
+	{
+		if ((*i)->getSchemeName() == StringUtil::BLANK)
+		{
+			return *i;
+		}
+	}
+
+	return 0;
+
+}
 
 }

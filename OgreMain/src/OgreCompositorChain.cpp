@@ -164,7 +164,34 @@ CompositorChain::InstanceIterator CompositorChain::getCompositors()
 //-----------------------------------------------------------------------
 void CompositorChain::setCompositorEnabled(size_t position, bool state)
 {
-    getCompositor(position)->setEnabled(state);
+	CompositorInstance* inst = getCompositor(position);
+	if (!state && inst->getEnabled())
+	{
+		// If we're disabling a 'middle' compositor in a chain, we have to be
+		// careful about textures which might have been shared by non-adjacent
+		// instances which have now become adjacent. 
+		CompositorInstance* nextInstance = getNextInstance(inst, true);
+		if (nextInstance)
+		{
+			CompositionTechnique::TargetPassIterator tpit = nextInstance->getTechnique()->getTargetPassIterator();
+			while(tpit.hasMoreElements())
+			{
+				CompositionTargetPass* tp = tpit.getNext();
+				if (tp->getInputMode() == CompositionTargetPass::IM_PREVIOUS)
+				{
+					if (nextInstance->getTechnique()->getTextureDefinition(tp->getOutputName())->shared)
+					{
+						// recreate
+						nextInstance->freeResources(false, true);
+						nextInstance->createResources(false);
+					}
+				}
+
+			}
+		}
+
+	}
+    inst->setEnabled(state);
 }
 //-----------------------------------------------------------------------
 void CompositorChain::preRenderTargetUpdate(const RenderTargetEvent& evt)
@@ -420,4 +447,43 @@ void CompositorChain::RQListener::flushUpTo(uint8 id)
 	}
 }
 //-----------------------------------------------------------------------
+CompositorInstance* CompositorChain::getPreviousInstance(CompositorInstance* curr, bool activeOnly)
+{
+	bool found = false;
+	for(Instances::reverse_iterator i=mInstances.rbegin(); i!=mInstances.rend(); ++i)
+	{
+		if (found)
+		{
+			if ((*i)->getEnabled() || !activeOnly)
+				return *i;
+		}
+		else if(*i == curr)
+		{
+			found = true;
+		}
+	}
+
+	return 0;
 }
+//---------------------------------------------------------------------
+CompositorInstance* CompositorChain::getNextInstance(CompositorInstance* curr, bool activeOnly)
+{
+	bool found = false;
+	for(Instances::iterator i=mInstances.begin(); i!=mInstances.end(); ++i)
+	{
+		if (found)
+		{
+			if ((*i)->getEnabled() || !activeOnly)
+				return *i;
+		}
+		else if(*i == curr)
+		{
+			found = true;
+		}
+	}
+
+	return 0;
+}
+//---------------------------------------------------------------------
+}
+

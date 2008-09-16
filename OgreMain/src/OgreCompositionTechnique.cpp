@@ -74,6 +74,20 @@ CompositionTechnique::TextureDefinition *CompositionTechnique::getTextureDefinit
     assert (index < mTextureDefinitions.size() && "Index out of bounds.");
     return mTextureDefinitions[index];
 }
+//---------------------------------------------------------------------
+CompositionTechnique::TextureDefinition *CompositionTechnique::getTextureDefinition(const String& name)
+{
+	TextureDefinitions::iterator i, iend;
+	iend = mTextureDefinitions.end();
+	for (i = mTextureDefinitions.begin(); i != iend; ++i)
+	{
+		if ((*i)->name == name)
+			return *i;
+	}
+
+	return 0;
+
+}
 //-----------------------------------------------------------------------
 
 size_t CompositionTechnique::getNumTextureDefinitions()
@@ -220,6 +234,11 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
 Compositor *CompositionTechnique::getParent()
 {
     return mParent;
+}
+//---------------------------------------------------------------------
+void CompositionTechnique::setSchemeName(const String& schemeName)
+{
+	mSchemeName = schemeName;
 }
 
 }
