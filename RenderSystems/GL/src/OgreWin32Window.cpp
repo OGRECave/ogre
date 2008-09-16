@@ -159,7 +159,15 @@ namespace Ogre {
 			if ((opt = miscParams->find("displayFrequency")) != end)
 				mDisplayFrequency = StringConverter::parseUnsignedInt(opt->second);
 			if ((opt = miscParams->find("colourDepth")) != end)
+			{
 				mColourDepth = StringConverter::parseUnsignedInt(opt->second);
+				if (!mIsFullScreen)
+				{
+					// make sure we don't exceed desktop colour depth
+					if (mColourDepth > GetDeviceCaps(GetDC(0), BITSPIXEL))
+						mColourDepth = GetDeviceCaps(GetDC(0), BITSPIXEL);
+				}
+			}
 
 			// incompatible with fullscreen
 			if ((opt = miscParams->find("parentWindowHandle")) != end)
