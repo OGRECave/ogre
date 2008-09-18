@@ -768,7 +768,7 @@ void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveText
 			{
 				if (i->first->width == 0 || i->first->height == 0)
 				{
-					i = mReserveTextures.erase(i);
+					mReserveTextures.erase(i++);
 				}
 				else
 					++i;
