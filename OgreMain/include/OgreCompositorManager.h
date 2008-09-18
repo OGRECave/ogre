@@ -203,7 +203,7 @@ namespace Ogre {
 		};
 		struct TextureDefLess
 		{
-			bool operator()(const TextureDef& x, const TextureDef& y)
+			bool _OgreExport operator()(const TextureDef& x, const TextureDef& y) const
 			{
 				if (x.format < y.format)
 					return true;
