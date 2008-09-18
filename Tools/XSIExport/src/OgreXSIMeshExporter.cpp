@@ -579,11 +579,11 @@ namespace Ogre {
 				samplerUVs[samplerIndex].y = 1.0f - curUVW[1];//v (invert)
 				samplerUVs[samplerIndex].z = curUVW[2];//w
 
-				if (!hasU && curUVW[0] != 0)
+				if (!hasU && !Ogre::Math::RealEqual(curUVW[0], 0))
 					hasU = true;
-				if (!hasV && curUVW[1] != 0)
+				if (!hasV && !Ogre::Math::RealEqual(curUVW[1], 0))
 					hasV = true;
-				if (!hasW && curUVW[2] != 0)
+				if (!hasW && !Ogre::Math::RealEqual(curUVW[2], 0))
 					hasW = true;
 
 			}
