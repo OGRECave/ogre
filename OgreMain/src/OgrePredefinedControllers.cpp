@@ -181,29 +181,11 @@ namespace Ogre
         }
         if (mScaleU)
         {
-            if (value >= 0)
-            {
-                // Add 1 to scale (+ve scales up)
-                mTextureLayer->setTextureUScale(1 + value);
-            }
-            else
-            {
-                // (-ve scales down)
-                mTextureLayer->setTextureUScale(1 / -value);
-            }
+            mTextureLayer->setTextureUScale(value);
         }
         if (mScaleV)
         {
-            if (value >= 0)
-            {
-                // Add 1 to scale (+ve scales up)
-                mTextureLayer->setTextureVScale(1 + value);
-            }
-            else
-            {
-                // (-ve scales down)
-                mTextureLayer->setTextureVScale(1 / -value);
-            }
+            mTextureLayer->setTextureVScale(value);
         }
         if (mRotate)
         {
