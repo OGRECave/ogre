@@ -87,6 +87,12 @@ namespace Ogre {
         /** Gets the total length of the animation. */
         Real getLength(void) const;
 
+		/** Sets the length of the animation. 
+		@note Changing the length of an animation may invalidate existing AnimationState
+		instances which will need to be recreated. 
+		*/
+		void setLength(Real len);
+
         /** Creates a NodeAnimationTrack for animating a Node.
         @param handle Handle to give the track, used for accessing the track later. 
             Must be unique within this Animation.

@@ -62,6 +62,11 @@ namespace Ogre {
     {
         return mLength;
     }
+	//---------------------------------------------------------------------
+	void Animation::setLength(Real len)
+	{
+		mLength = len;
+	}
     //---------------------------------------------------------------------
     NodeAnimationTrack* Animation::createNodeTrack(unsigned short handle)
     {
