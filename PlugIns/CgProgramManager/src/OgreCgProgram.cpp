@@ -32,12 +32,6 @@ Torus Knot Software Ltd.
 #include "OgreStringConverter.h"
 #include "OgreLogManager.h"
 
-#define FIRST_CG_VERSION_TO_SUPPORT_HLSL4 2100
-
-#if(CG_VERSION_NUM >= FIRST_CG_VERSION_TO_SUPPORT_HLSL4)
-#define CG_SUPPORTS_HLSL4
-#endif
-
 namespace Ogre {
     //-----------------------------------------------------------------------
     CgProgram::CmdEntryPoint CgProgram::msCmdEntryPoint;
@@ -137,7 +131,7 @@ namespace Ogre {
 		}
         buildArgs();
 		// deal with includes
-		String sourceToUse = preprocess(mSource);
+		String sourceToUse = resolveCgIncludes(mSource, this, mFilename);
         mCgProgram = cgCreateProgram(mCgContext, CG_SOURCE, sourceToUse.c_str(), 
             mSelectedCgProfile, mEntryPoint.c_str(), const_cast<const char**>(mCgArguments));
 
@@ -155,8 +149,15 @@ namespace Ogre {
 		// ignore any previous error
 		if (mSelectedCgProfile != CG_PROFILE_UNKNOWN && !mCompileError)
 		{
-#ifdef CG_SUPPORTS_HLSL4
-			if (mSelectedCgProfile == CG_PROFILE_VS_4_0 || mSelectedCgProfile == CG_PROFILE_PS_4_0)
+
+			if ( false
+#ifdef CG_PROFILE_VS_4_0
+				|| mSelectedCgProfile == CG_PROFILE_VS_4_0
+#endif
+#ifdef CG_PROFILE_PS_4_0
+				 || mSelectedCgProfile == CG_PROFILE_PS_4_0
+#endif
+				 )
 			{
 				// Create a high-level program, give it the same name as us
 				HighLevelGpuProgramPtr vp = 
@@ -177,7 +178,6 @@ namespace Ogre {
 				mAssemblerProgram = vp;
 			}
 			else
-#endif
 			{
 
 				String shaderAssemblerCode = cgGetProgramString(mCgProgram, CG_COMPILED_PROGRAM);
@@ -534,7 +534,7 @@ namespace Ogre {
         }
     }
 	//-----------------------------------------------------------------------
-	String CgProgram::preprocess(const String& inSource)
+	String CgProgram::resolveCgIncludes(const String& inSource, Resource* resourceBeingLoaded, const String& fileName)
 	{
 		String outSource;
 		// output will be at least this big
@@ -586,7 +586,7 @@ namespace Ogre {
 				{
 					OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
 						"Badly formed #include directive (expected \" or <) in file "
-						+ mFilename + ": " + inSource.substr(includePos, newLineAfter-includePos),
+						+ fileName + ": " + inSource.substr(includePos, newLineAfter-includePos),
 						"CgProgram::preprocessor");
 				}
 				else
@@ -599,7 +599,7 @@ namespace Ogre {
 			{
 				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
 					"Badly formed #include directive (expected " + endDelimeter + ") in file "
-					+ mFilename + ": " + inSource.substr(includePos, newLineAfter-includePos),
+					+ fileName + ": " + inSource.substr(includePos, newLineAfter-includePos),
 					"CgProgram::preprocessor");
 			}
 
@@ -608,7 +608,7 @@ namespace Ogre {
 
 			// open included file
 			DataStreamPtr resource = ResourceGroupManager::getSingleton().
-				openResource(filename, mGroup, true, this);
+				openResource(filename, resourceBeingLoaded->getGroup(), true, resourceBeingLoaded);
 
 			// replace entire include directive line
 			// copy up to just before include
@@ -633,7 +633,7 @@ namespace Ogre {
 
 			// Add #line to the end of the included file to correct the line count
 			outSource.append("\n#line " + Ogre::StringConverter::toString(lineCount) + 
-				"\"" + this->getSourceFile() + "\"\n");
+				"\"" + fileName + "\"\n");
 
 			startMarker = newLineAfter;
 

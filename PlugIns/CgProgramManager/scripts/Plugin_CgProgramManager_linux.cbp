@@ -70,11 +70,13 @@
 		<Linker>
 			<Add directory="../../../Samples/Common/bin/$(TARGET_NAME)" />
 		</Linker>
-		<Unit filename="../include/OgreCgPlugin.h" />
+    <Unit filename="../include/OgreCgFxScriptLoader.h" />
+    <Unit filename="../include/OgreCgPlugin.h" />
 		<Unit filename="../include/OgreCgPrerequisites.h" />
 		<Unit filename="../include/OgreCgProgram.h" />
 		<Unit filename="../include/OgreCgProgramFactory.h" />
-		<Unit filename="../src/OgreCgPlugin.cpp" />
+    <Unit filename="../src/OgreCgFxScriptLoader.cpp" />
+    <Unit filename="../src/OgreCgPlugin.cpp" />
 		<Unit filename="../src/OgreCgProgram.cpp" />
 		<Unit filename="../src/OgreCgProgramFactory.cpp" />
 		<Unit filename="../src/OgreCgProgramManagerDll.cpp" />

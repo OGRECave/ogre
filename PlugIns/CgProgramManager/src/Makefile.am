@@ -3,6 +3,7 @@ INCLUDES = $(STLPORT_CFLAGS) -I$(top_srcdir)/PlugIns/CgProgramManager/include -I
 pkglib_LTLIBRARIES = Plugin_CgProgramManager.la
 
 Plugin_CgProgramManager_la_SOURCES = OgreCgProgram.cpp \
+							 OgreCgFxScriptLoader.cpp \
 							 OgreCgPlugin.cpp \
                              OgreCgProgramFactory.cpp \
                              OgreCgProgramManagerDll.cpp 

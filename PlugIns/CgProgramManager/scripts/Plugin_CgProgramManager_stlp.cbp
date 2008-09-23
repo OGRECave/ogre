@@ -95,7 +95,14 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="..\include\OgreCgPlugin.h">
+    <Unit filename="..\include\OgreCgFxScriptLoader.h">
+      <Option compilerVar="CPP" />
+      <Option compile="0" />
+      <Option link="0" />
+      <Option target="Debug" />
+      <Option target="Release" />
+    </Unit>
+    <Unit filename="..\include\OgreCgPlugin.h">
 			<Option compilerVar="CPP" />
 			<Option compile="0" />
 			<Option link="0" />
@@ -109,7 +116,12 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="..\src\OgreCgPlugin.cpp">
+    <Unit filename="..\src\OgreCgFxScriptLoader.cpp">
+      <Option compilerVar="CPP" />
+      <Option target="Debug" />
+      <Option target="Release" />
+    </Unit>
+    <Unit filename="..\src\OgreCgPlugin.cpp">
 			<Option compilerVar="CPP" />
 			<Option target="Debug" />
 			<Option target="Release" />

@@ -30,6 +30,7 @@ Torus Knot Software Ltd.
 #include "OgreCgPlugin.h"
 #include "OgreRoot.h"
 #include "OgreHighLevelGpuProgramManager.h"
+#include "OgreCgFxScriptLoader.h"
 
 namespace Ogre 
 {
@@ -52,6 +53,8 @@ namespace Ogre
 		mCgProgramFactory = OGRE_NEW CgProgramFactory();
 		// Register
 		HighLevelGpuProgramManager::getSingleton().addFactory(mCgProgramFactory);
+
+		OGRE_NEW CgFxScriptLoader();
 	}
 	//---------------------------------------------------------------------
 	void CgPlugin::initialise()
@@ -68,6 +71,8 @@ namespace Ogre
 	{
         if (mCgProgramFactory)
         {
+			OGRE_DELETE CgFxScriptLoader::getSingletonPtr(); 
+
             // Remove from manager safely
             if (HighLevelGpuProgramManager::getSingletonPtr())
                 HighLevelGpuProgramManager::getSingleton().removeFactory(mCgProgramFactory);
