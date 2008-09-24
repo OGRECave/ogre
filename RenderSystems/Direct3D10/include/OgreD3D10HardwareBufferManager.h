@@ -66,6 +66,10 @@ namespace Ogre {
 		*/
 		void recreateDefaultPoolResources(void);
 
+		/// @copydoc HardwareBufferManager::createRenderToVertexBuffer
+		RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
+
+
 
 	};
 
