@@ -44,6 +44,7 @@ Torus Knot Software Ltd.
 #include "OgreCompositionTechnique.h"
 #include "OgreCompositionTargetPass.h"
 #include "OgreCompositionPass.h"
+#include "OgreExternalTextureSourceManager.h"
 
 namespace Ogre{
 	
@@ -3511,6 +3512,88 @@ namespace Ogre{
 			}
 		}
 	}
+
+	/**************************************************************************
+	* TextureSourceTranslator
+	**************************************************************************/
+	TextureSourceTranslator::TextureSourceTranslator()
+	{
+	}
+	//-------------------------------------------------------------------------
+	void TextureSourceTranslator::translate(Ogre::ScriptCompiler *compiler, const Ogre::AbstractNodePtr &node)
+	{
+		ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+
+		// It has to have one value identifying the texture source name
+		if(obj->values.empty())
+		{
+			compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, node->file, node->line,
+				"texture_source requires a type value");
+			return;
+		}
+
+		// Set the value of the source
+		ExternalTextureSourceManager::getSingleton().setCurrentPlugIn(obj->values.front()->getValue());
+
+		// Set up the technique, pass, and texunit levels
+		if(ExternalTextureSourceManager::getSingleton().getCurrentPlugIn() != 0)
+		{
+			TextureUnitState *texunit = any_cast<TextureUnitState*>(obj->parent->context);
+			Pass *pass = texunit->getParent();
+			Technique *technique = pass->getParent();
+			Material *material = technique->getParent();
+
+			unsigned short techniqueIndex = 0, passIndex = 0, texUnitIndex = 0;
+			for(unsigned short i = 0; i < material->getNumTechniques(); i++)
+			{
+				if(material->getTechnique(i) == technique)
+				{
+					techniqueIndex = i;
+					break;
+				}
+			}
+			for(unsigned short i = 0; i < technique->getNumPasses(); i++)
+			{
+				if(technique->getPass(i) == pass)
+				{
+					passIndex = i;
+					break;
+				}
+			}
+			for(unsigned short i = 0; i < pass->getNumTextureUnitStates(); i++)
+			{
+				if(pass->getTextureUnitState(i) == texunit)
+				{
+					texUnitIndex = i;
+					break;
+				}
+			}
+
+			String tps;
+			tps = StringConverter::toString(techniqueIndex) + " "
+				+ StringConverter::toString(passIndex) + " "
+				+ StringConverter::toString(texUnitIndex);
+
+			ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->setParameter( "set_T_P_S", tps );
+
+			for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+			{
+				if((*i)->type == ANT_PROPERTY)
+				{
+					PropertyAbstractNode *prop = (PropertyAbstractNode*)(*i).get();
+					// Glob the property values all together
+					String str = "";
+					for(AbstractNodeList::iterator j = prop->values.begin(); j != prop->values.end(); ++j)
+						str = str + (*j)->getValue() + " ";
+					ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->setParameter(prop->name, str);
+				}
+				else if((*i)->type == ANT_OBJECT)
+				{
+					processNode(compiler, *i);
+				}
+			}
+		}
+	}
 	
 	/**************************************************************************
 	 * GpuProgramTranslator
@@ -5419,6 +5502,8 @@ namespace Ogre{
 				translator = &mPassTranslator;
 			else if(obj->id == ID_TEXTURE_UNIT && parent && parent->id == ID_PASS)
 				translator = &mTextureUnitTranslator;
+			else if(obj->id == ID_TEXTURE_SOURCE && parent && parent->id == ID_TEXTURE_UNIT)
+				translator = &mTextureSourceTranslator;
 			else if(obj->id == ID_FRAGMENT_PROGRAM || obj->id == ID_VERTEX_PROGRAM || obj->id == ID_GEOMETRY_PROGRAM)
 				translator = &mGpuProgramTranslator;
 			else if(obj->id == ID_PARTICLE_SYSTEM)
