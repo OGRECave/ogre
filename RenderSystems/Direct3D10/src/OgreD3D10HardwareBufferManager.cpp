@@ -184,5 +184,11 @@ namespace Ogre {
 			StringConverter::toString(iCount) + " unmanaged index buffers");
 	}
 	//-----------------------------------------------------------------------
+	RenderToVertexBufferSharedPtr D3D10HardwareBufferManager::createRenderToVertexBuffer()
+	{
+		return RenderToVertexBufferSharedPtr();
+		// todo
+	}
+	//-----------------------------------------------------------------------
 
 }
