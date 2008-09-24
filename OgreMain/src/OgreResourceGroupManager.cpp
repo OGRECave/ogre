@@ -881,6 +881,28 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
+	ScriptLoader *ResourceGroupManager::_findScriptLoader(const String &pattern)
+	{
+		OGRE_LOCK_AUTO_MUTEX;
+
+		ScriptLoaderOrderMap::iterator oi;
+		for (oi = mScriptLoaderOrderMap.begin();
+			oi != mScriptLoaderOrderMap.end(); ++oi)
+		{
+			ScriptLoader* su = oi->second;
+			const StringVector& patterns = su->getScriptPatterns();
+
+			// Search for matches in the patterns
+			for (StringVector::const_iterator p = patterns.begin(); p != patterns.end(); ++p)
+			{
+				if(*p == pattern)
+					return su;
+			}
+		}
+
+		return 0; // No loader was found
+	}
+	//-----------------------------------------------------------------------
 	void ResourceGroupManager::parseResourceGroupScripts(ResourceGroup* grp)
 	{
 

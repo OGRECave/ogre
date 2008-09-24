@@ -886,6 +886,11 @@ namespace Ogre {
         */
         void _unregisterScriptLoader(ScriptLoader* su);
 
+		/** Method used to directly query for registered script loaders.
+		@param pattern The specific script pattern (e.g. *.material) the script loader handles
+		*/
+		ScriptLoader *_findScriptLoader(const String &pattern);
+
 		/** Internal method for getting a registered ResourceManager.
 		@param resourceType String identifying the resource type.
 		*/
