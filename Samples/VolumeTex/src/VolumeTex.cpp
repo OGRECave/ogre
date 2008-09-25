@@ -123,30 +123,29 @@ public:
 
     bool frameRenderingQueued( const FrameEvent& evt )
     {
-	using namespace OIS;
 	static float mTimeUntilNextToggle = 0.0f;
         if( ExampleFrameListener::frameRenderingQueued( evt ) == false )
 		return false;
 		
 		mTimeUntilNextToggle -= evt.timeSinceLastFrame;
 		
-        if( (mKeyboard->isKeyDown( KC_1 ) || mKeyboard->isKeyDown( KC_2 )) 
+        if( (mKeyboard->isKeyDown( OIS::KC_1 ) || mKeyboard->isKeyDown( OIS::KC_2 )) 
 				&& mTimeUntilNextToggle <= 0) {
-        	global_real += mKeyboard->isKeyDown( KC_1 )? -0.1f : 0.1f;
+        	global_real += mKeyboard->isKeyDown( OIS::KC_1 )? -0.1f : 0.1f;
 			generate();
 			mTimeUntilNextToggle = 0.5;
 			updateInfoParamReal();
 		}
-		 if( (mKeyboard->isKeyDown( KC_3 ) || mKeyboard->isKeyDown( KC_4 )) 
+		 if( (mKeyboard->isKeyDown( OIS::KC_3 ) || mKeyboard->isKeyDown( OIS::KC_4 )) 
 				&& mTimeUntilNextToggle <= 0) {
-        	global_imag += mKeyboard->isKeyDown( KC_3 )? -0.1f : 0.1f;
+        	global_imag += mKeyboard->isKeyDown( OIS::KC_3 )? -0.1f : 0.1f;
 			generate();
 			mTimeUntilNextToggle = 0.5;
 			updateInfoParamImag();
 		}
-		if( (mKeyboard->isKeyDown( KC_5 ) || mKeyboard->isKeyDown( KC_6 )) 
+		if( (mKeyboard->isKeyDown( OIS::KC_5 ) || mKeyboard->isKeyDown( OIS::KC_6 )) 
 				&& mTimeUntilNextToggle <= 0) {
-        	global_theta += mKeyboard->isKeyDown( KC_5 )? -0.1f : 0.1f;
+        	global_theta += mKeyboard->isKeyDown( OIS::KC_5 )? -0.1f : 0.1f;
 			generate();
 			mTimeUntilNextToggle = 0.5;
 			updateInfoParamTheta();

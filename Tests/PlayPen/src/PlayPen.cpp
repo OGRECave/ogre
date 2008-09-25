@@ -105,8 +105,6 @@ String animBlendTarget[2];
 int animBlendTargetIndex;
 MovablePlane movablePlane("APlane");
 
-using namespace OIS;
-
 class RefractionTextureListener : public RenderTargetListener
 {
 public:
@@ -160,7 +158,7 @@ public:
     bool frameStarted(const FrameEvent& evt)
     {
 		//mMoveSpeed = 0.2;
-		if (mKeyboard->isKeyDown(KC_SCROLL))
+		if (mKeyboard->isKeyDown(OIS::KC_SCROLL))
 		{
 			mWindow->writeContentsToTimestampedFile("test", ".jpg");
 		}
@@ -284,7 +282,7 @@ public:
             timeUntilNextToggle -= evt.timeSinceLastFrame;
 
 		static bool mWireframe = false;
-		if (mKeyboard->isKeyDown(KC_G) && timeUntilNextToggle <= 0)
+		if (mKeyboard->isKeyDown(OIS::KC_G) && timeUntilNextToggle <= 0)
         {
 			mWireframe = !mWireframe;
 			if (mWireframe)
@@ -299,7 +297,7 @@ public:
 
 		}
 
-		if (mKeyboard->isKeyDown(KC_MINUS) && timeUntilNextToggle <= 0)
+		if (mKeyboard->isKeyDown(OIS::KC_MINUS) && timeUntilNextToggle <= 0)
 		{
 			if (mWindow->isFullScreen())
 			{
@@ -312,7 +310,7 @@ public:
 			timeUntilNextToggle = 5;
 
 		}
-		if (mKeyboard->isKeyDown(KC_EQUALS) && timeUntilNextToggle <= 0)
+		if (mKeyboard->isKeyDown(OIS::KC_EQUALS) && timeUntilNextToggle <= 0)
 		{
 			mWindow->setFullscreen(true, 800, 600);
 			timeUntilNextToggle = 0.5;
@@ -354,12 +352,12 @@ public:
 			(*animi)->addTime(evt.timeSinceLastFrame);
 		}
 
-        if (mKeyboard->isKeyDown(KC_R) && timeUntilNextToggle <= 0)
+        if (mKeyboard->isKeyDown(OIS::KC_R) && timeUntilNextToggle <= 0)
         {
             rotate = !rotate;
             timeUntilNextToggle = 0.5;
         }
-        if (mKeyboard->isKeyDown(KC_1) && timeUntilNextToggle <= 0)
+        if (mKeyboard->isKeyDown(OIS::KC_1) && timeUntilNextToggle <= 0)
         {
             animate = !animate;
             timeUntilNextToggle = 0.5;
@@ -433,7 +431,7 @@ public:
         }
 
         /*
-		if (mKeyboard->isKeyDown(KC_V) && timeUntilNextToggle <= 0)
+		if (mKeyboard->isKeyDown(OIS::KC_V) && timeUntilNextToggle <= 0)
         {
             static bool isVP = false;
             if (!isVP)
@@ -451,7 +449,7 @@ public:
         }
         */
 
-		if (mKeyboard->isKeyDown(KC_SPACE))
+		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
 		{
 			if (testremoveNode)
 			{
@@ -462,7 +460,7 @@ public:
 				}
 			}
 		}
-		if (mKeyboard->isKeyDown(KC_0))
+		if (mKeyboard->isKeyDown(OIS::KC_0))
 		{
 			if (testremoveNode)
 			{
@@ -473,46 +471,46 @@ public:
 				}
 			}
 		}
-		if (mKeyboard->isKeyDown(KC_P))
+		if (mKeyboard->isKeyDown(OIS::KC_P))
         {
             mTestNode[0]->yaw(Degree(-evt.timeSinceLastFrame * 30));
         }
-		if (mKeyboard->isKeyDown(KC_O))
+		if (mKeyboard->isKeyDown(OIS::KC_O))
         {
             mTestNode[0]->yaw(Degree(evt.timeSinceLastFrame * 30));
         }
-		if (mKeyboard->isKeyDown(KC_K))
+		if (mKeyboard->isKeyDown(OIS::KC_K))
         {
             mTestNode[0]->roll(Degree(-evt.timeSinceLastFrame * 30));
         }
-		if (mKeyboard->isKeyDown(KC_L))
+		if (mKeyboard->isKeyDown(OIS::KC_L))
         {
             mTestNode[0]->roll(Degree(evt.timeSinceLastFrame * 30));
         }
-		if (mKeyboard->isKeyDown(KC_U))
+		if (mKeyboard->isKeyDown(OIS::KC_U))
         {
             mTestNode[0]->translate(0,0,-evt.timeSinceLastFrame * 30);
         }
-		if (mKeyboard->isKeyDown(KC_J))
+		if (mKeyboard->isKeyDown(OIS::KC_J))
         {
             mTestNode[0]->translate(0,0,evt.timeSinceLastFrame * 30);
         }
-		if (mKeyboard->isKeyDown(KC_M))
+		if (mKeyboard->isKeyDown(OIS::KC_M))
         {
             mTestNode[0]->translate(0,evt.timeSinceLastFrame * 30, 0);
         }
-		if (mKeyboard->isKeyDown(KC_N))
+		if (mKeyboard->isKeyDown(OIS::KC_N))
         {
             mTestNode[0]->translate(0,-evt.timeSinceLastFrame * 30, 0);
         }
 
-        if (mKeyboard->isKeyDown(KC_0) && timeUntilNextToggle <= 0)
+        if (mKeyboard->isKeyDown(OIS::KC_0) && timeUntilNextToggle <= 0)
         {
             mAnimState->setEnabled(!mAnimState->getEnabled());
             timeUntilNextToggle = 0.5;
         }
 
-		if (mEntity && mKeyboard->isKeyDown(KC_SPACE) && timeUntilNextToggle <= 0)
+		if (mEntity && mKeyboard->isKeyDown(OIS::KC_SPACE) && timeUntilNextToggle <= 0)
 		{
 			mSceneMgr->destroyEntity(mEntity);
 			//mLight->setCastShadows(true);
@@ -2023,7 +2021,7 @@ protected:
         for (int i = 0; i < 12; ++i)
         {
             ent = mSceneMgr->createEntity("robot" + StringConverter::toString(i), "robot.mesh");
-			if (false)//i % 2)
+			if (i % 2)
 			{
 				Entity* ent2 = mSceneMgr->createEntity("plane" + StringConverter::toString(i), "razor.mesh");
 				ent->attachObjectToBone("Joint8", ent2);
@@ -6829,16 +6827,14 @@ protected:
 
 	void testBug()
 	{
-		const_cast<RenderSystemCapabilities*>(mRoot->getRenderSystem()->getCapabilities())->setCapability(RSC_AUTOMIPMAP);
-
-
-		MaterialPtr mat = MaterialManager::getSingleton().create("uncompressed2d", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		mat->getTechnique(0)->getPass(0)->createTextureUnitState("ogrelogo.png");
 
 		Entity *e = mSceneMgr->createEntity("Plane", SceneManager::PT_PLANE);
-		e->setMaterialName(mat->getName());
+		e->setMaterialName("transform");
 		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
 		mWindow->getViewport(0)->setBackgroundColour(ColourValue::Red);
+
+
+
 
 		mCamera->setPosition(0,0,300);
 		mCamera->lookAt(Vector3::ZERO);
@@ -7188,7 +7184,7 @@ protected:
 
 		Any anyString(String("test"));
 
-		//testBug();
+		testBug();
 		//testSharedPtrBug();
         //testMatrices();
         //testBsp();
@@ -7310,7 +7306,7 @@ protected:
 		//testSRGBtexture(true);
 		//testLightClipPlanesMoreLights(true);
 
-		testFarFromOrigin();
+		//testFarFromOrigin();
 		//testGeometryShaders();
 		//testAlphaToCoverage();
 		
@@ -7388,12 +7384,12 @@ class MemoryTestFrameListener : public FrameListener
 {
 protected:
 	Real time;
-	Keyboard* mKeyboard;
+	OIS::Keyboard* mKeyboard;
 public:
 	MemoryTestFrameListener(RenderWindow * win)
 	{
 		time = 0;
-		ParamList pl;	
+		OIS::ParamList pl;	
 		size_t windowHnd = 0;
 		std::ostringstream windowHndStr;
 
@@ -7401,10 +7397,10 @@ public:
 		windowHndStr << windowHnd;
 		pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
 
-		InputManager &im = *InputManager::createInputSystem( pl );
+		OIS::InputManager &im = *OIS::InputManager::createInputSystem( pl );
 
 		//Create all devices (We only catch joystick exceptions here, as, most people have Key/Mouse)
-		mKeyboard = static_cast<Keyboard*>(im.createInputObject( OISKeyboard, false ));
+		mKeyboard = static_cast<OIS::Keyboard*>(im.createInputObject( OIS::OISKeyboard, false ));
 	}
 	virtual ~MemoryTestFrameListener()
 	{
@@ -7413,7 +7409,7 @@ public:
 
 	bool frameStarted(const FrameEvent& evt)
 	{
-		if( mKeyboard->isKeyDown( KC_ESCAPE) )
+		if( mKeyboard->isKeyDown( OIS::KC_ESCAPE) )
 		{
 			gReload = false;
 			return false;
@@ -7434,11 +7430,11 @@ public:
 		}
 	}
 
-	void keyClicked(KeyEvent* e) {};
-	void keyPressed(KeyEvent* e) {};
-	void keyReleased(KeyEvent* e) {};
-	void keyFocusIn(KeyEvent* e) {}
-	void keyFocusOut(KeyEvent* e) {}
+	void keyClicked(OIS::KeyEvent* e) {};
+	void keyPressed(OIS::KeyEvent* e) {};
+	void keyReleased(OIS::KeyEvent* e) {};
+	void keyFocusIn(OIS::KeyEvent* e) {}
+	void keyFocusOut(OIS::KeyEvent* e) {}
 };
 
 /** Application class */

@@ -232,44 +232,43 @@ public:
 
     bool frameRenderingQueued( const FrameEvent& evt )
     {
-	using namespace OIS;
         if( ExampleFrameListener::frameRenderingQueued( evt ) == false )
 		return false;
 		
-        if( mKeyboard->isKeyDown( KC_1 ) ) {
+        if( mKeyboard->isKeyDown( OIS::KC_1 ) ) {
         	k -= FROMFLOAT(0.005f*evt.timeSinceLastFrame);
 			updateInfoParamK();
 		}
-        if( mKeyboard->isKeyDown( KC_2 ) ) {
+        if( mKeyboard->isKeyDown( OIS::KC_2 ) ) {
         	k += FROMFLOAT(0.005f*evt.timeSinceLastFrame);
 			updateInfoParamK();
 		}
-        if( mKeyboard->isKeyDown( KC_3 ) ) {
+        if( mKeyboard->isKeyDown( OIS::KC_3 ) ) {
         	F -= FROMFLOAT(0.005f*evt.timeSinceLastFrame);
 			updateInfoParamF();
 		}
-        if( mKeyboard->isKeyDown( KC_4 ) ) {
+        if( mKeyboard->isKeyDown( OIS::KC_4 ) ) {
         	F += FROMFLOAT(0.005f*evt.timeSinceLastFrame);
 			updateInfoParamF();
 		}
-        if( mKeyboard->isKeyDown( KC_5 ) ) {
+        if( mKeyboard->isKeyDown( OIS::KC_5 ) ) {
         	hdiv0 -= FROMFLOAT(0.005f*evt.timeSinceLastFrame);
 			updateInfoParamA0();
 		}
-        if( mKeyboard->isKeyDown( KC_6 ) ) {
+        if( mKeyboard->isKeyDown( OIS::KC_6 ) ) {
         	hdiv0 += FROMFLOAT(0.005f*evt.timeSinceLastFrame);
 			updateInfoParamA0();
 		}
-        if( mKeyboard->isKeyDown( KC_7 ) ) {
+        if( mKeyboard->isKeyDown( OIS::KC_7 ) ) {
         	hdiv1 -= FROMFLOAT(0.005f*evt.timeSinceLastFrame);
 			updateInfoParamA1();
 		}
-        if( mKeyboard->isKeyDown( KC_8 ) ) {
+        if( mKeyboard->isKeyDown( OIS::KC_8 ) ) {
         	hdiv1 += FROMFLOAT(0.005f*evt.timeSinceLastFrame);
 			updateInfoParamA1();
 		}
 
-		if( mKeyboard->isKeyDown( KC_0 ) && !rpressed ) {
+		if( mKeyboard->isKeyDown( OIS::KC_0 ) && !rpressed ) {
 			// Reset 0
 			resetReactor();
 			fireUpReactor();
