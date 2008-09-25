@@ -121,7 +121,11 @@ namespace Ogre {
     #endif
 
     #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
-    #   define HashMap ::__gnu_cxx::hash_map
+	#   if OGRE_COMP_VER >= 430
+	#       define HashMap ::std::tr1::unordered_map
+	#    else
+	#       define HashMap ::__gnu_cxx::hash_map
+	#    endif
     #else
     #   if OGRE_COMPILER == OGRE_COMPILER_MSVC
     #       if OGRE_COMP_VER > 1300 && !defined(_STLP_MSVC)
