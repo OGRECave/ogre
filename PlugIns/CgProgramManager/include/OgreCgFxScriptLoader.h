@@ -36,6 +36,7 @@ Torus Knot Software Ltd.
 #include "OgreCgPrerequisites.h"
 #include "OgreTexture.h"
 #include "OgreTextureUnitState.h"
+#include "OgreGpuProgram.h"
 
 namespace Ogre {
 
