@@ -3592,6 +3592,8 @@ namespace Ogre{
 					processNode(compiler, *i);
 				}
 			}
+
+			ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->createDefinedTexture(material->getName(), material->getGroup());
 		}
 	}
 	
