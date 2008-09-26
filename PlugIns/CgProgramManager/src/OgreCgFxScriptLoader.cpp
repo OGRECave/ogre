@@ -39,19 +39,19 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector1b::Vector1b() : x(false)
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector1b::Vector1b( bool iX ) : x( iX )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector1b::Vector1b( CGstateassignment cgStateAssignment ) : x( false )
 	{
 		int nValsDummy[1];
@@ -59,29 +59,33 @@ namespace Ogre {
 		values = cgGetBoolStateAssignmentValues(cgStateAssignment, nValsDummy);
 		assert(nValsDummy[0] == 1);
 
+#if ( OGRE_COMPILER == OGRE_COMPILER_MSVC )
 #pragma warning(push)
-#pragma warning(disable: 4800) // warning C4800: 'const CGbool' : forcing value to bool 'true' or 'false' (performance warning)	
+#pragma warning(disable: 4800) // warning C4800: 'const CGbool' : forcing value to bool 'true' or 'false' (performance warning)
+#endif
 		x = static_cast<bool>(values[0]);
+#if ( OGRE_COMPILER == OGRE_COMPILER_MSVC )
 #pragma warning(pop)
+#endif
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector1b::operator bool() const
 	{
 		return x;
 	}
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector2b::Vector2b() : x( false ), y( false )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector2b::Vector2b( bool iX, bool iY , bool iZ, bool iW ) : x( iX ), y( iY )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector2b::Vector2b( CGstateassignment cgStateAssignment ) : x( false ), y( false )
 	{
 		int nValsDummy[1];
@@ -89,25 +93,29 @@ namespace Ogre {
 		values = cgGetBoolStateAssignmentValues(cgStateAssignment, nValsDummy);
 		assert(nValsDummy[0] == 2);
 
+#if ( OGRE_COMPILER == OGRE_COMPILER_MSVC )
 #pragma warning(push)
-#pragma warning(disable: 4800) // warning C4800: 'const CGbool' : forcing value to bool 'true' or 'false' (performance warning)	
+#pragma warning(disable: 4800) // warning C4800: 'const CGbool' : forcing value to bool 'true' or 'false' (performance warning)
+#endif
 		x = static_cast<bool>(values[0]);
 		y = static_cast<bool>(values[1]);
+#if ( OGRE_COMPILER == OGRE_COMPILER_MSVC )
 #pragma warning(pop)
+#endif
 	}
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
-	//-------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//--------------------------------------------------------------------
 	CgFxScriptLoader::Vector3b::Vector3b() : x( false ), y( false ), z( false )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector3b::Vector3b( bool iX, bool iY , bool iZ, bool iW ) : x( iX ), y( iY ), z( iZ )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector3b::Vector3b( CGstateassignment cgStateAssignment ) : x( false ), y( false ), z( false )
 	{
 		int nValsDummy[1];
@@ -115,26 +123,30 @@ namespace Ogre {
 		values = cgGetBoolStateAssignmentValues(cgStateAssignment, nValsDummy);
 		assert(nValsDummy[0] == 3);
 
+#if ( OGRE_COMPILER == OGRE_COMPILER_MSVC )
 #pragma warning(push)
-#pragma warning(disable: 4800) // warning C4800: 'const CGbool' : forcing value to bool 'true' or 'false' (performance warning)	
+#pragma warning(disable: 4800) // warning C4800: 'const CGbool' : forcing value to bool 'true' or 'false' (performance warning)
+#endif
 		x = static_cast<bool>(values[0]);
 		y = static_cast<bool>(values[1]);
 		z = static_cast<bool>(values[2]);
+#if ( OGRE_COMPILER == OGRE_COMPILER_MSVC )
 #pragma warning(pop)
+#endif
 	}
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector4b::Vector4b() : x( false ), y( false ), z( false ), w( false )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector4b::Vector4b( bool iX, bool iY , bool iZ, bool iW ) : x( iX ), y( iY ), z( iZ ), w( iW )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector4b::Vector4b( CGstateassignment cgStateAssignment ) : x( false ), y( false ), z( false ), w( false )
 	{
 		int nValsDummy[1];
@@ -142,27 +154,31 @@ namespace Ogre {
 		values = cgGetBoolStateAssignmentValues(cgStateAssignment, nValsDummy);
 		assert(nValsDummy[0] == 4);
 
+#if ( OGRE_COMPILER == OGRE_COMPILER_MSVC )
 #pragma warning(push)
-#pragma warning(disable: 4800) // warning C4800: 'const CGbool' : forcing value to bool 'true' or 'false' (performance warning)	
+#pragma warning(disable: 4800) // warning C4800: 'const CGbool' : forcing value to bool 'true' or 'false' (performance warning)
+#endif
 		x = static_cast<bool>(values[0]);
 		y = static_cast<bool>(values[1]);
 		z = static_cast<bool>(values[2]);
 		w = static_cast<bool>(values[3]);
+#if ( OGRE_COMPILER == OGRE_COMPILER_MSVC )
 #pragma warning(pop)
+#endif
 	}
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector1i::Vector1i() : x( 0 )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector1i::Vector1i( int iX ) : x( iX )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector1i::Vector1i( CGstateassignment cgStateAssignment ) : x( 0 )
 	{
 		int nValsDummy[1];
@@ -172,24 +188,24 @@ namespace Ogre {
 
 		x = values[0];
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector1i::operator int() const
 	{
 		return x;
 	}
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector2i::Vector2i() : x( 0 ), y( 0 )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector2i::Vector2i( int iX, int iY ) : x( iX ), y( iY )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector2i::Vector2i( CGstateassignment cgStateAssignment ) : x( 0 ), y( 0 )
 	{
 		int nValsDummy[1];
@@ -200,19 +216,19 @@ namespace Ogre {
 		x = values[0];
 		y = values[1];
 	}
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector3i::Vector3i() : x( 0 ), y( 0 ), z( 0 )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector3i::Vector3i( int iX, int iY, int iZ ) : x( iX ), y( iY ) , z( iZ )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector3i::Vector3i( CGstateassignment cgStateAssignment ) : x( 0 ), y( 0 ), z( 0 )
 	{
 		int nValsDummy[1];
@@ -224,19 +240,19 @@ namespace Ogre {
 		y = values[1];
 		z = values[2];
 	}
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector4i::Vector4i() : x( 0 ), y( 0 ), z( 0 ), w( 0 )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector4i::Vector4i( int iX, int iY, int iZ, int iW ) : x( iX ), y( iY ), z( iZ ), w( iW )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector4i::Vector4i( CGstateassignment cgStateAssignment ) : x( 0 ), y( 0 ), z( 0 ), w( 0 )
 	{
 		int nValsDummy[1];
@@ -249,19 +265,19 @@ namespace Ogre {
 		z = values[2];
 		w = values[3];
 	}
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector1f::Vector1f() : x( 0.0f )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector1f::Vector1f( float iX, float iY, float iZ ) : x( iX )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector1f::Vector1f( CGstateassignment cgStateAssignment ) : x( 0.0f )
 	{
 		int nValsDummy[1];
@@ -271,24 +287,24 @@ namespace Ogre {
 
 		x = values[0];
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector1f::operator float() const
 	{
 		return x;
 	}
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector2f::Vector2f() : x( 0.0f ), y( 0.0f )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector2f::Vector2f( float iX, float iY, float iZ ) : x( iX ), y( iY )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector2f::Vector2f( CGstateassignment cgStateAssignment ) : x( 0.0f ), y( 0.0f )
 	{
 		int nValsDummy[1];
@@ -299,19 +315,19 @@ namespace Ogre {
 		x = values[0];
 		y = values[1];
 	}
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector3f::Vector3f() : x( 0.0f ), y( 0.0f ), z( 0.0f )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector3f::Vector3f( float iX, float iY, float iZ ) : x( iX ), y( iY ), z( iZ )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector3f::Vector3f( CGstateassignment cgStateAssignment ) : x( 0.0f ), y( 0.0f ), z( 0.0f )
 	{
 		int nValsDummy[1];
@@ -323,19 +339,19 @@ namespace Ogre {
 		y = values[1];
 		z = values[2];
 	}
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector4f::Vector4f() : x( 0.0f ), y( 0.0f ), z( 0.0f ), w( 0.0f )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector4f::Vector4f( float iX, float iY, float iZ, float iW ) : x( iX ), y( iY ), z( iZ ), w( iW )
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::Vector4f::Vector4f( CGstateassignment cgStateAssignment ) : x( 0.0f ), y( 0.0f ), z( 0.0f ), w( 0.0f )
 	{
 		int nValsDummy[1];
@@ -348,45 +364,46 @@ namespace Ogre {
 		z = values[2];
 		w = values[3];
 	}
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::CgStateListener::CgStateListener(CGtype cgType)
 		: mCgState(0),
-		mCgContext(CgFxScriptLoader::getSingleton().getCgContext()),
-		mCgType(cgType)
-	
+		mCgType(cgType),
+		mCgContext(CgFxScriptLoader::getSingleton().getCgContext())
+
+
 	{
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::CgStateListener::~CgStateListener()
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CGbool CgFxScriptLoader::CgStateListener::cgCallBackSet( const CGstateassignment cgStateAssignment )
 	{
 		return CG_TRUE;
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CGbool CgFxScriptLoader::CgStateListener::cgCallBackReset( CGstateassignment cgStateAssignment )
 	{
 		return CG_TRUE;
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CGbool CgFxScriptLoader::CgStateListener::cgCallBackValidate( CGstateassignment cgStateAssignment )
 	{
 		return CG_TRUE;
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	void CgFxScriptLoader::CgStateListener::init()
 	{
 		createState();
-		checkForCgError("CgFxScriptLoader::CgStateListener::init", 
-			"Unable to Set create State: ", mCgContext);		
-		
+		checkForCgError("CgFxScriptLoader::CgStateListener::init",
+			"Unable to Set create State: ", mCgContext);
+
 		cgSetStateCallbacks( mCgState, getCgCallBackSet(), getCgCallBackReset(), getCgCallBackValidate() );
-		checkForCgError("CgFxScriptLoader::CgStateListener::init", 
+		checkForCgError("CgFxScriptLoader::CgStateListener::init",
 			"Unable to Set State Callbacks: ", mCgContext);
 	}
 	//---------------------------------------------------------------------
@@ -394,7 +411,7 @@ namespace Ogre {
 	{
 		cgAddStateEnumerant(mCgState, name, value);
 
-		checkForCgError("CgFxScriptLoader::CgMinFilterSamplerStateListener::createState", 
+		checkForCgError("CgFxScriptLoader::CgMinFilterSamplerStateListener::createState",
 			"Unable to Add State Enumerants: ", mCgContext);
 
 	}
@@ -432,12 +449,12 @@ namespace Ogre {
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	CgFxScriptLoader::CgGlobalStateListener::~CgGlobalStateListener()
 	{
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	void CgFxScriptLoader::CgGlobalStateListener::createState()
 	{
 		const char * typeNameAsString = CgFxScriptLoader::getSingleton().getGlobalStateNameTypeToString(mGlobalStateType);
@@ -1497,7 +1514,7 @@ namespace Ogre {
 		case TGMT_EYELINEAR: // EyeLinear
 		case TGMT_SPHEREMAP: // SphereMap
 		case TGMT_REFLECTIONMAP: // ReflectionMap
-		case TGMT_NORMALMAP: // NormalMap		
+		case TGMT_NORMALMAP: // NormalMap
 		default:
 			// todo - error
 			break;
@@ -2490,14 +2507,14 @@ namespace Ogre {
 	void CgFxScriptLoader::CgMinFilterSamplerStateListener::createState()
 	{
 		CgSamplerStateListener::createState();
-		
+
 		addStateEnumerant((int)MINFT_NEAREST				, "Nearest");
 		addStateEnumerant((int)MINFT_LINEAR					, "Linear");
 		addStateEnumerant((int)MINFT_LINEARMIPMAPNEAREST	, "LinearMipMapNearest");
 		addStateEnumerant((int)MINFT_NEARESTMIPMAPNEAREST	, "NearestMipMapNearest");
 		addStateEnumerant((int)MINFT_NEARESTMIPMAPLINEAR	, "NearestMipMapLinear");
 		addStateEnumerant((int)MINFT_LINEARMIPMAPLINEAR		, "LinearMipMapLinear");
-		
+
 	}
 	//---------------------------------------------------------------------
 	void CgFxScriptLoader::CgMinFilterSamplerStateListener::upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment )
@@ -2633,14 +2650,14 @@ namespace Ogre {
         return ms_Singleton;
     }
     CgFxScriptLoader& CgFxScriptLoader::getSingleton(void)
-    {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+    {
+        assert( ms_Singleton );  return ( *ms_Singleton );
     }
 	//---------------------------------------------------------------------
-    CgFxScriptLoader::CgFxScriptLoader() 
+    CgFxScriptLoader::CgFxScriptLoader()
     {
 		mCgContext = cgCreateContext();
-	
+
 		mCgStateListenerVector.resize(GST_COUNT);
 		for (int i = GST_FIRST ; i < GST_COUNT ; i++)
 		{
@@ -2661,7 +2678,7 @@ namespace Ogre {
 			mCgSamplerStateToListenerMap[mCgSamplerStateListenerVector[i]->getCgState()] = newState;
 
 		}
-		
+
 
 
         // Scripting is supported by this manager
@@ -2714,7 +2731,7 @@ namespace Ogre {
 		String sourceToUse = CgProgram::resolveCgIncludes(streamAsString, ogreMaterial.getPointer(), stream->getName());
 
 		CGeffect cgEffect = cgCreateEffect(mCgContext, sourceToUse.c_str(), NULL);
-		checkForCgError("CgFxScriptLoader::parseScript", 
+		checkForCgError("CgFxScriptLoader::parseScript",
 			"Unable to Create cg Effect: ", mCgContext);
 
 		ogreMaterial->removeAllTechniques();
@@ -2761,10 +2778,10 @@ namespace Ogre {
 			{
 				ogrePass->setName(cgPassName);
 			}
-			
+
 			parseCgPass(cgPass, ogrePass);
 			parseSamplerParameters(cgPass, ogrePass);
-			
+
 			cgPass = cgGetNextPass(cgPass);
 		}
 	}
@@ -2786,11 +2803,14 @@ namespace Ogre {
 		const char *stateName = NULL;
 		switch(ogreProgramType)
 		{
-		case GPT_VERTEX_PROGRAM: 
+		case GPT_VERTEX_PROGRAM:
 			stateName = "VertexProgram";
 			break;
-		case GPT_FRAGMENT_PROGRAM: 
+		case GPT_FRAGMENT_PROGRAM:
 			stateName = "FragmentProgram";
+			break;
+		case GPT_GEOMETRY_PROGRAM:
+			stateName = "GeometryProgram";
 			break;
 		}
 		CGstateassignment cgStateAssignment = cgGetNamedStateAssignment(cgPass, stateName);
@@ -2798,12 +2818,15 @@ namespace Ogre {
 		{
 			switch(ogreProgramType)
 			{
-			case GPT_VERTEX_PROGRAM: 
+			case GPT_VERTEX_PROGRAM:
 				stateName = "VertexShader";
 				break;
-			case GPT_FRAGMENT_PROGRAM: 
+			case GPT_FRAGMENT_PROGRAM:
 				stateName = "PixelShader";
 				break;
+            case GPT_GEOMETRY_PROGRAM:
+                stateName = "GeometryShader";
+                break;
 			}
 
 			cgStateAssignment = cgGetNamedStateAssignment(cgPass, stateName);
@@ -2820,8 +2843,6 @@ namespace Ogre {
 		CGparameter cgParameter = cgGetFirstParameter(cgProgram, CG_PROGRAM);
 		while (cgParameter)
 		{
-			CGenum parameterVariability = cgGetParameterVariability(cgParameter);
-			CGbool isParameterReferenced = cgIsParameterReferenced(cgParameter);
 			String paramName = cgGetParameterName(cgParameter);
 			cgParameter = cgGetNextParameter(cgParameter);
 		}
@@ -2830,7 +2851,7 @@ namespace Ogre {
 		const char * source = cgGetProgramString(cgProgram, CG_PROGRAM_SOURCE);
 		const char * entry = cgGetProgramString(cgProgram, CG_PROGRAM_ENTRY);
 		const char * profile = cgGetProgramString(cgProgram, CG_PROGRAM_PROFILE);
-		
+
 		// The name is all the path to this shader combined with the entry point and profile so it will be unique.
 		std::stringstream programName;
 		programName << ogrePass->getParent()->getParent()->getName() << "|"; // Material
@@ -2842,14 +2863,14 @@ namespace Ogre {
 		programName << ogrePass->getName(); // Pass
 
 		String ProgramNameAsString = programName.str();
-		
-		HighLevelGpuProgramPtr ogreProgram = 
+
+		HighLevelGpuProgramPtr ogreProgram =
 			HighLevelGpuProgramManager::getSingleton().
-			createProgram(ProgramNameAsString, 
-			ogrePass->getParent()->getParent()->getGroup(), 
-			"cg", 
+			createProgram(ProgramNameAsString,
+			ogrePass->getParent()->getParent()->getGroup(),
+			"cg",
 			ogreProgramType);
-		
+
 		ogreProgram->setSource(source);
 		ogreProgram->setParameter("entry_point", entry);
 		ogreProgram->setParameter("profiles", profile);
@@ -2872,6 +2893,9 @@ namespace Ogre {
 			case GPT_FRAGMENT_PROGRAM:
 				ogrePass->setFragmentProgram(ogreProgram->getName());
 				break;
+			case GPT_GEOMETRY_PROGRAM:
+				ogrePass->setGeometryProgram(ogreProgram->getName());
+				break;
 			}
 
 		}
@@ -2887,7 +2911,6 @@ namespace Ogre {
 		{
 			// get the constant definition
 			const String& ogreParamName = constIt.peekNextKey();
-			const GpuConstantDefinition& def = constIt.getNext();
 
 			CGparameter cgParameter = cgGetNamedEffectParameter(cgEffect, ogreParamName.c_str());
 			// try to find it without case
@@ -2927,9 +2950,9 @@ namespace Ogre {
 	void CgFxScriptLoader::parseCgProgramParameter( CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName )
 	{
 
-			bool isAutoConstant = 
+			bool isAutoConstant =
 				parseAutoConstantParam(cgParameter,
-				ogreProgramParameters, 
+				ogreProgramParameters,
 				ogreParamName);
 
 			if (!isAutoConstant)
@@ -2956,14 +2979,14 @@ namespace Ogre {
 					// todo
 					break;
 				default:
-					int aq = 4;
+					// todo error
 					break;
 
 				}
 			}
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	const CgFxScriptLoader::FXSemanticID CgFxScriptLoader::cgSemanticStringToType( const char * cgParamSemantic )
 	{
 		String sem = cgParamSemantic;
@@ -3040,7 +3063,7 @@ namespace Ogre {
 
 		return FXS_UNKNOWN;
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	const char * CgFxScriptLoader::getGlobalStateNameTypeToString( const GlobalStateType cgStateName )
 	{
 		switch(cgStateName)
@@ -3324,7 +3347,7 @@ namespace Ogre {
 		}
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	const char * CgFxScriptLoader::getSamplerStateNameTypeToString( const SamplerStateType cgStateName )
 	{
 		switch(cgStateName)
@@ -3356,7 +3379,7 @@ namespace Ogre {
 		}
 
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	const bool CgFxScriptLoader::cgSemanticToOgreAutoConstantType( const char * cgParamSemantic, GpuProgramParameters::AutoConstantType & ogreAutoConstantType )
 	{
 		FXSemanticID cgFXSemanticID = cgSemanticStringToType(cgParamSemantic);
@@ -3570,9 +3593,9 @@ namespace Ogre {
 			return false;
 		}
 
-		
+
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	bool CgFxScriptLoader::parseAutoConstantParam( CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName )
 	{
 		const char * cgParamSemantic = cgGetParameterSemantic(cgParameter);
@@ -3587,8 +3610,7 @@ namespace Ogre {
 			}
 			else
 			{
-				// todo - an error?
-				int i = 4;
+				// todo - an error
 			}
 			if (isAutoConstant)
 			{
@@ -3597,7 +3619,7 @@ namespace Ogre {
 		}
 		return isAutoConstant;
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	void CgFxScriptLoader::parseFloatCgProgramParameter( CGtype cgParamType, CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName )
 	{
 		float cgParamValue[4*4] = {
@@ -3667,13 +3689,16 @@ namespace Ogre {
 			paramSize = 4*3;
 			break;
 		case CG_FLOAT4x4:
-			paramSize = 4*4;			
+			paramSize = 4*4;
+			break;
+		default:
+            // todo error
 			break;
 		}
-		cgGetParameterValuefc(cgParameter, paramSize, cgParamValue);					
+		cgGetParameterValuefc(cgParameter, paramSize, cgParamValue);
 		ogreProgramParameters->setNamedConstant(ogreParamName, cgParamValue, 1, paramSize);
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	void CgFxScriptLoader::parseIntCgProgramParameter( CGtype cgParamType, CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName )
 	{
 		int cgParamValue[4*4] = {
@@ -3743,13 +3768,16 @@ namespace Ogre {
 			paramSize = 4*3;
 			break;
 		case CG_INT4x4:
-			paramSize = 4*4;			
+			paramSize = 4*4;
+			break;
+		default:
+            // todo error
 			break;
 		}
-		cgGetParameterValueic(cgParameter, paramSize, cgParamValue);					
+		cgGetParameterValueic(cgParameter, paramSize, cgParamValue);
 		ogreProgramParameters->setNamedConstant(ogreParamName, cgParamValue, 1, paramSize);
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	Ogre::CgFxScriptLoader::CgSamplerStateListener * CgFxScriptLoader::createCgSamplerStateListener( const SamplerStateType type )
 	{
 		switch(type)
@@ -3792,7 +3820,7 @@ namespace Ogre {
 			return OGRE_NEW CgSamplerStateListener(type, CG_STRING);
 		}
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	Ogre::CgFxScriptLoader::CgGlobalStateListener * CgFxScriptLoader::createCgGlobalStateListener( const GlobalStateType type )
 	{
 		switch(type)
@@ -4068,29 +4096,29 @@ namespace Ogre {
 		case GST_LIGHTMODELCOLORCONTROL:
 			return OGRE_NEW CgLightModelColorControlGlobalStateListener();
 		case GST_LOGICOP:
-			return OGRE_NEW CgLogicOpGlobalStateListener();		
+			return OGRE_NEW CgLogicOpGlobalStateListener();
 		case GST_POINTSPRITECOORDORIGIN:
-			return OGRE_NEW CgPointSpriteCoordOriginGlobalStateListener();	
+			return OGRE_NEW CgPointSpriteCoordOriginGlobalStateListener();
 		case GST_POINTSPRITERMODE:
-			return OGRE_NEW CgPointSpriteRModeGlobalStateListener();	
+			return OGRE_NEW CgPointSpriteRModeGlobalStateListener();
 		case GST_SHADEMODEL:
 		case GST_SHADEMODE:
-			return OGRE_NEW CgShadeModelGlobalStateListener();			
+			return OGRE_NEW CgShadeModelGlobalStateListener();
 		case GST_TEXGENSMODE:
 		case GST_TEXGENTMODE:
 		case GST_TEXGENRMODE:
 		case GST_TEXGENQMODE:
 			return OGRE_NEW CgTexGenModeGlobalStateListener(type);
 		case GST_TEXTUREENVMODE:
-			return OGRE_NEW CgTextureEnvModeGlobalStateListener();			
+			return OGRE_NEW CgTextureEnvModeGlobalStateListener();
 		case GST_MINFILTER:
-			return OGRE_NEW CgMinFilterGlobalStateListener();			
+			return OGRE_NEW CgMinFilterGlobalStateListener();
 		case GST_MAGFILTER:
-			return OGRE_NEW CgMagFilterGlobalStateListener();			
+			return OGRE_NEW CgMagFilterGlobalStateListener();
 		case GST_FRONTFACE:
 			return OGRE_NEW CgFrontFaceGlobalStateListener();
 		case GST_CULLFACE:
-			return OGRE_NEW CgCullFaceGlobalStateListener();	
+			return OGRE_NEW CgCullFaceGlobalStateListener();
 		case GST_FOGCOORDSRC:
 			return OGRE_NEW CgFogCoordSrcGlobalStateListener();
 		case GST_ALPHAFUNC:
@@ -4120,7 +4148,7 @@ namespace Ogre {
 		return OGRE_NEW CgGlobalStateListener(type, CG_STRING);
 		}
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	void CgFxScriptLoader::parsePassStateAssignments( CGpass cgPass, Pass * ogrePass )
 	{
 		CGstateassignment cgStateAssignment = cgGetFirstStateAssignment(cgPass);
@@ -4136,13 +4164,13 @@ namespace Ogre {
 			cgStateAssignment = cgGetNextStateAssignment(cgStateAssignment);
 		}
 	}
-	//--------------------------------------------------------------------- 
+	//---------------------------------------------------------------------
 	void CgFxScriptLoader::parseTextureUnitState( CGstateassignment cgStateAssignment, TextureUnitState * ogreTextureUnitState )
 	{
 		CGstate cgState = cgGetSamplerStateAssignmentState(cgStateAssignment);
 
-		checkForCgError("CgFxScriptLoader::parseTextureUnitState", 
-			"Unable to Get State Assignment State: ", mCgContext);		
+		checkForCgError("CgFxScriptLoader::parseTextureUnitState",
+			"Unable to Get State Assignment State: ", mCgContext);
 
 		CgSamplerStateToListenerMap::iterator samplerStateIter = mCgSamplerStateToListenerMap.find(cgState);
 		if (samplerStateIter != mCgSamplerStateToListenerMap.end())
@@ -4157,7 +4185,7 @@ namespace Ogre {
 		CGparameter cgParameter = cgGetFirstEffectParameter(cgEffect);
 		while (cgParameter)
 		{
-			if (cgGetParameterClass(cgParameter) == CG_PARAMETERCLASS_SAMPLER) 
+			if (cgGetParameterClass(cgParameter) == CG_PARAMETERCLASS_SAMPLER)
 			{
 				CGstateassignment cgStateAssignment = cgGetFirstSamplerStateAssignment(cgParameter);
 
@@ -4165,7 +4193,7 @@ namespace Ogre {
 				{
 					TextureUnitState * ogreTextureUnitState = ogrePass->createTextureUnitState();
 
-					while(cgStateAssignment) 
+					while(cgStateAssignment)
 					{
 						if(cgIsStateAssignment(cgStateAssignment))
 						{
