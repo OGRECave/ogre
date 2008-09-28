@@ -575,6 +575,7 @@
 		AA261E8D0CA17DC2000A3707 /* OgreRenderSystemCapabilitiesSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA261E8B0CA17DC2000A3707 /* OgreRenderSystemCapabilitiesSerializer.cpp */; };
 		AA508FB50C972C1B00D6EAD0 /* OgreTangentSpaceCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA508FB40C972C1B00D6EAD0 /* OgreTangentSpaceCalc.cpp */; };
 		AA508FB70C972C9000D6EAD0 /* OgreTangentSpaceCalc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA508FB60C972C8F00D6EAD0 /* OgreTangentSpaceCalc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA5607850E901ED60041BF06 /* OgreAxisAlignedBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA5607840E901ED60041BF06 /* OgreAxisAlignedBox.cpp */; };
 		AA7510670DDE20FE009D23BA /* OgreMemoryAllocatedObject.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510630DDE20FE009D23BA /* OgreMemoryAllocatedObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA7510680DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510640DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA7510690DDE20FE009D23BA /* OgreMemoryStdAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1348,6 +1349,7 @@
 		AA42976C0DB2B1940099A7F0 /* OgreAtomicWrappers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreAtomicWrappers.h; path = ../../OgreMain/include/OgreAtomicWrappers.h; sourceTree = SOURCE_ROOT; };
 		AA508FB40C972C1B00D6EAD0 /* OgreTangentSpaceCalc.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreTangentSpaceCalc.cpp; path = ../../OgreMain/src/OgreTangentSpaceCalc.cpp; sourceTree = SOURCE_ROOT; };
 		AA508FB60C972C8F00D6EAD0 /* OgreTangentSpaceCalc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreTangentSpaceCalc.h; path = ../../OgreMain/include/OgreTangentSpaceCalc.h; sourceTree = SOURCE_ROOT; };
+		AA5607840E901ED60041BF06 /* OgreAxisAlignedBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreAxisAlignedBox.cpp; path = ../../OgreMain/src/OgreAxisAlignedBox.cpp; sourceTree = SOURCE_ROOT; };
 		AA7510630DDE20FE009D23BA /* OgreMemoryAllocatedObject.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryAllocatedObject.h; path = ../../OgreMain/include/OgreMemoryAllocatedObject.h; sourceTree = SOURCE_ROOT; };
 		AA7510640DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryAllocatorConfig.h; path = ../../OgreMain/include/OgreMemoryAllocatorConfig.h; sourceTree = SOURCE_ROOT; };
 		AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryStdAlloc.h; path = ../../OgreMain/include/OgreMemoryStdAlloc.h; sourceTree = SOURCE_ROOT; };
@@ -1556,6 +1558,7 @@
 				000E1EF60B38D5AA004EA2DF /* OgreAnimationTrack.cpp */,
 				000E1EF70B38D5AA004EA2DF /* OgreArchiveManager.cpp */,
 				000E1EF80B38D5AA004EA2DF /* OgreAutoParamDataSource.cpp */,
+				AA5607840E901ED60041BF06 /* OgreAxisAlignedBox.cpp */,
 				000E1EFA0B38D5AA004EA2DF /* OgreBillboard.cpp */,
 				000E1EFB0B38D5AA004EA2DF /* OgreBillboardChain.cpp */,
 				000E1EFC0B38D5AA004EA2DF /* OgreBillboardParticleRenderer.cpp */,
@@ -2947,6 +2950,7 @@
 				AAE36CDF0E50EB8100ED4B76 /* OgreMemoryAllocatedObject.cpp in Sources */,
 				AAE047FD0E5E0BCE001D1ADC /* OgreShadowCameraSetupPSSM.cpp in Sources */,
 				AA89775E0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp in Sources */,
+				AA5607850E901ED60041BF06 /* OgreAxisAlignedBox.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
