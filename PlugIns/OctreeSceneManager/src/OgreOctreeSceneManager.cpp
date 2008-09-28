@@ -364,7 +364,16 @@ OctreeSceneManager::~OctreeSceneManager()
 
 Camera * OctreeSceneManager::createCamera( const String &name )
 {
-    Camera * c = OGRE_NEW OctreeCamera( name, this );
+	// Check name not used
+	if (mCameras.find(name) != mCameras.end())
+	{
+		OGRE_EXCEPT(
+			Exception::ERR_DUPLICATE_ITEM,
+			"A camera with the name " + name + " already exists",
+			"OctreeSceneManager::createCamera" );
+	}
+
+	Camera * c = OGRE_NEW OctreeCamera( name, this );
     mCameras.insert( CameraList::value_type( name, c ) );
 
 	// create visible bounds aab map entry
