@@ -357,6 +357,7 @@
 			<File
 				RelativePath="..\src\OgreCgFxScriptLoader.cpp"
 				>
+			</File>
 			<File
 				RelativePath="..\src\OgreCgPlugin.cpp"
 				>
