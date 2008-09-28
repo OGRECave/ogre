@@ -148,6 +148,13 @@ namespace Ogre{
 		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
 	};
 
+	class _OgreExport TextureSourceTranslator : public ScriptTranslator
+	{
+	public:
+		TextureSourceTranslator();
+		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+	};
+
 	class _OgreExport GpuProgramTranslator : public ScriptTranslator
 	{	
 	public:
@@ -236,6 +243,7 @@ namespace Ogre{
 		TechniqueTranslator mTechniqueTranslator;
 		PassTranslator mPassTranslator;
 		TextureUnitTranslator mTextureUnitTranslator;
+		TextureSourceTranslator mTextureSourceTranslator;
 		GpuProgramTranslator mGpuProgramTranslator;
 		ParticleSystemTranslator mParticleSystemTranslator;
 		ParticleEmitterTranslator mParticleEmitterTranslator;

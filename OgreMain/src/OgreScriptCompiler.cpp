@@ -863,6 +863,18 @@ namespace Ogre
 				}
 				return false;
 			}
+			else if(cls == "texture_source")
+			{
+				// Parent must be texture_unit
+				while(parent && parent->type == ANT_OBJECT)
+				{
+					ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(parent);
+					if(obj->cls == "texture_unit")
+						return true;
+					parent = obj->parent;
+				}
+				return false;
+			}
 		}
 		else
 		{
@@ -1160,6 +1172,7 @@ namespace Ogre
 		mIds["content_type"] = ID_CONTENT_TYPE;
 			mIds["named"] = ID_NAMED;
 			mIds["shadow"] = ID_SHADOW;
+		mIds["texture_source"] = ID_TEXTURE_SOURCE;
 
 		// Particle system
 		mIds["particle_system"] = ID_PARTICLE_SYSTEM;
