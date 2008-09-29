@@ -222,6 +222,25 @@ namespace Ogre
 		return D3DBLEND_FORCE_DWORD;
 	}
 	//---------------------------------------------------------------------
+	D3DBLENDOP D3D9Mappings::get(Ogre::SceneBlendOperation sbo)
+	{
+		switch(sbo)
+		{
+		case SBO_ADD:
+			return D3DBLENDOP_ADD;
+		case SBO_SUBTRACT:
+			return D3DBLENDOP_SUBTRACT;
+		case SBO_REVERSE_SUBTRACT:
+			return D3DBLENDOP_REVSUBTRACT;
+		case SBO_MIN:
+			return D3DBLENDOP_MIN;
+		case SBO_MAX:
+			return D3DBLENDOP_MAX;
+		}
+
+		return D3DBLENDOP_FORCE_DWORD;
+	}
+	//---------------------------------------------------------------------
 	DWORD D3D9Mappings::get(CompareFunction cf)
 	{
 		switch( cf )

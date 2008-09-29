@@ -255,6 +255,8 @@ namespace Ogre
 		void _setTextureMatrix( size_t unit, const Matrix4 &xform );
 		void _setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor );
 		void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha );
+		void _setSceneBlendingOperation(SceneBlendOperation op);
+		void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
 		void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
 		void _setViewport( Viewport *vp );
 		void _beginFrame(void);

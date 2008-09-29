@@ -298,6 +298,14 @@ namespace Ogre {
         /** See
           RenderSystem
          */
+		void _setSceneBlendingOperation(SceneBlendOperation op);
+		/** See
+          RenderSystem
+         */
+		void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
+		/** See
+          RenderSystem
+         */
         void _setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage);
         /** See
           RenderSystem

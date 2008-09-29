@@ -983,6 +983,8 @@ namespace Ogre
 			// no other cards have Dx9 hacks for alpha to coverage, as far as I know
 		}
 
+		rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
+
 
 		return rsc;
 
@@ -2204,6 +2206,28 @@ namespace Ogre
 			if( FAILED( hr = __SetRenderState( D3DRS_DESTBLENDALPHA, D3D9Mappings::get(destFactorAlpha) ) ) )
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha destination blend", "D3D9RenderSystem::_setSeperateSceneBlending" );
 		}
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::_setSceneBlendingOperation(Ogre::SceneBlendOperation op)
+	{
+		HRESULT hr;
+		if (FAILED(hr = __SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE)))
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set blending option", "D3D9RenderSystem::_setSceneBlendingOperation" );
+		if (FAILED(hr = __SetRenderState(D3DRS_BLENDOP, D3D9Mappings::get(op))))
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set scene blending operation option", "D3D9RenderSystem::_setSceneBlendingOperation" );
+		if (FAILED(hr = __SetRenderState(D3DRS_BLENDOPALPHA, D3D9Mappings::get(op))))
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set scene blending operation option", "D3D9RenderSystem::_setSceneBlendingOperation" );
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::_setSeparateSceneBlendingOperation(Ogre::SceneBlendOperation op, Ogre::SceneBlendOperation alphaOp)
+	{
+		HRESULT hr;
+		if (FAILED(hr = __SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE)))
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set blending option", "D3D9RenderSystem::_setSceneBlendingOperation" );
+		if (FAILED(hr = __SetRenderState(D3DRS_BLENDOP, D3D9Mappings::get(op))))
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set scene blending operation option", "D3D9RenderSystem::_setSceneBlendingOperation" );
+		if (FAILED(hr = __SetRenderState(D3DRS_BLENDOPALPHA, D3D9Mappings::get(alphaOp))))
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to set alpha scene blending operation option", "D3D9RenderSystem::_setSceneBlendingOperation" );
 	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage )

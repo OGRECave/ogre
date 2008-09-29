@@ -592,6 +592,12 @@ namespace Ogre {
 			rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
 		}
 
+		// Advanced blending operations
+		if(GLEW_VERSION_2_0)
+		{
+			rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
+		}
+
 		return rsc;
 	}
 
@@ -1673,6 +1679,80 @@ namespace Ogre {
 			glEnable(GL_BLEND);
 			glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
 		}
+	}
+	//-----------------------------------------------------------------------------
+	void GLRenderSystem::_setSceneBlendingOperation(SceneBlendOperation op)
+	{
+		glEnable(GL_BLEND);
+		
+		GLint func = GL_FUNC_ADD;
+		switch(op)
+		{
+		case SBO_ADD:
+			func = GL_FUNC_ADD;
+			break;
+		case SBO_SUBTRACT:
+			func = GL_FUNC_SUBTRACT;
+			break;
+		case SBO_REVERSE_SUBTRACT:
+			func = GL_FUNC_REVERSE_SUBTRACT;
+			break;
+		case SBO_MIN:
+			func = GL_MIN;
+			break;
+		case SBO_MAX:
+			func = GL_MAX;
+			break;
+		}
+
+		glBlendEquation(func);
+	}
+	//-----------------------------------------------------------------------------
+	void GLRenderSystem::_setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp)
+	{
+		glEnable(GL_BLEND);
+		
+		GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;
+
+		switch(op)
+		{
+		case SBO_ADD:
+			func = GL_FUNC_ADD;
+			break;
+		case SBO_SUBTRACT:
+			func = GL_FUNC_SUBTRACT;
+			break;
+		case SBO_REVERSE_SUBTRACT:
+			func = GL_FUNC_REVERSE_SUBTRACT;
+			break;
+		case SBO_MIN:
+			func = GL_MIN;
+			break;
+		case SBO_MAX:
+			func = GL_MAX;
+			break;
+		}
+
+		switch(alphaOp)
+		{
+		case SBO_ADD:
+			alphaFunc = GL_FUNC_ADD;
+			break;
+		case SBO_SUBTRACT:
+			alphaFunc = GL_FUNC_SUBTRACT;
+			break;
+		case SBO_REVERSE_SUBTRACT:
+			alphaFunc = GL_FUNC_REVERSE_SUBTRACT;
+			break;
+		case SBO_MIN:
+			alphaFunc = GL_MIN;
+			break;
+		case SBO_MAX:
+			alphaFunc = GL_MAX;
+			break;
+		}
+
+		glBlendEquationSeparate(func, alphaFunc);
 	}
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
