@@ -975,6 +975,14 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			mDestRenderSystem->_setSceneBlending(
 				pass->getSourceBlendFactor(), pass->getDestBlendFactor());
 		}
+		if ( pass->hasSeparateSceneBlendingOperations( ) )
+		{
+			mDestRenderSystem->_setSeparateSceneBlendingOperation( pass->getSceneBlendingOperation(), pass->getSceneBlendingOperationAlpha() );
+		}
+		else
+		{
+			mDestRenderSystem->_setSceneBlendingOperation( pass->getSceneBlendingOperation() );
+		}
 
 		// Set point parameters
 		mDestRenderSystem->_setPointParameters(

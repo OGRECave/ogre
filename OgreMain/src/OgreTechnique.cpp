@@ -94,6 +94,12 @@ namespace Ogre {
 			Pass* currPass = *i;
 			// Adjust pass index
 			currPass->_notifyIndex(passNum);
+			// Check for advanced blending operation support
+			if((currPass->getSceneBlendingOperation() != SBO_ADD || currPass->getSceneBlendingOperationAlpha() != SBO_ADD) && 
+				!caps->hasCapability(RSC_ADVANCED_BLEND_OPERATIONS))
+			{
+				return false;		
+			}
 			// Check texture unit requirements
 			size_t numTexUnitsRequested = currPass->getNumTextureUnitStates();
 			// Don't trust getNumTextureUnits for programmable

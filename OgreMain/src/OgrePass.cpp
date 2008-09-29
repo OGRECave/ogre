@@ -126,6 +126,9 @@ namespace Ogre {
 		, mSourceBlendFactorAlpha(SBF_ONE)
 		, mDestBlendFactorAlpha(SBF_ZERO)
 		, mSeparateBlend(false)
+		, mBlendOperation(SBO_ADD)
+		, mAlphaBlendOperation(SBO_ADD)
+		, mSeparateBlendOperation(false)
 		, mDepthCheck(true)
 		, mDepthWrite(true)
 		, mDepthFunc(CMPF_LESS_EQUAL)
@@ -224,6 +227,10 @@ namespace Ogre {
 		mSourceBlendFactorAlpha = oth.mSourceBlendFactorAlpha;
 		mDestBlendFactorAlpha = oth.mDestBlendFactorAlpha;
 		mSeparateBlend = oth.mSeparateBlend;
+
+		mBlendOperation = oth.mBlendOperation;
+		mAlphaBlendOperation = oth.mAlphaBlendOperation;
+		mSeparateBlendOperation = oth.mSeparateBlendOperation;
 
 	    mDepthCheck = oth.mDepthCheck;
 	    mDepthWrite = oth.mDepthWrite;
@@ -784,6 +791,34 @@ namespace Ogre {
 	bool Pass::hasSeparateSceneBlending() const
 	{
 		return mSeparateBlend;
+	}
+	//-----------------------------------------------------------------------
+	void Pass::setSceneBlendingOperation(SceneBlendOperation op)
+	{
+		mBlendOperation = op;
+		mSeparateBlendOperation = false;
+	}
+	//-----------------------------------------------------------------------
+	void Pass::setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp)
+	{
+		mBlendOperation = op;
+		mAlphaBlendOperation = alphaOp;
+		mSeparateBlendOperation = true;
+	}
+	//-----------------------------------------------------------------------
+	SceneBlendOperation Pass::getSceneBlendingOperation() const
+	{
+		return mBlendOperation;
+	}
+	//-----------------------------------------------------------------------
+	SceneBlendOperation Pass::getSceneBlendingOperationAlpha() const
+	{
+		return mAlphaBlendOperation;
+	}
+	//-----------------------------------------------------------------------
+	bool Pass::hasSeparateSceneBlendingOperations() const
+	{
+		return mSeparateBlendOperation;
 	}
     //-----------------------------------------------------------------------
     bool Pass::isTransparent(void) const

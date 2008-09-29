@@ -655,6 +655,22 @@ namespace Ogre
 		*/
 		virtual void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha) = 0;
 
+		/** Sets the global blending operation for combining subsequent renders with the existing frame contents.
+			This changes the operation uses for blending.
+			<p align="center">final = (texture * sourceFactor) OP (pixel * destFactor)</p>
+			@param blendOperation The blend operation mode for combining pixels
+		*/
+		virtual void _setSceneBlendingOperation(SceneBlendOperation op) = 0;
+
+		/** Sets the global blending operation for combining subsequent renders with the existing frame contents.
+			This changes the operation uses for blending.
+			Different modes can be set for combining the color components and the alpha components of the pixels.
+			<p align="center">final = (texture * sourceFactor) OP (pixel * destFactor)</p>
+			@param blendOperation The blend operation mode for combining pixels
+			@param alphaBlendOperation The blend operation mode for combining the alpha of pixels
+		*/
+		virtual void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp) = 0;
+
 		/** Sets the global alpha rejection approach for future renders.
 		By default images are rendered regardless of texture alpha. This method lets you change that.
 		@param func The comparison function which must pass for a pixel to be written.

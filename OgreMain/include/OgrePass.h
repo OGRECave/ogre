@@ -114,6 +114,15 @@ namespace Ogre {
 
 		// Used to determine if separate alpha blending should be used for color and alpha channels
 		bool mSeparateBlend;
+
+		//-------------------------------------------------------------------------
+		// Blending operations
+		SceneBlendOperation mBlendOperation;
+		SceneBlendOperation mAlphaBlendOperation;
+
+		// Determines if we should use separate blending operations for color and alpha channels
+		bool mSeparateBlendOperation;
+
         //-------------------------------------------------------------------------
 
         //-------------------------------------------------------------------------
@@ -655,6 +664,42 @@ namespace Ogre {
 	    /** Retrieves the alpha destination blending factor for the material (as set using Materiall::setSeparateSceneBlending).
         */
 		SceneBlendFactor getDestBlendFactorAlpha() const;
+
+		/** Sets the specific operation used to blend source and destination pixels together.
+			@remarks 
+			By default this operation is +, which creates this equation
+			<span align="center">
+			final = (texture * sourceFactor) + (pixel * destFactor)
+			</span>
+			By setting this to something other than SBO_ADD you can change the operation to achieve
+			a different effect.
+			@param op The blending operation mode to use for this pass
+		*/
+		void setSceneBlendingOperation(SceneBlendOperation op);
+
+		/** Sets the specific operation used to blend source and destination pixels together.
+			@remarks 
+			By default this operation is +, which creates this equation
+			<span align="center">
+			final = (texture * sourceFactor) + (pixel * destFactor)
+			</span>
+			By setting this to something other than SBO_ADD you can change the operation to achieve
+			a different effect.
+			This function allows more control over blending since it allows you to select different blending
+			modes for the color and alpha channels
+			@param op The blending operation mode to use for color channels in this pass
+			@param op The blending operation mode to use for alpha channels in this pass
+		*/
+		void setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
+
+		/** Returns true if this pass uses separate scene blending operations. */
+		bool hasSeparateSceneBlendingOperations() const;
+
+		/** Returns the current blending operation */
+		SceneBlendOperation getSceneBlendingOperation() const;
+
+		/** Returns the current alpha blending operation */
+		SceneBlendOperation getSceneBlendingOperationAlpha() const;
 
 		/** Returns true if this pass has some element of transparency. */
 		bool isTransparent(void) const;
