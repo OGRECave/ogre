@@ -53,14 +53,12 @@ material Examples/CelShading
 				texture cel_shading_specular.png 1d
 				tex_address_mode clamp
 				filtering none
-				tex_coord_set 1
 			}
 			texture_unit
 			{
 				texture cel_shading_edge.png 1d
 				tex_address_mode clamp
 				filtering none
-				tex_coord_set 2
 			}
 		}
 	}
@@ -428,8 +426,6 @@ material Examples/FresnelReflectionRefraction
 				// Will be filled in at runtime
 				texture Reflection
 				tex_address_mode clamp
-				// needed by ps.1.4
-				tex_coord_set 1
 			}
 			// Refraction
 			texture_unit
@@ -437,8 +433,6 @@ material Examples/FresnelReflectionRefraction
 				// Will be filled in at runtime
 				texture Refraction
 				tex_address_mode clamp
-				// needed by ps.1.4
-				tex_coord_set 2
 			}
 		}
 		
@@ -487,8 +481,6 @@ material Examples/FresnelReflectionRefraction
 				// Will be filled in at runtime
 				texture Reflection
 				tex_address_mode clamp
-				// needed by ps.1.4
-				tex_coord_set 1
 			}
 			// Refraction
 			texture_unit
@@ -496,8 +488,6 @@ material Examples/FresnelReflectionRefraction
 				// Will be filled in at runtime
 				texture Refraction
 				tex_address_mode clamp
-				// needed by ps.1.4
-				tex_coord_set 2
 			}
 		}
 	}    
