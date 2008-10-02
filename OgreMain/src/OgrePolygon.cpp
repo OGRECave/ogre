@@ -240,7 +240,7 @@ namespace Ogre
 			Real len1 = v1.length();
 			Real len2 = v2.length();
 
-			if (Math::RealEqual(len1 * len2, 0.0f, 1e-6f))
+			if (Math::RealEqual(len1 * len2, 0.0f, 1e-4f))
 			{
 				// We are on a vertex so consider this inside
 				return true; 
@@ -253,7 +253,7 @@ namespace Ogre
 		}
 
 		// result should be 2*PI if point is inside poly
-		return Math::RealEqual(anglesum, Math::TWO_PI, 1e-6f);
+		return Math::RealEqual(anglesum, Math::TWO_PI, 1e-4f);
 
 	}
 }
