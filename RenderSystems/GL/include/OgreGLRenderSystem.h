@@ -290,11 +290,11 @@ namespace Ogre {
         /** See
           RenderSystem
          */
-        void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor);
+        void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op );
         /** See
           RenderSystem
          */
-		void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha);
+		void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
         /** See
           RenderSystem
          */

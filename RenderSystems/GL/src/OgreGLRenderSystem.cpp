@@ -1645,7 +1645,7 @@ namespace Ogre {
 		return GL_ONE;
 	}
 
-	void GLRenderSystem::_setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor)
+	void GLRenderSystem::_setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op )
 	{
 		GLint sourceBlend = getBlendMode(sourceFactor);
 		GLint destBlend = getBlendMode(destFactor);
@@ -1658,33 +1658,7 @@ namespace Ogre {
 			glEnable(GL_BLEND);
 			glBlendFunc(sourceBlend, destBlend);
 		}
-	}
-	//-----------------------------------------------------------------------------
-	void GLRenderSystem::_setSeparateSceneBlending(
-		SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, 
-		SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha)
-	{
-		GLint sourceBlend = getBlendMode(sourceFactor);
-		GLint destBlend = getBlendMode(destFactor);
-		GLint sourceBlendAlpha = getBlendMode(sourceFactorAlpha);
-		GLint destBlendAlpha = getBlendMode(destFactorAlpha);
 
-		if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
-			sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
-		{
-			glDisable(GL_BLEND);
-		}
-		else
-		{
-			glEnable(GL_BLEND);
-			glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
-		}
-	}
-	//-----------------------------------------------------------------------------
-	void GLRenderSystem::_setSceneBlendingOperation(SceneBlendOperation op)
-	{
-		glEnable(GL_BLEND);
-		
 		GLint func = GL_FUNC_ADD;
 		switch(op)
 		{
@@ -1708,10 +1682,27 @@ namespace Ogre {
 		glBlendEquation(func);
 	}
 	//-----------------------------------------------------------------------------
-	void GLRenderSystem::_setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp)
+	void GLRenderSystem::_setSeparateSceneBlending(
+		SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, 
+		SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha,
+		SceneBlendOperation op, SceneBlendOperation alphaOp )
 	{
-		glEnable(GL_BLEND);
-		
+		GLint sourceBlend = getBlendMode(sourceFactor);
+		GLint destBlend = getBlendMode(destFactor);
+		GLint sourceBlendAlpha = getBlendMode(sourceFactorAlpha);
+		GLint destBlendAlpha = getBlendMode(destFactorAlpha);
+
+		if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
+			sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
+		{
+			glDisable(GL_BLEND);
+		}
+		else
+		{
+			glEnable(GL_BLEND);
+			glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
+		}
+
 		GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;
 
 		switch(op)
