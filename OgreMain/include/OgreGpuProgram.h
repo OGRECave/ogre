@@ -180,12 +180,12 @@ namespace Ogre {
 		*/
         static void setGenerateAllConstantDefinitionArrayEntries(bool generateAll);
 
-		/** Saves constant definitions to a file, compatible with GpuProgram::setManualNamedParametersFile. 
-		@see GpuProgram::setManualNamedParametersFile
+		/** Saves constant definitions to a file, compatible with GpuProgram::setManualNamedConstantsFile. 
+		@see GpuProgram::setManualNamedConstantsFile
 		*/
 		void save(const String& filename) const;
-		/** Loads constant definitions from a stream, compatible with GpuProgram::setManualNamedParametersFile. 
-		@see GpuProgram::setManualNamedParametersFile
+		/** Loads constant definitions from a stream, compatible with GpuProgram::setManualNamedConstantsFile. 
+		@see GpuProgram::setManualNamedConstantsFile
 		*/
 		void load(DataStreamPtr& stream);
 
