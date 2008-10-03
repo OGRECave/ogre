@@ -968,20 +968,24 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 		{
 			mDestRenderSystem->_setSeparateSceneBlending(
 				pass->getSourceBlendFactor(), pass->getDestBlendFactor(),
-				pass->getSourceBlendFactorAlpha(), pass->getDestBlendFactorAlpha());
+				pass->getSourceBlendFactorAlpha(), pass->getDestBlendFactorAlpha(),
+				pass->getSceneBlendingOperation(), 
+				pass->hasSeparateSceneBlendingOperations() ? pass->getSceneBlendingOperation() : pass->getSceneBlendingOperationAlpha() );
 		}
 		else
 		{
-			mDestRenderSystem->_setSceneBlending(
-				pass->getSourceBlendFactor(), pass->getDestBlendFactor());
-		}
-		if ( pass->hasSeparateSceneBlendingOperations( ) )
-		{
-			mDestRenderSystem->_setSeparateSceneBlendingOperation( pass->getSceneBlendingOperation(), pass->getSceneBlendingOperationAlpha() );
-		}
-		else
-		{
-			mDestRenderSystem->_setSceneBlendingOperation( pass->getSceneBlendingOperation() );
+			if(pass->hasSeparateSceneBlendingOperations( ) )
+			{
+				mDestRenderSystem->_setSeparateSceneBlending(
+					pass->getSourceBlendFactor(), pass->getDestBlendFactor(),
+					pass->getSourceBlendFactor(), pass->getDestBlendFactor(),
+					pass->getSceneBlendingOperation(), pass->getSceneBlendingOperationAlpha() );
+			}
+			else
+			{
+				mDestRenderSystem->_setSceneBlending(
+					pass->getSourceBlendFactor(), pass->getDestBlendFactor(), pass->getSceneBlendingOperation() );
+			}
 		}
 
 		// Set point parameters
