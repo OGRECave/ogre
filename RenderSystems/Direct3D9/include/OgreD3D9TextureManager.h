@@ -45,6 +45,17 @@ namespace Ogre
             const String& group, bool isManual, ManualResourceLoader* loader, 
             const NameValuePairList* createParams);
 
+		typedef HashSet<D3D9Texture*> D3D9TextureSet;
+		/** Record of all textures that exist, irrespective of visibility from
+		ResourceManager. When dealing with lost devices, we need to deal with
+		all textures that exist, even if they're unreferenced from the resource
+		manager's list but still referenced somewhere else. So keep another
+		log of them here.
+		*/
+		D3D9TextureSet mAllTextures;
+		OGRE_MUTEX(mAllTexturesMutex)
+
+
 	public:
 		D3D9TextureManager( LPDIRECT3DDEVICE9 pD3DDevice );
 		~D3D9TextureManager();
@@ -66,6 +77,9 @@ namespace Ogre
         /// @copydoc TextureManager::isHardwareFilteringSupported
         bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
             bool preciseFormatOnly = false);
+
+		/// Internal method to capture actual destruction (rather than removal)
+		void _notifyDestroyed(D3D9Texture*);
 
 	};
 }

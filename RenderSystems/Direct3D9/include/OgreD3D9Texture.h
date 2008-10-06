@@ -193,6 +193,8 @@ namespace Ogre {
 		bool releaseIfDefaultPool(void);
 		/// For dealing with lost devices - recreate the resource if in the default pool (and return true)
 		bool recreateIfDefaultPool(LPDIRECT3DDEVICE9 pDev);
+		/// Will this texture need to be in the default pool?
+		bool useDefaultPool();
 
     };
 
