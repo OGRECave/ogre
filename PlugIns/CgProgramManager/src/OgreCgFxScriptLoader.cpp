@@ -2911,6 +2911,7 @@ namespace Ogre {
 		{
 			// get the constant definition
 			const String& ogreParamName = constIt.peekNextKey();
+			constIt.getNext();
 
 			CGparameter cgParameter = cgGetNamedEffectParameter(cgEffect, ogreParamName.c_str());
 			// try to find it without case
