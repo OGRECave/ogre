@@ -170,6 +170,7 @@ namespace Ogre {
 
 #if OGRE_DEBUG_MODE
 		compileFlags |= D3DXSHADER_DEBUG;
+		compileFlags |= D3DXSHADER_SKIPOPTIMIZATION;
 #endif
 
         LPD3DXBUFFER errors = 0;
