@@ -112,6 +112,7 @@ namespace Ogre {
 	class MeshSerializerListener
 	{
 	public:
+		virtual ~MeshSerializerListener() {}
 		/// Called to override the loading of the given named material
 		virtual void processMaterialName(Mesh *mesh, String *name) = 0;
 		/// Called to override the reference to a skeleton

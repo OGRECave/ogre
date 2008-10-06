@@ -34,6 +34,7 @@ Torus Knot Software Ltd.
 #include "OgreBitwise.h"
 #include "OgreD3D9Mappings.h"
 #include "OgreD3D9RenderSystem.h"
+#include "OgreD3D9TextureManager.h"
 #include "OgreRoot.h"
 
 #include <d3dx9.h>
@@ -74,6 +75,8 @@ namespace Ogre
 		{
 			freeInternalResources();
 		}
+
+		static_cast<D3D9TextureManager*>(mCreator)->_notifyDestroyed(this);
 	}
 	/****************************************************************************************/
 	void D3D9Texture::copyToTexture(TexturePtr& target)
@@ -358,7 +361,7 @@ namespace Ogre
 
             // Determine D3D pool to use
             D3DPOOL pool;
-            if (mUsage & TU_DYNAMIC)
+            if (useDefaultPool())
             {
                 pool = D3DPOOL_DEFAULT;
             }
@@ -453,7 +456,7 @@ namespace Ogre
 
             // Determine D3D pool to use
             D3DPOOL pool;
-            if (mUsage & TU_DYNAMIC)
+            if (useDefaultPool())
             {
                 pool = D3DPOOL_DEFAULT;
             }
@@ -545,7 +548,7 @@ namespace Ogre
 
             // Determine D3D pool to use
             D3DPOOL pool;
-            if (mUsage & TU_DYNAMIC)
+            if (useDefaultPool())
             {
                 pool = D3DPOOL_DEFAULT;
             }
@@ -629,8 +632,7 @@ namespace Ogre
 		// Determine D3D pool to use
 		// Use managed unless we're a render target or user has asked for 
 		// a dynamic texture
-		if ((mUsage & TU_RENDERTARGET) ||
-			(mUsage & TU_DYNAMIC))
+		if (useDefaultPool())
 		{
 			mD3DPool = D3DPOOL_DEFAULT;
 		}
@@ -1420,8 +1422,11 @@ namespace Ogre
 		assert(idx < mSurfaceList.size());
 		return mSurfaceList[idx];
 	}
-	
-	
+	/****************************************************************************************/
+	bool D3D9Texture::useDefaultPool()
+	{
+		return (mUsage & TU_RENDERTARGET) || (mUsage & TU_DYNAMIC);
+	}
 	/****************************************************************************************/
 	bool D3D9Texture::releaseIfDefaultPool(void)
 	{

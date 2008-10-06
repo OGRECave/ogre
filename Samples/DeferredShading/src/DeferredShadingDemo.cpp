@@ -101,11 +101,10 @@ public:
 	}
 
 	virtual bool processUnbufferedKeyInput(const FrameEvent& evt) {
-		using namespace OIS;
 		bool retval = ExampleFrameListener::processUnbufferedKeyInput(evt);
 
 		// "C" switch filters
-		if (mKeyboard->isKeyDown(KC_C) && timeoutDelay==0) 
+		if (mKeyboard->isKeyDown(OIS::KC_C) && timeoutDelay==0) 
 		{
 			timeoutDelay = 0.5f;
 
@@ -120,7 +119,7 @@ public:
 		}
 
 		// "B" activate/deactivate minilight rendering
-		if (mKeyboard->isKeyDown(KC_B) && timeoutDelay==0) 
+		if (mKeyboard->isKeyDown(OIS::KC_B) && timeoutDelay==0) 
 		{
 			timeoutDelay = 0.5f;
 			SharedData::getSingleton().iActivate = !SharedData::getSingleton().iActivate;
@@ -135,7 +134,7 @@ public:
 			updateOverlays();
 		}
 		// "G" activate/deactivate global light rendering
-		if (mKeyboard->isKeyDown(KC_G) && timeoutDelay==0) 
+		if (mKeyboard->isKeyDown(OIS::KC_G) && timeoutDelay==0) 
 		{
 			timeoutDelay = 0.5f;
 			SharedData::getSingleton().iGlobalActivate = !SharedData::getSingleton().iGlobalActivate;

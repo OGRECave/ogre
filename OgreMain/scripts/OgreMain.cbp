@@ -66,7 +66,7 @@
 			<Add alias="All" targets="Debug;Release;" />
 		</VirtualTargets>
 		<Compiler>
-			<Add option="-Wall" />
+			<Add option="-W" />
 			<Add option="-mthreads" />
 			<Add option="-fmessage-length=0" />
 			<Add option="-fexceptions" />
@@ -181,8 +181,8 @@
 		<Unit filename="..\include\OgreMemoryAllocatedObject.h" />
 		<Unit filename="..\include\OgreMemoryAllocatorConfig.h" />
 		<Unit filename="..\include\OgreMemoryNedAlloc.h" />
-		<Unit filename="..\include\OgreMemoryStdAlloc.h" />
 		<Unit filename="..\include\OgreMemorySTLAllocator.h" />
+		<Unit filename="..\include\OgreMemoryStdAlloc.h" />
 		<Unit filename="..\include\OgreMemoryTracker.h" />
 		<Unit filename="..\include\OgreMesh.h" />
 		<Unit filename="..\include\OgreMeshFileFormat.h" />
@@ -244,6 +244,7 @@
 		<Unit filename="..\include\OgreRenderTarget.h" />
 		<Unit filename="..\include\OgreRenderTargetListener.h" />
 		<Unit filename="..\include\OgreRenderTexture.h" />
+		<Unit filename="..\include\OgreRenderToVertexBuffer.h" />
 		<Unit filename="..\include\OgreRenderWindow.h" />
 		<Unit filename="..\include\OgreRenderable.h" />
 		<Unit filename="..\include\OgreResource.h" />
@@ -261,11 +262,13 @@
 		<Unit filename="..\include\OgreScriptLexer.h" />
 		<Unit filename="..\include\OgreScriptLoader.h" />
 		<Unit filename="..\include\OgreScriptParser.h" />
+		<Unit filename="..\include\OgreScriptTranslator.h" />
 		<Unit filename="..\include\OgreSearchOps.h" />
 		<Unit filename="..\include\OgreSerializer.h" />
 		<Unit filename="..\include\OgreShadowCameraSetup.h" />
 		<Unit filename="..\include\OgreShadowCameraSetupFocused.h" />
 		<Unit filename="..\include\OgreShadowCameraSetupLiSPSM.h" />
+		<Unit filename="..\include\OgreShadowCameraSetupPSSM.h" />
 		<Unit filename="..\include\OgreShadowCameraSetupPlaneOptimal.h" />
 		<Unit filename="..\include\OgreShadowCaster.h" />
 		<Unit filename="..\include\OgreShadowTextureManager.h" />
@@ -319,6 +322,7 @@
 		<Unit filename="..\include\WIN32\OgreTimerImp.h" />
 		<Unit filename="..\include\asm_math.h" />
 		<Unit filename="..\include\stl_user_config.h" />
+		<Unit filename="..\src\GLX\GLX_backdrop.h" />
 		<Unit filename="..\src\OgreAlignedAllocator.cpp" />
 		<Unit filename="..\src\OgreAnimable.cpp" />
 		<Unit filename="..\src\OgreAnimation.cpp" />
@@ -390,6 +394,7 @@
 		<Unit filename="..\src\OgreMath.cpp" />
 		<Unit filename="..\src\OgreMatrix3.cpp" />
 		<Unit filename="..\src\OgreMatrix4.cpp" />
+		<Unit filename="..\src\OgreMemoryAllocatedObject.cpp" />
 		<Unit filename="..\src\OgreMemoryNedAlloc.cpp" />
 		<Unit filename="..\src\OgreMemoryTracker.cpp" />
 		<Unit filename="..\src\OgreMesh.cpp" />
@@ -445,6 +450,7 @@
 		<Unit filename="..\src\OgreRenderSystemCapabilitiesSerializer.cpp" />
 		<Unit filename="..\src\OgreRenderTarget.cpp" />
 		<Unit filename="..\src\OgreRenderTexture.cpp" />
+		<Unit filename="..\src\OgreRenderToVertexBuffer.cpp" />
 		<Unit filename="..\src\OgreRenderWindow.cpp" />
 		<Unit filename="..\src\OgreResource.cpp" />
 		<Unit filename="..\src\OgreResourceBackgroundQueue.cpp" />
@@ -454,18 +460,20 @@
 		<Unit filename="..\src\OgreRoot.cpp" />
 		<Unit filename="..\src\OgreRotationSpline.cpp" />
 		<Unit filename="..\src\OgreSIMDHelper.h" />
-		<Unit filename="..\src\OgreScriptCompiler.cpp" />
-		<Unit filename="..\src\OgreScriptLexer.cpp" />
-		<Unit filename="..\src\OgreScriptParser.cpp" />
 		<Unit filename="..\src\OgreSceneManager.cpp" />
 		<Unit filename="..\src\OgreSceneManagerEnumerator.cpp" />
 		<Unit filename="..\src\OgreSceneNode.cpp" />
 		<Unit filename="..\src\OgreSceneQuery.cpp" />
+		<Unit filename="..\src\OgreScriptCompiler.cpp" />
+		<Unit filename="..\src\OgreScriptLexer.cpp" />
+		<Unit filename="..\src\OgreScriptParser.cpp" />
+		<Unit filename="..\src\OgreScriptTranslator.cpp" />
 		<Unit filename="..\src\OgreSearchOps.cpp" />
 		<Unit filename="..\src\OgreSerializer.cpp" />
 		<Unit filename="..\src\OgreShadowCameraSetup.cpp" />
 		<Unit filename="..\src\OgreShadowCameraSetupFocused.cpp" />
 		<Unit filename="..\src\OgreShadowCameraSetupLiSPSM.cpp" />
+		<Unit filename="..\src\OgreShadowCameraSetupPSSM.cpp" />
 		<Unit filename="..\src\OgreShadowCameraSetupPlaneOptimal.cpp" />
 		<Unit filename="..\src\OgreShadowCaster.cpp" />
 		<Unit filename="..\src\OgreShadowTextureManager.cpp" />
@@ -509,6 +517,7 @@
 		<Unit filename="..\src\WIN32\ogrelogo.bmp" />
 		<Unit filename="..\src\WIN32\resource.h" />
 		<Unit filename="..\src\WIN32\winres.h" />
+		<Unit filename="..\src\gtk\GLX_backdrop.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -57,19 +57,25 @@ namespace Ogre
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader, const NameValuePairList* createParams)
     {
-        return new D3D9Texture(this, name, handle, group, isManual, loader, mpD3DDevice); 
+        D3D9Texture* ret = new D3D9Texture(this, name, handle, group, isManual, loader, mpD3DDevice); 
+		{
+			OGRE_LOCK_MUTEX(mAllTexturesMutex)
+			mAllTextures.insert(ret);
+		}
+
+		return ret;
     }
 
 	void D3D9TextureManager::releaseDefaultPoolResources(void)
 	{
 		size_t count = 0;
 
-		ResourceMap::iterator r, rend;
-		rend = mResources.end();
-		for (r = mResources.begin(); r != rend; ++r)
+		OGRE_LOCK_MUTEX(mAllTexturesMutex)
+
+		for (D3D9TextureSet::iterator i = mAllTextures.begin(); 
+			i != mAllTextures.end(); ++i)
 		{
-			D3D9TexturePtr t = r->second;
-			if (t->releaseIfDefaultPool())
+			if ((*i)->releaseIfDefaultPool())
 				count++;
 		}
 		LogManager::getSingleton().logMessage("D3D9TextureManager released:");
@@ -81,12 +87,12 @@ namespace Ogre
 	{
 		size_t count = 0;
 
-		ResourceMap::iterator r, rend;
-		rend = mResources.end();
-		for (r = mResources.begin(); r != rend; ++r)
+		OGRE_LOCK_MUTEX(mAllTexturesMutex)
+
+		for (D3D9TextureSet::iterator i = mAllTextures.begin(); 
+			i != mAllTextures.end(); ++i)
 		{
-			D3D9TexturePtr t = r->second;
-			if(t->recreateIfDefaultPool(mpD3DDevice))
+			if((*i)->recreateIfDefaultPool(mpD3DDevice))
 				count++;
 		}
 		LogManager::getSingleton().logMessage("D3D9TextureManager recreated:");
@@ -145,5 +151,11 @@ namespace Ogre
 
         return rs->_checkTextureFilteringSupported(ttype, format, usage);
     }
+
+	void D3D9TextureManager::_notifyDestroyed(D3D9Texture* tex)
+	{
+		OGRE_LOCK_MUTEX(mAllTexturesMutex)
+		mAllTextures.erase(tex);
+	}
 
 }

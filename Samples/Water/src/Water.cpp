@@ -456,7 +456,6 @@ public:
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {
-		using namespace OIS;
 
 		if( ExampleFrameListener::frameRenderingQueued(evt) == false )
 		{
@@ -495,15 +494,15 @@ public:
 		{ _value-=_change; if (_value<=_minVal) _value = _minVal ; _macro ; } ; \
 }
 
-		ADJUST_RANGE(headDepth, KC_U, KC_J, 0, 10, 0.5*changeSpeed, updateInfoHeadDepth()) ;
+		ADJUST_RANGE(headDepth, OIS::KC_U, OIS::KC_J, 0, 10, 0.5*changeSpeed, updateInfoHeadDepth()) ;
 
-		ADJUST_RANGE(waterMesh->PARAM_C, KC_2, KC_1, 0, 10, 0.1f*changeSpeed, updateInfoParamC()) ;
+		ADJUST_RANGE(waterMesh->PARAM_C, OIS::KC_2, OIS::KC_1, 0, 10, 0.1f*changeSpeed, updateInfoParamC()) ;
 
-		ADJUST_RANGE(waterMesh->PARAM_D, KC_4, KC_3, 0.1, 10, 0.1f*changeSpeed, updateInfoParamD()) ;
+		ADJUST_RANGE(waterMesh->PARAM_D, OIS::KC_4, OIS::KC_3, 0.1, 10, 0.1f*changeSpeed, updateInfoParamD()) ;
 
-		ADJUST_RANGE(waterMesh->PARAM_U, KC_6, KC_5, -2, 10, 0.1f*changeSpeed, updateInfoParamU()) ;
+		ADJUST_RANGE(waterMesh->PARAM_U, OIS::KC_6, OIS::KC_5, -2, 10, 0.1f*changeSpeed, updateInfoParamU()) ;
 
-		ADJUST_RANGE(waterMesh->PARAM_T, KC_8, KC_7, 0, 10, 0.1f*changeSpeed, updateInfoParamT()) ;
+		ADJUST_RANGE(waterMesh->PARAM_T, OIS::KC_8, OIS::KC_7, 0, 10, 0.1f*changeSpeed, updateInfoParamT()) ;
 
 		timeoutDelay-=evt.timeSinceLastFrame ;
 		if (timeoutDelay<=0)
@@ -513,11 +512,11 @@ public:
 		if (mKeyboard->isKeyDown(_key) && timeoutDelay==0) { \
 			timeoutDelay = _timeDelay ; _macro ;} }
 
-		SWITCH_VALUE(KC_N, 0.5f, switchNormals());
+		SWITCH_VALUE(OIS::KC_N, 0.5f, switchNormals());
 
-		SWITCH_VALUE(KC_M, 0.5f, switchMaterial());
+		SWITCH_VALUE(OIS::KC_M, 0.5f, switchMaterial());
 
-		SWITCH_VALUE(KC_B, 0.5f, switchSkyBox());
+		SWITCH_VALUE(OIS::KC_B, 0.5f, switchSkyBox());
 
 		animateHead(evt.timeSinceLastFrame);
 

@@ -164,6 +164,7 @@ namespace Ogre {
 		void parseVisibilityMask(void);
 		void parseLodBias(void);
 		void parseMaterialScheme(void);
+		void parseShadowsEnabled(void);
 		void parsePass(void);
 		void parseMaterial(void);
 		void parseFirstRenderQueue(void);

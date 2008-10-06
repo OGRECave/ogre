@@ -22,7 +22,7 @@ if test -z "`automake --version 2>&1|head -n 1|egrep '1.([6-9]|[1-9][0-9])'`"; t
 	exit 1;
 fi
 
-if test -z "`libtool --version 2>&1|head -n 1|egrep '1.[4-5]'`"; then
+if test 140 -gt "`libtool --version|head -n 1|awk '{print $4;}'|sed "s/\.//g"`"; then 
 	echo "Libtool 1.4 or above is required. Aborting build...";
 	exit 1;
 fi

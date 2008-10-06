@@ -65,13 +65,14 @@ namespace Ogre {
 		// Target
 		"<Target> ::= 'target ' <Label> '{' {<TargetOptions>} {<Pass>} '}' \n"
 	    "<TargetOptions> ::=	<TargetInput> | <OnlyInitial> | <VisibilityMask> | \n"
-	    "   <LodBias> | <MaterialScheme> \n"
+	    "   <LodBias> | <MaterialScheme> | <Shadows> \n"
 		"<TargetInput> ::= 'input' <TargetInputOptions> \n"
 		"<TargetInputOptions> ::= 'none' | 'previous' \n"
 		"<OnlyInitial> ::= 'only_initial' <On_Off> \n"
 		"<VisibilityMask> ::= 'visibility_mask' <#mask> \n"
 		"<LodBias> ::= 'lod_bias' <#lodbias> \n"
 		"<MaterialScheme> ::= 'material_scheme' <Label> \n"
+		"<Shadows> ::= 'shadows' <On_Off> \n"
 		"<TargetOutput> ::= 'target_output' '{' [<TargetOptions>] {<Pass>} '}' \n"
 		// Pass
 		"<Pass> ::= 'pass' <PassTypes> '{' {<PassOptions>} '}' \n"
@@ -183,6 +184,7 @@ namespace Ogre {
 		addLexemeAction("visibility_mask", &CompositorScriptCompiler::parseVisibilityMask);
 		addLexemeAction("lod_bias", &CompositorScriptCompiler::parseLodBias);
 		addLexemeAction("material_scheme", &CompositorScriptCompiler::parseMaterialScheme);
+		addLexemeAction("shadows", &CompositorScriptCompiler::parseShadowsEnabled);
 
 		// pass section
 		addLexemeAction("pass", &CompositorScriptCompiler::parsePass);
@@ -531,6 +533,12 @@ namespace Ogre {
 	{
 		assert(mScriptContext.target);
 		mScriptContext.target->setMaterialScheme(getNextTokenLabel());
+	}
+	//-----------------------------------------------------------------------
+	void CompositorScriptCompiler::parseShadowsEnabled(void)
+	{
+		assert(mScriptContext.target);
+		mScriptContext.target->setShadowsEnabled(testNextTokenID(ID_ON));
 	}
 	//-----------------------------------------------------------------------
 	void CompositorScriptCompiler::parsePass(void)

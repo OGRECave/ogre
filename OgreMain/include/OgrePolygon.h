@@ -54,11 +54,11 @@ namespace Ogre
 
 	protected:
 		VertexList		mVertexList;
-		Vector3			mNormal;
-		bool			mIsNormalSet;
+		mutable Vector3	mNormal;
+		mutable bool	mIsNormalSet;
 		/** Updates the normal.
 		*/
-		void updateNormal(void);
+		void updateNormal(void) const;
 
 
 	public:
@@ -94,11 +94,19 @@ namespace Ogre
 
 		/** Returns the polygon normal.
 		*/
-		const Vector3& getNormal(void);
+		const Vector3& getNormal(void) const;
 
 		/** Deletes a specific vertex.
 		*/
 		void deleteVertex(size_t vertex);
+
+		/** Determines if a point is inside the polygon.
+		@remarks
+			A point is inside a polygon if it is both on the polygon's plane, 
+			and within the polygon's bounds. Polygons are assumed to be convex
+			and planar.
+		*/
+		bool isPointInside(const Vector3& point) const;
 
 		/** Stores the edges of the polygon in ccw order.
 			The vertices are copied so the user has to take the 

@@ -5449,10 +5449,19 @@ void SceneManager::setShadowTextureSize(unsigned short size)
 //---------------------------------------------------------------------
 void SceneManager::setShadowTextureCount(size_t count)
 {
-    // Change size, any new items will take default
+    // Change size, any new items will need defaults
 	if (count != mShadowTextureConfigList.size())
 	{
-		mShadowTextureConfigList.resize(count);
+		// if no entries yet, use the defaults
+		if (mShadowTextureConfigList.empty())
+		{
+			mShadowTextureConfigList.resize(count);
+		}
+		else 
+		{
+			// create new instances with the same settings as the last item in the list
+			mShadowTextureConfigList.resize(count, *mShadowTextureConfigList.rbegin());
+		}
 		mShadowTextureConfigDirty = true;
 	}
 }

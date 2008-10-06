@@ -94,12 +94,11 @@ public:
 		mAniso(1), mSceneDetailIndex(0), mMoveSpeed(100), mRotateSpeed(36), mDebugOverlay(0),
 		mInputManager(0), mMouse(0), mKeyboard(0), mJoy(0)
 	{
-		using namespace OIS;
 
 		mDebugOverlay = OverlayManager::getSingleton().getByName("Core/DebugOverlay");
 
 		LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
-		ParamList pl;
+		OIS::ParamList pl;
 		size_t windowHnd = 0;
 		std::ostringstream windowHndStr;
 
@@ -107,13 +106,13 @@ public:
 		windowHndStr << windowHnd;
 		pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
 
-		mInputManager = InputManager::createInputSystem( pl );
+		mInputManager = OIS::InputManager::createInputSystem( pl );
 
 		//Create all devices (We only catch joystick exceptions here, as, most people have Key/Mouse)
-		mKeyboard = static_cast<Keyboard*>(mInputManager->createInputObject( OISKeyboard, bufferedKeys ));
-		mMouse = static_cast<Mouse*>(mInputManager->createInputObject( OISMouse, bufferedMouse ));
+		mKeyboard = static_cast<OIS::Keyboard*>(mInputManager->createInputObject( OIS::OISKeyboard, bufferedKeys ));
+		mMouse = static_cast<OIS::Mouse*>(mInputManager->createInputObject( OIS::OISMouse, bufferedMouse ));
 		try {
-			mJoy = static_cast<JoyStick*>(mInputManager->createInputObject( OISJoyStick, bufferedJoy ));
+			mJoy = static_cast<OIS::JoyStick*>(mInputManager->createInputObject( OIS::OISJoyStick, bufferedJoy ));
 		}
 		catch(...) {
 			mJoy = 0;
@@ -167,43 +166,42 @@ public:
 
 	virtual bool processUnbufferedKeyInput(const FrameEvent& evt)
 	{
-		using namespace OIS;
 
-		if(mKeyboard->isKeyDown(KC_A))
+		if(mKeyboard->isKeyDown(OIS::KC_A))
 			mTranslateVector.x = -mMoveScale;	// Move camera left
 
-		if(mKeyboard->isKeyDown(KC_D))
+		if(mKeyboard->isKeyDown(OIS::KC_D))
 			mTranslateVector.x = mMoveScale;	// Move camera RIGHT
 
-		if(mKeyboard->isKeyDown(KC_UP) || mKeyboard->isKeyDown(KC_W) )
+		if(mKeyboard->isKeyDown(OIS::KC_UP) || mKeyboard->isKeyDown(OIS::KC_W) )
 			mTranslateVector.z = -mMoveScale;	// Move camera forward
 
-		if(mKeyboard->isKeyDown(KC_DOWN) || mKeyboard->isKeyDown(KC_S) )
+		if(mKeyboard->isKeyDown(OIS::KC_DOWN) || mKeyboard->isKeyDown(OIS::KC_S) )
 			mTranslateVector.z = mMoveScale;	// Move camera backward
 
-		if(mKeyboard->isKeyDown(KC_PGUP))
+		if(mKeyboard->isKeyDown(OIS::KC_PGUP))
 			mTranslateVector.y = mMoveScale;	// Move camera up
 
-		if(mKeyboard->isKeyDown(KC_PGDOWN))
+		if(mKeyboard->isKeyDown(OIS::KC_PGDOWN))
 			mTranslateVector.y = -mMoveScale;	// Move camera down
 
-		if(mKeyboard->isKeyDown(KC_RIGHT))
+		if(mKeyboard->isKeyDown(OIS::KC_RIGHT))
 			mCamera->yaw(-mRotScale);
 
-		if(mKeyboard->isKeyDown(KC_LEFT))
+		if(mKeyboard->isKeyDown(OIS::KC_LEFT))
 			mCamera->yaw(mRotScale);
 
-		if( mKeyboard->isKeyDown(KC_ESCAPE) || mKeyboard->isKeyDown(KC_Q) )
+		if( mKeyboard->isKeyDown(OIS::KC_ESCAPE) || mKeyboard->isKeyDown(OIS::KC_Q) )
 			return false;
 
-       	if( mKeyboard->isKeyDown(KC_F) && mTimeUntilNextToggle <= 0 )
+       	if( mKeyboard->isKeyDown(OIS::KC_F) && mTimeUntilNextToggle <= 0 )
 		{
 			mStatsOn = !mStatsOn;
 			showDebugOverlay(mStatsOn);
 			mTimeUntilNextToggle = 1;
 		}
 
-		if( mKeyboard->isKeyDown(KC_T) && mTimeUntilNextToggle <= 0 )
+		if( mKeyboard->isKeyDown(OIS::KC_T) && mTimeUntilNextToggle <= 0 )
 		{
 			switch(mFiltering)
 			{
@@ -228,7 +226,7 @@ public:
 			mTimeUntilNextToggle = 1;
 		}
 
-		if(mKeyboard->isKeyDown(KC_SYSRQ) && mTimeUntilNextToggle <= 0)
+		if(mKeyboard->isKeyDown(OIS::KC_SYSRQ) && mTimeUntilNextToggle <= 0)
 		{
 			std::ostringstream ss;
 			ss << "screenshot_" << ++mNumScreenShots << ".png";
@@ -237,7 +235,7 @@ public:
 			mDebugText = "Saved: " + ss.str();
 		}
 
-		if(mKeyboard->isKeyDown(KC_R) && mTimeUntilNextToggle <=0)
+		if(mKeyboard->isKeyDown(OIS::KC_R) && mTimeUntilNextToggle <=0)
 		{
 			mSceneDetailIndex = (mSceneDetailIndex+1)%3 ;
 			switch(mSceneDetailIndex) {
@@ -249,7 +247,7 @@ public:
 		}
 
 		static bool displayCameraDetails = false;
-		if(mKeyboard->isKeyDown(KC_P) && mTimeUntilNextToggle <= 0)
+		if(mKeyboard->isKeyDown(OIS::KC_P) && mTimeUntilNextToggle <= 0)
 		{
 			displayCameraDetails = !displayCameraDetails;
 			mTimeUntilNextToggle = 0.5;
@@ -268,12 +266,11 @@ public:
 
 	virtual bool processUnbufferedMouseInput(const FrameEvent& evt)
 	{
-		using namespace OIS;
 
 		// Rotation factors, may not be used if the second mouse button is pressed
 		// 2nd mouse button - slide, otherwise rotate
-		const MouseState &ms = mMouse->getMouseState();
-		if( ms.buttonDown( MB_Right ) )
+		const OIS::MouseState &ms = mMouse->getMouseState();
+		if( ms.buttonDown( OIS::MB_Right ) )
 		{
 			mTranslateVector.x += ms.X.rel * 0.13;
 			mTranslateVector.y -= ms.Y.rel * 0.13;
@@ -311,7 +308,6 @@ public:
 	// Override frameRenderingQueued event to process that (don't care about frameEnded)
 	bool frameRenderingQueued(const FrameEvent& evt)
 	{
-		using namespace OIS;
 
 		if(mWindow->isClosed())	return false;
 
@@ -324,7 +320,7 @@ public:
 
 		bool buffJ = (mJoy) ? mJoy->buffered() : true;
 
-		Vector3 lastMotion = mTranslateVector;
+    	Ogre::Vector3 lastMotion = mTranslateVector;
 
 		//Check if one of the devices is not buffered
 		if( !mMouse->buffered() || !mKeyboard->buffered() || !buffJ )
@@ -353,7 +349,7 @@ public:
 				return false;
 
 		// ramp up / ramp down speed
-		if (mTranslateVector == Vector3::ZERO)
+    	if (mTranslateVector == Ogre::Vector3::ZERO)
 		{
 			// decay (one third speed)
 			mCurrentSpeed -= evt.timeSinceLastFrame * 0.3;

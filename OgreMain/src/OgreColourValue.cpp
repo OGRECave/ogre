@@ -28,6 +28,7 @@ Torus Knot Software Ltd.
 */
 #include "OgreStableHeaders.h"
 #include "OgreColourValue.h"
+#include "OgreMath.h"
 
 namespace Ogre {
 
@@ -360,6 +361,46 @@ namespace Ogre {
 		}
 
 
+	}
+	//---------------------------------------------------------------------
+	void ColourValue::getHSB(Real* hue, Real* saturation, Real* brightness) const
+	{
+
+		Real vMin = std::min(r, std::min(g, b));
+		Real vMax = std::max(r, std::max(g, b));
+		Real delta = vMax - vMin;
+
+		*brightness = vMax;
+
+		if (Math::RealEqual(delta, 0.0f, 1e-6))
+		{
+			// grey
+			*hue = 0;
+			*saturation = 0;
+		}
+		else                                    
+		{
+			// a colour
+			*saturation = delta / vMax;
+
+			Real deltaR = (((vMax - r) / 6.0f) + (delta / 2.0f)) / delta;
+			Real deltaG = (((vMax - g) / 6.0f) + (delta / 2.0f)) / delta;
+			Real deltaB = (((vMax - b) / 6.0f) + (delta / 2.0f)) / delta;
+
+			if (Math::RealEqual(r, vMax))
+				*hue = deltaB - deltaG;
+			else if (Math::RealEqual(g, vMax))
+				*hue = 0.3333333f + deltaR - deltaB;
+			else if (Math::RealEqual(b, vMax)) 
+				*hue = 0.6666667f + deltaG - deltaR;
+
+			if (*hue < 0.0f) 
+				*hue += 1.0f;
+			if (*hue > 1.0f)
+				*hue -= 1.0f;
+		}
+
+		
 	}
 
 }

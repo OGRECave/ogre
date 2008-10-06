@@ -354,7 +354,7 @@ namespace OgreRefApp
             {
                 o1 = *proxy1;
                 o2 = *proxy2;
-                int numc = dCollide(o1->id(), o2->id(), 0, &contactGeom, sizeof(dContactGeom));
+                int numc = dCollide(o1->id(), o2->id(), 1, &contactGeom, sizeof(dContactGeom));
                 if (numc)
                 {
                     // Create contact joints if either object is dynamics simulated
@@ -471,7 +471,7 @@ namespace OgreRefApp
                     dPlane odePlane(0, boundPlane->normal.x, boundPlane->normal.y, boundPlane->normal.z, 
                         -boundPlane->d);
 
-                    int numc = dCollide(obj->id(), odePlane.id() , 0, &contactGeom, sizeof(dContactGeom));
+                    int numc = dCollide(obj->id(), odePlane.id() , 1, &contactGeom, sizeof(dContactGeom));
                     if (numc)
                     {
                         // Create contact joints if object is dynamics simulated

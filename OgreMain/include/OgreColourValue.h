@@ -302,6 +302,14 @@ namespace Ogre {
 		*/
 		void setHSB(Real hue, Real saturation, Real brightness);
 
+		/** Convert the current colour to Hue, Saturation and Brightness values. 
+		@param hue Output hue value, scaled to the [0,1] range as opposed to the 0-360
+		@param saturation Output saturation level, [0,1]
+		@param brightness Output brightness level, [0,1]
+		*/
+		void getHSB(Real* hue, Real* saturation, Real* brightness) const;
+
+
 
 		/** Function for writing to a stream.
 		*/

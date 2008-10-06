@@ -499,7 +499,8 @@ namespace Ogre {
 			_initialise(true);
 		}
 
-        // Check we're not using a manual LOD
+        Entity* displayEntity = this;
+		// Check we're not using a manual LOD
         if (mMeshLodIndex > 0 && mMesh->isLodManual())
         {
             // Use alternate entity
@@ -513,14 +514,13 @@ namespace Ogre {
                 mAnimationState->copyMatchingState(
 					mLodEntityList[mMeshLodIndex - 1]->mAnimationState);
             }
-            mLodEntityList[mMeshLodIndex - 1]->_updateRenderQueue(queue);
-            return;
+            displayEntity = mLodEntityList[mMeshLodIndex - 1];
         }
 
         // Add each visible SubEntity to the queue
         SubEntityList::iterator i, iend;
-        iend = mSubEntityList.end();
-        for (i = mSubEntityList.begin(); i != iend; ++i)
+        iend = displayEntity->mSubEntityList.end();
+        for (i = displayEntity->mSubEntityList.begin(); i != iend; ++i)
         {
             if((*i)->isVisible())
             {
@@ -546,8 +546,25 @@ namespace Ogre {
             ChildObjectList::iterator child_itr_end = mChildObjectList.end();
             for( ; child_itr != child_itr_end; child_itr++)
             {
-                if ((*child_itr).second->isVisible())
-                    (*child_itr).second->_updateRenderQueue(queue);
+                MovableObject* child = child_itr->second;
+                bool isVisible = child->isVisible();
+                if (isVisible && (displayEntity != this))
+                {
+                    //Check if the bone exists in the current LOD
+
+                    //The child is connected to a tagpoint which is connected to a bone
+                    Bone* bone = static_cast<Bone*>(child->getParentNode()->getParent());
+                    if (!displayEntity->getSkeleton()->hasBone(bone->getName()))
+                    {
+                        //Current LOD entity does not have the bone that the
+                        //child is connected to. Do not display.
+                        isVisible = false;
+                    }
+                }
+                if (isVisible)
+                {
+                    child->_updateRenderQueue(queue);
+                }   
             }
         }
 

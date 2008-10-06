@@ -632,17 +632,16 @@ public:
     }
 	virtual bool processUnbufferedKeyInput(const FrameEvent& evt)
     {
-		using namespace OIS;
 
 		bool retval = ExampleFrameListener::processUnbufferedKeyInput(evt);
 
 		Real changeSpeed = evt.timeSinceLastFrame ;
 		
 		// adjust keyboard speed with SHIFT (increase) and CONTROL (decrease)
-		if (mKeyboard->isKeyDown(KC_LSHIFT) || mKeyboard->isKeyDown(KC_RSHIFT)) {
+		if (mKeyboard->isKeyDown(OIS::KC_LSHIFT) || mKeyboard->isKeyDown(OIS::KC_RSHIFT)) {
 			changeSpeed *= 10.0f ;
 		}
-		if (mKeyboard->isKeyDown(KC_LCONTROL)) { 
+		if (mKeyboard->isKeyDown(OIS::KC_LCONTROL)) { 
 			changeSpeed /= 10.0f ;
 		}
 		
@@ -653,11 +652,11 @@ public:
 		{ _value-=_change; if (_value<=_minVal) _value = _minVal ; _macro ; } ; \
 }
 		
-		ADJUST_RANGE(displacement, KC_2, KC_1, -2, 2, 0.1f*changeSpeed, updateInfoDisplacement()) ;
+		ADJUST_RANGE(displacement, OIS::KC_2, OIS::KC_1, -2, 2, 0.1f*changeSpeed, updateInfoDisplacement()) ;
 
-		ADJUST_RANGE(density, KC_4, KC_3, 0.1, 500, 10.0f*changeSpeed, updateInfoDensity()) ;
+		ADJUST_RANGE(density, OIS::KC_4, OIS::KC_3, 0.1, 500, 10.0f*changeSpeed, updateInfoDensity()) ;
 
-		ADJUST_RANGE(timeDensity, KC_6, KC_5, 1, 10, 1.0f*changeSpeed, updateInfoTimeDensity()) ;
+		ADJUST_RANGE(timeDensity, OIS::KC_6, OIS::KC_5, 1, 10, 1.0f*changeSpeed, updateInfoTimeDensity()) ;
 
 #define SWITCH_VALUE(_key,_timeDelay, _macro) { \
 		if (mKeyboard->isKeyDown(_key) && timeoutDelay==0) { \
@@ -667,15 +666,15 @@ public:
 		if (timeoutDelay<=0)
 			timeoutDelay = 0;
 
-		SWITCH_VALUE(KC_O, 0.5f, currentMeshIndex++ ; setObject());
+		SWITCH_VALUE(OIS::KC_O, 0.5f, currentMeshIndex++ ; setObject());
 
-		SWITCH_VALUE(KC_N, 0.5f, noiseOn = !noiseOn ; setNoiseOn());
+		SWITCH_VALUE(OIS::KC_N, 0.5f, noiseOn = !noiseOn ; setNoiseOn());
 
-		SWITCH_VALUE(KC_M, 0.5f, currentLBXindex++ ; setMaterialBlending());
+		SWITCH_VALUE(OIS::KC_M, 0.5f, currentLBXindex++ ; setMaterialBlending());
 
-		SWITCH_VALUE(KC_C, 0.5f, currentCubeMapIndex++ ; setCubeMap());
+		SWITCH_VALUE(OIS::KC_C, 0.5f, currentCubeMapIndex++ ; setCubeMap());
 		
-		SWITCH_VALUE(KC_SPACE, 0.5f, goRandom());
+		SWITCH_VALUE(OIS::KC_SPACE, 0.5f, goRandom());
 
 		return retval ;
 	}

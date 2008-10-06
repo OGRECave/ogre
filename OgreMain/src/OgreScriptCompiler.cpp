@@ -1203,6 +1203,7 @@ namespace Ogre
 		mIds["visibility_mask"] = ID_VISIBILITY_MASK;
 		mIds["lod_bias"] = ID_LOD_BIAS;
 		mIds["material_scheme"] = ID_MATERIAL_SCHEME;
+		mIds["shadows"] = ID_SHADOWS_ENABLED;
 
 		mIds["clear"] = ID_CLEAR;
 		mIds["stencil"] = ID_STENCIL;

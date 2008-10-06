@@ -155,7 +155,6 @@ public:
     }
     bool frameRenderingQueued(const FrameEvent& evt)
     {
-	using namespace OIS;
 
         if(!ExampleFrameListener::frameRenderingQueued(evt))
             return false;
@@ -165,7 +164,7 @@ public:
         timeDelay -= evt.timeSinceLastFrame;
 
 		// switch meshes
-        KEY_PRESSED(KC_O, 1, 
+        KEY_PRESSED(OIS::KC_O, 1, 
             mEntities[mCurrentEntity]->setVisible(false); 
             mCurrentEntity = (++mCurrentEntity) % NUM_ENTITIES; 
             mEntities[mCurrentEntity]->setVisible(true);
@@ -175,18 +174,18 @@ public:
         );
 
 		// switch materials
-		KEY_PRESSED(KC_M, 1, 
+		KEY_PRESSED(OIS::KC_M, 1, 
             mCurrentMaterial = (++mCurrentMaterial) % NUM_MATERIALS; 
             mEntities[mCurrentEntity]->setMaterialName(mMaterialNames[mCurrentEntity][mCurrentMaterial]);
             mMaterialInfo->setCaption("Current: " + mMaterialNames[mCurrentEntity][mCurrentMaterial]);
         );
 
 		// enable / disable lights
-		KEY_PRESSED(KC_1, 1, flipLightState(0));
+		KEY_PRESSED(OIS::KC_1, 1, flipLightState(0));
 		// switch materials
-		KEY_PRESSED(KC_2, 1, flipLightState(1));
+		KEY_PRESSED(OIS::KC_2, 1, flipLightState(1));
 		// switch materials
-		KEY_PRESSED(KC_3, 1, flipLightState(2));
+		KEY_PRESSED(OIS::KC_3, 1, flipLightState(2));
 
         // animate the lights
         for (size_t i = 0; i < NUM_LIGHTS; ++i)

@@ -1776,6 +1776,10 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::_setTextureCoordSet( size_t stage, size_t index )
 	{
+		// if vertex shader is being used, stage and index must match
+		if (mVertexProgramBound)
+			index = stage;
+
 		HRESULT hr;
 		// Record settings
 		mTexStageDesc[stage].coordIndex = index;

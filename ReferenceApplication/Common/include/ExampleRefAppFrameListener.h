@@ -76,8 +76,7 @@ public:
     // Constructor takes a RenderWindow because it uses that to determine input context
     ExampleRefAppFrameListener(RenderWindow* win, CollideCamera* cam, bool bufferedKeys = false, bool bufferedMouse = false)
     {
-		using namespace OIS;
-		ParamList pl;	
+		OIS::ParamList pl;	
 		size_t windowHnd = 0;
 		std::ostringstream windowHndStr;
 
@@ -85,18 +84,18 @@ public:
 		windowHndStr << windowHnd;
 		pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
 
-		mInputManager = InputManager::createInputSystem( pl );
+		mInputManager = OIS::InputManager::createInputSystem( pl );
 
 		//Create all devices (We only catch joystick exceptions here, as, most people have Key/Mouse)
-		mKeyboard = static_cast<Keyboard*>(mInputManager->createInputObject( OISKeyboard, bufferedKeys ));
-		mMouse = static_cast<Mouse*>(mInputManager->createInputObject( OISMouse, bufferedMouse ));
+		mKeyboard = static_cast<OIS::Keyboard*>(mInputManager->createInputObject( OIS::OISKeyboard, bufferedKeys ));
+		mMouse = static_cast<OIS::Mouse*>(mInputManager->createInputObject( OIS::OISMouse, bufferedMouse ));
 
 		unsigned int width, height, depth;
 		int left, top;
 		win->getMetrics(width, height, depth, left, top);
 
 		//Set Mouse Region.. if window resizes, we should alter this to reflect as well
-		const MouseState &ms = mMouse->getMouseState();
+		const OIS::MouseState &ms = mMouse->getMouseState();
 		ms.width = width;
 		ms.height = height;
 
@@ -123,43 +122,42 @@ public:
 
     bool processUnbufferedKeyInput(const FrameEvent& evt)
     {
-		using namespace OIS;
-
-		if(mKeyboard->isKeyDown(KC_A))
+		
+		if(mKeyboard->isKeyDown(OIS::KC_A))
 			mTranslateVector.x = -mMoveScale;	// Move camera left
 
-		if(mKeyboard->isKeyDown(KC_D))
+		if(mKeyboard->isKeyDown(OIS::KC_D))
 			mTranslateVector.x = mMoveScale;	// Move camera RIGHT
 
-		if(mKeyboard->isKeyDown(KC_UP) || mKeyboard->isKeyDown(KC_W) )
+		if(mKeyboard->isKeyDown(OIS::KC_UP) || mKeyboard->isKeyDown(OIS::KC_W) )
 			mTranslateVector.z = -mMoveScale;	// Move camera forward
 
-		if(mKeyboard->isKeyDown(KC_DOWN) || mKeyboard->isKeyDown(KC_S) )
+		if(mKeyboard->isKeyDown(OIS::KC_DOWN) || mKeyboard->isKeyDown(OIS::KC_S) )
 			mTranslateVector.z = mMoveScale;	// Move camera backward
 
-		if(mKeyboard->isKeyDown(KC_PGUP))
+		if(mKeyboard->isKeyDown(OIS::KC_PGUP))
 			mTranslateVector.y = mMoveScale;	// Move camera up
 
-		if(mKeyboard->isKeyDown(KC_PGDOWN))
+		if(mKeyboard->isKeyDown(OIS::KC_PGDOWN))
 			mTranslateVector.y = -mMoveScale;	// Move camera down
 
-		if(mKeyboard->isKeyDown(KC_RIGHT))
+		if(mKeyboard->isKeyDown(OIS::KC_RIGHT))
 			mCamera->yaw(-mRotScale);
 		
-		if(mKeyboard->isKeyDown(KC_LEFT))
+		if(mKeyboard->isKeyDown(OIS::KC_LEFT))
 			mCamera->yaw(mRotScale);
 
-		if( mKeyboard->isKeyDown(KC_ESCAPE) || mKeyboard->isKeyDown(KC_Q) )
+		if( mKeyboard->isKeyDown(OIS::KC_ESCAPE) || mKeyboard->isKeyDown(OIS::KC_Q) )
 			return false;
 
-       	if( mKeyboard->isKeyDown(KC_F) && mTimeUntilNextToggle <= 0 ) 
+       	if( mKeyboard->isKeyDown(OIS::KC_F) && mTimeUntilNextToggle <= 0 ) 
 		{
 			mStatsOn = !mStatsOn;
 			showDebugOverlay(mStatsOn);
 			mTimeUntilNextToggle = 1;
 		}
 
-		if(mKeyboard->isKeyDown(KC_SYSRQ) && mTimeUntilNextToggle <= 0)
+		if(mKeyboard->isKeyDown(OIS::KC_SYSRQ) && mTimeUntilNextToggle <= 0)
 		{
 			std::ostringstream ss;
 			ss << "screenshot_" << ++mNumScreenShots << ".png";
@@ -175,12 +173,11 @@ public:
 
     bool processUnbufferedMouseInput(const FrameEvent& evt)
     {
-		using namespace OIS;
-
+		
 		// Rotation factors, may not be used if the second mouse button is pressed
 		// 2nd mouse button - slide, otherwise rotate
-		const MouseState &ms = mMouse->getMouseState();
-		if( ms.buttonDown( MB_Right ) )
+		const OIS::MouseState &ms = mMouse->getMouseState();
+		if( ms.buttonDown( OIS::MB_Right ) )
 		{
 			mTranslateVector.x += ms.X.rel * 0.13;
 			mTranslateVector.y -= ms.Y.rel * 0.13;

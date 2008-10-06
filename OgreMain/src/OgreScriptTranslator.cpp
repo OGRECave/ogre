@@ -5198,6 +5198,30 @@ namespace Ogre{
 						}
 					}
 					break;
+				case ID_SHADOWS_ENABLED:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						return;
+					}
+					else if (prop->values.size() > 1)
+					{
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						return;
+					}
+					else
+					{
+						bool val;
+						if(getBoolean(prop->values.front(), &val))
+						{
+							mTarget->setShadowsEnabled(val);
+						}
+						else
+						{
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						}
+					}
+					break;
 				default:
 					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
 						"token \"" + prop->name + "\" is not recognized");

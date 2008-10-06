@@ -34,7 +34,11 @@ Torus Knot Software Ltd.
 // If we're using the GCC 3.1 C++ Std lib
 #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
 
-#include <ext/hash_map>
+// For gcc 4.3 see http://gcc.gnu.org/gcc-4.3/changes.html
+#   if OGRE_COMP_VER >= 430
+#       include <tr1/unordered_map> 
+#   else
+#       include <ext/hash_map>
 namespace __gnu_cxx
 {
     template <> struct hash< Ogre::_StringBase >
@@ -55,6 +59,7 @@ namespace __gnu_cxx
         }
     };
 }
+#   endif
 
 #endif
 
@@ -158,12 +163,16 @@ namespace Ogre {
 
 
 #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
-    typedef ::__gnu_cxx::hash< _StringBase > _StringHash;
+#   if OGRE_COMP_VER < 430
+	typedef ::__gnu_cxx::hash< _StringBase > _StringHash;
+#   else
+	typedef ::std::tr1::hash< _StringBase > _StringHash;
+#   endif
 #elif !defined( _STLP_HASH_FUN_H )
 	typedef stdext::hash_compare< _StringBase, std::less< _StringBase > > _StringHash;
 #else
-    typedef std::hash< _StringBase > _StringHash;
-#endif
+	typedef std::hash< _StringBase > _StringHash;
+#endif 
 
 } // namespace Ogre
 

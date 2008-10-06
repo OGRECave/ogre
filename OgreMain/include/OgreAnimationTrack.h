@@ -123,6 +123,8 @@ namespace Ogre
 		class _OgreExport Listener
 		{
 		public:
+			virtual ~Listener() {}
+
 			/** Get an interpolated keyframe for this track at the given time.
 			@returns true if the KeyFrame was populated, false if not.
 			*/

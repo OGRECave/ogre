@@ -152,6 +152,8 @@ The contents of both are identical, the only real difference is that you can onl
 @ref{compositor_lod_bias,lod_bias}
 @item
 @ref{material_scheme}
+@item
+@ref{compositor_shadows,shadows}
 @item 
 @ref{Compositor Passes,pass}
 @end itemize
@@ -188,11 +190,17 @@ Set the scene LOD bias for any render_scene passes performed in this target pass
 Format: lod_bias <lodbias>@*@*
 Default: lod_bias 1.0@*@*
 
-@anchor{material_scheme}
-@subheading material_scheme
-Set the material scheme for any render_scene passes performed in this target pass. Material schemes allow you to select alternative rendering paths for all objects in the scene.@*@*
-Format: material_scheme <Name>@*@*
-Default: material_scheme Default@*@*
+@anchor{compositor_shadows}
+@subheading shadows
+Sets whether shadows should be rendered during any render_scene pass performed in this target pass. The default is 'on'.@*@*
+Format: shadows (on | off)@*@*
+Default: shadows on@*@*
+
+@anchor{only_initial}
+@subheading only_initial
+If set to on, this target pass will only execute once initially after the effect has been enabled. This could be useful to perform once-off renders, after which the static contents are used by the rest of the compositor.@*@*
+Format: only_initial (on | off)@*@*
+Default: only_initial off@*@*
 
 @node Compositor Passes
 @subsection Compositor Passes
