@@ -627,7 +627,7 @@ namespace Ogre
 		return DXGI_FORMAT_R32G32B32_FLOAT;
 	}
 	//---------------------------------------------------------------------
-	LPCSTR D3D10Mappings::get(VertexElementSemantic sem)
+	LPCSTR D3D10Mappings::get(VertexElementSemantic sem,unsigned short index)
 	{
 		// todo - add to ogre - POSITIONT and PSIZE ("Transformed vertex position" and "Point size")
 		switch (sem)	

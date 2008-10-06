@@ -65,9 +65,13 @@ namespace Ogre {
 	}
 	D3D10HardwarePixelBuffer::~D3D10HardwarePixelBuffer()
 	{
-		for(size_t i = 0 ; i < mSliceTRT.size() ; i++)
+		if(mSliceTRT.empty())
+			return;
+		// Delete all render targets that are not yet deleted via _clearSliceRTT
+		for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
 		{
-			delete mSliceTRT[i];
+			if(mSliceTRT[zoffset])
+				Root::getSingleton().getRenderSystem()->destroyRenderTarget(mSliceTRT[zoffset]->getName());
 		}
 	}
 	//-----------------------------------------------------------------------------  

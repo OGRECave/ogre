@@ -116,7 +116,7 @@ namespace Ogre {
 			iend = mElementList.end();
 			for (idx = 0, i = mElementList.begin(); i != iend; ++i, ++idx)
 			{
-				D3delems[idx].SemanticName			= D3D10Mappings::get(i->getSemantic()); 
+				D3delems[idx].SemanticName			= D3D10Mappings::get(i->getSemantic(),i->getIndex());
 				D3delems[idx].SemanticIndex		= i->getIndex();
 				D3delems[idx].Format				= D3D10Mappings::get(i->getType());
 				D3delems[idx].InputSlot			= i->getSource();
@@ -145,18 +145,20 @@ namespace Ogre {
 
 			DWORD dwShaderFlags = 0;
 			ID3D10Blob* pVSBuf = boundVertexProgram->getMicroCode();
-
+			D3D10_INPUT_ELEMENT_DESC * pVertexDecl=getD3DVertexDeclaration();
 			HRESULT hr = mlpD3DDevice->CreateInputLayout( 
-				getD3DVertexDeclaration(), 
+				pVertexDecl, 
 				(UINT)getElementCount(), 
 				pVSBuf->GetBufferPointer(), 
 				pVSBuf->GetBufferSize(),
 				&pVertexLayout );
 
-			if (FAILED(hr))
+			if (FAILED(hr)|| mlpD3DDevice.isError())
 			{
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D10 vertex declaration", 
-					"D3D10VertexDeclaration::BindToShader");
+				String errorDescription = mlpD3DDevice.getErrorDescription();
+
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D10 vertex declaration"+errorDescription , 
+					"D3D10VertexDeclaration::getILayoutByShader");
 			}
 
 			mShaderToILayoutMap[boundVertexProgram] = pVertexLayout;
@@ -200,4 +202,5 @@ namespace Ogre {
 		return mVertexBufferDeclaration;
 	}
 }
+
 

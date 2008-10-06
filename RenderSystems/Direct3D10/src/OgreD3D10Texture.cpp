@@ -118,15 +118,18 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D10Texture::_loadTex()
 	{
+		size_t pos = mName.find_last_of(".");
+		String ext = mName.substr(pos+1);
+		String baseName = mName.substr(0, pos);
 		if(this->getTextureType() == TEX_TYPE_CUBE_MAP)
 		{
 			// Load from 6 separate files
 			// Use OGRE its own codecs
-			String baseName, ext;
-			size_t pos = mName.find_last_of(".");
-			baseName = mName.substr(0, pos);
-			if ( pos != String::npos )
-				ext = mName.substr(pos+1);
+		//	String baseName;
+		//	size_t pos = mName.find_last_of(".");
+			
+		//	if ( pos != String::npos )
+		//		ext = mName.substr(pos+1);
 			std::vector<Image> images(6);
 			ConstImagePtrList imagePtrs;
 			static const String suffixes[6] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
@@ -161,18 +164,51 @@ namespace Ogre
 		else
 		{
 			Image img;
+			DataStreamPtr dstream ;
 			// find & load resource data intro stream to allow resource
 			// group changes if required
-			DataStreamPtr dstream = 
-				ResourceGroupManager::getSingleton().openResource(
-				mName, mGroup, true, this);
+			if(ResourceGroupManager::getSingleton().resourceExists(mGroup,mName))
+			{
+				dstream = 
+					ResourceGroupManager::getSingleton().openResource(
+					mName, mGroup, true, this);
+			}
+			else
+			{
+				LogManager::getSingleton().logMessage("D3D10 : File "+mName+ " doesn't Exist ,Loading Missing.png instead ");
+				mName="Missing.png";
+				dstream =
+					ResourceGroupManager::getSingleton().openResource(
+					mName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, true, this);
+			}
 
-			size_t pos = mName.find_last_of(".");
-			String ext = mName.substr(pos+1);
+		
+			if(ext=="dds")
+			{
+				HRESULT hr;
 
-
-			img.load(dstream, ext);
-			loadImage(img);
+				MemoryDataStreamPtr memoryptr=MemoryDataStreamPtr(new MemoryDataStream(dstream));
+				// Load the Texture
+				hr = D3DX10CreateShaderResourceViewFromMemory( mDevice.get(),
+										memoryptr->getPtr(),
+										memoryptr->size(),
+										NULL,
+										NULL, 
+										&mpShaderResourceView, 
+										NULL );
+				if( FAILED( hr ) )
+				{
+					LogManager::getSingleton().logMessage("D3D10 : "+mName+" Could not be loaded");
+				}
+				D3D10_SHADER_RESOURCE_VIEW_DESC pDesc;
+				mpShaderResourceView->GetDesc(&pDesc);
+				int a=0;
+			}
+			else
+			{
+				img.load(dstream, ext);
+				loadImage(img);
+			}
 		}
 	}
 	//---------------------------------------------------------------------
@@ -226,7 +262,7 @@ namespace Ogre
 		DXGI_FORMAT d3dPF = this->_chooseD3DFormat();
 
 		// Use D3DX to help us create the texture, this way it can adjust any relevant sizes
-		UINT numMips = static_cast<UINT>(mNumRequestedMipmaps + 1);
+		UINT numMips = static_cast<UINT>(mNumRequestedMipmaps );
 
 
 
@@ -716,6 +752,8 @@ namespace Ogre
 		ID3D10Resource * pBackBuffer = buffer->getParentTexture()->getTextureResource();
 
 		D3D10_RENDER_TARGET_VIEW_DESC RTVDesc;
+		ZeroMemory( &RTVDesc, sizeof(RTVDesc) );
+
 		RTVDesc.Format = buffer->getParentTexture()->getShaderResourceViewDesc().Format;
 		switch(buffer->getParentTexture()->getShaderResourceViewDesc().ViewDimension)
 		{

@@ -1,11 +1,11 @@
 // -------------------------------
 // Cel Shading Section
 // -------------------------------
-vertex_program Ogre/CelShadingVP cg
+vertex_program Ogre/CelShadingVPCg cg
 {
 	source Example_CelShading.cg
 	entry_point main_vp
-	profiles vs_1_1 arbvp1
+	profiles vs_1_1 arbvp1 vs_4_0
 
 	default_params
 	{
@@ -16,11 +16,43 @@ vertex_program Ogre/CelShadingVP cg
 	}
 }
 
-fragment_program Ogre/CelShadingFP cg
+fragment_program Ogre/CelShadingFPCg cg
 {
 	source Example_CelShading.cg
 	entry_point main_fp
-	profiles ps_1_1 arbfp1 fp20
+	profiles ps_1_1 arbfp1 fp20 ps_4_0
+}
+
+vertex_program Ogre/CelShadingVPHLSL  hlsl
+{
+	source Example_CelShading.hlsl
+	target vs_4_0
+	entry_point main_vp
+	default_params
+	{
+		param_named_auto lightPosition light_position_object_space 0
+		param_named_auto eyePosition camera_position_object_space
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named shininess float 10 
+	}
+}
+
+fragment_program Ogre/CelShadingFPHLSL  hlsl
+{
+	source Example_CelShading.hlsl
+	target ps_4_0
+	entry_point main_fp
+}
+
+vertex_program Ogre/CelShadingVP unified
+{
+	delegate Ogre/CelShadingVPCg
+//	delegate Ogre/CelShadingVPHLSL
+}
+fragment_program Ogre/CelShadingFP unified
+{
+	delegate Ogre/CelShadingFPCg
+//	delegate Ogre/CelShadingFPHLSL
 }
 
 
@@ -580,6 +612,7 @@ material Examples/Athene/NormalMappedSpecular : Examples/BumpMapping/MultiLightS
 
 	}
 }
+
 
 
 

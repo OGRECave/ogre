@@ -114,7 +114,8 @@ namespace Ogre
 		void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
 
         void convertVertexShaderCaps(RenderSystemCapabilities* rsc) const;
-        void convertPixelShaderCaps(RenderSystemCapabilities* rsc) const;
+		void convertPixelShaderCaps(RenderSystemCapabilities* rsc) const;
+		void convertGeometryShaderCaps(RenderSystemCapabilities* rsc) const;
 		bool checkVertexTextureFormats(void);
 
 
@@ -140,6 +141,7 @@ namespace Ogre
 
 		D3D10HLSLProgram* mBoundVertexProgram;
 		D3D10HLSLProgram* mBoundFragmentProgram;
+		D3D10HLSLProgram* mBoundGeometryProgram;
 
 
 		ID3D10BlendState * mBoundBlendState;
@@ -274,8 +276,9 @@ namespace Ogre
         void _setTextureBorderColour(size_t stage, const ColourValue& colour);
 		void _setTextureMipmapBias(size_t unit, float bias);
 		void _setTextureMatrix( size_t unit, const Matrix4 &xform );
-		void _setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor );
-		void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha );
+		void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD);
+		void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, 
+			SceneBlendFactor destFactorAlpha, SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD);
 		void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
 		void _setViewport( Viewport *vp );
 		void _beginFrame(void);

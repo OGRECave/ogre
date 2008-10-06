@@ -30,6 +30,7 @@ Torus Knot Software Ltd.
 #include "OgreD3D10HardwareVertexBuffer.h"
 #include "OgreD3D10HardwareIndexBuffer.h"
 #include "OgreD3D10VertexDeclaration.h"
+#include "OgreD3D10RenderToVertexBuffer.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreD3D10Device.h"
@@ -93,6 +94,12 @@ namespace Ogre {
 		}
 		return HardwareIndexBufferSharedPtr(idx);
 
+	}
+	//-----------------------------------------------------------------------
+	RenderToVertexBufferSharedPtr 
+		D3D10HardwareBufferManager::createRenderToVertexBuffer()
+	{
+		return RenderToVertexBufferSharedPtr(new D3D10RenderToVertexBuffer());
 	}
 	//-----------------------------------------------------------------------
 	VertexDeclaration* D3D10HardwareBufferManager::createVertexDeclarationImpl(void)
@@ -182,12 +189,6 @@ namespace Ogre {
 			StringConverter::toString(vCount) + " unmanaged vertex buffers");
 		LogManager::getSingleton().logMessage(
 			StringConverter::toString(iCount) + " unmanaged index buffers");
-	}
-	//-----------------------------------------------------------------------
-	RenderToVertexBufferSharedPtr D3D10HardwareBufferManager::createRenderToVertexBuffer()
-	{
-		return RenderToVertexBufferSharedPtr();
-		// todo
 	}
 	//-----------------------------------------------------------------------
 

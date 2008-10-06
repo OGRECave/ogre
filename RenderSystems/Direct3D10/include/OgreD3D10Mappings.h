@@ -102,7 +102,7 @@ namespace Ogre
 		/// Get vertex data type
 		static DXGI_FORMAT get(VertexElementType vType);
 		/// Get vertex semantic
-		static LPCSTR get(VertexElementSemantic sem);
+		static LPCSTR get(VertexElementSemantic sem,unsigned short index);
 		/// Get dx10 color
 		static void get(const ColourValue& inColour, float * outColour );
 

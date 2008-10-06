@@ -54,6 +54,8 @@ namespace Ogre {
 		/// Create a hardware vertex buffer
 		HardwareIndexBufferSharedPtr 
 			createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
+		/// @copydoc HardwareBufferManager::createRenderToVertexBuffer
+		RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
 
 		/** Release all buffers in the default memory pool. 
 		@remarks
@@ -65,11 +67,6 @@ namespace Ogre {
 		Method for dealing with lost devices.
 		*/
 		void recreateDefaultPoolResources(void);
-
-		/// @copydoc HardwareBufferManager::createRenderToVertexBuffer
-		RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
-
-
 
 	};
 
