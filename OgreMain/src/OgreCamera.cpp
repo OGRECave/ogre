@@ -311,7 +311,12 @@ namespace Ogre {
     void Camera::rotate(const Quaternion& q)
     {
         // Note the order of the mult, i.e. q comes after
-        mOrientation = q * mOrientation;
+
+		// Normalise the quat to avoid cumulative problems with precision
+		Quaternion qnorm = q;
+		qnorm.normalise();
+        mOrientation = qnorm * mOrientation;
+
         invalidateView();
 
     }
@@ -459,6 +464,7 @@ namespace Ogre {
     void Camera::setOrientation(const Quaternion& q)
     {
         mOrientation = q;
+		mOrientation.normalise();
         invalidateView();
     }
     //-----------------------------------------------------------------------
