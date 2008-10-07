@@ -340,14 +340,7 @@ namespace Ogre {
 			unsigned int n = 0;
 			for (i = mSubEntityList.begin(); i != mSubEntityList.end(); ++i, ++n)
 			{
-				if ((*i)->getMaterial().isNull())
-				{
-					newEnt->getSubEntity(n)->setMaterialName((*i)->getMaterialName());
-				}
-				else
-				{
-					newEnt->getSubEntity(n)->setMaterialName((*i)->getMaterial()->getGroup());
-				}
+				newEnt->getSubEntity(n)->setMaterialName((*i)->getMaterialName());
 			}
 			if (mAnimationState)
 			{
