@@ -101,7 +101,7 @@ namespace Ogre {
 
         /** Returns whether the string begins with the pattern passed in.
         @param pattern The pattern to compare with.
-        @param lowerCase If true, the end of the string will be lower cased before
+        @param lowerCase If true, the start of the string will be lower cased before
             comparison, pattern should also be in lower case.
         */
         static bool startsWith(const String& str, const String& pattern, bool lowerCase = true);
