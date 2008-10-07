@@ -3381,20 +3381,14 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	const bool CgFxScriptLoader::cgSemanticToOgreAutoConstantType( const char * cgParamSemantic, GpuProgramParameters::AutoConstantType & ogreAutoConstantType )
+	const bool CgFxScriptLoader::cgSemanticToOgreAutoConstantType( const char * cgParamSemantic, const char * uiNameValue, GpuProgramParameters::AutoConstantType & ogreAutoConstantType, size_t & extraInfo )
 	{
+		extraInfo = 0;
+
 		FXSemanticID cgFXSemanticID = cgSemanticStringToType(cgParamSemantic);
 		switch(cgFXSemanticID)
 		{
 		case FXS_NONE:
-			return false;
-		case FXS_UNKNOWN:
-			return false;
-		case FXS_POSITION:
-			// todo - node position
-			return false;
-		case FXS_DIRECTION:
-			// todo - node position
 			return false;
 		case FXS_COLOR:
 			// todo - add to ogre
@@ -3590,32 +3584,146 @@ namespace Ogre {
 		case FXS_BOUNDINGRADIUS:
 			// todo - add to ogre
 			return false;
+		case FXS_POSITION:
+		case FXS_DIRECTION:
+		case FXS_UNKNOWN:
+			if (uiNameValue)
+			{
+				String uiNameValueAsString(uiNameValue);
+				String theWordLight = "Light";
+				if (StringUtil::startsWith(uiNameValueAsString, theWordLight, false))
+				{
+					size_t firstSpacePos = uiNameValueAsString.find(" ");
+					if (firstSpacePos > 0)
+					{
+						String lightNumberAsString = uiNameValueAsString.substr(theWordLight.size(), firstSpacePos - theWordLight.size());
+
+						size_t lightNumber = StringConverter::parseInt(lightNumberAsString);
+						extraInfo = lightNumber;
+
+						String colorPart = uiNameValueAsString.substr(firstSpacePos + 1);
+						if ( colorPart == "Color" ) // float4
+						{
+							ogreAutoConstantType = GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR;
+							return true;
+						}
+						if ( colorPart == "Intensity" ) // float
+						{
+							ogreAutoConstantType = GpuProgramParameters::ACT_LIGHT_POWER_SCALE;
+							return true;
+						}
+						if ( colorPart == "Light_position" ) // float3
+						{
+							ogreAutoConstantType = GpuProgramParameters::ACT_LIGHT_POSITION;
+							return true;
+						}
+						if ( colorPart == "Light_direction" ) // float3
+						{
+							ogreAutoConstantType = GpuProgramParameters::ACT_LIGHT_DIRECTION;
+							return true;
+						}
+						if ( colorPart == "Distance Falloff Exponent" ) // float
+						{
+							//ogreAutoConstantType = todo: add to GpuProgramParameters;
+							return false;
+						}
+						if ( colorPart == "Distance Falloff Start" ) // float
+						{
+							//ogreAutoConstantType = todo: add to GpuProgramParameters;
+							return false;
+						}
+						if ( colorPart == "Light1 Distance Falloff Limit" ) // float
+						{
+							//ogreAutoConstantType = todo: add to GpuProgramParameters;
+							return false;
+						}
+						if ( colorPart == "Distance Scale" ) // float
+						{
+							//ogreAutoConstantType = todo: add to GpuProgramParameters;
+							return false;
+						}
+						if ( colorPart == "Spread Inner" ) // float
+						{
+							//ogreAutoConstantType = todo: add to GpuProgramParameters;
+							return false;
+						}
+						if ( colorPart == "Spread Falloff" ) // float
+						{
+							//ogreAutoConstantType = todo: add to GpuProgramParameters;
+							return false;
+						}
+						if ( colorPart == "Light_spread_cos" ) // float
+						{
+							//ogreAutoConstantType = todo: add to GpuProgramParameters;
+							return false;
+						}
+					}
+
+				}
+				else // some other light params
+				{
+					if ( uiNameValueAsString == "Diffuse Scalar" ) // float
+					{
+						//ogreAutoConstantType = todo: add to GpuProgramParameters;
+						return false;
+					}
+					if ( uiNameValueAsString == "Specular Color" ) // float4
+					{
+						ogreAutoConstantType = GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR;
+						return true;
+					}
+					if ( uiNameValueAsString == "Specular Scalar" ) // float
+					{
+						//ogreAutoConstantType = todo: add to GpuProgramParameters;
+						return false;
+					}
+					if ( uiNameValueAsString == "Specular Shininess" ) // float
+					{
+						//ogreAutoConstantType = todo: add to GpuProgramParameters;
+						return false;
+					}
+				}
+			}
+			return false;
 		default:
 			return false;
 		}
 
-
 	}
+
 	//---------------------------------------------------------------------
 	bool CgFxScriptLoader::parseAutoConstantParam( CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName )
 	{
 		const char * cgParamSemantic = cgGetParameterSemantic(cgParameter);
+		CGannotation parameterAnnotation = cgGetFirstParameterAnnotation(cgParameter);
+		const char * uiNameValue = 0;
+		while(parameterAnnotation)
+		{
+			const char * annotationName = cgGetAnnotationName(parameterAnnotation);
+			if( strcmp("UIName", annotationName) == 0 )
+			{
+				uiNameValue = cgGetStringAnnotationValue(parameterAnnotation);
+			}
+			parameterAnnotation = cgGetNextAnnotation(parameterAnnotation);
+		}
+
 		bool isAutoConstant = false;
 		if (cgParamSemantic)
 		{
 			GpuProgramParameters::AutoConstantType ogreAutoConstantType;
-			bool autoConstantTypeFound = cgSemanticToOgreAutoConstantType(cgParamSemantic, ogreAutoConstantType);
+			size_t extraInfo = 0;
+			bool autoConstantTypeFound = cgSemanticToOgreAutoConstantType(cgParamSemantic, uiNameValue, ogreAutoConstantType, extraInfo);
 			if (autoConstantTypeFound)
 			{
 				isAutoConstant = true;
 			}
 			else
 			{
-				// todo - an error
+				// todo - an error?
 			}
 			if (isAutoConstant)
 			{
-				ogreProgramParameters->setNamedAutoConstant(ogreParamName, ogreAutoConstantType);
+				ogreProgramParameters->setNamedAutoConstant(ogreParamName, ogreAutoConstantType, extraInfo);
 			}
 		}
 		return isAutoConstant;

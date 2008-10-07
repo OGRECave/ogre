@@ -1478,7 +1478,7 @@ namespace Ogre {
 		void parseFloatCgProgramParameter( CGtype cgParamType, CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
 		void parseIntCgProgramParameter( CGtype cgParamType, CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
 		bool parseAutoConstantParam( CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
-		const bool cgSemanticToOgreAutoConstantType( const char * cgParamSemantic, GpuProgramParameters::AutoConstantType & ogreAutoConstantType );
+		const bool cgSemanticToOgreAutoConstantType( const char * cgParamSemantic, const char * uiNameValue, GpuProgramParameters::AutoConstantType & ogreAutoConstantType, size_t & extraInfo );
 		const FXSemanticID cgSemanticStringToType( const char * cgParamSemantic );
 
 		void buildStateNameStringToTypeMap();
