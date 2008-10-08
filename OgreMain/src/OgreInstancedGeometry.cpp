@@ -780,6 +780,8 @@ namespace Ogre {
 			OGRE_DELETE (*it)->indexData;
 	
 		}
+		mRenderOps.clear();
+
 		// delete the BatchInstances
 		for (BatchInstanceMap::iterator i = mBatchInstanceMap.begin();
 			i != mBatchInstanceMap.end(); ++i)
