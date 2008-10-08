@@ -158,6 +158,28 @@ AC_DEFUN([OGRE_USE_STLPORT],
  AC_SUBST(STLPORT_LIBS)
 ])
 
+AC_DEFUN([OGRE_CHECK_GL],
+[AC_ARG_ENABLE(gl,
+              AC_HELP_STRING([--enable-gl],
+                             [Build the OpenGL Render System]),
+              [build_gl=$enableval],
+              [build_gl=yes])
+
+AM_CONDITIONAL(BUILD_GLRENDERSYSTEM, test x$build_gl = xyes)
+
+])
+
+AC_DEFUN([OGRE_CHECK_GLES],
+[AC_ARG_ENABLE(gles,
+              AC_HELP_STRING([--enable-gles],
+                             [Build the OpenGL ES Render System]),
+              [build_gles=$enableval],
+              [build_gles=no])
+
+AM_CONDITIONAL(BUILD_GLESRENDERSYSTEM, test x$build_gles = xyes)
+
+])
+
 AC_DEFUN([OGRE_GET_PLATFORM],
 [OGRE_PLATFORM=GLX
  AC_ARG_WITH(platform, 
@@ -252,6 +274,53 @@ AC_DEFUN([OGRE_GET_GLSUPPORT],
   AC_CONFIG_FILES([RenderSystems/GL/src/GLX/Makefile
                    RenderSystems/GL/src/win32/Makefile])
 ])
+
+AC_DEFUN([OGRE_GET_GLESSUPPORT],
+[OGRE_GLESSUPPORT=none
+ AC_ARG_WITH(gles-support,
+             AC_HELP_STRING([--with-gles-support=PLATFORM],
+                            [ The GLESsupport to build (GLX). Defaults to the platform. Only set this if you know what you are doing. Use --with-platform otherwise.]),
+             OGRE_GLESSUPPORT=$withval,
+             OGRE_GLESSUPPORT=none)
+
+  if test "$OGRE_GLESSUPPORT" = "none" ; then
+    OGRE_GLESSUPPORT=EGL
+    AC_MSG_NOTICE([setting gles-support to platform: $OGRE_GLESSUPPORT])
+  fi
+  if test "$OGRE_GLESSUPPORT" != "EGL" ; then
+    AC_MSG_ERROR([setting gles-support to $OGRE_GLESSUPPORT is not supported yet])
+  fi
+
+  GLESSUPPORT_CFLAGS=""
+  GLESSUPPORT_LIBS=""
+
+  dnl Do the extra checks per type here
+  case $OGRE_GLESSUPPORT in
+    EGL)
+        AC_PATH_X
+        if test x"$x_includes" != x; then
+          if test x"$x_includes" != xNONE; then
+            GLESSUPPORT_CFLAGS="-I$x_includes"
+          fi
+        fi
+        if test x"$x_libraries" != x; then
+          if test x"$x_libraries" != xNONE; then
+            GLESSUPPORT_LIBS="-L$x_libraries -lX11 -lXext -lGLES_CM -lXrandr -lXxf86vm"
+          fi
+        dnl In case of xorg 7.x $x_libraries might be empty
+        else
+          GLESSUPPORT_LIBS="-lX11 -lXext -lGLES_CM -lXrandr -lXxf86vm"
+        fi
+    ;;
+  esac
+
+  AC_SUBST(GLESSUPPORT_CFLAGS)
+  AC_SUBST(GLESSUPPORT_LIBS)
+  AC_SUBST(OGRE_GLESSUPPORT)
+  AC_CONFIG_FILES([RenderSystems/GLES/include/EGL/Makefile
+                   RenderSystems/GLES/src/EGL/Makefile])
+])
+
 
 AC_DEFUN([OGRE_SETUP_FOR_TARGET],
 [case $host in

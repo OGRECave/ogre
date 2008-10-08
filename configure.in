@@ -79,8 +79,11 @@ AC_SUBST(ZZIPLIB_CFLAGS)
 AC_SUBST(ZZIPLIB_LIBS)
 
 dnl Get the GL and Platform libs for target build
+OGRE_CHECK_GL
+OGRE_CHECK_GLES
 OGRE_GET_PLATFORM
 OGRE_GET_GLSUPPORT
+OGRE_GET_GLESSUPPORT
 
 dnl Find the optional components we should build
 OGRE_CHECK_GUI
@@ -151,6 +154,9 @@ AC_CONFIG_FILES([Makefile \
     RenderSystems/GL/src/GLSL/include/Makefile \
     RenderSystems/GL/src/GLSL/src/Makefile \
     RenderSystems/GL/src/nvparse/Makefile \
+    RenderSystems/GLES/Makefile \
+    RenderSystems/GLES/include/Makefile \
+    RenderSystems/GLES/src/Makefile \
     RenderSystems/Direct3D9/Makefile \
     RenderSystems/Direct3D9/src/Makefile \
     RenderSystems/Direct3D9/include/Makefile \
@@ -265,6 +271,7 @@ test "x$no_ft" == "xyes" && ft_detected=no
 echo "--------===[ Configuration summary ]===--------"
 echo "    Target platform                 : $OGRE_PLATFORM"
 echo "    OpenGL Ogre support             : $OGRE_GLSUPPORT"
+echo "    OpenGL ES Ogre support          : $OGRE_GLESSUPPORT"
 echo "    GUI library to use              : $with_gui"
 echo "    Use double precision arithmetic : $build_double"
 echo "    Support for threading           : $build_threads"
