@@ -293,7 +293,7 @@ namespace Ogre{
 			{
 				Real r = 0;
 				if(getReal(*i, &r))
-					(*m)[n%4][n/4] = r;
+					(*m)[n/4][n%4] = r;
 				else
 					return false;
 			}
