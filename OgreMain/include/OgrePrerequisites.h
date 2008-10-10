@@ -101,7 +101,7 @@ namespace Ogre {
     #define OGRE_VERSION_MAJOR 1
     #define OGRE_VERSION_MINOR 6
     #define OGRE_VERSION_PATCH 0
-	#define OGRE_VERSION_SUFFIX "RC1"
+	#define OGRE_VERSION_SUFFIX ""
     #define OGRE_VERSION_NAME "Shoggoth"
 
     #define OGRE_VERSION    ((OGRE_VERSION_MAJOR << 16) | (OGRE_VERSION_MINOR << 8) | OGRE_VERSION_PATCH)
