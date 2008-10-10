@@ -100,7 +100,8 @@ namespace Ogre {
 		: mDepthWrite(true), mStencilMask(0xFFFFFFFF), mHardwareBufferManager(0),
 		mGpuProgramManager(0),
 		mGLSLProgramFactory(0),
-		mRTTManager(0)
+		mRTTManager(0),
+		mActiveTextureUnit(0)
 	{
 		size_t i;
 
@@ -1325,11 +1326,10 @@ namespace Ogre {
 		// Don't offer this as an option since D3D links it to sprite enabled
 		for (ushort i = 0; i < mFixedFunctionTextureUnits; ++i)
 		{
-			glActiveTextureARB(GL_TEXTURE0 + i);
+			setActiveTextureUnit(i);
 			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, 
 				enabled ? GL_TRUE : GL_FALSE);
 		}
-		glActiveTextureARB(GL_TEXTURE0);
 
 	}
 	//-----------------------------------------------------------------------------
@@ -1339,7 +1339,7 @@ namespace Ogre {
 
 		GLenum lastTextureType = mTextureTypes[stage];
 
-		glActiveTextureARB( GL_TEXTURE0 + stage );
+		setActiveTextureUnit(stage);
 		if (enabled)
 		{
 			if (!tex.isNull())
@@ -1384,7 +1384,6 @@ namespace Ogre {
 			glBindTexture (GL_TEXTURE_2D, 0); 
 		}
 
-		glActiveTextureARB( GL_TEXTURE0 );
 	}
 
 	//-----------------------------------------------------------------------------
@@ -1414,7 +1413,7 @@ namespace Ogre {
 		GLfloat eyePlaneR[] = {0.0, 0.0, 1.0, 0.0};
 		GLfloat eyePlaneQ[] = {0.0, 0.0, 0.0, 1.0};
 
-		glActiveTextureARB( GL_TEXTURE0 + stage );
+		setActiveTextureUnit(stage);
 
 		switch( m )
 		{
@@ -1537,7 +1536,6 @@ namespace Ogre {
 		default:
 			break;
 		}
-		glActiveTextureARB( GL_TEXTURE0 );
 	}
 	//-----------------------------------------------------------------------------
 	GLint GLRenderSystem::getTextureAddressingMode(
@@ -1560,31 +1558,28 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw)
 	{
-		glActiveTextureARB( GL_TEXTURE0 + stage );
+		setActiveTextureUnit(stage);
 		glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_S, 
 			getTextureAddressingMode(uvw.u));
 		glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_T, 
 			getTextureAddressingMode(uvw.v));
 		glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_R, 
 			getTextureAddressingMode(uvw.w));
-		glActiveTextureARB( GL_TEXTURE0 );
 	}
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setTextureBorderColour(size_t stage, const ColourValue& colour)
 	{
 		GLfloat border[4] = { colour.r, colour.g, colour.b, colour.a };
-		glActiveTextureARB( GL_TEXTURE0 + stage );
+		setActiveTextureUnit(stage);
 		glTexParameterfv( mTextureTypes[stage], GL_TEXTURE_BORDER_COLOR, border);
-		glActiveTextureARB( GL_TEXTURE0 );
 	}
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setTextureMipmapBias(size_t stage, float bias)
 	{
 		if (mCurrentCapabilities->hasCapability(RSC_MIPMAP_LOD_BIAS))
 		{
-			glActiveTextureARB( GL_TEXTURE0 + stage );
+			setActiveTextureUnit(stage);
 			glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, bias);
-			glActiveTextureARB( GL_TEXTURE0 );
 		}
 
 	}
@@ -1600,7 +1595,7 @@ namespace Ogre {
 		GLfloat mat[16];
 		makeGLMatrix(mat, xform);
 
-		glActiveTextureARB(GL_TEXTURE0 + stage);
+		setActiveTextureUnit(stage);
 		glMatrixMode(GL_TEXTURE);
 
 		// Load this matrix in
@@ -1613,7 +1608,6 @@ namespace Ogre {
 		}
 
 		glMatrixMode(GL_MODELVIEW);
-		glActiveTextureARB(GL_TEXTURE0);
 	}
 	//-----------------------------------------------------------------------------
 	GLint GLRenderSystem::getBlendMode(SceneBlendFactor ogreBlend) const
@@ -2275,7 +2269,7 @@ namespace Ogre {
 	void GLRenderSystem::_setTextureUnitFiltering(size_t unit, 
 		FilterType ftype, FilterOptions fo)
 	{
-		glActiveTextureARB( GL_TEXTURE0 + unit );
+		setActiveTextureUnit(unit);
 		switch(ftype)
 		{
 		case FT_MIN:
@@ -2315,7 +2309,6 @@ namespace Ogre {
 			break;
 		}
 
-		glActiveTextureARB( GL_TEXTURE0 );
 	}
 	//---------------------------------------------------------------------
 	GLfloat GLRenderSystem::_getCurrentAnisotropy(size_t unit)
@@ -2480,7 +2473,7 @@ namespace Ogre {
 			cmd = 0;
 		}
 
-		glActiveTextureARB(GL_TEXTURE0 + stage);
+		setActiveTextureUnit(stage);
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
 
 		if (bm.blendType == LBT_COLOUR)
@@ -2558,7 +2551,6 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		if (bm.source2 == LBS_MANUAL)
 			glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, cv2);
 
-		glActiveTextureARB(GL_TEXTURE0);
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::setGLLightPositionDirection(Light* lt, GLenum lightindex)
@@ -3387,6 +3379,15 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	{
 		// reacquire context
 		mCurrentContext->setCurrent();
+	}
+	//---------------------------------------------------------------------
+	void GLRenderSystem::setActiveTextureUnit(ushort unit)
+	{
+		if (mActiveTextureUnit != unit)
+		{
+			glActiveTextureARB(GL_TEXTURE0 + unit);
+			mActiveTextureUnit = unit;
+		}
 	}
 
 

@@ -134,6 +134,10 @@ namespace Ogre {
 			unwieldy and slow. However, FBO support for stencil buffers is poor.
         */
         GLRTTManager *mRTTManager;
+
+		void setActiveTextureUnit(ushort unit);
+		ushort mActiveTextureUnit;
+
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);
     public:
