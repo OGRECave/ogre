@@ -292,7 +292,19 @@ FunctionEnd
 
 Section Uninstall
   !insertmacro MUI_STARTMENU_GETFOLDER "Application" $ICONS_GROUP
-  RMDir /r "$INSTDIR"
+  RMDir /r "$INSTDIR\bin"
+  RMDir /r "$INSTDIR\docs"
+  RMDir /r "$INSTDIR\include"
+  RMDir /r "$INSTDIR\lib"
+  RMDir /r "$INSTDIR\media"
+  RMDir /r "$INSTDIR\samples"
+  Delete "$INSTDIR\OgreWebSite.url"
+  Delete "$INSTDIR\Setup_Help.url"
+  Delete "$INSTDIR\uninst.exe"
+
+  ; this only works if directory is empty
+  RMDir "$INSTDIR"
+  
   RMDir /r "$SMPROGRAMS\$ICONS_GROUP"
   
   Push "OGRE_HOME"
