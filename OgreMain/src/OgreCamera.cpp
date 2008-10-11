@@ -620,18 +620,18 @@ namespace Ogre {
     } 
 	//---------------------------------------------------------------------
 	PlaneBoundedVolume Camera::getCameraToViewportBoxVolume(Real screenLeft, 
-		Real screenTop, Real screenRight, Real screenBottom)
+		Real screenTop, Real screenRight, Real screenBottom, bool includeFarPlane)
 	{
 		PlaneBoundedVolume vol;
 		getCameraToViewportBoxVolume(screenLeft, screenTop, screenRight, screenBottom, 
-			&vol);
+			&vol, includeFarPlane);
 		return vol;
 
 	}
 	//---------------------------------------------------------------------()
 	void Camera::getCameraToViewportBoxVolume(Real screenLeft, 
 		Real screenTop, Real screenRight, Real screenBottom, 
-		PlaneBoundedVolume* outVolume)
+		PlaneBoundedVolume* outVolume, bool includeFarPlane)
 	{
 		outVolume->planes.clear();
 
@@ -686,15 +686,15 @@ namespace Ogre {
 			outVolume->planes.push_back(
 				Plane(mFrustumPlanes[FRUSTUM_PLANE_BOTTOM].normal, br.getOrigin()));
 			outVolume->planes.push_back(
-				Plane(mFrustumPlanes[FRUSTUM_PLANE_BOTTOM].normal, br.getOrigin()));
-			outVolume->planes.push_back(
 				Plane(mFrustumPlanes[FRUSTUM_PLANE_LEFT].normal, ul.getOrigin()));
 			
 
 		}
 
-		// near plane applicable to both projection types
+		// near & far plane applicable to both projection types
 		outVolume->planes.push_back(getFrustumPlane(FRUSTUM_PLANE_NEAR));
+		if (includeFarPlane)
+			outVolume->planes.push_back(getFrustumPlane(FRUSTUM_PLANE_FAR));
 	}
     // -------------------------------------------------------------------
     void Camera::setWindow (Real Left, Real Top, Real Right, Real Bottom)
