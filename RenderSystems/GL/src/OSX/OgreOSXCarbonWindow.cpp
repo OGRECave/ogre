@@ -234,7 +234,8 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
                 {kEventClassWindow, kEventWindowBoundsChanged},
                 {kEventClassWindow, kEventWindowExpanded},
                 {kEventClassWindow, kEventWindowCollapsed},
-                {kEventClassWindow, kEventWindowClosed}
+                {kEventClassWindow, kEventWindowClosed},
+                {kEventClassWindow, kEventWindowClose}
             };
             
             EventHandlerUPP handlerUPP = NewEventHandlerUPP(WindowEventUtilities::_CarbonWindowHandler);
@@ -244,7 +245,7 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
 			InstallStandardEventHandler(target);
             
             // We also need to install the WindowEvent Handler, we pass along the window with our requests
-            InstallEventHandler(target, handlerUPP, 9, eventSpecs, (void*)this, &mEventHandlerRef);
+            InstallEventHandler(target, handlerUPP, 10, eventSpecs, (void*)this, &mEventHandlerRef);
 			
 			// Display and select our window
 			ShowWindow(mWindow);

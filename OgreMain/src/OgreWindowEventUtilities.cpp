@@ -423,6 +423,20 @@ OSStatus WindowEventUtilities::_CarbonWindowHandler(EventHandlerCallRef nextHand
             for( ; start != end; ++start )
 				(start->second)->windowResized(curWindow);
             break;
+		case kEventWindowClose:
+		{
+			bool close = true;
+			for( ; start != end; ++start )
+			{
+				if (!(start->second)->windowClosing(curWindow))
+					close = false;
+			}
+			if (close)
+				// This will cause event handling to continue on to the standard handler, which calls
+				// DisposeWindow(), which leads to the 'kEventWindowClosed' event
+				status = eventNotHandledErr;
+			break;
+		}
         case kEventWindowClosed:
             curWindow->destroy();
             for( ; start != end; ++start )
