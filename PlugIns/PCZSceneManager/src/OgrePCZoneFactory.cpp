@@ -53,7 +53,7 @@ namespace Ogre
 	//-------------------------------------------------------------------------
 	// DefaultZoneFactory functions
 	//String defaultString = String("ZoneType_Default"); 
-	DefaultZoneFactory::DefaultZoneFactory() : PCZoneFactory(const String("ZoneType_Default"))
+	DefaultZoneFactory::DefaultZoneFactory() : PCZoneFactory(String("ZoneType_Default"))
 	{
 	}
 	DefaultZoneFactory::~DefaultZoneFactory()

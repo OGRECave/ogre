@@ -967,7 +967,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	//String terrainZoneString = String("ZoneType_Terrain"); 
 
-	TerrainZoneFactory::TerrainZoneFactory() : PCZoneFactory(const String("ZoneType_Terrain"))
+	TerrainZoneFactory::TerrainZoneFactory() : PCZoneFactory(String("ZoneType_Terrain"))
 	{
 	}
 	//-----------------------------------------------------------------------

@@ -11,7 +11,7 @@
 using namespace Ogre;
 static int count = 0;
 
-PCZSceneNode * RoomObject::createTestBuilding(Ogre::SceneManager *scene, String & name)
+PCZSceneNode * RoomObject::createTestBuilding(Ogre::SceneManager *scene, const String & name)
 {
 	count++;
 	mPortalCount = 0;
@@ -256,7 +256,7 @@ Ogre::ManualObject* RoomObject::createRoom(Ogre::SceneManager *scene,
 }
 
 void RoomObject::addMaterial(const Ogre::String &mat, 
-							 Ogre::ColourValue &clr, 
+							 const Ogre::ColourValue &clr, 
 							 Ogre::SceneBlendType sbt)
 {
 	static int init=false;
