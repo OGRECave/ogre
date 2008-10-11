@@ -194,10 +194,19 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
 			windowRect.bottom = height;
 			
 			// set the default attributes for the window
-			WindowAttributes windowAttrs = kWindowStandardDocumentAttributes
-				| kWindowStandardHandlerAttribute 
-				| kWindowInWindowMenuAttribute
-				| kWindowHideOnFullScreenAttribute;
+			WindowAttributes windowAttrs = kWindowStandardDocumentAttributes; // default: "resize"
+			
+			opt = miscParams->find("border");
+			if( opt != miscParams->end() )
+			{
+				String borderType = opt->second;
+				if( borderType == "none" )
+					windowAttrs = kWindowNoTitleBarAttribute;
+				else if( borderType == "fixed" )
+					windowAttrs = kWindowStandardFloatingAttributes;
+			}
+			
+			windowAttrs |= kWindowStandardHandlerAttribute | kWindowInWindowMenuAttribute | kWindowHideOnFullScreenAttribute;
 			
 			// Create the window
 			CreateNewWindow(kDocumentWindowClass, windowAttrs, &windowRect, &mWindow);
