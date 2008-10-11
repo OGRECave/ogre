@@ -149,7 +149,7 @@ namespace Ogre {
     void AutoParamDataSource::setCurrentLightList(const LightList* ll)
     {
         mCurrentLightList = ll;
-		for(size_t i = 0; i < ll->size(); ++i)
+		for(size_t i = 0; i < ll->size() && i < OGRE_MAX_SIMULTANEOUS_LIGHTS; ++i)
 		{
 			mSpotlightViewProjMatrixDirty[i] = true;
 			mSpotlightWorldViewProjMatrixDirty[i] = true;
@@ -603,117 +603,140 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void AutoParamDataSource::setTextureProjector(const Frustum* frust, size_t index = 0)
     {
-        mCurrentTextureProjector[index] = frust;
-        mTextureViewProjMatrixDirty[index] = true;
-		mTextureWorldViewProjMatrixDirty[index] = true;
-		mShadowCamDepthRangesDirty[index] = true;
+		if (index < OGRE_MAX_SIMULTANEOUS_LIGHTS)
+		{
+			mCurrentTextureProjector[index] = frust;
+			mTextureViewProjMatrixDirty[index] = true;
+			mTextureWorldViewProjMatrixDirty[index] = true;
+			mShadowCamDepthRangesDirty[index] = true;
+		}
 
     }
     //-----------------------------------------------------------------------------
     const Matrix4& AutoParamDataSource::getTextureViewProjMatrix(size_t index) const
     {
-        if (mTextureViewProjMatrixDirty[index] && mCurrentTextureProjector[index])
-        {
-			if (mCameraRelativeRendering)
+		if (index < OGRE_MAX_SIMULTANEOUS_LIGHTS)
+		{
+			if (mTextureViewProjMatrixDirty[index] && mCurrentTextureProjector[index])
 			{
-				// World positions are now going to be relative to the camera position
-				// so we need to alter the projector view matrix to compensate
-				Matrix4 viewMatrix;
-				mCurrentTextureProjector[index]->calcViewMatrixRelative(
-					mCurrentCamera->getDerivedPosition(), viewMatrix);
-				mTextureViewProjMatrix[index] = 
-					PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
-					mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 
-					viewMatrix;
+				if (mCameraRelativeRendering)
+				{
+					// World positions are now going to be relative to the camera position
+					// so we need to alter the projector view matrix to compensate
+					Matrix4 viewMatrix;
+					mCurrentTextureProjector[index]->calcViewMatrixRelative(
+						mCurrentCamera->getDerivedPosition(), viewMatrix);
+					mTextureViewProjMatrix[index] = 
+						PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
+						mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 
+						viewMatrix;
+				}
+				else
+				{
+					mTextureViewProjMatrix[index] = 
+						PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
+						mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 
+						mCurrentTextureProjector[index]->getViewMatrix();
+				}
+				mTextureViewProjMatrixDirty[index] = false;
 			}
-			else
-			{
-				mTextureViewProjMatrix[index] = 
-					PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
-					mCurrentTextureProjector[index]->getProjectionMatrixWithRSDepth() * 
-					mCurrentTextureProjector[index]->getViewMatrix();
-			}
-            mTextureViewProjMatrixDirty[index] = false;
-        }
-        return mTextureViewProjMatrix[index];
+			return mTextureViewProjMatrix[index];
+		}
+		else
+			return Matrix4::IDENTITY;
     }
 	//-----------------------------------------------------------------------------
 	const Matrix4& AutoParamDataSource::getTextureWorldViewProjMatrix(size_t index) const
 	{
-		if (mTextureWorldViewProjMatrixDirty[index] && mCurrentTextureProjector[index])
+		if (index < OGRE_MAX_SIMULTANEOUS_LIGHTS)
 		{
-			mTextureWorldViewProjMatrix[index] = 
-				getTextureViewProjMatrix(index)	* getWorldMatrix();
-			mTextureWorldViewProjMatrixDirty[index] = false;
+			if (mTextureWorldViewProjMatrixDirty[index] && mCurrentTextureProjector[index])
+			{
+				mTextureWorldViewProjMatrix[index] = 
+					getTextureViewProjMatrix(index)	* getWorldMatrix();
+				mTextureWorldViewProjMatrixDirty[index] = false;
+			}
+			return mTextureWorldViewProjMatrix[index];
 		}
-		return mTextureWorldViewProjMatrix[index];
+		else
+			return Matrix4::IDENTITY;
 	}
 	//-----------------------------------------------------------------------------
 	const Matrix4& AutoParamDataSource::getSpotlightViewProjMatrix(size_t index) const
 	{
-		const Light& l = getLight(index);
-
-		if (&l != &mBlankLight && 
-			l.getType() == Light::LT_SPOTLIGHT &&
-			mSpotlightViewProjMatrixDirty[index])
+		if (index < OGRE_MAX_SIMULTANEOUS_LIGHTS)
 		{
-			Frustum frust;
-			SceneNode dummyNode(0);
-			dummyNode.attachObject(&frust);
+			const Light& l = getLight(index);
 
-			frust.setProjectionType(PT_PERSPECTIVE);
-			frust.setFOVy(l.getSpotlightOuterAngle());
-			frust.setAspectRatio(1.0f);
-			// set near clip the same as main camera, since they are likely
-			// to both reflect the nature of the scene
-			frust.setNearClipDistance(mCurrentCamera->getNearClipDistance());
-			// Calculate position, which same as spotlight position, in camera-relative coords if required
-			dummyNode.setPosition(l.getDerivedPosition(true));
-			// Calculate direction, which same as spotlight direction
-			Vector3 dir = - l.getDerivedDirection(); // backwards since point down -z
-			dir.normalise();
-			Vector3 up = Vector3::UNIT_Y;
-			// Check it's not coincident with dir
-			if (Math::Abs(up.dotProduct(dir)) >= 1.0f)
+			if (&l != &mBlankLight && 
+				l.getType() == Light::LT_SPOTLIGHT &&
+				mSpotlightViewProjMatrixDirty[index])
 			{
-				// Use camera up
-				up = Vector3::UNIT_Z;
+				Frustum frust;
+				SceneNode dummyNode(0);
+				dummyNode.attachObject(&frust);
+
+				frust.setProjectionType(PT_PERSPECTIVE);
+				frust.setFOVy(l.getSpotlightOuterAngle());
+				frust.setAspectRatio(1.0f);
+				// set near clip the same as main camera, since they are likely
+				// to both reflect the nature of the scene
+				frust.setNearClipDistance(mCurrentCamera->getNearClipDistance());
+				// Calculate position, which same as spotlight position, in camera-relative coords if required
+				dummyNode.setPosition(l.getDerivedPosition(true));
+				// Calculate direction, which same as spotlight direction
+				Vector3 dir = - l.getDerivedDirection(); // backwards since point down -z
+				dir.normalise();
+				Vector3 up = Vector3::UNIT_Y;
+				// Check it's not coincident with dir
+				if (Math::Abs(up.dotProduct(dir)) >= 1.0f)
+				{
+					// Use camera up
+					up = Vector3::UNIT_Z;
+				}
+				// cross twice to rederive, only direction is unaltered
+				Vector3 left = dir.crossProduct(up);
+				left.normalise();
+				up = dir.crossProduct(left);
+				up.normalise();
+				// Derive quaternion from axes
+				Quaternion q;
+				q.FromAxes(left, up, dir);
+				dummyNode.setOrientation(q);
+
+				// The view matrix here already includes camera-relative changes if necessary
+				// since they are built into the frustum position
+				mSpotlightViewProjMatrix[index] = 
+					PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
+					frust.getProjectionMatrixWithRSDepth() * 
+					frust.getViewMatrix();
+
+				mSpotlightViewProjMatrixDirty[index] = false;
 			}
-			// cross twice to rederive, only direction is unaltered
-			Vector3 left = dir.crossProduct(up);
-			left.normalise();
-			up = dir.crossProduct(left);
-			up.normalise();
-			// Derive quaternion from axes
-			Quaternion q;
-			q.FromAxes(left, up, dir);
-			dummyNode.setOrientation(q);
-
-			// The view matrix here already includes camera-relative changes if necessary
-			// since they are built into the frustum position
-			mSpotlightViewProjMatrix[index] = 
-				PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE * 
-				frust.getProjectionMatrixWithRSDepth() * 
-				frust.getViewMatrix();
-
-			mSpotlightViewProjMatrixDirty[index] = false;
+			return mSpotlightViewProjMatrix[index];
 		}
-		return mSpotlightViewProjMatrix[index];
+		else
+			return Matrix4::IDENTITY;
 	}
 	//-----------------------------------------------------------------------------
 	const Matrix4& AutoParamDataSource::getSpotlightWorldViewProjMatrix(size_t index) const
 	{
-		const Light& l = getLight(index);
-
-		if (&l != &mBlankLight && 
-			l.getType() == Light::LT_SPOTLIGHT &&
-			mSpotlightWorldViewProjMatrixDirty[index])
+		if (index < OGRE_MAX_SIMULTANEOUS_LIGHTS)
 		{
-			mSpotlightWorldViewProjMatrix[index] = 
-				getSpotlightViewProjMatrix(index) * getWorldMatrix();
-			mSpotlightWorldViewProjMatrixDirty[index] = false;
+			const Light& l = getLight(index);
+
+			if (&l != &mBlankLight && 
+				l.getType() == Light::LT_SPOTLIGHT &&
+				mSpotlightWorldViewProjMatrixDirty[index])
+			{
+				mSpotlightWorldViewProjMatrix[index] = 
+					getSpotlightViewProjMatrix(index) * getWorldMatrix();
+				mSpotlightWorldViewProjMatrixDirty[index] = false;
+			}
+			return mSpotlightWorldViewProjMatrix[index];
 		}
-		return mSpotlightWorldViewProjMatrix[index];
+		else
+			return Matrix4::IDENTITY;
 	}
 //-----------------------------------------------------------------------------
   const Matrix4& AutoParamDataSource::getTextureTransformMatrix(size_t index) const
@@ -1021,29 +1044,34 @@ namespace Ogre {
 		if (!mCurrentSceneManager->isShadowTechniqueTextureBased())
 			return dummy;
 
-		if (mShadowCamDepthRangesDirty[index] && mCurrentTextureProjector[index])
+		if (index < OGRE_MAX_SIMULTANEOUS_LIGHTS)
 		{
-			const VisibleObjectsBoundsInfo& info = 
-				mCurrentSceneManager->getVisibleObjectsBoundsInfo(
-					(Camera*)mCurrentTextureProjector[index]);
-
-			Real depthRange = info.maxDistance - info.minDistance;
-			if (depthRange > std::numeric_limits<Real>::epsilon())
+			if (mShadowCamDepthRangesDirty[index] && mCurrentTextureProjector[index])
 			{
-				mShadowCamDepthRanges[index] = Vector4(
-					info.minDistance,
-					info.maxDistance,
-					depthRange,
-					1.0f / depthRange);
-			}
-			else
-			{
-				mShadowCamDepthRanges[index] = dummy;
-			}
+				const VisibleObjectsBoundsInfo& info = 
+					mCurrentSceneManager->getVisibleObjectsBoundsInfo(
+						(Camera*)mCurrentTextureProjector[index]);
 
-			mShadowCamDepthRangesDirty[index] = false;
+				Real depthRange = info.maxDistance - info.minDistance;
+				if (depthRange > std::numeric_limits<Real>::epsilon())
+				{
+					mShadowCamDepthRanges[index] = Vector4(
+						info.minDistance,
+						info.maxDistance,
+						depthRange,
+						1.0f / depthRange);
+				}
+				else
+				{
+					mShadowCamDepthRanges[index] = dummy;
+				}
+
+				mShadowCamDepthRangesDirty[index] = false;
+			}
+			return mShadowCamDepthRanges[index];
 		}
-		return mShadowCamDepthRanges[index];
+		else
+			return dummy;
 	}
 	//---------------------------------------------------------------------
 	const ColourValue& AutoParamDataSource::getShadowColour() const
