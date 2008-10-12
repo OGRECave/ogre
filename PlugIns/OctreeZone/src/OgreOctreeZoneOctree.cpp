@@ -37,7 +37,7 @@ Modified to use with PCZones 2007 by Eric Cha
 -----------------------------------------------------------------------------
 */
 
-#include <OgreOctree.h>
+#include <OgreOctreeZoneOctree.h>
 #include <OgrePCZSceneNode.h>
 #include "OgreOctreeZone.h"
 

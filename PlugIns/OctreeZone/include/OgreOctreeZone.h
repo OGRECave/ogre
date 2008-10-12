@@ -43,7 +43,7 @@ Code Style Update	 :
 #include "OgreOctreeZonePrerequisites.h"
 #include "OgrePCZone.h"
 #include "OgrePCZoneFactory.h"
-#include "OgreOctree.h"
+#include "OgreOctreeZoneOctree.h"
 
 namespace Ogre
 {

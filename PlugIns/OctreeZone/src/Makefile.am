@@ -4,7 +4,7 @@ pkglib_LTLIBRARIES = Plugin_OctreeZone.la
 
 Plugin_OctreeZone_la_SOURCES = \
 	OgreHeightmapTerrainZonePageSource.cpp \
-	OgreOctree.cpp \
+	OgreOctreeZoneOctree.cpp \
 	OgreOctreeZone.cpp \
 	OgreOctreeZoneDll.cpp \
 	OgreOctreeZonePlugin.cpp \

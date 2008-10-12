@@ -1,6 +1,6 @@
 noinst_HEADERS = \
 	OgreHeightmapTerrainZonePageSource.h \
-	OgreOctree.h \
+	OgreOctreeZoneOctree.h \
 	OgreOctreeZone.h \
 	OgreOctreeZonePlugin.h \
 	OgreOctreeZonePrerequisites.h \
