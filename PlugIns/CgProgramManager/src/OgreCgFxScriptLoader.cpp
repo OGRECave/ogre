@@ -2718,8 +2718,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Real CgFxScriptLoader::getLoadingOrder(void) const
     {
-        // after Material Manager
-        return 101.0f;
+		// before the normal material manager - so a normal material can inherits from a cgfx material
+		return 99.0f;
+
     }
 	//---------------------------------------------------------------------
     void CgFxScriptLoader::parseScript( DataStreamPtr& stream, const String& groupName )
