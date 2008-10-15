@@ -1482,20 +1482,19 @@ namespace Ogre {
 			}
 			msPassGraveyard.clear();
 		}
-
+        PassSet tempDirtyHashList;
 		{
 			OGRE_LOCK_MUTEX(msDirtyHashListMutex)
-			PassSet::iterator i, iend;
 			// The dirty ones will have been removed from the groups above using the old hash now
-			iend = msDirtyHashList.end();
-			for (i = msDirtyHashList.begin(); i != iend; ++i)
-			{
-				Pass* p = *i;
-				p->_recalculateHash();
-			}
-			// Clear the dirty list
-			msDirtyHashList.clear();
-		}
+            tempDirtyHashList.swap(msDirtyHashList);
+        }
+        PassSet::iterator i, iend;
+        iend = tempDirtyHashList.end();
+        for (i = tempDirtyHashList.begin(); i != iend; ++i)
+        {
+            Pass* p = *i;
+            p->_recalculateHash();
+        }
     }
     //-----------------------------------------------------------------------
     void Pass::queueForDeletion(void)
