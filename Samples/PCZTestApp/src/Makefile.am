@@ -3,5 +3,5 @@ INCLUDES = $(STLPORT_CFLAGS) -I$(top_srcdir)/Samples/PCZTestApp/include -I$(top_
 ogreexec_PROGRAMS = PCZTestApp
 
 PCZTestApp_SOURCES = PCZTestApp.cpp RoomObject.cpp
-PCZTestApp_LDFLAGS = -L$(top_builddir)/OgreMain/src
-PCZTestApp_LDADD = -lOgreMain $(top_builddir)/PlugIns/PCZSceneManager/src/Plugin_PCZSceneManager.la $(OIS_LIBS)
+PCZTestApp_LDFLAGS = -L$(top_builddir)/OgreMain/src -L$(top_builddir)/PlugIns/PCZSceneManager/src
+PCZTestApp_LDADD = -lOgreMain -lPlugin_PCZSceneManager $(OIS_LIBS)

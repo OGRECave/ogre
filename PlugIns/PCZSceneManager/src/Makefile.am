@@ -1,8 +1,8 @@
 INCLUDES = $(STLPORT_CFLAGS) -I$(top_srcdir)/PlugIns/PCZSceneManager/include -I$(top_srcdir)/OgreMain/include
 
-pkglib_LTLIBRARIES = Plugin_PCZSceneManager.la
+pkglib_LTLIBRARIES = libPlugin_PCZSceneManager.la
 
-Plugin_PCZSceneManager_la_SOURCES = \
+libPlugin_PCZSceneManager_la_SOURCES = \
 	OgreCapsule.cpp \
 	OgreDefaultZone.cpp \
 	OgrePCPlane.cpp \
@@ -19,5 +19,5 @@ Plugin_PCZSceneManager_la_SOURCES = \
 	OgrePortal.cpp \
 	OgreSegment.cpp
 
-Plugin_PCZSceneManager_la_LDFLAGS = -module $(PLUGIN_FLAGS) -L$(top_builddir)/OgreMain/src -Wl,-z,defs
-Plugin_PCZSceneManager_la_LIBADD = -lOgreMain $(OGRE_THREAD_LIBS)
+libPlugin_PCZSceneManager_la_LDFLAGS = -module $(PLUGIN_FLAGS) -L$(top_builddir)/OgreMain/src -Wl,-z,defs
+libPlugin_PCZSceneManager_la_LIBADD = -lOgreMain $(OGRE_THREAD_LIBS)

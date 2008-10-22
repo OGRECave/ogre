@@ -14,5 +14,5 @@ Plugin_OctreeZone_la_SOURCES = \
 	OgreTerrainZonePageSource.cpp \
 	OgreTerrainZoneRenderable.cpp
 
-Plugin_OctreeZone_la_LDFLAGS = -module $(PLUGIN_FLAGS) -L$(top_builddir)/OgreMain/src -Wl,-z,defs
-Plugin_OctreeZone_la_LIBADD = -lOgreMain $(top_builddir)/PlugIns/PCZSceneManager/src/Plugin_PCZSceneManager.la $(OGRE_THREAD_LIBS)
+Plugin_OctreeZone_la_LDFLAGS = -module $(PLUGIN_FLAGS) -L$(top_builddir)/OgreMain/src -L$(top_builddir)/PlugIns/PCZSceneManager/src -Wl,-z,defs
+Plugin_OctreeZone_la_LIBADD = -lOgreMain -lPlugin_PCZSceneManager $(OGRE_THREAD_LIBS)
