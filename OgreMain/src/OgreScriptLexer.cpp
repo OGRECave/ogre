@@ -39,7 +39,7 @@ namespace Ogre{
 	ScriptTokenListPtr ScriptLexer::tokenize(const String &str, const String &source)
 	{
 		// State enums
-		enum{ READY = 0, COMMENT, MULTICOMMENT, WORD, QUOTE, VAR };
+		enum{ READY = 0, COMMENT, MULTICOMMENT, WORD, QUOTE, VAR, POSSIBLECOMMENT };
 
 		// Set up some constant characters of interest
 #if OGRE_WCHAR_T_STRINGS
@@ -95,10 +95,13 @@ namespace Ogre{
 					lexeme = c;
 					setToken(lexeme, line, source, tokens.get());
 				}
-				else if(!isWhitespace(c) && c != slash)
+				else if(!isWhitespace(c))
 				{
 					lexeme = c;
-					state = WORD;
+					if(c == slash)
+						state = POSSIBLECOMMENT;
+					else
+						state = WORD;
 				}
 				break;
 			case COMMENT:
@@ -110,6 +113,17 @@ namespace Ogre{
 				if(c == slash && lastc == star)
 					state = READY;
 				break;
+			case POSSIBLECOMMENT:
+				if(c == slash && lastc == slash)
+				{
+					lexeme = "";
+					state = COMMENT;
+					break;	
+				}
+				else
+				{
+					state = WORD;
+				}
 			case WORD:
 				if(isNewline(c))
 				{
