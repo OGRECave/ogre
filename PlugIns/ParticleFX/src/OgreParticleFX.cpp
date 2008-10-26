@@ -36,7 +36,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     extern "C" void _OgreParticleFXExport dllStartPlugin(void) throw()
     {
-		plugin = new ParticleFXPlugin();
+		plugin = OGRE_NEW ParticleFXPlugin();
 		Root::getSingleton().installPlugin(plugin);
     }
 
@@ -44,7 +44,7 @@ namespace Ogre {
     extern "C" void _OgreParticleFXExport dllStopPlugin(void)
     {
 		Root::getSingleton().uninstallPlugin(plugin);
-		delete plugin;
+		OGRE_DELETE plugin;
 
     }
 

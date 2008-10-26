@@ -67,32 +67,32 @@ namespace Ogre
 		ParticleEmitterFactory* pEmitFact;
 
 		// PointEmitter
-		pEmitFact = new PointEmitterFactory();
+		pEmitFact = OGRE_NEW PointEmitterFactory();
 		ParticleSystemManager::getSingleton().addEmitterFactory(pEmitFact);
 		mEmitterFactories.push_back(pEmitFact);
 
 		// BoxEmitter
-		pEmitFact = new BoxEmitterFactory();
+		pEmitFact = OGRE_NEW BoxEmitterFactory();
 		ParticleSystemManager::getSingleton().addEmitterFactory(pEmitFact);
 		mEmitterFactories.push_back(pEmitFact);
 
 		// EllipsoidEmitter
-		pEmitFact = new EllipsoidEmitterFactory();
+		pEmitFact = OGRE_NEW EllipsoidEmitterFactory();
 		ParticleSystemManager::getSingleton().addEmitterFactory(pEmitFact);
 		mEmitterFactories.push_back(pEmitFact);
 
 		// CylinderEmitter
-		pEmitFact = new CylinderEmitterFactory();
+		pEmitFact = OGRE_NEW CylinderEmitterFactory();
 		ParticleSystemManager::getSingleton().addEmitterFactory(pEmitFact);
 		mEmitterFactories.push_back(pEmitFact);
 
 		// RingEmitter
-		pEmitFact = new RingEmitterFactory();
+		pEmitFact = OGRE_NEW RingEmitterFactory();
 		ParticleSystemManager::getSingleton().addEmitterFactory(pEmitFact);
 		mEmitterFactories.push_back(pEmitFact);
 
 		// HollowEllipsoidEmitter
-		pEmitFact = new HollowEllipsoidEmitterFactory();
+		pEmitFact = OGRE_NEW HollowEllipsoidEmitterFactory();
 		ParticleSystemManager::getSingleton().addEmitterFactory(pEmitFact);
 		mEmitterFactories.push_back(pEmitFact);
 
@@ -100,48 +100,48 @@ namespace Ogre
 		ParticleAffectorFactory* pAffFact;
 
 		// LinearForceAffector
-		pAffFact = new LinearForceAffectorFactory();
+		pAffFact = OGRE_NEW LinearForceAffectorFactory();
 		ParticleSystemManager::getSingleton().addAffectorFactory(pAffFact);
 		mAffectorFactories.push_back(pAffFact);
 
 		// ColourFaderAffector
-		pAffFact = new ColourFaderAffectorFactory();
+		pAffFact = OGRE_NEW ColourFaderAffectorFactory();
 		ParticleSystemManager::getSingleton().addAffectorFactory(pAffFact);
 		mAffectorFactories.push_back(pAffFact);
 
 		// ColourFaderAffector2
-		pAffFact = new ColourFaderAffectorFactory2();
+		pAffFact = OGRE_NEW ColourFaderAffectorFactory2();
 		ParticleSystemManager::getSingleton().addAffectorFactory(pAffFact);
 		mAffectorFactories.push_back(pAffFact);
 
 		// ColourImageAffector
-		pAffFact = new ColourImageAffectorFactory();
+		pAffFact = OGRE_NEW ColourImageAffectorFactory();
 		ParticleSystemManager::getSingleton().addAffectorFactory(pAffFact);
 		mAffectorFactories.push_back(pAffFact);
 
 		// ColourInterpolatorAffector
-		pAffFact = new ColourInterpolatorAffectorFactory();
+		pAffFact = OGRE_NEW ColourInterpolatorAffectorFactory();
 		ParticleSystemManager::getSingleton().addAffectorFactory(pAffFact);
 		mAffectorFactories.push_back(pAffFact);
 
 		// ScaleAffector
-		pAffFact = new ScaleAffectorFactory();
+		pAffFact = OGRE_NEW ScaleAffectorFactory();
 		ParticleSystemManager::getSingleton().addAffectorFactory(pAffFact);
 		mAffectorFactories.push_back(pAffFact);
 
 		// RotationAffector
-		pAffFact = new RotationAffectorFactory();
+		pAffFact = OGRE_NEW RotationAffectorFactory();
 		ParticleSystemManager::getSingleton().addAffectorFactory(pAffFact);
 		mAffectorFactories.push_back(pAffFact);
 
 
 		// DirectionRandomiserAffector
-		pAffFact = new DirectionRandomiserAffectorFactory();
+		pAffFact = OGRE_NEW DirectionRandomiserAffectorFactory();
 		ParticleSystemManager::getSingleton().addAffectorFactory(pAffFact);
 		mAffectorFactories.push_back(pAffFact);
 
 		// DeflectorPlaneAffector
-		pAffFact = new DeflectorPlaneAffectorFactory();
+		pAffFact = OGRE_NEW DeflectorPlaneAffectorFactory();
 		ParticleSystemManager::getSingleton().addAffectorFactory(pAffFact);
 		mAffectorFactories.push_back(pAffFact);
 	}
@@ -164,12 +164,12 @@ namespace Ogre
 
 		for (ei = mEmitterFactories.begin(); ei != mEmitterFactories.end(); ++ei)
 		{
-			delete (*ei);
+			OGRE_DELETE (*ei);
 		}
 
 		for (ai = mAffectorFactories.begin(); ai != mAffectorFactories.end(); ++ai)
 		{
-			delete (*ai);
+			OGRE_DELETE (*ai);
 		}
 
 

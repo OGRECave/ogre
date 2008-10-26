@@ -262,6 +262,7 @@ namespace Ogre
 	typedef RenderSysAllocatedObject	GpuParamsAlloc;
 	typedef ResourceAllocatedObject		PassAlloc;
 	typedef GeometryAllocatedObject		PatchAlloc;
+	typedef GeneralAllocatedObject		PluginAlloc;
 	typedef GeneralAllocatedObject		ProfilerAlloc;
 	typedef GeometryAllocatedObject		ProgMeshAlloc;
 	typedef SceneCtlAllocatedObject		RenderQueueAlloc;
