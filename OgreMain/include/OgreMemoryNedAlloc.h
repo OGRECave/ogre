@@ -31,6 +31,7 @@ Torus Knot Software Ltd.
 #define __MemoryNedAlloc_H__
 
 #include "OgreMemoryTracker.h"
+#include "OgrePlatformInformation.h"
 
 // This is an example of using a non-standard allocator with Ogre
 // Note, you need nedmalloc available on your build path to support this
