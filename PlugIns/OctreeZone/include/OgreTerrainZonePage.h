@@ -57,7 +57,7 @@ namespace Ogre {
         construction. Note that this structure is public to allow completely
         free access to users of this class.
     */
-    class _OgreOctreeZonePluginExport TerrainZonePage
+    class _OgreOctreeZonePluginExport TerrainZonePage : public GeometryAllocatedObject
     {
     public:
         typedef std::vector < TerrainZoneRenderable * > TerrainZoneRow;

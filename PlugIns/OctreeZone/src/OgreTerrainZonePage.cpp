@@ -70,7 +70,7 @@ namespace Ogre {
             jend = i->end();
             for (j = i->begin(); j != jend; ++j)
             {
-                delete *j;
+                OGRE_DELETE *j;
                 *j = 0;
             }
         }

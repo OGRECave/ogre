@@ -93,7 +93,7 @@ namespace Ogre {
         String name;
 
         // Create a TerrainZone Page
-        TerrainZonePage* page = new TerrainZonePage((mPageSize-1) / (mTileSize-1));
+        TerrainZonePage* page = OGRE_NEW TerrainZonePage((mPageSize-1) / (mTileSize-1));
         // Create a node for all tiles to be attached to
         // Note we sequentially name since page can be attached at different points
         // so page x/z is not appropriate
@@ -153,7 +153,7 @@ namespace Ogre {
 					((PCZSceneNode*)c)->allowToVisit(false);
 				}
 
-				TerrainZoneRenderable *tile = new TerrainZoneRenderable(name, mTerrainZone);
+				TerrainZoneRenderable *tile = OGRE_NEW TerrainZoneRenderable(name, mTerrainZone);
 				// set queue
 				tile->setRenderQueueGroup(mTerrainZone->mPCZSM->getWorldGeometryRenderQueue());
                 // Initialise the tile

@@ -64,16 +64,16 @@ Portal::Portal(const String & name, const PORTAL_TYPE type)
 	{
 	default:
 	case PORTAL_TYPE_QUAD:
-		mCorners = new Vector3[4];
-		mDerivedCorners = new Vector3[4];
+		mCorners = OGRE_ALLOC_T(Vector3, 4, MEMCATEGORY_SCENE_CONTROL);
+		mDerivedCorners = OGRE_ALLOC_T(Vector3, 4, MEMCATEGORY_SCENE_CONTROL);
 		break;
 	case PORTAL_TYPE_AABB:
-		mCorners = new Vector3[2];
-		mDerivedCorners = new Vector3[2];
+		mCorners = OGRE_ALLOC_T(Vector3, 2, MEMCATEGORY_SCENE_CONTROL);
+		mDerivedCorners = OGRE_ALLOC_T(Vector3, 2, MEMCATEGORY_SCENE_CONTROL);
 		break;
 	case PORTAL_TYPE_SPHERE:
-		mCorners = new Vector3[2];
-		mDerivedCorners = new Vector3[2];
+		mCorners = OGRE_ALLOC_T(Vector3, 2, MEMCATEGORY_SCENE_CONTROL);
+		mDerivedCorners = OGRE_ALLOC_T(Vector3, 2, MEMCATEGORY_SCENE_CONTROL);
 		break;
 	}
 }
@@ -81,10 +81,10 @@ Portal::Portal(const String & name, const PORTAL_TYPE type)
 Portal::~Portal()
 {
 	if (mCorners)
-		delete [] mCorners;
+		OGRE_FREE(mCorners, MEMCATEGORY_SCENE_CONTROL);
 	mCorners = 0;
 	if (mDerivedCorners)
-		delete [] mDerivedCorners;
+		OGRE_FREE(mDerivedCorners, MEMCATEGORY_SCENE_CONTROL);
 	mDerivedCorners = 0;
 }
 

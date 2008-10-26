@@ -58,7 +58,7 @@ namespace Ogre
     @remarks
     */
 
-	class _OgrePCZPluginExport Portal 
+	class _OgrePCZPluginExport Portal : public SceneCtlAllocatedObject
     {
     public:
 		enum PORTAL_TYPE
@@ -68,7 +68,7 @@ namespace Ogre
 			PORTAL_TYPE_SPHERE,
 		};
         Portal(const String &, const PORTAL_TYPE type = PORTAL_TYPE_QUAD);
-        ~Portal();
+        virtual ~Portal();
 
         /** Set the SceneNode the Portal is associated with
         */

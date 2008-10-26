@@ -82,7 +82,7 @@ namespace Ogre
 		while ( it != mZoneData.end() )
 		{
 			zoneData = it->second;
-			delete zoneData;
+			OGRE_DELETE zoneData;
 			++it;
 		}
 		mZoneData.clear();

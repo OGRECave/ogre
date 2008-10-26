@@ -69,7 +69,7 @@ namespace Ogre
 	}
 	PCZone* DefaultZoneFactory::createPCZone(PCZSceneManager * pczsm, const String& zoneName)
 	{
-		return new DefaultZone(pczsm, zoneName);
+		return OGRE_NEW DefaultZone(pczsm, zoneName);
 	}
 	//-------------------------------------------------------------------------
 	// PCZoneFactoryManager functions

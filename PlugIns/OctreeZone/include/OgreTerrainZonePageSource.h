@@ -66,7 +66,7 @@ namespace Ogre {
 	    across all sources.
 	*/
 	class _OgreOctreeZonePluginExport TerrainZonePageSourceListenerManager :
-		public Singleton<TerrainZonePageSourceListenerManager>
+		public Singleton<TerrainZonePageSourceListenerManager>, public GeneralAllocatedObject
 	{
 	protected:
         typedef std::vector<TerrainZonePageSourceListener*> PageSourceListenerList;
@@ -141,7 +141,7 @@ namespace Ogre {
     paging in this manager is not present yet but the system is designed to 
     extend to it. For now, all tiles are requested up-front.
     */
-    class _OgreOctreeZonePluginExport TerrainZonePageSource
+	class _OgreOctreeZonePluginExport TerrainZonePageSource : public GeometryAllocatedObject
     {
     protected:
         /// Link back to parent manager
