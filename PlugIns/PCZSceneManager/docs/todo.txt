@@ -4,6 +4,9 @@ Some items are specific, some are not, it's just a list to keep notes for myself
 
 UPDATES:
 -------------
+* PCZoneFactory eats a const String &, so code has been updated to use PCZoneFactory("ZoneType_Default")
+  instead of PCZoneFactory (String("ZoneType_Default")).  (10/17/08)
+* PCZSM now zeroes out the SkyBoxObj, SkyPlane, and SkyDome pointers when clearScene() is called. (10/26/08)
 * if a scene node is anchored to a zone, then child scene nodes created from that
   scene node (via SceneNode::createChildSceneNode()) are also anchored to the same zone. (5/8/08)
 * Portals can now be closed & opened (see Portal::close() and Portal::open()).
