@@ -30,6 +30,8 @@ Torus Knot Software Ltd.
 #ifndef __MemoryNedAlloc_H__
 #define __MemoryNedAlloc_H__
 
+#if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_NED
+
 namespace Ogre
 {
 	/** Non-templated utility class just to hide nedmalloc.
@@ -122,5 +124,8 @@ namespace Ogre
 
 
 }// namespace Ogre
+
+#endif 
+
 #endif // __MemoryNedAlloc_H__
 
