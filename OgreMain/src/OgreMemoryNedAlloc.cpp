@@ -27,9 +27,15 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
+#include "OgrePrerequisites.h"
 #include "OgreMemoryNedAlloc.h"
+#include "OgrePlatformInformation.h"
+#include "OgreMemoryTracker.h"
 
 #if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_NED
+
+// include ned implementation
+#include <nedmalloc.c>
 
 namespace Ogre
 {
@@ -85,9 +91,6 @@ namespace Ogre
 
 }
 
-// include ned implementation
-#include <nedmalloc.c>
-
-
 
 #endif
+
