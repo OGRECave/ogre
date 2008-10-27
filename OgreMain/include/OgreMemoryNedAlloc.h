@@ -41,6 +41,19 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	/** Non-templated utility class just to hide nedmalloc.
+	*/
+	class _OgreExport NedAllocImpl
+	{
+	public:
+		static void* allocBytes(size_t count, 
+			const char* file, int line, const char* func);
+		static void deallocBytes(void* ptr);
+		static void* allocBytesAligned(size_t align, size_t count, 
+			const char* file, int line, const char* func);
+		static void deallocBytesAligned(size_t align, void* ptr);
+
+	};
 
 	/**	An allocation policy for use with AllocatedObject and 
 	STLAllocator. This is the class that actually does the allocation
@@ -56,29 +69,11 @@ namespace Ogre
 		static inline void* allocateBytes(size_t count, 
 			const char* file = 0, int line = 0, const char* func = 0)
 		{
-			void* ptr = nedalloc::nedmalloc(count);
-#if OGRE_MEMORY_TRACKER
-			// this alloc policy doesn't do pools (yet, ned can do it)
-			MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
-#else
-			// avoid unused params warning
-			file;line;func;
-#endif
-			return ptr;
+			return NedAllocImpl::allocBytes(count, file, line, func);
 		}
-
 		static inline void deallocateBytes(void* ptr)
 		{
-#if OGRE_MEMORY_TRACKER
-			MemoryTracker::get()._recordDealloc(ptr);
-#endif
-			nedalloc::nedfree(ptr);
-		}
-
-		/// Get the maximum size of a single allocation
-		static inline size_t getMaxAllocationSize()
-		{
-			return std::numeric_limits<size_t>::max();
+			NedAllocImpl::deallocBytes(ptr);
 		}
 
 	private:
@@ -86,6 +81,7 @@ namespace Ogre
 		NedAllocPolicy()
 		{ }
 	};
+
 
 	/**	An allocation policy for use with AllocatedObject and 
 	STLAllocator, which aligns memory at a given boundary (which should be
@@ -110,26 +106,12 @@ namespace Ogre
 		static inline void* allocateBytes(size_t count, 
 			const char* file = 0, int line = 0, const char* func = 0)
 		{
-			// default to platform SIMD alignment if none specified
-			void* ptr =  Alignment ? nedalloc::nedmemalign(Alignment, count)
-				: nedalloc::nedmemalign(OGRE_SIMD_ALIGNMENT, count);
-#if OGRE_MEMORY_TRACKER
-			// this alloc policy doesn't do pools (yet, ned can do it)
-			MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
-#else
-			// avoid unused params warning
-			file;line;func;
-#endif
-			return ptr;
+			return NedAllocImpl::allocBytesAligned(Alignment, count, file, line, func);
 		}
 
 		static inline void deallocateBytes(void* ptr)
 		{
-#if OGRE_MEMORY_TRACKER
-			// this alloc policy doesn't do pools (yet, ned can do it)
-			MemoryTracker::get()._recordDealloc(ptr);
-#endif
-			nedalloc::nedfree(ptr);
+			NedAllocImpl::deallocBytesAligned(Alignment, ptr);
 		}
 
 		/// Get the maximum size of a single allocation
