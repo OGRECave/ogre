@@ -1210,7 +1210,7 @@ namespace Ogre
 	//-------------------------------------------------------------------------
 	// OctreeZoneFactory functions
 	//String octreeZoneString = String("ZoneType_Octree"); 
-	OctreeZoneFactory::OctreeZoneFactory() : PCZoneFactory(const String("ZoneType_Octree"))
+	OctreeZoneFactory::OctreeZoneFactory() : PCZoneFactory("ZoneType_Octree")
 	{
 	}
 	OctreeZoneFactory::~OctreeZoneFactory()
