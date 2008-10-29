@@ -38,6 +38,7 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+#if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_STD
 
 	/**	A "standard" allocation policy for use with AllocatedObject and 
 		STLAllocator. This is the class that actually does the allocation
@@ -136,7 +137,8 @@ namespace Ogre
 		{ }
 	};
 
-
+#endif
 
 }// namespace Ogre
+
 #endif // __MemoryStdAlloc_H__

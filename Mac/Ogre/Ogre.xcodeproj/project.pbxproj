@@ -599,6 +599,7 @@
 		AA8D7EE60EA2483A00D76955 /* OgrePCZSceneQuery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698150EA1117C00F18A41 /* OgrePCZSceneQuery.cpp */; };
 		AA8D7EE70EA2483A00D76955 /* OgrePortal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698160EA1117C00F18A41 /* OgrePortal.cpp */; };
 		AA8D7EE80EA2483A00D76955 /* OgreSegment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698170EA1117C00F18A41 /* OgreSegment.cpp */; };
+		AA9567C60EB79DA4009431A6 /* OgreMemoryNedAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9567C50EB79DA4009431A6 /* OgreMemoryNedAlloc.h */; };
 		AAA8B9700CC6A4FC001AD86E /* OgreScriptCompiler.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96E0CC6A4FC001AD86E /* OgreScriptCompiler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AAA8B9710CC6A4FC001AD86E /* OgreScriptParser.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AAAD1C430EA2394A009723FD /* OgreOctreeZoneOctree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAAD1C420EA2394A009723FD /* OgreOctreeZoneOctree.cpp */; };
@@ -1419,6 +1420,7 @@
 		AA89775D0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreRenderToVertexBuffer.cpp; path = ../../OgreMain/src/OgreRenderToVertexBuffer.cpp; sourceTree = SOURCE_ROOT; };
 		AA89775F0E5F4BE100A70BC4 /* OgreGLRenderToVertexBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreGLRenderToVertexBuffer.h; path = ../../RenderSystems/GL/include/OgreGLRenderToVertexBuffer.h; sourceTree = SOURCE_ROOT; };
 		AA8977600E5F4C0100A70BC4 /* OgreGLRenderToVertexBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreGLRenderToVertexBuffer.cpp; path = ../../RenderSystems/GL/src/OgreGLRenderToVertexBuffer.cpp; sourceTree = SOURCE_ROOT; };
+		AA9567C50EB79DA4009431A6 /* OgreMemoryNedAlloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreMemoryNedAlloc.h; path = ../../OgreMain/include/OgreMemoryNedAlloc.h; sourceTree = SOURCE_ROOT; };
 		AAA8B96E0CC6A4FC001AD86E /* OgreScriptCompiler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptCompiler.h; path = ../../OgreMain/include/OgreScriptCompiler.h; sourceTree = SOURCE_ROOT; };
 		AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptParser.h; path = ../../OgreMain/include/OgreScriptParser.h; sourceTree = SOURCE_ROOT; };
 		AAAD1C410EA23929009723FD /* OgreOctreeZoneOctree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreOctreeZoneOctree.h; path = ../../PlugIns/OctreeZone/include/OgreOctreeZoneOctree.h; sourceTree = SOURCE_ROOT; };
@@ -1968,6 +1970,7 @@
 				000E1DA10B38D566004EA2DF /* OgreMatrix4.h */,
 				AA7510630DDE20FE009D23BA /* OgreMemoryAllocatedObject.h */,
 				AA7510640DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h */,
+				AA9567C50EB79DA4009431A6 /* OgreMemoryNedAlloc.h */,
 				AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */,
 				AA7510660DDE20FE009D23BA /* OgreMemorySTLAllocator.h */,
 				AAF4F5320DE4C48C0073D0FD /* OgreMemoryTracker.h */,
@@ -2811,6 +2814,7 @@
 				AAE048000E5E0C15001D1ADC /* OgreShadowCameraSetupPSSM.h in Headers */,
 				AA89775B0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h in Headers */,
 				AAE7DD060E68917000E1371A /* OgreAtomicWrappers.h in Headers */,
+				AA9567C60EB79DA4009431A6 /* OgreMemoryNedAlloc.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3529,6 +3533,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ./include/Ogre_Prefix.pch;
 				HEADER_SEARCH_PATHS = (
+					../../OgreMain/src/nedmalloc,
 					./include,
 					../../Dependencies/include,
 				);
@@ -3564,6 +3569,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ./include/Ogre_Prefix.pch;
 				HEADER_SEARCH_PATHS = (
+					../../OgreMain/src/nedmalloc,
 					./include,
 					../../Dependencies/include,
 				);
