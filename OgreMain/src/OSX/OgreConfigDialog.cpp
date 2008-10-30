@@ -225,7 +225,7 @@ namespace Ogre {
 			renderer->setConfigOption("Colour Depth", "32");
 			renderer->setConfigOption("FSAA", "0");
 			renderer->setConfigOption("Full Screen", "No");
-			renderer->setConfigOption("RTT Preferred Mode", "PBuffer");
+			renderer->setConfigOption("RTT Preferred Mode", "FBO");
 			// Set the rendersystem and save the config.
 			Root::getSingleton().setRenderSystem(renderer);
 		}
