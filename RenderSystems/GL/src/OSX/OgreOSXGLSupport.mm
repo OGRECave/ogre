@@ -183,7 +183,7 @@ void OSXGLSupport::addConfig( void )
 	optRTTMode.possibleValues.push_back( "FBO" );
 	optRTTMode.possibleValues.push_back( "PBuffer" );
 	optRTTMode.possibleValues.push_back( "Copy" );
-	optRTTMode.currentValue = "PBuffer";
+	optRTTMode.currentValue = "FBO";
 	optRTTMode.immutable = false;
 
 
