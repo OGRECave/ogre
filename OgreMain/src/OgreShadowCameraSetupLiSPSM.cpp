@@ -42,7 +42,7 @@ namespace Ogre
 
 
 	LiSPSMShadowCameraSetup::LiSPSMShadowCameraSetup(void)
-		: mOptAdjustFactor(0.1f), mUseSimpleNOpt(true)
+		: mOptAdjustFactor(0.1f), mUseSimpleNOpt(true), mOptAdjustFactorTweak(1.0)
 	{
 	}
 	//-----------------------------------------------------------------------
@@ -134,7 +134,7 @@ namespace Ogre
 			// apply uniform shadow mapping
 			return 0.0;
 		}
-		return cam.getNearClipDistance() + Math::Sqrt(z0 * z1) * getOptimalAdjustFactor();
+		return cam.getNearClipDistance() + Math::Sqrt(z0 * z1) * getOptimalAdjustFactor() * mOptAdjustFactorTweak;
 	}
 	//-----------------------------------------------------------------------
 	Real LiSPSMShadowCameraSetup::calculateNOptSimple(const PointListBody& bodyLVS, 
@@ -152,7 +152,7 @@ namespace Ogre
 		// zn is set to Abs(near eye point)
 		// z0 is set to the near camera clip distance
 		// z1 is set to the far camera clip distance
-		return (Math::Abs(e_es.z) + Math::Sqrt(cam.getNearClipDistance() * cam.getFarClipDistance())) * getOptimalAdjustFactor();
+		return (Math::Abs(e_es.z) + Math::Sqrt(cam.getNearClipDistance() * cam.getFarClipDistance())) * getOptimalAdjustFactor() * mOptAdjustFactorTweak;
 	}
 	//-----------------------------------------------------------------------
 	Vector3 LiSPSMShadowCameraSetup::calculateZ0_ls(const Matrix4& lightSpace, 
@@ -234,6 +234,19 @@ namespace Ogre
 		// calculate standard shadow mapping matrix
 		Matrix4 LView, LProj;
 		calculateShadowMappingMatrix(*sm, *cam, *light, &LView, &LProj, NULL);
+		
+		// if the direction of the light and the direction of the camera tend to be parallel,
+		// then tweak up the adjust factor
+		Real parallelLimit = 0.9;
+		Real dot = cam->getDerivedDirection().dotProduct(light->getDerivedDirection());
+		if (dot >= parallelLimit)
+		{
+			mOptAdjustFactorTweak = 1.0 + (20 * ((dot - parallelLimit) / (1.0 - parallelLimit)) );
+		}
+		else
+		{
+			mOptAdjustFactorTweak = 1.0;
+		}
 
 		// build scene bounding box
 		const VisibleObjectsBoundsInfo& visInfo = sm->getVisibleObjectsBoundsInfo(texCam);
