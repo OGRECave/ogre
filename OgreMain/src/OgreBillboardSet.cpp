@@ -1177,7 +1177,9 @@ namespace Ogre {
             // TODO: Cache axis when billboard type is BBT_POINT or BBT_PERPENDICULAR_COMMON
             Vector3 axis = (offsets[3] - offsets[0]).crossProduct(offsets[2] - offsets[1]).normalisedCopy();
 
-            Quaternion rotation(bb.mRotation, axis);
+            Matrix3 rotation;
+			rotation.FromAxisAngle(axis, bb.mRotation);
+
             Vector3 pt;
 
             // Left-top
