@@ -19,7 +19,6 @@
 				000E24720B390B60004EA2DF /* PBXTargetDependency */,
 				000E24700B390B5F004EA2DF /* PBXTargetDependency */,
 				000E246E0B390B5F004EA2DF /* PBXTargetDependency */,
-				AAC698300EA111BB00F18A41 /* PBXTargetDependency */,
 				AAC6990E0EA117B500F18A41 /* PBXTargetDependency */,
 				000E26540B39863E004EA2DF /* PBXTargetDependency */,
 			);
@@ -603,25 +602,8 @@
 		AAA8B9700CC6A4FC001AD86E /* OgreScriptCompiler.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96E0CC6A4FC001AD86E /* OgreScriptCompiler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AAA8B9710CC6A4FC001AD86E /* OgreScriptParser.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AAAD1C430EA2394A009723FD /* OgreOctreeZoneOctree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAAD1C420EA2394A009723FD /* OgreOctreeZoneOctree.cpp */; };
-		AAC697E70EA1109000F18A41 /* Ogre.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 000E1D350B38D380004EA2DF /* Ogre.framework */; };
-		AAC698180EA1117C00F18A41 /* OgreCapsule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698090EA1117C00F18A41 /* OgreCapsule.cpp */; };
-		AAC698190EA1117C00F18A41 /* OgreDefaultZone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC6980A0EA1117C00F18A41 /* OgreDefaultZone.cpp */; };
-		AAC6981A0EA1117C00F18A41 /* OgrePCPlane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC6980B0EA1117C00F18A41 /* OgrePCPlane.cpp */; };
-		AAC6981B0EA1117C00F18A41 /* OgrePCZCamera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC6980C0EA1117C00F18A41 /* OgrePCZCamera.cpp */; };
-		AAC6981C0EA1117C00F18A41 /* OgrePCZFrustum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC6980D0EA1117C00F18A41 /* OgrePCZFrustum.cpp */; };
-		AAC6981D0EA1117C00F18A41 /* OgrePCZLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC6980E0EA1117C00F18A41 /* OgrePCZLight.cpp */; };
-		AAC6981E0EA1117C00F18A41 /* OgrePCZone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC6980F0EA1117C00F18A41 /* OgrePCZone.cpp */; };
-		AAC6981F0EA1117C00F18A41 /* OgrePCZoneFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698100EA1117C00F18A41 /* OgrePCZoneFactory.cpp */; };
-		AAC698200EA1117C00F18A41 /* OgrePCZPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698110EA1117C00F18A41 /* OgrePCZPlugin.cpp */; };
-		AAC698210EA1117C00F18A41 /* OgrePCZSceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698120EA1117C00F18A41 /* OgrePCZSceneManager.cpp */; };
-		AAC698230EA1117C00F18A41 /* OgrePCZSceneNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698140EA1117C00F18A41 /* OgrePCZSceneNode.cpp */; };
-		AAC698240EA1117C00F18A41 /* OgrePCZSceneQuery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698150EA1117C00F18A41 /* OgrePCZSceneQuery.cpp */; };
-		AAC698250EA1117C00F18A41 /* OgrePortal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698160EA1117C00F18A41 /* OgrePortal.cpp */; };
-		AAC698260EA1117C00F18A41 /* OgreSegment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698170EA1117C00F18A41 /* OgreSegment.cpp */; };
-		AAC698340EA1131A00F18A41 /* PCZSceneManager Plugin-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AAC698330EA1131A00F18A41 /* PCZSceneManager Plugin-Info.plist */; };
 		AAC698750EA114BB00F18A41 /* Ogre.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 000E1D350B38D380004EA2DF /* Ogre.framework */; };
 		AAC698A00EA1161A00F18A41 /* OctreeZone Plugin-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AAC6989F0EA1161A00F18A41 /* OctreeZone Plugin-Info.plist */; };
-		AAC698A40EA1164500F18A41 /* Plugin_PCZSceneManager.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = AAC697EB0EA1109000F18A41 /* Plugin_PCZSceneManager.bundle */; };
 		AAC698CF0EA116AB00F18A41 /* Plugin_OctreeZone.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = AAC698790EA114BB00F18A41 /* Plugin_OctreeZone.bundle */; };
 		AAC698E90EA1170000F18A41 /* OgreHeightmapTerrainZonePageSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698DF0EA1170000F18A41 /* OgreHeightmapTerrainZonePageSource.cpp */; };
 		AAC698EB0EA1170000F18A41 /* OgreOctreeZone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698E10EA1170000F18A41 /* OgreOctreeZone.cpp */; };
@@ -691,13 +673,6 @@
 			remoteGlobalIDString = 000E24760B390B99004EA2DF;
 			remoteInfo = "Bundle Resources";
 		};
-		AAC6982F0EA111BB00F18A41 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 000E1D240B38D32C004EA2DF /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AAC697D60EA1109000F18A41;
-			remoteInfo = "PCZSceneManager plugin";
-		};
 		AAC6990D0EA117B500F18A41 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 000E1D240B38D32C004EA2DF /* Project object */;
@@ -715,7 +690,6 @@
 			dstSubfolderSpec = 16;
 			files = (
 				AAC698CF0EA116AB00F18A41 /* Plugin_OctreeZone.bundle in CopyFiles */,
-				AAC698A40EA1164500F18A41 /* Plugin_PCZSceneManager.bundle in CopyFiles */,
 				000E24900B390BCB004EA2DF /* RenderSystem_GL.bundle in CopyFiles */,
 				000E24910B390BCB004EA2DF /* Plugin_ParticleFX.bundle in CopyFiles */,
 				000E24920B390BCB004EA2DF /* Plugin_BSPSceneManager.bundle in CopyFiles */,
@@ -1425,7 +1399,6 @@
 		AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptParser.h; path = ../../OgreMain/include/OgreScriptParser.h; sourceTree = SOURCE_ROOT; };
 		AAAD1C410EA23929009723FD /* OgreOctreeZoneOctree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreOctreeZoneOctree.h; path = ../../PlugIns/OctreeZone/include/OgreOctreeZoneOctree.h; sourceTree = SOURCE_ROOT; };
 		AAAD1C420EA2394A009723FD /* OgreOctreeZoneOctree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreOctreeZoneOctree.cpp; path = ../../PlugIns/OctreeZone/src/OgreOctreeZoneOctree.cpp; sourceTree = SOURCE_ROOT; };
-		AAC697EB0EA1109000F18A41 /* Plugin_PCZSceneManager.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Plugin_PCZSceneManager.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAC697F90EA1113800F18A41 /* OgreCapsule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreCapsule.h; path = ../../PlugIns/PCZSceneManager/include/OgreCapsule.h; sourceTree = SOURCE_ROOT; };
 		AAC697FA0EA1113800F18A41 /* OgreDefaultZone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreDefaultZone.h; path = ../../PlugIns/PCZSceneManager/include/OgreDefaultZone.h; sourceTree = SOURCE_ROOT; };
 		AAC697FB0EA1113800F18A41 /* OgrePCPlane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgrePCPlane.h; path = ../../PlugIns/PCZSceneManager/include/OgrePCPlane.h; sourceTree = SOURCE_ROOT; };
@@ -1544,14 +1517,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AAC697E60EA1109000F18A41 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				AAC697E70EA1109000F18A41 /* Ogre.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		AAC698740EA114BB00F18A41 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1590,7 +1555,6 @@
 				000E23C80B38FD6F004EA2DF /* Plugin_BSPSceneManager.bundle */,
 				000E23F60B39009B004EA2DF /* Plugin_OctreeSceneManager.bundle */,
 				000E24350B3902ED004EA2DF /* Plugin_CgProgramManager.bundle */,
-				AAC697EB0EA1109000F18A41 /* Plugin_PCZSceneManager.bundle */,
 				AAC698790EA114BB00F18A41 /* Plugin_OctreeZone.bundle */,
 			);
 			name = Products;
@@ -2926,23 +2890,6 @@
 			productReference = 000E24350B3902ED004EA2DF /* Plugin_CgProgramManager.bundle */;
 			productType = "com.apple.product-type.bundle";
 		};
-		AAC697D60EA1109000F18A41 /* PCZSceneManager plugin */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = AAC697E80EA1109000F18A41 /* Build configuration list for PBXNativeTarget "PCZSceneManager plugin" */;
-			buildPhases = (
-				AAC697D70EA1109000F18A41 /* Resources */,
-				AAC697D80EA1109000F18A41 /* Sources */,
-				AAC697E60EA1109000F18A41 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "PCZSceneManager plugin";
-			productName = "OctreeSceneManager Plugin";
-			productReference = AAC697EB0EA1109000F18A41 /* Plugin_PCZSceneManager.bundle */;
-			productType = "com.apple.product-type.bundle";
-		};
 		AAC698610EA114BB00F18A41 /* OctreeZone plugin */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AAC698760EA114BB00F18A41 /* Build configuration list for PBXNativeTarget "OctreeZone plugin" */;
@@ -2980,7 +2927,6 @@
 				000E23C70B38FD6F004EA2DF /* BSPSceneManager Plugin */,
 				000E23F50B39009B004EA2DF /* OctreeSceneManager Plugin */,
 				000E24340B3902ED004EA2DF /* CgProgramManager Plugin */,
-				AAC697D60EA1109000F18A41 /* PCZSceneManager plugin */,
 				AAC698610EA114BB00F18A41 /* OctreeZone plugin */,
 				000E24760B390B99004EA2DF /* Bundle Resources */,
 			);
@@ -3031,14 +2977,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		AAC697D70EA1109000F18A41 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				AAC698340EA1131A00F18A41 /* PCZSceneManager Plugin-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3387,27 +3325,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AAC697D80EA1109000F18A41 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				AAC698180EA1117C00F18A41 /* OgreCapsule.cpp in Sources */,
-				AAC698190EA1117C00F18A41 /* OgreDefaultZone.cpp in Sources */,
-				AAC6981A0EA1117C00F18A41 /* OgrePCPlane.cpp in Sources */,
-				AAC6981B0EA1117C00F18A41 /* OgrePCZCamera.cpp in Sources */,
-				AAC6981C0EA1117C00F18A41 /* OgrePCZFrustum.cpp in Sources */,
-				AAC6981D0EA1117C00F18A41 /* OgrePCZLight.cpp in Sources */,
-				AAC6981E0EA1117C00F18A41 /* OgrePCZone.cpp in Sources */,
-				AAC6981F0EA1117C00F18A41 /* OgrePCZoneFactory.cpp in Sources */,
-				AAC698200EA1117C00F18A41 /* OgrePCZPlugin.cpp in Sources */,
-				AAC698210EA1117C00F18A41 /* OgrePCZSceneManager.cpp in Sources */,
-				AAC698230EA1117C00F18A41 /* OgrePCZSceneNode.cpp in Sources */,
-				AAC698240EA1117C00F18A41 /* OgrePCZSceneQuery.cpp in Sources */,
-				AAC698250EA1117C00F18A41 /* OgrePortal.cpp in Sources */,
-				AAC698260EA1117C00F18A41 /* OgreSegment.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		AAC698640EA114BB00F18A41 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3475,11 +3392,6 @@
 			isa = PBXTargetDependency;
 			target = 000E24760B390B99004EA2DF /* Bundle Resources */;
 			targetProxy = 000E26530B39863E004EA2DF /* PBXContainerItemProxy */;
-		};
-		AAC698300EA111BB00F18A41 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = AAC697D60EA1109000F18A41 /* PCZSceneManager plugin */;
-			targetProxy = AAC6982F0EA111BB00F18A41 /* PBXContainerItemProxy */;
 		};
 		AAC6990E0EA117B500F18A41 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3861,47 +3773,6 @@
 			};
 			name = Release;
 		};
-		AAC697E90EA1109000F18A41 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				INFOPLIST_FILE = "/Users/steve/projects/Shoggoth/ogre/Mac/Ogre/./plist/PCZSceneManager Plugin-Info.plist";
-				INSTALL_PATH = "@executable_path/../Frameworks/Ogre.framework/Resources";
-				OTHER_LDFLAGS = "";
-				PREBINDING = NO;
-				PRODUCT_NAME = Plugin_PCZSceneManager;
-				WRAPPER_EXTENSION = bundle;
-				ZERO_LINK = NO;
-			};
-			name = Debug;
-		};
-		AAC697EA0EA1109000F18A41 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				INFOPLIST_FILE = "/Users/steve/projects/Shoggoth/ogre/Mac/Ogre/./plist/PCZSceneManager Plugin-Info.plist";
-				INSTALL_PATH = "@executable_path/../Frameworks/Ogre.framework/Resources";
-				OTHER_LDFLAGS = "";
-				PREBINDING = NO;
-				PRODUCT_NAME = Plugin_PCZSceneManager;
-				STRIP_INSTALLED_PRODUCT = YES;
-				WRAPPER_EXTENSION = bundle;
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
 		AAC698770EA114BB00F18A41 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4026,15 +3897,6 @@
 			buildConfigurations = (
 				000E248E0B390BC9004EA2DF /* Debug */,
 				000E248F0B390BC9004EA2DF /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		AAC697E80EA1109000F18A41 /* Build configuration list for PBXNativeTarget "PCZSceneManager plugin" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				AAC697E90EA1109000F18A41 /* Debug */,
-				AAC697EA0EA1109000F18A41 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
