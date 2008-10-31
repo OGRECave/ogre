@@ -200,7 +200,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\OgreOctree.cpp"
+				RelativePath="..\src\OgreOctreeZoneOctree.cpp"
 				>
 			</File>
 			<File
@@ -245,7 +245,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\OgreOctree.h"
+				RelativePath="..\include\OgreOctreeZoneOctree.h"
 				>
 			</File>
 			<File

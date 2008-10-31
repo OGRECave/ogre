@@ -53,7 +53,7 @@ namespace Ogre
 	//-------------------------------------------------------------------------
 	// DefaultZoneFactory functions
 	//String defaultString = String("ZoneType_Default"); 
-	DefaultZoneFactory::DefaultZoneFactory() : PCZoneFactory("ZoneType_Default")
+	DefaultZoneFactory::DefaultZoneFactory() : PCZoneFactory(String("ZoneType_Default"))
 	{
 	}
 	DefaultZoneFactory::~DefaultZoneFactory()
@@ -69,7 +69,7 @@ namespace Ogre
 	}
 	PCZone* DefaultZoneFactory::createPCZone(PCZSceneManager * pczsm, const String& zoneName)
 	{
-		return new DefaultZone(pczsm, zoneName);
+		return OGRE_NEW DefaultZone(pczsm, zoneName);
 	}
 	//-------------------------------------------------------------------------
 	// PCZoneFactoryManager functions

@@ -37,7 +37,7 @@ Modified to use with PCZones 2007 by Eric Cha
 -----------------------------------------------------------------------------
 */
 
-#include <OgreOctree.h>
+#include <OgreOctreeZoneOctree.h>
 #include <OgrePCZSceneNode.h>
 #include "OgreOctreeZone.h"
 
@@ -337,13 +337,13 @@ namespace Ogre
                 for ( int k = 0; k < 2; k++ )
                 {
                     if ( mChildren[ i ][ j ][ k ] != 0 )
-                        delete mChildren[ i ][ j ][ k ];
+                        OGRE_DELETE mChildren[ i ][ j ][ k ];
                 }
             }
         }
 
         if(mWireBoundingBox)
-            delete mWireBoundingBox;
+            OGRE_DELETE mWireBoundingBox;
 
         mParent = 0;
     }
@@ -376,7 +376,7 @@ namespace Ogre
     {
         // Create a WireBoundingBox if needed
         if(mWireBoundingBox == 0)
-            mWireBoundingBox = new WireBoundingBox();
+            mWireBoundingBox = OGRE_NEW WireBoundingBox();
 
         mWireBoundingBox->setupBoundingBox(mBox);
         return mWireBoundingBox;

@@ -79,6 +79,7 @@
 			<Add option="-D_MT" />
 			<Add directory="..\include" />
 			<Add directory="..\..\Dependencies\include" />
+			<Add directory="..\src\nedmalloc" />
 			<Add directory="..\src" />
 			<Add directory="..\src\WIN32" />
 		</Compiler>

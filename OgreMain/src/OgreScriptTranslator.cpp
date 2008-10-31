@@ -293,7 +293,7 @@ namespace Ogre{
 			{
 				Real r = 0;
 				if(getReal(*i, &r))
-					(*m)[n%4][n/4] = r;
+					(*m)[n/4][n%4] = r;
 				else
 					return false;
 			}
@@ -5425,6 +5425,45 @@ namespace Ogre{
 						}
 					}
 					break;
+				default:
+					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
+						"token \"" + prop->name + "\" is not recognized");
+				}
+			}
+		}
+	}
+
+	/**************************************************************************
+	* CompositionPassClearTranslator
+	*************************************************************************/
+	CompositionPassClearTranslator::CompositionPassClearTranslator()
+		:mPass(0)
+	{
+	}
+
+	void CompositionPassClearTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
+	{
+		ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+
+		mPass = any_cast<CompositionPass*>(obj->parent->context);
+
+		// Should be no parameters, just children
+		if(!obj->values.empty())
+		{
+			compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, obj->file, obj->line);
+		}
+
+		for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+		{
+			if((*i)->type == ANT_OBJECT)
+			{
+				processNode(compiler, *i);
+			}
+			else if((*i)->type == ANT_PROPERTY)
+			{
+				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+				switch(prop->id)
+				{
 				case ID_BUFFERS:
 					{
 						uint32 buffers = 0;
@@ -5495,6 +5534,45 @@ namespace Ogre{
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 					}
 					break;
+				default:
+					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
+						"token \"" + prop->name + "\" is not recognized");
+				}
+			}
+		}
+	}
+
+	/**************************************************************************
+	* CompositionPassStencilTranslator
+	*************************************************************************/
+	CompositionPassStencilTranslator::CompositionPassStencilTranslator()
+		:mPass(0)
+	{
+	}
+
+	void CompositionPassStencilTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
+	{
+		ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+
+		mPass = any_cast<CompositionPass*>(obj->parent->context);
+
+		// Should be no parameters, just children
+		if(!obj->values.empty())
+		{
+			compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, obj->file, obj->line);
+		}
+
+		for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+		{
+			if((*i)->type == ANT_OBJECT)
+			{
+				processNode(compiler, *i);
+			}
+			else if((*i)->type == ANT_PROPERTY)
+			{
+				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+				switch(prop->id)
+				{
 				case ID_CHECK:
 					{
 						if(prop->values.empty())
@@ -5661,6 +5739,10 @@ namespace Ogre{
 				translator = &mCompositionTargetPassTranslator;
 			else if(obj->id == ID_PASS && parent && (parent->id == ID_TARGET || parent->id == ID_TARGET_OUTPUT))
 				translator = &mCompositionPassTranslator;
+			else if(obj->id == ID_CLEAR && parent && parent->id == ID_PASS)
+				translator = &mCompositionPassClearTranslator;
+			else if(obj->id == ID_STENCIL && parent && parent->id == ID_PASS)
+				translator = &mCompositionPassStencilTranslator;
 		}
 
 		return translator;

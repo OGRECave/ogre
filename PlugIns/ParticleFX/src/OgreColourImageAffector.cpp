@@ -74,7 +74,7 @@ namespace Ogre {
             _loadImage();
         }
 
-		int				   width			= mColourImage.getWidth()  - 1;
+		int				   width			= (int)mColourImage.getWidth()  - 1;
         
 		while (!pi.end())
 		{

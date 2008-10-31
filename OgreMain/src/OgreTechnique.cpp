@@ -417,9 +417,6 @@ namespace Ogre {
 
             i = mPasses.begin() + destinationIndex;
 
-            // compensate for source erase if destination is greater than source
-            if (destinationIndex > sourceIndex) --i;
-
             mPasses.insert(i, pass);
 
 			// Adjust passes index

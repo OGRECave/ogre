@@ -46,7 +46,7 @@ namespace Ogre
 	class PCZSceneManager;
 
 	/// Factory for PCZones
-    class _OgrePCZPluginExport PCZoneFactory 
+	class _OgrePCZPluginExport PCZoneFactory : public SceneCtlAllocatedObject
     {
 	public:
 		PCZoneFactory(const String & typeName);
@@ -69,7 +69,7 @@ namespace Ogre
 	};
 
 	// PCZoneFactory manager class
-	class _OgrePCZPluginExport PCZoneFactoryManager : public Singleton<PCZoneFactoryManager>
+	class _OgrePCZPluginExport PCZoneFactoryManager : public Singleton<PCZoneFactoryManager>, public SceneCtlAllocatedObject
 	{
 	public:
 		PCZoneFactoryManager();	

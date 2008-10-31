@@ -44,7 +44,7 @@ namespace Ogre {
         /** See ParticleAffectorFactory */
         ParticleAffector* createAffector(ParticleSystem* psys)
         {
-            ParticleAffector* p = new ScaleAffector(psys);
+            ParticleAffector* p = OGRE_NEW ScaleAffector(psys);
             mAffectors.push_back(p);
             return p;
         }

@@ -68,7 +68,7 @@ namespace Ogre
 		for (i = mPortals.begin(); i != mPortals.end(); i++)
 		{
 			p = *i;
-			delete p;
+			OGRE_DELETE p;
 		}
 		mPortals.clear();
 
@@ -76,7 +76,7 @@ namespace Ogre
 		for (ZoneMap::iterator j = mZones.begin();
 			j != mZones.end(); ++j)
 		{
-			delete j->second;
+			OGRE_DELETE j->second;
 		}
 		mZones.clear();
         mDefaultZone = 0;
@@ -97,7 +97,7 @@ namespace Ogre
 		for (i = mPortals.begin(); i != mPortals.end(); i++)
 		{
 			p = *i;
-			delete p;
+			OGRE_DELETE p;
 		}
 		mPortals.clear();
 
@@ -105,7 +105,7 @@ namespace Ogre
 		for (ZoneMap::iterator j = mZones.begin();
 			j != mZones.end(); ++j)
 		{
-			delete j->second;
+			OGRE_DELETE j->second;
 		}
 		mZones.clear();
 
@@ -122,7 +122,7 @@ namespace Ogre
 	// Create a portal instance
 	Portal* PCZSceneManager::createPortal(const String &name, Ogre::Portal::PORTAL_TYPE type)
 	{
-		Portal* newPortal = new Portal(name, type);
+		Portal* newPortal = OGRE_NEW Portal(name, type);
 		mPortals.push_front(newPortal);
 		return newPortal;
 	}
@@ -152,7 +152,7 @@ namespace Ogre
 			mPortals.erase(it);
 		}
 		// delete the portal instance
-		delete p;
+		OGRE_DELETE p;
 	}
 
 	// delete a portal instance by pointer
@@ -192,7 +192,7 @@ namespace Ogre
 			}
 
 			// delete the portal instance
-			delete thePortal;
+			OGRE_DELETE thePortal;
 		}
 	}
 
@@ -254,12 +254,12 @@ namespace Ogre
 
 	SceneNode* PCZSceneManager::createSceneNodeImpl(void)
 	{
-		return new PCZSceneNode(this);
+		return OGRE_NEW PCZSceneNode(this);
 	}
 
 	SceneNode* PCZSceneManager::createSceneNodeImpl(const String& name)
 	{
-		return new PCZSceneNode(this, name);
+		return OGRE_NEW PCZSceneNode(this, name);
 	}
 
     SceneNode * PCZSceneManager::createSceneNode( void )
@@ -302,7 +302,7 @@ namespace Ogre
 				"PCZSceneManager::createCamera" );
 		}
 
-        Camera * c = new PCZCamera( name, this );
+        Camera * c = OGRE_NEW PCZCamera( name, this );
         mCameras.insert( CameraList::value_type( name, c ) );
 
 	    // create visible bounds aab map entry
@@ -349,7 +349,7 @@ namespace Ogre
 		for (SceneNodeList::iterator i = mSceneNodes.begin();
 			i != mSceneNodes.end(); ++i)
 		{
-			delete i->second;
+			OGRE_DELETE i->second;
 		}
 		mSceneNodes.clear();
 		mAutoTrackingSceneNodes.clear();
@@ -358,7 +358,7 @@ namespace Ogre
 		for (ZoneMap::iterator j = mZones.begin();
 			j != mZones.end(); ++j)
 		{
-			delete j->second;
+			OGRE_DELETE j->second;
 		}
 		mZones.clear();
 	    mDefaultZone = 0;
@@ -737,7 +737,7 @@ namespace Ogre
 		{
 			mZones.erase(zone->getName());
 		}
-		delete zone;
+		OGRE_DELETE zone;
 	}
 
     /* The following function checks if a node has left it's current home zone.
@@ -1304,7 +1304,7 @@ namespace Ogre
     AxisAlignedBoxSceneQuery*
     PCZSceneManager::createAABBQuery(const AxisAlignedBox& box, unsigned long mask)
     {
-        PCZAxisAlignedBoxSceneQuery* q = new PCZAxisAlignedBoxSceneQuery(this);
+        PCZAxisAlignedBoxSceneQuery* q = OGRE_NEW PCZAxisAlignedBoxSceneQuery(this);
         q->setBox(box);
         q->setQueryMask(mask);
         return q;
@@ -1313,7 +1313,7 @@ namespace Ogre
     SphereSceneQuery*
     PCZSceneManager::createSphereQuery(const Sphere& sphere, unsigned long mask)
     {
-        PCZSphereSceneQuery* q = new PCZSphereSceneQuery(this);
+        PCZSphereSceneQuery* q = OGRE_NEW PCZSphereSceneQuery(this);
         q->setSphere(sphere);
         q->setQueryMask(mask);
         return q;
@@ -1323,7 +1323,7 @@ namespace Ogre
     PCZSceneManager::createPlaneBoundedVolumeQuery(const PlaneBoundedVolumeList& volumes,
             unsigned long mask)
     {
-        PCZPlaneBoundedVolumeListSceneQuery* q = new PCZPlaneBoundedVolumeListSceneQuery(this);
+        PCZPlaneBoundedVolumeListSceneQuery* q = OGRE_NEW PCZPlaneBoundedVolumeListSceneQuery(this);
         q->setVolumes(volumes);
         q->setQueryMask(mask);
         return q;
@@ -1333,7 +1333,7 @@ namespace Ogre
     RaySceneQuery*
     PCZSceneManager::createRayQuery(const Ray& ray, unsigned long mask)
     {
-        PCZRaySceneQuery* q = new PCZRaySceneQuery(this);
+        PCZRaySceneQuery* q = OGRE_NEW PCZRaySceneQuery(this);
         q->setRay(ray);
         q->setQueryMask(mask);
         return q;
@@ -1343,7 +1343,7 @@ namespace Ogre
     PCZSceneManager::createIntersectionQuery(unsigned long mask)
     {
 
-        PCZIntersectionSceneQuery* q = new PCZIntersectionSceneQuery(this);
+        PCZIntersectionSceneQuery* q = OGRE_NEW PCZIntersectionSceneQuery(this);
         q->setQueryMask(mask);
         return q;
     }
@@ -1376,12 +1376,12 @@ namespace Ogre
     SceneManager* PCZSceneManagerFactory::createInstance(
 	    const String& instanceName)
     {
-	    return new PCZSceneManager(instanceName);
+	    return OGRE_NEW PCZSceneManager(instanceName);
     }
     //-----------------------------------------------------------------------
     void PCZSceneManagerFactory::destroyInstance(SceneManager* instance)
     {
-	    delete instance;
+	    OGRE_DELETE instance;
     }
 
 

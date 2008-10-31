@@ -237,6 +237,8 @@ namespace Ogre {
     public:
 		OGRE_STATIC_MUTEX(msDirtyHashListMutex)
 		OGRE_STATIC_MUTEX(msPassGraveyardMutex)
+		OGRE_MUTEX(mTexUnitChangeMutex)
+		OGRE_MUTEX(mGpuProgramChangeMutex)
         /// Default constructor
 		Pass(Technique* parent, unsigned short index);
         /// Copy constructor

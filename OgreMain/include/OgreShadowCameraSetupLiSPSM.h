@@ -97,6 +97,8 @@ namespace Ogre
 		Real mOptAdjustFactor;
 		/// Use simple nopt derivation?
 		bool mUseSimpleNOpt;
+		/// Extra calculated warp factor
+		mutable Real mOptAdjustFactorTweak;
 
 		/** Calculates the LiSPSM projection matrix P.
 		@remarks

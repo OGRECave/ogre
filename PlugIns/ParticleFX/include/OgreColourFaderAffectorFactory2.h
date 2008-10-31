@@ -44,7 +44,7 @@ namespace Ogre {
         /** See ParticleAffectorFactory */
         ParticleAffector* createAffector(ParticleSystem* psys)
         {
-            ParticleAffector* p = new ColourFaderAffector2(psys);
+            ParticleAffector* p = OGRE_NEW ColourFaderAffector2(psys);
             mAffectors.push_back(p);
             return p;
         }

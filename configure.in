@@ -140,9 +140,15 @@ AC_CONFIG_FILES([Makefile \
     PlugIns/OctreeSceneManager/Makefile \
     PlugIns/OctreeSceneManager/src/Makefile \
     PlugIns/OctreeSceneManager/include/Makefile \
+    PlugIns/OctreeZone/Makefile \
+    PlugIns/OctreeZone/src/Makefile \
+    PlugIns/OctreeZone/include/Makefile \
     PlugIns/ParticleFX/Makefile \
     PlugIns/ParticleFX/src/Makefile \
     PlugIns/ParticleFX/include/Makefile \
+    PlugIns/PCZSceneManager/Makefile \
+    PlugIns/PCZSceneManager/src/Makefile \
+    PlugIns/PCZSceneManager/include/Makefile \
     RenderSystems/Makefile \
     RenderSystems/GL/Makefile \
     RenderSystems/GL/src/Makefile \
@@ -242,6 +248,13 @@ AC_CONFIG_FILES([Makefile \
     Samples/Instancing/Makefile \
     Samples/Instancing/src/Makefile \
     Samples/Instancing/include/Makefile \
+    Samples/Isosurf/Makefile \
+    Samples/Isosurf/src/Makefile \
+    Samples/ParticleGS/Makefile \
+    Samples/ParticleGS/src/Makefile \
+    Samples/PCZTestApp/Makefile \
+    Samples/PCZTestApp/src/Makefile \
+    Samples/PCZTestApp/include/Makefile \
     Tests/Makefile \
     Tests/src/Makefile \
     Tools/Makefile \

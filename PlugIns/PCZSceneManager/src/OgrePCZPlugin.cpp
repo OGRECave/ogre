@@ -54,9 +54,9 @@ namespace Ogre
 	void PCZPlugin::install()
 	{
 		// Create objects
-		mPCZSMFactory = new PCZSceneManagerFactory();
-		mPCZoneFactoryManager = new PCZoneFactoryManager();
-        mPCZLightFactory = new PCZLightFactory();
+		mPCZSMFactory = OGRE_NEW PCZSceneManagerFactory();
+		mPCZoneFactoryManager = OGRE_NEW PCZoneFactoryManager();
+        mPCZLightFactory = OGRE_NEW PCZLightFactory();
 	}
 	//---------------------------------------------------------------------
 	void PCZPlugin::initialise()
@@ -77,11 +77,11 @@ namespace Ogre
 	void PCZPlugin::uninstall()
 	{
 		// destroy 
-		delete mPCZSMFactory;
+		OGRE_DELETE mPCZSMFactory;
 		mPCZSMFactory = 0;
-		delete mPCZoneFactoryManager;
+		OGRE_DELETE mPCZoneFactoryManager;
 		mPCZoneFactoryManager = 0;
-        delete mPCZLightFactory;
+        OGRE_DELETE mPCZLightFactory;
         mPCZLightFactory = 0;
 	}
 

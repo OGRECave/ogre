@@ -26,7 +26,7 @@ class RoomObject
 
 private:
 	void	addMaterial(const Ogre::String& mat, 
-						Ogre::ColourValue &clr, 
+						const Ogre::ColourValue &clr, 
 						Ogre::SceneBlendType sbt);
 	void	createPoints(Ogre::Vector3 dimensions,
 						 Ogre::Vector3 doorDimensions);
@@ -62,7 +62,7 @@ public:
 		DOOR_ALL	= 0xFF
 	};
 
-	Ogre::PCZSceneNode * createTestBuilding(Ogre::SceneManager *scene, Ogre::String & name);
+	Ogre::PCZSceneNode * createTestBuilding(Ogre::SceneManager *scene, const Ogre::String & name);
 
 	Ogre::ManualObject*createRoom(Ogre::SceneManager *scene, 
 								  const Ogre::String &name, 

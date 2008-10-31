@@ -1107,14 +1107,22 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TextureUnitState::createAnimController(void)
     {
-        assert(mAnimController == 0);
+        if (mAnimController)
+        {
+            ControllerManager::getSingleton().destroyController(mAnimController);
+            mAnimController = 0;
+        }
         mAnimController = ControllerManager::getSingleton().createTextureAnimator(this, mAnimDuration);
 
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::createEffectController(TextureEffect& effect)
     {
-        assert(effect.controller == 0);
+        if (effect.controller)
+        {
+            ControllerManager::getSingleton().destroyController(effect.controller);
+            effect.controller = 0;
+        }
         ControllerManager& cMgr = ControllerManager::getSingleton();
         switch (effect.type)
         {

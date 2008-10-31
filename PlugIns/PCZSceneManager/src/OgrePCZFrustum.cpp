@@ -72,7 +72,7 @@ namespace Ogre
 			// go to next entry
             pit++;
 			//delete the entry in the list
-            delete plane;
+            OGRE_DELETE_T(plane, PCPlane, MEMCATEGORY_SCENE_CONTROL);
         }
         mCullingPlaneReservoir.clear();
     }
@@ -445,7 +445,7 @@ namespace Ogre
 			return plane;
 		}
 		// no available planes! create one
-		plane = new PCPlane;
+		plane = OGRE_NEW_T(PCPlane, MEMCATEGORY_SCENE_CONTROL);
 		return plane;
 	}
 

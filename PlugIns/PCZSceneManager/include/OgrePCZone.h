@@ -77,7 +77,7 @@ namespace Ogre
     @remarks
     */
 
-    class _OgrePCZPluginExport PCZone
+	class _OgrePCZPluginExport PCZone : public SceneCtlAllocatedObject
     {
     public:
 
@@ -272,13 +272,13 @@ namespace Ogre
 
     };
 
-	class _OgrePCZPluginExport ZoneData
+	class _OgrePCZPluginExport ZoneData : public SceneCtlAllocatedObject
 	{
 	public:
 		/** Standard Constructor */
 		ZoneData(PCZSceneNode *, PCZone * );
 		/** Standard destructor */
-		~ZoneData();
+		virtual ~ZoneData();
 		/** Update data if neccessary */
 		virtual void update(void);
 	public:

@@ -54,7 +54,7 @@ namespace Ogre {
         /** See ParticleEmitterFactory */
         ParticleEmitter* createEmitter(ParticleSystem* psys) 
         {
-            ParticleEmitter* emit = new HollowEllipsoidEmitter(psys);
+            ParticleEmitter* emit = OGRE_NEW HollowEllipsoidEmitter(psys);
             mEmitters.push_back(emit);
             return emit;
         }

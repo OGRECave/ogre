@@ -428,7 +428,7 @@ namespace Ogre
 		{
 			// Wrap as a stream
 			DataStreamPtr stream(
-				new FileStreamDataStream(filename, &fs, false));
+				OGRE_NEW FileStreamDataStream(filename, &fs, false));
 			setZoneGeometry(stream, parentNode);
 		}
 		else
@@ -859,7 +859,7 @@ namespace Ogre
 			for ( int i = 0; i < 16; i++ )
 			{
 
-				mLevelIndex.push_back( new IndexMap() );
+				mLevelIndex.push_back( OGRE_NEW_T(IndexMap, MEMCATEGORY_GEOMETRY)() );
 
 			}
 
@@ -870,7 +870,7 @@ namespace Ogre
 	{
 		for ( int i = 0; i < mLevelIndex.size(); i++ )
 		{
-			delete mLevelIndex[i];
+			OGRE_DELETE_T(mLevelIndex[i], IndexMap, MEMCATEGORY_GEOMETRY);
 		}
 		mLevelIndex.clear();
 	}
@@ -879,7 +879,7 @@ namespace Ogre
 /*    RaySceneQuery* 
         TerrainZone::createRayQuery(const Ray& ray, unsigned long mask)
     {
-        TerrainRaySceneQuery *trsq = new TerrainRaySceneQuery(this);
+        TerrainRaySceneQuery *trsq = OGRE_NEW TerrainRaySceneQuery(this);
         trsq->setRay(ray);
         trsq->setQueryMask(mask);
         return trsq;
@@ -967,7 +967,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	//String terrainZoneString = String("ZoneType_Terrain"); 
 
-	TerrainZoneFactory::TerrainZoneFactory() : PCZoneFactory(const String("ZoneType_Terrain"))
+	TerrainZoneFactory::TerrainZoneFactory() : PCZoneFactory(String("ZoneType_Terrain"))
 	{
 	}
 	//-----------------------------------------------------------------------
@@ -976,7 +976,7 @@ namespace Ogre
 		for (TerrainZonePageSources::iterator i = mTerrainZonePageSources.begin();
 			i != mTerrainZonePageSources.end(); ++i)
 		{
-			delete *i;
+			OGRE_DELETE *i;
 		}
 		mTerrainZonePageSources.clear();
 	}
@@ -990,9 +990,9 @@ namespace Ogre
 	}
 	PCZone* TerrainZoneFactory::createPCZone(PCZSceneManager * pczsm, const String& zoneName)
 	{
-		TerrainZone * tz = new TerrainZone(pczsm, zoneName);
+		TerrainZone * tz = OGRE_NEW TerrainZone(pczsm, zoneName);
 		// Create & register default sources (one per zone)
-		HeightmapTerrainZonePageSource* ps = new HeightmapTerrainZonePageSource();
+		HeightmapTerrainZonePageSource* ps = OGRE_NEW HeightmapTerrainZonePageSource();
 		mTerrainZonePageSources.push_back(ps);
 		tz->registerPageSource("Heightmap", ps);
 		return tz;

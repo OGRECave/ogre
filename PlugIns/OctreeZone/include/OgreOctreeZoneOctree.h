@@ -63,7 +63,7 @@ of .5.  This guarantees that any thing that is half the size of the parent will
 fit completely into a child, with no splitting necessary.
 */
 
-class Octree
+class Octree : public SceneCtlAllocatedObject
 {
 public:
     Octree( PCZone * zone, Octree * p );

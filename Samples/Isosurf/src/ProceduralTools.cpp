@@ -23,7 +23,7 @@ using namespace Ogre;
 //  Traversing the grid in a swizzled fashion improves locality of reference,
 // and this is very beneficial when sampling a texture.
 //--------------------------------------------------------------------------------------
-void UnSwizzle(uint index, uint sizeLog2[3], uint * pPos)
+void UnSwizzle(Ogre::uint index, Ogre::uint sizeLog2[3], Ogre::uint * pPos)
 {
 
     // force index traversal to occur in 2x2x2 blocks by giving each of x, y, and z one
@@ -56,9 +56,9 @@ MeshPtr ProceduralTools::generateTetrahedra()
 	tetrahedraSubMesh->operationType = RenderOperation::OT_LINE_LIST;
 	tetrahedraSubMesh->setMaterialName("Ogre/IsoSurf/TessellateTetrahedra");
 	
-	uint sizeLog2[3] = { X_SIZE_LOG2, Y_SIZE_LOG2, Z_SIZE_LOG2 };
-	uint nTotalBits = sizeLog2[0] + sizeLog2[1] + sizeLog2[2];
-	uint nPointsTotal = 1 << nTotalBits;
+	Ogre::uint sizeLog2[3] = { X_SIZE_LOG2, Y_SIZE_LOG2, Z_SIZE_LOG2 };
+	Ogre::uint nTotalBits = sizeLog2[0] + sizeLog2[1] + sizeLog2[2];
+	Ogre::uint nPointsTotal = 1 << nTotalBits;
 
 	tetrahedraSubMesh->useSharedVertices = false;
 	tetrahedraSubMesh->vertexData = new VertexData;
@@ -74,7 +74,7 @@ MeshPtr ProceduralTools::generateTetrahedra()
 
 	HardwareIndexBufferSharedPtr indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
 		HardwareIndexBuffer::IT_32BIT, 
-		CELLS_COUNT * sizeof(uint) * 24, 
+		CELLS_COUNT * sizeof(Ogre::uint) * 24, 
 		HardwareBuffer::HBU_STATIC_WRITE_ONLY);
 	
 	tetrahedraSubMesh->vertexData->vertexBufferBinding->setBinding(0, vertexBuffer);
@@ -86,8 +86,8 @@ MeshPtr ProceduralTools::generateTetrahedra()
 	float* positions = static_cast<float*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 	
 	//Generate positions
-	for(uint i=0; i<nPointsTotal; i++) {
-		uint pos[3];
+	for(Ogre::uint i=0; i<nPointsTotal; i++) {
+		Ogre::uint pos[3];
 		pos[0] = i & ((1<<X_SIZE_LOG2)-1);
 		pos[1] = (i >> X_SIZE_LOG2) & ((1<<Y_SIZE_LOG2)-1);
 		pos[2] = (i >> (X_SIZE_LOG2+Y_SIZE_LOG2)) & ((1<<Z_SIZE_LOG2)-1);
@@ -101,14 +101,14 @@ MeshPtr ProceduralTools::generateTetrahedra()
 	}
 	vertexBuffer->unlock();
 	
-	uint numIndices = 0;
+	Ogre::uint numIndices = 0;
 
 	//Generate indices
-	uint32* indices = static_cast<uint32*>(indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+	Ogre::uint32* indices = static_cast<Ogre::uint32*>(indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 
-	for (uint i = 0; i<nPointsTotal; i++) {
+	for (Ogre::uint i = 0; i<nPointsTotal; i++) {
 
-		uint pos[3];
+		Ogre::uint pos[3];
 #if SWIZZLE
 		UnSwizzle(i, sizeLog2, pos);	// un-swizzle current index to get x, y, z for the current sampling point
 #else

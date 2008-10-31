@@ -43,7 +43,7 @@ namespace Ogre
     extern "C" void _OgrePCZPluginExport dllStartPlugin( void )
     {
         // Create new scene manager
-        pczPlugin = new PCZPlugin();
+        pczPlugin = OGRE_NEW PCZPlugin();
 
         // Register
         Root::getSingleton().installPlugin(pczPlugin);
@@ -52,6 +52,6 @@ namespace Ogre
     extern "C" void _OgrePCZPluginExport dllStopPlugin( void )
     {
 	    Root::getSingleton().uninstallPlugin(pczPlugin);
-	    delete pczPlugin;
+	    OGRE_DELETE pczPlugin;
     }
 }

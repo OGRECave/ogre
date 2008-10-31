@@ -27,10 +27,70 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
+#include "OgrePrerequisites.h"
+#include "OgreMemoryNedAlloc.h"
+#include "OgrePlatformInformation.h"
+#include "OgreMemoryTracker.h"
 
 #if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_NED
 
-// include implementation
+// include ned implementation
 #include <nedmalloc.c>
 
+namespace Ogre
+{
+
+	//---------------------------------------------------------------------
+	void* NedAllocImpl::allocBytes(size_t count, 
+		const char* file, int line, const char* func)
+	{
+		void* ptr = nedalloc::nedmalloc(count);
+	#if OGRE_MEMORY_TRACKER
+		// this alloc policy doesn't do pools (yet, ned can do it)
+		MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
+	#else
+		// avoid unused params warning
+		file;line;func;
+	#endif
+		return ptr;
+	}
+	//---------------------------------------------------------------------
+	void NedAllocImpl::deallocBytes(void* ptr)
+	{
+#if OGRE_MEMORY_TRACKER
+		MemoryTracker::get()._recordDealloc(ptr);
 #endif
+		nedalloc::nedfree(ptr);
+	}
+	//---------------------------------------------------------------------
+	void* NedAllocImpl::allocBytesAligned(size_t align, size_t count, 
+		const char* file, int line, const char* func)
+	{
+		// default to platform SIMD alignment if none specified
+		void* ptr =  align ? nedalloc::nedmemalign(align, count)
+			: nedalloc::nedmemalign(OGRE_SIMD_ALIGNMENT, count);
+#if OGRE_MEMORY_TRACKER
+		// this alloc policy doesn't do pools (yet, ned can do it)
+		MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
+#else
+		// avoid unused params warning
+		file;line;func;
+#endif
+		return ptr;
+	}
+	//---------------------------------------------------------------------
+	void NedAllocImpl::deallocBytesAligned(size_t align, void* ptr)
+	{
+#if OGRE_MEMORY_TRACKER
+		// this alloc policy doesn't do pools (yet, ned can do it)
+		MemoryTracker::get()._recordDealloc(ptr);
+#endif
+		nedalloc::nedfree(ptr);
+	}
+
+
+}
+
+
+#endif
+

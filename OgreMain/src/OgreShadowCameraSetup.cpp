@@ -102,7 +102,11 @@ namespace Ogre
 			// Set perspective projection
 			texCam->setProjectionType(PT_PERSPECTIVE);
 			// set FOV slightly larger than the spotlight range to ensure coverage
-			texCam->setFOVy(light->getSpotlightOuterAngle()*1.2);
+			Radian fovy = light->getSpotlightOuterAngle()*1.2;
+			// limit angle
+			if (fovy.valueDegrees() > 175)
+				fovy = Degree(175);
+			texCam->setFOVy(fovy);
 			// set near clip the same as main camera, since they are likely
 			// to both reflect the nature of the scene
 			texCam->setNearClipDistance(cam->getNearClipDistance());

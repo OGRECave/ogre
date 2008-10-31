@@ -780,6 +780,8 @@ namespace Ogre {
 			OGRE_DELETE (*it)->indexData;
 	
 		}
+		mRenderOps.clear();
+
 		// delete the BatchInstances
 		for (BatchInstanceMap::iterator i = mBatchInstanceMap.begin();
 			i != mBatchInstanceMap.end(); ++i)
@@ -1607,7 +1609,7 @@ namespace Ogre {
 	{
 
 		// Determine the current material technique
-		mTechnique = mMaterial->getTechnique(
+		mTechnique = mMaterial->getBestTechnique(
 			mMaterial->getLodIndexSquaredDepth(camDistanceSquared));	
 		GeometryBucketList::iterator i, iend;
 		iend =  mGeometryBucketList.end();

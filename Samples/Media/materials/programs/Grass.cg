@@ -2,7 +2,7 @@
 // Vertex program to wave some grass about
 // Assumes UV texture coords of v==0 indicates the top of the grass
 void grass_vp(float4 position : POSITION,
-			  float4 normal   : NORMAL,
+			  float3 normal   : NORMAL,
 			  float2 uv		  : TEXCOORD0,
 			  out float4 oPosition : POSITION,
 			  out float2 oUv	   : TEXCOORD0,
@@ -22,20 +22,12 @@ void grass_vp(float4 position : POSITION,
 	oPosition = mul(worldViewProj, mypos);
 
 	oUv = uv;
-	// get vertex light direction (support directional and point)
-    // Normal
-    // Make vec from vertex to camera
-    float4 EyeVec = camObjPos - mypos;
-    // Dot the v to eye and the normal to see if they point
-    //  in the same direction or opposite
-    float aligned = dot(normal, EyeVec); // -1..1
-    // If aligned is negative, we need to flip the normal
-    if (aligned < 0)  
-        normal = -normal;  
     // Color    
 	// get vertex light direction (support directional and point)
 	float3 light = normalize(objSpaceLight.xyz -  (mypos.xyz * objSpaceLight.w));
-    float diffuseFactor = max(dot(normal.xyz, light), 0);
+	// grass is just 2D quads, so if light passes underneath we need to invert the normal
+	// abs() will have the same effect
+    float diffuseFactor = abs(dot(normal.xyz, light));
 	oColour = ambient + diffuseFactor * lightColour;    
     
 }

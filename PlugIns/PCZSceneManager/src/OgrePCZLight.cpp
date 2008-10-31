@@ -189,13 +189,13 @@ namespace Ogre
 		const NameValuePairList* params)
 	{
 
-		return new PCZLight(name);
+		return OGRE_NEW PCZLight(name);
 
 	}
 	//-----------------------------------------------------------------------
 	void PCZLightFactory::destroyInstance( MovableObject* obj)
 	{
-		delete obj;
+		OGRE_DELETE obj;
 	}
 
 } // Namespace

@@ -14,6 +14,7 @@ FileSystem=@OGRE_MEDIADIR@/models
 FileSystem=@OGRE_MEDIADIR@/overlays
 FileSystem=@OGRE_MEDIADIR@/particle
 FileSystem=@OGRE_MEDIADIR@/gui
+FileSystem=@OGRE_MEDIADIR@/PCZAppMedia
 Zip=@OGRE_MEDIADIR@/packs/cubemap.zip
 Zip=@OGRE_MEDIADIR@/packs/cubemapsJS.zip
 Zip=@OGRE_MEDIADIR@/packs/dragon.zip

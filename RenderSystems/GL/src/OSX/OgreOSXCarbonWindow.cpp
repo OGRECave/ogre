@@ -194,10 +194,19 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
 			windowRect.bottom = height;
 			
 			// set the default attributes for the window
-			WindowAttributes windowAttrs = kWindowStandardDocumentAttributes
-				| kWindowStandardHandlerAttribute 
-				| kWindowInWindowMenuAttribute
-				| kWindowHideOnFullScreenAttribute;
+			WindowAttributes windowAttrs = kWindowStandardDocumentAttributes; // default: "resize"
+			
+			opt = miscParams->find("border");
+			if( opt != miscParams->end() )
+			{
+				String borderType = opt->second;
+				if( borderType == "none" )
+					windowAttrs = kWindowNoTitleBarAttribute;
+				else if( borderType == "fixed" )
+					windowAttrs = kWindowStandardFloatingAttributes;
+			}
+			
+			windowAttrs |= kWindowStandardHandlerAttribute | kWindowInWindowMenuAttribute | kWindowHideOnFullScreenAttribute;
 			
 			// Create the window
 			CreateNewWindow(kDocumentWindowClass, windowAttrs, &windowRect, &mWindow);
@@ -225,7 +234,8 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
                 {kEventClassWindow, kEventWindowBoundsChanged},
                 {kEventClassWindow, kEventWindowExpanded},
                 {kEventClassWindow, kEventWindowCollapsed},
-                {kEventClassWindow, kEventWindowClosed}
+                {kEventClassWindow, kEventWindowClosed},
+                {kEventClassWindow, kEventWindowClose}
             };
             
             EventHandlerUPP handlerUPP = NewEventHandlerUPP(WindowEventUtilities::_CarbonWindowHandler);
@@ -235,7 +245,7 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
 			InstallStandardEventHandler(target);
             
             // We also need to install the WindowEvent Handler, we pass along the window with our requests
-            InstallEventHandler(target, handlerUPP, 9, eventSpecs, (void*)this, &mEventHandlerRef);
+            InstallEventHandler(target, handlerUPP, 10, eventSpecs, (void*)this, &mEventHandlerRef);
 			
 			// Display and select our window
 			ShowWindow(mWindow);

@@ -62,7 +62,7 @@ namespace Ogre
 		// delete octree
 		if ( mOctree )
 		{
-			delete mOctree;
+			OGRE_DELETE mOctree;
 			mOctree = 0;
 		}
     }
@@ -158,7 +158,7 @@ namespace Ogre
 	*/
 	void OctreeZone::createNodeZoneData(PCZSceneNode * node)
 	{
-		OctreeZoneData * ozd = new OctreeZoneData(node, this);
+		OctreeZoneData * ozd = OGRE_NEW OctreeZoneData(node, this);
 		if (ozd)
 		{
 			node->setZoneData(this, ozd);
@@ -929,9 +929,9 @@ namespace Ogre
 	void OctreeZone::init(AxisAlignedBox &box, int depth)
 	{
 		if ( mOctree != 0 )
-			delete mOctree;
+			OGRE_DELETE mOctree;
 
-		mOctree = new Octree( this, 0 );
+		mOctree = OGRE_NEW Octree( this, 0 );
 
 		mMaxDepth = depth;
 		mBox = box;
@@ -948,9 +948,9 @@ namespace Ogre
 	void OctreeZone::resize( const AxisAlignedBox &box )
 	{
 		// delete the octree
-		delete mOctree;
+		OGRE_DELETE mOctree;
 		// create a new octree
-		mOctree = new Octree( this, 0 );
+		mOctree = OGRE_NEW Octree( this, 0 );
 		// set the octree bounding box 
 		mOctree->mBox = box;
 		const Vector3 min = box.getMinimum();
@@ -1082,7 +1082,7 @@ namespace Ogre
 
 			if ( octant -> mChildren[ x ][ y ][ z ] == 0 )
 			{
-				octant -> mChildren[ x ][ y ][ z ] = new Octree( this, octant );
+				octant -> mChildren[ x ][ y ][ z ] = OGRE_NEW Octree( this, octant );
 				const Vector3& octantMin = octant -> mBox.getMinimum();
 				const Vector3& octantMax = octant -> mBox.getMaximum();
 				Vector3 min, max;
@@ -1210,7 +1210,7 @@ namespace Ogre
 	//-------------------------------------------------------------------------
 	// OctreeZoneFactory functions
 	//String octreeZoneString = String("ZoneType_Octree"); 
-	OctreeZoneFactory::OctreeZoneFactory() : PCZoneFactory("ZoneType_Octree")
+	OctreeZoneFactory::OctreeZoneFactory() : PCZoneFactory(String("ZoneType_Octree"))
 	{
 	}
 	OctreeZoneFactory::~OctreeZoneFactory()
@@ -1226,7 +1226,7 @@ namespace Ogre
 	}
 	PCZone* OctreeZoneFactory::createPCZone(PCZSceneManager * pczsm, const String& zoneName)
 	{
-		return new OctreeZone(pczsm, zoneName);
+		return OGRE_NEW OctreeZone(pczsm, zoneName);
 	}
 
 }

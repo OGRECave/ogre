@@ -384,6 +384,7 @@ namespace Ogre {
     void Node::setOrientation( const Quaternion & q )
     {
         mOrientation = q;
+		mOrientation.normalise();
         needUpdate();
     }
     //-----------------------------------------------------------------------
@@ -511,20 +512,24 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::rotate(const Quaternion& q, TransformSpace relativeTo)
     {
+		// Normalise quaternion to avoid drift
+		Quaternion qnorm = q;
+		qnorm.normalise();
+
         switch(relativeTo)
         {
         case TS_PARENT:
             // Rotations are normally relative to local axes, transform up
-            mOrientation = q * mOrientation;
+            mOrientation = qnorm * mOrientation;
             break;
         case TS_WORLD:
             // Rotations are normally relative to local axes, transform up
             mOrientation = mOrientation * _getDerivedOrientation().Inverse()
-                * q * _getDerivedOrientation();
+                * qnorm * _getDerivedOrientation();
             break;
         case TS_LOCAL:
             // Note the order of the mult, i.e. q comes after
-            mOrientation = mOrientation * q;
+            mOrientation = mOrientation * qnorm;
             break;
         }
         needUpdate();

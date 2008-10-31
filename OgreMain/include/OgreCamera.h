@@ -467,9 +467,11 @@ namespace Ogre {
 			for a rubber-band selection. 
 		@param screenLeft, screenTop, screenRight, screenBottom The bounds of the
 			on-screen rectangle, expressed in normalised screen coordinates [0,1]
+		@param includeFarPlane If true, the volume is truncated by the camera far plane, 
+			by default it is left open-ended
 		*/
 		PlaneBoundedVolume getCameraToViewportBoxVolume(Real screenLeft, 
-			Real screenTop, Real screenRight, Real screenBottom);
+			Real screenTop, Real screenRight, Real screenBottom, bool includeFarPlane = false);
 
 		/** Gets a world-space list of planes enclosing a volume based on a viewport
 			rectangle. 
@@ -479,10 +481,12 @@ namespace Ogre {
 		@param screenLeft, screenTop, screenRight, screenBottom The bounds of the
 			on-screen rectangle, expressed in normalised screen coordinates [0,1]
 		@param outVolume The plane list to populate with the result
+		@param includeFarPlane If true, the volume is truncated by the camera far plane, 
+			by default it is left open-ended
 		*/
 		void getCameraToViewportBoxVolume(Real screenLeft, 
 			Real screenTop, Real screenRight, Real screenBottom, 
-			PlaneBoundedVolume* outVolume);
+			PlaneBoundedVolume* outVolume, bool includeFarPlane = false);
 
 		/** Internal method for OGRE to use for LOD calculations. */
 		Real _getLodBiasInverse(void) const;

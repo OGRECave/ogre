@@ -60,7 +60,7 @@ namespace Ogre
 
     //-----------------------------------------------------------------------
     TerrainZoneRenderable::TerrainZoneRenderable(const String& name, TerrainZone* tsm)
-        : Renderable(), MovableObject(name), mTerrainZone(tsm), mTerrain(0), mDeltaBuffers(0), mPositionBuffer(0)
+        : Renderable(), MovableObject(name), mTerrainZone(tsm), mTerrain(0),mPositionBuffer(0)
     {
         mForcedRenderLevel = -1;
         mLastNextLevel = -1;
@@ -96,16 +96,13 @@ namespace Ogre
     void TerrainZoneRenderable::deleteGeometry()
     {
         if(mTerrain)
-            delete mTerrain;
+            OGRE_DELETE mTerrain;
 
         if (mPositionBuffer)
-            delete [] mPositionBuffer;
-
-        if (mDeltaBuffers)
-            delete [] mDeltaBuffers;
+            OGRE_FREE(mPositionBuffer, MEMCATEGORY_GEOMETRY);
 
         if ( mMinLevelDistSqr != 0 )
-            delete [] mMinLevelDistSqr;
+            OGRE_FREE(mMinLevelDistSqr, MEMCATEGORY_GEOMETRY);
     }
     //-----------------------------------------------------------------------
     void TerrainZoneRenderable::initialise(int startx, int startz,  
@@ -128,7 +125,7 @@ namespace Ogre
         //calculate min and max heights;
         Real min = 256000, max = 0;
 
-        mTerrain = new VertexData;
+        mTerrain = OGRE_NEW VertexData;
         mTerrain->vertexStart = 0;
         mTerrain->vertexCount = mOptions->tileSize * mOptions->tileSize;
 
@@ -162,7 +159,7 @@ namespace Ogre
             mTerrain->vertexCount, 
             HardwareBuffer::HBU_STATIC_WRITE_ONLY);
         // Create system memory copy with just positions in it, for use in simple reads
-        mPositionBuffer = new float[mTerrain->vertexCount * 3];
+        mPositionBuffer = OGRE_ALLOC_T(float, mTerrain->vertexCount * 3, MEMCATEGORY_GEOMETRY);
 
         bind->setBinding(MAIN_BINDING, mMainBuffer);
 
@@ -178,7 +175,7 @@ namespace Ogre
 
         mRenderLevel = 0;
 
-        mMinLevelDistSqr = new Real[ mOptions->maxGeoMipMapLevel ];
+        mMinLevelDistSqr = OGRE_ALLOC_T(Real, mOptions->maxGeoMipMapLevel, MEMCATEGORY_GEOMETRY);
 
         int endx = startx + mOptions->tileSize;
 
@@ -248,8 +245,8 @@ namespace Ogre
         // Create delta buffer list if required to morph
         if (mOptions->lodMorph)
         {
-            // Create delta buffer for all except the lowest mip
-            mDeltaBuffers = new HardwareVertexBufferSharedPtr[mOptions->maxGeoMipMapLevel - 1];
+			// Create delta buffer for all except the lowest mip
+			mDeltaBuffers.resize(mOptions->maxGeoMipMapLevel - 1);
         }
 
         Real C = _calculateCFactor();
@@ -1019,7 +1016,7 @@ namespace Ogre
         int new_length = numTrisAcross * ((mOptions->tileSize-1) / step) + 2;
         //this is the maximum for a level.  It wastes a little, but shouldn't be a problem.
 
-        IndexData* indexData = new IndexData;
+        IndexData* indexData = OGRE_NEW IndexData;
         indexData->indexBuffer = 
             HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT,
@@ -1211,7 +1208,7 @@ namespace Ogre
         int new_length = ( mOptions->tileSize / step ) * ( mOptions->tileSize / step ) * 2 * 2 * 2 ;
         //this is the maximum for a level.  It wastes a little, but shouldn't be a problem.
 
-        indexData = new IndexData;
+        indexData = OGRE_NEW IndexData;
         indexData->indexBuffer = 
             HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT,
