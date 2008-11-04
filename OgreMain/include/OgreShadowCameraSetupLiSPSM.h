@@ -99,6 +99,8 @@ namespace Ogre
 		bool mUseSimpleNOpt;
 		/// Extra calculated warp factor
 		mutable Real mOptAdjustFactorTweak;
+		/// Threshold (cos angle) within which to start increasing the opt adjust as camera direction approaches light direction
+		Real mCosCamLightDirThreshold;
 
 		/** Calculates the LiSPSM projection matrix P.
 		@remarks
@@ -219,6 +221,23 @@ namespace Ogre
 		camera near point derivation (default is true)
 		*/
 		virtual bool getUseSimpleOptimalAdjust() const { return mUseSimpleNOpt; }
+
+		/** Sets the threshold between the camera and the light direction below
+			which the LiSPSM projection is 'flattened', since coincident light
+			and camera projections cause problems with the perspective skew.
+			@remarks
+			For example, setting this to 20 degrees will mean that as the difference 
+			between the light and camera direction reduces from 20 degrees to 0
+			degrees, the perspective skew will be proportionately removed.
+		*/
+		virtual void setCameraLightDirectionThreshold(Degree angle);
+
+		/** Sets the threshold between the camera and the light direction below
+		which the LiSPSM projection is 'flattened', since coincident light
+		and camera projections cause problems with the perspective skew.
+		*/
+		virtual Degree getCameraLightDirectionThreshold() const;
+
 
 	};
 
