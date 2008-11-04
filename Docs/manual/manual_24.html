@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -24,11 +24,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC126"></A>
+<A NAME="SEC128"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_23.html#SEC119"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_23.html#SEC121"> &lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_25.html#SEC132"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_25.html#SEC134"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -36,43 +36,53 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 3.1.10 Vertex Texture Fetch </H3>
-<!--docid::SEC126::-->
-
-<A NAME="SEC127"></A>
-<H3> Introduction   </H3>
-<!--docid::SEC127::-->
-More recent generations of video card allow you to perform a read from a texture in the vertex program rather than just the fragment program, as is traditional. This allows you to, for example, read the contents of a texture and displace vertices based on the intensity of the colour contained within.<BR><BR>
-
-<A NAME="SEC128"></A>
-<H3> Declaring the use of vertex texture fetching </H3>
 <!--docid::SEC128::-->
-Since hardware support for vertex texture fetching is not ubiquitous, you should use the uses_vertex_texture_fetch (See section <A HREF="manual_18.html#SEC108">Vertex texture fetching in vertex programs</A>) directive when declaring your vertex programs which use vertex textures, so that if it is not supported, technique fallback can be enabled. This is not strictly necessary for DirectX-targetted shaders, since vertex texture fetching is only supported in vs_3_0, which can be stated as a required syntax in your shader definition, but for OpenGL (GLSL), there are cards which support GLSL but not vertex textures, so you should be explicit about your need for them.
+<P>
 
 <A NAME="SEC129"></A>
-<H3> Render system texture binding differences </H3>
+<H3> Introduction   </H3>
 <!--docid::SEC129::-->
-Unfortunately the method for binding textures so that they are available to a vertex program is not well standardised. As at the time of writing, Shader Model 3.0 (SM3.0) hardware under DirectX9 include 4 separate sampler bindings for the purposes of vertex textures. OpenGL, on the other hand, is able to access vertex textures in GLSL (and in assembler through NV_vertex_program_3, although this is less popular), but the textures are shared with the fragment pipeline. I expect DirectX to move to the GL model with the advent of DirectX10, since a unified shader architecture implies sharing of texture resources between the two stages. As it is right now though, we're stuck with an inconsistent situation.<BR><BR>
-
-To reflect this, you should use the <A HREF="manual_17.html#SEC81">binding_type</A> attribute in a texture unit to indicate which unit you are targetting with your texture - 'fragment' (the default) or 'vertex'. For render systems that don't have separate bindings, this actually does nothing. But for those that do, it will ensure your texture gets bound to the right processing unit.
-
-Note that whilst DirectX9 has separate bindings for the vertex and fragment pipelines, binding a texture to the vertex processing unit still uses up a 'slot' which is then not available for use in the fragment pipeline. I didn't manage to find this documented anywhere, but the nVidia samples certainly avoid binding a texture to the same index on both vertex and fragment units, and when I tried to do it, the texture did not appear correctly in the fragment unit, whilst it did as soon as I moved it into the next unit.
+More recent generations of video card allow you to perform a read from a texture in the vertex program rather than just the fragment program, as is traditional. This allows you to, for example, read the contents of a texture and displace vertices based on the intensity of the colour contained within.<BR><BR>
+<P>
 
 <A NAME="SEC130"></A>
-<H3> Texture format limitations </H3>
+<H3> Declaring the use of vertex texture fetching </H3>
 <!--docid::SEC130::-->
-Again as at the time of writing, the types of texture you can use in a vertex program are limited to 1- or 4-component, full precision floating point formats. In code that equates to PF_FLOAT32_R or PF_FLOAT32_RGBA. No other formats are supported. In addition, the textures must be regular 2D textures (no cube or volume maps) and mipmapping and filtering is not supported, although you can perform filtering in your vertex program if you wish by sampling multiple times.
+Since hardware support for vertex texture fetching is not ubiquitous, you should use the uses_vertex_texture_fetch (See section <A HREF="manual_18.html#SEC108">Vertex texture fetching in vertex programs</A>) directive when declaring your vertex programs which use vertex textures, so that if it is not supported, technique fallback can be enabled. This is not strictly necessary for DirectX-targetted shaders, since vertex texture fetching is only supported in vs_3_0, which can be stated as a required syntax in your shader definition, but for OpenGL (GLSL), there are cards which support GLSL but not vertex textures, so you should be explicit about your need for them.
+<P>
 
 <A NAME="SEC131"></A>
-<H3> Hardware limitations </H3>
+<H3> Render system texture binding differences </H3>
 <!--docid::SEC131::-->
+Unfortunately the method for binding textures so that they are available to a vertex program is not well standardised. As at the time of writing, Shader Model 3.0 (SM3.0) hardware under DirectX9 include 4 separate sampler bindings for the purposes of vertex textures. OpenGL, on the other hand, is able to access vertex textures in GLSL (and in assembler through NV_vertex_program_3, although this is less popular), but the textures are shared with the fragment pipeline. I expect DirectX to move to the GL model with the advent of DirectX10, since a unified shader architecture implies sharing of texture resources between the two stages. As it is right now though, we're stuck with an inconsistent situation.<BR><BR>
+<P>
+
+To reflect this, you should use the <A HREF="manual_17.html#SEC81">binding_type</A> attribute in a texture unit to indicate which unit you are targetting with your texture - 'fragment' (the default) or 'vertex'. For render systems that don't have separate bindings, this actually does nothing. But for those that do, it will ensure your texture gets bound to the right processing unit.
+</P>
+<P>
+
+Note that whilst DirectX9 has separate bindings for the vertex and fragment pipelines, binding a texture to the vertex processing unit still uses up a 'slot' which is then not available for use in the fragment pipeline. I didn't manage to find this documented anywhere, but the nVidia samples certainly avoid binding a texture to the same index on both vertex and fragment units, and when I tried to do it, the texture did not appear correctly in the fragment unit, whilst it did as soon as I moved it into the next unit.
+</P>
+<P>
+
+<A NAME="SEC132"></A>
+<H3> Texture format limitations </H3>
+<!--docid::SEC132::-->
+Again as at the time of writing, the types of texture you can use in a vertex program are limited to 1- or 4-component, full precision floating point formats. In code that equates to PF_FLOAT32_R or PF_FLOAT32_RGBA. No other formats are supported. In addition, the textures must be regular 2D textures (no cube or volume maps) and mipmapping and filtering is not supported, although you can perform filtering in your vertex program if you wish by sampling multiple times.
+<P>
+
+<A NAME="SEC133"></A>
+<H3> Hardware limitations </H3>
+<!--docid::SEC133::-->
 As at the time of writing (early Q3 2006), ATI do not support texture fetch in their current crop of cards (Radeon X1n00). nVidia do support it in both their 6n00 and 7n00 range. ATI support an alternative called 'Render to Vertex Buffer', but this is not standardised at this time and is very much different in its implementation, so cannot be considered to be a drop-in replacement. This is the case even though the Radeon X1n00 cards claim to support vs_3_0 (which requires vertex texture fetch).
+<P>
 
 <A NAME="Script Inheritence"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_23.html#SEC119"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_23.html#SEC121"> &lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_25.html#SEC132"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_25.html#SEC134"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -81,7 +91,7 @@ As at the time of writing (early Q3 2006), ATI do not support texture fetch in t
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

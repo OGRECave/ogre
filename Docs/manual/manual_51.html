@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -24,11 +24,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC263"></A>
+<A NAME="SEC266"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_50.html#SEC262"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC261"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_52.html#SEC264"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_50.html#SEC265"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC264"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_52.html#SEC267"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -36,8 +36,8 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 </TR></TABLE>
 <HR SIZE=1>
 <H2> 5.2 Buffer Usage </H2>
-<!--docid::SEC263::-->
-Because the memory in a hardware buffer is likely to be under significant contention during the rendering of a scene, the kind of access you need to the buffer over the time it is used is extremely important; whether you need to update the contents of the buffer regularly, whether you need to be able to read information back from it, these are all important factors to how the graphics card manages the buffer. The method and exact parameters used to create a buffer depends on whether you are creating an index or vertex buffer (See section <A HREF="manual_55.html#SEC268">5.6 Hardware Vertex Buffers</A> and See section <A HREF="manual_60.html#SEC276">5.7 Hardware Index Buffers</A>), however one creation parameter is common to them both - the 'usage'. 
+<!--docid::SEC266::-->
+Because the memory in a hardware buffer is likely to be under significant contention during the rendering of a scene, the kind of access you need to the buffer over the time it is used is extremely important; whether you need to update the contents of the buffer regularly, whether you need to be able to read information back from it, these are all important factors to how the graphics card manages the buffer. The method and exact parameters used to create a buffer depends on whether you are creating an index or vertex buffer (See section <A HREF="manual_55.html#SEC271">5.6 Hardware Vertex Buffers</A> and See section <A HREF="manual_60.html#SEC279">5.7 Hardware Index Buffers</A>), however one creation parameter is common to them both - the 'usage'. 
 <BR><BR>
 The most optimal type of hardware buffer is one which is not updated often, and is never read from. The usage parameter of createVertexBuffer or createIndexBuffer can be one of the following:
 <DL COMPACT>
@@ -45,13 +45,13 @@ The most optimal type of hardware buffer is one which is not updated often, and 
 <DD>This means you do not need to update the buffer very often, but you might occasionally want to read from it.
 
 <DT><CODE>HBU_STATIC_WRITE_ONLY</CODE>
-<DD>This means you do not need to update the buffer very often, and you do not need to read from it. However, you may read from it's shadow buffer if you set one up (See section <A HREF="manual_52.html#SEC264">5.3 Shadow Buffers</A>). This is the optimal buffer usage setting.
+<DD>This means you do not need to update the buffer very often, and you do not need to read from it. However, you may read from it's shadow buffer if you set one up (See section <A HREF="manual_52.html#SEC267">5.3 Shadow Buffers</A>). This is the optimal buffer usage setting.
 
 <DT><CODE>HBU_DYNAMIC</CODE>
 <DD>This means you expect to update the buffer often, and that you may wish to read from it. This is the least optimal buffer setting.
 
 <DT><CODE>HBU_DYNAMIC_WRITE_ONLY</CODE>
-<DD>This means you expect to update the buffer often, but that you never want to read from it. However, you may read from it's shadow buffer if you set one up (See section <A HREF="manual_52.html#SEC264">5.3 Shadow Buffers</A>). If you use this option, and replace the entire contents of the buffer every frame, then you should use HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE instead, since that has better performance characteristics on some platforms.
+<DD>This means you expect to update the buffer often, but that you never want to read from it. However, you may read from it's shadow buffer if you set one up (See section <A HREF="manual_52.html#SEC267">5.3 Shadow Buffers</A>). If you use this option, and replace the entire contents of the buffer every frame, then you should use HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE instead, since that has better performance characteristics on some platforms.
 
 <DT><CODE>HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE</CODE>
 <DD>This means that you expect to replace the entire contents of the buffer on an extremely regular basis, most likely every frame. By selecting this option, you free the system up from having to be concerned about losing the existing contents of the buffer at any time, because if it does lose them, you will be replacing them next frame anyway. On some platforms this can make a significant performance difference, so you should try to use this whenever you have a buffer you need to update regularly. Note that if you create a buffer this way, you should use the HBL_DISCARD flag when locking the contents of it for writing.
@@ -64,9 +64,9 @@ Always try to use the _WRITE_ONLY forms. This just means that you cannot read <E
 <A NAME="Shadow Buffers"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_50.html#SEC262"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC261"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_52.html#SEC264"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_50.html#SEC265"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC264"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_52.html#SEC267"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -75,7 +75,7 @@ Always try to use the _WRITE_ONLY forms. This just means that you cannot read <E
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

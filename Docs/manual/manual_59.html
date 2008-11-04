@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -24,11 +24,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC275"></A>
+<A NAME="SEC278"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_58.html#SEC272"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC268"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_60.html#SEC276"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_58.html#SEC275"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC271"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_60.html#SEC279"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -36,8 +36,8 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 5.6.4 Updating Vertex Buffers </H3>
-<!--docid::SEC275::-->
-The complexity of updating a vertex buffer entirely depends on how its contents are laid out. You can lock a buffer (See section <A HREF="manual_53.html#SEC265">5.4 Locking buffers</A>), but how you write data into it vert much depends on what it contains.<BR><BR>
+<!--docid::SEC278::-->
+The complexity of updating a vertex buffer entirely depends on how its contents are laid out. You can lock a buffer (See section <A HREF="manual_53.html#SEC268">5.4 Locking buffers</A>), but how you write data into it vert much depends on what it contains.<BR><BR>
 Lets start with a vert simple example. Lets say you have a buffer which only contains vertex positions, so it only contains sets of 3 floating point numbers per vertex. In this case, all you need to do to write data into it is:
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>Real* pReal = static_cast&lt;Real*&gt;(vbuf-&gt;lock(HardwareBuffer::HBL_DISCARD));
 </pre></td></tr></table>... then you just write positions in chunks of 3 reals. If you have other floating point data in there, it's a little more complex but the principle is largely the same, you just need to write alternate elements. But what if you have elements of different types, or you need to derive how to write the vertex data from the elements themselves? Well, there are some useful methods on the VertexElement class to help you out.<BR><BR>
@@ -73,9 +73,9 @@ See the API docs for full details of all the helper methods on VertexDeclaration
 <A NAME="Hardware Index Buffers"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_58.html#SEC272"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC268"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_60.html#SEC276"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_58.html#SEC275"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC271"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_60.html#SEC279"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -84,7 +84,7 @@ See the API docs for full details of all the helper methods on VertexDeclaration
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -24,11 +24,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC270"></A>
+<A NAME="SEC273"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_56.html#SEC269"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC268"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_58.html#SEC272"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_56.html#SEC272"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC271"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_58.html#SEC275"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -36,12 +36,12 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 5.6.2 Vertex Declarations </H3>
-<!--docid::SEC270::-->
+<!--docid::SEC273::-->
 Vertex declarations define the vertex inputs used to render the geometry you want to appear on the screen. Basically this means that for each vertex, you want to feed a certain set of data into the graphics pipeling, which (you hope) will affect how it all looks when the triangles are drawn. Vertex declarations let you pull items of data (which we call vertex elements, represented by the VertexElement class) from any number of buffers, both shared and dedicated to that particular element. It's your job to ensure that the contents of the buffers make sense when interpreted in the way that your VertexDeclaration indicates that they should.<BR><BR>
 To add an element to a VertexDeclaration, you call it's addElement method. The parameters to this method are:
 <DL COMPACT>
 <DT>source
-<DD>This tells the declaration which buffer the element is to be pulled from. Note that this is just an index, which may range from 0 to one less than the number of buffers which are being bound as sources of vertex data. See section <A HREF="manual_58.html#SEC272">5.6.3 Vertex Buffer Bindings</A> for information on how a real buffer is bound to a source index. Storing the source of the vertex element this way (rather than using a buffer pointer) allows you to rebind the source of a vertex very easily, without changing the declaration of the vertex format itself.
+<DD>This tells the declaration which buffer the element is to be pulled from. Note that this is just an index, which may range from 0 to one less than the number of buffers which are being bound as sources of vertex data. See section <A HREF="manual_58.html#SEC275">5.6.3 Vertex Buffer Bindings</A> for information on how a real buffer is bound to a source index. Storing the source of the vertex element this way (rather than using a buffer pointer) allows you to rebind the source of a vertex very easily, without changing the declaration of the vertex format itself.
 <DT>offset
 <DD>Tells the declaration how far in bytes the element is offset from the start of each whole vertex in this buffer. This will be 0 if this is the only element being sourced from this buffer, but if other elements are there then it may be higher. A good way of thinking of this is the size of all vertex elements which precede this element in the buffer.
 <DT>type
@@ -54,9 +54,9 @@ To add an element to a VertexDeclaration, you call it's addElement method. The p
 
 You can repeat the call to addElement for as many elements as you have in your vertex input structures. There are also useful methods on VertexDeclaration for locating elements within a declaration - see the API reference for full details.
 
-<A NAME="SEC271"></A>
+<A NAME="SEC274"></A>
 <H3> Important Considerations </H3>
-<!--docid::SEC271::-->
+<!--docid::SEC274::-->
 Whilst in theory you have completely full reign over the format of you vertices, in reality there are some restrictions. Older DirectX hardware imposes a fixed ordering on the elements which are pulled from each buffer; specifically any hardware prior to DirectX 9 may impose the following restrictions:
 <UL>
 <LI>
@@ -79,9 +79,9 @@ OpenGL and DirectX 9 compatible hardware are not required to follow these strict
 <A NAME="Vertex Buffer Bindings"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_56.html#SEC269"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC268"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_58.html#SEC272"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_56.html#SEC272"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC271"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_58.html#SEC275"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -90,7 +90,7 @@ OpenGL and DirectX 9 compatible hardware are not required to follow these strict
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

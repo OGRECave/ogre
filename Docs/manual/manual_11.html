@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -37,14 +37,23 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <HR SIZE=1>
 <H2> 2.7 Materials </H2>
 <!--docid::SEC14::-->
+<P>
 
 The Material object controls how objects in the scene are rendered. It specifies what basic surface properties objects have such as reflectance of colours, shininess etc, how many texture layers are present, what images are on them and how they are blended together, what special effects are applied such as environment mapping, what culling mode is used, how the textures are filtered etc.<BR><BR>
+</P>
+<P>
 
 Materials can either be set up programmatically, by calling SceneManager::createMaterial and tweaking the settings, or by specifying it in a 'script' which is loaded at runtime. See section <A HREF="manual_14.html#SEC23">3.1 Material Scripts</A> for more info.<BR><BR>
+</P>
+<P>
 
 Basically everything about the appearance of an object apart from it's shape is controlled by the Material class.<BR><BR>
+</P>
+<P>
 
 The SceneManager class manages the master list of materials available to the scene. The list can be added to by the application by calling SceneManager::createMaterial, or by loading a Mesh (which will in turn load material properties). Whenever materials are added to the SceneManager, they start off with a default set of properties; these are defined by OGRE as the following:<BR><BR>
+</P>
+<P>
 
 <UL>
 <LI>
@@ -80,11 +89,15 @@ Solid polygon mode
 <LI>
 Bilinear texture filtering
 </UL>
+<P>
 
 You can alter these settings by calling SceneManager::getDefaultMaterialSettings() and making the required changes to the Material which is returned.
+</P>
+<P>
 
 Entities automatically have Material's associated with them if they use a Mesh object, since the Mesh object typically sets up it's required materials on loading. You can also customise the material used by an entity as described in <A HREF="manual_10.html#SEC13">2.6 Entities</A>. Just create a new Material, set it up how you like (you can copy an existing material into it if you like using a standard assignment statement) and point the SubEntity entries at it using SubEntity::setMaterialName().
-
+</P>
+<P>
 
 <A NAME="Overlays"></A>
 <HR SIZE=1>
@@ -100,7 +113,7 @@ Entities automatically have Material's associated with them if they use a Mesh o
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

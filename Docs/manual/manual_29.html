@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -24,11 +24,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC139"></A>
+<A NAME="SEC141"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_28.html#SEC138"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_28.html#SEC140"> &lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC143"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC145"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -36,13 +36,13 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 </TR></TABLE>
 <HR SIZE=1>
 <H2> 3.2 Compositor Scripts </H2>
-<!--docid::SEC139::-->
+<!--docid::SEC141::-->
 
 The compositor framework is a subsection of the OGRE API that allows you to easily define full screen post-processing effects. Compositor scripts offer you the ability to define compositor effects in a script which can be reused and modified easily, rather than having to use the API to define them. You still need to use code to instantiate a compositor against one of your visible viewports, but this is a much simpler process than actually defining the compositor itself. 
 
-<A NAME="SEC140"></A>
+<A NAME="SEC142"></A>
 <H2> Compositor Fundamentals </H2>
-<!--docid::SEC140::-->
+<!--docid::SEC142::-->
 
 Performing post-processing effects generally involves first rendering the scene to a texture, either in addition to or instead of the main window. Once the scene is in a texture, you can then pull the scene image into a fragment program and perform operations on it by rendering it through full screen quad. The target of this post processing render can be the main result (e.g. a window), or it can be another render texture so that you can perform multi-stage convolutions on the image. You can even 'ping-pong' the render back and forth between a couple of render textures to perform convolutions which require many iterations, without using a separate texture for each stage. Eventually you'll want to render the result to the final output, which you do with a full screen quad. This might replace the whole window (thus the main window doesn't need to render the scene itself), or it might be a combinational effect. <BR><BR> 
 
@@ -51,28 +51,28 @@ So that we can discuss how to implement these techniques efficiently, a number o
 <DT>Compositor
 <DD>Definition of a fullscreen effect that can be applied to a user viewport. This is what you're defining when writing compositor scripts as detailed in this section.
 <DT>Compositor Instance
-<DD>An instance of a compositor as applied to a single viewport. You create these based on compositor definitions, See section <A HREF="manual_33.html#SEC173">3.2.4 Applying a Compositor</A>.
+<DD>An instance of a compositor as applied to a single viewport. You create these based on compositor definitions, See section <A HREF="manual_33.html#SEC176">3.2.4 Applying a Compositor</A>.
 <DT>Compositor Chain
-<DD>It is possible to enable more than one compositor instance on a viewport at the same time, with one compositor taking the results of the previous one as input. This is known as a compositor chain. Every viewport which has at least one compositor attached to it has a compositor chain. See section <A HREF="manual_33.html#SEC173">3.2.4 Applying a Compositor</A>
+<DD>It is possible to enable more than one compositor instance on a viewport at the same time, with one compositor taking the results of the previous one as input. This is known as a compositor chain. Every viewport which has at least one compositor attached to it has a compositor chain. See section <A HREF="manual_33.html#SEC176">3.2.4 Applying a Compositor</A>
 <DT>Target
 <DD>This is a RenderTarget, ie the place where the result of a series of render operations is sent. A target may be the final output (and this is implicit, you don't have to declare it), or it may be an intermediate render texture, which you declare in your script with the <A HREF="manual_30.html#compositor_texture">texture line</A>. A target which is not the output target has a defined size and pixel format which you can control. 
 <DT>Output Target
 <DD>As Target, but this is the single final result of all operations. The size and pixel format of this target cannot be controlled by the compositor since it is defined by the application using it, thus you don't declare it in your script. However, you do declare a Target Pass for it, see below.
 <DT>Target Pass
-<DD>A Target may be rendered to many times in the course of a composition effect. In particular if you 'ping pong' a convolution between a couple of textures, you will have more than one Target Pass per Target. Target passes are declared in the script using a <A HREF="manual_31.html#SEC145">target or target_output line</A>, the latter being the final output target pass, of which there can be only one.
+<DD>A Target may be rendered to many times in the course of a composition effect. In particular if you 'ping pong' a convolution between a couple of textures, you will have more than one Target Pass per Target. Target passes are declared in the script using a <A HREF="manual_31.html#SEC147">target or target_output line</A>, the latter being the final output target pass, of which there can be only one.
 <DT>Pass
-<DD>Within a Target Pass, there are one or more individual <A HREF="manual_32.html#SEC152">passes</A>, which perform a very specific action, such as rendering the original scene (or pulling the result from the previous compositor in the chain), rendering a fullscreen quad, or clearing one or more buffers. Typically within a single target pass you will use the either a 'render scene' pass or a 'render quad' pass, not both. Clear can be used with either type. 
+<DD>Within a Target Pass, there are one or more individual <A HREF="manual_32.html#SEC155">passes</A>, which perform a very specific action, such as rendering the original scene (or pulling the result from the previous compositor in the chain), rendering a fullscreen quad, or clearing one or more buffers. Typically within a single target pass you will use the either a 'render scene' pass or a 'render quad' pass, not both. Clear can be used with either type. 
 </DL>
 
-<A NAME="SEC141"></A>
+<A NAME="SEC143"></A>
 <H2> Loading scripts  </H2>
-<!--docid::SEC141::-->
+<!--docid::SEC143::-->
 
 Compositor scripts are loaded when resource groups are initialised: OGRE looks in all resource locations associated with the group (see Root::addResourceLocation) for files with the '.compositor' extension and parses them. If you want to parse files manually, use CompositorSerializer::parseScript.<BR><BR>
 
-<A NAME="SEC142"></A>
+<A NAME="SEC144"></A>
 <H2> Format  </H2>
-<!--docid::SEC142::-->
+<!--docid::SEC144::-->
 
 Several compositors may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ('{', '}'), and comments indicated by starting a line with '//' (note, no nested form comments allowed). The general format is shown below in the example below:<BR><BR>
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>// This is a comment
@@ -107,14 +107,14 @@ compositor B&amp;W
 </pre></td></tr></table>
 Every compositor in the script must be given a name, which is the line 'compositor &lt;name&gt;' before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your compositors, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string.  Names can include spaces but must be surrounded by double quotes ie compositor &quot;My Name&quot;.<BR><BR>
 
-The major components of a compositor are the <A HREF="manual_30.html#SEC143">techniques</A>, the <A HREF="manual_31.html#SEC145">target passes</A> and the <A HREF="manual_32.html#SEC152">passes</A>, which are covered in detail in the following sections.<BR><BR>
+The major components of a compositor are the <A HREF="manual_30.html#SEC145">techniques</A>, the <A HREF="manual_31.html#SEC147">target passes</A> and the <A HREF="manual_32.html#SEC155">passes</A>, which are covered in detail in the following sections.<BR><BR>
 
 <A NAME="Compositor Techniques"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_28.html#SEC138"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_28.html#SEC140"> &lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC143"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC145"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -123,7 +123,7 @@ The major components of a compositor are the <A HREF="manual_30.html#SEC143">tec
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

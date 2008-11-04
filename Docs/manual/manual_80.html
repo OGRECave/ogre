@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -24,11 +24,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC340"></A>
+<A NAME="SEC343"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_79.html#SEC339"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_78.html#SEC335"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_81.html#SEC341"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_79.html#SEC342"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_78.html#SEC338"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_81.html#SEC344"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -36,7 +36,7 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 8.3.2 Pose Animation </H3>
-<!--docid::SEC340::-->
+<!--docid::SEC343::-->
 Pose animation allows you to blend together potentially multiple vertex poses at different influence levels into final vertex state. A common use for this is facial animation, where each facial expression is placed in a separate animation, and influences used to either blend from one expression to another, or to combine full expressions if each pose only affects part of the face.<BR><BR>
 
 In order to do this, pose animation uses a set of reference poses defined in the mesh, expressed as offsets to the original vertex data. It does not require that every vertex has an offset - those that don't are left alone. When blending in software these vertices are completely skipped - when blending in hardware (which requires a vertex entry for every vertex), zero offsets for vertices which are not mentioned are automatically created for you.<BR><BR>
@@ -45,14 +45,14 @@ Once you've defined the poses, you can refer to them in animations. Each pose an
 
 You should be careful how many poses you apply at once. When performing pose animation in hardware (See section <A HREF="manual_18.html#SEC107">Pose Animation in Vertex Programs</A>), every active pose requires another vertex buffer to be added to the shader, and in when animating in software it will also take longer the more active poses you have. Bear in mind that if you have 2 poses in one keyframe, and a different 2 in the next, that actually means there are 4 active keyframes when interpolating between them. <BR><BR>  
 
-You can combine pose animation with skeletal animation, See section <A HREF="manual_81.html#SEC341">8.3.3 Combining Skeletal and Vertex Animation</A>, and you can also hardware accelerate the application of the blend with a vertex shader, See section <A HREF="manual_18.html#SEC107">Pose Animation in Vertex Programs</A>.
+You can combine pose animation with skeletal animation, See section <A HREF="manual_81.html#SEC344">8.3.3 Combining Skeletal and Vertex Animation</A>, and you can also hardware accelerate the application of the blend with a vertex shader, See section <A HREF="manual_18.html#SEC107">Pose Animation in Vertex Programs</A>.
 
 <A NAME="Combining Skeletal and Vertex Animation"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_79.html#SEC339"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_78.html#SEC335"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_81.html#SEC341"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_79.html#SEC342"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_78.html#SEC338"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_81.html#SEC344"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -61,7 +61,7 @@ You can combine pose animation with skeletal animation, See section <A HREF="man
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

@@ -372,7 +372,7 @@ Each technique can be made up of many passes (@xref{Passes}), that is a complete
 
 Within each pass, there can be zero or many texture units in use (@xref{Texture Units}). These define the texture to be used, and optionally some blending operations (which use multitexturing) and texture effects.@*@*
 
-You can also reference vertex and fragment programs (or vertex and pixel shaders, if you want to use that terminology) in a pass with a given set of parameters. Programs themselves are declared in separate .program scripts (@xref{Declaring Vertex@comma{} Geometry and Fragment Programs}) and are used as described in @ref{Using Vertex@comma{} Geometry and Fragment Programs in a Pass}.
+You can also reference vertex and fragment programs (or vertex and pixel shaders, if you want to use that terminology) in a pass with a given set of parameters. Programs themselves are declared in separate .program scripts (@xref{Declaring Vertex/Geometry/Fragment Programs}) and are used as described in @ref{Using Vertex/Geometry/Fragment Programs in a Pass}.
 
 @subheading Top-level material attributes
 The outermost section of a material definition does not have a lot of attributes of its own (most of the configurable parameters are within the child sections. However, it does have some, and here they are:@*@*
@@ -515,7 +515,7 @@ A pass is a single render of the geometry in question; a single call to the rend
 
 To help clearly identify what each pass is used for, the pass can be named but its optional.  Passes not named within the script will take on a name that is the pass index number.  For example: the first pass in a technique is index 0 so its name would be "0" if it was not given a name in the script.  The pass name must be unqiue within the technique or else the final pass is the resulting merge of all passes with the same name in the technique.  A warning message is posted in the Ogre.log if this occurs.  Named passes can help when inheriting a material and modifying an existing pass: (@xref{Script Inheritence})@*@*
 
-Passes have a set of global attributes (described below), zero or more nested texture_unit entries (@xref{Texture Units}), and optionally a reference to a vertex and / or a fragment program (@xref{Using Vertex@comma{} Geometry and Fragment Programs in a Pass}).
+Passes have a set of global attributes (described below), zero or more nested texture_unit entries (@xref{Texture Units}), and optionally a reference to a vertex and / or a fragment program (@xref{Using Vertex/Geometry/Fragment Programs in a Pass}).
 
 @*@*
 Here are the attributes you can use in a 'pass' section of a .material script:
@@ -1003,7 +1003,7 @@ Default: start_light 0@*
 Sets the maximum number of lights which will be considered for use with this pass.@*@*
 Format: max_lights <number>@*@*
 
-The maximum number of lights which can be used when rendering fixed-function materials is set by the rendering system, and is typically set at 8. When you are using the programmable pipeline (@xref{Using Vertex@comma{} Geometry and Fragment Programs in a Pass}) this limit is dependent on the program you are running, or, if you use 'iteration once_per_light' or a variant (@xref{iteration}), it effectively only bounded by the number of passes you are willing to use. If you are not using pass iteration, the light limit applies once for this pass. If you are using pass iteration, the light limit applies across all iterations of this pass - for example if you have 12 lights in range with an 'iteration once_per_light' setup but your max_lights is set to 4 for that pass, the pass will only iterate 4 times. @*@*
+The maximum number of lights which can be used when rendering fixed-function materials is set by the rendering system, and is typically set at 8. When you are using the programmable pipeline (@xref{Using Vertex/Geometry/Fragment Programs in a Pass}) this limit is dependent on the program you are running, or, if you use 'iteration once_per_light' or a variant (@xref{iteration}), it effectively only bounded by the number of passes you are willing to use. If you are not using pass iteration, the light limit applies once for this pass. If you are using pass iteration, the light limit applies across all iterations of this pass - for example if you have 12 lights in range with an 'iteration once_per_light' setup but your max_lights is set to 4 for that pass, the pass will only iterate 4 times. @*@*
 
 Default: max_lights 8@*
 
@@ -1723,10 +1723,10 @@ Format: transform m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m3
 
 The indexes of the 4x4 matrix value above are expressed as m<row><col>.
 
-@node Declaring Vertex@comma{} Geometry and Fragment Programs
-@subsection Declaring Vertex@comma{} Geometry and Fragment Programs
+@node Declaring Vertex/Geometry/Fragment Programs
+@subsection Declaring Vertex/Geometry/Fragment Programs
 
-In order to use a vertex, geometry or fragment program in your materials (@xref{Using Vertex@comma{} Geometry and Fragment Programs in a Pass}), you first have to define them. A single program definition can be used by any number of materials, the only prerequisite is that a program must be defined before being referenced in the pass section of a material.@*@*
+In order to use a vertex, geometry or fragment program in your materials (@xref{Using Vertex/Geometry/Fragment Programs in a Pass}), you first have to define them. A single program definition can be used by any number of materials, the only prerequisite is that a program must be defined before being referenced in the pass section of a material.@*@*
 
 The definition of a program can either be embedded in the .material script itself (in which case it must precede any references to it in the script), or if you wish to use the same program across multiple .material files, you can define it in an external .program script. You define the program in exactly the same way whether you use a .program script or a .material script, the only difference is that all .program scripts are guaranteed to have been parsed before @strong{all} .material scripts, so you can guarantee that your program has been defined before any .material script that might use it. Just like .material scripts, .program scripts will be read from any location which is on your resource path, and you can define many programs in a single script.@*@*
 
@@ -2067,10 +2067,10 @@ material SupportHLSLandGLSLwithUnified
 At runtime, when myVertexProgram or myFragmentProgram are used, OGRE automatically picks a real program to delegate to based on what's supported on the current hardware / rendersystem. If none of the delegates are supported, the entire technique referencing the unified program is marked as unsupported and the next technique in the material is checked fro fallback, just like normal. As your materials get larger, and you find you need to support HLSL and GLSL specifically (or need to write multiple interface-compatible versions of a program for whatever other reason), unified programs can really help reduce duplication.
 
 
-@node Using Vertex@comma{} Geometry and Fragment Programs in a Pass
-@subsection Using Vertex@comma{} Geometry and Fragment Programs in a Pass
+@node Using Vertex/Geometry/Fragment Programs in a Pass
+@subsection Using Vertex/Geometry/Fragment Programs in a Pass
 
-Within a pass section of a material script, you can reference a vertex, geometry and / or a fragment program which is been defined in a .program script (@xref{Declaring Vertex@comma{} Geometry and Fragment Programs}). The programs are defined separately from the usage of them in the pass, since the programs are very likely to be reused between many separate materials, probably across many different .material scripts, so this approach lets you define the program only once and use it many times.@*@*
+Within a pass section of a material script, you can reference a vertex, geometry and / or a fragment program which is been defined in a .program script (@xref{Declaring Vertex/Geometry/Fragment Programs}). The programs are defined separately from the usage of them in the pass, since the programs are very likely to be reused between many separate materials, probably across many different .material scripts, so this approach lets you define the program only once and use it many times.@*@*
 
 As well as naming the program in question, you can also provide parameters to it. Here's a simple example:
 @example

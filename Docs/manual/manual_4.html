@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -40,27 +40,41 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <A NAME="SEC5"></A>
 <H2> Introduction  </H2>
 <!--docid::SEC5::-->
+<P>
 
 This tutorial gives you a quick summary of the core objects that you will use in OGRE and what they are used for.
+</P>
+<P>
 
 <A NAME="SEC6"></A>
 <H2> A Word About Namespaces </H2>
 <!--docid::SEC6::-->
+<P>
 
 OGRE uses a C++ feature called namespaces. This lets you put classes, enums, structures, anything really within a 'namespace' scope which is an easy way to prevent name clashes, i.e. situations where you have 2 things called the same thing. Since OGRE is designed to be used inside other applications, I wanted to be sure that name clashes would not be a problem. Some people prefix their classes/types with a short code because some compilers don't support namespaces, but I chose to use them because they are the 'right' way to do it. Sorry if you have a non-compliant compiler, but hey, the C++ standard has been defined for years, so compiler writers really have no excuse anymore. If your compiler doesn't support namespaces then it's probably because it's sh*t - get a better one. ;)
+</P>
+<P>
 
 This means every class, type etc should be prefixed with 'Ogre::', e.g. 'Ogre::Camera', 'Ogre::Vector3' etc which means if elsewhere in your application you have used a Vector3 type you won't get name clashes. To avoid lots of extra typing you can add a 'using namespace Ogre;' statement to your code which means you don't have to type the 'Ogre::' prefix unless there is ambiguity (in the situation where you have another definition with the same name).
+</P>
+<P>
 
 <A NAME="SEC7"></A>
 <H2> Overview from 10,000 feet </H2>
 <!--docid::SEC7::-->
+<P>
 
 Shown below is a diagram of some of the core objects and where they 'sit' in the grand sceme of things. This is not all the classes by a long shot, just a few examples of the more more significant ones to give you an idea of how it slots together.
 <CENTER><IMG SRC="./images/uml-overview.png" ALT="images/uml-overview"></CENTER>
+</P>
+<P>
 
 At the very top of the diagram is the Root object. This is your 'way in' to the OGRE system, and it's where you tend to create the top-level objects that you need to deal with, like scene managers, rendering systems and render windows, loading plugins, all the fundamental stuff. If you don't know where to start, Root is it for almost everything, although often it will just give you another object which will actually do the detail work, since Root itself is more of an organiser and facilitator object.
+</P>
+<P>
 
 The majority of rest of OGRE's classes fall into one of 3 roles:
+</P>
 <DL COMPACT>
 <DT>Scene Management
 <DD>This is about the contents of your scene, how it's structured, how it's viewed from cameras, etc. Objects in this area are responsible for giving you a natural declarative interface to the world you're building; ie you don't tell OGRE &quot;set these render states and then render 3 polygons&quot;, you tell it &quot;I want an object here, here and here, with these materials on them, rendered from this view&quot;, and let it get on with it.
@@ -69,8 +83,11 @@ The majority of rest of OGRE's classes fall into one of 3 roles:
 <DT>Rendering
 <DD>Finally, there's getting the visuals on the screen - this is about the lower-level end of the rendering pipeline, the specific rendering system API objects like buffers, render states and the like and pushing it all down the pipeline. Classes in the Scene Management subsystem use this to get their higher-level scene information onto the screen.
 </DL>
+<P>
 
 You'll notice that scattered around the edge are a number of plugins. OGRE is designed to be extended, and plugins are the usual way to go about it. Many of the classes in OGRE can be subclassed and extended, whether it's changing the scene organisation through a custom SceneManager, adding a new render system implementation (e.g. Direct3D or OpenGL), or providing a way to load resources from another source (say from a web location or a database). Again this is just a small smattering of the kinds of things plugins can do, but as you can see they can plug in to almost any aspect of the system. This way, OGRE isn't just a solution for one narrowly defined problem, it can extend to pretty much anything you need it to do.
+</P>
+<P>
 
 <A NAME="The Root Object"></A>
 <HR SIZE=1>
@@ -86,7 +103,7 @@ You'll notice that scattered around the edge are a number of plugins. OGRE is de
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

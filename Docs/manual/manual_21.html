@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -24,11 +24,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC112"></A>
+<A NAME="SEC113"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_20.html#SEC111"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_20.html#SEC112"> &lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_22.html#SEC118"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_22.html#SEC120"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -36,7 +36,7 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 3.1.7 OpenGL GLSL </H3>
-<!--docid::SEC112::-->
+<!--docid::SEC113::-->
 OpenGL GLSL has a similar language syntax to HLSL but is tied to the OpenGL API. The are a few benefits over Cg in that it only requires the OpenGL render system plugin, not any additional plugins. Declaring a OpenGL GLSL program is similar to Cg but simpler. Here's an example:
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>vertex_program myGLSLVertexProgram glsl
 {
@@ -70,9 +70,9 @@ vertex_program myGLSLVertexProgram2 glsl
 </pre></td></tr></table>
 External GLSL functions are attached to the program that needs them by using 'attach' and including the names of all external programs required on the same line seperated by spaces.  This can be done for both vertex and fragment programs.
 
-<A NAME="SEC113"></A>
+<A NAME="SEC114"></A>
 <H3> GLSL Texture Samplers </H3>
-<!--docid::SEC113::-->
+<!--docid::SEC114::-->
 To pass texture unit index values from the material script to texture samplers in glsl use 'int' type named parameters.  See the example below:<BR>
 
 excerpt from GLSL example.frag source:
@@ -111,9 +111,9 @@ material exampleGLSLTexturing
 </pre></td></tr></table>
 An index value of 0 refers to the first texture unit in the pass, an index value of 1 refers to the second unit in the pass and so on.<BR><BR>
 
-<A NAME="SEC114"></A>
+<A NAME="SEC115"></A>
 <H3> Matrix parameters </H3>
-<!--docid::SEC114::-->
+<!--docid::SEC115::-->
 
 Here are some examples of passing matrices to GLSL mat2, mat3, mat4 uniforms:
 
@@ -144,14 +144,14 @@ Here are some examples of passing matrices to GLSL mat2, mat3, mat4 uniforms:
   }
 }
 </pre></td></tr></table>
-<A NAME="SEC115"></A>
-<H3> Accessing OpenGL states in GLSL </H3>
-<!--docid::SEC115::-->
-GLSL can access most of the GL states directly so you do not need to pass these states through <A HREF="manual_23.html#SEC124">param_named_auto</A> in the material script.  This includes lights, material state, and all the matrices used in the openGL state ie model view matrix, worldview projection matrix etc. <BR><BR>
-
 <A NAME="SEC116"></A>
-<H3> Binding vertex attributes </H3>
+<H3> Accessing OpenGL states in GLSL </H3>
 <!--docid::SEC116::-->
+GLSL can access most of the GL states directly so you do not need to pass these states through <A HREF="manual_23.html#SEC126">param_named_auto</A> in the material script.  This includes lights, material state, and all the matrices used in the openGL state ie model view matrix, worldview projection matrix etc. <BR><BR>
+
+<A NAME="SEC117"></A>
+<H3> Binding vertex attributes </H3>
+<!--docid::SEC117::-->
 GLSL natively supports automatic binding of the most common incoming per-vertex attributes (e.g. gl_Vertex, gl_Normal, gl_MultiTexCoord0 etc). However, there are some which are not automatically bound, which must be declared in the shader using the 'attribute &lt;type&gt; &lt;name&gt;' syntax, and the vertex data bound to it by Ogre. <BR><BR>
 
 In addition to the built in attributes described in section 7.3 of the GLSL manual, Ogre supports a number of automatically bound custom vertex attributes. There are some drivers that do not behave correctly when mixing built-in vertex attributes like gl_Normal and custom vertex attributes, so for maximum compatibility you may well wish to use all custom attributes in shaders where you need at least one (e.g. for skeletal animation). 
@@ -175,9 +175,9 @@ In addition to the built in attributes described in section 7.3 of the GLSL manu
 <DT>blendWeights
 <DD>Binds VES_BLEND_WEIGHTS, declare as 'attribute vec4 blendWeights;'.
 
-<A NAME="SEC117"></A>
+<A NAME="SEC118"></A>
 <H3> Preprocessor definitions </H3>
-<!--docid::SEC117::-->
+<!--docid::SEC118::-->
 GLSL supports using preprocessor definitions in your code - some are defined by the implementation, but you can also define your own, say in order to use the same source code for a few different variants of the same technique. In order to use this feature, include preprocessor conditions in your GLSL code, of the kind #ifdef SYMBOL, #if SYMBOL==2 etc. Then in your program definition, use the 'preprocessor_defines' option, following it with a string if definitions.  Definitions are separated by ';' or ',' and may optionally have a '=' operator within them to specify a definition value. Those without an '=' will implicitly have a definition of 1. For example:<BR><BR>
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>// in your GLSL
 
@@ -197,15 +197,34 @@ GLSL supports using preprocessor definitions in your code - some are defined by 
 preprocessor_defines CLEVERTECHNIQUE,NUMTHINGS=2
 </pre></td></tr></table>This way you can use the same source code but still include small variations, each one defined as a different Ogre program name but based on the same source code.
 
+<A NAME="SEC119"></A>
+<H3> GLSL Geometry shader specification </H3>
+<!--docid::SEC119::-->
+GLSL allows the same shader to run on different types of geometry primitives. In order to properly link the shaders together, you have to specify which primitives it will receive as input, which primitives it will emit and how many vertices a single run of the shader can generate. The GLSL geometry_program definition requires three additional parameters :
+<DL COMPACT>
+<DT>input_operation_type
+<DD>The operation type of the geometry that the shader will receive. Can be 'point_list', 'line_list', 'line_strip', 'triangle_list', 'triangle_strip' or 'triangle_fan'.
+<DT>output_operation_type
+<DD>The operation type of the geometry that the shader will emit. Can be 'point_list', 'line_strip' or 'triangle_strip'.
+<DT>max_output_vertices
+<DD>The maximum number of vertices that the shader can emit. There is an upper limit for this value, it is exposed in the render system capabilities.
 
-
+For example:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>geometry_program Ogre/GPTest/Swizzle_GP_GLSL glsl
+{
+	source SwizzleGP.glsl
+	input_operation_type triangle_list
+	output_operation_type line_strip
+	max_output_vertices 6
+}
+</pre></td></tr></table><P>
 
 <A NAME="Unified High-level Programs"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_20.html#SEC111"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_20.html#SEC112"> &lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_22.html#SEC118"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_22.html#SEC120"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -214,7 +233,7 @@ preprocessor_defines CLEVERTECHNIQUE,NUMTHINGS=2
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 
