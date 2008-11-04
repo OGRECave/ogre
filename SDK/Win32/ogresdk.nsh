@@ -230,6 +230,7 @@ Section -Docs
   File "..\..\Docs\ChangeLog.html"
   File "..\..\Docs\style.css"
   File "..\..\Docs\ogre-logo.gif"
+  File "..\..\Docs\ogre-logo-wetfloor.gif"
   SetOutPath "$INSTDIR\docs\licenses"
   File "..\..\Docs\licenses\*.*"
 
