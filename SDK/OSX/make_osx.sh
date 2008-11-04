@@ -45,6 +45,7 @@ cp -R ../../Docs/licenses sdk_contents/docs/
 cp ReadMe.html sdk_contents/docs/
 cp ../../Docs/style.css sdk_contents/docs/
 cp -R ../../Docs/ChangeLog.html sdk_contents/docs/
+cp -R ../../Docs/*.gif sdk_contents/docs/
 
 echo API generation done.
 
