@@ -1,9 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // mesh.h
-// Author     : Francesco Giordana
-// Start Date : January 13, 2005
-// Copyright  : (C) 2006 by Francesco Giordana
-// Email      : fra.giordana@tiscali.it
+// Author       : Francesco Giordana
+// Sponsored by : Anygma N.V. (http://www.nazooka.com)
+// Start Date   : January 13, 2005
+// Copyright    : (C) 2006 by Francesco Giordana
+// Email        : fra.giordana@tiscali.it
 ////////////////////////////////////////////////////////////////////////////////
 
 /*********************************************************************************
@@ -39,6 +40,10 @@ namespace OgreMayaExporter
 		std::vector<vertex> vertices;
 		std::vector<dagInfo> dagMap;
 	} sharedGeometry;
+
+	typedef stdext::hash_map<int,int> submeshPoseRemapping;
+
+	typedef stdext::hash_map<int,submeshPoseRemapping> poseRemapping; 
 
 
 	/***** Class Mesh *****/
@@ -124,6 +129,7 @@ namespace OgreMayaExporter
 		MIntArray shaderPolygonMapping;
 		std::vector<faceArray> polygonSets;
 		bool opposite;
+		poseRemapping m_poseRemapping;
 	};
 
 }; // end of namespace

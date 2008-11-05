@@ -1,9 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // materialSet.h
-// Author     : Francesco Giordana
-// Start Date : January 13, 2005
-// Copyright  : (C) 2006 by Francesco Giordana
-// Email      : fra.giordana@tiscali.it
+// Author       : Francesco Giordana
+// Sponsored by : Anygma N.V. (http://www.nazooka.com)
+// Start Date   : January 13, 2005
+// Copyright    : (C) 2006 by Francesco Giordana
+// Email        : fra.giordana@tiscali.it
 ////////////////////////////////////////////////////////////////////////////////
 
 /*********************************************************************************

@@ -1,9 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // mesh.cpp
-// Author     : Francesco Giordana
-// Start Date : January 13, 2005
-// Copyright  : (C) 2006 by Francesco Giordana
-// Email      : fra.giordana@tiscali.it
+// Author       : Francesco Giordana
+// Sponsored by : Anygma N.V. (http://www.nazooka.com)
+// Start Date   : January 13, 2005
+// Copyright    : (C) 2006 by Francesco Giordana
+// Email        : fra.giordana@tiscali.it
 ////////////////////////////////////////////////////////////////////////////////
 
 /*********************************************************************************
@@ -42,12 +43,11 @@ namespace OgreMayaExporter
 	// clear data
 	void Mesh::clear()
 	{
-		int i;
 		m_name = "";
 		m_numTriangles = 0;
-		for (i=0; i<m_submeshes.size(); i++)
+		for (int i=0; i<m_submeshes.size(); i++)
 			delete m_submeshes[i];
-		for (i=0; i<m_sharedGeom.dagMap.size(); i++)
+		for (int i=0; i<m_sharedGeom.dagMap.size(); i++)
 		{
 			if (m_sharedGeom.dagMap[i].pBlendShape)
 				delete m_sharedGeom.dagMap[i].pBlendShape;
@@ -61,6 +61,7 @@ namespace OgreMayaExporter
 		if (m_pSkeleton)
 			delete m_pSkeleton;
 		m_pSkeleton = NULL;
+		m_poseRemapping.clear();
 	}
 
 	// get pointer to linked skeleton
@@ -118,7 +119,7 @@ namespace OgreMayaExporter
 			std::cout << "Error retrieving blend shape deformer linked to current mesh\n";
 			std::cout.flush();
 		}
-		// Set blend shape defeormer envelope to 0, to get base mesh
+		// Set blend shape deformer envelope to 0, to get base mesh
 		if (pBlendShape)
 		{
 			pBlendShape->setEnvelope(0.0f);
@@ -201,7 +202,6 @@ namespace OgreMayaExporter
 	MStatus Mesh::loadAnims(ParamList& params)
 	{
 		MStatus stat;
-		int i;
 		// save current time for later restore
 		MTime curTime = MAnimControl::currentTime();
 		std::cout << "Loading vertex animations...\n";
@@ -209,7 +209,7 @@ namespace OgreMayaExporter
 		// clear animations data
 		m_vertexClips.clear();
 		// load the requested clips
-		for (i=0; i<params.vertClipList.size(); i++)
+		for (int i=0; i<params.vertClipList.size(); i++)
 		{
 			std::cout << "Loading clip " << params.vertClipList[i].name.asChar() << "\n";
 			std::cout.flush();
@@ -237,13 +237,14 @@ namespace OgreMayaExporter
 	MStatus Mesh::loadBlendShapes(ParamList &params)
 	{
 		MStatus stat;
-		int i;
 		std::cout << "Loading blend shape poses...\n";
 		std::cout.flush();
+		// Disable constraints, IK, etc...
+		MGlobal::executeCommand("doEnableNodeItems false all",true);
 		// Set envelopes of all blend shape deformers to 0
 		if (params.useSharedGeom)
 		{
-			for  (i=0; i<m_sharedGeom.dagMap.size(); i++)
+			for  (int i=0; i<m_sharedGeom.dagMap.size(); i++)
 			{
 				dagInfo di = m_sharedGeom.dagMap[i];
 				if (di.pBlendShape)
@@ -252,7 +253,7 @@ namespace OgreMayaExporter
 		}
 		else
 		{
-			for (i=0; i<m_submeshes.size(); i++)
+			for (int i=0; i<m_submeshes.size(); i++)
 			{
 				Submesh* pSubmesh = m_submeshes[i];
 				if (pSubmesh->m_pBlendShape)
@@ -262,27 +263,29 @@ namespace OgreMayaExporter
 		// Get the blend shape poses
 		if (params.useSharedGeom)
 		{
-			for  (i=0; i<m_sharedGeom.dagMap.size(); i++)
+			for  (int i=0; i<m_sharedGeom.dagMap.size(); i++)
 			{
 				dagInfo di = m_sharedGeom.dagMap[i];
 				if (di.pBlendShape)
-					di.pBlendShape->loadPoses(di.dagPath,params,m_sharedGeom.vertices,di.numVertices,di.offset);
+					di.pBlendShape->loadPosesShared(di.dagPath,params,m_sharedGeom.vertices,di.numVertices,di.offset);
 			}
 		}
 		else
 		{
-			for (i=0; i<m_submeshes.size(); i++)
+			for (int i=0; i<m_submeshes.size(); i++)
 			{
 				Submesh* pSubmesh = m_submeshes[i];
 				if (pSubmesh->m_pBlendShape)
-					pSubmesh->m_pBlendShape->loadPoses(pSubmesh->m_dagPath,params,pSubmesh->m_vertices,
-						pSubmesh->m_vertices.size(),0,i);
+					pSubmesh->m_pBlendShape->loadPosesSubmesh(pSubmesh->m_dagPath,params,pSubmesh->m_vertices,
+						pSubmesh->m_indices,i+1);
 			}
 		}
+		// Enable constraints, IK, etc...
+		MGlobal::executeCommand("doEnableNodeItems true all",true);
 		// Restore blend shape deformers original envelopes
 		if (params.useSharedGeom)
 		{
-			for  (i=0; i<m_sharedGeom.dagMap.size(); i++)
+			for  (int i=0; i<m_sharedGeom.dagMap.size(); i++)
 			{
 				dagInfo di = m_sharedGeom.dagMap[i];
 				if (di.pBlendShape)
@@ -291,7 +294,7 @@ namespace OgreMayaExporter
 		}
 		else
 		{
-			for (i=0; i<m_submeshes.size(); i++)
+			for (int i=0; i<m_submeshes.size(); i++)
 			{
 				Submesh* pSubmesh = m_submeshes[i];
 				if (pSubmesh->m_pBlendShape)
@@ -309,11 +312,10 @@ namespace OgreMayaExporter
 	// Load blend shape animations
 	MStatus Mesh::loadBlendShapeAnimations(ParamList& params)
 	{
-		int i,j,k;
 		std::cout << "Loading blend shape animations...\n";
 		std::cout.flush();
 		// Read the list of blend shape clips to export
-		for (i=0; i<params.BSClipList.size(); i++)
+		for (int i=0; i<params.BSClipList.size(); i++)
 		{
 			int startPoseId = 0;
 			clipInfo ci = params.BSClipList[i];
@@ -328,14 +330,14 @@ namespace OgreMayaExporter
 			{
 				// Create a track for each blend shape
 				std::vector<Track> tracks;
-				for  (j=0; j<m_sharedGeom.dagMap.size(); j++)
+				for  (int j=0; j<m_sharedGeom.dagMap.size(); j++)
 				{
 					dagInfo di = m_sharedGeom.dagMap[j];
 					if (di.pBlendShape)
 					{
-						Track t = di.pBlendShape->loadTrack(ci.start,ci.stop,ci.rate,params,startPoseId);
+						Track t = di.pBlendShape->loadTrack(ci.start,ci.stop,ci.rate,params,0,startPoseId);
 						tracks.push_back(t);
-						startPoseId += di.pBlendShape->getPoses().size();
+						startPoseId += di.pBlendShape->getPoseGroups().find(0)->second.poses.size();
 					}
 				}
 				// Merge the tracks into a single track (shared geometry must have a single animation track)
@@ -343,18 +345,17 @@ namespace OgreMayaExporter
 				{
 					Track newTrack;
 					// Merge keyframes at the same time position from all tracks
-					for (j=0; j<tracks[0].m_vertexKeyframes.size(); j++)
+					for (int j=0; j<tracks[0].m_vertexKeyframes.size(); j++)
 					{
 						// Create a new keyframe
 						vertexKeyframe newKeyframe;
 						newKeyframe.time = tracks[0].m_vertexKeyframes[j].time;
 						// Get keyframe at current position from all tracks
-						for (k=0; k<tracks.size(); k++)
+						for (int k=0; k<tracks.size(); k++)
 						{
 							vertexKeyframe* pSrcKeyframe = &tracks[k].m_vertexKeyframes[j];
-							int pri;
 							// Add pose references from this keyframe to the new keyframe for the joined track
-							for (pri=0; pri<pSrcKeyframe->poserefs.size(); pri++)
+							for (int pri=0; pri<pSrcKeyframe->poserefs.size(); pri++)
 							{
 								// Create a new pose reference
 								vertexPoseRef poseref;
@@ -376,30 +377,39 @@ namespace OgreMayaExporter
 			{
 				// Create a track for each submesh
 				std::vector<Track> tracks;
-				for (j=0; j<m_submeshes.size(); j++)
+				for (int j=0; j<m_submeshes.size(); j++)
 				{
 					Submesh* pSubmesh = m_submeshes[j];
 					if (pSubmesh->m_pBlendShape)
 					{
-						Track t = pSubmesh->m_pBlendShape->loadTrack(ci.start,ci.stop,ci.rate,params,startPoseId);
+						int startPoseId = 0;
+						Track t = pSubmesh->m_pBlendShape->loadTrack(ci.start,ci.stop,ci.rate,params,j+1,startPoseId);
 						a.addTrack(t);
-						startPoseId += pSubmesh->m_pBlendShape->getPoses().size();
 					}
 				}
 			}
-			std::cout << "length: " << a.m_length << "\n";
-			std::cout << "num keyframes: " << a.m_tracks[0].m_vertexKeyframes.size() << "\n";
-			std::cout.flush();
-			m_BSClips.push_back(a);
+			if (a.m_tracks.size() > 0)
+			{
+				std::cout << "length: " << a.m_length << "\n";
+				std::cout << "num keyframes: " << a.m_tracks[0].m_vertexKeyframes.size() << "\n";
+				std::cout.flush();
+				m_BSClips.push_back(a);
+			}
+			else
+			{
+				std::cout << "no tracks exported: skipped. \n";
+				std::cout.flush();
+			}
 		}
 		return MS::kSuccess;
 	}
+
+
 /******************** Methods to parse geometry data from Maya ************************/
 	// Get uvsets info from the maya mesh
 	MStatus Mesh::getUVSets(const MDagPath& meshDag)
 	{
 		MFnMesh mesh(meshDag);
-		int i;
 		MStatus stat;
 		// Get uv texture coordinate sets' names
 		if (mesh.numUVSets() > 0)
@@ -413,7 +423,7 @@ namespace OgreMayaExporter
 			}
 		}
 		// Save uvsets info
-		for (i=m_uvsets.size(); i<newuvsets.length(); i++)
+		for (int i=m_uvsets.size(); i<newuvsets.length(); i++)
 		{
 			uvset uv;
 			uv.size = 2;
@@ -438,8 +448,7 @@ namespace OgreMayaExporter
 				MObject kObject = kDepNodeIt.item();
 				pSkinCluster = new MFnSkinCluster(kObject);
 				unsigned int uiNumGeometries = pSkinCluster->numOutputConnections();
-				unsigned int uiGeometry;
-				for(uiGeometry = 0; uiGeometry < uiNumGeometries; ++uiGeometry ) 
+				for(uint uiGeometry = 0; uiGeometry < uiNumGeometries; ++uiGeometry ) 
 				{
 					unsigned int uiIndex = pSkinCluster->indexForOutputConnection(uiGeometry);
 					MObject kOutputObject = pSkinCluster->outputShapeAtIndex(uiIndex);
@@ -539,13 +548,12 @@ namespace OgreMayaExporter
 	// Get vertex data
 	MStatus Mesh::getVertices(const MDagPath &meshDag, OgreMayaExporter::ParamList &params)
 	{
-		int i;
 		MFnMesh mesh(meshDag);
 		// prepare vertex table
 		newvertices.resize(mesh.numVertices());
 		newweights.resize(mesh.numVertices());
 		newjointIds.resize(mesh.numVertices());
-		for (i=0; i<newvertices.size(); i++)
+		for (int i=0; i<newvertices.size(); i++)
 		{
 			newvertices[i].pointIdx = -1;
 			newvertices[i].normalIdx = -1;
@@ -570,48 +578,16 @@ namespace OgreMayaExporter
 	// Get vertex bone assignements
 	MStatus Mesh::getVertexBoneWeights(const MDagPath& meshDag, OgreMayaExporter::ParamList &params)
 	{
-		int i,j,k;
 		unsigned int numWeights;
 		MStatus stat;
 		std::cout << "Get vbas\n";
 		std::cout.flush();
 		MItGeometry iterGeom(meshDag);
-		for (i=0; !iterGeom.isDone(); iterGeom.next(), i++)
+		for (int i=0; !iterGeom.isDone(); iterGeom.next(), i++)
 		{
 			MObject component = iterGeom.component();
 			MFloatArray vertexWeights;
 			stat=pSkinCluster->getWeights(meshDag,component,vertexWeights,numWeights);
-	/*		//normalize vertex weights
-			int widx;
-			// first, truncate the weights to given precision
-			long weightSum = 0;
-			for (widx=0; widx < vertexWeights.length(); widx++)
-			{
-				long w = (long) (((float)vertexWeights[widx]) / ((float)PRECISION));
-				vertexWeights[widx] = w;
-				weightSum += w;
-			}
-			// then divide by the sum of the weights to add up to 1 
-			// (if there is at least one weight > 0)
-			if (weightSum > 0)
-			{
-				float newSum = 0;
-				for (widx=0; widx < numWeights; widx++)
-				{
-					long w = (long) ((float)vertexWeights[widx] / ((float)PRECISION));
-					w = (long) (((float)w) / ((float)weightSum));
-					vertexWeights[widx] = (float) (((long)w) * ((float)PRECISION));
-					newSum += vertexWeights[widx];
-				}
-				if (newSum < 1.0f)
-					vertexWeights[numWeights-1] += PRECISION;
-			}
-			// else set all weights to 0
-			else
-			{
-				for (widx=0; widx < numWeights; widx++)
-					vertexWeights[widx] = 0;
-			}*/
 			// save the normalized weights
 			newweights[i]=vertexWeights;
 			if (MS::kSuccess != stat)
@@ -630,11 +606,11 @@ namespace OgreMayaExporter
 					std::cout.flush();
 				}
 				newjointIds[i].setLength(newweights[i].length());
-				for (j=0; j<influenceObjs.length(); j++)
+				for (int j=0; j<influenceObjs.length(); j++)
 				{
 					bool foundJoint = false;
 					MString partialPathName = influenceObjs[j].partialPathName(); 
-					for (k=0; k<m_pSkeleton->getJoints().size() && !foundJoint; k++)
+					for (int k=0; k<m_pSkeleton->getJoints().size() && !foundJoint; k++)
 					{
 						if (partialPathName == m_pSkeleton->getJoints()[k].name)
 						{
@@ -652,7 +628,6 @@ namespace OgreMayaExporter
 	// Get faces data
 	MStatus Mesh::getFaces(const MDagPath &meshDag, ParamList &params)
 	{
-		int i,j,k;
 		MStatus stat;
 		MFnMesh mesh(meshDag);
 		// create an iterator to go through mesh polygons
@@ -673,12 +648,11 @@ namespace OgreMayaExporter
 			for (; !faceIter.isDone(); faceIter.next())
 			{
 				int numTris=0;
-				int iTris;
 				bool different;
 				int vtxIdx, nrmIdx;
 				faceIter.numTriangles(numTris);
 				// for every triangle composing current polygon extract triangle info
-				for (iTris=0; iTris<numTris; iTris++)
+				for (int iTris=0; iTris<numTris; iTris++)
 				{
 					MPointArray triPoints;
 					MIntArray tempTriVertexIdx,triVertexIdx;
@@ -690,11 +664,10 @@ namespace OgreMayaExporter
 					// convert indices to face-relative indices
 					MIntArray polyIndices;
 					faceIter.getVertices(polyIndices);
-					unsigned int iPoly, iObj;
-					for (iObj=0; iObj < tempTriVertexIdx.length(); ++iObj)
+					for (uint iObj=0; iObj < tempTriVertexIdx.length(); ++iObj)
 					{
 						// iPoly is face-relative vertex index
-						for (iPoly=0; iPoly < polyIndices.length(); ++iPoly)
+						for (uint iPoly=0; iPoly < polyIndices.length(); ++iPoly)
 						{
 							if (tempTriVertexIdx[iObj] == polyIndices[iPoly]) 
 							{
@@ -704,7 +677,7 @@ namespace OgreMayaExporter
 						}
 					}
 					// iterate over triangle's vertices
-					for (i=0; i<3; i++)
+					for (int i=0; i<3; i++)
 					{
 						different = true;
 						vtxIdx = faceIter.vertexIndex(triVertexIdx[i],&stat);
@@ -767,18 +740,18 @@ namespace OgreMayaExporter
 							newvertices[vtxIdx].v.resize(newuvsets.length());
 							// save vbas
 							newvertices[vtxIdx].vba.resize(newweights[vtxIdx].length());
-							for (j=0; j<newweights[vtxIdx].length(); j++)
+							for (int j=0; j<newweights[vtxIdx].length(); j++)
 							{
 								newvertices[vtxIdx].vba[j] = (newweights[vtxIdx])[j];
 							}
 							// save joint ids
 							newvertices[vtxIdx].jointIds.resize(newjointIds[vtxIdx].length());
-							for (j=0; j<newjointIds[vtxIdx].length(); j++)
+							for (int j=0; j<newjointIds[vtxIdx].length(); j++)
 							{
 								newvertices[vtxIdx].jointIds[j] = (newjointIds[vtxIdx])[j];
 							}
 							// save uv sets data
-							for (j=0; j<newuvsets.length(); j++)
+							for (int j=0; j<newuvsets.length(); j++)
 							{
 								float2 uv;
 								stat = faceIter.getUV(triVertexIdx[i],uv,&newuvsets[j]);
@@ -798,7 +771,7 @@ namespace OgreMayaExporter
 						else	// already found at least 1 vertex in this position
 						{
 							// check if a vertex with same attributes has been saved already
-							for (k=vtxIdx; k!=-1 && different; k=newvertices[k].next)
+							for (int k=vtxIdx; k!=-1 && different; k=newvertices[k].next)
 							{
 								different = false;
 
@@ -820,7 +793,7 @@ namespace OgreMayaExporter
 
 								if (params.exportTexCoord)
 								{
-									for (j=0; j<newuvsets.length(); j++)
+									for (int j=0; j<newuvsets.length(); j++)
 									{
 										float2 uv;
 										stat = faceIter.getUV(triVertexIdx[i],uv,&newuvsets[j]);
@@ -854,20 +827,20 @@ namespace OgreMayaExporter
 								vtx.a = color.a;
 								// save vertex vba
 								vtx.vba.resize(newweights[vtxIdx].length());
-								for (j=0; j<newweights[vtxIdx].length(); j++)
+								for (int j=0; j<newweights[vtxIdx].length(); j++)
 								{
 									vtx.vba[j] = (newweights[vtxIdx])[j];
 								}
 								// save joint ids
 								vtx.jointIds.resize(newjointIds[vtxIdx].length());
-								for (j=0; j<newjointIds[vtxIdx].length(); j++)
+								for (int j=0; j<newjointIds[vtxIdx].length(); j++)
 								{
 									vtx.jointIds[j] = (newjointIds[vtxIdx])[j];
 								}
 								// save vertex texture coordinates
 								vtx.u.resize(newuvsets.length());
 								vtx.v.resize(newuvsets.length());
-								for (j=0; j<newuvsets.length(); j++)
+								for (int j=0; j<newuvsets.length(); j++)
 								{
 									float2 uv;
 									stat = faceIter.getUV(triVertexIdx[i],uv,&newuvsets[j]);
@@ -911,7 +884,6 @@ namespace OgreMayaExporter
 	// Build shared geometry
 	MStatus Mesh::buildSharedGeometry(const MDagPath &meshDag,ParamList& params)
 	{
-		int i,j,k;
 		std::cout << "Create list of shared vertices\n";
 		std::cout.flush();
 		// save a new entry in the shared geometry map: we associate the index of the first 
@@ -921,7 +893,7 @@ namespace OgreMayaExporter
 		di.dagPath = meshDag;
 		di.pBlendShape = pBlendShape;
 		// load shared vertices
-		for (i=0; i<newvertices.size(); i++)
+		for (int i=0; i<newvertices.size(); i++)
 		{
 			vertex v;
 			vertexInfo vInfo = newvertices[i];
@@ -963,7 +935,7 @@ namespace OgreMayaExporter
 			v.b = vInfo.b;
 			v.a = vInfo.a;
 			// save vertex bone assignements
-			for (k=0; k<vInfo.vba.size(); k++)
+			for (int k=0; k<vInfo.vba.size(); k++)
 			{
 				vba newVba;
 				newVba.jointIdx = vInfo.jointIds[k];
@@ -971,7 +943,7 @@ namespace OgreMayaExporter
 				v.vbas.push_back(newVba);
 			}
 			// save texture coordinates
-			for (k=0; k<vInfo.u.size(); k++)
+			for (int k=0; k<vInfo.u.size(); k++)
 			{
 				texcoord newTexCoords;
 				newTexCoords.u = vInfo.u[k];
@@ -985,10 +957,10 @@ namespace OgreMayaExporter
 			m_sharedGeom.vertices.push_back(v);
 		}
 		// Make sure all vertices have the same number of texture coordinates
-		for (i=0; i<m_sharedGeom.vertices.size(); i++)
+		for (int i=0; i<m_sharedGeom.vertices.size(); i++)
 		{
 			vertex* pV = &m_sharedGeom.vertices[i];
-			for (j=pV->texcoords.size(); j<m_uvsets.size(); j++)
+			for (int j=pV->texcoords.size(); j<m_uvsets.size(); j++)
 			{
 				texcoord newTexCoords;
 				newTexCoords.u = 0;
@@ -1009,22 +981,29 @@ namespace OgreMayaExporter
 	// Create submeshes
 	MStatus Mesh::createSubmeshes(const MDagPath& meshDag,ParamList& params)
 	{
-		int i;
 		MStatus stat;
 		MFnMesh mesh(meshDag);
-		for (i=0; i<shaders.length(); i++)
+		for (int i=0; i<shaders.length(); i++)
 		{
 			// check if the submesh has at least 1 triangle
 			if (polygonSets[i].size() > 0)
 			{
+				//create a name for the submesh
+				MString submesh_name = meshDag.partialPathName();
+				MFnDependencyNode shader_node(shaders[i]);
+				if (shaders.length()>1)
+				{
+					submesh_name += "_";
+					submesh_name += shader_node.name();
+				}
 				//create new submesh
-				Submesh* pSubmesh = new Submesh();
+				Submesh* pSubmesh = new Submesh(submesh_name);
 				//load linked shader
 				stat = pSubmesh->loadMaterial(shaders[i],newuvsets,params);
 				if (stat != MS::kSuccess)
 				{
 					MFnDependencyNode shadingGroup(shaders[i]);
-					std::cout << "Error loading submesh linked to shader " << shadingGroup.name().asChar() << "\n";
+					std::cout << "Error loading material for submesh: " << submesh_name.asChar() << "\n";
 					std::cout.flush();
 					return MS::kFailure;
 				}
@@ -1041,9 +1020,6 @@ namespace OgreMayaExporter
 		}
 		return MS::kSuccess;
 	}
-
-
-
 
 
 /******************** Methods to read vertex animations from Maya ************************/
@@ -1110,7 +1086,6 @@ namespace OgreMayaExporter
 	//load an animation track for the whole mesh (using shared geometry)
 	MStatus Mesh::loadMeshTrack(Animation& a,std::vector<float> &times, OgreMayaExporter::ParamList &params)
 	{
-		int i;
 		MStatus stat;
 		// create a new track
 		Track t;
@@ -1118,7 +1093,7 @@ namespace OgreMayaExporter
 		t.m_target = T_MESH;
 		t.m_vertexKeyframes.clear();
 		// get keyframes at given times
-		for (i=0; i<times.size(); i++)
+		for (int i=0; i<times.size(); i++)
 		{
 			//set time to wanted sample time
 			MAnimControl::setCurrentTime(MTime(times[i],MTime::kSeconds));
@@ -1140,11 +1115,10 @@ namespace OgreMayaExporter
 	//load all submesh animation tracks (one for each submesh)
 	MStatus Mesh::loadSubmeshTracks(Animation& a,std::vector<float> &times, OgreMayaExporter::ParamList &params)
 	{
-		int i,j;
 		MStatus stat;
 		// create a new track for each submesh
 		std::vector<Track> tracks;
-		for (i=0; i<m_submeshes.size(); i++)
+		for (int i=0; i<m_submeshes.size(); i++)
 		{
 			Track t;
 			t.m_type = TT_MORPH;
@@ -1154,12 +1128,12 @@ namespace OgreMayaExporter
 			tracks.push_back(t);
 		}
 		// get keyframes at given times
-		for (i=0; i<times.size(); i++)
+		for (int i=0; i<times.size(); i++)
 		{
 			//set time to wanted sample time
 			MAnimControl::setCurrentTime(MTime(times[i],MTime::kSeconds));
 			//load a keyframe for each submesh at current time
-			for (j=0; j<m_submeshes.size(); j++)
+			for (int j=0; j<m_submeshes.size(); j++)
 			{
 				stat = m_submeshes[j]->loadKeyframe(tracks[j],times[i]-times[0],params);
 				if (stat != MS::kSuccess)
@@ -1170,7 +1144,7 @@ namespace OgreMayaExporter
 			}
 		}
 		// add tracks to given animation
-		for (i=0; i< tracks.size(); i++)
+		for (int i=0; i< tracks.size(); i++)
 			a.addTrack(tracks[i]);
 		// track sucessfully loaded
 		return MS::kSuccess;
@@ -1181,12 +1155,11 @@ namespace OgreMayaExporter
 	// Load a keyframe for the whole mesh
 	MStatus Mesh::loadKeyframe(Track& t,float time,ParamList& params)
 	{
-		int i,j;
 		// create a new keyframe
 		vertexKeyframe k;
 		// set keyframe time
 		k.time = time;
-		for (i=0; i<m_sharedGeom.dagMap.size(); i++)
+		for (int i=0; i<m_sharedGeom.dagMap.size(); i++)
 		{
 			// get the mesh Fn
 			dagInfo di = m_sharedGeom.dagMap[i];
@@ -1198,7 +1171,7 @@ namespace OgreMayaExporter
 			else
 				mesh.getPoints(points,MSpace::kObject);
 			// calculate vertex offsets
-			for (j=0; j<di.numVertices; j++)
+			for (int j=0; j<di.numVertices; j++)
 			{
 				vertexPosition pos;
 				vertex v = m_sharedGeom.vertices[di.offset+j];
@@ -1225,7 +1198,6 @@ namespace OgreMayaExporter
 	MStatus Mesh::writeOgreBinary(ParamList &params)
 	{
 		MStatus stat;
-		int i;
 		// If no mesh have been exported, skip mesh creation
 		if (m_submeshes.size() <= 0)
 		{
@@ -1242,7 +1214,7 @@ namespace OgreMayaExporter
 			createOgreSharedGeometry(pMesh,params);
 		}
 		// Write submeshes data
-		for (i=0; i<m_submeshes.size(); i++)
+		for (int i=0; i<m_submeshes.size(); i++)
 		{
 			m_submeshes[i]->createOgreSubmesh(pMesh,params);
 		}
@@ -1271,7 +1243,7 @@ namespace OgreMayaExporter
 		}
 		// Create a bounding box for the mesh
 		Ogre::AxisAlignedBox bbox = pMesh->getBounds();
-		for(i=0; i<m_submeshes.size(); i++)
+		for(int i=0; i<m_submeshes.size(); i++)
 		{
 			MPoint min1 = m_submeshes[i]->m_boundingBox.min();
 			MPoint max1 = m_submeshes[i]->m_boundingBox.max();
@@ -1314,7 +1286,6 @@ namespace OgreMayaExporter
 	// Create shared geometry data for an Ogre mesh
 	MStatus Mesh::createOgreSharedGeometry(Ogre::MeshPtr pMesh,ParamList& params)
 	{
-		int i,j;
 		MStatus stat;
 		pMesh->sharedVertexData = new Ogre::VertexData();
 		pMesh->sharedVertexData->vertexCount = m_sharedGeom.vertices.size();
@@ -1339,7 +1310,7 @@ namespace OgreMayaExporter
             offset += Ogre::VertexElement::getTypeSize(Ogre::VET_COLOUR);
 		}
 		// Add texture coordinates
-		for (i=0; i<m_sharedGeom.vertices[0].texcoords.size(); i++)
+		for (int i=0; i<m_sharedGeom.vertices[0].texcoords.size(); i++)
 		{
 			Ogre::VertexElementType uvType = Ogre::VertexElement::multiplyTypeCount(Ogre::VET_FLOAT1, 2);
 			pDecl->addElement(buf, offset, uvType, Ogre::VES_TEXTURE_COORDINATES, i);
@@ -1355,11 +1326,11 @@ namespace OgreMayaExporter
 			// Create a new vertex bone assignements list
 			Ogre::Mesh::VertexBoneAssignmentList vbas;
 			// Scan list of shared geometry vertices
-			for (i=0; i<m_sharedGeom.vertices.size(); i++)
+			for (int i=0; i<m_sharedGeom.vertices.size(); i++)
 			{
 				vertex v = m_sharedGeom.vertices[i];
 				// Add all bone assignements for every vertex to the bone assignements list
-				for (j=0; j<v.vbas.size(); j++)
+				for (int j=0; j<v.vbas.size(); j++)
 				{
 					Ogre::VertexBoneAssignment vba;
 					vba.vertexIndex = i;
@@ -1401,10 +1372,9 @@ namespace OgreMayaExporter
 		float* pFloat;
 		Ogre::RGBA* pRGBA;
 		// Fill the vertex buffer with shared geometry data
-		long vi;
 		Ogre::ColourValue col;
 		float ucoord, vcoord;
-		for (vi=0; vi<vertices.size(); vi++)
+		for (long vi=0; vi<vertices.size(); vi++)
 		{
 			int iTexCoord = 0;
 			vertex v = vertices[vi];
@@ -1451,34 +1421,42 @@ namespace OgreMayaExporter
 	// Create mesh poses for an Ogre mesh
 	MStatus Mesh::createOgrePoses(Ogre::MeshPtr pMesh,ParamList& params)
 	{
-		int i,j,k;
+		int poseCounter = 0;
 		if (params.useSharedGeom)
 		{
+			// Create an entry in the submesh pose remapping table for the shared geometry
+			submeshPoseRemapping new_sbr;
+			m_poseRemapping.insert(std::pair<int,submeshPoseRemapping>(0,new_sbr));
+			submeshPoseRemapping& sbr = m_poseRemapping.find(0)->second;
 			// Read poses associated from all blendshapes associated to the shared geometry
-			for (i=0; i<m_sharedGeom.dagMap.size(); i++)
+			for (int i=0; i<m_sharedGeom.dagMap.size(); i++)
 			{
 				BlendShape* pBS = m_sharedGeom.dagMap[i].pBlendShape;
 				// Check if we have a blend shape associated to this subset of the shared geometry
 				if (pBS)
 				{
 					// Get all poses from current blend shape deformer
-					for (j=0; j<pBS->getPoses().size(); j++)
+					poseGroup& pg = pBS->getPoseGroups().find(0)->second;
+					for (int j=0; j<pg.poses.size(); j++)
 					{
 						// Get the pose
-						pose* p = &(pBS->getPoses()[j]);
+						pose* p = &(pg.poses[j]);
 						if (p->name == "")
 						{
 							p->name = "pose";
-							p->name += j;
+							p->name += poseCounter;
 						}
 						// Create a new pose for the ogre mesh
 						Ogre::Pose* pPose = pMesh->createPose(0,p->name.asChar());
 						// Set the pose attributes
-						for (k=0; k<p->offsets.size(); k++)
+						for (int k=0; k<p->offsets.size(); k++)
 						{
 							Ogre::Vector3 offset(p->offsets[k].x,p->offsets[k].y,p->offsets[k].z);
 							pPose->addVertex(p->offsets[k].index,offset);
 						}
+						// Add a pose remapping for current pose
+						sbr.insert(std::pair<int,int>(poseCounter,poseCounter));
+						poseCounter++;
 					}
 				}
 			}
@@ -1486,30 +1464,40 @@ namespace OgreMayaExporter
 		else
 		{
 			// Get poses associated to the submeshes
-			for (i=0; i<m_submeshes.size(); i++)
+			for (int i=0; i<m_submeshes.size(); i++)
 			{
 				BlendShape* pBS = m_submeshes[i]->m_pBlendShape;
 				// Check if this submesh has a blend shape deformer associated
 				if (pBS)
 				{
-					// Get all poses from current blend shape deformer
-					for (j=0; j<pBS->getPoses().size(); j++)
+					// Create an entry in the submesh pose remapping table for this submesh
+					submeshPoseRemapping new_sbr;
+					m_poseRemapping.insert(std::pair<int,submeshPoseRemapping>(i+1,new_sbr));
+					submeshPoseRemapping& sbr = m_poseRemapping.find(i+1)->second;
+					// Get the pose group corresponding to the current submesh
+					poseGroup& pg = pBS->getPoseGroups().find(i+1)->second;
+					// Get all poses from current blend shape deformer and current pose group
+					for (int j=0; j<pg.poses.size(); j++)
 					{
 						// Get the pose
-						pose* p = &(pBS->getPoses()[j]);
+						pose* p = &(pg.poses[j]);
 						if (p->name == "")
 						{
 							p->name = "pose";
-							p->name += j;
+							p->name += poseCounter;
 						}
 						// Create a new pose for the ogre mesh
 						Ogre::Pose* pPose = pMesh->createPose(p->index,p->name.asChar());
 						// Set the pose attributes
-						for (k=0; k<p->offsets.size(); k++)
+						for (int k=0; k<p->offsets.size(); k++)
 						{
 							Ogre::Vector3 offset(p->offsets[k].x,p->offsets[k].y,p->offsets[k].z);
 							pPose->addVertex(p->offsets[k].index,offset);
 						}
+						// Add a pose remapping for current pose
+						sbr.insert(std::pair<int,int>(j,poseCounter));
+						
+						poseCounter++;
 					}
 				}
 			}
@@ -1519,16 +1507,13 @@ namespace OgreMayaExporter
 	// Create vertex animations for an Ogre mesh
 	MStatus Mesh::createOgreVertexAnimations(Ogre::MeshPtr pMesh,ParamList& params)
 	{
-		int i,j,k;
-		std::cout << "pippo\n";
-		std::cout.flush();
 		// Read the list of vertex animation clips
-		for (i=0; i<m_vertexClips.size(); i++)
+		for (int i=0; i<m_vertexClips.size(); i++)
 		{
 			// Create a new animation
 			Ogre::Animation* pAnimation = pMesh->createAnimation(m_vertexClips[i].m_name.asChar(),m_vertexClips[i].m_length);
 			// Create all tracks for current animation
-			for (j=0; j<m_vertexClips[i].m_tracks.size(); j++)
+			for (int j=0; j<m_vertexClips[i].m_tracks.size(); j++)
 			{
 				Track* t = &(m_vertexClips[i].m_tracks[j]);
 				// Create a new track
@@ -1541,7 +1526,7 @@ namespace OgreMayaExporter
 						Ogre::VAT_MORPH);
 				}
 				// Create keyframes for current track
-				for (k=0; k<t->m_vertexKeyframes.size(); k++)
+				for (int k=0; k<t->m_vertexKeyframes.size(); k++)
 				{
 					// Create a new keyframe
 					Ogre::VertexMorphKeyFrame* pKeyframe = pTrack->createVertexMorphKeyFrame(t->m_vertexKeyframes[k].time);
@@ -1552,9 +1537,8 @@ namespace OgreMayaExporter
 						Ogre::HardwareBuffer::HBU_STATIC, true);
 					float* pFloat = static_cast<float*>(pBuffer->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 					// Fill the vertex buffer with vertex positions
-					int vi;
 					std::vector<vertexPosition>& positions = t->m_vertexKeyframes[k].positions;
-					for (vi=0; vi<positions.size(); vi++)
+					for (int vi=0; vi<positions.size(); vi++)
 					{
 						*pFloat++ = static_cast<float>(positions[vi].x);
 						*pFloat++ = static_cast<float>(positions[vi].y);
@@ -1572,14 +1556,13 @@ namespace OgreMayaExporter
 	// Create pose animations for an Ogre mesh
 	MStatus Mesh::createOgrePoseAnimations(Ogre::MeshPtr pMesh,ParamList& params)
 	{
-		int i,j,k;
 		// Get all loaded blend shape clips
-		for (i=0; i<m_BSClips.size(); i++)
+		for (int i=0; i<m_BSClips.size(); i++)
 		{
 			// Create a new animation for each clip
 			Ogre::Animation* pAnimation = pMesh->createAnimation(m_BSClips[i].m_name.asChar(),m_BSClips[i].m_length);
 			// Create animation tracks for this animation
-			for (j=0; j<m_BSClips[i].m_tracks.size(); j++)
+			for (int j=0; j<m_BSClips[i].m_tracks.size(); j++)
 			{
 				Track* t = &m_BSClips[i].m_tracks[j];
 				// Create a new track
@@ -1588,18 +1571,19 @@ namespace OgreMayaExporter
 					pTrack = pAnimation->createVertexTrack(0,pMesh->sharedVertexData,Ogre::VAT_POSE);
 				else
 				{
-					pTrack = pAnimation->createVertexTrack(t->m_index+1,pMesh->getSubMesh(t->m_index)->vertexData,
+					pTrack = pAnimation->createVertexTrack(t->m_index,pMesh->getSubMesh(t->m_index-1)->vertexData,
 						Ogre::VAT_POSE);
 				}
 				// Create keyframes for current track
-				for (k=0; k<t->m_vertexKeyframes.size(); k++)
+				for (int k=0; k<t->m_vertexKeyframes.size(); k++)
 				{
 					Ogre::VertexPoseKeyFrame* pKeyframe = pTrack->createVertexPoseKeyFrame(t->m_vertexKeyframes[k].time);
-					int pri;
-					for (pri=0; pri<t->m_vertexKeyframes[k].poserefs.size(); pri++)
+					for (int pri=0; pri<t->m_vertexKeyframes[k].poserefs.size(); pri++)
 					{
 						vertexPoseRef* pr = &t->m_vertexKeyframes[k].poserefs[pri];
-						pKeyframe->addPoseReference(pr->poseIndex,pr->poseWeight);
+						// Get the correct absolute index of the pose from the remapping
+						int poseIndex = m_poseRemapping.find(t->m_index)->second.find(pr->poseIndex)->second;
+						pKeyframe->addPoseReference(poseIndex,pr->poseWeight);
 					}
 				}
 			}

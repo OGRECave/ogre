@@ -1,9 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // submesh.cpp
-// Author     : Francesco Giordana
-// Start Date : January 13, 2005
-// Copyright  : (C) 2006 by Francesco Giordana
-// Email      : fra.giordana@tiscali.it
+// Author       : Francesco Giordana
+// Sponsored by : Anygma N.V. (http://www.nazooka.com)
+// Start Date   : January 13, 2005
+// Copyright    : (C) 2006 by Francesco Giordana
+// Email        : fra.giordana@tiscali.it
 ////////////////////////////////////////////////////////////////////////////////
 
 /*********************************************************************************
@@ -40,12 +41,11 @@ namespace OgreMayaExporter
 		m_name = "";
 		m_numTriangles = 0;
 		m_pMaterial = NULL;
+		m_indices.clear();
 		m_vertices.clear();
 		m_faces.clear();
 		m_uvsets.clear();
 		m_use32bitIndexes = false;
-		if (m_pBlendShape)
-			delete m_pBlendShape;
 		m_pBlendShape = NULL;
 	}
 
@@ -70,7 +70,6 @@ namespace OgreMayaExporter
 /***** load data *****/
 	MStatus Submesh::loadMaterial(MObject& shader,MStringArray& uvsets,ParamList& params)
 	{
-		int i;
 		MPlug plug;
 		MPlugArray srcplugarray;
 		bool foundShader = false;
@@ -80,7 +79,7 @@ namespace OgreMayaExporter
 		MFnDependencyNode shadingGroup(shader);
 		plug = shadingGroup.findPlug("surfaceShader");
 		plug.connectedTo(srcplugarray,true,false,&stat);
-		for (i=0; i<srcplugarray.length() && !foundShader; i++)
+		for (int i=0; i<srcplugarray.length() && !foundShader; i++)
 		{
 			if (srcplugarray[i].node().hasFn(MFn::kLambert) || srcplugarray[i].node().hasFn(MFn::kSurfaceShader) || 
 				srcplugarray[i].node().hasFn(MFn::kPluginHwShaderNode) )
@@ -102,7 +101,7 @@ namespace OgreMayaExporter
 			MStringArray tmpStrArray;
 			tmpStr.split(':',tmpStrArray);
 			MString name = "";
-			for (i=0; i<tmpStrArray.length(); i++)
+			for (int i=0; i<tmpStrArray.length(); i++)
 			{
 				name += tmpStrArray[i];
 				if (i < tmpStrArray.length()-1)
@@ -141,21 +140,24 @@ namespace OgreMayaExporter
 		m_dagPath = dag;
 		//create the mesh Fn
 		MFnMesh mesh(dag);
-		int i,j,k;
-		std::cout << "Loading submesh associated to material: " << m_pMaterial->name().asChar() << "...";
+		std::cout << "Loading submesh : " << m_name.asChar() << "...";
 		std::cout.flush();
 		//save uvsets info
-		for (i=m_uvsets.size(); i<texcoordsets.length(); i++)
+		for (int i=m_uvsets.size(); i<texcoordsets.length(); i++)
 		{
 			uvset uv;
 			uv.size = 2;
 			m_uvsets.push_back(uv);
 		}
 		//iterate over faces array, to retrieve vertices info
-		for (i=0; i<faces.size(); i++)
+		std::vector<int> vtx_mapping;
+		vtx_mapping.resize(vertInfo.size());
+		for (int i=0; i<vtx_mapping.size(); i++)
+			vtx_mapping[i] = -1;
+		for (int i=0; i<faces.size(); i++)
 		{
 			face newFace;
-			// if we are using shared geometry, indexes refer to the vertex buffer of the whole mesh
+			// If we are using shared geometry, indexes refer to the vertex buffer of the whole mesh
 			if (params.useSharedGeom)
 			{
 				if(opposite)
@@ -171,78 +173,100 @@ namespace OgreMayaExporter
 					newFace.v[2] = faces[i].v[2];
 				}
 			}
-			// otherwise we create a vertex buffer for this submesh
+			// Otherwise we create a vertex buffer for this submesh.
+			// First we create a list of the vertices that we need for this submesh
+			// then we get the vertex info for those vertices.
+			// The indices are stored in a set so we don't get duplicates
 			else
 			{	// faces are triangles, so retrieve index of the three vertices
-				for (j=0; j<3; j++)
+				for (int j=0; j<3; j++)
 				{
-					vertex v;
-					vertexInfo vInfo = vertInfo[faces[i].v[j]];
-					// save vertex coordinates (rescale to desired length unit)
-					MPoint point = points[vInfo.pointIdx] * params.lum;
-					if (fabs(point.x) < PRECISION)
-						point.x = 0;
-					if (fabs(point.y) < PRECISION)
-						point.y = 0;
-					if (fabs(point.z) < PRECISION)
-						point.z = 0;
-					v.x = point.x;
-					v.y = point.y;
-					v.z = point.z;
-					// save vertex normal
-					MFloatVector normal = normals[vInfo.normalIdx];
-					if (fabs(normal.x) < PRECISION)
-						normal.x = 0;
-					if (fabs(normal.y) < PRECISION)
-						normal.y = 0;
-					if (fabs(normal.z) < PRECISION)
-						normal.z = 0;
-					if (opposite)
+					long new_idx;
+					// Store the vertex index, if it hasn't already been stored in the set
+					long idx = faces[i].v[j];
+					if (vtx_mapping[idx] == -1)
 					{
-						v.n.x = -normal.x;
-						v.n.y = -normal.y;
-						v.n.z = -normal.z;
+						m_indices.push_back(idx);
+						new_idx = m_indices.size() - 1;
+						vtx_mapping[idx] = new_idx;
 					}
 					else
-					{
-						v.n.x = normal.x;
-						v.n.y = normal.y;
-						v.n.z = normal.z;
-					}
-					v.n.normalize();
-					// save vertex color
-					v.r = vInfo.r;
-					v.g = vInfo.g;
-					v.b = vInfo.b;
-					v.a = vInfo.a;
-					// save vertex bone assignements
-					for (k=0; k<vInfo.vba.size(); k++)
-					{
-						vba newVba;
-						newVba.jointIdx = vInfo.jointIds[k];
-						newVba.weight = vInfo.vba[k];
-						v.vbas.push_back(newVba);
-					}
-					// save texture coordinates
-					for (k=0; k<vInfo.u.size(); k++)
-					{
-						texcoord newTexCoords;
-						newTexCoords.u = vInfo.u[k];
-						newTexCoords.v = vInfo.v[k];
-						newTexCoords.w = 0;
-						v.texcoords.push_back(newTexCoords);
-					}
-					// save vertex index in maya mesh, to retrieve future positions of the same vertex
-					v.index = vInfo.pointIdx;
-					// add newly created vertex to vertex list
-					m_vertices.push_back(v);
+						new_idx = vtx_mapping[idx];
+					// Save the index in the set to the face info
 					if (opposite)	// reverse order of face vertices to get correct culling
-						newFace.v[2-j] = m_vertices.size() - 1;
+						newFace.v[2-j] = new_idx;
 					else
-						newFace.v[j] = m_vertices.size() - 1;
+						newFace.v[j] = new_idx;
 				}
 			}
 			m_faces.push_back(newFace);
+		}
+		// Get the vertices info (if there are vertices to store in this submesh)
+		for (int i=0; i<m_indices.size(); i++)
+		{
+			long vtx_idx = m_indices[i];
+			vertex v;
+			// get the vertex info
+			vertexInfo vInfo = vertInfo[vtx_idx];
+			// save vertex coordinates (rescale to desired length unit)
+			MPoint point = points[vInfo.pointIdx] * params.lum;
+			if (fabs(point.x) < PRECISION)
+				point.x = 0;
+			if (fabs(point.y) < PRECISION)
+				point.y = 0;
+			if (fabs(point.z) < PRECISION)
+				point.z = 0;
+			v.x = point.x;
+			v.y = point.y;
+			v.z = point.z;
+			// save vertex normal
+			MFloatVector normal = normals[vInfo.normalIdx];
+			if (fabs(normal.x) < PRECISION)
+				normal.x = 0;
+			if (fabs(normal.y) < PRECISION)
+				normal.y = 0;
+			if (fabs(normal.z) < PRECISION)
+				normal.z = 0;
+			if (opposite)
+			{
+				v.n.x = -normal.x;
+				v.n.y = -normal.y;
+				v.n.z = -normal.z;
+			}
+			else
+			{
+				v.n.x = normal.x;
+				v.n.y = normal.y;
+				v.n.z = normal.z;
+			}
+			v.n.normalize();
+			// save vertex color
+			v.r = vInfo.r;
+			v.g = vInfo.g;
+			v.b = vInfo.b;
+			v.a = vInfo.a;
+			// save vertex bone assignements
+			for (int k=0; k<vInfo.vba.size(); k++)
+			{
+				vba newVba;
+				newVba.jointIdx = vInfo.jointIds[k];
+				newVba.weight = vInfo.vba[k];
+				if (newVba.weight > PRECISION)
+					v.vbas.push_back(newVba);
+			}
+			// save texture coordinates
+			for (int k=0; k<vInfo.u.size(); k++)
+			{
+				texcoord newTexCoords;
+				newTexCoords.u = vInfo.u[k];
+				newTexCoords.v = vInfo.v[k];
+				newTexCoords.w = 0;
+				v.texcoords.push_back(newTexCoords);
+			}
+			// save vertex index in maya mesh, to retrieve future positions of the same vertex
+			v.index = vInfo.pointIdx;
+			// add newly created vertex to vertex list
+			m_vertices.push_back(v);
 		}
 		// set use32bitIndexes flag
 		if (params.useSharedGeom || (m_vertices.size() > 65535) || (m_faces.size() > 65535))
@@ -271,7 +295,6 @@ namespace OgreMayaExporter
 	// Load a keyframe for this submesh
 	MStatus Submesh::loadKeyframe(Track& t,float time,ParamList& params)
 	{
-		int i;
 		// create a new keyframe
 		vertexKeyframe k;
 		// set keyframe time
@@ -285,7 +308,7 @@ namespace OgreMayaExporter
 		else
 			mesh.getPoints(points,MSpace::kObject);
 		// calculate vertex offsets
-		for (i=0; i<m_vertices.size(); i++)
+		for (int i=0; i<m_vertices.size(); i++)
 		{
 			vertexPosition pos;
 			vertex v = m_vertices[i];
@@ -325,7 +348,6 @@ namespace OgreMayaExporter
 	// Write submesh data to an Ogre compatible mesh
 	MStatus Submesh::createOgreSubmesh(Ogre::MeshPtr pMesh,const ParamList& params)
 	{
-		int i,j;
 		MStatus stat;
 		// Create a new submesh
 		Ogre::SubMesh* pSubmesh;
@@ -359,7 +381,7 @@ namespace OgreMayaExporter
         {
 			Ogre::uint32* pIdx = static_cast<Ogre::uint32*>(
 				pSubmesh->indexData->indexBuffer->lock(Ogre::HardwareBuffer::HBL_DISCARD));
-			for (i=0; i<m_faces.size(); i++)
+			for (int i=0; i<m_faces.size(); i++)
 			{
 				*pIdx++ = static_cast<Ogre::uint32>(m_faces[i].v[0]);
 				*pIdx++ = static_cast<Ogre::uint32>(m_faces[i].v[1]);
@@ -371,7 +393,7 @@ namespace OgreMayaExporter
         {
             Ogre::uint16* pIdx = static_cast<Ogre::uint16*>(
 				pSubmesh->indexData->indexBuffer->lock(Ogre::HardwareBuffer::HBL_DISCARD));
-            for (i=0; i<m_faces.size(); i++)
+            for (int i=0; i<m_faces.size(); i++)
 			{
 				*pIdx++ = static_cast<Ogre::uint16>(m_faces[i].v[0]);
 				*pIdx++ = static_cast<Ogre::uint16>(m_faces[i].v[1]);
@@ -401,7 +423,7 @@ namespace OgreMayaExporter
 				offset += Ogre::VertexElement::getTypeSize(Ogre::VET_COLOUR);
 			}
 			// Add texture coordinates
-			for (i=0; i<m_vertices[0].texcoords.size(); i++)
+			for (int i=0; i<m_vertices[0].texcoords.size(); i++)
 			{
 				Ogre::VertexElementType uvType = Ogre::VertexElement::multiplyTypeCount(Ogre::VET_FLOAT1, 2);
 				pDecl->addElement(buf, offset, uvType, Ogre::VES_TEXTURE_COORDINATES, i);
@@ -417,11 +439,11 @@ namespace OgreMayaExporter
 				// Create a new vertex bone assignements list
 				Ogre::SubMesh::VertexBoneAssignmentList vbas;
 				// Scan list of shared geometry vertices
-				for (i=0; i<m_vertices.size(); i++)
+				for (int i=0; i<m_vertices.size(); i++)
 				{
 					vertex v = m_vertices[i];
 					// Add all bone assignemnts for every vertex to the bone assignements list
-					for (j=0; j<v.vbas.size(); j++)
+					for (int j=0; j<v.vbas.size(); j++)
 					{
 						Ogre::VertexBoneAssignment vba;
 						vba.vertexIndex = i;
@@ -461,10 +483,9 @@ namespace OgreMayaExporter
 		float* pFloat;
 		Ogre::RGBA* pRGBA;
 		// Fill the vertex buffer with shared geometry data
-		long vi;
 		Ogre::ColourValue col;
 		float ucoord, vcoord;
-		for (vi=0; vi<vertices.size(); vi++)
+		for (long vi=0; vi<vertices.size(); vi++)
 		{
 			int iTexCoord = 0;
 			vertex v = vertices[vi];

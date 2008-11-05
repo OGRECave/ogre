@@ -1,9 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // paramlist.cpp
-// Author     : Francesco Giordana
-// Start Date : January 13, 2005
-// Copyright  : (C) 2006 by Francesco Giordana
-// Email      : fra.giordana@tiscali.it
+// Author       : Francesco Giordana
+// Sponsored by : Anygma N.V. (http://www.nazooka.com)
+// Start Date   : January 13, 2005
+// Copyright    : (C) 2006 by Francesco Giordana
+// Email        : fra.giordana@tiscali.it
 ////////////////////////////////////////////////////////////////////////////////
 
 /*********************************************************************************
@@ -26,7 +27,7 @@ namespace OgreMayaExporter
 	{
 		MStatus stat;
 		// Parse arguments from command line
-		for (unsigned int i = 0; i < args.length(); i++ )
+		for (uint i=0; i < args.length(); i++ )
 		{
 			if ((MString("-all") == args.asString(i,&stat)) && (MS::kSuccess == stat))
 				exportAll = true;
@@ -190,9 +191,8 @@ namespace OgreMayaExporter
 				//get clip name
 				MString clipName = args.asString(++i,&stat);
 				//check if name is unique, otherwise skip the clip
-				int k;
 				bool uniqueName = true;
-				for (k=0; k<skelClipList.size() && uniqueName; k++)
+				for (int k=0; k<skelClipList.size() && uniqueName; k++)
 				{
 					if (clipName == skelClipList[k].name)
 						uniqueName = false;
@@ -265,9 +265,8 @@ namespace OgreMayaExporter
 				//get clip name
 				MString clipName = args.asString(++i,&stat);
 				//check if name is unique, otherwise skip the clip
-				int k;
 				bool uniqueName = true;
-				for (k=0; k<BSClipList.size() && uniqueName; k++)
+				for (int k=0; k<BSClipList.size() && uniqueName; k++)
 				{
 					if (clipName == BSClipList[k].name)
 						uniqueName = false;
@@ -340,9 +339,8 @@ namespace OgreMayaExporter
 				//get clip name
 				MString clipName = args.asString(++i,&stat);
 				//check if name is unique, otherwise skip the clip
-				int k;
 				bool uniqueName = true;
-				for (k=0; k<vertClipList.size() && uniqueName; k++)
+				for (int k=0; k<vertClipList.size() && uniqueName; k++)
 				{
 					if (clipName == vertClipList[k].name)
 						uniqueName = false;

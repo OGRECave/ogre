@@ -1,9 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // mayaExportLayer.h
-// Author     : Francesco Giordana
-// Start Date : January 13, 2005
-// Copyright  : (C) 2006 by Francesco Giordana
-// Email      : fra.giordana@tiscali.it
+// Author       : Francesco Giordana
+// Sponsored by : Anygma N.V. (http://www.nazooka.com)
+// Start Date   : January 13, 2005
+// Copyright    : (C) 2006 by Francesco Giordana
+// Email        : fra.giordana@tiscali.it
 ////////////////////////////////////////////////////////////////////////////////
 
 /*********************************************************************************
@@ -26,7 +27,12 @@
 #include <set>
 #include <cassert>
 #include <fstream>
-//#include <iostream>
+
+#ifdef MAC_PLUGIN
+	#include <ext/hash_map>
+#else
+	#include <hash_map>
+#endif
 
 // Maya API
 #include <maya/MAngle.h>

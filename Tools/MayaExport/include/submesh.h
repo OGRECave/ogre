@@ -1,9 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // submesh.h
-// Author     : Francesco Giordana
-// Start Date : January 13, 2005
-// Copyright  : (C) 2006 by Francesco Giordana
-// Email      : fra.giordana@tiscali.it
+// Author       : Francesco Giordana
+// Sponsored by : Anygma N.V. (http://www.nazooka.com)
+// Start Date   : January 13, 2005
+// Copyright    : (C) 2006 by Francesco Giordana
+// Email        : fra.giordana@tiscali.it
 ////////////////////////////////////////////////////////////////////////////////
 
 /*********************************************************************************
@@ -60,6 +61,7 @@ namespace OgreMayaExporter
 		Material* m_pMaterial;
 		long m_numTriangles;
 		long m_numVertices;
+		std::vector<long> m_indices;
 		std::vector<vertex> m_vertices;
 		std::vector<face> m_faces;
 		std::vector<uvset> m_uvsets;
