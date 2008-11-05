@@ -180,7 +180,7 @@ Section -Binaries
   File ".\samples\resources.cfg"
   File "..\..\Samples\Common\bin\Debug\plugins.cfg"
   File "..\..\Samples\Common\bin\Debug\media.cfg"
-  File "..\..\Samples\Common\bin\Debug\quake3settings.cfg"
+  File "..\..\Samples\Common\bin\quake3settings.cfg"
   ; Binaries - release
   SetOutPath "$INSTDIR\bin\release"
   SetOverwrite ifnewer
@@ -210,7 +210,7 @@ Section -Binaries
   File ".\samples\resources.cfg"
   File "..\..\Samples\Common\bin\Release\plugins.cfg"
   File "..\..\Samples\Common\bin\Release\media.cfg"
-  File "..\..\Samples\Common\bin\Release\quake3settings.cfg"
+  File "..\..\Samples\Common\bin\quake3settings.cfg"
 
 SectionEnd
 
