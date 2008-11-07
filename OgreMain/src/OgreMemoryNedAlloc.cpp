@@ -57,6 +57,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void NedAllocImpl::deallocBytes(void* ptr)
 	{
+		// deal with null
+		if (!ptr)
+			return;
 #if OGRE_MEMORY_TRACKER
 		MemoryTracker::get()._recordDealloc(ptr);
 #endif
@@ -81,6 +84,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void NedAllocImpl::deallocBytesAligned(size_t align, void* ptr)
 	{
+		// deal with null
+		if (!ptr)
+			return;
 #if OGRE_MEMORY_TRACKER
 		// this alloc policy doesn't do pools (yet, ned can do it)
 		MemoryTracker::get()._recordDealloc(ptr);
