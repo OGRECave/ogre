@@ -90,6 +90,9 @@ namespace Ogre
 		*/
 		PCZCamera::Visibility getVisibility( const AxisAlignedBox &bound );
 
+		/// Sets the type of projection to use (orthographic or perspective).
+		void setProjectionType(ProjectionType pt);
+
         /* Update function (currently used for making sure the origin stuff for the
            extra culling frustum is up to date */
         void update(void);

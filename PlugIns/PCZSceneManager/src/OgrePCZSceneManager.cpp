@@ -52,6 +52,7 @@ namespace Ogre
     PCZSceneManager::PCZSceneManager(const String& name) : SceneManager(name)
     {
         mDefaultZone = 0;
+		mActiveCameraZone = 0;
 		mZoneFactoryManager = 0;
         mShowPortals = false;
 		mDefaultZoneTypeName = "ZoneType_Default";
@@ -924,119 +925,167 @@ namespace Ogre
 	{
 		destroyAllMovableObjectsByType(PCZLightFactory::FACTORY_TYPE_NAME);
 	}
-    //---------------------------------------------------------------------
-    void PCZSceneManager::findLightsAffectingFrustum(const Camera* camera)
-    {
-        // Similar to the basic SceneManager, we iterate through
-        // lights to see which ones affect the frustum.  However,
-        // since we have camera & lights partitioned by zones,
-        // we can check only those lights which either affect the
-        // zone the camera is in, or affect zones which are visible to
-        // the camera
+	//---------------------------------------------------------------------
+	void PCZSceneManager::findLightsAffectingFrustum(const Camera* camera)
+	{
+		// Similar to the basic SceneManager, we iterate through
+		// lights to see which ones affect the frustum.  However,
+		// since we have camera & lights partitioned by zones,
+		// we can check only those lights which either affect the
+		// zone the camera is in, or affect zones which are visible to
+		// the camera
 
-        MovableObjectCollection* lights =
-            getMovableObjectCollection(PCZLightFactory::FACTORY_TYPE_NAME);
+		MovableObjectCollection* lights =
+			getMovableObjectCollection(PCZLightFactory::FACTORY_TYPE_NAME);
 
 
-	    {
-		    OGRE_LOCK_MUTEX(lights->mutex)
+		{
+			OGRE_LOCK_MUTEX(lights->mutex)
 
-		    // Pre-allocate memory
-		    mTestLightInfos.clear();
-		    mTestLightInfos.reserve(lights->map.size());
+			// Pre-allocate memory
+			mTestLightInfos.clear();
+			mTestLightInfos.reserve(lights->map.size());
 
-		    MovableObjectIterator it(lights->map.begin(), lights->map.end());
+			MovableObjectIterator it(lights->map.begin(), lights->map.end());
 
-		    while(it.hasMoreElements())
-		    {
-			    PCZLight* l = static_cast<PCZLight*>(it.getNext());
+			while(it.hasMoreElements())
+			{
+				PCZLight* l = static_cast<PCZLight*>(it.getNext());
+				if (l->isVisible() &&
+					l->affectsVisibleZone())
+				{
+					LightInfo lightInfo;
+					lightInfo.light = l;
+					lightInfo.type = l->getType();
+					if (lightInfo.type == Light::LT_DIRECTIONAL)
+					{
+						// Always visible
+						lightInfo.position = Vector3::ZERO;
+						lightInfo.range = 0;
+						mTestLightInfos.push_back(lightInfo);
+					}
+					else
+					{
+						// NB treating spotlight as point for simplicity
+						// Just see if the lights attenuation range is within the frustum
+						lightInfo.range = l->getAttenuationRange();
+						lightInfo.position = l->getDerivedPosition();
+						Sphere sphere(lightInfo.position, lightInfo.range);
+						if (camera->isVisible(sphere))
+						{
+							mTestLightInfos.push_back(lightInfo);
+						}
+					}
+				}
+			}
+		} // release lock on lights collection
 
-				if (mCameraRelativeRendering)
-					l->_setCameraRelative(mCameraInProgress);
-				else
-					l->_setCameraRelative(0);
+		// from here on down this function is same as Ogre::SceneManager
 
-			    if (l->isVisible() &&
-                    l->affectsVisibleZone())
-			    {
-				    LightInfo lightInfo;
-				    lightInfo.light = l;
-				    lightInfo.type = l->getType();
-				    if (lightInfo.type == Light::LT_DIRECTIONAL)
-				    {
-					    // Always visible
-					    lightInfo.position = Vector3::ZERO;
-					    lightInfo.range = 0;
-					    mTestLightInfos.push_back(lightInfo);
-				    }
-				    else
-				    {
-					    // NB treating spotlight as point for simplicity
-					    // Just see if the lights attenuation range is within the frustum
-					    lightInfo.range = l->getAttenuationRange();
-					    lightInfo.position = l->getDerivedPosition();
-					    Sphere sphere(lightInfo.position, lightInfo.range);
-					    if (camera->isVisible(sphere))
-					    {
-						    mTestLightInfos.push_back(lightInfo);
-					    }
-				    }
-			    }
-		    }
-	    } // release lock on lights collection
-        
-        // from here on down this function is same as Ogre::SceneManager
+		// Update lights affecting frustum if changed
+		if (mCachedLightInfos != mTestLightInfos)
+		{
+			mLightsAffectingFrustum.resize(mTestLightInfos.size());
+			LightInfoList::const_iterator i;
+			LightList::iterator j = mLightsAffectingFrustum.begin();
+			for (i = mTestLightInfos.begin(); i != mTestLightInfos.end(); ++i, ++j)
+			{
+				*j = i->light;
+				// add cam distance for sorting if texture shadows
+				if (isShadowTechniqueTextureBased())
+				{
+					(*j)->tempSquareDist = 
+						(camera->getDerivedPosition() - (*j)->getDerivedPosition()).squaredLength();
+				}
+			}
 
-        // Update lights affecting frustum if changed
-        if (mCachedLightInfos != mTestLightInfos)
-        {
-            mLightsAffectingFrustum.resize(mTestLightInfos.size());
-            LightInfoList::const_iterator i;
-            LightList::iterator j = mLightsAffectingFrustum.begin();
-            for (i = mTestLightInfos.begin(); i != mTestLightInfos.end(); ++i, ++j)
-            {
-                *j = i->light;
-			    // add cam distance for sorting if texture shadows
-			    if (isShadowTechniqueTextureBased())
-			    {
-				    (*j)->tempSquareDist = 
-					    (camera->getDerivedPosition() - (*j)->getDerivedPosition()).squaredLength();
-			    }
-            }
+			// Sort the lights if using texture shadows, since the first 'n' will be
+			// used to generate shadow textures and we should pick the most appropriate
+			if (isShadowTechniqueTextureBased())
+			{
+				// Allow a ShadowListener to override light sorting
+				// Reverse iterate so last takes precedence
+				bool overridden = false;
+				for (ListenerList::reverse_iterator ri = mListeners.rbegin();
+					ri != mListeners.rend(); ++ri)
+				{
+					overridden = (*ri)->sortLightsAffectingFrustum(mLightsAffectingFrustum);
+					if (overridden)
+						break;
+				}
+				if (!overridden)
+				{
+					// default sort (stable to preserve directional light ordering
+					std::stable_sort(
+						mLightsAffectingFrustum.begin(), mLightsAffectingFrustum.end(), 
+						lightsForShadowTextureLess());
+				}
+				
+			}
 
-		    // Sort the lights if using texture shadows, since the first 'n' will be
-		    // used to generate shadow textures and we should pick the most appropriate
-		    if (isShadowTechniqueTextureBased())
-		    {
-			    // Allow a ShadowListener to override light sorting
-			    // Reverse iterate so last takes precedence
-			    bool overridden = false;
-			    for (ListenerList::reverse_iterator ri = mListeners.rbegin();
-				    ri != mListeners.rend(); ++ri)
-			    {
-				    overridden = (*ri)->sortLightsAffectingFrustum(mLightsAffectingFrustum);
-				    if (overridden)
-					    break;
-			    }
-			    if (!overridden)
-			    {
-				    // default sort (stable to preserve directional light ordering
-				    std::stable_sort(
-					    mLightsAffectingFrustum.begin(), mLightsAffectingFrustum.end(), 
-					    lightsForShadowTextureLess());
-			    }
-    			
-		    }
+			// Use swap instead of copy operator for efficiently
+			mCachedLightInfos.swap(mTestLightInfos);
 
-            // Use swap instead of copy operator for efficiently
-            mCachedLightInfos.swap(mTestLightInfos);
+			// notify light dirty, so all movable objects will re-populate
+			// their light list next time
+			_notifyLightsDirty();
+		}
 
-            // notify light dirty, so all movable objects will re-populate
-            // their light list next time
-            _notifyLightsDirty();
-        }
+	}
+	//---------------------------------------------------------------------
+	void PCZSceneManager::ensureShadowTexturesCreated()
+	{
+		bool createSceneNode = mShadowTextureConfigDirty;
+		SceneManager::ensureShadowTexturesCreated();
+		if (!createSceneNode) return;
 
-    }
+		size_t count = mShadowTextureCameras.size();
+		for (size_t i = 0; i < count; ++i)
+		{
+			PCZSceneNode* node = (PCZSceneNode*)mSceneRoot->createChildSceneNode(
+				mShadowTextureCameras[i]->getName());
+			node->attachObject(mShadowTextureCameras[i]);
+			addPCZSceneNode(node, mDefaultZone);
+		}
+	}
+	//---------------------------------------------------------------------
+	void PCZSceneManager::destroyShadowTextures(void)
+	{
+		size_t count = mShadowTextureCameras.size();
+		for (size_t i = 0; i < count; ++i)
+		{
+			SceneNode* node = mShadowTextureCameras[i]->getParentSceneNode();
+			mSceneRoot->removeAndDestroyChild(node->getName());
+		}
+		SceneManager::destroyShadowTextures();
+	}
+	//---------------------------------------------------------------------
+	void PCZSceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
+	{
+		mActiveCameraZone = ((PCZSceneNode*)cam->getParentSceneNode())->getHomeZone();
+		SceneManager::prepareShadowTextures(cam, vp);
+	}
+	//---------------------------------------------------------------------
+	void PCZSceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration)
+	{
+		PCZSceneNode* camNode = (PCZSceneNode*)camera->getParentSceneNode();
+
+		if (light->getType() == Light::LT_DIRECTIONAL)
+		{
+			if (camNode->getHomeZone() != mActiveCameraZone)
+				addPCZSceneNode(camNode, mActiveCameraZone);
+		}
+		else
+		{
+			PCZSceneNode* lightNode = (PCZSceneNode*)light->getParentSceneNode();
+			assert(lightNode);
+			PCZone* lightZone = lightNode->getHomeZone();
+			if (camNode->getHomeZone() != lightZone)
+				addPCZSceneNode(camNode, lightZone);
+		}
+
+		SceneManager::fireShadowTexturesPreCaster(light, camera, iteration);
+	}
 
 	/* Attempt to automatically connect unconnected portals to proper target zones 
 		* by looking for matching portals in other zones which are at the same location
@@ -1359,7 +1408,6 @@ namespace Ogre
 			zoneIterator++;
 		}
 	}
-
 
 
     //-----------------------------------------------------------------------

@@ -258,13 +258,31 @@ namespace Ogre
         return true;
     }
 
+	/// Sets the type of projection to use (orthographic or perspective).
+	void PCZCamera::setProjectionType(ProjectionType pt)
+	{
+		mExtraCullingFrustum.setProjectionType(pt);
+		Camera::setProjectionType(pt);
+	}
+
     /* Update function (currently used for making sure the origin stuff for the
         extra culling frustum is up to date */
     void PCZCamera::update(void)
     {
         // make sure the extra culling frustum origin stuff is up to date
-        mExtraCullingFrustum.setOrigin(getDerivedPosition());
-        mExtraCullingFrustum.setOriginPlane(getDerivedDirection(), getDerivedPosition());
+		if (mProjType == PT_PERSPECTIVE)
+		//if (!mCustomViewMatrix)
+		{
+			mExtraCullingFrustum.setUseOriginPlane(true);
+			mExtraCullingFrustum.setOrigin(getDerivedPosition());
+			mExtraCullingFrustum.setOriginPlane(getDerivedDirection(), getDerivedPosition());
+		}
+		else
+		{
+			// In ortho mode, we don't want to cull things behind camera.
+			// This helps for back casting which is useful for texture shadow projection on directional light.
+			mExtraCullingFrustum.setUseOriginPlane(false);
+		}
     }
 
     // calculate extra culling planes from portal and camera 

@@ -185,14 +185,6 @@ namespace Ogre
         */
         virtual void destroyAllLights(void);
 
-        /** Internal method for locating a list of lights which could be affecting the frustum. 
-        @remarks
-            Custom scene managers are encouraged to override this method to make use of their
-            scene partitioning scheme to more efficiently locate lights, and to eliminate lights
-            which may be occluded by word geometry.
-        */
-        virtual void findLightsAffectingFrustum(const Camera* camera);
-		
 		/* Save the position of all nodes (saved to PCZSN->prevPosition)
 		*/
 		void _saveNodePositions(void);
@@ -360,6 +352,25 @@ namespace Ogre
 
 		// ZoneFactoryManager instance
 		PCZoneFactoryManager * mZoneFactoryManager;
+
+		/// The zone of the active camera (for shadow texture casting use);
+		PCZone* mActiveCameraZone;
+
+		/** Internal method for locating a list of lights which could be affecting the frustum. 
+		@remarks
+			Custom scene managers are encouraged to override this method to make use of their
+			scene partitioning scheme to more efficiently locate lights, and to eliminate lights
+			which may be occluded by word geometry.
+		*/
+		virtual void findLightsAffectingFrustum(const Camera* camera);
+		/// Internal method for creating shadow textures (texture-based shadows)
+		virtual void ensureShadowTexturesCreated();
+		/// Internal method for destroying shadow textures (texture-based shadows)
+		virtual void destroyShadowTextures(void);
+		/// Internal method for preparing shadow textures ready for use in a regular render
+		virtual void prepareShadowTextures(Camera* cam, Viewport* vp);
+		/// Internal method for firing the pre caster texture shadows event
+		virtual void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
     };
 
     /// Factory for PCZSceneManager

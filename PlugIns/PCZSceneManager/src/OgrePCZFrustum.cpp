@@ -56,10 +56,9 @@ email                : ericc@xenopi.com
 namespace Ogre
 {
 
-    PCZFrustum::PCZFrustum() 
-    {
-        mUseOriginPlane = false;
-    }
+	PCZFrustum::PCZFrustum() :
+	mProjType(PT_PERSPECTIVE), mUseOriginPlane(false)
+	{ }
 
     PCZFrustum::~PCZFrustum()
     {
@@ -369,7 +368,15 @@ namespace Ogre
 				// add the plane created from the two portal corner points and the frustum location
 				// to the  culling plane
                 PCPlane * newPlane = getUnusedCullingPlane();
-				newPlane->redefine(mOrigin, portal->getDerivedCorner(j), portal->getDerivedCorner(i));
+				if (mProjType == PT_ORTHOGRAPHIC) // use camera direction if projection is orthographic.
+				{
+					newPlane->redefine(portal->getDerivedCorner(j) + mOriginPlane.normal,
+						portal->getDerivedCorner(j), portal->getDerivedCorner(i));
+				}
+				else
+				{
+					newPlane->redefine(mOrigin, portal->getDerivedCorner(j), portal->getDerivedCorner(i));
+				}
                 newPlane->setPortal(portal);
                 mActiveCullingPlanes.push_front(newPlane);
 				addedcullingplanes++;

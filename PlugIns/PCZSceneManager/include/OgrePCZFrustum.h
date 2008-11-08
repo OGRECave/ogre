@@ -56,6 +56,7 @@ Code Style Update	 :
 
 #include "OgrePCPlane.h"
 #include "OgrePCZPrerequisites.h"
+#include "OgreFrustum.h"
 
 namespace Ogre
 {
@@ -106,12 +107,21 @@ namespace Ogre
         void setUseOriginPlane(bool yesno) {mUseOriginPlane = yesno;}
 		// get an unused PCPlane from the CullingPlane Reservoir
 		PCPlane * getUnusedCullingPlane(void);
+
+		/// Set the projection type of this PCZFrustum.
+		inline void setProjectionType(ProjectionType projType)
+		{ mProjType = projType; }
+		/// Get the projection type of this PCZFrustum.
+		inline ProjectionType getProjectionType() const
+		{ return mProjType; }
+
     protected:
         Vector3     mOrigin;
         Plane       mOriginPlane;
         bool        mUseOriginPlane;
         PCPlaneList mActiveCullingPlanes;
 		PCPlaneList mCullingPlaneReservoir;
+		ProjectionType mProjType;
 
     };
 
