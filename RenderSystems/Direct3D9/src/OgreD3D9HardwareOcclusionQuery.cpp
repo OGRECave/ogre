@@ -48,18 +48,7 @@ namespace Ogre {
     D3D9HardwareOcclusionQuery::D3D9HardwareOcclusionQuery( IDirect3DDevice9* pD3DDevice ) :
         mpDevice(pD3DDevice)
 	{ 
-		// create the occlusion query
-		const HRESULT hr = mpDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, &mpQuery);
-
-		if ( hr != D3D_OK ) 
-		{	
-            if( D3DERR_NOTAVAILABLE == hr)
-	        {
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                    "Cannot allocate a Hardware query. This video card doesn't supports it, sorry.", 
-                    "D3D9HardwareOcclusionQuery::D3D9HardwareOcclusionQuery" );
-            }			
-		}
+		recreateResources();
 	}
 
 	/**
@@ -67,7 +56,7 @@ namespace Ogre {
 	*/
 	D3D9HardwareOcclusionQuery::~D3D9HardwareOcclusionQuery() 
 	{ 
-		SAFE_RELEASE(mpQuery); 
+		releaseResources();
 	}
 
 	//------------------------------------------------------------------
@@ -83,6 +72,28 @@ namespace Ogre {
 	void D3D9HardwareOcclusionQuery::endOcclusionQuery() 
 	{ 
 		mpQuery->Issue(D3DISSUE_END); 
+	}
+
+	// [GLaforte - 06-11-2008]
+	// Abstract out the resource creation/release so that we can reset the device properly.
+	void D3D9HardwareOcclusionQuery::releaseResources()
+	{
+		SAFE_RELEASE(mpQuery);
+	}
+	void D3D9HardwareOcclusionQuery::recreateResources()
+	{
+		// create the occlusion query
+		const HRESULT hr = mpDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, &mpQuery);
+
+		if ( hr != D3D_OK ) 
+		{	
+			if( D3DERR_NOTAVAILABLE == hr)
+			{
+				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+					"Cannot allocate a Hardware query. This video card doesn't supports it, sorry.", 
+					"D3D9HardwareOcclusionQuery::D3D9HardwareOcclusionQuery" );
+			}			
+		}
 	}
 
 	//------------------------------------------------------------------
