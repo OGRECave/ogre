@@ -37,10 +37,9 @@ Torus Knot Software Ltd
 // We need to define a hash function for void*
 // For gcc 4.3 see http://gcc.gnu.org/gcc-4.3/changes.html
 #   if OGRE_COMP_VER >= 430
-#       include <backward/hash_map>
+#       include <tr1/unordered_map>
 #   else
 #       include <ext/hash_map>
-#   endif
 namespace __gnu_cxx
 {
 	template <> struct hash< void* >
@@ -52,6 +51,7 @@ namespace __gnu_cxx
 	};
 }
 
+#   endif
 #endif
 
 namespace Ogre
