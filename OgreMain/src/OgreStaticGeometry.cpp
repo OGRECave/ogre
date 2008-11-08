@@ -1616,6 +1616,9 @@ namespace Ogre {
 							*pDstReal++ = tmp.x;
 							*pDstReal++ = tmp.y;
 							*pDstReal++ = tmp.z;
+							// copy parity for tangent.
+							if (elem.getType() == Ogre::VET_FLOAT4)
+								*pDstReal = *pSrcReal;
 							break;
 						default:
 							// just raw copy
