@@ -37,7 +37,7 @@ namespace Ogre
 {
 
 	/** Plugin instance for Octree Manager */
-	class OctreePlugin : public Plugin, public GeneralAllocatedObject
+	class OctreePlugin : public Plugin
 	{
 	public:
 		OctreePlugin();

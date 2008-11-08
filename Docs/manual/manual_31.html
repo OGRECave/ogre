@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -24,11 +24,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC145"></A>
+<A NAME="SEC147"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC143"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC139"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_32.html#SEC152"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC145"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC141"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_32.html#SEC155"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -36,7 +36,7 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 3.2.2 Target Passes </H3>
-<!--docid::SEC145::-->
+<!--docid::SEC147::-->
 
 A target pass is the action of rendering to a given target, either a render texture or the final output. You can update the same render texture multiple times by adding more than one target pass to your compositor script - this is very useful for 'ping pong' renders between a couple of render textures to perform complex convolutions that cannot be done in a single render, such as blurring.<BR><BR>
 
@@ -51,24 +51,26 @@ The contents of both are identical, the only real difference is that you can onl
 <LI>
 <A HREF="manual_31.html#compositor_target_input">input</A>
 <LI>
-<A HREF="manual_31.html#SEC148">only_initial</A>
+<A HREF="manual_31.html#SEC150">only_initial</A>
 <LI>
-<A HREF="manual_31.html#SEC149">visibility_mask</A>
+<A HREF="manual_31.html#SEC151">visibility_mask</A>
 <LI>
 <A HREF="manual_31.html#compositor_lod_bias">lod_bias</A>
 <LI>
-<A HREF="manual_31.html#SEC151">material_scheme</A>
+<A HREF="manual_31.html#SEC154">material_scheme</A>
 <LI>
-<A HREF="manual_32.html#SEC152">pass</A>
+<A HREF="manual_31.html#compositor_shadows">shadows</A>
+<LI>
+<A HREF="manual_32.html#SEC155">pass</A>
 </UL>
 
-<A NAME="SEC146"></A>
+<A NAME="SEC148"></A>
 <H2> Attribute Descriptions   </H2>
-<!--docid::SEC146::-->
+<!--docid::SEC148::-->
 <A NAME="compositor_target_input"></A>
-<A NAME="SEC147"></A>
+<A NAME="SEC149"></A>
 <H3> input </H3>
-<!--docid::SEC147::-->
+<!--docid::SEC149::-->
 Sets input mode of the target, which tells the target pass what is pulled in before any of its own passes are rendered.<BR><BR>
 Format: input (none | previous)<BR><BR>
 Default: input none<BR><BR>
@@ -80,44 +82,52 @@ Default: input none<BR><BR>
 </DL>
 
 <A NAME="only_initial"></A>
-<A NAME="SEC148"></A>
+<A NAME="SEC150"></A>
 <H3> only_initial </H3>
-<!--docid::SEC148::-->
+<!--docid::SEC150::-->
 If set to on, this target pass will only execute once initially after the effect has been enabled. This could be useful to perform once-off renders, after which the static contents are used by the rest of the compositor.<BR><BR>
 Format: only_initial (on | off)<BR><BR>
 Default: only_initial off<BR><BR>
 
 
 <A NAME="visibility_mask"></A>
-<A NAME="SEC149"></A>
+<A NAME="SEC151"></A>
 <H3> visibility_mask </H3>
-<!--docid::SEC149::-->
+<!--docid::SEC151::-->
 Sets the visibility mask for any render_scene passes performed in this target pass. This is a bitmask (although it must be specified as decimal, not hex) and maps to SceneManager::setVisibilityMask.
 Format: visibility_mask &lt;mask&gt;<BR><BR>
 Default: visibility_mask 4294967295<BR><BR>
 
 <A NAME="compositor_lod_bias"></A>
-<A NAME="SEC150"></A>
+<A NAME="SEC152"></A>
 <H3> lod_bias </H3>
-<!--docid::SEC150::-->
+<!--docid::SEC152::-->
 Set the scene LOD bias for any render_scene passes performed in this target pass. The default is 1.0, everything below that means lower quality, higher means higher quality.<BR><BR>
 Format: lod_bias &lt;lodbias&gt;<BR><BR>
 Default: lod_bias 1.0<BR><BR>
 
+<A NAME="compositor_shadows"></A>
+<A NAME="SEC153"></A>
+<H3> shadows </H3>
+<!--docid::SEC153::-->
+Sets whether shadows should be rendered during any render_scene pass performed in this target pass. The default is 'on'.<BR><BR>
+Format: shadows (on | off)<BR><BR>
+Default: shadows on<BR><BR>
+
 <A NAME="material_scheme"></A>
-<A NAME="SEC151"></A>
+<A NAME="SEC154"></A>
 <H3> material_scheme </H3>
-<!--docid::SEC151::-->
-Set the material scheme for any render_scene passes performed in this target pass. Material schemes allow you to select alternative rendering paths for all objects in the scene.<BR><BR>
-Format: material_scheme &lt;Name&gt;<BR><BR>
-Default: material_scheme Default<BR><BR>
+<!--docid::SEC154::-->
+If set, indicates the material scheme to use for any render_scene pass. Useful for performing special-case rendering effects.<BR><BR>
+Format: material_scheme &lt;scheme name&gt;<BR><BR>
+Default: None<BR><BR>
 
 <A NAME="Compositor Passes"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC143"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC139"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_32.html#SEC152"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC145"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC141"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_32.html#SEC155"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -126,7 +136,7 @@ Default: material_scheme Default<BR><BR>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

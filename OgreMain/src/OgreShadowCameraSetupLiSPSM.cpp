@@ -42,7 +42,10 @@ namespace Ogre
 
 
 	LiSPSMShadowCameraSetup::LiSPSMShadowCameraSetup(void)
-		: mOptAdjustFactor(0.1f), mUseSimpleNOpt(true), mOptAdjustFactorTweak(1.0)
+		: mOptAdjustFactor(0.1f)
+		, mUseSimpleNOpt(true)
+		, mOptAdjustFactorTweak(1.0)
+		, mCosCamLightDirThreshold(0.9)
 	{
 	}
 	//-----------------------------------------------------------------------
@@ -237,11 +240,10 @@ namespace Ogre
 		
 		// if the direction of the light and the direction of the camera tend to be parallel,
 		// then tweak up the adjust factor
-		Real parallelLimit = 0.9;
-		Real dot = cam->getDerivedDirection().dotProduct(light->getDerivedDirection());
-		if (dot >= parallelLimit)
+		Real dot = Math::Abs(cam->getDerivedDirection().dotProduct(light->getDerivedDirection()));
+		if (dot >= mCosCamLightDirThreshold)
 		{
-			mOptAdjustFactorTweak = 1.0 + (20 * ((dot - parallelLimit) / (1.0 - parallelLimit)) );
+			mOptAdjustFactorTweak = 1.0 + (20 * ((dot - mCosCamLightDirThreshold) / (1.0 - mCosCamLightDirThreshold)) );
 		}
 		else
 		{
@@ -310,6 +312,17 @@ namespace Ogre
 		texCam->setCustomViewMatrix(true, LView);
 		texCam->setCustomProjectionMatrix(true, LProj);
 	}
+	//---------------------------------------------------------------------
+	void LiSPSMShadowCameraSetup::setCameraLightDirectionThreshold(Degree angle)
+	{
+		mCosCamLightDirThreshold = Math::Cos(angle.valueRadians());
+	}
+	//---------------------------------------------------------------------
+	Degree LiSPSMShadowCameraSetup::getCameraLightDirectionThreshold() const
+	{
+		return Degree(Math::ACos(mCosCamLightDirThreshold));
+	}
+
 
 }
 

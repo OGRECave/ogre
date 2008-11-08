@@ -20,6 +20,7 @@
 				<Linker>
 					<Add library="OgreMain_d" />
 					<Add library="ois_d" />
+					<Add library="Plugin_PCZSceneManager_d" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -38,6 +39,7 @@
 					<Add option="-s" />
 					<Add library="OgreMain" />
 					<Add library="ois" />
+					<Add library="Plugin_PCZSceneManager" />
 				</Linker>
 			</Target>
 		</Build>

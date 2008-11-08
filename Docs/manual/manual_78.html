@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -24,11 +24,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC335"></A>
+<A NAME="SEC338"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_77.html#SEC334"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_75.html#SEC332"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_79.html#SEC339"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_77.html#SEC337"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_75.html#SEC335"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_79.html#SEC342"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -36,21 +36,21 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 </TR></TABLE>
 <HR SIZE=1>
 <H2> 8.3 Vertex Animation </H2>
-<!--docid::SEC335::-->
+<!--docid::SEC338::-->
 Vertex animation is about using information about the movement of vertices directly to animate the mesh. Each track in a vertex animation targets a single VertexData instance. Vertex animation is stored inside the .mesh file since it is tightly linked to the vertex structure of the mesh.
 
 There are actually two subtypes of vertex animation, for reasons which will be discussed in a moment.
 
 <DL COMPACT>
-<DT><A HREF="manual_79.html#SEC339">8.3.1 Morph Animation</A>
+<DT><A HREF="manual_79.html#SEC342">8.3.1 Morph Animation</A>
 <DD>Morph animation is a very simple technique which interpolates mesh snapshots along a keyframe timeline. Morph animation has a direct correlation to old-skool character animation techniques used before skeletal animation was widely used.<BR>
-<DT><A HREF="manual_80.html#SEC340">8.3.2 Pose Animation</A>
+<DT><A HREF="manual_80.html#SEC343">8.3.2 Pose Animation</A>
 <DD>Pose animation is about blending multiple discrete poses, expressed as offsets to the base vertex data, with different weights to provide a final result. Pose animation's most obvious use is facial animation.
 </DL>
 
-<A NAME="SEC336"></A>
+<A NAME="SEC339"></A>
 <H2> Why two subtypes? </H2>
-<!--docid::SEC336::-->
+<!--docid::SEC339::-->
 So, why two subtypes of vertex animation? Couldn't both be implemented using the same system? The short answer is yes; in fact you can implement both types using pose animation. But for very good reasons we decided to allow morph animation to be specified separately since the subset of features that it uses is both easier to define and has lower requirements on hardware shaders, if animation is implemented through them. If you don't care about the reasons why these are implemented differently, you can skip to the next part.<BR><BR>
 
 Morph animation is a simple approach where we have a whole series of snapshots of vertex data which must be interpolated, e.g. a running animation implemented as morph targets. Because this is based on simple snapshots, it's quite fast to use when animating an entire mesh because it's a simple linear change between keyframes. However, this simplistic approach does not support blending between multiple morph animations. If you need animation blending, you are advised to use skeletal animation for full-mesh animation, and pose animation for animation of subsets of meshes or where skeletal animation doesn't fit - for example facial animation. For animating in a vertex shader, morph animation is quite simple and just requires the 2 vertex buffers (one the original position buffer) of absolute position data, and an interpolation factor. Each track in a morph animation refrences a unique set of vertex data. <BR><BR>
@@ -63,18 +63,18 @@ The downside of pose animation is that it can be more difficult to set up, requi
 
 So, by partitioning the vertex animation approaches into 2, we keep the simple morph technique easy to use, whilst still allowing all the powerful techniques to be used. Note that morph animation cannot be blended with other types of vertex animation on the same vertex data (pose animation or other morph animation); pose animation can be blended with other pose animation though, and both types can be combined with skeletal animation. This combination limitation applies per set of vertex data though, not globally across the mesh (see below). Also note that all morph animation can be expressed (in a more complex fashion) as pose animation, but not vice versa.
 
-<A NAME="SEC337"></A>
+<A NAME="SEC340"></A>
 <H2> Subtype applies per track </H2>
-<!--docid::SEC337::-->
+<!--docid::SEC340::-->
 It's important to note that the subtype in question is held at a track level, not at the animation or mesh level. Since tracks map onto VertexData instances, this means that if your mesh is split into SubMeshes, each with their own dedicated geometry, you can have one SubMesh animated using pose animation, and others animated with morph animation (or not vertex animated at all). <BR><BR>
 
 For example, a common set-up for a complex character which needs both skeletal and facial animation might be to split the head into a separate SubMesh with its own geometry, then apply skeletal animation to both submeshes, and pose animation to just the head. <BR><BR>
 
-To see how to apply vertex animation, See section <A HREF="manual_77.html#SEC334">8.2 Animation State</A>.
+To see how to apply vertex animation, See section <A HREF="manual_77.html#SEC337">8.2 Animation State</A>.
 
-<A NAME="SEC338"></A>
+<A NAME="SEC341"></A>
 <H2> Vertex buffer arrangements </H2>
-<!--docid::SEC338::-->
+<!--docid::SEC341::-->
 
 When using vertex animation in software, vertex buffers need to be arranged such that vertex positions reside in their own hardware buffer. This is to avoid having to upload all the other vertex data when updating, which would quickly saturate the GPU bus. When using the OGRE .mesh format and the tools / exporters that go with it, OGRE organises this for you automatically. But if you create buffers yourself, you need to be aware of the layout arrangements.<BR><BR>
 
@@ -83,9 +83,9 @@ To do this, you have a set of helper functions in Ogre::Mesh. See API Reference 
 <A NAME="Morph Animation"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_77.html#SEC334"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_75.html#SEC332"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_79.html#SEC339"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_77.html#SEC337"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_75.html#SEC335"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_79.html#SEC342"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -94,7 +94,7 @@ To do this, you have a set of helper functions in Ogre::Mesh. See API Reference 
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

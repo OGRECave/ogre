@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -24,11 +24,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC312"></A>
+<A NAME="SEC315"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_71.html#SEC304"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC301"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_73.html#SEC326"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_71.html#SEC307"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC304"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_73.html#SEC329"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -36,9 +36,9 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 </TR></TABLE>
 <HR SIZE=1>
 <H2> 7.2 Texture-based Shadows </H2>
-<!--docid::SEC312::-->
+<!--docid::SEC315::-->
 
-Texture shadows involve rendering shadow casters from the point of view of the light into a texture, which is then projected onto shadow receivers. The main advantage of texture shadows as opposed to <A HREF="manual_71.html#SEC304">7.1 Stencil Shadows</A> is that the overhead of increasing the geometric detail is far lower, since there is no need to perform per-triangle calculations. Most of the work in rendering texture shadows is done by the graphics card, meaning the technique scales well when taking advantage of the latest cards, which are at present outpacing CPUs in terms of their speed of development. In addition, texture shadows are <STRONG>much</STRONG> more customisable - you can pull them into shaders to apply as you like (particularly with <A HREF="manual_72.html#SEC325">Integrated Texture Shadows</A>, you can perform filtering to create softer shadows or perform other special effects on them. Basically, most modern engines use texture shadows as their primary shadow technique simply because they are more powerful, and the increasing speed of GPUs is rapidly amortising the fillrate / texture access costs of using them.<BR><BR>
+Texture shadows involve rendering shadow casters from the point of view of the light into a texture, which is then projected onto shadow receivers. The main advantage of texture shadows as opposed to <A HREF="manual_71.html#SEC307">7.1 Stencil Shadows</A> is that the overhead of increasing the geometric detail is far lower, since there is no need to perform per-triangle calculations. Most of the work in rendering texture shadows is done by the graphics card, meaning the technique scales well when taking advantage of the latest cards, which are at present outpacing CPUs in terms of their speed of development. In addition, texture shadows are <STRONG>much</STRONG> more customisable - you can pull them into shaders to apply as you like (particularly with <A HREF="manual_72.html#SEC328">Integrated Texture Shadows</A>, you can perform filtering to create softer shadows or perform other special effects on them. Basically, most modern engines use texture shadows as their primary shadow technique simply because they are more powerful, and the increasing speed of GPUs is rapidly amortising the fillrate / texture access costs of using them.<BR><BR>
 
 The main disadvantage to texture shadows is that, because they are simply a texture, they have a fixed resolution which means if stretched, the pixellation of the texture can become obvious. There are ways to combat this though:
 
@@ -54,97 +54,97 @@ If you combine all 3 of these techniques you can get a very high quality shadow 
 
 The other issue is with point lights. Because texture shadows require a render to texture in the direction of the light, omnidirectional lights (point lights) would require 6 renders to totally cover all the directions shadows might be cast. For this reason, Ogre primarily supports directional lights and spotlights for generating texture shadows; you can use point lights but they will only work if off-camera since they are essentially turned into a spotlight shining into your camera frustum for the purposes of texture shadows.<BR><BR>
 
-<A NAME="SEC313"></A>
+<A NAME="SEC316"></A>
 <H3> Directional Lights </H3>
-<!--docid::SEC313::-->
-Directional lights in theory shadow the entire scene from an infinitely distant light. Now, since we only have a finite texture which will look very poor quality if stretched over the entire scene, clearly a simplification is required. Ogre places a shadow texture over the area immediately in front of the camera, and moves it as the camera moves (although it rounds this movement to multiples of texels so that the slight 'swimming shadow' effect caused by moving the texture is minimised). The range to which this shadow extends, and the offset used to move it in front of the camera, are configurable (See section <A HREF="manual_72.html#SEC317">Configuring Texture Shadows</A>). At the far edge of the shadow, Ogre fades out the shadow based on other configurable parameters so that the termination of the shadow is softened.
+<!--docid::SEC316::-->
+Directional lights in theory shadow the entire scene from an infinitely distant light. Now, since we only have a finite texture which will look very poor quality if stretched over the entire scene, clearly a simplification is required. Ogre places a shadow texture over the area immediately in front of the camera, and moves it as the camera moves (although it rounds this movement to multiples of texels so that the slight 'swimming shadow' effect caused by moving the texture is minimised). The range to which this shadow extends, and the offset used to move it in front of the camera, are configurable (See section <A HREF="manual_72.html#SEC320">Configuring Texture Shadows</A>). At the far edge of the shadow, Ogre fades out the shadow based on other configurable parameters so that the termination of the shadow is softened.
 
-<A NAME="SEC314"></A>
+<A NAME="SEC317"></A>
 <H3> Spotlights </H3>
-<!--docid::SEC314::-->
+<!--docid::SEC317::-->
 Spotlights are much easier to represent as renderable shadow textures than directional lights, since they are naturally a frustum. Ogre represents spotlight directly by rendering the shadow from the light position, in the direction of the light cone; the field-of-view of the texture camera is adjusted based on the spotlight falloff angles. In addition, to hide the fact that the shadow texture is square and has definite edges which could show up outside the spotlight, Ogre uses a second texture unit when projecting the shadow onto the scene which fades out the shadow gradually in a projected circle around the spotlight.
 
-<A NAME="SEC315"></A>
+<A NAME="SEC318"></A>
 <H3> Point Lights </H3>
-<!--docid::SEC315::-->
+<!--docid::SEC318::-->
 As mentioned above, to support point lights properly would require multiple renders (either 6 for a cubic render or perhaps 2 for a less precise parabolic mapping), so rather than do that we approximate point lights as spotlights, where the configuration is changed on the fly to make the light shine from its position over the whole of the viewing frustum. This is not an ideal setup since it means it can only really work if the point light's position is out of view, and in addition the changing parameterisation can cause some 'swimming' of the texture. Generally we recommend avoiding making point lights cast texture shadows.
 
-<A NAME="SEC316"></A>
+<A NAME="SEC319"></A>
 <H3> Shadow Casters and Shadow Receivers </H3>
-<!--docid::SEC316::-->
-To enable texture shadows, use the shadow technique SHADOWTYPE_TEXTURE_MODULATIVE or SHADOWTYPE_TEXTURE_ADDITIVE; as the name suggests this produces <A HREF="manual_73.html#SEC326">7.3 Modulative Shadows</A> or <A HREF="manual_74.html#SEC328">7.4 Additive Light Masking</A> respectively. The cheapest and simplest texture shadow techniques do not use depth information, they merely render casters to a texture and render this onto receivers as plain colour - this means self-shadowing is not possible using these methods. This is the default behaviour if you use the automatic, fixed-function compatible (and thus usable on lower end hardware) texture shadow techniques. You can however use shaders-based techniques through custom shadow materials for casters and receivers to perform more complex shadow algorithms, such as depth shadow mapping which does allow self-shadowing. OGRE comes with an example of this in its shadows demo, although it's only usable on Shader Model 2 cards or better. Whilst fixed-function depth shadow mapping is available in OpenGL, it was never standardised in Direct3D so using shaders in custom caster &amp; receiver materials is the only portable way to do it. If you use this approach, call SceneManager::setShadowTextureSelfShadow with a parameter of 'true' to allow texture shadow casters to also be receivers. <BR><BR>
+<!--docid::SEC319::-->
+To enable texture shadows, use the shadow technique SHADOWTYPE_TEXTURE_MODULATIVE or SHADOWTYPE_TEXTURE_ADDITIVE; as the name suggests this produces <A HREF="manual_73.html#SEC329">7.3 Modulative Shadows</A> or <A HREF="manual_74.html#SEC331">7.4 Additive Light Masking</A> respectively. The cheapest and simplest texture shadow techniques do not use depth information, they merely render casters to a texture and render this onto receivers as plain colour - this means self-shadowing is not possible using these methods. This is the default behaviour if you use the automatic, fixed-function compatible (and thus usable on lower end hardware) texture shadow techniques. You can however use shaders-based techniques through custom shadow materials for casters and receivers to perform more complex shadow algorithms, such as depth shadow mapping which does allow self-shadowing. OGRE comes with an example of this in its shadows demo, although it's only usable on Shader Model 2 cards or better. Whilst fixed-function depth shadow mapping is available in OpenGL, it was never standardised in Direct3D so using shaders in custom caster &amp; receiver materials is the only portable way to do it. If you use this approach, call SceneManager::setShadowTextureSelfShadow with a parameter of 'true' to allow texture shadow casters to also be receivers. <BR><BR>
 If you're not using depth shadow mapping, OGRE divides shadow casters and receivers into 2 disjoint groups. Simply by turning off shadow casting on an object, you automatically make it a shadow receiver (although this can be disabled by setting the 'receive_shadows' option to 'false' in a material script. Similarly, if an object is set as a shadow caster, it cannot receive shadows. 
 <A NAME="Configuring Texture Shadows"></A>
-<A NAME="SEC317"></A>
+<A NAME="SEC320"></A>
 <H2> Configuring Texture Shadows </H2>
-<!--docid::SEC317::-->
+<!--docid::SEC320::-->
 There are a number of settings which will help you configure your texture-based shadows so that they match your requirements.
 
 <UL>
-<LI><A HREF="manual_72.html#SEC318">Maximum number of shadow textures</A>
-<LI><A HREF="manual_72.html#SEC319">Shadow texture size</A>
-<LI><A HREF="manual_72.html#SEC320">Shadow far distance</A>
-<LI><A HREF="manual_72.html#SEC321">Shadow texture offset (Directional Lights)</A>
-<LI><A HREF="manual_72.html#SEC322">Shadow fade settings</A>
-<LI><A HREF="manual_72.html#SEC324">Custom shadow camera setups</A>
-<LI><A HREF="manual_72.html#SEC325">Integrated Texture Shadows</A>
+<LI><A HREF="manual_72.html#SEC321">Maximum number of shadow textures</A>
+<LI><A HREF="manual_72.html#SEC322">Shadow texture size</A>
+<LI><A HREF="manual_72.html#SEC323">Shadow far distance</A>
+<LI><A HREF="manual_72.html#SEC324">Shadow texture offset (Directional Lights)</A>
+<LI><A HREF="manual_72.html#SEC325">Shadow fade settings</A>
+<LI><A HREF="manual_72.html#SEC327">Custom shadow camera setups</A>
+<LI><A HREF="manual_72.html#SEC328">Integrated Texture Shadows</A>
 </UL>
 
 <A NAME="Maximum number of shadow textures"></A>
-<A NAME="SEC318"></A>
+<A NAME="SEC321"></A>
 <H3> Maximum number of shadow textures </H3>
-<!--docid::SEC318::-->
+<!--docid::SEC321::-->
 Shadow textures take up texture memory, and to avoid stalling the rendering pipeline Ogre does not reuse the same shadow texture for multiple lights within the same frame. This means that each light which is to cast shadows must have its own shadow texture. In practice, if you have a lot of lights in your scene you would not wish to incur that sort of texture overhead.<BR><BR>
 You can adjust this manually by simply turning off shadow casting for lights you do not wish to cast shadows. In addition, you can set a maximum limit on the number of shadow textures Ogre is allowed to use by calling SceneManager::setShadowTextureCount. Each frame, Ogre determines the lights which could be affecting the frustum, and then allocates the number of shadow textures it is allowed to use to the lights on a first-come-first-served basis. Any additional lights will not cast shadows that frame.
 <BR><BR>Note that you can set the number of shadow textures and their size at the same time by using the SceneManager::setShadowTextureSettings method; this is useful because both the individual calls require the potential creation / destruction of texture resources.
 
 
 <A NAME="Shadow texture size"></A>
-<A NAME="SEC319"></A>
+<A NAME="SEC322"></A>
 <H3> Shadow texture size </H3>
-<!--docid::SEC319::-->
+<!--docid::SEC322::-->
 
 The size of the textures used for rendering the shadow casters into can be altered; clearly using larger textures will give you better quality shadows, but at the expense of greater memory usage. Changing the texture size is done by calling SceneManager::setShadowTextureSize - textures are assumed to be square and you must specify a texture size that is a power of 2. Be aware that each modulative shadow texture will take size*size*3 bytes of texture memory. <BR><BR>
 <STRONG>Important</STRONG>: if you use the GL render system your shadow texture size can only be larger (in either dimension) than the size of your primary window surface if the hardware supports the Frame Buffer Object (FBO) or Pixel Buffer Object (PBO) extensions. Most modern cards support this now, but be careful of older cards - you can check the ability of the hardware to manage this through ogreRoot-&gt;getRenderSystem()-&gt;getCapabilities()-&gt;hasCapability(RSC_HWRENDER_TO_TEXTURE). If this returns false, if you create a shadow texture larger in any dimension than the primary surface, the rest of the shadow texture will be blank.
 
 
 <A NAME="Shadow far distance"></A>
-<A NAME="SEC320"></A>
+<A NAME="SEC323"></A>
 <H3> Shadow far distance </H3>
-<!--docid::SEC320::-->
+<!--docid::SEC323::-->
 
 This determines the distance at which shadows are terminated; it also determines how far into the distance the texture shadows for directional lights are stretched - by reducing this value, or increasing the texture size, you can improve the quality of shadows from directional lights at the expense of closer shadow termination or increased memory usage, respectively.
 
 <A NAME="Shadow texture offset (Directional Lights)"></A>
-<A NAME="SEC321"></A>
+<A NAME="SEC324"></A>
 <H3> Shadow texture offset (Directional Lights) </H3>
-<!--docid::SEC321::-->
+<!--docid::SEC324::-->
 As mentioned above in the directional lights section, the rendering of shadows for directional lights is an approximation that allows us to use a single render to cover a largeish area with shadows. This offset parameter affects how far from the camera position the center of the shadow texture is offset, as a proprtion of the shadow far distance. The greater this value, the more of the shadow texture is 'useful' to you since it's ahead of the camera, but also the further you offset it, the more chance there is of accidentally seeing the edge of the shadow texture at more extreme angles. You change this value by calling SceneManager::setShadowDirLightTextureOffset, the default is 0.6.
 
 <A NAME="Shadow fade settings"></A>
-<A NAME="SEC322"></A>
+<A NAME="SEC325"></A>
 <H3> Shadow fade settings </H3>
-<!--docid::SEC322::-->
+<!--docid::SEC325::-->
 
 Shadows fade out before the shadow far distance so that the termination of shadow is not abrupt. You can configure the start and end points of this fade by calling the SceneManager::setShadowTextureFadeStart and SceneManager::setShadowTextureFadeEnd methods, both take distances as a proportion of the shadow far distance. Because of the inaccuracies caused by using a square texture and a radial fade distance, you cannot use 1.0 as the fade end, if you do you'll see artefacts at the extreme edges. The default values are 0.7 and 0.9, which serve most purposes but you can change them if you like.
 
-<A NAME="SEC323"></A>
+<A NAME="SEC326"></A>
 <H2> Texture shadows and vertex / fragment programs </H2>
-<!--docid::SEC323::-->
-When rendering shadow casters into a modulative shadow texture, Ogre turns off all textures, and all lighting contributions except for ambient light, which it sets to the colour of the shadow (<A HREF="manual_73.html#SEC327">Shadow Colour</A>). For additive shadows, it render the casters into a black &amp; white texture instead. This is enough to render shadow casters for fixed-function material techniques, however where a vertex program is used Ogre doesn't have so much control. If you use a vertex program in the <STRONG>first pass</STRONG> of your technique, then you must also tell ogre which vertex program you want it to use when rendering the shadow caster; see <A HREF="manual_23.html#SEC125">Shadows and Vertex Programs</A> for full details.
+<!--docid::SEC326::-->
+When rendering shadow casters into a modulative shadow texture, Ogre turns off all textures, and all lighting contributions except for ambient light, which it sets to the colour of the shadow (<A HREF="manual_73.html#SEC330">Shadow Colour</A>). For additive shadows, it render the casters into a black &amp; white texture instead. This is enough to render shadow casters for fixed-function material techniques, however where a vertex program is used Ogre doesn't have so much control. If you use a vertex program in the <STRONG>first pass</STRONG> of your technique, then you must also tell ogre which vertex program you want it to use when rendering the shadow caster; see <A HREF="manual_23.html#SEC127">Shadows and Vertex Programs</A> for full details.
 
 
 <A NAME="Custom shadow camera setups"></A>
-<A NAME="SEC324"></A>
+<A NAME="SEC327"></A>
 <H3> Custom shadow camera setups </H3>
-<!--docid::SEC324::-->
+<!--docid::SEC327::-->
 
 As previously mentioned, one of the downsides of texture shadows is that the texture resolution is finite, and it's possible to get aliasing when the size of the shadow texel is larger than a screen pixel, due to the projection of the texture. In order to address this, you can specify alternative projection bases by using or creating subclasses of the ShadowCameraSetup class. The default version is called DefaultShadowCameraSetup and this sets up a simple regular frustum for point and spotlights, and an orthographic frustum for directional lights. There is also a PlaneOptimalShadowCameraSetup class which specialises the projection to a plane, thus giving you much better definition provided your shadow receivers exist mostly in a single plane. Other setup classes (e.g. you might create a perspective or trapezoid shadow mapping version) can be created and plugged in at runtime, either on individual lights or on the SceneManager as a whole.
 
 <A NAME="Integrated Texture Shadows"></A>
-<A NAME="SEC325"></A>
+<A NAME="SEC328"></A>
 <H3> Integrated Texture Shadows </H3>
-<!--docid::SEC325::-->
+<!--docid::SEC328::-->
 
 Texture shadows have one major advantage over stencil shadows - the data used to represent them can be referenced in regular shaders. Whilst the default texture shadow modes (SHADOWTYPE_TEXTURE_MODULATIVE and SHADOWTYPE_TEXTURE_ADDITIVE) automatically render shadows for you, their disadvantage is that because they are generalised add-ons to your own materials, they tend to take more passes of the scene to use. In addition, you don't have a lot of control over the composition of the shadows.<BR><BR>
 
@@ -155,9 +155,9 @@ You reference a shadow texture in a material which implements this approach by u
 <A NAME="Modulative Shadows"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_71.html#SEC304"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC301"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_73.html#SEC326"> &gt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_71.html#SEC307"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC304"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_73.html#SEC329"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -166,7 +166,7 @@ You reference a shadow texture in a material which implements this approach by u
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

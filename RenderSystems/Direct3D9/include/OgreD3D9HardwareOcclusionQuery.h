@@ -79,6 +79,9 @@ namespace Ogre {
 		unsigned int getLastQuerysPixelcount() { return mPixelCount; }
         bool isStillOutstanding(void);
 
+		void releaseResources();
+		void recreateResources();
+
 	
 
 		//----------------------------------------------------------------------

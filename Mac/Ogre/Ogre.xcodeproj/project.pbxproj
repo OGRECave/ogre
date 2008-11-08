@@ -1431,7 +1431,6 @@
 		AAC698150EA1117C00F18A41 /* OgrePCZSceneQuery.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgrePCZSceneQuery.cpp; path = ../../PlugIns/PCZSceneManager/src/OgrePCZSceneQuery.cpp; sourceTree = SOURCE_ROOT; };
 		AAC698160EA1117C00F18A41 /* OgrePortal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgrePortal.cpp; path = ../../PlugIns/PCZSceneManager/src/OgrePortal.cpp; sourceTree = SOURCE_ROOT; };
 		AAC698170EA1117C00F18A41 /* OgreSegment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreSegment.cpp; path = ../../PlugIns/PCZSceneManager/src/OgreSegment.cpp; sourceTree = SOURCE_ROOT; };
-		AAC698330EA1131A00F18A41 /* PCZSceneManager Plugin-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "PCZSceneManager Plugin-Info.plist"; path = "plist/PCZSceneManager Plugin-Info.plist"; sourceTree = "<group>"; };
 		AAC698790EA114BB00F18A41 /* Plugin_OctreeZone.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Plugin_OctreeZone.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAC6989F0EA1161A00F18A41 /* OctreeZone Plugin-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "OctreeZone Plugin-Info.plist"; path = "plist/OctreeZone Plugin-Info.plist"; sourceTree = "<group>"; };
 		AAC698DF0EA1170000F18A41 /* OgreHeightmapTerrainZonePageSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreHeightmapTerrainZonePageSource.cpp; path = ../../PlugIns/OctreeZone/src/OgreHeightmapTerrainZonePageSource.cpp; sourceTree = SOURCE_ROOT; };
@@ -1574,7 +1573,6 @@
 				000E235D0B38F852004EA2DF /* ParticleFX Plugin-Info.plist */,
 				000E23C90B38FD6F004EA2DF /* BSPSceneManager Plugin-Info.plist */,
 				000E23F70B39009B004EA2DF /* OctreeSceneManager Plugin-Info.plist */,
-				AAC698330EA1131A00F18A41 /* PCZSceneManager Plugin-Info.plist */,
 				AAC6989F0EA1161A00F18A41 /* OctreeZone Plugin-Info.plist */,
 				000E24360B3902ED004EA2DF /* CgProgramManager Plugin-Info.plist */,
 				000E24550B390583004EA2DF /* EXRCodec Plugin-Info.plist */,

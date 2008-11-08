@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -37,19 +37,26 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <HR SIZE=1>
 <H2> 2.2 The RenderSystem object </H2>
 <!--docid::SEC9::-->
+<P>
 
 The RenderSystem object is actually an abstract class which defines the interface to the underlying 3D API. It is responsible for sending rendering operations to the API and setting all the various rendering options. This class is abstract because all the implementation is rendering API specific - there are API-specific subclasses for each rendering API (e.g. D3DRenderSystem for Direct3D). After the system has been initialised through Root::initialise, the RenderSystem object for the selected rendering API is available via the Root::getRenderSystem() method.<BR><BR>
+</P>
+<P>
 
 However, a typical application should not normally need to manipulate the RenderSystem object directly - everything you need for rendering objects and customising settings should be available on the SceneManager, Material and other scene-oriented classes. It's only if you want to create multiple rendering windows (completely separate windows in this case, not multiple viewports like a split-screen effect which is done via the RenderWindow class) or access other advanced features that you need access to the RenderSystem object.<BR><BR>
+</P>
+<P>
 
 For this reason I will not discuss the RenderSystem object further in these tutorials. You can assume the SceneManager handles the calls to the RenderSystem at the appropriate times.<BR><BR>
+</P>
+<P>
 
 <A NAME="The SceneManager object"></A>
 <HR SIZE=1>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

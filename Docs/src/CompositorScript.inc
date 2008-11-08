@@ -196,11 +196,11 @@ Sets whether shadows should be rendered during any render_scene pass performed i
 Format: shadows (on | off)@*@*
 Default: shadows on@*@*
 
-@anchor{only_initial}
-@subheading only_initial
-If set to on, this target pass will only execute once initially after the effect has been enabled. This could be useful to perform once-off renders, after which the static contents are used by the rest of the compositor.@*@*
-Format: only_initial (on | off)@*@*
-Default: only_initial off@*@*
+@anchor{material_scheme}
+@subheading material_scheme
+If set, indicates the material scheme to use for any render_scene pass. Useful for performing special-case rendering effects.@*@*
+Format: material_scheme <scheme name>@*@*
+Default: None@*@*
 
 @node Compositor Passes
 @subsection Compositor Passes

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -38,16 +38,27 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <H2> 1.2 Multi-everything </H2>
 <!--docid::SEC3::-->
 I wanted to do more than create a 3D engine that ran on one 3D API, on one platform, with one type of scene (indoor levels are most popular). I wanted OGRE to be able to extend to any kind of scene (but yet still implement scene-specific optimisations under the surface), any platform and any 3D API.<BR><BR>
+<P>
 
 Therefore all the 'visible' parts of OGRE are completely independent of platform, 3D API and scene type. There are no dependencies on Windows types, no assumptions about the type of scene you are creating, and the principles of the 3D aspects are based on core maths texts rather than one particular API implementation.<BR><BR>
+</P>
+<P>
 
 Now of course somewhere OGRE has to get down to the nitty-gritty of the specifics of the platform, API and scene, but it does this in subclasses specially designed for the environment in question, but which still expose the same interface as the abstract versions.<BR><BR>
+</P>
+<P>
 
 For example, there is a 'Win32Window' class which handles all the details about rendering windows on a Win32 platform - however the application designer only has to manipulate it via the superclass interface 'RenderWindow', which will be the same across all platforms.
+</P>
+<P>
 
 Similarly the 'SceneManager' class looks after the arrangement of objects in the scene and their rendering sequence. Applications only have to use this interface, but there is a 'BspSceneManager' class which optimises the scene management for indoor levels, meaning you get both performance and an easy to learn interface. All applications have to do is hint about the kind of scene they will be creating and let OGRE choose the most appropriate implementation - this is covered in a later tutorial.<BR><BR>
+</P>
+<P>
 
 OGRE's object-oriented nature makes all this possible. Currently OGRE runs on Windows, Linux and Mac OSX using plugins to drive the underlying rendering API (currently Direct3D or OpenGL). Applications use OGRE at the abstract level, thus ensuring that they automatically operate on all platforms and rendering subsystems that OGRE provides without any need for platform or API specific code.<BR><BR>
+</P>
+<P>
 
 <A NAME="The Core Objects"></A>
 <HR SIZE=1>
@@ -63,7 +74,7 @@ OGRE's object-oriented nature makes all this possible. Currently OGRE runs on Wi
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

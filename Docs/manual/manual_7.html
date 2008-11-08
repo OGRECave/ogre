@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -37,19 +37,31 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <HR SIZE=1>
 <H2> 2.3 The SceneManager object </H2>
 <!--docid::SEC10::-->
+<P>
 
 Apart from the Root object, this is probably the most critical part of the system from the application's point of view. Certainly it will be the object which is most used by the application. The SceneManager is in charge of the contents of the scene which is to be rendered by the engine. It is responsible for organising the contents using whatever technique it deems best, for creating and managing all the cameras, movable objects (entities), lights and materials (surface properties of objects), and for managing the 'world geometry' which is the sprawling static geometry usually used to represent the immovable parts of a scene.<BR><BR>
+</P>
+<P>
 
 It is to the SceneManager that you go when you want to create a camera for the scene. It's also where you go to retrieve or to remove a light from the scene. There is no need for your application to keep lists of objects, the SceneManager keeps a named set of all of the scene objects for you to access, should you need them. Look in the main documentation under the getCamera, getLight, getEntity etc methods.<BR><BR>
+</P>
+<P>
 
 The SceneManager also sends the scene to the RenderSystem object when it is time to render the scene. You never have to call the SceneManager::_renderScene method directly though - it is called automatically whenever a rendering target is asked to update.<BR><BR>
+</P>
+<P>
 
 So most of your interaction with the SceneManager is during scene setup. You're likely to call a great number of methods (perhaps driven by some input file containing the scene data) in order to set up your scene. You can also modify the contents of the scene dynamically during the rendering cycle if you create your own FrameListener object (see later).<BR><BR>
+</P>
+<P>
 
 Because different scene types require very different algorithmic approaches to deciding which objects get sent to the RenderSystem in order to attain good rendering performance, the SceneManager class is designed to be subclassed for different scene types. The default SceneManager object will render a scene, but it does little or no scene organisation and you should not expect the results to be high performance in the case of large scenes. The intention is that specialisations will be created for each type of scene such that under the surface the subclass will optimise the scene organisation for best performance given assumptions which can be made for that scene type. An example is the BspSceneManager which optimises rendering for large indoor levels based on a Binary Space Partition (BSP) tree.<BR><BR>
+</P>
+<P>
 
 The application using OGRE does not have to know which subclasses are available. The application simply calls Root::createSceneManager(..) passing as a parameter one of a number of scene types (e.g. ST_GENERIC, ST_INTERIOR etc). OGRE will automatically use the best SceneManager subclass available for that scene type, or default to the basic SceneManager if a specialist one is not available. This allows the developers of OGRE to add new scene specialisations later and thus optimise previously unoptimised scene types without the user applications having to change any code.<BR><BR>
-
+</P>
+<P>
 
 <A NAME="The ResourceGroupManager Object"></A>
 <HR SIZE=1>
@@ -65,7 +77,7 @@ The application using OGRE does not have to know which subclasses are available.
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

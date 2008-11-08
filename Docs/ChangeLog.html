@@ -30,8 +30,15 @@ Engine)</p>
 
 <p class="header" align="center">Change Log</p>
 
-<p class="mainheader">v1.6.0RC1 [Shoggoth] (28 August 2008) - Major Release</p>
-<ul><li> <b>Script Changes</b>
+<p class="mainheader">
+    v1.6.0 [Shoggoth] (3 November 2008) - Major Release</p>
+<p> <b></b>
+</p>
+    <a href="#changessince1.6.0RC1">
+[View changes since RC1]</a>
+    <ul>
+        
+        <li><b>Script Changes</b>
 <ul><li> <a href="http://www.ogre3d.org/wiki/index.php/NewScriptFeatures" class='external text' title="http://www.ogre3d.org/wiki/index.php/NewScriptFeatures" rel="nofollow">New script compilers</a> are enabled by default, see OGRE_USE_NEW_COMPILERS in OgreConfig.h
 </li><li> Unified script syntax (.os), can contain anything that would have been in type-specific scripts (.material, .particle etc)
 </li><li> Import other scripts via the 'import' directive
@@ -40,7 +47,9 @@ Engine)</p>
 </li><li> Interception of script parsing events now possible for custom behaviour
 
 </li></ul>
-</li><li> <b>Material Changes</b>
+        </li>
+    </ul>
+<ul><li> <b>Material Changes</b>
 <ul><li> 'manual_named_constants' directive added for assembler shaders to allow you to associate named parameters stored in a file with assembler. The file can be created from the GpuNamedParameters from high-level source if you want to precompile them.
 </li><li> 'gpu_vendor_rule' and 'gpu_device_rule' allow you to influence the techniques which are used with inclusive/exclusive matching rules on the vendor and device name. Can help tune your materials for vendor or device-specific behaviour.
 </li><li> '#include' directive now supported in HLSL and Cg shaders
@@ -192,9 +201,106 @@ Engine)</p>
 
 </li></ul>
 </li></ul>
+    <p>
+        <span style="text-decoration: underline"><a name="changessince1.6.0RC1"></a><strong>Changes since 1.6.0RC1</strong></span></p>
+    <ul>
+        <li>Native VC9 (2008) projects added</li>
+        <li>Correctly deal with decompressing DXT data that is less than 4 pixels in width/height</li>
+        <li>Fix assertion bug when mesh does not contain any UV</li>
+        <li>Added missing virtual destructors to new script compiler classes, fixes memory leak</li>
+        <li>Added PCZ plugins to SDK build script</li>
+        <li>Make LOD camera position available to shaders (lod_camera_position)</li>
+        <li>Fix passless technique handling in OgreEntity.cpp</li>
+        <li>Various GLX Config Dialog fixes</li>
+        <li>Add void* cast to deallocateBytes call to guarantee compatibility; this fixes luabind+ogre
+            compile error for example</li>
+        <li>Safety change - don't assume that shadow texture cameras and shadow texture list
+            is entirely in sync, in case an exception has made this temporarily not the case
+            before shutdown</li>
+        <li>Simple ease-in, ease-out for camera motion in samples</li>
+        <li>Fixed new script compiler not respecting the 'gamma' option to the texture directive
+            (hardware sRGB conversion on sample)</li>
+        <li>Make sure colour depth doesn't exceed desktop on GL/Win32/Windowed</li>
+        <li>gcc 4.3 deprecated the ext/hash_map and ext/hash_set includes. Now backward/hash_map
+            and backward/hash_set.</li>
+        <li>When using manual LOD on an Entity and attaching an object to a bone, still use
+            that attached object on lower detail versions. If a lower detail skeleton is being
+            used though and the bone that the child object is attached to no longer exists,
+            don't display the object.</li>
+        <li>Expose the ability to turn off shadows in a compositor in script</li>
+        <li>Fix for "No Contacts Requested" bug in ReferenceApp</li>
+        <li>Bugfix for segfault in Root::loadPlugins() when empty plugin directory specified</li>
+        <li>Fix wave_xform and scaling factors.</li>
+        <li>Allow Animation to change lengths, useful for editors; just document caveats.</li>
+        <li>Remove all 'using namespace OIS' directives, since OIS has a Vector3 now so it can
+            be ambiguous, better to refer to external project explicitly</li>
+        <li>When increasing the number of shadow textures, use the settings from the end of
+            the list if it is not empty. This avoids confusion when a user for example sets
+            the size or format first, then increases the count.</li>
+        <li>OctreeSceneManager should be checking for duplicates in createCamera like the other
+            SMs</li>
+        <li>texture_source now supported in new script compilers</li>
+        <li>Add missing ColourValue::getHSB method</li>
+        <li>Const fixes to Polygon, and adding missing obvious method (isPointInside)</li>
+        <li>Deal with D3D9 lost device condition where a texture is no longer contained in the
+            TextureManager resource list, but still exists through some other shared pointer
+            reference. Previously these were not released / restored (if in the default pool)
+            and could cause a failure to restore the device, they now are dealt with properly.</li>
+        <li>Normalise rotation quaternions to eliminate the progressive drift which can happen
+            in some cases (resulting in skewed matrices)</li>
+        <li>Fix a bug in the new compositor script compiler - the 'clear' and 'stencil' passes
+            are supposed to pick up their settings (buffers, colour_value etc) from nested sections,
+            not attributes directly under the pass. Added new translators to handle these nested
+            areas and moved the attribute parsing into them. This fixes bad parsing of compositors
+            with custom clear / stencil settings that used to work in 1.4.</li>
+        <li>Fix transposed matrix parsing in new script compiler; affected 'transform' attribute
+            in texture_unit and also shader parameters expressed as a matrix in script. Addressing
+            of matrix4 is [row][column] and not [column][row].</li>
+        <li>Fix to InstancedGeometry::destroy - clear list</li>
+        <li>Change Windows SDK script so that uninstall doesn't remove any new nested folders
+            created by the user underneath it.</li>
+        <li>Fix compile when using (deprecated) GTK platform</li>
+        <li>Patch autotools files for PCZSceneManager and new Samples</li>
+        <li>InstancedGeometry should be looking for the best technique, not the first technique</li>
+        <li>Fixed Technique::movePass when moving a pass forward</li>
+        <li>Camera::getCameraToViewportBoxVolume extra plane generated, also added optional
+            far plane inclusion as requested, non interface breaking</li>
+        <li>Extra checking in AutoParamDataSource to prevent accidental out of bounds access
+            to light arrays</li>
+        <li>Protect Pass hash recalculation process from race conditions by adding mutexes to
+            cover the change conditions</li>
+        <li>Mac/Carbon support for "border" and windowClosing event</li>
+        <li>Rename OgreOctree.h in OctreeZone plugin to avoid name clash with existing file
+            on OctreeSceneManager plugin. </li>
+        <li>Limit FOV on standard shadow camera setup so it doesn't approach 180 degrees</li>
+        <li>Added support for leading '/' in tokens in new script compiler</li>
+        <li>NedMalloc now added as an option for faster memory allocation / deallocation</li>
+        <li>Fix problem with setting up a controller on a TextureUnitState when one already
+            exists (e.g. calling setAnimatedTextureName more than once)</li>
+        <li>Slight optimisation to BillboardSet - use Matrix3 instead of Quaternion to orient,
+            uses less instructions.</li>
+        <li>Default preferred render texture mode to FBO in OS X now - this appears to be working
+            just fine in Leopard on my July 2007 MBP.</li>
+        <li>Improve LiSPSM quality when camera direction becomes parallel with the light direction
+            (scale up the opt adjust factor automatically)</li>
+        <li>Fix weird darkening of grass blades in Demo_Grass while camera moves (bug 190)</li>
+        <li>Compatibility with libtool 1.6+</li>
+        <li>Use forward slashes in q3settings.cfg</li>
+        <li>Fixed some gcc warnings &amp; const correctness issues</li>
+        <li>XCode &amp; MinGW build fixes</li>
+        <li>Documentation fixes</li>
+    </ul>
+    <p>
+    </p>
+    <p align="left" class="mainheader">
+        v1.4.9 [Eihort] (16 June 2008) - Maintenance Release</p>
+    <ul>
+        <li>Fix crash on Linux with NVIDIA cards when probing FBO formats</li>
+        <li>Fix corrupt mipmaps on NVIDIA with 175.x drivers</li>
+        <li>Fix GL clip planes for off-centre objects</li>
+    </ul>
 
-<p class="mainheader" align="left">Workaround for GLSL vertex attribute
-aliasing problems. v1.4.8 [Eihort] (10 May 2008) - Maintenance Release</p>
+<p class="mainheader" align="left"> v1.4.8 [Eihort] (10 May 2008) - Maintenance Release</p>
 <ul>
   <li>Mac OSX: 
     <ul>
@@ -779,24 +885,24 @@ since RC2:<br>
       <li>Significant speed improvements for dynamic VBOs -
         glMapBuffer/glUnmapBuffer is now only used for total buffer
         replacement or large sub-buffer changes; smaller partial updates use
-        a CPU scratch buffer area and glBufferSubData which can be much
+        a CPU scratch buffer area and glBufferSubData which can be much
         faster. Also eliminated some redundant copying when using shadow
         buffers</li>
       <li>Fix a problem with bleeding of vertex colour tracking state in GL
         rendersystem.</li>
       <li>Use a smaller buffer size when testing FBO formats to reduce
         overhead</li>
-      <li>Correct GeForce 6200 profile, doesn't support floating-point
-        texture filtering, as stated in NV documents</li>
+      <li>Correct GeForce 6200 profile, doesn't support floating-point
+        texture filtering, as stated in NV documents</li>
       <li>Fixed PBuffer check for whether main context is usable - copy/paste
         error compared width with height</li>
       <li>Fixed line ending detection in GLSL uniform parsing, was causing
-        problems with *nix line-endings</li>
-      <li>GLDefaultHardwareVertexBuffer now allocates aligned memory</li>
+        problems with *nix line-endings</li>
+      <li>GLDefaultHardwareVertexBuffer now allocates aligned memory</li>
       <li>Made GLTextureBuffer destructor safe even if failed to construct
         render-targets for some reason</li>
       <li>Don't use FBO method to upload texture from memory if either source
-        or target pixel format is luminance, seems never supported by
+        or target pixel format is luminance, seems never supported by
         hardware.</li>
       <li>Upload texture from memory with FBO should take extra care with
         source image rowPitch/slicePitch (e.g. nonconsecutive image).</li>
@@ -811,12 +917,13 @@ since RC2:<br>
         fails</li>
     </ul>
   </li>
-  <li>OSX:  
+  <li>OSX:&nbsp;
     <ul>
       <li>Updated the Xcode project by changing any header listed as project,
         or private, to public.</li>
       <li>Fixed the header referencing to be compatible with Xcode's
-        framework system.  This means that Ogre should be fully ready to be
+        framework system.&nbsp;
+          This means that Ogre should be fully ready to be
         released as a stand alone binary, and it will use the headers in the
         framework instead of needing an extra copy of the source around</li>
       <li>Added Crowd and Instancing demos</li>
@@ -831,17 +938,18 @@ since RC2:<br>
       <li>Fix GLX crash when building the config dialog image in debug
       mode</li>
       <li>Generally improved the GLX driver functionality</li>
-      <li>Allow gcc 4.x builds to take advantage of visibility attribute to
-        reduce plugin size a bit.  Works for MinGW and linux gcc &gt;=
+      <li>Allow gcc 4.x builds to take advantage of visibility attribute to
+        reduce plugin
+          size a bit.&nbsp; Works for MinGW and linux gcc &gt;=
       4.0.</li>
-      <li>Fix detection of X11 paths for 64bit systems</li>
+      <li>Fix detection of X11 paths for 64bit systems</li>
     </ul>
   </li>
   <li>Fix instancing demo crash (should have reduced the mesh count when
     removing cube.mesh)</li>
   <li>Fixed and unusual situation with auto-organised buffers where there
-    was unexpected blend weights/indices in vertex data</li>
-  <li>Hardware skinning examples:  
+    was unexpected blend weights/indices in vertex data</li>
+  <li>Hardware skinning examples:&nbsp;
     <ul>
       <li>have GLSL and Cg vertex two weight skinners share the same default
         parameters.</li>
@@ -849,7 +957,7 @@ since RC2:<br>
       <li>added unified vertex program for skinner two weight shadow
       casters</li>
       <li>used matrix multiply instead of individual dot products in GLSL
-        to improve performance on ATI cards</li>
+        to improve performance on ATI cards</li>
       <li></li>
     </ul>
   </li>
@@ -867,58 +975,59 @@ since RC2:<br>
     </ul>
   </li>
   <li>StringConverter::parseBool accepts '1' as true now</li>
-  <li>Enclose max/min with parentheses in headers to suppress nasty max/min
+  <li>Enclose max/min with parentheses in headers to suppress nasty max/min
     macro substitution if user has a Windows header on their path</li>
-  <li>Make static pass dirty list and graveyard threadsafe when threading
+  <li>Make static pass dirty list and graveyard threadsafe when threading
     enabled</li>
   <li>Fix bug
-    in GpuProgramParameters::_getFloatConstantPhysicalIndex/_getIntConstantPhysicalIndex
+    in GpuProgramParameters::_getFloatConstantPhysicalIndex/_getIntConstantPhysicalIndex
     when expanding in middle of the buffer for a logical entry</li>
-  <li>Fix CEGui renderer in GL being a bit random with the texture filter
+  <li>Fix CEGui renderer in GL being a bit random with the texture filter
     modes</li>
-  <li>Font bugfix - don't restart texture coordinates to (0,0) for each
+  <li>Font bugfix - don't restart texture coordinates to (0,0) for each
     code-point range</li>
   <li>Fixed the fact that Entity::_deinitialise() should have been clearing
     the internal lists</li>
-  <li>Fixed locale problems with StringConverter::parse* methods - now use
-    std::istringstream instead of atof / atoi so they behave consistently
-    with StringConverter::toString which uses ostringstream.</li>
+  <li>Fixed locale problems with StringConverter::parse* methods - now use
+    std::istringstream instead of atof / atoi so they behave consistently
+    with StringConverter::toString which uses ostringstream.</li>
   <li>Fixed bug which caused BSP loading not to parse .shader files in
     subfolders</li>
-  <li>Fix const-correctness on PixelUtil::packColour and
+  <li>Fix const-correctness on PixelUtil::packColour and
   Bitwise::intWrite</li>
   <li>TextAreaOverlayElement - needed to reduce the vertex count twice for
     CR/LF</li>
   <li>Fixed Pass max_lights in per-light or per-n-lights iteration, max
-    should apply to the sum of all iterations and not per single
+    should apply to the sum of all iterations and not per single
   iteration</li>
-  <li>'shadow_scene_depth_range' auto-binding needed same behavior as
-    SceneManager when dealing with light list</li>
-  <li>Consistency issues with writeContentsToFile fixed:  
+  <li>'shadow_scene_depth_range' auto-binding needed same behavior as
+    SceneManager when
+      dealing with light list</li>
+  <li>Consistency issues with writeContentsToFile fixed: &nbsp;
     <ul>
-      <li>D3D now writes only the client area to the screenshot, no title /
+      <li>D3D now writes only the client area to the screenshot, no title /
         border (matches GL)</li>
-      <li>Fixed 1-pixel border in Win32 GL screenshots caused by off-by-1
+      <li>Fixed 1-pixel border in Win32 GL screenshots caused by off-by-1
         params to glReadPixels</li>
-      <li>Used glReadBuffer(GL_FRONT) in fullscreen mode to ensure that the
+      <li>Used glReadBuffer(GL_FRONT) in fullscreen mode to ensure that the
         latest results are read in cases where single-stepping is done</li>
     </ul>
   </li>
   <li>Minor memory leaks fixed in OgreXmlConverter</li>
   <li>Ensure PixelUtil::getBNFExpressionOfPixelFormats is called after all
     global statics are properly initialised</li>
-  <li>Consistency fixes (export and const correctness) for &lt;&lt; operators
+  <li>Consistency fixes (export and const correctness) for &lt;&lt; operators
     in various classes</li>
-  <li>Make #ifdef more specific on OgrePrerequisites.h to avoid name
+  <li>Make #ifdef more specific on OgrePrerequisites.h to avoid name
   clashes</li>
   <li>TextureUnitState animated textures - allow resetting of animation
     position</li>
   <li>Default Quaternion::getYaw / getPitch / getRoll to more intuitive
-    versions ie the atan2 of the projection of the local axes. Can return to
+    versions ie the atan2 of the projection of the local axes. Can return to
     the previous version by passing 'false' to the methods.</li>
-  <li>Fix Ogre debug calloc macro has incorrect parameter count</li>
+  <li>Fix Ogre debug calloc macro has incorrect parameter count</li>
   <li>Added access to ManualObject sections after they are created</li>
-  <li>Added "hasEnded" method to AnimationState</li>
+  <li>Added "hasEnded" method to AnimationState</li>
   <li>Tidied and removed header entries for some previously removed code</li>
   <li>LEXIExporter updated to 1.0.3</li>
   <li>Blender Exporter: 
@@ -926,13 +1035,13 @@ since RC2:<br>
       <li>added check for empty ipos</li>
     </ul>
     <ul>
-      <li>fixed translation key frame values</li>
+      <li>fixed translation key frame values</li>
       <li>documentation updates</li>
     </ul>
   </li>
   <li>XSI Exporter: 
     <ul>
-      <li>Fix pose animations for objects not at the origin</li>
+      <li>Fix pose animations for objects not at the origin</li>
     </ul>
   </li>
   <li></li>
@@ -968,8 +1077,8 @@ the 1.4.0 release, this section just details the changes since RC1:<br>
   <li>Workaround for GLSL drivers (ATI) that report array uniforms
   incorrectly</li>
   <li>Updated to latest version of TinyXML for XMLConverter</li>
-  <li>Fixed codec support for 16-bit RGB(A) formats</li>
-  <li>Added warning when a skinned mesh has vertices not assigned to any
+  <li>Fixed codec support for 16-bit RGB(A) formats</li>
+  <li>Added warning when a skinned mesh has vertices not assigned to any
   bones</li>
   <li>Unicode fixes for MingW</li>
   <li>Bugfix for when the "original scene" compositor instance is not
@@ -977,27 +1086,27 @@ the 1.4.0 release, this section just details the changes since RC1:<br>
   <li>Added const version of SceneManager::getMovableObjectCollection</li>
   <li>Config file save/load moved out of config dialogs to common area</li>
   <li>Fix For "parentWindowHandle" with GLX</li>
-  <li>Instancing demo: Fix selection of ogrehead.mesh in Linux / OSX</li>
+  <li>Instancing demo: Fix selection of ogrehead.mesh in Linux / OSX</li>
   <li>Fixed D3D9HardwareOcclusionQuery::isStillOutstanding - should not have
     been using D3DGETDATA_FLUSH flag</li>
-  <li>Fix assert when using custom per-renderable GPU parameters with GLSL
-    params smaller than 4 floats (DeferredShading). </li>
+  <li>Fix assert when using custom per-renderable GPU parameters with GLSL
+    params smaller than 4 floats (DeferredShading).&nbsp; </li>
   <li>Eliminated GL MRT shader warning: global variable gl_FragData requires
     "#extension GL_ARB_draw_buffers : enable" before use.</li>
   <li>Make ResourceManager::getMemoryUsage public</li>
   <li>Improve compositor demo / sharpen edges shader support on lower-end ATI
     cards</li>
-  <li>Add non-const versions of GpuProgramParameters::getFloatPointer and
+  <li>Add non-const versions of GpuProgramParameters::getFloatPointer and
     getIntPointer</li>
-  <li>Add destructor implementation for ErrorDialog in Win32</li>
+  <li>Add destructor implementation for ErrorDialog in Win32</li>
   <li>Add SceneManager::get/setQueuedRenderableVisitor so users can hook into
     low-level rendering behaviour if they want to</li>
   <li>Fix rather obscure issue with glDrawBuffer / glReadBuffer not getting
     reset in some cases of external GL control</li>
-  <li>Fixed problem with attaching a Light instance to a bone</li>
+  <li>Fixed problem with attaching a Light instance to a bone</li>
   <li>Fixed / suppressed some warnings </li>
   <li>Small optimisations and tidy ups</li>
-  <li>Minor documentation updates </li>
+  <li>Minor documentation updates&nbsp; </li>
 </ul>
 
 <p class="mainheader" align="left"><a name="1.4.0"></a>v1.4.0 RC1 [Eihort]
@@ -1011,14 +1120,14 @@ to upgrade your applications from Dagon to Eihort.<br>
 Enhancements since the Dagon branch:<br>
 
 <ul>
-  <li><span style="font-weight: bold;">SSE/SSE2/SIMD</span> improves
+  <li><span style="font-weight: bold;">SSE/SSE2/SIMD</span> improves
     performance in several areas 
     <ul>
       <li>Software animation</li>
     </ul>
     <ul>
       <li>Batch concatenation of affine matrices</li>
-      <li>Shadow volume routines</li>
+      <li>Shadow volume routines</li>
       <li>Aligned memory allocator &amp; CPUID detection</li>
     </ul>
   </li>
@@ -1036,7 +1145,7 @@ Enhancements since the Dagon branch:<br>
       <li>'unified' program definitions allow you to use one program as an
         alias for others for simpler cross-platform support</li>
       <li>GLSL 1.2 (GL 2.1) supported allowing non-square matrices</li>
-      <li>GLSL now binds tangent, binormal, blendWeights and blendIndices to
+      <li>GLSL now binds tangent, binormal, blendWeights and blendIndices to
         extended attributes (see the manual)</li>
       <li>Added many new auto-bindings including: 
         <ul>
@@ -1044,7 +1153,7 @@ Enhancements since the Dagon branch:<br>
           <li>'array' versions of light auto-bindings
             (light_position_object_space_array, light_diffuse_colour_array,
             etc)</li>
-          <li>Fixed-function surface reflectance passthoughs
+          <li>Fixed-function surface reflectance passthoughs
             (surface_ambient_colour, surface_diffuse_colour, etc)</li>
           <li>texture_size, inverse_texture_size and packed_texture_size</li>
         </ul>
@@ -1059,9 +1168,9 @@ Enhancements since the Dagon branch:<br>
     </ul>
     <ul>
       <li>'content_type shadow' added to texture unit to auto-bind shadow
-        textures into your materials and use them in integrated rendering</li>
+        textures into your materials and use them in integrated rendering</li>
       <li>New light iteration parameters to give extra flexibility when doing
-        integrated lighting / shadowing - iteration per_n_lights and
+        integrated lighting / shadowing - iteration per_n_lights and
         start_light</li>
     </ul>
     <ul>
@@ -1114,7 +1223,7 @@ Enhancements since the Dagon branch:<br>
       <li>Added option to Skeleton::optimiseAllAnimations which only destroys
         node tracks which have identity keyframes only for <span
         style="font-style: italic;">all</span> animations.</li>
-      <li>Several runtime and memory footprint optimisations  </li>
+      <li>Several runtime and memory footprint optimisations&nbsp; </li>
     </ul>
   </li>
   <li style="font-weight: bold;">Math optimisations 
@@ -1122,7 +1231,7 @@ Enhancements since the Dagon branch:<br>
       <li>Added specially optimised functions to dealing with affine
         matrices<i>, </i>all<i></i>world / view transforms<i></i>now have to
         be affine transforms<i></i>(they were assumed so before
-        anyway)<i>.</i> </li>
+        anyway)<i>.</i>&nbsp; </li>
     </ul>
   </li>
   <li><span style="font-weight: bold;">Material enhancements</span> 
@@ -1144,7 +1253,7 @@ Enhancements since the Dagon branch:<br>
     <ul>
       <li>You can now describe the desired pixel format to be used instead of
         the original image format when loading a texture </li>
-      <li>You can now set the preferred bit depth for integer and float pixel
+      <li>You can now set the preferred bit depth for integer and float pixel
         formats respectively, for example loading 128-bit float textures as
         64-bit for performance </li>
     </ul>
@@ -1174,7 +1283,7 @@ Enhancements since the Dagon branch:<br>
       <li>Queue the loading of resources in a background thread</li>
       <li>Register your own thread or use automatic background queue
       manager</li>
-      <li>Simple queued notification callbacks in primary thread so user
+      <li>Simple queued notification callbacks in primary thread so user
         doesn't have to think in a thread-safe manner</li>
       <li>Advanced users can perform other tasks (like scene graph setup) in
         a separate thread if they're careful about locking</li>
@@ -1261,93 +1370,97 @@ Changes since v1.2.4:<br>
 <br>
 
 <ul>
-  <li>GL:  
+  <li>GL:&nbsp;
     <ul>
       <li>Cope with GL_COMPRESSED_RGB_S3TC_DXT1_EXT as well
-        as GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, OSX in particular seems to
+        as GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, OSX in particular seems to
         return the former sometimes even though DXT1 is only one format</li>
-      <li> Test support for GL_EXT_secondary_color before using to avoid
-        crashes on very old drivers</li>
+      <li> &nbsp;&nbsp; &nbsp; Test support for GL_EXT_secondary_color before using to avoid
+        crashes on very old drivers</li>
     </ul>
   </li>
-  <li>D3D9: Use per-texture unit constant storage for cards that support it
-    to allow each unit to be more independent like GL. Otherwise using more
-    than one manual blend in a pass would override the same value.</li>
-  <li>Fix light_direction_object_space and light_direction_view_space
-    auto params - should have been using inverse transpose since they are
+  <li>D3D9: Use per-texture unit constant storage for cards that support it
+    to allow each unit to be more independent like GL. Otherwise using more
+    than one manual blend in a pass would override the same value.</li>
+  <li>Fix light_direction_object_space and light_direction_view_space
+    auto params - should have been using inverse transpose since they are
     directions</li>
-  <li>Mesh: Close the log after writing debug edge data log to free up file
+  <li>Mesh: Close the log after writing debug edge data log to free up file
     handle</li>
-  <li>Animation: Deal with invalid zero-length animations in a friendlier
-    fashion (no infinite looping)</li>
+  <li>Animation: Deal with invalid zero-length animations in a friendlier
+    fashion (no infinite looping)</li>
   <li>GPU program params: 
     <ul>
-      <li>setAutoConstant should check to see if the parameter already has an
-        auto, and replace it if so to allow modification of autos without
-        endlessly growing list.  Add clearAutoConstant to allow the unbinding
-        of a single auto constant</li>
-      <li>When parsing a manual parameter, unset any auto parameters with the
-        same name / index. This solves the problem where overriding an auto
+      <li>setAutoConstant should check to see if the parameter already has an
+        auto, and replace it if so to allow modification of autos without
+        endlessly growing list.Add &nbsp;&nbsp;&nbsp;&nbsp;
+          clearAutoConstant to allow the unbinding
+        of a single auto constant</li>
+      <li>When parsing a manual parameter, unset any auto parameters with the
+        same name / index. This solves the problem where overriding an auto
         parameter with a manual one in a subclassed material, or overriding a
-        default parameter didn't work.</li>
-      <li>Fix ACT_LIGHT_POSITION_VIEW_SPACE - since Light::getAs4DVector
-        returns the result in worldspace, should be using just the view
+        default parameter didn't work.</li>
+      <li>Fix ACT_LIGHT_POSITION_VIEW_SPACE - since Light::getAs4DVector
+        returns the result in worldspace, should be using just the view
         matrix, not worldview<br>
       </li>
     </ul>
   </li>
   <li>Add SubEntity::getParent</li>
-  <li>Octree plugin:  
+  <li>Octree plugin:&nbsp;
     <ul>
       <li>OctreeNode::_isIn now deals with growth in object size and bumps
-        objects out of the current node when too big</li>
-      <li>Fix resize when setting 'Depth' parameter on OctreeSceneManager</li>
+        objects out of the current node when too big</li>
+      <li>Fix resize when setting 'Depth' parameter on OctreeSceneManager</li>
     </ul>
   </li>
   <li>Terrain: 
     <ul>
-      <li>Terrain renderable bounding radius should use half length of the
-        diagonal instead of maximise half length of edge of the bounding
+      <li>Terrain renderable bounding radius should use half length of the
+        diagonal instead of maximise half length of edge of the bounding
       box.</li>
-      <li>When calculating scale of terrain, should use pagesize - 1 since
-        pagesize refers to the number of vertices; physical size is one
+      <li>When calculating scale of terrain, should use pagesize - 1 since
+        pagesize refers
+          to the number of vertices; physical size is one
       less.</li>
     </ul>
   </li>
   <li>Fix Billboard origins BBO_TOP_* and BBO_BOTTOM_* , were inverted</li>
-  <li>Fix getCameraToViewportRay again, wasn't quite right for ortho / custom
+  <li>Fix getCameraToViewportRay again, wasn't quite right for ortho / custom
     matrices</li>
   <li>Force update of animation after reevaluating vertex processing, to cope
-    with potential switching between hardware/software at unusual times</li>
-  <li>Make CompositorChain::_compile public so that expert users
-    can precompile chains if they want to. Also some compositor compile
+    with potential switching between hardware/software at unusual times</li>
+  <li>Make CompositorChain::_compile public so that expert users
+    can precompile chains if they want to. Also some compositor compile
     optmisations.</li>
-  <li>Don't try to load a HighLevelGpuProgram if it is not supported - bulk
-    loading all resources in a group could cause this to fail if the shader
+  <li>Don't try to load a HighLevelGpuProgram if it is not supported - bulk
+    loading all
+      resources in a group could cause this to fail if the shader
     isfor an unsupported system </li>
   <li>Fixed automatic setting of texture alias names when adding a new
     unnamed texture unit to a pass and then naming it</li>
-  <li>Compiler2Pass: testNextTokenID() did not allow testing of the last
+  <li>Compiler2Pass: testNextTokenID() did not allow testing of the last
     token in the que. Also fixed some problems parsing off the end of the
     source in pass 1.</li>
   <li>Overlays: 
     <ul>
-      <li>Overlay::setZOrder should maintain the same zorder multiple as
-        Overlay::add2D on children </li>
+      <li>Overlay::setZOrder should maintain the same zorder multiple as
+        Overlay::add2D on children&nbsp; </li>
     </ul>
     <ul>
       <li>Fix another potential overlay teardown order problem - elements
         should tell their parents when they are destroyed.</li>
     </ul>
   </li>
-  <li>Change 'time' to 'time_0_1' in Fresnel shader to try to prevent
-    precision errors when run for a very long time</li>
-  <li>Fixed some Code::Blocks project dependencies for some projects. Updated
+  <li>Change 'time' to 'time_0_1' in Fresnel shader to try to prevent
+    precision errors
+      when run for a very long time</li>
+  <li>Fixed some Code::Blocks project dependencies for some projects. Updated
     to latest Code::Blocks project format.</li>
-  <li>Enable the FAT32 manifest workaround to prevent random manifest errors
-    when building on a FAT32 drive - seems to especially be a problem on
+  <li>Enable the FAT32 manifest workaround to prevent random manifest errors
+    when building on a FAT32 drive - seems to especially be a problem on
     VS2005 SP1</li>
-  <li>Fix a small constants overrun in
+  <li>Fix a small constants overrun in
   GpuProgramParameters::copyConstantsFrom</li>
   <li>Fix /RTCc compatibility in ColourValue</li>
   <li>Small const correctness and tidy ups</li>
@@ -1364,15 +1477,15 @@ Changes since v1.2.3:<br>
     <ul>
       <li>Eliminated setting of texture transform to D3D device if texture
         transforms are disabled, since D3D texture coordinate processing will
-        ignore it </li>
-      <li>If "Full Screen" or "Video Mode" configuration option missing when
+        ignore it&nbsp; </li>
+      <li>If "Full Screen" or "Video Mode" configuration option missing when
         creating an auto D3D window, should throw exception correctly</li>
       <li>D3D9RenderSystem::setVertexBufferBinding now dealing with gaps
-        in vertex buffer bindings correctly, could manifest iteself as
+        in vertex buffer bindings correctly, could manifest iteself as
         problems if entities created before shadow type picked (generally not
         recommended anyway)</li>
       <li>Correctly report support for non-POW2 textures in D3D9, and
-        also detect 'limited' support option which many cards have (no mips
+        also detect 'limited' support option which many cards have (no mips
         etc). Flag was not used in Ogre since POW2 issues are dealt with
         another way but external apps might be checking it.</li>
       <li>Fix divide by zero when locking DXT compressed textures</li>
@@ -1384,117 +1497,123 @@ Changes since v1.2.3:<br>
         destroying those buffer copies when the original was destroyed,
         leading to wasted memory that was only recovered when using more
         general shutdown methods</li>
-      <li>Full screen antialiasing (FSAA) now supported for Win32/GL even if
+      <li>Full screen antialiasing (FSAA) now supported for Win32/GL even if
         in 16bpp display mode</li>
-      <li>GLSL now correctly populating GL_SAMPLER_2D_RECT and
-        GL_SAMPLER_2D_RECT_SHADOW type uniforms</li>
-      <li>Detect FBO depth/stencil formats a little more robustly</li>
+      <li>GLSL now correctly populating GL_SAMPLER_2D_RECT and
+        GL_SAMPLER_2D_RECT_SHADOW type
+          uniforms</li>
+      <li>Detect FBO depth/stencil formats a little more robustly</li>
       <li>Ensure GLSL programs are properly unbound when the next program
         bound is a different type</li>
-      <li>Check for existence of wglSwapIntervalEXT before trying to use it,
-        fixes crash on very old drivers</li>
-      <li>Hardware pixel buffer locking fix - was only downloading the buffer
+      <li>Check for existence of wglSwapIntervalEXT before trying to use it,
+        fixes crash on
+          very old drivers</li>
+      <li>Hardware pixel buffer locking fix - was only downloading the buffer
         when locked read-only, now downloads provided the discard lock option
-        isn't used and the texture was not created write-only</li>
-      <li>Hardware pixel buffer unlocking optimisation - don't upload the
-        buffer if the original lock mode was read only</li>
+        isn't used and the texture was not created write-only</li>
+      <li>Hardware pixel buffer unlocking optimisation - don't upload the
+        buffer if the original
+          lock mode was read only</li>
     </ul>
   </li>
   <li>Shadows: 
     <ul>
-      <li>Should disable fogging explicitly for shadow receiver pass if using
-        additive texture shadows, since fogging state might otherwise leak
+      <li>Should disable fogging explicitly for shadow receiver pass if using
+        additive texture shadows, since fogging state might otherwise leak
         from a previous modulative mode</li>
-      <li>Fix memory growth issue with stencil shadows when destroying and
+      <li>Fix memory growth issue with stencil shadows when destroying and
         recreating entities - EntityShadowRenderable was creating vertex
-        buffer binding and vertex declarations itself when they were
-        already being created by VertexData</li>
+        buffer binding and vertex declarations itself when they were
+        already being created by VertexData</li>
     </ul>
   </li>
   <li>Materials: 
     <ul>
-      <li>Material::getNumLodLevels should fall back on first scheme if
+      <li>Material::getNumLodLevels should fall back on first scheme if
         scheme is not defined for this material</li>
-      <li>Fixed incorrect auto gpu program parameters:
+      <li>Fixed incorrect auto gpu program parameters:
         inverse_transpose_view_matrix, inverse_transpose_world_matrix
-        and inverse_transpose_worldview_matrix</li>
+        and inverse_transpose_worldview_matrix</li>
     </ul>
   </li>
   <li>Node: Fix missing calls to Node::Listener if user causes transformation
     derivation to happen earlier than regular Node::update()</li>
   <li>Fix reinitialisation of auto windows after Root::shutdown</li>
-  <li>BillboardChain::clearChain should notify index dirty and update
+  <li>BillboardChain::clearChain should notify index dirty and update
   bounds.</li>
   <li>RibbonTrail: 
     <ul>
       <li>setMaxChainElements, setNumberOfChains should reset all trails
-        to initial state if there have tracked node. </li>
+        to initial state if there have tracked node. &nbsp; </li>
       <li>setNumberOfChains should not allow changing the number of chains to
-        less than number of tracking nodes. </li>
-      <li>Overridden clearChain to reset trail to initial state if it has a
+        less than number of tracking nodes.&nbsp; </li>
+      <li>Overridden clearChain to reset trail to initial state if it has a
         tracked node.</li>
     </ul>
   </li>
   <li>Mesh: 
     <ul>
-      <li>Fixed an assert that would be raised when trying to lock an already
-        locked buffer when buildTangentVectors is called on a skeleton
+      <li>Fixed an assert that would be raised when trying to lock an already
+        locked buffer when buildTangentVectors is called on a skeleton
         animated mesh with no edge list built.</li>
     </ul>
   </li>
-  <li>Overlay:  
+  <li>Overlay:&nbsp;
     <ul>
-      <li>Fix copying of nested overlay container elements from template</li>
-      <li>Fix incorrect static_cast&lt;unsigned&gt; instances in
+      <li>Fix copying of nested overlay container elements from template</li>
+      <li>Fix incorrect static_cast&lt;unsigned&gt; instances in
         BorderPanelOverlayElement which caused problems with some metrics</li>
-      <li>On destruction of a root overlay container, remove from parent
-        overlay to avoid dangling bad reference</li>
+      <li>On destruction of a root overlay container, remove from parent
+        overlay to avoid
+          dangling bad reference</li>
     </ul>
   </li>
-  <li>Quaternion: Fixed shortest path slerp bug, also use lerp rather than
+  <li>Quaternion: Fixed shortest path slerp bug, also use lerp rather than
     just return first quaternion in case two quaternions are very close.</li>
-  <li>OctreeSceneManager: detect mOctree deletion during shutdown if
-    callbacks from nodes being destroyed hit OctreeSceneManager methods,
+  <li>OctreeSceneManager: detect mOctree deletion during shutdown if
+    callbacks from nodes being destroyed hit OctreeSceneManager methods,
     fixes some rare shutdown issues</li>
-  <li>TerrainSceneManager:  Fix terrain reloading problems (setWorldGeometry
+  <li>TerrainSceneManager:  Fix terrain reloading &nbsp; &nbsp; &nbsp; &nbsp; problems (setWorldGeometry
     called more than once)</li>
-  <li>Pass: dirty pass hashes immediately on change rather than on load. If
-    pass is loaded on demand as part of queueing an object for rendering, and
+  <li>Pass: dirty pass hashes immediately on change rather than on load. If
+    pass is loaded on demand as part of queueing an object for rendering, and
     the pass had previously been rendered, the pass hash would be dirtied too
-    late for it to be corrected (since the hash is recalculated when the
-    queue is cleared, which has already happened), leading to a hash
+    late for it to be corrected (since the hash is recalculated when the
+    queue is cleared, which has already happened), leading to a hash
     discrepancy</li>
   <li>Fix small memory growth issue when destroying and recreating
     StaticGeometry and ManualObject</li>
   <li>PixelFormat: PF_UNKNOWN should be marked as inaccessible from
     PixelUtil::isAccessible</li>
-  <li>Removed MemoryManager::instance() from MemoryManager methods being used
-    inside non-static MemoryManager methods</li>
-  <li>Profiler: Init hierarchicalLvl earlier so that it is valid when used by
+  <li>Removed MemoryManager::instance() from MemoryManager methods being used
+    inside non-static MemoryManager methods</li>
+  <li>Profiler: Init hierarchicalLvl earlier so that it is valid when used by
     intermediate code</li>
   <li>BillboardSet::mBoundingRadius now initialised correctly</li>
-  <li>Normalise result of Vector3::getRotationTo to protect against
-    variations in extreme cases</li>
-  <li>MaterialSerializer: Serialise number of mips and alpha-only option on
+  <li>Normalise result of Vector3::getRotationTo to protect against
+    variations in extreme
+      cases</li>
+  <li>MaterialSerializer: Serialise number of mips and alpha-only option on
     texture_unit 'texture' attributes</li>
   <li>AnimationTrack: Ensure the result for zero-weight and trackless
     animations is the same, caused incorrect blending if mixed</li>
-  <li>HDR compositor scene HDR rendering pass should use "input none",
-    and suppressed warning that attempt to render queue 5 before 96.</li>
+  <li>HDR compositor scene HDR rendering pass should use "input none",
+    and suppressed warning that attempt to render queue 5 before 96.</li>
   <li>Entity: 
     <ul>
-      <li>shareSkeletonInstanceWith should not delete sharing prepared temp
+      <li>shareSkeletonInstanceWith should not delete sharing prepared temp
         blend buffers</li>
-      <li>Stop sharing skeleton instance during entity destroy and there is
+      <li>Stop sharing skeleton instance during entity destroy and there is
         only one entity sharing the skeleton</li>
-      <li>Don't re-prepare temp blend buffers when stopping sharing skeleton
+      <li>Don't re-prepare temp blend buffers when stopping sharing skeleton
         instance, it's unnecessary in this case</li>
     </ul>
   </li>
   <li>Fix Camera::getCameraToViewportRay so that it deals with custom view /
     projection matrices properly</li>
-  <li>XSI Exporter: Fix a pose animation bug where the start of a pose
-    animation was truncated to fit to a later animation and incorrectly
+  <li>XSI Exporter: Fix a pose animation bug where the start of a pose
+    animation was truncated
+      to fit to a later animation and incorrectly
     indexed</li>
   <li>Code::Blocks: 
     <ul>
@@ -1528,7 +1647,7 @@ Changes since v1.2.2:<br>
       <li>Make sure fixed-function LBX_ADD_SMOOTH implemented, even though no
         direct equivalent for arbitrary GL_COMBINE in GL. GL_INTERPOLATE is
         the closest</li>
-      <li>Fix a problem with the model (world) matrix being incorrectly taken
+      <li>Fix a problem with the model (world) matrix being incorrectly taken
         into account when using fixed-function cubic reflection in GL</li>
     </ul>
   </li>
@@ -1547,9 +1666,9 @@ Changes since v1.2.2:<br>
         changes</li>
       <li>Fix a bug with ResourceGroupManager::loadResourceGroup - if any
         resource in the group at the start changed group (because of a
-        resource found in another location not in the group being loaded),
+        resource found in another location not in the group being loaded),
         iterators are invalidated which caused a nasty crash. Really people
-        should sort out their group locations but detect this condition and
+        should sort out their group locations but detect this condition and
         deal with it nicely</li>
       <li></li>
     </ul>
@@ -1582,8 +1701,8 @@ Changes since v1.2.2:<br>
         counterpart</li>
       <li><span style="font-weight: bold;">NOTE</span>: Using Frame Buffer
         Objects (FBOs) on OSX can cause some visual artefacts, choose
-        "PBuffer" as the "RTT Preferred Mode" when configuring the GL
-        rendersystem until Leopard is released which should fix this
+        "PBuffer" as the "RTT Preferred Mode" when configuring the GL
+        rendersystem until Leopard is released which should fix this
       problem.</li>
     </ul>
   </li>
@@ -1597,12 +1716,12 @@ Changes since v1.2.2:<br>
   <li>Node changes: 
     <ul>
       <li>If node already attached to a parent, addChild now throws an
-        exception instead of just asserting, helpful to track down this type
-        of bug in release build</li>
+        exception instead of just asserting, helpful to track down this type
+        of bug in release build</li>
       <li>removeChild(Node*) now uses node name to find whether/where to
         erasing the child (still keep same behavior as previous), increases
-        performance </li>
-      <li>Bugfix for node weighted transform scale blend: should interpolate
+        performance&nbsp; </li>
+      <li>Bugfix for node weighted transform scale blend: should interpolate
         between old and new scale rather than scaling old scale with factored
         new scale</li>
     </ul>
@@ -1626,7 +1745,7 @@ Changes since v1.2.2:<br>
       too</li>
     </ul>
   </li>
-  <li>BillboardChain:   
+  <li>BillboardChain: &nbsp;
     <ul>
       <li>changing number of elements and chains, enabling/disabling vertex
         colour and texture coords usage should mark index buffer dirty and
@@ -1636,7 +1755,7 @@ Changes since v1.2.2:<br>
   </li>
   <li>Tangent calculations: 
     <ul>
-      <li>Correct bug with shared geometry where each submesh covered only
+      <li>Correct bug with shared geometry where each submesh covered only
         some of the vertices</li>
       <li>Orthogonalise tangent vectors with the vertex normal when
       generating</li>
@@ -1645,15 +1764,15 @@ Changes since v1.2.2:<br>
   <li>Ensure the correct texture format / num mips is used if texture loaded
     through declareResource / loadResourceGroup instead of
     TextureManager::load</li>
-  <li>Fixed stencil shadow bug when enabling a custom near clip plane, which
+  <li>Fixed stencil shadow bug when enabling a custom near clip plane, which
     in some case missing generate light/dark caps that required by zfail
     algorithm</li>
-  <li>Viewport clear buffers defaults to FBT_COLOUR|FBT_DEPTH, the same as
-    the value defaulted in Viewport::setClearEveryFrame, not 0xFF. More
+  <li>Viewport clear buffers defaults to FBT_COLOUR|FBT_DEPTH, the same as
+    the value defaulted in Viewport::setClearEveryFrame, not 0xFF. More
     consistent, small speedup and resolves some compositor issues</li>
-  <li>Overlay bugfix - when a parent container was using pixel metrics, and
-    the child was using non-left or non-top alignment, the pixel metrics were
-    being used as relative metrics to calculate the childs position in
+  <li>Overlay bugfix - when a parent container was using pixel metrics, and
+    the child was using non-left or non-top alignment, the pixel metrics were
+    being used as relative metrics to calculate the childs position in
   error</li>
   <li>Mesh::clone - fix pose list being empty after mesh cloning</li>
   <li>DeferredShading Demo now compiles under OGRE_DOUBLE_PRECISION mode</li>
@@ -1665,28 +1784,29 @@ Changes since v1.2.2:<br>
   <li>StaticGeometry was getting the wrong material technique which caused
     material LOD not to work, and for potentially unsupported techniques to
     be picked - fixed.</li>
-  <li>Fix a bug in vertex morph animation where if the same keyframe was
+  <li>Fix a bug in vertex morph animation where if the same keyframe was
     passed as both parameters for the morph (because only one keyframe in a
-    track, or because the time exactly matched a keyframe), the same buffer
+    track, or because the time
+      exactly matched a keyframe), the same buffer
     was locked twice</li>
-  <li>Root::addFrameListener now deals with the case where a listener with a
+  <li>Root::addFrameListener now deals with the case where a listener with a
     given address is removed and re-added before the deferred removal is
     processed</li>
-  <li>Entity::refreshAvailableAnimationState should refresh vertex animation
+  <li>Entity::refreshAvailableAnimationState should refresh vertex animation
     too. Refreshing the animation state should update length if it has
   changed</li>
-  <li>Virtualise a few SceneNode methods so they can be overridden</li>
-  <li>Copy pass should copy hash value too. On demand illumination pass
+  <li>Virtualise a few SceneNode methods so they can be overridden</li>
+  <li>Copy pass should copy hash value too. On demand illumination pass
     compiles should calculate new pass hash value immediately.</li>
-  <li>BillboardSet: unreference main buffer when destroying buffers, so the
+  <li>BillboardSet: unreference main buffer when destroying buffers, so the
     hardware vertex buffer will release back to driver as early as
   possible</li>
   <li>Fix Ocean demo crashing if there are no supported material
   techniques</li>
-  <li>Safely handle null camera in all cases in Viewport</li>
-  <li>Fix a bug in the Milkshape exporter when exporting models imported from
+  <li>Safely handle null camera in all cases in Viewport</li>
+  <li>Fix a bug in the Milkshape exporter when exporting models imported from
     other formats which have less position keyframes than rotation keyframes
-    (Milkshape never creates these)</li>
+    (Milkshape never creates these)</li>
   <li>Fix and enhance BitmapFontBuilderTool</li>
   <li>Miscellaneous detail-level performance improvements</li>
   <li>Documentation updates</li>
@@ -1696,9 +1816,9 @@ Changes since v1.2.2:<br>
 Maintenance Release</p>
 Changes since v1.2.1: 
 <ul>
-  <li>D3D9:  
+  <li>D3D9:&nbsp;
     <ul>
-      <li>when loading DDS files, se 'Ex' versions of DDS loading routines so
+      <li>when loading DDS files, se 'Ex' versions of DDS loading routines so
         that user mipmap preferences are preserved</li>
       <li>Initialise D3DTexture::mD3DPool to some value other than
         D3DPOOL_DEFAULT, if texture loading failed and then later it might
@@ -1715,32 +1835,32 @@ Changes since v1.2.1:
       <li>added missing shadow sampler uniform types</li>
     </ul>
   </li>
-  <li>TextureUnitState: Reset mRecalcTexMatrix to false after texture matrix
-    calculated, to avoid recalculating each time</li>
-  <li>Fix bootstrap script not accepting autoconf 2.60</li>
-  <li>Node: Avoid queueing a node for update more than once, which could
+  <li>TextureUnitState: Reset mRecalcTexMatrix to false after texture matrix
+    calculated, to avoid recalculating each time</li>
+  <li>Fix bootstrap script not accepting autoconf 2.60</li>
+  <li>Node: Avoid queueing a node for update more than once, which could
     result in a crash if node was destroyed<br>
   </li>
-  <li>Added missing initialisation of mAutoCalc for RotationalSpline</li>
+  <li>Added missing initialisation of mAutoCalc for RotationalSpline</li>
   <li>MapIterator / ConstMapIterator - fixed peekNextValuePtr</li>
   <li>Fixed shadow_receiver_fragment_program usage with modulative texture
     shadows</li>
   <li>Added more tests for configure.in</li>
-  <li>Solaris 11 (Nexenta OS Alpha 5) build compatibility</li>
+  <li>Solaris 11 (Nexenta OS Alpha 5) build compatibility</li>
   <li>Fixed an inappropriate unsigned casting issue in TextAreaOverlayElement
     introduced in 1.2.1</li>
-  <li>OGRE_DEBUG_MEMORY_MANAGER can now be defined externally which is
-    usefull for batch builds that need to build both versions</li>
+  <li>OGRE_DEBUG_MEMORY_MANAGER can now be defined externally which is
+    usefull for batch builds that need to build both versions</li>
   <li>Added MinGW + STLPort version of Code::Blocks project for MeshUpgrader,
     a few other Code::Blocks project tweaks</li>
-  <li>SkeletonInstance::createTagPointOnBone offset position parameter should
+  <li>SkeletonInstance::createTagPointOnBone offset position parameter should
     default to ZERO instead of UNIT_SCALE.</li>
-  <li>Slight optimisation/fix of BillboardSet and ParticleSystem: 
+  <li>Slight optimisation/fix of BillboardSet and ParticleSystem: 
     <ul>
       <li>Use list&lt;&gt;::splice to move billboard/particle between active
-        and free list. As a side note that removing a billboard which doesn't
+        and free list. As a side note that removing a billboard which doesn't
         exist in the active list now causes assertion fault in debug</li>
-      <li>BBT_PERPENDICULAR_COMMON no need to generate axes and vertex
+      <li>BBT_PERPENDICULAR_COMMON no need to generate axes and vertex
         offsets for every billboards (use common axes and vertex offsets
         instead).</li>
       <li>Notify particle system renderer attached node only if is
@@ -1748,35 +1868,35 @@ Changes since v1.2.1:
     </ul>
   </li>
   <li>Fix CEGui renderer potential bufer overrun with malformed XML</li>
-  <li>Added MovableObject::getVisible allow direct access to the value set
-    by MovableObject::setVisible without the additional conditions of
+  <li>Added MovableObject::getVisible allow direct access to the value set
+    by MovableObject::setVisible without the additional conditions of
     isVisible</li>
-  <li>SceneNode::flipVisibility should use object visible flag only, i.e.
-    should not take object upper rendering distance into account.  </li>
-  <li>Added missing overridden getMovableType for RibbonTrail</li>
-  <li>Added overridden getSingleton* methods to CompositorManager for
+  <li>SceneNode::flipVisibility should use object visible flag only, i.e.
+    should not take object upper rendering distance into account. &nbsp; </li>
+  <li>Added missing overridden getMovableType for RibbonTrail</li>
+  <li>Added overridden getSingleton* methods to CompositorManager for
     consistency</li>
-  <li>Remove unnecessary normalize calls in normal mapping shaders for
-    optimisation on lower end cards </li>
-  <li>Sphere intersection test with another sphere or point now uses
-    squaredLength() instead of length() to avoid square root</li>
-  <li>Fixed a naming bug in the 3dsmax exporter, can now use names with
+  <li>Remove unnecessary normalize calls in normal mapping shaders for
+    optimisation on lower end cards&nbsp; </li>
+  <li>Sphere intersection test with another sphere or point now uses
+    squaredLength() instead of length() to avoid square root</li>
+  <li>Fixed a naming bug in the 3dsmax exporter, can now use names with
     operators embedded</li>
   <li>Added a few missing header files to Mac OSX framework</li>
   <li>SceneNode::_getWorldAABB returns AxisAlignedBox by const reference
     instead of by value</li>
   <li>Some octree functions const correctness improved</li>
-  <li>Tidy ups and minor optimisations for Vector2/3/4 classes</li>
+  <li>Tidy ups and minor optimisations for Vector2/3/4 classes</li>
   <li>SDL back-end: 
     <ul>
-      <li>VSync support for SDL RenderSystem added</li>
+      <li>VSync support for SDL RenderSystem added</li>
     </ul>
     <ul>
-      <li>Fix compilation of OgreSDLConfig_gtk.cpp with recent libsigc</li>
-      <li>SDL_FreeSurface not needed for screen surfaces</li>
+      <li>Fix compilation of OgreSDLConfig_gtk.cpp with recent libsigc</li>
+      <li>SDL_FreeSurface not needed for screen surfaces</li>
     </ul>
   </li>
-  <li>More corrections to the manual &amp; docs</li>
+  <li>More corrections to the manual &amp; docs</li>
 </ul>
 
 <p class="mainheader" align="left">v1.2.1 [Dagon] (11 June 2006) -
@@ -1785,15 +1905,15 @@ Changes since v1.2.0:
 <ul>
   <li>Fix bug with software skinning under gcc 4.1 (an optimisation issue
     which does not occur on stable gcc 4.0 or MSVC)</li>
-  <li>Remove unnecessary (and incorrect, although harmless) linker path from
+  <li>Remove unnecessary (and incorrect, although harmless) linker path from
     platform manager<br>
   </li>
-  <li>InputEvent's constructor should take 'when' param as a Real like the
-    subclasses KeyEvent and MouseEvent to avoid truncation</li>
-  <li>Fixed bug in edge list builder when dealing with degenerate triangles.
-    Conforming vertex / index data is required to build an edge list, so     
+  <li>InputEvent's constructor should take 'when' param as a Real like the
+    subclasses KeyEvent and MouseEvent to avoid truncation</li>
+  <li>Fixed bug in edge list builder when dealing with degenerate triangles.
+    Conforming vertex / index data is required to build an edge list, so &nbsp; &nbsp;&nbsp;
     throw an exception if this condition is detected</li>
-  <li>Fixed HLSL program populating incorrect parameter index of array
+  <li>Fixed HLSL program populating incorrect parameter index of array
     parameters</li>
   <li>Fixed potential double inserts into mSupportedTechniques while compile
     materials</li>
@@ -1801,23 +1921,24 @@ Changes since v1.2.0:
     avoid potential naming conflict and also marked it as private</li>
   <li>Minor issue in Rectangle2D - set the (unused in most cases) mBox member
     properly instead of some random stack variable</li>
-  <li>Fixed animation update problem when animation state changed between end
+  <li>Fixed animation update problem when animation state changed between end
     of last frame and beginning of next frame - note this changes the
     behaviour of AnimationStateSet::getDirtyFrameNumber, if you used this
     yourself, check the changes</li>
   <li>Fixed a bug causing the transform of an object attached to a bone to
     never update if its own transform is changed, when the parent skeleton
-    animation is frozen </li>
+    animation is frozen&nbsp;
+  </li>
   <li>Entity shouldn't force software animation because of stencil shadows if
     it has shadow casting disabled</li>
   <li>Texture Shadow fixes: 
     <ul>
       <li>Fix several bugs with using global custom shadow caster / receiver
-        materials that used vertex / fragment programs</li>
+        materials that used vertex / fragment programs</li>
     </ul>
     <ul>
-      <li>Fix continuous memory consumption bug when using a combination of
-        modulative texture shadows, custom shadow receivers and
+      <li>Fix continuous memory consumption bug when using a combination of
+        modulative texture shadows, custom shadow receivers and
       spotlights</li>
       <li>Fix bug in setShadowTextureSettings where the previous shadow pixel
         format settings would be used</li>
@@ -1826,18 +1947,19 @@ Changes since v1.2.0:
   <li>Remove fog-based distance fade of additive texture shadows since it
     can't work; clamp to border instead</li>
   <li>Fix problem in BillboardSet::setTextureCoords if params are 0,0</li>
-  <li>Add compatibility with NVPerfHUD 4.0</li>
+  <li>Add compatibility with NVPerfHUD 4.0</li>
   <li>Add missing 'clear' methods to BillboardChain</li>
-  <li>Add 'SceneManager::hasCamera', 'SceneManager::hasEntity' etc as
+  <li>Add 'SceneManager::hasCamera', 'SceneManager::hasEntity' etc as
     requested in the forum</li>
-  <li>XSI exporter: Fix a bug when submesh merging is enabled and objects do
-    not have the same geometry format (UV sets or vertex colours) - would
-    cause objects to be leaked and not exported</li>
+  <li>XSI exporter: Fix a bug when submesh merging is enabled and objects do
+    not have the same geometry format (UV sets or vertex colours) - would
+    cause objects to be
+      leaked and not exported</li>
   <li>CompositionPass should take &amp; return a Material shared pointer by
-    const reference instead of by value</li>
-  <li>Ensure correct values are returned from SkeletonInstance::getName,
+    const reference instead of by value</li>
+  <li>Ensure correct values are returned from SkeletonInstance::getName,
     getHandle, getGroup</li>
-  <li>Update to latest Code::Blocks project format</li>
+  <li>Update to latest Code::Blocks project format</li>
   <li>OpenGL fix for parentWindowHandle option under Windows</li>
   <li>Eye vector normalisation fix to the bump map w/ specular shader</li>
   <li>Fix XMLConverter crash with more than 65536 faces</li>
@@ -1845,11 +1967,11 @@ Changes since v1.2.0:
     <ul>
       <li>reflection map can now be blurred by using bias to select mipmap
         level during cube map sampling</li>
-      <li>fixed rotation matrix calc for tangent space to object space
-        transformation - Cg, HLSL, GLSL now produce the exact same image</li>
-      <li>allow wave amplitude to be much larger now that reflections work
-        correctly on waves</li>
-      <li>increased mesh resolution so that large waves aren't so jagged</li>
+      <li>fixed rotation matrix calc for tangent space to object space
+        transformation - Cg, HLSL, GLSL now produce the exact same image</li>
+      <li>allow wave amplitude to be much larger now that reflections work
+        correctly on waves</li>
+      <li>increased mesh resolution so that large waves aren't so jagged</li>
     </ul>
   </li>
   <li>SDK setup enhancements: 
@@ -1857,43 +1979,44 @@ Changes since v1.2.0:
       <li>Wiki page link on finish page</li>
       <li>Add readme checkbox on finish page so readme.html is opened after
         SDK finishes install</li>
-      <li>Fixed text crop problem on finish page </li>
+      <li>Fixed text crop problem on finish page&nbsp; </li>
       <li>Add shortcut link to relevant wiki page for SDK setup and usage</li>
     </ul>
   </li>
-  <li>Remove  unimplemented FrameEvent method declarations from
+  <li>Remove  &nbsp;&nbsp; &nbsp; unimplemented FrameEvent method declarations from
     ParticleSystemManager, shouldn't be there</li>
   <li>Documentation fixes &amp; tweaks</li>
 </ul>
 
-<p class="mainheader" align="left">v1.2.0 [Dagon] (Final: 7 May 2006) - Major
+<p class="mainheader" align="left">v1.2.0 [Dagon] (Final: 7 May 2006) - Major
 Release</p>
 See the RC1/2 notes below for other changes and major new features in 1.2.0.
-This release has the following changes &amp; bugfixes over RC2:<br>
+This release has the following changes &amp; bugfixes over RC2:<br>
 
 <ul>
   <li>Add NV_occlusion_query fallback for cards without
   ARB_occlusion_query</li>
   <li>Fix a couple of bugs when combining pose and skeletal animation in a
     single model</li>
-  <li>Add RTLD_GLOBAL when loading dynamic libs under Linux - solves problems
-    with DRI drivers</li>
+  <li>Add RTLD_GLOBAL when loading dynamic libs under Linux - solves problems
+    with DRI
+      drivers</li>
   <li>Compiler2Pass now includes exclusion support for character sets</li>
   <li>Compositor: 
     <ul>
-      <li>Fix knot material when HDR compositor enabled under OpenGL, now
+      <li>Fix knot material when HDR compositor enabled under OpenGL, now
         looks the same as D3D</li>
       <li>Gaussian blur compositor added</li>
       <li>Widen CEGui text widgets in compositor demo to prevent name
       clipping</li>
-      <li>Fixed the initialisation of the central sample offsets for vertical
-        blur, caused some artefacts in release mode sometimes in HDR and
+      <li>Fixed the initialisation of the central sample offsets for vertical
+        blur, caused some artefacts in release mode sometimes in HDR and
         gaussian blur</li>
     </ul>
   </li>
   <li>Code::Blocks: 
     <ul>
-      <li>STLPort import libs no longer required.  DLL is linked directly</li>
+      <li>STLPort import libs no longer required.&nbsp; DLL is linked directly</li>
       <li>Workaround a problem with STLport which caused filestream
       problems</li>
       <li>Project dependencies updated</li>
@@ -1903,20 +2026,21 @@ This release has the following changes &amp; bugfixes over RC2:<br>
   </li>
   <li>Fixed potential bug in FileSystemArchive::open - Open file stream
     should check ensure open succeeded</li>
-  <li>Apply original fog settings to auto params even when fog override is
-    enabled, since if you want to disable fixed function fog but implement
+  <li>Apply original fog settings to auto params even when fog override is
+    enabled, since if you want to disable fixed function fog but implement
     fog in the shader you can't do it otherwise</li>
-  <li>Recompile compositor if viewport colour / clear options changed since
+  <li>Recompile compositor if viewport colour / clear options changed since
     last compiled, necessary for reliably picking up viewport colours</li>
   <li>Shadows: 
     <ul>
       <li>Fixed a problem with using custom shadow caster / receiver
         materials and transparent objects</li>
-      <li>Tweak validation of transparent renderables so that those with more
-        than one pass are only rendered once into shadow textures and once
-        for a receiver pass</li>
-      <li>Don't hard code the avoidance of texture shadows in compositor
-        render queue listener, detect reentrancy more generally - allows
+      <li>Tweak validation of transparent renderables so that those with more
+        than one pass are only rendered once into shadow textures and once
+        for a receiver pass</li>
+      <li>Don't hard code the avoidance of texture shadows in compositor
+        render queue listener,
+          detect reentrancy more generally - allows
         compositors to be used on texture shadows if required</li>
       <li>Soft shadow example added using gaussian blur compositor on shadow
         texture</li>
@@ -1930,15 +2054,15 @@ This release has the following changes &amp; bugfixes over RC2:<br>
       <li>Mouse Wheel support</li>
     </ul>
   </li>
-  <li>Clarify assert messages when trying to retrieve invalid software blend
+  <li>Clarify assert messages when trying to retrieve invalid software blend
     data</li>
   <li>Fixed Direct3D9 FSAA options that didn't refresh until selecting
     another a video mode</li>
-  <li>Allow access to the internal inverse transforms in case external apps
-    were using the removed _getBindingPoseInverseTransform</li>
-  <li>Fixed memory leak of ManualObject when converted to Mesh</li>
-  <li>Fixed issue of global new([])/delete([]) overridden when compiling
-    in VS2005 with managed C++</li>
+  <li>Allow access to the internal inverse transforms in case external apps
+    were using the removed _getBindingPoseInverseTransform</li>
+  <li>Fixed memory leak of ManualObject when converted to Mesh</li>
+  <li>Fixed issue of global new([])/delete([]) overridden when compiling
+    in VS2005 with managed C++</li>
   <li>Fixed a couple of issues with the sizing / resizing of SDL surfaces</li>
   <li>XSI Exporter now builds successfully against the newer XSI 5.1 SDK</li>
   <li>Fixed a couple of multithreading issues fixed with shared pointers and
@@ -1948,7 +2072,7 @@ This release has the following changes &amp; bugfixes over RC2:<br>
 <p class="mainheader" align="left">v1.2.0 [Dagon] (RC2: 17 April 2006) -
 Major Release</p>
 See the RC1 notes below for the major new features in 1.2.0. This release has
-the following changes &amp; bugfixes over RC1:<br>
+the following changes &amp; bugfixes over RC1:<br>
 
 <ul>
   <li>Compatibility with Cg 1.4 (particularly affects GL); also Visual C++
@@ -1957,13 +2081,13 @@ the following changes &amp; bugfixes over RC1:<br>
   <li>Compositor demo expanded and improved; now uses CEGui to present all
     the available compositors and includes lots of new ones including Sharpen
     Edges, Old Movie, Posterise and HDR</li>
-  <li>Fix attaching objects to bones</li>
+  <li>Fix attaching objects to bones</li>
   <li>Fix crash bug in OgreMeshUpgrade when using meshes with no vertex
   colour</li>
-  <li>Bugfix for software skin blending with position/normal shared buffer
+  <li>Bugfix for software skin blending with position/normal shared buffer
     with blend position only. Also allow more flexible vertex data
   layout.</li>
-  <li>Fixed bug in default intersection scene query, incrementing wrong
+  <li>Fixed bug in default intersection scene query, incrementing wrong
     iterator in inner loop</li>
   <li>Fixed bug with hardware skinning on cards that don't support UBYTE4
     (Geforce 3/4)</li>
@@ -1973,16 +2097,16 @@ the following changes &amp; bugfixes over RC1:<br>
     especially ATI</li>
   <li>Added capability flag for point sprites and extended point parameters;
     point rendering for billboardset now falls back on non-point rendering if
-    point sprites not available</li>
-  <li>Throw exception if trying to attaching movable which already attached
+    point sprites not available</li>
+  <li>Throw exception if trying to attaching movable which already attached
     to scene node or bone.</li>
   <li>Added missing method Animation::_getVertexTrackList.</li>
   <li>Manual updates</li>
-  <li>Make MaterialSerializer match the manual for texture element - allow
+  <li>Make MaterialSerializer match the manual for texture element - allow
     all optional elements</li>
   <li>Fix segfaults when using an animation with no tracks</li>
   <li>Turn on RTTI for core projects for VC7.1 (already on for VC8)</li>
-  <li>Fix shadow volume generation for ManualObject</li>
+  <li>Fix shadow volume generation for ManualObject</li>
   <li>More graceful handling when trying to define high-level shaders in a
     language not possible for the current rendersystem (GLSL on D3D, HLSL on
     GL). You don't get lots of errors in the log anymore, and technique
@@ -2001,34 +2125,36 @@ the following changes &amp; bugfixes over RC1:<br>
   <li>Remove old MSVC hash_compare override - this was only required for VC6
     and VC7.0 and is no longer relevant. Can cause problems if users are
     relying on the default hash function.</li>
-  <li>Fixed issues with buggy GL drivers claiming GL 1.5 compliance and not
-    supporting ARB_vertex_buffer_object.  F</li>
-  <li>Fixed hardware occlusion support for GL render system (should check GL
+  <li>Fixed issues with buggy GL drivers claiming GL 1.5 compliance and not
+    supporting ARB_vertex_buffer_object.&nbsp; F</li>
+  <li>Fixed hardware occlusion support for GL render system (should check GL
     1.5 or ARB_occlusion_query instead of NV_occlusion_query)</li>
-  <li>Binary search optimization of keyframe searching, helps with very large
+  <li>Binary search optimization of keyframe searching, helps with very large
     animations.</li>
-  <li>Allow different resource group names to be used when creating
-    compositors from script.  Was previously hard coded.</li>
+  <li>Allow different resource group names to be used when creating
+    compositors from script.&nbsp;
+      Was previously hard coded.</li>
   <li>Fix to SharedPtr with threading support enabled</li>
-  <li>Calculating the bone matrices should combine scale as equivalent axes,
+  <li>Calculating the bone matrices should combine scale as equivalent axes,
     no shearing</li>
-  <li>Make MovableObject::_getParentNodeFullTransform return const reference
+  <li>Make MovableObject::_getParentNodeFullTransform return const reference
     of Matrix4 and avoid memory copy</li>
   <li>GLSL: Support arbitrary sized uniform arrays of vec4 like Cg
-  and HLSL</li>
+  and HLSL</li>
   <li>Dr_Bunsen_Head.jpg - texture was NPOT which was screwing up some ATI
     cards, fixed.</li>
-  <li>Avoid divide by zero when setting fog auto gpu program parameter.</li>
-  <li>Make 'original scene' compositor source pick up viewport background
-    colours &amp; clear options</li>
-  <li>Bugfix for using wrong source in VertexData::reorganiseBuffers</li>
-  <li>DataStream issues:  
+  <li>Avoid divide by zero when setting fog auto gpu program parameter.</li>
+  <li>Make 'original scene' compositor source pick up viewport background
+    colours &amp;
+      clear options</li>
+  <li>Bugfix for using wrong source in VertexData::reorganiseBuffers</li>
+  <li>DataStream issues:&nbsp;
     <ul>
-      <li>Fixed read, get and skip line bug when line too long. </li>
-      <li>readLine and skipLine now implemented in DataStream, derived class
-        doesn't need to override unless they have more effective
-        implementation.    </li>
-      <li>Use temp buffer in the stack instead of in the class.  </li>
+      <li>Fixed read, get and skip line bug when line too long.&nbsp; </li>
+      <li>readLine and skipLine now implemented in DataStream, derived class
+        doesn't need to override unless they have more effective
+        implementation. &nbsp; &nbsp; </li>
+      <li>Use temp buffer in the stack instead of in the class. &nbsp; </li>
       <li>ConfigFile should open file in binary mode, since line reading
         functions might seek backward, and seeking in text mode have problem
         with CR/LF pairs.</li>
@@ -2058,7 +2184,7 @@ Porting Notes</a> in the OGRE Wiki.
         through script</li>
     </ul>
   </li>
-  <li style="font-weight: bold;">Multiple Render Target (MRT) support 
+  <li style="font-weight: bold;">Multiple Render Target (MRT) support 
     <ul>
       <li>Render to multiple targets simultaneously in the same rendering
         operation</li>
@@ -2068,9 +2194,9 @@ Porting Notes</a> in the OGRE Wiki.
   </li>
   <li><b>RenderTexture enhancements</b> 
     <ul>
-      <li>RenderTextures are now created like all other textures, with
+      <li>RenderTextures are now created like all other textures, with
         TextureManager::getSingleton().createManual; you just need to set a
-        usage parameter of TU_RENDERTARGET</li>
+        usage parameter of TU_RENDERTARGET</li>
       <li>Render to the faces of cube maps and to volume slices</li>
       <li>Retrieve the content of these sub-faces by accessing the
         HardwarePixelBuffer like so:
@@ -2188,7 +2314,8 @@ Porting Notes</a> in the OGRE Wiki.
     <ul>
       <li>Techniques, passes, and Texture unit states can now be named </li>
       <li>Materials can now extend other materials, through the script syntax
-        'material DerivedMaterial : BaseMaterial', to allow simple refinement
+        'material DerivedMaterial
+          : BaseMaterial', to allow simple refinement
         of existing materials </li>
       <li>matrix4x4, float4, float9, and float16 in material script now
         properly load matrices for use with GLSL shader unitforms </li>
@@ -2234,7 +2361,7 @@ Porting Notes</a> in the OGRE Wiki.
           <li>Animation of vertex positions in either hardware or
           software</li>
           <li>'Morph' variant is similar to old-skool vertex keyframe
-            animation; this is recommended only for legacy applications (e.g.
+            animation; this is recommended only for legacy applications (e.g.
             MD2)</li>
           <li>'Pose' variant is a modern, blendable pose based system which
             allows you to perform much more sophisticated vertex animation
@@ -2253,18 +2380,18 @@ Porting Notes</a> in the OGRE Wiki.
   <li><b>Skinning blending enhancements</b>. 
     <ul>
       <li>Larger skeletons are now possible with hardware skinning. OGRE now
-        only passes world matrices for the bones of a subentity that are
+        only passes world matrices for the bones of a subentity that are
         actually used, saving shader constants if you split up your mesh,
         should your skeleton get too large for the constraints of the target
-        shader model.  </li>
+        shader model.&nbsp; </li>
       <li>Software skinning is now more efficient 
         <ul>
           <li>Temporary blended buffers are now held for a period of time per
             entity before being released back to the pool, which allows
             better frame coherency on these buffers</li>
-          <li>software skinning is now done in object space, with additional
+          <li>software skinning is now done in object space, with additional
             special optimisations for frozen/disabled animation, so that
-            the software blended vertex datacan be kept for as many frames as
+            the software blended vertex datacan be kept for as many frames as
             practical without recalculating it (it will only get released
             when the entity has been out of frame for some time) </li>
         </ul>
@@ -2281,7 +2408,7 @@ Porting Notes</a> in the OGRE Wiki.
       <li>Can convert the result to Mesh if desired for instancing </li>
     </ul>
   </li>
-  <li><b>Node </b><b>enhancements</b> 
+  <li><b>Node </b><b>enhancements</b> 
     <ul>
       <li>Node::Listener added so you can use Node::setListener to get
         callbacks when the transform changes </li>
@@ -2332,7 +2459,7 @@ Porting Notes</a> in the OGRE Wiki.
       </li>
     </ul>
   </li>
-  <li><b>Resource management </b><b>enhancements</b> 
+  <li><b>Resource management </b><b>enhancements</b> 
     <ul>
       <li>Added a new predefined resource group called
         ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME ("Internal") for
@@ -2466,7 +2593,7 @@ Maintenance Release</p>
   <li><span style="font-weight: bold;">Terrain plugin:</span> 
     <ul>
       <li>Light list finding should be specialised for each terrain
-      tile. </li>
+      tile.&nbsp; </li>
       <li>LOD calculation should use minimum distance between terrain tile
         bounding box and camera position</li>
     </ul>
@@ -2482,8 +2609,8 @@ Maintenance Release</p>
       spaces</li>
     </ul>
     <ul>
-      <li>TagPoint should always reflect parent entity scale changes</li>
-      <li>Fixed crash in SceneManager::destroySceneNode when using auto
+      <li>TagPoint should always reflect parent entity scale changes</li>
+      <li>Fixed crash in SceneManager::destroySceneNode when using auto
         tracking</li>
     </ul>
   </li>
@@ -2501,13 +2628,13 @@ Maintenance Release</p>
   <li style="font-weight: bold;">Materials: 
     <ul>
       <li>Fix incorrect output serialisation of 'modulate' and 'colour_blend'
-        scene blend factors from memory to .material files</li>
+        scene blend factors from memory to .material files</li>
     </ul>
     <ul>
       <li>Fix splitting of passes when too many texture units used</li>
       <li>Bugfix for auto gpu program parameters:'view_direction',
         'view_side_vector' and 'view_up_vector' should be in world space.
-        Also viewport size params were using render target details instead of
+        Also viewport size params were using render target details instead of
         viewport</li>
     </ul>
   </li>
@@ -2525,7 +2652,7 @@ Maintenance Release</p>
   <li>Fix Font::StrBBox for strings containing spaces</li>
   <li>Memory manager tweaks to improve shutdown performance when using large
     containers in debug</li>
-  <li>Quaternion now outputs to stream with same element ordering as
+  <li>Quaternion now outputs to stream with same element ordering as
     constructor</li>
   <li>Accessor methods added to retrieve current sky settings on
   SceneManager</li>
@@ -2553,12 +2680,12 @@ Maintenance Release</p>
   <li>Avoid multi-results of same object from
     OctreePlaneBoundedVolumeListSceneQuery</li>
   <li>Default mMaterialName as well as mpMaterial in SubEntity so they are
-    consistent (issue with StaticGeometry if no material set) </li>
+    consistent (issue with StaticGeometry if no material set)&nbsp; </li>
   <li>Fix infinite loop when RenderQueueListener tried to skip a queue</li>
   <li>Fix crash when creating / destroying Root more than once</li>
   <li>3D Studio Max exporter now supports Max 8</li>
   <li>New barrel and palette models added</li>
-  <li>Many compiler warnings squashed</li>
+  <li>Many compiler warnings squashed</li>
   <li>Documentation clarifications</li>
 </ul>
 
@@ -2575,7 +2702,7 @@ Maintenance Release</p>
       <li>Fix for using multiple clusters with envelopes (bone assignment
         groups) spanning them. </li>
       <li>Don't export empty submeshes (caused by starting with polys which
-        are  later all reallocated to clusters) </li>
+        are&nbsp; later all reallocated to clusters) </li>
     </ul>
   </li>
   <li><span style="font-weight: bold;">D3D9 fixes</span>: 
@@ -2748,7 +2875,8 @@ Maintenance Release</p>
 <p class="mainheader" align="left">v1.0.5 [Azathoth] (25 September 2005) -
 Maintenance Release</p>
 <ul>
-  <li><p style="margin-bottom: 0cm;">D3D9:  </p>
+  <li><p style="margin-bottom: 0cm;">D3D9:&nbsp;
+  </p>
     <ul>
       <li><p style="margin-bottom: 0cm;">Fixed device lost issue with manual
         textures with manual loaders. </p>
@@ -2995,7 +3123,7 @@ Maintenance Release</p>
     ./configure </p>
   </li>
   <li><p style="margin-bottom: 0cm;">XSI exporter - don't crash if textures
-    are not found, just warn instead.  Also trap cases where too many texture
+    are not found, just warn instead.&nbsp; Also trap cases where too many texture
     coordinate sets are used and warn.</p>
   </li>
   <li><p style="margin-bottom: 0cm;">Last of D3D9 leaks removed </p>
@@ -3034,7 +3162,7 @@ Maintenance Release</p>
     GL_MAX_TEXTURE_IMAGE_UNITS_ARB number of texture units when using shader
     hardware instead of just GL_MAX_TEXTURE_UNITS</p>
   </li>
-  <li><p style="margin-bottom: 0cm;">Fix attaching particle systems to bones 
+  <li><p style="margin-bottom: 0cm;">Fix attaching particle systems to bones&nbsp;
     </p>
   </li>
   <li><p style="margin-bottom: 0cm;">Implemented vp30, vp40, fp30 and fp40 Cg
@@ -3232,7 +3360,7 @@ Maintenance Release</p>
     but has been manually unloaded </p>
   </li>
   <li><p style="margin-bottom: 0cm;">Fixes Linux boost linking issue when
-    --enable-threading used.  Modified slightly to check for the existence of
+    --enable-threading used.&nbsp; Modified slightly to check for the existence of
     the library during ./configure. </p>
   </li>
   <li><p style="margin-bottom: 0cm;">Linux - disabled RTTI and disabled the
@@ -3681,6 +3809,6 @@ Notes Wiki Page</a>. </p>
   </li>
 </ul>
 
-<p align="left"> </p>
+<p align="left"> &nbsp;&nbsp;&nbsp;&nbsp;</p>
 </body>
 </html>

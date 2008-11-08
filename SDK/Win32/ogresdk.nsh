@@ -180,7 +180,7 @@ Section -Binaries
   File ".\samples\resources.cfg"
   File "..\..\Samples\Common\bin\Debug\plugins.cfg"
   File "..\..\Samples\Common\bin\Debug\media.cfg"
-  File "..\..\Samples\Common\bin\Debug\quake3settings.cfg"
+  File "..\..\Samples\Common\bin\quake3settings.cfg"
   ; Binaries - release
   SetOutPath "$INSTDIR\bin\release"
   SetOverwrite ifnewer
@@ -210,7 +210,7 @@ Section -Binaries
   File ".\samples\resources.cfg"
   File "..\..\Samples\Common\bin\Release\plugins.cfg"
   File "..\..\Samples\Common\bin\Release\media.cfg"
-  File "..\..\Samples\Common\bin\Release\quake3settings.cfg"
+  File "..\..\Samples\Common\bin\quake3settings.cfg"
 
 SectionEnd
 
@@ -230,6 +230,7 @@ Section -Docs
   File "..\..\Docs\ChangeLog.html"
   File "..\..\Docs\style.css"
   File "..\..\Docs\ogre-logo.gif"
+  File "..\..\Docs\ogre-logo-wetfloor.gif"
   SetOutPath "$INSTDIR\docs\licenses"
   File "..\..\Docs\licenses\*.*"
 

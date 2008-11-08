@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on August 27 2008 by texi2html 1.66 -->
+<!-- Created on November 4 2008 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -37,20 +37,35 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <HR SIZE=1>
 <H2> 2.6 Entities </H2>
 <!--docid::SEC13::-->
+<P>
 
 An entity is an instance of a movable object in the scene. It could be a car, a person, a dog, a shuriken, whatever. The only assumption is that it does not necessarily have a fixed position in the world.<BR><BR>
+</P>
+<P>
 
 Entities are based on discrete meshes, i.e. collections of geometry which are self-contained and typically fairly small on a world scale, which are represented by the Mesh object. Multiple entities can be based on the same mesh, since often you want to create multiple copies of the same type of object in a scene.<BR><BR>
+</P>
+<P>
 
 You create an entity by calling the SceneManager::createEntity method, giving it a name and specifying the name of the mesh object which it will be based on (e.g. 'muscleboundhero.mesh'). The SceneManager will ensure that the mesh is loaded by calling the MeshManager resource manager for you. Only one copy of the Mesh will be loaded.<BR><BR>
+</P>
+<P>
 
 Entities are not deemed to be a part of the scene until you attach them to a SceneNode (see the section below). By attaching entities to SceneNodes, you can create complex hierarchical relationships between the positions and orientations of entities. You then modify the positions of the nodes to indirectly affect the entity positions.<BR><BR>
+</P>
+<P>
 
 When a Mesh is loaded, it automatically comes with a number of materials defined. It is possible to have more than one material attached to a mesh - different parts of the mesh may use different materials. Any entity created from the mesh will automatically use the default materials. However, you can change this on a per-entity basis if you like so you can create a number of entities based on the same mesh but with different textures etc.<BR><BR>
+</P>
+<P>
 
 To understand how this works, you have to know that all Mesh objects are actually composed of SubMesh objects, each of which represents a part of the mesh using one Material. If a Mesh uses only one Material, it will only have one SubMesh.<BR><BR>
+</P>
+<P>
 
 When an Entity is created based on this Mesh, it is composed of (possibly) multiple SubEntity objects, each matching 1 for 1 with the SubMesh objects from the original Mesh. You can access the SubEntity objects using the Entity::getSubEntity method. Once you have a reference to a SubEntity, you can change the material it uses by calling it's setMaterialName method. In this way you can make an Entity deviate from the default materials and thus create an individual looking version of it.<BR><BR>
+</P>
+<P>
 
 <A NAME="Materials"></A>
 <HR SIZE=1>
@@ -66,7 +81,7 @@ When an Entity is created based on this Mesh, it is composed of (possibly) multi
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>August 27 2008</I>
+by <I>steve</I> on <I>November 4 2008</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

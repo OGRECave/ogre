@@ -3429,6 +3429,13 @@ namespace Ogre
 		static_cast<D3D9HardwareBufferManager*>(mHardwareBufferManager)
 			->releaseDefaultPoolResources();
 
+		// [GLaforte - 06-11-2008]
+		// Also reset the hardware queries..
+		for (HardwareOcclusionQueryList::iterator it = mHwOcclusionQueries.begin(); it != mHwOcclusionQueries.end(); ++it)
+		{
+			static_cast<D3D9HardwareOcclusionQuery*>(*it)->releaseResources();
+		}
+
 		mPrimaryWindow->destroyD3DResources();
 		// release additional swap chains (secondary windows)
 		SecondaryWindowList::iterator sw;
@@ -3440,7 +3447,7 @@ namespace Ogre
 		D3DPRESENT_PARAMETERS* presParams = mPrimaryWindow->getPresentationParameters();
 		// Reset the device, using the primary window presentation params
 		HRESULT hr = mpD3DDevice->Reset(presParams);
-
+	
 		if (hr == D3DERR_DEVICELOST)
 		{
 			// Don't continue
@@ -3483,6 +3490,13 @@ namespace Ogre
 			->recreateDefaultPoolResources();
 		static_cast<D3D9HardwareBufferManager*>(mHardwareBufferManager)
 			->recreateDefaultPoolResources();
+
+		// [GLaforte - 06-11-2008]
+		// Also reset the hardware queries..
+		for (HardwareOcclusionQueryList::iterator it = mHwOcclusionQueries.begin(); it != mHwOcclusionQueries.end(); ++it)
+		{
+			static_cast<D3D9HardwareOcclusionQuery*>(*it)->recreateResources();
+		}
 
 		LogManager::getSingleton().logMessage("!!! Direct3D Device successfully restored.");
 
