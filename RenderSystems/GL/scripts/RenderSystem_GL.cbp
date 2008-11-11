@@ -102,6 +102,7 @@
 		<Unit filename="..\include\OgreGLPlugin.h" />
 		<Unit filename="..\include\OgreGLPrerequisites.h" />
 		<Unit filename="..\include\OgreGLRenderSystem.h" />
+		<Unit filename="..\include\OgreGLRenderToVertexBuffer.h" />
 		<Unit filename="..\include\OgreGLRenderTexture.h" />
 		<Unit filename="..\include\OgreGLSupport.h" />
 		<Unit filename="..\include\OgreGLTexture.h" />
@@ -149,6 +150,7 @@
 		<Unit filename="..\src\OgreGLPlugin.cpp" />
 		<Unit filename="..\src\OgreGLRenderSystem.cpp" />
 		<Unit filename="..\src\OgreGLRenderTexture.cpp" />
+		<Unit filename="..\src\OgreGLRenderToVertexBuffer.cpp" />
 		<Unit filename="..\src\OgreGLSupport.cpp" />
 		<Unit filename="..\src\OgreGLTexture.cpp" />
 		<Unit filename="..\src\OgreGLTextureManager.cpp" />

@@ -371,14 +371,6 @@ namespace Ogre
 		mSkyBoxNode = mSkyPlaneNode = mSkyDomeNode = 0;
 		mSkyBoxEnabled = mSkyPlaneEnabled = mSkyDomeEnabled = false; 
 
-		// 10/26/2008 : (Eric Cha) set the skybox, skyplane, and skydome objects to null 
-		mSkyBoxObj = 0;
-		mSkyPlaneEntity = 0;
-		for (int i=0;i<5;i++)
-		{
-			mSkyDomeEntity[i] = 0;
-		}
-
 		// Clear render queue, empty completely
 		if (mRenderQueue)
 			mRenderQueue->clear(true);

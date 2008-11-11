@@ -3699,7 +3699,11 @@ namespace Ogre{
 					// Glob the property values all together
 					String str = "";
 					for(AbstractNodeList::iterator j = prop->values.begin(); j != prop->values.end(); ++j)
-						str = str + (*j)->getValue() + " ";
+					{
+						if(j != prop->values.begin())
+							str = str + " ";
+						str = str + (*j)->getValue();
+					}
 					ExternalTextureSourceManager::getSingleton().getCurrentPlugIn()->setParameter(prop->name, str);
 				}
 				else if((*i)->type == ANT_OBJECT)

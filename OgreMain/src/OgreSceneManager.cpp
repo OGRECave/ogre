@@ -193,6 +193,13 @@ SceneManager::~SceneManager()
 		mMovableObjectCollectionMap.clear();
 	}
 
+	OGRE_DELETE mSkyBoxObj;
+	OGRE_DELETE mSkyPlaneEntity;
+	for (int i=0;i<5;i++)
+	{
+		OGRE_DELETE mSkyDomeEntity[i];
+	}
+
 	OGRE_DELETE mShadowCasterQueryListener;
     OGRE_DELETE mSceneRoot;
     OGRE_DELETE mFullScreenQuad;
@@ -1502,7 +1509,12 @@ void SceneManager::_setSkyPlane(
             destroyEntity(meshName);
         }
         // Create, use the same name for mesh and entity
-        mSkyPlaneEntity = createEntity(meshName, meshName);
+		// manually construct as we don't want this to be destroyed on destroyAllMovableObjects
+		MovableObjectFactory* factory = 
+			Root::getSingleton().getMovableObjectFactory(EntityFactory::FACTORY_TYPE_NAME);
+		NameValuePairList params;
+		params["mesh"] = meshName;
+        mSkyPlaneEntity = static_cast<Entity*>(factory->createInstance(meshName, this, &params));
         mSkyPlaneEntity->setMaterialName(materialName, groupName);
         mSkyPlaneEntity->setCastShadows(false);
 
@@ -1585,7 +1597,7 @@ void SceneManager::_setSkyBox(
 		// Create object
 		if (!mSkyBoxObj)
 		{
-			mSkyBoxObj = createManualObject("SkyBox");
+			mSkyBoxObj = OGRE_NEW ManualObject("SkyBox");
 			mSkyBoxObj->setCastShadows(false);
 			mSkyBoxNode->attachObject(mSkyBoxObj);
 		}
@@ -1814,7 +1826,12 @@ void SceneManager::_setSkyDome(
                 // destroy old one, do it by name for speed
                 destroyEntity(entName);
             }
-            mSkyDomeEntity[i] = createEntity(entName, planeMesh->getName());
+			// construct manually so we don't have problems if destroyAllMovableObjects called
+			MovableObjectFactory* factory = 
+				Root::getSingleton().getMovableObjectFactory(EntityFactory::FACTORY_TYPE_NAME);
+			NameValuePairList params;
+			params["mesh"] = planeMesh->getName();
+			mSkyDomeEntity[i] = static_cast<Entity*>(factory->createInstance(entName, this, &params));
             mSkyDomeEntity[i]->setMaterialName(m->getName(), groupName);
             mSkyDomeEntity[i]->setCastShadows(false);
 
@@ -3577,6 +3594,7 @@ void SceneManager::manualRender(RenderOperation* rend,
 		Camera dummyCam(StringUtil::BLANK, 0);
 		dummyCam.setCustomViewMatrix(true, viewMatrix);
 		dummyCam.setCustomProjectionMatrix(true, projMatrix);
+		mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
 		pass->_updateAutoParamsNoLights(mAutoParamDataSource);
 		// NOTE: We MUST bind parameters AFTER updating the autos
 		if (pass->hasVertexProgram())
