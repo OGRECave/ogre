@@ -78,7 +78,13 @@ namespace Ogre
 
     bool PCZFrustum::isVisible( const AxisAlignedBox & bound) const
     {
-        // Get centre of the box
+        // Null boxes are always invisible
+        if (bound.isNull()) return false;
+
+        // Infinite boxes are always visible
+        if (bound.isInfinite()) return true;
+
+		// Get centre of the box
         Vector3 centre = bound.getCenter();
         // Get the half-size of the box
         Vector3 halfSize = bound.getHalfSize();
