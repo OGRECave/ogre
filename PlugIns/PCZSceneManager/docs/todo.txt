@@ -4,6 +4,7 @@ Some items are specific, some are not, it's just a list to keep notes for myself
 
 UPDATES:
 -------------
+* PCZFrustum treats infinite bounds as always visible and zero bounds as always invisible (Thanks Fish). 11/11/08
 * PCZoneFactory eats a const String &, so code has been updated to use PCZoneFactory("ZoneType_Default")
   instead of PCZoneFactory (String("ZoneType_Default")).  (10/17/08)
 * PCZSM now zeroes out the SkyBoxObj, SkyPlane, and SkyDome pointers when clearScene() is called. (10/26/08)
