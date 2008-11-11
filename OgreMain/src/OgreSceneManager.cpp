@@ -3563,6 +3563,7 @@ void SceneManager::manualRender(RenderOperation* rend,
 		Camera dummyCam(StringUtil::BLANK, 0);
 		dummyCam.setCustomViewMatrix(true, viewMatrix);
 		dummyCam.setCustomProjectionMatrix(true, projMatrix);
+		mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
 		pass->_updateAutoParamsNoLights(mAutoParamDataSource);
 		// NOTE: We MUST bind parameters AFTER updating the autos
 		if (pass->hasVertexProgram())
