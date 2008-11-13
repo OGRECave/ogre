@@ -30,7 +30,12 @@ Torus Knot Software Ltd
 #ifndef _MemoryTracker_H__
 #define _MemoryTracker_H__
 
-#include "OgrePrerequisites.h"
+// Don't include prerequisites, can cause a circular dependency
+// This file must be included within another file which already has the prerequisites in it
+//#include "OgrePrerequisites.h"
+#ifndef OGRE_COMPILER
+#	pragma message "MemoryTracker included somewhere OgrePrerequisites.h wasn't!"
+#endif
 
 // If we're using the GCC 3.1 C++ Std lib
 #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
