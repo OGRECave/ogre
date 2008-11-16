@@ -2569,6 +2569,13 @@ namespace Ogre{
 						if((*i0)->type == ANT_ATOM && (*i1)->type == ANT_ATOM)
 						{	
 							AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
+
+							String name = atom0->value;
+							std::vector<Any> args;
+							args.push_back(Any(&name));
+							args.push_back(Any(1));
+							compiler->_fireEvent("processTextureNames", args, 0);
+
 							mUnit->setCubicTextureName(atom0->value, atom1->id == ID_COMBINED_UVW);
 						}
 						else
@@ -2599,6 +2606,12 @@ namespace Ogre{
 							names[3] = atom3->value;
 							names[4] = atom4->value;
 							names[5] = atom5->value;
+
+							std::vector<Any> args;
+							args.push_back(Any((String*)names));
+							args.push_back(Any(6));
+							compiler->_fireEvent("processTextureNames", args, 0);
+
 							mUnit->setCubicTextureName(names, atom6->id == ID_COMBINED_UVW);
 						}
 
