@@ -120,6 +120,12 @@ namespace Ogre{
 					state = COMMENT;
 					break;	
 				}
+				else if(c == star && lastc == slash)
+				{
+					lexeme = "";
+					state = MULTICOMMENT;
+					break;
+				}
 				else
 				{
 					state = WORD;
