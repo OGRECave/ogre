@@ -1341,7 +1341,8 @@ namespace Ogre {
                         sourceElem = testElem;
                     }
                 }
-                else
+                
+				if(!foundExisting && targetSemantic == VES_TEXTURE_COORDINATES)
                 {
                     // We're looking for the destination
                     // Check to see if we've found a possible
