@@ -47,6 +47,7 @@ namespace Ogre {
     public:
         typedef std::map<String, Overlay*> OverlayMap;
 		typedef std::map<String, OverlayElement*> ElementMap;
+		typedef std::map<String, OverlayElementFactory*> FactoryMap;
     protected:
         OverlayMap mOverlayMap;
         StringVector mScriptPatterns;
@@ -64,7 +65,6 @@ namespace Ogre {
 	    bool parseChildren( DataStreamPtr& chunk, const String& line,
             Overlay* pOverlay, bool isTemplate, OverlayContainer* parent = NULL);
 
-		typedef std::map<String, OverlayElementFactory*> FactoryMap;
 		FactoryMap mFactories;
 
 		ElementMap mInstances;
@@ -170,6 +170,11 @@ namespace Ogre {
 		a new OverlayElement subclass.
 		*/
 		void addOverlayElementFactory(OverlayElementFactory* elemFactory);
+		
+		/** Get const access to the list of registered OverlayElement factories. */
+		const FactoryMap& getOverlayElementFactoryMap() const {
+			return mFactories;
+		}
 
 		OverlayElement* createOverlayElementFromTemplate(const String& templateName, const String& typeName, const String& instanceName, bool isTemplate = false);
 		/**
