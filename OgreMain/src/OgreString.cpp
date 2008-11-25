@@ -290,8 +290,8 @@ namespace Ogre {
 		String result = source;
 		while(1)
 		{
-			const int pos = result.find(replaceWhat);
-			if (pos==-1) break;
+			String::size_type pos = result.find(replaceWhat);
+			if (pos == String::npos) break;
 			result.replace(pos,replaceWhat.size(),replaceWithWhat);
 		}
 		return result;
