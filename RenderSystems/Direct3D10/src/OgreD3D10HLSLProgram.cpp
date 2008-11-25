@@ -22,6 +22,11 @@ Place - Suite 330, Boston, MA 02111-1307, USA, or go to
 http://www.gnu.org/copyleft/lesser.txt.
 -----------------------------------------------------------------------------
 */
+#ifndef D3DX10ReflectShader
+#include "d3d11.h"
+#include "D3Dcompiler.h"
+#pragma comment (lib, "d3dcompiler.lib")
+#endif
 #include "OgreD3D10HLSLProgram.h"
 #include "OgreException.h"
 #include "OgreRenderSystem.h"
@@ -183,8 +188,18 @@ namespace Ogre {
 		}
 
 		SIZE_T BytecodeLength = mpMicroCode->GetBufferSize();
+
+#ifdef D3DX10ReflectShader
 		hr = D3DX10ReflectShader( (void*) mpMicroCode->GetBufferPointer(), BytecodeLength,
 			&mpIShaderReflection );
+#else
+		void * mpIShaderReflectionVoid;
+		hr = D3DReflect( (void*) mpMicroCode->GetBufferPointer(), BytecodeLength,
+			IID_ID3D10Blob,
+			&mpIShaderReflectionVoid );
+		mpIShaderReflection = static_cast<ID3D10ShaderReflection1*>(mpIShaderReflectionVoid);
+#endif
+
 		if (!FAILED(hr))
 		{
 			hr = mpIShaderReflection->GetDesc( &mShaderDesc );
