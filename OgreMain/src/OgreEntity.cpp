@@ -532,7 +532,7 @@ namespace Ogre {
         // update the animation
         if (hasSkeleton() || hasVertexAnimation())
         {
-            updateAnimation();
+            displayEntity->updateAnimation();
 
             //--- pass this point,  we are sure that the transformation matrix of each bone and tagPoint have been updated
             ChildObjectList::iterator child_itr = mChildObjectList.begin();

@@ -69,9 +69,8 @@ namespace Ogre
 			// set up the shadow texture
 			// Set ortho projection
 			texCam->setProjectionType(PT_ORTHOGRAPHIC);
-			// set easy FOV and near dist so that texture covers far dist
-			texCam->setFOVy(Degree(90));
-			texCam->setNearClipDistance(shadowDist);
+			// set ortho window so that texture covers far dist
+			texCam->setOrthoWindow(shadowDist * 2, shadowDist * 2);
 
 			// Calculate look at position
 			// We want to look at a spot shadowOffset away from near plane

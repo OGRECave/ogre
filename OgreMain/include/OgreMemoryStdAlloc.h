@@ -51,15 +51,17 @@ namespace Ogre
 	{
 	public:
 		static inline void* allocateBytes(size_t count, 
-			const char* file = 0, int line = 0, const char* func = 0)
+#if OGRE_MEMORY_TRACKER
+			const char* file = 0, int line = 0, const char* func = 0
+#else
+			const char*  = 0, int  = 0, const char* = 0
+#endif
+            )
 		{
 			void* ptr = malloc(count);
 #if OGRE_MEMORY_TRACKER
 			// this alloc policy doesn't do pools
 			MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
-#else
-			// avoid unused params warning
-			count=file+line-func;
 #endif
 			return ptr;
 		}
@@ -104,16 +106,18 @@ namespace Ogre
 			[Alignment <= 128 && ((Alignment & (Alignment-1)) == 0) ? +1 : -1];
 
 		static inline void* allocateBytes(size_t count, 
-			const char* file = 0, int line = 0, const char* func = 0)
+#if OGRE_MEMORY_TRACKER
+			const char* file = 0, int line = 0, const char* func = 0
+#else
+			const char*  = 0, int  = 0, const char* = 0
+#endif
+            )
 		{
 			void* ptr = Alignment ? AlignedMemory::allocate(count, Alignment)
 				: AlignedMemory::allocate(count);
 #if OGRE_MEMORY_TRACKER
 			// this alloc policy doesn't do pools
 			MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
-#else
-			// avoid unused params warning
-			file;line;func;
 #endif
 			return ptr;
 		}

@@ -153,6 +153,10 @@ namespace Ogre
 		RSC_PBUFFER          = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 5),
 		/// Support for GL 1.5 but without HW occlusion workaround
 		RSC_GL1_5_NOHWOCCLUSION = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 6),
+		/// Support for point parameters ARB implementation
+		RSC_POINT_EXTENDED_PARAMETERS_ARB = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 7),
+		/// Support for point parameters EXT implementation
+		RSC_POINT_EXTENDED_PARAMETERS_EXT = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 8),
 
 
 	};

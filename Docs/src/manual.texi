@@ -1524,7 +1524,7 @@ Format: colour_op_ex <operation> <source1> <source2> [<manual_factor>] [<manual_
 
 Example colour_op_ex add_signed src_manual src_current 0.5@*@*
 
-See the IMPORTANT note below about the issues between mulitpass and multitexturing that using this method can create. Texture colour operations determine how the final colour of the surface appears when rendered. Texture units are used to combine colour values from various sources (e.g. the diffuse colour of the surface from lighting calculations, combined with the colour of the texture). This method allows you to specify the 'operation' to be used, i.e. the calculation such as adds or multiplies, and which values to use as arguments, such as a fixed value or a value from a previous calculation.@*@*
+See the IMPORTANT note below about the issues between multipass and multitexturing that using this method can create. Texture colour operations determine how the final colour of the surface appears when rendered. Texture units are used to combine colour values from various sources (e.g. the diffuse colour of the surface from lighting calculations, combined with the colour of the texture). This method allows you to specify the 'operation' to be used, i.e. the calculation such as adds or multiplies, and which values to use as arguments, such as a fixed value or a value from a previous calculation.@*@*
 
 @table @asis
 @item Operation options
@@ -1590,7 +1590,7 @@ Sets the multipass fallback operation for this layer, if you used colour_op_ex a
 
 Format: colour_op_multipass_fallback <src_factor> <dest_factor>@*@*
 
-Example: colour_op_mulitpass_fallback one one_minus_dest_alpha@*@*
+Example: colour_op_multipass_fallback one one_minus_dest_alpha@*@*
 
 Because some of the effects you can create using colour_op_ex are only supported under multitexturing hardware, if the hardware is lacking the system must fallback on multipass rendering, which unfortunately doesn't support as many effects. This attribute is for you to specify the fallback operation which most suits you.@*@*
 

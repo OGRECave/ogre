@@ -316,6 +316,8 @@ namespace Ogre {
 	void QueuedRenderableCollection::sort(const Camera* cam)
     {
 		// ascending and descending sort both set bit 1
+		// We always sort descending, becuase the only difference is in the
+		// acceptVisitor method, where we iterate in reverse in ascending mode
 		if (mOrganisationMode & OM_SORT_DESCENDING)
 		{
 			
@@ -386,10 +388,18 @@ namespace Ogre {
 	{
 		if ((om & mOrganisationMode) == 0)
 		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-				"Organisation mode requested in acceptVistor was not notified "
-				"to this class ahead of time, therefore may not be supported.", 
-				"QueuedRenderableCollection::acceptVisitor");
+			// try to fall back
+			if (OM_PASS_GROUP & mOrganisationMode)
+				om = OM_PASS_GROUP;
+			else if (OM_SORT_ASCENDING & mOrganisationMode)
+				om = OM_SORT_ASCENDING;
+			else if (OM_SORT_DESCENDING & mOrganisationMode)
+				om = OM_SORT_DESCENDING;
+			else
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+					"Organisation mode requested in acceptVistor was not notified "
+					"to this class ahead of time, therefore may not be supported.", 
+					"QueuedRenderableCollection::acceptVisitor");
 		}
 
 		switch(om)

@@ -3789,7 +3789,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "/Users/steve/projects/Shoggoth/ogre/Mac/Ogre/./plist/OctreeZone Plugin-Info.plist";
+				INFOPLIST_FILE = "./plist/OctreeZone Plugin-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks/Ogre.framework/Resources";
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
@@ -3809,7 +3809,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "/Users/steve/projects/Shoggoth/ogre/Mac/Ogre/./plist/OctreeZone Plugin-Info.plist";
+				INFOPLIST_FILE = "./plist/OctreeZone Plugin-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks/Ogre.framework/Resources";
 				LD_MAP_FILE_PATH = "$(TARGET_TEMP_DIR)/$(PRODUCT_NAME)-LinkMap-$(CURRENT_VARIANT)-$(CURRENT_ARCH).txt";
 				OTHER_LDFLAGS = "";

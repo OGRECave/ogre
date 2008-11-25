@@ -135,11 +135,11 @@ namespace Ogre {
 	#           define HashSet ::stdext::hash_set
     #       else
     #           define HashMap ::std::hash_map
-	#           define HashMap ::std::hash_set
+	#           define HashSet ::std::hash_set
     #       endif
     #   else
     #       define HashMap ::std::hash_map
-	#       define HashMap ::std::hash_set
+	#       define HashSet ::std::hash_set
     #   endif
     #endif
 

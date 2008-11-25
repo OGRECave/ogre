@@ -86,6 +86,7 @@ uint32 SceneManager::USER_TYPE_MASK_LIMIT         = SceneManager::FRUSTUM_TYPE_M
 SceneManager::SceneManager(const String& name) :
 mName(name),
 mRenderQueue(0),
+mLastRenderQueueInvocationCustom(false),
 mCurrentViewport(0),
 mSceneRoot(0),
 mSkyPlaneEntity(0),
@@ -1152,19 +1153,32 @@ void SceneManager::prepareRenderQueue(void)
 			updateRenderQueueGroupSplitOptions(group, invocation->getSuppressShadows(), 
 				invocation->getSuppressRenderStateChanges());
 		}
+
+		mLastRenderQueueInvocationCustom = true;
 	}
 	else
 	{
-		// Default all the queue groups that are there, new ones will be created
-		// with defaults too
-		RenderQueue::QueueGroupIterator groupIter = q->_getQueueGroupIterator();
-		while (groupIter.hasMoreElements())
+		if (mLastRenderQueueInvocationCustom)
 		{
-			RenderQueueGroup* g = groupIter.getNext();
-			g->defaultOrganisationMode();
+			// We need this here to reset if coming out of a render queue sequence, 
+			// but doing it resets any specialised settings set globally per render queue 
+			// so only do it when necessary - it's nice to allow people to set the organisation
+			// mode manually for example
+
+			// Default all the queue groups that are there, new ones will be created
+			// with defaults too
+			RenderQueue::QueueGroupIterator groupIter = q->_getQueueGroupIterator();
+			while (groupIter.hasMoreElements())
+			{
+				RenderQueueGroup* g = groupIter.getNext();
+				g->defaultOrganisationMode();
+			}
 		}
+
 		// Global split options
 		updateRenderQueueSplitOptions();
+
+		mLastRenderQueueInvocationCustom = false;
 	}
 
 }

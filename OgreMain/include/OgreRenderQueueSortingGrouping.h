@@ -465,6 +465,8 @@ namespace Ogre {
         PriorityMap mPriorityGroups;
 		/// Whether shadows are enabled for this queue
 		bool mShadowsEnabled;
+		/// Bitmask of the organisation modes requested (for new priority groups)
+		uint8 mOrganisationMode;
 
 
     public:
@@ -477,6 +479,7 @@ namespace Ogre {
             , mSplitNoShadowPasses(splitNoShadowPasses)
             , mShadowCastersNotReceivers(shadowCastersNotReceivers)
             , mShadowsEnabled(true)
+			, mOrganisationMode(0)
         {
         }
 
@@ -508,6 +511,12 @@ namespace Ogre {
                     mSplitPassesByLightingType,
                     mSplitNoShadowPasses, 
 					mShadowCastersNotReceivers);
+				if (mOrganisationMode)
+				{
+					pPriorityGrp->resetOrganisationModes();
+					pPriorityGrp->addOrganisationMode((QueuedRenderableCollection::OrganisationMode)mOrganisationMode);
+				}
+
                 mPriorityGroups.insert(PriorityMap::value_type(priority, pPriorityGrp));
             }
             else
@@ -609,6 +618,8 @@ namespace Ogre {
 		*/
 		void resetOrganisationModes(void)
 		{
+			mOrganisationMode = 0;
+
 			PriorityMap::iterator i, iend;
 			iend = mPriorityGroups.end();
 			for (i = mPriorityGroups.begin(); i != iend; ++i)
@@ -625,6 +636,8 @@ namespace Ogre {
 		*/
 		void addOrganisationMode(QueuedRenderableCollection::OrganisationMode om)
 		{
+			mOrganisationMode |= om;
+
 			PriorityMap::iterator i, iend;
 			iend = mPriorityGroups.end();
 			for (i = mPriorityGroups.begin(); i != iend; ++i)
@@ -641,6 +654,8 @@ namespace Ogre {
 		*/
 		void defaultOrganisationMode(void)
 		{
+			mOrganisationMode = 0;
+
 			PriorityMap::iterator i, iend;
 			iend = mPriorityGroups.end();
 			for (i = mPriorityGroups.begin(); i != iend; ++i)

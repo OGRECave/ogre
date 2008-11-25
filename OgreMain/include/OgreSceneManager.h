@@ -334,6 +334,7 @@ namespace Ogre {
 
         /// Queue of objects for rendering
         RenderQueue* mRenderQueue;
+		bool mLastRenderQueueInvocationCustom;
 
         /// Current ambient light, cached for RenderSystem
         ColourValue mAmbientLight;

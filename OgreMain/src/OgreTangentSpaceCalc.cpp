@@ -79,13 +79,6 @@ namespace Ogre
 		VertexElementSemantic targetSemantic,
 		unsigned short sourceTexCoordSet, unsigned short index)
 	{
-		if (index == 0 && targetSemantic == VES_TEXTURE_COORDINATES)
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Destination texture coordinate set must be greater than 0",
-				"TangentSpaceCalc::build");
-		}
-
 		Result res;
 
 		// Pull out all the vertex components we'll need

@@ -303,11 +303,17 @@ namespace Ogre {
 			rsc->setCapability(RSC_POINT_SPRITES);
 		}
 		// Check for point parameters
-		if(GLEW_VERSION_1_4 ||
-			GLEW_ARB_point_parameters ||
-			GLEW_EXT_point_parameters)
+		if (GLEW_VERSION_1_4)
 		{
 			rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
+		}
+		if (GLEW_ARB_point_parameters)
+		{
+			rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS_ARB);
+		}
+		if (GLEW_EXT_point_parameters)
+		{
+			rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS_EXT);
 		}
 
 		// Check for hardware stencil support and set bit depth
@@ -1263,52 +1269,63 @@ namespace Ogre {
 		bool attenuationEnabled, Real constant, Real linear, Real quadratic,
 		Real minSize, Real maxSize)
 	{
-
-		if(attenuationEnabled && 
-			mCurrentCapabilities->hasCapability(RSC_POINT_EXTENDED_PARAMETERS))
+		
+		float val[4] = {1, 0, 0, 1};
+		
+		if(attenuationEnabled) 
 		{
 			// Point size is still calculated in pixels even when attenuation is
 			// enabled, which is pretty awkward, since you typically want a viewport
 			// independent size if you're looking for attenuation.
 			// So, scale the point size up by viewport size (this is equivalent to
 			// what D3D does as standard)
-			Real adjSize = size * mActiveViewport->getActualHeight();
-			Real adjMinSize = minSize * mActiveViewport->getActualHeight();
-			Real adjMaxSize;
+			size = size * mActiveViewport->getActualHeight();
+			minSize = minSize * mActiveViewport->getActualHeight();
 			if (maxSize == 0.0f)
-				adjMaxSize = mCurrentCapabilities->getMaxPointSize(); // pixels
+				maxSize = mCurrentCapabilities->getMaxPointSize(); // pixels
 			else
-				adjMaxSize = maxSize * mActiveViewport->getActualHeight();
-			glPointSize(adjSize);
-
+				maxSize = maxSize * mActiveViewport->getActualHeight();
+			
 			// XXX: why do I need this for results to be consistent with D3D?
 			// Equations are supposedly the same once you factor in vp height
 			Real correction = 0.005;
 			// scaling required
-			float val[4] = {constant, linear*correction, quadratic*correction, 1};
-			glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, val);
-			glPointParameterf(GL_POINT_SIZE_MIN, adjMinSize);
-			glPointParameterf(GL_POINT_SIZE_MAX, adjMaxSize);
-		}
-		else
+			val[0] = constant;
+			val[1] = linear * correction;
+			val[2] = quadratic * correction;
+			val[3] = 1;
+		} 
+		else 
 		{
-			// no scaling required
-			// GL has no disabled flag for this so just set to constant
-			glPointSize(size);
-
-			if (mCurrentCapabilities->hasCapability(RSC_POINT_EXTENDED_PARAMETERS))
-			{
-				float val[4] = {1, 0, 0, 1};
-				glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, val);
-				glPointParameterf(GL_POINT_SIZE_MIN, minSize);
-				if (maxSize == 0.0f)
-					maxSize = mCurrentCapabilities->getMaxPointSize();
-				glPointParameterf(GL_POINT_SIZE_MAX, maxSize);
-			}
+			if (maxSize == 0.0f)
+				maxSize = mCurrentCapabilities->getMaxPointSize();
 		}
-
-
-
+		
+		// no scaling required
+		// GL has no disabled flag for this so just set to constant
+		glPointSize(size);
+		
+		if (mCurrentCapabilities->hasCapability(RSC_POINT_EXTENDED_PARAMETERS))
+		{
+			glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, val);
+			glPointParameterf(GL_POINT_SIZE_MIN, minSize);
+			glPointParameterf(GL_POINT_SIZE_MAX, maxSize);
+		} 
+		else if (mCurrentCapabilities->hasCapability(RSC_POINT_EXTENDED_PARAMETERS_ARB))
+		{
+			glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION, val);
+			glPointParameterfARB(GL_POINT_SIZE_MIN, minSize);
+			glPointParameterfARB(GL_POINT_SIZE_MAX, maxSize);
+		} 
+		else if (mCurrentCapabilities->hasCapability(RSC_POINT_EXTENDED_PARAMETERS_EXT))
+		{
+			glPointParameterfvEXT(GL_POINT_DISTANCE_ATTENUATION, val);
+			glPointParameterfEXT(GL_POINT_SIZE_MIN, minSize);
+			glPointParameterfEXT(GL_POINT_SIZE_MAX, maxSize);
+		}
+		
+		
+		
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::_setPointSpritesEnabled(bool enabled)
