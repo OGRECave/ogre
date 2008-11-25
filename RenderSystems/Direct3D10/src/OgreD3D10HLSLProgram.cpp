@@ -184,14 +184,11 @@ namespace Ogre {
 
 		SIZE_T BytecodeLength = mpMicroCode->GetBufferSize();
 
-#ifdef D3DX10ReflectShader
+#ifndef D3DX10ReflectShader
+#define D3DX10ReflectShader D3D10ReflectShader
+#endif
 		hr = D3DX10ReflectShader( (void*) mpMicroCode->GetBufferPointer(), BytecodeLength,
 			&mpIShaderReflection );
-#else
-		void* pMicroCode = mpMicroCode->GetBufferPointer();
-		hr = D3D10ReflectShader( pMicroCode, BytecodeLength,
-			&mpIShaderReflection );
-#endif
 
 		if (!FAILED(hr))
 		{
