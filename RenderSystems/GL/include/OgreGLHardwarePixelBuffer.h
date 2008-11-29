@@ -52,7 +52,7 @@ namespace Ogre {
 		void allocateBuffer();
 		void freeBuffer();
 		// Upload a box of pixels to this buffer on the card
-		virtual void upload(const PixelBox &data);
+		virtual void upload(const PixelBox &data, const Image::Box &dest);
 		// Download a box of pixels from the card
 		virtual void download(const PixelBox &data);
 	public:
@@ -90,7 +90,7 @@ namespace Ogre {
         /// @copydoc ardwarePixelBuffer::getRenderTarget
         RenderTexture* getRenderTarget(size_t);
         // Upload a box of pixels to this buffer on the card
-		virtual void upload(const PixelBox &data);
+		virtual void upload(const PixelBox &data, const Image::Box &dest);
 		// Download a box of pixels from the card
 		virtual void download(const PixelBox &data);
   

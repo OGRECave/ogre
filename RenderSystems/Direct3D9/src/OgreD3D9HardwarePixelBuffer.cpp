@@ -352,7 +352,7 @@ void D3D9HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::B
 	if(mSurface)
 	{
 		RECT destRect, srcRect;
-		srcRect = toD3DRECTExtent(converted);
+		srcRect = toD3DRECT(converted);
 		destRect = toD3DRECT(dstBox);
 		
 		if(D3DXLoadSurfaceFromMemory(mSurface, NULL, &destRect, 
@@ -367,7 +367,7 @@ void D3D9HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::B
 	else
 	{
 		D3DBOX destBox, srcBox;
-		srcBox = toD3DBOXExtent(converted);
+		srcBox = toD3DBOX(converted);
 		destBox = toD3DBOX(dstBox);
 		size_t sliceWidth;
 		if (PixelUtil::isCompressed(converted.format))
