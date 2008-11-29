@@ -1603,6 +1603,10 @@ void SceneManager::_setSkyBox(
 		}
 		else
 		{
+			if (!mSkyBoxObj->isAttached())
+			{
+				mSkyBoxNode->attachObject(mSkyBoxObj);
+			}
 			mSkyBoxObj->clear();
 		}
 		
