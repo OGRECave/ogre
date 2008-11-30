@@ -969,7 +969,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	ManualObject::ManualObjectSection::ManualObjectSection(ManualObject* parent,
 		const String& materialName, RenderOperation::OperationType opType, const String & groupName)
-		: mParent(parent), mMaterialName(materialName), mGroupName(groupName)
+		: mParent(parent), mMaterialName(materialName), mGroupName(groupName), m32BitIndices(false)
 	{
 		mRenderOperation.operationType = opType;
 		// default to no indexes unless we're told
