@@ -104,7 +104,7 @@ namespace Ogre {
 		ID3D10ShaderReflectionConstantBuffer* mShaderReflectionConstantBuffer;
 		D3D10_SHADER_BUFFER_DESC mConstantBufferDesc ;
 		D3D10_SHADER_DESC mShaderDesc;
-		ID3D10ShaderReflection1* mpIShaderReflection;
+		ID3D10ShaderReflection* mpIShaderReflection;
 
 		ID3D10VertexShader* mpVertexShader;
 		ID3D10PixelShader* mpPixelShader;
