@@ -104,7 +104,13 @@ namespace Ogre {
 		ID3D10ShaderReflectionConstantBuffer* mShaderReflectionConstantBuffer;
 		D3D10_SHADER_BUFFER_DESC mConstantBufferDesc ;
 		D3D10_SHADER_DESC mShaderDesc;
+
+// this is a temp patch for the nov 08 DX SDK
+#ifdef D3DX10ReflectShader 
+		ID3D10ShaderReflection1* mpIShaderReflection;
+#else
 		ID3D10ShaderReflection* mpIShaderReflection;
+#endif
 
 		ID3D10VertexShader* mpVertexShader;
 		ID3D10PixelShader* mpPixelShader;
