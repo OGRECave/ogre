@@ -67,6 +67,7 @@ public:
                 bool fullScreen, int left, int top, bool depthBuffer, 
                 void* miscParam, ...);
 
+	void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
     void destroy(void);
     bool isActive(void) const;
     bool isClosed(void) const;

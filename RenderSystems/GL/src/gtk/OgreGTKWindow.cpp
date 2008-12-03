@@ -106,11 +106,13 @@ void GTKWindow::create(const String& name, unsigned int width, unsigned int heig
 
     		if (fullScreen)
     		{
+				mIsFullScreen = true;
         		mGtkWindow->set_decorated(false);
         		mGtkWindow->fullscreen();
     		}
     		else
     		{
+				mIsFullScreen = false;
         		mGtkWindow->set_default_size(mWidth, mHeight);
         		mGtkWindow->move(left, top); 
     		}
@@ -148,6 +150,23 @@ void GTKWindow::destroy()
 	delete mGtkWindow;
 	mGtkWindow = 0;
 
+}
+
+void GTKWindow::setFullscreen(bool fullScreen, unsigned int width, unsigned int height)
+{
+
+	if((fullScreen) && (!mIsFullScreen))
+	{
+		mIsFullScreen = true;
+		mGtkWindow->fullscreen();
+		ogre->set_size_request(width, height);
+	}
+	else if((!fullScreen) && (mIsFullScreen))
+	{
+		mIsFullScreen = false;
+		mGtkWindow->unfullscreen();
+		ogre->set_size_request(width, height);
+	}
 }
 
 bool GTKWindow::isActive() const
