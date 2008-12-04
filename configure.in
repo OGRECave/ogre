@@ -1,11 +1,10 @@
 AC_PREREQ(2.50)
 
-AC_INIT([OGRE], [1.7.0])
+AC_INIT([OGRE],[1.7.0])
 
 AC_CANONICAL_TARGET
 
 # New syntax; PACKAGE gets defined as 'OGRE' not 'ogre'
-#AM_INIT_AUTOMAKE([OGRE], 1.7.0)
 AM_INIT_AUTOMAKE([OGRE], 1.7.0)
 AC_CONFIG_HEADERS([OgreMain/include/config.h])
 
@@ -89,6 +88,7 @@ dnl Find the optional components we should build
 OGRE_CHECK_GUI
 OGRE_CHECK_DOUBLE
 OGRE_CHECK_THREADING
+OGRE_CHECK_ALLOCATOR
 OGRE_CHECK_FREEIMAGE
 OGRE_CHECK_DEVIL
 AC_LANG_PUSH(C++)
@@ -288,6 +288,7 @@ echo "    OpenGL ES Ogre support          : $OGRE_GLESSUPPORT"
 echo "    GUI library to use              : $with_gui"
 echo "    Use double precision arithmetic : $build_double"
 echo "    Support for threading           : $build_threads"
+echo "    Memory allocator                : $with_allocator"
 echo "    Use STLport                     : $ac_cv_use_stlport"
 echo "    Use FreeType                    : $ft_detected"
 echo "    Use FreeImage                   : $build_freeimage"

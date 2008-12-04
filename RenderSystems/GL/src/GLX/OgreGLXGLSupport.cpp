@@ -144,7 +144,7 @@ namespace Ogre
 	//-------------------------------------------------------------------------------------------------//
 	GLXGLSupport::~GLXGLSupport() 
 	{
-		if (! mXDisplay)
+		if (mXDisplay)
 			XCloseDisplay(mXDisplay);
 		
 		if (! mIsExternalDisplay && mGLDisplay)

@@ -790,6 +790,19 @@ AC_DEFUN([AX_BOOST],
 	fi
 ])
 
+AC_DEFUN([OGRE_CHECK_ALLOCATOR],
+[
+    AC_ARG_WITH([allocator],
+        AC_HELP_STRING([--with-allocator=type], [Select the memory allocator type to use (std, ned) (default: std)]),
+        [with_allocator=${withval}], [with_allocator=std])
+    if test "x$with_allocator" == "xstd"; then
+        AC_DEFINE([OGRE_MEMORY_ALLOCATOR], [1], [Custom memory allocator setting])
+    fi
+    if test "x$with_allocator" == "xned"; then
+        AC_DEFINE([OGRE_MEMORY_ALLOCATOR], [2], [Custom memory allocator setting])
+    fi
+])
+
 AC_DEFUN([OGRE_CHECK_THREADING],
 [
 AC_ARG_ENABLE(threading,

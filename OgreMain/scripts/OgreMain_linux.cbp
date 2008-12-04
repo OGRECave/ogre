@@ -9,7 +9,7 @@
 		<Build>
 			<Target title="Debug">
 				<Option platforms="Unix;" />
-				<Option output="../../lib/libOgreMain_d.so" prefix_auto="1" extension_auto="1" />
+				<Option output="../../lib/libOgreMain_d" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -24,7 +24,7 @@
 			</Target>
 			<Target title="Release">
 				<Option platforms="Unix;" />
-				<Option output="../../lib/libOgreMain.so" prefix_auto="1" extension_auto="1" />
+				<Option output="../../lib/libOgreMain" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -72,6 +72,8 @@
 			<Add library="freetype" />
 			<Add library="freeimage" />
 			<Add library="zzip" />
+			<Add library="Xt" />
+			<Add library="Xaw" />
 		</Linker>
 		<Unit filename="../include/GLX/OgreConfigDialogImp.h" />
 		<Unit filename="../include/GLX/OgreErrorDialogImp.h" />
@@ -225,6 +227,7 @@
 		<Unit filename="../include/OgreRenderTarget.h" />
 		<Unit filename="../include/OgreRenderTargetListener.h" />
 		<Unit filename="../include/OgreRenderTexture.h" />
+		<Unit filename="../include/OgreRenderToVertexBuffer.h" />
 		<Unit filename="../include/OgreRenderWindow.h" />
 		<Unit filename="../include/OgreRenderable.h" />
 		<Unit filename="../include/OgreResource.h" />
@@ -365,12 +368,10 @@
 		<Unit filename="../src/OgreManualObject.cpp" />
 		<Unit filename="../src/OgreMaterial.cpp" />
 		<Unit filename="../src/OgreMaterialManager.cpp" />
-		<Unit filename="../src/OgreMaterialScriptCompiler.cpp" />
 		<Unit filename="../src/OgreMaterialSerializer.cpp" />
 		<Unit filename="../src/OgreMath.cpp" />
 		<Unit filename="../src/OgreMatrix3.cpp" />
 		<Unit filename="../src/OgreMatrix4.cpp" />
-		<Unit filename="../src/OgreMemoryManager.cpp" />
 		<Unit filename="../src/OgreMesh.cpp" />
 		<Unit filename="../src/OgreMeshManager.cpp" />
 		<Unit filename="../src/OgreMeshSerializer.cpp" />
@@ -421,6 +422,7 @@
 		<Unit filename="../src/OgreRenderSystemCapabilitiesSerializer.cpp" />
 		<Unit filename="../src/OgreRenderTarget.cpp" />
 		<Unit filename="../src/OgreRenderTexture.cpp" />
+		<Unit filename="../src/OgreRenderToVertexBuffer.cpp" />
 		<Unit filename="../src/OgreRenderWindow.cpp" />
 		<Unit filename="../src/OgreResource.cpp" />
 		<Unit filename="../src/OgreResourceBackgroundQueue.cpp" />
@@ -476,6 +478,7 @@
 		<Extensions>
 			<code_completion />
 			<envvars />
+			<debugger />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

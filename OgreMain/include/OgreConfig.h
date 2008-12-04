@@ -87,7 +87,9 @@ Torus Knot Software Ltd.
 #define OGRE_MEMORY_ALLOCATOR_NED 2			 // you need to have nedmalloc on your path for this
 #define OGRE_MEMORY_ALLOCATOR_USER 3
 
-#define OGRE_MEMORY_ALLOCATOR OGRE_MEMORY_ALLOCATOR_STD
+#ifndef OGRE_MEMORY_ALLOCATOR
+#  define OGRE_MEMORY_ALLOCATOR OGRE_MEMORY_ALLOCATOR_STD
+#endif
 
 // enable or disable the memory tracker, recording the memory allocations & tracking leaks
 // default is to disable since it's expensive, but you can enable if needed per build target

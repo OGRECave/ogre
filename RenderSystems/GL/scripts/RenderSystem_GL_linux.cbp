@@ -118,21 +118,20 @@
 		<Unit filename="../src/GLSL/include/OgreGLSLGpuProgram.h" />
 		<Unit filename="../src/GLSL/include/OgreGLSLLinkProgram.h" />
 		<Unit filename="../src/GLSL/include/OgreGLSLLinkProgramManager.h" />
+		<Unit filename="../src/GLSL/include/OgreGLSLPreprocessor.h" />
 		<Unit filename="../src/GLSL/include/OgreGLSLProgram.h" />
 		<Unit filename="../src/GLSL/include/OgreGLSLProgramFactory.h" />
-		<Unit filename="../src/GLSL/include/OgreGLSLPreprocessor.h" />
 		<Unit filename="../src/GLSL/src/OgreGLSLExtSupport.cpp" />
 		<Unit filename="../src/GLSL/src/OgreGLSLGpuProgram.cpp" />
 		<Unit filename="../src/GLSL/src/OgreGLSLLinkProgram.cpp" />
 		<Unit filename="../src/GLSL/src/OgreGLSLLinkProgramManager.cpp" />
+		<Unit filename="../src/GLSL/src/OgreGLSLPreprocessor.cpp" />
 		<Unit filename="../src/GLSL/src/OgreGLSLProgram.cpp" />
 		<Unit filename="../src/GLSL/src/OgreGLSLProgramFactory.cpp" />
-		<Unit filename="../src/GLSL/src/OgreGLSLPreprocessor.cpp" />
 		<Unit filename="../src/GLX/OgreGLUtil.h" />
 		<Unit filename="../src/GLX/OgreGLXContext.cpp" />
 		<Unit filename="../src/GLX/OgreGLXGLSupport.cpp" />
 		<Unit filename="../src/GLX/OgreGLXRenderTexture.cpp" />
-		<Unit filename="../src/GLX/OgreGLXUtils.cpp" />
 		<Unit filename="../src/GLX/OgreGLXWindow.cpp" />
 		<Unit filename="../src/OgreGLATIFSInit.cpp" />
 		<Unit filename="../src/OgreGLContext.cpp" />
@@ -154,6 +153,7 @@
 		<Unit filename="../src/OgreGLPlugin.cpp" />
 		<Unit filename="../src/OgreGLRenderSystem.cpp" />
 		<Unit filename="../src/OgreGLRenderTexture.cpp" />
+		<Unit filename="../src/OgreGLRenderToVertexBuffer.cpp" />
 		<Unit filename="../src/OgreGLSupport.cpp" />
 		<Unit filename="../src/OgreGLTexture.cpp" />
 		<Unit filename="../src/OgreGLTextureManager.cpp" />
@@ -206,6 +206,8 @@
 		<Unit filename="../src/nvparse/winheaders/unistd.h" />
 		<Extensions>
 			<code_completion />
+			<envvars />
+			<debugger />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

@@ -62,6 +62,8 @@
 		<Unit filename="../src/CameraTrack.cpp" />
 		<Extensions>
 			<code_completion />
+			<envvars />
+			<debugger />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

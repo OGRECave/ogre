@@ -949,36 +949,39 @@ namespace Ogre {
         // bool indexes32Bit
         bool idx32bit;
         readBools(stream, &idx32bit, 1);
-        if (idx32bit)
+        if (indexCount > 0)
         {
-            ibuf = HardwareBufferManager::getSingleton().
-                createIndexBuffer(
-                    HardwareIndexBuffer::IT_32BIT,
-                    sm->indexData->indexCount,
-                    pMesh->mIndexBufferUsage,
-					pMesh->mIndexBufferShadowBuffer);
-            // unsigned int* faceVertexIndices
-            unsigned int* pIdx = static_cast<unsigned int*>(
-                ibuf->lock(HardwareBuffer::HBL_DISCARD)
-                );
-            readInts(stream, pIdx, sm->indexData->indexCount);
-            ibuf->unlock();
+            if (idx32bit)
+            {
+                ibuf = HardwareBufferManager::getSingleton().
+                    createIndexBuffer(
+                        HardwareIndexBuffer::IT_32BIT,
+                        sm->indexData->indexCount,
+                        pMesh->mIndexBufferUsage,
+					    pMesh->mIndexBufferShadowBuffer);
+                // unsigned int* faceVertexIndices
+                unsigned int* pIdx = static_cast<unsigned int*>(
+                    ibuf->lock(HardwareBuffer::HBL_DISCARD)
+                    );
+                readInts(stream, pIdx, sm->indexData->indexCount);
+                ibuf->unlock();
 
-        }
-        else // 16-bit
-        {
-            ibuf = HardwareBufferManager::getSingleton().
-                createIndexBuffer(
-                    HardwareIndexBuffer::IT_16BIT,
-                    sm->indexData->indexCount,
-                    pMesh->mIndexBufferUsage,
-					pMesh->mIndexBufferShadowBuffer);
-            // unsigned short* faceVertexIndices
-            unsigned short* pIdx = static_cast<unsigned short*>(
-                ibuf->lock(HardwareBuffer::HBL_DISCARD)
-                );
-            readShorts(stream, pIdx, sm->indexData->indexCount);
-            ibuf->unlock();
+            }
+            else // 16-bit
+            {
+                ibuf = HardwareBufferManager::getSingleton().
+                    createIndexBuffer(
+                        HardwareIndexBuffer::IT_16BIT,
+                        sm->indexData->indexCount,
+                        pMesh->mIndexBufferUsage,
+					    pMesh->mIndexBufferShadowBuffer);
+                // unsigned short* faceVertexIndices
+                unsigned short* pIdx = static_cast<unsigned short*>(
+                    ibuf->lock(HardwareBuffer::HBL_DISCARD)
+                    );
+                readShorts(stream, pIdx, sm->indexData->indexCount);
+                ibuf->unlock();
+            }
         }
         sm->indexData->indexBuffer = ibuf;
 

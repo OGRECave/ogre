@@ -351,6 +351,7 @@ namespace Ogre {
             size_t left, top, right, bottom, front, back;
 			/// Parameterless constructor for setting the members manually
             Box()
+				: left(0), top(0), right(1), bottom(1), front(0), back(1)
             {
             }
             /** Define a box from left, top, right and bottom coordinates
