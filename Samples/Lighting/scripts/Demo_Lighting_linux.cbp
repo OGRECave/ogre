@@ -66,6 +66,8 @@
 		<Unit filename="../src/Lighting.cpp" />
 		<Extensions>
 			<code_completion />
+			<envvars />
+			<debugger />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

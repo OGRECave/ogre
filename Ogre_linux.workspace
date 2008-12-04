@@ -144,15 +144,7 @@
 			<Depends filename="RenderSystems/GL/scripts/RenderSystem_GL_linux.cbp" />
 			<Depends filename="Samples/Common/CEGUIRenderer/scripts/OgreGUIRenderer_linux.cbp" />
 		</Project>
-		<Project filename="Samples/Instancing/scripts/Demo_Instancing_linux.cbp">
-			<Depends filename="OgreMain/scripts/OgreMain_linux.cbp" />
-			<Depends filename="PlugIns/BSPSceneManager/scripts/Plugin_BSPSceneManager_linux.cbp" />
-			<Depends filename="PlugIns/CgProgramManager/scripts/Plugin_CgProgramManager_linux.cbp" />
-			<Depends filename="PlugIns/OctreeSceneManager/scripts/Plugin_OctreeSceneManager_linux.cbp" />
-			<Depends filename="PlugIns/ParticleFX/scripts/Plugin_ParticleFX_linux.cbp" />
-			<Depends filename="RenderSystems/GL/scripts/RenderSystem_GL_linux.cbp" />
-			<Depends filename="Samples/Common/CEGUIRenderer/scripts/OgreGUIRenderer_linux.cbp" />
-		</Project>
+		<Project filename="Samples/Instancing/scripts/Demo_Instancing_linux.cbp" />
 		<Project filename="Samples/Lighting/scripts/Demo_Lighting_linux.cbp">
 			<Depends filename="OgreMain/scripts/OgreMain_linux.cbp" />
 			<Depends filename="PlugIns/BSPSceneManager/scripts/Plugin_BSPSceneManager_linux.cbp" />
