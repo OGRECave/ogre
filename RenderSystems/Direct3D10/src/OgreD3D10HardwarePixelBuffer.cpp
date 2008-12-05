@@ -65,6 +65,14 @@ namespace Ogre {
 	}
 	D3D10HardwarePixelBuffer::~D3D10HardwarePixelBuffer()
 	{
+		if(mSliceTRT.empty())
+			return;
+		// Delete all render targets that are not yet deleted via _clearSliceRTT
+		for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
+		{
+			if(mSliceTRT[zoffset])
+				Root::getSingleton().getRenderSystem()->destroyRenderTarget(mSliceTRT[zoffset]->getName());
+		}
 	}
 	//-----------------------------------------------------------------------------  
 	// Util functions to convert a D3D locked box to a pixel box
@@ -191,7 +199,7 @@ namespace Ogre {
 
 		return res;
 	}
-	
+
 	//-----------------------------------------------------------------------------  
 
 	void D3D10HardwarePixelBuffer::blit(const HardwarePixelBufferSharedPtr &rsrc, const Image::Box &srcBox, const Image::Box &dstBox)
@@ -206,7 +214,7 @@ namespace Ogre {
 				"D3D10 device cannot copy a subresource - source and dest size are not the same and they have to be the same in DX10.",
 				"D3D10HardwarePixelBuffer::blit");
 		}
-		
+
 		D3D10_BOX srcBoxDx10 = OgreImageBoxToDx10Box(srcBox);
 
 
@@ -279,7 +287,7 @@ namespace Ogre {
 
 
 		_genMipmaps();
-		
+
 	}
 	//-----------------------------------------------------------------------------  
 	void D3D10HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box &dstBox)
@@ -321,6 +329,11 @@ namespace Ogre {
 			PixelUtil::bulkPixelConversion(src, converted);
 		}
 
+		// In d3d10 the Row Pitch is defined as: "The size of one row of the source data" and not 
+		// the same as the OGRE row pitch - meaning that we need to multiple the OGRE row pitch 
+		// with the size in bytes of the element to get the d3d10 row pitch. 
+		UINT d3dRowPitch = static_cast<UINT>(converted.rowPitch) * static_cast<UINT>(PixelUtil::getNumElemBytes(mFormat));
+
 
 		switch(mParentTexture->getTextureType()) {
 		case TEX_TYPE_1D:
@@ -341,7 +354,7 @@ namespace Ogre {
 						"D3D10HardwarePixelBuffer::blitFromMemory");
 				}
 			}
-		break;
+			break;
 		case TEX_TYPE_CUBE_MAP:
 		case TEX_TYPE_2D:
 			{
@@ -350,7 +363,7 @@ namespace Ogre {
 					static_cast<UINT>(mSubresourceIndex),
 					&dstBoxDx10,
 					converted.data,
-					static_cast<UINT>(converted.rowPitch),
+					d3dRowPitch,
 					mFace );
 				if (mDevice.isError())
 				{
@@ -368,7 +381,7 @@ namespace Ogre {
 					static_cast<UINT>(mSubresourceIndex),
 					&dstBoxDx10,
 					converted.data,
-					static_cast<UINT>(converted.rowPitch),
+					d3dRowPitch,
 					static_cast<UINT>(converted.slicePitch)
 					);
 				if (mDevice.isError())
