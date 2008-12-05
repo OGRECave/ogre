@@ -500,6 +500,7 @@ void CompositorInstance::createResources(bool forResizeOnly)
         size_t width = def->width;
         size_t height = def->height;
 		uint fsaa = 0;
+		String fsaaHint;
 		bool hwGamma = false;
 
 		// Skip this one if we're only (re)creating for a resize & it's not derived
@@ -507,7 +508,7 @@ void CompositorInstance::createResources(bool forResizeOnly)
 		if (forResizeOnly && width != 0 && height != 0)
 			continue;
 
-		deriveTextureRenderTargetOptions(def->name, &hwGamma, &fsaa);
+		deriveTextureRenderTargetOptions(def->name, &hwGamma, &fsaa, &fsaaHint);
 
         if(width == 0)
             width = static_cast<size_t>(
@@ -518,7 +519,10 @@ void CompositorInstance::createResources(bool forResizeOnly)
 
 		// determine options as a combination of selected options and possible options
 		if (!def->fsaa)
+		{
 			fsaa = 0;
+			fsaaHint = StringUtil::BLANK;
+		}
 		hwGamma = hwGamma || def->hwGammaWrite;
 
         /// Make the tetxure
@@ -544,7 +548,7 @@ void CompositorInstance::createResources(bool forResizeOnly)
 					// get / create shared texture
 					tex = CompositorManager::getSingleton().getSharedTexture(texname,
 						def->name, 
-						width, height, *p, fsaa, 
+						width, height, *p, fsaa, fsaaHint,  
 						hwGamma && !PixelUtil::isFloatingPoint(*p), 
 						assignedTextures, this);
 				}
@@ -554,7 +558,7 @@ void CompositorInstance::createResources(bool forResizeOnly)
 						texname, 
 						ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
 						(uint)width, (uint)height, 0, *p, TU_RENDERTARGET, 0, 
-						hwGamma && !PixelUtil::isFloatingPoint(*p), fsaa ); 
+						hwGamma && !PixelUtil::isFloatingPoint(*p), fsaa, fsaaHint ); 
 				}
 				
 				RenderTexture* rt = tex->getBuffer()->getRenderTarget();
@@ -583,7 +587,7 @@ void CompositorInstance::createResources(bool forResizeOnly)
 			{
 				// get / create shared texture
 				tex = CompositorManager::getSingleton().getSharedTexture(texName, 
-					def->name, width, height, def->formatList[0], fsaa, 
+					def->name, width, height, def->formatList[0], fsaa, fsaaHint,
 					hwGamma && !PixelUtil::isFloatingPoint(def->formatList[0]), assignedTextures, 
 					this);
 			}
@@ -593,7 +597,7 @@ void CompositorInstance::createResources(bool forResizeOnly)
 					texName, 
 					ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
 					(uint)width, (uint)height, 0, def->formatList[0], TU_RENDERTARGET, 0,
-					hwGamma && !PixelUtil::isFloatingPoint(def->formatList[0]), fsaa); 
+					hwGamma && !PixelUtil::isFloatingPoint(def->formatList[0]), fsaa, fsaaHint); 
 			}
 
 			rendTarget = tex->getBuffer()->getRenderTarget();
@@ -630,7 +634,7 @@ void CompositorInstance::createResources(bool forResizeOnly)
 }
 //---------------------------------------------------------------------
 void CompositorInstance::deriveTextureRenderTargetOptions(
-	const String& texname, bool *hwGammaWrite, uint *fsaa)
+	const String& texname, bool *hwGammaWrite, uint *fsaa, String* fsaaHint)
 {
 	// search for passes on this texture def that either include a render_scene
 	// or use input previous
@@ -688,11 +692,13 @@ void CompositorInstance::deriveTextureRenderTargetOptions(
 		RenderTarget* target = mChain->getViewport()->getTarget();
 		*hwGammaWrite = target->isHardwareGammaEnabled();
 		*fsaa = target->getFSAA();
+		*fsaaHint = target->getFSAAHint();
 	}
 	else
 	{
 		*hwGammaWrite = false;
 		*fsaa = 0;
+		*fsaaHint = StringUtil::BLANK;
 	}
 
 }

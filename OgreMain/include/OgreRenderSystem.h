@@ -340,8 +340,14 @@ namespace Ogre
 		**
 		Key: "FSAA"
 		Description: Full screen antialiasing factor
-		Values: 0,2,4,6,...
+		Values: 0,2,4,8,16
 		Default: 0 
+		**
+		Key: "FSAAHint"
+		Description: Full screen antialiasing hint
+		Values: Depends on rendersystem and hardware. Currently supports "Quality"
+			option.
+		Default: "" 
 		**
 		Key: "displayFrequency"
 		Description: Display frequency rate, for fullscreen mode

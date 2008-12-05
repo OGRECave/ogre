@@ -333,7 +333,7 @@ namespace Ogre {
 			inherit from the main render target to which we're attached. 
 		*/
 		void deriveTextureRenderTargetOptions(const String& texname, 
-			bool *hwGammaWrite, uint *fsaa);
+			bool *hwGammaWrite, uint *fsaa, String* fsaaHint);
         
         friend class CompositorChain;
     };

@@ -64,19 +64,6 @@ namespace Ogre
 		destroy();
 	}
 
-	bool D3D9RenderWindow::_checkMultiSampleQuality(D3DMULTISAMPLE_TYPE type, DWORD *outQuality, D3DFORMAT format, UINT adapterNum, D3DDEVTYPE deviceType, BOOL fullScreen)
-	{
-		LPDIRECT3D9 pD3D = mDriver->getD3D();
-
-		if (SUCCEEDED(pD3D->CheckDeviceMultiSampleType(
-			adapterNum, 
-			deviceType, format, 
-			fullScreen, type, outQuality)))
-			return true;
-		else
-			return false;
-	}
-
 	void D3D9RenderWindow::create(const String& name, unsigned int width, unsigned int height,
 		bool fullScreen, const NameValuePairList *miscParams)
 	{
@@ -87,6 +74,7 @@ namespace Ogre
 		HWND externalHandle = 0;
 		mFSAAType = D3DMULTISAMPLE_NONE;
 		mFSAAQuality = 0;
+		mFSAA = 0;
 		mVSync = false;
 		String title = name;
 		unsigned int colourDepth = 32;
@@ -96,6 +84,9 @@ namespace Ogre
 		String border = "";
 		bool outerSize = false;
 		mUseNVPerfHUD = false;
+		size_t fsaaSamples = 0;
+		String fsaaHint;
+
 
 		if(miscParams)
 		{
@@ -137,18 +128,18 @@ namespace Ogre
 			opt = miscParams->find("depthBuffer");
 			if(opt != miscParams->end())
 				depthBuffer = StringConverter::parseBool(opt->second);
-			// FSAA type
+			// FSAA settings
 			opt = miscParams->find("FSAA");
 			if(opt != miscParams->end())
 			{
 				mFSAA = StringConverter::parseUnsignedInt(opt->second);
-				mFSAAType = (D3DMULTISAMPLE_TYPE)mFSAA;
 			}
-				
-			// FSAA quality
-			opt = miscParams->find("FSAAQuality");
+			opt = miscParams->find("FSAAHint");
 			if(opt != miscParams->end())
-				mFSAAQuality = StringConverter::parseUnsignedInt(opt->second);
+			{
+				mFSAAHint = opt->second;
+			}
+
 			// window border style
 			opt = miscParams->find("border");
 			if(opt != miscParams->end())
@@ -462,6 +453,11 @@ namespace Ogre
 		else
 			// 16-bit depth, software stencil
 			md3dpp.AutoDepthStencilFormat	= D3DFMT_D16;
+
+
+		D3D9RenderSystem* rsys = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
+		rsys->determineFSAASettings(mFSAA, mFSAAHint, md3dpp.BackBufferFormat, mIsFullScreen, 
+			&mFSAAType, &mFSAAQuality);
 
 		md3dpp.MultiSampleType = mFSAAType;
 		md3dpp.MultiSampleQuality = (mFSAAQuality == 0) ? 0 : mFSAAQuality;
@@ -1126,4 +1122,5 @@ namespace Ogre
 		}
 		RenderWindow::update(swap);
 	}
+
 }

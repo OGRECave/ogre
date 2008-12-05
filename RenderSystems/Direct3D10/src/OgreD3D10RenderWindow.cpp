@@ -31,6 +31,7 @@ Torus Knot Software Ltd.
 #include "OgreD3D10RenderSystem.h"
 #include "OgreWindowEventUtilities.h"
 #include "OgreD3D10Driver.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {
@@ -85,8 +86,9 @@ namespace Ogre
 		HWND parentHWnd = 0;
 		HWND externalHandle = 0;
 		mFSAAType.Count = 1;
-		mFSAAType.Quality=0;
-		//mFSAAQuality = 0;
+		mFSAAType.Quality = 0;
+		mFSAA = 0;
+		mFSAAHint = "";
 		mVSync = false;
 		String title = name;
 		unsigned int colourDepth = 32;
@@ -142,12 +144,11 @@ namespace Ogre
 			if(opt != miscParams->end())
 			{
 				mFSAA = StringConverter::parseUnsignedInt(opt->second);
-				mFSAAType.Count = (UINT)mFSAA;
 			}
 			// FSAA quality
-			opt = miscParams->find("FSAAQuality");
+			opt = miscParams->find("FSAAHint");
 			if(opt != miscParams->end())
-				mFSAAType.Quality = StringConverter::parseUnsignedInt(opt->second);
+				mFSAAHint = opt->second;
 			// window border style
 			opt = miscParams->find("border");
 			if(opt != miscParams->end())
@@ -410,7 +411,8 @@ namespace Ogre
 		}
 		md3dpp.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-
+		D3D10RenderSystem* rsys = static_cast<D3D10RenderSystem*>(Root::getSingleton().getRenderSystem());
+		rsys->determineFSAASettings(mFSAA, mFSAAHint, md3dpp.BufferDesc.Format, &mFSAAType);
 
 
 		if (mVSync)

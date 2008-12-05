@@ -57,7 +57,7 @@ D3D9HardwarePixelBuffer::~D3D9HardwarePixelBuffer()
 }
 //-----------------------------------------------------------------------------  
 void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DSurface9 *surface, 
-								   bool update, bool writeGamma, uint fsaa, 
+								   bool update, bool writeGamma, uint fsaa, const String& fsaaHint,  
 								   IDirect3DSurface9* fsaaSurface, const String& srcName)
 {
 	mpDev = dev;
@@ -78,7 +78,7 @@ void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DSurface9 *sur
 	mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
 
 	if(mUsage & TU_RENDERTARGET)
-		createRenderTextures(update, writeGamma, fsaa, srcName);
+		createRenderTextures(update, writeGamma, fsaa, fsaaHint, srcName);
 }
 //-----------------------------------------------------------------------------
 void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DVolume9 *volume, 
@@ -101,7 +101,7 @@ void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DVolume9 *volu
 	mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
 
 	if(mUsage & TU_RENDERTARGET)
-		createRenderTextures(update, writeGamma, 0, srcName);
+		createRenderTextures(update, writeGamma, 0, StringUtil::BLANK, srcName);
 }
 //-----------------------------------------------------------------------------  
 // Util functions to convert a D3D locked box to a pixel box
@@ -600,7 +600,8 @@ RenderTexture *D3D9HardwarePixelBuffer::getRenderTarget(size_t zoffset)
     return mSliceTRT[zoffset];
 }
 //-----------------------------------------------------------------------------    
-void D3D9HardwarePixelBuffer::createRenderTextures(bool update, bool writeGamma, uint fsaa, const String& srcName)
+void D3D9HardwarePixelBuffer::createRenderTextures(bool update, bool writeGamma, 
+	uint fsaa, const String& fsaaHint, const String& srcName)
 {
     if (update)
     {
@@ -628,7 +629,7 @@ void D3D9HardwarePixelBuffer::createRenderTextures(bool update, bool writeGamma,
         String name;
 		name = "rtt/"+Ogre::StringConverter::toString((size_t)mSurface) + "/" + srcName;
 		
-        RenderTexture *trt = new D3D9RenderTexture(name, this, writeGamma, fsaa);
+        RenderTexture *trt = new D3D9RenderTexture(name, this, writeGamma, fsaa, fsaaHint);
         mSliceTRT.push_back(trt);
         Root::getSingleton().getRenderSystem()->attachRenderTarget(*trt);
     }

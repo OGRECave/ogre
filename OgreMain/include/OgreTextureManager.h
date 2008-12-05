@@ -279,7 +279,7 @@ namespace Ogre {
         virtual TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, uint depth, 
 			int num_mips, PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
-			bool hwGammaCorrection = false, uint fsaa = 0);
+			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK);
 			
         /** Create a manual texture with a depth of 1 (not loaded from a file).
             @param
@@ -326,10 +326,10 @@ namespace Ogre {
         TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, int num_mips,
             PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
-			bool hwGammaCorrection = false, uint fsaa = 0)
+			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK)
 		{
 			return createManual(name, group, texType, width, height, 1, 
-				num_mips, format, usage, loader, hwGammaCorrection, fsaa);
+				num_mips, format, usage, loader, hwGammaCorrection, fsaa, fsaaHint);
 		}
 
         /** Sets preferred bit depth for integer pixel format textures.

@@ -125,7 +125,7 @@ namespace Ogre {
 		*/
 		TexturePtr getSharedTexture(const String& name, const String& localName, 
 			size_t w, size_t h, 
-			PixelFormat f, int aa, bool srgb, UniqueTextureSet& texturesAlreadyAssigned, 
+			PixelFormat f, uint aa, const String& aaHint, bool srgb, UniqueTextureSet& texturesAlreadyAssigned, 
 			CompositorInstance* inst);
 
 		/** Free shared textures from the shared pool (compositor instances still 
@@ -192,11 +192,12 @@ namespace Ogre {
 		{
 			size_t width, height;
 			PixelFormat format;
-			int fsaa;
+			uint fsaa;
+			String fsaaHint;
 			bool sRGBwrite;
 
-			TextureDef(size_t w, size_t h, PixelFormat f, int aa, bool srgb)
-				: width(w), height(h), format(f), fsaa(aa), sRGBwrite(srgb)
+			TextureDef(size_t w, size_t h, PixelFormat f, uint aa, const String& aaHint, bool srgb)
+				: width(w), height(h), format(f), fsaa(aa), fsaaHint(aaHint), sRGBwrite(srgb)
 			{
 
 			}
@@ -221,8 +222,13 @@ namespace Ogre {
 								return true;
 							else if (x.fsaa == y.fsaa)
 							{
-								if (!x.sRGBwrite && y.sRGBwrite)
+								if (x.fsaaHint < y.fsaaHint)
 									return true;
+								else if (x.fsaaHint == y.fsaaHint)
+								{
+									if (!x.sRGBwrite && y.sRGBwrite)
+										return true;
+								}
 
 							}
 						}

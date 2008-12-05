@@ -57,10 +57,6 @@ namespace Ogre
 		
 		// Stored options
 		ConfigOptionMap mOptions;
-		/// full-screen multisampling antialiasing type
-		DXGI_SAMPLE_DESC mFSAAType;
-		/// full-screen multisampling antialiasing level
-		//DWORD mFSAAQuality;
 
 		/// instance
 		HINSTANCE mhInstance;
@@ -93,8 +89,6 @@ namespace Ogre
 		DWORD _getCurrentAnisotropy(size_t unit);
 		/// check if a FSAA is supported
 		bool _checkMultiSampleQuality(UINT SampleCount, UINT *outQuality, DXGI_FORMAT format);
-		/// set FSAA
-		void _setFSAA(DXGI_SAMPLE_DESC type, DWORD qualityLevel);
 		
 		D3D10HardwareBufferManager* mHardwareBufferManager;
 		D3D10GpuProgramManager* mGpuProgramManager;
@@ -366,6 +360,8 @@ namespace Ogre
         with the given usage options.
         */
         bool _checkTextureFilteringSupported(TextureType ttype, PixelFormat format, int usage);
+
+		void determineFSAASettings(uint fsaa, const String& fsaaHint, DXGI_FORMAT format, DXGI_SAMPLE_DESC* outFSAASettings);
 	};
 }
 #endif

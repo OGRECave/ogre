@@ -294,11 +294,11 @@ void CompositorManager::_reconstructAllCompositorResources()
 //---------------------------------------------------------------------
 TexturePtr CompositorManager::getSharedTexture(const String& name, 
 	const String& localName,
-	size_t w, size_t h, PixelFormat f, int aa, bool srgb, 
+	size_t w, size_t h, PixelFormat f, uint aa, const String& aaHint, bool srgb, 
 	CompositorManager::UniqueTextureSet& texturesAssigned, 
 	CompositorInstance* inst)
 {
-	TextureDef def(w, h, f, aa, srgb);
+	TextureDef def(w, h, f, aa, aaHint, srgb);
 	TexturesByDef::iterator i = mTexturesByDef.find(def);
 	if (i == mTexturesByDef.end())
 	{
@@ -356,7 +356,7 @@ TexturePtr CompositorManager::getSharedTexture(const String& name,
 			name, 
 			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
 			(uint)w, (uint)h, 0, f, TU_RENDERTARGET, 0,
-			srgb, aa); 
+			srgb, aa, aaHint); 
 
 		texList->push_back(ret);
 

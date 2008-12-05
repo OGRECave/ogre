@@ -126,9 +126,6 @@ namespace Ogre
 		// set config options defaults
 		initConfigOptions();
 
-		// fsaa options
-		mFSAAType.Count =1;
-		mFSAAType.Quality = 0;
 
 		// set stages desc. to defaults
 		for (size_t n = 0; n < OGRE_MAX_TEXTURE_LAYERS; n++)
@@ -246,7 +243,7 @@ namespace Ogre
 		optVSync.possibleValues.push_back( "No" );
 		optVSync.currentValue = "No";
 
-		optAA.name = "Anti aliasing";
+		optAA.name = "FSAA";
 		optAA.immutable = false;
 		optAA.possibleValues.push_back( "None" );
 		optAA.currentValue = "None";
@@ -387,33 +384,6 @@ namespace Ogre
             }
 		}
 
-		if( name == "Anti aliasing" )
-		{
-/*			if (value == "None")
-				_setFSAA(D3DMULTISAMPLE_NONE, 0);
-			else 
-			{
-				DXGI_SAMPLE_DESC fsaa = D3DMULTISAMPLE_NONE;
-				DWORD level = 0;
-
-				if (StringUtil::startsWith(value, "NonMaskable", false))
-				{
-					fsaa = D3DMULTISAMPLE_NONMASKABLE;
-					size_t pos = value.find_last_of(" ");
-					String sNum = value.substr(pos + 1);
-					level = StringConverter::parseInt(sNum);
-					level -= 1;
-				}
-				else if (StringUtil::startsWith(value, "Level", false))
-				{
-					size_t pos = value.find_last_of(" ");
-					String sNum = value.substr(pos + 1);
-					fsaa = (DXGI_SAMPLE_DESC)StringConverter::parseInt(sNum);
-				}
-
-				_setFSAA(fsaa, level);
-			}
-*/		}
 
 		if( name == "VSync" )
 		{
@@ -441,10 +411,10 @@ namespace Ogre
     void D3D10RenderSystem::refreshFSAAOptions(void)
     {
 
-        ConfigOptionMap::iterator it = mOptions.find( "Anti aliasing" );
+        ConfigOptionMap::iterator it = mOptions.find( "FSAA" );
         ConfigOption* optFSAA = &it->second;
         optFSAA->possibleValues.clear();
-        optFSAA->possibleValues.push_back("None");
+        optFSAA->possibleValues.push_back("0");
 
         it = mOptions.find("Rendering Device");
         D3D10Driver *driver = getDirect3DDrivers()->item(it->second.currentValue);
@@ -455,21 +425,7 @@ namespace Ogre
             if (videoMode)
             {
                 UINT numLevels = 0;
-               // get non maskable FSAA for this VMODE
 				 bool bOK=false;
-               /*  bool bOK = this->_checkMultiSampleQuality(
-                    D3DMULTISAMPLE_NONMASKABLE, 
-                    &numLevels, 
-                    videoMode->getFormat(), 
-                    driver->getAdapterNumber(),
-                    D3DDEVTYPE_HAL,
-                    TRUE);
-                if (bOK && numLevels > 0)
-                {
-                    for (DWORD n = 0; n < numLevels; n++)
-                        optFSAA->possibleValues.push_back("NonMaskable " + StringConverter::toString(n + 1));
-                }
-			*/
                 // set maskable levels supported
                 for (unsigned int n = 2; n < 17; n++)
                 {
@@ -479,7 +435,13 @@ namespace Ogre
                         videoMode->getFormat()
                         );
                     if (bOK)
-                        optFSAA->possibleValues.push_back("Level " + StringConverter::toString(n));
+					{
+                        optFSAA->possibleValues.push_back(StringConverter::toString(n));
+						if (n >=8)
+						{
+							optFSAA->possibleValues.push_back(StringConverter::toString(n) + " [Quality]");
+						}
+					}
                 }
             }
         }
@@ -491,7 +453,7 @@ namespace Ogre
                       optFSAA->currentValue);
         if (itValue == optFSAA->possibleValues.end())
         {
-            optFSAA->currentValue = "None";
+            optFSAA->currentValue = "0";
         }
 
     }
@@ -683,11 +645,21 @@ namespace Ogre
 			if( opt == mOptions.end() )
 				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find sRGB option!", "D3D9RenderSystem::initialise" );
 			hwGamma = opt->second.currentValue == "Yes";
+			uint fsaa = 0;
+			String fsaaHint;
+			if( (opt = mOptions.find("FSAA")) != mOptions.end() )
+			{
+				StringVector values = StringUtil::split(opt->second.currentValue, " ", 1);
+				fsaa = StringConverter::parseUnsignedInt(values[0]);
+				if (values.size() > 1)
+					fsaaHint = values[1];
+			}				
+			
 
 			NameValuePairList miscParams;
 			miscParams["colourDepth"] = StringConverter::toString(videoMode->getColourDepth());
-			miscParams["FSAA"] = StringConverter::toString(mFSAAType.Count);
-			miscParams["FSAAQuality"] = StringConverter::toString(mFSAAType.Quality);
+			miscParams["FSAA"] = fsaa;
+			miscParams["FSAAHint"] = fsaaHint;
 			miscParams["vsync"] = StringConverter::toString(mVSync);
 			miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
 			miscParams["gamma"] = StringConverter::toString(hwGamma);
@@ -723,15 +695,6 @@ namespace Ogre
 
 		return autoWindow;
 	}
-	//---------------------------------------------------------------------
-	void D3D10RenderSystem::_setFSAA(DXGI_SAMPLE_DESC type, DWORD qualityLevel)
-	{
-/*		if (!mDevice)
-		{
-			mFSAAType = type;
-			mFSAAQuality = qualityLevel;
-		}
-*/	}
 	//---------------------------------------------------------------------
 	void D3D10RenderSystem::reinitialise()
 	{
@@ -3368,5 +3331,114 @@ namespace Ogre
 	String D3D10RenderSystem::getErrorDescription( long errorNumber ) const
 	{
 		return mDevice.getErrorDescription(errorNumber);
+	}
+	//---------------------------------------------------------------------
+	void D3D10RenderSystem::determineFSAASettings(uint fsaa, const String& fsaaHint, 
+		DXGI_FORMAT format, DXGI_SAMPLE_DESC* outFSAASettings)
+	{
+		bool ok = false;
+		bool qualityHint = fsaaHint.find("Quality") != String::npos;
+		size_t origFSAA = fsaa;
+		IDXGIAdapter* pAdapter;
+		bool tryCSAA = false;
+		// NVIDIA, prefer CSAA if available for 8+
+		// it would be tempting to use getCapabilities()->getVendor() == GPU_NVIDIA but
+		// if this is the first window, caps will not be initialised yet
+		
+		if (mActiveD3DDriver->getAdapterIdentifier().VendorId == 0x10DE && 
+			fsaa >= 8)
+		{
+			tryCSAA	 = true;
+		}
+
+		while (!ok)
+		{
+			// Deal with special cases
+			if (tryCSAA)
+			{
+				// see http://developer.nvidia.com/object/coverage-sampled-aa.html
+				switch(fsaa)
+				{
+				case 8:
+					if (qualityHint)
+					{
+						outFSAASettings->Count = 8;
+						outFSAASettings->Quality = 8;
+					}
+					else
+					{
+						outFSAASettings->Count = 4;
+						outFSAASettings->Quality = 8;
+					}
+					break;
+				case 16:
+					if (qualityHint)
+					{
+						outFSAASettings->Count = 8;
+						outFSAASettings->Quality = 16;
+					}
+					else
+					{
+						outFSAASettings->Count = 4;
+						outFSAASettings->Quality = 16;
+					}
+					break;
+				}
+			}
+			else // !CSAA
+			{
+				outFSAASettings->Count = fsaa == 0 ? 1 : fsaa;
+				outFSAASettings->Quality = 0;
+			}
+
+
+			HRESULT hr;
+			UINT outQuality;
+			hr = mDevice->CheckMultisampleQualityLevels( 
+				format, 
+				outFSAASettings->Count, 
+				&outQuality);
+
+			if (SUCCEEDED(hr) && 
+				(!tryCSAA || outQuality > outFSAASettings->Quality))
+			{
+				ok = true;
+			}
+			else
+			{
+				// downgrade
+				if (tryCSAA && fsaa == 8)
+				{
+					// for CSAA, we'll try downgrading with quality mode at all samples.
+					// then try without quality, then drop CSAA
+					if (qualityHint)
+					{
+						// drop quality first
+						qualityHint = false;
+					}
+					else
+					{
+						// drop CSAA entirely 
+						tryCSAA = false;
+					}
+					// return to original requested samples
+					fsaa = origFSAA;
+				}
+				else
+				{
+					// drop samples
+					--fsaa;
+
+					if (fsaa == 1)
+					{
+						// ran out of options, no FSAA
+						fsaa = 0;
+						ok = true;
+					}
+				}
+			}
+
+		} // while !ok
+
 	}
 }

@@ -61,10 +61,8 @@ namespace Ogre
 		
 		// Stored options
 		ConfigOptionMap mOptions;
-		/// full-screen multisampling antialiasing type
-		D3DMULTISAMPLE_TYPE mFSAAType;
-		/// full-screen multisampling antialiasing level
-		DWORD mFSAAQuality;
+		size_t mFSAASamples;
+		String mFSAAHint;
 
 		/// instance
 		HINSTANCE mhInstance;
@@ -132,8 +130,6 @@ namespace Ogre
 		DWORD _getCurrentAnisotropy(size_t unit);
 		/// check if a FSAA is supported
 		bool _checkMultiSampleQuality(D3DMULTISAMPLE_TYPE type, DWORD *outQuality, D3DFORMAT format, UINT adapterNum, D3DDEVTYPE deviceType, BOOL fullScreen);
-		/// set FSAA
-		void _setFSAA(D3DMULTISAMPLE_TYPE type, DWORD qualityLevel);
 		
 		D3D9HardwareBufferManager* mHardwareBufferManager;
 		D3D9GpuProgramManager* mGpuProgramManager;
@@ -184,13 +180,41 @@ namespace Ogre
 			enough to hold the largest rendering target.
 			This is used as cache by _getDepthStencilFor.
 		*/
-		typedef std::pair<D3DFORMAT, D3DMULTISAMPLE_TYPE> ZBufferFormat;
+		struct ZBufferFormat
+		{
+			D3DFORMAT format;
+			D3DMULTISAMPLE_TYPE multisample_type;
+			DWORD multisample_quality;
+
+			ZBufferFormat(D3DFORMAT fmt, D3DMULTISAMPLE_TYPE aatype, DWORD aaQual)
+				: format(fmt), multisample_type(aatype), multisample_quality(aaQual) {}
+		};
 		struct ZBufferRef
 		{
 			IDirect3DSurface9 *surface;
 			size_t width, height;
 		};
-		typedef std::map<ZBufferFormat, ZBufferRef> ZBufferHash;
+		struct ZBufferFormatLess
+		{
+			bool operator()(const ZBufferFormat& x, const ZBufferFormat& y) const
+			{
+				if (x.format < y.format)
+					return true;
+				else if (x.format == y.format)
+				{
+					if (x.multisample_type < y.multisample_type)
+						return true;
+					else if (x.multisample_type == y.multisample_type)
+					{
+						if (x.multisample_quality < y.multisample_quality)
+							return true;
+					}
+				}
+				return false;
+			}
+		};
+
+		typedef std::map<ZBufferFormat, ZBufferRef, ZBufferFormatLess> ZBufferHash;
 		ZBufferHash mZBufferHash;
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);
@@ -334,7 +358,7 @@ namespace Ogre
 			multisample type.
 			@returns A directx surface, or 0 if there is no compatible depthstencil possible.
 		*/
-		IDirect3DSurface9* _getDepthStencilFor(D3DFORMAT fmt, D3DMULTISAMPLE_TYPE multisample, size_t width, size_t height);
+		IDirect3DSurface9* _getDepthStencilFor(D3DFORMAT fmt, D3DMULTISAMPLE_TYPE multisample, DWORD multisample_quality, size_t width, size_t height);
 
 		/** Clear all cached depth stencil surfaces
 		*/
@@ -344,6 +368,10 @@ namespace Ogre
         with the given usage options.
         */
         bool _checkTextureFilteringSupported(TextureType ttype, PixelFormat format, int usage);
+
+		/// Take in some requested FSAA settings and output supported D3D settings
+		void determineFSAASettings(size_t fsaa, const String& fsaaHint, D3DFORMAT d3dPixelFormat, 
+			bool fullScreen, D3DMULTISAMPLE_TYPE *outMultisampleType, DWORD *outMultisampleQuality);
 
 	};
 }

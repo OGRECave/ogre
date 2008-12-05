@@ -58,7 +58,8 @@ namespace Ogre
 		mDynamicTextures(false),
 		mHwGammaReadSupported(false),
 		mHwGammaWriteSupported(false),
-		mFSAALevelSupported(false)
+		mFSAAType(D3DMULTISAMPLE_NONE),
+		mFSAAQuality(0)
 	{
         _initDevice();
 	}
@@ -695,9 +696,16 @@ namespace Ogre
 				mHwGammaWriteSupported = _canUseHardwareGammaCorrection(usage, D3DRTYPE_TEXTURE, d3dPF, true);
 		}
 		// Check FSAA level
-		if (mFSAA > 0 && (mUsage & TU_RENDERTARGET))
+		if (mUsage & TU_RENDERTARGET)
 		{
-			mFSAALevelSupported = _canUseFSAALevel(usage, D3DRTYPE_TEXTURE, d3dPF, mFSAA);
+			D3D9RenderSystem* rsys = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
+			rsys->determineFSAASettings(mFSAA, mFSAAHint, d3dPF, false, 
+				&mFSAAType, &mFSAAQuality);
+		}
+		else
+		{
+			mFSAAType = D3DMULTISAMPLE_NONE;
+			mFSAAQuality = 0;
 		}
 		// check if mip maps are supported on hardware
 		mMipmapsHardwareGenerated = false;
@@ -759,12 +767,12 @@ namespace Ogre
 				"D3D9Texture::_createNormTex" );
 		}
 
-		if (mFSAA > 0 && mFSAALevelSupported)
+		if (mFSAAType)
 		{
 			// create AA surface
 			HRESULT hr = mpDev->CreateRenderTarget(desc.Width, desc.Height, d3dPF, 
-				(D3DMULTISAMPLE_TYPE)mFSAA, 
-				0, // Only supporting regular sampling, not nonmaskable 
+				mFSAAType, 
+				mFSAAQuality,
 				FALSE, // not lockable
 				&mFSAASurface, NULL);
 
@@ -828,9 +836,16 @@ namespace Ogre
 				mHwGammaWriteSupported = _canUseHardwareGammaCorrection(usage, D3DRTYPE_CUBETEXTURE, d3dPF, true);
 		}
 		// Check FSAA level
-		if (mFSAA > 0 && (mUsage & TU_RENDERTARGET))
+		if (mUsage & TU_RENDERTARGET)
 		{
-			mFSAALevelSupported = _canUseFSAALevel(usage, D3DRTYPE_CUBETEXTURE, d3dPF, mFSAA);
+			D3D9RenderSystem* rsys = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
+			rsys->determineFSAASettings(mFSAA, mFSAAHint, d3dPF, false, 
+				&mFSAAType, &mFSAAQuality);
+		}
+		else
+		{
+			mFSAAType = D3DMULTISAMPLE_NONE;
+			mFSAAQuality = 0;
 		}
 		// check if mip map cube textures are supported
 		mMipmapsHardwareGenerated = false;
@@ -891,12 +906,12 @@ namespace Ogre
 				"D3D9Texture::_createCubeTex" );
 		}
 
-		if (mFSAA > 0 && mFSAALevelSupported)
+		if (mFSAAType)
 		{
 			// create AA surface
 			HRESULT hr = mpDev->CreateRenderTarget(desc.Width, desc.Height, d3dPF, 
-				(D3DMULTISAMPLE_TYPE)mFSAA, 
-				0, // Only supporting regular sampling, not nonmaskable 
+				mFSAAType, 
+				mFSAAQuality,
 				FALSE, // not lockable
 				&mFSAASurface, NULL);
 
@@ -1235,28 +1250,6 @@ namespace Ogre
 
 	}
 	/****************************************************************************************/
-	bool D3D9Texture::_canUseFSAALevel(DWORD srcUsage, D3DRESOURCETYPE srcType, D3DFORMAT srcFormat, uint fsaa)
-	{
-		// those MUST be initialized !!!
-		assert(mpDev);
-		assert(mpD3D);
-
-
-		HRESULT hr = mpD3D->CheckDeviceMultiSampleType(
-			mDevCreParams.AdapterOrdinal, 
-			mDevCreParams.DeviceType, 
-			srcFormat, 
-			false,
-			(D3DMULTISAMPLE_TYPE)fsaa,
-			0);
-		if (hr == D3D_OK)
-			return true;
-		else
-			return false;
-
-
-	}
-	/****************************************************************************************/
 	bool D3D9Texture::_canAutoGenMipmaps(DWORD srcUsage, D3DRESOURCETYPE srcType, D3DFORMAT srcFormat)
 	{
 		// those MUST be initialized !!!
@@ -1360,7 +1353,7 @@ namespace Ogre
 				surface->Release();
 
 				GETLEVEL(0, mip)->bind(mpDev, surface, updateOldList, mHwGammaWriteSupported, 
-					mFSAALevelSupported? mFSAA : 0, mFSAASurface, mName);
+					mFSAA, mFSAAHint, mFSAASurface, mName);
 			}
 			break;
 		case TEX_TYPE_CUBE_MAP:
@@ -1378,7 +1371,7 @@ namespace Ogre
 					surface->Release();
 					
 					GETLEVEL(face, mip)->bind(mpDev, surface, updateOldList, mHwGammaWriteSupported, 
-						mFSAALevelSupported? mFSAA : 0, mFSAASurface, mName);
+						mFSAA, mFSAAHint, mFSAASurface, mName);
 				}
 			}
 			break;

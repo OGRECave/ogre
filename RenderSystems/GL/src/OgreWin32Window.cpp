@@ -123,6 +123,9 @@ namespace Ogre {
 			if ((opt = miscParams->find("FSAA")) != end)
 				mFSAA = StringConverter::parseUnsignedInt(opt->second);
 
+			if ((opt = miscParams->find("FSAAHint")) != end)
+				mFSAAHint = opt->second;
+
 			if ((opt = miscParams->find("gamma")) != end)
 				hwGamma = StringConverter::parseBool(opt->second);
 

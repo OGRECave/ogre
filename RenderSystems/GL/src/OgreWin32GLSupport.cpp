@@ -96,7 +96,15 @@ namespace Ogre {
 		optFSAA.immutable = false;
 		optFSAA.possibleValues.push_back("0");
 		for (std::vector<int>::iterator it = mFSAALevels.begin(); it != mFSAALevels.end(); ++it)
-			optFSAA.possibleValues.push_back(StringConverter::toString(*it));
+		{
+			String val = StringConverter::toString(*it);
+			optFSAA.possibleValues.push_back(val);
+			/* not implementing CSAA in GL for now
+			if (*it >= 8)
+				optFSAA.possibleValues.push_back(val + " [Quality]");
+			*/
+
+		}
 		optFSAA.currentValue = "0";
 
 		optRTTMode.name = "RTT Preferred Mode";
@@ -244,9 +252,14 @@ namespace Ogre {
 			opt = mOptions.find("FSAA");
 			if (opt == mOptions.end())
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find FSAA options!", "Win32GLSupport::createWindow");
-			unsigned int multisample =
-				StringConverter::parseUnsignedInt(opt->second.currentValue);
+			StringVector aavalues = StringUtil::split(opt->second.currentValue, " ", 1);
+			unsigned int multisample = StringConverter::parseUnsignedInt(aavalues[0]);
+			String multisample_hint;
+			if (aavalues.size() > 1)
+				multisample_hint = aavalues[1];
+
 			winOptions["FSAA"] = StringConverter::toString(multisample);
+			winOptions["FSAAHint"] = multisample_hint;
 
 			opt = mOptions.find("sRGB Gamma Conversion");
 			if (opt == mOptions.end())

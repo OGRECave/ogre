@@ -350,6 +350,9 @@ namespace Ogre {
 		*/
 		virtual uint getFSAA() const { return mFSAA; }
 
+		/** Gets the FSAA hint (@see Root::createRenderWindow)
+		*/
+		virtual const String& getFSAAHint() const { return mFSAAHint; }
 
         /** RenderSystem specific interface for a RenderTarget;
             this should be subclassed by RenderSystems.
@@ -395,6 +398,7 @@ namespace Ogre {
 		bool mHwGamma;
 		// FSAA performed?
 		uint mFSAA;
+		String mFSAAHint;
 
         void updateStats(void);
 

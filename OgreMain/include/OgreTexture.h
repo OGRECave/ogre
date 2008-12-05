@@ -166,13 +166,19 @@ namespace Ogre {
 			rendertarget.
 		@note This option will be ignored if TU_RENDERTARGET is not part of the
 			usage options on this texture, or if the hardware does not support it. 
+		@param fsaa The number of samples
+		@param fsaaHint Any hinting text (@see Root::createRenderWindow)
 		*/
-		virtual void setFSAA(uint fsaa) { mFSAA = fsaa; }
+		virtual void setFSAA(uint fsaa, const String& fsaaHint) { mFSAA = fsaa; mFSAAHint = fsaaHint; }
 
 		/** Get the level of multisample AA to be used if this texture is a 
 		rendertarget.
 		*/
 		virtual uint getFSAA() const { return mFSAA; }
+
+		/** Get the multisample AA hint if this texture is a rendertarget.
+		*/
+		virtual const String& getFSAAHint() const { return mFSAAHint; }
 
 		/** Returns the height of the texture.
         */
@@ -366,6 +372,7 @@ namespace Ogre {
         float mGamma;
 		bool mHwGamma;
 		uint mFSAA;
+		String mFSAAHint;
 
         TextureType mTextureType;
 		PixelFormat mFormat;
