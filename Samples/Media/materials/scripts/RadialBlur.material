@@ -31,6 +31,10 @@ material Ogre/Compositor/Radial_Blur
 			cull_software none
 			depth_check off
 
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
+			{
+			}
+
 			fragment_program_ref Radial_Blur_psUnified
 			{
 	            param_named sampleDist float 1.0

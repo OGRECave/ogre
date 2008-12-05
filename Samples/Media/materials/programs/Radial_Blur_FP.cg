@@ -20,7 +20,7 @@ static const float samples[10] =
 0.08
 };
 
-float4 main(float4 Pos : SV_POSITION,
+float4 main(float4 Pos : POSITION,
             float2 texCoord: TEXCOORD0,
             uniform float sampleDist,
             uniform float sampleStrength
