@@ -23,8 +23,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-__author__ = 'Michael Reimpell'
-__version__ = 'n/a'
+__author__ = 'Michael Reimpell (Maintainer: Lih-Hern Pang)'
+__version__ = '1.0'
 __url__ = ["Help, http://www.ogre3d.org/phpBB2/search.php", "Ogre3D, http://www.ogre3d.org"]
 __bpydoc__ = "Please see the external documentation that comes with the script."
 
@@ -1679,7 +1679,6 @@ else:
 				ToggleView(mvhLayout3, Size([Size.INFINITY, 20], [100, 20]), self.customMaterial, \
 					T("Custom Materials"), \
 					T("Export using custom material templates."))
-				self.customMaterial.addView(self)
 
 				self.matAlternatives = AlternativesLayout(mvLayout)
 				self.matAltDefault = Spacer(self.matAlternatives, Size([0, 20]))
@@ -1720,6 +1719,11 @@ else:
 					T("Get help."))
 				Button(bhLayout, bSize, MeshExporterApplication.QuitAction(self), T("Quit"), \
 					T("Quit without exporting."))
+
+				# hook up events.
+				self.customMaterial.addView(self)
+				self.materalScriptName.addView(self)
+
 				return
 			def update(self):
 				"""Called by customMaterial.
@@ -1728,6 +1732,11 @@ else:
 					self.matAlternatives.setCurrent(self.matAltCustom)
 				else:
 					self.matAlternatives.setCurrent(self.matAltDefault)
+
+				# Material script name must have a value. if it's empty, force it to scene name.
+				print self.materalScriptName.getValue()
+				if len(self.materalScriptName.getValue()) == 0:
+					self.materalScriptName.setValue(Blender.Scene.GetCurrent().getName() + '.material')
 				return
 			def go(self):
 				self.mainScreen.activate()

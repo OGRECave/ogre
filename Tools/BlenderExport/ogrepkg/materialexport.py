@@ -929,7 +929,7 @@ class MaterialManager:
 				if bMaterial:
 					faceMaterial = GameEngineMaterial(self, bMesh, bMFace, colouredAmbient)
 				else:
-					faceMaterial = DefaultMaterial(self, 'default')
+					faceMaterial = DefaultMaterial(self, 'BaseWhite')
 		elif self.customMaterial:
 			bMaterial = None
 			try:
@@ -939,7 +939,7 @@ class MaterialManager:
 			if bMaterial:
 				faceMaterial = CustomMaterial(self, bMesh, bMFace, colouredAmbient, self.customMaterialTplPath)
 			else:
-				faceMaterial = DefaultMaterial(self, 'default')
+				faceMaterial = DefaultMaterial(self, 'BaseWhite')
 		else:
 			# rendering material
 			bMaterial = None
@@ -950,7 +950,7 @@ class MaterialManager:
 			if bMaterial:
 				faceMaterial = RenderingMaterial(self, bMesh, bMFace, colouredAmbient)
 			else:
-				faceMaterial = DefaultMaterial(self, 'default')
+				faceMaterial = DefaultMaterial(self, 'BaseWhite')
 		## return material or None
 		material = None
 		if faceMaterial:
