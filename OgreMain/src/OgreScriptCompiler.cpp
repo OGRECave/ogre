@@ -390,7 +390,33 @@ namespace Ogre
 		return mErrors.empty();
 	}
 
-	bool ScriptCompiler::_compile(AbstractNodeListPtr nodes, const String &group)
+	AbstractNodeListPtr ScriptCompiler::_generateAST(const String &str, const String &source, bool doImports, bool doObjects, bool doVariables)
+	{
+		// Clear the past errors
+		mErrors.clear();
+
+		ScriptLexer lexer;
+		ScriptParser parser;
+		ConcreteNodeListPtr cst = parser.parse(lexer.tokenize(str, source));
+
+		// Call the listener to intercept CST
+		if(mListener)
+			mListener->preConversion(this, cst);
+
+		// Convert our nodes to an AST
+		AbstractNodeListPtr ast = convertToAST(cst);
+
+		if(!ast.isNull() && doImports)
+			processImports(ast);
+		if(!ast.isNull() && doObjects)
+			processObjects(ast.get(), ast);
+		if(!ast.isNull() && doVariables)
+			processVariables(ast.get());
+
+		return ast;
+	}
+
+	bool ScriptCompiler::_compile(AbstractNodeListPtr nodes, const String &group, bool doImports, bool doObjects, bool doVariables)
 	{
 		// Set up the compilation context
 		mGroup = group;
@@ -402,11 +428,14 @@ namespace Ogre
 		mEnv.clear();
 
 		// Processes the imports for this script
-		processImports(nodes);
+		if(doImports)
+			processImports(nodes);
 		// Process object inheritance
-		processObjects(nodes.get(), nodes);
+		if(doObjects)
+			processObjects(nodes.get(), nodes);
 		// Process variable expansion
-		processVariables(nodes.get());
+		if(doVariables)
+			processVariables(nodes.get());
 
 		// Translate the nodes
 		for(AbstractNodeList::iterator i = nodes->begin(); i != nodes->end(); ++i)

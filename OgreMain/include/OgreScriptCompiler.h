@@ -222,8 +222,10 @@ namespace Ogre
 		bool compile(const String &str, const String &source, const String &group);
 		/// Compiles resources from the given concrete node list
 		bool compile(const ConcreteNodeListPtr &nodes, const String &group);
+		/// Generates the AST from the given string script
+		AbstractNodeListPtr _generateAST(const String &str, const String &source, bool doImports = false, bool doObjects = false, bool doVariables = false);
 		/// Compiles the given abstract syntax tree
-		bool _compile(AbstractNodeListPtr nodes, const String &group);
+		bool _compile(AbstractNodeListPtr nodes, const String &group, bool doImports = true, bool doObjects = true, bool doVariables = true);
 		/// Adds the given error to the compiler's list of errors
 		void addError(uint32 code, const String &file, int line, const String &msg = "");
 		/// Sets the listener used by the compiler
