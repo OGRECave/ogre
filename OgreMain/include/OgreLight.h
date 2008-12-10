@@ -411,6 +411,45 @@ namespace Ogre {
         Real getShadowFarDistance(void) const;
         Real getShadowFarDistanceSquared(void) const;
 
+		/** Set the near clip plane distance to be used by the shadow camera, if
+		this light casts texture shadows.
+		@param near The distance, or -1 to use the main camera setting
+		*/
+		void setShadowNearClipDistance(Real nearClip) { mShadowNearClipDist = nearClip; }
+
+		/** Get the near clip plane distance to be used by the shadow camera, if
+		this light casts texture shadows.
+		@remarks May be zero if the light doesn't have it's own near distance set;
+			use _deriveShadowNearDistance for a version guaranteed to give a result.
+		*/
+		Real getShadowNearClipDistance() const { return mShadowNearClipDist; }
+
+		/** Derive a shadow camera near distance from either the light, or
+			from the main camera if the light doesn't have its own setting.
+		*/
+		Real _deriveShadowNearClipDistance(const Camera* maincam) const;
+
+		/** Set the far clip plane distance to be used by the shadow camera, if
+		this light casts texture shadows.
+			@remarks This is different from the 'shadow far distance', which is
+			always measured from the main camera. This distance is the far clip plane
+			of the light camera.
+			@param far The distance, or -1 to use the main camera setting
+		*/
+		void setShadowFarClipDistance(Real farClip) { mShadowFarClipDist = farClip; }
+
+		/** Get the far clip plane distance to be used by the shadow camera, if
+		this light casts texture shadows.
+		@remarks May be zero if the light doesn't have it's own far distance set;
+		use _deriveShadowfarDistance for a version guaranteed to give a result.
+		*/
+		Real getShadowFarClipDistance() const { return mShadowFarClipDist; }
+
+		/** Derive a shadow camera far distance from either the light, or
+		from the main camera if the light doesn't have its own setting.
+		*/
+		Real _deriveShadowFarClipDistance(const Camera* maincam) const;
+
 		/// Set the camera which this light should be relative to, for camera-relative rendering
 		void _setCameraRelative(Camera* cam);
 
@@ -443,6 +482,9 @@ namespace Ogre {
 		bool mOwnShadowFarDist;
 		Real mShadowFarDist;
 		Real mShadowFarDistSquared;
+		
+		Real mShadowNearClipDist;
+		Real mShadowFarClipDist;
 
 
         mutable Vector3 mDerivedPosition;

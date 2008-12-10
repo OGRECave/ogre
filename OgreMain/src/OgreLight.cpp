@@ -54,6 +54,8 @@ namespace Ogre {
 		  mOwnShadowFarDist(false),
 		  mShadowFarDist(0),
 		  mShadowFarDistSquared(0),
+		  mShadowNearClipDist(-1),
+		  mShadowFarClipDist(-1),
           mDerivedPosition(Vector3::ZERO),
           mDerivedDirection(Vector3::UNIT_Z),
 		  mDerivedCamRelativePosition(Vector3::ZERO),
@@ -82,6 +84,8 @@ namespace Ogre {
 		mOwnShadowFarDist(false),
 		mShadowFarDist(0),
 		mShadowFarDistSquared(0),
+		mShadowNearClipDist(-1),
+		mShadowFarClipDist(-1),
         mDerivedPosition(Vector3::ZERO),
         mDerivedDirection(Vector3::UNIT_Z),
 		mDerivedCamRelativeDirty(false),
@@ -797,6 +801,27 @@ namespace Ogre {
 	{
 		mCameraToBeRelativeTo = cam;
 		mDerivedCamRelativeDirty = true;
+	}
+	//---------------------------------------------------------------------
+	Real Light::_deriveShadowNearClipDistance(const Camera* maincam) const
+	{
+		if (mShadowNearClipDist > 0)
+			return mShadowNearClipDist;
+		else
+			return maincam->getNearClipDistance();
+	}
+	//---------------------------------------------------------------------
+	Real Light::_deriveShadowFarClipDistance(const Camera* maincam) const
+	{
+		if (mShadowFarClipDist >= 0)
+			return mShadowFarClipDist;
+		else
+		{
+			if (mLightType == LT_DIRECTIONAL)
+				return 0;
+			else
+				return mRange;
+		}
 	}
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
