@@ -175,11 +175,7 @@ namespace Ogre {
 		switch (mOptimisationLevel)
 		{
 		case OPT_DEFAULT:
-#if OGRE_DEBUG_MODE
-			compileFlags |= D3DXSHADER_SKIPOPTIMIZATION;
-#else
 			compileFlags |= D3DXSHADER_OPTIMIZATION_LEVEL1;
-#endif
 			break;
 		case OPT_NONE:
 			compileFlags |= D3DXSHADER_SKIPOPTIMIZATION;
