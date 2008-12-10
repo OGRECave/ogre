@@ -456,7 +456,7 @@ namespace Ogre {
         if (mCreator)
         {
             // Use SceneManager to calculate
-            mCreator->_populateLightList(this->_getDerivedPosition(), radius, destList);
+            mCreator->_populateLightList(this, radius, destList);
         }
         else
         {

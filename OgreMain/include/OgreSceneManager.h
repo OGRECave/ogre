@@ -1094,6 +1094,34 @@ namespace Ogre {
         */
         virtual void _populateLightList(const Vector3& position, Real radius, LightList& destList);
 
+		/** Populates a light list with an ordered set of the lights which are closest
+        to the position of the SceneNode given.
+        @remarks
+            Note that since directional lights have no position, they are always considered
+            closer than any point lights and as such will always take precedence. 
+			This overloaded version will take the SceneNode's position and use the second method
+			to populate the list.
+        @par
+            Subclasses of the default SceneManager may wish to take into account other issues
+            such as possible visibility of the light if that information is included in their
+            data structures. This basic scenemanager simply orders by distance, eliminating 
+            those lights which are out of range or could not be affecting the frustum (i.e.
+            only the lights returned by SceneManager::_getLightsAffectingFrustum are take into
+            account). 
+		@par   
+			Also note that subclasses of the SceneNode might be used here to provide cached
+			scene related data, accelerating the list population (for example light lists for
+			SceneNodes could be cached inside subclassed SceneNode objects).
+        @par
+            The number of items in the list may exceed the maximum number of lights supported
+            by the renderer, but the extraneous ones will never be used. In fact the limit will
+            be imposed by Pass::getMaxSimultaneousLights.
+        @param sn The SceneNode for which to evaluate the list of lights
+        @param radius The bounding radius to test
+        @param destList List to be populated with ordered set of lights; will be cleared by 
+            this method before population.
+        */
+        virtual void _populateLightList(const SceneNode* sn, Real radius, LightList& destList);
 
         /** Creates an instance of a SceneNode.
             @remarks

@@ -469,6 +469,11 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
 
 }
 //-----------------------------------------------------------------------
+void SceneManager::_populateLightList(const SceneNode* sn, Real radius, LightList& destList) 
+{
+    _populateLightList(sn->_getDerivedPosition(), radius, destList);
+}
+//-----------------------------------------------------------------------
 Entity* SceneManager::createEntity(const String& entityName, PrefabType ptype)
 {
     switch (ptype)
