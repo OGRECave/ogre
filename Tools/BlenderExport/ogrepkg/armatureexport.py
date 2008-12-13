@@ -44,8 +44,8 @@ def GetArmatureObject(bObject):
 		else:
 			# check modifier stack, use last armature modifier
 			for modifier in bObject.modifiers:
-				if ((modifier.type == Blender.Modifier.Type['ARMATURE'])
-					and modifier[Blender.Modifier.Settings.VERTGROUP]):
+				if ((modifier.type == Blender.Modifier.Types.ARMATURE)
+					and modifier[Blender.Modifier.Settings.VGROUPS]):
 					bArmatureObject = modifier[Blender.Modifier.Settings.OBJECT]
 	return bArmatureObject
 

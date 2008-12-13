@@ -23,8 +23,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-__author__ = 'Michael Reimpell'
-__version__ = 'n/a'
+__author__ = 'Michael Reimpell (Maintainer: Lih-Hern Pang)'
+__version__ = '1.1'
 __url__ = ["Help, http://www.ogre3d.org/phpBB2/search.php", "Ogre3D, http://www.ogre3d.org"]
 __bpydoc__ = "Please see the external documentation that comes with the script."
 
@@ -1520,7 +1520,7 @@ else:
 							# view
 							oldView = self.managerViewList[0]
 							# add new to alternatives layout
-							self.managerViewList[0] = ArmatureAnimationProxyanagerView( \
+							self.managerViewList[0] = ArmatureAnimationProxyManagerView( \
 								self.alternatives,  Size([Size.INFINITY, Size.INFINITY], [350, 120]), \
 								self.managerList[0])
 							# remove old from alternatives layout
@@ -1564,7 +1564,7 @@ else:
 							# view
 							oldView = self.managerViewList[1]
 							# add new to alternatives layout
-							self.managerViewList[1] = PoseAnimationProxyanagerView( \
+							self.managerViewList[1] = PoseAnimationProxyManagerView( \
 								self.alternatives,  Size([Size.INFINITY, Size.INFINITY], [350, 120]), \
 								self.managerList[1])
 							# remove old from alternatives layout
@@ -1608,7 +1608,7 @@ else:
 							# view
 							oldView = self.managerViewList[2]
 							# add new to alternatives layout
-							self.managerViewList[2] = PoseAnimationProxyanagerView( \
+							self.managerViewList[2] = PoseAnimationProxyManagerView( \
 								self.alternatives,  Size([Size.INFINITY, Size.INFINITY], [350, 120]), \
 								self.managerList[2])
 							# remove old from alternatives layout
@@ -1679,7 +1679,6 @@ else:
 				ToggleView(mvhLayout3, Size([Size.INFINITY, 20], [100, 20]), self.customMaterial, \
 					T("Custom Materials"), \
 					T("Export using custom material templates."))
-				self.customMaterial.addView(self)
 
 				self.matAlternatives = AlternativesLayout(mvLayout)
 				self.matAltDefault = Spacer(self.matAlternatives, Size([0, 20]))
@@ -1720,6 +1719,11 @@ else:
 					T("Get help."))
 				Button(bhLayout, bSize, MeshExporterApplication.QuitAction(self), T("Quit"), \
 					T("Quit without exporting."))
+
+				# hook up events.
+				self.customMaterial.addView(self)
+				self.materalScriptName.addView(self)
+
 				return
 			def update(self):
 				"""Called by customMaterial.
@@ -1728,6 +1732,10 @@ else:
 					self.matAlternatives.setCurrent(self.matAltCustom)
 				else:
 					self.matAlternatives.setCurrent(self.matAltDefault)
+
+				# Material script name must have a value. if it's empty, force it to scene name.
+				if len(self.materalScriptName.getValue()) == 0:
+					self.materalScriptName.setValue(Blender.Scene.GetCurrent().getName() + '.material')
 				return
 			def go(self):
 				self.mainScreen.activate()
