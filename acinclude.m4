@@ -724,8 +724,8 @@ AC_DEFUN([AX_BOOST],
 AC_DEFUN([OGRE_CHECK_ALLOCATOR],
 [
     AC_ARG_WITH([allocator],
-        AC_HELP_STRING([--with-allocator=type], [Select the memory allocator type to use (std, ned) (default: std)]),
-        [with_allocator=${withval}], [with_allocator=std])
+        AC_HELP_STRING([--with-allocator=type], [Select the memory allocator type to use (std, ned) (default: ned)]),
+        [with_allocator=${withval}], [with_allocator=ned])
     if test "x$with_allocator" == "xstd"; then
         AC_DEFINE([OGRE_MEMORY_ALLOCATOR], [1], [Custom memory allocator setting])
     fi

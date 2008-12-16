@@ -88,7 +88,7 @@ Torus Knot Software Ltd.
 #define OGRE_MEMORY_ALLOCATOR_USER 3
 
 #ifndef OGRE_MEMORY_ALLOCATOR
-#  define OGRE_MEMORY_ALLOCATOR OGRE_MEMORY_ALLOCATOR_STD
+#  define OGRE_MEMORY_ALLOCATOR OGRE_MEMORY_ALLOCATOR_NED
 #endif
 
 // enable or disable the memory tracker, recording the memory allocations & tracking leaks
