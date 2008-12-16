@@ -80,7 +80,7 @@ public:
         if (mFrameListener)
             delete mFrameListener;
         if (mRoot)
-            delete mRoot;
+            OGRE_DELETE mRoot;
     }
 
     /// Start the example
@@ -114,7 +114,7 @@ protected:
 		pluginsPath = mResourcePath + "plugins.cfg";
 #endif
 		
-        mRoot = new Root(pluginsPath, 
+        mRoot = OGRE_NEW Root(pluginsPath, 
             mResourcePath + "ogre.cfg", mResourcePath + "Ogre.log");
 
         setupResources();
