@@ -2353,7 +2353,6 @@ void SceneManager::renderTextureShadowCasterQueueGroupObjects(
 	RenderQueueGroup* pGroup, 
 	QueuedRenderableCollection::OrganisationMode om)
 {
-    static LightList nullLightList;
     // This is like the basic group render, except we skip all transparents
     // and we also render any non-shadowed objects
     // Note that non-shadow casters will have already been eliminated during
@@ -2384,15 +2383,15 @@ void SceneManager::renderTextureShadowCasterQueueGroupObjects(
         pPriorityGrp->sort(mCameraInProgress);
 
         // Do solids, override light list incase any vertex programs use them
-        renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &nullLightList);
-        renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, false, false, &nullLightList);
+        renderObjects(pPriorityGrp->getSolidsBasic(), om, false, false, &mShadowTextureCurrentCasterLightList);
+        renderObjects(pPriorityGrp->getSolidsNoShadowReceive(), om, false, false, &mShadowTextureCurrentCasterLightList);
 		// Do unsorted transparents that cast shadows
-		renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, false, false, &nullLightList);
+		renderObjects(pPriorityGrp->getTransparentsUnsorted(), om, false, false, &mShadowTextureCurrentCasterLightList);
 		// Do transparents that cast shadows
 		renderTransparentShadowCasterObjects(
 				pPriorityGrp->getTransparents(), 
 				QueuedRenderableCollection::OM_SORT_DESCENDING, 
-				false, false, &nullLightList);
+				false, false, &mShadowTextureCurrentCasterLightList);
 
 
     }// for each priority
@@ -5850,6 +5849,12 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
 			// skip light if shadows are disabled
 			if (!light->getCastShadows())
 				continue;
+
+			if (mShadowTextureCurrentCasterLightList.empty())
+				mShadowTextureCurrentCasterLightList.push_back(light);
+			else
+				mShadowTextureCurrentCasterLightList[0] = light;
+
 
 			// texture iteration per light.
 			size_t textureCountPerLight = mShadowTextureCountPerType[light->getType()];

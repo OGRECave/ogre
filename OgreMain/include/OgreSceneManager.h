@@ -470,6 +470,7 @@ namespace Ogre {
         LightInfoList mCachedLightInfos;
 		LightInfoList mTestLightInfos; // potentially new list
         ulong mLightsDirtyCounter;
+		LightList mShadowTextureCurrentCasterLightList;
 
 		typedef std::map<String, MovableObject*> MovableObjectMap;
 		/// Simple structure to hold MovableObject map and a mutex to go with it.
