@@ -23,6 +23,8 @@ zone will only work correctly if the user moves the camera through the
 doorways (as opposed to going through the walls).  
 
 /////////////////////////////////////////////////////////////////////////////
+Change Log:
 
+(12/03/2008) Fixed mesh name references in code to account for case sensitivity in Linux.
 
 /////////////////////////////////////////////////////////////////////////////
