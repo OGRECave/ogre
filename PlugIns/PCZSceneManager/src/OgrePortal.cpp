@@ -37,7 +37,6 @@ current TODO's       : none known
 #include "OgrePortal.h"
 #include "OgrePCZSceneNode.h"
 #include "OgreSphere.h"
-#include "OgreCapsule.h"
 #include "OgreSegment.h"
 #include "OgreRay.h"
 #include "OgrePCZone.h"   // need access to real zone class 
@@ -45,21 +44,23 @@ current TODO's       : none known
 using namespace Ogre;
 
 Portal::Portal(const String & name, const PORTAL_TYPE type)
-{
-	mType = type,
-	mName = name;
-    mTargetZone = 0;
-	mCurrentHomeZone = 0;
-	mNewHomeZone = 0;
-	mTargetPortal = 0;
-	mNode = 0;
-	mRadius = 0.0;
-	mDirection = Vector3::UNIT_Z;
-	mLocalsUpToDate = false;
+	: MovableObject(name),
+	mType(type),
+	mIsAntiPortal(false),
+	mTargetZone(0),
+	mCurrentHomeZone(0),
+	mNewHomeZone(0),
+	mTargetPortal(0),
+	mRadius(0.0),
+	mDirection(Vector3::UNIT_Z),
+	mLocalsUpToDate(false),
+	mDerivedUpToDate(false),
 	// set prevWorldTransform to a zero'd out matrix
-	prevWorldTransform = Matrix4::ZERO;
+	prevWorldTransform(Matrix4::ZERO),
 	// default to open
-	mOpen = true;
+	mOpen(true),
+	mWasMoved(true)
+{
 	switch (mType)
 	{
 	default:
@@ -88,11 +89,40 @@ Portal::~Portal()
 	mDerivedCorners = 0;
 }
 
+const AxisAlignedBox& Portal::getWorldBoundingBox(bool derive) const
+{
+//	if (derive)
+//	{
+//		updateDerivedValues();
+//	}
+
+	return mPortalAAB;
+}
+
+const Sphere& Portal::getWorldBoundingSphere(bool derive) const
+{
+//	if (derive)
+//	{
+//		updateDerivedValues();
+//	}
+
+	return mDerivedSphere;
+}
+
+/** change this portal to an antiportal or change an antiportal to a regular portal */
+void Portal::setAntiPortal(bool trueOrfalse)
+{
+	// NOTE: DO NOT USE ANTI-PORTALS.  They are not ready to be used!
+	// 
+	//mIsAntiPortal = trueOrfalse;
+}
+
 // Set the SceneNode the Portal is associated with
 void Portal::setNode( SceneNode * sn )
 {
-    mNode = sn ;
-	mLocalsUpToDate = false;
+	if (mParentNode) ((SceneNode*)mParentNode)->detachObject(this);
+	if (sn) sn->attachObject(this);
+	mDerivedUpToDate = false;
 }
 // Set the 1st Zone the Portal connects to
 void Portal::setTargetZone( PCZone * z )
@@ -130,8 +160,9 @@ void Portal::setTargetPortal( Portal * p )
 // Set the local coordinates of one of the portal corners    
 void Portal::setCorner( int index, Vector3 & pt)
 {
-    mCorners[index] = pt ;
+	mCorners[index] = pt ;
 	mLocalsUpToDate = false;
+	mDerivedUpToDate = false;
 }
 /** Set the local coordinates of all of the portal corners
 */
@@ -159,13 +190,18 @@ void Portal::setCorners( Vector3 * corners )
 		break;
 	}
 	mLocalsUpToDate = false;
+	mDerivedUpToDate = false;
 }
 
 // calculate the local direction of the portal from the corners
-void Portal::calcDirectionAndRadius(void)
+void Portal::calcDirectionAndRadius(void) const
 {
 	Vector3 radiusVector;
 	Vector3 side1, side2;
+
+	// for AAB building.
+	Vector3 min(Math::POS_INFINITY, Math::POS_INFINITY, Math::POS_INFINITY);
+	Vector3 max(Math::NEG_INFINITY, Math::NEG_INFINITY, Math::NEG_INFINITY);
 
 	switch (mType)
 	{
@@ -181,6 +217,9 @@ void Portal::calcDirectionAndRadius(void)
 		for (int i=0;i<4;i++)
 		{
 			mLocalCP += mCorners[i];
+
+			min.makeFloor(mCorners[i]);
+			max.makeCeil(mCorners[i]);
 		}
 		mLocalCP *= 0.25f;
 		// then calculate radius
@@ -200,6 +239,9 @@ void Portal::calcDirectionAndRadius(void)
 		// this gives the radius of a sphere that encapsulates the aabb
 		radiusVector = mCorners[0] - mLocalCP;
 		mRadius = radiusVector.length();
+
+		min = mCorners[0];
+		max = mCorners[1];
 		break;
 	case PORTAL_TYPE_SPHERE:
 		// "direction" is is either pointed inward or outward and is set by user, not calculated.
@@ -208,15 +250,19 @@ void Portal::calcDirectionAndRadius(void)
 		// since corner1 is point on sphere, radius is simply corner1 - center point
 		radiusVector = mCorners[1] - mLocalCP;
 		mRadius = radiusVector.length();
+
+		min = mDerivedCP - mRadius;
+		max = mDerivedCP + mRadius;
 		break;
 	}
 	mDerivedSphere.setRadius(mRadius);
+	mLocalPortalAAB.setExtents(min, max);
 	// locals are now up to date
 	mLocalsUpToDate = true;
 }
 
 // Calculate the local bounding sphere of the portal from the corner points
-Real Portal::getRadius( void )
+Real Portal::getRadius( void ) const
 {
 	if (!mLocalsUpToDate)
 	{
@@ -279,77 +325,74 @@ void Portal::updateDerivedValues(void)
 		numCorners = 2;
 
 	// calculate derived values
-	if (mNode)
+	if (mParentNode)
 	{
-		if (prevWorldTransform != mNode->_getFullTransform())
+		if(mCurrentHomeZone)
 		{
-            if(mCurrentHomeZone) 
+			// inform home zone that a portal has been updated 
+			mCurrentHomeZone->setPortalsUpdated(true);
+		}
+		// save world transform
+		Matrix4 transform = mParentNode->_getFullTransform();
+		Matrix3 rotation;
+		// save off the current DerivedCP
+		mPrevDerivedCP = mDerivedCP;
+		mDerivedCP = transform * mLocalCP;
+		mDerivedSphere.setCenter(mDerivedCP);
+		switch(mType)
+		{
+		case PORTAL_TYPE_QUAD:
+			for (int i=0;i<numCorners;i++)
 			{
-				// inform home zone that a portal has been updated 
-				mCurrentHomeZone->setPortalsUpdated(true);   
+				mDerivedCorners[i] =  transform * mCorners[i];
 			}
-			// save world transform
-			Matrix4 transform = mNode->_getFullTransform();
-			Matrix3 rotation;
-			// save off the current DerivedCP
-			mPrevDerivedCP = mDerivedCP;
-			mDerivedCP = transform * mLocalCP;
-			mDerivedSphere.setCenter(mDerivedCP);
-			switch(mType)
+			transform.extract3x3Matrix(rotation);
+			mDerivedDirection = rotation * mDirection;
+			break;
+		case PORTAL_TYPE_AABB:
 			{
-			case PORTAL_TYPE_QUAD:
-				for (int i=0;i<numCorners;i++)
-				{
-					mDerivedCorners[i] =  transform * mCorners[i];
-				}
-				transform.extract3x3Matrix(rotation);
-				mDerivedDirection = rotation * mDirection;
-				break;
-			case PORTAL_TYPE_AABB:
-				{
-					AxisAlignedBox aabb;
-					aabb.setExtents(mCorners[0], mCorners[1]);
-					aabb = mNode->_getWorldAABB();
-					//aabb.transform(mNode->_getFullTransform());
-					mDerivedCorners[0] = aabb.getMinimum();
-					mDerivedCorners[1] = aabb.getMaximum();
-					mDerivedDirection = mDirection;
-				}
-				break;
-			case PORTAL_TYPE_SPHERE:
-				{
-					mDerivedCorners[0] = mDerivedCP;
-					mDerivedCorners[1] = transform * mCorners[1];
-					mDerivedDirection = mDirection;
-				}
-				break;
+				AxisAlignedBox aabb;
+				aabb.setExtents(mCorners[0], mCorners[1]);
+				aabb = ((SceneNode*)mParentNode)->_getWorldAABB();
+				//aabb.transform(mParentNode->_getFullTransform());
+				mDerivedCorners[0] = aabb.getMinimum();
+				mDerivedCorners[1] = aabb.getMaximum();
+				mDerivedDirection = mDirection;
 			}
-			if (prevWorldTransform != Matrix4::ZERO)
+			break;
+		case PORTAL_TYPE_SPHERE:
 			{
-				// save previous calc'd plane
-				mPrevDerivedPlane = mDerivedPlane;
-				// calc new plane
-				mDerivedPlane = Ogre::Plane(mDerivedDirection, mDerivedCP);
-				// only update prevWorldTransform if did not move
-				// we need to add this conditional to ensure that
-				// the portal fully updates when it changes position.
-				if (mPrevDerivedPlane == mDerivedPlane &&
-					mPrevDerivedCP == mDerivedCP)
-				{
-					prevWorldTransform = transform;
-				}
-				mPrevDerivedCP = mDerivedCP;
+				mDerivedCorners[0] = mDerivedCP;
+				mDerivedCorners[1] = transform * mCorners[1];
+				mDerivedDirection = mDirection;
 			}
-			else
+			break;
+		}
+		if (prevWorldTransform != Matrix4::ZERO)
+		{
+			// save previous calc'd plane
+			mPrevDerivedPlane = mDerivedPlane;
+			// calc new plane
+			mDerivedPlane = Ogre::Plane(mDerivedDirection, mDerivedCP);
+			// only update prevWorldTransform if did not move
+			// we need to add this conditional to ensure that
+			// the portal fully updates when it changes position.
+			if (mPrevDerivedPlane == mDerivedPlane &&
+				mPrevDerivedCP == mDerivedCP)
 			{
-				// calc new plane
-				mDerivedPlane = Ogre::Plane(mDerivedDirection, mDerivedCP);
-				// this is first time, so there is no previous, so prev = current.
-				mPrevDerivedPlane = mDerivedPlane;
-				mPrevDerivedCP = mDerivedCP;
-				prevWorldTransform = Matrix4::IDENTITY;
 				prevWorldTransform = transform;
 			}
+			mPrevDerivedCP = mDerivedCP;
+		}
+		else
+		{
+			// calc new plane
+			mDerivedPlane = Ogre::Plane(mDerivedDirection, mDerivedCP);
+			// this is first time, so there is no previous, so prev = current.
+			mPrevDerivedPlane = mDerivedPlane;
+			mPrevDerivedCP = mDerivedCP;
+			prevWorldTransform = Matrix4::IDENTITY;
+			prevWorldTransform = transform;
 		}
 	}
 	else // no associated node, so just use the local values as derived values
@@ -372,7 +415,7 @@ void Portal::updateDerivedValues(void)
 		}
 		else
 		{
-            if(mCurrentHomeZone) 
+			if(mCurrentHomeZone)
 			{
 				// this case should only happen once 
 				mCurrentHomeZone->setPortalsUpdated(true);
@@ -395,11 +438,19 @@ void Portal::updateDerivedValues(void)
 			prevWorldTransform = Matrix4::IDENTITY;
 		}
 	}
+
+	// rebuild AAB.
+	mPortalAAB = mWorldAABB;
+	mPortalAAB.merge(mPrevPortalAAB);
+	mPrevPortalAAB = mWorldAABB;
+
+	mPortalCapsule.set(mPrevDerivedCP, mDerivedCP, mRadius);
+	mDerivedUpToDate = true;
 }
 
 // Adjust the portal so that it is centered and oriented on the given node
 // NOTE: This function will move/rotate the node as well!
-// NOTE: The node will become the portal's "associated" node (mNode).
+// NOTE: The node will become the portal's "associated" node (mParentNode).
 void Portal::adjustNodeToMatch(SceneNode *node )
 {
 	int i;
@@ -668,7 +719,7 @@ Portal::PortalIntersectResult Portal::intersects(PCZSceneNode * pczsn)
 	// Only check if portal is open
 	if (mOpen)
 	{
-		if (pczsn == mNode)
+		if (pczsn == mParentNode)
 		{
 			// ignore the scene node if it is the node the portal is associated with
 			return Portal::NO_INTERSECT;
@@ -682,10 +733,7 @@ Portal::PortalIntersectResult Portal::intersects(PCZSceneNode * pczsn)
 			nodeSegment.set(pczsn->getPrevPosition(), pczsn->_getDerivedPosition());
 
 			// we model the portal as a line swept sphere (mPrevDerivedCP to mDerivedCP).
-			Capsule portalCapsule;
-			portalCapsule.set(mPrevDerivedCP, mDerivedCP, mRadius);
-
-			if (portalCapsule.intersects(nodeSegment))
+			if (getCapsule().intersects(nodeSegment))
 			{
 				// the portal intersected the node at some time from last frame to this frame. 
 				// Now check if node "crossed" the portal
@@ -816,22 +864,17 @@ Portal::PortalIntersectResult Portal::intersects(PCZSceneNode * pczsn)
 */
 bool Portal::crossedPortal(Portal * otherPortal)
 {
-	// Only check if portal is open
-	if (otherPortal->isOpen())
+	// Only check if portal is open and is not an antiportal
+	if (otherPortal->isOpen() &&
+		!(otherPortal->isAntiPortal()))
 	{
 		// we model both portals as line swept spheres (mPrevDerivedCP to mDerivedCP).
 		// intersection test is then between the capsules.
 		// BUGBUG! This routine needs to check for case where one or both objects
 		//         don't move - resulting in simple sphere tests
 		// BUGBUG! If one (or both) portals are aabb's this is REALLY not accurate.
-		Capsule portalCapsule, otherPortalCapsule;
-		portalCapsule.set( mPrevDerivedCP, mDerivedCP, mRadius);
-
-		otherPortalCapsule.set(otherPortal->getPrevDerivedCP(), 
-							   otherPortal->getDerivedCP(),
-							   otherPortal->getRadius());
-
-		if (portalCapsule.intersects(otherPortalCapsule))
+		const Capsule& otherPortalCapsule(otherPortal->getCapsule());
+		if (getCapsule().intersects(otherPortalCapsule))
 		{
 			// the portal intersected the other portal at some time from last frame to this frame. 
 			// Now check if this portal "crossed" the other portal
@@ -909,7 +952,9 @@ bool Portal::crossedPortal(Portal * otherPortal)
 		}
 	}
 	// there was no crossing of the portal by this portal. It might be touching
-	// the other portal (but we don't care currently)
+	// the other portal (but we don't care currently) or the other
+	// portal might be an antiportal (crossing not possible) or the
+	// other portal might be closed.
 	return false;
 }
 
@@ -960,5 +1005,55 @@ bool Portal::closeTo(Portal * otherPortal)
 		break;
 	}
 	return close;
+}
+
+/** @copydoc MovableObject::getMovableType. */
+const String& Portal::getMovableType() const
+{
+	static String type("Portal");
+	return type;
+}
+
+/** @copydoc MovableObject::getBoundingBox. */
+const AxisAlignedBox& Portal::getBoundingBox() const
+{
+	if (!mLocalsUpToDate)
+	{
+		calcDirectionAndRadius();
+	}
+	return mLocalPortalAAB;
+}
+
+bool Portal::needUpdate()
+{
+	PCZSceneNode* pczNode = (PCZSceneNode*)mParentNode;
+	return (!mLocalsUpToDate || (pczNode && pczNode->isMoved()));
+}
+
+/** Returns an updated capsule of the portal for intersection test. */
+const Capsule& Portal::getCapsule()
+{
+	PCZSceneNode* pczNode = (PCZSceneNode*)mParentNode;
+	bool justStoppedMoving = mWasMoved && (pczNode && !pczNode->isMoved());
+	if (!mDerivedUpToDate || justStoppedMoving)
+	{
+		updateDerivedValues();
+		mWasMoved = false;
+	}
+	return mPortalCapsule;
+}
+
+/** Returns an updated AAB of the portal for intersection test. */
+const AxisAlignedBox& Portal::getAAB()
+{
+	PCZSceneNode* pczNode = (PCZSceneNode*)mParentNode;
+	bool justStoppedMoving = mWasMoved && (pczNode && !pczNode->isMoved());
+	if (!mDerivedUpToDate || justStoppedMoving)
+	{
+		updateDerivedValues();
+		mWasMoved = false;
+	}
+
+	return mPortalAAB;
 }
 

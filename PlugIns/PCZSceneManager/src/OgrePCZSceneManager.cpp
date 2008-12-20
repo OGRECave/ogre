@@ -464,66 +464,21 @@ namespace Ogre
 	   2) update the spatial data for all zones (& portals in the zones)
 	   3) Update the PCZSNMap entry for every scene node
 	*/
-    void PCZSceneManager::_updateSceneGraph( Camera * cam )
-    {
+	void PCZSceneManager::_updateSceneGraph( Camera * cam )
+	{
 		// First do the standard scene graph update
-        SceneManager::_updateSceneGraph( cam );
-		// Then do the portal update.  This is done after all the regular
-		// scene graph node updates because portals can move (being attached to scene nodes)
-		// (also clear node refs in every zone)
-	    _updatePortalSpatialData();
+		SceneManager::_updateSceneGraph( cam );
 		// check for portal zone-related changes (portals intersecting other portals)
 		_updatePortalZoneData();
+		// mark nodes dirty base on portals that changed.
+		_dirtyNodeByMovingPortals();
 		// update all scene nodes
 		_updatePCZSceneNodes();
-        // calculate zones affected by each light
-        _calcZonesAffectedByLights(cam);
-		// save node positions
-		//_saveNodePositions();
+		// calculate zones affected by each light
+		_calcZonesAffectedByLights(cam);
 		// clear update flags at end so user triggered updated are 
 		// not cleared prematurely 
 		_clearAllZonesPortalUpdateFlag(); 
-    }
-
-	/* Save the position of all nodes (saved to PCZSN->prevPosition)
-	* NOTE: Yeah, this is inefficient because it's doing EVERY node in the
-	*       scene.  A more efficient way would be override all scene node
-	*	    functions that change position/orientation and save old position
-	*	    & orientation when those functions are called, but that's more 
-	*       coding work than I willing to do right now...
-	*/
-	void PCZSceneManager::_saveNodePositions(void)
-	{
-		SceneNodeList::iterator it = mSceneNodes.begin();
-		PCZSceneNode * pczsn;
-
-	    while ( it != mSceneNodes.end() )
-	    {
-		    pczsn = (PCZSceneNode*)(it->second);
-			// Update a single entry 
-			pczsn->savePrevPosition();
-			// proceed to next entry in the map
-		    ++it;
-	    }
-	}
-
-	/** Update the spatial data for every zone portal in the scene */
-
-	void PCZSceneManager::_updatePortalSpatialData(void)
-	{
-		PCZone * zone;
-	    ZoneMap::iterator zit = mZones.begin();
-
-	    while ( zit != mZones.end() )
-	    {
-		    zone = zit->second;
-			// this call updates Portal spatials 
-			zone->updatePortalsSpatially(); 
-			// clear the visitor node list in the zone while we're here
-			zone->_clearNodeLists(PCZone::VISITOR_NODE_LIST);
-			// proceed to next zone in the list
-		    ++zit;
-	    }
 	}
 
 	/** Update the zone data for every zone portal in the scene */
@@ -543,6 +498,22 @@ namespace Ogre
 	    }
 	}
 
+	/** Mark nodes dirty for every zone with moving portal in the scene */
+	void PCZSceneManager::_dirtyNodeByMovingPortals(void)
+	{
+		PCZone * zone;
+		ZoneMap::iterator zit = mZones.begin();
+
+		while ( zit != mZones.end() )
+		{
+			zone = zit->second;
+			// this call mark nodes dirty base on moving portals 
+			zone->dirtyNodeByMovingPortals(); 
+			// proceed to next zone in the list
+			++zit;
+		}
+	}
+
 	/* Update all PCZSceneNodes. 
 	*/
 	void PCZSceneManager::_updatePCZSceneNodes(void)
@@ -550,17 +521,20 @@ namespace Ogre
 		SceneNodeList::iterator it = mSceneNodes.begin();
 		PCZSceneNode * pczsn;
 
-	    while ( it != mSceneNodes.end() )
-	    {
-		    pczsn = (PCZSceneNode*)(it->second);
-			if (pczsn->isEnabled())
+		while ( it != mSceneNodes.end() )
+		{
+			pczsn = (PCZSceneNode*)(it->second);
+			if (pczsn->isMoved() && pczsn->isEnabled())
 			{
 				// Update a single entry 
-				_updatePCZSceneNode(pczsn); 
+				_updatePCZSceneNode(pczsn);
+
+				// reset moved state.
+				pczsn->setMoved(false);
 			}
 			// proceed to next entry in the list
-		    ++it;
-	    }
+			++it;
+		}
 	}
 
     /*
@@ -605,7 +579,7 @@ namespace Ogre
 			return;
 
 		// clear all references to visiting zones
-		pczsn->clearVisitingZonesMap();
+		pczsn->clearNodeFromVisitedZones();
 
         // Find the current home zone of the node associated with the pczsn entry.
 		_updateHomeZone( pczsn, false );

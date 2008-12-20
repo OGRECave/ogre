@@ -1,0 +1,36 @@
+UPDATES:
+-------------
+
+* (12/19/08) Changed line endings to Windows CR/LF standard in OgreOctreeZone.cpp & OgreDefaultZone.cpp
+* (12/19/08) Initial coding for anti-portals has started.  It is not functional yet, so don't use it.
+* (12/19/08) Portals no longer cross over other portals if they both lead to the same zone (this was put in to fix a rare bug
+  which was causing portals which were "close" to each other to cause inadvertent portal transfers.
+* (12/16/08) PCZSceneNode::createChildSceneNode() no longer automatically anchors the new child node if the parent is anchored.  
+* (12/16/08) You can un-anchor PCZSceneNodes from Zones by calling PCZSceneNode::anchorToZone(0).
+* (12/3/08) Moved this list of updates to it's own file (changelog.txt)
+* (12/2/08) Numerous Optimizations (thanks Lf3thn4d) 
+ - Update only nodes that moved
+ - Update only portals that moved
+ - Update nodes that are within interest of moving portals
+ - MAJOR CHANGE: Made portal a movable object so that it can track movement
+ - Optimized portal update code (Less useless check)
+ - Don't clear visiting node each frame but let updating nodes remove themselves from visiting zones File 
+
+* (11/11/08) PCZFrustum treats infinite bounds as always visible and zero bounds as always invisible (Thanks Fish). 
+* (10/17/08) PCZoneFactory eats a const String &, so code has been updated to use PCZoneFactory("ZoneType_Default")
+  instead of PCZoneFactory (String("ZoneType_Default")).  
+* (10/26/08) PCZSM now zeroes out the SkyBoxObj, SkyPlane, and SkyDome pointers when clearScene() is called. 
+* (5/8/08) if a scene node is anchored to a zone, then child scene nodes created from that
+  scene node (via SceneNode::createChildSceneNode()) are also anchored to the same zone. 
+* (4/24/08) Portals can now be closed & opened (see Portal::close() and Portal::open()).
+  Closing a portal prevents scene traversal through the portal and also prevents
+  scene nodes from crossing the portal. 
+* (4/24/08) Infinite Recursion bug for scene traversal FIXED.  This was fixed by adding an
+  additional culling plane drawn from the actual plane of quad portals.  The infinite recursion
+  bug occurred in situations where a viewer was outside a building, could look straight through
+  the building back to the outside, and then into another building similarly set up.  This
+  situation is still VERY bad from a performance standpoint, but at least it doesn't crash.  
+* (03/18/08) The PCZFrustum now uses a Culling Plane Reservoir which eliminates the constant memory
+  allocations/de-allocations for PCPlanes during the culling process. 
+* (03/25/08) Light zones now only update affected list when portals move or lights move (Thanks Aulcard)
+* (03/25/08) PCZSceneNodes now only save old spatial data when they move (Thanks Aulcard) 

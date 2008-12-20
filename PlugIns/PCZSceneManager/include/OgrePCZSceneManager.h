@@ -185,19 +185,14 @@ namespace Ogre
         */
         virtual void destroyAllLights(void);
 
-		/* Save the position of all nodes (saved to PCZSN->prevPosition)
-		*/
-		void _saveNodePositions(void);
-
-		/** Update the spatial data for every zone portal in the scene */
-
-		void _updatePortalSpatialData(void);
-
 		/** Check/Update the zone data for every portal in the scene.
 		 *  Essentially, this routine checks each portal for intersections
 		 *  with other portals and updates if a crossing occurs 
 		 */
 		void _updatePortalZoneData(void);
+
+		/** Mark nodes dirty for every zone with moving portal in the scene */
+		void _dirtyNodeByMovingPortals(void);
 
 		/** Update the PCZSceneNodes 
 		*/
@@ -392,4 +387,5 @@ namespace Ogre
 }
 
 #endif
+
 

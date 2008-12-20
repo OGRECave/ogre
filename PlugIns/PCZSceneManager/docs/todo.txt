@@ -2,27 +2,6 @@
 This file contains a list of todo items for the PCZSceneManager plugin.
 Some items are specific, some are not, it's just a list to keep notes for myself.
 
-UPDATES:
--------------
-* PCZFrustum treats infinite bounds as always visible and zero bounds as always invisible (Thanks Fish). 11/11/08
-* PCZoneFactory eats a const String &, so code has been updated to use PCZoneFactory("ZoneType_Default")
-  instead of PCZoneFactory (String("ZoneType_Default")).  (10/17/08)
-* PCZSM now zeroes out the SkyBoxObj, SkyPlane, and SkyDome pointers when clearScene() is called. (10/26/08)
-* if a scene node is anchored to a zone, then child scene nodes created from that
-  scene node (via SceneNode::createChildSceneNode()) are also anchored to the same zone. (5/8/08)
-* Portals can now be closed & opened (see Portal::close() and Portal::open()).
-  Closing a portal prevents scene traversal through the portal and also prevents
-  scene nodes from crossing the portal. (4/24/08)
-* Infinite Recursion bug for scene traversal FIXED.  This was fixed by adding an
-  additional culling plane drawn from the actual plane of quad portals.  The infinite recursion
-  bug occurred in situations where a viewer was outside a building, could look straight through
-  the building back to the outside, and then into another building similarly set up.  This
-  situation is still VERY bad from a performance standpoint, but at least it doesn't crash.  (4/24/08)
-* The PCZFrustum now uses a Culling Plane Reservoir which eliminates the constant memory
-  allocations/de-allocations for PCPlanes during the culling process. (03/18/08)
-* Light zones now only update affected list when portals move or lights move (Thanks Aulcard)
-  (03/25/08)
-* PCZSceneNodes now only save old spatial data when they move (Thanks Aulcard) (03/25/08)
 
 KNOWN BUGS:
 -------------
@@ -40,8 +19,6 @@ TODO:
 
 OPTIMIZATIONS (todo):
 ---------------------
-* All Portals calculate position update every frame, similar to how PCZSceneNodes were updating
-  every frame.  This could be changed so that it is only done when portals move/changes.
 * OctreeZone - utilize octree when determining portal visibility (currently does 
   separate check not accelerated by octree) for both cameras and light frustums).
 * Add scissor rects for portals which are fully visible (i.e. all 4 sides)

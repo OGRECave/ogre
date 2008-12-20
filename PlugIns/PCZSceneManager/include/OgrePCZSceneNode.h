@@ -65,7 +65,8 @@ namespace Ogre
 		PCZSceneNode( SceneManager* creator, const String& name );
 		/** Standard destructor */
 		~PCZSceneNode();
-		virtual void _update(bool updateChildren, bool parentHasChanged);
+		void _update(bool updateChildren, bool parentHasChanged);
+		void updateFromParentImpl() const;
 
         /** Creates an unnamed new SceneNode as a child of this node.
         @param
@@ -115,17 +116,20 @@ namespace Ogre
 		void		updateZoneData(void);
 		void		enable(bool yesno) {mEnabled = yesno;}
 		bool		isEnabled(void) {return mEnabled;}
+		bool		isMoved(void) {return mMoved;}
+		void		setMoved(bool value) {mMoved = value;}
 	protected:
-		Vector3         mNewPosition; 
+		mutable Vector3	mNewPosition; 
 		PCZone *		mHomeZone;
 		bool			mAnchored;
 		bool			mAllowedToVisit;
 		ZoneMap			mVisitingZones;
-		Vector3			mPrevPosition;
+		mutable Vector3	mPrevPosition;
 		unsigned long	mLastVisibleFrame;
 		PCZCamera*		mLastVisibleFromCamera;
 		ZoneDataMap		mZoneData;
 		bool			mEnabled;
+		mutable bool	mMoved;
 	};
 }
 

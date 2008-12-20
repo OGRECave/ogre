@@ -40,30 +40,29 @@ using namespace Ogre;
 
 //----------------------------------------------------------------------------
 
-Capsule::Capsule ()
+Capsule::Capsule()
 {
-    // uninitialized
+	// uninitialized
 }
 //----------------------------------------------------------------------------
-Capsule::Capsule (const Segment& segment, Real radius)
-    :
-    mSegment(segment)
+Capsule::Capsule(const Segment& segment, Real radius)
+	: mSegment(segment),
+	mRadius(radius)
 {
-    mRadius = radius;
 }
 //----------------------------------------------------------------------------
-void Capsule::set(Vector3& newOrigin, Vector3& newEnd, Real newRadius)
+void Capsule::set(const Vector3& newOrigin, const Vector3& newEnd, Real newRadius)
 {
 	mSegment.set(newOrigin, newEnd);
 	mRadius = newRadius;
 }
 //----------------------------------------------------------------------------
-void Capsule::setOrigin(Vector3 & newOrigin)
+void Capsule::setOrigin(const Vector3& newOrigin)
 {
 	mSegment.mOrigin = newOrigin;
 }
 //----------------------------------------------------------------------------
-void Capsule::setEndPoint(Vector3 & newEndpoint)
+void Capsule::setEndPoint(const Vector3& newEndpoint)
 {
 	mSegment.setEndPoint(newEndpoint);
 }
@@ -73,16 +72,16 @@ void Capsule::setRadius(Real newRadius)
 	mRadius = newRadius;
 }
 //----------------------------------------------------------------------------
-bool Capsule::intersects(Capsule& otherCapsule)
+bool Capsule::intersects(const Capsule& otherCapsule) const
 {
 	Real fDistance = mSegment.distance(otherCapsule.mSegment);
-    Real fRSum = mRadius + otherCapsule.mRadius;
-    return fDistance <= fRSum;
+	Real fRSum = mRadius + otherCapsule.mRadius;
+	return fDistance <= fRSum;
 }
 //----------------------------------------------------------------------------
-bool Capsule::intersects(Segment &segment)
+bool Capsule::intersects(const Segment& segment) const
 {
-    Real fDist =  segment.distance(mSegment);
-    return fDist <= mRadius;
+	Real fDist = segment.distance(mSegment);
+	return fDist <= mRadius;
 }
 //----------------------------------------------------------------------------

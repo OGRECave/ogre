@@ -58,7 +58,7 @@ Segment::Segment (const Vector3& origin,
 {
 }
 //----------------------------------------------------------------------------
-void Segment::set(Vector3& newOrigin, const Vector3& newEnd)
+void Segment::set(const Vector3& newOrigin, const Vector3& newEnd)
 {
 	mOrigin = newOrigin;
 	// calc the direction vector
@@ -66,25 +66,25 @@ void Segment::set(Vector3& newOrigin, const Vector3& newEnd)
 	mExtent = mDirection.normalise();
 }
 //----------------------------------------------------------------------------
-void Segment::setOrigin(Vector3 & newOrigin)
+void Segment::setOrigin(const Vector3& newOrigin)
 {
 	mOrigin = newOrigin;
 }
 //----------------------------------------------------------------------------
-void Segment::setEndPoint(Vector3 & newEnd)
+void Segment::setEndPoint(const Vector3& newEnd)
 {
 	// calc the direction vector
 	mDirection = newEnd - mOrigin;
 	mExtent = mDirection.normalise();
 }
 //----------------------------------------------------------------------------
-Real Segment::distance(Segment& otherSegment)
+Real Segment::distance(const Segment& otherSegment) const
 {
     Real fSqrDist = squaredDistance(otherSegment);
 	return Ogre::Math::Sqrt(fSqrDist);
 }
 //----------------------------------------------------------------------------
-Real Segment::squaredDistance(Segment& otherSegment)
+Real Segment::squaredDistance(const Segment& otherSegment) const
 {
     Vector3 kDiff = mOrigin - otherSegment.mOrigin;
     Real fA01 = -mDirection.dotProduct(otherSegment.mDirection);
@@ -408,7 +408,7 @@ Real Segment::squaredDistance(Segment& otherSegment)
 }
 
 //----------------------------------------------------------------------------
-bool Segment::intersects(Capsule &capsule)
+bool Segment::intersects(const Capsule &capsule) const
 {
     Real fDist =  distance(capsule.mSegment);
     return fDist <= capsule.mRadius;

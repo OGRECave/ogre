@@ -61,16 +61,16 @@ namespace Ogre
 		Segment (const Vector3&, const Vector3&, Real);
 
 		// set values
-		void set(Vector3& newOrigin, const Vector3& newEnd);
-		void setOrigin(Vector3 & newOrigin);
-		void setEndPoint(Vector3 & newEndpoint);
+		void set(const Vector3& newOrigin, const Vector3& newEnd);
+		void setOrigin(const Vector3& newOrigin);
+		void setEndPoint(const Vector3& newEndpoint);
 
 		// functions to calculate distance to another segment
-		Real distance(Segment& otherSegment);
-		Real squaredDistance(Segment& otherSegment);
+		Real distance(const Segment& otherSegment) const;
+		Real squaredDistance(const Segment& otherSegment) const;
 
 		// intersect check between segment & capsule 
-		bool intersects(Capsule &);
+		bool intersects(const Capsule&) const;
 
 		// defining variables
 		Vector3 mOrigin;
