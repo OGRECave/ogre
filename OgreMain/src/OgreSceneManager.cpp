@@ -6419,7 +6419,84 @@ SceneManager::SceneMgrQueuedRenderableVisitor* SceneManager::getQueuedRenderable
 {
 	return mActiveQueuedRenderableVisitor;
 }
+//---------------------------------------------------------------------
+void SceneManager::addLodListener(LodListener *listener)
+{
+    mLodListeners.insert(listener);
+}
+//---------------------------------------------------------------------
+void SceneManager::removeLodListener(LodListener *listener)
+{
+    LodListenerSet::iterator it = mLodListeners.find(listener);
+    if (it != mLodListeners.end())
+        mLodListeners.erase(it);
+}
+//---------------------------------------------------------------------
+void SceneManager::_notifyMovableObjectLodChanged(MovableObjectLodChangedEvent& evt)
+{
+    // Notify listeners and determine if event needs to be queued
+    bool queueEvent = false;
+    for (LodListenerSet::iterator it = mLodListeners.begin(); it != mLodListeners.end(); ++it)
+    {
+        if ((*it)->prequeueMovableObjectLodChanged(evt))
+            queueEvent = true;
+    }
 
+    // Push event onto queue if requested
+    if (queueEvent)
+        mMovableObjectLodChangedEvents.push_back(evt);
+}
+//---------------------------------------------------------------------
+void SceneManager::_notifyEntityMeshLodChanged(EntityMeshLodChangedEvent& evt)
+{
+    // Notify listeners and determine if event needs to be queued
+    bool queueEvent = false;
+    for (LodListenerSet::iterator it = mLodListeners.begin(); it != mLodListeners.end(); ++it)
+    {
+        if ((*it)->prequeueEntityMeshLodChanged(evt))
+            queueEvent = true;
+    }
+
+    // Push event onto queue if requested
+    if (queueEvent)
+        mEntityMeshLodChangedEvents.push_back(evt);
+}
+//---------------------------------------------------------------------
+void SceneManager::_notifyEntityMaterialLodChanged(EntityMaterialLodChangedEvent& evt)
+{
+    // Notify listeners and determine if event needs to be queued
+    bool queueEvent = false;
+    for (LodListenerSet::iterator it = mLodListeners.begin(); it != mLodListeners.end(); ++it)
+    {
+        if ((*it)->prequeueEntityMaterialLodChanged(evt))
+            queueEvent = true;
+    }
+
+    // Push event onto queue if requested
+    if (queueEvent)
+        mEntityMaterialLodChangedEvents.push_back(evt);
+}
+//---------------------------------------------------------------------
+void SceneManager::_handleLodEvents()
+{
+    // Handle events with each listener
+    for (LodListenerSet::iterator it = mLodListeners.begin(); it != mLodListeners.end(); ++it)
+    {
+        for (MovableObjectLodChangedEventList::const_iterator jt = mMovableObjectLodChangedEvents.begin(); jt != mMovableObjectLodChangedEvents.end(); ++jt)
+            (*it)->postqueueMovableObjectLodChanged(*jt);
+
+        for (EntityMeshLodChangedEventList::const_iterator jt = mEntityMeshLodChangedEvents.begin(); jt != mEntityMeshLodChangedEvents.end(); ++jt)
+            (*it)->postqueueEntityMeshLodChanged(*jt);
+
+        for (EntityMaterialLodChangedEventList::const_iterator jt = mEntityMaterialLodChangedEvents.begin(); jt != mEntityMaterialLodChangedEvents.end(); ++jt)
+            (*it)->postqueueEntityMaterialLodChanged(*jt);
+    }
+
+    // Clear event queues
+    mMovableObjectLodChangedEvents.clear();
+    mEntityMeshLodChangedEvents.clear();
+    mEntityMaterialLodChangedEvents.clear();
+}
 
 
 }

@@ -186,6 +186,9 @@ namespace Ogre {
         // Font manager
         mFontManager = OGRE_NEW FontManager();
 
+        // Lod strategy manager
+        mLodStrategyManager = OGRE_NEW LodStrategyManager();
+
 #if OGRE_PROFILING
         // Profiler
         mProfiler = OGRE_NEW Profiler();
@@ -272,6 +275,7 @@ namespace Ogre {
 #endif
         OGRE_DELETE mOverlayManager;
         OGRE_DELETE mFontManager;
+		OGRE_DELETE mLodStrategyManager;
         OGRE_DELETE mArchiveManager;
         OGRE_DELETE mZipArchiveFactory;
         OGRE_DELETE mFileSystemArchiveFactory;
@@ -1134,7 +1138,13 @@ namespace Ogre {
 		bool ret = _fireFrameRenderingQueued();
 		// block for final swap
 		mActiveRenderer->_swapAllRenderTargetBuffers(mActiveRenderer->getWaitForVerticalBlank());
-		
+
+        // This belongs here, as all render targets must be updated before events are
+        // triggered, otherwise targets could be mismatched.  This could produce artifacts,
+        // for instance, with shadows.
+        for (SceneManagerEnumerator::SceneManagerIterator it = getSceneManagerIterator(); it.hasMoreElements(); it.moveNext())
+            it.peekNextValue()->_handleLodEvents();
+
 		return ret;
 	}
 	//-----------------------------------------------------------------------

@@ -581,6 +581,15 @@
 		AA7510680DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510640DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA7510690DDE20FE009D23BA /* OgreMemoryStdAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA75106A0DDE20FE009D23BA /* OgreMemorySTLAllocator.h in Headers */ = {isa = PBXBuildFile; fileRef = AA7510660DDE20FE009D23BA /* OgreMemorySTLAllocator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA81343A0EFE94A9004EA3A5 /* OgreDistanceLodStrategy.h in Headers */ = {isa = PBXBuildFile; fileRef = AA8134360EFE94A9004EA3A5 /* OgreDistanceLodStrategy.h */; };
+		AA81343B0EFE94A9004EA3A5 /* OgreLodListener.h in Headers */ = {isa = PBXBuildFile; fileRef = AA8134370EFE94A9004EA3A5 /* OgreLodListener.h */; };
+		AA81343C0EFE94A9004EA3A5 /* OgreLodStrategyManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AA8134380EFE94A9004EA3A5 /* OgreLodStrategyManager.h */; };
+		AA81343D0EFE94A9004EA3A5 /* OgrePixelCountLodStrategy.h in Headers */ = {isa = PBXBuildFile; fileRef = AA8134390EFE94A9004EA3A5 /* OgrePixelCountLodStrategy.h */; };
+		AA8134420EFE94DC004EA3A5 /* OgreDistanceLodStrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA81343E0EFE94DC004EA3A5 /* OgreDistanceLodStrategy.cpp */; };
+		AA8134430EFE94DC004EA3A5 /* OgreLodStrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA81343F0EFE94DC004EA3A5 /* OgreLodStrategy.cpp */; };
+		AA8134440EFE94DC004EA3A5 /* OgreLodStrategyManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA8134400EFE94DC004EA3A5 /* OgreLodStrategyManager.cpp */; };
+		AA8134450EFE94DC004EA3A5 /* OgrePixelCountLodStrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA8134410EFE94DC004EA3A5 /* OgrePixelCountLodStrategy.cpp */; };
+		AA8134630EFEA36D004EA3A5 /* OgreLodStrategy.h in Headers */ = {isa = PBXBuildFile; fileRef = AA8134620EFEA36D004EA3A5 /* OgreLodStrategy.h */; };
 		AA879F810EBB02180048013E /* OgreCgFxScriptLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA879F800EBB02180048013E /* OgreCgFxScriptLoader.cpp */; };
 		AA89775B0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA89775A0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA89775E0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA89775D0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp */; };
@@ -1391,6 +1400,15 @@
 		AA7510640DDE20FE009D23BA /* OgreMemoryAllocatorConfig.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryAllocatorConfig.h; path = ../../OgreMain/include/OgreMemoryAllocatorConfig.h; sourceTree = SOURCE_ROOT; };
 		AA7510650DDE20FE009D23BA /* OgreMemoryStdAlloc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemoryStdAlloc.h; path = ../../OgreMain/include/OgreMemoryStdAlloc.h; sourceTree = SOURCE_ROOT; };
 		AA7510660DDE20FE009D23BA /* OgreMemorySTLAllocator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreMemorySTLAllocator.h; path = ../../OgreMain/include/OgreMemorySTLAllocator.h; sourceTree = SOURCE_ROOT; };
+		AA8134360EFE94A9004EA3A5 /* OgreDistanceLodStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreDistanceLodStrategy.h; path = ../../OgreMain/include/OgreDistanceLodStrategy.h; sourceTree = SOURCE_ROOT; };
+		AA8134370EFE94A9004EA3A5 /* OgreLodListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreLodListener.h; path = ../../OgreMain/include/OgreLodListener.h; sourceTree = SOURCE_ROOT; };
+		AA8134380EFE94A9004EA3A5 /* OgreLodStrategyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreLodStrategyManager.h; path = ../../OgreMain/include/OgreLodStrategyManager.h; sourceTree = SOURCE_ROOT; };
+		AA8134390EFE94A9004EA3A5 /* OgrePixelCountLodStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgrePixelCountLodStrategy.h; path = ../../OgreMain/include/OgrePixelCountLodStrategy.h; sourceTree = SOURCE_ROOT; };
+		AA81343E0EFE94DC004EA3A5 /* OgreDistanceLodStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreDistanceLodStrategy.cpp; path = ../../OgreMain/src/OgreDistanceLodStrategy.cpp; sourceTree = SOURCE_ROOT; };
+		AA81343F0EFE94DC004EA3A5 /* OgreLodStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreLodStrategy.cpp; path = ../../OgreMain/src/OgreLodStrategy.cpp; sourceTree = SOURCE_ROOT; };
+		AA8134400EFE94DC004EA3A5 /* OgreLodStrategyManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreLodStrategyManager.cpp; path = ../../OgreMain/src/OgreLodStrategyManager.cpp; sourceTree = SOURCE_ROOT; };
+		AA8134410EFE94DC004EA3A5 /* OgrePixelCountLodStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgrePixelCountLodStrategy.cpp; path = ../../OgreMain/src/OgrePixelCountLodStrategy.cpp; sourceTree = SOURCE_ROOT; };
+		AA8134620EFEA36D004EA3A5 /* OgreLodStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreLodStrategy.h; path = ../../OgreMain/include/OgreLodStrategy.h; sourceTree = SOURCE_ROOT; };
 		AA879F7E0EBB02030048013E /* OgreCgFxScriptLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreCgFxScriptLoader.h; path = ../../PlugIns/CgProgramManager/include/OgreCgFxScriptLoader.h; sourceTree = SOURCE_ROOT; };
 		AA879F800EBB02180048013E /* OgreCgFxScriptLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreCgFxScriptLoader.cpp; path = ../../PlugIns/CgProgramManager/src/OgreCgFxScriptLoader.cpp; sourceTree = SOURCE_ROOT; };
 		AA89775A0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreRenderToVertexBuffer.h; path = ../../OgreMain/include/OgreRenderToVertexBuffer.h; sourceTree = SOURCE_ROOT; };
@@ -1690,6 +1708,7 @@
 				000E1F150B38D5AA004EA2DF /* OgreDDSCodec.cpp */,
 				000E1F160B38D5AA004EA2DF /* OgreDefaultHardwareBufferManager.cpp */,
 				000E1F170B38D5AA004EA2DF /* OgreDefaultSceneQueries.cpp */,
+				AA81343E0EFE94DC004EA3A5 /* OgreDistanceLodStrategy.cpp */,
 				000E1F180B38D5AA004EA2DF /* OgreDynLib.cpp */,
 				000E1F190B38D5AA004EA2DF /* OgreDynLibManager.cpp */,
 				000E1F1A0B38D5AA004EA2DF /* OgreEdgeListBuilder.cpp */,
@@ -1718,6 +1737,8 @@
 				005E5EA50B7F39CB00658C32 /* OgreInstancedGeometry.cpp */,
 				000E1F300B38D5AA004EA2DF /* OgreKeyFrame.cpp */,
 				000E1F310B38D5AA004EA2DF /* OgreLight.cpp */,
+				AA81343F0EFE94DC004EA3A5 /* OgreLodStrategy.cpp */,
+				AA8134400EFE94DC004EA3A5 /* OgreLodStrategyManager.cpp */,
 				000E1F320B38D5AA004EA2DF /* OgreLog.cpp */,
 				000E1F330B38D5AA004EA2DF /* OgreLogManager.cpp */,
 				000E1F340B38D5AA004EA2DF /* ogremain.map */,
@@ -1758,6 +1779,7 @@
 				000E1F560B38D5AA004EA2DF /* OgrePatchMesh.cpp */,
 				000E1F570B38D5AA004EA2DF /* OgrePatchSurface.cpp */,
 				000E1F580B38D5AA004EA2DF /* OgrePixelConversions.h */,
+				AA8134410EFE94DC004EA3A5 /* OgrePixelCountLodStrategy.cpp */,
 				000E1F590B38D5AA004EA2DF /* OgrePixelFormat.cpp */,
 				000E1F5A0B38D5AA004EA2DF /* OgrePlane.cpp */,
 				000E1F5B0B38D5AA004EA2DF /* OgrePlatformInformation.cpp */,
@@ -1891,6 +1913,7 @@
 				000E1D760B38D565004EA2DF /* OgreDataStream.h */,
 				000E1D770B38D565004EA2DF /* OgreDDSCodec.h */,
 				000E1D780B38D565004EA2DF /* OgreDefaultHardwareBufferManager.h */,
+				AA8134360EFE94A9004EA3A5 /* OgreDistanceLodStrategy.h */,
 				000E1D790B38D565004EA2DF /* OgreDynLib.h */,
 				000E1D7A0B38D565004EA2DF /* OgreDynLibManager.h */,
 				000E1D7B0B38D565004EA2DF /* OgreEdgeListBuilder.h */,
@@ -1924,6 +1947,9 @@
 				000E1D950B38D566004EA2DF /* OgreIteratorWrappers.h */,
 				000E1D960B38D566004EA2DF /* OgreKeyFrame.h */,
 				000E1D970B38D566004EA2DF /* OgreLight.h */,
+				AA8134370EFE94A9004EA3A5 /* OgreLodListener.h */,
+				AA8134620EFEA36D004EA3A5 /* OgreLodStrategy.h */,
+				AA8134380EFE94A9004EA3A5 /* OgreLodStrategyManager.h */,
 				000E1D980B38D566004EA2DF /* OgreLog.h */,
 				000E1D990B38D566004EA2DF /* OgreLogManager.h */,
 				000E1D9A0B38D566004EA2DF /* OgreManualObject.h */,
@@ -1969,6 +1995,7 @@
 				000E1DC00B38D566004EA2DF /* OgrePass.h */,
 				000E1DC10B38D566004EA2DF /* OgrePatchMesh.h */,
 				000E1DC20B38D566004EA2DF /* OgrePatchSurface.h */,
+				AA8134390EFE94A9004EA3A5 /* OgrePixelCountLodStrategy.h */,
 				000E1DC30B38D566004EA2DF /* OgrePixelFormat.h */,
 				000E1DC40B38D566004EA2DF /* OgrePlane.h */,
 				000E1DC50B38D566004EA2DF /* OgrePlaneBoundedVolume.h */,
@@ -2782,6 +2809,11 @@
 				AA89775B0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h in Headers */,
 				AAE7DD060E68917000E1371A /* OgreAtomicWrappers.h in Headers */,
 				AA9567C60EB79DA4009431A6 /* OgreMemoryNedAlloc.h in Headers */,
+				AA81343A0EFE94A9004EA3A5 /* OgreDistanceLodStrategy.h in Headers */,
+				AA81343B0EFE94A9004EA3A5 /* OgreLodListener.h in Headers */,
+				AA81343C0EFE94A9004EA3A5 /* OgreLodStrategyManager.h in Headers */,
+				AA81343D0EFE94A9004EA3A5 /* OgrePixelCountLodStrategy.h in Headers */,
+				AA8134630EFEA36D004EA3A5 /* OgreLodStrategy.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3179,6 +3211,10 @@
 				AAE047FD0E5E0BCE001D1ADC /* OgreShadowCameraSetupPSSM.cpp in Sources */,
 				AA89775E0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp in Sources */,
 				AA5607850E901ED60041BF06 /* OgreAxisAlignedBox.cpp in Sources */,
+				AA8134420EFE94DC004EA3A5 /* OgreDistanceLodStrategy.cpp in Sources */,
+				AA8134430EFE94DC004EA3A5 /* OgreLodStrategy.cpp in Sources */,
+				AA8134440EFE94DC004EA3A5 /* OgreLodStrategyManager.cpp in Sources */,
+				AA8134450EFE94DC004EA3A5 /* OgrePixelCountLodStrategy.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

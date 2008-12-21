@@ -41,6 +41,7 @@ Description: Somewhere to play in the sand...
 #include "AnimationBlender.h"
 #include "OgreErrorDialog.h"
 #include "OgreFontManager.h"
+#include "OgreDistanceLodStrategy.h"
 // Static plugins declaration section
 // Note that every entry in here adds an extra header / library dependency
 #ifdef OGRE_STATIC_LIB
@@ -525,7 +526,7 @@ public:
 			mAnimStateList.push_back(anim);
 		}
         
-		if (compositorToSwitch && mKeyboard->isKeyDown(KC_C) && timeUntilNextToggle <= 0)
+		if (compositorToSwitch && mKeyboard->isKeyDown(OIS::KC_C) && timeUntilNextToggle <= 0)
 		{
 			++compositorSchemeIndex;
 			compositorSchemeIndex = compositorSchemeIndex % compositorSchemeList.size();
@@ -2120,8 +2121,8 @@ protected:
 		MeshPtr msh1 = (MeshPtr)MeshManager::getSingleton().load("robot.mesh", 
 			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-		msh1->createManualLodLevel(200, "razor.mesh");
-		msh1->createManualLodLevel(500, "sphere.mesh");
+        msh1->createManualLodLevel(Math::Sqr(200), "razor.mesh");
+		msh1->createManualLodLevel(Math::Sqr(500), "sphere.mesh");
 
 		Entity *ent;
 		for (int i = 0; i < 5; ++i)
@@ -2200,13 +2201,13 @@ protected:
 
 		msh1->removeLodLevels();
 
-		Mesh::LodDistanceList lodList;
-		lodList.push_back(50);
-		lodList.push_back(100);
-		lodList.push_back(150);
-		lodList.push_back(200);
-		lodList.push_back(250);
-		lodList.push_back(300);
+		Mesh::LodValueList lodList;
+        lodList.push_back(Math::Sqr(50));
+		lodList.push_back(Math::Sqr(100));
+		lodList.push_back(Math::Sqr(150));
+		lodList.push_back(Math::Sqr(200));
+		lodList.push_back(Math::Sqr(250));
+		lodList.push_back(Math::Sqr(300));
 
 		msh1->generateLodLevels(lodList, ProgressiveMesh::VRQ_PROPORTIONAL, 0.3);
 
@@ -5294,8 +5295,8 @@ protected:
 		t->createPass()->createTextureUnitState("r2skin.jpg");
 		t->setSchemeName("newscheme");
 
-		Material::LodDistanceList ldl;
-		ldl.push_back(500.0f);
+		Material::LodValueList ldl;
+		ldl.push_back(Math::Sqr(500.0f));
 		mat->setLodLevels(ldl);
 
 
@@ -5343,9 +5344,9 @@ protected:
 
 		// No LOD 2 for newscheme! Should fallback on LOD 1
 
-		Material::LodDistanceList ldl;
-		ldl.push_back(250.0f);
-		ldl.push_back(500.0f);
+		Material::LodValueList ldl;
+		ldl.push_back(Math::Sqr(250.0f));
+		ldl.push_back(Math::Sqr(500.0f));
 		mat->setLodLevels(ldl);
 
 
@@ -6896,6 +6897,154 @@ protected:
 
 	}
 
+    class TestLodListener
+        : public LodListener
+    {
+        SceneManager *mSceneMgr;
+
+    public:
+        TestLodListener(SceneManager *sceneMgr)
+            : mSceneMgr(sceneMgr)
+        { }
+
+        virtual bool prequeueEntityMeshLodChanged(const EntityMeshLodChangedEvent& evt)
+        {
+            // Queue event
+            return true;
+        }
+
+        virtual void postqueueEntityMeshLodChanged(const EntityMeshLodChangedEvent& evt)
+        {
+            // Check for change
+            if (evt.newLodIndex != evt.previousLodIndex)
+            {
+                double value = 0.2 * (1 + evt.newLodIndex);
+                mSceneMgr->setAmbientLight(ColourValue(value, value, value));
+            }
+        }
+    };
+
+    class DebugLodStrategyListener
+        : public FrameListener
+    {
+        const Entity *mEntity;
+        const Camera *mCamera;
+
+    public:
+        DebugLodStrategyListener(const Entity *entity, const Camera *camera)
+            : mEntity(entity)
+            , mCamera(camera)
+        { }
+
+        virtual bool frameStarted(const FrameEvent& evt)
+        {
+            MaterialPtr mat = mEntity->getSubEntity(0)->getMaterial();
+            const LodStrategy *strategy = mat->getLodStrategy();
+            Real value = strategy->getValue(mEntity, mCamera);
+
+            TextAreaOverlayElement *debugTextArea = (TextAreaOverlayElement *)
+                OverlayManager::getSingleton().getOverlayElement("Ogre/DebugLodTextArea");
+            debugTextArea->setCaption(
+                "Strategy: " + strategy->getName() + "\n" +
+                "Value: " + Ogre::StringConverter::toString(value));
+
+            return FrameListener::frameStarted(evt);
+        }
+    };
+
+    void testLod()
+    {
+        // Setup lighting
+        mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
+        Light* l = mSceneMgr->createLight("LodTestLight");
+        l->setPosition(500, 500, 200);
+        l->setDiffuseColour(ColourValue::White);
+
+        // Generate mesh lods
+        MeshManager *meshManager = MeshManager::getSingletonPtr();
+        //MeshPtr mesh = meshManager->load("TestLod.mesh", "General");
+        MeshPtr mesh = meshManager->load("knot.mesh", "General");
+        Mesh::LodValueList distances;
+        distances.push_back(50);
+        distances.push_back(150);
+        distances.push_back(250);
+        mesh->generateLodLevels(distances, Ogre::ProgressiveMesh::VRQ_PROPORTIONAL, 0.5);
+
+        // Create entity
+        Entity *entity = mSceneMgr->createEntity("LodTestEntity", mesh->getName());
+        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(entity);
+
+        // Create material
+        MaterialPtr material = MaterialManager::getSingleton().create("LodTestMaterial", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        Technique *technique;
+        Pass *pass;
+        technique = material->getTechnique(0);
+        technique->setLodIndex(0);
+        pass = technique->getPass(0);
+        pass->setAmbient(Ogre::ColourValue::Red);
+        pass->setDiffuse(Ogre::ColourValue::Red);
+        technique = material->createTechnique();
+        technique->setLodIndex(1);
+        pass = technique->createPass();
+        pass->setAmbient(Ogre::ColourValue::Blue);
+        pass->setDiffuse(Ogre::ColourValue::Blue);
+        technique = material->createTechnique();
+        technique->setLodIndex(2);
+        pass = technique->createPass();
+        pass->setAmbient(Ogre::ColourValue::Green);
+        pass->setDiffuse(Ogre::ColourValue::Green);
+
+        // Material lods set based on strategy
+        Material::LodValueList lods;
+
+        // Toggle this to use pixel count strategy or default distance strategy
+        if (true)
+        {
+            // Set material lod strategy
+            LodStrategy *materialLodStrategy = LodStrategyManager::getSingleton().getStrategy("PixelCount");
+            material->setLodStrategy(materialLodStrategy);
+
+            // Create material lods
+            lods.push_back(400000);
+            lods.push_back(100000);
+        }
+        else
+        {
+            // Create material lods
+            lods.push_back(100);
+            lods.push_back(200);
+        }
+
+        material->setLodLevels(lods);
+        entity->setMaterialName(material->getName());
+
+        // Set distance lod strategy reference view
+        DistanceLodStrategy::getSingleton().setReferenceView(256, 256, Degree(60));
+
+        // Add lod listener
+        mSceneMgr->addLodListener(new TestLodListener(mSceneMgr));
+
+        // Get debug overlay
+        Overlay* debugOverlay = OverlayManager::getSingleton().getByName("Core/DebugOverlay");
+        // Create debug panel
+        OverlayContainer* debugPanel = (OverlayContainer*)
+            (OverlayManager::getSingleton().createOverlayElement("Panel", "Ogre/DebugLodPanel"));
+        debugPanel->setPosition(0.025, 0.025);
+        debugPanel->setDimensions(0.5, 0.25);
+        debugOverlay->add2D(debugPanel);
+        // Create debug text area
+        TextAreaOverlayElement *debugTextArea = (TextAreaOverlayElement *)
+            (OverlayManager::getSingleton().createOverlayElement("TextArea", "Ogre/DebugLodTextArea"));
+        debugTextArea->setMetricsMode(GMM_RELATIVE);
+        debugTextArea->setPosition(0, 0);
+        debugTextArea->setFontName("BlueHighway");
+        debugTextArea->setDimensions(0.2, 0.5);
+        debugTextArea->setCharHeight(0.025);
+        debugPanel->addChild(debugTextArea);
+        // Add listener to update text
+        mRoot->addFrameListener(new DebugLodStrategyListener(entity, mCamera));
+    }
+
 
 
 	void testBug()
@@ -7516,8 +7665,14 @@ protected:
 		//testFarFromOrigin();
 		//testGeometryShaders();
 		//testAlphaToCoverage();
-		testCompositorTechniqueSwitch(true);
+		//testCompositorTechniqueSwitch(true);
 		//testBlitSubTextures();
+
+        testLod();
+
+
+
+
 		
     }
     // Create new frame listener

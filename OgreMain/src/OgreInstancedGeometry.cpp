@@ -643,12 +643,12 @@ namespace Ogre {
 				ret->setRenderQueueGroup(mRenderQueueID);
 		}
 	
-		const size_t numLod = lastBatchInstance->mLodSquaredDistances.size();
-		ret->mLodSquaredDistances.resize(numLod);
+		const size_t numLod = lastBatchInstance->mLodValues.size();
+		ret->mLodValues.resize(numLod);
 		for (ushort lod = 0; lod < numLod; lod++)
 		{
-			ret->mLodSquaredDistances[lod] =
-			lastBatchInstance->mLodSquaredDistances[lod];
+			ret->mLodValues[lod] =
+			lastBatchInstance->mLodValues[lod];
 		}
 
 
@@ -687,7 +687,7 @@ namespace Ogre {
 		
 			LODBucket* lod = lodIterator.getNext();
 			//create a new lod bucket for the new BatchInstance
-			LODBucket* lodBucket= OGRE_NEW LODBucket(ret,lod->getLod(),lod->getSquaredDistance());
+			LODBucket* lodBucket= OGRE_NEW LODBucket(ret, lod->getLod(), lod->getLodValue());
 
 			//add the lod bucket to the BatchInstance list
 			ret->updateContainers(lodBucket);
@@ -1117,10 +1117,9 @@ namespace Ogre {
 		SceneManager* mgr, uint32 BatchInstanceID)
 		: MovableObject(name), mParent(parent), mSceneMgr(mgr), mNode(0),
 		mBatchInstanceID(BatchInstanceID), mBoundingRadius(0.0f),
-		mCurrentLod(0)
+		mCurrentLod(0),
+        mLodStrategy(0)
 	{
-		// First LOD mandatory, and always from 0
-		mLodSquaredDistances.push_back(0.0f);
 	}
 	//--------------------------------------------------------------------------
 	InstancedGeometry::BatchInstance::~BatchInstance()
@@ -1151,21 +1150,38 @@ namespace Ogre {
 	void InstancedGeometry::BatchInstance::assign(QueuedSubMesh* qmesh)
 	{
 		mQueuedSubMeshes.push_back(qmesh);
-		// update lod distances
+
+        // Set/check lod strategy
+        const LodStrategy *lodStrategy = qmesh->submesh->parent->getLodStrategy();
+        if (mLodStrategy == 0)
+        {
+            mLodStrategy = lodStrategy;
+
+            // First LOD mandatory, and always from base lod value
+            mLodValues.push_back(mLodStrategy->getBaseValue());
+        }
+        else
+        {
+            if (mLodStrategy != lodStrategy)
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Lod strategies do not match",
+                    "InstancedGeometry::InstancedObject::assign");
+        }
+
+		// update lod values
 		ushort lodLevels = qmesh->submesh->parent->getNumLodLevels();
 		assert(qmesh->geometryLodList->size() == lodLevels);
 
-		while(mLodSquaredDistances.size() < lodLevels)
+		while(mLodValues.size() < lodLevels)
 		{
-			mLodSquaredDistances.push_back(0.0f);
+			mLodValues.push_back(0.0f);
 		}
 		// Make sure LOD levels are max of all at the requested level
 		for (ushort lod = 1; lod < lodLevels; ++lod)
 		{
 			const MeshLodUsage& meshLod =
 				qmesh->submesh->parent->getLodLevel(lod);
-			mLodSquaredDistances[lod] = std::max(mLodSquaredDistances[lod],
-				meshLod.fromDepthSquared);
+			mLodValues[lod] = std::max(mLodValues[lod],
+				meshLod.value);
 		}
 
 		// update bounds
@@ -1186,10 +1202,10 @@ namespace Ogre {
 		mNode->attachObject(this);
 		// We need to create enough LOD buckets to deal with the highest LOD
 		// we encountered in all the meshes queued
-		for (ushort lod = 0; lod < mLodSquaredDistances.size(); ++lod)
+		for (ushort lod = 0; lod < mLodValues.size(); ++lod)
 		{
 			LODBucket* lodBucket =
-				OGRE_NEW LODBucket(this, lod, mLodSquaredDistances[lod]);
+				OGRE_NEW LODBucket(this, lod, mLodValues[lod]);
 			mLodBucketList.push_back(lodBucket);
 			// Now iterate over the meshes and assign to LODs
 			// LOD bucket will pick the right LOD to use
@@ -1302,44 +1318,28 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	void InstancedGeometry::BatchInstance::_notifyCurrentCamera(Camera* cam)
 	{
-		// Calculate squared view depth
-		Vector3 diff = cam->getLodCamera()->getDerivedPosition() ;
-		Real squaredDepth = diff.squaredLength();
+        // Set camera
+        mCamera = cam;
 
-		// Determine whether to still render
-		Real renderingDist = mParent->getRenderingDistance();
-		if (renderingDist > 0)
-		{
-			// Max distance to still render
-			Real maxDist = renderingDist + mBoundingRadius;
-			if (squaredDepth > Math::Sqr(maxDist))
-			{
-				mBeyondFarDistance = true;
-				return;
-			}
-		}
 
-		mBeyondFarDistance = false;
+        // Cache squared view depth for use by GeometryBucket
+        mSquaredViewDepth = mParentNode->getSquaredViewDepth(cam->getLodCamera());
 
-		// Distance from the edge of the bounding sphere
-		mCamDistanceSquared = squaredDepth - mBoundingRadius * mBoundingRadius;
-		// Clamp to 0
-		mCamDistanceSquared = std::max(static_cast<Real>(0.0), mCamDistanceSquared);
+        // No lod strategy set yet, skip (this indicates that there are no submeshes)
+        if (mLodStrategy == 0)
+            return;
 
-		// Determine active lod
-		mCurrentLod = static_cast<ushort>(mLodSquaredDistances.size() - 1);
-		assert (!mLodSquaredDistances.empty());
-		mCurrentLod = static_cast <unsigned short> (mLodSquaredDistances.size() - 1);
-	
-		for (ushort i = 0; i < mLodSquaredDistances.size(); ++i)
-		{
-			if (mLodSquaredDistances[i] > mCamDistanceSquared)
-			{
-				mCurrentLod = i - 1;
-				break;
-			}
-		}
+        // Sanity check
+        assert(!mLodValues.empty());
 
+        // Calculate lod value
+        Real lodValue = mLodStrategy->getValue(this, cam);
+
+        // Store lod value for this strategy
+        mLodValue = lodValue;
+
+        // Get lod index
+        mCurrentLod = mLodStrategy->getIndex(lodValue, mLodValues);
 	}
 	//--------------------------------------------------------------------------
 	const AxisAlignedBox& InstancedGeometry::BatchInstance::getBoundingBox(void) const
@@ -1369,7 +1369,7 @@ namespace Ogre {
 		}
 	
 		mLodBucketList[mCurrentLod]->addRenderables(queue, mRenderQueueID,
-			mCamDistanceSquared);
+			mLodValue);
 	}
 	//---------------------------------------------------------------------
 	void InstancedGeometry::BatchInstance::visitRenderables(
@@ -1416,8 +1416,8 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	//--------------------------------------------------------------------------
 	InstancedGeometry::LODBucket::LODBucket(BatchInstance* parent, unsigned short lod,
-		Real lodDist)
-		: mParent(parent), mLod(lod), mSquaredDistance(lodDist)
+		Real lodValue)
+		: mParent(parent), mLod(lod), mLodValue(lodValue)
 	{
 	}
 	//--------------------------------------------------------------------------
@@ -1486,14 +1486,14 @@ namespace Ogre {
 	}
 	//--------------------------------------------------------------------------
 	void InstancedGeometry::LODBucket::addRenderables(RenderQueue* queue,
-		uint8 group, Real camDistanceSquared)
+		uint8 group, Real lodValue)
 	{
 		// Just pass this on to child buckets
 		MaterialBucketMap::iterator i, iend;
 		iend =  mMaterialBucketMap.end();
 		for (i = mMaterialBucketMap.begin(); i != iend; ++i)
 		{
-			i->second->addRenderables(queue, group, camDistanceSquared);
+			i->second->addRenderables(queue, group, lodValue);
 		}
 	}
 	//---------------------------------------------------------------------
@@ -1520,7 +1520,7 @@ namespace Ogre {
 	{
 		of << "LOD Bucket " << mLod << std::endl;
 		of << "------------------" << std::endl;
-		of << "Distance: " << Math::Sqrt(mSquaredDistance) << std::endl;
+		of << "Lod Value: " << mLodValue << std::endl;
 		of << "Number of Materials: " << mMaterialBucketMap.size() << std::endl;
 		for (MaterialBucketMap::const_iterator i = mMaterialBucketMap.begin();
 			i != mMaterialBucketMap.end(); ++i)
@@ -1605,12 +1605,21 @@ namespace Ogre {
 	}
 	//--------------------------------------------------------------------------
 	void InstancedGeometry::MaterialBucket::addRenderables(RenderQueue* queue,
-		uint8 group, Real camDistanceSquared)
+		uint8 group, Real lodValue)
 	{
+        // Get batch instance
+        BatchInstance *batchInstance = mParent->getParent();
+
+        // Get material lod strategy
+        const LodStrategy *materialLodStrategy = mMaterial->getLodStrategy();
+
+        // If material strategy doesn't match, recompute lod value with correct strategy
+        if (materialLodStrategy != batchInstance->mLodStrategy)
+            lodValue = materialLodStrategy->getValue(batchInstance, batchInstance->mCamera);
 
 		// Determine the current material technique
 		mTechnique = mMaterial->getBestTechnique(
-			mMaterial->getLodIndexSquaredDepth(camDistanceSquared));	
+			mMaterial->getLodIndex(lodValue));	
 		GeometryBucketList::iterator i, iend;
 		iend =  mGeometryBucketList.end();
 			
@@ -1844,7 +1853,11 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	Real InstancedGeometry::GeometryBucket::getSquaredViewDepth(const Camera* cam) const
 	{
-		return mParent->getParent()->getSquaredDistance();
+        const BatchInstance *batchInstance = mParent->getParent()->getParent();
+        if (cam == batchInstance->mCamera)
+            return batchInstance->mSquaredViewDepth;
+        else
+            return batchInstance->getParentNode()->getSquaredViewDepth(cam->getLodCamera());
 	}
 	//--------------------------------------------------------------------------
 	const LightList& InstancedGeometry::GeometryBucket::getLights(void) const

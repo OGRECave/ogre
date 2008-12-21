@@ -60,7 +60,6 @@ namespace Ogre {
 		mCullFrustum(0),
 		mUseRenderingDistance(true),
 		mLodCamera(0)
-
     {
 
         // Reasonable defaults to camera params

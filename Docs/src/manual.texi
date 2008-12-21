@@ -377,9 +377,26 @@ You can also reference vertex and fragment programs (or vertex and pixel shaders
 @subheading Top-level material attributes
 The outermost section of a material definition does not have a lot of attributes of its own (most of the configurable parameters are within the child sections. However, it does have some, and here they are:@*@*
 @anchor{lod_distances}
-@subheading lod_distances
-This attribute controls the distances at which different Techniques can come into effect. @xref{Techniques} for a full discussion of this option.
+@subheading lod_distances (deprecated)
+This option is deprecated in favour of @ref{lod_values} now. 
 @*@*
+@anchor{lod_strategy}
+@subheading lod_strategy 
+Sets the name of the LOD strategy to use. Defaults to 'Distance' which means LOD changes based on distance from the camera. Also supported is 'PixelCount' which changes LOD based on an estimate of the screen-space pixels affected. @*@*
+Format: lod_strategy <name>@*
+Default: lod_strategy Distance@*@*
+@subheading lod_values 
+This attribute defines the values used to control the LOD transition for this material. By setting this attribute, you indicate that you want this material to alter the Technique that it uses based on some metric, such as the distance from the camera, or the approximate screen space coverage. The exact meaning of these values is determined by the option you select for @ref{lod_strategy} - it is a list of distances for the 'Distance' strategy, and a list of pixel counts for the 'PixelCount' strategy, for example. You must give it a list of values, in order from highest LOD value to lowest LOD value, each one indicating the point at which the material will switch to the next LOD. Implicitly, all materials activate LOD index 0 for values less than the first entry, so you do not have to specify '0' at the start of the list. You must ensure that there is at least one Technique with a @ref{lod_index} value for each value in the list (so if you specify 3 values, you must have techniques for LOD indexes 0, 1, 2 and 3). Note you must always have at least one Technique at lod_index 0.@*@*
+@*@*
+Format: lod_values <value0> <value1> <value2> ...@*
+Default: none@*@*
+
+Example: @*
+lod_strategy Distance
+lod_values 300.0 600.5 1200@*@*
+
+The above example would cause the material to use the best Technique at lod_index 0 up to a distance of 300 world units, the best from lod_index 1 from 300 up to 600, lod_index 2 from 600 to 1200, and lod_index 3 from 1200 upwards.@*@*
+
 @anchor{receive_shadows}
 @subheading receive_shadows
 This attribute controls whether objects using this material can have shadows cast upon them.@*@* 
@@ -466,18 +483,6 @@ All techniques must belong to a LOD index, by default they all belong to index 0
 The distance at which a LOD level is applied is determined by the lod_distances attribute of the containing material, @xref{lod_distances} for details.@*@*
 
 Default: lod_index 0@*@*
-
-@anchor{lod_distances}
-@subheading lod_distances
-@strong{Note: this attribute must be specified in the outer material section (ie the parent of all the techniques), but it's specified here since it is most relevant to this section.}@*@*
-
-By setting this attribute, you indicate that you want this material to alter the Technique that it uses based on distance from the camera. You must give it a list of distances, in ascending order, each one indicating the distance at which the material will switch to the next LOD. Implicitly, all materials activate LOD index 0 for distances less than the smallest of these. You must ensure that there is at least one Technique with a @ref{lod_index} value for each distance in the list (so if you specify 3 distances, you must have techniques for indexes 1, 2 and 3). Note you must always have at least one Technique at lod_index 0.@*@*
-
-Format: lod_distances <distance_1> [<distance_2> ... <distance_n>]@*
-
-Example: lod_distances 300.0 600.5 1200@*@*
-
-The above example would cause the material to use the best Technique at lod_index 0 up to a distance of 300 world units, the best from lod_index 1 from 300 up to 600, lod_index 2 from 600 to 1200, and lod_index 3 from 1200 upwards.@*@*
 
 Techniques also contain one or more passes (and there must be at least one), @xref{Passes}.
 

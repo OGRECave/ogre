@@ -80,18 +80,20 @@ namespace Ogre {
             share the same scene node as the parent.
     */
 
-
     struct MeshLodUsage;
+    class LodStrategy;
 
     class _OgreExport Mesh: public Resource
     {
         friend class SubMesh;
         friend class MeshSerializerImpl;
+        friend class MeshSerializerImpl_v1_4;
         friend class MeshSerializerImpl_v1_2;
         friend class MeshSerializerImpl_v1_1;
 
     public:
-		typedef std::vector<Real> LodDistanceList;
+		typedef std::vector<Real> LodValueList;
+        typedef std::vector<MeshLodUsage> MeshLodUsageList;
         /// Multimap of vertex bone assignments (orders by vertex index)
         typedef std::multimap<size_t, VertexBoneAssignment> VertexBoneAssignmentList;
         typedef MapIterator<VertexBoneAssignmentList> BoneAssignmentIterator;
@@ -149,9 +151,9 @@ namespace Ogre {
             IndexMap& blendIndexToBoneIndexMap,
             VertexData* targetVertexData);
 
+        const LodStrategy *mLodStrategy;
 		bool mIsLodManual;
 		ushort mNumLods;
-		typedef std::vector<MeshLodUsage> MeshLodUsageList;
 		MeshLodUsageList mMeshLodUsageList;
 
 		HardwareBuffer::Usage mVertexBufferUsage;
@@ -410,13 +412,13 @@ namespace Ogre {
 			to that level of detail. 
 		@par
 			I recommend calling this method before mesh export, not at runtime.
-		@param lodDistances A list of depth values indicating the distances at which new lods should be
+		@param lodValues A list of lod values indicating the values at which new lods should be
 			generated. 
 		@param reductionMethod The way to determine the number of vertices collapsed per LOD
 		@param reductionValue Meaning depends on reductionMethod, typically either the proportion
 			of remaining vertices to collapse or a fixed number of vertices.
 		*/
-		void generateLodLevels(const LodDistanceList& lodDistances, 
+		void generateLodLevels(const LodValueList& lodValues, 
 			ProgressiveMesh::VertexReductionQuota reductionMethod, Real reductionValue);
 
 		/** Returns the number of levels of detail that this mesh supports. 
@@ -436,10 +438,10 @@ namespace Ogre {
 			this is an animated mesh. Therefore for complex models you are likely to be better off
 			modelling your LODs yourself and using this method, whilst for models with fairly
 			simple materials and no animation you can just use the generateLodLevels method.
-		@param fromDepth The z value from which this Lod will apply.
+		@param value The value from which this Lod will apply.
 		@param meshName The name of the mesh which will be the lower level detail version.
 		*/
-		void createManualLodLevel(Real fromDepth, const String& meshName);
+		void createManualLodLevel(Real value, const String& meshName);
 
 		/** Changes the alternate mesh to use as a manual LOD at the given index.
 		@remarks
@@ -450,17 +452,9 @@ namespace Ogre {
 		*/
 		void updateManualLodLevel(ushort index, const String& meshName);
 
-		/** Retrieves the level of detail index for the given depth value. 
+		/** Retrieves the level of detail index for the given lod value. 
 		*/
-		ushort getLodIndex(Real depth) const;
-
-		/** Retrieves the level of detail index for the given squared depth value. 
-		@remarks
-			Internally the lods are stored at squared depths to avoid having to perform
-			square roots when determining the lod. This method allows you to provide a
-			squared length depth value to avoid having to do your own square roots.
-		*/
-		ushort getLodIndexSquaredDepth(Real squaredDepth) const;
+		ushort getLodIndex(Real value) const;
 
 		/** Returns true if this mesh is using manual LOD.
 		@remarks
@@ -856,6 +850,11 @@ namespace Ogre {
 		/** Get pose list */
 		const PoseList& getPoseList(void) const;
 
+        /** Get lod strategy used by this mesh. */
+        const LodStrategy *getLodStrategy() const;
+        /** Set the lod strategy used by this mesh. */
+        void setLodStrategy(LodStrategy *lodStrategy);
+
     };
 
     /** Specialisation of SharedPtr to allow SharedPtr to be assigned to MeshPtr 
@@ -881,8 +880,19 @@ namespace Ogre {
 	/** A way of recording the way each LODs is recorded this Mesh. */
 	struct MeshLodUsage
 	{
-		/// squared Z value from which this LOD will apply
-		Real fromDepthSquared;
+        /** User-supplied values used to determine when th is lod applies.
+        @remarks
+            This is required in case the lod strategy changes.
+        */
+        Real userValue;
+
+		/** Value used by to determine when this lod applies.
+		@remarks
+			May be interpretted differently by different strategies.
+            Transformed from user-supplied values with LodStrategy::transformUserValue.
+		*/
+		Real value;
+		
 		/// Only relevant if mIsLodManual is true, the name of the alternative mesh to use
 		String manualName;
 		/// Hard link to mesh to avoid looking up each time

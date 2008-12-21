@@ -32,6 +32,8 @@ Torus Knot Software Ltd.
 #include "OgrePrerequisites.h"
 #include "OgreMovableObject.h"
 #include "OgreRenderable.h"
+#include "OgreMesh.h"
+#include "OgreLodStrategy.h"
 
 namespace Ogre {
 
@@ -279,7 +281,7 @@ namespace Ogre {
 			void build(bool stencilShadows);
 			/// Add children to the render queue
 			void addRenderables(RenderQueue* queue, uint8 group, 
-				Real camSquaredDist);
+				Real lodValue);
 			/// Get the material for this bucket
 			const MaterialPtr& getMaterial(void) const { return mMaterial; }
 			/// Iterator over geometry
@@ -307,27 +309,27 @@ namespace Ogre {
 			Region* mParent;
 			/// LOD level (0 == full LOD)
 			unsigned short mLod;
-			/// distance at which this LOD starts to apply (squared)
-			Real mSquaredDistance;
+			/// lod value at which this LOD starts to apply (squared)
+			Real mLodValue;
 			/// Lookup of Material Buckets in this region
 			MaterialBucketMap mMaterialBucketMap;
 			/// Geometry queued for a single LOD (deallocated here)
 			QueuedGeometryList mQueuedGeometryList;
 		public:
-			LODBucket(Region* parent, unsigned short lod, Real lodDist);
+			LODBucket(Region* parent, unsigned short lod, Real lodValue);
 			virtual ~LODBucket();
 			Region* getParent(void) { return mParent; }
 			/// Get the lod index
 			ushort getLod(void) const { return mLod; }
-			/// Get the lod squared distance
-			Real getSquaredDistance(void) const { return mSquaredDistance; }
+			/// Get the lod value
+			Real getLodValue(void) const { return mLodValue; }
 			/// Assign a queued submesh to this bucket, using specified mesh LOD
 			void assign(QueuedSubMesh* qsm, ushort atLod);
 			/// Build
 			void build(bool stencilShadows);
 			/// Add children to the render queue
 			void addRenderables(RenderQueue* queue, uint8 group, 
-				Real camSquaredDistance);
+				Real lodValue);
 			/// Iterator over the materials in this LOD
 			typedef MapIterator<MaterialBucketMap> MaterialIterator;
 			/// Get an iterator over the materials in this LOD
@@ -347,6 +349,8 @@ namespace Ogre {
 		*/
 		class _OgreExport Region : public MovableObject
 		{
+            friend class MaterialBucket;
+            friend class GeometryBucket;
 		public:
 			/// list of LOD Buckets in this region
 			typedef std::vector<LODBucket*> LODBucketList;
@@ -384,16 +388,16 @@ namespace Ogre {
 			uint32 mRegionID;
 			/// Center of the region
 			Vector3 mCentre;
-			/// LOD distances (squared) as built up - use the max at each level
-			std::vector<Real> mLodSquaredDistances;
+			/// Lod values as built up - use the max at each level
+			Mesh::LodValueList mLodValues;
 			/// Local AABB relative to region centre
 			AxisAlignedBox mAABB;
 			/// Local bounding radius
 			Real mBoundingRadius;
 			/// The current lod level, as determined from the last camera
 			ushort mCurrentLod;
-			/// Current camera distance, passed on to do material lod later
-			Real mCamDistanceSquared;
+			/// Current lod value, passed on to do material lod later
+			Real mLodValue;
 			/// List of LOD buckets			
 			LODBucketList mLodBucketList;
 			/// List of lights for this region
@@ -406,7 +410,12 @@ namespace Ogre {
 			ShadowRenderableList mShadowRenderables;
 			/// Is a vertex program in use somewhere in this region?
 			bool mVertexProgramInUse;
-
+            /// Lod strategy reference
+            const LodStrategy *mLodStrategy;
+            /// Current camera
+            Camera *mCamera;
+            /// Cached squared view depth value to avoid recalculation by GeometryBucket
+            Real mSquaredViewDepth;
 
 
 		public:

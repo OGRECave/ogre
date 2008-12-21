@@ -194,15 +194,17 @@ namespace Ogre {
 		/// The LOD number of the mesh to use, calculated by _notifyCurrentCamera
 		ushort mMeshLodIndex;
 
-		/// LOD bias factor, inverted for optimisation when calculating adjusted depth
-		Real mMeshLodFactorInv;
+		/// LOD bias factor, transformed for optimisation when calculating adjusted lod value
+		Real mMeshLodFactorTransformed;
 		/// Index of minimum detail LOD (NB higher index is lower detail)
 		ushort mMinMeshLodIndex;
 		/// Index of maximum detail LOD (NB lower index is higher detail)
 		ushort mMaxMeshLodIndex;
 
-		/// LOD bias factor, inverted for optimisation when calculating adjusted depth
-		Real mMaterialLodFactorInv;
+        /// LOD bias factor, not transformed
+        Real mMaterialLodFactor;
+		/// LOD bias factor, transformed for optimisation when calculating adjusted lod value
+		Real mMaterialLodFactorTransformed;
 		/// Index of minimum detail LOD (NB higher index is lower detail)
 		ushort mMinMaterialLodIndex;
 		/// Index of maximum detail LOD (NB lower index is higher detail)
@@ -739,7 +741,8 @@ namespace Ogre {
 		void visitRenderables(Renderable::Visitor* visitor, 
 			bool debugRenderables = false);
 
-
+        /** Get the lod strategy transformation of the mesh lod factor. */
+        Real _getMeshLodFactorTransformed() const;
 
 
 	};

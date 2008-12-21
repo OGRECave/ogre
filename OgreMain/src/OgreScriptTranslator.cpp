@@ -45,6 +45,8 @@ Torus Knot Software Ltd.
 #include "OgreCompositionTargetPass.h"
 #include "OgreCompositionPass.h"
 #include "OgreExternalTextureSourceManager.h"
+#include "OgreLodStrategyManager.h"
+#include "OgreDistanceLodStrategy.h"
 
 namespace Ogre{
 	
@@ -442,9 +444,9 @@ namespace Ogre{
 				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
 				switch(prop->id)
 				{
-				case ID_LOD_DISTANCES:
+				case ID_LOD_VALUES:
 					{
-						Material::LodDistanceList lods;
+						Material::LodValueList lods;
 						for(AbstractNodeList::iterator j = prop->values.begin(); j != prop->values.end(); ++j)
 						{
 							Real v = 0;
@@ -452,11 +454,62 @@ namespace Ogre{
 								lods.push_back(v);
 							else
 								compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
-									"lod_distances expects only numbers as arguments");
+									"lod_values expects only numbers as arguments");
 						}
 						mMaterial->setLodLevels(lods);
 					}
 					break;
+                case ID_LOD_DISTANCES:
+                    {
+                        // Set strategy to distance strategy
+                        LodStrategy *strategy = DistanceLodStrategy::getSingletonPtr();
+                        mMaterial->setLodStrategy(strategy);
+
+                        // Read in lod distances
+                        Material::LodValueList lods;
+                        for(AbstractNodeList::iterator j = prop->values.begin(); j != prop->values.end(); ++j)
+                        {
+                            Real v = 0;
+                            if(getReal(*j, &v))
+                                lods.push_back(v);
+                            else
+                                compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
+                                    "lod_values expects only numbers as arguments");
+                        }
+                        mMaterial->setLodLevels(lods);
+                    }
+                    break;
+                case ID_LOD_STRATEGY:
+                    if (prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if (prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "lod_strategy only supports 1 argument");
+                    }
+                    else
+                    {
+                        String strategyName;
+                        bool result = getString(prop->values.front(), &strategyName);
+                        if (result)
+                        {
+                            LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(strategyName);
+
+                            result = (strategy != 0);
+
+                            if (result)
+                                mMaterial->setLodStrategy(strategy);
+                        }
+                        
+                        if (!result)
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                "lod_strategy argument must be a valid lod strategy");
+                        }
+                    }
+                    break;
 				case ID_RECEIVE_SHADOWS:
 					if(prop->values.empty())
 					{

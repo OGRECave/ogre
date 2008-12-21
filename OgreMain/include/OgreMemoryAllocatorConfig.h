@@ -283,6 +283,7 @@ namespace Ogre
 	typedef GeneralAllocatedObject		UtilityAlloc;
 	typedef GeometryAllocatedObject		VertexDataAlloc;
 	typedef RenderSysAllocatedObject	ViewportAlloc;
+	typedef SceneCtlAllocatedObject		LodAlloc;
 
 	// Containers (by-value only)
 	// Will  be of the form:

@@ -377,6 +377,10 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 				RelativePath="..\src\OgreDefaultSceneQueries.cpp">
 			</File>
 			<File
+				RelativePath="..\src\OgreDistanceLodStrategy.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\OgreDynLib.cpp">
 			</File>
 			<File
@@ -488,6 +492,12 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 			<File
 				RelativePath="..\src\OgreLight.cpp">
 			</File>
+			<File
+				RelativePath="..\src\OgreLodStrategy.cpp">
+			</File>
+			<File
+				RelativePath="..\src\OgreLodStrategyManager.cpp">
+			</File>			
 			<File
 				RelativePath="..\src\OgreLog.cpp">
 			</File>
@@ -604,6 +614,9 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 			</File>
 			<File
 				RelativePath="..\src\OgrePixelConversions.h">
+			</File>
+			<File
+				RelativePath="..\src\OgrePixelCountLodStrategy.cpp">
 			</File>
 			<File
 				RelativePath="..\src\OgrePixelFormat.cpp">
@@ -1009,6 +1022,9 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 				RelativePath="..\include\OgreDefaultHardwareBufferManager.h">
 			</File>
 			<File
+				RelativePath="..\include\OgreDistanceLodStrategy.h">
+			</File>
+			<File
 				RelativePath="..\include\OgreDllInteface.h">
 			</File>
 			<File
@@ -1109,6 +1125,15 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 			</File>
 			<File
 				RelativePath="..\include\OgreLight.h">
+			</File>
+			<File
+				RelativePath="..\include\OgreLodListener.h">
+			</File>
+			<File
+				RelativePath="..\include\OgreLodStrategy.h">
+			</File>
+			<File
+				RelativePath="..\include\OgreLodStrategyManager.h">
 			</File>
 			<File
 				RelativePath="..\include\OgreLog.h">
@@ -1244,6 +1269,9 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 			</File>
 			<File
 				RelativePath="..\include\OgrePatchSurface.h">
+			</File>
+			<File
+				RelativePath="..\include\OgrePixelCountLodStrategy.h">
 			</File>
 			<File
 				RelativePath="..\include\OgrePixelFormat.h">

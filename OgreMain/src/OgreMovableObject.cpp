@@ -36,6 +36,7 @@ Torus Knot Software Ltd.
 #include "OgreRoot.h"
 #include "OgreSceneManager.h"
 #include "OgreCamera.h"
+#include "OgreLodListener.h"
 
 namespace Ogre {
 	//-----------------------------------------------------------------------
@@ -255,6 +256,15 @@ namespace Ogre {
 			{
 				mBeyondFarDistance = false;
 			}
+
+            // Construct event object
+            MovableObjectLodChangedEvent evt;
+            evt.movableObject = this;
+            evt.camera = cam;
+
+            // Notify lod event listeners
+            cam->getSceneManager()->_notifyMovableObjectLodChanged(evt);
+
 		}
 
         mRenderingDisabled = mListener && !mListener->objectRendering(this, cam);

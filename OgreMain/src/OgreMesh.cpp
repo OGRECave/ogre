@@ -43,6 +43,8 @@ Torus Knot Software Ltd.
 #include "OgreAnimationTrack.h"
 #include "OgreOptimisedUtil.h"
 #include "OgreTangentSpaceCalc.h"
+#include "OgreLodStrategyManager.h"
+
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -115,9 +117,13 @@ namespace Ogre {
 		sharedVertexData(0)
     {
 
+        // Initialise to default strategy
+        mLodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
+
 		// Init first (manual) lod
 		MeshLodUsage lod;
-		lod.fromDepthSquared = 0.0f;
+        lod.userValue = std::numeric_limits<Real>::quiet_NaN(); // User value not used for base lod level
+		lod.value = mLodStrategy->getBaseValue();
         lod.edgeData = NULL;
         lod.manualMesh.setNull();
 		mMeshLodUsageList.push_back(lod);
@@ -196,6 +202,13 @@ namespace Ogre {
 				buildEdgeList();
 			}
 		}
+
+        // The loading process accesses lod usages directly, so
+        // transformation of user values must occur after loading is complete.
+
+        // Transform user lod values (starting at index 1, no need to transform base value)
+		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin(); i != mMeshLodUsageList.end(); ++i)
+            i->value = mLodStrategy->transformUserValue(i->userValue);
 	}
 	//-----------------------------------------------------------------------
     void Mesh::prepareImpl()
@@ -347,6 +360,7 @@ namespace Ogre {
         newMesh->mAABB = mAABB;
         newMesh->mBoundRadius = mBoundRadius;
 
+        newMesh->mLodStrategy = mLodStrategy;
 		newMesh->mIsLodManual = mIsLodManual;
 		newMesh->mNumLods = mNumLods;
 		newMesh->mMeshLodUsageList = mMeshLodUsageList;
@@ -854,24 +868,17 @@ namespace Ogre {
         return mSkeletonName;
     }
     //---------------------------------------------------------------------
-    void Mesh::generateLodLevels(const LodDistanceList& lodDistances,
+    void Mesh::generateLodLevels(const LodValueList& lodValues,
         ProgressiveMesh::VertexReductionQuota reductionMethod, Real reductionValue)
     {
 #if OGRE_DEBUG_MODE
-        Real prev = 0;
-        for (LodDistanceList::const_iterator it = lodDistances.begin();
-            it != lodDistances.end(); ++it)
-        {
-            Real cur = (*it) * (*it);
-            assert(cur >= prev && "The lod distances must be sort ascending");
-            prev = cur;
-        }
+        mLodStrategy->assertSorted(lodValues);
 #endif
 
         removeLodLevels();
 
 		LogManager::getSingleton().stream()
-			<< "Generating " << lodDistances.size()
+			<< "Generating " << lodValues.size()
 			<< " lower LODs for mesh " << mName;
 
         SubMeshList::iterator isub, isubend;
@@ -886,7 +893,7 @@ namespace Ogre {
 
                 ProgressiveMesh pm(pVertexData, (*isub)->indexData);
                 pm.build(
-                static_cast<ushort>(lodDistances.size()),
+                static_cast<ushort>(lodValues.size()),
                     &((*isub)->mLodFaceList),
                     reductionMethod, reductionValue);
 
@@ -894,7 +901,7 @@ namespace Ogre {
             else
             {
                 // create empty index data for each lod
-                for (size_t i = 0; i < lodDistances.size(); ++i)
+                for (size_t i = 0; i < lodValues.size(); ++i)
                 {
                     (*isub)->mLodFaceList.push_back(OGRE_NEW IndexData);
                 }
@@ -902,19 +909,20 @@ namespace Ogre {
         }
 
         // Iterate over the lods and record usage
-        LodDistanceList::const_iterator idist, idistend;
-        idistend = lodDistances.end();
-        mMeshLodUsageList.resize(lodDistances.size() + 1);
+        LodValueList::const_iterator ivalue, ivalueend;
+        ivalueend = lodValues.end();
+        mMeshLodUsageList.resize(lodValues.size() + 1);
         MeshLodUsageList::iterator ilod = mMeshLodUsageList.begin();
-        for (idist = lodDistances.begin(); idist != idistend; ++idist)
+        for (ivalue = lodValues.begin(); ivalue != ivalueend; ++ivalue)
         {
             // Record usage
             MeshLodUsage& lod = *++ilod;
-            lod.fromDepthSquared = (*idist) * (*idist);
+            lod.userValue = (*ivalue);
+            lod.value = mLodStrategy->transformUserValue(lod.userValue);
             lod.edgeData = 0;
             lod.manualMesh.setNull();
         }
-        mNumLods = static_cast<ushort>(lodDistances.size() + 1);
+        mNumLods = static_cast<ushort>(lodValues.size() + 1);
     }
     //---------------------------------------------------------------------
     ushort Mesh::getNumLodLevels(void) const
@@ -953,32 +961,23 @@ namespace Ogre {
         return mMeshLodUsageList[index];
     }
     //---------------------------------------------------------------------
-	struct ManualLodSortLess :
-	public std::binary_function<const MeshLodUsage&, const MeshLodUsage&, bool>
-	{
-		bool operator() (const MeshLodUsage& mesh1, const MeshLodUsage& mesh2)
-		{
-			// sort ascending by depth
-			return mesh1.fromDepthSquared < mesh2.fromDepthSquared;
-		}
-	};
-	void Mesh::createManualLodLevel(Real fromDepth, const String& meshName)
+	void Mesh::createManualLodLevel(Real lodValue, const String& meshName)
 	{
 
 		// Basic prerequisites
-        assert(fromDepth > 0 && "The LOD depth must be greater than zero");
         assert((mIsLodManual || mNumLods == 1) && "Generated LODs already in use!");
 
 		mIsLodManual = true;
 		MeshLodUsage lod;
-		lod.fromDepthSquared = fromDepth * fromDepth;
+		lod.userValue = lodValue;
+        lod.value = mLodStrategy->transformUserValue(lod.userValue);
 		lod.manualName = meshName;
 		lod.manualMesh.setNull();
         lod.edgeData = 0;
 		mMeshLodUsageList.push_back(lod);
 		++mNumLods;
 
-		std::sort(mMeshLodUsageList.begin(), mMeshLodUsageList.end(), ManualLodSortLess());
+        mLodStrategy->sort(mMeshLodUsageList);
 	}
     //---------------------------------------------------------------------
 	void Mesh::updateManualLodLevel(ushort index, const String& meshName)
@@ -997,28 +996,10 @@ namespace Ogre {
         lod->edgeData = 0;
 	}
     //---------------------------------------------------------------------
-	ushort Mesh::getLodIndex(Real depth) const
+	ushort Mesh::getLodIndex(Real value) const
 	{
-		return getLodIndexSquaredDepth(depth * depth);
-	}
-    //---------------------------------------------------------------------
-	ushort Mesh::getLodIndexSquaredDepth(Real squaredDepth) const
-	{
-		MeshLodUsageList::const_iterator i, iend;
-		iend = mMeshLodUsageList.end();
-		ushort index = 0;
-		for (i = mMeshLodUsageList.begin(); i != iend; ++i, ++index)
-		{
-			if (i->fromDepthSquared > squaredDepth)
-			{
-				return index - 1;
-			}
-		}
-
-		// If we fall all the way through, use the highest value
-		return static_cast<ushort>(mMeshLodUsageList.size() - 1);
-
-
+        // Get index from strategy
+        return mLodStrategy->getIndex(value, mMeshLodUsageList);
 	}
     //---------------------------------------------------------------------
 	void Mesh::_setLodInfo(unsigned short numLevels, bool isManual)
@@ -1095,7 +1076,8 @@ namespace Ogre {
         mNumLods = 1;
 		// Init first (manual) lod
 		MeshLodUsage lod;
-		lod.fromDepthSquared = 0.0f;
+        lod.userValue = std::numeric_limits<Real>::quiet_NaN();
+		lod.value = mLodStrategy->getBaseValue();
         lod.edgeData = 0;
         lod.manualMesh.setNull();
 		mMeshLodUsageList.push_back(lod);
@@ -2150,6 +2132,24 @@ namespace Ogre {
 
     }
 	//---------------------------------------------------------------------
+    const LodStrategy *Mesh::getLodStrategy() const
+    {
+        return mLodStrategy;
+    }
+    //---------------------------------------------------------------------
+    void Mesh::setLodStrategy(LodStrategy *lodStrategy)
+    {
+        mLodStrategy = lodStrategy;
+
+        assert(mMeshLodUsageList.size());
+        mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
+
+        // Re-transform user lod values (starting at index 1, no need to transform base value)
+		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin(); i != mMeshLodUsageList.end(); ++i)
+            i->value = mLodStrategy->transformUserValue(i->userValue);
+
+    }
+    //---------------------------------------------------------------------
 
 }
 

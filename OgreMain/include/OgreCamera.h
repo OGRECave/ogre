@@ -149,8 +149,8 @@ namespace Ogre {
 		Frustum *mCullFrustum;
 		/// Whether or not the rendering distance of objects should take effect for this camera
 		bool mUseRenderingDistance;
-		/// Camera to use for LOD calculation
-		const Camera* mLodCamera;
+        /// Camera to use for LOD calculation
+        const Camera* mLodCamera;
 
 
         // Internal functions for calcs

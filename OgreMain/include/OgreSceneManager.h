@@ -51,6 +51,7 @@ Torus Knot Software Ltd.
 #include "OgreShadowTextureManager.h"
 #include "OgreCamera.h"
 #include "OgreInstancedGeometry.h"
+#include "OgreLodListener.h"
 
 namespace Ogre {
 
@@ -900,6 +901,33 @@ namespace Ogre {
 		bool mCameraRelativeRendering;
 		Matrix4 mCachedViewMatrix;
 		Vector3 mCameraRelativePosition;
+
+
+
+
+
+
+
+
+
+
+
+
+        /// Set of registered lod listeners
+        typedef std::set<LodListener*> LodListenerSet;
+        LodListenerSet mLodListeners;
+
+        /// List of movable object lod changed events
+        typedef std::vector<MovableObjectLodChangedEvent> MovableObjectLodChangedEventList;
+        MovableObjectLodChangedEventList mMovableObjectLodChangedEvents;
+
+        /// List of entity mesh lod changed events
+        typedef std::vector<EntityMeshLodChangedEvent> EntityMeshLodChangedEventList;
+        EntityMeshLodChangedEventList mEntityMeshLodChangedEvents;
+
+        /// List of entity material lod changed events
+        typedef std::vector<EntityMaterialLodChangedEvent> EntityMaterialLodChangedEventList;
+        EntityMaterialLodChangedEventList mEntityMaterialLodChangedEvents;
 
     public:
         /** Constructor.
@@ -3141,6 +3169,29 @@ namespace Ogre {
 			to always place the camera at the origin and move the world around it.
 		*/
 		virtual bool getCameraRelativeRendering() const { return mCameraRelativeRendering; }
+
+
+        /** Add a level of detail listener. */
+        void addLodListener(LodListener *listener);
+
+        /**
+        Remove a level of detail listener.
+        @remarks
+            Do not call from inside an LodListener callback method.
+        */
+        void removeLodListener(LodListener *listener);
+
+        /** Notify that a movable object lod change event has occurred. */
+        void _notifyMovableObjectLodChanged(MovableObjectLodChangedEvent& evt);
+
+        /** Notify that an entity mesh lod change event has occurred. */
+        void _notifyEntityMeshLodChanged(EntityMeshLodChangedEvent& evt);
+
+        /** Notify that an entity material lod change event has occurred. */
+        void _notifyEntityMaterialLodChanged(EntityMaterialLodChangedEvent& evt);
+
+        /** Handle lod events. */
+        void _handleLodEvents();
     };
 
     /** Default implementation of IntersectionSceneQuery. */

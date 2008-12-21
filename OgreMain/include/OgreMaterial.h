@@ -37,11 +37,11 @@ Torus Knot Software Ltd.
 #include "OgreColourValue.h"
 #include "OgreBlendMode.h"
 
-
 namespace Ogre {
 
 	// Forward declaration
 	class MaterialPtr;
+    class LodStrategy;
 
 	/** Class encapsulates rendering properties of an object.
     @remarks
@@ -87,8 +87,8 @@ namespace Ogre {
 
     public:
         /// distance list used to specify LOD
-        typedef std::vector<Real> LodDistanceList;
-        typedef ConstVectorIterator<LodDistanceList> LodDistanceIterator;
+        typedef std::vector<Real> LodValueList;
+        typedef ConstVectorIterator<LodValueList> LodValueIterator;
     protected:
 
 
@@ -109,7 +109,9 @@ namespace Ogre {
 		*/
         BestTechniquesBySchemeList mBestTechniquesBySchemeList;
 
-        LodDistanceList mLodDistances;
+        LodValueList mUserLodValues;
+        LodValueList mLodValues;
+        const LodStrategy *mLodStrategy;
         bool mReceiveShadows;
 		bool mTransparencyCastsShadows;
         /// Does this material require compilation?
@@ -598,25 +600,27 @@ namespace Ogre {
             method to determine the distance at which the lowe levels of detail kick in.
             The decision about what distance is actually used is a combination of this
             and the LOD bias applied to both the current Camera and the current Entity.
-        @param lodDistances A vector of Reals which indicate the distance at which to 
+        @param lodValues A vector of Reals which indicate the lod value at which to 
             switch to lower details. They are listed in LOD index order, starting at index
             1 (ie the first level down from the highest level 0, which automatically applies
-            from a distance of 0).
+            from a value of 0).
         */
-        void setLodLevels(const LodDistanceList& lodDistances);
-        /** Gets an iterator over the list of distances at which each LOD comes into effect. 
+        void setLodLevels(const LodValueList& lodValues);
+        /** Gets an iterator over the list of values at which each LOD comes into effect. 
         @remarks
             Note that the iterator returned from this method is not totally analogous to 
             the one passed in by calling setLodLevels - the list includes a zero
-            entry at the start (since the highest LOD starts at distance 0), and
-            the other distances are held as their squared value for efficiency.
+            entry at the start (since the highest LOD starts at value 0).
         */
-        LodDistanceIterator getLodDistanceIterator(void) const;
+        LodValueIterator getLodValueIterator(void) const;
 
-        /** Gets the LOD index to use at the given distance. */
-        unsigned short getLodIndex(Real d) const;
-        /** Gets the LOD index to use at the given squared distance. */
-        unsigned short getLodIndexSquaredDepth(Real squaredDepth) const;
+        /** Gets the LOD index to use at the given value. */
+        ushort getLodIndex(Real value) const;
+
+        /** Get lod strategy used by this material. */
+        const LodStrategy *getLodStrategy() const;
+        /** Set the lod strategy used by this material. */
+        void setLodStrategy(LodStrategy *lodStrategy);
 
         /** @copydoc Resource::touch
         */

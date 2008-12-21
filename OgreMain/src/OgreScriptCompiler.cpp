@@ -1019,6 +1019,8 @@ namespace Ogre
 		mIds["shadow_receiver_vertex_program_ref"] = ID_SHADOW_RECEIVER_VERTEX_PROGRAM_REF;
 		mIds["shadow_receiver_fragment_program_ref"] = ID_SHADOW_RECEIVER_FRAGMENT_PROGRAM_REF;
 
+        mIds["lod_values"] = ID_LOD_VALUES;
+        mIds["lod_strategy"] = ID_LOD_STRATEGY;
 		mIds["lod_distances"] = ID_LOD_DISTANCES;
 		mIds["receive_shadows"] = ID_RECEIVE_SHADOWS;
 		mIds["transparency_casts_shadows"] = ID_TRANSPARENCY_CASTS_SHADOWS;

@@ -37,6 +37,7 @@ Torus Knot Software Ltd.
 #include "OgreAnimationTrack.h"
 #include "OgreBone.h"
 #include "OgreIteratorWrappers.h"
+#include "OgreMesh.h"
 
 namespace Ogre {
 
@@ -338,7 +339,7 @@ namespace Ogre {
 			void build();
 			/// Add children to the render queue
 			void addRenderables(RenderQueue* queue, uint8 group, 
-				Real camSquaredDist);
+				Real lodValue);
 			/// Get the material for this bucket
 			const MaterialPtr& getMaterial(void) const { return mMaterial; }
 			/// Iterator over geometry
@@ -376,27 +377,27 @@ namespace Ogre {
 			BatchInstance* mParent;
 			/// LOD level (0 == full LOD)
 			unsigned short mLod;
-			/// distance at which this LOD starts to apply (squared)
-			Real mSquaredDistance;
+			/// lod value at which this LOD starts to apply (squared)
+			Real mLodValue;
 			/// Lookup of Material Buckets in this BatchInstance
 			MaterialBucketMap mMaterialBucketMap;
 			/// Geometry queued for a single LOD (deallocated here)
 			QueuedGeometryList mQueuedGeometryList;
 		public:
-			LODBucket(BatchInstance* parent, unsigned short lod, Real lodDist);
+			LODBucket(BatchInstance* parent, unsigned short lod, Real lodValue);
 			virtual ~LODBucket();
 			BatchInstance* getParent(void) { return mParent; }
 			/// Get the lod index
 			ushort getLod(void) const { return mLod; }
-			/// Get the lod squared distance
-			Real getSquaredDistance(void) const { return mSquaredDistance; }
+			/// Get the lod value
+			Real getLodValue(void) const { return mLodValue; }
 			/// Assign a queued submesh to this bucket, using specified mesh LOD
 			void assign(QueuedSubMesh* qsm, ushort atLod);
 			/// Build
 			void build();
 			/// Add children to the render queue
 			void addRenderables(RenderQueue* queue, uint8 group, 
-				Real camSquaredDistance);
+				Real lodValue);
 			/// Iterator over the materials in this LOD
 			typedef MapIterator<MaterialBucketMap> MaterialIterator;
 			/// Get an iterator over the materials in this LOD
@@ -418,6 +419,7 @@ namespace Ogre {
 		*/
 		class _OgreExport  BatchInstance : public MovableObject
 		{
+            friend class MaterialBucket;
 			public:
 		
 
@@ -440,19 +442,25 @@ namespace Ogre {
 
 			ObjectsMap mInstancesMap;
 		public:
-			/// LOD distances (squared) as built up - use the max at each level
-			std::vector<Real> mLodSquaredDistances;
+			/// Lod values as built up - use the max at each level
+			Mesh::LodValueList mLodValues;
 			/// Local AABB relative to BatchInstance centre
 			AxisAlignedBox mAABB;
 			/// Local bounding radius
 			Real mBoundingRadius;
 			/// The current lod level, as determined from the last camera
 			ushort mCurrentLod;
-			/// Current camera distance, passed on to do material lod later
-			Real mCamDistanceSquared;
+			/// Current lod value, passed on to do material lod later
+			Real mLodValue;
+            /// Current camera, passed on to do material lod later
+            Camera *mCamera;
+            /// Cached squared view depth value to avoid recalculation by GeometryBucket
+            Real mSquaredViewDepth;
 		protected:
 			/// List of LOD buckets			
 			LODBucketList mLodBucketList;
+            /// Lod strategy reference
+            const LodStrategy *mLodStrategy;
 
 		public:
 			BatchInstance(InstancedGeometry* parent, const String& name, SceneManager* mgr, 
@@ -650,6 +658,7 @@ namespace Ogre {
 			this InstancedGeometry if you like. The Entity passed in is simply 
 			used as a definition.
 		@note Must be called before 'build'.
+        @note All added entities must use the same lod strategy.
 		@param ent The Entity to use as a definition (the Mesh and Materials 
 			referenced will be recorded for the build call).
 		@param position The world position at which to add this Entity
@@ -675,6 +684,7 @@ namespace Ogre {
 			versions! We don't do this for you incase you are preparing this 
 			in advance and so don't want the originals detached yet. 
 		@note Must be called before 'build'.
+        @note All added entities must use the same lod strategy.
 		@param node Pointer to the node to use to provide a set of Entity 
 			templates
 		*/

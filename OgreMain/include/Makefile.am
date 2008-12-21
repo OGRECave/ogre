@@ -38,6 +38,7 @@ pkginclude_HEADERS = Ogre.h \
                      OgreDataStream.h \
                      OgreDDSCodec.h \
                      OgreDefaultHardwareBufferManager.h \
+                     OgreDistanceLodStrategy.h \
                      OgreDynLib.h \
                      OgreDynLibManager.h \
                      OgreEdgeListBuilder.h \
@@ -73,6 +74,9 @@ pkginclude_HEADERS = Ogre.h \
                      OgreIteratorWrappers.h \
                      OgreKeyFrame.h \
                      OgreLight.h \
+                     OgreLodListener.h \
+                     OgreLodStrategy.h \
+                     OgreLodStrategyManager.h \
                      OgreLog.h \
                      OgreLogManager.h \
                      OgreManualObject.h \
@@ -118,6 +122,7 @@ pkginclude_HEADERS = Ogre.h \
                      OgrePass.h \
                      OgrePatchMesh.h \
                      OgrePatchSurface.h \
+                     OgrePixelCountLodStrategy.h \
                      OgrePixelFormat.h \
                      OgrePlane.h \
                      OgrePlaneBoundedVolume.h \
