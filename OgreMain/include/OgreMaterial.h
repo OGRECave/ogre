@@ -603,18 +603,25 @@ namespace Ogre {
         @param lodValues A vector of Reals which indicate the lod value at which to 
             switch to lower details. They are listed in LOD index order, starting at index
             1 (ie the first level down from the highest level 0, which automatically applies
-            from a value of 0).
+            from a value of 0). These are 'user values', before being potentially 
+			transformed by the strategy, so for the distance strategy this is an
+			unsquared distance for example.
         */
         void setLodLevels(const LodValueList& lodValues);
         /** Gets an iterator over the list of values at which each LOD comes into effect. 
         @remarks
             Note that the iterator returned from this method is not totally analogous to 
             the one passed in by calling setLodLevels - the list includes a zero
-            entry at the start (since the highest LOD starts at value 0).
+            entry at the start (since the highest LOD starts at value 0). Also, the
+			values returned are after being transformed by LodStrategy::transformUserValue.
         */
         LodValueIterator getLodValueIterator(void) const;
 
-        /** Gets the LOD index to use at the given value. */
+        /** Gets the LOD index to use at the given value. 
+		@note The value passed in is the 'transformed' value. If you are dealing with
+		an original source value (e.g. distance), use LodStrategy::transformUserValue
+		to turn this into a lookup value.
+		*/
         ushort getLodIndex(Real value) const;
 
         /** Get lod strategy used by this material. */

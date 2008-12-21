@@ -413,7 +413,9 @@ namespace Ogre {
 		@par
 			I recommend calling this method before mesh export, not at runtime.
 		@param lodValues A list of lod values indicating the values at which new lods should be
-			generated. 
+		generated. These are 'user values', before being potentially 
+		transformed by the strategy, so for the distance strategy this is an
+		unsquared distance for example.
 		@param reductionMethod The way to determine the number of vertices collapsed per LOD
 		@param reductionValue Meaning depends on reductionMethod, typically either the proportion
 			of remaining vertices to collapse or a fixed number of vertices.
@@ -453,6 +455,9 @@ namespace Ogre {
 		void updateManualLodLevel(ushort index, const String& meshName);
 
 		/** Retrieves the level of detail index for the given lod value. 
+		@note The value passed in is the 'transformed' value. If you are dealing with
+		an original source value (e.g. distance), use LodStrategy::transformUserValue
+		to turn this into a lookup value.
 		*/
 		ushort getLodIndex(Real value) const;
 
