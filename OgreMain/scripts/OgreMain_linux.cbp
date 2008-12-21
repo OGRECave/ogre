@@ -138,6 +138,7 @@
 		<Unit filename="../include/OgreFreeImageCodec.h" />
 		<Unit filename="../include/OgreFrustum.h" />
 		<Unit filename="../include/OgreGpuProgram.h" />
+		<Unit filename="../include/OgreDistanceLodStrategy.h" />
 		<Unit filename="../include/OgreGpuProgramManager.h" />
 		<Unit filename="../include/OgreGpuProgramUsage.h" />
 		<Unit filename="../include/OgreHardwareBuffer.h" />
@@ -170,6 +171,9 @@
 		<Unit filename="../include/OgreMeshFileFormat.h" />
 		<Unit filename="../include/OgreMeshManager.h" />
 		<Unit filename="../include/OgreMeshSerializer.h" />
+		<Unit filename="../include/OgreLodListener.h" />
+		<Unit filename="../include/OgreLodStrategy.h" />
+		<Unit filename="../include/OgreLodStrategyManager.h" />
 		<Unit filename="../include/OgreMeshSerializerImpl.h" />
 		<Unit filename="../include/OgreMovableObject.h" />
 		<Unit filename="../include/OgreMovablePlane.h" />
@@ -215,6 +219,7 @@
 		<Unit filename="../include/OgreRay.h" />
 		<Unit filename="../include/OgreRectangle.h" />
 		<Unit filename="../include/OgreRectangle2D.h" />
+		<Unit filename="../include/OgrePixelCountLodStrategy.h" />
 		<Unit filename="../include/OgreRenderOperation.h" />
 		<Unit filename="../include/OgreRenderQueue.h" />
 		<Unit filename="../include/OgreRenderQueueInvocation.h" />
@@ -359,6 +364,7 @@
 		<Unit filename="../src/OgreHighLevelGpuProgram.cpp" />
 		<Unit filename="../src/OgreHighLevelGpuProgramManager.cpp" />
 		<Unit filename="../src/OgreImage.cpp" />
+		<Unit filename="../src/OgreDistanceLodStrategy.cpp" />
 		<Unit filename="../src/OgreImageResampler.h" />
 		<Unit filename="../src/OgreInstancedGeometry.cpp" />
 		<Unit filename="../src/OgreKeyFrame.cpp" />
@@ -386,6 +392,8 @@
 			<Option compiler="gcc" use="1" buildCommand="$compiler $options -msse $includes -c $file -o $object" />
 		</Unit>
 		<Unit filename="../src/OgreOverlay.cpp" />
+		<Unit filename="../src/OgreLodStrategy.cpp" />
+		<Unit filename="../src/OgreLodStrategyManager.cpp" />
 		<Unit filename="../src/OgreOverlayContainer.cpp" />
 		<Unit filename="../src/OgreOverlayElement.cpp" />
 		<Unit filename="../src/OgreOverlayElementCommands.cpp" />
@@ -427,6 +435,7 @@
 		<Unit filename="../src/OgreResource.cpp" />
 		<Unit filename="../src/OgreResourceBackgroundQueue.cpp" />
 		<Unit filename="../src/OgreResourceGroupManager.cpp" />
+		<Unit filename="../src/OgrePixelCountLodStrategy.cpp" />
 		<Unit filename="../src/OgreResourceManager.cpp" />
 		<Unit filename="../src/OgreRibbonTrail.cpp" />
 		<Unit filename="../src/OgreRoot.cpp" />
