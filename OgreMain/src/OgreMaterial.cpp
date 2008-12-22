@@ -818,7 +818,7 @@ namespace Ogre {
         mLodValues[0] = mLodStrategy->getBaseValue();
 
         // Re-transform all user lod values (starting at index 1, no need to transform base value)
-        for (int i = 1; i < mUserLodValues.size(); ++i)
+        for (size_t i = 1; i < mUserLodValues.size(); ++i)
             mLodValues[i] = mLodStrategy->transformUserValue(mUserLodValues[i]);
     }
     //---------------------------------------------------------------------
