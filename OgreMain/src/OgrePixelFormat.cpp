@@ -1268,10 +1268,12 @@ namespace Ogre {
 
         const size_t srcPixelSize = PixelUtil::getNumElemBytes(src.format);
         const size_t dstPixelSize = PixelUtil::getNumElemBytes(dst.format);
-        uint8 *srcptr = static_cast<uint8*>(src.data)
+        /*uint8 *srcptr = static_cast<uint8*>(src.data)
             + (src.left + src.top * src.rowPitch + src.front * src.slicePitch) * srcPixelSize;
         uint8 *dstptr = static_cast<uint8*>(dst.data)
             + (dst.left + dst.top * dst.rowPitch + dst.front * dst.slicePitch) * dstPixelSize;
+		*/
+		uint8 *srcptr = static_cast<uint8*>(src.data), *dstptr = static_cast<uint8*>(dst.data);
 
         // Calculate pitches+skips in bytes
         const size_t srcRowSkipBytes = src.getRowSkip()*srcPixelSize;

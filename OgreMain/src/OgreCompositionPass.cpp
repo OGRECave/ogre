@@ -54,7 +54,9 @@ CompositionPass::CompositionPass(CompositionTargetPass *parent):
     mQuadLeft(-1),
     mQuadTop(1),
     mQuadRight(1),
-    mQuadBottom(-1)
+    mQuadBottom(-1),
+	mQuadFarCorners(false),
+	mQuadFarCornersViewSpace(false)
 {
 }
 //-----------------------------------------------------------------------
@@ -270,6 +272,20 @@ bool CompositionPass::getQuadCorners(Real & left,Real & top,Real & right,Real & 
     bottom = mQuadBottom;
     return mQuadCornerModified;
 }
+void CompositionPass::setQuadFarCorners(bool farCorners, bool farCornersViewSpace)
+{
+	mQuadFarCorners = farCorners;
+	mQuadFarCornersViewSpace = farCornersViewSpace;
+}
+bool CompositionPass::getQuadFarCorners() const
+{
+	return mQuadFarCorners;
+}
+bool CompositionPass::getQuadFarCornersViewSpace() const
+{
+	return mQuadFarCornersViewSpace;
+}
+
 //-----------------------------------------------------------------------
 bool CompositionPass::_isSupported(void)
 {

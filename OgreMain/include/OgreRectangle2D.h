@@ -62,6 +62,10 @@ namespace Ogre {
         */
         void setCorners(Real left, Real top, Real right, Real bottom);
 
+		/** Sets the normals of the rectangle
+		*/
+		void setNormals(const Ogre::Vector3 &topLeft, const Ogre::Vector3 &bottomLeft, const Ogre::Vector3 &topRight, const Ogre::Vector3 &bottomRight);
+
         Real getSquaredViewDepth(const Camera* cam) const { return 0; }
 
         Real getBoundingRadius(void) const { return 0; }

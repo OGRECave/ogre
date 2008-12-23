@@ -845,7 +845,6 @@ namespace Ogre
 					if(insertPos != dest->children.end())
 					{
 						dest->children.insert(insertPos, newNode);
-						insertPos++;
 					}
 					else
 					{
@@ -1243,6 +1242,9 @@ namespace Ogre
 		mIds["identifier"] = ID_IDENTIFIER;
 		mIds["first_render_queue"] = ID_FIRST_RENDER_QUEUE;
 		mIds["last_render_queue"] = ID_LAST_RENDER_QUEUE;
+		mIds["quad_normals"] = ID_QUAD_NORMALS;
+			mIds["camera_far_corners_view_space"] = ID_CAMERA_FAR_CORNERS_VIEW_SPACE;
+			mIds["camera_far_corners_world_space"] = ID_CAMERA_FAR_CORNERS_WORLD_SPACE;
 
 		mIds["buffers"] = ID_BUFFERS;
 			mIds["colour"] = ID_COLOUR;

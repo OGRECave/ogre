@@ -46,6 +46,7 @@ Torus Knot Software Ltd.
 #include "OgreCamera.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
+#include "OgreHardwareBufferManager.h"
 
 namespace Ogre {
 CompositorInstance::CompositorInstance(CompositionTechnique *technique,
@@ -155,15 +156,13 @@ public:
 		instance->_fireNotifyMaterialSetup(pass_id, mat);
 		technique = mat->getTechnique(0);
 		assert(technique);
-        
-       
 	}
 	MaterialPtr mat;
 	Technique *technique;
 	CompositorInstance *instance;
 	uint32 pass_id;
 
-    bool mQuadCornerModified;
+    bool mQuadCornerModified, mQuadFarCorners, mQuadFarCornersViewSpace;
     Real mQuadLeft;
     Real mQuadTop;
     Real mQuadRight;
@@ -177,30 +176,50 @@ public:
         mQuadBottom = bottom;
         mQuadCornerModified=true;
     }
-        
+
+	void setQuadFarCorners(bool farCorners, bool farCornersViewSpace)
+	{
+		mQuadFarCorners = farCorners;
+		mQuadFarCornersViewSpace = farCornersViewSpace;
+	}
+   
 	virtual void execute(SceneManager *sm, RenderSystem *rs)
 	{
 		// Fire listener
 		instance->_fireNotifyMaterialRender(pass_id, mat);
 
-        Rectangle2D * mRectangle=static_cast<Rectangle2D *>(CompositorManager::getSingleton()._getTexturedRectangle2D());
-        if (mQuadCornerModified)
-        {
-            // insure positions are using peculiar render system offsets 
-            RenderSystem* rs = Root::getSingleton().getRenderSystem();
-            Viewport* vp = rs->_getViewport();
-            Real hOffset = rs->getHorizontalTexelOffset() / (0.5 * vp->getActualWidth());
-            Real vOffset = rs->getVerticalTexelOffset() / (0.5 * vp->getActualHeight());
-            mRectangle->setCorners(mQuadLeft + hOffset, mQuadTop - vOffset, mQuadRight + hOffset, mQuadBottom - vOffset);
-        }
-        
+        Viewport* vp = rs->_getViewport();
+		Rectangle2D *rect = static_cast<Rectangle2D*>(CompositorManager::getSingleton()._getTexturedRectangle2D());
+
+		if (mQuadCornerModified)
+		{
+			// insure positions are using peculiar render system offsets 
+			Real hOffset = rs->getHorizontalTexelOffset() / (0.5 * vp->getActualWidth());
+			Real vOffset = rs->getVerticalTexelOffset() / (0.5 * vp->getActualHeight());
+			rect->setCorners(mQuadLeft + hOffset, mQuadTop - vOffset, mQuadRight + hOffset, mQuadBottom - vOffset);
+		}
+
+		if(mQuadFarCorners)
+		{
+			const Ogre::Vector3 *corners = vp->getCamera()->getWorldSpaceCorners();
+			if(mQuadFarCornersViewSpace)
+			{
+				const Ogre::Matrix4 &viewMat = vp->getCamera()->getViewMatrix(true);
+				rect->setNormals(viewMat*corners[5], viewMat*corners[6], viewMat*corners[4], viewMat*corners[7]);
+			}
+			else
+			{
+				rect->setNormals(corners[5], corners[6], corners[4], corners[7]);
+			}
+		}
+
 		// Queue passes from mat
 		Technique::PassIterator i = technique->getPassIterator();
 		while(i.hasMoreElements())
 		{
 			sm->_injectRenderWithPass(
 				i.getNext(), 
-				mRectangle,
+				rect,
 				false // don't allow replacement of shadow passes
 				);
 		}
@@ -310,7 +329,8 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
             Real left,top,right,bottom;
             if (pass->getQuadCorners(left,top,right,bottom))
                 rsQuadOperation->setQuadCorners(left,top,right,bottom);
-                
+			rsQuadOperation->setQuadFarCorners(pass->getQuadFarCorners(), pass->getQuadFarCornersViewSpace());
+			
 			queueRenderSystemOp(finalState,rsQuadOperation);
             break;
         }

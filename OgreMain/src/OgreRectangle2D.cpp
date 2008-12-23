@@ -35,7 +35,8 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 #define POSITION_BINDING 0
-#define TEXCOORD_BINDING 1
+#define NORMAL_BINDING 1
+#define TEXCOORD_BINDING 2
 
     Rectangle2D::Rectangle2D(bool includeTextureCoords) 
     {
@@ -65,6 +66,35 @@ namespace Ogre {
 
         // Bind buffer
         bind->setBinding(POSITION_BINDING, vbuf);
+
+		decl->addElement(NORMAL_BINDING, 0, VET_FLOAT3, VES_NORMAL);
+
+		vbuf = 
+			HardwareBufferManager::getSingleton().createVertexBuffer(
+            decl->getVertexSize(NORMAL_BINDING),
+            mRenderOp.vertexData->vertexCount,
+            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+
+		bind->setBinding(NORMAL_BINDING, vbuf);
+
+		float *pNorm = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
+		*pNorm++ = 0.0f;
+		*pNorm++ = 0.0f;
+		*pNorm++ = 1.0f;
+
+		*pNorm++ = 0.0f;
+		*pNorm++ = 0.0f;
+		*pNorm++ = 1.0f;
+
+		*pNorm++ = 0.0f;
+		*pNorm++ = 0.0f;
+		*pNorm++ = 1.0f;
+
+		*pNorm++ = 0.0f;
+		*pNorm++ = 0.0f;
+		*pNorm++ = 1.0f;
+
+		vbuf->unlock();
 
         if (includeTextureCoords)
         {
@@ -96,9 +126,6 @@ namespace Ogre {
 
         // set basic white material
         this->setMaterial("BaseWhiteNoLighting");
-
-
-
     }
 
     Rectangle2D::~Rectangle2D() 
@@ -135,6 +162,31 @@ namespace Ogre {
             std::max(left, right), std::max(top, bottom), 0);
 
     }
+
+	void Rectangle2D::setNormals(const Ogre::Vector3 &topLeft, const Ogre::Vector3 &bottomLeft, const Ogre::Vector3 &topRight, const Ogre::Vector3 &bottomRight)
+	{
+		HardwareVertexBufferSharedPtr vbuf = 
+            mRenderOp.vertexData->vertexBufferBinding->getBuffer(NORMAL_BINDING);
+        float* pFloat = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
+
+        *pFloat++ = topLeft.x;
+        *pFloat++ = topLeft.y;
+        *pFloat++ = topLeft.z;
+
+        *pFloat++ = bottomLeft.x;
+        *pFloat++ = bottomLeft.y;
+        *pFloat++ = bottomLeft.z;
+
+        *pFloat++ = topRight.x;
+        *pFloat++ = topRight.y;
+        *pFloat++ = topRight.z;
+
+        *pFloat++ = bottomRight.x;
+        *pFloat++ = bottomRight.y;
+        *pFloat++ = bottomRight.z;
+
+        vbuf->unlock();
+	}
 
     // Override this method to prevent parent transforms (rotation,translation,scale)
     void Rectangle2D::getWorldTransforms( Matrix4* xform ) const

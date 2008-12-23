@@ -5339,7 +5339,8 @@ namespace Ogre{
 			mPass->setType(CompositionPass::PT_RENDERSCENE);
 		else
 		{
-			compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line);
+			compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line,
+				"pass types must be \"clear\", \"stencil\", \"render_quad\", or \"render_scene\".");
 			return;
 		}
 
@@ -5488,6 +5489,35 @@ namespace Ogre{
 						if(getUInt(prop->values.front(), &val))
 						{
 							mPass->setLastRenderQueue(val);
+						}
+						else
+						{
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						}
+					}
+					break;
+				case ID_QUAD_NORMALS:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						return;
+					}
+					else if (prop->values.size() > 1)
+					{
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						return;
+					}
+					else
+					{
+						if(prop->values.front()->type == ANT_ATOM)
+						{
+							AtomAbstractNode *atom = reinterpret_cast<AtomAbstractNode*>(prop->values.front().get());
+							if(atom->id == ID_CAMERA_FAR_CORNERS_VIEW_SPACE)
+								mPass->setQuadFarCorners(true, true);
+							else if(atom->id == ID_CAMERA_FAR_CORNERS_WORLD_SPACE)
+								mPass->setQuadFarCorners(true, false);
+							else
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 						}
 						else
 						{
