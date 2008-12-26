@@ -816,7 +816,6 @@ namespace Ogre
 					if(insertPos != dest->children.end())
 					{
 						dest->children.insert(insertPos, newNode);
-						insertPos++;
 					}
 					else
 					{
