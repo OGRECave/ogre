@@ -570,6 +570,11 @@ namespace Ogre
 		RenderWindow* createRenderWindow(const String &name, unsigned int width, unsigned int height, 
 			bool fullScreen, const NameValuePairList *miscParams = 0) ;
 
+		/** @copydoc RenderSystem::_createRenderWindows
+		*/
+		bool createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
+			RenderWindowList& createdWindows);
+	
         /** Destroys a rendering window.
         */
         void detachRenderTarget( RenderTarget* pWin );

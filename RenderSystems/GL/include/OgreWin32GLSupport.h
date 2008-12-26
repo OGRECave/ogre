@@ -27,7 +27,7 @@ namespace Ogre
 		String validateConfig();
 
 		virtual RenderWindow* createWindow(bool autoCreateWindow, GLRenderSystem* renderSystem, const String& windowTitle = "OGRE Render Window");
-
+		
 		/// @copydoc RenderSystem::_createRenderWindow
 		virtual RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height, 
 			bool fullScreen, const NameValuePairList *miscParams = 0);
@@ -65,10 +65,13 @@ namespace Ogre
 		bool mHasPixelFormatARB;
         bool mHasMultisample;
 		bool mHasHardwareGamma;
+		std::vector<MONITORINFOEX> mMonitorInfoList;
 
 		void refreshConfig();
 		void initialiseWGL();
 		static LRESULT CALLBACK dummyWndProc(HWND hwnd, UINT umsg, WPARAM wp, LPARAM lp);
+		static BOOL CALLBACK sCreateMonitorsInfoEnumProc(HMONITOR hMonitor, HDC hdcMonitor, 
+			LPRECT lprcMonitor, LPARAM dwData);
 	};
 
 }

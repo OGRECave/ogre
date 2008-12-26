@@ -43,19 +43,7 @@ namespace Ogre
 	class D3D9VideoMode;
 
 	class D3D9Driver
-	{
-	private:
-		LPDIRECT3D9 mpD3D;
-		// D3D only allows one device per adapter, so it can safely be stored
-		// here as well.
-		LPDIRECT3DDEVICE9 mpD3DDevice;
-		unsigned int mAdapterNumber;
-		D3DADAPTER_IDENTIFIER9 mAdapterIdentifier;
-		D3DDISPLAYMODE mDesktopDisplayMode;
-		D3D9VideoModeList* mpVideoModeList;
-		unsigned int tempNo;
-        static unsigned int driverCount;
-
+	{	
 	public:
 		// Constructors
 		D3D9Driver();						// Default
@@ -77,6 +65,39 @@ namespace Ogre
 		const D3DDISPLAYMODE& getDesktopMode() const { return mDesktopDisplayMode; }
 
 		D3D9VideoModeList* getVideoModeList();
+		bool isMultihead(void) {return mIsMultihead;}
+		void setMultihead(bool multihead) {mIsMultihead = multihead;}
+		bool isAutoDepthStencil(void) {return mIsAutoDepthStencil;}
+		void setAutoDepthStencil(bool autoDepthStencil) {mIsAutoDepthStencil = autoDepthStencil;}
+
+	private:
+
+		// Direct3D9 Interface.
+		LPDIRECT3D9				mpD3D;
+
+		// D3D only allows one device per adapter, so it can safely be stored
+		// here as well.
+		LPDIRECT3DDEVICE9		mpD3DDevice;
+
+		// Adapter number.
+		unsigned int			mAdapterNumber;
+
+		// Adapter identifier
+		D3DADAPTER_IDENTIFIER9	mAdapterIdentifier;
+
+		// Desktop display mode.
+		D3DDISPLAYMODE			mDesktopDisplayMode;
+
+		// Video modes list.
+		D3D9VideoModeList*		mpVideoModeList;
+
+		// Tells if the device created on this adapter is using multi head.
+		bool					mIsMultihead;
+
+		// Tells if auto depth buffer flag can be specified in case of multi head device usage.
+		bool					mIsAutoDepthStencil;
+
+
 	};
 }
 #endif

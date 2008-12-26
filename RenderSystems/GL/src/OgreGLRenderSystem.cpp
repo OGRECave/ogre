@@ -923,6 +923,68 @@ namespace Ogre {
 		}
 	}
 
+	//---------------------------------------------------------------------
+	bool GLRenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
+		RenderWindowList& createdWindows)
+	{		
+		// Call base render system method.
+		if (false == RenderSystem::_createRenderWindows(renderWindowDescriptions, createdWindows))
+			return false;
+
+		unsigned int fullscreenWindowsCount = 0;
+			
+		// Count full screen windows.
+		for (unsigned int nWindow = 0; nWindow < renderWindowDescriptions.size(); ++nWindow)
+		{
+			const RenderWindowDescription* curDesc = &renderWindowDescriptions[nWindow];
+
+			if (curDesc->useFullScreen)			
+				fullscreenWindowsCount++;			
+		}
+
+				
+		// Case we have to create multiple windowed rendering windows.
+		if (fullscreenWindowsCount == 0)
+		{
+			for(size_t i = 0; i < renderWindowDescriptions.size(); ++i)
+			{
+				const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];			
+				RenderWindow*			  curWindow = NULL;
+				
+				curWindow = _createRenderWindow(curRenderWindowDescription.name, 
+					curRenderWindowDescription.width, 
+					curRenderWindowDescription.height, 
+					curRenderWindowDescription.useFullScreen, 
+					&curRenderWindowDescription.miscParams);
+										
+				createdWindows.push_back(curWindow);														
+			}
+		}
+
+		// Case we have to create multiple full screen rendering windows.
+		else
+		{			
+			for(size_t i = 0; i < renderWindowDescriptions.size(); ++i)
+			{
+				const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];			
+				RenderWindow*       curWindow = NULL;
+				NameValuePairList   extramMiscParams = curRenderWindowDescription.miscParams;		
+
+				// Override window adapter.
+				extramMiscParams["head"] = StringConverter::toString(i);
+				
+				curWindow = _createRenderWindow(curRenderWindowDescription.name, 
+					curRenderWindowDescription.width, curRenderWindowDescription.height, 
+					true, 
+					&extramMiscParams);
+											
+				createdWindows.push_back(curWindow);																	
+			}
+		}
+								
+		return true;
+	}
+	//---------------------------------------------------------------------
 	RenderWindow* GLRenderSystem::_createRenderWindow(const String &name, 
 		unsigned int width, unsigned int height, bool fullScreen,
 		const NameValuePairList *miscParams)

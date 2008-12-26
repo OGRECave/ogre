@@ -436,6 +436,22 @@ namespace Ogre {
 		/// Everything was clipped away
 		CLIPPED_ALL = 2
 	};
+
+	/// Render window creation parameters.
+	struct RenderWindowDescription
+	{
+		String				name;
+		unsigned int		width;
+		unsigned int		height;
+		bool				useFullScreen;
+		NameValuePairList	miscParams;
+	};
+
+	/// Render window creation parameters container.
+	typedef std::vector<RenderWindowDescription>		RenderWindowDescriptionList;
+
+	/// Render window container.
+	typedef std::vector<RenderWindow*>			RenderWindowList;
 }
 
 #endif

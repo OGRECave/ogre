@@ -148,11 +148,71 @@ namespace Ogre {
         return 0;
     }
 
-		void RenderSystem::useCustomRenderSystemCapabilities(RenderSystemCapabilities* capabilities)
+	//---------------------------------------------------------------------------------------------
+	void RenderSystem::useCustomRenderSystemCapabilities(RenderSystemCapabilities* capabilities)
+	{
+		mCurrentCapabilities = capabilities;
+		mUseCustomCapabilities = true;
+	}
+
+	//---------------------------------------------------------------------------------------------
+	bool RenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
+		RenderWindowList& createdWindows)
+	{
+		unsigned int fullscreenWindowsCount = 0;
+
+		// Grab some information and avoid duplicate render windows.
+		for (unsigned int nWindow=0; nWindow < renderWindowDescriptions.size(); ++nWindow)
 		{
-				mCurrentCapabilities = capabilities;
-				mUseCustomCapabilities = true;
+			const RenderWindowDescription* curDesc = &renderWindowDescriptions[nWindow];
+
+			// Count full screen windows.
+			if (curDesc->useFullScreen)			
+				fullscreenWindowsCount++;	
+
+			bool renderWindowFound = false;
+
+			if (mRenderTargets.find(curDesc->name) != mRenderTargets.end())
+				renderWindowFound = true;
+			else
+			{
+				for (unsigned int nSecWindow = nWindow + 1 ; nSecWindow < renderWindowDescriptions.size(); ++nSecWindow)
+				{
+					if (curDesc->name == renderWindowDescriptions[nSecWindow].name)
+					{
+						renderWindowFound = true;
+						break;
+					}					
+				}
+			}
+
+			// Make sure we don't already have a render target of the 
+			// same name as the one supplied
+			if(renderWindowFound)
+			{
+				String msg;
+
+				msg = "A render target of the same name '" + String(curDesc->name) + "' already "
+					"exists.  You cannot create a new window with this name.";
+				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, msg, "RenderSystem::createRenderWindow" );
+			}
 		}
+		
+		// Case we have to create some full screen rendering windows.
+		if (fullscreenWindowsCount > 0)
+		{
+			// Can not mix full screen and windowed rendering windows.
+			if (fullscreenWindowsCount != renderWindowDescriptions.size())
+			{
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+					"Can not create mix of full screen and windowed rendering windows",
+					"RenderSystem::createRenderWindows");
+			}					
+		}
+
+		return true;
+	}
+
     //---------------------------------------------------------------------------------------------
     void RenderSystem::destroyRenderWindow(const String& name)
     {

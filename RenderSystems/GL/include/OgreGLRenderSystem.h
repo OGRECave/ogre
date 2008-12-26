@@ -202,6 +202,11 @@ namespace Ogre {
 		RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
 			bool fullScreen, const NameValuePairList *miscParams = 0);
 
+		/// @copydoc RenderSystem::_createRenderWindows
+		bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
+			RenderWindowList& createdWindows);
+
+		
 		/// @copydoc RenderSystem::createMultiRenderTarget
 		virtual MultiRenderTarget * createMultiRenderTarget(const String & name); 
 		

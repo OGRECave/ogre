@@ -997,6 +997,28 @@ namespace Ogre {
         return ret;
 
     }
+	//-----------------------------------------------------------------------
+	bool Root::createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
+		RenderWindowList& createdWindows)
+	{
+		if (!mActiveRenderer)
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+				"Cannot create render windows - no render "
+				"system has been selected.", "Root::createRenderWindows");
+		}
+
+		bool success;
+		
+		success = mActiveRenderer->_createRenderWindows(renderWindowDescriptions, createdWindows);		
+		if(success && !mFirstTimePostWindowInit)
+		{
+			oneTimePostWindowInit();
+			createdWindows[0]->_setPrimary();
+		}
+
+		return success;
+	}	
     //-----------------------------------------------------------------------
     void Root::detachRenderTarget(RenderTarget* target)
     {

@@ -44,12 +44,13 @@ namespace Ogre
 		@param deviceIfSwapChain The existing D3D device to create an additional swap chain from, if this is not
 			the first window.
 		*/
-		D3D9RenderWindow(HINSTANCE instance, D3D9Driver *driver, LPDIRECT3DDEVICE9 deviceIfSwapChain = 0);
+		D3D9RenderWindow(HINSTANCE instance, D3D9Driver *driver, bool isSwapChain);
 		~D3D9RenderWindow();
 		void create(const String& name, unsigned int width, unsigned int height,
 	            bool fullScreen, const NameValuePairList *miscParams);
 		void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
 		void destroy(void);
+		bool isActive() const;
 		bool isVisible() const;
 		bool isClosed() const { return mClosed; }
 		void reposition(int left, int top);
@@ -69,6 +70,9 @@ namespace Ogre
 
 		// Method for dealing with resize / move & 3d library
 		void windowMovedOrResized();
+
+		/// Build the presentation parameters used with this window
+		void buildPresentParameters(void);
 
 		/// Get the presentation parameters used with this window
 		D3DPRESENT_PARAMETERS* getPresentationParameters(void) 
@@ -96,6 +100,7 @@ namespace Ogre
 		HINSTANCE mInstance;			// Process instance
 		D3D9Driver *mDriver;			// D3D9 driver
 		HWND	mHWnd;					// Win32 Window handle
+		int		mHeadIndex;				// Head adapater index.
 		bool	mIsExternal;			// window not created by Ogre
 		bool	mSizing;
 		bool	mClosed;

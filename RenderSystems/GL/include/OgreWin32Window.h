@@ -44,6 +44,7 @@ namespace Ogre {
 	            bool fullScreen, const NameValuePairList *miscParams);
 	   void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
         void destroy(void);
+		bool isActive(void) const;
         bool isVisible() const;
         bool isClosed(void) const;
         void reposition(int left, int top);
@@ -73,8 +74,9 @@ namespace Ogre {
 		HDC		mHDC;
 		HGLRC	mGlrc;
         bool    mIsExternal;
-	bool    mIsExternalGLControl;
-	bool	mIsExternalGLContext;
+		char*   mDeviceName;
+		bool    mIsExternalGLControl;
+		bool	mIsExternalGLContext;
         bool    mSizing;
 		bool	mClosed;
         int     mDisplayFrequency;      // fullscreen only, to restore display

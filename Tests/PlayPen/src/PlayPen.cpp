@@ -66,6 +66,10 @@ Description: Somewhere to play in the sand...
 #include <crtdbg.h>
 #endi*/
 
+
+// Uncomment this to create dual full screen render windows.
+//#define _DUAL_MONITOR_RENDER_MODE_
+
 #define NUM_TEST_NODES 5
 SceneNode* mTestNode[NUM_TEST_NODES] = {0,0,0,0,0};
 SceneNode* mLightNode = 0;
@@ -592,12 +596,14 @@ public:
 
 };
 
+
 class PlayPenApplication : public ExampleApplication
 {
 protected:
-    RefractionTextureListener mRefractionListener;
-    ReflectionTextureListener mReflectionListener;
-	StaticPluginLoader mStaticPluginLoader;
+    RefractionTextureListener  mRefractionListener;
+    ReflectionTextureListener  mReflectionListener;
+	StaticPluginLoader		   mStaticPluginLoader;
+	RenderWindowList      mRenderWindows;	
 public:
     PlayPenApplication() {
     
@@ -624,6 +630,88 @@ public:
 #endif
     }
 protected:
+
+	bool configure(void)
+	{
+		bool result;
+
+		if(mRoot->showConfigDialog())
+		{
+#ifdef _DUAL_MONITOR_RENDER_MODE_
+			result = createDualFullscreenRenderWindows();
+#else
+			// If returned true, user clicked OK so initialise
+			// Here we choose to let the system create a default rendering window by passing 'true'
+			mWindow = mRoot->initialise(true);
+#endif			
+			result = true;
+		}
+		else
+		{
+			result = false;
+		}	
+
+		return result;
+	}
+
+	bool createDualFullscreenRenderWindows()
+	{
+	
+		mRoot->initialise(false, "Dual Monitor test");
+
+		RenderWindowDescriptionList renderWindowsDescriptions;			
+		unsigned int left = 0;
+		
+		renderWindowsDescriptions.resize(2);
+
+		// Generate windows creation parameters.		
+		for (unsigned int i = 0;  i < 2; ++i)
+		{											
+			renderWindowsDescriptions[i].miscParams["top"] = StringConverter::toString((int)0);
+			renderWindowsDescriptions[i].miscParams["left"] = StringConverter::toString((int)left);
+			renderWindowsDescriptions[i].width  = 1024;
+			renderWindowsDescriptions[i].height = 768;
+			renderWindowsDescriptions[i].useFullScreen = true;
+			renderWindowsDescriptions[i].name = "Monitor_" + StringConverter::toString(i);
+			
+			left += renderWindowsDescriptions[i].width;
+		}
+							
+		// Create the render windows.
+		if (false == mRoot->createRenderWindows(renderWindowsDescriptions, mRenderWindows))
+			return false;
+
+		mWindow = mRenderWindows[0];
+
+		return true;
+	}
+
+	virtual void createCamera(void)
+	{
+		// Create the camera
+		mCamera = mSceneMgr->createCamera("PlayerCam");
+
+		// Position it at 500 in Z direction
+		mCamera->setPosition(Vector3(0,0,500));
+		// Look back along -Z
+		mCamera->lookAt(Vector3(0,0,-300));
+		mCamera->setNearClipDistance(5);
+
+		// Attach the main camera to secondary render windows.
+		attachCameraToSecondaryWindows();
+	}
+
+
+	void attachCameraToSecondaryWindows()
+	{		
+		// Create camera for the secondary render windows.
+		for (unsigned int i=1; i < mRenderWindows.size(); ++i)
+		{
+			RenderWindow* pCurWindow = mRenderWindows[i];
+
+			pCurWindow->addViewport(mCamera);
+		}		
+	}
     
     void chooseSceneManager(void)
     {

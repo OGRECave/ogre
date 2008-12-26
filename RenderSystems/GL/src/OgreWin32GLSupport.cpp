@@ -276,15 +276,88 @@ namespace Ogre {
         }
 	}
 
+	BOOL CALLBACK Win32GLSupport::sCreateMonitorsInfoEnumProc(
+		HMONITOR hMonitor,  // handle to display monitor
+		HDC hdcMonitor,     // handle to monitor DC
+		LPRECT lprcMonitor, // monitor intersection rectangle
+		LPARAM dwData       // data
+		)
+	{
+		std::vector<MONITORINFOEX>* pArrMonitorsInfo = (std::vector<MONITORINFOEX>*)dwData;
+
+		// Get monitor info
+		MONITORINFOEX monitorInfoEx;
+
+		memset(&monitorInfoEx, 0, sizeof(monitorInfoEx));
+		monitorInfoEx.cbSize = sizeof(MONITORINFOEX);
+		GetMonitorInfo(hMonitor, &monitorInfoEx);
+
+		pArrMonitorsInfo->push_back(monitorInfoEx);
+
+		return TRUE;
+	}
+
+
 	RenderWindow* Win32GLSupport::newWindow(const String &name, unsigned int width, 
 		unsigned int height, bool fullScreen, const NameValuePairList *miscParams)
-	{
-		ConfigOptionMap::iterator opt = mOptions.find("Display Frequency");
-		if (opt == mOptions.end())
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find Display Frequency options!", "Win32GLSupport::newWindow");
-		unsigned int displayFrequency = StringConverter::parseUnsignedInt(opt->second.currentValue);
-
+	{		
 		Win32Window* window = new Win32Window(*this);
+		NameValuePairList newParams;
+	
+		if (miscParams != NULL)
+		{			
+			NameValuePairList::const_iterator headIt = miscParams->find("head");
+		
+			if (headIt != miscParams->end())
+			{
+				newParams = *miscParams;
+				miscParams = &newParams;
+				
+				NameValuePairList::const_iterator opt;
+				int left = -1;
+				int top  = -1;
+
+				if ((opt = newParams.find("left")) != newParams.end())
+					left = StringConverter::parseInt(opt->second);
+
+				if ((opt = newParams.find("top")) != newParams.end())
+					top = StringConverter::parseInt(opt->second);
+
+				// Use given top left as anchor point and determine the
+				// device name by it.
+				if (top != -1 && left != -1)
+				{
+					POINT			pt;
+					HMONITOR		hCurWindowMonitor;
+					MONITORINFOEX   mi;
+					
+					pt.x = left;
+					pt.y = top;
+
+					hCurWindowMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);	
+
+					memset(&mi, 0, sizeof(mi));
+					mi.cbSize = sizeof(mi);
+
+					if (GetMonitorInfo(hCurWindowMonitor, &mi))
+						newParams["headDeviceName"] = mi.szDevice;
+				}
+
+				// Use head index to grab device name in case position was not
+				// used or failed.
+				if (newParams.find("headDeviceName") == newParams.end()) 
+				{
+					if (mMonitorInfoList.empty())		
+						EnumDisplayMonitors(NULL, NULL, sCreateMonitorsInfoEnumProc, (LPARAM)&mMonitorInfoList);			
+
+					int head = StringConverter::parseInt(headIt->second);
+					if (head < mMonitorInfoList.size())
+					{						
+						newParams["headDeviceName"] = mMonitorInfoList[head].szDevice;						
+					}
+				}								
+			}
+		}
 		window->create(name, width, height, fullScreen, miscParams);
 
 		if(!mInitialWindow)
@@ -548,10 +621,8 @@ namespace Ogre {
 		return new Win32PBuffer(format, width, height);
 	}
 
-
 	String translateWGLError()
 	{
-
 		int winError = GetLastError();
 		char* errDesc;
 		int i;

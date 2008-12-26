@@ -77,6 +77,8 @@ namespace Ogre
 		mBasicStatesInitialised = false;
 		mUseNVPerfHUD = false;
 		mHLSLProgramFactory = NULL;
+		mPresentationParamCount = 0;
+		md3dppa = NULL;
 
 		// init lights
 		for(int i = 0; i < MAX_LIGHTS; i++ )
@@ -595,12 +597,20 @@ namespace Ogre
 		SAFE_DELETE( mTextureManager );
 		SAFE_DELETE( mHardwareBufferManager );
 		SAFE_DELETE( mGpuProgramManager );
+		SAFE_DELETE_ARRAY( md3dppa );	
 	}
 	//---------------------------------------------------------------------
 	RenderWindow* D3D9RenderSystem::_createRenderWindow(const String &name, 
 		unsigned int width, unsigned int height, bool fullScreen,
 		const NameValuePairList *miscParams)
 	{
+
+		if (mActiveD3DDriver->isMultihead())
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Cannot create other windows when multihead is active",
+				"D3D9RenderSystem::createRenderWindow");
+		}
 
 		// Check we're not creating a secondary window when the primary
 		// was fullscreen
@@ -648,7 +658,7 @@ namespace Ogre
 		}
 
 		RenderWindow* win = new D3D9RenderWindow(mhInstance, mActiveD3DDriver, 
-			mPrimaryWindow ? mpD3DDevice : 0);
+			mPrimaryWindow != NULL);
 
 		win->create( name, width, height, fullScreen, miscParams);
 
@@ -660,32 +670,7 @@ namespace Ogre
 			mPrimaryWindow = (D3D9RenderWindow *)win;
 			win->getCustomAttribute( "D3DDEVICE", &mpD3DDevice );
 
-			// Create the texture manager for use by others
-			mTextureManager = new D3D9TextureManager( mpD3DDevice );
-			// Also create hardware buffer manager
-			mHardwareBufferManager = new D3D9HardwareBufferManager(mpD3DDevice);
-
-			// Create the GPU program manager
-			mGpuProgramManager = new D3D9GpuProgramManager(mpD3DDevice);
-			// create & register HLSL factory
-			if (mHLSLProgramFactory == NULL)
-				mHLSLProgramFactory = new D3D9HLSLProgramFactory();
-
-
-			// Initialise the capabilities structures
-			// get caps
-			mpD3DDevice->GetDeviceCaps(&mCaps);
-
-			mRealCapabilities = createRenderSystemCapabilities();							
-			mRealCapabilities->addShaderProfile("hlsl");
-
-			// if we are using custom capabilities, then 
-			// mCurrentCapabilities has already been loaded
-			if(!mUseCustomCapabilities)
-				mCurrentCapabilities = mRealCapabilities;
-
-			initialiseFromRenderSystemCapabilities(mCurrentCapabilities, mPrimaryWindow);
-
+			postDeviceCreated();			
 		}
 		else
 		{
@@ -695,6 +680,287 @@ namespace Ogre
 		return win;
 
 	}
+
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::postDeviceCreated()
+	{
+		// Create the texture manager for use by others
+		mTextureManager = new D3D9TextureManager( mpD3DDevice );
+		// Also create hardware buffer manager
+		mHardwareBufferManager = new D3D9HardwareBufferManager(mpD3DDevice);
+
+		// Create the GPU program manager
+		mGpuProgramManager = new D3D9GpuProgramManager(mpD3DDevice);
+		// create & register HLSL factory
+		if (mHLSLProgramFactory == NULL)
+			mHLSLProgramFactory = new D3D9HLSLProgramFactory();
+
+
+		// Initialise the capabilities structures
+		// get caps
+		mpD3DDevice->GetDeviceCaps(&mCaps);
+
+		mRealCapabilities = createRenderSystemCapabilities();							
+		mRealCapabilities->addShaderProfile("hlsl");
+
+		// if we are using custom capabilities, then 
+		// mCurrentCapabilities has already been loaded
+		if(!mUseCustomCapabilities)
+			mCurrentCapabilities = mRealCapabilities;
+
+		initialiseFromRenderSystemCapabilities(mCurrentCapabilities, mPrimaryWindow);
+	}
+
+	//---------------------------------------------------------------------
+	bool D3D9RenderSystem::_createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
+		RenderWindowList& createdWindows)
+	{
+		// Call base render system method.
+		if (false == RenderSystem::_createRenderWindows(renderWindowDescriptions, createdWindows))
+			return false;
+
+		unsigned int fullscreenWindowsCount = 0;
+
+		// Count full screen windows.
+		for (unsigned int nWindow = 0; nWindow < renderWindowDescriptions.size(); ++nWindow)
+		{
+			const RenderWindowDescription* pCurDesc = &renderWindowDescriptions[nWindow];
+
+			if (pCurDesc->useFullScreen)			
+				fullscreenWindowsCount++;			
+		}		
+		
+
+		// Case we have to create multiple windowed rendering windows or just
+		// single window.
+		if (renderWindowDescriptions.size() == 1 || fullscreenWindowsCount == 0)
+		{
+			for(size_t i = 0; i < renderWindowDescriptions.size(); ++i)
+			{
+				const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];			
+				RenderWindow*			  curWindow = NULL;
+
+				curWindow = _createRenderWindow(curRenderWindowDescription.name, 
+					curRenderWindowDescription.width, 
+					curRenderWindowDescription.height, 
+					curRenderWindowDescription.useFullScreen, 
+					&curRenderWindowDescription.miscParams);
+								
+				createdWindows.push_back(curWindow);											
+			}
+		}
+
+		// Case we have to create multiple full screen rendering windows on the same adapter.
+		else
+		{	
+			D3DCAPS9 caps9;
+
+			mpD3D->GetDeviceCaps(mActiveD3DDriver->getAdapterNumber(), D3DDEVTYPE_HAL, &caps9);
+
+			if (caps9.NumberOfAdaptersInGroup != renderWindowDescriptions.size())
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					"Adapter output head(s) count and requsted rendering windows count are mismatched - multiple render windows creation failed.",
+					"D3D9RenderSystem::createRenderWindows");
+			}
+			
+
+			// Mark the active driver as multi head.
+			mActiveD3DDriver->setMultihead(true);
+
+			// first create the primary window
+			createdWindows.push_back(new D3D9RenderWindow(mhInstance, mActiveD3DDriver, false));
+
+			NameValuePairList extraMiscParams;
+
+			extraMiscParams = renderWindowDescriptions[0].miscParams;
+
+			// do not create the device now because the device must be supplied the 
+			// HWND of all the windows
+			extraMiscParams["createD3DResources"] = "false";
+			extraMiscParams["head"] = "0";
+			createdWindows[0]->create( renderWindowDescriptions[0].name, renderWindowDescriptions[0].width,
+				renderWindowDescriptions[0].height, true,
+				&extraMiscParams);							
+			
+			mPrimaryWindow = static_cast<D3D9RenderWindow*>(createdWindows[0]);
+
+
+			mPresentationParamCount = caps9.NumberOfAdaptersInGroup;
+
+			// then create the secondary windows
+			for( int i = 1; i < mPresentationParamCount; ++i)
+			{
+				D3D9RenderWindow* curWindow = new D3D9RenderWindow(mhInstance, mActiveD3DDriver, true);					
+							
+				extraMiscParams = renderWindowDescriptions[i].miscParams;
+
+
+				// still no D3D resources creation
+				extraMiscParams["createD3DResources"] = "false";				
+				// secondary windows are children of the primary windows
+				extraMiscParams["parentWindowHandle"] = 
+					StringConverter::toString(reinterpret_cast<int>(mPrimaryWindow->getWindowHandle()));
+				extraMiscParams["head"] = StringConverter::toString(i);
+				curWindow->create(renderWindowDescriptions[i].name, renderWindowDescriptions[i].width,
+					renderWindowDescriptions[i].height, true,
+					&extraMiscParams);
+				mSecondaryWindows.push_back(curWindow);
+
+				// All the window's present parameters must be supplied when creating the device so
+				// build them before
+				curWindow->buildPresentParameters();
+
+				createdWindows.push_back(curWindow);				
+			}
+
+			for( int i = 0; i < createdWindows.size(); ++i)
+			{
+				// when all the windows are created, the device can be created
+				static_cast<D3D9RenderWindow*>(createdWindows[i])->createD3DResources();
+				attachRenderTarget( *createdWindows[i] );
+			}
+
+			postDeviceCreated();
+		}
+		
+		return true;
+	}
+
+	//---------------------------------------------------------------------
+	LPDIRECT3DDEVICE9 D3D9RenderSystem::createDevice(HWND focusWindow, D3DPRESENT_PARAMETERS *pd3dpp)
+	{
+		D3DDEVTYPE devType = D3DDEVTYPE_HAL;
+		HRESULT hr;
+		LPDIRECT3D9 pD3D = mActiveD3DDriver->getD3D();
+		DWORD extraFlags = 0;
+
+		// Do we want to preserve the FPU mode? Might be useful for scientific apps
+
+		ConfigOptionMap& options = getConfigOptions();
+		ConfigOptionMap::iterator opti = options.find("Floating-point mode");
+		if (opti != options.end() && opti->second.currentValue == "Consistent")
+			extraFlags |= D3DCREATE_FPU_PRESERVE;
+
+#if OGRE_THREAD_SUPPORT
+		extraFlags |= D3DCREATE_MULTITHREADED;
+#endif
+		// Set default settings (use the one Ogre discovered as a default)
+		UINT adapterToUse = mActiveD3DDriver->getAdapterNumber();
+
+		if (mUseNVPerfHUD)
+		{
+			// Look for 'NVIDIA NVPerfHUD' adapter (<= v4)
+			// or 'NVIDIA PerfHUD' (v5)
+			// If it is present, override default settings
+			for (UINT adapter=0; adapter < mActiveD3DDriver->getD3D()->GetAdapterCount(); ++adapter)
+			{
+				D3DADAPTER_IDENTIFIER9 identifier;
+				HRESULT res;
+				res = pD3D->GetAdapterIdentifier(adapter,0,&identifier);
+				if (strstr(identifier.Description,"PerfHUD") != 0)
+				{
+					adapterToUse = adapter;
+					devType = D3DDEVTYPE_REF;
+					break;
+				}
+			}
+		}
+
+
+
+		// Create present parameters for multihead
+		if(mActiveD3DDriver->isMultihead())
+		{
+			// Make sure we use the master adapter only.
+			LPDIRECT3D9 pD3D = mActiveD3DDriver->getD3D();
+			for (UINT adapter=0; adapter < pD3D->GetAdapterCount(); ++adapter)
+			{
+				D3DCAPS9 AdapterCaps;
+				HRESULT hr;
+
+				hr = pD3D->GetDeviceCaps(adapter, D3DDEVTYPE_REF, &AdapterCaps);
+				if (SUCCEEDED(hr))
+				{
+					if (AdapterCaps.AdapterOrdinal == AdapterCaps.MasterAdapterOrdinal)
+					{
+						adapterToUse = AdapterCaps.AdapterOrdinal;
+						break;
+					}
+				}
+			}
+
+			bool autoDepthStencil = true;
+			// copy in the render system the array of present parameters used to create the device
+			SAFE_DELETE_ARRAY(md3dppa);	
+			md3dppa = new D3DPRESENT_PARAMETERS[mPresentationParamCount];
+			md3dppa[0] = D3DPRESENT_PARAMETERS(*pd3dpp);
+
+			for (int i = 1; i < mPresentationParamCount; i++)
+			{
+				md3dppa[i] = *mSecondaryWindows[i-1]->getPresentationParameters();
+
+				// disable AutoDepthStencil if these parameters vary between render windows
+				if (md3dppa[0].BackBufferHeight != md3dppa[i].BackBufferHeight || 
+					md3dppa[0].BackBufferWidth != md3dppa[i].BackBufferWidth || 
+					md3dppa[0].BackBufferFormat != md3dppa[i].BackBufferFormat || 
+					md3dppa[0].AutoDepthStencilFormat != md3dppa[i].AutoDepthStencilFormat)
+				{
+					autoDepthStencil = false;
+					mActiveD3DDriver->setAutoDepthStencil(false);
+				}
+			}
+			if(!autoDepthStencil)
+			{
+				for(int i = 0; i < mPresentationParamCount; i++)
+				{
+					md3dppa[i].EnableAutoDepthStencil = false;
+				}
+			}
+			extraFlags |= D3DCREATE_ADAPTERGROUP_DEVICE;
+		}
+		else
+		{
+			// copy in the render system the present parameters used to create the device
+			md3dppa = new D3DPRESENT_PARAMETERS[1];
+			md3dppa[0] = D3DPRESENT_PARAMETERS(*pd3dpp);
+		}
+
+		hr = pD3D->CreateDevice(adapterToUse, devType, focusWindow,
+			D3DCREATE_HARDWARE_VERTEXPROCESSING | extraFlags, md3dppa, &mpD3DDevice );
+
+		if (FAILED(hr))
+		{
+			// Try a second time, may fail the first time due to back buffer count,
+			// which will be corrected down to 1 by the runtime
+			hr = pD3D->CreateDevice( adapterToUse, devType, focusWindow,
+				D3DCREATE_HARDWARE_VERTEXPROCESSING | extraFlags, md3dppa, &mpD3DDevice );
+		}
+		if( FAILED( hr ) )
+		{
+			hr = pD3D->CreateDevice( adapterToUse, devType, focusWindow,
+				D3DCREATE_MIXED_VERTEXPROCESSING | extraFlags, md3dppa, &mpD3DDevice );
+			if( FAILED( hr ) )
+			{
+				hr = pD3D->CreateDevice( adapterToUse, devType, focusWindow,
+					D3DCREATE_SOFTWARE_VERTEXPROCESSING | extraFlags, md3dppa, &mpD3DDevice );
+			}
+		}
+		// TODO: make this a bit better e.g. go from pure vertex processing to software
+
+		if( FAILED( hr ))
+		{
+			//destroy();
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Failed to create Direct3D9 Device: " + 
+				getErrorDescription(hr), 
+				"D3D9RenderWindow::createD3DResources" );
+		}
+
+		mActiveD3DDriver->setD3DDevice( mpD3DDevice );
+		return mpD3DDevice;
+	}
+	
 	//---------------------------------------------------------------------
 	RenderSystemCapabilities* D3D9RenderSystem::createRenderSystemCapabilities(void) const
 	{
@@ -1237,11 +1503,14 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::destroyRenderTarget(const String& name)
 	{
+		bool bFreeDevice = false;
+
 		// Check in specialised lists
-		if (mPrimaryWindow->getName() == name)
+		if (mPrimaryWindow != NULL && mPrimaryWindow->getName() == name)
 		{
 			// We're destroying the primary window, so reset device and window
 			mPrimaryWindow = 0;
+			bFreeDevice = true;
 		}
 		else
 		{
@@ -1259,10 +1528,9 @@ namespace Ogre
 		// Do the real removal
 		RenderSystem::destroyRenderTarget(name);
 
-		// Did we destroy the primary?
-		if (!mPrimaryWindow)
-		{
-			// device is no longer valid, so free it all up
+		// We should free device.
+		if (bFreeDevice)
+		{			
 			freeDevice();
 		}
 
@@ -2920,6 +3188,13 @@ namespace Ogre
 			break;
 		};
 
+		// Make sure texcoord index is equal to stage value, As SDK Doc suggests:
+		// "When rendering using vertex shaders, each stage's texture coordinate index must be set to its default value."
+		// This solves such an errors when working with the Debug runtime -
+		// "Direct3D9: (ERROR) :Stage 1 - Texture coordinate index in the stage must be equal to the stage index when programmable vertex pipeline is used".
+		for (unsigned int nStage=0; nStage < 8; ++nStage)
+			__SetTextureStageState(nStage, D3DTSS_TEXCOORDINDEX, nStage);
+
 		RenderSystem::bindGpuProgram(prg);
 
 	}
@@ -3408,10 +3683,18 @@ namespace Ogre
 			(*sw)->destroyD3DResources();
 		}
 
-		D3DPRESENT_PARAMETERS* presParams = mPrimaryWindow->getPresentationParameters();
-		// Reset the device, using the primary window presentation params
-		HRESULT hr = mpD3DDevice->Reset(presParams);
-	
+		D3DPRESENT_PARAMETERS* pCurPresParams = NULL;
+		HRESULT hr;
+
+		if (mActiveD3DDriver->isMultihead())
+			pCurPresParams = md3dppa;
+		else
+			pCurPresParams = mPrimaryWindow->getPresentationParameters();
+				
+						
+		// Reset the device using the relevant presentation params.
+		hr = mpD3DDevice->Reset(pCurPresParams);
+			
 		if (hr == D3DERR_DEVICELOST)
 		{
 			// Don't continue
@@ -3424,9 +3707,16 @@ namespace Ogre
 				"D3D9RenderWindow::restoreLostDevice" );
 		}
 
-		LogManager::getSingleton().stream()
-			<< "Reset device ok w:" << presParams->BackBufferWidth
-			<< " h:" << presParams->BackBufferHeight;
+
+		StringUtil::StrStreamType str;
+	
+		str << "Reset device ok w:" << pCurPresParams[0].BackBufferWidth
+			<< " h:" << pCurPresParams[0].BackBufferHeight;
+		
+		
+		LogManager::getSingleton().logMessage(str.str());
+					
+
 		// If windowed, we have to reset the size here
 		// since a fullscreen switch may have occurred
 		if (mPrimaryWindow->_getSwitchingFullscreen())
@@ -3439,7 +3729,6 @@ namespace Ogre
 		mBasicStatesInitialised = false;
 		mVertexProgramBound = false;
 		mFragmentProgramBound = false;
-
 
 
 		// recreate additional swap chains

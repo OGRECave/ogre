@@ -59,6 +59,11 @@ namespace Ogre
 		/// Direct3D rendering device
 		LPDIRECT3DDEVICE9	mpD3DDevice;
 		
+		// Present parameters with which the device was created. May be
+		// and array of presentation parameters if multihead is enabled
+		D3DPRESENT_PARAMETERS *md3dppa;
+		/// Present parameters count.
+		size_t mPresentationParamCount;
 		// Stored options
 		ConfigOptionMap mOptions;
 		size_t mFSAASamples;
@@ -102,6 +107,7 @@ namespace Ogre
 		D3D9DriverList* getDirect3DDrivers(void);
 		void refreshD3DSettings(void);
         void refreshFSAAOptions(void);
+		void postDeviceCreated(void);
 		void freeDevice(void);
 
 		inline bool compareDecls( D3DVERTEXELEMENT9* pDecl1, D3DVERTEXELEMENT9* pDecl2, size_t size );
@@ -233,7 +239,13 @@ namespace Ogre
 		/// @copydoc RenderSystem::_createRenderWindow
 		RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
 			bool fullScreen, const NameValuePairList *miscParams = 0);
-
+		/// @copydoc RenderSystem::_createRenderWindows
+		bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
+			RenderWindowList& createdWindows);
+	
+		/// Creates the Direct3D device used for rendering
+		LPDIRECT3DDEVICE9 createDevice(HWND focusWindow, D3DPRESENT_PARAMETERS *pd3dpp );
+		
 		/// @copydoc RenderSystem::createMultiRenderTarget
 		virtual MultiRenderTarget * createMultiRenderTarget(const String & name);
 

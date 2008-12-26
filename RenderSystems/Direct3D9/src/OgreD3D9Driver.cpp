@@ -31,23 +31,21 @@ Torus Knot Software Ltd.
 #include "OgreD3D9VideoMode.h"
 
 namespace Ogre
-{
-    unsigned int D3D9Driver::driverCount = 0;
-
+{   
 	D3D9Driver::D3D9Driver()
-	{
-		tempNo = ++driverCount;
+	{		
 		mpD3D = NULL;
 		// initialise device member
 		mpD3DDevice = NULL;
 		ZeroMemory( &mAdapterIdentifier, sizeof(mAdapterIdentifier) );
 		ZeroMemory( &mDesktopDisplayMode, sizeof(mDesktopDisplayMode) );
 		mpVideoModeList = NULL;
+		mIsAutoDepthStencil = true;
+		mIsMultihead = false;
 	}
 
 	D3D9Driver::D3D9Driver( const D3D9Driver &ob )
-	{
-		tempNo = ++driverCount;
+	{		
 		mpD3D = ob.mpD3D;
 		// copy device member
 		mpD3DDevice = ob.mpD3DDevice;
@@ -55,11 +53,12 @@ namespace Ogre
 		mAdapterIdentifier = ob.mAdapterIdentifier;
 		mDesktopDisplayMode = ob.mDesktopDisplayMode;
 		mpVideoModeList = NULL;
+		mIsAutoDepthStencil = true;
+		mIsMultihead = false;
 	}
 
 	D3D9Driver::D3D9Driver( LPDIRECT3D9 pD3D, unsigned int adapterNumber, const D3DADAPTER_IDENTIFIER9& adapterIdentifier, const D3DDISPLAYMODE& desktopDisplayMode )
-	{
-		tempNo = ++driverCount;
+	{		
 		mpD3D = pD3D;
 		// initialise device member
 		mpD3DDevice = NULL;
@@ -67,12 +66,13 @@ namespace Ogre
 		mAdapterIdentifier = adapterIdentifier;
 		mDesktopDisplayMode = desktopDisplayMode;
 		mpVideoModeList = NULL;
+		mIsAutoDepthStencil = true;
+		mIsMultihead = false;
 	}
 
 	D3D9Driver::~D3D9Driver()
 	{
-		SAFE_DELETE( mpVideoModeList );
-		driverCount--;
+		SAFE_DELETE( mpVideoModeList );		
 	}
 
 	String D3D9Driver::DriverName() const
@@ -81,9 +81,11 @@ namespace Ogre
 	}
 
 	String D3D9Driver::DriverDescription() const
-	{
-        String driverDescription(mAdapterIdentifier.Description);
-        StringUtil::trim(driverDescription);
+	{       
+		StringUtil::StrStreamType str;
+		str << "Adapter-" << mAdapterNumber << "-" << mAdapterIdentifier.Description;
+		String driverDescription(str.str());
+		StringUtil::trim(driverDescription);
 
         return  driverDescription;
 	}
