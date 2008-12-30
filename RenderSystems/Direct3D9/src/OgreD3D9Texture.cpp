@@ -1348,12 +1348,13 @@ namespace Ogre
 				if(mpNormTex->GetSurfaceLevel(mip, &surface) != D3D_OK)
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Get surface level failed",
 		 				"D3D9Texture::_createSurfaceList");
-				// decrement reference count, the GetSurfaceLevel call increments this
-				// this is safe because the texture keeps a reference as well
-				surface->Release();
 
 				GETLEVEL(0, mip)->bind(mpDev, surface, updateOldList, mHwGammaWriteSupported, 
 					mFSAA, mFSAAHint, mFSAASurface, mName);
+
+				// decrement reference count, the GetSurfaceLevel call increments this
+				// this is safe because the texture keeps a reference as well
+				surface->Release();
 			}
 			break;
 		case TEX_TYPE_CUBE_MAP:
@@ -1366,12 +1367,13 @@ namespace Ogre
 					if(mpCubeTex->GetCubeMapSurface((D3DCUBEMAP_FACES)face, mip, &surface) != D3D_OK)
 						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Get cubemap surface failed",
 		 				"D3D9Texture::getBuffer");
-					// decrement reference count, the GetSurfaceLevel call increments this
-					// this is safe because the texture keeps a reference as well
-					surface->Release();
 					
 					GETLEVEL(face, mip)->bind(mpDev, surface, updateOldList, mHwGammaWriteSupported, 
 						mFSAA, mFSAAHint, mFSAASurface, mName);
+
+					// decrement reference count, the GetSurfaceLevel call increments this
+					// this is safe because the texture keeps a reference as well
+					surface->Release();
 				}
 			}
 			break;
@@ -1383,11 +1385,12 @@ namespace Ogre
 				if(mpVolumeTex->GetVolumeLevel(mip, &volume) != D3D_OK)
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Get volume level failed",
 		 				"D3D9Texture::getBuffer");	
+						
+				GETLEVEL(0, mip)->bind(mpDev, volume, updateOldList, mHwGammaWriteSupported, mName);
+
 				// decrement reference count, the GetSurfaceLevel call increments this
 				// this is safe because the texture keeps a reference as well
 				volume->Release();
-						
-				GETLEVEL(0, mip)->bind(mpDev, volume, updateOldList, mHwGammaWriteSupported, mName);
 			}
 			break;
 		};
