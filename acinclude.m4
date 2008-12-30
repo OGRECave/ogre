@@ -904,16 +904,14 @@ AC_DEFUN([OGRE_CHECK_GUI],
     #remove any old files
     rm -f OgreMain/src/OgreConfigDialog.lo OgreMain/src/OgreErrorDialog.lo
 
-    # Prefer win32, then gtk, then Xt
+    # Prefer win32, then Xt. gtk is being phased out and must be explicitly specified.
     if test "x$with_gui" == "xauto" && test "x$OGRE_PLATFORM" == "xWIN32"; then
         with_gui=win32
     fi
 
-    if test "x$with_gui" == "xauto" || test "x$with_gui" == "xgtk"; then
+    if test "x$with_gui" == "xgtk"; then
         PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.0.0, [with_gui=gtk], [
-            if test "x$with_gui" == "xgtk"; then
-                AC_MSG_ERROR([You chose gtk for the GUI but gtk is not available.])
-            fi
+            AC_MSG_ERROR([You chose gtk for the GUI but gtk is not available.])
         ])
     fi
 
