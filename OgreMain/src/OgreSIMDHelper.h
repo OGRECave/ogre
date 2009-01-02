@@ -115,9 +115,13 @@ Torus Knot Software Ltd.
 #if !defined(_XMMINTRIN_H_INCLUDED)
 
 // Simulate VC/ICC intrinsics. Only used intrinsics are declared here.
-
+#   if OGRE_COMP_VER >= 350
+typedef float __m128 __attribute__ ((vector_size (16), aligned(16)));
+typedef int __m64 __attribute__ ((vector_size (8)));
+#   else
 typedef float __m128 __attribute__ ((mode(V4SF),aligned(16)));
 typedef int __m64 __attribute__ ((mode(V2SI)));
+#   endif
 
 // Macro for declare intrinsic routines always inline even if in debug build
 #define __ALWAYS_INLINE    FORCEINLINE __attribute__ ((__always_inline__))
