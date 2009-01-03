@@ -75,6 +75,7 @@
 		<Unit filename="../include/OgreColourImageAffector.h" />
 		<Unit filename="../include/OgreColourImageAffectorFactory.h" />
 		<Unit filename="../include/OgreColourInterpolatorAffector.h" />
+		<Unit filename="../include/OgreColourInterpolatorAffectorFactory.h" />
 		<Unit filename="../include/OgreCylinderEmitter.h" />
 		<Unit filename="../include/OgreCylinderEmitterFactory.h" />
 		<Unit filename="../include/OgreDeflectorPlaneAffector.h" />
@@ -97,7 +98,6 @@
 		<Unit filename="../include/OgreRotationAffectorFactory.h" />
 		<Unit filename="../include/OgreScaleAffector.h" />
 		<Unit filename="../include/OgreScaleAffectorFactory.h" />
-		<Unit filename="../misc/OgreParticleFXDll.def" />
 		<Unit filename="../src/OgreAreaEmitter.cpp" />
 		<Unit filename="../src/OgreBoxEmitter.cpp" />
 		<Unit filename="../src/OgreColourFaderAffector.cpp" />
@@ -118,6 +118,8 @@
 		<Unit filename="../src/OgreScaleAffector.cpp" />
 		<Extensions>
 			<code_completion />
+			<envvars />
+			<debugger />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

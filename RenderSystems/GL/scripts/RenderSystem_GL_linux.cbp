@@ -83,13 +83,20 @@
 			<Add directory="../../../Samples/Common/bin/$(TARGET_NAME)" />
 			<Add directory="/usr/X11R6/lib" />
 		</Linker>
+		<Unit filename="../include/GL/gl.h" />
 		<Unit filename="../include/GL/glew.h" />
+		<Unit filename="../include/GL/glext.h" />
+		<Unit filename="../include/GL/glxew.h" />
+		<Unit filename="../include/GL/glxext.h" />
+		<Unit filename="../include/GL/glxtokens.h" />
 		<Unit filename="../include/GL/wglew.h" />
+		<Unit filename="../include/GL/wglext.h" />
 		<Unit filename="../include/GLX/OgreGLXContext.h" />
 		<Unit filename="../include/GLX/OgreGLXGLSupport.h" />
 		<Unit filename="../include/GLX/OgreGLXRenderTexture.h" />
 		<Unit filename="../include/GLX/OgreGLXUtils.h" />
 		<Unit filename="../include/GLX/OgreGLXWindow.h" />
+		<Unit filename="../include/OgreGLATIFSInit.h" />
 		<Unit filename="../include/OgreGLContext.h" />
 		<Unit filename="../include/OgreGLDefaultHardwareBufferManager.h" />
 		<Unit filename="../include/OgreGLFBOMultiRenderTarget.h" />
@@ -110,10 +117,13 @@
 		<Unit filename="../include/OgreGLPrerequisites.h" />
 		<Unit filename="../include/OgreGLRenderSystem.h" />
 		<Unit filename="../include/OgreGLRenderTexture.h" />
+		<Unit filename="../include/OgreGLRenderToVertexBuffer.h" />
 		<Unit filename="../include/OgreGLSupport.h" />
 		<Unit filename="../include/OgreGLTexture.h" />
 		<Unit filename="../include/OgreGLTextureManager.h" />
-		<Unit filename="../misc/OgreGLEngine.def" />
+		<Unit filename="../include/OgreSDLGLSupport.h" />
+		<Unit filename="../include/OgreSDLPrerequisites.h" />
+		<Unit filename="../include/OgreSDLWindow.h" />
 		<Unit filename="../src/GLSL/include/OgreGLSLExtSupport.h" />
 		<Unit filename="../src/GLSL/include/OgreGLSLGpuProgram.h" />
 		<Unit filename="../src/GLSL/include/OgreGLSLLinkProgram.h" />
@@ -203,7 +213,6 @@
 		<Unit filename="../src/nvparse/vs1.0_inst_list.cpp" />
 		<Unit filename="../src/nvparse/vs1.0_inst_list.h" />
 		<Unit filename="../src/nvparse/vsp1.0_impl.cpp" />
-		<Unit filename="../src/nvparse/winheaders/unistd.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
