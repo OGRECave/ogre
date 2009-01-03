@@ -68,7 +68,12 @@ namespace Ogre {
     }
 
     Exception::Exception(const Exception& rhs)
-        : line( rhs.line ), number( rhs.number ), description( rhs.description ), source( rhs.source ), file( rhs.file )
+        : line( rhs.line ), 
+		number( rhs.number ), 
+		typeName( rhs.typeName ), 
+		description( rhs.description ), 
+		source( rhs.source ), 
+		file( rhs.file )
     {
     }
 
