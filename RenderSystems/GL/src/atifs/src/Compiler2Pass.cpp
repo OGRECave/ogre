@@ -271,7 +271,7 @@ bool Compiler2Pass::ValidateToken(const uint rulepathIDX, const uint activeRuleI
 }
 
 
-char* Compiler2Pass::getTypeDefText(const uint sid)
+const char* Compiler2Pass::getTypeDefText(const uint sid)
 {
 	return mRootRulePath[mSymbolTypeLib[sid].mDefTextID].mSymbol;
 }
