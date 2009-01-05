@@ -199,7 +199,7 @@ namespace Ogre {
 
 		return res;
 	}
-	
+
 	//-----------------------------------------------------------------------------  
 
 	void D3D10HardwarePixelBuffer::blit(const HardwarePixelBufferSharedPtr &rsrc, const Image::Box &srcBox, const Image::Box &dstBox)
@@ -214,7 +214,7 @@ namespace Ogre {
 				"D3D10 device cannot copy a subresource - source and dest size are not the same and they have to be the same in DX10.",
 				"D3D10HardwarePixelBuffer::blit");
 		}
-		
+
 		D3D10_BOX srcBoxDx10 = OgreImageBoxToDx10Box(srcBox);
 
 
@@ -287,7 +287,7 @@ namespace Ogre {
 
 
 		_genMipmaps();
-		
+
 	}
 	//-----------------------------------------------------------------------------  
 	void D3D10HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box &dstBox)
@@ -354,7 +354,7 @@ namespace Ogre {
 						"D3D10HardwarePixelBuffer::blitFromMemory");
 				}
 			}
-		break;
+			break;
 		case TEX_TYPE_CUBE_MAP:
 		case TEX_TYPE_2D:
 			{

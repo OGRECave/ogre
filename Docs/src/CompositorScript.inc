@@ -270,7 +270,7 @@ Default: identifier 0@*@*
 @subheading first_render_queue
 For passes of type 'render_scene', this sets the first render queue id that is included in the render. Defaults to the value of RENDER_QUEUE_SKIES_EARLY.@*@*
 Format: first_render_queue <id>@*@*
-Default: first_render_queue 5@*@*
+Default: first_render_queue 0@*@*
 
 @anchor{last_render_queue}
 @subheading last_render_queue

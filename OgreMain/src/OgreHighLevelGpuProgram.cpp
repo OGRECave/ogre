@@ -69,6 +69,7 @@ namespace Ogre
         }
 
         unloadHighLevel();
+		resetCompileError();
     }
     //---------------------------------------------------------------------------
     HighLevelGpuProgram::~HighLevelGpuProgram()

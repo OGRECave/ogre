@@ -4,6 +4,8 @@
   http://creativecommons.org/licenses/publicdomain.  Send questions,
   comments, complaints, performance data, etc to dl@cs.oswego.edu
 
+  ** Modified by OGRE to support MinGW 5 Jan 2009
+
 * Version pre-2.8.4 Mon Nov 27 11:22:37 2006    (dl at gee)
 
    Note: There may be an updated version of this malloc obtainable at
@@ -321,7 +323,7 @@ MORECORE                  default: sbrk
   size_t (sometimes declared as "intptr_t").  It doesn't much matter
   though. Internally, we only call it with arguments less than half
   the max value of a size_t, which should work across all reasonable
-  possibilities, although sometimes generating compiler warnings.  
+  possibilities, although sometimes generating compiler warnings.
 
 MORECORE_CONTIGUOUS       default: 1 (true) if HAVE_MORECORE
   If true, take advantage of fact that consecutive calls to MORECORE
@@ -849,8 +851,8 @@ void* dlvalloc(size_t);
   (parameter-number, parameter-value) pair.  mallopt then sets the
   corresponding parameter to the argument value if it can (i.e., so
   long as the value is meaningful), and returns 1 if successful else
-  0.  To workaround the fact that mallopt is specified to use int, 
-  not size_t parameters, the value -1 is specially treated as the 
+  0.  To workaround the fact that mallopt is specified to use int,
+  not size_t parameters, the value -1 is specially treated as the
   maximum unsigned size_t value.
 
   SVID/XPG/ANSI defines four standard param numbers for mallopt,
@@ -1344,6 +1346,13 @@ LONG __cdecl _InterlockedExchange(LONG volatile *Target, LONG Value);
 #define interlockedcompareexchange _InterlockedCompareExchange
 #define interlockedexchange _InterlockedExchange
 #endif /* Win32 */
+// --- BEGIN OGRE MODIFICATION ---
+// MinGW compatibility
+#ifdef __MINGW32__
+#define interlockedcompareexchange InterlockedCompareExchange
+#define interlockedexchange InterlockedExchange
+#endif /* __MINGW32__ */
+// --- END OGRE MODIFICATION ---
 #endif /* USE_LOCKS */
 
 /* Declarations for bit scanning on win32 */
@@ -1565,7 +1574,7 @@ static FORCEINLINE int win32munmap(void* ptr, size_t size) {
 #else  /* HAVE_MMAP */
     #define IS_MMAPPED_BIT          (SIZE_T_ZERO)
     #define USE_MMAP_BIT            (SIZE_T_ZERO)
-    
+
     #define MMAP(s)                 MFAIL
     #define MUNMAP(a, s)            (-1)
     #define DIRECT_MMAP(s)          MFAIL
@@ -1607,7 +1616,7 @@ static FORCEINLINE int win32munmap(void* ptr, size_t size) {
   threads.  This does not protect against direct calls to MORECORE
   by other threads not using this lock, so there is still code to
   cope the best we can on interference.
-  
+
   Per-mspace locks surround calls to malloc, free, etc.  To enable use
   in layered extensions, per-mspace locks are reentrant.
 
@@ -1658,9 +1667,9 @@ static FORCEINLINE int pthread_acquire_lock (MLOCK_T *sl) {
       int cmp = 0;
       int val = 1;
       int ret;
-      __asm__ __volatile__  ("lock; cmpxchgl %1, %2"             
-                             : "=a" (ret)               
-                             : "r" (val), "m" (*(lp)), "0"(cmp) 
+      __asm__ __volatile__  ("lock; cmpxchgl %1, %2"
+                             : "=a" (ret)
+                             : "r" (val), "m" (*(lp)), "0"(cmp)
                              : "memory", "cc");
       if (!ret) {
         assert(!sl->threadid);
@@ -1710,9 +1719,9 @@ static FORCEINLINE int pthread_try_lock (MLOCK_T *sl) {
     int cmp = 0;
     int val = 1;
     int ret;
-    __asm__ __volatile__  ("lock; cmpxchgl %1, %2"             
-                           : "=a" (ret)               
-                           : "r" (val), "m" (*(lp)), "0"(cmp) 
+    __asm__ __volatile__  ("lock; cmpxchgl %1, %2"
+                           : "=a" (ret)
+                           : "r" (val), "m" (*(lp)), "0"(cmp)
                            : "memory", "cc");
     if (!ret) {
       assert(!sl->threadid);
@@ -1866,7 +1875,7 @@ static void init_malloc_global_mutex() {
     if (stat > 0)
       return;
     /* transition to < 0 while initializing, then to > 0) */
-    if (stat == 0 && 
+    if (stat == 0 &&
         interlockedcompareexchange(&malloc_global_mutex_status, -1, 0) == 0) {
       InitializeCriticalSection(&malloc_global_mutex);
       interlockedexchange(&malloc_global_mutex_status,1);
@@ -2815,7 +2824,7 @@ static size_t traverse_and_check(mstate m);
 #elif USE_BUILTIN_FFS
 #define compute_bit2idx(X, I) I = ffs(X)-1
 
-#else 
+#else
 #define compute_bit2idx(X, I)\
 {\
   unsigned int Y = X - 1;\
@@ -2954,7 +2963,7 @@ static int init_mparams(void) {
     size_t magic;
     size_t psize;
     size_t gsize;
-   
+
 #ifndef WIN32
     psize = malloc_getpagesize;
     gsize = ((DEFAULT_GRANULARITY != 0)? DEFAULT_GRANULARITY : psize);
@@ -3011,7 +3020,7 @@ static int init_mparams(void) {
         magic = *((size_t *) buf);
         close(fd);
       }
-      else 
+      else
 #endif /* USE_DEV_RANDOM */
 #ifdef WIN32
         magic = (size_t)(GetTickCount() ^ (size_t)0x55555555U);
@@ -3896,9 +3905,9 @@ static void* sys_alloc(mstate m, size_t nb) {
     3. A call to MORECORE that cannot usually contiguously extend memory.
        (disabled if not HAVE_MORECORE)
 
-   In all cases, we need to request enough bytes from system to ensure 
-   we can malloc nb bytes upon success, so pad with enough space for 
-   top_foot, plus alignment-pad to make sure we don't lose bytes if 
+   In all cases, we need to request enough bytes from system to ensure
+   we can malloc nb bytes upon success, so pad with enough space for
+   top_foot, plus alignment-pad to make sure we don't lose bytes if
    not on boundary, and round this up to a granularity unit.
   */
 

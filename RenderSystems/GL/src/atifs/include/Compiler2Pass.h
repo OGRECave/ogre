@@ -73,7 +73,7 @@ protected:
 	struct TokenRule {
 		OperationType mOperation;
 		uint mTokenID;
-		char* mSymbol;
+		const char* mSymbol;
 		uint mErrorID;
 
 	};
@@ -169,7 +169,7 @@ protected:
 	@param sid is the token ID
 	@return a pointer to the string text
 	*/
-	char* getTypeDefText(const uint sid);
+	const char* getTypeDefText(const uint sid);
 
 	/** check to see if the text at the present position in the source is a numerical constant
 	@param fvalue is a reference that will receive the float value that is in the source

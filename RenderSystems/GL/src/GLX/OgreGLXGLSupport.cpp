@@ -309,7 +309,12 @@ namespace Ogre
 		
 		if (name == "Video Mode")
 		{
-			refreshConfig();
+			ConfigOptionMap::iterator opt;
+			if((opt = mOptions.find("Full Screen")) != mOptions.end())
+			{
+				if (opt->second.currentValue == "Yes")
+					refreshConfig();
+			}
 		}
 	}
 

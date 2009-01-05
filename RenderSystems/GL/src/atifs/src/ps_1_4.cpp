@@ -1860,7 +1860,7 @@ void PS_1_4::test()
   // Second Test
   // did the type lib get initialized properly with a default name index
   fprintf(fp, "\nTesting: getTypeDefText\n");
-  char* resultstr = getTypeDefText(sid_MOV);
+  const char* resultstr = getTypeDefText(sid_MOV);
   fprintf(fp, "  default name of mov is: [%s]: %s", resultstr, (strcmp("mov", resultstr)==0)?passed:failed);
   fprintf(fp, "finished testing: getTypeDefText\n");
 

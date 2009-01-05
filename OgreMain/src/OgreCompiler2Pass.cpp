@@ -1302,7 +1302,7 @@ namespace Ogre {
             if (mActiveTokenState != &mBNFTokenState)
                 autoTokenIDStart = getAutoTokenIDStart();
             // make sure new auto gen id starts at autoTokenIDStart or greater
-            newTokenID = (mActiveTokenState->lexemeTokenDefinitions.size() <= autoTokenIDStart ) ? autoTokenIDStart : newTokenID = mActiveTokenState->lexemeTokenDefinitions.size();
+            newTokenID = (mActiveTokenState->lexemeTokenDefinitions.size() <= autoTokenIDStart ) ? autoTokenIDStart : mActiveTokenState->lexemeTokenDefinitions.size();
         }
 
         if (newTokenID >= mActiveTokenState->lexemeTokenDefinitions.size())

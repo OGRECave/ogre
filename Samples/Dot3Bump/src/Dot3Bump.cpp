@@ -166,7 +166,7 @@ public:
 		// switch meshes
         KEY_PRESSED(OIS::KC_O, 1, 
             mEntities[mCurrentEntity]->setVisible(false); 
-            mCurrentEntity = (++mCurrentEntity) % NUM_ENTITIES; 
+            mCurrentEntity = (mCurrentEntity + 1) % NUM_ENTITIES; 
             mEntities[mCurrentEntity]->setVisible(true);
             mEntities[mCurrentEntity]->setMaterialName(mMaterialNames[mCurrentEntity][mCurrentMaterial]);
             mObjectInfo->setCaption("Current: " + mEntityMeshes[mCurrentEntity]);
@@ -175,7 +175,7 @@ public:
 
 		// switch materials
 		KEY_PRESSED(OIS::KC_M, 1, 
-            mCurrentMaterial = (++mCurrentMaterial) % NUM_MATERIALS; 
+            mCurrentMaterial = (mCurrentMaterial + 1) % NUM_MATERIALS; 
             mEntities[mCurrentEntity]->setMaterialName(mMaterialNames[mCurrentEntity][mCurrentMaterial]);
             mMaterialInfo->setCaption("Current: " + mMaterialNames[mCurrentEntity][mCurrentMaterial]);
         );
