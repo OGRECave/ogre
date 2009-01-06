@@ -865,7 +865,7 @@ namespace Ogre {
         //
 
         // Calculate delta-transforms for all source bones.
-        std::vector<DeltaTransform> deltaTransforms(numSrcBones);
+        vector<DeltaTransform>::type deltaTransforms(numSrcBones);
         for (handle = 0; handle < numSrcBones; ++handle)
         {
             const Bone* srcBone = src->getBone(handle);

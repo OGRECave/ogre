@@ -94,7 +94,7 @@ namespace Ogre {
 			ColourValue colour;
 
 		};
-		typedef std::vector<Element> ElementList;
+		typedef vector<Element>::type ElementList;
 
 		/** Constructor (don't use directly, use factory) 
 		@param name The name to give this object
@@ -305,7 +305,7 @@ namespace Ogre {
 			/// The 'tail' of the chain, relative to start
 			size_t tail;
 		};
-		typedef std::vector<ChainSegment> ChainSegmentList;
+		typedef vector<ChainSegment>::type ChainSegmentList;
 		ChainSegmentList mChainSegmentList;
 
 		/// Setup the STL collections

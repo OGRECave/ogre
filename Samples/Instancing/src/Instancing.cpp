@@ -187,7 +187,7 @@ void InstancingListener::createCurrentGeomOpt()
 	posMatrices.reserve (numRender);
 
 
-	std::vector <Vector3 *> posMatCurr;
+	vector <Vector3 *>::type posMatCurr;
 	posMatCurr.resize (numRender);
 	posMatCurr.reserve (numRender);
 	for (size_t i = 0; i < numRender; i++)
@@ -520,7 +520,7 @@ void InstancingListener::updateStats(void)
 		+ " " + Ogre::StringConverter::toString(stats.worstFrameTime)+" ms");
 
 	mGuiTris->setText(tris + Ogre::StringConverter::toString(stats.triangleCount));
-	mGuiDbg->setText(mDebugText);
+	mGuiDbg->setText(mDebugText.c_str());
 	mAvgFrameTime = 1.0f/(stats.avgFPS + 1.0f);
 	if (mAvgFrameTime > 0.1f) mAvgFrameTime = 0.1f;
 

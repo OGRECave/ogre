@@ -133,9 +133,7 @@ MEMCATEGORY_GENERAL, and you must set the SharedPtrFreeMethod parameter
 to SPFM_DELETE_T</li>
     <li>Instances constructed using OGRE_ALLOC_T must be allocated using MEMCATEGORY_GENERAL, and you must set the SharedPtrFreeMethod parameter to SPFM_FREE</li>
   </ol>
-  <li>When defining STL containers, provide a custom allocator based on
-STLAllocator&lt;AllocPolicy&gt;. The AllocPolicy should be one of those
-typedef'ed inOgreMemoryAllocatorConfig.h, e.g. GeometryAllocPolicy </li>
+  <li>When defining STL containers, instead of using std::vector<T> or std::list<T> etc, use the memory-manager enabled versions vector<T>::type and list<T>::type respectively (most containers have this equivalent). This defaults the memory manager to the General type, but you can override the last parameter to the template if you want an alternate type.</li>
 </ol>
 <h2>Style issues</h2>
 

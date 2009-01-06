@@ -225,7 +225,7 @@ namespace Ogre {
 			return;
 
         // Cache vertex/face data first
-        std::vector<StaticFaceGroup*>::const_iterator faceGrpi;
+		vector<StaticFaceGroup*>::type::const_iterator faceGrpi;
         static RenderOperation patchOp;
         
         // no world transform required
@@ -399,7 +399,7 @@ namespace Ogre {
                 // Try to insert, will find existing if already there
                 std::pair<MaterialFaceGroupMap::iterator, bool> matgrpi;
                 matgrpi = mMatFaceGroupMap.insert(
-                    MaterialFaceGroupMap::value_type(pMat.getPointer(), std::vector<StaticFaceGroup*>())
+					MaterialFaceGroupMap::value_type(pMat.getPointer(), vector<StaticFaceGroup*>::type())
                     );
                 // Whatever happened, matgrpi.first is map iterator
                 // Need to get second part of that to get vector
@@ -750,7 +750,7 @@ namespace Ogre {
 
                     for (bi = brushes.begin(); bi != biend; ++bi)
                     {
-                        std::list<Plane>::const_iterator planeit, planeitend;
+						list<Plane>::type::const_iterator planeit, planeitend;
                         planeitend = (*bi)->planes.end();
                         bool brushIntersect = true; // Assume intersecting for now
 
@@ -815,7 +815,7 @@ namespace Ogre {
     void BspRaySceneQuery::clearTemporaries(void)
     {
         mObjsThisQuery.clear();
-        std::vector<WorldFragment*>::iterator i;
+		vector<WorldFragment*>::type::iterator i;
         for (i = mSingleIntersections.begin(); i != mSingleIntersections.end(); ++i)
         {
             OGRE_FREE(*i, MEMCATEGORY_SCENE_CONTROL);

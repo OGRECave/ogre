@@ -76,7 +76,7 @@ public:
 // Some global node data
 SceneNode* mRedYellowLightsNode;
 SceneNode* mGreenBlueLightsNode;
-std::vector<AnimationState*> mAnimStateList;
+vector<AnimationState*>::type mAnimStateList;
 
 
 // Listener class for frame updates
@@ -94,7 +94,7 @@ public:
 	if( ExampleFrameListener::frameRenderingQueued(evt) == false )
 		return false;
 
-		std::vector<AnimationState*>::iterator animi;
+		vector<AnimationState*>::type::iterator animi;
 		for (animi = mAnimStateList.begin(); animi != mAnimStateList.end(); ++animi)
 		{
 			(*animi)->addTime(evt.timeSinceLastFrame);

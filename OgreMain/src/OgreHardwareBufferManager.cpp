@@ -362,7 +362,7 @@ namespace Ogre {
         std::pair<_Iter, _Iter> range = mFreeTempVertexBufferMap.equal_range(sourceBuffer);
         if (range.first != range.second)
         {
-            std::list<HardwareVertexBufferSharedPtr> holdForDelayDestroy;
+            list<HardwareVertexBufferSharedPtr>::type holdForDelayDestroy;
             for (_Iter it = range.first; it != range.second; ++it)
             {
                 if (it->second.useCount() <= 1)

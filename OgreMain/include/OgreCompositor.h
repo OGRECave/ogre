@@ -48,7 +48,7 @@ namespace Ogre {
         ~Compositor();
         
         /// Data types for internal lists
-        typedef std::vector<CompositionTechnique *> Techniques;
+        typedef vector<CompositionTechnique *>::type Techniques;
         typedef VectorIterator<Techniques> TechniqueIterator;
         
         /** Create a new technique, and return a pointer to it.

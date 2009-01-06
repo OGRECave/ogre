@@ -54,7 +54,7 @@ LGPL like the rest of the engine.
         size_t				  mCurrentMaterial;
 		Ogre::SceneNode * mSpinny;
 
-//        typedef std::vector< ShaderControlGUIWidget > ShaderControlContainer;
+//        typedef vector< ShaderControlGUIWidget >::type ShaderControlContainer;
 //        typedef ShaderControlContainer::iterator ShaderControlIterator;
 
 //        ShaderControlContainer    mShaderControlContainer;

@@ -53,8 +53,8 @@ namespace Ogre
 
 class Image;
 
-typedef std::vector < TerrainPage * > TerrainPageRow;
-typedef std::vector < TerrainPageRow > TerrainPage2D;
+typedef vector< TerrainPage * >::type TerrainPageRow;
+typedef vector< TerrainPageRow >::type TerrainPage2D;
 
 /** Default implementation of RaySceneQuery. */
 class _OgreOctreePluginExport TerrainRaySceneQuery : public OctreeRaySceneQuery
@@ -278,7 +278,7 @@ public:
     */
     virtual void setPrimaryCamera(const Camera* cam);
     /// Internal map of page source name to page source
-    typedef std::map<String, TerrainPageSource*> PageSourceMap;
+    typedef map<String, TerrainPageSource*>::type PageSourceMap;
 
     /// Iterator over all page sources
     typedef ConstMapIterator<PageSourceMap> PageSourceIterator;
@@ -418,7 +418,7 @@ protected:
 class TerrainSceneManagerFactory : public SceneManagerFactory
 {
 protected:
-	typedef std::vector<TerrainPageSource*> TerrainPageSources;
+	typedef vector<TerrainPageSource*>::type TerrainPageSources;
 	TerrainPageSources mTerrainPageSources;
 	void initMetaData(void) const;
 public:

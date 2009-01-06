@@ -327,13 +327,13 @@ namespace Ogre {
 			};
 
 			
-            typedef std::list<ProfileInstance> ProfileStack;
-            typedef std::list<ProfileFrame> ProfileFrameList;
-            typedef std::list<ProfileHistory> ProfileHistoryList;
-            typedef std::map<String, ProfileHistoryList::iterator> ProfileHistoryMap;
-            typedef std::map<String, bool> DisabledProfileMap;
+            typedef list<ProfileInstance>::type ProfileStack;
+            typedef list<ProfileFrame>::type ProfileFrameList;
+            typedef list<ProfileHistory>::type ProfileHistoryList;
+            typedef map<String, ProfileHistoryList::iterator>::type ProfileHistoryMap;
+            typedef map<String, bool>::type DisabledProfileMap;
 
-            typedef std::list<OverlayElement*> ProfileBarList;
+            typedef list<OverlayElement*>::type ProfileBarList;
 
             /// A stack for each individual profile per frame
             ProfileStack mProfiles;

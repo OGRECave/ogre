@@ -231,8 +231,8 @@ protected:
         mWindow->getViewport(0)->setBackgroundColour(fadeColour);
 
 		// create a terrain zone
-        std::string terrain_cfg("terrain.cfg");
-		std::string zoneName("Terrain1_Zone");
+        String terrain_cfg("terrain.cfg");
+		String zoneName("Terrain1_Zone");
 		PCZone * terrainZone = createTerrainZone(zoneName, terrain_cfg);
 
 /*		// Create another terrain zone

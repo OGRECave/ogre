@@ -82,8 +82,8 @@ protected:
 	/// Generator
 	Impl *mImpl;
 
-	typedef std::map<Perm, Ogre::GpuProgramPtr> ProgramMap;
-	typedef std::map<Perm, Ogre::MaterialPtr> MaterialMap;
+	typedef Ogre::map<Perm, Ogre::GpuProgramPtr>::type ProgramMap;
+	typedef Ogre::map<Perm, Ogre::MaterialPtr>::type MaterialMap;
 
 	ProgramMap mVs, mFs;
 	MaterialMap mTemplateMat, mMaterials;

@@ -199,7 +199,9 @@ protected:
     void destroyScene(void)
     {
         // free up the pointer before we shut down OGRE
-        patch.setNull();
+		mSceneMgr->clearScene();
+		MeshManager::getSingleton().removeAll();
+		patch.setNull();
     }
 	void createFrameListener(void)
     {

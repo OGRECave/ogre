@@ -455,7 +455,7 @@ private:
 	bool						d_sorted;			//!< true when data in quad list is sorted.
 	Point						d_texelOffset;		//!< Offset required for proper texel mapping.
 
-	std::list<OgreCEGUITexture*> d_texturelist;		//!< List used to track textures.
+	Ogre::list<OgreCEGUITexture*>::type d_texturelist;		//!< List used to track textures.
 };
 
 } // End of  CEGUI namespace section

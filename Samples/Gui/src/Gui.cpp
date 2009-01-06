@@ -131,7 +131,7 @@ private:
 	CEGUI::Window* mTip;
 	CEGUI::Listbox* mList;
 	CEGUI::Window* mEditBox;
-	typedef std::map<CEGUI::String, CEGUI::String> DescriptionMap;
+	typedef map<CEGUI::String, CEGUI::String>::type DescriptionMap;
 	DescriptionMap mDescriptionMap;
 
 public:

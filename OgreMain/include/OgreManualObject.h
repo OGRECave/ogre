@@ -443,7 +443,7 @@ namespace Ogre
 
 		};
 
-		typedef std::vector<ManualObjectSection*> SectionList;
+		typedef vector<ManualObjectSection*>::type SectionList;
 
 		/// @copydoc MovableObject::visitRenderables
 		void visitRenderables(Renderable::Visitor* visitor, 

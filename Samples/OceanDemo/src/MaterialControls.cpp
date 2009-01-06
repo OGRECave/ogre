@@ -113,7 +113,7 @@ void loadMaterialControlsFile(MaterialControlsContainer& controlsContainer, cons
 void loadAllMaterialControlFiles(MaterialControlsContainer& controlsContainer)
 {
     Ogre::StringVectorPtr fileStringVector = Ogre::ResourceGroupManager::getSingleton().findResourceNames( Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, "*.controls" );
-    std::vector<Ogre::String>::iterator controlsFileNameIterator = fileStringVector->begin();
+	Ogre::StringVector::iterator controlsFileNameIterator = fileStringVector->begin();
 
     while ( controlsFileNameIterator != fileStringVector->end() )
 	{

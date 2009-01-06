@@ -766,7 +766,7 @@ namespace Ogre {
 
     }
     // -------------------------------------------------------------------
-    const std::vector<Plane>& Camera::getWindowPlanes(void) const
+    const vector<Plane>::type& Camera::getWindowPlanes(void) const
     {
         updateView();
         setWindowImpl();
@@ -934,9 +934,9 @@ namespace Ogre {
 	//| coordinate system in which this is true.			|
 	//|_____________________________________________________|
 	//
-	std::vector<Vector4> Camera::getRayForwardIntersect(const Vector3& anchor, const Vector3 *dir, Real planeOffset) const
+	vector<Vector4>::type Camera::getRayForwardIntersect(const Vector3& anchor, const Vector3 *dir, Real planeOffset) const
 	{
-		std::vector<Vector4> res;
+		vector<Vector4>::type res;
 
 		if(!dir)
 			return res;
@@ -1017,7 +1017,7 @@ namespace Ogre {
 	//| line at infinity.									|
 	//|_____________________________________________________|
 	//
-	void Camera::forwardIntersect(const Plane& worldPlane, std::vector<Vector4>* intersect3d) const
+	void Camera::forwardIntersect(const Plane& worldPlane, vector<Vector4>::type* intersect3d) const
 	{
 		if(!intersect3d)
 			return;
@@ -1045,7 +1045,7 @@ namespace Ogre {
 		vec[3] = invPlaneRot * brCorner - lPos; 
 
 		// compute intersection points on plane
-		std::vector<Vector4> iPnt = getRayForwardIntersect(lPos, vec, -pval.d);
+		vector<Vector4>::type iPnt = getRayForwardIntersect(lPos, vec, -pval.d);
 
 
 		// return wanted data

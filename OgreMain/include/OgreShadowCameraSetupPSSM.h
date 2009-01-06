@@ -50,8 +50,8 @@ namespace Ogre
 	class _OgreExport PSSMShadowCameraSetup : public Ogre::LiSPSMShadowCameraSetup
 	{
 	public:
-		typedef std::vector<Real> SplitPointList;
-		typedef std::vector<Real> OptimalAdjustFactorList;
+		typedef vector<Real>::type SplitPointList;
+		typedef vector<Real>::type OptimalAdjustFactorList;
 
 	protected:
 		size_t mSplitCount;

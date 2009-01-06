@@ -46,7 +46,7 @@ namespace Ogre {
         String mType;
         unsigned int mFreeImageType;
 
-		typedef std::list<ImageCodec*> RegisteredCodecList;
+		typedef list<ImageCodec*>::type RegisteredCodecList;
 		static RegisteredCodecList msCodecList;
 
 		/** Common encoding routine. */

@@ -450,7 +450,7 @@ namespace OgreRefApp
         CollisionProxyList::const_iterator proxy, proxyend;
         proxyend = mCollisionProxies.end();
 
-        std::list<Plane>::const_iterator pi, piend;
+        list<Plane>::type::const_iterator pi, piend;
         piend = wf->planes->end();
 
         CollisionInfo collInfo;

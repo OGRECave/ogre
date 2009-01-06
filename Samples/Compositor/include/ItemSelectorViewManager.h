@@ -75,7 +75,7 @@ LGPL like the rest of the engine.
 
             ItemSelector() : CheckBoxWidget(0) {}
         };
-        typedef std::vector<ItemSelector> ItemSelectorContainer;
+		typedef Ogre::vector<ItemSelector>::type ItemSelectorContainer;
         typedef ItemSelectorContainer::iterator ItemSelectorIterator;
 
         float mVerticalScrollPosition;

@@ -62,9 +62,9 @@ class OctreeAxisAlignedBoxSceneQuery;
 class OctreePlaneBoundedVolumeListSceneQuery;
 
 
-typedef std::list < WireBoundingBox * > BoxList;
-typedef std::list < unsigned long > ColorList;
-//typedef std::list < SceneNode * > SceneNodeList;
+typedef list< WireBoundingBox * >::type BoxList;
+typedef list< unsigned long >::type ColorList;
+//typedef list< SceneNode * >::type SceneNodeList;
 
 
 /** Specialized SceneManager that divides the geometry into an octree in order to facilitate spatial queries.
@@ -141,22 +141,22 @@ public:
     /** Recurses the octree, adding any nodes intersecting with the box into the given list.
     It ignores the exclude scene node.
     */
-    void findNodesIn( const AxisAlignedBox &box, std::list < SceneNode * > &list, SceneNode *exclude = 0 );
+    void findNodesIn( const AxisAlignedBox &box, list< SceneNode * >::type &list, SceneNode *exclude = 0 );
 
     /** Recurses the octree, adding any nodes intersecting with the sphere into the given list.
     It ignores the exclude scene node.
     */
-    void findNodesIn( const Sphere &sphere, std::list < SceneNode * > &list, SceneNode *exclude = 0 );
+    void findNodesIn( const Sphere &sphere, list< SceneNode * >::type &list, SceneNode *exclude = 0 );
 
     /** Recurses the octree, adding any nodes intersecting with the volume into the given list.
       It ignores the exclude scene node.
       */
-    void findNodesIn( const PlaneBoundedVolume &volume, std::list < SceneNode * > &list, SceneNode *exclude=0 );
+    void findNodesIn( const PlaneBoundedVolume &volume, list< SceneNode * >::type &list, SceneNode *exclude=0 );
 
     /** Recurses the octree, adding any nodes intersecting with the ray into the given list.
       It ignores the exclude scene node.
       */
-    void findNodesIn( const Ray &ray, std::list < SceneNode * > &list, SceneNode *exclude=0 );
+    void findNodesIn( const Ray &ray, list< SceneNode * >::type &list, SceneNode *exclude=0 );
 
     /** Sets the box visibility flag */
     void setShowBoxes( bool b )

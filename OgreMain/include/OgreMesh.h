@@ -92,13 +92,13 @@ namespace Ogre {
         friend class MeshSerializerImpl_v1_1;
 
     public:
-		typedef std::vector<Real> LodValueList;
-        typedef std::vector<MeshLodUsage> MeshLodUsageList;
+		typedef vector<Real>::type LodValueList;
+        typedef vector<MeshLodUsage>::type MeshLodUsageList;
         /// Multimap of vertex bone assignments (orders by vertex index)
-        typedef std::multimap<size_t, VertexBoneAssignment> VertexBoneAssignmentList;
+		typedef multimap<size_t, VertexBoneAssignment>::type VertexBoneAssignmentList;
         typedef MapIterator<VertexBoneAssignmentList> BoneAssignmentIterator;
-        typedef std::vector<SubMesh*> SubMeshList;
-        typedef std::vector<unsigned short> IndexMap;
+        typedef vector<SubMesh*>::type SubMeshList;
+        typedef vector<unsigned short>::type IndexMap;
 
     protected:
         /** A list of submeshes which make up this mesh.
@@ -167,7 +167,7 @@ namespace Ogre {
         bool mAutoBuildEdgeLists;
 
 		/// Storage of morph animations, lookup by name
-		typedef std::map<String, Animation*> AnimationList;
+		typedef map<String, Animation*>::type AnimationList;
 		AnimationList mAnimationsList;
 		/// The vertex animation type associated with the shared vertex data
 		mutable VertexAnimationType mSharedVertexDataAnimationType;
@@ -736,7 +736,7 @@ namespace Ogre {
 			number in start and end
 		*/
 		static void softwareVertexPoseBlend(Real weight, 
-			const std::map<size_t, Vector3>& vertexOffsetMap,
+			const map<size_t, Vector3>::type& vertexOffsetMap,
 			VertexData* targetVertexData);
         /** Gets a reference to the optional name assignments of the SubMeshes. */
         const SubMeshNameMap& getSubMeshNameMap(void) const { return mSubMeshNameMap; }

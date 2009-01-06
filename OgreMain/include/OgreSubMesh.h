@@ -102,7 +102,7 @@ namespace Ogre {
                 The use of shared or non-shared index map is determined when
                 model data is converted to the OGRE .mesh format.
         */
-        typedef std::vector<unsigned short> IndexMap;
+        typedef vector<unsigned short>::type IndexMap;
         IndexMap blendIndexToBoneIndexMap;
 
         ProgressiveMesh::LODFaceList mLodFaceList;
@@ -126,7 +126,7 @@ namespace Ogre {
                 If this array is empty, submesh sorting is done like in older versions -
                 by comparing the positions of the owning entity.
          */
-        std::vector<Vector3> extremityPoints;
+        vector<Vector3>::type extremityPoints;
 
         /// Reference to parent Mesh (not a smart pointer so child does not keep parent alive).
         Mesh* parent;
@@ -169,7 +169,7 @@ namespace Ogre {
         void clearBoneAssignments(void);
 
         /// Multimap of verex bone assignments (orders by vertex index)
-        typedef std::multimap<size_t, VertexBoneAssignment> VertexBoneAssignmentList;
+        typedef multimap<size_t, VertexBoneAssignment>::type VertexBoneAssignmentList;
         typedef MapIterator<VertexBoneAssignmentList> BoneAssignmentIterator;
 
         /** Gets an iterator for access all bone assignments. 

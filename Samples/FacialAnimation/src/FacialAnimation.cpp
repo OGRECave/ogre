@@ -341,7 +341,7 @@ protected:
 		for (int i = 0; i < SI_COUNT; ++i)
 		{
 			scrollbars[i] = static_cast<CEGUI::Scrollbar*>(
-				wmgr.getWindow(scrollbarNames[i]));
+				wmgr.getWindow(scrollbarNames[i].c_str()));
 			scrollbars[i]->subscribeEvent(
 				CEGUI::Scrollbar::EventScrollPositionChanged, 
 				CEGUI::Event::Subscriber(&FacialApplication::handleScrollChanged, this));

@@ -46,7 +46,7 @@ namespace Ogre
 	class _OgreExport ConvexBody
 	{
 	public:
-		typedef std::vector< Polygon* >	PolygonList;
+		typedef vector< Polygon* >::type	PolygonList;
 
 	protected:
 		PolygonList mPolygons;

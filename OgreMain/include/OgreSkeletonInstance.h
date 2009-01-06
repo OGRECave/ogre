@@ -115,7 +115,7 @@ namespace Ogre {
         /// Pointer back to master Skeleton
         SkeletonPtr mSkeleton;
 
-        typedef std::list<TagPoint*> TagPointList;
+        typedef list<TagPoint*>::type TagPointList;
 
         /** Active tag point list.
         @remarks

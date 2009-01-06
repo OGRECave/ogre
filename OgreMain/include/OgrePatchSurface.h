@@ -198,7 +198,7 @@ namespace Ogre {
 
         Real mSubdivisionFactor;
 
-        std::vector<Vector3> mVecCtlPoints;
+        vector<Vector3>::type mVecCtlPoints;
 
         /** Internal method for finding the subdivision level given 3 control points.
         */

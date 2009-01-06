@@ -121,7 +121,7 @@ namespace Ogre {
             const NameValuePairList* params);
 
 		/// Scheme name -> index. Never shrinks! Should be pretty static anyway
-		typedef std::map<String, unsigned short> SchemeMap;
+		typedef map<String, unsigned short>::type SchemeMap;
 		/// List of material schemes
 		SchemeMap mSchemes;
 		/// Current material scheme
@@ -129,7 +129,7 @@ namespace Ogre {
 		/// Current material scheme
 		unsigned short mActiveSchemeIndex;
 
-		typedef std::list<Listener*> ListenerList;
+		typedef list<Listener*>::type ListenerList;
 		ListenerList mListenerList;
 
     public:

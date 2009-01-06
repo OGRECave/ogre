@@ -41,7 +41,7 @@ namespace Ogre {
     class _OgreExport LodStrategyManager : public Singleton<LodStrategyManager>, public LodAlloc
     {
         /** Map of strategies. */
-        typedef std::map<String, LodStrategy *> StrategyMap;
+        typedef map<String, LodStrategy *>::type StrategyMap;
 
         /** Internal map of strategies. */
         StrategyMap mStrategies;

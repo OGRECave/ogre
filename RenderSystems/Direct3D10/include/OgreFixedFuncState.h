@@ -61,7 +61,7 @@ namespace Ogre {
 		void setCoordIndex(uint8 val);
 	};
 
-	typedef std::vector<TextureLayerState> TextureLayerStateList;
+	typedef vector<TextureLayerState>::type TextureLayerStateList;
 
 	class VertexBufferElement
 	{
@@ -78,7 +78,7 @@ namespace Ogre {
 		void setVertexElementIndex(unsigned short val);
 	};
 
-	typedef std::vector<VertexBufferElement> VertexBufferElementList;
+	typedef vector<VertexBufferElement>::type VertexBufferElementList;
 
 	class VertexBufferDeclaration
 	{

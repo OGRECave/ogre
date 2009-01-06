@@ -67,7 +67,7 @@ namespace Ogre {
 		uint32 line;
 	};
 	typedef SharedPtr<ScriptToken> ScriptTokenPtr;
-	typedef std::vector<ScriptTokenPtr> ScriptTokenList;
+	typedef vector<ScriptTokenPtr>::type ScriptTokenList;
 	typedef SharedPtr<ScriptTokenList> ScriptTokenListPtr;
 
 	class _OgreExport ScriptLexer : public ScriptCompilerAlloc

@@ -116,8 +116,8 @@ namespace Ogre {
 
 
 
-        std::vector<Quaternion> mPoints;
-        std::vector<Quaternion> mTangents;
+        vector<Quaternion>::type mPoints;
+        vector<Quaternion>::type mTangents;
 
     };
 

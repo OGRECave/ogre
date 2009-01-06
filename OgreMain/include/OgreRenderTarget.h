@@ -402,11 +402,11 @@ namespace Ogre {
 
         void updateStats(void);
 
-        typedef std::map<int, Viewport*, std::less<int> > ViewportList;
+		typedef map<int, Viewport*>::type ViewportList;
         /// List of viewports, map on Z-order
         ViewportList mViewportList;
 
-        typedef std::vector<RenderTargetListener*> RenderTargetListenerList;
+        typedef vector<RenderTargetListener*>::type RenderTargetListenerList;
         RenderTargetListenerList mListeners;
 	
 

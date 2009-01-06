@@ -49,7 +49,7 @@ namespace Ogre {
             IM_NONE,        // No input
             IM_PREVIOUS     // Output of previous Composition in chain
         };
-        typedef std::vector<CompositionPass *> Passes;
+        typedef vector<CompositionPass *>::type Passes;
         typedef VectorIterator<Passes> PassIterator;
         
         /** Set input mode of this TargetPass

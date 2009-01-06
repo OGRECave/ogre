@@ -114,7 +114,7 @@ namespace Ogre {
 		/** Internal method for forcing all active compositors to recreate their resources. */
 		void _reconstructAllCompositorResources();
 
-		typedef std::set<Texture*> UniqueTextureSet;
+		typedef set<Texture*>::type UniqueTextureSet;
 
 		/** Utility function to get an existing shared texture matching a given
 			definition, or creating one if one doesn't exist. It also takes into
@@ -169,7 +169,7 @@ namespace Ogre {
 
 	
 	private:
-        typedef std::map<Viewport*, CompositorChain*> Chains;
+        typedef map<Viewport*, CompositorChain*>::type Chains;
         Chains mChains;
 
 		/// Serializer - Hold instance per thread if necessary
@@ -182,10 +182,10 @@ namespace Ogre {
 		Rectangle2D *mRectangle;
 
 		/// List of instances
-		typedef std::vector<CompositorInstance *> Instances;
+		typedef vector<CompositorInstance *>::type Instances;
 		Instances mInstances;
 
-		typedef std::vector<TexturePtr> TextureList;
+		typedef vector<TexturePtr>::type TextureList;
 		typedef VectorIterator<TextureList> TextureIterator;
 
 		struct TextureDef
@@ -238,7 +238,7 @@ namespace Ogre {
 			}
 			virtual ~TextureDefLess() {}
 		};
-		typedef std::map<TextureDef, TextureList*, TextureDefLess> TexturesByDef;
+		typedef map<TextureDef, TextureList*, TextureDefLess>::type TexturesByDef;
 		TexturesByDef mTexturesByDef;
 
 

@@ -95,7 +95,7 @@ namespace Ogre {
 		optFSAA.name = "FSAA";
 		optFSAA.immutable = false;
 		optFSAA.possibleValues.push_back("0");
-		for (std::vector<int>::iterator it = mFSAALevels.begin(); it != mFSAALevels.end(); ++it)
+		for (vector<int>::type::iterator it = mFSAALevels.begin(); it != mFSAALevels.end(); ++it)
 		{
 			String val = StringConverter::toString(*it);
 			optFSAA.possibleValues.push_back(val);
@@ -152,7 +152,7 @@ namespace Ogre {
 		DWORD width = StringConverter::parseUnsignedInt(val.substr(0, pos));
 		DWORD height = StringConverter::parseUnsignedInt(val.substr(pos+1, String::npos));
 
-		for(std::vector<DEVMODE>::const_iterator i = mDevModes.begin(); i != mDevModes.end(); ++i)
+		for(vector<DEVMODE>::type::const_iterator i = mDevModes.begin(); i != mDevModes.end(); ++i)
 		{
 			if (i->dmPelsWidth != width || i->dmPelsHeight != height)
 				continue;
@@ -283,7 +283,7 @@ namespace Ogre {
 		LPARAM dwData       // data
 		)
 	{
-		std::vector<MONITORINFOEX>* pArrMonitorsInfo = (std::vector<MONITORINFOEX>*)dwData;
+		vector<MONITORINFOEX>::type* pArrMonitorsInfo = (vector<MONITORINFOEX>::type*)dwData;
 
 		// Get monitor info
 		MONITORINFOEX monitorInfoEx;
@@ -393,7 +393,7 @@ namespace Ogre {
         LogManager::getSingleton().stream()
 			<< "Supported WGL extensions: " << wgl_extensions;
 		// Parse them, and add them to the main list
-		std::stringstream ext;
+		StringStream ext;
         String instr;
 		ext << wgl_extensions;
         while(ext >> instr)
@@ -578,7 +578,7 @@ namespace Ogre {
 		{
 
 			// Use WGL to test extended caps (multisample, sRGB)
-			std::vector<int> attribList;
+			vector<int>::type attribList;
 			attribList.push_back(WGL_DRAW_TO_WINDOW_ARB); attribList.push_back(GL_TRUE);
 			attribList.push_back(WGL_SUPPORT_OPENGL_ARB); attribList.push_back(GL_TRUE);
 			attribList.push_back(WGL_DOUBLE_BUFFER_ARB); attribList.push_back(GL_TRUE);

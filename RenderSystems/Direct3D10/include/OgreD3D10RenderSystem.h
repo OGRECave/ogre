@@ -178,7 +178,7 @@ namespace Ogre
 		/// Primary window, the one used to create the device
 		D3D10RenderWindow* mPrimaryWindow;
 
-		typedef std::vector<D3D10RenderWindow*> SecondaryWindowList;
+		typedef vector<D3D10RenderWindow*>::type SecondaryWindowList;
 		// List of additional windows after the first (swap chains)
 		SecondaryWindowList mSecondaryWindows;
 
@@ -201,7 +201,7 @@ namespace Ogre
 			IDXGISurface *surface;
 			size_t width, height;
 		};
-		typedef std::map<ZBufferFormat, ZBufferRef> ZBufferHash;
+		typedef map<ZBufferFormat, ZBufferRef>::type ZBufferHash;
 		ZBufferHash mZBufferHash;
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);

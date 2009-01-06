@@ -251,7 +251,7 @@ namespace Ogre
 	{
 		assert(this->getTextureType() == TEX_TYPE_CUBE_MAP);
 
-        LoadedStreams loadedStreams = LoadedStreams(new std::vector<MemoryDataStreamPtr>());
+        LoadedStreams loadedStreams = LoadedStreams(new vector<MemoryDataStreamPtr>::type());
         // DDS load?
 		if (getSourceFileType() == "dds")
 		{
@@ -300,7 +300,7 @@ namespace Ogre
 			ResourceGroupManager::getSingleton().openResource(
 				mName, mGroup, true, this);
 
-        LoadedStreams loadedStreams = LoadedStreams(new std::vector<MemoryDataStreamPtr>());
+        LoadedStreams loadedStreams = LoadedStreams(new vector<MemoryDataStreamPtr>::type());
         loadedStreams->push_back(MemoryDataStreamPtr(new MemoryDataStream(dstream)));
         return loadedStreams;
     }
@@ -314,7 +314,7 @@ namespace Ogre
 			ResourceGroupManager::getSingleton().openResource(
 				mName, mGroup, true, this);
 
-        LoadedStreams loadedStreams = LoadedStreams(new std::vector<MemoryDataStreamPtr>());
+        LoadedStreams loadedStreams = LoadedStreams(new vector<MemoryDataStreamPtr>::type());
         loadedStreams->push_back(MemoryDataStreamPtr(new MemoryDataStream(dstream)));
         return loadedStreams;
 	}
@@ -420,7 +420,7 @@ namespace Ogre
 			if ( pos != String::npos )
 				ext = mName.substr(pos+1);
 
-			std::vector<Image> images(6);
+			vector<Image>::type images(6);
 			ConstImagePtrList imagePtrs;
 
 			for(size_t i = 0; i < 6; i++)

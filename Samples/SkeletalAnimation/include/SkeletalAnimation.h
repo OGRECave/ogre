@@ -40,7 +40,7 @@ class SkeletalAnimationFrameListener : public ExampleFrameListener
 {
 protected:
 public:
-	SkeletalAnimationFrameListener(RenderWindow* win, Camera* cam, const std::string &debugText)
+	SkeletalAnimationFrameListener(RenderWindow* win, Camera* cam, const String &debugText)
         : ExampleFrameListener(win, cam)
     {
 		mDebugText = debugText;
@@ -88,7 +88,7 @@ public:
     SkeletalApplication() {}
 
 protected:
-	std::string mDebugText;
+	String mDebugText;
 
     // Just override the mandatory create scene method
     void createScene(void)

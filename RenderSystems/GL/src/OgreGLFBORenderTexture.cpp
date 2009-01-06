@@ -358,7 +358,7 @@ static const size_t depthBits[] =
         glDrawBuffer(old_drawbuffer);
         glReadBuffer(old_readbuffer);
 
-        std::string fmtstring;
+		String fmtstring;
         for(size_t x=0; x<PF_COUNT; ++x)
         {
             if(mProps[x].valid)

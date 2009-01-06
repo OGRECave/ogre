@@ -170,7 +170,7 @@ namespace Ogre {
         BspNode::Brush *mBrushes;
 
         /** Vector of player start points */
-        std::vector<ViewPoint> mPlayerStarts;
+		vector<ViewPoint>::type mPlayerStarts;
 
         /** Internal utility function for loading data from Quake3. */
         void loadQuake3Level(const Quake3Level& q3lvl);
@@ -202,14 +202,14 @@ namespace Ogre {
         /** Internal method for parsing chosen entities. */
         void loadEntities(const Quake3Level& q3lvl);
 
-        typedef std::map<const MovableObject*, std::list<BspNode*> > MovableToNodeMap;
+		typedef map<const MovableObject*, list<BspNode*>::type >::type MovableToNodeMap;
         /// Map for locating the nodes a movable is currently a member of
         MovableToNodeMap mMovableToNodeMap;
 
         void tagNodesWithMovable(BspNode* node, const MovableObject* mov, const Vector3& pos);
 
         // Storage of patches 
-        typedef std::map<int, PatchSurface*> PatchMap;
+		typedef map<int, PatchSurface*>::type PatchMap;
         PatchMap mPatches;
         // Total number of vertices required for all patches
         size_t mPatchVertexCount;

@@ -104,7 +104,7 @@ protected:
 	bool mActive;
 	DSMode mCurrentMode;
 
-	typedef std::set<MLight*> LightList;
+	typedef Ogre::set<MLight*>::type LightList;
 
 	LightList mLights;
 

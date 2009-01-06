@@ -496,7 +496,7 @@ TiXmlElement::TiXmlElement (const char * _value)
 
 
 #ifdef TIXML_USE_STL
-TiXmlElement::TiXmlElement( const std::string& _value ) 
+TiXmlElement::TiXmlElement( const TIXML_STRING& _value ) 
 	: TiXmlNode( TiXmlNode::ELEMENT )
 {
 	firstChild = lastChild = 0;
@@ -548,7 +548,7 @@ const char* TiXmlElement::Attribute( const char* name ) const
 
 
 #ifdef TIXML_USE_STL
-const std::string* TiXmlElement::Attribute( const std::string& name ) const
+const TIXML_STRING* TiXmlElement::Attribute( const TIXML_STRING& name ) const
 {
 	const TiXmlAttribute* node = attributeSet.Find( name );
 	if ( node )
@@ -575,9 +575,9 @@ const char* TiXmlElement::Attribute( const char* name, int* i ) const
 
 
 #ifdef TIXML_USE_STL
-const std::string* TiXmlElement::Attribute( const std::string& name, int* i ) const
+const TIXML_STRING* TiXmlElement::Attribute( const TIXML_STRING& name, int* i ) const
 {
-	const std::string* s = Attribute( name );
+	const TIXML_STRING* s = Attribute( name );
 	if ( i )
 	{
 		if ( s ) {
@@ -609,9 +609,9 @@ const char* TiXmlElement::Attribute( const char* name, double* d ) const
 
 
 #ifdef TIXML_USE_STL
-const std::string* TiXmlElement::Attribute( const std::string& name, double* d ) const
+const TIXML_STRING* TiXmlElement::Attribute( const TIXML_STRING& name, double* d ) const
 {
-	const std::string* s = Attribute( name );
+	const TIXML_STRING* s = Attribute( name );
 	if ( d )
 	{
 		if ( s ) {
@@ -636,7 +636,7 @@ int TiXmlElement::QueryIntAttribute( const char* name, int* ival ) const
 
 
 #ifdef TIXML_USE_STL
-int TiXmlElement::QueryIntAttribute( const std::string& name, int* ival ) const
+int TiXmlElement::QueryIntAttribute( const TIXML_STRING& name, int* ival ) const
 {
 	const TiXmlAttribute* node = attributeSet.Find( name );
 	if ( !node )
@@ -656,7 +656,7 @@ int TiXmlElement::QueryDoubleAttribute( const char* name, double* dval ) const
 
 
 #ifdef TIXML_USE_STL
-int TiXmlElement::QueryDoubleAttribute( const std::string& name, double* dval ) const
+int TiXmlElement::QueryDoubleAttribute( const TIXML_STRING& name, double* dval ) const
 {
 	const TiXmlAttribute* node = attributeSet.Find( name );
 	if ( !node )
@@ -679,11 +679,11 @@ void TiXmlElement::SetAttribute( const char * name, int val )
 
 
 #ifdef TIXML_USE_STL
-void TiXmlElement::SetAttribute( const std::string& name, int val )
+void TiXmlElement::SetAttribute( const TIXML_STRING& name, int val )
 {	
-   std::ostringstream oss;
+   Ogre::StringStream oss;
    oss << val;
-   SetAttribute( name, oss.str() );
+   SetAttribute( name, oss.str().c_str() );
 }
 #endif
 
@@ -731,7 +731,7 @@ void TiXmlElement::SetAttribute( const char * cname, const char * cvalue )
 
 
 #ifdef TIXML_USE_STL
-void TiXmlElement::SetAttribute( const std::string& name, const std::string& _value )
+void TiXmlElement::SetAttribute( const TIXML_STRING& name, const TIXML_STRING& _value )
 {
 	TiXmlAttribute* node = attributeSet.Find( name );
 	if ( node )
@@ -884,7 +884,7 @@ TiXmlDocument::TiXmlDocument( const char * documentName ) : TiXmlNode( TiXmlNode
 
 
 #ifdef TIXML_USE_STL
-TiXmlDocument::TiXmlDocument( const std::string& documentName ) : TiXmlNode( TiXmlNode::DOCUMENT )
+TiXmlDocument::TiXmlDocument( const TIXML_STRING& documentName ) : TiXmlNode( TiXmlNode::DOCUMENT )
 {
 	tabsize = 4;
 	useMicrosoftBOM = false;
@@ -932,8 +932,8 @@ bool TiXmlDocument::LoadFile( const char* _filename, TiXmlEncoding encoding )
 {
 	// There was a really terrifying little bug here. The code:
 	//		value = filename
-	// in the STL case, cause the assignment method of the std::string to
-	// be called. What is strange, is that the std::string had the same
+	// in the STL case, cause the assignment method of the TIXML_STRING to
+	// be called. What is strange, is that the TIXML_STRING had the same
 	// address as it's c_str() method, and so bad things happen. Looks
 	// like a bug in the Microsoft STL implementation.
 	// Add an extra string to avoid the crash.
@@ -1373,9 +1373,9 @@ TiXmlDeclaration::TiXmlDeclaration( const char * _version,
 
 
 #ifdef TIXML_USE_STL
-TiXmlDeclaration::TiXmlDeclaration(	const std::string& _version,
-									const std::string& _encoding,
-									const std::string& _standalone )
+TiXmlDeclaration::TiXmlDeclaration(	const TIXML_STRING& _version,
+									const TIXML_STRING& _encoding,
+									const TIXML_STRING& _standalone )
 	: TiXmlNode( TiXmlNode::DECLARATION )
 {
 	version = _version;
@@ -1530,7 +1530,7 @@ void TiXmlAttributeSet::Remove( TiXmlAttribute* removeMe )
 
 
 #ifdef TIXML_USE_STL
-const TiXmlAttribute* TiXmlAttributeSet::Find( const std::string& name ) const
+const TiXmlAttribute* TiXmlAttributeSet::Find( const TIXML_STRING& name ) const
 {
 	for( const TiXmlAttribute* node = sentinel.next; node != &sentinel; node = node->next )
 	{
@@ -1541,7 +1541,7 @@ const TiXmlAttribute* TiXmlAttributeSet::Find( const std::string& name ) const
 }
 
 /*
-TiXmlAttribute*	TiXmlAttributeSet::Find( const std::string& name )
+TiXmlAttribute*	TiXmlAttributeSet::Find( const TIXML_STRING& name )
 {
 	for( TiXmlAttribute* node = sentinel.next; node != &sentinel; node = node->next )
 	{
@@ -1601,7 +1601,7 @@ std::ostream& operator<< (std::ostream & out, const TiXmlNode & base)
 }
 
 
-std::string& operator<< (std::string& out, const TiXmlNode& base )
+TIXML_STRING& operator<< (TIXML_STRING& out, const TiXmlNode& base )
 {
 	TiXmlPrinter printer;
 	printer.SetStreamPrinting();

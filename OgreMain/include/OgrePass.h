@@ -184,7 +184,7 @@ namespace Ogre {
         //-------------------------------------------------------------------------
 
         /// Storage of texture unit states
-        typedef std::vector<TextureUnitState*> TextureUnitStates;
+        typedef vector<TextureUnitState*>::type TextureUnitStates;
         TextureUnitStates mTextureUnitStates;
 
 		// Vertex program details
@@ -212,7 +212,7 @@ namespace Ogre {
 		// constant, linear, quadratic coeffs
 		Real mPointAttenuationCoeffs[3];
 		// TU Content type lookups
-		typedef std::vector<unsigned short> ContentTypeLookup;
+		typedef vector<unsigned short>::type ContentTypeLookup;
 		mutable ContentTypeLookup mShadowContentTypeLookup;
 		mutable bool mContentTypeLookupBuilt;
 		/// Scissoring for the light?
@@ -226,7 +226,7 @@ namespace Ogre {
 		void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);
 
 	public:
-		typedef std::set<Pass*> PassSet;
+		typedef set<Pass*>::type PassSet;
     protected:
 		/// List of Passes whose hashes need recalculating
 		static PassSet msDirtyHashList;
@@ -1639,7 +1639,7 @@ namespace Ogre {
 		IlluminationPass() {}
     };
 
-    typedef std::vector<IlluminationPass*> IlluminationPassList;
+    typedef vector<IlluminationPass*>::type IlluminationPassList;
 
 
 }

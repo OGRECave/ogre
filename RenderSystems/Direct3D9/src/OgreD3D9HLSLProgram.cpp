@@ -89,7 +89,7 @@ namespace Ogre {
         // Populate preprocessor defines
         String stringBuffer;
 
-        std::vector<D3DXMACRO> defines;
+        vector<D3DXMACRO>::type defines;
         const D3DXMACRO* pDefines = 0;
         if (!mPreprocessorDefines.empty())
         {

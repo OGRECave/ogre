@@ -209,13 +209,13 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void AnimationTrack::_collectKeyFrameTimes(std::vector<Real>& keyFrameTimes)
+    void AnimationTrack::_collectKeyFrameTimes(vector<Real>::type& keyFrameTimes)
     {
         for (KeyFrameList::const_iterator i = mKeyFrames.begin(); i != mKeyFrames.end(); ++i)
         {
             Real timePos = (*i)->getTime();
 
-            std::vector<Real>::iterator it =
+            vector<Real>::type::iterator it =
                 std::lower_bound(keyFrameTimes.begin(), keyFrameTimes.end(), timePos);
             if (it == keyFrameTimes.end() || *it != timePos)
             {
@@ -224,7 +224,7 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void AnimationTrack::_buildKeyFrameIndexMap(const std::vector<Real>& keyFrameTimes)
+    void AnimationTrack::_buildKeyFrameIndexMap(const vector<Real>::type& keyFrameTimes)
     {
         // Pre-allocate memory
         mKeyFrameIndexMap.resize(keyFrameTimes.size() + 1);
@@ -608,7 +608,7 @@ namespace Ogre {
 		Quaternion lastorientation;
         KeyFrameList::iterator i = mKeyFrames.begin();
 		Radian quatTolerance(1e-3f);
-		std::list<unsigned short> removeList;
+		list<unsigned short>::type removeList;
 		unsigned short k = 0;
 		ushort dupKfCount = 0;
         for (; i != mKeyFrames.end(); ++i, ++k)
@@ -645,7 +645,7 @@ namespace Ogre {
 		}
 
 		// Now remove keyframes, in reverse order to avoid index revocation
-		std::list<unsigned short>::reverse_iterator r = removeList.rbegin();
+		list<unsigned short>::type::reverse_iterator r = removeList.rbegin();
 		for (; r!= removeList.rend(); ++r)
 		{
 			removeKeyFrame(*r);

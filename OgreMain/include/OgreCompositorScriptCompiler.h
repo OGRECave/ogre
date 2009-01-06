@@ -127,7 +127,7 @@ namespace Ogre {
 		CompositorScriptContext mScriptContext;
 
 		typedef void (CompositorScriptCompiler::* CSC_Action)(void);
-		typedef std::map<size_t, CSC_Action> TokenActionMap;
+		typedef map<size_t, CSC_Action>::type TokenActionMap;
 		typedef TokenActionMap::iterator TokenActionIterator;
 		/** Map of Token value as key to an Action.  An Action converts tokens into
 		the final format.

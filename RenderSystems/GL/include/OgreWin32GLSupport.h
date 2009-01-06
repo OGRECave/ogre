@@ -59,13 +59,13 @@ namespace Ogre
 		virtual GLPBuffer *createPBuffer(PixelComponentType format, size_t width, size_t height);
 	private:
 		// Allowed video modes
-		std::vector<DEVMODE> mDevModes;
+		vector<DEVMODE>::type mDevModes;
 		Win32Window *mInitialWindow;
-		std::vector<int> mFSAALevels;
+		vector<int>::type mFSAALevels;
 		bool mHasPixelFormatARB;
         bool mHasMultisample;
 		bool mHasHardwareGamma;
-		std::vector<MONITORINFOEX> mMonitorInfoList;
+		vector<MONITORINFOEX>::type mMonitorInfoList;
 
 		void refreshConfig();
 		void initialiseWGL();

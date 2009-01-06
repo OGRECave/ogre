@@ -126,7 +126,7 @@ namespace Ogre{
 		AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
 		if(!Ogre::StringConverter::isNumber(atom->value))
 			return false;
-		std::stringstream stream;
+		StringStream stream;
 		stream << atom->value;
 		stream >> *result;
 		return true;
@@ -139,7 +139,7 @@ namespace Ogre{
 		AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
 		if(!Ogre::StringConverter::isNumber(atom->value))
 			return false;
-		std::stringstream stream;
+		StringStream stream;
 		stream << atom->value;
 		stream >> *result;
 		return true;
@@ -152,7 +152,7 @@ namespace Ogre{
 		AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
 		if(!Ogre::StringConverter::isNumber(atom->value))
 			return false;
-		std::stringstream stream;
+		StringStream stream;
 		stream << atom->value;
 		stream >> *result;
 		return true;
@@ -165,7 +165,7 @@ namespace Ogre{
 		AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
 		if(!Ogre::StringConverter::isNumber(atom->value))
 			return false;
-		std::stringstream stream;
+		StringStream stream;
 		stream << atom->value;
 		stream >> *result;
 		return true;
@@ -413,7 +413,7 @@ namespace Ogre{
 			compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line);
 
 		// Create a material with the given name
-		std::vector<Ogre::Any> args;
+		vector<Ogre::Any>::type args;
 		args.push_back(Any(obj->file));
 		args.push_back(Any(obj->name));
 		args.push_back(Any(compiler->getResourceGroup()));
@@ -585,7 +585,7 @@ namespace Ogre{
 		// Apply the texture aliases
 		if(compiler->getListener())
 		{
-			std::vector<Ogre::Any> args;
+			vector<Ogre::Any>::type args;
 			args.push_back(Ogre::Any(mMaterial));
 			args.push_back(Ogre::Any(&mTextureAliases));
 			compiler->getListener()->handleEvent(compiler, "preApplyTextureAliases", args, 0);
@@ -681,7 +681,7 @@ namespace Ogre{
 						String matName;
 						if(getString(*i0, &matName))
 						{
-							std::vector<Any> args;
+							vector<Any>::type args;
 							args.push_back(Any(&matName));
 							compiler->_fireEvent("processMaterialName", args, 0);
 
@@ -708,7 +708,7 @@ namespace Ogre{
 						String matName;
 						if(getString(*i0, &matName))
 						{
-							std::vector<Any> args;
+							vector<Any>::type args;
 							args.push_back(Any(&matName));
 							compiler->_fireEvent("processMaterialName", args, 0);
 
@@ -2275,7 +2275,7 @@ namespace Ogre{
 
 		String name = node->name;
 
-		std::vector<Any> args;
+		vector<Any>::type args;
 		args.push_back(Any(&name));
 		compiler->_fireEvent("processGpuProgramName", args, 0);
 
@@ -2303,7 +2303,7 @@ namespace Ogre{
 		}
 
 		String name = node->name;
-		std::vector<Any> args;
+		vector<Any>::type args;
 		args.push_back(Any(&name));
 		compiler->_fireEvent("processGpuProgramName", args, 0);
 
@@ -2325,7 +2325,7 @@ namespace Ogre{
 		}
 
 		String name = node->name;
-		std::vector<Any> args;
+		vector<Any>::type args;
 		args.push_back(Any(&name));
 		compiler->_fireEvent("processGpuProgramName", args, 0);
 
@@ -2347,7 +2347,7 @@ namespace Ogre{
 		}
 
 		String name = node->name;
-		std::vector<Any> args;
+		vector<Any>::type args;
 		args.push_back(Any(&name));
 		compiler->_fireEvent("processGpuProgramName", args, 0);
 
@@ -2369,7 +2369,7 @@ namespace Ogre{
 		}
 
 		String name = node->name;
-		std::vector<Any> args;
+		vector<Any>::type args;
 		args.push_back(Any(&name));
 		compiler->_fireEvent("processGpuProgramName", args, 0);
 
@@ -2391,7 +2391,7 @@ namespace Ogre{
 		}
 
 		String name = node->name;
-		std::vector<Any> args;
+		vector<Any>::type args;
 		args.push_back(Any(&name));
 		compiler->_fireEvent("processGpuProgramName", args, 0);
 
@@ -2518,7 +2518,7 @@ namespace Ogre{
 								++j;
 							}
 
-							std::vector<Any> args;
+							vector<Any>::type args;
 							args.push_back(Any(&val));
 							args.push_back(Any(1));
 							compiler->_fireEvent("processTextureNames", args, 0);
@@ -2553,7 +2553,7 @@ namespace Ogre{
 								Real val2;
 								if(getString(*i0, &val0) && getUInt(*i1, &val1) && getReal(*i2, &val2))
 								{
-									std::vector<Any> args;
+									vector<Any>::type args;
 									args.push_back(Any(&val0));
 									args.push_back(Any(1));
 									compiler->_fireEvent("processTextureNames", args, 0);
@@ -2593,7 +2593,7 @@ namespace Ogre{
 									++j;
 								}
 
-								std::vector<Any> args;
+								vector<Any>::type args;
 								args.push_back(Any(names));
 								args.push_back(Any(n));
 								compiler->_fireEvent("processTextureNames", args, 0);
@@ -2624,7 +2624,7 @@ namespace Ogre{
 							AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
 
 							String name = atom0->value;
-							std::vector<Any> args;
+							vector<Any>::type args;
 							args.push_back(Any(&name));
 							args.push_back(Any(1));
 							compiler->_fireEvent("processTextureNames", args, 0);
@@ -2660,7 +2660,7 @@ namespace Ogre{
 							names[4] = atom4->value;
 							names[5] = atom5->value;
 
-							std::vector<Any> args;
+							vector<Any>::type args;
 							args.push_back(Any((String*)names));
 							args.push_back(Any(6));
 							compiler->_fireEvent("processTextureNames", args, 0);
@@ -3827,7 +3827,7 @@ namespace Ogre{
 	//-------------------------------------------------------------------------
 	void GpuProgramTranslator::translateGpuProgram(ScriptCompiler *compiler, ObjectAbstractNode *obj)
 	{
-		std::list<std::pair<String,String> > customParameters;
+		list<std::pair<String,String> >::type customParameters;
 		String syntax, source;
 		AbstractNodePtr params;
 		for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
@@ -3908,7 +3908,7 @@ namespace Ogre{
 		GpuProgram *prog = 0;
 		
 		Any retval;
-		std::vector<Any> args;
+		vector<Any>::type args;
 		args.push_back(Any(obj->file));
 		args.push_back(Any(obj->name));
 		args.push_back(Any(compiler->getResourceGroup()));
@@ -3949,7 +3949,7 @@ namespace Ogre{
 		prog->_notifyOrigin(obj->file);
 
 		// Set the custom parameters
-		for(std::list<std::pair<String,String> >::iterator i = customParameters.begin(); i != customParameters.end(); ++i)
+		for(list<std::pair<String,String> >::type::iterator i = customParameters.begin(); i != customParameters.end(); ++i)
 			prog->setParameter(i->first, i->second);
 
 		// Set up default parameters
@@ -3962,7 +3962,7 @@ namespace Ogre{
 	//-------------------------------------------------------------------------
 	void GpuProgramTranslator::translateUnifiedGpuProgram(ScriptCompiler *compiler, ObjectAbstractNode *obj)
 	{
-		std::list<std::pair<String,String> > customParameters;
+		list<std::pair<String,String> >::type customParameters;
 		AbstractNodePtr params;
 		for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
 		{
@@ -3975,7 +3975,7 @@ namespace Ogre{
 					if(!prop->values.empty() && prop->values.front()->type == ANT_ATOM)
 						value = ((AtomAbstractNode*)prop->values.front().get())->value;
 					
-					std::vector<Any> args;
+					vector<Any>::type args;
 					args.push_back(Any(&value));
 					compiler->_fireEvent("processGpuProgramName", args, 0);
 					customParameters.push_back(std::make_pair("delegate", value));
@@ -4010,7 +4010,7 @@ namespace Ogre{
 		// Allocate the program
 		HighLevelGpuProgram *prog = 0;
 		Any retval;
-		std::vector<Any> args;
+		vector<Any>::type args;
 		args.push_back(Any(obj->file));
 		args.push_back(Any(obj->name));
 		args.push_back(Any(compiler->getResourceGroup()));
@@ -4050,7 +4050,7 @@ namespace Ogre{
 		prog->_notifyOrigin(obj->file);
 
 		// Set the custom parameters
-		for(std::list<std::pair<String,String> >::iterator i = customParameters.begin(); i != customParameters.end(); ++i)
+		for(list<std::pair<String,String> >::type::iterator i = customParameters.begin(); i != customParameters.end(); ++i)
 			prog->setParameter(i->first, i->second);
 
 		// Set up default parameters
@@ -4076,7 +4076,7 @@ namespace Ogre{
 			return;
 		}
 
-		std::list<std::pair<String,String> > customParameters;
+		list<std::pair<String,String> >::type customParameters;
 		String source;
 		AbstractNodePtr params;
 		for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
@@ -4105,7 +4105,7 @@ namespace Ogre{
 					String value;
 					if(!prop->values.empty() && prop->values.front()->type == ANT_ATOM)
 						value = ((AtomAbstractNode*)prop->values.front().get())->value;
-					std::vector<Any> args;
+					vector<Any>::type args;
 					args.push_back(Any(&value));
 					compiler->_fireEvent("processGpuProgramName", args, 0);
 					customParameters.push_back(std::make_pair(prop->name, value));
@@ -4140,7 +4140,7 @@ namespace Ogre{
 		// Allocate the program
 		HighLevelGpuProgram *prog = 0;
 		Any retval;
-		std::vector<Any> args;
+		vector<Any>::type args;
 		args.push_back(Any(obj->file));
 		args.push_back(Any(obj->name));
 		args.push_back(Any(compiler->getResourceGroup()));
@@ -4183,7 +4183,7 @@ namespace Ogre{
 		prog->_notifyOrigin(obj->file);
 
 		// Set the custom parameters
-		for(std::list<std::pair<String,String> >::iterator i = customParameters.begin(); i != customParameters.end(); ++i)
+		for(list<std::pair<String,String> >::type::iterator i = customParameters.begin(); i != customParameters.end(); ++i)
 			prog->setParameter(i->first, i->second);
 
 		// Set up default parameters
@@ -4581,7 +4581,7 @@ namespace Ogre{
 
 		// Allocate the particle system
 		Any retval;
-		std::vector<Any> args;
+		vector<Any>::type args;
 		args.push_back(Any(obj->file));
 		args.push_back(Any(obj->name));
 		args.push_back(Any(compiler->getResourceGroup()));
@@ -4633,7 +4633,7 @@ namespace Ogre{
 						{
 							String name = ((AtomAbstractNode*)prop->values.front().get())->value;
 							
-							std::vector<Any> args;
+							vector<Any>::type args;
 							args.push_back(Any(&name));
 							compiler->_fireEvent("processMaterialName", args, 0);
 
@@ -4843,7 +4843,7 @@ namespace Ogre{
 
 		// Create the compositor
 		Any retval;
-		std::vector<Any> args;
+		vector<Any>::type args;
 		args.push_back(Any(obj->file));
 		args.push_back(Any(obj->name));
 		args.push_back(Any(compiler->getResourceGroup()));
@@ -5048,7 +5048,7 @@ namespace Ogre{
 						// No errors, create
 						String name = atom0->value;
 						
-						std::vector<Any> args;
+						vector<Any>::type args;
 						args.push_back(Any(&name));
 						args.push_back(Any(1));
 						compiler->_fireEvent("processTextureNames", args, 0);
@@ -5113,7 +5113,7 @@ namespace Ogre{
 			{
 				String name = obj->name;
 				
-				std::vector<Any> args;
+				vector<Any>::type args;
 				args.push_back(Any(&name));
 				args.push_back(Any(1));
 				compiler->_fireEvent("processTextureNames", args, 0);
@@ -5371,7 +5371,7 @@ namespace Ogre{
 						String val;
 						if(getString(prop->values.front(), &val))
 						{
-							std::vector<Any> args;
+							vector<Any>::type args;
 							args.push_back(Any(&val));
 							compiler->_fireEvent("processMaterialName", args, 0);
 
@@ -5411,7 +5411,7 @@ namespace Ogre{
 								}
 							}
 							
-							std::vector<Any> args;
+							vector<Any>::type args;
 							args.push_back(Any(&name));
 							args.push_back(Any(1));
 							compiler->_fireEvent("processTextureNames", args, 0);

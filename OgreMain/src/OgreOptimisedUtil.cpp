@@ -114,7 +114,7 @@ namespace Ogre {
 
         typedef ProfileItem ProfileItems[IMPL_COUNT];
 
-        typedef std::vector<OptimisedUtil*> OptimisedUtilList;
+        typedef vector<OptimisedUtil*>::type OptimisedUtilList;
         OptimisedUtilList mOptimisedUtils;
 
     public:

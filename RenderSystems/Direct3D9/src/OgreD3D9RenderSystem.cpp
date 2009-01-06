@@ -628,7 +628,7 @@ namespace Ogre
 		}
 
 		// Log a message
-		std::stringstream ss;
+		StringStream ss;
 		ss << "D3D9RenderSystem::_createRenderWindow \"" << name << "\", " <<
 			width << "x" << height << " ";
 		if(fullScreen)

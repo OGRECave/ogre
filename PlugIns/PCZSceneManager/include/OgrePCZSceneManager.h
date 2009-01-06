@@ -58,8 +58,8 @@ namespace Ogre
     class PCZAxisAlignedBoxSceneQuery;
     class PCZPlaneBoundedVolumeListSceneQuery;
 
-    typedef std::list < SceneNode * > NodeList;
-    typedef std::list < WireBoundingBox * > BoxList;
+    typedef list< SceneNode * >::type NodeList;
+    typedef list< WireBoundingBox * >::type BoxList;
 
     /** Specialized SceneManager that uses Portal-Connected-Zones to divide the scene spatially.
     */

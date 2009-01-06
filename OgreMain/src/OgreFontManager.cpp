@@ -127,7 +127,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void FontManager::parseAttribute(const String& line, FontPtr& pFont)
     {
-        std::vector<String> params = StringUtil::split(line);
+        vector<String>::type params = StringUtil::split(line);
         String& attrib = params[0];
 		StringUtil::toLowerCase(attrib);
         if (attrib == "type")

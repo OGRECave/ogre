@@ -125,7 +125,7 @@ namespace Ogre {
 
 			D3D10_SHADER_VARIABLE_DESC var;
 		};
-		typedef std::vector<ShaderVarWithPosInBuf> ShaderVars;
+		typedef vector<ShaderVarWithPosInBuf>::type ShaderVars;
 		typedef ShaderVars::iterator ShaderVarsIter; 
 
 		ShaderVars mShaderVars;

@@ -226,7 +226,7 @@ namespace Ogre {
             const Vector3 &cp = cam->getDerivedPosition();
             const Matrix4 &l2w = mParentEntity->_getParentNodeFullTransform();
 			dist = std::numeric_limits<Real>::infinity();
-            for (std::vector<Vector3>::const_iterator i = mSubMesh->extremityPoints.begin();
+            for (vector<Vector3>::type::const_iterator i = mSubMesh->extremityPoints.begin();
                  i != mSubMesh->extremityPoints.end (); ++i)
             {
                 Vector3 v = l2w * (*i);

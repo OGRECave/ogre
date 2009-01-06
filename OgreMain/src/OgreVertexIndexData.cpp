@@ -323,10 +323,10 @@ namespace Ogre {
 
 		// Build up a list of both old and new elements in each buffer
 		unsigned short buf = 0;
-		std::vector<void*> oldBufferLocks;
-        std::vector<size_t> oldBufferVertexSizes;
-		std::vector<void*> newBufferLocks;
-        std::vector<size_t> newBufferVertexSizes;
+		vector<void*>::type oldBufferLocks;
+        vector<size_t>::type oldBufferVertexSizes;
+		vector<void*>::type newBufferLocks;
+        vector<size_t>::type newBufferVertexSizes;
 		VertexBufferBinding* newBinding = 
 			HardwareBufferManager::getSingleton().createVertexBufferBinding();
         const VertexBufferBinding::VertexBufferBindingMap& oldBindingMap = vertexBufferBinding->getBindings();
@@ -371,7 +371,7 @@ namespace Ogre {
 		}
 
 		// Map from new to old elements
-        typedef std::map<const VertexElement*, const VertexElement*> NewToOldElementMap;
+        typedef map<const VertexElement*, const VertexElement*>::type NewToOldElementMap;
 		NewToOldElementMap newToOldElementMap;
 		const VertexDeclaration::VertexElementList& newElemList = newDeclaration->getElements();
 		VertexDeclaration::VertexElementList::const_iterator ei, eiend;
@@ -537,7 +537,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void VertexData::removeUnusedBuffers(void)
     {
-        std::set<ushort> usedBuffers;
+        set<ushort>::type usedBuffers;
 
         // Collect used buffers
         const VertexDeclaration::VertexElementList& allelems = 

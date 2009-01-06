@@ -577,7 +577,7 @@ namespace Ogre {
 			CGstate getCgState() const;
 		};
 
-		typedef std::vector<CgStateListener *> CgStateListenerVector;
+		typedef vector<CgStateListener *>::type CgStateListenerVector;
 
 		class CgGlobalStateListener : public CgStateListener
 		{
@@ -1449,8 +1449,8 @@ namespace Ogre {
 			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
 		};
 
-		typedef std::map<CGstate, CgGlobalStateListener *> CgGlobalStateToListenerMap;
-		typedef std::map<CGstate, CgSamplerStateListener *> CgSamplerStateToListenerMap;
+		typedef map<CGstate, CgGlobalStateListener *>::type CgGlobalStateToListenerMap;
+		typedef map<CGstate, CgSamplerStateListener *>::type CgSamplerStateToListenerMap;
 
 		CgGlobalStateToListenerMap mCgGlobalStateToListenerMap;
 		CgSamplerStateToListenerMap mCgSamplerStateToListenerMap;

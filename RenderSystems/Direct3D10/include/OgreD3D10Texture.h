@@ -66,7 +66,7 @@ namespace Ogre {
 		// Dynamic textures?
 		bool                            mDynamicTextures;
 		/// Vector of pointers to subsurfaces
-		typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
+		typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
 		SurfaceList						mSurfaceList;
 
 		D3D10_SHADER_RESOURCE_VIEW_DESC mSRVDesc;

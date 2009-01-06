@@ -112,7 +112,7 @@ private:
 	MeshPtr clonedMesh ;
 
 	Entity *objectEntity ;
-	std::vector<MaterialPtr> clonedMaterials ;
+	vector<MaterialPtr>::type clonedMaterials ;
 
 	// configuration
 	Real displacement ;
@@ -564,7 +564,7 @@ private:
 #define MEDIA_FILENAME "media.cfg"
 	void readConfig()
 	{
-        std::string media_filename(MEDIA_FILENAME);
+        String media_filename(MEDIA_FILENAME);
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         media_filename = macBundlePath() + "/Contents/Resources/" + media_filename;
 #endif

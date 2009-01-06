@@ -68,7 +68,11 @@ namespace Ogre
 		{
 			NedAllocImpl::deallocBytes(ptr);
 		}
-
+		/// Get the maximum size of a single allocation
+		static inline size_t getMaxAllocationSize()
+		{
+			return std::numeric_limits<size_t>::max();
+		}
 	private:
 		// No instantiation
 		NedAllocPolicy()

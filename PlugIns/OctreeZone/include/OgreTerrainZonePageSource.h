@@ -44,7 +44,7 @@ email                : ericcATxenopiDOTcom
 namespace Ogre {
 
     typedef std::pair<String, String> TerrainZonePageSourceOption;
-    typedef std::vector<TerrainZonePageSourceOption> TerrainZonePageSourceOptionList;
+    typedef vector<TerrainZonePageSourceOption>::type TerrainZonePageSourceOptionList;
 
     /** Abstract class which classes can override to receive notifications
         when a page is ready to be added to the terrain manager.
@@ -69,7 +69,7 @@ namespace Ogre {
 		public Singleton<TerrainZonePageSourceListenerManager>, public GeneralAllocatedObject
 	{
 	protected:
-        typedef std::vector<TerrainZonePageSourceListener*> PageSourceListenerList;
+        typedef vector<TerrainZonePageSourceListener*>::type PageSourceListenerList;
         PageSourceListenerList mPageSourceListeners;
 	public:
         TerrainZonePageSourceListenerManager() {}

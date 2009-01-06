@@ -44,7 +44,7 @@ Code Style Update	 :
 namespace Ogre
 {
 
-    typedef std::list<PCZone*> ZoneList;
+    typedef list<PCZone*>::type ZoneList;
 
     /** Specialized version of Ogre::Light which caches which zones the light affects
     @remarks

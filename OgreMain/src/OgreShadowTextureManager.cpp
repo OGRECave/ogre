@@ -79,7 +79,7 @@ namespace Ogre
 	{
 		listToPopulate.clear();
 
-		std::set<Texture*> usedTextures;
+		set<Texture*>::type usedTextures;
 
 		for (ShadowTextureConfigList::const_iterator c = config.begin(); c != config.end(); ++c)
 		{

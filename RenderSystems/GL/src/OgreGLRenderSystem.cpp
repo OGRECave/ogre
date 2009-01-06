@@ -997,7 +997,7 @@ namespace Ogre {
 				"GLRenderSystem::_createRenderWindow" );
 		}
 		// Log a message
-		std::stringstream ss;
+		StringStream ss;
 		ss << "GLRenderSystem::_createRenderWindow \"" << name << "\", " <<
 			width << "x" << height << " ";
 		if(fullScreen)
@@ -2680,7 +2680,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
             op.vertexData->vertexDeclaration->getElements();
         VertexDeclaration::VertexElementList::const_iterator elem, elemEnd;
         elemEnd = decl.end();
-		std::vector<GLuint> attribsBound;
+		vector<GLuint>::type attribsBound;
 
 		for (elem = decl.begin(); elem != elemEnd; ++elem)
 		{
@@ -2896,7 +2896,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 			glDisableClientState( GL_SECONDARY_COLOR_ARRAY );
 		}
  		// unbind any custom attributes
-		for (std::vector<GLuint>::iterator ai = attribsBound.begin(); ai != attribsBound.end(); ++ai)
+		for (vector<GLuint>::type::iterator ai = attribsBound.begin(); ai != attribsBound.end(); ++ai)
  		{
  			glDisableVertexAttribArrayARB(*ai); 
  

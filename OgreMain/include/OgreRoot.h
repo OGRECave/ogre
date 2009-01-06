@@ -42,7 +42,7 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
-    typedef std::vector<RenderSystem*> RenderSystemList;
+    typedef vector<RenderSystem*>::type RenderSystemList;
 	
     /** The root class of the Ogre system.
         @remarks
@@ -106,15 +106,15 @@ namespace Ogre
 		Real mFrameSmoothingTime;
 
 	public:
-		typedef std::vector<DynLib*> PluginLibList;
-		typedef std::vector<Plugin*> PluginInstanceList;
+		typedef vector<DynLib*>::type PluginLibList;
+		typedef vector<Plugin*>::type PluginInstanceList;
 	protected:
 		/// List of plugin DLLs loaded
         PluginLibList mPluginLibs;
 		/// List of Plugin instances registered
 		PluginInstanceList mPlugins;
 
-		typedef std::map<String, MovableObjectFactory*> MovableObjectFactoryMap;
+		typedef map<String, MovableObjectFactory*>::type MovableObjectFactoryMap;
 		MovableObjectFactoryMap mMovableObjectFactoryMap;
 		uint32 mNextMovableObjectTypeFlag;
 		// stock movable factories
@@ -125,7 +125,7 @@ namespace Ogre
 		MovableObjectFactory* mBillboardChainFactory;
 		MovableObjectFactory* mRibbonTrailFactory;
 
-		typedef std::map<String, RenderQueueInvocationSequence*> RenderQueueInvocationSequenceMap;
+		typedef map<String, RenderQueueInvocationSequence*>::type RenderQueueInvocationSequenceMap;
 		RenderQueueInvocationSequenceMap mRQSequenceMap;
 
 		/// Are we initialised yet?
@@ -155,10 +155,10 @@ namespace Ogre
         void oneTimePostWindowInit(void);
 
         /** Set of registered frame listeners */
-        std::set<FrameListener*> mFrameListeners;
+        set<FrameListener*>::type mFrameListeners;
 
         /** Set of frame listeners marked for removal*/
-        std::set<FrameListener*> mRemovedFrameListeners;
+        set<FrameListener*>::type mRemovedFrameListeners;
 
         /** Indicates the type of event to be considered by calculateEventTime(). */
         enum FrameEventTimeType {
@@ -170,7 +170,8 @@ namespace Ogre
         };
 
         /// Contains the times of recently fired events
-        std::deque<unsigned long> mEventTimes[FETT_COUNT];
+		typedef deque<unsigned long>::type EventTimesQueue;
+        EventTimesQueue mEventTimes[FETT_COUNT];
 
         /** Internal method for calculating the average time between recently fired events.
         @param now The current time in ms.

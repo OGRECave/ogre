@@ -73,7 +73,7 @@ namespace Ogre {
 		// Dynamic textures?
 		bool                            mDynamicTextures;
 		/// Vector of pointers to subsurfaces
-		typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
+		typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
 		SurfaceList						mSurfaceList;
 	
 		/// Is hardware gamma supported (read)?
@@ -87,7 +87,7 @@ namespace Ogre {
         void _initDevice(void);
 
         // needed to store data between prepareImpl and loadImpl
-        typedef SharedPtr<std::vector<MemoryDataStreamPtr> > LoadedStreams;
+        typedef SharedPtr<vector<MemoryDataStreamPtr>::type > LoadedStreams;
 
 		/// internal method, load a cube texture
 		void _loadCubeTex(const LoadedStreams &loadedStreams);

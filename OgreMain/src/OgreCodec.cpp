@@ -33,7 +33,7 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    std::map< String, Codec * > Codec::ms_mapCodecs;
+    map< String, Codec * >::type Codec::ms_mapCodecs;
 
     Codec::~Codec() {
     }

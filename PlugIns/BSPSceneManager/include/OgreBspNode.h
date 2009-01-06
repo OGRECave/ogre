@@ -143,14 +143,14 @@ namespace Ogre {
         /// Gets the signed distance to the dividing plane
         Real getDistance(const Vector3& pos) const;
 
-        typedef std::set<const MovableObject*> IntersectingObjectSet;
+		typedef set<const MovableObject*>::type IntersectingObjectSet;
 
         struct Brush
         {
-            std::list<Plane> planes;
+			list<Plane>::type planes;
             SceneQuery::WorldFragment fragment; // For query reporting
         };
-        typedef std::vector<Brush*> NodeBrushList; // Main brush memory held on level
+		typedef vector<Brush*>::type NodeBrushList; // Main brush memory held on level
 
         /** Get the list of solid Brushes for this node.
         @remarks Only applicable for leaf nodes. 

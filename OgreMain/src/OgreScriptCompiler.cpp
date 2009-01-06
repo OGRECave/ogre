@@ -113,7 +113,7 @@ namespace Ogre
 
 	std::pair<bool,String> ObjectAbstractNode::getVariable(const String &name) const
 	{
-		std::map<String,String>::const_iterator i = mEnv.find(name);
+		map<String,String>::type::const_iterator i = mEnv.find(name);
 		if(i != mEnv.end())
 			return std::make_pair(true, i->second);
 
@@ -128,7 +128,7 @@ namespace Ogre
 		return std::make_pair(false, "");
 	}
 
-	const std::map<String,String> &ObjectAbstractNode::getVariables() const
+	const map<String,String>::type &ObjectAbstractNode::getVariables() const
 	{
 		return mEnv;
 	}
@@ -237,12 +237,12 @@ namespace Ogre
 		Ogre::LogManager::getSingleton().logMessage(str);
 	}
 
-	bool ScriptCompilerListener::handleEvent(ScriptCompiler *compiler, const String &name, const std::vector<Ogre::Any> &args, Ogre::Any *retval)
+	bool ScriptCompilerListener::handleEvent(ScriptCompiler *compiler, const String &name, const vector<Ogre::Any>::type &args, Ogre::Any *retval)
 	{
 		return false;
 	}
 
-	Ogre::Any ScriptCompilerListener::createObject(ScriptCompiler *compiler, const String &type, const std::vector<Ogre::Any> &args)
+	Ogre::Any ScriptCompilerListener::createObject(ScriptCompiler *compiler, const String &type, const vector<Ogre::Any>::type &args)
 	{
 		return Ogre::Any();
 	}
@@ -491,14 +491,14 @@ namespace Ogre
 		return mGroup;
 	}
 
-	bool ScriptCompiler::_fireEvent(const Ogre::String &name, const std::vector<Any> &args, Ogre::Any *retval)
+	bool ScriptCompiler::_fireEvent(const Ogre::String &name, const vector<Any>::type &args, Ogre::Any *retval)
 	{
 		if(mListener)
 			return mListener->handleEvent(this, name, args, retval);
 		return false;
 	}
 
-	Any ScriptCompiler::_fireCreateObject(const Ogre::String &type, const std::vector<Any> &args)
+	Any ScriptCompiler::_fireCreateObject(const Ogre::String &type, const vector<Any>::type &args)
 	{
 		if(mListener)
 			return mListener->createObject(this, type, args);
@@ -688,7 +688,7 @@ namespace Ogre
 			ObjectAbstractNode *src = reinterpret_cast<ObjectAbstractNode*>(source.get());
 
 			// Overlay the environment of one on top the other first
-			for(std::map<String,String>::const_iterator i = src->getVariables().begin(); i != src->getVariables().end(); ++i)
+			for(map<String,String>::type::const_iterator i = src->getVariables().begin(); i != src->getVariables().end(); ++i)
 			{
 				std::pair<bool,String> var = dest->getVariable(i->first);
 				if(!var.first)
@@ -696,12 +696,12 @@ namespace Ogre
 			}
 			
 			// Create a vector storing each pairing of override between source and destination
-			std::vector<std::pair<AbstractNodePtr,AbstractNodeList::iterator> > overrides; 
+			vector<std::pair<AbstractNodePtr,AbstractNodeList::iterator> >::type overrides; 
 			// A list of indices for each destination node tracks the minimum
 			// source node they can index-match against
-			std::map<ObjectAbstractNode*,size_t> indices;
+			map<ObjectAbstractNode*,size_t>::type indices;
 			// A map storing which nodes have overridden from the destination node
-			std::map<ObjectAbstractNode*,bool> overridden;
+			map<ObjectAbstractNode*,bool>::type overridden;
 
 			// Fill the vector with objects from the source node (base)
 			// And insert non-objects into the overrides list of the destination
@@ -859,7 +859,7 @@ namespace Ogre
 	{
 		// Run past the listener
 		Any retval;
-		std::vector<Any> args;
+		vector<Any>::type args;
 		args.push_back(Any(cls));
 		args.push_back(Any(parent));
 		_fireEvent("processNameExclusion", args, &retval);
@@ -957,7 +957,7 @@ namespace Ogre
 					varAccess = scope->getVariable(var->name);
 				if(!scope || !varAccess.first)
 				{
-					std::map<String,String>::iterator k = mEnv.find(var->name);
+					map<String,String>::type::iterator k = mEnv.find(var->name);
 					varAccess.first = k != mEnv.end();
 					if(varAccess.first)
 						varAccess.second = k->second;
@@ -1391,7 +1391,7 @@ namespace Ogre
 				impl->abstract = false;
 
 				// Create a temporary detail list
-				std::list<ConcreteNode*> temp;
+				list<ConcreteNode*>::type temp;
 				if(node->token == "abstract")
 				{
 					impl->abstract = true;
@@ -1406,7 +1406,7 @@ namespace Ogre
 				}
 
 				// Get the type of object
-				std::list<ConcreteNode*>::const_iterator iter = temp.begin();
+				list<ConcreteNode*>::type::const_iterator iter = temp.begin();
 				impl->cls = (*iter)->token;
 				++iter;
 
@@ -1594,7 +1594,7 @@ namespace Ogre
 	{
 		OGRE_LOCK_AUTO_MUTEX
 		
-		for(std::vector<ScriptTranslatorManager*>::iterator i = mManagers.begin(); i != mManagers.end(); ++i)
+		for(vector<ScriptTranslatorManager*>::type::iterator i = mManagers.begin(); i != mManagers.end(); ++i)
 		{
 			if(*i == man)
 			{
@@ -1616,7 +1616,7 @@ namespace Ogre
 			OGRE_LOCK_AUTO_MUTEX
 			
 			// Start looking from the back
-			for(std::vector<ScriptTranslatorManager*>::reverse_iterator i = mManagers.rbegin(); i != mManagers.rend(); ++i)
+			for(vector<ScriptTranslatorManager*>::type::reverse_iterator i = mManagers.rbegin(); i != mManagers.rend(); ++i)
 			{
 				translator = (*i)->getTranslator(node);
 				if(translator != 0)

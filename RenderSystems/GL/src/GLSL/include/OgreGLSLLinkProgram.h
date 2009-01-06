@@ -45,7 +45,7 @@ namespace Ogre {
 		const GpuConstantDefinition* mConstantDef;
 	};
 
-	typedef std::vector<GLUniformReference> GLUniformReferenceList;
+	typedef vector<GLUniformReference>::type GLUniformReferenceList;
 	typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
 
 	/** C++ encapsulation of GLSL Program Object
@@ -79,7 +79,7 @@ namespace Ogre {
 		/// extract attributes
 		void extractAttributes(void);
 
-		typedef std::set<GLuint> AttributeSet;
+		typedef set<GLuint>::type AttributeSet;
 		// Custom attribute bindings
 		AttributeSet mValidAttributes;
 

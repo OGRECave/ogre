@@ -66,12 +66,12 @@ namespace Ogre
 	class PCZSceneManager;
     class PCZLight;
 
-    typedef std::map<String, PCZone*> ZoneMap;
-	typedef std::list<PCZone*> PCZoneList;
-    typedef std::list < Portal * > PortalList;
-	typedef std::list < SceneNode * > NodeList;
-	typedef std::set < PCZSceneNode * > PCZSceneNodeList;
-    typedef std::map<String, SceneNode*> SceneNodeList;
+    typedef map<String, PCZone*>::type ZoneMap;
+	typedef list<PCZone*>::type PCZoneList;
+    typedef list< Portal * >::type PortalList;
+	typedef list< SceneNode * >::type NodeList;
+	typedef set< PCZSceneNode * >::type PCZSceneNodeList;
+    typedef map<String, SceneNode*>::type SceneNodeList;
 
     /** Portal-Connected Zone datastructure for managing scene nodes.
     @remarks

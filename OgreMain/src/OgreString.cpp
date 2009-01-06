@@ -69,9 +69,9 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    std::vector<String> StringUtil::split( const String& str, const String& delims, unsigned int maxSplits)
+    vector<String>::type StringUtil::split( const String& str, const String& delims, unsigned int maxSplits)
     {
-        std::vector<String> ret;
+        vector<String>::type ret;
         // Pre-allocate some space for performance
         ret.reserve(maxSplits ? maxSplits+1 : 10);    // 10 is guessed capacity for most case
 

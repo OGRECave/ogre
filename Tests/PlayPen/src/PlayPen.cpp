@@ -78,7 +78,7 @@ SceneNode* camNode;
 Entity* mEntity;
 Real animTime = 0;
 Animation* mAnim = 0;
-std::vector<AnimationState*> mAnimStateList;
+vector<AnimationState*>::type mAnimStateList;
 AnimationState* mAnimState = 0;
 Overlay* mpOverlay;
 Entity* pPlaneEnt;
@@ -272,7 +272,6 @@ public:
     {
 
 
-
         // local just to stop toggles flipping too fast
         static Real timeUntilNextToggle = 0;
         static bool animate = true;
@@ -354,7 +353,7 @@ public:
 			}
 		}
 
-		std::vector<AnimationState*>::iterator animi;
+		vector<AnimationState*>::type::iterator animi;
 		for (animi = mAnimStateList.begin(); animi != mAnimStateList.end(); ++animi)
 		{
 			(*animi)->addTime(evt.timeSinceLastFrame);
@@ -374,11 +373,11 @@ public:
 
         if (rayQuery)
         {
-		    static std::set<Entity*> lastEnts;
+		    static set<Entity*>::type lastEnts;
 		    rayQuery->setRay(mCamera->getCameraToViewportRay(0.5, 0.5));
 
 		    // Reset last set
-		    for (std::set<Entity*>::iterator lasti = lastEnts.begin();
+		    for (set<Entity*>::type::iterator lasti = lastEnts.begin();
 				    lasti != lastEnts.end(); ++lasti)
 		    {
 			    (*lasti)->setMaterialName("Examples/OgreLogo");
@@ -405,10 +404,10 @@ public:
 
         if (intersectionQuery)
         {
-            static std::set<Entity*> lastEnts;
+            static set<Entity*>::type lastEnts;
 
             // Reset last set
-            for (std::set<Entity*>::iterator lasti = lastEnts.begin();
+            for (set<Entity*>::type::iterator lasti = lastEnts.begin();
                 lasti != lastEnts.end(); ++lasti)
             {
                 (*lasti)->setMaterialName("Examples/OgreLogo");
@@ -585,6 +584,7 @@ public:
 
 			}
 		}
+
 
         // Print camera details
         //mWindow->setDebugText("P: " + StringConverter::toString(mCamera->getDerivedPosition()) + " " + 
@@ -3620,16 +3620,16 @@ protected:
 	};
 	void testRadixSort()
 	{
-		RadixSort<std::list<int>, int, int> rs;
+		RadixSort<list<int>::type, int, int> rs;
 		SortFunctor f;
 
-		std::list<int> particles;
+		list<int>::type particles;
 		for (int r = 0; r < 20; ++r)
 		{
 			particles.push_back((int)Math::RangeRandom(-1e3f, 1e3f));
 		}
 
-		std::list<int>::iterator i;
+		list<int>::type::iterator i;
 		LogManager::getSingleton().logMessage("BEFORE");
 		for (i = particles.begin(); i != particles.end(); ++i)
 			LogManager::getSingleton().stream() << *i;
@@ -4658,7 +4658,7 @@ protected:
 
 	}
 
-	std::map<SharedPtr<int>, int> testMap;
+	map<SharedPtr<int>, int>::type testMap;
 
 	void testFloat32DDS()
 	{
@@ -7589,6 +7589,74 @@ protected:
 
 	}
 
+	void testDepthShadowMap()
+	{
+		mSceneMgr->setShadowTextureCount(1);
+		mSceneMgr->setShadowTextureConfig(0, 1024, 1024, PF_FLOAT32_R);
+		mSceneMgr->setShadowTextureSelfShadow(true);
+		mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+		mSceneMgr->setShadowCasterRenderBackFaces(false);
+
+		mSceneMgr->setShadowTextureCasterMaterial("DepthShadowCaster");
+
+		// Single light
+		Light* l = mSceneMgr->createLight("l1");
+		l->setType(Light::LT_SPOTLIGHT);
+		//l->setPosition(500, 500, -100);
+		l->setPosition(0, 500, 0);
+		Vector3 dir = -l->getPosition();
+		dir.normalise();
+		l->setDirection(dir);
+		l->setSpotlightOuterAngle(Degree(40));
+		l->setSpotlightInnerAngle(Degree(35));
+
+
+		// ground plane
+		movablePlane.normal = Vector3::UNIT_Y;
+		movablePlane.d = 0;
+		MeshManager::getSingleton().createPlane("Myplane",
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, movablePlane,
+			5500,5500,10,10,true,1,5,5,Vector3::UNIT_Z);
+		Entity* pPlaneEnt;
+		pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+		pPlaneEnt->setMaterialName("DepthShadowReceiver");
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
+
+		// box
+		ManualObject* man = mSceneMgr->createManualObject("box");
+		Real boxsize = 50;
+		Real boxsizehalf = boxsize / 2.0;
+		man->begin("DepthShadowReceiver");
+		man->position(-boxsizehalf, 0, boxsizehalf);
+		man->position(boxsizehalf, 0, boxsizehalf);
+		man->position(boxsizehalf, 0, -boxsizehalf);
+		man->position(-boxsizehalf, 0, -boxsizehalf);
+		man->position(-boxsizehalf, boxsize, boxsizehalf);
+		man->position(boxsizehalf, boxsize, boxsizehalf);
+		man->position(boxsizehalf, boxsize, -boxsizehalf);
+		man->position(-boxsizehalf, boxsize, -boxsizehalf);
+		man->quad(3, 2, 1, 0);
+		man->quad(4, 5, 6, 7);
+		man->quad(0, 1, 5, 4);
+		man->quad(1, 2, 6, 5);
+		man->quad(2, 3, 7, 6);
+		man->quad(3, 0, 4, 7);
+		man->end();
+		
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(man);
+
+		mCamera->setPosition(0, 200, 100);
+		mCamera->lookAt(Vector3::ZERO);
+
+
+		// Create RTT
+		//TexturePtr rtt = TextureManager::getSingleton().createManual("rtt1", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+		//	TEX_TYPE_2D, 1024, 1024, 1, 0, PF_FLOAT32_R);
+
+
+
+	}
+
 	void createScene(void)
     {
 
@@ -7678,7 +7746,7 @@ protected:
 
 		//testManualLOD();
 		//testGeneratedLOD();
-		//testLotsAndLotsOfEntities();
+		testLotsAndLotsOfEntities();
 		//testSimpleMesh();
 		//test2Windows();
 		//testStaticGeometry();
@@ -7756,7 +7824,9 @@ protected:
 		//testCompositorTechniqueSwitch(true);
 		//testBlitSubTextures();
 
-        testLod();
+		//testDepthShadowMap();
+
+        //testLod();
 
 
 

@@ -143,9 +143,9 @@ namespace Ogre {
         bool mAllDefaultRotation;
         bool mWorldSpace;
 
-        typedef std::list<Billboard*> ActiveBillboardList;
-        typedef std::list<Billboard*> FreeBillboardList;
-        typedef std::vector<Billboard*> BillboardPool;
+        typedef list<Billboard*>::type ActiveBillboardList;
+        typedef list<Billboard*>::type FreeBillboardList;
+        typedef vector<Billboard*>::type BillboardPool;
 
         /** Active billboard list.
             @remarks
@@ -202,7 +202,7 @@ namespace Ogre {
         /// Flag indicating whether each billboard should be culled separately (default: false)
         bool mCullIndividual;
 
-        typedef std::vector< Ogre::FloatRect > TextureCoordSets;
+        typedef vector< Ogre::FloatRect >::type TextureCoordSets;
         TextureCoordSets mTextureCoords;
 
         /// The type of billboard to render

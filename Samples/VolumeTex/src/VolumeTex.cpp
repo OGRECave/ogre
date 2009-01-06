@@ -64,7 +64,7 @@ public:
 		const float vscale = 1.0f/vcut;
 		
 		HardwarePixelBufferSharedPtr buffer = ptex->getBuffer(0, 0);
-		std::stringstream d;
+		Ogre::StringStream d;
 		d << "HardwarePixelBuffer " << buffer->getWidth() << " " << buffer->getHeight() << " " << buffer->getDepth();
 		LogManager::getSingleton().logMessage(d.str());
 		

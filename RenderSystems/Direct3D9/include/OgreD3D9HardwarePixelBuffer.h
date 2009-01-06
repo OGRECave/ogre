@@ -70,7 +70,7 @@ namespace Ogre {
 		IDirect3DBaseTexture9 *mMipTex;
 
 		/// Render targets
-		typedef std::vector<RenderTexture*> SliceTRT;
+		typedef vector<RenderTexture*>::type SliceTRT;
         SliceTRT mSliceTRT;
 	public:
 		D3D9HardwarePixelBuffer(HardwareBuffer::Usage usage);

@@ -57,7 +57,7 @@ namespace Ogre
 
 		shaderSource = shaderSource + "struct VS_INPUT { ";
 
-		std::map<uint8, VertexElementType> texCordVecType;
+		map<uint8, VertexElementType>::type texCordVecType;
 
 		uint8 semanticCount[100];
 		ZeroMemory(semanticCount, sizeof(uint8) * 100);

@@ -307,7 +307,7 @@ namespace Ogre {
         MeshPtr newMesh = MeshManager::getSingleton().createManual(newName, theGroup);
 
         // Copy submeshes first
-        std::vector<SubMesh*>::iterator subi;
+        vector<SubMesh*>::type::iterator subi;
         SubMesh* newSub;
         for (subi = mSubMeshList.begin(); subi != mSubMeshList.end(); ++subi)
         {
@@ -583,7 +583,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    typedef std::multimap<Real, Mesh::VertexBoneAssignmentList::iterator> WeightIteratorMap;
+    typedef multimap<Real, Mesh::VertexBoneAssignmentList::iterator>::type WeightIteratorMap;
     unsigned short Mesh::_rationaliseBoneAssignments(size_t vertexCount, Mesh::VertexBoneAssignmentList& assignments)
     {
         // Iterate through, finding the largest # bones per vertex
@@ -705,7 +705,7 @@ namespace Ogre {
             return;
         }
 
-        typedef std::set<unsigned short> BoneIndexSet;
+        typedef set<unsigned short>::type BoneIndexSet;
         BoneIndexSet usedBoneIndices;
 
         // Collect actually used bones
@@ -1758,7 +1758,7 @@ namespace Ogre {
 	}
 	//---------------------------------------------------------------------
 	void Mesh::softwareVertexPoseBlend(Real weight,
-		const std::map<size_t, Vector3>& vertexOffsetMap,
+		const map<size_t, Vector3>::type& vertexOffsetMap,
 		VertexData* targetVertexData)
 	{
 		// Do nothing if no weight
@@ -1779,7 +1779,7 @@ namespace Ogre {
 			destBuf->lock(HardwareBuffer::HBL_NORMAL));
 
 		// Iterate over affected vertices
-		for (std::map<size_t, Vector3>::const_iterator i = vertexOffsetMap.begin();
+		for (map<size_t, Vector3>::type::const_iterator i = vertexOffsetMap.begin();
 			i != vertexOffsetMap.end(); ++i)
 		{
 			// Adjust pointer
@@ -2124,7 +2124,7 @@ namespace Ogre {
 	void Mesh::updateMaterialForAllSubMeshes(void)
 	{
         // iterate through each sub mesh and request the submesh to update its material
-        std::vector<SubMesh*>::iterator subi;
+        vector<SubMesh*>::type::iterator subi;
         for (subi = mSubMeshList.begin(); subi != mSubMeshList.end(); ++subi)
         {
             (*subi)->updateMaterialUsingTextureAliases();

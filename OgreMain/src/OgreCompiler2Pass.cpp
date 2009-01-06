@@ -556,7 +556,7 @@ namespace Ogre {
         const TokenInst& token = getCurrentToken();
         if ( token.tokenID == _value_)
         {
-            std::map<size_t, float>::const_iterator i = mConstants.find(mPass2TokenQuePosition);
+            map<size_t, float>::type::const_iterator i = mConstants.find(mPass2TokenQuePosition);
             if (i != mConstants.end())
             {
                 return i->second;
@@ -587,7 +587,7 @@ namespace Ogre {
         const TokenInst& token = getCurrentToken();
         if (token.tokenID == _character_)
         {
-            std::map<size_t, String>::const_iterator i = mLabels.find(mPass2TokenQuePosition);
+            map<size_t, String>::type::const_iterator i = mLabels.find(mPass2TokenQuePosition);
             if (i != mLabels.end())
             {
                 return i->second;

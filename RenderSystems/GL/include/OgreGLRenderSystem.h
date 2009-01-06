@@ -124,7 +124,7 @@ namespace Ogre {
         GLContext *mMainContext;
         /* The current GL context  - main thread only*/
         GLContext *mCurrentContext;
-		typedef std::list<GLContext*> GLContextList;
+		typedef list<GLContext*>::type GLContextList;
 		/// List of background thread contexts
 		GLContextList mBackgroundContextList;
 

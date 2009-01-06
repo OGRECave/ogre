@@ -91,7 +91,7 @@ namespace Ogre
 	void D3D10Texture::loadImage( const Image &img )
 	{
 		// Use OGRE its own codecs
-		std::vector<const Image*> imagePtrs;
+		vector<const Image*>::type imagePtrs;
 		imagePtrs.push_back(&img);
 		_loadImages( imagePtrs );
 	}
@@ -130,7 +130,7 @@ namespace Ogre
 			
 		//	if ( pos != String::npos )
 		//		ext = mName.substr(pos+1);
-			std::vector<Image> images(6);
+			vector<Image>::type images(6);
 			ConstImagePtrList imagePtrs;
 			static const String suffixes[6] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
 

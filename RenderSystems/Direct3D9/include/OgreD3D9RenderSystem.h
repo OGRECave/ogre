@@ -169,7 +169,7 @@ namespace Ogre
 		/// Primary window, the one used to create the device
 		D3D9RenderWindow* mPrimaryWindow;
 
-		typedef std::vector<D3D9RenderWindow*> SecondaryWindowList;
+		typedef vector<D3D9RenderWindow*>::type SecondaryWindowList;
 		// List of additional windows after the first (swap chains)
 		SecondaryWindowList mSecondaryWindows;
 
@@ -220,7 +220,7 @@ namespace Ogre
 			}
 		};
 
-		typedef std::map<ZBufferFormat, ZBufferRef, ZBufferFormatLess> ZBufferHash;
+		typedef map<ZBufferFormat, ZBufferRef, ZBufferFormatLess>::type ZBufferHash;
 		ZBufferHash mZBufferHash;
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);

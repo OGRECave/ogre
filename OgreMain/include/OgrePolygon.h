@@ -47,9 +47,9 @@ namespace Ogre
 	{
 
 	public:
-		typedef std::vector<Vector3>				VertexList;
+		typedef vector<Vector3>::type				VertexList;
 
-		typedef std::multimap<Vector3, Vector3>		EdgeMap;
+		typedef multimap<Vector3, Vector3>::type		EdgeMap;
 		typedef std::pair< Vector3, Vector3>		Edge;
 
 	protected:

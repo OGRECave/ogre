@@ -71,10 +71,10 @@ namespace Ogre {
 
         // State variables for rendering WIP
         // Set of face groups (by index) already included
-        typedef std::set<int> FaceGroupSet;
+		typedef set<int>::type FaceGroupSet;
         FaceGroupSet mFaceGroupSet;
         // Material -> face group hashmap
-        typedef std::map<Material*, std::vector<StaticFaceGroup*>, materialLess > MaterialFaceGroupMap;
+		typedef map<Material*, vector<StaticFaceGroup*>::type, materialLess >::type MaterialFaceGroupMap;
         MaterialFaceGroupMap mMatFaceGroupMap;
 
         RenderOperation mRenderOp;
@@ -112,7 +112,7 @@ namespace Ogre {
 		// Overridden so we can manually render world geometry
 		bool fireRenderQueueEnded(uint8 id, const String& invocation);
 
-        typedef std::set<const MovableObject*> MovablesForRendering;
+		typedef set<const MovableObject*>::type MovablesForRendering;
         MovablesForRendering mMovablesForRendering;
 
     public:
@@ -245,9 +245,9 @@ namespace Ogre {
         void execute(RaySceneQueryListener* listener);
     protected:
         /// Set for eliminating duplicates since objects can be in > 1 node
-        std::set<MovableObject*> mObjsThisQuery;
+		set<MovableObject*>::type mObjsThisQuery;
         /// list of the last single intersection world fragments (derived)
-        std::vector<SceneQuery::WorldFragment*> mSingleIntersections;
+		vector<SceneQuery::WorldFragment*>::type mSingleIntersections;
 
         void clearTemporaries(void);
         /** Internal processing of a single node.

@@ -118,7 +118,7 @@ namespace Ogre {
                 size_t stencil;   // Stencil format (0=no stencil)
             };
             
-            std::vector<Mode> modes;
+            vector<Mode>::type modes;
         };
         /** Properties for all internal formats defined by OGRE
         */
@@ -173,7 +173,7 @@ namespace Ogre {
             GLRenderBuffer *buffer;
             size_t refcount;
         };
-        typedef std::map<RBFormat, RBRef> RenderBufferMap;
+        typedef map<RBFormat, RBRef>::type RenderBufferMap;
         RenderBufferMap mRenderBufferMap;
         // map(format, sizex, sizey) -> [GLSurface*,refcount]
         

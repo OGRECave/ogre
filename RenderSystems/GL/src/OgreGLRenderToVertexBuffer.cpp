@@ -311,7 +311,7 @@ namespace Ogre {
 			GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
 			GLhandleARB linkProgramId = linkProgram->getGLHandle();
 			
-			std::vector<GLint> locations;
+			vector<GLint>::type locations;
 			for (unsigned short e=0; e < declaration->getElementCount(); e++)
 			{
 				const VertexElement* element =declaration->getElement(e);
@@ -333,7 +333,7 @@ namespace Ogre {
 		else
 		{
 			//Either fixed function or assembly (CG = assembly) shaders
-			std::vector<GLint> attribs;
+			vector<GLint>::type attribs;
 			for (unsigned short e=0; e < declaration->getElementCount(); e++)
 			{
 				const VertexElement* element = declaration->getElement(e);

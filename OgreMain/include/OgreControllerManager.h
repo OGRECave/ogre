@@ -52,7 +52,7 @@ namespace Ogre {
     class _OgreExport ControllerManager : public Singleton<ControllerManager>, public ControllerAlloc
     {
     protected:
-        typedef std::set<Controller<Real>*> ControllerList;
+        typedef set<Controller<Real>*>::type ControllerList;
         ControllerList mControllers;
 
         /// Global predefined controller

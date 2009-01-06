@@ -650,7 +650,7 @@ namespace Ogre {
     void Root::addFrameListener(FrameListener* newListener)
     {
 		// Check if the specified listener is scheduled for removal
-		std::set<FrameListener *>::iterator i = mRemovedFrameListeners.find(newListener);
+		set<FrameListener *>::type::iterator i = mRemovedFrameListeners.find(newListener);
 
 		// If yes, cancel the removal. Otherwise add it to other listeners.
 		if (i != mRemovedFrameListeners.end())
@@ -669,7 +669,7 @@ namespace Ogre {
     bool Root::_fireFrameStarted(FrameEvent& evt)
     {
         // Remove all marked listeners
-        std::set<FrameListener*>::iterator i;
+        set<FrameListener*>::type::iterator i;
         for (i = mRemovedFrameListeners.begin();
             i != mRemovedFrameListeners.end(); i++)
         {
@@ -694,7 +694,7 @@ namespace Ogre {
 		++mNextFrame;
 
         // Remove all marked listeners
-        std::set<FrameListener*>::iterator i;
+        set<FrameListener*>::type::iterator i;
         for (i = mRemovedFrameListeners.begin();
             i != mRemovedFrameListeners.end(); i++)
         {
@@ -716,7 +716,7 @@ namespace Ogre {
     bool Root::_fireFrameEnded(FrameEvent& evt)
     {
         // Remove all marked listeners
-        std::set<FrameListener*>::iterator i;
+        set<FrameListener*>::type::iterator i;
         for (i = mRemovedFrameListeners.begin();
             i != mRemovedFrameListeners.end(); i++)
         {
@@ -780,7 +780,7 @@ namespace Ogre {
         // Calculate the average time passed between events of the given type
         // during the last mFrameSmoothingTime seconds.
 
-        std::deque<unsigned long>& times = mEventTimes[type];
+        EventTimesQueue& times = mEventTimes[type];
         times.push_back(now);
 
         if(times.size() == 1)
@@ -791,7 +791,7 @@ namespace Ogre {
 			static_cast<unsigned long>(mFrameSmoothingTime * 1000.0f);
 
         // Find the oldest time to keep
-        std::deque<unsigned long>::iterator it = times.begin(),
+        EventTimesQueue::iterator it = times.begin(),
             end = times.end()-2; // We need at least two times
         while(it != end)
         {

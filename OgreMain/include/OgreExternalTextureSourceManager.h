@@ -110,7 +110,7 @@ namespace Ogre
 		ExternalTextureSource* mpCurrExternalTextureSource;
 		
         // Collection of loaded texture System PlugIns, keyed by registered type
-        typedef std::map< String, ExternalTextureSource*> TextureSystemList;
+        typedef map< String, ExternalTextureSource*>::type TextureSystemList;
         TextureSystemList mTextureSystems;
     };
 } 

@@ -69,7 +69,7 @@ namespace Ogre {
     class _OgreExport StringUtil
     {
 	public:
-        typedef std::ostringstream StrStreamType;
+		typedef StringStream StrStreamType;
 
         /** Removes any whitespace characters, be it standard space or
             TABs and so on.
@@ -88,7 +88,7 @@ namespace Ogre {
                 maxSplits The maximum number of splits to perform (0 for unlimited splits). If this
                 parameters is > 0, the splitting process will stop after this many splits, left to right.
         */
-		static std::vector< String > split( const String& str, const String& delims = "\t\n ", unsigned int maxSplits = 0);
+		static vector< String >::type split( const String& str, const String& delims = "\t\n ", unsigned int maxSplits = 0);
 
         /** Upper-cases all the characters in the string.
         */

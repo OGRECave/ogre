@@ -3367,7 +3367,7 @@ namespace Ogre
                 hgp->setSourceFile(def->source);
 
 			    // Set custom parameters
-				std::vector<std::pair<String, String> >::const_iterator i, iend;
+				vector<std::pair<String, String> >::type::const_iterator i, iend;
 			    iend = def->customParameters.end();
 			    for (i = def->customParameters.begin(); i != iend; ++i)
 			    {

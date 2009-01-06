@@ -231,7 +231,7 @@ namespace Ogre {
 	class _OgreExport AnimableObject
 	{
 	protected:
-		typedef std::map<String, StringVector> AnimableDictionaryMap;
+		typedef map<String, StringVector>::type AnimableDictionaryMap;
 		/// Static map of class name to list of animable value names
 		static AnimableDictionaryMap msAnimableDictionary;
 		/** Get the name of the animable dictionary for this class.

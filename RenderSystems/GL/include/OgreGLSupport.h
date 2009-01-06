@@ -92,7 +92,7 @@ protected:
     ConfigOptionMap mOptions;
 
 	// This contains the complete list of supported extensions
-    std::set<String> extensionList;
+    set<String>::type extensionList;
 private:
     String mVersion;
     String mVendor;

@@ -160,7 +160,7 @@ namespace Ogre {
 	typedef SharedPtr<DataStream> DataStreamPtr;
 
 	/// List of DataStream items
-	typedef std::list<DataStreamPtr> DataStreamList;
+	typedef list<DataStreamPtr>::type DataStreamList;
 	/// Shared pointer to list of DataStream items
 	typedef SharedPtr<DataStreamList> DataStreamListPtr;
 

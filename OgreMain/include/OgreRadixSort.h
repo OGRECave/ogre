@@ -105,10 +105,11 @@ namespace Ogre {
 
 		};
 		/// Temp sort storage
-		std::vector<SortEntry> mSortArea1;
-		std::vector<SortEntry> mSortArea2;
-		std::vector<SortEntry>* mSrc;
-		std::vector<SortEntry>* mDest;
+		typedef std::vector<SortEntry, STLAllocator<SortEntry, GeneralAllocPolicy> > SortVector; 
+		SortVector mSortArea1;
+		SortVector mSortArea2;
+		SortVector* mSrc;
+		SortVector* mDest;
 		TContainer mTmpContainer; // initial copy
 
 
@@ -298,7 +299,7 @@ namespace Ogre {
 			{
 				sortPass(p);
 				// flip src/dst
-				std::vector<SortEntry>* tmp = mSrc;
+				SortVector* tmp = mSrc;
 				mSrc = mDest;
 				mDest = tmp;
 			}

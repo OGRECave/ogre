@@ -2854,7 +2854,7 @@ namespace Ogre {
 		const char * profile = cgGetProgramString(cgProgram, CG_PROGRAM_PROFILE);
 
 		// The name is all the path to this shader combined with the entry point and profile so it will be unique.
-		std::stringstream programName;
+		StringStream programName;
 		programName << ogrePass->getParent()->getParent()->getName() << "|"; // Material
 		programName << entry << "|"; // entry
 		programName << profile << "|"; // profile

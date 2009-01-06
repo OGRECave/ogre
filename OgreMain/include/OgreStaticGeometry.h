@@ -139,7 +139,7 @@ namespace Ogre {
 			VertexData *vertexData;
 			IndexData *indexData;
 		};
-		typedef std::list<OptimisedSubMeshGeometry*> OptimisedSubMeshGeometryList;
+		typedef list<OptimisedSubMeshGeometry*>::type OptimisedSubMeshGeometryList;
 		/// Saved link between SubMesh at a LOD and vertex/index data
 		/// May point to original or optimised geometry
 		struct SubMeshLodGeometryLink
@@ -147,8 +147,8 @@ namespace Ogre {
 			VertexData* vertexData;
 			IndexData* indexData;
 		};
-		typedef std::vector<SubMeshLodGeometryLink> SubMeshLodGeometryLinkList;
-		typedef std::map<SubMesh*, SubMeshLodGeometryLinkList*> SubMeshGeometryLookup;
+		typedef vector<SubMeshLodGeometryLink>::type SubMeshLodGeometryLinkList;
+		typedef map<SubMesh*, SubMeshLodGeometryLinkList*>::type SubMeshGeometryLookup;
 		/// Structure recording a queued submesh for the build
 		struct QueuedSubMesh : public BatchedGeometryAlloc
 		{
@@ -162,7 +162,7 @@ namespace Ogre {
 			/// Pre-transformed world AABB 
 			AxisAlignedBox worldBounds;
 		};
-		typedef std::vector<QueuedSubMesh*> QueuedSubMeshList;
+		typedef vector<QueuedSubMesh*>::type QueuedSubMeshList;
 		/// Structure recording a queued geometry for low level builds
 		struct QueuedGeometry : public BatchedGeometryAlloc
 		{
@@ -171,7 +171,7 @@ namespace Ogre {
 			Quaternion orientation;
 			Vector3 scale;
 		};
-		typedef std::vector<QueuedGeometry*> QueuedGeometryList;
+		typedef vector<QueuedGeometry*>::type QueuedGeometryList;
 		
 		// forward declarations
 		class LODBucket;
@@ -250,7 +250,7 @@ namespace Ogre {
 		{
 		public:
 			/// list of Geometry Buckets in this region
-			typedef std::vector<GeometryBucket*> GeometryBucketList;
+			typedef vector<GeometryBucket*>::type GeometryBucketList;
 		protected:
 			/// Pointer to parent LODBucket
 			LODBucket* mParent;
@@ -264,7 +264,7 @@ namespace Ogre {
 			/// list of Geometry Buckets in this region
 			GeometryBucketList mGeometryBucketList;
 			// index to current Geometry Buckets for a given geometry format
-			typedef std::map<String, GeometryBucket*> CurrentGeometryMap;
+			typedef map<String, GeometryBucket*>::type CurrentGeometryMap;
 			CurrentGeometryMap mCurrentGeometryMap;
 			/// Get a packed string identifying the geometry format
 			String getGeometryFormatString(SubMeshLodGeometryLink* geom);
@@ -303,7 +303,7 @@ namespace Ogre {
 		{
 		public:
 			/// Lookup of Material Buckets in this region
-			typedef std::map<String, MaterialBucket*> MaterialBucketMap;
+			typedef map<String, MaterialBucket*>::type MaterialBucketMap;
 		protected:
 			/// Pointer to parent region
 			Region* mParent;
@@ -353,7 +353,7 @@ namespace Ogre {
             friend class GeometryBucket;
 		public:
 			/// list of LOD Buckets in this region
-			typedef std::vector<LODBucket*> LODBucketList;
+			typedef vector<LODBucket*>::type LODBucketList;
 		protected:
 			/** Nested class to allow region shadows. */
 			class _OgreExport RegionShadowRenderable : public ShadowRenderable
@@ -467,7 +467,7 @@ namespace Ogre {
 			0 in the x axis begins at mOrigin.x + (mRegionDimensions.x * -512), 
 			and region 1023 ends at mOrigin + (mRegionDimensions.x * 512).
 		*/
-		typedef std::map<uint32, Region*> RegionMap;
+		typedef map<uint32, Region*>::type RegionMap;
 	protected:
 		// General state & settings
 		SceneManager* mOwner;
@@ -537,7 +537,7 @@ namespace Ogre {
 		void splitGeometry(VertexData* vd, IndexData* id, 
 			SubMeshLodGeometryLink* targetGeomLink);
 
-		typedef std::map<size_t, size_t> IndexRemap;
+		typedef map<size_t, size_t>::type IndexRemap;
 		/** Method for figuring out which vertices are used by an index buffer
 			and calculating a remap lookup for a vertex buffer just containing
 			those vertices. 

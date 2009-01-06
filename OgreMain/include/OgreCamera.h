@@ -136,7 +136,7 @@ namespace Ogre {
         /// Is viewing window used.
         bool mWindowSet;
         /// Windowed viewport clip planes 
-        mutable std::vector<Plane> mWindowClipPlanes;
+        mutable vector<Plane>::type mWindowClipPlanes;
         // Was viewing window changed.
         mutable bool mRecalcWindow;
         /// The last viewport to be added using this camera
@@ -168,7 +168,7 @@ namespace Ogre {
         virtual void setWindowImpl(void) const;
 
 		/** Helper function for forwardIntersect that intersects rays with canonical plane */
-		virtual std::vector<Vector4> getRayForwardIntersect(const Vector3& anchor, const Vector3 *dir, Real planeOffset) const;
+		virtual vector<Vector4>::type getRayForwardIntersect(const Vector3& anchor, const Vector3 *dir, Real planeOffset) const;
 
     public:
         /** Standard constructor.
@@ -511,7 +511,7 @@ namespace Ogre {
         /// Returns if a viewport window is being used
         virtual bool isWindowSet(void) const { return mWindowSet; }
         /// Gets the window clip planes, only applicable if isWindowSet == true
-        const std::vector<Plane>& getWindowPlanes(void) const;
+        const vector<Plane>::type& getWindowPlanes(void) const;
 
         /** Overridden from MovableObject */
         Real getBoundingRadius(void) const;
@@ -561,7 +561,7 @@ namespace Ogre {
 		 @remarks
 		    Forward projection may lead to intersections at infinity.
 		*/
-		virtual void forwardIntersect(const Plane& worldPlane, std::vector<Vector4>* intersect3d) const;
+		virtual void forwardIntersect(const Plane& worldPlane, vector<Vector4>::type* intersect3d) const;
 
 		/// @copydoc Frustum::isVisible
 		bool isVisible(const AxisAlignedBox& bound, FrustumPlane* culledBy = 0) const;

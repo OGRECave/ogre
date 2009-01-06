@@ -142,7 +142,7 @@ namespace Ogre {
 			, elementSize(0)
 			, arraySize(1) {}
 	};
-	typedef std::map<String, GpuConstantDefinition> GpuConstantDefinitionMap;
+	typedef map<String, GpuConstantDefinition>::type GpuConstantDefinitionMap;
 	typedef ConstMapIterator<GpuConstantDefinitionMap> GpuConstantDefinitionIterator;
 
 	/// Struct collecting together the information for named constants.
@@ -223,7 +223,7 @@ namespace Ogre {
 		GpuLogicalIndexUse(size_t bufIdx, size_t curSz) 
 			: physicalIndex(bufIdx), currentSize(curSz) {}
 	};
-	typedef std::map<size_t, GpuLogicalIndexUse> GpuLogicalIndexUseMap;
+	typedef map<size_t, GpuLogicalIndexUse>::type GpuLogicalIndexUseMap;
 	/// Container struct to allow params to safely & update shared list of logical buffer assignments
 	struct _OgreExport GpuLogicalBufferStruct
 	{
@@ -778,18 +778,18 @@ namespace Ogre {
 
         };
 		// Auto parameter storage
-		typedef std::vector<AutoConstantEntry> AutoConstantList;
+		typedef vector<AutoConstantEntry>::type AutoConstantList;
 
 		/** Definition of container that holds the current float constants.
 		@note Not necessarily in direct index order to constant indexes, logical
 			to physical index map is derived from GpuProgram
 		*/
-		typedef std::vector<float> FloatConstantList;
+		typedef vector<float>::type FloatConstantList;
 		/** Definition of container that holds the current float constants.
 		@note Not necessarily in direct index order to constant indexes, logical
 			to physical index map is derived from GpuProgram
 		*/
-		typedef std::vector<int> IntConstantList;
+		typedef vector<int>::type IntConstantList;
 
 	protected:
         static AutoConstantDefinition AutoConstantDictionary[];

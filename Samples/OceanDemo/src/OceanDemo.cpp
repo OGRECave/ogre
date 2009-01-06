@@ -17,6 +17,16 @@ LGPL like the rest of the engine.
 
 #include <cstdlib>
 
+inline Ogre::String operator +(const Ogre::String& l,const CEGUI::String& o)
+{
+	return l+o.c_str();
+}
+/*
+inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
+{
+	return l+o.c_str();
+}
+*/
 
 /**********************************************************************
 OS X Specific Resource Location Finding
@@ -436,7 +446,7 @@ void OceanDemo::initComboBoxes(void)
 
 	cbobox = (Combobox*)WindowManager::getSingleton().getWindow("ModelCombos");
     Ogre::StringVectorPtr meshStringVector = Ogre::ResourceGroupManager::getSingleton().findResourceNames( Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, "*.mesh" );
-    std::vector<Ogre::String>::iterator meshFileNameIterator = meshStringVector->begin();
+    Ogre::StringVector::iterator meshFileNameIterator = meshStringVector->begin();
 
     while ( meshFileNameIterator != meshStringVector->end() )
 	{
@@ -1175,7 +1185,7 @@ bool OceanDemo_FrameListener::keyPressed (const OIS::KeyEvent &e)
 
     if (e.key == OIS::KC_SYSRQ )
     {
-		std::ostringstream ss;
+		Ogre::StringStream ss;
         ss << "screenshot_" << ++mNumScreenShots << ".png";
         mMain->getRenderWindow()->writeContentsToFile(ss.str());
         //mTimeUntilNextToggle = 0.5;
@@ -1242,7 +1252,7 @@ void OceanDemo_FrameListener::updateStats(void)
 		+ " " + Ogre::StringConverter::toString(stats.worstFrameTime)+" ms");
 
 	mGuiTris->setText(tris + Ogre::StringConverter::toString(stats.triangleCount));
-	mGuiDbg->setText(mDebugText);
+	mGuiDbg->setText(mDebugText.c_str());
 	mAvgFrameTime = 1.0f/(stats.avgFPS + 1.0f);
 	if (mAvgFrameTime > 0.1f) mAvgFrameTime = 0.1f;
 

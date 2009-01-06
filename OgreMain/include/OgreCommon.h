@@ -37,8 +37,6 @@ Torus Knot Software Ltd.
 #endif
 
 #include <utility>
-#include <vector>
-#include <map>
 
 #if defined ( OGRE_GCC_VISIBILITY )
 #   pragma GCC visibility pop
@@ -288,16 +286,16 @@ namespace Ogre {
     
 	
     class Light;
-	typedef std::vector<Light*> LightList;
+	typedef vector<Light*>::type LightList;
 
-    typedef std::map<String, bool> UnaryOptionList;
-    typedef std::map<String, String> BinaryOptionList;
+    typedef map<String, bool>::type UnaryOptionList;
+    typedef map<String, String>::type BinaryOptionList;
 
 	/// Name / value parameter pair (first = name, second = value)
-	typedef std::map<String, String> NameValuePairList;
+	typedef map<String, String>::type NameValuePairList;
 
     /// Alias / Texture name pair (first = alias, second = texture name)
-    typedef std::map<String, String> AliasTextureNamePairList;
+    typedef map<String, String>::type AliasTextureNamePairList;
 
         template< typename T > struct TRect
         {
@@ -448,10 +446,10 @@ namespace Ogre {
 	};
 
 	/// Render window creation parameters container.
-	typedef std::vector<RenderWindowDescription>		RenderWindowDescriptionList;
+	typedef vector<RenderWindowDescription>::type RenderWindowDescriptionList;
 
 	/// Render window container.
-	typedef std::vector<RenderWindow*>			RenderWindowList;
+	typedef vector<RenderWindow*>::type RenderWindowList;
 }
 
 #endif

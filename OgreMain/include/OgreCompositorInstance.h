@@ -86,9 +86,9 @@ namespace Ogre {
 			/// Set state to SceneManager and RenderSystem
 			virtual void execute(SceneManager *sm, RenderSystem *rs) = 0;
 		};
-		typedef std::map<int, MaterialPtr> QuadMaterialMap;
+		typedef map<int, MaterialPtr>::type QuadMaterialMap;
 		typedef std::pair<int, RenderSystemOperation*> RenderSystemOpPair;
-		typedef std::vector<RenderSystemOpPair> RenderSystemOpPairs;
+		typedef vector<RenderSystemOpPair>::type RenderSystemOpPairs;
         /** Operation setup for a RenderTarget (collected).
         */
         class TargetOperation
@@ -144,7 +144,7 @@ namespace Ogre {
 			/** Whether shadows will be enabled */
 			bool shadowsEnabled;
         };
-        typedef std::vector<TargetOperation> CompiledState;
+        typedef vector<TargetOperation>::type CompiledState;
         
         /** Set enabled flag. The compositor instance will only render if it is
             enabled, otherwise it is pass-through.
@@ -270,12 +270,12 @@ namespace Ogre {
         /// Is this instance enabled?
         bool mEnabled;
         /// Map from name->local texture
-        typedef std::map<String,TexturePtr> LocalTextureMap;
+        typedef map<String,TexturePtr>::type LocalTextureMap;
         LocalTextureMap mLocalTextures;
 		/// Store a list of MRTs we've created
-		typedef std::map<String,MultiRenderTarget*> LocalMRTMap;
+		typedef map<String,MultiRenderTarget*>::type LocalMRTMap;
 		LocalMRTMap mLocalMRTs;
-		typedef std::map<CompositionTechnique::TextureDefinition*, TexturePtr> ReserveTextureMap;
+		typedef map<CompositionTechnique::TextureDefinition*, TexturePtr>::type ReserveTextureMap;
 		/** Textures that are not currently in use, but that we want to keep for now,
 			for example if we switch techniques but want to keep all textures available
 			in case we switch back. 
@@ -283,7 +283,7 @@ namespace Ogre {
 		ReserveTextureMap mReserveTextures;
 
 		/// Vector of listeners
-		typedef std::vector<Listener*> Listeners;
+		typedef vector<Listener*>::type Listeners;
 		Listeners mListeners;
         
         /// Previous instance (set by chain)

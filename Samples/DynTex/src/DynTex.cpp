@@ -112,7 +112,7 @@ public:
 	void fireUpReactor()
 	{
 		LogManager::getSingleton().logMessage("Warning: reactor is being fired up");
-		int center = reactorExtent/2;
+		unsigned int center = reactorExtent/2;
 		for(unsigned int x=center-10; x<center+10; x++) 
 		{
 			for(unsigned int y=center-10; y<center+10; y++) 
@@ -378,7 +378,7 @@ protected:
 		//TextureManager::getSingleton().getByName("RustySteel.jpg");
 		
 		
-		std::stringstream d;
+		Ogre::StringStream d;
 		d << "HardwarePixelBuffer " << buffer->getWidth() << " " << buffer->getHeight() << " " << buffer->getDepth();
 		LogManager::getSingleton().logMessage(d.str());
 		

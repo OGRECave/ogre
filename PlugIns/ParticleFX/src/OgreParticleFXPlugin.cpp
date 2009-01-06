@@ -159,8 +159,8 @@ namespace Ogre
 	void ParticleFXPlugin::uninstall()
 	{
 		// destroy 
-		std::vector<ParticleEmitterFactory*>::iterator ei;
-		std::vector<ParticleAffectorFactory*>::iterator ai;
+		vector<ParticleEmitterFactory*>::type::iterator ei;
+		vector<ParticleAffectorFactory*>::type::iterator ai;
 
 		for (ei = mEmitterFactories.begin(); ei != mEmitterFactories.end(); ++ei)
 		{

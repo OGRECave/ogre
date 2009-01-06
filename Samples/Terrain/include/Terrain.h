@@ -118,7 +118,7 @@ protected:
         mSceneMgr->setFog( FOG_LINEAR, fadeColour, .001, 500, 1000);
         mWindow->getViewport(0)->setBackgroundColour(fadeColour);
 
-        std::string terrain_cfg("terrain.cfg");
+        String terrain_cfg("terrain.cfg");
         mSceneMgr -> setWorldGeometry( terrain_cfg );
         // Infinite far plane?
         if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_INFINITE_FAR_PLANE))

@@ -59,7 +59,7 @@ namespace Ogre
     class _OgreExport LogManager : public Singleton<LogManager>, public LogAlloc
     {
 	protected:
-        typedef std::map<String, Log*, std::less<String> >	LogList;
+		typedef map<String, Log*>::type	LogList;
 
         /// A list of all the logs the manager can access
         LogList mLogs;

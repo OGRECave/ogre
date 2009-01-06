@@ -39,7 +39,7 @@ namespace Ogre
 	class D3D9DriverList
 	{
 	private:
-		std::vector<D3D9Driver> mDriverList;
+		vector<D3D9Driver>::type mDriverList;
 		LPDIRECT3D9 mpD3D;
 
 	public:

@@ -38,8 +38,8 @@ Description: Fresnel reflections and refractions
 // Hacky globals
 Camera* theCam;
 Entity* pPlaneEnt;
-std::vector<Entity*> aboveWaterEnts;
-std::vector<Entity*> belowWaterEnts;
+Ogre::vector<Entity*>::type aboveWaterEnts;
+Ogre::vector<Entity*>::type belowWaterEnts;
 
 // Fish!
 #define NUM_FISH 30
@@ -63,7 +63,7 @@ public:
     {
         // Hide plane and objects above the water
         pPlaneEnt->setVisible(false);
-        std::vector<Entity*>::iterator i, iend;
+		vector<Entity*>::type::iterator i, iend;
         iend = aboveWaterEnts.end();
         for (i = aboveWaterEnts.begin(); i != iend; ++i)
         {
@@ -75,7 +75,7 @@ public:
     {
         // Show plane and objects above the water
         pPlaneEnt->setVisible(true);
-        std::vector<Entity*>::iterator i, iend;
+		vector<Entity*>::type::iterator i, iend;
         iend = aboveWaterEnts.end();
         for (i = aboveWaterEnts.begin(); i != iend; ++i)
         {
@@ -91,7 +91,7 @@ public:
     {
         // Hide plane and objects below the water
         pPlaneEnt->setVisible(false);
-        std::vector<Entity*>::iterator i, iend;
+		vector<Entity*>::type::iterator i, iend;
         iend = belowWaterEnts.end();
         for (i = belowWaterEnts.begin(); i != iend; ++i)
         {
@@ -104,7 +104,7 @@ public:
     {
         // Show plane and objects below the water
         pPlaneEnt->setVisible(true);
-        std::vector<Entity*>::iterator i, iend;
+		vector<Entity*>::type::iterator i, iend;
         iend = belowWaterEnts.end();
         for (i = belowWaterEnts.begin(); i != iend; ++i)
         {

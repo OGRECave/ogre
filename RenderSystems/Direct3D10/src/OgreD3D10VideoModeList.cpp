@@ -96,7 +96,7 @@ namespace Ogre
 
 					// Check to see if it is already in the list (to filter out refresh rates)
 					BOOL found = FALSE;
-					std::vector<D3D10VideoMode>::iterator it;
+					vector<D3D10VideoMode>::type::iterator it;
 					for( it = mModeList.begin(); it != mModeList.end(); it++ )
 					{
 						DXGI_OUTPUT_DESC oldOutput= it->getDisplayMode();
@@ -135,7 +135,7 @@ namespace Ogre
 
 		// Check to see if it is already in the list (to filter out refresh rates)
 		BOOL found = FALSE;
-		std::vector<D3D10VideoMode>::iterator it;
+		vector<D3D10VideoMode>::type::iterator it;
 		for( it = mModeList.begin(); it != mModeList.end(); it++ )
 		{
 		DXGI_OUTPUT_DESC oldDisp = it->getDisplayMode();
@@ -166,7 +166,7 @@ namespace Ogre
 
 		// Check to see if it is already in the list (to filter out refresh rates)
 		BOOL found = FALSE;
-		std::vector<D3D10VideoMode>::iterator it;
+		vector<D3D10VideoMode>::type::iterator it;
 		for( it = mModeList.begin(); it != mModeList.end(); it++ )
 		{
 		DXGI_OUTPUT_DESC oldDisp = it->getDisplayMode();
@@ -196,14 +196,14 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	D3D10VideoMode* D3D10VideoModeList::item( size_t index )
 	{
-		std::vector<D3D10VideoMode>::iterator p = mModeList.begin();
+		vector<D3D10VideoMode>::type::iterator p = mModeList.begin();
 
 		return &p[index];
 	}
 	//---------------------------------------------------------------------
 	D3D10VideoMode* D3D10VideoModeList::item( const String &name )
 	{
-		std::vector<D3D10VideoMode>::iterator it = mModeList.begin();
+		vector<D3D10VideoMode>::type::iterator it = mModeList.begin();
 		if (it == mModeList.end())
 			return NULL;
 

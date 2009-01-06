@@ -62,7 +62,7 @@ namespace Ogre
 {
     class Portal;
 
-    typedef std::list < PCPlane * > PCPlaneList;
+    typedef list< PCPlane * >::type PCPlaneList;
 
     /** Specialized frustum shaped culling volume that has culling planes created from portals 
     */

@@ -331,7 +331,7 @@ namespace Ogre {
         float *vertices = OGRE_ALLOC_T(float, s->extremityPoints.size() * 3, MEMCATEGORY_GEOMETRY);
 		float *pVert = vertices;
 
-        for (std::vector<Vector3>::const_iterator i = s->extremityPoints.begin();
+        for (vector<Vector3>::type::const_iterator i = s->extremityPoints.begin();
              i != s->extremityPoints.end(); ++i)
         {
 			*pVert++ = i->x;
@@ -780,7 +780,7 @@ namespace Ogre {
 	void MeshSerializerImpl::readSubMeshNameTable(DataStreamPtr& stream, Mesh* pMesh)
 	{
 		// The map for
-		std::map<unsigned short, String> subMeshNames;
+		map<unsigned short, String>::type subMeshNames;
 		unsigned short streamID, subMeshIndex;
 
 		// Need something to store the index, and the objects name
@@ -815,7 +815,7 @@ namespace Ogre {
 		// ?
 
 		// Loop through and save out the index and names.
-		std::map<unsigned short, String>::const_iterator it = subMeshNames.begin();
+		map<unsigned short, String>::type::const_iterator it = subMeshNames.begin();
 
 		while(it != subMeshNames.end())
 		{
@@ -2740,7 +2740,7 @@ namespace Ogre {
                 }
 
                 // The map used to mapping original triangle index to new index
-                typedef std::vector<size_t> TriangleIndexRemap;
+                typedef vector<size_t>::type TriangleIndexRemap;
                 TriangleIndexRemap triangleIndexRemap(numTriangles);
 
                 // New triangles information that should be group by vertex set.

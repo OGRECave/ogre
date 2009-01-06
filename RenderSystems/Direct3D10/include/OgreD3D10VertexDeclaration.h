@@ -40,7 +40,7 @@ namespace Ogre {
 
 		bool mNeedsRebuild;
 
-		typedef std::map<D3D10HLSLProgram*, ID3D10InputLayout*> ShaderToILayoutMap;
+		typedef map<D3D10HLSLProgram*, ID3D10InputLayout*>::type ShaderToILayoutMap;
 		typedef ShaderToILayoutMap::iterator ShaderToILayoutMapIterator;
 
 		D3D10_INPUT_ELEMENT_DESC*  mD3delems;

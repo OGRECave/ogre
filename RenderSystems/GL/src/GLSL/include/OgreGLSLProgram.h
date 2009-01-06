@@ -186,7 +186,7 @@ namespace Ogre {
 		/// Preprocessor options
 		String mPreprocessorDefines;
 		/// container of attached programs
-		typedef std::vector< GLSLProgram* > GLSLProgramContainer;
+		typedef vector< GLSLProgram* >::type GLSLProgramContainer;
 		typedef GLSLProgramContainer::iterator GLSLProgramContainerIterator;
 		GLSLProgramContainer mAttachedGLSLPrograms;
 

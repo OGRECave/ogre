@@ -67,7 +67,7 @@ namespace Ogre {
 		: public ResourceManager, public Singleton<HighLevelGpuProgramManager>
 	{
 	public:
-		typedef std::map<String, HighLevelGpuProgramFactory*> FactoryMap;
+		typedef map<String, HighLevelGpuProgramFactory*>::type FactoryMap;
 	protected:
 		/// Factories capable of creating HighLevelGpuProgram instances
 		FactoryMap mFactories;

@@ -82,7 +82,7 @@ namespace Ogre {
     class _OgreExport RenderQueue : public RenderQueueAlloc
     {
     public:
-        typedef std::map< uint8, RenderQueueGroup* > RenderQueueGroupMap;
+        typedef map< uint8, RenderQueueGroup* >::type RenderQueueGroupMap;
         /// Iterator over queue groups
         typedef MapIterator<RenderQueueGroupMap> QueueGroupIterator;
 		/** Class to listen in on items being added to the render queue. 

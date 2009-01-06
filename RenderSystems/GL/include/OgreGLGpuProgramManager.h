@@ -43,7 +43,7 @@ public:
         GpuProgramType gptype, const String& syntaxCode);
 
 private:
-    typedef std::map<String, CreateGpuProgramCallback> ProgramMap;
+    typedef map<String, CreateGpuProgramCallback>::type ProgramMap;
     ProgramMap mProgramMap;
 
 protected:

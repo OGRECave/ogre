@@ -380,7 +380,7 @@ namespace Ogre {
     {
         // 3 params: <layer> <x_tile> <y_tile>
         // Param count is validated higher up
-        std::vector<String> vec = StringUtil::split(val);
+        vector<String>::type vec = StringUtil::split(val);
         ushort layer = (ushort)StringConverter::parseUnsignedInt(vec[0]);
         Real x_tile = StringConverter::parseReal(vec[1]);
         Real y_tile = StringConverter::parseReal(vec[2]);
@@ -412,7 +412,7 @@ namespace Ogre {
     }
     void PanelOverlayElement::CmdUVCoords::doSet(void* target, const String& val)
     {
-        std::vector<String> vec = StringUtil::split(val);
+        vector<String>::type vec = StringUtil::split(val);
 
         static_cast<PanelOverlayElement*>(target)->setUV(
             StringConverter::parseReal(vec[0]),

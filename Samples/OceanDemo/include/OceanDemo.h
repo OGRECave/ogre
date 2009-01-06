@@ -91,7 +91,7 @@ protected:
 	CEGUI::Window* mGuiDbg;
 	CEGUI::Window* mRoot;
 
-	std::string mDebugText;
+	Ogre::String mDebugText;
 
 	CEGUI::MouseButton convertOISButtonToCegui(int ois_button_id);
 	void CheckMovementKeys( CEGUI::Key::Scan keycode, bool state );
@@ -149,7 +149,7 @@ protected:
 	Ogre::GpuProgramParametersSharedPtr mActiveFragmentParameters;
 	Ogre::GpuProgramParametersSharedPtr mActiveVertexParameters;
 
-	typedef std::vector< ShaderControlGUIWidget > ShaderControlContainer;
+	typedef Ogre::vector< ShaderControlGUIWidget >::type ShaderControlContainer;
 	typedef ShaderControlContainer::iterator ShaderControlIterator;
 
 	ShaderControlContainer    mShaderControlContainer;

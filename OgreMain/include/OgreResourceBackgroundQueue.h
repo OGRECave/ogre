@@ -153,8 +153,8 @@ namespace Ogre {
 			Listener* listener;
 			BackgroundProcessResult result;
 		};
-		typedef std::list<Request> RequestQueue;
-		typedef std::map<BackgroundProcessTicket, Request*> RequestTicketMap;
+		typedef list<Request>::type RequestQueue;
+		typedef map<BackgroundProcessTicket, Request*>::type RequestTicketMap;
 		
 		/// Queue of requests, used to store and order requests
 		RequestQueue mRequestQueue;
@@ -182,7 +182,7 @@ namespace Ogre {
 			// Type 2 - ResourceBackgroundQueue::Listener kind
             Request req;
 		};
-		typedef std::list<QueuedNotification> NotificationQueue;
+		typedef list<QueuedNotification>::type NotificationQueue;
 		/// Queued notifications of background loading being finished
 		NotificationQueue mNotificationQueue;
 		/// Mutex to protect the background event queue]

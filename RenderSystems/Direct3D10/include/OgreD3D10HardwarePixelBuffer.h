@@ -51,7 +51,7 @@ namespace Ogre {
 		D3D10_BOX OgreImageBoxToDx10Box(const Image::Box &inBox) const;
 
 		/// Render targets
-		typedef std::vector<RenderTexture*> SliceTRT;
+		typedef vector<RenderTexture*>::type SliceTRT;
 		SliceTRT mSliceTRT;
 	public:
 		D3D10HardwarePixelBuffer(D3D10Texture * parentTexture, D3D10Device & device, size_t subresourceIndex,

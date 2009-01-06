@@ -67,7 +67,7 @@ public:
 
 		MLight *iMainLight;
 
-		std::vector<Node*> mLightNodes;
+		vector<Node*>::type mLightNodes;
 
 };
 template<> SharedData* Singleton<SharedData>::ms_Singleton = 0;
@@ -124,8 +124,8 @@ public:
 			timeoutDelay = 0.5f;
 			SharedData::getSingleton().iActivate = !SharedData::getSingleton().iActivate;
 			// Hide/show all minilights
-			std::vector<Node*>::iterator i = SharedData::getSingleton().mLightNodes.begin();
-			std::vector<Node*>::iterator iend = SharedData::getSingleton().mLightNodes.end();
+			vector<Node*>::type::iterator i = SharedData::getSingleton().mLightNodes.begin();
+			vector<Node*>::type::iterator iend = SharedData::getSingleton().mLightNodes.end();
 			for(; i!=iend; ++i)
 			{
 				static_cast<SceneNode*>(*i)->setVisible(SharedData::getSingleton().iActivate, true);
@@ -370,10 +370,10 @@ protected:
 	void createSampleLights()
 	{
 		// Create some lights		
-		std::vector<MLight*> lights;
+		vector<MLight*>::type lights;
 		SceneNode *parentNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("LightsParent");
 		// Create light nodes
-		std::vector<Node*> nodes;
+		vector<Node*>::type nodes;
 
 		MLight *a = mSystem->createMLight();
 		SceneNode *an = parentNode->createChildSceneNode();
@@ -439,7 +439,7 @@ protected:
 		// Create marker meshes to show user where the lights are
 		Entity *ent;
 		GeomUtils::createSphere("PointLightMesh", 1.0f, 5, 5, true, true);
-		for(std::vector<MLight*>::iterator i=lights.begin(); i!=lights.end(); ++i)
+		for(vector<MLight*>::type::iterator i=lights.begin(); i!=lights.end(); ++i)
 		{
 			MLight* light = *i;
 			ent = mSceneMgr->createEntity(light->getName()+"v", "PointLightMesh");

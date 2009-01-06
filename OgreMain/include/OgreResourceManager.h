@@ -433,7 +433,7 @@ namespace Ogre {
     public:
 		typedef HashMap< String, ResourcePtr > ResourceMap;
 		typedef HashMap< String, ResourceMap > ResourceWithGroupMap;
-		typedef std::map<ResourceHandle, ResourcePtr> ResourceHandleMap;
+		typedef map<ResourceHandle, ResourcePtr>::type ResourceHandleMap;
     protected:
         ResourceHandleMap mResourcesByHandle;
         ResourceMap mResources;

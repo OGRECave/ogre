@@ -168,7 +168,7 @@ namespace Ogre {
         */
         virtual Bone* getRootBone(void) const;
 
-        typedef std::vector<Bone*> BoneList;
+        typedef vector<Bone*>::type BoneList;
         typedef VectorIterator<BoneList> BoneIterator;
         /// Get an iterator over the root bones in the skeleton, ie those with no parents
         virtual BoneIterator getRootBoneIterator(void);
@@ -326,7 +326,7 @@ namespace Ogre {
 		/// Remove all links to other skeletons for the purposes of sharing animation
 		virtual void removeAllLinkedSkeletonAnimationSources(void);
 		
-		typedef std::vector<LinkedSkeletonAnimationSource> 
+		typedef vector<LinkedSkeletonAnimationSource>::type 
 			LinkedSkeletonAnimSourceList;
 		typedef ConstVectorIterator<LinkedSkeletonAnimSourceList> 
 			LinkedSkeletonAnimSourceIterator;
@@ -345,7 +345,7 @@ namespace Ogre {
 		virtual bool hasManualBones(void) const { return !mManualBones.empty(); }
 
         /// Map to translate bone handle from one skeleton to another skeleton.
-        typedef std::vector<ushort> BoneHandleMap;
+        typedef vector<ushort>::type BoneHandleMap;
 
         /** Merge animations from another Skeleton object into this skeleton.
         @remarks
@@ -403,7 +403,7 @@ namespace Ogre {
         /// Storage of bones, indexed by bone handle
         BoneList mBoneList;
         /// Lookup by bone name
-        typedef std::map<String, Bone*> BoneListByName;
+        typedef map<String, Bone*>::type BoneListByName;
         BoneListByName mBoneListByName;
 
 
@@ -411,7 +411,7 @@ namespace Ogre {
         mutable BoneList mRootBones;
         /// Bone automatic handles
         unsigned short mNextAutoHandle;
-		typedef std::set<Bone*> BoneSet;
+		typedef set<Bone*>::type BoneSet;
 		/// Manual bones
 		BoneSet mManualBones;
 		/// Manual bones dirty?
@@ -419,7 +419,7 @@ namespace Ogre {
 
 
         /// Storage of animations, lookup by name
-        typedef std::map<String, Animation*> AnimationList;
+        typedef map<String, Animation*>::type AnimationList;
         AnimationList mAnimationsList;
 
 		/// List of references to other skeletons to use animations from 

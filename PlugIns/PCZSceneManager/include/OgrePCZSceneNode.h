@@ -53,8 +53,8 @@ namespace Ogre
 	class PCZone;
 	class ZoneData;
 	class PCZCamera;
-    typedef std::map<String, PCZone*> ZoneMap;
-	typedef std::map<String, ZoneData*> ZoneDataMap;
+    typedef map<String, PCZone*>::type ZoneMap;
+	typedef map<String, ZoneData*>::type ZoneDataMap;
 
 	class _OgrePCZPluginExport PCZSceneNode : public SceneNode
 	{

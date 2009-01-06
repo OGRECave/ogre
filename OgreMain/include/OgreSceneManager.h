@@ -343,18 +343,18 @@ namespace Ogre {
         /// The rendering system to send the scene to
         RenderSystem *mDestRenderSystem;
 
-        typedef std::map<String, Camera* > CameraList;
+        typedef map<String, Camera* >::type CameraList;
 
         /** Central list of cameras - for easy memory management and lookup.
         */
         CameraList mCameras;
 
-		typedef std::map<String, StaticGeometry* > StaticGeometryList;
+		typedef map<String, StaticGeometry* >::type StaticGeometryList;
 		StaticGeometryList mStaticGeometryList;
-		typedef std::map<String, InstancedGeometry* > InstancedGeometryList;
+		typedef map<String, InstancedGeometry* >::type InstancedGeometryList;
 		InstancedGeometryList mInstancedGeometryList;
 
-        typedef std::map<String, SceneNode*> SceneNodeList;
+        typedef map<String, SceneNode*>::type SceneNodeList;
 
         /** Central list of SceneNodes - for easy memory management.
             @note
@@ -373,7 +373,7 @@ namespace Ogre {
         SceneNode* mSceneRoot;
 
         /// Autotracking scene nodes
-        typedef std::set<SceneNode*> AutoTrackingSceneNodes;
+        typedef set<SceneNode*>::type AutoTrackingSceneNodes;
         AutoTrackingSceneNodes mAutoTrackingSceneNodes;
 
         // Sky params
@@ -409,7 +409,7 @@ namespace Ogre {
         Real mFogEnd;
         Real mFogDensity;
 
-		typedef std::set<uint8> SpecialCaseRenderQueueList;
+		typedef set<uint8>::type SpecialCaseRenderQueueList;
 		SpecialCaseRenderQueueList mSpecialCaseQueueList;
 		SpecialCaseRenderQueueMode mSpecialCaseQueueMode;
 		uint8 mWorldGeometryRenderQueue;
@@ -432,18 +432,18 @@ namespace Ogre {
 				have a focus step to limit the shadow sample distribution to only valid visible
 				scene elements.
 		*/
-		typedef std::map< const Camera*, VisibleObjectsBoundsInfo> CamVisibleObjectsMap;
+		typedef map< const Camera*, VisibleObjectsBoundsInfo>::type CamVisibleObjectsMap;
 		CamVisibleObjectsMap mCamVisibleObjectsMap; 
 
 		/** ShadowCamera to light mapping */
-		typedef std::map< const Camera*, const Light* > ShadowCamLightMapping;
+		typedef map< const Camera*, const Light* >::type ShadowCamLightMapping;
 		ShadowCamLightMapping mShadowCamLightMapping;
 
 		/// Array defining shadow count per light type.
 		size_t mShadowTextureCountPerType[3];
 
 		/// Array defining shadow texture index in light list.
-		std::vector<size_t> mShadowTextureIndexLightList;
+		vector<size_t>::type mShadowTextureIndexLightList;
 
         /// Cached light information, used to tracking light's changes
         struct _OgreExport LightInfo
@@ -465,7 +465,7 @@ namespace Ogre {
             }
         };
 
-        typedef std::vector<LightInfo> LightInfoList;
+        typedef vector<LightInfo>::type LightInfoList;
 
         LightList mLightsAffectingFrustum;
         LightInfoList mCachedLightInfos;
@@ -473,14 +473,14 @@ namespace Ogre {
         ulong mLightsDirtyCounter;
 		LightList mShadowTextureCurrentCasterLightList;
 
-		typedef std::map<String, MovableObject*> MovableObjectMap;
+		typedef map<String, MovableObject*>::type MovableObjectMap;
 		/// Simple structure to hold MovableObject map and a mutex to go with it.
 		struct MovableObjectCollection
 		{
 			MovableObjectMap map;
 			OGRE_MUTEX(mutex)
 		};
-		typedef std::map<String, MovableObjectCollection*> MovableObjectCollectionMap;
+		typedef map<String, MovableObjectCollection*>::type MovableObjectCollectionMap;
 		MovableObjectCollectionMap mMovableObjectCollectionMap;
 		/** Gets the movable object collection for the given type name.
 		@remarks
@@ -571,7 +571,7 @@ namespace Ogre {
         bool mDisplayNodes;
 
         /// Storage of animations, lookup by name
-        typedef std::map<String, Animation*> AnimationList;
+        typedef map<String, Animation*>::type AnimationList;
         AnimationList mAnimationsList;
 		OGRE_MUTEX(mAnimationsListMutex)
         AnimationStateSet mAnimationStates;
@@ -585,10 +585,10 @@ namespace Ogre {
             which override the camera's own view / projection matrices. */
         virtual void resetViewProjMode(void);
 
-        typedef std::vector<RenderQueueListener*> RenderQueueListenerList;
+        typedef vector<RenderQueueListener*>::type RenderQueueListenerList;
         RenderQueueListenerList mRenderQueueListeners;
 
-        typedef std::vector<Listener*> ListenerList;
+        typedef vector<Listener*>::type ListenerList;
         ListenerList mListeners;
         /// Internal method for firing the queue start event, returns true if queue is to be skipped
         virtual bool fireRenderQueueStarted(uint8 id, const String& invocation);
@@ -662,7 +662,7 @@ namespace Ogre {
 		bool mShadowTextureConfigDirty;
         ShadowTextureList mShadowTextures;
 		TexturePtr mNullShadowTexture;
-		typedef std::vector<Camera*> ShadowTextureCameraList;
+		typedef vector<Camera*>::type ShadowTextureCameraList;
 		ShadowTextureCameraList mShadowTextureCameras;
         Texture* mCurrentShadowTexture;
 		bool mShadowUseInfiniteFarPlane;
@@ -678,7 +678,7 @@ namespace Ogre {
 			LightClippingInfo() : scissorValid(false), clipPlanesValid(false) {}
 
 		};
-		typedef std::map<Light*, LightClippingInfo> LightClippingInfoMap;
+		typedef map<Light*, LightClippingInfo>::type LightClippingInfoMap;
 		LightClippingInfoMap mLightClippingInfoMap;
 		unsigned long mLightClippingInfoMapFrameNumber;
 
@@ -734,7 +734,7 @@ namespace Ogre {
         void renderShadowVolumeObjects(ShadowCaster::ShadowRenderableListIterator iShadowRenderables,
             Pass* pass, const LightList *manualLightList, unsigned long flags,
             bool secondpass, bool zfail, bool twosided);
-        typedef std::vector<ShadowCaster*> ShadowCasterList;
+        typedef vector<ShadowCaster*>::type ShadowCasterList;
         ShadowCasterList mShadowCasterList;
         SphereSceneQuery* mShadowCasterSphereQuery;
         AxisAlignedBoxSceneQuery* mShadowCasterAABBQuery;
@@ -914,19 +914,19 @@ namespace Ogre {
 
 
         /// Set of registered lod listeners
-        typedef std::set<LodListener*> LodListenerSet;
+        typedef set<LodListener*>::type LodListenerSet;
         LodListenerSet mLodListeners;
 
         /// List of movable object lod changed events
-        typedef std::vector<MovableObjectLodChangedEvent> MovableObjectLodChangedEventList;
+		typedef vector<MovableObjectLodChangedEvent>::type MovableObjectLodChangedEventList;
         MovableObjectLodChangedEventList mMovableObjectLodChangedEvents;
 
         /// List of entity mesh lod changed events
-        typedef std::vector<EntityMeshLodChangedEvent> EntityMeshLodChangedEventList;
+        typedef vector<EntityMeshLodChangedEvent>::type EntityMeshLodChangedEventList;
         EntityMeshLodChangedEventList mEntityMeshLodChangedEvents;
 
         /// List of entity material lod changed events
-        typedef std::vector<EntityMaterialLodChangedEvent> EntityMaterialLodChangedEventList;
+        typedef vector<EntityMaterialLodChangedEvent>::type EntityMaterialLodChangedEventList;
         EntityMaterialLodChangedEventList mEntityMaterialLodChangedEvents;
 
     public:

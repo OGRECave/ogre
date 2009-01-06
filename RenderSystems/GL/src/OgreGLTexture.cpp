@@ -252,7 +252,7 @@ namespace Ogre {
 
     static inline void do_image_io(const String &name, const String &group,
                                    const String &ext,
-                                   std::vector<Image> &images,
+                                   vector<Image>::type &images,
                                    Resource *r)
     {
 		size_t imgIdx = images.size();
@@ -276,7 +276,7 @@ namespace Ogre {
         if( pos != String::npos )
             ext = mName.substr(pos+1);
 
-        LoadedImages loadedImages = LoadedImages(new std::vector<Image>());
+        LoadedImages loadedImages = LoadedImages(new vector<Image>::type());
 
         if(mTextureType == TEX_TYPE_1D || mTextureType == TEX_TYPE_2D || 
             mTextureType == TEX_TYPE_3D)
@@ -303,7 +303,7 @@ namespace Ogre {
             }
             else
             {
-                std::vector<Image> images(6);
+                vector<Image>::type images(6);
                 ConstImagePtrList imagePtrs;
                 static const String suffixes[6] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
 

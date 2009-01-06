@@ -114,7 +114,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	D3D10Driver* D3D10DriverList::item( const String &name )
 	{
-		std::vector<D3D10Driver*>::iterator it = mDriverList.begin();
+		vector<D3D10Driver*>::type::iterator it = mDriverList.begin();
 		if (it == mDriverList.end())
 			return NULL;
 

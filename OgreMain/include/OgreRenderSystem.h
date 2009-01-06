@@ -49,8 +49,8 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
-	typedef std::map< String, RenderTarget * > RenderTargetMap;
-	typedef std::multimap<uchar, RenderTarget * > RenderTargetPriorityMap;
+	typedef map< String, RenderTarget * >::type RenderTargetMap;
+	typedef multimap<uchar, RenderTarget * >::type RenderTargetPriorityMap;
 
 	class TextureManager;
 	/// Enum describing the ways to generate texture coordinates
@@ -1283,10 +1283,10 @@ namespace Ogre
 		/// Internal method for firing a rendersystem event
 		virtual void fireEvent(const String& name, const NameValuePairList* params = 0);
 
-		typedef std::list<Listener*> ListenerList;
+		typedef list<Listener*>::type ListenerList;
 		ListenerList mEventListeners;
 
-		typedef std::list<HardwareOcclusionQuery*> HardwareOcclusionQueryList;
+		typedef list<HardwareOcclusionQuery*>::type HardwareOcclusionQueryList;
 		HardwareOcclusionQueryList mHwOcclusionQueries;
 
 		bool mVertexProgramBound;

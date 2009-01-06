@@ -115,7 +115,7 @@ namespace Ogre {
 #else // OGRE_USE_NEW_COMPILERS
         String line;
         ParticleSystem* pSys;
-        std::vector<String> vecparams;
+        vector<String>::type vecparams;
 
         pSys = 0;
 
@@ -488,7 +488,7 @@ namespace Ogre {
     void ParticleSystemManager::parseAttrib(const String& line, ParticleSystem* sys)
     {
         // Split params on space
-        std::vector<String> vecparams = StringUtil::split(line, "\t ", 1);
+        vector<String>::type vecparams = StringUtil::split(line, "\t ", 1);
 
         // Look up first param (command setting)
         if (!sys->setParameter(vecparams[0], vecparams[1]))
@@ -515,7 +515,7 @@ namespace Ogre {
     void ParticleSystemManager::parseEmitterAttrib(const String& line, ParticleEmitter* emit)
     {
         // Split params on first space
-        std::vector<String> vecparams = StringUtil::split(line, "\t ", 1);
+        vector<String>::type vecparams = StringUtil::split(line, "\t ", 1);
 
         // Look up first param (command setting)
         if (!emit->setParameter(vecparams[0], vecparams[1]))
@@ -529,7 +529,7 @@ namespace Ogre {
     void ParticleSystemManager::parseAffectorAttrib(const String& line, ParticleAffector* aff)
     {
         // Split params on space
-        std::vector<String> vecparams = StringUtil::split(line, "\t ", 1);
+        vector<String>::type vecparams = StringUtil::split(line, "\t ", 1);
 
         // Look up first param (command setting)
         if (!aff->setParameter(vecparams[0], vecparams[1]))

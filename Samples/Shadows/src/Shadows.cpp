@@ -50,7 +50,7 @@ LGPL like the rest of the engine.
 Entity* mAthene;
 AnimationState* mAnimState = 0;
 Entity* pPlaneEnt;
-std::vector<Entity*> pColumns;
+vector<Entity*>::type pColumns;
 Light* mLight;
 Light* mSunLight;
 SceneNode* mLightNode = 0;
@@ -1306,11 +1306,11 @@ protected:
 
 
 		mFixedBiasText->setText(StringConverter::toString(
-			mFixedBias->getScrollPosition(), 4, 5, '0', std::ios::fixed));
+			mFixedBias->getScrollPosition(), 4, 5, '0', std::ios::fixed).c_str());
 		mGradientBiasText->setText(StringConverter::toString(
-			mGradientBias->getScrollPosition(), 4, 5, '0', std::ios::fixed));
+			mGradientBias->getScrollPosition(), 4, 5, '0', std::ios::fixed).c_str());
 		mGradientClampText->setText(StringConverter::toString(
-			mGradientClamp->getScrollPosition(), 4, 5, '0', std::ios::fixed));
+			mGradientClamp->getScrollPosition(), 4, 5, '0', std::ios::fixed).c_str());
 	}
 
 	void setDefaultDepthShadowParams()
@@ -1361,7 +1361,7 @@ protected:
 		// Sort out base materials
 		pPlaneEnt->setMaterialName(BASIC_ROCKWALL_MATERIAL);
 		mAthene->setMaterialName(BASIC_ATHENE_MATERIAL);
-		for (std::vector<Entity*>::iterator i = pColumns.begin();
+		for (vector<Entity*>::type::iterator i = pColumns.begin();
 			i != pColumns.end(); ++i)
 		{
 			(*i)->setMaterialName(BASIC_ROCKWALL_MATERIAL);
@@ -1416,7 +1416,7 @@ protected:
 					// Sort out base materials
 					pPlaneEnt->setMaterialName(CUSTOM_ROCKWALL_MATERIAL);
 					mAthene->setMaterialName(CUSTOM_ATHENE_MATERIAL);
-					for (std::vector<Entity*>::iterator i = pColumns.begin();
+					for (vector<Entity*>::type::iterator i = pColumns.begin();
 						i != pColumns.end(); ++i)
 					{
 						(*i)->setMaterialName(CUSTOM_ROCKWALL_MATERIAL);
@@ -1453,7 +1453,7 @@ protected:
 					// Sort out base materials
 					pPlaneEnt->setMaterialName(CUSTOM_ROCKWALL_MATERIAL + "/PCF");
 					mAthene->setMaterialName(CUSTOM_ATHENE_MATERIAL + "/PCF");
-					for (std::vector<Entity*>::iterator i = pColumns.begin();
+					for (vector<Entity*>::type::iterator i = pColumns.begin();
 						i != pColumns.end(); ++i)
 					{
 						(*i)->setMaterialName(CUSTOM_ROCKWALL_MATERIAL + "/PCF");

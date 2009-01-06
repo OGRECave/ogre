@@ -79,7 +79,7 @@ namespace Ogre {
 		friend class EntityFactory;
 		friend class SubEntity;
 	public:
-		typedef std::set<Entity*> EntitySet;
+		typedef set<Entity*>::type EntitySet;
 
 	protected:
 
@@ -96,7 +96,7 @@ namespace Ogre {
 
 		/** List of SubEntities (point to SubMeshes).
 		*/
-		typedef std::vector<SubEntity*> SubEntityList;
+		typedef vector<SubEntity*>::type SubEntityList;
 		SubEntityList mSubEntityList;
 
 
@@ -215,7 +215,7 @@ namespace Ogre {
 		same number of SubMeshes, therefore we have to allow a separate Entity list
 		with each alternate one.
 		*/
-		typedef std::vector<Entity*> LODEntityList;
+		typedef vector<Entity*>::type LODEntityList;
 		LODEntityList mLodEntityList;
 
 		/** This Entity's personal copy of the skeleton, if skeletally animated
@@ -258,7 +258,7 @@ namespace Ogre {
 
 	public:
 		/// Contains the child objects (attached to bones) indexed by name
-		typedef std::map<String, MovableObject*> ChildObjectList;
+		typedef map<String, MovableObject*>::type ChildObjectList;
 	protected:
 		ChildObjectList mChildObjectList;
 

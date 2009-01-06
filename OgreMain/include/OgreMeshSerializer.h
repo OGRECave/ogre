@@ -95,7 +95,7 @@ namespace Ogre {
     protected:
         static String msCurrentVersion;
 
-        typedef std::map<String, MeshSerializerImpl* > MeshSerializerImplMap;
+        typedef map<String, MeshSerializerImpl* >::type MeshSerializerImplMap;
         MeshSerializerImplMap mImplementations;
 
 		MeshSerializerListener *mListener;

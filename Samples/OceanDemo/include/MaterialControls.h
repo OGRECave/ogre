@@ -39,7 +39,7 @@ struct ShaderControl
 	float convertScrollPositionToParam(const float val) const { return val + MinVal; }
 };
 
-typedef std::vector<ShaderControl> ShaderControlsContainer;
+typedef Ogre::vector<ShaderControl>::type ShaderControlsContainer;
 typedef ShaderControlsContainer::iterator ShaderControlIterator;
 // used for materials that have user controls
 
@@ -87,7 +87,7 @@ protected:
     ShaderControlsContainer mShaderControlsContainer;
 };
 
-typedef std::vector<MaterialControls> MaterialControlsContainer;
+typedef Ogre::vector<MaterialControls>::type MaterialControlsContainer;
 typedef MaterialControlsContainer::iterator MaterialControlsIterator;
 
 

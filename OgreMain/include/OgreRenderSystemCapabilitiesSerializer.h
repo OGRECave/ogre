@@ -66,30 +66,30 @@ namespace Ogre {
         // "automipmap" and "pbuffer" are both activated with setCapability (passing RSC_AUTOMIPMAP and RSC_PBUFFER respectivelly)
         // while "max_num_multi_render_targets" is an integer and has it's own method: setMaxMultiNumRenderTargets
         // we need to know these types to automatically parse each capability
-        typedef std::map<String, CapabilityKeywordType> KeywordTypeMap;
+        typedef map<String, CapabilityKeywordType>::type KeywordTypeMap;
         KeywordTypeMap mKeywordTypeMap;
 
         typedef void (RenderSystemCapabilities::*SetStringMethod)(const String&);
         // maps capability keywords to setCapability(String& cap) style methods
-        typedef std::map<String, SetStringMethod> SetStringMethodDispatchTable;
+        typedef map<String, SetStringMethod>::type SetStringMethodDispatchTable;
         SetStringMethodDispatchTable mSetStringMethodDispatchTable;
 
         // SET_INT_METHOD parsing tables
         typedef void (RenderSystemCapabilities::*SetIntMethod)(ushort);
-        typedef std::map<String, SetIntMethod> SetIntMethodDispatchTable;
+        typedef map<String, SetIntMethod>::type SetIntMethodDispatchTable;
         SetIntMethodDispatchTable mSetIntMethodDispatchTable;
 
         // SET_BOOL_METHOD parsing tables
         typedef void (RenderSystemCapabilities::*SetBoolMethod)(bool);
-        typedef std::map<String, SetBoolMethod> SetBoolMethodDispatchTable;
+        typedef map<String, SetBoolMethod>::type SetBoolMethodDispatchTable;
         SetBoolMethodDispatchTable mSetBoolMethodDispatchTable;
 
         // SET_REAL_METHOD parsing tables
         typedef void (RenderSystemCapabilities::*SetRealMethod)(Real);
-        typedef std::map<String, SetRealMethod> SetRealMethodDispatchTable;
+        typedef map<String, SetRealMethod>::type SetRealMethodDispatchTable;
         SetRealMethodDispatchTable mSetRealMethodDispatchTable;
 
-        typedef std::map<String, Capabilities> CapabilitiesMap;
+        typedef map<String, Capabilities>::type CapabilitiesMap;
         CapabilitiesMap mCapabilitiesMap;
 
         inline void addCapabilitiesMapping(String name, Capabilities cap)
@@ -99,7 +99,7 @@ namespace Ogre {
 
 
         // capabilities lines for parsing are collected along with their line numbers for debugging
-        typedef std::vector<std::pair<String, int> > CapabilitiesLinesList;
+        typedef vector<std::pair<String, int> >::type CapabilitiesLinesList;
         // the set of states that the parser can be in
         enum ParseAction {PARSE_HEADER, FIND_OPEN_BRACE, COLLECT_LINES};
 

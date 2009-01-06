@@ -42,7 +42,7 @@ namespace Ogre {
     String StringConverter::toString(Real val, unsigned short precision, 
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
-        StringUtil::StrStreamType stream;
+        stringstream stream;
         stream.precision(precision);
         stream.width(width);
         stream.fill(fill);
@@ -55,7 +55,7 @@ namespace Ogre {
     String StringConverter::toString(int val, 
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
-        StringUtil::StrStreamType stream;
+        stringstream stream;
 		stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -68,7 +68,7 @@ namespace Ogre {
     String StringConverter::toString(unsigned int val, 
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
-        StringUtil::StrStreamType stream;
+        stringstream stream;
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -80,7 +80,7 @@ namespace Ogre {
     String StringConverter::toString(size_t val, 
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
-        StringUtil::StrStreamType stream;
+        stringstream stream;
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -93,7 +93,7 @@ namespace Ogre {
     String StringConverter::toString(unsigned long val, 
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
-        StringUtil::StrStreamType stream;
+        stringstream stream;
         stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -108,7 +108,7 @@ namespace Ogre {
     String StringConverter::toString(size_t val, 
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
-        StringUtil::StrStreamType stream;
+        stringstream stream;
 		stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -120,7 +120,7 @@ namespace Ogre {
     String StringConverter::toString(unsigned long val, 
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
-        StringUtil::StrStreamType stream;
+        stringstream stream;
 		stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -133,7 +133,7 @@ namespace Ogre {
     String StringConverter::toString(long val, 
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
-        StringUtil::StrStreamType stream;
+        stringstream stream;
 		stream.width(width);
         stream.fill(fill);
         if (flags)
@@ -144,28 +144,28 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
     String StringConverter::toString(const Vector2& val)
     {
-        StringUtil::StrStreamType stream;
+        stringstream stream;
 		stream << val.x << " " << val.y;
         return stream.str();
     }
     //-----------------------------------------------------------------------
     String StringConverter::toString(const Vector3& val)
     {
-        StringUtil::StrStreamType stream;
+        stringstream stream;
 		stream << val.x << " " << val.y << " " << val.z;
         return stream.str();
     }
 	//-----------------------------------------------------------------------
     String StringConverter::toString(const Vector4& val)
     {
-        StringUtil::StrStreamType stream;
+        stringstream stream;
 		stream << val.x << " " << val.y << " " << val.z << " " << val.w;
         return stream.str();
     }
     //-----------------------------------------------------------------------
     String StringConverter::toString(const Matrix3& val)
     {
-		StringUtil::StrStreamType stream;
+		stringstream stream;
         stream << val[0][0] << " " 
             << val[0][1] << " "             
             << val[0][2] << " "             
@@ -204,7 +204,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     String StringConverter::toString(const Matrix4& val)
     {
-		StringUtil::StrStreamType stream;
+		stringstream stream;
         stream << val[0][0] << " " 
             << val[0][1] << " "             
             << val[0][2] << " "             
@@ -226,21 +226,21 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     String StringConverter::toString(const Quaternion& val)
     {
-		StringUtil::StrStreamType stream;
+		stringstream stream;
         stream  << val.w << " " << val.x << " " << val.y << " " << val.z;
         return stream.str();
     }
     //-----------------------------------------------------------------------
     String StringConverter::toString(const ColourValue& val)
     {
-		StringUtil::StrStreamType stream;
+		stringstream stream;
         stream << val.r << " " << val.g << " " << val.b << " " << val.a;
         return stream.str();
     }
     //-----------------------------------------------------------------------
     String StringConverter::toString(const StringVector& val)
     {
-		StringUtil::StrStreamType stream;
+		stringstream stream;
         StringVector::const_iterator i, iend, ibegin;
         ibegin = val.begin();
         iend = val.end();
@@ -257,7 +257,7 @@ namespace Ogre {
     Real StringConverter::parseReal(const String& val)
     {
 		// Use istringstream for direct correspondence with toString
-		std::istringstream str(val);
+		StringStream str(val);
 		Real ret = 0;
 		str >> ret;
 
@@ -267,7 +267,7 @@ namespace Ogre {
     int StringConverter::parseInt(const String& val)
     {
 		// Use istringstream for direct correspondence with toString
-		std::istringstream str(val);
+		StringStream str(val);
 		int ret = 0;
 		str >> ret;
 
@@ -277,7 +277,7 @@ namespace Ogre {
     unsigned int StringConverter::parseUnsignedInt(const String& val)
     {
 		// Use istringstream for direct correspondence with toString
-		std::istringstream str(val);
+		StringStream str(val);
 		unsigned int ret = 0;
 		str >> ret;
 
@@ -287,7 +287,7 @@ namespace Ogre {
     long StringConverter::parseLong(const String& val)
     {
 		// Use istringstream for direct correspondence with toString
-		std::istringstream str(val);
+		StringStream str(val);
 		long ret = 0;
 		str >> ret;
 
@@ -297,7 +297,7 @@ namespace Ogre {
     unsigned long StringConverter::parseUnsignedLong(const String& val)
     {
 		// Use istringstream for direct correspondence with toString
-		std::istringstream str(val);
+		StringStream str(val);
 		unsigned long ret = 0;
 		str >> ret;
 
@@ -313,7 +313,7 @@ namespace Ogre {
     Vector2 StringConverter::parseVector2(const String& val)
     {
         // Split on space
-        std::vector<String> vec = StringUtil::split(val);
+        vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() != 2)
         {
@@ -328,7 +328,7 @@ namespace Ogre {
     Vector3 StringConverter::parseVector3(const String& val)
     {
         // Split on space
-        std::vector<String> vec = StringUtil::split(val);
+        vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() != 3)
         {
@@ -343,7 +343,7 @@ namespace Ogre {
     Vector4 StringConverter::parseVector4(const String& val)
     {
         // Split on space
-        std::vector<String> vec = StringUtil::split(val);
+        vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() != 4)
         {
@@ -358,7 +358,7 @@ namespace Ogre {
     Matrix3 StringConverter::parseMatrix3(const String& val)
     {
         // Split on space
-        std::vector<String> vec = StringUtil::split(val);
+        vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() != 9)
         {
@@ -375,7 +375,7 @@ namespace Ogre {
     Matrix4 StringConverter::parseMatrix4(const String& val)
     {
         // Split on space
-        std::vector<String> vec = StringUtil::split(val);
+        vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() != 16)
         {
@@ -393,7 +393,7 @@ namespace Ogre {
     Quaternion StringConverter::parseQuaternion(const String& val)
     {
         // Split on space
-        std::vector<String> vec = StringUtil::split(val);
+        vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() != 4)
         {
@@ -408,7 +408,7 @@ namespace Ogre {
     ColourValue StringConverter::parseColourValue(const String& val)
     {
         // Split on space
-        std::vector<String> vec = StringUtil::split(val);
+        vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() == 4)
         {
@@ -431,7 +431,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool StringConverter::isNumber(const String& val)
 	{
-		std::istringstream str(val);
+		StringStream str(val);
 		float tst;
 		str >> tst;
 		return !str.fail() && str.eof();

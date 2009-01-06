@@ -29,7 +29,7 @@ LGPL like the rest of the engine.
     ItemSelectorViewManager::ItemSelectorViewManager(const Ogre::String& parentWindowName)
         : mItemSelectorController(0)
     {
-        mParentWindow = CEGUI::WindowManager::getSingleton().getWindow(parentWindowName);
+        mParentWindow = CEGUI::WindowManager::getSingleton().getWindow(parentWindowName.c_str());
         // add a scrollable pane as a child to the parent
         mScrollablePane = (CEGUI::ScrollablePane*)CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/ScrollablePane",
                                     ("MainScrollPane"));

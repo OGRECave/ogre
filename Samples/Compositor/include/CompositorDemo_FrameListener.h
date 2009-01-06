@@ -81,7 +81,7 @@ LGPL like the rest of the engine.
 
 
     protected:
-        std::string mDebugText;
+		Ogre::String mDebugText;
 
         CompositorDemo* mMain;
         HeatVisionListener *hvListener;
@@ -135,7 +135,7 @@ LGPL like the rest of the engine.
         CEGUI::Window* mRoot;
 		CEGUI::Listbox* mDebugRTTListbox;
 		CEGUI::Window* mDebugRTTStaticImage;
-		typedef std::vector<CEGUI::Imageset*> ImageSetList;
+		typedef Ogre::vector<CEGUI::Imageset*>::type ImageSetList;
 		ImageSetList mDebugRTTImageSets;
 
         CEGUI::MouseButton convertOISButtonToCegui(int ois_button_id);

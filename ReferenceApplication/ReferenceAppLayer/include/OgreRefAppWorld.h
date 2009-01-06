@@ -47,14 +47,14 @@ namespace OgreRefApp {
         /// Pointer to OGRE's scene manager
         SceneManager* mSceneMgr;
 
-        typedef std::map<String, ApplicationObject*> ObjectMap;
+        typedef map<String, ApplicationObject*>::type ObjectMap;
         /// Main list of objects
         ObjectMap mObjects;
 
-        typedef std::map<String, Joint*> JointMap;
+        typedef map<String, Joint*>::type JointMap;
         JointMap mJoints;
 
-        typedef std::set<ApplicationObject*> ObjectSet;
+        typedef set<ApplicationObject*>::type ObjectSet;
         /// Set of dynamics objects (those to perform physics on)
         ObjectSet mDynamicsObjects;
 

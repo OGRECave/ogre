@@ -100,7 +100,7 @@ namespace Ogre {
 
         unsigned int flags;
         int numPasses;
-        typedef std::vector<Pass> PassList;
+		typedef vector<Pass>::type PassList;
         PassList pass;
         bool farbox;            // Skybox
         String farboxName;

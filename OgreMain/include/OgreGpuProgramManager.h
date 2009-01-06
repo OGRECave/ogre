@@ -42,7 +42,7 @@ namespace Ogre {
 	{
 	public:
 
-		typedef std::set<String> SyntaxCodes;
+		typedef set<String>::type SyntaxCodes;
 
 
 	protected:

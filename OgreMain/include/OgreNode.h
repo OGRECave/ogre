@@ -98,7 +98,7 @@ namespace Ogre {
         /// Collection of pointers to direct children; hashmap for efficiency
         ChildNodeMap mChildren;
 
-		typedef std::set<Node*> ChildUpdateSet;
+		typedef set<Node*>::type ChildUpdateSet;
         /// List of children which need updating, used if self is not out of date but children are
         mutable ChildUpdateSet mChildrenToUpdate;
         /// Flag to indicate own transform from parent is out of date
@@ -201,7 +201,7 @@ namespace Ogre {
 		/** Node listener - only one allowed (no list) for size & performance reasons. */
 		Listener* mListener;
 
-		typedef std::vector<Node*> QueuedUpdates;
+		typedef vector<Node*>::type QueuedUpdates;
 		static QueuedUpdates msQueuedUpdates;
 
 

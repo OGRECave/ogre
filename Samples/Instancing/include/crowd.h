@@ -56,13 +56,13 @@ protected:
 	Ogre::Timer*timer;
 	double mLastTime,mBurnAmount;
 
-	std::vector <InstancedGeometry *>		renderInstance;
-	std::vector <StaticGeometry *>	renderStatic;
-	std::vector <Entity *>			renderEntity;
-	std::vector <AnimationState*> animations;
+	vector <InstancedGeometry *>::type		renderInstance;
+	vector <StaticGeometry *>::type	renderStatic;
+	vector <Entity *>::type			renderEntity;
+	vector <AnimationState*>::type animations;
 
-	std::vector <SceneNode *>			nodes; 
-	std::vector <Vector3 *>			posMatrices;
+	vector <SceneNode *>::type			nodes; 
+	vector <Vector3 *>::type			posMatrices;
 
 	CEGUI::Renderer* mGUIRenderer;
 	CEGUI::Window* mGuiAvg;
@@ -203,7 +203,7 @@ protected:
 
 	void createScene(void)
 	{
-		std::string terrain_cfg("terrain.cfg");
+		String terrain_cfg("terrain.cfg");
         mSceneMgr -> setWorldGeometry( terrain_cfg );
 		// Set ambient light
 		mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));

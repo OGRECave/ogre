@@ -36,7 +36,7 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
     typedef std::pair<String, String> TerrainPageSourceOption;
-    typedef std::vector<TerrainPageSourceOption> TerrainPageSourceOptionList;
+    typedef vector<TerrainPageSourceOption>::type TerrainPageSourceOptionList;
 
     /** Abstract class which classes can override to receive notifications
         when a page is ready to be added to the terrain manager.
@@ -61,7 +61,7 @@ namespace Ogre {
 		public Singleton<TerrainPageSourceListenerManager>, public GeneralAllocatedObject
 	{
 	protected:
-        typedef std::vector<TerrainPageSourceListener*> PageSourceListenerList;
+        typedef vector<TerrainPageSourceListener*>::type PageSourceListenerList;
         PageSourceListenerList mPageSourceListeners;
 	public:
         TerrainPageSourceListenerManager() {}

@@ -112,8 +112,8 @@ namespace Ogre {
 
         bool mAutoCalc;
 
-        std::vector<Vector3> mPoints;
-        std::vector<Vector3> mTangents;
+        vector<Vector3>::type mPoints;
+        vector<Vector3>::type mTangents;
 
         /// Matrix of coefficients 
         Matrix4 mCoeffs;

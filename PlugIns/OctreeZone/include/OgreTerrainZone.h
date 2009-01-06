@@ -50,8 +50,8 @@ namespace Ogre
 
 	class Image;
 
-	typedef std::vector < TerrainZonePage * > TerrainZonePageRow;
-	typedef std::vector < TerrainZonePageRow > TerrainZonePage2D;
+	typedef vector< TerrainZonePage * >::type TerrainZonePageRow;
+	typedef vector< TerrainZonePageRow >::type TerrainZonePage2D;
 
 	/** This is a basic PCZone for organizing TerrainRenderables into a total landscape.
 	* It loads a terrain from a .cfg file that specifices what textures/scale/mipmaps/etc to use.
@@ -250,7 +250,7 @@ namespace Ogre
 		*/
 		virtual void setPrimaryCamera(const Camera* cam);
 		/// Internal map of page source name to page source
-		typedef std::map<String, TerrainZonePageSource*> PageSourceMap;
+		typedef map<String, TerrainZonePageSource*>::type PageSourceMap;
 
 		/// Iterator over all page sources
 		typedef ConstMapIterator<PageSourceMap> PageSourceIterator;
@@ -389,7 +389,7 @@ namespace Ogre
 	class TerrainZoneFactory : public PCZoneFactory
 	{
 	protected:
-		typedef std::vector<TerrainZonePageSource*> TerrainZonePageSources;
+		typedef vector<TerrainZonePageSource*>::type TerrainZonePageSources;
 		TerrainZonePageSources mTerrainZonePageSources;
 	public:
 		TerrainZoneFactory();
