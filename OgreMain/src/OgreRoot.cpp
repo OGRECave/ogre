@@ -668,6 +668,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Root::_fireFrameStarted(FrameEvent& evt)
     {
+		OgreProfileBeginGroup("Frame", OGREPROF_GENERAL);
+
         // Remove all marked listeners
         set<FrameListener*>::type::iterator i;
         for (i = mRemovedFrameListeners.begin();
@@ -741,6 +743,8 @@ namespace Ogre {
 
 		// Also tell the ResourceBackgroundQueue to propagate background load events
 		ResourceBackgroundQueue::getSingleton()._fireOnFrameCallbacks();
+
+		OgreProfileEndGroup("Frame", OGREPROF_GENERAL);
 
         return ret;
     }

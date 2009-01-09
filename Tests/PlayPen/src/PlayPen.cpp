@@ -3328,6 +3328,11 @@ protected:
 		mCamera->setPosition(0,0, -4000);
 		mCamera->lookAt(Vector3::ZERO);
 
+		// enable the profiler
+		Profiler& prof = Profiler::getSingleton();
+		prof.setEnabled(true);
+		
+
 	}
 
 	void testSimpleMesh()

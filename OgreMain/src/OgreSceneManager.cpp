@@ -68,6 +68,7 @@ Torus Knot Software Ltd.
 #include "OgreBillboardChain.h"
 #include "OgreRibbonTrail.h"
 #include "OgreParticleSystemManager.h"
+#include "OgreProfiler.h"
 // This class implements the most basic scene manager
 
 #include <cstdio>
@@ -1190,6 +1191,8 @@ void SceneManager::prepareRenderQueue(void)
 //-----------------------------------------------------------------------
 void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverlays)
 {
+	OgreProfileGroup("_renderScene", OGREPROF_GENERAL);
+
     Root::getSingleton()._setCurrentSceneManager(this);
 	mActiveQueuedRenderableVisitor->targetSceneMgr = this;
 	mAutoParamDataSource->setCurrentSceneManager(this);
@@ -1237,17 +1240,20 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 		OGRE_LOCK_MUTEX(sceneGraphMutex)
 
 		// Update scene graph for this camera (can happen multiple times per frame)
-		_updateSceneGraph(camera);
-
-		// Auto-track nodes
-		AutoTrackingSceneNodes::iterator atsni, atsniend;
-		atsniend = mAutoTrackingSceneNodes.end();
-		for (atsni = mAutoTrackingSceneNodes.begin(); atsni != atsniend; ++atsni)
 		{
-			(*atsni)->_autoTrack();
+			OgreProfileGroup("_updateSceneGraph", OGREPROF_GENERAL);
+			_updateSceneGraph(camera);
+
+			// Auto-track nodes
+			AutoTrackingSceneNodes::iterator atsni, atsniend;
+			atsniend = mAutoTrackingSceneNodes.end();
+			for (atsni = mAutoTrackingSceneNodes.begin(); atsni != atsniend; ++atsni)
+			{
+				(*atsni)->_autoTrack();
+			}
+			// Auto-track camera if required
+			camera->_autoTrack();
 		}
-		// Auto-track camera if required
-		camera->_autoTrack();
 
 
 		if (mIlluminationStage != IRS_RENDER_TO_TEXTURE && mFindVisibleObjects)
@@ -1262,6 +1268,8 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 				// technique in use
 				if (isShadowTechniqueTextureBased())
 				{
+					OgreProfileGroup("prepareShadowTextures", OGREPROF_GENERAL);
+
 					// *******
 					// WARNING
 					// *******
@@ -1317,10 +1325,15 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 		}
 
 		// Prepare render queue for receiving new objects
-		prepareRenderQueue();
+		{
+			OgreProfileGroup("prepareRenderQueue", OGREPROF_GENERAL);
+			prepareRenderQueue();
+		}
 
 		if (mFindVisibleObjects)
 		{
+			OgreProfileGroup("_findVisibleObjects", OGREPROF_CULLING);
+
 			// Assemble an AAB on the fly which contains the scene elements visible
 			// by the camera.
 			CamVisibleObjectsMap::iterator camVisObjIt = mCamVisibleObjectsMap.find( camera );
@@ -1381,7 +1394,10 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 	mDestRenderSystem->_setViewMatrix(mCachedViewMatrix);
 
     // Render scene content
-    _renderVisibleObjects();
+	{
+		OgreProfileGroup("_renderVisibleObjects", OGREPROF_RENDERING);
+		_renderVisibleObjects();
+	}
 
     // End frame
     mDestRenderSystem->_endFrame();

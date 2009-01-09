@@ -62,17 +62,18 @@ namespace Ogre {
         assert( ms_Singleton );  return ( *ms_Singleton );  
     }
     //-----------------------------------------------------------------------
-    Profile::Profile(const String& profileName) {
+    Profile::Profile(const String& profileName, uint32 groupID) 
+		: mName(profileName)
+		, mGroupID(groupID)
+	{
 
-        mName = profileName;
-
-        Ogre::Profiler::getSingleton().beginProfile(profileName);
+        Ogre::Profiler::getSingleton().beginProfile(profileName, groupID);
 
     }
     //-----------------------------------------------------------------------
     Profile::~Profile() {
 
-        Ogre::Profiler::getSingleton().endProfile(mName);
+        Ogre::Profiler::getSingleton().endProfile(mName, mGroupID);
 
     }
     //-----------------------------------------------------------------------
@@ -81,21 +82,34 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     // PROFILER DEFINITIONS
     //-----------------------------------------------------------------------
-    Profiler::Profiler() {
-
-        // init some variables
-        mTimer = 0;
-        mTotalFrameTime = 0;
-        mUpdateDisplayFrequency = 0;
-        mCurrentFrame = 0;
-        mEnabled = mNewEnableState = false; // the profiler starts out as disabled
-        mEnableStateChangePending = false;
-        mInitialized = false;
-        maxProfiles = 50;
-
-        // by default the display will be updated every 10 frames
-        mUpdateDisplayFrequency = 10;
-
+    Profiler::Profiler() 
+		: mInitialized(false)
+		, mMaxDisplayProfiles(50)
+		, mOverlay(0)
+		, mProfileGui(0)
+		, mBarHeight(10)
+		, mGuiHeight(25)
+		, mGuiWidth(250)
+		, mGuiTop(0)
+		, mGuiLeft(0)
+		, mBarIndent(250)
+		, mGuiBorderWidth(10)
+		, mBarLineWidth(2)
+		, mBarSpacing(3)
+		, mUpdateDisplayFrequency(10)
+		, mCurrentFrame(0)
+		, mTimer(0)
+		, mTotalFrameTime(0)
+		, mEnabled(false)
+		, mEnableStateChangePending(false)
+		, mNewEnableState(false)
+		, mProfileMask(0xFFFFFFFF)
+		, mDisplayMode(DISPLAY_MILLISECONDS)
+		, mMaxTotalFrameTime(0)
+		, mAverageFrameTime(0)
+		, mResetExtents(false)
+	{
+		
     }
     //-----------------------------------------------------------------------
     Profiler::~Profiler() {
@@ -114,16 +128,48 @@ namespace Ogre {
         mProfileBars.clear();
 
     }
-    //-----------------------------------------------------------------------
-    void Profiler::initialize() {
+	//---------------------------------------------------------------------
+	void Profiler::setOverlayDimensions(Real width, Real height)
+	{
+		mGuiWidth = width;
+		mGuiHeight = height;
+		mBarIndent = mGuiWidth;
 
-        // init some gui characteristics
-        mBarHeight = 10; //0.02;
-        mGuiBorderWidth = 10; //0.02;
-        mGuiHeight = 25; //0.05;
-        mGuiWidth = 250; //0.15;
-        mBarIndent = mGuiWidth;
-        mBarLineWidth = 2;
+		mProfileGui->setDimensions(width, height);
+
+	}
+	//---------------------------------------------------------------------
+	void Profiler::setOverlayPosition(Real left, Real top)
+	{
+		mGuiLeft = left;
+		mGuiTop = top;
+
+		mProfileGui->setPosition(left, top);
+	}
+	//---------------------------------------------------------------------
+	Real Profiler::getOverlayWidth() const
+	{
+		return mGuiWidth;
+	}
+	//---------------------------------------------------------------------
+	Real Profiler::getOverlayHeight() const
+	{
+		return mGuiHeight;
+	}
+	//---------------------------------------------------------------------
+	Real Profiler::getOverlayLeft() const
+	{
+		return mGuiLeft;
+	}
+	//---------------------------------------------------------------------
+	Real Profiler::getOverlayTop() const
+	{
+		return mGuiTop;
+	}
+	//---------------------------------------------------------------------
+    void Profiler::initialize() 
+	{
+
 
         // create a new overlay to hold our Profiler display
         mOverlay = OverlayManager::getSingleton().create("Profiler");
@@ -134,56 +180,38 @@ namespace Ogre {
 
         OverlayElement* element;
 
-        // we create the little "ticks" above the profiles
-        for (uint k = 1; k < 10; ++k) { // we don't want a tick at 0% or 100%
-
-            if (k != 5) { // we don't want a tick at 50%
-                element = createTextArea("ProfileKeyLine" + StringConverter::toString(k), 20, 10, 2, mGuiWidth * (1 + k * .1), 9, "|");
-                mProfileGui->addChild(element);
-            }
-
-        }
-
-        // we create a 0% marker
-        element = createTextArea("ProfileKey0", 50, 10, 2, mGuiWidth * 0.99, 9, "0%");
-        mProfileGui->addChild(element);
-
-        // we create a 50% marker
-        element = createTextArea("ProfileyKey50", 50, 10, 2, mGuiWidth * 1.48, 9, "50%");
-        mProfileGui->addChild(element);
-
-        // we create a 100% marker
-        element = createTextArea("ProfileKey100", 50, 10, 2, mGuiWidth * 1.98, 9, "100%");
-        mProfileGui->addChild(element);
-
         // we create an initial pool of 50 profile bars
-        for (uint i = 0; i < maxProfiles; ++i) {
+        for (uint i = 0; i < mMaxDisplayProfiles; ++i) {
 
             // this is for the profile name and the number of times it was called in a frame
-            element = createTextArea("profileText" + StringConverter::toString(i), 90, mBarHeight, mGuiBorderWidth + (mBarHeight * 2) * i, 0, 14, "", false);
+            element = createTextArea("profileText" + StringConverter::toString(i), 90, mBarHeight, mGuiBorderWidth + (mBarHeight + mBarSpacing) * i, 0, 14, "", false);
             mProfileGui->addChild(element);
             mProfileBars.push_back(element);
 
             // this indicates the current frame time
-            element = createPanel("currBar" + StringConverter::toString(i), 0, mBarHeight, mGuiBorderWidth + (mBarHeight * 2) * i, mBarIndent, "Core/ProfilerCurrent", false);
+            element = createPanel("currBar" + StringConverter::toString(i), 0, mBarHeight, mGuiBorderWidth + (mBarHeight + mBarSpacing) * i, mBarIndent, "Core/ProfilerCurrent", false);
             mProfileGui->addChild(element);
             mProfileBars.push_back(element);
 
             // this indicates the minimum frame time
-            element = createPanel("minBar" + StringConverter::toString(i), mBarLineWidth, mBarHeight, mGuiBorderWidth + (mBarHeight * 2) * i, 0, "Core/ProfilerMin", false);
+            element = createPanel("minBar" + StringConverter::toString(i), mBarLineWidth, mBarHeight, mGuiBorderWidth + (mBarHeight + mBarSpacing) * i, 0, "Core/ProfilerMin", false);
             mProfileGui->addChild(element);
             mProfileBars.push_back(element);
 
             // this indicates the maximum frame time
-            element = createPanel("maxBar" + StringConverter::toString(i), mBarLineWidth, mBarHeight, mGuiBorderWidth + (mBarHeight * 2) * i, 0, "Core/ProfilerMax", false);
+            element = createPanel("maxBar" + StringConverter::toString(i), mBarLineWidth, mBarHeight, mGuiBorderWidth + (mBarHeight + mBarSpacing) * i, 0, "Core/ProfilerMax", false);
             mProfileGui->addChild(element);
             mProfileBars.push_back(element);
 
             // this indicates the average frame time
-            element = createPanel("avgBar" + StringConverter::toString(i), mBarLineWidth, mBarHeight, mGuiBorderWidth + (mBarHeight * 2) * i, 0, "Core/ProfilerAvg", false);
+            element = createPanel("avgBar" + StringConverter::toString(i), mBarLineWidth, mBarHeight, mGuiBorderWidth + (mBarHeight + mBarSpacing) * i, 0, "Core/ProfilerAvg", false);
             mProfileGui->addChild(element);
             mProfileBars.push_back(element);
 
+			// this indicates the text of the frame time
+			element = createTextArea("statText" + StringConverter::toString(i), 20, mBarHeight, mGuiBorderWidth + (mBarHeight + mBarSpacing) * i, 0, 14, "", false);
+			mProfileGui->addChild(element);
+			mProfileBars.push_back(element);
         }
 
         // throw everything all the GUI stuff into the overlay and display it
@@ -280,7 +308,8 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void Profiler::beginProfile(const String& profileName) {
+    void Profiler::beginProfile(const String& profileName, uint32 groupID) 
+	{
 
         // if the profiler is enabled
         if (!mEnabled) {
@@ -288,6 +317,12 @@ namespace Ogre {
             return;
 
         }
+
+		// mask groups
+		if ((groupID & mProfileMask) == 0)
+		{
+			return;
+		}
 
         // empty string is reserved for the root
         assert ((profileName != "") && ("Profile name can't be an empty string"));
@@ -367,12 +402,16 @@ namespace Ogre {
             ProfileHistory h;
             h.name = profileName;
             h.numCallsThisFrame = 0;
-            h.totalTime = 0;
+            h.totalTimePercent = 0;
+			h.totalTimeMillisecs = 0;
             h.totalCalls = 0;
-            h.maxTime = 0;
-            h.minTime = 1;
+            h.maxTimePercent = 0;
+			h.maxTimeMillisecs = 0;
+            h.minTimePercent = 1;
+			h.minTimeMillisecs = 100000;
             h.hierarchicalLvl = p.hierarchicalLvl;
-            h.currentTime = 0;
+            h.currentTimePercent = 0;
+			h.currentTimeMillisecs = 0;
 
             // we add this to the history
             hIter = mProfileHistory.insert(mProfileHistory.end(), h);
@@ -392,7 +431,7 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void Profiler::endProfile(const String& profileName) {
+    void Profiler::endProfile(const String& profileName, uint32 groupID) {
 
 		// if the profiler received a request to be enabled or disabled
 		// we reached the end of the frame so we can safely do this
@@ -469,8 +508,8 @@ namespace Ogre {
 
         }
 
-        // we subtract the time the children profiles took from this profile
-        (*iter).frameTime += timeElapsed - bProfile.accum;
+		// nested profiles are cumulative
+        (*iter).frameTime += timeElapsed;
         (*iter).calls++;
 
         // the stack is empty and all the profiles have been completed
@@ -479,6 +518,9 @@ namespace Ogre {
 
             // we know that the time elapsed of the main loop is the total time the frame took
             mTotalFrameTime = timeElapsed;
+
+			if (timeElapsed > mMaxTotalFrameTime)
+				mMaxTotalFrameTime = timeElapsed;
 
             // we got all the information we need, so process the profiles
             // for this frame
@@ -507,6 +549,8 @@ namespace Ogre {
 
         }
 
+		Real maxFrameTime = 0;
+
         // iterate through each of the profiles processed during this frame
         for (frameIter = mProfileFrame.begin(); frameIter != mProfileFrame.end(); ++frameIter) {
 
@@ -523,28 +567,60 @@ namespace Ogre {
             // calculate what percentage of frame time this profile took
             Real framePercentage = (Real) frameTime / (Real) mTotalFrameTime;
 
+			Real frameTimeMillisecs = (Real)frameTime / 1000.0f;
+
             // update the profile stats
-            (*historyIter).currentTime = framePercentage;
-            (*historyIter).totalTime += framePercentage;
-            (*historyIter).totalCalls++;
+			(*historyIter).currentTimePercent = framePercentage;
+			(*historyIter).currentTimeMillisecs = frameTimeMillisecs;
+			if (mResetExtents)
+			{
+				(*historyIter).totalTimePercent = framePercentage;
+				(*historyIter).totalTimeMillisecs = frameTimeMillisecs;
+				(*historyIter).totalCalls = 1;
+			}
+			else
+			{
+				(*historyIter).totalTimePercent += framePercentage;
+				(*historyIter).totalTimeMillisecs += frameTimeMillisecs;
+				(*historyIter).totalCalls++;
+			}
             (*historyIter).numCallsThisFrame = calls;
             (*historyIter).hierarchicalLvl = lvl;
 
             // if we find a new minimum for this profile, update it
-            if ((framePercentage) < ((*historyIter).minTime)) {
-
-                (*historyIter).minTime = framePercentage;
-
+            if (frameTimeMillisecs < ((*historyIter).minTimeMillisecs)
+				|| mResetExtents)
+			{
+                (*historyIter).minTimePercent = framePercentage;
+				(*historyIter).minTimeMillisecs = frameTimeMillisecs;
             }
 
             // if we find a new maximum for this profile, update it
-            if ((framePercentage) > ((*historyIter).maxTime)) {
-
-                (*historyIter).maxTime = framePercentage;
-
+            if (frameTimeMillisecs > ((*historyIter).maxTimeMillisecs) 
+				|| mResetExtents)
+			{
+                (*historyIter).maxTimePercent = framePercentage;
+				(*historyIter).maxTimeMillisecs = frameTimeMillisecs;
             }
 
+			if (frameTime > maxFrameTime)
+				maxFrameTime = frameTime;
+
         }
+
+		// Calculate whether the extents are now so out of date they need regenerating
+		if (mCurrentFrame == 0)
+			mAverageFrameTime = maxFrameTime;
+		else
+			mAverageFrameTime = (mAverageFrameTime + maxFrameTime) * 0.5;
+
+		if ((Real)mMaxTotalFrameTime > mAverageFrameTime * 4)
+		{
+			mResetExtents = true;
+			mMaxTotalFrameTime = mAverageFrameTime;
+		}
+		else
+			mResetExtents = false;
 
     }
     //-----------------------------------------------------------------------
@@ -557,9 +633,8 @@ namespace Ogre {
         }
 
         // if its time to update the display
-        if (mCurrentFrame >= mUpdateDisplayFrequency) {
+        if (!(mCurrentFrame % mUpdateDisplayFrequency)) {
 
-            mCurrentFrame = 0;
 
             ProfileHistoryList::iterator iter;
             ProfileBarList::iterator bIter;
@@ -568,7 +643,9 @@ namespace Ogre {
 
             Real newGuiHeight = mGuiHeight;
 
-            int temp = 0; // dummy variable for weird Ogre issue
+            int profileCount = 0; 
+
+			Real maxTimeMillisecs = (Real)mMaxTotalFrameTime / 1000.0f;
 
             // go through each profile and display it
             for (iter = mProfileHistory.begin(), bIter = mProfileBars.begin(); 
@@ -591,34 +668,61 @@ namespace Ogre {
                 // Ogre gui issue (bug?)
                 g->setMetricsMode(GMM_PIXELS);
                 g->setHeight(mBarHeight);
-                g->setWidth(((*iter).currentTime) * mGuiWidth);
+				if (mDisplayMode == DISPLAY_PERCENTAGE)
+					g->setWidth(((*iter).currentTimePercent) * mGuiWidth);
+				else
+					g->setWidth(((*iter).currentTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
                 g->setLeft(mGuiWidth);
-                g->setTop(mGuiBorderWidth + temp * mBarHeight * 2);
+                g->setTop(mGuiBorderWidth + profileCount * (mBarHeight + mBarSpacing));
 
                 // display line to indicate the minimum frame time for this profile
                 bIter++;
                 g = *bIter;
                 g->show();
-                g->setLeft(mBarIndent + (*iter).minTime * mGuiWidth);
+				if (mDisplayMode == DISPLAY_PERCENTAGE)
+		            g->setLeft(mBarIndent + (*iter).minTimePercent * mGuiWidth);
+				else
+					g->setLeft(mBarIndent + ((*iter).minTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
 
                 // display line to indicate the maximum frame time for this profile
                 bIter++;
                 g = *bIter;
                 g->show();
-                g->setLeft(mBarIndent + (*iter).maxTime * mGuiWidth);
-
+				if (mDisplayMode == DISPLAY_PERCENTAGE)
+	                g->setLeft(mBarIndent + (*iter).maxTimePercent * mGuiWidth);
+				else
+					g->setLeft(mBarIndent + ((*iter).maxTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
                 // display line to indicate the average frame time for this profile
                 bIter++;
                 g = *bIter;
                 g->show();
                 if ((*iter).totalCalls != 0)
-                    g->setLeft(mBarIndent + ((*iter).totalTime / (*iter).totalCalls) * mGuiWidth);
+					if (mDisplayMode == DISPLAY_PERCENTAGE)
+	                    g->setLeft(mBarIndent + ((*iter).totalTimePercent / (*iter).totalCalls) * mGuiWidth);
+					else
+						g->setLeft(mBarIndent + (((*iter).totalTimeMillisecs / (*iter).totalCalls) / maxTimeMillisecs) * mGuiWidth);
                 else
                     g->setLeft(mBarIndent);
-                // we set the height of the display with respect to the number of profiles displayed
-                newGuiHeight += mBarHeight * 2;
 
-                temp++;
+				// display text
+				bIter++;
+				g = *bIter;
+				g->show();
+				if (mDisplayMode == DISPLAY_PERCENTAGE)
+				{
+					g->setLeft(mBarIndent + (*iter).currentTimePercent * mGuiWidth + 2);
+					g->setCaption(StringConverter::toString((*iter).currentTimePercent * 100.0f, 3, 3) + "%");
+				}
+				else
+				{
+					g->setLeft(mBarIndent + ((*iter).currentTimeMillisecs / maxTimeMillisecs) * mGuiWidth + 2);
+					g->setCaption(StringConverter::toString((*iter).currentTimeMillisecs, 3, 3) + "ms");
+				}
+
+				// we set the height of the display with respect to the number of profiles displayed
+                newGuiHeight += mBarHeight + mBarSpacing;
+
+                profileCount++;
 
             }
 
@@ -638,12 +742,7 @@ namespace Ogre {
 
         }
 
-        // not time to update the display yet
-        else {
-
-            mCurrentFrame++;
-
-        }
+		mCurrentFrame++;
 
     }
     //-----------------------------------------------------------------------
@@ -660,7 +759,7 @@ namespace Ogre {
 
         iter = (*mapIter).second;
 
-        return ((*iter).currentTime == (*iter).maxTime);
+        return ((*iter).currentTimePercent == (*iter).maxTimePercent);
 
     }
     //-----------------------------------------------------------------------
@@ -677,7 +776,7 @@ namespace Ogre {
 
         iter = (*mapIter).second;
 
-        return ((*iter).currentTime == (*iter).minTime);
+        return ((*iter).currentTimePercent == (*iter).minTimePercent);
 
     }
     //-----------------------------------------------------------------------
@@ -695,9 +794,9 @@ namespace Ogre {
         iter = (*mapIter).second;
 
         if (greaterThan)
-            return ((*iter).currentTime > limit);
+            return ((*iter).currentTimePercent > limit);
         else
-            return ((*iter).currentTime < limit);
+            return ((*iter).currentTimePercent < limit);
 
     }
     //-----------------------------------------------------------------------
@@ -717,7 +816,10 @@ namespace Ogre {
 
             }
 
-            LogManager::getSingleton().logMessage(indent + "Name " + (*iter).name + " | Min " + StringConverter::toString((*iter).minTime) + " | Max " + StringConverter::toString((*iter).maxTime) + " | Avg "+ StringConverter::toString((*iter).totalTime / (*iter).totalCalls));
+            LogManager::getSingleton().logMessage(indent + "Name " + (*iter).name + 
+				" | Min " + StringConverter::toString((*iter).minTimePercent) + 
+				" | Max " + StringConverter::toString((*iter).maxTimePercent) + 
+				" | Avg "+ StringConverter::toString((*iter).totalTimePercent / (*iter).totalCalls));
 
         }
 
@@ -730,12 +832,15 @@ namespace Ogre {
         ProfileHistoryList::iterator iter;
         for (iter = mProfileHistory.begin(); iter != mProfileHistory.end(); ++iter) {
         
-            (*iter).currentTime = (*iter).maxTime = (*iter).totalTime = 0;
+            (*iter).currentTimePercent = (*iter).maxTimePercent = (*iter).totalTimePercent = 0;
+			(*iter).currentTimeMillisecs = (*iter).maxTimeMillisecs = (*iter).totalTimeMillisecs = 0;
             (*iter).numCallsThisFrame = (*iter).totalCalls = 0;
 
-            (*iter).minTime = 1;
+            (*iter).minTimePercent = 1;
+			(*iter).minTimeMillisecs = 100000;
 
         }
+		mMaxTotalFrameTime = 0;
 
     }
     //-----------------------------------------------------------------------
