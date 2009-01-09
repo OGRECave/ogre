@@ -38,7 +38,7 @@ Torus Knot Software Ltd.
 
 /** If set to 1, profiling code will be included in the application. When you
 	are deploying your application you will probably want to set this to 0 */
-#define OGRE_PROFILING 1
+#define OGRE_PROFILING 0
 
 /** There are three modes for handling asserts in OGRE:
 0 - STANDARD - Standard asserts in debug builds, nothing in release builds
@@ -107,7 +107,7 @@ Torus Knot Software Ltd.
 // default is to disable since it's expensive, but you can enable if needed per build target
 
 #ifndef OGRE_MEMORY_TRACKER_DEBUG_MODE
-#  define OGRE_MEMORY_TRACKER_DEBUG_MODE 1
+#  define OGRE_MEMORY_TRACKER_DEBUG_MODE 0
 #endif
 
 #ifndef OGRE_MEMORY_TRACKER_RELEASE_MODE
