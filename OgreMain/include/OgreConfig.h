@@ -38,7 +38,7 @@ Torus Knot Software Ltd.
 
 /** If set to 1, profiling code will be included in the application. When you
 	are deploying your application you will probably want to set this to 0 */
-#define OGRE_PROFILING 0
+#define OGRE_PROFILING 1
 
 /** There are three modes for handling asserts in OGRE:
 0 - STANDARD - Standard asserts in debug builds, nothing in release builds
