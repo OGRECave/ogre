@@ -100,7 +100,7 @@ namespace Ogre
 		AllocationMap mAllocations;
 
 		size_t mTotalAllocations;
-		typedef vector<size_t>::type AllocationsByPool;
+		typedef std::vector<size_t> AllocationsByPool;
 		AllocationsByPool mAllocationsByPool;
 
 		void reportLeaks();
