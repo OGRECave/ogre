@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="Ogre  workspace">
-		<Project filename="OgreMain\scripts\OgreMain.cbp" active="1" />
+		<Project filename="OgreMain\scripts\OgreMain.cbp" />
 		<Project filename="PlugIns\BSPSceneManager\scripts\Plugin_BSPSceneManager.cbp">
 			<Depends filename="OgreMain\scripts\OgreMain.cbp" />
 		</Project>
@@ -10,6 +10,13 @@
 		</Project>
 		<Project filename="PlugIns\OctreeSceneManager\scripts\Plugin_OctreeSceneManager.cbp">
 			<Depends filename="OgreMain\scripts\OgreMain.cbp" />
+		</Project>
+		<Project filename="PlugIns\PCZSceneManager\scripts\Plugin_PCZSceneManager.cbp">
+			<Depends filename="OgreMain\scripts\OgreMain.cbp" />
+		</Project>
+		<Project filename="PlugIns\OctreeZone\scripts\Plugin_OctreeZone.cbp">
+			<Depends filename="OgreMain\scripts\OgreMain.cbp" />
+			<Depends filename="PlugIns\PCZSceneManager\scripts\Plugin_PCZSceneManager.cbp" />
 		</Project>
 		<Project filename="PlugIns\ParticleFX\scripts\Plugin_ParticleFX.cbp">
 			<Depends filename="OgreMain\scripts\OgreMain.cbp" />
@@ -330,6 +337,18 @@
 		</Project>
 		<Project filename="Tools\MaterialUpgrader\scripts\MaterialUpgrader.cbp">
 			<Depends filename="OgreMain\scripts\OgreMain.cbp" />
+		</Project>
+		<Project filename="Samples\PCZTestApp\scripts\PCZTestApp.cbp" active="1">
+			<Depends filename="OgreMain\scripts\OgreMain.cbp" />
+			<Depends filename="PlugIns\BSPSceneManager\scripts\Plugin_BSPSceneManager.cbp" />
+			<Depends filename="PlugIns\CgProgramManager\scripts\Plugin_CgProgramManager.cbp" />
+			<Depends filename="PlugIns\OctreeSceneManager\scripts\Plugin_OctreeSceneManager.cbp" />
+			<Depends filename="PlugIns\PCZSceneManager\scripts\Plugin_PCZSceneManager.cbp" />
+			<Depends filename="PlugIns\OctreeZone\scripts\Plugin_OctreeZone.cbp" />
+			<Depends filename="PlugIns\ParticleFX\scripts\Plugin_ParticleFX.cbp" />
+			<Depends filename="RenderSystems\Direct3D9\scripts\RenderSystem_Direct3D9.cbp" />
+			<Depends filename="RenderSystems\GL\scripts\RenderSystem_GL.cbp" />
+			<Depends filename="Samples\Common\CEGUIRenderer\scripts\OgreGUIRenderer.cbp" />
 		</Project>
 	</Workspace>
 </CodeBlocks_workspace_file>
