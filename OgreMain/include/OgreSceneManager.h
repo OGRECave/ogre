@@ -902,9 +902,11 @@ namespace Ogre {
 		Matrix4 mCachedViewMatrix;
 		Vector3 mCameraRelativePosition;
 
+		/// Last light sets
+		uint32 mLastLightHash;
+		unsigned short mLastLightLimit;
 
-
-
+		void useLights(const LightList& lights, unsigned short limit);
 
 
 

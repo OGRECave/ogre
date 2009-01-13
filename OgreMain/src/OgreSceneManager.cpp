@@ -145,7 +145,9 @@ mVisibilityMask(0xFFFFFFFF),
 mFindVisibleObjects(true),
 mSuppressRenderStateChanges(false),
 mSuppressShadows(false),
-mCameraRelativeRendering(false)
+mCameraRelativeRendering(false),
+mLastLightHash(0),
+mLastLightLimit(0)
 {
 
     // init sky
@@ -1200,6 +1202,10 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 	// Also set the internal viewport pointer at this point, for calls that need it
 	// However don't call setViewport just yet (see below)
 	mCurrentViewport = vp;
+
+	// reset light hash so even if light list is the same, we refresh the content every frame
+	LightList emptyLightList;
+	useLights(emptyLightList, 0);
 
     if (isShadowTechniqueInUse())
     {
@@ -3218,7 +3224,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				// Only do this if fixed-function vertex lighting applies
 				if (pass->getLightingEnabled() && passSurfaceAndLightParams)
 				{
-					mDestRenderSystem->_useLights(*pLightListToUse, pass->getMaxSimultaneousLights());
+					useLights(*pLightListToUse, pass->getMaxSimultaneousLights());
 				}
 				// optional light scissoring & clipping
 				ClipResult scissored = CLIPPED_NONE;
@@ -3329,7 +3335,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				if (manualLightList && 
 					pass->getLightingEnabled() && passSurfaceAndLightParams)
 				{
-					mDestRenderSystem->_useLights(*manualLightList, pass->getMaxSimultaneousLights());
+					useLights(*manualLightList, pass->getMaxSimultaneousLights());
 				}
 
 				// optional light scissoring
@@ -6512,6 +6518,17 @@ void SceneManager::_handleLodEvents()
     mMovableObjectLodChangedEvents.clear();
     mEntityMeshLodChangedEvents.clear();
     mEntityMaterialLodChangedEvents.clear();
+}
+//---------------------------------------------------------------------
+void SceneManager::useLights(const LightList& lights, unsigned short limit)
+{
+	// only call the rendersystem if light list has changed
+	if (lights.getHash() != mLastLightHash || limit > mLastLightLimit)
+	{
+		mDestRenderSystem->_useLights(lights, limit);
+		mLastLightHash = lights.getHash();
+		mLastLightLimit = limit;
+	}
 }
 
 

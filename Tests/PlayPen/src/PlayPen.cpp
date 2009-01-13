@@ -3318,7 +3318,7 @@ protected:
 		l->setDirection(-Vector3::UNIT_Y);
 
 		// Create a set of random balls
-		Entity* ent = mSceneMgr->createEntity("Ball", "robot.mesh");
+		Entity* ent = mSceneMgr->createEntity("Ball", "cube.mesh");
 		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ent);
 		createRandomEntityClones(ent, 3000, Vector3(-1000,-1000,-1000), Vector3(1000,1000,1000));
 
@@ -3329,8 +3329,9 @@ protected:
 		mCamera->lookAt(Vector3::ZERO);
 
 		// enable the profiler
-		Profiler& prof = Profiler::getSingleton();
-		prof.setEnabled(true);
+		Profiler* prof = Profiler::getSingletonPtr();
+		if (prof)
+			prof->setEnabled(true);
 		
 
 	}

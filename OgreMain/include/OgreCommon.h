@@ -44,6 +44,8 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/// Fast general hashing algorithm
+	uint32 _OgreExport FastHash (const char * data, int len, uint32 hashSoFar = 0);
 
     /** Comparison functions used for the depth/stencil buffer operations and 
 		others. */
@@ -285,8 +287,169 @@ namespace Ogre {
     };
     
 	
-    class Light;
-	typedef vector<Light*>::type LightList;
+	/** A hashed vector.
+	*/
+	template <typename T>
+	class HashedVector
+	{
+	public:
+		typedef std::vector<T, STLAllocator<T, GeneralAllocPolicy> > VectorImpl;
+	protected:
+		VectorImpl mList;
+		uint32 mListHash;
+
+		void addToHash(const T& newPtr)
+		{
+			mListHash = FastHash((const char*)&newPtr, sizeof(T), mListHash);
+		}
+		void recalcHash()
+		{
+			mListHash = 0;
+			for (iterator i = mList.begin(); i != mList.end(); ++i)
+				addToHash(*i);
+		}
+
+	public:
+		typedef typename VectorImpl::value_type value_type;
+		typedef typename VectorImpl::pointer pointer;
+		typedef typename VectorImpl::reference reference;
+		typedef typename VectorImpl::const_reference const_reference;
+		typedef typename VectorImpl::size_type size_type;
+		typedef typename VectorImpl::difference_type difference_type;
+		typedef typename VectorImpl::iterator iterator;
+		typedef typename VectorImpl::const_iterator const_iterator;
+		typedef typename VectorImpl::reverse_iterator reverse_iterator;
+		typedef typename VectorImpl::const_reverse_iterator const_reverse_iterator;
+
+		iterator begin() { return mList.begin(); }
+		iterator end() { return mList.end(); }
+		const_iterator begin() const { return mList.begin(); }
+		const_iterator end() const { return mList.end(); }
+		reverse_iterator rbegin() { return mList.rbegin(); }
+		reverse_iterator rend() { return mList.rend(); }
+		const_reverse_iterator rbegin() const { return mList.rbegin(); }
+		const_reverse_iterator rend() const { return mList.rend(); }
+		size_type size() const { return mList.size(); }
+		size_type max_size() const { return mList.max_size(); }
+		size_type capacity() const { return mList.capacity(); }
+		bool empty() const { return mList.empty(); }
+		reference operator[](size_type n) { return mList[n]; }
+		const_reference operator[](size_type n) const { return mList[n]; }
+		reference at(size_type n) { return mList.const_iterator(n); }
+		const_reference at(size_type n) const { return mList.at(n); }
+		HashedVector() : mListHash(0) {}
+		HashedVector(size_type n) : mList(n), mListHash(0) {}
+		HashedVector(size_type n, const T& t) : mList(n, t), mListHash(0) {}
+		HashedVector(const HashedVector<T>& rhs) 
+			: mList(rhs.mList), mListHash(rhs.mListHash) {}
+
+		template <class InputIterator>
+		HashedVector(InputIterator a, InputIterator b)
+			: mList(a, b)
+		{
+			recalcHash();
+		}
+
+		~HashedVector() {}
+		HashedVector<T>& operator=(const HashedVector<T>& rhs)
+		{
+			mList = rhs.mList;
+			mListHash = rhs.mListHash;
+			return *this;
+		}
+
+		void reserve(size_t t) { mList.reserve(t); }
+		reference front() { return mList.front(); }
+		const_reference front() const { return mList.front(); }
+		reference back()  { return mList.back(); }
+		const_reference back() const { return mList.back(); }
+		void push_back(const T& t)
+		{ 
+			mList.push_back(t);
+			addToHash(t);
+		}
+		void pop_back()
+		{
+			mList.pop_back();
+			recalcHash();
+		}
+		void swap(HashedVector<T>& rhs)
+		{
+			mList.swap(rhs.mList);
+			recalcHash();
+		}
+		iterator insert(iterator pos, const T& t)
+		{
+			bool recalc = (pos != end());
+			mList.insert(pos, t);
+			if (recalc)
+				recalcHash();
+			else
+				addToHash(t);
+		}
+
+		template <class InputIterator>
+		void insert(iterator pos,
+			InputIterator f, InputIterator l)
+		{
+			mList.insert(pos, f, l);
+			recalcHash();
+		}
+
+		void insert(iterator pos, size_type n, const T& x)
+		{
+			mList.insert(pos, n, x);
+			recalcHash();
+		}
+
+		iterator erase(iterator pos)
+		{
+			iterator ret = mList.erase(pos);
+			recalcHash();
+			return ret;
+		}
+		iterator erase(iterator first, iterator last)
+		{
+			iterator ret = mList.erase(first, last);
+			recalcHash();
+			return ret;
+		}
+		void clear()
+		{
+			mList.clear();
+			mListHash = 0;
+		}
+
+		void resize(size_type n, const T& t = T())
+		{
+			bool recalc = false;
+			if (n != size())
+				recalc = true;
+
+			mList.resize(n, t);
+			if (recalc)
+				recalcHash();
+		}
+
+		bool operator==(const HashedVector<T>& b)
+		{ return mListHash == b.mListHash; }
+
+		bool operator<(const HashedVector<T>& b)
+		{ return mListHash < b.mListHash; }
+
+
+		/// Get the hash value
+		uint32 getHash() const { return mListHash; }
+	public:
+
+
+
+	};
+
+	class Light;
+	typedef HashedVector<Light*> LightList;
+
+
 
     typedef map<String, bool>::type UnaryOptionList;
     typedef map<String, String>::type BinaryOptionList;
