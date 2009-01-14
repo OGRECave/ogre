@@ -147,6 +147,9 @@ namespace Ogre {
         /// The last frame that this light list was updated in
         mutable ulong mLightListUpdated;
 
+		/// the light mask defined for this movable. This will be taken into consideration when deciding which light should affect this movable
+		uint32 mLightMask;
+
 		// Static members
 		/// Default query flags
 		static uint32 msDefaultQueryFlags;
@@ -418,6 +421,19 @@ namespace Ogre {
         @returns The list of lights use to lighting this object.
         */
         virtual const LightList& queryLights(void) const;
+
+		/** Get a bitwise mask which will filter the lights affecting this object
+		@remarks
+		By default, this mask is fully set meaning all lights will affect this object
+		*/
+		virtual uint32 getLightMask()const { return mLightMask; }
+		/** Set a bitwise mask which will filter the lights affecting this object
+		@remarks
+		This mask will be compared against the mask held against Light to determine
+		if a light should affect a given object. 
+		By default, this mask is fully set meaning all lights will affect this object
+		*/
+		virtual void setLightMask(uint32 lightMask);
 
 		/** Returns a pointer to the current list of lights for this object.
 		@remarks

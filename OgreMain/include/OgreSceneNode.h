@@ -326,8 +326,9 @@ namespace Ogre {
             cleared by this method before population.
         @param radius Parameter to specify lights intersecting a given radius of
             this SceneNode's centre.
+		@param lightMask The mask with which to include / exclude lights
         */
-        virtual void findLights(LightList& destList, Real radius) const;
+        virtual void findLights(LightList& destList, Real radius, uint32 lightMask = 0xFFFFFFFF) const;
 
         /** Tells the node whether to yaw around it's own local Y axis or a fixed axis of choice.
         @remarks

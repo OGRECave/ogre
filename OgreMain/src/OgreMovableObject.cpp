@@ -62,6 +62,7 @@ namespace Ogre {
         , mRenderingDisabled(false)
         , mListener(0)
         , mLightListUpdated(0)
+		, mLightMask(0xFFFFFFFF)
     {
     }
     //-----------------------------------------------------------------------
@@ -84,6 +85,7 @@ namespace Ogre {
         , mRenderingDisabled(false)
         , mListener(0)
         , mLightListUpdated(0)
+		, mLightMask(0xFFFFFFFF)
     {
     }
     //-----------------------------------------------------------------------
@@ -346,7 +348,7 @@ namespace Ogre {
             {
                 mLightListUpdated = frame;
 
-                sn->findLights(mLightList, this->getBoundingRadius());
+                sn->findLights(mLightList, this->getBoundingRadius(), this->getLightMask());
             }
         }
         else
@@ -404,6 +406,13 @@ namespace Ogre {
 		{
 			return 0xFFFFFFFF;
 		}
+	}
+	//---------------------------------------------------------------------
+	void MovableObject::setLightMask(uint32 lightMask)
+	{
+		this->mLightMask = lightMask;
+		//make sure to request a new light list from the scene manager if mask changed
+		mLightListUpdated = 0;
 	}
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------

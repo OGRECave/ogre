@@ -406,7 +406,7 @@ bool SceneManager::lightLess::operator()(const Light* a, const Light* b) const
 }
 //-----------------------------------------------------------------------
 void SceneManager::_populateLightList(const Vector3& position, Real radius, 
-									  LightList& destList)
+									  LightList& destList, uint32 lightMask)
 {
     // Really basic trawl of the lights, then sort
     // Subclasses could do something smarter
@@ -423,6 +423,10 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
     for (it = candidateLights.begin(); it != candidateLights.end(); ++it)
     {
         Light* lt = *it;
+		// check whether or not this light is suppose to be taken into consideration for the current light mask set for this operation
+		if(!(lt->getLightMask() & lightMask))
+			continue; //skip this light
+
 		// Calc squared distance
 		lt->_calcTempSquareDist(position);
 
@@ -472,9 +476,9 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
 
 }
 //-----------------------------------------------------------------------
-void SceneManager::_populateLightList(const SceneNode* sn, Real radius, LightList& destList) 
+void SceneManager::_populateLightList(const SceneNode* sn, Real radius, LightList& destList, uint32 lightMask) 
 {
-    _populateLightList(sn->_getDerivedPosition(), radius, destList);
+    _populateLightList(sn->_getDerivedPosition(), radius, destList, lightMask);
 }
 //-----------------------------------------------------------------------
 Entity* SceneManager::createEntity(const String& entityName, PrefabType ptype)

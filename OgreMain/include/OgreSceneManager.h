@@ -1122,8 +1122,9 @@ namespace Ogre {
         @param radius The bounding radius to test
         @param destList List to be populated with ordered set of lights; will be cleared by 
             this method before population.
+		@param lightMask The mask with which to include / exclude lights
         */
-        virtual void _populateLightList(const Vector3& position, Real radius, LightList& destList);
+        virtual void _populateLightList(const Vector3& position, Real radius, LightList& destList, uint32 lightMask = 0xFFFFFFFF);
 
 		/** Populates a light list with an ordered set of the lights which are closest
         to the position of the SceneNode given.
@@ -1151,8 +1152,9 @@ namespace Ogre {
         @param radius The bounding radius to test
         @param destList List to be populated with ordered set of lights; will be cleared by 
             this method before population.
+		@param lightMask The mask with which to include / exclude lights
         */
-        virtual void _populateLightList(const SceneNode* sn, Real radius, LightList& destList);
+        virtual void _populateLightList(const SceneNode* sn, Real radius, LightList& destList, uint32 lightMask = 0xFFFFFFFF);
 
         /** Creates an instance of a SceneNode.
             @remarks
