@@ -366,14 +366,13 @@ namespace Ogre {
 	}
     //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::getByName(const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
-    {
-		OGRE_LOCK_AUTO_MUTEX
-		
+    {		
 		ResourcePtr res;
 
 		// if not in the global pool - get it from the grouped pool 
 		if(!ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(groupName))
 		{
+			OGRE_LOCK_AUTO_MUTEX
 			ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(groupName);
 
 			if( itGroup != mResourcesWithGroup.end())
@@ -390,6 +389,7 @@ namespace Ogre {
 		// if didn't find it the grouped pool - get it from the global pool 
 		if (res.isNull())
 		{
+			OGRE_LOCK_AUTO_MUTEX
 
 			ResourceMap::iterator it = mResources.find(name);
 
@@ -417,11 +417,8 @@ namespace Ogre {
 				}
 			}
 		}
-		
-
+	
 		return res;
-
-
     }
     //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::getByHandle(ResourceHandle handle)
