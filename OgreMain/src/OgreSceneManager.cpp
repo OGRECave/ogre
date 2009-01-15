@@ -1126,6 +1126,10 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 
 		// set pass number
     	mAutoParamDataSource->setPassNumber( pass->getIndex() );
+
+		// update all the global params
+		pass->_updateAutoParamsGlobal(mAutoParamDataSource);
+
 	}
 
     return pass;
@@ -2982,7 +2986,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
             mAutoParamDataSource->setCurrentRenderable(rend);
             // Tell auto params object about the world matrices, eliminated query from renderable again
             mAutoParamDataSource->setWorldMatrices(mTempXform, numMatrices);
-            pass->_updateAutoParamsNoLights(mAutoParamDataSource);
+            pass->_updateAutoParamsPerObjectNoLights(mAutoParamDataSource);
             if (pass->hasVertexProgram())
             {
                 passSurfaceAndLightParams = pass->getVertexProgram()->getPassSurfaceAndLightStates();
@@ -3643,7 +3647,8 @@ void SceneManager::manualRender(RenderOperation* rend,
 		dummyCam.setCustomViewMatrix(true, viewMatrix);
 		dummyCam.setCustomProjectionMatrix(true, projMatrix);
 		mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
-		pass->_updateAutoParamsNoLights(mAutoParamDataSource);
+		pass->_updateAutoParamsGlobal(mAutoParamDataSource);
+		pass->_updateAutoParamsPerObjectNoLights(mAutoParamDataSource);
 		// NOTE: We MUST bind parameters AFTER updating the autos
 		if (pass->hasVertexProgram())
 		{

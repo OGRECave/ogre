@@ -1461,25 +1461,46 @@ namespace Ogre {
             (*i)->setTextureAnisotropy(maxAniso);
         }
     }
+	//-----------------------------------------------------------------------
+	void Pass::_updateAutoParamsGlobal(const AutoParamDataSource* source) const
+	{
+		if (hasVertexProgram())
+		{
+			// Update vertex program auto params
+			mVertexProgramUsage->getParameters()->_updateAutoParamsGlobal(source);
+		}
+
+		if (hasGeometryProgram())
+		{
+			// Update geometry program auto params
+			mGeometryProgramUsage->getParameters()->_updateAutoParamsGlobal(source);
+		}
+
+		if (hasFragmentProgram())
+		{
+			// Update fragment program auto params
+			mFragmentProgramUsage->getParameters()->_updateAutoParamsGlobal(source);
+		}
+	}
     //-----------------------------------------------------------------------
-    void Pass::_updateAutoParamsNoLights(const AutoParamDataSource* source) const
+    void Pass::_updateAutoParamsPerObjectNoLights(const AutoParamDataSource* source) const
     {
         if (hasVertexProgram())
         {
             // Update vertex program auto params
-            mVertexProgramUsage->getParameters()->_updateAutoParamsNoLights(source);
+            mVertexProgramUsage->getParameters()->_updateAutoParamsPerObjectNoLights(source);
         }
 
         if (hasGeometryProgram())
         {
             // Update geometry program auto params
-            mGeometryProgramUsage->getParameters()->_updateAutoParamsNoLights(source);
+            mGeometryProgramUsage->getParameters()->_updateAutoParamsPerObjectNoLights(source);
         }
 
         if (hasFragmentProgram())
         {
             // Update fragment program auto params
-            mFragmentProgramUsage->getParameters()->_updateAutoParamsNoLights(source);
+            mFragmentProgramUsage->getParameters()->_updateAutoParamsPerObjectNoLights(source);
         }
     }
     //-----------------------------------------------------------------------

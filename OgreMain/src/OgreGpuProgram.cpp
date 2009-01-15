@@ -1230,18 +1230,246 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------
 
+	//-----------------------------------------------------------------------------
+	void GpuProgramParameters::_updateAutoParamsGlobal(const AutoParamDataSource* source)
+	{
+		if (!hasAutoConstants()) return; // abort early if no autos
+
+		mActivePassIterationIndex = std::numeric_limits<size_t>::max();
+
+		// Autoconstant index is not a physical index
+		for (AutoConstantList::const_iterator i = mAutoConstants.begin(); i != mAutoConstants.end(); ++i)
+		{
+			switch(i->paramType)
+			{
+			case ACT_VIEW_MATRIX:
+				_writeRawConstant(i->physicalIndex, source->getViewMatrix());
+				break;
+			case ACT_INVERSE_VIEW_MATRIX:
+				_writeRawConstant(i->physicalIndex, source->getInverseViewMatrix());
+				break;
+			case ACT_TRANSPOSE_VIEW_MATRIX:
+				_writeRawConstant(i->physicalIndex, source->getTransposeViewMatrix());
+				break;
+			case ACT_INVERSE_TRANSPOSE_VIEW_MATRIX:
+				_writeRawConstant(i->physicalIndex, source->getInverseTransposeViewMatrix());
+				break;
+
+			case ACT_PROJECTION_MATRIX:
+				_writeRawConstant(i->physicalIndex, source->getProjectionMatrix());
+				break;
+			case ACT_INVERSE_PROJECTION_MATRIX:
+				_writeRawConstant(i->physicalIndex, source->getInverseProjectionMatrix());
+				break;
+			case ACT_TRANSPOSE_PROJECTION_MATRIX:
+				_writeRawConstant(i->physicalIndex, source->getTransposeProjectionMatrix());
+				break;
+			case ACT_INVERSE_TRANSPOSE_PROJECTION_MATRIX:
+				_writeRawConstant(i->physicalIndex, source->getInverseTransposeProjectionMatrix());
+				break;
+
+			case ACT_VIEWPROJ_MATRIX:
+				_writeRawConstant(i->physicalIndex, source->getViewProjectionMatrix());
+				break;
+			case ACT_INVERSE_VIEWPROJ_MATRIX:
+				_writeRawConstant(i->physicalIndex, source->getInverseViewProjMatrix());
+				break;
+			case ACT_TRANSPOSE_VIEWPROJ_MATRIX:
+				_writeRawConstant(i->physicalIndex, source->getTransposeViewProjMatrix());
+				break;
+			case ACT_INVERSE_TRANSPOSE_VIEWPROJ_MATRIX:
+				_writeRawConstant(i->physicalIndex, source->getInverseTransposeViewProjMatrix());
+				break;
+			case ACT_RENDER_TARGET_FLIPPING:
+				_writeRawConstant(i->physicalIndex, source->getCurrentRenderTarget()->requiresTextureFlipping() ? -1.f : +1.f);
+				break;
+
+				// NB ambient light still here because it's not related to a specific light
+			case ACT_AMBIENT_LIGHT_COLOUR: 
+				_writeRawConstant(i->physicalIndex, source->getAmbientLightColour(), 
+					i->elementCount);
+				break;
+			case ACT_DERIVED_AMBIENT_LIGHT_COLOUR:
+				_writeRawConstant(i->physicalIndex, source->getDerivedAmbientLightColour(),
+					i->elementCount);
+				break;
+			case ACT_DERIVED_SCENE_COLOUR:
+				_writeRawConstant(i->physicalIndex, source->getDerivedSceneColour(),
+					i->elementCount);
+				break;
+
+			case ACT_FOG_COLOUR:
+				_writeRawConstant(i->physicalIndex, source->getFogColour());
+				break;
+			case ACT_FOG_PARAMS:
+				_writeRawConstant(i->physicalIndex, source->getFogParams(), i->elementCount);
+				break;
+
+			case ACT_SURFACE_AMBIENT_COLOUR:
+				_writeRawConstant(i->physicalIndex, source->getSurfaceAmbientColour(),
+					i->elementCount);
+				break;
+			case ACT_SURFACE_DIFFUSE_COLOUR:
+				_writeRawConstant(i->physicalIndex, source->getSurfaceDiffuseColour(),
+					i->elementCount);
+				break;
+			case ACT_SURFACE_SPECULAR_COLOUR:
+				_writeRawConstant(i->physicalIndex, source->getSurfaceSpecularColour(),
+					i->elementCount);
+				break;
+			case ACT_SURFACE_EMISSIVE_COLOUR:
+				_writeRawConstant(i->physicalIndex, source->getSurfaceEmissiveColour(),
+					i->elementCount);
+				break;
+			case ACT_SURFACE_SHININESS:
+				_writeRawConstant(i->physicalIndex, source->getSurfaceShininess());
+				break;
+
+			case ACT_CAMERA_POSITION:
+				_writeRawConstant(i->physicalIndex, source->getCameraPosition(), i->elementCount);
+				break;
+			case ACT_TIME:
+				_writeRawConstant(i->physicalIndex, source->getTime() * i->fData);
+				break;
+			case ACT_TIME_0_X:
+				_writeRawConstant(i->physicalIndex, source->getTime_0_X(i->fData));
+				break;
+			case ACT_COSTIME_0_X:
+				_writeRawConstant(i->physicalIndex, source->getCosTime_0_X(i->fData));
+				break;
+			case ACT_SINTIME_0_X:
+				_writeRawConstant(i->physicalIndex, source->getSinTime_0_X(i->fData));
+				break;
+			case ACT_TANTIME_0_X:
+				_writeRawConstant(i->physicalIndex, source->getTanTime_0_X(i->fData));
+				break;
+			case ACT_TIME_0_X_PACKED:
+				_writeRawConstant(i->physicalIndex, source->getTime_0_X_packed(i->fData), i->elementCount);
+				break;
+			case ACT_TIME_0_1:
+				_writeRawConstant(i->physicalIndex, source->getTime_0_1(i->fData));
+				break;
+			case ACT_COSTIME_0_1:
+				_writeRawConstant(i->physicalIndex, source->getCosTime_0_1(i->fData));
+				break;
+			case ACT_SINTIME_0_1:
+				_writeRawConstant(i->physicalIndex, source->getSinTime_0_1(i->fData));
+				break;
+			case ACT_TANTIME_0_1:
+				_writeRawConstant(i->physicalIndex, source->getTanTime_0_1(i->fData));
+				break;
+			case ACT_TIME_0_1_PACKED:
+				_writeRawConstant(i->physicalIndex, source->getTime_0_1_packed(i->fData), i->elementCount);
+				break;
+			case ACT_TIME_0_2PI:
+				_writeRawConstant(i->physicalIndex, source->getTime_0_2Pi(i->fData));
+				break;
+			case ACT_COSTIME_0_2PI:
+				_writeRawConstant(i->physicalIndex, source->getCosTime_0_2Pi(i->fData));
+				break;
+			case ACT_SINTIME_0_2PI:
+				_writeRawConstant(i->physicalIndex, source->getSinTime_0_2Pi(i->fData));
+				break;
+			case ACT_TANTIME_0_2PI:
+				_writeRawConstant(i->physicalIndex, source->getTanTime_0_2Pi(i->fData));
+				break;
+			case ACT_TIME_0_2PI_PACKED:
+				_writeRawConstant(i->physicalIndex, source->getTime_0_2Pi_packed(i->fData), i->elementCount);
+				break;
+			case ACT_FRAME_TIME:
+				_writeRawConstant(i->physicalIndex, source->getFrameTime() * i->fData);
+				break;
+			case ACT_FPS:
+				_writeRawConstant(i->physicalIndex, source->getFPS());
+				break;
+			case ACT_VIEWPORT_WIDTH:
+				_writeRawConstant(i->physicalIndex, source->getViewportWidth());
+				break;
+			case ACT_VIEWPORT_HEIGHT:
+				_writeRawConstant(i->physicalIndex, source->getViewportHeight());
+				break;
+			case ACT_INVERSE_VIEWPORT_WIDTH:
+				_writeRawConstant(i->physicalIndex, source->getInverseViewportWidth());
+				break;
+			case ACT_INVERSE_VIEWPORT_HEIGHT:
+				_writeRawConstant(i->physicalIndex, source->getInverseViewportHeight());
+				break;
+			case ACT_VIEWPORT_SIZE:
+				_writeRawConstant(i->physicalIndex, Vector4(
+					source->getViewportWidth(),
+					source->getViewportHeight(),
+					source->getInverseViewportWidth(),
+					source->getInverseViewportHeight()), i->elementCount);
+				break;
+			case ACT_TEXEL_OFFSETS:
+				{
+					RenderSystem* rsys = Root::getSingleton().getRenderSystem();
+					_writeRawConstant(i->physicalIndex, Vector4(
+						rsys->getHorizontalTexelOffset(), 
+						rsys->getVerticalTexelOffset(), 
+						rsys->getHorizontalTexelOffset() * source->getInverseViewportWidth(),
+						rsys->getVerticalTexelOffset() * source->getInverseViewportHeight()),
+						i->elementCount);
+				}
+				break;
+			case ACT_TEXTURE_SIZE:
+				_writeRawConstant(i->physicalIndex, source->getTextureSize(i->data), i->elementCount);
+				break;
+			case ACT_INVERSE_TEXTURE_SIZE:
+				_writeRawConstant(i->physicalIndex, source->getInverseTextureSize(i->data), i->elementCount);
+				break;
+			case ACT_PACKED_TEXTURE_SIZE:
+				_writeRawConstant(i->physicalIndex, source->getPackedTextureSize(i->data), i->elementCount);
+				break;
+			case ACT_SCENE_DEPTH_RANGE:
+				_writeRawConstant(i->physicalIndex, source->getSceneDepthRange(), i->elementCount);
+				break;
+			case ACT_VIEW_DIRECTION:
+				_writeRawConstant(i->physicalIndex, source->getViewDirection());
+				break;
+			case ACT_VIEW_SIDE_VECTOR:
+				_writeRawConstant(i->physicalIndex, source->getViewSideVector());
+				break;
+			case ACT_VIEW_UP_VECTOR:
+				_writeRawConstant(i->physicalIndex, source->getViewUpVector());
+				break;
+			case ACT_FOV:
+				_writeRawConstant(i->physicalIndex, source->getFOV());
+				break;
+			case ACT_NEAR_CLIP_DISTANCE:
+				_writeRawConstant(i->physicalIndex, source->getNearClipDistance());
+				break;
+			case ACT_FAR_CLIP_DISTANCE:
+				_writeRawConstant(i->physicalIndex, source->getFarClipDistance());
+				break;
+			case ACT_PASS_NUMBER:
+				_writeRawConstant(i->physicalIndex, (float)source->getPassNumber());
+				break;
+			case ACT_PASS_ITERATION_NUMBER:
+				// this is actually just an initial set-up, it's bound separately, so still global
+				_writeRawConstant(i->physicalIndex, 0.0f);
+				mActivePassIterationIndex = i->physicalIndex;
+				break;
+			case ACT_TEXTURE_MATRIX:
+				_writeRawConstant(i->physicalIndex, source->getTextureTransformMatrix(i->data));
+				break;
+			case ACT_LOD_CAMERA_POSITION:
+				_writeRawConstant(i->physicalIndex, source->getLodCameraPosition(), i->elementCount);
+				break;
+			default:
+				break;
+			};
+		}
+
+	}
     //-----------------------------------------------------------------------------
-    void GpuProgramParameters::_updateAutoParamsNoLights(const AutoParamDataSource* source)
+    void GpuProgramParameters::_updateAutoParamsPerObjectNoLights(const AutoParamDataSource* source)
     {
         if (!hasAutoConstants()) return; // abort early if no autos
-        Vector3 vec3;
-        Vector4 vec4;
         size_t index;
         size_t numMatrices;
         const Matrix4* pMatrix;
         size_t m;
-
-		mActivePassIterationIndex = std::numeric_limits<size_t>::max();
 
 		// Autoconstant index is not a physical index
         AutoConstantList::const_iterator i, iend;
@@ -1274,51 +1502,11 @@ namespace Ogre
                     index += 12;
                     ++pMatrix;
                 }
-                
                 break;
             case ACT_WORLD_MATRIX_ARRAY:
                 _writeRawConstant(i->physicalIndex, source->getWorldMatrixArray(), 
                     source->getWorldMatrixCount());
                 break;
-            case ACT_VIEW_MATRIX:
-                _writeRawConstant(i->physicalIndex, source->getViewMatrix());
-                break;
-            case ACT_INVERSE_VIEW_MATRIX:
-               _writeRawConstant(i->physicalIndex, source->getInverseViewMatrix());
-               break;
-            case ACT_TRANSPOSE_VIEW_MATRIX:
-               _writeRawConstant(i->physicalIndex, source->getTransposeViewMatrix());
-               break;
-            case ACT_INVERSE_TRANSPOSE_VIEW_MATRIX:
-               _writeRawConstant(i->physicalIndex, source->getInverseTransposeViewMatrix());
-               break;
-
-            case ACT_PROJECTION_MATRIX:
-                _writeRawConstant(i->physicalIndex, source->getProjectionMatrix());
-                break;
-            case ACT_INVERSE_PROJECTION_MATRIX:
-               _writeRawConstant(i->physicalIndex, source->getInverseProjectionMatrix());
-               break;
-            case ACT_TRANSPOSE_PROJECTION_MATRIX:
-               _writeRawConstant(i->physicalIndex, source->getTransposeProjectionMatrix());
-               break;
-            case ACT_INVERSE_TRANSPOSE_PROJECTION_MATRIX:
-               _writeRawConstant(i->physicalIndex, source->getInverseTransposeProjectionMatrix());
-               break;
-
-            case ACT_VIEWPROJ_MATRIX:
-                _writeRawConstant(i->physicalIndex, source->getViewProjectionMatrix());
-                break;
-            case ACT_INVERSE_VIEWPROJ_MATRIX:
-               _writeRawConstant(i->physicalIndex, source->getInverseViewProjMatrix());
-               break;
-            case ACT_TRANSPOSE_VIEWPROJ_MATRIX:
-               _writeRawConstant(i->physicalIndex, source->getTransposeViewProjMatrix());
-               break;
-            case ACT_INVERSE_TRANSPOSE_VIEWPROJ_MATRIX:
-               _writeRawConstant(i->physicalIndex, source->getInverseTransposeViewProjMatrix());
-               break;
-
             case ACT_WORLDVIEW_MATRIX:
                 _writeRawConstant(i->physicalIndex, source->getWorldViewMatrix());
                 break;
@@ -1344,193 +1532,17 @@ namespace Ogre
             case ACT_INVERSE_TRANSPOSE_WORLDVIEWPROJ_MATRIX:
                _writeRawConstant(i->physicalIndex, source->getInverseTransposeWorldViewProjMatrix());
                break;
-
-            case ACT_RENDER_TARGET_FLIPPING:
-               _writeRawConstant(i->physicalIndex, source->getCurrentRenderTarget()->requiresTextureFlipping() ? -1.f : +1.f);
-               break;
-
-            // NB ambient light still here because it's not related to a specific light
-            case ACT_AMBIENT_LIGHT_COLOUR: 
-                _writeRawConstant(i->physicalIndex, source->getAmbientLightColour(), 
-					i->elementCount);
-                break;
-            case ACT_DERIVED_AMBIENT_LIGHT_COLOUR:
-                _writeRawConstant(i->physicalIndex, source->getDerivedAmbientLightColour(),
-                    i->elementCount);
-                break;
-            case ACT_DERIVED_SCENE_COLOUR:
-                _writeRawConstant(i->physicalIndex, source->getDerivedSceneColour(),
-                    i->elementCount);
-                break;
-
-            case ACT_FOG_COLOUR:
-                _writeRawConstant(i->physicalIndex, source->getFogColour());
-                break;
-            case ACT_FOG_PARAMS:
-                _writeRawConstant(i->physicalIndex, source->getFogParams(), i->elementCount);
-                break;
-
-            case ACT_SURFACE_AMBIENT_COLOUR:
-                _writeRawConstant(i->physicalIndex, source->getSurfaceAmbientColour(),
-                    i->elementCount);
-                break;
-            case ACT_SURFACE_DIFFUSE_COLOUR:
-                _writeRawConstant(i->physicalIndex, source->getSurfaceDiffuseColour(),
-                    i->elementCount);
-                break;
-            case ACT_SURFACE_SPECULAR_COLOUR:
-                _writeRawConstant(i->physicalIndex, source->getSurfaceSpecularColour(),
-                    i->elementCount);
-                break;
-            case ACT_SURFACE_EMISSIVE_COLOUR:
-                _writeRawConstant(i->physicalIndex, source->getSurfaceEmissiveColour(),
-                    i->elementCount);
-                break;
-            case ACT_SURFACE_SHININESS:
-                _writeRawConstant(i->physicalIndex, source->getSurfaceShininess());
-                break;
-
-            case ACT_CAMERA_POSITION:
-                _writeRawConstant(i->physicalIndex, source->getCameraPosition(), i->elementCount);
-                break;
-            case ACT_CAMERA_POSITION_OBJECT_SPACE:
-                _writeRawConstant(i->physicalIndex, source->getCameraPositionObjectSpace(), i->elementCount);
-                break;
-
-            case ACT_TIME:
-               _writeRawConstant(i->physicalIndex, source->getTime() * i->fData);
-               break;
-           case ACT_TIME_0_X:
-               _writeRawConstant(i->physicalIndex, source->getTime_0_X(i->fData));
-               break;
-            case ACT_COSTIME_0_X:
-               _writeRawConstant(i->physicalIndex, source->getCosTime_0_X(i->fData));
-               break;
-            case ACT_SINTIME_0_X:
-               _writeRawConstant(i->physicalIndex, source->getSinTime_0_X(i->fData));
-               break;
-            case ACT_TANTIME_0_X:
-               _writeRawConstant(i->physicalIndex, source->getTanTime_0_X(i->fData));
-               break;
-            case ACT_TIME_0_X_PACKED:
-               _writeRawConstant(i->physicalIndex, source->getTime_0_X_packed(i->fData), i->elementCount);
-               break;
-            case ACT_TIME_0_1:
-               _writeRawConstant(i->physicalIndex, source->getTime_0_1(i->fData));
-               break;
-            case ACT_COSTIME_0_1:
-               _writeRawConstant(i->physicalIndex, source->getCosTime_0_1(i->fData));
-               break;
-            case ACT_SINTIME_0_1:
-               _writeRawConstant(i->physicalIndex, source->getSinTime_0_1(i->fData));
-               break;
-            case ACT_TANTIME_0_1:
-               _writeRawConstant(i->physicalIndex, source->getTanTime_0_1(i->fData));
-               break;
-            case ACT_TIME_0_1_PACKED:
-               _writeRawConstant(i->physicalIndex, source->getTime_0_1_packed(i->fData), i->elementCount);
-               break;
-            case ACT_TIME_0_2PI:
-               _writeRawConstant(i->physicalIndex, source->getTime_0_2Pi(i->fData));
-               break;
-            case ACT_COSTIME_0_2PI:
-               _writeRawConstant(i->physicalIndex, source->getCosTime_0_2Pi(i->fData));
-               break;
-            case ACT_SINTIME_0_2PI:
-               _writeRawConstant(i->physicalIndex, source->getSinTime_0_2Pi(i->fData));
-               break;
-            case ACT_TANTIME_0_2PI:
-               _writeRawConstant(i->physicalIndex, source->getTanTime_0_2Pi(i->fData));
-               break;
-            case ACT_TIME_0_2PI_PACKED:
-               _writeRawConstant(i->physicalIndex, source->getTime_0_2Pi_packed(i->fData), i->elementCount);
-               break;
-            case ACT_FRAME_TIME:
-               _writeRawConstant(i->physicalIndex, source->getFrameTime() * i->fData);
-               break;
-            case ACT_FPS:
-               _writeRawConstant(i->physicalIndex, source->getFPS());
-               break;
-            case ACT_VIEWPORT_WIDTH:
-               _writeRawConstant(i->physicalIndex, source->getViewportWidth());
-               break;
-            case ACT_VIEWPORT_HEIGHT:
-               _writeRawConstant(i->physicalIndex, source->getViewportHeight());
-               break;
-            case ACT_INVERSE_VIEWPORT_WIDTH:
-               _writeRawConstant(i->physicalIndex, source->getInverseViewportWidth());
-               break;
-            case ACT_INVERSE_VIEWPORT_HEIGHT:
-               _writeRawConstant(i->physicalIndex, source->getInverseViewportHeight());
-               break;
-            case ACT_VIEWPORT_SIZE:
-               _writeRawConstant(i->physicalIndex, Vector4(
-                   source->getViewportWidth(),
-                   source->getViewportHeight(),
-                   source->getInverseViewportWidth(),
-                   source->getInverseViewportHeight()), i->elementCount);
-               break;
-			case ACT_TEXEL_OFFSETS:
-				{
-					RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-					_writeRawConstant(i->physicalIndex, Vector4(
-						rsys->getHorizontalTexelOffset(), 
-						rsys->getVerticalTexelOffset(), 
-						rsys->getHorizontalTexelOffset() * source->getInverseViewportWidth(),
-						rsys->getVerticalTexelOffset() * source->getInverseViewportHeight()),
-						i->elementCount);
-				}
-				break;
-            case ACT_TEXTURE_SIZE:
-                _writeRawConstant(i->physicalIndex, source->getTextureSize(i->data), i->elementCount);
-                break;
-            case ACT_INVERSE_TEXTURE_SIZE:
-                _writeRawConstant(i->physicalIndex, source->getInverseTextureSize(i->data), i->elementCount);
-                break;
-            case ACT_PACKED_TEXTURE_SIZE:
-                _writeRawConstant(i->physicalIndex, source->getPackedTextureSize(i->data), i->elementCount);
-                break;
-			case ACT_SCENE_DEPTH_RANGE:
-				_writeRawConstant(i->physicalIndex, source->getSceneDepthRange(), i->elementCount);
-				break;
-            case ACT_VIEW_DIRECTION:
-               _writeRawConstant(i->physicalIndex, source->getViewDirection());
-               break;
-            case ACT_VIEW_SIDE_VECTOR:
-               _writeRawConstant(i->physicalIndex, source->getViewSideVector());
-               break;
-            case ACT_VIEW_UP_VECTOR:
-               _writeRawConstant(i->physicalIndex, source->getViewUpVector());
-               break;
-            case ACT_FOV:
-               _writeRawConstant(i->physicalIndex, source->getFOV());
-               break;
-            case ACT_NEAR_CLIP_DISTANCE:
-               _writeRawConstant(i->physicalIndex, source->getNearClipDistance());
-               break;
-            case ACT_FAR_CLIP_DISTANCE:
-               _writeRawConstant(i->physicalIndex, source->getFarClipDistance());
-               break;
-            case ACT_PASS_NUMBER:
-                _writeRawConstant(i->physicalIndex, (float)source->getPassNumber());
-                break;
-            case ACT_PASS_ITERATION_NUMBER:
-                _writeRawConstant(i->physicalIndex, 0.0f);
-                mActivePassIterationIndex = i->physicalIndex;
-                break;
-            case ACT_CUSTOM:
-			case ACT_ANIMATION_PARAMETRIC:
-                source->getCurrentRenderable()->_updateCustomGpuParameter(*i, this);
-                break;
-            case ACT_TEXTURE_MATRIX:
-                _writeRawConstant(i->physicalIndex, source->getTextureTransformMatrix(i->data));
-                break;
-			case ACT_LOD_CAMERA_POSITION:
-				_writeRawConstant(i->physicalIndex, source->getLodCameraPosition(), i->elementCount);
+			case ACT_CAMERA_POSITION_OBJECT_SPACE:
+				_writeRawConstant(i->physicalIndex, source->getCameraPositionObjectSpace(), i->elementCount);
 				break;
 			case ACT_LOD_CAMERA_POSITION_OBJECT_SPACE:
 				_writeRawConstant(i->physicalIndex, source->getLodCameraPositionObjectSpace(), i->elementCount);
 				break;
+
+            case ACT_CUSTOM:
+			case ACT_ANIMATION_PARAMETRIC:
+                source->getCurrentRenderable()->_updateCustomGpuParameter(*i, this);
+                break;
             default:
                 break;
             }
