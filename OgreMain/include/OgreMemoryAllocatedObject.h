@@ -91,6 +91,12 @@ namespace Ogre
 			Alloc::deallocateBytes(ptr);
 		}
 
+		// Corresponding operator for placement delete (second param same as the first)
+		void operator delete( void* ptr, void* )
+		{
+			Alloc::deallocateBytes(ptr);
+		}
+
 		// only called if there is an exception in corresponding 'new'
 		void operator delete( void* ptr, const char* , int , const char*  )
 		{
