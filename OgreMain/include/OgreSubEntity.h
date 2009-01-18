@@ -122,6 +122,14 @@ namespace Ogre {
         */
         void setMaterialName( const String& name );
 
+		/** Sets a Material to be used.
+			@remarks
+				By default a SubEntity uses the default Material that the SubMesh
+				uses. This call can alter that so that the Material is different
+				for this instance.
+		*/
+		void setMaterial( const MaterialPtr& material );
+
         /** Tells this SubEntity whether to be visible or not. */
         virtual void setVisible(bool visible);
 

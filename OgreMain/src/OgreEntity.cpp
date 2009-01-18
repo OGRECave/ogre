@@ -362,6 +362,18 @@ namespace Ogre {
         }
 
     }
+
+
+	void Entity::setMaterial( const MaterialPtr& material )
+	{
+		// Set for all subentities
+		SubEntityList::iterator i;
+		for (i = mSubEntityList.begin(); i != mSubEntityList.end(); ++i)
+		{
+			(*i)->setMaterial(material);
+		}
+	}
+
     //-----------------------------------------------------------------------
     void Entity::_notifyCurrentCamera(Camera* cam)
     {

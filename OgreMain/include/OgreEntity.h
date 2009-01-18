@@ -340,6 +340,17 @@ namespace Ogre {
 		*/
 		void setMaterialName(const String& name);
 
+		
+		/** Sets the material to use for the whole of this entity.
+			@remarks
+				This is a shortcut method to set all the materials for all
+				subentities of this entity. Only use this method is you want to
+				set the same material for all subentities or if you know there
+				is only one. Otherwise call getSubEntity() and call the same
+				method on the individual SubEntity.
+		*/
+		void setMaterial(const MaterialPtr& material);
+
 		/** Overridden - see MovableObject.
 		*/
 		void _notifyCurrentCamera(Camera* cam);
