@@ -296,17 +296,20 @@ namespace Ogre {
 		typedef std::vector<T, STLAllocator<T, GeneralAllocPolicy> > VectorImpl;
 	protected:
 		VectorImpl mList;
-		uint32 mListHash;
+		mutable uint32 mListHash;
+		mutable bool mListHashDirty;
 
-		void addToHash(const T& newPtr)
+		void addToHash(const T& newPtr) const
 		{
 			mListHash = FastHash((const char*)&newPtr, sizeof(T), mListHash);
 		}
-		void recalcHash()
+		void recalcHash() const
 		{
 			mListHash = 0;
-			for (iterator i = mList.begin(); i != mList.end(); ++i)
+			for (const_iterator i = mList.begin(); i != mList.end(); ++i)
 				addToHash(*i);
+			mListHashDirty = false;
+			
 		}
 
 	public:
@@ -321,11 +324,30 @@ namespace Ogre {
 		typedef typename VectorImpl::reverse_iterator reverse_iterator;
 		typedef typename VectorImpl::const_reverse_iterator const_reverse_iterator;
 
-		iterator begin() { return mList.begin(); }
+		void dirtyHash()
+		{
+			mListHashDirty = true;
+		}
+		bool isHashDirty() const
+		{
+			return mListHashDirty;
+		}
+
+		iterator begin() 
+		{ 
+			// we have to assume that hash needs recalculating on non-const
+			dirtyHash();
+			return mList.begin(); 
+		}
 		iterator end() { return mList.end(); }
 		const_iterator begin() const { return mList.begin(); }
 		const_iterator end() const { return mList.end(); }
-		reverse_iterator rbegin() { return mList.rbegin(); }
+		reverse_iterator rbegin() 
+		{ 
+			// we have to assume that hash needs recalculating on non-const
+			dirtyHash();
+			return mList.rbegin(); 
+		}
 		reverse_iterator rend() { return mList.rend(); }
 		const_reverse_iterator rbegin() const { return mList.rbegin(); }
 		const_reverse_iterator rend() const { return mList.rend(); }
@@ -347,7 +369,7 @@ namespace Ogre {
 		HashedVector(InputIterator a, InputIterator b)
 			: mList(a, b)
 		{
-			recalcHash();
+			dirtyHash();
 		}
 
 		~HashedVector() {}
@@ -355,6 +377,7 @@ namespace Ogre {
 		{
 			mList = rhs.mList;
 			mListHash = rhs.mListHash;
+			mListHashDirty = rhs.mListHashDirty;
 			return *this;
 		}
 
@@ -366,24 +389,26 @@ namespace Ogre {
 		void push_back(const T& t)
 		{ 
 			mList.push_back(t);
-			addToHash(t);
+			// Quick progressive hash add
+			if (!isHashDirty())
+				addToHash(t);
 		}
 		void pop_back()
 		{
 			mList.pop_back();
-			recalcHash();
+			dirtyHash();
 		}
 		void swap(HashedVector<T>& rhs)
 		{
 			mList.swap(rhs.mList);
-			recalcHash();
+			dirtyHash();
 		}
 		iterator insert(iterator pos, const T& t)
 		{
 			bool recalc = (pos != end());
 			mList.insert(pos, t);
 			if (recalc)
-				recalcHash();
+				dirtyHash();
 			else
 				addToHash(t);
 		}
@@ -393,25 +418,25 @@ namespace Ogre {
 			InputIterator f, InputIterator l)
 		{
 			mList.insert(pos, f, l);
-			recalcHash();
+			dirtyHash();
 		}
 
 		void insert(iterator pos, size_type n, const T& x)
 		{
 			mList.insert(pos, n, x);
-			recalcHash();
+			dirtyHash();
 		}
 
 		iterator erase(iterator pos)
 		{
 			iterator ret = mList.erase(pos);
-			recalcHash();
+			dirtyHash();
 			return ret;
 		}
 		iterator erase(iterator first, iterator last)
 		{
 			iterator ret = mList.erase(first, last);
-			recalcHash();
+			dirtyHash();
 			return ret;
 		}
 		void clear()
@@ -428,7 +453,7 @@ namespace Ogre {
 
 			mList.resize(n, t);
 			if (recalc)
-				recalcHash();
+				dirtyHash();
 		}
 
 		bool operator==(const HashedVector<T>& b)
@@ -439,7 +464,13 @@ namespace Ogre {
 
 
 		/// Get the hash value
-		uint32 getHash() const { return mListHash; }
+		uint32 getHash() const 
+		{ 
+			if (isHashDirty())
+				recalcHash();
+
+			return mListHash; 
+		}
 	public:
 
 
