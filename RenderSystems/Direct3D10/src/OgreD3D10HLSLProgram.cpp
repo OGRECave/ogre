@@ -729,23 +729,20 @@ namespace Ogre {
 			ShaderVarWithPosInBuf * iter = &mShaderVars[0];
 			for (size_t i = 0 ; i < mConstantBufferDesc.Variables ; i++, iter++)
 			{
-				if (!iter->wasInit)
+				const GpuConstantDefinition& def = params->getConstantDefinition(iter->var.Name);
+				iter->isFloat = def.isFloat();
+				iter->physicalIndex = def.physicalIndex;
+				iter->wasInit = true;
+				
+				if(iter->isFloat)
 				{
-					const GpuConstantDefinition& def = params->getConstantDefinition(iter->var.Name);
-					iter->isFloat = def.isFloat();
-					iter->physicalIndex = def.physicalIndex;
-					iter->wasInit = true;
-					
-					if(iter->isFloat)
-					{
-						iter->src = (void *)&(*(params->getFloatConstantList().begin()+iter->physicalIndex));
-					}
-					else
-					{
-						iter->src = (void *)&(*(params->getIntConstantList().begin()+iter->physicalIndex));
-					}
-
+					iter->src = (void *)&(*(params->getFloatConstantList().begin()+iter->physicalIndex));
 				}
+				else
+				{
+					iter->src = (void *)&(*(params->getIntConstantList().begin()+iter->physicalIndex));
+				}
+
 			
 
 				memcpy( &pConstData[iter->var.StartOffset], iter->src , iter->var.Size);
