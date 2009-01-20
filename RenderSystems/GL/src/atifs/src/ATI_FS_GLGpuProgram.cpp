@@ -66,27 +66,30 @@ void ATI_FS_GLGpuProgram::unbindProgram(void)
 }
 
 
-void ATI_FS_GLGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params)
+void ATI_FS_GLGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask)
 {
-
 	// only supports float constants
 	const GpuLogicalBufferStruct* floatStruct = params->getFloatLogicalBufferStruct();
 
 	for (GpuLogicalIndexUseMap::const_iterator i = floatStruct->map.begin();
 		i != floatStruct->map.end(); ++i)
 	{
-		size_t logicalIndex = i->first;
-		const float* pFloat = params->getFloatPointer(i->second.physicalIndex);
-		// Iterate over the params, set in 4-float chunks (low-level)
-		for (size_t j = 0; j < i->second.currentSize; j+=4)
+		if (i->second.variability & mask)
 		{
-			glSetFragmentShaderConstantATI(GL_CON_0_ATI + logicalIndex, pFloat);
-			pFloat += 4;
-			++logicalIndex;
+			size_t logicalIndex = i->first;
+			const float* pFloat = params->getFloatPointer(i->second.physicalIndex);
+			// Iterate over the params, set in 4-float chunks (low-level)
+			for (size_t j = 0; j < i->second.currentSize; j+=4)
+			{
+				glSetFragmentShaderConstantATI(GL_CON_0_ATI + logicalIndex, pFloat);
+				pFloat += 4;
+				++logicalIndex;
+			}
 		}
 	}
 
 }
+
 
 void ATI_FS_GLGpuProgram::bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params)
 {

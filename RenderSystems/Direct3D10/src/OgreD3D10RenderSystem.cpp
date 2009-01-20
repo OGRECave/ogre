@@ -2464,7 +2464,7 @@ namespace Ogre
 				// Bind Vertex Program
 				bindGpuProgram(fixedFuncPrograms->getVertexProgramUsage()->getProgram().get());
 				bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
-					fixedFuncPrograms->getVertexProgramUsage()->getParameters());
+					fixedFuncPrograms->getVertexProgramUsage()->getParameters(), (uint16)GPV_ALL);
 
 			}
 
@@ -2474,7 +2474,7 @@ namespace Ogre
 				// Bind Fragment Program 
 				bindGpuProgram(fixedFuncPrograms->getFragmentProgramUsage()->getProgram().get());
 				bindGpuProgramParameters(GPT_FRAGMENT_PROGRAM, 
-					fixedFuncPrograms->getFragmentProgramUsage()->getParameters());
+					fixedFuncPrograms->getFragmentProgramUsage()->getParameters(), (uint16)GPV_ALL);
 			}
 				
 
@@ -2733,10 +2733,10 @@ namespace Ogre
 		RenderSystem::unbindGpuProgram(gptype);
     }
 	//---------------------------------------------------------------------
-    void D3D10RenderSystem::bindGpuProgramParameters(GpuProgramType gptype, 
-        GpuProgramParametersSharedPtr params)
-    {
-
+	void D3D10RenderSystem::bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask)
+	{
+		// Do everything here in Dx10, since deal with via buffers anyway so number of calls
+		// is actually the same whether we categorise the updates or not
 		ID3D10Buffer* pBuffers[1] ;
 		switch(gptype)
 		{
@@ -2746,7 +2746,7 @@ namespace Ogre
 				//{
 				if (mBoundVertexProgram)
 				{
-					pBuffers[0] = mBoundVertexProgram->getConstantBuffer(params);
+					pBuffers[0] = mBoundVertexProgram->getConstantBuffer(params, mask);
 					mDevice->VSSetConstantBuffers( 0, 1, pBuffers );
 					if (mDevice.isError())
 					{
@@ -2770,7 +2770,7 @@ namespace Ogre
 				//{
 				if (mBoundFragmentProgram)
 				{
-					pBuffers[0] = mBoundFragmentProgram->getConstantBuffer(params);
+					pBuffers[0] = mBoundFragmentProgram->getConstantBuffer(params, mask);
 					mDevice->PSSetConstantBuffers( 0, 1, pBuffers );
 					if (mDevice.isError())
 					{
@@ -2800,7 +2800,7 @@ namespace Ogre
 			{
 				if (mBoundGeometryProgram)
 				{
-					pBuffers[0] = mBoundGeometryProgram->getConstantBuffer(params);
+					pBuffers[0] = mBoundGeometryProgram->getConstantBuffer(params, mask);
 					mDevice->GSSetConstantBuffers( 0, 1, pBuffers );
 					if (mDevice.isError())
 					{
@@ -2815,7 +2815,7 @@ namespace Ogre
 			break;
 
 		};
-    }
+	}
 	//---------------------------------------------------------------------
     void D3D10RenderSystem::bindGpuProgramPassIterationParameters(GpuProgramType gptype)
     {
@@ -2823,14 +2823,14 @@ namespace Ogre
 		switch(gptype)
 		{
 		case GPT_VERTEX_PROGRAM:
-			bindGpuProgramParameters(gptype, mActiveVertexGpuProgramParameters);
+			bindGpuProgramParameters(gptype, mActiveVertexGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
 			break;
 
 		case GPT_FRAGMENT_PROGRAM:
-			bindGpuProgramParameters(gptype, mActiveFragmentGpuProgramParameters);
+			bindGpuProgramParameters(gptype, mActiveFragmentGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
 			break;
 		case GPT_GEOMETRY_PROGRAM:
-			bindGpuProgramParameters(gptype, mActiveGeometryGpuProgramParameters);
+			bindGpuProgramParameters(gptype, mActiveGeometryGpuProgramParameters, (uint16)GPV_PASS_ITERATION_NUMBER);
 			break;
 
 		}

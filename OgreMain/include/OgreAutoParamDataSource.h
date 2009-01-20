@@ -165,6 +165,7 @@ namespace Ogre {
         virtual const Vector4& getCameraPositionObjectSpace(void) const;
 		virtual const Vector4& getLodCameraPosition(void) const;
 		virtual const Vector4& getLodCameraPositionObjectSpace(void) const;
+		virtual bool hasLightList() const { return mCurrentLightList != 0; }
         /** Get the light which is 'index'th closest to the current object */        
 		virtual float getLightNumber(size_t index) const;
 		virtual float getLightCount() const;

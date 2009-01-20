@@ -68,7 +68,7 @@ void GLGpuNvparseProgram::unbindProgram(void)
     glDisable(GL_PER_STAGE_CONSTANTS_NV);
 }
 
-void GLGpuNvparseProgram::bindProgramParameters(GpuProgramParametersSharedPtr params)
+void GLGpuNvparseProgram::bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask)
 {
     // NB, register combiners uses 2 constants per texture stage (0 and 1)
     // We have stored these as (stage * 2) + const_index in the physical buffer

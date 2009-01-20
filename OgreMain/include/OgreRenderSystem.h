@@ -1006,8 +1006,13 @@ namespace Ogre
 		virtual void bindGpuProgram(GpuProgram* prg);
 
 		/** Bind Gpu program parameters.
+		@param gptype The type of program to bind the parameters to
+		@param params The parameters to bind
+		@param variabilityMask A mask of GpuParamVariability identifying which params need binding
 		*/
-		virtual void bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params) = 0;
+		virtual void bindGpuProgramParameters(GpuProgramType gptype, 
+			GpuProgramParametersSharedPtr params, uint16 variabilityMask) = 0;
+
 		/** Only binds Gpu program parameters used for passes that have more than one iteration rendering
 		*/
 		virtual void bindGpuProgramPassIterationParameters(GpuProgramType gptype) = 0;

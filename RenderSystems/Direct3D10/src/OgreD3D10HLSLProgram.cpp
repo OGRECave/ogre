@@ -370,7 +370,7 @@ namespace Ogre {
 					OGRE_LOCK_MUTEX(mFloatLogicalToPhysical.mutex)
 						mFloatLogicalToPhysical.map.insert(
 						GpuLogicalIndexUseMap::value_type(paramIndex, 
-						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize)));
+						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
 					mFloatLogicalToPhysical.bufferSize += def.arraySize * def.elementSize;
 					mConstantDefs.floatBufferSize = mFloatLogicalToPhysical.bufferSize;
 				}
@@ -380,7 +380,7 @@ namespace Ogre {
 					OGRE_LOCK_MUTEX(mIntLogicalToPhysical.mutex)
 						mIntLogicalToPhysical.map.insert(
 						GpuLogicalIndexUseMap::value_type(paramIndex, 
-						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize)));
+						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
 					mIntLogicalToPhysical.bufferSize += def.arraySize * def.elementSize;
 					mConstantDefs.intBufferSize = mIntLogicalToPhysical.bufferSize;
 				}
@@ -717,7 +717,7 @@ namespace Ogre {
 	}
 
 	//-----------------------------------------------------------------------------
-	ID3D10Buffer* D3D10HLSLProgram::getConstantBuffer(GpuProgramParametersSharedPtr params)
+	ID3D10Buffer* D3D10HLSLProgram::getConstantBuffer(GpuProgramParametersSharedPtr params, uint16 variabilityMask)
 	{
 		// Update the Constant Buffer
 
@@ -730,22 +730,26 @@ namespace Ogre {
 			for (size_t i = 0 ; i < mConstantBufferDesc.Variables ; i++, iter++)
 			{
 				const GpuConstantDefinition& def = params->getConstantDefinition(iter->var.Name);
-				iter->isFloat = def.isFloat();
-				iter->physicalIndex = def.physicalIndex;
-				iter->wasInit = true;
+				if (def.variability & variabilityMask)
+				{
+
+					iter->isFloat = def.isFloat();
+					iter->physicalIndex = def.physicalIndex;
+					iter->wasInit = true;
+					
+					if(iter->isFloat)
+					{
+						iter->src = (void *)&(*(params->getFloatConstantList().begin()+iter->physicalIndex));
+					}
+					else
+					{
+						iter->src = (void *)&(*(params->getIntConstantList().begin()+iter->physicalIndex));
+					}
+
 				
-				if(iter->isFloat)
-				{
-					iter->src = (void *)&(*(params->getFloatConstantList().begin()+iter->physicalIndex));
-				}
-				else
-				{
-					iter->src = (void *)&(*(params->getIntConstantList().begin()+iter->physicalIndex));
-				}
 
-			
-
-				memcpy( &pConstData[iter->var.StartOffset], iter->src , iter->var.Size);
+					memcpy( &pConstData[iter->var.StartOffset], iter->src , iter->var.Size);
+				}
 			}
 
 			mConstantBuffer->Unmap();

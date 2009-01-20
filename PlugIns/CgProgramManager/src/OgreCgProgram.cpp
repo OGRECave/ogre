@@ -330,7 +330,7 @@ namespace Ogre {
 						OGRE_LOCK_MUTEX(mFloatLogicalToPhysical.mutex)
 						mFloatLogicalToPhysical.map.insert(
 							GpuLogicalIndexUseMap::value_type(logicalIndex, 
-								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize)));
+								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
 						mFloatLogicalToPhysical.bufferSize += def.arraySize * def.elementSize;
 						mConstantDefs.floatBufferSize = mFloatLogicalToPhysical.bufferSize;
 					}
@@ -339,7 +339,7 @@ namespace Ogre {
 						OGRE_LOCK_MUTEX(mIntLogicalToPhysical.mutex)
 						mIntLogicalToPhysical.map.insert(
 							GpuLogicalIndexUseMap::value_type(logicalIndex, 
-								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize)));
+								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
 						mIntLogicalToPhysical.bufferSize += def.arraySize * def.elementSize;
 						mConstantDefs.intBufferSize = mIntLogicalToPhysical.bufferSize;
 					}

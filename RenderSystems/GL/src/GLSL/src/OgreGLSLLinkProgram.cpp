@@ -282,7 +282,7 @@ namespace Ogre {
 
 	//-----------------------------------------------------------------------
 	void GLSLLinkProgram::updateUniforms(GpuProgramParametersSharedPtr params, 
-		GpuProgramType fromProgType)
+		uint16 mask, GpuProgramType fromProgType)
 	{
 		// iterate through uniform reference list and update uniform values
 		GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
@@ -296,114 +296,117 @@ namespace Ogre {
 			if (fromProgType == currentUniform->mSourceProgType)
 			{
 				const GpuConstantDefinition* def = currentUniform->mConstantDef;
-				GLsizei glArraySize = (GLsizei)def->arraySize;
-
-				// get the index in the parameter real list
-				switch (def->constType)
+				if (def->variability & mask)
 				{
-				case GCT_FLOAT1:
-					glUniform1fvARB(currentUniform->mLocation, glArraySize, 
-						params->getFloatPointer(def->physicalIndex));
-					break;
-				case GCT_FLOAT2:
-					glUniform2fvARB(currentUniform->mLocation, glArraySize, 
-						params->getFloatPointer(def->physicalIndex));
-					break;
-				case GCT_FLOAT3:
-					glUniform3fvARB(currentUniform->mLocation, glArraySize, 
-						params->getFloatPointer(def->physicalIndex));
-					break;
-				case GCT_FLOAT4:
-					glUniform4fvARB(currentUniform->mLocation, glArraySize, 
-						params->getFloatPointer(def->physicalIndex));
-					break;
-				case GCT_MATRIX_2X2:
-					glUniformMatrix2fvARB(currentUniform->mLocation, glArraySize, 
-						GL_TRUE, params->getFloatPointer(def->physicalIndex));
-					break;
-				case GCT_MATRIX_2X3:
-					if (GLEW_VERSION_2_1)
-					{
-						glUniformMatrix2x3fv(currentUniform->mLocation, glArraySize, 
-							GL_TRUE, params->getFloatPointer(def->physicalIndex));
-					}
-					break;
-				case GCT_MATRIX_2X4:
-					if (GLEW_VERSION_2_1)
-					{
-						glUniformMatrix2x4fv(currentUniform->mLocation, glArraySize, 
-							GL_TRUE, params->getFloatPointer(def->physicalIndex));
-					}
-					break;
-				case GCT_MATRIX_3X2:
-					if (GLEW_VERSION_2_1)
-					{
-						glUniformMatrix3x2fv(currentUniform->mLocation, glArraySize, 
-							GL_TRUE, params->getFloatPointer(def->physicalIndex));
-					}
-					break;
-				case GCT_MATRIX_3X3:
-					glUniformMatrix3fvARB(currentUniform->mLocation, glArraySize, 
-						GL_TRUE, params->getFloatPointer(def->physicalIndex));
-					break;
-				case GCT_MATRIX_3X4:
-					if (GLEW_VERSION_2_1)
-					{
-						glUniformMatrix3x4fv(currentUniform->mLocation, glArraySize, 
-							GL_TRUE, params->getFloatPointer(def->physicalIndex));
-					}
-					break;
-				case GCT_MATRIX_4X2:
-					if (GLEW_VERSION_2_1)
-					{
-						glUniformMatrix4x2fv(currentUniform->mLocation, glArraySize, 
-							GL_TRUE, params->getFloatPointer(def->physicalIndex));
-					}
-					break;
-				case GCT_MATRIX_4X3:
-					if (GLEW_VERSION_2_1)
-					{
-						glUniformMatrix4x3fv(currentUniform->mLocation, glArraySize, 
-							GL_TRUE, params->getFloatPointer(def->physicalIndex));
-					}
-					break;
-				case GCT_MATRIX_4X4:
-					glUniformMatrix4fvARB(currentUniform->mLocation, glArraySize, 
-						GL_TRUE, params->getFloatPointer(def->physicalIndex));
-					break;
-				case GCT_INT1:
-					glUniform1ivARB(currentUniform->mLocation, glArraySize, 
-						(GLint*)params->getIntPointer(def->physicalIndex));
-					break;
-				case GCT_INT2:
-					glUniform2ivARB(currentUniform->mLocation, glArraySize, 
-						(GLint*)params->getIntPointer(def->physicalIndex));
-					break;
-				case GCT_INT3:
-					glUniform3ivARB(currentUniform->mLocation, glArraySize, 
-						(GLint*)params->getIntPointer(def->physicalIndex));
-					break;
-				case GCT_INT4:
-					glUniform4ivARB(currentUniform->mLocation, glArraySize, 
-						(GLint*)params->getIntPointer(def->physicalIndex));
-					break;
-				case GCT_SAMPLER1D:
-				case GCT_SAMPLER1DSHADOW:
-				case GCT_SAMPLER2D:
-				case GCT_SAMPLER2DSHADOW:
-				case GCT_SAMPLER3D:
-				case GCT_SAMPLERCUBE:
-					// samplers handled like 1-element ints
-					glUniform1ivARB(currentUniform->mLocation, 1, 
-						(GLint*)params->getIntPointer(def->physicalIndex));
-					break;
 
-				} // end switch
-#if OGRE_DEBUG_MODE
-				checkForGLSLError( "GLSLLinkProgram::updateUniforms", "Error updating uniform", 0 );
-#endif
+					GLsizei glArraySize = (GLsizei)def->arraySize;
 
-			}
+					// get the index in the parameter real list
+					switch (def->constType)
+					{
+					case GCT_FLOAT1:
+						glUniform1fvARB(currentUniform->mLocation, glArraySize, 
+							params->getFloatPointer(def->physicalIndex));
+						break;
+					case GCT_FLOAT2:
+						glUniform2fvARB(currentUniform->mLocation, glArraySize, 
+							params->getFloatPointer(def->physicalIndex));
+						break;
+					case GCT_FLOAT3:
+						glUniform3fvARB(currentUniform->mLocation, glArraySize, 
+							params->getFloatPointer(def->physicalIndex));
+						break;
+					case GCT_FLOAT4:
+						glUniform4fvARB(currentUniform->mLocation, glArraySize, 
+							params->getFloatPointer(def->physicalIndex));
+						break;
+					case GCT_MATRIX_2X2:
+						glUniformMatrix2fvARB(currentUniform->mLocation, glArraySize, 
+							GL_TRUE, params->getFloatPointer(def->physicalIndex));
+						break;
+					case GCT_MATRIX_2X3:
+						if (GLEW_VERSION_2_1)
+						{
+							glUniformMatrix2x3fv(currentUniform->mLocation, glArraySize, 
+								GL_TRUE, params->getFloatPointer(def->physicalIndex));
+						}
+						break;
+					case GCT_MATRIX_2X4:
+						if (GLEW_VERSION_2_1)
+						{
+							glUniformMatrix2x4fv(currentUniform->mLocation, glArraySize, 
+								GL_TRUE, params->getFloatPointer(def->physicalIndex));
+						}
+						break;
+					case GCT_MATRIX_3X2:
+						if (GLEW_VERSION_2_1)
+						{
+							glUniformMatrix3x2fv(currentUniform->mLocation, glArraySize, 
+								GL_TRUE, params->getFloatPointer(def->physicalIndex));
+						}
+						break;
+					case GCT_MATRIX_3X3:
+						glUniformMatrix3fvARB(currentUniform->mLocation, glArraySize, 
+							GL_TRUE, params->getFloatPointer(def->physicalIndex));
+						break;
+					case GCT_MATRIX_3X4:
+						if (GLEW_VERSION_2_1)
+						{
+							glUniformMatrix3x4fv(currentUniform->mLocation, glArraySize, 
+								GL_TRUE, params->getFloatPointer(def->physicalIndex));
+						}
+						break;
+					case GCT_MATRIX_4X2:
+						if (GLEW_VERSION_2_1)
+						{
+							glUniformMatrix4x2fv(currentUniform->mLocation, glArraySize, 
+								GL_TRUE, params->getFloatPointer(def->physicalIndex));
+						}
+						break;
+					case GCT_MATRIX_4X3:
+						if (GLEW_VERSION_2_1)
+						{
+							glUniformMatrix4x3fv(currentUniform->mLocation, glArraySize, 
+								GL_TRUE, params->getFloatPointer(def->physicalIndex));
+						}
+						break;
+					case GCT_MATRIX_4X4:
+						glUniformMatrix4fvARB(currentUniform->mLocation, glArraySize, 
+							GL_TRUE, params->getFloatPointer(def->physicalIndex));
+						break;
+					case GCT_INT1:
+						glUniform1ivARB(currentUniform->mLocation, glArraySize, 
+							(GLint*)params->getIntPointer(def->physicalIndex));
+						break;
+					case GCT_INT2:
+						glUniform2ivARB(currentUniform->mLocation, glArraySize, 
+							(GLint*)params->getIntPointer(def->physicalIndex));
+						break;
+					case GCT_INT3:
+						glUniform3ivARB(currentUniform->mLocation, glArraySize, 
+							(GLint*)params->getIntPointer(def->physicalIndex));
+						break;
+					case GCT_INT4:
+						glUniform4ivARB(currentUniform->mLocation, glArraySize, 
+							(GLint*)params->getIntPointer(def->physicalIndex));
+						break;
+					case GCT_SAMPLER1D:
+					case GCT_SAMPLER1DSHADOW:
+					case GCT_SAMPLER2D:
+					case GCT_SAMPLER2DSHADOW:
+					case GCT_SAMPLER3D:
+					case GCT_SAMPLERCUBE:
+						// samplers handled like 1-element ints
+						glUniform1ivARB(currentUniform->mLocation, 1, 
+							(GLint*)params->getIntPointer(def->physicalIndex));
+						break;
+
+					} // end switch
+	#if OGRE_DEBUG_MODE
+					checkForGLSLError( "GLSLLinkProgram::updateUniforms", "Error updating uniform", 0 );
+	#endif
+				} // variability & mask
+			} // fromProgType == currentUniform->mSourceProgType
   
   		} // end for
 	}

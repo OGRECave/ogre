@@ -224,6 +224,7 @@ namespace Ogre
 		ZBufferHash mZBufferHash;
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);
+
 	public:
 		// constructor
 		D3D9RenderSystem( HINSTANCE hInstance );
@@ -330,10 +331,8 @@ namespace Ogre
         /** See
           RenderSystem
          */
-        void bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params);
-        /** See
-          RenderSystem
-         */
+		void bindGpuProgramParameters(GpuProgramType gptype, 
+			GpuProgramParametersSharedPtr params, uint16 variabilityMask);
         void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
 
         void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);

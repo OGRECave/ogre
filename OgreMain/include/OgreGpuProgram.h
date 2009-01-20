@@ -80,6 +80,26 @@ namespace Ogre {
 		GCT_UNKNOWN = 99
 	};
 
+	/** The variability of a GPU parameter, as derived from auto-params targetting it.
+		These values must be powers of two since they are used in masks.
+	*/
+	enum GpuParamVariability
+	{
+		/// No variation except by manual setting - the default
+		GPV_GLOBAL = 1, 
+		/// Varies per object (based on an auto param usually), but not per light setup
+		GPV_PER_OBJECT = 2, 
+		/// Varies with light setup
+		GPV_LIGHTS = 4, 
+		/// Varies with pass iteration number
+		GPV_PASS_ITERATION_NUMBER = 8,
+
+
+		/// Full mask (16-bit)
+		GPV_ALL = 0xFFFF
+
+	};
+
 	/** Information about predefined program constants. 
 	@note Only available for high-level programs but is referenced generically
 		by GpuProgramParameters.
@@ -97,6 +117,8 @@ namespace Ogre {
 		size_t elementSize;
 		/// Length of array
 		size_t arraySize;
+		/// How this parameter varies (bitwise combination of GpuProgramVariability)
+		mutable uint16 variability;
 
 		bool isFloat() const
 		{
@@ -140,7 +162,8 @@ namespace Ogre {
 			: constType(GCT_UNKNOWN)
 			, physicalIndex((std::numeric_limits<size_t>::max)())
 			, elementSize(0)
-			, arraySize(1) {}
+			, arraySize(1)
+			, variability(GPV_GLOBAL) {}
 	};
 	typedef map<String, GpuConstantDefinition>::type GpuConstantDefinitionMap;
 	typedef ConstMapIterator<GpuConstantDefinitionMap> GpuConstantDefinitionIterator;
@@ -219,9 +242,13 @@ namespace Ogre {
 		size_t physicalIndex;
 		/// Current physical size allocation
 		size_t currentSize;
+		/// How the contents of this slot vary
+		mutable uint16 variability;
 
-		GpuLogicalIndexUse(size_t bufIdx, size_t curSz) 
-			: physicalIndex(bufIdx), currentSize(curSz) {}
+		GpuLogicalIndexUse() 
+			: physicalIndex(99999), currentSize(0), variability(GPV_GLOBAL) {}
+		GpuLogicalIndexUse(size_t bufIdx, size_t curSz, uint16 v) 
+			: physicalIndex(bufIdx), currentSize(curSz), variability(v) {}
 	};
 	typedef map<size_t, GpuLogicalIndexUse>::type GpuLogicalIndexUseMap;
 	/// Container struct to allow params to safely & update shared list of logical buffer assignments
@@ -767,14 +794,18 @@ namespace Ogre {
 				size_t data;
 				Real fData;
 			};
+			/// The variability of this parameter (see GpuParamVariability)
+			uint16 variability;
 
             AutoConstantEntry(AutoConstantType theType, size_t theIndex, size_t theData, 
-				size_t theElemCount = 4)
-                : paramType(theType), physicalIndex(theIndex), elementCount(theElemCount), data(theData) {}
+				uint16 theVariability, size_t theElemCount = 4)
+                : paramType(theType), physicalIndex(theIndex), elementCount(theElemCount), 
+				data(theData), variability(theVariability) {}
 
 			AutoConstantEntry(AutoConstantType theType, size_t theIndex, Real theData, 
-				size_t theElemCount = 4)
-				: paramType(theType), physicalIndex(theIndex), elementCount(theElemCount), fData(theData) {}
+				uint16 theVariability, size_t theElemCount = 4)
+				: paramType(theType), physicalIndex(theIndex), elementCount(theElemCount), 
+				fData(theData), variability(theVariability) {}
 
         };
 		// Auto parameter storage
@@ -813,6 +844,16 @@ namespace Ogre {
 		bool mIgnoreMissingParams;
         /// physical index for active pass iteration parameter real constant entry;
         size_t mActivePassIterationIndex;
+
+		/** Gets the low-level structure for a logical index. 
+		*/
+		GpuLogicalIndexUse* _getFloatConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
+		/** Gets the physical buffer index associated with a logical int constant index. 
+		*/
+		GpuLogicalIndexUse* _getIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
+
+		/// Return the variability for an auto constant
+		uint16 deriveVariability(AutoConstantType act);
 
     public:
 		GpuProgramParameters();
@@ -1095,12 +1136,12 @@ namespace Ogre {
 			physical buffer index.
 		*/
 		void _setRawAutoConstant(size_t physicalIndex, AutoConstantType acType, size_t extraInfo, 
-			size_t elementSize = 4);
+			uint16 variability, size_t elementSize = 4);
 		/** As setAutoConstantReal, but sets up the auto constant directly against a
 		physical buffer index.
 		*/
 		void _setRawAutoConstantReal(size_t physicalIndex, AutoConstantType acType, Real rData, 
-			size_t elementSize = 4);
+			uint16 variability, size_t elementSize = 4);
 
 
 		/** Unbind an auto constant so that the constant is manually controlled again. */
@@ -1149,13 +1190,11 @@ namespace Ogre {
 		*/
 		const AutoConstantEntry* _findRawAutoConstantEntryInt(size_t physicalIndex);
 
-		/** Update any automatic parameters which are not dependent on per-object state.
+		/** Update automatic parameters.
+		@param source The source of the parameters
+		@param variabilityMask A mask of GpuParamVariability which identifies which autos will need updating
 		*/
-		void _updateAutoParamsGlobal(const AutoParamDataSource* source);
-        /** Updates the automatic parameters that vary per object (except lights) based on the details provided. */
-        void _updateAutoParamsPerObjectNoLights(const AutoParamDataSource* source);
-        /** Updates the automatic parameters for lights based on the details provided. */
-        void _updateAutoParamsLightsOnly(const AutoParamDataSource* source);
+		void _updateAutoParams(const AutoParamDataSource* source, uint16 variabilityMask);
 
 		/** Tells the program whether to ignore missing parameters or not.
 		*/
@@ -1339,15 +1378,14 @@ namespace Ogre {
 		@param requestedSize The requested size - pass 0 to ignore missing entries
 			and return std::numeric_limits<size_t>::max() 
 		*/
-		size_t _getFloatConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize);
+		size_t _getFloatConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
 		/** Gets the physical buffer index associated with a logical int constant index. 
 		@note Only applicable to low-level programs.
 		@param logicalIndex The logical parameter index
 		@param requestedSize The requested size - pass 0 to ignore missing entries
 			and return std::numeric_limits<size_t>::max() 
 		*/
-		size_t _getIntConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize);
-
+		size_t _getIntConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
 
         /** Sets whether or not we need to transpose the matrices passed in from the rest of OGRE.
         @remarks

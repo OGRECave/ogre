@@ -3000,21 +3000,21 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 
 	}
 	//---------------------------------------------------------------------
-	void GLRenderSystem::bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params)
+	void GLRenderSystem::bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask)
 	{
 		switch (gptype)
 		{
 		case GPT_VERTEX_PROGRAM:
 			mActiveVertexGpuProgramParameters = params;
-			mCurrentVertexProgram->bindProgramParameters(params);
+			mCurrentVertexProgram->bindProgramParameters(params, mask);
 			break;
 		case GPT_GEOMETRY_PROGRAM:
 			mActiveGeometryGpuProgramParameters = params;
-			mCurrentGeometryProgram->bindProgramParameters(params);
+			mCurrentGeometryProgram->bindProgramParameters(params, mask);
 			break;
 		case GPT_FRAGMENT_PROGRAM:
 			mActiveFragmentGpuProgramParameters = params;
-			mCurrentFragmentProgram->bindProgramParameters(params);
+			mCurrentFragmentProgram->bindProgramParameters(params, mask);
 			break;
 		}
 	}

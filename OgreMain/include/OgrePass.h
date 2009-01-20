@@ -1384,14 +1384,11 @@ namespace Ogre {
         /** Tells the pass that it needs recompilation. */
         void _notifyNeedsRecompile(void);
 
-		/** Update any automatic parameters which are not dependent on per-object state.
+		/** Update automatic parameters.
+		@param source The source of the parameters
+		@param variabilityMask A mask of GpuParamVariability which identifies which autos will need updating
 		*/
-		void _updateAutoParamsGlobal(const AutoParamDataSource* source) const;
-
-        /** Update any automatic parameters which vary per object (except lights) on this pass */
-        void _updateAutoParamsPerObjectNoLights(const AutoParamDataSource* source) const;
-        /** Update any automatic light parameters on this pass */
-        void _updateAutoParamsLightsOnly(const AutoParamDataSource* source) const;
+		void _updateAutoParams(const AutoParamDataSource* source, uint16 variabilityMask) const;
 
 		/** Gets the 'nth' texture which references the given content type.
 		@remarks

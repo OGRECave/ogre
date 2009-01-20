@@ -147,7 +147,9 @@ mSuppressRenderStateChanges(false),
 mSuppressShadows(false),
 mCameraRelativeRendering(false),
 mLastLightHash(0),
-mLastLightLimit(0)
+mLastLightLimit(0),
+mLastLightHashGpuProgram(0),
+mGpuParamsDirty((uint16)GPV_ALL)
 {
 
     // init sky
@@ -880,8 +882,8 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 
 		if (pass->hasVertexProgram())
 		{
-			mDestRenderSystem->bindGpuProgram(pass->getVertexProgram()->_getBindingDelegate());
-			// bind parameters later since they can be per-object
+			bindGpuProgram(pass->getVertexProgram()->_getBindingDelegate());
+			// bind parameters later 
 			// does the vertex program want surface and light params passed to rendersystem?
 			passSurfaceAndLightParams = pass->getVertexProgram()->getPassSurfaceAndLightStates();
 		}
@@ -897,8 +899,8 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 
 		if (pass->hasGeometryProgram())
 		{
-			mDestRenderSystem->bindGpuProgram(pass->getGeometryProgram()->_getBindingDelegate());
-			// bind parameters later since they can be per-object
+			bindGpuProgram(pass->getGeometryProgram()->_getBindingDelegate());
+			// bind parameters later 
 		}
 		else
 		{
@@ -931,9 +933,8 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 		// Using a fragment program?
 		if (pass->hasFragmentProgram())
 		{
-			mDestRenderSystem->bindGpuProgram(
-				pass->getFragmentProgram()->_getBindingDelegate());
-			// bind parameters later since they can be per-object
+			bindGpuProgram(pass->getFragmentProgram()->_getBindingDelegate());
+			// bind parameters later 
 		}
 		else
 		{
@@ -1127,8 +1128,8 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 		// set pass number
     	mAutoParamDataSource->setPassNumber( pass->getIndex() );
 
-		// update all the global params
-		pass->_updateAutoParamsGlobal(mAutoParamDataSource);
+		// mark global params as dirty
+		mGpuParamsDirty |= (uint16)GPV_GLOBAL;
 
 	}
 
@@ -2943,6 +2944,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     unsigned short numMatrices;
     static RenderOperation ro;
 
+
     // Set up rendering operation
     // I know, I know, const_cast is nasty but otherwise it requires all internal
     // state of the Renderable assigned to the rop to be mutable
@@ -2976,6 +2978,9 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     // Issue view / projection changes if any
     useRenderableViewProjMode(rend);
 
+	// mark per-object params as dirty
+	mGpuParamsDirty |= (uint16)GPV_PER_OBJECT;
+
     if (!mSuppressRenderStateChanges)
     {
         bool passSurfaceAndLightParams = true;
@@ -2986,11 +2991,10 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
             mAutoParamDataSource->setCurrentRenderable(rend);
             // Tell auto params object about the world matrices, eliminated query from renderable again
             mAutoParamDataSource->setWorldMatrices(mTempXform, numMatrices);
-            pass->_updateAutoParamsPerObjectNoLights(mAutoParamDataSource);
-            if (pass->hasVertexProgram())
-            {
-                passSurfaceAndLightParams = pass->getVertexProgram()->getPassSurfaceAndLightStates();
-            }
+			if (pass->hasVertexProgram())
+			{
+				passSurfaceAndLightParams = pass->getVertexProgram()->getPassSurfaceAndLightStates();
+			}
         }
 
         // Reissue any texture gen settings which are dependent on view matrix
@@ -3206,27 +3210,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				// Do we need to update GPU program parameters?
 				if (pass->isProgrammable())
 				{
-					// Update any automatic gpu params for lights
-					// Other bits of information will have to be looked up
-					mAutoParamDataSource->setCurrentLightList(pLightListToUse);
-					pass->_updateAutoParamsLightsOnly(mAutoParamDataSource);
-					// NOTE: We MUST bind parameters AFTER updating the autos
-
-					if (pass->hasVertexProgram())
-					{
-						mDestRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
-							pass->getVertexProgramParameters());
-					}
-					if (pass->hasGeometryProgram())
-					{
-						mDestRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
-							pass->getGeometryProgramParameters());
-					}
-					if (pass->hasFragmentProgram())
-					{
-						mDestRenderSystem->bindGpuProgramParameters(GPT_FRAGMENT_PROGRAM, 
-							pass->getFragmentProgramParameters());
-					}
+					useLightsGpuProgram(pass, pLightListToUse);
 				}
 				// Do we need to update light states? 
 				// Only do this if fixed-function vertex lighting applies
@@ -3285,6 +3269,9 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				}
 				depthInc += pass->getPassIterationCount();
 
+				// Finalise GPU parameter bindings
+				updateGpuProgramParameters(pass);
+
 				if (rend->preRender(this, mDestRenderSystem))
 					mDestRenderSystem->_render(ro);
 				rend->postRender(this, mDestRenderSystem);
@@ -3317,26 +3304,9 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					// Do we have a manual light list?
 					if (manualLightList)
 					{
-						// Update any automatic gpu params for lights
-						mAutoParamDataSource->setCurrentLightList(manualLightList);
-						pass->_updateAutoParamsLightsOnly(mAutoParamDataSource);
+						useLightsGpuProgram(pass, manualLightList);
 					}
 
-					if (pass->hasVertexProgram())
-					{
-						mDestRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
-							pass->getVertexProgramParameters());
-					}
-					if (pass->hasGeometryProgram())
-					{
-						mDestRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
-							pass->getGeometryProgramParameters());
-					}
-					if (pass->hasFragmentProgram())
-					{
-						mDestRenderSystem->bindGpuProgramParameters(GPT_FRAGMENT_PROGRAM, 
-							pass->getFragmentProgramParameters());
-					}
 				}
 
 				// Use manual lights if present, and not using vertex programs that don't use fixed pipeline
@@ -3364,6 +3334,9 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					// issue the render op		
 					// nfz: set up multipass rendering
 					mDestRenderSystem->setCurrentPassIterationCount(pass->getPassIterationCount());
+					// Finalise GPU parameter bindings
+					updateGpuProgramParameters(pass);
+
 					if (rend->preRender(this, mDestRenderSystem))
 						mDestRenderSystem->_render(ro);
 					rend->postRender(this, mDestRenderSystem);
@@ -3647,24 +3620,7 @@ void SceneManager::manualRender(RenderOperation* rend,
 		dummyCam.setCustomViewMatrix(true, viewMatrix);
 		dummyCam.setCustomProjectionMatrix(true, projMatrix);
 		mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
-		pass->_updateAutoParamsGlobal(mAutoParamDataSource);
-		pass->_updateAutoParamsPerObjectNoLights(mAutoParamDataSource);
-		// NOTE: We MUST bind parameters AFTER updating the autos
-		if (pass->hasVertexProgram())
-		{
-			mDestRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
-				pass->getVertexProgramParameters());
-		}
-		if (pass->hasGeometryProgram())
-		{
-			mDestRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
-				pass->getGeometryProgramParameters());
-		}
-		if (pass->hasFragmentProgram())
-		{
-			mDestRenderSystem->bindGpuProgramParameters(GPT_FRAGMENT_PROGRAM, 
-				pass->getFragmentProgramParameters());
-		}
+		updateGpuProgramParameters(pass);
 	}
     mDestRenderSystem->_render(*rend);
 
@@ -5138,10 +5094,10 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
             }
         }
 
-        mDestRenderSystem->bindGpuProgram(mShadowStencilPass->getVertexProgram()->_getBindingDelegate());
+        bindGpuProgram(mShadowStencilPass->getVertexProgram()->_getBindingDelegate());
 		if (!ShadowVolumeExtrudeProgram::frgProgramName.empty())
 		{
-			mDestRenderSystem->bindGpuProgram(mShadowStencilPass->getFragmentProgram()->_getBindingDelegate());
+			bindGpuProgram(mShadowStencilPass->getFragmentProgram()->_getBindingDelegate());
 		}
 
     }
@@ -6538,6 +6494,63 @@ void SceneManager::useLights(const LightList& lights, unsigned short limit)
 		mLastLightHash = lights.getHash();
 		mLastLightLimit = limit;
 	}
+}
+//---------------------------------------------------------------------
+void SceneManager::useLightsGpuProgram(const Pass* pass, const LightList* lights)
+{
+	// only call the rendersystem if light list has changed
+	if (lights->getHash() != mLastLightHashGpuProgram)
+	{
+		// Update any automatic gpu params for lights
+		// Other bits of information will have to be looked up
+		mAutoParamDataSource->setCurrentLightList(lights);
+		mGpuParamsDirty |= GPV_LIGHTS;
+
+		mLastLightHashGpuProgram = lights->getHash();
+
+	}
+}
+//---------------------------------------------------------------------
+void SceneManager::bindGpuProgram(GpuProgram* prog)
+{
+	// need to reset the light hash, and paarams that need resetting, since program params will have been invalidated
+	mLastLightHashGpuProgram = 0;
+	mGpuParamsDirty = (uint16)GPV_ALL;
+	mDestRenderSystem->bindGpuProgram(prog);
+}
+//---------------------------------------------------------------------
+void SceneManager::updateGpuProgramParameters(const Pass* pass)
+{
+	if (pass->isProgrammable())
+	{
+
+		if (!mGpuParamsDirty)
+			return;
+
+		if (mGpuParamsDirty)
+			pass->_updateAutoParams(mAutoParamDataSource, mGpuParamsDirty);
+
+		if (pass->hasVertexProgram())
+		{
+			mDestRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
+				pass->getVertexProgramParameters(), mGpuParamsDirty);
+		}
+
+		if (pass->hasGeometryProgram())
+		{
+			mDestRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
+				pass->getGeometryProgramParameters(), mGpuParamsDirty);
+		}
+
+		if (pass->hasFragmentProgram())
+		{
+			mDestRenderSystem->bindGpuProgramParameters(GPT_FRAGMENT_PROGRAM, 
+				pass->getFragmentProgramParameters(), mGpuParamsDirty);
+		}
+
+		mGpuParamsDirty = 0;
+	}
+
 }
 
 

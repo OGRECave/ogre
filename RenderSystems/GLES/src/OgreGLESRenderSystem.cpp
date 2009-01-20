@@ -2391,7 +2391,7 @@ namespace Ogre {
         // Not implemented
     }
 
-    void GLESRenderSystem::bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params)
+    void GLESRenderSystem::bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask)
     {
         // Not implemented
     }

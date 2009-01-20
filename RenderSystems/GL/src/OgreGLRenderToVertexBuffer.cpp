@@ -189,12 +189,12 @@ namespace Ogre {
 		if (r2vbPass->hasVertexProgram())
 		{
 			targetRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
-				r2vbPass->getVertexProgramParameters());
+				r2vbPass->getVertexProgramParameters(), GPV_ALL);
 		}
 		if (r2vbPass->hasGeometryProgram())
 		{
 			targetRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
-				r2vbPass->getGeometryProgramParameters());
+				r2vbPass->getGeometryProgramParameters(), GPV_ALL);
 		}
 		targetRenderSystem->_render(renderOp);
 		

@@ -50,7 +50,7 @@ namespace Ogre {
         virtual void unbindProgram(void) {}
 
         /// Execute the param binding functions for this program
-        virtual void bindProgramParameters(GpuProgramParametersSharedPtr params) {}
+		virtual void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
 		/// Bind just the pass iteration parameters
 		virtual void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params) {}
 
@@ -99,7 +99,7 @@ namespace Ogre {
         /// Execute the unbinding functions for this program
         void unbindProgram(void);
         /// Execute the param binding functions for this program
-        void bindProgramParameters(GpuProgramParametersSharedPtr params);
+		void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
 		/// Bind just the pass iteration parameters
 		void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
 

@@ -1462,68 +1462,26 @@ namespace Ogre {
         }
     }
 	//-----------------------------------------------------------------------
-	void Pass::_updateAutoParamsGlobal(const AutoParamDataSource* source) const
+	void Pass::_updateAutoParams(const AutoParamDataSource* source, uint16 mask) const
 	{
 		if (hasVertexProgram())
 		{
 			// Update vertex program auto params
-			mVertexProgramUsage->getParameters()->_updateAutoParamsGlobal(source);
+			mVertexProgramUsage->getParameters()->_updateAutoParams(source, mask);
 		}
 
 		if (hasGeometryProgram())
 		{
 			// Update geometry program auto params
-			mGeometryProgramUsage->getParameters()->_updateAutoParamsGlobal(source);
+			mGeometryProgramUsage->getParameters()->_updateAutoParams(source, mask);
 		}
 
 		if (hasFragmentProgram())
 		{
 			// Update fragment program auto params
-			mFragmentProgramUsage->getParameters()->_updateAutoParamsGlobal(source);
+			mFragmentProgramUsage->getParameters()->_updateAutoParams(source, mask);
 		}
 	}
-    //-----------------------------------------------------------------------
-    void Pass::_updateAutoParamsPerObjectNoLights(const AutoParamDataSource* source) const
-    {
-        if (hasVertexProgram())
-        {
-            // Update vertex program auto params
-            mVertexProgramUsage->getParameters()->_updateAutoParamsPerObjectNoLights(source);
-        }
-
-        if (hasGeometryProgram())
-        {
-            // Update geometry program auto params
-            mGeometryProgramUsage->getParameters()->_updateAutoParamsPerObjectNoLights(source);
-        }
-
-        if (hasFragmentProgram())
-        {
-            // Update fragment program auto params
-            mFragmentProgramUsage->getParameters()->_updateAutoParamsPerObjectNoLights(source);
-        }
-    }
-    //-----------------------------------------------------------------------
-    void Pass::_updateAutoParamsLightsOnly(const AutoParamDataSource* source) const
-    {
-        if (hasVertexProgram())
-        {
-            // Update vertex program auto params
-            mVertexProgramUsage->getParameters()->_updateAutoParamsLightsOnly(source);
-        }
-
-        if (hasGeometryProgram())
-        {
-            // Update geometry program auto params
-            mGeometryProgramUsage->getParameters()->_updateAutoParamsLightsOnly(source);
-        }
-
-        if (hasFragmentProgram())
-        {
-            // Update fragment program auto params
-            mFragmentProgramUsage->getParameters()->_updateAutoParamsLightsOnly(source);
-        }
-    }
     //-----------------------------------------------------------------------
     void Pass::processPendingPassUpdates(void)
     {

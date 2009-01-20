@@ -165,7 +165,7 @@ namespace Ogre {
 		ID3D10GeometryShader* getGeometryShader(void) const; 
 		ID3D10Blob * getMicroCode(void) const;  
 
-		ID3D10Buffer* getConstantBuffer(GpuProgramParametersSharedPtr params);
+		ID3D10Buffer* getConstantBuffer(GpuProgramParametersSharedPtr params, uint16 variabilityMask);
 
 		void CreateVertexShader();
 		void CreatePixelShader();
