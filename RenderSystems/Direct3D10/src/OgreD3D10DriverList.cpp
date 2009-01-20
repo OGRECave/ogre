@@ -60,16 +60,6 @@ namespace Ogre
 		if( FAILED(hr) )
 			return false;
 
-		/*		for( UINT iAdapter=0; iAdapter < mpD3D->GetAdapterCount(); ++iAdapter )
-		{
-		D3DADAPTER_IDENTIFIER9 adapterIdentifier;
-		DXGI_OUTPUT_DESC d3ddm;
-		mpD3D->GetAdapterIdentifier( iAdapter, 0, &adapterIdentifier );
-		mpD3D->GetAdapterDisplayMode( iAdapter, &d3ddm );
-
-		mDriverList.push_back( D3D10Driver( mpD3D, iAdapter, adapterIdentifier, d3ddm ) );
-		}
-		*/
 		for( UINT iAdapter=0; ; iAdapter++ )
 		{
 			IDXGIAdapter*					pDXGIAdapter;
@@ -84,15 +74,19 @@ namespace Ogre
 				delete pDXGIAdapter;
 				return false;
 			}
-			/*			// get the description of the adapter
-			DXGI_ADAPTER_DESC AdapterDesc;
-			hr = pDXGIAdapter->GetDesc( &AdapterDesc );
-			if( FAILED(hr) )
+
+			// we don't want NVIDIA PerfHUD in the list - so - here we filter it out
+			DXGI_ADAPTER_DESC adaptDesc;
+			if ( SUCCEEDED( pDXGIAdapter->GetDesc( &adaptDesc ) ) )
 			{
-			delete pDXGIAdapter;
-			return hr;
+				const bool isPerfHUD = wcscmp( adaptDesc.Description, L"NVIDIA PerfHUD" ) == 0;
+
+				if (isPerfHUD)
+				{
+					continue;
+				}
 			}
-			*/
+
 			mDriverList.push_back(new D3D10Driver( D3D10Device(),  iAdapter,pDXGIAdapter) );
 
 		}

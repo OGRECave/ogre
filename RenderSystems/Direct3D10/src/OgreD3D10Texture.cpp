@@ -801,7 +801,7 @@ namespace Ogre
 		descDepth.Height = mHeight;
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
-		descDepth.Format = DXGI_FORMAT_D16_UNORM;
+		descDepth.Format = DXGI_FORMAT_R32_TYPELESS;
 		descDepth.SampleDesc.Count = 1;
 		descDepth.SampleDesc.Quality = 0;
 		descDepth.Usage = D3D10_USAGE_DEFAULT;
@@ -820,7 +820,7 @@ namespace Ogre
 
 		// Create the depth stencil view
 		D3D10_DEPTH_STENCIL_VIEW_DESC descDSV;
-		descDSV.Format = descDepth.Format;
+		descDSV.Format = DXGI_FORMAT_D32_FLOAT;
 		descDSV.ViewDimension = D3D10_DSV_DIMENSION_TEXTURE2D;
 		descDSV.Texture2D.MipSlice = 0;
 		hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &mDepthStencilView );

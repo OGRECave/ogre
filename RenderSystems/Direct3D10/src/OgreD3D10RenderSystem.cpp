@@ -568,12 +568,48 @@ namespace Ogre
 				deviceFlags |= D3D10_CREATE_DEVICE_SINGLETHREADED;
 			}
 			D3D10_DRIVER_TYPE driverType = D3D10_DRIVER_TYPE_HARDWARE;
-			if(mUseNVPerfHUD)
+
+			// Search for a PerfHUD adapter
+			UINT nAdapter = 0;
+			IDXGIAdapter* pAdapter = NULL;
+			IDXGIAdapter* pSelectedAdapter = mActiveD3DDriver->getDeviceAdapter();
+			if ( mUseNVPerfHUD )
 			{
-				driverType = D3D10_DRIVER_TYPE_REFERENCE;
+				IDXGIFactory* pDXGIFactory;
+
+				HRESULT hr;
+				hr = CreateDXGIFactory( __uuidof( IDXGIFactory), (void**)&pDXGIFactory);
+
+				if (FAILED(hr))
+				{
+					OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "A DX10 Compliant Video Card is Required",
+						"D3D10RenderSystem::D3D10RenderSystem" );
+				}
+
+				// Search for a PerfHUD adapter
+				while( pDXGIFactory->EnumAdapters( nAdapter, &pAdapter ) != DXGI_ERROR_NOT_FOUND )
+				{
+					if ( pAdapter )
+					{
+						DXGI_ADAPTER_DESC adaptDesc;
+						if ( SUCCEEDED( pAdapter->GetDesc( &adaptDesc ) ) )
+						{
+							const bool isPerfHUD = wcscmp( adaptDesc.Description, L"NVIDIA PerfHUD" ) == 0;
+							if ( isPerfHUD )
+							{
+								pSelectedAdapter = pAdapter;
+								driverType = D3D10_DRIVER_TYPE_REFERENCE;
+							}
+						}
+						++nAdapter;
+					}
+				}
+
+				pDXGIFactory->Release();
 			}
+
 			ID3D10Device * device;
-			if(FAILED(D3D10CreateDevice(mActiveD3DDriver->getDeviceAdapter(),driverType ,0,deviceFlags,D3D10_SDK_VERSION, &device)))			
+			if(FAILED(D3D10CreateDevice(pSelectedAdapter,driverType ,0,deviceFlags,D3D10_SDK_VERSION, &device)))         
 			{
 				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
 					"Failed to create Direct3D10 object", 
@@ -3339,7 +3375,6 @@ namespace Ogre
 		bool ok = false;
 		bool qualityHint = fsaaHint.find("Quality") != String::npos;
 		size_t origFSAA = fsaa;
-		IDXGIAdapter* pAdapter;
 		bool tryCSAA = false;
 		// NVIDIA, prefer CSAA if available for 8+
 		// it would be tempting to use getCapabilities()->getVendor() == GPU_NVIDIA but
@@ -3422,7 +3457,7 @@ namespace Ogre
 						tryCSAA = false;
 					}
 					// return to original requested samples
-					fsaa = origFSAA;
+					fsaa = static_cast<uint>(origFSAA);
 				}
 				else
 				{
