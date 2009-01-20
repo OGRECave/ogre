@@ -355,9 +355,19 @@ namespace Ogre {
 		size_type max_size() const { return mList.max_size(); }
 		size_type capacity() const { return mList.capacity(); }
 		bool empty() const { return mList.empty(); }
-		reference operator[](size_type n) { return mList[n]; }
+		reference operator[](size_type n) 
+		{ 
+			// we have to assume that hash needs recalculating on non-const
+			dirtyHash();
+			return mList[n]; 
+		}
 		const_reference operator[](size_type n) const { return mList[n]; }
-		reference at(size_type n) { return mList.const_iterator(n); }
+		reference at(size_type n) 
+		{ 
+			// we have to assume that hash needs recalculating on non-const
+			dirtyHash();
+			return mList.const_iterator(n); 
+		}
 		const_reference at(size_type n) const { return mList.at(n); }
 		HashedVector() : mListHash(0) {}
 		HashedVector(size_type n) : mList(n), mListHash(0) {}
@@ -382,9 +392,19 @@ namespace Ogre {
 		}
 
 		void reserve(size_t t) { mList.reserve(t); }
-		reference front() { return mList.front(); }
+		reference front() 
+		{ 
+			// we have to assume that hash needs recalculating on non-const
+			dirtyHash();
+			return mList.front(); 
+		}
 		const_reference front() const { return mList.front(); }
-		reference back()  { return mList.back(); }
+		reference back()  
+		{ 
+			// we have to assume that hash needs recalculating on non-const
+			dirtyHash();
+			return mList.back(); 
+		}
 		const_reference back() const { return mList.back(); }
 		void push_back(const T& t)
 		{ 
