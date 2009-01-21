@@ -1008,9 +1008,7 @@ namespace Ogre
 		size_t logicalIndex, size_t requestedSize, uint16 variability)
 	{
 		if (!mFloatLogicalToPhysical)
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-			"This is not a low-level parameter parameter object",
-			"GpuProgramParameters::_getFloatConstantPhysicalIndex");
+			return 0;
 
 		GpuLogicalIndexUse* indexUse = 0;
 		OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex)
