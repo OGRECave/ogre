@@ -417,7 +417,6 @@ namespace Ogre {
             /// Cached squared view depth value to avoid recalculation by GeometryBucket
             Real mSquaredViewDepth;
 
-
 		public:
 			Region(StaticGeometry* parent, const String& name, SceneManager* mgr, 
 				uint32 regionID, const Vector3& centre);
@@ -484,6 +483,8 @@ namespace Ogre {
         uint8 mRenderQueueID;
 		/// Flags whether the RenderQueue's default should be used.
 		bool mRenderQueueIDSet;
+		/// Stores the visibility flags for the regions
+		uint32 mVisibilityFlags;
 
 		QueuedSubMeshList mQueuedSubMeshes;
 
@@ -720,6 +721,11 @@ namespace Ogre {
 		virtual void setOrigin(const Vector3& origin) { mOrigin = origin; }
 		/** Gets the origin of this geometry. */
 		virtual const Vector3& getOrigin(void) const { return mOrigin; }
+
+		/// Sets the visibility flags of all the regions at once
+		void setVisibilityFlags(uint32 flags);
+		/// Returns the visibility flags of the regions
+		uint32 getVisibilityFlags() const;
 
         /** Sets the render queue group this object will be rendered through.
         @remarks

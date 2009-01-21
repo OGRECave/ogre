@@ -62,7 +62,8 @@ namespace Ogre {
 		mOrigin(Vector3(0,0,0)),
 		mVisible(true),
         mRenderQueueID(RENDER_QUEUE_MAIN),
-        mRenderQueueIDSet(false)
+        mRenderQueueIDSet(false),
+		mVisibilityFlags(Ogre::MovableObject::getDefaultVisibilityFlags())
 	{
 	}
 	//--------------------------------------------------------------------------
@@ -569,6 +570,9 @@ namespace Ogre {
 			ri != mRegionMap.end(); ++ri)
 		{
 			ri->second->build(stencilShadows);
+			
+			// Set the visibility flags on these regions
+			ri->second->setVisibilityFlags(mVisibilityFlags);
 		}
 
 	}
@@ -650,6 +654,25 @@ namespace Ogre {
 	uint8 StaticGeometry::getRenderQueueGroup(void) const
 	{
 		return mRenderQueueID;
+	}
+	//--------------------------------------------------------------------------
+	void StaticGeometry::setVisibilityFlags(uint32 flags)
+	{
+		mVisibilityFlags = flags;
+		for (RegionMap::const_iterator ri = mRegionMap.begin();
+			ri != mRegionMap.end(); ++ri)
+		{
+			ri->second->setVisibilityFlags(flags);
+		}
+	}
+	//--------------------------------------------------------------------------
+	uint32 StaticGeometry::getVisibilityFlags() const
+	{
+		if(mRegionMap.empty())
+			return MovableObject::getDefaultVisibilityFlags();
+
+		RegionMap::const_iterator ri = mRegionMap.begin();
+		return ri->second->getVisibilityFlags();
 	}
 	//--------------------------------------------------------------------------
 	void StaticGeometry::dump(const String& filename) const
@@ -915,7 +938,14 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	bool StaticGeometry::Region::isVisible(void) const
 	{
-		return mVisible && !mBeyondFarDistance;
+		if(!mVisible || mBeyondFarDistance)
+			return false;
+
+		SceneManager* sm = Root::getSingleton()._getCurrentSceneManager();
+        if (sm && !(mVisibilityFlags & sm->_getCombinedVisibilityMask()))
+            return false;
+
+        return true;
 	}
 	//--------------------------------------------------------------------------
 	StaticGeometry::Region::LODIterator
