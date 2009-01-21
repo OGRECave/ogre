@@ -203,7 +203,24 @@ namespace Ogre
 		if (!_getDelegate().isNull())
 			return _getDelegate()->getPassSurfaceAndLightStates();
 		else
-			return false;
+			return HighLevelGpuProgram::getPassSurfaceAndLightStates();
+	}
+	//---------------------------------------------------------------------
+	bool UnifiedHighLevelGpuProgram::getPassFogStates(void) const
+	{
+		if (!_getDelegate().isNull())
+			return _getDelegate()->getPassFogStates();
+		else
+			return HighLevelGpuProgram::getPassFogStates();
+	}
+	//---------------------------------------------------------------------
+	bool UnifiedHighLevelGpuProgram::getPassTransformStates(void) const
+	{
+		if (!_getDelegate().isNull())
+			return _getDelegate()->getPassTransformStates();
+		else
+			return HighLevelGpuProgram::getPassTransformStates();
+
 	}
 	//-----------------------------------------------------------------------
 	bool UnifiedHighLevelGpuProgram::hasCompileError(void) const

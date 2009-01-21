@@ -873,12 +873,8 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         // Tell params about current pass
         mAutoParamDataSource->setCurrentPass(pass);
 
-		// TEST
-		/*
-		LogManager::getSingleton().logMessage("BEGIN PASS " + StringConverter::toString(pass->getIndex()) + 
-		" of " + pass->getParent()->getParent()->getName());
-		*/
 		bool passSurfaceAndLightParams = true;
+		bool passFogParams = true;
 
 		if (pass->hasVertexProgram())
 		{
@@ -935,6 +931,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 		{
 			bindGpuProgram(pass->getFragmentProgram()->_getBindingDelegate());
 			// bind parameters later 
+			passFogParams = pass->getFragmentProgram()->getPassFogStates();
 		}
 		else
 		{
@@ -947,35 +944,39 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			// Set fixed-function fragment settings
 		}
 
-        /* We need sets fog properties always. In D3D, it applies to shaders prior
-        to version vs_3_0 and ps_3_0. And in OGL, it applies to "ARB_fog_XXX" in
-        fragment program, and in other ways, them maybe access by gpu program via
-        "state.fog.XXX".
-        */
-        // New fog params can either be from scene or from material
-        FogMode newFogMode;
-        ColourValue newFogColour;
-        Real newFogStart, newFogEnd, newFogDensity;
-        if (pass->getFogOverride())
-        {
-            // New fog params from material
-            newFogMode = pass->getFogMode();
-            newFogColour = pass->getFogColour();
-            newFogStart = pass->getFogStart();
-            newFogEnd = pass->getFogEnd();
-            newFogDensity = pass->getFogDensity();
-        }
-        else
-        {
-            // New fog params from scene
-            newFogMode = mFogMode;
-            newFogColour = mFogColour;
-            newFogStart = mFogStart;
-            newFogEnd = mFogEnd;
-            newFogDensity = mFogDensity;
-        }
-        mDestRenderSystem->_setFog(
-            newFogMode, newFogColour, newFogDensity, newFogStart, newFogEnd);
+		if (passFogParams)
+		{
+			// New fog params can either be from scene or from material
+			FogMode newFogMode;
+			ColourValue newFogColour;
+			Real newFogStart, newFogEnd, newFogDensity;
+			if (pass->getFogOverride())
+			{
+				// New fog params from material
+				newFogMode = pass->getFogMode();
+				newFogColour = pass->getFogColour();
+				newFogStart = pass->getFogStart();
+				newFogEnd = pass->getFogEnd();
+				newFogDensity = pass->getFogDensity();
+			}
+			else
+			{
+				// New fog params from scene
+				newFogMode = mFogMode;
+				newFogColour = mFogColour;
+				newFogStart = mFogStart;
+				newFogEnd = mFogEnd;
+				newFogDensity = mFogDensity;
+			}
+
+			/* In D3D, it applies to shaders prior
+			to version vs_3_0 and ps_3_0. And in OGL, it applies to "ARB_fog_XXX" in
+			fragment program, and in other ways, them maybe access by gpu program via
+			"state.fog.XXX".
+			*/
+	        mDestRenderSystem->_setFog(
+		        newFogMode, newFogColour, newFogDensity, newFogStart, newFogEnd);
+		}
         // Tell params about ORIGINAL fog
 		// Need to be able to override fixed function fog, but still have
 		// original fog parameters available to a shader than chooses to use
@@ -2951,6 +2952,15 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     const_cast<Renderable*>(rend)->getRenderOperation(ro);
     ro.srcRenderable = rend;
 
+	GpuProgram* vprog = pass->hasVertexProgram() ? pass->getVertexProgram().get() : 0;
+
+	bool passTransformState = true;
+
+	if (vprog)
+	{
+		passTransformState = vprog->getPassTransformStates();
+	}
+
     // Set world transformation
     numMatrices = rend->getNumWorldTransforms();
 	
@@ -2965,18 +2975,22 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				mTempXform[i].setTrans(mTempXform[i].getTrans() - mCameraRelativePosition);
 			}
 		}
-		
-		if (numMatrices > 1)
+
+		if (passTransformState)
 		{
-			mDestRenderSystem->_setWorldMatrices(mTempXform, numMatrices);
-		}
-		else
-		{
-			mDestRenderSystem->_setWorldMatrix(*mTempXform);
+			if (numMatrices > 1)
+			{
+				mDestRenderSystem->_setWorldMatrices(mTempXform, numMatrices);
+			}
+			else
+			{
+				mDestRenderSystem->_setWorldMatrix(*mTempXform);
+			}
 		}
 	}
     // Issue view / projection changes if any
-    useRenderableViewProjMode(rend);
+	if (passTransformState)
+		useRenderableViewProjMode(rend);
 
 	// mark per-object params as dirty
 	mGpuParamsDirty |= (uint16)GPV_PER_OBJECT;
@@ -2991,9 +3005,9 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
             mAutoParamDataSource->setCurrentRenderable(rend);
             // Tell auto params object about the world matrices, eliminated query from renderable again
             mAutoParamDataSource->setWorldMatrices(mTempXform, numMatrices);
-			if (pass->hasVertexProgram())
+			if (vprog)
 			{
-				passSurfaceAndLightParams = pass->getVertexProgram()->getPassSurfaceAndLightStates();
+				passSurfaceAndLightParams = vprog->getPassSurfaceAndLightStates();
 			}
         }
 

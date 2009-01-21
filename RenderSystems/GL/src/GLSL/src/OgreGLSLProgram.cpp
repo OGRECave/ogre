@@ -290,13 +290,20 @@ namespace Ogre {
         }
         // Manually assign language now since we use it immediately
         mSyntaxCode = "glsl";
-
-		// want scenemanager to pass on surface and light states to the rendersystem
-		mPassSurfaceAndLightStates = true;
-
         
     }
-
+	//---------------------------------------------------------------------
+	bool GLSLProgram::getPassSurfaceAndLightStates(void) const
+	{
+		// scenemanager should pass on light & material state to the rendersystem
+		return true;
+	}
+	//---------------------------------------------------------------------
+	bool GLSLProgram::getPassTransformStates(void) const
+	{
+		// scenemanager should pass on transform state to the rendersystem
+		return true;
+	}
 	//-----------------------------------------------------------------------
     String GLSLProgram::CmdAttach::doGet(const void *target) const
     {

@@ -128,6 +128,8 @@ namespace Ogre {
 		GpuProgramParametersSharedPtr getDefaultParameters(void);
 		bool hasDefaultParameters(void) const;
 		bool getPassSurfaceAndLightStates(void) const;
+		bool getPassFogStates(void) const;
+		bool getPassTransformStates(void) const;
 		bool hasCompileError(void) const;
 		void resetCompileError(void);
 

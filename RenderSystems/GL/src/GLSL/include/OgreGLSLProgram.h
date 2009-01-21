@@ -75,6 +75,10 @@ namespace Ogre {
 		void detachFromProgramObject( const GLhandleARB programObject );
 		String getAttachedShaderNames() const { return mAttachedShaderNames; }
 
+		/// Overridden
+		bool getPassTransformStates(void) const;
+		bool getPassSurfaceAndLightStates(void) const;
+
         /** Attach another GLSL Shader to this one. */
         void attachChildShader(const String& name);
 

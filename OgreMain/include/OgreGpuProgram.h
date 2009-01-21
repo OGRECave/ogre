@@ -1528,8 +1528,6 @@ namespace Ogre {
 		bool mNeedsAdjacencyInfo;
 		/// The default parameters for use with this object
 		GpuProgramParametersSharedPtr mDefaultParams;
-		/// Does this program want light states passed through fixed pipeline
-		bool mPassSurfaceAndLightStates;
 		/// Did we encounter a compilation error?
 		bool mCompileError;
 		/** Record of logical to physical buffer maps. Mandatory for low-level
@@ -1705,23 +1703,33 @@ namespace Ogre {
         */
         virtual bool hasDefaultParameters(void) const { return !mDefaultParams.isNull(); }
 
-		/** Sets whether a vertex program requires light and material states to be passed
-		to through fixed pipeline low level API rendering calls.
-		@remarks
-		If this is set to true, OGRE will pass all active light states to the fixed function
-		pipeline.  This is useful for high level shaders like GLSL that can read the OpenGL
-		light and material states.  This way the user does not have to use autoparameters to 
-		pass light position, color etc.
-		*/
-		virtual void setSurfaceAndPassLightStates(bool state)
-			{ mPassSurfaceAndLightStates = state; }
-
 		/** Returns whether a vertex program wants light and material states to be passed
-		through fixed pipeline low level API rendering calls
+		through fixed pipeline low level API rendering calls (default false, subclasses can override)
+		@remarks
+			Most vertex programs do not need this material information, however GLSL
+			shaders can refer to this material and lighting state so enable this option
 		*/
-		virtual bool getPassSurfaceAndLightStates(void) const { return mPassSurfaceAndLightStates; }
+		virtual bool getPassSurfaceAndLightStates(void) const { return false; }
 
-        /** Returns a string that specifies the language of the gpu programs as specified
+		/** Returns whether a fragment program wants fog state to be passed
+		through fixed pipeline low level API rendering calls (default true, subclasses can override)
+		@remarks
+		On DirectX, shader model 2 and earlier continues to have fixed-function fog
+		applied to it, so fog state is still passed (you should disable fog on the
+		pass if you want to perform fog in the shader). In OpenGL it is also
+		common to be able to access the fixed-function fog state inside the shader. 
+		*/
+		virtual bool getPassFogStates(void) const { return true; }
+
+		/** Returns whether a vertex program wants transform state to be passed
+		through fixed pipeline low level API rendering calls
+		@remarks
+		Most vertex programs do not need fixed-function transform information, however GLSL
+		shaders can refer to this state so enable this option
+		*/
+		virtual bool getPassTransformStates(void) const { return false; }
+
+		/** Returns a string that specifies the language of the gpu programs as specified
         in a material script. ie: asm, cg, hlsl, glsl
         */
         virtual const String& getLanguage(void) const;
