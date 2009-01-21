@@ -579,11 +579,11 @@ namespace Ogre {
 
         /** Internal method used by _renderSingleObject to deal with renderables
             which override the camera's own view / projection materices. */
-        virtual void useRenderableViewProjMode(const Renderable* pRend);
+        virtual void useRenderableViewProjMode(const Renderable* pRend, bool fixedFunction);
         
         /** Internal method used by _renderSingleObject to deal with renderables
             which override the camera's own view / projection matrices. */
-        virtual void resetViewProjMode(void);
+        virtual void resetViewProjMode(bool fixedFunction);
 
         typedef vector<RenderQueueListener*>::type RenderQueueListenerList;
         RenderQueueListenerList mRenderQueueListeners;

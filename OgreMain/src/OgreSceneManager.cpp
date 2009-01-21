@@ -2989,8 +2989,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 		}
 	}
     // Issue view / projection changes if any
-	if (passTransformState)
-		useRenderableViewProjMode(rend);
+	useRenderableViewProjMode(rend, passTransformState);
 
 	// mark per-object params as dirty
 	mGpuParamsDirty |= (uint16)GPV_PER_OBJECT;
@@ -3374,7 +3373,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 	}
 	
     // Reset view / projection changes if any
-    resetViewProjMode();
+    resetViewProjMode(passTransformState);
 
 }
 //-----------------------------------------------------------------------
@@ -3643,14 +3642,16 @@ void SceneManager::manualRender(RenderOperation* rend,
 
 }
 //---------------------------------------------------------------------
-void SceneManager::useRenderableViewProjMode(const Renderable* pRend)
+void SceneManager::useRenderableViewProjMode(const Renderable* pRend, bool fixedFunction)
 {
     // Check view matrix
     bool useIdentityView = pRend->getUseIdentityView();
     if (useIdentityView)
     {
         // Using identity view now, change it
-        mDestRenderSystem->_setViewMatrix(Matrix4::IDENTITY);
+		if (fixedFunction)
+			mDestRenderSystem->_setViewMatrix(Matrix4::IDENTITY);
+		mGpuParamsDirty |= (uint16)GPV_GLOBAL;
         mResetIdentityView = true;
     }
 
@@ -3658,9 +3659,13 @@ void SceneManager::useRenderableViewProjMode(const Renderable* pRend)
     if (useIdentityProj)
     {
         // Use identity projection matrix, still need to take RS depth into account.
-        Matrix4 mat;
-        mDestRenderSystem->_convertProjectionMatrix(Matrix4::IDENTITY, mat);
-        mDestRenderSystem->_setProjectionMatrix(mat);
+		if (fixedFunction)
+		{
+			Matrix4 mat;
+			mDestRenderSystem->_convertProjectionMatrix(Matrix4::IDENTITY, mat);
+			mDestRenderSystem->_setProjectionMatrix(mat);
+		}
+		mGpuParamsDirty |= (uint16)GPV_GLOBAL;
 
         mResetIdentityProj = true;
     }
@@ -3668,20 +3673,26 @@ void SceneManager::useRenderableViewProjMode(const Renderable* pRend)
     
 }
 //---------------------------------------------------------------------
-void SceneManager::resetViewProjMode(void)
+void SceneManager::resetViewProjMode(bool fixedFunction)
 {
     if (mResetIdentityView)
     {
         // Coming back to normal from identity view
-        mDestRenderSystem->_setViewMatrix(mCachedViewMatrix);
+		if (fixedFunction)
+			mDestRenderSystem->_setViewMatrix(mCachedViewMatrix);
+		mGpuParamsDirty |= (uint16)GPV_GLOBAL;
+
         mResetIdentityView = false;
     }
     
     if (mResetIdentityProj)
     {
         // Coming back from flat projection
-        mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());
-        mResetIdentityProj = false;
+        if (fixedFunction)
+			mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());
+		mGpuParamsDirty |= (uint16)GPV_GLOBAL;
+
+		mResetIdentityProj = false;
     }
     
 
