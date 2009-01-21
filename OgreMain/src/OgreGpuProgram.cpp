@@ -1320,6 +1320,7 @@ namespace Ogre
 				i->paramType = acType;
 				i->data = extraInfo;
 				i->elementCount = elementSize;
+				i->variability = variability;
 				found = true;
 				break;
 			}
@@ -1345,6 +1346,7 @@ namespace Ogre
 				i->paramType = acType;
 				i->fData = rData;
 				i->elementCount = elementSize;
+				i->variability = variability;
 				found = true;
 				break;
 			}
@@ -1434,7 +1436,8 @@ namespace Ogre
 		// abort early if no autos
 		if (!hasAutoConstants()) return; 
 		// abort early if variability doesn't match any param
-		if (!(mask & mCombinedVariability)) return; 
+		if (!(mask & mCombinedVariability)) 
+			return; 
 
 		size_t index;
 		size_t numMatrices;
@@ -2221,6 +2224,7 @@ namespace Ogre
 		mFloatConstants = source.getFloatConstantList();
 		mIntConstants = source.getIntConstantList();
 		mAutoConstants = source.getAutoConstantList();
+		mCombinedVariability = source.mCombinedVariability;
     }
     //-----------------------------------------------------------------------
     const GpuProgramParameters::AutoConstantDefinition* 
