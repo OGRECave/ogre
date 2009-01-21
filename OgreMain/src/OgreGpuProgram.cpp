@@ -581,6 +581,7 @@ namespace Ogre
 		mFloatLogicalToPhysical(0)
 		, mIntLogicalToPhysical(0)
 		, mNamedConstants(0)
+		, mCombinedVariability(GPV_GLOBAL)
 		, mTransposeMatrices(false)
 		, mIgnoreMissingParams(false)
 		, mActivePassIterationIndex(std::numeric_limits<size_t>::max())	
@@ -605,6 +606,7 @@ namespace Ogre
 		mIntLogicalToPhysical = oth.mIntLogicalToPhysical;
 		mNamedConstants = oth.mNamedConstants;
 
+		mCombinedVariability = oth.mCombinedVariability;
         mTransposeMatrices = oth.mTransposeMatrices;
         mIgnoreMissingParams  = oth.mIgnoreMissingParams;
 		mActivePassIterationIndex = oth.mActivePassIterationIndex;
@@ -1325,6 +1327,9 @@ namespace Ogre
 		if (!found)
 			mAutoConstants.push_back(AutoConstantEntry(acType, physicalIndex, extraInfo, variability, elementSize));
 
+		mCombinedVariability |= variability;
+
+
 	}
 	//-----------------------------------------------------------------------------
 	void GpuProgramParameters::_setRawAutoConstantReal(size_t physicalIndex, 
@@ -1347,6 +1352,7 @@ namespace Ogre
 		if (!found)
 			mAutoConstants.push_back(AutoConstantEntry(acType, physicalIndex, rData, variability, elementSize));
 
+		mCombinedVariability |= variability;
 	}
 	//-----------------------------------------------------------------------------
 	void GpuProgramParameters::clearAutoConstant(size_t index)
@@ -1397,6 +1403,7 @@ namespace Ogre
     void GpuProgramParameters::clearAutoConstants(void)
     {
         mAutoConstants.clear();
+		mCombinedVariability = GPV_GLOBAL;
     }
     //-----------------------------------------------------------------------------
     GpuProgramParameters::AutoConstantIterator GpuProgramParameters::getAutoConstantIterator(void) const
@@ -1424,7 +1431,10 @@ namespace Ogre
 	//-----------------------------------------------------------------------------
 	void GpuProgramParameters::_updateAutoParams(const AutoParamDataSource* source, uint16 mask)
 	{
-		if (!hasAutoConstants()) return; // abort early if no autos
+		// abort early if no autos
+		if (!hasAutoConstants()) return; 
+		// abort early if variability doesn't match any param
+		if (!(mask & mCombinedVariability)) return; 
 
 		size_t index;
 		size_t numMatrices;

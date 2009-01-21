@@ -838,6 +838,8 @@ namespace Ogre {
 		const GpuNamedConstants* mNamedConstants;
         /// List of automatically updated parameters
         AutoConstantList mAutoConstants;
+		/// The combined variability masks of all parameters
+		uint16 mCombinedVariability;
         /// Do we need to transpose matrices?
         bool mTransposeMatrices;
 		/// flag to indicate if names not found will be ignored
