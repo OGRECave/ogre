@@ -584,7 +584,7 @@
 		AA89775B0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA89775A0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA89775E0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA89775D0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp */; };
 		AA8977610E5F4C0100A70BC4 /* OgreGLRenderToVertexBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA8977600E5F4C0100A70BC4 /* OgreGLRenderToVertexBuffer.cpp */; };
-		AA8B090C0F26716800CFB593 /* OgreMemoryNedAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9567C50EB79DA4009431A6 /* OgreMemoryNedAlloc.h */; };
+		AA8B090C0F26716800CFB593 /* OgreMemoryNedAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9567C50EB79DA4009431A6 /* OgreMemoryNedAlloc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA8D7EDA0EA2483A00D76955 /* OgreCapsule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698090EA1117C00F18A41 /* OgreCapsule.cpp */; };
 		AA8D7EDB0EA2483A00D76955 /* OgreDefaultZone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC6980A0EA1117C00F18A41 /* OgreDefaultZone.cpp */; };
 		AA8D7EDC0EA2483A00D76955 /* OgrePCPlane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC6980B0EA1117C00F18A41 /* OgrePCPlane.cpp */; };
