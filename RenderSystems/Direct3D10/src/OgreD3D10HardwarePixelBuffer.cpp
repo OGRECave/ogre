@@ -91,7 +91,9 @@ namespace Ogre {
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "DirectX does not allow locking of or directly writing to RenderTargets. Use blitFromMemory if you need the contents.",
 			"D3D10HardwarePixelBuffer::lockImpl");	
 		// Set extents and format
-		PixelBox rval(lockBox, mFormat);
+		// Note that we do not carry over the left/top/front here, since the returned
+		// PixelBox will be re-based from the locking point onwards
+		PixelBox rval(lockBox.getWidth(), lockBox.getHeight(), lockBox.getDepth(), mFormat);
 		// Set locking flags according to options
 		D3D10_MAP  flags = D3D10_MAP_WRITE_DISCARD ;
 		switch(options)

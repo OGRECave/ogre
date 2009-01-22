@@ -602,8 +602,10 @@ namespace Ogre {
 
 		const size_t elemSize = PixelUtil::getNumElemBytes(format);
 		// Calculate new data origin
-		PixelBox rval(def, format, ((uint8*)data)
-			+ ((def.left-left)*elemSize)
+		// Notice how we do not propagate left/top/front from the incoming box, since
+		// the returned pointer is already offset
+		PixelBox rval(def.getWidth(), def.getHeight(), def.getDepth(), format, 
+			((uint8*)data) + ((def.left-left)*elemSize)
 			+ ((def.top-top)*rowPitch*elemSize)
 			+ ((def.front-front)*slicePitch*elemSize)
 		);
