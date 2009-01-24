@@ -388,7 +388,7 @@
 						Name="VCCLCompilerTool"
 						FloatingPointModel="2"
 						DisableLanguageExtensions="false"
-						WarningLevel="4"
+						WarningLevel="3"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
