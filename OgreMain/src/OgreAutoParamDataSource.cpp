@@ -94,7 +94,7 @@ namespace Ogre {
     const Light& AutoParamDataSource::getLight(size_t index) const
     {
         // If outside light range, return a blank light to ensure zeroised for program
-		if (index < mCurrentLightList->size())
+		if (mCurrentLightList && index < mCurrentLightList->size())
 		{
 			return *((*mCurrentLightList)[index]);
 		}
