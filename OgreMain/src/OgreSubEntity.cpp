@@ -80,18 +80,42 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SubEntity::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
+		MaterialPtr material = MaterialManager::getSingleton().getByName(name, groupName);
 
-        //String oldName = mMaterialName;
-        mMaterialName = name;
-        mpMaterial = MaterialManager::getSingleton().getByName(mMaterialName, groupName);
+		if( material.isNull() )
+		{
+			LogManager::getSingleton().logMessage("Can't assign material " + name +
+				" to SubEntity of " + mParentEntity->getName() + " because this "
+				"Material does not exist. Have you forgotten to define it in a "
+				".material script?");
 
+			material = MaterialManager::getSingleton().getByName("BaseWhite");
+
+			if (material.isNull())
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
+					"to SubEntity of " + mParentEntity->getName() + ". Did "
+					"you forget to call MaterialManager::initialise()?",
+					"SubEntity.setMaterialName");
+			}
+		}
+
+        setMaterial( material );
+    }
+
+	void SubEntity::setMaterial( const MaterialPtr& material )
+	{
+		mpMaterial = material;
+		
         if (mpMaterial.isNull())
         {
-            LogManager::getSingleton().logMessage("Can't assign material " + name + 
+			LogManager::getSingleton().logMessage("Can't assign material "  
                 " to SubEntity of " + mParentEntity->getName() + " because this "
                 "Material does not exist. Have you forgotten to define it in a "
                 ".material script?");
+			
             mpMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
+			
             if (mpMaterial.isNull())
             {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
@@ -100,14 +124,17 @@ namespace Ogre {
                     "SubEntity.setMaterialName");
             }
         }
+		
+		mMaterialName = mpMaterial->getName();
+
         // Ensure new material loaded (will not load again if already loaded)
         mpMaterial->load();
 
         // tell parent to reconsider material vertex processing options
         mParentEntity->reevaluateVertexProcessing();
 
+	}
 
-    }
     //-----------------------------------------------------------------------
     const MaterialPtr& SubEntity::getMaterial(void) const
     {
@@ -419,6 +446,5 @@ namespace Ogre {
 		}
 
 	}
-
 
 }

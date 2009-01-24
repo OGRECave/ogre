@@ -540,6 +540,9 @@ namespace Ogre {
     size_t MeshSerializerImpl::calcSubMeshSize(const SubMesh* pSub)
     {
         size_t size = STREAM_OVERHEAD_SIZE;
+		
+		bool idx32bit = (!pSub->indexData->indexBuffer.isNull() &&
+						 pSub->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
 
         // Material name
         size += pSub->getMaterialName().length() + 1;
@@ -550,9 +553,11 @@ namespace Ogre {
         size += sizeof(unsigned int);
         // bool indexes32bit
         size += sizeof(bool);
-        // unsigned int* faceVertexIndices
-        size += sizeof(unsigned int) * pSub->indexData->indexCount;
-
+        // unsigned int* / unsigned short* faceVertexIndices
+		if (idx32bit)
+			size += sizeof(unsigned int) * pSub->indexData->indexCount;
+		else
+			size += sizeof(unsigned short) * pSub->indexData->indexCount;
         // Geometry
         if (!pSub->useSharedVertices)
         {

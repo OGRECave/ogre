@@ -86,7 +86,7 @@ namespace Ogre
 		{ }
 
 		/// copy ctor - done component wise
-		inline STLAllocator( STLAllocator const& rhs )
+		inline STLAllocator( STLAllocator const& )
 		{ }
 
 		/// cast
@@ -96,7 +96,7 @@ namespace Ogre
 
 		/// cast
 		template <typename U, typename P>
-		inline STLAllocator( STLAllocator<U, P> const& rhs )
+		inline STLAllocator( STLAllocator<U, P> const& )
 		{ }
 
 		/// memory allocation (elements, used by STL)
@@ -110,10 +110,10 @@ namespace Ogre
 		}
 
 		/// memory deallocation (elements, used by STL)
-		inline void deallocate( pointer ptr, size_type count )
+		inline void deallocate( pointer ptr, size_type )
 		{
 			// convert request to bytes, but we can't use this?
-			register size_type sz = count*sizeof( T );
+			// register size_type sz = count*sizeof( T );
 			AllocPolicy::deallocateBytes(ptr);
 		}
 

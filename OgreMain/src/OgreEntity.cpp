@@ -366,6 +366,18 @@ namespace Ogre {
         }
 
     }
+
+
+	void Entity::setMaterial( const MaterialPtr& material )
+	{
+		// Set for all subentities
+		SubEntityList::iterator i;
+		for (i = mSubEntityList.begin(); i != mSubEntityList.end(); ++i)
+		{
+			(*i)->setMaterial(material);
+		}
+	}
+
     //-----------------------------------------------------------------------
     void Entity::_notifyCurrentCamera(Camera* cam)
     {
@@ -575,7 +587,7 @@ namespace Ogre {
 
         // Since we know we're going to be rendered, take this opportunity to
         // update the animation
-        if (hasSkeleton() || hasVertexAnimation())
+        if (displayEntity->hasSkeleton() || displayEntity->hasVertexAnimation())
         {
             displayEntity->updateAnimation();
 

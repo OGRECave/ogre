@@ -594,6 +594,7 @@
 		AA89775B0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA89775A0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA89775E0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA89775D0E5F4BB900A70BC4 /* OgreRenderToVertexBuffer.cpp */; };
 		AA8977610E5F4C0100A70BC4 /* OgreGLRenderToVertexBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA8977600E5F4C0100A70BC4 /* OgreGLRenderToVertexBuffer.cpp */; };
+		AA8B090C0F26716800CFB593 /* OgreMemoryNedAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9567C50EB79DA4009431A6 /* OgreMemoryNedAlloc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA8D7EDA0EA2483A00D76955 /* OgreCapsule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698090EA1117C00F18A41 /* OgreCapsule.cpp */; };
 		AA8D7EDB0EA2483A00D76955 /* OgreDefaultZone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC6980A0EA1117C00F18A41 /* OgreDefaultZone.cpp */; };
 		AA8D7EDC0EA2483A00D76955 /* OgrePCPlane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC6980B0EA1117C00F18A41 /* OgrePCPlane.cpp */; };
@@ -608,7 +609,6 @@
 		AA8D7EE60EA2483A00D76955 /* OgrePCZSceneQuery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698150EA1117C00F18A41 /* OgrePCZSceneQuery.cpp */; };
 		AA8D7EE70EA2483A00D76955 /* OgrePortal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698160EA1117C00F18A41 /* OgrePortal.cpp */; };
 		AA8D7EE80EA2483A00D76955 /* OgreSegment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC698170EA1117C00F18A41 /* OgreSegment.cpp */; };
-		AA9567C60EB79DA4009431A6 /* OgreMemoryNedAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9567C50EB79DA4009431A6 /* OgreMemoryNedAlloc.h */; };
 		AAA8B9700CC6A4FC001AD86E /* OgreScriptCompiler.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96E0CC6A4FC001AD86E /* OgreScriptCompiler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AAA8B9710CC6A4FC001AD86E /* OgreScriptParser.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA8B96F0CC6A4FC001AD86E /* OgreScriptParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AAAD1C430EA2394A009723FD /* OgreOctreeZoneOctree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAAD1C420EA2394A009723FD /* OgreOctreeZoneOctree.cpp */; };
@@ -2808,7 +2808,7 @@
 				AAE048000E5E0C15001D1ADC /* OgreShadowCameraSetupPSSM.h in Headers */,
 				AA89775B0E5F4B9400A70BC4 /* OgreRenderToVertexBuffer.h in Headers */,
 				AAE7DD060E68917000E1371A /* OgreAtomicWrappers.h in Headers */,
-				AA9567C60EB79DA4009431A6 /* OgreMemoryNedAlloc.h in Headers */,
+				AA8B090C0F26716800CFB593 /* OgreMemoryNedAlloc.h in Headers */,
 				AA81343A0EFE94A9004EA3A5 /* OgreDistanceLodStrategy.h in Headers */,
 				AA81343B0EFE94A9004EA3A5 /* OgreLodListener.h in Headers */,
 				AA81343C0EFE94A9004EA3A5 /* OgreLodStrategyManager.h in Headers */,

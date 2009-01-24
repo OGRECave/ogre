@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Plugin_OctreeZone" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\..\..\lib\Plugin_OctreeZone_d.dll" prefix_auto="0" extension_auto="0" />
+				<Option object_output="..\obj\Debug" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-D_USRDLL" />
+					<Add option="-DOGRE_OCTREEZONEPLUGIN_EXPORTS" />
+					<Add option="-DOGRE_TERRAINZONEPLUGIN_EXPORTS" />
+					<Add directory="..\include" />
+					<Add directory="..\..\PCZSceneManager\include" />
+					<Add directory="..\..\..\OgreMain\include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="..\include" />
+					<Add directory="..\..\PCZSceneManager\include" />
+					<Add directory="..\..\..\OgreMain\include" />
+				</ResourceCompiler>
+				<Linker>
+					<Add library="OgreMain_d" />
+					<Add library="Plugin_PCZSceneManager_d" />
+					<Add directory="..\..\..\lib" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="cmd /c copy $($(TARGET_NAME)_OUTPUT_FILE) ..\..\..\Samples\Common\bin\$(TARGET_NAME)" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Release">
+				<Option output="..\..\..\lib\Plugin_OctreeZone.dll" prefix_auto="0" extension_auto="0" />
+				<Option object_output="..\obj\Release" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-W" />
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-D_USRDLL" />
+					<Add option="-DOGRE_OCTREEZONEPLUGIN_EXPORTS" />
+					<Add option="-DOGRE_TERRAINZONEPLUGIN_EXPORTS" />
+					<Add directory="..\include" />
+					<Add directory="..\..\PCZSceneManager\include" />
+					<Add directory="..\..\..\OgreMain\include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="..\include" />
+					<Add directory="..\..\PCZSceneManager\include" />
+					<Add directory="..\..\..\OgreMain\include" />
+				</ResourceCompiler>
+				<Linker>
+					<Add library="OgreMain" />
+					<Add library="Plugin_PCZSceneManager" />
+					<Add directory="..\..\..\lib" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="cmd /c copy $($(TARGET_NAME)_OUTPUT_FILE) ..\..\..\Samples\Common\bin\$(TARGET_NAME)" />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<VirtualTargets>
+			<Add alias="All" targets="Debug;Release;" />
+		</VirtualTargets>
+		<Compiler>
+			<Add option="-mthreads" />
+			<Add option="-fmessage-length=0" />
+			<Add option="-fexceptions" />
+			<Add option="-fident" />
+			<Add option="-pipe" />
+		</Compiler>
+		<Linker>
+			<Add option="-Wl,--enable-auto-image-base" />
+			<Add option="-Wl,--add-stdcall-alias" />
+		</Linker>
+		<Unit filename="..\include\OgreHeightmapTerrainZonePageSource.h" />
+		<Unit filename="..\include\OgreOctreeZone.h" />
+		<Unit filename="..\include\OgreOctreeZoneOctree.h" />
+		<Unit filename="..\include\OgreOctreeZonePlugin.h" />
+		<Unit filename="..\include\OgreOctreeZonePrerequisites.h" />
+		<Unit filename="..\include\OgreTerrainVertexProgram.h" />
+		<Unit filename="..\include\OgreTerrainZone.h" />
+		<Unit filename="..\include\OgreTerrainZonePage.h" />
+		<Unit filename="..\include\OgreTerrainZonePageSource.h" />
+		<Unit filename="..\include\OgreTerrainZonePrerequisites.h" />
+		<Unit filename="..\include\OgreTerrainZoneRenderable.h" />
+		<Unit filename="..\src\OgreHeightmapTerrainZonePageSource.cpp" />
+		<Unit filename="..\src\OgreOctreeZone.cpp" />
+		<Unit filename="..\src\OgreOctreeZoneDll.cpp" />
+		<Unit filename="..\src\OgreOctreeZoneOctree.cpp" />
+		<Unit filename="..\src\OgreOctreeZonePlugin.cpp" />
+		<Unit filename="..\src\OgreTerrainVertexProgram.cpp" />
+		<Unit filename="..\src\OgreTerrainZone.cpp" />
+		<Unit filename="..\src\OgreTerrainZonePage.cpp" />
+		<Unit filename="..\src\OgreTerrainZonePageSource.cpp" />
+		<Unit filename="..\src\OgreTerrainZoneRenderable.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

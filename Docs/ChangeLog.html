@@ -31,6 +31,281 @@ Engine)</p>
 <p class="header" align="center">Change Log</p>
 
 <p class="mainheader">
+    v1.6.1 [Shoggoth] (22 January 2009) - Maintenance Release</p>
+<ul>
+  <li>
+    <b>Shadows</b>
+    <ul>
+      <li>
+LiSPSM now
+automatically adjusts for duelling frusta
+      </li>
+      <li>
+Uniform shadow
+camera is now independent of FOV for directional shadows
+      </li>
+      <li>
+Directional shadows
+no longer jitter when using the uniform shadow camera
+      </li>
+      <li>
+Fix
+PSSMShadowCameraSetup when using arbitrary number of split points
+      </li>
+    </ul>
+  </li>
+  <li>
+    <b>Memory</b>
+    <ul>
+      <li>
+Nedmalloc
+deallocator should deal with null pointers
+      </li>
+      <li>
+Nedmalloc is now
+the default allocator
+      </li>
+      <li>
+Linux build now
+has option to
+change allocators
+      </li>
+    </ul>
+  </li>
+  <li>
+    <b>Materials</b>
+    <ul>
+      <li>
+cubic_texture
+now calls processTextureNames event properly
+      </li>
+      <li>
+Fixed
+support for multi-line comments
+      </li>
+      <li>
+Fixed
+script inheritance ordering bug
+      </li>
+      <li>
+Fixed
+extra space being added to the parameters of texture_source in scripts
+      </li>
+      <li>
+High-level
+shaders can now be reloaded properly after a compile error
+      </li>
+    </ul>
+  </li>
+  <li>
+    <b>DirectX9</b>
+    <ul>
+      <li>
+Fix device reset
+error when using hardware occlusion queries
+      </li>
+    </ul>
+  </li>
+  <li>
+    <b>DirectX10</b>
+    <ul>
+      <li>
+Fixed compilation
+on the November 08 DirectX SDK
+      </li>
+      <li>
+Image pitch bug
+fixed
+      </li>
+    </ul>
+  </li>
+  <li>
+    <b>OpenGL</b>
+    <ul>
+      <li>
+Fix
+crash on Radeon 9200 in _setPointParameters
+      </li>
+      <li>
+GTK
+fullscreen mode now works
+      </li>
+    </ul>
+  </li>
+  <li>
+    <b>GLSL</b>
+    <ul>
+      <li>
+Fix
+warnings of the form &ldquo;Could not find vertex shader attribute
+'vertex' to match BindAttributeLocation request&rdquo; </li>
+      <li>
+Fix
+custom attribute names (tangent, blendWeights etc) interfering with
+user-specified 'varying' bindings that happen to be called the same
+thing
+      </li>
+      <li>
+Fix
+&ldquo;Invalid Enumerant&rdquo; errors caused by
+trial-and-error binding of custom attributes
+      </li>
+    </ul>
+  </li>
+  <li>
+    <b>OS X</b>
+    <ul>
+      <li>
+Fixed
+plist link for OctreeZone project
+      </li>
+      <li>
+Make
+sure OgreMemoryNedMalloc.h is copied during Framework bundling
+      </li>
+    </ul>
+  </li>
+  <li>
+    <b>Code::Blocks</b>
+    <ul>
+      <li>
+Project
+files updated to include PCZ plugins &amp; sample
+      </li>
+      <li>
+GL
+render system project updated to include render to vertex buffer
+      </li>
+    </ul>
+  </li>
+  <li>
+    <b>PCZ
+SceneManager</b>
+    <ul>
+      <li>
+        <span style="font-weight: normal;">Texture shadows
+now work
+correctly in PCZ scene manager</span>
+      </li>
+      <li>
+        <span style="font-weight: normal;">Null and
+infinite AABBs now
+handled correctly</span>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <b>Tangent support</b>
+    <ul>
+      <li>
+StaticGeometry
+now supports tangent parity option
+      </li>
+      <li>
+Allow
+texture coordinate index 0 to be used for tangents if required
+(previously only the tangent semantic, or texture coordinate 1 or
+higher were supported)
+      </li>
+    </ul>
+  </li>
+  <li>
+    <b>Pixel buffers</b>
+    <ul>
+      <li>
+Some
+blit functions were ignoring the left/top/front offsets, this is fixed
+      </li>
+      <li>
+HardwarePixelBuffer::lock
+implementations should not return the same left/top/front offsets as
+the incoming parameters, since the returned pointer is already offset
+      </li>
+      <li>
+Box
+now has a safer default construction, in particular setting front/back
+to 0/1
+      </li>
+    </ul>
+  </li>
+  <li>
+    <b>Linux / GLX </b>
+    <ul>
+      <li>
+Xt is now the
+default GUI on
+Linux instead of GTK (if installed)
+      </li>
+      <li>
+Do not correct
+window size to
+valid fullscreen mode in windowed mode
+      </li>
+      <li>
+Fix typo in
+closing GLX window
+      </li>
+    </ul>
+  </li>
+  <li>
+Fixed animation
+update for
+entities using the same Skeleton at all LOD levels
+  </li>
+  <li>
+MeshSerializer can
+now load
+submeshes without indices successfully
+  </li>
+  <li>
+Hardware SRGB option is now
+properly registered when using background loaded textures
+  </li>
+  <li>
+In SceneManager::_manualRender,
+shader params for view/projection are now updated correctly
+  </li>
+  <li>
+Fixed bugs with sky boxes /
+domes etc when repeatedly clearing the scene &amp; resetting
+  </li>
+  <li>
+Fix calculated SubMesh size in
+.mesh when using 16-bit indices
+  </li>
+  <li>
+Manually changing the
+sort mode of solids in a render queue now works as expected
+  </li>
+  <li>
+Fix precision error in
+AnimationState::hasEnded
+  </li>
+  <li>
+Allow access to const
+version of OverlayElement factory list.
+  </li>
+  <li>
+Allow setMaterial() on
+Entity/SubEntity as well as setMaterialName, for efficiency
+  </li>
+  <li>
+STLport build option
+fixed
+  </li>
+  <li>
+Fixed uninitialised
+typeName in Exception
+  </li>
+  <li>
+Fix various compiler
+warnings
+  </li>
+</ul>
+
+
+
+<p class="mainheader">
     v1.6.0 [Shoggoth] (3 November 2008) - Major Release</p>
 <p> <b></b>
 </p>

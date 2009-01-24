@@ -92,10 +92,40 @@ namespace Ogre
 			// Round local x/y position based on a world-space texel; this helps to reduce
 			// jittering caused by the projection moving with the camera
 			// Viewport is 2 * near clip distance across (90 degree fov)
-			Real worldTexelSize = (texCam->getNearClipDistance() * 20) / vp->getActualWidth();
-			pos.x -= fmod(pos.x, worldTexelSize);
-			pos.y -= fmod(pos.y, worldTexelSize);
-			pos.z -= fmod(pos.z, worldTexelSize);
+			//~ Real worldTexelSize = (texCam->getNearClipDistance() * 20) / vp->getActualWidth();
+			//~ pos.x -= fmod(pos.x, worldTexelSize);
+			//~ pos.y -= fmod(pos.y, worldTexelSize);
+			//~ pos.z -= fmod(pos.z, worldTexelSize);
+			Real worldTexelSize = (shadowDist * 2) / texCam->getViewport()->getActualWidth();
+
+			 //get texCam orientation
+
+			 Vector3 up = Vector3::UNIT_Y;
+			 // Check it's not coincident with dir
+			 if (Math::Abs(up.dotProduct(dir)) >= 1.0f)
+			 {
+				// Use camera up
+				up = Vector3::UNIT_Z;
+			 }
+			 // cross twice to rederive, only direction is unaltered
+			 Vector3 left = dir.crossProduct(up);
+			 left.normalise();
+			 up = dir.crossProduct(left);
+			 up.normalise();
+			 // Derive quaternion from axes
+			 Quaternion q;
+			 q.FromAxes(left, up, dir);
+
+			 //convert world space camera position into light space
+			 Vector3 lightSpacePos = q.Inverse() * pos;
+			 
+			 //snap to nearest texel
+			 lightSpacePos.x -= fmod(lightSpacePos.x, worldTexelSize);
+			 lightSpacePos.y -= fmod(lightSpacePos.y, worldTexelSize);
+
+			 //convert back to world space
+			 pos = q * lightSpacePos;
+			
 		}
 		// Spotlight
 		else if (light->getType() == Light::LT_SPOTLIGHT)
