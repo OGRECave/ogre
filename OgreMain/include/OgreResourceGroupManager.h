@@ -795,7 +795,20 @@ namespace Ogre {
 
 		/** Retrieve the modification time of a given file */
 		time_t resourceModifiedTime(const String& group, const String& filename); 
-        
+        /** List all resource locations in a resource group.
+        @param groupName The name of the group
+        @returns A list of resource locations matching the criteria
+        */
+        StringVectorPtr listResourceLocations(const String& groupName);
+
+        /** Find all resource location names matching a given pattern in a
+            resource group.
+        @param groupName The name of the group
+        @param pattern The pattern to search for; wildcards (*) are allowed
+        @returns A list of resource locations matching the criteria
+        */
+        StringVectorPtr findResourceLocation(const String& groupName, const String& pattern);
+
 		/** Retrieve the modification time of a given file */
 		time_t resourceModifiedTime(ResourceGroup* group, const String& filename); 
 

@@ -1658,6 +1658,65 @@ namespace Ogre {
 		return grp->name;
 	}
     //-----------------------------------------------------------------------
+    StringVectorPtr ResourceGroupManager::listResourceLocations(const String& groupName)
+    {
+        OGRE_LOCK_AUTO_MUTEX
+        StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+
+        // Try to find in resource index first
+        ResourceGroup* grp = getResourceGroup(groupName);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot locate a resource group called '" + groupName + "'", 
+                "ResourceGroupManager::listResourceNames");
+        }
+
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME) // lock group mutex
+
+        // Iterate over the archives
+        LocationList::iterator i, iend;
+        iend = grp->locationList.end();
+        for (i = grp->locationList.begin(); i != iend; ++i)
+        {
+            vec->push_back((*i)->archive->getName());
+        }
+
+        return vec;
+    }
+    //-----------------------------------------------------------------------
+    StringVectorPtr ResourceGroupManager::findResourceLocation(const String& groupName, const String& pattern)
+    {
+        OGRE_LOCK_AUTO_MUTEX
+        StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+
+        // Try to find in resource index first
+        ResourceGroup* grp = getResourceGroup(groupName);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot locate a resource group called '" + groupName + "'", 
+                "ResourceGroupManager::listResourceNames");
+        }
+
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME) // lock group mutex
+
+        // Iterate over the archives
+        LocationList::iterator i, iend;
+        iend = grp->locationList.end();
+        for (i = grp->locationList.begin(); i != iend; ++i)
+        {
+            String location = (*i)->archive->getName();
+            // Search for the pattern
+            if(StringUtil::match(location, pattern))
+            {
+                vec->push_back(location);
+            }
+        }
+
+        return vec;
+    }
+    //-----------------------------------------------------------------------
     void ResourceGroupManager::linkWorldGeometryToResourceGroup(const String& group, 
         const String& worldGeometry, SceneManager* sceneManager)
     {
