@@ -1318,7 +1318,7 @@ namespace Ogre {
             lodValue = materialLodStrategy->getValue(region, region->mCamera);
 
 		// Determine the current material technique
-		mTechnique = mMaterial->getTechnique(
+		mTechnique = mMaterial->getBestTechnique(
 			mMaterial->getLodIndex(lodValue));
 		GeometryBucketList::iterator i, iend;
 		iend =  mGeometryBucketList.end();
