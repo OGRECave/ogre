@@ -95,6 +95,7 @@ namespace Ogre {
         unsigned short mIndex; // pass index
         String mName; // optional name for the pass
         uint32 mHash; // pass hash
+		bool mHashDirtyQueued; // needs to be dirtied when next loaded
         //-------------------------------------------------------------------------
         // Colour properties, only applicable in fixed-function passes
         ColourValue mAmbient;
