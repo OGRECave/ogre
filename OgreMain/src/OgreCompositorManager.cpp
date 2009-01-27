@@ -263,6 +263,8 @@ void CompositorManager::_reconstructAllCompositorResources()
 {
 	// In order to deal with shared resources, we have to disable *all* compositors
 	// first, that way shared resources will get freed
+	typedef vector<CompositorInstance*>::type InstVec;
+	InstVec instancesToReenable;
 	for (Chains::iterator i = mChains.begin(); i != mChains.end(); ++i)
 	{
 		CompositorChain* chain = i->second;
@@ -273,22 +275,15 @@ void CompositorManager::_reconstructAllCompositorResources()
 			if (inst->getEnabled())
 			{
 				inst->setEnabled(false);
+				instancesToReenable.push_back(inst);
 			}
 		}
 	}
 
-	for (Chains::iterator i = mChains.begin(); i != mChains.end(); ++i)
+	for (InstVec::iterator i = instancesToReenable.begin(); i != instancesToReenable.end(); ++i)
 	{
-		CompositorChain* chain = i->second;
-		CompositorChain::InstanceIterator instIt = chain->getCompositors();
-		while (instIt.hasMoreElements())
-		{
-			CompositorInstance* inst = instIt.getNext();
-			if (inst->getEnabled())
-			{
-				inst->setEnabled(true);
-			}
-		}
+		CompositorInstance* inst = *i;
+		inst->setEnabled(true);
 	}
 }
 //---------------------------------------------------------------------
