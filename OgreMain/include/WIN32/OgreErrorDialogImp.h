@@ -30,15 +30,8 @@ Torus Knot Software Ltd.
 #define __WIN32ERRORDIALOG_H__
 
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX // required to stop windows.h messing up std::min
 #include "windows.h"
-
-//Get around Windows hackery
-#ifdef max
-#  undef max
-#endif
-#ifdef min
-#  undef min
-#endif
 
 namespace Ogre
 {

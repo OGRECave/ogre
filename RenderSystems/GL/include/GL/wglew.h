@@ -40,10 +40,9 @@
 #define __wglext_h_
 
 #if !defined(APIENTRY) && !defined(__CYGWIN__)
-#  ifndef WIN32_LEAN_AND_MEAN
-#    define WIN32_LEAN_AND_MEAN 1
-#  endif
-#include <windows.h>
+#  define WIN32_LEAN_AND_MEAN
+#  define NOMINMAX // required to stop windows.h messing up std::min
+#  include <windows.h>
 #endif
 
 /*

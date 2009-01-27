@@ -718,7 +718,9 @@ char *yytext;
 #include "ts1.0_inst_list.h"
 #include "_ts1.0_parser.h"
 #ifdef _WIN32
-# include <windows.h>
+#  define WIN32_LEAN_AND_MEAN
+#  define NOMINMAX // required to stop windows.h messing up std::min
+#  include <windows.h>
 #endif
 #include <GL/glew.h>
 #include "nvparse_errors.h"

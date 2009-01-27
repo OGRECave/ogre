@@ -169,7 +169,9 @@ void yyerror(char* s);
 int yylex ( void );
 
 #ifdef _WIN32
-# include <windows.h>
+#  define WIN32_LEAN_AND_MEAN
+#  define NOMINMAX // required to stop windows.h messing up std::min
+#  include <windows.h>
 #endif
 
 #include <stdio.h>
