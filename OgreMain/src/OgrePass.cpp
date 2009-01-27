@@ -117,6 +117,7 @@ namespace Ogre {
         : mParent(parent)
 		, mIndex(index)
 		, mHash(0)
+		, mHashDirtyQueued(false)
 		, mAmbient(ColourValue::White)
 		, mDiffuse(ColourValue::White)
 		, mSpecular(ColourValue::Black)
@@ -185,7 +186,8 @@ namespace Ogre {
         // default name to index
         mName = StringConverter::toString(mIndex);
 
-        _dirtyHash();
+		// init the hash inline
+		_recalculateHash();
    }
 
     //-----------------------------------------------------------------------------
@@ -196,7 +198,9 @@ namespace Ogre {
         mParent = parent;
         mIndex = index;
         mQueuedForDeletion = false;
-        _dirtyHash();
+
+		// init the hash inline
+		_recalculateHash();
     }
     //-----------------------------------------------------------------------------
     Pass::~Pass()
@@ -1205,6 +1209,11 @@ namespace Ogre {
 			mShadowReceiverFragmentProgramUsage->_load();
 		}
 
+		if (mHashDirtyQueued)
+		{
+			_dirtyHash();
+		}
+
 	}
     //-----------------------------------------------------------------------
 	void Pass::_unload(void)
@@ -1423,9 +1432,17 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void Pass::_dirtyHash(void)
 	{
-		OGRE_LOCK_MUTEX(msDirtyHashListMutex)
-		// Mark this hash as for follow up
-		msDirtyHashList.insert(this);
+		if (mParent->getParent()->isLoaded())
+		{
+			OGRE_LOCK_MUTEX(msDirtyHashListMutex)
+			// Mark this hash as for follow up
+			msDirtyHashList.insert(this);
+			mHashDirtyQueued = false;
+		}
+		else
+		{
+			mHashDirtyQueued = true;
+		}
 	}
 	//---------------------------------------------------------------------
 	void Pass::clearDirtyHashList(void) 

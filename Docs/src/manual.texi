@@ -559,6 +559,8 @@ Here are the attributes you can use in a 'pass' section of a .material script:
 @item
 @ref{illumination_stage}
 @item
+@ref{transparent_sorting}
+@item
 @ref{normalise_normals}
 @item
 @ref{cull_hardware}
