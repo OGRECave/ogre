@@ -76,7 +76,7 @@ namespace Ogre {
         template< class Y>
 		explicit SharedPtr(Y* rep, SharedPtrFreeMethod freeMethod = SPFM_DELETE) 
 			: pRep(rep)
-			, pUseCount(OGRE_NEW_T(unsigned int, MEMCATEGORY_GENERAL)(1))
+			, pUseCount(rep ? OGRE_NEW_T(unsigned int, MEMCATEGORY_GENERAL)(1) : 0)
 			, useFreeMethod(freeMethod)
 		{
             OGRE_SET_AUTO_SHARED_MUTEX_NULL
