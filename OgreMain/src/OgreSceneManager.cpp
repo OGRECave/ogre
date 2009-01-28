@@ -2109,6 +2109,8 @@ void SceneManager::_renderVisibleObjects(void)
 //-----------------------------------------------------------------------
 void SceneManager::renderVisibleObjectsCustomSequence(RenderQueueInvocationSequence* seq)
 {
+	firePostRenderQueues();
+
 	RenderQueueInvocationIterator invocationIt = seq->iterator();
 	while (invocationIt.hasMoreElements())
 	{
@@ -2148,10 +2150,14 @@ void SceneManager::renderVisibleObjectsCustomSequence(RenderQueueInvocationSeque
 
 
 	}
+
+	firePostRenderQueues();
 }
 //-----------------------------------------------------------------------
 void SceneManager::renderVisibleObjectsDefaultSequence(void)
 {
+	firePreRenderQueues();
+
     // Render each separate queue
     RenderQueue::QueueGroupIterator queueIt = getRenderQueue()->_getQueueGroupIterator();
 
@@ -2199,6 +2205,8 @@ void SceneManager::renderVisibleObjectsDefaultSequence(void)
         } while (repeatQueue);
 
     } // for each queue group
+
+	firePostRenderQueues();
 
 }
 //-----------------------------------------------------------------------
@@ -3777,6 +3785,24 @@ void SceneManager::removeListener(Listener* delListener)
         }
     }
 
+}
+//---------------------------------------------------------------------
+void SceneManager::firePreRenderQueues()
+{
+	for (RenderQueueListenerList::iterator i = mRenderQueueListeners.begin(); 
+		i != mRenderQueueListeners.end(); ++i)
+	{
+		(*i)->preRenderQueues();
+	}
+}
+//---------------------------------------------------------------------
+void SceneManager::firePostRenderQueues()
+{
+	for (RenderQueueListenerList::iterator i = mRenderQueueListeners.begin(); 
+		i != mRenderQueueListeners.end(); ++i)
+	{
+		(*i)->postRenderQueues();
+	}
 }
 //---------------------------------------------------------------------
 bool SceneManager::fireRenderQueueStarted(uint8 id, const String& invocation)

@@ -52,6 +52,14 @@ namespace Ogre {
     {
     public:
 		virtual ~RenderQueueListener() {}
+
+		/** Event raised before all render queues are processed. 
+		*/
+		virtual void preRenderQueues() {}
+		/** Event raised after all render queues are processed. 
+		*/
+		virtual void postRenderQueues() {}
+
         /** Event raised before a queue group is rendered. 
         @remarks
             This method is called by the SceneManager before each queue group is
@@ -65,7 +73,7 @@ namespace Ogre {
 			for this queue group.
         */
         virtual void renderQueueStarted(uint8 queueGroupId, const String& invocation, 
-			bool& skipThisInvocation) = 0;
+			bool& skipThisInvocation) {}
 
         /** Event raised after a queue group is rendered. 
         @remarks
@@ -80,7 +88,7 @@ namespace Ogre {
 			events will also be fired for it again.
         */
         virtual void renderQueueEnded(uint8 queueGroupId, const String& invocation, 
-			bool& repeatThisInvocation) = 0;
+			bool& repeatThisInvocation) {}
     };
 
 }

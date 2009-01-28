@@ -590,6 +590,10 @@ namespace Ogre {
 
         typedef vector<Listener*>::type ListenerList;
         ListenerList mListeners;
+		/// Internal method for firing the queue start event
+		virtual void firePreRenderQueues();
+		/// Internal method for firing the queue end event
+		virtual void firePostRenderQueues();
         /// Internal method for firing the queue start event, returns true if queue is to be skipped
         virtual bool fireRenderQueueStarted(uint8 id, const String& invocation);
         /// Internal method for firing the queue end event, returns true if queue is to be repeated
