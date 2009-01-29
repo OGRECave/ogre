@@ -119,6 +119,7 @@ namespace Ogre {
             VertexElementType getColourVertexElementType(void) const;
             void setNormaliseNormals(bool normalise);
             void _useLights(const LightList& lights, unsigned short limit);
+			bool areFixedFunctionLightsInViewSpace() const { return true; }
             void _setWorldMatrix(const Matrix4 &m);
             void _setViewMatrix(const Matrix4 &m);
             void _setProjectionMatrix(const Matrix4 &m);

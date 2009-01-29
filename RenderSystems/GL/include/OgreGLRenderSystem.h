@@ -238,6 +238,10 @@ namespace Ogre {
         /** See
           RenderSystem
          */
+		bool areFixedFunctionLightsInViewSpace() const { return true; }
+        /** See
+          RenderSystem
+         */
         void _setWorldMatrix(const Matrix4 &m);
         /** See
           RenderSystem

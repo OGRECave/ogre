@@ -471,6 +471,9 @@ namespace Ogre
 		up to the number specified (this allows the same list to be used with different
 		count limits) */
 		virtual void _useLights(const LightList& lights, unsigned short limit) = 0;
+		/** Are fixed-function lights provided in view space? Affects optimisation. 
+		*/
+		virtual bool areFixedFunctionLightsInViewSpace() const { return false; }
 		/** Sets the world transform matrix. */
 		virtual void _setWorldMatrix(const Matrix4 &m) = 0;
 		/** Sets multiple world matrices (vertex blending). */

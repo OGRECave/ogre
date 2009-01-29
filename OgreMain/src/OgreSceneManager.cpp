@@ -6539,7 +6539,8 @@ void SceneManager::_handleLodEvents()
 void SceneManager::useLights(const LightList& lights, unsigned short limit)
 {
 	// only call the rendersystem if light list has changed
-	if (lights.getHash() != mLastLightHash || limit > mLastLightLimit)
+	if (mDestRenderSystem->areFixedFunctionLightsInViewSpace() ||
+		lights.getHash() != mLastLightHash || limit != mLastLightLimit)
 	{
 		mDestRenderSystem->_useLights(lights, limit);
 		mLastLightHash = lights.getHash();
