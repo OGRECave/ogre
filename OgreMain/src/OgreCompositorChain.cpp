@@ -264,8 +264,6 @@ void CompositorChain::postTargetOperation(CompositorInstance::TargetOperation &o
     SceneManager *sm = cam->getSceneManager();
 	/// Unregister our listener
 	sm->removeRenderQueueListener(&mOurListener);
-	/// Flush remaing operations
-	mOurListener.flushUpTo((uint8)RENDER_QUEUE_COUNT);
 	/// Restore default scene and camera settings
 	sm->setVisibilityMask(mOldVisibilityMask);
 	sm->setFindVisibleObjects(mOldFindVisibleObjects);
