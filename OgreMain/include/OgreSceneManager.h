@@ -914,6 +914,7 @@ namespace Ogre {
 		uint16 mGpuParamsDirty;
 
 		virtual void useLights(const LightList& lights, unsigned short limit);
+		virtual void setViewMatrix(const Matrix4& m);
 		virtual void useLightsGpuProgram(const Pass* pass, const LightList* lights);
 		virtual void bindGpuProgram(GpuProgram* prog);
 		virtual void updateGpuProgramParameters(const Pass* p);

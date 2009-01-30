@@ -1407,7 +1407,8 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 	}
 	mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, camera->getDerivedPosition());
 
-	mDestRenderSystem->_setViewMatrix(mCachedViewMatrix);
+	
+	setViewMatrix(mCachedViewMatrix);
 
     // Render scene content
 	{
@@ -3623,7 +3624,7 @@ void SceneManager::manualRender(RenderOperation* rend,
 {
     mDestRenderSystem->_setViewport(vp);
     mDestRenderSystem->_setWorldMatrix(worldMatrix);
-    mDestRenderSystem->_setViewMatrix(viewMatrix);
+    setViewMatrix(viewMatrix);
     mDestRenderSystem->_setProjectionMatrix(projMatrix);
 
     if (doBeginEndFrame)
@@ -3658,7 +3659,7 @@ void SceneManager::useRenderableViewProjMode(const Renderable* pRend, bool fixed
     {
         // Using identity view now, change it
 		if (fixedFunction)
-			mDestRenderSystem->_setViewMatrix(Matrix4::IDENTITY);
+			setViewMatrix(Matrix4::IDENTITY);
 		mGpuParamsDirty |= (uint16)GPV_GLOBAL;
         mResetIdentityView = true;
     }
@@ -3687,7 +3688,7 @@ void SceneManager::resetViewProjMode(bool fixedFunction)
     {
         // Coming back to normal from identity view
 		if (fixedFunction)
-			mDestRenderSystem->_setViewMatrix(mCachedViewMatrix);
+			setViewMatrix(mCachedViewMatrix);
 		mGpuParamsDirty |= (uint16)GPV_GLOBAL;
 
         mResetIdentityView = false;
@@ -6536,11 +6537,20 @@ void SceneManager::_handleLodEvents()
     mEntityMaterialLodChangedEvents.clear();
 }
 //---------------------------------------------------------------------
+void SceneManager::setViewMatrix(const Matrix4& m)
+{
+	mDestRenderSystem->_setViewMatrix(m);
+	if (mDestRenderSystem->areFixedFunctionLightsInViewSpace())
+	{
+		// reset light hash if we've got lights already set
+		mLastLightHash = mLastLightHash ? 0 : mLastLightHash;
+	}
+}
+//---------------------------------------------------------------------
 void SceneManager::useLights(const LightList& lights, unsigned short limit)
 {
 	// only call the rendersystem if light list has changed
-	if (mDestRenderSystem->areFixedFunctionLightsInViewSpace() ||
-		lights.getHash() != mLastLightHash || limit != mLastLightLimit)
+	if (lights.getHash() != mLastLightHash || limit != mLastLightLimit)
 	{
 		mDestRenderSystem->_useLights(lights, limit);
 		mLastLightHash = lights.getHash();
