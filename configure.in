@@ -258,9 +258,6 @@ AC_CONFIG_FILES([Makefile \
     Tests/Makefile \
     Tests/src/Makefile \
     Tools/Makefile \
-    Tools/MaterialUpgrader/Makefile \
-    Tools/MaterialUpgrader/src/Makefile \
-    Tools/MaterialUpgrader/include/Makefile \
     Tools/MeshUpgrader/Makefile \
     Tools/MeshUpgrader/src/Makefile \
     Tools/XMLConverter/Makefile \

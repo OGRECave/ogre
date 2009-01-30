@@ -335,9 +335,6 @@
 		<Project filename="Tools\MeshUpgrader\scripts\MeshUpgrader.cbp">
 			<Depends filename="OgreMain\scripts\OgreMain.cbp" />
 		</Project>
-		<Project filename="Tools\MaterialUpgrader\scripts\MaterialUpgrader.cbp">
-			<Depends filename="OgreMain\scripts\OgreMain.cbp" />
-		</Project>
 		<Project filename="Samples\PCZTestApp\scripts\PCZTestApp.cbp" active="1">
 			<Depends filename="OgreMain\scripts\OgreMain.cbp" />
 			<Depends filename="PlugIns\BSPSceneManager\scripts\Plugin_BSPSceneManager.cbp" />

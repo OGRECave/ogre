@@ -427,15 +427,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Demo_Water", "Samples\Water
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MaterialUpgrader", "Tools\MaterialUpgrader\scripts\MaterialUpgrader_vc9.vcproj", "{2BA1BBEE-CE27-48D6-A89D-EBAA81D40B6D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{35AFBABB-DF05-43DE-91A7-BB828A874015} = {35AFBABB-DF05-43DE-91A7-BB828A874015}
-	EndProjectSection
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshUpgrader", "Tools\MeshUpgrader\scripts\MeshUpgrader_vc9.vcproj", "{6B3CABED-0D07-4AF0-8931-929B9B28BA8B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{35AFBABB-DF05-43DE-91A7-BB828A874015} = {35AFBABB-DF05-43DE-91A7-BB828A874015}
@@ -924,12 +915,6 @@ Global
 		{C7167FBD-F166-4DEA-B50B-9F25E28B75F6}.Release|Win32.ActiveCfg = Release|Win32
 		{C7167FBD-F166-4DEA-B50B-9F25E28B75F6}.Release|Win32.Build.0 = Release|Win32
 		{C7167FBD-F166-4DEA-B50B-9F25E28B75F6}.ReleaseStaticLib|Win32.ActiveCfg = Release|Win32
-		{2BA1BBEE-CE27-48D6-A89D-EBAA81D40B6D}.Debug|Win32.ActiveCfg = Debug|Win32
-		{2BA1BBEE-CE27-48D6-A89D-EBAA81D40B6D}.Debug|Win32.Build.0 = Debug|Win32
-		{2BA1BBEE-CE27-48D6-A89D-EBAA81D40B6D}.DebugStaticLib|Win32.ActiveCfg = Debug|Win32
-		{2BA1BBEE-CE27-48D6-A89D-EBAA81D40B6D}.Release|Win32.ActiveCfg = Release|Win32
-		{2BA1BBEE-CE27-48D6-A89D-EBAA81D40B6D}.Release|Win32.Build.0 = Release|Win32
-		{2BA1BBEE-CE27-48D6-A89D-EBAA81D40B6D}.ReleaseStaticLib|Win32.ActiveCfg = Release|Win32
 		{6B3CABED-0D07-4AF0-8931-929B9B28BA8B}.Debug|Win32.ActiveCfg = Debug|Win32
 		{6B3CABED-0D07-4AF0-8931-929B9B28BA8B}.Debug|Win32.Build.0 = Debug|Win32
 		{6B3CABED-0D07-4AF0-8931-929B9B28BA8B}.DebugStaticLib|Win32.ActiveCfg = Debug|Win32
