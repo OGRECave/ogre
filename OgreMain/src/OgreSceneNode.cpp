@@ -44,6 +44,7 @@ namespace Ogre {
         : Node()
         , mWireBoundingBox(0)
         , mShowBoundingBox(false)
+        , mHideBoundingBox(false)
         , mCreator(creator)
         , mYawFixed(false)
         , mAutoTrackTarget(0)
@@ -56,6 +57,7 @@ namespace Ogre {
         : Node(name)
         , mWireBoundingBox(0)
         , mShowBoundingBox(false)
+        , mHideBoundingBox(false)
         , mCreator(creator)
         , mYawFixed(false)
         , mAutoTrackTarget(0)
@@ -328,7 +330,8 @@ namespace Ogre {
 
 		// Check if the bounding box should be shown.
 		// See if our flag is set or if the scene manager flag is set.
-		if (mShowBoundingBox || (mCreator && mCreator->getShowBoundingBoxes())) 
+		if ( !mHideBoundingBox &&
+             (mShowBoundingBox || (mCreator && mCreator->getShowBoundingBoxes())) )
 		{ 
 			_addBoundingBoxToQueue(queue);
 		}
@@ -354,6 +357,9 @@ namespace Ogre {
 		return mShowBoundingBox;
 	}
 
+	void SceneNode::hideBoundingBox(bool bHide) {
+		mHideBoundingBox = bHide;
+	}
 
     //-----------------------------------------------------------------------
     void SceneNode::updateFromParentImpl(void) const

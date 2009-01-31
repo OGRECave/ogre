@@ -63,6 +63,7 @@ namespace Ogre {
 		WireBoundingBox *mWireBoundingBox;
 		/// Flag that determines if the bounding box of the node should be displayed
 		bool mShowBoundingBox;
+        bool mHideBoundingBox;
 
         /// SceneManager which created this node
         SceneManager* mCreator;
@@ -277,6 +278,13 @@ namespace Ogre {
             Use this to show or hide the bounding box of the node.
         */
 		virtual void showBoundingBox(bool bShow);
+
+        /** Allows the overriding of the node's bounding box
+            over the SceneManager's bounding box setting.
+        @remarks
+            Use this to override the bounding box setting of the node.
+        */
+		virtual void hideBoundingBox(bool bHide);
 
         /** Add the bounding box to the rendering queue.
         */
