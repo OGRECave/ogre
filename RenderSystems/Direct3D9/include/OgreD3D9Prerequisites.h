@@ -39,6 +39,10 @@ Torus Knot Software Ltd.
 #define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
 #define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
 
+// enable extended d3d debug 
+#if OGRE_DEBUG_MODE
+#	define D3D_DEBUG_INFO
+#endif
 
 #undef NOMINMAX
 #define NOMINMAX // required to stop windows.h screwing up std::min definition
