@@ -91,6 +91,21 @@ namespace Ogre
 			m[2][2] = fEntry22;
 		}
 
+		/** Exchange the contents of this matrix with another. 
+		*/
+		inline void swap(Matrix3& other)
+		{
+			std::swap(m[0][0], other.m[0][0]);
+			std::swap(m[0][1], other.m[0][1]);
+			std::swap(m[0][2], other.m[0][2]);
+			std::swap(m[1][0], other.m[1][0]);
+			std::swap(m[1][1], other.m[1][1]);
+			std::swap(m[1][2], other.m[1][2]);
+			std::swap(m[2][0], other.m[2][0]);
+			std::swap(m[2][1], other.m[2][1]);
+			std::swap(m[2][2], other.m[2][2]);
+		}
+
         // member access, allows use of construct mat[r][c]
         inline Real* operator[] (size_t iRow) const
 		{

@@ -86,6 +86,16 @@ namespace Ogre
         {
         }
 
+		/** Exchange the contents of this vector with another. 
+		*/
+		inline void swap(Vector4& other)
+		{
+			std::swap(x, other.x);
+			std::swap(y, other.y);
+			std::swap(z, other.z);
+			std::swap(w, other.w);
+		}
+	
 		inline Real operator [] ( const size_t i ) const
         {
             assert( i < 4 );
@@ -389,3 +399,4 @@ namespace Ogre
 
 }
 #endif
+

@@ -88,6 +88,16 @@ namespace Ogre {
 			memcpy(&w, valptr, sizeof(Real)*4);
 		}
 
+		/** Exchange the contents of this quaternion with another. 
+		*/
+		inline void swap(Quaternion& other)
+		{
+			std::swap(w, other.w);
+			std::swap(x, other.x);
+			std::swap(y, other.y);
+			std::swap(z, other.z);
+		}
+
 		/// Array accessor operator
 		inline Real operator [] ( const size_t i ) const
 		{
