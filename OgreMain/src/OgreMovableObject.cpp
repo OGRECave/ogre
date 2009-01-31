@@ -162,7 +162,7 @@ namespace Ogre {
 
     }
 	//---------------------------------------------------------------------
-	void MovableObject::detatchFromParent(void)
+	void MovableObject::detachFromParent(void)
 	{
 		if (isAttached())
 		{
