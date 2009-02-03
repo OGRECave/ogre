@@ -31,22 +31,17 @@ Torus Knot Software Ltd.
 
 #include "OgreD3D9Prerequisites.h"
 #include "OgreHardwareIndexBuffer.h"
+#include "OgreD3D9Resource.h"
 
 namespace Ogre { 
 
 
-    class D3D9HardwareIndexBuffer : public HardwareIndexBuffer
+    class D3D9HardwareIndexBuffer : public HardwareIndexBuffer, public D3D9Resource
     {
-    protected:
-        LPDIRECT3DINDEXBUFFER9 mlpD3DBuffer;
-		D3DPOOL mD3DPool;
-        /** See HardwareBuffer. */
-        void* lockImpl(size_t offset, size_t length, LockOptions options);
-        /** See HardwareBuffer. */
-		void unlockImpl(void);
+  
     public:
 		D3D9HardwareIndexBuffer(IndexType idxType, size_t numIndexes, 
-			HardwareBuffer::Usage usage, LPDIRECT3DDEVICE9 pDev, bool useSystemMem, bool useShadowBuffer);
+			HardwareBuffer::Usage usage, bool useSystemMem, bool useShadowBuffer);
         ~D3D9HardwareIndexBuffer();
         /** See HardwareBuffer. */
         void readData(size_t offset, size_t length, void* pDest);
@@ -54,19 +49,51 @@ namespace Ogre {
         void writeData(size_t offset, size_t length, const void* pSource,
 				bool discardWholeBuffer = false);
 
-		/// For dealing with lost devices - release the resource if in the default pool
-		bool releaseIfDefaultPool(void);
-		/// For dealing with lost devices - recreate the resource if in the default pool
-		bool recreateIfDefaultPool(LPDIRECT3DDEVICE9 pDev);
+		// Called immediately after the Direct3D device has been created.
+		virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
 
+		// Called before the Direct3D device is going to be destroyed.
+		virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
+
+		// Called immediately after the Direct3D device has entered a lost state.
+		virtual void notifyOnDeviceLost(IDirect3DDevice9* d3d9Device);
+
+		// Called immediately after the Direct3D device has been reset
+		virtual void notifyOnDeviceReset(IDirect3DDevice9* d3d9Device);
+
+		// Create the actual index buffer.
+		void createBuffer(IDirect3DDevice9* d3d9Device, D3DPOOL ePool);
+	
 		/// Get the D3D-specific index buffer
-        LPDIRECT3DINDEXBUFFER9 getD3DIndexBuffer(void) { return mlpD3DBuffer; }
+        IDirect3DIndexBuffer9* getD3DIndexBuffer(void);		
 
+	protected:
+		struct BufferResources
+		{
+			IDirect3DIndexBuffer9*		mBuffer;
+			bool						mOutOfDate;
+			size_t						mLockOffset;
+			size_t						mLockLength;
+			LockOptions					mLockOptions;
+			uint						mLastUsedFrame;
+		};
 
+	protected:
+		/** See HardwareBuffer. */
+		void* lockImpl(size_t offset, size_t length, LockOptions options);
+		/** See HardwareBuffer. */
+		void unlockImpl(void);
+		// updates buffer resources from system memory buffer.
+		bool updateBufferResources(const char* systemMemoryBuffer, BufferResources* bufferResources);
 
+	protected:		
+		typedef std::map<IDirect3DDevice9*, BufferResources*>	DeviceToBufferResourcesMap;
+		typedef DeviceToBufferResourcesMap::iterator			DeviceToBufferResourcesIterator;
+
+		DeviceToBufferResourcesMap	mMapDeviceToBufferResources;	// Map between device to buffer resources.	
+		D3DINDEXBUFFER_DESC			mBufferDesc;					// Buffer description.		
+		char*						mSystemMemoryBuffer;			// Consistent system memory buffer for multiple devices support.
     };
-
-
 }
 
 

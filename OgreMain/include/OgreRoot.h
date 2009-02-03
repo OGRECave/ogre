@@ -891,6 +891,11 @@ namespace Ogre
 			registered.
 		*/
 		MovableObjectFactoryIterator getMovableObjectFactoryIterator(void) const;
+
+		/**
+		* Gets the number of display monitors.
+		*/
+		virtual unsigned int getDisplayMonitorCount() const;
     };
 } // Namespace Ogre
 #endif

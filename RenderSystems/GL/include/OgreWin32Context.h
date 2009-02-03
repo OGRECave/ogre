@@ -48,6 +48,8 @@ namespace Ogre {
 		/// @copydoc GLContext::clone
 		GLContext* clone() const;
 
+		virtual void releaseContext();
+
 	protected:
         HDC     mHDC;
         HGLRC   mGlrc;

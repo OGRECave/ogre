@@ -32,8 +32,8 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
     //-----------------------------------------------------------------------------
-    D3D9GpuProgramManager::D3D9GpuProgramManager(LPDIRECT3DDEVICE9 device)
-        :GpuProgramManager(), mpDevice(device)
+    D3D9GpuProgramManager::D3D9GpuProgramManager()
+        :GpuProgramManager()
     {
         // Superclass sets up members 
 
@@ -65,12 +65,12 @@ namespace Ogre {
         if (paramIt->second == "vertex_program")
         {
             return new D3D9GpuVertexProgram(this, name, handle, group, 
-                isManual, loader, mpDevice);
+                isManual, loader);
         }
         else
         {
             return new D3D9GpuFragmentProgram(this, name, handle, group, 
-                isManual, loader, mpDevice);
+                isManual, loader);
         }
     }
     //-----------------------------------------------------------------------------
@@ -81,12 +81,12 @@ namespace Ogre {
         if (gptype == GPT_VERTEX_PROGRAM)
         {
             return new D3D9GpuVertexProgram(this, name, handle, group, 
-                isManual, loader, mpDevice);
+                isManual, loader);
         }
         else
         {
             return new D3D9GpuFragmentProgram(this, name, handle, group, 
-                isManual, loader, mpDevice);
+                isManual, loader);
         }
     }
 }

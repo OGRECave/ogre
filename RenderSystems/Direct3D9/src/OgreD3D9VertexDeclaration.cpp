@@ -30,25 +30,26 @@ Torus Knot Software Ltd.
 #include "OgreD3D9Mappings.h"
 #include "OgreException.h"
 #include "OgreRoot.h"
+#include "OgreD3D9RenderSystem.h"
 
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    D3D9VertexDeclaration::D3D9VertexDeclaration(LPDIRECT3DDEVICE9 device) 
-        : mlpD3DDevice(device), mlpD3DDecl(NULL), mNeedsRebuild(true)
+    D3D9VertexDeclaration::D3D9VertexDeclaration()         
     {
+
     }
     //-----------------------------------------------------------------------
     D3D9VertexDeclaration::~D3D9VertexDeclaration()
     {
-        SAFE_RELEASE(mlpD3DDecl);
+       releaseDeclaration();
     }
     //-----------------------------------------------------------------------
     const VertexElement& D3D9VertexDeclaration::addElement(unsigned short source, 
         size_t offset, VertexElementType theType,
         VertexElementSemantic semantic, unsigned short index)
     {
-        mNeedsRebuild = true;
+        releaseDeclaration();   
         return VertexDeclaration::addElement(source, offset, theType, semantic, index);
     }
     //-----------------------------------------------------------------------------
@@ -56,26 +57,26 @@ namespace Ogre {
         unsigned short source, size_t offset, VertexElementType theType,
         VertexElementSemantic semantic, unsigned short index)
     {
-        mNeedsRebuild = true;
+        releaseDeclaration();   
         return VertexDeclaration::insertElement(atPosition, source, offset, theType, semantic, index);
     }
     //-----------------------------------------------------------------------
     void D3D9VertexDeclaration::removeElement(unsigned short elem_index)
     {
         VertexDeclaration::removeElement(elem_index);
-        mNeedsRebuild = true;
+        releaseDeclaration();   
     }
 	//-----------------------------------------------------------------------
 	void D3D9VertexDeclaration::removeElement(VertexElementSemantic semantic, unsigned short index)
 	{
 		VertexDeclaration::removeElement(semantic, index);
-		mNeedsRebuild = true;
+		releaseDeclaration();   
 	}
 	//-----------------------------------------------------------------------
 	void D3D9VertexDeclaration::removeAllElements(void)
 	{
 		VertexDeclaration::removeAllElements();
-		mNeedsRebuild = true;
+		releaseDeclaration();   
 	}
     //-----------------------------------------------------------------------
     void D3D9VertexDeclaration::modifyElement(unsigned short elem_index, 
@@ -83,25 +84,47 @@ namespace Ogre {
         VertexElementSemantic semantic, unsigned short index)
     {
         VertexDeclaration::modifyElement(elem_index, source, offset, theType, semantic, index);
-        mNeedsRebuild = true;
+		releaseDeclaration();       
     }
-    //-----------------------------------------------------------------------
-    LPDIRECT3DVERTEXDECLARATION9 D3D9VertexDeclaration::getD3DVertexDeclaration(void)
-    {
-        if (mNeedsRebuild)
-        {
-            SAFE_RELEASE(mlpD3DDecl);
-            // Create D3D elements
-            D3DVERTEXELEMENT9* d3delems = new D3DVERTEXELEMENT9[mElementList.size() + 1];
 
-            VertexElementList::const_iterator i, iend;
-            unsigned int idx;
-            iend = mElementList.end();
-            for (idx = 0, i = mElementList.begin(); i != iend; ++i, ++idx)
-            {
-                d3delems[idx].Method = D3DDECLMETHOD_DEFAULT;
-                d3delems[idx].Offset = static_cast<WORD>(i->getOffset());
-                d3delems[idx].Stream = i->getSource();
+	 //-----------------------------------------------------------------------
+	void D3D9VertexDeclaration::notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device)
+	{
+		
+	}
+
+	 //-----------------------------------------------------------------------
+	void D3D9VertexDeclaration::notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device)
+	{
+		DeviceToDeclarationIterator it = mMapDeviceToDeclaration.find(d3d9Device);
+
+		if (it != mMapDeviceToDeclaration.end())	
+		{
+			SAFE_RELEASE(it->second);	
+			mMapDeviceToDeclaration.erase(it);
+		}
+	}
+
+    //-----------------------------------------------------------------------
+    IDirect3DVertexDeclaration9* D3D9VertexDeclaration::getD3DVertexDeclaration(void)
+    {
+		IDirect3DDevice9* pCurDevice   = D3D9RenderSystem::getActiveD3D9Device();
+		DeviceToDeclarationIterator it = mMapDeviceToDeclaration.find(pCurDevice);
+		IDirect3DVertexDeclaration9* lpVertDecl = NULL;
+
+		// Case we have to create the declaration for this device.
+		if (it == mMapDeviceToDeclaration.end() || it->second == NULL)
+		{
+			D3DVERTEXELEMENT9* d3delems = new D3DVERTEXELEMENT9[mElementList.size() + 1];
+
+			VertexElementList::const_iterator i, iend;
+			unsigned int idx;
+			iend = mElementList.end();
+			for (idx = 0, i = mElementList.begin(); i != iend; ++i, ++idx)
+			{
+				d3delems[idx].Method = D3DDECLMETHOD_DEFAULT;
+				d3delems[idx].Offset = static_cast<WORD>(i->getOffset());
+				d3delems[idx].Stream = i->getSource();
 				d3delems[idx].Type = D3D9Mappings::get(i->getType());
 				d3delems[idx].Usage = D3D9Mappings::get(i->getSemantic());
 				// NB force index if colours since D3D uses the same usage for 
@@ -118,33 +141,53 @@ namespace Ogre {
 				{
 					d3delems[idx].UsageIndex = i->getIndex();
 				}
-            }
-            // Add terminator
-		    d3delems[idx].Stream = 0xff;
-		    d3delems[idx].Offset = 0;
-		    d3delems[idx].Type = D3DDECLTYPE_UNUSED;
-		    d3delems[idx].Method = 0;
-		    d3delems[idx].Usage = 0;
-		    d3delems[idx].UsageIndex = 0;
-            
-            HRESULT hr = mlpD3DDevice->CreateVertexDeclaration(d3delems, &mlpD3DDecl);
+			}
+			// Add terminator
+			d3delems[idx].Stream = 0xff;
+			d3delems[idx].Offset = 0;
+			d3delems[idx].Type = D3DDECLTYPE_UNUSED;
+			d3delems[idx].Method = 0;
+			d3delems[idx].Usage = 0;
+			d3delems[idx].UsageIndex = 0;
 
-            if (FAILED(hr))
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                    "Cannot create D3D9 vertex declaration: " + 
-                    Root::getSingleton().getErrorDescription(hr), 
-                    "Direct3D9VertexDeclaration::getD3DVertexDeclaration");
-            }
+			
+			HRESULT hr = pCurDevice->CreateVertexDeclaration(d3delems, &lpVertDecl);
 
-            delete [] d3delems;
+			if (FAILED(hr))
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+					"Cannot create D3D9 vertex declaration: " + 
+					Root::getSingleton().getErrorDescription(hr), 
+					"Direct3D9VertexDeclaration::getD3DVertexDeclaration");
+			}
 
-			mNeedsRebuild = false;
+			delete [] d3delems;
 
-        }
-        return mlpD3DDecl;
+			mMapDeviceToDeclaration[pCurDevice] = lpVertDecl;
+		}
+
+		// Declaration already exits.
+		else
+		{
+			lpVertDecl = mMapDeviceToDeclaration[pCurDevice];
+		}
+		
+        return lpVertDecl;
     }
     //-----------------------------------------------------------------------
+	void D3D9VertexDeclaration::releaseDeclaration()
+	{
+		DeviceToDeclarationIterator it = mMapDeviceToDeclaration.begin();
+
+		while (it != mMapDeviceToDeclaration.end())
+		{
+			SAFE_RELEASE(it->second);
+			++it;
+		}	
+		mMapDeviceToDeclaration.clear();
+	}
+
+	//-----------------------------------------------------------------------
 
 
 }

@@ -31,7 +31,7 @@ Torus Knot Software Ltd.
 
 #include "OgreD3D9Prerequisites.h"
 #include "OgreRenderWindow.h"
-#include "OgreD3D9Driver.h"
+#include "OgreD3D9Device.h"
 
 namespace Ogre 
 {
@@ -44,85 +44,71 @@ namespace Ogre
 		@param deviceIfSwapChain The existing D3D device to create an additional swap chain from, if this is not
 			the first window.
 		*/
-		D3D9RenderWindow(HINSTANCE instance, D3D9Driver *driver, bool isSwapChain);
-		~D3D9RenderWindow();
-		void create(const String& name, unsigned int width, unsigned int height,
-	            bool fullScreen, const NameValuePairList *miscParams);
-		void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
-		void destroy(void);
-		bool isActive() const;
-		bool isVisible() const;
-		bool isClosed() const { return mClosed; }
-		void reposition(int left, int top);
-		void resize(unsigned int width, unsigned int height);
-		void swapBuffers( bool waitForVSync = true );
-		HWND getWindowHandle() const { return mHWnd; }
+		D3D9RenderWindow					(HINSTANCE instance);
+		~D3D9RenderWindow					();
+		
+		
+		void				create				(const String& name, unsigned int width, unsigned int height,
+												 bool fullScreen, const NameValuePairList *miscParams);
+		void				setFullscreen		(bool fullScreen, unsigned int width, unsigned int height);
+		void				destroy				(void);
+		bool				isActive			() const;
+		bool				isVisible			() const;
+		bool 				isClosed			() const { return mClosed; }
+		void 				reposition			(int left, int top);
+		void 				resize				(unsigned int width, unsigned int height);
+		void 				swapBuffers			( bool waitForVSync = true );
+		HWND 				getWindowHandle		() const { return mHWnd; }				
+		IDirect3DDevice9*	getD3D9Device		();
+		D3D9Device*			getDevice			();
+		void				setDevice			(D3D9Device* device);
 
-		D3D9Driver* getDirectD3DDriver() { return mDriver; }
-		// changed to access driver member
-		LPDIRECT3DDEVICE9 getD3DDevice() { return mDriver->getD3DDevice(); }
-
-		void getCustomAttribute( const String& name, void* pData );
+		void				getCustomAttribute	(const String& name, void* pData);
+		
 		/** Overridden - see RenderTarget.
 		*/
-		virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
-		bool requiresTextureFlipping() const { return false; }
+		void				copyContentsToMemory	(const PixelBox &dst, FrameBuffer buffer);
+		bool				requiresTextureFlipping	() const { return false; }
 
 		// Method for dealing with resize / move & 3d library
-		void windowMovedOrResized();
-
-		/// Build the presentation parameters used with this window
-		void buildPresentParameters(void);
-
-		/// Get the presentation parameters used with this window
-		D3DPRESENT_PARAMETERS* getPresentationParameters(void) 
-		{ return &md3dpp; }
-
-		/// @copydoc RenderTarget::update
-		void update(bool swap);
-		
-		/** Create (or recreate) the D3D device or SwapChain for this window.
-		*/
-		void createD3DResources();
+		void				windowMovedOrResized	();
 	
-		/** Destroy the D3D device or SwapChain for this window.
-		*/
-		void destroyD3DResources();
+		/// Build the presentation parameters used with this window
+		void				buildPresentParameters	(D3DPRESENT_PARAMETERS* presentParams);
+		
+		/// @copydoc RenderTarget::update
+		void update(bool swap);				
 	
 		/// Accessor for render surface
-		LPDIRECT3DSURFACE9 getRenderSurface() { return mpRenderSurface; }
+		IDirect3DSurface9* getRenderSurface();
 
 		/// Are we in the middle of switching between fullscreen and windowed
-		bool _getSwitchingFullscreen() const { return mSwitchingFullscreen; }
+		bool _getSwitchingFullscreen() const;
+		
 		/// Indicate that fullscreen / windowed switching has finished
 		void _finishSwitchingFullscreen();
+	
+		/// Returns true if this window use depth buffer.
+		bool isDepthBuffered() const;
+
+		/// Returns true if this window should use NV perf hud adapter.
+		bool isNvPerfHUDEnable() const;
+
 	protected:
-		HINSTANCE mInstance;			// Process instance
-		D3D9Driver *mDriver;			// D3D9 driver
-		HWND	mHWnd;					// Win32 Window handle
-		int		mHeadIndex;				// Head adapater index.
-		bool	mIsExternal;			// window not created by Ogre
-		bool	mSizing;
-		bool	mClosed;
-		bool	mIsSwapChain;			// Is this a secondary window?
-		bool	mSwitchingFullscreen;	// Are we switching from fullscreen to windowed or vice versa
+		HINSTANCE					mInstance;				// Process instance
+		D3D9Device* 				mDevice;				// D3D9 device wrapper class.
+		bool						mDeviceValid;			// Device was validation succeeded.
+		HWND						mHWnd;					// Win32 Window handle		
+		bool						mIsExternal;			// window not created by Ogre
+		bool						mClosed;				// Is this window destroyed.		
+		bool						mSwitchingFullscreen;	// Are we switching from fullscreen to windowed or vice versa		
+		D3DMULTISAMPLE_TYPE			mFSAAType;				// AA type.
+		DWORD						mFSAAQuality;			// AA quality.
+		UINT						mDisplayFrequency;		// Display frequency.
+		bool						mVSync;					// Use vertical sync or not.
+		bool						mUseNVPerfHUD;			// Use NV Perf HUD.
 
-		// -------------------------------------------------------
-		// DirectX-specific
-		// -------------------------------------------------------
-
-		// Pointer to swap chain, only valid if mIsSwapChain
-		LPDIRECT3DSWAPCHAIN9 mpSwapChain;
-		D3DPRESENT_PARAMETERS md3dpp;
-		LPDIRECT3DSURFACE9 mpRenderSurface;
-		LPDIRECT3DSURFACE9 mpRenderZBuffer;
-		D3DMULTISAMPLE_TYPE mFSAAType;
-		DWORD mFSAAQuality;
-		UINT mDisplayFrequency;
-		bool mVSync;
-		bool mUseNVPerfHUD;
-
-
+		void updateWindowRect();
 	};
 }
 #endif

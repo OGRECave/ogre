@@ -63,6 +63,11 @@ namespace Ogre {
 		@note The caller is responsible for deleting the returned context.
 		*/
 		virtual GLContext* clone() const = 0;
+
+		/**
+		* Release the render context.
+		*/
+		virtual void releaseContext() {}
     protected:
         bool initialized;
     };

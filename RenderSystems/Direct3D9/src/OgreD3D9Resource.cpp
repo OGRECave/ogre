@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2006 Torus Knot Software Ltd
@@ -26,40 +26,19 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#ifndef __D3D9MULTIRENDERTARGET_H__
-#define __D3D9MULTIRENDERTARGET_H__
+#include "OgreD3D9Resource.h"
+#include "OgreD3D9ResourceManager.h"
+#include "OgreD3D9RenderSystem.h"
 
-#include "OgreD3D9Prerequisites.h"
-#include "OgreTexture.h"
-#include "OgreRenderTexture.h"
-#include "OgreImage.h"
-#include "OgreException.h"
-#include "OgreD3D9HardwarePixelBuffer.h"
+namespace Ogre
+{
+	D3D9Resource::D3D9Resource()
+	{		
+		D3D9RenderSystem::getResourceManager()->_notifyResourceCreated(static_cast<D3D9Resource*>(this));		
+	}
 
-#include <d3d9.h>
-#include <d3dx9.h>
-#include <dxerr9.h>
-
-namespace Ogre {
-	class D3D9MultiRenderTarget : public MultiRenderTarget
-	{
-	public:
-		D3D9MultiRenderTarget(const String &name);
-		~D3D9MultiRenderTarget();
-
-        virtual void update(bool swapBuffers);
-
-		virtual void getCustomAttribute( const String& name, void *pData );
-
-		bool requiresTextureFlipping() const { return false; }
-	private:
-		D3D9HardwarePixelBuffer *mRenderTargets[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-		virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
-		virtual void unbindSurfaceImpl(size_t attachment);
-
-		/** Check surfaces and update RenderTarget extent */
-		void checkAndUpdate();
-	};
-};
-
-#endif
+	D3D9Resource::~D3D9Resource()
+	{		
+		D3D9RenderSystem::getResourceManager()->_notifyResourceDestroyed(static_cast<D3D9Resource*>(this));
+	}
+}

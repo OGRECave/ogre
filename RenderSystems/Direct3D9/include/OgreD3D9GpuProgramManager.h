@@ -37,7 +37,6 @@ namespace Ogre {
     class D3D9GpuProgramManager : public GpuProgramManager
     {
     protected:
-        LPDIRECT3DDEVICE9 mpDevice;
         /// @copydoc ResourceManager::createImpl
         Resource* createImpl(const String& name, ResourceHandle handle, 
             const String& group, bool isManual, ManualResourceLoader* loader,
@@ -47,7 +46,7 @@ namespace Ogre {
             const String& group, bool isManual, ManualResourceLoader* loader,
             GpuProgramType gptype, const String& syntaxCode);
     public:
-        D3D9GpuProgramManager(LPDIRECT3DDEVICE9 device);
+        D3D9GpuProgramManager();
 		~D3D9GpuProgramManager();
     };
 

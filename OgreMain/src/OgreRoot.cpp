@@ -1321,6 +1321,20 @@ namespace Ogre {
 		}
 		mRQSequenceMap.clear();
 	}
+
+	//---------------------------------------------------------------------
+	unsigned int Root::getDisplayMonitorCount() const
+	{
+		if (!mActiveRenderer)
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+				"Cannot get display monitor count "
+				"No render system has been selected.", "Root::getDisplayMonitorCount");
+		}
+
+		return mActiveRenderer->getDisplayMonitorCount();
+
+	}
 	//---------------------------------------------------------------------
 
 

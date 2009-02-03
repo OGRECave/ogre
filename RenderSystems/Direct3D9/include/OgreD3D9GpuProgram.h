@@ -32,70 +32,97 @@ Torus Knot Software Ltd.
 // Precompiler options
 #include "OgreD3D9Prerequisites.h"
 #include "OgreGpuProgram.h"
+#include "OgreD3D9Resource.h"
 
 namespace Ogre {
 
     /** Direct3D implementation of a few things common to low-level vertex & fragment programs. */
-    class D3D9GpuProgram : public GpuProgram
-    {
-    protected:
-        LPDIRECT3DDEVICE9 mpDevice;
-        LPD3DXBUFFER mpExternalMicrocode; // microcode from elsewhere, we do NOT delete this ourselves
+    class D3D9GpuProgram : public GpuProgram, public D3D9Resource
+    {   	
     public:
         D3D9GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader, LPDIRECT3DDEVICE9 pDev);
-        
+            const String& group, bool isManual, ManualResourceLoader* loader);
+        ~D3D9GpuProgram();
 
         /** Tells the program to load from some externally created microcode instead of a file or source. 
         @remarks
             It is the callers responsibility to delete the microcode buffer.
         */ 
-        void setExternalMicrocode(LPD3DXBUFFER pMicrocode) { mpExternalMicrocode = pMicrocode; }
+        void setExternalMicrocode(ID3DXBuffer* pMicrocode) { mpExternalMicrocode = pMicrocode; }
         /** Gets the external microcode buffer, if any. */
         LPD3DXBUFFER getExternalMicrocode(void) { return mpExternalMicrocode; }
     protected:
         /** @copydoc Resource::loadImpl */
         void loadImpl(void);
+		/** Loads this program to specified device */
+		void loadImpl(IDirect3DDevice9* d3d9Device);
         /** Overridden from GpuProgram */
         void loadFromSource(void);
-        /** Internal method to load from microcode, must be overridden by subclasses. */
-        virtual void loadFromMicrocode(LPD3DXBUFFER microcode) = 0;
+		/** Loads this program from source to specified device */
+		void loadFromSource(IDirect3DDevice9* d3d9Device);        
+		/** Loads this program from microcode, must be overridden by subclasses. */
+        virtual void loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode) = 0;
 
+	protected:    
+		ID3DXBuffer* mpExternalMicrocode; // microcode from elsewhere, we do NOT delete this ourselves	
 
     };
 
     /** Direct3D implementation of low-level vertex programs. */
     class D3D9GpuVertexProgram : public D3D9GpuProgram
-    {
-    protected:
-        LPDIRECT3DVERTEXSHADER9 mpVertexShader;
+    {  
     public:
         D3D9GpuVertexProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader, LPDIRECT3DDEVICE9 pDev);
+            const String& group, bool isManual, ManualResourceLoader* loader);
 		~D3D9GpuVertexProgram();
-        /// Gets the vertex shader
-        LPDIRECT3DVERTEXSHADER9 getVertexShader(void) const { return mpVertexShader; }
+        
+		/// Gets the vertex shader
+        IDirect3DVertexShader9* getVertexShader(void);
+
+		// Called immediately after the Direct3D device has been created.
+		virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
+
+		// Called before the Direct3D device is going to be destroyed.
+		virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
+
     protected:
         /** @copydoc Resource::unloadImpl */
         void unloadImpl(void);
-        void loadFromMicrocode(LPD3DXBUFFER microcode);
+        void loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode);
+
+	protected:
+		typedef std::map<IDirect3DDevice9*, IDirect3DVertexShader9*>	DeviceToVertexShaderMap;
+		typedef DeviceToVertexShaderMap::iterator						DeviceToVertexShaderIterator;
+	
+		DeviceToVertexShaderMap		mMapDeviceToVertexShader;	
     };
 
     /** Direct3D implementation of low-level fragment programs. */
     class D3D9GpuFragmentProgram : public D3D9GpuProgram
-    {
-    protected:
-        LPDIRECT3DPIXELSHADER9 mpPixelShader;
+    {  
     public:
         D3D9GpuFragmentProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader, LPDIRECT3DDEVICE9 pDev);
+            const String& group, bool isManual, ManualResourceLoader* loader);
 		~D3D9GpuFragmentProgram();
         /// Gets the pixel shader
-        LPDIRECT3DPIXELSHADER9 getPixelShader(void) const { return mpPixelShader; }
+        IDirect3DPixelShader9* getPixelShader(void);
+
+		// Called immediately after the Direct3D device has been created.
+		virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
+
+		// Called before the Direct3D device is going to be destroyed.
+		virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
+
     protected:
         /** @copydoc Resource::unloadImpl */
         void unloadImpl(void);
-        void loadFromMicrocode(LPD3DXBUFFER microcode);
+        void loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode);
+
+	protected:
+		typedef std::map<IDirect3DDevice9*, IDirect3DPixelShader9*>		DeviceToPixelShaderMap;
+		typedef DeviceToPixelShaderMap::iterator						DeviceToPixelShaderIterator;
+
+		DeviceToPixelShaderMap		mMapDeviceToPixelShader;			
     };
     /** Specialisation of SharedPtr to allow SharedPtr to be assigned to D3D9GpuProgramPtr 
     @note Has to be a subclass since we need operator=.

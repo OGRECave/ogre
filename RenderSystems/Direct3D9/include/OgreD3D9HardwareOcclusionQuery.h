@@ -32,6 +32,7 @@ Torus Knot Software Ltd.
 
 #include "OgreD3D9Prerequisites.h"
 #include "OgreHardwareOcclusionQuery.h"
+#include "OgreD3D9Resource.h"
 
 
 namespace Ogre {
@@ -51,7 +52,7 @@ namespace Ogre {
 	* Updated on 12/7/2004 by Chris McGuirk
 	* Updated on 4/8/2005 by Tuan Kuranes email: tuan.kuranes@free.fr
 	*/
-	class D3D9HardwareOcclusionQuery : public HardwareOcclusionQuery
+	class D3D9HardwareOcclusionQuery : public HardwareOcclusionQuery, public D3D9Resource
 	{
 		//----------------------------------------------------------------------
 		// Public methods
@@ -62,7 +63,7 @@ namespace Ogre {
 		* Default object constructor
 		* 
 		*/
-		D3D9HardwareOcclusionQuery( IDirect3DDevice9* pD3DDevice );
+		D3D9HardwareOcclusionQuery();
 
 		/**
 		* Object destructor
@@ -76,20 +77,36 @@ namespace Ogre {
 		void beginOcclusionQuery();	
 		void endOcclusionQuery();
 		bool pullOcclusionQuery( unsigned int* NumOfFragments);
-		unsigned int getLastQuerysPixelcount() { return mPixelCount; }
+		unsigned int getLastQuerysPixelcount();
         bool isStillOutstanding(void);
-
-		void releaseResources();
-		void recreateResources();
-
 	
+		// Called immediately after the Direct3D device has been created.
+		virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
+
+		// Called before the Direct3D device is going to be destroyed.
+		virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
+		
+		// Called immediately after the Direct3D device has entered a lost state.
+		// This is the place to release non-managed resources.
+		virtual void notifyOnDeviceLost(IDirect3DDevice9* d3d9Device);
+
+		// Called immediately after the Direct3D device has been reset.
+		// This is the place to create non-managed resources.
+		virtual void notifyOnDeviceReset(IDirect3DDevice9* d3d9Device);
+	
+
+	private:
+		void createQuery(IDirect3DDevice9* d3d9Device);
+		void releaseQuery(IDirect3DDevice9* d3d9Device);
 
 		//----------------------------------------------------------------------
 		// private members
 		//--
-	private:	
-		IDirect3DQuery9*	mpQuery;
-		IDirect3DDevice9*   mpDevice;
+	private:					
+		typedef std::map<IDirect3DDevice9*, IDirect3DQuery9*> DeviceToQueryMap;
+		typedef DeviceToQueryMap::iterator					  DeviceToQueryIterator;
+
+		DeviceToQueryMap				mMapDeviceToQuery;		
 	};
 
 

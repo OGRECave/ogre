@@ -26,8 +26,8 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#ifndef __D3D8TEXTURE_H__
-#define __D3D8TEXTURE_H__
+#ifndef __D3D9TEXTURE_H__
+#define __D3D9TEXTURE_H__
 
 #include "OgreD3D9Prerequisites.h"
 #include "OgreTexture.h"
@@ -35,66 +35,64 @@ Torus Knot Software Ltd.
 #include "OgreImage.h"
 #include "OgreException.h"
 #include "OgreD3D9HardwarePixelBuffer.h"
+#include "OgreD3D9Resource.h"
 
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <dxerr9.h>
 
 namespace Ogre {
-	class D3D9Texture : public Texture
+	class D3D9Texture : public Texture, public D3D9Resource
 	{
-	protected:
-		/// D3DDevice pointer
-		IDirect3DDevice9		*mpDev;		
-		/// D3D9 pointer
-		IDirect3D9				*mpD3D;
-		/// 1D/2D normal texture pointer
-		IDirect3DTexture9		*mpNormTex;	
-		/// cubic texture pointer
-		IDirect3DCubeTexture9	*mpCubeTex;	
-        /// Volume texture
-        IDirect3DVolumeTexture9 *mpVolumeTex;
-        /// actual texture pointer
-		IDirect3DBaseTexture9	*mpTex;
-		/// Optional FSAA surface
-		IDirect3DSurface9* mFSAASurface;
+	protected:	
+
+		struct TextureResources
+		{
+			/// 1D/2D normal texture pointer
+			IDirect3DTexture9* pNormTex;	
+			/// cubic texture pointer
+			IDirect3DCubeTexture9* pCubeTex;	
+			/// Volume texture
+			IDirect3DVolumeTexture9* pVolumeTex;
+			/// actual texture pointer
+			IDirect3DBaseTexture9* pBaseTex;
+			/// Optional FSAA surface
+			IDirect3DSurface9* pFSAASurface;			
+		};
+		
+		typedef map<IDirect3DDevice9*, TextureResources*>::type	DeviceToTextureResourcesMap;
+		typedef DeviceToTextureResourcesMap::iterator			DeviceToTextureResourcesIterator;
+
+		/// Map between device to texture resources.
+		DeviceToTextureResourcesMap	mMapDeviceToTextureResources;
 
 
-		/// cube texture individual face names
-		String							mCubeFaceNames[6];
-		/// device creation parameters
-		D3DDEVICE_CREATION_PARAMETERS	mDevCreParams;
-		/// back buffer pixel format
-		D3DFORMAT						mBBPixelFormat;
-		/// The memory pool being used
-		D3DPOOL							mD3DPool;
-		/// device capabilities pointer
-		D3DCAPS9						mDevCaps;
-		// Dynamic textures?
-		bool                            mDynamicTextures;
 		/// Vector of pointers to subsurfaces
 		typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
-		SurfaceList						mSurfaceList;
-	
+		SurfaceList	mSurfaceList;
+		/// cube texture individual face names
+		String							mCubeFaceNames[6];	
+		/// The memory pool being used
+		D3DPOOL							mD3DPool;
+		// Dynamic textures?
+		bool                            mDynamicTextures;
+		
 		/// Is hardware gamma supported (read)?
 		bool mHwGammaReadSupported;
 		/// Is hardware gamma supported (write)?
 		bool mHwGammaWriteSupported;
 		D3DMULTISAMPLE_TYPE mFSAAType;
 		DWORD mFSAAQuality;
-
-        /// Initialise the device and get formats
-        void _initDevice(void);
-
+		
         // needed to store data between prepareImpl and loadImpl
         typedef SharedPtr<vector<MemoryDataStreamPtr>::type > LoadedStreams;
 
 		/// internal method, load a cube texture
-		void _loadCubeTex(const LoadedStreams &loadedStreams);
+		void _loadCubeTex(IDirect3DDevice9* d3d9Device, const LoadedStreams &loadedStreams);
 		/// internal method, load a normal texture
-		void _loadNormTex(const LoadedStreams &loadedStreams);
+		void _loadNormTex(IDirect3DDevice9* d3d9Device, const LoadedStreams &loadedStreams);
 		/// internal method, load a volume texture
-		void _loadVolumeTex(const LoadedStreams &loadedStreams);
+		void _loadVolumeTex(IDirect3DDevice9* d3d9Device, const LoadedStreams &loadedStreams);
 
 		/// internal method, prepare a cube texture
 		LoadedStreams _prepareCubeTex();
@@ -103,32 +101,41 @@ namespace Ogre {
 		/// internal method, prepare a volume texture
 		LoadedStreams _prepareVolumeTex();
 
-		/// internal method, create a blank normal 1D/2D texture
-		void _createNormTex();
-		/// internal method, create a blank cube texture
-		void _createCubeTex();
-		/// internal method, create a blank cube texture
-		void _createVolumeTex();
+		/// internal method, create a blank normal 1D/2D texture		
+		void _createNormTex(IDirect3DDevice9* d3d9Device);
+		/// internal method, create a blank cube texture		
+		void _createCubeTex(IDirect3DDevice9* d3d9Device);
+		/// internal method, create a blank cube texture		
+		void _createVolumeTex(IDirect3DDevice9* d3d9Device);
 
 		/// internal method, return a D3D pixel format for texture creation
-		D3DFORMAT _chooseD3DFormat();
+		D3DFORMAT _chooseD3DFormat(IDirect3DDevice9* d3d9Device);
 
+		/// @copydoc Resource::calculateSize
+		size_t calculateSize(void) const;
+		/// @copydoc Texture::createInternalResources
+		void createInternalResources(void);
+		/// @copydoc Texture::freeInternalResources
+		void freeInternalResources(void);
 		/// @copydoc Texture::createInternalResourcesImpl
 		void createInternalResourcesImpl(void);
+		/// Creates this texture resources on the specified device.
+		void createInternalResourcesImpl(IDirect3DDevice9* d3d9Device);
 		/// free internal resources
 		void freeInternalResourcesImpl(void);
 		/// internal method, set Texture class source image protected attributes
 		void _setSrcAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format);
 		/// internal method, set Texture class final texture protected attributes
-		void _setFinalAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format);
+		void _setFinalAttributes(IDirect3DDevice9* d3d9Device, TextureResources* textureResources, 
+			unsigned long width, unsigned long height, unsigned long depth, PixelFormat format);
 		/// internal method, return the best by hardware supported filter method
-		D3DTEXTUREFILTERTYPE _getBestFilterMethod();
+		D3DTEXTUREFILTERTYPE _getBestFilterMethod(IDirect3DDevice9* d3d9Device);
 		/// internal method, return true if the device/texture combination can use dynamic textures
-		bool _canUseDynamicTextures(DWORD srcUsage, D3DRESOURCETYPE srcType, D3DFORMAT srcFormat);
+		bool _canUseDynamicTextures(IDirect3DDevice9* d3d9Device, DWORD srcUsage, D3DRESOURCETYPE srcType, D3DFORMAT srcFormat);
 		/// internal method, return true if the device/texture combination can auto gen. mip maps
-		bool _canAutoGenMipmaps(DWORD srcUsage, D3DRESOURCETYPE srcType, D3DFORMAT srcFormat);
+		bool _canAutoGenMipmaps(IDirect3DDevice9* d3d9Device, DWORD srcUsage, D3DRESOURCETYPE srcType, D3DFORMAT srcFormat);
 		/// internal method, return true if the device/texture combination can use hardware gamma
-		bool _canUseHardwareGammaCorrection(DWORD srcUsage, D3DRESOURCETYPE srcType, D3DFORMAT srcFormat, bool forwriting);
+		bool _canUseHardwareGammaCorrection(IDirect3DDevice9* d3d9Device, DWORD srcUsage, D3DRESOURCETYPE srcType, D3DFORMAT srcFormat, bool forwriting);
 		
 		/// internal method, the cube map face name for the spec. face index
 		String _getCubeFaceName(unsigned char face) const
@@ -136,14 +143,28 @@ namespace Ogre {
 		
 		/// internal method, create D3D9HardwarePixelBuffers for every face and
 		/// mipmap level. This method must be called after the D3D texture object was created
-		void _createSurfaceList(void);
+		void _createSurfaceList(IDirect3DDevice9* d3d9Device, TextureResources* textureResources);
 
         /// overriden from Resource
-        void loadImpl();
+        void loadImpl();		 
+		/// Loads this texture into the specified device.
+		void loadImpl(IDirect3DDevice9* d3d9Device);
         /// overriden from Resource
         void prepareImpl();
         /// overriden from Resource
         void unprepareImpl();
+
+		/// gets the texture resources attached to the given device.
+		TextureResources* getTextureResources(IDirect3DDevice9* d3d9Device);
+
+		/// allocates new texture resources structure attached to the given device.
+		TextureResources* allocateTextureResources(IDirect3DDevice9* d3d9Device);
+
+		/// creates this texture resources according to the current settings.
+		void createTextureResources(IDirect3DDevice9* d3d9Device);
+
+		/// frees the given texture resources.
+		void freeTextureResources(IDirect3DDevice9* d3d9Device, TextureResources* textureResources);
 
         /** Vector of pointers to streams that were pulled from disk by
             prepareImpl  but have yet to be pushed into texture memory
@@ -151,15 +172,15 @@ namespace Ogre {
         */
         LoadedStreams mLoadedStreams;
 
+		friend class D3D9HardwarePixelBuffer;
 	public:
 		/// constructor 
         D3D9Texture(ResourceManager* creator, const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader, 
-            IDirect3DDevice9 *pD3DDevice);
+            const String& group, bool isManual, ManualResourceLoader* loader);
 		/// destructor
 		~D3D9Texture();
 
-		/// overriden from Texture
+		/// overridden from Texture
 		void copyToTexture( TexturePtr& target );
 
 
@@ -167,14 +188,11 @@ namespace Ogre {
 		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 		
 		/// retrieves a pointer to the actual texture
-		IDirect3DBaseTexture9 *getTexture() 
-		{ assert(mpTex); return mpTex; }
+		IDirect3DBaseTexture9 *getTexture();		
 		/// retrieves a pointer to the normal 1D/2D texture
-		IDirect3DTexture9 *getNormTexture()
-		{ assert(mpNormTex); return mpNormTex; }
+		IDirect3DTexture9 *getNormTexture();
 		/// retrieves a pointer to the cube texture
-		IDirect3DCubeTexture9 *getCubeTexture()
-		{ assert(mpCubeTex); return mpCubeTex; }
+		IDirect3DCubeTexture9 *getCubeTexture();
 
 		/** Indicates whether the hardware gamma is actually enabled and supported. 
 		@remarks
@@ -184,16 +202,24 @@ namespace Ogre {
 			hardware gamma flag (e.g. serialisation) we need another indicator.
 		*/
 		bool isHardwareGammaReadToBeUsed() const { return mHwGamma && mHwGammaReadSupported; }
-		
-		
-
-		/// For dealing with lost devices - release the resource if in the default pool (and return true)
-		bool releaseIfDefaultPool(void);
-		/// For dealing with lost devices - recreate the resource if in the default pool (and return true)
-		bool recreateIfDefaultPool(LPDIRECT3DDEVICE9 pDev);
+					
 		/// Will this texture need to be in the default pool?
 		bool useDefaultPool();
 
+		// Called immediately after the Direct3D device has been created.
+		virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
+
+		// Called before the Direct3D device is going to be destroyed.
+		virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
+
+		// Called immediately after the Direct3D device has entered a lost state.
+		virtual void notifyOnDeviceLost(IDirect3DDevice9* d3d9Device);
+
+		// Called immediately after the Direct3D device has been reset
+		virtual void notifyOnDeviceReset(IDirect3DDevice9* d3d9Device);
+
+		// Reload this texture.
+		void reloadTexture();		
     };
 
     /** Specialisation of SharedPtr to allow SharedPtr to be assigned to D3D9TexturePtr 
@@ -286,25 +312,10 @@ namespace Ogre {
     class D3D9RenderTexture : public RenderTexture
     {
     public:
-		D3D9RenderTexture(const String &name, D3D9HardwarePixelBuffer *buffer, bool writeGamma, size_t fsaa, const String& fsaaHint):
-			RenderTexture(buffer, 0)
-		{ 
-			mName = name;
-			mHwGamma = writeGamma;
-			mFSAA = fsaa;
-			mFSAAHint = fsaaHint;
-		}
+		D3D9RenderTexture(const String &name, D3D9HardwarePixelBuffer *buffer, bool writeGamma, uint fsaa);
         ~D3D9RenderTexture() {}
 
-        void rebind(D3D9HardwarePixelBuffer *buffer)
-        {
-            mBuffer = buffer;
-            mWidth = mBuffer->getWidth();
-            mHeight = mBuffer->getHeight();
-            mColourDepth = Ogre::PixelUtil::getNumElemBits(mBuffer->getFormat());
-        }
-
-        virtual void update(void);
+		virtual void update(bool swap);
 
 		virtual void getCustomAttribute( const String& name, void *pData );
 

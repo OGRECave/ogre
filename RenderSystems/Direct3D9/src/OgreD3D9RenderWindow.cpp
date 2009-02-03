@@ -35,30 +35,25 @@ Torus Knot Software Ltd.
 #include "OgreBitwise.h"
 #include "OgreImageCodec.h"
 #include "OgreStringConverter.h"
-
-#include <d3d9.h>
 #include "OgreRoot.h"
 #include "OgreWindowEventUtilities.h"
+#include "OgreD3D9DeviceManager.h"
 
 namespace Ogre
 {
-	D3D9RenderWindow::D3D9RenderWindow(HINSTANCE instance, D3D9Driver *driver, bool isSwapChain)
-        : mInstance(instance)
-        , mDriver(driver)
-        , mpRenderSurface(0)
-		, mpRenderZBuffer(0)
+	D3D9RenderWindow::D3D9RenderWindow(HINSTANCE instance)
+        : mInstance(instance)        
 	{
-		mIsFullScreen = false;
-		mIsSwapChain = isSwapChain;
+		mDevice = NULL;
+		mIsFullScreen = false;		
 		mIsExternal = false;
 		mHWnd = 0;
-		mActive = false;
-		mSizing = false;
+		mActive = false;		
 		mClosed = false;
 		mSwitchingFullscreen = false;
 		mDisplayFrequency = 0;
-		mpSwapChain = NULL;
-		mHeadIndex = 0;
+		mDeviceValid = false;
+		mUseNVPerfHUD = false;
 	}
 
 	D3D9RenderWindow::~D3D9RenderWindow()
@@ -70,8 +65,7 @@ namespace Ogre
 		bool fullScreen, const NameValuePairList *miscParams)
 	{
 		HINSTANCE hInst = mInstance;
-		D3D9Driver* driver = mDriver;
-
+	
 		HWND parentHWnd = 0;
 		HWND externalHandle = 0;
 		mFSAAType = D3DMULTISAMPLE_NONE;
@@ -88,7 +82,7 @@ namespace Ogre
 		mUseNVPerfHUD = false;
 		size_t fsaaSamples = 0;
 		String fsaaHint;
-		bool createResources = true;
+		int monitorIndex = -1;	//Default by detecting the adapter from left / top position
 
 		if(miscParams)
 		{
@@ -158,15 +152,10 @@ namespace Ogre
 			opt = miscParams->find("gamma");
 			if(opt != miscParams->end())
 				mHwGamma = StringConverter::parseBool(opt->second);
-
-			// head number for this window if multihead enabled
-			opt = miscParams->find("head");
+			// monitor index
+			opt = miscParams->find("monitorIndex");
 			if(opt != miscParams->end())
-				mHeadIndex = StringConverter::parseInt(opt->second);
-			// create the d3dressources ? useful in multihead bulk windows creation
-			opt = miscParams->find("createD3DResources");
-			if(opt != miscParams->end())
-				createResources = StringConverter::parseBool(opt->second);
+				monitorIndex = StringConverter::parseInt(opt->second);
 
 		}
 
@@ -176,9 +165,76 @@ namespace Ogre
 
 		if (!externalHandle)
 		{
-			DWORD dwStyle = WS_VISIBLE | WS_CLIPCHILDREN;
-			DWORD dwStyleEx = 0;
-			RECT rc;
+			DWORD		dwStyle = WS_VISIBLE | WS_CLIPCHILDREN;
+			DWORD		dwStyleEx = 0;
+			HMONITOR    hMonitor = NULL;		
+			MONITORINFO monitorInfo;
+			RECT		rc;
+
+
+			// If we specified which adapter we want to use - find it's monitor.
+			if (monitorIndex != -1)
+			{
+				IDirect3D9* direct3D9 = D3D9RenderSystem::getDirect3D9();
+
+				for (uint i=0; i < direct3D9->GetAdapterCount(); ++i)
+				{
+					if (i == monitorIndex)
+					{
+						hMonitor = direct3D9->GetAdapterMonitor(i);
+						break;
+					}
+				}				
+			}
+
+			// If we didn't specified the adapter index, or if it didn't find it
+			if (hMonitor == NULL)
+			{
+				POINT windowAnchorPoint;
+
+				// Fill in anchor point.
+				windowAnchorPoint.x = left;
+				windowAnchorPoint.y = top;
+
+
+				// Get the nearest monitor to this window.
+				hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTONEAREST);
+			}
+
+			// Get the target monitor info		
+			memset(&monitorInfo, 0, sizeof(MONITORINFO));
+			monitorInfo.cbSize = sizeof(MONITORINFO);
+			GetMonitorInfo(hMonitor, &monitorInfo);
+
+
+			// No specified top left -> Center the window in the middle of the monitor
+			if (left == -1 || top == -1)
+			{				
+				int screenw = monitorInfo.rcMonitor.right  - monitorInfo.rcMonitor.left;
+				int screenh = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+
+				SetRect(&rc, 0, 0, width, height);
+				AdjustWindowRect(&rc, dwStyle, false);
+
+				// clamp window dimensions to screen size
+				int outerw = (rc.right-rc.left < screenw)? rc.right-rc.left : screenw;
+				int outerh = (rc.bottom-rc.top < screenh)? rc.bottom-rc.top : screenh;
+
+				if (left == -1)
+					left = monitorInfo.rcMonitor.left + (screenw - outerw) / 2;
+				else if (monitorIndex != -1)
+					left += monitorInfo.rcMonitor.left;
+
+				if (top == -1)
+					top = monitorInfo.rcMonitor.top + (screenh - outerh) / 2;
+				else if (monitorIndex != -1)
+					top += monitorInfo.rcMonitor.top;
+			}
+			else if (monitorIndex != -1)
+			{
+				left += monitorInfo.rcMonitor.left;
+				top += monitorInfo.rcMonitor.top;
+			}
 
 			mWidth = width;
 			mHeight = height;
@@ -189,7 +245,8 @@ namespace Ogre
 			{
 				dwStyleEx |= WS_EX_TOPMOST;
 				dwStyle |= WS_POPUP;
-				mTop = mLeft = 0;
+				mTop = monitorInfo.rcMonitor.top;
+				mLeft = monitorInfo.rcMonitor.left;				
 			}
 			else
 			{
@@ -217,17 +274,18 @@ namespace Ogre
 					mWidth = rc.right - rc.left;
 					mHeight = rc.bottom - rc.top;
 
-					// Clamp width and height to the desktop dimensions
-					int screenw = GetSystemMetrics(SM_CXSCREEN);
-					int screenh = GetSystemMetrics(SM_CYSCREEN);
-					if ((int)mWidth > screenw)
-						mWidth = screenw;
-					if ((int)mHeight > screenh)
-						mHeight = screenh;
-					if (mLeft < 0)
-						mLeft = (screenw - mWidth) / 2;
-					if (mTop < 0)
-						mTop = (screenh - mHeight) / 2;
+					// Clamp window rect to the nearest display monitor.
+					if (mLeft < monitorInfo.rcMonitor.left)
+						mLeft = monitorInfo.rcMonitor.left;		
+
+					if (mTop < monitorInfo.rcMonitor.top)					
+						mTop = monitorInfo.rcMonitor.top;					
+				
+					if (static_cast<int>(mWidth) > monitorInfo.rcMonitor.right - mLeft)					
+						mWidth = monitorInfo.rcMonitor.right - mLeft;	
+
+					if (static_cast<int>(mHeight) > monitorInfo.rcMonitor.bottom - mTop)					
+						mHeight = monitorInfo.rcMonitor.bottom - mTop;										
 				}
 			}
 			
@@ -272,10 +330,7 @@ namespace Ogre
 			<< "D3D9 : Created D3D9 Rendering Window '"
 			<< mName << "' : " << mWidth << "x" << mHeight 
 			<< ", " << mColourDepth << "bpp";
-
-		if(createResources)
-			createD3DResources();
-
+									
 		mActive = true;
 		mClosed = false;
 	}
@@ -284,7 +339,6 @@ namespace Ogre
 	{
 		if (fullScreen != mIsFullScreen || width != mWidth || height != mHeight)
 		{
-
 			if (fullScreen != mIsFullScreen)
 				mSwitchingFullscreen = true;
 
@@ -296,19 +350,32 @@ namespace Ogre
 			if (fullScreen)
 			{
 				dwStyle |= WS_POPUP;
-				mTop = mLeft = 0;
+				
+				// Get the nearest monitor to this window.
+				HMONITOR hMonitor = MonitorFromWindow(mHWnd, MONITOR_DEFAULTTONEAREST);
+
+				// Get monitor info	
+				MONITORINFO monitorInfo;
+
+				memset(&monitorInfo, 0, sizeof(MONITORINFO));
+				monitorInfo.cbSize = sizeof(MONITORINFO);
+				GetMonitorInfo(hMonitor, &monitorInfo);
+
+				mTop = monitorInfo.rcMonitor.top;
+				mLeft = monitorInfo.rcMonitor.left;				
 				mWidth = width;
 				mHeight = height;
+				
 				// need different ordering here
 
 				if (oldFullscreen)
 				{
 					// was previously fullscreen, just changing the resolution
-					SetWindowPos(mHWnd, HWND_TOPMOST, 0, 0, width, height, SWP_NOACTIVATE);
+					SetWindowPos(mHWnd, HWND_TOPMOST, mLeft, mTop, width, height, SWP_NOACTIVATE);
 				}
 				else
 				{
-					SetWindowPos(mHWnd, HWND_TOPMOST, 0, 0, width, height, SWP_NOACTIVATE);
+					SetWindowPos(mHWnd, HWND_TOPMOST, mLeft, mTop, width, height, SWP_NOACTIVATE);
 					//MoveWindow(mHWnd, mLeft, mTop, mWidth, mHeight, FALSE);
 					SetWindowLong(mHWnd, GWL_STYLE, dwStyle);
 					SetWindowPos(mHWnd, 0, 0,0, 0,0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);
@@ -331,33 +398,24 @@ namespace Ogre
 				// Note that we also set the position in the restoreLostDevice method
 				// via _finishSwitchingFullScreen
 			}
-
-			md3dpp.Windowed = !fullScreen;
-			md3dpp.FullScreen_RefreshRateInHz = mIsFullScreen ? mDisplayFrequency : 0;
-			md3dpp.BackBufferHeight = height;
-			md3dpp.BackBufferWidth = width;
-
-			if ((oldFullscreen && fullScreen) || mIsExternal)
-			{
-				// Have to release & trigger device reset
-				// NB don't use windowMovedOrResized since Win32 doesn't know
-				// about the size change yet
-				SAFE_RELEASE(mpRenderSurface);
-				static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem())->_notifyDeviceLost();
-				// Notify viewports of resize
-				ViewportList::iterator it = mViewportList.begin();
-				while(it != mViewportList.end()) (*it++).second->_updateDimensions();
-			}
+						
+			// Have to release & trigger device reset
+			// NB don't use windowMovedOrResized since Win32 doesn't know
+			// about the size change yet				
+			mDevice->invalidate();
+			// Notify viewports of resize
+			ViewportList::iterator it = mViewportList.begin();
+			while(it != mViewportList.end()) (*it++).second->_updateDimensions();
 		}
 	} 
 
 	void D3D9RenderWindow::_finishSwitchingFullscreen()
-	{
+	{		
 		if(mIsFullScreen)
 		{
 			// Need to reset the region on the window sometimes, when the 
 			// windowed mode was constrained by desktop 
-			HRGN hRgn = CreateRectRgn(0,0,md3dpp.BackBufferWidth, md3dpp.BackBufferHeight);
+			HRGN hRgn = CreateRectRgn(0,0,mWidth, mHeight);
 			SetWindowRgn(mHWnd, hRgn, FALSE);
 		}
 		else
@@ -365,7 +423,7 @@ namespace Ogre
 			// When switching back to windowed mode, need to reset window size 
 			// after device has been restored
 			RECT rc;
-			SetRect(&rc, 0, 0, md3dpp.BackBufferWidth, md3dpp.BackBufferHeight);
+			SetRect(&rc, 0, 0, mWidth, mHeight);
 			AdjustWindowRect(&rc, GetWindowLong(mHWnd, GWL_STYLE), false);
 			unsigned int winWidth = rc.right - rc.left;
 			unsigned int winHeight = rc.bottom - rc.top;
@@ -379,136 +437,34 @@ namespace Ogre
 		}
 		mSwitchingFullscreen = false;
 	}
-
-	void D3D9RenderWindow::createD3DResources(void)
-	{
-		// access device via driver
-		LPDIRECT3DDEVICE9 mpD3DDevice = mDriver->getD3DDevice();
-
-		if (mIsSwapChain && !mpD3DDevice)
-		{
-			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-				"Secondary window has not been given the device from the primary!",
-				"D3D9RenderWindow::createD3DResources");
-		}
-
-			
-
-		// Set up the presentation parameters
-		buildPresentParameters();
-
-
-		if (!mpD3DDevice)
-		{
-			// We haven't created the device yet, this must be the first time
-			mpD3DDevice = static_cast<D3D9RenderSystem*>(
-				Root::getSingleton().getRenderSystem())->createDevice(mHWnd,&md3dpp);
-		}
-
-		// If the swap chain is not associated with the render window
-		if(!mpSwapChain)
-		{
-			// Create additional swap chain
-			if (mIsSwapChain && !mDriver->isMultihead())
-			{
-				// Create swap chain
-				HRESULT hr = mpD3DDevice->CreateAdditionalSwapChain(
-					&md3dpp, &mpSwapChain);
-				if (FAILED(hr))
-				{
-					// Try a second time, may fail the first time due to back buffer count,
-					// which will be corrected by the runtime
-					hr = mpD3DDevice->CreateAdditionalSwapChain(
-						&md3dpp, &mpSwapChain);
-				}
-				if (FAILED(hr))
-				{
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-						"Unable to create an additional swap chain",
-						"D3D9RenderWindow::createD3DResources");
-				}
-			}
-			else
-			{
-				// The swap chain is already created by the device
-				HRESULT hr = mpD3DDevice->GetSwapChain( mHeadIndex, &mpSwapChain );
-				if (FAILED(hr)) 
-				{
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-						"Unable to get the swap chain",
-						"D3D9RenderWindow::createD3DResources");
-				}
-			}
-
-			// Store references to buffers for convenience
-			SAFE_RELEASE(mpRenderSurface);
-			SAFE_RELEASE(mpRenderZBuffer);
-			mpSwapChain->GetBackBuffer( 0, D3DBACKBUFFER_TYPE_MONO, &mpRenderSurface );
-
-			// Additional swap chains need their own depth buffer
-			// to support resizing them
-			if (mIsDepthBuffered) 
-			{
-				// if multihead is enabled, depth buffer can be created automatically for 
-				// all the adapters. if multihead is not enabled, depth buffer is just
-				// created for the main swap chain
-				if(mDriver->isMultihead() && mDriver->isAutoDepthStencil()
-					|| !mDriver->isMultihead() && !mIsSwapChain)
-				{
-					mpD3DDevice->GetDepthStencilSurface( &mpRenderZBuffer );
-				}
-				else
-				{
-					HRESULT hr = mpD3DDevice->CreateDepthStencilSurface(
-						mWidth, mHeight,
-						md3dpp.AutoDepthStencilFormat,
-						md3dpp.MultiSampleType,
-						md3dpp.MultiSampleQuality, 
-						(md3dpp.Flags & D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL),
-						&mpRenderZBuffer, NULL
-						);
-
-					if (FAILED(hr)) 
-					{
-						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-							"Unable to create a depth buffer for the swap chain",
-							"D3D9RenderWindow::createD3DResources");
-					}
-
-					if(!mIsSwapChain)
-					{
-						mpD3DDevice->SetDepthStencilSurface(mpRenderZBuffer);
-					}
-				}
-			} 
-			else 
-			{
-				mpRenderZBuffer = 0;
-			}
-		}
-	}
-
-	void D3D9RenderWindow::buildPresentParameters(void)
+	
+	void D3D9RenderWindow::buildPresentParameters(D3DPRESENT_PARAMETERS* presentParams)
 	{		
 		// Set up the presentation parameters		
-		LPDIRECT3D9 pD3D = mDriver->getD3D();
+		IDirect3D9* pD3D = D3D9RenderSystem::getDirect3D9();
 		D3DDEVTYPE devType = D3DDEVTYPE_HAL;
 
-		ZeroMemory( &md3dpp, sizeof(D3DPRESENT_PARAMETERS) );
-		md3dpp.Windowed					= !mIsFullScreen;
-		md3dpp.SwapEffect				= D3DSWAPEFFECT_DISCARD;
+		ZeroMemory( presentParams, sizeof(D3DPRESENT_PARAMETERS) );
+		presentParams->Windowed					= !mIsFullScreen;
+		presentParams->SwapEffect				= D3DSWAPEFFECT_DISCARD;
 		// triple buffer if VSync is on
-		md3dpp.BackBufferCount			= mVSync ? 2 : 1;
-		md3dpp.EnableAutoDepthStencil	= mIsDepthBuffered;
-		md3dpp.hDeviceWindow			= mHWnd;
-		md3dpp.BackBufferWidth			= mWidth;
-		md3dpp.BackBufferHeight			= mHeight;
-		md3dpp.FullScreen_RefreshRateInHz = mIsFullScreen ? mDisplayFrequency : 0;
+		presentParams->BackBufferCount			= mVSync ? 2 : 1;
+		presentParams->EnableAutoDepthStencil	= mIsDepthBuffered;
+		presentParams->hDeviceWindow			= mHWnd;
+		presentParams->BackBufferWidth			= mWidth;
+		presentParams->BackBufferHeight			= mHeight;
+		presentParams->FullScreen_RefreshRateInHz = mIsFullScreen ? mDisplayFrequency : 0;
+		
+		if (presentParams->BackBufferWidth == 0)		
+			presentParams->BackBufferWidth = 1;					
+
+		if (presentParams->BackBufferHeight == 0)	
+			presentParams->BackBufferHeight = 1;					
 
 
 		if (mVSync)
 		{
-			md3dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+			presentParams->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 		}
 		else
 		{
@@ -522,62 +478,64 @@ namespace Ogre
 					"disabling VSync in windowed mode can cause timing issues at lower "
 					"frame rates, turn VSync on if you observe this problem.");
 			}
-			md3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+			presentParams->PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 		}
 
-		md3dpp.BackBufferFormat		= D3DFMT_R5G6B5;
+		presentParams->BackBufferFormat		= D3DFMT_R5G6B5;
 		if( mColourDepth > 16 )
-			md3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
+			presentParams->BackBufferFormat = D3DFMT_X8R8G8B8;
 
 		if (mColourDepth > 16 )
 		{
 			// Try to create a 32-bit depth, 8-bit stencil
-			if( FAILED( pD3D->CheckDeviceFormat(mDriver->getAdapterNumber(),
-				devType,  md3dpp.BackBufferFormat,  D3DUSAGE_DEPTHSTENCIL, 
+			if( FAILED( pD3D->CheckDeviceFormat(mDevice->getAdapterNumber(),
+				devType,  presentParams->BackBufferFormat,  D3DUSAGE_DEPTHSTENCIL, 
 				D3DRTYPE_SURFACE, D3DFMT_D24S8 )))
 			{
 				// Bugger, no 8-bit hardware stencil, just try 32-bit zbuffer 
-				if( FAILED( pD3D->CheckDeviceFormat(mDriver->getAdapterNumber(),
-					devType,  md3dpp.BackBufferFormat,  D3DUSAGE_DEPTHSTENCIL, 
+				if( FAILED( pD3D->CheckDeviceFormat(mDevice->getAdapterNumber(),
+					devType,  presentParams->BackBufferFormat,  D3DUSAGE_DEPTHSTENCIL, 
 					D3DRTYPE_SURFACE, D3DFMT_D32 )))
 				{
 					// Jeez, what a naff card. Fall back on 16-bit depth buffering
-					md3dpp.AutoDepthStencilFormat = D3DFMT_D16;
+					presentParams->AutoDepthStencilFormat = D3DFMT_D16;
 				}
 				else
-					md3dpp.AutoDepthStencilFormat = D3DFMT_D32;
+					presentParams->AutoDepthStencilFormat = D3DFMT_D32;
 			}
 			else
 			{
 				// Woohoo!
-				if( SUCCEEDED( pD3D->CheckDepthStencilMatch( mDriver->getAdapterNumber(), devType,
-					md3dpp.BackBufferFormat, md3dpp.BackBufferFormat, D3DFMT_D24S8 ) ) )
+				if( SUCCEEDED( pD3D->CheckDepthStencilMatch( mDevice->getAdapterNumber(), devType,
+					presentParams->BackBufferFormat, presentParams->BackBufferFormat, D3DFMT_D24S8 ) ) )
 				{
-					md3dpp.AutoDepthStencilFormat = D3DFMT_D24S8; 
+					presentParams->AutoDepthStencilFormat = D3DFMT_D24S8; 
 				} 
 				else 
-					md3dpp.AutoDepthStencilFormat = D3DFMT_D24X8; 
+					presentParams->AutoDepthStencilFormat = D3DFMT_D24X8; 
 			}
 		}
 		else
 			// 16-bit depth, software stencil
-			md3dpp.AutoDepthStencilFormat	= D3DFMT_D16;
+			presentParams->AutoDepthStencilFormat	= D3DFMT_D16;
 
 
 		D3D9RenderSystem* rsys = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
-		rsys->determineFSAASettings(mFSAA, mFSAAHint, md3dpp.BackBufferFormat, mIsFullScreen, 
+		
+		rsys->determineFSAASettings(mDevice->getD3D9Device(),
+			mFSAA, mFSAAHint, presentParams->BackBufferFormat, mIsFullScreen, 
 			&mFSAAType, &mFSAAQuality);
 
-		md3dpp.MultiSampleType = mFSAAType;
-		md3dpp.MultiSampleQuality = (mFSAAQuality == 0) ? 0 : mFSAAQuality;
+		presentParams->MultiSampleType = mFSAAType;
+		presentParams->MultiSampleQuality = (mFSAAQuality == 0) ? 0 : mFSAAQuality;
 
 		// Check sRGB
 		if (mHwGamma)
 		{
 			/* hmm, this never succeeds even when device does support??
 			if(FAILED(pD3D->CheckDeviceFormat(mDriver->getAdapterNumber(),
-				devType, md3dpp.BackBufferFormat, D3DUSAGE_QUERY_SRGBWRITE, 
-				D3DRTYPE_SURFACE, md3dpp.BackBufferFormat )))
+				devType, presentParams->BackBufferFormat, D3DUSAGE_QUERY_SRGBWRITE, 
+				D3DRTYPE_SURFACE, presentParams->BackBufferFormat )))
 			{
 				// disable - not supported
 				mHwGamma = false;
@@ -586,19 +544,15 @@ namespace Ogre
 
 		}
 	}
-
-
-	void D3D9RenderWindow::destroyD3DResources()
-	{
-		SAFE_RELEASE(mpRenderZBuffer);
-		SAFE_RELEASE(mpSwapChain);
-		SAFE_RELEASE(mpRenderSurface);
-	}
-
+	
 	void D3D9RenderWindow::destroy()
 	{
-		destroyD3DResources();
-
+		if (mDevice != NULL)
+		{
+			mDevice->detachRenderWindow(this);
+			mDevice = NULL;
+		}
+		
 		if (mHWnd && !mIsExternal)
 		{
 			WindowEventUtilities::_removeRenderWindow(this);
@@ -649,131 +603,14 @@ namespace Ogre
 	{
 		if (!mHWnd || IsIconic(mHWnd))
 			return;
-
-		RECT rc;
-		// top and left represent outer window position
-		GetWindowRect(mHWnd, &rc);
-		mTop = rc.top;
-		mLeft = rc.left;
-		// width and height represent drawable area only
-		GetClientRect(mHWnd, &rc);
-		unsigned int width = rc.right;
-		unsigned int height = rc.bottom;
-		if (mWidth == width && mHeight == height)
-			return;
-
-		SAFE_RELEASE( mpRenderSurface );
-
-		if (mIsSwapChain) 
-		{
-
-			D3DPRESENT_PARAMETERS pp = md3dpp;
-
-			pp.BackBufferWidth = width;
-			pp.BackBufferHeight = height;
-
-			SAFE_RELEASE( mpRenderZBuffer );
-			SAFE_RELEASE( mpSwapChain );
-
-			HRESULT hr = mDriver->getD3DDevice()->CreateAdditionalSwapChain(
-				&pp,
-				&mpSwapChain);
-
-			if (FAILED(hr)) 
-			{
-				LogManager::getSingleton().stream(LML_CRITICAL)
-					<< "D3D9RenderWindow: failed to reset device to new dimensions << "
-					<< width << " x " << height << ". Trying to recover.";
-
-				// try to recover
-				hr = mDriver->getD3DDevice()->CreateAdditionalSwapChain(
-					&md3dpp,
-					&mpSwapChain);
-
-				if (FAILED(hr))
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Reset window to last size failed", "D3D9RenderWindow::resize" );
-
-			}		
-			else 
-			{
-				md3dpp = pp;
-
-				mWidth = width;
-				mHeight = height;
-				
-				SAFE_RELEASE(mpRenderSurface);
-				hr = mpSwapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &mpRenderSurface);
-				SAFE_RELEASE(mpRenderZBuffer);
-				hr = mDriver->getD3DDevice()->CreateDepthStencilSurface(
-					mWidth, mHeight,
-					md3dpp.AutoDepthStencilFormat,
-					md3dpp.MultiSampleType,
-					md3dpp.MultiSampleQuality, 
-					(md3dpp.Flags & D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL),
-					&mpRenderZBuffer, NULL
-					);
-
-				if (FAILED(hr)) 
-				{
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to create depth stencil surface for Swap Chain", "D3D9RenderWindow::resize" );
-				}
-
-			}
-		}
-		// primary windows must reset the device
-		else 
-		{
-			md3dpp.BackBufferWidth = mWidth = width;
-			md3dpp.BackBufferHeight = mHeight = height;
-			static_cast<D3D9RenderSystem*>(
-				Root::getSingleton().getRenderSystem())->_notifyDeviceLost();
-		}
-
-		// Notify viewports of resize
-		ViewportList::iterator it = mViewportList.begin();
-		while( it != mViewportList.end() )
-			(*it++).second->_updateDimensions();
+	
+		updateWindowRect();
 	}
 
 	void D3D9RenderWindow::swapBuffers( bool waitForVSync )
 	{
-		// access device through driver
-		LPDIRECT3DDEVICE9 mpD3DDevice = mDriver->getD3DDevice();
-		if( mpD3DDevice )
-		{			
-			HRESULT hr;
-
-			if (mDriver->isMultihead())
-			{
-				if (isPrimary())
-					hr = mpD3DDevice->Present( NULL, NULL, 0, NULL );
-				else
-					hr = S_OK;
-			}
-			else
-			{
-				if (mIsSwapChain)
-				{
-					hr = mpSwapChain->Present(NULL, NULL, NULL, NULL, 0);
-				}
-				else
-				{
-					hr = mpD3DDevice->Present( NULL, NULL, 0, NULL );
-				}
-			}
-
-			
-			if( D3DERR_DEVICELOST == hr )
-			{
-				SAFE_RELEASE(mpRenderSurface);
-				SAFE_RELEASE(mpRenderZBuffer);
-
-				static_cast<D3D9RenderSystem*>(
-					Root::getSingleton().getRenderSystem())->_notifyDeviceLost();
-			}
-			else if( FAILED(hr) )
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error Presenting surfaces", "D3D9RenderWindow::swapBuffers" );
-		}
+		if (mDeviceValid)
+			mDevice->present(this);		
 	}
 
 	void D3D9RenderWindow::getCustomAttribute( const String& name, void* pData )
@@ -784,10 +621,10 @@ namespace Ogre
 
 		if( name == "D3DDEVICE" )
 		{
-			LPDIRECT3DDEVICE9 *pDev = (LPDIRECT3DDEVICE9*)pData;
-			*pDev = getD3DDevice();
+			IDirect3DDevice9* *pDev = (IDirect3DDevice9**)pData;
+			*pDev = getD3D9Device();
 			return;
-		}
+		}		
 		else if( name == "WINDOW" )
 		{
 			HWND *pHwnd = (HWND*)pData;
@@ -803,20 +640,20 @@ namespace Ogre
 		}
 		else if( name == "D3DZBUFFER" )
 		{
-			LPDIRECT3DSURFACE9 *pSurf = (LPDIRECT3DSURFACE9*)pData;
-			*pSurf = mpRenderZBuffer;
+			IDirect3DSurface9* *pSurf = (IDirect3DSurface9**)pData;
+			*pSurf = mDevice->getDepthBuffer(this);
 			return;
 		}
 		else if( name == "DDBACKBUFFER" )
 		{
-			LPDIRECT3DSURFACE9 *pSurf = (LPDIRECT3DSURFACE9*)pData;
-			*pSurf = mpRenderSurface;
+			IDirect3DSurface9* *pSurf = (IDirect3DSurface9**)pData;
+			*pSurf = mDevice->getBackBuffer(this);
 			return;
 		}
 		else if( name == "DDFRONTBUFFER" )
 		{
-			LPDIRECT3DSURFACE9 *pSurf = (LPDIRECT3DSURFACE9*)pData;
-			*pSurf = mpRenderSurface;
+			IDirect3DSurface9* *pSurf = (IDirect3DSurface9**)pData;
+			*pSurf = mDevice->getBackBuffer(this);
 			return;
 		}
 	}
@@ -833,11 +670,12 @@ namespace Ogre
 		}
 
 		HRESULT hr;
-		LPDIRECT3DSURFACE9 pSurf = 0, pTempSurf = 0;
+		IDirect3DSurface9* pSurf = NULL;
+		IDirect3DSurface9* pTempSurf = NULL;
 		D3DSURFACE_DESC desc;
 		D3DLOCKED_RECT lockedRect;
 
-		LPDIRECT3DDEVICE9 mpD3DDevice = mDriver->getD3DDevice();
+		IDirect3DDevice9* pD3DDevice = getD3D9Device();
 
 		if (buffer == FB_AUTO)
 		{
@@ -848,10 +686,8 @@ namespace Ogre
 		if (buffer == FB_FRONT)
 		{
 			D3DDISPLAYMODE dm;
-
-			LPDIRECT3DDEVICE9 mpD3DDevice = mDriver->getD3DDevice();
-
-			if (FAILED(hr = mpD3DDevice->GetDisplayMode(0, &dm)))
+			
+			if (FAILED(hr = pD3DDevice->GetDisplayMode(0, &dm)))
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
 							"Can't get display mode: " + Root::getSingleton().getErrorDescription(hr),
@@ -861,7 +697,7 @@ namespace Ogre
 			desc.Width = dm.Width;
 			desc.Height = dm.Height;
 			desc.Format = D3DFMT_A8R8G8B8;
-			if (FAILED(hr = mpD3DDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height,
+			if (FAILED(hr = pD3DDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height,
 																	 desc.Format,
 																	 D3DPOOL_SYSTEMMEM,
 																	 &pTempSurf,
@@ -872,7 +708,7 @@ namespace Ogre
 							"D3D9RenderWindow::copyContentsToMemory");
 			}
 
-			if (FAILED(hr = mpD3DDevice->GetFrontBufferData(0, pTempSurf)))
+			if (FAILED(hr = pD3DDevice->GetFrontBufferData(0, pTempSurf)))
 			{
 				SAFE_RELEASE(pTempSurf);
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
@@ -890,10 +726,10 @@ namespace Ogre
 				{
 					RECT rect;
 
-					rect.left = (LONG)dst.left;
-					rect.right = (LONG)dst.right;
-					rect.top = (LONG)dst.top;
-					rect.bottom = (LONG)dst.bottom;
+					rect.left = static_cast<LONG>(dst.left);
+					rect.right = static_cast<LONG>(dst.right);
+					rect.top = static_cast<LONG>(dst.top);
+					rect.bottom = static_cast<LONG>(dst.bottom);
 
 					hr = pTempSurf->LockRect(&lockedRect, &rect, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK);
 				}
@@ -909,10 +745,10 @@ namespace Ogre
 			{
 				RECT srcRect;
 				//GetClientRect(mHWnd, &srcRect);
-				srcRect.left = (LONG)dst.left;
-				srcRect.top = (LONG)dst.top;
-				srcRect.right = (LONG)dst.right;
-				srcRect.bottom = (LONG)dst.bottom;
+				srcRect.left = static_cast<LONG>(dst.left);
+				srcRect.top = static_cast<LONG>(dst.top);
+				srcRect.right = static_cast<LONG>(dst.right);
+				srcRect.bottom = static_cast<LONG>(dst.bottom);
 				POINT point;
 				point.x = srcRect.left;
 				point.y = srcRect.top;
@@ -937,7 +773,7 @@ namespace Ogre
 		else
 		{
 			SAFE_RELEASE(pSurf);
-			if(FAILED(hr = mpD3DDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pSurf)))
+			if(FAILED(hr = pD3DDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pSurf)))
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
 							"Can't get back buffer: " + Root::getSingleton().getErrorDescription(hr),
@@ -951,7 +787,7 @@ namespace Ogre
 							"D3D9RenderWindow::copyContentsToMemory");
 			}
 
-			if (FAILED(hr = mpD3DDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height,
+			if (FAILED(hr = pD3DDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height,
 																	 desc.Format,
 																	 D3DPOOL_SYSTEMMEM,
 																	 &pTempSurf,
@@ -964,7 +800,7 @@ namespace Ogre
 
 			if (desc.MultiSampleType == D3DMULTISAMPLE_NONE)
 			{
-				if (FAILED(hr = mpD3DDevice->GetRenderTargetData(pSurf, pTempSurf)))
+				if (FAILED(hr = pD3DDevice->GetRenderTargetData(pSurf, pTempSurf)))
 				{
 					SAFE_RELEASE(pTempSurf);
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
@@ -974,9 +810,9 @@ namespace Ogre
 			}
 			else
 			{
-				LPDIRECT3DSURFACE9 pStretchSurf = 0;
+				IDirect3DSurface9* pStretchSurf = 0;
 
-				if (FAILED(hr = mpD3DDevice->CreateRenderTarget(desc.Width, desc.Height,
+				if (FAILED(hr = pD3DDevice->CreateRenderTarget(desc.Width, desc.Height,
 																desc.Format,
 																D3DMULTISAMPLE_NONE,
 																0,
@@ -990,7 +826,7 @@ namespace Ogre
 								"D3D9RenderWindow::copyContentsToMemory");
 				}
 
-				if (FAILED(hr = mpD3DDevice->StretchRect(pSurf, 0, pStretchSurf, 0, D3DTEXF_NONE)))
+				if (FAILED(hr = pD3DDevice->StretchRect(pSurf, 0, pStretchSurf, 0, D3DTEXF_NONE)))
 				{
 					SAFE_RELEASE(pTempSurf);
 					SAFE_RELEASE(pStretchSurf);
@@ -998,7 +834,7 @@ namespace Ogre
 								"Can't stretch rect: " + Root::getSingleton().getErrorDescription(hr),
 								"D3D9RenderWindow::copyContentsToMemory");
 				}
-				if (FAILED(hr = mpD3DDevice->GetRenderTargetData(pStretchSurf, pTempSurf)))
+				if (FAILED(hr = pD3DDevice->GetRenderTargetData(pStretchSurf, pTempSurf)))
 				{
 					SAFE_RELEASE(pTempSurf);
 					SAFE_RELEASE(pStretchSurf);
@@ -1017,10 +853,10 @@ namespace Ogre
 			{
 				RECT rect;
 
-				rect.left = (LONG)dst.left;
-				rect.right = (LONG)dst.right;
-				rect.top = (LONG)dst.top;
-				rect.bottom = (LONG)dst.bottom;
+				rect.left = static_cast<LONG>(dst.left);
+				rect.right = static_cast<LONG>(dst.right);
+				rect.top = static_cast<LONG>(dst.top);
+				rect.bottom = static_cast<LONG>(dst.bottom);
 
 				hr = pTempSurf->LockRect(&lockedRect, &rect, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK);
 			}
@@ -1053,64 +889,123 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------------
 	void D3D9RenderWindow::update(bool swap)
-	{
-
-		D3D9RenderSystem* rs = static_cast<D3D9RenderSystem*>(
-			Root::getSingleton().getRenderSystem());
-
-		// access device through driver
-		LPDIRECT3DDEVICE9 mpD3DDevice = mDriver->getD3DDevice();
-
-		if (rs->isDeviceLost())
-		{
-			// Test the cooperative mode first
-			HRESULT hr = mpD3DDevice->TestCooperativeLevel();
-			if (hr == D3DERR_DEVICELOST)
-			{
-				// device lost, and we can't reset
-				// can't do anything about it here, wait until we get 
-				// D3DERR_DEVICENOTRESET; rendering calls will silently fail until 
-				// then (except Present, but we ignore device lost there too)
-				SAFE_RELEASE(mpRenderSurface);
-				SAFE_RELEASE (mpRenderZBuffer);
-				Sleep(50);
-				return;
-			}
-			else
-			{
-				// device lost, and we can reset
-				rs->restoreLostDevice();
-
-				// Still lost?
-				if (rs->isDeviceLost())
-				{
-					// Wait a while
-					Sleep(50);
-					return;
-				}
-
-				if (!mIsSwapChain) 
-				{
-					// re-qeuery buffers
-					SAFE_RELEASE(mpRenderSurface);
-					mpD3DDevice->GetRenderTarget( 0, &mpRenderSurface );
-					SAFE_RELEASE(mpRenderZBuffer);
-					mpD3DDevice->GetDepthStencilSurface( &mpRenderZBuffer );
-				}
-				else 
-				{
-				    // Update dimensions incase changed
-		            ViewportList::iterator it = mViewportList.begin();
-		            while( it != mViewportList.end() )
-			            (*it++).second->_updateDimensions();
-					// Actual restoration of surfaces will happen in 
-					// D3D9RenderSystem::restoreLostDevice when it calls
-					// createD3DResources for each secondary window
-				}
-			}
-
+	{		
+		// External windows should update per frame
+		// since it dosen't get the window resize/move messages.
+		if (mIsExternal)
+		{		
+			updateWindowRect();
 		}
-		RenderWindow::update(swap);
+
+		if (mWidth == 0 || mHeight == 0)
+		{
+			mDeviceValid = false;
+			return;
+		}
+
+		D3D9RenderSystem::getDeviceManager()->setActiveRenderTargetDevice(mDevice);
+		
+		// Check that device can be used for rendering operations.
+		mDeviceValid = mDevice->validate(this);
+		if (mDeviceValid)
+		{
+			// Finish window / fullscreen mode switch.
+			if (_getSwitchingFullscreen())		
+				_finishSwitchingFullscreen();		
+
+			
+			RenderWindow::update(swap);					
+		}
+
+		D3D9RenderSystem::getDeviceManager()->setActiveRenderTargetDevice(NULL);	
 	}
 
+	//-----------------------------------------------------------------------------
+	IDirect3DDevice9* D3D9RenderWindow::getD3D9Device()
+	{
+		return mDevice->getD3D9Device();
+	}
+
+	//-----------------------------------------------------------------------------
+	IDirect3DSurface9* D3D9RenderWindow::getRenderSurface()
+	{
+		return mDevice->getBackBuffer(this);
+	}
+
+	//-----------------------------------------------------------------------------
+	bool D3D9RenderWindow::_getSwitchingFullscreen() const
+	{
+		return mSwitchingFullscreen;
+	}
+
+	//-----------------------------------------------------------------------------
+	D3D9Device* D3D9RenderWindow::getDevice()
+	{
+		return mDevice;
+	}
+
+	//-----------------------------------------------------------------------------
+	void D3D9RenderWindow::setDevice(D3D9Device* device)
+	{
+		mDevice = device;
+		mDeviceValid = false;
+	}
+
+	//-----------------------------------------------------------------------------
+	bool D3D9RenderWindow::isDepthBuffered() const
+	{
+		return mIsDepthBuffered;
+	}
+
+	//-----------------------------------------------------------------------------
+	void D3D9RenderWindow::updateWindowRect()
+	{
+		RECT rc;
+		BOOL result;
+
+		// Update top left parameters
+		result = GetWindowRect(mHWnd, &rc);
+		if (result == FALSE)
+		{
+			mTop = 0;
+			mLeft = 0;
+			mWidth = 0;
+			mHeight = 0;
+			return;
+		}
+		
+		mTop = rc.top;
+		mLeft = rc.left;
+
+		// width and height represent drawable area only
+		result = GetClientRect(mHWnd, &rc);
+		if (result == FALSE)
+		{
+			mTop = 0;
+			mLeft = 0;
+			mWidth = 0;
+			mHeight = 0;
+			return;
+		}
+		unsigned int width = rc.right - rc.left;
+		unsigned int height = rc.bottom - rc.top;
+
+		// Case window resized.
+		if (width != mWidth || height != mHeight)
+		{
+			mWidth  = rc.right - rc.left;
+			mHeight = rc.bottom - rc.top;
+
+			// Notify viewports of resize
+			ViewportList::iterator it = mViewportList.begin();
+			while( it != mViewportList.end() )
+				(*it++).second->_updateDimensions();			
+		}			
+	}
+
+	//-----------------------------------------------------------------------------
+	bool D3D9RenderWindow::isNvPerfHUDEnable() const
+	{
+		return mUseNVPerfHUD;
+	}
 }

@@ -888,7 +888,11 @@ namespace Ogre {
 		for (GLContextList::iterator i = mBackgroundContextList.begin(); 
 			i != mBackgroundContextList.end(); ++i)
 		{
-			delete *i;
+			GLContext* pCurContext = *i;
+
+			pCurContext->releaseContext();
+
+			delete pCurContext;
 		}
 		mBackgroundContextList.clear();
 
@@ -931,55 +935,19 @@ namespace Ogre {
 		if (false == RenderSystem::_createRenderWindows(renderWindowDescriptions, createdWindows))
 			return false;
 
-		unsigned int fullscreenWindowsCount = 0;
-			
-		// Count full screen windows.
-		for (unsigned int nWindow = 0; nWindow < renderWindowDescriptions.size(); ++nWindow)
+		// Simply call _createRenderWindow in a loop.
+		for (size_t i = 0; i < renderWindowDescriptions.size(); ++i)
 		{
-			const RenderWindowDescription* curDesc = &renderWindowDescriptions[nWindow];
+			const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];			
+			RenderWindow* curWindow = NULL;
 
-			if (curDesc->useFullScreen)			
-				fullscreenWindowsCount++;			
-		}
+			curWindow = _createRenderWindow(curRenderWindowDescription.name, 
+				curRenderWindowDescription.width, 
+				curRenderWindowDescription.height, 
+				curRenderWindowDescription.useFullScreen, 
+				&curRenderWindowDescription.miscParams);
 
-				
-		// Case we have to create multiple windowed rendering windows.
-		if (fullscreenWindowsCount == 0)
-		{
-			for(size_t i = 0; i < renderWindowDescriptions.size(); ++i)
-			{
-				const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];			
-				RenderWindow*			  curWindow = NULL;
-				
-				curWindow = _createRenderWindow(curRenderWindowDescription.name, 
-					curRenderWindowDescription.width, 
-					curRenderWindowDescription.height, 
-					curRenderWindowDescription.useFullScreen, 
-					&curRenderWindowDescription.miscParams);
-										
-				createdWindows.push_back(curWindow);														
-			}
-		}
-
-		// Case we have to create multiple full screen rendering windows.
-		else
-		{			
-			for(size_t i = 0; i < renderWindowDescriptions.size(); ++i)
-			{
-				const RenderWindowDescription& curRenderWindowDescription = renderWindowDescriptions[i];			
-				RenderWindow*       curWindow = NULL;
-				NameValuePairList   extramMiscParams = curRenderWindowDescription.miscParams;		
-
-				// Override window adapter.
-				extramMiscParams["head"] = StringConverter::toString(i);
-				
-				curWindow = _createRenderWindow(curRenderWindowDescription.name, 
-					curRenderWindowDescription.width, curRenderWindowDescription.height, 
-					true, 
-					&extramMiscParams);
-											
-				createdWindows.push_back(curWindow);																	
-			}
+			createdWindows.push_back(curWindow);											
 		}
 								
 		return true;
@@ -3458,6 +3426,12 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	{
 		// reacquire context
 		mCurrentContext->setCurrent();
+	}
+
+	//---------------------------------------------------------------------
+	unsigned int GLRenderSystem::getDisplayMonitorCount() const
+	{
+		return mGLSupport->getDisplayMonitorCount();
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::setActiveTextureUnit(ushort unit)

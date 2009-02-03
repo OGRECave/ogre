@@ -57,6 +57,7 @@ namespace Ogre
 
 		virtual bool supportsPBuffers();
 		virtual GLPBuffer *createPBuffer(PixelComponentType format, size_t width, size_t height);
+		virtual unsigned int getDisplayMonitorCount() const;
 	private:
 		// Allowed video modes
 		vector<DEVMODE>::type mDevModes;
@@ -65,7 +66,17 @@ namespace Ogre
 		bool mHasPixelFormatARB;
         bool mHasMultisample;
 		bool mHasHardwareGamma;
-		vector<MONITORINFOEX>::type mMonitorInfoList;
+
+		struct DisplayMonitorInfo
+		{
+			HMONITOR		hMonitor;
+			MONITORINFOEX	monitorInfoEx;
+		};
+
+		typedef vector<DisplayMonitorInfo>::type DisplayMonitorInfoList;
+		typedef DisplayMonitorInfoList::iterator DisplayMonitorInfoIterator;
+
+		DisplayMonitorInfoList mMonitorInfoList;
 
 		void refreshConfig();
 		void initialiseWGL();

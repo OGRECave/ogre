@@ -283,16 +283,18 @@ namespace Ogre {
 		LPARAM dwData       // data
 		)
 	{
-		vector<MONITORINFOEX>::type* pArrMonitorsInfo = (vector<MONITORINFOEX>::type*)dwData;
+		DisplayMonitorInfoList* pArrMonitorsInfo = (DisplayMonitorInfoList*)dwData;
 
 		// Get monitor info
-		MONITORINFOEX monitorInfoEx;
+		DisplayMonitorInfo displayMonitorInfo;
 
-		memset(&monitorInfoEx, 0, sizeof(monitorInfoEx));
-		monitorInfoEx.cbSize = sizeof(MONITORINFOEX);
-		GetMonitorInfo(hMonitor, &monitorInfoEx);
+		displayMonitorInfo.hMonitor = hMonitor;
 
-		pArrMonitorsInfo->push_back(monitorInfoEx);
+		memset(&displayMonitorInfo.monitorInfoEx, 0, sizeof(MONITORINFOEX));
+		displayMonitorInfo.monitorInfoEx.cbSize = sizeof(MONITORINFOEX);
+		GetMonitorInfo(hMonitor, &displayMonitorInfo.monitorInfoEx);
+
+		pArrMonitorsInfo->push_back(displayMonitorInfo);
 
 		return TRUE;
 	}
@@ -305,14 +307,31 @@ namespace Ogre {
 		NameValuePairList newParams;
 	
 		if (miscParams != NULL)
-		{			
-			NameValuePairList::const_iterator headIt = miscParams->find("head");
+		{	
+			newParams = *miscParams;
+			miscParams = &newParams;
+
+			NameValuePairList::const_iterator monitorIndexIt = miscParams->find("monitorIndex");			
+			HMONITOR hMonitor = NULL;
+			int monitorIndex = -1;
 		
-			if (headIt != miscParams->end())
+			// If monitor index found, try to assign the monitor handle based on it.
+			if (monitorIndexIt != miscParams->end())
+			{				
+				if (mMonitorInfoList.empty())		
+					EnumDisplayMonitors(NULL, NULL, sCreateMonitorsInfoEnumProc, (LPARAM)&mMonitorInfoList);			
+
+				monitorIndex = StringConverter::parseInt(monitorIndexIt->second);
+				if (monitorIndex < (int)mMonitorInfoList.size())
+				{						
+					hMonitor = mMonitorInfoList[monitorIndex].hMonitor;					
+				}
+			}
+			// If we didn't specified the monitor index, or if it didn't find it
+			if (hMonitor == NULL)
 			{
-				newParams = *miscParams;
-				miscParams = &newParams;
-				
+				POINT windowAnchorPoint;
+		
 				NameValuePairList::const_iterator opt;
 				int left = -1;
 				int top  = -1;
@@ -323,41 +342,18 @@ namespace Ogre {
 				if ((opt = newParams.find("top")) != newParams.end())
 					top = StringConverter::parseInt(opt->second);
 
-				// Use given top left as anchor point and determine the
-				// device name by it.
-				if (top != -1 && left != -1)
-				{
-					POINT			pt;
-					HMONITOR		hCurWindowMonitor;
-					MONITORINFOEX   mi;
-					
-					pt.x = left;
-					pt.y = top;
+				// Fill in anchor point.
+				windowAnchorPoint.x = left;
+				windowAnchorPoint.y = top;
 
-					hCurWindowMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);	
 
-					memset(&mi, 0, sizeof(mi));
-					mi.cbSize = sizeof(mi);
-
-					if (GetMonitorInfo(hCurWindowMonitor, &mi))
-						newParams["headDeviceName"] = mi.szDevice;
-				}
-
-				// Use head index to grab device name in case position was not
-				// used or failed.
-				if (newParams.find("headDeviceName") == newParams.end()) 
-				{
-					if (mMonitorInfoList.empty())		
-						EnumDisplayMonitors(NULL, NULL, sCreateMonitorsInfoEnumProc, (LPARAM)&mMonitorInfoList);			
-
-					int head = StringConverter::parseInt(headIt->second);
-					if (head < mMonitorInfoList.size())
-					{						
-						newParams["headDeviceName"] = mMonitorInfoList[head].szDevice;						
-					}
-				}								
+				// Get the nearest monitor to this window.
+				hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTONEAREST);				
 			}
+
+			newParams["monitorHandle"] = StringConverter::toString((int)hMonitor);																
 		}
+
 		window->create(name, width, height, fullScreen, miscParams);
 
 		if(!mInitialWindow)
@@ -619,6 +615,14 @@ namespace Ogre {
     GLPBuffer *Win32GLSupport::createPBuffer(PixelComponentType format, size_t width, size_t height)
 	{
 		return new Win32PBuffer(format, width, height);
+	}
+
+	unsigned int Win32GLSupport::getDisplayMonitorCount() const
+	{
+		if (mMonitorInfoList.empty())		
+			EnumDisplayMonitors(NULL, NULL, sCreateMonitorsInfoEnumProc, (LPARAM)&mMonitorInfoList);
+
+		return (unsigned int)mMonitorInfoList.size();
 	}
 
 	String translateWGLError()

@@ -87,6 +87,12 @@ public:
     */
     virtual void initialiseExtensions();
 
+	/// @copydoc RenderSystem::getDisplayMonitorCount
+	virtual unsigned int getDisplayMonitorCount() const
+	{
+		return 1;
+	}
+
 protected:
 	// Stored options
     ConfigOptionMap mOptions;

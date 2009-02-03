@@ -31,18 +31,16 @@ Torus Knot Software Ltd.
 
 #include "OgreD3D9Prerequisites.h"
 #include "OgreHardwareVertexBuffer.h"
+#include "OgreD3D9Resource.h"
 
 namespace Ogre { 
 
     /** Specialisation of VertexDeclaration for D3D9 */
-    class D3D9VertexDeclaration : public VertexDeclaration
+    class D3D9VertexDeclaration : public VertexDeclaration, public D3D9Resource
     {
-    protected:
-        LPDIRECT3DDEVICE9 mlpD3DDevice;
-        LPDIRECT3DVERTEXDECLARATION9 mlpD3DDecl;
-        bool mNeedsRebuild;
+    
     public:
-        D3D9VertexDeclaration(LPDIRECT3DDEVICE9 device);
+        D3D9VertexDeclaration();
         ~D3D9VertexDeclaration();
         
         /** See VertexDeclaration */
@@ -68,10 +66,24 @@ namespace Ogre {
         void modifyElement(unsigned short elem_index, unsigned short source, size_t offset, VertexElementType theType,
             VertexElementSemantic semantic, unsigned short index = 0);
 
+		// Called immediately after the Direct3D device has been created.
+		virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
+
+		// Called before the Direct3D device is going to be destroyed.
+		virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
+
         /** Gets the D3D9-specific vertex declaration. */
-        LPDIRECT3DVERTEXDECLARATION9 getD3DVertexDeclaration(void);
+        IDirect3DVertexDeclaration9* getD3DVertexDeclaration(void);
+
+	protected:
+		void	releaseDeclaration();
 
 
+	protected:        
+		typedef map<IDirect3DDevice9*, IDirect3DVertexDeclaration9*>::type	DeviceToDeclarationMap;
+		typedef DeviceToDeclarationMap::iterator							DeviceToDeclarationIterator;
+
+		DeviceToDeclarationMap		mMapDeviceToDeclaration;
     };
 
 }

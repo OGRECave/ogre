@@ -67,8 +67,11 @@ Description: Somewhere to play in the sand...
 #endi*/
 
 
-// Uncomment this to create dual full screen render windows.
-//#define _DUAL_MONITOR_RENDER_MODE_
+// Uncomment this to create multiple render windows which are clone of the main window.
+// NOTE: If you choose full screen - make sure you select the primary adapter. This is 
+// important since each full screen window should have it's own adapter and for
+// code simplicity the code here assumes that the main window sits on the first available adapter.
+//#define _MULTIPLE_MONITOR_RENDER_MODE_
 
 #define NUM_TEST_NODES 5
 SceneNode* mTestNode[NUM_TEST_NODES] = {0,0,0,0,0};
@@ -637,8 +640,8 @@ protected:
 
 		if(mRoot->showConfigDialog())
 		{
-#ifdef _DUAL_MONITOR_RENDER_MODE_
-			result = createDualFullscreenRenderWindows();
+#ifdef _MULTIPLE_MONITOR_RENDER_MODE_
+			result = createMultipleRenderWindows();
 #else
 			// If returned true, user clicked OK so initialise
 			// Here we choose to let the system create a default rendering window by passing 'true'
@@ -654,35 +657,27 @@ protected:
 		return result;
 	}
 
-	bool createDualFullscreenRenderWindows()
-	{
-	
-		mRoot->initialise(false, "Dual Monitor test");
-
-		RenderWindowDescriptionList renderWindowsDescriptions;			
-		unsigned int left = 0;
+	bool createMultipleRenderWindows()
+	{	
+		// Create the main window.
+		mWindow = mRoot->initialise(true, "RenderWindow_0");
 		
-		renderWindowsDescriptions.resize(2);
+		// Create the rest of the windows.
+		for (unsigned i = 1; i < mRoot->getDisplayMonitorCount(); ++i)
+		{
+			String strWindowName = "RenderWindow_" + StringConverter::toString(i);
+			NameValuePairList nvList;
 
-		// Generate windows creation parameters.		
-		for (unsigned int i = 0;  i < 2; ++i)
-		{											
-			renderWindowsDescriptions[i].miscParams["top"] = StringConverter::toString((int)0);
-			renderWindowsDescriptions[i].miscParams["left"] = StringConverter::toString((int)left);
-			renderWindowsDescriptions[i].width  = 1024;
-			renderWindowsDescriptions[i].height = 768;
-			renderWindowsDescriptions[i].useFullScreen = true;
-			renderWindowsDescriptions[i].name = "Monitor_" + StringConverter::toString(i);
-			
-			left += renderWindowsDescriptions[i].width;
+			nvList["monitorIndex"] = StringConverter::toString(i);
+
+			RenderWindow* currRenderWindow = mRoot->createRenderWindow(strWindowName,
+				mWindow->getWidth(), mWindow->getHeight(), mWindow->isFullScreen(), &nvList);
+
+			currRenderWindow->setDeactivateOnFocusChange(false);
+
+			mRenderWindows.push_back(currRenderWindow);
 		}
-							
-		// Create the render windows.
-		if (false == mRoot->createRenderWindows(renderWindowsDescriptions, mRenderWindows))
-			return false;
-
-		mWindow = mRenderWindows[0];
-
+	
 		return true;
 	}
 
@@ -697,15 +692,15 @@ protected:
 		mCamera->lookAt(Vector3(0,0,-300));
 		mCamera->setNearClipDistance(5);
 
-		// Attach the main camera to secondary render windows.
-		attachCameraToSecondaryWindows();
+		// Attach the main camera to additional render windows.
+		attachCameraToAdditionalRenderWindows();
 	}
 
 
-	void attachCameraToSecondaryWindows()
+	void attachCameraToAdditionalRenderWindows()
 	{		
 		// Create camera for the secondary render windows.
-		for (unsigned int i=1; i < mRenderWindows.size(); ++i)
+		for (unsigned int i=0; i < mRenderWindows.size(); ++i)
 		{
 			RenderWindow* pCurWindow = mRenderWindows[i];
 
@@ -7752,7 +7747,7 @@ protected:
 
 		//testManualLOD();
 		//testGeneratedLOD();
-		testLotsAndLotsOfEntities();
+		//testLotsAndLotsOfEntities();
 		//testSimpleMesh();
 		//test2Windows();
 		//testStaticGeometry();
@@ -7832,7 +7827,7 @@ protected:
 
 		//testDepthShadowMap();
 
-        //testLod();
+        testLod();
 
 
 

@@ -85,22 +85,20 @@ namespace Ogre {
 		mHWnd = 0;
 		mName = name;
 		mIsFullScreen = fullScreen;
-		mClosed = false;
-
-		// load window defaults
-		mLeft = mTop = -1; // centered
-		mWidth = width;
-		mHeight = height;
+		mClosed = false;		
 		mDisplayFrequency = 0;
 		mIsDepthBuffered = true;
 		mColourDepth = mIsFullScreen? 32 : GetDeviceCaps(GetDC(0), BITSPIXEL);
-
+		int left = -1; // Defaults to screen center
+		int top = -1; // Defaults to screen center
 		HWND parent = 0;
 		String title = name;
 		bool vsync = false;
 		String border;
 		bool outerSize = false;
 		bool hwGamma = false;
+		int monitorIndex = -1;
+		HMONITOR hMonitor = NULL;
 
 		if(miscParams)
 		{
@@ -112,10 +110,10 @@ namespace Ogre {
 				title = opt->second;
 
 			if ((opt = miscParams->find("left")) != end)
-				mLeft = StringConverter::parseInt(opt->second);
+				left = StringConverter::parseInt(opt->second);
 
 			if ((opt = miscParams->find("top")) != end)
-				mTop = StringConverter::parseInt(opt->second);
+				top = StringConverter::parseInt(opt->second);
 
 			if ((opt = miscParams->find("depthBuffer")) != end)
 				mIsDepthBuffered = StringConverter::parseBool(opt->second);
@@ -170,7 +168,7 @@ namespace Ogre {
 				if (!mIsFullScreen)
 				{
 					// make sure we don't exceed desktop colour depth
-					if (mColourDepth > GetDeviceCaps(GetDC(0), BITSPIXEL))
+					if ((int)mColourDepth > GetDeviceCaps(GetDC(0), BITSPIXEL))
 						mColourDepth = GetDeviceCaps(GetDC(0), BITSPIXEL);
 				}
 			}
@@ -180,38 +178,87 @@ namespace Ogre {
 				parent = (HWND)StringConverter::parseUnsignedInt(opt->second);
 
 
-			// Deal with multihead
-			NameValuePairList::const_iterator headDev = miscParams->find("headDeviceName");
-			if (headDev != miscParams->end())	
-			{
-				size_t devNameLen = strlen(headDev->second.c_str());
-				mDeviceName = new char[devNameLen + 1];
-
-				strcpy(mDeviceName, headDev->second.c_str());			
-			}
-			else
-				mDeviceName = NULL;
-
+			// monitor index
+			if ((opt = miscParams->find("monitorIndex")) != end)
+				monitorIndex = StringConverter::parseInt(opt->second);
+			
+			// monitor handle
+			if ((opt = miscParams->find("monitorHandle")) != end)
+				hMonitor = (HMONITOR)StringConverter::parseInt(opt->second);			
 		}
 
 		if (!mIsExternal)
 		{
-			DWORD dwStyle = WS_VISIBLE | WS_CLIPCHILDREN;
-			DWORD dwStyleEx = 0;
-			int outerw, outerh;
+			DWORD		  dwStyle = WS_VISIBLE | WS_CLIPCHILDREN;
+			DWORD		  dwStyleEx = 0;					
+			MONITORINFOEX monitorInfoEx;
+			RECT		  rc;
+			
+			// If we didn't specified the adapter index, or if it didn't find it
+			if (hMonitor == NULL)
+			{
+				POINT windowAnchorPoint;
+
+				// Fill in anchor point.
+				windowAnchorPoint.x = left;
+				windowAnchorPoint.y = top;
+
+
+				// Get the nearest monitor to this window.
+				hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTONEAREST);
+			}
+
+			// Get the target monitor info		
+			memset(&monitorInfoEx, 0, sizeof(MONITORINFOEX));
+			monitorInfoEx.cbSize = sizeof(MONITORINFOEX);
+			GetMonitorInfo(hMonitor, &monitorInfoEx);
+
+			size_t devNameLen = strlen(monitorInfoEx.szDevice);
+			mDeviceName = new char[devNameLen + 1];
+
+			strcpy(mDeviceName, monitorInfoEx.szDevice);			
+
+
+			// No specified top left -> Center the window in the middle of the monitor
+			if (left == -1 || top == -1)
+			{				
+				int screenw = monitorInfoEx.rcMonitor.right  - monitorInfoEx.rcMonitor.left;
+				int screenh = monitorInfoEx.rcMonitor.bottom - monitorInfoEx.rcMonitor.top;
+
+				SetRect(&rc, 0, 0, width, height);
+				AdjustWindowRect(&rc, dwStyle, false);
+
+				// clamp window dimensions to screen size
+				int outerw = (rc.right-rc.left < screenw)? rc.right-rc.left : screenw;
+				int outerh = (rc.bottom-rc.top < screenh)? rc.bottom-rc.top : screenh;
+
+				if (left == -1)
+					left = monitorInfoEx.rcMonitor.left + (screenw - outerw) / 2;
+				else if (monitorIndex != -1)
+					left += monitorInfoEx.rcMonitor.left;
+
+				if (top == -1)
+					top = monitorInfoEx.rcMonitor.top + (screenh - outerh) / 2;
+				else if (monitorIndex != -1)
+					top += monitorInfoEx.rcMonitor.top;
+			}
+			else if (monitorIndex != -1)
+			{
+				left += monitorInfoEx.rcMonitor.left;
+				top += monitorInfoEx.rcMonitor.top;
+			}
+
+			mWidth = width;
+			mHeight = height;
+			mTop = top;
+			mLeft = left;
 
 			if (mIsFullScreen)
 			{
 				dwStyle |= WS_POPUP;
 				dwStyleEx |= WS_EX_TOPMOST;
-				outerw = mWidth;
-				outerh = mHeight;
-
-				if (mDeviceName == NULL)
-				{
-					mLeft = 0;
-					mTop = 0;
-				}								
+				mTop = monitorInfoEx.rcMonitor.top;
+				mLeft = monitorInfoEx.rcMonitor.left;											
 			}
 			else
 			{				
@@ -235,26 +282,26 @@ namespace Ogre {
 
 				if (!outerSize)
 				{
-					// calculate overall dimensions for requested client area
-					RECT rc = { 0, 0, mWidth, mHeight };
+					// Calculate window dimensions required
+					// to get the requested client area
+					SetRect(&rc, 0, 0, mWidth, mHeight);
 					AdjustWindowRect(&rc, dwStyle, false);
+					mWidth = rc.right - rc.left;
+					mHeight = rc.bottom - rc.top;
 
-					// clamp window dimensions to screen size
-					outerw = (rc.right-rc.left < screenw)? rc.right-rc.left : screenw;
-					outerh = (rc.bottom-rc.top < screenh)? rc.bottom-rc.top : screenh;
-				}
+					// Clamp window rect to the nearest display monitor.
+					if (mLeft < monitorInfoEx.rcMonitor.left)
+						mLeft = monitorInfoEx.rcMonitor.left;		
 
-				// center window if given negative coordinates
-				if (mLeft < 0)
-					mLeft = (screenw - outerw) / 2;
-				if (mTop < 0)
-					mTop = (screenh - outerh) / 2;
+					if (mTop < monitorInfoEx.rcMonitor.top)					
+						mTop = monitorInfoEx.rcMonitor.top;					
 
-				// keep window contained in visible screen area
-				if (mLeft > screenw - outerw)
-					mLeft = screenw - outerw;
-				if (mTop > screenh - outerh)
-					mTop = screenh - outerh;
+					if ((int)mWidth > monitorInfoEx.rcMonitor.right - mLeft)					
+						mWidth = monitorInfoEx.rcMonitor.right - mLeft;	
+
+					if ((int)mHeight > monitorInfoEx.rcMonitor.bottom - mTop)					
+						mHeight = monitorInfoEx.rcMonitor.bottom - mTop;		
+				}			
 			}
 
 			// register class and create window
@@ -290,7 +337,7 @@ namespace Ogre {
 
 			// Pass pointer to self as WM_CREATE parameter
 			mHWnd = CreateWindowEx(dwStyleEx, "OgreGLWindow", title.c_str(),
-				dwStyle, mLeft, mTop, outerw, outerh, parent, 0, hInst, this);
+				dwStyle, mLeft, mTop, mWidth, mHeight, parent, 0, hInst, this);
 
 			WindowEventUtilities::_addRenderWindow(this);
 
@@ -443,8 +490,21 @@ namespace Ogre {
 				if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN, NULL) != DISP_CHANGE_SUCCESSFUL)				
 					LogManager::getSingleton().logMessage(LML_CRITICAL, "ChangeDisplaySettings failed");
 
+				// Get the nearest monitor to this window.
+				HMONITOR hMonitor = MonitorFromWindow(mHWnd, MONITOR_DEFAULTTONEAREST);
+
+				// Get monitor info	
+				MONITORINFO monitorInfo;
+
+				memset(&monitorInfo, 0, sizeof(MONITORINFO));
+				monitorInfo.cbSize = sizeof(MONITORINFO);
+				GetMonitorInfo(hMonitor, &monitorInfo);
+
+				mTop = monitorInfo.rcMonitor.top;
+				mLeft = monitorInfo.rcMonitor.left;
+
 				SetWindowLong(mHWnd, GWL_STYLE, dwStyle);
-				SetWindowPos(mHWnd, HWND_TOPMOST, 0, 0, width, height,
+				SetWindowPos(mHWnd, HWND_TOPMOST, mLeft, mTop, width, height,
 					SWP_NOACTIVATE);
 				mWidth = width;
 				mHeight = height;

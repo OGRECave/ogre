@@ -40,10 +40,9 @@ namespace Ogre
 	{
 	private:
 		vector<D3D9Driver>::type mDriverList;
-		LPDIRECT3D9 mpD3D;
-
+		
 	public:
-		D3D9DriverList( LPDIRECT3D9 pD3D );
+		D3D9DriverList();
 		~D3D9DriverList();
 
 		BOOL enumerate();

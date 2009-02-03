@@ -1230,6 +1230,12 @@ namespace Ogre
 		@see RenderSystem::registerThread
 		*/
 		virtual void unregisterThread() = 0;
+
+		/**
+		* Gets the number of display monitors.
+		@see Root::getDisplayMonitorCount
+		*/
+		virtual unsigned int getDisplayMonitorCount() const = 0;
 	protected:
 
 

@@ -85,4 +85,14 @@ namespace Ogre {
 
 		return new Win32Context(mHDC, newCtx);
 	}
+
+	void Win32Context::releaseContext()
+	{
+		if (mGlrc != NULL)
+		{
+			wglDeleteContext(mGlrc);
+			mGlrc = NULL;
+			mHDC  = NULL;
+		}		
+	}
 }

@@ -28,6 +28,7 @@ Torus Knot Software Ltd.
 */
 #include "OgreD3D9VideoModeList.h"
 #include "OgreException.h"
+#include "OgreD3D9RenderSystem.h"
 
 namespace Ogre 
 {
@@ -49,7 +50,7 @@ namespace Ogre
 	BOOL D3D9VideoModeList::enumerate()
 	{
 		UINT iMode;
-		LPDIRECT3D9 pD3D = mpDriver->getD3D();
+		IDirect3D9* pD3D = D3D9RenderSystem::getDirect3D9();
 		UINT adapter = mpDriver->getAdapterNumber();
 
 		for( iMode=0; iMode < pD3D->GetAdapterModeCount( adapter, D3DFMT_R5G6B5 ); iMode++ )

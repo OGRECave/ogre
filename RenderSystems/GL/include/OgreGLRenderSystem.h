@@ -491,6 +491,9 @@ namespace Ogre {
         void _unregisterContext(GLContext *context);
 		/** Returns the main context */
 		GLContext* _getMainContext() {return mMainContext;} 
+
+		/// @copydoc RenderSystem::getDisplayMonitorCount
+		unsigned int getDisplayMonitorCount() const;
     };
 }
 #endif

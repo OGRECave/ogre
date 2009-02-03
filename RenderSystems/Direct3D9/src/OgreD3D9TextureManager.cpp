@@ -37,15 +37,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre 
 {
-	D3D9TextureManager::D3D9TextureManager( LPDIRECT3DDEVICE9 pD3DDevice ) : TextureManager()
-	{
-		mpD3DDevice = pD3DDevice;
-		if( !mpD3DDevice )
-			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Invalid Direct3DDevice passed", "D3D9TextureManager::D3D9TextureManager" );
+	D3D9TextureManager::D3D9TextureManager() : TextureManager()
+	{		
         // register with group manager
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
 	}
-
+	
 	D3D9TextureManager::~D3D9TextureManager()
 	{
         // unregister with group manager
@@ -57,49 +54,9 @@ namespace Ogre
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader, const NameValuePairList* createParams)
     {
-        D3D9Texture* ret = new D3D9Texture(this, name, handle, group, isManual, loader, mpD3DDevice); 
-		{
-			OGRE_LOCK_MUTEX(mAllTexturesMutex)
-			mAllTextures.insert(ret);
-		}
-
+        D3D9Texture* ret = new D3D9Texture(this, name, handle, group, isManual, loader); 		
 		return ret;
     }
-
-	void D3D9TextureManager::releaseDefaultPoolResources(void)
-	{
-		size_t count = 0;
-
-		OGRE_LOCK_MUTEX(mAllTexturesMutex)
-
-		for (D3D9TextureSet::iterator i = mAllTextures.begin(); 
-			i != mAllTextures.end(); ++i)
-		{
-			if ((*i)->releaseIfDefaultPool())
-				count++;
-		}
-		LogManager::getSingleton().logMessage("D3D9TextureManager released:");
-		LogManager::getSingleton().logMessage(
-			StringConverter::toString(count) + " unmanaged textures");
-	}
-
-	void D3D9TextureManager::recreateDefaultPoolResources(void)
-	{
-		size_t count = 0;
-
-		OGRE_LOCK_MUTEX(mAllTexturesMutex)
-
-		for (D3D9TextureSet::iterator i = mAllTextures.begin(); 
-			i != mAllTextures.end(); ++i)
-		{
-			if((*i)->recreateIfDefaultPool(mpD3DDevice))
-				count++;
-		}
-		LogManager::getSingleton().logMessage("D3D9TextureManager recreated:");
-		LogManager::getSingleton().logMessage(
-			StringConverter::toString(count) + " unmanaged textures");
-	}
-
 
 	PixelFormat D3D9TextureManager::getNativeFormat(TextureType ttype, PixelFormat format, int usage)
 	{
@@ -120,24 +77,24 @@ namespace Ogre
 			pool = D3DPOOL_DEFAULT;
 		}
 
+		IDirect3DDevice9* pCurDevice = D3D9RenderSystem::getActiveD3D9Device();
+
 		// Use D3DX to adjust pixel format
 		switch(ttype)
 		{
 		case TEX_TYPE_1D:
 		case TEX_TYPE_2D:
-			D3DXCheckTextureRequirements(mpD3DDevice, NULL, NULL, NULL, d3dusage, &d3dPF, pool);
+			D3DXCheckTextureRequirements(pCurDevice, NULL, NULL, NULL, d3dusage, &d3dPF, pool);
 			break;
 		case TEX_TYPE_3D:
-			D3DXCheckVolumeTextureRequirements(mpD3DDevice, NULL, NULL, NULL, NULL, d3dusage, &d3dPF, pool);
+			D3DXCheckVolumeTextureRequirements(pCurDevice, NULL, NULL, NULL, NULL, d3dusage, &d3dPF, pool);
 			break;
 		case TEX_TYPE_CUBE_MAP:
-			D3DXCheckCubeTextureRequirements(mpD3DDevice, NULL, NULL, d3dusage, &d3dPF, pool);
+			D3DXCheckCubeTextureRequirements(pCurDevice, NULL, NULL, d3dusage, &d3dPF, pool);
 			break;
 		};
 
 		return D3D9Mappings::_getPF(d3dPF);
-
-
 	}
 
     bool D3D9TextureManager::isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
@@ -151,11 +108,4 @@ namespace Ogre
 
         return rs->_checkTextureFilteringSupported(ttype, format, usage);
     }
-
-	void D3D9TextureManager::_notifyDestroyed(D3D9Texture* tex)
-	{
-		OGRE_LOCK_MUTEX(mAllTexturesMutex)
-		mAllTextures.erase(tex);
-	}
-
 }

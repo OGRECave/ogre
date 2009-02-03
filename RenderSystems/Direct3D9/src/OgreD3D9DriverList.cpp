@@ -29,13 +29,12 @@ Torus Knot Software Ltd.
 #include "OgreD3D9DriverList.h"
 #include "OgreLogManager.h"
 #include "OgreException.h"
+#include "OgreD3D9RenderSystem.h"
 
 namespace Ogre 
 {
-	D3D9DriverList::D3D9DriverList( LPDIRECT3D9 pD3D ) : mpD3D(pD3D)
+	D3D9DriverList::D3D9DriverList()
 	{
-		if( !mpD3D )
-			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Direct3D9 interface pointer is NULL", "D3D9DriverList::D3D9DriverList" );
 		enumerate();
 	}
 
@@ -46,15 +45,20 @@ namespace Ogre
 
 	BOOL D3D9DriverList::enumerate()
 	{
+		IDirect3D9* lpD3D9 = D3D9RenderSystem::getDirect3D9();
+
 		LogManager::getSingleton().logMessage( "D3D9: Driver Detection Starts" );
-		for( UINT iAdapter=0; iAdapter < mpD3D->GetAdapterCount(); ++iAdapter )
+		for( UINT iAdapter=0; iAdapter < lpD3D9->GetAdapterCount(); ++iAdapter )
 		{
 			D3DADAPTER_IDENTIFIER9 adapterIdentifier;
 			D3DDISPLAYMODE d3ddm;
-			mpD3D->GetAdapterIdentifier( iAdapter, 0, &adapterIdentifier );
-			mpD3D->GetAdapterDisplayMode( iAdapter, &d3ddm );
+			D3DCAPS9 d3dcaps9;
+			
+			lpD3D9->GetAdapterIdentifier( iAdapter, 0, &adapterIdentifier );
+			lpD3D9->GetAdapterDisplayMode( iAdapter, &d3ddm );
+			lpD3D9->GetDeviceCaps( iAdapter, D3DDEVTYPE_HAL, &d3dcaps9 );
 
-			mDriverList.push_back( D3D9Driver( mpD3D, iAdapter, adapterIdentifier, d3ddm ) );
+			mDriverList.push_back( D3D9Driver( iAdapter, d3dcaps9, adapterIdentifier, d3ddm ) );
 		}
 
 		LogManager::getSingleton().logMessage( "D3D9: Driver Detection Ends" );

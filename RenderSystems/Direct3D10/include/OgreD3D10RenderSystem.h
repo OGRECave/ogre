@@ -362,6 +362,10 @@ namespace Ogre
         bool _checkTextureFilteringSupported(TextureType ttype, PixelFormat format, int usage);
 
 		void determineFSAASettings(uint fsaa, const String& fsaaHint, DXGI_FORMAT format, DXGI_SAMPLE_DESC* outFSAASettings);
+
+		/// @copydoc RenderSystem::getDisplayMonitorCount
+		unsigned int getDisplayMonitorCount() const {return 1;} //todo
+
 	};
 }
 #endif

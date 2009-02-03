@@ -6,7 +6,7 @@ For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2006 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
-
+ 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License as published by the Free Software
 Foundation; either version 2 of the License, or (at your option) any later
@@ -33,41 +33,33 @@ Torus Knot Software Ltd.
 namespace Ogre
 {   
 	D3D9Driver::D3D9Driver()
-	{		
-		mpD3D = NULL;
-		// initialise device member
-		mpD3DDevice = NULL;
+	{						
+		mAdapterNumber	= 0;
+		ZeroMemory( &mD3D9DeviceCaps, sizeof(mD3D9DeviceCaps) );
 		ZeroMemory( &mAdapterIdentifier, sizeof(mAdapterIdentifier) );
-		ZeroMemory( &mDesktopDisplayMode, sizeof(mDesktopDisplayMode) );
-		mpVideoModeList = NULL;
-		mIsAutoDepthStencil = true;
-		mIsMultihead = false;
+		ZeroMemory( &mDesktopDisplayMode, sizeof(mDesktopDisplayMode) );		
+		mpVideoModeList = NULL;				
 	}
 
 	D3D9Driver::D3D9Driver( const D3D9Driver &ob )
-	{		
-		mpD3D = ob.mpD3D;
-		// copy device member
-		mpD3DDevice = ob.mpD3DDevice;
-		mAdapterNumber = ob.mAdapterNumber;
-		mAdapterIdentifier = ob.mAdapterIdentifier;
+	{			
+		mAdapterNumber		= ob.mAdapterNumber;
+		mD3D9DeviceCaps		= ob.mD3D9DeviceCaps;
+		mAdapterIdentifier	= ob.mAdapterIdentifier;
 		mDesktopDisplayMode = ob.mDesktopDisplayMode;
-		mpVideoModeList = NULL;
-		mIsAutoDepthStencil = true;
-		mIsMultihead = false;
+		mpVideoModeList		= NULL;				
 	}
 
-	D3D9Driver::D3D9Driver( LPDIRECT3D9 pD3D, unsigned int adapterNumber, const D3DADAPTER_IDENTIFIER9& adapterIdentifier, const D3DDISPLAYMODE& desktopDisplayMode )
-	{		
-		mpD3D = pD3D;
-		// initialise device member
-		mpD3DDevice = NULL;
-		mAdapterNumber = adapterNumber;
-		mAdapterIdentifier = adapterIdentifier;
+	D3D9Driver::D3D9Driver( unsigned int adapterNumber,
+		const D3DCAPS9& deviceCaps,
+		const D3DADAPTER_IDENTIFIER9& adapterIdentifier, 
+		const D3DDISPLAYMODE& desktopDisplayMode )
+	{				
+		mAdapterNumber		= adapterNumber;
+		mD3D9DeviceCaps		= deviceCaps;
+		mAdapterIdentifier	= adapterIdentifier;
 		mDesktopDisplayMode = desktopDisplayMode;
-		mpVideoModeList = NULL;
-		mIsAutoDepthStencil = true;
-		mIsMultihead = false;
+		mpVideoModeList		= NULL;			
 	}
 
 	D3D9Driver::~D3D9Driver()
@@ -83,7 +75,7 @@ namespace Ogre
 	String D3D9Driver::DriverDescription() const
 	{       
 		StringUtil::StrStreamType str;
-		str << "Adapter-" << mAdapterNumber << "-" << mAdapterIdentifier.Description;
+		str << "Monitor-" << (mAdapterNumber+1) << "-" << mAdapterIdentifier.Description;
 		String driverDescription(str.str());
 		StringUtil::trim(driverDescription);
 
@@ -96,5 +88,5 @@ namespace Ogre
 			mpVideoModeList = new D3D9VideoModeList( this );
 
 		return mpVideoModeList;
-	}
+	}	
 }
