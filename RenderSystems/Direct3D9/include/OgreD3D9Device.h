@@ -113,8 +113,8 @@ namespace Ogre {
 			IDirect3DSurface9*	 	depthBuffer;
 			D3DPRESENT_PARAMETERS	presentParameters;				
 		};		
-		typedef std::map<D3D9RenderWindow*, RenderWindowResources*>	RenderWindowToResorucesMap;
-		typedef RenderWindowToResorucesMap::iterator				RenderWindowToResorucesIterator;
+		typedef map<D3D9RenderWindow*, RenderWindowResources*>::type RenderWindowToResorucesMap;
+		typedef RenderWindowToResorucesMap::iterator				 RenderWindowToResorucesIterator;
 
 		RenderWindowToResorucesMap mMapRenderWindowToResoruces;		// Map between render window to resources.
 

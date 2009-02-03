@@ -90,7 +90,7 @@ namespace Ogre {
 		bool updateBufferResources(const char* systemMemoryBuffer, BufferResources* bufferResources);		
 
 	protected:
-		typedef std::map<IDirect3DDevice9*, BufferResources*>	DeviceToBufferResourcesMap;
+		typedef map<IDirect3DDevice9*, BufferResources*>::type	DeviceToBufferResourcesMap;
 		typedef DeviceToBufferResourcesMap::iterator			DeviceToBufferResourcesIterator;
 
 		DeviceToBufferResourcesMap	mMapDeviceToBufferResources;	// Map between device to buffer resources.

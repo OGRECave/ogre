@@ -246,6 +246,12 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
+				RelativePath="..\src\OgreD3D9Device.cpp">
+			</File>
+			<File
+				RelativePath="..\src\OgreD3D9DeviceManager.cpp">
+			</File>
+			<File
 				RelativePath="..\src\OgreD3D9Driver.cpp">
 			</File>
 			<File
@@ -297,6 +303,12 @@
 				RelativePath="..\src\OgreD3D9RenderWindow.cpp">
 			</File>
 			<File
+				RelativePath="..\src\OgreD3D9Resource.cpp">
+			</File>
+			<File
+				RelativePath="..\src\OgreD3D9ResourceManager.cpp">
+			</File>
+			<File
 				RelativePath="..\src\OgreD3D9Texture.cpp">
 			</File>
 			<File
@@ -315,6 +327,12 @@
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
+			<File
+				RelativePath="..\include\OgreD3D9Device.h">
+			</File>
+			<File
+				RelativePath="..\include\OgreD3D9DeviceManager.h">
+			</File>
 			<File
 				RelativePath="..\include\OgreD3D9Driver.h">
 			</File>
@@ -365,6 +383,12 @@
 			</File>
 			<File
 				RelativePath="..\include\OgreD3D9RenderWindow.h">
+			</File>
+			<File
+				RelativePath="..\include\OgreD3D9Resource.h">
+			</File>
+			<File
+				RelativePath="..\include\OgreD3D9ResourceManager.h">
 			</File>
 			<File
 				RelativePath="..\include\OgreD3D9Texture.h">

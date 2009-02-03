@@ -91,7 +91,7 @@ namespace Ogre {
         void loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode);
 
 	protected:
-		typedef std::map<IDirect3DDevice9*, IDirect3DVertexShader9*>	DeviceToVertexShaderMap;
+		typedef map<IDirect3DDevice9*, IDirect3DVertexShader9*>::type   DeviceToVertexShaderMap;
 		typedef DeviceToVertexShaderMap::iterator						DeviceToVertexShaderIterator;
 	
 		DeviceToVertexShaderMap		mMapDeviceToVertexShader;	
@@ -119,7 +119,7 @@ namespace Ogre {
         void loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode);
 
 	protected:
-		typedef std::map<IDirect3DDevice9*, IDirect3DPixelShader9*>		DeviceToPixelShaderMap;
+		typedef map<IDirect3DDevice9*, IDirect3DPixelShader9*>::type	DeviceToPixelShaderMap;
 		typedef DeviceToPixelShaderMap::iterator						DeviceToPixelShaderIterator;
 
 		DeviceToPixelShaderMap		mMapDeviceToPixelShader;			
