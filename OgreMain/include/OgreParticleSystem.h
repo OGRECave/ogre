@@ -613,6 +613,24 @@ namespace Ogre {
         */
         void _updateBounds(void);
 
+		/** This is used to turn on or off particle emission for this system.
+		@remarks
+			By default particle system is always emitting particles (if a emitters exists)
+			and this can be used to stop the emission for all emitters. To turn it on again, 
+			call it passing true.
+
+			Note that this does not detach the particle system from the scene node, it will 
+			still use some CPU.
+		*/
+		void setEmitting(bool v);
+
+		/** Returns true if the particle system emitting flag is turned on.
+		@remarks
+			This function will not actually return whether the particles are being emitted.
+			It only returns the value of emitting flag.
+		*/
+		bool getEmitting() const;
+
 		/// Override to return specific type flag
 		uint32 getTypeFlags(void) const;
     protected:
@@ -674,6 +692,8 @@ namespace Ogre {
 		Controller<Real>* mTimeController;
         /// Indication whether the emitted emitter pool (= pool with particle emitters that are emitted) is initialised
 		bool mEmittedEmitterPoolInitialised;
+		/// Used to control if the particle system should emit particles or not.
+		bool mIsEmitting;
 
         typedef list<Particle*>::type ActiveParticleList;
         typedef list<Particle*>::type FreeParticleList;

@@ -104,7 +104,8 @@ namespace Ogre {
         mRenderer(0),
         mCullIndividual(false),
         mPoolSize(0),
-		mEmittedEmitterPoolSize(0)
+		mEmittedEmitterPoolSize(0),
+		mIsEmitting(true)
 	{
         initParameters();
 
@@ -406,8 +407,12 @@ namespace Ogre {
                 _expire(iterationInterval);
                 _triggerAffectors(iterationInterval);
                 _applyMotion(iterationInterval);
-                // Emit new particles
-                _triggerEmitters(iterationInterval);
+
+				if(mIsEmitting)
+				{
+					// Emit new particles
+					_triggerEmitters(iterationInterval);
+				}
 
                 mUpdateRemainTime -= iterationInterval;
             }
@@ -418,8 +423,12 @@ namespace Ogre {
             _expire(timeElapsed);
             _triggerAffectors(timeElapsed);
             _applyMotion(timeElapsed);
-            // Emit new particles
-            _triggerEmitters(timeElapsed);
+
+			if(mIsEmitting)
+			{
+				// Emit new particles
+				_triggerEmitters(timeElapsed);
+			}
         }
 
         if (!mBoundsAutoUpdate && mBoundsUpdateTime > 0.0f)
@@ -871,6 +880,16 @@ namespace Ogre {
             _update(interval);
         }
     }
+	//-----------------------------------------------------------------------
+	void ParticleSystem::setEmitting(bool v)
+	{
+		mIsEmitting = v;
+	}
+	//-----------------------------------------------------------------------
+	bool ParticleSystem::getEmitting() const
+	{
+		return mIsEmitting;
+	}
     //-----------------------------------------------------------------------
     const String& ParticleSystem::getMovableType(void) const
     {
