@@ -117,16 +117,99 @@ namespace Ogre {
 			profile = "ps_4_0";
 			break;
 		}*/
+
+		// Populate preprocessor defines
+        String stringBuffer;
+
+        vector<D3D10_SHADER_MACRO>::type defines;
+        const D3D10_SHADER_MACRO* pDefines = 0;
+        if (!mPreprocessorDefines.empty())
+        {
+            stringBuffer = mPreprocessorDefines;
+
+            // Split preprocessor defines and build up macro array
+            D3D10_SHADER_MACRO macro;
+            String::size_type pos = 0;
+            while (pos != String::npos)
+            {
+                macro.Name = &stringBuffer[pos];
+                macro.Definition = 0;
+
+				String::size_type start_pos=pos;
+
+                // Find delims
+                pos = stringBuffer.find_first_of(";,=", pos);
+
+				if(start_pos==pos)
+				{
+					if(pos==stringBuffer.length())
+					{
+						break;
+					}
+					pos++;
+					continue;
+				}
+
+                if (pos != String::npos)
+                {
+                    // Check definition part
+                    if (stringBuffer[pos] == '=')
+                    {
+                        // Setup null character for macro name
+                        stringBuffer[pos++] = '\0';
+                        macro.Definition = &stringBuffer[pos];
+                        pos = stringBuffer.find_first_of(";,", pos);
+                    }
+                    else
+                    {
+                        // No definition part, define as "1"
+                        macro.Definition = "1";
+                    }
+
+                    if (pos != String::npos)
+                    {
+                        // Setup null character for macro name or definition
+                        stringBuffer[pos++] = '\0';
+                    }
+                }
+				else
+				{
+					macro.Definition = "1";
+				}
+				if(strlen(macro.Name)>0)
+				{
+					defines.push_back(macro);
+				}
+				else
+				{
+					break;
+				}
+            }
+
+            // Add NULL terminator
+            macro.Name = 0;
+            macro.Definition = 0;
+            defines.push_back(macro);
+
+            pDefines = &defines[0];
+        }
+
 		UINT compileFlags=0;
 		#ifdef OGRE_DEBUG_MODE
 			compileFlags|=D3D10_SHADER_DEBUG;
 			compileFlags|=D3D10_SHADER_SKIP_OPTIMIZATION;
 		#endif
+
+		if (mColumnMajorMatrices)
+            compileFlags |= D3D10_SHADER_PACK_MATRIX_COLUMN_MAJOR;
+        else
+            compileFlags |= D3D10_SHADER_PACK_MATRIX_ROW_MAJOR;
+
 		HRESULT hr = D3DX10CompileFromMemory(
 			mSource.c_str(),	// [in] Pointer to the shader in memory. 
 			mSource.size(),		// [in] Size of the shader in memory.  
 			NULL,				// [in] The name of the file that contains the shader code. 
-			NULL,				// [in] Optional. Pointer to a NULL-terminated array of macro definitions. See D3D10_SHADER_MACRO. If not used, set this to NULL. 
+			pDefines,			// [in] Optional. Pointer to a NULL-terminated array of macro definitions. See D3D10_SHADER_MACRO. If not used, set this to NULL. 
 			&includeHandler,	// [in] Optional. Pointer to an ID3D10Include Interface interface for handling include files. Setting this to NULL will cause a compile error if a shader contains a #include. 
 			mEntryPoint.c_str(), // [in] Name of the shader-entrypoint function where shader execution begins. 
 			mTarget.c_str(),			// [in] A string that specifies the shader model; can be any profile in shader model 2, shader model 3, or shader model 4. 
@@ -145,7 +228,7 @@ namespace Ogre {
 				mSource.c_str(),	// [in] Pointer to the shader in memory. 
 				mSource.size(),		// [in] Size of the shader in memory.  
 				NULL,				// [in] The name of the file that contains the shader code. 
-				NULL,				// [in] Optional. Pointer to a NULL-terminated array of macro definitions. See D3D10_SHADER_MACRO. If not used, set this to NULL. 
+				pDefines,			// [in] Optional. Pointer to a NULL-terminated array of macro definitions. See D3D10_SHADER_MACRO. If not used, set this to NULL. 
 				&includeHandler,	// [in] Optional. Pointer to an ID3D10Include Interface interface for handling include files. Setting this to NULL will cause a compile error if a shader contains a #include. 
 				mEntryPoint.c_str(), // [in] Name of the shader-entrypoint function where shader execution begins. 
 				mTarget.c_str(),			// [in] A string that specifies the shader model; can be any profile in shader model 2, shader model 3, or shader model 4. 
@@ -512,7 +595,7 @@ namespace Ogre {
 		: HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
 		, mpMicroCode(NULL), mErrorsInCompile(false), mConstantBuffer(NULL), mDevice(device), 
 		mpIShaderReflection(NULL), mShaderReflectionConstantBuffer(NULL), mpVertexShader(NULL)//, mpConstTable(NULL)
-		,mpPixelShader(NULL),mpGeometryShader(NULL)
+		,mpPixelShader(NULL),mpGeometryShader(NULL),mColumnMajorMatrices(true)
 	{
 		if ("Hatch_ps_hlsl" == name)
 		{
@@ -578,7 +661,7 @@ namespace Ogre {
 		GpuProgramParametersSharedPtr params = HighLevelGpuProgram::createParameters();
 
 		// D3D HLSL uses column-major matrices
-		params->setTransposeMatrices(true);
+		params->setTransposeMatrices(mColumnMajorMatrices);
 
 		return params;
 	}
