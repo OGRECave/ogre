@@ -199,7 +199,7 @@ namespace Ogre {
 			compileFlags|=D3D10_SHADER_DEBUG;
 			compileFlags|=D3D10_SHADER_SKIP_OPTIMIZATION;
 		#endif
-
+		
 		if (mColumnMajorMatrices)
             compileFlags |= D3D10_SHADER_PACK_MATRIX_COLUMN_MAJOR;
         else
@@ -445,6 +445,7 @@ namespace Ogre {
 				String name = prefix + paramName;
 
 				GpuConstantDefinition def;
+				def.logicalIndex = paramIndex;
 				// populate type, array size & element size
 				populateDef(varRefTypeDesc, def);
 				if (def.isFloat())
