@@ -205,8 +205,8 @@ namespace Ogre
 		optFullScreen.immutable = false;
 
 		optResourceCeationPolicy.name = "Resource Creation Policy";		
-		optResourceCeationPolicy.possibleValues.push_back( "Create on load" );
-		optResourceCeationPolicy.possibleValues.push_back( "Create On demand" );
+		optResourceCeationPolicy.possibleValues.push_back( "Create on all devices" );
+		optResourceCeationPolicy.possibleValues.push_back( "Create on active device" );
 
 		if (mResourceManager->getCreationPolicy() == RCP_CREATE_ON_ACTIVE_DEVICE)
 			optResourceCeationPolicy.currentValue = "Create on active device";			
