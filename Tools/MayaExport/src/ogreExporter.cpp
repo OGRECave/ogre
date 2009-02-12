@@ -504,6 +504,10 @@ namespace OgreMayaExporter
 		Ogre::MaterialManager matMgr;
 		Ogre::DefaultHardwareBufferManager hardwareBufMgr;
 
+		// Creating default log to avoid crashes in skeleton serialization.
+		logMgr.createLog("OgreMayaExporter.log", true);
+
+
 		// Write mesh binary
 		if (m_params.exportMesh)
 		{
