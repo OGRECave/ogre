@@ -640,7 +640,8 @@ class ArmatureExporter:
 			
 			# restore current settings
 			Blender.Set('curframe', frameAtExportTime)
-			actionAtExportTime.setActive(self.bArmatureObject)
+			if (actionAtExportTime is not None):
+				actionAtExportTime.setActive(self.bArmatureObject)
 		return
 	def _writeAnimations(self, f, indentation=0):
 		if (len(self.animationList) > 0):
