@@ -30,6 +30,8 @@ distribution.
 //#define DEBUG_PARSER
 #if defined( DEBUG_PARSER )
 #	if defined( DEBUG ) && defined( _MSC_VER )
+#       define WIN32_LEAN_AND_MEAN
+#       define NOMINMAX // required to stop windows.h messing up std::min
 #		include <windows.h>
 #		define TIXML_LOG OutputDebugString
 #	else

@@ -29,18 +29,9 @@ Torus Knot Software Ltd.
 #ifndef __Win32Timer_H__
 #define __Win32Timer_H__
 
-#ifndef WIN32_LEAN_AND_MEAN
-#  define WIN32_LEAN_AND_MEAN
-#endif
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX // required to stop windows.h messing up std::min
 #include "windows.h"
-
-//Get around Windows hackery
-#ifdef max
-#  undef max
-#endif
-#ifdef min
-#  undef min
-#endif
 
 namespace Ogre
 {

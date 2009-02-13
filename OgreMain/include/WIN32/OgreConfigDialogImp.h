@@ -32,15 +32,8 @@ Torus Knot Software Ltd.
 #include "OgrePrerequisites.h"
 
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX // required to stop windows.h messing up std::min
 #include "windows.h"
-
-//Get around Windows hackery
-#ifdef max
-#  undef max
-#endif
-#ifdef min
-#  undef min
-#endif
 
 namespace Ogre
 {

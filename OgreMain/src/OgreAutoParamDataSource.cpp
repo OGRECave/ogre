@@ -492,9 +492,9 @@ namespace Ogre {
 		return static_cast<float>(mCurrentLightList->size());
 	}
 	//---------------------------------------------------------------------
-	int AutoParamDataSource::getLightCastsShadows(size_t index) const
+	float AutoParamDataSource::getLightCastsShadows(size_t index) const
 	{
-		return static_cast<int>(getLight(index).getCastShadows() ? 1 : 0);
+		return getLight(index).getCastShadows() ? 1.0f : 0.0f;
 	}
     //-----------------------------------------------------------------------------
 	const ColourValue& AutoParamDataSource::getAmbientLightColour(void) const

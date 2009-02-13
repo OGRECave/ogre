@@ -3290,7 +3290,8 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 			mCurrentFragmentProgram->unbindProgram();
 
 		// It's ready to switching
-		mCurrentContext->endCurrent();
+		if (mCurrentContext)
+			mCurrentContext->endCurrent();
 		mCurrentContext = context;
 		mCurrentContext->setCurrent();
 

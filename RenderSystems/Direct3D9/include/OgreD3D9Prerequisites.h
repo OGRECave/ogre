@@ -44,8 +44,8 @@ Torus Knot Software Ltd.
 #	define D3D_DEBUG_INFO
 #endif
 
-#undef NOMINMAX
-#define NOMINMAX // required to stop windows.h screwing up std::min definition
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX // required to stop windows.h messing up std::min
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <dxerr9.h>

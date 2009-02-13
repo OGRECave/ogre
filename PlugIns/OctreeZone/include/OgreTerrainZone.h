@@ -100,44 +100,44 @@ namespace Ogre
 									 const String& typeName = StringUtil::BLANK);
 
 		/** Returns the height at the given terrain coordinates. */
-		float getHeightAt( float x, float y );
+		virtual float getHeightAt( float x, float y );
 
 
-		bool intersectSegment( const Vector3 & start, const Vector3 & end, Vector3 * result );
+		virtual bool intersectSegment( const Vector3 & start, const Vector3 & end, Vector3 * result );
 
 		/** Sets the texture to use for the main world texture. */
-		void setWorldTexture(const String& textureName);
+		virtual void setWorldTexture(const String& textureName);
 		/** Sets the texture to use for the detail texture. */
-		void setDetailTexture(const String& textureName);
+		virtual void setDetailTexture(const String& textureName);
 		/** Sets the number of times per tile the detail texture should be repeated. */
-		void setDetailTextureRepeat(int repeat);
+		virtual void setDetailTextureRepeat(int repeat);
 		/** Sets the dimensions of each tile (must be power of 2 + 1) */
-		void setTileSize(int size); 
+		virtual void setTileSize(int size); 
 		/** Sets the dimensions of each page (must be power of 2 + 1) */
-		void setPageSize(int size); 
+		virtual void setPageSize(int size); 
 		/** Sets the maximum screen space pixel error.  */
-		void setMaxPixelError(int pixelError); 
+		virtual void setMaxPixelError(int pixelError); 
 		/** Sets how to scale the terrain data. */
-		void setScale(const Vector3& scale);
+		virtual void setScale(const Vector3& scale);
 		/** Sets the maximum geomipmap level to allow. */
-		void setMaxGeoMipMapLevel(int maxMip);
+		virtual void setMaxGeoMipMapLevel(int maxMip);
 	    
 		/** Gets the texture to use for the main world texture. */
-		const String& getWorldTexture(void) { return mWorldTextureName; }
+		virtual const String& getWorldTexture(void) { return mWorldTextureName; }
 		/** Gets the texture to use for the detail texture. */
-		const String& getDetailTexture(void) { return mDetailTextureName; }
+		virtual const String& getDetailTexture(void) { return mDetailTextureName; }
 		/** Gets the number of times per tile the detail texture should be repeated. */
-		int getDetailTextureRepeat(void);
+		virtual int getDetailTextureRepeat(void);
 		/** Gets the dimensions of each tile (must be power of 2 + 1) */
-		int getTileSize(void); 
+		virtual int getTileSize(void); 
 		/** Gets the dimensions of each page (must be power of 2 + 1) */
-		int getPageSize(void); 
+		virtual int getPageSize(void); 
 		/** Gets the maximum screen space pixel error.  */
-		int getMaxPixelError(void); 
+		virtual int getMaxPixelError(void); 
 		/** Gets how to scale the terrain data. */
-		const Vector3& getScale(void);
+		virtual const Vector3& getScale(void);
 		/** Gets the maximum geomipmap level to allow. */
-		int getMaxGeoMipMapLevel(void);
+		virtual int getMaxGeoMipMapLevel(void);
 
 
 
@@ -145,14 +145,14 @@ namespace Ogre
 		@remarks
 			The default is not, in which case it uses triangle lists. 
 		*/
-		void setUseTriStrips(bool useStrips);
+		virtual void setUseTriStrips(bool useStrips);
 		/** Sets whether or not terrain tiles should be morphed between LODs
 		(NB requires vertex program support). */
-		void setUseLODMorph(bool useMorph);
+		virtual void setUseLODMorph(bool useMorph);
 		/** Sets whether vertex normals will be generated for the terrain. */
-		void setUseVertexNormals(bool useNormals);
+		virtual void setUseVertexNormals(bool useNormals);
 		/** Sets whether vertex colours will be used. */
-		void setUseVertexColours(bool useColours);
+		virtual void setUseVertexColours(bool useColours);
 
 		/** Sets the name of a custom material to use to shade the landcape.
 		@remarks
@@ -179,7 +179,7 @@ namespace Ogre
 					(@see setCustomMaterialMorphFactorParam)</li>
 			</ul>
 		*/
-		void setCustomMaterial(const String& materialName);
+		virtual void setCustomMaterial(const String& materialName);
 		/** Sets the name of the vertex program parameter to which to pass the
 			LOD morph factor.
 		@remarks
@@ -198,7 +198,7 @@ namespace Ogre
 			which allows you to set the parameter index for low-level assembler programs.
 		@param paramName The name of the parameter which will receive the morph factor
 		*/
-		void setCustomMaterialMorphFactorParam(const String& paramName);
+		virtual void setCustomMaterialMorphFactorParam(const String& paramName);
 		/** Sets the index of the vertex program parameter to which to pass the
 			LOD morph factor.
 		@remarks
@@ -217,10 +217,10 @@ namespace Ogre
 			which allows you to set the parameter name for high-level programs.
 		@param paramName The name of the parameter which will receive the morph factor
 		*/
-		void setCustomMaterialMorphFactorParam(size_t paramIndex);
+		virtual void setCustomMaterialMorphFactorParam(size_t paramIndex);
 		/** Sets the distance at which the LOD will start to morph downwards, as
 		a proportion of the distance between the LODs. */
-		void setLODMorphStart(Real morphStart);
+		virtual void setLODMorphStart(Real morphStart);
 
 		/** Returns the TerrainRenderable that contains the given pt.
 			If no tile exists at the point, it returns 0;
@@ -243,7 +243,7 @@ namespace Ogre
 		virtual void notifyCameraCreated( Camera* c );
 
 		/// Gets the terrain options 
-		const TerrainZoneOptions& getOptions(void) { return mOptions; }
+		virtual const TerrainZoneOptions& getOptions(void) { return mOptions; }
 
 		/** Sets the 'primary' camera, i.e. the one which will be used to determine
 			the 'home' terrain page, and to calculate the error metrics. 
@@ -255,7 +255,7 @@ namespace Ogre
 		/// Iterator over all page sources
 		typedef ConstMapIterator<PageSourceMap> PageSourceIterator;
 		/// Get an iterator over all page sources
-		PageSourceIterator getPageSourceIterator(void);
+		virtual PageSourceIterator getPageSourceIterator(void);
 		/** Registers a TerrainZonePageSource class and associates it with a named type 
 			of source.
 		@remarks
@@ -294,28 +294,28 @@ namespace Ogre
 		*/
 		virtual void attachPage(ushort pageX, ushort pageZ, TerrainZonePage* page);
 		/// Get a pointer to the material being used for the terrain
-		MaterialPtr& getTerrainMaterial(void);
+		virtual MaterialPtr& getTerrainMaterial(void);
 		// Called when a _renderScene is called in the SceneManager
-		void notifyBeginRenderScene(void);
+		virtual void notifyBeginRenderScene(void);
 
 		/// Get the SceneNode under which all terrain nodes are attached.
-		PCZSceneNode* getTerrainRootNode(void) const { return mTerrainRoot; }
+		virtual PCZSceneNode* getTerrainRootNode(void) const { return mTerrainRoot; }
 		/** clear structures for the zone */
-		void clearZone(void);
+		virtual void clearZone(void);
 		/* called by PCZSM during setWorldGeometryRenderQueue() */
-		void notifyWorldGeometryRenderQueue(uint8 qid);
+		virtual void notifyWorldGeometryRenderQueue(uint8 qid);
 
 		/// Get the shared list of indexes cached (internal use only)
-		TerrainBufferCache& _getIndexCache(void) {return mIndexCache;}
+		virtual TerrainBufferCache& _getIndexCache(void) {return mIndexCache;}
 
 		/// Get the shared level index list (internal use only)
-		LevelArray& _getLevelIndex(void) { return mLevelIndex; }
+		virtual LevelArray& _getLevelIndex(void) { return mLevelIndex; }
 
 		/// Get the current page count (internal use only)
-		size_t _getPageCount(void) { return mTerrainZonePages.size(); }
+		virtual size_t _getPageCount(void) { return mTerrainZonePages.size(); }
 
 		/// Shutdown cleanly before we get destroyed
-		void shutdown(void);
+		virtual void shutdown(void);
 
 	protected:
 
@@ -367,16 +367,16 @@ namespace Ogre
 		LevelArray mLevelIndex;
 	    
 		/// Internal method for loading configurations settings
-		void loadConfig(DataStreamPtr& stream);
+		virtual void loadConfig(DataStreamPtr& stream);
 
 		/// Sets up the terrain material
-		void setupTerrainMaterial(void);
+		virtual void setupTerrainMaterial(void);
 		/// Sets up the terrain page slots
-		void setupTerrainZonePages(PCZSceneNode * parentNode);
+		virtual void setupTerrainZonePages(PCZSceneNode * parentNode);
 		/// Initialise level indexes
-		void initLevelIndexes(void);
+		virtual void initLevelIndexes(void);
 		/// Destroy level indexes
-		void destroyLevelIndexes(void);
+		virtual void destroyLevelIndexes(void);
 
 
 		/// Map of source type -> TerrainZonePageSource

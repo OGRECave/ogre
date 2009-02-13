@@ -3140,6 +3140,11 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 							pass->getOnlyLightType() != currLight->getType())
 						{
 							// Skip
+							// Also skip shadow texture(s)
+							if (isShadowTechniqueTextureBased())
+							{
+								shadowTexIndex += mShadowTextureCountPerType[currLight->getType()];
+							}
 							continue;
 						}
 

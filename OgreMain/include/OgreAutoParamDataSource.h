@@ -169,7 +169,7 @@ namespace Ogre {
         /** Get the light which is 'index'th closest to the current object */        
 		virtual float getLightNumber(size_t index) const;
 		virtual float getLightCount() const;
-		virtual int getLightCastsShadows(size_t index) const;
+		virtual float getLightCastsShadows(size_t index) const;
 		virtual const ColourValue& getLightDiffuseColour(size_t index) const;
 		virtual const ColourValue& getLightSpecularColour(size_t index) const;
 		virtual const ColourValue getLightDiffuseColourWithPower(size_t index) const;

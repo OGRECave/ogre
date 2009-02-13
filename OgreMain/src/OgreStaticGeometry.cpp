@@ -1498,7 +1498,7 @@ namespace Ogre {
 	{
 		// Do we have enough space?
 		if (mVertexData->vertexCount + qgeom->geometry->vertexData->vertexCount
-			> mMaxVertexIndex)
+			> (mMaxVertexIndex + 1))
 		{
 			return false;
 		}

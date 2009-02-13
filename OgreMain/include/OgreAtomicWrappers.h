@@ -170,10 +170,10 @@ namespace Ogre {
 
 }
 
- #elif OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_THREAD_SUPPORT
+ #elif OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1400 && OGRE_THREAD_SUPPORT
 
-#undef NOMINMAX
-#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX // required to stop windows.h messing up std::min
 #include <windows.h>
 #include <intrin.h>
 
