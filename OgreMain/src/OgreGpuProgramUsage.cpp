@@ -36,7 +36,7 @@ namespace Ogre
 {
     //-----------------------------------------------------------------------------
     GpuProgramUsage::GpuProgramUsage(GpuProgramType gptype) :
-        mType(gptype), mProgram()
+        mType(gptype), mProgram(), mRecreateParams(false)
     {
     }
 	//-----------------------------------------------------------------------------
@@ -45,11 +45,24 @@ namespace Ogre
         , mProgram(oth.mProgram)
         // nfz: parameters should be copied not just use a shared ptr to the original
 		, mParameters(OGRE_NEW GpuProgramParameters(*oth.mParameters))
+		, mRecreateParams(false)
 	{
+	}
+	//---------------------------------------------------------------------
+	GpuProgramUsage::~GpuProgramUsage()
+	{
+		if (!mProgram.isNull())
+			mProgram->removeListener(this);
 	}
 	//-----------------------------------------------------------------------------
 	void GpuProgramUsage::setProgramName(const String& name, bool resetParams)
 	{
+		if (!mProgram.isNull())
+		{
+			mProgram->removeListener(this);
+			mRecreateParams = true;
+		}
+
 		mProgram = GpuProgramManager::getSingleton().getByName(name);
 
         if (mProgram.isNull())
@@ -61,8 +74,13 @@ namespace Ogre
                 "GpuProgramUsage::setProgramName");
         }
         // Reset parameters 
-        if (resetParams || mParameters.isNull())
-            mParameters = mProgram->createParameters();
+        if (resetParams || mParameters.isNull() || mRecreateParams)
+		{
+			recreateParameters();
+		}
+
+		// Listen in on reload events so we can regenerate params
+		mProgram->addListener(this);
 
 	}
     //-----------------------------------------------------------------------------
@@ -99,5 +117,38 @@ namespace Ogre
     {
         // TODO?
     }
+	//---------------------------------------------------------------------
+	void GpuProgramUsage::unloadingComplete(Resource* prog)
+	{
+		mRecreateParams = true;
+
+	}
+	//---------------------------------------------------------------------
+	void GpuProgramUsage::loadingComplete(Resource* prog)
+	{
+		// Need to re-create parameters
+		if (mRecreateParams)
+			recreateParameters();
+
+	}
+	//---------------------------------------------------------------------
+	void GpuProgramUsage::recreateParameters()
+	{
+		// Keep a reference to old ones to copy
+		GpuProgramParametersSharedPtr savedParams = mParameters;
+
+		// Create new params
+		mParameters = mProgram->createParameters();
+
+		// Copy old (matching) values across
+		// Don't use copyConstantsFrom since program may be different
+		if (!savedParams.isNull())
+			mParameters->copyMatchingNamedConstantsFrom(*savedParams.get());
+
+		mRecreateParams = false;
+
+	}
+
+
 
 }

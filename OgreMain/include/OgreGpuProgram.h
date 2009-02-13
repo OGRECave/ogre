@@ -1402,8 +1402,21 @@ namespace Ogre {
 
 		/** Copies the values of all constants (including auto constants) from another
 			GpuProgramParameters object.
+		@note This copes the internal storage of the paarameters object and therefore
+			can only be used for parameters objects created from the same GpuProgram.
+			To merge parameters that match from different programs, use copyMatchingNamedConstantsFrom.
 		*/
 		void copyConstantsFrom(const GpuProgramParameters& source);
+
+		/** Copies the values of all matching named constants (including auto constants) from 
+			another GpuProgramParameters object. 
+		@remarks
+			This method iterates over the named constants in another parameters object
+			and copies across the values where they match. This method is safe to
+			use when the 2 parameters objects came from different programs, but only
+			works for named parameters.
+		*/
+		void copyMatchingNamedConstantsFrom(const GpuProgramParameters& source);
 
         /** gets the auto constant definition associated with name if found else returns NULL
         @param name The name of the auto constant

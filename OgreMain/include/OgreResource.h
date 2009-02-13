@@ -80,29 +80,40 @@ namespace Ogre {
 			virtual ~Listener() {}
 
 			/** Callback to indicate that background loading has completed.
-			@remarks
-				This callback is only relevant when a Resource has been
-				marked as background loaded (@see Resource::setBackgroundLoaded)
-				, and occurs when that loading has completed. The call
-				does not itself occur in the thread which is doing the loading;
-				when loading is complete a response indicator is placed with the
-				ResourceGroupManager, which will then be sent back to the 
-				listener as part of the application's primary frame loop thread.
+			@deprecated
+				Use loadingComplete instead.
 			*/
 			virtual void backgroundLoadingComplete(Resource*) {}
 
 			/** Callback to indicate that background preparing has completed.
+			@deprecated
+				Use preparingComplete instead.
+			*/
+			virtual void backgroundPreparingComplete(Resource*) {}
+
+			/** Called whenever the resource finishes loading. 
 			@remarks
-				This callback is only relevant when a Resource has been
-				marked as background loaded (@see Resource::setBackgroundLoaded)
-				, and occurs when that preparing (but not necessarily loading) has completed. The call
-				does not itself occur in the thread which is doing the preparing;
+				If a Resource has been marked as background loaded (@see Resource::setBackgroundLoaded), 
+				the call does not itself occur in the thread which is doing the loading;
+				when loading is complete a response indicator is placed with the
+				ResourceGroupManager, which will then be sent back to the 
+				listener as part of the application's primary frame loop thread.
+			*/
+			virtual void loadingComplete(Resource*) {}
+
+
+			/** called whenever the resource finishes preparing (paging into memory).
+			@remarks
+				If a Resource has been marked as background loaded (@see Resource::setBackgroundLoaded)
+				the call does not itself occur in the thread which is doing the preparing;
 				when preparing is complete a response indicator is placed with the
 				ResourceGroupManager, which will then be sent back to the 
 				listener as part of the application's primary frame loop thread.
 			*/
-			virtual void backgroundPreparingComplete(Resource*) {}
-			
+			virtual void preparingComplete(Resource*) {}
+
+			/** Called whenever the resource has been unloaded. */
+			virtual void unloadingComplete(Resource*) {}
 		};
 		
 		/// Enum identifying the loading state of the resource
@@ -425,23 +436,33 @@ namespace Ogre {
 		virtual void _dirtyState();
 
 
-		/** Firing of background loading complete event
+		/** Firing of loading complete event
 		@remarks
 			You should call this from the thread that runs the main frame loop 
 			to avoid having to make the receivers of this event thread-safe.
 			If you use Ogre's built in frame loop you don't need to call this
 			yourself.
 		*/
-		virtual void _fireBackgroundLoadingComplete(void);
+		virtual void _fireLoadingComplete(void);
 
-		/** Firing of background preparing complete event
+		/** Firing of preparing complete event
 		@remarks
 			You should call this from the thread that runs the main frame loop 
 			to avoid having to make the receivers of this event thread-safe.
 			If you use Ogre's built in frame loop you don't need to call this
 			yourself.
 		*/
-		virtual void _fireBackgroundPreparingComplete(void);
+		virtual void _firePreparingComplete(void);
+
+		/** Firing of unloading complete event
+		@remarks
+		You should call this from the thread that runs the main frame loop 
+		to avoid having to make the receivers of this event thread-safe.
+		If you use Ogre's built in frame loop you don't need to call this
+		yourself.
+		*/
+		virtual void _fireUnloadingComplete(void);
+
 
     };
 

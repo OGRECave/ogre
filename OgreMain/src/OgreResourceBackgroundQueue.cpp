@@ -598,9 +598,9 @@ namespace Ogre {
 		{
 			if (i->resource) {
                 if (i->load) {
-                    i->resource->_fireBackgroundLoadingComplete();
+                    i->resource->_fireLoadingComplete();
                 } else {
-                    i->resource->_fireBackgroundPreparingComplete();
+                    i->resource->_firePreparingComplete();
                 }
 			} else {
                 const ResourceBackgroundQueue::Request &r = i->req;

@@ -117,6 +117,9 @@ namespace Ogre
 		// Fire (deferred) events
 		if (mIsBackgroundLoaded)
 			queueFireBackgroundPreparingComplete();
+		else
+			_firePreparingComplete();
+
 
 	}
 
@@ -214,6 +217,8 @@ namespace Ogre
 		// Fire (deferred) events
 		if (mIsBackgroundLoaded)
 			queueFireBackgroundLoadingComplete();
+		else
+			_fireLoadingComplete();
 
 
 	}
@@ -265,6 +270,9 @@ namespace Ogre
 		if(old==LOADSTATE_LOADED && mCreator)
 			mCreator->_notifyResourceUnloaded(this);
 
+		_fireUnloadingComplete();
+
+
 	}
 	//-----------------------------------------------------------------------
 	void Resource::reload(void) 
@@ -307,14 +315,18 @@ namespace Ogre
 			ResourceBackgroundQueue::getSingleton()._queueFireBackgroundLoadingComplete(this);
 	}
 	//-----------------------------------------------------------------------
-	void Resource::_fireBackgroundLoadingComplete(void)
+	void Resource::_fireLoadingComplete(void)
 	{
 		// Lock the listener list
 		OGRE_LOCK_MUTEX(mListenerListMutex)
 		for (ListenerList::iterator i = mListenerList.begin();
 			i != mListenerList.end(); ++i)
 		{
-			(*i)->backgroundLoadingComplete(this);
+			// deprecated call
+			if (isBackgroundLoaded())
+				(*i)->backgroundLoadingComplete(this);
+
+			(*i)->loadingComplete(this);
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -326,15 +338,33 @@ namespace Ogre
 			ResourceBackgroundQueue::getSingleton()._queueFireBackgroundPreparingComplete(this);
 	}
 	//-----------------------------------------------------------------------
-	void Resource::_fireBackgroundPreparingComplete(void)
+	void Resource::_firePreparingComplete(void)
 	{
 		// Lock the listener list
 		OGRE_LOCK_MUTEX(mListenerListMutex)
 		for (ListenerList::iterator i = mListenerList.begin();
 			i != mListenerList.end(); ++i)
 		{
-			(*i)->backgroundPreparingComplete(this);
+			// deprecated call
+			if (isBackgroundLoaded())
+				(*i)->backgroundPreparingComplete(this);
+
+			(*i)->preparingComplete(this);
+
 		}
+	}
+	//-----------------------------------------------------------------------
+	void Resource::_fireUnloadingComplete(void)
+	{
+		// Lock the listener list
+		OGRE_LOCK_MUTEX(mListenerListMutex)
+			for (ListenerList::iterator i = mListenerList.begin();
+				i != mListenerList.end(); ++i)
+			{
+
+				(*i)->unloadingComplete(this);
+
+			}
 	}
 
 }

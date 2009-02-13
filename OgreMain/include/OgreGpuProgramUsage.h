@@ -63,7 +63,7 @@ namespace Ogre
         Just incase it wasn't clear from the above, this class provides linkage to both 
         GpuProgram and HighLevelGpuProgram, despite its name.
     */
-	class _OgreExport GpuProgramUsage : public PassAlloc
+	class _OgreExport GpuProgramUsage : public Resource::Listener, public PassAlloc
     {
     protected:
         GpuProgramType mType;
@@ -72,7 +72,11 @@ namespace Ogre
 
         /// program parameters
         GpuProgramParametersSharedPtr mParameters;
+		
+		/// Whether to recreate parameters next load
+		bool mRecreateParams;
 
+		void recreateParameters();
 
     public:
         /** Default constructor.
@@ -82,6 +86,8 @@ namespace Ogre
 
 		/** Copy constructor */
 		GpuProgramUsage(const GpuProgramUsage& rhs);
+
+		~GpuProgramUsage();
 
         /** Gets the type of program we're trying to link to. */
         GpuProgramType getType(void) const { return mType; }
@@ -123,6 +129,10 @@ namespace Ogre
         void _load(void);
         /// Unload this usage 
         void _unload(void);
+
+		// Resource Listener
+		void unloadingComplete(Resource* prog);
+		void loadingComplete(Resource* prog);
 
     };
 }

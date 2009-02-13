@@ -2226,6 +2226,65 @@ namespace Ogre
 		mAutoConstants = source.getAutoConstantList();
 		mCombinedVariability = source.mCombinedVariability;
     }
+	//---------------------------------------------------------------------
+	void GpuProgramParameters::copyMatchingNamedConstantsFrom(const GpuProgramParameters& source)
+	{
+		if (mNamedConstants && source.mNamedConstants)
+		{
+			std::map<size_t, size_t> srcToDestPhysicalMap;
+			for (GpuConstantDefinitionMap::const_iterator i = source.mNamedConstants->map.begin(); 
+				i != source.mNamedConstants->map.end(); ++i)
+			{
+				const String& paramName = i->first;
+				const GpuConstantDefinition& olddef = i->second;
+				const GpuConstantDefinition* newdef = _findNamedConstantDefinition(paramName, false);
+				if (newdef)
+				{
+					// Copy data across, based on smallest common definition size
+					size_t srcsz = olddef.elementSize * olddef.arraySize;
+					size_t destsz = newdef->elementSize * newdef->arraySize;
+					size_t sz = std::min(srcsz, destsz);
+					if (newdef->isFloat())
+					{
+						
+						memcpy(getFloatPointer(newdef->physicalIndex), 
+							source.getFloatPointer(olddef.physicalIndex),
+							sz * sizeof(float));
+					}
+					else
+					{
+						memcpy(getIntPointer(newdef->physicalIndex), 
+							source.getIntPointer(olddef.physicalIndex),
+							sz * sizeof(int));
+					}
+					// we'll use this physical map to resolve autos later
+					srcToDestPhysicalMap[olddef.physicalIndex] = newdef->physicalIndex;
+				}
+			}
+
+			for (AutoConstantList::const_iterator i = source.mAutoConstants.begin(); 
+				i != source.mAutoConstants.end(); ++i)
+			{
+				const GpuProgramParameters::AutoConstantEntry& autoEntry = *i;
+				// find dest physical index
+				std::map<size_t, size_t>::iterator mi = srcToDestPhysicalMap.find(autoEntry.physicalIndex);
+				if (mi != srcToDestPhysicalMap.end())
+				{
+					if (autoEntry.fData)
+					{
+						_setRawAutoConstantReal(mi->second, autoEntry.paramType, autoEntry.fData,
+							deriveVariability(autoEntry.paramType), autoEntry.elementCount);
+					}
+					else
+					{
+						_setRawAutoConstant(mi->second, autoEntry.paramType, autoEntry.data,
+							deriveVariability(autoEntry.paramType), autoEntry.elementCount);
+					}
+				}
+
+			}
+		}
+	}
     //-----------------------------------------------------------------------
     const GpuProgramParameters::AutoConstantDefinition* 
 	GpuProgramParameters::getAutoConstantDefinition(const String& name)
