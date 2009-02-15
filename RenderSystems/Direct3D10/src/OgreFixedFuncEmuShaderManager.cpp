@@ -74,9 +74,9 @@ namespace Ogre
 			);
 
 		// Vertex program details
-		GpuProgramUsage * vertexProgramUsage = new GpuProgramUsage(GPT_VERTEX_PROGRAM);
+		GpuProgramUsage * vertexProgramUsage = new GpuProgramUsage(GPT_VERTEX_PROGRAM, NULL);
 		// Fragment program details
-		GpuProgramUsage * fragmentProgramUsage = new GpuProgramUsage(GPT_FRAGMENT_PROGRAM);
+		GpuProgramUsage * fragmentProgramUsage = new GpuProgramUsage(GPT_FRAGMENT_PROGRAM, NULL);
 
 
 		HighLevelGpuProgramPtr vs;
