@@ -291,6 +291,20 @@ namespace Ogre
 		try 
 		{
 			loadFromSource();
+
+			if (!mDefaultParams.isNull())
+			{
+				// Keep a reference to old ones to copy
+				GpuProgramParametersSharedPtr savedParams = mDefaultParams;
+
+				// Create new params
+				mDefaultParams = createParameters();
+
+				// Copy old (matching) values across
+				// Don't use copyConstantsFrom since program may be different
+				mDefaultParams->copyMatchingNamedConstantsFrom(*savedParams.get());
+
+			}
 		}
 		catch (const Exception&)
 		{
@@ -2231,7 +2245,7 @@ namespace Ogre
 	{
 		if (mNamedConstants && source.mNamedConstants)
 		{
-			std::map<size_t, size_t> srcToDestPhysicalMap;
+			std::map<size_t, String> srcToDestNamedMap;
 			for (GpuConstantDefinitionMap::const_iterator i = source.mNamedConstants->map.begin(); 
 				i != source.mNamedConstants->map.end(); ++i)
 			{
@@ -2257,8 +2271,8 @@ namespace Ogre
 							source.getIntPointer(olddef.physicalIndex),
 							sz * sizeof(int));
 					}
-					// we'll use this physical map to resolve autos later
-					srcToDestPhysicalMap[olddef.physicalIndex] = newdef->physicalIndex;
+					// we'll use this map to resolve autos later
+					srcToDestNamedMap[olddef.physicalIndex] = paramName;
 				}
 			}
 
@@ -2267,18 +2281,16 @@ namespace Ogre
 			{
 				const GpuProgramParameters::AutoConstantEntry& autoEntry = *i;
 				// find dest physical index
-				std::map<size_t, size_t>::iterator mi = srcToDestPhysicalMap.find(autoEntry.physicalIndex);
-				if (mi != srcToDestPhysicalMap.end())
+				std::map<size_t, String>::iterator mi = srcToDestNamedMap.find(autoEntry.physicalIndex);
+				if (mi != srcToDestNamedMap.end())
 				{
 					if (autoEntry.fData)
 					{
-						_setRawAutoConstantReal(mi->second, autoEntry.paramType, autoEntry.fData,
-							deriveVariability(autoEntry.paramType), autoEntry.elementCount);
+						setNamedAutoConstantReal(mi->second, autoEntry.paramType, autoEntry.fData);
 					}
 					else
 					{
-						_setRawAutoConstant(mi->second, autoEntry.paramType, autoEntry.data,
-							deriveVariability(autoEntry.paramType), autoEntry.elementCount);
+						setNamedAutoConstant(mi->second, autoEntry.paramType, autoEntry.data);
 					}
 				}
 

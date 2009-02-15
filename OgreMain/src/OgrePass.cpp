@@ -278,7 +278,7 @@ namespace Ogre {
 
 		if (oth.mVertexProgramUsage)
 		{
-			mVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mVertexProgramUsage));
+			mVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mVertexProgramUsage), this);
 		}
 		else
 		{
@@ -286,7 +286,7 @@ namespace Ogre {
 		}
         if (oth.mShadowCasterVertexProgramUsage)
         {
-            mShadowCasterVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowCasterVertexProgramUsage));
+            mShadowCasterVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowCasterVertexProgramUsage), this);
         }
         else
         {
@@ -294,7 +294,7 @@ namespace Ogre {
         }
         if (oth.mShadowReceiverVertexProgramUsage)
         {
-            mShadowReceiverVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowReceiverVertexProgramUsage));
+            mShadowReceiverVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowReceiverVertexProgramUsage), this);
         }
         else
         {
@@ -302,7 +302,7 @@ namespace Ogre {
         }
 		if (oth.mFragmentProgramUsage)
 		{
-		    mFragmentProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mFragmentProgramUsage));
+		    mFragmentProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mFragmentProgramUsage), this);
         }
         else
         {
@@ -310,7 +310,7 @@ namespace Ogre {
         }
 		if (oth.mGeometryProgramUsage)
 		{
-		    mGeometryProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mGeometryProgramUsage));
+		    mGeometryProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mGeometryProgramUsage), this);
         }
         else
         {
@@ -318,7 +318,7 @@ namespace Ogre {
         }
 		if (oth.mShadowReceiverFragmentProgramUsage)
 		{
-			mShadowReceiverFragmentProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowReceiverFragmentProgramUsage));
+			mShadowReceiverFragmentProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowReceiverFragmentProgramUsage), this);
 		}
 		else
 		{
@@ -1255,7 +1255,7 @@ namespace Ogre {
         {
             if (!mVertexProgramUsage)
             {
-                mVertexProgramUsage = OGRE_NEW GpuProgramUsage(GPT_VERTEX_PROGRAM);
+                mVertexProgramUsage = OGRE_NEW GpuProgramUsage(GPT_VERTEX_PROGRAM, this);
             }
 		    mVertexProgramUsage->setProgramName(name, resetParams);
         }
@@ -1288,7 +1288,7 @@ namespace Ogre {
         {
             if (!mFragmentProgramUsage)
             {
-                mFragmentProgramUsage = OGRE_NEW GpuProgramUsage(GPT_FRAGMENT_PROGRAM);
+                mFragmentProgramUsage = OGRE_NEW GpuProgramUsage(GPT_FRAGMENT_PROGRAM, this);
             }
 		    mFragmentProgramUsage->setProgramName(name, resetParams);
         }
@@ -1321,7 +1321,7 @@ namespace Ogre {
         {
             if (!mGeometryProgramUsage)
             {
-                mGeometryProgramUsage = OGRE_NEW GpuProgramUsage(GPT_GEOMETRY_PROGRAM);
+                mGeometryProgramUsage = OGRE_NEW GpuProgramUsage(GPT_GEOMETRY_PROGRAM, this);
             }
 		    mGeometryProgramUsage->setProgramName(name, resetParams);
         }
@@ -1599,7 +1599,7 @@ namespace Ogre {
         {
             if (!mShadowCasterVertexProgramUsage)
             {
-                mShadowCasterVertexProgramUsage = OGRE_NEW GpuProgramUsage(GPT_VERTEX_PROGRAM);
+                mShadowCasterVertexProgramUsage = OGRE_NEW GpuProgramUsage(GPT_VERTEX_PROGRAM, this);
             }
             mShadowCasterVertexProgramUsage->setProgramName(name);
         }
@@ -1654,7 +1654,7 @@ namespace Ogre {
         {
             if (!mShadowReceiverVertexProgramUsage)
             {
-                mShadowReceiverVertexProgramUsage = OGRE_NEW GpuProgramUsage(GPT_VERTEX_PROGRAM);
+                mShadowReceiverVertexProgramUsage = OGRE_NEW GpuProgramUsage(GPT_VERTEX_PROGRAM, this);
             }
             mShadowReceiverVertexProgramUsage->setProgramName(name);
         }
@@ -1709,7 +1709,7 @@ namespace Ogre {
 		{
 			if (!mShadowReceiverFragmentProgramUsage)
 			{
-				mShadowReceiverFragmentProgramUsage = OGRE_NEW GpuProgramUsage(GPT_FRAGMENT_PROGRAM);
+				mShadowReceiverFragmentProgramUsage = OGRE_NEW GpuProgramUsage(GPT_FRAGMENT_PROGRAM, this);
 			}
 			mShadowReceiverFragmentProgramUsage->setProgramName(name);
 		}

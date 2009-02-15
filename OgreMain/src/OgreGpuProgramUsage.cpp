@@ -35,13 +35,14 @@ Torus Knot Software Ltd.
 namespace Ogre
 {
     //-----------------------------------------------------------------------------
-    GpuProgramUsage::GpuProgramUsage(GpuProgramType gptype) :
-        mType(gptype), mProgram(), mRecreateParams(false)
+    GpuProgramUsage::GpuProgramUsage(GpuProgramType gptype, Pass* parent) :
+        mType(gptype), mParent(parent), mProgram(), mRecreateParams(false)
     {
     }
 	//-----------------------------------------------------------------------------
-	GpuProgramUsage::GpuProgramUsage(const GpuProgramUsage& oth)
+	GpuProgramUsage::GpuProgramUsage(const GpuProgramUsage& oth, Pass* parent)
         : mType(oth.mType)
+		, mParent(parent)
         , mProgram(oth.mProgram)
         // nfz: parameters should be copied not just use a shared ptr to the original
 		, mParameters(OGRE_NEW GpuProgramParameters(*oth.mParameters))

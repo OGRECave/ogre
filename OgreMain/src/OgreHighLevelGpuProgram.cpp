@@ -57,6 +57,21 @@ namespace Ogre
 			{
 				mAssemblerProgram->load();
 			}
+
+			if (!mDefaultParams.isNull())
+			{
+				// Keep a reference to old ones to copy
+				GpuProgramParametersSharedPtr savedParams = mDefaultParams;
+
+				// Create new params
+				mDefaultParams = createParameters();
+
+				// Copy old (matching) values across
+				// Don't use copyConstantsFrom since program may be different
+				mDefaultParams->copyMatchingNamedConstantsFrom(*savedParams.get());
+
+			}
+
 		}
     }
     //---------------------------------------------------------------------------

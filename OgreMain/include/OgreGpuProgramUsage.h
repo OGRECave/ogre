@@ -35,6 +35,8 @@ Torus Knot Software Ltd.
 
 namespace Ogre 
 {
+	class Pass;
+
     /** This class makes the usage of a vertex and fragment programs (low-level or high-level), 
         with a given set of parameters, explicit.
     @remarks
@@ -67,6 +69,7 @@ namespace Ogre
     {
     protected:
         GpuProgramType mType;
+		Pass* mParent;
         // The program link
         GpuProgramPtr mProgram;
 
@@ -82,10 +85,10 @@ namespace Ogre
         /** Default constructor.
         @param gptype The type of program to link to
         */
-        GpuProgramUsage(GpuProgramType gptype);
+        GpuProgramUsage(GpuProgramType gptype, Pass* parent);
 
 		/** Copy constructor */
-		GpuProgramUsage(const GpuProgramUsage& rhs);
+		GpuProgramUsage(const GpuProgramUsage& rhs, Pass* newparent);
 
 		~GpuProgramUsage();
 
