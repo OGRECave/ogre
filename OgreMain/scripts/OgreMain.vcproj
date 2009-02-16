@@ -451,6 +451,9 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 				RelativePath="..\src\OgreGpuProgram.cpp">
 			</File>
 			<File
+				RelativePath="..\src\OgreGpuProgramParams.cpp">
+			</File>
+			<File
 				RelativePath="..\src\OgreGpuProgramManager.cpp">
 			</File>
 			<File
@@ -1077,6 +1080,9 @@ copy $(OutDir)\$(TargetFileName) ..\..\Tools\Common\bin\$(ConfigurationName)
 			</File>
 			<File
 				RelativePath="..\include\OgreGpuProgram.h">
+			</File>
+			<File
+				RelativePath="..\include\OgreGpuProgramParams.h">
 			</File>
 			<File
 				RelativePath="..\include\OgreGpuProgramManager.h">

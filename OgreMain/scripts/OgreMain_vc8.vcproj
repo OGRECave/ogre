@@ -586,6 +586,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\OgreGpuProgramParams.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\OgreGpuProgramUsage.cpp"
 				>
 			</File>
@@ -1420,6 +1424,10 @@
 			</File>
 			<File
 				RelativePath="..\include\OgreGpuProgramManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\OgreGpuProgramParams.h"
 				>
 			</File>
 			<File

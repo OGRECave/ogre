@@ -44,6 +44,7 @@ libOgreMain_la_SOURCES = OgreAlignedAllocator.cpp \
                          OgreFontManager.cpp \
 			 OgreFrustum.cpp \
                          OgreGpuProgram.cpp \
+                         OgreGpuProgramParams.cpp \
                          OgreGpuProgramManager.cpp \
                          OgreGpuProgramUsage.cpp \
 			 OgreHardwareBufferManager.cpp \

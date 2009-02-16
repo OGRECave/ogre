@@ -155,6 +155,7 @@
 		<Unit filename="..\include\OgreFreeImageCodec.h" />
 		<Unit filename="..\include\OgreFrustum.h" />
 		<Unit filename="..\include\OgreGpuProgram.h" />
+		<Unit filename="..\include\OgreGpuProgramParams.h" />
 		<Unit filename="..\include\OgreGpuProgramManager.h" />
 		<Unit filename="..\include\OgreGpuProgramUsage.h" />
 		<Unit filename="..\include\OgreHardwareBuffer.h" />
@@ -378,6 +379,7 @@
 		<Unit filename="..\src\OgreFreeImageCodec.cpp" />
 		<Unit filename="..\src\OgreFrustum.cpp" />
 		<Unit filename="..\src\OgreGpuProgram.cpp" />
+		<Unit filename="..\src\OgreGpuProgramParams.cpp" />
 		<Unit filename="..\src\OgreGpuProgramManager.cpp" />
 		<Unit filename="..\src\OgreGpuProgramUsage.cpp" />
 		<Unit filename="..\src\OgreHardwareBufferManager.cpp" />

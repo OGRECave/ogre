@@ -55,6 +55,7 @@ pkginclude_HEADERS = Ogre.h \
                      OgreFreeImageCodec.h \
                      OgreFrustum.h \
                      OgreGpuProgram.h \
+                     OgreGpuProgramParams.h \
                      OgreGpuProgramManager.h \
                      OgreGpuProgramUsage.h \
                      OgreHardwareBuffer.h \
