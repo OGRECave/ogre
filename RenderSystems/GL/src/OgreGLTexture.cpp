@@ -115,10 +115,10 @@ namespace Ogre {
 			mNumMipmaps = maxMips;
 		
 		// Generate texture name
-        glGenTextures( 1, &mTextureID );
+        glGenTexturesEXT( 1, &mTextureID );
 		
 		// Set texture type
-		glBindTexture( getGLTextureTarget(), mTextureID );
+		glBindTextureEXT( getGLTextureTarget(), mTextureID );
         
 		// This needs to be set otherwise the texture doesn't get rendered
         glTexParameteri( getGLTextureTarget(), GL_TEXTURE_MAX_LEVEL, mNumMipmaps );

@@ -96,3 +96,24 @@ namespace Ogre {
 		}		
 	}
 }
+
+#if OGRE_THREAD_SUPPORT == 1
+
+// declared in OgreGLPrerequisites.h 
+WGLEWContext * wglewGetContext()
+{
+	static boost::thread_specific_ptr<WGLEWContext> WGLEWContextsPtr;
+
+	WGLEWContext * currentWGLEWContextsPtr = WGLEWContextsPtr.get();
+	if (currentWGLEWContextsPtr == NULL)
+	{
+		currentWGLEWContextsPtr = new WGLEWContext();
+		WGLEWContextsPtr.reset(currentWGLEWContextsPtr);
+		ZeroMemory(currentWGLEWContextsPtr, sizeof(WGLEWContext));
+		wglewInit();
+
+	}
+	return currentWGLEWContextsPtr;
+}
+
+#endif

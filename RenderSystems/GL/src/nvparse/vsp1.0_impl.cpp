@@ -4,7 +4,6 @@
 #include <string>
 #include <ctype.h>
 
-#include <OgreGLPrerequisites.h>
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #	include <OpenGL/glu.h>
 #else

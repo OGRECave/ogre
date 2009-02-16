@@ -42,3 +42,22 @@ namespace Ogre {
     }
     
 }
+
+#if OGRE_THREAD_SUPPORT == 1
+
+// declared in OgreGLPrerequisites.h 
+GLEWContext * glewGetContext()
+{
+	static boost::thread_specific_ptr<GLEWContext> GLEWContextsPtr;
+
+	GLEWContext * currentGLEWContextsPtr =  GLEWContextsPtr.get();
+	if (currentGLEWContextsPtr == NULL)
+	{
+		currentGLEWContextsPtr = new GLEWContext();
+		GLEWContextsPtr.reset(currentGLEWContextsPtr);
+		ZeroMemory(currentGLEWContextsPtr, sizeof(GLEWContext));
+		glewInit();
+	}
+	return currentGLEWContextsPtr;
+}
+#endif

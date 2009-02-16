@@ -2,8 +2,6 @@
 #include "nvparse_errors.h"
 #include "nvparse_externs.h"
 
-#include <OgreGLPrerequisites.h>
-
 void FinalRgbFunctionStruct::ZeroOut()
 {
 	RegisterEnum zero;

@@ -54,7 +54,10 @@ Torus Knot Software Ltd.s
 
 // Convenience macro from ARB_vertex_buffer_object spec
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
+
+#if OGRE_THREAD_SUPPORT != 1
 GLenum glewContextInit (Ogre::GLSupport *glSupport);
+#endif
 
 namespace Ogre {
 
@@ -805,9 +808,9 @@ namespace Ogre {
 		{
 			// Before GL version 2.0, we need to get one of the extensions
 			if(caps->hasCapability(RSC_FBO_ARB))
-				__glewDrawBuffers = glDrawBuffersARB;
+				GLEW_GET_FUN(__glewDrawBuffers) = glDrawBuffersARB;
 			else if(caps->hasCapability(RSC_FBO_ATI))
-				__glewDrawBuffers = glDrawBuffersATI;
+				GLEW_GET_FUN(__glewDrawBuffers) = glDrawBuffersATI;
 
 			if(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE))
 			{
@@ -1044,7 +1047,9 @@ namespace Ogre {
 		LogManager::getSingleton().logMessage("***************************");
 
 		// Get extension function pointers
+#if OGRE_THREAD_SUPPORT != 1
 		glewContextInit(mGLSupport);
+#endif
 	}
 
 
@@ -1413,9 +1418,9 @@ namespace Ogre {
 			}
 
 			if(!tex.isNull())
-				glBindTexture( mTextureTypes[stage], tex->getGLID() );
+				glBindTextureEXT( mTextureTypes[stage], tex->getGLID() );
 			else
-				glBindTexture( mTextureTypes[stage], static_cast<GLTextureManager*>(mTextureManager)->getWarningTextureID() );
+				glBindTextureEXT( mTextureTypes[stage], static_cast<GLTextureManager*>(mTextureManager)->getWarningTextureID() );
 		}
 		else
 		{
@@ -1428,7 +1433,7 @@ namespace Ogre {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			}
 			// bind zero texture
-			glBindTexture (GL_TEXTURE_2D, 0); 
+			glBindTextureEXT (GL_TEXTURE_2D, 0); 
 		}
 
 	}

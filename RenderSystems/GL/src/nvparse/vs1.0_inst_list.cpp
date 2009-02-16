@@ -6,7 +6,7 @@
 #include "nvparse_errors.h"
 #include "nvparse_externs.h"
 #include <string.h>
-#include <OgreGLPrerequisites.h>
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #	include <OpenGL/glu.h>
 #else

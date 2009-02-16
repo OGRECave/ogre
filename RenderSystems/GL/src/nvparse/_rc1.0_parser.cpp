@@ -60,7 +60,7 @@ Torus Knot Software Ltd.
    There are some unavoidable exceptions within include files to
    define necessary library symbols; they are noted "INFRINGES ON
    USER NAME SPACE" below.  */
-
+#include <OgreGLPrerequisites.h>
 /* Identify Bison output.  */
 #define YYBISON 1
 

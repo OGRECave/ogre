@@ -13,7 +13,9 @@
 
 using namespace Ogre;
 
+#if OGRE_THREAD_SUPPORT != 1
 GLenum wglewContextInit (Ogre::GLSupport *glSupport);
+#endif
 
 namespace Ogre {
 	Win32GLSupport::Win32GLSupport()
@@ -378,7 +380,9 @@ namespace Ogre {
 		// First, initialise the normal extensions
 		GLSupport::initialiseExtensions();
 		// wglew init
+#if OGRE_THREAD_SUPPORT != 1
 		wglewContextInit(this);
+#endif
 
 		// Check for W32 specific extensions probe function
 		PFNWGLGETEXTENSIONSSTRINGARBPROC _wglGetExtensionsStringARB = 
@@ -513,9 +517,9 @@ namespace Ogre {
 				unsigned int count;
                 // cheating here.  wglChoosePixelFormatARB procc address needed later on
                 // when a valid GL context does not exist and glew is not initialized yet.
-                __wglewChoosePixelFormatARB =
+                WGLEW_GET_FUN(__wglewChoosePixelFormatARB) =
                     (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
-                if (__wglewChoosePixelFormatARB(hdc, iattr, 0, 256, formats, &count))
+                if (WGLEW_GET_FUN(__wglewChoosePixelFormatARB)(hdc, iattr, 0, 256, formats, &count))
                 {
                     // determine what multisampling levels are offered
                     int query = WGL_SAMPLES_ARB, samples;
@@ -570,7 +574,7 @@ namespace Ogre {
 		if (hwGamma && !mHasHardwareGamma)
 			return false;
 		
-		if ((multisample || hwGamma) && __wglewChoosePixelFormatARB)
+		if ((multisample || hwGamma) && WGLEW_GET_FUN(__wglewChoosePixelFormatARB))
 		{
 
 			// Use WGL to test extended caps (multisample, sRGB)
@@ -596,7 +600,7 @@ namespace Ogre {
 			UINT nformats;
 			// ChoosePixelFormatARB proc address was obtained when setting up a dummy GL context in initialiseWGL()
 			// since glew hasn't been initialized yet, we have to cheat and use the previously obtained address
-			if (!__wglewChoosePixelFormatARB(hdc, &(attribList[0]), NULL, 1, &format, &nformats) || nformats <= 0)
+			if (!WGLEW_GET_FUN(__wglewChoosePixelFormatARB)(hdc, &(attribList[0]), NULL, 1, &format, &nformats) || nformats <= 0)
 				return false;
 		}
 		else
@@ -610,7 +614,7 @@ namespace Ogre {
 
 	bool Win32GLSupport::supportsPBuffers()
 	{
-		return __WGLEW_ARB_pbuffer != GL_FALSE;
+		return WGLEW_GET_FUN(__WGLEW_ARB_pbuffer) != GL_FALSE;
 	}
     GLPBuffer *Win32GLSupport::createPBuffer(PixelComponentType format, size_t width, size_t height)
 	{

@@ -1,5 +1,4 @@
 #include "ts1.0_inst.h"
-#include <OgreGLPrerequisites.h>
 
 Inst::Inst(int inst, float arg0, float arg1, float arg2, float arg3, float arg4, float arg5, float arg6)
 {

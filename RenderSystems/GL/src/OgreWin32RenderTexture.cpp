@@ -51,7 +51,7 @@ namespace Ogre {
 		if(mUseBind)
 		{
 			// Bind texture
-			glBindTexture(GL_TEXTURE_2D, static_cast<GLTexture*>(mTexture.get())->getGLID());
+			glBindTextureEXT(GL_TEXTURE_2D, static_cast<GLTexture*>(mTexture.get())->getGLID());
 			wglBindTexImageARB(mPBuffer, WGL_FRONT_LEFT_ARB);
 		}
 #endif
@@ -62,9 +62,9 @@ namespace Ogre {
 		if(mUseBind)
 		{
 			// Unbind texture
-			glBindTexture(GL_TEXTURE_2D,
+			glBindTextureEXT(GL_TEXTURE_2D,
 				static_cast<GLTexture*>(mTexture.get())->getGLID());
-			glBindTexture(GL_TEXTURE_2D,
+			glBindTextureEXT(GL_TEXTURE_2D,
 				static_cast<GLTexture*>(mTexture.get())->getGLID());
 			wglReleaseTexImageARB(mPBuffer, WGL_FRONT_LEFT_ARB);
 		}

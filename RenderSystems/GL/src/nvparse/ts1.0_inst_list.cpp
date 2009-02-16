@@ -6,8 +6,6 @@
 #include "nvparse_errors.h"
 #include "nvparse_externs.h"
 
-#include <OgreGLPrerequisites.h>
-
 using namespace Ogre;
 
 const int instListInc = 4;

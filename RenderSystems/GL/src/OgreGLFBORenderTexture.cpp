@@ -250,8 +250,8 @@ static const size_t depthBits[] =
             if (fmt!=GL_NONE)
             {
 				// Create and attach texture
-				glGenTextures(1, &tid);
-				glBindTexture(target, tid);
+				glGenTexturesEXT(1, &tid);
+				glBindTextureEXT(target, tid);
 				
                 // Set some default parameters so it won't fail on NVidia cards         
                 glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 0);

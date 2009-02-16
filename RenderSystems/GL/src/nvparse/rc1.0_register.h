@@ -2,6 +2,7 @@
 #define _RC10_REGISTER_H
 
 #include <stdlib.h>
+#include <OgreGLPrerequisites.h>
 #include <GL/glew.h>
 
 #define RCP_NUM_GENERAL_COMBINERS 8
