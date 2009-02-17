@@ -2975,6 +2975,14 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	//---------------------------------------------------------------------
 	void GLRenderSystem::bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask)
 	{
+		if (mask & (uint16)GPV_GLOBAL)
+		{
+			// We could maybe use GL_EXT_bindable_uniform here to produce Dx10-style
+			// shared constant buffers, but GPU support seems fairly weak?
+			// for now, just copy
+			params->_copySharedParams();
+		}
+
 		switch (gptype)
 		{
 		case GPT_VERTEX_PROGRAM:

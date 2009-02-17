@@ -377,89 +377,74 @@ namespace Ogre {
 			case CG_HALF:
 			case CG_HALF1:
 				def.constType = GCT_FLOAT1;
-				def.elementSize = 4; // padded to 4 elements
 				break;
 			case CG_FLOAT2:
 			case CG_HALF2:
 				def.constType = GCT_FLOAT2;
-				def.elementSize = 4; // padded to 4 elements
 				break;
 			case CG_FLOAT3:
 			case CG_HALF3:
 				def.constType = GCT_FLOAT3;
-				def.elementSize = 4; // padded to 4 elements
 				break;
 			case CG_FLOAT4:
 			case CG_HALF4:
 				def.constType = GCT_FLOAT4;
-				def.elementSize = 4; 
 				break;
 			case CG_FLOAT2x2:
 			case CG_HALF2x2:
 				def.constType = GCT_MATRIX_2X2;
-				def.elementSize = 8; // Cg pads this to 2 float4s
 				break;
 			case CG_FLOAT2x3:
 			case CG_HALF2x3:
 				def.constType = GCT_MATRIX_2X3;
-				def.elementSize = 8; // Cg pads this to 2 float4s
 				break;
 			case CG_FLOAT2x4:
 			case CG_HALF2x4:
 				def.constType = GCT_MATRIX_2X4;
-				def.elementSize = 8; 
 				break;
 			case CG_FLOAT3x2:
 			case CG_HALF3x2:
-				def.constType = GCT_MATRIX_2X3;
-				def.elementSize = 12; // Cg pads this to 3 float4s
+				def.constType = GCT_MATRIX_3X2;
 				break;
 			case CG_FLOAT3x3:
 			case CG_HALF3x3:
 				def.constType = GCT_MATRIX_3X3;
-				def.elementSize = 12; // Cg pads this to 3 float4s
 				break;
 			case CG_FLOAT3x4:
 			case CG_HALF3x4:
 				def.constType = GCT_MATRIX_3X4;
-				def.elementSize = 12; 
 				break;
 			case CG_FLOAT4x2:
 			case CG_HALF4x2:
 				def.constType = GCT_MATRIX_4X2;
-				def.elementSize = 16; // Cg pads this to 4 float4s
 				break;
 			case CG_FLOAT4x3:
 			case CG_HALF4x3:
 				def.constType = GCT_MATRIX_4X3;
-				def.elementSize = 16; // Cg pads this to 4 float4s
 				break;
 			case CG_FLOAT4x4:
 			case CG_HALF4x4:
 				def.constType = GCT_MATRIX_4X4;
-				def.elementSize = 16; // Cg pads this to 4 float4s
 				break;
 			case CG_INT:
 			case CG_INT1:
 				def.constType = GCT_INT1;
-				def.elementSize = 4; // Cg pads this to int4
 				break;
 			case CG_INT2:
 				def.constType = GCT_INT2;
-				def.elementSize = 4; // Cg pads this to int4
 				break;
 			case CG_INT3:
 				def.constType = GCT_INT3;
-				def.elementSize = 4; // Cg pads this to int4
 				break;
 			case CG_INT4:
 				def.constType = GCT_INT4;
-				def.elementSize = 4; 
 				break;
 			default:
 				def.constType = GCT_UNKNOWN;
 				break;
 			}
+			// Cg pads
+			def.elementSize = GpuConstantDefinition::getElementSize(def.constType, true);
 		}
 	}
     //-----------------------------------------------------------------------

@@ -194,106 +194,87 @@ namespace Ogre {
 		{
 		case GL_FLOAT:
 			defToUpdate.constType = GCT_FLOAT1;
-			defToUpdate.elementSize = 1;
 			break;
 		case GL_FLOAT_VEC2:
 			defToUpdate.constType = GCT_FLOAT2;
-			defToUpdate.elementSize = 2;
 			break;
 
 		case GL_FLOAT_VEC3:
 			defToUpdate.constType = GCT_FLOAT3;
-			defToUpdate.elementSize = 3;
 			break;
 
 		case GL_FLOAT_VEC4:
 			defToUpdate.constType = GCT_FLOAT4;
-			defToUpdate.elementSize = 4;
 			break;
 		case GL_SAMPLER_1D:
 			// need to record samplers for GLSL
 			defToUpdate.constType = GCT_SAMPLER1D;
-			defToUpdate.elementSize = 1;
 			break;
 		case GL_SAMPLER_2D:
 		case GL_SAMPLER_2D_RECT_ARB:
 			defToUpdate.constType = GCT_SAMPLER2D;
-			defToUpdate.elementSize = 1;
 			break;
 		case GL_SAMPLER_3D:
 			defToUpdate.constType = GCT_SAMPLER3D;
-			defToUpdate.elementSize = 1;
 			break;
 		case GL_SAMPLER_CUBE:
 			defToUpdate.constType = GCT_SAMPLERCUBE;
-			defToUpdate.elementSize = 1;
 			break;
 		case GL_SAMPLER_1D_SHADOW:
 			defToUpdate.constType = GCT_SAMPLER1DSHADOW;
-			defToUpdate.elementSize = 1;
 			break;
 		case GL_SAMPLER_2D_SHADOW:
 		case GL_SAMPLER_2D_RECT_SHADOW_ARB:
 			defToUpdate.constType = GCT_SAMPLER2DSHADOW;
-			defToUpdate.elementSize = 1;
 			break;
 		case GL_INT:
 			defToUpdate.constType = GCT_INT1;
-			defToUpdate.elementSize = 1;
 			break;
 		case GL_INT_VEC2:
 			defToUpdate.constType = GCT_INT2;
-			defToUpdate.elementSize = 2;
 			break;
 		case GL_INT_VEC3:
 			defToUpdate.constType = GCT_INT3;
-			defToUpdate.elementSize = 3;
 			break;
 		case GL_INT_VEC4:
 			defToUpdate.constType = GCT_INT4;
-			defToUpdate.elementSize = 4;
 			break;
 		case GL_FLOAT_MAT2:
 			defToUpdate.constType = GCT_MATRIX_2X2;
-			defToUpdate.elementSize = 4;
 			break;
 		case GL_FLOAT_MAT3:
 			defToUpdate.constType = GCT_MATRIX_3X3;
-			defToUpdate.elementSize = 9;
 			break;
 		case GL_FLOAT_MAT4:
 			defToUpdate.constType = GCT_MATRIX_4X4;
-			defToUpdate.elementSize = 16;
 			break;
 		case GL_FLOAT_MAT2x3:
 			defToUpdate.constType = GCT_MATRIX_2X3;
-			defToUpdate.elementSize = 6;
 			break;
 		case GL_FLOAT_MAT3x2:
 			defToUpdate.constType = GCT_MATRIX_3X2;
-			defToUpdate.elementSize = 6;
 			break;
 		case GL_FLOAT_MAT2x4:
 			defToUpdate.constType = GCT_MATRIX_2X4;
-			defToUpdate.elementSize = 8;
 			break;
 		case GL_FLOAT_MAT4x2:
 			defToUpdate.constType = GCT_MATRIX_4X2;
-			defToUpdate.elementSize = 8;
 			break;
 		case GL_FLOAT_MAT3x4:
 			defToUpdate.constType = GCT_MATRIX_3X4;
-			defToUpdate.elementSize = 12;
 			break;
 		case GL_FLOAT_MAT4x3:
 			defToUpdate.constType = GCT_MATRIX_4X3;
-			defToUpdate.elementSize = 12;
 			break;
 		default:
 			defToUpdate.constType = GCT_UNKNOWN;
 			break;
 
 		}
+
+		// GL doesn't pad
+		defToUpdate.elementSize = GpuConstantDefinition::getElementSize(defToUpdate.constType, false);
+
 
 	}
 	//---------------------------------------------------------------------

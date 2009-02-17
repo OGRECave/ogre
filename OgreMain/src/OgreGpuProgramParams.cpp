@@ -336,6 +336,267 @@ namespace Ogre
 	}
 
 	//-----------------------------------------------------------------------------
+	//      GpuSharedParameters Methods
+	//-----------------------------------------------------------------------------
+	GpuSharedParameters::GpuSharedParameters(const String& name)
+		:mName(name), mFrameLastUpdated(Root::getSingleton().getNextFrameNumber())
+	{
+
+	}
+	//---------------------------------------------------------------------
+	GpuSharedParameters::~GpuSharedParameters()
+	{
+
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::addConstantDefinition(const String& name, GpuConstantType constType, size_t arraySize)
+	{
+		if (mNamedConstants.map.find(name) != mNamedConstants.map.end())
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Constant entry with name '" + name + "' already exists. ", 
+				"GpuSharedParameters::addConstantDefinition");
+		}
+		GpuConstantDefinition def;
+		def.arraySize = arraySize;
+		def.constType = constType;
+		// for compatibility we do not pad values to multiples of 4
+		// when it comes to arrays, user is responsible for creating matching defs
+		def.elementSize = GpuConstantDefinition::getElementSize(constType, false);
+
+		// not used
+		def.logicalIndex = 0;
+		def.variability = (uint16)GPV_GLOBAL;
+
+		if (def.isFloat())
+		{
+			def.physicalIndex = mFloatConstants.size();
+			mFloatConstants.resize(mFloatConstants.size() + def.arraySize * def.elementSize);
+		}
+		else
+		{
+			def.physicalIndex = mIntConstants.size();
+			mIntConstants.resize(mIntConstants.size() + def.arraySize * def.elementSize);
+		}
+
+		mNamedConstants.map[name] = def;
+	}
+	//---------------------------------------------------------------------
+	GpuConstantDefinitionIterator GpuSharedParameters::getConstantDefinitionIterator(void) const
+	{
+		return GpuConstantDefinitionIterator(mNamedConstants.map.begin(), mNamedConstants.map.end());
+	}
+	//---------------------------------------------------------------------
+	const GpuConstantDefinition& GpuSharedParameters::getConstantDefinition(const String& name) const
+	{
+		GpuConstantDefinitionMap::const_iterator i = mNamedConstants.map.find(name);
+		if (i == mNamedConstants.map.end())
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Constant entry with name '" + name + "' does not exist. ", 
+				"GpuSharedParameters::getConstantDefinition");
+		}
+		return i->second;
+	}
+	//---------------------------------------------------------------------
+	const GpuNamedConstants& GpuSharedParameters::getConstantDefinitions() const
+	{
+		return mNamedConstants;
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::setNamedConstant(const String& name, Real val)
+	{
+		setNamedConstant(name, &val, 1);
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::setNamedConstant(const String& name, int val)
+	{
+		setNamedConstant(name, &val, 1);
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::setNamedConstant(const String& name, const Vector4& vec)
+	{
+		setNamedConstant(name, vec.ptr(), 4);
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::setNamedConstant(const String& name, const Vector3& vec)
+	{
+		setNamedConstant(name, vec.ptr(), 3);
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::setNamedConstant(const String& name, const Matrix4& m)
+	{
+		setNamedConstant(name, m[0], 16);
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::setNamedConstant(const String& name, const Matrix4* m, size_t numEntries)
+	{
+		setNamedConstant(name, m[0][0], 16 * numEntries);
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::setNamedConstant(const String& name, const float *val, size_t count)
+	{
+		GpuConstantDefinitionMap::const_iterator i = mNamedConstants.map.find(name);
+		if (i != mNamedConstants.map.end())
+		{
+			const GpuConstantDefinition& def = i->second;
+			memcpy(&mFloatConstants[def.physicalIndex], val, 
+				sizeof(float) * std::min(count, def.elementSize * def.arraySize));
+		}
+
+		_markDirty();
+
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::setNamedConstant(const String& name, const double *val, size_t count)
+	{
+		GpuConstantDefinitionMap::const_iterator i = mNamedConstants.map.find(name);
+		if (i != mNamedConstants.map.end())
+		{
+			const GpuConstantDefinition& def = i->second;
+
+			count = std::min(count, def.elementSize * def.arraySize);
+			const double* src = val;
+			float* dst = &mFloatConstants[def.physicalIndex];
+			for (size_t v = 0; v < count; ++v)
+			{
+				*dst++ = static_cast<float>(*src++);
+			}
+		}
+
+		_markDirty();
+
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::setNamedConstant(const String& name, const ColourValue& colour)
+	{
+		setNamedConstant(name, colour.ptr(), 4);
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::setNamedConstant(const String& name, const int *val, size_t count)
+	{
+		GpuConstantDefinitionMap::const_iterator i = mNamedConstants.map.find(name);
+		if (i != mNamedConstants.map.end())
+		{
+			const GpuConstantDefinition& def = i->second;
+			memcpy(&mIntConstants[def.physicalIndex], val, 
+				sizeof(int) * std::min(count, def.elementSize * def.arraySize));
+		}
+
+		_markDirty();
+
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::_markDirty()
+	{
+		mFrameLastUpdated = Root::getSingleton().getNextFrameNumber();
+	}
+
+	//-----------------------------------------------------------------------------
+	//      GpuSharedParametersUsage Methods
+	//-----------------------------------------------------------------------------
+	GpuSharedParametersUsage::GpuSharedParametersUsage(GpuSharedParametersPtr sharedParams, 
+		GpuProgramParameters* params)
+		: mSharedParams(sharedParams)
+		, mParams(params)
+	{
+		const GpuConstantDefinitionMap& sharedmap = mSharedParams->getConstantDefinitions().map;
+		for (GpuConstantDefinitionMap::const_iterator i = sharedmap.begin(); i != sharedmap.end(); ++i)
+		{
+			const String& pName = i->first;
+			const GpuConstantDefinition& shareddef = i->second;
+
+			const GpuConstantDefinition* instdef = mParams->_findNamedConstantDefinition(pName, false);
+			if (instdef)
+			{
+				// Check that the definitions are the same 
+				if (instdef->constType == shareddef.constType && 
+					instdef->arraySize == shareddef.arraySize)
+				{
+					CopyDataEntry e;
+					e.srcDefinition = &shareddef;
+					e.dstDefinition = instdef;
+					mCopyDataList.push_back(e);
+				}
+			}
+
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParametersUsage::_copySharedParamsToTargetParams()
+	{
+		for (CopyDataList::iterator i = mCopyDataList.begin(); i != mCopyDataList.end(); ++i)
+		{
+			CopyDataEntry& e = *i;
+
+			if (e.dstDefinition->isFloat())
+			{	
+				const float* pSrc = mSharedParams->getFloatPointer(e.srcDefinition->physicalIndex);
+				float* pDst = mParams->getFloatPointer(e.dstDefinition->physicalIndex);
+
+				// Deal with matrix transposition here!!!
+				// transposition is specific to the dest param set, shared params don't do it
+				if (mParams->getTransposeMatrices() && e.dstDefinition->constType == GCT_MATRIX_4X4)
+				{
+					for (int row = 0; row < 4; ++row)
+						for (int col = 0; col < 4; ++col)
+							pDst[row * 4 + col] = pSrc[col * 4 + row];
+				}
+				else
+				{
+					if (e.dstDefinition->elementSize == e.srcDefinition->elementSize)
+					{
+						// simple copy
+						memcpy(pDst, pSrc, sizeof(float) * e.dstDefinition->elementSize * e.dstDefinition->arraySize);
+					}
+					else
+					{
+						// target params may be padded to 4 elements, shared params are packed
+						assert(e.dstDefinition->elementSize % 4 == 0);
+						size_t iterations = e.dstDefinition->elementSize / 4 
+							* e.dstDefinition->arraySize;
+						size_t valsPerIteration = e.srcDefinition->elementSize / iterations;
+						for (size_t l = 0; l < iterations; ++l)
+						{
+							memcpy(pDst, pSrc, sizeof(float) * valsPerIteration);
+							pSrc += valsPerIteration;
+							pDst += 4;
+						}
+					}
+				}
+			}
+			else
+			{
+				const int* pSrc = mSharedParams->getIntPointer(e.srcDefinition->physicalIndex);
+				int* pDst = mParams->getIntPointer(e.dstDefinition->physicalIndex);
+
+				if (e.dstDefinition->elementSize == e.srcDefinition->elementSize)
+				{
+					// simple copy
+					memcpy(pDst, pSrc, sizeof(int) * e.dstDefinition->elementSize * e.dstDefinition->arraySize);
+				}
+				else
+				{
+					// target params may be padded to 4 elements, shared params are packed
+					assert(e.dstDefinition->elementSize % 4 == 0);
+					size_t iterations = (e.dstDefinition->elementSize / 4)
+						* e.dstDefinition->arraySize;
+					size_t valsPerIteration = e.srcDefinition->elementSize / iterations;
+					for (size_t l = 0; l < iterations; ++l)
+					{
+						memcpy(pDst, pSrc, sizeof(int) * valsPerIteration);
+						pSrc += valsPerIteration;
+						pDst += 4;
+					}
+				}
+			}
+		}
+	}
+
+
+
+	//-----------------------------------------------------------------------------
 	//      GpuProgramParameters Methods
 	//-----------------------------------------------------------------------------
 	GpuProgramParameters::GpuProgramParameters() :
@@ -366,6 +627,7 @@ namespace Ogre
 		mFloatLogicalToPhysical = oth.mFloatLogicalToPhysical;
 		mIntLogicalToPhysical = oth.mIntLogicalToPhysical;
 		mNamedConstants = oth.mNamedConstants;
+		mSharedParamSets = oth.mSharedParamSets;
 
 		mCombinedVariability = oth.mCombinedVariability;
 		mTransposeMatrices = oth.mTransposeMatrices;
@@ -1986,6 +2248,7 @@ namespace Ogre
 		mIntConstants = source.getIntConstantList();
 		mAutoConstants = source.getAutoConstantList();
 		mCombinedVariability = source.mCombinedVariability;
+		mSharedParamSets = source.mSharedParamSets;
 	}
 	//---------------------------------------------------------------------
 	void GpuProgramParameters::copyMatchingNamedConstantsFrom(const GpuProgramParameters& source)
@@ -2042,6 +2305,17 @@ namespace Ogre
 				}
 
 			}
+
+			// Copy shared param sets
+			for (GpuSharedParamUsageList::const_iterator i = source.mSharedParamSets.begin();
+				i != source.mSharedParamSets.end(); ++i)
+			{
+				const GpuSharedParametersUsage& usage = *i;
+				if (!isUsingSharedParameters(usage.getName()))
+				{
+					addSharedParameters(usage.getSharedParams());
+				}
+			}
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -2097,6 +2371,65 @@ namespace Ogre
 			++mFloatConstants[mActivePassIterationIndex];
 		}
 	}
+	//---------------------------------------------------------------------
+	void GpuProgramParameters::addSharedParameters(GpuSharedParametersPtr sharedParams)
+	{
+		if (!isUsingSharedParameters(sharedParams->getName()))
+		{
+			mSharedParamSets.push_back(GpuSharedParametersUsage(sharedParams, this));
+		}
+	}
+	//---------------------------------------------------------------------
+	void GpuProgramParameters::addSharedParameters(const String& sharedParamsName)
+	{
+		addSharedParameters(GpuProgramManager::getSingleton().getSharedParameters(sharedParamsName));
+	}
+	//---------------------------------------------------------------------
+	bool GpuProgramParameters::isUsingSharedParameters(const String& sharedParamsName) const
+	{
+		for (GpuSharedParamUsageList::const_iterator i = mSharedParamSets.begin();
+			i != mSharedParamSets.end(); ++i)
+		{
+			if (i->getName() == sharedParamsName)
+				return true;
+		}
+		return false;
+	}
+	//---------------------------------------------------------------------
+	void GpuProgramParameters::removeSharedParameters(const String& sharedParamsName)
+	{
+		for (GpuSharedParamUsageList::iterator i = mSharedParamSets.begin();
+			i != mSharedParamSets.end(); ++i)
+		{
+			if (i->getName() == sharedParamsName)
+			{
+				mSharedParamSets.erase(i);
+				break;
+			}
+		}
+	}
+	//---------------------------------------------------------------------
+	void GpuProgramParameters::removeAllSharedParameters()
+	{
+		mSharedParamSets.clear();
+	}
+	//---------------------------------------------------------------------
+	const GpuProgramParameters::GpuSharedParamUsageList& 
+	GpuProgramParameters::getSharedParameters() const
+	{
+		return mSharedParamSets;
+	}
+	//---------------------------------------------------------------------
+	void GpuProgramParameters::_copySharedParams()
+	{
+		for (GpuSharedParamUsageList::iterator i = mSharedParamSets.begin(); 
+			i != mSharedParamSets.end(); ++i )
+		{
+			i->_copySharedParamsToTargetParams();
+		}
+
+	}
+
 
 
 

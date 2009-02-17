@@ -2771,6 +2771,14 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D10RenderSystem::bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask)
 	{
+		if (mask & (uint16)GPV_GLOBAL)
+		{
+			// TODO: Dx10 supports shared constant buffers, so use them
+			// check the match to constant buffers & use rendersystem data hooks to store
+			// for now, just copy
+			params->_copySharedParams();
+		}
+
 		// Do everything here in Dx10, since deal with via buffers anyway so number of calls
 		// is actually the same whether we categorise the updates or not
 		ID3D10Buffer* pBuffers[1] ;

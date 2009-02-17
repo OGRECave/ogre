@@ -73,10 +73,10 @@ void GLGpuNvparseProgram::bindProgramParameters(GpuProgramParametersSharedPtr pa
     // NB, register combiners uses 2 constants per texture stage (0 and 1)
     // We have stored these as (stage * 2) + const_index in the physical buffer
 	// There are no other parameters in a register combiners shader
-	const GpuProgramParameters::FloatConstantList& floatList = 
+	const FloatConstantList& floatList = 
 		params->getFloatConstantList();
 	size_t index = 0;
-	for (GpuProgramParameters::FloatConstantList::const_iterator i = floatList.begin();
+	for (FloatConstantList::const_iterator i = floatList.begin();
 		i != floatList.end(); ++i, ++index)
 	{
 		GLenum combinerStage = GL_COMBINER0_NV + (unsigned int)(index / 2);

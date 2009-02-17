@@ -35,6 +35,7 @@ Torus Knot Software Ltd.
 #include "OgreIteratorWrappers.h"
 #include "OgreSerializer.h"
 #include "OgreRenderOperation.h"
+#include "OgreAny.h"
 
 namespace Ogre {
 
@@ -113,7 +114,12 @@ namespace Ogre {
 
 		bool isFloat() const
 		{
-			switch(constType)
+			return isFloat(constType);
+		}
+
+		static bool isFloat(GpuConstantType c)
+		{
+			switch(c)
 			{
 			case GCT_INT1:
 			case GCT_INT2:
@@ -134,7 +140,12 @@ namespace Ogre {
 
 		bool isSampler() const
 		{
-			switch(constType)
+			return isSampler(constType);
+		}
+
+		static bool isSampler(GpuConstantType c)
+		{
+			switch(c)
 			{
 			case GCT_SAMPLER1D:
 			case GCT_SAMPLER2D:
@@ -147,6 +158,91 @@ namespace Ogre {
 				return false;
 			};
 
+		}
+
+
+		/** Get the element size of a given type, including whether to pad the 
+			elements into multiples of 4 (e.g. SM1 and D3D does, GLSL doesn't)
+		*/
+		static size_t getElementSize(GpuConstantType ctype, bool padToMultiplesOf4)
+		{
+			if (padToMultiplesOf4)
+			{
+				switch(ctype)
+				{
+				case GCT_FLOAT1:
+				case GCT_INT1:
+				case GCT_SAMPLER1D:
+				case GCT_SAMPLER2D:
+				case GCT_SAMPLER3D:
+				case GCT_SAMPLERCUBE:
+				case GCT_SAMPLER1DSHADOW:
+				case GCT_SAMPLER2DSHADOW:
+				case GCT_FLOAT2:
+				case GCT_INT2:
+				case GCT_FLOAT3:
+				case GCT_INT3:
+				case GCT_FLOAT4:
+				case GCT_INT4:
+					return 4;
+				case GCT_MATRIX_2X2:
+				case GCT_MATRIX_2X3:
+				case GCT_MATRIX_2X4:
+					return 8; // 2 float4s
+				case GCT_MATRIX_3X2:
+				case GCT_MATRIX_3X3:
+				case GCT_MATRIX_3X4:
+					return 12; // 3 float4s
+				case GCT_MATRIX_4X2:
+				case GCT_MATRIX_4X3:
+				case GCT_MATRIX_4X4:
+					return 16; // 4 float4s
+				default:
+					return 4;
+				};
+			}
+			else
+			{
+				switch(ctype)
+				{
+				case GCT_FLOAT1:
+				case GCT_INT1:
+				case GCT_SAMPLER1D:
+				case GCT_SAMPLER2D:
+				case GCT_SAMPLER3D:
+				case GCT_SAMPLERCUBE:
+				case GCT_SAMPLER1DSHADOW:
+				case GCT_SAMPLER2DSHADOW:
+					return 1;
+				case GCT_FLOAT2:
+				case GCT_INT2:
+					return 2;
+				case GCT_FLOAT3:
+				case GCT_INT3:
+					return 3;
+				case GCT_FLOAT4:
+				case GCT_INT4:
+					return 4;
+				case GCT_MATRIX_2X2:
+					return 4;
+				case GCT_MATRIX_2X3:
+				case GCT_MATRIX_3X2:
+					return 6;
+				case GCT_MATRIX_2X4:
+				case GCT_MATRIX_4X2:
+					return 8; 
+				case GCT_MATRIX_3X3:
+					return 9;
+				case GCT_MATRIX_3X4:
+				case GCT_MATRIX_4X3:
+					return 12; 
+				case GCT_MATRIX_4X4:
+					return 16; 
+				default:
+					return 4;
+				};
+
+			}
 		}
 
 		GpuConstantDefinition()
@@ -251,6 +347,178 @@ namespace Ogre {
 		/// Shortcut to know the buffer size needs
 		size_t bufferSize;
 		GpuLogicalBufferStruct() : bufferSize(0) {}
+	};
+
+	/** Definition of container that holds the current float constants.
+	@note Not necessarily in direct index order to constant indexes, logical
+	to physical index map is derived from GpuProgram
+	*/
+	typedef vector<float>::type FloatConstantList;
+	/** Definition of container that holds the current float constants.
+	@note Not necessarily in direct index order to constant indexes, logical
+	to physical index map is derived from GpuProgram
+	*/
+	typedef vector<int>::type IntConstantList;
+
+	/** A group of manually updated parameters that are shared between many parameter sets.
+	@remarks
+		Sometimes you want to set some common parameters across many otherwise 
+		different parameter sets, and keep them all in sync together. This class
+		allows you to define a set of parameters that you can share across many
+		parameter sets and have the parameters that match automatically be pulled
+		from the shared set, rather than you having to set them on all the parameter
+		sets individually.
+	@par
+		Parameters in a shared set are matched up with instances in a GpuProgramParameters
+		structure by matching names. It is up to you to define the named parameters
+		that a shared set contains, and ensuring the definition matches.
+	@note
+		Shared parameter sets can be named, and looked up using the GpuProgramManager.
+	*/
+	class _OgreExport GpuSharedParameters : public GpuParamsAlloc
+	{
+	protected:
+		GpuNamedConstants mNamedConstants;
+		FloatConstantList mFloatConstants;
+		IntConstantList mIntConstants;
+		const String& mName;
+
+		// Optional data the rendersystem might want to store
+		mutable Any mRenderSystemData;
+
+		/// Not used when copying data, but might be useful to RS using shared buffers
+		size_t mFrameLastUpdated;
+
+	public:
+		GpuSharedParameters(const String& name);
+		virtual ~GpuSharedParameters();
+
+		/// Get the name of this shared parameter set
+		const String& getName() { return mName; }
+
+		/** Add a new constant definition to this shared set of parameters.
+		@remarks
+			Unlike GpuProgramParameters, where the parameter list is defined by the
+			program being compiled, this shared parameter set is defined by the
+			user. Only parameters which have been predefined here may be later
+			updated.
+		*/
+		void addConstantDefinition(const String& name, GpuConstantType constType, size_t arraySize = 1);
+
+		/** Mark the shared set as being dirty (values modified).
+		@remarks
+		You do not need to call this yourself, set is marked as dirty whenever
+		setNamedConstant or (non const) getFloatPointer et al are called.
+		*/
+		void _markDirty();
+		/// Get the frame in which this shared parameter set was last updated
+		size_t getFrameLastUpdated() const { return mFrameLastUpdated; }
+
+		/** Gets an iterator over the named GpuConstantDefinition instances as defined
+			by the user. 
+		*/
+		GpuConstantDefinitionIterator getConstantDefinitionIterator(void) const;
+
+		/** Get a specific GpuConstantDefinition for a named parameter.
+		*/
+		const GpuConstantDefinition& getConstantDefinition(const String& name) const;
+
+		/** Get the full list of GpuConstantDefinition instances.
+		*/
+		const GpuNamedConstants& getConstantDefinitions() const;
+	
+		/** @copydoc GpuProgramParameters::setNamedConstant */
+		void setNamedConstant(const String& name, Real val);
+		/** @copydoc GpuProgramParameters::setNamedConstant */
+		void setNamedConstant(const String& name, int val);
+		/** @copydoc GpuProgramParameters::setNamedConstant */
+		void setNamedConstant(const String& name, const Vector4& vec);
+		/** @copydoc GpuProgramParameters::setNamedConstant */
+		void setNamedConstant(const String& name, const Vector3& vec);
+		/** @copydoc GpuProgramParameters::setNamedConstant */
+		void setNamedConstant(const String& name, const Matrix4& m);
+		/** @copydoc GpuProgramParameters::setNamedConstant */
+		void setNamedConstant(const String& name, const Matrix4* m, size_t numEntries);
+		/** @copydoc GpuProgramParameters::setNamedConstant */
+		void setNamedConstant(const String& name, const float *val, size_t count);
+		/** @copydoc GpuProgramParameters::setNamedConstant */
+		void setNamedConstant(const String& name, const double *val, size_t count);
+			/** @copydoc GpuProgramParameters::setNamedConstant */
+		void setNamedConstant(const String& name, const ColourValue& colour);
+		/** @copydoc GpuProgramParameters::setNamedConstant */
+		void setNamedConstant(const String& name, const int *val, size_t count);
+
+		/// Get a pointer to the 'nth' item in the float buffer
+		float* getFloatPointer(size_t pos) { _markDirty(); return &mFloatConstants[pos]; }
+		/// Get a pointer to the 'nth' item in the float buffer
+		const float* getFloatPointer(size_t pos) const { return &mFloatConstants[pos]; }
+		/// Get a pointer to the 'nth' item in the int buffer
+		int* getIntPointer(size_t pos) { _markDirty(); return &mIntConstants[pos]; }
+		/// Get a pointer to the 'nth' item in the int buffer
+		const int* getIntPointer(size_t pos) const { return &mIntConstants[pos]; }
+
+
+		/** Internal method that the RenderSystem might use to store optional data. */
+		void _setRenderSystemData(const Any& data) const { mRenderSystemData = data; }
+		/** Internal method that the RenderSystem might use to store optional data. */
+		const Any& _getRenderSystemData() const { return mRenderSystemData; }
+
+	};
+
+	/// Shared pointer used to hold references to GpuProgramParameters instances
+	typedef SharedPtr<GpuSharedParameters> GpuSharedParametersPtr;
+
+	class GpuProgramParameters;
+
+	/** This class records the usage of a set of shared parameters in a concrete
+		set of GpuProgramParameters.
+	*/
+	class _OgreExport GpuSharedParametersUsage : public GpuParamsAlloc
+	{
+	protected:
+		GpuSharedParametersPtr mSharedParams;
+		// Not a shared pointer since this is also parent
+		GpuProgramParameters* mParams;
+		// list of physical mappings that we are going to bring in
+		struct CopyDataEntry
+		{
+			const GpuConstantDefinition* srcDefinition;
+			const GpuConstantDefinition* dstDefinition;
+		};
+		typedef vector<CopyDataEntry>::type CopyDataList;
+
+		CopyDataList mCopyDataList;
+
+		// Optional data the rendersystem might want to store
+		mutable Any mRenderSystemData;
+
+
+	public:
+		/// Construct usage
+		GpuSharedParametersUsage(GpuSharedParametersPtr sharedParams, 
+			GpuProgramParameters* params);
+
+		/** Update the target parameters by copying the data from the shared
+			parameters.
+		@note This method  may not actually be called if the RenderSystem
+			supports using shared parameters directly in their own shared buffer; in
+			which case the values should not be copied out of the shared area
+			into the individual parameter set, but bound separately.
+		*/
+		void _copySharedParamsToTargetParams();
+
+		/// Get the name of the shared parameter set
+		const String& getName() const { return mSharedParams->getName(); }
+
+		GpuSharedParametersPtr getSharedParams() const { return mSharedParams; }
+		GpuProgramParameters* getTargetParams() const { return mParams; }
+
+		/** Internal method that the RenderSystem might use to store optional data. */
+		void _setRenderSystemData(const Any& data) const { mRenderSystemData = data; }
+		/** Internal method that the RenderSystem might use to store optional data. */
+		const Any& _getRenderSystemData() const { return mRenderSystemData; }
+
+
 	};
 
 	/** Collects together the program parameters used for a GpuProgram.
@@ -802,16 +1070,7 @@ namespace Ogre {
 		// Auto parameter storage
 		typedef vector<AutoConstantEntry>::type AutoConstantList;
 
-		/** Definition of container that holds the current float constants.
-		@note Not necessarily in direct index order to constant indexes, logical
-		to physical index map is derived from GpuProgram
-		*/
-		typedef vector<float>::type FloatConstantList;
-		/** Definition of container that holds the current float constants.
-		@note Not necessarily in direct index order to constant indexes, logical
-		to physical index map is derived from GpuProgram
-		*/
-		typedef vector<int>::type IntConstantList;
+		typedef vector<GpuSharedParametersUsage>::type GpuSharedParamUsageList;
 
 	protected:
 		static AutoConstantDefinition AutoConstantDictionary[];
@@ -847,6 +1106,13 @@ namespace Ogre {
 
 		/// Return the variability for an auto constant
 		uint16 deriveVariability(AutoConstantType act);
+
+		GpuSharedParamUsageList mSharedParamSets;
+
+		// Optional data the rendersystem might want to store
+		mutable Any mRenderSystemData;
+
+
 
 	public:
 		GpuProgramParameters();
@@ -1432,6 +1698,50 @@ namespace Ogre {
 		/** Get the physical buffer index of the pass iteration number constant */
 		size_t getPassIterationNumberIndex() const 
 		{ return mActivePassIterationIndex; }
+
+
+		/** Use a set of shared parameters in this parameters object.
+		@remarks
+			Allows you to use a set of shared parameters to automatically update 
+			this parameter set.
+		*/
+		void addSharedParameters(GpuSharedParametersPtr sharedParams);
+
+		/** Use a set of shared parameters in this parameters object.
+		@remarks
+			Allows you to use a set of shared parameters to automatically update 
+			this parameter set.
+		@param sharedParamsName The name of a shared parameter set as defined in
+			GpuProgramManager
+		*/
+		void addSharedParameters(const String& sharedParamsName);
+
+		/** Returns whether this parameter set is using the named shared parameter set. */
+		bool isUsingSharedParameters(const String& sharedParamsName) const;
+
+		/** Stop using the named shared parameter set. */
+		void removeSharedParameters(const String& sharedParamsName);
+
+		/** Stop using all shared parameter sets. */
+		void removeAllSharedParameters();
+
+		/** Get the list of shared parameter sets. */
+		const GpuSharedParamUsageList& getSharedParameters() const;
+
+		/** Internal method that the RenderSystem might use to store optional data. */
+		void _setRenderSystemData(const Any& data) const { mRenderSystemData = data; }
+		/** Internal method that the RenderSystem might use to store optional data. */
+		const Any& _getRenderSystemData() const { return mRenderSystemData; }
+
+		/** Update the parameters by copying the data from the shared
+		parameters.
+		@note This method  may not actually be called if the RenderSystem
+		supports using shared parameters directly in their own shared buffer; in
+		which case the values should not be copied out of the shared area
+		into the individual parameter set, but bound separately.
+		*/
+		void _copySharedParams();
+
 
 
 	};

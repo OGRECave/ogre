@@ -115,6 +115,7 @@ MovablePlane movablePlane("APlane");
 CompositorInstance* compositorToSwitch = 0;
 int compositorSchemeIndex = 0;
 StringVector compositorSchemeList;
+GpuSharedParametersPtr testSharedParams;
 
 class RefractionTextureListener : public RenderTargetListener
 {
@@ -7658,6 +7659,100 @@ protected:
 
 	}
 
+	void testSharedGpuParameters()
+	{
+		// define a couple of *different* shaders, but each of which refers to some common params
+		String vpSrc1 = " \
+			void vp1(float4 position : POSITION, \
+				out float4 oPosition : POSITION, \
+				out float4 oCol : COLOR, \
+			\
+				uniform float4 colourInput, \
+				uniform float someFloatParam, \
+				uniform float4x4 worldViewProj) \
+		{ \
+			oPosition = mul(worldViewProj, position); \
+			oCol = colourInput; \
+			oCol.g += someFloatParam; \
+		} \
+		";
+		String vpSrc2 = " \
+			void vp2(float4 position : POSITION, \
+				out float4 oPosition : POSITION, \
+				out float4 oCol : COLOR, \
+				\
+				uniform float4 ambient, \
+				uniform float4 colourInput, \
+				uniform float someFloatParam, \
+				uniform float4x4 worldViewProj) \
+		{ \
+			oPosition = mul(worldViewProj, position); \
+			oCol = ambient + colourInput; \
+			oCol.g += someFloatParam; \
+		} \
+		";
+
+		HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
+		HighLevelGpuProgramPtr vp1 = hmgr.createProgram("vp1", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, "cg", GPT_VERTEX_PROGRAM);
+		vp1->setSource(vpSrc1);
+		vp1->setParameter("entry_point", "vp1");
+		vp1->setParameter("profiles", "vs_1_1 arbvp1");
+		vp1->load();
+		HighLevelGpuProgramPtr vp2 = hmgr.createProgram("vp2", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, "cg", GPT_VERTEX_PROGRAM);
+		vp2->setSource(vpSrc2);
+		vp2->setParameter("entry_point", "vp2");
+		vp2->setParameter("profiles", "vs_1_1 arbvp1");
+		vp2->load();
+
+		testSharedParams = GpuProgramManager::getSingleton().createSharedParameters("SinbadsParams");
+
+		// define the shared param structure
+		// deliberately define in the opposite order to programs, shouldn't matter
+		testSharedParams->addConstantDefinition("colourInput", GCT_FLOAT4);
+		testSharedParams->addConstantDefinition("someFloatParam", GCT_FLOAT1);
+
+		// set some initial values
+		Vector4 col(0.7, 0.0, 0.0, 1.0);
+		testSharedParams->setNamedConstant("colourInput", col);
+		testSharedParams->setNamedConstant("someFloatParam", 0.1f);
+
+		// define materials
+		MaterialManager& mmgr = MaterialManager::getSingleton();
+		MaterialPtr m1 = mmgr.create("m1", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		Pass* p1 = m1->getTechnique(0)->getPass(0);
+		p1->setVertexProgram("vp1");
+		GpuProgramParametersSharedPtr params1 = p1->getVertexProgramParameters();
+		params1->setNamedAutoConstant("worldViewProj", GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
+		params1->addSharedParameters("SinbadsParams");
+
+
+		MaterialPtr m2 = mmgr.create("m2", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		Pass* p2 = m2->getTechnique(0)->getPass(0);
+		p2->setVertexProgram("vp2");
+		GpuProgramParametersSharedPtr params2 = p2->getVertexProgramParameters();
+		params2->setNamedAutoConstant("worldViewProj", GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
+		params2->setNamedAutoConstant("ambient", GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR);
+		params2->addSharedParameters("SinbadsParams");
+
+
+		Entity* e = mSceneMgr->createEntity("1", "knot.mesh");
+		e->setMaterialName("m1");
+		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-100, 0, 0))->attachObject(e);
+
+		e = mSceneMgr->createEntity("2", "knot.mesh");
+		e->setMaterialName("m2");
+		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(100, 0, 0))->attachObject(e);
+
+		mCamera->setPosition(0, 0, 300);
+		mCamera->lookAt(Vector3::ZERO);
+
+		mWindow->getViewport(0)->setBackgroundColour(ColourValue(0, 1, 1));
+
+		mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2, 1.0));
+
+
+	}
+
 	void createScene(void)
     {
 
@@ -7827,7 +7922,8 @@ protected:
 
 		//testDepthShadowMap();
 
-        testLod();
+        //testLod();
+		testSharedGpuParameters();
 
 
 

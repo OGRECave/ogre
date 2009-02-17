@@ -170,5 +170,37 @@ namespace Ogre {
 	{
 		return GpuProgramParametersSharedPtr(OGRE_NEW GpuProgramParameters());
 	}
+	//---------------------------------------------------------------------
+	GpuSharedParametersPtr GpuProgramManager::createSharedParameters(const String& name)
+	{
+		if (mSharedParametersMap.find(name) != mSharedParametersMap.end())
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"The shared parameter set '" + name + "' already exists!", 
+				"GpuProgramManager::createSharedParameters");
+		}
+		GpuSharedParametersPtr ret(OGRE_NEW GpuSharedParameters(name));
+		mSharedParametersMap[name] = ret;
+		return ret;
+	}
+	//---------------------------------------------------------------------
+	GpuSharedParametersPtr GpuProgramManager::getSharedParameters(const String& name) const
+	{
+		SharedParametersMap::const_iterator i = mSharedParametersMap.find(name);
+		if (i == mSharedParametersMap.end())
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"No shared parameter set with name '" + name + "'!", 
+				"GpuProgramManager::createSharedParameters");
+		}
+		return i->second;
+	}
+	//---------------------------------------------------------------------
+	const GpuProgramManager::SharedParametersMap& 
+	GpuProgramManager::getAvailableSharedParameters() const
+	{
+		return mSharedParametersMap;
+	}
+	//---------------------------------------------------------------------
 
 }

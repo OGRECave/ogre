@@ -3032,6 +3032,12 @@ namespace Ogre
 			bindGpuProgramPassIterationParameters(gptype);
 			return;
 		}
+		
+		if (variability & (uint16)GPV_GLOBAL)
+		{
+			// D3D9 doesn't support shared constant buffers, so use copy routine
+			params->_copySharedParams();
+		}
 
 		HRESULT hr;
 		const GpuLogicalBufferStruct* floatLogical = params->getFloatLogicalBufferStruct();

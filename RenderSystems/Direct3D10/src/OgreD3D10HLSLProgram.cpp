@@ -488,19 +488,15 @@ namespace Ogre {
 			{
 			case 1:
 				def.constType = GCT_INT1;
-				def.elementSize = 4; // HLSL always packs
 				break;
 			case 2:
 				def.constType = GCT_INT2;
-				def.elementSize = 4; // HLSL always packs
 				break;
 			case 3:
 				def.constType = GCT_INT3;
-				def.elementSize = 4; // HLSL always packs
 				break;
 			case 4:
 				def.constType = GCT_INT4;
-				def.elementSize = 4; 
 				break;
 			} // columns
 			break;
@@ -512,19 +508,15 @@ namespace Ogre {
 				{
 				case 1:
 					def.constType = GCT_FLOAT1;
-					def.elementSize = 4; // HLSL always packs
 					break;
 				case 2:
 					def.constType = GCT_FLOAT2;
-					def.elementSize = 4; // HLSL always packs
 					break;
 				case 3:
 					def.constType = GCT_FLOAT3;
-					def.elementSize = 4; // HLSL always packs
 					break;
 				case 4:
 					def.constType = GCT_FLOAT4;
-					def.elementSize = 4; 
 					break;
 				} // columns
 				break;
@@ -533,15 +525,12 @@ namespace Ogre {
 				{
 				case 2:
 					def.constType = GCT_MATRIX_2X2;
-					def.elementSize = 8; // HLSL always packs
 					break;
 				case 3:
 					def.constType = GCT_MATRIX_2X3;
-					def.elementSize = 8; // HLSL always packs
 					break;
 				case 4:
 					def.constType = GCT_MATRIX_2X4;
-					def.elementSize = 8; 
 					break;
 				} // columns
 				break;
@@ -550,15 +539,12 @@ namespace Ogre {
 				{
 				case 2:
 					def.constType = GCT_MATRIX_3X2;
-					def.elementSize = 12; // HLSL always packs
 					break;
 				case 3:
 					def.constType = GCT_MATRIX_3X3;
-					def.elementSize = 12; // HLSL always packs
 					break;
 				case 4:
 					def.constType = GCT_MATRIX_3X4;
-					def.elementSize = 12; 
 					break;
 				} // columns
 				break;
@@ -567,15 +553,12 @@ namespace Ogre {
 				{
 				case 2:
 					def.constType = GCT_MATRIX_4X2;
-					def.elementSize = 16; // HLSL always packs
 					break;
 				case 3:
 					def.constType = GCT_MATRIX_4X3;
-					def.elementSize = 16; // HLSL always packs
 					break;
 				case 4:
 					def.constType = GCT_MATRIX_4X4;
-					def.elementSize = 16; 
 					break;
 				} // columns
 				break;
@@ -587,6 +570,10 @@ namespace Ogre {
 			// not mapping samplers, don't need to take the space 
 			break;
 		};
+
+		// HLSL pads to 4 elements
+		def.elementSize = GpuConstantDefinition::getElementSize(def.constType, true);
+
 
 	}
 	//-----------------------------------------------------------------------

@@ -43,9 +43,13 @@ namespace Ogre {
 	public:
 
 		typedef set<String>::type SyntaxCodes;
+		typedef map<String, GpuSharedParametersPtr>::type SharedParametersMap;
 
 
 	protected:
+
+		SharedParametersMap mSharedParametersMap;
+
         /// Specialised create method with specific parameters
         virtual Resource* createImpl(const String& name, ResourceHandle handle, 
             const String& group, bool isManual, ManualResourceLoader* loader,
@@ -147,6 +151,24 @@ namespace Ogre {
             returned in preference to low-level programs.
         */
         ResourcePtr getByName(const String& name, bool preferHighLevelPrograms = true);
+
+
+		/** Create a new set of shared parameters, which can be used across many 
+			GpuProgramParameters objects of different structures.
+		@param name The name to give the shared parameters so you can refer to them
+			later.
+		*/
+		virtual GpuSharedParametersPtr createSharedParameters(const String& name);
+
+		/** Retrieve a set of shared parameters, which can be used across many 
+		GpuProgramParameters objects of different structures.
+		*/
+		virtual GpuSharedParametersPtr getSharedParameters(const String& name) const;
+
+		/** Get (const) access to the available shared parameter sets. 
+		*/
+		virtual const SharedParametersMap& getAvailableSharedParameters() const;
+
         /** Override standard Singleton retrieval.
         @remarks
         Why do we do this? Well, it's because the Singleton
