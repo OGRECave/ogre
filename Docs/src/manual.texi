@@ -1846,6 +1846,23 @@ vertex_program Ogre/CelShadingVP cg
 @end example
 The syntax of the parameter definition is exactly the same as when you define parameters when using programs, @xref{Program Parameter Specification}. Defining default parameters allows you to avoid rebinding common parameters repeatedly (clearly in the above example, all but 'shininess' are unlikely to change between uses of the program) which makes your material declarations shorter.
 
+@anchor{Declaring Shared Parameters}
+@subheading Declaring Shared Parameters
+Often, not every parameter you want to pass to a shader is unique to that program, and perhaps you want to give the same value to a number of different programs, and a number of different materials using that program. Shared parameter sets allow you to define a 'holding area' for shared parameters that can then be referenced when you need them in particular shaders, while keeping the definition of that value in one place. To define a set of shared parameters, you do this:
+@example
+shared_params YourSharedParamsName
+{
+	shared_param_named mySharedParam1 float4 0.1 0.2 0.3 0.4
+	...
+}
+@end example
+As you can see, you need to use the keyword 'shared_params' and follow it with the name that you will use to identify these shared parameters. Inside the curly braces, you can define one parameter per line, in a way which is very similar to the @ref{param_named} syntax. The definition of these lines is:@*@*
+Format: shared_param_name <param_name> <param_type> [<[array_size]>] [<initial_values>]@*@*
+
+The param_name must be unique within the set, and the param_type can be any one of float, float2, float3, float4, int, int2, int3, int4, matrix2x2, matrix2x3, matrix2x4, matrix3x2, matrix3x3, matrix3x4, matrix4x2, matrix4x3 and matrix4x4. The array_size option allows you to define arrays of param_type should you wish, and if present must be a number enclosed in square brackets (and note, must be separated from the param_type with whitespace). If you wish, you can also initialise the parameters by providing a list of values.@*@*
+
+Once you have defined the shared parameters, you can reference them inside default_params and params blocks using @ref{shared_params_ref}. You can also obtain a reference to them in your code via GpuProgramManager::getSharedParameters, and update the values for all instances using them. 
+
 @node High-level Programs
 @heading High-level Programs
 Support for high level vertex and fragment programs is provided through plugins; this is to make sure that an application using OGRE can use as little or as much of the high-level program functionality as they like. OGRE currently supports 3 high-level program types, Cg (@ref{Cg}) (an API- and card-independent, high-level language which lets you write programs for both OpenGL and DirectX for lots of cards), DirectX 9 High-Level Shader Language (@ref{HLSL}), and OpenGL Shader Language (@ref{GLSL}). HLSL can only be used with the DirectX rendersystem, and GLSL can only be used with the GL rendersystem. Cg can be used with both, although experience has shown that more advanced programs, particularly fragment programs which perform a lot of texture fetches, can produce better code in the rendersystem-specific shader langauge. @*@*
@@ -2105,6 +2122,7 @@ Parameters can be specified using one of 4 commands as shown below. The same syn
 @item @ref{param_indexed_auto}
 @item @ref{param_named}
 @item @ref{param_named_auto}
+@item @ref{shared_params_ref}
 @end itemize
 
 @anchor{param_indexed}
@@ -2410,6 +2428,15 @@ Format: param_named_auto <name> <value_code> <extra_params>@*@*
 Example: param_named_auto worldViewProj WORLDVIEWPROJ_MATRIX@*@*
 
 The allowed value codes and the meaning of extra_params are detailed in @ref{param_indexed_auto}.
+
+@anchor{shared_params_ref}
+@subheading shared_params_ref
+
+This option allows you to reference shared parameter sets as defined in @ref{Declaring Shared Parameters}. @*@*
+Format: shared_params_ref <shared_set_name>@*@*
+Example: shared_params_ref mySharedParams@*@*
+
+The only required parameter is a name, which must be the name of an already defined shared parameter set. All named parameters which are present in the program that are also present in the shared parameter set will be linked, and the shared parameters used as if you had defined them locally. This is dependent on the definitions (type and array size) matching between the shared set and the program.@*@*
 
 @anchor{Shadows and Vertex Programs}
 @subheading Shadows and Vertex Programs

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on February 18 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): Using Vertex/Geometry/Fragment Programs in a Pass</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): Using Vertex/Geometry/Fragment Programs in a Pass</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Using Vertex/Geometry/Fragment Programs in a Pass">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Using Vertex/Geometry/Fragment Programs in a Pass">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): Using Vertex/Geometry/Fragment Programs in a Pass">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): Using Vertex/Geometry/Fragment Programs in a Pass">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -24,11 +24,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC121"></A>
+<A NAME="SEC123"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_22.html#SEC120"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_22.html#SEC122"> &lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_24.html#SEC128"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_24.html#SEC131"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -36,12 +36,9 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 3.1.9 Using Vertex/Geometry/Fragment Programs in a Pass </H3>
-<!--docid::SEC121::-->
-<P>
+<!--docid::SEC123::-->
 
-Within a pass section of a material script, you can reference a vertex, geometry and / or a fragment program which is been defined in a .program script (See section <A HREF="manual_18.html#SEC101">3.1.4 Declaring Vertex/Geometry/Fragment Programs</A>). The programs are defined separately from the usage of them in the pass, since the programs are very likely to be reused between many separate materials, probably across many different .material scripts, so this approach lets you define the program only once and use it many times.<BR><BR>
-</P>
-<P>
+Within a pass section of a material script, you can reference a vertex, geometry and / or a fragment program which is been defined in a .program script (See section <A HREF="manual_18.html#SEC102">3.1.4 Declaring Vertex/Geometry/Fragment Programs</A>). The programs are defined separately from the usage of them in the pass, since the programs are very likely to be reused between many separate materials, probably across many different .material scripts, so this approach lets you define the program only once and use it many times.<BR><BR>
 
 As well as naming the program in question, you can also provide parameters to it. Here's a simple example:
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>vertex_program_ref myVertexProgram
@@ -50,78 +47,54 @@ As well as naming the program in question, you can also provide parameters to it
 	param_indexed      4 float4  10.0 0 0 0
 }
 </pre></td></tr></table>In this example, we bind a vertex program called 'myVertexProgram' (which will be defined elsewhere) to the pass, and give it 2 parameters, one is an 'auto' parameter, meaning we do not have to supply a value as such, just a recognised code (in this case it's the world/view/projection matrix which is kept up to date automatically by Ogre). The second parameter is a manually specified parameter, a 4-element float. The indexes are described later.<BR><BR>
-<P>
 
 The syntax of the link to a vertex program and a fragment or geometry program are identical, the only difference is that 'fragment_program_ref' and 'geometry_program_ref' are used respectively instead of 'vertex_program_ref'.<BR><BR>
-</P>
-<P>
 
 For many situations vertex, geometry and fragment programs are associated with each other in a pass but this is not cast in stone.  You could have a vertex program that can be used by several different fragment programs.  Another situation that arises is that you can mix fixed pipeline and programmable pipeline (shaders) together. You could use the non-programable vertex fixed function pipeline and then provide a fragment_program_ref in a pass ie there would be no vertex_program_ref section in the pass.  The fragment program referenced in the pass must meet the requirements as defined in the related API in order to read from the outputs of the vertex fixed pipeline.  You could also just have a vertex program that outputs to the fragment fixed function pipeline.<BR><BR>
-</P>
-<P>
 
 The requirements to read from or write to the fixed function pipeline are similar between rendering API's (DirectX and OpenGL) but how its actually done in each type of shader (vertex, geometry or fragment) depends on the shader language.  For HLSL (DirectX API) and associated asm consult MSDN at <A HREF="http://msdn.microsoft.com/library/">http://msdn.microsoft.com/library/</A>. For GLSL (OpenGL), consult section 7.6 of the GLSL spec 1.1 available at <A HREF="http://developer.3dlabs.com/documents/index.htm">http://developer.3dlabs.com/documents/index.htm</A>.  The built in varying variables provided in GLSL allow your program to read/write to the fixed function pipeline varyings.  For Cg consult the Language Profiles section in CgUsersManual.pdf that comes with the Cg Toolkit available at <A HREF="http://developer.nvidia.com/object/cg_toolkit.html">http://developer.nvidia.com/object/cg_toolkit.html</A>.  For HLSL and Cg its the varying bindings that allow your shader programs to read/write to the fixed function pipeline varyings.<BR><BR>
-</P>
-<P>
 
 <A NAME="Program Parameter Specification"></A>
-<A NAME="SEC122"></A>
+<A NAME="SEC124"></A>
 <H3> Parameter specification </H3>
-<!--docid::SEC122::-->
-Parameters can be specified using one of 4 commands as shown below. The same syntax is used whether you are defining a parameter just for this particular use of the program, or when specifying the <A HREF="manual_18.html#SEC103">Default Program Parameters</A>. Parameters set in the specific use of the program override the defaults.
+<!--docid::SEC124::-->
+Parameters can be specified using one of 4 commands as shown below. The same syntax is used whether you are defining a parameter just for this particular use of the program, or when specifying the <A HREF="manual_18.html#SEC104">Default Program Parameters</A>. Parameters set in the specific use of the program override the defaults.
 <UL>
-<LI><A HREF="manual_23.html#SEC123">param_indexed</A>
-<LI><A HREF="manual_23.html#SEC124">param_indexed_auto</A>
-<LI><A HREF="manual_23.html#SEC125">param_named</A>
-<LI><A HREF="manual_23.html#SEC126">param_named_auto</A>
+<LI><A HREF="manual_23.html#SEC125">param_indexed</A>
+<LI><A HREF="manual_23.html#SEC126">param_indexed_auto</A>
+<LI><A HREF="manual_23.html#SEC127">param_named</A>
+<LI><A HREF="manual_23.html#SEC128">param_named_auto</A>
+<LI><A HREF="manual_23.html#SEC129">shared_params_ref</A>
 </UL>
-<P>
 
 <A NAME="param_indexed"></A>
-<A NAME="SEC123"></A>
+<A NAME="SEC125"></A>
 <H3> param_indexed </H3>
-<!--docid::SEC123::-->
+<!--docid::SEC125::-->
 This command sets the value of an indexed parameter. <BR><BR>
-<P>
 
 format: param_indexed &lt;index&gt; &lt;type&gt; &lt;value&gt;<BR><BR>
 example: param_indexed 0 float4 10.0 0 0 0<BR><BR>
-</P>
-<P>
 
 The 'index' is simply a number representing the position in the parameter list which the value should be written, and you should derive this from your program definition. The index is relative to the way constants are stored on the card, which is in 4-element blocks. For example if you defined a float4 parameter at index 0, the next index would be 1. If you defined a matrix4x4 at index 0, the next usable index would be 4, since a 4x4 matrix takes up 4 indexes.<BR><BR>
-</P>
-<P>
 
 The value of 'type' can be float4, matrix4x4, float&lt;n&gt;, int4, int&lt;n&gt;. Note that 'int' parameters are only available on some more advanced program syntaxes, check the D3D or GL vertex / fragment program documentation for full details. Typically the most useful ones will be float4 and matrix4x4. Note that if you use a type which is not a multiple of 4, then the remaining values up to the multiple of 4 will be filled with zeroes for you (since GPUs always use banks of 4 floats per constant even if only one is used).<BR><BR>
-</P>
-<P>
 
 'value' is simply a space or tab-delimited list of values which can be converted into the type you have specified.
-</P>
-<P>
 
 <A NAME="param_indexed_auto"></A>
-<A NAME="SEC124"></A>
+<A NAME="SEC126"></A>
 <H3> param_indexed_auto </H3>
-<!--docid::SEC124::-->
-<P>
+<!--docid::SEC126::-->
 
 This command tells Ogre to automatically update a given parameter with a derived value. This frees you from writing code to update program parameters every frame when they are always changing.<BR><BR>
-</P>
-<P>
 
 format: param_indexed_auto &lt;index&gt; &lt;value_code&gt; &lt;extra_params&gt;<BR><BR>
 example: param_indexed_auto 0 worldviewproj_matrix<BR><BR>
-</P>
-<P>
 
-'index' has the same meaning as <A HREF="manual_23.html#SEC123">param_indexed</A>; note this time you do not have to specify the size of the parameter because the engine knows this already. In the example, the world/view/projection matrix is being used so this is implicitly a matrix4x4.<BR><BR>
-</P>
-<P>
+'index' has the same meaning as <A HREF="manual_23.html#SEC125">param_indexed</A>; note this time you do not have to specify the size of the parameter because the engine knows this already. In the example, the world/view/projection matrix is being used so this is implicitly a matrix4x4.<BR><BR>
 
 'value_code' is one of a list of recognised values:<BR>
-</P>
 <DL COMPACT>
 <DT>world_matrix
 <DD>The current world matrix.
@@ -131,14 +104,10 @@ example: param_indexed_auto 0 worldviewproj_matrix<BR><BR>
 <DD>The transpose of the world matrix
 <DT>inverse_transpose_world_matrix
 <DD>The inverse transpose of the world matrix
-<P>
 
-</P>
 <DT>world_matrix_array_3x4
 <DD>An array of world matrices, each represented as only a 3x4 matrix (3 rows of 4columns) usually for doing hardware skinning. You should make enough entries available in your vertex program for the number of bones in use, ie an array of numBones*3 float4's.
-<P>
 
-</P>
 <DT>view_matrix
 <DD>The current view matrix.
 <DT>inverse_view_matrix
@@ -147,9 +116,7 @@ example: param_indexed_auto 0 worldviewproj_matrix<BR><BR>
 <DD>The transpose of the view matrix
 <DT>inverse_transpose_view_matrix
 <DD>The inverse transpose of the view matrix
-<P>
 
-</P>
 <DT>projection_matrix
 <DD>The current projection matrix.
 <DT>inverse_projection_matrix
@@ -158,9 +125,7 @@ example: param_indexed_auto 0 worldviewproj_matrix<BR><BR>
 <DD>The transpose of the projection matrix
 <DT>inverse_transpose_projection_matrix
 <DD>The inverse transpose of the projection matrix
-<P>
 
-</P>
 <DT>worldview_matrix
 <DD>The current world and view matrices concatenated.
 <DT>inverse_worldview_matrix
@@ -169,9 +134,7 @@ example: param_indexed_auto 0 worldviewproj_matrix<BR><BR>
 <DD>The transpose of the world and view matrices
 <DT>inverse_transpose_worldview_matrix
 <DD>The inverse transpose of the current concatenated world and view matrices.
-<P>
 
-</P>
 <DT>viewproj_matrix
 <DD>The current view and projection matrices concatenated.
 <DT>inverse_viewproj_matrix
@@ -180,9 +143,7 @@ example: param_indexed_auto 0 worldviewproj_matrix<BR><BR>
 <DD>The transpose of the view &amp; projection matrices
 <DT>inverse_transpose_viewproj_matrix
 <DD>The inverse transpose of the view &amp; projection matrices
-<P>
 
-</P>
 <DT>worldviewproj_matrix
 <DD>The current world, view and projection matrices concatenated.
 <DT>inverse_worldviewproj_matrix
@@ -193,14 +154,10 @@ example: param_indexed_auto 0 worldviewproj_matrix<BR><BR>
 <DD>The inverse transpose of the world, view and projection matrices
 <DT>texture_matrix
 <DD>The transform matrix of a given texture unit, as it would usually be seen in the fixed-function pipeline. This requires an index in the 'extra_params' field, and relates to the 'nth' texture unit of the pass in question. NB if the given index exceeds the number of texture units available for this pass, then the parameter will be set to Matrix4::IDENTITY.
-<P>
 
-</P>
 <DT>render_target_flipping
 <DD>The value use to adjust transformed y position if bypassed projection matrix transform. It's -1 if the render target requires texture flipping, +1 otherwise.
-<P>
 
-</P>
 <DT>light_diffuse_colour
 <DD>The diffuse colour of a given light; this requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light - note that directional lights are always first in the list and always present). NB if there are no lights this close, then the parameter will be set to black.
 <DT>light_specular_colour
@@ -265,29 +222,23 @@ example: param_indexed_auto 0 worldviewproj_matrix<BR><BR>
 <DD>Sets an integer parameter to 1 if the given light casts shadows, 0 otherwise, Requires a light index parameter.
 <DT>ambient_light_colour
 <DD>The colour of the ambient light currently set in the scene.
-<P>
 
-</P>
 <DT>surface_ambient_colour
-<DD>The ambient colour reflectance properties of the pass (See section <A HREF="manual_16.html#SEC40">ambient</A>). This allows you access to fixed-function pipeline property handily.
+<DD>The ambient colour reflectance properties of the pass (See section <A HREF="manual_16.html#SEC41">ambient</A>). This allows you access to fixed-function pipeline property handily.
 <DT>surface_diffuse_colour
-<DD>The diffuse colour reflectance properties of the pass (See section <A HREF="manual_16.html#SEC41">diffuse</A>). This allows you access to fixed-function pipeline property handily.
+<DD>The diffuse colour reflectance properties of the pass (See section <A HREF="manual_16.html#SEC42">diffuse</A>). This allows you access to fixed-function pipeline property handily.
 <DT>surface_specular_colour
-<DD>The specular colour reflectance properties of the pass (See section <A HREF="manual_16.html#SEC42">specular</A>). This allows you access to fixed-function pipeline property handily.
+<DD>The specular colour reflectance properties of the pass (See section <A HREF="manual_16.html#SEC43">specular</A>). This allows you access to fixed-function pipeline property handily.
 <DT>surface_emissive_colour
-<DD>The amount of self-illumination of the pass (See section <A HREF="manual_16.html#SEC43">emissive</A>). This allows you access to fixed-function pipeline property handily.
+<DD>The amount of self-illumination of the pass (See section <A HREF="manual_16.html#SEC44">emissive</A>). This allows you access to fixed-function pipeline property handily.
 <DT>surface_shininess
-<DD>The shininess of the pass, affecting the size of specular highlights (See section <A HREF="manual_16.html#SEC42">specular</A>). This allows you bind to fixed-function pipeline property handily.
-<P>
+<DD>The shininess of the pass, affecting the size of specular highlights (See section <A HREF="manual_16.html#SEC43">specular</A>). This allows you bind to fixed-function pipeline property handily.
 
-</P>
 <DT>derived_ambient_light_colour
 <DD>The derived ambient light colour, with 'r', 'g', 'b' components filled with product of surface_ambient_colour and ambient_light_colour, respectively, and 'a' component filled with surface ambient alpha component.
 <DT>derived_scene_colour
 <DD>The derived scene colour, with 'r', 'g' and 'b' components filled with sum of derived_ambient_light_colour and surface_emissive_colour, respectively, and 'a' component filled with surface diffuse alpha component.
-<P>
 
-</P>
 <DT>derived_light_diffuse_colour
 <DD>The derived light diffuse colour, with 'r', 'g' and 'b' components filled with product of surface_diffuse_colour, light_diffuse_colour and light_power, respectively, and 'a' component filled with surface diffuse alpha component. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light).
 <DT>derived_light_specular_colour
@@ -296,9 +247,7 @@ example: param_indexed_auto 0 worldviewproj_matrix<BR><BR>
 <DD>As derived_light_diffuse_colour, except that this populates an array of parameters with a number of lights, and the 'extra_params' field refers to the number of 'nth closest' lights to be processed. This parameter is not compatible with light-based pass_iteration options but can be used for single-pass lighting.
 <DT>derived_light_specular_colour_array
 <DD>As derived_light_specular_colour, except that this populates an array of parameters with a number of lights, and the 'extra_params' field refers to the number of 'nth closest' lights to be processed. This parameter is not compatible with light-based pass_iteration options but can be used for single-pass lighting.
-<P>
 
-</P>
 <DT>fog_colour
 <DD>The colour of the fog currently set in the scene.
 <DT>fog_params
@@ -399,84 +348,75 @@ example: param_indexed_auto 0 worldviewproj_matrix<BR><BR>
 <DD>Provides packed texture size of the selected texture unit. Requires a texture unit index parameter. Provided as float4(width, height, 1 / width, 1 / height). For 3D-texture, depth is ignored, for 1D-texture, height sets to 1.
 <A NAME="pass_number"></A>
 <DT>pass_number
-<DD>Sets the active pass index number in a gpu parameter.  The first pass in a technique has an index of 0, the second an index of 1 and so on.  This is usefull for multipass shaders (ie fur or blur shader) that need to know what pass it is.  By setting up the auto parameter in a <A HREF="manual_18.html#SEC103">Default Program Parameters</A> list in a program definition, there is no requirement to set the pass number parameter in each pass and lose track. (See  <A HREF="manual_16.html#fur_example">fur_example</A>)
+<DD>Sets the active pass index number in a gpu parameter.  The first pass in a technique has an index of 0, the second an index of 1 and so on.  This is usefull for multipass shaders (ie fur or blur shader) that need to know what pass it is.  By setting up the auto parameter in a <A HREF="manual_18.html#SEC104">Default Program Parameters</A> list in a program definition, there is no requirement to set the pass number parameter in each pass and lose track. (See  <A HREF="manual_16.html#fur_example">fur_example</A>)
 <A NAME="pass_iteration_number"></A>
 <DT>pass_iteration_number
-<DD>Usefull for GPU programs that need to know what the current pass iteration number is. The first iteration of a pass is numbered 0.  The last iteration number is one less than what is set for the pass iteration number.  If a pass has its iteration attribute set to 5 then the last iteration number (5th execution of the pass) is 4.(See section <A HREF="manual_16.html#SEC68">iteration</A>)
+<DD>Usefull for GPU programs that need to know what the current pass iteration number is. The first iteration of a pass is numbered 0.  The last iteration number is one less than what is set for the pass iteration number.  If a pass has its iteration attribute set to 5 then the last iteration number (5th execution of the pass) is 4.(See section <A HREF="manual_16.html#SEC69">iteration</A>)
 <A NAME="animation_parametric"></A>
 <DT>animation_parametric
 <DD>Useful for hardware vertex animation. For morph animation, sets the parametric value (0..1) representing the distance between the first position keyframe (bound to positions) and the second position keyframe (bound to the first free texture coordinate) so that the vertex program can interpolate between them. For pose animation, indicates a group of up to 4 parametric weight values applying to a sequence of up to 4 poses (each one bound to x, y, z and w of the constant), one for each pose. The original positions are held in the usual position buffer, and the offsets to take those positions to the pose where weight == 1.0 are in the first 'n' free texture coordinates; 'n' being determined by the value passed to includes_pose_animation. If more than 4 simultaneous poses are required, then you'll need more than 1 shader constant to hold the parametric values, in which case you should use this binding more than once, referencing a different constant entry; the second one will contain the parametrics for poses 5-8, the third for poses 9-12, and so on.
 <DT>custom
 <DD>This allows you to map a custom parameter on an individual Renderable (see Renderable::setCustomParameter) to a parameter on a GPU program. It requires that you complete the 'extra_params' field with the index that was used in the Renderable::setCustomParameter call, and this will ensure that whenever this Renderable is used, it will have it's custom parameter mapped in. It's very important that this parameter has been defined on all Renderables that are assigned the material that contains this automatic mapping, otherwise the process will fail.
 </DL>
-<P>
 
 <A NAME="param_named"></A>
-<A NAME="SEC125"></A>
+<A NAME="SEC127"></A>
 <H3> param_named </H3>
-<!--docid::SEC125::-->
+<!--docid::SEC127::-->
 This is the same as param_indexed, but uses a named parameter instead of an index. This can only be used with high-level programs which include parameter names; if you're using an assembler program then you have no choice but to use indexes. Note that you can use indexed parameters for high-level programs too, but it is less portable since if you reorder your parameters in the high-level program the indexes will change.<BR><BR>
 format: param_named &lt;name&gt; &lt;type&gt; &lt;value&gt;<BR><BR>
 example: param_named shininess float4 10.0 0 0 0<BR><BR>
 The type is required because the program is not compiled and loaded when the material script is parsed, so at this stage we have no idea what types the parameters are. Programs are only loaded and compiled when they are used, to save memory.
-<P>
 
 <A NAME="param_named_auto"></A>
-<A NAME="SEC126"></A>
+<A NAME="SEC128"></A>
 <H3> param_named_auto </H3>
-<!--docid::SEC126::-->
-<P>
+<!--docid::SEC128::-->
 
 This is the named equivalent of param_indexed_auto, for use with high-level programs.<BR><BR>
 Format: param_named_auto &lt;name&gt; &lt;value_code&gt; &lt;extra_params&gt;<BR><BR>
 Example: param_named_auto worldViewProj WORLDVIEWPROJ_MATRIX<BR><BR>
-</P>
-<P>
 
-The allowed value codes and the meaning of extra_params are detailed in <A HREF="manual_23.html#SEC124">param_indexed_auto</A>.
-</P>
-<P>
+The allowed value codes and the meaning of extra_params are detailed in <A HREF="manual_23.html#SEC126">param_indexed_auto</A>.
+
+<A NAME="shared_params_ref"></A>
+<A NAME="SEC129"></A>
+<H3> shared_params_ref </H3>
+<!--docid::SEC129::-->
+
+This option allows you to reference shared parameter sets as defined in <A HREF="manual_18.html#SEC105">Declaring Shared Parameters</A>. <BR><BR>
+Format: shared_params_ref &lt;shared_set_name&gt;<BR><BR>
+Example: shared_params_ref mySharedParams<BR><BR>
+
+The only required parameter is a name, which must be the name of an already defined shared parameter set. All named parameters which are present in the program that are also present in the shared parameter set will be linked, and the shared parameters used as if you had defined them locally. This is dependent on the definitions (type and array size) matching between the shared set and the program.<BR><BR>
 
 <A NAME="Shadows and Vertex Programs"></A>
-<A NAME="SEC127"></A>
+<A NAME="SEC130"></A>
 <H3> Shadows and Vertex Programs </H3>
-<!--docid::SEC127::-->
-When using shadows (See section <A HREF="manual_70.html#SEC304">7. Shadows</A>), the use of vertex programs can add some additional complexities, because Ogre can only automatically deal with everything when using the fixed-function pipeline. If you use vertex programs, and you are also using shadows, you may need to make some adjustments. <BR><BR>
-<P>
+<!--docid::SEC130::-->
+When using shadows (See section <A HREF="manual_70.html#SEC307">7. Shadows</A>), the use of vertex programs can add some additional complexities, because Ogre can only automatically deal with everything when using the fixed-function pipeline. If you use vertex programs, and you are also using shadows, you may need to make some adjustments. <BR><BR>
 
 If you use <STRONG>stencil shadows</STRONG>, then any vertex programs which do vertex deformation can be a problem, because stencil shadows are calculated on the CPU, which does not have access to the modified vertices. If the vertex program is doing standard skeletal animation, this is ok (see section above) because Ogre knows how to replicate the effect in software, but any other vertex deformation cannot be replicated, and you will either have to accept that the shadow will not reflect this deformation, or you should turn off shadows for that object. <BR><BR>
-</P>
-<P>
 
 If you use <STRONG>texture shadows</STRONG>, then vertex deformation is acceptable; however, when rendering the object into the shadow texture (the shadow caster pass), the shadow has to be rendered in a solid colour (linked to the ambient colour). You must therefore provide an alternative vertex program, so Ogre provides you with a way of specifying one to use when rendering the caster. Basically you link an alternative vertex program, using exactly the same syntax as the original vertex program link:
-</P>
-<P>
 
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>shadow_caster_vertex_program_ref myShadowCasterVertexProgram
 {
 	param_indexed_auto 0 worldviewproj_matrix
 	param_indexed_auto 4 ambient_light_colour
 }
-</pre></td></tr></table><P>
-
+</pre></td></tr></table>
 When rendering a shadow caster, Ogre will automatically use the alternate program. You can bind the same or different parameters to the program - the most important thing is that you bind <STRONG>ambiend_light_colour</STRONG>, since this determines the colour of the shadow in modulative texture shadows. If you don't supply an alternate program, Ogre will fall back on a fixed-function material which will not reflect any vertex deformation you do in your vertex program. <BR><BR>
-</P>
-<P>
 
 In addition, when rendering the shadow receivers with shadow textures, Ogre needs to project the shadow texture. It does this automatically in fixed function mode, but if the receivers use vertex programs, they need to have a shadow receiver program which does the usual vertex deformation, but also generates projective texture coordinates. The additional program linked into the pass like this:
-</P>
-<P>
 
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>shadow_receiver_vertex_program_ref myShadowReceiverVertexProgram
 {
 	param_indexed_auto 0 worldviewproj_matrix
 	param_indexed_auto 4 texture_viewproj_matrix
 }
-</pre></td></tr></table><P>
-
+</pre></td></tr></table>
 For the purposes of writing this alternate program, there is an automatic parameter binding of 'texture_viewproj_matrix' which provides the program with texture projection parameters. The vertex program should do it's normal vertex processing, and generate texture coordinates using this matrix and place them in texture coord sets 0 and 1, since some shadow techniques use 2 texture units. The colour of the vertices output by this vertex program must always be white, so as not to affect the final colour of the rendered shadow. <BR><BR>
-</P>
-<P>
 
 When using additive texture shadows, the shadow pass render is actually the lighting render, so if you perform any fragmene program lighting you also need to pull in a custom fragment program. You use the shadow_receiver_fragment_program_ref for this:
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>shadow_receiver_fragment_program_ref myShadowReceiverFragmentProgram
@@ -484,14 +424,13 @@ When using additive texture shadows, the shadow pass render is actually the ligh
 	param_named_auto lightDiffuse light_diffuse_colour 0 
 }
 </pre></td></tr></table>You should pass the projected shadow coordinates from the custom vertex program. As for textures, texture unit 0 will always be the shadow texture. Any other textures which you bind in your pass will be carried across too, but will be moved up by 1 unit to make room for the shadow texture. Therefore your shadow receiver fragment program is likely to be the same as the bare lighting pass of your normal material, except that you insert an extra texture sampler at index 0, which you will use to adjust the result by (modulating diffuse and specular components).
-<P>
 
 <A NAME="Vertex Texture Fetch"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_22.html#SEC120"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_22.html#SEC122"> &lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_24.html#SEC128"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_24.html#SEC131"> &gt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
@@ -500,7 +439,7 @@ When using additive texture shadows, the shadow pass render is actually the ligh
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>steve</I> on <I>February 18 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

@@ -82,6 +82,9 @@ namespace Ogre{
 		static bool getFloats(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, float *vals, int count);
 		/// Converts the node to a StencilOperation enum and returns true if successful
 		static bool getStencilOp(const AbstractNodePtr &node, StencilOperation *op); 
+		/// Converts the node to a GpuConstantType enum and returns true if successful
+		static bool getConstantType(AbstractNodeList::const_iterator i, GpuConstantType *op); 
+
 	};
 
 	/** The ScriptTranslatorManager manages the lifetime and access to
@@ -166,6 +169,14 @@ namespace Ogre{
 		void translateUnifiedGpuProgram(ScriptCompiler *compiler, ObjectAbstractNode *obj);
 	public:
 		static void translateProgramParameters(ScriptCompiler *compiler, GpuProgramParametersSharedPtr params, ObjectAbstractNode *obj);
+	};
+
+	class _OgreExport SharedParamsTranslator : public ScriptTranslator
+	{	
+	public:
+		SharedParamsTranslator();
+		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+	protected:
 	};
 
 	/**************************************************************************
@@ -261,6 +272,7 @@ namespace Ogre{
 		TextureUnitTranslator mTextureUnitTranslator;
 		TextureSourceTranslator mTextureSourceTranslator;
 		GpuProgramTranslator mGpuProgramTranslator;
+		SharedParamsTranslator mSharedParamsTranslator;
 		ParticleSystemTranslator mParticleSystemTranslator;
 		ParticleEmitterTranslator mParticleEmitterTranslator;
 		ParticleAffectorTranslator mParticleAffectorTranslator;

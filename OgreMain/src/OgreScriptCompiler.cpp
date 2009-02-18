@@ -1208,6 +1208,10 @@ namespace Ogre
 			mIds["named"] = ID_NAMED;
 			mIds["shadow"] = ID_SHADOW;
 		mIds["texture_source"] = ID_TEXTURE_SOURCE;
+		mIds["shared_params"] = ID_SHARED_PARAMS;
+		mIds["shared_param_named"] = ID_SHARED_PARAM_NAMED;
+		mIds["shared_params_ref"] = ID_SHARED_PARAMS_REF;
+
 
 		// Particle system
 		mIds["particle_system"] = ID_PARTICLE_SYSTEM;
