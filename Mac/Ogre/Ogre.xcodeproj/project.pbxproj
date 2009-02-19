@@ -569,6 +569,8 @@
 		AA06EFE80CEE58080013023A /* OgreScriptParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA06EFE50CEE58080013023A /* OgreScriptParser.cpp */; };
 		AA06EFEB0CEE58310013023A /* OgreScriptLexer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA06EFE90CEE58310013023A /* OgreScriptLexer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA06EFEC0CEE58310013023A /* OgreScriptLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = AA06EFEA0CEE58310013023A /* OgreScriptLoader.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA11EEF50F4E011E0020163D /* OgreGpuProgramParams.h in Headers */ = {isa = PBXBuildFile; fileRef = AA11EEF40F4E011E0020163D /* OgreGpuProgramParams.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AA11EEF70F4E01690020163D /* OgreGpuProgramParams.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA11EEF60F4E01690020163D /* OgreGpuProgramParams.cpp */; };
 		AA123E6F0C53FAB9000009B6 /* OgreGLSLPreprocessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA123E390C53F7F9000009B6 /* OgreGLSLPreprocessor.cpp */; };
 		AA261E870CA17D99000A3707 /* OgreRenderSystemCapabilitiesManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AA261E850CA17D99000A3707 /* OgreRenderSystemCapabilitiesManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA261E880CA17D9A000A3707 /* OgreRenderSystemCapabilitiesSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA261E860CA17D99000A3707 /* OgreRenderSystemCapabilitiesSerializer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1386,6 +1388,8 @@
 		AA06EFE50CEE58080013023A /* OgreScriptParser.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreScriptParser.cpp; path = ../../OgreMain/src/OgreScriptParser.cpp; sourceTree = SOURCE_ROOT; };
 		AA06EFE90CEE58310013023A /* OgreScriptLexer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptLexer.h; path = ../../OgreMain/include/OgreScriptLexer.h; sourceTree = SOURCE_ROOT; };
 		AA06EFEA0CEE58310013023A /* OgreScriptLoader.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreScriptLoader.h; path = ../../OgreMain/include/OgreScriptLoader.h; sourceTree = SOURCE_ROOT; };
+		AA11EEF40F4E011E0020163D /* OgreGpuProgramParams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreGpuProgramParams.h; path = ../../OgreMain/include/OgreGpuProgramParams.h; sourceTree = SOURCE_ROOT; };
+		AA11EEF60F4E01690020163D /* OgreGpuProgramParams.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreGpuProgramParams.cpp; path = ../../OgreMain/src/OgreGpuProgramParams.cpp; sourceTree = SOURCE_ROOT; };
 		AA123E380C53F7DA000009B6 /* OgreGLSLPreprocessor.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreGLSLPreprocessor.h; path = ../../RenderSystems/GL/src/GLSL/include/OgreGLSLPreprocessor.h; sourceTree = SOURCE_ROOT; };
 		AA123E390C53F7F9000009B6 /* OgreGLSLPreprocessor.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreGLSLPreprocessor.cpp; path = ../../RenderSystems/GL/src/GLSL/src/OgreGLSLPreprocessor.cpp; sourceTree = SOURCE_ROOT; };
 		AA261E850CA17D99000A3707 /* OgreRenderSystemCapabilitiesManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreRenderSystemCapabilitiesManager.h; path = ../../OgreMain/include/OgreRenderSystemCapabilitiesManager.h; sourceTree = SOURCE_ROOT; };
@@ -1724,6 +1728,7 @@
 				000E1F230B38D5AA004EA2DF /* OgreFrustum.cpp */,
 				000E1F240B38D5AA004EA2DF /* OgreGpuProgram.cpp */,
 				000E1F250B38D5AA004EA2DF /* OgreGpuProgramManager.cpp */,
+				AA11EEF60F4E01690020163D /* OgreGpuProgramParams.cpp */,
 				000E1F260B38D5AA004EA2DF /* OgreGpuProgramUsage.cpp */,
 				000E1F270B38D5AA004EA2DF /* OgreHardwareBufferManager.cpp */,
 				000E1F280B38D5AA004EA2DF /* OgreHardwareIndexBuffer.cpp */,
@@ -1932,6 +1937,7 @@
 				000E1D870B38D566004EA2DF /* OgreFrustum.h */,
 				000E1D880B38D566004EA2DF /* OgreGpuProgram.h */,
 				000E1D890B38D566004EA2DF /* OgreGpuProgramManager.h */,
+				AA11EEF40F4E011E0020163D /* OgreGpuProgramParams.h */,
 				000E1D8A0B38D566004EA2DF /* OgreGpuProgramUsage.h */,
 				000E1D8B0B38D566004EA2DF /* OgreHardwareBuffer.h */,
 				000E1D8C0B38D566004EA2DF /* OgreHardwareBufferManager.h */,
@@ -2814,6 +2820,7 @@
 				AA81343C0EFE94A9004EA3A5 /* OgreLodStrategyManager.h in Headers */,
 				AA81343D0EFE94A9004EA3A5 /* OgrePixelCountLodStrategy.h in Headers */,
 				AA8134630EFEA36D004EA3A5 /* OgreLodStrategy.h in Headers */,
+				AA11EEF50F4E011E0020163D /* OgreGpuProgramParams.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3215,6 +3222,7 @@
 				AA8134430EFE94DC004EA3A5 /* OgreLodStrategy.cpp in Sources */,
 				AA8134440EFE94DC004EA3A5 /* OgreLodStrategyManager.cpp in Sources */,
 				AA8134450EFE94DC004EA3A5 /* OgrePixelCountLodStrategy.cpp in Sources */,
+				AA11EEF70F4E01690020163D /* OgreGpuProgramParams.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
