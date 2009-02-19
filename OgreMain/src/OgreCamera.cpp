@@ -1072,6 +1072,8 @@ namespace Ogre {
 		this->setLodCamera(cam->getLodCamera());
 		this->setUseRenderingDistance(cam->getUseRenderingDistance());
 		this->setCullingFrustum(cam->getCullingFrustum());
+		this->setFOVy(cam->getFOVy());
+		this->setFocalLength(cam->getFocalLength());
 
 
 	}
