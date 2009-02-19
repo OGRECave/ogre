@@ -1,0 +1,141 @@
+OGRE CMake BUILD SYSTEM
+========================================================================
+
+Welcome to the new CMake build system for Ogre. This readme file will
+explain what CMake is and how you can use it to build the Ogre libraries
+and the sample applications.
+
+
+1. What is CMake?
+-------------------
+
+CMake is a cross-platform build system - or perhaps more accurately a
+build configurator. It is a program which, from a set of CMake scripts,
+creates a native build system for your platform which then allows you
+to build Ogre. 
+The build process is configurable via CMake. Ogre provides several
+options which you can use to customise your build. 
+
+
+2. Getting CMake
+------------------
+
+CMake is available from http://www.cmake.org (Resources -> Downloads).
+You can get its sources, but there are precompiled binaries for all
+platforms. Furthermore, if you are on a Linux system, chances are high
+that your distributor offers a package for CMake. You need a CMake
+version >= 2.6, though.
+
+
+3. Basic concepts
+-------------------
+
+There are three directories involved in the build process. First is
+the source dir where the Ogre sources reside as well as the CMake
+scripts. The next is the build dir in which CMake will store the
+build configuration and where the generated build system will
+create the object files and other intermediate files. In theory
+you can use the source dir as the build dir, but this will clutter
+the sources with CMake stuff and object files, and there's no easy
+way to clean it up again. Therefore I recommend you choose a different
+build directory. You might want to create a subdirectory "build" in 
+your Ogre sources and use that one as the build directory.
+Finally there's the install directory. People familiar with Unix know
+the concept, this is where the Ogre libraries will finally be copied 
+to alongside with all the necessary headers and other dependencies.
+This is basically where the clean output is put so that you can start
+working with it.
+The layout of the install directory will resemble that of the Ogre SDK
+packages. Under bin, you'll find the sample binaries along with
+the necessary .cfg files as well as the DLLs (on Windows). In include
+you'll find the Ogre headers, lib contains the link libraries.
+
+
+4. Using CMake on Windows
+---------------------------
+
+Start CMake from the Start menu. You will notice two entries, "CMake"
+and "cmake-gui (beta)". Both are graphical interfaces which work
+similar, so you can choose either. I recommend the latter because it
+has a cleaner interface.
+First, in the field "Where is the source code" enter the path to where
+your Ogre sources lie. Then, in the field "Where to build the binaries"
+you are required to select the build directory (see above). 
+Once you have selected the directories, hit the button "Configure" in 
+the lower left. This will start a first CMake run on the build scripts,
+and CMake will ask you to select the build system you want to create.
+Choose the appropriate one for your compiler, for example:
+  Visual Studio 9 2008
+Now, CMake will present you with a list of configuration options. They
+are explained further down. You can also toggle advanced options (or
+select "Group view" from the dropdown box in cmake-gui) where you
+will be able to see some more advanced config options. Modify any of
+them to your liking. The most important ones are those with the
+OGRE prefix. There's also CMAKE_INSTALL_PREFIX which determines where
+the built libraries will be installed.
+If you get any error messages from CMake, check the log window at the
+bottom, it will contain a log of all the actions CMake does. Chances
+for errors are that a necessary dependency package was not found.
+You might need to manually provide their locations in the advanced
+options (or install them in the first place).
+
+Once satisfied with the selected options, hit "Configure" again.
+CMake will update its settings. Then hit "Generate" to finally
+create the build system.
+Now, in your build directory you will find a build system as per
+your request. In case of Visual Studio, you should find a solution
+file "OGRE3D.sln" which you can open. You will see the usual
+projects as well as some custom CMake targets (like ALL_BUILD,
+INSTALL etc.). Now do the following:
+- Select your build type (Debug, Release, ...) 
+- Right-click on ALL_BUILD and choose to build it. This will compile
+all parts of Ogre that you have enabled in the CMake config.
+- If you have doxygen installed (and CMake found it) and you want
+to generate the API docs, right-click on the target "doc" and build it.
+- Right-click on target INSTALL and "build" it. This will create your
+install directory where all necessary include, library und runtime
+files will be installed.
+- If you want, repeat for a different build type.
+
+
+5. Using CMake on Linux
+-------------------------
+
+Check if cmake-gui is available. If so, you can use it in much the same
+way as described in 4. Otherwise you will need to work with the console.
+In the console, first change to the directory of the Ogre sources. Now
+create a build directory and change to it:
+  mkdir build && cd build
+You need to run cmake from the build directory and provide it with the
+location of the build directory. If you followed the above guideline,
+then you can simply type:
+  cmake ..
+CMake will now parse the scripts in the Ogre source tree. Watch the 
+output, especially if all necessary dependencies have been found. If not,
+you might need to install the missing ones or provide their locations
+manually (more in a minute).
+Now, we want to configure the build. Run:
+  ccmake ..
+Which will give you a frontend to configure the CMake build settings.
+You will see several available options, those prefixed with OGRE 
+configure the build process. There's also CMAKE_INSTALL_PATH which
+determines where the final libraries will be installed (see 3).
+CMAKE_BUILD_TYPE determines the type of build you will get. Available
+options are (Release, Debug, MinSizeRel, RelWithDebInfo). Choose
+the one you want. There are more options available which you can toggle
+with 't'. If any dependency was not found, you need to do this to
+set the corresponding variables manually (most importantly 
+PKG_INCLUDE_DIRS and PKG_LIBRARY, with PKG being the dependency that
+wasn't found).
+Once you are content with your choices, hit 'c' to configure the build.
+Afterwards, hit 'g' to generate a build system. Press 'q' to quit ccmake.
+A set of Makefiles have now been generated in the build directory, so
+to start the Ogre build, simply type:
+  make
+as usual. This will build all libraries and samples depending on your 
+CMake settings. Now, if you have doxygen installed and want to create
+the API documentation for Ogre, type
+  make doc
+This will invoke doxygen (may take a while...).
+Once all is done, you can install the build as usual via
+  make install (might need root privileges)

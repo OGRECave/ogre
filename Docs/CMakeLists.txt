@@ -1,0 +1,34 @@
+###############################################################
+# Install documentation
+# Build API docs, if doxygen is available
+###############################################################
+
+# Set docs target directory
+if (WIN32)
+  set(OGRE_DOCS_PATH "Docs")
+elseif (UNIX)
+  set(OGRE_DOCS_PATH "share/OGRE/docs")
+elseif (APPLE)
+  # TODO
+endif ()
+  
+if (OGRE_INSTALL_DOCS)
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+    DESTINATION ${OGRE_DOCS_PATH}
+    PATTERN ".svn" EXCLUDE
+    PATTERN "src" EXCLUDE
+  )
+endif ()
+
+# Build and install API documentation if doxygen is available
+if(DOXYGEN_FOUND)
+	configure_file(${OGRE_TEMPLATES_DIR}/html.cfg.in ${OGRE3D_BINARY_DIR}/html.cfg)
+	add_custom_target(doc COMMAND 
+    ${DOXYGEN_EXECUTABLE} ${OGRE3D_BINARY_DIR}/html.cfg 
+    WORKING_DIRECTORY ${OGRE3D_SOURCE_DIR}/Docs/src/ 
+    COMMENT "Building documentation" VERBATIM
+  )
+	file(WRITE ${OGRE3D_BINARY_DIR}/api/temp.txt "This file should be deleted before installation. It is only here to force the creation of the api folder")
+	file(REMOVE ${OGRE3D_BINARY_DIR}/api/temp.txt)
+	install(DIRECTORY ${OGRE3D_BINARY_DIR}/api DESTINATION ${OGRE_DOCS_PATH})
+endif()

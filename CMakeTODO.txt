@@ -1,0 +1,29 @@
+TODO
+====
+
+Essential before switch-on as primary system
+
+* Debugging from VStudio
+* Missing dependency DLLs (OIS, CEGUI, Cg)
+* Install samples sources
+  * Should probably rearrange the samples directory
+* SDK testing
+* Establish 3rd-party library build procedure
+* Add static library option
+* DirectX 10 project missing
+* Test Code::Blocks / MinGW, Linux
+
+Optional 
+
+* GLES project
+* Investigate OSX (may have to continue to use custom XCode project)
+* Reference app? (or drop this)
+* CPack
+  * Started work on this
+
+OGRE CHANGES ONCE LIVE
+======================
+
+- Remove OgreConfig.h from OgreMain/include => CMakeTemplates/OgreConfig.h.in
+- Move Ogre version information from OgrePrerequisites.h => CMakeTemplates/OgreVersion.h.in
+- Docs/src/html.cfg is no longer necessary as it is generated from CMakeTemplates/html.cfg.in

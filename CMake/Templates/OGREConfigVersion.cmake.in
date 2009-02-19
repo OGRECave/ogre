@@ -1,0 +1,22 @@
+# Check the version of OGRE is good enough
+#
+# Copyright © 2008, Matt Williams
+#
+# Redistribution and use is allowed according to the terms of the BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+
+set(PACAKGE_VERSION @OGRE_VERSION@)
+
+if(${PACKAGE_VERSION} VERSION_EQUAL ${PACKAGE_FIND_VERSION})
+	#Exact match
+	set(PACKAGE_VERSION_EXACT TRUE)
+	set(PACKAGE_VERSION_COMPATIBLE TRUE)
+elseif(${PACKAGE_VERSION} VERSION_GREATER ${PACKAGE_FIND_VERSION})
+	#Installed version is greater than requested
+	set(PACKAGE_VERSION_EXACT FALSE)
+	set(PACKAGE_VERSION_COMPATIBLE TRUE)
+else(${PACKAGE_VERSION} VERSION_EQUAL ${PACKAGE_FIND_VERSION})
+	#Installed version isn't a high enough version
+	set(PACKAGE_VERSION_EXACT FALSE)
+	set(PACKAGE_VERSION_COMPATIBLE FALSE)
+endif(${PACKAGE_VERSION} VERSION_EQUAL ${PACKAGE_FIND_VERSION})
