@@ -9,8 +9,6 @@ Essential before switch-on as primary system
   * Should probably rearrange the samples directory
 * SDK testing
 * Establish 3rd-party library build procedure
-* Add static library option
-* DirectX 10 project missing
 * Test Code::Blocks / MinGW, Linux
 
 Optional 
