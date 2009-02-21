@@ -4468,7 +4468,7 @@ namespace Ogre{
 						if(prop->values.size() >= 2)
 						{
 							AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
-								i1 = getNodeAt(prop->values, 1), i2 = getNodeAt(prop->values, 2);
+								i1 = getNodeAt(prop->values, 1), i2 = getNodeAt(prop->values, 2), i3 = getNodeAt(prop->values, 3);
 							if((*i0)->type != ANT_ATOM || (*i1)->type != ANT_ATOM)
 							{
 								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
@@ -4560,8 +4560,26 @@ namespace Ogre{
 										}
 										else
 										{
+											bool success = false;
 											uint32 extraInfo = 0;
-											if(getUInt(*i2, &extraInfo))
+											if(i3 == prop->values.end())
+											{ // Handle only one extra value
+												if(getUInt(*i2, &extraInfo))
+												{
+													success = true;
+												}
+											}
+											else
+											{ // Handle two extra values
+												uint32 extraInfo1 = 0, extraInfo2 = 0;
+												if(getUInt(*i2, &extraInfo1) && getUInt(*i3, &extraInfo2))
+												{
+													extraInfo = extraInfo1 | (extraInfo2 << 16);
+													success = true;
+												}
+											}
+
+											if(success)
 											{
 												try
 												{
@@ -4575,6 +4593,11 @@ namespace Ogre{
 													compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 														"setting of constant failed");
 												}
+											}
+											else
+											{
+												compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+													"invalid auto constant extra info parameter");
 											}
 										}
 									}

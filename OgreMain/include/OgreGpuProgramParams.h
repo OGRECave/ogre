@@ -992,6 +992,8 @@ namespace Ogre {
 			position. See Camera::setLodCamera.
 			*/
 			ACT_LOD_CAMERA_POSITION_OBJECT_SPACE, 
+			/** Binds custom per-light constants to the shaders. */
+			ACT_LIGHT_CUSTOM
 		};
 
 		/** Defines the type of the extra data item used by the auto constant.
@@ -1391,6 +1393,22 @@ namespace Ogre {
 		void setAutoConstant(size_t index, AutoConstantType acType, size_t extraInfo = 0);
 		void setAutoConstantReal(size_t index, AutoConstantType acType, Real rData);
 
+		/** Sets up a constant which will automatically be updated by the system.
+		@remarks
+		Vertex and fragment programs often need parameters which are to do with the
+		current render state, or particular values which may very well change over time,
+		and often between objects which are being rendered. This feature allows you 
+		to set up a certain number of predefined parameter mappings that are kept up to 
+		date for you.
+		@param index The location in the constant list to place this updated constant every time
+		it is changed. Note that because of the nature of the types, we know how big the 
+		parameter details will be so you don't need to set that like you do for manual constants.
+		@param acType The type of automatic constant to set
+		@param extraInfo1 The first extra parameter required by the auto constant type
+		@param extraInfo2 The first extra parameter required by the auto constant type
+		*/
+		void setAutoConstant(size_t index, AutoConstantType acType, uint16 extraInfo1, uint16 extraInfo2);
+
 		/** As setAutoConstant, but sets up the auto constant directly against a
 		physical buffer index.
 		*/
@@ -1607,6 +1625,23 @@ namespace Ogre {
 		*/
 		void setNamedAutoConstant(const String& name, AutoConstantType acType, size_t extraInfo = 0);
 		void setNamedAutoConstantReal(const String& name, AutoConstantType acType, Real rData);
+
+		/** Sets up a constant which will automatically be updated by the system.
+		@remarks
+		Vertex and fragment programs often need parameters which are to do with the
+		current render state, or particular values which may very well change over time,
+		and often between objects which are being rendered. This feature allows you 
+		to set up a certain number of predefined parameter mappings that are kept up to 
+		date for you.
+		@note
+		This named option will only work if you are using a parameters object created
+		from a high-level program (HighLevelGpuProgram).
+		@param name The name of the parameter
+		@param acType The type of automatic constant to set
+		@param extraInfo1 The first extra info required by this auto constant type
+		@param extraInfo2 The first extra info required by this auto constant type
+		*/
+		void setNamedAutoConstant(const String& name, AutoConstantType acType, uint16 extraInfo1, uint16 extraInfo2);
 
 		/** Sets a named parameter up to track a derivation of the current time.
 		@note

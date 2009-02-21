@@ -1079,6 +1079,17 @@ namespace Ogre {
 	{
 		return mCurrentSceneManager->getShadowColour();
 	}
+	//-------------------------------------------------------------------------
+	void AutoParamDataSource::updateLightCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry, GpuProgramParameters *params) const
+	{
+		uint16 lightIndex = static_cast<uint16>(constantEntry.data & 0xFFFF),
+			paramIndex = static_cast<uint16>((constantEntry.data >> 16) & 0xFFFF);
+		if(mCurrentLightList && lightIndex < mCurrentLightList->size())
+		{
+			const Light &light = getLight(lightIndex);
+			light._updateCustomGpuParameter(paramIndex, constantEntry, params);
+		}
+	}
 
 }
 

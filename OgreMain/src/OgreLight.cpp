@@ -824,6 +824,36 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
+	void Light::setCustomParameter(uint16 index, const Ogre::Vector4 &value)
+	{
+		mCustomParameters[index] = value;
+	}
+	//-----------------------------------------------------------------------
+	const Vector4 &Light::getCustomParameter(uint16 index) const
+	{
+		CustomParameterMap::const_iterator i = mCustomParameters.find(index);
+        if (i != mCustomParameters.end())
+        {
+            return i->second;
+        }
+        else
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Parameter at the given index was not found.",
+                "Light::getCustomParameter");
+        }
+	}
+	//-----------------------------------------------------------------------
+	void Light::_updateCustomGpuParameter(uint16 paramIndex, const GpuProgramParameters::AutoConstantEntry& constantEntry, GpuProgramParameters *params) const
+	{
+		CustomParameterMap::const_iterator i = mCustomParameters.find(paramIndex);
+        if (i != mCustomParameters.end())
+        {
+            params->_writeRawConstant(constantEntry.physicalIndex, i->second, 
+				constantEntry.elementCount);
+        }
+	}
+	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	String LightFactory::FACTORY_TYPE_NAME = "Light";
 	//-----------------------------------------------------------------------

@@ -453,7 +453,54 @@ namespace Ogre {
 		/// Set the camera which this light should be relative to, for camera-relative rendering
 		void _setCameraRelative(Camera* cam);
 
+		/** Sets a custom parameter for this Light, which may be used to 
+            drive calculations for this specific Renderable, like GPU program parameters.
+        @remarks
+            Calling this method simply associates a numeric index with a 4-dimensional
+            value for this specific Light. This is most useful if the material
+            which this Renderable uses a vertex or fragment program, and has an 
+            ACT_LIGHT_CUSTOM parameter entry. This parameter entry can refer to the
+            index you specify as part of this call, thereby mapping a custom
+            parameter for this renderable to a program parameter.
+        @param index The index with which to associate the value. Note that this
+            does not have to start at 0, and can include gaps. It also has no direct
+            correlation with a GPU program parameter index - the mapping between the
+            two is performed by the ACT_LIGHT_CUSTOM entry, if that is used.
+        @param value The value to associate.
+        */
+        void setCustomParameter(uint16 index, const Vector4& value);
 
+        /** Gets the custom value associated with this Light at the given index.
+        @param
+            @see setCustomParaemter for full details.
+        */
+        const Vector4& getCustomParameter(uint16 index) const;
+
+		/** Update a custom GpuProgramParameters constant which is derived from 
+            information only this Light knows.
+        @remarks
+            This method allows a Light to map in a custom GPU program parameter
+            based on it's own data. This is represented by a GPU auto parameter
+            of ACT_LIGHT_CUSTOM, and to allow there to be more than one of these per
+            Light, the 'data' field on the auto parameter will identify
+            which parameter is being updated and on which light. The implementation 
+			of this method must identify the parameter being updated, and call a 'setConstant' 
+            method on the passed in GpuProgramParameters object.
+        @par
+            You do not need to override this method if you're using the standard
+            sets of data associated with the Renderable as provided by setCustomParameter
+            and getCustomParameter. By default, the implementation will map from the
+            value indexed by the 'constantEntry.data' parameter to a value previously
+            set by setCustomParameter. But custom Renderables are free to override
+            this if they want, in any case.
+        @param paramIndex The index of the constant being updated
+		@param constantEntry The auto constant entry from the program parameters
+        @param params The parameters object which this method should call to 
+            set the updated parameters.
+        */
+        virtual void _updateCustomGpuParameter(uint16 paramIndex, 
+			const GpuProgramParameters::AutoConstantEntry& constantEntry, 
+			GpuProgramParameters* params) const;
     protected:
         /// internal method for synchronising with parent node (if any)
         virtual void update(void) const;
@@ -505,6 +552,9 @@ namespace Ogre {
 		/// Pointer to a custom shadow camera setup
 		mutable ShadowCameraSetupPtr mCustomShadowCameraSetup;
 
+		typedef map<uint16, Vector4>::type CustomParameterMap;
+		/// Stores the custom parameters for the light
+        CustomParameterMap mCustomParameters;
     };
 
 	/** Factory object for creating Light instances */
