@@ -389,6 +389,9 @@ namespace Ogre {
 		/// Not used when copying data, but might be useful to RS using shared buffers
 		size_t mFrameLastUpdated;
 
+		/// Version number of the definitions in this buffer
+		unsigned long mVersion; 
+
 	public:
 		GpuSharedParameters(const String& name);
 		virtual ~GpuSharedParameters();
@@ -404,6 +407,19 @@ namespace Ogre {
 			updated.
 		*/
 		void addConstantDefinition(const String& name, GpuConstantType constType, size_t arraySize = 1);
+
+		/** Remove a constant definition from this shared set of parameters.
+		*/
+		void removeConstantDefinition(const String& name);
+
+		/** Remove a constant definition from this shared set of parameters.
+		*/
+		void removeAllConstantDefinitions();
+
+		/** Get the version number of this shared parameter set, can be used to identify when 
+			changes have occurred. 
+		*/
+		unsigned long getVersion() const { return mVersion; }
 
 		/** Mark the shared set as being dirty (values modified).
 		@remarks
@@ -491,6 +507,11 @@ namespace Ogre {
 
 		// Optional data the rendersystem might want to store
 		mutable Any mRenderSystemData;
+
+		/// Version of shared params we based the copydata on
+		unsigned long mCopyDataVersion;
+
+		void initCopyData();
 
 
 	public:

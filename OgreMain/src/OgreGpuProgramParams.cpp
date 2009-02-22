@@ -340,7 +340,9 @@ namespace Ogre
 	//      GpuSharedParameters Methods
 	//-----------------------------------------------------------------------------
 	GpuSharedParameters::GpuSharedParameters(const String& name)
-		:mName(name), mFrameLastUpdated(Root::getSingleton().getNextFrameNumber())
+		:mName(name)
+		, mFrameLastUpdated(Root::getSingleton().getNextFrameNumber())
+		, mVersion(0)
 	{
 
 	}
@@ -381,6 +383,70 @@ namespace Ogre
 		}
 
 		mNamedConstants.map[name] = def;
+
+		++mVersion;
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::removeConstantDefinition(const String& name)
+	{
+		GpuConstantDefinitionMap::iterator i = mNamedConstants.map.find(name);
+		if (i != mNamedConstants.map.end())
+		{
+			GpuConstantDefinition& def = i->second;
+			bool isFloat = def.isFloat();
+			size_t numElems = def.elementSize * def.arraySize;
+
+			for (GpuConstantDefinitionMap::iterator j = mNamedConstants.map.begin();
+				j != mNamedConstants.map.end(); ++j)
+			{
+				GpuConstantDefinition& otherDef = j->second;
+				bool otherIsFloat = otherDef.isFloat();
+
+				// same type, and comes after in the buffer
+				if ( ((isFloat && otherIsFloat) || (!isFloat && !otherIsFloat)) && 
+					otherDef.physicalIndex > def.physicalIndex)
+				{
+					// adjust index
+					otherDef.physicalIndex -= numElems;
+				}
+			}
+
+			// remove floats and reduce buffer
+			if (isFloat)
+			{
+				mNamedConstants.floatBufferSize -= numElems;
+
+				FloatConstantList::iterator beg = mFloatConstants.begin();
+				std::advance(beg, def.physicalIndex);
+				FloatConstantList::iterator en = beg;
+				std::advance(en, numElems);
+				mFloatConstants.erase(beg, en);
+			}
+			else
+			{
+				mNamedConstants.intBufferSize -= numElems;
+
+				IntConstantList::iterator beg = mIntConstants.begin();
+				std::advance(beg, def.physicalIndex);
+				IntConstantList::iterator en = beg;
+				std::advance(en, numElems);
+				mIntConstants.erase(beg, en);
+
+			}
+
+			++mVersion;
+			
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParameters::removeAllConstantDefinitions()
+	{
+		mNamedConstants.map.clear();
+		mNamedConstants.floatBufferSize = 0;
+		mNamedConstants.intBufferSize = 0;
+		mFloatConstants.clear();
+		mIntConstants.clear();
 	}
 	//---------------------------------------------------------------------
 	GpuConstantDefinitionIterator GpuSharedParameters::getConstantDefinitionIterator(void) const
@@ -501,6 +567,14 @@ namespace Ogre
 		: mSharedParams(sharedParams)
 		, mParams(params)
 	{
+		initCopyData();
+	}
+	//---------------------------------------------------------------------
+	void GpuSharedParametersUsage::initCopyData()
+	{
+
+		mCopyDataList.clear();
+
 		const GpuConstantDefinitionMap& sharedmap = mSharedParams->getConstantDefinitions().map;
 		for (GpuConstantDefinitionMap::const_iterator i = sharedmap.begin(); i != sharedmap.end(); ++i)
 		{
@@ -523,10 +597,16 @@ namespace Ogre
 
 		}
 
+		mCopyDataVersion = mSharedParams->getVersion();
+
 	}
 	//---------------------------------------------------------------------
 	void GpuSharedParametersUsage::_copySharedParamsToTargetParams()
 	{
+		// check copy data version
+		if (mCopyDataVersion != mSharedParams->getVersion())
+			initCopyData();
+
 		for (CopyDataList::iterator i = mCopyDataList.begin(); i != mCopyDataList.end(); ++i)
 		{
 			CopyDataEntry& e = *i;
