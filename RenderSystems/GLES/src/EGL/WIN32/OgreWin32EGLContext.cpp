@@ -27,36 +27,28 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
+#include "OgreGLESRenderSystem.h"
 
-#ifndef __GLESPBuffer_H__
-#define __GLESPBuffer_H__
+#include "OgreEGLSupport.h"
+#include "OgreWin32EGLContext.h"
 
-#include "OgreGLESPrerequisites.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
-    class GLContext;
-
-    /** An off-screen rendering context. These contexts are always RGBA for simplicity, speed and
-        convience, but the component format is configurable.
-    */
-    class _OgrePrivate GLESPBuffer
+    Win32EGLContext::Win32EGLContext(EGLDisplay eglDisplay, 
+							const EGLSupport* glsupport,
+                           ::EGLConfig glconfig,
+                           ::EGLSurface drawable)
+        : EGLContext(eglDisplay, glsupport, glconfig, drawable)
     {
-        protected:
-            PixelComponentType mFormat;
-            size_t mWidth, mHeight;
+    }
 
-        public:
-            GLESPBuffer(PixelComponentType format, size_t width, size_t height);
-            virtual ~GLESPBuffer();
+    Win32EGLContext::~Win32EGLContext()
+    {
+    }
 
-            PixelComponentType getFormat() { return mFormat; }
-            size_t getWidth() { return mWidth; }
-            size_t getHeight() { return mHeight; }
-
-            /** Get PBuffer component format for an OGRE pixel format.
-             */
-            static PixelComponentType getPixelComponentType(PixelFormat fmt);
-    };
+    GLESContext* Win32EGLContext::clone() const
+    {
+        return new Win32EGLContext(mEglDisplay ,mGLSupport, mConfig, mDrawable);
+    }
 }
-
-#endif

@@ -31,21 +31,29 @@ Torus Knot Software Ltd.
 #ifndef __EGLSupport_H__
 #define __EGLSupport_H__
 
-#include <X11/Xutil.h>
 
 #include "OgreGLESSupport.h"
 #include "OgreGLESPrerequisites.h"
 #include "OgreGLESPBuffer.h"
+#include "OgreEGLWindow.h"
 
 namespace Ogre {
+	template<class C> void removeDuplicates(C& c)
+	{
+		std::sort(c.begin(), c.end());
+		typename C::iterator p = std::unique(c.begin(), c.end());
+		c.erase(p, c.end());
+	}
+
     class _OgrePrivate EGLSupport : public GLESSupport
     {
-        private:
+        protected:
             void refreshConfig(void);
 
             EGLDisplay mGLDisplay;
-            Display* mXDisplay;
-            bool mIsExternalDisplay;
+			NativeDisplayType mNativeDisplay;
+
+			bool mIsExternalDisplay;
             bool mRandr;
             typedef std::pair<uint, uint> ScreenSize;
             typedef short Rate;
@@ -56,22 +64,24 @@ namespace Ogre {
             VideoMode mCurrentMode;
             StringVector mSampleLevels;
 
+			virtual EGLWindow* createEGLWindow( EGLSupport * support) = 0;
+			NativeDisplayType getNativeDisplayType();
         public:
             EGLSupport();
-            ~EGLSupport();
+            virtual ~EGLSupport();
 
             void start(void);
             void stop(void);
             void addConfig(void);
             String validateConfig(void);
             void setConfigOption(const String &name, const String &value);
-            String getDisplayName (void);
-            EGLDisplay getGLDisplay(void);
-            Display* getXDisplay(void);
-            EGLConfig* chooseGLConfig(const GLint *attribList, GLint *nElements);
+            virtual String getDisplayName (void);
+			EGLDisplay getGLDisplay(void);
+			void setGLDisplay(EGLDisplay val);
+			EGLConfig* chooseGLConfig(const GLint *attribList, GLint *nElements);
             GLint getGLConfigAttrib(EGLConfig fbConfig, GLint attribute, GLint *value);
             void* getProcAddress(const Ogre::String& name);
-            ::EGLContext createNewContext(::EGLConfig glconfig, ::EGLContext shareList);
+            ::EGLContext createNewContext(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLContext shareList) const;
 
             RenderWindow* createWindow(bool autoCreateWindow,
                                        GLESRenderSystem *renderSystem,
@@ -85,18 +95,12 @@ namespace Ogre {
             ::EGLConfig getGLConfigFromContext(::EGLContext context);
             ::EGLConfig getGLConfigFromDrawable(::EGLSurface drawable,
                                                 unsigned int *w, unsigned int *h);
-            XVisualInfo *getVisualFromFBConfig(::EGLConfig glConfig);
-            ::EGLConfig selectGLConfig (const int* minAttribs, const int *maxAttribs);
+			::EGLConfig selectGLConfig (const int* minAttribs, const int *maxAttribs);
             void switchMode(void);
-            void switchMode(uint& width, uint& height, short& frequency);
-
-            GLESPBuffer* createPBuffer(PixelComponentType format,
-                                       size_t width, size_t height);
-
-            Atom mAtomDeleteWindow;
-            Atom mAtomFullScreen;
-            Atom mAtomState;
-    };
+			virtual void switchMode(uint& width, uint& height, short& frequency) = 0;
+            virtual GLESPBuffer* createPBuffer(PixelComponentType format,
+                                       size_t width, size_t height) = 0;
+	};
 }
 
 #endif

@@ -94,6 +94,12 @@ namespace Ogre {
         : HardwareIndexBuffer(idxType, numIndexes, usage, true, false)
           // always software, never shadowed
     {
+		if (idxType == HardwareIndexBuffer::IT_32BIT)
+		{
+			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+				"32 bit hardware buffers are not allowed in OpenGL ES.",
+				"GLESDefaultHardwareIndexBuffer");
+		}
         mpData = new unsigned char[mSizeInBytes];
     }
 
@@ -164,4 +170,10 @@ namespace Ogre {
         return HardwareIndexBufferSharedPtr(
             new GLESDefaultHardwareIndexBuffer(itype, numIndexes, usage));
     }
+
+	Ogre::RenderToVertexBufferSharedPtr GLESDefaultHardwareBufferManager::createRenderToVertexBuffer( void )
+	{
+		Ogre::RenderToVertexBufferSharedPtr  todo;
+		return todo;
+	}
 }

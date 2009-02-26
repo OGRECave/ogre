@@ -44,7 +44,7 @@ namespace Ogre {
     #   define OGRE_GL_MAP_BUFFER_THRESHOLD 0
     #endif
 
-    /** Implementation of HardwareBufferManager for OpenGL. */
+    /** Implementation of HardwareBufferManager for OpenGLES. */
     class _OgrePrivate GLESHardwareBufferManager : public HardwareBufferManager
     {
         protected:
@@ -53,7 +53,7 @@ namespace Ogre {
 
         public:
             GLESHardwareBufferManager();
-            ~GLESHardwareBufferManager();
+            virtual ~GLESHardwareBufferManager();
             /// Creates a vertex buffer
             HardwareVertexBufferSharedPtr createVertexBuffer(size_t vertexSize,
                 size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false);

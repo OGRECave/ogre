@@ -28,35 +28,28 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GLESPBuffer_H__
-#define __GLESPBuffer_H__
+#include "OgreGLESRenderSystem.h"
 
-#include "OgreGLESPrerequisites.h"
+#include "OgreEGLSupport.h"
+#include "OgreGtkEGLContext.h"
+
+#include "OgreRoot.h"
 
 namespace Ogre {
-    class GLContext;
-
-    /** An off-screen rendering context. These contexts are always RGBA for simplicity, speed and
-        convience, but the component format is configurable.
-    */
-    class _OgrePrivate GLESPBuffer
+    GtkEGLContext::GtkEGLContext(EGLDisplay eglDisplay,
+							const EGLSupport* glsupport,
+                           ::EGLConfig glconfig,
+                           ::EGLSurface drawable)
+        : EGLContext(eglDisplay, glsupport, glconfig, drawable)
     {
-        protected:
-            PixelComponentType mFormat;
-            size_t mWidth, mHeight;
+    }
 
-        public:
-            GLESPBuffer(PixelComponentType format, size_t width, size_t height);
-            virtual ~GLESPBuffer();
+    GtkEGLContext::~GtkEGLContext()
+    {
+    }
 
-            PixelComponentType getFormat() { return mFormat; }
-            size_t getWidth() { return mWidth; }
-            size_t getHeight() { return mHeight; }
-
-            /** Get PBuffer component format for an OGRE pixel format.
-             */
-            static PixelComponentType getPixelComponentType(PixelFormat fmt);
-    };
+    GLESContext* GtkEGLContext::clone() const
+    {
+        return new GtkEGLContext(mEglDisplay, mGLSupport, mConfig, mDrawable);
+    }
 }
-
-#endif

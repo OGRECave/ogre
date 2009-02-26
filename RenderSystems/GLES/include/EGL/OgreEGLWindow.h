@@ -38,7 +38,7 @@ Torus Knot Software Ltd.
 namespace Ogre {
     class _OgrePrivate EGLWindow : public RenderWindow
     {
-        private:
+        protected:
             bool mClosed;
             bool mVisible;
             bool mIsTopLevel;
@@ -47,25 +47,37 @@ namespace Ogre {
 
             EGLSupport* mGLSupport;
             EGLContext* mContext;
-            Window mWindow;
+			NativeWindowType mWindow;
+			NativeDisplayType mNativeDisplay;
+			::EGLDisplay mEglDisplay;
 
-            void switchFullScreen(bool fullscreen);
-            ::EGLSurface createSurfaceFromWindow(::EGLDisplay display, Window win, ::EGLConfig config);
 
-        public:
+			::EGLConfig mEglConfig;
+			::EGLSurface mEglSurface;
+
+            ::EGLSurface createSurfaceFromWindow(::EGLDisplay display, NativeWindowType win);
+
+			virtual void switchFullScreen(bool fullscreen) = 0;
+			virtual EGLContext * createEGLContext() const = 0;
+			virtual void getLeftAndTopFromNativeWindow(int & left, int & top) = 0;
+			virtual void initNativeCreatedWindow() = 0;
+			virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title ) = 0;
+			virtual void reposition(int left, int top) = 0;
+			virtual void resize(unsigned int width, unsigned int height) = 0;
+			virtual void windowMovedOrResized() = 0;
+
+	public:
             EGLWindow(EGLSupport* glsupport);
-            ~EGLWindow();
+            virtual ~EGLWindow();
 
             void create(const String& name, unsigned int width, unsigned int height,
                         bool fullScreen, const NameValuePairList *miscParams);
-            void setFullscreen (bool fullscreen, uint width, uint height);
+
+			virtual void setFullscreen (bool fullscreen, uint width, uint height);
             void destroy(void);
             bool isClosed(void) const;
             bool isVisible(void) const;
             void setVisible(bool visible);
-            void reposition(int left, int top);
-            void resize(unsigned int width, unsigned int height);
-            void windowMovedOrResized();
             void swapBuffers(bool waitForVSync);
             void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
 
@@ -74,13 +86,12 @@ namespace Ogre {
                * Get custom attribute; the following attributes are valid:
                * WINDOW         The X Window target for rendering.
                * GLCONTEXT      The Ogre GLContext used for rendering.
-               * DISPLAY        The X Display connection behind that context.
-               * DISPLAYNAME    The X Server name for the connected display.
-               * ATOM           The X Atom used in client delete events.
+               * DISPLAY        EGLDisplay connection behind that context.
+               * DISPLAYNAME    The name for the connected display.
                */
-            void getCustomAttribute(const String& name, void* pData);
+            virtual void getCustomAttribute(const String& name, void* pData);
 
-            bool requiresTextureFlipping() const { return false; }
+            bool requiresTextureFlipping() const;
     };
 }
 

@@ -102,6 +102,20 @@ namespace Ogre {
                                                 const String& syntaxCode)
     {
         // TODO not implemented
-        return 0;
+		class DummyGpuProgram : public GpuProgram
+		{
+		public:
+			DummyGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+				const String& group, bool isManual, ManualResourceLoader* loader)
+				: GpuProgram(creator, name, handle, group, isManual, loader )
+			{};
+			/** @copydoc Resource::unloadImpl */
+			void unloadImpl(void){};
+			/** Overridden from GpuProgram */
+			void loadFromSource(void){};
+
+		};
+		return new DummyGpuProgram(this, name, handle, group, 
+			isManual, loader);
     }
 }

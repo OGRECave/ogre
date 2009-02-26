@@ -311,7 +311,7 @@ namespace Ogre {
 
         // Do mipmapping in software? (uses GLU) For some cards, this is still needed. Of course,
         // only when mipmap generation is desired.
-        bool doSoftware = wantGeneratedMips && !mMipmapsHardwareGenerated && getNumMipmaps();
+        bool doSoftware = true; // seems that hardware doesn't work for OpenGL ES...// wantGeneratedMips && !mMipmapsHardwareGenerated && getNumMipmaps();
 
         for (size_t face = 0; face < getNumFaces(); face++)
         {

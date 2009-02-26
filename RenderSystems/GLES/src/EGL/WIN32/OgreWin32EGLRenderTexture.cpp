@@ -28,35 +28,34 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GLESPBuffer_H__
-#define __GLESPBuffer_H__
+#include "OgreStableHeaders.h"
+
+#include "OgreException.h"
+#include "OgreLogManager.h"
+#include "OgreRoot.h"
+#include "OgreStringConverter.h"
 
 #include "OgreGLESPrerequisites.h"
+#include "OgreGLESRenderSystem.h"
+
+#include "OgreWin32EGLRenderTexture.h"
+#include "OgreWin32EGLContext.h"
+#include "OgreWin32EGLSupport.h"
+
+#include <iostream>
+#include <climits>
 
 namespace Ogre {
-    class GLContext;
 
-    /** An off-screen rendering context. These contexts are always RGBA for simplicity, speed and
-        convience, but the component format is configurable.
-    */
-    class _OgrePrivate GLESPBuffer
-    {
-        protected:
-            PixelComponentType mFormat;
-            size_t mWidth, mHeight;
+	Win32EGLPBuffer::Win32EGLPBuffer( EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height )
+		: EGLPBuffer(glsupport, format, width, height)
+	{
 
-        public:
-            GLESPBuffer(PixelComponentType format, size_t width, size_t height);
-            virtual ~GLESPBuffer();
+	}
 
-            PixelComponentType getFormat() { return mFormat; }
-            size_t getWidth() { return mWidth; }
-            size_t getHeight() { return mHeight; }
+	Win32EGLPBuffer::~Win32EGLPBuffer()
+	{
 
-            /** Get PBuffer component format for an OGRE pixel format.
-             */
-            static PixelComponentType getPixelComponentType(PixelFormat fmt);
-    };
+	}
+
 }
-
-#endif

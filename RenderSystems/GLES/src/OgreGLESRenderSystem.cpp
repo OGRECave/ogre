@@ -27,7 +27,7 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-
+#define NOMINMAX
 #include "OgreGLESRenderSystem.h"
 #include "OgreGLESTextureManager.h"
 #include "OgreGLESDefaultHardwareBufferManager.h"
@@ -236,7 +236,7 @@ namespace Ogre {
         if(caps->getRenderSystemName() != getName())
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Trying to initialize GLESRenderSystem from RenderSystemCapabilities that do not support OpenGL",
+                        "Trying to initialize GLESRenderSystem from RenderSystemCapabilities that do not support OpenGLES",
                         "GLESRenderSystem::initialiseFromRenderSystemCapabilities");
         }
 
@@ -623,6 +623,7 @@ namespace Ogre {
                                                Real minSize,
                                                Real maxSize)
     {
+		 GL_CHECK_ERROR;
         if (attenuationEnabled &&
             mCurrentCapabilities->hasCapability(RSC_POINT_EXTENDED_PARAMETERS))
         {
@@ -1193,6 +1194,11 @@ namespace Ogre {
         }
         else
         {
+			// SBF_SOURCE_COLOUR - not allowed for source - http://www.khronos.org/opengles/sdk/1.1/docs/man/
+			if(sourceFactor == SBF_SOURCE_COLOUR)
+			{
+				sourceBlend = getBlendMode(SBF_SOURCE_ALPHA);
+			}
             glEnable(GL_BLEND);
             GL_CHECK_ERROR;
             glBlendFunc(sourceBlend, destBlend);
@@ -1200,6 +1206,30 @@ namespace Ogre {
         }
     }
 
+	void GLESRenderSystem::_setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op )
+	{
+		 GL_CHECK_ERROR;
+		GLint sourceBlend = getBlendMode(sourceFactor);
+		GLint destBlend = getBlendMode(destFactor);
+		if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO)
+		{
+			glDisable(GL_BLEND);
+			GL_CHECK_ERROR;
+		}
+		else
+		{
+			// SBF_SOURCE_COLOUR - not allowed for source - http://www.khronos.org/opengles/sdk/1.1/docs/man/
+			if(sourceFactor == SBF_SOURCE_COLOUR)
+			{
+				sourceBlend = getBlendMode(SBF_SOURCE_ALPHA);
+			}
+			glEnable(GL_BLEND);
+			GL_CHECK_ERROR;
+			glBlendFunc(sourceBlend, destBlend);
+			GL_CHECK_ERROR;
+		}
+
+	}
     void GLESRenderSystem::_setSeparateSceneBlending(SceneBlendFactor sourceFactor,
                                                    SceneBlendFactor destFactor,
                                                    SceneBlendFactor sourceFactorAlpha,
@@ -1208,21 +1238,36 @@ namespace Ogre {
         // Not supported
     }
 
-    void GLESRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value)
+	void GLESRenderSystem::_setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp )
+	{
+        // Not supported
+	}
+    void GLESRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
-        if (func == CMPF_ALWAYS_PASS)
-        {
-            glDisable(GL_ALPHA_TEST);
-            GL_CHECK_ERROR;
-        }
-        else
-        {
-            glEnable(GL_ALPHA_TEST);
-            GL_CHECK_ERROR;
-            glAlphaFunc(convertCompareFunction(func), value / 255.0f);
-            GL_CHECK_ERROR;
-        }
-    }
+		bool a2c = false;
+		static bool lasta2c = false;
+		if (func == CMPF_ALWAYS_PASS)
+		{
+			glDisable(GL_ALPHA_TEST);
+			GL_CHECK_ERROR;
+		}
+		else
+		{
+			glEnable(GL_ALPHA_TEST);
+			GL_CHECK_ERROR;
+			glAlphaFunc(convertCompareFunction(func), value / 255.0f);
+			GL_CHECK_ERROR;
+		}
+		if (a2c != lasta2c && getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
+		{
+			if (a2c)
+				glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+			else
+				glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+
+			lasta2c = a2c;
+		} 
+	}
 
     void GLESRenderSystem::_setViewport(Viewport *vp)
     {
@@ -1844,6 +1889,7 @@ namespace Ogre {
                                   mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
                                   mDerivedDepthBiasSlopeScale);
                 }
+				GL_CHECK_ERROR;
                 glDrawElements(primType, op.indexData->indexCount, indexType, pBufferData);
                 GL_CHECK_ERROR;
             } while (updatePassIterationRenderState());
@@ -2400,4 +2446,9 @@ namespace Ogre {
     {
         // Not implemented
     }
+
+	unsigned int GLESRenderSystem::getDisplayMonitorCount() const
+	{
+		return 1;
+	}
 }

@@ -32,15 +32,20 @@ Torus Knot Software Ltd.
 #define __GLESPrerequisites_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreMath.h"
 
 #include <GLES/gl.h>
 #include <GLES/egl.h>
+
+#ifndef None
+#define None NULL
+#endif
 
 //PowerVR extension
 #define GL_BGRA_PVR 0x80E1
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
-#   ifdef OGRE_GLPLUGIN_EXPORTS
+#   ifdef OGRE_GLESPLUGIN_EXPORTS
 #       define _OgreGLESExport __declspec(dllexport)
 #   else
 #       if defined( __MINGW32__ )

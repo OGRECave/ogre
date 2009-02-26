@@ -39,7 +39,14 @@ namespace Ogre {
                                                      bool useShadowBuffer)
         : HardwareIndexBuffer(idxType, numIndexes, usage, false, useShadowBuffer)
     {
-        if (!useShadowBuffer)
+		if (idxType == HardwareIndexBuffer::IT_32BIT)
+		{
+			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+				"32 bit hardware buffers are not allowed in OpenGL ES.",
+				"GLESHardwareIndexBuffer");
+		}
+
+		if (!useShadowBuffer)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Only support with shadowBuffer",

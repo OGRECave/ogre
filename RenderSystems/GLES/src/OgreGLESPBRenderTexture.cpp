@@ -74,12 +74,6 @@ namespace Ogre {
             target.buffer = static_cast<GLESHardwarePixelBuffer*>(mBuffer);
             target.zoffset = mZOffset;
         }
-        else if (name == "GLCONTEXT")
-        {
-            // Get PBuffer for our internal format
-            *static_cast<GLESContext**>(pData) =
-                mManager->getContextFor(mPBFormat, mWidth, mHeight);
-        }
     }
 
     GLESPBRTTManager::GLESPBRTTManager(GLESSupport *support, RenderTarget *mainwindow)
@@ -161,20 +155,4 @@ namespace Ogre {
         }
     }
 
-    GLESContext *GLESPBRTTManager::getContextFor(PixelComponentType ctype,
-                                                 size_t width, size_t height)
-    {
-        // Faster to return main context if the RTT is smaller than the window size
-        // and ctype is PCT_BYTE. This must be checked every time because the window might have been resized
-        if (ctype == PCT_BYTE)
-        {
-            if (width <= mMainWindow->getWidth() &&
-                height <= mMainWindow->getHeight())
-            {
-                return mMainContext;
-            }
-        }
-        assert(mPBuffers[ctype].pb);
-        return mPBuffers[ctype].pb->getContext();
-    }
 }

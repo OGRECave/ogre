@@ -59,7 +59,7 @@ namespace Ogre {
             GLESHardwareIndexBuffer(IndexType idxType, size_t numIndexes,
                                   HardwareBuffer::Usage usage,
                                   bool useShadowBuffer);
-            ~GLESHardwareIndexBuffer();
+            virtual ~GLESHardwareIndexBuffer();
             /** See HardwareBuffer. */
             void readData(size_t offset, size_t length, void* pDest);
             /** See HardwareBuffer. */

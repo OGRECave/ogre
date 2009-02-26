@@ -28,34 +28,28 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GLESPBuffer_H__
-#define __GLESPBuffer_H__
+#ifndef __Win32EGLWindow_H__
+#define __Win32EGLWindow_H__
 
-#include "OgreGLESPrerequisites.h"
+#include "OgreEGLWindow.h"
 
 namespace Ogre {
-    class GLContext;
-
-    /** An off-screen rendering context. These contexts are always RGBA for simplicity, speed and
-        convience, but the component format is configurable.
-    */
-    class _OgrePrivate GLESPBuffer
+    class _OgrePrivate Win32EGLWindow : public EGLWindow
     {
-        protected:
-            PixelComponentType mFormat;
-            size_t mWidth, mHeight;
+	protected:
+		virtual EGLContext * createEGLContext() const;
+		virtual void getLeftAndTopFromNativeWindow(int & left, int & top);
+		virtual void initNativeCreatedWindow();
+		virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
+		virtual void reposition(int left, int top);
+		virtual void resize(unsigned int width, unsigned int height);
+		virtual void windowMovedOrResized();
+		virtual void switchFullScreen(bool fullscreen);
 
-        public:
-            GLESPBuffer(PixelComponentType format, size_t width, size_t height);
-            virtual ~GLESPBuffer();
+    public:
+		Win32EGLWindow(EGLSupport* glsupport);
+		virtual ~Win32EGLWindow();
 
-            PixelComponentType getFormat() { return mFormat; }
-            size_t getWidth() { return mWidth; }
-            size_t getHeight() { return mHeight; }
-
-            /** Get PBuffer component format for an OGRE pixel format.
-             */
-            static PixelComponentType getPixelComponentType(PixelFormat fmt);
     };
 }
 

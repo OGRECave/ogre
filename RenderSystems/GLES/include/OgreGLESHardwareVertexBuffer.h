@@ -35,7 +35,7 @@ Torus Knot Software Ltd.
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
-    /// Specialisation of HardwareVertexBuffer for OpenGL
+    /// Specialisation of HardwareVertexBuffer for OpenGLES
     class _OgrePrivate GLESHardwareVertexBuffer : public HardwareVertexBuffer
     {
         private:
@@ -58,7 +58,7 @@ namespace Ogre {
         public:
             GLESHardwareVertexBuffer(size_t vertexSize, size_t numVertices,
                                    HardwareBuffer::Usage usage, bool useShadowBuffer);
-            ~GLESHardwareVertexBuffer();
+            virtual ~GLESHardwareVertexBuffer();
 
             /** See HardwareBuffer. */
             void readData(size_t offset, size_t length, void* pDest);

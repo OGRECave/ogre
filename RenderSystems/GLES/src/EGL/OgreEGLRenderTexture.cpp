@@ -49,11 +49,10 @@ namespace Ogre {
     EGLPBuffer::EGLPBuffer(EGLSupport* glsupport, PixelComponentType format,
                            size_t width, size_t height)
         : mGLSupport(glsupport),
-          GLESPBuffer(format, width, height),
-          mContext(0)
+          GLESPBuffer(format, width, height)
     {
-        ::EGLDisplay glDisplay = mGLSupport->getGLDisplay();
-        ::EGLSurface eglDrawable = 0;
+        mGlDisplay = mGLSupport->getGLDisplay();
+        mEglDrawable = 0;
         ::EGLConfig glConfig = 0;
 
         bool isFloat = false;
@@ -101,19 +100,26 @@ namespace Ogre {
         };
 
         int pBufferAttribs[] = {
+			// First we specify the width of the surface...
             EGL_WIDTH, mWidth,
+			// ...then the height of the surface...
             EGL_HEIGHT, mHeight,
+			/* ... then we specifiy the target for the texture
+			that will be created when the pbuffer is created...*/
+			EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
+			/*..then the format of the texture that will be created
+			when the pBuffer is bound to a texture...*/
             EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGB,
-            EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
+			// The final thing is EGL_NONE which signifies the end.
             EGL_NONE
         };
 
         glConfig = mGLSupport->selectGLConfig(minAttribs, maxAttribs);
         EGL_CHECK_ERROR;
-        eglDrawable = eglCreatePbufferSurface(glDisplay, glConfig, pBufferAttribs);
+        mEglDrawable = eglCreatePbufferSurface(mGlDisplay, glConfig, pBufferAttribs);
         EGL_CHECK_ERROR;
 
-        if (!glConfig || !eglDrawable)
+        if (!glConfig || !mEglDrawable)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Unable to create Pbuffer",
@@ -123,11 +129,11 @@ namespace Ogre {
         GLint glConfigID;
         GLint iWidth, iHeight;
 
-        eglGetConfigAttrib(glDisplay, glConfig, EGL_CONFIG_ID, &glConfigID);
+        eglGetConfigAttrib(mGlDisplay, glConfig, EGL_CONFIG_ID, &glConfigID);
         EGL_CHECK_ERROR;
-        eglQuerySurface(glDisplay, eglDrawable, EGL_WIDTH, &iWidth);
+        eglQuerySurface(mGlDisplay, mEglDrawable, EGL_WIDTH, &iWidth);
         EGL_CHECK_ERROR;
-        eglQuerySurface(glDisplay, eglDrawable, EGL_HEIGHT, &iHeight);
+        eglQuerySurface(mGlDisplay, mEglDrawable, EGL_HEIGHT, &iHeight);
         EGL_CHECK_ERROR;
 
         mWidth = iWidth;
@@ -135,18 +141,13 @@ namespace Ogre {
         LogManager::getSingleton().logMessage(LML_NORMAL, "EGLPBuffer::create used final dimensions " + StringConverter::toString(mWidth) + " x " + StringConverter::toString(mHeight));
         LogManager::getSingleton().logMessage("EGLPBuffer::create used FBConfigID " + StringConverter::toString(glConfigID));
 
-        mContext = new EGLContext(mGLSupport, glConfig, eglDrawable);
     }
 
     EGLPBuffer::~EGLPBuffer()
     {
-        eglDestroySurface(mGLSupport->getGLDisplay(), mContext->mDrawable);
-        delete mContext;
+		eglDestroySurface(mGlDisplay, mEglDrawable);
         LogManager::getSingleton().logMessage(LML_NORMAL, "EGLPBuffer::PBuffer destroyed");
     }
 
-    GLESContext *EGLPBuffer::getContext()
-    {
-        return mContext;
-    }
+
 }

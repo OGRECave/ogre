@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
@@ -28,35 +28,37 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GLESPBuffer_H__
-#define __GLESPBuffer_H__
+#ifndef __EGLSupport_H__
+#define __EGLSupport_H__
 
-#include "OgreGLESPrerequisites.h"
+
+#include <X11/Xutil.h>
+
+#include "OgreEGLSupport.h"
 
 namespace Ogre {
-    class GLContext;
-
-    /** An off-screen rendering context. These contexts are always RGBA for simplicity, speed and
-        convience, but the component format is configurable.
-    */
-    class _OgrePrivate GLESPBuffer
+    class _OgrePrivate GtkEGLSupport : public EGLSupport
     {
-        protected:
-            PixelComponentType mFormat;
-            size_t mWidth, mHeight;
+		protected:
+			virtual EGLWindow* createEGLWindow( EGLSupport * support);
 
+			Display* getXDisplay(void);
+			XVisualInfo *getVisualFromFBConfig(::EGLConfig glConfig);
+			virtual NativeDisplayType getNativeDisplayType();
+			Atom mAtomDeleteWindow;
+			Atom mAtomFullScreen;
+			Atom mAtomState;
         public:
-            GLESPBuffer(PixelComponentType format, size_t width, size_t height);
-            virtual ~GLESPBuffer();
+            GtkEGLSupport();
+            virtual ~GtkEGLSupport();
 
-            PixelComponentType getFormat() { return mFormat; }
-            size_t getWidth() { return mWidth; }
-            size_t getHeight() { return mHeight; }
+			virtual GLESPBuffer* createPBuffer(PixelComponentType format,
+				size_t width, size_t height);
 
-            /** Get PBuffer component format for an OGRE pixel format.
-             */
-            static PixelComponentType getPixelComponentType(PixelFormat fmt);
-    };
+			virtual void switchMode(uint& width, uint& height, short& frequency);
+
+
+	};
 }
 
 #endif

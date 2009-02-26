@@ -27,7 +27,6 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-
 #include "OgreGLESRenderSystem.h"
 
 #include "OgreEGLSupport.h"
@@ -36,14 +35,17 @@ Torus Knot Software Ltd.
 #include "OgreRoot.h"
 
 namespace Ogre {
-    EGLContext::EGLContext(EGLSupport* glsupport,
+    EGLContext::EGLContext(EGLDisplay eglDisplay,
+							const EGLSupport* glsupport,
                            ::EGLConfig glconfig,
                            ::EGLSurface drawable)
         : mGLSupport(glsupport),
           mDrawable(drawable),
           mContext(0),
-          mConfig(glconfig)
+          mConfig(glconfig),
+		  mEglDisplay(eglDisplay)
     {
+		assert(drawable);
         GLESRenderSystem* renderSystem =
             static_cast<GLESRenderSystem*>(Root::getSingleton().getRenderSystem());
         EGLContext* mainContext =
@@ -55,7 +57,7 @@ namespace Ogre {
             shareContext = mainContext->mContext;
         }
 
-        mContext = mGLSupport->createNewContext(mConfig, shareContext);
+        mContext = mGLSupport->createNewContext(eglDisplay, mConfig, shareContext);
 
         if (!mContext)
         {
@@ -70,13 +72,13 @@ namespace Ogre {
         GLESRenderSystem *rs =
             static_cast<GLESRenderSystem*>(Root::getSingleton().getRenderSystem());
 
-        eglDestroyContext(mGLSupport->getGLDisplay(), mContext);
+        eglDestroyContext(mEglDisplay, mContext);
         rs->_unregisterContext(this);
     }
 
     void EGLContext::setCurrent()
     {
-        EGLBoolean ret = eglMakeCurrent(mGLSupport->getGLDisplay(),
+        EGLBoolean ret = eglMakeCurrent(mEglDisplay,
                                         mDrawable, mDrawable, mContext);
         if (!ret)
         {
@@ -88,11 +90,11 @@ namespace Ogre {
 
     void EGLContext::endCurrent()
     {
-        eglMakeCurrent(mGLSupport->getGLDisplay(), None, None, None);
+		eglMakeCurrent(mEglDisplay, None, None, None);
     }
 
-    GLESContext* EGLContext::clone() const
-    {
-        return new EGLContext(mGLSupport, mConfig, mDrawable);
-    }
+	EGLSurface EGLContext::getDrawable() const
+	{
+		return mDrawable;
+	}
 }

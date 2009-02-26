@@ -391,6 +391,7 @@ namespace Ogre {
                 GL_CHECK_ERROR;
             }
 
+			GL_CHECK_ERROR;
             glTexSubImage2D(GL_TEXTURE_2D,
                             mLevel,
                             data.left, data.top,

@@ -69,7 +69,6 @@ namespace Ogre {
             virtual void unbind(RenderTarget *target);
             void requestPBuffer(PixelComponentType ctype, size_t width, size_t height);
             void releasePBuffer(PixelComponentType ctype);
-            GLESContext *getContextFor(PixelComponentType ctype, size_t width, size_t height);
 
         protected:
             GLESSupport *mSupport;

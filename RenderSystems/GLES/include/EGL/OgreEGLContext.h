@@ -38,21 +38,23 @@ namespace Ogre {
 
     class _OgrePrivate EGLContext: public GLESContext
     {
-        private:
+        protected:
             ::EGLConfig    mConfig;
-            EGLSupport*    mGLSupport;
-
+            const EGLSupport*    mGLSupport;
+			::EGLSurface   mDrawable;
+			::EGLContext   mContext;
+			EGLDisplay mEglDisplay;
         public:
-            EGLContext(EGLSupport* glsupport, ::EGLConfig fbconfig, ::EGLSurface drawable);
+            EGLContext(EGLDisplay eglDisplay, const EGLSupport* glsupport, ::EGLConfig fbconfig, ::EGLSurface drawable);
 
             virtual ~EGLContext();
 
             virtual void setCurrent();
             virtual void endCurrent();
-            GLESContext* clone() const;
+            virtual GLESContext* clone() const = 0;
 
-            ::EGLSurface   mDrawable;
-            ::EGLContext   mContext;
+			EGLSurface getDrawable() const;
+
     };
 }
 

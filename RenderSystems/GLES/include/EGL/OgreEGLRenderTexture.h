@@ -33,7 +33,8 @@ Torus Knot Software Ltd.
 
 #include "OgrePrerequisites.h"
 #include "OgreGLESPBuffer.h"
-
+#include "OgreEGLContext.h"
+#include "OgreEGLSupport.h"
 namespace Ogre
 {
     class GLESContext;
@@ -43,14 +44,13 @@ namespace Ogre
     class _OgrePrivate EGLPBuffer : public GLESPBuffer
     {
         protected:
-            EGLContext*   mContext;
             EGLSupport*   mGLSupport;
-
+			::EGLDisplay mGlDisplay;
+			::EGLSurface mEglDrawable;
         public:
             EGLPBuffer(EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height);
-            ~EGLPBuffer();
+            virtual ~EGLPBuffer();
 
-            virtual GLESContext *getContext();
     };
 }
 

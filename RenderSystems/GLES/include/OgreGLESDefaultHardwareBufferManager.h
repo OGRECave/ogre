@@ -50,7 +50,7 @@ namespace Ogre {
         public:
             GLESDefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices,
                                           HardwareBuffer::Usage usage);
-            ~GLESDefaultHardwareVertexBuffer();
+            virtual ~GLESDefaultHardwareVertexBuffer();
             /** See HardwareBuffer. */
             void readData(size_t offset, size_t length, void* pDest);
             /** See HardwareBuffer. */
@@ -76,7 +76,7 @@ namespace Ogre {
 
         public:
             GLESDefaultHardwareIndexBuffer(IndexType idxType, size_t numIndexes, HardwareBuffer::Usage usage);
-            ~GLESDefaultHardwareIndexBuffer();
+            virtual ~GLESDefaultHardwareIndexBuffer();
             /** See HardwareBuffer. */
             void readData(size_t offset, size_t length, void* pDest);
             /** See HardwareBuffer. */
@@ -101,7 +101,7 @@ namespace Ogre {
     {
         public:
             GLESDefaultHardwareBufferManager();
-            ~GLESDefaultHardwareBufferManager();
+            virtual ~GLESDefaultHardwareBufferManager();
             // Creates a vertex buffer
             HardwareVertexBufferSharedPtr
                 createVertexBuffer(size_t vertexSize, size_t numVerts,
@@ -110,6 +110,8 @@ namespace Ogre {
             HardwareIndexBufferSharedPtr
                 createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes,
                     HardwareBuffer::Usage usage, bool useShadowBuffer = false);
+
+			RenderToVertexBufferSharedPtr createRenderToVertexBuffer(void);
     };
 }
 

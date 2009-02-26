@@ -40,111 +40,23 @@ Torus Knot Software Ltd.
 #include "OgreEGLWindow.h"
 #include "OgreEGLRenderTexture.h"
 
-#include <X11/extensions/Xrandr.h>
-#include <X11/Xutil.h>
 
 namespace Ogre {
-    template<class C> void removeDuplicates(C& c)
-    {
-        std::sort(c.begin(), c.end());
-        typename C::iterator p = std::unique(c.begin(), c.end());
-        c.erase(p, c.end());
-    }
+
 
     EGLSupport::EGLSupport()
         : mGLDisplay(0),
-          mXDisplay(0),
-          mRandr(false)
+          mNativeDisplay(0),
+		  mRandr(false)
     {
         mGLDisplay = getGLDisplay();
-        mXDisplay = getXDisplay();
+		mNativeDisplay = getNativeDisplayType();
 
-        int dummy;
-
-        if (XQueryExtension(mXDisplay, "RANDR", &dummy, &dummy, &dummy))
-        {
-            XRRScreenConfiguration *screenConfig;
-
-            mRandr = true;
-            screenConfig = XRRGetScreenInfo(mXDisplay, DefaultRootWindow(mXDisplay));
-
-            if (screenConfig)
-            {
-                XRRScreenSize *screenSizes;
-                int nSizes = 0;
-                Rotation currentRotation;
-                int currentSizeID = XRRConfigCurrentConfiguration(screenConfig, &currentRotation);
-
-                screenSizes = XRRConfigSizes(screenConfig, &nSizes);
-                mCurrentMode.first.first = screenSizes[currentSizeID].width;
-                mCurrentMode.first.second = screenSizes[currentSizeID].height;
-                mCurrentMode.second = XRRConfigCurrentRate(screenConfig);
-                mOriginalMode = mCurrentMode;
-
-                for (int sizeID = 0; sizeID < nSizes; sizeID++)
-                {
-                    short *rates;
-                    int nRates = 0;
-
-                    rates = XRRConfigRates(screenConfig, sizeID, &nRates);
-                    for (int rate = 0; rate < nRates; rate++)
-                    {
-                        VideoMode mode;
-
-                        mode.first.first = screenSizes[sizeID].width;
-                        mode.first.second = screenSizes[sizeID].height;
-                        mode.second = rates[rate];
-
-                        mVideoModes.push_back(mode);
-                    }
-                }
-                XRRFreeScreenConfigInfo(screenConfig);
-            }
-        }
-        else
-        {
-            mCurrentMode.first.first = DisplayWidth(mXDisplay, DefaultScreen(mXDisplay));
-            mCurrentMode.first.second = DisplayHeight(mXDisplay, DefaultScreen(mXDisplay));
-            mCurrentMode.second = 0;
-            mOriginalMode = mCurrentMode;
-            mVideoModes.push_back(mCurrentMode);
-        }
-
-        EGLConfig *glConfigs;
-        int config, nConfigs = 0;
-
-        glConfigs = chooseGLConfig(NULL, &nConfigs);
-
-        for (config = 0; config < nConfigs; config++)
-        {
-            int caveat, samples;
-
-            getGLConfigAttrib(glConfigs[config], EGL_CONFIG_CAVEAT, &caveat);
-
-            if (caveat != EGL_SLOW_CONFIG)
-            {
-                getGLConfigAttrib(glConfigs[config], EGL_SAMPLES, &samples);
-                mSampleLevels.push_back(StringConverter::toString(samples));
-            }
-        }
-
-        free(glConfigs);
-
-        removeDuplicates(mSampleLevels);
     }
 
     EGLSupport::~EGLSupport()
     {
-        if (!mXDisplay)
-        {
-            XCloseDisplay(mXDisplay);
-        }
-
-        if (!mGLDisplay)
-        {
-            eglTerminate(mGLDisplay);
-        }
-    }
+	}
 
     void EGLSupport::addConfig(void)
     {
@@ -263,19 +175,25 @@ namespace Ogre {
         return StringUtil::BLANK;
     }
 
+	NativeDisplayType EGLSupport::getNativeDisplayType()
+	{
+		return EGL_DEFAULT_DISPLAY; // TODO
+	}
+
     EGLDisplay EGLSupport::getGLDisplay(void)
     {
         if (!mGLDisplay)
         {
-            Display *xdisplay;
             EGLint major, minor;
 
-            xdisplay = getXDisplay();
-            mGLDisplay = eglGetDisplay((NativeDisplayType) xdisplay);
+            mNativeDisplay = getNativeDisplayType();
+
+			mGLDisplay = eglGetDisplay(mNativeDisplay);
+
             if(mGLDisplay == EGL_NO_DISPLAY)
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "Couldn`t open X display " + String((const char*)XDisplayName(0)),
+                            "Couldn`t open X display " + getDisplayName(),
                             "EGLSupport::getGLDisplay");
             }
 
@@ -286,35 +204,14 @@ namespace Ogre {
                             "EGLSupport::getGLDisplay");
             }
         }
-
-        return mGLDisplay;
+		return mGLDisplay;
     }
 
-    Display* EGLSupport::getXDisplay(void)
-    {
-        if (!mXDisplay)
-        {
-            mXDisplay = XOpenDisplay(0);
-
-            if (!mXDisplay)
-            {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "Couldn`t open X display",
-                            "EGLSupport::getXDisplay");
-            }
-
-            mAtomDeleteWindow = XInternAtom(mXDisplay, "WM_DELETE_WINDOW", True);
-            mAtomFullScreen = XInternAtom(mXDisplay, "_NET_WM_STATE_FULLSCREEN", True);
-            mAtomState = XInternAtom(mXDisplay, "_NET_WM_STATE", True);
-        }
-
-        return mXDisplay;
-    }
 
     String EGLSupport::getDisplayName(void)
     {
-        return String((const char*)XDisplayName(DisplayString(mXDisplay)));
-    }
+		return "todo";
+	}
 
     EGLConfig* EGLSupport::chooseGLConfig(const GLint *attribList, GLint *nElements)
     {
@@ -329,7 +226,7 @@ namespace Ogre {
 
             *nElements = 0;
             return None;
-        }
+		}
 
         configs = (EGLConfig*) malloc(*nElements * sizeof(EGLConfig));
         if (eglChooseConfig(mGLDisplay, attribList, configs, *nElements, nElements) == EGL_FALSE)
@@ -340,7 +237,7 @@ namespace Ogre {
 
             *nElements = 0;
             free(configs);
-            return None;
+			return None;
         }
 
         return configs;
@@ -501,61 +398,6 @@ namespace Ogre {
         return glConfig;
     }
 
-    void EGLSupport::switchMode(uint& width, uint& height, short& frequency)
-    {
-        if (!mRandr)
-            return;
-
-        int size = 0;
-        int newSize = -1;
-
-        VideoModes::iterator mode;
-        VideoModes::iterator end = mVideoModes.end();
-        VideoMode *newMode = 0;
-
-        for(mode = mVideoModes.begin(); mode != end; size++)
-        {
-            if (mode->first.first >= static_cast<int>(width) &&
-                mode->first.second >= static_cast<int>(height))
-            {
-                if (!newMode ||
-                    mode->first.first < newMode->first.first ||
-                    mode->first.second < newMode->first.second)
-                {
-                    newSize = size;
-                    newMode = &(*mode);
-                }
-            }
-
-            VideoMode* lastMode = &(*mode);
-
-            while (++mode != end && mode->first == lastMode->first)
-            {
-                if (lastMode == newMode && mode->second == frequency)
-                {
-                    newMode = &(*mode);
-                }
-            }
-        }
-
-        if (newMode && *newMode != mCurrentMode)
-        {
-            XRRScreenConfiguration *screenConfig =
-                XRRGetScreenInfo(mXDisplay, DefaultRootWindow(mXDisplay));
-            if (screenConfig)
-            {
-                Rotation currentRotation;
-
-                XRRConfigCurrentConfiguration (screenConfig, &currentRotation);
-                XRRSetScreenConfigAndRate(mXDisplay, screenConfig, DefaultRootWindow(mXDisplay),
-                                          newSize, currentRotation, newMode->second, CurrentTime);
-                XRRFreeScreenConfigInfo(screenConfig);
-                mCurrentMode = *newMode;
-                LogManager::getSingleton().logMessage("Entered video mode " + StringConverter::toString(mCurrentMode.first.first) + "x" + StringConverter::toString(mCurrentMode.first.second) + " @ " + StringConverter::toString(mCurrentMode.second) + "MHz");
-            }
-        }
-    }
-
     void EGLSupport::switchMode(void)
     {
         return switchMode(mOriginalMode.first.first,
@@ -615,18 +457,28 @@ namespace Ogre {
                                         bool fullScreen,
                                         const NameValuePairList *miscParams)
     {
-        EGLWindow* window = new EGLWindow(this);
+        EGLWindow* window = createEGLWindow(this);
 
         window->create(name, width, height, fullScreen, miscParams);
 
         return window;
     }
 
-    ::EGLContext EGLSupport::createNewContext(::EGLConfig glconfig,
-                                              ::EGLContext shareList)
+    ::EGLContext EGLSupport::createNewContext(EGLDisplay eglDisplay,
+											  ::EGLConfig glconfig,
+                                              ::EGLContext shareList) const 
     {
-        ::EGLContext context = eglCreateContext(mGLDisplay, glconfig, 0, 0);
-        if (context == ((::EGLContext) 0))
+		::EGLContext context = ((::EGLContext) 0);
+		if (eglDisplay == ((EGLDisplay) 0))
+		{
+			context = eglCreateContext(mGLDisplay, glconfig, shareList, 0);
+		}
+		else
+		{
+			context = eglCreateContext(eglDisplay, glconfig, 0, 0);
+		}
+
+		if (context == ((::EGLContext) 0))
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Fail to create New context",
@@ -637,53 +489,6 @@ namespace Ogre {
         return context;
     }
 
-    GLESPBuffer *EGLSupport::createPBuffer(PixelComponentType format,
-                                           size_t width, size_t height)
-    {
-        return new EGLPBuffer(this, format, width, height);
-    }
-
-    XVisualInfo *EGLSupport::getVisualFromFBConfig(::EGLConfig glConfig)
-    {
-        XVisualInfo *vi, tmp;
-        int vid, n;
-        ::EGLDisplay glDisplay;
-        Display *xDisplay;
-
-        glDisplay = getGLDisplay();
-        xDisplay = getXDisplay();
-
-        if (eglGetConfigAttrib(glDisplay, glConfig, EGL_NATIVE_VISUAL_ID, &vid) == EGL_FALSE)
-        {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Fail to get VISUAL_ID from glConfig",
-                        __FUNCTION__);
-            return 0;
-        }
-
-        if (vid == 0)
-        {
-            const int screen_number = DefaultScreen(xDisplay);
-            Visual *v = DefaultVisual(xDisplay, screen_number);
-            vid = XVisualIDFromVisual(v);
-        }
-
-        tmp.visualid = vid;
-        vi = 0;
-        vi = XGetVisualInfo(xDisplay,
-                            VisualIDMask,
-                            &tmp, &n);
-        if (vi == 0)
-        {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Fail to get X11 VISUAL",
-                        __FUNCTION__);
-            return 0;
-        }
-
-        return vi;
-    }
-
     void EGLSupport::start()
     {
     }
@@ -691,4 +496,9 @@ namespace Ogre {
     void EGLSupport::stop()
     {
     }
+
+	void EGLSupport::setGLDisplay( EGLDisplay val )
+	{
+		mGLDisplay = val;
+	}
 }

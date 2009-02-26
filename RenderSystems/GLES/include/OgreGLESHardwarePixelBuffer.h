@@ -70,7 +70,7 @@ namespace Ogre {
             void blitFromMemory(const PixelBox &src, const Image::Box &dstBox);
             void blitToMemory(const Image::Box &srcBox, const PixelBox &dst);
 
-            ~GLESHardwarePixelBuffer();
+            virtual ~GLESHardwarePixelBuffer();
 
             /** Bind surface to frame buffer. Needs FBO extension.
             */
@@ -88,7 +88,7 @@ namespace Ogre {
                             GLint width, GLint height, GLint format,
                             GLint face,
                             GLint level, Usage usage, bool softwareMipmap, bool writeGamma, uint fsaa);
-            ~GLESTextureBuffer();
+            virtual ~GLESTextureBuffer();
 
             RenderTexture* getRenderTarget(size_t);
 
@@ -123,7 +123,7 @@ namespace Ogre {
     {
         public:
             GLESRenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples);
-            ~GLESRenderBuffer();
+            virtual ~GLESRenderBuffer();
 
             virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
 

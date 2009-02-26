@@ -57,7 +57,7 @@ namespace Ogre {
 
         public:
             GLESGpuProgramManager();
-            ~GLESGpuProgramManager();
+            virtual ~GLESGpuProgramManager();
             bool registerProgramFactory(const String& syntaxCode, CreateGpuProgramCallback createFn);
             bool unregisterProgramFactory(const String& syntaxCode);
     };

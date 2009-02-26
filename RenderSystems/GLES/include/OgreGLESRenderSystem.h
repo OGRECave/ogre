@@ -97,7 +97,7 @@ namespace Ogre {
         public:
             // Default constructor / destructor
             GLESRenderSystem();
-            ~GLESRenderSystem();
+            virtual ~GLESRenderSystem();
 
             const String& getName(void) const;
             ConfigOptionMap& getConfigOptions(void);
@@ -206,6 +206,15 @@ namespace Ogre {
             void unbindGpuProgram(GpuProgramType gptype);
             void bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask);
             void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
+
+			/// @copydoc RenderSystem::_setSceneBlending
+			void _setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op );
+			/// @copydoc RenderSystem::_setSeparateSceneBlending
+			void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
+			/// @copydoc RenderSystem::_setAlphaRejectSettings
+			void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
+			/// @copydoc RenderSystem::getDisplayMonitorCount
+			unsigned int getDisplayMonitorCount() const;
     };
 }
 
