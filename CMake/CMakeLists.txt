@@ -16,6 +16,8 @@ set(INST_FILES
   Packages/FindOGRE.cmake
   Utils/FindPkgMacros.cmake
   Utils/OgreInstall.cmake
+  Utils/OgreConfigBuild.cmake
+  Templates/VisualStudioUserFile.vcproj.user.in
 ) 
 install(FILES ${INST_FILES} DESTINATION ${OGRE_CMAKE_DIR})
 

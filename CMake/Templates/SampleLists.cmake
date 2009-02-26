@@ -13,7 +13,14 @@ set(CMAKE_MODULE_PATH
   "${OGRE3D_SOURCE_DIR}/../cmake"
   "${OGRE3D_SOURCE_DIR}/../../../lib/cmake"
 )
+if (WIN32)
+  set(OGRE_TEMPLATES_DIR "${OGRE3D_SOURCE_DIR}/../cmake")
+elseif (UNIX)
+  set(OGRE_TEMPLATES_DIR "${OGRE3D_SOURCE_DIR}/../../../lib/cmake")
+else ()
+endif ()
 include(OgreInstall)
+include(OgreConfigBuild)
 set(CMAKE_PREFIX_PATH 
   "${OGRE3D_SOURCE_DIR}/../"
   "${OGRE3D_SOURCE_DIR}/../../../"

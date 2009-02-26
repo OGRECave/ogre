@@ -3,5 +3,6 @@
 set(SOURCE_FILES src/Fresnel.cpp)
 
 add_executable(Demo_Fresnel WIN32 ${SOURCE_FILES})
+ogre_config_build(Demo_Fresnel)
 target_link_libraries(Demo_Fresnel ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_install_sample(Demo_Fresnel)

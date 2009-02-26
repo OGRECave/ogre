@@ -479,6 +479,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/nedmalloc)
 
 # setup OgreMain target
 add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
+ogre_config_build(OgreMain)
 set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OGRE_VERSION_MAJOR})
 target_link_libraries(OgreMain
   ${ZLIB_LIBRARIES}

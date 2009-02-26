@@ -3,8 +3,6 @@ TODO
 
 Essential before switch-on as primary system
 
-* Debugging from VStudio
-* Missing dependency DLLs (OIS, CEGUI, Cg)
 * Install samples sources
   * Should probably rearrange the samples directory
 * SDK testing
@@ -24,4 +22,6 @@ OGRE CHANGES ONCE LIVE
 
 - Remove OgreConfig.h from OgreMain/include => CMakeTemplates/OgreConfig.h.in
 - Move Ogre version information from OgrePrerequisites.h => CMakeTemplates/OgreVersion.h.in
+- NOTE: If a custom XCode project is kept, OgreConfig.h and OgreVersion.h must still be
+  provided. CMake builds will use the generated versions instead.
 - Docs/src/html.cfg is no longer necessary as it is generated from CMakeTemplates/html.cfg.in

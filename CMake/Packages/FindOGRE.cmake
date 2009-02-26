@@ -74,7 +74,9 @@ if (OGRE_PCZ_FOUND)
   endif()
 endif()
 
-set(CMAKE_FIND_LIBRARY_PREFIXES ${TMP_CMAKE_LIB_PREFIX})
+if (TMP_CMAKE_LIB_PREFIX)
+  set(CMAKE_FIND_LIBRARY_PREFIXES ${TMP_CMAKE_LIB_PREFIX})
+endif ()
 
 # look for CEGUI Ogre Renderer
 find_package(CEGUI QUIET)

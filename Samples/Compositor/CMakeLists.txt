@@ -14,5 +14,6 @@ set(SOURCE_FILES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/CEGUIRenderer/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_Compositor WIN32 ${HEADER_FILES} ${SOURCE_FILES})
+ogre_config_build(Demo_Compositor)
 target_link_libraries(Demo_Compositor ${OGRE_LIBRARIES} ${CEGUI_LIBRARIES} ${OGRE_CEGUI_LIBRARIES} ${OIS_LIBRARIES})
 ogre_install_sample(Demo_Compositor)

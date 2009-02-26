@@ -32,6 +32,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../PCZSceneManager/include)
 add_definitions(-D_USRDLL)
 
 add_library(Plugin_OctreeZone ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
+ogre_config_build(Plugin_OctreeZone)
 target_link_libraries(Plugin_OctreeZone OgreMain Plugin_PCZSceneManager)
 
 if (NOT OGRE_STATIC)

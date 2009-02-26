@@ -18,8 +18,8 @@ set(CMAKE_MODULE_PATH
   "${OGRE3D_SOURCE_DIR}/CMake/Packages"
 )
 include(MacroLogFeature)
-include(Packaging)
 include(OgreInstall)
+include(OgreConfigBuild)
 set(OGRE_TEMPLATES_DIR "${OGRE3D_SOURCE_DIR}/CMake/Templates")
 
 
@@ -182,3 +182,6 @@ add_subdirectory(CMake)
 
 # Install dependencies
 add_subdirectory(Dependencies)
+
+# Provide CPack packaging target
+include(Packaging)

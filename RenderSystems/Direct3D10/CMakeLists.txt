@@ -70,6 +70,7 @@ link_directories(${DirectX_LIBRARY_PATHS})
 add_definitions(-D_USRDLL)
 
 add_library(RenderSystem_Direct3D10 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
+ogre_config_build(RenderSystem_Direct3D10)
 target_link_libraries(RenderSystem_Direct3D10
   OgreMain
   d3d10

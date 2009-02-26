@@ -31,6 +31,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_definitions(-D_USRDLL)
 
 add_library(Plugin_BSPSceneManager ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
+ogre_config_build(Plugin_BSPSceneManager)
 target_link_libraries(Plugin_BSPSceneManager OgreMain)
 
 if (NOT OGRE_STATIC)
