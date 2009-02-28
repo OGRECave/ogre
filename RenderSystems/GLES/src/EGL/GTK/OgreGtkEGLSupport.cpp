@@ -42,22 +42,53 @@ Torus Knot Software Ltd.
 #include "OgreGtkEGLContext.h"
 
 
-#include <X11/extensions/Xrandr.h>
-#include <X11/Xutil.h>
+#if (OGRE_PLATFORM != OGRE_PLATFORM_LINUX)
+	void XStringListToTextProperty(char ** prop, int num, XTextProperty * textProp){};
+	NativeWindowType DefaultRootWindow(NativeDisplayType nativeDisplayType){return NativeWindowType();};
+	bool XQueryExtension(NativeDisplayType nativeDisplayType, char * name, int * dummy0, int * dummy2, int * dummy3){return 0;}
+	XRRScreenConfiguration * XRRGetScreenInfo(NativeDisplayType nativeDisplayType, NativeWindowType window ){return 0;};
+	int XRRConfigCurrentConfiguration(XRRScreenConfiguration * config, Rotation * rotation){return 0;};
+	XRRScreenSize * XRRConfigSizes(XRRScreenConfiguration * config, int * nSizes){return 0;};
+	int XRRConfigCurrentRate(XRRScreenConfiguration * config){return 0;};
+	short * XRRConfigRates(XRRScreenConfiguration * config, int sizeID, int * nRates){return 0;};
+	void XRRFreeScreenConfigInfo(XRRScreenConfiguration * config){}
+	int DefaultScreen(NativeDisplayType nativeDisplayType){return 0;};
+	int DisplayWidth(NativeDisplayType nativeDisplayType, int screen){return 0;};
+	int DisplayHeight(NativeDisplayType nativeDisplayType, int screen){return 0;};
+	NativeDisplayType XOpenDisplay(int num){return NativeDisplayType();};
+	void XCloseDisplay(NativeDisplayType nativeDisplayType){};
+	Atom XInternAtom(NativeDisplayType nativeDisplayType, char * name, GtkBool isTrue) {return Atom();};
+	char * DisplayString(NativeDisplayType nativeDisplayType){return 0;};
+	const char * XDisplayName(char * name){return 0;};
+	Visual * DefaultVisual(NativeDisplayType nativeDisplayType,  int screen){return 0;};
+	int XVisualIDFromVisual(Visual *v){return 0;};
+	void XRRSetScreenConfigAndRate(NativeDisplayType nativeDisplayType, XRRScreenConfiguration * config, NativeWindowType window, int size, Rotation rotation, int mode, int currentTime ){};
+	XVisualInfo * XGetVisualInfo(NativeDisplayType nativeDisplayType,  int mask, XVisualInfo * info, int * n){return 0;};
+	typedef int (*XErrorHandler)(Display *, XErrorEvent*);
+	XErrorHandler XSetErrorHandler(XErrorHandler xErrorHandler){return 0;};
+	void XDestroyWindow(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType){};
+	bool XGetWindowAttributes(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, XWindowAttributes * xWindowAttributes){return 0;};
+	int XCreateColormap(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, int visual, int allocNone){return 0;};
+	NativeWindowType XCreateWindow(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, int left, int top, int width, int height, int dummy1, int depth, int inputOutput, int visual, int mask, XSetWindowAttributes * xSetWindowAttributes){return NativeWindowType();};
+	void XFree(void *data){};
+	XWMHints * XAllocWMHints(){return 0;};
+	XSizeHints * XAllocSizeHints(){return 0;};
+	void XSetWMProperties(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType,XTextProperty * titleprop, char * dummy1, char * dummy2, int num, XSizeHints *sizeHints, XWMHints *wmHints, char * dummy3){};
+	void XSetWMProtocols(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, Atom * atom, int num){};
+	void XMapWindow(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType){};
+	void XFlush(NativeDisplayType nativeDisplayType){};
+	void XMoveWindow(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, int left, int top){};
+	void XResizeWindow(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, int left, int top){};
+	void XQueryTree(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, NativeWindowType * root, NativeWindowType *parent, NativeWindowType **children, unsigned int * nChildren){};
+	void XSendEvent(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, int dummy1, int mask, XEvent* xevent){};
+#endif
 
 namespace Ogre {
-    template<class C> void removeDuplicates(C& c)
-    {
-        std::sort(c.begin(), c.end());
-        typename C::iterator p = std::unique(c.begin(), c.end());
-        c.erase(p, c.end());
-    }
-
 
     GtkEGLSupport::GtkEGLSupport()
     {
         mGLDisplay = getGLDisplay();
-		mNativeDisplay = getNativeDisplayType();
+		mNativeDisplay = getNativeDisplay();
 
 		int dummy;
 
@@ -133,6 +164,7 @@ namespace Ogre {
         removeDuplicates(mSampleLevels);
     }
 
+
 	EGLWindow* GtkEGLSupport::createEGLWindow( EGLSupport * support )
 	{
 		return new GtkEGLWindow(support);
@@ -143,7 +175,7 @@ namespace Ogre {
 		return new GtkEGLPBuffer(this, format, width, height);
 	}
 
-    EGLSupport::~EGLSupport()
+    GtkEGLSupport::~GtkEGLSupport()
     {
         if (!mNativeDisplay)
         {
@@ -159,14 +191,8 @@ namespace Ogre {
 
 
 
-	NativeDisplayType GtkEGLSupport::getNativeDisplayType()
+	NativeDisplayType GtkEGLSupport::getNativeDisplay()
 	{
-		return (NativeDisplayType) getXDisplay();
-	}
-
- 
-    Display* GtkEGLSupport::getXDisplay(void)
-    {
         if (!mNativeDisplay)
         {
             mNativeDisplay = XOpenDisplay(0);
@@ -247,62 +273,16 @@ namespace Ogre {
         }
 	}
 
-	void GtkEGLSupport::switchMode( uint& width, uint& height, short& frequency )
-	{
-		if (!mRandr)
-			return;
 
-		int size = 0;
-		int newSize = -1;
-
-		VideoModes::iterator mode;
-		VideoModes::iterator end = mVideoModes.end();
-		VideoMode *newMode = 0;
-
-		for(mode = mVideoModes.begin(); mode != end; size++)
-		{
-			if (mode->first.first >= static_cast<int>(width) &&
-				mode->first.second >= static_cast<int>(height))
-			{
-				if (!newMode ||
-					mode->first.first < newMode->first.first ||
-					mode->first.second < newMode->first.second)
-				{
-					newSize = size;
-					newMode = &(*mode);
-				}
-			}
-
-			VideoMode* lastMode = &(*mode);
-
-			while (++mode != end && mode->first == lastMode->first)
-			{
-				if (lastMode == newMode && mode->second == frequency)
-				{
-					newMode = &(*mode);
-				}
-			}
-		}
-		// todo
-
-	}
-
-
-    GLESPBuffer *GtkEGLSupport::createPBuffer(PixelComponentType format,
-                                           size_t width, size_t height)
-    {
-        return new GtkEGLPBuffer(this, format, width, height);
-    }
 
     XVisualInfo *GtkEGLSupport::getVisualFromFBConfig(::EGLConfig glConfig)
     {
         XVisualInfo *vi, tmp;
         int vid, n;
         ::EGLDisplay glDisplay;
-        Display *xDisplay;
 
         glDisplay = getGLDisplay();
-        xDisplay = getXDisplay();
+        mNativeDisplay = getNativeDisplay();
 
         if (eglGetConfigAttrib(glDisplay, glConfig, EGL_NATIVE_VISUAL_ID, &vid) == EGL_FALSE)
         {
@@ -314,14 +294,14 @@ namespace Ogre {
 
         if (vid == 0)
         {
-            const int screen_number = DefaultScreen(xDisplay);
-            Visual *v = DefaultVisual(xDisplay, screen_number);
+            const int screen_number = DefaultScreen(mNativeDisplay);
+            Visual *v = DefaultVisual(mNativeDisplay, screen_number);
             vid = XVisualIDFromVisual(v);
         }
 
         tmp.visualid = vid;
         vi = 0;
-        vi = XGetVisualInfo(xDisplay,
+        vi = XGetVisualInfo(mNativeDisplay,
                             VisualIDMask,
                             &tmp, &n);
         if (vi == 0)
@@ -334,5 +314,6 @@ namespace Ogre {
 
         return vi;
     }
+
 
 }

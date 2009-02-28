@@ -59,8 +59,8 @@ namespace Ogre {
 
 			virtual void switchFullScreen(bool fullscreen) = 0;
 			virtual EGLContext * createEGLContext() const = 0;
-			virtual void getLeftAndTopFromNativeWindow(int & left, int & top) = 0;
-			virtual void initNativeCreatedWindow() = 0;
+			virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height) = 0;
+			virtual void initNativeCreatedWindow(const NameValuePairList *miscParams) = 0;
 			virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title ) = 0;
 			virtual void reposition(int left, int top) = 0;
 			virtual void resize(unsigned int width, unsigned int height) = 0;
@@ -84,7 +84,7 @@ namespace Ogre {
             /**
                @remarks
                * Get custom attribute; the following attributes are valid:
-               * WINDOW         The X Window target for rendering.
+               * WINDOW         The X NativeWindowType target for rendering.
                * GLCONTEXT      The Ogre GLContext used for rendering.
                * DISPLAY        EGLDisplay connection behind that context.
                * DISPLAYNAME    The name for the connected display.

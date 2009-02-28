@@ -38,7 +38,7 @@ Torus Knot Software Ltd.
 #include <GLES/egl.h>
 
 #ifndef None
-#define None NULL
+	#define None NULL
 #endif
 
 //PowerVR extension

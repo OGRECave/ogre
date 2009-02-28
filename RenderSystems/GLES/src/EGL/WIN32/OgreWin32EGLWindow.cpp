@@ -60,12 +60,12 @@ namespace Ogre {
 		return new Win32EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
 	}
 
-	void Win32EGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top )
+	void Win32EGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
 	{
 
 	}
 
-	void Win32EGLWindow::initNativeCreatedWindow()
+	void Win32EGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
 	{
 
 	}

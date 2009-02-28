@@ -50,7 +50,7 @@ namespace Ogre {
 		  mRandr(false)
     {
         mGLDisplay = getGLDisplay();
-		mNativeDisplay = getNativeDisplayType();
+		mNativeDisplay = getNativeDisplay();
 
     }
 
@@ -175,7 +175,7 @@ namespace Ogre {
         return StringUtil::BLANK;
     }
 
-	NativeDisplayType EGLSupport::getNativeDisplayType()
+	NativeDisplayType EGLSupport::getNativeDisplay()
 	{
 		return EGL_DEFAULT_DISPLAY; // TODO
 	}
@@ -186,7 +186,7 @@ namespace Ogre {
         {
             EGLint major, minor;
 
-            mNativeDisplay = getNativeDisplayType();
+            mNativeDisplay = getNativeDisplay();
 
 			mGLDisplay = eglGetDisplay(mNativeDisplay);
 

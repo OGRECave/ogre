@@ -38,8 +38,8 @@ namespace Ogre {
     {
 	protected:
 		virtual EGLContext * createEGLContext() const;
-		virtual void getLeftAndTopFromNativeWindow(int & left, int & top);
-		virtual void initNativeCreatedWindow();
+		virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
+		virtual void initNativeCreatedWindow(const NameValuePairList *miscParams);
 		virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
 		virtual void reposition(int left, int top);
 		virtual void resize(unsigned int width, unsigned int height);

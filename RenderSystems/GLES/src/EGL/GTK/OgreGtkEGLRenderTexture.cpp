@@ -39,7 +39,7 @@ Torus Knot Software Ltd.
 #include "OgreGLESRenderSystem.h"
 
 #include "OgreGtkEGLRenderTexture.h"
-#include "OgrGtkeEGLContext.h"
+#include "OgreGtkEGLContext.h"
 #include "OgreGtkEGLSupport.h"
 
 #include <iostream>

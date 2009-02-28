@@ -65,7 +65,6 @@ namespace Ogre {
             StringVector mSampleLevels;
 
 			virtual EGLWindow* createEGLWindow( EGLSupport * support) = 0;
-			NativeDisplayType getNativeDisplayType();
         public:
             EGLSupport();
             virtual ~EGLSupport();
@@ -100,6 +99,7 @@ namespace Ogre {
 			virtual void switchMode(uint& width, uint& height, short& frequency) = 0;
             virtual GLESPBuffer* createPBuffer(PixelComponentType format,
                                        size_t width, size_t height) = 0;
+			NativeDisplayType getNativeDisplay();
 	};
 }
 

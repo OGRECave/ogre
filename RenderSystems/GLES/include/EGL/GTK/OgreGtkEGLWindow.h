@@ -37,10 +37,11 @@ namespace Ogre {
     class _OgrePrivate GtkEGLWindow : public EGLWindow
     {
 	protected:
-		Window mParentWindow ;
+		NativeWindowType mParentWindow ;
+		NativeWindowType mExternalWindow;
 		virtual EGLContext * createEGLContext() const;
-		virtual void getLeftAndTopFromNativeWindow(int & left, int & top);
-		virtual void initNativeCreatedWindow();
+		virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
+		virtual void initNativeCreatedWindow(const NameValuePairList *miscParams);
 		virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
 		virtual void reposition(int left, int top);
 		virtual void resize(unsigned int width, unsigned int height);
@@ -55,7 +56,7 @@ namespace Ogre {
 			@remarks
 			* Get custom attribute; the following attributes are valid:
 			* XDISPLAY        The X Display connection behind that context.
-			* XWINDOW        The X Window connection behind that context.
+			* XWINDOW        The X NativeWindowType connection behind that context.
 			* ATOM           The X Atom used in client delete events.
 			*/
 			virtual void getCustomAttribute(const String& name, void* pData);

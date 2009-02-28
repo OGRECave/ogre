@@ -332,7 +332,7 @@ namespace Ogre {
         if (mRenderTargets.find(name) != mRenderTargets.end())
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Window with name '" + name + "' already exists",
+                        "NativeWindowType with name '" + name + "' already exists",
                         "GLESRenderSystem::_createRenderWindow");
         }
 

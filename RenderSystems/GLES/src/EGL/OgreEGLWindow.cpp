@@ -87,7 +87,7 @@ namespace Ogre {
 		int left = 0;
 		int top  = 0;
 
-		getLeftAndTopFromNativeWindow(left, top);
+		getLeftAndTopFromNativeWindow(left, top, width, height);
 
         mIsFullScreen = fullScreen;
 
@@ -153,7 +153,7 @@ namespace Ogre {
             }
 		}
 
-		initNativeCreatedWindow();
+		initNativeCreatedWindow(miscParams);
 
         if (mEglSurface)
         {
@@ -420,7 +420,7 @@ namespace Ogre {
         if (surface == EGL_NO_SURFACE)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Fail to create EGLSurface based on X Window",
+                        "Fail to create EGLSurface based on X NativeWindowType",
                         __FUNCTION__);
         }
         return surface;
