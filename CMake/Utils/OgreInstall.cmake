@@ -37,11 +37,13 @@ function(ogre_install_plugin PLUGINNAME)
 endfunction(ogre_install_plugin)
 
 function(ogre_install_sample SAMPLENAME)
-  install(TARGETS ${SAMPLENAME}
-    RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" CONFIGURATIONS Release MinSizeRel RelWithDebInfo OPTIONAL
-  )
-  install(TARGETS ${SAMPLENAME}
-    RUNTIME DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS DEBUG OPTIONAL
-  )
+  if (OGRE_INSTALL_SAMPLES)
+    install(TARGETS ${SAMPLENAME}
+      RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" CONFIGURATIONS Release MinSizeRel RelWithDebInfo OPTIONAL
+    )
+    install(TARGETS ${SAMPLENAME}
+      RUNTIME DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS DEBUG OPTIONAL
+    )
+  endif ()	
 endfunction(ogre_install_sample)
 

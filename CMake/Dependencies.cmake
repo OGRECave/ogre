@@ -4,7 +4,7 @@
 
 # OGRE_DEPENDENCIES_DIR can be used to specify a single base
 # folder where the required dependencies may be found.
-set(OGRE_DEPENDENCIES_DIR "${OGRE3D_SOURCE_DIR}/Dependencies" CACHE PATH "Path to OGRE dependencies")
+set(OGRE_DEPENDENCIES_DIR "${OGRE_SOURCE_DIR}/Dependencies" CACHE PATH "Path to OGRE dependencies")
 
 # Set hardcoded path guesses for various platforms
 if (WIN32)
@@ -43,11 +43,7 @@ macro_log_feature(ZZip_FOUND "zziplib" "Extract data from zip archives" "http://
 
 # Find FreeImage
 find_package(FreeImage)
-set(FREEIMAGE_REQUIRED TRUE)
-if (OGRE_CONFIG_DISABLE_FREEIMAGE)
-  set(FREEIMAGE_REQUIRED FALSE)
-endif ()
-macro_log_feature(FreeImage_FOUND "freeimage" "Support for commonly used graphics image formats" "http://freeimage.sourceforge.net" ${FREEIMAGE_REQUIRED} "" "")
+macro_log_feature(FreeImage_FOUND "freeimage" "Support for commonly used graphics image formats" "http://freeimage.sourceforge.net" FALSE "" "")
 
 # Find FreeType
 find_package(Freetype)

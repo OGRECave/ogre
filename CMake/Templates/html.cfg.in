@@ -6,7 +6,7 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = OGRE
 PROJECT_NUMBER         = ${OGRE_VERSION}
-OUTPUT_DIRECTORY       = ${OGRE3D_BINARY_DIR}/api/
+OUTPUT_DIRECTORY       = ${OGRE_BINARY_DIR}/api/
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
 BRIEF_MEMBER_DESC      = YES
@@ -81,11 +81,11 @@ WARN_IF_UNDOCUMENTED   = YES
 WARN_IF_DOC_ERROR      = YES
 WARN_NO_PARAMDOC       = NO
 WARN_FORMAT            = "$file:$line: $text     "
-WARN_LOGFILE           = ${OGRE3D_BINARY_DIR}/doxygen_warnings.log
+WARN_LOGFILE           = ${OGRE_BINARY_DIR}/doxygen_warnings.log
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = ${OGRE3D_SOURCE_DIR}/OgreMain \
+INPUT                  = ${OGRE_SOURCE_DIR}/OgreMain \
                          apimainpage.txt
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = Ogre*.h

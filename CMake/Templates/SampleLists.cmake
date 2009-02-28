@@ -6,25 +6,29 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 cmake_policy(SET CMP0003 NEW)
 
-project(OGRE3D)
+project(OGRE)
 
 # Include necessary submodules
 set(CMAKE_MODULE_PATH 
-  "${OGRE3D_SOURCE_DIR}/../cmake"
-  "${OGRE3D_SOURCE_DIR}/../../../lib/cmake"
+  "${OGRE_SOURCE_DIR}/../cmake"
+  "${OGRE_SOURCE_DIR}/../../../lib/cmake"
 )
 if (WIN32)
-  set(OGRE_TEMPLATES_DIR "${OGRE3D_SOURCE_DIR}/../cmake")
+  set(OGRE_TEMPLATES_DIR "${OGRE_SOURCE_DIR}/../cmake")
+  set(OGRE_WORK_DIR "${OGRE_SOURCE_DIR}/..")
+  set(CMAKE_INSTALL_PREFIX ${OGRE_WORK_DIR} CACHE PATH "CMake install path")
 elseif (UNIX)
-  set(OGRE_TEMPLATES_DIR "${OGRE3D_SOURCE_DIR}/../../../lib/cmake")
+  set(OGRE_TEMPLATES_DIR "${OGRE_SOURCE_DIR}/../../../lib/cmake")
+  set(CMAKE_INSTALL_PREFIX "${OGRE_SOURCE_DIR}/../../.." CACHE PATH "CMake install path")
 else ()
 endif ()
 include(OgreInstall)
 include(OgreConfigBuild)
 set(CMAKE_PREFIX_PATH 
-  "${OGRE3D_SOURCE_DIR}/../"
-  "${OGRE3D_SOURCE_DIR}/../../../"
+  "${OGRE_SOURCE_DIR}/../"
+  "${OGRE_SOURCE_DIR}/../../../"
 )
+set(OGRE_INSTALL_SAMPLES TRUE)
 
 
 #####################################################################
@@ -55,9 +59,9 @@ include_directories(
 )
 
 # Specify build paths
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OGRE3D_BINARY_DIR}/lib")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OGRE3D_BINARY_DIR}/lib")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OGRE3D_BINARY_DIR}/bin")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/lib")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/bin")
 
 
 # Configure Samples build

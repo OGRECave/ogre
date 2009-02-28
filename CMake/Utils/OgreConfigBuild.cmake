@@ -11,9 +11,9 @@ endfunction(ogre_create_vcproj_userfile)
 
 function(ogre_config_build TARGETNAME)
   set_target_properties(${TARGETNAME} PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY ${OGRE3D_BINARY_DIR}/lib
-	LIBRARY_OUTPUT_DIRECTORY ${OGRE3D_BINARY_DIR}/lib
-	RUNTIME_OUTPUT_DIRECTORY ${OGRE3D_BINARY_DIR}/bin
+    ARCHIVE_OUTPUT_DIRECTORY ${OGRE_BINARY_DIR}/lib
+	LIBRARY_OUTPUT_DIRECTORY ${OGRE_BINARY_DIR}/lib
+	RUNTIME_OUTPUT_DIRECTORY ${OGRE_BINARY_DIR}/bin
   )
   ogre_create_vcproj_userfile(${TARGETNAME})
 endfunction(ogre_config_build)

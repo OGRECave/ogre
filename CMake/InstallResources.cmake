@@ -44,48 +44,48 @@ endif ()
 
 # CREATE CONFIG FILES - INSTALL VERSIONS
 # create resources.cfg
-configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE3D_BINARY_DIR}/inst/bin/debug/resources.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE3D_BINARY_DIR}/inst/bin/release/resources.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/resources.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg)
 # create plugins.cfg
-configure_file(${OGRE_TEMPLATES_DIR}/plugins_d.cfg.in ${OGRE3D_BINARY_DIR}/inst/bin/debug/plugins.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE3D_BINARY_DIR}/inst/bin/release/plugins.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/plugins_d.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/plugins.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg)
 # create media.cfg
-configure_file(${OGRE_TEMPLATES_DIR}/media.cfg.in ${OGRE3D_BINARY_DIR}/inst/bin/debug/media.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/media.cfg.in ${OGRE3D_BINARY_DIR}/inst/bin/release/media.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/media.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/media.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/media.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/media.cfg)
 # create quake3settings.cfg
-configure_file(${OGRE_TEMPLATES_DIR}/quake3settings.cfg.in ${OGRE3D_BINARY_DIR}/inst/bin/debug/quake3settings.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/quake3settings.cfg.in ${OGRE3D_BINARY_DIR}/inst/bin/release/quake3settings.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/quake3settings.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/quake3settings.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/quake3settings.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/quake3settings.cfg)
 
 # install resource files
 install(FILES 
-  ${OGRE3D_BINARY_DIR}/inst/bin/debug/resources.cfg
-  ${OGRE3D_BINARY_DIR}/inst/bin/debug/plugins.cfg
-  ${OGRE3D_BINARY_DIR}/inst/bin/debug/media.cfg
-  ${OGRE3D_BINARY_DIR}/inst/bin/debug/quake3settings.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/debug/resources.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/debug/plugins.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/debug/media.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/debug/quake3settings.cfg
   DESTINATION "bin${OGRE_DEBUG_PATH}"
   CONFIGURATIONS Debug
 )
 install(FILES 
-  ${OGRE3D_BINARY_DIR}/inst/bin/release/resources.cfg
-  ${OGRE3D_BINARY_DIR}/inst/bin/release/plugins.cfg
-  ${OGRE3D_BINARY_DIR}/inst/bin/release/media.cfg
-  ${OGRE3D_BINARY_DIR}/inst/bin/release/quake3settings.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/release/media.cfg
+  ${OGRE_BINARY_DIR}/inst/bin/release/quake3settings.cfg
   DESTINATION "bin${OGRE_RELEASE_PATH}"
   CONFIGURATIONS Release MinSizeRel RelWithDebInfo None
 )
 if (UNIX AND CMAKE_BUILD_TYPE STREQUAL "")
   install(FILES 
-    ${OGRE3D_BINARY_DIR}/inst/bin/release/resources.cfg
-    ${OGRE3D_BINARY_DIR}/inst/bin/release/plugins.cfg
-    ${OGRE3D_BINARY_DIR}/inst/bin/release/media.cfg
-    ${OGRE3D_BINARY_DIR}/inst/bin/release/quake3settings.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/media.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/quake3settings.cfg
     DESTINATION "bin${OGRE_RELEASE_PATH}"
   )
 endif()
 
 
 # CREATE CONFIG FILES - BUILD DIR VERSIONS
-set(OGRE_MEDIA_DIR_REL "${OGRE3D_SOURCE_DIR}/Samples/Media")
+set(OGRE_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Samples/Media")
 if (WIN32)
   set(OGRE_PLUGIN_DIR_REL ".")
 elseif (UNIX)
@@ -94,14 +94,14 @@ elseif (APPLE)
   # TODO
 endif ()
 # create resources.cfg
-configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE3D_BINARY_DIR}/bin/debug/resources.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE3D_BINARY_DIR}/bin/release/resources.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/bin/debug/resources.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/bin/release/resources.cfg)
 # create plugins.cfg
-configure_file(${OGRE_TEMPLATES_DIR}/plugins_d.cfg.in ${OGRE3D_BINARY_DIR}/bin/debug/plugins.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE3D_BINARY_DIR}/bin/release/plugins.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/plugins_d.cfg.in ${OGRE_BINARY_DIR}/bin/debug/plugins.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/release/plugins.cfg)
 # create media.cfg
-configure_file(${OGRE_TEMPLATES_DIR}/media.cfg.in ${OGRE3D_BINARY_DIR}/bin/debug/media.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/media.cfg.in ${OGRE3D_BINARY_DIR}/bin/release/media.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/media.cfg.in ${OGRE_BINARY_DIR}/bin/debug/media.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/media.cfg.in ${OGRE_BINARY_DIR}/bin/release/media.cfg)
 # create quake3settings.cfg
-configure_file(${OGRE_TEMPLATES_DIR}/quake3settings.cfg.in ${OGRE3D_BINARY_DIR}/bin/debug/quake3settings.cfg)
-configure_file(${OGRE_TEMPLATES_DIR}/quake3settings.cfg.in ${OGRE3D_BINARY_DIR}/bin/release/quake3settings.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/quake3settings.cfg.in ${OGRE_BINARY_DIR}/bin/debug/quake3settings.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/quake3settings.cfg.in ${OGRE_BINARY_DIR}/bin/release/quake3settings.cfg)

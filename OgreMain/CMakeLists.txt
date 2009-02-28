@@ -44,6 +44,7 @@ set (HEADER_FILES
   include/OgreCompositorInstance.h
   include/OgreCompositorManager.h
   include/OgreCompositorScriptCompiler.h
+  include/OgreCompositorScriptCompiler2.h
   include/OgreCompositorSerializer.h
   include/OgreConfigDialog.h
   include/OgreConfigFile.h
@@ -130,6 +131,7 @@ set (HEADER_FILES
   include/OgreParticleEmitterCommands.h
   include/OgreParticleEmitterFactory.h
   include/OgreParticleIterator.h
+  include/OgreParticleScriptCompiler.h
   include/OgreParticleSystem.h
   include/OgreParticleSystemManager.h
   include/OgreParticleSystemRenderer.h
