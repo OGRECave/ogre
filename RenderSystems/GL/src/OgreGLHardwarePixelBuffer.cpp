@@ -202,7 +202,7 @@ GLTextureBuffer::GLTextureBuffer(const String &baseName, GLenum target, GLuint i
 	// devise mWidth, mHeight and mDepth and mFormat
 	GLint value;
 	
-	glBindTextureEXT( mTarget, mTextureID );
+	glBindTexture( mTarget, mTextureID );
 	
 	// Get face identifier
 	mFaceTarget = mTarget;
@@ -290,7 +290,7 @@ GLTextureBuffer::~GLTextureBuffer()
 //-----------------------------------------------------------------------------
 void GLTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
 {
-	glBindTextureEXT( mTarget, mTextureID );
+	glBindTexture( mTarget, mTextureID );
 	if(PixelUtil::isCompressed(data.format))
 	{
 		if(data.format != mFormat || !data.isConsecutive())
@@ -468,7 +468,7 @@ void GLTextureBuffer::download(const PixelBox &data)
 		data.getDepth() != getDepth())
 		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "only download of entire buffer is supported by GL",
 		 	"GLHardwarePixelBuffer::download");
-	glBindTextureEXT( mTarget, mTextureID );
+	glBindTexture( mTarget, mTextureID );
 	if(PixelUtil::isCompressed(data.format))
 	{
 		if(data.format != mFormat || !data.isConsecutive())
@@ -526,7 +526,7 @@ void GLTextureBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
 //-----------------------------------------------------------------------------
 void GLTextureBuffer::copyFromFramebuffer(size_t zoffset)
 {
-    glBindTextureEXT(mTarget, mTextureID);
+    glBindTexture(mTarget, mTextureID);
     switch(mTarget)
     {
     case GL_TEXTURE_1D:
@@ -603,7 +603,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
     glLoadIdentity();
     
     /// Set up source texture
-    glBindTextureEXT(src->mTarget, src->mTextureID);
+    glBindTexture(src->mTarget, src->mTextureID);
     
     /// Set filtering modes depending on the dimensions and source
     if(srcBox.getWidth()==dstBox.getWidth() &&
@@ -654,8 +654,8 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
     {
         /// If target format not directly supported, create intermediate texture
         GLenum tempFormat = GLPixelUtil::getClosestGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
-        glGenTexturesEXT(1, &tempTex);
-        glBindTextureEXT(GL_TEXTURE_2D, tempTex);
+        glGenTextures(1, &tempTex);
+        glBindTexture(GL_TEXTURE_2D, tempTex);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
         /// Allocate temporary texture of the size of the destination area
         glTexImage2D(GL_TEXTURE_2D, 0, tempFormat, 
@@ -693,7 +693,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         w = (w+0.5f) / (float)src->mDepth;
         
         /// Finally we're ready to rumble
-        glBindTextureEXT(src->mTarget, src->mTextureID);
+        glBindTexture(src->mTarget, src->mTextureID);
         glEnable(src->mTarget);
         glBegin(GL_QUADS);
         glTexCoord3f(u1, v1, w);
@@ -710,7 +710,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         if(tempTex)
         {
             /// Copy temporary texture
-            glBindTextureEXT(mTarget, mTextureID);
+            glBindTexture(mTarget, mTextureID);
             switch(mTarget)
             {
             case GL_TEXTURE_1D:
@@ -738,13 +738,13 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         /// Generate mipmaps
         if(mUsage & TU_AUTOMIPMAP)
         {
-            glBindTextureEXT(mTarget, mTextureID);
+            glBindTexture(mTarget, mTextureID);
             glGenerateMipmapEXT(mTarget);
         }
     }
 
     /// Reset source texture to sane state
-    glBindTextureEXT(src->mTarget, src->mTextureID);
+    glBindTexture(src->mTarget, src->mTextureID);
     glTexParameteri(src->mTarget, GL_TEXTURE_BASE_LEVEL, 0);
     
     /// Detach texture from temporary framebuffer
@@ -812,10 +812,10 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Image::Box 
     GLenum format = GLPixelUtil::getClosestGLInternalFormat(src.format);
     
     /// Generate texture name
-    glGenTexturesEXT(1, &id);
+    glGenTextures(1, &id);
     
     /// Set texture type
-    glBindTextureEXT(target, id);
+    glBindTexture(target, id);
     
     /// Set automatic mipmap generation; nice for minimisation
     glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 1000 );

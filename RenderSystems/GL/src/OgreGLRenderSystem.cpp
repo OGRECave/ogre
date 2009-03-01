@@ -1418,9 +1418,9 @@ namespace Ogre {
 			}
 
 			if(!tex.isNull())
-				glBindTextureEXT( mTextureTypes[stage], tex->getGLID() );
+				glBindTexture( mTextureTypes[stage], tex->getGLID() );
 			else
-				glBindTextureEXT( mTextureTypes[stage], static_cast<GLTextureManager*>(mTextureManager)->getWarningTextureID() );
+				glBindTexture( mTextureTypes[stage], static_cast<GLTextureManager*>(mTextureManager)->getWarningTextureID() );
 		}
 		else
 		{
@@ -1433,7 +1433,7 @@ namespace Ogre {
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			}
 			// bind zero texture
-			glBindTextureEXT (GL_TEXTURE_2D, 0); 
+			glBindTexture(GL_TEXTURE_2D, 0); 
 		}
 
 	}
