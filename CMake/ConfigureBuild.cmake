@@ -1,3 +1,9 @@
+#######################################################################
+# This file takes care of configuring Ogre to build with the settings
+# given in CMake. It creates the necessary config.h file and will 
+# also prepare package files for pkg-config and CMake.
+#######################################################################
+
 # should we build static libs?
 if (OGRE_STATIC)
   set(OGRE_LIB_TYPE STATIC)
@@ -10,7 +16,7 @@ if (OGRE_CONFIG_THREADS AND UNIX)
   add_definitions(-pthread)
 endif()
 
-# determine config values depending on build options and set preprocessor defines accordingly
+# determine config values depending on build options 
 set(OGRE_SET_DOUBLE 0)
 set(OGRE_SET_ALLOCATOR ${OGRE_CONFIG_ALLOCATOR})
 set(OGRE_SET_CONTAINERS_USE_ALLOCATOR 0)
@@ -25,10 +31,10 @@ set(OGRE_STATIC_LIB 0)
 if (OGRE_CONFIG_DOUBLE)
   set(OGRE_SET_DOUBLE 1)
 endif()
-if (OGRE_CONFIG_CONTAINERS_USE_ALLOCATOR)
+if (OGRE_CONFIG_CONTAINERS_USE_CUSTOM_ALLOCATOR)
   set(OGRE_SET_CONTAINERS_USE_ALLOCATOR 1)
 endif ()
-if (OGRE_CONFIG_STRING_USE_ALLOCATOR)
+if (OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR)
   set(OGRE_SET_STRING_USE_ALLOCATOR 1)
 endif ()
 if (OGRE_CONFIG_MEMTRACK_DEBUG)
@@ -49,40 +55,47 @@ endif()
 if (OGRE_STATIC)
   set(OGRE_STATIC_LIB 1)
 endif()
-if (OGRE_SET_THREADS GREATER 2 OR OGRE_SET_THREADS LESS 0)
-  set(OGRE_SET_THREADS 1)
-endif ()
-add_definitions(-DOGRE_DOUBLE_PRECISION=${OGRE_SET_DOUBLE})
-add_definitions(-DOGRE_MEMORY_ALLOCATOR=${OGRE_SET_ALLOCATOR})
-add_definitions(-DOGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR=${OGRE_SET_CONTAINERS_USE_ALLOCATOR})
-add_definitions(-DOGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR=${OGRE_SET_STRING_USE_ALLOCATOR})
-add_definitions(-DOGRE_MEMORY_TRACKER_DEBUG_MODE=${OGRE_SET_MEMTRACK_DEBUG})
-add_definitions(-DOGRE_MEMORY_TRACKER_RELEASE_MODE=${OGRE_SET_MEMTRACK_RELEASE})
-add_definitions(-DOGRE_THREAD_SUPPORT=${OGRE_SET_THREADS})
-add_definitions(-DOGRE_NO_FREEIMAGE=${OGRE_SET_DISABLE_FREEIMAGE})
-add_definitions(-DOGRE_NO_DDS_CODEC=${OGRE_SET_DISABLE_DDS})
-add_definitions(-DOGRE_USE_NEW_COMPILERS=${OGRE_SET_NEW_COMPILERS})
+add_definitions(-DHAVE_CONFIG_H)
+
+# generate config.h
+configure_file(${OGRE_TEMPLATES_DIR}/config.h.in ${OGRE_BINARY_DIR}/include/config.h @ONLY)
+install(FILES ${OGRE_BINARY_DIR}/include/config.h DESTINATION include/OGRE)
 
 # Read contents of the OgreConfig.h file
 file(READ "${OGRE_SOURCE_DIR}/OgreMain/include/OgreConfig.h" OGRE_CONFIG_H)
-# modify OgreConfig.h contents
-replace_preprocessor_entry(OGRE_CONFIG_H OGRE_DOUBLE_PRECISION ${OGRE_SET_DOUBLE})
-replace_preprocessor_entry(OGRE_CONFIG_H OGRE_MEMORY_ALLOCATOR ${OGRE_SET_ALLOCATOR})
-replace_preprocessor_entry(OGRE_CONFIG_H OGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR ${OGRE_SET_CONTAINERS_USE_ALLOCATOR})
-replace_preprocessor_entry(OGRE_CONFIG_H OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR ${OGRE_SET_STRING_USE_ALLOCATOR})
-replace_preprocessor_entry(OGRE_CONFIG_H OGRE_MEMORY_TRACKER_DEBUG_MODE ${OGRE_SET_MEMTRACK_DEBUG})
-replace_preprocessor_entry(OGRE_CONFIG_H OGRE_MEMORY_TRACKER_RELEASE_MODE ${OGRE_SET_MEMTRACK_RELEASE})
-replace_preprocessor_entry(OGRE_CONFIG_H OGRE_THREAD_SUPPORT ${OGRE_SET_THREADS})
-replace_preprocessor_entry(OGRE_CONFIG_H OGRE_NO_FREEIMAGE ${OGRE_SET_DISABLE_FREEIMAGE})
-replace_preprocessor_entry(OGRE_CONFIG_H OGRE_NO_DDS ${OGRE_SET_DISABLE_DDS})
-replace_preprocessor_entry(OGRE_CONFIG_H OGRE_USE_NEW_COMPILERS ${OGRE_SET_NEW_COMPILERS})
-set_preprocessor_entry(OGRE_CONFIG_H OGRE_STATIC_LIB OGRE_STATIC_LIB)
-
-# save new OgreConfig.h to build dir
-file(WRITE ${OGRE_BINARY_DIR}/include/OgreConfig.h ${OGRE_CONFIG_H})
+# add HAVE_CONFIG_H preprocessor define
+file(WRITE ${OGRE_BINARY_DIR}/include/OgreConfig.h "#define HAVE_CONFIG_H\n${OGRE_CONFIG_H}")
 install(FILES ${OGRE_BINARY_DIR}/include/OgreConfig.h DESTINATION include/OGRE)
 
-# Configure the OgreVersion.h header
-#configure_file(${OGRE_TEMPLATES_DIR}/OgreVersion.h.in ${OGRE_BINARY_DIR}/include/OgreVersion.h)
-#install(FILES ${OGRE_BINARY_DIR}/include/OgreVersion.h DESTINATION include/OGRE)
+
+# Create the pkg-config package file on Unix systems
+if (UNIX)
+  set(prefix ${CMAKE_INSTALL_PREFIX})
+  set(libdir ${CMAKE_INSTALL_PREFIX}/lib)
+  set(includedir ${CMAKE_INSTALL_PREFIX}/include)
+  set(PACKAGE "OGRE")
+  set(VERSION ${OGRE_VERSION})
+  if (OGRE_CONFIG_THREADS GREATER 0)
+    set(OGRE_CFLAGS "-pthread")
+    set(OGRE_THREAD_LIBS "-lpthread")
+  endif ()
+  set(exec_prefix ${CMAKE_INSTALL_PREFIX})
+  configure_file(${OGRE_SOURCE_DIR}/OGRE.pc.in ${OGRE_BINARY_DIR}/pkgconfig/OGRE.pc @ONLY)
+  install(FILES ${OGRE_BINARY_DIR}/pkgconfig/OGRE.pc DESTINATION lib/pkgconfig)
+endif ()
+
+# Create the CMake package files
+if (WIN32)
+  set(OGRE_CMAKE_DIR CMake)
+elseif (UNIX)
+  set(OGRE_CMAKE_DIR lib/cmake)
+elseif (APPLE)
+endif ()
+configure_file(${OGRE_TEMPLATES_DIR}/OGREConfig.cmake.in ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake @ONLY)
+configure_file(${OGRE_TEMPLATES_DIR}/OGREConfigVersion.cmake.in ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake @ONLY)
+install(FILES
+  ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake
+  ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake
+  DESTINATION ${OGRE_CMAKE_DIR}
+)
 

@@ -30,8 +30,9 @@ set(OGRE_WORK_DIR ${OGRE_BINARY_DIR})
 # Set up the basic build environment
 #####################################################################
 
-# include Ogre version numbers
-include(OgreVersion)
+# determine Ogre version numbers
+include(OgreGetVersion)
+ogre_get_version(${OGRE_SOURCE_DIR}/OgreMain/include/OgrePrerequisites.h)
 
 # Create debug libraries with _d postfix
 set(CMAKE_DEBUG_POSTFIX "_d")
@@ -46,6 +47,7 @@ endif ()
 
 # Add OgreMain include path
 include_directories("${OGRE_SOURCE_DIR}/OgreMain/include")
+include_directories("${OGRE_BINARY_DIR}/include")
 
 # Find dependencies
 include(Dependencies)
