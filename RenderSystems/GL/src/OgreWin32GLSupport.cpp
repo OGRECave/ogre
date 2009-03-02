@@ -164,7 +164,11 @@ namespace Ogre {
 		remove_duplicates(optColourDepth->possibleValues);
 		remove_duplicates(optDisplayFrequency->possibleValues);
 		optColourDepth->currentValue = optColourDepth->possibleValues.back();
-		if (optDisplayFrequency->currentValue != "N/A")
+		bool freqValid = std::find(optDisplayFrequency->possibleValues.begin(),
+			optDisplayFrequency->possibleValues.end(),
+			optDisplayFrequency->currentValue) != optDisplayFrequency->possibleValues.end();
+
+		if ( (optDisplayFrequency->currentValue != "N/A") && !freqValid )			
 			optDisplayFrequency->currentValue = optDisplayFrequency->possibleValues.front();
 	}
 
@@ -195,7 +199,8 @@ namespace Ogre {
 			}
 			else
 			{
-				it->second.currentValue = it->second.possibleValues.front();
+				if (it->second.currentValue.empty() || it->second.currentValue == "N/A")
+					it->second.currentValue = it->second.possibleValues.front();
 				it->second.immutable = false;
 			}
 		}

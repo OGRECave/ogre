@@ -427,10 +427,12 @@ namespace Ogre
 			AdjustWindowRect(&rc, GetWindowLong(mHWnd, GWL_STYLE), false);
 			unsigned int winWidth = rc.right - rc.left;
 			unsigned int winHeight = rc.bottom - rc.top;
-			int screenw = GetSystemMetrics(SM_CXSCREEN);
-			int screenh = GetSystemMetrics(SM_CYSCREEN);
-			int left = (screenw - winWidth) / 2;
-			int top = (screenh - winHeight) / 2;
+			unsigned int screenw = GetSystemMetrics(SM_CXSCREEN);
+			unsigned int screenh = GetSystemMetrics(SM_CYSCREEN);
+
+			// deal with overflow when switching down to smaller resolution
+			int left = screenw > winWidth ? ((screenw - winWidth) / 2) : 0;
+			int top = screenh > winHeight ? ((screenh - winHeight) / 2) : 0;
 			SetWindowPos(mHWnd, HWND_NOTOPMOST, left, top, winWidth, winHeight,
 				SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOACTIVATE);
 

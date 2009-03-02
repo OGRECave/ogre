@@ -486,7 +486,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Real OverlayManager::getViewportAspectRatio(void) const
     {
-        return (Real)mLastViewportHeight / (Real)mLastViewportWidth;
+        return (Real)mLastViewportWidth / (Real)mLastViewportHeight;
     }
     //---------------------------------------------------------------------
 	//---------------------------------------------------------------------
