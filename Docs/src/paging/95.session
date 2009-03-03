@@ -1,0 +1,11 @@
+window_sizes 1680 964 393 1182 700 82
+diagrams
+  active  classdiagram_ref 128095 // main
+    1281 808 100 15 0 0
+end
+show_stereotypes
+selected class_ref 129503 // PixelCountLodStragey
+open
+  classview_ref 128095 // main
+end
+end
