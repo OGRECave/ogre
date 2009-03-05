@@ -21,7 +21,10 @@ LGPL like the rest of the engine.
 #  define OGRE_STATIC_GL
 #  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #    define OGRE_STATIC_Direct3D9
-#    define OGRE_STATIC_Direct3D10
+// dx10 will only work on vista, so be careful about statically linking
+#    if OGRE_USE_D3D10
+#      define OGRE_STATIC_Direct3D10
+#    endif
 #  endif
 #  define OGRE_STATIC_BSPSceneManager
 #  define OGRE_STATIC_ParticleFX
