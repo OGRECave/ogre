@@ -3,10 +3,10 @@ TODO
 
 Essential before switch-on as primary system
 
-* Install samples sources
-  * Should probably rearrange the samples directory
 * SDK testing
 * Establish 3rd-party library build procedure
+  * For projects using CMake: Need to enhance/finish the FindOGRE and OGREConfig scripts
+  * For projects not using CMake: Probably little changes, but examples would still be good
 * Test Code::Blocks / MinGW, Linux
 
 Optional 
@@ -15,13 +15,15 @@ Optional
 * Investigate OSX (may have to continue to use custom XCode project)
 * Reference app? (or drop this)
 * CPack
-  * Started work on this
+  * NSIS installer working, but doesn't set OGRE_HOME environment variable yet.
+  * Investigate .deb, .rpm packages for Linux
 
 OGRE CHANGES ONCE LIVE
 ======================
 
-- Remove OgreConfig.h from OgreMain/include => CMakeTemplates/OgreConfig.h.in
-- Move Ogre version information from OgrePrerequisites.h => CMakeTemplates/OgreVersion.h.in
-- NOTE: If a custom XCode project is kept, OgreConfig.h and OgreVersion.h must still be
-  provided. CMake builds will use the generated versions instead.
 - Docs/src/html.cfg is no longer necessary as it is generated from CMakeTemplates/html.cfg.in
+- Remove Dependencies/CMakeLists.txt from OGRE source tree. This file should be provided by
+  the pre-built dependencies package.
+- Restructure pre-built dependencies packages to place DLLs in Dependencies/bin instead of
+  Samples/Common/bin, since the latter is no longer in use
+

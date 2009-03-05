@@ -55,16 +55,23 @@ endif()
 if (OGRE_STATIC)
   set(OGRE_STATIC_LIB 1)
 endif()
-add_definitions(-DHAVE_CONFIG_H)
+add_definitions(-DHAVE_OGRE_BUILDSETTINGS_H)
 
-# generate config.h
-configure_file(${OGRE_TEMPLATES_DIR}/config.h.in ${OGRE_BINARY_DIR}/include/config.h @ONLY)
-install(FILES ${OGRE_BINARY_DIR}/include/config.h DESTINATION include/OGRE)
+# determine system endianess
+include(TestBigEndian)
+test_big_endian(OGRE_CONFIG_BIG_ENDIAN)
+if (NOT OGRE_CONFIG_BIG_ENDIAN)
+  set(OGRE_CONFIG_LITTLE_ENDIAN 1)
+endif ()
+
+# generate buildsettings.h 
+configure_file(${OGRE_TEMPLATES_DIR}/buildsettings.h.in ${OGRE_BINARY_DIR}/include/buildsettings.h @ONLY)
+install(FILES ${OGRE_BINARY_DIR}/include/buildsettings.h DESTINATION include/OGRE)
 
 # Read contents of the OgreConfig.h file
 file(READ "${OGRE_SOURCE_DIR}/OgreMain/include/OgreConfig.h" OGRE_CONFIG_H)
-# add HAVE_CONFIG_H preprocessor define
-file(WRITE ${OGRE_BINARY_DIR}/include/OgreConfig.h "#define HAVE_CONFIG_H\n${OGRE_CONFIG_H}")
+# add HAVE_OGRE_BUILDSETTINGS_H preprocessor define
+file(WRITE ${OGRE_BINARY_DIR}/include/OgreConfig.h "#define HAVE_OGRE_BUILDSETTINGS_H\n${OGRE_CONFIG_H}")
 install(FILES ${OGRE_BINARY_DIR}/include/OgreConfig.h DESTINATION include/OGRE)
 
 

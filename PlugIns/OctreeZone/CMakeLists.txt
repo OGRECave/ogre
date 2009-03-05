@@ -40,6 +40,13 @@ if (NOT OGRE_STATIC)
     COMPILE_DEFINITIONS OGRE_OCTREEZONEPLUGIN_EXPORTS OGRE_TERRAINZONEPLUGIN_EXPORTS)
 endif ()
 set_target_properties(Plugin_OctreeZone PROPERTIES PREFIX "")
+# need to include the plugins directory in the RPATH for OctreeZone to be able
+# to find the PCZSceneManager library
+if (UNIX)
+  set_target_properties(Plugin_OctreeZone PROPERTIES
+    INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/OGRE
+  )
+endif ()
 
 ogre_install_plugin(Plugin_OctreeZone)
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/PCZ)

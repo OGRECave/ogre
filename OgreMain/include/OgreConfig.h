@@ -29,6 +29,11 @@ Torus Knot Software Ltd.
 #ifndef __Config_H_
 #define __Config_H_
 
+// Include the CMake-generated build settings, if applicable
+#ifdef HAVE_OGRE_BUILDSETTINGS_H
+#include "buildsettings.h"
+#endif
+
 // Read configuration options; some systems use an auto-generated config.h,
 // other use a manually generated config.h; in any case just define
 // HAVE_CONFIG_H to include the custom config.h file.

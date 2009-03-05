@@ -12,4 +12,6 @@ set(CPACK_PACKAGE_VENDOR "Torus Knot Software")
 set(CPACK_RESOURCE_FILE_LICENSE "${OGRE_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_ICON "${OGRE_SOURCE_DIR}\\\\ogrelogo.gif")
 
+set(CPACK_PACKAGE_CONTACT "OGRE Team <sinbad@ogre3d.org>")
+
 include(CPack)
