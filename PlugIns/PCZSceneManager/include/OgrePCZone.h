@@ -69,7 +69,6 @@ namespace Ogre
     typedef map<String, PCZone*>::type ZoneMap;
 	typedef list<PCZone*>::type PCZoneList;
     typedef list< Portal * >::type PortalList;
-	typedef list< SceneNode * >::type NodeList;
 	typedef set< PCZSceneNode * >::type PCZSceneNodeList;
     typedef map<String, SceneNode*>::type SceneNodeList;
 
@@ -181,6 +180,8 @@ namespace Ogre
 
 		/* Update a node's home zone */
 		virtual PCZone * updateNodeHomeZone(PCZSceneNode * pczsn, bool allowBackTouces) = 0;
+
+		typedef list< SceneNode * >::type NodeList;
 
         /** Find and add visible objects to the render queue.
         @remarks

@@ -306,7 +306,7 @@ namespace Ogre
 		virtual void notifyWorldGeometryRenderQueue(uint8 qid);
 
 		/// Get the shared list of indexes cached (internal use only)
-		virtual TerrainBufferCache& _getIndexCache(void) {return mIndexCache;}
+		virtual TerrainZoneBufferCache& _getIndexCache(void) {return mIndexCache;}
 
 		/// Get the shared level index list (internal use only)
 		virtual LevelArray& _getLevelIndex(void) { return mLevelIndex; }
@@ -362,7 +362,7 @@ namespace Ogre
 		TerrainZonePage2D mTerrainZonePages;
 		//-- attributes to share across tiles
 		/// Shared list of index buffers
-		TerrainBufferCache mIndexCache;
+		TerrainZoneBufferCache mIndexCache;
 		/// Shared array of IndexData (reuse indexes across tiles)
 		LevelArray mLevelIndex;
 	    

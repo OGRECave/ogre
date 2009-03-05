@@ -49,9 +49,6 @@ namespace Ogre
 
 class OctreeNode;
 
-typedef list< OctreeNode * >::type NodeList;
-
-
 /** Octree datastructure for managing scene nodes.
 @remarks
 This is a loose octree implementation, meaning that each
@@ -128,6 +125,7 @@ public:
     void _getCullBounds( AxisAlignedBox * ) const;
 
 
+	typedef list< OctreeNode * >::type NodeList;
     /** Public list of SceneNodes attached to this particular octree
     */
     NodeList mNodes;

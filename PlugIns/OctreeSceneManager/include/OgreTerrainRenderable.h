@@ -81,11 +81,6 @@ namespace Ogre
         IndexArray mCache;
     };
 
-    inline Real _max( Real x, Real y )
-    {
-        return ( x > y ) ? x : y;
-    }
-
     /** A simple class for encapsulating parameters which are commonly needed by 
     both TerrainSceneManager and TerrainRenderable.
     */

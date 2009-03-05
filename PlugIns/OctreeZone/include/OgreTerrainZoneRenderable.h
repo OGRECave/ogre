@@ -59,7 +59,7 @@ namespace Ogre
     * A cache of TerrainIndexBuffers.  Used to keep track of the buffers, and
     * delete them when the program finishes.
     */
-    class TerrainBufferCache
+    class TerrainZoneBufferCache
     {
     public:
         void shutdown(void)
@@ -70,18 +70,13 @@ namespace Ogre
             }
             mCache.clear();
         }
-        ~TerrainBufferCache()
+        ~TerrainZoneBufferCache()
         {
             shutdown();
         }
 
         IndexArray mCache;
     };
-
-    inline Real _max( Real x, Real y )
-    {
-        return ( x > y ) ? x : y;
-    }
 
     /** A simple class for encapsulating parameters which are commonly needed by 
     both TerrainSceneManager and TerrainZoneRenderable.

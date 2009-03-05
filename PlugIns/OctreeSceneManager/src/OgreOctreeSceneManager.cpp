@@ -556,7 +556,7 @@ void OctreeSceneManager::_alertVisibleObjects( void )
         "Function doesn't do as advertised",
         "OctreeSceneManager::_alertVisibleObjects" );
 
-    NodeList::iterator it = mVisible.begin();
+    Octree::NodeList::iterator it = mVisible.begin();
 
     while ( it != mVisible.end() )
     {
@@ -624,7 +624,7 @@ void OctreeSceneManager::walkOctree( OctreeCamera *camera, RenderQueue *queue,
     {
 
         //Add stuff to be rendered;
-        NodeList::iterator it = octant -> mNodes.begin();
+        Octree::NodeList::iterator it = octant -> mNodes.begin();
 
         if ( mShowBoxes )
         {
@@ -710,7 +710,7 @@ void _findNodes( const AxisAlignedBox &t, list< SceneNode * >::type &list, Scene
 	}
 
 
-	NodeList::iterator it = octant -> mNodes.begin();
+	Octree::NodeList::iterator it = octant -> mNodes.begin();
 
 	while ( it != octant -> mNodes.end() )
 	{
@@ -783,7 +783,7 @@ void _findNodes( const Sphere &t, list< SceneNode * >::type &list, SceneNode *ex
 	}
 
 
-	NodeList::iterator it = octant -> mNodes.begin();
+	Octree::NodeList::iterator it = octant -> mNodes.begin();
 
 	while ( it != octant -> mNodes.end() )
 	{
@@ -857,7 +857,7 @@ void _findNodes( const PlaneBoundedVolume &t, list< SceneNode * >::type &list, S
 	}
 
 
-	NodeList::iterator it = octant -> mNodes.begin();
+	Octree::NodeList::iterator it = octant -> mNodes.begin();
 
 	while ( it != octant -> mNodes.end() )
 	{
@@ -930,7 +930,7 @@ void _findNodes( const Ray &t, list< SceneNode * >::type &list, SceneNode *exclu
 	}
 
 
-	NodeList::iterator it = octant -> mNodes.begin();
+	Octree::NodeList::iterator it = octant -> mNodes.begin();
 
 	while ( it != octant -> mNodes.end() )
 	{

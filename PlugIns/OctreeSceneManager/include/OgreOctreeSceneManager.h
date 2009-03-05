@@ -199,11 +199,10 @@ public:
     RaySceneQuery* createRayQuery(const Ray& ray, unsigned long mask);
     IntersectionSceneQuery* createIntersectionQuery(unsigned long mask);
 
-
 protected:
 
 
-    NodeList mVisible;
+	Octree::NodeList mVisible;
 
     /// The root octree
     Octree *mOctree;
