@@ -184,6 +184,11 @@ OceanDemo::~OceanDemo()
     mActiveMaterial.setNull();
 
     delete mRoot;
+
+#ifdef OGRE_STATIC_LIB
+	mStaticPluginLoader.unload();
+#endif
+
 }
 
 //--------------------------------------------------------------------------
@@ -200,16 +205,23 @@ bool OceanDemo::setup(void)
 {
 	bool setupCompleted = false;
 
-	#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-        Ogre::String mResourcePath;
-        mResourcePath = bundlePath() + "/Contents/Resources/";
-        mRoot = new Ogre::Root(mResourcePath + "plugins.cfg",
-                         mResourcePath + "ogre.cfg", mResourcePath + "Ogre.log");
-    #else
+	Ogre::String mResourcePath;
+	Ogre::String pluginsPath;
+	// only use plugins.cfg if not static
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+	mResourcePath = bundlePath() + "/Contents/Resources/";
+#endif
+#ifndef OGRE_STATIC_LIB
+	pluginsPath = mResourcePath + "plugins.cfg";
+#endif
 
-        mRoot = new Ogre::Root();
+	mRoot = new Ogre::Root(pluginsPath,
+		mResourcePath + "ogre.cfg", mResourcePath + "Ogre.log");
 
-    #endif
+#ifdef OGRE_STATIC_LIB
+	mStaticPluginLoader.load();
+#endif
+
 
     setupResources();
 

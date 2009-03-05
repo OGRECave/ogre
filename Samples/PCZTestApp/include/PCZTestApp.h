@@ -14,6 +14,9 @@ This file based on the Example App framework from Ogre3d (www.ogre3d.org)
 		Portal Connected Zone (PCZ) Scene Manager Plugin.
 */
 
+// tell static build system that we want PCZ
+#define OGRE_USE_PCZ 1
+
 #include "ExampleApplication.h" 
 #include "RoomObject.h"
 #include "OgreTerrainZone.h"

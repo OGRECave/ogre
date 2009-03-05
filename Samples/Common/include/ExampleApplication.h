@@ -27,18 +27,26 @@ Description: Base class for all the OGRE examples
 // Static plugins declaration section
 // Note that every entry in here adds an extra header / library dependency
 #ifdef OGRE_STATIC_LIB
-#  define OGRE_STATIC_PLUGIN_GL
+#  define OGRE_STATIC_GL
 #  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #    define OGRE_STATIC_Direct3D9
+     // dx10 will only work on vista, so be careful about statically linking
+#    if OGRE_USE_D3D10
+#      define OGRE_STATIC_Direct3D10
+#    endif
 #  endif
-#  define OGRE_STATIC_OctreeSceneManager
 #  define OGRE_STATIC_BSPSceneManager
 #  define OGRE_STATIC_ParticleFX
 #  define OGRE_STATIC_CgProgramManager
-#  define OGRE_STATIC_PCZSceneManager
-#  define OGRE_STATIC_OctreeZone
+#  ifdef OGRE_USE_PCZ
+#    define OGRE_STATIC_PCZSceneManager
+#    define OGRE_STATIC_OctreeZone
+#  else
+#    define OGRE_STATIC_OctreeSceneManager
+#  endif
+
+#  include "OgreStaticPluginLoader.h"
 #endif
-#include "OgreStaticPluginLoader.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include <CoreFoundation/CoreFoundation.h>
@@ -96,7 +104,10 @@ public:
             delete mFrameListener;
         if (mRoot)
             OGRE_DELETE mRoot;
+
+#ifdef OGRE_STATIC_LIB
 		mStaticPluginLoader.unload();
+#endif
     }
 
     /// Start the example
@@ -113,7 +124,9 @@ public:
 
 protected:
     Root *mRoot;
+#ifdef OGRE_STATIC_LIB
 	StaticPluginLoader mStaticPluginLoader;
+#endif
     Camera* mCamera;
     SceneManager* mSceneMgr;
     ExampleFrameListener* mFrameListener;
@@ -133,8 +146,9 @@ protected:
 		
         mRoot = OGRE_NEW Root(pluginsPath, 
             mResourcePath + "ogre.cfg", mResourcePath + "Ogre.log");
+#ifdef OGRE_STATIC_LIB
 		mStaticPluginLoader.load();
-
+#endif
         setupResources();
 
         bool carryOn = configure();

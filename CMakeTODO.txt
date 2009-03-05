@@ -3,6 +3,7 @@ TODO
 
 Essential before switch-on as primary system
 
+* Dependency DLLs for OIS and Cg end up in the wrong place in Release mode, in build_dir/bin/debug instead of the release folder?
 * Install samples sources
   * Should probably rearrange the samples directory
 * SDK testing

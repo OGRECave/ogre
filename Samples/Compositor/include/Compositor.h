@@ -15,6 +15,27 @@ LGPL like the rest of the engine.
 #ifndef _CompositorDemo_H_
 #define _CompositorDemo_H_
 
+// Static plugins declaration section
+// Note that every entry in here adds an extra header / library dependency
+#ifdef OGRE_STATIC_LIB
+#  define OGRE_STATIC_GL
+#  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#    define OGRE_STATIC_Direct3D9
+#    define OGRE_STATIC_Direct3D10
+#  endif
+#  define OGRE_STATIC_BSPSceneManager
+#  define OGRE_STATIC_ParticleFX
+#  define OGRE_STATIC_CgProgramManager
+#  ifdef OGRE_USE_PCZ
+#    define OGRE_STATIC_PCZSceneManager
+#    define OGRE_STATIC_OctreeZone
+#  else
+#    define OGRE_STATIC_OctreeSceneManager
+#  endif
+
+#  include "OgreStaticPluginLoader.h"
+#endif
+
 #include "OgreConfigFile.h"
 #include "OgreStringConverter.h"
 #include "OgreException.h"
@@ -41,6 +62,9 @@ LGPL like the rest of the engine.
     {
     protected:
         Ogre::Root*			  mRoot;
+#ifdef OGRE_STATIC_LIB
+		Ogre::StaticPluginLoader	  mStaticPluginLoader;
+#endif
         Ogre::Camera*		  mCamera;
         Ogre::SceneManager*	  mSceneMgr;
         // the scene node of the entity

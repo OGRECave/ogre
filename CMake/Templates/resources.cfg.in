@@ -15,6 +15,7 @@ FileSystem=@OGRE_MEDIA_DIR_REL@/overlays
 FileSystem=@OGRE_MEDIA_DIR_REL@/particle
 FileSystem=@OGRE_MEDIA_DIR_REL@/gui
 FileSystem=@OGRE_MEDIA_DIR_REL@/DeferredShadingMedia
+FileSystem=@OGRE_MEDIA_DIR_REL@/PCZAppMedia
 Zip=@OGRE_MEDIA_DIR_REL@/packs/cubemap.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/cubemapsJS.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/dragon.zip
