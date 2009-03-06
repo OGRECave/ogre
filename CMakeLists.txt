@@ -76,6 +76,7 @@ option(OGRE_BUILD_PLUGIN_BSP "Build BSP SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_OCTREE "Build Octree SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_PCZ "Build PCZ SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_PFX "Build ParticleFX plugin" TRUE)
+option(OGRE_BUILD_COMPONENT_PAGING "Build Paging component" TRUE)
 cmake_dependent_option(OGRE_BUILD_PLUGIN_CG "Build Cg plugin" TRUE "Cg_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_CEGUIRENDERER "Build CEGUI renderer" TRUE "CEGUI_FOUND" FALSE)
 option(OGRE_BUILD_SAMPLES "Build Ogre demos" TRUE)
@@ -142,6 +143,9 @@ add_subdirectory(RenderSystems)
 
 # Setup Plugins
 add_subdirectory(PlugIns)
+
+# Setup Components
+add_subdirectory(Components)
 
 # Setup CEGUI renderer
 if (OGRE_BUILD_CEGUIRENDERER)

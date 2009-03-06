@@ -1,6 +1,6 @@
 format 65
 "paging"
-  revision 1
+  revision 3
   modified_by 95 "Steve"
 
 
@@ -163,6 +163,10 @@ format 65
 	  b role_name "" private
 	    classrelation_ref 134623 // <association>
       end
+
+      classrelation 139871 // <association>
+	relation_ref 135519 // <association>
+      end
     end
 
     class 128735 "ObjectPageContentFactory"
@@ -224,20 +228,8 @@ format 65
 	relation_ref 131679 // <association>
       end
 
-      classrelation 135007 // <association>
-	relation 132063 ----
-	  a role_name "" multiplicity "*" private
-	    classrelation_ref 135007 // <association>
-	  b role_name "" private
-	    classrelation_ref 135135 // <association>
-      end
-
-      classrelation 135519 // <association>
-	relation 132319 ----
-	  a role_name "" private
-	    classrelation_ref 135519 // <association>
-	  b role_name "" private
-	    classrelation_ref 135647 // <association>
+      classrelation 137439 // <association>
+	relation_ref 133727 // <association>
       end
     end
 
@@ -254,16 +246,12 @@ format 65
 	relation_ref 130399 // <association>
       end
 
-      classrelation 134751 // <association>
-	relation 131935 ----
+      classrelation 137567 // <association>
+	relation 133855 ----
 	  a role_name "" private
-	    classrelation_ref 134751 // <association>
+	    classrelation_ref 137567 // <association>
 	  b role_name "" private
-	    classrelation_ref 134879 // <association>
-      end
-
-      classrelation 135391 // <association>
-	relation_ref 132191 // <association>
+	    classrelation_ref 137695 // <association>
       end
     end
 
@@ -276,8 +264,12 @@ format 65
       idl_decl ""
       explicit_switch_type ""
       
-      classrelation 135647 // <association>
-	relation_ref 132319 // <association>
+      classrelation 139231 // <association>
+	relation 135263 ----
+	  a role_name "" private
+	    classrelation_ref 139231 // <association>
+	  b role_name "" private
+	    classrelation_ref 139359 // <association>
       end
     end
 
@@ -361,6 +353,14 @@ format 65
       classrelation 134623 // <association>
 	relation_ref 131807 // <association>
       end
+
+      classrelation 137055 // <association>
+	relation 133599 ----
+	  a role_name "" private
+	    classrelation_ref 137055 // <association>
+	  b role_name "" private
+	    classrelation_ref 137183 // <association>
+      end
     end
 
     class 129887 "PagedWorldSection"
@@ -391,7 +391,6 @@ format 65
       classrelation 131807 // <association>
 	relation_ref 130271 // <association>
       end
-
     end
 
     class 130015 "TerrainPageContent"
@@ -477,12 +476,12 @@ format 65
       idl_decl ""
       explicit_switch_type ""
       
-      classrelation 134879 // <association>
-	relation_ref 131935 // <association>
+      classrelation 137183 // <association>
+	relation_ref 133599 // <association>
       end
     end
 
-    class 130655 "PageLOD"
+    class 130655 "PageContentCollection"
       visibility package 
       cpp_decl ""
       java_decl ""
@@ -491,16 +490,67 @@ format 65
       idl_decl ""
       explicit_switch_type ""
       
-      classrelation 135135 // <association>
-	relation_ref 132063 // <association>
+      classrelation 137311 // <association>
+	relation 133727 ----
+	  a role_name "" private
+	    classrelation_ref 137311 // <association>
+	  b role_name "" private
+	    classrelation_ref 137439 // <association>
       end
 
-      classrelation 135263 // <association>
-	relation 132191 ----
-	  a role_name "" multiplicity "*" private
-	    classrelation_ref 135263 // <association>
+      classrelation 137695 // <association>
+	relation_ref 133855 // <association>
+      end
+
+      classrelation 139487 // <association>
+	relation 135391 ----
+	  a role_name "" private
+	    classrelation_ref 139487 // <association>
 	  b role_name "" private
-	    classrelation_ref 135391 // <association>
+	    classrelation_ref 139615 // <association>
+      end
+    end
+
+    class 131807 "LodPageContentCollection"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 139103 // <generalisation>
+	relation 135135 ---|>
+	  a public
+	    classrelation_ref 139103 // <generalisation>
+	  b parent class_ref 130655 // PageContentCollection
+      end
+
+      classrelation 139359 // <association>
+	relation_ref 135263 // <association>
+      end
+    end
+
+    class 131935 "PageContentCollectionFactory"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 139615 // <association>
+	relation_ref 135391 // <association>
+      end
+
+      classrelation 139743 // <association>
+	relation 135519 ----
+	  a role_name "" private
+	    classrelation_ref 139743 // <association>
+	  b role_name "" private
+	    classrelation_ref 139871 // <association>
       end
     end
   end
