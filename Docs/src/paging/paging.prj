@@ -1,6 +1,6 @@
 format 65
 "paging"
-  revision 3
+  revision 4
   modified_by 95 "Steve"
 
 
@@ -551,6 +551,23 @@ format 65
 	    classrelation_ref 139743 // <association>
 	  b role_name "" private
 	    classrelation_ref 139871 // <association>
+      end
+    end
+
+    class 133087 "LodPageContentCollectionFactory"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 141023 // <generalisation>
+	relation 136671 ---|>
+	  a public
+	    classrelation_ref 141023 // <generalisation>
+	  b parent class_ref 131935 // PageContentCollectionFactory
       end
     end
   end

@@ -4,7 +4,7 @@ diagrams
     1281 808 100 15 0 0
 end
 show_stereotypes
-selected class_ref 129503 // PixelCountLodStragey
+selected class_ref 131935 // PageContentCollectionFactory
 open
   classview_ref 128095 // main
 end
