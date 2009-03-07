@@ -115,5 +115,5 @@ else() # other OS only need one cfg file
   configure_file(${OGRE_TEMPLATES_DIR}/media.cfg.in ${OGRE_BINARY_DIR}/bin/media.cfg)
   # create quake3settings.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/quake3settings.cfg.in ${OGRE_BINARY_DIR}/bin/quake3settings.cfg)
-
+endif ()
 

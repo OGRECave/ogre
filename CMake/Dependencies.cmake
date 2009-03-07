@@ -5,28 +5,28 @@
 # OGRE_DEPENDENCIES_DIR can be used to specify a single base
 # folder where the required dependencies may be found.
 set(OGRE_DEPENDENCIES_DIR "${OGRE_SOURCE_DIR}/Dependencies" CACHE PATH "Path to OGRE dependencies")
+set(DEP_PREFIX_SEARCH_DIR "${OGRE_DEPENDENCIES_DIR}")
 
 # Set hardcoded path guesses for various platforms
-if (WIN32)
+if (WIN32 OR APPLE)
   set(DEP_INCLUDE_SEARCH_DIR "${OGRE_DEPENDENCIES_DIR}/include")
   set(DEP_LIB_SEARCH_DIR "${OGRE_DEPENDENCIES_DIR}/lib/Release")
   set(DEP_LIBD_SEARCH_DIR "${OGRE_DEPENDENCIES_DIR}/lib/Debug")
-  set(DEP_PREFIX_SEARCH_DIR "${OGRE_DEPENDENCIES_DIR}")
-  
-elseif (UNIX)
-  set(DEP_INCLUDE_SEARCH_DIR "/usr/local/include" ${OGRE_DEPENDENCIES_DIR}/include)
-  set(DEP_LIB_SEARCH_DIR "/usr/local/lib" ${OGRE_DEPENDENCIES_DIR}/lib)
-  set(DEP_LIBD_SEARCH_DIR "/usr/local/lib" ${OGRE_DEPENDENCIES_DIR}/lib)
-  set(DEP_PREFIX_SEARCH_DIR "${OGRE_DEPENDENCIES_DIR}")
+endif ()
 
-elseif (APPLE)
-# TODO
+
+if (UNIX)
+  # Important - OS X registers as *both* UNIX and APPLE, so append
+  set(DEP_INCLUDE_SEARCH_DIR ${DEP_INCLUDE_SEARCH_DIR} "/usr/local/include" ${OGRE_DEPENDENCIES_DIR}/include)
+  set(DEP_LIB_SEARCH_DIR ${DEP_LIB_SEARCH_DIR} "/usr/local/lib" ${OGRE_DEPENDENCIES_DIR}/lib)
+  set(DEP_LIBD_SEARCH_DIR ${DEP_LIBD_SEARCH_DIR} "/usr/local/lib" ${OGRE_DEPENDENCIES_DIR}/lib)
 endif ()
 
 # give guesses as hints to the find_package calls
 set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${DEP_INCLUDE_SEARCH_DIR})
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${DEP_LIB_SEARCH_DIR} ${DEP_LIBD_SEARCH_DIR})
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${DEP_PREFIX_SEARCH_DIR})
+set(CMAKE_FRAMEWORK_PATH ${CMAKE_FRAMEWORK_PATH} ${OGRE_DEPENDENCIES_DIR})
 
 
 #######################################################################
