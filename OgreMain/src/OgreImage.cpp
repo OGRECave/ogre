@@ -342,6 +342,7 @@ namespace Ogre {
 		imgData->height = m_uHeight;
 		imgData->width = m_uWidth;
 		imgData->depth = m_uDepth;
+		imgData->size = m_uSize;
 		// Wrap in CodecDataPtr, this will delete
 		Codec::CodecDataPtr codeDataPtr(imgData);
 		// Wrap memory, be sure not to delete when stream destroyed
