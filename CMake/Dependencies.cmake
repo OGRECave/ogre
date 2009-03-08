@@ -112,6 +112,12 @@ macro_log_feature(OIS_FOUND "OIS" "Input library needed for the samples" "http:/
 find_package(Doxygen)
 macro_log_feature(DOXYGEN_FOUND "Doxygen" "Tool for building API documentation" "http://doxygen.org" FALSE "" "")
 
+#######################################################################
+# Tests
+#######################################################################
+
+find_package(CppUnit)
+macro_log_feature(CppUnit_FOUND "CppUnit" "Library for performing unit tests" "http://cppunit.sourceforge.net" FALSE "" "")
 
 # Display results, terminate if anything required is missing
 MACRO_DISPLAY_FEATURE_LOG()
@@ -130,6 +136,7 @@ include_directories(
   ${BOOST_INCLUDE_DIRS}
   ${X11_INCLUDE_DIR}
   ${DirectX_INCLUDE_DIRS}
+  ${CppUnit_INCLUDE_DIRS}
 )
 link_directories(
   ${OPENGL_LIBRARY_DIRS}
@@ -137,4 +144,5 @@ link_directories(
   ${BOOST_LIBRARY_DIRS}
   ${X11_LIBRARY_DIRS}
   ${DirectX_LIBRARY_DIRS}
+  ${CppUnit_LIBRARY_DIRS}
 )

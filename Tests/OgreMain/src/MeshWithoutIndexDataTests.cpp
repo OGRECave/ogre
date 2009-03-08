@@ -448,7 +448,7 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName);
 
-    Mesh::LodDistanceList lodDistanceList;
+    Mesh::LodValueList lodDistanceList;
     lodDistanceList.push_back(600.0);
     mesh->generateLodLevels(lodDistanceList, ProgressiveMesh::VRQ_CONSTANT, 2);
 

@@ -227,7 +227,7 @@ void RenderSystemCapabilitiesTests::testSerializeShaderCapability()
 void RenderSystemCapabilitiesTests::testWriteSimpleCapabilities()
 {
     using namespace Ogre;
-    using namespace std;
+	using namespace std;
 
     String name = "simple caps";
     String filename = "simpleCapsTest.rendercaps";
@@ -255,7 +255,7 @@ void RenderSystemCapabilitiesTests::testWriteSimpleCapabilities()
     capsfile.getline(buff, 255);
     CPPUNIT_ASSERT_EQUAL(String("{"), String(buff));
     // scan every line and find the set capabilities it them
-    vector <String> lines;
+	std::vector <String> lines;
     while(capsfile.good())
     {
         capsfile.getline(buff, 255);
@@ -304,7 +304,7 @@ void RenderSystemCapabilitiesTests::testWriteAllFalseCapabilities()
     capsfile.getline(buff, 255);
     CPPUNIT_ASSERT_EQUAL(String("{"), String(buff));
     // scan every line and find the set capabilities it them
-    vector <String> lines;
+    std::vector <String> lines;
     while(capsfile.good())
     {
         capsfile.getline(buff, 255);
@@ -427,7 +427,7 @@ void RenderSystemCapabilitiesTests::testWriteAllTrueCapabilities()
     capsfile.getline(buff, 255);
     CPPUNIT_ASSERT_EQUAL(String("{"), String(buff));
     // scan every line and find the set capabilities it them
-    vector <String> lines;
+    std::vector <String> lines;
     while(capsfile.good())
     {
         capsfile.getline(buff, 255);

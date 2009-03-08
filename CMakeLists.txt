@@ -81,6 +81,7 @@ cmake_dependent_option(OGRE_BUILD_PLUGIN_CG "Build Cg plugin" TRUE "Cg_FOUND" FA
 cmake_dependent_option(OGRE_BUILD_CEGUIRENDERER "Build CEGUI renderer" TRUE "CEGUI_FOUND" FALSE)
 option(OGRE_BUILD_SAMPLES "Build Ogre demos" TRUE)
 option(OGRE_BUILD_TOOLS "Build the command-line tools" TRUE)
+option(OGRE_BUILD_TESTS "Build the unit tests & PlayPen" FALSE)
 # Configure the build
 #option(OGRE_CONFIG_PROFILING "Enable Ogre profiling code" FALSE)
 #set(OGRE_CONFIG_ASSERTMODE 0 CACHE STRING 
@@ -158,6 +159,11 @@ add_subdirectory(Samples)
 # Setup command-line tools
 if (OGRE_BUILD_TOOLS)
   add_subdirectory(Tools)
+endif ()
+
+# Setup tests
+if (OGRE_BUILD_TESTS)
+  add_subdirectory(Tests)
 endif ()
 
 # Install documentation

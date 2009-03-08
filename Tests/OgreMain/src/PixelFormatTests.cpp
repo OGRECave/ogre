@@ -171,8 +171,11 @@ void PixelFormatTests::testCase(PixelFormat srcFormat, PixelFormat dstFormat)
     s << " ";
 
     // Compare result
-    CPPUNIT_ASSERT_MESSAGE("Conversion mismatch ["+PixelUtil::getFormatName(srcFormat)+"->"+PixelUtil::getFormatName(dstFormat)+"] "+s.str(),
-        memcmp(dst1.data, dst2.data, eob) == 0);
+	StringUtil::StrStreamType msg;
+	msg << "Conversion mismatch [" << PixelUtil::getFormatName(srcFormat) << 
+		"->" << PixelUtil::getFormatName(dstFormat) << "] " << s.str();
+    CPPUNIT_ASSERT_MESSAGE(msg.str().c_str(),
+		memcmp(dst1.data, dst2.data, eob) == 0);
 }
 
 void PixelFormatTests::testBulkConversion()
