@@ -10,8 +10,10 @@ set(CPACK_PACKAGE_NAME "OGRE")
 set(CPACK_PACKAGE_VENDOR "Torus Knot Software")
 
 set(CPACK_RESOURCE_FILE_LICENSE "${OGRE_SOURCE_DIR}/COPYING")
-set(CPACK_PACKAGE_ICON "${OGRE_SOURCE_DIR}\\\\ogrelogo.gif")
+#set(CPACK_PACKAGE_ICON "${OGRE_SOURCE_DIR}\\\\ogrelogo.gif")
 
 set(CPACK_PACKAGE_CONTACT "OGRE Team <sinbad@ogre3d.org>")
+
+set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "WriteRegStr \\\${WriteEnvStr_RegKey} \\\"OGRE_HOME\\\" $INSTDIR")
 
 include(CPack)
