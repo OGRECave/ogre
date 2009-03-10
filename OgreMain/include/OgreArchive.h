@@ -85,13 +85,15 @@ namespace Ogre {
         String mName; 
         /// Archive type code
         String mType;
+		/// Read-only flag
+		bool mReadOnly;
     public:
 
 
         /** Constructor - don't call direct, used by ArchiveFactory.
         */
         Archive( const String& name, const String& archType )
-            : mName(name), mType(archType) {}
+            : mName(name), mType(archType), mReadOnly(true) {}
 
         /** Default destructor.
         */
@@ -119,16 +121,38 @@ namespace Ogre {
         */
         virtual void unload() = 0;
 
+		/** Reports whether this Archive is read-only, or whether the contents
+			can be updated. 
+		*/
+		virtual bool isReadOnly() const { return mReadOnly; }
+
         /** Open a stream on a given file. 
         @note
             There is no equivalent 'close' method; the returned stream
             controls the lifecycle of this file operation.
         @param filename The fully qualified name of the file
+		@param readOnly Whether to open the file in read-only mode or not (note, 
+			if the archive is read-only then this cannot be set to false)
         @returns A shared pointer to a DataStream which can be used to 
             read / write the file. If the file is not present, returns a null
 			shared pointer.
         */
-        virtual DataStreamPtr open(const String& filename) const = 0;
+        virtual DataStreamPtr open(const String& filename, bool readOnly = true) const = 0;
+
+		/** Create a new file (or overwrite one already there). 
+		@note If the archive is read-only then this method will fail.
+		@param filename The fully qualified name of the file
+		@returns A shared pointer to a DataStream which can be used to 
+		read / write the file. 
+		*/
+		virtual DataStreamPtr create(const String& filename) const = 0;
+
+		/** Delete a named file.
+		@remarks Not possible on read-only archives
+		@param filename The fully qualified name of the file
+		*/
+		virtual void remove(const String& filename) const = 0;
+
 
         /** List all file names in the archive.
         @note

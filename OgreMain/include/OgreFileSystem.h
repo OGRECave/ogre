@@ -68,9 +68,15 @@ namespace Ogre {
         void unload();
 
         /// @copydoc Archive::open
-        DataStreamPtr open(const String& filename) const;
+        DataStreamPtr open(const String& filename, bool readOnly = true) const;
 
-        /// @copydoc Archive::list
+		/// @copydoc Archive::create
+		DataStreamPtr create(const String& filename) const;
+
+		/// @copydoc Archive::delete
+		void remove(const String& filename) const;
+
+		/// @copydoc Archive::list
         StringVectorPtr list(bool recursive = true, bool dirs = false);
 
         /// @copydoc Archive::listFileInfo

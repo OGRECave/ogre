@@ -186,7 +186,18 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void FileSystemArchive::load()
     {
-        // do nothing here, what has to be said will be said later
+        // test to see if this folder is writeable
+		String testPath = concatenate_path(mName, "__testwrite.ogre");
+		std::ofstream writeStream;
+		writeStream.open(testPath.c_str());
+		if (writeStream.fail())
+			mReadOnly = true;
+		else
+		{
+			mReadOnly = false;
+			writeStream.close();
+			::remove(testPath.c_str());
+		}
     }
     //-----------------------------------------------------------------------
     void FileSystemArchive::unload()
@@ -194,34 +205,110 @@ namespace Ogre {
         // nothing to see here, move along
     }
     //-----------------------------------------------------------------------
-    DataStreamPtr FileSystemArchive::open(const String& filename) const
+    DataStreamPtr FileSystemArchive::open(const String& filename, bool readOnly) const
     {
-        String full_path = concatenate_path(mName, filename);
+		String full_path = concatenate_path(mName, filename);
 
-        // Use filesystem to determine size 
-        // (quicker than streaming to the end and back)
-        struct stat tagStat;
-	int ret = stat(full_path.c_str(), &tagStat);
-        assert(ret == 0 && "Problem getting file size" );
+		// Use filesystem to determine size 
+		// (quicker than streaming to the end and back)
+		struct stat tagStat;
+		int ret = stat(full_path.c_str(), &tagStat);
+		assert(ret == 0 && "Problem getting file size" );
 
-        // Always open in binary mode
-        std::ifstream *origStream = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL)();
-        origStream->open(full_path.c_str(), std::ios::in | std::ios::binary);
+		// Always open in binary mode
+		// Also, always include reading
+		std::ios::openmode mode = std::ios::in | std::ios::binary;
+		std::istream* baseStream = 0;
+		std::ifstream* roStream = 0;
+		std::fstream* rwStream = 0;
 
-        // Should check ensure open succeeded, in case fail for some reason.
-        if (origStream->fail())
-        {
-            OGRE_DELETE_T(origStream, basic_ifstream, MEMCATEGORY_GENERAL);
-            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
-                "Cannot open file: " + filename,
-                "FileSystemArchive::open");
-        }
+		if (!readOnly && isReadOnly())
+		{
+			mode |= std::ios::out;
+			rwStream = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
+			rwStream->open(full_path.c_str(), mode);
+			baseStream = rwStream;
+		}
+		else
+		{
+			roStream = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL)();
+			roStream->open(full_path.c_str(), mode);
+			baseStream = roStream;
+		}
 
-        /// Construct return stream, tell it to delete on destroy
-        FileStreamDataStream* stream = OGRE_NEW FileStreamDataStream(filename,
-            origStream, tagStat.st_size, true);
-        return DataStreamPtr(stream);
+
+		// Should check ensure open succeeded, in case fail for some reason.
+		if (baseStream->fail())
+		{
+			OGRE_DELETE_T(roStream, basic_ifstream, MEMCATEGORY_GENERAL);
+			OGRE_DELETE_T(rwStream, basic_fstream, MEMCATEGORY_GENERAL);
+			OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
+				"Cannot open file: " + filename,
+				"FileSystemArchive::open");
+		}
+
+		/// Construct return stream, tell it to delete on destroy
+		FileStreamDataStream* stream = 0;
+		if (rwStream)
+		{
+			// use the writeable stream 
+			stream = OGRE_NEW FileStreamDataStream(filename,
+				rwStream, tagStat.st_size, true);
+		}
+		else
+		{
+			// read-only stream
+			stream = OGRE_NEW FileStreamDataStream(filename,
+				roStream, tagStat.st_size, true);
+		}
+		return DataStreamPtr(stream);
     }
+	//---------------------------------------------------------------------
+	DataStreamPtr FileSystemArchive::create(const String& filename) const
+	{
+		if (isReadOnly())
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Cannot create a file in a read-only archive", 
+				"FileSystemArchive::remove");
+		}
+
+		String full_path = concatenate_path(mName, filename);
+
+		// Always open in binary mode
+		// Also, always include reading
+		std::ios::openmode mode = std::ios::out | std::ios::binary;
+		std::fstream* rwStream = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
+		rwStream->open(full_path.c_str(), mode);
+
+		// Should check ensure open succeeded, in case fail for some reason.
+		if (rwStream->fail())
+		{
+			OGRE_DELETE_T(rwStream, basic_fstream, MEMCATEGORY_GENERAL);
+			OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
+				"Cannot open file: " + filename,
+				"FileSystemArchive::create");
+		}
+
+		/// Construct return stream, tell it to delete on destroy
+		FileStreamDataStream* stream = OGRE_NEW FileStreamDataStream(filename,
+				rwStream, 0, true);
+
+		return DataStreamPtr(stream);
+	}
+	//---------------------------------------------------------------------
+	void FileSystemArchive::remove(const String& filename) const
+	{
+		if (isReadOnly())
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Cannot remove a file from a read-only archive", 
+				"FileSystemArchive::remove");
+		}
+		String full_path = concatenate_path(mName, filename);
+		::remove(filename.c_str());
+
+	}
     //-----------------------------------------------------------------------
     StringVectorPtr FileSystemArchive::list(bool recursive, bool dirs)
     {

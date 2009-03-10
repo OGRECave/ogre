@@ -129,7 +129,7 @@ namespace Ogre {
     
     }
     //-----------------------------------------------------------------------
-	DataStreamPtr ZipArchive::open(const String& filename) const
+	DataStreamPtr ZipArchive::open(const String& filename, bool readOnly) const
     {
 
         // Format not used here (always binary)
@@ -154,6 +154,18 @@ namespace Ogre {
         return DataStreamPtr(OGRE_NEW ZipDataStream(filename, zzipFile, static_cast<size_t>(zstat.st_size)));
 
     }
+	//---------------------------------------------------------------------
+	DataStreamPtr ZipArchive::create(const String& filename) const
+	{
+		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+			"Modification of zipped archives is not supported", 
+			"ZipArchive::create");
+
+	}
+	//---------------------------------------------------------------------
+	void ZipArchive::remove(const String& filename) const
+	{
+	}
     //-----------------------------------------------------------------------
     StringVectorPtr ZipArchive::list(bool recursive, bool dirs)
     {
@@ -291,6 +303,12 @@ namespace Ogre {
         }
         return (size_t) r;
     }
+	//---------------------------------------------------------------------
+	size_t ZipDataStream::write(void* buf, size_t count)
+	{
+		// not supported
+		return 0;
+	}
     //-----------------------------------------------------------------------
     void ZipDataStream::skip(long count)
     {
