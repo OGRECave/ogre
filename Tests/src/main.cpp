@@ -36,11 +36,14 @@ int main(int argc, char *argv[])
     runner.addTest( CPPUNIT_NS::TestFactoryRegistry::getRegistry().makeTest() );
     runner.run( controller );
 
-    // Print test in a compiler compatible format.
+    // Print test results to a file
+	std::ofstream ofile("OgreTestResults.log");
+	
     CPPUNIT_NS::CompilerOutputter* outputter =
-        CPPUNIT_NS::CompilerOutputter::defaultOutputter(&result, std::cout);
+        CPPUNIT_NS::CompilerOutputter::defaultOutputter(&result, ofile);
     outputter->write();
     delete outputter;
+
 
     tearDownSuite();
 
