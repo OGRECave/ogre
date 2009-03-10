@@ -38,16 +38,24 @@ CPPUNIT_TEST_SUITE_REGISTRATION( MeshWithoutIndexDataTests );
 void MeshWithoutIndexDataTests::setUp()
 {
 	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", true);
+	new ResourceGroupManager();
+	new LodStrategyManager();
     mBufMgr = new DefaultHardwareBufferManager();
     mMeshMgr = new MeshManager();
     archiveMgr = new ArchiveManager();
     archiveMgr->addArchiveFactory(new FileSystemArchiveFactory());
+
+	MaterialManager* matMgr = new MaterialManager();
+	matMgr->initialise();
 }
 void MeshWithoutIndexDataTests::tearDown()
 {
     delete mMeshMgr;
     delete mBufMgr;
     delete archiveMgr;
+	delete MaterialManager::getSingletonPtr();
+	delete LodStrategyManager::getSingletonPtr();
+	delete ResourceGroupManager::getSingletonPtr();
 }
 
 void MeshWithoutIndexDataTests::testCreateSimpleLine()

@@ -33,6 +33,7 @@ Torus Knot Software Ltd.
 #include "OgreCompositorManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreGpuProgramManager.h"
+#include "OgreLodStrategyManager.h"
 
 Ogre::LogManager* logMgr;
 void setUpSuite()
@@ -57,7 +58,10 @@ void tearDownSuite()
 
 	if(Ogre::LogManager::getSingletonPtr())
 		delete Ogre::LogManager::getSingletonPtr();
+	if(Ogre::ResourceGroupManager::getSingletonPtr())
+		delete Ogre::ResourceGroupManager::getSingletonPtr();
+	if(Ogre::LodStrategyManager::getSingletonPtr())
+		delete Ogre::LodStrategyManager::getSingletonPtr();
 
-    logMgr = 0;
 }
 
