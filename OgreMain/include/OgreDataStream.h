@@ -102,7 +102,11 @@ namespace Ogre {
 		@param count Number of bytes to write
 		@returns The number of bytes written
 		*/
-		virtual size_t write(void* buf, size_t count) = 0;
+		virtual size_t write(void* buf, size_t count)
+		{
+			// default to not supported
+			return 0;
+		}
 
 		/** Get a single line from the stream.
 		@remarks
