@@ -341,7 +341,7 @@ namespace Ogre {
             of << "Render System=" << std::endl;
         }
 
-        for (RenderSystemList::const_iterator pRend = getAvailableRenderers()->begin(); pRend != getAvailableRenderers()->end(); ++pRend)
+        for (RenderSystemList::const_iterator pRend = getAvailableRenderers().begin(); pRend != getAvailableRenderers().end(); ++pRend)
         {
             RenderSystem* rs = *pRend;
             of << std::endl;
@@ -367,7 +367,6 @@ namespace Ogre {
         //   available, and false if no saved config is
         //   stored, or if there has been a problem
         ConfigFile cfg;
-        //RenderSystemList::iterator pRend;
 
         try {
             // Don't trim whitespace
@@ -439,11 +438,11 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    RenderSystemList* Root::getAvailableRenderers(void)
+    const RenderSystemList& Root::getAvailableRenderers(void)
     {
         // Returns a vector of renders
 
-        return &mRenderers;
+        return mRenderers;
 
     }
 
@@ -457,7 +456,7 @@ namespace Ogre {
         }
 
         RenderSystemList::const_iterator pRend;
-        for (pRend = getAvailableRenderers()->begin(); pRend != getAvailableRenderers()->end(); ++pRend)
+        for (pRend = getAvailableRenderers().begin(); pRend != getAvailableRenderers().end(); ++pRend)
         {
             RenderSystem* rs = *pRend;
             if (rs->getName() == name)

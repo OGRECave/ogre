@@ -66,8 +66,8 @@ namespace Ogre
 #endif
     {
         HWND hwndDlgItem;
-        static RenderSystemList* lstRend;
-        RenderSystemList::iterator pRend;
+        static const RenderSystemList* lstRend;
+        RenderSystemList::const_iterator pRend;
         static ConfigOptionMap opts;
         String err;
 
@@ -80,7 +80,7 @@ namespace Ogre
             // Load saved settings
             dlg->mSelectedRenderSystem = Root::getSingleton().getRenderSystem();
             // Get all render systems
-            lstRend = Root::getSingleton().getAvailableRenderers();
+            lstRend = &Root::getSingleton().getAvailableRenderers();
             pRend = lstRend->begin();            
             i = 0;
             while (pRend != lstRend->end())

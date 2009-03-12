@@ -289,9 +289,9 @@ bool GLXConfigurator::CreateWindow() {
 	Widget menu = XtVaCreatePopupShell("menu", simpleMenuWidgetClass, mb1,
 		0, NULL);
 
-	RenderSystemList* renderers = Root::getSingleton().getAvailableRenderers();
-	for (RenderSystemList::iterator pRend = renderers->begin();
-	                pRend != renderers->end(); pRend++) {
+	const RenderSystemList& renderers = Root::getSingleton().getAvailableRenderers();
+	for (RenderSystemList::const_iterator pRend = renderers.begin();
+	                pRend != renderers.end(); pRend++) {
 		// Create callback data
 		mRendererCallbackData.push_back(RendererCallbackData(this, *pRend, mb1));
 

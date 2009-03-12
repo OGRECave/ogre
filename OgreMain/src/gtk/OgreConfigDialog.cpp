@@ -84,8 +84,8 @@ void ConfigDialog::rendererChanged (GtkComboBox *widget, gpointer data)
 
     gchar *renderer = gtk_combo_box_get_active_text (widget);
 
-    RenderSystemList *renderers = Root::getSingleton ().getAvailableRenderers ();
-    for (RenderSystemList::iterator r = renderers->begin(); r != renderers->end (); r++)
+    const RenderSystemList &renderers = Root::getSingleton ().getAvailableRenderers ();
+    for (RenderSystemList::const_iterator r = renderers.begin(); r != renderers.end (); r++)
         if (strcmp (renderer, (*r)->getName ().c_str ()) == 0)
         {
             This->mSelectedRenderSystem = *r;
@@ -253,9 +253,9 @@ bool ConfigDialog::createWindow ()
     g_signal_connect (G_OBJECT (rs_cb), "changed", G_CALLBACK (rendererChanged), this);
 
     // Add all available renderers to the combo box
-    RenderSystemList *renderers = Root::getSingleton ().getAvailableRenderers ();
+    const RenderSystemList &renderers = Root::getSingleton ().getAvailableRenderers ();
     uint idx = 0, sel_renderer_idx = 0;
-    for (RenderSystemList::iterator r = renderers->begin(); r != renderers->end (); r++, idx++)
+    for (RenderSystemList::const_iterator r = renderers.begin(); r != renderers.end (); r++, idx++)
     {
         gtk_combo_box_append_text (GTK_COMBO_BOX (rs_cb), (*r)->getName ().c_str ());
         if (mSelectedRenderSystem == *r)

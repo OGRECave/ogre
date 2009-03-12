@@ -251,7 +251,7 @@ namespace Ogre
                 list of RenderSystem subclasses. Can be used to build a
                 custom settings dialog.
         */
-        RenderSystemList* getAvailableRenderers(void);
+        const RenderSystemList& getAvailableRenderers(void);
 
         /** Retrieve a pointer to the render system by the given name
             @param

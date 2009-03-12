@@ -154,7 +154,7 @@ INT WINAPI EmbeddedMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 		root.loadPlugin("Plugin_CgProgramManager");
 
 		// select first renderer & init with no window
-		root.setRenderSystem(*(root.getAvailableRenderers()->begin()));
+		root.setRenderSystem(*(root.getAvailableRenderers().begin()));
 		root.initialise(false);
 
 		// create first window manually

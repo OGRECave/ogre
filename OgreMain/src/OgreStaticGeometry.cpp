@@ -1497,8 +1497,10 @@ namespace Ogre {
 	bool StaticGeometry::GeometryBucket::assign(QueuedGeometry* qgeom)
 	{
 		// Do we have enough space?
-		if (mVertexData->vertexCount + qgeom->geometry->vertexData->vertexCount
-			> (mMaxVertexIndex + 1))
+		// -2 first to avoid overflow (-1 to adjust count to index, -1 to ensure 
+		// no overflow at 32 bits and use >= instead of >)
+		if ((mVertexData->vertexCount - 2 + qgeom->geometry->vertexData->vertexCount)
+			>= mMaxVertexIndex)
 		{
 			return false;
 		}
