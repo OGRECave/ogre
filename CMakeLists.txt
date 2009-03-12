@@ -22,6 +22,7 @@ include(MacroLogFeature)
 include(OgreInstall)
 include(OgreConfigBuild)
 include(PreprocessorUtils)
+include(OgreFindFrameworks)
 set(OGRE_TEMPLATES_DIR "${OGRE_SOURCE_DIR}/CMake/Templates")
 set(OGRE_WORK_DIR ${OGRE_BINARY_DIR})
 

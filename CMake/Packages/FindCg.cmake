@@ -12,9 +12,8 @@
 # On OSX default to using the framework version of Cg.
 
 IF (APPLE)
-  INCLUDE(${CMAKE_ROOT}/Modules/CMakeFindFrameworks.cmake)
   SET(Cg_FRAMEWORK_INCLUDES)
-  CMAKE_FIND_FRAMEWORKS(Cg)
+  OGRE_FIND_FRAMEWORKS(Cg)
   IF (Cg_FRAMEWORKS)
     FOREACH(dir ${Cg_FRAMEWORKS})
       SET(Cg_FRAMEWORK_INCLUDES ${Cg_FRAMEWORK_INCLUDES}
