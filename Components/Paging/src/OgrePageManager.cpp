@@ -27,11 +27,16 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 #include "OgrePageManager.h"
+#include "OgrePagedWorld.h"
+#include "OgrePageStrategy.h"
+#include "OgreStringConverter.h"
+#include "OgreException.h"
 
 namespace Ogre
 {
 	//---------------------------------------------------------------------
 	PageManager::PageManager()
+		: mWorldNameIndex(1)
 	{
 
 	}
@@ -43,39 +48,136 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	PagedWorld* PageManager::createWorld(const String& name)
 	{
-		return 0;
+		String theName = name;
+		if (theName.empty())
+		{
+			do 
+			{
+				theName = "World" + StringConverter::toString(mWorldNameIndex++);
+			} while (mWorlds.find(theName) != mWorlds.end());
+		}
+		else if(mWorlds.find(theName) != mWorlds.end())
+		{
+			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
+				"World named '" + theName + "' already exists!",
+				"PageManager::createWorld");
+		}
+
+		PagedWorld* ret = OGRE_NEW PagedWorld(theName, this);
+		mWorlds[theName] = ret;
+
+		return ret;
+	}
+	//---------------------------------------------------------------------
+	void PageManager::destroyWorld(const String& name)
+	{
+		WorldMap::iterator i = mWorlds.find(name);
+		if (i != mWorlds.end())
+		{
+			OGRE_DELETE i->second;
+			mWorlds.erase(i);
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void PageManager::destroyWorld(PagedWorld* world)
+	{
+		detachWorld(world);
+		OGRE_DELETE world;
 	}
 	//---------------------------------------------------------------------
 	void PageManager::attachWorld(PagedWorld* world)
 	{
+		if(mWorlds.find(world->getName()) != mWorlds.end())
+		{
+			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
+				"World named '" + world->getName() + "' already exists!",
+				"PageManager::attachWorld");
+		}
 
+		mWorlds[world->getName()] = world;
+		
 	}
 	//---------------------------------------------------------------------
 	void PageManager::detachWorld(PagedWorld* world)
 	{
-
+		WorldMap::iterator i = mWorlds.find(world->getName());
+		if (i != mWorlds.end() && i->second == world)
+		{
+			mWorlds.erase(i);
+		}
 	}
 	//---------------------------------------------------------------------
 	PagedWorld* PageManager::loadWorld(const String& filename, const String& name)
 	{
-		return 0;
-	}
-	//---------------------------------------------------------------------
-	PagedWorld* PageManager::loadWorld(DataStreamPtr& stream, const String& name)
-	{
-		return 0;
-	}
-	//---------------------------------------------------------------------
-	void PageManager::saveWorld(PagedWorld* world, const String& filename)
-	{
+		PagedWorld* ret = createWorld(name);
+
+		ret->load(filename);
+
+		return ret;
+
 
 	}
 	//---------------------------------------------------------------------
-	void PageManager::saveWorld(PagedWorld* world, DataStreamPtr& stream)
+	PagedWorld* PageManager::loadWorld(const DataStreamPtr& stream, const String& name)
 	{
+		PagedWorld* ret = createWorld(name);
+
+		ret->load(stream);
+
+		return ret;
+	}
+	//---------------------------------------------------------------------
+	void PageManager::saveWorld(PagedWorld* world, const String& filename, Archive* arch)
+	{
+		world->save(filename, arch);
+	}
+	//---------------------------------------------------------------------
+	void PageManager::saveWorld(PagedWorld* world, const DataStreamPtr& stream)
+	{
+		world->save(stream);
+	}
+	//---------------------------------------------------------------------
+	PagedWorld* PageManager::getWorld(const String& name)
+	{
+		WorldMap::iterator i = mWorlds.find(name);
+		if (i != mWorlds.end())
+			return i->second;
+		else
+			return 0;
+	}
+	//---------------------------------------------------------------------
+	void PageManager::addStrategy(PageStrategy* strategy)
+	{
+		// note - deliberately allowing overriding
+		mStrategies[strategy->getName()] = strategy;
+	}
+	//---------------------------------------------------------------------
+	void PageManager::removeStrategy(PageStrategy* strategy)
+	{
+		StrategyMap::iterator i = mStrategies.find(strategy->getName());
+		if (i != mStrategies.end() && i->second == strategy)
+		{
+			mStrategies.erase(i);
+		}
+	}
+	//---------------------------------------------------------------------
+	PageStrategy* PageManager::getStrategy(const String& name)
+	{
+		StrategyMap::iterator i = mStrategies.find(name);
+		if (i != mStrategies.end())
+			return i->second;
+		else
+			return 0;
 
 	}
 	//---------------------------------------------------------------------
+	const PageManager::StrategyMap& PageManager::getStrategies() const
+	{
+		return mStrategies;
+	}
+	//---------------------------------------------------------------------
+
 
 }
 

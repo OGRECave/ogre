@@ -46,6 +46,8 @@ namespace Ogre
 	class PageManager;
 	class PageStrategy;
 
+	typedef GeneralAllocatedObject PageAlloc;
+
 }
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(OGRE_STATIC_LIB)

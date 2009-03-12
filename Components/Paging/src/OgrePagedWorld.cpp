@@ -27,9 +27,97 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 #include "OgrePagedWorld.h"
+#include "OgreResourceGroupManager.h"
 
 namespace Ogre
 {
+	//---------------------------------------------------------------------
+	PagedWorld::PagedWorld(const String& name, PageManager* manager)
+		:mName(name), mManager(manager)
+	{
+
+	}
+	//---------------------------------------------------------------------
+	PagedWorld::~PagedWorld()
+	{
+
+	}
+	//---------------------------------------------------------------------
+	void PagedWorld::load(const String& filename)
+	{
+		// Load from any resource location
+		DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(filename);
+
+		if (stream.isNull())
+		{
+			// try manual load (absolute files)
+			struct stat tagStat;
+			if (stat(filename.c_str(), &tagStat) == 0)
+			{
+				std::ifstream* fstr = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL)();
+				fstr->open(filename.c_str(), std::ios::in | std::ios::binary);
+				if (fstr->fail())
+				{
+					OGRE_DELETE_T(fstr, basic_ifstream, MEMCATEGORY_GENERAL);
+				}
+				else
+				{
+					stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename,
+						fstr, tagStat.st_size, true));
+				}
+			}
+		}
+
+		if (stream.isNull())
+		{
+			OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
+				"Cannot open world file: " + filename,
+				"PagedWorld::load");
+		}
+
+		load(stream);
+
+	}
+	//---------------------------------------------------------------------
+	void PagedWorld::load(const DataStreamPtr& stream)
+	{
+		// TODO
+	}
+	//---------------------------------------------------------------------
+	void PagedWorld::save(const String& filename, Archive* arch)
+	{
+		DataStreamPtr stream;
+		if (arch)
+		{
+			stream = arch->create(filename);
+		}
+		else
+		{
+			std::fstream* fstr = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
+			fstr->open(filename.c_str(), std::ios::out | std::ios::binary);
+			if (fstr->fail())
+			{
+				OGRE_DELETE_T(fstr, basic_fstream, MEMCATEGORY_GENERAL);
+				OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
+					"Cannot open world file for writing: " + filename,
+					"PageManager::saveWorld");
+			}
+			stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename,
+				fstr, 0, true));
+
+		}
+
+		save(stream);
+		
+	}
+	//---------------------------------------------------------------------
+	void PagedWorld::save(const DataStreamPtr& stream)
+	{
+		// TODO
+	}
+	//---------------------------------------------------------------------
+
+
 
 }
 

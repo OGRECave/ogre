@@ -34,6 +34,47 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	/** Defines the interface to a strategy class which is responsible for deciding
+		when Page instances are requested for addition and removal from the 
+		paging system.
+	@remarks
+		The interface is deliberately light, with no specific mention of requesting
+		new Page instances. It is entirely up to the PageStrategy to respond
+		to the events raised on it and to call methods on other classes (such as
+		requesting new pages). 
+	*/
+	class _OgrePagingExport PageStrategy : public PageAlloc
+	{
+	protected:
+		String mName;
+		PageManager* mManager;
+	public:
+		PageStrategy(const String& name, PageManager* manager)
+			: mName(name), mManager(manager)
+		{
+
+		}
+
+		virtual ~PageStrategy() {}
+
+		const String& getName() const { return mName; }
+		PageManager* getManager() const { return mManager; }
+
+		/// Called when the frame starts
+		virtual void frameStart(Real timeSinceLastFrame) {}
+		/// Called when the frame ends
+		virtual void frameEnd(Real timeElapsed) {}
+		/** Called when a camera is used for any kind of rendering.
+		@remarks
+			This is probably the primary way in which the strategy will request
+			new pages. 
+		@param cam Camera which is being used for rendering. Class should not
+			rely on this pointer remaining valid permanently because no notification 
+			will be given when the camera is destroyed. 
+		*/
+		virtual void notifyCamera(Camera* cam) {}
+
+	};
 
 }
 

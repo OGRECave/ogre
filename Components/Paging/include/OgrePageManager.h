@@ -32,11 +32,12 @@ Torus Knot Software Ltd.
 
 #include "OgrePagingPrerequisites.h"
 #include "OgreString.h"
+#include "OgreResourceGroupManager.h"
+
 
 namespace Ogre
 {
-	class DataStreamPtr;
-
+	
 	/** The PageManager is the entry point through which you load all PagedWorld instances, 
 		and the place where PageStrategy instances and factory classes are
 		registered to customise the paging behaviour.
@@ -52,6 +53,13 @@ namespace Ogre
 			will be generated).
 		*/
 		PagedWorld* createWorld(const String& name = StringUtil::BLANK);
+
+		/** Destroy a world. */
+		void destroyWorld(const String& name);
+
+		/** Destroy a world. */
+		void destroyWorld(PagedWorld* world);
+
 		/** Attach a pre-created PagedWorld instance to this manager. 
 		*/
 		void attachWorld(PagedWorld* world);
@@ -70,19 +78,52 @@ namespace Ogre
 		@param name Optionally give a name to the world (if no name is given, one
 		will be generated).
 		*/
-		PagedWorld* loadWorld(DataStreamPtr& stream, const String& name = StringUtil::BLANK);
+		PagedWorld* loadWorld(const DataStreamPtr& stream, const String& name = StringUtil::BLANK);
 		/** Save a PagedWorld instance to a file. 
 		@param world The world to be saved
 		@param filename The filename to save the data to
+		@param arch The Archive that filename is relative to (optional)
 		*/
-		void saveWorld(PagedWorld* world, const String& filename);
+		void saveWorld(PagedWorld* world, const String& filename, Archive* arch = 0);
 		/** Save a PagedWorld instance to a file. 
 		@param world The world to be saved
 		@param stream The stream to save the data to
 		*/
-		void saveWorld(PagedWorld* world, DataStreamPtr& stream);
+		void saveWorld(PagedWorld* world, const DataStreamPtr& stream);
+		/** Get a named world.
+		@params name The name of the world (not a filename, the identifying name)
+		@returns The world, or null if the world doesn't exist.
+		*/
+		PagedWorld* getWorld(const String& name);
+		typedef map<String, PagedWorld*>::type WorldMap;
+		/** Get a reference to the worlds that are currently loaded. */
+		const WorldMap& getWorlds() const { return mWorlds; }
 
 
+		typedef map<String, PageStrategy*>::type StrategyMap;
+		/** Add a new PageStrategy implementation. 
+		@remarks
+			The caller remains resonsible for destruction of this instance. 
+		*/
+		void addStrategy(PageStrategy* strategy);
+
+		/** Remove a PageStrategy implementation. 
+		*/
+		void removeStrategy(PageStrategy* strategy);
+
+		/** Get a PageStrategy.
+		@param name The name of the strategy to retrieve
+		@returns Pointer to a PageStrategy, or null if the strategy was not found.
+		*/
+		PageStrategy* getStrategy(const String& name);
+
+		/** Get a reference to the registered strategies.
+		*/
+		const StrategyMap& getStrategies() const;
+	protected:
+		WorldMap mWorlds;
+		StrategyMap mStrategies;
+		size_t mWorldNameIndex;
 
 	};
 }
