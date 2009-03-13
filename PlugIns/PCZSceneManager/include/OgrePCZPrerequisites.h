@@ -54,6 +54,8 @@ Code Style Update	 :
 #   else
 #       define _OgrePCZPluginExport __declspec(dllimport)
 #   endif
+#elif defined ( OGRE_GCC_VISIBILITY )
+#    define _OgrePCZPluginExport  __attribute__ ((visibility("default")))
 #else
 #   define _OgrePCZPluginExport
 #endif
