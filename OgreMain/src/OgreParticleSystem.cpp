@@ -138,7 +138,8 @@ namespace Ogre {
         mRenderer(0), 
 		mCullIndividual(false),
         mPoolSize(0),
-		mEmittedEmitterPoolSize(0)
+		mEmittedEmitterPoolSize(0),
+		mIsEmitting(true)
     {
         setDefaultDimensions( 100, 100 );
         setMaterialName( "BaseWhite" );
