@@ -12,6 +12,7 @@ Essential before switch-on as primary system
 To be done after switch-over
 
 * SDK changes - Win32 and OS X scripts will need altering
+* Pregenerating project files for source packages (& SDK's) - absolute paths will break this, can we use relative dirs?
 * GLES project
 * OS X
   * Dependencies now getting picked up, but option to build frameworks doesn't seem to be working yet. 
