@@ -6528,8 +6528,8 @@ protected:
 		MultiRenderTarget* mrtTex;
 
 		Viewport* viewport = mWindow->getViewport(0);
-		uint width = viewport->getActualWidth();
-		uint height = viewport->getActualHeight();
+		int width = viewport->getActualWidth();
+		int height = viewport->getActualHeight();
 
 		Tex[0] = TextureManager::getSingleton().createManual("diffusemap", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D,
 			width,height,0,PF_R8G8B8A8,TU_RENDERTARGET);
