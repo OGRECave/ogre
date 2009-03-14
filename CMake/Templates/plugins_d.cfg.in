@@ -9,6 +9,8 @@ PluginFolder=@OGRE_PLUGIN_DIR_REL@
 @OGRE_COMMENT_PLUGIN_PARTICLEFX@ Plugin=Plugin_ParticleFX_d
 @OGRE_COMMENT_PLUGIN_BSP@ Plugin=Plugin_BSPSceneManager_d
 @OGRE_COMMENT_PLUGIN_CG@ Plugin=Plugin_CgProgramManager_d
-@OGRE_COMMENT_PLUGIN_PCZ@ Plugin=Plugin_PCZSceneManager_d
-@OGRE_COMMENT_PLUGIN_PCZ@ Plugin=Plugin_OctreeZone_d
+# Uncomment the following if you want to run the PCZ demo
+# Comment Plugin_OctreeSceneManager instead
+# Plugin=Plugin_PCZSceneManager_d
+# Plugin=Plugin_OctreeZone_d
 @OGRE_COMMENT_PLUGIN_OCTREE@ Plugin=Plugin_OctreeSceneManager_d

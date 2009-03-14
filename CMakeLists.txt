@@ -35,8 +35,10 @@ set(OGRE_WORK_DIR ${OGRE_BINARY_DIR})
 include(OgreGetVersion)
 ogre_get_version(${OGRE_SOURCE_DIR}/OgreMain/include/OgrePrerequisites.h)
 
-# Create debug libraries with _d postfix
-set(CMAKE_DEBUG_POSTFIX "_d")
+if (WIN32)
+  # Create debug libraries with _d postfix
+  set(CMAKE_DEBUG_POSTFIX "_d")
+endif ()
 
 # Set compiler specific build flags
 if (CMAKE_COMPILER_IS_GNUCXX)

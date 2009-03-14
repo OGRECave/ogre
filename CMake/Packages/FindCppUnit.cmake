@@ -8,18 +8,27 @@
 include(FindPkgMacros)
 findpkg_begin(CppUnit)
 
+# construct search paths
+set(CppUnit_PREFIX_PATH ${CPPUNIT_HOME} $ENV{CPPUNIT_HOME})
+create_search_paths(CppUnit)
+# redo search if prefix path changed
+clear_if_changed(CppUnit_PREFIX_PATH
+  CppUnit_LIBRARY_FWK
+  CppUnit_LIBRARY_REL
+  CppUnit_LIBRARY_DBG
+  CppUnit_INCLUDE_DIR
+)
+
 set(CppUnit_LIBRARY_NAMES cppunit)
 get_debug_names(CppUnit_LIBRARY_NAMES)
 
 use_pkgconfig(CppUnit_PKGC cppunit)
 
-# Add other places CppUnit might be found
-set(CPPUNIT_INC_SEARCH_PATH "$ENV{CPPUNIT_HOME}/include")
-set(CPPUNIT_LIB_SEARCH_PATH "$ENV{CPPUNIT_HOME}/lib")
+findpkg_framework(CppUnit)
 
-find_path(CppUnit_INCLUDE_DIR NAMES cppunit/Test.h PATHS ${CppUnit_PKGC_INCLUDE_DIRS} ${CPPUNIT_INC_SEARCH_PATH})
-find_library(CppUnit_LIBRARY_REL NAMES ${CppUnit_LIBRARY_NAMES} PATHS ${CppUnit_PKGC_LIBRARY_DIRS} ${CPPUNIT_LIB_SEARCH_PATH})
-find_library(CppUnit_LIBRARY_DBG NAMES ${CppUnit_LIBRARY_NAMES_DBG} PATHS ${CppUnit_PKGC_LIBRARY_DIRS} ${CPPUNIT_LIB_SEARCH_PATH})
+find_path(CppUnit_INCLUDE_DIR NAMES cppunit/Test.h HINTS ${CppUnit_INC_SEARCH_PATH} ${CppUnit_PKGC_INCLUDE_DIRS})
+find_library(CppUnit_LIBRARY_REL NAMES ${CppUnit_LIBRARY_NAMES} HINTS ${CppUnit_LIB_SEARCH_PATH} ${CppUnit_PKGC_LIBRARY_DIRS})
+find_library(CppUnit_LIBRARY_DBG NAMES ${CppUnit_LIBRARY_NAMES_DBG} HINTS ${CppUnit_LIB_SEARCH_PATH} ${CppUnit_PKGC_LIBRARY_DIRS})
 make_library_set(CppUnit_LIBRARY)
 
 findpkg_finish(CppUnit)
