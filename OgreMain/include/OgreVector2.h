@@ -337,6 +337,32 @@ namespace Ogre
         {
             return x * x + y * y;
         }
+        /** Returns the distance to another vector.
+            @warning
+                This operation requires a square root and is expensive in
+                terms of CPU operations. If you don't need to know the exact
+                distance (e.g. for just comparing distances) use squaredDistance()
+                instead.
+        */
+        inline Real distance(const Vector2& rhs) const
+        {
+            return (*this - rhs).length();
+        }
+
+        /** Returns the square of the distance to another vector.
+            @remarks
+                This method is for efficiency - calculating the actual
+                distance to another vector requires a square root, which is
+                expensive in terms of the operations required. This method
+                returns the square of the distance to another vector, i.e.
+                the same as the distance but before the square root is taken.
+                Use this if you want to find the longest / shortest distance
+                without incurring the square root.
+        */
+        inline Real squaredDistance(const Vector2& rhs) const
+        {
+            return (*this - rhs).squaredLength();
+        }
 
         /** Calculates the dot (scalar) product of this vector with another.
             @remarks
