@@ -452,6 +452,21 @@ if (WIN32)
   source_group(Resources FILES ${RESOURCE_FILES})
   set(PLATFORM_HEADER_INSTALL "win32")
 
+elseif (APPLE)
+  include_directories("include/OSX")
+  set(PLATFORM_HEADER_FILES
+    include/OSX/OgreConfigDialogImp.h
+    include/OSX/OgreErrorDialogImp.h
+    include/OSX/OgreTimerImp.h
+  )
+  set(PLATFORM_SOURCE_FILES
+    src/OSX/OgreConfigDialog.cpp
+    src/OSX/OgreErrorDialog.cpp
+    src/OSX/OgreTimer.cpp
+    src/OgreSearchOps.cpp
+  )
+  set(PLATFORM_LIBS "-framework Carbon")
+  set(PLATFORM_HEADER_INSTALL "OSX")
 elseif (UNIX)
   include_directories(include/GLX ${X11_INCLUDE_DIR})
   set(PLATFORM_HEADER_FILES
@@ -469,8 +484,6 @@ elseif (UNIX)
   set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xt_LIB} ${XAW_LIBRARY} pthread)
   set(PLATFORM_HEADER_INSTALL "GLX")
 
-elseif (APPLE)
-  include_directories("include/OSX")
 endif(WIN32)
 
 
@@ -483,6 +496,10 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/nedmalloc)
 add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
 ogre_config_build(OgreMain)
 set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OGRE_VERSION_MAJOR})
+if (APPLE)
+  set_target_properties(OgreMain PROPERTIES	FRAMEWORK TRUE)
+  set_target_properties(OgreMain PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADER_FILES}" )
+endif()
 target_link_libraries(OgreMain
   ${ZLIB_LIBRARIES}
   ${ZZip_LIBRARIES}
