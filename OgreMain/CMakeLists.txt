@@ -454,16 +454,25 @@ if (WIN32)
 
 elseif (APPLE)
   include_directories("include/OSX")
+  include_directories("${CMAKE_SOURCE_DIR}/Mac/Ogre/include")
   set(PLATFORM_HEADER_FILES
     include/OSX/OgreConfigDialogImp.h
     include/OSX/OgreErrorDialogImp.h
     include/OSX/OgreTimerImp.h
+    # think about relocating these
+    ${CMAKE_SOURCE_DIR}/Mac/Ogre/include/macBundlePath.h
+    ${CMAKE_SOURCE_DIR}/Mac/Ogre/include/macPlugins.h
+    ${CMAKE_SOURCE_DIR}/Mac/Ogre/include/OgreOSXCocoaView.h
   )
   set(PLATFORM_SOURCE_FILES
     src/OSX/OgreConfigDialog.cpp
     src/OSX/OgreErrorDialog.cpp
     src/OSX/OgreTimer.cpp
     src/OgreSearchOps.cpp
+    # think about relocating these
+    ${CMAKE_SOURCE_DIR}/Mac/Ogre/src/macBundlePath.cpp
+    ${CMAKE_SOURCE_DIR}/Mac/Ogre/src/macPlugins.cpp
+    ${CMAKE_SOURCE_DIR}/Mac/Ogre/src/OgreOSXCocoaView.mm
   )
   set(PLATFORM_LIBS "-framework Carbon")
   set(PLATFORM_HEADER_INSTALL "OSX")
@@ -499,6 +508,8 @@ set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OG
 if (APPLE)
   set_target_properties(OgreMain PROPERTIES	FRAMEWORK TRUE)
   set_target_properties(OgreMain PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADER_FILES}" )
+  # Framework is called 'Ogre'
+  set_target_properties(OgreMain PROPERTIES	OUTPUT_NAME Ogre)
 endif()
 target_link_libraries(OgreMain
   ${ZLIB_LIBRARIES}
