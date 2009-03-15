@@ -37,11 +37,14 @@ Torus Knot Software Ltd.
 
 #include "OgrePlatform.h"
 
+
 #if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
 
 #include <dirent.h>
 #include <unistd.h>
+#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN
 #include <fnmatch.h>
+#endif
 
 /* Our simplified data entry structure */
 struct _finddata_t
@@ -51,12 +54,14 @@ struct _finddata_t
     unsigned long size;
 };
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN
 #define _A_NORMAL 0x00  /* Normalfile-Noread/writerestrictions */
 #define _A_RDONLY 0x01  /* Read only file */
 #define _A_HIDDEN 0x02  /* Hidden file */
 #define _A_SYSTEM 0x04  /* System file */
-#define _A_SUBDIR 0x10  /* Subdirectory */
 #define _A_ARCH   0x20  /* Archive file */
+#endif
+#define _A_SUBDIR 0x10  /* Subdirectory */
 
 long _findfirst(const char *pattern, struct _finddata_t *data);
 int _findnext(long id, struct _finddata_t *data);

@@ -26,6 +26,7 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd
 ---------------------------------------------------------------------------
 */
+#include "OgrePlatform.h"
 #include "OgreStableHeaders.h"
 #include "OgrePrerequisites.h"
 #include "OgreMemoryTracker.h"

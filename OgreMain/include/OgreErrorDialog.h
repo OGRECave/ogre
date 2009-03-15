@@ -45,6 +45,8 @@ Torus Knot Software Ltd.
 # include "GLX/OgreErrorDialogImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 # include "OSX/OgreErrorDialogImp.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
+# include "Symbian/OgreErrorDialogImp.h"
 #endif
 
 #endif

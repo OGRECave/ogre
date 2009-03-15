@@ -34,6 +34,28 @@ Torus Knot Software Ltd.
 #include <stdio.h>
 #include <ctype.h>
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
+#include "OgreString.h"
+
+
+
+bool fnmatch (Ogre::String pattern, Ogre::String name, int dummy)
+{
+	if (pattern == "*")
+	{
+		return true;
+	}
+	if (pattern.substr(0,2) == "*.")
+	{
+		Ogre::StringUtil::toLowerCase(pattern);
+		Ogre::StringUtil::toLowerCase(name);
+		Ogre::String extToFind = pattern.substr(2, pattern.size() - 2);
+		return (name.size() > extToFind.size()) &&(extToFind == name.substr(name.size() - extToFind.size(), extToFind.size()));
+	}
+	return false;
+}
+#endif
+
 /* Win32 directory operations emulation */
 #if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
 

@@ -26,27 +26,16 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#ifndef __CommonConfigDialog_H__
-#define __CommonConfigDialog_H__
+#include "OgreConfigDialog.h"
+#include "OgreException.h"
+#include "OgreLogManager.h"
 
-#include "OgrePrerequisites.h"
-#include "OgrePlatform.h"
 
-// Bring in the specific platform's header file: first allow forced override
-#if defined OGRE_GUI_WIN32
-# include "WIN32/OgreConfigDialogImp.h"
-#elif defined OGRE_GUI_gtk
-# include "gtk/OgreConfigDialogImp.h"
-#elif defined OGRE_GUI_GLX
-# include "GLX/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-# include "WIN32/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-# include "GLX/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-# include "OSX/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
-# include "Symbian/OgreConfigDialogImp.h"
-#endif
+namespace Ogre {
 
-#endif
+ConfigDialog::ConfigDialog ()
+{
+}
+
+
+}

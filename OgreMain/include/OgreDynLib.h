@@ -51,6 +51,13 @@ typedef struct HINSTANCE__* hInstance;
 #    define DYNLIB_LOAD( a ) mac_loadExeBundle( a )
 #    define DYNLIB_GETSYM( a, b ) mac_getBundleSym( a, b )
 #    define DYNLIB_UNLOAD( a ) mac_unloadExeBundle( a )
+
+#elif OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
+#    define DYNLIB_HANDLE void*
+#    define DYNLIB_LOAD( a ) 0
+#    define DYNLIB_GETSYM( a, b ) 0
+#    define DYNLIB_UNLOAD( a ) 0
+
 #endif
 
 namespace Ogre {

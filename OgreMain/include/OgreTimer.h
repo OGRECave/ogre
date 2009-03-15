@@ -35,7 +35,7 @@ Torus Knot Software Ltd.
 //Bring in the specific platform's header file
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 # include "WIN32/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_LINUX) || (OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN)
 # include "GLX/OgreTimerImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 # include "OSX/OgreTimerImp.h"
