@@ -107,7 +107,7 @@ MACRO(findpkg_framework fwk)
     FOREACH(dir ${${fwk}_FRAMEWORK_PATH})
       SET(fwkpath ${dir}/${fwk}.framework)
       IF(EXISTS ${fwkpath})
-        SET(${fwk}_FRAMEWORK_INCLUDES ${{fwk}_FRAMEWORK_INCLUDES}
+        SET(${fwk}_FRAMEWORK_INCLUDES ${${fwk}_FRAMEWORK_INCLUDES}
           ${fwkpath}/Headers ${fwkpath}/PrivateHeaders)
         if (NOT ${fwk}_LIBRARY_FWK)
           SET(${fwk}_LIBRARY_FWK "-framework ${fwk}" CACHE STRING "${fwk} library")
