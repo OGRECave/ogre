@@ -895,7 +895,7 @@ namespace Ogre
 		/**
 		* Gets the number of display monitors.
 		*/
-		virtual unsigned int getDisplayMonitorCount() const;
+		unsigned int getDisplayMonitorCount() const;
     };
 } // Namespace Ogre
 #endif
