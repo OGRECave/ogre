@@ -119,6 +119,17 @@ macro_log_feature(DOXYGEN_FOUND "Doxygen" "Tool for building API documentation" 
 find_package(CppUnit)
 macro_log_feature(CppUnit_FOUND "CppUnit" "Library for performing unit tests" "http://cppunit.sourceforge.net" FALSE "" "")
 
+#######################################################################
+# Apple-specific
+#######################################################################
+if (APPLE)
+  find_package(Carbon)
+  macro_log_feature(Carbon_FOUND "Carbon" "Carbon" "http://www.apple.com" TRUE "" "")
+
+  find_package(Cocoa)
+  macro_log_feature(Cocoa_FOUND "Cocoa" "Cocoa" "http://www.apple.com" TRUE "" "")
+endif(APPLE)
+
 # Display results, terminate if anything required is missing
 MACRO_DISPLAY_FEATURE_LOG()
 
@@ -131,12 +142,14 @@ include_directories(
   ${FREETYPE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIRS}
   ${CEGUI_INCLUDE_DIRS}
-  ${OIS_INCLLUDE_DIRS}
+  ${OIS_INCLUDE_DIRS}
   ${Cg_INCLUDE_DIRS}
   ${BOOST_INCLUDE_DIRS}
   ${X11_INCLUDE_DIR}
   ${DirectX_INCLUDE_DIRS}
   ${CppUnit_INCLUDE_DIRS}
+  ${Carbon_INCLUDE_DIRS}
+  ${Cocoa_INCLUDE_DIRS}
 )
 link_directories(
   ${OPENGL_LIBRARY_DIRS}
@@ -146,3 +159,4 @@ link_directories(
   ${DirectX_LIBRARY_DIRS}
   ${CppUnit_LIBRARY_DIRS}
 )
+

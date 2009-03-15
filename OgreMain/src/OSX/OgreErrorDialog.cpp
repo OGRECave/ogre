@@ -1,4 +1,6 @@
 #include "OgreErrorDialog.h"
+#include <Carbon/Carbon.h>
+
 
 using namespace Ogre;
 

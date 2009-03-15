@@ -5,6 +5,8 @@
 #include <Ogre/OgreRoot.h>
 #include <Ogre/OgreRenderSystem.h>
 
+#include <Carbon/Carbon.h>
+
 namespace Ogre
 {
 	class ConfigDialog : public UtilityAlloc

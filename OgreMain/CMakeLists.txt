@@ -474,7 +474,7 @@ elseif (APPLE)
     ${CMAKE_SOURCE_DIR}/Mac/Ogre/src/macPlugins.cpp
     ${CMAKE_SOURCE_DIR}/Mac/Ogre/src/OgreOSXCocoaView.mm
   )
-  set(PLATFORM_LIBS "-framework Carbon")
+  set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
   set(PLATFORM_HEADER_INSTALL "OSX")
 elseif (UNIX)
   include_directories(include/GLX ${X11_INCLUDE_DIR})
