@@ -178,6 +178,10 @@ namespace Ogre
         @param type The type of event to be considered.
         */
         Real calculateEventTime(unsigned long now, FrameEventTimeType type);
+
+		/** Update a set of event times (note, progressive, only call once for each type per frame) */
+		void populateFrameEvent(FrameEventTimeType type, FrameEvent& evtToUpdate);
+
     public:
 
         /** Constructor
@@ -478,6 +482,15 @@ namespace Ogre
             raising frame events before and after.
         */
         bool renderOneFrame(void);
+
+		/** Render one frame, with custom frame time information. 
+		@remarks
+		Updates all the render targets automatically and then returns,
+		raising frame events before and after - all per-frame times are based on
+		the time value you pass in.
+		*/
+		bool renderOneFrame(Real timeSinceLastFrame);
+
         /** Shuts down the system manually.
             @remarks
                 This is normally done by Ogre automatically so don't think
@@ -765,6 +778,19 @@ namespace Ogre
 		@returns false if a FrameListener indicated it wishes to exit the render loop
         */
         bool _updateAllRenderTargets(void);
+
+        /** Internal method used for updating all RenderTarget objects (windows, 
+            renderable textures etc) which are set to auto-update, with a custom time
+			passed to the frameRenderingQueued events.
+        @remarks
+            You don't need to use this method if you're using Ogre's own internal
+            rendering loop (Root::startRendering). If you're running your own loop
+            you may wish to call it to update all the render targets which are
+            set to auto update (RenderTarget::setAutoUpdated). You can also update
+            individual RenderTarget instances using their own update() method.
+		@returns false if a FrameListener indicated it wishes to exit the render loop
+        */
+        bool _updateAllRenderTargets(FrameEvent& evt);
 
 		/** Create a new RenderQueueInvocationSequence, useful for linking to
 			Viewport instances to perform custom rendering.

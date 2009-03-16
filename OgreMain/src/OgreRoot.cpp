@@ -750,33 +750,33 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Root::_fireFrameStarted()
     {
-        unsigned long now = mTimer->getMilliseconds();
         FrameEvent evt;
-        evt.timeSinceLastEvent = calculateEventTime(now, FETT_ANY);
-        evt.timeSinceLastFrame = calculateEventTime(now, FETT_STARTED);
+		populateFrameEvent(FETT_STARTED, evt);
 
         return _fireFrameStarted(evt);
     }
     //-----------------------------------------------------------------------
     bool Root::_fireFrameRenderingQueued()
     {
-        unsigned long now = mTimer->getMilliseconds();
-        FrameEvent evt;
-        evt.timeSinceLastEvent = calculateEventTime(now, FETT_ANY);
-        evt.timeSinceLastFrame = calculateEventTime(now, FETT_QUEUED);
+		FrameEvent evt;
+		populateFrameEvent(FETT_QUEUED, evt);
 
         return _fireFrameRenderingQueued(evt);
     }
     //-----------------------------------------------------------------------
     bool Root::_fireFrameEnded()
     {
-        unsigned long now = mTimer->getMilliseconds();
         FrameEvent evt;
-        evt.timeSinceLastEvent = calculateEventTime(now, FETT_ANY);
-        evt.timeSinceLastFrame = calculateEventTime(now, FETT_ENDED);
-
+		populateFrameEvent(FETT_ENDED, evt);
         return _fireFrameEnded(evt);
     }
+	//---------------------------------------------------------------------
+	void Root::populateFrameEvent(FrameEventTimeType type, FrameEvent& evtToUpdate)
+	{
+		unsigned long now = mTimer->getMilliseconds();
+		evtToUpdate.timeSinceLastEvent = calculateEventTime(now, FETT_ANY);
+		evtToUpdate.timeSinceLastFrame = calculateEventTime(now, type);
+	}
     //-----------------------------------------------------------------------
     Real Root::calculateEventTime(unsigned long now, FrameEventTimeType type)
     {
@@ -848,7 +848,26 @@ namespace Ogre {
 
         return _fireFrameEnded();
     }
+	//---------------------------------------------------------------------
+	bool Root::renderOneFrame(Real timeSinceLastFrame)
+	{
+		FrameEvent evt;
+		evt.timeSinceLastFrame = timeSinceLastFrame;
 
+		unsigned long now = mTimer->getMilliseconds();
+		evt.timeSinceLastEvent = calculateEventTime(now, FETT_ANY);
+
+		if(!_fireFrameStarted(evt))
+			return false;
+
+		if (!_updateAllRenderTargets(evt))
+			return false;
+
+		now = mTimer->getMilliseconds();
+		evt.timeSinceLastEvent = calculateEventTime(now, FETT_ANY);
+
+		return _fireFrameEnded(evt);
+	}
     //-----------------------------------------------------------------------
     void Root::shutdown(void)
     {
@@ -1169,6 +1188,24 @@ namespace Ogre {
         // for instance, with shadows.
         for (SceneManagerEnumerator::SceneManagerIterator it = getSceneManagerIterator(); it.hasMoreElements(); it.moveNext())
             it.peekNextValue()->_handleLodEvents();
+
+		return ret;
+	}
+	//---------------------------------------------------------------------
+	bool Root::_updateAllRenderTargets(FrameEvent& evt)
+	{
+		// update all targets but don't swap buffers
+		mActiveRenderer->_updateAllRenderTargets(false);
+		// give client app opportunity to use queued GPU time
+		bool ret = _fireFrameRenderingQueued(evt);
+		// block for final swap
+		mActiveRenderer->_swapAllRenderTargetBuffers(mActiveRenderer->getWaitForVerticalBlank());
+
+		// This belongs here, as all render targets must be updated before events are
+		// triggered, otherwise targets could be mismatched.  This could produce artifacts,
+		// for instance, with shadows.
+		for (SceneManagerEnumerator::SceneManagerIterator it = getSceneManagerIterator(); it.hasMoreElements(); it.moveNext())
+			it.peekNextValue()->_handleLodEvents();
 
 		return ret;
 	}
