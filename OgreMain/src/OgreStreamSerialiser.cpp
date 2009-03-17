@@ -28,6 +28,7 @@ Torus Knot Software Ltd.
 */
 #include "OgreStableHeaders.h"
 
+#include "OgreCommon.h"
 #include "OgreStreamSerialiser.h"
 #include "OgreException.h"
 #include "OgreStringConverter.h"
