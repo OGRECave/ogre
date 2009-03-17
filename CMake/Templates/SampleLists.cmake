@@ -22,8 +22,7 @@ elseif (UNIX)
   set(CMAKE_INSTALL_PREFIX "${OGRE_SOURCE_DIR}/../../.." CACHE PATH "CMake install path")
 else ()
 endif ()
-include(OgreInstall)
-include(OgreConfigBuild)
+include(OgreConfigTargets)
 set(CMAKE_PREFIX_PATH 
   "${OGRE_SOURCE_DIR}/../"
   "${OGRE_SOURCE_DIR}/../../../"
