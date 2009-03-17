@@ -53,13 +53,9 @@ namespace Ogre
 		mHasSky = false;
 	}
 
-    PCZone::~PCZone()
-    {
-		// clear list of nodes contained within the zone
-		_clearNodeLists(HOME_NODE_LIST|VISITOR_NODE_LIST);
-		// clear portal list (actual deletion of portals takes place in the PCZSM)
-		mPortals.clear();
-    }
+	PCZone::~PCZone()
+	{
+	}
 
 	/** Remove all nodes from the node reference list and clear it
 	*/
@@ -85,9 +81,7 @@ namespace Ogre
 		{
 			portal2 = *pi2;
 			//portal2->updateDerivedValues();
-			if (portal2->getTargetZone() == 0 &&
-				portal2->isAntiPortal() == false &&
-				portal2->closeTo(portal) &&
+			if (portal2->getTargetZone() == 0 && portal2->closeTo(portal) &&
 				portal2->getDerivedDirection().dotProduct(portal->getDerivedDirection()) < -0.9)
 			{
 				// found a match!
@@ -96,6 +90,71 @@ namespace Ogre
 		}
 		// no match
 		return 0;
+	}
+
+
+	/* Add a portal to the zone */
+	void PCZone::_addPortal(Portal * newPortal)
+	{
+		if (newPortal)
+		{
+			// make sure portal is unique (at least in this zone)
+			PortalList::iterator it = std::find(mPortals.begin(), mPortals.end(), newPortal);
+			if (it != mPortals.end())
+			{
+				OGRE_EXCEPT(
+					Exception::ERR_DUPLICATE_ITEM,
+					"A portal with the name " + newPortal->getName() + " already exists",
+					"PCZone::_addPortal" );
+			}
+
+			// add portal to portals list
+			mPortals.push_back(newPortal);
+
+			// tell the portal which zone it's currently in
+			newPortal->setCurrentHomeZone(this);
+		}
+	}
+
+	/* Remove a portal from the zone (does not erase the portal object, just removes reference) */
+	void PCZone::_removePortal(Portal * removePortal)
+	{
+		if (removePortal)
+		{
+			mPortals.erase(std::find(mPortals.begin(), mPortals.end(), removePortal));
+		}
+	}
+
+	/* Add an anti portal to the zone */
+	void PCZone::_addAntiPortal(AntiPortal* newAntiPortal)
+	{
+		if (newAntiPortal)
+		{
+			// make sure portal is unique (at least in this zone)
+			AntiPortalList::iterator it = std::find(mAntiPortals.begin(), mAntiPortals.end(), newAntiPortal);
+			if (it != mAntiPortals.end())
+			{
+				OGRE_EXCEPT(
+					Exception::ERR_DUPLICATE_ITEM,
+					"An anti portal with the name " + newAntiPortal->getName() + " already exists",
+					"PCZone::_addAntiPortal" );
+			}
+
+			// add portal to portals list
+			mAntiPortals.push_back(newAntiPortal);
+
+			// tell the portal which zone it's currently in
+			newAntiPortal->setCurrentHomeZone(this);
+		}
+	}
+
+	/* Remove an anti portal from the zone */
+	void PCZone::_removeAntiPortal(AntiPortal* removeAntiPortal)
+	{
+		if (removeAntiPortal)
+		{
+			mAntiPortals.erase(std::find(mAntiPortals.begin(), mAntiPortals.end(), removeAntiPortal));
+		}
 	}
 
 	/* create node specific zone data if necessary

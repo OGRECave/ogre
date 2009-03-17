@@ -121,9 +121,11 @@ namespace Ogre
     }
 
 	// Create a portal instance
-	Portal* PCZSceneManager::createPortal(const String &name, Ogre::Portal::PORTAL_TYPE type)
+	Portal* PCZSceneManager::createPortal(const String& name, PortalBase::PORTAL_TYPE type)
 	{
 		Portal* newPortal = OGRE_NEW Portal(name, type);
+		newPortal->_notifyCreator(Root::getSingleton().getMovableObjectFactory("Portal"));
+		newPortal->_notifyManager(this);
 		mPortals.push_front(newPortal);
 		return newPortal;
 	}
@@ -190,6 +192,71 @@ namespace Ogre
 				// inform zone of portal change 
 				homeZone->setPortalsUpdated(true);   
 				homeZone->_removePortal(thePortal);
+			}
+
+			// delete the portal instance
+			OGRE_DELETE thePortal;
+		}
+	}
+
+	/** Create a new anti portal instance */
+	AntiPortal* PCZSceneManager::createAntiPortal(const String& name, PortalBase::PORTAL_TYPE type)
+	{
+		AntiPortal* newAntiPortal = OGRE_NEW AntiPortal(name, type);
+		newAntiPortal->_notifyCreator(Root::getSingleton().getMovableObjectFactory("AntiPortal"));
+		newAntiPortal->_notifyManager(this);
+		mAntiPortals.push_front(newAntiPortal);
+		return newAntiPortal;
+	}
+
+	/** Delete a anti portal instance by pointer */
+	void PCZSceneManager::destroyAntiPortal(AntiPortal * p)
+	{
+		// remove the Portal from it's home zone
+		PCZone* homeZone = p->getCurrentHomeZone();
+		if (homeZone)
+		{
+			// inform zone of portal change. Do here since PCZone is abstract 
+			homeZone->setPortalsUpdated(true);
+			homeZone->_removeAntiPortal(p);
+		}
+
+		// remove the portal from the master portal list
+		AntiPortalList::iterator it = std::find(mAntiPortals.begin(), mAntiPortals.end(), p);
+		if (it != mAntiPortals.end()) mAntiPortals.erase(it);
+
+		// delete the portal instance
+		OGRE_DELETE p;
+	}
+
+	/** Delete a anti portal instance by name */
+	void PCZSceneManager::destroyAntiPortal(const String& portalName)
+	{
+		// find the anti portal from the master portal list
+		AntiPortal* p;
+		AntiPortal* thePortal = 0;
+		AntiPortalList::iterator it = mAntiPortals.begin();
+		while (it != mAntiPortals.end())
+		{
+			p = *it;
+			if (p->getName() == portalName)
+			{
+				thePortal = p;
+				// erase entry in the master list
+				mAntiPortals.erase(it);
+				break;
+			}
+			it++;
+		}
+		if (thePortal)
+		{
+			// remove the Portal from it's home zone
+			PCZone* homeZone = thePortal->getCurrentHomeZone();
+			if (homeZone)
+			{
+				// inform zone of portal change 
+				homeZone->setPortalsUpdated(true);
+				homeZone->_removeAntiPortal(thePortal);
 			}
 
 			// delete the portal instance

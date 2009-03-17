@@ -82,10 +82,12 @@ NOTE: Portals currently only connect different zones.  The user can't
 connect portals to the same zone yet (i.e. no teleporters).  This functionality
 could be added later.
 
-NEW IN VERSION 1.4.5: Portals can be "closed" (and opened) by calling Portal::close()
-(and Portal::open()).  Closing a portal prevents the scene manager from traversing
+UPDATE as of 3/17/09: Portals can be "closed" (and opened) by calling Portal::setEnable(false)
+(and Portal::setEnable(false)).  Disabling a portal prevents the scene manager from traversing
 through the portal and also prevents scenenodes & ray queries from crossing the portal.
-Basically, it turns a portal "off".
+Basically, it turns a portal "off".  Disabling an antiportal (see note below about 
+Creating antiportals) prevents the antiportal from blocking scene traversal through
+regular portals.
 
 NEW IN VERSION 1.2: Portals can take 3 different forms: quad portals, AAB portals, 
 and Sphere portals.  AAB and Sphere portals do not add any culling planes to the
@@ -134,6 +136,18 @@ assign their zone targets (i.e. the zone which they connect to) or they can
 call PCZSceneManager::connectPortalsToTargetZonesByLocation() to do it 
 automatically.  Note that this function requires all portals to have a matching
 portal in the target zone.  
+
+ANTIPORTALS  ** NEW As of 3/17/09 **
+
+Antiportals are a new feature (thanks to Lf3thn4d). Antiportals prevent traversal of 
+portals located behind them (as viewed from the camera).  They are created and manipulated
+the same as regular portals (except you don't need to create them in pairs, since they
+block scene traversal to other zones instead of connecting them).  Only Quad Antiportals
+are supported.  
+
+To Create an antiportal, it's very similar to regular portals.  All you need to do is call
+PCZSceneManager::createAntiPortal("name of the antiportal"), set the corner values,
+attach it to a node, and add it to the proper zone.  
 
 CREATING OBJECTS/ENTITIES:
 

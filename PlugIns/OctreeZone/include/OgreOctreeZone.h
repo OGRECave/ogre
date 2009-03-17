@@ -86,14 +86,6 @@ namespace Ogre
 		*/
 		virtual void createNodeZoneData(PCZSceneNode *);
 
-		/* Add a portal to the zone
-		*/
-		virtual void _addPortal( Portal * );
-
-		/* Remove a portal from the zone
-		*/
-		virtual void _removePortal( Portal * );
-
 		/** (recursive) check the given node against all portals in the zone
 		*/
 		virtual void _checkNodeAgainstPortals(PCZSceneNode *, Portal * );

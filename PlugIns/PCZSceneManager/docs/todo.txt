@@ -9,9 +9,13 @@ KNOWN BUGS:
   put in a hack which can potentially result in light not traversing into some zones properly.
   It will probably not be noticeable in most situations, but could potentially show up in
   very complex portal/zone setups.
+* Deleting a Zone and then recreating will cause problems if PCZSceneNodes are still referencing the original deleted zone
 
 TODO:
 -------------
+* If a Zone is deleted, scan all the SceneNodes and remove matching ZoneData
+* PCZTestApp (and all PCZSM apps?) currently requires linking to the PCZ import library - it shouldn't.
+* PCZ .dll does not load (init) properly unless it's in the same directory as the executable.
 * Allow portals to connect to the same zone they are in
 * Test function to prevent scenenodes from crossing portals which they won't fit through
 * More testing 
@@ -25,7 +29,5 @@ OPTIMIZATIONS (todo):
 * TerrainZoneRenderable has a function for intersecting segments.  Maybe (?) able to
   use my Ogre::Segment class instead of Ray?
 
-FUTURE FEATURES:
-----------------
-* Add anti-portals?
+
 

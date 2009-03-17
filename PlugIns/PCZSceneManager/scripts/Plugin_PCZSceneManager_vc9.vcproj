@@ -339,6 +339,10 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm"
 			>
 			<File
+				RelativePath="..\src\OgreAntiPortal.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\OgreCapsule.cpp"
 				>
 			</File>
@@ -395,6 +399,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\OgrePortalBase.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\OgreSegment.cpp"
 				>
 			</File>
@@ -403,6 +411,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc"
 			>
+			<File
+				RelativePath="..\include\OgreAntiPortal.h"
+				>
+			</File>
 			<File
 				RelativePath="..\include\OgreCapsule.h"
 				>
@@ -457,6 +469,10 @@
 			</File>
 			<File
 				RelativePath="..\include\OgrePortal.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\OgrePortalBase.h"
 				>
 			</File>
 			<File

@@ -69,7 +69,9 @@ namespace Ogre
 	protected:
 		PCZSceneManagerFactory* mPCZSMFactory;
 		PCZoneFactoryManager* mPCZoneFactoryManager;
-        PCZLightFactory* mPCZLightFactory;
+		PCZLightFactory* mPCZLightFactory;
+		PortalFactory* mPortalFactory;
+		AntiPortalFactory* mAntiPortalFactory;
 	};
 }
 

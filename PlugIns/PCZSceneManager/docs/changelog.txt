@@ -1,6 +1,6 @@
 UPDATES:
 -------------
-
+* (3/17/09) Added support for Antiportals (thanks Lf3thn4d!), fixed PCZTestApp bug and added example Antiportals.
 * (12/19/08) Changed line endings to Windows CR/LF standard in OgreOctreeZone.cpp & OgreDefaultZone.cpp
 * (12/19/08) Initial coding for anti-portals has started.  It is not functional yet, so don't use it.
 * (12/19/08) Portals no longer cross over other portals if they both lead to the same zone (this was put in to fix a rare bug

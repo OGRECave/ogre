@@ -60,7 +60,7 @@ Code Style Update	 :
 
 namespace Ogre
 {
-    class Portal;
+    class PortalBase;
 
     typedef list< PCPlane * >::type PCPlaneList;
 
@@ -78,25 +78,31 @@ namespace Ogre
 			FULL
 		};
 
-        /** Standard constructor */
-        PCZFrustum();
-        /** Standard destructor */
-        ~PCZFrustum();
+		/** Standard constructor */
+		PCZFrustum();
+		/** Standard destructor */
+		~PCZFrustum();
 
 		/* isVisible function for aabb */
 		bool isVisible( const AxisAlignedBox &bound) const;
 		/* isVisible function for sphere */
 		bool isVisible( const Sphere &bound) const;
-        /* isVisible() function for portals */
-        bool isVisible (Portal * portal);
+		/* isVisible() function for portals */
+		bool isVisible(const PortalBase* portal) const;
+		/* special function that returns true only when aabb fully fits inside the frustum. */
+		bool isFullyVisible(const AxisAlignedBox& bound) const;
+		/* special function that returns true only when sphere fully fits inside the frustum. */
+		bool isFullyVisible(const Sphere& bound) const;
+		/* special function that returns true only when portal fully fits inside the frustum. */
+		bool isFullyVisible(const PortalBase* portal) const;
         /* more detailed check for visibility of an AABB */
         PCZFrustum::Visibility getVisibility(const AxisAlignedBox & bound);
 
-        // calculate  culling planes from portal and Frustum 
-        // origin and add to list of  culling planes
-        int addPortalCullingPlanes(Portal * portal);
-        // remove  culling planes created from the given portal
-        void removePortalCullingPlanes(Portal *portal);
+		// calculate  culling planes from portal and Frustum 
+		// origin and add to list of  culling planes
+		int addPortalCullingPlanes(PortalBase* portal);
+		// remove  culling planes created from the given portal
+		void removePortalCullingPlanes(PortalBase* portal);
 		// remove all  culling planes
 		void removeAllCullingPlanes(void);
         // set the origin value

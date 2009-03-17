@@ -39,7 +39,7 @@ Code Style Update	 :
 
 #include <OgreCamera.h>
 #include "OgrePCPlane.h"
-#include "OgrePortal.h"
+#include "OgrePortalBase.h"
 #include "OgrePCZFrustum.h"
 #include "OgrePCZPrerequisites.h"
 
@@ -79,8 +79,8 @@ namespace Ogre
 		/* Overridden isVisible function for aabb */
 		virtual bool isVisible( const AxisAlignedBox &bound, FrustumPlane *culledBy=0) const;
 
-        /* isVisible() function for portals */
-        bool isVisible (Portal * portal, FrustumPlane *culledBy = 0);
+		/* isVisible() function for portals */
+		bool isVisible(PortalBase* portal, FrustumPlane* culledBy = 0) const;
 
         /** Returns the visiblity of the box
         */
@@ -97,11 +97,11 @@ namespace Ogre
            extra culling frustum is up to date */
         void update(void);
 
-        // calculate extra culling planes from portal and camera 
-        // origin and add to list of extra culling planes
-        int addPortalCullingPlanes(Portal * portal);
-        // remove extra culling planes created from the given portal
-        void removePortalCullingPlanes(Portal *portal);
+		// calculate extra culling planes from portal and camera 
+		// origin and add to list of extra culling planes
+		int addPortalCullingPlanes(PortalBase* portal);
+		// remove extra culling planes created from the given portal
+		void removePortalCullingPlanes(PortalBase* portal);
 		// remove all extra culling planes
         void removeAllExtraCullingPlanes(void);
     protected:

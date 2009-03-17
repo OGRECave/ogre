@@ -46,6 +46,7 @@ Code Style Update	 :
 #include "OgrePCZone.h"
 #include "OgrePCZoneFactory.h"
 #include "OgrePortal.h"
+#include "OgreAntiPortal.h"
 
 namespace Ogre
 {
@@ -88,7 +89,7 @@ namespace Ogre
 
 		/** Create a new portal instance
 		*/
-		Portal* createPortal(const String &name, const Ogre::Portal::PORTAL_TYPE type = Ogre::Portal::PORTAL_TYPE_QUAD);
+		Portal* createPortal(const String& name, PortalBase::PORTAL_TYPE type = PortalBase::PORTAL_TYPE_QUAD);
 
 		/** Delete a portal instance by pointer
 		*/
@@ -97,6 +98,15 @@ namespace Ogre
 		/** Delete a portal instance by name
 		*/
 		void destroyPortal(const String & portalName);
+
+		/** Create a new anti portal instance */
+		AntiPortal* createAntiPortal(const String& name, PortalBase::PORTAL_TYPE type = PortalBase::PORTAL_TYPE_QUAD);
+
+		/** Delete a anti portal instance by pointer */
+		void destroyAntiPortal(AntiPortal * p);
+
+		/** Delete a anti portal instance by name */
+		void destroyAntiPortal(const String& portalName);
 
 		/** Create a zone from a file (type of file
 		  * depends on the zone type
@@ -338,6 +348,9 @@ namespace Ogre
 
 		/// Master list of Portals in the world (includes all portals)
 		PortalList mPortals;
+
+		/// Master list of AntiPortals in the world.
+		AntiPortalList mAntiPortals;
 
         /// Portals visibility flag
         bool mShowPortals;
