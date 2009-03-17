@@ -213,6 +213,7 @@ set (HEADER_FILES
   include/OgreStaticFaceGroup.h
   include/OgreStaticGeometry.h
   include/OgreStdHeaders.h
+  include/OgreStreamSerialiser.h
   include/OgreString.h
   include/OgreStringConverter.h
   include/OgreStringInterface.h
@@ -404,6 +405,7 @@ set (SOURCE_FILES
   src/OgreSkeletonManager.cpp
   src/OgreSkeletonSerializer.cpp
   src/OgreStaticGeometry.cpp
+  src/OgreStreamSerialiser.cpp
   src/OgreString.cpp
   src/OgreStringConverter.cpp
   src/OgreStringInterface.cpp

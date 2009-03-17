@@ -102,7 +102,7 @@ namespace Ogre {
 		@param count Number of bytes to write
 		@returns The number of bytes written
 		*/
-		virtual size_t write(void* buf, size_t count)
+		virtual size_t write(const void* buf, size_t count)
 		{
 			// default to not supported
 			return 0;
@@ -324,7 +324,7 @@ namespace Ogre {
 
 		/** @copydoc DataStream::write
 		*/
-		size_t write(void* buf, size_t count);
+		size_t write(const void* buf, size_t count);
 
 		/** @copydoc DataStream::readLine
 		*/
@@ -460,7 +460,7 @@ namespace Ogre {
 
 		/** @copydoc DataStream::write
 		*/
-		size_t write(void* buf, size_t count);
+		size_t write(const void* buf, size_t count);
 
 		/** @copydoc DataStream::readLine
 		*/
@@ -515,7 +515,7 @@ namespace Ogre {
 
 		/** @copydoc DataStream::write
 		*/
-		size_t write(void* buf, size_t count);
+		size_t write(const void* buf, size_t count);
 
 		/** @copydoc DataStream::skip
 		*/

@@ -13,6 +13,7 @@ if (OGRE_BUILD_TESTS)
 		OgreMain/include/PixelFormatTests.h
 		OgreMain/include/RadixSortTests.h
 		OgreMain/include/RenderSystemCapabilitiesTests.h
+		OgreMain/include/StreamSerialiserTests.h
 		OgreMain/include/StringTests.h
 		OgreMain/include/Suite.h
 		OgreMain/include/UseCustomCapabilitiesTests.h
@@ -27,6 +28,7 @@ if (OGRE_BUILD_TESTS)
 		OgreMain/src/PixelFormatTests.cpp
 		OgreMain/src/RadixSort.cpp
 		OgreMain/src/RenderSystemCapabilitiesTests.cpp
+		OgreMain/src/StreamSerialiserTests.cpp
 		OgreMain/src/StringTests.cpp
 		OgreMain/src/Suite.cpp
 		OgreMain/src/UseCustomCapabilitiesTests.cpp

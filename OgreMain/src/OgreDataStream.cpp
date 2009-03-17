@@ -302,7 +302,7 @@ namespace Ogre {
         return cnt;
     }
 	//---------------------------------------------------------------------
-	size_t MemoryDataStream::write(void* buf, size_t count)
+	size_t MemoryDataStream::write(const void* buf, size_t count)
 	{
 		size_t written = 0;
 		if (isWriteable())
@@ -498,12 +498,12 @@ namespace Ogre {
         return mpInStream->gcount();
     }
 	//-----------------------------------------------------------------------
-	size_t FileStreamDataStream::write(void* buf, size_t count)
+	size_t FileStreamDataStream::write(const void* buf, size_t count)
 	{
 		size_t written = 0;
 		if (isWriteable() && mpFStream)
 		{
-			mpFStream->write(static_cast<char*>(buf), static_cast<std::streamsize>(count));
+			mpFStream->write(static_cast<const char*>(buf), static_cast<std::streamsize>(count));
 			written = count;
 		}
 		return written;
@@ -668,7 +668,7 @@ namespace Ogre {
         return fread(buf, 1, count, mFileHandle);
     }
 	//-----------------------------------------------------------------------
-	size_t FileHandleDataStream::write(void* buf, size_t count)
+	size_t FileHandleDataStream::write(const void* buf, size_t count)
 	{
 		if (!isWriteable())
 			return 0;
