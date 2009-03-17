@@ -4,8 +4,8 @@ set(SOURCE_FILES src/Gui.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/CEGUIRenderer/include)
 add_executable(Demo_Gui WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})
-ogre_config_build(Demo_Gui)
+
 target_link_libraries(Demo_Gui ${OGRE_LIBRARIES} ${CEGUI_LIBRARIES} ${OGRE_CEGUI_LIBRARIES} ${OIS_LIBRARIES})
-ogre_install_sample(Demo_Gui)
+ogre_config_sample(Demo_Gui)
 
 add_dependencies(Demo_Gui ${SAMPLE_DEPENDENCIES})

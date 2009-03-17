@@ -25,7 +25,7 @@ if (NOT OGRE_STATIC)
   ) 
 ENDIF (NOT OGRE_STATIC)
 
-ogre_install_lib(CEGUIOgreRenderer)
+ogre_config_lib(CEGUIOgreRenderer)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE
 )

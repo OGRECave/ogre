@@ -505,7 +505,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/nedmalloc)
 
 # setup OgreMain target
 add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
-ogre_config_build(OgreMain)
 set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OGRE_VERSION_MAJOR})
 if (APPLE)
   set_target_properties(OgreMain PROPERTIES	FRAMEWORK TRUE)
@@ -522,9 +521,6 @@ target_link_libraries(OgreMain
 )
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(OgreMain ${Boost_LIBRARIES})
-  if (NOT OGRE_STATIC)
-    add_definitions(-DBOOST_ALL_DYN_LINK)
-  endif ()
 endif ()
 # specify a precompiled header to use
 use_precompiled_header(OgreMain 
@@ -533,7 +529,7 @@ use_precompiled_header(OgreMain
 )
 
 # install OgreMain
-ogre_install_lib(OgreMain)
+ogre_config_lib(OgreMain)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE
 )

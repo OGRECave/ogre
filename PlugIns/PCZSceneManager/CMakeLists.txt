@@ -40,15 +40,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_definitions(-D_USRDLL)
 
 add_library(Plugin_PCZSceneManager ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
-ogre_config_build(Plugin_PCZSceneManager)
 target_link_libraries(Plugin_PCZSceneManager OgreMain)
-
 if (NOT OGRE_STATIC)
   set_target_properties(Plugin_PCZSceneManager PROPERTIES
     COMPILE_DEFINITIONS OGRE_PCZPLUGIN_EXPORTS
   ) 
 endif ()
-set_target_properties(Plugin_PCZSceneManager PROPERTIES PREFIX "")
 
-ogre_install_plugin(Plugin_PCZSceneManager)
+ogre_config_plugin(Plugin_PCZSceneManager)
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/PCZ)

@@ -44,7 +44,6 @@ include_directories(${CMAKE_SOURCE_DIR}/OgreMain/include)
 
 # setup target
 add_library(OgrePaging ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
-ogre_config_build(OgrePaging)
 set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OGRE_VERSION_MAJOR})
 target_link_libraries(OgrePaging OgreMain)
 if (OGRE_CONFIG_THREADS)
@@ -52,7 +51,7 @@ if (OGRE_CONFIG_THREADS)
 endif ()
 
 # install 
-ogre_install_lib(OgrePaging)
+ogre_config_lib(OgrePaging)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Paging
 )

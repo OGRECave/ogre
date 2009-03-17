@@ -5,8 +5,8 @@ set(SOURCE_FILES src/EnvMapping.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_EnvMapping WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
-ogre_config_build(Demo_EnvMapping)
+
 target_link_libraries(Demo_EnvMapping ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
-ogre_install_sample(Demo_EnvMapping)
+ogre_config_sample(Demo_EnvMapping)
 
 add_dependencies(Demo_EnvMapping ${SAMPLE_DEPENDENCIES})

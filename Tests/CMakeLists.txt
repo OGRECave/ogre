@@ -38,7 +38,7 @@ if (OGRE_BUILD_TESTS)
 	)
 
 	add_executable(Test_Ogre WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
-	ogre_config_build(Test_Ogre)
+	ogre_config_common(Test_Ogre)
 	target_link_libraries(Test_Ogre ${OGRE_LIBRARIES} ${CppUnit_LIBRARIES})
 
   endif ()

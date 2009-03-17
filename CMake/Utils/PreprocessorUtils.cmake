@@ -11,6 +11,19 @@ macro(get_preprocessor_entry CONTENTS KEYWORD VARIABLE)
   endif ()
 endmacro()
 
+macro(has_preprocessor_entry CONTENTS KEYWORD VARIABLE)
+  string(REGEX MATCH
+    "\n *# *define +(${KEYWORD})"
+    PREPROC_TEMP_VAR
+    ${${CONTENTS}}
+  )
+  if (CMAKE_MATCH_1)
+    set(${VARIABLE} TRUE)
+  else ()
+    set(${VARIABLE} FALSE)
+  endif ()
+endmacro()
+
 macro(replace_preprocessor_entry VARIABLE KEYWORD NEW_VALUE)
   string(REGEX REPLACE 
     "(// *)?# *define +${KEYWORD} +[^ \n]*"

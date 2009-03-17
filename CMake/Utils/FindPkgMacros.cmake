@@ -4,12 +4,17 @@
 
 # Begin processing of package
 macro(findpkg_begin PREFIX)
-  if (${PREFIX}_INCLUDE_DIR)
-    set(${PREFIX}_FIND_QUIETLY TRUE)
-  elseif (NOT ${PREFIX}_FIND_QUIETLY)
+  if (NOT ${PREFIX}_FIND_QUIETLY)
     message(STATUS "Looking for ${PREFIX}...")
   endif ()
 endmacro(findpkg_begin)
+
+# Display a status message unless FIND_QUIETLY is set
+macro(pkg_message PREFIX)
+  if (NOT ${PREFIX}_FIND_QUIETLY)
+    message(STATUS ${ARGN})
+  endif ()
+endmacro(pkg_message)
 
 # Construct search paths for includes and libraries from a PREFIX_PATH
 macro(create_search_paths PREFIX)
@@ -64,7 +69,7 @@ endmacro(get_debug_names)
 
 # Add the parent dir from DIR to VAR 
 macro(add_parent_dir VAR DIR)
-  get_filename_component(${DIR}_TEMP ${${DIR}}/.. ABSOLUTE)
+  get_filename_component(${DIR}_TEMP "${${DIR}}/.." ABSOLUTE)
   set(${VAR} ${${VAR}} ${${DIR}_TEMP})
 endmacro(add_parent_dir)
 
@@ -88,7 +93,7 @@ macro(findpkg_finish PREFIX)
       endif ()
     endif ()
 
-    mark_as_advanced(${PREFIX}_INCLUDE_DIR ${PREFIX}_LIBRARY ${PREFIX}_LIBRARY_REL ${PREFIX}_LIBRARY_DBGi ${PREFIX}_LIBRARY_FWK)
+    mark_as_advanced(${PREFIX}_INCLUDE_DIR ${PREFIX}_LIBRARY ${PREFIX}_LIBRARY_REL ${PREFIX}_LIBRARY_DBG ${PREFIX}_LIBRARY_FWK)
   endif ()
 endmacro(findpkg_finish)
 

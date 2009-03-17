@@ -11,9 +11,14 @@ else ()
   set(OGRE_LIB_TYPE SHARED)
 endif ()
 
-# add compile options necessary for threading
-if (OGRE_CONFIG_THREADS AND UNIX)
-  add_definitions(-pthread)
+# configure threading options
+if (OGRE_CONFIG_THREADS)
+  if (UNIX)
+    add_definitions(-pthread)
+  endif ()
+  if (NOT OGRE_STATIC)
+    add_definitions(-DBOOST_ALL_DYN_LINK)
+  endif ()
 endif()
 
 # determine config values depending on build options 

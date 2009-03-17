@@ -32,14 +32,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../PCZSceneManager/include)
 add_definitions(-D_USRDLL)
 
 add_library(Plugin_OctreeZone ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
-ogre_config_build(Plugin_OctreeZone)
 target_link_libraries(Plugin_OctreeZone OgreMain Plugin_PCZSceneManager)
-
 if (NOT OGRE_STATIC)
   set_property(TARGET Plugin_OctreeZone PROPERTY
     COMPILE_DEFINITIONS OGRE_OCTREEZONEPLUGIN_EXPORTS OGRE_TERRAINZONEPLUGIN_EXPORTS)
 endif ()
-set_target_properties(Plugin_OctreeZone PROPERTIES PREFIX "")
+
 # need to include the plugins directory in the RPATH for OctreeZone to be able
 # to find the PCZSceneManager library
 if (UNIX)
@@ -48,5 +46,5 @@ if (UNIX)
   )
 endif ()
 
-ogre_install_plugin(Plugin_OctreeZone)
+ogre_config_plugin(Plugin_OctreeZone)
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/PCZ)

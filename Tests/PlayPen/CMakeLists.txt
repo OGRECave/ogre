@@ -11,9 +11,8 @@ set(SOURCE_FILES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/Samples/Common/include)
 add_executable(PlayPen WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
-ogre_config_build(PlayPen)
 target_link_libraries(PlayPen ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
-ogre_install_sample(PlayPen)
+ogre_config_sample(PlayPen)
 
 add_dependencies(PlayPen ${TEST_DEPENDENCIES})
 

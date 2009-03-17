@@ -70,7 +70,6 @@ link_directories(${DirectX_LIBRARY_PATHS})
 add_definitions(-D_USRDLL)
 
 add_library(RenderSystem_Direct3D10 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
-ogre_config_build(RenderSystem_Direct3D10)
 target_link_libraries(RenderSystem_Direct3D10
   OgreMain
   d3d10
@@ -85,6 +84,8 @@ if (NOT OGRE_STATIC)
     COMPILE_DEFINITIONS OGRED3DENGINEDLL_EXPORTS
   )
 endif ()
-set_target_properties(RenderSystem_Direct3D10 PROPERTIES PREFIX "")
+if (OGRE_CONFIG_THREADS)
+  target_link_libraries(RenderSystemDirect3D10 ${Boost_LIBRARIES})
+endif ()
 
-ogre_install_plugin(RenderSystem_Direct3D10)
+ogre_config_plugin(RenderSystem_Direct3D10)
