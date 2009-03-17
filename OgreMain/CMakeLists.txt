@@ -520,6 +520,9 @@ target_link_libraries(OgreMain
 )
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(OgreMain ${Boost_LIBRARIES})
+  if (NOT OGRE_STATIC)
+    add_definitions(-DBOOST_ALL_DYN_LINK)
+  endif ()
 endif ()
 # specify a precompiled header to use
 use_precompiled_header(OgreMain 
