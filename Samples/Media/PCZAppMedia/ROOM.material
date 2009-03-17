@@ -130,3 +130,20 @@ material Roofing_Tile_Spanish
       }
    }
 }
+material TransparentGlassTinted
+{
+	technique
+	{
+		pass
+		{
+			scene_blend add
+			depth_write off
+			cull_hardware none
+
+			texture_unit
+			{
+				texture Translucent_Glass_Tinted.jpg
+			}
+		}
+	}
+}

@@ -14,9 +14,6 @@ This file based on the Example App framework from Ogre3d (www.ogre3d.org)
 		Portal Connected Zone (PCZ) Scene Manager Plugin.
 */
 
-// tell static build system that we want PCZ
-#define OGRE_USE_PCZ 1
-
 #include "ExampleApplication.h" 
 #include "RoomObject.h"
 #include "OgreTerrainZone.h"
@@ -205,6 +202,28 @@ protected:
 		return terrainZone;
 	}
 
+	PCZSceneNode* createAntiPortal(const String& name)
+	{
+		// Create antiportal test.
+		PCZSceneNode* antiPortalNode = (PCZSceneNode*)mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		PCZone* defaultZone = ((PCZSceneManager*)mSceneMgr)->getDefaultZone();
+		AntiPortal* antiPortal = ((PCZSceneManager*)mSceneMgr)->createAntiPortal(name);
+		antiPortal->setCorner(0, Vector3(100.0f, 100.0f, 0.0f));
+		antiPortal->setCorner(1, Vector3(100.0f, -100.0f, 0.0f));
+		antiPortal->setCorner(2, Vector3(-100.0f, -100.0f, 0.0f));
+		antiPortal->setCorner(3, Vector3(-100.0f, 100.0f, 0.0f));
+		antiPortalNode->attachObject(antiPortal);
+		defaultZone->_addAntiPortal(antiPortal);
+		((PCZSceneManager*)mSceneMgr)->addPCZSceneNode(antiPortalNode, defaultZone);
+
+		// Anti portal prop.
+		Entity* planeEnt = mSceneMgr->createEntity(name + "Entity", SceneManager::PT_PLANE);
+		planeEnt->setMaterialName("TransparentGlassTinted");
+		antiPortalNode->attachObject(planeEnt);
+
+		return antiPortalNode;
+	}
+
     // Just override the mandatory create scene method
     void createScene(void)
     {
@@ -310,6 +329,14 @@ protected:
 		buildingNode->setPosition(400, 165, 570);
 		//Ogre::Radian r = Radian(3.1416/7.0);
 		//buildingNode->rotate(Vector3::UNIT_Y, r);
+
+		PCZSceneNode* antiPortalNode1 = createAntiPortal("AntiPortal1");
+		antiPortalNode1->setPosition(Vector3(450, 200, 800));
+		antiPortalNode1->setScale(0.5f, 0.5f, 0.5f);
+
+		PCZSceneNode* antiPortalNode2 = createAntiPortal("AntiPortal2");
+		antiPortalNode2->setPosition(Vector3(460, 200, 700));
+		antiPortalNode2->setScale(0.5f, 0.5f, 0.5f);
 
         // Position camera in the center of the building
         mCameraNode->setPosition(buildingNode->getPosition());
