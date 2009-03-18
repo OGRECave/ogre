@@ -38,10 +38,12 @@ function(ogre_config_lib LIBNAME)
   if (OGRE_STATIC)
     # add static prefix, if compiling static version
     set_target_properties(${LIBNAME} PROPERTIES OUTPUT_NAME ${LIBNAME}Static)
-  else ()
-    # add GCC visibility flags to shared library build
-    set_target_properties(${LIBNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
-  endif ()
+  else (OGRE_STATIC)
+    if (CMAKE_COMPILER_IS_GNUCXX)
+      # add GCC visibility flags to shared library build
+      set_target_properties(${LIBNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
+	endif (CMAKE_COMPILER_IS_GNUCXX)
+  endif (OGRE_STATIC)
   install(TARGETS ${LIBNAME}
     RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" 
       CONFIGURATIONS Release MinSizeRel RelWithDebInfo None
