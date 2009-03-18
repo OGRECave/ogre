@@ -1,6 +1,7 @@
 # Configure PCZ SceneManager build
 
 set (HEADER_FILES
+  include/OgreAntiPortal.h
   include/OgreCapsule.h
   include/OgreDefaultZone.h
   include/OgrePCPlane.h
@@ -15,10 +16,12 @@ set (HEADER_FILES
   include/OgrePCZSceneNode.h
   include/OgrePCZSceneQuery.h
   include/OgrePortal.h
+  include/OgrePortalBase.h
   include/OgreSegment.h
 )
 
 set (SOURCE_FILES
+  src/OgreAntiPortal.cpp
   src/OgreCapsule.cpp
   src/OgreDefaultZone.cpp
   src/OgrePCPlane.cpp
@@ -33,6 +36,7 @@ set (SOURCE_FILES
   src/OgrePCZSceneNode.cpp
   src/OgrePCZSceneQuery.cpp
   src/OgrePortal.cpp
+  src/OgrePortalBase.cpp
   src/OgreSegment.cpp
 )
 
