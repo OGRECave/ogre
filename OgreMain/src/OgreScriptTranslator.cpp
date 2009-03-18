@@ -831,7 +831,7 @@ namespace Ogre{
 						if(prop->values.front()->type == ANT_ATOM && 
 							((AtomAbstractNode*)prop->values.front().get())->id == ID_VERTEXCOLOUR)
 						{
-							mPass->setVertexColourTracking(TVC_AMBIENT);
+							mPass->setVertexColourTracking(mPass->getVertexColourTracking() | TVC_AMBIENT);
 						}
 						else
 						{
@@ -859,7 +859,7 @@ namespace Ogre{
 						if(prop->values.front()->type == ANT_ATOM && 
 							((AtomAbstractNode*)prop->values.front().get())->id == ID_VERTEXCOLOUR)
 						{
-							mPass->setVertexColourTracking(TVC_DIFFUSE);
+							mPass->setVertexColourTracking(mPass->getVertexColourTracking() | TVC_DIFFUSE);
 						}
 						else
 						{
@@ -887,7 +887,7 @@ namespace Ogre{
 						if(prop->values.front()->type == ANT_ATOM && 
 							((AtomAbstractNode*)prop->values.front().get())->id == ID_VERTEXCOLOUR)
 						{
-							mPass->setVertexColourTracking(TVC_SPECULAR);
+							mPass->setVertexColourTracking(mPass->getVertexColourTracking() | TVC_SPECULAR);
 
 							if(prop->values.size() >= 2)
 							{
@@ -964,7 +964,7 @@ namespace Ogre{
 						if(prop->values.front()->type == ANT_ATOM && 
 							((AtomAbstractNode*)prop->values.front().get())->id == ID_VERTEXCOLOUR)
 						{
-							mPass->setVertexColourTracking(TVC_EMISSIVE);
+							mPass->setVertexColourTracking(mPass->getVertexColourTracking() | TVC_EMISSIVE);
 						}
 						else
 						{
