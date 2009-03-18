@@ -66,11 +66,13 @@ function(ogre_config_plugin PLUGINNAME)
   if (OGRE_STATIC)
     # add static prefix, if compiling static version
     set_target_properties(${PLUGINNAME} PROPERTIES OUTPUT_NAME ${PLUGINNAME}Static)
-  else ()
-    # add GCC visibility flags to shared library build
-    set_target_properties(${PLUGINNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
-    # disable "lib" prefix on Unix
-    set_target_properties(${PLUGINNAME} PROPERTIES PREFIX "")
+  else (OGRE_STATIC)
+    if (CMAKE_COMPILER_IS_GNUCXX)
+      # add GCC visibility flags to shared library build
+      set_target_properties(${PLUGINNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
+      # disable "lib" prefix on Unix
+      set_target_properties(${PLUGINNAME} PROPERTIES PREFIX "")
+	endif (CMAKE_COMPILER_IS_GNUCXX)
   endif ()
   install(TARGETS ${PLUGINNAME}
     RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" 
