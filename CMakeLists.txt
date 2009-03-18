@@ -47,26 +47,28 @@ if (MSVC)
   add_definitions(/fp:fast)
 endif ()
 
-# Test for GCC visibility
-set(CMAKE_VERBOSE_MAKEFILE ON)
-include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag(-fvisibility=hidden OGRE_GCC_VISIBILITY)
-if (OGRE_GCC_VISIBILITY)
-  # determine gcc version
-  execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion 
-    OUTPUT_VARIABLE OGRE_GCC_VERSION)
-  message(STATUS "Detected g++ ${OGRE_GCC_VERSION}")
-  message(STATUS "Enabling GCC visibility flags")
-  set(OGRE_GCC_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY -fvisibility=hidden")
+if (CMAKE_COMPILER_IS_GNUCXX)
+  # Test for GCC visibility
+  set(CMAKE_VERBOSE_MAKEFILE ON)
+  include(CheckCXXCompilerFlag)
+  check_cxx_compiler_flag(-fvisibility=hidden OGRE_GCC_VISIBILITY)
+  if (OGRE_GCC_VISIBILITY)
+    # determine gcc version
+    execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion 
+      OUTPUT_VARIABLE OGRE_GCC_VERSION)
+    message(STATUS "Detected g++ ${OGRE_GCC_VERSION}")
+    message(STATUS "Enabling GCC visibility flags")
+    set(OGRE_GCC_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY -fvisibility=hidden")
   
-  # check if we can safely add -fvisibility-inlines-hidden
-  string(TOLOWER "${CMAKE_BUILD_TYPE}" OGRE_BUILD_TYPE)
-  if (OGRE_BUILD_TYPE STREQUAL "debug" AND OGRE_GCC_VERSION VERSION_LESS "4.2")
-    message(STATUS "Skipping -fvisibility-inlines-hidden due to possible bug in g++ < 4.2")
-  else ()
-    set(OGRE_GCC_VISIBILITY_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS} -fvisibility-inlines-hidden")
-  endif ()
-endif ()
+    # check if we can safely add -fvisibility-inlines-hidden
+    string(TOLOWER "${CMAKE_BUILD_TYPE}" OGRE_BUILD_TYPE)
+    if (OGRE_BUILD_TYPE STREQUAL "debug" AND OGRE_GCC_VERSION VERSION_LESS "4.2")
+      message(STATUS "Skipping -fvisibility-inlines-hidden due to possible bug in g++ < 4.2")
+    else ()
+      set(OGRE_GCC_VISIBILITY_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS} -fvisibility-inlines-hidden")
+    endif ()
+  endif (OGRE_GCC_VISIBILITY)
+endif (CMAKE_COMPILER_IS_GNUCXX)
 
 # Add OgreMain include path
 include_directories("${OGRE_SOURCE_DIR}/OgreMain/include")
