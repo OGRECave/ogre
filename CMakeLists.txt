@@ -49,7 +49,6 @@ endif ()
 
 if (CMAKE_COMPILER_IS_GNUCXX)
   # Test for GCC visibility
-  set(CMAKE_VERBOSE_MAKEFILE ON)
   include(CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-fvisibility=hidden OGRE_GCC_VISIBILITY)
   if (OGRE_GCC_VISIBILITY)

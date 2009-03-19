@@ -80,34 +80,66 @@ file(WRITE ${OGRE_BINARY_DIR}/include/OgreConfig.h "#define HAVE_OGRE_BUILDSETTI
 install(FILES ${OGRE_BINARY_DIR}/include/OgreConfig.h DESTINATION include/OGRE)
 
 
-# Create the pkg-config package file on Unix systems
+# Create the pkg-config package files on Unix systems
 if (UNIX)
-  set(prefix ${CMAKE_INSTALL_PREFIX})
-  set(libdir ${CMAKE_INSTALL_PREFIX}/lib)
-  set(includedir ${CMAKE_INSTALL_PREFIX}/include)
-  set(PACKAGE "OGRE")
-  set(VERSION ${OGRE_VERSION})
+  set(OGRE_ADDITIONAL_LIBS "")
+  set(OGRE_CFLAGS "")
+  set(OGRE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
   if (OGRE_CONFIG_THREADS GREATER 0)
     set(OGRE_CFLAGS "-pthread")
-    set(OGRE_THREAD_LIBS "-lpthread")
+    set(OGRE_ADDITIONAL_LIBS "${OGRE_ADDITIONAL_LIBS} -lpthread")
   endif ()
-  set(exec_prefix ${CMAKE_INSTALL_PREFIX})
-  configure_file(${OGRE_SOURCE_DIR}/OGRE.pc.in ${OGRE_BINARY_DIR}/pkgconfig/OGRE.pc @ONLY)
+  if (OGRE_STATIC)
+    if (OGRE_CONFIG_THREADS)
+      set(OGRE_ADDITIONAL_LIBS "${OGRE_ADDITIONAL_LIBS} -lboost-thread-mt")
+    endif ()
+    # there is no pkgconfig file for freeimage, so we need to add that lib manually
+    set(OGRE_ADDITIONAL_LIBS "${OGRE_ADDITIONAL_LIBS} -lfreeimage")
+    configure_file(${OGRE_TEMPLATES_DIR}/OGREStatic.pc.in ${OGRE_BINARY_DIR}/pkgconfig/OGRE.pc @ONLY)
+  else ()
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE.pc.in ${OGRE_BINARY_DIR}/pkgconfig/OGRE.pc @ONLY)
+  endif ()
   install(FILES ${OGRE_BINARY_DIR}/pkgconfig/OGRE.pc DESTINATION lib/pkgconfig)
+
+  # configure additional packages
+  set(OGRE_LIB_SUFFIX "")
+  set(OGRE_PLUGIN_PREFIX "")
+  set(OGRE_PLUGIN_EXT ".so")
+  if (OGRE_STATIC)
+    set(OGRE_LIB_SUFFIX "Static")
+    set(OGRE_PLUGIN_PREFIX "lib")
+    set(OGRE_PLUGIN_EXT ".a")
+  endif ()
+  
+  if (OGRE_BUILD_CEGUIRENDERER)
+    configure_file(${OGRE_TEMPLATES_DIR}/CEGUI-OGRE.pc.in ${OGRE_BINARY_DIR}/pkgconfig/CEGUI-OGRE.pc @ONLY)
+    install(FILES ${OGRE_BINARY_DIR}/pkgconfig/CEGUI-OGRE.pc DESTINATION lib/pkgconfig)
+  endif ()
+
+  if (OGRE_BUILD_PLUGIN_PCZ)
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-PCZ.pc.in ${OGRE_BINARY_DIR}/pkgconfig/OGRE-PCZ.pc @ONLY)
+    install(FILES ${OGRE_BINARY_DIR}/pkgconfig/OGRE-PCZ.pc DESTINATION lib/pkgconfig)
+  endif ()
+  
+  if (OGRE_BUILD_COMPONENT_PAGING)
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-Paging.pc.in ${OGRE_BINARY_DIR}/pkgconfig/OGRE-Paging.pc @ONLY)
+    install(FILES ${OGRE_BINARY_DIR}/pkgconfig/OGRE-Paging.pc DESTINATION lib/pkgconfig)
+  endif ()
 endif ()
 
-# Create the CMake package files
-if (WIN32)
-  set(OGRE_CMAKE_DIR CMake)
-elseif (UNIX)
-  set(OGRE_CMAKE_DIR lib/cmake)
-elseif (APPLE)
-endif ()
-configure_file(${OGRE_TEMPLATES_DIR}/OGREConfig.cmake.in ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake @ONLY)
-configure_file(${OGRE_TEMPLATES_DIR}/OGREConfigVersion.cmake.in ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake @ONLY)
-install(FILES
-  ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake
-  ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake
-  DESTINATION ${OGRE_CMAKE_DIR}
-)
-
+### Commented because the FindOGRE script can currently fill this role better ###
+# # Create the CMake package files
+# if (WIN32)
+#   set(OGRE_CMAKE_DIR CMake)
+# elseif (UNIX)
+#   set(OGRE_CMAKE_DIR lib/cmake)
+# elseif (APPLE)
+# endif ()
+# configure_file(${OGRE_TEMPLATES_DIR}/OGREConfig.cmake.in ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake @ONLY)
+# configure_file(${OGRE_TEMPLATES_DIR}/OGREConfigVersion.cmake.in ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake @ONLY)
+# install(FILES
+#   ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake
+#   ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake
+#   DESTINATION ${OGRE_CMAKE_DIR}
+# )
+# 

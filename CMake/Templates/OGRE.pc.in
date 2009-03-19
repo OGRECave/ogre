@@ -1,0 +1,12 @@
+prefix=@OGRE_PREFIX_PATH@
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+plugindir=${libdir}/OGRE
+
+Name: OGRE
+Description: Object-Oriented Graphics Rendering Engine
+Version: @OGRE_VERSION@
+URL: http://www.ogre3d.org
+Libs: -L${libdir} -lOgreMain @OGRE_ADDITIONAL_LIBS@
+Cflags: -I${includedir} -I${includedir}/OGRE @OGRE_CFLAGS@

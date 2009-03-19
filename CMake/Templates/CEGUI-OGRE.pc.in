@@ -1,0 +1,11 @@
+prefix=@OGRE_PREFIX_PATH@
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: CEGUI-OGRE
+Description: CEGUI Renderer interface module for OGRE (Object-Oriented Graphics Rendering Engine).
+Version: @OGRE_VERSION@
+Requires: OGRE = @OGRE_VERSION@, CEGUI >= 0.5.0
+Libs: -L${libdir} -lCEGUIOgreRenderer
+Cflags: -I${includedir}/OGRE/CEGUIRenderer @OGRE_CFLAGS@
