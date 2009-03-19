@@ -8,6 +8,6 @@ Name: OGRE (static lib)
 Description: Object-Oriented Graphics Rendering Engine
 Version: @OGRE_VERSION@
 URL: http://www.ogre3d.org
-Requires: freetype2, zziplib, x11, xt, xaw, gl
+Requires: freetype2, zziplib, x11, xt, xaw7, gl
 Libs: -L${libdir} -L${plugindir} -lOgreMainStatic @OGRE_ADDITIONAL_LIBS@
 Cflags: -I${includedir} -I${includedir}/OGRE @OGRE_CFLAGS@
