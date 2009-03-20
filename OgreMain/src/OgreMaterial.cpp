@@ -518,18 +518,17 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Material::setAmbient(Real red, Real green, Real blue)
     {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setAmbient(red, green, blue);
-        }
-
+		setAmbient(ColourValue(red, green, blue));
     }
     //-----------------------------------------------------------------------
     void Material::setAmbient(const ColourValue& ambient)
     {
-        setAmbient(ambient.r, ambient.g, ambient.b);
+		Techniques::iterator i, iend;
+		iend = mTechniques.end();
+		for (i = mTechniques.begin(); i != iend; ++i)
+		{
+			(*i)->setAmbient(ambient);
+		}
     }
     //-----------------------------------------------------------------------
     void Material::setDiffuse(Real red, Real green, Real blue, Real alpha)
@@ -574,17 +573,17 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Material::setSelfIllumination(Real red, Real green, Real blue)
     {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setSelfIllumination(red, green, blue);
-        }
+		setSelfIllumination(ColourValue(red, green, blue));   
     }
     //-----------------------------------------------------------------------
     void Material::setSelfIllumination(const ColourValue& selfIllum)
     {
-        setSelfIllumination(selfIllum.r, selfIllum.g, selfIllum.b);
+		Techniques::iterator i, iend;
+		iend = mTechniques.end();
+		for (i = mTechniques.begin(); i != iend; ++i)
+		{
+			(*i)->setSelfIllumination(selfIllum);
+		}
     }
     //-----------------------------------------------------------------------
     void Material::setDepthCheckEnabled(bool enabled)
