@@ -32,7 +32,7 @@ AC_SUBST(OGRE_CFLAGS)
 # There are quirks for x86_64 and debug builds with gcc < 4.2
 AC_LANG_PUSH(C++)
 AC_LIBTOOL_COMPILER_OPTION([if $CXX supports -fvisibility],
-    [ogre_prog_compiler_supports_visibility],
+    [ogre_cv_prog_compiler_supports_visibility],
     [-fvisibility=hidden -fvisibility-inlines-hidden], [],
     [CFLAGS_VISIBILITY="-fvisibility=hidden -fvisibility-inlines-hidden -DOGRE_GCC_VISIBILITY";
     case $target_cpu in
