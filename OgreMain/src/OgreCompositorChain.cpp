@@ -62,10 +62,10 @@ void CompositorChain::destroyResources(void)
 	if (mViewport)
 	{
 		removeAllCompositors();
-		mViewport->getTarget()->removeListener(this);
 		/// Destroy "original scene" compositor instance
 		if (mOriginalScene)
 		{
+			mViewport->getTarget()->removeListener(this);
 			mOriginalScene->getTechnique()->destroyInstance(mOriginalScene);
 			mOriginalScene = 0;
 		}
