@@ -882,7 +882,8 @@ namespace Ogre
 					"D3D9RenderWindow::copyContentsToMemory");
 			}
 
-			if (FAILED(hr = mpD3DDevice->GetFrontBufferData(0, pTempSurf)))
+			if (FAILED(hr = mIsSwapChain? mpSwapChain->GetFrontBufferData(pTempSurf) :
+										  mpD3DDevice->GetFrontBufferData(0, pTempSurf)))
 			{
 				SAFE_RELEASE(pTempSurf);
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
@@ -947,7 +948,8 @@ namespace Ogre
 		else
 		{
 			SAFE_RELEASE(pSurf);
-			if(FAILED(hr = mpD3DDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pSurf)))
+			if(FAILED(hr = mIsSwapChain? mpSwapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &pSurf) :
+										 mpD3DDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pSurf)))
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
 					"Can't get back buffer: " + Root::getSingleton().getErrorDescription(hr),
