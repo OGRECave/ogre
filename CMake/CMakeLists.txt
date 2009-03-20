@@ -15,6 +15,7 @@ set(INST_FILES
   Packages/FindOIS.cmake
   Packages/FindOGRE.cmake
   Utils/FindPkgMacros.cmake
+  Utils/PreprocessorUtils.cmake
   Utils/OgreConfigTargets.cmake
   Utils/OgreGetVersion.cmake
   Templates/VisualStudioUserFile.vcproj.user.in
