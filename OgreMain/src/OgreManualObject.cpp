@@ -504,6 +504,7 @@ namespace Ogre {
 			case VET_FLOAT1:
 			case VET_FLOAT2:
 			case VET_FLOAT3:
+			case VET_FLOAT4:
 				elem.baseVertexPointerToElement(pBase, &pFloat);
 				break;
 			case VET_COLOUR:
