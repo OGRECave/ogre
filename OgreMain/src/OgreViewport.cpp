@@ -242,6 +242,7 @@ namespace Ogre {
     void Viewport::setCamera(Camera* cam)
     {
         mCamera = cam;
+		_updateDimensions();
 		if(cam) mCamera->_notifyViewport(this);
     }
     //---------------------------------------------------------------------

@@ -205,7 +205,7 @@ namespace Ogre {
 		// this can happen if Mesh is loaded in background or after reinitialisation
 		if( mParentNode )
 		{
-			getParentSceneNode()->_updateBounds();
+			getParentSceneNode()->needUpdate();
 		}
 
 		mInitialised = true;

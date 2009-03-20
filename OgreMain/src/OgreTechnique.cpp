@@ -642,18 +642,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Technique::setAmbient(Real red, Real green, Real blue)
     {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setAmbient(red, green, blue);
-        }
+		setAmbient(ColourValue(red, green, blue));
+        
 
     }
     //-----------------------------------------------------------------------
     void Technique::setAmbient(const ColourValue& ambient)
     {
-        setAmbient(ambient.r, ambient.g, ambient.b);
+		Passes::iterator i, iend;
+		iend = mPasses.end();
+		for (i = mPasses.begin(); i != iend; ++i)
+		{
+			(*i)->setAmbient(ambient);
+		}
     }
     //-----------------------------------------------------------------------
     void Technique::setDiffuse(Real red, Real green, Real blue, Real alpha)
@@ -698,17 +699,17 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Technique::setSelfIllumination(Real red, Real green, Real blue)
     {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setSelfIllumination(red, green, blue);
-        }
+        setSelfIllumination(ColourValue(red, green, blue));
     }
     //-----------------------------------------------------------------------
     void Technique::setSelfIllumination(const ColourValue& selfIllum)
     {
-        setSelfIllumination(selfIllum.r, selfIllum.g, selfIllum.b);
+		Passes::iterator i, iend;
+		iend = mPasses.end();
+		for (i = mPasses.begin(); i != iend; ++i)
+		{
+			(*i)->setSelfIllumination(selfIllum);
+		}
     }
     //-----------------------------------------------------------------------
     void Technique::setDepthCheckEnabled(bool enabled)

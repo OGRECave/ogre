@@ -323,6 +323,37 @@ namespace Ogre {
 
 		};
 
+		/** Inner helper class to implement the visitor pattern for rendering objects
+			in a queue. 
+		*/
+		class _OgreExport SceneMgrQueuedRenderableVisitor : public QueuedRenderableVisitor
+		{
+		protected:
+			/// Pass that was actually used at the grouping level
+			const Pass* mUsedPass;
+		public:
+			SceneMgrQueuedRenderableVisitor() 
+				:transparentShadowCastersMode(false) {}
+			~SceneMgrQueuedRenderableVisitor() {}
+			void visit(Renderable* r);
+			bool visit(const Pass* p);
+			void visit(RenderablePass* rp);
+
+			/// Target SM to send renderables to
+			SceneManager* targetSceneMgr;
+			/// Are we in transparent shadow caster mode?
+			bool transparentShadowCastersMode;
+			/// Automatic light handling?
+			bool autoLights;
+			/// Manual light list
+			const LightList* manualLightList;
+			/// Scissoring if requested?
+			bool scissoring;
+
+		};
+		/// Allow visitor helper to access protected methods
+		friend class SceneMgrQueuedRenderableVisitor;
+
     protected:
 
         /// Subclasses can override this to ensure their specialised SceneNode is used.
@@ -866,36 +897,6 @@ namespace Ogre {
 		virtual void resetLightClip();
 		virtual void checkCachedLightClippingInfo();
 
-		/** Inner helper class to implement the visitor pattern for rendering objects
-			in a queue. 
-		*/
-		class _OgreExport SceneMgrQueuedRenderableVisitor : public QueuedRenderableVisitor
-		{
-		protected:
-			/// Pass that was actually used at the grouping level
-			const Pass* mUsedPass;
-		public:
-			SceneMgrQueuedRenderableVisitor() 
-				:transparentShadowCastersMode(false) {}
-			~SceneMgrQueuedRenderableVisitor() {}
-			void visit(Renderable* r);
-			bool visit(const Pass* p);
-			void visit(RenderablePass* rp);
-
-			/// Target SM to send renderables to
-			SceneManager* targetSceneMgr;
-			/// Are we in transparent shadow caster mode?
-			bool transparentShadowCastersMode;
-			/// Automatic light handling?
-			bool autoLights;
-			/// Manual light list
-			const LightList* manualLightList;
-			/// Scissoring if requested?
-			bool scissoring;
-
-		};
-		/// Allow visitor helper to access protected methods
-		friend class SceneMgrQueuedRenderableVisitor;
 		/// The active renderable visitor class - subclasses could override this
 		SceneMgrQueuedRenderableVisitor* mActiveQueuedRenderableVisitor;
 		/// Storage for default renderable visitor

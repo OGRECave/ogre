@@ -39,6 +39,8 @@ Torus Knot Software Ltd.
 #include "OgreCompositorManager.h"
 #include "OgreSceneManager.h"
 #include "OgreRenderQueueInvocation.h"
+#include "OgreMaterialManager.h"
+
 namespace Ogre {
 CompositorChain::CompositorChain(Viewport *vp):
     mViewport(vp),
@@ -62,10 +64,10 @@ void CompositorChain::destroyResources(void)
 	if (mViewport)
 	{
 		removeAllCompositors();
-		mViewport->getTarget()->removeListener(this);
 		/// Destroy "original scene" compositor instance
 		if (mOriginalScene)
 		{
+			mViewport->getTarget()->removeListener(this);
 			OGRE_DELETE mOriginalScene;
 			mOriginalScene = 0;
 		}
@@ -341,6 +343,11 @@ void CompositorChain::_compile()
 
 	bool compositorsEnabled = false;
 
+	// force default scheme so materials for compositor quads will determined correctly
+	MaterialManager& matMgr = MaterialManager::getSingleton();
+	String prevMaterialScheme = matMgr.getActiveScheme();
+	matMgr.setActiveScheme(MaterialManager::DEFAULT_SCHEME_NAME);
+	
     /// Set previous CompositorInstance for each compositor in the list
     CompositorInstance *lastComposition = mOriginalScene;
 	mOriginalScene->mPreviousInstance = 0;
@@ -383,6 +390,10 @@ void CompositorChain::_compile()
 				mOldClearEveryFrameBuffers);
 		}
 	}
+
+	// restore material scheme
+	matMgr.setActiveScheme(prevMaterialScheme);
+
     
     mDirty = false;
 }

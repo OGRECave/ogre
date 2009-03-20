@@ -30,6 +30,7 @@ Torus Knot Software Ltd.
 #define __D3D9Device_H__
 
 #include "OgreD3D9Prerequisites.h"
+#include "OgreRenderTarget.h"
 
 namespace Ogre {
 
@@ -76,6 +77,7 @@ namespace Ogre {
 		uint					getLastPresentFrame		() const { return mLastPresentFrame; }
 
 		void					setAdapterOrdinalIndex  (D3D9RenderWindow* renderWindow, uint adapterOrdinalInGroupIndex);
+		void					copyContentsToMemory(D3D9RenderWindow* window, const PixelBox &dst, RenderTarget::FrameBuffer buffer);
 	
 	public:
 		D3D9Device	(D3D9DeviceManager* deviceManager,

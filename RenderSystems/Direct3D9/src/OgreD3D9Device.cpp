@@ -1036,4 +1036,246 @@ namespace Ogre
 			}
 		}
 	}
+	//---------------------------------------------------------------------
+	void D3D9Device::copyContentsToMemory(D3D9RenderWindow* renderWindow, 
+		const PixelBox &dst, RenderTarget::FrameBuffer buffer)
+	{
+		RenderWindowToResorucesIterator it = getRenderWindowIterator(renderWindow);
+		RenderWindowResources* resources = it->second;
+		bool swapChain = isSwapChainWindow(renderWindow);
+
+
+
+		if ((dst.left < 0) || (dst.right > renderWindow->getWidth()) ||
+			(dst.top < 0) || (dst.bottom > renderWindow->getHeight()) ||
+			(dst.front != 0) || (dst.back != 1))
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+				"Invalid box.",
+				"D3D9Device::copyContentsToMemory" );
+		}
+
+		HRESULT hr;
+		IDirect3DSurface9* pSurf = NULL;
+		IDirect3DSurface9* pTempSurf = NULL;
+		D3DSURFACE_DESC desc;
+		D3DLOCKED_RECT lockedRect;
+
+
+		if (buffer == RenderTarget::FB_AUTO)
+		{
+			//buffer = mIsFullScreen? FB_FRONT : FB_BACK;
+			buffer = RenderTarget::FB_FRONT;
+		}
+
+		if (buffer == RenderTarget::FB_FRONT)
+		{
+			D3DDISPLAYMODE dm;
+
+			if (FAILED(hr = mpDevice->GetDisplayMode(0, &dm)))
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+					"Can't get display mode: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9Device::copyContentsToMemory");
+			}
+
+			desc.Width = dm.Width;
+			desc.Height = dm.Height;
+			desc.Format = D3DFMT_A8R8G8B8;
+			if (FAILED(hr = mpDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height,
+				desc.Format,
+				D3DPOOL_SYSTEMMEM,
+				&pTempSurf,
+				0)))
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+					"Can't create offscreen buffer: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9Device::copyContentsToMemory");
+			}
+
+			if (FAILED(hr = swapChain ? resources->swapChain->GetFrontBufferData(pTempSurf) :
+				mpDevice->GetFrontBufferData(0, pTempSurf)))
+			{
+				SAFE_RELEASE(pTempSurf);
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+					"Can't get front buffer: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9Device::copyContentsToMemory");
+			}
+
+			if(renderWindow->isFullScreen())
+			{
+				if ((dst.left == 0) && (dst.right == renderWindow->getWidth()) && (dst.top == 0) && (dst.bottom == renderWindow->getHeight()))
+				{
+					hr = pTempSurf->LockRect(&lockedRect, 0, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK);
+				}
+				else
+				{
+					RECT rect;
+
+					rect.left = static_cast<LONG>(dst.left);
+					rect.right = static_cast<LONG>(dst.right);
+					rect.top = static_cast<LONG>(dst.top);
+					rect.bottom = static_cast<LONG>(dst.bottom);
+
+					hr = pTempSurf->LockRect(&lockedRect, &rect, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK);
+				}
+				if (FAILED(hr))
+				{
+					SAFE_RELEASE(pTempSurf);
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+						"Can't lock rect: " + Root::getSingleton().getErrorDescription(hr),
+						"D3D9Device::copyContentsToMemory");
+				} 
+			}
+			else
+			{
+				RECT srcRect;
+				//GetClientRect(mHWnd, &srcRect);
+				srcRect.left = static_cast<LONG>(dst.left);
+				srcRect.top = static_cast<LONG>(dst.top);
+				srcRect.right = static_cast<LONG>(dst.right);
+				srcRect.bottom = static_cast<LONG>(dst.bottom);
+				POINT point;
+				point.x = srcRect.left;
+				point.y = srcRect.top;
+				ClientToScreen(renderWindow->getWindowHandle(), &point);
+				srcRect.top = point.y;
+				srcRect.left = point.x;
+				srcRect.bottom += point.y;
+				srcRect.right += point.x;
+
+				desc.Width = srcRect.right - srcRect.left;
+				desc.Height = srcRect.bottom - srcRect.top;
+
+				if (FAILED(hr = pTempSurf->LockRect(&lockedRect, &srcRect, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK)))
+				{
+					SAFE_RELEASE(pTempSurf);
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+						"Can't lock rect: " + Root::getSingleton().getErrorDescription(hr),
+						"D3D9Device::copyContentsToMemory");
+				} 
+			}
+		}
+		else
+		{
+			SAFE_RELEASE(pSurf);
+			if(FAILED(hr = swapChain? resources->swapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &pSurf) :
+				mpDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pSurf)))
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+					"Can't get back buffer: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9Device::copyContentsToMemory");
+			}
+
+			if(FAILED(hr = pSurf->GetDesc(&desc)))
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+					"Can't get description: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9Device::copyContentsToMemory");
+			}
+
+			if (FAILED(hr = mpDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height,
+				desc.Format,
+				D3DPOOL_SYSTEMMEM,
+				&pTempSurf,
+				0)))
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+					"Can't create offscreen surface: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9Device::copyContentsToMemory");
+			}
+
+			if (desc.MultiSampleType == D3DMULTISAMPLE_NONE)
+			{
+				if (FAILED(hr = mpDevice->GetRenderTargetData(pSurf, pTempSurf)))
+				{
+					SAFE_RELEASE(pTempSurf);
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+						"Can't get render target data: " + Root::getSingleton().getErrorDescription(hr),
+						"D3D9Device::copyContentsToMemory");
+				}
+			}
+			else
+			{
+				IDirect3DSurface9* pStretchSurf = 0;
+
+				if (FAILED(hr = mpDevice->CreateRenderTarget(desc.Width, desc.Height,
+					desc.Format,
+					D3DMULTISAMPLE_NONE,
+					0,
+					false,
+					&pStretchSurf,
+					0)))
+				{
+					SAFE_RELEASE(pTempSurf);
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+						"Can't create render target: " + Root::getSingleton().getErrorDescription(hr),
+						"D3D9Device::copyContentsToMemory");
+				}
+
+				if (FAILED(hr = mpDevice->StretchRect(pSurf, 0, pStretchSurf, 0, D3DTEXF_NONE)))
+				{
+					SAFE_RELEASE(pTempSurf);
+					SAFE_RELEASE(pStretchSurf);
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+						"Can't stretch rect: " + Root::getSingleton().getErrorDescription(hr),
+						"D3D9Device::copyContentsToMemory");
+				}
+				if (FAILED(hr = mpDevice->GetRenderTargetData(pStretchSurf, pTempSurf)))
+				{
+					SAFE_RELEASE(pTempSurf);
+					SAFE_RELEASE(pStretchSurf);
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+						"Can't get render target data: " + Root::getSingleton().getErrorDescription(hr),
+						"D3D9Device::copyContentsToMemory");
+				}
+				SAFE_RELEASE(pStretchSurf);
+			}
+
+			if ((dst.left == 0) && (dst.right == renderWindow->getWidth()) && (dst.top == 0) && (dst.bottom == renderWindow->getHeight()))
+			{
+				hr = pTempSurf->LockRect(&lockedRect, 0, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK);
+			}
+			else
+			{
+				RECT rect;
+
+				rect.left = static_cast<LONG>(dst.left);
+				rect.right = static_cast<LONG>(dst.right);
+				rect.top = static_cast<LONG>(dst.top);
+				rect.bottom = static_cast<LONG>(dst.bottom);
+
+				hr = pTempSurf->LockRect(&lockedRect, &rect, D3DLOCK_READONLY | D3DLOCK_NOSYSLOCK);
+			}
+			if (FAILED(hr))
+			{
+				SAFE_RELEASE(pTempSurf);
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+					"Can't lock rect: " + Root::getSingleton().getErrorDescription(hr),
+					"D3D9Device::copyContentsToMemory");
+			}
+		}
+
+		PixelFormat format = Ogre::D3D9Mappings::_getPF(desc.Format);
+
+		if (format == PF_UNKNOWN)
+		{
+			SAFE_RELEASE(pTempSurf);
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+				"Unsupported format", "D3D9Device::copyContentsToMemory");
+		}
+
+		PixelBox src(dst.getWidth(), dst.getHeight(), 1, format, lockedRect.pBits);
+		src.rowPitch = lockedRect.Pitch / PixelUtil::getNumElemBytes(format);
+		src.slicePitch = desc.Height * src.rowPitch;
+
+		PixelUtil::bulkPixelConversion(src, dst);
+
+		SAFE_RELEASE(pTempSurf);
+		SAFE_RELEASE(pSurf);
+
+
+	}
+
+
 }
