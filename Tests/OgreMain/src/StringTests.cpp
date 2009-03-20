@@ -163,7 +163,7 @@ void StringTests::testParseLong()
 }
 void StringTests::testParseUnsignedLong()
 {
-	unsigned long r = 4294967295;
+	unsigned long r = 4294967295UL;
 
 	String s = StringConverter::toString(r);
 	unsigned long t = StringConverter::parseUnsignedLong(s);

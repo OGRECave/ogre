@@ -6,6 +6,8 @@
 
 #include <cppunit/TestRunner.h>
 
+#include <OgrePlatform.h>
+
 #include "Suite.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32

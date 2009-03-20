@@ -803,7 +803,7 @@ void OceanDemo::configureShaderControls(void)
 							case GPU_FRAGMENT:
 								{
 									Ogre::GpuProgramParametersSharedPtr activeParameters =
-										(ActiveShaderDef.ValType == Ogre::GPT_VERTEX_PROGRAM) ?
+										(ActiveShaderDef.ValType == GPU_VERTEX) ?
 											mActiveVertexParameters : mActiveFragmentParameters;
 									if(!activeParameters.isNull())
 									{

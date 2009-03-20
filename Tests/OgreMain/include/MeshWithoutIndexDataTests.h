@@ -31,6 +31,7 @@ Torus Knot Software Ltd.
 #include "OgreLogManager.h"
 
 using namespace Ogre;
+using Ogre::ushort;
 
 class MeshWithoutIndexDataTests : public CppUnit::TestFixture
 {
