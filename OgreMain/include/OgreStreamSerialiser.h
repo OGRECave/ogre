@@ -32,6 +32,7 @@ Torus Knot Software Ltd.
 #include "OgrePrerequisites.h"
 #include "OgreDataStream.h"
 
+
 namespace Ogre 
 {
 	/** Utility class providing helper methods for reading / writing 
@@ -131,7 +132,14 @@ namespace Ogre
 		*/
 		uint32 getCurrentChunkID() const;
 
-
+		/** Get the current byte position relative to the start of the data section
+			of the last chunk that was read or written. 
+		@returns the offset. Note that a return value of 0 means that either the
+			position is at the start of the chunk data section (ie right after the
+			header), or that no chunk is currently active. Use getCurrentChunkID
+			or getCurrentChunkDepth to determine if a chunk is active.
+		*/
+		size_t getOffsetFromChunkStart() const;
 
 		/** Reads the start of the next chunk in the file.
 		@remarks
