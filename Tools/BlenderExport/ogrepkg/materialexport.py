@@ -804,6 +804,12 @@ class CustomMaterial(RenderingMaterial):
 						templateDict[textureName + '._colour_op'] = 'alpha_blend'
 					else:
 						templateDict[textureName + '._colour_op'] = 'modulate'
+					templateDict[textureName + '._sizeX'] = "%.6g" % mtex.size[0]
+					templateDict[textureName + '._sizeY'] = "%.6g" % mtex.size[1]
+					templateDict[textureName + '._sizeZ'] = "%.6g" % mtex.size[2]
+					templateDict[textureName + '._offsetX'] = "%.6g" % mtex.ofs[0]
+					templateDict[textureName + '._offsetY'] = "%.6g" % mtex.ofs[1]
+					templateDict[textureName + '._offsetZ'] = "%.6g" % mtex.ofs[2]
 
 		try:
 			propertyGroup = self.material.properties['properties']
