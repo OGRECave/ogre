@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 #include "OgreCompositionTechnique.h"
 
 namespace Ogre {
-    const size_t RENDER_QUEUE_COUNT = RENDER_QUEUE_MAX+1;       
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+	const size_t RENDER_QUEUE_COUNT = RENDER_QUEUE_MAX+1;       
             
     /** An instance of a Compositor object for one Viewport. It is part of the CompositorChain
 		for a Viewport.
@@ -337,6 +343,9 @@ namespace Ogre {
         
         friend class CompositorChain;
     };
+	/** @} */
+	/** @} */
+
 }
 
 #endif

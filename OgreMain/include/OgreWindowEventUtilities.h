@@ -44,6 +44,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
 	/**
 	@Remarks
 		Callback class used to send out window events to client app
@@ -169,5 +175,7 @@ namespace Ogre
 		typedef vector<RenderWindow*>::type Windows;
 		static Windows _msWindows;
 	};
+	/** @} */
+	/** @} */
 }
 #endif

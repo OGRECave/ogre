@@ -44,6 +44,12 @@ email                : pjcast@yahoo.com
 
 namespace Ogre
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Materials
+	*  @{
+	*/
 	/** 
 	Singleton Class which handles the registering and control of texture plugins. The plugins
 	will be mostly controlled via a string interface. */
@@ -113,5 +119,7 @@ namespace Ogre
         typedef map< String, ExternalTextureSource*>::type TextureSystemList;
         TextureSystemList mTextureSystems;
     };
+	/** @} */
+	/** @} */
 } 
 #endif

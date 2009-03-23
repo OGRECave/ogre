@@ -54,6 +54,12 @@ Torus Knot Software Ltd.
 #include "OgreLodListener.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
 
     /** Structure for holding a position & orientation pair. */
     struct ViewPoint
@@ -3325,6 +3331,8 @@ namespace Ogre {
 
 	};
 
+	/** @} */
+	/** @} */
 
 
 } // Namespace

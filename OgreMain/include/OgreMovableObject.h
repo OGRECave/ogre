@@ -46,7 +46,13 @@ namespace Ogre {
 	// Forward declaration
 	class MovableObjectFactory;
 
-    /** Abstract class defining a movable object in a scene.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
+	/** Abstract class defining a movable object in a scene.
         @remarks
             Instances of this class are discrete, relatively small, movable objects
             which are attached to SceneNode objects to define their position.
@@ -583,6 +589,8 @@ namespace Ogre {
 		unsigned long getTypeFlags(void) const { return mTypeFlag; }
 
 	};
+	/** @} */
+	/** @} */
 
 }
 #endif

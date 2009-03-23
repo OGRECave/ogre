@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Generic class for serialising data to / from binary stream-based files.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
+	/** Generic class for serialising data to / from binary stream-based files.
     @remarks
         This class provides a number of useful methods for exporting / importing data
         from stream-oriented binary files (e.g. .mesh and .skeleton).
@@ -106,6 +112,8 @@ namespace Ogre {
 		/// Determine the endianness to write with based on option
 		virtual void determineEndianness(Endian requestedEndian);
     };
+	/** @} */
+	/** @} */
 
 }
 

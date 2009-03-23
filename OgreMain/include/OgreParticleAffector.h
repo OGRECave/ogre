@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Abstract class defining the interface to be implemented by particle affectors.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+/** Abstract class defining the interface to be implemented by particle affectors.
     @remarks
         Particle affectors modify particles in a particle system over their lifetime. They can be
         grouped into types, e.g. 'vector force' affectors, 'fader' affectors etc; each type will 
@@ -108,6 +114,8 @@ namespace Ogre {
         const String &getType(void) const { return mType; }
 
     };
+	/** @} */
+	/** @} */
 
 }
 

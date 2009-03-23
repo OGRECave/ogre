@@ -31,6 +31,12 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
 	/** Real type for numeric solvers */
 	typedef double PreciseReal;
 
@@ -49,6 +55,8 @@ namespace Ogre {
 	    */
 		static bool solveNxNLinearSysDestr(int n, PreciseReal **coeff, PreciseReal *col);
 	};
+	/** @} */
+	/** @} */
 
 }
 

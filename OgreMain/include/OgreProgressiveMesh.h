@@ -43,7 +43,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** This class reduces the complexity of the geometry it is given.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup LOD
+	*  @{
+	*/
+	/** This class reduces the complexity of the geometry it is given.
         This class is dedicated to reducing the number of triangles in a given mesh
         taking into account seams in both geometry and texture co-ordinates and meshes 
         which have multiple frames.
@@ -242,6 +248,8 @@ namespace Ogre {
     };
 
 
+	/** @} */
+	/** @} */
 
 }
 

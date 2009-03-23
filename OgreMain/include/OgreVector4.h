@@ -35,7 +35,13 @@ Torus Knot Software Ltd.
 namespace Ogre
 {
 
-    /** 4-dimensional homogeneous vector.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
+	/** 4-dimensional homogeneous vector.
     */
     class _OgreExport Vector4
     {
@@ -396,6 +402,8 @@ namespace Ogre
         // special
         static const Vector4 ZERO;
     };
+	/** @} */
+	/** @} */
 
 }
 #endif

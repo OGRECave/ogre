@@ -38,7 +38,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Represents a convex volume bounded by planes.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
+	/** Represents a convex volume bounded by planes.
     */
     class _OgreExport PlaneBoundedVolume
     {
@@ -121,6 +127,8 @@ namespace Ogre {
 
     typedef vector<PlaneBoundedVolume>::type PlaneBoundedVolumeList;
 
+	/** @} */
+	/** @} */
 
 }
 

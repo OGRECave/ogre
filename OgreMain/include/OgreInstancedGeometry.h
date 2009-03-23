@@ -41,6 +41,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
 	/** Pre-transforms and batches up meshes for efficient use as instanced geometry
 		in a scene
 	@remarks
@@ -855,6 +861,8 @@ namespace Ogre {
 
 	};
 
+	/** @} */
+	/** @} */
 }
 
 #endif

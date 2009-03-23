@@ -37,7 +37,13 @@ Torus Knot Software Ltd.
 #include "OgreRenderSystem.h"
 
 namespace Ogre {
-    /** Class for managing Compositor settings for Ogre. Compositors provide the means
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+	/** Class for managing Compositor settings for Ogre. Compositors provide the means
         to flexibly "composite" the final rendering result from multiple scene renders
         and intermediate operations like rendering fullscreen quads. This makes
         it possible to apply postfilter effects, HDRI postprocessing, and shadow
@@ -248,6 +254,8 @@ namespace Ogre {
 		bool isInputToOutputTarget(CompositorInstance* inst, TexturePtr tex);
 
     };
+	/** @} */
+	/** @} */
 
 }
 

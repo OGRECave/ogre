@@ -53,7 +53,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
-    /** A 3x3 matrix which can represent rotations around axes.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
+	/** A 3x3 matrix which can represent rotations around axes.
         @note
             <b>All the code is adapted from the Wild Magic 0.2 Matrix
             library (http://www.geometrictools.com/).</b>
@@ -251,5 +257,7 @@ namespace Ogre
         // for faster access
         friend class Matrix4;
     };
+	/** @} */
+	/** @} */
 }
 #endif

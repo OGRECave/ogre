@@ -35,7 +35,15 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Class to provide aligned memory allocate functionality.
+	/** \addtogroup Core
+	*  @{
+	*/
+
+	/** \addtogroup Memory
+	*  @{
+	*/
+
+	/** Class to provide aligned memory allocate functionality.
     @remarks
         All SIMD processing are friendly with aligned memory, and some SIMD routines
         are designed for working with aligned memory only. If the data are intended to
@@ -91,6 +99,9 @@ namespace Ogre {
         */
         static void deallocate(void* p);
 	};
+
+	/** @} */
+	/** @} */
 
 }
 

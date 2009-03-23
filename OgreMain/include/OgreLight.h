@@ -42,7 +42,13 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 
-    /** Representation of a dynamic light source in the scene.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
+	/** Representation of a dynamic light source in the scene.
         @remarks
             Lights are added to the scene like any other object. They contain various
             parameters like type, position, attenuation (how light intensity fades with
@@ -572,6 +578,8 @@ namespace Ogre {
 		void destroyInstance( MovableObject* obj);  
 
 	};
+	/** @} */
+	/** @} */
 
 } // Namespace
 #endif

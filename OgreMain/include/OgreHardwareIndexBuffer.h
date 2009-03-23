@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Specialisation of HardwareBuffer for vertex index buffers, still abstract. */
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
+	/** Specialisation of HardwareBuffer for vertex index buffers, still abstract. */
     class _OgreExport HardwareIndexBuffer : public HardwareBuffer
     {
 	    public:
@@ -73,6 +79,8 @@ namespace Ogre {
         HardwareIndexBufferSharedPtr() : SharedPtr<HardwareIndexBuffer>() {}
         explicit HardwareIndexBufferSharedPtr(HardwareIndexBuffer* buf);
     };
+	/** @} */
+	/** @} */
 }
 #endif
 

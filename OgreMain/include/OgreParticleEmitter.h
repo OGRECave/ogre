@@ -41,7 +41,13 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 
-    /** Abstract class defining the interface to be implemented by particle emitters.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+	/** Abstract class defining the interface to be implemented by particle emitters.
     @remarks
         Particle emitters are the sources of particles in a particle system. 
         This class defines the ParticleEmitter interface, and provides a basic implementation 
@@ -493,6 +499,8 @@ namespace Ogre {
 
 
     };
+	/** @} */
+	/** @} */
 
 }
 

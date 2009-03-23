@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Abstract class defining the interface to be implemented by creators of ParticleEmitter subclasses.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+	/** Abstract class defining the interface to be implemented by creators of ParticleEmitter subclasses.
     @remarks
         Plugins or 3rd party applications can add new types of particle emitters to Ogre by creating
         subclasses of the ParticleEmitter class. Because multiple instances of these emitters may be
@@ -69,6 +75,8 @@ namespace Ogre {
 
     };
 
+	/** @} */
+	/** @} */
 
 }
 

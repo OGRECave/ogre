@@ -36,6 +36,12 @@ Torus Knot Software Ltd.
 #include "OgreMatrix4.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
 
 	/** A 3D box aligned with the x/y/z axes.
 	@remarks
@@ -800,6 +806,8 @@ namespace Ogre {
 
 	};
 
+	/** @} */
+	/** @} */
 } // namespace Ogre
 
 #endif

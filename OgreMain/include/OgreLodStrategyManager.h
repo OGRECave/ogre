@@ -37,7 +37,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Manager for lod strategies. */
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup LOD
+	*  @{
+	*/
+	/** Manager for lod strategies. */
     class _OgreExport LodStrategyManager : public Singleton<LodStrategyManager>, public LodAlloc
     {
         /** Map of strategies. */
@@ -121,6 +127,8 @@ namespace Ogre {
         */
         static LodStrategyManager* getSingletonPtr(void);
     };
+	/** @} */
+	/** @} */
 }
 
 #endif

@@ -38,7 +38,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Enum to identify material sections. */
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Materials
+	*  @{
+	*/
+	/** Enum to identify material sections. */
     enum MaterialScriptSection
     {
         MSS_NONE,
@@ -276,5 +282,7 @@ namespace Ogre {
 		}
 
     };
+	/** @} */
+	/** @} */
 }
 #endif

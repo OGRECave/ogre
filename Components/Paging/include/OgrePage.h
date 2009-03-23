@@ -32,9 +32,21 @@ Torus Knot Software Ltd.
 
 #include "OgrePagingPrerequisites.h"
 
+
 namespace Ogre
 {
+	/** \addtogroup Optional Components
+	*  @{
+	*/
+	/** \addtogroup Paging
+	*  Some details on paging component
+	*  @{
+	*/
 
+	/** @} */
+	/** @} */
 }
+
+
 
 #endif 

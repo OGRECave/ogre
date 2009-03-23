@@ -39,6 +39,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
 	/** Struct associating a single Pass with a single Renderable. 
 		This is used to for objects sorted by depth and thus not
 		grouped by pass.
@@ -666,6 +672,8 @@ namespace Ogre {
 
     };
 
+	/** @} */
+	/** @} */
 
 
 }

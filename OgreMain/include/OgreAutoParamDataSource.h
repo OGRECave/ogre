@@ -40,6 +40,12 @@ namespace Ogre {
 
 	// forward decls
 	struct VisibleObjectsBoundsInfo;
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Materials
+	*  @{
+	*/
 
 
     /** This utility class is used to hold the information used to generate the matrices
@@ -253,6 +259,8 @@ namespace Ogre {
         virtual void incPassNumber(void);
 		virtual void updateLightCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry, GpuProgramParameters *params) const;
     };
+	/** @} */
+	/** @} */
 }
 
 #endif

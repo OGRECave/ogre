@@ -34,7 +34,13 @@ Torus Knot Software Ltd.
 #include "OgreLight.h"
 
 namespace Ogre {
-    /** Static class containing source for vertex programs for extruding shadow volumes
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
+	/** Static class containing source for vertex programs for extruding shadow volumes
     @remarks
         This exists so we don't have to be dependent on an external media files.
         Assembler is used so we don't have to rely on particular plugins.
@@ -253,5 +259,7 @@ namespace Ogre {
 
 		
     };
+	/** @} */
+	/** @} */
 }
 #endif

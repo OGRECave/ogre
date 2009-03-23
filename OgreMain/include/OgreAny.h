@@ -46,6 +46,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 	/** Variant type that can hold Any other type.
 	*/
 	class Any 
@@ -398,6 +404,8 @@ namespace Ogre
 		}
         return *result;
     }
+	/** @} */
+	/** @} */
 
 
 }

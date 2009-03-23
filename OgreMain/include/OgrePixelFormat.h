@@ -33,7 +33,13 @@ Torus Knot Software Ltd.
 #include "OgreCommon.h"
 
 namespace Ogre {
-    /** The pixel format used for images, textures, and render surfaces */
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Image
+	*  @{
+	*/
+	/** The pixel format used for images, textures, and render surfaces */
     enum PixelFormat
     {
         /// Unknown pixel format.
@@ -468,6 +474,8 @@ namespace Ogre {
         */
         static void bulkPixelConversion(const PixelBox &src, const PixelBox &dst);
     };
+	/** @} */
+	/** @} */
 
 }
 

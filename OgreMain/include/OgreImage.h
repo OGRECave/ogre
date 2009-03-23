@@ -35,6 +35,12 @@ Torus Knot Software Ltd.
 #include "OgreDataStream.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Image
+	*  @{
+	*/
 
     enum ImageFlags
     {
@@ -444,6 +450,8 @@ namespace Ogre {
 	typedef vector<Image*>::type ImagePtrList;
 	typedef vector<const Image*>::type ConstImagePtrList;
 
+	/** @} */
+	/** @} */
 
 } // namespace
 

@@ -41,7 +41,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Defines a generic resource handler.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
+	/** Defines a generic resource handler.
     @remarks
         A resource manager is responsible for managing a pool of
         resources of a particular type. It must index them, look
@@ -467,6 +473,8 @@ namespace Ogre {
     
 
     };
+	/** @} */
+	/** @} */
 
 }
 

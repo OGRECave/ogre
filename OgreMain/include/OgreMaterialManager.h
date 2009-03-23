@@ -40,7 +40,13 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 
-    /** Class for managing Material settings for Ogre.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Materials
+	*  @{
+	*/
+	/** Class for managing Material settings for Ogre.
         @remarks
             Materials control the eventual surface rendering properties of geometry. This class
             manages the library of materials, dealing with programmatic registrations and lookups,
@@ -282,6 +288,8 @@ namespace Ogre {
         static MaterialManager* getSingletonPtr(void);
 
     };
+	/** @} */
+	/** @} */
 
 }
 

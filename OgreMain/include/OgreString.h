@@ -64,6 +64,12 @@ namespace __gnu_cxx
 #endif
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 
     /** Utility class for manipulating Strings.  */
     class _OgreExport StringUtil
@@ -173,6 +179,8 @@ namespace Ogre {
 #else
 	typedef std::hash< _StringBase > _StringHash;
 #endif 
+	/** @} */
+	/** @} */
 
 } // namespace Ogre
 

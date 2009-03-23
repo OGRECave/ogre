@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 namespace Ogre 
 {
     
-    /** Records the assignment of a single vertex to a single bone with the corresponding weight.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Animation
+	*  @{
+	*/
+	/** Records the assignment of a single vertex to a single bone with the corresponding weight.
     @remarks
         This simple struct simply holds a vertex index, bone index and weight representing the
         assignment of a vertex to a bone for skeletal animation. There may be many of these
@@ -50,6 +56,8 @@ namespace Ogre
 
     } VertexBoneAssignment;
 
+	/** @} */
+	/** @} */
 
 }
 

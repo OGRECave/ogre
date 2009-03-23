@@ -38,6 +38,12 @@ Torus Knot Software Ltd.
 namespace Ogre
 {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
 	/** Class for calculating a tangent space basis.
 	*/
 	class _OgreExport TangentSpaceCalc
@@ -253,6 +259,8 @@ namespace Ogre
 		
 
 	};
+	/** @} */
+	/** @} */
 
 }
 

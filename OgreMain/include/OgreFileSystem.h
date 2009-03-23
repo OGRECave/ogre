@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Specialisation of the Archive class to allow reading of files from 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
+	/** Specialisation of the Archive class to allow reading of files from 
         filesystem folders / directories.
     */
     class _OgreExport FileSystemArchive : public Archive 
@@ -130,6 +136,8 @@ namespace Ogre {
         void destroyInstance( Archive* arch) { delete arch; }
     };
 
+	/** @} */
+	/** @} */
 
 }
 

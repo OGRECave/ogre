@@ -41,7 +41,13 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 
-    /** Class representing a general-purpose node an articulated scene graph.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
+	/** Class representing a general-purpose node an articulated scene graph.
         @remarks
             A node in the scene graph is a node in a structured tree. A node contains
             information about the transformation which will apply to
@@ -706,6 +712,8 @@ namespace Ogre {
 
 
     };
+	/** @} */
+	/** @} */
 
 } //namespace
 

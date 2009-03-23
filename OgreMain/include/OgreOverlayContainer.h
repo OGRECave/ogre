@@ -38,7 +38,13 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 
-    /** A 2D element which contains other OverlayElement instances.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Overlays
+	*  @{
+	*/
+	/** A 2D element which contains other OverlayElement instances.
     @remarks
         This is a specialisation of OverlayElement for 2D elements that contain other
         elements. These are also the smallest elements that can be attached directly
@@ -137,6 +143,8 @@ namespace Ogre {
     };
 
 
+	/** @} */
+	/** @} */
 
 }
 

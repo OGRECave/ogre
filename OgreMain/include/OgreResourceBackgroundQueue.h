@@ -36,6 +36,12 @@ Torus Knot Software Ltd.
 #include "OgreResource.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
 
 	/// Identifier of a background process
 	typedef unsigned long BackgroundProcessTicket;
@@ -503,6 +509,8 @@ namespace Ogre {
 
 	};
 
+	/** @} */
+	/** @} */
 
 }
 

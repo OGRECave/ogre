@@ -38,7 +38,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
-    /** The log manager handles the creation and retrieval of logs for the
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
+	/** The log manager handles the creation and retrieval of logs for the
         application.
         @remarks
             This class will create new log files and will retrieve instances
@@ -163,6 +169,8 @@ namespace Ogre
     };
 
 
+	/** @} */
+	/** @} */
 }
 
 #endif

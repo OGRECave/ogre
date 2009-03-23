@@ -37,6 +37,12 @@ Torus Knot Software Ltd.
 #include "OgreCommon.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
 
     /** A billboard is a primitive which always faces the camera in every frame.
         @remarks
@@ -211,6 +217,9 @@ namespace Ogre {
         */
         const FloatRect& getTexcoordRect(void) const { return mTexcoordRect; }
     };
+
+	/** @} */
+	/** @} */
 
 }
 

@@ -43,6 +43,12 @@ Torus Knot Software Ltd.
 #endif
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 
 	/// Fast general hashing algorithm
 	uint32 _OgreExport FastHash (const char * data, int len, uint32 hashSoFar = 0);
@@ -664,6 +670,8 @@ namespace Ogre {
 
 	/// Render window container.
 	typedef vector<RenderWindow*>::type RenderWindowList;
+	/** @} */
+	/** @} */
 }
 
 #endif

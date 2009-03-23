@@ -36,6 +36,12 @@ Torus Knot Software Ltd.
 #include "OgreNode.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup LOD
+	*  @{
+	*/
 
     /** Level of detail strategy based on distance from camera. */
     class _OgreExport DistanceLodStrategy : public LodStrategy, public Singleton<DistanceLodStrategy>
@@ -124,6 +130,8 @@ namespace Ogre {
         Real mReferenceViewValue;
 
     };
+	/** @} */
+	/** @} */
 
 } // namespace
 

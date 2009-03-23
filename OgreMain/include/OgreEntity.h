@@ -42,6 +42,12 @@ Torus Knot Software Ltd.
 #include "OgreResourceGroupManager.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
 	/** Defines an instance of a discrete, movable object based on a Mesh.
 	@remarks
 	Ogre generally divides renderable objects into 2 groups, discrete
@@ -773,6 +779,8 @@ namespace Ogre {
 		void destroyInstance( MovableObject* obj);
 
 	};
+	/** @} */
+	/** @} */
 
 } // namespace
 

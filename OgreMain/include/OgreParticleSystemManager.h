@@ -43,7 +43,13 @@ namespace Ogre {
 	// Forward decl
 	class ParticleSystemFactory;
 	
-    /** Manages particle systems, particle system scripts (templates) and the 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+	/** Manages particle systems, particle system scripts (templates) and the 
 		available emitter & affector factories.
     @remarks
         This singleton class is responsible for creating and managing particle 
@@ -383,7 +389,9 @@ namespace Ogre {
 		void destroyInstance( MovableObject* obj);  
 
 	};
-	
+	/** @} */
+	/** @} */
+
 }
 
 #endif

@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Handles the management of skeleton resources.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Animation
+	*  @{
+	*/
+	/** Handles the management of skeleton resources.
         @remarks
             This class deals with the runtime management of
             skeleton data; like other resource managers it handles
@@ -91,6 +97,8 @@ namespace Ogre {
 
     };
 
+	/** @} */
+	/** @} */
 
 }
 

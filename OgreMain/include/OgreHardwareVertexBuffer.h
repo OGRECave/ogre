@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 #include "OgreColourValue.h"
 
 namespace Ogre {
-    /** Specialisation of HardwareBuffer for a vertex buffer. */
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
+	/** Specialisation of HardwareBuffer for a vertex buffer. */
     class _OgreExport HardwareVertexBuffer : public HardwareBuffer
     {
 	    protected:
@@ -533,6 +539,8 @@ namespace Ogre {
 
 
 	};
+	/** @} */
+	/** @} */
 
 
 

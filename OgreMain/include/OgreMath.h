@@ -33,7 +33,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
-    /** Wrapper class which indicates a given angle value is in Radians.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
+	/** Wrapper class which indicates a given angle value is in Radians.
     @remarks
         Radian values are interchangeable with Degree values, and conversions
         will be done automatically between them.
@@ -614,6 +620,8 @@ namespace Ogre
 	{
 		return Degree ( a / b.valueDegrees() );
 	}
+	/** @} */
+	/** @} */
 
 }
 #endif

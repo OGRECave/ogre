@@ -33,6 +33,12 @@ Torus Knot Software Ltd.
 #include "OgrePanelOverlayElement.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Overlays
+	*  @{
+	*/
 
     class BorderRenderable;
     
@@ -339,6 +345,8 @@ namespace Ogre {
 			return mParent->getPolygonModeOverrideable();
 		}
     };
+	/** @} */
+	/** @} */
 
 }
 

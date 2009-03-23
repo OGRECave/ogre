@@ -37,7 +37,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Level of detail strategy based on pixel count approximation from bounding sphere projection. */
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup LOD
+	*  @{
+	*/
+	/** Level of detail strategy based on pixel count approximation from bounding sphere projection. */
     class _OgreExport PixelCountLodStrategy : public LodStrategy, public Singleton<PixelCountLodStrategy>
     {
     protected:
@@ -100,6 +106,8 @@ namespace Ogre {
         static PixelCountLodStrategy* getSingletonPtr(void);
 
     };
+	/** @} */
+	/** @} */
 
 } // namespace
 

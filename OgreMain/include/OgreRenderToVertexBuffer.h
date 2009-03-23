@@ -34,7 +34,13 @@ Torus Knot Software Ltd.
 #include "OgreRenderOperation.h"
 
 namespace Ogre {
-    /**
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
+	/**
         An object which renders geometry to a vertex.
     @remarks
         This is especially useful together with geometry shaders, as you can
@@ -139,6 +145,8 @@ namespace Ogre {
     };
 
 	typedef SharedPtr<RenderToVertexBuffer> RenderToVertexBufferSharedPtr;
+	/** @} */
+	/** @} */
 }
 
 #endif

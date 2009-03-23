@@ -38,6 +38,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
 	/** Class providing a much simplified interface to generating manual
 	 	objects with custom geometry.
 	@remarks
@@ -536,6 +542,8 @@ namespace Ogre
 		void destroyInstance( MovableObject* obj);  
 
 	};
+	/** @} */
+	/** @} */
 }
 
 #endif

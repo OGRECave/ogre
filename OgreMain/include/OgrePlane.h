@@ -40,7 +40,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Defines a plane in 3D space.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
+	/** Defines a plane in 3D space.
         @remarks
             A plane is defined in 3D space by the equation
             Ax + By + Cz + D = 0
@@ -150,6 +156,8 @@ namespace Ogre {
     };
 
     typedef vector<Plane>::type PlaneList;
+	/** @} */
+	/** @} */
 
 } // namespace Ogre
 

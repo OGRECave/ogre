@@ -38,7 +38,16 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    class _OgreExport SimpleRenderable : public MovableObject, public Renderable
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
+	/** Simple implementation of MovableObject and Renderable for single-part custom objects. 
+	@see ManualObject for a simpler interface with more flexibility
+	*/
+	class _OgreExport SimpleRenderable : public MovableObject, public Renderable
     {
     protected:
         RenderOperation mRenderOp;
@@ -91,6 +100,8 @@ namespace Ogre {
         const LightList& getLights(void) const;
 
     };
+	/** @} */
+	/** @} */
 }
 
 #endif

@@ -35,7 +35,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /// Struct containing information about a lod change event for movable objects.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup LOD
+	*  @{
+	*/
+	/// Struct containing information about a lod change event for movable objects.
     struct MovableObjectLodChangedEvent
     {
         /// The movable object whose level of detail has changed.
@@ -189,6 +195,8 @@ namespace Ogre {
         virtual void postqueueEntityMaterialLodChanged(const EntityMaterialLodChangedEvent& evt) { };
 
     };
+	/** @} */
+	/** @} */
 }
 
 #endif

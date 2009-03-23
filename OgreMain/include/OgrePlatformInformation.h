@@ -96,6 +96,12 @@ namespace Ogre {
 #endif
 
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 
 
     /** Class which provides the run-time platform information Ogre runs on.
@@ -162,6 +168,8 @@ namespace Ogre {
 		static void log(Log* pLog);
 
     };
+	/** @} */
+	/** @} */
 
 }
 

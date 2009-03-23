@@ -34,9 +34,15 @@ Torus Knot Software Ltd.
 #include "OgreString.h"
 #include "OgreResourceGroupManager.h"
 
-
 namespace Ogre
 {
+	/** \addtogroup Optional Components
+	*  @{
+	*/
+	/** \addtogroup Paging
+	*  Some details on paging component
+	*  @{
+	*/
 	
 	/** The PageManager is the entry point through which you load all PagedWorld instances, 
 		and the place where PageStrategy instances and factory classes are
@@ -126,7 +132,13 @@ namespace Ogre
 		size_t mWorldNameIndex;
 
 	};
+
+	/** @} */
+	/** @} */
 }
+
+
+
 
 
 #endif 

@@ -40,6 +40,12 @@ namespace Ogre
 {
 #if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_STD
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Memory
+	*  @{
+	*/
 	/**	A "standard" allocation policy for use with AllocatedObject and 
 		STLAllocator. This is the class that actually does the allocation
 		and deallocation of physical memory, and is what you will want to 
@@ -142,6 +148,8 @@ namespace Ogre
 	};
 
 #endif
+	/** @} */
+	/** @} */
 
 }// namespace Ogre
 

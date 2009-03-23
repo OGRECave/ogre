@@ -34,7 +34,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** This class interpolates orientations (rotations) along a spline using 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
+	/** This class interpolates orientations (rotations) along a spline using 
         derivatives of quaternions.
     @remarks
         Like the SimpleSpline class, this class is about interpolating values 
@@ -121,6 +127,8 @@ namespace Ogre {
 
     };
 
+	/** @} */
+	/** @} */
 
 }
 

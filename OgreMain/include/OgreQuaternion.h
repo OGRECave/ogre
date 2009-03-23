@@ -48,7 +48,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Implementation of a Quaternion, i.e. a rotation around an axis.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
+	/** Implementation of a Quaternion, i.e. a rotation around an axis.
     */
     class _OgreExport Quaternion
     {
@@ -255,6 +261,8 @@ namespace Ogre {
         }
 
     };
+	/** @} */
+	/** @} */
 
 }
 

@@ -35,6 +35,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
 	/** Specialisation of HighLevelGpuProgram which just delegates its implementation
 		to one other high level program, allowing a single program definition
 		to represent one supported program from a number of options
@@ -165,6 +171,8 @@ namespace Ogre {
 
 	};
 
+	/** @} */
+	/** @} */
 
 }
 #endif

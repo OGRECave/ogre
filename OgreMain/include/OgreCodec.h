@@ -36,6 +36,12 @@ Torus Knot Software Ltd.
 #include "OgreStringVector.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 
     /** Abstract class that defines a 'codec'.
         @remarks
@@ -152,6 +158,8 @@ namespace Ogre {
 		*/
 		virtual String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const = 0;
     };
+	/** @} */
+	/** @} */
 
 } // namespace
 

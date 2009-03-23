@@ -41,6 +41,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
 
 	/** Allows the rendering of a chain of connected billboards.
 	@remarks
@@ -341,6 +347,8 @@ namespace Ogre {
 
 	};
 
+	/** @} */
+	/** @} */
 
 } // namespace
 

@@ -33,7 +33,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Wraps iteration over a vector.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
+	/** Wraps iteration over a vector.
     @remarks
         This class is here just to allow clients to iterate over an internal
         vector of a class without having to have access to the vector itself
@@ -355,5 +361,7 @@ namespace Ogre {
 
 
     };
+	/** @} */
+	/** @} */
 }
 #endif

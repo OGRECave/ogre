@@ -31,7 +31,13 @@ http://www.gnu.org/copyleft/lesser.txt
 
 namespace Ogre
 {
-    /** Manages the target rendering window.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
+	/** Manages the target rendering window.
         @remarks
             This class handles a window into which the contents
             of a scene are rendered. There is a many-to-1 relationship
@@ -174,6 +180,8 @@ namespace Ogre
         
         friend class Root;
     };
+	/** @} */
+	/** @} */
 
 } // Namespace
 #endif

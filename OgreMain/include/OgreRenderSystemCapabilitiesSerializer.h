@@ -39,7 +39,13 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 
-    /** Class for serializing RenderSystemCapabilities to / from a .rendercaps script.*/
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
+	/** Class for serializing RenderSystemCapabilities to / from a .rendercaps script.*/
 	class _OgreExport RenderSystemCapabilitiesSerializer : public RenderSysAlloc
     {
 
@@ -233,6 +239,8 @@ namespace Ogre {
         void logParseError(const String& error) const;
 
     };
+	/** @} */
+	/** @} */
 
 }
 #endif

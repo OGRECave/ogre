@@ -35,6 +35,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
+
 	class _OgreExport Timer : public TimerAlloc
     {
     private:
@@ -88,5 +95,7 @@ namespace Ogre
 		/** Returns microseconds since initialisation or last reset, only CPU time measured */	
 		unsigned long getMicrosecondsCPU();
     };
+	/** @} */
+	/** @} */
 } 
 #endif

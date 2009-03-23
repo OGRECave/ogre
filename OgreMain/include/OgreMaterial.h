@@ -43,6 +43,12 @@ namespace Ogre {
 	class MaterialPtr;
     class LodStrategy;
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Materials
+	*  @{
+	*/
 	/** Class encapsulates rendering properties of an object.
     @remarks
     Ogre's material class encapsulates ALL aspects of the visual appearance,
@@ -718,6 +724,8 @@ namespace Ogre {
 			return *this;
 		}
 	};
+	/** @} */
+	/** @} */
 
 } //namespace 
 

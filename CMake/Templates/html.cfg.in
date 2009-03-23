@@ -86,6 +86,7 @@ WARN_LOGFILE           = ${OGRE_BINARY_DIR}/doxygen_warnings.log
 # configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = ${OGRE_SOURCE_DIR}/OgreMain \
+						 ${OGRE_SOURCE_DIR}/Components \
                          apimainpage.txt
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = Ogre*.h

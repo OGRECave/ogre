@@ -37,7 +37,13 @@ namespace Ogre
 {
 	class Pass;
 
-    /** This class makes the usage of a vertex and fragment programs (low-level or high-level), 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Materials
+	*  @{
+	*/
+	/** This class makes the usage of a vertex and fragment programs (low-level or high-level), 
         with a given set of parameters, explicit.
     @remarks
         Using a vertex or fragment program can get fairly complex; besides the fairly rudimentary
@@ -138,5 +144,7 @@ namespace Ogre
 		void loadingComplete(Resource* prog);
 
     };
+	/** @} */
+	/** @} */
 }
 #endif

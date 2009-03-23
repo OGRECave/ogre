@@ -42,6 +42,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
+
     typedef vector<RenderSystem*>::type RenderSystemList;
 	
     /** The root class of the Ogre system.
@@ -923,5 +930,7 @@ namespace Ogre
 		*/
 		unsigned int getDisplayMonitorCount() const;
     };
+	/** @} */
+	/** @} */
 } // Namespace Ogre
 #endif

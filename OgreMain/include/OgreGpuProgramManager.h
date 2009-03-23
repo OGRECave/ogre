@@ -38,6 +38,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
 	class _OgreExport GpuProgramManager : public ResourceManager, public Singleton<GpuProgramManager>
 	{
 	public:
@@ -206,6 +212,8 @@ namespace Ogre {
 
 	};
 
+	/** @} */
+	/** @} */
 }
 
 #endif

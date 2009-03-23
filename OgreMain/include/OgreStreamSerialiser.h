@@ -35,6 +35,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre 
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
+
 	/** Utility class providing helper methods for reading / writing 
 		structured data held in a DataStream.
 	@remarks
@@ -265,6 +272,8 @@ namespace Ogre
 		virtual Chunk* popChunk(uint id);
 
 	};
+	/** @} */
+	/** @} */
 }
 
 #endif

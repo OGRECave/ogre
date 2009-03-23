@@ -33,6 +33,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
 /** Definition of the OGRE .mesh file format 
 
     .mesh files are binary files (for read efficiency at runtime) and are arranged into chunks 
@@ -273,6 +279,9 @@ namespace Ogre {
 
 	*/
     };
+	/** @} */
+	/** @} */
+
 } // namespace
 
 

@@ -34,7 +34,13 @@ Torus Knot Software Ltd.
 #include "OgreHardwareIndexBuffer.h"
 
 namespace Ogre {
-	
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
+
 	/// Define a list of usage flags
 	typedef vector<HardwareBuffer::Usage>::type BufferUsageList;
 
@@ -281,6 +287,8 @@ namespace Ogre {
 
 			bool inCache(unsigned int index);
 	};
+	/** @} */
+	/** @} */
 }
 #endif
 

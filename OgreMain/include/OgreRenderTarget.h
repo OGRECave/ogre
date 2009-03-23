@@ -45,7 +45,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** A 'canvas' which can receive the results of a rendering
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
+	/** A 'canvas' which can receive the results of a rendering
         operation.
         @remarks
             This abstract class defines a common root to all targets of rendering operations. A
@@ -426,6 +432,8 @@ namespace Ogre {
 		/// Internal implementation of update()
 		virtual void updateImpl();
     };
+	/** @} */
+	/** @} */
 
 } // Namespace
 

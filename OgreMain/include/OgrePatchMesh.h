@@ -35,7 +35,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Patch specialisation of Mesh. 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup LOD
+	*  @{
+	*/
+	/** Patch specialisation of Mesh. 
     @remarks
         Instances of this class should be created by calling MeshManager::createBezierPatch.
     */
@@ -148,6 +154,8 @@ namespace Ogre {
             return *this;
         }
     };
+	/** @} */
+	/** @} */
 
 }
 

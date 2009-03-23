@@ -39,6 +39,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre 
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Animation
+	*  @{
+	*/
     /** Time index object used to search keyframe at the given position.
     */
     class _OgreExport TimeIndex
@@ -559,7 +565,8 @@ namespace Ogre
 
 
 	};
-
+	/** @} */
+	/** @} */
 }
 
 #endif

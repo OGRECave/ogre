@@ -34,7 +34,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Utility class for provides optimised functions.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
+	/** Utility class for provides optimised functions.
     @note
         This class are supposed used by internal engine only.
     */
@@ -215,6 +221,8 @@ namespace Ogre {
     {
         ptr = rawOffsetPointer(ptr, offset);
     }
+	/** @} */
+	/** @} */
 
 }
 

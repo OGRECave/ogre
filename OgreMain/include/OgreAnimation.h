@@ -38,6 +38,13 @@ Torus Knot Software Ltd.
 #include "OgreAnimationState.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+
+	/** \addtogroup Animation
+	*  @{
+	*/
 
     /** An animation sequence. 
     @remarks
@@ -419,7 +426,8 @@ namespace Ogre {
         void buildKeyFrameTimeList(void) const;
     };
 
-
+	/** @} */
+	/** @} */
 }
 
 

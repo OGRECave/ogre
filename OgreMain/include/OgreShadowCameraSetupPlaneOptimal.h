@@ -35,6 +35,12 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
 	/** Implements the plane optimal shadow camera algorithm.
         @remarks
             Given a plane of interest, it is possible to set up the shadow camera
@@ -75,6 +81,8 @@ namespace Ogre {
 		virtual void getShadowCamera (const SceneManager *sm, const Camera *cam, 
 									  const Viewport *vp, const Light *light, Camera *texCam, size_t iteration) const;
 	};
+	/** @} */
+	/** @} */
 
 }
 

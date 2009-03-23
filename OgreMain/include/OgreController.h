@@ -35,7 +35,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 	
 	
 	/** Subclasses of this class are responsible for performing a function on an input value for a Controller.
@@ -221,6 +226,8 @@ namespace Ogre {
 
     };
 
+	/** @} */
+	/** @} */
 
 }
 

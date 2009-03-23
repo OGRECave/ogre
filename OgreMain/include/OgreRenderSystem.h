@@ -49,6 +49,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
+
 	typedef map< String, RenderTarget * >::type RenderTargetMap;
 	typedef multimap<uchar, RenderTarget * >::type RenderTargetPriorityMap;
 
@@ -1332,6 +1339,8 @@ namespace Ogre
 
 
 	};
+	/** @} */
+	/** @} */
 }
 
 #endif

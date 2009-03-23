@@ -37,6 +37,12 @@ Torus Knot Software Ltd.
 namespace Ogre 
 {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
 	/** Implements the Light Space Perspective Shadow Mapping Algorithm.
 	@remarks
 	Implements the LiSPSM algorithm for an advanced shadow map generation. LiSPSM was
@@ -240,6 +246,8 @@ namespace Ogre
 
 
 	};
+	/** @} */
+	/** @} */
 
 }
 

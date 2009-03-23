@@ -35,7 +35,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Abstract class defining the interface to be implemented by creators of ParticleAffector subclasses.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+	/** Abstract class defining the interface to be implemented by creators of ParticleAffector subclasses.
     @remarks
         Plugins or 3rd party applications can add new types of particle affectors to Ogre by creating
         subclasses of the ParticleAffector class. Because multiple instances of these affectors may be
@@ -66,6 +72,8 @@ namespace Ogre {
         virtual void destroyAffector(ParticleAffector* e);
     };
 
+	/** @} */
+	/** @} */
 
 }
 

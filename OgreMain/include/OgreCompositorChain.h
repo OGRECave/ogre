@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 #include "OgreCompositor.h"
 namespace Ogre {
     
-    /** Chain of compositor effects applying to one viewport.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+	/** Chain of compositor effects applying to one viewport.
      */
     class _OgreExport CompositorChain: public RenderTargetListener, public CompositorInstAlloc
     {
@@ -216,6 +222,8 @@ namespace Ogre {
 		bool mOldShadowsEnabled;
 
     };
+	/** @} */
+	/** @} */
 }
 
 #endif

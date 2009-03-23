@@ -34,6 +34,12 @@ Torus Knot Software Ltd.
 #include "OgreScriptCompiler.h"
 
 namespace Ogre{
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 	/** This class translates script AST (abstract syntax tree) into
 	 *  Ogre resources. It defines a common interface for subclasses
 	 *  which perform the actual translation.
@@ -289,6 +295,8 @@ namespace Ogre{
 		/// Returns a manager for the given object abstract node, or null if it is not supported
 		virtual ScriptTranslator *getTranslator(const AbstractNodePtr &node);
 	};
+	/** @} */
+	/** @} */
 }
 
 

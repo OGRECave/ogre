@@ -42,7 +42,13 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 
-    /** Definition of a Plane that may be attached to a node, and the derived
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
+	/** Definition of a Plane that may be attached to a node, and the derived
         details of it retrieved simply.
     @remarks
         This plane is not here for rendering purposes, it's to allow you to attach
@@ -86,5 +92,7 @@ namespace Ogre {
 			bool debugRenderables = false) {/* do nothing */}
 
     };
+	/** @} */
+	/** @} */
 }
 #endif

@@ -34,7 +34,13 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 
-    /** This class is designed to be subclassed by OGRE users, to allow them to
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
+	/** This class is designed to be subclassed by OGRE users, to allow them to
         associate their own application objects with MovableObject instances
         in the engine.
     @remarks
@@ -87,6 +93,8 @@ namespace Ogre {
     };
     
         
+	/** @} */
+	/** @} */
 
 }
 

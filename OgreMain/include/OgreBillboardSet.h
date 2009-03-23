@@ -39,6 +39,12 @@ Torus Knot Software Ltd.
 #include "OgreResourceGroupManager.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
 
     /** Enum covering what exactly a billboard's position means (center,
         top-left etc).
@@ -834,7 +840,8 @@ namespace Ogre {
 		void destroyInstance( MovableObject* obj);  
 
 	};
-
+	/** @} */
+	/** @} */
 
 }
 

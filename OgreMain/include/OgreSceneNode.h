@@ -40,7 +40,13 @@ namespace Ogre {
 	// forward decl
 	struct VisibleObjectsBoundsInfo;
 
-    /** Class representing a node in the scene graph.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
+	/** Class representing a node in the scene graph.
         @remarks
             A SceneNode is a type of Node which is used to organise objects in a scene.
             It has the same hierarchical transformation properties of the generic Node class,
@@ -455,6 +461,8 @@ namespace Ogre {
 
 
     };
+	/** @} */
+	/** @} */
 
 
 }// namespace

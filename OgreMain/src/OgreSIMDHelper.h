@@ -251,6 +251,12 @@ __MM_DECL_OP2(cmpnle_ps, cmpnleps, xm)
 
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
 
 #if __OGRE_HAVE_SSE
 
@@ -466,6 +472,8 @@ namespace Ogre {
 
 
 #endif  // __OGRE_HAVE_SSE
+	/** @} */
+	/** @} */
 
 }
 

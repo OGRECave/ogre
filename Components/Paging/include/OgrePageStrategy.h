@@ -32,8 +32,17 @@ Torus Knot Software Ltd.
 
 #include "OgrePagingPrerequisites.h"
 
+
 namespace Ogre
 {
+	/** \addtogroup Optional Components
+	*  @{
+	*/
+	/** \addtogroup Paging
+	*  Some details on paging component
+	*/
+	/*@{*/
+
 	/** Defines the interface to a strategy class which is responsible for deciding
 		when Page instances are requested for addition and removal from the 
 		paging system.
@@ -76,7 +85,11 @@ namespace Ogre
 
 	};
 
+	/*@}*/
+	/*@}*/
 }
+
+
 
 
 #endif 

@@ -40,7 +40,13 @@ namespace Ogre {
 
     // forward declaration
     class SceneQueryListener;
-    /** A class for performing queries on a scene.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
+	/** A class for performing queries on a scene.
     @remarks
         This is an abstract class for performing a query on a scene, i.e. to retrieve
         a list of objects and/or world geometry sections which are potentially intersecting a
@@ -549,6 +555,8 @@ namespace Ogre {
         bool queryResult(MovableObject* movable, SceneQuery::WorldFragment* fragment);
     };
     
+	/** @} */
+	/** @} */
 
 }
     

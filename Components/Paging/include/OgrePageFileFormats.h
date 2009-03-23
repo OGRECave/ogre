@@ -32,10 +32,69 @@ Torus Knot Software Ltd.
 
 #include "OgrePagingPrerequisites.h"
 
-namespace Ogre
-{
+/** \addtogroup Optional Components
+*  @{
+*/
+/** \addtogroup Paging
+*  Some details on paging component
+*/
+/*@{*/
 
-}
+
+/** @file
+	The paging file format is a composite one - a single file / stream can contain
+	data which is not necessarily all read by a single class. Instead, data
+	chunks can be read by different classes, allowing the format to be extended to
+	different types smoothly.
+	@par
+	Paging world files have by default an extension ".world", but that is not
+	a requirement. Internally, the only thing that matters is the data chunks
+	and their identifiers, which are 4-character codes embedded in a uint32 as
+	calculated by StreamSerialiser::makeIdentifier. All data will be read and 
+	written using DataStream and the StreamSerialiser class. 
+	@par
+	<b>Chunk Definitions</b>
+	@par
+	<b>PageWorld (Identifier 'PGWD')</b>\n
+	[Version 1]
+	<table>
+	<tr>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>World Name</td>
+		<td>char* (\n terminated)</td>
+		<td>The name of the world - should be unique</td>
+	</tr>
+	<tr>
+		<td>PagedWorldSection List</td>
+		<td>Chunk List</td>
+		<td>A variable-length list of nested PageWorldSection chunks</td>
+	</tr>
+	</table>
+
+	@par
+	<b>PageWorldSection (Identifier 'PGWS')</b>\n
+	[Version 1]
+	<table>
+	<tr>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>World Section Name</td>
+		<td>char*</td>
+		<td>The name of the world section - should be unique within world</td>
+	</tr>
+	</table>
+
+*/
+
+/*@}*/
+/*@}*/
 
 
 #endif 

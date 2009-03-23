@@ -33,6 +33,12 @@ Torus Knot Software Ltd.
 #include "OgreIteratorWrappers.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
 	/** Object representing one render to a RenderTarget or Viewport in the Ogre Composition
 		framework.
 	 */
@@ -162,6 +168,8 @@ namespace Ogre {
 		bool mShadowsEnabled;
     };
 
+	/** @} */
+	/** @} */
 }
 
 #endif

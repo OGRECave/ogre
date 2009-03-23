@@ -35,7 +35,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    // LogMessageLevel + LoggingLevel > OGRE_LOG_THRESHOLD = message logged
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
+	// LogMessageLevel + LoggingLevel > OGRE_LOG_THRESHOLD = message logged
     #define OGRE_LOG_THRESHOLD 4
 
     /** The level of detail to which the log will go into.
@@ -236,6 +242,8 @@ namespace Ogre {
 		};
 
     };
+	/** @} */
+	/** @} */
 }
 
 #endif

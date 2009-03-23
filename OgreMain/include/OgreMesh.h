@@ -47,7 +47,13 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 
-    /** Resource holding data about 3D mesh.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
+	/** Resource holding data about 3D mesh.
         @remarks
             This class holds the data used to represent a discrete
             3-dimensional object. Mesh data usually contains more
@@ -906,6 +912,8 @@ namespace Ogre {
         mutable EdgeData* edgeData;
 	};
 
+	/** @} */
+	/** @} */
 
 
 } // namespace

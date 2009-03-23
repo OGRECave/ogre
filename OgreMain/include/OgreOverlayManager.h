@@ -37,7 +37,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Manages Overlay objects, parsing them from .overlay files and
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Overlays
+	*  @{
+	*/
+	/** Manages Overlay objects, parsing them from .overlay files and
         storing a lookup library of them. Alo manages the creation of 
 		OverlayContainers and OverlayElements, used for non-interactive 2D 
 		elements such as HUDs.
@@ -233,6 +239,8 @@ namespace Ogre {
     };
 
 
+	/** @} */
+	/** @} */
 
 }
 

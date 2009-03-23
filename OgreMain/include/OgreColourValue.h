@@ -32,6 +32,12 @@ Torus Knot Software Ltd.
 #include "OgrePrerequisites.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 
     typedef uint32 RGBA;
     typedef uint32 ARGB;
@@ -321,6 +327,8 @@ namespace Ogre {
 		}
 
     };
+	/** @} */
+	/** @} */
 
 } // namespace
 

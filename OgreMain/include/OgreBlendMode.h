@@ -33,6 +33,12 @@ Torus Knot Software Ltd.
 #include "OgreColourValue.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Materials
+	*  @{
+	*/
 
     /** Type of texture blend mode.
     */
@@ -253,6 +259,8 @@ namespace Ogre {
 		SBO_MIN,
 		SBO_MAX
 	};
+	/** @} */
+	/** @} */
 
 }
 

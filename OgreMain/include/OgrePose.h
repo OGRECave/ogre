@@ -37,6 +37,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Animation
+	*  @{
+	*/
 	/** A pose is a linked set of vertex offsets applying to one set of vertex
 		data. 
 	@remarks
@@ -105,6 +111,8 @@ namespace Ogre {
 	};
 	typedef vector<Pose*>::type PoseList;
 
+	/** @} */
+	/** @} */
 
 }
 

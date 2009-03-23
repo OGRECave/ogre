@@ -63,6 +63,12 @@ namespace std
 
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Overlays
+	*  @{
+	*/
 
 	/* READ THIS NOTICE BEFORE USING IN YOUR OWN APPLICATIONS
 	=NOTICE=
@@ -2417,6 +2423,8 @@ namespace Ogre {
 		return os << s.asWStr();
 	}
 
+	/** @} */
+	/** @} */
 
 
 } // namespace Ogre{

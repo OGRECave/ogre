@@ -34,6 +34,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Memory
+	*  @{
+	*/
 	/** Non-templated utility class just to hide nedmalloc.
 	*/
 	class _OgreExport NedAllocImpl
@@ -126,6 +132,8 @@ namespace Ogre
 	// if you want - that is lefts as an exercise for the user
 
 
+	/** @} */
+	/** @} */
 
 }// namespace Ogre
 

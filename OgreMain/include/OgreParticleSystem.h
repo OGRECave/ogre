@@ -43,7 +43,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Class defining particle system based special effects.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+	/** Class defining particle system based special effects.
     @remarks
         Particle systems are special effects generators which are based on a 
         number of moving points to create the impression of things like like 
@@ -897,6 +903,8 @@ namespace Ogre {
         */
 		void _notifyReorganiseEmittedEmitterData (void);
     };
+	/** @} */
+	/** @} */
 
 }
 

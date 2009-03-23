@@ -37,7 +37,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Class for converting the core Ogre data types to/from Strings.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
+	/** Class for converting the core Ogre data types to/from Strings.
     @remarks
         The code for converting values to and from strings is here as a separate
         class to avoid coupling String to other datatypes (and vice-versa) which reduces
@@ -249,6 +255,8 @@ namespace Ogre {
         static bool isNumber(const String& val);
     };
 
+	/** @} */
+	/** @} */
 
 }
 

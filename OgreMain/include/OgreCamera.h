@@ -48,7 +48,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
 
     /** A viewpoint from which the scene will be rendered.
         @remarks
@@ -615,6 +620,8 @@ namespace Ogre {
 		/** Get the derived orientation of this frustum. */
 		const Quaternion& getOrientationForViewUpdate(void) const;
      };
+	 /** @} */
+	 /** @} */
 
 } // namespace Ogre
 #endif

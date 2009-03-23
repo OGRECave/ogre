@@ -43,6 +43,12 @@ namespace Ogre {
 	// Forward declaration
 	class ManualResourceLoader;
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
 	/** Abstract class representing a loadable resource (e.g. textures, sounds etc)
         @remarks
             Resources are data objects that must be loaded and managed throughout
@@ -526,6 +532,8 @@ namespace Ogre {
 		*/
 		virtual void loadResource(Resource* resource) = 0;
 	};
+	/** @} */
+	/** @} */
 }
 
 #endif

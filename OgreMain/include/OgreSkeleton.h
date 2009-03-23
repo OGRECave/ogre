@@ -38,6 +38,12 @@ Torus Knot Software Ltd.
 #include "OgreStringVector.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Animation
+	*  @{
+	*/
 
     /**  */
     enum SkeletonAnimationBlendMode {
@@ -515,6 +521,9 @@ namespace Ogre {
 				SkeletonPtr skelPtr)
 				: skeletonName(skelName), pSkeleton(skelPtr), scale(scl) {}
 	};
+	/** @} */
+	/** @} */
+
 }
 
 

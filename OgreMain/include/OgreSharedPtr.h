@@ -32,6 +32,12 @@ Torus Knot Software Ltd.
 #include "OgrePrerequisites.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 
 	/// The method to use to free memory on destruction
 	enum SharedPtrFreeMethod
@@ -261,6 +267,8 @@ namespace Ogre {
 	{
 		return std::less<const void*>()(a.get(), b.get());
 	}
+	/** @} */
+	/** @} */
 }
 
 

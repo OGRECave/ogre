@@ -40,7 +40,13 @@ typedef struct zzip_file	ZZIP_FILE;
 
 namespace Ogre {
 
-    /** Specialisation of the Archive class to allow reading of files from a zip
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
+	/** Specialisation of the Archive class to allow reading of files from a zip
         format source archive.
     @remarks
         This archive format supports all archives compressed in the standard
@@ -141,6 +147,8 @@ namespace Ogre {
 
     };
 
+	/** @} */
+	/** @} */
 
 }
 

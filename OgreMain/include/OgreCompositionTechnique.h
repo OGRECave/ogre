@@ -34,7 +34,13 @@ Torus Knot Software Ltd.
 #include "OgreIteratorWrappers.h"
 
 namespace Ogre {
-    /** Base composition technique, can be subclassed in plugins.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+	/** Base composition technique, can be subclassed in plugins.
      */
 	class _OgreExport CompositionTechnique : public CompositorInstAlloc
     {
@@ -149,6 +155,8 @@ namespace Ogre {
 		String mSchemeName;
 
     };
+	/** @} */
+	/** @} */
 
 }
 

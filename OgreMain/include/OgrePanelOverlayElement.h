@@ -35,7 +35,13 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 
-    /** OverlayElement representing a flat, single-material (or transparent) panel which can contain other elements.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Overlays
+	*  @{
+	*/
+	/** OverlayElement representing a flat, single-material (or transparent) panel which can contain other elements.
     @remarks
         This class subclasses OverlayContainer because it can contain other elements. Like other
         containers, if hidden it's contents are also hidden, if moved it's contents also move etc. 
@@ -148,6 +154,8 @@ namespace Ogre {
         static CmdUVCoords msCmdUVCoords;
 
     };
+	/** @} */
+	/** @} */
 
 }
 

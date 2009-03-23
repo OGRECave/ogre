@@ -61,6 +61,12 @@ typedef struct HINSTANCE__* hInstance;
 #endif
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 
     /** Resource holding data about a dynamic library.
         @remarks
@@ -117,6 +123,8 @@ namespace Ogre {
         /// Handle to the loaded library.
         DYNLIB_HANDLE m_hInst;
     };
+	/** @} */
+	/** @} */
 
 }
 

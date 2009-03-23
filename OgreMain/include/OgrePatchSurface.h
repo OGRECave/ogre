@@ -38,7 +38,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** A surface which is defined by curves of some kind to form a patch, e.g. a Bezier patch.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup LOD
+	*  @{
+	*/
+	/** A surface which is defined by curves of some kind to form a patch, e.g. a Bezier patch.
         @remarks
             This object will take a list of control points with various assorted data, and will
             subdivide it into a patch mesh. Currently only Bezier curves are supported for defining
@@ -227,6 +233,8 @@ namespace Ogre {
 
     };
 
+	/** @} */
+	/** @} */
 
 } // namespace
 

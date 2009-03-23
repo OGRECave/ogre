@@ -38,7 +38,13 @@ Torus Knot Software Ltd.
 #include "OgrePlane.h"
 namespace Ogre
 {
-    /** Class encapsulating a standard 4x4 homogeneous matrix.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
+	/** Class encapsulating a standard 4x4 homogeneous matrix.
         @remarks
             OGRE uses column vectors when applying matrix multiplications,
             This means a vector is represented as a single column, 4-row
@@ -643,6 +649,8 @@ namespace Ogre
             v.x*mat[0][3] + v.y*mat[1][3] + v.z*mat[2][3] + v.w*mat[3][3]
             );
     }
+	/** @} */
+	/** @} */
 
 }
 #endif

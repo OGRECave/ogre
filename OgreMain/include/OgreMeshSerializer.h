@@ -38,7 +38,13 @@ namespace Ogre {
 	
 	class MeshSerializerListener;
 
-    /** Class for serialising mesh data to/from an OGRE .mesh file.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
+	/** Class for serialising mesh data to/from an OGRE .mesh file.
     @remarks
         This class allows exporters to write OGRE .mesh files easily, and allows the
         OGRE engine to import .mesh files into instantiated OGRE Meshes.
@@ -118,6 +124,8 @@ namespace Ogre {
 		/// Called to override the reference to a skeleton
 		virtual void processSkeletonName(Mesh *mesh, String *name) = 0;
 	};
+	/** @} */
+	/** @} */
 }
 
 

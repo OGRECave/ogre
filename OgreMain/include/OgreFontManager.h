@@ -33,7 +33,13 @@ http://www.gnu.org/copyleft/lesser.txt
 
 namespace Ogre
 {
-    /** Manages Font resources, parsing .fontdef files and generally organising them.*/
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
+	/** Manages Font resources, parsing .fontdef files and generally organising them.*/
     class _OgreExport FontManager : public ResourceManager, public Singleton< FontManager >
     {
     public:
@@ -88,6 +94,8 @@ namespace Ogre
 
 
     };
+	/** @} */
+	/** @} */
 }
 
 #endif

@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 namespace Ogre
 {
 
-    /** Standard 3-dimensional vector.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
+	/** Standard 3-dimensional vector.
         @remarks
             A direction in 3D space represented as distances along the 3
             orthogonal axes (x, y, z). Note that positions, directions and
@@ -778,6 +784,8 @@ namespace Ogre
             return o;
         }
     };
+	/** @} */
+	/** @} */
 
 }
 #endif

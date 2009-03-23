@@ -36,6 +36,12 @@ namespace Ogre
 {
 
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Memory
+	*  @{
+	*/
 	/**
 	Wrapper class for operating as an STL container allocator.
 	This class acts as the host for a configured allocation policy.
@@ -186,6 +192,8 @@ namespace Ogre
 	}
 
 
+	/** @} */
+	/** @} */
 
 }// namespace Ogre
 

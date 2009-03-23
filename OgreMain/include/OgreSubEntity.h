@@ -38,7 +38,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Utility class which defines the sub-parts of an Entity.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
+	/** Utility class which defines the sub-parts of an Entity.
         @remarks
             Just as meshes are split into submeshes, an Entity is made up of
             potentially multiple SubMeshes. These are mainly here to provide the
@@ -225,6 +231,8 @@ namespace Ogre {
 		void _invalidateCameraCache ()
 		{ mCachedCamera = 0; }
     };
+	/** @} */
+	/** @} */
 
 }
 

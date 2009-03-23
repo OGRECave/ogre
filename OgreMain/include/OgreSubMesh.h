@@ -41,7 +41,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Defines a part of a complete mesh.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
+	/** Defines a part of a complete mesh.
         @remarks
             Meshes which make up the definition of a discrete 3D object
             are made up of potentially multiple parts. This is because
@@ -272,6 +278,8 @@ namespace Ogre {
 
 
     };
+	/** @} */
+	/** @} */
 
 } // namespace
 

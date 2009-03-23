@@ -38,7 +38,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Strategy for determining level of detail.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup LOD
+	*  @{
+	*/
+	/** Strategy for determining level of detail.
     @remarks
         Generally, to create a new lod strategy, all of the following will
         need to be implemented: getValueImpl, getBaseValue, transformBias,
@@ -119,6 +125,8 @@ namespace Ogre {
         static ushort getIndexDescending(Real value, const Material::LodValueList& materialLodValueList);
 
     };
+	/** @} */
+	/** @} */
 
 } // namespace
 

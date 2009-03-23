@@ -38,6 +38,15 @@ namespace Ogre
 {
 	class PageManager;
 
+	/** \addtogroup Optional Components
+	*  @{
+	*/
+	/** \addtogroup Paging
+	*  Some details on paging component
+	*  @{
+	*/
+
+
 	/** This class represents a collection of pages which make up a world. 
 	@remarks
 		It's important to bear in mind that the PagedWorld only delineates the
@@ -123,8 +132,13 @@ namespace Ogre
 
 
 	};
+	
+	/** @} */
+	/** @} */
 
 }
+
+
 
 
 #endif 

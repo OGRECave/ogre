@@ -40,6 +40,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
 	/** Subclass of BillboardChain which automatically leaves a trail behind
 		one or more Node instances.
 	@remarks
@@ -232,6 +238,8 @@ namespace Ogre {
 		void destroyInstance( MovableObject* obj);  
 
 	};
+	/** @} */
+	/** @} */
 
 }
 

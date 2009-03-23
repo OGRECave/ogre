@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** This class allows you to plug in new ways to define the camera setup when
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
+	/** This class allows you to plug in new ways to define the camera setup when
 		rendering and projecting shadow textures.
 	@remarks
 		The default projection used when rendering shadow textures is a uniform
@@ -94,6 +100,8 @@ namespace Ogre {
 
 
 	typedef SharedPtr<ShadowCameraSetup> ShadowCameraSetupPtr;
+	/** @} */
+	/** @} */
 
 }
 

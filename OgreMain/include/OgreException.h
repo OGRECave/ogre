@@ -70,7 +70,13 @@ Torus Knot Software Ltd.
 #endif
 
 namespace Ogre {
-    /** When thrown, provides information about an error that has occurred inside the engine.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
+	/** When thrown, provides information about an error that has occurred inside the engine.
         @remarks
             OGRE never uses return values to indicate errors. Instead, if an
             error occurs, an exception is thrown, and this is the object that
@@ -336,6 +342,8 @@ namespace Ogre {
 #define OGRE_EXCEPT(num, desc, src) throw Ogre::ExceptionFactory::create( \
 	Ogre::ExceptionCodeType<num>(), desc, src, __FILE__, __LINE__ );
 #endif
+	/** @} */
+	/** @} */
 
 } // Namespace Ogre
 #endif

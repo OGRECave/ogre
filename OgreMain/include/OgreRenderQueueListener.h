@@ -34,7 +34,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Abstract interface which classes must implement if they wish to receive
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
+	/** Abstract interface which classes must implement if they wish to receive
         events from the render queue. 
     @remarks
         The OGRE render queue is divided into several queue groups, as defined by
@@ -90,6 +96,8 @@ namespace Ogre {
         virtual void renderQueueEnded(uint8 queueGroupId, const String& invocation, 
 			bool& repeatThisInvocation) {}
     };
+	/** @} */
+	/** @} */
 
 }
 

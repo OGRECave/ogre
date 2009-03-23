@@ -35,8 +35,14 @@ Torus Knot Software Ltd.
 #include <istream>
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
 
-	/** General purpose class used for encapsulating the reading of data.
+	/** General purpose class used for encapsulating the reading and writing of data.
 	@remarks
 		This class performs basically the same tasks as std::basic_istream, 
 		except that it does not have any formatting capabilities, and is
@@ -538,6 +544,8 @@ namespace Ogre {
         void close(void);
 
 	};
+	/** @} */
+	/** @} */
 }
 #endif
 

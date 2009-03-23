@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 namespace Ogre
 {
 
-    /** Standard 2-dimensional vector.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
+	/** Standard 2-dimensional vector.
         @remarks
             A direction in 2D space represented as distances along the 2
             orthogonal axes (x, y). Note that positions, directions and
@@ -556,6 +562,8 @@ namespace Ogre
         }
 
     };
+	/** @} */
+	/** @} */
 
 }
 #endif

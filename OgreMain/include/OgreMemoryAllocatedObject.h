@@ -43,6 +43,12 @@ Torus Knot Software Ltd
 
 namespace Ogre
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Memory
+	*  @{
+	*/
 	/** Superclass for all objects that wish to use custom memory allocators
 		when their new / delete operators are called.
 		Requires a template parameter identifying the memory allocator policy 
@@ -116,6 +122,8 @@ namespace Ogre
 	};
 
 
+	/** @} */
+	/** @} */
 
 }
 #endif

@@ -36,6 +36,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
     /** This class manages the available ArchiveFactory plugins. 
     */
     class _OgreExport ArchiveManager : public Singleton<ArchiveManager>, public ArchiveAlloc
@@ -126,6 +132,8 @@ namespace Ogre {
         */
         static ArchiveManager* getSingletonPtr(void);
     };
+	/** @} */
+	/** @} */
 
 }
 

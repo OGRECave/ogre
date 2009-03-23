@@ -61,6 +61,12 @@ namespace __gnu_cxx
 
 namespace Ogre
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Memory
+	*  @{
+	*/
 
 #if OGRE_MEMORY_TRACKER
 
@@ -168,6 +174,9 @@ namespace Ogre
 
 
 #endif
+	/** @} */
+	/** @} */
+
 }
 
 #endif

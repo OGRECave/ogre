@@ -36,6 +36,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 
     /// List of parameter types available
     enum ParameterType
@@ -324,6 +330,8 @@ namespace Ogre {
 
     };
 
+	/** @} */
+	/** @} */
 
 
 }

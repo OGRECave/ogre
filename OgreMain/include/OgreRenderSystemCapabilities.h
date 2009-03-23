@@ -52,6 +52,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre 
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
+
 	/// Enumerates the categories of capabilities
 	enum CapabilitiesCategory
 	{
@@ -692,6 +699,8 @@ namespace Ogre
 
 	};
 
+	/** @} */
+	/** @} */
 } // namespace
 
 #endif // __RenderSystemCapabilities__

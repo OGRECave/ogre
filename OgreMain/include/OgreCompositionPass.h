@@ -35,6 +35,12 @@ Torus Knot Software Ltd.
 #include "OgreRenderQueue.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
 	/** Object representing one pass or operation in a composition sequence. This provides a 
 		method to conveniently interleave RenderSystem commands between Render Queues.
 	 */
@@ -312,6 +318,8 @@ namespace Ogre {
 
 		bool mQuadFarCorners, mQuadFarCornersViewSpace;
     };
+	/** @} */
+	/** @} */
 
 }
 

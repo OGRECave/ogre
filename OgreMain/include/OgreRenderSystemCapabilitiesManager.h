@@ -40,7 +40,13 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 
-    /** Class for managing RenderSystemCapabilities database for Ogre.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
+	/** Class for managing RenderSystemCapabilities database for Ogre.
         @remarks This class behaves similarly to other ResourceManager, although .rendercaps are not resources.
 						It contains and abstract a .rendercaps Serializer
     */
@@ -114,6 +120,8 @@ namespace Ogre {
 
     };
 
+	/** @} */
+	/** @} */
 }
 
 #endif

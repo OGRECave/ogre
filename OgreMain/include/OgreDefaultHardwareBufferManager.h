@@ -36,6 +36,12 @@ Torus Knot Software Ltd.
 #include "OgreHardwareIndexBuffer.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
 
     /// Specialisation of HardwareVertexBuffer for emulation
     class _OgreExport DefaultHardwareVertexBuffer : public HardwareVertexBuffer 
@@ -111,6 +117,8 @@ namespace Ogre {
 		RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
     };
 
+	/** @} */
+	/** @} */
 
 }
 

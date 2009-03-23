@@ -39,6 +39,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
     /** Information about a file/directory within the archive will be
     returned using a FileInfo struct.
     @see
@@ -225,6 +231,9 @@ namespace Ogre {
         const String& getType(void) const { return mType; }
         
     };
+	/** @} */
+	/** @} */
+
 }
 
 #endif

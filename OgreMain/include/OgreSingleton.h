@@ -51,6 +51,13 @@ Torus Knot Software Ltd.
 #   pragma GCC visibility push(default)
 #endif
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
+
 // End SJS additions
     /** Template class for creating single-instance global classes.
     */
@@ -78,6 +85,9 @@ namespace Ogre {
         static T* getSingletonPtr( void )
 		{ return ms_Singleton; }
     };
+	/** @} */
+	/** @} */
+
 }
 #if defined ( OGRE_GCC_VISIBILITY )
 #   pragma GCC visibility pop

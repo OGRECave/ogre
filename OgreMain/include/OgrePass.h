@@ -39,6 +39,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Materials
+	*  @{
+	*/
 	/// Categorisation of passes for the purpose of additive lighting
 	enum IlluminationStage
 	{
@@ -1643,6 +1649,8 @@ namespace Ogre {
 
     typedef vector<IlluminationPass*>::type IlluminationPassList;
 
+	/** @} */
+	/** @} */
 
 }
 

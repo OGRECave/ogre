@@ -37,7 +37,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Representation of a ray in space, i.e. a line with an origin and direction. */
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
+	/** Representation of a ray in space, i.e. a line with an origin and direction. */
     class _OgreExport Ray
     {
     protected:
@@ -110,6 +116,8 @@ namespace Ogre {
 		}
 
     };
+	/** @} */
+	/** @} */
 
 }
 #endif

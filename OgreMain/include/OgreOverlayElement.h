@@ -41,6 +41,12 @@ Torus Knot Software Ltd.
 #include "OgreRectangle.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Overlays
+	*  @{
+	*/
 
 #if OGRE_UNICODE_SUPPORT
 	typedef UTFString DisplayString;
@@ -485,6 +491,8 @@ namespace Ogre {
     };
 
 
+	/** @} */
+	/** @} */
 
 }
 

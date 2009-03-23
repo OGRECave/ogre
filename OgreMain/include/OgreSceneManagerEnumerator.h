@@ -37,6 +37,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
     
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
 	/// Factory for default scene manager
 	class _OgreExport DefaultSceneManagerFactory : public SceneManagerFactory
 	{
@@ -215,6 +221,8 @@ namespace Ogre {
 
     };
 
+	/** @} */
+	/** @} */
 
 }
 

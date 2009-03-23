@@ -38,7 +38,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Abstract class defining the interface required to be implemented
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
+	/** Abstract class defining the interface required to be implemented
         by classes which provide rendering capability to ParticleSystem instances.
     */
     class _OgreExport ParticleSystemRenderer : public StringInterface, public FXAlloc
@@ -126,6 +132,8 @@ namespace Ogre {
     public:
         // No methods, must just override all methods inherited from FactoryObj
     };
+	/** @} */
+	/** @} */
 
 }
 

@@ -39,6 +39,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
 	typedef vector<TexturePtr>::type ShadowTextureList;
 
 	/** Structure containing the configuration for one shadow texture. */
@@ -138,6 +144,8 @@ namespace Ogre
 
 	};
 
+	/** @} */
+	/** @} */
 }
 
 

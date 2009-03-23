@@ -36,6 +36,12 @@ Torus Knot Software Ltd.
 namespace Ogre
 {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Scene
+	*  @{
+	*/
 	/** Parallel Split Shadow Map (PSSM) shadow camera setup. 
 	@remarks
 		A PSSM shadow system uses multiple shadow maps per light and maps each
@@ -115,5 +121,7 @@ namespace Ogre
 		Real getOptimalAdjustFactor() const;
 
 	};
+	/** @} */
+	/** @} */
 }
 #endif

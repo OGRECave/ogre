@@ -31,7 +31,13 @@ http://www.gnu.org/copyleft/lesser.txt
 
 namespace Ogre
 {
-    /** This class implements an overlay element which contains simple unformatted text.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Overlays
+	*  @{
+	*/
+	/** This class implements an overlay element which contains simple unformatted text.
     */
     class _OgreExport TextAreaOverlayElement : public OverlayElement
     {
@@ -241,6 +247,8 @@ namespace Ogre
         /// Updates vertex colours
         virtual void updateColours(void);
     };
+	/** @} */
+	/** @} */
 }
 
 #endif

@@ -39,7 +39,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Class for loading & managing textures.
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
+	/** Class for loading & managing textures.
         @remarks
             Note that this class is abstract - the particular
             RenderSystem that is in use at the time will create
@@ -496,6 +502,8 @@ namespace Ogre {
         ushort mPreferredFloatBitDepth;
         size_t mDefaultNumMipmaps;
     };
+	/** @} */
+	/** @} */
 }// Namespace
 
 #endif

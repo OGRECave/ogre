@@ -38,16 +38,22 @@ Torus Knot Software Ltd.
 #include "OgreIteratorWrappers.h"
 #include <ctime>
 
-/// If X11/Xlib.h gets included before this header (for example it happens when
-/// including wxWidgets and FLTK), Status is defined as an int which we don't
-/// want as we have an enum named Status.
+// If X11/Xlib.h gets included before this header (for example it happens when
+// including wxWidgets and FLTK), Status is defined as an int which we don't
+// want as we have an enum named Status.
 #ifdef Status
 #undef Status
 #endif
 
 namespace Ogre {
 
-    /** This abstract class defines an interface which is called back during
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
+	/** This abstract class defines an interface which is called back during
         resource group loading to indicate the progress of the load. 
 	@remarks
 		Resource group loading is in 2 phases - creating resources from 
@@ -1025,6 +1031,8 @@ namespace Ogre {
         static ResourceGroupManager* getSingletonPtr(void);
 
     };
+	/** @} */
+	/** @} */
 }
 
 #endif

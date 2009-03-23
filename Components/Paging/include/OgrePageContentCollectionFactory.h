@@ -34,8 +34,20 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	/** \addtogroup Optional Components
+	*  @{
+	*/
+	/** \addtogroup Paging
+	*  Some details on paging component
+	*  @{
+	*/
 
+
+	/** @} */
+	/** @} */
 }
+
+
 
 
 #endif 

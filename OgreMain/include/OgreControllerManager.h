@@ -39,6 +39,12 @@ Torus Knot Software Ltd.
 #include "OgreSharedPtr.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 
     typedef SharedPtr< ControllerValue<Real> > ControllerValueRealPtr;
     typedef SharedPtr< ControllerFunction<Real> > ControllerFunctionRealPtr;
@@ -282,6 +288,8 @@ namespace Ogre {
         static ControllerManager* getSingletonPtr(void);
     };
 
+	/** @} */
+	/** @} */
 
 }
 #endif

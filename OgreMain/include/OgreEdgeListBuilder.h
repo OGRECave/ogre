@@ -35,6 +35,12 @@ Torus Knot Software Ltd.
 #include "OgreRenderOperation.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Math
+	*  @{
+	*/
 
 
     /** This class contains the information required to describe the edge connectivity of a
@@ -254,6 +260,8 @@ namespace Ogre {
         void connectOrCreateEdge(size_t vertexSet, size_t triangleIndex, size_t vertIndex0, size_t vertIndex1, 
             size_t sharedVertIndex0, size_t sharedVertIndex1);
     };
+	/** @} */
+	/** @} */
 
 }
 #endif

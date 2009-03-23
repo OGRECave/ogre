@@ -37,6 +37,12 @@ Torus Knot Software Ltd.
 
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 
 	/** Compiler for parsing & lexing .compositor scripts */
 	class _OgreExport CompositorScriptCompiler : public Compiler2Pass
@@ -185,6 +191,8 @@ namespace Ogre {
 		StencilOperation extractStencilOp(void);
         CompareFunction extractCompareFunc(void);
 	};
+	/** @} */
+	/** @} */
 }
 
 #endif

@@ -34,6 +34,12 @@ Torus Knot Software Ltd.
 // this file is inlined into OgreImage.cpp!
 // do not include anywhere else.
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Image
+	*  @{
+	*/
 
 // variable name hints:
 // sx_48 = 16/48-bit fixed-point x-position in source
@@ -336,6 +342,8 @@ template<unsigned int channels> struct LinearResampler_Byte {
 		}
 	}
 };
+/** @} */
+/** @} */
 
 }
 

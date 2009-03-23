@@ -39,6 +39,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Materials
+	*  @{
+	*/
 	/** Enumeration of the types of constant we may encounter in programs. 
 	@note Low-level programs, by definition, will always use either
 	float4 or int4 constant types since that is the fundamental underlying
@@ -1805,6 +1811,8 @@ namespace Ogre {
 	/// Shared pointer used to hold references to GpuProgramParameters instances
 	typedef SharedPtr<GpuProgramParameters> GpuProgramParametersSharedPtr;
 
+	/** @} */
+	/** @} */
 }
 #endif
 

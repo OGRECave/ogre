@@ -33,6 +33,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 	/** Class for performing a radix sort (fast comparison-less sort based on 
 		byte value) on various standard STL containers. 
 	@remarks
@@ -317,6 +323,8 @@ namespace Ogre {
 
 	};
 
+	/** @} */
+	/** @} */
 
 }
 #endif

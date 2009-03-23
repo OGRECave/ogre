@@ -38,6 +38,12 @@ Torus Knot Software Ltd.
 #include "OgreRenderToVertexBuffer.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup RenderSystem
+	*  @{
+	*/
 
     /** Abstract interface representing a 'licensee' of a hardware buffer copy.
     remarks
@@ -399,6 +405,8 @@ namespace Ogre {
             
     };
 
+	/** @} */
+	/** @} */
 }
 
 #endif

@@ -38,7 +38,13 @@ Torus Knot Software Ltd.
 #include "OgreTexture.h"
 
 namespace Ogre {
-    /** Class representing the state of a single texture unit during a Pass of a
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Materials
+	*  @{
+	*/
+	/** Class representing the state of a single texture unit during a Pass of a
         Technique, of a Material.
     @remarks
         Texture units are pipelines for retrieving texture data for rendering onto
@@ -1178,6 +1184,8 @@ protected:
 
     };
 
+	/** @} */
+	/** @} */
 
 }
 

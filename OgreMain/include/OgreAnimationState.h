@@ -38,6 +38,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Animation
+	*  @{
+	*/
+
     /** Represents the state of an animation and the weight of it's influence. 
     @remarks
         Other classes can hold instances of this class to store the state of any animations
@@ -270,7 +277,8 @@ namespace Ogre {
 
 	};
 
-
+	/** @} */	
+	/** @} */
 }
 
 #endif

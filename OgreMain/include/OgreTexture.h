@@ -36,7 +36,13 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    /** Enum identifying the texture usage
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
+	/** Enum identifying the texture usage
     */
     enum TextureUsage
     {
@@ -465,6 +471,8 @@ namespace Ogre {
             return *this;
         }
     };
+	/** @} */
+	/** @} */
 
 }
 

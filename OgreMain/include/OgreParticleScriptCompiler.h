@@ -35,6 +35,12 @@ Torus Knot Software Ltd.
 namespace Ogre{
 
 	class ParticleScriptCompiler;
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Effects
+	*  @{
+	*/
 	/** This is the specific listener for the particle script compiler.
 		It allows overriding behavior for specific functionality of this compiler.
 	*/
@@ -79,6 +85,8 @@ namespace Ogre{
 		// The system being compiled
 		ParticleSystem *mSystem;
 	};
+	/** @} */
+	/** @} */
 
 }
 

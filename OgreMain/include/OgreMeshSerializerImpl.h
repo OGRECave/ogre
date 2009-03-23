@@ -42,7 +42,13 @@ namespace Ogre {
 	class MeshSerializerListener;
     class LodStrategy;
 
-    /** Internal implementation of Mesh reading / writing for the latest version of the
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
+	/** Internal implementation of Mesh reading / writing for the latest version of the
     .mesh format.
     @remarks
     In order to maintain compatibility with older versions of the .mesh format, there
@@ -225,6 +231,8 @@ namespace Ogre {
             Mesh* pMesh, VertexData* dest, unsigned short set);
     };
 
+	/** @} */
+	/** @} */
 
 }
 

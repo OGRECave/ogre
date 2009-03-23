@@ -39,6 +39,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 	/** These enums hold the types of the concrete parsed nodes */
 	enum ConcreteNodeType
 	{
@@ -759,6 +765,8 @@ namespace Ogre
 			ID_TWO_SIDED,
 		ID_END_BUILTIN_IDS
 	};
+	/** @} */
+	/** @} */
 }
 
 #endif

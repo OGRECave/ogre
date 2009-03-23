@@ -34,6 +34,12 @@ Torus Knot Software Ltd.
 #include "OgrePrerequisites.h"
 
 namespace Ogre {
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 
     /** Compiler2Pass is a generic 2 pass compiler/assembler
     @remarks
@@ -659,6 +665,8 @@ class _OgreExport Compiler2Pass : public ScriptTranslatorAlloc
         virtual const String& getClientGrammerName(void) const = 0;
 
     };
+	/** @} */
+	/** @} */
 
 }
 

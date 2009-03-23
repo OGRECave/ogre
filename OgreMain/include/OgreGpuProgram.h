@@ -40,6 +40,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Resources
+	*  @{
+	*/
 	/** Enumerates the types of programs which can run on the GPU. */
 	enum GpuProgramType
 	{
@@ -460,6 +466,8 @@ namespace Ogre {
         /// Operator used to convert a HighLevelGpuProgramPtr to a GpuProgramPtr
         GpuProgramPtr& operator=(const HighLevelGpuProgramPtr& r);
 	};
+	/** @} */
+	/** @} */
 }
 
 #endif

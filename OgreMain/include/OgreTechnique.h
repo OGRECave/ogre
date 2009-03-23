@@ -38,7 +38,13 @@ Torus Knot Software Ltd.
 #include "OgreRenderSystemCapabilities.h"
 
 namespace Ogre {
-    /** Class representing an approach to rendering this particular Material. 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup Materials
+	*  @{
+	*/
+	/** Class representing an approach to rendering this particular Material. 
     @remarks
         Ogre will attempt to use the best technique supported by the active hardware, 
         unless you specifically request a lower detail technique (say for distant
@@ -679,6 +685,8 @@ namespace Ogre {
 
     };
 
+	/** @} */
+	/** @} */
 
 }
 #endif

@@ -38,6 +38,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 	/** These codes represent token IDs which are numerical translations of
 		specific lexemes. Specific compilers using the lexer can register their
 		own token IDs which are given precedence over these built-in ones.
@@ -84,6 +90,8 @@ namespace Ogre {
 		bool isNewline(Ogre::String::value_type c) const;
 	};
 
+	/** @} */
+	/** @} */
 }
 
 #endif
