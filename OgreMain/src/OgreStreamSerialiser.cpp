@@ -52,11 +52,12 @@ namespace Ogre
 		sizeof(uint32); // checksum
 	//---------------------------------------------------------------------
 	StreamSerialiser::StreamSerialiser(const DataStreamPtr& stream, Endian endianMode, 
-		bool autoHeader)
+		bool autoHeader, RealStorageFormat realFormat)
 		: mStream(stream)
 		, mEndian(endianMode)
 		, mFlipEndian(false)
 		, mReadWriteHeader(autoHeader)
+		, mRealFormat(realFormat)
 	{
 		if (mEndian != ENDIAN_AUTO)
 		{
@@ -172,6 +173,12 @@ namespace Ogre
 		const Chunk* c = readChunkBegin();
 		// endian should be flipped now
 		assert(c->id == HEADER_ID);
+
+		// read real storage format
+		bool realIsDouble;
+		read(&realIsDouble);
+		mRealFormat = realIsDouble? REAL_DOUBLE : REAL_FLOAT;
+
 		readChunkEnd(HEADER_ID);
 
 	}
@@ -231,6 +238,11 @@ namespace Ogre
 
 		// Header chunk has zero data size
 		writeChunkImpl(HEADER_ID, 1);
+
+		// real format
+		bool realIsDouble = (mRealFormat == REAL_DOUBLE);
+		write(&realIsDouble);
+
 		writeChunkEnd(HEADER_ID);
 
 		mReadWriteHeader = false;
@@ -367,24 +379,28 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void StreamSerialiser::write(const Vector2* vec)
+	void StreamSerialiser::write(const Vector2* vec, size_t count)
 	{
-		write(vec->ptr(), 2);
+		for (size_t i = 0; i < count; ++i, ++vec)
+			write(vec->ptr(), 2);
 	}
 	//---------------------------------------------------------------------
-	void StreamSerialiser::write(const Vector3* vec)
+	void StreamSerialiser::write(const Vector3* vec, size_t count)
 	{
-		write(vec->ptr(), 3);
+		for (size_t i = 0; i < count; ++i, ++vec)
+			write(vec->ptr(), 3);
 	}
 	//---------------------------------------------------------------------
-	void StreamSerialiser::write(const Vector4* vec)
+	void StreamSerialiser::write(const Vector4* vec, size_t count)
 	{
-		write(vec->ptr(), 4);
+		for (size_t i = 0; i < count; ++i, ++vec)
+			write(vec->ptr(), 4);
 	}
 	//---------------------------------------------------------------------
-	void StreamSerialiser::write(const Quaternion* q)
+	void StreamSerialiser::write(const Quaternion* q, size_t count)
 	{
-		write(q->ptr(), 4);
+		for (size_t i = 0; i < count; ++i, ++q)
+			write(q->ptr(), 4);
 	}
 	//---------------------------------------------------------------------
 	void StreamSerialiser::write(const String* string)
@@ -395,14 +411,99 @@ namespace Ogre
 		mStream->write(&eol, 1);
 	}
 	//---------------------------------------------------------------------
-	void StreamSerialiser::write(const Matrix3* m)
+	void StreamSerialiser::write(const Matrix3* m, size_t count)
 	{
-		write((*m)[0], 9);
+		for (size_t i = 0; i < count; ++i, ++m)
+			write((*m)[0], 9);
 	}
 	//---------------------------------------------------------------------
-	void StreamSerialiser::write(const Matrix4* m)
+	void StreamSerialiser::write(const Matrix4* m, size_t count)
 	{
-		write((*m)[0], 12);
+		for (size_t i = 0; i < count; ++i, ++m)
+			write((*m)[0], 12);
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::write(const AxisAlignedBox* aabb, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i, ++aabb)
+		{
+			bool infinite = aabb->isInfinite();
+			write(&infinite);
+			write(&aabb->getMinimum());
+			write(&aabb->getMaximum());
+		}		
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::write(const Sphere* sphere, size_t count)
+	{
+
+		for (size_t i = 0; i < count; ++i, ++sphere)
+		{
+			write(&sphere->getCenter());
+			Real radius = sphere->getRadius();
+			write(&radius);
+		}
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::write(const Plane* plane, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i, ++plane)
+		{
+			write(&plane->normal);
+			write(&plane->d);
+		}
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::write(const Ray* ray, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i, ++ray)
+		{
+			write(&ray->getOrigin());
+			write(&ray->getDirection());
+		}
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::write(const Radian* rad, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i, ++rad)
+		{
+			Real r = rad->valueRadians();
+			write(&r);
+		}
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::write(const Node* node, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i, ++node)
+		{
+			write(&node->getPosition());
+			write(&node->getOrientation());
+			write(&node->getScale());
+		}
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::write(const bool* val, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i, ++val)
+		{
+			char c = val? 1 : 0;
+			write(&c);
+		}
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::write(const Real* val, size_t count)
+	{
+#if OGRE_DOUBLE_PRECISION
+		if (mRealFormat == REAL_DOUBLE)
+			writeData(val, sizeof(double), count);
+		else
+			writeDoublesAsFloats(val, count);
+#else
+		if (mRealFormat == REAL_FLOAT)
+			writeData(val, sizeof(float), count);
+		else
+			writeFloatsAsDoubles(val, count);
+#endif
 	}
 	//---------------------------------------------------------------------
 	void StreamSerialiser::readData(void* buf, size_t size, size_t count)
@@ -417,34 +518,52 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void StreamSerialiser::read(Vector2* vec)
+	void StreamSerialiser::read(Vector2* vec, size_t count)
 	{
-		read(vec->ptr(), 2);
+		for (size_t i = 0; i < count; ++i, ++vec)
+		{
+			read(vec->ptr(), 2);
+		}
 	}
 	//---------------------------------------------------------------------
-	void StreamSerialiser::read(Vector3* vec)
+	void StreamSerialiser::read(Vector3* vec, size_t count)
 	{
-		read(vec->ptr(), 3);
+		for (size_t i = 0; i < count; ++i, ++vec)
+		{
+			read(vec->ptr(), 3);
+		}
 	}
 	//---------------------------------------------------------------------
-	void StreamSerialiser::read(Vector4* vec)
+	void StreamSerialiser::read(Vector4* vec, size_t count)
 	{
-		read(vec->ptr(), 4);
+		for (size_t i = 0; i < count; ++i, ++vec)
+		{
+			read(vec->ptr(), 4);
+		}
 	}
 	//---------------------------------------------------------------------
-	void StreamSerialiser::read(Quaternion* q)
+	void StreamSerialiser::read(Quaternion* q, size_t count)
 	{
-		read(q->ptr(), 4);
+		for (size_t i = 0; i < count; ++i, ++q)
+		{
+			read(q->ptr(), 4);
+		}
 	}
 	//---------------------------------------------------------------------
-	void StreamSerialiser::read(Matrix3* m)
+	void StreamSerialiser::read(Matrix3* m, size_t count)
 	{
-		read((*m)[0], 9);
+		for (size_t i = 0; i < count; ++i, ++m)
+		{
+			read((*m)[0], 9);
+		}
 	}
 	//---------------------------------------------------------------------
-	void StreamSerialiser::read(Matrix4* m)
+	void StreamSerialiser::read(Matrix4* m, size_t count)
 	{
-		read((*m)[0], 12);
+		for (size_t i = 0; i < count; ++i, ++m)
+		{
+			read((*m)[0], 12);
+		}
 	}
 	//---------------------------------------------------------------------
 	void StreamSerialiser::read(String* string)
@@ -452,6 +571,133 @@ namespace Ogre
 		String readStr = mStream->getLine(false);
 		string->swap(readStr);
 	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::read(Real* val, size_t count)
+	{
+#if OGRE_DOUBLE_PRECISION
+		if (mRealFormat == REAL_DOUBLE)
+			readData(val, sizeof(double), count);
+		else
+			readFloatsAsDoubles(val, count);
+#else
+		if (mRealFormat == REAL_FLOAT)
+			readData(val, sizeof(float), count);
+		else
+			readDoublesAsFloats(val, count);
+#endif
+
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::read(AxisAlignedBox* aabb, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i, ++aabb)
+		{
+			bool infinite;
+			read(&infinite);
+			Vector3 tmpMin, tmpMax;
+			read(&tmpMin);
+			read(&tmpMax);
+
+			if (infinite)
+				aabb->setInfinite();
+			else
+				aabb->setExtents(tmpMin, tmpMax);
+		}
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::read(Sphere* sphere, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i, ++sphere)
+		{
+			Vector3 center;
+			Real radius;
+			read(&center);
+			read(&radius);
+			sphere->setCenter(center);
+			sphere->setRadius(radius);
+		}
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::read(Plane* plane, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i, ++plane)
+		{
+			read(&plane->normal);
+			read(&plane->d);
+		}
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::read(Ray* ray, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i, ++ray)
+		{
+			Vector3 origin, dir;
+			read(&origin);
+			read(&dir);
+			ray->setOrigin(origin);
+			ray->setDirection(dir);
+		}
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::read(Radian* angle, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i, ++angle)
+		{
+			Real rads;
+			read(&rads);
+			*angle = Radian(rads);
+		}
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::read(Node* node, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i, ++node)
+		{
+			Vector3 pos, scale;
+			Quaternion orient;
+			read(&pos);
+			read(&orient);
+			read(&scale);
+			node->setPosition(pos);
+			node->setOrientation(orient);
+			node->setScale(scale);
+		}
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::read(bool* val, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i, ++val)
+		{
+			char c;
+			read(&c);
+			*val = (c == 1);
+		}
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::writeFloatsAsDoubles(const float* val, size_t count)
+	{
+		double t = 0;
+		writeConverted(val, t, count);
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::writeDoublesAsFloats(const double* val, size_t count)
+	{
+		float t = 0;
+		writeConverted(val, t, count);
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::readFloatsAsDoubles(double* val, size_t count)
+	{
+		float t = 0;
+		readConverted(val, t, count);
+	}
+	//---------------------------------------------------------------------
+	void StreamSerialiser::readDoublesAsFloats(float* val, size_t count)
+	{
+		double t = 0;
+		readConverted(val, t, count);
+	}
+
 	//---------------------------------------------------------------------
 	void StreamSerialiser::flipEndian(void * pBase, size_t size, size_t count)
 	{

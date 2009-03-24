@@ -78,6 +78,16 @@ namespace Ogre
 			ENDIAN_LITTLE
 		};
 
+		/// The storage format of Real values
+		enum RealStorageFormat
+		{
+			/// Real is stored as float, reducing precision if you're using OGRE_DOUBLE_PRECISION
+			REAL_FLOAT,
+			/// Real as stored as double, not useful unless you're using OGRE_DOUBLE_PRECISION
+			REAL_DOUBLE
+		};
+
+
 		/// Definition of a chunk of data in a file
 		struct Chunk : public StreamAlloc
 		{
@@ -105,9 +115,19 @@ namespace Ogre
 			then you can skip writing / reading the header if you wish, if for example
 			this stream is midway through a file which has already included header
 			information.
+		@param realFormat Set the format you want to write reals in. Only useful for files that 
+			you're writing (since when reading this is picked up from the file), 
+			and can only be changed if autoHeader is true, since real format is stored in the header. 
+			Defaults to float unless you're using OGRE_DOUBLE_PRECISION.
 		*/
 		StreamSerialiser(const DataStreamPtr& stream, Endian endianMode = ENDIAN_AUTO, 
-			bool autoHeader = true);
+			bool autoHeader = true, 
+#if OGRE_DOUBLE_PRECISION
+			RealStorageFormat realFormat = REAL_DOUBLE
+#else
+			RealStorageFormat realFormat = REAL_FLOAT
+#endif
+			);
 		virtual ~StreamSerialiser();
 
 		/** Get the endian mode.
@@ -213,13 +233,24 @@ namespace Ogre
 			writeData(pT, sizeof(T), count);
 		}
 
-		virtual void write(const Vector2* vec);
-		virtual void write(const Vector3* vec);
-		virtual void write(const Vector4* vec);
-		virtual void write(const Quaternion* q);
-		virtual void write(const Matrix3* m);
-		virtual void write(const Matrix4* m);
+		// Special-case Real since we need to deal with single/double precision
+		virtual void write(const Real* val, size_t count = 1);
+
+		virtual void write(const Vector2* vec, size_t count = 1);
+		virtual void write(const Vector3* vec, size_t count = 1);
+		virtual void write(const Vector4* vec, size_t count = 1);
+		virtual void write(const Quaternion* q, size_t count = 1);
+		virtual void write(const Matrix3* m, size_t count = 1);
+		virtual void write(const Matrix4* m, size_t count = 1);
 		virtual void write(const String* string);
+		virtual void write(const AxisAlignedBox* aabb, size_t count = 1);
+		virtual void write(const Sphere* sphere, size_t count = 1);
+		virtual void write(const Plane* plane, size_t count = 1);
+		virtual void write(const Ray* ray, size_t count = 1);
+		virtual void write(const Radian* angle, size_t count = 1);
+		virtual void write(const Node* node, size_t count = 1);
+		virtual void write(const bool* boolean, size_t count = 1);
+
 
 		/** Read arbitrary data from a stream. 
 		@param buf Pointer to bytes
@@ -236,20 +267,31 @@ namespace Ogre
 			readData(pT, sizeof(T), count);
 		}
 
+		// Special case Real, single/double-precision issues
+		virtual void read(Real* val, size_t count = 1);
+
 		/// read a Vector3
-		virtual void read(Vector2* vec);
-		virtual void read(Vector3* vec);
-		virtual void read(Vector4* vec);
-		virtual void read(Quaternion* q);
-		virtual void read(Matrix3* m);
-		virtual void read(Matrix4* m);
+		virtual void read(Vector2* vec, size_t count = 1);
+		virtual void read(Vector3* vec, size_t count = 1);
+		virtual void read(Vector4* vec, size_t count = 1);
+		virtual void read(Quaternion* q, size_t count = 1);
+		virtual void read(Matrix3* m, size_t count = 1);
+		virtual void read(Matrix4* m, size_t count = 1);
 		virtual void read(String* string);
+		virtual void read(AxisAlignedBox* aabb, size_t count = 1);
+		virtual void read(Sphere* sphere, size_t count = 1);
+		virtual void read(Plane* plane, size_t count = 1);
+		virtual void read(Ray* ray, size_t count = 1);
+		virtual void read(Radian* angle, size_t count = 1);
+		virtual void read(Node* node, size_t count = 1);
+		virtual void read(bool* val, size_t count = 1);
 
 	protected:
 		DataStreamPtr mStream;
 		Endian mEndian;
 		bool mFlipEndian;
 		bool mReadWriteHeader;
+		RealStorageFormat mRealFormat;
 		typedef deque<Chunk*>::type ChunkStack;
 		/// Current list of open chunks
 		ChunkStack mChunkStack;
@@ -270,6 +312,38 @@ namespace Ogre
 		virtual void flipEndian(void * pData, size_t size);
 		virtual void determineEndianness();
 		virtual Chunk* popChunk(uint id);
+
+		virtual void writeFloatsAsDoubles(const float* val, size_t count);
+		virtual void writeDoublesAsFloats(const double* val, size_t count);
+		virtual void readFloatsAsDoubles(double* val, size_t count);
+		virtual void readDoublesAsFloats(float* val, size_t count);
+		template <typename T, typename U>
+		void writeConverted(const T* src, U typeToWrite, size_t count)
+		{
+			U* tmp = OGRE_ALLOC_T(U, count, MEMCATEGORY_GENERAL);
+			U* pDst = tmp;
+			const T* pSrc = src;
+			for (size_t i = 0; i < count; ++i)
+				*pDst++ = static_cast<U>(*pSrc++);
+			
+			writeData(tmp, sizeof(U), count);
+
+			OGRE_FREE(tmp, MEMCATEGORY_GENERAL);
+		}
+		template <typename T, typename U>
+		void readConverted(T* dst, U typeToRead, size_t count)
+		{
+			U* tmp = OGRE_ALLOC_T(U, count, MEMCATEGORY_GENERAL);
+			readData(tmp, sizeof(U), count);
+
+			T* pDst = dst;
+			const U* pSrc = tmp;
+			for (size_t i = 0; i < count; ++i)
+				*pDst++ = static_cast<T>(*pSrc++);
+
+
+			OGRE_FREE(tmp, MEMCATEGORY_GENERAL);
+		}
 
 	};
 	/** @} */
