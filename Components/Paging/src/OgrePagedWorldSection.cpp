@@ -30,6 +30,15 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	PagedWorldSection::PagedWorldSection(const String& name, PagedWorld* parent, PageStrategy* strategy)
+		: mName(name), mParent(parent), mStrategy(strategy)
+	{
+	}
+	//---------------------------------------------------------------------
+	PagedWorldSection::~PagedWorldSection()
+	{
+
+	}
 
 }
 

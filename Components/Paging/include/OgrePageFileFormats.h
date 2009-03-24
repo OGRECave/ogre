@@ -53,9 +53,12 @@ Torus Knot Software Ltd.
 	calculated by StreamSerialiser::makeIdentifier. All data will be read and 
 	written using DataStream and the StreamSerialiser class. 
 	@par
+	Data types are expressed at the lowest level exposed by the StreamSerialiser class, 
+	which is used to read / write this file. 
+	@par
 	<b>Chunk Definitions</b>
 	@par
-	<b>PageWorld (Identifier 'PGWD')</b>\n
+	<b>PagedWorld (Identifier 'PWLD')</b>\n
 	[Version 1]
 	<table>
 	<tr>
@@ -71,12 +74,12 @@ Torus Knot Software Ltd.
 	<tr>
 		<td>PagedWorldSection List</td>
 		<td>Chunk List</td>
-		<td>A variable-length list of nested PageWorldSection chunks</td>
+		<td>A variable-length list of nested PagedWorldSection chunks</td>
 	</tr>
 	</table>
 
 	@par
-	<b>PageWorldSection (Identifier 'PGWS')</b>\n
+	<b>PagedWorldSection (Identifier 'PWSC')</b>\n
 	[Version 1]
 	<table>
 	<tr>
@@ -89,8 +92,39 @@ Torus Knot Software Ltd.
 		<td>char*</td>
 		<td>The name of the world section - should be unique within world</td>
 	</tr>
+	<tr>
+		<td>Bounding box</td>
+		<td>AABB</td>
+		<td>AABB of this world section in world space</td>
+	</tr>
+	<tr>
+		<td>PageStrategy name</td>
+		<td>char*</td>
+		<td>The name of the PageStrategy class this world section uses to manage pages</td>
+	</tr>
+	<tr>
+		<td>Page Strategy Data</td>
+		<td>Nested Chunk</td>
+		<td>PageStrategy specific data for this world section</td>
+	</tr>
 	</table>
 
+	@par
+	<b>PagedWorldSectionStrategyData (Identifier 'PWSS')</b>\n
+	[Version 1]
+	<table>
+	<tr>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>PageStrategy defined</td>
+		<td>???</td>
+		<td>This chunk will contain data as defined by the specific PageStrategy used by the
+			parent PagedWorldSection</td>
+	</tr>
+	</table>
 */
 
 /*@}*/

@@ -43,6 +43,38 @@ namespace Ogre
 	*  @{
 	*/
 
+	/** Represents a section of the PagedWorld which uses a given PageStrategy, and
+		which is made up of a generally localised set of Page instances.
+	@remarks
+		The reason for PagedWorldSection is that you may wish to cater for multiple
+		sections of your world which use a different approach to paging (ie a
+		different PageStrategy), or which are significantly far apart or separate 
+		that the parameters you want to pass to the PageStrategy are different.
+	@par
+		PagedWorldSection instances are fully contained within the PagedWorld and
+		their definitions are loaded in their entirety when the PagedWorld is
+		loaded. However, no Page instances are initially loaded - those are the
+		responsibility of the PageStrategy.
+	*/
+	class PagedWorldSection : public PageAlloc
+	{
+	protected:
+		String mName;
+		PagedWorld* mParent;
+		PageStrategy* mStrategy;
+	public:
+		/** Construct a new instance, specifying the parent and assigned strategy. */
+		PagedWorldSection(const String& name, PagedWorld* parent, PageStrategy* strategy);
+		virtual ~PagedWorldSection();
+
+		/// Get the name of this section
+		const String& getName() const { return mName; }
+		/// Get the page strategy which this section is using
+		PageStrategy* getStrategy() const { return mStrategy; }
+		/// Get the parent world
+		PagedWorld* getWorld() const { return mParent; }
+
+	};
 
 	/** @} */
 	/** @} */

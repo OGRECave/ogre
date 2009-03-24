@@ -37,6 +37,7 @@ Torus Knot Software Ltd.
 #endif
 
 #include <utility>
+#include <sstream>
 
 #if defined ( OGRE_GCC_VISIBILITY )
 #   pragma GCC visibility pop
@@ -670,6 +671,32 @@ namespace Ogre {
 
 	/// Render window container.
 	typedef vector<RenderWindow*>::type RenderWindowList;
+
+	/// Utility class to generate a sequentially numbered series of names
+	class NameGenerator
+	{
+	protected:
+		String mPrefix;
+		unsigned long mNext;
+		OGRE_AUTO_MUTEX
+	public:
+		NameGenerator(const String& prefix) : mPrefix(prefix), mNext(1) {}
+
+		String generate()
+		{
+			OGRE_LOCK_AUTO_MUTEX
+			std::ostringstream s;
+			s << mPrefix << mNext++;
+			return s.str();
+		}
+
+		void reset()
+		{
+			OGRE_LOCK_AUTO_MUTEX
+			mNext = 0;
+		}
+
+	};
 	/** @} */
 	/** @} */
 }

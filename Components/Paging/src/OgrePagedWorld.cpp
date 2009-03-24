@@ -29,11 +29,14 @@ Torus Knot Software Ltd.
 #include "OgrePagedWorld.h"
 #include "OgreResourceGroupManager.h"
 
+#include "OgrePageManager.h"
+#include "OgrePagedWorldSection.h"
+
 namespace Ogre
 {
 	//---------------------------------------------------------------------
 	PagedWorld::PagedWorld(const String& name, PageManager* manager)
-		:mName(name), mManager(manager)
+		:mName(name), mManager(manager), mSectionNameGenerator("Section")
 	{
 
 	}
@@ -116,6 +119,67 @@ namespace Ogre
 		// TODO
 	}
 	//---------------------------------------------------------------------
+	PagedWorldSection* PagedWorld::createSection(const String& strategyName, 
+		const String& sectionName)
+	{
+		// get the strategy
+		PageStrategy* strategy = mManager->getStrategy(strategyName);
+
+		return createSection(strategy, sectionName);
+
+	}
+	//---------------------------------------------------------------------
+	PagedWorldSection* PagedWorld::createSection(PageStrategy* strategy, 
+		const String& sectionName)
+	{
+		String theName = sectionName;
+		if (theName.empty())
+		{
+			do 
+			{
+				theName = mSectionNameGenerator.generate();
+			} while (mSections.find(theName) != mSections.end());
+		}
+		else if(mSections.find(theName) != mSections.end())
+		{
+			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
+				"World section named '" + theName + "' already exists!",
+				"PagedWorld::createSection");
+		}
+
+		PagedWorldSection* ret = OGRE_NEW PagedWorldSection(theName, this, strategy);
+		mSections[theName] = ret;
+
+		return ret;
+
+	}
+	//---------------------------------------------------------------------
+	void PagedWorld::destroySection(const String& name)
+	{
+		SectionMap::iterator i = mSections.find(name);
+		if (i != mSections.end())
+		{
+			OGRE_DELETE i->second;
+			mSections.erase(i);
+		}
+	}
+	//---------------------------------------------------------------------
+	void PagedWorld::destroySection(PagedWorldSection* sec)
+	{
+		destroySection(sec->getName());
+	}
+	//---------------------------------------------------------------------
+	PagedWorldSection* PagedWorld::getSection(const String& name)
+	{
+		SectionMap::iterator i = mSections.find(name);
+		if (i != mSections.end())
+			return i->second;
+		else
+			return 0;
+
+	}
+	//---------------------------------------------------------------------
+
 
 
 

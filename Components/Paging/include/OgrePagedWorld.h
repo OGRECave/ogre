@@ -33,6 +33,7 @@ Torus Knot Software Ltd.
 #include "OgrePagingPrerequisites.h"
 #include "OgreString.h"
 #include "OgreDataStream.h"
+#include "OgreCommon.h"
 
 namespace Ogre
 {
@@ -116,6 +117,8 @@ namespace Ogre
 			const String& sectionName = StringUtil::BLANK);
 
 		/** Destroy a section of world. */
+		void destroySection(const String& name);
+		/** Destroy a section of world. */
 		void destroySection(PagedWorldSection* sec);
 
 		/** Retrieve a section of the world. */
@@ -127,6 +130,7 @@ namespace Ogre
 
 	protected:
 		SectionMap mSections;
+		NameGenerator mSectionNameGenerator;
 
 
 

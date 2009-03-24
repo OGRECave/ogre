@@ -36,7 +36,7 @@ namespace Ogre
 {
 	//---------------------------------------------------------------------
 	PageManager::PageManager()
-		: mWorldNameIndex(1)
+		: mWorldNameGenerator("World")
 	{
 
 	}
@@ -53,7 +53,7 @@ namespace Ogre
 		{
 			do 
 			{
-				theName = "World" + StringConverter::toString(mWorldNameIndex++);
+				theName = mWorldNameGenerator.generate();
 			} while (mWorlds.find(theName) != mWorlds.end());
 		}
 		else if(mWorlds.find(theName) != mWorlds.end())

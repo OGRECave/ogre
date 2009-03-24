@@ -33,6 +33,7 @@ Torus Knot Software Ltd.
 #include "OgrePagingPrerequisites.h"
 #include "OgreString.h"
 #include "OgreResourceGroupManager.h"
+#include "OgreCommon.h"
 
 namespace Ogre
 {
@@ -129,7 +130,7 @@ namespace Ogre
 	protected:
 		WorldMap mWorlds;
 		StrategyMap mStrategies;
-		size_t mWorldNameIndex;
+		NameGenerator mWorldNameGenerator;
 
 	};
 
