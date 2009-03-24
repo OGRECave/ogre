@@ -202,5 +202,17 @@ String EXRCodec::getType() const
 }
 
 
+String EXRCodec::magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const
+{
+  // look for OpenEXR magic number
+  if (maxbytes >= 4 
+      && magicNumberPtr[0] == 0x76
+      && magicNumberPtr[1] == 0x2f
+      && magicNumberPtr[2] == 0x31
+      && magicNumberPtr[3] == 0x01)
+    return "exr";
+    
+  return "";
+}
 
 }
