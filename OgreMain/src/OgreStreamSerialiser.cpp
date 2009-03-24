@@ -39,6 +39,10 @@ Torus Knot Software Ltd.
 #include "OgreMatrix3.h"
 #include "OgreMatrix4.h"
 #include "OgreQuaternion.h"
+#include "OgreAxisAlignedBox.h"
+#include "OgreNode.h"
+#include "OgreRay.h"
+#include "OgreSphere.h"
 
 namespace Ogre
 {
