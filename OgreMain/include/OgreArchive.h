@@ -167,7 +167,7 @@ namespace Ogre {
 		{
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
 				"This archive does not support removal of files.", 
-				"Archive::create");
+				"Archive::remove");
 		}
 
         /** List all file names in the archive.
