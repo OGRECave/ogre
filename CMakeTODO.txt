@@ -6,7 +6,7 @@ Essential before switch-on as primary system
 * Establish 3rd-party library build procedure
   * For projects using CMake: Need to enhance/finish the FindOGRE and OGREConfig scripts
   * For projects not using CMake: Probably little changes, but examples would still be good
-* Test Code::Blocks / MinGW, Linux
+* Test Code::Blocks / MinGW
 
 
 To be done after switch-over
@@ -15,8 +15,7 @@ To be done after switch-over
 * Pregenerating project files for source packages (& SDK's) - absolute paths will break this, can we use relative dirs?
 * GLES project
 * OS X
-  * Dependencies now getting picked up, but option to build frameworks doesn't seem to be working yet. 
-* Reference app? (or drop this)
+  * Ogre framework is building, plugins and samples still need looking at
 * CPack
   * Investigate .deb, .rpm packages for Linux
 
