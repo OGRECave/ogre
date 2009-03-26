@@ -16,10 +16,11 @@ if (OGRE_CONFIG_THREADS)
   if (UNIX)
     add_definitions(-pthread)
   endif ()
-  if (NOT OGRE_STATIC)
-    add_definitions(-DBOOST_ALL_DYN_LINK)
-  endif ()
 endif()
+
+if (Boost_FOUND AND !Boost_USE_STATIC_LIBS)
+  add_definitions(-DBOOST_ALL_DYN_LINK)
+endif ()
 
 # determine config values depending on build options 
 set(OGRE_SET_DOUBLE 0)

@@ -84,12 +84,20 @@ find_package(Cg)
 macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
 
 # Find Boost
-if (OGRE_STATIC)
-  set(Boost_USE_STATIC_LIBS TRUE)
-endif()
+# Prefer static linking in all cases
+set(Boost_USE_STATIC_LIBS TRUE)
 set(Boost_ADDITIONAL_VERSIONS "1.37.0" "1.37" "1.38.0" "1.38")
-find_package(Boost COMPONENTS thread QUIET)
-macro_log_feature(Boost_FOUND "boost-thread" "Used for threading support" "http://boost.org" FALSE "" "")
+# Components that need linking (NB does not include heaader-only components like bind)
+set(OGRE_BOOST_COMPONENTS thread)
+find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+if (!Boost_FOUND)
+	# Try dynamic
+	set(Boost_USE_STATIC_LIBS TRUE)
+	find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+endif()
+# Optional Boost libs (Boost_${COMPONENT}_FOUND
+macro_log_feature(Boost_FOUND "boost" "Boost (general)" "http://boost.org" FALSE "" "")
+macro_log_feature(Boost_THREAD_FOUND "boost-thread" "Used for threading support" "http://boost.org" FALSE "" "")
 
 
 #######################################################################
