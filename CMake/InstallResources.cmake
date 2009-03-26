@@ -100,7 +100,7 @@ if (WIN32)
   set(OGRE_PLUGIN_DIR_DBG ".")
 elseif (UNIX)
   set(OGRE_PLUGIN_DIR_REL "../lib")
-  set(OGRE_PLUGIN_DIR_DBG "../../lib/OGRE")
+  set(OGRE_PLUGIN_DIR_DBG "../lib")
 endif ()
 if (WIN32)
   # create resources.cfg
