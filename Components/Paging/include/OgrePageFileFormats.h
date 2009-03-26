@@ -68,7 +68,7 @@ Torus Knot Software Ltd.
 	</tr>
 	<tr>
 		<td>World Name</td>
-		<td>char* (\n terminated)</td>
+		<td>char*</td>
 		<td>The name of the world - should be unique</td>
 	</tr>
 	<tr>
@@ -110,7 +110,7 @@ Torus Knot Software Ltd.
 	</table>
 
 	@par
-	<b>PagedWorldSectionStrategyData (Identifier 'PWSS')</b>\n
+	<b>PagedStrategyData (Identifier 'PWSS')</b>\n
 	[Version 1]
 	<table>
 	<tr>
@@ -121,7 +121,7 @@ Torus Knot Software Ltd.
 	<tr>
 		<td>PageStrategy defined</td>
 		<td>???</td>
-		<td>This chunk will contain data as defined by the specific PageStrategy used by the
+		<td>This chunk will contain data as defined by the specific PageStrategyData used by the
 			parent PagedWorldSection</td>
 	</tr>
 	</table>

@@ -43,6 +43,25 @@ namespace Ogre
 	*/
 	/*@{*/
 
+
+	/** Abstract marker class representing the data held against the PagedWorldSection
+	which is specifically used by the PageStrategy.
+	*/
+	class _OgrePagingExport PageStrategyData : public PageAlloc
+	{
+	public:
+		PageStrategyData() {}
+		virtual ~PageStrategyData() {}
+
+		/// Load this data from a stream
+		virtual void load(StreamSerialiser& stream) = 0;
+		/// Save this data to a stream
+		virtual void save(StreamSerialiser& stream) = 0;
+
+
+	};
+
+
 	/** Defines the interface to a strategy class which is responsible for deciding
 		when Page instances are requested for addition and removal from the 
 		paging system.
@@ -83,6 +102,21 @@ namespace Ogre
 		*/
 		virtual void notifyCamera(Camera* cam) {}
 
+		/** Create a PageStrategyData instance containing the data specific to this
+			PageStrategy. 
+		@par
+			This data will be held by a given PagedWorldSection and the structure of
+			the data will be specific to the PageStrategy subclass.
+		*/
+		virtual PageStrategyData* createData() = 0;
+
+		/** Destroy a PageStrategyData instance containing the data specific to this
+		PageStrategy. 
+		@par
+		This data will be held by a given PagedWorldSection and the structure of
+		the data will be specific to the PageStrategy subclass.
+		*/
+		virtual void destroyData(PageStrategyData* d) = 0;
 	};
 
 	/*@}*/

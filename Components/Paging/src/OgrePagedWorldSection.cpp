@@ -27,18 +27,114 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 #include "OgrePagedWorldSection.h"
+#include "OgrePageStrategy.h"
+#include "OgreStreamSerialiser.h"
+#include "OgreException.h"
+#include "OgrePagedWorld.h"
+#include "OgrePageManager.h"
 
 namespace Ogre
 {
+	//---------------------------------------------------------------------
+	const uint32 PagedWorldSection::msChunkID = StreamSerialiser::makeIdentifier("PWSC");
+	const uint16 PagedWorldSection::msChunkVersion = 1;
+	//---------------------------------------------------------------------
 	PagedWorldSection::PagedWorldSection(const String& name, PagedWorld* parent, PageStrategy* strategy)
-		: mName(name), mParent(parent), mStrategy(strategy)
+		: mName(name), mParent(parent), mStrategy(0)
 	{
+		setStrategy(strategy);
 	}
 	//---------------------------------------------------------------------
 	PagedWorldSection::~PagedWorldSection()
 	{
+		mStrategy->destroyData(mStrategyData);
+		mStrategyData = 0;
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::setBoundingBox(const AxisAlignedBox& box)
+	{
+		mAABB = box;
+	}
+	//---------------------------------------------------------------------
+	const AxisAlignedBox& PagedWorldSection::getBoundingBox() const
+	{
+		return mAABB;
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::setStrategy(PageStrategy* strat)
+	{
+		if (strat != mStrategy)
+		{
+			if (mStrategy)
+			{
+				mStrategy->destroyData(mStrategyData);
+				mStrategy = 0;
+				mStrategyData = 0;
+			}
+
+			mStrategy = strat;
+			mStrategyData = mStrategy->createData();
+		}
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::setStrategy(const String& stratName)
+	{
+		setStrategy(mParent->getManager()->getStrategy(stratName));
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::load(StreamSerialiser& ser)
+	{
+		const StreamSerialiser::Chunk* chunk = ser.readChunkBegin();
+		if (chunk->id != msChunkID)
+		{
+			ser.undoReadChunk(chunk->id);
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+				"Stream does not contain PagedWorldSection data!", 
+				"PagedWorldSection::load");
+		}
+
+		// Check version
+		if (chunk->version > msChunkVersion)
+		{
+			// skip the rest
+			ser.readChunkEnd(chunk->id);
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+				"PagedWorldSection data version exceeds what this software can read!", 
+				"PagedWorldSection::load");
+		}
+
+		// Name
+		ser.read(&mName);
+		// AABB
+		ser.read(&mAABB);
+		// Page Strategy Name
+		String stratname;
+		ser.read(&stratname);
+		setStrategy(stratname);
+		// Page Strategy Data
+		mStrategyData->load(ser);
+
+		ser.readChunkEnd(msChunkID);
 
 	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::save(StreamSerialiser& ser)
+	{
+		ser.writeChunkBegin(msChunkID, msChunkVersion);
+
+		// Name
+		ser.write(&mName);
+		// AABB
+		ser.write(&mAABB);
+		// Page Strategy Name
+		ser.write(&mStrategy->getName());
+		// Page Strategy Data
+		mStrategyData->save(ser);
+
+		ser.writeChunkEnd(msChunkID);
+
+	}
+
 
 }
 

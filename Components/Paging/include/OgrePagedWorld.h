@@ -59,6 +59,9 @@ namespace Ogre
 	protected:
 		String mName;
 		PageManager* mManager;
+
+		static const uint32 msChunkID;
+		static const uint16 msChunkVersion;
 	public:
 		/** Constructor.
 		@param name The name of the world, which must be enough to identify the 
@@ -78,6 +81,8 @@ namespace Ogre
 		void load(const String& filename);
 		/// Load world data from a stream
 		void load(const DataStreamPtr& stream);
+		/// Load world data from a serialiser
+		void load(StreamSerialiser& stream);
 		/** Save world data to a file
 		@param filename The name of the file to create
 		@param Archive Optional archive which the filename is relative to
@@ -85,6 +90,8 @@ namespace Ogre
 		void save(const String& filename, Archive* arch = 0);
 		/// Save world data to a stream
 		void save(const DataStreamPtr& stream);
+		/// Save world data to a serialiser
+		void save(StreamSerialiser& stream);
 
 		/** Create a new section of the world.
 		@remarks

@@ -31,9 +31,13 @@ Torus Knot Software Ltd.
 
 #include "OgrePageManager.h"
 #include "OgrePagedWorldSection.h"
+#include "OgreStreamSerialiser.h"
 
 namespace Ogre
 {
+	//---------------------------------------------------------------------
+	const uint32 PagedWorld::msChunkID = StreamSerialiser::makeIdentifier("PWLD");
+	const uint16 PagedWorld::msChunkVersion = 1;
 	//---------------------------------------------------------------------
 	PagedWorld::PagedWorld(const String& name, PageManager* manager)
 		:mName(name), mManager(manager), mSectionNameGenerator("Section")
@@ -84,7 +88,39 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void PagedWorld::load(const DataStreamPtr& stream)
 	{
-		// TODO
+		StreamSerialiser ser(stream);
+		load(ser);
+	}
+	//---------------------------------------------------------------------
+	void PagedWorld::load(StreamSerialiser& ser)
+	{
+		const StreamSerialiser::Chunk* chunk = ser.readChunkBegin();
+		if (chunk->id != msChunkID)
+		{
+			ser.undoReadChunk(chunk->id);
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+				"Stream does not contain PagedWorld data!", 
+				"PagedWorld::load");
+		}
+
+		// Check version
+		if (chunk->version > msChunkVersion)
+		{
+			// skip the rest
+			ser.readChunkEnd(chunk->id);
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+				"PagedWorld data version exceeds what this software can read!", 
+				"PagedWorld::load");
+		}
+
+		// Name
+		ser.read(&mName);
+		// Sections
+		for (SectionMap::iterator i = mSections.begin(); i != mSections.end(); ++i)
+			i->second->load(ser);
+
+		ser.readChunkEnd(msChunkID);
+
 	}
 	//---------------------------------------------------------------------
 	void PagedWorld::save(const String& filename, Archive* arch)
@@ -116,7 +152,21 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void PagedWorld::save(const DataStreamPtr& stream)
 	{
-		// TODO
+		StreamSerialiser ser(stream);
+		save(ser);
+	}
+	//---------------------------------------------------------------------
+	void PagedWorld::save(StreamSerialiser& ser)
+	{
+		ser.writeChunkBegin(msChunkID, msChunkVersion);
+
+		// Name
+		ser.write(&mName);
+		// Sections
+		for (SectionMap::iterator i = mSections.begin(); i != mSections.end(); ++i)
+			i->second->save(ser);
+
+		ser.writeChunkEnd(msChunkID);
 	}
 	//---------------------------------------------------------------------
 	PagedWorldSection* PagedWorld::createSection(const String& strategyName, 

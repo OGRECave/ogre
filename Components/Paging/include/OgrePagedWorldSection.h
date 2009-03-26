@@ -31,7 +31,7 @@ Torus Knot Software Ltd.
 #define __Ogre_PagedWorldSection_H__
 
 #include "OgrePagingPrerequisites.h"
-
+#include "OgreAxisAlignedBox.h"
 
 namespace Ogre
 {
@@ -60,19 +60,51 @@ namespace Ogre
 	{
 	protected:
 		String mName;
+		AxisAlignedBox mAABB;
 		PagedWorld* mParent;
 		PageStrategy* mStrategy;
+		PageStrategyData* mStrategyData;
+
+		static const uint32 msChunkID;
+		static const uint16 msChunkVersion;
+
 	public:
 		/** Construct a new instance, specifying the parent and assigned strategy. */
 		PagedWorldSection(const String& name, PagedWorld* parent, PageStrategy* strategy);
 		virtual ~PagedWorldSection();
 
 		/// Get the name of this section
-		const String& getName() const { return mName; }
+		virtual const String& getName() const { return mName; }
 		/// Get the page strategy which this section is using
-		PageStrategy* getStrategy() const { return mStrategy; }
+		virtual PageStrategy* getStrategy() const { return mStrategy; }
+		/** Change the page strategy.
+		@remarks
+			Doing this will invalidate any pages attached to this world section, and
+			require the PageStrategyData to be repopulated.
+		*/
+		virtual void setStrategy(PageStrategy* strat);
+		/** Change the page strategy.
+		@remarks
+			Doing this will invalidate any pages attached to this world section, and
+			require the PageStrategyData to be repopulated.
+		*/
+		virtual void setStrategy(const String& stratName);
+
 		/// Get the parent world
-		PagedWorld* getWorld() const { return mParent; }
+		virtual PagedWorld* getWorld() const { return mParent; }
+		/// Get the data required by the PageStrategy which is specific to this world section
+		virtual PageStrategyData* getStrategyData() const { return mStrategyData; }
+		/// Set the bounds of this section
+		virtual void setBoundingBox(const AxisAlignedBox& box);
+		/// Get the bounds of this section
+		virtual const AxisAlignedBox& getBoundingBox() const;
+
+
+		/// Load this section from a stream
+		virtual void load(StreamSerialiser& stream);
+		/// Save this section to a stream
+		virtual void save(StreamSerialiser& stream);
+
 
 	};
 

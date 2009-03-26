@@ -45,6 +45,7 @@ namespace Ogre
 	class PagedWorldSection;
 	class PageManager;
 	class PageStrategy;
+	class PageStrategyData;
 
 	typedef GeneralAllocatedObject PageAlloc;
 
