@@ -29,12 +29,18 @@ set(OGRE_WORK_DIR ${OGRE_BINARY_DIR})
 # Set up the basic build environment
 #####################################################################
 
+if (CMAKE_BUILD_TYPE STREQUAL "")
+  # CMake defaults to leaving CMAKE_BUILD_TYPE empty. This screws up
+  # differentiation between debug and release builds.
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose the type of build, options are: None (CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif ()
+
 # determine Ogre version numbers
 include(OgreGetVersion)
 ogre_get_version(${OGRE_SOURCE_DIR}/OgreMain/include/OgrePrerequisites.h)
 message(STATUS "Configuring OGRE ${OGRE_VERSION}")
 
-if (WIN32)
+if (NOT APPLE)
   # Create debug libraries with _d postfix
   set(CMAKE_DEBUG_POSTFIX "_d")
 endif ()

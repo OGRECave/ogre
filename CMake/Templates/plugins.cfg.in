@@ -5,6 +5,7 @@ PluginFolder=@OGRE_PLUGIN_DIR_REL@
 
 # Define plugins
 @OGRE_COMMENT_RENDERSYSTEM_D3D9@ Plugin=RenderSystem_Direct3D9
+@OGRE_COMMENT_RENDERSYSTEM_D3D10@ Plugin=RenderSystem_Direct3D10
 @OGRE_COMMENT_RENDERSYSTEM_GL@ Plugin=RenderSystem_GL
 @OGRE_COMMENT_PLUGIN_PARTICLEFX@ Plugin=Plugin_ParticleFX
 @OGRE_COMMENT_PLUGIN_BSP@ Plugin=Plugin_BSPSceneManager

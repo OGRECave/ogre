@@ -6,7 +6,7 @@ if (WIN32)
   set(OGRE_PLUGIN_PATH "/opt")
 elseif (UNIX)
   set(OGRE_RELEASE_PATH "")
-  set(OGRE_DEBUG_PATH "")
+  set(OGRE_DEBUG_PATH "/debug")
   set(OGRE_PLUGIN_PATH "/OGRE")
 endif ()
 
@@ -46,11 +46,11 @@ function(ogre_config_lib LIBNAME)
   endif (OGRE_STATIC)
   install(TARGETS ${LIBNAME}
     RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" 
-      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None
-    LIBRARY DESTINATION "lib" CONFIGURATIONS Release MinSizeRel RelWithDebInfo None
-    ARCHIVE DESTINATION "lib" CONFIGURATIONS Release MinSizeRel RelWithDebInfo None
+      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
+    LIBRARY DESTINATION "lib" CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
+    ARCHIVE DESTINATION "lib" CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
     FRAMEWORK DESTINATION "bin${OGRE_RELEASE_PATH}" 
-      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None
+      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
   )
   install(TARGETS ${LIBNAME}
     RUNTIME DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS DEBUG
@@ -76,11 +76,11 @@ function(ogre_config_plugin PLUGINNAME)
   endif ()
   install(TARGETS ${PLUGINNAME}
     RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" 
-      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None
+      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
     LIBRARY DESTINATION "lib${OGRE_PLUGIN_PATH}" 
-      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None
+      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
     ARCHIVE DESTINATION "lib${OGRE_PLUGIN_PATH}" 
-      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None
+      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
   )
   install(TARGETS ${PLUGINNAME}
     RUNTIME DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS DEBUG
