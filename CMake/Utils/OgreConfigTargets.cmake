@@ -92,6 +92,14 @@ endfunction(ogre_config_plugin)
 # setup Ogre demo build
 function(ogre_config_sample SAMPLENAME)
   ogre_config_common(${SAMPLENAME})
+
+  # set install RPATH for Unix systems
+  if (UNIX AND OGRE_FULL_RPATH)
+    set_property(TARGET ${SAMPLENAME} APPEND PROPERTY
+      INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+    set_property(TARGET ${SAMPLENAME} PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
+  endif ()
+
   if (OGRE_INSTALL_SAMPLES)
     install(TARGETS ${SAMPLENAME}
       RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" 

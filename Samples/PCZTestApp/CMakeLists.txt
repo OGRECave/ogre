@@ -13,7 +13,7 @@ add_executable(Demo_PCZTestApp WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_
 target_link_libraries(Demo_PCZTestApp ${OGRE_LIBRARIES} ${OGRE_PCZ_LIBRARIES} ${OGRE_PCZ_OCTREE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample(Demo_PCZTestApp)
 # need to include plugins directory in RPATH for the demo to be able to find the PCZ libs
-set_target_properties(Demo_PCZTestApp PROPERTIES
+set_property(TARGET Demo_PCZTestApp APPEND PROPERTY
   INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/OGRE
 )
 

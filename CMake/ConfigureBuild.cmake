@@ -63,10 +63,9 @@ if (OGRE_STATIC)
 endif()
 add_definitions(-DHAVE_OGRE_BUILDSETTINGS_H)
 
-# determine system endianess
-include(TestBigEndian)
-test_big_endian(OGRE_CONFIG_BIG_ENDIAN)
-if (NOT OGRE_CONFIG_BIG_ENDIAN)
+if (OGRE_TEST_BIG_ENDIAN)
+  set(OGRE_CONFIG_BIG_ENDIAN 1)
+else ()
   set(OGRE_CONFIG_LITTLE_ENDIAN 1)
 endif ()
 

@@ -69,6 +69,10 @@ if (CMAKE_COMPILER_IS_GNUCXX)
   endif (OGRE_GCC_VISIBILITY)
 endif (CMAKE_COMPILER_IS_GNUCXX)
 
+# determine system endianess
+include(TestBigEndian)
+test_big_endian(OGRE_TEST_BIG_ENDIAN)
+
 # Add OgreMain include path
 include_directories("${OGRE_SOURCE_DIR}/OgreMain/include")
 include_directories("${OGRE_BINARY_DIR}/include")
@@ -144,6 +148,7 @@ option(OGRE_INSTALL_SAMPLES "Install Ogre demos." FALSE)
 option(OGRE_INSTALL_DOCS "Install documentation." FALSE)
 option(OGRE_INSTALL_MEDIA "Install media files." FALSE)
 option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE)
+option(OGRE_FULL_RPATH "Build executables with the full required RPATH to run from their install location." FALSE)
 
 
 
