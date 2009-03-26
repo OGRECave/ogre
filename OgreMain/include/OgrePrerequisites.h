@@ -361,6 +361,7 @@ namespace Ogre {
     class Sphere;
     class SphereSceneQuery;
 	class StaticGeometry;
+	class StreamSerialiser;
     class StringConverter;
     class StringInterface;
     class SubEntity;

@@ -95,9 +95,9 @@ namespace Ogre
 			uint32 id;
 			/// Version of the chunk (stored)
 			uint16 version;
-			/// Length of the chunk in bytes (stored)
+			/// Length of the chunk data in bytes, excluding the header of this chunk (stored)
 			uint32 length;
-			/// Location of the chunk in bytes from the start of a stream (derived)
+			/// Location of the chunk (header) in bytes from the start of a stream (derived)
 			uint32 offset;
 
 			Chunk() : id(0), version(1), length(0), offset(0) {}
@@ -180,6 +180,17 @@ namespace Ogre
 		@returns The Chunk that comes next
 		*/
 		virtual const Chunk* readChunkBegin();
+
+		/** Call this to 'rewind' the stream to just before the start of the current
+			chunk. 
+		@remarks
+			The most common case of wanting to use this is if you'd calledReadChunkBegin(), 
+			but the chunk you read wasn't one you wanted to process, and rather than
+			skipping over it (which readChunkEnd() would do), you want to backtrack
+			and give something else an opportunity to read it. 
+		@param id The id of the chunk that you were reading (for validation purposes)
+		*/
+		virtual void undoReadChunk(uint32 id);
 
 		/** Finish the reading of a chunk.
 		@remarks

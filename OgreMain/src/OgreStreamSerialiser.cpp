@@ -133,6 +133,18 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void StreamSerialiser::undoReadChunk(uint32 id)
+	{
+		Chunk* c = popChunk(id);
+
+		checkStream();
+
+		mStream->seek(c->offset);
+
+		OGRE_DELETE c;
+
+	}
+	//---------------------------------------------------------------------
 	void StreamSerialiser::readChunkEnd(uint32 id)
 	{
 		Chunk* c = popChunk(id);
@@ -142,8 +154,8 @@ namespace Ogre
 		// skip to the end of the chunk if we were not there already
 		// this lets us quite reading a chunk anywhere and have the read marker
 		// automatically skip to the next one
-		if (mStream->tell() < (c->offset + c->length))
-			mStream->seek(c->offset + c->length);
+		if (mStream->tell() < (c->offset + CHUNK_HEADER_SIZE + c->length))
+			mStream->seek(c->offset + CHUNK_HEADER_SIZE + c->length);
 
 		OGRE_DELETE c;
 	}
