@@ -162,22 +162,6 @@ namespace Ogre
 		/// Get the expected type code for a given value
 		template<typename T>
 		static PropertyType getTypeForValue(const T& val) { return PROP_UNKNOWN; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const short& val) { return PROP_SHORT; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const unsigned short& val) { return PROP_UNSIGNED_SHORT; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const int& val) { return PROP_INT; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const unsigned int& val) { return PROP_UNSIGNED_INT; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const long& val) { return PROP_LONG; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const unsigned long& val) { return PROP_UNSIGNED_LONG; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const Real& val) { return PROP_REAL; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const String& val) { return PROP_STRING; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const Vector2& val) { return PROP_VECTOR2; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const Vector3& val) { return PROP_VECTOR3; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const Vector4& val) { return PROP_VECTOR4; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const ColourValue& val) { return PROP_COLOUR; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const bool& val) { return PROP_BOOL; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const Quaternion& val) { return PROP_QUATERNION; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const Matrix3& val) { return PROP_MATRIX3; }
-		template<> static PropertyType PropertyDef::getTypeForValue(const Matrix4& val) { return PROP_MATRIX4; }
 
 	protected:
 		// no default construction
@@ -188,6 +172,23 @@ namespace Ogre
 		PropertyType mType;
 
 	};
+
+  template<> PropertyType PropertyDef::getTypeForValue(const short& val) { return PROP_SHORT; }
+  template<> PropertyType PropertyDef::getTypeForValue(const unsigned short& val) { return PROP_UNSIGNED_SHORT; }
+  template<> PropertyType PropertyDef::getTypeForValue(const int& val) { return PROP_INT; }
+  template<> PropertyType PropertyDef::getTypeForValue(const unsigned int& val) { return PROP_UNSIGNED_INT; }
+  template<> PropertyType PropertyDef::getTypeForValue(const long& val) { return PROP_LONG; }
+  template<> PropertyType PropertyDef::getTypeForValue(const unsigned long& val) { return PROP_UNSIGNED_LONG; }
+  template<> PropertyType PropertyDef::getTypeForValue(const Real& val) { return PROP_REAL; }
+  template<> PropertyType PropertyDef::getTypeForValue(const String& val) { return PROP_STRING; }
+  template<> PropertyType PropertyDef::getTypeForValue(const Vector2& val) { return PROP_VECTOR2; }
+  template<> PropertyType PropertyDef::getTypeForValue(const Vector3& val) { return PROP_VECTOR3; }
+  template<> PropertyType PropertyDef::getTypeForValue(const Vector4& val) { return PROP_VECTOR4; }
+  template<> PropertyType PropertyDef::getTypeForValue(const ColourValue& val) { return PROP_COLOUR; }
+  template<> PropertyType PropertyDef::getTypeForValue(const bool& val) { return PROP_BOOL; }
+  template<> PropertyType PropertyDef::getTypeForValue(const Quaternion& val) { return PROP_QUATERNION; }
+  template<> PropertyType PropertyDef::getTypeForValue(const Matrix3& val) { return PROP_MATRIX3; }
+  template<> PropertyType PropertyDef::getTypeForValue(const Matrix4& val) { return PROP_MATRIX4; }
 
 	/// Map from property name to shared definition
 	typedef map<String, PropertyDef>::type PropertyDefMap;
