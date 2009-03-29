@@ -8,6 +8,10 @@ set(SOURCE_FILES
 	src/AnimationBlender.cpp
 	src/WindowEmbedding.cpp)
 
+if (APPLE)
+  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} IOKit)
+endif ()
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/Samples/Common/include)
 add_executable(PlayPen WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )

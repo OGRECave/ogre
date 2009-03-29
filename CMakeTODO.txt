@@ -1,12 +1,10 @@
 TODO
 ====
 
-Essential before switch-on as primary system
-
 * Establish 3rd-party library build procedure
   * For projects using CMake: Need to enhance/finish the FindOGRE and OGREConfig scripts
   * For projects not using CMake: Probably little changes, but examples would still be good
-* Test Code::Blocks / MinGW
+* Delete native Code::Blocks / MinGW
 
 
 To be done after switch-over
@@ -15,16 +13,13 @@ To be done after switch-over
 * Pregenerating project files for source packages (& SDK's) - absolute paths will break this, can we use relative dirs?
 * GLES project
 * OS X
-  * Ogre framework is building, plugins and samples still need looking at
+  * Plugins are all dylibs now rather than bundles. Keep that way, since universal binaries are not necessarily required? Can do separate ppc and i386 builds with CMake anyway
+  * Everything is building, but runtime layout is not configured yet
 * CPack
   * Investigate .deb, .rpm packages for Linux
 
-OGRE CHANGES ONCE LIVE
-======================
-
-- Docs/src/html.cfg is no longer necessary as it is generated from CMakeTemplates/html.cfg.in
-- New dependencies packages needed:
-  - Remove Dependencies/CMakeLists.txt from OGRE source tree. This file should be provided by
+* New dependencies packages needed:
+  * Remove Dependencies/CMakeLists.txt from OGRE source tree. This file should be provided by
     the pre-built dependencies package 
-  - Place DLLs in Dependencies/bin instead of Samples/Common/bin, since the latter is no longer in use
+  * Place DLLs in Dependencies/bin instead of Samples/Common/bin, since the latter is no longer in use
 
