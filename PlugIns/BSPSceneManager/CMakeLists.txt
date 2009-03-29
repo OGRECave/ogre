@@ -38,4 +38,8 @@ if (NOT OGRE_STATIC)
   ) 
 endif ()
 
+if (OGRE_INSTALL_PLUGINS_HEADERS)
+  install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/BSPSceneManager)
+endif ()
+
 ogre_config_plugin(Plugin_BSPSceneManager)

@@ -30,6 +30,6 @@ ENDIF (NOT OGRE_STATIC)
 
 ogre_config_lib(CEGUIOgreRenderer)
 install(FILES ${HEADER_FILES}
-  DESTINATION include/OGRE
+  DESTINATION include/OGRE/CEGUIRenderer
 )
 

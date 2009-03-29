@@ -52,4 +52,4 @@ if (NOT OGRE_STATIC)
 endif ()
 
 ogre_config_plugin(Plugin_PCZSceneManager)
-install(FILES ${HEADER_FILES} DESTINATION include/OGRE/PCZ)
+install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/PCZSceneManager)

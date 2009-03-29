@@ -44,3 +44,7 @@ if (NOT OGRE_STATIC)
 endif ()
 
 ogre_config_plugin(Plugin_OctreeSceneManager)
+if (OGRE_INSTALL_PLUGINS_HEADERS)
+  install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/OctreeSceneManager)
+endif ()
+

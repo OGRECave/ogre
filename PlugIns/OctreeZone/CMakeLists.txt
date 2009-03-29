@@ -47,4 +47,4 @@ if (UNIX)
 endif ()
 
 ogre_config_plugin(Plugin_OctreeZone)
-install(FILES ${HEADER_FILES} DESTINATION include/OGRE/PCZ)
+install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/OctreeZone)

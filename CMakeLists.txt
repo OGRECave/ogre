@@ -150,6 +150,7 @@ cmake_dependent_option(OGRE_CONFIG_DISABLE_FREEIMAGE "Don't build FreeImage code
 option(OGRE_CONFIG_DISABLE_DDS "Don't build DDS codec." FALSE)
 option(OGRE_CONFIG_NEW_COMPILERS "Use the new script compilers." TRUE)
 # Customise what to install
+option(OGRE_INSTALL_PLUGINS_HEADERS "Install header files for Ogre plugins." FALSE)
 option(OGRE_INSTALL_SAMPLES "Install Ogre demos." FALSE)
 option(OGRE_INSTALL_DOCS "Install documentation." FALSE)
 option(OGRE_INSTALL_MEDIA "Install media files." FALSE)
