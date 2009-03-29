@@ -34,7 +34,7 @@ Torus Knot Software Ltd.
 namespace Ogre
 {
 	/** Class for displaying the error dialog if Ogre fails badly. */
-	class ErrorDialog
+	class _OgreExport ErrorDialog
 	{
 	public:
 		ErrorDialog();

@@ -283,7 +283,7 @@ protected:
 		sm->indexData->indexBuffer = HardwareBufferManager::getSingleton()
 			.createIndexBuffer(HardwareIndexBuffer::IT_16BIT, 6*3,
 				HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-		uint16* pI = static_cast<uint16*>(
+		Ogre::uint16* pI = static_cast<Ogre::uint16*>(
 			sm->indexData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 		for (i = 0; i < 3; ++i)
 		{

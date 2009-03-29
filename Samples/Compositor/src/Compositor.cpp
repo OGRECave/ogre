@@ -542,7 +542,7 @@ void CompositorDemo::createViewports(void)
 		HardwarePixelBufferSharedPtr ptr = tex->getBuffer(0,0);
 		ptr->lock(HardwareBuffer::HBL_DISCARD);
 		const PixelBox &pb = ptr->getCurrentLock();
-		uint8 *data = static_cast<uint8*>(pb.data);
+		Ogre::uint8 *data = static_cast<Ogre::uint8*>(pb.data);
 
 		size_t height = pb.getHeight();
 		size_t width = pb.getWidth();
@@ -582,7 +582,7 @@ void CompositorDemo::createViewports(void)
 		HardwarePixelBufferSharedPtr ptr2 = tex2->getBuffer(0,0);
 		ptr2->lock(HardwareBuffer::HBL_DISCARD);
 		const PixelBox &pb2 = ptr2->getCurrentLock();
-		uint8 *data2 = static_cast<uint8*>(pb2.data);
+		Ogre::uint8 *data2 = static_cast<Ogre::uint8*>(pb2.data);
 		
 		size_t height2 = pb2.getHeight();
 		size_t width2 = pb2.getWidth();

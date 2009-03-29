@@ -19,7 +19,7 @@ TexturePtr ptex;
 HardwarePixelBufferSharedPtr buffer;
 Overlay* overlay;
 static const int reactorExtent = 130; // must be 2^N + 2
-uint32 clut[1024];
+Ogre::uint32 clut[1024];
 AnimationState *swim;
 // Nano fixed point library
 #define FROMFLOAT(X) ((int)((X)*((float)(1<<16))))
@@ -197,7 +197,7 @@ public:
 		const PixelBox &pb = buffer->getCurrentLock();
 		unsigned int idx = reactorExtent+1;
 		for(unsigned int y=0; y<(reactorExtent-2); y++) {
-			uint32 *data = static_cast<uint32*>(pb.data) + y*pb.rowPitch;
+			Ogre::uint32 *data = static_cast<Ogre::uint32*>(pb.data) + y*pb.rowPitch;
 			int *chem = &chemical[0][idx];
 			for(unsigned int x=0; x<(reactorExtent-2); x++) {
 				data[x] = clut[(chem[x]>>6)&1023];

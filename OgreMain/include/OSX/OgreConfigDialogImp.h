@@ -9,7 +9,7 @@
 
 namespace Ogre
 {
-	class ConfigDialog : public UtilityAlloc
+	class _OgreExport ConfigDialog : public UtilityAlloc
 	{
 	public:
 		ConfigDialog();

@@ -117,7 +117,6 @@ macro_log_feature(CEGUI_FOUND "CEGUI" "GUI system used for some of the samples" 
 find_package(OIS)
 macro_log_feature(OIS_FOUND "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
 
-
 #######################################################################
 # Tools
 #######################################################################
@@ -141,6 +140,9 @@ if (APPLE)
 
   find_package(Cocoa)
   macro_log_feature(Cocoa_FOUND "Cocoa" "Cocoa" "http://www.apple.com" TRUE "" "")
+
+  find_package(IOKit)
+  macro_log_feature(IOKit_FOUND "IOKit" "IOKit HID framework needed by the samples" "http://www.apple.com" FALSE "" "")
 endif(APPLE)
 
 # Display results, terminate if anything required is missing
