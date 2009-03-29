@@ -111,3 +111,24 @@ function(ogre_config_sample SAMPLENAME)
   endif ()	
 endfunction(ogre_config_sample)
 
+# setup Ogre tool build
+function(ogre_config_tool TOOLNAME)
+  ogre_config_common(${TOOLNAME})
+
+  # set install RPATH for Unix systems
+  if (UNIX AND OGRE_FULL_RPATH)
+    set_property(TARGET ${TOOLNAME} APPEND PROPERTY
+      INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+    set_property(TARGET ${TOOLNAME} PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
+  endif ()
+
+  if (OGRE_INSTALL_TOOLS)
+    install(TARGETS ${TOOLNAME}
+      RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" 
+        CONFIGURATIONS Release MinSizeRel RelWithDebInfo None OPTIONAL
+    )
+    install(TARGETS ${TOOLNAME}
+      RUNTIME DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS Debug OPTIONAL
+    )
+  endif ()	
+endfunction(ogre_config_tool)

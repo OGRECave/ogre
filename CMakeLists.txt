@@ -152,6 +152,7 @@ option(OGRE_CONFIG_NEW_COMPILERS "Use the new script compilers." TRUE)
 # Customise what to install
 option(OGRE_INSTALL_PLUGINS_HEADERS "Install header files for Ogre plugins." FALSE)
 option(OGRE_INSTALL_SAMPLES "Install Ogre demos." FALSE)
+option(OGRE_INSTALL_TOOLS "Install Ogre tools." TRUE)
 option(OGRE_INSTALL_DOCS "Install documentation." FALSE)
 option(OGRE_INSTALL_MEDIA "Install media files." FALSE)
 option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE)

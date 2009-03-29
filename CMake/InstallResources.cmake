@@ -65,31 +65,24 @@ configure_file(${OGRE_TEMPLATES_DIR}/quake3settings_d.cfg.in ${OGRE_BINARY_DIR}/
 configure_file(${OGRE_TEMPLATES_DIR}/quake3settings.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/quake3settings.cfg)
 
 # install resource files
-install(FILES 
-  ${OGRE_BINARY_DIR}/inst/bin/debug/resources.cfg
-  ${OGRE_BINARY_DIR}/inst/bin/debug/plugins.cfg
-  ${OGRE_BINARY_DIR}/inst/bin/debug/media.cfg
-  ${OGRE_BINARY_DIR}/inst/bin/debug/quake3settings.cfg
-  DESTINATION "bin${OGRE_DEBUG_PATH}"
-  CONFIGURATIONS Debug
-)
-install(FILES 
-  ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
-  ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
-  ${OGRE_BINARY_DIR}/inst/bin/release/media.cfg
-  ${OGRE_BINARY_DIR}/inst/bin/release/quake3settings.cfg
-  DESTINATION "bin${OGRE_RELEASE_PATH}"
-  CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
-)
-#if (UNIX AND CMAKE_BUILD_TYPE STREQUAL "")
-#  install(FILES 
-#    ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
-#    ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
-#    ${OGRE_BINARY_DIR}/inst/bin/release/media.cfg
-#    ${OGRE_BINARY_DIR}/inst/bin/release/quake3settings.cfg
-#    DESTINATION "bin${OGRE_RELEASE_PATH}"
-#  )
-#endif()
+if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_TOOLS)
+  install(FILES 
+    ${OGRE_BINARY_DIR}/inst/bin/debug/resources.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/debug/plugins.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/debug/media.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/debug/quake3settings.cfg
+    DESTINATION "bin${OGRE_DEBUG_PATH}"
+    CONFIGURATIONS Debug
+  )
+  install(FILES 
+    ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/media.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/quake3settings.cfg
+    DESTINATION "bin${OGRE_RELEASE_PATH}"
+    CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
+  )
+endif ()
 
 
 # CREATE CONFIG FILES - BUILD DIR VERSIONS
