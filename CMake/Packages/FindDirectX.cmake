@@ -46,5 +46,16 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
   #message("DirectX_INCLUDE_DIR=${DirectX_INCLUDE_DIR}")
   #message("DirectX_LIBRARY=${DirectX_LIBRARY}")
   #message("DirectX_ROOT_DIR=${DirectX_ROOT_DIR}")
+  
+  # look for D3D10.1 components
+  if (DirectX_FOUND)
+    find_path(DirectX_D3D10_INCLUDE_DIR NAMES d3d10_1shader.h HINTS ${DirectX_INCLUDE_DIR})
+	find_library(DirectX_D3D10_LIBRARY NAMES d3d10 HINTS ${DirectX_LIBRARY_PATHS} NO_DEFAULT_PATH)
+	if (DirectX_D3D10_INCLUDE_DIR AND DirectX_D3D10_LIBRARY)
+	  set(DirectX_D3D10_FOUND TRUE)
+	  set(DirectX_D3D10_INCLUDE_DIRS ${DirectX_D3D10_INCLUDE_DIR})
+	  set(DirectX_D3D10_LIBRARIES ${DirectX_D3D10_LIBRARY})
+	endif ()
+  endif ()
 
 endif(WIN32)
