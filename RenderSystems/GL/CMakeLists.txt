@@ -143,6 +143,43 @@ if (WIN32)
   source_group(NVparse FILES ${NVPARSE_FILES})
   source_group(ATIFS FILES ${ATIFS_FILES})
   source_group(GLSL FILES ${GLSL_FILES})
+elseif (APPLE)
+#  set(PLATFORM_HEADER_FILES
+  set(PLATFORM_FILES
+    include/OSX/OgreOSXCGLContext.h
+    include/OSX/OgreOSXCarbonContext.h
+    include/OSX/OgreOSXCarbonWindow.h
+    include/OSX/OgreOSXCocoaContext.h
+    include/OSX/OgreOSXCocoaWindow.h
+    include/OSX/OgreOSXContext.h
+    include/OSX/OgreOSXGLSupport.h
+    include/OSX/OgreOSXRenderTexture.h
+    include/OSX/OgreOSXWindow.h
+    src/OSX/OgreGLUtil.h
+    # think about relocating these
+    #${CMAKE_SOURCE_DIR}/Mac/Ogre/include/macBundlePath.h
+    #${CMAKE_SOURCE_DIR}/Mac/Ogre/include/macPlugins.h
+    #${CMAKE_SOURCE_DIR}/Mac/Ogre/include/OgreOSXCocoaView.h
+#  )
+#  set(PLATFORM_SOURCE_FILES
+    src/OSX/OgreOSXCarbonContext.cpp
+    src/OSX/OgreOSXCocoaContext.mm
+    src/OSX/OgreOSXContext.cpp
+    src/OSX/OgreOSXRenderTexture.cpp
+    src/OSX/OgreOSXCGLContext.cpp
+    src/OSX/OgreOSXCarbonWindow.cpp
+    src/OSX/OgreOSXCocoaWindow.mm
+    src/OSX/OgreOSXGLSupport.mm
+    src/OSX/OgreOSXWindow.cpp
+    # think about relocating these
+    #${CMAKE_SOURCE_DIR}/Mac/Ogre/src/macBundlePath.cpp
+    #${CMAKE_SOURCE_DIR}/Mac/Ogre/src/macPlugins.cpp
+    #${CMAKE_SOURCE_DIR}/Mac/Ogre/src/OgreOSXCocoaView.mm
+  )
+  include_directories(src/OSX include/OSX)
+  include_directories("${CMAKE_SOURCE_DIR}/Mac/Ogre/include")
+  set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
+  set(PLATFORM_HEADER_INSTALL "OSX")
 elseif (UNIX)
   set(PLATFORM_FILES 
     include/GLX/OgreGLXContext.h
@@ -157,7 +194,6 @@ elseif (UNIX)
     src/GLX/OgreGLXWindow.cpp
   )
   include_directories(src/GLX include/GLX)
-elseif (APPLE)
 endif ()
 
 

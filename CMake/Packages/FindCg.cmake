@@ -10,6 +10,7 @@
 # 
 
 # On OSX default to using the framework version of Cg.
+include(OgreFindFrameworks)
 
 IF (APPLE)
   SET(Cg_FRAMEWORK_INCLUDES)

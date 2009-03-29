@@ -1,9 +1,9 @@
 #ifndef __OSXConfigDialog_H__
 #define __OSXConfigDialog_H__
 
-#include <Ogre/OgrePrerequisites.h>
-#include <Ogre/OgreRoot.h>
-#include <Ogre/OgreRenderSystem.h>
+#include "OgrePrerequisites.h"
+#include "OgreRoot.h"
+#include "OgreRenderSystem.h"
 
 #include <Carbon/Carbon.h>
 

@@ -30,6 +30,7 @@ Torus Knot Software Ltd.
 #ifndef __OSXWindow_H__
 #define __OSXWindow_H__
 
+#include <Carbon/Carbon.h>
 #include "OgreRenderWindow.h"
 #include "OgreOSXContext.h"
 #include <OpenGL/OpenGL.h>

@@ -1,4 +1,7 @@
 # Configure Octree SceneManager build
+if (APPLE)
+  include_directories("${CMAKE_SOURCE_DIR}/Mac/Ogre/include")
+endif()
 
 set (HEADER_FILES
   include/OgreCEGUIRenderer.h
