@@ -1,106 +1,217 @@
 AUTHORS
 =======
+OGRE was originally created by Steve Streeting (sinbad), but many other developers have contributed to the project over the years. 
 
-OGRE Team 
----------
-Steve Streeting	(sinbad)              
-Thomas Muldowney (temas)
-James O'Sullivan (_mental_)
-Wladimir J. van der Laan (miathan6/wumpus)
+The full list of contributors is:
 
-Feature Contributors
---------------------
-The following list includes developers who have contributed features to OGRE:
-
-Contributor                             Subject Areas 
------------                             --------------------------------------
-Adrian Cearnau (cearny)               : Codecs, dynamic library loading
-Jon Anderson (janders)                : octree plugin
-Martin Persson                        : Nature plugin
-Jesse Rusak (jder) 	  				  : Mac OSX port
-Etienne Mallard (earthquakeproof)	  : 3D Studio Model Exporter
-Banania								  : ditto
-Paolo Gavocanov (cTh) 				  : Initial D3D9 port, Meshviewer, 
-                                        3D Studio Scene Exporter
-Ivica Aracic (macross/bytelord)       : Ogre4J, Maya exporter, .scene format
-Jeff Leigh							  : Sky enhancements, debug overlay
-Jose A Milan (jamilan/spoke)          : Paging landscape plugin
-Tuan Kuranes (kuranes)                : ditto
-Stephan Kaiser (psyclonist)           : OgreFsrad, OgreLMTS, .scene format
-Philippe Culet                        : Attaching objects to bones
-Jon L. Griffeth (silent3)             : GUI enhancements
-Dan Sonnemann (oberleutnantdan)       : Timers
-Amit Mathew                           : Profiler
-Dennis Verbeek                        : Lightwave exporter
-David Whittaker                       : Displacement mapping terrain
-Chris Groskopf (staringmonkey)        : OgreTok
-Jeff Doyle (nfz)                      : ATI_fragment_shader compiler, 
-                                        paging landscape
-Patrick Kooman                        : Overlay editor
-Doug Wolanick (icetec)                : DotSceneOctree exporter & plugin
-John Van Vliet (granite/fifty1)       : Maya exporter
-Marcin Zukowski (eru)                 : Demo_CubeMapping and Demo_Water
-Jens Hoffmann                         : Blender exporter
-Michael Reimpell                      : Blender exporter
-Sam le Pirate                         : BMP support
-Attila Tajti (attis)                  : Wings3D exporter
-? (Firestorm)                         : Particle scale and rotate affectors
-Lee Sandberg                          : Hardware occlusion query support
-Phillip Castaneda (pjcast)            : External texture sources / dynamic
-										textures
-Henry Goffin (qsilver)				  : Ultra-fast scaling code in 
-										OgreImageResampler.h
-Federico Di Gregorio (fog)			  : Debian packaging
-
-Others
-------
-The following people have been notable in their support of OGRE through the
-fixing of bugs, testing patches, and various other miscellaneous contributions:
-
-Timo Keller (norondion) 
-Kai-Peter Backman
-Daniel Wessl?n
-Benny Kramek (wolfman8k) 
-Riku Nurminen (rakkis)
-Christopher John Gilbert (thegilb)
-Martin Pollard (xmp)
-Nikita Mikros (santanopoulos)
-Chris Heald (antiarc)
-Michael Casaday
-Evgeni Popov
-Chris McGuirk (leedgitar)
-Te'ja (thiveertm)
-Keith Jackson
-G Nikolakis
-Genva
-Christian Lindequist Larsen (DWORD)
-Chris Heald (Antiarc)
-Green Eyed Monster (monster)
-
-
-
-
-If we've forgotten you in the above list, please contact us!
-
-See Readme.html in the Docs folder for more details, in particular information on the media supplied with the demos.
-
------
-
-Copyright 1999-2004 The OGRE Team.
-
-This file is part of OGRE (Object-Oriented Graphics Rendering Engine).
-
-OGRE is free software; you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
-
-OGRE is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with OGRE; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.
+James O'Sullivan ( _mental_ ) 
+Harald Achitz ( a4z ) 
+Chris Kohnert ( aeyr ) 
+Ahmed Ismaiel Zakaria ( ahmedali ) 
+Allan Jaenicke
+Laboureur Frederic ( alphasnd ) 
+Amit Mathew ( amitmathew ) 
+Andrew Patzwald ( amp44x ) 
+Andrew Fenn ( Zeaus ) 
+Andy Miller ( andy_miller ) 
+Andrew Zabolotny ( andyz ) 
+Ferdinand Joseph Fernandez ( anomalous underdog ) 
+Antony Suter ( Bontakun ) 
+Artem Baguinski ( artm ) 
+Zdeno Miklas ( ashid ) 
+Assaf Raman 
+Jason Assalita ( avengre ) 
+Manuel Alvarez ( bananiafr ) 
+William V. Baxter III  ( baxissimo ) 
+Bruno Crivelari Sanches ( bcsanchez ) 
+Argiris Kirtzidis ( Bekas ) 
+Brian Johnstone ( bjj1478 / Praetor ) 
+Avery Fay ( btmorex ) 
+Ivica Aracic ( bytelord ) 
+Tim Kelsey ( c4llidus ) 
+Holger Frydrych ( cabalistic ) 
+Adrian Cearnau ( cearny ) 
+Andres Mejia ( ceros ) 
+Chetan Deshpande ( ChetanDeshpande ) 
+Christian Southgate ( chrid ) 
+Christian Boutin ( christianboutin ) 
+Christian Lindequist Larsen ( dword ) 
+Luc Claustres ( claustre ) 
+Heikki Törmälä ( cmayhem ) 
+Mark Thomas ( Codetick / TMT ) 
+Greg Junker ( Xavier / cos_xavier ) 
+François Bruneau ( cottonbelly ) 
+Jean-Baptiste Griffo ( crashy ) 
+Paul Turner ( Crayzed / crazyeddie ) 
+Paolo Gavocanov ( cthno1 ) 
+Philippe Culet ( cuinl ) 
+Daniel Andersson ( d_mon ) 
+Damien Gerhardy ( gerds ) 
+Daniel Horn  ( danielrh ) 
+David Durant ( ddurant ) 
+Dennis Verbeek ( dennisverbeek ) 
+Doraisamy Ganeshkumar ( dganesh ) 
+David Guy ( dguy ) 
+Dmitry Yunchik ( DimA ) 
+Doug Wolanick
+Fred Guignot ( dropfred ) 
+Etienne Mallard ( earthquakeproof ) 
+Ethan Tira-Thompson ( ejtttje ) 
+Erik Karulf ( ekarulf ) 
+Eric Tulla ( Emtulla / ChocoboInbreeder ) 
+Eric Cha ( Xenopi / Chaster ) 
+Erik Hjortsberg ( erikhjortsberg ) 
+Erik Schack Andersen ( eschack ) 
+Evgeni Popov ( evpopov ) 
+Evgeny A. Marchenko ( mentor / evgeni_m ) 
+Alexander Folomeyv ( falek_sf ) 
+Wael El Oraiby  ( farakon ) 
+Chris Robinson ( fatpwnage ) 
+Felix Bellaby ( felix_bellaby ) 
+Francesco Giordana ( fgiordana ) 
+Matthew Reid ( foxbat ) 
+Jiang Anxiong Jeffrey ( gamedboy ) 
+JianHua Xie ( genva ) 
+Gaylord Foureau ( gforeau ) 
+Gabriel Gambetta ( ggambett ) 
+Robert Noll ( ghoulsblade ) 
+Andrzej Giniewicz ( giniu ) 
+Guillaume Laforte ( glaforte ) 
+Gonen Beneish ( gonenb ) 
+John Van Vliet ( granite ) 
+Graham Scott Rhodes ( grhodes ) 
+Matthias Fink ( gs2x ) 
+Guillaume Buisson ( gustav ) 
+Andrzej Haczewski ( guyver6 ) 
+Daniel Wickert ( haffax ) 
+Daniel Horn ( hellcatv ) 
+David Longacre ( hexidave ) 
+Hidehiro Kuroda ( jagoon ) 
+Brian Hudson ( hudson_b ) 
+Qu shiwei ( iloseall ) 
+Sean Lindskog ( Jabberwocky ) 
+James D. Trotter ( jamesdt ) 
+Jose Antonio Milan Perez ( jamilan / spoke ) 
+Jonathan Anderson ( janders ) 
+Jason K. O'Brien
+James Covington ( jaymzjc ) 
+Jay Sprenkle
+Jesse Rusak ( jder ) 
+James Le Cuirot ( jerseychewi / Chewi ) 
+John Bartholomew ( johnb213 ) 
+Jorrit de Vries ( jorrit5477 ) 
+Josh Flowers
+Jules Robichaud Gagnon ( jules_robichaud ) 
+Juozas Gaigalas ( juozasg ) 
+Justin Walsh ( JustinWalsh ) 
+Jon Watte ( jwatte ) 
+Kai-Peter Bäckman ( kai-peter ) 
+Kai Blin
+Andreas Olov Stenius ( kaos_explosive ) 
+Matt Williams ( kardoon ) 
+Kevin J Bluck ( kbluck ) 
+Jesús Alonso Abad ( kencho ) 
+Urs Hanselmann ( kickin_bear / noisydev ) 
+Joël Lamotte ( Klaim ) 
+Koen Kooi
+Paul Cheyrou-lagrèze ( tuan kuranes ) 
+Lakin Wecker
+Chris McGuirk ( leedgitar ) 
+Lee Sandberg ( leesandberg ) 
+Pang Lih-Hern ( Lf3T-Hn4D ) 
+Leon Glass ( lglass ) 
+Andres Carrera ( lioric ) 
+Stefan Josua Walter ( Llarlen ) 
+Lois Desplat ( Lodes ) 
+Christopher Bowen ( lostera ) 
+Mathieu Le Ber ( m_leber ) 
+Martin Correll ( mac99 ) 
+Konrad Koch ( mad366 ) 
+Manuel García Rodríguez ( manuel_gr ) 
+Mattan Furst ( mattan_f ) 
+Alex Man ( mcspy0312 ) 
+Mika Halttunen ( mh ) 
+Michaël Broutin ( mikachu59 ) 
+Michael Dilger ( mikedilger ) 
+Nikita Buida ( mj / mj_sf ) 
+Jacobus Izak Van Aarde Krynauw ( nanocell ) 
+Nathan M. Hanish
+Nathan Walker
+Derek Nedelman ( nedelman ) 
+Jeff Doyle ( nfz ) 
+Jason Wagner ( nialscorva ) 
+Nicholas Molton
+Nils Schneider
+Nir Hasson
+Noam Gat ( Noman ) 
+Vincent Vivanloc ( nop / nopnopzero ) 
+Pau Novau Lebrato ( novaumas ) 
+Amit Bleiweiss ( omekinteractive ) 
+Michael Williamson ( ozwally ) 
+Paul Fenwick ( paulwf ) 
+Pavel Vorobealov ( pavor ) 
+Hamilton Chong ( peridexion ) 
+Peter Newman ( PeterNewman / wizarth ) 
+Pierre Morcello ( pierre_m ) 
+Phillip J. Castaneda ( pjcast ) 
+Phil McLachlan
+Peter Miller ( pmiller ) 
+Ciaran Gultnieks ( poisoned ) 
+Sascha Bosecker ( poldi-49152 ) 
+Poojan Prabhu ( poojan_prabhu / jimmemalone ) 
+Quentin Froemke ( qfroemke / qtf ) 
+Henry Goffin ( qsilver ) 
+Stéphane Bessette ( rackle ) 
+Matt Rice ( ratmice ) 
+Bora Utku ( Red5_StandingBy ) 
+Michael Reimpell ( reimpell ) 
+Renato Araujo Oliveira Filho ( renatofilho ) 
+Rune Myrland ( rmy ) 
+Robin Bourianes ( robin_onesia / bamboo2 ) 
+Royce Eugene Mitchell III ( royce3 ) 
+John K. Grant ( rufeo / cryfer ) 
+Samuel Toulouse ( samlepirate ) 
+Sylvain Cunzi ( scunzi ) 
+Sebastien Frippiat ( sebarnolds ) 
+Sean Kennedy ( serrux ) 
+Antoine Diamant-Berger ( shadow007 ) 
+Ingo Heßling ( shadowcode1980 ) 
+Jon L. Griffeth ( silent3 ) 
+Steve Streeting ( sinbad ) 
+Shane Parker ( sirshane ) 
+Martin Schmitz ( skiri-ki ) 
+Steven S. Klug ( sklug ) 
+Ronald Hall ( Sobek47 ) 
+Daniel Svensson ( soldans ) 
+Martin Sherburn ( spacedude ) 
+Chris Hunt ( spacejim / Captain_Deathbeard ) 
+Dave Cunningham ( sparksparkspark ) 
+Henry van Merode ( spookyboo ) 
+Madhu Srinivasan ( srinivma ) 
+Satyajit Sarangi ( ssarangi ) 
+Stefan Geiger
+Stewart Heckenberg ( youdaman ) 
+Wolfgang Steiner ( stoneCold ) 
+Benjamin Kinsey ( stormsong_lead ) 
+Andreas Podgurski ( SunSailor / SunSailor75 ) 
+Peter 'piet' Loest ( superpiet ) 
+Mats Leksell ( sxw ) 
+Thomas Muldowney ( temas ) 
+Timothy A. Graupmann ( tgraupmann ) 
+Beau Hardy ( theotherguy ) 
+Thorsten Lange ( Injector ) 
+Tibor Tihon 
+Thomas Hill ( tomlikestorock ) 
+Filip Volejnik ( volca ) 
+Van Stokes, Jr. ( Van ) 
+Ville Heiskanen ( vzheiska ) 
+Aneurin Price ( waywocket ) 
+Wesley Howe ( weshowe ) 
+Lucas Westine ( westine ) 
+Will Thimbleby
+Balázs Hajdics ( wolverine___ ) 
+Wladimir J. van der Laan ( wumpus ) 
+Daniel Jungmann ( xaphier ) 
+Eric Shorkey ( zeroskill ) 
+Zaid Abdulla ( zkam83 ) 
+Mark Ivey ( zovirl ) 
