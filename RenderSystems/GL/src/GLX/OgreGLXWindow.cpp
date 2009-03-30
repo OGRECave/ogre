@@ -404,7 +404,7 @@ namespace Ogre
 			WindowEventUtilities::_addRenderWindow(this);
 		}
 		
-		mContext = new GLXContext(mGLSupport, fbConfig, glxDrawable);
+    mContext = new GLXContext(mGLSupport, fbConfig, glxDrawable, glxContext);
 		
 		::GLXDrawable oldDrawable = glXGetCurrentDrawable();
 		::GLXContext  oldContext  = glXGetCurrentContext();

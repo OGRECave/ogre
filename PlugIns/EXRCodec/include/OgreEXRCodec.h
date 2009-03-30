@@ -48,6 +48,8 @@ namespace Ogre {
         void codeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const;
         /// @copydoc Codec::decode
         DecodeResult decode(DataStreamPtr& input) const;
+        /// @copydoc Codec::magicNumberToFileExt
+        String magicNumberToFileExt(const char* magicNumberPtr, size_t maxbytes) const;
 
         String getType() const;
     };

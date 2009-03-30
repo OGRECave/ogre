@@ -35,7 +35,7 @@ Torus Knot Software Ltd.
 
 namespace Ogre 
 {
-	GLXContext::GLXContext(GLXGLSupport* glsupport, ::GLXFBConfig fbconfig, ::GLXDrawable drawable) :
+	GLXContext::GLXContext(GLXGLSupport* glsupport, ::GLXFBConfig fbconfig, ::GLXDrawable drawable, ::GLXContext context) :
 		mGLSupport(glsupport), mDrawable(drawable), mContext(0), mFBConfig(fbconfig)
 	{
 		GLRenderSystem *renderSystem = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
@@ -47,8 +47,15 @@ namespace Ogre
 			shareContext = mainContext->mContext;
 		}
 		
-		mContext = mGLSupport->createNewContext(mFBConfig, GLX_RGBA_TYPE, shareContext, GL_TRUE);
-		
+    if (context)
+    {
+      mContext = context;
+    }
+    else
+    {
+      mContext = mGLSupport->createNewContext(mFBConfig, GLX_RGBA_TYPE, shareContext, GL_TRUE);
+		}
+
 		if (! mContext)
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to create a suitable GLXContext", "GLXContext::GLXContext");

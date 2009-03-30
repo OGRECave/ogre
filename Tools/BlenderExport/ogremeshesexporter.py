@@ -24,7 +24,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 __author__ = 'Michael Reimpell (Maintainer: Lih-Hern Pang)'
-__version__ = '1.1'
+__version__ = '1.2'
 __url__ = ["Help, http://www.ogre3d.org/phpBB2/search.php", "Ogre3D, http://www.ogre3d.org"]
 __bpydoc__ = "Please see the external documentation that comes with the script."
 

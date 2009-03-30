@@ -37,7 +37,7 @@ namespace Ogre {
 	class _OgrePrivate GLXContext: public GLContext
 	{
 	public:
-		GLXContext(GLXGLSupport* glsupport, ::GLXFBConfig fbconfig, ::GLXDrawable drawable);
+		GLXContext(GLXGLSupport* glsupport, ::GLXFBConfig fbconfig, ::GLXDrawable drawable, ::GLXContext context = 0);
 		
 		virtual ~GLXContext();
 		
