@@ -56,7 +56,15 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Overlay::~Overlay()
     {
+		// remove children
+
         OGRE_DELETE mRootNode;
+		
+		for (OverlayContainerList::iterator i = m2DElements.begin(); 
+			 i != m2DElements.end(); ++i)
+		{
+			(*i)->_notifyParent(0, 0);
+		}
     }
     //---------------------------------------------------------------------
     const String& Overlay::getName(void) const
@@ -139,6 +147,7 @@ namespace Ogre {
     void Overlay::remove2D(OverlayContainer* cont)
     {
         m2DElements.remove(cont);
+		cont->_notifyParent(0, 0);
 		assignZOrders();
     }
     //---------------------------------------------------------------------
