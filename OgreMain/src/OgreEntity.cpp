@@ -629,9 +629,9 @@ namespace Ogre {
                 Bone* bone = mSkeletonInstance->getBone(b);
                 if(mRenderQueueIDSet)
                 {
-                     queue->addRenderable(bone, mRenderQueueID);
+                     queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID);
                 } else {
-                     queue->addRenderable(bone);
+                     queue->addRenderable(bone->getDebugRenderable(1));
                 }
             }
         }

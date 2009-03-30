@@ -325,7 +325,7 @@ namespace Ogre {
         if (displayNodes)
         {
             // Include self in the render queue
-            queue->addRenderable(this);
+            queue->addRenderable(getDebugRenderable());
         }
 
 		// Check if the bounding box should be shown.
@@ -338,6 +338,11 @@ namespace Ogre {
 
 
     }
+
+	Node::DebugRenderable* SceneNode::getDebugRenderable()
+	{
+		return Node::getDebugRenderable(mWorldAABB.getHalfSize().length());
+	}
 
 
 	void SceneNode::_addBoundingBoxToQueue(RenderQueue* queue) {

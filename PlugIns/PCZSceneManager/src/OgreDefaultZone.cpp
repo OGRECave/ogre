@@ -540,7 +540,7 @@ namespace Ogre
 					// if we are displaying nodes, add the node renderable to the queue
 					if ( displayNodes )
 					{
-						queue -> addRenderable( pczsn );
+						queue -> addRenderable( pczsn->getDebugRenderable() );
 					}
 					// if the scene manager or the node wants the bounding box shown, add it to the queue
 					if (pczsn->getShowBoundingBox() || showBoundingBoxes)
@@ -574,7 +574,7 @@ namespace Ogre
 					// if we are displaying nodes, add the node renderable to the queue
 					if ( displayNodes )
 					{
-						queue -> addRenderable( pczsn );
+						queue -> addRenderable( pczsn->getDebugRenderable() );
 					}
 					// if the scene manager or the node wants the bounding box shown, add it to the queue
 					if (pczsn->getShowBoundingBox() || showBoundingBoxes)

@@ -457,6 +457,9 @@ namespace Ogre {
         */
         virtual void setDebugDisplayEnabled(bool enabled, bool cascade = true);
 
+		/// As Node::getDebugRenderable, except scaling is automatically determined
+		virtual DebugRenderable* getDebugRenderable();
+
 
 
 

@@ -731,7 +731,7 @@ namespace Ogre
 						// if we are displaying nodes, add the node renderable to the queue
 						if ( displayNodes )
 						{
-							queue -> addRenderable( sn );
+							queue -> addRenderable( sn->getDebugRenderable() );
 						}
 						// if the scene manager or the node wants the bounding box shown, add it to the queue
 						if (sn->getShowBoundingBox() || showBoundingBoxes)
