@@ -156,6 +156,7 @@ option(OGRE_INSTALL_TOOLS "Install Ogre tools." TRUE)
 option(OGRE_INSTALL_DOCS "Install documentation." FALSE)
 option(OGRE_INSTALL_MEDIA "Install media files." FALSE)
 option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE)
+cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" FALSE "MSVC" FALSE)
 option(OGRE_FULL_RPATH "Build executables with the full required RPATH to run from their install location." FALSE)
 
 

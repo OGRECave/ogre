@@ -58,6 +58,21 @@ function(ogre_config_lib LIBNAME)
     ARCHIVE DESTINATION "lib" CONFIGURATIONS DEBUG
     FRAMEWORK DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS DEBUG
   )
+  
+  if (OGRE_INSTALL_PDB)
+    # install debug pdb files
+    if (OGRE_STATIC)
+	  install(FILES ${OGRE_BINARY_DIR}/lib${OGRE_DEBUG_PATH}/${LIBNAME}Static_d.pdb
+	    DESTINATION lib
+		CONFIGURATIONS Debug
+	  )
+	else ()
+	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${LIBNAME}_d.pdb
+	    DESTINATION bin${OGRE_DEBUG_PATH}
+		CONFIGURATIONS Debug
+	  )
+	endif ()
+  endif ()
 endfunction(ogre_config_lib)
 
 # setup plugin build
@@ -87,6 +102,21 @@ function(ogre_config_plugin PLUGINNAME)
     LIBRARY DESTINATION "lib${OGRE_PLUGIN_PATH}" CONFIGURATIONS DEBUG
     ARCHIVE DESTINATION "lib${OGRE_PLUGIN_PATH}" CONFIGURATIONS DEBUG
   )
+
+  if (OGRE_INSTALL_PDB)
+    # install debug pdb files
+    if (OGRE_STATIC)
+	  install(FILES ${OGRE_BINARY_DIR}/lib${OGRE_DEBUG_PATH}/${PLUGINNAME}Static_d.pdb
+	    DESTINATION lib/opt
+		CONFIGURATIONS Debug
+	  )
+	else ()
+	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${PLUGINNAME}_d.pdb
+	    DESTINATION bin${OGRE_DEBUG_PATH}
+		CONFIGURATIONS Debug
+	  )
+	endif ()
+  endif ()
 endfunction(ogre_config_plugin)
 
 # setup Ogre demo build
@@ -114,6 +144,14 @@ function(ogre_config_sample SAMPLENAME)
       RUNTIME DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS Debug OPTIONAL
     )
   endif ()	
+
+  if (OGRE_INSTALL_PDB)
+    # install debug pdb files
+	install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}.pdb
+	  DESTINATION bin${OGRE_DEBUG_PATH}
+	  CONFIGURATIONS Debug
+	)
+  endif ()
 endfunction(ogre_config_sample)
 
 # setup Ogre tool build
@@ -136,4 +174,12 @@ function(ogre_config_tool TOOLNAME)
       RUNTIME DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS Debug OPTIONAL
     )
   endif ()	
+
+  if (OGRE_INSTALL_PDB)
+    # install debug pdb files
+	install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${TOOLNAME}.pdb
+	  DESTINATION bin${OGRE_DEBUG_PATH}
+	  CONFIGURATIONS Debug
+	)
+  endif ()
 endfunction(ogre_config_tool)
