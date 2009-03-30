@@ -99,6 +99,11 @@ function(ogre_config_sample SAMPLENAME)
       INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
     set_property(TARGET ${SAMPLENAME} PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
   endif ()
+  
+  # On OS X, create .app bundle
+  if (APPLE)
+    set_property(TARGET ${SAMPLENAME} PROPERTY MACOSX_BUNDLE TRUE)
+  endif ()
 
   if (OGRE_INSTALL_SAMPLES)
     install(TARGETS ${SAMPLENAME}
