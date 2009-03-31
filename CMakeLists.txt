@@ -95,6 +95,14 @@ set(OGRE_PCZ_OCTREE_LIBRARIES Plugin_OctreeZone)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/bin")
+if (WIN32 OR APPLE)
+  if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    # We don't want to install in default system location, install is really for the SDK, so call it that
+    SET(CMAKE_INSTALL_PREFIX
+	  "${OGRE_BINARY_DIR}/sdk" CACHE PATH "OGRE install prefix" FORCE
+    )
+  endif (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+endif(WIN32 OR APPLE)
 
 
 ######################################################################
