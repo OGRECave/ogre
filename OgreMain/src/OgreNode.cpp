@@ -828,6 +828,7 @@ namespace Ogre {
 			p->setVertexColourTracking(TVC_AMBIENT);
 			p->setSceneBlending(SBT_TRANSPARENT_ALPHA);
 			p->setCullingMode(CULL_NONE);
+			p->setDepthWriteEnabled(false);
 		}
 
 		String meshName = "Ogre/Debug/AxesMesh";
