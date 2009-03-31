@@ -341,7 +341,11 @@ namespace Ogre {
 
 	Node::DebugRenderable* SceneNode::getDebugRenderable()
 	{
-		return Node::getDebugRenderable(mWorldAABB.getHalfSize().length());
+		Vector3 hs = mWorldAABB.getHalfSize();
+		Real sz = std::min(hs.x, hs.y);
+		sz = std::min(sz, hs.z);
+		sz = std::max(sz, (Real)1.0);
+		return Node::getDebugRenderable(sz);
 	}
 
 
