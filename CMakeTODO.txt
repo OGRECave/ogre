@@ -22,4 +22,5 @@ To be done after switch-over
   * Remove Dependencies/CMakeLists.txt from OGRE source tree. This file should be provided by
     the pre-built dependencies package 
   * Place DLLs in Dependencies/bin instead of Samples/Common/bin, since the latter is no longer in use
+  * Dependencies should be installed in the build directory, not the ogre directory, so that multiple compilers may be supported from one source folder
 
