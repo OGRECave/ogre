@@ -106,6 +106,36 @@ namespace Ogre
 		virtual void save(StreamSerialiser& stream);
 
 
+		/// Called when the frame starts
+		virtual void frameStart(Real timeSinceLastFrame);
+		/// Called when the frame ends
+		virtual void frameEnd(Real timeElapsed);
+		/// Notify a section of the current camera
+		virtual void notifyCamera(Camera* cam);
+
+
+		/** Ask for a page to be loaded with the given (section-relative) PageID
+		@remarks
+			If this page is already loaded, this request will not load it again.
+			If the page needs loading, then it may be an asynchronous process depending
+			on whether threading is enabled.
+		*/
+		virtual void requestPage(PageID pageID);
+		/** Ask for a page to be kept in memory if it's loaded.
+		@remarks
+			This method indicates that a page should be retained if it's already
+			in memory, but if it's not then it won't trigger a load. This is useful
+			for retaining pages that have just gone out of range, but which you
+			don't want to unload just yet because it's quite possible they may come
+			back into the active set again very quickly / easily. But at the same
+			time, if they've already been purged you don't want to force them to load. 
+			This is the 'maybe' region of pages. 
+		@par
+			Any Page that is neither requested nor maintained in a frame will be
+			deemed a candidate for unloading.
+		*/
+		virtual void maintainPage(PageID pageID);
+
 	};
 
 	/** @} */

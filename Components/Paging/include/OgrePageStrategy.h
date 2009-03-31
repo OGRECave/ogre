@@ -89,9 +89,9 @@ namespace Ogre
 		PageManager* getManager() const { return mManager; }
 
 		/// Called when the frame starts
-		virtual void frameStart(Real timeSinceLastFrame) {}
+		virtual void frameStart(Real timeSinceLastFrame, PagedWorldSection* section) {}
 		/// Called when the frame ends
-		virtual void frameEnd(Real timeElapsed) {}
+		virtual void frameEnd(Real timeElapsed, PagedWorldSection* section) {}
 		/** Called when a camera is used for any kind of rendering.
 		@remarks
 			This is probably the primary way in which the strategy will request
@@ -100,7 +100,7 @@ namespace Ogre
 			rely on this pointer remaining valid permanently because no notification 
 			will be given when the camera is destroyed. 
 		*/
-		virtual void notifyCamera(Camera* cam) {}
+		virtual void notifyCamera(Camera* cam, PagedWorldSection* section) {}
 
 		/** Create a PageStrategyData instance containing the data specific to this
 			PageStrategy. 

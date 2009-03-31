@@ -134,6 +134,33 @@ namespace Ogre
 		ser.writeChunkEnd(msChunkID);
 
 	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::requestPage(PageID pageID)
+	{
+		// TODO
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::maintainPage(PageID pageID)
+	{
+		// TODO
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::frameStart(Real timeSinceLastFrame)
+	{
+		mStrategy->frameStart(timeSinceLastFrame, this);
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::frameEnd(Real timeElapsed)
+	{
+		mStrategy->frameEnd(timeElapsed, this);
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::notifyCamera(Camera* cam)
+	{
+		mStrategy->notifyCamera(cam, this);
+	}
+
+
 
 
 }

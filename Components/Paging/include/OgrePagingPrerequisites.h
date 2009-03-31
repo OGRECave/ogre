@@ -49,6 +49,9 @@ namespace Ogre
 
 	typedef GeneralAllocatedObject PageAlloc;
 
+	/// Identifier for a page
+	typedef uint32 PageID;
+
 }
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(OGRE_STATIC_LIB)

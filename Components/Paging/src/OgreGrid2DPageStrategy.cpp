@@ -27,18 +27,27 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 #include "OgreGrid2DPageStrategy.h"
+#include "OgreStreamSerialiser.h"
+#include "OgreException.h"
+#include "OgreCamera.h"
+#include "OgrePagedWorldSection.h"
 
 namespace Ogre
 {
+	//---------------------------------------------------------------------
+	const uint32 Grid2DPageStrategyData::msChunkID = StreamSerialiser::makeIdentifier("G2DD");
+	const uint16 Grid2DPageStrategyData::msChunkVersion = 1;
 	//---------------------------------------------------------------------
 	Grid2DPageStrategyData::Grid2DPageStrategyData()
 		: PageStrategyData()
 		, mMode(G2D_X_Z)
 		, mWorldOrigin(Vector3::ZERO)
 		, mOrigin(Vector2::ZERO)
-		, mCellSize(10000)
+		, mCellSize(1000)
+		, mLoadRadius(10000)
+		, mUnloadRadius(12000)
 	{
-
+		
 	}
 	//---------------------------------------------------------------------
 	Grid2DPageStrategyData::~Grid2DPageStrategyData()
@@ -57,6 +66,7 @@ namespace Ogre
 	{
 		mWorldOrigin = worldOrigin;
 		convertWorldToGridSpace(mWorldOrigin, mOrigin);
+		mBottomLeft = mOrigin - Vector2(mCellSize * 65536 * 0.5, mCellSize * 65536 * 0.5);
 	}
 	//---------------------------------------------------------------------
 	void Grid2DPageStrategyData::convertWorldToGridSpace(const Vector3& world, Vector2& grid)
@@ -78,17 +88,173 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
-	void Grid2DPageStrategyData::load(StreamSerialiser& stream)
+	void Grid2DPageStrategyData::determineGridLocation(const Vector2& gridpos, uint16* row, uint16* col)
 	{
-		// TODO
+		// get distance from bottom-left (indexing start)
+		Vector2 localPos = gridpos - mBottomLeft;
+		// in cells
+		localPos = localPos / mCellSize;
+
+		// truncate
+		*col = static_cast<uint16>(localPos.x);
+		*row = static_cast<uint16>(localPos.y);
+
+
 	}
 	//---------------------------------------------------------------------
-	void Grid2DPageStrategyData::save(StreamSerialiser& stream)
+	void Grid2DPageStrategyData::setCellSize(Real sz)
 	{
-		// TODO
+		mCellSize = sz;
+		mLoadRadiusInCells = mLoadRadius / mCellSize;
+		mUnloadRadiusInCells = mUnloadRadius / mCellSize;
+		mBottomLeft = mOrigin - Vector2(mCellSize * 65536 * 0.5, mCellSize * 65536 * 0.5);
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::setLoadRadius(Real sz)
+	{
+		mLoadRadius = sz;
+		mLoadRadiusInCells = mLoadRadius / mCellSize;
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::setUnloadRadius(Real sz)
+	{
+		mUnloadRadius = sz;
+		mUnloadRadiusInCells = mUnloadRadius / mCellSize;
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::load(StreamSerialiser& ser)
+	{
+		const StreamSerialiser::Chunk* chunk = ser.readChunkBegin();
+		if (chunk->id != msChunkID)
+		{
+			ser.undoReadChunk(chunk->id);
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+				"Stream does not contain Grid2DPageStrategyData data!", 
+				"Grid2DPageStrategyData::load");
+		}
+
+		// Check version
+		if (chunk->version > msChunkVersion)
+		{
+			// skip the rest
+			ser.readChunkEnd(chunk->id);
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+				"Grid2DPageStrategyData data version exceeds what this software can read!", 
+				"Grid2DPageStrategyData::load");
+		}
+
+		uint8 readMode;
+		ser.read(&readMode);
+		mMode = (Grid2DMode)readMode;
+
+		Vector3 origin;
+		ser.read(&origin);
+		setOrigin(origin);
+
+		ser.read(&mCellSize);
+		ser.read(&mLoadRadius);
+		ser.read(&mUnloadRadius);
+
+		ser.readChunkEnd(chunk->id);
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::save(StreamSerialiser& ser)
+	{
+		ser.writeChunkBegin(msChunkID, msChunkVersion);
+
+		uint8 readMode = (uint8)mMode;
+		ser.write(&readMode);
+
+		ser.write(&mWorldOrigin);
+		ser.write(&mCellSize);
+		ser.write(&mLoadRadius);
+		ser.write(&mUnloadRadius);
+
+		ser.writeChunkEnd(msChunkID);
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
+	Grid2DPageStrategy::Grid2DPageStrategy(PageManager* manager)
+		: PageStrategy("Grid2D", manager)
+	{
+
+	}
+	//---------------------------------------------------------------------
+	Grid2DPageStrategy::~Grid2DPageStrategy()
+	{
+
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategy::notifyCamera(Camera* cam, PagedWorldSection* section)
+	{
+		Grid2DPageStrategyData* stratData = static_cast<Grid2DPageStrategyData*>(section->getStrategyData());
+
+		const Vector3& pos = cam->getDerivedPosition();
+		Vector2 gridpos;
+		stratData->convertWorldToGridSpace(pos, gridpos);
+		uint16 row, col;
+		stratData->determineGridLocation(gridpos, &row, &col);
+
+		Real loadRadius = stratData->getLoadRadiusInCells();
+		Real unloadRadius = stratData->getUnloadRadiusInCells();
+		// scan the whole unload range
+		Real frowmin = (Real)row - unloadRadius;
+		Real frowmax = (Real)row + unloadRadius;
+		Real fcolmin = (Real)col - unloadRadius;
+		Real fcolmax = (Real)col + unloadRadius;
+		// Round UP max, round DOWN min
+		uint16 rowmin = frowmin < 0 ? 0 : (uint16)floor(frowmin);
+		uint16 rowmax = frowmax > 65535 ? 65535 : (uint16)ceil(frowmax);
+		uint16 colmin = fcolmin < 0 ? 0 : (uint16)floor(fcolmin);
+		uint16 colmax = fcolmax > 65535 ? 65535 : (uint16)ceil(fcolmax);
+		// the inner, active load range
+		frowmin = (Real)row - loadRadius;
+		frowmax = (Real)row + loadRadius;
+		fcolmin = (Real)col - loadRadius;
+		fcolmax = (Real)col + loadRadius;
+		// Round UP max, round DOWN min
+		uint16 loadrowmin = frowmin < 0 ? 0 : (uint16)floor(frowmin);
+		uint16 loadrowmax = frowmax > 65535 ? 65535 : (uint16)ceil(frowmax);
+		uint16 loadcolmin = fcolmin < 0 ? 0 : (uint16)floor(fcolmin);
+		uint16 loadcolmax = fcolmax > 65535 ? 65535 : (uint16)ceil(fcolmax);
+
+		for (uint16 r = rowmin; r <= rowmax; ++r)
+		{
+			for (uint16 c = colmin; c <= colmax; ++c)
+			{
+				PageID pageID = calculatePageID(r, c);
+				if (r >= loadrowmin && r <= loadrowmax && c >= loadcolmin && c <= loadcolmax)
+				{
+					// in the 'load' range, request it
+					section->requestPage(pageID);
+				}
+				else
+				{
+					// in the outer 'unload' range, maintain it but don't actively load
+					section->maintainPage(pageID);
+				}
+				// other pages will by inference be marked for unloading
+			}
+		}	
+		
+
+
+	}
+	//---------------------------------------------------------------------
+	PageStrategyData* Grid2DPageStrategy::createData()
+	{
+		return OGRE_NEW Grid2DPageStrategyData();
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategy::destroyData(PageStrategyData* d)
+	{
+		OGRE_DELETE d;
+	}
+	//---------------------------------------------------------------------
+	PageID Grid2DPageStrategy::calculatePageID(uint16 row, uint16 col)
+	{
+		return (PageID)row * 65536 + col;
+	}
 
 
 }

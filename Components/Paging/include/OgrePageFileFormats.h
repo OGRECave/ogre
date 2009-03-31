@@ -110,7 +110,7 @@ Torus Knot Software Ltd.
 	</table>
 
 	@par
-	<b>PagedStrategyData (Identifier 'PWSS')</b>\n
+	<b>PagedStrategyData (Identifier defined by subclass)</b>\n
 	[Version 1]
 	<table>
 	<tr>

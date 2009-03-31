@@ -57,7 +57,54 @@ namespace Ogre
 		/// Grid is in the Y/Z plane
 		G2D_Y_Z = 2
 	};
-	/** Specialisation of PageStrategyData for GridPageStrategy
+	/** Specialisation of PageStrategyData for GridPageStrategy.
+	@remarks
+		Structurally this data defines with a grid of pages, with the logical 
+		origin in the middle of the entire grid, but with an indexing system 
+		of rows and columns which starts in the bottom left and works to the right
+		and up. Therefore the page at row 0 and column 0 is in the bottom left, but
+		this is actually at -(CellSize * 65536 / 2) in terms of coordinates from 
+		the origin. It's done this way because most people want to specify the 
+		'origin' to be the middle, stretching in all directions of the plane, 
+		but the row/column indexes are always positive for simplicity.
+	@par
+		The data format for this in a file is:<br/>
+		<b>Grid2DPageStrategyData (Identifier 'G2DD')</b>\n
+		[Version 1]
+		<table>
+		<tr>
+			<td><b>Name</b></td>
+			<td><b>Type</b></td>
+			<td><b>Description</b></td>
+		</tr>
+		<tr>
+			<td>Grid orientation</td>
+			<td>uint8</td>
+			<td>The orientation of the grid; XY = 0, XY = 1, YZ = 2</td>
+		</tr>
+		<tr>
+			<td>Grid origin</td>
+			<td>Vector3</td>
+			<td>World origin of the grid.</td>
+		</tr>
+		<tr>
+			<td>Grid cell size</td>
+			<td>Real</td>
+			<td>The size of each cell (page) in the grid</td>
+		</tr>
+		<tr>
+			<td>Load radius</td>
+			<td>Real</td>
+			<td>The outer radius at which new pages should start loading</td>
+		</tr>
+		<tr>
+			<td>Unload radius</td>
+			<td>Real</td>
+			<td>The radius at which existing pages should start unloading (should be larger than 
+				Load radius)</td>
+		</tr>
+		</table>
+
 	*/
 	class _OgrePagingExport Grid2DPageStrategyData : public PageStrategyData
 	{
@@ -66,11 +113,21 @@ namespace Ogre
 		Grid2DMode mMode;
 		/// Origin (world space)
 		Vector3 mWorldOrigin;
-		/// Origin (grid space)
+		/// Origin (grid-aligned world space)
 		Vector2 mOrigin;
+		/// Bottom-left position (grid-aligned world space)
+		Vector2 mBottomLeft;
 		/// Grid cell (page) size
 		Real mCellSize;
+		/// Load radius
+		Real mLoadRadius;
+		/// Unload radius
+		Real mUnloadRadius;
+		Real mLoadRadiusInCells;
+		Real mUnloadRadiusInCells;
 
+		static const uint32 msChunkID;
+		static const uint16 msChunkVersion;
 	public:
 		Grid2DPageStrategyData();
 		~Grid2DPageStrategyData();
@@ -85,6 +142,22 @@ namespace Ogre
 		virtual void setOrigin(const Vector3& worldOrigin);
 		/// Get the origin of the grid in world space
 		virtual const Vector3& getOrigin(const Vector3& worldOrigin) { return mWorldOrigin; }
+		/// Set the size of the cells in the grid
+		virtual void setCellSize(Real sz);
+		/// Get the size of the cells in the grid
+		virtual Real getCellSize() const { return mCellSize; }
+		/// Set the loading radius 
+		virtual void setLoadRadius(Real sz);
+		/// Get the loading radius 
+		virtual Real getLoadRadius() const { return mLoadRadius; }
+		/// Set the Unloading radius 
+		virtual void setUnloadRadius(Real sz);
+		/// Get the Unloading radius 
+		virtual Real getUnloadRadius() const { return mUnloadRadius; }
+		/// Get the load radius as a multiple of cells
+		virtual Real getLoadRadiusInCells() { return mLoadRadiusInCells; }
+		/// Get the unload radius as a multiple of cells
+		virtual Real getUnloadRadiusInCells(){ return mUnloadRadiusInCells; }
 
 		/// Load this data from a stream
 		void load(StreamSerialiser& stream);
@@ -93,26 +166,32 @@ namespace Ogre
 
 		/// Convert a world point to grid space
 		virtual void convertWorldToGridSpace(const Vector3& world, Vector2& grid);
+		
+		/// Convert a grid position into a row and column index
+		void determineGridLocation(const Vector2& gridpos, uint16* row, uint16* col);
 
 	};
 
 
 	/** Page strategy which loads new pages based on a regular 2D grid.
 	@remarks
+		The grid can be up to 65536 x 65536 cells in size. PageIDs are generated
+		like this: (row * 65536) + col. The grid is centred around the grid origin, such 
+		that the boundaries of the cell around that origin are [-CellSize/2, CellSize/2)
 	*/
-	class _OgrePagingExport Grid2DPageStrategy : public PageAlloc
+	class _OgrePagingExport Grid2DPageStrategy : public PageStrategy
 	{
-	protected:
 	public:
-		Grid2DPageStrategy(const String& name, PageManager* manager);
+		Grid2DPageStrategy(PageManager* manager);
 
 		~Grid2DPageStrategy();
 
-		void frameStart(Real timeSinceLastFrame);
-		void frameEnd(Real timeElapsed);
-		void notifyCamera(Camera* cam);
+		// Overridden members
+		void notifyCamera(Camera* cam, PagedWorldSection* section);
 		PageStrategyData* createData();
 		void destroyData(PageStrategyData* d);
+	protected:
+		PageID calculatePageID(uint16 row, uint16 col);
 	};
 
 	/*@}*/
