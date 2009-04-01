@@ -45,7 +45,7 @@ namespace Ogre
 		, mOrigin(Vector2::ZERO)
 		, mCellSize(1000)
 		, mLoadRadius(10000)
-		, mUnloadRadius(12000)
+		, mHoldRadius(12000)
 	{
 		
 	}
@@ -106,7 +106,7 @@ namespace Ogre
 	{
 		mCellSize = sz;
 		mLoadRadiusInCells = mLoadRadius / mCellSize;
-		mUnloadRadiusInCells = mUnloadRadius / mCellSize;
+		mHoldRadiusInCells = mHoldRadius / mCellSize;
 		mBottomLeft = mOrigin - Vector2(mCellSize * 65536 * 0.5, mCellSize * 65536 * 0.5);
 	}
 	//---------------------------------------------------------------------
@@ -116,10 +116,10 @@ namespace Ogre
 		mLoadRadiusInCells = mLoadRadius / mCellSize;
 	}
 	//---------------------------------------------------------------------
-	void Grid2DPageStrategyData::setUnloadRadius(Real sz)
+	void Grid2DPageStrategyData::setHoldRadius(Real sz)
 	{
-		mUnloadRadius = sz;
-		mUnloadRadiusInCells = mUnloadRadius / mCellSize;
+		mHoldRadius = sz;
+		mHoldRadiusInCells = mHoldRadius / mCellSize;
 	}
 	//---------------------------------------------------------------------
 	void Grid2DPageStrategyData::load(StreamSerialiser& ser)
@@ -153,7 +153,7 @@ namespace Ogre
 
 		ser.read(&mCellSize);
 		ser.read(&mLoadRadius);
-		ser.read(&mUnloadRadius);
+		ser.read(&mHoldRadius);
 
 		ser.readChunkEnd(chunk->id);
 	}
@@ -168,7 +168,7 @@ namespace Ogre
 		ser.write(&mWorldOrigin);
 		ser.write(&mCellSize);
 		ser.write(&mLoadRadius);
-		ser.write(&mUnloadRadius);
+		ser.write(&mHoldRadius);
 
 		ser.writeChunkEnd(msChunkID);
 	}
@@ -196,12 +196,12 @@ namespace Ogre
 		stratData->determineGridLocation(gridpos, &row, &col);
 
 		Real loadRadius = stratData->getLoadRadiusInCells();
-		Real unloadRadius = stratData->getUnloadRadiusInCells();
-		// scan the whole unload range
-		Real frowmin = (Real)row - unloadRadius;
-		Real frowmax = (Real)row + unloadRadius;
-		Real fcolmin = (Real)col - unloadRadius;
-		Real fcolmax = (Real)col + unloadRadius;
+		Real holdRadius = stratData->getHoldRadiusInCells();
+		// scan the whole Hold range
+		Real frowmin = (Real)row - holdRadius;
+		Real frowmax = (Real)row + holdRadius;
+		Real fcolmin = (Real)col - holdRadius;
+		Real fcolmax = (Real)col + holdRadius;
 		// Round UP max, round DOWN min
 		uint16 rowmin = frowmin < 0 ? 0 : (uint16)floor(frowmin);
 		uint16 rowmax = frowmax > 65535 ? 65535 : (uint16)ceil(frowmax);
@@ -226,12 +226,12 @@ namespace Ogre
 				if (r >= loadrowmin && r <= loadrowmax && c >= loadcolmin && c <= loadcolmax)
 				{
 					// in the 'load' range, request it
-					section->requestPage(pageID);
+					section->loadPage(pageID);
 				}
 				else
 				{
-					// in the outer 'unload' range, maintain it but don't actively load
-					section->maintainPage(pageID);
+					// in the outer 'hold' range, keep it but don't actively load
+					section->holdPage(pageID);
 				}
 				// other pages will by inference be marked for unloading
 			}

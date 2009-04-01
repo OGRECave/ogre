@@ -135,12 +135,12 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void PagedWorldSection::requestPage(PageID pageID)
+	void PagedWorldSection::loadPage(PageID pageID)
 	{
 		// TODO
 	}
 	//---------------------------------------------------------------------
-	void PagedWorldSection::maintainPage(PageID pageID)
+	void PagedWorldSection::holdPage(PageID pageID)
 	{
 		// TODO
 	}

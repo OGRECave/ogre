@@ -120,7 +120,7 @@ namespace Ogre
 			If the page needs loading, then it may be an asynchronous process depending
 			on whether threading is enabled.
 		*/
-		virtual void requestPage(PageID pageID);
+		virtual void loadPage(PageID pageID);
 		/** Ask for a page to be kept in memory if it's loaded.
 		@remarks
 			This method indicates that a page should be retained if it's already
@@ -131,10 +131,10 @@ namespace Ogre
 			time, if they've already been purged you don't want to force them to load. 
 			This is the 'maybe' region of pages. 
 		@par
-			Any Page that is neither requested nor maintained in a frame will be
+			Any Page that is neither requested nor held in a frame will be
 			deemed a candidate for unloading.
 		*/
-		virtual void maintainPage(PageID pageID);
+		virtual void holdPage(PageID pageID);
 
 	};
 

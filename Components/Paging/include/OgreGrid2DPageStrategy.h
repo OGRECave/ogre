@@ -98,10 +98,10 @@ namespace Ogre
 			<td>The outer radius at which new pages should start loading</td>
 		</tr>
 		<tr>
-			<td>Unload radius</td>
+			<td>Hold radius</td>
 			<td>Real</td>
-			<td>The radius at which existing pages should start unloading (should be larger than 
-				Load radius)</td>
+			<td>The radius at which existing pages should be held if already loaded 
+				but not actively loaded (should be larger than Load radius)</td>
 		</tr>
 		</table>
 
@@ -121,10 +121,10 @@ namespace Ogre
 		Real mCellSize;
 		/// Load radius
 		Real mLoadRadius;
-		/// Unload radius
-		Real mUnloadRadius;
+		/// Hold radius
+		Real mHoldRadius;
 		Real mLoadRadiusInCells;
-		Real mUnloadRadiusInCells;
+		Real mHoldRadiusInCells;
 
 		static const uint32 msChunkID;
 		static const uint16 msChunkVersion;
@@ -150,14 +150,14 @@ namespace Ogre
 		virtual void setLoadRadius(Real sz);
 		/// Get the loading radius 
 		virtual Real getLoadRadius() const { return mLoadRadius; }
-		/// Set the Unloading radius 
-		virtual void setUnloadRadius(Real sz);
-		/// Get the Unloading radius 
-		virtual Real getUnloadRadius() const { return mUnloadRadius; }
+		/// Set the Holding radius 
+		virtual void setHoldRadius(Real sz);
+		/// Get the Holding radius 
+		virtual Real getHoldRadius() const { return mHoldRadius; }
 		/// Get the load radius as a multiple of cells
 		virtual Real getLoadRadiusInCells() { return mLoadRadiusInCells; }
-		/// Get the unload radius as a multiple of cells
-		virtual Real getUnloadRadiusInCells(){ return mUnloadRadiusInCells; }
+		/// Get the Hold radius as a multiple of cells
+		virtual Real getHoldRadiusInCells(){ return mHoldRadiusInCells; }
 
 		/// Load this data from a stream
 		void load(StreamSerialiser& stream);
