@@ -205,6 +205,11 @@ namespace Ogre
 		/// @copydoc RenderSystem::_createRenderWindows
 		bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
 			RenderWindowList& createdWindows);
+
+		/**
+         * Set current render target to target, enabling its GL context if needed
+         */
+		void _setRenderTarget(RenderTarget *target){}
 		
 		/// @copydoc RenderSystem::createMultiRenderTarget
 		virtual MultiRenderTarget * createMultiRenderTarget(const String & name);

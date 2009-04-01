@@ -334,6 +334,11 @@ namespace Ogre
 		void preExtraThreadsStarted();
 		void postExtraThreadsStarted();
 
+		/**
+         * Set current render target to target, enabling its GL context if needed
+         */
+		void _setRenderTarget(RenderTarget *target){}
+
 		/** D3D specific method to restore a lost device. */
 		void restoreLostDevice(void);
 		/** D3D specific method to return whether the device has been lost. */
