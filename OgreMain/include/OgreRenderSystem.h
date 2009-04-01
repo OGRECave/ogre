@@ -1154,7 +1154,7 @@ namespace Ogre
 		}
 
 		/**
-         * Set current render target to target, enabling its GL context if needed
+         * Set current render target to target, enabling its device context if needed
          */
         virtual void _setRenderTarget(RenderTarget *target) = 0;
 

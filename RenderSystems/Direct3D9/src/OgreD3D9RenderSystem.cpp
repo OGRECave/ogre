@@ -2664,57 +2664,64 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
+	void D3D9RenderSystem::_setRenderTarget(RenderTarget *target)
+	{
+		mActiveRenderTarget = target;
+
+		HRESULT hr;
+
+		// Retrieve render surfaces (up to OGRE_MAX_MULTIPLE_RENDER_TARGETS)
+		IDirect3DSurface9* pBack[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+		memset(pBack, 0, sizeof(pBack));
+		target->getCustomAttribute( "DDBACKBUFFER", &pBack );
+		if (!pBack[0])
+			return;
+
+		IDirect3DSurface9* pDepth = NULL;
+		target->getCustomAttribute( "D3DZBUFFER", &pDepth );
+		if (!pDepth)
+		{
+			/// No depth buffer provided, use our own
+			/// Request a depth stencil that is compatible with the format, multisample type and
+			/// dimensions of the render target.
+			D3DSURFACE_DESC srfDesc;
+			if(FAILED(pBack[0]->GetDesc(&srfDesc)))
+				return; // ?
+			pDepth = _getDepthStencilFor(srfDesc.Format, srfDesc.MultiSampleType, srfDesc.MultiSampleQuality, srfDesc.Width, srfDesc.Height);
+		}
+		// Bind render targets
+		uint count = mCurrentCapabilities->getNumMultiRenderTargets();
+		for(uint x=0; x<count; ++x)
+		{
+			hr = getActiveD3D9Device()->SetRenderTarget(x, pBack[x]);
+			if (FAILED(hr))
+			{
+				String msg = DXGetErrorDescription9(hr);
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setRenderTarget : " + msg, "D3D9RenderSystem::_setViewport" );
+			}
+		}
+		hr = getActiveD3D9Device()->SetDepthStencilSurface(pDepth);
+		if (FAILED(hr))
+		{
+			String msg = DXGetErrorDescription9(hr);
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setDepthStencil : " + msg, "D3D9RenderSystem::_setViewport" );
+		}
+	}
+	//---------------------------------------------------------------------
 	void D3D9RenderSystem::_setViewport( Viewport *vp )
 	{
 		if( vp != mActiveViewport || vp->_isUpdated() )
 		{
 			mActiveViewport = vp;
-			mActiveRenderTarget = vp->getTarget();					
 
 			// ok, it's different, time to set render target and viewport params
 			D3DVIEWPORT9 d3dvp;
 			HRESULT hr;
 
 			// Set render target
-			RenderTarget* target;
-			target = vp->getTarget();
+			RenderTarget* target = vp->getTarget();
+			_setRenderTarget(target);
 
-			// Retrieve render surfaces (up to OGRE_MAX_MULTIPLE_RENDER_TARGETS)
-			IDirect3DSurface9* pBack[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-			memset(pBack, 0, sizeof(pBack));
-			target->getCustomAttribute( "DDBACKBUFFER", &pBack );
-			if (!pBack[0])
-				return;
-
-			IDirect3DSurface9* pDepth = NULL;
-			target->getCustomAttribute( "D3DZBUFFER", &pDepth );
-			if (!pDepth)
-			{
-				/// No depth buffer provided, use our own
-				/// Request a depth stencil that is compatible with the format, multisample type and
-				/// dimensions of the render target.
-				D3DSURFACE_DESC srfDesc;
-				if(FAILED(pBack[0]->GetDesc(&srfDesc)))
-					return; // ?
-				pDepth = _getDepthStencilFor(srfDesc.Format, srfDesc.MultiSampleType, srfDesc.MultiSampleQuality, srfDesc.Width, srfDesc.Height);
-			}
-			// Bind render targets
-			uint count = mCurrentCapabilities->getNumMultiRenderTargets();
-			for(uint x=0; x<count; ++x)
-			{
-				hr = getActiveD3D9Device()->SetRenderTarget(x, pBack[x]);
-				if (FAILED(hr))
-				{
-					String msg = DXGetErrorDescription9(hr);
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setRenderTarget : " + msg, "D3D9RenderSystem::_setViewport" );
-				}
-			}
-			hr = getActiveD3D9Device()->SetDepthStencilSurface(pDepth);
-			if (FAILED(hr))
-			{
-				String msg = DXGetErrorDescription9(hr);
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setDepthStencil : " + msg, "D3D9RenderSystem::_setViewport" );
-			}
 
 			_setCullingMode( mCullingMode );
 

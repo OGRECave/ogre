@@ -1997,12 +1997,94 @@ namespace Ogre
 	
 	}*/
 	//---------------------------------------------------------------------
+	void D3D10RenderSystem::_setRenderTarget(RenderTarget *target)
+	{
+		mActiveRenderTarget = target;
+
+
+		// Retrieve render surfaces (up to OGRE_MAX_MULTIPLE_RENDER_TARGETS)
+		/*	IDXGISurface * pBack[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+		memset(pBack, 0, sizeof(pBack));
+		target->getCustomAttribute( "DDBACKBUFFER", &pBack );
+		if (!pBack[0])
+		return;
+
+		IDXGISurface * pDepth = NULL;
+		target->getCustomAttribute( "D3DZBUFFER", &pDepth );
+		if (!pDepth)
+		{
+		/// No depth buffer provided, use our own
+		/// Request a depth stencil that is compatible with the format, multisample type and
+		/// dimensions of the render target.
+		D3DSURFACE_DESC srfDesc;
+		if(FAILED(pBack[0]->GetDesc(&srfDesc)))
+		return; // ?
+		pDepth = _getDepthStencilFor(srfDesc.Format, srfDesc.MultiSampleType, srfDesc.Width, srfDesc.Height);
+		}
+		// Bind render targets
+		uint count = mCapabilities->numMultiRenderTargets();
+		for(uint x=0; x<count; ++x)
+		{
+		hr = mDevice->SetRenderTarget(x, pBack[x]);
+		if (FAILED(hr))
+		{
+		String msg ;//= DXGetErrorDescription9(hr);
+		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setRenderTarget : " + msg, "D3D10RenderSystem::_setViewport" );
+		}
+		}
+		*/
+		ID3D10RenderTargetView * pRTView;
+		target->getCustomAttribute( "ID3D10RenderTargetView", &pRTView );
+		ID3D10DepthStencilView * pRTDepthView;
+		target->getCustomAttribute( "ID3D10DepthStencilView", &pRTDepthView );
+
+
+		// we need to clear the state 
+		mDevice->ClearState();
+
+		if (mDevice.isError())
+		{
+			String errorDescription = mDevice.getErrorDescription();
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"D3D10 device cannot Clear State\nError Description:" + errorDescription,
+				"D3D10RenderSystem::_setViewport");
+		}
+
+
+
+		// now switch to the new render target
+		mDevice->OMSetRenderTargets(1,
+			&pRTView,
+			pRTDepthView);
+
+
+		if (mDevice.isError())
+		{
+			String errorDescription = mDevice.getErrorDescription();
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"D3D10 device cannot set render target\nError Description:" + errorDescription,
+				"D3D10RenderSystem::_setViewport");
+		}
+
+		// TODO - support MRT
+
+		/*	hr = mDevice->SetDepthStencilSurface(pDepth);
+		if (FAILED(hr))
+		{
+		String msg ;//= DXGetErrorDescription9(hr);
+		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setDepthStencil : " + msg, "D3D10RenderSystem::_setViewport" );
+		}
+		*/
+
+	}
+	//---------------------------------------------------------------------
 	void D3D10RenderSystem::_setViewport( Viewport *vp )
 	{
 		if( vp != mActiveViewport || vp->_isUpdated() )
 		{
 			mActiveViewport = vp;
-			mActiveRenderTarget = vp->getTarget();
+			
+
 
 			// ok, it's different, time to set render target and viewport params
 			D3D10_VIEWPORT d3dvp;
@@ -2012,79 +2094,7 @@ namespace Ogre
 			RenderTarget* target;
 			target = vp->getTarget();
 
-			// Retrieve render surfaces (up to OGRE_MAX_MULTIPLE_RENDER_TARGETS)
-		/*	IDXGISurface * pBack[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-			memset(pBack, 0, sizeof(pBack));
-			target->getCustomAttribute( "DDBACKBUFFER", &pBack );
-			if (!pBack[0])
-				return;
-
-			IDXGISurface * pDepth = NULL;
-			target->getCustomAttribute( "D3DZBUFFER", &pDepth );
-			if (!pDepth)
-			{
-				/// No depth buffer provided, use our own
-				/// Request a depth stencil that is compatible with the format, multisample type and
-				/// dimensions of the render target.
-				D3DSURFACE_DESC srfDesc;
-				if(FAILED(pBack[0]->GetDesc(&srfDesc)))
-					return; // ?
-				pDepth = _getDepthStencilFor(srfDesc.Format, srfDesc.MultiSampleType, srfDesc.Width, srfDesc.Height);
-			}
-			// Bind render targets
-			uint count = mCapabilities->numMultiRenderTargets();
-			for(uint x=0; x<count; ++x)
-			{
-				hr = mDevice->SetRenderTarget(x, pBack[x]);
-				if (FAILED(hr))
-				{
-					String msg ;//= DXGetErrorDescription9(hr);
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setRenderTarget : " + msg, "D3D10RenderSystem::_setViewport" );
-				}
-			}
-			*/
-			ID3D10RenderTargetView * pRTView;
-			target->getCustomAttribute( "ID3D10RenderTargetView", &pRTView );
-			ID3D10DepthStencilView * pRTDepthView;
-			target->getCustomAttribute( "ID3D10DepthStencilView", &pRTDepthView );
-
-
-			// we need to clear the state 
-			mDevice->ClearState();
-
-			if (mDevice.isError())
-			{
-				String errorDescription = mDevice.getErrorDescription();
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-					"D3D10 device cannot Clear State\nError Description:" + errorDescription,
-					"D3D10RenderSystem::_setViewport");
-			}
-
-
-
-			// now switch to the new render target
-			mDevice->OMSetRenderTargets(1,
-				&pRTView,
-				pRTDepthView);
-
-
-			if (mDevice.isError())
-			{
-				String errorDescription = mDevice.getErrorDescription();
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-					"D3D10 device cannot set render target\nError Description:" + errorDescription,
-					"D3D10RenderSystem::_setViewport");
-			}
-
-			// TODO - support MRT
-
-		/*	hr = mDevice->SetDepthStencilSurface(pDepth);
-			if (FAILED(hr))
-			{
-				String msg ;//= DXGetErrorDescription9(hr);
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setDepthStencil : " + msg, "D3D10RenderSystem::_setViewport" );
-			}
-*/
+			_setRenderTarget(target);
 			_setCullingMode( mCullingMode );
 
 			// set viewport dimensions

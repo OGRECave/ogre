@@ -209,7 +209,7 @@ namespace Ogre
 		/**
          * Set current render target to target, enabling its GL context if needed
          */
-		void _setRenderTarget(RenderTarget *target){}
+		void _setRenderTarget(RenderTarget *target);
 		
 		/// @copydoc RenderSystem::createMultiRenderTarget
 		virtual MultiRenderTarget * createMultiRenderTarget(const String & name);
