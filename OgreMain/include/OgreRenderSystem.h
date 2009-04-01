@@ -1153,6 +1153,11 @@ namespace Ogre
 			mDerivedDepthBiasSlopeScale = slopeScale;
 		}
 
+		/**
+         * Set current render target to target, enabling its GL context if needed
+         */
+        virtual void _setRenderTarget(RenderTarget *target) = 0;
+
 		/** Defines a listener on the custom events that this render system 
 		can raise.
 		@see RenderSystem::addListener
