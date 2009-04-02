@@ -502,7 +502,7 @@ namespace Ogre
 	{
 		for (size_t i = 0; i < count; ++i, ++val)
 		{
-			char c = val? 1 : 0;
+			char c = (*val)? 1 : 0;
 			write(&c);
 		}
 	}
