@@ -145,6 +145,30 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	uint32 StreamSerialiser::peekNextChunkID()
+	{
+		checkStream();
+
+		if (eof())
+			return 0;
+
+		// Have we figured out the endian mode yet?
+		if (mReadWriteHeader)
+			readHeader();
+
+		if (mEndian == ENDIAN_AUTO)
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+			"Endian mode has not been determined, did you disable header without setting?", 
+			"StreamSerialiser::peekNextChunkID");
+
+		size_t homePos = mStream->tell();
+		uint32 ret;
+		read(&ret);
+		mStream->seek(homePos);
+
+		return ret;
+	}
+	//---------------------------------------------------------------------
 	void StreamSerialiser::readChunkEnd(uint32 id)
 	{
 		Chunk* c = popChunk(id);
@@ -738,7 +762,11 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	uint32 StreamSerialiser::calculateChecksum(Chunk* c)
 	{
-		return FastHash((const char*)c, sizeof(uint32) * 2 + sizeof(uint16));
+		uint32 hashVal = FastHash((const char*)&c->id, sizeof(uint32));
+		hashVal = FastHash((const char*)&c->version, sizeof(uint16), hashVal);
+		hashVal = FastHash((const char*)&c->length, sizeof(uint32), hashVal);
+
+		return hashVal;
 	}
 	//---------------------------------------------------------------------
 	StreamSerialiser::Chunk* StreamSerialiser::popChunk(uint id)

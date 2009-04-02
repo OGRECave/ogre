@@ -192,6 +192,9 @@ namespace Ogre
 		*/
 		virtual void undoReadChunk(uint32 id);
 
+		/** Call this to 'peek' at the next chunk ID without permanently moving the stream pointer. */
+		virtual uint32 peekNextChunkID(); 
+
 		/** Finish the reading of a chunk.
 		@remarks
 			You can call this method at any point after calling readChunkBegin, even

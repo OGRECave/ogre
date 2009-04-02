@@ -335,6 +335,11 @@ namespace Ogre {
             SceneManager* worldGeometrySceneManager;
 			// in global pool flag - if true the resource will be loaded even a different	group was requested in the load method as a parameter.
 			bool inGlobalPool;
+
+			void addToIndex(const String& filename, Archive* arch);
+			void removeFromIndex(const String& filename, Archive* arch);
+			void removeFromIndex(Archive* arch);
+
 		};
         /// Map from resource group names to groups
         typedef map<String, ResourceGroup*>::type ResourceGroupMap;
@@ -824,6 +829,47 @@ namespace Ogre {
 
 		/** Retrieve the modification time of a given file */
 		time_t resourceModifiedTime(ResourceGroup* group, const String& filename); 
+
+		/** Create a new resource file in a given group.
+		@remarks
+			This method creates a new file in a resource group and passes you back a 
+			writeable stream. 
+		@param filename The name of the file to create
+		@param groupName The name of the group in which to create the file
+		@param overwrite If true, an existing file will be overwritten, if false
+			an error will occur if the file already exists
+		@param locationPattern If the resource group contains multiple locations, 
+			then usually the file will be created in the first writable location. If you 
+			want to be more specific, you can include a location pattern here and 
+			only locations which match that pattern (as determined by StringUtil::match)
+			will be considered candidates for creation.
+		*/
+		DataStreamPtr createResource(const String& filename, const String& groupName = DEFAULT_RESOURCE_GROUP_NAME, 
+			bool overwrite = false, const String& locationPattern = StringUtil::BLANK);
+
+		/** Delete a single resource file.
+		@param filename The name of the file to delete. 
+		@param groupName The name of the group in which to search
+		@param locationPattern If the resource group contains multiple locations, 
+			then usually first matching file found in any location will be deleted. If you 
+			want to be more specific, you can include a location pattern here and 
+			only locations which match that pattern (as determined by StringUtil::match)
+			will be considered candidates for deletion.
+		*/
+		void deleteResource(const String& filename, const String& groupName = DEFAULT_RESOURCE_GROUP_NAME, 
+			const String& locationPattern = StringUtil::BLANK);
+
+		/** Delete all matching resource files.
+		@param filePattern The pattern (see StringUtil::match) of the files to delete. 
+		@param groupName The name of the group in which to search
+		@param locationPattern If the resource group contains multiple locations, 
+			then usually all matching files in any location will be deleted. If you 
+			want to be more specific, you can include a location pattern here and 
+			only locations which match that pattern (as determined by StringUtil::match)
+			will be considered candidates for deletion.
+		*/
+		void deleteMatchingResources(const String& filePattern, const String& groupName = DEFAULT_RESOURCE_GROUP_NAME, 
+			const String& locationPattern = StringUtil::BLANK);
 
 		/** Adds a ResourceGroupListener which will be called back during 
             resource loading events. 

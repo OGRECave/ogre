@@ -525,17 +525,7 @@ namespace Ogre {
         // Index resources
         StringVectorPtr vec = pArch->find("*", recursive);
         for( StringVector::iterator it = vec->begin(); it != vec->end(); ++it )
-        {
-			// Index under full name, case sensitive
-            grp->resourceIndexCaseSensitive[(*it)] = pArch;
-            if (!pArch->isCaseSensitive())
-            {
-	            // Index under lower case name too for case insensitive match
-    	        String indexName = (*it);
-                StringUtil::toLowerCase(indexName);
-	            grp->resourceIndexCaseInsensitive[indexName] = pArch;
-            }
-        }
+			grp->addToIndex(*it, pArch);
 		
 		StringUtil::StrStreamType msg;
 		msg << "Added resource location '" << name << "' of type '" << locType
@@ -567,34 +557,7 @@ namespace Ogre {
 			Archive* pArch = (*li)->archive;
 			if (pArch->getName() == name)
 			{
-				// Delete indexes
-				ResourceLocationIndex::iterator rit, ritend;
-				ritend = grp->resourceIndexCaseInsensitive.end();
-				for (rit = grp->resourceIndexCaseInsensitive.begin(); rit != ritend;)
-				{
-					if (rit->second == pArch)
-					{
-						ResourceLocationIndex::iterator del = rit++;
-						grp->resourceIndexCaseInsensitive.erase(del);
-					}
-					else
-					{
-						++rit;
-					}
-				}
-                ritend = grp->resourceIndexCaseSensitive.end();
-                for (rit = grp->resourceIndexCaseSensitive.begin(); rit != ritend;)
-                {
-                    if (rit->second == pArch)
-                    {
-                        ResourceLocationIndex::iterator del = rit++;
-                        grp->resourceIndexCaseSensitive.erase(del);
-                    }
-                    else
-                    {
-                        ++rit;
-                    }
-                }
+				grp->removeFromIndex(pArch);
 				// Erase list entry
 				OGRE_DELETE_T(*li, ResourceLocation, MEMCATEGORY_RESOURCE);
 				grp->locationList.erase(li);
@@ -804,6 +767,121 @@ namespace Ogre {
 		return ret;
 		
     }
+	//---------------------------------------------------------------------
+	DataStreamPtr ResourceGroupManager::createResource(const String& filename, 
+		const String& groupName, bool overwrite, const String& locationPattern)
+	{
+		OGRE_LOCK_AUTO_MUTEX
+		ResourceGroup* grp = getResourceGroup(groupName);
+		if (!grp)
+		{
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+				"Cannot locate a resource group called '" + groupName + "'", 
+				"ResourceGroupManager::createResource");
+		}
+
+		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME) // lock group mutex
+
+		
+		for (LocationList::iterator li = grp->locationList.begin(); 
+			li != grp->locationList.end(); ++li)
+		{
+			Archive* arch = (*li)->archive;
+
+			if (!arch->isReadOnly() && 
+				(locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
+			{
+				if (!overwrite && arch->exists(filename))
+					OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
+						"Cannot overwrite existing file " + filename, 
+						"ResourceGroupManager::createResource");
+				
+				// create it
+				DataStreamPtr ret = arch->create(filename);
+				grp->addToIndex(filename, arch);
+
+
+				return ret;
+			}
+		}
+
+		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+			"Cannot find a writable location in group " + groupName, 
+			"ResourceGroupManager::createResource");
+
+	}
+	//---------------------------------------------------------------------
+	void ResourceGroupManager::deleteResource(const String& filename, const String& groupName, 
+		const String& locationPattern)
+	{
+		OGRE_LOCK_AUTO_MUTEX
+		ResourceGroup* grp = getResourceGroup(groupName);
+		if (!grp)
+		{
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+				"Cannot locate a resource group called '" + groupName + "'", 
+				"ResourceGroupManager::createResource");
+		}
+
+		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME) // lock group mutex
+
+		
+		for (LocationList::iterator li = grp->locationList.begin(); 
+			li != grp->locationList.end(); ++li)
+		{
+			Archive* arch = (*li)->archive;
+
+			if (!arch->isReadOnly() && 
+				(locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
+			{
+				if (arch->exists(filename))
+				{
+					arch->remove(filename);
+					grp->removeFromIndex(filename, arch);
+
+					// only remove one file
+					break;
+				}
+			}
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void ResourceGroupManager::deleteMatchingResources(const String& filePattern, 
+		const String& groupName, const String& locationPattern)
+	{
+		OGRE_LOCK_AUTO_MUTEX
+		ResourceGroup* grp = getResourceGroup(groupName);
+		if (!grp)
+		{
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+				"Cannot locate a resource group called '" + groupName + "'", 
+				"ResourceGroupManager::createResource");
+		}
+
+		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME) // lock group mutex
+
+		
+		for (LocationList::iterator li = grp->locationList.begin(); 
+			li != grp->locationList.end(); ++li)
+		{
+			Archive* arch = (*li)->archive;
+
+			if (!arch->isReadOnly() && 
+				(locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
+			{
+				StringVectorPtr matchingFiles = arch->find(filePattern);
+				for (StringVector::iterator f = matchingFiles->begin(); f != matchingFiles->end(); ++f)
+				{
+					arch->remove(*f);
+					grp->removeFromIndex(*f, arch);
+
+				}
+			}
+		}
+
+
+	}
     //-----------------------------------------------------------------------
     void ResourceGroupManager::addResourceGroupListener(ResourceGroupListener* l)
     {
@@ -1802,6 +1880,71 @@ namespace Ogre {
 	{
 		return mLoadingListener;
 	}
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	void ResourceGroupManager::ResourceGroup::addToIndex(const String& filename, Archive* arch)
+	{
+		// internal, assumes mutex lock has already been obtained
+		this->resourceIndexCaseSensitive[filename] = arch;
+
+		if (!arch->isCaseSensitive())
+		{
+			String lcase = filename;
+			StringUtil::toLowerCase(lcase);
+			this->resourceIndexCaseInsensitive[lcase] = arch;
+		}
+	}
+	//---------------------------------------------------------------------
+	void ResourceGroupManager::ResourceGroup::removeFromIndex(const String& filename, Archive* arch)
+	{
+		// internal, assumes mutex lock has already been obtained
+		ResourceLocationIndex::iterator i = this->resourceIndexCaseSensitive.find(filename);
+		if (i != this->resourceIndexCaseSensitive.end() && i->second == arch)
+			this->resourceIndexCaseSensitive.erase(i);
+
+		if (!arch->isCaseSensitive())
+		{
+			String lcase = filename;
+			StringUtil::toLowerCase(lcase);
+			i = this->resourceIndexCaseInsensitive.find(filename);
+			if (i != this->resourceIndexCaseInsensitive.end() && i->second == arch)
+				this->resourceIndexCaseInsensitive.erase(i);
+		}
+	}
+	//---------------------------------------------------------------------
+	void ResourceGroupManager::ResourceGroup::removeFromIndex(Archive* arch)
+	{
+		// Delete indexes
+		ResourceLocationIndex::iterator rit, ritend;
+		ritend = this->resourceIndexCaseInsensitive.end();
+		for (rit = this->resourceIndexCaseInsensitive.begin(); rit != ritend;)
+		{
+			if (rit->second == arch)
+			{
+				ResourceLocationIndex::iterator del = rit++;
+				this->resourceIndexCaseInsensitive.erase(del);
+			}
+			else
+			{
+				++rit;
+			}
+		}
+		ritend = this->resourceIndexCaseSensitive.end();
+		for (rit = this->resourceIndexCaseSensitive.begin(); rit != ritend;)
+		{
+			if (rit->second == arch)
+			{
+				ResourceLocationIndex::iterator del = rit++;
+				this->resourceIndexCaseSensitive.erase(del);
+			}
+			else
+			{
+				++rit;
+			}
+		}
+
+	}
+	//---------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	ScriptLoader::~ScriptLoader()
 	{
