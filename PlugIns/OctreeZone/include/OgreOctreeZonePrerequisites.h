@@ -52,8 +52,14 @@ Code Style Update	 :
 #   ifdef OGRE_OCTREEZONEPLUGIN_EXPORTS
 #       define _OgreOctreeZonePluginExport __declspec(dllexport)
 #   else
-#       define _OgreOctreeZonePluginExport __declspec(dllimport)
+#       if defined( __MINGW32__ )
+#           define _OgreOctreeZonePluginExport
+#       else
+#           define _OgreOctreeZonePluginExport __declspec(dllimport)
+#       endif
 #   endif
+#elif defined ( OGRE_GCC_VISIBILITY )
+#    define _OgreOctreeZonePluginExport __attribute__ ((visibility("default")))
 #else
 #   define _OgreOctreeZonePluginExport
 #endif
