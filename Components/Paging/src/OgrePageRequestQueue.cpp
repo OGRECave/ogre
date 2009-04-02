@@ -26,33 +26,32 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#include "OgrePage.h"
-#include "OgreRoot.h"
+#include "OgrePageRequestQueue.h"
+#include "OgreStringConverter.h"
+#include "OgreException.h"
 
 namespace Ogre
 {
 	//---------------------------------------------------------------------
-	Page::Page(PageID pageID)
-		: mID(pageID)
-		, mParent(0)
+	PageRequestQueue::PageRequestQueue(PageManager* manager)
+		: mManager(manager)
 	{
+	}
+	//---------------------------------------------------------------------
+	PageRequestQueue::~PageRequestQueue()
+	{
+	}
+	//---------------------------------------------------------------------
+	void PageRequestQueue::loadPage(PageID pageID, PagedWorldSection* section)
+	{
+		// TODO
+	}
+	//---------------------------------------------------------------------
+	void PageRequestQueue::unloadPage(Page* page)
+	{
+		// TODO
+	}
 
-	}
-	//---------------------------------------------------------------------
-	Page::~Page()
-	{
-
-	}
-	//---------------------------------------------------------------------
-	void Page::_notifyAttached(PagedWorldSection* parent)
-	{
-		mParent = parent;
-	}
-	//---------------------------------------------------------------------
-	void Page::touch()
-	{
-		mFrameLastHeld = Root::getSingleton().getNextFrameNumber();
-	}
 
 }
 

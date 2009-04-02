@@ -31,19 +31,26 @@ Torus Knot Software Ltd.
 #include "OgrePageStrategy.h"
 #include "OgreStringConverter.h"
 #include "OgreException.h"
+#include "OgrePageRequestQueue.h"
+#include "OgrePagedWorldSection.h"
+#include "OgrePagedWorld.h"
+#include "OgreStreamSerialiser.h"
 
 namespace Ogre
 {
 	//---------------------------------------------------------------------
 	PageManager::PageManager()
 		: mWorldNameGenerator("World")
+		, mQueue(0)
+		, mPageStreamProvider(0)
+		, mPageResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
 	{
-
+		mQueue = OGRE_NEW PageRequestQueue(this);
 	}
 	//---------------------------------------------------------------------
 	PageManager::~PageManager()
 	{
-
+		OGRE_DELETE mQueue;
 	}
 	//---------------------------------------------------------------------
 	PagedWorld* PageManager::createWorld(const String& name)
@@ -112,7 +119,9 @@ namespace Ogre
 	{
 		PagedWorld* ret = createWorld(name);
 
-		ret->load(filename);
+		StreamSerialiser* ser = _readWorldStream(filename);
+		ret->load(*ser);
+		OGRE_DELETE ser;
 
 		return ret;
 
@@ -128,9 +137,9 @@ namespace Ogre
 		return ret;
 	}
 	//---------------------------------------------------------------------
-	void PageManager::saveWorld(PagedWorld* world, const String& filename, Archive* arch)
+	void PageManager::saveWorld(PagedWorld* world, const String& filename)
 	{
-		world->save(filename, arch);
+		world->save(filename);
 	}
 	//---------------------------------------------------------------------
 	void PageManager::saveWorld(PagedWorld* world, const DataStreamPtr& stream)
@@ -177,6 +186,90 @@ namespace Ogre
 		return mStrategies;
 	}
 	//---------------------------------------------------------------------
+	StreamSerialiser* PageManager::_readPageStream(PageID pageID, PagedWorldSection* section)
+	{
+		StreamSerialiser* ser = 0;
+		if (mPageStreamProvider)
+			ser = mPageStreamProvider->readPageStream(pageID, section);
+		if (!ser)
+		{
+			// use default implementation
+			StringUtil::StrStreamType nameStr;
+			nameStr << section->getWorld()->getName() << "_" << section->getName() 
+				<< "_" << pageID << ".page";
+			DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(nameStr.str());
+
+			ser = OGRE_NEW StreamSerialiser(stream);
+
+		}
+
+		return ser;
+
+	}
+	//---------------------------------------------------------------------
+	StreamSerialiser* PageManager::_writePageStream(PageID pageID, PagedWorldSection* section)
+	{
+		StreamSerialiser* ser = 0;
+		if (mPageStreamProvider)
+			ser = mPageStreamProvider->writePageStream(pageID, section);
+		if (!ser)
+		{
+			// use default implementation
+			StringUtil::StrStreamType nameStr;
+			nameStr << section->getWorld()->getName() << "_" << section->getName() 
+				<< "_" << pageID << ".page";
+			
+			// create file, overwrite if necessary
+			DataStreamPtr stream = ResourceGroupManager::getSingleton().createResource(
+				nameStr.str(), mPageResourceGroup, true);
+
+			ser = OGRE_NEW StreamSerialiser(stream);
+
+		}
+
+		return ser;
+
+	}
+	//---------------------------------------------------------------------
+	StreamSerialiser* PageManager::_readWorldStream(const String& filename)
+	{
+		StreamSerialiser* ser = 0;
+		if (mPageStreamProvider)
+			ser = mPageStreamProvider->readWorldStream(filename);
+		if (!ser)
+		{
+			// use default implementation
+			DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(
+				filename);
+
+			ser = OGRE_NEW StreamSerialiser(stream);
+
+		}
+
+		return ser;
+
+	}
+	//---------------------------------------------------------------------
+	StreamSerialiser* PageManager::_writeWorldStream(const String& filename)
+	{
+		StreamSerialiser* ser = 0;
+		if (mPageStreamProvider)
+			ser = mPageStreamProvider->writeWorldStream(filename);
+		if (!ser)
+		{
+			// use default implementation
+			// create file, overwrite if necessary
+			DataStreamPtr stream = ResourceGroupManager::getSingleton().createResource(
+				filename, mPageResourceGroup, true);
+
+			ser = OGRE_NEW StreamSerialiser(stream);
+
+		}
+
+		return ser;
+
+	}
+
 
 
 }

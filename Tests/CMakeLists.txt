@@ -37,6 +37,19 @@ if (OGRE_BUILD_TESTS)
 		src/main.cpp
 	)
 
+	if (OGRE_BUILD_COMPONENT_PAGING)
+	  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Paging/include
+	    ${CMAKE_SOURCE_DIR}/Components/Paging/include)
+	  
+	  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgrePaging)
+	  set(HEADER_FILES ${HEADER_FILES}
+	    Components/Paging/include/PageCoreTests.h
+	  )
+	  set(SOURCE_FILES ${SOURCE_FILES}
+	    Components/Paging/src/PageCoreTests.cpp
+	  )
+	endif ()
+
 	add_executable(Test_Ogre WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
 	ogre_config_common(Test_Ogre)
 	target_link_libraries(Test_Ogre ${OGRE_LIBRARIES} ${CppUnit_LIBRARIES})

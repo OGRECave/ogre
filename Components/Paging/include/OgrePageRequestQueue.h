@@ -26,33 +26,55 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#include "OgrePage.h"
-#include "OgreRoot.h"
+
+#ifndef __Ogre_PageRequestQueue_H__
+#define __Ogre_PageRequestQueue_H__
+
+#include "OgrePagingPrerequisites.h"
+#include "OgreString.h"
+#include "OgreCommon.h"
 
 namespace Ogre
 {
-	//---------------------------------------------------------------------
-	Page::Page(PageID pageID)
-		: mID(pageID)
-		, mParent(0)
-	{
+	/** \addtogroup Optional Components
+	*  @{
+	*/
+	/** \addtogroup Paging
+	*  Some details on paging component
+	*  @{
+	*/
 
-	}
-	//---------------------------------------------------------------------
-	Page::~Page()
+	/** The PageRequestQueue is where pages are queued for loading and freeing.
+	*/
+	class _OgrePagingExport PageRequestQueue : public PageAlloc
 	{
+	public:
+		PageRequestQueue(PageManager* manager);
+		virtual ~PageRequestQueue();
 
-	}
-	//---------------------------------------------------------------------
-	void Page::_notifyAttached(PagedWorldSection* parent)
-	{
-		mParent = parent;
-	}
-	//---------------------------------------------------------------------
-	void Page::touch()
-	{
-		mFrameLastHeld = Root::getSingleton().getNextFrameNumber();
-	}
+		/** Load a Page with a given ID, for a given PagedWorldSection.
+		@remarks
+			This method is called from the main rendering thread in all cases. 
+			If threading is enabled, the request is queued and processed by 
+			a separate thread. At some point later on the loaded page will be attached
+			to the section which requested it. 
+		*/
+		void loadPage(PageID pageID, PagedWorldSection* section);
+		/** Dispose of a page */
+		void unloadPage(Page* page);
 
+
+
+	protected:
+		PageManager* mManager;
+	};
+
+	/** @} */
+	/** @} */
 }
 
+
+
+
+
+#endif 

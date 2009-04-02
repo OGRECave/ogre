@@ -35,8 +35,8 @@ Torus Knot Software Ltd.
 namespace Ogre
 {
 	//---------------------------------------------------------------------
-	const uint32 Grid2DPageStrategyData::msChunkID = StreamSerialiser::makeIdentifier("G2DD");
-	const uint16 Grid2DPageStrategyData::msChunkVersion = 1;
+	const uint32 Grid2DPageStrategyData::CHUNK_ID = StreamSerialiser::makeIdentifier("G2DD");
+	const uint16 Grid2DPageStrategyData::CHUNK_VERSION = 1;
 	//---------------------------------------------------------------------
 	Grid2DPageStrategyData::Grid2DPageStrategyData()
 		: PageStrategyData()
@@ -122,19 +122,17 @@ namespace Ogre
 		mHoldRadiusInCells = mHoldRadius / mCellSize;
 	}
 	//---------------------------------------------------------------------
-	void Grid2DPageStrategyData::load(StreamSerialiser& ser)
+	bool Grid2DPageStrategyData::load(StreamSerialiser& ser)
 	{
 		const StreamSerialiser::Chunk* chunk = ser.readChunkBegin();
-		if (chunk->id != msChunkID)
+		if (chunk->id != CHUNK_ID)
 		{
 			ser.undoReadChunk(chunk->id);
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-				"Stream does not contain Grid2DPageStrategyData data!", 
-				"Grid2DPageStrategyData::load");
+			return false;
 		}
 
 		// Check version
-		if (chunk->version > msChunkVersion)
+		if (chunk->version > CHUNK_VERSION)
 		{
 			// skip the rest
 			ser.readChunkEnd(chunk->id);
@@ -156,11 +154,13 @@ namespace Ogre
 		ser.read(&mHoldRadius);
 
 		ser.readChunkEnd(chunk->id);
+
+		return true;
 	}
 	//---------------------------------------------------------------------
 	void Grid2DPageStrategyData::save(StreamSerialiser& ser)
 	{
-		ser.writeChunkBegin(msChunkID, msChunkVersion);
+		ser.writeChunkBegin(CHUNK_ID, CHUNK_VERSION);
 
 		uint8 readMode = (uint8)mMode;
 		ser.write(&readMode);
@@ -170,7 +170,7 @@ namespace Ogre
 		ser.write(&mLoadRadius);
 		ser.write(&mHoldRadius);
 
-		ser.writeChunkEnd(msChunkID);
+		ser.writeChunkEnd(CHUNK_ID);
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------

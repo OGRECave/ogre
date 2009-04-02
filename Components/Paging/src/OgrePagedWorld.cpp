@@ -36,11 +36,11 @@ Torus Knot Software Ltd.
 namespace Ogre
 {
 	//---------------------------------------------------------------------
-	const uint32 PagedWorld::msChunkID = StreamSerialiser::makeIdentifier("PWLD");
-	const uint16 PagedWorld::msChunkVersion = 1;
+	const uint32 PagedWorld::CHUNK_ID = StreamSerialiser::makeIdentifier("PWLD");
+	const uint16 PagedWorld::CHUNK_VERSION = 1;
 	//---------------------------------------------------------------------
 	PagedWorld::PagedWorld(const String& name, PageManager* manager)
-		:mName(name), mManager(manager), mSectionNameGenerator("Section")
+		:mName(name), mManager(manager), mSectionNameGenerator("Section"), mPageStreamProvider(0)
 	{
 
 	}
@@ -52,38 +52,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void PagedWorld::load(const String& filename)
 	{
-		// Load from any resource location
-		DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(filename);
-
-		if (stream.isNull())
-		{
-			// try manual load (absolute files)
-			struct stat tagStat;
-			if (stat(filename.c_str(), &tagStat) == 0)
-			{
-				std::ifstream* fstr = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL)();
-				fstr->open(filename.c_str(), std::ios::in | std::ios::binary);
-				if (fstr->fail())
-				{
-					OGRE_DELETE_T(fstr, basic_ifstream, MEMCATEGORY_GENERAL);
-				}
-				else
-				{
-					stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename,
-						fstr, tagStat.st_size, true));
-				}
-			}
-		}
-
-		if (stream.isNull())
-		{
-			OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
-				"Cannot open world file: " + filename,
-				"PagedWorld::load");
-		}
-
-		load(stream);
-
+		StreamSerialiser* ser = mManager->_readWorldStream(filename);
+		load(*ser);
+		OGRE_DELETE ser;
 	}
 	//---------------------------------------------------------------------
 	void PagedWorld::load(const DataStreamPtr& stream)
@@ -92,19 +63,17 @@ namespace Ogre
 		load(ser);
 	}
 	//---------------------------------------------------------------------
-	void PagedWorld::load(StreamSerialiser& ser)
+	bool PagedWorld::load(StreamSerialiser& ser)
 	{
 		const StreamSerialiser::Chunk* chunk = ser.readChunkBegin();
-		if (chunk->id != msChunkID)
+		if (chunk->id != CHUNK_ID)
 		{
 			ser.undoReadChunk(chunk->id);
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-				"Stream does not contain PagedWorld data!", 
-				"PagedWorld::load");
+			return false;
 		}
 
 		// Check version
-		if (chunk->version > msChunkVersion)
+		if (chunk->version > CHUNK_VERSION)
 		{
 			// skip the rest
 			ser.readChunkEnd(chunk->id);
@@ -116,38 +85,31 @@ namespace Ogre
 		// Name
 		ser.read(&mName);
 		// Sections
-		for (SectionMap::iterator i = mSections.begin(); i != mSections.end(); ++i)
-			i->second->load(ser);
+		bool sectionsOk = true;
+		while(ser.peekNextChunkID() == PagedWorldSection::CHUNK_ID)
+		{
+			PagedWorldSection* sec = OGRE_NEW PagedWorldSection(this);
+			bool sectionsOk = sec->load(ser);
+			if (sectionsOk)
+				mSections[sec->getName()] = sec;
+			else
+			{
+				OGRE_DELETE sec;
+				break;
+			}
+		}
 
-		ser.readChunkEnd(msChunkID);
+		ser.readChunkEnd(CHUNK_ID);
+
+		return true;
 
 	}
 	//---------------------------------------------------------------------
-	void PagedWorld::save(const String& filename, Archive* arch)
+	void PagedWorld::save(const String& filename)
 	{
-		DataStreamPtr stream;
-		if (arch)
-		{
-			stream = arch->create(filename);
-		}
-		else
-		{
-			std::fstream* fstr = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
-			fstr->open(filename.c_str(), std::ios::out | std::ios::binary);
-			if (fstr->fail())
-			{
-				OGRE_DELETE_T(fstr, basic_fstream, MEMCATEGORY_GENERAL);
-				OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
-					"Cannot open world file for writing: " + filename,
-					"PageManager::saveWorld");
-			}
-			stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename,
-				fstr, 0, true));
-
-		}
-
-		save(stream);
-		
+		StreamSerialiser* ser = mManager->_writeWorldStream(filename);
+		save(*ser);
+		OGRE_DELETE ser;
 	}
 	//---------------------------------------------------------------------
 	void PagedWorld::save(const DataStreamPtr& stream)
@@ -158,7 +120,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void PagedWorld::save(StreamSerialiser& ser)
 	{
-		ser.writeChunkBegin(msChunkID, msChunkVersion);
+		ser.writeChunkBegin(CHUNK_ID, CHUNK_VERSION);
 
 		// Name
 		ser.write(&mName);
@@ -166,7 +128,7 @@ namespace Ogre
 		for (SectionMap::iterator i = mSections.begin(); i != mSections.end(); ++i)
 			i->second->save(ser);
 
-		ser.writeChunkEnd(msChunkID);
+		ser.writeChunkEnd(CHUNK_ID);
 	}
 	//---------------------------------------------------------------------
 	PagedWorldSection* PagedWorld::createSection(const String& strategyName, 
@@ -229,6 +191,27 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	StreamSerialiser* PagedWorld::_readPageStream(PageID pageID, PagedWorldSection* section)
+	{
+		StreamSerialiser* ser = 0;
+		if (mPageStreamProvider)
+			ser = mPageStreamProvider->readPageStream(pageID, section);
+		if (!ser)
+			ser = mManager->_readPageStream(pageID, section);
+		return ser;
+
+	}
+	//---------------------------------------------------------------------
+	StreamSerialiser* PagedWorld::_writePageStream(PageID pageID, PagedWorldSection* section)
+	{
+		StreamSerialiser* ser = 0;
+		if (mPageStreamProvider)
+			ser = mPageStreamProvider->writePageStream(pageID, section);
+		if (!ser)
+			ser = mManager->_writePageStream(pageID, section);
+		return ser;
+
+	}
 
 
 

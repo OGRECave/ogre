@@ -44,12 +44,54 @@ namespace Ogre
 	*  Some details on paging component
 	*  @{
 	*/
+
+	/** Abstract class that can be implemented by the user application to 
+		provide a way to retrieve paging data from a source of their choosing.
+	*/
+	class PageStreamProvider : public PageAlloc
+	{
+	public:
+		PageStreamProvider() {}
+		virtual ~PageStreamProvider() {}
+
+		/** Get a serialiser set up to read PagedWorld data for the given world filename. 
+		@remarks
+		The StreamSerialiser returned is the responsibility of the caller to
+		delete. 
+		*/
+		virtual StreamSerialiser* readWorldStream(const String& filename) { return 0; }
+		/** Get a serialiser set up to write PagedWorld data for the given world filename. 
+		@remarks
+		The StreamSerialiser returned is the responsibility of the caller to
+		delete. 
+		*/
+		virtual StreamSerialiser* writeWorldStream(const String& filename) { return 0; }
+		/** Get a serialiser set up to read Page data for the given PageID, 
+			or null if this provider cannot supply one. 
+		@remarks
+			The StreamSerialiser returned is the responsibility of the caller to
+			delete. 
+		@param pageID The ID of the page being requested
+		@param section The parent section to which this page will belong
+		*/
+		virtual StreamSerialiser* readPageStream(PageID pageID, PagedWorldSection* section) { return 0; }
+
+		/** Get a serialiser set up to write Page data for the given PageID, 
+		or null if this provider cannot supply one. 
+		@remarks
+		The StreamSerialiser returned is the responsibility of the caller to
+		delete. 
+		@param pageID The ID of the page being requested
+		@param section The parent section to which this page will belong
+		*/
+		virtual StreamSerialiser* writePageStream(PageID pageID, PagedWorldSection* section) { return 0; }
+	};
 	
 	/** The PageManager is the entry point through which you load all PagedWorld instances, 
 		and the place where PageStrategy instances and factory classes are
 		registered to customise the paging behaviour.
 	*/
-	class _OgrePagingExport PageManager : public GeneralAllocatedObject
+	class _OgrePagingExport PageManager : public PageAlloc
 	{
 	public:
 		PageManager();
@@ -91,7 +133,7 @@ namespace Ogre
 		@param filename The filename to save the data to
 		@param arch The Archive that filename is relative to (optional)
 		*/
-		void saveWorld(PagedWorld* world, const String& filename, Archive* arch = 0);
+		void saveWorld(PagedWorld* world, const String& filename);
 		/** Save a PagedWorld instance to a file. 
 		@param world The world to be saved
 		@param stream The stream to save the data to
@@ -127,11 +169,72 @@ namespace Ogre
 		/** Get a reference to the registered strategies.
 		*/
 		const StrategyMap& getStrategies() const;
+		/// Get the request queue
+		PageRequestQueue* getQueue() const { return mQueue; }
+
+
+		/** Set the PageStreamProvider which can provide streams for any Page. 
+		@remarks
+			This is the top-level way that you can direct how Page data is loaded. 
+			When data for a Page is requested for a PagedWorldSection, the following
+			sequence of classes will be checked to see if they have a provider willing
+			to supply the stream: PagedWorldSection, PagedWorld, PageManager.
+			If none of these do, then the default behaviour is to look for a file
+			called worldname_sectionname_pageID.page. 
+		@note
+			The caller remains responsible for the destruction of the provider.
+		*/
+		void setPageStreamProvider(PageStreamProvider* provider) { mPageStreamProvider = provider; }
+		
+		/** Get the PageStreamProvider which can provide streams for any Page. */
+		PageStreamProvider* getPageStreamProvider() const { return mPageStreamProvider; }
+
+		/** Get a serialiser set up to read Page data for the given PageID. 
+		@param pageID The ID of the page being requested
+		@param section The parent section to which this page will belong
+		@remarks
+			The StreamSerialiser returned is the responsibility of the caller to
+			delete. 
+		*/
+		StreamSerialiser* _readPageStream(PageID pageID, PagedWorldSection* section);
+
+		/** Get a serialiser set up to write Page data for the given PageID. 
+		@param pageID The ID of the page being requested
+		@param section The parent section to which this page will belong
+		@remarks
+		The StreamSerialiser returned is the responsibility of the caller to
+		delete. 
+		*/
+		StreamSerialiser* _writePageStream(PageID pageID, PagedWorldSection* section);
+		/** Get a serialiser set up to read PagedWorld data for the given world name. 
+		@remarks
+			The StreamSerialiser returned is the responsibility of the caller to
+			delete. 
+		*/
+		StreamSerialiser* _readWorldStream(const String& filename);
+
+		/** Get a serialiser set up to write PagedWorld data. 
+		@remarks
+		The StreamSerialiser returned is the responsibility of the caller to
+		delete. 
+		*/
+		StreamSerialiser* _writeWorldStream(const String& filename);
+
+		/** Get the resource group that will be used to read/write files when the
+			default load routines are used. 
+		*/
+		const String& getPageResourceGroup() const { return mPageResourceGroup; }
+		/** Set the resource group that will be used to read/write files when the
+		default load routines are used. 
+		*/
+		void getPageResourceGroup(const String& g) { mPageResourceGroup = g; }
 	protected:
 		WorldMap mWorlds;
 		StrategyMap mStrategies;
 		NameGenerator mWorldNameGenerator;
-
+		PageRequestQueue* mQueue;
+		PageStreamProvider* mPageStreamProvider;
+		String mPageResourceGroup;
 	};
 
 	/** @} */

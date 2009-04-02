@@ -43,6 +43,39 @@ namespace Ogre
 	*  @{
 	*/
 
+	/** Page class
+	*/
+	class Page : public PageAlloc
+	{
+	protected:
+		PageID mID;
+		PagedWorldSection* mParent;
+		unsigned long mFrameLastHeld;
+	public:
+		Page(PageID pageID);
+		virtual ~Page();
+
+		/// Get the ID of this page, unique withing the parent
+		virtual PageID getID() const { return mID; }
+		/// Get the PagedWorldSection this page belongs to, or zero if unattached
+		virtual PagedWorldSection* getParentSection() const { return mParent; }
+		/** Get the frame number in which this Page was last loaded or held.
+		@remarks
+			A Page that has not been requested to be loaded or held in the recent
+			past will be a candidate for removal.
+		*/
+		virtual unsigned long getFrameLastHeld() { return mFrameLastHeld; }
+		/// 'Touch' the page to let it know it's being used
+		virtual void touch();
+		/// Get whether or not this page is currently attached 
+		virtual bool isAttached() const { return mParent != 0; }
+
+
+		/// Internal method to notify a page that it is attached
+		virtual void _notifyAttached(PagedWorldSection* parent);
+
+	};
+
 	/** @} */
 	/** @} */
 }

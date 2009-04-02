@@ -26,33 +26,57 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#include "OgrePage.h"
-#include "OgreRoot.h"
+#include "PageCoreTests.h"
+#include "OgrePagedWorld.h"
+#include "OgrePagedWorldSection.h"
 
-namespace Ogre
+CPPUNIT_TEST_SUITE_REGISTRATION( PageCoreTests );
+
+void PageCoreTests::setUp()
 {
-	//---------------------------------------------------------------------
-	Page::Page(PageID pageID)
-		: mID(pageID)
-		, mParent(0)
-	{
+	mRoot = OGRE_NEW Root();
+	mPageManager = OGRE_NEW PageManager();
+	mGridStrategy = OGRE_NEW Grid2DPageStrategy(mPageManager);
+	mPageManager->addStrategy(mGridStrategy);
 
-	}
-	//---------------------------------------------------------------------
-	Page::~Page()
-	{
+	mRoot->addResourceLocation("./", "FileSystem");
 
-	}
-	//---------------------------------------------------------------------
-	void Page::_notifyAttached(PagedWorldSection* parent)
-	{
-		mParent = parent;
-	}
-	//---------------------------------------------------------------------
-	void Page::touch()
-	{
-		mFrameLastHeld = Root::getSingleton().getNextFrameNumber();
-	}
+}
+
+void PageCoreTests::tearDown()
+{
+	OGRE_DELETE mPageManager;
+	OGRE_DELETE mGridStrategy;
+	OGRE_DELETE mRoot;
+}
+
+
+void PageCoreTests::testSimpleCreateSaveLoadWorld()
+{
+	String worldName = "MyWorld";
+	String filename = "myworld.world";
+	String sectionName1 = "Section1";
+	String sectionName2 = "Section2";
+	PagedWorld* world = mPageManager->createWorld(worldName);
+	PagedWorldSection* section = world->createSection(mGridStrategy, sectionName1);
+	section = world->createSection(mGridStrategy, sectionName2);
+	
+	world->save(filename);
+
+	mPageManager->destroyWorld(world);
+	world = 0;
+
+	world = mPageManager->loadWorld(filename);
+
+	CPPUNIT_ASSERT_EQUAL(worldName, world->getName());
+	CPPUNIT_ASSERT_EQUAL((size_t)2, world->getSectionCount());
+
+	section = world->getSection(sectionName1);
+	CPPUNIT_ASSERT(section != 0);
+	section = world->getSection(sectionName2);
+	CPPUNIT_ASSERT(section != 0);
+
+
 
 }
 

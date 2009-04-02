@@ -126,9 +126,10 @@ namespace Ogre
 		Real mLoadRadiusInCells;
 		Real mHoldRadiusInCells;
 
-		static const uint32 msChunkID;
-		static const uint16 msChunkVersion;
 	public:
+		static const uint32 CHUNK_ID;
+		static const uint16 CHUNK_VERSION;
+
 		Grid2DPageStrategyData();
 		~Grid2DPageStrategyData();
 
@@ -159,8 +160,8 @@ namespace Ogre
 		/// Get the Hold radius as a multiple of cells
 		virtual Real getHoldRadiusInCells(){ return mHoldRadiusInCells; }
 
-		/// Load this data from a stream
-		void load(StreamSerialiser& stream);
+		/// Load this data from a stream (returns true if successful)
+		bool load(StreamSerialiser& stream);
 		/// Save this data to a stream
 		void save(StreamSerialiser& stream);
 

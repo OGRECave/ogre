@@ -32,23 +32,35 @@ Torus Knot Software Ltd.
 #include "OgreException.h"
 #include "OgrePagedWorld.h"
 #include "OgrePageManager.h"
+#include "OgrePage.h"
+#include "OgrePageRequestQueue.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {
 	//---------------------------------------------------------------------
-	const uint32 PagedWorldSection::msChunkID = StreamSerialiser::makeIdentifier("PWSC");
-	const uint16 PagedWorldSection::msChunkVersion = 1;
+	const uint32 PagedWorldSection::CHUNK_ID = StreamSerialiser::makeIdentifier("PWSC");
+	const uint16 PagedWorldSection::CHUNK_VERSION = 1;
+	//---------------------------------------------------------------------
+	PagedWorldSection::PagedWorldSection(PagedWorld* parent)
+		: mParent(parent), mStrategy(0), mPageStreamProvider(0)
+	{
+
+	}
 	//---------------------------------------------------------------------
 	PagedWorldSection::PagedWorldSection(const String& name, PagedWorld* parent, PageStrategy* strategy)
-		: mName(name), mParent(parent), mStrategy(0)
+		: mName(name), mParent(parent), mStrategy(0), mPageStreamProvider(0)
 	{
 		setStrategy(strategy);
 	}
 	//---------------------------------------------------------------------
 	PagedWorldSection::~PagedWorldSection()
 	{
-		mStrategy->destroyData(mStrategyData);
-		mStrategyData = 0;
+		if (mStrategy)
+		{
+			mStrategy->destroyData(mStrategyData);
+			mStrategyData = 0;
+		}
 	}
 	//---------------------------------------------------------------------
 	void PagedWorldSection::setBoundingBox(const AxisAlignedBox& box)
@@ -73,7 +85,8 @@ namespace Ogre
 			}
 
 			mStrategy = strat;
-			mStrategyData = mStrategy->createData();
+			if (mStrategy)
+				mStrategyData = mStrategy->createData();
 		}
 	}
 	//---------------------------------------------------------------------
@@ -82,19 +95,17 @@ namespace Ogre
 		setStrategy(mParent->getManager()->getStrategy(stratName));
 	}
 	//---------------------------------------------------------------------
-	void PagedWorldSection::load(StreamSerialiser& ser)
+	bool PagedWorldSection::load(StreamSerialiser& ser)
 	{
 		const StreamSerialiser::Chunk* chunk = ser.readChunkBegin();
-		if (chunk->id != msChunkID)
+		if (chunk->id != CHUNK_ID)
 		{
 			ser.undoReadChunk(chunk->id);
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-				"Stream does not contain PagedWorldSection data!", 
-				"PagedWorldSection::load");
+			return false;
 		}
 
 		// Check version
-		if (chunk->version > msChunkVersion)
+		if (chunk->version > CHUNK_VERSION)
 		{
 			// skip the rest
 			ser.readChunkEnd(chunk->id);
@@ -112,15 +123,20 @@ namespace Ogre
 		ser.read(&stratname);
 		setStrategy(stratname);
 		// Page Strategy Data
-		mStrategyData->load(ser);
+		bool strategyDataOk = mStrategyData->load(ser);
+		if (!strategyDataOk)
+			LogManager::getSingleton().stream() << "Error: PageStrategyData for section '"
+			<< mName << "' was not loaded correctly, check file contents";
 
-		ser.readChunkEnd(msChunkID);
+		ser.readChunkEnd(CHUNK_ID);
+
+		return true;
 
 	}
 	//---------------------------------------------------------------------
 	void PagedWorldSection::save(StreamSerialiser& ser)
 	{
-		ser.writeChunkBegin(msChunkID, msChunkVersion);
+		ser.writeChunkBegin(CHUNK_ID, CHUNK_VERSION);
 
 		// Name
 		ser.write(&mName);
@@ -131,18 +147,64 @@ namespace Ogre
 		// Page Strategy Data
 		mStrategyData->save(ser);
 
-		ser.writeChunkEnd(msChunkID);
+		ser.writeChunkEnd(CHUNK_ID);
 
 	}
 	//---------------------------------------------------------------------
 	void PagedWorldSection::loadPage(PageID pageID)
 	{
-		// TODO
+		PageMap::iterator i = mPages.find(pageID);
+		if (i == mPages.end())
+			mParent->getManager()->getQueue()->loadPage(pageID, this);
+		else
+			i->second->touch();
 	}
 	//---------------------------------------------------------------------
 	void PagedWorldSection::holdPage(PageID pageID)
 	{
-		// TODO
+		PageMap::iterator i = mPages.find(pageID);
+		if (i != mPages.end())
+			i->second->touch();
+	}
+	//---------------------------------------------------------------------
+	Page* PagedWorldSection::getPage(PageID pageID)
+	{
+		PageMap::iterator i = mPages.find(pageID);
+		if (i != mPages.end())
+			return i->second;
+		else
+			return 0;
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::attachPage(Page* page)
+	{
+		// try to insert
+		std::pair<PageMap::iterator, bool> ret = mPages.insert(
+			PageMap::value_type(page->getID(), page));
+
+		if (!ret.second)
+		{
+			// page with this ID already in map
+			if (ret.first->second != page)
+			{
+				// replacing a page, delete the old one
+				OGRE_DELETE ret.first->second;
+				ret.first->second = page;
+			}
+		}
+		page->_notifyAttached(this);
+			
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::detachPage(Page* page)
+	{
+		PageMap::iterator i = mPages.find(page->getID());
+		if (i != mPages.end() && i->second == page)
+		{
+			mPages.erase(i);
+			page->_notifyAttached(0);
+		}
+
 	}
 	//---------------------------------------------------------------------
 	void PagedWorldSection::frameStart(Real timeSinceLastFrame)
@@ -158,6 +220,28 @@ namespace Ogre
 	void PagedWorldSection::notifyCamera(Camera* cam)
 	{
 		mStrategy->notifyCamera(cam, this);
+	}
+	//---------------------------------------------------------------------
+	StreamSerialiser* PagedWorldSection::_readPageStream(PageID pageID)
+	{
+		StreamSerialiser* ser = 0;
+		if (mPageStreamProvider)
+			ser = mPageStreamProvider->readPageStream(pageID, this);
+		if (!ser)
+			ser = mParent->_readPageStream(pageID, this);
+		return ser;
+
+	}
+	//---------------------------------------------------------------------
+	StreamSerialiser* PagedWorldSection::_writePageStream(PageID pageID)
+	{
+		StreamSerialiser* ser = 0;
+		if (mPageStreamProvider)
+			ser = mPageStreamProvider->writePageStream(pageID, this);
+		if (!ser)
+			ser = mParent->_writePageStream(pageID, this);
+		return ser;
+
 	}
 
 

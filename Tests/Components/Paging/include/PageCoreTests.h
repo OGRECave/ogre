@@ -26,33 +26,28 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#include "OgrePage.h"
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
+
 #include "OgreRoot.h"
+#include "OgrePageManager.h"
+#include "OgreGrid2DPageStrategy.h"
 
-namespace Ogre
+using namespace Ogre; 
+
+class PageCoreTests : public CppUnit::TestFixture
 {
-	//---------------------------------------------------------------------
-	Page::Page(PageID pageID)
-		: mID(pageID)
-		, mParent(0)
-	{
+	// CppUnit macros for setting up the test suite
+	CPPUNIT_TEST_SUITE( PageCoreTests );
+	CPPUNIT_TEST(testSimpleCreateSaveLoadWorld);
+	CPPUNIT_TEST_SUITE_END();
 
-	}
-	//---------------------------------------------------------------------
-	Page::~Page()
-	{
-
-	}
-	//---------------------------------------------------------------------
-	void Page::_notifyAttached(PagedWorldSection* parent)
-	{
-		mParent = parent;
-	}
-	//---------------------------------------------------------------------
-	void Page::touch()
-	{
-		mFrameLastHeld = Root::getSingleton().getNextFrameNumber();
-	}
-
-}
-
+	Root* mRoot;
+	PageManager* mPageManager;
+	Grid2DPageStrategy* mGridStrategy;
+public:
+	void setUp();
+	void tearDown();
+	void testSimpleCreateSaveLoadWorld();
+	void testLoadWorld();
+};

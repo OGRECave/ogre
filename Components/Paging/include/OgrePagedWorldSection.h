@@ -58,17 +58,25 @@ namespace Ogre
 	*/
 	class PagedWorldSection : public PageAlloc
 	{
+	public:
+		typedef map<PageID, Page*>::type PageMap;
 	protected:
 		String mName;
 		AxisAlignedBox mAABB;
 		PagedWorld* mParent;
 		PageStrategy* mStrategy;
 		PageStrategyData* mStrategyData;
+		PageMap mPages;
+		PageStreamProvider* mPageStreamProvider;
 
-		static const uint32 msChunkID;
-		static const uint16 msChunkVersion;
 
 	public:
+		static const uint32 CHUNK_ID;
+		static const uint16 CHUNK_VERSION;
+
+		/** Construct a new instance, specifying just the parent (expecting to load). */
+		PagedWorldSection(PagedWorld* parent); 
+
 		/** Construct a new instance, specifying the parent and assigned strategy. */
 		PagedWorldSection(const String& name, PagedWorld* parent, PageStrategy* strategy);
 		virtual ~PagedWorldSection();
@@ -100,8 +108,8 @@ namespace Ogre
 		virtual const AxisAlignedBox& getBoundingBox() const;
 
 
-		/// Load this section from a stream
-		virtual void load(StreamSerialiser& stream);
+		/// Load this section from a stream (returns true if successful)
+		virtual bool load(StreamSerialiser& stream);
 		/// Save this section to a stream
 		virtual void save(StreamSerialiser& stream);
 
@@ -135,6 +143,59 @@ namespace Ogre
 			deemed a candidate for unloading.
 		*/
 		virtual void holdPage(PageID pageID);
+
+		/** Retrieves a Page.
+		@remarks
+			This method will only return Page instances that are already loaded. It
+			will return null if a page is not loaded. 
+		*/
+		virtual Page* getPage(PageID pageID);
+
+		/** Attach a page to this section. 
+		@remarks
+			This method is usually called by the loading routine and not directly. 
+			This class becomes responsible for deleting the Page.
+		*/
+		virtual void attachPage(Page* page);
+
+		/** Detach a page to this section. 
+		@remarks
+		This method is usually called by the unloading routine and not directly. 
+		This class is no longer responsible for deleting the Page.
+		*/
+		virtual void detachPage(Page* page);
+
+		/** Set the PageStreamProvider which can provide streams Pages in this section. 
+		@remarks
+			This is the top-level way that you can direct how Page data is loaded. 
+			When data for a Page is requested for a PagedWorldSection, the following
+			sequence of classes will be checked to see if they have a provider willing
+			to supply the stream: PagedWorldSection, PagedWorld, PageManager.
+			If none of these do, then the default behaviour is to look for a file
+			called worldname_sectionname_pageID.page. 
+		@note
+			The caller remains responsible for the destruction of the provider.
+		*/
+		void setPageStreamProvider(PageStreamProvider* provider) { mPageStreamProvider = provider; }
+		
+		/** Get the PageStreamProvider which can provide streams for Pages in this section. */
+		PageStreamProvider* getPageStreamProvider() const { return mPageStreamProvider; }
+
+		/** Get a serialiser set up to read Page data for the given PageID. 
+		@param pageID The ID of the page being requested
+		@remarks
+		The StreamSerialiser returned is the responsibility of the caller to
+		delete. 
+		*/
+		StreamSerialiser* _readPageStream(PageID pageID);
+
+		/** Get a serialiser set up to write Page data for the given PageID. 
+		@param pageID The ID of the page being requested
+		@remarks
+		The StreamSerialiser returned is the responsibility of the caller to
+		delete. 
+		*/
+		StreamSerialiser* _writePageStream(PageID pageID);
 
 	};
 

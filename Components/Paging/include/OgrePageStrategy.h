@@ -53,8 +53,8 @@ namespace Ogre
 		PageStrategyData() {}
 		virtual ~PageStrategyData() {}
 
-		/// Load this data from a stream
-		virtual void load(StreamSerialiser& stream) = 0;
+		/// Load this data from a stream (returns true if successful)
+		virtual bool load(StreamSerialiser& stream) = 0;
 		/// Save this data to a stream
 		virtual void save(StreamSerialiser& stream) = 0;
 

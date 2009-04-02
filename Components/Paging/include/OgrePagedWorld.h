@@ -59,10 +59,11 @@ namespace Ogre
 	protected:
 		String mName;
 		PageManager* mManager;
+		PageStreamProvider* mPageStreamProvider;
 
-		static const uint32 msChunkID;
-		static const uint16 msChunkVersion;
 	public:
+		static const uint32 CHUNK_ID;
+		static const uint16 CHUNK_VERSION;
 		/** Constructor.
 		@param name The name of the world, which must be enough to identify the 
 			place where data for it can be loaded from (doesn't have to be a filename
@@ -81,13 +82,13 @@ namespace Ogre
 		void load(const String& filename);
 		/// Load world data from a stream
 		void load(const DataStreamPtr& stream);
-		/// Load world data from a serialiser
-		void load(StreamSerialiser& stream);
+		/// Load world data from a serialiser (returns true if successful)
+		bool load(StreamSerialiser& stream);
 		/** Save world data to a file
-		@param filename The name of the file to create
-		@param Archive Optional archive which the filename is relative to
+		@param filename The name of the file to create; this can either be an 
+			absolute filename or 
 		*/
-		void save(const String& filename, Archive* arch = 0);
+		void save(const String& filename);
 		/// Save world data to a stream
 		void save(const DataStreamPtr& stream);
 		/// Save world data to a serialiser
@@ -128,12 +129,50 @@ namespace Ogre
 		/** Destroy a section of world. */
 		void destroySection(PagedWorldSection* sec);
 
+		/** Get the number of sections this world has. */
+		size_t getSectionCount() const { return mSections.size(); }
+
 		/** Retrieve a section of the world. */
 		PagedWorldSection* getSection(const String& name);
 
 		typedef map<String, PagedWorldSection*>::type SectionMap;
 		/// Retrieve a const reference to all the sections in this world
 		const SectionMap& getSections() const { return mSections; }
+
+		/** Set the PageStreamProvider which can provide streams for Pages in this world. 
+		@remarks
+			This is the top-level way that you can direct how Page data is loaded. 
+			When data for a Page is requested for a PagedWorldSection, the following
+			sequence of classes will be checked to see if they have a provider willing
+			to supply the stream: PagedWorldSection, PagedWorld, PageManager.
+			If none of these do, then the default behaviour is to look for a file
+			called worldname_sectionname_pageID.page. 
+		@note
+			The caller remains responsible for the destruction of the provider.
+		*/
+		void setPageStreamProvider(PageStreamProvider* provider) { mPageStreamProvider = provider; }
+		
+		/** Get the PageStreamProvider which can provide streams for Pages in this world. */
+		PageStreamProvider* getPageStreamProvider() const { return mPageStreamProvider; }
+
+		/** Get a serialiser set up to read Page data for the given PageID. 
+		@param pageID The ID of the page being requested
+		@param section The parent section to which this page will belong
+		@remarks
+		The StreamSerialiser returned is the responsibility of the caller to
+		delete. 
+		*/
+		StreamSerialiser* _readPageStream(PageID pageID, PagedWorldSection* section);
+
+		/** Get a serialiser set up to read Page data for the given PageID. 
+		@param pageID The ID of the page being requested
+		@param section The parent section to which this page will belong
+		@remarks
+		The StreamSerialiser returned is the responsibility of the caller to
+		delete. 
+		*/
+		StreamSerialiser* _writePageStream(PageID pageID, PagedWorldSection* section);
+
 
 	protected:
 		SectionMap mSections;
