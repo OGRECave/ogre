@@ -43,13 +43,13 @@ namespace Ogre
 	const uint16 PagedWorldSection::CHUNK_VERSION = 1;
 	//---------------------------------------------------------------------
 	PagedWorldSection::PagedWorldSection(PagedWorld* parent)
-		: mParent(parent), mStrategy(0), mPageStreamProvider(0)
+		: mParent(parent), mStrategy(0), mPageProvider(0)
 	{
 
 	}
 	//---------------------------------------------------------------------
 	PagedWorldSection::PagedWorldSection(const String& name, PagedWorld* parent, PageStrategy* strategy)
-		: mName(name), mParent(parent), mStrategy(0), mPageStreamProvider(0)
+		: mName(name), mParent(parent), mStrategy(0), mPageProvider(0)
 	{
 		setStrategy(strategy);
 	}
@@ -155,9 +155,25 @@ namespace Ogre
 	{
 		PageMap::iterator i = mPages.find(pageID);
 		if (i == mPages.end())
-			mParent->getManager()->getQueue()->loadPage(pageID, this);
+		{
+			Page* page = OGRE_NEW Page(pageID);
+			// attach page immediately, but notice that it's not loaded yet
+			attachPage(page);
+			mParent->getManager()->getQueue()->loadPage(page, this);
+		}
 		else
 			i->second->touch();
+	}
+	//---------------------------------------------------------------------
+	bool PagedWorldSection::_generatePage(Page* page)
+	{
+		bool generated = false;
+		if (mPageProvider)
+			generated = mPageProvider->generatePage(page, this);
+		if (!generated)
+			generated = mParent->_generatePage(page, this);
+		return generated;
+
 	}
 	//---------------------------------------------------------------------
 	void PagedWorldSection::holdPage(PageID pageID)
@@ -225,8 +241,8 @@ namespace Ogre
 	StreamSerialiser* PagedWorldSection::_readPageStream(PageID pageID)
 	{
 		StreamSerialiser* ser = 0;
-		if (mPageStreamProvider)
-			ser = mPageStreamProvider->readPageStream(pageID, this);
+		if (mPageProvider)
+			ser = mPageProvider->readPageStream(pageID, this);
 		if (!ser)
 			ser = mParent->_readPageStream(pageID, this);
 		return ser;
@@ -236,8 +252,8 @@ namespace Ogre
 	StreamSerialiser* PagedWorldSection::_writePageStream(PageID pageID)
 	{
 		StreamSerialiser* ser = 0;
-		if (mPageStreamProvider)
-			ser = mPageStreamProvider->writePageStream(pageID, this);
+		if (mPageProvider)
+			ser = mPageProvider->writePageStream(pageID, this);
 		if (!ser)
 			ser = mParent->_writePageStream(pageID, this);
 		return ser;

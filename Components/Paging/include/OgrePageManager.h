@@ -34,6 +34,8 @@ Torus Knot Software Ltd.
 #include "OgreString.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreCommon.h"
+#include "OgreCamera.h"
+#include "OgreFrameListener.h"
 
 namespace Ogre
 {
@@ -46,14 +48,22 @@ namespace Ogre
 	*/
 
 	/** Abstract class that can be implemented by the user application to 
-		provide a way to retrieve paging data from a source of their choosing.
+		provide a way to retrieve or generate page data from a source of their choosing.
+	@note
+		All of the methods in this class can be called in a background, non-render thread. 		
 	*/
-	class PageStreamProvider : public PageAlloc
+	class PageProvider : public PageAlloc
 	{
 	public:
-		PageStreamProvider() {}
-		virtual ~PageStreamProvider() {}
+		PageProvider() {}
+		virtual ~PageProvider() {}
 
+		/** Get a Page generated procedurally. 
+		@remarks
+			This method allows you to populate Page instances procedurally if you wish.
+			Return true if you populated the page, false otherwise
+		*/
+		virtual bool generatePage(Page* page, PagedWorldSection* section) { return false; }
 		/** Get a serialiser set up to read PagedWorld data for the given world filename. 
 		@remarks
 		The StreamSerialiser returned is the responsibility of the caller to
@@ -90,6 +100,9 @@ namespace Ogre
 	/** The PageManager is the entry point through which you load all PagedWorld instances, 
 		and the place where PageStrategy instances and factory classes are
 		registered to customise the paging behaviour.
+	@remarks
+		To get started, the minimum you need is a PagedWorld with at least one PagedWorldSection
+		within it, and at least one Camera being tracked (see addCamera). 
 	*/
 	class _OgrePagingExport PageManager : public PageAlloc
 	{
@@ -173,7 +186,7 @@ namespace Ogre
 		PageRequestQueue* getQueue() const { return mQueue; }
 
 
-		/** Set the PageStreamProvider which can provide streams for any Page. 
+		/** Set the PageProvider which can provide streams for any Page. 
 		@remarks
 			This is the top-level way that you can direct how Page data is loaded. 
 			When data for a Page is requested for a PagedWorldSection, the following
@@ -184,11 +197,18 @@ namespace Ogre
 		@note
 			The caller remains responsible for the destruction of the provider.
 		*/
-		void setPageStreamProvider(PageStreamProvider* provider) { mPageStreamProvider = provider; }
+		void setPageProvider(PageProvider* provider) { mPageProvider = provider; }
 		
-		/** Get the PageStreamProvider which can provide streams for any Page. */
-		PageStreamProvider* getPageStreamProvider() const { return mPageStreamProvider; }
+		/** Get the PageProvider which can provide streams for any Page. */
+		PageProvider* getPageProvider() const { return mPageProvider; }
 
+		/** Give a provider the opportunity to generate page content procedurally. 
+		@remarks
+		You should not call this method directly. This call may well happen in 
+		a separate thread.
+		@returns true if the page was populated, false otherwise
+		*/
+		virtual bool _generatePage(Page* page, PagedWorldSection* section);
 		/** Get a serialiser set up to read Page data for the given PageID. 
 		@param pageID The ID of the page being requested
 		@param section The parent section to which this page will belong
@@ -228,13 +248,72 @@ namespace Ogre
 		default load routines are used. 
 		*/
 		void getPageResourceGroup(const String& g) { mPageResourceGroup = g; }
+
+		/** Tells the paging system to start tracking a given camera. 
+		@remarks
+			In order for the paging system to funciton it needs to know which
+			Cameras to track. You may not want to have all your cameras affect
+			the paging system, so just add the cameras you want it to keep track of
+			here. 
+		*/
+		void addCamera(Camera* c);
+
+		/** Tells the paging system to stop tracking a given camera. 
+		*/
+		void removeCamera(Camera* c);
+
+		/** Returns whether or not a given camera is being watched by the paging system.
+		*/
+		bool hasCamera(Camera* c) const;
+
+		typedef vector<Camera*>::type CameraList;
+		/** Returns a list of camerasl being tracked. */
+		const CameraList& getCameraList() const;
+
+		/** Set the debug display level.
+		@remarks
+			This setting controls how much debug information is displayed in the scene.
+			The exact interpretation of this value depends on the PageStrategy you're
+			using, and whether the PageContent decides to also display debug information.
+			Generally speaking, 0 means no debug display, 1 means simple debug
+			display (usually the PageStrategy) and anything more than that is
+			up to the classes involved. 
+		*/
+		void setDebugDisplayLevel(uint8 lvl) { mDebugDisplayLvl = lvl; }
+		/** Get the debug display level. */
+		uint8 getDebugDisplayLevel() const { return mDebugDisplayLvl; }
+
+
 	protected:
+
+		class EventRouter : public Camera::Listener, public FrameListener
+		{
+		public:
+			PageManager* pManager;
+			WorldMap* pWorldMap;
+
+			EventRouter() {}
+			~EventRouter() {}
+
+			void cameraPreRenderScene(Camera* cam);
+			void cameraDestroyed(Camera* cam);
+			bool frameStarted(const FrameEvent& evt);
+			bool frameEnded(const FrameEvent& evt);
+		};
+
+		void createStandardStrategies();
+
 		WorldMap mWorlds;
 		StrategyMap mStrategies;
 		NameGenerator mWorldNameGenerator;
 		PageRequestQueue* mQueue;
-		PageStreamProvider* mPageStreamProvider;
+		PageProvider* mPageProvider;
 		String mPageResourceGroup;
+		CameraList mCameraList;
+		EventRouter mEventRouter;
+		uint8 mDebugDisplayLvl;
+
+		Grid2DPageStrategy* mGrid2DPageStrategy;
 	};
 
 	/** @} */

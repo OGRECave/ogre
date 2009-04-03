@@ -85,6 +85,23 @@ namespace Ogre {
     */
     class _OgreExport Camera : public Frustum
     {
+	public:
+		/** Listener interface so you can be notified of Camera events. 
+		*/
+		class _OgreExport Listener 
+		{
+		public:
+			Listener() {}
+			virtual ~Listener() {}
+
+			/// Called prior to the scene being rendered with this camera
+			virtual void cameraPreRenderScene(Camera* cam) {}
+			/// Called after the scene has been rendered with this camera
+			virtual void cameraPostRenderScene(Camera* cam) {}
+			/// Called when the camera is being destroyed
+			virtual void cameraDestroyed(Camera* cam) {}
+
+		};
     protected:
         /// Camera name
         String mName;
@@ -157,6 +174,9 @@ namespace Ogre {
         /// Camera to use for LOD calculation
         const Camera* mLodCamera;
 
+		typedef vector<Listener*>::type ListenerList;
+		ListenerList mListeners;
+
 
         // Internal functions for calcs
         bool isViewOutOfDate(void) const;
@@ -184,6 +204,10 @@ namespace Ogre {
         */
         virtual ~Camera();
 
+		/// Add a listener to this camera
+		virtual void addListener(Listener* l);
+		/// Remove a listener to this camera
+		virtual void removeListener(Listener* l);
 
         /** Returns a pointer to the SceneManager this camera is rendering through.
         */

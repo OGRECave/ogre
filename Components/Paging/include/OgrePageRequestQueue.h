@@ -52,14 +52,14 @@ namespace Ogre
 		PageRequestQueue(PageManager* manager);
 		virtual ~PageRequestQueue();
 
-		/** Load a Page with a given ID, for a given PagedWorldSection.
+		/** Load a Page, for a given PagedWorldSection.
 		@remarks
 			This method is called from the main rendering thread in all cases. 
 			If threading is enabled, the request is queued and processed by 
 			a separate thread. At some point later on the loaded page will be attached
 			to the section which requested it. 
 		*/
-		void loadPage(PageID pageID, PagedWorldSection* section);
+		void loadPage(Page* page, PagedWorldSection* section);
 		/** Dispose of a page */
 		void unloadPage(Page* page);
 

@@ -36,8 +36,6 @@ void PageCoreTests::setUp()
 {
 	mRoot = OGRE_NEW Root();
 	mPageManager = OGRE_NEW PageManager();
-	mGridStrategy = OGRE_NEW Grid2DPageStrategy(mPageManager);
-	mPageManager->addStrategy(mGridStrategy);
 
 	mRoot->addResourceLocation("./", "FileSystem");
 
@@ -46,7 +44,6 @@ void PageCoreTests::setUp()
 void PageCoreTests::tearDown()
 {
 	OGRE_DELETE mPageManager;
-	OGRE_DELETE mGridStrategy;
 	OGRE_DELETE mRoot;
 }
 
@@ -58,8 +55,8 @@ void PageCoreTests::testSimpleCreateSaveLoadWorld()
 	String sectionName1 = "Section1";
 	String sectionName2 = "Section2";
 	PagedWorld* world = mPageManager->createWorld(worldName);
-	PagedWorldSection* section = world->createSection(mGridStrategy, sectionName1);
-	section = world->createSection(mGridStrategy, sectionName2);
+	PagedWorldSection* section = world->createSection("Grid2D", sectionName1);
+	section = world->createSection("Grid2D", sectionName2);
 	
 	world->save(filename);
 

@@ -34,7 +34,9 @@ Torus Knot Software Ltd.
 #include "OgrePageRequestQueue.h"
 #include "OgrePagedWorldSection.h"
 #include "OgrePagedWorld.h"
+#include "OgreGrid2DPageStrategy.h"
 #include "OgreStreamSerialiser.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {
@@ -42,15 +44,34 @@ namespace Ogre
 	PageManager::PageManager()
 		: mWorldNameGenerator("World")
 		, mQueue(0)
-		, mPageStreamProvider(0)
+		, mPageProvider(0)
 		, mPageResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+		, mDebugDisplayLvl(0)
+		, mGrid2DPageStrategy(0)
 	{
 		mQueue = OGRE_NEW PageRequestQueue(this);
+
+		mEventRouter.pManager = this;
+		mEventRouter.pWorldMap = &mWorlds;
+
+		Root::getSingleton().addFrameListener(&mEventRouter);
+
+		createStandardStrategies();
+
 	}
 	//---------------------------------------------------------------------
 	PageManager::~PageManager()
 	{
 		OGRE_DELETE mQueue;
+
+		OGRE_DELETE mGrid2DPageStrategy;
+	}
+	//---------------------------------------------------------------------
+	void PageManager::createStandardStrategies()
+	{
+		mGrid2DPageStrategy = OGRE_NEW Grid2DPageStrategy(this);
+		addStrategy(mGrid2DPageStrategy);
+
 	}
 	//---------------------------------------------------------------------
 	PagedWorld* PageManager::createWorld(const String& name)
@@ -189,8 +210,8 @@ namespace Ogre
 	StreamSerialiser* PageManager::_readPageStream(PageID pageID, PagedWorldSection* section)
 	{
 		StreamSerialiser* ser = 0;
-		if (mPageStreamProvider)
-			ser = mPageStreamProvider->readPageStream(pageID, section);
+		if (mPageProvider)
+			ser = mPageProvider->readPageStream(pageID, section);
 		if (!ser)
 		{
 			// use default implementation
@@ -210,8 +231,8 @@ namespace Ogre
 	StreamSerialiser* PageManager::_writePageStream(PageID pageID, PagedWorldSection* section)
 	{
 		StreamSerialiser* ser = 0;
-		if (mPageStreamProvider)
-			ser = mPageStreamProvider->writePageStream(pageID, section);
+		if (mPageProvider)
+			ser = mPageProvider->writePageStream(pageID, section);
 		if (!ser)
 		{
 			// use default implementation
@@ -234,8 +255,8 @@ namespace Ogre
 	StreamSerialiser* PageManager::_readWorldStream(const String& filename)
 	{
 		StreamSerialiser* ser = 0;
-		if (mPageStreamProvider)
-			ser = mPageStreamProvider->readWorldStream(filename);
+		if (mPageProvider)
+			ser = mPageProvider->readWorldStream(filename);
 		if (!ser)
 		{
 			// use default implementation
@@ -253,8 +274,8 @@ namespace Ogre
 	StreamSerialiser* PageManager::_writeWorldStream(const String& filename)
 	{
 		StreamSerialiser* ser = 0;
-		if (mPageStreamProvider)
-			ser = mPageStreamProvider->writeWorldStream(filename);
+		if (mPageProvider)
+			ser = mPageProvider->writeWorldStream(filename);
 		if (!ser)
 		{
 			// use default implementation
@@ -269,6 +290,73 @@ namespace Ogre
 		return ser;
 
 	}
+	//---------------------------------------------------------------------
+	bool PageManager::_generatePage(Page* page, PagedWorldSection* section)
+	{
+		bool generated = false;
+		if (mPageProvider)
+			generated = mPageProvider->generatePage(page, section);
+
+		return generated;
+	}
+	//---------------------------------------------------------------------
+	void PageManager::addCamera(Camera* c)
+	{
+		if (std::find(mCameraList.begin(), mCameraList.end(), c) == mCameraList.end())
+		{
+			mCameraList.push_back(c);
+			c->addListener(&mEventRouter);
+		}
+	}
+	//---------------------------------------------------------------------
+	void PageManager::removeCamera(Camera* c)
+	{
+		CameraList::iterator i = std::find(mCameraList.begin(), mCameraList.end(), c);
+		if (i != mCameraList.end())
+		{
+			c->removeListener(&mEventRouter);
+			mCameraList.erase(i);
+		}
+	}
+	//---------------------------------------------------------------------
+	bool PageManager::hasCamera(Camera* c) const
+	{
+		return std::find(mCameraList.begin(), mCameraList.end(), c) != mCameraList.end();
+	}
+	//---------------------------------------------------------------------
+	const PageManager::CameraList& PageManager::getCameraList() const
+	{
+		return mCameraList;
+	}
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	void PageManager::EventRouter::cameraPreRenderScene(Camera* cam)
+	{
+		for(WorldMap::iterator i = pWorldMap->begin(); i != pWorldMap->end(); ++i)
+			i->second->notifyCamera(cam);
+	}
+	//---------------------------------------------------------------------
+	void PageManager::EventRouter::cameraDestroyed(Camera* cam)
+	{
+		pManager->removeCamera(cam);
+	}
+	//---------------------------------------------------------------------
+	bool PageManager::EventRouter::frameStarted(const FrameEvent& evt)
+	{
+		for(WorldMap::iterator i = pWorldMap->begin(); i != pWorldMap->end(); ++i)
+			i->second->frameStart(evt.timeSinceLastFrame);
+
+		return true;
+	}
+	//---------------------------------------------------------------------
+	bool PageManager::EventRouter::frameEnded(const FrameEvent& evt)
+	{
+		for(WorldMap::iterator i = pWorldMap->begin(); i != pWorldMap->end(); ++i)
+			i->second->frameEnd(evt.timeSinceLastFrame);
+
+		return true;
+	}
+
 
 
 

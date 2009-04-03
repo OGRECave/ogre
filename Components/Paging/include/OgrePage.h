@@ -31,6 +31,7 @@ Torus Knot Software Ltd.
 #define __Ogre_Page_H__
 
 #include "OgrePagingPrerequisites.h"
+#include "OgreAtomicWrappers.h"
 
 
 namespace Ogre
@@ -47,10 +48,29 @@ namespace Ogre
 	*/
 	class Page : public PageAlloc
 	{
+	public:
+		/** Status of the Page. 
+		*/
+		enum Status
+		{
+			/// Just defined, not loaded
+			STATUS_UNLOADED,
+			/// In the process of getting / generating data for the page
+			STATUS_PREPARING, 
+			/** At this stage all data has been read, and all non-GPU tasks have been done. 
+				This is the end of the background thread's involvement.
+			*/
+			STATUS_PREPARED, 
+			/// Finalising the load in the main render thread
+			STATUS_LOADING,
+			/// Data loaded / generated 
+			STATUS_LOADED
+		};
 	protected:
 		PageID mID;
 		PagedWorldSection* mParent;
 		unsigned long mFrameLastHeld;
+		AtomicScalar<Status> mStatus;
 	public:
 		Page(PageID pageID);
 		virtual ~Page();
@@ -71,8 +91,30 @@ namespace Ogre
 		virtual bool isAttached() const { return mParent != 0; }
 
 
+		/// Load page data from a serialiser (returns true if successful)
+		bool load(StreamSerialiser& stream);
+		/// Save page data to a serialiser 
+		void save(StreamSerialiser& stream);
+
 		/// Internal method to notify a page that it is attached
 		virtual void _notifyAttached(PagedWorldSection* parent);
+
+		/** Returns true if the Page has been fully loaded, false otherwise.
+		*/
+		virtual bool isLoaded() const { return (mStatus.get() == STATUS_LOADED); }
+
+		/** Returns whether the resource is currently in the process of
+			loading.
+		*/
+		virtual bool isLoading() const
+		{
+			Status s = mStatus.get();
+			return (s == STATUS_LOADING || s == STATUS_PREPARING);
+		}
+
+		/// Returns the current status
+		virtual Status getStatus() const { return mStatus.get(); }
+
 
 	};
 

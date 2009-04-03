@@ -2014,6 +2014,7 @@ protected:
 
 
         Entity *ent = mSceneMgr->createEntity("robot", "robot.mesh");
+		//ent->setDisplaySkeleton(true);
         // Uncomment the below to test software skinning
         ent->setMaterialName("Examples/Rocky");
         // Add entity to the scene node
@@ -2032,8 +2033,8 @@ protected:
         l->setDiffuseColour(0.5, 1.0, 0.5);
 
         // Position the camera
-        mCamera->setPosition(100,50,100);
-        mCamera->lookAt(-50,50,0);
+        mCamera->setPosition(200,50,0);
+        mCamera->lookAt(0,50,0);
 
         // Report whether hardware skinning is enabled or not
         Technique* t = ent->getSubEntity(0)->getTechnique();
@@ -7756,6 +7757,7 @@ protected:
 	void createScene(void)
     {
 
+		//mSceneMgr->setDisplaySceneNodes(true);
 
 		mCamera->setPosition(-0.19199729, 1.0310142, -41.884644);
 		mCamera->setDirection(Vector3::NEGATIVE_UNIT_Z);
@@ -7816,7 +7818,7 @@ protected:
 		//testInfiniteAAB();
 
         //testProjection();
-        //testStencilShadows(SHADOWTYPE_STENCIL_ADDITIVE, true, true);
+        testStencilShadows(SHADOWTYPE_STENCIL_ADDITIVE, true, true);
         //testStencilShadows(SHADOWTYPE_STENCIL_MODULATIVE, false, true);
         //testTextureShadows(SHADOWTYPE_TEXTURE_ADDITIVE, true);
 		//testTextureShadows(SHADOWTYPE_TEXTURE_MODULATIVE, false);
@@ -7923,7 +7925,7 @@ protected:
 		//testDepthShadowMap();
 
         //testLod();
-		testSharedGpuParameters();
+		//testSharedGpuParameters();
 
 
 

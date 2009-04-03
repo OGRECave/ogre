@@ -19,6 +19,7 @@ set (HEADER_FILES
 	include/OgrePageManager.h
 	include/OgrePageRequestQueue.h
 	include/OgrePageStrategy.h
+	include/OgrePaging.h
 	include/OgrePagingPrerequisites.h
 )
 

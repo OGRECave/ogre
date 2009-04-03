@@ -35,6 +35,7 @@ namespace Ogre
 	Page::Page(PageID pageID)
 		: mID(pageID)
 		, mParent(0)
+		, mStatus(STATUS_UNLOADED)
 	{
 
 	}
@@ -53,6 +54,30 @@ namespace Ogre
 	{
 		mFrameLastHeld = Root::getSingleton().getNextFrameNumber();
 	}
+	//---------------------------------------------------------------------
+	bool Page::load(StreamSerialiser& stream)
+	{
+		// Fast pre-check
+		if (mStatus.get() != STATUS_UNLOADED) 
+			return true;
+
+		// Set to loading
+		if (!mStatus.cas(STATUS_UNLOADED, STATUS_LOADING))
+			return true;
+
+		// Now do the real loading
+		// TODO
+
+
+		mStatus.set(STATUS_LOADED);
+		return true;
+	}
+	//---------------------------------------------------------------------
+	void Page::save(StreamSerialiser& stream)
+	{
+		// TODO
+	}
+
 
 }
 

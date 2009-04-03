@@ -40,7 +40,7 @@ namespace Ogre
 	const uint16 PagedWorld::CHUNK_VERSION = 1;
 	//---------------------------------------------------------------------
 	PagedWorld::PagedWorld(const String& name, PageManager* manager)
-		:mName(name), mManager(manager), mSectionNameGenerator("Section"), mPageStreamProvider(0)
+		:mName(name), mManager(manager), mSectionNameGenerator("Section"), mPageProvider(0)
 	{
 
 	}
@@ -191,11 +191,22 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	bool PagedWorld::_generatePage(Page* page, PagedWorldSection* section)
+	{
+		bool generated = false;
+		if (mPageProvider)
+			generated = mPageProvider->generatePage(page, section);
+		if (!generated)
+			generated = mManager->_generatePage(page, section);
+		return generated;
+
+	}
+	//---------------------------------------------------------------------
 	StreamSerialiser* PagedWorld::_readPageStream(PageID pageID, PagedWorldSection* section)
 	{
 		StreamSerialiser* ser = 0;
-		if (mPageStreamProvider)
-			ser = mPageStreamProvider->readPageStream(pageID, section);
+		if (mPageProvider)
+			ser = mPageProvider->readPageStream(pageID, section);
 		if (!ser)
 			ser = mManager->_readPageStream(pageID, section);
 		return ser;
@@ -205,12 +216,36 @@ namespace Ogre
 	StreamSerialiser* PagedWorld::_writePageStream(PageID pageID, PagedWorldSection* section)
 	{
 		StreamSerialiser* ser = 0;
-		if (mPageStreamProvider)
-			ser = mPageStreamProvider->writePageStream(pageID, section);
+		if (mPageProvider)
+			ser = mPageProvider->writePageStream(pageID, section);
 		if (!ser)
 			ser = mManager->_writePageStream(pageID, section);
 		return ser;
 
+	}
+	//---------------------------------------------------------------------
+	void PagedWorld::frameStart(Real t)
+	{
+		for (SectionMap::iterator i = mSections.begin(); i != mSections.end(); ++i)
+		{
+			i->second->frameStart(t);
+		}
+	}
+	//---------------------------------------------------------------------
+	void PagedWorld::frameEnd(Real t)
+	{
+		for (SectionMap::iterator i = mSections.begin(); i != mSections.end(); ++i)
+		{
+			i->second->frameEnd(t);
+		}
+	}
+	//---------------------------------------------------------------------
+	void PagedWorld::notifyCamera(Camera* cam)
+	{
+		for (SectionMap::iterator i = mSections.begin(); i != mSections.end(); ++i)
+		{
+			i->second->notifyCamera(cam);
+		}
 	}
 
 

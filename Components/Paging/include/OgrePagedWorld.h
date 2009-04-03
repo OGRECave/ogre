@@ -59,7 +59,7 @@ namespace Ogre
 	protected:
 		String mName;
 		PageManager* mManager;
-		PageStreamProvider* mPageStreamProvider;
+		PageProvider* mPageProvider;
 
 	public:
 		static const uint32 CHUNK_ID;
@@ -139,7 +139,7 @@ namespace Ogre
 		/// Retrieve a const reference to all the sections in this world
 		const SectionMap& getSections() const { return mSections; }
 
-		/** Set the PageStreamProvider which can provide streams for Pages in this world. 
+		/** Set the PageProvider which can provide streams for Pages in this world. 
 		@remarks
 			This is the top-level way that you can direct how Page data is loaded. 
 			When data for a Page is requested for a PagedWorldSection, the following
@@ -150,11 +150,18 @@ namespace Ogre
 		@note
 			The caller remains responsible for the destruction of the provider.
 		*/
-		void setPageStreamProvider(PageStreamProvider* provider) { mPageStreamProvider = provider; }
+		void setPageProvider(PageProvider* provider) { mPageProvider = provider; }
 		
-		/** Get the PageStreamProvider which can provide streams for Pages in this world. */
-		PageStreamProvider* getPageStreamProvider() const { return mPageStreamProvider; }
+		/** Get the PageProvider which can provide streams for Pages in this world. */
+		PageProvider* getPageProvider() const { return mPageProvider; }
 
+		/** Give a world  the opportunity to generate page content procedurally. 
+		@remarks
+		You should not call this method directly. This call may well happen in 
+		a separate thread.
+		@returns true if the page was populated, false otherwise
+		*/
+		virtual bool _generatePage(Page* page, PagedWorldSection* section);
 		/** Get a serialiser set up to read Page data for the given PageID. 
 		@param pageID The ID of the page being requested
 		@param section The parent section to which this page will belong
@@ -172,6 +179,14 @@ namespace Ogre
 		delete. 
 		*/
 		StreamSerialiser* _writePageStream(PageID pageID, PagedWorldSection* section);
+
+		/// Called when the frame starts
+		virtual void frameStart(Real timeSinceLastFrame);
+		/// Called when the frame ends
+		virtual void frameEnd(Real timeElapsed);
+		/// Notify a world of the current camera
+		virtual void notifyCamera(Camera* cam);
+
 
 
 	protected:

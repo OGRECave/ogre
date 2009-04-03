@@ -29,6 +29,9 @@ Torus Knot Software Ltd.
 #include "OgrePageRequestQueue.h"
 #include "OgreStringConverter.h"
 #include "OgreException.h"
+#include "OgrePagedWorldSection.h"
+#include "OgrePage.h"
+#include "OgreStreamSerialiser.h"
 
 namespace Ogre
 {
@@ -42,9 +45,19 @@ namespace Ogre
 	{
 	}
 	//---------------------------------------------------------------------
-	void PageRequestQueue::loadPage(PageID pageID, PagedWorldSection* section)
+	void PageRequestQueue::loadPage(Page* page, PagedWorldSection* section)
 	{
-		// TODO
+		// TODO threading
+
+		// synchronous mode
+		// Alolow procedural generation
+		if (!section->_generatePage(page))
+		{
+			StreamSerialiser* ser = section->_readPageStream(page->getID());
+			page->load(*ser);
+			OGRE_DELETE ser;
+		}
+
 	}
 	//---------------------------------------------------------------------
 	void PageRequestQueue::unloadPage(Page* page)

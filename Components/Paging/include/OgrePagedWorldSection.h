@@ -67,7 +67,7 @@ namespace Ogre
 		PageStrategy* mStrategy;
 		PageStrategyData* mStrategyData;
 		PageMap mPages;
-		PageStreamProvider* mPageStreamProvider;
+		PageProvider* mPageProvider;
 
 
 	public:
@@ -129,6 +129,15 @@ namespace Ogre
 			on whether threading is enabled.
 		*/
 		virtual void loadPage(PageID pageID);
+
+		/** Give a section the opportunity to generate page content procedurally. 
+		@remarks
+		You should not call this method directly. This call may well happen in 
+		a separate thread.
+		@returns true if the page was populated, false otherwise
+		*/
+		virtual bool _generatePage(Page* page);
+
 		/** Ask for a page to be kept in memory if it's loaded.
 		@remarks
 			This method indicates that a page should be retained if it's already
@@ -165,7 +174,7 @@ namespace Ogre
 		*/
 		virtual void detachPage(Page* page);
 
-		/** Set the PageStreamProvider which can provide streams Pages in this section. 
+		/** Set the PageProvider which can provide streams Pages in this section. 
 		@remarks
 			This is the top-level way that you can direct how Page data is loaded. 
 			When data for a Page is requested for a PagedWorldSection, the following
@@ -176,10 +185,10 @@ namespace Ogre
 		@note
 			The caller remains responsible for the destruction of the provider.
 		*/
-		void setPageStreamProvider(PageStreamProvider* provider) { mPageStreamProvider = provider; }
+		void setPageProvider(PageProvider* provider) { mPageProvider = provider; }
 		
-		/** Get the PageStreamProvider which can provide streams for Pages in this section. */
-		PageStreamProvider* getPageStreamProvider() const { return mPageStreamProvider; }
+		/** Get the PageProvider which can provide streams for Pages in this section. */
+		PageProvider* getPageProvider() const { return mPageProvider; }
 
 		/** Get a serialiser set up to read Page data for the given PageID. 
 		@param pageID The ID of the page being requested

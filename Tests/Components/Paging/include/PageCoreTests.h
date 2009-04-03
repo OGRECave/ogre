@@ -44,7 +44,6 @@ class PageCoreTests : public CppUnit::TestFixture
 
 	Root* mRoot;
 	PageManager* mPageManager;
-	Grid2DPageStrategy* mGridStrategy;
 public:
 	void setUp();
 	void tearDown();

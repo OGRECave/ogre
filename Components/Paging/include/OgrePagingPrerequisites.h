@@ -35,6 +35,7 @@ Torus Knot Software Ltd.
 namespace Ogre
 {
 	// forward decls
+	class Grid2DPageStrategy;
 	class Page;
 	class PageConnection;
 	class PageContent;
@@ -47,7 +48,7 @@ namespace Ogre
 	class PageRequestQueue;
 	class PageStrategy;
 	class PageStrategyData;
-	class PageStreamProvider;
+	class PageProvider;
 
 	typedef GeneralAllocatedObject PageAlloc;
 

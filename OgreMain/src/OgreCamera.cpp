@@ -89,9 +89,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Camera::~Camera()
     {
-        // Do nothing
+		for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+		{
+			(*i)->cameraDestroyed(this);
+		}
     }
-
     //-----------------------------------------------------------------------
     SceneManager* Camera::getSceneManager(void) const
     {
@@ -398,11 +400,31 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Camera::_renderScene(Viewport *vp, bool includeOverlays)
     {
+		for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+		{
+			(*i)->cameraPreRenderScene(this);
+		}
 
         mSceneMgr->_renderScene(this, vp, includeOverlays);
-    }
 
-
+		for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+		{
+			(*i)->cameraPostRenderScene(this);
+		}
+	}
+	//---------------------------------------------------------------------
+	void Camera::addListener(Listener* l)
+	{
+		if (std::find(mListeners.begin(), mListeners.end(), l) == mListeners.end())
+			mListeners.push_back(l);
+	}
+	//---------------------------------------------------------------------
+	void Camera::removeListener(Listener* l)
+	{
+		ListenerList::iterator i = std::find(mListeners.begin(), mListeners.end(), l);
+		if (i != mListeners.end())
+			mListeners.erase(i);
+	}
     //-----------------------------------------------------------------------
     std::ostream& operator<<( std::ostream& o, const Camera& c )
     {
