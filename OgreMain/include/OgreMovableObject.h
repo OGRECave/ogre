@@ -206,6 +206,9 @@ namespace Ogre {
         */
         virtual SceneNode* getParentSceneNode(void) const;
 
+		/// Gets whether the parent node is a TagPoint (or a SceneNode)
+		virtual bool isParentTagPoint() const { return mParentIsTagPoint; }
+
         /** Internal method called to notify the object that it has been attached to a node.
         */
         virtual void _notifyAttached(Node* parent, bool isTagPoint = false);
