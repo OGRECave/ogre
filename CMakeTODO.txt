@@ -13,7 +13,8 @@ To be done after switch-over
 * GLES project
 * OS X
   * Plugins are all dylibs now rather than bundles. Keep that way, since universal binaries are not necessarily required? Can do separate ppc and i386 builds with CMake anyway
-  * Everything is building, but runtime layout is not configured yet
+  * Everything is building, but runtime layout is not configured yet. Ogre.framework is now being
+    searched for in @executable_path/../Frameworks, ie Demo.app/Contents/Frameworks dir to be entirely self-contained.
 * CPack
   * Investigate .deb, .rpm packages for Linux
 

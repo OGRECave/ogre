@@ -511,6 +511,11 @@ if (APPLE)
   set_target_properties(OgreMain PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADER_FILES}" )
   # Framework is called 'Ogre'
   set_target_properties(OgreMain PROPERTIES	OUTPUT_NAME Ogre)
+  # Set the INSTALL_PATH so that Frameworks can be local
+  set_target_properties(OgreMain
+     PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+     INSTALL_NAME_DIR "@executable_path/../Frameworks"
+  )
 endif()
 target_link_libraries(OgreMain
   ${ZLIB_LIBRARIES}
