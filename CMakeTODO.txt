@@ -10,7 +10,6 @@ TODO
 To be done after switch-over
 
 * SDK changes - Win32 and OS X scripts will need altering
-* Pregenerating project files for source packages (& SDK's) - absolute paths will break this, can we use relative dirs?
 * GLES project
 * OS X
   * Plugins are all dylibs now rather than bundles. Keep that way, since universal binaries are not necessarily required? Can do separate ppc and i386 builds with CMake anyway

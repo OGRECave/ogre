@@ -132,6 +132,11 @@ if (UNIX)
   endif ()
 endif ()
 
+if (OGRE_STANDALONE_BUILD)
+  set(CMAKE_USE_RELATIVE_PATHS true)
+  set(CMAKE_SUPPRESS_REGENERATION true)
+endif()
+
 ### Commented because the FindOGRE script can currently fill this role better ###
 # # Create the CMake package files
 # if (WIN32)
