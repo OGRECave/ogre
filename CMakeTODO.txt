@@ -13,6 +13,7 @@ To be done after switch-over
 * GLES project
 * OS X
   * Tidy up files in ogre/Mac - should be moved into OgreMain/OSX
+  * Only Debug and Release builds are supported at the moment, since the others still use the same folders. 
 * CPack
   * Investigate .deb, .rpm packages for Linux
 
