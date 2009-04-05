@@ -130,9 +130,25 @@ function(ogre_config_sample SAMPLENAME)
     set_property(TARGET ${SAMPLENAME} PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
   endif ()
   
-  # On OS X, create .app bundle
   if (APPLE)
+    # On OS X, create .app bundle
     set_property(TARGET ${SAMPLENAME} PROPERTY MACOSX_BUNDLE TRUE)
+    # also, symlink frameworks so .app is standalone
+    # NOTE: $(CONFIGURATION) is not resolvable at CMake run time, it's only 
+    # valid at build time (hence parenthesis rather than braces)
+    set (OGRE_SAMPLE_CONTENTS_PATH 
+      ${CMAKE_BINARY_DIR}/bin/$(CONFIGURATION)/${SAMPLENAME}.app/Contents)
+    add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+      COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks
+      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework 
+        ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
+      COMMAND ln ARGS -s -f ${CMAKE_SOURCE_DIR}/Dependencies/Cg.framework 
+        ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
+      COMMAND ln ARGS -s -f ${CMAKE_SOURCE_DIR}/Dependencies/CEGUI.framework 
+        ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
+    )
+    
+    
   endif ()
 
   if (OGRE_INSTALL_SAMPLES)
