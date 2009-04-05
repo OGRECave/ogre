@@ -256,12 +256,12 @@ protected:
                 // OS X does not set the working directory relative to the app,
                 // In order to make things portable on OS X we need to provide
                 // the loading with it's own bundle path location
-                ResourceGroupManager::getSingleton().addResourceLocation(
-                    String(macBundlePath() + "/" + archName), typeName, secName);
-#else
+				if (!StringUtil::startsWith(archName, "/", false)) // only adjust relative dirs
+					archName = String(macBundlePath() + "/" + archName);
+#endif
                 ResourceGroupManager::getSingleton().addResourceLocation(
                     archName, typeName, secName);
-#endif
+
             }
         }
     }
