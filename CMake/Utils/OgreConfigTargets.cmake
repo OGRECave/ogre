@@ -88,7 +88,21 @@ function(ogre_config_plugin PLUGINNAME)
       # disable "lib" prefix on Unix
       set_target_properties(${PLUGINNAME} PROPERTIES PREFIX "")
 	endif (CMAKE_COMPILER_IS_GNUCXX)
-  endif ()
+	
+	if (APPLE)
+	  # copy plugin into Ogre.framework/Contents/Resources
+	  # NOTE: $(CONFIGURATION) is resolved only at build time, not CMake time!
+	  set (OGRE_FWK_CONTENTS_PATH 
+        ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Contents)
+      add_custom_command(TARGET ${PLUGINNAME} POST_BUILD
+        COMMAND mkdir ARGS -p ${OGRE_FWK_CONTENTS_PATH}/Resources
+        COMMAND cp ARGS -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/${PLUGINNAME}.dylib 
+        ${OGRE_FWK_CONTENTS_PATH}/Resources/
+	  )
+	  
+	endif (APPLE)
+	
+  endif (OGRE_STATIC)
   install(TARGETS ${PLUGINNAME}
     RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" 
       CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
@@ -147,6 +161,19 @@ function(ogre_config_sample SAMPLENAME)
       COMMAND ln ARGS -s -f ${CMAKE_SOURCE_DIR}/Dependencies/CEGUI.framework 
         ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
     )
+    # now cfg files
+    add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+      COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
+      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/bin/plugins.cfg 
+        ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/bin/resources.cfg 
+        ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/bin/media.cfg 
+        ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/bin/quake3settings.cfg 
+        ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+    )
+    
     
     
   endif ()
