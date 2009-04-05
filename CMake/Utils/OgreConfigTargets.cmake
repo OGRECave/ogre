@@ -87,21 +87,7 @@ function(ogre_config_plugin PLUGINNAME)
       set_target_properties(${PLUGINNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
       # disable "lib" prefix on Unix
       set_target_properties(${PLUGINNAME} PROPERTIES PREFIX "")
-	endif (CMAKE_COMPILER_IS_GNUCXX)
-	
-	if (APPLE)
-	  # copy plugin into Ogre.framework/Contents/Resources
-	  # NOTE: $(CONFIGURATION) is resolved only at build time, not CMake time!
-	  set (OGRE_FWK_CONTENTS_PATH 
-        ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Contents)
-      add_custom_command(TARGET ${PLUGINNAME} POST_BUILD
-        COMMAND mkdir ARGS -p ${OGRE_FWK_CONTENTS_PATH}/Resources
-        COMMAND cp ARGS -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/${PLUGINNAME}.dylib 
-        ${OGRE_FWK_CONTENTS_PATH}/Resources/
-	  )
-	  
-	endif (APPLE)
-	
+	endif (CMAKE_COMPILER_IS_GNUCXX)	
   endif (OGRE_STATIC)
   install(TARGETS ${PLUGINNAME}
     RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" 
@@ -173,10 +159,50 @@ function(ogre_config_sample SAMPLENAME)
       COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/bin/quake3settings.cfg 
         ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
     )
-    
-    
-    
-  endif ()
+    # now plugins
+    add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+      COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins)
+    if (OGRE_BUILD_RENDERSYSTEM_GL)
+      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/RenderSystem_GL.dylib 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+      )
+    endif ()
+	if (OGRE_BUILD_PLUGIN_BSP)    
+      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_BSPSceneManager.dylib 
+        ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+      )
+    endif()
+	if (OGRE_BUILD_PLUGIN_CG)    
+      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_CgProgramManager.dylib 
+        ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+      )
+    endif()
+	if (OGRE_BUILD_PLUGIN_OCTREE)    
+      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_OctreeSceneManager.dylib 
+        ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+      )
+    endif()
+	if (OGRE_BUILD_PLUGIN_PCZ)    
+      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_PCZSceneManager.dylib 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/    
+      )
+      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_OctreeZone.dylib 
+        ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+      )
+    endif()
+	if (OGRE_BUILD_PLUGIN_PFX)    
+      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_ParticleFX.dylib 
+        ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+      )
+    endif()
+  endif (APPLE)
 
   if (OGRE_INSTALL_SAMPLES)
     install(TARGETS ${SAMPLENAME}

@@ -70,7 +70,11 @@ namespace Ogre {
         if (name.substr(name.length() - 3, 3) != ".so")
            name += ".so";
 #endif
-
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+        // dlopen() does not add .dylib to the filename, like windows does for .dll
+        if (name.substr(name.length() - 6, 6) != ".dylib")
+			name += ".dylib";
+#endif
         m_hInst = (DYNLIB_HANDLE)DYNLIB_LOAD( name.c_str() );
 
         if( !m_hInst )

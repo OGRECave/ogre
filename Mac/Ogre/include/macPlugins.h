@@ -28,6 +28,7 @@ Torus Knot Software Ltd.
 */
 
 #include <CoreFoundation/CoreFoundation.h>
+#include <dlfcn.h>
 #include "OgrePrerequisites.h"
 
 namespace Ogre {
@@ -36,4 +37,5 @@ namespace Ogre {
      void * mac_getBundleSym(CFBundleRef bundle, const char *name);
      bool mac_unloadExeBundle(CFBundleRef bundle);
      const char *mac_errorBundle();
+	void* mac_loadDylib(const char* name);
 }
