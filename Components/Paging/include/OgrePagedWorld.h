@@ -103,10 +103,11 @@ namespace Ogre
 			wanted the same strategy but parameterised differently.
 		@param strategyName The name of the strategy to use (must be registered	
 			with PageManager)
+		@param sceneMgr The SceneManager to use for this section
 		@param sectionName An optional name to give the section (if none is
 			provided, one will be generated)
 		*/
-		PagedWorldSection* createSection(const String& strategyName, 
+		PagedWorldSection* createSection(const String& strategyName, SceneManager* sceneMgr,
 			const String& sectionName = StringUtil::BLANK);
 
 
@@ -118,10 +119,11 @@ namespace Ogre
 			if you needed different simultaneous paging strategies, or you 
 			wanted the same strategy but parameterised differently.
 		@param strategy The strategy to use 
+		@param sceneMgr The SceneManager to use for this section
 		@param sectionName An optional name to give the section (if none is
 			provided, one will be generated)
 		*/
-		PagedWorldSection* createSection(PageStrategy* strategy, 
+		PagedWorldSection* createSection(PageStrategy* strategy, SceneManager* sceneMgr, 
 			const String& sectionName = StringUtil::BLANK);
 
 		/** Destroy a section of world. */

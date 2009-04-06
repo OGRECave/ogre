@@ -132,17 +132,17 @@ namespace Ogre
 	}
 	//---------------------------------------------------------------------
 	PagedWorldSection* PagedWorld::createSection(const String& strategyName, 
-		const String& sectionName)
+		SceneManager* sceneMgr, const String& sectionName)
 	{
 		// get the strategy
 		PageStrategy* strategy = mManager->getStrategy(strategyName);
 
-		return createSection(strategy, sectionName);
+		return createSection(strategy, sceneMgr, sectionName);
 
 	}
 	//---------------------------------------------------------------------
 	PagedWorldSection* PagedWorld::createSection(PageStrategy* strategy, 
-		const String& sectionName)
+		SceneManager* sceneMgr, const String& sectionName)
 	{
 		String theName = sectionName;
 		if (theName.empty())
@@ -159,7 +159,7 @@ namespace Ogre
 				"PagedWorld::createSection");
 		}
 
-		PagedWorldSection* ret = OGRE_NEW PagedWorldSection(theName, this, strategy);
+		PagedWorldSection* ret = OGRE_NEW PagedWorldSection(theName, this, strategy, sceneMgr);
 		mSections[theName] = ret;
 
 		return ret;

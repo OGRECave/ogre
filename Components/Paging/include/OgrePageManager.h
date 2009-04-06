@@ -52,7 +52,7 @@ namespace Ogre
 	@note
 		All of the methods in this class can be called in a background, non-render thread. 		
 	*/
-	class PageProvider : public PageAlloc
+	class PageProvider
 	{
 	public:
 		PageProvider() {}

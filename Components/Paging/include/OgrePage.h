@@ -71,6 +71,9 @@ namespace Ogre
 		PagedWorldSection* mParent;
 		unsigned long mFrameLastHeld;
 		AtomicScalar<Status> mStatus;
+
+		SceneNode* mDebugNode;
+		void updateDebugDisplay();
 	public:
 		Page(PageID pageID);
 		virtual ~Page();
@@ -114,6 +117,14 @@ namespace Ogre
 
 		/// Returns the current status
 		virtual Status getStatus() const { return mStatus.get(); }
+
+		/// Called when the frame starts
+		virtual void frameStart(Real timeSinceLastFrame);
+		/// Called when the frame ends
+		virtual void frameEnd(Real timeElapsed);
+		/// Notify a section of the current camera
+		virtual void notifyCamera(Camera* cam);
+
 
 
 	};

@@ -35,6 +35,7 @@ Torus Knot Software Ltd.
 #include "OgrePage.h"
 #include "OgrePageRequestQueue.h"
 #include "OgreLogManager.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {
@@ -43,13 +44,14 @@ namespace Ogre
 	const uint16 PagedWorldSection::CHUNK_VERSION = 1;
 	//---------------------------------------------------------------------
 	PagedWorldSection::PagedWorldSection(PagedWorld* parent)
-		: mParent(parent), mStrategy(0), mPageProvider(0)
+		: mParent(parent), mStrategy(0), mPageProvider(0), mSceneMgr(0)
 	{
 
 	}
 	//---------------------------------------------------------------------
-	PagedWorldSection::PagedWorldSection(const String& name, PagedWorld* parent, PageStrategy* strategy)
-		: mName(name), mParent(parent), mStrategy(0), mPageProvider(0)
+	PagedWorldSection::PagedWorldSection(const String& name, PagedWorld* parent, 
+		PageStrategy* strategy, SceneManager* sm)
+		: mName(name), mParent(parent), mStrategy(0), mPageProvider(0), mSceneMgr(sm)
 	{
 		setStrategy(strategy);
 	}
@@ -61,6 +63,8 @@ namespace Ogre
 			mStrategy->destroyData(mStrategyData);
 			mStrategyData = 0;
 		}
+
+		removeAllPages();
 	}
 	//---------------------------------------------------------------------
 	void PagedWorldSection::setBoundingBox(const AxisAlignedBox& box)
@@ -87,12 +91,31 @@ namespace Ogre
 			mStrategy = strat;
 			if (mStrategy)
 				mStrategyData = mStrategy->createData();
+
+			removeAllPages();
 		}
+
 	}
 	//---------------------------------------------------------------------
 	void PagedWorldSection::setStrategy(const String& stratName)
 	{
 		setStrategy(mParent->getManager()->getStrategy(stratName));
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::setSceneManager(SceneManager* sm)
+	{
+		if (sm != mSceneMgr)
+		{
+			mSceneMgr = sm;
+			removeAllPages();
+		}
+		
+		
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::setSceneManager(const String& smName)
+	{
+		setSceneManager(Root::getSingleton().getSceneManager(smName));
 	}
 	//---------------------------------------------------------------------
 	bool PagedWorldSection::load(StreamSerialiser& ser)
@@ -204,6 +227,7 @@ namespace Ogre
 			if (ret.first->second != page)
 			{
 				// replacing a page, delete the old one
+				mParent->getManager()->getQueue()->cancelOperationsForPage(ret.first->second);
 				OGRE_DELETE ret.first->second;
 				ret.first->second = page;
 			}
@@ -223,19 +247,39 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void PagedWorldSection::removeAllPages()
+	{
+		for (PageMap::iterator i= mPages.begin(); i != mPages.end(); ++i)
+		{
+			mParent->getManager()->getQueue()->cancelOperationsForPage(i->second);
+			OGRE_DELETE i->second;
+		}
+		mPages.clear();
+
+	}
+	//---------------------------------------------------------------------
 	void PagedWorldSection::frameStart(Real timeSinceLastFrame)
 	{
 		mStrategy->frameStart(timeSinceLastFrame, this);
+
+		for (PageMap::iterator i = mPages.begin(); i != mPages.end(); ++i)
+			i->second->frameStart(timeSinceLastFrame);
 	}
 	//---------------------------------------------------------------------
 	void PagedWorldSection::frameEnd(Real timeElapsed)
 	{
 		mStrategy->frameEnd(timeElapsed, this);
+
+		for (PageMap::iterator i = mPages.begin(); i != mPages.end(); ++i)
+			i->second->frameEnd(timeElapsed);
 	}
 	//---------------------------------------------------------------------
 	void PagedWorldSection::notifyCamera(Camera* cam)
 	{
 		mStrategy->notifyCamera(cam, this);
+
+		for (PageMap::iterator i = mPages.begin(); i != mPages.end(); ++i)
+			i->second->notifyCamera(cam);
 	}
 	//---------------------------------------------------------------------
 	StreamSerialiser* PagedWorldSection::_readPageStream(PageID pageID)

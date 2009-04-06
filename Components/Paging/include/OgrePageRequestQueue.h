@@ -63,6 +63,14 @@ namespace Ogre
 		/** Dispose of a page */
 		void unloadPage(Page* page);
 
+		/** Cancel any pending operations for a Page.
+		@remarks
+			Any queued operations for a given page will be removed. If an operation
+			is in progress, it will be allowed to finish before this method
+			returns.
+		*/
+		void cancelOperationsForPage(Page* p);
+
 
 
 	protected:

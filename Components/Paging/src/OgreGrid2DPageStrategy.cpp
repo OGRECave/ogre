@@ -31,6 +31,12 @@ Torus Knot Software Ltd.
 #include "OgreException.h"
 #include "OgreCamera.h"
 #include "OgrePagedWorldSection.h"
+#include "OgrePage.h"
+#include "OgreSceneNode.h"
+#include "OgreSceneManager.h"
+#include "OgreMaterialManager.h"
+#include "OgreManualObject.h"
+#include "OgrePageManager.h"
 
 namespace Ogre
 {
@@ -44,9 +50,10 @@ namespace Ogre
 		, mWorldOrigin(Vector3::ZERO)
 		, mOrigin(Vector2::ZERO)
 		, mCellSize(1000)
-		, mLoadRadius(10000)
-		, mHoldRadius(12000)
+		, mLoadRadius(2000)
+		, mHoldRadius(3000)
 	{
+		updateDerivedMetrics();
 		
 	}
 	//---------------------------------------------------------------------
@@ -66,7 +73,7 @@ namespace Ogre
 	{
 		mWorldOrigin = worldOrigin;
 		convertWorldToGridSpace(mWorldOrigin, mOrigin);
-		mBottomLeft = mOrigin - Vector2(mCellSize * 65536 * 0.5, mCellSize * 65536 * 0.5);
+		updateDerivedMetrics();
 	}
 	//---------------------------------------------------------------------
 	void Grid2DPageStrategyData::convertWorldToGridSpace(const Vector3& world, Vector2& grid)
@@ -88,6 +95,33 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::convertGridToWorldSpace(const Vector2& grid, Vector3& world)
+	{
+		// Note that we don't set the 3rd coordinate, let the caller determine that
+		switch(mMode)
+		{
+		case G2D_X_Z:
+			world.x = grid.x;
+			world.z = -grid.y;
+			break;
+		case G2D_X_Y:
+			world.x = grid.x;
+			world.y = grid.y;
+			break;
+		case G2D_Y_Z:
+			world.z = -grid.x;
+			world.y = grid.y;
+			break;
+		}
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::updateDerivedMetrics()
+	{
+		mLoadRadiusInCells = mLoadRadius / mCellSize;
+		mHoldRadiusInCells = mHoldRadius / mCellSize;
+		mBottomLeft = mOrigin - Vector2(mCellSize * 65536 * 0.5, mCellSize * 65536 * 0.5);
+	}
+	//---------------------------------------------------------------------
 	void Grid2DPageStrategyData::determineGridLocation(const Vector2& gridpos, uint16* row, uint16* col)
 	{
 		// get distance from bottom-left (indexing start)
@@ -102,24 +136,43 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::getBottomLeftGridSpace(uint16 row, uint16 col, Vector2& bl)
+	{
+		bl.x = mBottomLeft.x + col * mCellSize;
+		bl.y = mBottomLeft.y + row * mCellSize;
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::getMidPointGridSpace(uint16 row, uint16 col, Vector2& mid)
+	{
+		getBottomLeftGridSpace(row, col, mid);
+		mid.x += mCellSize * 0.5;
+		mid.y += mCellSize * 0.5;
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::getCornersGridSpace(uint16 row, uint16 col, Vector2* pFourPoints)
+	{
+		getBottomLeftGridSpace(row, col, pFourPoints[0]);
+		pFourPoints[1] = pFourPoints[0] + Vector2(mCellSize, 0);
+		pFourPoints[2] = pFourPoints[0] + Vector2(mCellSize, mCellSize);
+		pFourPoints[3] = pFourPoints[0] + Vector2(0, mCellSize);
+	}
+	//---------------------------------------------------------------------
 	void Grid2DPageStrategyData::setCellSize(Real sz)
 	{
 		mCellSize = sz;
-		mLoadRadiusInCells = mLoadRadius / mCellSize;
-		mHoldRadiusInCells = mHoldRadius / mCellSize;
-		mBottomLeft = mOrigin - Vector2(mCellSize * 65536 * 0.5, mCellSize * 65536 * 0.5);
+		updateDerivedMetrics();
 	}
 	//---------------------------------------------------------------------
 	void Grid2DPageStrategyData::setLoadRadius(Real sz)
 	{
 		mLoadRadius = sz;
-		mLoadRadiusInCells = mLoadRadius / mCellSize;
+		updateDerivedMetrics();
 	}
 	//---------------------------------------------------------------------
 	void Grid2DPageStrategyData::setHoldRadius(Real sz)
 	{
 		mHoldRadius = sz;
-		mHoldRadiusInCells = mHoldRadius / mCellSize;
+		updateDerivedMetrics();
 	}
 	//---------------------------------------------------------------------
 	bool Grid2DPageStrategyData::load(StreamSerialiser& ser)
@@ -254,6 +307,90 @@ namespace Ogre
 	PageID Grid2DPageStrategy::calculatePageID(uint16 row, uint16 col)
 	{
 		return (PageID)row * 65536 + col;
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategy::calculateRowCol(PageID inPageID, uint16 *row, uint16 *col)
+	{
+		// inverse of calculatePageID
+		*row = inPageID / 65536;
+		*col = inPageID % 65536;
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategy::updateDebugDisplay(Page* p, SceneNode* sn)
+	{
+		uint8 dbglvl = mManager->getDebugDisplayLevel();
+		if (dbglvl)
+		{
+			// we could try to avoid updating the geometry every time here, but this 
+			// wouldn't easily deal with paging parameter changes. There shouldn't 
+			// be that many pages anyway, and this is debug after all, so update every time
+			uint16 row, col;
+			calculateRowCol(p->getID(), &row, &col);
+
+			Grid2DPageStrategyData* data = static_cast<Grid2DPageStrategyData*>(p->getParentSection()->getStrategyData());
+
+			// Determine our centre point, we'll anchor here
+			// Note that world points are initialised to ZERO since only 2 dimensions
+			// are updated by the grid data (we could display this grid anywhere)
+			Vector2 gridMidPoint;
+			Vector3 worldMidPoint = Vector3::ZERO;
+			data->getMidPointGridSpace(row, col, gridMidPoint);
+			data->convertGridToWorldSpace(gridMidPoint, worldMidPoint);
+
+			sn->setPosition(worldMidPoint);
+
+			Vector2 gridCorners[4];
+			Vector3 worldCorners[4];
+
+			data->getCornersGridSpace(row, col, gridCorners);
+			for (int i = 0; i < 4; ++i)
+			{
+				worldCorners[i] = Vector3::ZERO;
+				data->convertGridToWorldSpace(gridCorners[i], worldCorners[i]);
+				// make relative to mid point
+				worldCorners[i] -= worldMidPoint;
+			}
+
+			String matName = "Ogre/G2D/Debug";
+			MaterialPtr mat = MaterialManager::getSingleton().getByName(matName);
+			if (mat.isNull())
+			{
+				mat = MaterialManager::getSingleton().create(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+				Pass* pass = mat->getTechnique(0)->getPass(0);
+				pass->setLightingEnabled(false);
+				pass->setVertexColourTracking(TVC_AMBIENT);
+				pass->setDepthWriteEnabled(false);
+				mat->load();
+			}
+
+
+			ManualObject* mo = 0;
+			if (sn->numAttachedObjects() == 0)
+			{
+				mo = p->getParentSection()->getSceneManager()->createManualObject();
+				mo->begin(matName, RenderOperation::OT_LINE_STRIP);
+			}
+			else
+			{
+				mo = static_cast<ManualObject*>(sn->getAttachedObject(0));
+				mo->beginUpdate(0);
+			}
+
+			ColourValue vcol = p->getStatus() == Page::STATUS_LOADED ? 
+				ColourValue::Green : ColourValue::Red;
+			for(int i = 0; i < 5; ++i)
+			{
+				mo->position(worldCorners[i%4]);
+				mo->colour(vcol);
+			}
+
+			mo->end();
+
+			if (sn->numAttachedObjects() == 0)
+				sn->attachObject(mo);
+
+		}
+
 	}
 
 

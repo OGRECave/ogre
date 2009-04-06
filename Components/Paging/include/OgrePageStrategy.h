@@ -117,6 +117,14 @@ namespace Ogre
 		the data will be specific to the PageStrategy subclass.
 		*/
 		virtual void destroyData(PageStrategyData* d) = 0;
+
+		/** Update the contents of the passed in SceneNode to reflect the 
+			debug display of a given page. 
+		@remarks
+			The PageStrategy is to have complete control of the contents of this
+			SceneNode, it must not be altered / added to by others.
+		*/
+		virtual void updateDebugDisplay(Page* p, SceneNode* sn) = 0;
 	};
 
 	/*@}*/

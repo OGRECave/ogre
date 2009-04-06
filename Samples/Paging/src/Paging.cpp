@@ -64,7 +64,7 @@ public:
 
 
 
-class PagingApp : public ExampleApplication
+class PagingApp : public ExampleApplication, public PageProvider
 {
 public:
 	PagingApp() : mPageManager(0) {}
@@ -82,12 +82,28 @@ protected:
 		mPageManager = OGRE_NEW PageManager();
 
 		PagedWorld* world = mPageManager->createWorld();
-		PagedWorldSection* sec = world->createSection("Grid2D");
+		PagedWorldSection* sec = world->createSection("Grid2D", mSceneMgr);
 
 		Grid2DPageStrategyData* data = static_cast<Grid2DPageStrategyData*>(sec->getStrategyData());
 
+		// accept defaults for now
+
 		mPageManager->setDebugDisplayLevel(1);
 
+		// hook up self to provide pages procedurally
+		mPageManager->setPageProvider(this);
+
+		mCamera->setPosition(0, 100, 0);
+
+		mPageManager->addCamera(mCamera);
+
+	}
+
+	// callback on PageProvider
+	bool generatePage(Page* page, PagedWorldSection* section)
+	{
+		// say we populated something just so it doesn't try to load any more
+		return true;
 	}
 
     // Create new frame listener

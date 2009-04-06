@@ -28,6 +28,12 @@ Torus Knot Software Ltd.
 */
 #include "OgrePage.h"
 #include "OgreRoot.h"
+#include "OgrePagedWorldSection.h"
+#include "OgrePagedWorld.h"
+#include "OgrePageStrategy.h"
+#include "OgrePageManager.h"
+#include "OgreSceneNode.h"
+#include "OgreSceneManager.h"
 
 namespace Ogre
 {
@@ -36,6 +42,7 @@ namespace Ogre
 		: mID(pageID)
 		, mParent(0)
 		, mStatus(STATUS_UNLOADED)
+		, mDebugNode(0)
 	{
 
 	}
@@ -76,6 +83,44 @@ namespace Ogre
 	void Page::save(StreamSerialiser& stream)
 	{
 		// TODO
+	}
+	//---------------------------------------------------------------------
+	void Page::frameStart(Real timeSinceLastFrame)
+	{
+		updateDebugDisplay();
+
+
+	}
+	//---------------------------------------------------------------------
+	void Page::frameEnd(Real timeElapsed)
+	{
+
+	}
+	//---------------------------------------------------------------------
+	void Page::notifyCamera(Camera* cam)
+	{
+
+	}
+	//---------------------------------------------------------------------
+	void Page::updateDebugDisplay()
+	{
+		uint8 dbglvl = mParent->getWorld()->getManager()->getDebugDisplayLevel();
+		if (dbglvl > 0)
+		{
+			// update debug display
+			if (!mDebugNode)
+			{
+				mDebugNode = mParent->getSceneManager()->getRootSceneNode()->createChildSceneNode();
+			}
+			mParent->getStrategy()->updateDebugDisplay(this, mDebugNode);
+
+			mDebugNode->setVisible(true);
+		}
+		else if (mDebugNode)
+		{
+			mDebugNode->setVisible(false);
+		}
+
 	}
 
 

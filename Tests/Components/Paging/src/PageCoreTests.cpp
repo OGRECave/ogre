@@ -39,6 +39,8 @@ void PageCoreTests::setUp()
 
 	mRoot->addResourceLocation("./", "FileSystem");
 
+	mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
+
 }
 
 void PageCoreTests::tearDown()
@@ -55,8 +57,8 @@ void PageCoreTests::testSimpleCreateSaveLoadWorld()
 	String sectionName1 = "Section1";
 	String sectionName2 = "Section2";
 	PagedWorld* world = mPageManager->createWorld(worldName);
-	PagedWorldSection* section = world->createSection("Grid2D", sectionName1);
-	section = world->createSection("Grid2D", sectionName2);
+	PagedWorldSection* section = world->createSection("Grid2D", mSceneMgr, sectionName1);
+	section = world->createSection("Grid2D", mSceneMgr, sectionName2);
 	
 	world->save(filename);
 

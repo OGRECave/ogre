@@ -68,6 +68,7 @@ namespace Ogre
 		PageStrategyData* mStrategyData;
 		PageMap mPages;
 		PageProvider* mPageProvider;
+		SceneManager* mSceneMgr;
 
 
 	public:
@@ -78,7 +79,8 @@ namespace Ogre
 		PagedWorldSection(PagedWorld* parent); 
 
 		/** Construct a new instance, specifying the parent and assigned strategy. */
-		PagedWorldSection(const String& name, PagedWorld* parent, PageStrategy* strategy);
+		PagedWorldSection(const String& name, PagedWorld* parent, PageStrategy* strategy, 
+			SceneManager* sm);
 		virtual ~PagedWorldSection();
 
 		/// Get the name of this section
@@ -97,6 +99,23 @@ namespace Ogre
 			require the PageStrategyData to be repopulated.
 		*/
 		virtual void setStrategy(const String& stratName);
+
+		/** Change the SceneManager.
+		@remarks
+		Doing this will invalidate any pages attached to this world section, and
+		require the pages to be reloaded.
+		*/
+		virtual void setSceneManager(SceneManager* sm);
+		
+		/** Change the SceneManager.
+		@remarks
+		Doing this will invalidate any pages attached to this world section, and
+		require the pages to be reloaded.
+		@param smName The instance name of the SceneManager
+		*/
+		virtual void setSceneManager(const String& smName);
+		/// Get the current SceneManager
+		virtual SceneManager* getSceneManager() const { return mSceneMgr; }
 
 		/// Get the parent world
 		virtual PagedWorld* getWorld() const { return mParent; }
@@ -173,6 +192,12 @@ namespace Ogre
 		This class is no longer responsible for deleting the Page.
 		*/
 		virtual void detachPage(Page* page);
+
+		/** Remove all pages immediately. 
+		@remarks
+			Effectively 'resets' this section by deleting all pages. 
+		*/
+		virtual void removeAllPages();
 
 		/** Set the PageProvider which can provide streams Pages in this section. 
 		@remarks

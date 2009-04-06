@@ -64,6 +64,11 @@ namespace Ogre
 	{
 		// TODO
 	}
+	//---------------------------------------------------------------------
+	void PageRequestQueue::cancelOperationsForPage(Page* p)
+	{
+		// TODO
+	}
 
 
 }

@@ -44,6 +44,7 @@ class PageCoreTests : public CppUnit::TestFixture
 
 	Root* mRoot;
 	PageManager* mPageManager;
+	SceneManager* mSceneMgr;
 public:
 	void setUp();
 	void tearDown();

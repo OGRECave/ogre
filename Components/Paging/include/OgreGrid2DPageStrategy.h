@@ -126,6 +126,8 @@ namespace Ogre
 		Real mLoadRadiusInCells;
 		Real mHoldRadiusInCells;
 
+		void updateDerivedMetrics();
+
 	public:
 		static const uint32 CHUNK_ID;
 		static const uint16 CHUNK_VERSION;
@@ -165,8 +167,19 @@ namespace Ogre
 		/// Save this data to a stream
 		void save(StreamSerialiser& stream);
 
-		/// Convert a world point to grid space
+		/// Convert a world point to grid space (not relative to origin)
 		virtual void convertWorldToGridSpace(const Vector3& world, Vector2& grid);
+		/// Convert a grid point to world space - note only 2 axes populated
+		virtual void convertGridToWorldSpace(const Vector2& grid, Vector3& world);
+		/// Get the (grid space) mid point of a cell
+		virtual void getMidPointGridSpace(uint16 row, uint16 col, Vector2& mid);
+		/// Get the (grid space) bottom-left of a cell
+		virtual void getBottomLeftGridSpace(uint16 row, uint16 col, Vector2& bl);
+		/** Get the (grid space) corners of a cell.
+		@remarks
+			Populates pFourPoints in anticlockwise order from the bottom left point.
+		*/
+		virtual void getCornersGridSpace(uint16 row, uint16 col, Vector2* pFourPoints);
 		
 		/// Convert a grid position into a row and column index
 		void determineGridLocation(const Vector2& gridpos, uint16* row, uint16* col);
@@ -191,8 +204,10 @@ namespace Ogre
 		void notifyCamera(Camera* cam, PagedWorldSection* section);
 		PageStrategyData* createData();
 		void destroyData(PageStrategyData* d);
+		void updateDebugDisplay(Page* p, SceneNode* sn);
 	protected:
 		PageID calculatePageID(uint16 row, uint16 col);
+		void calculateRowCol(PageID inPageID, uint16 *row, uint16 *col);
 	};
 
 	/*@}*/
