@@ -1365,6 +1365,11 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void GLRenderSystem::_setPointSpritesEnabled(bool enabled)
 	{
+		if (!getCapabilities()->hasCapability(RSC_POINT_SPRITES))
+		{
+			return;
+		}
+
 		if (enabled)
 		{
 			glEnable(GL_POINT_SPRITE);
