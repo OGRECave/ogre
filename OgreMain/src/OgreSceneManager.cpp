@@ -111,6 +111,7 @@ mResetIdentityProj(false),
 mNormaliseNormalsOnScale(true),
 mFlipCullingOnNegativeScale(true),
 mLightsDirtyCounter(0),
+mMovableNameGenerator("Ogre/MO"),
 mShadowCasterPlainBlackPass(0),
 mShadowReceiverPass(0),
 mDisplayNodes(false),
@@ -371,6 +372,12 @@ Light* SceneManager::createLight(const String& name)
 		createMovableObject(name, LightFactory::FACTORY_TYPE_NAME));
 }
 //-----------------------------------------------------------------------
+Light* SceneManager::createLight()
+{
+	String name = mMovableNameGenerator.generate();
+	return createLight(name);
+}
+//-----------------------------------------------------------------------
 Light* SceneManager::getLight(const String& name) const
 {
 	return static_cast<Light*>(
@@ -501,6 +508,12 @@ Entity* SceneManager::createEntity(const String& entityName, PrefabType ptype)
         "Unknown prefab type for entity " + entityName,
         "SceneManager::createEntity");
 }
+//---------------------------------------------------------------------
+Entity* SceneManager::createEntity(PrefabType ptype)
+{
+	String name = mMovableNameGenerator.generate();
+	return createEntity(ptype);
+}
 
 //-----------------------------------------------------------------------
 Entity* SceneManager::createEntity(
@@ -517,7 +530,13 @@ Entity* SceneManager::createEntity(
 			&params));
 
 }
-
+//---------------------------------------------------------------------
+Entity* SceneManager::createEntity(const String& meshName)
+{
+	String name = mMovableNameGenerator.generate();
+	// note, we can't allow groupName to be passes, it would be ambiguous (2 string params)
+	return createEntity(name, meshName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+}
 //-----------------------------------------------------------------------
 Entity* SceneManager::getEntity(const String& name) const
 {
@@ -562,6 +581,12 @@ ManualObject* SceneManager::createManualObject(const String& name)
 		createMovableObject(name, ManualObjectFactory::FACTORY_TYPE_NAME));
 }
 //-----------------------------------------------------------------------
+ManualObject* SceneManager::createManualObject()
+{
+	String name = mMovableNameGenerator.generate();
+	return createManualObject(name);
+}
+//-----------------------------------------------------------------------
 ManualObject* SceneManager::getManualObject(const String& name) const
 {
 	return static_cast<ManualObject*>(
@@ -596,6 +621,12 @@ BillboardChain* SceneManager::createBillboardChain(const String& name)
 		createMovableObject(name, BillboardChainFactory::FACTORY_TYPE_NAME));
 }
 //-----------------------------------------------------------------------
+BillboardChain* SceneManager::createBillboardChain()
+{
+	String name = mMovableNameGenerator.generate();
+	return createBillboardChain(name);
+}
+//-----------------------------------------------------------------------
 BillboardChain* SceneManager::getBillboardChain(const String& name) const
 {
 	return static_cast<BillboardChain*>(
@@ -628,6 +659,12 @@ RibbonTrail* SceneManager::createRibbonTrail(const String& name)
 {
 	return static_cast<RibbonTrail*>(
 		createMovableObject(name, RibbonTrailFactory::FACTORY_TYPE_NAME));
+}
+//-----------------------------------------------------------------------
+RibbonTrail* SceneManager::createRibbonTrail()
+{
+	String name = mMovableNameGenerator.generate();
+	return createRibbonTrail(name);
 }
 //-----------------------------------------------------------------------
 RibbonTrail* SceneManager::getRibbonTrail(const String& name) const
@@ -680,6 +717,13 @@ ParticleSystem* SceneManager::createParticleSystem(const String& name,
 		createMovableObject(name, ParticleSystemFactory::FACTORY_TYPE_NAME, 
 			&params));
 }
+//-----------------------------------------------------------------------
+ParticleSystem* SceneManager::createParticleSystem(size_t quota, const String& group)
+{
+	String name = mMovableNameGenerator.generate();
+	return createParticleSystem(name, quota, group);
+}
+
 //-----------------------------------------------------------------------
 ParticleSystem* SceneManager::getParticleSystem(const String& name) const
 {
@@ -3452,6 +3496,12 @@ BillboardSet* SceneManager::createBillboardSet(const String& name, unsigned int 
 		createMovableObject(name, BillboardSetFactory::FACTORY_TYPE_NAME, &params));
 }
 //-----------------------------------------------------------------------
+BillboardSet* SceneManager::createBillboardSet(unsigned int poolSize)
+{
+	String name = mMovableNameGenerator.generate();
+	return createBillboardSet(name, poolSize);
+}
+//-----------------------------------------------------------------------
 BillboardSet* SceneManager::getBillboardSet(const String& name) const
 {
 	return static_cast<BillboardSet*>(
@@ -6197,6 +6247,12 @@ MovableObject* SceneManager::createMovableObject(const String& name,
 		return newObj;
 	}
 
+}
+//---------------------------------------------------------------------
+MovableObject* SceneManager::createMovableObject(const String& typeName, const NameValuePairList* params /* = 0 */)
+{
+	String name = mMovableNameGenerator.generate();
+	return createMovableObject(name, typeName, params);
 }
 //---------------------------------------------------------------------
 void SceneManager::destroyMovableObject(const String& name, const String& typeName)
