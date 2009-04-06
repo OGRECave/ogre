@@ -677,7 +677,7 @@ namespace Ogre {
 	{
 	protected:
 		String mPrefix;
-		unsigned long mNext;
+		unsigned long long int mNext;
 		OGRE_AUTO_MUTEX
 	public:
 		NameGenerator(const String& prefix) : mPrefix(prefix), mNext(1) {}
