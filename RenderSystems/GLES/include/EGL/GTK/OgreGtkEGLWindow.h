@@ -32,13 +32,18 @@ Torus Knot Software Ltd.
 #define __GtkEGLWindow_H__
 
 #include "OgreEGLWindow.h"
+#include "OgreGtkEGLSupport.h"
 
 namespace Ogre {
     class _OgrePrivate GtkEGLWindow : public EGLWindow
     {
 	protected:
-		NativeWindowType mParentWindow ;
-		NativeWindowType mExternalWindow;
+		GtkEGLSupport* mGLSupport;
+
+		//Changed these variables back to Window type because
+		//it seems they are not used outside this class.
+		Window mParentWindow;
+		Window mExternalWindow;
 		virtual EGLContext * createEGLContext() const;
 		virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
 		virtual void initNativeCreatedWindow(const NameValuePairList *miscParams);
@@ -48,8 +53,9 @@ namespace Ogre {
 		virtual void windowMovedOrResized();
 		virtual void switchFullScreen(bool fullscreen);
 
+
 	public:
-            GtkEGLWindow(EGLSupport* glsupport);
+            GtkEGLWindow(GtkEGLSupport* glsupport);
            virtual  ~GtkEGLWindow();
 
 			/**
@@ -62,6 +68,10 @@ namespace Ogre {
 			virtual void getCustomAttribute(const String& name, void* pData);
 
 			virtual void setFullscreen (bool fullscreen, uint width, uint height);
+
+	    //Moved this from EGLWindow because it has some native calls.
+            void create(const String& name, unsigned int width, unsigned int height,
+                        bool fullScreen, const NameValuePairList *miscParams);
 	};
 }
 

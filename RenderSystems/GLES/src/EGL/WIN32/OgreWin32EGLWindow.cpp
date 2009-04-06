@@ -46,9 +46,11 @@ Torus Knot Software Ltd.
 
 
 namespace Ogre {
-    Win32EGLWindow::Win32EGLWindow(EGLSupport *glsupport)
+    Win32EGLWindow::Win32EGLWindow(Win32EGLSupport *glsupport)
 		: EGLWindow(glsupport)
     {
+		mGLSupport = glsupport;
+		mNativeDisplay = glsupport->getNativeDisplay();
     }
 
     Win32EGLWindow::~Win32EGLWindow()
@@ -298,4 +300,164 @@ namespace Ogre {
 	{
 
 	}
+
+    void Win32EGLWindow::create(const String& name, uint width, uint height,
+                                bool fullScreen, const NameValuePairList *miscParams)
+    {
+        String title = name;
+        uint samples = 0;
+        int gamma;
+        short frequency = 0;
+        bool vsync = false;
+        ::EGLContext eglContext = 0;
+		int left = 0;
+		int top  = 0;
+
+		getLeftAndTopFromNativeWindow(left, top, width, height);
+
+        mIsFullScreen = fullScreen;
+
+        if (miscParams)
+        {
+            NameValuePairList::const_iterator opt;
+            NameValuePairList::const_iterator end = miscParams->end();
+
+            if ((opt = miscParams->find("currentGLContext")) != end &&
+                StringConverter::parseBool(opt->second))
+            {
+                eglContext = eglGetCurrentContext();
+                if (eglContext)
+                {
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                                "currentGLContext was specified with no current GL context",
+                                "EGLWindow::create");
+                }
+
+                eglContext = eglGetCurrentContext();
+                mEglSurface = eglGetCurrentSurface(EGL_DRAW);
+            }
+
+            // Note: Some platforms support AA inside ordinary windows
+            if ((opt = miscParams->find("FSAA")) != end)
+            {
+                samples = StringConverter::parseUnsignedInt(opt->second);
+            }
+
+            if ((opt = miscParams->find("displayFrequency")) != end)
+            {
+                frequency = (short)StringConverter::parseInt(opt->second);
+            }
+
+            if ((opt = miscParams->find("vsync")) != end)
+            {
+                vsync = StringConverter::parseBool(opt->second);
+            }
+
+            if ((opt = miscParams->find("gamma")) != end)
+            {
+                gamma = StringConverter::parseBool(opt->second);
+            }
+
+            if ((opt = miscParams->find("left")) != end)
+            {
+                left = StringConverter::parseInt(opt->second);
+            }
+
+            if ((opt = miscParams->find("top")) != end)
+            {
+                top = StringConverter::parseInt(opt->second);
+            }
+
+            if ((opt = miscParams->find("title")) != end)
+            {
+                title = opt->second;
+            }
+
+            if ((opt = miscParams->find("externalGLControl")) != end)
+            {
+                mIsExternalGLControl = StringConverter::parseBool(opt->second);
+            }
+		}
+
+		initNativeCreatedWindow(miscParams);
+
+        if (mEglSurface)
+        {
+            mEglConfig = mGLSupport->getGLConfigFromDrawable (mEglSurface, &width, &height);
+        }
+
+        if (!mEglConfig && eglContext)
+        {
+            mEglConfig = mGLSupport->getGLConfigFromContext(eglContext);
+
+            if (!mEglConfig)
+            {
+                // This should never happen.
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                            "Unexpected failure to determine a EGLFBConfig",
+                            "EGLWindow::create");
+            }
+        }
+
+        mIsExternal = (mEglSurface != 0);
+
+
+
+        if (!mEglConfig)
+        {
+            int minAttribs[] = {
+                EGL_LEVEL, 0,
+                EGL_DEPTH_SIZE, 16,
+                EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+                EGL_NONE
+            };
+
+            int maxAttribs[] = {
+                EGL_SAMPLES, samples,
+                EGL_STENCIL_SIZE, INT_MAX,
+                EGL_NONE
+            };
+
+            mEglConfig = mGLSupport->selectGLConfig(minAttribs, maxAttribs);
+            mHwGamma = false;
+        }
+
+        if (!mIsTopLevel)
+        {
+            mIsFullScreen = false;
+            left = top = 0;
+        }
+
+        if (mIsFullScreen)
+        {
+            mGLSupport->switchMode (width, height, frequency);
+        }
+
+		if (!mIsExternal)
+        {
+			createNativeWindow(left, top, width, height, title);
+		}
+
+		mContext = createEGLContext();
+
+        ::EGLSurface oldDrawableDraw = eglGetCurrentSurface(EGL_DRAW);
+        ::EGLSurface oldDrawableRead = eglGetCurrentSurface(EGL_READ);
+        ::EGLContext oldContext  = eglGetCurrentContext();
+
+        int glConfigID;
+
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_CONFIG_ID, &glConfigID);
+        LogManager::getSingleton().logMessage("EGLWindow::create used FBConfigID = " + StringConverter::toString(glConfigID));
+
+        mName = name;
+        mWidth = width;
+        mHeight = height;
+        mLeft = left;
+        mTop = top;
+        mActive = true;
+		mVisible = true;
+
+        mClosed = false;
+	}
+
 }

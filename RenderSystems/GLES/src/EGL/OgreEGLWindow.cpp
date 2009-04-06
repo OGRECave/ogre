@@ -75,7 +75,8 @@ namespace Ogre {
         mContext = 0;
     }
 
-    void EGLWindow::create(const String& name, uint width, uint height,
+//	Moved EGLWindow::create to native source because it has native calls in it
+/*    void EGLWindow::create(const String& name, uint width, uint height,
                            bool fullScreen, const NameValuePairList *miscParams)
     {
         String title = name;
@@ -232,7 +233,7 @@ namespace Ogre {
 		mVisible = true;
 
         mClosed = false;
-	}
+	}*/
 
     void EGLWindow::destroy(void)
     {
@@ -370,7 +371,7 @@ namespace Ogre {
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
 				"Unsupported format.",
-				"Win32Window::copyContentsToMemory" );
+				"GtkEGLWindow::copyContentsToMemory" );
 		}
 
 

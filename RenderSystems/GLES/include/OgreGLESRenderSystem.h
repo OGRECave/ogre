@@ -139,9 +139,6 @@ namespace Ogre {
             void _setTextureBorderColour(size_t stage, const ColourValue& colour);
             void _setTextureMipmapBias(size_t unit, float bias);
             void _setTextureMatrix(size_t stage, const Matrix4& xform);
-            void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor);
-            void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha);
-            void _setAlphaRejectSettings(CompareFunction func, unsigned char value);
             void _setViewport(Viewport *vp);
             void _beginFrame(void);
             void _endFrame(void);
@@ -215,6 +212,9 @@ namespace Ogre {
 			void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
 			/// @copydoc RenderSystem::getDisplayMonitorCount
 			unsigned int getDisplayMonitorCount() const;
+
+            void _setSceneBlendingOperation(SceneBlendOperation op);
+            void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
     };
 }
 

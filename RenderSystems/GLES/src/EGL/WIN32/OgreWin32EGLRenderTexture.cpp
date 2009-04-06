@@ -47,9 +47,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-	Win32EGLPBuffer::Win32EGLPBuffer( EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height )
+	Win32EGLPBuffer::Win32EGLPBuffer( Win32EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height )
 		: EGLPBuffer(glsupport, format, width, height)
 	{
+		mGLSupport = glsupport;
+		mGlDisplay = glsupport->getGLDisplay();
+		initEGLPBuffer();
 
 	}
 

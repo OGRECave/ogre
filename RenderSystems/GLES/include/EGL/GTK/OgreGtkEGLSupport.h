@@ -80,6 +80,7 @@ Torus Knot Software Ltd.
 	class XRRScreenConfiguration{};
 	class Rotation{};
 	class Visual{};
+	#define Window  NativeWindowType
 
 	struct XVisualInfo{int visualid, visual, depth;};
 	struct XRRScreenSize{int width, height;};
@@ -95,43 +96,43 @@ Torus Knot Software Ltd.
 
 
 	void XStringListToTextProperty(char ** prop, int num, XTextProperty * textProp);
-	NativeWindowType DefaultRootWindow(NativeDisplayType nativeDisplayType);
-	bool XQueryExtension(NativeDisplayType nativeDisplayType, char * name, int * dummy0, int * dummy2, int * dummy3);
-	XRRScreenConfiguration * XRRGetScreenInfo(NativeDisplayType nativeDisplayType, NativeWindowType window );
+	Window DefaultRootWindow(Display* nativeDisplayType);
+	bool XQueryExtension(Display* nativeDisplayType, char * name, int * dummy0, int * dummy2, int * dummy3);
+	XRRScreenConfiguration * XRRGetScreenInfo(Display* nativeDisplayType, Window window );
 	int XRRConfigCurrentConfiguration(XRRScreenConfiguration * config, Rotation * rotation);
 	XRRScreenSize * XRRConfigSizes(XRRScreenConfiguration * config, int * nSizes);
 	int XRRConfigCurrentRate(XRRScreenConfiguration * config);
 	short * XRRConfigRates(XRRScreenConfiguration * config, int sizeID, int * nRates);
 	void XRRFreeScreenConfigInfo(XRRScreenConfiguration * config);
 	int DefaultScreen(NativeDisplayType nativeDisplayType);
-	int DisplayWidth(NativeDisplayType nativeDisplayType, int screen);
-	int DisplayHeight(NativeDisplayType nativeDisplayType, int screen);
-	NativeDisplayType XOpenDisplay(int num);
-	void XCloseDisplay(NativeDisplayType nativeDisplayType);
-	Atom XInternAtom(NativeDisplayType nativeDisplayType, char * name, GtkBool isTrue);;
+	int DisplayWidth(Display* nativeDisplayType, int screen);
+	int DisplayHeight(Display* nativeDisplayType, int screen);
+	Display* XOpenDisplay(int num);
+	void XCloseDisplay(Display* nativeDisplayType);
+	Atom XInternAtom(Display* nativeDisplayType, char * name, GtkBool isTrue);;
 	char * DisplayString(NativeDisplayType nativeDisplayType);
 	const char * XDisplayName(char * name);
-	Visual * DefaultVisual(NativeDisplayType nativeDisplayType,  int screen);
+	Visual * DefaultVisual(Display* nativeDisplayType,  int screen);
 	int XVisualIDFromVisual(Visual *v);
-	void XRRSetScreenConfigAndRate(NativeDisplayType nativeDisplayType, XRRScreenConfiguration * config, NativeWindowType window, int size, Rotation rotation, int mode, int currentTime );
-	XVisualInfo * XGetVisualInfo(NativeDisplayType nativeDisplayType,  int mask, XVisualInfo * info, int * n);
+	void XRRSetScreenConfigAndRate(Display* nativeDisplayType, XRRScreenConfiguration * config, Window window, int size, Rotation rotation, int mode, int currentTime );
+	XVisualInfo * XGetVisualInfo(Display* nativeDisplayType,  int mask, XVisualInfo * info, int * n);
 	typedef int (*XErrorHandler)(Display *, XErrorEvent*);
 	XErrorHandler XSetErrorHandler(XErrorHandler xErrorHandler);
-	void XDestroyWindow(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType);
-	bool XGetWindowAttributes(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, XWindowAttributes * xWindowAttributes);
-	int XCreateColormap(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, int visual, int allocNone);
-	NativeWindowType XCreateWindow(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, int left, int top, int width, int height, int dummy1, int depth, int inputOutput, int visual, int mask, XSetWindowAttributes * xSetWindowAttributes);
+	void XDestroyWindow(Display* nativeDisplayType, Window nativeWindowType);
+	bool XGetWindowAttributes(Display* nativeDisplayType, Window nativeWindowType, XWindowAttributes * xWindowAttributes);
+	int XCreateColormap(Display* nativeDisplayType, Window nativeWindowType, int visual, int allocNone);
+	Window XCreateWindow(Display* nativeDisplayType, Window nativeWindowType, int left, int top, int width, int height, int dummy1, int depth, int inputOutput, int visual, int mask, XSetWindowAttributes * xSetWindowAttributes);
 	void XFree(void *data);
 	XWMHints * XAllocWMHints();
 	XSizeHints * XAllocSizeHints();
-	void XSetWMProperties(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType,XTextProperty * titleprop, char * dummy1, char * dummy2, int num, XSizeHints *sizeHints, XWMHints *wmHints, char * dummy3);
-	void XSetWMProtocols(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, Atom * atom, int num);
-	void XMapWindow(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType);
-	void XFlush(NativeDisplayType nativeDisplayType);
-	void XMoveWindow(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, int left, int top);
-	void XResizeWindow(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, int left, int top);
-	void XQueryTree(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, NativeWindowType * root, NativeWindowType *parent, NativeWindowType **children, unsigned int * nChildren);
-	void XSendEvent(NativeDisplayType nativeDisplayType, NativeWindowType nativeWindowType, int dummy1, int mask, XEvent* xevent);
+	void XSetWMProperties(Display* nativeDisplayType, Window nativeWindowType,XTextProperty * titleprop, char * dummy1, char * dummy2, int num, XSizeHints *sizeHints, XWMHints *wmHints, char * dummy3);
+	void XSetWMProtocols(Display* nativeDisplayType, Window nativeWindowType, Atom * atom, int num);
+	void XMapWindow(Display* nativeDisplayType, Window nativeWindowType);
+	void XFlush(Display* nativeDisplayType);
+	void XMoveWindow(Display* nativeDisplayType, Window nativeWindowType, int left, int top);
+	void XResizeWindow(Display* nativeDisplayType, Window nativeWindowType, int left, int top);
+	void XQueryTree(Display* nativeDisplayType, Window nativeWindowType, Window * root, Window *parent, Window **children, unsigned int * nChildren);
+	void XSendEvent(Display* nativeDisplayType, Window nativeWindowType, int dummy1, int mask, XEvent* xevent);
 #endif
 
 
@@ -139,7 +140,10 @@ namespace Ogre {
     class _OgrePrivate GtkEGLSupport : public EGLSupport
     {
 		protected:
-			virtual EGLWindow* createEGLWindow( EGLSupport * support);
+
+			//removed createEGLWindow because it was easier to just use
+			// new GtkEGLWindow in the code to get the native version.
+			//virtual EGLWindow* createEGLWindow( EGLSupport * support);
 
         public:
             GtkEGLSupport();
@@ -151,11 +155,22 @@ namespace Ogre {
 			virtual void switchMode(uint& width, uint& height, short& frequency);
 			String getDisplayName(void);
 
-			virtual NativeDisplayType getNativeDisplay(void);
+			NativeDisplayType getNativeDisplay(void);
 			XVisualInfo *getVisualFromFBConfig(::EGLConfig glConfig);
 			Atom mAtomDeleteWindow;
 			Atom mAtomFullScreen;
 			Atom mAtomState;
+
+			// This just sets the native variables needed by EGLSupport::getGLDisplay
+			//Then it calls EGLSupport::getDLDisplay to do the rest of the work.
+			EGLDisplay getGLDisplay();
+
+			//Moved this here from EGLSupport because maybe it should be more native.
+	                RenderWindow* newWindow(const String& name,
+            	                        unsigned int width, unsigned int height,
+            	                        bool fullScreen,
+            	                        const NameValuePairList *miscParams = 0);
+
 	};
 }
 

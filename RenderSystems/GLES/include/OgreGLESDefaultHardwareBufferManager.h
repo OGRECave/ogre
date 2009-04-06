@@ -111,7 +111,7 @@ namespace Ogre {
                 createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes,
                     HardwareBuffer::Usage usage, bool useShadowBuffer = false);
 
-			RenderToVertexBufferSharedPtr createRenderToVertexBuffer(void);
+	    RenderToVertexBufferSharedPtr createRenderToVertexBuffer(void);
     };
 }
 

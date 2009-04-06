@@ -49,6 +49,7 @@ namespace Ogre
 			::EGLSurface mEglDrawable;
         public:
             EGLPBuffer(EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height);
+	    void initEGLPBuffer();
             virtual ~EGLPBuffer();
 
     };

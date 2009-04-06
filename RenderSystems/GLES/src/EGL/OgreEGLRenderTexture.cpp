@@ -48,10 +48,20 @@ Torus Knot Software Ltd.
 namespace Ogre {
     EGLPBuffer::EGLPBuffer(EGLSupport* glsupport, PixelComponentType format,
                            size_t width, size_t height)
-        : mGLSupport(glsupport),
-          GLESPBuffer(format, width, height)
+        : GLESPBuffer(format, width, height)
     {
-        mGlDisplay = mGLSupport->getGLDisplay();
+
+    }
+
+	//Changed the constructor to a member function so that the
+	//native constructor would be called first. This member
+	//function is then called from the native constructor.
+    void EGLPBuffer::initEGLPBuffer()
+    {
+
+//	These are now initialized in the native constructors.
+//	mGLSupport = glsupport;
+//        mGlDisplay = mGLSupport->getGLDisplay();
         mEglDrawable = 0;
         ::EGLConfig glConfig = 0;
 
@@ -114,7 +124,9 @@ namespace Ogre {
             EGL_NONE
         };
 
+
         glConfig = mGLSupport->selectGLConfig(minAttribs, maxAttribs);
+
         EGL_CHECK_ERROR;
         mEglDrawable = eglCreatePbufferSurface(mGlDisplay, glConfig, pBufferAttribs);
         EGL_CHECK_ERROR;
@@ -125,7 +137,6 @@ namespace Ogre {
                         "Unable to create Pbuffer",
                         "EGLPBuffer::EGLPBuffer");
         }
-
         GLint glConfigID;
         GLint iWidth, iHeight;
 

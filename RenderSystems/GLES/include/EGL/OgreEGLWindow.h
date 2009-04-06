@@ -38,6 +38,7 @@ Torus Knot Software Ltd.
 namespace Ogre {
     class _OgrePrivate EGLWindow : public RenderWindow
     {
+	private:
         protected:
             bool mClosed;
             bool mVisible;
@@ -70,8 +71,9 @@ namespace Ogre {
             EGLWindow(EGLSupport* glsupport);
             virtual ~EGLWindow();
 
-            void create(const String& name, unsigned int width, unsigned int height,
-                        bool fullScreen, const NameValuePairList *miscParams);
+//		Moved create to native source because it has native calls in it.
+//            void create(const String& name, unsigned int width, unsigned int height,
+//                        bool fullScreen, const NameValuePairList *miscParams);
 
 			virtual void setFullscreen (bool fullscreen, uint width, uint height);
             void destroy(void);

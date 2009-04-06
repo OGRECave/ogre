@@ -32,6 +32,7 @@ Torus Knot Software Ltd.
 #define __Win32EGLWindow_H__
 
 #include "OgreEGLWindow.h"
+#include "OgreWin32EGLSupport.h"
 
 namespace Ogre {
     class _OgrePrivate Win32EGLWindow : public EGLWindow
@@ -47,8 +48,10 @@ namespace Ogre {
 		virtual void switchFullScreen(bool fullscreen);
 
     public:
-		Win32EGLWindow(EGLSupport* glsupport);
+		Win32EGLWindow(Win32EGLSupport* glsupport);
 		virtual ~Win32EGLWindow();
+        void create(const String& name, unsigned int width, unsigned int height,
+                    bool fullScreen, const NameValuePairList *miscParams);
 
     };
 }

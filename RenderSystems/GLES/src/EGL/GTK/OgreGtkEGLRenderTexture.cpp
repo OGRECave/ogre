@@ -47,10 +47,12 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-	GtkEGLPBuffer::GtkEGLPBuffer( EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height )
+	GtkEGLPBuffer::GtkEGLPBuffer( GtkEGLSupport* glsupport, PixelComponentType format, size_t width, size_t height )
 		: EGLPBuffer(glsupport, format, width, height)
 	{
-
+		mGlDisplay = glsupport->getGLDisplay();
+		mGLSupport = glsupport;
+		initEGLPBuffer();
 	}
 
 	GtkEGLPBuffer::~GtkEGLPBuffer()

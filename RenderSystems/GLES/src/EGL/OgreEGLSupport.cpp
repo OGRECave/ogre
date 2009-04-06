@@ -46,11 +46,11 @@ namespace Ogre {
 
     EGLSupport::EGLSupport()
         : mGLDisplay(0),
-          mNativeDisplay(0),
+          //mNativeDisplay(0),
 		  mRandr(false)
     {
-        mGLDisplay = getGLDisplay();
-		mNativeDisplay = getNativeDisplay();
+//        mGLDisplay = getGLDisplay();
+//		mNativeDisplay = getNativeDisplay();
 
     }
 
@@ -175,34 +175,31 @@ namespace Ogre {
         return StringUtil::BLANK;
     }
 
-	NativeDisplayType EGLSupport::getNativeDisplay()
-	{
-		return EGL_DEFAULT_DISPLAY; // TODO
-	}
+	//Moved to native.
+//	NativeDisplayType EGLSupport::getNativeDisplay()
+//	{
+//		return EGL_DEFAULT_DISPLAY; // TODO
+//	}
 
     EGLDisplay EGLSupport::getGLDisplay(void)
     {
-        if (!mGLDisplay)
+        EGLint major, minor;
+
+
+		mGLDisplay = eglGetDisplay(mNativeDisplay);
+
+        if(mGLDisplay == EGL_NO_DISPLAY)
         {
-            EGLint major, minor;
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "Couldn`t open X display " + getDisplayName(),
+                        "EGLSupport::getGLDisplay");
+        }
 
-            mNativeDisplay = getNativeDisplay();
-
-			mGLDisplay = eglGetDisplay(mNativeDisplay);
-
-            if(mGLDisplay == EGL_NO_DISPLAY)
-            {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "Couldn`t open X display " + getDisplayName(),
-                            "EGLSupport::getGLDisplay");
-            }
-
-            if (eglInitialize(mGLDisplay, &major, &minor) == EGL_FALSE)
-            {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "Couldn`t initialize EGLDispaly ",
-                            "EGLSupport::getGLDisplay");
-            }
+        if (eglInitialize(mGLDisplay, &major, &minor) == EGL_FALSE)
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "Couldn`t initialize EGLDisplay ",
+                        "EGLSupport::getGLDisplay");
         }
 		return mGLDisplay;
     }
@@ -452,17 +449,17 @@ namespace Ogre {
         return window;
     }
 
-    RenderWindow* EGLSupport::newWindow(const String &name,
-                                        unsigned int width, unsigned int height,
-                                        bool fullScreen,
-                                        const NameValuePairList *miscParams)
-    {
-        EGLWindow* window = createEGLWindow(this);
-
-        window->create(name, width, height, fullScreen, miscParams);
-
-        return window;
-    }
+//    RenderWindow* EGLSupport::newWindow(const String &name,
+//                                        unsigned int width, unsigned int height,
+//                                        bool fullScreen,
+//                                        const NameValuePairList *miscParams)
+//    {
+//        EGLWindow* window = createEGLWindow(this);
+//
+//        window->create(name, width, height, fullScreen, miscParams);
+//
+//        return window;
+//    }
 
     ::EGLContext EGLSupport::createNewContext(EGLDisplay eglDisplay,
 											  ::EGLConfig glconfig,

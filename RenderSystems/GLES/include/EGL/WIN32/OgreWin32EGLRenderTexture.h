@@ -33,6 +33,7 @@ Torus Knot Software Ltd.
 
 #include "OgrePrerequisites.h"
 #include "OgreEGLRenderTexture.h"
+#include "OgreWin32EGLSupport.h"
 
 namespace Ogre
 {
@@ -45,7 +46,7 @@ namespace Ogre
 		protected:
 
 		public:
-            Win32EGLPBuffer(EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height);
+            Win32EGLPBuffer(Win32EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height);
             virtual ~Win32EGLPBuffer();
     };
 }

@@ -80,6 +80,12 @@ namespace Ogre {
             virtual void initialiseExtensions();
             virtual bool checkExtension(const String& ext) const;
 
+            virtual unsigned int getDisplayMonitorCount() const
+            {
+                return 1;
+            }
+    
+
             virtual void start() = 0;
             virtual void stop() = 0;
 

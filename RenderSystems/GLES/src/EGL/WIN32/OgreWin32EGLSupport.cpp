@@ -50,6 +50,8 @@ namespace Ogre {
 	{
 		//RECT windowRect;
 		//GetClientRect(mNativeDisplay, &windowRect);
+		mNativeDisplay = getNativeDisplay();
+		mGLDisplay = getGLDisplay();
 		mCurrentMode.first.first = 555; // todo
 		mCurrentMode.first.second = 555; // todo
 		mCurrentMode.second = 0;
@@ -86,10 +88,12 @@ namespace Ogre {
 
 	}
 
-	EGLWindow* Win32EGLSupport::createEGLWindow(  EGLSupport * support )
-	{
-		return new Win32EGLWindow(support);
-	}
+	//Removed createEGLWindow because it was easier to call new Win32EGLWindow
+	//directly to get the native version.
+//	EGLWindow* Win32EGLSupport::createEGLWindow(  EGLSupport * support )
+//	{
+//		return new Win32EGLWindow(support);
+//	}
 
 	GLESPBuffer* Win32EGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
 	{
@@ -135,5 +139,38 @@ namespace Ogre {
 
 		//todo
 	}
+
+	//Moved to native from EGLSupport 
+   RenderWindow* Win32EGLSupport::newWindow(const String &name,
+                                        unsigned int width, unsigned int height,
+                                        bool fullScreen,
+                                        const NameValuePairList *miscParams)
+    {
+//        EGLWindow* window = createEGLWindow(this);
+
+	Win32EGLWindow* window = new Win32EGLWindow(this);
+        window->create(name, width, height, fullScreen, miscParams);
+
+        return window;
+    }
+
+	//Moved to native from EGLSupport
+	NativeDisplayType Win32EGLSupport::getNativeDisplay()
+	{
+		return EGL_DEFAULT_DISPLAY; // TODO
+	}
+
+	//Win32EGLSupport::getGLDisplay sets up the native variable
+	//then calls EGLSupport::getGLDisplay
+	EGLDisplay Win32EGLSupport::getGLDisplay()
+	{
+		if (!mGLDisplay)
+		{
+			mNativeDisplay = getNativeDisplay();
+			return EGLSupport::getGLDisplay();
+		}
+		return mGLDisplay;
+	}
+
 
 }

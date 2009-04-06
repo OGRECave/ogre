@@ -64,7 +64,7 @@ namespace Ogre {
             VideoMode mCurrentMode;
             StringVector mSampleLevels;
 
-			virtual EGLWindow* createEGLWindow( EGLSupport * support) = 0;
+			//virtual EGLWindow* createEGLWindow( EGLSupport * support) = 0;
         public:
             EGLSupport();
             virtual ~EGLSupport();
@@ -75,7 +75,7 @@ namespace Ogre {
             String validateConfig(void);
             void setConfigOption(const String &name, const String &value);
             virtual String getDisplayName (void);
-			EGLDisplay getGLDisplay(void);
+	    EGLDisplay getGLDisplay(void);
 			void setGLDisplay(EGLDisplay val);
 			EGLConfig* chooseGLConfig(const GLint *attribList, GLint *nElements);
             GLint getGLConfigAttrib(EGLConfig fbConfig, GLint attribute, GLint *value);
@@ -86,10 +86,10 @@ namespace Ogre {
                                        GLESRenderSystem *renderSystem,
                                        const String& windowTitle);
 
-            RenderWindow* newWindow(const String& name,
-                                    unsigned int width, unsigned int height,
-                                    bool fullScreen,
-                                    const NameValuePairList *miscParams = 0);
+//            RenderWindow* newWindow(const String& name,
+//                                    unsigned int width, unsigned int height,
+//                                    bool fullScreen,
+//                                    const NameValuePairList *miscParams = 0);
 
             ::EGLConfig getGLConfigFromContext(::EGLContext context);
             ::EGLConfig getGLConfigFromDrawable(::EGLSurface drawable,
@@ -99,7 +99,7 @@ namespace Ogre {
 			virtual void switchMode(uint& width, uint& height, short& frequency) = 0;
             virtual GLESPBuffer* createPBuffer(PixelComponentType format,
                                        size_t width, size_t height) = 0;
-			NativeDisplayType getNativeDisplay();
+//			NativeDisplayType getNativeDisplay();
 	};
 }
 

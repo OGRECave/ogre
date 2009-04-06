@@ -1183,29 +1183,6 @@ namespace Ogre {
         return GL_ONE;
     }
 
-    void GLESRenderSystem::_setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor)
-    {
-        GLint sourceBlend = getBlendMode(sourceFactor);
-        GLint destBlend = getBlendMode(destFactor);
-        if (sourceFactor == SBF_ONE && destFactor == SBF_ZERO)
-        {
-            glDisable(GL_BLEND);
-            GL_CHECK_ERROR;
-        }
-        else
-        {
-			// SBF_SOURCE_COLOUR - not allowed for source - http://www.khronos.org/opengles/sdk/1.1/docs/man/
-			if(sourceFactor == SBF_SOURCE_COLOUR)
-			{
-				sourceBlend = getBlendMode(SBF_SOURCE_ALPHA);
-			}
-            glEnable(GL_BLEND);
-            GL_CHECK_ERROR;
-            glBlendFunc(sourceBlend, destBlend);
-            GL_CHECK_ERROR;
-        }
-    }
-
 	void GLESRenderSystem::_setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op )
 	{
 		 GL_CHECK_ERROR;
@@ -1230,13 +1207,6 @@ namespace Ogre {
 		}
 
 	}
-    void GLESRenderSystem::_setSeparateSceneBlending(SceneBlendFactor sourceFactor,
-                                                   SceneBlendFactor destFactor,
-                                                   SceneBlendFactor sourceFactorAlpha,
-                                                   SceneBlendFactor destFactorAlpha)
-    {
-        // Not supported
-    }
 
 	void GLESRenderSystem::_setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp )
 	{
@@ -2265,9 +2235,9 @@ namespace Ogre {
 
         mGLSupport->initialiseExtensions();
 
-        LogManager::getSingleton().logMessage("***************************");
-        LogManager::getSingleton().logMessage("*** GL Renderer Started ***");
-        LogManager::getSingleton().logMessage("***************************");
+        LogManager::getSingleton().logMessage("*****************************");
+        LogManager::getSingleton().logMessage("*** GLES Renderer Started ***");
+        LogManager::getSingleton().logMessage("*****************************");
     }
 
     void GLESRenderSystem::_setRenderTarget(RenderTarget *target)

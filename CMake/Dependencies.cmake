@@ -68,6 +68,10 @@ endif ()
 find_package(OpenGL)
 macro_log_feature(OPENGL_FOUND "opengl" "Support for the OpenGL render system" "" FALSE "" "")
 
+# Find OpenGLES
+find_package(OpenGLES)
+macro_log_feature(OPENGLES_FOUND "opengles" "Support for the OpenGL ES render system" "" FALSE "" "")
+
 # Find DirectX
 if(WIN32)
 	find_package(DirectX)
