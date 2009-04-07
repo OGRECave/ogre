@@ -682,6 +682,7 @@ namespace Ogre {
 	public:
 		NameGenerator(const String& prefix) : mPrefix(prefix), mNext(1) {}
 
+		/// Generate a new name
 		String generate()
 		{
 			OGRE_LOCK_AUTO_MUTEX
@@ -690,11 +691,30 @@ namespace Ogre {
 			return s.str();
 		}
 
+		/// Reset the internal counter
 		void reset()
 		{
 			OGRE_LOCK_AUTO_MUTEX
-			mNext = 0;
+			mNext = 1ULL;
 		}
+
+		/// Manually set the internal counter (use caution)
+		void setNext(unsigned long long int val)
+		{
+			OGRE_LOCK_AUTO_MUTEX
+			mNext = val;
+		}
+
+		/// Get the internal counter
+		unsigned long long int getNext() const
+		{
+			// lock even on get because 64-bit may not be atomic read
+			OGRE_LOCK_AUTO_MUTEX
+			return mNext;
+		}
+
+
+
 
 	};
 	/** @} */
