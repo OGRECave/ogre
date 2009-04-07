@@ -1136,6 +1136,8 @@ namespace Ogre {
 		/// Return the variability for an auto constant
 		uint16 deriveVariability(AutoConstantType act);
 
+		void copySharedParamSetUsage(const GpuSharedParamUsageList& srcList);
+
 		GpuSharedParamUsageList mSharedParamSets;
 
 		// Optional data the rendersystem might want to store

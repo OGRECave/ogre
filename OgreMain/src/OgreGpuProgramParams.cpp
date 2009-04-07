@@ -708,7 +708,7 @@ namespace Ogre
 		mFloatLogicalToPhysical = oth.mFloatLogicalToPhysical;
 		mIntLogicalToPhysical = oth.mIntLogicalToPhysical;
 		mNamedConstants = oth.mNamedConstants;
-		mSharedParamSets = oth.mSharedParamSets;
+		copySharedParamSetUsage(oth.mSharedParamSets);
 
 		mCombinedVariability = oth.mCombinedVariability;
 		mTransposeMatrices = oth.mTransposeMatrices;
@@ -716,6 +716,16 @@ namespace Ogre
 		mActivePassIterationIndex = oth.mActivePassIterationIndex;
 
 		return *this;
+	}
+	//---------------------------------------------------------------------
+	void GpuProgramParameters::copySharedParamSetUsage(const GpuSharedParamUsageList& srcList)
+	{
+		mSharedParamSets.clear();
+		for (GpuSharedParamUsageList::const_iterator i = srcList.begin(); i != srcList.end(); ++i)
+		{
+			mSharedParamSets.push_back(GpuSharedParametersUsage(i->getSharedParams(), this));
+		}
+
 	}
 	//---------------------------------------------------------------------
 	void GpuProgramParameters::_setNamedConstants(
@@ -2371,7 +2381,7 @@ namespace Ogre
 		mIntConstants = source.getIntConstantList();
 		mAutoConstants = source.getAutoConstantList();
 		mCombinedVariability = source.mCombinedVariability;
-		mSharedParamSets = source.mSharedParamSets;
+		copySharedParamSetUsage(source.mSharedParamSets);
 	}
 	//---------------------------------------------------------------------
 	void GpuProgramParameters::copyMatchingNamedConstantsFrom(const GpuProgramParameters& source)
