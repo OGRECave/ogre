@@ -3932,16 +3932,6 @@ namespace Ogre{
 							"source file expected");
 					}
 				}
-				else if(prop->name == "attach")
-				{
-					String value;
-					if(!prop->values.empty() && prop->values.front()->type == ANT_ATOM)
-						value = ((AtomAbstractNode*)prop->values.front().get())->value;
-					std::vector<Any> args;
-					args.push_back(Any(&value));
-					compiler->_fireEvent("processGpuProgramName", args, 0);
-					customParameters.push_back(std::make_pair(prop->name, value));
-				}
 				else
 				{
 					String name = prop->name, value;
@@ -3955,6 +3945,12 @@ namespace Ogre{
 							else
 								first = false;
 							value += ((AtomAbstractNode*)(*i).get())->value;
+							if(prop->name == "attach")
+							{
+								std::vector<Any> args;
+								args.push_back(Any(&value));
+								compiler->_fireEvent("processGpuProgramName", args, 0);
+							}
 						}
 					}
 					customParameters.push_back(std::make_pair(name, value));
