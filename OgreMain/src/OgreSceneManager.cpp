@@ -1064,7 +1064,8 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			pass->getPointMinSize(), 
 			pass->getPointMaxSize());
 
-		mDestRenderSystem->_setPointSpritesEnabled(pass->getPointSpritesEnabled());
+		if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_POINT_SPRITES))
+			mDestRenderSystem->_setPointSpritesEnabled(pass->getPointSpritesEnabled());
 
 		// Texture unit settings
 

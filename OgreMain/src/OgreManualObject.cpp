@@ -811,7 +811,7 @@ namespace Ogre {
 	void ManualObject::_updateRenderQueue(RenderQueue* queue)
 	{
 		// To be used when order of creation must be kept while rendering
-		unsigned int priority = 0;
+		unsigned short priority = queue->getDefaultRenderablePriority();
 
 		for (SectionList::iterator i = mSectionList.begin(); i != mSectionList.end(); ++i)
 		{
@@ -822,9 +822,9 @@ namespace Ogre {
 				continue;
 
 			if (mRenderQueueIDSet)
-				queue->addRenderable(*i, mRenderQueueID, mKeepDeclarationOrder ? priority++ : 0);
+				queue->addRenderable(*i, mRenderQueueID, mKeepDeclarationOrder ? priority++ : queue->getDefaultRenderablePriority());
 			else
-				queue->addRenderable(*i, queue->getDefaultQueueGroup(), mKeepDeclarationOrder ? priority++ : 0);
+				queue->addRenderable(*i, queue->getDefaultQueueGroup(), mKeepDeclarationOrder ? priority++ : queue->getDefaultRenderablePriority());
 		}
 	}
 	//-----------------------------------------------------------------------------

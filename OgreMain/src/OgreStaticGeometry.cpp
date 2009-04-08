@@ -716,8 +716,7 @@ namespace Ogre {
 		SceneManager* mgr, uint32 regionID, const Vector3& centre)
 		: MovableObject(name), mParent(parent), mSceneMgr(mgr), mNode(0),
 		mRegionID(regionID), mCentre(centre), mBoundingRadius(0.0f),
-		mCurrentLod(0), mEdgeList(0), mVertexProgramInUse(false),
-		mLodStrategy(0)
+		mCurrentLod(0), mLodStrategy(0)
 	{
 	}
 	//--------------------------------------------------------------------------
@@ -736,14 +735,6 @@ namespace Ogre {
 			OGRE_DELETE *i;
 		}
 		mLodBucketList.clear();
-
-		for (ShadowRenderableList::iterator s = mShadowRenderables.begin();
-			s != mShadowRenderables.end(); ++s)
-		{
-			OGRE_DELETE *s;
-		}
-		mShadowRenderables.clear();
-		OGRE_DELETE mEdgeList;
 
 		// no need to delete queued meshes, these are managed in StaticGeometry
 
@@ -827,57 +818,9 @@ namespace Ogre {
 			lodBucket->build(stencilShadows);
 		}
 
-		// Do we need to build an edge list?
-		if (stencilShadows)
-		{
-			EdgeListBuilder eb;
-			size_t vertexSet = 0;
-			LODIterator lodIterator = getLODIterator();
-			while (lodIterator.hasMoreElements())
-			{
-				LODBucket* lod = lodIterator.getNext();
-				LODBucket::MaterialIterator matIt = lod->getMaterialIterator();
-				while (matIt.hasMoreElements())
-				{
-					MaterialBucket* mat = matIt.getNext();
-					MaterialBucket::GeometryIterator geomIt =
-						mat->getGeometryIterator();
-					// Check if we have vertex programs here
-					Technique* t = mat->getMaterial()->getBestTechnique();
-					if (t)
-					{
-						Pass* p = t->getPass(0);
-						if (p)
-						{
-							if (p->hasVertexProgram())
-							{
-								mVertexProgramInUse = true;
-							}
-						}
+
+
 					}
-
-					while (geomIt.hasMoreElements())
-					{
-						GeometryBucket* geom = geomIt.getNext();
-
-						// Check we're dealing with 16-bit indexes here
-						// Since stencil shadows can only deal with 16-bit
-						// More than that and stencil is probably too CPU-heavy
-						// in any case
-						assert(geom->getIndexData()->indexBuffer->getType()
-							== HardwareIndexBuffer::IT_16BIT &&
-							"Only 16-bit indexes allowed when using stencil shadows");
-						eb.addVertexData(geom->getVertexData());
-						eb.addIndexData(geom->getIndexData(), vertexSet++);
-					}
-				}
-			}
-			mEdgeList = eb.build();
-
-		}
-
-
-	}
 	//--------------------------------------------------------------------------
 	const String& StaticGeometry::Region::getMovableType(void) const
 	{
@@ -953,89 +896,45 @@ namespace Ogre {
 	{
 		return LODIterator(mLodBucketList.begin(), mLodBucketList.end());
 	}
-	//--------------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	ShadowCaster::ShadowRenderableListIterator
 	StaticGeometry::Region::getShadowVolumeRenderableIterator(
 		ShadowTechnique shadowTechnique, const Light* light,
 		HardwareIndexBufferSharedPtr* indexBuffer,
 		bool extrude, Real extrusionDistance, unsigned long flags)
 	{
-
-		assert(indexBuffer && "Only external index buffers are supported right now");
-		assert((*indexBuffer)->getType() == HardwareIndexBuffer::IT_16BIT &&
-			"Only 16-bit indexes supported for now");
-
 		// Calculate the object space light details
 		Vector4 lightPos = light->getAs4DVector();
 		Matrix4 world2Obj = mParentNode->_getFullTransform().inverseAffine();
 		lightPos = world2Obj.transformAffine(lightPos);
 
-		// We need to search the edge list for silhouette edges
-		if (!mEdgeList)
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"You enabled stencil shadows after the buid process!",
-				"StaticGeometry::Region::getShadowVolumeRenderableIterator");
-		}
+		// per-LOD shadow lists & edge data
+		mLodBucketList[mCurrentLod]->updateShadowRenderables(
+			shadowTechnique, lightPos, indexBuffer, extrude, extrusionDistance, flags);
+		
+		EdgeData* edgeList = mLodBucketList[mCurrentLod]->getEdgeList();
+		ShadowRenderableList& shadowRendList = mLodBucketList[mCurrentLod]->getShadowRenderableList();
 
-		// Init shadow renderable list if required
-		bool init = mShadowRenderables.empty();
-
-		EdgeData::EdgeGroupList::iterator egi;
-		ShadowRenderableList::iterator si, siend;
-		RegionShadowRenderable* esr = 0;
-		if (init)
-			mShadowRenderables.resize(mEdgeList->edgeGroups.size());
-
-		//bool updatedSharedGeomNormals = false;
-		siend = mShadowRenderables.end();
-		egi = mEdgeList->edgeGroups.begin();
-		for (si = mShadowRenderables.begin(); si != siend; ++si, ++egi)
-		{
-			if (init)
-			{
-				// Create a new renderable, create a separate light cap if
-				// we're using a vertex program (either for this model, or
-				// for extruding the shadow volume) since otherwise we can
-				// get depth-fighting on the light cap
-
-				*si = OGRE_NEW RegionShadowRenderable(this, indexBuffer,
-					egi->vertexData, mVertexProgramInUse || !extrude);
-			}
-			// Get shadow renderable
-			esr = static_cast<RegionShadowRenderable*>(*si);
-			HardwareVertexBufferSharedPtr esrPositionBuffer = esr->getPositionBuffer();
-			// Extrude vertices in software if required
-			if (extrude)
-			{
-				extrudeVertices(esrPositionBuffer,
-					egi->vertexData->vertexCount,
-					lightPos, extrusionDistance);
-
-			}
-
-		}
 		// Calc triangle light facing
-		updateEdgeListLightFacing(mEdgeList, lightPos);
+		updateEdgeListLightFacing(edgeList, lightPos);
 
 		// Generate indexes and update renderables
-		generateShadowVolume(mEdgeList, *indexBuffer, light,
-			mShadowRenderables, flags);
+		generateShadowVolume(edgeList, *indexBuffer, light,
+			shadowRendList, flags);
 
 
-		return ShadowRenderableListIterator(mShadowRenderables.begin(), mShadowRenderables.end());
-
+		return ShadowCaster::ShadowRenderableListIterator(shadowRendList.begin(), shadowRendList.end());
 
 	}
 	//--------------------------------------------------------------------------
 	EdgeData* StaticGeometry::Region::getEdgeList(void)
 	{
-		return mEdgeList;
+		return mLodBucketList[mCurrentLod]->getEdgeList();
 	}
 	//--------------------------------------------------------------------------
 	bool StaticGeometry::Region::hasEdgeList(void)
 	{
-		return mEdgeList != 0;
+		return getEdgeList() != 0;
 	}
 	//--------------------------------------------------------------------------
 	void StaticGeometry::Region::dump(std::ofstream& of) const
@@ -1056,8 +955,8 @@ namespace Ogre {
 	}
 	//--------------------------------------------------------------------------
 	//--------------------------------------------------------------------------
-	StaticGeometry::Region::RegionShadowRenderable::RegionShadowRenderable(
-		Region* parent, HardwareIndexBufferSharedPtr* indexBuffer,
+	StaticGeometry::LODBucket::LODShadowRenderable::LODShadowRenderable(
+		LODBucket* parent, HardwareIndexBufferSharedPtr* indexBuffer,
 		const VertexData* vertexData, bool createSeparateLightCap,
 		bool isLightCap)
 		: mParent(parent)
@@ -1100,34 +999,42 @@ namespace Ogre {
 			if (createSeparateLightCap)
 			{
 				// Create child light cap
-				mLightCap = OGRE_NEW RegionShadowRenderable(parent,
+				mLightCap = OGRE_NEW LODShadowRenderable(parent,
 					indexBuffer, vertexData, false, true);
 			}
 		}
 	}
 	//--------------------------------------------------------------------------
-	StaticGeometry::Region::RegionShadowRenderable::~RegionShadowRenderable()
+	StaticGeometry::LODBucket::LODShadowRenderable::~LODShadowRenderable()
 	{
 		OGRE_DELETE mRenderOp.indexData;
 		OGRE_DELETE mRenderOp.vertexData;
 	}
 	//--------------------------------------------------------------------------
-	void StaticGeometry::Region::RegionShadowRenderable::getWorldTransforms(
+	void StaticGeometry::LODBucket::LODShadowRenderable::getWorldTransforms(
 		Matrix4* xform) const
 	{
 		// pretransformed
-		*xform = mParent->_getParentNodeFullTransform();
+		*xform = mParent->getParent()->_getParentNodeFullTransform();
 	}
 	//--------------------------------------------------------------------------
 	//--------------------------------------------------------------------------
 	StaticGeometry::LODBucket::LODBucket(Region* parent, unsigned short lod,
 		Real lodValue)
-		: mParent(parent), mLod(lod), mLodValue(lodValue)
+		: mParent(parent), mLod(lod), mLodValue(lodValue), mEdgeList(0)
+		, mVertexProgramInUse(false)
 	{
 	}
 	//--------------------------------------------------------------------------
 	StaticGeometry::LODBucket::~LODBucket()
 	{
+		OGRE_DELETE mEdgeList;
+		for (ShadowCaster::ShadowRenderableList::iterator s = mShadowRenderables.begin();
+			s != mShadowRenderables.end(); ++s)
+		{
+			OGRE_DELETE *s;
+		}
+		mShadowRenderables.clear();
 		// delete
 		for (MaterialBucketMap::iterator i = mMaterialBucketMap.begin();
 			i != mMaterialBucketMap.end(); ++i)
@@ -1181,11 +1088,57 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	void StaticGeometry::LODBucket::build(bool stencilShadows)
 	{
+
+		EdgeListBuilder eb;
+		size_t vertexSet = 0;
+
 		// Just pass this on to child buckets
 		for (MaterialBucketMap::iterator i = mMaterialBucketMap.begin();
 			i != mMaterialBucketMap.end(); ++i)
 		{
-			i->second->build(stencilShadows);
+			MaterialBucket* mat = i->second;
+
+			mat->build(stencilShadows);
+
+			if (stencilShadows)
+			{
+				MaterialBucket::GeometryIterator geomIt =
+					mat->getGeometryIterator();
+				// Check if we have vertex programs here
+				Technique* t = mat->getMaterial()->getBestTechnique();
+				if (t)
+				{
+					Pass* p = t->getPass(0);
+					if (p)
+					{
+						if (p->hasVertexProgram())
+						{
+							mVertexProgramInUse = true;
+		}
+	}
+				}
+
+				while (geomIt.hasMoreElements())
+				{
+					GeometryBucket* geom = geomIt.getNext();
+
+					// Check we're dealing with 16-bit indexes here
+					// Since stencil shadows can only deal with 16-bit
+					// More than that and stencil is probably too CPU-heavy
+					// in any case
+					assert(geom->getIndexData()->indexBuffer->getType()
+						== HardwareIndexBuffer::IT_16BIT &&
+						"Only 16-bit indexes allowed when using stencil shadows");
+					eb.addVertexData(geom->getVertexData());
+					eb.addIndexData(geom->getIndexData(), vertexSet++);
+				}
+
+			}
+		}
+
+		if (stencilShadows)
+		{
+			mEdgeList = eb.build();
 		}
 	}
 	//--------------------------------------------------------------------------
@@ -1230,6 +1183,63 @@ namespace Ogre {
 			i != mMaterialBucketMap.end(); ++i)
 		{
 			i->second->visitRenderables(visitor, debugRenderables);
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void StaticGeometry::LODBucket::updateShadowRenderables(
+		ShadowTechnique shadowTechnique, const Vector4& lightPos, 
+		HardwareIndexBufferSharedPtr* indexBuffer, bool extrude, 
+		Real extrusionDistance, unsigned long flags /* = 0  */)
+	{
+		assert(indexBuffer && "Only external index buffers are supported right now");
+		assert((*indexBuffer)->getType() == HardwareIndexBuffer::IT_16BIT &&
+			"Only 16-bit indexes supported for now");
+
+		// We need to search the edge list for silhouette edges
+		if (!mEdgeList)
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+				"You enabled stencil shadows after the buid process!",
+				"StaticGeometry::LODBucket::getShadowVolumeRenderableIterator");
+		}
+
+		// Init shadow renderable list if required
+		bool init = mShadowRenderables.empty();
+
+		EdgeData::EdgeGroupList::iterator egi;
+		ShadowCaster::ShadowRenderableList::iterator si, siend;
+		LODShadowRenderable* esr = 0;
+		if (init)
+			mShadowRenderables.resize(mEdgeList->edgeGroups.size());
+
+		//bool updatedSharedGeomNormals = false;
+		siend = mShadowRenderables.end();
+		egi = mEdgeList->edgeGroups.begin();
+		for (si = mShadowRenderables.begin(); si != siend; ++si, ++egi)
+		{
+			if (init)
+			{
+				// Create a new renderable, create a separate light cap if
+				// we're using a vertex program (either for this model, or
+				// for extruding the shadow volume) since otherwise we can
+				// get depth-fighting on the light cap
+
+				*si = OGRE_NEW LODShadowRenderable(this, indexBuffer,
+					egi->vertexData, mVertexProgramInUse || !extrude);
+			}
+			// Get shadow renderable
+			esr = static_cast<LODShadowRenderable*>(*si);
+			HardwareVertexBufferSharedPtr esrPositionBuffer = esr->getPositionBuffer();
+			// Extrude vertices in software if required
+			if (extrude)
+			{
+				mParent->extrudeVertices(esrPositionBuffer,
+					egi->vertexData->vertexCount,
+					lightPos, extrusionDistance);
+
+			}
+
 		}
 
 	}

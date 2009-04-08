@@ -311,6 +311,27 @@ namespace Ogre {
 			/// Lookup of Material Buckets in this region
 			typedef map<String, MaterialBucket*>::type MaterialBucketMap;
 		protected:
+			/** Nested class to allow shadows. */
+			class _OgreExport LODShadowRenderable : public ShadowRenderable
+			{
+			protected:
+				LODBucket* mParent;
+				// Shared link to position buffer
+				HardwareVertexBufferSharedPtr mPositionBuffer;
+				// Shared link to w-coord buffer (optional)
+				HardwareVertexBufferSharedPtr mWBuffer;
+
+			public:
+				LODShadowRenderable(LODBucket* parent, 
+					HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData, 
+					bool createSeparateLightCap, bool isLightCap = false);
+				~LODShadowRenderable();
+				/// Overridden from ShadowRenderable
+				void getWorldTransforms(Matrix4* xform) const;
+				HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
+				HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
+
+			};
 			/// Pointer to parent region
 			Region* mParent;
 			/// LOD level (0 == full LOD)
@@ -321,6 +342,12 @@ namespace Ogre {
 			MaterialBucketMap mMaterialBucketMap;
 			/// Geometry queued for a single LOD (deallocated here)
 			QueuedGeometryList mQueuedGeometryList;
+			/// Edge list, used if stencil shadow casting is enabled 
+			EdgeData* mEdgeList;
+			/// Is a vertex program in use somewhere in this group?
+			bool mVertexProgramInUse;
+			/// List of shadow renderables
+			ShadowCaster::ShadowRenderableList mShadowRenderables;
 		public:
 			LODBucket(Region* parent, unsigned short lod, Real lodValue);
 			virtual ~LODBucket();
@@ -343,6 +370,13 @@ namespace Ogre {
 			/// Dump contents for diagnostics
 			void dump(std::ofstream& of) const;
 			void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables);
+			EdgeData* getEdgeList() const { return mEdgeList; }
+			ShadowCaster::ShadowRenderableList& getShadowRenderableList() { return mShadowRenderables; }
+			bool isVertexProgramInUse() const { return mVertexProgramInUse; }
+			void updateShadowRenderables(
+				ShadowTechnique shadowTechnique, const Vector4& lightPos, 
+				HardwareIndexBufferSharedPtr* indexBuffer, 
+				bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 );
 			
 		};
 		/** The details of a topological region which is the highest level of
@@ -361,27 +395,6 @@ namespace Ogre {
 			/// list of LOD Buckets in this region
 			typedef vector<LODBucket*>::type LODBucketList;
 		protected:
-			/** Nested class to allow region shadows. */
-			class _OgreExport RegionShadowRenderable : public ShadowRenderable
-			{
-			protected:
-				Region* mParent;
-				// Shared link to position buffer
-				HardwareVertexBufferSharedPtr mPositionBuffer;
-				// Shared link to w-coord buffer (optional)
-				HardwareVertexBufferSharedPtr mWBuffer;
-
-			public:
-				RegionShadowRenderable(Region* parent, 
-					HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData, 
-					bool createSeparateLightCap, bool isLightCap = false);
-				~RegionShadowRenderable();
-				/// Overridden from ShadowRenderable
-				void getWorldTransforms(Matrix4* xform) const;
-				HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
-				HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
-
-			};
 			/// Parent static geometry
 			StaticGeometry* mParent;
 			/// Scene manager link
@@ -410,12 +423,6 @@ namespace Ogre {
 			mutable LightList mLightList;
 			/// The last frame that this light list was updated in
 			mutable ulong mLightListUpdated;
-			/// Edge list, used if stencil shadow casting is enabled 
-			EdgeData* mEdgeList;
-			/// List of shadow renderables
-			ShadowRenderableList mShadowRenderables;
-			/// Is a vertex program in use somewhere in this region?
-			bool mVertexProgramInUse;
             /// Lod strategy reference
             const LodStrategy *mLodStrategy;
             /// Current camera

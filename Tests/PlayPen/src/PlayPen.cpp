@@ -3549,6 +3549,91 @@ protected:
 
 	}
 
+	void testStaticGeometryWithLOD(bool stencilShadows)
+	{
+		if (stencilShadows)
+		{
+			mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_MODULATIVE);
+		}
+		// Set ambient light
+		mSceneMgr->setAmbientLight(ColourValue(0, 0, 0));
+
+		// Create a point light
+		Light* l = mSceneMgr->createLight("MainLight");
+		l->setDiffuseColour(0.4, 0.4, 0.4);
+		l->setSpecularColour(ColourValue::White);
+
+		SceneNode* animNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		Animation* anim = mSceneMgr->createAnimation("an1", 20);
+		anim->setInterpolationMode(Animation::IM_SPLINE);
+		NodeAnimationTrack* track = anim->createNodeTrack(1, animNode);
+		TransformKeyFrame* kf = track->createNodeKeyFrame(0);
+		kf->setTranslate(Vector3(2300, 600, 2300));
+		kf = track->createNodeKeyFrame(5);
+		kf->setTranslate(Vector3(-2300, 600, 2300));
+		kf = track->createNodeKeyFrame(10);
+		kf->setTranslate(Vector3(-2300, 600, -2300));
+		kf = track->createNodeKeyFrame(15);
+		kf->setTranslate(Vector3(2300, 600, -2300));
+		kf = track->createNodeKeyFrame(20);
+		kf->setTranslate(Vector3(2300, 600, 2300));
+
+		//animNode->attachObject(l);
+		l->setPosition(0, 600, 0);
+		l->setAttenuation(10000, 1, 0, 0);
+
+		AnimationState* animState = mSceneMgr->createAnimationState("an1");
+		animState->setEnabled(true);
+		mAnimStateList.push_back(animState);
+
+
+
+		Plane plane;
+		plane.normal = Vector3::UNIT_Y;
+		plane.d = 0;
+		MeshManager::getSingleton().createPlane("Myplane",
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+			4500,4500,10,10,true,1,5,5,Vector3::UNIT_Z);
+		Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+		pPlaneEnt->setMaterialName("Examples/GrassFloor");
+		pPlaneEnt->setCastShadows(false);
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
+
+		Vector3 min(-2000,30,-2000);
+		Vector3 max(2000,30,2000);
+
+
+		MeshPtr msh = MeshManager::getSingleton().load("knot.mesh", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		
+		Entity* e = mSceneMgr->createEntity("1", msh->getName());
+
+		StaticGeometry* s = mSceneMgr->createStaticGeometry("bing");
+		s->setCastShadows(true);
+		s->setRegionDimensions(Vector3(500,500,500));
+		for (int i = 0; i < 10; ++i)
+		{
+			Vector3 pos;
+			pos.x = Math::RangeRandom(min.x, max.x);
+			pos.y = Math::RangeRandom(min.y, max.y);
+			pos.z = Math::RangeRandom(min.z, max.z);
+
+			s->addEntity(e, pos);
+
+		}
+
+		s->build();
+		mCamera->setLodBias(0.5);
+
+		//mTestNode[0] = s->getRegionIterator().getNext()->getParentSceneNode();
+
+
+
+
+
+
+
+	}
+
 	void testReloadResources()
 	{
 		mSceneMgr->setAmbientLight(ColourValue::White);
@@ -7140,18 +7225,30 @@ protected:
 
 	void testBug()
 	{
+		mSceneMgr->setAmbientLight( ColourValue( 1, 1, 1 ) );
 
-		Entity *e = mSceneMgr->createEntity("Plane", SceneManager::PT_PLANE);
-		e->setMaterialName("transform");
-		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
-		mWindow->getViewport(0)->setBackgroundColour(ColourValue::Red);
+		ManualObject *manual = mSceneMgr->createManualObject("manual");
+		manual->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_STRIP);
 
+		manual->position(-100.0, -100.0, 0.0);
+		manual->position(100.0, -100.0, 0.0);
+		manual->position(100.0, 100.0, 0.0);
+		manual->position(-100.0, 100.0, 0.0);
 
+		manual->index(0);
+		manual->index(1);
+		manual->index(2);
+		manual->index(3);
+		manual->index(0);
 
+		manual->end();
+		SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		node->attachObject(manual);
 
-		mCamera->setPosition(0,0,300);
-		mCamera->lookAt(Vector3::ZERO);
-
+		// of course the following two lines are pointless,
+		// only for demonstration purposes
+		node->detachObject(manual);
+		mSceneMgr->destroyManualObject(manual); //CRASH HERE 
 	}
 
 	void testManualObject2D()
@@ -7821,7 +7918,7 @@ protected:
         testStencilShadows(SHADOWTYPE_STENCIL_ADDITIVE, true, true);
         //testStencilShadows(SHADOWTYPE_STENCIL_MODULATIVE, false, true);
         //testTextureShadows(SHADOWTYPE_TEXTURE_ADDITIVE, true);
-		//testTextureShadows(SHADOWTYPE_TEXTURE_MODULATIVE, false);
+		//testTextureShadows(SHADOWTYPE_TEXTURE_MODULATIVE, true);
 		//testTextureShadowsIntegrated();
 		//testTextureShadowsIntegratedPSSM();
 		//testStencilShadowsMixedOpSubMeshes(false, true);
@@ -7848,6 +7945,7 @@ protected:
 		//testSimpleMesh();
 		//test2Windows();
 		//testStaticGeometry();
+		testStaticGeometryWithLOD(true);
 		//testBillboardTextureCoords();
 		//testBillboardOrigins();
 		//testReloadResources();
