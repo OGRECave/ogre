@@ -78,7 +78,6 @@ if(WIN32)
 	macro_log_feature(DirectX_FOUND "DirectX" "Support for the DirectX render system" "http://msdn.microsoft.com/en-us/directx/" FALSE "" "")
 endif()
 
-
 #######################################################################
 # Additional features
 #######################################################################
@@ -107,6 +106,11 @@ else ()
 endif()
 macro_log_feature(Boost_FOUND "boost" "Boost (general)" "http://boost.org" ${OGRE_BOOST_REQUIRED} "" "")
 macro_log_feature(Boost_THREAD_FOUND "boost-thread" "Used for threading support" "http://boost.org" FALSE "" "")
+
+# POCO
+find_package(POCO)
+macro_log_feature(Poco_FOUND "POCO" "POCO framework" "http://pocoproject.org/" FALSE "" "")
+
 
 
 #######################################################################
