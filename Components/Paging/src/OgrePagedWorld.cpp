@@ -191,13 +191,46 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	bool PagedWorld::_generatePage(Page* page, PagedWorldSection* section)
+	bool PagedWorld::_prepareProceduralPage(Page* page, PagedWorldSection* section)
 	{
 		bool generated = false;
 		if (mPageProvider)
-			generated = mPageProvider->generatePage(page, section);
+			generated = mPageProvider->prepareProceduralPage(page, section);
 		if (!generated)
-			generated = mManager->_generatePage(page, section);
+			generated = mManager->_prepareProceduralPage(page, section);
+		return generated;
+
+	}
+	//---------------------------------------------------------------------
+	bool PagedWorld::_loadProceduralPage(Page* page, PagedWorldSection* section)
+	{
+		bool generated = false;
+		if (mPageProvider)
+			generated = mPageProvider->loadProceduralPage(page, section);
+		if (!generated)
+			generated = mManager->_loadProceduralPage(page, section);
+		return generated;
+
+	}
+	//---------------------------------------------------------------------
+	bool PagedWorld::_unprepareProceduralPage(Page* page, PagedWorldSection* section)
+	{
+		bool generated = false;
+		if (mPageProvider)
+			generated = mPageProvider->unprepareProceduralPage(page, section);
+		if (!generated)
+			generated = mManager->_unprepareProceduralPage(page, section);
+		return generated;
+
+	}
+	//---------------------------------------------------------------------
+	bool PagedWorld::_unloadProceduralPage(Page* page, PagedWorldSection* section)
+	{
+		bool generated = false;
+		if (mPageProvider)
+			generated = mPageProvider->unloadProceduralPage(page, section);
+		if (!generated)
+			generated = mManager->_unloadProceduralPage(page, section);
 		return generated;
 
 	}

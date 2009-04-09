@@ -79,6 +79,8 @@ protected:
 
 	void createScene(void)
     {
+		LogManager::getSingleton().setLogDetail(LL_BOREME);
+
 		mPageManager = OGRE_NEW PageManager();
 
 		PagedWorld* world = mPageManager->createWorld();
@@ -100,12 +102,17 @@ protected:
 	}
 
 	// callback on PageProvider
-	bool generatePage(Page* page, PagedWorldSection* section)
+	bool prepareProceduralPage(Page* page, PagedWorldSection* section)
 	{
 		// say we populated something just so it doesn't try to load any more
 		return true;
 	}
 
+	bool loadProceduralPage(Page* page, PagedWorldSection* section)
+	{
+		// say we populated something just so it doesn't try to load any more
+		return true;
+	}
     // Create new frame listener
     void createFrameListener(void)
     {

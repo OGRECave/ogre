@@ -64,7 +64,11 @@ namespace Ogre
 			/// Finalising the load in the main render thread
 			STATUS_LOADING,
 			/// Data loaded / generated 
-			STATUS_LOADED
+			STATUS_LOADED, 
+			/// Unloading in main render thread (goes back to STATUS_PREPARED)
+			STATUS_UNLOADING,
+			/// Unpreparing, potentially in a background thread (goes back to STATUS_UNLOADED)
+			STATUS_UNPREPARING
 		};
 	protected:
 		PageID mID;
@@ -94,8 +98,62 @@ namespace Ogre
 		virtual bool isAttached() const { return mParent != 0; }
 
 
-		/// Load page data from a serialiser (returns true if successful)
-		bool load(StreamSerialiser& stream);
+		/** Read page data from a serialiser (returns true if successful) & prepare.
+		@remarks
+			'prepare' means to pull data in from a file, and to do as much processing
+			on it as required to be ready to create GPU resources. Since this method can 
+			be called from a non-render thread, this implementation must not access
+			any GPU resources.
+		*/
+		bool prepare(StreamSerialiser& stream);
+		/** Finalise the loading of the data.
+		@remarks
+			This implementation will finalise any work done in prepare() and create
+			or access any GPU resources. This method will be called from the main
+			render thread.
+		*/
+		void load();
+
+		/** Deallocate any background resources.
+		@remarks
+			This method may be called in a background, non-render thread after 
+			unload() therefore should only deallocate non-GPU resources. 
+			GPU resources should be freed in unload(). 
+
+		*/
+		void unprepare();
+
+		/** Unload the Page, deallocating any GPU resources. 
+		@remarks
+			This method will be called in the main render thread just before the unprepare()
+			call (which may be done in the background). Any GPU-dependent 
+			instances must be cleaned up in this call, anything else can be done
+			in the unprepare() call.
+		*/
+		void unload();
+
+		/** Returns whether this page was 'held' in the last frame, that is
+			was it either directly needed, or requested to stay in memory (held - as
+			in a buffer region for example). If not, this page is eligible for 
+			removal.
+		*/
+		bool isHeld() const;
+
+		/// Mark a page as preparing (internal use)
+		void _markPreparing();
+		/// Mark a page as prepared (internal use)
+		void _markPrepared();
+		/// Mark a page as loading (internal use)
+		void _markLoading();
+		/// Mark a page as loaded (internal use)
+		void _markLoaded();
+		/// Mark a page as unloading (internal use)
+		void _markUnloading();
+		/// Mark a page as unpreparing (internal use)
+		void _markUnpreparing();
+		/// Mark a page as unloaded (internal use)
+		void _markUnloaded();
+
 		/// Save page data to a serialiser 
 		void save(StreamSerialiser& stream);
 

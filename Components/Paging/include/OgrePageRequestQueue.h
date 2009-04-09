@@ -61,7 +61,7 @@ namespace Ogre
 		*/
 		void loadPage(Page* page, PagedWorldSection* section);
 		/** Dispose of a page */
-		void unloadPage(Page* page);
+		void unloadPage(Page* page, PagedWorldSection* section);
 
 		/** Cancel any pending operations for a Page.
 		@remarks
@@ -71,10 +71,73 @@ namespace Ogre
 		*/
 		void cancelOperationsForPage(Page* p);
 
+		/** Enable this option if you want to force synchronous loading of all 
+			future requests.
+		*/
+		void setForceSynchronous(bool force) { mForceSynchronous = force; }
+		/** Gets whether requests will be dealt with synchronously even if a thread
+			is available. 
+		*/
+		bool getForceSynchronous() const { return mForceSynchronous; }
+
+		/** Set the amount of time the render thread is allowed to spend on pending requests.
+		@remarks
+			Even though much work is done in a background thread, the main render 
+			thread is still required to manage GPU resources. Therefore each frame
+			pending requests of this type will be dealt with in the main thread too.
+			This option allows you to specify how long the main thread is allowed
+			to spend each frame on this task, and if any tasks are left over after
+			this time then they are deferred to the next frame. Note that at
+			least one task is always performed. 
+		@param milliseconds The amount of time budgeted in milliseconds, default is
+			0 (no limit)
+		*/
+		void setRenderThreadFrameTimeBudget(unsigned long milliseconds)
+		{ mRenderThreadTimeLimit = milliseconds; }
+
+		unsigned long getRenderThreadFrameTimeBudget() const { return mRenderThreadTimeLimit; }
+		/// To be called in the main render thread each frame
+		void processRenderThreadRequests();
 
 
 	protected:
 		PageManager* mManager;
+		bool mForceSynchronous;
+		unsigned long mRenderThreadTimeLimit;
+
+		/// The request type for a request - listed in general lifecycle order
+		enum RequestType
+		{
+			PREPARE_PAGE = 0, 
+			LOAD_PAGE = 1,
+			UNLOAD_PAGE = 2, 
+			UNPREPARE_PAGE = 3,
+			DELETE_PAGE = 4
+		};
+
+		struct _OgrePagingExport Request
+		{
+			RequestType requestType;
+			Page* page;
+			PagedWorldSection* section;
+
+			Request(RequestType rt, Page* p, PagedWorldSection* s) 
+				: requestType(rt), page(p), section(s) {}
+		};
+
+		typedef deque<Request>::type RequestQueue;
+		/// Requests pending for the background queue
+		RequestQueue mBackgroundQueue;
+		/// Requests pending for the render queue (follow on from background)
+		RequestQueue mRenderQueue;
+
+		void addBackgroundRequest(const Request& r);
+		void addRenderRequest(const Request& r);
+		
+		/// Process the background portion of a request (may be threaded)
+		void processBackgroundRequest(const Request& r);
+		/// Process the render portion of a request (may be threaded)
+		void processRenderRequest(const Request& r);
 	};
 
 	/** @} */

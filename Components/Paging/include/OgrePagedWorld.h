@@ -157,13 +157,38 @@ namespace Ogre
 		/** Get the PageProvider which can provide streams for Pages in this world. */
 		PageProvider* getPageProvider() const { return mPageProvider; }
 
-		/** Give a world  the opportunity to generate page content procedurally. 
+		/** Give a world  the opportunity to prepare page content procedurally. 
 		@remarks
 		You should not call this method directly. This call may well happen in 
-		a separate thread.
+		a separate thread so it should not access GPU resources, use _loadProceduralPage
+		for that
 		@returns true if the page was populated, false otherwise
 		*/
-		virtual bool _generatePage(Page* page, PagedWorldSection* section);
+		virtual bool _prepareProceduralPage(Page* page, PagedWorldSection* section);
+		/** Give a world  the opportunity to prepare page content procedurally. 
+		@remarks
+		You should not call this method directly. This call will happen in 
+		the main render thread so it can access GPU resources. Use _prepareProceduralPage
+		for background preparation.
+		@returns true if the page was populated, false otherwise
+		*/
+		virtual bool _loadProceduralPage(Page* page, PagedWorldSection* section);
+		/** Give a world  the opportunity to unload page content procedurally. 
+		@remarks
+		You should not call this method directly. This call will happen in 
+		the main render thread so it can access GPU resources. Use _unprepareProceduralPage
+		for background preparation.
+		@returns true if the page was populated, false otherwise
+		*/
+		virtual bool _unloadProceduralPage(Page* page, PagedWorldSection* section);
+		/** Give a world  the opportunity to unprepare page content procedurally. 
+		@remarks
+		You should not call this method directly. This call may well happen in 
+		a separate thread so it should not access GPU resources, use _unloadProceduralPage
+		for that
+		@returns true if the page was unpopulated, false otherwise
+		*/
+		virtual bool _unprepareProceduralPage(Page* page, PagedWorldSection* section);
 		/** Get a serialiser set up to read Page data for the given PageID. 
 		@param pageID The ID of the page being requested
 		@param section The parent section to which this page will belong

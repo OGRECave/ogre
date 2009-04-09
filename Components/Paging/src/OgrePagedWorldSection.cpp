@@ -188,13 +188,65 @@ namespace Ogre
 			i->second->touch();
 	}
 	//---------------------------------------------------------------------
-	bool PagedWorldSection::_generatePage(Page* page)
+	void PagedWorldSection::unloadPage(PageID pageID)
+	{
+		PageMap::iterator i = mPages.find(pageID);
+		if (i != mPages.end())
+		{
+			Page* page = i->second;
+			mPages.erase(i);
+			page->_notifyAttached(0);
+
+			mParent->getManager()->getQueue()->unloadPage(page, this);
+			
+		}
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::unloadPage(Page* p)
+	{
+		unloadPage(p->getID());
+	}
+	//---------------------------------------------------------------------
+	bool PagedWorldSection::_prepareProceduralPage(Page* page)
 	{
 		bool generated = false;
 		if (mPageProvider)
-			generated = mPageProvider->generatePage(page, this);
+			generated = mPageProvider->prepareProceduralPage(page, this);
 		if (!generated)
-			generated = mParent->_generatePage(page, this);
+			generated = mParent->_prepareProceduralPage(page, this);
+		return generated;
+
+	}
+	//---------------------------------------------------------------------
+	bool PagedWorldSection::_loadProceduralPage(Page* page)
+	{
+		bool generated = false;
+		if (mPageProvider)
+			generated = mPageProvider->loadProceduralPage(page, this);
+		if (!generated)
+			generated = mParent->_loadProceduralPage(page, this);
+		return generated;
+
+	}
+	//---------------------------------------------------------------------
+	bool PagedWorldSection::_unloadProceduralPage(Page* page)
+	{
+		bool generated = false;
+		if (mPageProvider)
+			generated = mPageProvider->unloadProceduralPage(page, this);
+		if (!generated)
+			generated = mParent->_unloadProceduralPage(page, this);
+		return generated;
+
+	}
+	//---------------------------------------------------------------------
+	bool PagedWorldSection::_unprepareProceduralPage(Page* page)
+	{
+		bool generated = false;
+		if (mPageProvider)
+			generated = mPageProvider->unprepareProceduralPage(page, this);
+		if (!generated)
+			generated = mParent->_unprepareProceduralPage(page, this);
 		return generated;
 
 	}
@@ -270,8 +322,18 @@ namespace Ogre
 	{
 		mStrategy->frameEnd(timeElapsed, this);
 
-		for (PageMap::iterator i = mPages.begin(); i != mPages.end(); ++i)
-			i->second->frameEnd(timeElapsed);
+		for (PageMap::iterator i = mPages.begin(); i != mPages.end(); )
+		{
+			// if this page wasn't used, unload
+			Page* p = i->second;
+			// pre-increment since unloading will remove it
+			++i;
+			if (!p->isHeld())
+				unloadPage(p);
+			else
+				p->frameEnd(timeElapsed);
+		}
+
 	}
 	//---------------------------------------------------------------------
 	void PagedWorldSection::notifyCamera(Camera* cam)

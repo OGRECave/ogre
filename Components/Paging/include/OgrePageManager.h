@@ -58,12 +58,37 @@ namespace Ogre
 		PageProvider() {}
 		virtual ~PageProvider() {}
 
-		/** Get a Page generated procedurally. 
+		/** Give a provider the opportunity to prepare page content procedurally. 
 		@remarks
-			This method allows you to populate Page instances procedurally if you wish.
-			Return true if you populated the page, false otherwise
+		This call may well happen in a separate thread so it should not access 
+		GPU resources, use loadProceduralPage for that
+		@returns true if the page was populated, false otherwise
 		*/
-		virtual bool generatePage(Page* page, PagedWorldSection* section) { return false; }
+		virtual bool prepareProceduralPage(Page* page, PagedWorldSection* section) { return false; }
+		/** Give a provider the opportunity to load page content procedurally. 
+		@remarks
+		This call will happen in the main render thread so it can access GPU resources. 
+		Use prepareProceduralPage for background preparation.
+		@returns true if the page was populated, false otherwise
+		*/
+		virtual bool loadProceduralPage(Page* page, PagedWorldSection* section) { return false; }
+		/** Give a provider the opportunity to unload page content procedurally. 
+		@remarks
+		You should not call this method directly. This call will happen in 
+		the main render thread so it can access GPU resources. Use _unprepareProceduralPage
+		for background preparation.
+		@returns true if the page was populated, false otherwise
+		*/
+		virtual bool unloadProceduralPage(Page* page, PagedWorldSection* section) { return false; }
+		/** Give a provider the opportunity to unprepare page content procedurally. 
+		@remarks
+		You should not call this method directly. This call may well happen in 
+		a separate thread so it should not access GPU resources, use _unloadProceduralPage
+		for that
+		@returns true if the page was unpopulated, false otherwise
+		*/
+		virtual bool unprepareProceduralPage(Page* page, PagedWorldSection* section) { return false; }
+
 		/** Get a serialiser set up to read PagedWorld data for the given world filename. 
 		@remarks
 		The StreamSerialiser returned is the responsibility of the caller to
@@ -202,13 +227,38 @@ namespace Ogre
 		/** Get the PageProvider which can provide streams for any Page. */
 		PageProvider* getPageProvider() const { return mPageProvider; }
 
-		/** Give a provider the opportunity to generate page content procedurally. 
+		/** Give a provider the opportunity to prepare page content procedurally. 
 		@remarks
 		You should not call this method directly. This call may well happen in 
-		a separate thread.
+		a separate thread so it should not access GPU resources, use _loadProceduralPage
+		for that
 		@returns true if the page was populated, false otherwise
 		*/
-		virtual bool _generatePage(Page* page, PagedWorldSection* section);
+		virtual bool _prepareProceduralPage(Page* page, PagedWorldSection* section);
+		/** Give a provider the opportunity to prepare page content procedurally. 
+		@remarks
+		You should not call this method directly. This call will happen in 
+		the main render thread so it can access GPU resources. Use _prepareProceduralPage
+		for background preparation.
+		@returns true if the page was populated, false otherwise
+		*/
+		virtual bool _loadProceduralPage(Page* page, PagedWorldSection* section);
+		/** Give a manager  the opportunity to unload page content procedurally. 
+		@remarks
+		You should not call this method directly. This call will happen in 
+		the main render thread so it can access GPU resources. Use _unprepareProceduralPage
+		for background preparation.
+		@returns true if the page was populated, false otherwise
+		*/
+		virtual bool _unloadProceduralPage(Page* page, PagedWorldSection* section);
+		/** Give a manager  the opportunity to unprepare page content procedurally. 
+		@remarks
+		You should not call this method directly. This call may well happen in 
+		a separate thread so it should not access GPU resources, use _unloadProceduralPage
+		for that
+		@returns true if the page was unpopulated, false otherwise
+		*/
+		virtual bool _unprepareProceduralPage(Page* page, PagedWorldSection* section);
 		/** Get a serialiser set up to read Page data for the given PageID. 
 		@param pageID The ID of the page being requested
 		@param section The parent section to which this page will belong

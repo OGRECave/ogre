@@ -143,19 +143,58 @@ namespace Ogre
 
 		/** Ask for a page to be loaded with the given (section-relative) PageID
 		@remarks
+			You would not normally call this manually, the PageStrategy is in 
+			charge of it usually.
 			If this page is already loaded, this request will not load it again.
 			If the page needs loading, then it may be an asynchronous process depending
 			on whether threading is enabled.
 		*/
 		virtual void loadPage(PageID pageID);
 
-		/** Give a section the opportunity to generate page content procedurally. 
+		/** Ask for a page to be unloaded with the given (section-relative) PageID
+		@remarks
+			You would not normally call this manually, the PageStrategy is in 
+			charge of it usually.
+		*/
+		virtual void unloadPage(PageID pageID);
+		/** Ask for a page to be unloaded with the given (section-relative) PageID
+		@remarks
+		You would not normally call this manually, the PageStrategy is in 
+		charge of it usually.
+		*/
+		virtual void unloadPage(Page* p);
+		/** Give a section the opportunity to prepare page content procedurally. 
 		@remarks
 		You should not call this method directly. This call may well happen in 
-		a separate thread.
+		a separate thread so it should not access GPU resources, use _loadProceduralPage
+		for that
 		@returns true if the page was populated, false otherwise
 		*/
-		virtual bool _generatePage(Page* page);
+		virtual bool _prepareProceduralPage(Page* page);
+		/** Give a section the opportunity to prepare page content procedurally. 
+		@remarks
+		You should not call this method directly. This call will happen in 
+		the main render thread so it can access GPU resources. Use _prepareProceduralPage
+		for background preparation.
+		@returns true if the page was populated, false otherwise
+		*/
+		virtual bool _loadProceduralPage(Page* page);
+		/** Give a section  the opportunity to unload page content procedurally. 
+		@remarks
+		You should not call this method directly. This call will happen in 
+		the main render thread so it can access GPU resources. Use _unprepareProceduralPage
+		for background preparation.
+		@returns true if the page was populated, false otherwise
+		*/
+		virtual bool _unloadProceduralPage(Page* page);
+		/** Give a section  the opportunity to unprepare page content procedurally. 
+		@remarks
+		You should not call this method directly. This call may well happen in 
+		a separate thread so it should not access GPU resources, use _unloadProceduralPage
+		for that
+		@returns true if the page was unpopulated, false otherwise
+		*/
+		virtual bool _unprepareProceduralPage(Page* page);
 
 		/** Ask for a page to be kept in memory if it's loaded.
 		@remarks

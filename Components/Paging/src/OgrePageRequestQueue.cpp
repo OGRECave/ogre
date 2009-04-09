@@ -32,12 +32,19 @@ Torus Knot Software Ltd.
 #include "OgrePagedWorldSection.h"
 #include "OgrePage.h"
 #include "OgreStreamSerialiser.h"
+#include "OgreLogManager.h"
+#include "OgreRoot.h"
+#include "OgreTimer.h"
+#include "OgrePagedWorld.h"
 
 namespace Ogre
 {
 	//---------------------------------------------------------------------
 	PageRequestQueue::PageRequestQueue(PageManager* manager)
 		: mManager(manager)
+		// TODO - don't force sync (threading primitives still TBA)
+		, mForceSynchronous(true)
+		, mRenderThreadTimeLimit(0)
 	{
 	}
 	//---------------------------------------------------------------------
@@ -47,27 +54,248 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void PageRequestQueue::loadPage(Page* page, PagedWorldSection* section)
 	{
-		// TODO threading
+		
+		// Prepare in the background
+		Request req(PREPARE_PAGE, page, section);
+		addBackgroundRequest(req);
 
-		// synchronous mode
-		// Alolow procedural generation
-		if (!section->_generatePage(page))
-		{
-			StreamSerialiser* ser = section->_readPageStream(page->getID());
-			page->load(*ser);
-			OGRE_DELETE ser;
-		}
+		// load will happen in the main thread once preparation is complete
+
 
 	}
 	//---------------------------------------------------------------------
-	void PageRequestQueue::unloadPage(Page* page)
+	void PageRequestQueue::unloadPage(Page* page, PagedWorldSection* section)
 	{
-		// TODO
+		// unload in main thread, then unprepare in background
+		Request req(UNLOAD_PAGE, page, section);
+		addRenderRequest(req);
+
 	}
 	//---------------------------------------------------------------------
 	void PageRequestQueue::cancelOperationsForPage(Page* p)
 	{
-		// TODO
+		// cancel background
+		{
+			// TODO lock background queue
+			for(RequestQueue::iterator i = mBackgroundQueue.begin(); i != mBackgroundQueue.end(); )
+			{
+				if (i->page == p)
+					i = mBackgroundQueue.erase(i);
+				else
+					++i;
+			}
+
+		}
+
+		// cancel render
+		{
+			// TODO lock render queue
+			for(RequestQueue::iterator i = mRenderQueue.begin(); i != mRenderQueue.end(); )
+			{
+				if (i->page == p)
+					i = mRenderQueue.erase(i);
+				else
+					++i;
+			}
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void PageRequestQueue::addBackgroundRequest(const Request& r)
+	{
+		Log* log = LogManager::getSingleton().getDefaultLog();
+		if (log->getLogDetail() == LL_BOREME)
+		{
+			LogManager::getSingleton().stream(LML_TRIVIAL)
+				<< "PageRequestQueue: queueing background thread request " << r.requestType << 
+				" for page ID " << r.page->getID() << " world " << r.section->getWorld()->getName()
+				<< ":" << r.section->getName();
+		}
+
+		if (mForceSynchronous)
+		{
+			processBackgroundRequest(r);
+		}
+		else
+		{
+			// TODO lock
+			mBackgroundQueue.push_back(r);
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void PageRequestQueue::addRenderRequest(const Request& r)
+	{
+		Log* log = LogManager::getSingleton().getDefaultLog();
+		if (log->getLogDetail() == LL_BOREME)
+		{
+			LogManager::getSingleton().stream(LML_TRIVIAL)
+				<< "PageRequestQueue: queueing render thread request " << r.requestType << 
+				" for page ID " << r.page->getID() << " world " << r.section->getWorld()->getName()
+				<< ":" << r.section->getName();
+		}
+		if (mForceSynchronous)
+		{
+			processRenderRequest(r);
+		}
+		else
+		{
+			// TODO lock
+			mRenderQueue.push_back(r);
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void PageRequestQueue::processBackgroundRequest(const Request& r)
+	{
+		Log* log = LogManager::getSingleton().getDefaultLog();
+		if (log->getLogDetail() == LL_BOREME)
+		{
+			LogManager::getSingleton().stream(LML_TRIVIAL)
+				<< "PageRequestQueue: processing background thread request " << r.requestType << 
+				" for page ID " << r.page->getID() << " world " << r.section->getWorld()->getName()
+				<< ":" << r.section->getName();
+		}
+		try
+		{
+			switch(r.requestType)
+			{
+			case PREPARE_PAGE:
+				{
+					// Allow procedural generation
+					if (r.section->_prepareProceduralPage(r.page))
+					{
+						r.page->_markPrepared();
+					}
+					else
+					{
+						StreamSerialiser* ser = r.section->_readPageStream(r.page->getID());
+						r.page->prepare(*ser);
+						OGRE_DELETE ser;
+					}
+
+
+					// Pass back to render thread to finalise
+					Request newreq(LOAD_PAGE, r.page, r.section);
+					addRenderRequest(newreq);
+				}
+
+				break;
+			case UNPREPARE_PAGE:
+				{
+
+					// Allow procedural generation
+					if (r.section->_unprepareProceduralPage(r.page))
+					{
+						r.page->_markUnloaded();
+					}
+					else
+					{
+						r.page->unprepare();
+					}
+
+					// Pass back to render thread to finalise
+					Request newreq(DELETE_PAGE, r.page, r.section);
+					addRenderRequest(newreq);
+				}
+
+				break;
+			default:
+				// not a background request
+				;
+			};
+		}
+		catch (Exception& e)
+		{
+			LogManager::getSingleton().stream() << "Error processing background request: "
+				<< e.getFullDescription();
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void PageRequestQueue::processRenderRequest(const Request& r)
+	{
+		Log* log = LogManager::getSingleton().getDefaultLog();
+		if (log->getLogDetail() == LL_BOREME)
+		{
+			LogManager::getSingleton().stream(LML_TRIVIAL)
+				<< "PageRequestQueue: processing render thread request " << r.requestType << 
+				" for page ID " << r.page->getID() << " world " << r.section->getWorld()->getName()
+				<< ":" << r.section->getName();
+		}
+		try
+		{
+			switch(r.requestType)
+			{
+			case LOAD_PAGE:
+				// Allow procedural generation
+				if (r.section->_loadProceduralPage(r.page))
+				{		
+					r.page->_markLoaded();
+				}
+				else
+				{
+					r.page->load();
+				}
+				
+
+				break;
+			case UNLOAD_PAGE:
+				{
+					// Allow procedural unload
+					if (r.section->_unloadProceduralPage(r.page))
+					{		
+						r.page->_markPrepared();
+					}
+					else
+					{
+						r.page->unload();
+					}
+
+					// Pass back to background thread to finalise
+					Request newreq(UNPREPARE_PAGE, r.page, r.section);
+					addBackgroundRequest(newreq);
+				}
+
+				break;
+			case DELETE_PAGE:
+				OGRE_DELETE r.page;
+				break;
+			default:
+				// not a render request
+				;
+			};
+		}
+		catch (Exception& e)
+		{
+			LogManager::getSingleton().stream() << "Error processing render request: "
+				<< e.getFullDescription();
+		}
+
+
+	}
+	//---------------------------------------------------------------------
+	void PageRequestQueue::processRenderThreadRequests()
+	{
+		Timer* timer = Root::getSingleton().getTimer();
+		unsigned long msStart = timer->getMilliseconds();
+
+		while(!mRenderQueue.empty())
+		{
+			// FIFO
+			// TODO lock
+			Request r = mRenderQueue.front();
+			mRenderQueue.pop_front();
+
+			processRenderRequest(r);
+
+			if (mRenderThreadTimeLimit && 
+				(msStart + mRenderThreadTimeLimit) <= timer->getMilliseconds())
+			{
+				// time up!
+				break;
+			}
+		}
 	}
 
 

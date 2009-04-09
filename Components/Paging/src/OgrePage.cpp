@@ -44,40 +44,149 @@ namespace Ogre
 		, mStatus(STATUS_UNLOADED)
 		, mDebugNode(0)
 	{
-
+		touch();
 	}
 	//---------------------------------------------------------------------
 	Page::~Page()
 	{
-
 	}
 	//---------------------------------------------------------------------
 	void Page::_notifyAttached(PagedWorldSection* parent)
 	{
+		if (!parent && mParent && mDebugNode)
+		{
+			// destroy while we have the chance
+			SceneNode::ObjectIterator it = mDebugNode->getAttachedObjectIterator();
+			while(it.hasMoreElements())
+				mParent->getSceneManager()->destroyMovableObject(it.getNext());
+			mDebugNode->removeAndDestroyAllChildren();
+			mParent->getSceneManager()->destroySceneNode(mDebugNode);
+
+			mDebugNode = 0;
+		}
 		mParent = parent;
 	}
 	//---------------------------------------------------------------------
 	void Page::touch()
 	{
-		mFrameLastHeld = Root::getSingleton().getNextFrameNumber();
+		mFrameLastHeld = Root::getSingleton().getNextFrameNumber() + 1;
 	}
 	//---------------------------------------------------------------------
-	bool Page::load(StreamSerialiser& stream)
+	bool Page::isHeld() const
+	{
+		unsigned long nextFrame = Root::getSingleton().getNextFrameNumber();
+		// 1-frame tolerance, since the next frame number varies depending which
+		// side of frameRenderingQueued you are
+		return (mFrameLastHeld == nextFrame ||
+			mFrameLastHeld + 1 == nextFrame);
+	}
+	//---------------------------------------------------------------------
+	bool Page::prepare(StreamSerialiser& stream)
 	{
 		// Fast pre-check
 		if (mStatus.get() != STATUS_UNLOADED) 
 			return true;
 
 		// Set to loading
-		if (!mStatus.cas(STATUS_UNLOADED, STATUS_LOADING))
+		if (!mStatus.cas(STATUS_UNLOADED, STATUS_PREPARING))
 			return true;
 
 		// Now do the real loading
 		// TODO
 
 
-		mStatus.set(STATUS_LOADED);
+		mStatus.set(STATUS_PREPARED);
 		return true;
+	}
+	//---------------------------------------------------------------------
+	void Page::load()
+	{
+		// Fast pre-check
+		if (mStatus.get() != STATUS_PREPARED) 
+			return;
+
+		// Set to loading
+		if (!mStatus.cas(STATUS_PREPARED, STATUS_LOADING))
+			return;
+
+		// Now do the real loading
+		// TODO
+
+
+		mStatus.set(STATUS_LOADED);
+	}
+	//---------------------------------------------------------------------
+	void Page::unprepare()
+	{
+		// Fast pre-check
+		if (mStatus.get() != STATUS_PREPARED) 
+			return;
+
+		if (!mStatus.cas(STATUS_PREPARED, STATUS_UNPREPARING))
+			return;
+
+		// TODO
+
+
+		mStatus.set(STATUS_UNLOADED);
+	}
+	//---------------------------------------------------------------------
+	void Page::unload()
+	{
+		// Fast pre-check
+		if (mStatus.get() != STATUS_LOADED) 
+			return;
+
+		if (!mStatus.cas(STATUS_LOADED, STATUS_UNLOADING))
+			return;
+
+		// TODO
+
+
+		mStatus.set(STATUS_PREPARED);
+
+	}
+	//---------------------------------------------------------------------
+	void Page::_markPreparing()
+	{
+		Status s = mStatus.get();
+		mStatus.cas(s, STATUS_PREPARING);
+	}
+	//---------------------------------------------------------------------
+	void Page::_markPrepared()
+	{
+		Status s = mStatus.get();
+		mStatus.cas(s, STATUS_PREPARED);
+	}
+	//---------------------------------------------------------------------
+	void Page::_markLoading()
+	{
+		Status s = mStatus.get();
+		mStatus.cas(s, STATUS_LOADING);
+	}
+	//---------------------------------------------------------------------
+	void Page::_markLoaded()
+	{
+		Status s = mStatus.get();
+		mStatus.cas(s, STATUS_LOADED);
+	}
+	//---------------------------------------------------------------------
+	void Page::_markUnloading()
+	{
+		Status s = mStatus.get();
+		mStatus.cas(s, STATUS_UNLOADING);
+	}
+	//---------------------------------------------------------------------
+	void Page::_markUnpreparing()
+	{
+		Status s = mStatus.get();
+		mStatus.cas(s, STATUS_UNPREPARING);
+	}
+	//---------------------------------------------------------------------
+	void Page::_markUnloaded()
+	{
+		Status s = mStatus.get();
+		mStatus.cas(s, STATUS_UNLOADED);
 	}
 	//---------------------------------------------------------------------
 	void Page::save(StreamSerialiser& stream)

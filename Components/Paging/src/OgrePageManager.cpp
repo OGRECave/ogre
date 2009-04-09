@@ -291,11 +291,38 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	bool PageManager::_generatePage(Page* page, PagedWorldSection* section)
+	bool PageManager::_prepareProceduralPage(Page* page, PagedWorldSection* section)
 	{
 		bool generated = false;
 		if (mPageProvider)
-			generated = mPageProvider->generatePage(page, section);
+			generated = mPageProvider->prepareProceduralPage(page, section);
+
+		return generated;
+	}
+	//---------------------------------------------------------------------
+	bool PageManager::_loadProceduralPage(Page* page, PagedWorldSection* section)
+	{
+		bool generated = false;
+		if (mPageProvider)
+			generated = mPageProvider->loadProceduralPage(page, section);
+
+		return generated;
+	}
+	//---------------------------------------------------------------------
+	bool PageManager::_unprepareProceduralPage(Page* page, PagedWorldSection* section)
+	{
+		bool generated = false;
+		if (mPageProvider)
+			generated = mPageProvider->unprepareProceduralPage(page, section);
+
+		return generated;
+	}
+	//---------------------------------------------------------------------
+	bool PageManager::_unloadProceduralPage(Page* page, PagedWorldSection* section)
+	{
+		bool generated = false;
+		if (mPageProvider)
+			generated = mPageProvider->unloadProceduralPage(page, section);
 
 		return generated;
 	}
@@ -343,8 +370,11 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool PageManager::EventRouter::frameStarted(const FrameEvent& evt)
 	{
+
 		for(WorldMap::iterator i = pWorldMap->begin(); i != pWorldMap->end(); ++i)
 			i->second->frameStart(evt.timeSinceLastFrame);
+
+		pManager->getQueue()->processRenderThreadRequests();
 
 		return true;
 	}

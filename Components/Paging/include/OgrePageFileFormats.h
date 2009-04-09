@@ -125,6 +125,101 @@ Torus Knot Software Ltd.
 			parent PagedWorldSection</td>
 	</tr>
 	</table>
+	@par
+	<b>Page (Identifier 'PAGE')</b>\n
+	[Version 1]
+	<table>
+	<tr>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>Page ID</td>
+		<td>uint32</td>
+		<td>The identifier of the page</td>
+	</tr>
+	<tr>
+		<td>PageContentCollection list</td>
+		<td>Nested chunk list</td>
+		<td>1-n nested chunks of type PageContentCollection</td>
+	</tr>
+	</table>
+	@par
+	<b>PageContentCollection (Identifier 'PGCC')</b>\n
+	[Version 1]
+	<table>
+	<tr>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>Factory name</td>
+		<td>char*</td>
+		<td>The name of the content collection factory</td>
+	</tr>
+	<tr>
+		<td>PageContentCollectionData chunk</td>
+		<td>Nested chunk</td>
+		<td>Data required to initialise & configure the content collection</td>
+	</tr>
+	<tr>
+		<td>PageContent chunk list</td>
+		<td>Nested chunk list</td>
+		<td>List of 1-n PageContent chunks</td>
+	</tr>
+	</table>
+	@par
+	<b>PageContentCollectionData (Identifier defined by subclass)</b>\n
+	[Version 1]
+	<table>
+	<tr>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>PageContentCollection subclass defined</td>
+		<td>???</td>
+		<td>This chunk will contain data as defined by the specific PageContentCollection subclass</td>
+	</tr>
+	</table>
+	@par
+	<b>PageContent (Identifier 'PGCN')</b>\n
+	[Version 1]
+	<table>
+	<tr>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>Factory name</td>
+		<td>char*</td>
+		<td>The name of the content	factory</td>
+	</tr>
+	<tr>
+		<td>PageContentData chunk</td>
+		<td>Nested chunk</td>
+		<td>Data required to initialise & configure the content</td>
+	</tr>
+	</table>
+	@par
+	<b>PageContentData (Identifier defined by subclass)</b>\n
+	[Version 1]
+	<table>
+	<tr>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>PageContent subclass defined</td>
+		<td>???</td>
+		<td>This chunk will contain data as defined by the specific PageContent subclass</td>
+	</tr>
+	</table>
 */
 
 /*@}*/
