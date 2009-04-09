@@ -45,7 +45,7 @@ namespace Ogre {
 	#define SCRATCH_POOL_SIZE 1 * 1024 * 1024
 	#define SCRATCH_ALIGNMENT 32
 	//---------------------------------------------------------------------
-    GLHardwareBufferManager::GLHardwareBufferManager()
+    GLHardwareBufferManager::GLHardwareBufferManager() : mMapBufferThreshold(OGRE_GL_MAP_BUFFER_THRESHOLD)
     {
 		// Init scratch pool
 		// TODO make it a configurable size?
@@ -54,6 +54,22 @@ namespace Ogre {
 		GLScratchBufferAlloc* ptrAlloc = (GLScratchBufferAlloc*)mScratchBufferPool;
 		ptrAlloc->size = SCRATCH_POOL_SIZE - sizeof(GLScratchBufferAlloc);
 		ptrAlloc->free = 1;
+
+		// non-Win32 machines are having issues glBufferSubData, looks like buffer corruption
+		// disable for now until we figure out where the problem lies			
+#	if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
+		mMapBufferThreshold = 0;
+#	endif
+
+		// Win32 machines with ATI GPU are having issues glMapBuffer, looks like buffer corruption
+		// disable for now until we figure out where the problem lies			
+#	if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+		if (!GLEW_NV_point_sprite) // if not NVIDIA...
+		{
+			mMapBufferThreshold = 0xffffffffUL  /* maximum unsigned long value */;
+		}
+#	endif
+
     }
     //-----------------------------------------------------------------------
     GLHardwareBufferManager::~GLHardwareBufferManager()
@@ -244,5 +260,15 @@ namespace Ogre {
 		assert (false && "Memory deallocation error");
 
 
+	}
+	//---------------------------------------------------------------------
+	const size_t GLHardwareBufferManager::getGLMapBufferThreshold() const
+	{
+		return mMapBufferThreshold;
+	}
+	//---------------------------------------------------------------------
+	void GLHardwareBufferManager::setGLMapBufferThreshold( const size_t value )
+	{
+		mMapBufferThreshold = value;
 	}
 }
