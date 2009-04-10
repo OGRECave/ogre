@@ -99,6 +99,11 @@ namespace Ogre {
 	//* Creation / loading methods ********************************************
 	void GLTexture::createInternalResourcesImpl(void)
     {
+		if (!GLEW_VERSION_1_2 && mTextureType == TEX_TYPE_3D)
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+				"3D Textures not supported before OpenGL 1.2", 
+				"GLTexture::createInternalResourcesImpl");
+
 		// Convert to nearest power-of-two size if required
         mWidth = GLPixelUtil::optionalPO2(mWidth);      
         mHeight = GLPixelUtil::optionalPO2(mHeight);
@@ -121,13 +126,17 @@ namespace Ogre {
 		glBindTexture( getGLTextureTarget(), mTextureID );
         
 		// This needs to be set otherwise the texture doesn't get rendered
-        glTexParameteri( getGLTextureTarget(), GL_TEXTURE_MAX_LEVEL, mNumMipmaps );
+		if (GLEW_VERSION_1_2)
+			glTexParameteri( getGLTextureTarget(), GL_TEXTURE_MAX_LEVEL, mNumMipmaps );
         
         // Set some misc default parameters so NVidia won't complain, these can of course be changed later
         glTexParameteri(getGLTextureTarget(), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(getGLTextureTarget(), GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		if (GLEW_VERSION_1_2)
+		{
+			glTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(getGLTextureTarget(), GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		}
 		
 		// If we can do automip generation and the user desires this, do so
 		mMipmapsHardwareGenerated = 

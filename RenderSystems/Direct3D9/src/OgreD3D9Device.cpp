@@ -591,15 +591,26 @@ namespace Ogre
 
 			hr = pD3D9->CreateDevice(mAdapterNumber, mDeviceType, mFocusWindow,
 				mBehaviorFlags, mPresentationParams, &mpDevice);
+		}
 
-			if( FAILED( hr ) )
+		if( FAILED( hr ) )
+		{
+			// try to create the device with software vertex processing.
+			mBehaviorFlags &= ~D3DCREATE_MIXED_VERTEXPROCESSING;
+			mBehaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+			hr = pD3D9->CreateDevice(mAdapterNumber, mDeviceType, mFocusWindow,
+				mBehaviorFlags, mPresentationParams, &mpDevice);
+		}
+
+		if ( FAILED( hr ) )
+		{
+			// try reference device
+			mDeviceType = D3DDEVTYPE_REF;
+			hr = pD3D9->CreateDevice(mAdapterNumber, mDeviceType, mFocusWindow,
+				mBehaviorFlags, mPresentationParams, &mpDevice);
+
+			if ( FAILED( hr ) )
 			{
-				// Last thing we try to create the device with software vertex processing.
-				mBehaviorFlags &= ~D3DCREATE_MIXED_VERTEXPROCESSING;
-				mBehaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-				hr = pD3D9->CreateDevice(mAdapterNumber, mDeviceType, mFocusWindow,
-					mBehaviorFlags, mPresentationParams, &mpDevice);
-
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 					"Cannot create device!", 
 					"D3D9Device::createD3D9Device" );

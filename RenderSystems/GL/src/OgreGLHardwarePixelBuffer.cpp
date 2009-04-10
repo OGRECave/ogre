@@ -456,7 +456,8 @@ void GLTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
 	}
 	// Restore defaults
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-	glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0);
+	if (GLEW_VERSION_1_2)
+		glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0);
 	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }

@@ -254,7 +254,8 @@ static const size_t depthBits[] =
 				glBindTexture(target, tid);
 				
                 // Set some default parameters so it won't fail on NVidia cards         
-                glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 0);
+				if (GLEW_VERSION_1_2)
+					glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 0);
                 glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

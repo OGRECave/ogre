@@ -347,6 +347,24 @@ namespace Ogre
 			}
 		}
 
+		// No matching device found -> try reference device type (might have been 
+		// previously created as a fallback, but don't change devType because HAL
+		// should be preferred on creation)
+		if (renderDevice == NULL)
+		{
+			for (uint i = 0; i < mRenderDevices.size(); ++i)
+			{
+				D3D9Device* currDevice = mRenderDevices[i];
+
+				if (currDevice->getAdapterNumber() == nAdapterOrdinal &&
+					currDevice->getDeviceType() == D3DDEVTYPE_REF)
+				{
+					renderDevice = currDevice;
+					break;
+				}			
+			}
+		}
+
 
 		// No matching device found -> create new one.
 		if (renderDevice == NULL)
