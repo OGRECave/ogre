@@ -589,7 +589,14 @@ namespace Ogre
 							D3DCREATE_SOFTWARE_VERTEXPROCESSING | extraFlags, &md3dpp, &mpD3DDevice );
 					}
 				}
-				// TODO: make this a bit better e.g. go from pure vertex processing to software
+				
+				if( FAILED( hr ) )
+				{
+					// software device
+					devType = D3DDEVTYPE_REF;
+					hr = pD3D->CreateDevice( adapterToUse, devType, mHWnd,
+						D3DCREATE_SOFTWARE_VERTEXPROCESSING | extraFlags, &md3dpp, &mpD3DDevice );
+				}
 				if( FAILED( hr ) )
 				{
 					destroy();

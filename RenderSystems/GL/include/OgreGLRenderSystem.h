@@ -136,6 +136,7 @@ namespace Ogre {
         GLRTTManager *mRTTManager;
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);
+		bool activateGLTextureUnit(size_t unit);
     public:
         // Default constructor / destructor
         GLRenderSystem();

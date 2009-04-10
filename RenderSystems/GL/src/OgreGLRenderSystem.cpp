@@ -569,20 +569,32 @@ namespace Ogre {
 		}
 
 		// Point size
-		float ps;
-		glGetFloatv(GL_POINT_SIZE_MAX, &ps);
-		rsc->setMaxPointSize(ps);
+		if (GLEW_VERSION_1_4)
+		{
+			float ps;
+			glGetFloatv(GL_POINT_SIZE_MAX, &ps);
+			rsc->setMaxPointSize(ps);
+		}
+		else
+		{
+			GLint vSize[2];
+			glGetIntegerv(GL_POINT_SIZE_RANGE,vSize);
+			rsc->setMaxPointSize(vSize[1]);
+		}
 
 		// Vertex texture fetching
-		GLint vUnits;
-		glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, &vUnits);
-		rsc->setNumVertexTextureUnits(static_cast<ushort>(vUnits));
-		if (vUnits > 0)
+		if (mGLSupport->checkExtension("GL_ARB_vertex_shader"))
 		{
-			rsc->setCapability(RSC_VERTEX_TEXTURE_FETCH);
+			GLint vUnits;
+			glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, &vUnits);
+			rsc->setNumVertexTextureUnits(static_cast<ushort>(vUnits));
+			if (vUnits > 0)
+			{
+				rsc->setCapability(RSC_VERTEX_TEXTURE_FETCH);
+			}
+			// GL always shares vertex and fragment texture units (for now?)
+			rsc->setVertexTextureUnitsShared(true);
 		}
-		// GL always shares vertex and fragment texture units (for now?)
-		rsc->setVertexTextureUnitsShared(true);
 
 		// Mipmap LOD biasing?
 		if (GLEW_VERSION_1_4 || GLEW_EXT_texture_lod_bias)
@@ -1323,6 +1335,9 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void GLRenderSystem::_setPointSpritesEnabled(bool enabled)
 	{
+		if (!getCapabilities()->hasCapability(RSC_POINT_SPRITES))
+			return;
+
 		if (enabled)
 		{
 			glEnable(GL_POINT_SPRITE);
@@ -1336,11 +1351,11 @@ namespace Ogre {
 		// Don't offer this as an option since D3D links it to sprite enabled
 		for (ushort i = 0; i < mFixedFunctionTextureUnits; ++i)
 		{
-			glActiveTextureARB(GL_TEXTURE0 + i);
+			activateGLTextureUnit(i);
 			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, 
 				enabled ? GL_TRUE : GL_FALSE);
 		}
-		glActiveTextureARB(GL_TEXTURE0);
+		activateGLTextureUnit(0);
 
 	}
 	//-----------------------------------------------------------------------------
@@ -1350,7 +1365,9 @@ namespace Ogre {
 
 		GLenum lastTextureType = mTextureTypes[stage];
 
-		glActiveTextureARB( GL_TEXTURE0 + stage );
+		if (!activateGLTextureUnit(stage))
+			return;
+
 		if (enabled)
 		{
 			if (!tex.isNull())
@@ -1395,7 +1412,7 @@ namespace Ogre {
 			glBindTexture (GL_TEXTURE_2D, 0); 
 		}
 
-		glActiveTextureARB( GL_TEXTURE0 );
+		activateGLTextureUnit(0);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -1425,7 +1442,8 @@ namespace Ogre {
 		GLfloat eyePlaneR[] = {0.0, 0.0, 1.0, 0.0};
 		GLfloat eyePlaneQ[] = {0.0, 0.0, 0.0, 1.0};
 
-		glActiveTextureARB( GL_TEXTURE0 + stage );
+		if (!activateGLTextureUnit(stage))
+			return;
 
 		switch( m )
 		{
@@ -1548,7 +1566,7 @@ namespace Ogre {
 		default:
 			break;
 		}
-		glActiveTextureARB( GL_TEXTURE0 );
+		activateGLTextureUnit(0);
 	}
 	//-----------------------------------------------------------------------------
 	GLint GLRenderSystem::getTextureAddressingMode(
@@ -1571,31 +1589,36 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw)
 	{
-		glActiveTextureARB( GL_TEXTURE0 + stage );
+		if (!activateGLTextureUnit(stage))
+			return;
 		glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_S, 
 			getTextureAddressingMode(uvw.u));
 		glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_T, 
 			getTextureAddressingMode(uvw.v));
 		glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_R, 
 			getTextureAddressingMode(uvw.w));
-		glActiveTextureARB( GL_TEXTURE0 );
+		activateGLTextureUnit(0);
 	}
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setTextureBorderColour(size_t stage, const ColourValue& colour)
 	{
 		GLfloat border[4] = { colour.r, colour.g, colour.b, colour.a };
-		glActiveTextureARB( GL_TEXTURE0 + stage );
-		glTexParameterfv( mTextureTypes[stage], GL_TEXTURE_BORDER_COLOR, border);
-		glActiveTextureARB( GL_TEXTURE0 );
+		if (activateGLTextureUnit(stage))
+		{
+			glTexParameterfv( mTextureTypes[stage], GL_TEXTURE_BORDER_COLOR, border);
+			activateGLTextureUnit(0);
+		}
 	}
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setTextureMipmapBias(size_t stage, float bias)
 	{
 		if (mCurrentCapabilities->hasCapability(RSC_MIPMAP_LOD_BIAS))
 		{
-			glActiveTextureARB( GL_TEXTURE0 + stage );
-			glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, bias);
-			glActiveTextureARB( GL_TEXTURE0 );
+			if (activateGLTextureUnit(stage))
+			{
+				glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, bias);
+				activateGLTextureUnit(0);
+			}
 		}
 
 	}
@@ -1611,7 +1634,8 @@ namespace Ogre {
 		GLfloat mat[16];
 		makeGLMatrix(mat, xform);
 
-		glActiveTextureARB(GL_TEXTURE0 + stage);
+		if (!activateGLTextureUnit(stage))
+			return;
 		glMatrixMode(GL_TEXTURE);
 
 		// Load this matrix in
@@ -1624,7 +1648,7 @@ namespace Ogre {
 		}
 
 		glMatrixMode(GL_MODELVIEW);
-		glActiveTextureARB(GL_TEXTURE0);
+		activateGLTextureUnit(0);
 	}
 	//-----------------------------------------------------------------------------
 	GLint GLRenderSystem::getBlendMode(SceneBlendFactor ogreBlend) const
@@ -2221,7 +2245,8 @@ namespace Ogre {
 	void GLRenderSystem::_setTextureUnitFiltering(size_t unit, 
 		FilterType ftype, FilterOptions fo)
 	{
-		glActiveTextureARB( GL_TEXTURE0 + unit );
+		if (!activateGLTextureUnit(unit))
+			return;
 		switch(ftype)
 		{
 		case FT_MIN:
@@ -2261,7 +2286,7 @@ namespace Ogre {
 			break;
 		}
 
-		glActiveTextureARB( GL_TEXTURE0 );
+		activateGLTextureUnit(0);
 	}
 	//---------------------------------------------------------------------
 	GLfloat GLRenderSystem::_getCurrentAnisotropy(size_t unit)
@@ -2426,7 +2451,8 @@ namespace Ogre {
 			cmd = 0;
 		}
 
-		glActiveTextureARB(GL_TEXTURE0 + stage);
+		if (!activateGLTextureUnit(stage))
+			return;
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
 
 		if (bm.blendType == LBT_COLOUR)
@@ -2504,7 +2530,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		if (bm.source2 == LBS_MANUAL)
 			glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, cv2);
 
-		glActiveTextureARB(GL_TEXTURE0);
+		activateGLTextureUnit(0);
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::setGLLightPositionDirection(Light* lt, GLenum lightindex)
@@ -2550,6 +2576,8 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		RenderSystem::_render(op);
 
 		void* pBufferData = 0;
+		bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
+
 
         const VertexDeclaration::VertexElementList& decl = 
             op.vertexData->vertexDeclaration->getElements();
@@ -2645,7 +2673,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
  					if (mCurrentVertexProgram)
  					{
  						// Programmable pipeline - direct UV assignment
- 						glClientActiveTextureARB(GL_TEXTURE0 + elem->getIndex());
+						glClientActiveTextureARB(GL_TEXTURE0 + elem->getIndex());
  						glTexCoordPointer(
  							VertexElement::getTypeCount(elem->getType()), 
  							GLHardwareBufferManager::getGLType(elem->getType()),
@@ -2660,9 +2688,10 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
  						{
  							// Only set this texture unit's texcoord pointer if it
  							// is supposed to be using this element's index
- 							if (mTextureCoordIndex[i] == elem->getIndex())
+ 							if (mTextureCoordIndex[i] == elem->getIndex() && i < mFixedFunctionTextureUnits)
  							{
- 								glClientActiveTextureARB(GL_TEXTURE0 + i);
+								if (multitexturing)
+ 									glClientActiveTextureARB(GL_TEXTURE0 + i);
  								glTexCoordPointer(
  									VertexElement::getTypeCount(elem->getType()), 
  									GLHardwareBufferManager::getGLType(elem->getType()),
@@ -2680,7 +2709,8 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
   
         }
 
-		glClientActiveTextureARB(GL_TEXTURE0);
+		if (multitexturing)
+			glClientActiveTextureARB(GL_TEXTURE0);
 
 		// Find the correct type to render
 		GLint primType;
@@ -2758,12 +2788,19 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		}
 
         glDisableClientState( GL_VERTEX_ARRAY );
-        for (int i = 0; i < OGRE_MAX_TEXTURE_COORD_SETS; i++)
-        {
-            glClientActiveTextureARB(GL_TEXTURE0 + i);
-            glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-        }
-        glClientActiveTextureARB(GL_TEXTURE0);
+		// only valid up to GL_MAX_TEXTURE_COORDS, which is recorded in mFixedFunctionTextureUnits
+		if (multitexturing)
+		{
+			for (int i = 0; i < mFixedFunctionTextureUnits; i++)
+			{
+				glClientActiveTextureARB(GL_TEXTURE0 + i);
+			}
+			glClientActiveTextureARB(GL_TEXTURE0);
+		}
+		else
+		{
+			glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+		}
         glDisableClientState( GL_NORMAL_ARRAY );
         glDisableClientState( GL_COLOR_ARRAY );
 		if (GLEW_EXT_secondary_color)
@@ -3164,11 +3201,17 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	//---------------------------------------------------------------------
 	void GLRenderSystem::_oneTimeContextInitialization()
 	{
-		// Set nicer lighting model -- d3d9 has this by default
-		glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
-		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);        
-		glEnable(GL_COLOR_SUM);
-		glDisable(GL_DITHER);
+		if (GLEW_VERSION_1_2)
+		{
+			// Set nicer lighting model -- d3d9 has this by default
+			glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
+			glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);        
+		}
+		if (GLEW_VERSION_1_4)
+		{
+			glEnable(GL_COLOR_SUM);
+			glDisable(GL_DITHER);
+		}
 
 		// Check for FSAA
 		// Enable the extension if it was enabled by the GLSupport
@@ -3245,18 +3288,21 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		// Bind frame buffer object
 		mRTTManager->bind(target);
 
-		// Enable / disable sRGB states
-		if (target->isHardwareGammaEnabled())
+		if (GLEW_VERSION_1_2)
 		{
-			glEnable(GL_FRAMEBUFFER_SRGB_EXT);
-			
-			// Note: could test GL_FRAMEBUFFER_SRGB_CAPABLE_EXT here before
-			// enabling, but GL spec says incapable surfaces ignore the setting
-			// anyway. We test the capability to enable isHardwareGammaEnabled.
-		}
-		else
-		{
-			glDisable(GL_FRAMEBUFFER_SRGB_EXT);
+			// Enable / disable sRGB states
+			if (target->isHardwareGammaEnabled())
+			{
+				glEnable(GL_FRAMEBUFFER_SRGB_EXT);
+				
+				// Note: could test GL_FRAMEBUFFER_SRGB_CAPABLE_EXT here before
+				// enabling, but GL spec says incapable surfaces ignore the setting
+				// anyway. We test the capability to enable isHardwareGammaEnabled.
+			}
+			else
+			{
+				glDisable(GL_FRAMEBUFFER_SRGB_EXT);
+			}
 		}
 	}
 	//---------------------------------------------------------------------
@@ -3334,6 +3380,24 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	{
 		// reacquire context
 		mCurrentContext->setCurrent();
+	}
+	//---------------------------------------------------------------------
+	bool GLRenderSystem::activateGLTextureUnit(size_t unit)
+	{
+		if (GLEW_VERSION_1_2 && unit < getCapabilities()->getNumTextureUnits())
+		{
+			glActiveTextureARB(GL_TEXTURE0 + unit);
+			return true;
+		}
+		else if (!unit)
+		{
+			// always ok to use the first unit
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 
