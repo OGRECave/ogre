@@ -31,6 +31,9 @@ Torus Knot Software Ltd.
 #include "OgreGLHardwareIndexBuffer.h"
 #include "OgreGLRenderToVertexBuffer.h"
 #include "OgreHardwareBuffer.h"
+#include "OgreRoot.h"
+#include "OgreRenderSystem.h"
+#include "OgreRenderSystemCapabilities.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -45,7 +48,8 @@ namespace Ogre {
 	#define SCRATCH_POOL_SIZE 1 * 1024 * 1024
 	#define SCRATCH_ALIGNMENT 32
 	//---------------------------------------------------------------------
-    GLHardwareBufferManager::GLHardwareBufferManager() : mMapBufferThreshold(OGRE_GL_MAP_BUFFER_THRESHOLD)
+    GLHardwareBufferManager::GLHardwareBufferManager() 
+		: mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
     {
 		// Init scratch pool
 		// TODO make it a configurable size?
@@ -64,7 +68,7 @@ namespace Ogre {
 		// Win32 machines with ATI GPU are having issues glMapBuffer, looks like buffer corruption
 		// disable for now until we figure out where the problem lies			
 #	if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		if (!GLEW_NV_point_sprite) // if not NVIDIA...
+		if (Root::getSingleton().getRenderSystem()->getCapabilities()->getVendor() == GPU_ATI) 
 		{
 			mMapBufferThreshold = 0xffffffffUL  /* maximum unsigned long value */;
 		}
