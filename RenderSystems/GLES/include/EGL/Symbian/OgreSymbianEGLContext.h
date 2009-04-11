@@ -4,6 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
+Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2006 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
@@ -26,21 +27,22 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#include "OgreConfigDialog.h"
-#include "OgreException.h"
-#include "OgreLogManager.h"
 
+#ifndef __SymbianEGLContext_H__
+#define __SymbianEGLContext_H__
+
+#include "OgreEGLContext.h"
 
 namespace Ogre {
+    class _OgrePrivate SymbianEGLContext: public EGLContext
+    {
+ 
+        public:
+            SymbianEGLContext(EGLDisplay eglDisplay, const EGLSupport* glsupport, ::EGLConfig fbconfig, ::EGLSurface drawable);
 
-ConfigDialog::ConfigDialog ()
-{
+            virtual ~SymbianEGLContext();
+            GLESContext* clone() const;
+    };
 }
 
-bool ConfigDialog::display(void)
-{
-	return true;
-}
-
-
-}
+#endif

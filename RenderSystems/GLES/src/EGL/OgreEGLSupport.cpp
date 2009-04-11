@@ -191,7 +191,7 @@ namespace Ogre {
         if(mGLDisplay == EGL_NO_DISPLAY)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Couldn`t open X display " + getDisplayName(),
+                        "Couldn`t open EGLDisplay " + getDisplayName(),
                         "EGLSupport::getGLDisplay");
         }
 

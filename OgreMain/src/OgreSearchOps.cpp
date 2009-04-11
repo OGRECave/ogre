@@ -37,7 +37,8 @@ Torus Knot Software Ltd.
 #if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
 #include "OgreString.h"
 
-
+// SYMBIAN todo - possibly use - CDirScan from C:\Symbian\9.2\S60_3rd_FP1\Epoc32\include\f32file.h
+// see this sample - http://wiki.forum.nokia.com/index.php/Find_Files
 
 bool fnmatch (Ogre::String pattern, Ogre::String name, int dummy)
 {
@@ -50,7 +51,14 @@ bool fnmatch (Ogre::String pattern, Ogre::String name, int dummy)
 		Ogre::StringUtil::toLowerCase(pattern);
 		Ogre::StringUtil::toLowerCase(name);
 		Ogre::String extToFind = pattern.substr(2, pattern.size() - 2);
-		return (name.size() > extToFind.size()) &&(extToFind == name.substr(name.size() - extToFind.size(), extToFind.size()));
+		if ((name.size() > extToFind.size()) &&(extToFind == name.substr(name.size() - extToFind.size(), extToFind.size())))
+		{
+			return 0; // match
+		}
+		else
+		{
+			return 1; // don't match
+		}
 	}
 	return false;
 }

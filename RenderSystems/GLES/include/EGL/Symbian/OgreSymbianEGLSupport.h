@@ -1,9 +1,10 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
+Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2006 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
@@ -26,21 +27,33 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#include "OgreConfigDialog.h"
-#include "OgreException.h"
-#include "OgreLogManager.h"
 
+#ifndef __SymbianEGLSupport_H__
+#define __SymbianEGLSupport_H__
+
+
+#include "OgreEGLSupport.h"
 
 namespace Ogre {
+    class _OgrePrivate SymbianEGLSupport : public EGLSupport
+    {
+		protected:
+			virtual EGLWindow* createEGLWindow( EGLSupport * support);
+        public:
+            SymbianEGLSupport();
+            virtual ~SymbianEGLSupport();
 
-ConfigDialog::ConfigDialog ()
-{
+			virtual GLESPBuffer* createPBuffer(PixelComponentType format,
+				size_t width, size_t height);
+			virtual void switchMode(uint& width, uint& height, short& frequency);
+
+			virtual RenderWindow* newWindow(const String &name,
+				unsigned int width, unsigned int height,
+				bool fullScreen,
+				const NameValuePairList *miscParams = 0);
+
+
+	};
 }
 
-bool ConfigDialog::display(void)
-{
-	return true;
-}
-
-
-}
+#endif

@@ -85,6 +85,13 @@ namespace Ogre {
 
 		// Wrap as a stream
 		DataStreamPtr stream(OGRE_NEW FileStreamDataStream(filename, &fp, false));
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
+		// seems readLine doesn't work correctly in SYMBIAN with files
+		DataStreamPtr memoryStream(OGRE_NEW MemoryDataStream(stream));
+		stream = memoryStream;
+#endif
+
 		load(stream, separators, trimWhitespace);
 
 	}

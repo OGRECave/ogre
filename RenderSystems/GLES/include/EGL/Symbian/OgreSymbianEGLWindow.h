@@ -4,6 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
+Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2006 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
@@ -26,21 +27,35 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#include "OgreConfigDialog.h"
-#include "OgreException.h"
-#include "OgreLogManager.h"
 
+#ifndef __SymbianEGLWindow_H__
+#define __SymbianEGLWindow_H__
+
+#include "OgreEGLWindow.h"
 
 namespace Ogre {
+    class _OgrePrivate SymbianEGLWindow : public EGLWindow
+    {
+	protected:
 
-ConfigDialog::ConfigDialog ()
-{
+		virtual EGLContext * createEGLContext() const;
+		virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
+		virtual void initNativeCreatedWindow(const NameValuePairList *miscParams);
+		virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
+		virtual void reposition(int left, int top);
+		virtual void resize(unsigned int width, unsigned int height);
+		virtual void windowMovedOrResized();
+		virtual void switchFullScreen(bool fullscreen);
+
+    public:
+		SymbianEGLWindow(EGLSupport* glsupport);
+		virtual ~SymbianEGLWindow();
+
+		void create(const String& name, unsigned int width, unsigned int height,
+		                        bool fullScreen, const NameValuePairList *miscParams);
+
+
+    };
 }
 
-bool ConfigDialog::display(void)
-{
-	return true;
-}
-
-
-}
+#endif
