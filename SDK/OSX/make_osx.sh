@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OGRE_VERSION="v1.6.1"
+OGRE_VERSION="v1.6.2"
 # Only build for i386, halves the size
 ARCH="i386"
 REMOVE_ARCH="ppc"

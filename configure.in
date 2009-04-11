@@ -1,11 +1,11 @@
 AC_PREREQ(2.50)
 
-AC_INIT([OGRE], [1.6.1])
+AC_INIT([OGRE], [1.6.2])
 
 AC_CANONICAL_TARGET
 
 # New syntax; PACKAGE gets defined as 'OGRE' not 'ogre'
-AM_INIT_AUTOMAKE([OGRE], 1.6.1)
+AM_INIT_AUTOMAKE([OGRE], 1.6.2)
 AC_CONFIG_HEADERS([OgreMain/include/config.h])
 
 dnl Check for programs
