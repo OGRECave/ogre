@@ -59,6 +59,7 @@ namespace Ogre {
         // This makes it the same as OpenGL and other right-handed systems
         , mCullingMode(CULL_CLOCKWISE)
         , mVSync(true)
+		, mVSyncInterval(1)
 		, mWBuffer(false)
         , mInvertVertexWinding(false)
         , mDisabledTexUnitsFrom(0)

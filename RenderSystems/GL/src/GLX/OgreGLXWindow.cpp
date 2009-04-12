@@ -111,6 +111,7 @@ namespace Ogre
 		uint samples = 0;
 		short frequency = 0;
 		bool vsync = false;
+		unsigned int vsyncInterval = 1;
 		int gamma = 0;
 		::GLXContext glxContext = 0;
 		::GLXDrawable glxDrawable = 0;
@@ -154,6 +155,9 @@ namespace Ogre
 			
 			if((opt = miscParams->find("vsync")) != end) 
 				vsync = StringConverter::parseBool(opt->second);
+
+			if((opt = miscParams->find("vsyncInterval")) != end) 
+				vsyncInterval = StringConverter::parseUnsignedInt(opt->second);
 
 			if ((opt = miscParams->find("gamma")) != end)
 				gamma = StringConverter::parseBool(opt->second);
@@ -413,7 +417,7 @@ namespace Ogre
 		
 		if (! mIsExternalGLControl && GLXEW_SGI_swap_control)
 		{
-			glXSwapIntervalSGI (vsync ? 1 : 0);
+			glXSwapIntervalSGI (vsync ? vsyncInterval : 0);
 		}
 		
 		mContext->endCurrent();

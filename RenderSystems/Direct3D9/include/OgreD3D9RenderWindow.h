@@ -106,6 +106,7 @@ namespace Ogre
 		DWORD						mFSAAQuality;			// AA quality.
 		UINT						mDisplayFrequency;		// Display frequency.
 		bool						mVSync;					// Use vertical sync or not.
+		unsigned int				mVSyncInterval;		
 		bool						mUseNVPerfHUD;			// Use NV Perf HUD.
 
 		void updateWindowRect();

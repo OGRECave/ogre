@@ -72,6 +72,7 @@ namespace Ogre
 		mFSAAQuality = 0;
 		mFSAA = 0;
 		mVSync = false;
+		mVSyncInterval = 1;
 		String title = name;
 		unsigned int colourDepth = 32;
 		int left = -1; // Defaults to screen center
@@ -112,6 +113,10 @@ namespace Ogre
 			opt = miscParams->find("vsync");
 			if(opt != miscParams->end())
 				mVSync = StringConverter::parseBool(opt->second);
+			// vsyncInterval	[parseUnsignedInt]
+			opt = miscParams->find("vsyncInterval");
+			if(opt != miscParams->end())
+				mVSyncInterval = StringConverter::parseUnsignedInt(opt->second);
 			// displayFrequency
 			opt = miscParams->find("displayFrequency");
 			if(opt != miscParams->end())
@@ -466,7 +471,37 @@ namespace Ogre
 
 		if (mVSync)
 		{
-			presentParams->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+			// D3D9 only seems to support 2-4 presentation intervals in fullscreen
+			if (mIsFullScreen)
+			{
+				switch(mVSyncInterval)
+				{
+				case 1:
+				default:
+					presentParams->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+					break;
+				case 2:
+					presentParams->PresentationInterval = D3DPRESENT_INTERVAL_TWO;
+					break;
+				case 3:
+					presentParams->PresentationInterval = D3DPRESENT_INTERVAL_THREE;
+					break;
+				case 4:
+					presentParams->PresentationInterval = D3DPRESENT_INTERVAL_FOUR;
+					break;
+				};
+				// check that the interval was supported, revert to 1 to be safe otherwise
+				D3DCAPS9 caps;
+				pD3D->GetDeviceCaps(mDevice->getAdapterNumber(), devType, &caps);
+				if (!(caps.PresentationIntervals & presentParams->PresentationInterval))
+					presentParams->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+
+			}
+			else
+			{
+				presentParams->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+			}
+
 		}
 		else
 		{

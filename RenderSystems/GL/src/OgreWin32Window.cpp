@@ -94,6 +94,7 @@ namespace Ogre {
 		HWND parent = 0;
 		String title = name;
 		bool vsync = false;
+		unsigned int vsyncInterval = 1;
 		String border;
 		bool outerSize = false;
 		bool hwGamma = false;
@@ -120,6 +121,9 @@ namespace Ogre {
 
 			if ((opt = miscParams->find("vsync")) != end)
 				vsync = StringConverter::parseBool(opt->second);
+
+			if ((opt = miscParams->find("vsyncInterval")) != end)
+				vsyncInterval = StringConverter::parseUnsignedInt(opt->second);
 
 			if ((opt = miscParams->find("FSAA")) != end)
 				mFSAA = StringConverter::parseUnsignedInt(opt->second);
@@ -419,7 +423,7 @@ namespace Ogre {
 			PFNWGLSWAPINTERVALEXTPROC _wglSwapIntervalEXT = 
 				(PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
 			if (_wglSwapIntervalEXT)
-				_wglSwapIntervalEXT(vsync? 1 : 0);
+				_wglSwapIntervalEXT(vsync? vsyncInterval : 0);
 		}
 
         if (old_context && old_context != mGlrc)

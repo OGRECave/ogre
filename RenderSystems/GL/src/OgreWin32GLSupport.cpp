@@ -52,6 +52,7 @@ namespace Ogre {
 		ConfigOption optColourDepth;
 		ConfigOption optDisplayFrequency;
 		ConfigOption optVSync;
+		ConfigOption optVSyncInterval;
 		ConfigOption optFSAA;
 		ConfigOption optRTTMode;
 		ConfigOption optSRGB;
@@ -94,6 +95,14 @@ namespace Ogre {
 		optVSync.possibleValues.push_back("Yes");
 		optVSync.currentValue = "No";
 
+		optVSyncInterval.name = "VSync Interval";
+		optVSyncInterval.immutable = false;
+		optVSyncInterval.possibleValues.push_back( "1" );
+		optVSyncInterval.possibleValues.push_back( "2" );
+		optVSyncInterval.possibleValues.push_back( "3" );
+		optVSyncInterval.possibleValues.push_back( "4" );
+		optVSyncInterval.currentValue = "1";
+
 		optFSAA.name = "FSAA";
 		optFSAA.immutable = false;
 		optFSAA.possibleValues.push_back("0");
@@ -130,6 +139,7 @@ namespace Ogre {
 		mOptions[optColourDepth.name] = optColourDepth;
 		mOptions[optDisplayFrequency.name] = optDisplayFrequency;
 		mOptions[optVSync.name] = optVSync;
+		mOptions[optVSyncInterval.name] = optVSyncInterval;
 		mOptions[optFSAA.name] = optFSAA;
 		mOptions[optRTTMode.name] = optRTTMode;
 		mOptions[optSRGB.name] = optSRGB;
@@ -247,6 +257,12 @@ namespace Ogre {
 			bool vsync = (opt->second.currentValue == "Yes");
 			winOptions["vsync"] = StringConverter::toString(vsync);
 			renderSystem->setWaitForVerticalBlank(vsync);
+
+			opt = mOptions.find("VSync Interval");
+			if (opt == mOptions.end())
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync Interval options!", "Win32GLSupport::createWindow");
+			winOptions["vsyncInterval"] = opt->second.currentValue;
+
 
 			opt = mOptions.find("Display Frequency");
 			if (opt != mOptions.end())

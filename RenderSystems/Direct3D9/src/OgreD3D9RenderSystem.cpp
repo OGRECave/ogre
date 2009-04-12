@@ -181,6 +181,7 @@ namespace Ogre
 		ConfigOption optVideoMode;
 		ConfigOption optFullScreen;
 		ConfigOption optVSync;
+		ConfigOption optVSyncInterval;
 		ConfigOption optAA;
 		ConfigOption optFPUMode;
 		ConfigOption optNVPerfHUD;
@@ -231,6 +232,14 @@ namespace Ogre
 		optVSync.possibleValues.push_back( "No" );
 		optVSync.currentValue = "No";
 
+		optVSyncInterval.name = "VSync Interval";
+		optVSyncInterval.immutable = false;
+		optVSyncInterval.possibleValues.push_back( "1" );
+		optVSyncInterval.possibleValues.push_back( "2" );
+		optVSyncInterval.possibleValues.push_back( "3" );
+		optVSyncInterval.possibleValues.push_back( "4" );
+		optVSyncInterval.currentValue = "1";
+
 		optAA.name = "FSAA";
 		optAA.immutable = false;
 		optAA.possibleValues.push_back( "None" );
@@ -265,6 +274,7 @@ namespace Ogre
 		mOptions[optVideoMode.name] = optVideoMode;
 		mOptions[optFullScreen.name] = optFullScreen;
 		mOptions[optVSync.name] = optVSync;
+		mOptions[optVSyncInterval.name] = optVSyncInterval;
 		mOptions[optAA.name] = optAA;
 		mOptions[optFPUMode.name] = optFPUMode;
 		mOptions[optNVPerfHUD.name] = optNVPerfHUD;
@@ -371,6 +381,11 @@ namespace Ogre
 				mVSync = true;
 			else
 				mVSync = false;
+		}
+
+		if( name == "VSync Interval" )
+		{
+			mVSyncInterval = StringConverter::parseUnsignedInt(value);
 		}
 
 		if( name == "Allow NVPerfHUD" )
@@ -590,6 +605,7 @@ namespace Ogre
 			miscParams["FSAA"] = StringConverter::toString(mFSAASamples);
 			miscParams["FSAAHint"] = mFSAAHint;
 			miscParams["vsync"] = StringConverter::toString(mVSync);
+			miscParams["vsyncInterval"] = StringConverter::toString(mVSyncInterval);
 			miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
 			miscParams["gamma"] = StringConverter::toString(hwGamma);
 			miscParams["monitorIndex"] = StringConverter::toString(static_cast<int>(mActiveD3DDriver->getAdapterNumber()));
