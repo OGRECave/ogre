@@ -29,6 +29,8 @@ Torus Knot Software Ltd.
 #include "OgrePageManager.h"
 #include "OgrePagedWorld.h"
 #include "OgrePageStrategy.h"
+#include "OgrePageContentCollectionFactory.h"
+#include "OgrePageContentFactory.h"
 #include "OgreStringConverter.h"
 #include "OgreException.h"
 #include "OgrePageRequestQueue.h"
@@ -205,6 +207,66 @@ namespace Ogre
 	const PageManager::StrategyMap& PageManager::getStrategies() const
 	{
 		return mStrategies;
+	}
+	//---------------------------------------------------------------------
+	void PageManager::addContentCollectionFactory(PageContentCollectionFactory* f)
+	{
+		// note - deliberately allowing overriding
+		mContentCollectionFactories[f->getName()] = f;
+	}
+	//---------------------------------------------------------------------
+	void PageManager::removeContentCollectionFactory(PageContentCollectionFactory* f)
+	{
+		ContentCollectionFactoryMap::iterator i = mContentCollectionFactories.find(f->getName());
+		if (i != mContentCollectionFactories.end() && i->second == f)
+		{
+			mContentCollectionFactories.erase(i);
+		}
+	}
+	//---------------------------------------------------------------------
+	PageContentCollectionFactory* PageManager::getContentCollectionFactory(const String& name)
+	{
+		ContentCollectionFactoryMap::iterator i = mContentCollectionFactories.find(name);
+		if (i != mContentCollectionFactories.end())
+			return i->second;
+		else
+			return 0;
+
+	}
+	//---------------------------------------------------------------------
+	const PageManager::ContentCollectionFactoryMap& PageManager::getContentCollectionFactories() const
+	{
+		return mContentCollectionFactories;
+	}
+	//---------------------------------------------------------------------
+	void PageManager::addContentFactory(PageContentFactory* f)
+	{
+		// note - deliberately allowing overriding
+		mContentFactories[f->getName()] = f;
+	}
+	//---------------------------------------------------------------------
+	void PageManager::removeContentFactory(PageContentFactory* f)
+	{
+		ContentFactoryMap::iterator i = mContentFactories.find(f->getName());
+		if (i != mContentFactories.end() && i->second == f)
+		{
+			mContentFactories.erase(i);
+		}
+	}
+	//---------------------------------------------------------------------
+	PageContentFactory* PageManager::getContentFactory(const String& name)
+	{
+		ContentFactoryMap::iterator i = mContentFactories.find(name);
+		if (i != mContentFactories.end())
+			return i->second;
+		else
+			return 0;
+
+	}
+	//---------------------------------------------------------------------
+	const PageManager::ContentFactoryMap& PageManager::getContentFactories() const
+	{
+		return mContentFactories;
 	}
 	//---------------------------------------------------------------------
 	StreamSerialiser* PageManager::_readPageStream(PageID pageID, PagedWorldSection* section)

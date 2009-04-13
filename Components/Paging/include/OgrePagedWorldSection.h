@@ -270,6 +270,10 @@ namespace Ogre
 		*/
 		StreamSerialiser* _writePageStream(PageID pageID);
 
+		/** Function for writing to a stream.
+		*/
+		_OgrePagingExport friend std::ostream& operator <<( std::ostream& o, const PagedWorldSection& p );
+
 	};
 
 	/** @} */

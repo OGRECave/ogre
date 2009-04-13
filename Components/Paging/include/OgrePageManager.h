@@ -207,6 +207,51 @@ namespace Ogre
 		/** Get a reference to the registered strategies.
 		*/
 		const StrategyMap& getStrategies() const;
+
+
+		typedef map<String, PageContentCollectionFactory*>::type ContentCollectionFactoryMap;
+		/** Add a new PageContentCollectionFactory implementation. 
+		@remarks
+		The caller remains resonsible for destruction of this instance. 
+		*/
+		void addContentCollectionFactory(PageContentCollectionFactory* f);
+
+		/** Remove a PageContentCollectionFactory implementation. 
+		*/
+		void removeContentCollectionFactory(PageContentCollectionFactory* f);
+
+		/** Get a PageContentCollectionFactory.
+		@param name The name of the factory to retrieve
+		@returns Pointer to a PageContentCollectionFactory, or null if the ContentCollection was not found.
+		*/
+		PageContentCollectionFactory* getContentCollectionFactory(const String& name);
+
+		/** Get a reference to the registered strategies.
+		*/
+		const ContentCollectionFactoryMap& getContentCollectionFactories() const;
+
+		typedef map<String, PageContentFactory*>::type ContentFactoryMap;
+		/** Add a new PageContentFactory implementation. 
+		@remarks
+		The caller remains resonsible for destruction of this instance. 
+		*/
+		void addContentFactory(PageContentFactory* f);
+
+		/** Remove a PageContentFactory implementation. 
+		*/
+		void removeContentFactory(PageContentFactory* f);
+
+		/** Get a PageContentFactory.
+		@param name The name of the factory to retrieve
+		@returns Pointer to a PageContentFactory, or null if the Content was not found.
+		*/
+		PageContentFactory* getContentFactory(const String& name);
+
+		/** Get a reference to the registered strategies.
+		*/
+		const ContentFactoryMap& getContentFactories() const;
+
+
 		/// Get the request queue
 		PageRequestQueue* getQueue() const { return mQueue; }
 
@@ -355,6 +400,8 @@ namespace Ogre
 
 		WorldMap mWorlds;
 		StrategyMap mStrategies;
+		ContentCollectionFactoryMap mContentCollectionFactories;
+		ContentFactoryMap mContentFactories;
 		NameGenerator mWorldNameGenerator;
 		PageRequestQueue* mQueue;
 		PageProvider* mPageProvider;

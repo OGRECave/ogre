@@ -31,7 +31,7 @@ Torus Knot Software Ltd.
 #define __Ogre_Page_H__
 
 #include "OgrePagingPrerequisites.h"
-#include "OgreAtomicWrappers.h"
+#include "OgrePageLoadableUnit.h"
 
 
 namespace Ogre
@@ -46,39 +46,28 @@ namespace Ogre
 
 	/** Page class
 	*/
-	class Page : public PageAlloc
+	class Page : public PageLoadableUnit
 	{
 	public:
-		/** Status of the Page. 
-		*/
-		enum Status
-		{
-			/// Just defined, not loaded
-			STATUS_UNLOADED,
-			/// In the process of getting / generating data for the page
-			STATUS_PREPARING, 
-			/** At this stage all data has been read, and all non-GPU tasks have been done. 
-				This is the end of the background thread's involvement.
-			*/
-			STATUS_PREPARED, 
-			/// Finalising the load in the main render thread
-			STATUS_LOADING,
-			/// Data loaded / generated 
-			STATUS_LOADED, 
-			/// Unloading in main render thread (goes back to STATUS_PREPARED)
-			STATUS_UNLOADING,
-			/// Unpreparing, potentially in a background thread (goes back to STATUS_UNLOADED)
-			STATUS_UNPREPARING
-		};
+		typedef vector<PageContentCollection*>::type ContentCollectionList;
 	protected:
 		PageID mID;
 		PagedWorldSection* mParent;
 		unsigned long mFrameLastHeld;
-		AtomicScalar<Status> mStatus;
+		ContentCollectionList mContentCollections;
 
 		SceneNode* mDebugNode;
 		void updateDebugDisplay();
+
+		bool prepareImpl(StreamSerialiser& stream);
+		void loadImpl();
+		void unprepareImpl();
+		void unloadImpl();
+
 	public:
+		static const uint32 CHUNK_ID;
+		static const uint16 CHUNK_VERSION;
+
 		Page(PageID pageID);
 		virtual ~Page();
 
@@ -98,83 +87,18 @@ namespace Ogre
 		virtual bool isAttached() const { return mParent != 0; }
 
 
-		/** Read page data from a serialiser (returns true if successful) & prepare.
-		@remarks
-			'prepare' means to pull data in from a file, and to do as much processing
-			on it as required to be ready to create GPU resources. Since this method can 
-			be called from a non-render thread, this implementation must not access
-			any GPU resources.
-		*/
-		bool prepare(StreamSerialiser& stream);
-		/** Finalise the loading of the data.
-		@remarks
-			This implementation will finalise any work done in prepare() and create
-			or access any GPU resources. This method will be called from the main
-			render thread.
-		*/
-		void load();
-
-		/** Deallocate any background resources.
-		@remarks
-			This method may be called in a background, non-render thread after 
-			unload() therefore should only deallocate non-GPU resources. 
-			GPU resources should be freed in unload(). 
-
-		*/
-		void unprepare();
-
-		/** Unload the Page, deallocating any GPU resources. 
-		@remarks
-			This method will be called in the main render thread just before the unprepare()
-			call (which may be done in the background). Any GPU-dependent 
-			instances must be cleaned up in this call, anything else can be done
-			in the unprepare() call.
-		*/
-		void unload();
-
 		/** Returns whether this page was 'held' in the last frame, that is
 			was it either directly needed, or requested to stay in memory (held - as
 			in a buffer region for example). If not, this page is eligible for 
 			removal.
 		*/
-		bool isHeld() const;
-
-		/// Mark a page as preparing (internal use)
-		void _markPreparing();
-		/// Mark a page as prepared (internal use)
-		void _markPrepared();
-		/// Mark a page as loading (internal use)
-		void _markLoading();
-		/// Mark a page as loaded (internal use)
-		void _markLoaded();
-		/// Mark a page as unloading (internal use)
-		void _markUnloading();
-		/// Mark a page as unpreparing (internal use)
-		void _markUnpreparing();
-		/// Mark a page as unloaded (internal use)
-		void _markUnloaded();
+		virtual bool isHeld() const;
 
 		/// Save page data to a serialiser 
-		void save(StreamSerialiser& stream);
+		virtual void save(StreamSerialiser& stream);
 
 		/// Internal method to notify a page that it is attached
 		virtual void _notifyAttached(PagedWorldSection* parent);
-
-		/** Returns true if the Page has been fully loaded, false otherwise.
-		*/
-		virtual bool isLoaded() const { return (mStatus.get() == STATUS_LOADED); }
-
-		/** Returns whether the resource is currently in the process of
-			loading.
-		*/
-		virtual bool isLoading() const
-		{
-			Status s = mStatus.get();
-			return (s == STATUS_LOADING || s == STATUS_PREPARING);
-		}
-
-		/// Returns the current status
-		virtual Status getStatus() const { return mStatus.get(); }
 
 		/// Called when the frame starts
 		virtual void frameStart(Real timeSinceLastFrame);
@@ -183,6 +107,28 @@ namespace Ogre
 		/// Notify a section of the current camera
 		virtual void notifyCamera(Camera* cam);
 
+		/** Add a content collection to this Page. 
+		@remarks
+			This class now becomes responsible for deleting this collection
+		*/
+		virtual void attachContentCollection(PageContentCollection* coll);
+		/** Remove a content collection from this Page. 
+		@remarks
+			This class ceases to be responsible for deleting this collection.
+		*/
+		virtual void detachContentCollection(PageContentCollection* coll);
+		/// Get the number of content collections
+		virtual size_t getContentCollectionCount() const;
+		/// Get a content collection
+		virtual PageContentCollection* getContentCollection(size_t index);
+		/// Get the list of content collections
+		const ContentCollectionList& getContentCollectionList() const;
+
+
+
+		/** Function for writing to a stream.
+		*/
+		_OgrePagingExport friend std::ostream& operator <<( std::ostream& o, const Page& p );
 
 
 	};

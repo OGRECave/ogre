@@ -39,7 +39,7 @@ namespace Ogre
 	class Page;
 	class PageConnection;
 	class PageContent;
-	class PageContendFactory;
+	class PageContentFactory;
 	class PageContentCollection;
 	class PageContentCollectionFactory;
 	class PagedWorld;

@@ -36,13 +36,32 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	/** \addtogroup Optional Components
+	*  @{
+	*/
+
 	/** \addtogroup Paging
 	*  Some details on paging component
 	*  @{
 	*/
 
+	/** Define the interface to a factory class that will create subclasses
+	of PageContent. 
+	*/
+	class PageContentFactory : public PageAlloc
+	{
+	public:
+		PageContentFactory() {}
+		virtual ~PageContentFactory() {}
+
+		virtual const String& getName() const = 0;
+		virtual PageContent* createInstance() = 0;
+		virtual void destroyInstance(PageContent*) = 0;
+
+	};
 
 
+	/** @} */
 	/** @} */
 }
 

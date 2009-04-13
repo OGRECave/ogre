@@ -214,6 +214,9 @@ namespace Ogre
 		/// Notify a world of the current camera
 		virtual void notifyCamera(Camera* cam);
 
+		/** Function for writing to a stream.
+		*/
+		_OgrePagingExport friend std::ostream& operator <<( std::ostream& o, const PagedWorld& p );
 
 
 	protected:

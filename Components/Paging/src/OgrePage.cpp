@@ -34,14 +34,19 @@ Torus Knot Software Ltd.
 #include "OgrePageManager.h"
 #include "OgreSceneNode.h"
 #include "OgreSceneManager.h"
+#include "OgreStreamSerialiser.h"
+#include "OgrePageContentCollectionFactory.h"
+#include "OgrePageContentCollection.h"
 
 namespace Ogre
 {
 	//---------------------------------------------------------------------
+	const uint32 Page::CHUNK_ID = StreamSerialiser::makeIdentifier("PAGE");
+	const uint16 Page::CHUNK_VERSION = 1;
+	//---------------------------------------------------------------------
 	Page::Page(PageID pageID)
 		: mID(pageID)
 		, mParent(0)
-		, mStatus(STATUS_UNLOADED)
 		, mDebugNode(0)
 	{
 		touch();
@@ -49,6 +54,14 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	Page::~Page()
 	{
+		destroy();
+
+		for (ContentCollectionList::iterator i = mContentCollections.begin(); 
+			i != mContentCollections.end(); ++i)
+		{
+			delete *i;
+		}
+		mContentCollections.clear();
 	}
 	//---------------------------------------------------------------------
 	void Page::_notifyAttached(PagedWorldSection* parent)
@@ -81,133 +94,148 @@ namespace Ogre
 			mFrameLastHeld + 1 == nextFrame);
 	}
 	//---------------------------------------------------------------------
-	bool Page::prepare(StreamSerialiser& stream)
+	bool Page::prepareImpl(StreamSerialiser& stream)
 	{
-		// Fast pre-check
-		if (mStatus.get() != STATUS_UNLOADED) 
-			return true;
-
-		// Set to loading
-		if (!mStatus.cas(STATUS_UNLOADED, STATUS_PREPARING))
-			return true;
 
 		// Now do the real loading
-		// TODO
+		const StreamSerialiser::Chunk* chunk = stream.readChunkBegin();
+		if (chunk->id != CHUNK_ID)
+		{
+			LogManager::getSingleton().stream() << "Error: Tried to populate Page ID " << mID
+				<< " with non-Page data; chunk ID: " << chunk->id;
+			stream.undoReadChunk(chunk->id);
+			return false;
+		}
+		else if (chunk->version > CHUNK_VERSION)
+		{
+			// skip the rest
+			stream.readChunkEnd(chunk->id);
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+				"Page data version exceeds what this software can read!", 
+				"Page::prepare");
+
+		}
+
+		// pageID check (we should know the ID we're expecting)
+		uint32 storedID;
+		stream.read(&storedID);
+		if (mID != storedID)
+		{
+			LogManager::getSingleton().stream() << "Error: Tried to populate Page ID " << mID
+				<< " with data corresponding to page ID " << storedID;
+			stream.undoReadChunk(chunk->id);
+			return false;
+		}
+
+		PageManager* mgr = mParent->getWorld()->getManager();
+		
+		while(stream.peekNextChunkID() == PageContentCollection::CHUNK_ID)
+		{
+			const StreamSerialiser::Chunk* collChunk = stream.readChunkBegin();
+			String factoryName;
+			stream.read(&factoryName);
+			// Supported type?
+			PageContentCollectionFactory* collFact = mgr->getContentCollectionFactory(factoryName);
+			if (collFact)
+			{
+				PageContentCollection* collInst = collFact->createInstance();
+				if (collInst->prepare(stream)) // read type-specific data
+				{
+					attachContentCollection(collInst);
+				}
+				else
+				{
+					LogManager::getSingleton().stream() << "Error preparing PageContentCollection type: " 
+						<< factoryName << " in " << *this;
+					collFact->destroyInstance(collInst);
+				}
+			}
+			else
+			{
+				LogManager::getSingleton().stream() << "Unsupported PageContentCollection type: " 
+					<< factoryName << " in " << *this;
+				// skip
+				stream.readChunkEnd(collChunk->id);
+			}
+
+		}
 
 
-		mStatus.set(STATUS_PREPARED);
 		return true;
 	}
 	//---------------------------------------------------------------------
-	void Page::load()
+	void Page::loadImpl()
 	{
-		// Fast pre-check
-		if (mStatus.get() != STATUS_PREPARED) 
-			return;
 
-		// Set to loading
-		if (!mStatus.cas(STATUS_PREPARED, STATUS_LOADING))
-			return;
-
-		// Now do the real loading
 		// TODO
-
-
-		mStatus.set(STATUS_LOADED);
+		
 	}
 	//---------------------------------------------------------------------
-	void Page::unprepare()
+	void Page::unprepareImpl()
 	{
-		// Fast pre-check
-		if (mStatus.get() != STATUS_PREPARED) 
-			return;
 
-		if (!mStatus.cas(STATUS_PREPARED, STATUS_UNPREPARING))
-			return;
+		// TODO
+
+	}
+	//---------------------------------------------------------------------
+	void Page::unloadImpl()
+	{
 
 		// TODO
 
 
-		mStatus.set(STATUS_UNLOADED);
-	}
-	//---------------------------------------------------------------------
-	void Page::unload()
-	{
-		// Fast pre-check
-		if (mStatus.get() != STATUS_LOADED) 
-			return;
-
-		if (!mStatus.cas(STATUS_LOADED, STATUS_UNLOADING))
-			return;
-
-		// TODO
-
-
-		mStatus.set(STATUS_PREPARED);
-
-	}
-	//---------------------------------------------------------------------
-	void Page::_markPreparing()
-	{
-		Status s = mStatus.get();
-		mStatus.cas(s, STATUS_PREPARING);
-	}
-	//---------------------------------------------------------------------
-	void Page::_markPrepared()
-	{
-		Status s = mStatus.get();
-		mStatus.cas(s, STATUS_PREPARED);
-	}
-	//---------------------------------------------------------------------
-	void Page::_markLoading()
-	{
-		Status s = mStatus.get();
-		mStatus.cas(s, STATUS_LOADING);
-	}
-	//---------------------------------------------------------------------
-	void Page::_markLoaded()
-	{
-		Status s = mStatus.get();
-		mStatus.cas(s, STATUS_LOADED);
-	}
-	//---------------------------------------------------------------------
-	void Page::_markUnloading()
-	{
-		Status s = mStatus.get();
-		mStatus.cas(s, STATUS_UNLOADING);
-	}
-	//---------------------------------------------------------------------
-	void Page::_markUnpreparing()
-	{
-		Status s = mStatus.get();
-		mStatus.cas(s, STATUS_UNPREPARING);
-	}
-	//---------------------------------------------------------------------
-	void Page::_markUnloaded()
-	{
-		Status s = mStatus.get();
-		mStatus.cas(s, STATUS_UNLOADED);
 	}
 	//---------------------------------------------------------------------
 	void Page::save(StreamSerialiser& stream)
 	{
-		// TODO
+		stream.writeChunkBegin(CHUNK_ID, CHUNK_VERSION);
+
+		// page id
+		stream.write(&mID);
+
+		// content collections
+		for (ContentCollectionList::iterator i = mContentCollections.begin();
+			i != mContentCollections.end(); ++i)
+		{
+			(*i)->save(stream);
+		}
+
+		stream.writeChunkEnd(CHUNK_ID);
 	}
 	//---------------------------------------------------------------------
 	void Page::frameStart(Real timeSinceLastFrame)
 	{
 		updateDebugDisplay();
 
+		// content collections
+		for (ContentCollectionList::iterator i = mContentCollections.begin();
+			i != mContentCollections.end(); ++i)
+		{
+			(*i)->frameStart(timeSinceLastFrame);
+		}
+
 
 	}
 	//---------------------------------------------------------------------
 	void Page::frameEnd(Real timeElapsed)
 	{
+		// content collections
+		for (ContentCollectionList::iterator i = mContentCollections.begin();
+			i != mContentCollections.end(); ++i)
+		{
+			(*i)->frameEnd(timeElapsed);
+		}
 
 	}
 	//---------------------------------------------------------------------
 	void Page::notifyCamera(Camera* cam)
 	{
+		// content collections
+		for (ContentCollectionList::iterator i = mContentCollections.begin();
+			i != mContentCollections.end(); ++i)
+		{
+			(*i)->notifyCamera(cam);
+		}
 
 	}
 	//---------------------------------------------------------------------
@@ -231,6 +259,48 @@ namespace Ogre
 		}
 
 	}
+	//---------------------------------------------------------------------
+	void Page::attachContentCollection(PageContentCollection* coll)
+	{
+		coll->_notifyAttached(this);
+		mContentCollections.push_back(coll);
+	}
+	//---------------------------------------------------------------------
+	void Page::detachContentCollection(PageContentCollection* coll)
+	{
+		ContentCollectionList::iterator i = std::find(
+			mContentCollections.begin(), mContentCollections.end(), coll);
+		if (i != mContentCollections.end())
+		{
+			coll->_notifyAttached(0);
+			mContentCollections.erase(i);
+		}
+	}
+	//---------------------------------------------------------------------
+	size_t Page::getContentCollectionCount() const
+	{
+		return mContentCollections.size();
+	}
+	//---------------------------------------------------------------------
+	PageContentCollection* Page::getContentCollection(size_t index)
+	{
+		assert(index < mContentCollections.size());
+
+		return mContentCollections[index];
+	}
+	//---------------------------------------------------------------------
+	const Page::ContentCollectionList& Page::getContentCollectionList() const
+	{
+		return mContentCollections;
+	}
+	//---------------------------------------------------------------------
+	std::ostream& operator <<( std::ostream& o, const Page& p )
+	{
+		o << "Page(ID:" << p.getID() << ", section:" << p.getParentSection()->getName()
+			<< ", world:" << p.getParentSection()->getWorld()->getName() << ")";
+		return o;
+	}
+
 
 
 }

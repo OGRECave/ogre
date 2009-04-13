@@ -26,54 +26,98 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#include "OgrePageContent.h"
-#include "OgrePageContentFactory.h"
+#include "OgrePageLoadableUnit.h"
+#include "OgreException.h"
 
 namespace Ogre
 {
 	//---------------------------------------------------------------------
-	PageContent::PageContent(PageContentFactory* creator)
-		: mCreator(creator), mParent(0)
+	PageLoadableUnit::PageLoadableUnit()
+		: mStatus(STATUS_UNLOADED)
 	{
 
 	}
 	//---------------------------------------------------------------------
-	PageContent::~PageContent()
+	PageLoadableUnit::~PageLoadableUnit()
 	{
-		// don't call destroy(), we're not the final subclass
+		// call destroy() in subclasses to ensure fully complete
 	}
 	//---------------------------------------------------------------------
-	const String& PageContent::getType() const
+	void PageLoadableUnit::destroy()
 	{
-		return mCreator->getName();
+		// unload if needed (main thread)
+		if (mStatus.get() == STATUS_LOADED)
+			unload();
+		if (mStatus.get() == STATUS_PREPARED)
+			unprepare();
+
+		assert(mStatus.get() == STATUS_UNLOADED);
 	}
 	//---------------------------------------------------------------------
-	void PageContent::save(StreamSerialiser& stream)
+	bool PageLoadableUnit::prepare(StreamSerialiser& stream)
 	{
+		if (!_changeStatus(STATUS_UNLOADED, STATUS_PREPARING))
+			return false;
+
+		bool ret = prepareImpl(stream);
+
+		if (ret)
+		{
+			mStatus.set(STATUS_PREPARED);
+		}
+		else
+		{
+			mStatus.set(STATUS_UNLOADED);
+		}
+		return ret;
+	}
+	//---------------------------------------------------------------------
+	void PageLoadableUnit::load()
+	{
+		if (mStatus.get() == STATUS_UNLOADED)
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+				"Cannot load before prepare() is performed", 
+				"PageLoadableUnit::load");
+		}
+
+		if (!_changeStatus(STATUS_PREPARED, STATUS_LOADING))
+			return;
+
+		loadImpl();
+
+		mStatus.set(STATUS_LOADED);
+	}
+	//---------------------------------------------------------------------
+	void PageLoadableUnit::unload()
+	{
+		if (!_changeStatus(STATUS_LOADED, STATUS_UNLOADING))
+			return;
+
+		unloadImpl();
+
+		mStatus.set(STATUS_PREPARED);
+	}
+	//---------------------------------------------------------------------
+	void PageLoadableUnit::unprepare()
+	{
+		if (!_changeStatus(STATUS_PREPARED, STATUS_UNPREPARING))
+			return;
+
+		unprepareImpl();
+
+		mStatus.set(STATUS_UNLOADED);
+	}
+	//---------------------------------------------------------------------
+	bool PageLoadableUnit::_changeStatus(UnitStatus oldStatus, UnitStatus newStatus)
+	{
+		// Fast pre-check (no lock)
+		if (mStatus.get() != oldStatus) 
+			return false;
+
+		// Set, with check & lock
+		return mStatus.cas(oldStatus, newStatus);
 
 	}
-	//---------------------------------------------------------------------
-	void PageContent::_notifyAttached(PageContentCollection* parent)
-	{
-		mParent = parent;
-	}
-	//---------------------------------------------------------------------
-	void PageContent::frameStart(Real timeSinceLastFrame)
-	{
-
-	}
-	//---------------------------------------------------------------------
-	void PageContent::frameEnd(Real timeElapsed)
-	{
-
-	}
-	//---------------------------------------------------------------------
-	void PageContent::notifyCamera(Camera* cam)
-	{
-
-	}
-	//---------------------------------------------------------------------
-
-
 }
 

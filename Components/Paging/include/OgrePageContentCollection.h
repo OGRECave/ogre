@@ -31,6 +31,7 @@ Torus Knot Software Ltd.
 #define __Ogre_PageContentCollection_H__
 
 #include "OgrePagingPrerequisites.h"
+#include "OgrePageLoadableUnit.h"
 
 
 namespace Ogre
@@ -42,6 +43,46 @@ namespace Ogre
 	*  Some details on paging component
 	*  @{
 	*/
+
+
+	/** Definition of the interface for a collection of PageContent instances. 
+	@remarks
+		This class acts as a grouping level for PageContent instances. Rather than 
+		PageContent instances being held in a list directly under Page, which might 
+		be the most obvious solution, this intermediate class is here to allow
+		the collection of relevant PageContent instances to be modified at runtime
+		if required. For example, potentially you might want to define Page-level LOD
+		in which different collections of PageContent are loaded at different times.
+	*/
+	class _OgrePagingExport PageContentCollection : public PageLoadableUnit
+	{
+	public:
+		typedef vector<PageContent*>::type ContentList;
+	protected:
+		PageContentCollectionFactory* mCreator;
+		Page* mParent;
+	public:
+		static const uint32 CHUNK_ID;
+		static const uint16 CHUNK_VERSION;
+
+		PageContentCollection(PageContentCollectionFactory* creator);
+		virtual ~PageContentCollection();
+
+		/// Get the type of the collection, which will match it's factory
+		virtual const String& getType() const;
+
+		virtual void save(StreamSerialiser& stream);
+		/// Internal method to notify a page that it is attached
+		virtual void _notifyAttached(Page* parent);
+		/// Called when the frame starts
+		virtual void frameStart(Real timeSinceLastFrame);
+		/// Called when the frame ends
+		virtual void frameEnd(Real timeElapsed);
+		/// Notify a section of the current camera
+		virtual void notifyCamera(Camera* cam);
+
+
+	};
 
 
 	/** @} */

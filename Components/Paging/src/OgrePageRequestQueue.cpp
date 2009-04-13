@@ -165,7 +165,7 @@ namespace Ogre
 					// Allow procedural generation
 					if (r.section->_prepareProceduralPage(r.page))
 					{
-						r.page->_markPrepared();
+						r.page->_changeStatus(PageLoadableUnit::STATUS_UNLOADED, PageLoadableUnit::STATUS_PREPARED);
 					}
 					else
 					{
@@ -187,7 +187,7 @@ namespace Ogre
 					// Allow procedural generation
 					if (r.section->_unprepareProceduralPage(r.page))
 					{
-						r.page->_markUnloaded();
+						r.page->_changeStatus(PageLoadableUnit::STATUS_PREPARED, PageLoadableUnit::STATUS_UNLOADED);
 					}
 					else
 					{
@@ -231,7 +231,7 @@ namespace Ogre
 				// Allow procedural generation
 				if (r.section->_loadProceduralPage(r.page))
 				{		
-					r.page->_markLoaded();
+					r.page->_changeStatus(PageLoadableUnit::STATUS_PREPARED, PageLoadableUnit::STATUS_LOADED);
 				}
 				else
 				{
@@ -245,7 +245,7 @@ namespace Ogre
 					// Allow procedural unload
 					if (r.section->_unloadProceduralPage(r.page))
 					{		
-						r.page->_markPrepared();
+						r.page->_changeStatus(PageLoadableUnit::STATUS_LOADED, PageLoadableUnit::STATUS_PREPARED);
 					}
 					else
 					{

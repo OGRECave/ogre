@@ -365,6 +365,13 @@ namespace Ogre
 		return ser;
 
 	}
+	//---------------------------------------------------------------------
+	std::ostream& operator <<( std::ostream& o, const PagedWorldSection& p )
+	{
+		o << "PagedWorldSection(" << p.getName() << ", world:" << p.getWorld()->getName() << ")";
+		return o;
+	}
+
 
 
 

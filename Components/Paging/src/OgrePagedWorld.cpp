@@ -280,6 +280,12 @@ namespace Ogre
 			i->second->notifyCamera(cam);
 		}
 	}
+	//---------------------------------------------------------------------
+	std::ostream& operator <<( std::ostream& o, const PagedWorld& p )
+	{
+		o << "PagedWorld(" << p.getName() << ")";
+		return o;
+	}
 
 
 

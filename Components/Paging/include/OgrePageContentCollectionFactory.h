@@ -42,6 +42,21 @@ namespace Ogre
 	*  @{
 	*/
 
+	/** Define the interface to a factory class that will create subclasses
+		of PageContentCollection. 
+	*/
+	class PageContentCollectionFactory : public PageAlloc
+	{
+	public:
+		PageContentCollectionFactory() {}
+		virtual ~PageContentCollectionFactory() {}
+
+		virtual const String& getName() const = 0;
+		virtual PageContentCollection* createInstance() = 0;
+		virtual void destroyInstance(PageContentCollection*) = 0;
+
+
+	};
 
 	/** @} */
 	/** @} */

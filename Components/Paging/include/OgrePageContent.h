@@ -31,6 +31,7 @@ Torus Knot Software Ltd.
 #define __Ogre_PageContent_H__
 
 #include "OgrePagingPrerequisites.h"
+#include "OgrePageLoadableUnit.h"
 
 
 
@@ -43,6 +44,37 @@ namespace Ogre
 	*  Some details on paging component
 	*  @{
 	*/
+
+
+	/** Interface definition for a unit of content within a page. 
+	*/
+	class _OgrePagingExport PageContent : public PageLoadableUnit
+	{
+	protected:
+		PageContentFactory* mCreator;
+		PageContentCollection* mParent;
+	public:
+		PageContent(PageContentFactory* creator);
+		virtual ~PageContent();
+
+
+		/// Get the type of the content, which will match it's factory
+		virtual const String& getType() const;
+
+		virtual void save(StreamSerialiser& stream);
+		/// Internal method to notify a page that it is attached
+		virtual void _notifyAttached(PageContentCollection* parent);
+		/// Called when the frame starts
+		virtual void frameStart(Real timeSinceLastFrame);
+		/// Called when the frame ends
+		virtual void frameEnd(Real timeElapsed);
+		/// Notify a section of the current camera
+		virtual void notifyCamera(Camera* cam);
+
+
+
+
+	};
 
 	/** @} */
 	/** @} */
