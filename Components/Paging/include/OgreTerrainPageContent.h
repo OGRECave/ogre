@@ -27,11 +27,12 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __Ogre_PageContent_H__
-#define __Ogre_PageContent_H__
+#ifndef __Ogre_TerrainPageContent_H__
+#define __Ogre_TerrainPageContent_H__
 
 #include "OgrePagingPrerequisites.h"
-#include "OgrePageLoadableUnit.h"
+#include "OgrePageContent.h"
+#include "OgrePageContentFactory.h"
 
 
 
@@ -46,37 +47,71 @@ namespace Ogre
 	*/
 
 
-	/** Interface definition for a unit of content within a page. 
+	/** Specialisation of page content for a page of terrain.
+	@par
+		The data format for this in a file is:<br/>
+		<b>TerrainContentData (Identifier 'TERR')</b>\n
+		[Version 1]
+		<table>
+		<tr>
+			<td><b>Name</b></td>
+			<td><b>Type</b></td>
+			<td><b>Description</b></td>
+		</tr>
+		<tr>
+			<td>Terrain orientation</td>
+			<td>uint8</td>
+			<td>The orientation of the terrain; XZ = 0, XY = 1, YZ = 2</td>
+		</tr>
+		</table>
 	*/
-	class _OgrePagingExport PageContent : public PageLoadableUnit
+	class _OgrePagingExport TerrainPageContent : public PageContent
 	{
-	protected:
-		PageContentFactory* mCreator;
-		PageContentCollection* mParent;
 	public:
-		PageContent(PageContentFactory* creator);
-		virtual ~PageContent();
+		TerrainPageContent(PageContentFactory* creator);
+		virtual ~TerrainPageContent();
 
-		PageManager* getManager() const;
+		static const uint32 TERRAIN_CHUNK_ID;
+		static const uint16 TERRAIN_CHUNK_VERSION;
 
-		/// Internal method to notify a page that it is attached
-		virtual void _notifyAttached(PageContentCollection* parent);
-		/// Get the type of the content, which will match it's factory
-		virtual const String& getType() const;
+		// Overridden from PageContent
+		void save(StreamSerialiser& stream);
 
-		/// Save the content to a stream
-		virtual void save(StreamSerialiser& stream) = 0;
-		/// Called when the frame starts
-		virtual void frameStart(Real timeSinceLastFrame) {}
-		/// Called when the frame ends
-		virtual void frameEnd(Real timeElapsed) {}
-		/// Notify a section of the current camera
-		virtual void notifyCamera(Camera* cam) {}
-
+	protected:
+		// Overridden from PageLoadableUnit
+		bool prepareImpl(StreamSerialiser& stream);
+		void loadImpl();
+		void unloadImpl();
+		void unprepareImpl();
 
 
 
 	};
+
+
+	/// Factory class for TerrainPageContent
+	class TerrainPageContentFactory : public PageContentFactory
+	{
+	public:
+		static String FACTORY_NAME;
+
+		TerrainPageContentFactory() {}
+		~TerrainPageContentFactory() {}
+
+		const String& getName() const { return FACTORY_NAME; }
+
+		PageContent* createInstance() 
+		{
+			return OGRE_NEW TerrainPageContent(this); 
+		}
+		void destroyInstance(PageContent* c)
+		{
+			OGRE_DELETE c;
+		}
+
+
+	};
+
 
 	/** @} */
 	/** @} */

@@ -22,6 +22,8 @@ set (HEADER_FILES
 	include/OgrePageStrategy.h
 	include/OgrePaging.h
 	include/OgrePagingPrerequisites.h
+	include/OgreSimplePageContentCollection.h
+	include/OgreTerrainPageContent.h
 )
 
 set (SOURCE_FILES
@@ -38,6 +40,8 @@ set (SOURCE_FILES
 	src/OgrePageManager.cpp
 	src/OgrePageRequestQueue.cpp
 	src/OgrePageStrategy.cpp
+	src/OgreSimplePageContentCollection.cpp
+	src/OgreTerrainPageContent.cpp
 )
 
 

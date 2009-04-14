@@ -65,22 +65,8 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool PagedWorld::load(StreamSerialiser& ser)
 	{
-		const StreamSerialiser::Chunk* chunk = ser.readChunkBegin();
-		if (chunk->id != CHUNK_ID)
-		{
-			ser.undoReadChunk(chunk->id);
+		if (!ser.readChunkBegin(CHUNK_ID, CHUNK_VERSION, "PagedWorld"))
 			return false;
-		}
-
-		// Check version
-		if (chunk->version > CHUNK_VERSION)
-		{
-			// skip the rest
-			ser.readChunkEnd(chunk->id);
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-				"PagedWorld data version exceeds what this software can read!", 
-				"PagedWorld::load");
-		}
 
 		// Name
 		ser.read(&mName);

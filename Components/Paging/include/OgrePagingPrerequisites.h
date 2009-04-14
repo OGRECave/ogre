@@ -49,6 +49,11 @@ namespace Ogre
 	class PageStrategy;
 	class PageStrategyData;
 	class PageProvider;
+	class TerrainPageContent;
+	class TerrainPageContentFactory;
+	class SimplePageContentCollection;
+	class SimplePageContentCollectionFactory;
+
 
 	typedef GeneralAllocatedObject PageAlloc;
 

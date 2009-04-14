@@ -71,6 +71,8 @@ namespace Ogre
 		Page(PageID pageID);
 		virtual ~Page();
 
+		PageManager* getManager() const;
+
 		/// Get the ID of this page, unique withing the parent
 		virtual PageID getID() const { return mID; }
 		/// Get the PagedWorldSection this page belongs to, or zero if unattached
@@ -107,6 +109,18 @@ namespace Ogre
 		/// Notify a section of the current camera
 		virtual void notifyCamera(Camera* cam);
 
+		/** Create a new PageContentCollection within this page.
+		This is equivalent to calling PageManager::createContentCollection and 
+		then attachContentCollection.
+		@param typeName The name of the type of content collection (see PageManager::getContentCollectionFactories)
+		*/
+		virtual PageContentCollection* createContentCollection(const String& typeName);
+
+		/** Destroy a PageContentCollection within this page.
+		This is equivalent to calling detachContentCollection and 
+			PageManager::destroyContentCollection.
+		*/
+		virtual void destroyContentCollection(PageContentCollection* coll);
 		/** Add a content collection to this Page. 
 		@remarks
 			This class now becomes responsible for deleting this collection

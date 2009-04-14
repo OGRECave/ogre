@@ -56,8 +56,6 @@ namespace Ogre
 	*/
 	class _OgrePagingExport PageContentCollection : public PageLoadableUnit
 	{
-	public:
-		typedef vector<PageContent*>::type ContentList;
 	protected:
 		PageContentCollectionFactory* mCreator;
 		Page* mParent;
@@ -68,18 +66,21 @@ namespace Ogre
 		PageContentCollection(PageContentCollectionFactory* creator);
 		virtual ~PageContentCollection();
 
+		PageManager* getManager() const;
+
 		/// Get the type of the collection, which will match it's factory
 		virtual const String& getType() const;
 
-		virtual void save(StreamSerialiser& stream);
 		/// Internal method to notify a page that it is attached
 		virtual void _notifyAttached(Page* parent);
+		/// Save the collection to a stream
+		virtual void save(StreamSerialiser& stream) = 0;
 		/// Called when the frame starts
-		virtual void frameStart(Real timeSinceLastFrame);
+		virtual void frameStart(Real timeSinceLastFrame) = 0;
 		/// Called when the frame ends
-		virtual void frameEnd(Real timeElapsed);
+		virtual void frameEnd(Real timeElapsed) = 0;
 		/// Notify a section of the current camera
-		virtual void notifyCamera(Camera* cam);
+		virtual void notifyCamera(Camera* cam) = 0;
 
 
 	};

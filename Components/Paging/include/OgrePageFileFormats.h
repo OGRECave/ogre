@@ -164,11 +164,6 @@ Torus Knot Software Ltd.
 		<td>Nested chunk</td>
 		<td>Data required to initialise & configure the content collection</td>
 	</tr>
-	<tr>
-		<td>PageContent chunk list</td>
-		<td>Nested chunk list</td>
-		<td>List of 1-n PageContent chunks</td>
-	</tr>
 	</table>
 	@par
 	<b>PageContentCollectionData (Identifier defined by subclass)</b>\n

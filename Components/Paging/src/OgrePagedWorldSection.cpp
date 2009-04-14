@@ -67,6 +67,11 @@ namespace Ogre
 		removeAllPages();
 	}
 	//---------------------------------------------------------------------
+	PageManager* PagedWorldSection::getManager() const
+	{
+		return mParent->getManager();
+	}
+	//---------------------------------------------------------------------
 	void PagedWorldSection::setBoundingBox(const AxisAlignedBox& box)
 	{
 		mAABB = box;
@@ -99,7 +104,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void PagedWorldSection::setStrategy(const String& stratName)
 	{
-		setStrategy(mParent->getManager()->getStrategy(stratName));
+		setStrategy(getManager()->getStrategy(stratName));
 	}
 	//---------------------------------------------------------------------
 	void PagedWorldSection::setSceneManager(SceneManager* sm)
@@ -120,22 +125,8 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool PagedWorldSection::load(StreamSerialiser& ser)
 	{
-		const StreamSerialiser::Chunk* chunk = ser.readChunkBegin();
-		if (chunk->id != CHUNK_ID)
-		{
-			ser.undoReadChunk(chunk->id);
+		if (!ser.readChunkBegin(CHUNK_ID, CHUNK_VERSION, "PagedWorldSection"))
 			return false;
-		}
-
-		// Check version
-		if (chunk->version > CHUNK_VERSION)
-		{
-			// skip the rest
-			ser.readChunkEnd(chunk->id);
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-				"PagedWorldSection data version exceeds what this software can read!", 
-				"PagedWorldSection::load");
-		}
 
 		// Name
 		ser.read(&mName);
@@ -170,11 +161,28 @@ namespace Ogre
 		// Page Strategy Data
 		mStrategyData->save(ser);
 
+		// save all pages
+		// TODO
+
 		ser.writeChunkEnd(CHUNK_ID);
 
 	}
 	//---------------------------------------------------------------------
-	void PagedWorldSection::loadPage(PageID pageID)
+	PageID PagedWorldSection::getPageID(const Vector3& worldPos)
+	{
+		return mStrategy->getPageID(worldPos, this);
+	}
+	//---------------------------------------------------------------------
+	Page* PagedWorldSection::loadOrCreatePage(const Vector3& worldPos)
+	{
+		PageID id = getPageID(worldPos);
+		// this will create a Page instance no matter what, even if load fails
+		// we force the load attempt to happen immediately (forceSynchronous)
+		loadPage(id, true);
+		return getPage(id);
+	}
+	//---------------------------------------------------------------------
+	void PagedWorldSection::loadPage(PageID pageID, bool sync)
 	{
 		PageMap::iterator i = mPages.find(pageID);
 		if (i == mPages.end())
@@ -182,13 +190,13 @@ namespace Ogre
 			Page* page = OGRE_NEW Page(pageID);
 			// attach page immediately, but notice that it's not loaded yet
 			attachPage(page);
-			mParent->getManager()->getQueue()->loadPage(page, this);
+			getManager()->getQueue()->loadPage(page, this, sync);
 		}
 		else
 			i->second->touch();
 	}
 	//---------------------------------------------------------------------
-	void PagedWorldSection::unloadPage(PageID pageID)
+	void PagedWorldSection::unloadPage(PageID pageID, bool sync)
 	{
 		PageMap::iterator i = mPages.find(pageID);
 		if (i != mPages.end())
@@ -197,14 +205,14 @@ namespace Ogre
 			mPages.erase(i);
 			page->_notifyAttached(0);
 
-			mParent->getManager()->getQueue()->unloadPage(page, this);
+			getManager()->getQueue()->unloadPage(page, this, sync);
 			
 		}
 	}
 	//---------------------------------------------------------------------
-	void PagedWorldSection::unloadPage(Page* p)
+	void PagedWorldSection::unloadPage(Page* p, bool sync)
 	{
-		unloadPage(p->getID());
+		unloadPage(p->getID(), sync);
 	}
 	//---------------------------------------------------------------------
 	bool PagedWorldSection::_prepareProceduralPage(Page* page)
@@ -279,7 +287,7 @@ namespace Ogre
 			if (ret.first->second != page)
 			{
 				// replacing a page, delete the old one
-				mParent->getManager()->getQueue()->cancelOperationsForPage(ret.first->second);
+				getManager()->getQueue()->cancelOperationsForPage(ret.first->second);
 				OGRE_DELETE ret.first->second;
 				ret.first->second = page;
 			}
@@ -303,7 +311,7 @@ namespace Ogre
 	{
 		for (PageMap::iterator i= mPages.begin(); i != mPages.end(); ++i)
 		{
-			mParent->getManager()->getQueue()->cancelOperationsForPage(i->second);
+			getManager()->getQueue()->cancelOperationsForPage(i->second);
 			OGRE_DELETE i->second;
 		}
 		mPages.clear();

@@ -27,8 +27,7 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 #include "PageCoreTests.h"
-#include "OgrePagedWorld.h"
-#include "OgrePagedWorldSection.h"
+#include "OgrePaging.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION( PageCoreTests );
 
@@ -59,6 +58,18 @@ void PageCoreTests::testSimpleCreateSaveLoadWorld()
 	PagedWorld* world = mPageManager->createWorld(worldName);
 	PagedWorldSection* section = world->createSection("Grid2D", mSceneMgr, sectionName1);
 	section = world->createSection("Grid2D", mSceneMgr, sectionName2);
+
+	// Create a page
+	Page* p = section->loadOrCreatePage(Vector3::ZERO);
+
+	SimplePageContentCollection* coll = static_cast<SimplePageContentCollection*>(
+		p->createContentCollection("Simple"));
+
+	TerrainPageContent* terrain = static_cast<TerrainPageContent*>(
+		coll->createContent("Terrain"));
+
+	// manually set page to loaded since we've populated it
+	p->setLoaded();
 	
 	world->save(filename);
 

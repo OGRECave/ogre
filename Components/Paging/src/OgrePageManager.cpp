@@ -37,6 +37,8 @@ Torus Knot Software Ltd.
 #include "OgrePagedWorldSection.h"
 #include "OgrePagedWorld.h"
 #include "OgreGrid2DPageStrategy.h"
+#include "OgreTerrainPageContent.h"
+#include "OgreSimplePageContentCollection.h"
 #include "OgreStreamSerialiser.h"
 #include "OgreRoot.h"
 
@@ -50,6 +52,8 @@ namespace Ogre
 		, mPageResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
 		, mDebugDisplayLvl(0)
 		, mGrid2DPageStrategy(0)
+		, mTerrainContentFactory(0)
+		, mSimpleCollectionFactory(0)
 	{
 		mQueue = OGRE_NEW PageRequestQueue(this);
 
@@ -59,6 +63,7 @@ namespace Ogre
 		Root::getSingleton().addFrameListener(&mEventRouter);
 
 		createStandardStrategies();
+		createStandardContentFactories();
 
 	}
 	//---------------------------------------------------------------------
@@ -67,12 +72,26 @@ namespace Ogre
 		OGRE_DELETE mQueue;
 
 		OGRE_DELETE mGrid2DPageStrategy;
+		OGRE_DELETE mTerrainContentFactory;
+		OGRE_DELETE mSimpleCollectionFactory;
 	}
 	//---------------------------------------------------------------------
 	void PageManager::createStandardStrategies()
 	{
 		mGrid2DPageStrategy = OGRE_NEW Grid2DPageStrategy(this);
 		addStrategy(mGrid2DPageStrategy);
+
+	}
+	//---------------------------------------------------------------------
+	void PageManager::createStandardContentFactories()
+	{
+		// content 
+		mTerrainContentFactory = OGRE_NEW TerrainPageContentFactory();
+		addContentFactory(mTerrainContentFactory);
+
+		// collections
+		mSimpleCollectionFactory = OGRE_NEW SimplePageContentCollectionFactory();
+		addContentCollectionFactory(mSimpleCollectionFactory);
 
 	}
 	//---------------------------------------------------------------------
@@ -239,6 +258,26 @@ namespace Ogre
 		return mContentCollectionFactories;
 	}
 	//---------------------------------------------------------------------
+	PageContentCollection* PageManager::createContentCollection(const String& typeName)
+	{
+		PageContentCollectionFactory* fact = getContentCollectionFactory(typeName);
+		if (!fact)
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+				typeName + " is not the name of a valid PageContentCollectionFactory", 
+				"PageManager::createContentCollection");
+
+		return fact->createInstance();
+	}
+	//---------------------------------------------------------------------
+	void PageManager::destroyContentCollection(PageContentCollection* coll)
+	{
+		PageContentCollectionFactory* fact = getContentCollectionFactory(coll->getType());
+		if (fact)
+			fact->destroyInstance(coll);
+		else
+			OGRE_DELETE coll; // normally a safe fallback
+	}
+	//---------------------------------------------------------------------
 	void PageManager::addContentFactory(PageContentFactory* f)
 	{
 		// note - deliberately allowing overriding
@@ -267,6 +306,26 @@ namespace Ogre
 	const PageManager::ContentFactoryMap& PageManager::getContentFactories() const
 	{
 		return mContentFactories;
+	}
+	//---------------------------------------------------------------------
+	PageContent* PageManager::createContent(const String& typeName)
+	{
+		PageContentFactory* fact = getContentFactory(typeName);
+		if (!fact)
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+			typeName + " is not the name of a valid PageContentFactory", 
+			"PageManager::createContent");
+
+		return fact->createInstance();
+	}
+	//---------------------------------------------------------------------
+	void PageManager::destroyContent(PageContent* c)
+	{
+		PageContentFactory* fact = getContentFactory(c->getType());
+		if (fact)
+			fact->destroyInstance(c);
+		else
+			OGRE_DELETE c; // normally a safe fallback
 	}
 	//---------------------------------------------------------------------
 	StreamSerialiser* PageManager::_readPageStream(PageID pageID, PagedWorldSection* section)

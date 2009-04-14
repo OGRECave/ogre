@@ -226,6 +226,15 @@ namespace Ogre
 		*/
 		PageContentCollectionFactory* getContentCollectionFactory(const String& name);
 
+		/** Create a new instance of PageContentCollection using the registered
+			factories.
+		@param typeName The name of the type of collection to create
+		*/
+		PageContentCollection* createContentCollection(const String& typeName);
+
+		/** Destroy an instance of PageContentCollection. */
+		void destroyContentCollection(PageContentCollection* coll);
+
 		/** Get a reference to the registered strategies.
 		*/
 		const ContentCollectionFactoryMap& getContentCollectionFactories() const;
@@ -251,6 +260,14 @@ namespace Ogre
 		*/
 		const ContentFactoryMap& getContentFactories() const;
 
+		/** Create a new instance of PageContent using the registered
+		factories.
+		@param typeName The name of the type of content to create
+		*/
+		PageContent* createContent(const String& typeName);
+
+		/** Destroy an instance of PageContent. */
+		void destroyContent(PageContent* c);
 
 		/// Get the request queue
 		PageRequestQueue* getQueue() const { return mQueue; }
@@ -397,6 +414,7 @@ namespace Ogre
 		};
 
 		void createStandardStrategies();
+		void createStandardContentFactories();
 
 		WorldMap mWorlds;
 		StrategyMap mStrategies;
@@ -411,6 +429,8 @@ namespace Ogre
 		uint8 mDebugDisplayLvl;
 
 		Grid2DPageStrategy* mGrid2DPageStrategy;
+		TerrainPageContentFactory* mTerrainContentFactory;
+		SimplePageContentCollectionFactory* mSimpleCollectionFactory;
 	};
 
 	/** @} */

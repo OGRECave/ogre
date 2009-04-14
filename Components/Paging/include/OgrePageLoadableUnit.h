@@ -148,6 +148,13 @@ namespace Ogre
 		virtual void unprepare();
 
 
+		/** Set this unit's status to STATUS_LOADED without going through the 
+			load sequence. 
+		@remarks
+			Usually you would do this because you're manually defining the content
+			rather than loading it, some other way than via PageProvider. 
+		*/
+		virtual void setLoaded();
 		/** Manually change a loadable unit's status - advanced use only.
 		@remarks Takes old & new status to avoid race conditions
 		@returns Whether the status change was successful

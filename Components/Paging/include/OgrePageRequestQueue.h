@@ -59,9 +59,9 @@ namespace Ogre
 			a separate thread. At some point later on the loaded page will be attached
 			to the section which requested it. 
 		*/
-		void loadPage(Page* page, PagedWorldSection* section);
+		void loadPage(Page* page, PagedWorldSection* section, bool forceSync = false);
 		/** Dispose of a page */
-		void unloadPage(Page* page, PagedWorldSection* section);
+		void unloadPage(Page* page, PagedWorldSection* section, bool forceSync = false);
 
 		/** Cancel any pending operations for a Page.
 		@remarks
@@ -131,8 +131,8 @@ namespace Ogre
 		/// Requests pending for the render queue (follow on from background)
 		RequestQueue mRenderQueue;
 
-		void addBackgroundRequest(const Request& r);
-		void addRenderRequest(const Request& r);
+		void addBackgroundRequest(const Request& r, bool forceSync = false);
+		void addRenderRequest(const Request& r, bool forceSync = false);
 		
 		/// Process the background portion of a request (may be threaded)
 		void processBackgroundRequest(const Request& r);

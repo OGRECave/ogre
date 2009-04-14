@@ -125,6 +125,11 @@ namespace Ogre
 			SceneNode, it must not be altered / added to by others.
 		*/
 		virtual void updateDebugDisplay(Page* p, SceneNode* sn) = 0;
+
+		/** Get the page ID for a given world position. 
+		@returns The page ID
+		*/
+		virtual PageID getPageID(const Vector3& worldPos, PagedWorldSection* section) = 0;
 	};
 
 	/*@}*/

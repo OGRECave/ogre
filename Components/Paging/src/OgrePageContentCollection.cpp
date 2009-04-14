@@ -30,6 +30,7 @@ Torus Knot Software Ltd.
 #include "OgrePageContentCollectionFactory.h"
 #include "OgreStreamSerialiser.h"
 #include "OgrePageContent.h"
+#include "OgrePage.h"
 
 namespace Ogre
 {
@@ -48,36 +49,20 @@ namespace Ogre
 		// don't call destroy(), we're not the final subclass
 	}
 	//---------------------------------------------------------------------
+	PageManager* PageContentCollection::getManager() const
+	{
+		return mParent->getManager();
+	}
+	//---------------------------------------------------------------------
 	const String& PageContentCollection::getType() const
 	{
 		return mCreator->getName();
-	}
-	//---------------------------------------------------------------------
-	void PageContentCollection::save(StreamSerialiser& stream)
-	{
-
 	}
 	//---------------------------------------------------------------------
 	void PageContentCollection::_notifyAttached(Page* parent)
 	{
 		mParent = parent;
 	}
-	//---------------------------------------------------------------------
-	void PageContentCollection::frameStart(Real timeSinceLastFrame)
-	{
-
-	}
-	//---------------------------------------------------------------------
-	void PageContentCollection::frameEnd(Real timeElapsed)
-	{
-
-	}
-	//---------------------------------------------------------------------
-	void PageContentCollection::notifyCamera(Camera* cam)
-	{
-
-	}
-	//---------------------------------------------------------------------
 
 
 }

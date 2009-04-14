@@ -64,6 +64,11 @@ namespace Ogre
 		mContentCollections.clear();
 	}
 	//---------------------------------------------------------------------
+	PageManager* Page::getManager() const
+	{
+		return mParent->getManager();
+	}
+	//---------------------------------------------------------------------
 	void Page::_notifyAttached(PagedWorldSection* parent)
 	{
 		if (!parent && mParent && mDebugNode)
@@ -98,23 +103,8 @@ namespace Ogre
 	{
 
 		// Now do the real loading
-		const StreamSerialiser::Chunk* chunk = stream.readChunkBegin();
-		if (chunk->id != CHUNK_ID)
-		{
-			LogManager::getSingleton().stream() << "Error: Tried to populate Page ID " << mID
-				<< " with non-Page data; chunk ID: " << chunk->id;
-			stream.undoReadChunk(chunk->id);
+		if (!stream.readChunkBegin(CHUNK_ID, CHUNK_VERSION, "Page"))
 			return false;
-		}
-		else if (chunk->version > CHUNK_VERSION)
-		{
-			// skip the rest
-			stream.readChunkEnd(chunk->id);
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-				"Page data version exceeds what this software can read!", 
-				"Page::prepare");
-
-		}
 
 		// pageID check (we should know the ID we're expecting)
 		uint32 storedID;
@@ -123,11 +113,11 @@ namespace Ogre
 		{
 			LogManager::getSingleton().stream() << "Error: Tried to populate Page ID " << mID
 				<< " with data corresponding to page ID " << storedID;
-			stream.undoReadChunk(chunk->id);
+			stream.undoReadChunk(CHUNK_ID);
 			return false;
 		}
 
-		PageManager* mgr = mParent->getWorld()->getManager();
+		PageManager* mgr = getManager();
 		
 		while(stream.peekNextChunkID() == PageContentCollection::CHUNK_ID)
 		{
@@ -241,7 +231,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Page::updateDebugDisplay()
 	{
-		uint8 dbglvl = mParent->getWorld()->getManager()->getDebugDisplayLevel();
+		uint8 dbglvl = getManager()->getDebugDisplayLevel();
 		if (dbglvl > 0)
 		{
 			// update debug display
@@ -258,6 +248,19 @@ namespace Ogre
 			mDebugNode->setVisible(false);
 		}
 
+	}
+	//---------------------------------------------------------------------
+	PageContentCollection* Page::createContentCollection(const String& typeName)
+	{
+		PageContentCollection* coll = getManager()->createContentCollection(typeName);
+		attachContentCollection(coll);
+		return coll;
+	}
+	//---------------------------------------------------------------------
+	void Page::destroyContentCollection(PageContentCollection* coll)
+	{
+		detachContentCollection(coll);
+		getManager()->destroyContentCollection(coll);
 	}
 	//---------------------------------------------------------------------
 	void Page::attachContentCollection(PageContentCollection* coll)

@@ -52,23 +52,23 @@ namespace Ogre
 	{
 	}
 	//---------------------------------------------------------------------
-	void PageRequestQueue::loadPage(Page* page, PagedWorldSection* section)
+	void PageRequestQueue::loadPage(Page* page, PagedWorldSection* section, bool forceSync)
 	{
 		
 		// Prepare in the background
 		Request req(PREPARE_PAGE, page, section);
-		addBackgroundRequest(req);
+		addBackgroundRequest(req, forceSync);
 
 		// load will happen in the main thread once preparation is complete
 
 
 	}
 	//---------------------------------------------------------------------
-	void PageRequestQueue::unloadPage(Page* page, PagedWorldSection* section)
+	void PageRequestQueue::unloadPage(Page* page, PagedWorldSection* section, bool forceSync)
 	{
 		// unload in main thread, then unprepare in background
 		Request req(UNLOAD_PAGE, page, section);
-		addRenderRequest(req);
+		addRenderRequest(req, forceSync);
 
 	}
 	//---------------------------------------------------------------------
@@ -101,7 +101,7 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void PageRequestQueue::addBackgroundRequest(const Request& r)
+	void PageRequestQueue::addBackgroundRequest(const Request& r, bool forceSync)
 	{
 		Log* log = LogManager::getSingleton().getDefaultLog();
 		if (log->getLogDetail() == LL_BOREME)
@@ -112,7 +112,7 @@ namespace Ogre
 				<< ":" << r.section->getName();
 		}
 
-		if (mForceSynchronous)
+		if (mForceSynchronous || forceSync)
 		{
 			processBackgroundRequest(r);
 		}
@@ -124,7 +124,7 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void PageRequestQueue::addRenderRequest(const Request& r)
+	void PageRequestQueue::addRenderRequest(const Request& r, bool forceSync)
 	{
 		Log* log = LogManager::getSingleton().getDefaultLog();
 		if (log->getLogDetail() == LL_BOREME)
@@ -134,7 +134,7 @@ namespace Ogre
 				" for page ID " << r.page->getID() << " world " << r.section->getWorld()->getName()
 				<< ":" << r.section->getName();
 		}
-		if (mForceSynchronous)
+		if (mForceSynchronous || forceSync)
 		{
 			processRenderRequest(r);
 		}

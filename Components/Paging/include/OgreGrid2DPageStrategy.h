@@ -80,7 +80,7 @@ namespace Ogre
 		<tr>
 			<td>Grid orientation</td>
 			<td>uint8</td>
-			<td>The orientation of the grid; XY = 0, XY = 1, YZ = 2</td>
+			<td>The orientation of the grid; XZ = 0, XY = 1, YZ = 2</td>
 		</tr>
 		<tr>
 			<td>Grid origin</td>
@@ -115,6 +115,10 @@ namespace Ogre
 		Vector3 mWorldOrigin;
 		/// Origin (grid-aligned world space)
 		Vector2 mOrigin;
+		/// Grid horizontal extent in cells
+		uint32 mGridExtentsHorz;
+		/// Grid vertical extent in cells
+		uint32 mGridExtentsVert;
 		/// Bottom-left position (grid-aligned world space)
 		Vector2 mBottomLeft;
 		/// Grid cell (page) size
@@ -149,6 +153,16 @@ namespace Ogre
 		virtual void setCellSize(Real sz);
 		/// Get the size of the cells in the grid
 		virtual Real getCellSize() const { return mCellSize; }
+		/// Set the number of cells in the grid in each dimension (defaults to max of 65536)
+		virtual void setCellCount(uint32 horz, uint32 vert);
+		/// Set the number of cells in the grid horizontally (defaults to max of 65536)
+		virtual void setCellCountHorz(uint32 horz);
+		/// Set the number of cells in the grid horizontally (defaults to max of 65536)
+		virtual void setCellCountVert(uint32 vert);
+		/// Get the number of cells in the grid horizontally (defaults to max of 65536)
+		virtual uint32 getCellCountHorz() const;
+		/// Get the number of cells in the grid horizontally (defaults to max of 65536)
+		virtual uint32 getCellCountVert() const;
 		/// Set the loading radius 
 		virtual void setLoadRadius(Real sz);
 		/// Get the loading radius 
@@ -184,6 +198,9 @@ namespace Ogre
 		/// Convert a grid position into a row and column index
 		void determineGridLocation(const Vector2& gridpos, uint16* row, uint16* col);
 
+		PageID calculatePageID(uint16 row, uint16 col);
+		void calculateRowCol(PageID inPageID, uint16 *row, uint16 *col);
+
 	};
 
 
@@ -205,9 +222,7 @@ namespace Ogre
 		PageStrategyData* createData();
 		void destroyData(PageStrategyData* d);
 		void updateDebugDisplay(Page* p, SceneNode* sn);
-	protected:
-		PageID calculatePageID(uint16 row, uint16 col);
-		void calculateRowCol(PageID inPageID, uint16 *row, uint16 *col);
+		PageID getPageID(const Vector3& worldPos, PagedWorldSection* section);
 	};
 
 	/*@}*/

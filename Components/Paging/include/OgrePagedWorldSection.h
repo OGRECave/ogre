@@ -83,6 +83,8 @@ namespace Ogre
 			SceneManager* sm);
 		virtual ~PagedWorldSection();
 
+		PageManager* getManager() const;
+
 		/// Get the name of this section
 		virtual const String& getName() const { return mName; }
 		/// Get the page strategy which this section is using
@@ -140,6 +142,18 @@ namespace Ogre
 		/// Notify a section of the current camera
 		virtual void notifyCamera(Camera* cam);
 
+		/** Load or create a page against this section covering the given world 
+			space position. 
+		@remarks
+			This method is designed mainly for editors - it will try to load
+			an existing page if there is one, otherwise it will create a new one
+			synchronously.
+		*/
+		virtual Page* loadOrCreatePage(const Vector3& worldPos);
+
+		/** Get the page ID for a given world position. */
+		virtual PageID getPageID(const Vector3& worldPos);
+
 
 		/** Ask for a page to be loaded with the given (section-relative) PageID
 		@remarks
@@ -148,21 +162,27 @@ namespace Ogre
 			If this page is already loaded, this request will not load it again.
 			If the page needs loading, then it may be an asynchronous process depending
 			on whether threading is enabled.
+		@param pageID The page ID to load
+		@param forceSynchronous If true, the page will always be loaded synchronously
 		*/
-		virtual void loadPage(PageID pageID);
+		virtual void loadPage(PageID pageID, bool forceSynchronous = false);
 
 		/** Ask for a page to be unloaded with the given (section-relative) PageID
 		@remarks
 			You would not normally call this manually, the PageStrategy is in 
 			charge of it usually.
+		@param pageID The page ID to unload
+		@param forceSynchronous If true, the page will always be unloaded synchronously
 		*/
-		virtual void unloadPage(PageID pageID);
+		virtual void unloadPage(PageID pageID, bool forceSynchronous = false);
 		/** Ask for a page to be unloaded with the given (section-relative) PageID
 		@remarks
 		You would not normally call this manually, the PageStrategy is in 
 		charge of it usually.
+		@param p The Page to unload
+		@param forceSynchronous If true, the page will always be unloaded synchronously
 		*/
-		virtual void unloadPage(Page* p);
+		virtual void unloadPage(Page* p, bool forceSynchronous = false);
 		/** Give a section the opportunity to prepare page content procedurally. 
 		@remarks
 		You should not call this method directly. This call may well happen in 

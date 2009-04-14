@@ -26,103 +26,66 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#include "OgrePageLoadableUnit.h"
-#include "OgreException.h"
+#include "OgreTerrainPageContent.h"
+#include "OgreStreamSerialiser.h"
 
 namespace Ogre
 {
 	//---------------------------------------------------------------------
-	PageLoadableUnit::PageLoadableUnit()
-		: mStatus(STATUS_UNLOADED)
+	const uint32 TerrainPageContent::TERRAIN_CHUNK_ID = StreamSerialiser::makeIdentifier("TERR");
+	const uint16 TerrainPageContent::TERRAIN_CHUNK_VERSION = 1;
+	//---------------------------------------------------------------------
+	TerrainPageContent::TerrainPageContent(PageContentFactory* creator)
+		: PageContent(creator)
 	{
 
 	}
 	//---------------------------------------------------------------------
-	PageLoadableUnit::~PageLoadableUnit()
+	TerrainPageContent::~TerrainPageContent()
 	{
-		// call destroy() in subclasses to ensure fully complete
+		destroy();
 	}
 	//---------------------------------------------------------------------
-	void PageLoadableUnit::destroy()
+	void TerrainPageContent::save(StreamSerialiser& stream)
 	{
-		// unload if needed (main thread)
-		if (mStatus.get() == STATUS_LOADED)
-			unload();
-		if (mStatus.get() == STATUS_PREPARED)
-			unprepare();
+		stream.writeChunkBegin(TERRAIN_CHUNK_ID, TERRAIN_CHUNK_VERSION);
+		// TODO
 
-		assert(mStatus.get() == STATUS_UNLOADED);
+		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
 	}
 	//---------------------------------------------------------------------
-	bool PageLoadableUnit::prepare(StreamSerialiser& stream)
+	bool TerrainPageContent::prepareImpl(StreamSerialiser& stream)
 	{
-		if (!_changeStatus(STATUS_UNLOADED, STATUS_PREPARING))
+		if (!stream.readChunkBegin(TERRAIN_CHUNK_ID, TERRAIN_CHUNK_VERSION, "TerrainPageContent"))
 			return false;
 
-		bool ret = prepareImpl(stream);
+		// TODO
 
-		if (ret)
-		{
-			mStatus.set(STATUS_PREPARED);
-		}
-		else
-		{
-			mStatus.set(STATUS_UNLOADED);
-		}
-		return ret;
+		stream.readChunkEnd(TERRAIN_CHUNK_ID);
+		return true;
 	}
 	//---------------------------------------------------------------------
-	void PageLoadableUnit::load()
+	void TerrainPageContent::loadImpl()
 	{
-		if (mStatus.get() == STATUS_UNLOADED)
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
-				"Cannot load before prepare() is performed", 
-				"PageLoadableUnit::load");
-		}
-
-		if (!_changeStatus(STATUS_PREPARED, STATUS_LOADING))
-			return;
-
-		loadImpl();
-
-		mStatus.set(STATUS_LOADED);
-	}
-	//---------------------------------------------------------------------
-	void PageLoadableUnit::unload()
-	{
-		if (!_changeStatus(STATUS_LOADED, STATUS_UNLOADING))
-			return;
-
-		unloadImpl();
-
-		mStatus.set(STATUS_PREPARED);
-	}
-	//---------------------------------------------------------------------
-	void PageLoadableUnit::unprepare()
-	{
-		if (!_changeStatus(STATUS_PREPARED, STATUS_UNPREPARING))
-			return;
-
-		unprepareImpl();
-
-		mStatus.set(STATUS_UNLOADED);
-	}
-	//---------------------------------------------------------------------
-	bool PageLoadableUnit::_changeStatus(UnitStatus oldStatus, UnitStatus newStatus)
-	{
-		// Fast pre-check (no lock)
-		if (mStatus.get() != oldStatus) 
-			return false;
-
-		// Set, with check & lock
-		return mStatus.cas(oldStatus, newStatus);
+		// TODO
 
 	}
 	//---------------------------------------------------------------------
-	void PageLoadableUnit::setLoaded()
+	void TerrainPageContent::unloadImpl()
 	{
-		_changeStatus(mStatus.get(), STATUS_LOADED);
+		// TODO
+
 	}
+	//---------------------------------------------------------------------
+	void TerrainPageContent::unprepareImpl()
+	{
+		// TODO
+
+	}
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	String TerrainPageContentFactory::FACTORY_NAME = "Terrain";
+	//---------------------------------------------------------------------
+
 }
 
