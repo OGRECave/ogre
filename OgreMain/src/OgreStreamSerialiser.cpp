@@ -133,6 +133,30 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	const StreamSerialiser::Chunk* StreamSerialiser::readChunkBegin(
+		uint32 id, uint16 maxVersion, const String& msg)
+	{
+		const Chunk* c = readChunkBegin();
+		if (c->id != id)
+		{
+			// rewind
+			undoReadChunk(c->id);
+			return 0;
+		}
+		else if (c->version > maxVersion)
+		{
+			LogManager::getSingleton().stream() << "Error: " << msg 
+				<< " : Data version is " << c->version << " but this software can only read "
+				<< "up to version " << maxVersion;
+			// skip
+			readChunkEnd(c->id);
+			return 0;
+		}
+
+		return c;
+
+	}
+	//---------------------------------------------------------------------
 	void StreamSerialiser::undoReadChunk(uint32 id)
 	{
 		Chunk* c = popChunk(id);
@@ -182,6 +206,13 @@ namespace Ogre
 			mStream->seek(c->offset + CHUNK_HEADER_SIZE + c->length);
 
 		OGRE_DELETE c;
+	}
+	//---------------------------------------------------------------------
+	bool StreamSerialiser::isEndOfChunk(uint32 id)
+	{
+		const Chunk* c = getCurrentChunk();
+		assert(c->id == id);
+		return mStream->tell() == (c->offset + CHUNK_HEADER_SIZE + c->length);
 	}
 	//---------------------------------------------------------------------
 	void StreamSerialiser::readHeader()

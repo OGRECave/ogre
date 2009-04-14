@@ -181,6 +181,20 @@ namespace Ogre
 		*/
 		virtual const Chunk* readChunkBegin();
 
+		/** Reads the start of the next chunk so long as it's of a given ID and version.
+		@remarks
+			This method operates like readChunkBegin, except it checks the ID and
+			version.
+		@param id The ID you're expecting. If the next chunk isn't of this ID, then
+			the chunk read is undone and the method returns null.
+		@param maxVersion The maximum version you're able to process. If the ID is correct
+			but the version	exceeds what is passed in here, the chunk is skipped over,
+			the problem logged and null is returned. 
+		@param msg Descriptive text added to the log if versions are not compatible
+		@returns The chunk if it passes the validation.
+		*/
+		virtual const Chunk* readChunkBegin(uint32 id, uint16 maxVersion, const String& msg = StringUtil::BLANK);
+
 		/** Call this to 'rewind' the stream to just before the start of the current
 			chunk. 
 		@remarks
@@ -204,6 +218,11 @@ namespace Ogre
 		@param id The id of the chunk that you were reading (for validation purposes)
 		*/
 		virtual void readChunkEnd(uint32 id);
+
+		/** Return whether the current data pointer is at the end of the current chunk.
+		@param id The id of the chunk that you were reading (for validation purposes)
+		*/
+		virtual bool isEndOfChunk(uint32 id);
 
 		/// Reports whether the stream is at the end of file
 		virtual bool eof() const;
