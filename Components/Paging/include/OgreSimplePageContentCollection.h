@@ -122,7 +122,7 @@ namespace Ogre
 
 
 	/// Factory class for SimplePageContentCollection
-	class SimplePageContentCollectionFactory : public PageContentCollectionFactory
+	class _OgrePagingExport SimplePageContentCollectionFactory : public PageContentCollectionFactory
 	{
 	public:
 		static String FACTORY_NAME;

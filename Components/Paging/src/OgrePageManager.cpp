@@ -37,10 +37,10 @@ Torus Knot Software Ltd.
 #include "OgrePagedWorldSection.h"
 #include "OgrePagedWorld.h"
 #include "OgreGrid2DPageStrategy.h"
-#include "OgreTerrainPageContent.h"
 #include "OgreSimplePageContentCollection.h"
 #include "OgreStreamSerialiser.h"
 #include "OgreRoot.h"
+#include "OgrePageContent.h"
 
 namespace Ogre
 {
@@ -52,7 +52,6 @@ namespace Ogre
 		, mPageResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
 		, mDebugDisplayLvl(0)
 		, mGrid2DPageStrategy(0)
-		, mTerrainContentFactory(0)
 		, mSimpleCollectionFactory(0)
 	{
 		mQueue = OGRE_NEW PageRequestQueue(this);
@@ -72,7 +71,6 @@ namespace Ogre
 		OGRE_DELETE mQueue;
 
 		OGRE_DELETE mGrid2DPageStrategy;
-		OGRE_DELETE mTerrainContentFactory;
 		OGRE_DELETE mSimpleCollectionFactory;
 	}
 	//---------------------------------------------------------------------
@@ -85,10 +83,6 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void PageManager::createStandardContentFactories()
 	{
-		// content 
-		mTerrainContentFactory = OGRE_NEW TerrainPageContentFactory();
-		addContentFactory(mTerrainContentFactory);
-
 		// collections
 		mSimpleCollectionFactory = OGRE_NEW SimplePageContentCollectionFactory();
 		addContentCollectionFactory(mSimpleCollectionFactory);

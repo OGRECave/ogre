@@ -68,7 +68,7 @@ namespace Ogre
 		Subclasses should implement the protected prepareImpl() et al methods rather
 		than the main public methods. 
 	*/
-	class PageLoadableUnit : public PageAlloc
+	class _OgrePagingExport PageLoadableUnit : public PageAlloc
 	{
 	public:
 		PageLoadableUnit();

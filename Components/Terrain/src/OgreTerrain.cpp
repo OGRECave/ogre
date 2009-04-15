@@ -26,65 +26,69 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#include "OgreTerrainPageContent.h"
+#include "OgreTerrain.h"
 #include "OgreStreamSerialiser.h"
 
 namespace Ogre
 {
 	//---------------------------------------------------------------------
-	const uint32 TerrainPageContent::TERRAIN_CHUNK_ID = StreamSerialiser::makeIdentifier("TERR");
-	const uint16 TerrainPageContent::TERRAIN_CHUNK_VERSION = 1;
+	const uint32 Terrain::TERRAIN_CHUNK_ID = StreamSerialiser::makeIdentifier("TERR");
+	const uint16 Terrain::TERRAIN_CHUNK_VERSION = 1;
 	//---------------------------------------------------------------------
-	TerrainPageContent::TerrainPageContent(PageContentFactory* creator)
-		: PageContent(creator)
+	Terrain::Terrain()
 	{
 
 	}
 	//---------------------------------------------------------------------
-	TerrainPageContent::~TerrainPageContent()
+	Terrain::~Terrain()
 	{
-		destroy();
 	}
 	//---------------------------------------------------------------------
-	void TerrainPageContent::save(StreamSerialiser& stream)
+	void Terrain::save(StreamSerialiser& stream)
 	{
 		stream.writeChunkBegin(TERRAIN_CHUNK_ID, TERRAIN_CHUNK_VERSION);
+
+
 		// TODO
+
 
 		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
 	}
 	//---------------------------------------------------------------------
-	bool TerrainPageContent::prepareImpl(StreamSerialiser& stream)
+	bool Terrain::prepare(StreamSerialiser& stream)
 	{
-		if (!stream.readChunkBegin(TERRAIN_CHUNK_ID, TERRAIN_CHUNK_VERSION, "TerrainPageContent"))
+		if (!stream.readChunkBegin(TERRAIN_CHUNK_ID, TERRAIN_CHUNK_VERSION))
 			return false;
 
 		// TODO
 
 		stream.readChunkEnd(TERRAIN_CHUNK_ID);
+
 		return true;
 	}
 	//---------------------------------------------------------------------
-	void TerrainPageContent::loadImpl()
+	bool Terrain::prepare(const ImportData& importData)
 	{
 		// TODO
 
-	}
-	//---------------------------------------------------------------------
-	void TerrainPageContent::unloadImpl()
-	{
-		// TODO
+		return true;
 
 	}
 	//---------------------------------------------------------------------
-	void TerrainPageContent::unprepareImpl()
+	void Terrain::load()
 	{
 		// TODO
-
 	}
 	//---------------------------------------------------------------------
+	void Terrain::unload()
+	{
+		// TODO
+	}
 	//---------------------------------------------------------------------
-	String TerrainPageContentFactory::FACTORY_NAME = "Terrain";
+	void Terrain::unprepare()
+	{
+		// TODO
+	}
 	//---------------------------------------------------------------------
 
 }

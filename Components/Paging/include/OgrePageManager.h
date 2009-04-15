@@ -429,7 +429,6 @@ namespace Ogre
 		uint8 mDebugDisplayLvl;
 
 		Grid2DPageStrategy* mGrid2DPageStrategy;
-		TerrainPageContentFactory* mTerrainContentFactory;
 		SimplePageContentCollectionFactory* mSimpleCollectionFactory;
 	};
 

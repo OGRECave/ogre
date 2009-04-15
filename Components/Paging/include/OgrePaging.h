@@ -41,7 +41,6 @@ Torus Knot Software Ltd.
 #include "OgrePageManager.h"
 #include "OgrePageStrategy.h"
 #include "OgreSimplePageContentCollection.h"
-#include "OgreTerrainPageContent.h"
 
 
 #endif

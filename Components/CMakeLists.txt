@@ -11,3 +11,6 @@ if (OGRE_BUILD_COMPONENT_PROPERTY)
   add_subdirectory(Property)
 endif ()
 
+if (OGRE_BUILD_COMPONENT_TERRAIN)
+  add_subdirectory(Terrain)
+endif ()

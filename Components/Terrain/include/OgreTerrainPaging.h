@@ -27,10 +27,10 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __Ogre_TerrainPageContent_H__
-#define __Ogre_TerrainPageContent_H__
+#ifndef __Ogre_TerrainPaging_H__
+#define __Ogre_TerrainPaging_H__
 
-#include "OgrePagingPrerequisites.h"
+#include "OgreTerrainPrerequisites.h"
 #include "OgrePageContent.h"
 #include "OgrePageContentFactory.h"
 
@@ -41,14 +41,16 @@ namespace Ogre
 	/** \addtogroup Optional Components
 	*  @{
 	*/
-	/** \addtogroup Paging
-	*  Some details on paging component
+	/** \addtogroup Terrain
+	*  Some details on the terrain component
 	*  @{
 	*/
 
 
 	/** Specialisation of page content for a page of terrain.
 	@par
+		This class forms a bridge between the paging system and a chunk of terrain.
+
 		The data format for this in a file is:<br/>
 		<b>TerrainContentData (Identifier 'TERR')</b>\n
 		[Version 1]
@@ -65,14 +67,11 @@ namespace Ogre
 		</tr>
 		</table>
 	*/
-	class _OgrePagingExport TerrainPageContent : public PageContent
+	class _OgreTerrainExport TerrainPageContent : public PageContent
 	{
 	public:
 		TerrainPageContent(PageContentFactory* creator);
 		virtual ~TerrainPageContent();
-
-		static const uint32 TERRAIN_CHUNK_ID;
-		static const uint16 TERRAIN_CHUNK_VERSION;
 
 		// Overridden from PageContent
 		void save(StreamSerialiser& stream);
@@ -84,13 +83,16 @@ namespace Ogre
 		void unloadImpl();
 		void unprepareImpl();
 
+		/// The actual terrain
+		Terrain* mTerrain;
+
 
 
 	};
 
 
 	/// Factory class for TerrainPageContent
-	class TerrainPageContentFactory : public PageContentFactory
+	class _OgreTerrainExport TerrainPageContentFactory : public PageContentFactory
 	{
 	public:
 		static String FACTORY_NAME;

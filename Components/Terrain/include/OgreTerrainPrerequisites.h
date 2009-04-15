@@ -27,53 +27,38 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __Ogre_Paging_Prereq_H__
-#define __Ogre_Paging_Prereq_H__
+#ifndef __Ogre_Terrain_Prereq_H__
+#define __Ogre_Terrain_Prereq_H__
 
 #include "OgrePrerequisites.h"
 
 namespace Ogre
 {
 	// forward decls
-	class Grid2DPageStrategy;
-	class Page;
-	class PageConnection;
-	class PageContent;
-	class PageContentFactory;
-	class PageContentCollection;
-	class PageContentCollectionFactory;
-	class PagedWorld;
-	class PagedWorldSection;
-	class PageManager;
-	class PageRequestQueue;
-	class PageStrategy;
-	class PageStrategyData;
-	class PageProvider;
-	class SimplePageContentCollection;
-	class SimplePageContentCollectionFactory;
+	class Terrain;
+	class TerrainPageContent;
+	class TerrainPageContentFactory;
 
 
-	typedef GeneralAllocatedObject PageAlloc;
+	typedef GeneralAllocatedObject TerrainAlloc;
 
-	/// Identifier for a page
-	typedef uint32 PageID;
 
 }
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(OGRE_STATIC_LIB)
-#	ifdef OGRE_PAGING_EXPORTS
-#		define _OgrePagingExport __declspec(dllexport)
+#	ifdef OGRE_TERRAIN_EXPORTS
+#		define _OgreTerrainExport __declspec(dllexport)
 #	else
 #       if defined( __MINGW32__ )
-#           define _OgrePagingExport
+#           define _OgreTerrainExport
 #       else
-#    		define _OgrePagingExport __declspec(dllimport)
+#    		define _OgreTerrainExport __declspec(dllimport)
 #       endif
 #   endif
 #elif defined ( OGRE_GCC_VISIBILITY )
-#    define _OgrePagingExport  __attribute__ ((visibility("default")))
+#    define _OgreTerrainExport  __attribute__ ((visibility("default")))
 #else
-#	define _OgrePagingExport
+#	define _OgreTerrainExport
 #endif	// OGRE_WIN32
 
 #endif 
