@@ -16,6 +16,12 @@ macro(pkg_message PREFIX)
   endif ()
 endmacro(pkg_message)
 
+# Get environment variable, define it as ENV_$var and make sure backslashes are converted to forward slashes
+macro(getenv_path VAR)
+   set(ENV_${VAR} $ENV{${VAR}})
+   string( REGEX REPLACE "\\\\" "/" ENV_${VAR} ${ENV_${VAR}} )
+endmacro(getenv_path)
+
 # Construct search paths for includes and libraries from a PREFIX_PATH
 macro(create_search_paths PREFIX)
   foreach(dir ${${PREFIX}_PREFIX_PATH})

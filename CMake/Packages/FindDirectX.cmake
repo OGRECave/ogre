@@ -10,8 +10,13 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
   include(FindPkgMacros)
   findpkg_begin(DirectX)
   
+  # Get path, convert backslashes as ${ENV_DXSDK_DIR}
+  getenv_path(DXSDK_DIR)
+  
   # construct search paths
-  set(DirectX_PREFIX_PATH ${DXSDK_DIR} $ENV{DXSDK_DIR}
+  set(DirectX_PREFIX_PATH 
+    "${DXSDK_DIR}" 
+	"${ENV_DXSDK_DIR}"
     "C:/apps_x86/Microsoft DirectX SDK*"
     "C:/Program Files (x86)/Microsoft DirectX SDK*"
     "C:/apps/Microsoft DirectX SDK*"
@@ -39,7 +44,6 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
   if(DirectX_INCLUDE_DIR)
     set(DirectX_ROOT_DIR "${DirectX_INCLUDE_DIR}/..") 
   endif(DirectX_INCLUDE_DIR)
-
 
   findpkg_finish(DirectX)
 
