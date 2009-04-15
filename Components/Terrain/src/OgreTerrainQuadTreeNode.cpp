@@ -26,40 +26,42 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-
-#ifndef __Ogre_Terrain_Prereq_H__
-#define __Ogre_Terrain_Prereq_H__
-
-#include "OgrePrerequisites.h"
+#include "OgreTerrainQuadTreeNode.h"
+#include "OgreTerrain.h"
 
 namespace Ogre
 {
-	// forward decls
-	class Terrain;
-	class TerrainPageContent;
-	class TerrainPageContentFactory;
-	class TerrainQuadTreeNode;
+	//---------------------------------------------------------------------
+	TerrainQuadTreeNode::TerrainQuadTreeNode(Terrain* terrain, 
+		TerrainQuadTreeNode* parent, uint16 xoff, uint16 yoff, uint16 size)
+		: mTerrain(terrain)
+		, mParent(parent)
+		, mOffsetX(xoff)
+		, mOffsetY(yoff)
+		, mSize(size)
+	{
+		if (terrain->getMinBatchSize() < size)
+		{
+			uint16 childSize = ((size - 1) * 0.5) + 1;
+			uint16 childOff = childSize - 1;
+			// create children
+			mChildren[0] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff, childSize);
+			mChildren[1] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff, childSize);
+			mChildren[2] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff + childOff, childSize);
+			mChildren[3] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff + childOff, childSize);
 
-
-	typedef GeneralAllocatedObject TerrainAlloc;
-
-
+		}
+		else
+		{
+			memset(mChildren, 0, sizeof(TerrainQuadTreeNode*) * 4);
+		}
+	}
+	//---------------------------------------------------------------------
+	TerrainQuadTreeNode::~TerrainQuadTreeNode()
+	{
+		for (int i = 0; i < 4; ++i)
+			OGRE_DELETE mChildren[i];
+	}
+	//---------------------------------------------------------------------
 }
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(OGRE_STATIC_LIB)
-#	ifdef OGRE_TERRAIN_EXPORTS
-#		define _OgreTerrainExport __declspec(dllexport)
-#	else
-#       if defined( __MINGW32__ )
-#           define _OgreTerrainExport
-#       else
-#    		define _OgreTerrainExport __declspec(dllimport)
-#       endif
-#   endif
-#elif defined ( OGRE_GCC_VISIBILITY )
-#    define _OgreTerrainExport  __attribute__ ((visibility("default")))
-#else
-#	define _OgreTerrainExport
-#endif	// OGRE_WIN32
-
-#endif 

@@ -8,10 +8,12 @@ PROJECT(OgreTerrain)
 set (HEADER_FILES
     include/OgreTerrain.h
 	include/OgreTerrainPrerequisites.h
+    include/OgreTerrainQuadTreeNode.h
 )
 
 set (SOURCE_FILES
 	src/OgreTerrain.cpp
+	src/OgreTerrainQuadTreeNode.cpp
 )
 
 

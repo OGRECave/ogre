@@ -31,7 +31,7 @@ Torus Knot Software Ltd.
 #define __Ogre_Terrain_H__
 
 #include "OgreTerrainPrerequisites.h"
-
+#include "OgreCommon.h"
 
 
 namespace Ogre
@@ -53,14 +53,39 @@ namespace Ogre
 	[Version 1]
 	<table>
 	<tr>
-	<td><b>Name</b></td>
-	<td><b>Type</b></td>
-	<td><b>Description</b></td>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
 	</tr>
 	<tr>
-	<td>Terrain orientation</td>
-	<td>uint8</td>
-	<td>The orientation of the terrain; XZ = 0, XY = 1, YZ = 2</td>
+		<td>Terrain orientation</td>
+		<td>uint8</td>
+		<td>The orientation of the terrain; XZ = 0, XY = 1, YZ = 2</td>
+	</tr>
+	<tr>
+		<td>Terrain size</td>
+		<td>uint16</td>
+		<td>The number of vertices along one side of the terrain</td>
+	</tr>
+	<tr>
+		<td>Terrain world size</td>
+		<td>Real</td>
+		<td>The world size of one side of the terrain</td>
+	</tr>
+	<tr>
+		<td>Max batch size</td>
+		<td>uint16</td>
+		<td>The maximum batch size in vertices along one side</td>
+	</tr>
+	<tr>
+		<td>Min batch size</td>
+		<td>uint16</td>
+		<td>The minimum batch size in vertices along one side</td>
+	</tr>
+	<tr>
+		<td>Height data</td>
+		<td>float[size*size]</td>
+		<td>List of floating point heights</td>
 	</tr>
 	</table>
 	*/
@@ -103,16 +128,16 @@ namespace Ogre
 			@remarks
 			The terrain will be divided into tiles, and this is the minimum
 			size of one tile in vertices (at any LOD). Adjacent tiles will be
-			collected together into one batch once they are individually at this minimum,
+			collected together into one batch to drop LOD levels once they are individually at this minimum,
 			so setting this value higher means greater batching at the expense
 			of making adjacent tiles use a common LOD.
-			Only when the entire terrain is collected together into one batch can 
-			the batch size become smaller than this.
+			Once the entire terrain is collected together into one batch this 
+			effectively sets the minimum LOD.
 			*/
 			uint16 minBatchSize;
 
-			/** Where a height of zero is positioned in world space. */
-			Real baseHeight;
+			/** The world size of the terrain. */
+			Real worldSize;
 
 			/** Optional heightmap providing the initial heights for the terrain. 
 			@remarks
@@ -136,7 +161,7 @@ namespace Ogre
 				, terrainSize(1025)
 				, maxBatchSize(65)
 				, minBatchSize(17)
-				, baseHeight(0)
+				, worldSize(1000)
 				, inputImage(0)
 				, inputFloat(0)
 				, inputScale(1.0)
@@ -181,7 +206,51 @@ namespace Ogre
 			This is safe to do in a background thread after calling unload().
 		*/
 		void unprepare();
+
+
+		/** Get a pointer to all the height data for this terrain.
+		@remarks
+			This pointer is not const, so you can update the height data if you
+			wish. However, changes will not be propagated until you call 
+			Terrain::dirty or Terrain::dirtyRect.
+		*/
+		float* getHeightData();
+
+		/// Get the alignment of the terrain
+		Alignment getAlignment() const;
+		/// Get the size of the terrain in vertices along one side
+		uint16 getSize() const;
+		/// Get the maximum size in vertices along one side of a batch 
+		uint16 getMaxBatchSize() const;
+		/// Get the minimum size in vertices along one side of a batch 
+		uint16 getMinBatchSize() const;
+		/// Get the size of the terrain in world units
+		Real getWorldSize() const;
+
+		/** Mark the entire terrain as dirty, so that the geometry is
+			updated the next time it is accessed. 
+		*/
+		void dirty();
+
+		/** Mark a region of the terrain as dirty, so that the geometry is 
+			updated the next time it is accessed. 
+		@param rect A rectangle expressed in vertices describing the dirty region
+		*/
+		void dirtyRect(const Rect& rect);
 	protected:
+
+		void freeCPUResources();
+		void freeGPUResources();
+
+
+		/// The height data
+		float* mHeightData;
+		Alignment mAlign;
+		Real mWorldSize;
+		uint16 mSize;
+		uint16 mMaxBatchSize;
+		uint16 mMinBatchSize;
+		TerrainQuadTreeNode* mQuadTree;
 
 
 	};
