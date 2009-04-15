@@ -2,10 +2,14 @@
 
 if (WIN32)
   set(OGRE_RELEASE_PATH "/Release")
+  set(OGRE_RELWDBG_PATH "/RelWithDebInfo")
+  set(OGRE_MINSIZE_PATH "/MinSizeRel")
   set(OGRE_DEBUG_PATH "/Debug")
   set(OGRE_PLUGIN_PATH "/opt")
 elseif (UNIX)
   set(OGRE_RELEASE_PATH "")
+  set(OGRE_RELWDBG_PATH "")
+  set(OGRE_MINSIZE_PATH "")
   set(OGRE_DEBUG_PATH "/debug")
   set(OGRE_PLUGIN_PATH "/OGRE")
 endif ()
@@ -21,6 +25,34 @@ function(ogre_create_vcproj_userfile TARGETNAME)
   endif ()
 endfunction(ogre_create_vcproj_userfile)
 
+# install targets according to current build type
+function(ogre_install_target TARGETNAME)
+  install(TARGETS ${TARGETNAME}
+    RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" CONFIGURATIONS Release None ""
+    LIBRARY DESTINATION "lib" CONFIGURATIONS Release None ""
+    ARCHIVE DESTINATION "lib" CONFIGURATIONS Release None ""
+    FRAMEWORK DESTINATION "bin${OGRE_RELEASE_PATH}" CONFIGURATIONS Release None ""
+  )
+  install(TARGETS ${TARGETNAME}
+    RUNTIME DESTINATION "bin${OGRE_RELWDBG_PATH}" CONFIGURATIONS RelWithDebInfo
+    LIBRARY DESTINATION "lib" CONFIGURATIONS RelWithDebInfo
+    ARCHIVE DESTINATION "lib" CONFIGURATIONS RelWithDebInfo
+    FRAMEWORK DESTINATION "bin${OGRE_RELWDBG_PATH}" CONFIGURATIONS RelWithDebInfo
+  )
+  install(TARGETS ${TARGETNAME}
+    RUNTIME DESTINATION "bin${OGRE_MINSIZE_PATH}" CONFIGURATIONS MinSizeRel
+    LIBRARY DESTINATION "lib" CONFIGURATIONS MinSizeRel
+    ARCHIVE DESTINATION "lib" CONFIGURATIONS MinSizeRel
+    FRAMEWORK DESTINATION "bin${OGRE_MINSIZE_PATH}" CONFIGURATIONS MinSizeRel
+  )
+  install(TARGETS ${TARGETNAME}
+    RUNTIME DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS Debug
+    LIBRARY DESTINATION "lib" CONFIGURATIONS Debug
+    ARCHIVE DESTINATION "lib" CONFIGURATIONS Debug
+    FRAMEWORK DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS Debug
+  )
+endfunction(ogre_install_target)
+
 # setup common target settings
 function(ogre_config_common TARGETNAME)
   set_target_properties(${TARGETNAME} PROPERTIES
@@ -30,7 +62,6 @@ function(ogre_config_common TARGETNAME)
   )
   ogre_create_vcproj_userfile(${TARGETNAME})
 endfunction(ogre_config_common)
-
 
 # setup library build
 function(ogre_config_lib LIBNAME)
@@ -44,20 +75,7 @@ function(ogre_config_lib LIBNAME)
       set_target_properties(${LIBNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
 	endif (CMAKE_COMPILER_IS_GNUCXX)
   endif (OGRE_STATIC)
-  install(TARGETS ${LIBNAME}
-    RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" 
-      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
-    LIBRARY DESTINATION "lib" CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
-    ARCHIVE DESTINATION "lib" CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
-    FRAMEWORK DESTINATION "bin${OGRE_RELEASE_PATH}" 
-      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
-  )
-  install(TARGETS ${LIBNAME}
-    RUNTIME DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS DEBUG
-    LIBRARY DESTINATION "lib" CONFIGURATIONS DEBUG
-    ARCHIVE DESTINATION "lib" CONFIGURATIONS DEBUG
-    FRAMEWORK DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS DEBUG
-  )
+  ogre_install_target(${LIBNAME})
   
   if (OGRE_INSTALL_PDB)
     # install debug pdb files
@@ -66,10 +84,18 @@ function(ogre_config_lib LIBNAME)
 	    DESTINATION lib
 		CONFIGURATIONS Debug
 	  )
+	  install(FILES ${OGRE_BINARY_DIR}/lib${OGRE_RELWDBG_PATH}/${LIBNAME}Static.pdb
+	    DESTINATION lib
+		CONFIGURATIONS RelWithDebInfo
+	  )
 	else ()
 	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${LIBNAME}_d.pdb
 	    DESTINATION bin${OGRE_DEBUG_PATH}
 		CONFIGURATIONS Debug
+	  )
+	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_RELWDBG_PATH}/${LIBNAME}.pdb
+	    DESTINATION bin${OGRE_RELWDBG_PATH}
+		CONFIGURATIONS RelWithDebInfo
 	  )
 	endif ()
   endif ()
@@ -89,19 +115,7 @@ function(ogre_config_plugin PLUGINNAME)
       set_target_properties(${PLUGINNAME} PROPERTIES PREFIX "")
 	endif (CMAKE_COMPILER_IS_GNUCXX)	
   endif (OGRE_STATIC)
-  install(TARGETS ${PLUGINNAME}
-    RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" 
-      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
-    LIBRARY DESTINATION "lib${OGRE_PLUGIN_PATH}" 
-      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
-    ARCHIVE DESTINATION "lib${OGRE_PLUGIN_PATH}" 
-      CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
-  )
-  install(TARGETS ${PLUGINNAME}
-    RUNTIME DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS DEBUG
-    LIBRARY DESTINATION "lib${OGRE_PLUGIN_PATH}" CONFIGURATIONS DEBUG
-    ARCHIVE DESTINATION "lib${OGRE_PLUGIN_PATH}" CONFIGURATIONS DEBUG
-  )
+  ogre_install_target(${PLUGINNAME})
 
   if (OGRE_INSTALL_PDB)
     # install debug pdb files
@@ -110,10 +124,18 @@ function(ogre_config_plugin PLUGINNAME)
 	    DESTINATION lib/opt
 		CONFIGURATIONS Debug
 	  )
+	  install(FILES ${OGRE_BINARY_DIR}/lib${OGRE_RELWDBG_PATH}/${PLUGINNAME}Static.pdb
+	    DESTINATION lib/opt
+		CONFIGURATIONS RelWithDebInfo
+	  )
 	else ()
 	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${PLUGINNAME}_d.pdb
 	    DESTINATION bin${OGRE_DEBUG_PATH}
 		CONFIGURATIONS Debug
+	  )
+	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_RELWDBG_PATH}/${PLUGINNAME}.pdb
+	    DESTINATION bin${OGRE_RELWDBG_PATH}
+		CONFIGURATIONS RelWithDebInfo
 	  )
 	endif ()
   endif ()
@@ -205,20 +227,16 @@ function(ogre_config_sample SAMPLENAME)
   endif (APPLE)
 
   if (OGRE_INSTALL_SAMPLES)
-    install(TARGETS ${SAMPLENAME}
-      RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" 
-        CONFIGURATIONS Release MinSizeRel RelWithDebInfo None OPTIONAL
-    )
-    install(TARGETS ${SAMPLENAME}
-      RUNTIME DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS Debug OPTIONAL
-    )
+    ogre_install_target(${SAMPLENAME})
   endif ()	
 
   if (OGRE_INSTALL_PDB)
     # install debug pdb files
 	install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}.pdb
-	  DESTINATION bin${OGRE_DEBUG_PATH}
-	  CONFIGURATIONS Debug
+	  DESTINATION bin${OGRE_DEBUG_PATH} CONFIGURATIONS Debug
+	)
+	install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_RELWDBG_PATH}/${SAMPLENAME}.pdb
+	  DESTINATION bin${OGRE_RELWDBG_PATH} CONFIGURATIONS RelWithDebInfo
 	)
   endif ()
 endfunction(ogre_config_sample)
@@ -235,13 +253,7 @@ function(ogre_config_tool TOOLNAME)
   endif ()
 
   if (OGRE_INSTALL_TOOLS)
-    install(TARGETS ${TOOLNAME}
-      RUNTIME DESTINATION "bin${OGRE_RELEASE_PATH}" 
-        CONFIGURATIONS Release MinSizeRel RelWithDebInfo None OPTIONAL
-    )
-    install(TARGETS ${TOOLNAME}
-      RUNTIME DESTINATION "bin${OGRE_DEBUG_PATH}" CONFIGURATIONS Debug OPTIONAL
-    )
+    ogre_install_target(${TOOLNAME})
   endif ()	
 
   if (OGRE_INSTALL_PDB)
@@ -249,6 +261,10 @@ function(ogre_config_tool TOOLNAME)
 	install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${TOOLNAME}.pdb
 	  DESTINATION bin${OGRE_DEBUG_PATH}
 	  CONFIGURATIONS Debug
+	)
+	install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_RELWDBG_PATH}/${TOOLNAME}.pdb
+	  DESTINATION bin${OGRE_RELWDBG_PATH}
+	  CONFIGURATIONS RelWithDebInfo
 	)
   endif ()
 endfunction(ogre_config_tool)

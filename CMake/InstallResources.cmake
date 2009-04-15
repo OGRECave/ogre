@@ -79,8 +79,21 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_TOOLS)
     ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
     ${OGRE_BINARY_DIR}/inst/bin/release/media.cfg
     ${OGRE_BINARY_DIR}/inst/bin/release/quake3settings.cfg
-    DESTINATION "bin${OGRE_RELEASE_PATH}"
-    CONFIGURATIONS Release MinSizeRel RelWithDebInfo None ""
+    DESTINATION "bin${OGRE_RELEASE_PATH}" CONFIGURATIONS Release None ""
+  )
+  install(FILES 
+    ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/media.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/quake3settings.cfg
+	DESTINATION "bin${OGRE_RELWDBG_PATH}" CONFIGURATIONS RelWithDebInfo
+  )
+  install(FILES 
+    ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/media.cfg
+    ${OGRE_BINARY_DIR}/inst/bin/release/quake3settings.cfg
+	DESTINATION "bin${OGRE_MINSIZE_PATH}" CONFIGURATIONS MinSizeRel
   )
 endif ()
 
@@ -103,15 +116,23 @@ if (WIN32)
   # create resources.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/resources_d.cfg.in ${OGRE_BINARY_DIR}/bin/debug/resources.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/bin/release/resources.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/bin/relwithdebinfo/resources.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/bin/minsizerel/resources.cfg)
   # create plugins.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/plugins_d.cfg.in ${OGRE_BINARY_DIR}/bin/debug/plugins.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/release/plugins.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/relwithdebinfo/plugins.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/minsizerel/plugins.cfg)
   # create media.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/media.cfg.in ${OGRE_BINARY_DIR}/bin/debug/media.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/media.cfg.in ${OGRE_BINARY_DIR}/bin/release/media.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/media.cfg.in ${OGRE_BINARY_DIR}/bin/relwithdebinfo/media.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/media.cfg.in ${OGRE_BINARY_DIR}/bin/minsizerel/media.cfg)
   # create quake3settings.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/quake3settings_d.cfg.in ${OGRE_BINARY_DIR}/bin/debug/quake3settings.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/quake3settings.cfg.in ${OGRE_BINARY_DIR}/bin/release/quake3settings.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/quake3settings.cfg.in ${OGRE_BINARY_DIR}/bin/relwithdebinfo/quake3settings.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/quake3settings.cfg.in ${OGRE_BINARY_DIR}/bin/minsizerel/quake3settings.cfg)
 else() # other OS only need one cfg file
   string(TOLOWER "${CMAKE_BUILD_TYPE}" OGRE_BUILD_TYPE)
   if (OGRE_BUILD_TYPE STREQUAL "debug" AND NOT APPLE)

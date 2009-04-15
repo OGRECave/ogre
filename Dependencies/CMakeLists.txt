@@ -30,7 +30,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
     ${OGRE_DEP_BIN_DIR}/debug/CEGUIFalagardWRBase_d.dll
     ${OGRE_DEP_BIN_DIR}/debug/cg.dll
     ${OGRE_DEP_BIN_DIR}/debug/OIS_d.dll
-	DESTINATION bin/debug
+	DESTINATION bin/debug CONFIGURATIONS Debug
   )
   install(FILES
     ${OGRE_DEP_BIN_DIR}/release/CEGUIBase.dll
@@ -38,7 +38,23 @@ if (OGRE_INSTALL_DEPENDENCIES)
     ${OGRE_DEP_BIN_DIR}/release/CEGUIFalagardWRBase.dll
     ${OGRE_DEP_BIN_DIR}/release/cg.dll
     ${OGRE_DEP_BIN_DIR}/release/OIS.dll
-	DESTINATION bin/release
+	DESTINATION bin/release CONFIGURATIONS Release None ""
+  )  
+  install(FILES
+    ${OGRE_DEP_BIN_DIR}/release/CEGUIBase.dll
+    ${OGRE_DEP_BIN_DIR}/release/CEGUI${OGRE_CEGUI_XML_PARSER}Parser.dll
+    ${OGRE_DEP_BIN_DIR}/release/CEGUIFalagardWRBase.dll
+    ${OGRE_DEP_BIN_DIR}/release/cg.dll
+    ${OGRE_DEP_BIN_DIR}/release/OIS.dll
+	DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo
+  )  
+  install(FILES
+    ${OGRE_DEP_BIN_DIR}/release/CEGUIBase.dll
+    ${OGRE_DEP_BIN_DIR}/release/CEGUI${OGRE_CEGUI_XML_PARSER}Parser.dll
+    ${OGRE_DEP_BIN_DIR}/release/CEGUIFalagardWRBase.dll
+    ${OGRE_DEP_BIN_DIR}/release/cg.dll
+    ${OGRE_DEP_BIN_DIR}/release/OIS.dll
+	DESTINATION bin/minsizerel CONFIGURATIONS MinSizeRel
   )  
 endif ()
 
@@ -54,3 +70,15 @@ configure_file(${OGRE_DEP_BIN_DIR}/release/CEGUI${OGRE_CEGUI_XML_PARSER}Parser.d
 configure_file(${OGRE_DEP_BIN_DIR}/release/CEGUIFalagardWRBase.dll ${OGRE_BINARY_DIR}/bin/release/CEGUIFalagardWRBase.dll COPYONLY)
 configure_file(${OGRE_DEP_BIN_DIR}/release/cg.dll ${OGRE_BINARY_DIR}/bin/release/cg.dll COPYONLY)
 configure_file(${OGRE_DEP_BIN_DIR}/release/OIS.dll ${OGRE_BINARY_DIR}/bin/release/OIS.dll COPYONLY)
+
+configure_file(${OGRE_DEP_BIN_DIR}/release/CEGUIBase.dll ${OGRE_BINARY_DIR}/bin/relwithdebinfo/CEGUIBase.dll COPYONLY)
+configure_file(${OGRE_DEP_BIN_DIR}/release/CEGUI${OGRE_CEGUI_XML_PARSER}Parser.dll ${OGRE_BINARY_DIR}/bin/relwithdebinfo/CEGUI${OGRE_CEGUI_XML_PARSER}Parser.dll COPYONLY)
+configure_file(${OGRE_DEP_BIN_DIR}/release/CEGUIFalagardWRBase.dll ${OGRE_BINARY_DIR}/bin/relwithdebinfo/CEGUIFalagardWRBase.dll COPYONLY)
+configure_file(${OGRE_DEP_BIN_DIR}/release/cg.dll ${OGRE_BINARY_DIR}/bin/relwithdebinfo/cg.dll COPYONLY)
+configure_file(${OGRE_DEP_BIN_DIR}/release/OIS.dll ${OGRE_BINARY_DIR}/bin/relwithdebinfo/OIS.dll COPYONLY)
+
+configure_file(${OGRE_DEP_BIN_DIR}/release/CEGUIBase.dll ${OGRE_BINARY_DIR}/bin/minsizerel/CEGUIBase.dll COPYONLY)
+configure_file(${OGRE_DEP_BIN_DIR}/release/CEGUI${OGRE_CEGUI_XML_PARSER}Parser.dll ${OGRE_BINARY_DIR}/bin/minsizerel/CEGUI${OGRE_CEGUI_XML_PARSER}Parser.dll COPYONLY)
+configure_file(${OGRE_DEP_BIN_DIR}/release/CEGUIFalagardWRBase.dll ${OGRE_BINARY_DIR}/bin/minsizerel/CEGUIFalagardWRBase.dll COPYONLY)
+configure_file(${OGRE_DEP_BIN_DIR}/release/cg.dll ${OGRE_BINARY_DIR}/bin/minsizerel/cg.dll COPYONLY)
+configure_file(${OGRE_DEP_BIN_DIR}/release/OIS.dll ${OGRE_BINARY_DIR}/bin/minsizerel/OIS.dll COPYONLY)
