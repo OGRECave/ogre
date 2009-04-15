@@ -180,6 +180,7 @@ mCameraRelativeRendering(false)
 //-----------------------------------------------------------------------
 SceneManager::~SceneManager()
 {
+	destroyShadowTextures();
     clearScene();
     destroyAllCameras();
 
