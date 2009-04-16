@@ -8,8 +8,11 @@
 include(FindPkgMacros)
 findpkg_begin(FREETYPE)
 
+# Get path, convert backslashes as ${ENV_${var}}
+getenv_path(FREETYPE_HOME)
+
 # construct search paths
-set(FREETYPE_PREFIX_PATH ${FREETYPE_HOME} $ENV{FREETYPE_HOME})
+set(FREETYPE_PREFIX_PATH ${FREETYPE_HOME} ${ENV_FREETYPE_HOME})
 create_search_paths(FREETYPE)
 # redo search if prefix path changed
 clear_if_changed(FREETYPE_PREFIX_PATH

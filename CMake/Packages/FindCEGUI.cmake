@@ -8,11 +8,16 @@
 include(FindPkgMacros)
 findpkg_begin(CEGUI)
 
+# Get path, convert backslashes as ${ENV_${var}}
+getenv_path(CEGUI_HOME)
+getenv_path(OGRE_SOURCE)
+getenv_path(OGRE_HOME)
+
 # construct search paths
-set(CEGUI_PREFIX_PATH ${CEGUI_HOME} $ENV{CEGUI_HOME}
+set(CEGUI_PREFIX_PATH ${CEGUI_HOME} ${ENV_CEGUI_HOME}
   ${OGRE_SOURCE}/Dependencies
-  $ENV{OGRE_SOURCE}/Dependencies
-  ${OGRE_HOME} $ENV{OGRE_HOME})
+  ${ENV_OGRE_SOURCE}/Dependencies
+  ${OGRE_HOME} ${ENV_OGRE_HOME})
 create_search_paths(CEGUI)
 # redo search if prefix path changed
 clear_if_changed(CEGUI_PREFIX_PATH

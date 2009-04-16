@@ -8,8 +8,11 @@
 include(FindPkgMacros)
 findpkg_begin(ZLIB)
 
+# Get path, convert backslashes as ${ENV_${var}}
+getenv_path(ZLIB_HOME)
+
 # construct search paths
-set(ZLIB_PREFIX_PATH ${ZLIB_HOME} $ENV{ZLIB_HOME})
+set(ZLIB_PREFIX_PATH ${ZLIB_HOME} ${ENV_ZLIB_HOME})
 create_search_paths(ZLIB)
 # redo search if prefix path changed
 clear_if_changed(ZLIB_PREFIX_PATH

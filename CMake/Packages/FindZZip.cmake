@@ -8,8 +8,12 @@
 include(FindPkgMacros)
 findpkg_begin(ZZip)
 
+# Get path, convert backslashes as ${ENV_${var}}
+getenv_path(ZZIP_HOME)
+
+
 # construct search paths
-set(ZZip_PREFIX_PATH ${ZZIP_HOME} $ENV{ZZIP_HOME})
+set(ZZip_PREFIX_PATH ${ZZIP_HOME} ${ENV_ZZIP_HOME})
 create_search_paths(ZZip)
 # redo search if prefix path changed
 clear_if_changed(ZZip_PREFIX_PATH

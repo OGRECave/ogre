@@ -8,8 +8,11 @@
 include(FindPkgMacros)
 findpkg_begin(CppUnit)
 
+# Get path, convert backslashes as ${ENV_${var}}
+getenv_path(CPPUNIT_HOME)
+
 # construct search paths
-set(CppUnit_PREFIX_PATH ${CPPUNIT_HOME} $ENV{CPPUNIT_HOME})
+set(CppUnit_PREFIX_PATH ${CPPUNIT_HOME} ${ENV_CPPUNIT_HOME})
 create_search_paths(CppUnit)
 # redo search if prefix path changed
 clear_if_changed(CppUnit_PREFIX_PATH

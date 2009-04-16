@@ -39,6 +39,15 @@ include(FindPkgMacros)
 include(PreprocessorUtils)
 findpkg_begin(OGRE)
 
+
+# Get path, convert backslashes as ${ENV_${var}}
+getenv_path(OGRE_HOME)
+getenv_path(OGRE_SDK)
+getenv_path(OGRE_SOURCE)
+getenv_path(OGRE_BUILD)
+getenv_path(PROGRAMFILES)
+
+
 # Determine whether to search for a dynamic or static build
 if (OGRE_STATIC)
   set(OGRE_LIB_SUFFIX "Static")
@@ -54,7 +63,7 @@ get_debug_names(OGRE_LIBRARY_NAMES)
 # OS specific guesses
 if (WIN32)
   set(OGRE_PREFIX_GUESSES
-    $ENV{PROGRAMFILES}/OGRE
+    ${ENV_PROGRAMFILES}/OGRE
     C:/OgreSDK
   )
 elseif (UNIX)
@@ -70,13 +79,13 @@ elseif (UNIX)
   )
 endif ()
 set(OGRE_PREFIX_PATH
-  ${OGRE_HOME} $ENV{OGRE_HOME} $ENV{OGRE_SDK}
+  ${OGRE_HOME} ${ENV_OGRE_HOME} ${ENV_OGRE_SDK}
   ${OGRE_PREFIX_GUESSES}
 )
 create_search_paths(OGRE)
 # If both OGRE_BUILD and OGRE_SOURCE are set, prepare to find Ogre in a build dir
-set(OGRE_PREFIX_SOURCE ${OGRE_SOURCE} $ENV{OGRE_SOURCE})
-set(OGRE_PREFIX_BUILD ${OGRE_BUILD} $ENV{OGRE_BUILD})
+set(OGRE_PREFIX_SOURCE ${OGRE_SOURCE} ${ENV_OGRE_SOURCE})
+set(OGRE_PREFIX_BUILD ${OGRE_BUILD} ${ENV_OGRE_BUILD})
 if (OGRE_PREFIX_SOURCE AND OGRE_PREFIX_BUILD)
   foreach(dir ${OGRE_PREFIX_SOURCE})
     set(OGRE_INC_SEARCH_PATH ${dir}/OgreMain/include ${dir}/Dependencies/include ${OGRE_INC_SEARCH_PATH})

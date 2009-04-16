@@ -8,8 +8,11 @@
 include(FindPkgMacros)
 findpkg_begin(FreeImage)
 
+# Get path, convert backslashes as ${ENV_${var}}
+getenv_path(FREEIMAGE_HOME)
+
 # construct search paths
-set(FreeImage_PREFIX_PATH ${FREEIMAGE_HOME} $ENV{FREEIMAGE_HOME})
+set(FreeImage_PREFIX_PATH ${FREEIMAGE_HOME} ${ENV_FREEIMAGE_HOME})
 create_search_paths(FreeImage)
 # redo search if prefix path changed
 clear_if_changed(FreeImage_PREFIX_PATH

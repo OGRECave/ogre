@@ -48,7 +48,9 @@ SET(POCO_INCLUDE_DIR_MESSAGE "Set the Poco_INCLUDE_DIR cmake cache entry to the 
 SET(POCO_LIBRARY_PATH_DESCRIPTION "top-level directory containing the poco libraries.")
 SET(POCO_LIBRARY_DIR_MESSAGE "Set the Poco_LIBRARY_DIR cmake cache entry to the ${POCO_LIBRARY_PATH_DESCRIPTION}")
 
-SET(POCO_DIR_SEARCH ${POCO_ROOT} $ENV{POCO_ROOT})
+# Get path, convert backslashes as ${ENV_${var}}
+getenv_path(POCO_ROOT)
+SET(POCO_DIR_SEARCH ${POCO_ROOT} ${ENV_POCO_ROOT})
 IF(POCO_DIR_SEARCH)
   FILE(TO_CMAKE_PATH ${POCO_DIR_SEARCH} POCO_DIR_SEARCH)
 ENDIF(POCO_DIR_SEARCH)

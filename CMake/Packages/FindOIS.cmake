@@ -8,10 +8,15 @@
 include(FindPkgMacros)
 findpkg_begin(OIS)
 
+# Get path, convert backslashes as ${ENV_${var}}
+getenv_path(OIS_HOME)
+getenv_path(OGRE_HOME)
+getenv_path(OGRE_SOURCE)
+
 # construct search paths
-set(OIS_PREFIX_PATH ${OIS_HOME} $ENV{OIS_HOME} 
-  ${OGRE_SOURCE}/Dependencies $ENV{OGRE_SOURCE}/Dependencies
-  ${OGRE_HOME} $ENV{OGRE_HOME})
+set(OIS_PREFIX_PATH ${OIS_HOME} ${ENV_OIS_HOME} 
+  ${OGRE_SOURCE}/Dependencies ${ENV_OGRE_SOURCE}/Dependencies
+  ${OGRE_HOME} ${ENV_OGRE_HOME})
 create_search_paths(OIS)
 # redo search if prefix path changed
 clear_if_changed(OIS_PREFIX_PATH
