@@ -49,6 +49,7 @@ namespace Ogre
     const Real Math::HALF_PI = Real( 0.5 * PI );
 	const Real Math::fDeg2Rad = PI / Real(180.0);
 	const Real Math::fRad2Deg = Real(180.0) / PI;
+	const Real Math::LOG2 = log(Real(2.0));
 
     int Math::mTrigTableSize;
    Math::AngleUnit Math::msAngleUnit;

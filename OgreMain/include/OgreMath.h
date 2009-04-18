@@ -259,6 +259,13 @@ namespace Ogre
 
 		static inline Real Log (Real fValue) { return Real(log(fValue)); }
 
+		/// Stored value of log(2) for frequent use
+		static const Real LOG2;
+
+		static inline Real Log2 (Real fValue) { return Real(log(fValue)/LOG2); }
+
+		static inline Real LogN (Real base, Real fValue) { return Real(log(fValue)/log(base)); }
+
 		static inline Real Pow (Real fBase, Real fExponent) { return Real(pow(fBase,fExponent)); }
 
         static Real Sign (Real fValue);
