@@ -32,6 +32,7 @@ Torus Knot Software Ltd.
 
 #include "OgreTerrainPrerequisites.h"
 #include "OgreCommon.h"
+#include "OgreVector3.h"
 
 
 namespace Ogre
@@ -83,16 +84,28 @@ namespace Ogre
 		<td>The minimum batch size in vertices along one side</td>
 	</tr>
 	<tr>
+		<td>Position</td>
+		<td>Vector3</td>
+		<td>The location of the centre of the terrain</td>
+	</tr>
+	<tr>
 		<td>Height data</td>
 		<td>float[size*size]</td>
 		<td>List of floating point heights</td>
+	</tr>
+	<tr>
+		<td>Delta data</td>
+		<td>float[size*size]</td>
+		<td>List of floating point delta values for each vertex, storing the difference
+			between its real height, and the height it will become on the first
+			LOD level in which it is eliminated.</td>
 	</tr>
 	</table>
 	*/
 	class _OgreTerrainExport Terrain : public TerrainAlloc
 	{
 	public:
-		Terrain();
+		Terrain(SceneManager* sm);
 		virtual ~Terrain();
 
 		static const uint32 TERRAIN_CHUNK_ID;
@@ -136,6 +149,12 @@ namespace Ogre
 			*/
 			uint16 minBatchSize;
 
+			/** Position of the terrain.
+			@remarks
+				Represents the position of the centre of the terrain. 
+			*/
+			Vector3 pos;
+
 			/** The world size of the terrain. */
 			Real worldSize;
 
@@ -161,6 +180,7 @@ namespace Ogre
 				, terrainSize(1025)
 				, maxBatchSize(65)
 				, minBatchSize(17)
+				, pos(Vector3::ZERO)
 				, worldSize(1000)
 				, inputImage(0)
 				, inputFloat(0)
@@ -210,11 +230,24 @@ namespace Ogre
 
 		/** Get a pointer to all the height data for this terrain.
 		@remarks
+			The height data is in world coordinates, relative to the position 
+			of the terrain.
+		@par
 			This pointer is not const, so you can update the height data if you
 			wish. However, changes will not be propagated until you call 
 			Terrain::dirty or Terrain::dirtyRect.
 		*/
 		float* getHeightData();
+
+		/** Get a pointer to the height data for a given point. 
+		*/
+		float* getHeightData(long x, long y);
+
+		/** Get a Vector3 of the world-space point on the terrain, aligned as per
+			options.
+		@note This point is relative to Terrain::getPosition
+		*/
+		void getPoint(long x, long y, Vector3* outpos);
 
 		/// Get the alignment of the terrain
 		Alignment getAlignment() const;
@@ -227,6 +260,10 @@ namespace Ogre
 		/// Get the size of the terrain in world units
 		Real getWorldSize() const;
 
+		/// Get the world position of the terrain centre
+		const Vector3& getPosition() const { return mPos; }
+		/// Set the position of the terrain centre in world coordinates
+		void setPosition(const Vector3& pos);
 		/** Mark the entire terrain as dirty, so that the geometry is
 			updated the next time it is accessed. 
 		*/
@@ -234,29 +271,126 @@ namespace Ogre
 
 		/** Mark a region of the terrain as dirty, so that the geometry is 
 			updated the next time it is accessed. 
-		@param rect A rectangle expressed in vertices describing the dirty region
+		@param rect A rectangle expressed in vertices describing the dirty region;
+			left <= right, bottom <= top
 		*/
 		void dirtyRect(const Rect& rect);
+
+
+		/** Whether to use triangle strips or not then rendering terrain
+			(default true, set for new Terrain using TerrainGlobalOptions)
+		*/
+		bool getUseTriangleStrips() { return mUseTriangleStrips; }
+		/** Whether to morph between LODs using a vertex program. 
+			(default true, set for new Terrain using TerrainGlobalOptions)
+		*/
+		bool getUseLodMorph() { return mUseLodMorph; }
+		/** The default size of 'skirts' used to hide terrain cracks
+			(default 10, set for new Terrain using TerrainGlobalOptions)
+		*/
+		Real getSkirtSize() { return mSkirtSize; }
+
+		/** Calculate (or recalculate) the delta values of heights between a vertex
+			in its recorded position, and the place it will end up in the LOD
+			in which it is removed. 
+		@param rect Rectangle describing the area to calculate (left <= right, bottom <= top)
+			
+		*/
+		void calculateHeightDeltas(const Rect& rect);
+
+		/** Get the maximum vertical difference between any vertex in one 
+			LOD level and the implicit position it would be in the level below it
+			because it has been removed. 
+		@note
+			This method assumes that height deltas are up to date (@see calculateHeightDeltas)
+		@param rect Rectangle describing the (inclusive) set of points to 
+			be calculated (left <= right, bottom <= top)
+		@param srcLOD The level of detail from which to reduce from (0 is the 
+			highest level)
+		*/
+		Real getMaxHeightDelta(const Rect& rect, unsigned short srcLOD);
 	protected:
 
 		void freeCPUResources();
 		void freeGPUResources();
+		void determineLodLevels();
+		void updateBaseScale();
+		/** Get a Vector3 of the world-space point on the terrain, aligned Y-up always.
+		@note This point is relative to Terrain::getPosition
+		*/
+		void getPointAlign(long x, long y, Alignment align, Vector3* outpos);
 
-
-		/// The height data
+		SceneManager* mSceneMgr;
+		SceneNode* mRootNode;
+		
+		/// The height data (world coords relative to mPos)
 		float* mHeightData;
+		/// The delta information defining how a vertex moves before it is removed at a lower LOD
+		float* mDeltaData;
 		Alignment mAlign;
 		Real mWorldSize;
 		uint16 mSize;
 		uint16 mMaxBatchSize;
 		uint16 mMinBatchSize;
+		Vector3 mPos;
 		TerrainQuadTreeNode* mQuadTree;
+		uint16 mNumLodLevels;
+		uint16 mTreeDepth;
+		Real mBase;
+		Real mScale;
 
+		bool mUseTriangleStrips;
+		bool mUseLodMorph;
+		Real mSkirtSize;
 
 	};
 
 
 
+	class _OgreTerrainExport TerrainGlobalOptions
+	{
+	protected:
+		// no instantiation
+		TerrainGlobalOptions() {}
+
+		static bool msUseTriangleStrips;
+		static bool msUseLodMorph;
+		static Real msSkirtSize;
+
+	public:
+
+
+		/** Static method - whether to use triangle strips or not then rendering terrain
+		(default true)
+		*/
+		static bool getUseTriangleStrips() { return msUseTriangleStrips; }
+		/** Static method - whether to use triangle strips or not then rendering terrain
+		(default true)
+		@remarks
+			Changing this value only applies to Terrain instances loaded / reloaded afterwards.
+		*/
+		static void setUseTriangleStrips(bool useStrips) { msUseTriangleStrips = useStrips; }
+		/** Static method - whether to morph between LODs using a vertex program. 
+		(default true)
+		*/
+		static bool getUseLodMorph() { return msUseLodMorph; }
+		/** Static method - whether to morph between LODs using a vertex program. 
+		(default true)
+		@remarks
+			Changing this value only applies to Terrain instances loaded / reloaded afterwards.
+		*/
+		static void setUseLodMorph(bool useMorph) { msUseLodMorph = useMorph; }
+		/** Static method - the default size of 'skirts' used to hide terrain cracks
+		(default 10)
+		*/
+		static Real getSkirtSize() { return msSkirtSize; }
+		/** Static method - the default size of 'skirts' used to hide terrain cracks
+		(default 10)
+		@remarks
+			Changing this value only applies to Terrain instances loaded / reloaded afterwards.
+		*/
+		static void setSkirtSize(Real skirtSz) { msSkirtSize = skirtSz; }
+	};
 
 
 	/** @} */

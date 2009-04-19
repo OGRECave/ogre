@@ -37,7 +37,6 @@ namespace Ogre
 		: PageContent(creator)
 		, mTerrain(0)
 	{
-		mTerrain = OGRE_NEW Terrain();
 	}
 	//---------------------------------------------------------------------
 	TerrainPageContent::~TerrainPageContent()
@@ -54,6 +53,10 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool TerrainPageContent::prepareImpl(StreamSerialiser& stream)
 	{
+		if (!mTerrain)
+		{
+			mTerrain = OGRE_NEW Terrain(getSceneManager());
+		}
 		return mTerrain->prepare(stream);
 	}
 	//---------------------------------------------------------------------
@@ -70,6 +73,8 @@ namespace Ogre
 	void TerrainPageContent::unprepareImpl()
 	{
 		mTerrain->unprepare();
+		OGRE_DELETE mTerrain;
+		mTerrain = 0;
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------

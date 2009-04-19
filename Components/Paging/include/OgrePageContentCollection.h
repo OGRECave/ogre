@@ -67,6 +67,8 @@ namespace Ogre
 		virtual ~PageContentCollection();
 
 		PageManager* getManager() const;
+		Page* getParentPage() const { return mParent; }
+		SceneManager* getSceneManager() const;
 
 		/// Get the type of the collection, which will match it's factory
 		virtual const String& getType() const;

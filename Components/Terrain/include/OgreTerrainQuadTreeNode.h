@@ -98,6 +98,15 @@ namespace Ogre
 		/// Get parent node
 		TerrainQuadTreeNode* getParent() const;
 
+		/// Prepare node and children (perform CPU tasks, may be background thread)
+		void prepare();
+		/// Load node and children (perform GPU tasks, will be render thread)
+		void load();
+		/// Unload node and children (perform GPU tasks, will be render thread)
+		void unload();
+		/// Unprepare node and children (perform CPU tasks, may be background thread)
+		void unprepare();
+
 	protected:
 		Terrain* mTerrain;
 		TerrainQuadTreeNode* mParent;

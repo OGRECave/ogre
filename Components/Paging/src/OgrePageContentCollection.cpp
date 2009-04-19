@@ -63,6 +63,11 @@ namespace Ogre
 	{
 		mParent = parent;
 	}
+	//---------------------------------------------------------------------
+	SceneManager* PageContentCollection::getSceneManager() const
+	{
+		return mParent->getSceneManager();
+	}	
 
 
 }

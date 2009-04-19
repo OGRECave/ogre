@@ -63,5 +63,80 @@ namespace Ogre
 			OGRE_DELETE mChildren[i];
 	}
 	//---------------------------------------------------------------------
+	bool TerrainQuadTreeNode::isLeaf() const
+	{
+		return mChildren[0] != 0;
+	}
+	//---------------------------------------------------------------------
+	TerrainQuadTreeNode* TerrainQuadTreeNode::getChild(unsigned short child) const
+	{
+		if (isLeaf() || child >= 4)
+			return 0;
+
+		return mChildren[child];
+	}
+	//---------------------------------------------------------------------
+	TerrainQuadTreeNode* TerrainQuadTreeNode::getParent() const
+	{
+		return mParent;
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::prepare()
+	{
+		if (isLeaf())
+		{
+			// calculate error terms
+			// A = 1 / tan(fovy)    (== 1 for fovy=45)
+			// T = 2 * maxPixelError / vertRes
+			// CFactor = A / T
+			// delta = abs(vertex_height - interpolated_vertex_height)
+			// D2 = delta * delta * CFactor * CFactor;
+			// Must find max(D2) for any given LOD
+
+			// delta varies by vertex but not by viewport
+			// CFactor varies by viewport (fovy and pixel height) but not vertex
+
+			// to avoid precalculating the final value (and therefore making it 
+			// viewport-specific), precalculate only max(delta * delta), 
+			// since this will be valid for any CFactor. 
+
+
+			
+
+
+		}
+		else
+		{
+			for (int i = 0; i < 4; ++i)
+				mChildren[i]->prepare();
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::load()
+	{
+		if (!isLeaf())
+			for (int i = 0; i < 4; ++i)
+				mChildren[i]->load();
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::unload()
+	{
+		if (!isLeaf())
+			for (int i = 0; i < 4; ++i)
+				mChildren[i]->unload();
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::unprepare()
+	{
+		if (!isLeaf())
+			for (int i = 0; i < 4; ++i)
+				mChildren[i]->unprepare();
+
+	}
+
+
 }
 

@@ -58,6 +58,7 @@ namespace Ogre
 		virtual ~PageContent();
 
 		PageManager* getManager() const;
+		SceneManager* getSceneManager() const;
 
 		/// Internal method to notify a page that it is attached
 		virtual void _notifyAttached(PageContentCollection* parent);

@@ -297,6 +297,11 @@ namespace Ogre
 		return mContentCollections;
 	}
 	//---------------------------------------------------------------------
+	SceneManager* Page::getSceneManager() const
+	{
+		return mParent->getSceneManager();
+	}
+	//---------------------------------------------------------------------
 	std::ostream& operator <<( std::ostream& o, const Page& p )
 	{
 		o << "Page(ID:" << p.getID() << ", section:" << p.getParentSection()->getName()

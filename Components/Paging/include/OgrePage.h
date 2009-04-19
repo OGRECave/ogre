@@ -72,6 +72,7 @@ namespace Ogre
 		virtual ~Page();
 
 		PageManager* getManager() const;
+		SceneManager* getSceneManager() const;
 
 		/// Get the ID of this page, unique withing the parent
 		virtual PageID getID() const { return mID; }
