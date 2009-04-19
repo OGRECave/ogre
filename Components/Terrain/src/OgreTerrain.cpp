@@ -452,8 +452,19 @@ namespace Ogre
 							Real actual_h = actualPos.y;
 							Real delta = interp_h - actual_h;
 
-							// Save height difference 
-							mDeltaData[fulldetailx + (fulldetailz * mSize)] = delta;
+							// max(delta) is the worst case scenario at this LOD
+							// compared to the original heightmap
+							// TODO - store this worst-case per unit of LOD
+
+							// If this vertex is being removed at this LOD, 
+							// then save the height difference since that's the move
+							// it will need to make. Vertices to be removed at this LOD
+							// are halfway between the steps
+							if ((fulldetailx % step) == step / 2 || (fulldetailz % step) == step / 2)
+							{
+								// Save height difference 
+								mDeltaData[fulldetailx + (fulldetailz * mSize)] = delta;
+							}
 
 						}
 
