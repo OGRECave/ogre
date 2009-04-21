@@ -650,23 +650,22 @@ namespace Ogre
 			{
 				ObjectAbstractNode *obj = (ObjectAbstractNode*)(*i).get();
 
-				// Check if it is inheriting anything
-				if(!obj->base.empty())
+				// Overlay base classes in order.
+                for (std::vector<String>::const_iterator baseIt = obj->bases.begin(), end_it = obj->bases.end(); baseIt != end_it; ++baseIt)
 				{
+                    const String& base = *baseIt;
 					// Check the top level first, then check the import table
-					AbstractNodeListPtr newNodes = locateTarget(top.get(), obj->base);
+					AbstractNodeListPtr newNodes = locateTarget(top.get(), base);
 					if(newNodes->empty())
-						newNodes = locateTarget(&mImportTable, obj->base);
+						newNodes = locateTarget(&mImportTable, base);
 
-					if(!newNodes->empty())
-					{
-						for(AbstractNodeList::iterator j = newNodes->begin(); j != newNodes->end(); ++j)
+					if (!newNodes->empty()) {
+						for(AbstractNodeList::iterator j = newNodes->begin(); j != newNodes->end(); ++j) {
 							overlayObject(*j, obj);
-					}
-					else
-					{
+                        }
+					} else {
 						addError(CE_OBJECTBASENOTFOUND, obj->file, obj->line,
-							"base object named \"" + obj->base + "\" not found in script definition");
+							"base object named \"" + base + "\" not found in script definition");
 					}
 				}
 
@@ -1447,15 +1446,13 @@ namespace Ogre
 					++iter;
 				}
 
-				// Find the base
+				// Find the bases
 				if(iter != temp.end() && (*iter)->type == CNT_COLON)
 				{
-					if((*iter)->children.empty())
-					{
-						mCompiler->addError(CE_STRINGEXPECTED, (*iter)->file, (*iter)->line);
-						return;
-					}
-					impl->base = (*iter)->children.front()->token;
+					// Children of the ':' are bases
+					for(ConcreteNodeList::iterator j = (*iter)->children.begin(); j != (*iter)->children.end(); ++j)
+						impl->bases.push_back((*j)->token);
+                    ++iter;
 				}
 
 				// Finally try to map the cls to an id
@@ -1660,4 +1657,5 @@ namespace Ogre
         mScriptCompiler->compile(stream->getAsString(), stream->getName(), groupName);
     }
 }
+
 
