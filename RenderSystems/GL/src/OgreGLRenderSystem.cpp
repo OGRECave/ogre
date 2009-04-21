@@ -237,6 +237,12 @@ namespace Ogre {
 			if (rsc->getVendor() == GPU_ATI)
 				disableAutoMip = true;
 #endif
+			// The Intel 915G frequently corrupts textures when using hardware mip generation
+			// I'm not currently sure how many generations of hardware this affects, 
+			// so for now, be safe.
+			if (rsc->getVendor() == GPU_INTEL)
+				disableAutoMip = true;
+
 			if (!disableAutoMip)
 				rsc->setCapability(RSC_AUTOMIPMAP);
         }
