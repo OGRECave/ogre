@@ -93,13 +93,6 @@ namespace Ogre
 		<td>float[size*size]</td>
 		<td>List of floating point heights</td>
 	</tr>
-	<tr>
-		<td>Delta data</td>
-		<td>float[size*size]</td>
-		<td>List of floating point delta values for each vertex, storing the difference
-			between its real height, and the height it will become on the first
-			LOD level in which it is eliminated.</td>
-	</tr>
 	</table>
 	*/
 	class _OgreTerrainExport Terrain : public TerrainAlloc
@@ -272,7 +265,7 @@ namespace Ogre
 		/** Mark a region of the terrain as dirty, so that the geometry is 
 			updated the next time it is accessed. 
 		@param rect A rectangle expressed in vertices describing the dirty region;
-			left <= right, bottom <= top
+			left < right, top < bottom, left & top are inclusive, right & bottom exclusive
 		*/
 		void dirtyRect(const Rect& rect);
 
@@ -290,6 +283,12 @@ namespace Ogre
 		*/
 		Real getSkirtSize() { return mSkirtSize; }
 
+		/// Get the total number of LOD levels in the terrain
+		uint16 getNumLodLevels() const { return mNumLodLevels; }
+
+		/// Get the number of LOD levels in a leaf of the terrain quadtree
+		uint16 getNumLodLevelsPerLeaf() const { return mNumLodLevelsPerLeafNode; }
+
 		/** Calculate (or recalculate) the delta values of heights between a vertex
 			in its recorded position, and the place it will end up in the LOD
 			in which it is removed. 
@@ -304,7 +303,7 @@ namespace Ogre
 		@note
 			This method assumes that height deltas are up to date (@see calculateHeightDeltas)
 		@param rect Rectangle describing the (inclusive) set of points to 
-			be calculated (left <= right, bottom <= top)
+			be calculated (left < right, top < bottom, left & top are inclusive, right & bottom exclusive)
 		@param srcLOD The level of detail from which to reduce from (0 is the 
 			highest level)
 		*/
@@ -335,6 +334,7 @@ namespace Ogre
 		Vector3 mPos;
 		TerrainQuadTreeNode* mQuadTree;
 		uint16 mNumLodLevels;
+		uint16 mNumLodLevelsPerLeafNode;
 		uint16 mTreeDepth;
 		Real mBase;
 		Real mScale;

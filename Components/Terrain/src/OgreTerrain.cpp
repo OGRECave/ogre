@@ -53,6 +53,7 @@ namespace Ogre
 		, mPos(Vector3::ZERO)
 		, mQuadTree(0)
 		, mNumLodLevels(0)
+		, mNumLodLevelsPerLeafNode(0)
 		, mTreeDepth(0)
 	{
 		mRootNode = sm->getRootSceneNode()->createChildSceneNode();
@@ -108,13 +109,18 @@ namespace Ogre
 		size_t numVertices = mSize * mSize;
 		mHeightData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
 		stream.read(mHeightData, numVertices);
-		mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
-		stream.read(mDeltaData, numVertices);
 
 		stream.readChunkEnd(TERRAIN_CHUNK_ID);
 
-		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize);
+		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1);
 		mQuadTree->prepare();
+
+		mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
+		// calculate entire terrain
+		Rect rect;
+		rect.top = 0; rect.bottom = mSize;
+		rect.left = 0; rect.right = mSize;
+		calculateHeightDeltas(rect);
 
 		return true;
 	}
@@ -184,14 +190,17 @@ namespace Ogre
 		}
 
 		mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
+
+
+		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1);
+		mQuadTree->prepare();
+
 		// calculate entire terrain
 		Rect rect;
-		rect.bottom = 0; rect.top = mSize - 1;
-		rect.left = 0; rect.right = mSize - 1;
+		rect.top = 0; rect.bottom = mSize;
+		rect.left = 0; rect.right = mSize;
 		calculateHeightDeltas(rect);
 
-		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize);
-		mQuadTree->prepare();
 
 		return true;
 
@@ -229,6 +238,7 @@ namespace Ogre
 			17 vertices (per side) or 33. This makes buffer re-use much easier while
 			still giving the full range of LODs.
 		*/
+		mNumLodLevelsPerLeafNode = Math::Log2(mMaxBatchSize - 1) - Math::Log2(mMinBatchSize - 1) + 1;
 		mNumLodLevels = Math::Log2(mSize - 1) - Math::Log2(mMinBatchSize - 1) + 1;
 		mTreeDepth = Math::Log2(mMaxBatchSize - 1) - Math::Log2(mMinBatchSize - 1) + 2;
 	}
@@ -329,12 +339,21 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::dirty()
 	{
-		// TODO
+		// TODO - geometry
+
+		// calculate entire terrain
+		Rect rect;
+		rect.top = 0; rect.bottom = mSize;
+		rect.left = 0; rect.right = mSize;
+		calculateHeightDeltas(rect);
 	}
 	//---------------------------------------------------------------------
 	void Terrain::dirtyRect(const Rect& rect)
 	{
-		// TODO
+		// TODO - geometry
+
+		calculateHeightDeltas(rect);
+
 	}
 	//---------------------------------------------------------------------
 	void Terrain::freeCPUResources()
@@ -362,19 +381,35 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::calculateHeightDeltas(const Rect& rect)
 	{
+		Rect clampedRect(rect);
+		clampedRect.left = std::max(0L, clampedRect.left);
+		clampedRect.top = std::max(0L, clampedRect.top);
+		clampedRect.right = std::min((long)mSize, clampedRect.right);
+		clampedRect.bottom = std::min((long)mSize, clampedRect.bottom);
+
+		mQuadTree->preDeltaCalculation(clampedRect);
 
 		/// Iterate over target levels, 
 		for (int targetLevel = 1; targetLevel < mNumLodLevels; ++targetLevel)
 		{
+			int sourceLevel = targetLevel - 1;
 			int step = 1 << targetLevel;
 			// The step of the next higher LOD
 			int higherstep = step >> 1;
 
-			// Adjust rectangle 
+			// round the rectangle at this level so that it starts & ends on 
+			// the step boundaries
+			Rect lodRect(clampedRect);
+			lodRect.left -= lodRect.left % step;
+			lodRect.top -= lodRect.top % step;
+			if (lodRect.right % step)
+				lodRect.right += step - (lodRect.right % step);
+			if (lodRect.bottom % step)
+				lodRect.bottom += step - (lodRect.bottom % step);
 
-			for (int j = rect.bottom; j < rect.top - step; j += step )
+			for (int j = lodRect.top; j < lodRect.bottom - step; j += step )
 			{
-				for (int i = rect.left; i < rect.right - step; i += step )
+				for (int i = lodRect.left; i < lodRect.right - step; i += step )
 				{
 					// Form planes relating to the lower detail tris to be produced
 					// For tri lists and even tri strip rows, they are this shape:
@@ -454,7 +489,10 @@ namespace Ogre
 
 							// max(delta) is the worst case scenario at this LOD
 							// compared to the original heightmap
-							// TODO - store this worst-case per unit of LOD
+
+							// tell the quadtree about this 
+							mQuadTree->notifyDelta(fulldetailx, fulldetailz, sourceLevel, delta);
+
 
 							// If this vertex is being removed at this LOD, 
 							// then save the height difference since that's the move

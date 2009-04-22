@@ -31,6 +31,8 @@ Torus Knot Software Ltd.
 #define __Ogre_TerrainQuadTreeNode_H__
 
 #include "OgreTerrainPrerequisites.h"
+#include "OgreCommon.h"
+#include "OgreHardwareIndexBuffer.h"
 
 
 
@@ -85,14 +87,22 @@ namespace Ogre
 		@param parent Optional parent node (in which case xoff, yoff are 0 and size must be entire terrain)
 		@param xoff,off Offsets from the start of the terrain data in 2D
 		@param size The size of the node in vertices at the highest LOD
+		@param lod The base LOD level
 		*/
 		TerrainQuadTreeNode(Terrain* terrain, TerrainQuadTreeNode* parent, 
-			uint16 xoff, uint16 yoff, uint16 size);
+			uint16 xoff, uint16 yoff, uint16 size, uint16 lod);
 		virtual ~TerrainQuadTreeNode();
 
-
+		/// Get the horizontal offset into the main terrain data of this node
+		uint16 getXOffset() const { return mOffsetX; }
+		/// Get the vertical offset into the main terrain data of this node
+		uint16 getYOffset() const { return mOffsetY; }
 		/// Is this a leaf node (no children)
 		bool isLeaf() const;
+		/// Get the base LOD level this node starts at
+		uint16 getBaseLod() const { return mBaseLod; }
+		/// Get the number of LOD levels this node can represent itself (only > 1 for leaf nodes)
+		uint16 getLodCount() const;
 		/// Get child node
 		TerrainQuadTreeNode* getChild(unsigned short child) const;
 		/// Get parent node
@@ -107,13 +117,45 @@ namespace Ogre
 		/// Unprepare node and children (perform CPU tasks, may be background thread)
 		void unprepare();
 
+		struct _OgreTerrainExport LodLevel : public TerrainAlloc
+		{
+			/// Number of vertices rendered down one side (not including skirts)
+			uint16 sz;
+			/// Index buffer used to render this level from the main vertex data
+			HardwareIndexBufferSharedPtr indexBuffer;
+			/// Maximum delta height between this and the next lower lod
+			Real maxHeightDelta;
+		};
+		typedef vector<LodLevel*>::type LodLevelList;
+
+		/** Get the LodLevel information for a given lod.
+		@param lod The lod level index relative to this classes own list; if you
+			want to use a global lod level, subtract getBaseLod() first.
+		*/
+		const LodLevel* getLodLevel(uint16 lod);
+
+		/** Notify the node (and children) that deltas are going to be calculated for a given range.
+		@remarks
+			Based on this call, we can know whether or not to reset the max height.
+		*/
+		void preDeltaCalculation(const Rect& rect);
+
+		/** Notify the node (and children) of a height delta value. */
+		void notifyDelta(uint16 x, uint16 y, uint16 lod, Real delta);
+
+
 	protected:
 		Terrain* mTerrain;
 		TerrainQuadTreeNode* mParent;
 		TerrainQuadTreeNode* mChildren[4];
+		LodLevelList mLodLevels;
 
 		uint16 mOffsetX, mOffsetY;
+		uint16 mBoundaryX, mBoundaryY;
+		/// the number of vertices at the original terrain resolution this node encompasses
 		uint16 mSize;
+		uint16 mBaseLod;
+		uint16 mUpperLod;
 
 	};
 

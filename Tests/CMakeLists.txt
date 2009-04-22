@@ -49,6 +49,18 @@ if (OGRE_BUILD_TESTS)
 	    Components/Paging/src/PageCoreTests.cpp
 	  )
 	endif ()
+	if (OGRE_BUILD_COMPONENT_TERRAIN)
+	  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Terrain/include
+	    ${CMAKE_SOURCE_DIR}/Components/Terrain/include)
+	  
+	  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreTerrain)
+	  set(HEADER_FILES ${HEADER_FILES}
+	    Components/Terrain/include/TerrainTests.h
+	  )
+	  set(SOURCE_FILES ${SOURCE_FILES}
+	    Components/Terrain/src/TerrainTests.cpp
+	  )
+	endif ()
 
 	add_executable(Test_Ogre WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
 	ogre_config_common(Test_Ogre)

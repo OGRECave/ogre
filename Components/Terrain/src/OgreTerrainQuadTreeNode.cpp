@@ -33,27 +33,58 @@ namespace Ogre
 {
 	//---------------------------------------------------------------------
 	TerrainQuadTreeNode::TerrainQuadTreeNode(Terrain* terrain, 
-		TerrainQuadTreeNode* parent, uint16 xoff, uint16 yoff, uint16 size)
+		TerrainQuadTreeNode* parent, uint16 xoff, uint16 yoff, uint16 size, uint16 lod)
 		: mTerrain(terrain)
 		, mParent(parent)
 		, mOffsetX(xoff)
 		, mOffsetY(yoff)
+		, mBoundaryX(xoff + size)
+		, mBoundaryY(yoff + size)
 		, mSize(size)
+		, mBaseLod(lod)
 	{
 		if (terrain->getMinBatchSize() < size)
 		{
 			uint16 childSize = ((size - 1) * 0.5) + 1;
 			uint16 childOff = childSize - 1;
+			uint16 childLod = lod - 1; // LOD levels decrease down the tree (higher detail)
 			// create children
-			mChildren[0] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff, childSize);
-			mChildren[1] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff, childSize);
-			mChildren[2] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff + childOff, childSize);
-			mChildren[3] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff + childOff, childSize);
+			mChildren[0] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff, childSize, childLod);
+			mChildren[1] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff, childSize, childLod);
+			mChildren[2] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff + childOff, childSize, childLod);
+			mChildren[3] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff + childOff, childSize, childLod);
+
+			LodLevel* ll = OGRE_NEW LodLevel();
+			// non-leaf nodes always render with minBatchSize vertices
+			ll->sz = terrain->getMinBatchSize();
+			ll->maxHeightDelta = 0;
+			mLodLevels.push_back(ll);
 
 		}
 		else
 		{
+			// No children
 			memset(mChildren, 0, sizeof(TerrainQuadTreeNode*) * 4);
+
+			// this is a leaf node and may have internal LODs of its own
+			uint16 ownLod = terrain->getNumLodLevelsPerLeaf();
+			// remember, LOD levels are lower indexed when higher detail
+			assert(mBaseLod - ownLod + 1 == 0);
+			// leaf nodes render from max batch size to min batch size
+			uint16 sz = terrain->getMaxBatchSize();
+
+			while (ownLod--)
+			{
+				LodLevel* ll = OGRE_NEW LodLevel();
+				ll->sz = sz;
+				ll->maxHeightDelta = 0;
+				mLodLevels.push_back(ll);
+				if (ownLod)
+					sz = ((sz - 1) * 0.5) + 1;
+			}
+			
+			assert(sz == terrain->getMinBatchSize());
+
 		}
 	}
 	//---------------------------------------------------------------------
@@ -61,6 +92,9 @@ namespace Ogre
 	{
 		for (int i = 0; i < 4; ++i)
 			OGRE_DELETE mChildren[i];
+
+		for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i)
+			OGRE_DELETE *i;
 	}
 	//---------------------------------------------------------------------
 	bool TerrainQuadTreeNode::isLeaf() const
@@ -135,6 +169,72 @@ namespace Ogre
 			for (int i = 0; i < 4; ++i)
 				mChildren[i]->unprepare();
 
+	}
+	//---------------------------------------------------------------------
+	uint16 TerrainQuadTreeNode::getLodCount() const
+	{
+		return static_cast<uint16>(mLodLevels.size());
+	}
+	//---------------------------------------------------------------------
+	const TerrainQuadTreeNode::LodLevel* TerrainQuadTreeNode::getLodLevel(uint16 lod)
+	{
+		assert(lod < mLodLevels.size());
+
+		return mLodLevels[lod];
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::preDeltaCalculation(const Rect& rect)
+	{
+		if (rect.left <= mBoundaryX || rect.right > mOffsetX
+			|| rect.top <= mBoundaryY || rect.bottom > mOffsetY)
+		{
+			// relevant to this node (overlaps)
+
+			// if the rect covers the whole node, reset the max height
+			// this means that if you recalculate the deltas progressively, end up keeping
+			// a max height that's no longer the case (ie more conservative lod), 
+			// but that's the price for not recaculating the whole node. If a 
+			// complete recalculation is required, just dirty the entire node. (or terrain)
+
+			if (rect.left <= mOffsetX && rect.right > mBoundaryX 
+				&& rect.top <= mOffsetY && rect.bottom > mBoundaryY)
+			{
+				for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i)
+					(*i)->maxHeightDelta = 0.0;
+			}
+
+			// pass on to children
+			if (!isLeaf())
+			{
+				for (int i = 0; i < 4; ++i)
+					mChildren[i]->preDeltaCalculation(rect);
+
+			}
+		}
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::notifyDelta(uint16 x, uint16 y, uint16 lod, Real delta)
+	{
+		if (x >= mOffsetX && x < mBoundaryX 
+			&& y >= mOffsetY && y < mBoundaryY)
+		{
+			// within our bounds, check it's our LOD level
+			// remember, LODs decrease!
+			if (lod <= mBaseLod && lod >= mBaseLod - mLodLevels.size())
+			{
+				for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i)
+					(*i)->maxHeightDelta = std::max((*i)->maxHeightDelta, delta);
+			}
+
+			// pass on to children
+			if (!isLeaf())
+			{
+				for (int i = 0; i < 4; ++i)
+					mChildren[i]->notifyDelta(x, y, lod, delta);
+
+			}
+
+		}
 	}
 
 

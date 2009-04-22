@@ -26,64 +26,71 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#include "PageCoreTests.h"
-#include "OgrePaging.h"
+#include "TerrainTests.h"
+#include "OgreTerrain.h"
+#include "OgreConfigFile.h"
+#include "OgreResourceGroupManager.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( PageCoreTests );
 
-void PageCoreTests::setUp()
+CPPUNIT_TEST_SUITE_REGISTRATION( TerrainTests );
+
+void TerrainTests::setUp()
 {
 	mRoot = OGRE_NEW Root();
-	mPageManager = OGRE_NEW PageManager();
 
-	mRoot->addResourceLocation("./", "FileSystem");
+	// Load resource paths from config file
+	ConfigFile cf;
+	cf.load("resources.cfg");
+
+	// Go through all sections & settings in the file
+	ConfigFile::SectionIterator seci = cf.getSectionIterator();
+
+	String secName, typeName, archName;
+	while (seci.hasMoreElements())
+	{
+		secName = seci.peekNextKey();
+		ConfigFile::SettingsMultiMap *settings = seci.getNext();
+		ConfigFile::SettingsMultiMap::iterator i;
+		for (i = settings->begin(); i != settings->end(); ++i)
+		{
+			typeName = i->first;
+			archName = i->second;
+			ResourceGroupManager::getSingleton().addResourceLocation(
+				archName, typeName, secName);
+
+		}
+	}
 
 	mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
 
 }
 
-void PageCoreTests::tearDown()
+void TerrainTests::tearDown()
 {
-	OGRE_DELETE mPageManager;
 	OGRE_DELETE mRoot;
 }
 
 
-void PageCoreTests::testSimpleCreateSaveLoadWorld()
+void TerrainTests::testCreate()
 {
-	String worldName = "MyWorld";
-	String filename = "myworld.world";
-	String sectionName1 = "Section1";
-	String sectionName2 = "Section2";
-	PagedWorld* world = mPageManager->createWorld(worldName);
-	PagedWorldSection* section = world->createSection("Grid2D", mSceneMgr, sectionName1);
-	section = world->createSection("Grid2D", mSceneMgr, sectionName2);
+	Terrain* t = OGRE_NEW Terrain(mSceneMgr);
+	Image img;
+	img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-	// Create a page
-	Page* p = section->loadOrCreatePage(Vector3::ZERO);
-
-	SimplePageContentCollection* coll = static_cast<SimplePageContentCollection*>(
-		p->createContentCollection("Simple"));
-
-	// manually set page to loaded since we've populated it
-	p->setLoaded();
+	Terrain::ImportData imp;
+	imp.inputImage = &img;
+	imp.terrainSize = 513;
+	imp.worldSize = 1000;
+	imp.minBatchSize = 33;
+	imp.maxBatchSize = 65;
+	t->prepare(imp);
+	t->load();
 	
-	world->save(filename);
 
-	mPageManager->destroyWorld(world);
-	world = 0;
-
-	world = mPageManager->loadWorld(filename);
-
-	CPPUNIT_ASSERT_EQUAL(worldName, world->getName());
-	CPPUNIT_ASSERT_EQUAL((size_t)2, world->getSectionCount());
-
-	section = world->getSection(sectionName1);
-	CPPUNIT_ASSERT(section != 0);
-	section = world->getSection(sectionName2);
-	CPPUNIT_ASSERT(section != 0);
+	
 
 
 
+	OGRE_DELETE t;
 }
 
