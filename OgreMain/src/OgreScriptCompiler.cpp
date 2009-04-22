@@ -812,7 +812,7 @@ namespace Ogre
 							for(size_t j = overrideIndex; j < overrides.size(); ++j)
 							{
 								ObjectAbstractNode *temp = reinterpret_cast<ObjectAbstractNode*>(overrides[j].first.get());
-								if(temp->cls == node->cls && overrides[j].second == dest->children.end())
+								if(temp->name.empty() && temp->cls == node->cls && overrides[j].second == dest->children.end())
 								{
 									overrides[j] = std::make_pair(overrides[j].first, i);
 									break;
