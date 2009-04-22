@@ -125,7 +125,8 @@ namespace Ogre
 	private:
 		map<String,String>::type mEnv;
 	public:
-		String name, cls, base;
+		String name, cls;
+		std::vector<String> bases;
 		uint32 id;
 		bool abstract;
 		AbstractNodeList children;
