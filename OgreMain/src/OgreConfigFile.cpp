@@ -168,7 +168,7 @@ namespace Ogre {
             SettingsMultiMap::const_iterator i = seci->second->find(key);
             if (i == seci->second->end())
             {
-                return StringUtil::BLANK;
+                return defaultValue;
             }
             else
             {
