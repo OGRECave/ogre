@@ -103,6 +103,7 @@ namespace Ogre
 
 		static const uint32 TERRAIN_CHUNK_ID;
 		static const uint16 TERRAIN_CHUNK_VERSION;
+		static const uint16 TERRAIN_MAX_BATCH_SIZE;
 
 		/// The alignment of the terrain
 		enum Alignment
