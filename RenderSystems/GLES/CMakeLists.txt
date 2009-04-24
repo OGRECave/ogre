@@ -53,12 +53,14 @@ set(SOURCE_FILES
 
 # Add system specific settings
 if (WIN32)
-  set(PLATFORM_FILES 
+  set(PLATFORM_HEADERS 
     include/EGL/WIN32/OgreWin32EGLContext.h
     include/EGL/WIN32/OgreWin32EGLSupport.h
     include/EGL/WIN32/OgreWin32EGLRenderTexture.h
     include/EGL/WIN32/OgreWin32EGLWindow.h
     include/EGL/WIN32/OgreGLESUtil.h
+  )
+  set(PLATFORM_SOURCES
     src/EGL/WIN32/OgreWin32EGLSupport.cpp
     src/EGL/WIN32/OgreWin32EGLRenderTexture.cpp
     src/EGL/WIN32/OgreWin32EGLWindow.cpp
@@ -66,20 +68,25 @@ if (WIN32)
   )
   include_directories(src/EGL/WIN32 include/EGL/WIN32)
   link_directories(${OPENGLES_LIBRARY_PATH})
+  set(PLATFORM_HEADER_INSTALL "WIN32")
+#elseif (APPLE)
 elseif (UNIX)
-  set(PLATFORM_FILES 
+  set(PLATFORM_HEADERS
     include/EGL/GTK/OgreGtkEGLContext.h
     include/EGL/GTK/OgreGtkEGLSupport.h
     include/EGL/GTK/OgreGtkEGLRenderTexture.h
     include/EGL/GTK/OgreGtkEGLWindow.h
     include/EGL/GTK/OgreGLESUtil.h
+  )
+  set(PLATFORM_SOURCES
     src/EGL/GTK/OgreGtkEGLContext.cpp
     src/EGL/GTK/OgreGtkEGLSupport.cpp
     src/EGL/GTK/OgreGtkEGLRenderTexture.cpp
     src/EGL/GTK/OgreGtkEGLWindow.cpp
   )
   include_directories(src/EGL/GTK include/EGL/GTK)
-elseif (APPLE)
+  set(PLATFORM_HEADER_INSTALL "GTK")
+  set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
 endif ()
 
 
@@ -89,11 +96,8 @@ include_directories(
   ${OPENGLES_INCLUDE_DIR}
 )
 
-if (UNIX)
-  set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
-endif ()
 
-add_library(RenderSystem_GLES ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_FILES})
+add_library(RenderSystem_GLES ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES})
 target_link_libraries(RenderSystem_GLES OgreMain ${OPENGLES_LIBRARIES} ${PLATFORM_LIBS})
 
 if (NOT OGRE_STATIC)
@@ -106,3 +110,7 @@ if (OGRE_CONFIG_THREADS)
 endif ()
 
 ogre_config_plugin(RenderSystem_GLES)
+if (OGRE_INSTALL_PLUGINS_HEADERS)
+  install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/GLES)
+  install(FILES ${PLATFORM_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES/${PLATFORM_HEADER_INSTALL})
+endif ()

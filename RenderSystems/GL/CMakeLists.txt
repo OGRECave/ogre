@@ -127,25 +127,27 @@ set(ATIFS_FILES
 
 # Add system specific settings
 if (WIN32)
-  set(PLATFORM_FILES 
+  set(PLATFORM_HEADERS 
     include/OgreWin32Context.h
     include/OgreWin32GLSupport.h
     include/OgreWin32Prerequisites.h
     include/OgreWin32RenderTexture.h
     include/OgreWin32Window.h
+    src/win32/OgreGLUtil.h
+  )
+  set(PLATFORM_SOURCES
     src/OgreWin32GLSupport.cpp
     src/OgreWin32RenderTexture.cpp
     src/OgreWin32Window.cpp
-    src/win32/OgreGLUtil.h
     src/win32/OgreWin32Context.cpp
   )
   include_directories(src/nvparse/winheaders src/win32)
   source_group(NVparse FILES ${NVPARSE_FILES})
   source_group(ATIFS FILES ${ATIFS_FILES})
   source_group(GLSL FILES ${GLSL_FILES})
+  set(PLATFORM_HEADER_INSTALL "")
 elseif (APPLE)
-#  set(PLATFORM_HEADER_FILES
-  set(PLATFORM_FILES
+  set(PLATFORM_HEADERS
     include/OSX/OgreOSXCGLContext.h
     include/OSX/OgreOSXCarbonContext.h
     include/OSX/OgreOSXCarbonWindow.h
@@ -156,12 +158,13 @@ elseif (APPLE)
     include/OSX/OgreOSXRenderTexture.h
     include/OSX/OgreOSXWindow.h
     src/OSX/OgreGLUtil.h
+  
     # think about relocating these
     #${CMAKE_SOURCE_DIR}/Mac/Ogre/include/macBundlePath.h
     #${CMAKE_SOURCE_DIR}/Mac/Ogre/include/macPlugins.h
     #${CMAKE_SOURCE_DIR}/Mac/Ogre/include/OgreOSXCocoaView.h
-#  )
-#  set(PLATFORM_SOURCE_FILES
+  )
+  set(PLATFORM_SOURCES
     src/OSX/OgreOSXCarbonContext.cpp
     src/OSX/OgreOSXCocoaContext.mm
     src/OSX/OgreOSXContext.cpp
@@ -181,19 +184,23 @@ elseif (APPLE)
   set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
   set(PLATFORM_HEADER_INSTALL "OSX")
 elseif (UNIX)
-  set(PLATFORM_FILES 
+  set(PLATFORM_HEADERS
     include/GLX/OgreGLXContext.h
     include/GLX/OgreGLXGLSupport.h
     include/GLX/OgreGLXRenderTexture.h
     include/GLX/OgreGLXUtils.h
     include/GLX/OgreGLXWindow.h
     src/GLX/OgreGLUtil.h
+  )
+  set(PLATFORM_SOURCES
     src/GLX/OgreGLXContext.cpp
     src/GLX/OgreGLXGLSupport.cpp
     src/GLX/OgreGLXRenderTexture.cpp
     src/GLX/OgreGLXWindow.cpp
   )
   include_directories(src/GLX include/GLX)
+  set(PLATFORM_HEADER_INSTALL "GLX")
+  set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
 endif ()
 
 
@@ -205,11 +212,7 @@ include_directories(
   ${OPENGL_INCLUDE_DIR}
 )
 
-if (UNIX)
-  set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
-endif ()
-
-add_library(RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${GLSL_FILES} ${ATIFS_FILES} ${NVPARSE_FILES} ${PLATFORM_FILES})
+add_library(RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${GLSL_FILES} ${ATIFS_FILES} ${NVPARSE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES})
 target_link_libraries(RenderSystem_GL OgreMain ${OPENGL_LIBRARIES} ${PLATFORM_LIBS})
 
 if (NOT OGRE_STATIC)
@@ -222,3 +225,9 @@ if (OGRE_CONFIG_THREADS)
 endif ()
 
 ogre_config_plugin(RenderSystem_GL)
+if (OGRE_INSTALL_PLUGINS_HEADERS)
+  install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/GL)
+  install(FILES ${PLATFORM_HEADERS} DESTINATION include/OGRE/RenderSystems/GL/${PLATFORM_HEADER_INSTALL})
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/GL DESTINATION include/OGRE/RenderSystems/GL)
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include/ DESTINATION include/OGRE/RenderSystems/GL)
+endif ()

@@ -67,6 +67,7 @@ ELSE (APPLE)
       ${Cg_COMPILER_SUPER_DIR}/lib
       ${Cg_COMPILER_DIR}
       DOC "The Cg runtime library"
+      PATH_SUFFIXES "" release relwithdebinfo minsizerel debug
       )
     FIND_LIBRARY( Cg_GL_LIBRARIES
       NAMES CgGL
@@ -77,6 +78,7 @@ ELSE (APPLE)
       ${Cg_COMPILER_SUPER_DIR}/lib
       ${Cg_COMPILER_DIR}
       DOC "The Cg runtime library"
+      PATH_SUFFIXES "" release relwithdebinfo minsizerel debug
       )
   ELSE (WIN32)
     FIND_PROGRAM( Cg_COMPILER cgc
@@ -101,6 +103,7 @@ ELSE (APPLE)
       ${Cg_COMPILER_SUPER_DIR}/lib64
       ${Cg_COMPILER_SUPER_DIR}/lib
       DOC "The Cg runtime library"
+      PATH_SUFFIXES "" release relwithdebinfo minsizerel debug
       )
     FIND_LIBRARY( Cg_GL_LIBRARIES CgGL
       PATHS
@@ -111,6 +114,7 @@ ELSE (APPLE)
       ${Cg_COMPILER_SUPER_DIR}/lib64
       ${Cg_COMPILER_SUPER_DIR}/lib
       DOC "The Cg runtime library"
+      PATH_SUFFIXES "" release relwithdebinfo minsizerel debug
       )
   ENDIF (WIN32)
 ENDIF (APPLE)

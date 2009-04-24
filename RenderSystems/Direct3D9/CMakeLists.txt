@@ -81,3 +81,6 @@ if (OGRE_CONFIG_THREADS)
 endif ()
 
 ogre_config_plugin(RenderSystem_Direct3D9)
+if (OGRE_INSTALL_PLUGINS_HEADERS)
+  install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/Direct3D9)
+endif ()

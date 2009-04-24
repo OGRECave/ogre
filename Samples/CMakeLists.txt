@@ -68,7 +68,7 @@ if (OGRE_BUILD_SAMPLES)
 		)
 
 	# Link to all enabled plugins
-	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${SAMPLE_DEPENDENCIES})
+	set(OGRE_PLUGIN_LIBRARIES ${SAMPLE_DEPENDENCIES})
 
 	# Need to include resource files so that icons are linked
 	if (WIN32)

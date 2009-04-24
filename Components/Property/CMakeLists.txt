@@ -21,6 +21,7 @@ add_definitions(-DOGRE_PROPERTY_EXPORTS -D_MT -D_USRDLL)
 # include headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/OgreMain/include)
+include_directories(${Boost_INCLUDE_DIRS})
 
 
 # setup target

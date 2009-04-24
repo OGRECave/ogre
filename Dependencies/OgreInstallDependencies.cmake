@@ -6,8 +6,11 @@ if (NOT WIN32)
   return()
 endif()
 
+get_filename_component(OGRE_DEP_CUR_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
 option(OGRE_INSTALL_DEPENDENCIES "Install dependencies needed for sample builds" FALSE)
-set(OGRE_DEP_BIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../Samples/Common/bin)
+# TODO: Move binary files to Dependencies/bin
+set(OGRE_DEP_BIN_DIR ${OGRE_DEP_CUR_DIR}/../Samples/Common/bin)
 
 # MinGW currently uses TinyXML parser for some reason
 if (MINGW)
@@ -16,21 +19,34 @@ else()
 	set(OGRE_CEGUI_XML_PARSER Expat)
 endif()
 if (OGRE_INSTALL_DEPENDENCIES)
-  install(DIRECTORY include/CEGUI include/OIS DESTINATION include)
-  install(FILES
-    lib/debug/CEGUIBase_d.lib
-	lib/debug/OIS_d.lib
-	lib/release/CEGUIBase.lib
-	lib/release/OIS.lib
-	DESTINATION lib
-  )
+  if (OGRE_STATIC)
+    # for static builds, projects must link against all Ogre dependencies themselves, so copy full include and lib dir
+    install(DIRECTORY ${OGRE_DEP_CUR_DIR}/include/ DESTINATION include)
+    install(DIRECTORY ${OGRE_DEP_CUR_DIR}/lib/ DESTINATION lib)
+    
+  else ()
+    # for non-static builds, we only need CEGUI and OIS for the samples
+    install(DIRECTORY ${OGRE_DEP_CUR_DIR}/include/CEGUI ${OGRE_DEP_CUR_DIR}/include/OIS   DESTINATION include)
+    install(FILES
+      ${OGRE_DEP_CUR_DIR}/lib/debug/CEGUIBase_d.lib
+      ${OGRE_DEP_CUR_DIR}/lib/debug/OIS_d.lib
+      DESTINATION lib/debug CONFIGURATIONS Debug
+    )
+    install(FILES
+      ${OGRE_DEP_CUR_DIR}/lib/release/CEGUIBase.lib
+      ${OGRE_DEP_CUR_DIR}/lib/release/OIS.lib
+      DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
+    )
+  endif ()
+    
+  # copy the dependency DLLs to the right places
   install(FILES
     ${OGRE_DEP_BIN_DIR}/debug/CEGUIBase_d.dll
     ${OGRE_DEP_BIN_DIR}/debug/CEGUI${OGRE_CEGUI_XML_PARSER}Parser_d.dll
     ${OGRE_DEP_BIN_DIR}/debug/CEGUIFalagardWRBase_d.dll
     ${OGRE_DEP_BIN_DIR}/debug/cg.dll
     ${OGRE_DEP_BIN_DIR}/debug/OIS_d.dll
-	DESTINATION bin/debug CONFIGURATIONS Debug
+	  DESTINATION bin/debug CONFIGURATIONS Debug
   )
   install(FILES
     ${OGRE_DEP_BIN_DIR}/release/CEGUIBase.dll
@@ -38,7 +54,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
     ${OGRE_DEP_BIN_DIR}/release/CEGUIFalagardWRBase.dll
     ${OGRE_DEP_BIN_DIR}/release/cg.dll
     ${OGRE_DEP_BIN_DIR}/release/OIS.dll
-	DESTINATION bin/release CONFIGURATIONS Release None ""
+	  DESTINATION bin/release CONFIGURATIONS Release None ""
   )  
   install(FILES
     ${OGRE_DEP_BIN_DIR}/release/CEGUIBase.dll
@@ -46,7 +62,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
     ${OGRE_DEP_BIN_DIR}/release/CEGUIFalagardWRBase.dll
     ${OGRE_DEP_BIN_DIR}/release/cg.dll
     ${OGRE_DEP_BIN_DIR}/release/OIS.dll
-	DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo
+	  DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo
   )  
   install(FILES
     ${OGRE_DEP_BIN_DIR}/release/CEGUIBase.dll
@@ -54,7 +70,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
     ${OGRE_DEP_BIN_DIR}/release/CEGUIFalagardWRBase.dll
     ${OGRE_DEP_BIN_DIR}/release/cg.dll
     ${OGRE_DEP_BIN_DIR}/release/OIS.dll
-	DESTINATION bin/minsizerel CONFIGURATIONS MinSizeRel
+	  DESTINATION bin/minsizerel CONFIGURATIONS MinSizeRel
   )  
 endif ()
 

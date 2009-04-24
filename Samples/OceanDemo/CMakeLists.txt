@@ -7,7 +7,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/CEGUIRenderer/include)
 add_executable(Demo_OceanDemo WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
-target_link_libraries(Demo_OceanDemo ${OGRE_LIBRARIES} ${CEGUI_LIBRARIES} ${OGRE_CEGUI_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Demo_OceanDemo ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${CEGUI_LIBRARIES} ${OGRE_CEGUIRenderer_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample(Demo_OceanDemo)
 
-add_dependencies(Demo_OceanDemo ${SAMPLE_DEPENDENCIES})
+if (SAMPLE_DEPENDENCIES)
+  add_dependencies(Demo_OceanDemo ${SAMPLE_DEPENDENCIES})
+endif ()

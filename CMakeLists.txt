@@ -87,9 +87,11 @@ include_directories("${OGRE_BINARY_DIR}/include")
 include(Dependencies)
 # definitions for samples
 set(OGRE_LIBRARIES OgreMain) 
-set(OGRE_CEGUI_LIBRARIES CEGUIOgreRenderer)
-set(OGRE_PCZ_LIBRARIES Plugin_PCZSceneManager)
-set(OGRE_PCZ_OCTREE_LIBRARIES Plugin_OctreeZone)
+set(OGRE_CEGUIRenderer_LIBRARIES CEGUIOgreRenderer)
+set(OGRE_Paging_LIBRARIES OgrePaging)
+set(OGRE_Terrain_LIBRARIES OgreTerrain)
+set(OGRE_Plugin_PCZSceneManager_LIBRARIES Plugin_PCZSceneManager)
+set(OGRE_Plugin_OctreeZone_LIBRARIES Plugin_OctreeZone)
 
 # Specify build paths
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/lib")
@@ -225,9 +227,6 @@ endif ()
 
 # Install CMake modules
 add_subdirectory(CMake)
-
-# Install dependencies
-add_subdirectory(Dependencies)
 
 # Provide CPack packaging target
 include(Packaging)

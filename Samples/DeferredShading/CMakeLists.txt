@@ -21,7 +21,9 @@ set(SOURCE_FILES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_DeferredShading ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
-target_link_libraries(Demo_DeferredShading ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Demo_DeferredShading ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample(Demo_DeferredShading)
 
-add_dependencies(Demo_DeferredShading ${SAMPLE_DEPENDENCIES})
+if (SAMPLE_DEPENDENCIES)
+  add_dependencies(Demo_DeferredShading ${SAMPLE_DEPENDENCIES})
+endif ()

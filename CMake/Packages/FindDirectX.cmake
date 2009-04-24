@@ -40,12 +40,20 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
     set(DirectX_LIBPATH_SUFFIX "x86")
   endif(CMAKE_CL_64)
   find_library(DirectX_LIBRARY NAMES d3d9 HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
+  find_library(DirectX_D3DX9_LIBRARY NAMES d3dx9 HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
+  find_library(DirectX_DXERR9_LIBRARY NAMES dxerr9 HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
+  find_library(DirectX_DXGUID_LIBRARY NAMES dxguid HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
   
   if(DirectX_INCLUDE_DIR)
     set(DirectX_ROOT_DIR "${DirectX_INCLUDE_DIR}/..") 
   endif(DirectX_INCLUDE_DIR)
 
   findpkg_finish(DirectX)
+  set(DirectX_LIBRARIES ${DirectX_LIBRARIES} 
+    ${DirectX_D3DX9_LIBRARY}
+    ${DirectX_DXERR9_LIBRARY}
+    ${DirectX_DXGUID_LIBRARY}
+  )
 
   # look for D3D10.1 components
   if (DirectX_FOUND)

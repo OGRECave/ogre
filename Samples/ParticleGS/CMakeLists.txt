@@ -10,7 +10,9 @@ set(SOURCE_FILES
 
 add_executable(Demo_ParticleGS WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
-target_link_libraries(Demo_ParticleGS ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Demo_ParticleGS ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample(Demo_ParticleGS)
 
-add_dependencies(Demo_ParticleGS ${SAMPLE_DEPENDENCIES})
+if (SAMPLE_DEPENDENCIES)
+  add_dependencies(Demo_ParticleGS ${SAMPLE_DEPENDENCIES})
+endif ()

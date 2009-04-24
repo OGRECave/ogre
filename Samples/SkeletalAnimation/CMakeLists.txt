@@ -6,7 +6,9 @@ set(SOURCE_FILES src/SkeletalAnimation.cpp)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_SkeletalAnimation WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
-target_link_libraries(Demo_SkeletalAnimation ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Demo_SkeletalAnimation ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample(Demo_SkeletalAnimation)
 
-add_dependencies(Demo_SkeletalAnimation ${SAMPLE_DEPENDENCIES})
+if (SAMPLE_DEPENDENCIES)
+  add_dependencies(Demo_SkeletalAnimation ${SAMPLE_DEPENDENCIES})
+endif ()
