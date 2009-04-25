@@ -226,6 +226,8 @@ namespace Ogre {
 			rsc->setVendor(GPU_MATROX);
 		else if (strstr(vendorName, "3DLabs"))
 			rsc->setVendor(GPU_3DLABS);
+		else if (strstr(vendorName, "SiS"))
+			rsc->setVendor(GPU_SIS);
 		else
 			rsc->setVendor(GPU_UNKNOWN);
 
@@ -241,6 +243,16 @@ namespace Ogre {
 			if (rsc->getVendor() == GPU_ATI)
 				disableAutoMip = true;
 #endif
+			// The Intel 915G frequently corrupts textures when using hardware mip generation
+			// I'm not currently sure how many generations of hardware this affects, 
+			// so for now, be safe.
+			if (rsc->getVendor() == GPU_INTEL)
+				disableAutoMip = true;
+
+			// SiS chipsets also seem to have problems with this
+			if (rsc->getVendor() == GPU_SIS)
+				disableAutoMip = true;
+
 			if (!disableAutoMip)
 				rsc->setCapability(RSC_AUTOMIPMAP);
         }

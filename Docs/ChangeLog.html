@@ -31,6 +31,54 @@ Engine)</p>
 <p class="header" align="center">Change Log</p>
 
 <p class="mainheader">
+    v1.6.2 [Shoggoth] (11 April 2009) - Maintenance Release</p>
+<ul>
+  <li><b>LGPL static link exclusion</b> clause added to our official license terms. Static linking terms are now the same as dynamic linking.</li>
+  <li><b>OpenGL</b>:<ul>
+	<li>Safety check before using mCurrentContext</li>
+	<li>Win32: Correctly restore display frequency on Win32/GL, was getting overridden  after restoreConfig</li>
+	<li>Linux: CurrentGLContext option for GLX rendersystem should not be creating a new context.</li>
+	<li>ATI: Workaround for corruptions in most recent drivers with sub-buffer updates with glMapBuffer</li>
+	<li>ATI: fix crashes on some older cards when trying to use point sprites</li>
+	<li>Add support for more graceful downgrading on pre-GL 1.2 cards and other underpowered systems (Mesa should now work)</li>
+	</ul>
+  </li>
+  <li><b>D3D9</b>:<ul>
+	<li>Remove flushUpTo() call in CompositorChain::postTargetOperation; this happens after the begin/end of the scene and actually gets ignored anyway, D3D9 would bitch about this in debug mode</li>
+	<li>Fix a potential issue with switching from fullscreen to windowed if requested size overflows</li>
+	<li>Fix copyContentsToMemory in D3D9 for secondary windows</li>
+	<li>Allow reference device software fallback for low-end machines</li>
+    </ul>
+  </li>
+  <li>Win32: standardise the use of NOMINMAX and WIN32_LEAN_AND_MEAN</li>
+  <li>Linux: Fix aclocal warnings in configure.in</li>
+  <li>Linux: Deal with Xlib.h's definition of 'Status' which clashes with ResourceGroupManager header</li>
+  <li>OS X: OgreMemoryNedMalloc.h correctly made 'public' in the Copy Headers task</li>
+  <li>GCC: Make the PCZ plugin use the gcc visibility options like other libraries</li>
+  <li>VC7.1: Fix for threaded build, VC7.1 doesn't have intrin.h</li>
+  <li>VC9: Added missing 'user' files for VC9</li>
+  <li>Change to the timing of dirtying a Pass hash before a material is loaded to better support threaded material population.</li>
+  <li>Fix small potential memory leak when explicitly constructing a SharedPtr with a null pointer</li>
+  <li>Fix a shadow map indexing bug when using pass iteration for a specific light type and multiple light types all with shadows</li>
+  <li>Fix OverlayManager::getViewportAspectRatio, was inverted</li>
+  <li>Return float from AutoParamDataSource::getLightCastsShadows to match declared type</li>
+  <li>Make methods of TerrainZone virtual</li>
+  <li>Fix off-by-one error in StaticGeometry::GeometryBucket::assign when checking number of vertices.</li>
+  <li>Make sure aspect ratio of camera is updated when camera newly assigned to a viewport</li>
+  <li>Propagate alpha for material and technique setAmbient and setSelfIllumination</li>
+  <li>Fixed ManualObject's support for 4D texture coordinates</li>
+  <li>Fixed ManualObject transparent sorting behaviour when using 'keep ordering' mode</li>
+  <li>Fix a crash when a compositor chain doesn't have a compositor attached to it</li>
+  <li>Default material scheme when compiling compositors, so that quad materials get assigned correctly</li>
+  <li>Fix bug with StaticGeometry when using stencil shadows and LOD.</li>
+  <li>Fix the GLSL 'attach' directive  not allowing multiple attachments in one line.</li>
+  <li>SceneManager::SceneMgrQueuedRenderableVisitor should be public, needed for SceneManager::setQueuedRenderableVisitor</li>
+  <li>Entity::_initialise now uses needUpdate() rather than updateBounds() to update parent node so that it will work on deeper hierarchies with SceneManagers which require parent bounds to also be updated (or processed some other way).</li>
+  <li>Fixed OpenEXR plugin build</li>
+  <li>Fixed crashes with certain Overlay destruction orders.</li>
+  <li>Documentation updates</li>
+</ul>
+  <p class="mainheader">
     v1.6.1 [Shoggoth] (22 January 2009) - Maintenance Release</p>
 <ul>
   <li>

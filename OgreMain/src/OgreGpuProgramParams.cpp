@@ -894,18 +894,18 @@ namespace Ogre
 		_writeRawConstants(physicalIndex, vec.ptr(), 3);		
 	}
 	//-----------------------------------------------------------------------------
-	void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const Matrix4& m)
+	void GpuProgramParameters::_writeRawConstant(size_t physicalIndex, const Matrix4& m,size_t elementCount)
 	{
 
 		// remember, raw content access uses raw float count rather than float4
 		if (mTransposeMatrices)
 		{
 			Matrix4 t = m.transpose();
-			_writeRawConstants(physicalIndex, t[0], 16);
+			_writeRawConstants(physicalIndex, t[0], elementCount>16?16:elementCount);
 		}
 		else
 		{
-			_writeRawConstants(physicalIndex, m[0], 16);
+			_writeRawConstants(physicalIndex, m[0], elementCount>16?16:elementCount);
 		}
 
 	}
@@ -1419,7 +1419,7 @@ namespace Ogre
 
 		GpuLogicalIndexUse* indexUse = _getFloatConstantLogicalIndexUse(index, sz, deriveVariability(acType));
 
-		_setRawAutoConstant(indexUse->physicalIndex, acType, extraInfo, indexUse->variability);
+		_setRawAutoConstant(indexUse->physicalIndex, acType, extraInfo, indexUse->variability, sz);
 	}
 	//-----------------------------------------------------------------------------
 	void GpuProgramParameters::_setRawAutoConstant(size_t physicalIndex, 
@@ -1463,7 +1463,7 @@ namespace Ogre
 
 		GpuLogicalIndexUse* indexUse = _getFloatConstantLogicalIndexUse(index, sz, deriveVariability(acType));
 
-		_setRawAutoConstant(indexUse->physicalIndex, acType, extraInfo, indexUse->variability);
+		_setRawAutoConstant(indexUse->physicalIndex, acType, extraInfo, indexUse->variability, sz);
 	}
 	//-----------------------------------------------------------------------------
 	void GpuProgramParameters::_setRawAutoConstantReal(size_t physicalIndex, 
@@ -1559,7 +1559,7 @@ namespace Ogre
 
 		GpuLogicalIndexUse* indexUse = _getFloatConstantLogicalIndexUse(index, sz, deriveVariability(acType));
 
-		_setRawAutoConstantReal(indexUse->physicalIndex, acType, rData, indexUse->variability);
+		_setRawAutoConstantReal(indexUse->physicalIndex, acType, rData, indexUse->variability, sz);
 	}
 	//-----------------------------------------------------------------------------
 
@@ -1592,42 +1592,42 @@ namespace Ogre
 				switch(i->paramType)
 				{
 				case ACT_VIEW_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getViewMatrix());
+					_writeRawConstant(i->physicalIndex, source->getViewMatrix(),i->elementCount);
 					break;
 				case ACT_INVERSE_VIEW_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getInverseViewMatrix());
+					_writeRawConstant(i->physicalIndex, source->getInverseViewMatrix(),i->elementCount);
 					break;
 				case ACT_TRANSPOSE_VIEW_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getTransposeViewMatrix());
+					_writeRawConstant(i->physicalIndex, source->getTransposeViewMatrix(),i->elementCount);
 					break;
 				case ACT_INVERSE_TRANSPOSE_VIEW_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getInverseTransposeViewMatrix());
+					_writeRawConstant(i->physicalIndex, source->getInverseTransposeViewMatrix(),i->elementCount);
 					break;
 
 				case ACT_PROJECTION_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getProjectionMatrix());
+					_writeRawConstant(i->physicalIndex, source->getProjectionMatrix(),i->elementCount);
 					break;
 				case ACT_INVERSE_PROJECTION_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getInverseProjectionMatrix());
+					_writeRawConstant(i->physicalIndex, source->getInverseProjectionMatrix(),i->elementCount);
 					break;
 				case ACT_TRANSPOSE_PROJECTION_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getTransposeProjectionMatrix());
+					_writeRawConstant(i->physicalIndex, source->getTransposeProjectionMatrix(),i->elementCount);
 					break;
 				case ACT_INVERSE_TRANSPOSE_PROJECTION_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getInverseTransposeProjectionMatrix());
+					_writeRawConstant(i->physicalIndex, source->getInverseTransposeProjectionMatrix(),i->elementCount);
 					break;
 
 				case ACT_VIEWPROJ_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getViewProjectionMatrix());
+					_writeRawConstant(i->physicalIndex, source->getViewProjectionMatrix(),i->elementCount);
 					break;
 				case ACT_INVERSE_VIEWPROJ_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getInverseViewProjMatrix());
+					_writeRawConstant(i->physicalIndex, source->getInverseViewProjMatrix(),i->elementCount);
 					break;
 				case ACT_TRANSPOSE_VIEWPROJ_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getTransposeViewProjMatrix());
+					_writeRawConstant(i->physicalIndex, source->getTransposeViewProjMatrix(),i->elementCount);
 					break;
 				case ACT_INVERSE_TRANSPOSE_VIEWPROJ_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getInverseTransposeViewProjMatrix());
+					_writeRawConstant(i->physicalIndex, source->getInverseTransposeViewProjMatrix(),i->elementCount);
 					break;
 				case ACT_RENDER_TARGET_FLIPPING:
 					_writeRawConstant(i->physicalIndex, source->getCurrentRenderTarget()->requiresTextureFlipping() ? -1.f : +1.f);
@@ -1800,7 +1800,7 @@ namespace Ogre
 					mActivePassIterationIndex = i->physicalIndex;
 					break;
 				case ACT_TEXTURE_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getTextureTransformMatrix(i->data));
+					_writeRawConstant(i->physicalIndex, source->getTextureTransformMatrix(i->data),i->elementCount);
 					break;
 				case ACT_LOD_CAMERA_POSITION:
 					_writeRawConstant(i->physicalIndex, source->getLodCameraPosition(), i->elementCount);
@@ -1808,18 +1808,18 @@ namespace Ogre
 
 				case ACT_TEXTURE_WORLDVIEWPROJ_MATRIX:
 					// can also be updated in lights
-					_writeRawConstant(i->physicalIndex, source->getTextureWorldViewProjMatrix(i->data));
+					_writeRawConstant(i->physicalIndex, source->getTextureWorldViewProjMatrix(i->data),i->elementCount);
 					break;
 				case ACT_TEXTURE_WORLDVIEWPROJ_MATRIX_ARRAY:
 					for (size_t l = 0; l < i->data; ++l)
 					{
 						// can also be updated in lights
 						_writeRawConstant(i->physicalIndex + l*i->elementCount, 
-							source->getTextureWorldViewProjMatrix(l));
+							source->getTextureWorldViewProjMatrix(l),i->elementCount);
 					}
 					break;
 				case ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getSpotlightWorldViewProjMatrix(i->data));
+					_writeRawConstant(i->physicalIndex, source->getSpotlightWorldViewProjMatrix(i->data),i->elementCount);
 					break;
 				case ACT_LIGHT_POSITION_OBJECT_SPACE:
 					_writeRawConstant(i->physicalIndex, 
@@ -1868,16 +1868,16 @@ namespace Ogre
 					break;
 
 				case ACT_WORLD_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getWorldMatrix());
+					_writeRawConstant(i->physicalIndex, source->getWorldMatrix(),i->elementCount);
 					break;
 				case ACT_INVERSE_WORLD_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getInverseWorldMatrix());
+					_writeRawConstant(i->physicalIndex, source->getInverseWorldMatrix(),i->elementCount);
 					break;
 				case ACT_TRANSPOSE_WORLD_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getTransposeWorldMatrix());
+					_writeRawConstant(i->physicalIndex, source->getTransposeWorldMatrix(),i->elementCount);
 					break;
 				case ACT_INVERSE_TRANSPOSE_WORLD_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getInverseTransposeWorldMatrix());
+					_writeRawConstant(i->physicalIndex, source->getInverseTransposeWorldMatrix(),i->elementCount);
 					break;
 
 				case ACT_WORLD_MATRIX_ARRAY_3x4:
@@ -1897,29 +1897,29 @@ namespace Ogre
 						source->getWorldMatrixCount());
 					break;
 				case ACT_WORLDVIEW_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getWorldViewMatrix());
+					_writeRawConstant(i->physicalIndex, source->getWorldViewMatrix(),i->elementCount);
 					break;
 				case ACT_INVERSE_WORLDVIEW_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getInverseWorldViewMatrix());
+					_writeRawConstant(i->physicalIndex, source->getInverseWorldViewMatrix(),i->elementCount);
 					break;
 				case ACT_TRANSPOSE_WORLDVIEW_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getTransposeWorldViewMatrix());
+					_writeRawConstant(i->physicalIndex, source->getTransposeWorldViewMatrix(),i->elementCount);
 					break;
 				case ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getInverseTransposeWorldViewMatrix());
+					_writeRawConstant(i->physicalIndex, source->getInverseTransposeWorldViewMatrix(),i->elementCount);
 					break;
 
 				case ACT_WORLDVIEWPROJ_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getWorldViewProjMatrix());
+					_writeRawConstant(i->physicalIndex, source->getWorldViewProjMatrix(),i->elementCount);
 					break;
 				case ACT_INVERSE_WORLDVIEWPROJ_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getInverseWorldViewProjMatrix());
+					_writeRawConstant(i->physicalIndex, source->getInverseWorldViewProjMatrix(),i->elementCount);
 					break;
 				case ACT_TRANSPOSE_WORLDVIEWPROJ_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getTransposeWorldViewProjMatrix());
+					_writeRawConstant(i->physicalIndex, source->getTransposeWorldViewProjMatrix(),i->elementCount);
 					break;
 				case ACT_INVERSE_TRANSPOSE_WORLDVIEWPROJ_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getInverseTransposeWorldViewProjMatrix());
+					_writeRawConstant(i->physicalIndex, source->getInverseTransposeWorldViewProjMatrix(),i->elementCount);
 					break;
 				case ACT_CAMERA_POSITION_OBJECT_SPACE:
 					_writeRawConstant(i->physicalIndex, source->getCameraPositionObjectSpace(), i->elementCount);
@@ -2106,18 +2106,18 @@ namespace Ogre
 					break;
 				case ACT_TEXTURE_VIEWPROJ_MATRIX:
 					// can also be updated in lights
-					_writeRawConstant(i->physicalIndex, source->getTextureViewProjMatrix(i->data));
+					_writeRawConstant(i->physicalIndex, source->getTextureViewProjMatrix(i->data),i->elementCount);
 					break;
 				case ACT_TEXTURE_VIEWPROJ_MATRIX_ARRAY:
 					for (size_t l = 0; l < i->data; ++l)
 					{
 						// can also be updated in lights
 						_writeRawConstant(i->physicalIndex + l*i->elementCount, 
-							source->getTextureViewProjMatrix(l));
+							source->getTextureViewProjMatrix(l),i->elementCount);
 					}
 					break;
 				case ACT_SPOTLIGHT_VIEWPROJ_MATRIX:
-					_writeRawConstant(i->physicalIndex, source->getSpotlightViewProjMatrix(i->data));
+					_writeRawConstant(i->physicalIndex, source->getSpotlightViewProjMatrix(i->data),i->elementCount);
 					break;
 				default:
 					break;
@@ -2169,7 +2169,7 @@ namespace Ogre
 		const GpuConstantDefinition* def = 
 			_findNamedConstantDefinition(name, !mIgnoreMissingParams);
 		if (def)
-			_writeRawConstant(def->physicalIndex, m);
+			_writeRawConstant(def->physicalIndex, m, def->elementSize);
 	}
 	//---------------------------------------------------------------------------
 	void GpuProgramParameters::setNamedConstant(const String& name, const Matrix4* m, 

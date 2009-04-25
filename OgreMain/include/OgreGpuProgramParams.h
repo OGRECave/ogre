@@ -1323,8 +1323,9 @@ namespace Ogre {
 		the named / logical index versions.
 		@param physicalIndex The physical buffer index at which to place the parameter 
 		@param m The value to set
+		@param elementCount actual element count used with shader
 		*/
-		void _writeRawConstant(size_t physicalIndex, const Matrix4& m);
+		void _writeRawConstant(size_t physicalIndex, const Matrix4& m, size_t elementCount);
 		/** Write a list of Matrix4 parameters to the program.
 		@note You can use these methods if you have already derived the physical
 		constant buffer location, for a slight speed improvement over using

@@ -216,8 +216,9 @@ namespace Ogre
 		GPU_S3 = 4,
 		GPU_MATROX = 5,
 		GPU_3DLABS = 6,
+		GPU_SIS = 7,
 		/// placeholder
-		GPU_VENDOR_COUNT = 7
+		GPU_VENDOR_COUNT = 8
 	};
 
 	/** singleton class for storing the capabilities of the graphics card. 

@@ -937,6 +937,9 @@ namespace Ogre
 		case 0x102B:
 			rsc->setVendor(GPU_MATROX);
 			break;
+		case 0x1039:
+			rsc->setVendor(GPU_SIS);
+			break;
 		default:
 			rsc->setVendor(GPU_UNKNOWN);
 			break;

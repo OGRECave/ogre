@@ -6,7 +6,6 @@
 		Id='6F7C886C-AC7C-481B-B244-236DF5D2D312'
 		Language='1033' Codepage='1252' 
 		Version='1.7.0' Manufacturer='OGRE Project'>
-
     	<Package Id='????????-????-????-????-????????????' Keywords='Installer'
       		Description="OGRE XSI v5.x Exporter Installer"
 			Comments='Softimage XSI v5.x Exporter for OGRE' Manufacturer='OGRE Project'

@@ -268,6 +268,7 @@ namespace Ogre {
 			msGPUVendorStrings[GPU_3DLABS] = "3dlabs";
 			msGPUVendorStrings[GPU_S3] = "s3";
 			msGPUVendorStrings[GPU_MATROX] = "matrox";
+			msGPUVendorStrings[GPU_SIS] = "sis";
 		}
 	}
 

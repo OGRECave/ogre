@@ -114,6 +114,7 @@ namespace Ogre {
 		, mMagFilter(FO_LINEAR)
 		, mMipFilter(FO_POINT)
 		, mMaxAniso(MaterialManager::getSingleton().getDefaultAnisotropy())
+		, mMipmapBias(0)
 		, mIsDefaultAniso(true)
 		, mIsDefaultFiltering(true)
 		, mBindingType(BT_FRAGMENT)
@@ -121,6 +122,13 @@ namespace Ogre {
 		, mParent(parent)
 		, mAnimController(0)
     {
+		mColourBlendMode.blendType = LBT_COLOUR;
+		mAlphaBlendMode.operation = LBX_MODULATE;
+		mAlphaBlendMode.blendType = LBT_ALPHA;
+		mAlphaBlendMode.source1 = LBS_TEXTURE;
+		mAlphaBlendMode.source2 = LBS_CURRENT;
+		setColourOperation(LBO_MODULATE);
+		setTextureAddressingMode(TAM_WRAP);
 
         setTextureName(texName);
         setTextureCoordSet(texCoordSet);

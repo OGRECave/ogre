@@ -6,7 +6,6 @@
 		Id='5940AABD-1573-4cbc-B82F-CA526690FEB5'
 		Language='1033' Codepage='1252' 
 		Version='1.7.0' Manufacturer='OGRE Project'>
-
     	<Package Id='????????-????-????-????-????????????' Keywords='Installer'
 			Description="OGRE Command Line Tools Installer"
 			Comments='Command Line Tools for OGRE' Manufacturer='OGRE Project'

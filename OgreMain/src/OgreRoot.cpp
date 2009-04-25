@@ -1115,17 +1115,21 @@ namespace Ogre {
 		// Load plugin library
         DynLib* lib = DynLibManager::getSingleton().load( pluginName );
 		// Store for later unload
-		mPluginLibs.push_back(lib);
+		// Check for existence, because if called 2+ times DynLibManager returns existing entry
+		if (std::find(mPluginLibs.begin(), mPluginLibs.end(), lib) == mPluginLibs.end())
+		{
+			mPluginLibs.push_back(lib);
 
-		// Call startup function
-		DLL_START_PLUGIN pFunc = (DLL_START_PLUGIN)lib->getSymbol("dllStartPlugin");
+			// Call startup function
+			DLL_START_PLUGIN pFunc = (DLL_START_PLUGIN)lib->getSymbol("dllStartPlugin");
 
-		if (!pFunc)
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot find symbol dllStartPlugin in library " + pluginName,
-				"Root::loadPlugin");
+			if (!pFunc)
+				OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot find symbol dllStartPlugin in library " + pluginName,
+					"Root::loadPlugin");
 
-		// This must call installPlugin
-		pFunc();
+			// This must call installPlugin
+			pFunc();
+		}
 
 	}
     //-----------------------------------------------------------------------

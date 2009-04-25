@@ -6,7 +6,6 @@
 		Id='CFE34964-1DAB-43b3-9540-07A0B77CC6FB'
 		Language='1033' Codepage='1252' 
 		Version='1.7.0' Manufacturer='OGRE Project'>
-
     	<Package Id='????????-????-????-????-????????????' Keywords='Installer'
       		Description="OGREMilkshape Exporter Installer"
 			Comments='Milkshape Exporter for OGRE' Manufacturer='OGRE Project'

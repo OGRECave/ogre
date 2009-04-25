@@ -997,23 +997,6 @@ namespace Ogre {
             method the number of times equal to the value they return from 
             SceneManager::estimateWorldGeometry while loading their geometry.
         */
-        void _notifyWorldGeometryPrepareStageStarted(const String& description);
-        /** Notify this manager that one stage of world geometry loading has been 
-            completed.
-        @remarks
-            Custom SceneManagers which load custom world geometry should call this 
-            method the number of times equal to the value they return from 
-            SceneManager::estimateWorldGeometry while loading their geometry.
-        */
-        void _notifyWorldGeometryPrepareStageEnded(void);
-
-        /** Notify this manager that one stage of world geometry loading has been 
-            started.
-        @remarks
-            Custom SceneManagers which load custom world geometry should call this 
-            method the number of times equal to the value they return from 
-            SceneManager::estimateWorldGeometry while loading their geometry.
-        */
         void _notifyWorldGeometryStageStarted(const String& description);
         /** Notify this manager that one stage of world geometry loading has been 
             completed.
