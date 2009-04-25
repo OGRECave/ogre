@@ -298,17 +298,11 @@ namespace Ogre
 		*/
 		void calculateHeightDeltas(const Rect& rect);
 
-		/** Get the maximum vertical difference between any vertex in one 
-			LOD level and the implicit position it would be in the level below it
-			because it has been removed. 
-		@note
-			This method assumes that height deltas are up to date (@see calculateHeightDeltas)
-		@param rect Rectangle describing the (inclusive) set of points to 
-			be calculated (left < right, top < bottom, left & top are inclusive, right & bottom exclusive)
-		@param srcLOD The level of detail from which to reduce from (0 is the 
-			highest level)
+		/** Gets the resolution of the entire terrain (down one edge) at a 
+			given LOD level. 
 		*/
-		Real getMaxHeightDelta(const Rect& rect, unsigned short srcLOD);
+		uint16 getResolutionAtLod(uint16 lodLevel);
+
 	protected:
 
 		void freeCPUResources();

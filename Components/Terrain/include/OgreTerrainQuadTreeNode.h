@@ -90,7 +90,7 @@ namespace Ogre
 		@param lod The base LOD level
 		*/
 		TerrainQuadTreeNode(Terrain* terrain, TerrainQuadTreeNode* parent, 
-			uint16 xoff, uint16 yoff, uint16 size, uint16 lod);
+			uint16 xoff, uint16 yoff, uint16 size, uint16 lod, uint16 depth);
 		virtual ~TerrainQuadTreeNode();
 
 		/// Get the horizontal offset into the main terrain data of this node
@@ -120,7 +120,7 @@ namespace Ogre
 		struct _OgreTerrainExport LodLevel : public TerrainAlloc
 		{
 			/// Number of vertices rendered down one side (not including skirts)
-			uint16 sz;
+			uint16 batchSize;
 			/// Index buffer used to render this level from the main vertex data
 			HardwareIndexBufferSharedPtr indexBuffer;
 			/// Maximum delta height between this and the next lower lod
@@ -143,6 +143,19 @@ namespace Ogre
 		/** Notify the node (and children) of a height delta value. */
 		void notifyDelta(uint16 x, uint16 y, uint16 lod, Real delta);
 
+		/** Assign vertex data to the tree, from a depth and at a given resolution.
+		@param treeDepthStart The first depth of tree that should use this data, owns the data
+		@param treeDepthEnd The end of the depth that should use this data (exclusive)
+		@param resolution The resolution of the data to use
+		*/
+		void assignVertexData(uint16 treeDepthStart, uint16 treeDepthEnd, uint16 resolution);
+
+		/** Tell a node that it should use an anscestor's vertex data.
+		@param treeDepthEnd The end of the depth that should use this data (exclusive)
+		@param resolution The resolution of the data to use
+		*/
+		void useAncestorVertexData(TerrainQuadTreeNode* owner, uint16 treeDepthEnd, uint16 resolution);
+
 
 	protected:
 		Terrain* mTerrain;
@@ -155,7 +168,10 @@ namespace Ogre
 		/// the number of vertices at the original terrain resolution this node encompasses
 		uint16 mSize;
 		uint16 mBaseLod;
-		uint16 mUpperLod;
+		uint16 mDepth;
+
+		TerrainQuadTreeNode* mNodeWithVertexData;
+		bool mOwnVertexData;
 
 	};
 

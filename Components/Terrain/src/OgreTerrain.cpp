@@ -117,7 +117,7 @@ namespace Ogre
 
 		stream.readChunkEnd(TERRAIN_CHUNK_ID);
 
-		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1);
+		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0);
 		mQuadTree->prepare();
 
 		mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
@@ -221,7 +221,7 @@ namespace Ogre
 		mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
 
 
-		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1);
+		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0);
 		mQuadTree->prepare();
 
 		// calculate entire terrain
@@ -272,73 +272,101 @@ namespace Ogre
 		mTreeDepth = Math::Log2(mMaxBatchSize - 1) - Math::Log2(mMinBatchSize - 1) + 2;
 
 		/* Now we need to figure out how to distribute vertex data. We want to 
-		   use 16-bit indexes for compatibility, which means that the maximum patch
-		   size that we can address (even sparsely for lower LODs) is 129x129 
-		   (the next one up, 257x257 is too big). 
+		use 16-bit indexes for compatibility, which means that the maximum patch
+		size that we can address (even sparsely for lower LODs) is 129x129 
+		(the next one up, 257x257 is too big). 
 
-		   So we need to split the vertex data into chunks of 129. The number of 
-		   primary tiles this creates also indicates the point above which in
-		   the node tree that we can no longer merge tiles at lower LODs without
-		   using different vertex data. For example, using the 257x257 input example
-		   above, the vertex data would have to be split in 2 (in each dimension)
-		   in order to fit within the 129x129 range. This data could be shared by
-		   all tree depths from 1 onwards, it's just that LODs 3-1 would sample 
-		   the 129x129 data sparsely. LOD 0 would sample all of the vertices.
+		So we need to split the vertex data into chunks of 129. The number of 
+		primary tiles this creates also indicates the point above which in
+		the node tree that we can no longer merge tiles at lower LODs without
+		using different vertex data. For example, using the 257x257 input example
+		above, the vertex data would have to be split in 2 (in each dimension)
+		in order to fit within the 129x129 range. This data could be shared by
+		all tree depths from 1 onwards, it's just that LODs 3-1 would sample 
+		the 129x129 data sparsely. LOD 0 would sample all of the vertices.
 
-		   LOD 4 however, the lowest LOD, could not work with the same vertex data
-		   because it needs to cover the entire terrain. There are 2 choices here:
-		   create another set of vertex data at 17x17 which is only used by LOD 4, 
-		   or make LOD 4 occur at tree depth 1 instead (ie still split up, and 
-		   rendered as 2x9 along each edge instead. 
+		LOD 4 however, the lowest LOD, could not work with the same vertex data
+		because it needs to cover the entire terrain. There are 2 choices here:
+		create another set of vertex data at 17x17 which is only used by LOD 4, 
+		or make LOD 4 occur at tree depth 1 instead (ie still split up, and 
+		rendered as 2x9 along each edge instead. 
 
-		   Since rendering very small batches is not desirable, and the vertex counts
-		   are inherently not going to be large, creating a separate vertex set is
-		   preferable. This will also be more efficient on the vertex cache with
-		   distant terrains. 
+		Since rendering very small batches is not desirable, and the vertex counts
+		are inherently not going to be large, creating a separate vertex set is
+		preferable. This will also be more efficient on the vertex cache with
+		distant terrains. 
 
-		   We probably need a larger example, because in this case only 1 level (LOD 0)
-		   needs to use this separate vertex data. Higher detail terrains will need
-		   it for multiple levels, here's a 2049x2049 example with 65 / 33 batch settings:
+		We probably need a larger example, because in this case only 1 level (LOD 0)
+		needs to use this separate vertex data. Higher detail terrains will need
+		it for multiple levels, here's a 2049x2049 example with 65 / 33 batch settings:
 
-		   LODlevels = log2(2049 - 1) - log2(33 - 1) + 1 = 11 - 5 + 1 = 7
-		   TreeDepth = log2((2049 - 1) / (65 - 1)) + 1 = 6
-		   Number of vertex data splits at most detailed level: 
-		   (size - 1) / (TERRAIN_MAX_BATCH_SIZE - 1) = 2048 / 128 = 16
+		LODlevels = log2(2049 - 1) - log2(33 - 1) + 1 = 11 - 5 + 1 = 7
+		TreeDepth = log2((2049 - 1) / (65 - 1)) + 1 = 6
+		Number of vertex data splits at most detailed level: 
+		(size - 1) / (TERRAIN_MAX_BATCH_SIZE - 1) = 2048 / 128 = 16
 
-		   LOD 0: 2049 vertices, 32 x 65 vertex tiles (tree depth 5) vdata 0-15 [129x16]
-		   LOD 1: 1025 vertices, 32 x 33 vertex tiles (tree depth 5) vdata 0-15 [129x16]
-		   LOD 2: 513  vertices, 16 x 33 vertex tiles (tree depth 4) vdata 0-15 [129x16]
-		   LOD 3: 257  vertices, 8  x 33 vertex tiles (tree depth 3) vdata 16-17 [129x2] 
-		   LOD 4: 129  vertices, 4  x 33 vertex tiles (tree depth 2) vdata 16-17 [129x2]
-		   LOD 5: 65   vertices, 2  x 33 vertex tiles (tree depth 1) vdata 16-17 [129x2]
-		   LOD 6: 33   vertices, 1  x 33 vertex tiles (tree depth 0) vdata 18 [33]
+		LOD 0: 2049 vertices, 32 x 65 vertex tiles (tree depth 5) vdata 0-15  [129x16]
+		LOD 1: 1025 vertices, 32 x 33 vertex tiles (tree depth 5) vdata 0-15  [129x16]
+		LOD 2: 513  vertices, 16 x 33 vertex tiles (tree depth 4) vdata 0-15  [129x16]
+		LOD 3: 257  vertices, 8  x 33 vertex tiles (tree depth 3) vdata 16-17 [129x2] 
+		LOD 4: 129  vertices, 4  x 33 vertex tiles (tree depth 2) vdata 16-17 [129x2]
+		LOD 5: 65   vertices, 2  x 33 vertex tiles (tree depth 1) vdata 16-17 [129x2]
+		LOD 6: 33   vertices, 1  x 33 vertex tiles (tree depth 0) vdata 18    [33]
 
-		   All the vertex counts are to be squared, they are just along one edge. 
-		   So as you can see, we need to have 3 levels of vertex data to satisy this
-		   (admittedly quite extreme) case, and a total of 19 sets of vertex data. 
-		   The full detail geometry, which is  16(x16) sets of 129(x129), used by 
-		   LODs 0-2. LOD 3 can't use this set because it needs to group across them, 
-		   because it has only 8 tiles, so we make another set which satisfies this 
-		   at a maximum of 129 vertices per vertex data section. In this case LOD 
-		   3 needs 257(x257) total vertices so we still split into 2(x2) sets of 129. 
-		   This set is good up to and including LOD 5, but LOD 6 needs a single 
-		   contiguous set of vertices, so we make a 33x33 vertex set for it. 
+		All the vertex counts are to be squared, they are just along one edge. 
+		So as you can see, we need to have 3 levels of vertex data to satisy this
+		(admittedly quite extreme) case, and a total of 19 sets of vertex data. 
+		The full detail geometry, which is  16(x16) sets of 129(x129), used by 
+		LODs 0-2. LOD 3 can't use this set because it needs to group across them, 
+		because it has only 8 tiles, so we make another set which satisfies this 
+		at a maximum of 129 vertices per vertex data section. In this case LOD 
+		3 needs 257(x257) total vertices so we still split into 2(x2) sets of 129. 
+		This set is good up to and including LOD 5, but LOD 6 needs a single 
+		contiguous set of vertices, so we make a 33x33 vertex set for it. 
 
-		   In terms of vertex data stored, this means that while our primary data is:
-			  2049^2 = 4198401 vertices
-		   our final stored vertex data is 
-		      (16 * 129)^2 + (2 * 129)^2 + 33^2 = 4327749 vertices
+		In terms of vertex data stored, this means that while our primary data is:
+		2049^2 = 4198401 vertices
+		our final stored vertex data is 
+		(16 * 129)^2 + (2 * 129)^2 + 33^2 = 4327749 vertices
 
-		   That equals a 3% premium, but it's both necessary and worth it for the
-		   reduction in batch count resulting from the grouping. In addition, at
-		   LODs 3 and 6 (or rather tree depth 3 and 0) there is the opportunity 
-		   to free up the vertex data used by more detailed LODs, which is
-		   important when dealing with large terrains. For example, if we
-		   freed the (GPU) vertex data for LOD 0-2 in the medium distance, 
-		   we would save 98% of the memory overhead for this terrain. 
+		That equals a 3% premium, but it's both necessary and worth it for the
+		reduction in batch count resulting from the grouping. In addition, at
+		LODs 3 and 6 (or rather tree depth 3 and 0) there is the opportunity 
+		to free up the vertex data used by more detailed LODs, which is
+		important when dealing with large terrains. For example, if we
+		freed the (GPU) vertex data for LOD 0-2 in the medium distance, 
+		we would save 98% of the memory overhead for this terrain. 
 
 		*/
 
+		uint16 depth = mTreeDepth;
+		uint16 prevdepth = depth;
+		uint16 currresolution = mSize;
+		uint16 bakedresolution = mSize;
+		uint16 targetSplits = (bakedresolution - 1) / (TERRAIN_MAX_BATCH_SIZE - 1);
+		while(depth-- && targetSplits)
+		{
+			uint splits = 1 << depth;
+			if (splits == targetSplits)
+			{
+				// vertex data goes at this level, at bakedresolution
+				// applies to all lower levels (except those with a closer vertex data)
+				mQuadTree->assignVertexData(depth, prevdepth, bakedresolution);
+				
+				// next set to look for
+				bakedresolution =  ((currresolution - 1) >> 1) + 1;
+				targetSplits = (bakedresolution - 1) / (TERRAIN_MAX_BATCH_SIZE - 1);
+				prevdepth = depth;
+				
+			}
+
+			currresolution = ((currresolution - 1) >> 1) + 1;
+			
+
+		}
+
+		// Always assign vertex data to the top of the tree
+		mQuadTree->assignVertexData(0, prevdepth, bakedresolution);
 
 	}
 	//---------------------------------------------------------------------
@@ -613,9 +641,9 @@ namespace Ogre
 	}
 
 	//---------------------------------------------------------------------
-	Real getMaxHeightDelta(const Rect& rect, unsigned short srcLOD)
+	uint16 Terrain::getResolutionAtLod(uint16 lodLevel)
 	{
-		return 0;
+		return ((mSize - 1) >> lodLevel) + 1;
 	}
 
 

@@ -33,7 +33,7 @@ namespace Ogre
 {
 	//---------------------------------------------------------------------
 	TerrainQuadTreeNode::TerrainQuadTreeNode(Terrain* terrain, 
-		TerrainQuadTreeNode* parent, uint16 xoff, uint16 yoff, uint16 size, uint16 lod)
+		TerrainQuadTreeNode* parent, uint16 xoff, uint16 yoff, uint16 size, uint16 lod, uint16 depth)
 		: mTerrain(terrain)
 		, mParent(parent)
 		, mOffsetX(xoff)
@@ -42,21 +42,25 @@ namespace Ogre
 		, mBoundaryY(yoff + size)
 		, mSize(size)
 		, mBaseLod(lod)
+		, mDepth(depth)
+		, mNodeWithVertexData(0)
+		, mOwnVertexData(false)
 	{
 		if (terrain->getMinBatchSize() < size)
 		{
 			uint16 childSize = ((size - 1) * 0.5) + 1;
 			uint16 childOff = childSize - 1;
 			uint16 childLod = lod - 1; // LOD levels decrease down the tree (higher detail)
+			uint16 childDepth = depth + 1;
 			// create children
-			mChildren[0] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff, childSize, childLod);
-			mChildren[1] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff, childSize, childLod);
-			mChildren[2] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff + childOff, childSize, childLod);
-			mChildren[3] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff + childOff, childSize, childLod);
+			mChildren[0] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff, childSize, childLod, childDepth);
+			mChildren[1] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff, childSize, childLod, childDepth);
+			mChildren[2] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff + childOff, childSize, childLod, childDepth);
+			mChildren[3] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff + childOff, childSize, childLod, childDepth);
 
 			LodLevel* ll = OGRE_NEW LodLevel();
 			// non-leaf nodes always render with minBatchSize vertices
-			ll->sz = terrain->getMinBatchSize();
+			ll->batchSize = terrain->getMinBatchSize();
 			ll->maxHeightDelta = 0;
 			mLodLevels.push_back(ll);
 
@@ -76,7 +80,7 @@ namespace Ogre
 			while (ownLod--)
 			{
 				LodLevel* ll = OGRE_NEW LodLevel();
-				ll->sz = sz;
+				ll->batchSize = sz;
 				ll->maxHeightDelta = 0;
 				mLodLevels.push_back(ll);
 				if (ownLod)
@@ -117,6 +121,8 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::prepare()
 	{
+
+
 		if (isLeaf())
 		{
 			// calculate error terms
@@ -236,6 +242,38 @@ namespace Ogre
 
 		}
 	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::assignVertexData(uint16 treeDepthStart, uint16 treeDepthEnd, uint16 resolution)
+	{
+		assert(treeDepthStart >= mDepth && "Should not be calling this");
+
+		if (mDepth == treeDepthStart)
+		{
+			// we own this vertex data
+			mOwnVertexData = true;
+
+			// TODO - create vertex structure, not using GPU for now
+			// think of children's requirements for skirts!
+
+			// pass on to children
+			if (!isLeaf() && treeDepthEnd > mDepth)
+			{
+				for (int i = 0; i < 4; ++i)
+					mChildren[i]->useAncestorVertexData(this, treeDepthEnd, resolution);
+
+			}
+			
+
+
+		}
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::useAncestorVertexData(TerrainQuadTreeNode* owner, uint16 treeDepthEnd, uint16 resolution)
+	{
+
+		// TODO
+	}
+
 
 
 }
