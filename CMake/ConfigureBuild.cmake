@@ -16,11 +16,13 @@ if (OGRE_CONFIG_THREADS)
   if (UNIX)
     add_definitions(-pthread)
   endif ()
+  include_directories(${Boost_INCLUDE_DIRS})
+  # On MSVC Boost usually tries to autolink boost libraries. However since
+  # this behaviour is not available on all compilers, we need to find the libraries
+  # ourselves, anyway. Disable auto-linking to avoid mess-ups.
+  add_definitions(-DBOOST_ALL_NO_LIB)
 endif()
 
-if (Boost_FOUND AND !Boost_USE_STATIC_LIBS)
-  add_definitions(-DBOOST_ALL_DYN_LINK)
-endif ()
 
 # determine config values depending on build options 
 set(OGRE_SET_DOUBLE 0)

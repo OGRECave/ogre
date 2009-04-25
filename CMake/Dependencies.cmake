@@ -96,7 +96,7 @@ macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://develop
 set(Boost_USE_STATIC_LIBS TRUE)
 set(Boost_ADDITIONAL_VERSIONS "1.37.0" "1.37" "1.38.0" "1.38")
 # Components that need linking (NB does not include heaader-only components like bind)
-set(OGRE_BOOST_COMPONENTS thread)
+set(OGRE_BOOST_COMPONENTS thread date_time)
 find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
 if (!Boost_FOUND)
 	# Try dynamic
@@ -106,6 +106,7 @@ endif()
 # Optional Boost libs (Boost_${COMPONENT}_FOUND
 macro_log_feature(Boost_FOUND "boost" "Boost (general)" "http://boost.org" FALSE "" "")
 macro_log_feature(Boost_THREAD_FOUND "boost-thread" "Used for threading support" "http://boost.org" FALSE "" "")
+macro_log_feature(Boost_DATE_TIME_FOUND "boost-date_time" "Used for threading support" "http://boost.org" FALSE "" "")
 
 # POCO
 find_package(POCO)
