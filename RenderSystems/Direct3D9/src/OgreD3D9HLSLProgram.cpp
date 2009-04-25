@@ -364,7 +364,7 @@ namespace Ogre {
 			} // columns
 			break;
 		case D3DXPT_FLOAT:
-			switch(d3dDesc.Rows)
+			switch(d3dDesc.RegisterCount)
 			{
 			case 1:
 				switch(d3dDesc.Columns)
