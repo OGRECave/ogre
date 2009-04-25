@@ -764,7 +764,7 @@ namespace Ogre {
 						}
 						else
 						{
-							convertTexGenDX(tex, e, shader);
+							convertTexGenOGL(tex, e, shader);
 						}
 
 					}
