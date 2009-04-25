@@ -512,7 +512,7 @@ Entity* SceneManager::createEntity(const String& entityName, PrefabType ptype)
 Entity* SceneManager::createEntity(PrefabType ptype)
 {
 	String name = mMovableNameGenerator.generate();
-	return createEntity(ptype);
+	return createEntity(name, ptype);
 }
 
 //-----------------------------------------------------------------------
