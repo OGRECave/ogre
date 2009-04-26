@@ -52,7 +52,7 @@ OSXCarbonWindow::OSXCarbonWindow()
 	mAGLContext = NULL;
 	mContext = NULL;
 	mWindow = NULL;
-    mEventHandlerRef = NULL;
+	mEventHandlerRef = NULL;
 	mView = NULL;
 }
 
@@ -117,7 +117,7 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
 		else if(mainContext->getContextType() == "AGL")
 		{
 			OSXCarbonContext* aglShare = static_cast<OSXCarbonContext*>(mainContext);
-			aglGetCGLContext(aglShare->getContext(), &((void*)share));
+			aglGetCGLContext(aglShare->getContext(), (void**)&share);
 		}
 		else if(mainContext->getContextType() == "CGL")
 		{
@@ -170,7 +170,6 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
 		else if(mainContext->getContextType() == "AGL")
 		{
 			OSXCarbonContext* context = static_cast<OSXCarbonContext*>( rs->_getMainContext() );
-			AGLContext shared = context->getContext();
 			mAGLContext = aglCreateContext(pixelFormat, context->getContext());
 		}
 		else
@@ -265,24 +264,23 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
 			// First get the HIViewRef / ControlRef
 			mView = (HIViewRef)StringConverter::parseUnsignedLong(opt->second);
 			mWindow = GetControlOwner(mView);
-			
 			// Lets try hiding the HIView
 			//HIViewSetVisible(mView, false);
-					
 			// Get the rect bounds
 			::Rect ctrlBounds;
 			GetControlBounds(mView, &ctrlBounds);
 			GLint bufferRect[4];
-
+      
 			bufferRect[0] = ctrlBounds.left;					// left edge
 			bufferRect[1] = ctrlBounds.bottom;					// bottom edge
 			bufferRect[2] =	ctrlBounds.right - ctrlBounds.left; // width of buffer rect
 			bufferRect[3] = ctrlBounds.bottom - ctrlBounds.top; // height of buffer rect
+      
 			aglSetInteger(mAGLContext, AGL_BUFFER_RECT, bufferRect);
 			aglEnable (mAGLContext, AGL_BUFFER_RECT);
-            
-            mIsExternal = true;
-		}
+
+      		mIsExternal = true;
+    }
 		
 		// Set the drawable, and current context
 		// If you do this last, there is a moment before the rendering window pops-up
@@ -368,11 +366,45 @@ void OSXCarbonWindow::resize(unsigned int width, unsigned int height)
 	// Check if the window size really changed
 	if(mWidth == width && mHeight == height)
 		return;
-
 	mWidth = width;
 	mHeight = height;
+	if (mIsExternal)
+	{
+		HIRect viewBounds, winBounds;
+		HIViewGetBounds(mView, &viewBounds);
+		HIViewRef root = HIViewGetRoot(HIViewGetWindow(mView));
+		HIViewGetBounds(root, &winBounds);
+		HIViewConvertRect(&viewBounds, mView, root);
+		mLeft = viewBounds.origin.x;
+		mTop = winBounds.size.height - (viewBounds.origin.y + viewBounds.size.height);
+		// Set the AGL buffer rectangle (i.e. the bounds that we will use) 
+		GLint bufferRect[4];      
+		bufferRect[0] = mLeft; // 0 = left edge 
+		bufferRect[1] = mTop; // 0 = bottom edge 
+		bufferRect[2] = mWidth; // width of buffer rect 
+		bufferRect[3] = mHeight; // height of buffer rect 
+		aglSetInteger(mAGLContext, AGL_BUFFER_RECT, bufferRect);
+		for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it) 
+		{ 
+			(*it).second->_updateDimensions(); 
+		}
+	}
+	else
+	{
+		SizeWindow(mWindow, width, height, true);
+	}
+}
 
-	SizeWindow(mWindow, width, height, true);
+void OSXCarbonWindow::setVisible( bool visible ) {
+  mVisible = visible;
+  if (mIsExternal && !visible) {
+    GLint bufferRect[4]={0,0,0,0};
+    aglSetInteger(mAGLContext, AGL_BUFFER_RECT, bufferRect);
+  }
+}
+
+bool OSXCarbonWindow::isVisible( void ) const {
+  return mVisible;
 }
 
 //-------------------------------------------------------------------------------------------------//
@@ -458,7 +490,7 @@ void OSXCarbonWindow::windowMovedOrResized()
         mWidth = viewBounds.size.width; 
         mHeight = viewBounds.size.height; 
         mLeft = viewBounds.origin.x; 
-        mTop = bufferRect[1]; 
+        mTop = bufferRect[1];
     } 
     
     for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it) 

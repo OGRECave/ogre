@@ -57,8 +57,12 @@ namespace Ogre
         /** Overridden - see RenderWindow */
 		virtual void resize( unsigned int width, unsigned int height );
         /** Overridden - see RenderWindow */
+    	virtual void setVisible( bool visible );
+        /** Overridden - see RenderWindow */
+    	virtual bool isVisible(void) const;
+        /** Overridden - see RenderWindow */
 		virtual void swapBuffers( bool waitForVSync );
-		/** Overridden - see RenderTarget */
+   	    /** Overridden - see RenderTarget */
 		virtual void windowMovedOrResized();
 
 		bool requiresTextureFlipping() const { return false; }
@@ -77,11 +81,12 @@ namespace Ogre
 		HIViewRef mView;
 		AGLContext mAGLContext;
 		
-		bool mActive;
-		bool mClosed;
-        bool mCreated;
-		bool mHasResized;
-        bool mIsExternal;
+    bool mActive;
+    bool mClosed;
+    bool mCreated;
+    bool mHasResized;
+    bool mIsExternal;
+    bool mVisible;
 	};
 }
 
