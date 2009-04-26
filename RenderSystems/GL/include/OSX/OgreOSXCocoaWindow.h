@@ -37,7 +37,7 @@ namespace Ogre {
     {
     private:
 		NSWindow *mWindow;
-		OgreView *mView;
+		NSView *mView;		//was OgreView *mView;
 		NSOpenGLContext *glContext;
 		
         bool mActive;

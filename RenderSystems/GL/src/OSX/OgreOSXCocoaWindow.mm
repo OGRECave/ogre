@@ -199,8 +199,14 @@ Key: "vsync" Description: Synchronize buffer swaps to vsync Values: true, false 
 			glContext = [[NSOpenGLContext alloc] initWithFormat: openglFormat shareContext:shareContext];
 			
 			NameValuePairList::const_iterator opt = 0;
-			if(miscParams)
+			NameValuePairList::const_iterator param_useNSView_pair = 0;
+			if(miscParams) {
 				opt = miscParams->find("externalWindowHandle");
+				param_useNSView_pair = miscParams->find("macAPICocoaUseNSView") ;
+
+				
+			}
+			
 			if(!miscParams || opt == miscParams->end())
 			{
 				//Not sure why this should be but it is required for the window to work at fullscreen.
@@ -216,14 +222,30 @@ Key: "vsync" Description: Synchronize buffer swaps to vsync Values: true, false 
 			}
 			else
 			{
-				mView = (OgreView*)StringConverter::parseUnsignedLong(opt->second);
-				[mView setOgreWindow:this];
+				bool useNSView = false ;
+				if(param_useNSView_pair != miscParams->end())
+					if(param_useNSView_pair->second == "true")
+						useNSView = true ;
+
+				// If the macAPICocoaUseNSView parmeter was set, use the winhandler as pointer to an NSView
+				// Otherwise we assume the user created the inerface with Interface Builder and instantiated an OgreView.
 				
-				NSRect b = [mView bounds];
-				width = b.size.width;
-				height = b.size.height;
+				if(useNSView) {
+					LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external plain NSView*") ;
+					NSView * nsview = (NSView*)StringConverter::parseUnsignedLong(opt->second);
+					mView = nsview ;					
+				} else {
+					OgreView * view = (OgreView*)StringConverter::parseUnsignedLong(opt->second);
+					[view setOgreWindow:this];
+					mView = view ;
+				
+					NSRect b = [mView bounds];
+					width = b.size.width;
+					height = b.size.height;
+				}
 			}
-			
+
+				
 			[glContext setView:mView];
 
 			mName = name;
