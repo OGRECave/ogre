@@ -44,7 +44,8 @@ namespace Ogre {
     {   
 
     public:
-		D3D9HardwareVertexBuffer(size_t vertexSize, size_t numVertices, HardwareBuffer::Usage usage, bool useSystemMem, bool useShadowBuffer);
+		D3D9HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, 
+			size_t numVertices, HardwareBuffer::Usage usage, bool useSystemMem, bool useShadowBuffer);
         ~D3D9HardwareVertexBuffer();
         /** See HardwareBuffer. */
         void readData(size_t offset, size_t length, void* pDest);

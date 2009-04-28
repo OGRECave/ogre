@@ -38,10 +38,10 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 	//---------------------------------------------------------------------
-    D3D9HardwareIndexBuffer::D3D9HardwareIndexBuffer(HardwareIndexBuffer::IndexType idxType, 
+    D3D9HardwareIndexBuffer::D3D9HardwareIndexBuffer(HardwareBufferManagerBase* mgr, HardwareIndexBuffer::IndexType idxType, 
         size_t numIndexes, HardwareBuffer::Usage usage,
         bool useSystemMemory, bool useShadowBuffer)
-        : HardwareIndexBuffer(idxType, numIndexes, usage, useSystemMemory, useShadowBuffer)
+        : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, useSystemMemory, useShadowBuffer)
     {
 		D3DPOOL eResourcePool;
 

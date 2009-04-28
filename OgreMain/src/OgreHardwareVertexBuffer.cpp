@@ -39,10 +39,11 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
     //-----------------------------------------------------------------------------
-    HardwareVertexBuffer::HardwareVertexBuffer(size_t vertexSize,  
+    HardwareVertexBuffer::HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize,  
         size_t numVertices, HardwareBuffer::Usage usage, 
         bool useSystemMemory, bool useShadowBuffer) 
         : HardwareBuffer(usage, useSystemMemory, useShadowBuffer), 
+		  mMgr(mgr),
           mNumVertices(numVertices),
           mVertexSize(vertexSize)
     {
@@ -60,10 +61,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     HardwareVertexBuffer::~HardwareVertexBuffer()
     {
-		HardwareBufferManager* mgr = HardwareBufferManager::getSingletonPtr();
-		if (mgr)
+		if (mMgr)
 		{
-			mgr->_notifyVertexBufferDestroyed(this);
+			mMgr->_notifyVertexBufferDestroyed(this);
 		}
         if (mpShadowBuffer)
         {
@@ -413,9 +413,10 @@ namespace Ogre {
 		return sz;
 	}
     //-----------------------------------------------------------------------------
-    VertexDeclaration* VertexDeclaration::clone(void)
+    VertexDeclaration* VertexDeclaration::clone(HardwareBufferManagerBase* mgr)
     {
-        VertexDeclaration* ret = HardwareBufferManager::getSingleton().createVertexDeclaration();
+		HardwareBufferManagerBase* pManager = mgr ? mgr : HardwareBufferManager::getSingletonPtr(); 
+        VertexDeclaration* ret = pManager->createVertexDeclaration();
 
 		VertexElementList::const_iterator i, iend;
 		iend = mElementList.end();

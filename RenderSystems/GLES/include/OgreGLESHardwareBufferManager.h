@@ -45,15 +45,15 @@ namespace Ogre {
     #endif
 
     /** Implementation of HardwareBufferManager for OpenGLES. */
-    class _OgrePrivate GLESHardwareBufferManager : public HardwareBufferManager
+    class _OgrePrivate GLESHardwareBufferManagerBase : public HardwareBufferManagerBase
     {
         protected:
             char* mScratchBufferPool;
             OGRE_MUTEX(mScratchMutex)
 
         public:
-            GLESHardwareBufferManager();
-            virtual ~GLESHardwareBufferManager();
+            GLESHardwareBufferManagerBase();
+            virtual ~GLESHardwareBufferManagerBase();
             /// Creates a vertex buffer
             HardwareVertexBufferSharedPtr createVertexBuffer(size_t vertexSize,
                 size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
@@ -82,6 +82,51 @@ namespace Ogre {
             /// @see allocateScratch
             void deallocateScratch(void* ptr);
     };
+
+	/// GLESHardwareBufferManagerBase as a Singleton
+	class _OgrePrivate GLESHardwareBufferManager : public HardwareBufferManager
+	{
+	public:
+		GLESHardwareBufferManager()
+			: HardwareBufferManager(OGRE_NEW GLESHardwareBufferManagerBase()) 
+		{
+
+		}
+		~GLESHardwareBufferManager()
+		{
+			OGRE_DELETE mImpl;
+		}
+
+
+
+		/// Utility function to get the correct GL usage based on HBU's
+		static GLenum getGLUsage(unsigned int usage) 
+		{ return GLESHardwareBufferManagerBase::getGLUsage(usage); }
+
+		/// Utility function to get the correct GL type based on VET's
+		static GLenum getGLType(unsigned int type)
+		{ return GLESHardwareBufferManagerBase::getGLType(type); }
+
+		/** Allocator method to allow us to use a pool of memory as a scratch
+		area for hardware buffers. This is because glMapBuffer is incredibly
+		inefficient, seemingly no matter what options we give it. So for the
+		period of lock/unlock, we will instead allocate a section of a local
+		memory pool, and use glBufferSubDataARB / glGetBufferSubDataARB
+		instead.
+		*/
+		void* allocateScratch(uint32 size)
+		{
+			return static_cast<GLESHardwareBufferManagerBase*>(mImpl)->allocateScratch(size);
+		}
+
+		/// @see allocateScratch
+		void deallocateScratch(void* ptr)
+		{
+			static_cast<GLESHardwareBufferManagerBase*>(mImpl)->deallocateScratch(ptr);
+		}
+
+	};
+
 }
 
 #endif

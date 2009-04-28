@@ -36,18 +36,18 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    D3D9HardwareBufferManager::D3D9HardwareBufferManager()       
+    D3D9HardwareBufferManagerBase::D3D9HardwareBufferManagerBase()       
     {
     }
     //-----------------------------------------------------------------------
-    D3D9HardwareBufferManager::~D3D9HardwareBufferManager()
+    D3D9HardwareBufferManagerBase::~D3D9HardwareBufferManagerBase()
     {
         destroyAllDeclarations();
         destroyAllBindings();
     }
     //-----------------------------------------------------------------------
     HardwareVertexBufferSharedPtr 
-    D3D9HardwareBufferManager::
+    D3D9HardwareBufferManagerBase::
     createVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage,
 		bool useShadowBuffer)
     {
@@ -72,7 +72,7 @@ namespace Ogre {
         }
 #endif
 		D3D9HardwareVertexBuffer* vbuf = new D3D9HardwareVertexBuffer(
-			vertexSize, numVerts, usage, false, useShadowBuffer);
+			this, vertexSize, numVerts, usage, false, useShadowBuffer);
 		{
 			OGRE_LOCK_MUTEX(mVertexBuffersMutex)
 			mVertexBuffers.insert(vbuf);
@@ -81,7 +81,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
 	HardwareIndexBufferSharedPtr 
-    D3D9HardwareBufferManager::
+    D3D9HardwareBufferManagerBase::
     createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
         HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
@@ -104,7 +104,7 @@ namespace Ogre {
         }
 #endif
 		D3D9HardwareIndexBuffer* idx = new D3D9HardwareIndexBuffer(
-			itype, numIndexes, usage, false, useShadowBuffer);
+			this, itype, numIndexes, usage, false, useShadowBuffer);
 		{
 			OGRE_LOCK_MUTEX(mIndexBuffersMutex)
 			mIndexBuffers.insert(idx);
@@ -114,19 +114,19 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     RenderToVertexBufferSharedPtr 
-        D3D9HardwareBufferManager::createRenderToVertexBuffer()
+        D3D9HardwareBufferManagerBase::createRenderToVertexBuffer()
     {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
             "Direct3D9 does not support render to vertex buffer objects", 
-            "D3D9HardwareBufferManager::createRenderToVertexBuffer");
+            "D3D9HardwareBufferManagerBase::createRenderToVertexBuffer");
 	}
     //-----------------------------------------------------------------------
-    VertexDeclaration* D3D9HardwareBufferManager::createVertexDeclarationImpl(void)
+    VertexDeclaration* D3D9HardwareBufferManagerBase::createVertexDeclarationImpl(void)
     {
         return new D3D9VertexDeclaration();
     }
     //-----------------------------------------------------------------------
-    void D3D9HardwareBufferManager::destroyVertexDeclarationImpl(VertexDeclaration* decl)
+    void D3D9HardwareBufferManagerBase::destroyVertexDeclarationImpl(VertexDeclaration* decl)
     {
         delete decl;
     }

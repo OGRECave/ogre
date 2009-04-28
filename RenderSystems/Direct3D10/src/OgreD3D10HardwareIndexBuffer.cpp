@@ -32,10 +32,10 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 	//---------------------------------------------------------------------
-	D3D10HardwareIndexBuffer::D3D10HardwareIndexBuffer(HardwareIndexBuffer::IndexType idxType, 
+	D3D10HardwareIndexBuffer::D3D10HardwareIndexBuffer(HardwareBufferManagerBase* mgr, HardwareIndexBuffer::IndexType idxType, 
 		size_t numIndexes, HardwareBuffer::Usage usage, D3D10Device & device, 
 		bool useSystemMemory, bool useShadowBuffer)
-		: HardwareIndexBuffer(idxType, numIndexes, usage, useSystemMemory, useShadowBuffer)
+		: HardwareIndexBuffer(mgr, idxType, numIndexes, usage, useSystemMemory, useShadowBuffer)
 	{
 		// everything is done via internal generalisation
 		mBufferImpl = new D3D10HardwareBuffer(D3D10HardwareBuffer::INDEX_BUFFER, 

@@ -38,10 +38,10 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 	//---------------------------------------------------------------------
-    D3D9HardwareVertexBuffer::D3D9HardwareVertexBuffer(size_t vertexSize, 
+    D3D9HardwareVertexBuffer::D3D9HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, 
         size_t numVertices, HardwareBuffer::Usage usage, 
         bool useSystemMemory, bool useShadowBuffer)
-        : HardwareVertexBuffer(vertexSize, numVertices, usage, useSystemMemory, useShadowBuffer)
+        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, useSystemMemory, useShadowBuffer)
     {
 		D3DPOOL eResourcePool;
 		       

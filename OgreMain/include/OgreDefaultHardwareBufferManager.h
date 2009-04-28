@@ -93,18 +93,18 @@ namespace Ogre {
 
     };
 
-	/** Specialisation of HardwareBufferManager to emulate hardware buffers.
+	/** Specialisation of HardwareBufferManagerBase to emulate hardware buffers.
 	@remarks
 		You might want to instantiate this class if you want to utilise
 		classes like MeshSerializer without having initialised the 
 		rendering system (which is required to create a 'real' hardware
 		buffer manager.
 	*/
-	class _OgreExport DefaultHardwareBufferManager : public HardwareBufferManager
+	class _OgreExport DefaultHardwareBufferManagerBase : public HardwareBufferManagerBase
 	{
     public:
-        DefaultHardwareBufferManager();
-        ~DefaultHardwareBufferManager();
+        DefaultHardwareBufferManagerBase();
+        ~DefaultHardwareBufferManagerBase();
         /// Creates a vertex buffer
 		HardwareVertexBufferSharedPtr 
             createVertexBuffer(size_t vertexSize, size_t numVerts, 
@@ -116,6 +116,21 @@ namespace Ogre {
 		/// Create a hardware vertex buffer
 		RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
     };
+
+	/// DefaultHardwareBufferManager as a Singleton
+	class _OgreExport DefaultHardwareBufferManager : public HardwareBufferManager
+	{
+	public:
+		DefaultHardwareBufferManager()
+			: HardwareBufferManager(OGRE_NEW DefaultHardwareBufferManagerBase()) 
+		{
+
+		}
+		~DefaultHardwareBufferManager()
+		{
+			OGRE_DELETE mImpl;
+		}
+	};
 
 	/** @} */
 	/** @} */

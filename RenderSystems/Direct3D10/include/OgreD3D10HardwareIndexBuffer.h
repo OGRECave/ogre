@@ -45,7 +45,7 @@ namespace Ogre {
 		void unlockImpl(void) {}
 
 	public:
-		D3D10HardwareIndexBuffer(IndexType idxType, size_t numIndexes, 
+		D3D10HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes, 
 			HardwareBuffer::Usage usage, D3D10Device & device, bool useSystemMem, bool useShadowBuffer);
 		~D3D10HardwareIndexBuffer();
 

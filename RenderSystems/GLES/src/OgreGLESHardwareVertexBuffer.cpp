@@ -34,11 +34,12 @@ Torus Knot Software Ltd.
 #include "OgreLogManager.h"
 
 namespace Ogre {
-    GLESHardwareVertexBuffer::GLESHardwareVertexBuffer(size_t vertexSize,
+    GLESHardwareVertexBuffer::GLESHardwareVertexBuffer(HardwareBufferManagerBase* mgr, 
+													   size_t vertexSize,
                                                        size_t numVertices,
                                                        HardwareBuffer::Usage usage,
                                                        bool useShadowBuffer)
-        : HardwareVertexBuffer(vertexSize, numVertices, usage, false, useShadowBuffer)
+        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, useShadowBuffer)
     {
         if (!useShadowBuffer)
         {

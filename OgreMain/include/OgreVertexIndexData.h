@@ -53,8 +53,13 @@ namespace Ogre {
         VertexData(const VertexData& rhs); /* do nothing, should not use */
         /// Protected operator=, to prevent misuse
         VertexData& operator=(const VertexData& rhs); /* do not use */
+
+		HardwareBufferManagerBase* mMgr;
     public:
-        VertexData();
+		/** Constructor
+		@param mgr Optional HardwareBufferManager from which to create resources
+		*/
+        VertexData(HardwareBufferManagerBase* mgr = 0);
         ~VertexData();
 
 		/** Declaration of the vertex to be used in this operation. 
@@ -84,9 +89,11 @@ namespace Ogre {
 		size_t hwAnimDataItemsUsed;
 		
 		/** Clones this vertex data, potentially including replicating any vertex buffers.
+		@param copyData Whether to create new vertex buffers too or just reference the existing ones
+		@param mgr If supplied, the buffer manager through which copies should be made
 		@remarks The caller is expected to delete the returned pointer when ready
 		*/
-		VertexData* clone(bool copyData = true) const;
+		VertexData* clone(bool copyData = true, HardwareBufferManagerBase* mgr = 0) const;
 
         /** Modifies the vertex data to be suitable for use for rendering shadow geometry.
         @remarks
@@ -231,9 +238,11 @@ namespace Ogre {
 		size_t indexCount;
 
 		/** Clones this index data, potentially including replicating the index buffer.
+		@param copyData Whether to create new buffers too or just reference the existing ones
+		@param mgr If supplied, the buffer manager through which copies should be made
 		@remarks The caller is expected to delete the returned pointer when finished
 		*/
-		IndexData* clone(bool copyData = true) const;
+		IndexData* clone(bool copyData = true, HardwareBufferManagerBase* mgr = 0) const;
 
 		/** Re-order the indexes in this index data structure to be more
 			vertex cache friendly; that is to re-use the same vertices as close

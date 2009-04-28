@@ -56,7 +56,7 @@ namespace Ogre {
             void unlockImpl(void);
 
         public:
-            GLESHardwareVertexBuffer(size_t vertexSize, size_t numVertices,
+            GLESHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices,
                                    HardwareBuffer::Usage usage, bool useShadowBuffer);
             virtual ~GLESHardwareVertexBuffer();
 

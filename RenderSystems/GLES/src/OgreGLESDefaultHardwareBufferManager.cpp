@@ -34,7 +34,7 @@ namespace Ogre {
     GLESDefaultHardwareVertexBuffer::GLESDefaultHardwareVertexBuffer(size_t vertexSize,
                                                                  size_t numVertices,
                                                                  HardwareBuffer::Usage usage)
-        : HardwareVertexBuffer(vertexSize, numVertices, usage, true, false)
+        : HardwareVertexBuffer(0, vertexSize, numVertices, usage, true, false)
     {
         mpData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
     }
@@ -91,7 +91,7 @@ namespace Ogre {
     GLESDefaultHardwareIndexBuffer::GLESDefaultHardwareIndexBuffer(IndexType idxType,
                                                                size_t numIndexes,
                                                                HardwareBuffer::Usage usage)
-        : HardwareIndexBuffer(idxType, numIndexes, usage, true, false)
+        : HardwareIndexBuffer(0, idxType, numIndexes, usage, true, false)
           // always software, never shadowed
     {
 		if (idxType == HardwareIndexBuffer::IT_32BIT)
@@ -145,18 +145,18 @@ namespace Ogre {
         memcpy(mpData + offset, pSource, length);
     }
 
-    GLESDefaultHardwareBufferManager::GLESDefaultHardwareBufferManager()
+    GLESDefaultHardwareBufferManagerBase::GLESDefaultHardwareBufferManagerBase()
     {
     }
 
-    GLESDefaultHardwareBufferManager::~GLESDefaultHardwareBufferManager()
+    GLESDefaultHardwareBufferManagerBase::~GLESDefaultHardwareBufferManagerBase()
     {
         destroyAllDeclarations();
         destroyAllBindings();
     }
 
     HardwareVertexBufferSharedPtr
-        GLESDefaultHardwareBufferManager::createVertexBuffer(size_t vertexSize,
+        GLESDefaultHardwareBufferManagerBase::createVertexBuffer(size_t vertexSize,
         size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
         return HardwareVertexBufferSharedPtr(
@@ -164,18 +164,18 @@ namespace Ogre {
     }
 
     HardwareIndexBufferSharedPtr
-        GLESDefaultHardwareBufferManager::createIndexBuffer(HardwareIndexBuffer::IndexType itype,
+        GLESDefaultHardwareBufferManagerBase::createIndexBuffer(HardwareIndexBuffer::IndexType itype,
         size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
         return HardwareIndexBufferSharedPtr(
             new GLESDefaultHardwareIndexBuffer(itype, numIndexes, usage));
     }
 
-	Ogre::RenderToVertexBufferSharedPtr GLESDefaultHardwareBufferManager::createRenderToVertexBuffer( void )
+	Ogre::RenderToVertexBufferSharedPtr GLESDefaultHardwareBufferManagerBase::createRenderToVertexBuffer( void )
 	{
 	        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-	                "Cannot create RenderToVertexBuffer in GLESDefaultHardwareBufferManager", 
-	                "GLESDefaultHardwareBufferManager::createRenderToVertexBuffer");
+	                "Cannot create RenderToVertexBuffer in GLESDefaultHardwareBufferManagerBase", 
+	                "GLESDefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
 
 		Ogre::RenderToVertexBufferSharedPtr  todo;
 		return todo;

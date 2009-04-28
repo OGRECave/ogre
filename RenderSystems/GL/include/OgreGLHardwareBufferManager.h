@@ -39,7 +39,7 @@ namespace Ogre {
 
 
     /** Implementation of HardwareBufferManager for OpenGL. */
-    class _OgrePrivate GLHardwareBufferManager : public HardwareBufferManager
+    class _OgrePrivate GLHardwareBufferManagerBase : public HardwareBufferManagerBase
     {
 	protected:
 		char* mScratchBufferPool;
@@ -47,8 +47,8 @@ namespace Ogre {
 		size_t mMapBufferThreshold;
 
     public:
-        GLHardwareBufferManager();
-        ~GLHardwareBufferManager();
+        GLHardwareBufferManagerBase();
+        ~GLHardwareBufferManagerBase();
         /// Creates a vertex buffer
         HardwareVertexBufferSharedPtr createVertexBuffer(size_t vertexSize, 
             size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
@@ -81,6 +81,61 @@ namespace Ogre {
 		const size_t getGLMapBufferThreshold() const;
 		void setGLMapBufferThreshold( const size_t value );
     };
+
+	/// GLHardwareBufferManagerBase as a Singleton
+	class _OgrePrivate GLHardwareBufferManager : public HardwareBufferManager
+	{
+	public:
+		GLHardwareBufferManager()
+			: HardwareBufferManager(OGRE_NEW GLHardwareBufferManagerBase()) 
+		{
+
+		}
+		~GLHardwareBufferManager()
+		{
+			OGRE_DELETE mImpl;
+		}
+
+
+
+		/// Utility function to get the correct GL usage based on HBU's
+		static GLenum getGLUsage(unsigned int usage) 
+		{ return GLHardwareBufferManagerBase::getGLUsage(usage); }
+
+		/// Utility function to get the correct GL type based on VET's
+		static GLenum getGLType(unsigned int type)
+		{ return GLHardwareBufferManagerBase::getGLType(type); }
+
+		/** Allocator method to allow us to use a pool of memory as a scratch
+		area for hardware buffers. This is because glMapBuffer is incredibly
+		inefficient, seemingly no matter what options we give it. So for the
+		period of lock/unlock, we will instead allocate a section of a local
+		memory pool, and use glBufferSubDataARB / glGetBufferSubDataARB
+		instead.
+		*/
+		void* allocateScratch(uint32 size)
+		{
+			return static_cast<GLHardwareBufferManagerBase*>(mImpl)->allocateScratch(size);
+		}
+
+		/// @see allocateScratch
+		void deallocateScratch(void* ptr)
+		{
+			static_cast<GLHardwareBufferManagerBase*>(mImpl)->deallocateScratch(ptr);
+		}
+
+		/** Threshold after which glMapBuffer is used and not glBufferSubData
+		*/
+		const size_t getGLMapBufferThreshold() const
+		{
+			return static_cast<GLHardwareBufferManagerBase*>(mImpl)->getGLMapBufferThreshold();
+		}
+		void setGLMapBufferThreshold( const size_t value )
+		{
+			static_cast<GLHardwareBufferManagerBase*>(mImpl)->setGLMapBufferThreshold(value);
+		}
+
+	};
 
 }
 

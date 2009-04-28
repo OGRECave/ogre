@@ -97,11 +97,11 @@ namespace Ogre {
         rendering system (which is required to create a 'real' hardware
         buffer manager.
     */
-    class _OgrePrivate GLESDefaultHardwareBufferManager : public HardwareBufferManager
+    class _OgrePrivate GLESDefaultHardwareBufferManagerBase : public HardwareBufferManagerBase
     {
         public:
-            GLESDefaultHardwareBufferManager();
-            virtual ~GLESDefaultHardwareBufferManager();
+            GLESDefaultHardwareBufferManagerBase();
+            virtual ~GLESDefaultHardwareBufferManagerBase();
             // Creates a vertex buffer
             HardwareVertexBufferSharedPtr
                 createVertexBuffer(size_t vertexSize, size_t numVerts,
@@ -113,6 +113,23 @@ namespace Ogre {
 
 	    RenderToVertexBufferSharedPtr createRenderToVertexBuffer(void);
     };
+
+	/// GLESDefaultHardwareBufferManagerBase as a Singleton
+	class _OgrePrivate GLESDefaultHardwareBufferManager : public HardwareBufferManager
+	{
+	public:
+		GLESDefaultHardwareBufferManager()
+			: HardwareBufferManager(OGRE_NEW GLESDefaultHardwareBufferManagerBase()) 
+		{
+
+		}
+		~GLESDefaultHardwareBufferManager()
+		{
+			OGRE_DELETE mImpl;
+		}
+
+
+	};
 }
 
 #endif

@@ -46,7 +46,7 @@ namespace Ogre {
         uint32 free: 1;
     };
 
-    GLESHardwareBufferManager::GLESHardwareBufferManager()
+    GLESHardwareBufferManagerBase::GLESHardwareBufferManagerBase()
     {
         // Init scratch pool
         // TODO make it a configurable size?
@@ -59,7 +59,7 @@ namespace Ogre {
         ptrAlloc->free = 1;
     }
 
-    GLESHardwareBufferManager::~GLESHardwareBufferManager()
+    GLESHardwareBufferManagerBase::~GLESHardwareBufferManagerBase()
     {
         destroyAllDeclarations();
         destroyAllBindings();
@@ -68,14 +68,14 @@ namespace Ogre {
     }
 
     HardwareVertexBufferSharedPtr
-        GLESHardwareBufferManager::createVertexBuffer(size_t vertexSize,
+        GLESHardwareBufferManagerBase::createVertexBuffer(size_t vertexSize,
                                                       size_t numVerts,
                                                       HardwareBuffer::Usage usage,
                                                       bool useShadowBuffer)
     {
         // always use shadowBuffer
         GLESHardwareVertexBuffer* buf =
-            new GLESHardwareVertexBuffer(vertexSize, numVerts, usage, true);
+            new GLESHardwareVertexBuffer(this, vertexSize, numVerts, usage, true);
         {
             OGRE_LOCK_MUTEX(mVertexBuffersMutex)
             mVertexBuffers.insert(buf);
@@ -83,14 +83,14 @@ namespace Ogre {
         return HardwareVertexBufferSharedPtr(buf);
     }
 
-    HardwareIndexBufferSharedPtr GLESHardwareBufferManager::createIndexBuffer(HardwareIndexBuffer::IndexType itype,
+    HardwareIndexBufferSharedPtr GLESHardwareBufferManagerBase::createIndexBuffer(HardwareIndexBuffer::IndexType itype,
                                                                               size_t numIndexes,
                                                                               HardwareBuffer::Usage usage,
                                                                               bool useShadowBuffer)
     {
         // always use shadowBuffer
         GLESHardwareIndexBuffer* buf =
-            new GLESHardwareIndexBuffer(itype, numIndexes, usage, true);
+            new GLESHardwareIndexBuffer(this, itype, numIndexes, usage, true);
         {
             OGRE_LOCK_MUTEX(mIndexBuffersMutex)
             mIndexBuffers.insert(buf);
@@ -98,14 +98,14 @@ namespace Ogre {
         return HardwareIndexBufferSharedPtr(buf);
     }
 
-	RenderToVertexBufferSharedPtr GLESHardwareBufferManager::createRenderToVertexBuffer()
+	RenderToVertexBufferSharedPtr GLESHardwareBufferManagerBase::createRenderToVertexBuffer()
 	{
 		// not supported
 		return RenderToVertexBufferSharedPtr();
 	}
 
 
-    GLenum GLESHardwareBufferManager::getGLUsage(unsigned int usage)
+    GLenum GLESHardwareBufferManagerBase::getGLUsage(unsigned int usage)
     {
         switch(usage)
         {
@@ -121,7 +121,7 @@ namespace Ogre {
         };
     }
 
-    GLenum GLESHardwareBufferManager::getGLType(unsigned int type)
+    GLenum GLESHardwareBufferManagerBase::getGLType(unsigned int type)
     {
         switch(type)
         {
@@ -145,7 +145,7 @@ namespace Ogre {
         };
     }
 
-    void* GLESHardwareBufferManager::allocateScratch(uint32 size)
+    void* GLESHardwareBufferManagerBase::allocateScratch(uint32 size)
     {
         // simple forward link search based on alloc sizes
         // not that fast but the list should never get that long since not many
@@ -194,7 +194,7 @@ namespace Ogre {
         return 0;
     }
 
-    void GLESHardwareBufferManager::deallocateScratch(void* ptr)
+    void GLESHardwareBufferManagerBaseBase::deallocateScratch(void* ptr)
     {
         OGRE_LOCK_MUTEX(mScratchMutex)
 

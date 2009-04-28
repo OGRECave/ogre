@@ -44,7 +44,7 @@ namespace Ogre {
 		void unlockImpl(void) {}
 
 	public:
-		D3D10HardwareVertexBuffer(size_t vertexSize, size_t numVertices, 
+		D3D10HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
 			HardwareBuffer::Usage usage, D3D10Device & device, bool useSystemMem, bool useShadowBuffer);
 		~D3D10HardwareVertexBuffer();
 

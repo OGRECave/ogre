@@ -33,11 +33,12 @@ Torus Knot Software Ltd.
 #include "OgreException.h"
 
 namespace Ogre {
-    GLESHardwareIndexBuffer::GLESHardwareIndexBuffer(IndexType idxType,
+    GLESHardwareIndexBuffer::GLESHardwareIndexBuffer(HardwareBufferManagerBase* mgr, 
+													 IndexType idxType,
                                                      size_t numIndexes,
                                                      HardwareBuffer::Usage usage,
                                                      bool useShadowBuffer)
-        : HardwareIndexBuffer(idxType, numIndexes, usage, false, useShadowBuffer)
+        : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer)
     {
 		if (idxType == HardwareIndexBuffer::IT_32BIT)
 		{

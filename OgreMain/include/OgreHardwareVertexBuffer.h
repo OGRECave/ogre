@@ -36,6 +36,8 @@ Torus Knot Software Ltd.
 #include "OgreColourValue.h"
 
 namespace Ogre {
+	class HardwareBufferManagerBase;
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -47,14 +49,17 @@ namespace Ogre {
     {
 	    protected:
 
+			HardwareBufferManagerBase* mMgr;
 		    size_t mNumVertices;
             size_t mVertexSize;
 
 	    public:
 		    /// Should be called by HardwareBufferManager
-		    HardwareVertexBuffer(size_t vertexSize, size_t numVertices,
+		    HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices,
                 HardwareBuffer::Usage usage, bool useSystemMemory, bool useShadowBuffer);
             ~HardwareVertexBuffer();
+			/// Return the manager of this buffer, if any
+			HardwareBufferManagerBase* getManager() const { return mMgr; }
             /// Gets the size in bytes of a single vertex in this buffer
             size_t getVertexSize(void) const { return mVertexSize; }
             /// Get the number of vertices in this buffer
@@ -429,8 +434,11 @@ namespace Ogre {
 		/** Gets the vertex size defined by this declaration for a given source. */
         virtual size_t getVertexSize(unsigned short source);
 
-        /** Clones this declaration. */
-        virtual VertexDeclaration* clone(void);
+        /** Clones this declaration. 
+		@param mgr Optional HardwareBufferManager to use for creating the clone
+			(if null, use the current default).
+		*/
+        virtual VertexDeclaration* clone(HardwareBufferManagerBase* mgr = 0);
 
         inline bool operator== (const VertexDeclaration& rhs) const
         {

@@ -96,10 +96,19 @@ namespace Ogre {
     };
 
 
-    /** Abstract singleton class for managing hardware buffers, a concrete instance
-    of this will be created by the RenderSystem. */
-    class _OgreExport HardwareBufferManager : public Singleton<HardwareBufferManager>
-    {
+	/** Base definition of a hardware buffer manager.
+	@remarks
+		This class is deliberately not a Singleton, so that multiple types can 
+		exist at once. The Singleton is wrapped via the Decorator pattern
+		in HardwareBufferManager, below. Each concrete implementation should
+		provide a subclass of HardwareBufferManagerBase, which does the actual
+		work, and also a very simple subclass of HardwareBufferManager which 
+		simply constructs the instance of the HardwareBufferManagerBase subclass 
+		and passes it to the HardwareBufferManager superclass as a delegate. 
+		This subclass must also delete the implementation instance it creates.
+	*/
+	class _OgreExport HardwareBufferManagerBase : public BufferAlloc
+	{
         friend class HardwareVertexBufferSharedPtr;
         friend class HardwareIndexBufferSharedPtr;
     protected:
@@ -194,13 +203,13 @@ namespace Ogre {
 
 
         /// Creates  a new buffer as a copy of the source, does not copy data
-        HardwareVertexBufferSharedPtr makeBufferCopy(
+        virtual HardwareVertexBufferSharedPtr makeBufferCopy(
             const HardwareVertexBufferSharedPtr& source, 
             HardwareBuffer::Usage usage, bool useShadowBuffer);
 
     public:
-        HardwareBufferManager();
-        virtual ~HardwareBufferManager();
+        HardwareBufferManagerBase();
+        virtual ~HardwareBufferManagerBase();
 		/** Create a hardware vertex buffer.
         @remarks
             This method creates a new vertex buffer; this will act as a source of geometry
@@ -369,6 +378,124 @@ namespace Ogre {
 		void _notifyVertexBufferDestroyed(HardwareVertexBuffer* buf);
 		/// Notification that a hardware index buffer has been destroyed
 		void _notifyIndexBufferDestroyed(HardwareIndexBuffer* buf);
+
+	};
+
+    /** Singleton wrapper for hardware buffer manager. */
+    class _OgreExport HardwareBufferManager : public HardwareBufferManagerBase, public Singleton<HardwareBufferManager>
+    {
+        friend class HardwareVertexBufferSharedPtr;
+        friend class HardwareIndexBufferSharedPtr;
+    protected:
+		HardwareBufferManagerBase* mImpl;
+	public:
+		HardwareBufferManager(HardwareBufferManagerBase* imp);
+		~HardwareBufferManager();
+
+		/** @copydoc HardwareBufferManagerInterface::createVertexBuffer */
+		HardwareVertexBufferSharedPtr 
+            createVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage, 
+			bool useShadowBuffer = false)
+		{
+			return mImpl->createVertexBuffer(vertexSize, numVerts, usage, useShadowBuffer);
+		}
+		/** @copydoc HardwareBufferManagerInterface::createIndexBuffer */
+		HardwareIndexBufferSharedPtr 
+            createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
+			HardwareBuffer::Usage usage, bool useShadowBuffer = false)
+		{
+			return mImpl->createIndexBuffer(itype, numIndexes, usage, useShadowBuffer);
+		}
+
+		/** @copydoc HardwareBufferManagerInterface::createRenderToVertexBuffer */
+		RenderToVertexBufferSharedPtr createRenderToVertexBuffer()
+		{
+			return mImpl->createRenderToVertexBuffer();
+		}
+
+		/** @copydoc HardwareBufferManagerInterface::createVertexDeclaration */
+		virtual VertexDeclaration* createVertexDeclaration(void)
+		{
+			return mImpl->createVertexDeclaration();
+		}
+		/** @copydoc HardwareBufferManagerInterface::destroyVertexDeclaration */
+        virtual void destroyVertexDeclaration(VertexDeclaration* decl)
+		{
+			mImpl->destroyVertexDeclaration(decl);
+		}
+
+		/** @copydoc HardwareBufferManagerInterface::createVertexBufferBinding */
+		virtual VertexBufferBinding* createVertexBufferBinding(void)
+		{
+			return mImpl->createVertexBufferBinding();
+		}
+		/** @copydoc HardwareBufferManagerInterface::destroyVertexBufferBinding */
+		virtual void destroyVertexBufferBinding(VertexBufferBinding* binding)
+		{
+			mImpl->destroyVertexBufferBinding(binding);
+		}
+		/** @copydoc HardwareBufferManagerInterface::registerVertexBufferSourceAndCopy */
+		virtual void registerVertexBufferSourceAndCopy(
+			const HardwareVertexBufferSharedPtr& sourceBuffer,
+			const HardwareVertexBufferSharedPtr& copy)
+		{
+			mImpl->registerVertexBufferSourceAndCopy(sourceBuffer, copy);
+		}
+		/** @copydoc HardwareBufferManagerInterface::allocateVertexBufferCopy */
+        virtual HardwareVertexBufferSharedPtr allocateVertexBufferCopy(
+            const HardwareVertexBufferSharedPtr& sourceBuffer, 
+            BufferLicenseType licenseType,
+            HardwareBufferLicensee* licensee,
+            bool copyData = false)
+		{
+			return mImpl->allocateVertexBufferCopy(sourceBuffer, licenseType, licensee, copyData);
+		}
+		/** @copydoc HardwareBufferManagerInterface::releaseVertexBufferCopy */
+        virtual void releaseVertexBufferCopy(
+            const HardwareVertexBufferSharedPtr& bufferCopy)
+		{
+			mImpl->releaseVertexBufferCopy(bufferCopy);
+		}
+
+		/** @copydoc HardwareBufferManagerInterface::touchVertexBufferCopy */
+        virtual void touchVertexBufferCopy(
+            const HardwareVertexBufferSharedPtr& bufferCopy)
+		{
+			mImpl->touchVertexBufferCopy(bufferCopy);
+		}
+
+		/** @copydoc HardwareBufferManagerInterface::_freeUnusedBufferCopies */
+        virtual void _freeUnusedBufferCopies(void)
+		{
+			mImpl->_freeUnusedBufferCopies();
+		}
+		/** @copydoc HardwareBufferManagerInterface::_releaseBufferCopies */
+        virtual void _releaseBufferCopies(bool forceFreeUnused = false)
+		{
+			mImpl->_releaseBufferCopies(forceFreeUnused);
+		}
+		/** @copydoc HardwareBufferManagerInterface::_forceReleaseBufferCopies */
+        virtual void _forceReleaseBufferCopies(
+            const HardwareVertexBufferSharedPtr& sourceBuffer)
+		{
+			mImpl->_forceReleaseBufferCopies(sourceBuffer);
+		}
+		/** @copydoc HardwareBufferManagerInterface::_forceReleaseBufferCopies */
+        virtual void _forceReleaseBufferCopies(HardwareVertexBuffer* sourceBuffer)
+		{
+			mImpl->_forceReleaseBufferCopies(sourceBuffer);
+		}
+		/** @copydoc HardwareBufferManagerInterface::_notifyVertexBufferDestroyed */
+		void _notifyVertexBufferDestroyed(HardwareVertexBuffer* buf)
+		{
+			mImpl->_notifyVertexBufferDestroyed(buf);
+		}
+		/** @copydoc HardwareBufferManagerInterface::_notifyIndexBufferDestroyed */
+		void _notifyIndexBufferDestroyed(HardwareIndexBuffer* buf)
+		{
+			mImpl->_notifyIndexBufferDestroyed(buf);
+		}
+
 
         /** Override standard Singleton retrieval.
         @remarks

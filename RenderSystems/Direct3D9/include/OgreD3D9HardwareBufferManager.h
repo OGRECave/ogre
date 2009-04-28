@@ -35,7 +35,7 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
     /** Implementation of HardwareBufferManager for D3D9. */
-    class D3D9HardwareBufferManager : public HardwareBufferManager
+    class D3D9HardwareBufferManagerBase : public HardwareBufferManagerBase
     {
     protected:     
         /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
@@ -44,8 +44,8 @@ namespace Ogre {
         void destroyVertexDeclarationImpl(VertexDeclaration* decl);
 
     public:
-        D3D9HardwareBufferManager();
-        ~D3D9HardwareBufferManager();
+        D3D9HardwareBufferManagerBase();
+        ~D3D9HardwareBufferManagerBase();
         /// Creates a vertex buffer
 		HardwareVertexBufferSharedPtr 
             createVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
@@ -55,6 +55,21 @@ namespace Ogre {
 		/// Create a render to vertex buffer
 		RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
     };
+
+	/// D3D9HardwareBufferManagerBase as a Singleton
+	class D3D9HardwareBufferManager : public HardwareBufferManager
+	{
+	public:
+		D3D9HardwareBufferManager()
+			: HardwareBufferManager(OGRE_NEW D3D9HardwareBufferManagerBase()) 
+		{
+
+		}
+		~D3D9HardwareBufferManager()
+		{
+			OGRE_DELETE mImpl;
+		}
+	};
 
 }
 

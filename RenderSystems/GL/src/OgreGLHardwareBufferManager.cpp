@@ -48,7 +48,7 @@ namespace Ogre {
 	#define SCRATCH_POOL_SIZE 1 * 1024 * 1024
 	#define SCRATCH_ALIGNMENT 32
 	//---------------------------------------------------------------------
-    GLHardwareBufferManager::GLHardwareBufferManager() 
+    GLHardwareBufferManagerBase::GLHardwareBufferManagerBase() 
 		: mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
     {
 		// Init scratch pool
@@ -76,7 +76,7 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    GLHardwareBufferManager::~GLHardwareBufferManager()
+    GLHardwareBufferManagerBase::~GLHardwareBufferManagerBase()
     {
         destroyAllDeclarations();
         destroyAllBindings();
@@ -84,11 +84,11 @@ namespace Ogre {
 		OGRE_FREE_ALIGN(mScratchBufferPool, MEMCATEGORY_GEOMETRY, SCRATCH_ALIGNMENT);
     }
     //-----------------------------------------------------------------------
-    HardwareVertexBufferSharedPtr GLHardwareBufferManager::createVertexBuffer(
+    HardwareVertexBufferSharedPtr GLHardwareBufferManagerBase::createVertexBuffer(
         size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
 		GLHardwareVertexBuffer* buf = 
-			new GLHardwareVertexBuffer(vertexSize, numVerts, usage, useShadowBuffer);
+			new GLHardwareVertexBuffer(this, vertexSize, numVerts, usage, useShadowBuffer);
 		{
 			OGRE_LOCK_MUTEX(mVertexBuffersMutex)
 			mVertexBuffers.insert(buf);
@@ -97,12 +97,12 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     HardwareIndexBufferSharedPtr 
-    GLHardwareBufferManager::createIndexBuffer(
+    GLHardwareBufferManagerBase::createIndexBuffer(
         HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
         HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
 		GLHardwareIndexBuffer* buf = 
-			new GLHardwareIndexBuffer(itype, numIndexes, usage, useShadowBuffer);
+			new GLHardwareIndexBuffer(this, itype, numIndexes, usage, useShadowBuffer);
 		{
 			OGRE_LOCK_MUTEX(mIndexBuffersMutex)
 			mIndexBuffers.insert(buf);
@@ -111,12 +111,12 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     RenderToVertexBufferSharedPtr 
-        GLHardwareBufferManager::createRenderToVertexBuffer()
+        GLHardwareBufferManagerBase::createRenderToVertexBuffer()
 	{
         return RenderToVertexBufferSharedPtr(new GLRenderToVertexBuffer);
     }
     //---------------------------------------------------------------------
-    GLenum GLHardwareBufferManager::getGLUsage(unsigned int usage)
+    GLenum GLHardwareBufferManagerBase::getGLUsage(unsigned int usage)
     {
         switch(usage)
         {
@@ -133,7 +133,7 @@ namespace Ogre {
         };
     }
     //---------------------------------------------------------------------
-    GLenum GLHardwareBufferManager::getGLType(unsigned int type)
+    GLenum GLHardwareBufferManagerBase::getGLType(unsigned int type)
     {
         switch(type)
         {
@@ -158,7 +158,7 @@ namespace Ogre {
     }
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
-	void* GLHardwareBufferManager::allocateScratch(uint32 size)
+	void* GLHardwareBufferManagerBase::allocateScratch(uint32 size)
 	{
 		// simple forward link search based on alloc sizes
 		// not that fast but the list should never get that long since not many
@@ -211,7 +211,7 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	void GLHardwareBufferManager::deallocateScratch(void* ptr)
+	void GLHardwareBufferManagerBase::deallocateScratch(void* ptr)
 	{
 		OGRE_LOCK_MUTEX(mScratchMutex)
 
@@ -266,12 +266,12 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	const size_t GLHardwareBufferManager::getGLMapBufferThreshold() const
+	const size_t GLHardwareBufferManagerBase::getGLMapBufferThreshold() const
 	{
 		return mMapBufferThreshold;
 	}
 	//---------------------------------------------------------------------
-	void GLHardwareBufferManager::setGLMapBufferThreshold( const size_t value )
+	void GLHardwareBufferManagerBase::setGLMapBufferThreshold( const size_t value )
 	{
 		mMapBufferThreshold = value;
 	}

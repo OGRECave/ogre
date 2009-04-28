@@ -40,12 +40,11 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-	VertexData::VertexData()
+	VertexData::VertexData(HardwareBufferManagerBase* mgr)
 	{
-		vertexBufferBinding = HardwareBufferManager::getSingleton().
-			createVertexBufferBinding();
-		vertexDeclaration = HardwareBufferManager::getSingleton().
-			createVertexDeclaration();
+		mMgr = mgr ? mgr : HardwareBufferManager::getSingletonPtr();
+		vertexBufferBinding = mMgr->createVertexBufferBinding();
+		vertexDeclaration = mMgr->createVertexDeclaration();
 		vertexCount = 0;
 		vertexStart = 0;
 		hwAnimDataItemsUsed = 0;
@@ -54,15 +53,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	VertexData::~VertexData()
 	{
-		HardwareBufferManager::getSingleton().
-			destroyVertexBufferBinding(vertexBufferBinding);
-		HardwareBufferManager::getSingleton().destroyVertexDeclaration(vertexDeclaration);
-
+		mMgr->destroyVertexBufferBinding(vertexBufferBinding);
+		mMgr->destroyVertexDeclaration(vertexDeclaration);
 	}
     //-----------------------------------------------------------------------
-	VertexData* VertexData::clone(bool copyData) const
+	VertexData* VertexData::clone(bool copyData, HardwareBufferManagerBase* mgr) const
 	{
-		VertexData* dest = OGRE_NEW VertexData();
+		HardwareBufferManagerBase* pManager = mgr ? mgr : mMgr;
+
+		VertexData* dest = OGRE_NEW VertexData(mgr);
 
 		// Copy vertex buffers in turn
 		const VertexBufferBinding::VertexBufferBindingMap& bindings = 
@@ -76,8 +75,7 @@ namespace Ogre {
             if (copyData)
             {
 			    // create new buffer with the same settings
-			    dstBuf = 
-				    HardwareBufferManager::getSingleton().createVertexBuffer(
+			    dstBuf = pManager->createVertexBuffer(
 					    srcbuf->getVertexSize(), srcbuf->getNumVertices(), srcbuf->getUsage(),
 					    srcbuf->hasShadowBuffer());
 
@@ -165,14 +163,14 @@ namespace Ogre {
             HardwareVertexBufferSharedPtr newPosBuffer, newRemainderBuffer;
             if (wasSharedBuffer)
             {
-                newRemainderBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
+                newRemainderBuffer = vbuf->getManager()->createVertexBuffer(
                     vbuf->getVertexSize() - posElem->getSize(), vbuf->getNumVertices(), vbuf->getUsage(),
                     vbuf->hasShadowBuffer());
             }
             // Allocate new position buffer, will be FLOAT3 and 2x the size
             size_t oldVertexCount = vbuf->getNumVertices();
             size_t newVertexCount = oldVertexCount * 2;
-            newPosBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
+            newPosBuffer = vbuf->getManager()->createVertexBuffer(
                 VertexElement::getTypeSize(VET_FLOAT3), newVertexCount, vbuf->getUsage(), 
                 vbuf->hasShadowBuffer());
 
@@ -234,12 +232,12 @@ namespace Ogre {
 
             // At this stage, he original vertex buffer is going to be destroyed
             // So we should force the deallocation of any temporary copies
-            HardwareBufferManager::getSingleton()._forceReleaseBufferCopies(vbuf);
+            vbuf->getManager()->_forceReleaseBufferCopies(vbuf);
 
             if (useVertexPrograms)
             {
                 // Now it's time to set up the w buffer
-                hardwareShadowVolWBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
+                hardwareShadowVolWBuffer = vbuf->getManager()->createVertexBuffer(
                     sizeof(float), newVertexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
                 // Fill the first half with 1.0, second half with 0.0
                 pDest = static_cast<float*>(
@@ -327,8 +325,7 @@ namespace Ogre {
         vector<size_t>::type oldBufferVertexSizes;
 		vector<void*>::type newBufferLocks;
         vector<size_t>::type newBufferVertexSizes;
-		VertexBufferBinding* newBinding = 
-			HardwareBufferManager::getSingleton().createVertexBufferBinding();
+		VertexBufferBinding* newBinding = mMgr->createVertexBufferBinding();
         const VertexBufferBinding::VertexBufferBindingMap& oldBindingMap = vertexBufferBinding->getBindings();
         VertexBufferBinding::VertexBufferBindingMap::const_iterator itBinding;
 
@@ -358,7 +355,7 @@ namespace Ogre {
             size_t vertexSize = newDeclaration->getVertexSize(buf);
 
 			HardwareVertexBufferSharedPtr vbuf = 
-				HardwareBufferManager::getSingleton().createVertexBuffer(
+				mMgr->createVertexBuffer(
 					vertexSize,
 					vertexCount, 
 					bufferUsages[buf]);
@@ -429,9 +426,8 @@ namespace Ogre {
         }
 
 		// Delete old binding & declaration
-		HardwareBufferManager::getSingleton().
-			destroyVertexBufferBinding(vertexBufferBinding);
-		HardwareBufferManager::getSingleton().destroyVertexDeclaration(vertexDeclaration);
+		mMgr->destroyVertexBufferBinding(vertexBufferBinding);
+		mMgr->destroyVertexDeclaration(vertexDeclaration);
 
 		// Assign new binding and declaration
 		vertexDeclaration = newDeclaration;
@@ -692,15 +688,15 @@ namespace Ogre {
 	{
 	}
     //-----------------------------------------------------------------------
-	IndexData* IndexData::clone(bool copyData) const
+	IndexData* IndexData::clone(bool copyData, HardwareBufferManagerBase* mgr) const
 	{
+		HardwareBufferManagerBase* pManager = mgr ? mgr : HardwareBufferManager::getSingletonPtr();
 		IndexData* dest = OGRE_NEW IndexData();
 		if (indexBuffer.get())
 		{
             if (copyData)
             {
-			    dest->indexBuffer = HardwareBufferManager::getSingleton().
-				    createIndexBuffer(indexBuffer->getType(), indexBuffer->getNumIndexes(),
+			    dest->indexBuffer = pManager->createIndexBuffer(indexBuffer->getType(), indexBuffer->getNumIndexes(),
 				    indexBuffer->getUsage(), indexBuffer->hasShadowBuffer());
 			    dest->indexBuffer->copyData(*indexBuffer, 0, 0, indexBuffer->getSizeInBytes(), true);
             }

@@ -56,7 +56,7 @@ namespace Ogre {
             void unlockImpl(void);
 
         public:
-            GLESHardwareIndexBuffer(IndexType idxType, size_t numIndexes,
+            GLESHardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes,
                                   HardwareBuffer::Usage usage,
                                   bool useShadowBuffer);
             virtual ~GLESHardwareIndexBuffer();

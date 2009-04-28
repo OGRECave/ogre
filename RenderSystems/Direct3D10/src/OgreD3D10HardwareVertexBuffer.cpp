@@ -33,10 +33,10 @@ Torus Knot Software Ltd.
 namespace Ogre {
 
 	//---------------------------------------------------------------------
-	D3D10HardwareVertexBuffer::D3D10HardwareVertexBuffer(size_t vertexSize, 
+	D3D10HardwareVertexBuffer::D3D10HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, 
 		size_t numVertices, HardwareBuffer::Usage usage, D3D10Device & device, 
 		bool useSystemMemory, bool useShadowBuffer)
-		: HardwareVertexBuffer(vertexSize, numVertices, usage, useSystemMemory, useShadowBuffer)
+		: HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, useSystemMemory, useShadowBuffer)
 	{
 		// everything is done via internal generalisation
 		mBufferImpl = new D3D10HardwareBuffer(D3D10HardwareBuffer::VERTEX_BUFFER, 

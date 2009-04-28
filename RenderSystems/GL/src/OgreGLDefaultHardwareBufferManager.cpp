@@ -33,7 +33,7 @@ namespace Ogre {
 
 	GLDefaultHardwareVertexBuffer::GLDefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, 
 		HardwareBuffer::Usage usage)
-        : HardwareVertexBuffer(vertexSize, numVertices, usage, true, false) // always software, never shadowed
+        : HardwareVertexBuffer(0, vertexSize, numVertices, usage, true, false) // always software, never shadowed
 	{
         mpData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
 	}
@@ -84,7 +84,7 @@ namespace Ogre {
 
 	GLDefaultHardwareIndexBuffer::GLDefaultHardwareIndexBuffer(IndexType idxType, 
 		size_t numIndexes, HardwareBuffer::Usage usage) 
-		: HardwareIndexBuffer(idxType, numIndexes, usage, true, false) // always software, never shadowed
+		: HardwareIndexBuffer(0, idxType, numIndexes, usage, true, false) // always software, never shadowed
 	{
 		mpData = new unsigned char[mSizeInBytes];
 	}
@@ -135,18 +135,18 @@ namespace Ogre {
 	
 	
     //-----------------------------------------------------------------------
-    GLDefaultHardwareBufferManager::GLDefaultHardwareBufferManager()
+    GLDefaultHardwareBufferManagerBase::GLDefaultHardwareBufferManagerBase()
 	{
 	}
     //-----------------------------------------------------------------------
-    GLDefaultHardwareBufferManager::~GLDefaultHardwareBufferManager()
+    GLDefaultHardwareBufferManagerBase::~GLDefaultHardwareBufferManagerBase()
 	{
         destroyAllDeclarations();
         destroyAllBindings();
 	}
     //-----------------------------------------------------------------------
 	HardwareVertexBufferSharedPtr 
-        GLDefaultHardwareBufferManager::createVertexBuffer(size_t vertexSize, 
+        GLDefaultHardwareBufferManagerBase::createVertexBuffer(size_t vertexSize, 
 		size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer)
 	{
 		return HardwareVertexBufferSharedPtr(
@@ -154,7 +154,7 @@ namespace Ogre {
 	}
     //-----------------------------------------------------------------------
 	HardwareIndexBufferSharedPtr 
-        GLDefaultHardwareBufferManager::createIndexBuffer(HardwareIndexBuffer::IndexType itype, 
+        GLDefaultHardwareBufferManagerBase::createIndexBuffer(HardwareIndexBuffer::IndexType itype, 
 		size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer)
 	{
 		return HardwareIndexBufferSharedPtr(
@@ -162,10 +162,10 @@ namespace Ogre {
 	}
     //-----------------------------------------------------------------------
 	RenderToVertexBufferSharedPtr 
-		GLDefaultHardwareBufferManager::createRenderToVertexBuffer()
+		GLDefaultHardwareBufferManagerBase::createRenderToVertexBuffer()
 	{
 		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Cannot create RenderToVertexBuffer in GLDefaultHardwareBufferManager", 
-				"GLDefaultHardwareBufferManager::createRenderToVertexBuffer");
+				"Cannot create RenderToVertexBuffer in GLDefaultHardwareBufferManagerBase", 
+				"GLDefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
 	}
 }
