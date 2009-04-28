@@ -908,9 +908,10 @@ class MeshExporter:
 				self.submeshManager.getSubmesh(faceMaterial).addFace(bMFace)
 		return
 	def _write(self, dir, convertXML):
+		exportDir = dir or Blender.sys.dirname(Blender.Get('filename'))
 		file = self.getName() + ".mesh.xml"
 		Log.getSingleton().logInfo("Writing mesh file \"%s\"" % file)
-		fileObject = open(os.path.join(dir, file), "w")
+		fileObject = open(Blender.sys.join(exportDir, file), "w")
 		fileObject.write(indent(0)+"<mesh>\n")
 		# submeshes
 		self.submeshManager.write(fileObject, 1)
@@ -922,5 +923,5 @@ class MeshExporter:
 		fileObject.write(indent(0)+"</mesh>\n")
 		fileObject.close()
 		if convertXML:
-			OgreXMLConverter.getSingleton().convert(os.path.join(dir, file))
+			OgreXMLConverter.getSingleton().convert(Blender.sys.join(exportDir, file))
 		return
