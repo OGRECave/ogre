@@ -646,7 +646,135 @@ namespace Ogre
 		return ((mSize - 1) >> lodLevel) + 1;
 	}
 
+  //---------------------------------------------------------------------
+  std::pair<bool, Vector3> Terrain::rayIntersects(const Ray& ray) 
+  {
+    typedef std::pair<bool, Vector3> Result;
+    // first step: convert the ray to a local vertex space
+    // we assume terrain to be in the x-z plane, with the [0,0] vertex
+    // at origin and a plane distance of 1 between vertices.
+    // This makes calculations easier.
+    Vector3 rayOrigin = ray.getOrigin() - getPosition();
+    Vector3 rayDirection = ray.getDirection();
+    // relabel axes (probably wrong? need correct coordinate transformation)
+    switch (getAlignment())
+    {
+    case ALIGN_X_Y:
+      std::swap(rayOrigin.y, rayOrigin.z);
+      std::swap(rayDirection.y, rayDirection.z);
+      break;
+    case ALIGN_Y_Z:
+      std::swap(rayOrigin.x, rayOrigin.y);
+      std::swap(rayDirection.x, rayDirection.y);
+      break;
+    }
+    // readjust coordinate origin
+    rayOrigin.x += mWorldSize/2;
+    rayOrigin.z += mWorldSize/2;
+    // scale down to vertex level
+    rayOrigin.x /= mScale;
+    rayOrigin.z /= mScale;
+    rayDirection.x /= mScale;
+    rayDirection.z /= mScale;
+    rayDirection.normalise();
+    Ray localRay (rayOrigin, rayDirection);
 
+    // test if the ray actually hits the terrain's bounds
+    // TODO: Replace y values with actual heightmap height limits
+    AxisAlignedBox aabb (Vector3(0, 0, 0), Vector3(mSize, 1000000, mSize));
+    std::pair<bool, Real> aabbTest = localRay.intersects(aabb);
+    if (!aabbTest.first)
+      return Result(false, Vector3());
+    // get intersection point and move inside
+    Vector3 cur = localRay.getPoint(aabbTest.second);
+
+    // now check every quad the ray touches
+    int quadX = std::min(std::max(static_cast<int>(cur.x), 0), (int)mSize-2);
+    int quadZ = std::min(std::max(static_cast<int>(cur.z), 0), (int)mSize-2);
+    int flipX = (rayDirection.x < 0 ? 0 : 1);
+    int flipZ = (rayDirection.z < 0 ? 0 : 1);
+    int xDir = (rayDirection.x < 0 ? -1 : 1);
+    int zDir = (rayDirection.z < 0 ? -1 : 1);
+    Result result;
+    while (cur.y >= -1 && cur.y <= 2)
+    {
+      if (quadX < 0 || quadX >= (int)mSize-1 || quadZ < 0 || quadZ >= (int)mSize-1)
+        break;
+
+      result = checkQuadIntersection(quadX, quadZ, localRay);
+      if (result.first)
+        break;
+
+      // determine next quad to test
+      Real xDist = (quadX - cur.x + flipX) / rayDirection.x;
+      Real zDist = (quadZ - cur.z + flipZ) / rayDirection.z;
+      if (xDist < zDist)
+      {
+        quadX += xDir;
+        cur += rayDirection * xDist;
+      }
+      else
+      {
+        quadZ += zDir;
+        cur += rayDirection * zDist;
+      }
+
+    }
+
+    if (result.first)
+    {
+      // transform the point of intersection back to world space
+      result.second.x *= mScale;
+      result.second.z *= mScale;
+      result.second.x -= mWorldSize/2;
+      result.second.z -= mWorldSize/2;
+      switch (getAlignment())
+      {
+      case ALIGN_X_Y:
+        std::swap(result.second.y, result.second.z);
+        break;
+      case ALIGN_Y_Z:
+        std::swap(result.second.x, result.second.y);
+        break;
+      }
+      result.second += getPosition();
+    }
+    return result;
+  }
+  //---------------------------------------------------------------------
+  std::pair<bool, Vector3> Terrain::checkQuadIntersection(int x, int z, const Ray& ray)
+  {
+    // build the two planes belonging to the quad's triangles
+    Vector3 v1 (x, *getHeightData(x,z), z);
+    Vector3 v2 (x+1, *getHeightData(x+1,z), z);
+    Vector3 v3 (x, *getHeightData(x,z+1), z+1);
+    Vector3 v4 (x+1, *getHeightData(x+1,z+1), z+1);
+    // TODO: Is this the correct triangle order?
+    Plane p1 (v1, v3, v2);
+    Plane p2 (v3, v4, v2);
+
+    // Test for intersection with the two planes. 
+    // Then test that the intersection points are actually
+    // still inside the triangle (with a small error margin)
+    std::pair<bool, Real> planeInt = ray.intersects(p1);
+    if (planeInt.first)
+    {
+      Vector3 where = ray.getPoint(planeInt.second);
+      Vector3 rel = where - v1;
+      if (rel.x >= -0.01 && rel.x <= 1.01 && rel.z >= -0.01 && rel.z <= 1.01 && rel.x+rel.z <= 1.01)
+        return std::pair<bool, Vector3>(true, where);
+    }
+    planeInt = ray.intersects(p2);
+    if (planeInt.first)
+    {
+      Vector3 where = ray.getPoint(planeInt.second);
+      Vector3 rel = where - v1;
+      if (rel.x >= -0.01 && rel.x <= 1.01 && rel.z >= -0.01 && rel.z <= 1.01 && rel.x+rel.z >= 0.99)
+        return std::pair<bool, Vector3>(true, where);
+    }
+
+    return std::pair<bool, Vector3>(false, Vector3());
+  }
 
 }
 

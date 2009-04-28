@@ -303,6 +303,15 @@ namespace Ogre
 		*/
 		uint16 getResolutionAtLod(uint16 lodLevel);
 
+    /** Test for intersection of a given ray with the terrain. If the ray hits
+      the terrain, the point of intersection is returned.
+    @param ray The ray to test for intersection
+    @return A pair which contains whether the ray hit the terrain and, if so, where.
+    @remarks This can be called from any thread as long as no parallel write to
+      the heightmap data occurs.
+    */
+    std::pair<bool, Vector3> rayIntersects(const Ray& ray); //const;
+
 	protected:
 
 		void freeCPUResources();
@@ -313,6 +322,8 @@ namespace Ogre
 		@note This point is relative to Terrain::getPosition
 		*/
 		void getPointAlign(long x, long y, Alignment align, Vector3* outpos);
+    /// Test a single quad of the terrain for ray intersection.
+    std::pair<bool, Vector3> checkQuadIntersection(int x, int z, const Ray& ray); //const;
 
 		SceneManager* mSceneMgr;
 		SceneNode* mRootNode;
