@@ -45,16 +45,32 @@ namespace Ogre {
 		mMgr = mgr ? mgr : HardwareBufferManager::getSingletonPtr();
 		vertexBufferBinding = mMgr->createVertexBufferBinding();
 		vertexDeclaration = mMgr->createVertexDeclaration();
+		mDeleteDclBinding = true;
 		vertexCount = 0;
 		vertexStart = 0;
 		hwAnimDataItemsUsed = 0;
 
 	}
+	//---------------------------------------------------------------------
+	VertexData::VertexData(VertexDeclaration* dcl, VertexBufferBinding* bind)
+	{
+		// this is a fallback rather than actively used
+		mMgr = HardwareBufferManager::getSingletonPtr();
+		vertexDeclaration = dcl;
+		vertexBufferBinding = bind;
+		mDeleteDclBinding = false;
+		vertexCount = 0;
+		vertexStart = 0;
+		hwAnimDataItemsUsed = 0;
+	}
     //-----------------------------------------------------------------------
 	VertexData::~VertexData()
 	{
-		mMgr->destroyVertexBufferBinding(vertexBufferBinding);
-		mMgr->destroyVertexDeclaration(vertexDeclaration);
+		if (mDeleteDclBinding)
+		{
+			mMgr->destroyVertexBufferBinding(vertexBufferBinding);
+			mMgr->destroyVertexDeclaration(vertexDeclaration);
+		}
 	}
     //-----------------------------------------------------------------------
 	VertexData* VertexData::clone(bool copyData, HardwareBufferManagerBase* mgr) const
@@ -314,8 +330,10 @@ namespace Ogre {
         }
     }
 	//-----------------------------------------------------------------------
-	void VertexData::reorganiseBuffers(VertexDeclaration* newDeclaration, const BufferUsageList& bufferUsages)
+	void VertexData::reorganiseBuffers(VertexDeclaration* newDeclaration, 
+		const BufferUsageList& bufferUsages, HardwareBufferManagerBase* mgr)
 	{
+		HardwareBufferManagerBase* pManager = mgr ? mgr : mMgr;
         // Firstly, close up any gaps in the buffer sources which might have arisen
         newDeclaration->closeGapsInSource();
 
@@ -325,7 +343,7 @@ namespace Ogre {
         vector<size_t>::type oldBufferVertexSizes;
 		vector<void*>::type newBufferLocks;
         vector<size_t>::type newBufferVertexSizes;
-		VertexBufferBinding* newBinding = mMgr->createVertexBufferBinding();
+		VertexBufferBinding* newBinding = pManager->createVertexBufferBinding();
         const VertexBufferBinding::VertexBufferBindingMap& oldBindingMap = vertexBufferBinding->getBindings();
         VertexBufferBinding::VertexBufferBindingMap::const_iterator itBinding;
 
@@ -355,7 +373,7 @@ namespace Ogre {
             size_t vertexSize = newDeclaration->getVertexSize(buf);
 
 			HardwareVertexBufferSharedPtr vbuf = 
-				mMgr->createVertexBuffer(
+				pManager->createVertexBuffer(
 					vertexSize,
 					vertexCount, 
 					bufferUsages[buf]);
@@ -426,16 +444,22 @@ namespace Ogre {
         }
 
 		// Delete old binding & declaration
-		mMgr->destroyVertexBufferBinding(vertexBufferBinding);
-		mMgr->destroyVertexDeclaration(vertexDeclaration);
+		if (mDeleteDclBinding)
+		{
+			pManager->destroyVertexBufferBinding(vertexBufferBinding);
+			pManager->destroyVertexDeclaration(vertexDeclaration);
+		}
 
 		// Assign new binding and declaration
 		vertexDeclaration = newDeclaration;
 		vertexBufferBinding = newBinding;		
+		// after this is complete, new manager should be used
+		mMgr = pManager;
+		mDeleteDclBinding = true; // because we created these through a manager
 
 	}
     //-----------------------------------------------------------------------
-    void VertexData::reorganiseBuffers(VertexDeclaration* newDeclaration)
+    void VertexData::reorganiseBuffers(VertexDeclaration* newDeclaration, HardwareBufferManagerBase* mgr)
     {
         // Derive the buffer usages from looking at where the source has come
         // from
@@ -485,7 +509,7 @@ namespace Ogre {
             usages.push_back(final);
         }
         // Call specific method
-        reorganiseBuffers(newDeclaration, usages);
+        reorganiseBuffers(newDeclaration, usages, mgr);
 
     }
     //-----------------------------------------------------------------------

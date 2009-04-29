@@ -56,10 +56,24 @@ namespace Ogre {
 
 		HardwareBufferManagerBase* mMgr;
     public:
-		/** Constructor
+		/** Constructor.
+		@note 
+			This constructor creates the VertexDeclaration and VertexBufferBinding
+			automatically, and arranges for their deletion afterwards.
 		@param mgr Optional HardwareBufferManager from which to create resources
 		*/
         VertexData(HardwareBufferManagerBase* mgr = 0);
+		/** Constructor.
+		@note 
+		This constructor receives the VertexDeclaration and VertexBufferBinding
+		from the caller, and as such does not arrange for their deletion afterwards, 
+		the caller remains responsible for that.
+		@param dcl The VertexDeclaration to use
+		@param bind The VertexBufferBinding to use
+		@param deleteDclBind If true, this instance will delete the declaration 
+			and binding passed in
+		*/
+		VertexData(VertexDeclaration* dcl, VertexBufferBinding* bind);
         ~VertexData();
 
 		/** Declaration of the vertex to be used in this operation. 
@@ -70,6 +84,8 @@ namespace Ogre {
 		@remarks Note that this is created for you on construction.
 		*/
 		VertexBufferBinding* vertexBufferBinding;
+		/// Whether this class should delete the declaration and binding
+		bool mDeleteDclBinding;
 		/// The base vertex index to start from
 		size_t vertexStart;
 		/// The number of vertices used in this operation
@@ -147,8 +163,11 @@ namespace Ogre {
 		@param bufferUsages Vector of usage flags which indicate the usage options
 			for each new vertex buffer created. The indexes of the entries must correspond
 			to the buffer binding values referenced in the declaration.
+		@param mgr Optional pointer to the manager to use to create new declarations
+			and buffers etc. If not supplied, the HardwareBufferManager singleton will be used
 		*/
-		void reorganiseBuffers(VertexDeclaration* newDeclaration, const BufferUsageList& bufferUsage);
+		void reorganiseBuffers(VertexDeclaration* newDeclaration, const BufferUsageList& bufferUsage, 
+			HardwareBufferManagerBase* mgr = 0);
 
 		/** Reorganises the data in the vertex buffers according to the 
 			new vertex declaration passed in. Note that new vertex buffers
@@ -164,8 +183,10 @@ namespace Ogre {
 			must not include any elements which do not already exist in the 
 			current declaration; you can drop elements by 
 			excluding them from the declaration if you wish, however.
+		@param mgr Optional pointer to the manager to use to create new declarations
+			and buffers etc. If not supplied, the HardwareBufferManager singleton will be used
 		*/
-		void reorganiseBuffers(VertexDeclaration* newDeclaration);
+		void reorganiseBuffers(VertexDeclaration* newDeclaration, HardwareBufferManagerBase* mgr = 0);
 
         /** Remove any gaps in the vertex buffer bindings.
         @remarks
