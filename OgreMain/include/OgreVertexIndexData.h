@@ -70,8 +70,6 @@ namespace Ogre {
 		the caller remains responsible for that.
 		@param dcl The VertexDeclaration to use
 		@param bind The VertexBufferBinding to use
-		@param deleteDclBind If true, this instance will delete the declaration 
-			and binding passed in
 		*/
 		VertexData(VertexDeclaration* dcl, VertexBufferBinding* bind);
         ~VertexData();
