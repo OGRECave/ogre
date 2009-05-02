@@ -157,6 +157,7 @@ namespace Ogre
 		void useAncestorVertexData(TerrainQuadTreeNode* owner, uint16 treeDepthEnd, uint16 resolution);
 
 
+
 	protected:
 		Terrain* mTerrain;
 		TerrainQuadTreeNode* mParent;
@@ -170,8 +171,28 @@ namespace Ogre
 		uint16 mBaseLod;
 		uint16 mDepth;
 
+		struct VertexDataRecord : public TerrainAlloc
+		{
+			VertexData* cpuVertexData;
+			VertexData* gpuVertexData;
+			/// Base resolution of the data (size down one side)
+			uint16 resolution;
+			/// Number of quadtree levels (including this one) this data applies to
+			uint16 treeLevels;
+
+			VertexDataRecord(uint16 res, uint16 lvls) 
+				: cpuVertexData(0), gpuVertexData(0), resolution(res), treeLevels(lvls) {}
+		};
+		
 		TerrainQuadTreeNode* mNodeWithVertexData;
-		bool mOwnVertexData;
+		VertexDataRecord* mVertexDataRecord;
+
+		const VertexDataRecord* getVertexDataRecord() const;
+		void createCpuVertexData();
+		void destroyCpuVertexData();
+
+		void createGpuVertexData();
+		void destroyGpuVertexData();
 
 	};
 

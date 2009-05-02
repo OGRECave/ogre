@@ -236,12 +236,29 @@ namespace Ogre
 		/** Get a pointer to the height data for a given point. 
 		*/
 		float* getHeightData(long x, long y);
+		/** Get a pointer to all the delta data for this terrain.
+		@remarks
+			The delta data is a measure at a given vertex of by how much vertically
+			a vertex will have to move to reach the point at which it will be
+			removed in the next lower LOD.
+		*/
+		const float* getDeltaData();
+
+		/** Get a pointer to the delta data for a given point. 
+		*/
+		const float* getDeltaData(long x, long y);
 
 		/** Get a Vector3 of the world-space point on the terrain, aligned as per
 			options.
 		@note This point is relative to Terrain::getPosition
 		*/
 		void getPoint(long x, long y, Vector3* outpos);
+
+		/** Get a Vector3 of the world-space point on the terrain, supplying the
+			height data manually (can be more optimal). 
+		@note This point is relative to Terrain::getPosition
+		*/
+		void getPoint(long x, long y, float height, Vector3* outpos);
 
 		/// Get the alignment of the terrain
 		Alignment getAlignment() const;
@@ -283,6 +300,35 @@ namespace Ogre
 			(default 10, set for new Terrain using TerrainGlobalOptions)
 		*/
 		Real getSkirtSize() { return mSkirtSize; }
+		/** Whether to include normals in the terrain geometry to support basic dynamic
+		lighting. 
+		@note Including normals in the terrain geometry is usually not recommended, 
+		because as LOD decreases, the vertex lighting becomes approximated and
+		will start to look wrong. Instead, it is better to generate a texture which
+		encodes the normals as an object-space normal map which keeps lighting
+		fidelity constant at all LODs, but does require shaders to use. Even if you're
+		targetting the fixed-function pipeline you're better not to use vertex normals
+		and instead use baked lightmaps.
+		(default false, set for new Terrain using TerrainGlobalOptions)
+		*/
+		bool getGenerateVertexNormals() { return mGenerateVertexNormals; }
+
+		/** Whether to generate a texture containing the normals of the terrain. 
+		(default true, set for new Terrain using TerrainGlobalOptions)
+		*/
+		bool getGenerateNormalMap() { return mGenerateNormalMap; }
+		/** Whether to generate a texture containing the shadows of the terrain at
+			a particular time of day.
+		(default false, set for new Terrain using TerrainGlobalOptions)
+		*/
+		bool getGenerateShadowMap() { return mGenerateShadowMap; }
+
+		/** Whether to generate a horizon map containing the angles of the horizon
+			along a given linear sun track, which allows real-time shadows to be
+			generated for the terrain very cheaply without using shadow textures.
+			(default false, set for new Terrain using TerrainGlobalOptions)		
+		*/
+		bool getGenerateHorizonMap() { return mGenerateHorizonMap; }
 
 		/// Get the total number of LOD levels in the terrain
 		uint16 getNumLodLevels() const { return mNumLodLevels; }
@@ -322,6 +368,11 @@ namespace Ogre
 		@note This point is relative to Terrain::getPosition
 		*/
 		void getPointAlign(long x, long y, Alignment align, Vector3* outpos);
+		/** Get a Vector3 of the world-space point on the terrain, supplying the
+		height data manually (can be more optimal). 
+		@note This point is relative to Terrain::getPosition
+		*/
+		void getPointAlign(long x, long y, float height, Alignment align, Vector3* outpos);
     /// Test a single quad of the terrain for ray intersection.
     std::pair<bool, Vector3> checkQuadIntersection(int x, int z, const Ray& ray); //const;
 
@@ -348,6 +399,10 @@ namespace Ogre
 		bool mUseTriangleStrips;
 		bool mUseLodMorph;
 		Real mSkirtSize;
+		bool mGenerateVertexNormals;
+		bool mGenerateNormalMap;
+		bool mGenerateShadowMap;
+		bool mGenerateHorizonMap;
 
 	};
 
@@ -362,7 +417,13 @@ namespace Ogre
 		static bool msUseTriangleStrips;
 		static bool msUseLodMorph;
 		static Real msSkirtSize;
-
+		static bool msGenerateVertexNormals;
+		static bool msGenerateNormalMap;
+		static bool msGenerateShadowMap;
+		static Vector3 msShadowMapDir;
+		static bool msGenerateHorizonMap;
+		static Radian mHorizonMapAzimuth;
+		static Radian mHorizonMapZenith;
 	public:
 
 
@@ -396,6 +457,86 @@ namespace Ogre
 			Changing this value only applies to Terrain instances loaded / reloaded afterwards.
 		*/
 		static void setSkirtSize(Real skirtSz) { msSkirtSize = skirtSz; }
+		/** Whether to include normals in the terrain geometry to support basic dynamic
+		lighting. 
+		@note Including normals in the terrain geometry is usually not recommended, 
+		because as LOD decreases, the vertex lighting becomes approximated and
+		will start to look wrong. Instead, it is better to generate a texture which
+		encodes the normals as an object-space normal map which keeps lighting
+		fidelity constant at all LODs, but does require shaders to use. Even if you're
+		targetting the fixed-function pipeline you're better not to use vertex normals
+		and instead use baked lightmaps.
+		(default false)
+		*/
+		static bool getGenerateVertexNormals() { return msGenerateVertexNormals; }
+		/** Static method - whether to generate Normals on terrain
+		(default true)
+		@remarks
+		Changing this value only applies to Terrain instances loaded / reloaded afterwards.
+		*/
+		static void setGenerateVertexNormals(bool nm) { msGenerateVertexNormals = nm; }
+		/** Whether to generate a texture containing the normals of the terrain.
+		@remarks
+			Because of the variable LOD of the terrain, storing normals in vertices
+			doesn't produce attractive results. Instead, a terrain-wide normal map
+			is typically used, storing the object-space normals of the terrain
+			(default true)
+		*/
+		static bool getGenerateNormalMap() { return msGenerateNormalMap; }
+		/** Whether to generate a texture containing the normals of the terrain. */
+		static void setGenerateNormalMap(bool nm) { msGenerateNormalMap = nm; }
+		/** Whether to generate a texture containing the shadows of the terrain at
+			a particular time of day.
+		@remarks
+			This can be a useful feature for older hardware, or indeed any 
+			situation where dynamic shadows are not required. It requires that
+			the light direction is set too.
+		*/
+		static bool getGenerateShadowMap() { return msGenerateShadowMap; }
+		/** Whether to generate a texture containing the shadows of the terrain. */
+		static void setGenerateShadowMap(bool sm) { msGenerateShadowMap = sm; }
+		/// Get the shadow map light direction to use (world space)
+		static const Vector3& getShadowMapDirection() { return msShadowMapDir; }
+		/** Set the shadow map light direction to use (world space). */
+		static void setShadowMapDirection(const Vector3& v) { msShadowMapDir = v; }
+
+		/** Whether to generate a horizon map containing the angles of the horizon
+			along a given linear sun track, which allows real-time shadows to be
+			generated for the terrain very cheaply without using shadow textures.
+		@remarks
+			This can be a useful feature for moderate hardware, giving you the ability
+			to self-shadow the terrain without rendering depth shadow maps. Each point
+			in the texture encodes 2 values - the highest point on the terrain that
+			can be seen from that point in the direction of the sun in the morning, 
+			and the same thing in the evening (ie the opposite direction). With these
+			two values and a single 'time of day' value, you can calculate terrain
+			shadowing. 
+		@note This option uses the azimuth setting to detemine the track of the sun.
+			At runtime, it uses the zenith value which represents the time of day.
+		*/
+		static bool getGenerateHorizonMap() { return msGenerateHorizonMap; }
+		/** Whether to generate a texture containing the shadows of the terrain. */
+		static void setGenerateHorizonMap(bool hm) { msGenerateHorizonMap = hm; }
+		/** Get the azimuth angle of the sun track across the terrain for use in 
+			generating the horizon map; zero is  east/west (default)
+		*/
+		static Radian getHorizonMapAzimuth() { return mHorizonMapAzimuth; }
+		/** Set the azimuth angle of the sun track across the terrain; zero is 
+		east/west (default)
+		*/
+		static void setHorizonMapAzimuth(Radian az) { mHorizonMapAzimuth = az; }
+		/** Get the current zenith angle of the sun; zero is midday (default), 
+		    -HALF_PI is sunrise, HALF_PI is sunset. This doesn't affect the 
+			calculation of the horizon map, it controls the current state in 
+			which it is used.
+		*/
+		static Radian getHorizonMapZenith() { return mHorizonMapZenith; }
+		/** Set the current zenith angle of the sun; zero is midday (default), 
+		    -HALF_PI is sunrise, HALF_PI is sunset. This doesn't affect the 
+			calculation of the horizon map, it controls the current state in 
+			which it is used.
+		*/
+		static void setHorizonMapZenith(Radian z) { mHorizonMapZenith = z; }
 	};
 
 

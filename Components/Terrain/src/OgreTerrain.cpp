@@ -50,6 +50,13 @@ namespace Ogre
 	bool TerrainGlobalOptions::msUseTriangleStrips = true;
 	bool TerrainGlobalOptions::msUseLodMorph = true;
 	Real TerrainGlobalOptions::msSkirtSize = 10;
+	bool TerrainGlobalOptions::msGenerateVertexNormals = false;
+	bool TerrainGlobalOptions::msGenerateNormalMap = true;
+	bool TerrainGlobalOptions::msGenerateShadowMap = false;
+	Vector3 TerrainGlobalOptions::msShadowMapDir = Vector3(1, -1, 0).normalisedCopy();
+	bool TerrainGlobalOptions::msGenerateHorizonMap = false;
+	Radian TerrainGlobalOptions::mHorizonMapAzimuth = Radian(0);
+	Radian TerrainGlobalOptions::mHorizonMapZenith = Radian(0);
 	//---------------------------------------------------------------------
 	Terrain::Terrain(SceneManager* sm)
 		: mSceneMgr(sm)
@@ -162,6 +169,10 @@ namespace Ogre
 		mUseTriangleStrips = TerrainGlobalOptions::getUseTriangleStrips();
 		mUseLodMorph = TerrainGlobalOptions::getUseLodMorph();
 		mSkirtSize = TerrainGlobalOptions::getSkirtSize();
+		mGenerateVertexNormals = TerrainGlobalOptions::getGenerateVertexNormals();
+		mGenerateNormalMap = TerrainGlobalOptions::getGenerateNormalMap();
+		mGenerateShadowMap = TerrainGlobalOptions::getGenerateShadowMap();
+		mGenerateHorizonMap = TerrainGlobalOptions::getGenerateHorizonMap();
 
 		mAlign = importData.terrainAlign;
 		mSize = importData.terrainSize;
@@ -192,7 +203,7 @@ namespace Ogre
 					*dst++ = (*src++ * importData.inputScale) + importData.inputBias;
 			}
 		}
-		if (importData.inputImage)
+		else if (importData.inputImage)
 		{
 			Image* img = importData.inputImage;
 
@@ -396,27 +407,48 @@ namespace Ogre
 		return &mHeightData[y * mSize + x];
 	}
 	//---------------------------------------------------------------------
+	const float* Terrain::getDeltaData()
+	{
+		return mDeltaData;
+	}
+	//---------------------------------------------------------------------
+	const float* Terrain::getDeltaData(long x, long y)
+	{
+		assert (x >= 0 && x < mSize && y >= 0 && y < mSize);
+		return &mDeltaData[y * mSize + x];
+	}
+	//---------------------------------------------------------------------
 	void Terrain::getPoint(long x, long y, Vector3* outpos)
 	{
 		getPointAlign(x, y, mAlign, outpos);
 	}
 	//---------------------------------------------------------------------
+	void Terrain::getPoint(long x, long y, float height, Vector3* outpos)
+	{
+		getPointAlign(x, y, height, mAlign, outpos);
+	}
+	//---------------------------------------------------------------------
 	void Terrain::getPointAlign(long x, long y, Alignment align, Vector3* outpos)
+	{
+		getPointAlign(x, y, *getHeightData(x, y), align, outpos);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getPointAlign(long x, long y, float height, Alignment align, Vector3* outpos)
 	{
 		switch(align)
 		{
 		case ALIGN_X_Z:
-			outpos->y = *getHeightData(x, y);
+			outpos->y = height;
 			outpos->x = x * mScale + mBase;
 			outpos->z = y * mScale + mBase;
 			break;
 		case ALIGN_Y_Z:
-			outpos->x = *getHeightData(x, y);
+			outpos->x = height;
 			outpos->y = x * mScale + mBase;
 			outpos->z = y * mScale + mBase;
 			break;
 		case ALIGN_X_Y:
-			outpos->z = *getHeightData(x, y);
+			outpos->z = height;
 			outpos->x = x * mScale + mBase;
 			outpos->y = y * mScale + mBase;
 			break;
