@@ -87,6 +87,20 @@ namespace Ogre
 
 		stream.write(&mSize);
 		stream.write(&mWorldSize);
+		uint16 splatDimCount;
+		if (mSplatTextureWorldSize.empty())
+		{
+			splatDimCount = 1;
+			Real dim = getSplatTextureWorldSize(0);
+			stream.write(&splatDimCount);
+			stream.write(&dim);
+		}
+		else
+		{
+			splatDimCount = static_cast<uint16>(mSplatTextureWorldSize.size());
+			stream.write(&splatDimCount);
+			stream.write(&mSplatTextureWorldSize[0], mSplatTextureWorldSize.size());
+		}
 		stream.write(&mMaxBatchSize);
 		stream.write(&mMinBatchSize);
 		stream.write(&mPos);
@@ -111,6 +125,14 @@ namespace Ogre
 		stream.read(&align);
 		mAlign = (Alignment)align;
 		stream.read(&mWorldSize);
+		uint16 splatDimCount;
+		stream.read(&splatDimCount);
+		for (uint16 i = 0; i < splatDimCount; ++i)
+		{
+			Real dim;
+			stream.read(&dim);
+			setSplatTextureWorldSize(i, dim);
+		}
 		stream.read(&mMaxBatchSize);
 		stream.read(&mMinBatchSize);
 		stream.read(&mPos);
@@ -177,6 +199,10 @@ namespace Ogre
 		mAlign = importData.terrainAlign;
 		mSize = importData.terrainSize;
 		mWorldSize = importData.worldSize;
+		for (uint16 i = 0; i < importData.splatTextureWorldSizeList.size(); ++i)
+		{
+			setSplatTextureWorldSize(i, importData.splatTextureWorldSizeList[i]);
+		}
 		mMaxBatchSize = importData.maxBatchSize;
 		mMinBatchSize = importData.minBatchSize;
 		mPos = importData.pos;
@@ -479,6 +505,52 @@ namespace Ogre
 	Real Terrain::getWorldSize() const
 	{
 		return mWorldSize;
+	}
+	//---------------------------------------------------------------------
+	Real Terrain::getSplatTextureWorldSize(uint16 index) const
+	{
+		if (index < mSplatTextureWorldSize.size())
+		{
+			return mSplatTextureWorldSize[index];
+		}
+		else if (!mSplatTextureWorldSize.empty())
+		{
+			return mSplatTextureWorldSize[0];
+		}
+		else
+		{
+			// default to tile 100 times
+			return mWorldSize * 0.01;
+		}
+	}
+	//---------------------------------------------------------------------
+	void Terrain::setSplatTextureWorldSize(uint16 index, Real size)
+	{
+		if (index >= mSplatTextureWorldSize.size())
+		{
+			mSplatTextureWorldSize.resize(index + 1);
+			mSplatTextureUVMultiplier.resize(index + 1);
+		}
+
+		mSplatTextureWorldSize[index] = size;
+		mSplatTextureUVMultiplier[index] = mWorldSize / size;
+	}
+	//---------------------------------------------------------------------
+	Real Terrain::getSplatTextureUVMultipler(uint16 index) const
+	{
+		if (index < mSplatTextureUVMultiplier.size())
+		{
+			return mSplatTextureUVMultiplier[index];
+		}
+		else if (!mSplatTextureUVMultiplier.empty())
+		{
+			return mSplatTextureUVMultiplier[0];
+		}
+		else
+		{
+			// default to tile 100 times
+			return 100;
+		}
 	}
 	//---------------------------------------------------------------------
 	void Terrain::setPosition(const Vector3& pos)

@@ -74,6 +74,16 @@ namespace Ogre
 		<td>The world size of one side of the terrain</td>
 	</tr>
 	<tr>
+		<td>Terrain splat dimensions count</td>
+		<td>uint16</td>
+		<td>The number of sets of world splat texture dimensions to follow</td>
+	</tr>
+	<tr>
+		<td>Terrain splat dimensions</td>
+		<td>Real*</td>
+		<td>A number of sets of splat dimensions</td>
+	</tr>
+	<tr>
 		<td>Max batch size</td>
 		<td>uint16</td>
 		<td>The maximum batch size in vertices along one side</td>
@@ -104,6 +114,8 @@ namespace Ogre
 		static const uint32 TERRAIN_CHUNK_ID;
 		static const uint16 TERRAIN_CHUNK_VERSION;
 		static const uint16 TERRAIN_MAX_BATCH_SIZE;
+
+		typedef vector<Real>::type RealVector;
 
 		/// The alignment of the terrain
 		enum Alignment
@@ -152,6 +164,14 @@ namespace Ogre
 			/** The world size of the terrain. */
 			Real worldSize;
 
+			/** How large an area in world space the terrain (splat) textures cover
+				before repeating. 
+			@remarks This is a list of values, since you can use different scaling
+				values per splat layer if you wish. If you want to use the same
+				value for all layers, just add a single value to this list.
+			*/
+			RealVector splatTextureWorldSizeList;
+
 			/** Optional heightmap providing the initial heights for the terrain. 
 			@remarks
 				If supplied, should ideally be terrainSize * terrainSize, but if
@@ -181,6 +201,7 @@ namespace Ogre
 				, inputScale(1.0)
 				, inputBias(0.0)
 			{
+
 			}
 
 		};
@@ -270,6 +291,27 @@ namespace Ogre
 		uint16 getMinBatchSize() const;
 		/// Get the size of the terrain in world units
 		Real getWorldSize() const;
+		/** How large an area in world space the terrain (splat) textures cover
+		before repeating. 
+		@param index The texture splat index.
+		*/
+		Real getSplatTextureWorldSize(uint16 index) const;
+		/** How large an area in world space the terrain (splat) textures cover
+		before repeating. 
+		@param index The texture splat index.
+		@param size The world size of the texture before repeating
+		*/
+		void setSplatTextureWorldSize(uint16 index, Real size);
+
+		/** Get the splat texture UV multiplier. 
+		@remarks
+			This is derived from the texture world size. The base UVs in the 
+			terrain vary from 0 to 1 and this multiplier is used (in a fixed-function 
+			texture coord scaling or a shader parameter) to translate it to the
+			final value.
+		@param index The texture splat index.
+		*/
+		Real getSplatTextureUVMultipler(uint16 index) const;
 
 		/// Get the world position of the terrain centre
 		const Vector3& getPosition() const { return mPos; }
@@ -395,6 +437,9 @@ namespace Ogre
 		uint16 mTreeDepth;
 		Real mBase;
 		Real mScale;
+		RealVector mSplatTextureWorldSize;
+		RealVector mSplatTextureUVMultiplier;
+
 
 		bool mUseTriangleStrips;
 		bool mUseLodMorph;

@@ -369,6 +369,7 @@ namespace Ogre
 			// Main data
 			uint16 xlimit = mOffsetX + mVertexDataRecord->resolution;
 			uint16 ylimit = mOffsetY + mVertexDataRecord->resolution;
+			Real uvScale = 1.0 / (mTerrain->getSize() - 1);
 			const float* pBaseHeight = mTerrain->getHeightData(mOffsetX, mOffsetY);
 			const float* pBaseDelta = mTerrain->getDeltaData(mOffsetX, mOffsetY);
 			uint16 rowskip = mTerrain->getSize();
@@ -396,11 +397,10 @@ namespace Ogre
 						*pBuf++;
 					}
 
-					// UVs
-					// TODO
-					*pBuf++;
-					*pBuf++;
-
+					// UVs - base UVs vary from 0 to 1, all other values
+					// will be derived using scalings
+					*pBuf++ = x * uvScale;
+					*pBuf++ = 1.0 - (y * uvScale);
 
 					
 				}
