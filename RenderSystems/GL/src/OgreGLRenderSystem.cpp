@@ -2913,6 +2913,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 			for (int i = 0; i < mFixedFunctionTextureUnits; i++)
 			{
             glClientActiveTextureARB(GL_TEXTURE0 + i);
+				glDisableClientState( GL_TEXTURE_COORD_ARRAY );
 			}
 			glClientActiveTextureARB(GL_TEXTURE0);
 		}

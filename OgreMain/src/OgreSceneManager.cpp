@@ -3642,6 +3642,7 @@ void SceneManager::_applySceneAnimations(void)
 	// manual lock over states (extended duration required)
 	OGRE_LOCK_MUTEX(mAnimationStates.OGRE_AUTO_MUTEX_NAME)
 
+	// Iterate twice, once to reset, once to apply, to allow blending
     ConstEnabledAnimationStateIterator stateIt = mAnimationStates.getEnabledAnimationStateIterator();
 
     while (stateIt.hasMoreElements())
@@ -3650,7 +3651,6 @@ void SceneManager::_applySceneAnimations(void)
         Animation* anim = getAnimation(state->getAnimationName());
 
         // Reset any nodes involved
-        // NB this excludes blended animations
         Animation::NodeTrackIterator nodeTrackIt = anim->getNodeTrackIterator();
         while(nodeTrackIt.hasMoreElements())
         {
@@ -3666,12 +3666,17 @@ void SceneManager::_applySceneAnimations(void)
 			if (!anim.isNull())
 				anim->resetToBaseValue();
         }
-
-        // Apply the animation
-        anim->apply(state->getTimePosition(), state->getWeight());
     }
 
-
+	// this should allow blended animations
+	stateIt = mAnimationStates.getEnabledAnimationStateIterator();
+	while (stateIt.hasMoreElements())
+	{
+		const AnimationState* state = stateIt.getNext();
+		Animation* anim = getAnimation(state->getAnimationName());
+		// Apply the animation
+		anim->apply(state->getTimePosition(), state->getWeight());
+	}
 }
 //---------------------------------------------------------------------
 void SceneManager::manualRender(RenderOperation* rend, 
