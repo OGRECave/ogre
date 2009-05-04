@@ -376,15 +376,15 @@ namespace Ogre {
 			return mList.const_iterator(n); 
 		}
 		const_reference at(size_type n) const { return mList.at(n); }
-		HashedVector() : mListHash(0) {}
-		HashedVector(size_type n) : mList(n), mListHash(0) {}
-		HashedVector(size_type n, const T& t) : mList(n, t), mListHash(0) {}
+		HashedVector() : mListHash(0), mListHashDirty(false) {}
+		HashedVector(size_type n) : mList(n), mListHash(0), mListHashDirty(false) {}
+		HashedVector(size_type n, const T& t) : mList(n, t), mListHash(0), mListHashDirty(false) {}
 		HashedVector(const HashedVector<T>& rhs) 
-			: mList(rhs.mList), mListHash(rhs.mListHash) {}
+			: mList(rhs.mList), mListHash(rhs.mListHash), mListHashDirty(false) {}
 
 		template <class InputIterator>
 		HashedVector(InputIterator a, InputIterator b)
-			: mList(a, b)
+			: mList(a, b), mListHashDirty(false)
 		{
 			dirtyHash();
 		}
@@ -470,6 +470,7 @@ namespace Ogre {
 		{
 			mList.clear();
 			mListHash = 0;
+			mListHashDirty = false;
 		}
 
 		void resize(size_type n, const T& t = T())
