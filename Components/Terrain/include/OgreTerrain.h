@@ -257,6 +257,11 @@ namespace Ogre
 		/** Get a pointer to the height data for a given point. 
 		*/
 		float* getHeightData(long x, long y);
+
+		/** Get the height data for a given point. 
+		*/
+		float getHeight(long x, long y);
+
 		/** Get a pointer to all the delta data for this terrain.
 		@remarks
 			The delta data is a measure at a given vertex of by how much vertically
@@ -280,6 +285,28 @@ namespace Ogre
 		@note This point is relative to Terrain::getPosition
 		*/
 		void getPoint(long x, long y, float height, Vector3* outpos);
+
+		/** Translate a vector into world space based on the alignment options.
+		@param inVec The vector in basis space, where x/y represents the 
+		terrain plane and z represents the up vector
+		*/
+		void getVector(const Vector3& inVec, Vector3* outVec);
+		/** Translate a vector into world space based on a specified alignment.
+		@param inVec The vector in basis space, where x/y represents the 
+		terrain plane and z represents the up vector
+		*/
+		void getVectorAlign(const Vector3& inVec, Alignment align, Vector3* outVec);
+
+		/** Translate a vector into world space based on the alignment options.
+		@param x, y, z The vector in basis space, where x/y represents the 
+		terrain plane and z represents the up vector
+		*/
+		void getVector(Real x, Real y, Real z, Vector3* outVec);
+		/** Translate a vector into world space based on a specified alignment.
+		@param x, y, z The vector in basis space, where x/y represents the 
+		terrain plane and z represents the up vector
+		*/
+		void getVectorAlign(Real x, Real y, Real z, Alignment align, Vector3* outVec);
 
 		/// Get the alignment of the terrain
 		Alignment getAlignment() const;

@@ -146,7 +146,7 @@ namespace Ogre
 
 		stream.readChunkEnd(TERRAIN_CHUNK_ID);
 
-		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0);
+		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
 		mQuadTree->prepare();
 
 		mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
@@ -258,7 +258,7 @@ namespace Ogre
 		mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
 
 
-		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0);
+		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
 		mQuadTree->prepare();
 
 		// calculate entire terrain
@@ -433,6 +433,11 @@ namespace Ogre
 		return &mHeightData[y * mSize + x];
 	}
 	//---------------------------------------------------------------------
+	float Terrain::getHeight(long x, long y)
+	{
+		return *getHeightData(x, y);
+	}
+	//---------------------------------------------------------------------
 	const float* Terrain::getDeltaData()
 	{
 		return mDeltaData;
@@ -480,6 +485,45 @@ namespace Ogre
 			break;
 		};
 
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getVector(const Vector3& inVec, Vector3* outVec)
+	{
+		getVectorAlign(inVec.x, inVec.y, inVec.z, mAlign, outVec);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getVector(Real x, Real y, Real z, Vector3* outVec)
+	{
+		getVectorAlign(x, y, z, mAlign, outVec);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getVectorAlign(const Vector3& inVec, Alignment align, Vector3* outVec)
+	{
+		getVectorAlign(inVec.x, inVec.y, inVec.z, align, outVec);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getVectorAlign(Real x, Real y, Real z, Alignment align, Vector3* outVec)
+	{
+
+		switch(align)
+		{
+		case ALIGN_X_Z:
+			outVec->y = z;
+			outVec->x = x;
+			outVec->z = y;
+			break;
+		case ALIGN_Y_Z:
+			outVec->x = z;
+			outVec->y = x;
+			outVec->z = y;
+			break;
+		case ALIGN_X_Y:
+			outVec->x = x;
+			outVec->y = y;
+			outVec->z = z;
+			break;
+		};
+		
 	}
 	//---------------------------------------------------------------------
 	Terrain::Alignment Terrain::getAlignment() const

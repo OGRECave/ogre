@@ -88,9 +88,11 @@ namespace Ogre
 		@param xoff,off Offsets from the start of the terrain data in 2D
 		@param size The size of the node in vertices at the highest LOD
 		@param lod The base LOD level
+		@param depth The depth that this node is at in the tree (or convenience)
+		@param quadrant The index of the quadrant (0, 1, 2, 3)
 		*/
 		TerrainQuadTreeNode(Terrain* terrain, TerrainQuadTreeNode* parent, 
-			uint16 xoff, uint16 yoff, uint16 size, uint16 lod, uint16 depth);
+			uint16 xoff, uint16 yoff, uint16 size, uint16 lod, uint16 depth, uint16 quadrant);
 		virtual ~TerrainQuadTreeNode();
 
 		/// Get the horizontal offset into the main terrain data of this node
@@ -170,12 +172,16 @@ namespace Ogre
 		uint16 mSize;
 		uint16 mBaseLod;
 		uint16 mDepth;
+		uint16 mQuadrant;
+		/// Although this node shares vertex data with other nodes, its skirt is all its own
+		uint16 mSkirtVertexStart;
+
 
 		struct VertexDataRecord : public TerrainAlloc
 		{
 			VertexData* cpuVertexData;
 			VertexData* gpuVertexData;
-			/// Base resolution of the data (size down one side)
+			/// Base resolution of the data (size down one side, for the whole terrain)
 			uint16 resolution;
 			/// Number of quadtree levels (including this one) this data applies to
 			uint16 treeLevels;

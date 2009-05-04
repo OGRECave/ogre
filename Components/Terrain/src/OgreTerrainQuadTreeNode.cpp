@@ -38,7 +38,8 @@ namespace Ogre
 {
 	//---------------------------------------------------------------------
 	TerrainQuadTreeNode::TerrainQuadTreeNode(Terrain* terrain, 
-		TerrainQuadTreeNode* parent, uint16 xoff, uint16 yoff, uint16 size, uint16 lod, uint16 depth)
+		TerrainQuadTreeNode* parent, uint16 xoff, uint16 yoff, uint16 size, 
+		uint16 lod, uint16 depth, uint16 quadrant)
 		: mTerrain(terrain)
 		, mParent(parent)
 		, mOffsetX(xoff)
@@ -48,6 +49,7 @@ namespace Ogre
 		, mSize(size)
 		, mBaseLod(lod)
 		, mDepth(depth)
+		, mQuadrant(quadrant)
 		, mNodeWithVertexData(0)
 		, mVertexDataRecord(0)
 	{
@@ -58,10 +60,10 @@ namespace Ogre
 			uint16 childLod = lod - 1; // LOD levels decrease down the tree (higher detail)
 			uint16 childDepth = depth + 1;
 			// create children
-			mChildren[0] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff, childSize, childLod, childDepth);
-			mChildren[1] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff, childSize, childLod, childDepth);
-			mChildren[2] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff + childOff, childSize, childLod, childDepth);
-			mChildren[3] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff + childOff, childSize, childLod, childDepth);
+			mChildren[0] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff, childSize, childLod, childDepth, 0);
+			mChildren[1] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff, childSize, childLod, childDepth, 1);
+			mChildren[2] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff + childOff, childSize, childLod, childDepth, 2);
+			mChildren[3] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff + childOff, childSize, childLod, childDepth, 3);
 
 			LodLevel* ll = OGRE_NEW LodLevel();
 			// non-leaf nodes always render with minBatchSize vertices
@@ -312,9 +314,9 @@ namespace Ogre
 
 			// create vertex structure, not using GPU for now (these are CPU structures)
 			VertexDeclaration* dcl = OGRE_NEW VertexDeclaration();
-			VertexBufferBinding* buf = OGRE_NEW VertexBufferBinding();
+			VertexBufferBinding* bufbind = OGRE_NEW VertexBufferBinding();
 
-			mVertexDataRecord->cpuVertexData = OGRE_NEW VertexData(dcl, buf);
+			mVertexDataRecord->cpuVertexData = OGRE_NEW VertexData(dcl, bufbind);
 
 			// Vertex declaration
 			// TODO: consider vertex compression
@@ -344,22 +346,19 @@ namespace Ogre
 
 			// Calculate number of vertices
 			// Base geometry res * res
-			size_t numVerts = Math::Sqr(mVertexDataRecord->resolution);
+			size_t baseNumVerts = Math::Sqr(mVertexDataRecord->resolution);
+			size_t numVerts = baseNumVerts;
 			// Now add space for skirts
-			uint16 currentRes = mVertexDataRecord->resolution;
+			// Skirts will be rendered as copies of the edge vertices translated downwards
+			// Some people use one big fan with only 3 vertices at the bottom, 
+			// but this requires creating them much bigger that necessary, meaning
+			// more unnecessary overdraw, so we'll use more vertices 
+			// You need 2^levels + 1 rows of full resolution (max 129) vertex copies, plus
+			// the same number of columns. There are common vertices at intersections
 			uint16 levels = mVertexDataRecord->treeLevels;
-			uint16 numTiles = 1;
-			while (levels--)
-			{
-				// skirts require a strip around the outside 
-				// top & bottom row (resolution + 2 each)
-				// left & right sides (resolution each)
-				// so resolution * 4 + 4
-				// multiply by numTiles because at each level, we have to supply 4 children
-				numVerts += numTiles * (currentRes * 4 + 4);
-				numTiles *= 4;
-				currentRes = ((currentRes - 1) * 0.5) + 1;
-			}
+			uint16 skirtRowCols = (Math::Pow(2, levels) + 1);
+			numVerts += mVertexDataRecord->resolution * skirtRowCols;
+			numVerts += mVertexDataRecord->resolution * skirtRowCols;
 
 			// manually create CPU-side buffer
 			HardwareVertexBufferSharedPtr vbuf(
@@ -367,27 +366,33 @@ namespace Ogre
 
 			// Fill the buffers
 			// Main data
-			uint16 xlimit = mOffsetX + mVertexDataRecord->resolution;
-			uint16 ylimit = mOffsetY + mVertexDataRecord->resolution;
+			uint16 xlimit = mOffsetX + mSize;
+			uint16 ylimit = mOffsetY + mSize;
+			uint16 inc = mTerrain->getSize() / mVertexDataRecord->resolution;
+
 			Real uvScale = 1.0 / (mTerrain->getSize() - 1);
 			const float* pBaseHeight = mTerrain->getHeightData(mOffsetX, mOffsetY);
 			const float* pBaseDelta = mTerrain->getDeltaData(mOffsetX, mOffsetY);
-			uint16 rowskip = mTerrain->getSize();
+			uint16 rowskip = mTerrain->getSize() * inc;
 			Vector3 pos;
 			float* pBuf = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
-			for (uint16 y = mOffsetY; y < ylimit; ++y)
+			for (uint16 y = mOffsetY; y < ylimit; y += inc)
 			{
 				const float* pHeight = pBaseHeight;
 				const float* pDelta = pBaseDelta;
-				for (uint16 x = mOffsetX; x < xlimit; ++x)
+				for (uint16 x = mOffsetX; x < xlimit; x += inc)
 				{
-					mTerrain->getPoint(x, y, *pHeight++, &pos);
+					mTerrain->getPoint(x, y, *pHeight, &pos);
+					pHeight += inc;
 
 					*pBuf++ = pos.x;
 					*pBuf++ = pos.y;
 					*pBuf++ = pos.z;
 					if (morph)
-						*pBuf++ = *pDelta++;
+					{
+						*pBuf++ = *pDelta;
+						pDelta += inc;
+					}
 
 					if (mTerrain->getGenerateVertexNormals())
 					{
@@ -408,11 +413,75 @@ namespace Ogre
 				pBaseDelta += rowskip;
 
 			}
-			// skirts
 
+			// skirt spacing based on top-level resolution (* inc to cope with resolution which is not the max)
+			uint16 skirtSpacing = (mVertexDataRecord->resolution-1) / (skirtRowCols-1) * inc;
+			Vector3 skirtOffset;
+			mTerrain->getVector(0, 0, -mTerrain->getSkirtSize(), &skirtOffset);
+			// skirt rows
+			pBaseHeight = mTerrain->getHeightData(mOffsetX, mOffsetY);
+			for (uint16 y = mOffsetY; y < ylimit; y += skirtSpacing)
+			{
+				const float* pHeight = pBaseHeight;
+				for (uint16 x = mOffsetX; x < xlimit; x += inc)
+				{
+					mTerrain->getPoint(x, y, *pHeight, &pos);
+					pHeight += inc;
 
+					pos += skirtOffset;
+
+					*pBuf++ = pos.x;
+					*pBuf++ = pos.y;
+					*pBuf++ = pos.z;
+					if (morph)
+						*pBuf++ = 0; // no morphing
+
+					if (mTerrain->getGenerateVertexNormals())
+					{
+						// complete these later - should be a copy of the main
+						*pBuf++;
+						*pBuf++;
+						*pBuf++;
+					}
+
+					// UVs - same as base
+					*pBuf++ = x * uvScale;
+					*pBuf++ = 1.0 - (y * uvScale);
+				}
+				pBaseHeight += rowskip * skirtSpacing;
+			}
+			// skirt cols
+			uint16 colskip = inc * skirtSpacing;
+			for (uint16 x = mOffsetX; x < xlimit; x += skirtSpacing)
+			{
+				for (uint16 y = mOffsetY; y < ylimit; y += inc)
+				{
+					mTerrain->getPoint(x, y, mTerrain->getHeight(x, y), &pos);
+					pos += skirtOffset;
+
+					*pBuf++ = pos.x;
+					*pBuf++ = pos.y;
+					*pBuf++ = pos.z;
+					if (morph)
+						*pBuf++ = 0; // no morphing
+
+					if (mTerrain->getGenerateVertexNormals())
+					{
+						// complete these later - should be a copy of the main
+						*pBuf++;
+						*pBuf++;
+						*pBuf++;
+					}
+
+					// UVs - same as base
+					*pBuf++ = x * uvScale;
+					*pBuf++ = 1.0 - (y * uvScale);
+				}
+			}
 
 			vbuf->unlock();
+
+			bufbind->setBinding(0, vbuf);
 
 
 		}
