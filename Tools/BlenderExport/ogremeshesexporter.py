@@ -1309,10 +1309,10 @@ else:
 				for proxyManager in self.armatureAnimationProxyManagerDict.values():
 					proxyManager.savePackageSettings()
 				return
-			def export(self, exportPath, exportMaterial, materialScriptName, customMaterial, customMaterialTplPath, colouredAmbient, gameEngineMaterials, exportMesh, fixUpAxis, skeletonUseMeshName, convertXML, copyTextures):
+			def export(self, exportPath, exportMaterial, materialScriptName, customMaterial, customMaterialTplPath, colouredAmbient, gameEngineMaterials, exportMesh, fixUpAxis, skeletonUseMeshName, convertXML, copyTextures, requireFaceMats):
 				# create MaterialManager
 				if len(self.selectedList):
-					materialManager = MaterialManager(exportPath, materialScriptName, gameEngineMaterials, customMaterial, customMaterialTplPath)
+					materialManager = MaterialManager(exportPath, materialScriptName, gameEngineMaterials, customMaterial, customMaterialTplPath, requireFaceMats)
 					Log.getSingleton().logInfo("Output to directory \"%s\"" % exportPath)
 					for name in self.selectedList:
 						Log.getSingleton().logInfo("Processing Object \"%s\"" % name)
@@ -1633,6 +1633,7 @@ else:
 				self.fixUpAxis = ToggleModel(True)
 				self.convertXML = ToggleModel(0)
 				self.copyTextures = ToggleModel(0)
+				self.requireFaceMats = ToggleModel(True)
 				self.skeletonUseMeshName = ToggleModel(1)
 
 				matTglGrp = ToggleGroup()
@@ -1665,7 +1666,7 @@ else:
 				ToggleView(mvhLayout2, Size([Size.INFINITY, 20], [150, 20]), self.colouredAmbient, \
 					T("Coloured Ambient"), \
 					T("Use Amb factor times diffuse colour as ambient instead of Amb factor times white."))
-				ToggleView(mvhLayout2, Size([Size.INFINITY, 20], [150, 20]), self.copyTextures, \
+				ToggleView(mvhLayout2, Size([Size.INFINITY, 20], [100, 20]), self.copyTextures, \
 					T("Copy Textures"), \
 					T("Copy texture files into export path."))
 
@@ -1703,9 +1704,12 @@ else:
 				globalSettingLayout1 = HorizontalLayout(globalSettingLayout)
 				ToggleView(globalSettingLayout1, Size([Size.INFINITY, 20], [100, 20]), self.fixUpAxis, T("Fix Up Axis to Y"), \
 					T("Fix up axis as Y instead of Z."))
-				ToggleView(globalSettingLayout1, Size([Size.INFINITY, 20], [100, 20]), self.skeletonUseMeshName, T("Skeleton name follow mesh"), \
+				ToggleView(globalSettingLayout1, Size([Size.INFINITY, 20], [100, 20]), self.requireFaceMats, T("Require Materials"), \
+					T("Generate Error message when part of a mesh is not assigned with a material."))
+				ToggleView(globalSettingLayout1, Size([Size.INFINITY, 20], [150, 20]), self.skeletonUseMeshName, T("Skeleton name follow mesh"), \
 					T("Use mesh name for the exported skeleton name instead of the armature name."))
-				ToggleView(globalSettingLayout1, Size([Size.INFINITY, 20], [100, 20]), self.convertXML, T("OgreXMLConverter"), \
+				globalSettingLayout2 = HorizontalLayout(globalSettingLayout)
+				ToggleView(globalSettingLayout2, Size([Size.INFINITY, 20], [100, 20]), self.convertXML, T("OgreXMLConverter"), \
 					T("Run OgreXMLConverter on the exported XML files."))
 				## buttons
 				Spacer(vLayout, Size([0, 10]))
@@ -1768,6 +1772,9 @@ else:
 				fixUpAxis = PackageSettings.getSingleton().getSetting('fixUpAxis')
 				if fixUpAxis is not None:
 					self.fixUpAxis.setValue(fixUpAxis)
+				requireFaceMats = PackageSettings.getSingleton().getSetting('requireFaceMats')
+				if requireFaceMats is not None:
+					self.requireFaceMats.setValue(requireFaceMats)
 				skeletonUseMeshName = PackageSettings.getSingleton().getSetting('skeletonUseMeshName')
 				if skeletonUseMeshName is not None:
 					self.skeletonUseMeshName.setValue(skeletonUseMeshName)
@@ -1787,6 +1794,7 @@ else:
 				PackageSettings.getSingleton().setSetting('colouredAmbient', self.colouredAmbient.getValue())
 				PackageSettings.getSingleton().setSetting('gameEngineMaterials', self.gameEngineMaterials.getValue())
 				PackageSettings.getSingleton().setSetting('copyTextures', self.copyTextures.getValue())
+				PackageSettings.getSingleton().setSetting('requireFaceMats', self.requireFaceMats.getValue())
 				PackageSettings.getSingleton().setSetting('exportMesh', self.exportMesh.getValue())
 				PackageSettings.getSingleton().setSetting('fixUpAxis', self.fixUpAxis.getValue())
 				PackageSettings.getSingleton().setSetting('skeletonUseMeshName', self.skeletonUseMeshName.getValue())
@@ -1866,7 +1874,9 @@ else:
 						self.app.fixUpAxis.getValue(), \
 						self.app.skeletonUseMeshName.getValue(), \
 						self.app.convertXML.getValue(), \
-						self.app.copyTextures.getValue())
+						self.app.copyTextures.getValue(), \
+						self.app.requireFaceMats.getValue(), \
+						)
 					Log.getSingleton().logInfo("Done.")
 					activator.setEnabled(True)
 					Blender.Draw.Redraw(1)

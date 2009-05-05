@@ -817,7 +817,7 @@ class CustomMaterial(RenderingMaterial):
 		except KeyError:
 			pass
 
-		f.write(self.template.safe_substitute(templateDict));
+		f.write(self.template.safe_substitute(templateDict))
 
 		return
 	def _getAmbient(self):
@@ -899,7 +899,7 @@ class MaterialManager:
 	"""Manages database of material definitions.
 	"""
 	#TODO append to existing material script
-	def __init__(self, dir=None, file=None, gameEngineMaterial=False, customMaterial=False, customMaterialTplPath=None):
+	def __init__(self, dir=None, file=None, gameEngineMaterial=False, customMaterial=False, customMaterialTplPath=None, requireFaceMats=True):
 		"""Constructor.
 		
 		   @param path Directory to the material file. Default is directory of the last file read or written with Blender.
@@ -907,18 +907,26 @@ class MaterialManager:
 		"""
 		self.dir = dir or Blender.sys.dirname(Blender.Get('filename'))
 		self.file = file or (Blender.Scene.GetCurrent().getName() + ".material")
-		self.gameEngineMaterial = gameEngineMaterial;
-		self.customMaterial = customMaterial;
-		self.customMaterialTplPath = customMaterialTplPath;
+		self.gameEngineMaterial = gameEngineMaterial
+		self.customMaterial = customMaterial
+		self.customMaterialTplPath = customMaterialTplPath
 		# key=name, value=material
 		self.materialsDict = {}
 		# key=basename, value=path
 		self.textureFilesDict = {}
+		if requireFaceMats:
+			self.noMatWarned = set()
+			# We only warn once for each blender Obj X mesh
+			# This set keeps track of what we have issued warnings for already
+		else:
+			self.noMatWarned = None
 		return
-	def getMaterial(self, bMesh, bMFace, colouredAmbient):
+	def getMaterial(self, bMesh, bMFace, colouredAmbient, objName):
 		"""Returns material of a given face or <code>None</code>.
 		"""
 		## get name of export material for Blender's material settings of that face.
+		# The objName param provides for precise and optimally concise
+		# error messages
 		faceMaterial = None
 		if self.gameEngineMaterial:
 			if bMesh.faceUV and not(bMFace.mode & Blender.Mesh.FaceModes['INVISIBLE']):
@@ -927,36 +935,43 @@ class MaterialManager:
 					faceMaterial = GameEngineMaterial(self, bMesh, bMFace, colouredAmbient)
 			else:
 				# material only
-				bMaterial = None
-				try:
-					bMaterial = bMesh.materials[bMFace.mat]
-				except:
-					Log.getSingleton().logWarning("Face without material assignment in mesh \"%s\"!" % bMesh.name)
-				if bMaterial:
-					faceMaterial = GameEngineMaterial(self, bMesh, bMFace, colouredAmbient)
-				else:
+				if (bMesh.materials == None
+						or bMFace.mat >= len(bMesh.materials)
+						or not bMesh.materials[bMFace.mat]):
+					if self.noMatWarned != None and (
+							objName + '|' + bMesh.name) not in self.noMatWarned:
+						Log.getSingleton().logError(('Face(s) without eng. '
+								+ 'material assignment in obj "%s", mesh "%s"!')
+								% (objName, bMesh.name))
+						self.noMatWarned.add(objName + '|' + bMesh.name)
 					faceMaterial = DefaultMaterial(self, 'BaseWhite')
+				else:
+					faceMaterial = GameEngineMaterial(self, bMesh, bMFace, colouredAmbient)
 		elif self.customMaterial:
-			bMaterial = None
-			try:
-				bMaterial = bMesh.materials[bMFace.mat]
-			except:
-				Log.getSingleton().logError("Face without material assignment in mesh \"%s\"!" % bMesh.name)
-			if bMaterial:
-				faceMaterial = CustomMaterial(self, bMesh, bMFace, colouredAmbient, self.customMaterialTplPath)
-			else:
+			if (bMesh.materials == None or bMFace.mat >= len(bMesh.materials)
+					or not bMesh.materials[bMFace.mat]):
+				if self.noMatWarned != None and (
+						objName + '|' + bMesh.name) not in self.noMatWarned:
+					Log.getSingleton().logError(('Face(s) without custom '
+							+ 'material assignment in obj "%s", mesh "%s"!')
+							% (objName, bMesh.name))
+					self.noMatWarned.add(objName + '|' + bMesh.name)
 				faceMaterial = DefaultMaterial(self, 'BaseWhite')
+			else:
+				faceMaterial = CustomMaterial(self, bMesh, bMFace, colouredAmbient, self.customMaterialTplPath)
 		else:
 			# rendering material
-			bMaterial = None
-			try:
-				bMaterial = bMesh.materials[bMFace.mat]
-			except:
-				Log.getSingleton().logError("Face without material assignment in mesh \"%s\"!" % bMesh.name)
-			if bMaterial:
-				faceMaterial = RenderingMaterial(self, bMesh, bMFace, colouredAmbient)
-			else:
+			if (bMesh.materials == None or bMFace.mat >= len(bMesh.materials)
+					or not bMesh.materials[bMFace.mat]):
+				if self.noMatWarned != None and (
+						objName + '|' + bMesh.name) not in self.noMatWarned:
+					Log.getSingleton().logError(('Face(s) without '
+							+ 'material assignment in obj "%s", mesh "%s"!')
+							% (objName, bMesh.name))
+					self.noMatWarned.add(objName + '|' + bMesh.name)
 				faceMaterial = DefaultMaterial(self, 'BaseWhite')
+			else:
+				faceMaterial = RenderingMaterial(self, bMesh, bMFace, colouredAmbient)
 		## return material or None
 		material = None
 		if faceMaterial:
