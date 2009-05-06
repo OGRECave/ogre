@@ -476,10 +476,10 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void StreamSerialiser::write(const String* string)
 	{
-		mStream->write(string->c_str(), string->size());
-		// write terminator (newline)
-		char eol = '\n';
-		mStream->write(&eol, 1);
+		// uint32 of size first, then (unterminated) string
+		uint32 len = static_cast<uint32>(string->length());
+		write(&len);
+		mStream->write(string->c_str(), len);
 	}
 	//---------------------------------------------------------------------
 	void StreamSerialiser::write(const Matrix3* m, size_t count)
@@ -639,8 +639,11 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void StreamSerialiser::read(String* string)
 	{
-		String readStr = mStream->getLine(false);
-		string->swap(readStr);
+		// String is stored as a uint32 character count, then string
+		uint32 len;
+		read(&len);
+		string->resize(len);
+		read(&(*string->begin()), len);
 	}
 	//---------------------------------------------------------------------
 	void StreamSerialiser::read(Real* val, size_t count)
