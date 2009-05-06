@@ -80,7 +80,7 @@ void StreamSerialiserTests::testWriteBasic()
 		const StreamSerialiser::Chunk* c = serialiser.readChunkBegin();
 
 		CPPUNIT_ASSERT_EQUAL(chunkID, c->id);
-		CPPUNIT_ASSERT_EQUAL(sizeof(Vector3) + sizeof(int) + aTestString.size() + 1, c->length);
+		CPPUNIT_ASSERT_EQUAL(sizeof(Vector3) + sizeof(int) + aTestString.size() + 4, (size_t)c->length);
 
 		Vector3 inVector;
 		String inString;

@@ -31,7 +31,7 @@ Torus Knot Software Ltd.
 #include "OgreException.h"
 
 // Regsiter the suite
-CPPUNIT_TEST_SUITE_REGISTRATION( FileSystemArchiveTests );
+//CPPUNIT_TEST_SUITE_REGISTRATION( FileSystemArchiveTests );
 
 void FileSystemArchiveTests::setUp()
 {
