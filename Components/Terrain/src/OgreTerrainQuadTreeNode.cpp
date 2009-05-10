@@ -52,6 +52,7 @@ namespace Ogre
 		, mQuadrant(quadrant)
 		, mNodeWithVertexData(0)
 		, mVertexDataRecord(0)
+		, mMovable(0)
 	{
 		if (terrain->getMinBatchSize() < size)
 		{
@@ -97,6 +98,17 @@ namespace Ogre
 			assert(sz == terrain->getMinBatchSize());
 
 		}
+		
+		// Local centre calculation
+		// Because of pow2 + 1 there is always a middle point
+		uint16 midoffset = (size - 1) / 2;
+		uint16 midpointx = mOffsetX + midoffset;
+		uint16 midpointy = mOffsetY + midoffset;
+		// derive the local centre, but give it a height of 0
+		// TODO - what if we actually centred this at the terrain height at this point?
+		// would this be better?
+		mTerrain->getPoint(midpointx, midpointy, 0, &mLocalCentre);
+		
 	}
 	//---------------------------------------------------------------------
 	TerrainQuadTreeNode::~TerrainQuadTreeNode()
@@ -285,6 +297,7 @@ namespace Ogre
 				mChildren[i]->assignVertexData(treeDepthStart, treeDepthEnd, resolution);
 			
 		}
+		createCpuIndexData();
 
 	}
 	//---------------------------------------------------------------------
@@ -299,6 +312,7 @@ namespace Ogre
 				mChildren[i]->useAncestorVertexData(owner, treeDepthEnd, resolution);
 
 		}
+		createCpuIndexData();
 	}
 	//---------------------------------------------------------------------
 	const TerrainQuadTreeNode::VertexDataRecord* TerrainQuadTreeNode::getVertexDataRecord() const
@@ -323,13 +337,11 @@ namespace Ogre
 			size_t offset = 0;
 			// POSITION binding depends on whether we're geomorphing
 			// TODO - should we check that materials have geomorphing?
-			bool morph = false;
 			if (mTerrain->getUseLodMorph() && 
 				Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_VERTEX_PROGRAM))
 			{
 				// float4(x, y, z, delta)
 				offset += dcl->addElement(0, offset, VET_FLOAT4, VES_POSITION).getSize();
-				morph = true;
 			}
 			else
 			{
@@ -356,136 +368,214 @@ namespace Ogre
 			// You need 2^levels + 1 rows of full resolution (max 129) vertex copies, plus
 			// the same number of columns. There are common vertices at intersections
 			uint16 levels = mVertexDataRecord->treeLevels;
-			uint16 skirtRowCols = (Math::Pow(2, levels) + 1);
-			numVerts += mVertexDataRecord->resolution * skirtRowCols;
-			numVerts += mVertexDataRecord->resolution * skirtRowCols;
+			mVertexDataRecord->numSkirtRowsCols = (Math::Pow(2, levels) + 1);
+			numVerts += mVertexDataRecord->resolution * mVertexDataRecord->numSkirtRowsCols;
+			numVerts += mVertexDataRecord->resolution * mVertexDataRecord->numSkirtRowsCols;
 
 			// manually create CPU-side buffer
 			HardwareVertexBufferSharedPtr vbuf(
 				OGRE_NEW DefaultHardwareVertexBuffer(dcl->getVertexSize(0), numVerts, HardwareBuffer::HBU_STATIC_WRITE_ONLY));
-
-			// Fill the buffers
-			// Main data
-			uint16 xlimit = mOffsetX + mSize;
-			uint16 ylimit = mOffsetY + mSize;
-			uint16 inc = mTerrain->getSize() / mVertexDataRecord->resolution;
-
-			Real uvScale = 1.0 / (mTerrain->getSize() - 1);
-			const float* pBaseHeight = mTerrain->getHeightData(mOffsetX, mOffsetY);
-			const float* pBaseDelta = mTerrain->getDeltaData(mOffsetX, mOffsetY);
-			uint16 rowskip = mTerrain->getSize() * inc;
-			Vector3 pos;
-			float* pBuf = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
-			for (uint16 y = mOffsetY; y < ylimit; y += inc)
-			{
-				const float* pHeight = pBaseHeight;
-				const float* pDelta = pBaseDelta;
-				for (uint16 x = mOffsetX; x < xlimit; x += inc)
-				{
-					mTerrain->getPoint(x, y, *pHeight, &pos);
-					pHeight += inc;
-
-					*pBuf++ = pos.x;
-					*pBuf++ = pos.y;
-					*pBuf++ = pos.z;
-					if (morph)
-					{
-						*pBuf++ = *pDelta;
-						pDelta += inc;
-					}
-
-					if (mTerrain->getGenerateVertexNormals())
-					{
-						// complete these later
-						*pBuf++;
-						*pBuf++;
-						*pBuf++;
-					}
-
-					// UVs - base UVs vary from 0 to 1, all other values
-					// will be derived using scalings
-					*pBuf++ = x * uvScale;
-					*pBuf++ = 1.0 - (y * uvScale);
-
-					
-				}
-				pBaseHeight += rowskip;
-				pBaseDelta += rowskip;
-
-			}
-
-			// skirt spacing based on top-level resolution (* inc to cope with resolution which is not the max)
-			uint16 skirtSpacing = (mVertexDataRecord->resolution-1) / (skirtRowCols-1) * inc;
-			Vector3 skirtOffset;
-			mTerrain->getVector(0, 0, -mTerrain->getSkirtSize(), &skirtOffset);
-			// skirt rows
-			pBaseHeight = mTerrain->getHeightData(mOffsetX, mOffsetY);
-			for (uint16 y = mOffsetY; y < ylimit; y += skirtSpacing)
-			{
-				const float* pHeight = pBaseHeight;
-				for (uint16 x = mOffsetX; x < xlimit; x += inc)
-				{
-					mTerrain->getPoint(x, y, *pHeight, &pos);
-					pHeight += inc;
-
-					pos += skirtOffset;
-
-					*pBuf++ = pos.x;
-					*pBuf++ = pos.y;
-					*pBuf++ = pos.z;
-					if (morph)
-						*pBuf++ = 0; // no morphing
-
-					if (mTerrain->getGenerateVertexNormals())
-					{
-						// complete these later - should be a copy of the main
-						*pBuf++;
-						*pBuf++;
-						*pBuf++;
-					}
-
-					// UVs - same as base
-					*pBuf++ = x * uvScale;
-					*pBuf++ = 1.0 - (y * uvScale);
-				}
-				pBaseHeight += rowskip * skirtSpacing;
-			}
-			// skirt cols
-			uint16 colskip = inc * skirtSpacing;
-			for (uint16 x = mOffsetX; x < xlimit; x += skirtSpacing)
-			{
-				for (uint16 y = mOffsetY; y < ylimit; y += inc)
-				{
-					mTerrain->getPoint(x, y, mTerrain->getHeight(x, y), &pos);
-					pos += skirtOffset;
-
-					*pBuf++ = pos.x;
-					*pBuf++ = pos.y;
-					*pBuf++ = pos.z;
-					if (morph)
-						*pBuf++ = 0; // no morphing
-
-					if (mTerrain->getGenerateVertexNormals())
-					{
-						// complete these later - should be a copy of the main
-						*pBuf++;
-						*pBuf++;
-						*pBuf++;
-					}
-
-					// UVs - same as base
-					*pBuf++ = x * uvScale;
-					*pBuf++ = 1.0 - (y * uvScale);
-				}
-			}
-
-			vbuf->unlock();
-
+			
+			Rect updateRect(mOffsetX, mOffsetY, mBoundaryX, mBoundaryY);
+			updateVertexBuffer(vbuf, updateRect);
 			bufbind->setBinding(0, vbuf);
+		}
+	}
+	//----------------------------------------------------------------------
+	void TerrainQuadTreeNode::updateVertexBuffer(HardwareVertexBufferSharedPtr& vbuf, const Rect& rect)
+	{
+		// potentially reset our bounds depending on coverage of the update
+		resetBounds(rect);
 
+		bool morph = mTerrain->getUseLodMorph() && 
+			Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_VERTEX_PROGRAM);
+
+		long destOffsetX = rect.left - mOffsetX;
+		long destOffsetY = rect.top - mOffsetY;
+		// Fill the buffers
+		// Main data
+		uint16 inc = mTerrain->getSize() / mVertexDataRecord->resolution;
+		
+		HardwareBuffer::LockOptions lockMode;
+		if (destOffsetX || destOffsetY || rect.right - rect.left < mSize
+			|| rect.bottom - rect.top < mSize)
+		{
+			lockMode = HardwareBuffer::HBL_NORMAL;
+		}
+		else
+		{
+			lockMode = HardwareBuffer::HBL_DISCARD;
+		}
+
+		Real uvScale = 1.0 / (mTerrain->getSize() - 1);
+		const float* pBaseHeight = mTerrain->getHeightData(rect.left, rect.top);
+		const float* pBaseDelta = mTerrain->getDeltaData(rect.left, rect.top);
+		uint16 rowskip = mTerrain->getSize() * inc;
+		uint16 destRowSkip = mVertexDataRecord->resolution * vbuf->getVertexSize();
+		Vector3 pos;
+		float* pRootBuf = static_cast<float*>(vbuf->lock(lockMode));
+		float* pRowBuf = pRootBuf;
+		// skip dest buffer in by left/top
+		pRowBuf += destOffsetY * destRowSkip + destOffsetX * vbuf->getVertexSize();
+		for (uint16 y = rect.top; y < rect.bottom; y += inc)
+		{
+			const float* pHeight = pBaseHeight;
+			const float* pDelta = pBaseDelta;
+			float* pBuf = pRowBuf;
+			for (uint16 x = rect.left; x < rect.right; x += inc)
+			{
+				mTerrain->getPoint(x, y, *pHeight, &pos);
+				pHeight += inc;
+
+				*pBuf++ = pos.x;
+				*pBuf++ = pos.y;
+				*pBuf++ = pos.z;
+				if (morph)
+				{
+					*pBuf++ = *pDelta;
+					pDelta += inc;
+				}
+
+				if (mTerrain->getGenerateVertexNormals())
+				{
+					// complete these later
+					*pBuf++;
+					*pBuf++;
+					*pBuf++;
+				}
+
+				// UVs - base UVs vary from 0 to 1, all other values
+				// will be derived using scalings
+				*pBuf++ = x * uvScale;
+				*pBuf++ = 1.0 - (y * uvScale);
+				
+				// Update bounds
+				mergeIntoBounds(x, y, pos);
+
+				
+			}
+			pBaseHeight += rowskip;
+			pBaseDelta += rowskip;
+			pRowBuf += destRowSkip;
 
 		}
 
+		// skirt spacing based on top-level resolution (* inc to cope with resolution which is not the max)
+		uint16 skirtSpacing = (mVertexDataRecord->resolution-1) / (mVertexDataRecord->numSkirtRowsCols-1) * inc;
+		Vector3 skirtOffset;
+		mTerrain->getVector(0, 0, -mTerrain->getSkirtSize(), &skirtOffset);
+
+		// clamp to skirt spacing (round up)
+		long skirtStartX = rect.left;
+		if (skirtStartX % skirtSpacing)
+			skirtStartX += skirtSpacing - (skirtStartX % skirtSpacing);
+		long skirtStartY = rect.top;
+		if (skirtStartY % skirtSpacing)
+			skirtStartY += skirtSpacing - (skirtStartY % skirtSpacing);
+		
+		// skirt rows
+		pBaseHeight = mTerrain->getHeightData(skirtStartX, skirtStartY);
+		// position dest buffer just after the main vertex data
+		pRowBuf = pRootBuf + vbuf->getVertexSize() 
+			* mVertexDataRecord->resolution * mVertexDataRecord->resolution;
+		// move it onwards to skip the skirts we don't need to update
+		pRowBuf += destRowSkip * (skirtStartY - mOffsetY) / skirtSpacing;
+		pRowBuf += vbuf->getVertexSize() * (skirtStartX - mOffsetX) / skirtSpacing;
+		for (uint16 y = skirtStartY; y < rect.bottom; y += skirtSpacing)
+		{
+			const float* pHeight = pBaseHeight;
+			float* pBuf = pRowBuf;
+			for (uint16 x = skirtStartX; x < rect.right; x += inc)
+			{
+				mTerrain->getPoint(x, y, *pHeight, &pos);
+				pHeight += inc;
+
+				pos += skirtOffset;
+
+				*pBuf++ = pos.x;
+				*pBuf++ = pos.y;
+				*pBuf++ = pos.z;
+				if (morph)
+					*pBuf++ = 0; // no morphing
+
+				if (mTerrain->getGenerateVertexNormals())
+				{
+					// complete these later - should be a copy of the main
+					*pBuf++;
+					*pBuf++;
+					*pBuf++;
+				}
+
+				// UVs - same as base
+				*pBuf++ = x * uvScale;
+				*pBuf++ = 1.0 - (y * uvScale);
+			}
+			pBaseHeight += rowskip * skirtSpacing;
+			pRowBuf += destRowSkip;
+		}
+		// skirt cols
+		// position dest buffer just after the main vertex data and skirt rows
+		pRowBuf = pRootBuf + vbuf->getVertexSize() 
+		* mVertexDataRecord->resolution * mVertexDataRecord->resolution;
+		// skip the row skirts
+		pRowBuf += mVertexDataRecord->numSkirtRowsCols * mVertexDataRecord->resolution * vbuf->getVertexSize();
+		// move it onwards to skip the skirts we don't need to update
+		pRowBuf += destRowSkip * (skirtStartX - mOffsetX) / skirtSpacing;
+		pRowBuf += vbuf->getVertexSize() * (skirtStartY - mOffsetY) / skirtSpacing;
+		
+		for (uint16 x = skirtStartX; x < rect.right; x += skirtSpacing)
+		{
+			float* pBuf = pRowBuf;
+			for (uint16 y = skirtStartY; y < rect.bottom; y += inc)
+			{
+				mTerrain->getPoint(x, y, mTerrain->getHeight(x, y), &pos);
+				pos += skirtOffset;
+
+				*pBuf++ = pos.x;
+				*pBuf++ = pos.y;
+				*pBuf++ = pos.z;
+				if (morph)
+					*pBuf++ = 0; // no morphing
+
+				if (mTerrain->getGenerateVertexNormals())
+				{
+					// complete these later - should be a copy of the main
+					*pBuf++;
+					*pBuf++;
+					*pBuf++;
+				}
+
+				// UVs - same as base
+				*pBuf++ = x * uvScale;
+				*pBuf++ = 1.0 - (y * uvScale);
+			}
+			pRowBuf += destRowSkip;
+		}
+
+		vbuf->unlock();
+		
+		mVertexDataRecord->gpuVertexDataDirty = true;
+
+	}
+	//---------------------------------------------------------------------
+	uint16 TerrainQuadTreeNode::calcSkirtVertexIndex(uint16 mainIndex, bool isCol)
+	{
+		const VertexDataRecord* vdr = getVertexDataRecord();
+		uint16 row = mainIndex / vdr->resolution;
+		uint16 col = mainIndex % vdr->resolution;
+		
+		// No offsets used here, this is an index into the current vertex data, 
+		// which is already relative
+		if (isCol)
+		{
+			uint16 base = vdr->numSkirtRowsCols * vdr->resolution;
+			return base + vdr->resolution * col + row;
+		}
+		else
+		{
+			return vdr->resolution * row + col;
+		}
+		
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::destroyCpuVertexData()
@@ -506,8 +596,160 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::createCpuIndexData()
+	{
+		for (size_t lod = 0; lod < mLodLevels.size(); ++lod)
+		{
+			LodLevel* ll = mLodLevels[lod];
+
+			OGRE_DELETE ll->cpuIndexData;
+
+			ll->cpuIndexData = OGRE_NEW IndexData();
+
+			if (mTerrain->getUseTriangleStrips())
+				createTriangleStripBuffer(ll->batchSize, ll->cpuIndexData);
+			else
+				createTriangleListBuffer(ll->batchSize, ll->cpuIndexData);
+			
+		}
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::createTriangleListBuffer(uint16 batchSize, IndexData* destData)
+	{
+		/* Triangles are this shape for all rows:
+		 6---7---8
+		 | \ | \ |
+		 3---4---5
+		 | \ | \ |
+		 0---1---2
+		 Represented as (0,1,3), (3,1,4) etc
+		Skirts are added to the end of the list, and for consistency with the
+		strip generation of skirts, are generated from the top-right and go
+		anticlockwise around the edge. This goes: (8,s8,7,s8,s7,7,7,s7,6,s7,s6,6)
+		 for the top edge, and correspondingly for the other edges.
+		*/
+		
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::createTriangleStripBuffer(uint16 batchSize, IndexData* destData)
+	{
+		/* For even / odd tri strip rows, triangles are this shape:
+		6---7---8
+		| \ | \ |
+		3---4---5
+		| / | / |
+		0---1---2
+		Note how vertex rows count upwards. In order to match up the anti-clockwise
+		winding and this upward transitioning list, we need to start from the
+		right hand side. So we get (2,5,1,4,0,3) etc on even lines (right-left)
+		and (3,6,4,7,5,8) etc on odd lines (left-right). At the turn, we emit the end index 
+		twice, this forms a degenerate triangle, which lets us turn without any artefacts. 
+		So the full list in this simple case is (2,5,1,4,0,3,3,6,4,7,5,8)
+
+		Skirts are part of the same strip, so after finishing on 8, where sX is
+		 the skirt vertex corresponding to main vertex X, we go
+		 anticlockwise around the edge, (s8,7,s7,6,s6) to do the top skirt, 
+		then (3,s3,0,s0),(1,s1,2,s2),(5,s5,8,s8) to finish the left, bottom, and
+		 right skirts respectively.
+		*/
+
+		// to issue a complete row, it takes issuing the upper and lower row
+		// this includes the degenerate triangle
+		size_t indexesPerRow = batchSize * 2;
+		size_t numRows = batchSize - 1;
+		size_t mainIndexCount = indexesPerRow * numRows;
+		// skirts take indexesPerRow for the first one, then indexesPerRow-1 for the
+		// other 3 sides because we chain then together
+		size_t skirtIndexCount = indexesPerRow + (indexesPerRow - 1) * 3;
+		
+		destData->indexStart = 0;
+		destData->indexCount = mainIndexCount + skirtIndexCount;
+		destData->indexBuffer.bind(OGRE_NEW DefaultHardwareIndexBuffer(
+			HardwareIndexBuffer::IT_16BIT, destData->indexCount, HardwareBuffer::HBU_STATIC)); 
+		
+		uint16* pI = static_cast<uint16*>(destData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+		
+		// Main terrain area
+		size_t vertexIncrement = (getVertexDataRecord()->resolution - 1) / (batchSize - 1);
+		size_t rowSize = getVertexDataRecord()->resolution * vertexIncrement;
+		uint16 currentVertex = batchSize * vertexIncrement;
+		bool rightToLeft = true;
+		for (uint16 r = 0; r < numRows; ++r)
+		{
+			for (uint16 c = 0; c < batchSize - 1; ++c)
+			{
+								
+				*pI++ = currentVertex;
+				*pI++ = currentVertex + rowSize;
+				
+				currentVertex = rightToLeft ? 
+					currentVertex - vertexIncrement : currentVertex + vertexIncrement;
+				
+			}
+			rightToLeft = !rightToLeft;
+			currentVertex += rowSize;
+		}
+		
+		
+		// Skirts
+		for (uint16 s = 0; s < 4; ++s)
+		{
+			int edgeIncrement;
+			switch(s)
+			{
+				case 0: // top
+					edgeIncrement = -static_cast<int>(vertexIncrement);
+					break;
+				case 1: // left
+					edgeIncrement = -static_cast<int>(rowSize);
+					break;
+				case 2: // bottom
+					edgeIncrement = static_cast<int>(vertexIncrement);
+					break;
+				case 3: // right
+					edgeIncrement = static_cast<int>(rowSize);
+					break;
+			}
+			// Skirts are stored in contiguous rows / columns (rows 0/2, cols 1/3)
+			uint16 skirtIndex = calcSkirtVertexIndex(currentVertex, (s % 2) != 0);
+			for (uint16 c = 0; c < batchSize - 1; ++c)
+			{
+				*pI++ = currentVertex;
+				*pI++ = skirtIndex;	
+				currentVertex += edgeIncrement;
+				skirtIndex += vertexIncrement;
+			}
+			if (s == 3)
+			{
+				// we issue an extra 2 indices to finish the skirt off
+				*pI++ = currentVertex;
+				*pI++ = skirtIndex;
+				currentVertex += edgeIncrement;
+				skirtIndex += vertexIncrement;
+			}
+		}
+		
+		
+
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::destroyCpuIndexData()
+	{
+		for (size_t lod = 0; lod < mLodLevels.size(); ++lod)
+		{
+			LodLevel* ll = mLodLevels[lod];
+
+			OGRE_DELETE ll->cpuIndexData;
+			ll->cpuIndexData = 0;
+		}
+
+	}
+	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::createGpuVertexData()
 	{
+		// TODO - mutex cpu data
 		if (mVertexDataRecord && mVertexDataRecord->cpuVertexData)
 		{
 			destroyGpuVertexData();
@@ -515,9 +757,20 @@ namespace Ogre
 			// clone CPU data into GPU data
 			// default is to create new declarations from hardware manager
 			mVertexDataRecord->gpuVertexData = mVertexDataRecord->cpuVertexData->clone();
-
+			mVertexDataRecord->gpuVertexDataDirty = false;
 		}
 
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::updateGpuVertexData()
+	{
+		// TODO - mutex cpu data
+		if (mVertexDataRecord->gpuVertexDataDirty)
+		{
+			mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(0)->
+				copyData(*mVertexDataRecord->cpuVertexData->vertexBufferBinding->getBuffer(0).get());
+			mVertexDataRecord->gpuVertexDataDirty = false;
+		}
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::destroyGpuVertexData()
@@ -530,6 +783,130 @@ namespace Ogre
 
 
 	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::createGpuIndexData()
+	{
+		for (size_t lod = 0; lod < mLodLevels.size(); ++lod)
+		{
+			LodLevel* ll = mLodLevels[lod];
+
+			OGRE_DELETE ll->gpuIndexData;
+			// clone, using default buffer manager ie hardware
+			ll->gpuIndexData = ll->cpuIndexData->clone();
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::destroyGpuIndexData()
+	{
+		for (size_t lod = 0; lod < mLodLevels.size(); ++lod)
+		{
+			LodLevel* ll = mLodLevels[lod];
+
+			OGRE_DELETE ll->gpuIndexData;
+			ll->gpuIndexData = 0;
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::mergeIntoBounds(long x, long y, const Vector3& pos)
+	{
+		if (pointIntersectsNode(x, y))
+		{
+			// Make relative to local centre
+			Vector3 localPos = pos - mLocalCentre;
+			mAABB.merge(localPos);
+			mBoundingRadius = std::max(mBoundingRadius, localPos.length());
+			
+			if (!isLeaf())
+			{
+				for (int i = 0; i < 4; ++i)
+					mChildren[i]->mergeIntoBounds(x, y, pos);
+			}
+		}
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::resetBounds(const Rect& rect)
+	{
+		if (rectIntersectsNode(rect))
+		{
+			mAABB.setNull();
+			mBoundingRadius = 0;
+			
+			if (!isLeaf())
+			{
+				for (int i = 0; i < 4; ++i)
+					mChildren[i]->resetBounds(rect);
+			}
+
+			
+		}
+	}
+	//---------------------------------------------------------------------
+	bool TerrainQuadTreeNode::rectIntersectsNode(const Rect& rect)
+	{
+		return (rect.right >= mOffsetX && rect.left <= mBoundaryX &&
+				rect.bottom >= mOffsetY && rect.top <= mBoundaryY);
+	}
+	//---------------------------------------------------------------------
+	bool TerrainQuadTreeNode::pointIntersectsNode(long x, long y)
+	{
+		return x >= mOffsetX && x < mBoundaryX && 
+			y >= mOffsetY && y < mBoundaryY;
+	}
+	//---------------------------------------------------------------------
+	const AxisAlignedBox& TerrainQuadTreeNode::getAABB() const
+	{
+		return mAABB;
+	}
+	//---------------------------------------------------------------------
+	Real TerrainQuadTreeNode::getBoundingRadius() const
+	{
+		return mBoundingRadius;
+	}
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	TerrainQuadTreeNode::Movable::Movable(TerrainQuadTreeNode* parent)
+		: mParent(parent)
+	{
+
+	}
+	//---------------------------------------------------------------------
+	TerrainQuadTreeNode::Movable::~Movable()
+	{
+
+	}
+	//---------------------------------------------------------------------
+	const String& TerrainQuadTreeNode::Movable::getMovableType(void) const
+	{
+		static String stype("OgreTerrainNodeMovable");
+
+		return stype;
+
+	}
+	//---------------------------------------------------------------------
+	const AxisAlignedBox& TerrainQuadTreeNode::Movable::getBoundingBox(void) const
+	{
+		return mParent->getAABB();
+	}
+	//---------------------------------------------------------------------
+	Real TerrainQuadTreeNode::Movable::getBoundingRadius(void) const
+	{
+		return mParent->getBoundingRadius();
+	}
+	//------------------------------------------------------------------------
+	void TerrainQuadTreeNode::Movable::_updateRenderQueue(RenderQueue* queue)
+	{
+		// TODO
+	}
+	//------------------------------------------------------------------------
+	void TerrainQuadTreeNode::Movable::visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables)
+	{
+		// TODO
+	}
+	//------------------------------------------------------------------------
+
+	
 
 
 

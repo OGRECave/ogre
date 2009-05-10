@@ -281,7 +281,18 @@ namespace Ogre {
 				srcBuffer.unlock();
 			}
 
-            /// Updates the real buffer from the shadow buffer, if required
+			/** Copy all data from another buffer into this one. 
+			@remarks
+				Normally these buffers should be of identical size, but if they're
+				not, the routine will use the smallest of the two sizes.
+			*/
+			virtual void copyData(HardwareBuffer& srcBuffer)
+			{
+				size_t sz = std::min(getSizeInBytes(), srcBuffer.getSizeInBytes()); 
+				copyData(srcBuffer, 0, 0, sz, true);
+			}
+			
+			/// Updates the real buffer from the shadow buffer, if required
             virtual void _updateFromShadow(void)
             {
                 if (mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)

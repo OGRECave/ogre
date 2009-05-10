@@ -33,11 +33,14 @@ Torus Knot Software Ltd.
 #include "OgreTerrainPrerequisites.h"
 #include "OgreCommon.h"
 #include "OgreHardwareIndexBuffer.h"
+#include "OgreMovableObject.h"
 
 
 
 namespace Ogre
 {
+	class HardwareVertexBufferSharedPtr;
+	
 	/** \addtogroup Optional Components
 	*  @{
 	*/
@@ -123,10 +126,14 @@ namespace Ogre
 		{
 			/// Number of vertices rendered down one side (not including skirts)
 			uint16 batchSize;
-			/// Index buffer used to render this level from the main vertex data
-			HardwareIndexBufferSharedPtr indexBuffer;
+			/// index data referencing the main vertex data but in CPU buffers (built in background)
+			IndexData* cpuIndexData;
+			/// "Real" index data on the gpu
+			IndexData* gpuIndexData;
 			/// Maximum delta height between this and the next lower lod
 			Real maxHeightDelta;
+
+			LodLevel() : cpuIndexData(0), gpuIndexData(0) {}
 		};
 		typedef vector<LodLevel*>::type LodLevelList;
 
@@ -159,6 +166,33 @@ namespace Ogre
 		void useAncestorVertexData(TerrainQuadTreeNode* owner, uint16 treeDepthEnd, uint16 resolution);
 
 
+		/** Merge a point (relative to terrain node) into the local bounds, 
+			and that of children if applicable.
+		@param x,y The point on the terrain to which this position corresponds 
+			(affects which nodes update their bounds)
+		@param pos The position relative to the terrain centre
+		*/
+		void mergeIntoBounds(long x, long y, const Vector3& pos);
+		/** Reset the bounds of this node and all its children for the region given.
+		@param rect The region for which bounds should be reset, in top-level terrain coords
+		*/
+		void resetBounds(const Rect& rect);
+		
+		/** Returns true if the given rectangle overlaps the terrain area that
+			this node references.
+		 @param rect The region in top-level terrain coords
+		*/
+		bool rectIntersectsNode(const Rect& rect);
+		/** Returns true if the given point is in the terrain area that
+		 this node references.
+		 @param x,y The point in top-level terrain coords
+		 */
+		bool pointIntersectsNode(long x, long y);
+
+		/// Get the AABB (local coords) of this node
+		const AxisAlignedBox& getAABB() const;
+		/// Get the bounding radius of this node
+		Real getBoundingRadius() const;
 
 	protected:
 		Terrain* mTerrain;
@@ -173,9 +207,9 @@ namespace Ogre
 		uint16 mBaseLod;
 		uint16 mDepth;
 		uint16 mQuadrant;
-		/// Although this node shares vertex data with other nodes, its skirt is all its own
-		uint16 mSkirtVertexStart;
-
+		Vector3 mLocalCentre; // relative to terrain centre
+		AxisAlignedBox mAABB; //relative to mLocalCentre
+		Real mBoundingRadius; //relative to mLocalCentre
 
 		struct VertexDataRecord : public TerrainAlloc
 		{
@@ -185,20 +219,78 @@ namespace Ogre
 			uint16 resolution;
 			/// Number of quadtree levels (including this one) this data applies to
 			uint16 treeLevels;
+			/// Number of rows and columns of skirts
+			uint16 numSkirtRowsCols;
+			/// Is the GPU vertex data out of date?
+			bool gpuVertexDataDirty;
 
 			VertexDataRecord(uint16 res, uint16 lvls) 
-				: cpuVertexData(0), gpuVertexData(0), resolution(res), treeLevels(lvls) {}
+				: cpuVertexData(0), gpuVertexData(0), resolution(res), 
+				treeLevels(lvls), gpuVertexDataDirty(false) {}
 		};
 		
 		TerrainQuadTreeNode* mNodeWithVertexData;
 		VertexDataRecord* mVertexDataRecord;
 
+		/** MovableObject implementation to provide the hook to the scene.
+		@remarks
+			In one sense, it would be most convenient to have a single MovableObject
+			to represent the whole Terrain object, and then internally perform
+			some quadtree frustum culling to narrow down which specific tiles are rendered.
+			However, the one major flaw with that is that exposing the bounds to 
+			the SceneManager at that level prevents it from doing anything smarter
+			in terms of culling - for example a portal or occlusion culling SceneManager
+			would have no opportunity to process the leaf nodes in those terms, and
+			a simple frustum cull may give significantly poorer results. 
+		@par
+			Therefore, we in fact register a MovableObject at every node, and 
+			use the LOD factor to determine which one is currently active. LODs
+			must be mutually exclusive and to deal with precision errors, we really
+			need to evaluate them all at once, rather than as part of the 
+			_notifyCurrentCamera function. Therefore we register a GlobalRenderTargetListener
+			to listen in on pre-renders of all viewports and to precalculate
+			which nodes will be displayed when it comes to purely a LOD basis.
+		*/
+		class Movable : public MovableObject
+		{
+		protected:
+			TerrainQuadTreeNode* mParent;
+		public:
+			Movable(TerrainQuadTreeNode* parent);
+			~Movable();
+			
+	        // necessary overrides
+			const String& getMovableType(void) const;
+			const AxisAlignedBox& getBoundingBox(void) const;
+			Real getBoundingRadius(void) const;
+			void _updateRenderQueue(RenderQueue* queue);
+			void visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables = false);
+			
+			
+		};
+		Movable* mMovable;
+
+
 		const VertexDataRecord* getVertexDataRecord() const;
 		void createCpuVertexData();
+		/* Update the vertex buffer - the rect in question is relative to the whole terrain, 
+			not the local vertex data (which may use a subset)
+		*/
+		void updateVertexBuffer(HardwareVertexBufferSharedPtr& vbuf, const Rect& rect);
+		void createCpuIndexData();
 		void destroyCpuVertexData();
+		void destroyCpuIndexData();
 
 		void createGpuVertexData();
 		void destroyGpuVertexData();
+		void updateGpuVertexData();
+		void createGpuIndexData();
+		void destroyGpuIndexData();
+
+		void createTriangleListBuffer(uint16 batchSize, IndexData* destData);
+		void createTriangleStripBuffer(uint16 batchSize, IndexData* destData);
+		
+		uint16 calcSkirtVertexIndex(uint16 mainIndex, bool isCol);
 
 	};
 

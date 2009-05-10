@@ -33,6 +33,7 @@ Torus Knot Software Ltd.
 #include "OgreTerrainPrerequisites.h"
 #include "OgreCommon.h"
 #include "OgreVector3.h"
+#include "OgreAxisAlignedBox.h"
 
 
 namespace Ogre
@@ -418,15 +419,20 @@ namespace Ogre
 		*/
 		uint16 getResolutionAtLod(uint16 lodLevel);
 
-    /** Test for intersection of a given ray with the terrain. If the ray hits
-      the terrain, the point of intersection is returned.
-    @param ray The ray to test for intersection
-    @return A pair which contains whether the ray hit the terrain and, if so, where.
-    @remarks This can be called from any thread as long as no parallel write to
-      the heightmap data occurs.
-    */
-    std::pair<bool, Vector3> rayIntersects(const Ray& ray); //const;
-
+		/** Test for intersection of a given ray with the terrain. If the ray hits
+		 the terrain, the point of intersection is returned.
+		 @param ray The ray to test for intersection
+		 @return A pair which contains whether the ray hit the terrain and, if so, where.
+		 @remarks This can be called from any thread as long as no parallel write to
+		 the heightmap data occurs.
+		 */
+		std::pair<bool, Vector3> rayIntersects(const Ray& ray); //const;
+		
+		/// Get the AABB (local coords) of the entire terrain
+		const AxisAlignedBox& getAABB() const;
+		/// Get the bounding radius of the entire terrain
+		Real getBoundingRadius() const;
+		
 	protected:
 
 		void freeCPUResources();
@@ -475,6 +481,7 @@ namespace Ogre
 		bool mGenerateNormalMap;
 		bool mGenerateShadowMap;
 		bool mGenerateHorizonMap;
+		
 
 	};
 
