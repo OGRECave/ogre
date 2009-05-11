@@ -619,6 +619,9 @@ namespace Ogre {
         /** Removes a resource location from the search path. */ 
         void removeResourceLocation(const String& name, 
 			const String& resGroup = DEFAULT_RESOURCE_GROUP_NAME);
+        /** Verify if a resource location exists for the given group. */ 
+		bool ResourceGroupManager::resourceLocationExists(const String& name, 
+			const String& resGroup = DEFAULT_RESOURCE_GROUP_NAME);
 
         /** Declares a resource to be a part of a resource group, allowing you 
             to load and unload it as part of the group.

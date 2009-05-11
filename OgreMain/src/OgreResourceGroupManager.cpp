@@ -503,6 +503,27 @@ namespace Ogre {
 		return (grp->groupStatus == ResourceGroup::LOADED);
     }
     //-----------------------------------------------------------------------
+    bool ResourceGroupManager::resourceLocationExists(const String& name, 
+        const String& resGroup)
+    {
+		ResourceGroup* grp = getResourceGroup(resGroup);
+		if (!grp)
+			return false;
+
+		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME) // lock group mutex
+
+		LocationList::iterator li, liend;
+		liend = grp->locationList.end();
+		for (li = grp->locationList.begin(); li != liend; ++li)
+		{
+			Archive* pArch = (*li)->archive;
+			if (pArch->getName() == name)
+				// Delete indexes
+				return true;
+		}
+		return false;
+	}
+    //-----------------------------------------------------------------------
     void ResourceGroupManager::addResourceLocation(const String& name, 
         const String& locType, const String& resGroup, bool recursive)
     {
