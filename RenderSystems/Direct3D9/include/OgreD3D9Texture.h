@@ -305,7 +305,7 @@ namespace Ogre {
             mColourDepth = Ogre::PixelUtil::getNumElemBits(mBuffer->getFormat());
         }
 
-        virtual void update(void);
+        virtual void update(bool swapBuffers);
 
 		virtual void getCustomAttribute( const String& name, void *pData );
 

@@ -1485,14 +1485,14 @@ namespace Ogre
 
 
 	/****************************************************************************************/
-    void D3D9RenderTexture::update(void)
+    void D3D9RenderTexture::update(bool swapBuffers)
     {
         D3D9RenderSystem* rs = static_cast<D3D9RenderSystem*>(
             Root::getSingleton().getRenderSystem());
         if (rs->isDeviceLost())
             return;
 
-        RenderTexture::update();
+        RenderTexture::update(swapBuffers);
     }
 	//---------------------------------------------------------------------
 	void D3D9RenderTexture::getCustomAttribute( const String& name, void *pData )

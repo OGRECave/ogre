@@ -97,14 +97,14 @@ namespace Ogre
 		checkAndUpdate();
 	}
 
-    void D3D9MultiRenderTarget::update(void)
+    void D3D9MultiRenderTarget::update(bool swapBuffers)
     {
         D3D9RenderSystem* rs = static_cast<D3D9RenderSystem*>(
             Root::getSingleton().getRenderSystem());
         if (rs->isDeviceLost())
             return;
 
-        MultiRenderTarget::update();
+        MultiRenderTarget::update(swapBuffers);
     }
 
 	void D3D9MultiRenderTarget::getCustomAttribute(const String& name, void *pData)
