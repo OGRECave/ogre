@@ -3952,6 +3952,17 @@ void SceneManager::firePostFindVisibleObjects(Viewport* v)
 
 }
 //---------------------------------------------------------------------
+void SceneManager::fireSceneManagerDestroyed()
+{
+	ListenerList::iterator i, iend;
+
+	iend = mListeners.end();
+	for (i = mListeners.begin(); i != iend; ++i)
+	{
+		(*i)->sceneManagerDestroyed(this);
+	}
+}
+//---------------------------------------------------------------------
 void SceneManager::setViewport(Viewport* vp)
 {
     mCurrentViewport = vp;

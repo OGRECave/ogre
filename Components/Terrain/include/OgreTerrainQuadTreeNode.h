@@ -194,6 +194,22 @@ namespace Ogre
 		/// Get the bounding radius of this node
 		Real getBoundingRadius() const;
 
+		/** Calculate appropriate LOD for this node and children
+		@param cam The camera to be used (this should already be the LOD camera)
+		@param cFactor The cFactor which incorporates the viewport size, max pixel error and lod bias
+		@returns true if this node or any of its children were selected for rendering
+		*/
+		bool calculateCurrentLod(const Camera* cam, Real cFactor);
+
+		/// Get the current LOD index (only valid after calculateCurrentLod
+		int getCurrentLod() const { return mCurrentLod; }
+		/// Manually set the current LOD, intended for internal use only
+		void setCurrentLod(int lod) { mCurrentLod = lod; }
+		/// Get the transition state between the current LOD and the next lower one
+		float getLodTransition() const { return mLodTransition; }
+		/// Manually set the current LOD transition state, intended for internal use only
+		void setLodTransition(float t) { mLodTransition = t; }
+
 	protected:
 		Terrain* mTerrain;
 		TerrainQuadTreeNode* mParent;
@@ -210,6 +226,8 @@ namespace Ogre
 		Vector3 mLocalCentre; // relative to terrain centre
 		AxisAlignedBox mAABB; //relative to mLocalCentre
 		Real mBoundingRadius; //relative to mLocalCentre
+		int mCurrentLod; // -1 = none (do not render)
+		float mLodTransition; // 0-1 transition to lower LOD
 
 		struct VertexDataRecord : public TerrainAlloc
 		{
@@ -247,9 +265,9 @@ namespace Ogre
 			use the LOD factor to determine which one is currently active. LODs
 			must be mutually exclusive and to deal with precision errors, we really
 			need to evaluate them all at once, rather than as part of the 
-			_notifyCurrentCamera function. Therefore we register a GlobalRenderTargetListener
-			to listen in on pre-renders of all viewports and to precalculate
-			which nodes will be displayed when it comes to purely a LOD basis.
+			_notifyCurrentCamera function. Therefore the root Terrain registers
+			a SceneManager::Listener to precalculate which nodes will be displayed 
+			when it comes to purely a LOD basis.
 		*/
 		class Movable : public MovableObject
 		{

@@ -34,6 +34,7 @@ Torus Knot Software Ltd.
 #include "OgreCommon.h"
 #include "OgreVector3.h"
 #include "OgreAxisAlignedBox.h"
+#include "OgreSceneManager.h"
 
 
 namespace Ogre
@@ -106,7 +107,7 @@ namespace Ogre
 	</tr>
 	</table>
 	*/
-	class _OgreTerrainExport Terrain : public TerrainAlloc
+	class _OgreTerrainExport Terrain : public SceneManager::Listener, public TerrainAlloc
 	{
 	public:
 		Terrain(SceneManager* sm);
@@ -361,15 +362,15 @@ namespace Ogre
 		/** Whether to use triangle strips or not then rendering terrain
 			(default true, set for new Terrain using TerrainGlobalOptions)
 		*/
-		bool getUseTriangleStrips() { return mUseTriangleStrips; }
+		bool getUseTriangleStrips() const { return mUseTriangleStrips; }
 		/** Whether to morph between LODs using a vertex program. 
 			(default true, set for new Terrain using TerrainGlobalOptions)
 		*/
-		bool getUseLodMorph() { return mUseLodMorph; }
+		bool getUseLodMorph() const { return mUseLodMorph; }
 		/** The default size of 'skirts' used to hide terrain cracks
 			(default 10, set for new Terrain using TerrainGlobalOptions)
 		*/
-		Real getSkirtSize() { return mSkirtSize; }
+		Real getSkirtSize() const { return mSkirtSize; }
 		/** Whether to include normals in the terrain geometry to support basic dynamic
 		lighting. 
 		@note Including normals in the terrain geometry is usually not recommended, 
@@ -381,24 +382,24 @@ namespace Ogre
 		and instead use baked lightmaps.
 		(default false, set for new Terrain using TerrainGlobalOptions)
 		*/
-		bool getGenerateVertexNormals() { return mGenerateVertexNormals; }
+		bool getGenerateVertexNormals() const { return mGenerateVertexNormals; }
 
 		/** Whether to generate a texture containing the normals of the terrain. 
 		(default true, set for new Terrain using TerrainGlobalOptions)
 		*/
-		bool getGenerateNormalMap() { return mGenerateNormalMap; }
+		bool getGenerateNormalMap() const { return mGenerateNormalMap; }
 		/** Whether to generate a texture containing the shadows of the terrain at
 			a particular time of day.
 		(default false, set for new Terrain using TerrainGlobalOptions)
 		*/
-		bool getGenerateShadowMap() { return mGenerateShadowMap; }
+		bool getGenerateShadowMap() const { return mGenerateShadowMap; }
 
 		/** Whether to generate a horizon map containing the angles of the horizon
 			along a given linear sun track, which allows real-time shadows to be
 			generated for the terrain very cheaply without using shadow textures.
 			(default false, set for new Terrain using TerrainGlobalOptions)		
 		*/
-		bool getGenerateHorizonMap() { return mGenerateHorizonMap; }
+		bool getGenerateHorizonMap() const { return mGenerateHorizonMap; }
 
 		/// Get the total number of LOD levels in the terrain
 		uint16 getNumLodLevels() const { return mNumLodLevels; }
@@ -432,7 +433,13 @@ namespace Ogre
 		const AxisAlignedBox& getAABB() const;
 		/// Get the bounding radius of the entire terrain
 		Real getBoundingRadius() const;
-		
+
+		/// Overridden from SceneManager::Listener
+		void preFindVisibleObjects(SceneManager* source, 
+			SceneManager::IlluminationRenderStage irs, Viewport* v);
+		/// Overridden from SceneManager::Listener
+		void sceneManagerDestroyed(SceneManager* source);
+
 	protected:
 
 		void freeCPUResources();
@@ -448,6 +455,7 @@ namespace Ogre
 		@note This point is relative to Terrain::getPosition
 		*/
 		void getPointAlign(long x, long y, float height, Alignment align, Vector3* outpos);
+		void calculateCurrentLod(Viewport* vp);
     /// Test a single quad of the terrain for ray intersection.
     std::pair<bool, Vector3> checkQuadIntersection(int x, int z, const Ray& ray); //const;
 
@@ -480,13 +488,18 @@ namespace Ogre
 		bool mGenerateVertexNormals;
 		bool mGenerateNormalMap;
 		bool mGenerateShadowMap;
-		bool mGenerateHorizonMap;
-		
+		bool mGenerateHorizonMap;	
 
 	};
 
 
 
+	/** Options class which just stores default options for the terrain.
+	@remarks
+		None of these options are stored with the terrain when saved. They are
+		options that you can use to modify the behaviour of the terrain when it
+		is loaded or created. 
+	*/
 	class _OgreTerrainExport TerrainGlobalOptions
 	{
 	protected:
@@ -501,8 +514,9 @@ namespace Ogre
 		static bool msGenerateShadowMap;
 		static Vector3 msShadowMapDir;
 		static bool msGenerateHorizonMap;
-		static Radian mHorizonMapAzimuth;
-		static Radian mHorizonMapZenith;
+		static Radian msHorizonMapAzimuth;
+		static Radian msHorizonMapZenith;
+		static Real msMaxPixelError;
 	public:
 
 
@@ -599,23 +613,34 @@ namespace Ogre
 		/** Get the azimuth angle of the sun track across the terrain for use in 
 			generating the horizon map; zero is  east/west (default)
 		*/
-		static Radian getHorizonMapAzimuth() { return mHorizonMapAzimuth; }
+		static Radian getHorizonMapAzimuth() { return msHorizonMapAzimuth; }
 		/** Set the azimuth angle of the sun track across the terrain; zero is 
 		east/west (default)
 		*/
-		static void setHorizonMapAzimuth(Radian az) { mHorizonMapAzimuth = az; }
+		static void setHorizonMapAzimuth(Radian az) { msHorizonMapAzimuth = az; }
 		/** Get the current zenith angle of the sun; zero is midday (default), 
 		    -HALF_PI is sunrise, HALF_PI is sunset. This doesn't affect the 
 			calculation of the horizon map, it controls the current state in 
 			which it is used.
 		*/
-		static Radian getHorizonMapZenith() { return mHorizonMapZenith; }
+		static Radian getHorizonMapZenith() { return msHorizonMapZenith; }
 		/** Set the current zenith angle of the sun; zero is midday (default), 
 		    -HALF_PI is sunrise, HALF_PI is sunset. This doesn't affect the 
 			calculation of the horizon map, it controls the current state in 
-			which it is used.
+			which it is used, therefore this can be varied dynamically
 		*/
-		static void setHorizonMapZenith(Radian z) { mHorizonMapZenith = z; }
+		static void setHorizonMapZenith(Radian z) { msHorizonMapZenith = z; }
+
+		/** Get the maximum screen pixel error that should be allowed when rendering. */
+		static Real getMaxPixelError() { return msMaxPixelError; }
+
+		/** Set the maximum screen pixel error that should  be allowed when rendering. 
+		@note
+			This value can be varied dynamically and affects all existing terrains.
+			It will be weighted by the LOD bias on viewports. 
+		*/
+		static void setMaxPixelError(Real pixerr) { msMaxPixelError = pixerr; }
+
 	};
 
 

@@ -37,6 +37,7 @@ Torus Knot Software Ltd.
 #include "OgreException.h"
 #include "OgreBitwise.h"
 #include "OgreStringConverter.h"
+#include "OgreViewport.h"
 
 namespace Ogre
 {
@@ -55,8 +56,9 @@ namespace Ogre
 	bool TerrainGlobalOptions::msGenerateShadowMap = false;
 	Vector3 TerrainGlobalOptions::msShadowMapDir = Vector3(1, -1, 0).normalisedCopy();
 	bool TerrainGlobalOptions::msGenerateHorizonMap = false;
-	Radian TerrainGlobalOptions::mHorizonMapAzimuth = Radian(0);
-	Radian TerrainGlobalOptions::mHorizonMapZenith = Radian(0);
+	Radian TerrainGlobalOptions::msHorizonMapAzimuth = Radian(0);
+	Radian TerrainGlobalOptions::msHorizonMapZenith = Radian(0);
+	Real TerrainGlobalOptions::msMaxPixelError = 3.0;
 	//---------------------------------------------------------------------
 	Terrain::Terrain(SceneManager* sm)
 		: mSceneMgr(sm)
@@ -69,13 +71,18 @@ namespace Ogre
 		, mTreeDepth(0)
 	{
 		mRootNode = sm->getRootSceneNode()->createChildSceneNode();
+		sm->addListener(this);
 	}
 	//---------------------------------------------------------------------
 	Terrain::~Terrain()
 	{
 		freeGPUResources();
 		freeCPUResources();
-		mSceneMgr->destroySceneNode(mRootNode);
+		if (mSceneMgr)
+		{
+			mSceneMgr->destroySceneNode(mRootNode);
+			mSceneMgr->removeListener(this);
+		}
 	}
 	//---------------------------------------------------------------------
 	const AxisAlignedBox& Terrain::getAABB() const
@@ -427,17 +434,20 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::load()
 	{
-		mQuadTree->load();
+		if (mQuadTree)
+			mQuadTree->load();
 	}
 	//---------------------------------------------------------------------
 	void Terrain::unload()
 	{
-		mQuadTree->unload();
+		if (mQuadTree)
+			mQuadTree->unload();
 	}
 	//---------------------------------------------------------------------
 	void Terrain::unprepare()
 	{
-		mQuadTree->unprepare();
+		if (mQuadTree)
+			mQuadTree->unprepare();
 	}
 	//---------------------------------------------------------------------
 	float* Terrain::getHeightData()
@@ -811,7 +821,43 @@ namespace Ogre
 	{
 		return ((mSize - 1) >> lodLevel) + 1;
 	}
+	//---------------------------------------------------------------------
+	void Terrain::preFindVisibleObjects(SceneManager* source, 
+		SceneManager::IlluminationRenderStage irs, Viewport* v)
+	{
+		// only calculate LOD on main render passes
+		if (irs == SceneManager::IRS_NONE)
+			calculateCurrentLod(v);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::sceneManagerDestroyed(SceneManager* source)
+	{
+		unload();
+		unprepare();
+		if (source == mSceneMgr)
+			mSceneMgr = 0;
+	}
+	//---------------------------------------------------------------------
+	void Terrain::calculateCurrentLod(Viewport* vp)
+	{
+		if (mQuadTree)
+		{
+			// calculate error terms
+			const Camera* cam = vp->getCamera()->getLodCamera();
 
+			// A = 1 / tan(fovy)    (== 1 for fovy=45)
+			Real A = 1.0 / Math::Tan(cam->getFOVy());
+			// T = 2 * maxPixelError / vertRes
+			Real maxPixelError = TerrainGlobalOptions::getMaxPixelError() * cam->_getLodBiasInverse();
+			Real T = 2.0 * maxPixelError / (Real)vp->getActualHeight();
+
+			// CFactor = A / T
+			Real cFactor = A / T;
+
+
+			mQuadTree->calculateCurrentLod(cam, cFactor);
+		}
+	}
 	//---------------------------------------------------------------------
 	std::pair<bool, Vector3> Terrain::rayIntersects(const Ray& ray) 
 	{

@@ -240,7 +240,7 @@ namespace Ogre {
 			@param v The viewport being updated. You can get the camera from here.
 			*/
 			virtual void preFindVisibleObjects(SceneManager* source, 
-				IlluminationRenderStage irs, Viewport* v) = 0;
+				IlluminationRenderStage irs, Viewport* v) {}
 			/** Called after searching for visible objects in this SceneManager.
 			@remarks
 				Note that the render queue at this stage will be full of the current
@@ -252,7 +252,7 @@ namespace Ogre {
 			@param v The viewport being updated. You can get the camera from here.
 			*/
 			virtual void postFindVisibleObjects(SceneManager* source, 
-				IlluminationRenderStage irs, Viewport* v) = 0;
+				IlluminationRenderStage irs, Viewport* v) {}
 
 			/** Event raised after all shadow textures have been rendered into for 
 				all queues / targets but before any other geometry has been rendered
@@ -268,7 +268,7 @@ namespace Ogre {
 				This event will only be fired when texture shadows are in use.
 			@param numberOfShadowTextures The number of shadow textures in use
 			*/
-			virtual void shadowTexturesUpdated(size_t numberOfShadowTextures) = 0;
+			virtual void shadowTexturesUpdated(size_t numberOfShadowTextures) {}
 
 			/** This event occurs just before the view & projection matrices are
 		 		set for rendering into a shadow texture.
@@ -284,7 +284,7 @@ namespace Ogre {
 			@param iteration For lights that use multiple shadow textures, the iteration number
 			*/
 			virtual void shadowTextureCasterPreViewProj(Light* light, 
-				Camera* camera, size_t iteration) = 0;
+				Camera* camera, size_t iteration) {}
 			/** This event occurs just before the view & projection matrices are
 		 		set for re-rendering a shadow receiver.
 			@remarks
@@ -299,7 +299,7 @@ namespace Ogre {
 				the shadow texture
 			*/
 			virtual void shadowTextureReceiverPreViewProj(Light* light, 
-				Frustum* frustum) = 0;
+				Frustum* frustum) {}
 
 			/** Hook to allow the listener to override the ordering of lights for
 				the entire frustum.
@@ -324,6 +324,9 @@ namespace Ogre {
 			@returns true if you sorted the list, false otherwise.
 			*/
 			virtual bool sortLightsAffectingFrustum(LightList& lightList) { return false; }
+
+			/** Event notifying the listener of the SceneManager's destruction. */
+			virtual void sceneManagerDestroyed(SceneManager* source) {}
 
 
 
@@ -647,6 +650,8 @@ namespace Ogre {
 		virtual void firePreFindVisibleObjects(Viewport* v);
 		/// Internal method for firing find visible objects event
 		virtual void firePostFindVisibleObjects(Viewport* v);
+		/// Internal method for firing destruction event
+		virtual void fireSceneManagerDestroyed();
         /** Internal method for setting the destination viewport for the next render. */
         virtual void setViewport(Viewport *vp);
 

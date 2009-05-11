@@ -148,24 +148,9 @@ namespace Ogre
 
 		if (isLeaf())
 		{
-			// calculate error terms
-			// A = 1 / tan(fovy)    (== 1 for fovy=45)
-			// T = 2 * maxPixelError / vertRes
-			// CFactor = A / T
-			// delta = abs(vertex_height - interpolated_vertex_height)
-			// D2 = delta * delta * CFactor * CFactor;
-			// Must find max(D2) for any given LOD
-
-			// delta varies by vertex but not by viewport
-			// CFactor varies by viewport (fovy and pixel height) but not vertex
-
-			// to avoid precalculating the final value (and therefore making it 
-			// viewport-specific), precalculate only max(delta * delta), 
-			// since this will be valid for any CFactor. 
 
 
-			
-
+		
 
 		}
 		else
@@ -251,20 +236,32 @@ namespace Ogre
 			&& y >= mOffsetY && y < mBoundaryY)
 		{
 			// within our bounds, check it's our LOD level
-			// remember, LODs decrease!
-			if (lod <= mBaseLod && lod >= mBaseLod - mLodLevels.size())
+			if (lod >= mBaseLod && lod < mBaseLod + mLodLevels.size())
 			{
-				for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i)
-					(*i)->maxHeightDelta = std::max((*i)->maxHeightDelta, delta);
+				// Apply the delta to all LODs equal or lower detail to lod
+				LodLevelList::iterator i = mLodLevels.begin();
+				std::advance(i, lod - mBaseLod);
+				(*i)->maxHeightDelta = std::max((*i)->maxHeightDelta, delta);
 			}
 
 			// pass on to children
 			if (!isLeaf())
 			{
+				LodLevel* lowestOwnLod = *mLodLevels.rbegin();
+
 				for (int i = 0; i < 4; ++i)
+				{
 					mChildren[i]->notifyDelta(x, y, lod, delta);
 
+					// make sure that our highest delta value is greater than all children's
+					// otherwise we could have some crossover problems
+					// TODO
+
+				}
+
 			}
+
+			// TODO - make sure own LOD levels delta values ascend
 
 		}
 	}
@@ -863,6 +860,96 @@ namespace Ogre
 	Real TerrainQuadTreeNode::getBoundingRadius() const
 	{
 		return mBoundingRadius;
+	}
+	//---------------------------------------------------------------------
+	bool TerrainQuadTreeNode::calculateCurrentLod(const Camera* cam, Real cFactor)
+	{
+		bool ret = false;
+
+		// Check children first
+		int childRenderedCount = 0;
+		if (!isLeaf())
+		{
+			for (int i = 0; i < 4; ++i)
+			{
+				if (mChildren[i]->calculateCurrentLod(cam, cFactor))
+					++childRenderedCount;
+			}
+
+		}
+
+		if (childRenderedCount == 0)
+		{
+			// no children were within their LOD ranges, so we should consider our own
+			// Get distance to this terrain node (to closest point of the box)
+			Vector3 localPos = cam->getDerivedPosition() - mLocalCentre;
+			Ray ray(localPos, -localPos);
+			std::pair<bool, Real> intersectRes = Math::intersects(ray, mAABB);
+
+			// ray will always intersect, we just want the distance
+			Real dist = intersectRes.second;
+
+			// For each LOD, the distance at which the LOD will transition *downwards*
+			// is given by 
+			// distTransition = maxDelta * cFactor;
+			int lodLvl = 0;
+			mCurrentLod = -1;
+			for (LodLevelList::const_iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i, ++lodLvl)
+			{
+				const LodLevel* ll = *i;
+
+				Real distTransition = ll->maxHeightDelta * cFactor;
+				if (dist < distTransition)
+				{
+					// we're within range of this LOD
+					mCurrentLod = lodLvl;
+
+					if (mTerrain->getUseLodMorph())
+					{
+						// calculate the transition percentage
+						Real distRemain = distTransition - dist;
+						// we need a percentage of the total distance for this LOD, 
+						// which means taking off the distance for the next higher LOD
+						// TODO
+
+					}
+
+
+					// since LODs are ordered from highest to lowest detail, 
+					// we can stop looking now
+					break;
+
+
+				}
+			}
+
+		}
+		else 
+		{
+			// we should not render ourself
+			mCurrentLod = -1;
+			if (childRenderedCount < 4)
+			{
+				// only *some* children decided to render on their own, but either 
+				// none or all need to render, so set the others manually to their lowest
+				for (int i = 0; i < 4; ++i)
+				{
+					TerrainQuadTreeNode* child = mChildren[i];
+					if (child->getCurrentLod() == -1)
+					{
+						child->setCurrentLod(child->getLodCount()-1);
+						child->setLodTransition(1.0);
+					}
+				}
+			} // (childRenderedCount < 4)
+
+			ret = true;
+
+		} // (childRenderedCount == 0)
+
+
+		return ret;
+
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
