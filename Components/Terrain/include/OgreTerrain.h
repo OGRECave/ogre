@@ -346,6 +346,8 @@ namespace Ogre
 		const Vector3& getPosition() const { return mPos; }
 		/// Set the position of the terrain centre in world coordinates
 		void setPosition(const Vector3& pos);
+		/// Get the root scene node for the terrain (internal use only)
+		SceneNode* _getRootSceneNode() const;
 		/** Mark the entire terrain as dirty, so that the geometry is
 			updated the next time it is accessed. 
 		*/
@@ -434,11 +436,22 @@ namespace Ogre
 		/// Get the bounding radius of the entire terrain
 		Real getBoundingRadius() const;
 
+		/// Get the material being used for the terrain
+		const MaterialPtr& getMaterial() const;
+
 		/// Overridden from SceneManager::Listener
 		void preFindVisibleObjects(SceneManager* source, 
 			SceneManager::IlluminationRenderStage irs, Viewport* v);
 		/// Overridden from SceneManager::Listener
 		void sceneManagerDestroyed(SceneManager* source);
+
+		/// Get the render queue group that this terrain will be rendered into
+		uint8 getRenderQueueGroup(void) const { return mRenderQueueGroup; }
+		/** Set the render queue group that this terrain will be rendered into.
+		@remarks The default is specified in TerrainGlobalOptions
+		*/
+		void setRenderQueueGroup(uint8 grp) { mRenderQueueGroup = grp; }
+
 
 	protected:
 
@@ -456,8 +469,11 @@ namespace Ogre
 		*/
 		void getPointAlign(long x, long y, float height, Alignment align, Vector3* outpos);
 		void calculateCurrentLod(Viewport* vp);
-    /// Test a single quad of the terrain for ray intersection.
-    std::pair<bool, Vector3> checkQuadIntersection(int x, int z, const Ray& ray); //const;
+		/// Test a single quad of the terrain for ray intersection.
+		std::pair<bool, Vector3> checkQuadIntersection(int x, int z, const Ray& ray); //const;
+
+		void copyGlobalOptions();
+
 
 		SceneManager* mSceneMgr;
 		SceneNode* mRootNode;
@@ -488,7 +504,10 @@ namespace Ogre
 		bool mGenerateVertexNormals;
 		bool mGenerateNormalMap;
 		bool mGenerateShadowMap;
-		bool mGenerateHorizonMap;	
+		bool mGenerateHorizonMap;
+		uint8 mRenderQueueGroup;
+
+		MaterialPtr mMaterial;
 
 	};
 
@@ -516,7 +535,9 @@ namespace Ogre
 		static bool msGenerateHorizonMap;
 		static Radian msHorizonMapAzimuth;
 		static Radian msHorizonMapZenith;
+		static bool msCastsShadows;
 		static Real msMaxPixelError;
+		static uint8 msRenderQueueGroup;
 	public:
 
 
@@ -631,6 +652,18 @@ namespace Ogre
 		*/
 		static void setHorizonMapZenith(Radian z) { msHorizonMapZenith = z; }
 
+		/** Whether the terrain will be able to cast shadows (texture shadows
+		only are supported, and you must be using depth shadow maps).
+		*/
+		static bool getCastsDynamicShadows() { return msCastsShadows; }
+
+		/** Whether the terrain will be able to cast shadows (texture shadows
+		only are supported, and you must be using depth shadow maps).
+		This value can be set dynamically, and affects all existing terrains.
+		It defaults to false. 
+		*/
+		static void setCastsDynamicShadows(bool s) { msCastsShadows = s; }
+
 		/** Get the maximum screen pixel error that should be allowed when rendering. */
 		static Real getMaxPixelError() { return msMaxPixelError; }
 
@@ -640,6 +673,15 @@ namespace Ogre
 			It will be weighted by the LOD bias on viewports. 
 		*/
 		static void setMaxPixelError(Real pixerr) { msMaxPixelError = pixerr; }
+
+		/// Get the render queue group that this terrain will be rendered into
+		static uint8 getRenderQueueGroup(void) { return msRenderQueueGroup; }
+		/** Set the render queue group that terrains will be rendered into.
+		@remarks This applies to newly created terrains, after which they will
+			maintain their own queue group settings
+		*/
+		static void setRenderQueueGroup(uint8 grp) { msRenderQueueGroup = grp; }
+
 
 	};
 

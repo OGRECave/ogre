@@ -53,6 +53,7 @@ namespace Ogre
 		, mNodeWithVertexData(0)
 		, mVertexDataRecord(0)
 		, mMovable(0)
+		, mRend(0)
 	{
 		if (terrain->getMinBatchSize() < size)
 		{
@@ -108,11 +109,20 @@ namespace Ogre
 		// TODO - what if we actually centred this at the terrain height at this point?
 		// would this be better?
 		mTerrain->getPoint(midpointx, midpointy, 0, &mLocalCentre);
+
+		mMovable = OGRE_NEW Movable(this);
+		mTerrain->_getRootSceneNode()->createChildSceneNode(mLocalCentre)->attachObject(mMovable);
+		mRend = OGRE_NEW Rend(this);
 		
 	}
 	//---------------------------------------------------------------------
 	TerrainQuadTreeNode::~TerrainQuadTreeNode()
 	{
+		OGRE_DELETE mMovable;
+		mMovable = 0;
+		OGRE_DELETE mRend;
+		mRend = 0;
+
 		for (int i = 0; i < 4; ++i)
 			OGRE_DELETE mChildren[i];
 
@@ -140,6 +150,11 @@ namespace Ogre
 	TerrainQuadTreeNode* TerrainQuadTreeNode::getParent() const
 	{
 		return mParent;
+	}
+	//---------------------------------------------------------------------
+	Terrain* TerrainQuadTreeNode::getTerrain() const
+	{
+		return mTerrain;
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::prepare()
@@ -934,6 +949,8 @@ namespace Ogre
 			// ray will always intersect, we just want the distance
 			Real dist = intersectRes.second;
 
+			// TODO: calculate material LOD too
+
 			// For each LOD, the distance at which the LOD will transition *downwards*
 			// is given by 
 			// distTransition = maxDelta * cFactor;
@@ -1034,11 +1051,71 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	bool TerrainQuadTreeNode::isRenderedAtCurrentLod() const
+	{
+		return mCurrentLod != -1;
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::updateRenderQueue(RenderQueue* queue)
+	{
+		if (isRenderedAtCurrentLod())
+		{
+			queue->addRenderable(mRend, mTerrain->getRenderQueueGroup());			
+		}
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables)
+	{
+		visitor->visit(mRend, 0, false);
+	}
+	//---------------------------------------------------------------------
+	const MaterialPtr& TerrainQuadTreeNode::getMaterial(void) const
+	{
+		return mTerrain->getMaterial();
+	}
+	//---------------------------------------------------------------------
+	Technique* TerrainQuadTreeNode::getTechnique(void) const
+	{ 
+		// TODO material LOD
+		return getMaterial()->getBestTechnique(0, mRend); 
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::getRenderOperation(RenderOperation& op)
+	{
+		mNodeWithVertexData->updateGpuVertexData();
+
+		op.indexData = mLodLevels[mCurrentLod]->gpuIndexData;
+		op.operationType = mTerrain->getUseTriangleStrips() ?
+			RenderOperation::OT_TRIANGLE_STRIP : RenderOperation::OT_TRIANGLE_LIST;
+		op.srcRenderable = mRend;
+		op.useIndexes = true;
+		op.vertexData = getVertexDataRecord()->gpuVertexData;
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::getWorldTransforms(Matrix4* xform) const
+	{
+		*xform = mMovable->_getParentNodeFullTransform();
+	}
+	//---------------------------------------------------------------------
+	Real TerrainQuadTreeNode::getSquaredViewDepth(const Camera* cam) const
+	{
+		return mMovable->getParentSceneNode()->getSquaredViewDepth(cam);
+	}
+	//---------------------------------------------------------------------
+	const LightList& TerrainQuadTreeNode::getLights(void) const
+	{
+		return mMovable->queryLights();
+	}
+	//---------------------------------------------------------------------
+	bool TerrainQuadTreeNode::getCastsShadows(void) const
+	{
+		return TerrainGlobalOptions::getCastsDynamicShadows();
+	}
+	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	TerrainQuadTreeNode::Movable::Movable(TerrainQuadTreeNode* parent)
 		: mParent(parent)
 	{
-
 	}
 	//---------------------------------------------------------------------
 	TerrainQuadTreeNode::Movable::~Movable()
@@ -1066,14 +1143,60 @@ namespace Ogre
 	//------------------------------------------------------------------------
 	void TerrainQuadTreeNode::Movable::_updateRenderQueue(RenderQueue* queue)
 	{
-		// TODO
+		mParent->updateRenderQueue(queue);		
 	}
 	//------------------------------------------------------------------------
 	void TerrainQuadTreeNode::Movable::visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables)
 	{
-		// TODO
+		mParent->visitRenderables(visitor, debugRenderables);	
 	}
 	//------------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	TerrainQuadTreeNode::Rend::Rend(TerrainQuadTreeNode* parent)
+		:mParent(parent)
+	{
+	}
+	//---------------------------------------------------------------------
+	TerrainQuadTreeNode::Rend::~Rend()
+	{
+	}
+	//---------------------------------------------------------------------
+	const MaterialPtr& TerrainQuadTreeNode::Rend::getMaterial(void) const
+	{
+		return mParent->getMaterial();
+	}
+	//---------------------------------------------------------------------
+	Technique* TerrainQuadTreeNode::Rend::getTechnique() const
+	{
+		return mParent->getTechnique();
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::Rend::getRenderOperation(RenderOperation& op)
+	{
+		mParent->getRenderOperation(op);
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::Rend::getWorldTransforms(Matrix4* xform) const
+	{
+		mParent->getWorldTransforms(xform);
+	}
+	//---------------------------------------------------------------------
+	Real TerrainQuadTreeNode::Rend::getSquaredViewDepth(const Camera* cam) const
+	{
+		return mParent->getSquaredViewDepth(cam);
+	}
+	//---------------------------------------------------------------------
+	const LightList& TerrainQuadTreeNode::Rend::getLights(void) const
+	{
+		return mParent->getLights();
+	}
+	//---------------------------------------------------------------------
+	bool TerrainQuadTreeNode::Rend::getCastsShadows(void) const
+	{
+		return mParent->getCastsShadows();
+	}
+	//---------------------------------------------------------------------
+
 
 	
 

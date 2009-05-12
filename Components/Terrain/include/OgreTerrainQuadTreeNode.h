@@ -34,6 +34,7 @@ Torus Knot Software Ltd.
 #include "OgreCommon.h"
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreMovableObject.h"
+#include "OgreRenderable.h"
 
 
 
@@ -112,6 +113,8 @@ namespace Ogre
 		TerrainQuadTreeNode* getChild(unsigned short child) const;
 		/// Get parent node
 		TerrainQuadTreeNode* getParent() const;
+		/// Get ultimate parent terrain
+		Terrain* getTerrain() const;
 
 		/// Prepare node and children (perform CPU tasks, may be background thread)
 		void prepare();
@@ -201,6 +204,8 @@ namespace Ogre
 		const AxisAlignedBox& getAABB() const;
 		/// Get the bounding radius of this node
 		Real getBoundingRadius() const;
+		/// Get the local centre of this node, relative to parent terrain centre
+		const Vector3& getLocalCentre() const { return mLocalCentre; }
 
 		/** Calculate appropriate LOD for this node and children
 		@param cam The camera to be used (this should already be the LOD camera)
@@ -211,6 +216,8 @@ namespace Ogre
 
 		/// Get the current LOD index (only valid after calculateCurrentLod)
 		int getCurrentLod() const { return mCurrentLod; }
+		/// Returns whether this node is rendering itself at the current LOD level
+		bool isRenderedAtCurrentLod() const;
 		/// Manually set the current LOD, intended for internal use only
 		void setCurrentLod(int lod) { mCurrentLod = lod; }
 		/// Get the transition state between the current LOD and the next lower one (only valid after calculateCurrentLod)
@@ -293,10 +300,44 @@ namespace Ogre
 			Real getBoundingRadius(void) const;
 			void _updateRenderQueue(RenderQueue* queue);
 			void visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables = false);
-			
-			
 		};
 		Movable* mMovable;
+		friend class Movable;
+
+		/// Hook to the render queue
+		class Rend : public Renderable, public TerrainAlloc
+		{
+		protected:
+			TerrainQuadTreeNode* mParent;
+		public:
+			Rend(TerrainQuadTreeNode* parent);
+			~Rend();
+
+			const MaterialPtr& getMaterial(void) const;
+			// TODO material LOD
+			Technique* getTechnique(void) const;
+			void getRenderOperation(RenderOperation& op);
+			void getWorldTransforms(Matrix4* xform) const;
+			Real getSquaredViewDepth(const Camera* cam) const;
+			const LightList& getLights(void) const;
+			bool getCastsShadows(void) const;
+
+		};
+		Rend* mRend;
+		friend class Rend;
+
+		// actual implementation of MovableObject methods
+		void updateRenderQueue(RenderQueue* queue);
+		void visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables = false);
+		// actual implementations of Renderable methods
+		const MaterialPtr& getMaterial(void) const;
+		// TODO material LOD
+		Technique* getTechnique(void) const;
+		void getRenderOperation(RenderOperation& op);
+		void getWorldTransforms(Matrix4* xform) const;
+		Real getSquaredViewDepth(const Camera* cam) const;
+		const LightList& getLights(void) const;
+		bool getCastsShadows(void) const;
 
 
 		const VertexDataRecord* getVertexDataRecord() const;

@@ -58,7 +58,9 @@ namespace Ogre
 	bool TerrainGlobalOptions::msGenerateHorizonMap = false;
 	Radian TerrainGlobalOptions::msHorizonMapAzimuth = Radian(0);
 	Radian TerrainGlobalOptions::msHorizonMapZenith = Radian(0);
+	bool TerrainGlobalOptions::msCastsShadows = false;
 	Real TerrainGlobalOptions::msMaxPixelError = 3.0;
+	uint8 TerrainGlobalOptions::msRenderQueueGroup = RENDER_QUEUE_MAIN;
 	//---------------------------------------------------------------------
 	Terrain::Terrain(SceneManager* sm)
 		: mSceneMgr(sm)
@@ -136,10 +138,7 @@ namespace Ogre
 	{
 		freeCPUResources();
 
-		// get settings
-		mUseTriangleStrips = TerrainGlobalOptions::getUseTriangleStrips();
-		mUseLodMorph = TerrainGlobalOptions::getUseLodMorph();
-		mSkirtSize = TerrainGlobalOptions::getSkirtSize();
+		copyGlobalOptions();
 
 		if (!stream.readChunkBegin(TERRAIN_CHUNK_ID, TERRAIN_CHUNK_VERSION))
 			return false;
@@ -186,6 +185,8 @@ namespace Ogre
 	{
 		freeCPUResources();
 
+		copyGlobalOptions();
+
 		// validate
 		if (!(Bitwise::isPO2(importData.terrainSize - 1) && Bitwise::isPO2(importData.minBatchSize - 1)
 			&& Bitwise::isPO2(importData.maxBatchSize - 1)))
@@ -209,15 +210,6 @@ namespace Ogre
 					StringConverter::toString(TERRAIN_MAX_BATCH_SIZE),
 				"Terrain::prepare");
 		}
-
-		// get settings
-		mUseTriangleStrips = TerrainGlobalOptions::getUseTriangleStrips();
-		mUseLodMorph = TerrainGlobalOptions::getUseLodMorph();
-		mSkirtSize = TerrainGlobalOptions::getSkirtSize();
-		mGenerateVertexNormals = TerrainGlobalOptions::getGenerateVertexNormals();
-		mGenerateNormalMap = TerrainGlobalOptions::getGenerateNormalMap();
-		mGenerateShadowMap = TerrainGlobalOptions::getGenerateShadowMap();
-		mGenerateHorizonMap = TerrainGlobalOptions::getGenerateHorizonMap();
 
 		mAlign = importData.terrainAlign;
 		mSize = importData.terrainSize;
@@ -294,6 +286,19 @@ namespace Ogre
 
 
 		return true;
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::copyGlobalOptions()
+	{
+		mUseTriangleStrips = TerrainGlobalOptions::getUseTriangleStrips();
+		mUseLodMorph = TerrainGlobalOptions::getUseLodMorph();
+		mSkirtSize = TerrainGlobalOptions::getSkirtSize();
+		mGenerateVertexNormals = TerrainGlobalOptions::getGenerateVertexNormals();
+		mGenerateNormalMap = TerrainGlobalOptions::getGenerateNormalMap();
+		mGenerateShadowMap = TerrainGlobalOptions::getGenerateShadowMap();
+		mGenerateHorizonMap = TerrainGlobalOptions::getGenerateHorizonMap();
+		mRenderQueueGroup = TerrainGlobalOptions::getRenderQueueGroup();
 
 	}
 	//---------------------------------------------------------------------
@@ -632,6 +637,11 @@ namespace Ogre
 		updateBaseScale();
 	}
 	//---------------------------------------------------------------------
+	SceneNode* Terrain::_getRootSceneNode() const
+	{
+		return mRootNode;
+	}
+	//---------------------------------------------------------------------
 	void Terrain::updateBaseScale()
 	{
 		// centre the terrain on local origin
@@ -856,6 +866,8 @@ namespace Ogre
 			// CFactor = A / T
 			Real cFactor = A / T;
 
+			// CFactor should be squared before being used
+			cFactor = Math::Sqr(cFactor);
 
 			mQuadTree->calculateCurrentLod(cam, cFactor);
 		}
@@ -993,6 +1005,14 @@ namespace Ogre
 		
 		return std::pair<bool, Vector3>(false, Vector3());
 	}
+	//---------------------------------------------------------------------
+	const MaterialPtr& Terrain::getMaterial() const
+	{
+		// TODO - generate material
+
+		return mMaterial;
+	}
+
 	
 	
 }
