@@ -132,8 +132,12 @@ namespace Ogre
 			IndexData* gpuIndexData;
 			/// Maximum delta height between this and the next lower lod
 			Real maxHeightDelta;
+			/// The most recently calculated transition distance
+			Real lastTransitionDist;
+			/// The cFactor value used to calculate transitionDist
+			Real lastCFactor;
 
-			LodLevel() : cpuIndexData(0), gpuIndexData(0) {}
+			LodLevel() : cpuIndexData(0), gpuIndexData(0), lastTransitionDist(0), lastCFactor(0) {}
 		};
 		typedef vector<LodLevel*>::type LodLevelList;
 
@@ -151,6 +155,10 @@ namespace Ogre
 
 		/** Notify the node (and children) of a height delta value. */
 		void notifyDelta(uint16 x, uint16 y, uint16 lod, Real delta);
+
+		/** Notify the node (and children) that deltas have finished being calculated.
+		*/
+		void postDeltaCalculation(const Rect& rect);
 
 		/** Assign vertex data to the tree, from a depth and at a given resolution.
 		@param treeDepthStart The first depth of tree that should use this data, owns the data
@@ -201,11 +209,11 @@ namespace Ogre
 		*/
 		bool calculateCurrentLod(const Camera* cam, Real cFactor);
 
-		/// Get the current LOD index (only valid after calculateCurrentLod
+		/// Get the current LOD index (only valid after calculateCurrentLod)
 		int getCurrentLod() const { return mCurrentLod; }
 		/// Manually set the current LOD, intended for internal use only
 		void setCurrentLod(int lod) { mCurrentLod = lod; }
-		/// Get the transition state between the current LOD and the next lower one
+		/// Get the transition state between the current LOD and the next lower one (only valid after calculateCurrentLod)
 		float getLodTransition() const { return mLodTransition; }
 		/// Manually set the current LOD transition state, intended for internal use only
 		void setLodTransition(float t) { mLodTransition = t; }
@@ -228,6 +236,8 @@ namespace Ogre
 		Real mBoundingRadius; //relative to mLocalCentre
 		int mCurrentLod; // -1 = none (do not render)
 		float mLodTransition; // 0-1 transition to lower LOD
+		/// The child with the largest height delta 
+		TerrainQuadTreeNode* mChildWithMaxHeightDelta;
 
 		struct VertexDataRecord : public TerrainAlloc
 		{

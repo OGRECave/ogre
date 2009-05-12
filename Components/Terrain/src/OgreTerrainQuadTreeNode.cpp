@@ -252,18 +252,63 @@ namespace Ogre
 				for (int i = 0; i < 4; ++i)
 				{
 					mChildren[i]->notifyDelta(x, y, lod, delta);
-
-					// make sure that our highest delta value is greater than all children's
-					// otherwise we could have some crossover problems
-					// TODO
-
 				}
 
 			}
 
-			// TODO - make sure own LOD levels delta values ascend
-
 		}
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::postDeltaCalculation(const Rect& rect)
+	{
+		if (rect.left <= mBoundaryX || rect.right > mOffsetX
+			|| rect.top <= mBoundaryY || rect.bottom > mOffsetY)
+		{
+			// relevant to this node (overlaps)
+
+			// each non-leaf node should know which of its children transitions
+			// to the lower LOD level last, because this is the one which controls
+			// when the parent takes over
+			if (!isLeaf())
+			{
+				Real maxChildDelta = 0;
+				mChildWithMaxHeightDelta = 0;
+				for (int i = 0; i < 4; ++i)
+				{
+					TerrainQuadTreeNode* child = mChildren[i];
+
+					child->postDeltaCalculation(rect);
+
+					Real childDelta = child->getLodLevel(child->getLodCount()-1)->maxHeightDelta;
+					if (childDelta > maxChildDelta)
+					{
+						mChildWithMaxHeightDelta = child;
+						maxChildDelta = childDelta;
+					}
+
+				}
+
+				// make sure that our highest delta value is greater than all children's
+				// otherwise we could have some crossover problems
+				// for a non-leaf, there is only one LOD level
+				mLodLevels[0]->maxHeightDelta = std::max(mLodLevels[0]->maxHeightDelta, maxChildDelta);
+
+			}
+			else
+			{
+				// make sure own LOD levels delta values ascend
+				for (size_t i = 0; i < mLodLevels.size() - 1; ++i)
+				{
+					// the next LOD after this one should have a higher delta
+					// otherwise it won't come into affect further back like it should!
+					mLodLevels[i+1]->maxHeightDelta = 
+						std::max(mLodLevels[i+1]->maxHeightDelta, 
+							mLodLevels[i]->maxHeightDelta);
+				}
+
+			}
+		}
+
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::assignVertexData(uint16 treeDepthStart, uint16 treeDepthEnd, uint16 resolution)
@@ -894,11 +939,21 @@ namespace Ogre
 			// distTransition = maxDelta * cFactor;
 			int lodLvl = 0;
 			mCurrentLod = -1;
-			for (LodLevelList::const_iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i, ++lodLvl)
+			for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i, ++lodLvl)
 			{
-				const LodLevel* ll = *i;
+				LodLevel* ll = *i;
 
-				Real distTransition = ll->maxHeightDelta * cFactor;
+				// Calculate or reuse transition distance
+				Real distTransition;
+				if (Math::RealEqual(cFactor, ll->lastCFactor))
+					distTransition = ll->lastTransitionDist;
+				else
+				{
+					distTransition = ll->maxHeightDelta * cFactor;
+					ll->lastCFactor = cFactor;
+					ll->lastTransitionDist = distTransition;
+				}
+
 				if (dist < distTransition)
 				{
 					// we're within range of this LOD
@@ -907,11 +962,38 @@ namespace Ogre
 					if (mTerrain->getUseLodMorph())
 					{
 						// calculate the transition percentage
-						Real distRemain = distTransition - dist;
-						// we need a percentage of the total distance for this LOD, 
+						// we need a percentage of the total distance for just this LOD, 
 						// which means taking off the distance for the next higher LOD
-						// TODO
+						// which is either the previous entry in the LOD list, 
+						// or the largest of any children. In both cases these will
+						// have been calculated before this point, since we process
+						// children first. Distances at lower LODs are guaranteed
+						// to be larger than those at higher LODs
 
+						Real distTotal = distTransition;
+						if (isLeaf())
+						{
+							// Any higher LODs?
+							if (i != mLodLevels.begin())
+							{
+								LodLevelList::iterator prev = i - 1;
+								distTotal -= (*prev)->lastTransitionDist;
+							}
+						}
+						else
+						{
+							// Take the distance of the lowest LOD of child
+							const LodLevel* childLod = mChildWithMaxHeightDelta->getLodLevel(
+								mChildWithMaxHeightDelta->getLodCount()-1);
+							distTotal -= childLod->lastTransitionDist;
+						}
+						// fade from 0 to 1 in the last 25% of the distance
+						Real distMorphRegion = distTotal * 0.25;
+						Real distRemain = distTransition - dist;
+
+						mLodTransition = 1.0 - (distRemain / distMorphRegion);
+						mLodTransition = std::min((Real)1.0, mLodTransition);
+						mLodTransition = std::max((Real)0.0, mLodTransition);
 					}
 
 

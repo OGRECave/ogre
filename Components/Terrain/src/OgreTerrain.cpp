@@ -814,6 +814,8 @@ namespace Ogre
 			} // j
 		} // targetLevel
 
+		mQuadTree->postDeltaCalculation(clampedRect);
+
 	}
 
 	//---------------------------------------------------------------------
