@@ -346,7 +346,7 @@ namespace Ogre
 			createCpuIndexData();
 
 			// pass on to children
-			if (!isLeaf() && treeDepthEnd > mDepth)
+			if (!isLeaf() && treeDepthEnd > (mDepth + 1)) // treeDepthEnd is exclusive, and this is children
 			{
 				for (int i = 0; i < 4; ++i)
 					mChildren[i]->useAncestorVertexData(this, treeDepthEnd, resolution);
@@ -369,7 +369,7 @@ namespace Ogre
 		mNodeWithVertexData = owner; 
 		mVertexDataRecord = 0;
 
-		if (!isLeaf() && treeDepthEnd > mDepth)
+		if (!isLeaf() && treeDepthEnd > (mDepth + 1)) // treeDepthEnd is exclusive, and this is children
 		{
 			for (int i = 0; i < 4; ++i)
 				mChildren[i]->useAncestorVertexData(owner, treeDepthEnd, resolution);
