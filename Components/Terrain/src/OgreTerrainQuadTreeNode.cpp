@@ -55,7 +55,7 @@ namespace Ogre
 		, mMovable(0)
 		, mRend(0)
 	{
-		if (terrain->getMinBatchSize() < size)
+		if (terrain->getMaxBatchSize() < size)
 		{
 			uint16 childSize = ((size - 1) * 0.5) + 1;
 			uint16 childOff = childSize - 1;
@@ -81,8 +81,11 @@ namespace Ogre
 
 			// this is a leaf node and may have internal LODs of its own
 			uint16 ownLod = terrain->getNumLodLevelsPerLeaf();
-			// remember, LOD levels are lower indexed when higher detail
-			assert(mBaseLod - ownLod + 1 == 0);
+			assert (lod == (ownLod - 1) && "The lod passed in should reflect the number of "
+				"lods in a leaf");
+			// leaf nodes always have a base LOD of 0, because they're always handling
+			// the highest level of detail
+			mBaseLod = 0;
 			// leaf nodes render from max batch size to min batch size
 			uint16 sz = terrain->getMaxBatchSize();
 
@@ -136,7 +139,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool TerrainQuadTreeNode::isLeaf() const
 	{
-		return mChildren[0] != 0;
+		return mChildren[0] == 0;
 	}
 	//---------------------------------------------------------------------
 	TerrainQuadTreeNode* TerrainQuadTreeNode::getChild(unsigned short child) const
@@ -178,6 +181,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::load()
 	{
+		createGpuVertexData();
+		createGpuIndexData();
+
 		if (!isLeaf())
 			for (int i = 0; i < 4; ++i)
 				mChildren[i]->load();
@@ -328,7 +334,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::assignVertexData(uint16 treeDepthStart, uint16 treeDepthEnd, uint16 resolution)
 	{
-		assert(treeDepthStart < mDepth && "Should not be calling this");
+		assert(treeDepthStart >= mDepth && "Should not be calling this");
 
 		if (mDepth == treeDepthStart)
 		{
@@ -337,6 +343,7 @@ namespace Ogre
 			mVertexDataRecord = OGRE_NEW VertexDataRecord(resolution, treeDepthEnd - treeDepthStart + 1);
 
 			createCpuVertexData();
+			createCpuIndexData();
 
 			// pass on to children
 			if (!isLeaf() && treeDepthEnd > mDepth)
@@ -354,7 +361,6 @@ namespace Ogre
 				mChildren[i]->assignVertexData(treeDepthStart, treeDepthEnd, resolution);
 			
 		}
-		createCpuIndexData();
 
 	}
 	//---------------------------------------------------------------------
@@ -451,7 +457,7 @@ namespace Ogre
 		long destOffsetY = rect.top - mOffsetY;
 		// Fill the buffers
 		// Main data
-		uint16 inc = mTerrain->getSize() / mVertexDataRecord->resolution;
+		uint16 inc = (mTerrain->getSize()-1) / (mVertexDataRecord->resolution-1);
 		
 		HardwareBuffer::LockOptions lockMode;
 		if (destOffsetX || destOffsetY || rect.right - rect.left < mSize
@@ -470,15 +476,15 @@ namespace Ogre
 		uint16 rowskip = mTerrain->getSize() * inc;
 		uint16 destRowSkip = mVertexDataRecord->resolution * vbuf->getVertexSize();
 		Vector3 pos;
-		float* pRootBuf = static_cast<float*>(vbuf->lock(lockMode));
-		float* pRowBuf = pRootBuf;
+		unsigned char* pRootBuf = static_cast<unsigned char*>(vbuf->lock(lockMode));
+		unsigned char* pRowBuf = pRootBuf;
 		// skip dest buffer in by left/top
 		pRowBuf += destOffsetY * destRowSkip + destOffsetX * vbuf->getVertexSize();
 		for (uint16 y = rect.top; y < rect.bottom; y += inc)
 		{
 			const float* pHeight = pBaseHeight;
 			const float* pDelta = pBaseDelta;
-			float* pBuf = pRowBuf;
+			float* pBuf = static_cast<float*>(static_cast<void*>(pRowBuf));
 			for (uint16 x = rect.left; x < rect.right; x += inc)
 			{
 				mTerrain->getPoint(x, y, *pHeight, &pos);
@@ -541,7 +547,7 @@ namespace Ogre
 		for (uint16 y = skirtStartY; y < rect.bottom; y += skirtSpacing)
 		{
 			const float* pHeight = pBaseHeight;
-			float* pBuf = pRowBuf;
+			float* pBuf = static_cast<float*>(static_cast<void*>(pRowBuf));
 			for (uint16 x = skirtStartX; x < rect.right; x += inc)
 			{
 				mTerrain->getPoint(x, y, *pHeight, &pos);
@@ -567,7 +573,7 @@ namespace Ogre
 				*pBuf++ = x * uvScale;
 				*pBuf++ = 1.0 - (y * uvScale);
 			}
-			pBaseHeight += rowskip * skirtSpacing;
+			pBaseHeight += mTerrain->getSize() * skirtSpacing;
 			pRowBuf += destRowSkip;
 		}
 		// skirt cols
@@ -582,7 +588,7 @@ namespace Ogre
 		
 		for (uint16 x = skirtStartX; x < rect.right; x += skirtSpacing)
 		{
-			float* pBuf = pRowBuf;
+			float* pBuf = static_cast<float*>(static_cast<void*>(pRowBuf));
 			for (uint16 y = skirtStartY; y < rect.bottom; y += inc)
 			{
 				mTerrain->getPoint(x, y, mTerrain->getHeight(x, y), &pos);
@@ -807,9 +813,8 @@ namespace Ogre
 	void TerrainQuadTreeNode::createGpuVertexData()
 	{
 		// TODO - mutex cpu data
-		if (mVertexDataRecord && mVertexDataRecord->cpuVertexData)
+		if (mVertexDataRecord && mVertexDataRecord->cpuVertexData && !mVertexDataRecord->gpuVertexData)
 		{
-			destroyGpuVertexData();
 
 			// clone CPU data into GPU data
 			// default is to create new declarations from hardware manager
@@ -822,7 +827,7 @@ namespace Ogre
 	void TerrainQuadTreeNode::updateGpuVertexData()
 	{
 		// TODO - mutex cpu data
-		if (mVertexDataRecord->gpuVertexDataDirty)
+		if (mVertexDataRecord && mVertexDataRecord->gpuVertexDataDirty)
 		{
 			mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(0)->
 				copyData(*mVertexDataRecord->cpuVertexData->vertexBufferBinding->getBuffer(0).get());
@@ -847,9 +852,11 @@ namespace Ogre
 		{
 			LodLevel* ll = mLodLevels[lod];
 
-			OGRE_DELETE ll->gpuIndexData;
-			// clone, using default buffer manager ie hardware
-			ll->gpuIndexData = ll->cpuIndexData->clone();
+			if (!ll->gpuIndexData)
+			{
+				// clone, using default buffer manager ie hardware
+				ll->gpuIndexData = ll->cpuIndexData->clone();
+			}
 		}
 
 	}
@@ -924,6 +931,10 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool TerrainQuadTreeNode::calculateCurrentLod(const Camera* cam, Real cFactor)
 	{
+		// early-out
+		if (!cam->isVisible(mMovable->getWorldBoundingBox(true)))
+			return false;
+
 		bool ret = false;
 
 		// Check children first

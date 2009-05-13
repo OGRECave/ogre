@@ -181,7 +181,10 @@ namespace Ogre
 			*/
 			Image* inputImage;
 
-			/// Optional list of terrainSize * terrainSize floats defining the terrain. 
+			/** Optional list of terrainSize * terrainSize floats defining the terrain. 
+				The list of floats wil be interpreted such that the first row
+				in the array equates to the bottom row of vertices. 
+			*/
 			float* inputFloat;
 
 			/// How to scale the input values provided (if any)
@@ -458,6 +461,7 @@ namespace Ogre
 		void freeCPUResources();
 		void freeGPUResources();
 		void determineLodLevels();
+		void distributeVertexData();
 		void updateBaseScale();
 		/** Get a Vector3 of the world-space point on the terrain, aligned Y-up always.
 		@note This point is relative to Terrain::getPosition

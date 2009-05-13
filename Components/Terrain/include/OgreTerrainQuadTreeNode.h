@@ -105,7 +105,7 @@ namespace Ogre
 		uint16 getYOffset() const { return mOffsetY; }
 		/// Is this a leaf node (no children)
 		bool isLeaf() const;
-		/// Get the base LOD level this node starts at
+		/// Get the base LOD level this node starts at (the highest LOD it handles)
 		uint16 getBaseLod() const { return mBaseLod; }
 		/// Get the number of LOD levels this node can represent itself (only > 1 for leaf nodes)
 		uint16 getLodCount() const;
@@ -146,7 +146,8 @@ namespace Ogre
 
 		/** Get the LodLevel information for a given lod.
 		@param lod The lod level index relative to this classes own list; if you
-			want to use a global lod level, subtract getBaseLod() first.
+			want to use a global lod level, subtract getBaseLod() first. Higher
+			LOD levels are lower detail.
 		*/
 		const LodLevel* getLodLevel(uint16 lod);
 

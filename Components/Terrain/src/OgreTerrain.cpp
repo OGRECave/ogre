@@ -178,6 +178,8 @@ namespace Ogre
 		rect.left = 0; rect.right = mSize;
 		calculateHeightDeltas(rect);
 
+		distributeVertexData();
+
 		return true;
 	}
 	//---------------------------------------------------------------------
@@ -252,8 +254,17 @@ namespace Ogre
 				img->resize(mSize, mSize);
 
 			// convert image data to floats
-			PixelBox destBox(mSize, mSize, 1, PF_FLOAT32_R, mHeightData);
-			PixelUtil::bulkPixelConversion(img->getPixelBox(), destBox);
+			// Do this on a row-by-row basis, because we describe the terrain in
+			// a bottom-up fashion (ie ascending world coords), while Image is top-down
+			unsigned char* pSrcBase = img->getData();
+			for (size_t i = 0; i < mSize; ++i)
+			{
+				size_t srcy = mSize - i - 1;
+				unsigned char* pSrc = pSrcBase + srcy * img->getRowSpan();
+				float* pDst = mHeightData + i * mSize;
+				PixelUtil::bulkPixelConversion(pSrc, img->getFormat(), 
+					pDst, PF_FLOAT32_R, mSize);
+			}
 
 			if (!Math::RealEqual(importData.inputBias, 0.0) || !Math::RealEqual(importData.inputScale, 1.0))
 			{
@@ -283,6 +294,8 @@ namespace Ogre
 		rect.top = 0; rect.bottom = mSize;
 		rect.left = 0; rect.right = mSize;
 		calculateHeightDeltas(rect);
+
+		distributeVertexData();
 
 
 		return true;
@@ -336,8 +349,12 @@ namespace Ogre
 		*/
 		mNumLodLevelsPerLeafNode = Math::Log2(mMaxBatchSize - 1) - Math::Log2(mMinBatchSize - 1) + 1;
 		mNumLodLevels = Math::Log2(mSize - 1) - Math::Log2(mMinBatchSize - 1) + 1;
-		mTreeDepth = Math::Log2(mMaxBatchSize - 1) - Math::Log2(mMinBatchSize - 1) + 2;
-
+		//mTreeDepth = Math::Log2(mMaxBatchSize - 1) - Math::Log2(mMinBatchSize - 1) + 2;
+		mTreeDepth = mNumLodLevels - mNumLodLevelsPerLeafNode + 1;
+	}
+	//---------------------------------------------------------------------
+	void Terrain::distributeVertexData()
+	{
 		/* Now we need to figure out how to distribute vertex data. We want to 
 		use 16-bit indexes for compatibility, which means that the maximum patch
 		size that we can address (even sparsely for lower LODs) is 129x129 
@@ -419,16 +436,16 @@ namespace Ogre
 				// vertex data goes at this level, at bakedresolution
 				// applies to all lower levels (except those with a closer vertex data)
 				mQuadTree->assignVertexData(depth, prevdepth, bakedresolution);
-				
+
 				// next set to look for
 				bakedresolution =  ((currresolution - 1) >> 1) + 1;
 				targetSplits = (bakedresolution - 1) / (TERRAIN_MAX_BATCH_SIZE - 1);
 				prevdepth = depth;
-				
+
 			}
 
 			currresolution = ((currresolution - 1) >> 1) + 1;
-			
+
 
 		}
 
@@ -647,7 +664,7 @@ namespace Ogre
 		// centre the terrain on local origin
 		mBase = -mWorldSize * 0.5; 
 		// scale determines what 1 unit on the grid becomes in world space
-		mScale =  mWorldSize / (Real)mSize;
+		mScale =  mWorldSize / (Real)(mSize-1);
 	}
 	//---------------------------------------------------------------------
 	void Terrain::dirty()
