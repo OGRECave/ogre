@@ -542,12 +542,12 @@ namespace Ogre
 		case ALIGN_X_Z:
 			outpos->y = height;
 			outpos->x = x * mScale + mBase;
-			outpos->z = y * mScale + mBase;
+			outpos->z = y * -mScale - mBase;
 			break;
 		case ALIGN_Y_Z:
 			outpos->x = height;
 			outpos->y = x * mScale + mBase;
-			outpos->z = y * mScale + mBase;
+			outpos->z = y * -mScale - mBase;
 			break;
 		case ALIGN_X_Y:
 			outpos->z = height;
@@ -581,12 +581,12 @@ namespace Ogre
 		case ALIGN_X_Z:
 			outVec->y = z;
 			outVec->x = x;
-			outVec->z = y;
+			outVec->z = -y;
 			break;
 		case ALIGN_Y_Z:
 			outVec->x = z;
-			outVec->y = x;
-			outVec->z = y;
+			outVec->y = y;
+			outVec->z = -x;
 			break;
 		case ALIGN_X_Y:
 			outVec->x = x;

@@ -722,8 +722,10 @@ namespace Ogre
 		*/
 
 		// to issue a complete row, it takes issuing the upper and lower row
-		// this includes the degenerate triangle
-		size_t indexesPerRow = batchSize * 2;
+		// and one extra index, which is the degenerate triangle and also turning
+		// around the winding
+		const VertexDataRecord* vdr = getVertexDataRecord();
+		size_t indexesPerRow = batchSize * 2 + 1;
 		size_t numRows = batchSize - 1;
 		size_t mainIndexCount = indexesPerRow * numRows;
 		// skirts take indexesPerRow for the first one, then indexesPerRow-1 for the
@@ -738,21 +740,21 @@ namespace Ogre
 		uint16* pI = static_cast<uint16*>(destData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 		
 		// At what frequency do we sample the vertex data we're using?
-		size_t vertexIncrement = (getVertexDataRecord()->resolution - 1) / (batchSize - 1);
+		size_t vertexIncrement = (vdr->resolution - 1) / (batchSize - 1);
 		// Ratio of the main terrain resolution in relation to this vertex data resolution
-		size_t resolutionRatio = (mTerrain->getSize() - 1) / (getVertexDataRecord()->resolution - 1);
+		size_t resolutionRatio = (mTerrain->getSize() - 1) / (vdr->resolution - 1);
 		// also factor in that we may be addressing just a subset
 		uint16 depthDifference = mDepth - mNodeWithVertexData->mDepth;
 		vertexIncrement /= (1 << depthDifference);
-		size_t rowSize = getVertexDataRecord()->resolution * vertexIncrement;
+		size_t rowSize = vdr->resolution * vertexIncrement;
 
 		// Start on the right
-		uint16 currentVertex = batchSize * vertexIncrement;
+		uint16 currentVertex = (batchSize - 1) * vertexIncrement;
 		// but, our quad area might not start at 0 in this vertex data
 		// offsets are at main terrain resolution, remember
 		uint16 columnStart = (mOffsetX - mNodeWithVertexData->mOffsetX) / resolutionRatio;
 		uint16 rowStart = ((mOffsetY - mNodeWithVertexData->mOffsetY) / resolutionRatio);
-		currentVertex += rowStart * getVertexDataRecord()->resolution + columnStart;
+		currentVertex += rowStart * vdr->resolution + columnStart;
 		bool rightToLeft = true;
 		for (uint16 r = 0; r < numRows; ++r)
 		{
@@ -768,6 +770,8 @@ namespace Ogre
 			}
 			rightToLeft = !rightToLeft;
 			currentVertex += rowSize;
+			// issue one extra index to turn winding around
+			*pI++ = currentVertex;
 		}
 		
 		
