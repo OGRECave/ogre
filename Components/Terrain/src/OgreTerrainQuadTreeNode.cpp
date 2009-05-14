@@ -954,7 +954,10 @@ namespace Ogre
 			// no children were within their LOD ranges, so we should consider our own
 			// Get distance to this terrain node (to closest point of the box)
 			Vector3 localPos = cam->getDerivedPosition() - mLocalCentre;
-			Ray ray(localPos, -localPos);
+			// head towards centre of the box (note, box may not cover mLocalCentre because of height)
+			Vector3 dir(mAABB.getCenter() - localPos);
+			dir.normalise();
+			Ray ray(localPos, dir);
 			std::pair<bool, Real> intersectRes = Math::intersects(ray, mAABB);
 
 			// ray will always intersect, we just want the distance
@@ -986,6 +989,7 @@ namespace Ogre
 				{
 					// we're within range of this LOD
 					mCurrentLod = lodLvl;
+					ret = true;
 
 					if (mTerrain->getUseLodMorph())
 					{
@@ -1038,6 +1042,7 @@ namespace Ogre
 		{
 			// we should not render ourself
 			mCurrentLod = -1;
+			ret = false;
 			if (childRenderedCount < 4)
 			{
 				// only *some* children decided to render on their own, but either 
@@ -1052,8 +1057,6 @@ namespace Ogre
 					}
 				}
 			} // (childRenderedCount < 4)
-
-			ret = true;
 
 		} // (childRenderedCount == 0)
 
@@ -1098,7 +1101,6 @@ namespace Ogre
 		op.indexData = mLodLevels[mCurrentLod]->gpuIndexData;
 		op.operationType = mTerrain->getUseTriangleStrips() ?
 			RenderOperation::OT_TRIANGLE_STRIP : RenderOperation::OT_TRIANGLE_LIST;
-		op.srcRenderable = mRend;
 		op.useIndexes = true;
 		op.vertexData = getVertexDataRecord()->gpuVertexData;
 	}
