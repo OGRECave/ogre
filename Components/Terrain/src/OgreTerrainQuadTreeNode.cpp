@@ -438,6 +438,9 @@ namespace Ogre
 			// manually create CPU-side buffer
 			HardwareVertexBufferSharedPtr vbuf(
 				OGRE_NEW DefaultHardwareVertexBuffer(dcl->getVertexSize(0), numVerts, HardwareBuffer::HBU_STATIC_WRITE_ONLY));
+
+			mVertexDataRecord->cpuVertexData->vertexStart = 0;
+			mVertexDataRecord->cpuVertexData->vertexCount = numVerts;
 			
 			Rect updateRect(mOffsetX, mOffsetY, mBoundaryX, mBoundaryY);
 			updateVertexBuffer(vbuf, updateRect);
@@ -522,6 +525,7 @@ namespace Ogre
 			pRowBuf += destRowSkip;
 
 		}
+
 
 		// skirt spacing based on top-level resolution (* inc to cope with resolution which is not the max)
 		uint16 skirtSpacing = (mVertexDataRecord->resolution-1) / (mVertexDataRecord->numSkirtRowsCols-1) * inc;
@@ -733,10 +737,22 @@ namespace Ogre
 		
 		uint16* pI = static_cast<uint16*>(destData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 		
-		// Main terrain area
+		// At what frequency do we sample the vertex data we're using?
 		size_t vertexIncrement = (getVertexDataRecord()->resolution - 1) / (batchSize - 1);
+		// Ratio of the main terrain resolution in relation to this vertex data resolution
+		size_t resolutionRatio = (mTerrain->getSize() - 1) / (getVertexDataRecord()->resolution - 1);
+		// also factor in that we may be addressing just a subset
+		uint16 depthDifference = mDepth - mNodeWithVertexData->mDepth;
+		vertexIncrement /= (1 << depthDifference);
 		size_t rowSize = getVertexDataRecord()->resolution * vertexIncrement;
+
+		// Start on the right
 		uint16 currentVertex = batchSize * vertexIncrement;
+		// but, our quad area might not start at 0 in this vertex data
+		// offsets are at main terrain resolution, remember
+		uint16 columnStart = (mOffsetX - mNodeWithVertexData->mOffsetX) / resolutionRatio;
+		uint16 rowStart = ((mOffsetY - mNodeWithVertexData->mOffsetY) / resolutionRatio);
+		currentVertex += rowStart * getVertexDataRecord()->resolution + columnStart;
 		bool rightToLeft = true;
 		for (uint16 r = 0; r < numRows; ++r)
 		{
@@ -792,7 +808,6 @@ namespace Ogre
 				skirtIndex += vertexIncrement;
 			}
 		}
-		
 		
 
 

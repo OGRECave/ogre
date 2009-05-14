@@ -38,6 +38,7 @@ Torus Knot Software Ltd.
 #include "OgreBitwise.h"
 #include "OgreStringConverter.h"
 #include "OgreViewport.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {
@@ -351,6 +352,11 @@ namespace Ogre
 		mNumLodLevels = Math::Log2(mSize - 1) - Math::Log2(mMinBatchSize - 1) + 1;
 		//mTreeDepth = Math::Log2(mMaxBatchSize - 1) - Math::Log2(mMinBatchSize - 1) + 2;
 		mTreeDepth = mNumLodLevels - mNumLodLevelsPerLeafNode + 1;
+
+		LogManager::getSingleton().stream() << "Terrain created; size=" << mSize
+			<< " minBatch=" << mMinBatchSize << " maxBatch=" << mMaxBatchSize
+			<< " treeDepth=" << mTreeDepth << " lodLevels=" << mNumLodLevels 
+			<< " leafLods=" << mNumLodLevelsPerLeafNode;
 	}
 	//---------------------------------------------------------------------
 	void Terrain::distributeVertexData()
@@ -423,6 +429,10 @@ namespace Ogre
 
 		*/
 
+		LogManager& logMgr = LogManager::getSingleton();
+		logMgr.stream(LML_TRIVIAL) << "Terrain::distributeVertexData processing source "
+			"terrain size of " << mSize;
+
 		uint16 depth = mTreeDepth;
 		uint16 prevdepth = depth;
 		uint16 currresolution = mSize;
@@ -433,6 +443,9 @@ namespace Ogre
 			uint splits = 1 << depth;
 			if (splits == targetSplits)
 			{
+				logMgr.stream(LML_TRIVIAL) << "  Assigning vertex data, resolution="
+					<< bakedresolution << " startDepth=" << depth << " endDepth=" << prevdepth
+					<< " splits=" << splits;
 				// vertex data goes at this level, at bakedresolution
 				// applies to all lower levels (except those with a closer vertex data)
 				mQuadTree->assignVertexData(depth, prevdepth, bakedresolution);
@@ -450,7 +463,15 @@ namespace Ogre
 		}
 
 		// Always assign vertex data to the top of the tree
-		mQuadTree->assignVertexData(0, prevdepth, bakedresolution);
+		if (prevdepth > 0)
+		{
+			mQuadTree->assignVertexData(0, 1, getMinBatchSize());
+			logMgr.stream(LML_TRIVIAL) << "  Assigning vertex data, resolution: "
+				<< getMinBatchSize() << " startDepth: 0 endDepth: 1 splits: 1";
+
+		}
+
+		logMgr.stream(LML_TRIVIAL) << "Terrain::distributeVertexData finished";
 
 	}
 	//---------------------------------------------------------------------

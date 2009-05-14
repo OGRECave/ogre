@@ -251,7 +251,6 @@ namespace Ogre
 		{
 			VertexData* cpuVertexData;
 			VertexData* gpuVertexData;
-			/// Base resolution of the data (size down one side, for the whole terrain)
 			uint16 resolution;
 			/// Number of quadtree levels (including this one) this data applies to
 			uint16 treeLevels;
