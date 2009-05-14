@@ -192,131 +192,131 @@ namespace Ogre
 		{
 			renderSystem->mActiveD3DDriver = findDriver(renderWindow);
 			nAdapterOrdinal = renderSystem->mActiveD3DDriver->getAdapterNumber();
+		}		
 
-			// Default group includes at least the given render window.
-			renderWindowsGroup.push_back(renderWindow);
+		// Default group includes at least the given render window.
+		renderWindowsGroup.push_back(renderWindow);
 
-			// Case this is a full screen window, check if we can create a group of 
-			// render windows on the same device using the multi-head feature.
-			if (renderWindow->isFullScreen())
+		// Case this is a full screen window, check if we can create a group of 
+		// render windows on the same device using the multi-head feature.
+		if (renderWindow->isFullScreen())
+		{
+			const D3DCAPS9& targetAdapterCaps = renderSystem->mActiveD3DDriver->getD3D9DeviceCaps();
+			D3DCAPS9        masterAdapterCaps;
+
+			// Find the master device caps.
+			if (targetAdapterCaps.MasterAdapterOrdinal == targetAdapterCaps.AdapterOrdinal)
 			{
-				const D3DCAPS9& targetAdapterCaps = renderSystem->mActiveD3DDriver->getD3D9DeviceCaps();
-				D3DCAPS9        masterAdapterCaps;
+				masterAdapterCaps = targetAdapterCaps;
+			}
+			else
+			{
+				for (uint i = 0; i < driverList->count(); ++i)
+				{
+					D3D9Driver* currDriver = driverList->item(i);
+					const D3DCAPS9& currDeviceCaps = currDriver->getD3D9DeviceCaps();
 
-				// Find the master device caps.
-				if (targetAdapterCaps.MasterAdapterOrdinal == targetAdapterCaps.AdapterOrdinal)
-				{
-					masterAdapterCaps = targetAdapterCaps;
-				}
-				else
-				{
-					for (uint i = 0; i < driverList->count(); ++i)
+					if (currDeviceCaps.AdapterOrdinal == targetAdapterCaps.MasterAdapterOrdinal)
 					{
-						D3D9Driver* currDriver = driverList->item(i);
+						masterAdapterCaps = currDeviceCaps;
+						break;
+					}					
+				}
+			}
+
+			// Case the master adapter can handle multiple adapters.
+			if (masterAdapterCaps.NumberOfAdaptersInGroup > 1)
+			{				
+				// Create empty list of render windows composing this group.
+				renderWindowsGroup.resize(masterAdapterCaps.NumberOfAdaptersInGroup);
+				for (uint i = 0; i < renderWindowsGroup.size(); ++i)
+					renderWindowsGroup[i] = NULL;
+
+
+				// Assign the current render window to it's place in the group.
+				renderWindowsGroup[targetAdapterCaps.AdapterOrdinalInGroup] = renderWindow;
+
+
+				// For each existing window - check if it belongs to the group.
+				for (uint i = 0; i < renderSystem->mRenderWindows.size(); ++i)
+				{
+					D3D9RenderWindow* currRenderWindow = renderSystem->mRenderWindows[i];
+
+					if (currRenderWindow->isFullScreen())
+					{
+						D3D9Driver* currDriver = findDriver(currRenderWindow);
 						const D3DCAPS9& currDeviceCaps = currDriver->getD3D9DeviceCaps();
 
-						if (currDeviceCaps.AdapterOrdinal == targetAdapterCaps.MasterAdapterOrdinal)
+						if (currDeviceCaps.MasterAdapterOrdinal == masterAdapterCaps.AdapterOrdinal)
 						{
-							masterAdapterCaps = currDeviceCaps;
+							renderWindowsGroup[currDeviceCaps.AdapterOrdinalInGroup] = currRenderWindow;
 							break;
-						}					
-					}
+						}
+					}									
 				}
 
-				// Case the master adapter can handle multiple adapters.
-				if (masterAdapterCaps.NumberOfAdaptersInGroup > 1)
-				{				
-					// Create empty list of render windows composing this group.
-					renderWindowsGroup.resize(masterAdapterCaps.NumberOfAdaptersInGroup);
-					for (uint i = 0; i < renderWindowsGroup.size(); ++i)
-						renderWindowsGroup[i] = NULL;
+				bool bDeviceGroupFull = true;
 
 
-					// Assign the current render window to it's place in the group.
-					renderWindowsGroup[targetAdapterCaps.AdapterOrdinalInGroup] = renderWindow;
-
-
-					// For each existing window - check if it belongs to the group.
-					for (uint i = 0; i < renderSystem->mRenderWindows.size(); ++i)
+				// Check if render windows group is full and ready to be drived by
+				// the master device.
+				for (uint i = 0; i < renderWindowsGroup.size(); ++i)
+				{
+					// This group misses required window -> go back to default.
+					if (renderWindowsGroup[i] == NULL)
 					{
-						D3D9RenderWindow* currRenderWindow = renderSystem->mRenderWindows[i];
+						bDeviceGroupFull = false;
+						renderWindowsGroup.clear();
+						renderWindowsGroup.push_back(renderWindow);
+						break;
+					}					
+				}
 
-						if (currRenderWindow->isFullScreen())
-						{
-							D3D9Driver* currDriver = findDriver(currRenderWindow);
-							const D3DCAPS9& currDeviceCaps = currDriver->getD3D9DeviceCaps();
+				// Case device group is full -> we can use multi head device.
+				if (bDeviceGroupFull)
+				{
+					bool validateAllDevices = false;
 
-							if (currDeviceCaps.MasterAdapterOrdinal == masterAdapterCaps.AdapterOrdinal)
-							{
-								renderWindowsGroup[currDeviceCaps.AdapterOrdinalInGroup] = currRenderWindow;
-								break;
-							}
-						}									
-					}
-
-					bool bDeviceGroupFull = true;
-
-
-					// Check if render windows group is full and ready to be drived by
-					// the master device.
 					for (uint i = 0; i < renderWindowsGroup.size(); ++i)
 					{
-						// This group misses required window -> go back to default.
-						if (renderWindowsGroup[i] == NULL)
+						D3D9RenderWindow* currRenderWindow = renderWindowsGroup[i];
+						D3D9Device* currDevice = currRenderWindow->getDevice();
+
+						// This is the master window
+						if (i == 0)
 						{
-							bDeviceGroupFull = false;
-							renderWindowsGroup.clear();
-							renderWindowsGroup.push_back(renderWindow);
-							break;
-						}					
-					}
-
-					// Case device group is full -> we can use multi head device.
-					if (bDeviceGroupFull)
-					{
-						bool validateAllDevices = false;
-
-						for (uint i = 0; i < renderWindowsGroup.size(); ++i)
-						{
-							D3D9RenderWindow* currRenderWindow = renderWindowsGroup[i];
-							D3D9Device* currDevice = currRenderWindow->getDevice();
-
-							// This is the master window
-							if (i == 0)
+							// If master device exists - just release it.
+							if (currDevice != NULL)
 							{
-								// If master device exists - just release it.
-								if (currDevice != NULL)
-								{
-									renderDevice = currDevice;
-									renderDevice->release();
-								}							
-							}
-
-							// This is subordinate window.
-							else
-							{						
-								// If subordinate device exists - destroy it.
-								if (currDevice != NULL)
-								{
-									currDevice->destroy();
-									validateAllDevices = true;
-								}							
-							}						
+								renderDevice = currDevice;
+								renderDevice->release();
+							}							
 						}
 
-						// In case some device was destroyed - make sure all other devices are valid.
-						// A possible scenario is that full screen window has been destroyed and it's handle
-						// was used and the shared focus handle. All other devices used this handle and must be
-						// recreated using other handles otherwise create device will fail. 
-						if (validateAllDevices)
-						{
-							for (uint i = 0; i < mRenderDevices.size(); ++i)
-								mRenderDevices[i]->validateFocusWindow();
-						}	
-					}				
-				}
-			}		
-		}
+						// This is subordinate window.
+						else
+						{						
+							// If subordinate device exists - destroy it.
+							if (currDevice != NULL)
+							{
+								currDevice->destroy();
+								validateAllDevices = true;
+							}							
+						}						
+					}
+
+					// In case some device was destroyed - make sure all other devices are valid.
+					// A possible scenario is that full screen window has been destroyed and it's handle
+					// was used and the shared focus handle. All other devices used this handle and must be
+					// recreated using other handles otherwise create device will fail. 
+					if (validateAllDevices)
+					{
+						for (uint i = 0; i < mRenderDevices.size(); ++i)
+							mRenderDevices[i]->validateFocusWindow();
+					}	
+				}				
+			}
+		}		
 		
 		
 
