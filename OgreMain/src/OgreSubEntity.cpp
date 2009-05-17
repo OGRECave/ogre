@@ -80,6 +80,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SubEntity::setMaterialName( const String& name)
     {
+		// early-out
+		if (name == mMaterialName)
+			return;
+		
 		MaterialPtr material = MaterialManager::getSingleton().getByName(name);
 
 		if( material.isNull() )

@@ -985,6 +985,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setMaterialName(const String& name)
     {
+		// early-out
+		if (name == mMaterialName)
+			return;
+
         mMaterialName = name;
         if (mIsRendererConfigured)
         {
