@@ -86,6 +86,8 @@ set (HEADER_FILES
   include/OgreImage.h
   include/OgreImageCodec.h
   include/OgreInstancedGeometry.h
+  include/OgreIteratorRange.h
+  include/OgreIteratorWrapper.h
   include/OgreIteratorWrappers.h
   include/OgreKeyFrame.h
   include/OgreLight.h

@@ -160,6 +160,7 @@ endif ()
 cmake_dependent_option(OGRE_CONFIG_DISABLE_FREEIMAGE "Don't build FreeImage codec. If you use this option, you need to provide your own image handling codecs." FALSE "FreeImage_FOUND" TRUE)
 option(OGRE_CONFIG_DISABLE_DDS "Don't build DDS codec." FALSE)
 option(OGRE_CONFIG_NEW_COMPILERS "Use the new script compilers." TRUE)
+cmake_dependent_option(OGRE_USE_BOOST "Use Boost extensions" TRUE "Boost_FOUND" FALSE)
 # Customise what to install
 option(OGRE_INSTALL_PLUGINS_HEADERS "Install header files for Ogre plugins." FALSE)
 option(OGRE_INSTALL_SAMPLES "Install Ogre demos." FALSE)
