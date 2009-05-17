@@ -224,6 +224,13 @@ namespace Ogre {
 		*/
 		bool isTransparentSortingEnabled(void) const;
 
+		/** Returns true if this Technique has transparent sorting forced. 
+		@remarks
+			This basically boils down to whether the first pass
+			has transparent sorting forced or not
+		*/
+		bool isTransparentSortingForced(void) const;
+
         /** Internal prepare method, derived from call to Material::prepare. */
         void _prepare(void);
         /** Internal unprepare method, derived from call to Material::unprepare. */

@@ -1572,11 +1572,25 @@ namespace Ogre{
 					else
 					{
 						bool val = true;
-						if(getBoolean(prop->values.front(), &val))
+						if(getBoolean(prop->values.front(), &val)) 
+						{
 							mPass->setTransparentSortingEnabled(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-								prop->values.front()->getValue() + " is not a valid boolean");
+                            mPass->setTransparentSortingForced(false);
+                        } 
+						else 
+						{
+                            String val2;
+                            if (getString(prop->values.front(), &val2) && val2=="force") 
+							{
+                                mPass->setTransparentSortingEnabled(true);
+                                mPass->setTransparentSortingForced(true);
+                            }
+							else 
+							{
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                    prop->values.front()->getValue() + " must be boolean or force");
+                            }
+                        }    
 					}
 					break;
 				case ID_ILLUMINATION_STAGE:

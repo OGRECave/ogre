@@ -873,9 +873,11 @@ Default: normalise_normals off@*
 
 Sets if transparent textures should be sorted by depth or not.@*@*
 
-Format: transparent_sorting <on|off>@*@*
+Format: transparent_sorting <on|off|force>@*@*
 
-By default all transparent materials are sorted such that renderables furthest away from the camera are rendered first. This is usually the desired behaviour but in certain cases this depth sorting may be unnecessary and undesirable. If for example it is necessary to ensure the rendering order does not change from one frame to the next.@*@*
+By default all transparent materials are sorted such that renderables furthest away from the camera are rendered first. This is usually the desired behaviour but in certain cases this depth sorting may be unnecessary and undesirable. If for example it is necessary to ensure the rendering order does not change from one frame to the next. In this case you could set the value to 'off' to prevent sorting.@*@*
+
+You can also use the keyword 'force' to force transparent sorting on, regardless of other circumstances. Usually sorting is only used when the pass is also transparent, and has a depth write or read which indicates it cannot reliably render without sorting. By using 'force', you tell OGRE to sort this pass no matter what other circumstances are present.@*@*
 
 Default: transparent_sorting on@*@*
 

@@ -151,6 +151,8 @@ namespace Ogre {
 
 		// Transparent depth sorting
 		bool mTransparentSorting;
+		// Transparent depth sorting forced
+		bool mTransparentSortingForced;
         //-------------------------------------------------------------------------
 
         //-------------------------------------------------------------------------
@@ -1056,6 +1058,21 @@ namespace Ogre {
         /** Returns whether or not transparent sorting is enabled.
         */
 		bool getTransparentSortingEnabled(void) const;
+
+        /** Sets whether or not transparent sorting is forced.
+        @param enabled
+			If true depth sorting of this material will be depend only on the value of
+            getTransparentSortingEnabled().
+        @remarks
+			By default even if transparent sorting is enabled, depth sorting will only be
+            performed when the material is transparent and depth write/check are disabled.
+            This function disables these extra conditions.
+        */
+        void setTransparentSortingForced(bool enabled);
+
+        /** Returns whether or not transparent sorting is forced.
+        */
+		bool getTransparentSortingForced(void) const;
 
 		/** Sets whether or not this pass should iterate per light or number of
 			lights which can affect the object being rendered.
