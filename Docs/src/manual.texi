@@ -2519,7 +2519,7 @@ Once scripts have been parsed, your code is free to instantiate systems based on
 Several particle systems may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ({}), and comments indicated by starting a line with '//' (note, no nested form comments allowed). The general format is shown below in a typical example:
 @example
 // A sparkly purple fountain
-Examples/PurpleFountain
+particle_system Examples/PurpleFountain
 {
     material Examples/Flare2
     particle_width 20

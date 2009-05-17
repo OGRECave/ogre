@@ -1005,6 +1005,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
+		// early-out
+		if (name == mMaterialName)
+			return;
+
         mMaterialName = name;
         if (mIsRendererConfigured)
         {

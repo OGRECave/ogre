@@ -301,6 +301,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardSet::setMaterialName( const String& name , const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */ )
     {
+		// early-out
+		if (name == mMaterialName)
+			return;
+		
         mMaterialName = name;
 
         mpMaterial = MaterialManager::getSingleton().getByName(name, groupName);

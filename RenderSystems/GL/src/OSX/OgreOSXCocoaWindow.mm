@@ -60,6 +60,7 @@ namespace Ogre {
 	void OSXCocoaWindow::create(const String& name, unsigned int width, unsigned int height,
 	            bool fullScreen, const NameValuePairList *miscParams)
     {
+		mIsFullScreen=fullScreen;
 		NSAutoreleasePool *arp = [[NSAutoreleasePool alloc] init];
 		NSApplicationLoad();
 		//OgreWindowDelegate *delegate = [[OgreWindowDelegate alloc] initWithGLOSXCocoaWindow:this];
@@ -361,6 +362,16 @@ Key: "vsync" Description: Synchronize buffer swaps to vsync Values: true, false 
 		if( name == "GLCONTEXT" ) 
 		{
 			*static_cast<OSXContext**>(pData) = mContext;
+			return;
+		} 
+		if( name == "WINDOW" ) 
+		{
+			*(void**)pData = mWindow;
+			return;
+		} 
+		if( name == "VIEW" ) 
+		{
+			*(void**)(pData) = mView;
 			return;
 		} 
 	}

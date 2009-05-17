@@ -858,7 +858,7 @@ class MeshExporter:
 		# populated on export
 		self.submeshManager = None
 		return
-	def export(self, dir, materialManager=MaterialManager(), fixUpAxis=True, exportMesh=True, colouredAmbient=False, convertXML=False):
+	def export(self, dir, materialManager, fixUpAxis=True, exportMesh=True, colouredAmbient=False, convertXML=False):
 		# leave editmode
 		editmode = Blender.Window.EditMode()
 		if editmode:
@@ -902,7 +902,7 @@ class MeshExporter:
 		bMesh = self.bObject.getData(mesh=True)
 		self.submeshManager = SubmeshManager(bMesh, fixUpAxis, self.armatureExporter)
 		for bMFace in bMesh.faces:
-			faceMaterial = materialManager.getMaterial(bMesh, bMFace, colouredAmbient)
+			faceMaterial = materialManager.getMaterial(bMesh, bMFace, colouredAmbient, self.name)
 			if faceMaterial and exportMesh:
 				# append face to submesh
 				self.submeshManager.getSubmesh(faceMaterial).addFace(bMFace)

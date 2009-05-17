@@ -80,6 +80,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SubEntity::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
+		// early-out
+		if (name == mMaterialName)
+			return;
+
 		MaterialPtr material = MaterialManager::getSingleton().getByName(name, groupName);
 
 		if( material.isNull() )
