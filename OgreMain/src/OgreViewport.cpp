@@ -35,6 +35,7 @@ Torus Knot Software Ltd.
 #include "OgreMath.h"
 #include "OgreRoot.h"
 #include "OgreMaterialManager.h"
+#include "OgreRenderSystem.h"
 
 
 namespace Ogre {
@@ -219,6 +220,20 @@ namespace Ogre {
     {
         return mClearBuffers;
     }
+    //---------------------------------------------------------------------
+	void Viewport::clear(unsigned int buffers, const ColourValue& col,  
+						 Real depth, unsigned short stencil)
+	{
+		RenderSystem* rs = Root::getSingleton().getRenderSystem();
+		if (rs)
+		{
+			Viewport* currentvp = rs->_getViewport();
+			rs->_setViewport(this);
+			rs->clearFrameBuffer(buffers, col, depth, stencil);
+			if (currentvp && currentvp != this)
+				rs->_setViewport(currentvp);
+		}
+	}
     //---------------------------------------------------------------------
     void Viewport::getActualDimensions(int &left, int&top, int &width, int &height) const
     {
