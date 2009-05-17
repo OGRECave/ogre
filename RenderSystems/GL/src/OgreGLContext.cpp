@@ -55,7 +55,7 @@ GLEWContext * glewGetContext()
 	{
 		currentGLEWContextsPtr = new GLEWContext();
 		GLEWContextsPtr.reset(currentGLEWContextsPtr);
-		ZeroMemory(currentGLEWContextsPtr, sizeof(GLEWContext));
+		memset(currentGLEWContextsPtr, 0, sizeof(GLEWContext));
 		glewInit();
 	}
 	return currentGLEWContextsPtr;
