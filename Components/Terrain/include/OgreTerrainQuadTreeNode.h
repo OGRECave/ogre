@@ -358,7 +358,6 @@ namespace Ogre
 		void createGpuIndexData();
 		void destroyGpuIndexData();
 
-		void createTriangleListBuffer(uint16 batchSize, IndexData* destData);
 		void createTriangleStripBuffer(uint16 batchSize, IndexData* destData);
 		
 		uint16 calcSkirtVertexIndex(uint16 mainIndex, bool isCol);

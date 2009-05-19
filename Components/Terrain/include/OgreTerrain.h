@@ -364,10 +364,6 @@ namespace Ogre
 		void dirtyRect(const Rect& rect);
 
 
-		/** Whether to use triangle strips or not then rendering terrain
-			(default true, set for new Terrain using TerrainGlobalOptions)
-		*/
-		bool getUseTriangleStrips() const { return mUseTriangleStrips; }
 		/** Whether to morph between LODs using a vertex program. 
 			(default true, set for new Terrain using TerrainGlobalOptions)
 		*/
@@ -502,7 +498,6 @@ namespace Ogre
 		RealVector mSplatTextureUVMultiplier;
 
 
-		bool mUseTriangleStrips;
 		bool mUseLodMorph;
 		Real mSkirtSize;
 		bool mGenerateVertexNormals;
@@ -529,7 +524,6 @@ namespace Ogre
 		// no instantiation
 		TerrainGlobalOptions() {}
 
-		static bool msUseTriangleStrips;
 		static bool msUseLodMorph;
 		static Real msSkirtSize;
 		static bool msGenerateVertexNormals;
@@ -545,16 +539,6 @@ namespace Ogre
 	public:
 
 
-		/** Static method - whether to use triangle strips or not then rendering terrain
-		(default true)
-		*/
-		static bool getUseTriangleStrips() { return msUseTriangleStrips; }
-		/** Static method - whether to use triangle strips or not then rendering terrain
-		(default true)
-		@remarks
-			Changing this value only applies to Terrain instances loaded / reloaded afterwards.
-		*/
-		static void setUseTriangleStrips(bool useStrips) { msUseTriangleStrips = useStrips; }
 		/** Static method - whether to morph between LODs using a vertex program. 
 		(default true)
 		*/

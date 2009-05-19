@@ -686,30 +686,9 @@ namespace Ogre
 
 			ll->cpuIndexData = OGRE_NEW IndexData();
 
-			if (mTerrain->getUseTriangleStrips())
-				createTriangleStripBuffer(ll->batchSize, ll->cpuIndexData);
-			else
-				createTriangleListBuffer(ll->batchSize, ll->cpuIndexData);
+			createTriangleStripBuffer(ll->batchSize, ll->cpuIndexData);
 			
 		}
-	}
-	//---------------------------------------------------------------------
-	void TerrainQuadTreeNode::createTriangleListBuffer(uint16 batchSize, IndexData* destData)
-	{
-		/* Triangles are this shape for all rows:
-		 6---7---8
-		 | \ | \ |
-		 3---4---5
-		 | \ | \ |
-		 0---1---2
-		 Represented as (0,1,3), (3,1,4) etc
-		Skirts are added to the end of the list, and for consistency with the
-		strip generation of skirts, are generated from the top-right and go
-		anticlockwise around the edge. This goes: (8,s8,7,s8,s7,7,7,s7,6,s7,s6,6)
-		 for the top edge, and correspondingly for the other edges.
-		*/
-		
-
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::createTriangleStripBuffer(uint16 batchSize, IndexData* destData)
@@ -1148,8 +1127,7 @@ namespace Ogre
 		mNodeWithVertexData->updateGpuVertexData();
 
 		op.indexData = mLodLevels[mCurrentLod]->gpuIndexData;
-		op.operationType = mTerrain->getUseTriangleStrips() ?
-			RenderOperation::OT_TRIANGLE_STRIP : RenderOperation::OT_TRIANGLE_LIST;
+		op.operationType = RenderOperation::OT_TRIANGLE_STRIP;
 		op.useIndexes = true;
 		op.vertexData = getVertexDataRecord()->gpuVertexData;
 	}

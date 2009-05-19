@@ -49,7 +49,6 @@ namespace Ogre
 	const uint16 Terrain::TERRAIN_MAX_BATCH_SIZE = 129; 
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
-	bool TerrainGlobalOptions::msUseTriangleStrips = true;
 	bool TerrainGlobalOptions::msUseLodMorph = true;
 	Real TerrainGlobalOptions::msSkirtSize = 10;
 	bool TerrainGlobalOptions::msGenerateVertexNormals = false;
@@ -305,7 +304,6 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::copyGlobalOptions()
 	{
-		mUseTriangleStrips = TerrainGlobalOptions::getUseTriangleStrips();
 		mUseLodMorph = TerrainGlobalOptions::getUseLodMorph();
 		mSkirtSize = TerrainGlobalOptions::getSkirtSize();
 		mGenerateVertexNormals = TerrainGlobalOptions::getGenerateVertexNormals();
@@ -763,7 +761,7 @@ namespace Ogre
 				for (int i = lodRect.left; i < lodRect.right - step; i += step )
 				{
 					// Form planes relating to the lower detail tris to be produced
-					// For tri lists and even tri strip rows, they are this shape:
+					// For even tri strip rows, they are this shape:
 					// x---x
 					// | / |
 					// x---x
@@ -780,7 +778,7 @@ namespace Ogre
 
 					Plane t1, t2;
 					bool backwardTri = false;
-					if (!mUseTriangleStrips || j % 2 == 0)
+					if (j % 2 == 0)
 					{
 						t1.redefine(v1, v3, v2);
 						t2.redefine(v2, v3, v4);
