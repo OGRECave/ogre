@@ -465,7 +465,7 @@ namespace Ogre
 		// Always assign vertex data to the top of the tree
 		if (prevdepth > 0)
 		{
-			mQuadTree->assignVertexData(0, 1, getMinBatchSize());
+			mQuadTree->assignVertexData(0, 1, bakedresolution);
 			logMgr.stream(LML_TRIVIAL) << "  Assigning vertex data, resolution: "
 				<< getMinBatchSize() << " startDepth: 0 endDepth: 1 splits: 1";
 

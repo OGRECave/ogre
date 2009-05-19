@@ -340,7 +340,7 @@ namespace Ogre
 		{
 			// we own this vertex data
 			mNodeWithVertexData = this;
-			mVertexDataRecord = OGRE_NEW VertexDataRecord(resolution, treeDepthEnd - treeDepthStart + 1);
+			mVertexDataRecord = OGRE_NEW VertexDataRecord(resolution, treeDepthEnd - treeDepthStart);
 
 			createCpuVertexData();
 			createCpuIndexData();
@@ -758,15 +758,19 @@ namespace Ogre
 		bool rightToLeft = true;
 		for (uint16 r = 0; r < numRows; ++r)
 		{
-			for (uint16 c = 0; c < batchSize - 1; ++c)
+			for (uint16 c = 0; c < batchSize; ++c)
 			{
 								
 				*pI++ = currentVertex;
 				*pI++ = currentVertex + rowSize;
 				
-				currentVertex = rightToLeft ? 
-					currentVertex - vertexIncrement : currentVertex + vertexIncrement;
-				
+				// don't increment / decrement at a border, keep this vertex for next
+				// row as we 'snake' across the tile
+				if (c+1 < batchSize)
+				{
+					currentVertex = rightToLeft ? 
+						currentVertex - vertexIncrement : currentVertex + vertexIncrement;
+				}				
 			}
 			rightToLeft = !rightToLeft;
 			currentVertex += rowSize;
