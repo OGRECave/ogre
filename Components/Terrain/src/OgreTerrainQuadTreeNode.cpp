@@ -529,7 +529,7 @@ namespace Ogre
 
 
 		// skirt spacing based on top-level resolution (* inc to cope with resolution which is not the max)
-		uint16 skirtSpacing = (mVertexDataRecord->resolution-1) / (mVertexDataRecord->numSkirtRowsCols-1) * inc;
+		uint16 skirtSpacing = mVertexDataRecord->skirtRowColSkip * inc;
 		Vector3 skirtOffset;
 		mTerrain->getVector(0, 0, -mTerrain->getSkirtSize(), &skirtOffset);
 
@@ -632,9 +632,6 @@ namespace Ogre
 		// row / col in main vertex resolution
 		uint16 row = mainIndex / vdr->resolution;
 		uint16 col = mainIndex % vdr->resolution;
-
-		uint16 skirtRow = row / vdr->skirtRowColSkip;
-		uint16 skirtCol = col / vdr->skirtRowColSkip;
 		
 		// skrits are after main vertices, so skip them
 		uint16 base = vdr->resolution * vdr->resolution;
@@ -649,12 +646,14 @@ namespace Ogre
 		// which is already relative
 		if (isCol)
 		{
+			uint16 skirtNum = col / vdr->skirtRowColSkip;
 			uint16 colbase = vdr->numSkirtRowsCols * vdr->resolution;
-			return base + colbase + vdr->resolution * skirtCol + skirtRow;
+			return base + colbase + vdr->resolution * skirtNum + row;
 		}
 		else
 		{
-			return base + vdr->resolution * skirtRow + skirtCol;
+			uint16 skirtNum = row / vdr->skirtRowColSkip;
+			return base + vdr->resolution * skirtNum + col;
 		}
 		
 	}
@@ -796,20 +795,29 @@ namespace Ogre
 		// Skirts
 		for (uint16 s = 0; s < 4; ++s)
 		{
-			int edgeIncrement;
+			// edgeIncrement is the index offset from one original edge vertex to the next
+			// in this row or column. Columns skip based on a row size here
+			// skirtIncrement is the index offset from one skirt vertex to the next, 
+			// because skirts are packed in rows/cols then there is no row multiplier for
+			// processing columns
+			int edgeIncrement, skirtIncrement;
 			switch(s)
 			{
 				case 0: // top
 					edgeIncrement = -static_cast<int>(vertexIncrement);
+					skirtIncrement = -static_cast<int>(vertexIncrement);
 					break;
 				case 1: // left
 					edgeIncrement = -static_cast<int>(rowSize);
+					skirtIncrement = -static_cast<int>(vertexIncrement);
 					break;
 				case 2: // bottom
 					edgeIncrement = static_cast<int>(vertexIncrement);
+					skirtIncrement = static_cast<int>(vertexIncrement);
 					break;
 				case 3: // right
 					edgeIncrement = static_cast<int>(rowSize);
+					skirtIncrement = static_cast<int>(vertexIncrement);
 					break;
 			}
 			// Skirts are stored in contiguous rows / columns (rows 0/2, cols 1/3)
@@ -819,7 +827,7 @@ namespace Ogre
 				*pI++ = currentVertex;
 				*pI++ = skirtIndex;	
 				currentVertex += edgeIncrement;
-				skirtIndex += vertexIncrement;
+				skirtIndex += skirtIncrement;
 			}
 			if (s == 3)
 			{
@@ -827,7 +835,7 @@ namespace Ogre
 				*pI++ = currentVertex;
 				*pI++ = skirtIndex;
 				currentVertex += edgeIncrement;
-				skirtIndex += vertexIncrement;
+				skirtIndex += skirtIncrement;
 			}
 		}
 		
