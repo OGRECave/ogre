@@ -1,135 +1,92 @@
-# - Find the Poco includes and libraries.
-# The following variables are set if Poco is found.  If Poco is not
-# found, Poco_FOUND is set to false.
-#  Poco_FOUND        - True when the Poco include directory is found.
-#  Poco_INCLUDE_DIRS - the path to where the poco include files are.
-#  Poco_LIBRARY_DIRS - The path to where the poco library files are.
-#  Poco_BINARY_DIRS - The path to where the poco dlls are.
-
-# ----------------------------------------------------------------------------
-# If you have installed Poco in a non-standard location.
-# Then you have three options. 
-# In the following comments, it is assumed that <Your Path>
-# points to the root directory of the include directory of Poco. e.g
-# If you have put poco in C:\development\Poco then <Your Path> is
-# "C:/development/Poco" and in this directory there will be two
-# directories called "include" and "lib".
-# 1) After CMake runs, set Poco_INCLUDE_DIR to <Your Path>/poco<-version>
-# 2) Use CMAKE_INCLUDE_PATH to set a path to <Your Path>/poco<-version>. This will allow FIND_PATH()
-#    to locate Poco_INCLUDE_DIR by utilizing the PATH_SUFFIXES option. e.g.
-#    SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "<Your Path>/include")
-# 3) Set an environment variable called ${POCO_ROOT} that points to the root of where you have
-#    installed Poco, e.g. <Your Path>. It is assumed that there is at least a subdirectory called
-#    Foundation/include/Poco in this path.
+# - Try to find POCO libraries
+# Once done, this will define
 #
-# Note:
-#  1) If you are just using the poco headers, then you do not need to use
-#     Poco_LIBRARY_DIRS in your CMakeLists.txt file.
-#  2) If Poco has not been installed, then when setting Poco_LIBRARY_DIRS
-#     the script will look for /lib first and, if this fails, then for /stage/lib.
-#
-# Usage:
-# In your CMakeLists.txt file do something like this:
-# ...
-# # Poco
-# FIND_PACKAGE(Poco)
-# ...
-# INCLUDE_DIRECTORIES(${Poco_INCLUDE_DIRS})
-# LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
-#
-# In Windows, we make the assumption that, if the Poco files are installed, the default directory
-# will be C:\poco or C:\Program Files\Poco.
+#  POCO_FOUND - system has POCO
+#  POCO_INCLUDE_DIRS - the POCO include directories 
+#  POCO_LIBRARIES - link these to use POCO
 
 include(FindPkgMacros)
-findpkg_begin(Poco)
-
-SET(POCO_INCLUDE_PATH_DESCRIPTION "top-level directory containing the poco include directories. E.g /usr/local/include/poco-1.2.1 or c:\\poco\\include\\poco-1.2.1")
-SET(POCO_INCLUDE_DIR_MESSAGE "Set the Poco_INCLUDE_DIR cmake cache entry to the ${POCO_INCLUDE_PATH_DESCRIPTION}")
-SET(POCO_LIBRARY_PATH_DESCRIPTION "top-level directory containing the poco libraries.")
-SET(POCO_LIBRARY_DIR_MESSAGE "Set the Poco_LIBRARY_DIR cmake cache entry to the ${POCO_LIBRARY_PATH_DESCRIPTION}")
+findpkg_begin(POCO)
 
 # Get path, convert backslashes as ${ENV_${var}}
+getenv_path(POCO_HOME)
 getenv_path(POCO_ROOT)
-SET(POCO_DIR_SEARCH ${POCO_ROOT} ${ENV_POCO_ROOT})
-IF(POCO_DIR_SEARCH)
-  FILE(TO_CMAKE_PATH ${POCO_DIR_SEARCH} POCO_DIR_SEARCH)
-ENDIF(POCO_DIR_SEARCH)
+getenv_path(POCO_BASE)
 
-
-IF(WIN32)
-  SET(POCO_DIR_SEARCH
-    ${POCO_DIR_SEARCH}
-    C:/poco
-    D:/poco
-    "C:Program Files/poco"
-    "D:Program Files/poco"
-  )
-ENDIF(WIN32)
-
-# Add in some path suffixes. These will have to be updated whenever a new Poco version comes out.
-SET(SUFFIX_FOR_INCLUDE_PATH
- poco-1.3.1p1
+# construct search paths
+set(POCO_PREFIX_PATH 
+  ${POCO_HOME} ${ENV_POCO_HOME} 
+  ${POCO_ROOT} ${ENV_POCO_ROOT}
+  ${POCO_BASE} ${ENV_POCO_BASE}
+)
+# redo search if prefix path changed
+clear_if_changed(POCO_PREFIX_PATH
+  POCO_LIBRARY_FWK
+  POCO_LIBRARY_REL
+  POCO_LIBRARY_DBG
+  POCO_INCLUDE_DIR
 )
 
-SET(SUFFIX_FOR_LIBRARY_PATH
- poco-1.3.1p1/lib
- poco-1.3.1p1/lib/Linux/i686
- lib
- lib/Linux/i686
-)
+create_search_paths(POCO)
+set(POCO_INC_SEARCH_PATH ${POCO_INC_SEARCH_PATH} ${POCO_PREFIX_PATH})
 
-#
-# Look for an installation.
-#
-FIND_PATH(Poco_INCLUDE_DIR NAMES Foundation/include/Poco/AbstractCache.h PATH_SUFFIXES ${SUFFIX_FOR_INCLUDE_PATH} PATHS
 
-  # Look in other places.
-  ${POCO_DIR_SEARCH}
+set(POCO_LIBRARY_NAMES PocoFoundation PocoFoundationmt)
+get_debug_names(POCO_LIBRARY_NAMES)
 
-  # Help the user find it if we cannot.
-  DOC "The ${POCO_INCLUDE_DIR_MESSAGE}"
-)
+use_pkgconfig(POCO_PKGC POCO)
 
-# Assume we didn't find it.
-SET(Poco_FOUND 0)
+findpkg_framework(POCO)
 
-# Now try to get the include and library path.
-IF(Poco_INCLUDE_DIR)
+find_path(POCO_INCLUDE_DIR NAMES Poco/Foundation.h HINTS ${POCO_INC_SEARCH_PATH} ${POCO_PKGC_INCLUDE_DIRS} PATH_SUFFIXES Foundation/include)
+find_library(POCO_LIBRARY_REL NAMES ${POCO_LIBRARY_NAMES} HINTS ${POCO_LIB_SEARCH_PATH} ${POCO_PKGC_LIBRARY_DIRS} PATH_SUFFIXES Linux/i686)
+find_library(POCO_LIBRARY_DBG NAMES ${POCO_LIBRARY_NAMES_DBG} HINTS ${POCO_LIB_SEARCH_PATH} ${POCO_PKGC_LIBRARY_DIRS} PATH_SUFFIXES Linux/i686)
+make_library_set(POCO_LIBRARY)
 
-  IF(EXISTS "${Poco_INCLUDE_DIR}")
-    SET(Poco_INCLUDE_DIRS
-      #${Poco_INCLUDE_DIR}/CppUnit/include
-      ${Poco_INCLUDE_DIR}/Foundation/include
-      #${Poco_INCLUDE_DIR}/Net/include
-      #${Poco_INCLUDE_DIR}/Util/include
-      #${Poco_INCLUDE_DIR}/XML/include
-    )
-    SET(Poco_FOUND 1)
-  ENDIF(EXISTS "${Poco_INCLUDE_DIR}")
+findpkg_finish(POCO)
 
-  if (MSVC)
-    set(Poco_LIBRARY_NAMES PocoFoundationmt)
-  else ()
-    set(Poco_LIBRARY_NAMES PocoFoundation)
-  endif()
-  get_debug_names(Poco_LIBRARY_NAMES)
+if (NOT POCO_FOUND)
+  return()
+endif ()
 
-  find_library(Poco_LIBRARY_REL NAMES ${Poco_LIBRARY_NAMES} PATH_SUFFIXES ${SUFFIX_FOR_LIBRARY_PATH} PATHS ${Poco_INCLUDE_DIR} ${POCO_DIR_SEARCH})
-  find_library(Poco_LIBRARY_DBG NAMES ${Poco_LIBRARY_NAMES_DBG} PATH_SUFFIXES ${SUFFIX_FOR_LIBRARY_PATH} PATHS ${Poco_INCLUDE_DIR} ${POCO_DIR_SEARCH})
-  
-ENDIF(Poco_INCLUDE_DIR)
 
-IF(NOT Poco_FOUND)
-  IF(NOT Poco_FIND_QUIETLY)
-    MESSAGE(STATUS "Poco was not found. ${POCO_DIR_MESSAGE}")
-  ELSE(NOT Poco_FIND_QUIETLY)
-    IF(Poco_FIND_REQUIRED)
-      MESSAGE(FATAL_ERROR "Poco was not found. ${POCO_DIR_MESSAGE}")
-    ENDIF(Poco_FIND_REQUIRED)
-  ENDIF(NOT Poco_FIND_QUIETLY)
-ENDIF(NOT Poco_FOUND)
+# Look for Poco's Util package
+findpkg_begin(POCO_Util)
+set(POCO_Util_LIBRARY_NAMES PocoUtil PocoUtilmt)
+get_debug_names(POCO_Util_LIBRARY_NAMES)
+find_path(POCO_Util_INCLUDE_DIR NAMES Poco/Util/Util.h HINTS ${POCO_INCLUDE_DIR} ${POCO_INC_SEARCH_PATH} ${POCO_PKGC_INCLUDE_DIRS} PATH_SUFFIXES Util/include)
+find_library(POCO_Util_LIBRARY_REL NAMES ${POCO_Util_LIBRARY_NAMES} HINTS ${POCO_LIB_SEARCH_PATH} ${POCO_PKGC_LIBRARY_DIRS} PATH_SUFFIXES Linux/i686)
+find_library(POCO_Util_LIBRARY_DBG NAMES ${POCO_Util_LIBRARY_NAMES_DBG} HINTS ${POCO_LIB_SEARCH_PATH} ${POCO_PKGC_LIBRARY_DIRS} PATH_SUFFIXES Linux/i686)
+make_library_set(POCO_Util_LIBRARY)
+findpkg_finish(POCO_Util)
 
-make_library_set(Poco_LIBRARY)
-set(Poco_LIBRARIES ${Poco_LIBRARY})
+# Look for Poco's Net package
+findpkg_begin(POCO_Net)
+set(POCO_Net_LIBRARY_NAMES PocoNet PocoNetmt)
+get_debug_names(POCO_Net_LIBRARY_NAMES)
+find_path(POCO_Net_INCLUDE_DIR NAMES Poco/Net/Net.h HINTS ${POCO_INCLUDE_DIR} ${POCO_INC_SEARCH_PATH} ${POCO_PKGC_INCLUDE_DIRS} PATH_SUFFIXES Net/include)
+find_library(POCO_Net_LIBRARY_REL NAMES ${POCO_Net_LIBRARY_NAMES} HINTS ${POCO_LIB_SEARCH_PATH} ${POCO_PKGC_LIBRARY_DIRS} PATH_SUFFIXES Linux/i686)
+find_library(POCO_Net_LIBRARY_DBG NAMES ${POCO_Net_LIBRARY_NAMES_DBG} HINTS ${POCO_LIB_SEARCH_PATH} ${POCO_PKGC_LIBRARY_DIRS} PATH_SUFFIXES Linux/i686)
+make_library_set(POCO_Net_LIBRARY)
+findpkg_finish(POCO_Net)
 
-findpkg_finish(Poco)
+# Look for Poco's NetSSL package
+findpkg_begin(POCO_NetSSL)
+set(POCO_NetSSL_LIBRARY_NAMES PocoNetSSL PocoNetSSLmt)
+get_debug_names(POCO_NetSSL_LIBRARY_NAMES)
+find_path(POCO_NetSSL_INCLUDE_DIR NAMES Poco/Net/NetSSL.h HINTS ${POCO_INCLUDE_DIR} ${POCO_INC_SEARCH_PATH} ${POCO_PKGC_INCLUDE_DIRS} PATH_SUFFIXES NetSSL/include)
+find_library(POCO_NetSSL_LIBRARY_REL NAMES ${POCO_NetSSL_LIBRARY_NAMES} HINTS ${POCO_LIB_SEARCH_PATH} ${POCO_PKGC_LIBRARY_DIRS} PATH_SUFFIXES Linux/i686)
+find_library(POCO_NetSSL_LIBRARY_DBG NAMES ${POCO_NetSSL_LIBRARY_NAMES_DBG} HINTS ${POCO_LIB_SEARCH_PATH} ${POCO_PKGC_LIBRARY_DIRS} PATH_SUFFIXES Linux/i686)
+make_library_set(POCO_NetSSL_LIBRARY)
+findpkg_finish(POCO_NetSSL)
+
+# Look for Poco's XML package
+findpkg_begin(POCO_XML)
+set(POCO_XML_LIBRARY_NAMES PocoXML PocoXMLmt)
+get_debug_names(POCO_XML_LIBRARY_NAMES)
+find_path(POCO_XML_INCLUDE_DIR NAMES Poco/XML/XML.h HINTS ${POCO_INCLUDE_DIR} ${POCO_INC_SEARCH_PATH} ${POCO_PKGC_INCLUDE_DIRS} PATH_SUFFIXES XML/include)
+find_library(POCO_XML_LIBRARY_REL NAMES ${POCO_XML_LIBRARY_NAMES} HINTS ${POCO_LIB_SEARCH_PATH} ${POCO_PKGC_LIBRARY_DIRS} PATH_SUFFIXES Linux/i686)
+find_library(POCO_XML_LIBRARY_DBG NAMES ${POCO_XML_LIBRARY_NAMES_DBG} HINTS ${POCO_LIB_SEARCH_PATH} ${POCO_PKGC_LIBRARY_DIRS} PATH_SUFFIXES Linux/i686)
+make_library_set(POCO_XML_LIBRARY)
+findpkg_finish(POCO_XML)
+

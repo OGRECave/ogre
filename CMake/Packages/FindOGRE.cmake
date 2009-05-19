@@ -387,7 +387,7 @@ endmacro(ogre_find_plugin)
 
 ogre_find_plugin(Plugin_PCZSceneManager OgrePCZSceneManager.h PCZ PlugIns/PCZSceneManager/include)
 ogre_find_plugin(Plugin_OctreeZone OgreOctreeZone.h PCZ PlugIns/OctreeZone/include)
-ogre_find_plugin(Plugin_BSPSceneManager OgreBSPSceneManager.h PlugIns/BSPSceneManager/include)
+ogre_find_plugin(Plugin_BSPSceneManager OgreBspSceneManager.h PlugIns/BSPSceneManager/include)
 ogre_find_plugin(Plugin_CgProgramManager OgreCgProgram.h PlugIns/CgProgramManager/include)
 ogre_find_plugin(Plugin_OctreeSceneManager OgreOctreeSceneManager.h PlugIns/OctreeSceneManager/include)
 ogre_find_plugin(Plugin_ParticleFX OgreParticleFXPrerequisites.h PlugIns/ParticleFX/include)
