@@ -110,7 +110,7 @@ macro_log_feature(Boost_DATE_TIME_FOUND "boost-date_time" "Used for threading su
 
 # POCO
 find_package(POCO)
-macro_log_feature(Poco_FOUND "POCO" "POCO framework" "http://pocoproject.org/" FALSE "" "")
+macro_log_feature(POCO_FOUND "POCO" "POCO framework" "http://pocoproject.org/" FALSE "" "")
 
 
 
