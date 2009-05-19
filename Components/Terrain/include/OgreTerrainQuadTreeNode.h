@@ -256,6 +256,8 @@ namespace Ogre
 			uint16 treeLevels;
 			/// Number of rows and columns of skirts
 			uint16 numSkirtRowsCols;
+			/// The number of rows / cols to skip in between skirts
+			uint16 skirtRowColSkip;
 			/// Is the GPU vertex data out of date?
 			bool gpuVertexDataDirty;
 

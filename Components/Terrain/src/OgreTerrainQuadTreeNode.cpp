@@ -432,6 +432,7 @@ namespace Ogre
 			// the same number of columns. There are common vertices at intersections
 			uint16 levels = mVertexDataRecord->treeLevels;
 			mVertexDataRecord->numSkirtRowsCols = (Math::Pow(2, levels) + 1);
+			mVertexDataRecord->skirtRowColSkip = (mVertexDataRecord->resolution - 1) / (mVertexDataRecord->numSkirtRowsCols - 1);
 			numVerts += mVertexDataRecord->resolution * mVertexDataRecord->numSkirtRowsCols;
 			numVerts += mVertexDataRecord->resolution * mVertexDataRecord->numSkirtRowsCols;
 
@@ -628,19 +629,32 @@ namespace Ogre
 	uint16 TerrainQuadTreeNode::calcSkirtVertexIndex(uint16 mainIndex, bool isCol)
 	{
 		const VertexDataRecord* vdr = getVertexDataRecord();
+		// row / col in main vertex resolution
 		uint16 row = mainIndex / vdr->resolution;
 		uint16 col = mainIndex % vdr->resolution;
+
+		uint16 skirtRow = row / vdr->skirtRowColSkip;
+		uint16 skirtCol = col / vdr->skirtRowColSkip;
 		
+		// skrits are after main vertices, so skip them
+		uint16 base = vdr->resolution * vdr->resolution;
+
+		// The layout in vertex data is:
+		// 1. row skirts
+		//    numSkirtRowsCols rows of resolution vertices each
+		// 2. column skirts
+		//    numSkirtRowsCols cols of resolution vertices each
+
 		// No offsets used here, this is an index into the current vertex data, 
 		// which is already relative
 		if (isCol)
 		{
-			uint16 base = vdr->numSkirtRowsCols * vdr->resolution;
-			return base + vdr->resolution * col + row;
+			uint16 colbase = vdr->numSkirtRowsCols * vdr->resolution;
+			return base + colbase + vdr->resolution * skirtCol + skirtRow;
 		}
 		else
 		{
-			return vdr->resolution * row + col;
+			return base + vdr->resolution * skirtRow + skirtCol;
 		}
 		
 	}
