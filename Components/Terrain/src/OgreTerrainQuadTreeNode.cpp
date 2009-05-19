@@ -738,12 +738,13 @@ namespace Ogre
 		// and one extra index, which is the degenerate triangle and also turning
 		// around the winding
 		const VertexDataRecord* vdr = getVertexDataRecord();
-		size_t indexesPerRow = batchSize * 2 + 1;
+		size_t mainIndexesPerRow = batchSize * 2 + 1;
 		size_t numRows = batchSize - 1;
-		size_t mainIndexCount = indexesPerRow * numRows;
-		// skirts take indexesPerRow for the first one, then indexesPerRow-1 for the
-		// other 3 sides because we chain then together
-		size_t skirtIndexCount = indexesPerRow + (indexesPerRow - 1) * 3;
+		size_t mainIndexCount = mainIndexesPerRow * numRows;
+		// skirts share edges, so they take 1 less row per side than batchSize, 
+		// but with 2 extra at the end (repeated) to finish the strip
+		// * 2 for the vertical line, * 4 for the sides, +2 to finish
+		size_t skirtIndexCount = (batchSize - 1) * 2 * 4 + 2;
 		
 		destData->indexStart = 0;
 		destData->indexCount = mainIndexCount + skirtIndexCount;
@@ -751,6 +752,7 @@ namespace Ogre
 			HardwareIndexBuffer::IT_16BIT, destData->indexCount, HardwareBuffer::HBU_STATIC)); 
 		
 		uint16* pI = static_cast<uint16*>(destData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+		uint16* basepI = pI;
 		
 		// At what frequency do we sample the vertex data we're using?
 		size_t vertexIncrement = (vdr->resolution - 1) / (batchSize - 1);
@@ -838,6 +840,8 @@ namespace Ogre
 				skirtIndex += skirtIncrement;
 			}
 		}
+
+		assert (pI - basepI == destData->indexCount);
 		
 
 
