@@ -332,7 +332,8 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void TerrainQuadTreeNode::assignVertexData(uint16 treeDepthStart, uint16 treeDepthEnd, uint16 resolution)
+	void TerrainQuadTreeNode::assignVertexData(uint16 treeDepthStart, 
+		uint16 treeDepthEnd, uint16 resolution, uint sz)
 	{
 		assert(treeDepthStart >= mDepth && "Should not be calling this");
 
@@ -340,7 +341,7 @@ namespace Ogre
 		{
 			// we own this vertex data
 			mNodeWithVertexData = this;
-			mVertexDataRecord = OGRE_NEW VertexDataRecord(resolution, treeDepthEnd - treeDepthStart);
+			mVertexDataRecord = OGRE_NEW VertexDataRecord(resolution, sz, treeDepthEnd - treeDepthStart);
 
 			createCpuVertexData();
 			createCpuIndexData();
@@ -358,7 +359,7 @@ namespace Ogre
 			assert(!isLeaf() && "No more levels below this!");
 
 			for (int i = 0; i < 4; ++i)
-				mChildren[i]->assignVertexData(treeDepthStart, treeDepthEnd, resolution);
+				mChildren[i]->assignVertexData(treeDepthStart, treeDepthEnd, resolution, sz);
 			
 		}
 
@@ -420,8 +421,8 @@ namespace Ogre
 			offset += dcl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES).getSize();
 
 			// Calculate number of vertices
-			// Base geometry res * res
-			size_t baseNumVerts = Math::Sqr(mVertexDataRecord->resolution);
+			// Base geometry size * size
+			size_t baseNumVerts = Math::Sqr(mVertexDataRecord->size);
 			size_t numVerts = baseNumVerts;
 			// Now add space for skirts
 			// Skirts will be rendered as copies of the edge vertices translated downwards
@@ -432,9 +433,9 @@ namespace Ogre
 			// the same number of columns. There are common vertices at intersections
 			uint16 levels = mVertexDataRecord->treeLevels;
 			mVertexDataRecord->numSkirtRowsCols = (Math::Pow(2, levels) + 1);
-			mVertexDataRecord->skirtRowColSkip = (mVertexDataRecord->resolution - 1) / (mVertexDataRecord->numSkirtRowsCols - 1);
-			numVerts += mVertexDataRecord->resolution * mVertexDataRecord->numSkirtRowsCols;
-			numVerts += mVertexDataRecord->resolution * mVertexDataRecord->numSkirtRowsCols;
+			mVertexDataRecord->skirtRowColSkip = (mVertexDataRecord->size - 1) / (mVertexDataRecord->numSkirtRowsCols - 1);
+			numVerts += mVertexDataRecord->size * mVertexDataRecord->numSkirtRowsCols;
+			numVerts += mVertexDataRecord->size * mVertexDataRecord->numSkirtRowsCols;
 
 			// manually create CPU-side buffer
 			HardwareVertexBufferSharedPtr vbuf(
@@ -478,7 +479,7 @@ namespace Ogre
 		const float* pBaseHeight = mTerrain->getHeightData(rect.left, rect.top);
 		const float* pBaseDelta = mTerrain->getDeltaData(rect.left, rect.top);
 		uint16 rowskip = mTerrain->getSize() * inc;
-		uint16 destRowSkip = mVertexDataRecord->resolution * vbuf->getVertexSize();
+		uint16 destRowSkip = mVertexDataRecord->size * vbuf->getVertexSize();
 		Vector3 pos;
 		unsigned char* pRootBuf = static_cast<unsigned char*>(vbuf->lock(lockMode));
 		unsigned char* pRowBuf = pRootBuf;
@@ -492,6 +493,9 @@ namespace Ogre
 			for (uint16 x = rect.left; x < rect.right; x += inc)
 			{
 				mTerrain->getPoint(x, y, *pHeight, &pos);
+				// relative to local centre
+				pos -= mLocalCentre;
+
 				pHeight += inc;
 
 				*pBuf++ = pos.x;
@@ -545,7 +549,7 @@ namespace Ogre
 		pBaseHeight = mTerrain->getHeightData(skirtStartX, skirtStartY);
 		// position dest buffer just after the main vertex data
 		pRowBuf = pRootBuf + vbuf->getVertexSize() 
-			* mVertexDataRecord->resolution * mVertexDataRecord->resolution;
+			* mVertexDataRecord->size * mVertexDataRecord->size;
 		// move it onwards to skip the skirts we don't need to update
 		pRowBuf += destRowSkip * (skirtStartY - mOffsetY) / skirtSpacing;
 		pRowBuf += vbuf->getVertexSize() * (skirtStartX - mOffsetX) / skirtSpacing;
@@ -556,6 +560,8 @@ namespace Ogre
 			for (uint16 x = skirtStartX; x < rect.right; x += inc)
 			{
 				mTerrain->getPoint(x, y, *pHeight, &pos);
+				// relative to local centre
+				pos -= mLocalCentre;
 				pHeight += inc;
 
 				pos += skirtOffset;
@@ -584,9 +590,9 @@ namespace Ogre
 		// skirt cols
 		// position dest buffer just after the main vertex data and skirt rows
 		pRowBuf = pRootBuf + vbuf->getVertexSize() 
-		* mVertexDataRecord->resolution * mVertexDataRecord->resolution;
+			* mVertexDataRecord->size * mVertexDataRecord->size;
 		// skip the row skirts
-		pRowBuf += mVertexDataRecord->numSkirtRowsCols * mVertexDataRecord->resolution * vbuf->getVertexSize();
+		pRowBuf += mVertexDataRecord->numSkirtRowsCols * mVertexDataRecord->size * vbuf->getVertexSize();
 		// move it onwards to skip the skirts we don't need to update
 		pRowBuf += destRowSkip * (skirtStartX - mOffsetX) / skirtSpacing;
 		pRowBuf += vbuf->getVertexSize() * (skirtStartY - mOffsetY) / skirtSpacing;
@@ -597,6 +603,8 @@ namespace Ogre
 			for (uint16 y = skirtStartY; y < rect.bottom; y += inc)
 			{
 				mTerrain->getPoint(x, y, mTerrain->getHeight(x, y), &pos);
+				// relative to local centre
+				pos -= mLocalCentre;
 				pos += skirtOffset;
 
 				*pBuf++ = pos.x;
@@ -630,11 +638,11 @@ namespace Ogre
 	{
 		const VertexDataRecord* vdr = getVertexDataRecord();
 		// row / col in main vertex resolution
-		uint16 row = mainIndex / vdr->resolution;
-		uint16 col = mainIndex % vdr->resolution;
+		uint16 row = mainIndex / vdr->size;
+		uint16 col = mainIndex % vdr->size;
 		
 		// skrits are after main vertices, so skip them
-		uint16 base = vdr->resolution * vdr->resolution;
+		uint16 base = vdr->size * vdr->size;
 
 		// The layout in vertex data is:
 		// 1. row skirts
@@ -647,13 +655,13 @@ namespace Ogre
 		if (isCol)
 		{
 			uint16 skirtNum = col / vdr->skirtRowColSkip;
-			uint16 colbase = vdr->numSkirtRowsCols * vdr->resolution;
-			return base + colbase + vdr->resolution * skirtNum + row;
+			uint16 colbase = vdr->numSkirtRowsCols * vdr->size;
+			return base + colbase + vdr->size * skirtNum + row;
 		}
 		else
 		{
 			uint16 skirtNum = row / vdr->skirtRowColSkip;
-			return base + vdr->resolution * skirtNum + col;
+			return base + vdr->size * skirtNum + col;
 		}
 		
 	}
@@ -733,14 +741,14 @@ namespace Ogre
 		uint16* pI = static_cast<uint16*>(destData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 		uint16* basepI = pI;
 		
-		// At what frequency do we sample the vertex data we're using?
-		size_t vertexIncrement = (vdr->resolution - 1) / (batchSize - 1);
 		// Ratio of the main terrain resolution in relation to this vertex data resolution
 		size_t resolutionRatio = (mTerrain->getSize() - 1) / (vdr->resolution - 1);
-		// also factor in that we may be addressing just a subset
-		uint16 depthDifference = mDepth - mNodeWithVertexData->mDepth;
-		vertexIncrement /= (1 << depthDifference);
-		size_t rowSize = vdr->resolution * vertexIncrement;
+		// At what frequency do we sample the vertex data we're using?
+		// mSize is the coverage in terms of the original terrain data (not split to fit in 16-bit)
+		size_t vertexIncrement = (mSize-1) / (batchSize-1);
+		// however, the vertex data we're referencing may not be at the full resolution anyway
+		vertexIncrement /= resolutionRatio;
+		size_t rowSize = vdr->size * vertexIncrement;
 
 		// Start on the right
 		uint16 currentVertex = (batchSize - 1) * vertexIncrement;
@@ -748,7 +756,7 @@ namespace Ogre
 		// offsets are at main terrain resolution, remember
 		uint16 columnStart = (mOffsetX - mNodeWithVertexData->mOffsetX) / resolutionRatio;
 		uint16 rowStart = ((mOffsetY - mNodeWithVertexData->mOffsetY) / resolutionRatio);
-		currentVertex += rowStart * vdr->resolution + columnStart;
+		currentVertex += rowStart * vdr->size + columnStart;
 		bool rightToLeft = true;
 		for (uint16 r = 0; r < numRows; ++r)
 		{
@@ -821,7 +829,6 @@ namespace Ogre
 		}
 
 		assert (pI - basepI == destData->indexCount);
-		
 
 
 	}
@@ -961,7 +968,10 @@ namespace Ogre
 	{
 		// early-out
 		if (!cam->isVisible(mMovable->getWorldBoundingBox(true)))
+		{
+			mCurrentLod = -1;
 			return false;
+		}
 
 		bool ret = false;
 
@@ -1070,7 +1080,7 @@ namespace Ogre
 		{
 			// we should not render ourself
 			mCurrentLod = -1;
-			ret = false;
+			ret = true; // to indicate a child has rendered so parent doesn't need to
 			if (childRenderedCount < 4)
 			{
 				// only *some* children decided to render on their own, but either 

@@ -446,7 +446,9 @@ namespace Ogre
 					<< " splits=" << splits;
 				// vertex data goes at this level, at bakedresolution
 				// applies to all lower levels (except those with a closer vertex data)
-				mQuadTree->assignVertexData(depth, prevdepth, bakedresolution);
+				// determine physical size (as opposed to resolution)
+				size_t sz = ((bakedresolution-1) / splits) + 1;
+				mQuadTree->assignVertexData(depth, prevdepth, bakedresolution, sz);
 
 				// next set to look for
 				bakedresolution =  ((currresolution - 1) >> 1) + 1;
@@ -463,9 +465,9 @@ namespace Ogre
 		// Always assign vertex data to the top of the tree
 		if (prevdepth > 0)
 		{
-			mQuadTree->assignVertexData(0, 1, bakedresolution);
+			mQuadTree->assignVertexData(0, 1, bakedresolution, bakedresolution);
 			logMgr.stream(LML_TRIVIAL) << "  Assigning vertex data, resolution: "
-				<< getMinBatchSize() << " startDepth: 0 endDepth: 1 splits: 1";
+				<< bakedresolution << " startDepth=0 endDepth=1 splits=1";
 
 		}
 

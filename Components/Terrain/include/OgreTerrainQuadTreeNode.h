@@ -167,9 +167,10 @@ namespace Ogre
 		/** Assign vertex data to the tree, from a depth and at a given resolution.
 		@param treeDepthStart The first depth of tree that should use this data, owns the data
 		@param treeDepthEnd The end of the depth that should use this data (exclusive)
-		@param resolution The resolution of the data to use
+		@param resolution The resolution of the data to use (compared to full terrain)
+		@param sz The size of the data along one edge
 		*/
-		void assignVertexData(uint16 treeDepthStart, uint16 treeDepthEnd, uint16 resolution);
+		void assignVertexData(uint16 treeDepthStart, uint16 treeDepthEnd, uint16 resolution, uint sz);
 
 		/** Tell a node that it should use an anscestor's vertex data.
 		@param treeDepthEnd The end of the depth that should use this data (exclusive)
@@ -251,7 +252,10 @@ namespace Ogre
 		{
 			VertexData* cpuVertexData;
 			VertexData* gpuVertexData;
+			/// resolution of the data compared to the base terrain data (NOT number of vertices!)
 			uint16 resolution;
+			/// size of the data along one edge
+			uint16 size;
 			/// Number of quadtree levels (including this one) this data applies to
 			uint16 treeLevels;
 			/// Number of rows and columns of skirts
@@ -261,8 +265,8 @@ namespace Ogre
 			/// Is the GPU vertex data out of date?
 			bool gpuVertexDataDirty;
 
-			VertexDataRecord(uint16 res, uint16 lvls) 
-				: cpuVertexData(0), gpuVertexData(0), resolution(res), 
+			VertexDataRecord(uint16 res, uint16 sz, uint16 lvls) 
+				: cpuVertexData(0), gpuVertexData(0), resolution(res), size(sz),
 				treeLevels(lvls), gpuVertexDataDirty(false) {}
 		};
 		
