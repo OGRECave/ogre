@@ -1,3 +1,24 @@
+OGRE  is licensed under the GNU Lesser General Public License (LGPL), with
+the following exceptions / clarifications:
+
+   1. Making modifications to OGRE configuration files, build scripts and 
+      configuration headers such as OgreConfig.h in order to create a 
+	  customised build setup of OGRE with the otherwise unmodified source code,
+	  does not constitute a derived work
+   2. Building against OGRE headers which have inlined code does not constitute 
+      a derived work
+   3. User code which subclasses OGRE classes does not form a derivative work
+   4. Statically linking the OGRE libraries into a user application does not 
+      make the user application a derived work, and therefore does not require 
+	  the user to pass on the source code or object code to their own 
+	  application. The OGRE source code with all modifications must still be 
+	  passed on in the same way as using OGRE as a shared library.
+   5. Using source code obsfucation on the OGRE source code when distributing 
+      it is not permitted .
+
+These exceptions / clarifications shall be deemed to amend the base LGPL text, 
+as reproduced below.
+
 		  GNU LESSER GENERAL PUBLIC LICENSE
 		       Version 2.1, February 1999
 
