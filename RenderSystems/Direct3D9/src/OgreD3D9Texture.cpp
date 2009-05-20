@@ -812,6 +812,19 @@ namespace Ogre
 	}
 
 	/****************************************************************************************/
+	void D3D9Texture::determinePool()
+	{
+		if (useDefaultPool())
+		{
+			mD3DPool = D3DPOOL_DEFAULT;
+		}
+		else
+		{
+			mD3DPool = D3DPOOL_MANAGED;
+		}
+
+	}
+	/****************************************************************************************/
     void D3D9Texture::createInternalResourcesImpl(void)
 	{
 		for (uint i = 0; i < D3D9RenderSystem::getResourceCreationDeviceCount(); ++i)
@@ -840,17 +853,6 @@ namespace Ogre
 			mSrcHeight = mHeight;
 		}
 
-		// Determine D3D pool to use
-		// Use managed unless we're a render target or user has asked for 
-		// a dynamic texture
-		if (useDefaultPool())
-		{
-			mD3DPool = D3DPOOL_DEFAULT;
-		}
-		else
-		{
-			mD3DPool = D3DPOOL_MANAGED;
-		}
 		// load based on tex.type
 		switch (getTextureType())
 		{
@@ -945,6 +947,9 @@ namespace Ogre
 			mNumMipmaps = 0;
 			numMips = 1;
 		}
+
+		// derive the pool to use
+		determinePool();
 
 		TextureResources* textureResources;			
 	
@@ -1102,6 +1107,8 @@ namespace Ogre
 			numMips = 1;
 		}
 
+		// derive the pool to use
+		determinePool();
 		TextureResources* textureResources;			
 
 		// Get or create new texture resources structure.
@@ -1250,6 +1257,8 @@ namespace Ogre
 			numMips = 1;
 		}
 
+		// derive the pool to use
+		determinePool();
 		TextureResources* textureResources;			
 
 		// Get or create new texture resources structure.
@@ -1715,7 +1724,11 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool D3D9Texture::useDefaultPool()
 	{
-		return (mUsage & TU_RENDERTARGET) || (mUsage & TU_DYNAMIC);
+		// Determine D3D pool to use
+		// Use managed unless we're a render target or user has asked for 
+		// a dynamic texture, and device supports D3DUSAGE_DYNAMIC (because default pool
+		// resources without the dynamic flag are not lockable)
+		return (mUsage & TU_RENDERTARGET) || ((mUsage & TU_DYNAMIC) && mDynamicTextures);
 	}
 	
 	//---------------------------------------------------------------------

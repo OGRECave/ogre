@@ -476,10 +476,15 @@ namespace Ogre {
     const AxisAlignedBox& Entity::getBoundingBox(void) const
     {
 		// Get from Mesh
-        mFullBoundingBox = mMesh->getBounds();
-        mFullBoundingBox.merge(getChildObjectsBoundingBox());
+		if (mMesh->isLoaded())
+		{
+			mFullBoundingBox = mMesh->getBounds();
+			mFullBoundingBox.merge(getChildObjectsBoundingBox());
 
-        // Don't scale here, this is taken into account when world BBox calculation is done
+			// Don't scale here, this is taken into account when world BBox calculation is done
+		}
+		else
+			mFullBoundingBox.setNull();
 
         return mFullBoundingBox;
     }

@@ -166,6 +166,8 @@ namespace Ogre {
 		/// frees the given texture resources.
 		void freeTextureResources(IDirect3DDevice9* d3d9Device, TextureResources* textureResources);
 
+		void determinePool();
+
         /** Vector of pointers to streams that were pulled from disk by
             prepareImpl  but have yet to be pushed into texture memory
             by loadImpl.  Should be cleared on load and on unprepare.
