@@ -620,6 +620,19 @@ namespace Ogre
 
 	}
 	/****************************************************************************************/
+	void D3D9Texture::determinePool()
+	{
+		if (useDefaultPool())
+		{
+			mD3DPool = D3DPOOL_DEFAULT;
+		}
+		else
+		{
+			mD3DPool = D3DPOOL_MANAGED;
+		}
+
+	}
+	/****************************************************************************************/
     void D3D9Texture::createInternalResourcesImpl(void)
 	{
 		// If mSrcWidth and mSrcHeight are zero, the requested extents have probably been set
@@ -629,17 +642,6 @@ namespace Ogre
 			mSrcHeight = mHeight;
 		}
 		
-		// Determine D3D pool to use
-		// Use managed unless we're a render target or user has asked for 
-		// a dynamic texture
-		if (useDefaultPool())
-		{
-			mD3DPool = D3DPOOL_DEFAULT;
-		}
-		else
-		{
-			mD3DPool = D3DPOOL_MANAGED;
-		}
 		// load based on tex.type
 		switch (this->getTextureType())
 		{
@@ -720,6 +722,9 @@ namespace Ogre
 			mNumMipmaps = 0;
 			numMips = 1;
 		}
+
+		// derive the pool to use
+		determinePool();
 
 		// create the texture
 		hr = D3DXCreateTexture(	
@@ -854,6 +859,9 @@ namespace Ogre
 			numMips = 1;
 		}
 
+		// derive the pool to use
+		determinePool();
+
 		// create the texture
 		hr = D3DXCreateCubeTexture(	
 				mpDev,								// device
@@ -980,6 +988,9 @@ namespace Ogre
 			mNumMipmaps = 0;
 			numMips = 1;
 		}
+
+		// derive the pool to use
+		determinePool();
 
 		// create the texture
 		hr = D3DXCreateVolumeTexture(	
@@ -1425,7 +1436,11 @@ namespace Ogre
 	/****************************************************************************************/
 	bool D3D9Texture::useDefaultPool()
 	{
-		return (mUsage & TU_RENDERTARGET) || (mUsage & TU_DYNAMIC);
+		// Determine D3D pool to use
+		// Use managed unless we're a render target or user has asked for 
+		// a dynamic texture, and device supports D3DUSAGE_DYNAMIC (because default pool
+		// resources without the dynamic flag are not lockable)
+		return (mUsage & TU_RENDERTARGET) || ((mUsage & TU_DYNAMIC) && mDynamicTextures);
 	}
 	/****************************************************************************************/
 	bool D3D9Texture::releaseIfDefaultPool(void)
