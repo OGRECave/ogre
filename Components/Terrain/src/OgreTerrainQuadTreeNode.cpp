@@ -1006,8 +1006,12 @@ namespace Ogre
 			}
 			else
 			{
-				// simple distance to tile centre
-				dist = (mAABB.getCenter() - localPos).length();
+				// distance to tile centre
+				Vector3 diff = mAABB.getCenter() - localPos;
+				dist = diff.length();
+				// deduct half the radius of the box, assume that on average the 
+				// worst case is best approximated by this
+				dist -= (mBoundingRadius * 0.5);
 			}
 
 			// TODO: calculate material LOD too
