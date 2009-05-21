@@ -966,14 +966,14 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool TerrainQuadTreeNode::calculateCurrentLod(const Camera* cam, Real cFactor)
 	{
+		mSelfOrChildRendered = false;
+
 		// early-out
 		if (!cam->isVisible(mMovable->getWorldBoundingBox(true)))
 		{
 			mCurrentLod = -1;
-			return false;
+			return mSelfOrChildRendered;
 		}
-
-		bool ret = false;
 
 		// Check children first
 		int childRenderedCount = 0;
@@ -1036,7 +1036,7 @@ namespace Ogre
 				{
 					// we're within range of this LOD
 					mCurrentLod = lodLvl;
-					ret = true;
+					mSelfOrChildRendered = true;
 
 					if (mTerrain->getUseLodMorph())
 					{
@@ -1089,7 +1089,7 @@ namespace Ogre
 		{
 			// we should not render ourself
 			mCurrentLod = -1;
-			ret = true; // to indicate a child has rendered so parent doesn't need to
+			mSelfOrChildRendered = true; 
 			if (childRenderedCount < 4)
 			{
 				// only *some* children decided to render on their own, but either 
@@ -1097,7 +1097,7 @@ namespace Ogre
 				for (int i = 0; i < 4; ++i)
 				{
 					TerrainQuadTreeNode* child = mChildren[i];
-					if (child->getCurrentLod() == -1)
+					if (!child->isSelfOrChildRenderedAtCurrentLod())
 					{
 						child->setCurrentLod(child->getLodCount()-1);
 						child->setLodTransition(1.0);
@@ -1108,13 +1108,18 @@ namespace Ogre
 		} // (childRenderedCount == 0)
 
 
-		return ret;
+		return mSelfOrChildRendered;
 
 	}
 	//---------------------------------------------------------------------
 	bool TerrainQuadTreeNode::isRenderedAtCurrentLod() const
 	{
 		return mCurrentLod != -1;
+	}
+	//---------------------------------------------------------------------
+	bool TerrainQuadTreeNode::isSelfOrChildRenderedAtCurrentLod() const
+	{
+		return mSelfOrChildRendered;
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::updateRenderQueue(RenderQueue* queue)

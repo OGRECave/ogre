@@ -220,6 +220,8 @@ namespace Ogre
 		int getCurrentLod() const { return mCurrentLod; }
 		/// Returns whether this node is rendering itself at the current LOD level
 		bool isRenderedAtCurrentLod() const;
+		/// Returns whether this node or its children are being rendered at the current LOD level
+		bool isSelfOrChildRenderedAtCurrentLod() const;
 		/// Manually set the current LOD, intended for internal use only
 		void setCurrentLod(int lod) { mCurrentLod = lod; }
 		/// Get the transition state between the current LOD and the next lower one (only valid after calculateCurrentLod)
@@ -247,6 +249,7 @@ namespace Ogre
 		float mLodTransition; // 0-1 transition to lower LOD
 		/// The child with the largest height delta 
 		TerrainQuadTreeNode* mChildWithMaxHeightDelta;
+		bool mSelfOrChildRendered;
 
 		struct VertexDataRecord : public TerrainAlloc
 		{
