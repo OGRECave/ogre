@@ -61,6 +61,7 @@ namespace Ogre
 	bool TerrainGlobalOptions::msCastsShadows = false;
 	Real TerrainGlobalOptions::msMaxPixelError = 3.0;
 	uint8 TerrainGlobalOptions::msRenderQueueGroup = RENDER_QUEUE_MAIN;
+	bool TerrainGlobalOptions::msUseRayBoxDistanceCalculation = false;
 	//---------------------------------------------------------------------
 	Terrain::Terrain(SceneManager* sm)
 		: mSceneMgr(sm)
@@ -889,23 +890,22 @@ namespace Ogre
 	}
 	//---------------------------------------------------------------------
 	void Terrain::calculateCurrentLod(Viewport* vp)
-	{
+ 	{
 		if (mQuadTree)
 		{
 			// calculate error terms
 			const Camera* cam = vp->getCamera()->getLodCamera();
 
-			// A = 1 / tan(fovy)    (== 1 for fovy=45)
-			Real A = 1.0 / Math::Tan(cam->getFOVy());
+			// W. de Boer 2000 calculation
+			// A = vp_near / abs(vp_top)
+			// A = 1 / tan(fovy*0.5)    (== 1 for fovy=45*2)
+			Real A = 1.0 / Math::Tan(cam->getFOVy() * 0.5);
 			// T = 2 * maxPixelError / vertRes
 			Real maxPixelError = TerrainGlobalOptions::getMaxPixelError() * cam->_getLodBiasInverse();
 			Real T = 2.0 * maxPixelError / (Real)vp->getActualHeight();
 
 			// CFactor = A / T
 			Real cFactor = A / T;
-
-			// CFactor should be squared before being used
-			cFactor = Math::Sqr(cFactor);
 
 			mQuadTree->calculateCurrentLod(cam, cFactor);
 		}

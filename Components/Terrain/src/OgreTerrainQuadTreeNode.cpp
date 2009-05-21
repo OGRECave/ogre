@@ -990,16 +990,25 @@ namespace Ogre
 		if (childRenderedCount == 0)
 		{
 			// no children were within their LOD ranges, so we should consider our own
-			// Get distance to this terrain node (to closest point of the box)
 			Vector3 localPos = cam->getDerivedPosition() - mLocalCentre;
-			// head towards centre of the box (note, box may not cover mLocalCentre because of height)
-			Vector3 dir(mAABB.getCenter() - localPos);
-			dir.normalise();
-			Ray ray(localPos, dir);
-			std::pair<bool, Real> intersectRes = Math::intersects(ray, mAABB);
+			Real dist;
+			if (TerrainGlobalOptions::getUseRayBoxDistanceCalculation())
+			{
+				// Get distance to this terrain node (to closest point of the box)
+				// head towards centre of the box (note, box may not cover mLocalCentre because of height)
+				Vector3 dir(mAABB.getCenter() - localPos);
+				dir.normalise();
+				Ray ray(localPos, dir);
+				std::pair<bool, Real> intersectRes = Math::intersects(ray, mAABB);
 
-			// ray will always intersect, we just want the distance
-			Real dist = intersectRes.second;
+				// ray will always intersect, we just want the distance
+				dist = intersectRes.second;
+			}
+			else
+			{
+				// simple distance to tile centre
+				dist = (mAABB.getCenter() - localPos).length();
+			}
 
 			// TODO: calculate material LOD too
 

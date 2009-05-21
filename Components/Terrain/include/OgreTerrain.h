@@ -536,6 +536,7 @@ namespace Ogre
 		static bool msCastsShadows;
 		static Real msMaxPixelError;
 		static uint8 msRenderQueueGroup;
+		static bool msUseRayBoxDistanceCalculation;
 	public:
 
 
@@ -669,6 +670,25 @@ namespace Ogre
 			maintain their own queue group settings
 		*/
 		static void setRenderQueueGroup(uint8 grp) { msRenderQueueGroup = grp; }
+
+		/** Returns whether or not to use an accurate calculation of camera distance
+			from a terrain tile (ray / AABB intersection) or whether to use the
+			simpler distance from the tile centre. 
+		*/
+		static bool getUseRayBoxDistanceCalculation() { return msUseRayBoxDistanceCalculation; }
+
+		/** Sets whether to use an accurate ray / box intersection to determine
+			distance from a terrain tile, or whether to use the simple distance
+			from the tile centre.
+			Using ray/box intersection will result in higher detail terrain because 
+			the LOD calculation is more conservative, assuming the 'worst case scenario' 
+			of a large height difference at the edge of a tile. This is guaranteed to give you at least
+			the max pixel error or better, but will often give you more detail than
+			you need. Not using the ray/box method is cheaper but will only use
+			the max pixel error as a guide, the actual error will vary above and
+			below that. The default is not to use the ray/box approach.
+		*/
+		static void setUseRayBoxDistanceCalculation(bool rb) { msUseRayBoxDistanceCalculation = rb; }
 
 
 	};
