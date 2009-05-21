@@ -1019,62 +1019,73 @@ namespace Ogre
 			mCurrentLod = -1;
 			for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i, ++lodLvl)
 			{
-				LodLevel* ll = *i;
-
-				// Calculate or reuse transition distance
-				Real distTransition;
-				if (Math::RealEqual(cFactor, ll->lastCFactor))
-					distTransition = ll->lastTransitionDist;
-				else
+				// If we have no parent, and this is the lowest LOD, we always render
+				// this is the 'last resort' so to speak, we always enoucnter this last
+				if (lodLvl+1 == mLodLevels.size() && !mParent)
 				{
-					distTransition = ll->maxHeightDelta * cFactor;
-					ll->lastCFactor = cFactor;
-					ll->lastTransitionDist = distTransition;
-				}
-
-				if (dist < distTransition)
-				{
-					// we're within range of this LOD
 					mCurrentLod = lodLvl;
 					mSelfOrChildRendered = true;
+					mLodTransition = 0;
+				}
+				else
+				{
+					// check the distance
+					LodLevel* ll = *i;
 
-					if (mTerrain->getUseLodMorph())
+					// Calculate or reuse transition distance
+					Real distTransition;
+					if (Math::RealEqual(cFactor, ll->lastCFactor))
+						distTransition = ll->lastTransitionDist;
+					else
 					{
-						// calculate the transition percentage
-						// we need a percentage of the total distance for just this LOD, 
-						// which means taking off the distance for the next higher LOD
-						// which is either the previous entry in the LOD list, 
-						// or the largest of any children. In both cases these will
-						// have been calculated before this point, since we process
-						// children first. Distances at lower LODs are guaranteed
-						// to be larger than those at higher LODs
-
-						Real distTotal = distTransition;
-						if (isLeaf())
-						{
-							// Any higher LODs?
-							if (i != mLodLevels.begin())
-							{
-								LodLevelList::iterator prev = i - 1;
-								distTotal -= (*prev)->lastTransitionDist;
-							}
-						}
-						else
-						{
-							// Take the distance of the lowest LOD of child
-							const LodLevel* childLod = mChildWithMaxHeightDelta->getLodLevel(
-								mChildWithMaxHeightDelta->getLodCount()-1);
-							distTotal -= childLod->lastTransitionDist;
-						}
-						// fade from 0 to 1 in the last 25% of the distance
-						Real distMorphRegion = distTotal * 0.25;
-						Real distRemain = distTransition - dist;
-
-						mLodTransition = 1.0 - (distRemain / distMorphRegion);
-						mLodTransition = std::min((Real)1.0, mLodTransition);
-						mLodTransition = std::max((Real)0.0, mLodTransition);
+						distTransition = ll->maxHeightDelta * cFactor;
+						ll->lastCFactor = cFactor;
+						ll->lastTransitionDist = distTransition;
 					}
 
+					if (dist < distTransition)
+					{
+						// we're within range of this LOD
+						mCurrentLod = lodLvl;
+						mSelfOrChildRendered = true;
+
+						if (mTerrain->getUseLodMorph())
+						{
+							// calculate the transition percentage
+							// we need a percentage of the total distance for just this LOD, 
+							// which means taking off the distance for the next higher LOD
+							// which is either the previous entry in the LOD list, 
+							// or the largest of any children. In both cases these will
+							// have been calculated before this point, since we process
+							// children first. Distances at lower LODs are guaranteed
+							// to be larger than those at higher LODs
+
+							Real distTotal = distTransition;
+							if (isLeaf())
+							{
+								// Any higher LODs?
+								if (i != mLodLevels.begin())
+								{
+									LodLevelList::iterator prev = i - 1;
+									distTotal -= (*prev)->lastTransitionDist;
+								}
+							}
+							else
+							{
+								// Take the distance of the lowest LOD of child
+								const LodLevel* childLod = mChildWithMaxHeightDelta->getLodLevel(
+									mChildWithMaxHeightDelta->getLodCount()-1);
+								distTotal -= childLod->lastTransitionDist;
+							}
+							// fade from 0 to 1 in the last 25% of the distance
+							Real distMorphRegion = distTotal * 0.25;
+							Real distRemain = distTransition - dist;
+
+							mLodTransition = 1.0 - (distRemain / distMorphRegion);
+							mLodTransition = std::min((Real)1.0, mLodTransition);
+							mLodTransition = std::max((Real)0.0, mLodTransition);
+						}
+					}
 
 					// since LODs are ordered from highest to lowest detail, 
 					// we can stop looking now
