@@ -35,7 +35,7 @@ Torus Knot Software Ltd.
 #include "OgreVector3.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreSceneManager.h"
-
+#include "OgreTerrainMaterialGenerator.h"
 
 namespace Ogre
 {
@@ -46,7 +46,6 @@ namespace Ogre
 	*  Some details on the terrain component
 	*  @{
 	*/
-
 
 	/** The main containing class for a chunk of terrain.
 	@par
@@ -76,16 +75,6 @@ namespace Ogre
 		<td>The world size of one side of the terrain</td>
 	</tr>
 	<tr>
-		<td>Terrain splat dimensions count</td>
-		<td>uint16</td>
-		<td>The number of sets of world splat texture dimensions to follow</td>
-	</tr>
-	<tr>
-		<td>Terrain splat dimensions</td>
-		<td>Real*</td>
-		<td>A number of sets of splat dimensions</td>
-	</tr>
-	<tr>
 		<td>Max batch size</td>
 		<td>uint16</td>
 		<td>The maximum batch size in vertices along one side</td>
@@ -105,6 +94,123 @@ namespace Ogre
 		<td>float[size*size]</td>
 		<td>List of floating point heights</td>
 	</tr>
+	<tr>
+		<td>LayerDeclaration</td>
+		<td>LayerDeclaration*</td>
+		<td>The layer declaration for this terrain (see below)</td>
+	</tr>
+	<tr>
+		<td>Layer count</td>
+		<td>uint8</td>
+		<td>The number of layers in this terrain</td>
+	</tr>
+	<tr>
+		<td>LayerInstance list</td>
+		<td>LayerInstance*</td>
+		<td>A number of LayerInstance definitions based on layer count (see below)</td>
+	</tr>
+	<tr>
+		<td>Packed blend texture data</td>
+		<td>uint8*</td>
+		<td>layerCount-1 sets of blend texture data interleaved as either RGB or RGBA 
+			depending on layer count</td>
+	</tr>
+	</table>
+	<b>TerrainLayerDeclaration (Identifier 'TDCL')</b>\n
+	[Version 1]
+	<table>
+	<tr>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td><b>TerrainLayerSampler Count</b></td>
+		<td><b>uint8</b></td>
+		<td><b>Number of samplers in this declaration</b></td>
+	</tr>
+	<tr>
+		<td><b>TerrainLayerSampler List</b></td>
+		<td><b>TerrainLayerSampler*</b></td>
+		<td><b>List of TerrainLayerSampler structures</b></td>
+	</tr>
+	<tr>
+		<td><b>Sampler Element Count</b></td>
+		<td><b>uint8</b></td>
+		<td><b>Number of sampler elements in this declaration</b></td>
+	</tr>
+	<tr>
+		<td><b>TerrainLayerSamplerElement List</b></td>
+		<td><b>TerrainLayerSamplerElement*</b></td>
+		<td><b>List of TerrainLayerSamplerElement structures</b></td>
+	</tr>
+	</table>
+	<b>TerrainLayerSampler (Identifier 'TSAM')</b>\n
+	[Version 1]
+	<table>
+	<tr>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td><b>Alias</b></td>
+		<td><b>String</b></td>
+		<td><b>Alias name of this sampler</b></td>
+	</tr>
+	<tr>
+		<td><b>Format</b></td>
+		<td><b>uint8</b></td>
+		<td><b>Desired pixel format</b></td>
+	</tr>
+	</table>
+	<b>TerrainLayerSamplerElement (Identifier 'TSEL')</b>\n
+	[Version 1]
+	<table>
+	<tr>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td><b>Source</b></td>
+		<td><b>uint8</b></td>
+		<td><b>Sampler source index</b></td>
+	</tr>
+	<tr>
+		<td><b>Semantic</b></td>
+		<td><b>uint8</b></td>
+		<td><b>Semantic interpretation of this element</b></td>
+	</tr>
+	<tr>
+		<td><b>Element start</b></td>
+		<td><b>uint8</b></td>
+		<td><b>Start of this element in the sampler</b></td>
+	</tr>
+	<tr>
+		<td><b>Element count</b></td>
+		<td><b>uint8</b></td>
+		<td><b>Number of elements in the sampler used by this entry</b></td>
+	</tr>
+	</table>
+	<b>LayerInstance (Identifier 'TLIN')</b>\n
+	[Version 1]
+	<table>
+	<tr>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td><b>World size</b></td>
+		<td><b>Real</b></td>
+		<td><b>The world size of this layer (determines UV scaling)</b></td>
+	</tr>
+	<tr>
+		<td><b>Texture list</b></td>
+		<td><b>String*</b></td>
+		<td><b>List of texture names corresponding to the number of samplers in the layer declaration</b></td>
+	</tr>
 	</table>
 	*/
 	class _OgreTerrainExport Terrain : public SceneManager::Listener, public TerrainAlloc
@@ -117,7 +223,30 @@ namespace Ogre
 		static const uint16 TERRAIN_CHUNK_VERSION;
 		static const uint16 TERRAIN_MAX_BATCH_SIZE;
 
+		static const uint32 TERRAINLAYERDECLARATION_CHUNK_ID;
+		static const uint16 TERRAINLAYERDECLARATION_CHUNK_VERSION;
+		static const uint32 TERRAINLAYERSAMPLER_CHUNK_ID;
+		static const uint16 TERRAINLAYERSAMPLER_CHUNK_VERSION;
+		static const uint32 TERRAINLAYERSAMPLERELEMENT_CHUNK_ID;
+		static const uint16 TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION;
+		static const uint32 TERRAINLAYERINSTANCE_CHUNK_ID;
+		static const uint16 TERRAINLAYERINSTANCE_CHUNK_VERSION;
+
 		typedef vector<Real>::type RealVector;
+
+		/** An instance of a layer, with specific texture names
+		*/
+		struct _OgreTerrainExport LayerInstance
+		{
+			/// The world size of the texture to be applied in this layer
+			Real worldSize;
+			/// List of texture names to import; must match with TerrainLayerDeclaration
+			StringVector textureNames;
+
+			LayerInstance()
+				: worldSize(100) {}
+		};
+		typedef vector<LayerInstance>::type LayerInstanceList;
 
 		/// The alignment of the terrain
 		enum Alignment
@@ -166,14 +295,6 @@ namespace Ogre
 			/** The world size of the terrain. */
 			Real worldSize;
 
-			/** How large an area in world space the terrain (splat) textures cover
-				before repeating. 
-			@remarks This is a list of values, since you can use different scaling
-				values per splat layer if you wish. If you want to use the same
-				value for all layers, just add a single value to this list.
-			*/
-			RealVector splatTextureWorldSizeList;
-
 			/** Optional heightmap providing the initial heights for the terrain. 
 			@remarks
 				If supplied, should ideally be terrainSize * terrainSize, but if
@@ -192,7 +313,16 @@ namespace Ogre
 			/// How to bias the input values provided (if any)
 			Real inputBias;
 
-			// TODO - add options for UV generation, tangents etc
+			/** Definition of the contents of each layer (required).
+			Most likely,  you will pull a declaration from a TerrainMaterialGenerator
+			of your choice.
+			*/
+			TerrainLayerDeclaration layerDeclaration;
+			/** List of layer structures, one for each layer required.
+				Can be empty or underfilled if required, list will be padded with
+				blank textures.
+			*/
+			LayerInstanceList layerList;
 
 			ImportData() 
 				: terrainAlign(ALIGN_X_Z)
@@ -323,27 +453,49 @@ namespace Ogre
 		uint16 getMinBatchSize() const;
 		/// Get the size of the terrain in world units
 		Real getWorldSize() const;
-		/** How large an area in world space the terrain (splat) textures cover
+
+		/** Get the number of layers in this terrain. */
+		uint8 getLayerCount() const { return static_cast<uint8>(mLayers.size()); }
+
+		/** Get the declaration which describes the layers in this terrain. */
+		const TerrainLayerDeclaration& getLayerDeclaration() const { return mLayerDecl; }
+
+		/** How large an area in world space the texture in a terrain layer covers
 		before repeating. 
-		@param index The texture splat index.
+		@param index The layer index.
 		*/
-		Real getSplatTextureWorldSize(uint16 index) const;
-		/** How large an area in world space the terrain (splat) textures cover
+		Real getLayerWorldSize(uint8 index) const;
+		/** How large an area in world space the texture in a terrain layer covers
 		before repeating. 
-		@param index The texture splat index.
+		@param index The layer index.
 		@param size The world size of the texture before repeating
 		*/
-		void setSplatTextureWorldSize(uint16 index, Real size);
+		void setLayerWorldSize(uint8 index, Real size);
 
-		/** Get the splat texture UV multiplier. 
+		/** Get the layer UV multiplier. 
 		@remarks
 			This is derived from the texture world size. The base UVs in the 
 			terrain vary from 0 to 1 and this multiplier is used (in a fixed-function 
 			texture coord scaling or a shader parameter) to translate it to the
 			final value.
-		@param index The texture splat index.
+		@param index The layer index.
 		*/
-		Real getSplatTextureUVMultipler(uint16 index) const;
+		Real getLayerUVMultipler(uint8 index) const;
+
+		/** Get the name of the texture bound to a given index within a given layer.
+		See the LayerDeclaration for a list of sampelrs within a layer.
+		@param layerIndex The layer index.
+		@param samplerIndex The sampler index within a layer
+		*/
+		const String& getLayerTextureName(uint8 layerIndex, uint8 samplerIndex) const;
+		/** Set the name of the texture bound to a given index within a given layer.
+		See the LayerDeclaration for a list of sampelrs within a layer.
+		@param index The layer index.
+		@param size The world size of the texture before repeating
+		@param textureName The name of the texture to use
+		*/
+		void setLayerTextureName(uint8 layerIndex, uint8 samplerIndex, const String& textureName);
+
 
 		/// Get the world position of the terrain centre
 		const Vector3& getPosition() const { return mPos; }
@@ -473,6 +625,8 @@ namespace Ogre
 		std::pair<bool, Vector3> checkQuadIntersection(int x, int z, const Ray& ray); //const;
 
 		void copyGlobalOptions();
+		void checkLayers();
+		void deriveUVMultipliers();
 
 
 		SceneManager* mSceneMgr;
@@ -494,8 +648,9 @@ namespace Ogre
 		uint16 mTreeDepth;
 		Real mBase;
 		Real mScale;
-		RealVector mSplatTextureWorldSize;
-		RealVector mSplatTextureUVMultiplier;
+		TerrainLayerDeclaration mLayerDecl;
+		LayerInstanceList mLayers;
+		RealVector mLayerUVMultiplier;
 
 
 		bool mUseLodMorph;
@@ -506,10 +661,11 @@ namespace Ogre
 		bool mGenerateHorizonMap;
 		uint8 mRenderQueueGroup;
 
-		MaterialPtr mMaterial;
+		mutable MaterialPtr mMaterial;
+		mutable TerrainMaterialGenerator* mMaterialGenerator;
+		mutable unsigned long long int mMaterialGenerationCount;
 
 	};
-
 
 
 	/** Options class which just stores default options for the terrain.
@@ -537,6 +693,7 @@ namespace Ogre
 		static Real msMaxPixelError;
 		static uint8 msRenderQueueGroup;
 		static bool msUseRayBoxDistanceCalculation;
+		static TerrainMaterialGeneratorList msMatGeneratorList;
 	public:
 
 
@@ -689,6 +846,23 @@ namespace Ogre
 			below that. The default is not to use the ray/box approach.
 		*/
 		static void setUseRayBoxDistanceCalculation(bool rb) { msUseRayBoxDistanceCalculation = rb; }
+
+		/** Get the list of material generators that are currently available.
+		*/
+		static const TerrainMaterialGeneratorList& getMaterialGeneratorList() { return msMatGeneratorList; }
+
+		/** Add a new material generator to the list. Generators added later
+			take precedence over those added earlier. 
+		*/
+		static void addMaterialGenerator(TerrainMaterialGenerator* gen);
+		/** Remove a material generator from the list 
+		*/
+		static void removeMaterialGenerator(TerrainMaterialGenerator* gen);
+
+		/** Get the first material generator that can generate materials for the
+			given layer declaration.
+		*/
+		static TerrainMaterialGenerator* getMaterialGenerator(const TerrainLayerDeclaration& decl);
 
 
 	};

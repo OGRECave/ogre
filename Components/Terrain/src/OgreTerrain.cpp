@@ -45,6 +45,14 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	const uint32 Terrain::TERRAIN_CHUNK_ID = StreamSerialiser::makeIdentifier("TERR");
 	const uint16 Terrain::TERRAIN_CHUNK_VERSION = 1;
+	const uint32 Terrain::TERRAINLAYERDECLARATION_CHUNK_ID = StreamSerialiser::makeIdentifier("TDCL");
+	const uint16 Terrain::TERRAINLAYERDECLARATION_CHUNK_VERSION = 1;
+	const uint32 Terrain::TERRAINLAYERSAMPLER_CHUNK_ID = StreamSerialiser::makeIdentifier("TSAM");;
+	const uint16 Terrain::TERRAINLAYERSAMPLER_CHUNK_VERSION = 1;
+	const uint32 Terrain::TERRAINLAYERSAMPLERELEMENT_CHUNK_ID = StreamSerialiser::makeIdentifier("TSEL");;
+	const uint16 Terrain::TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION = 1;
+	const uint32 Terrain::TERRAINLAYERINSTANCE_CHUNK_ID = StreamSerialiser::makeIdentifier("TLIN");;
+	const uint16 Terrain::TERRAINLAYERINSTANCE_CHUNK_VERSION = 1;
 	// since 129^2 is the greatest power we can address in 16-bit index
 	const uint16 Terrain::TERRAIN_MAX_BATCH_SIZE = 129; 
 	//---------------------------------------------------------------------
@@ -62,6 +70,34 @@ namespace Ogre
 	Real TerrainGlobalOptions::msMaxPixelError = 3.0;
 	uint8 TerrainGlobalOptions::msRenderQueueGroup = RENDER_QUEUE_MAIN;
 	bool TerrainGlobalOptions::msUseRayBoxDistanceCalculation = false;
+	TerrainMaterialGeneratorList TerrainGlobalOptions::msMatGeneratorList;
+	//---------------------------------------------------------------------
+	void TerrainGlobalOptions::addMaterialGenerator(TerrainMaterialGenerator* gen)
+	{
+		if (std::find(msMatGeneratorList.begin(), msMatGeneratorList.end(), gen) != msMatGeneratorList.end())
+			msMatGeneratorList.push_back(gen);
+	}
+	//---------------------------------------------------------------------
+	void TerrainGlobalOptions::removeMaterialGenerator(TerrainMaterialGenerator* gen)
+	{
+		TerrainMaterialGeneratorList::iterator i = std::find(
+			msMatGeneratorList.begin(), msMatGeneratorList.end(), gen);
+		if (i != msMatGeneratorList.end())
+			msMatGeneratorList.erase(i);
+	}
+	//---------------------------------------------------------------------
+	TerrainMaterialGenerator* TerrainGlobalOptions::getMaterialGenerator(const TerrainLayerDeclaration& decl)
+	{
+		for (TerrainMaterialGeneratorList::reverse_iterator i = msMatGeneratorList.rbegin(); 
+			i != msMatGeneratorList.rend(); ++i)
+		{
+			if ((*i)->canGenerateUsingDeclaration(decl))
+				return *i;
+		}
+
+		return 0;
+	}
+	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	Terrain::Terrain(SceneManager* sm)
 		: mSceneMgr(sm)
@@ -72,6 +108,8 @@ namespace Ogre
 		, mNumLodLevels(0)
 		, mNumLodLevelsPerLeafNode(0)
 		, mTreeDepth(0)
+		, mMaterialGenerator(0)
+		, mMaterialGenerationCount(0)
 	{
 		mRootNode = sm->getRootSceneNode()->createChildSceneNode();
 		sm->addListener(this);
@@ -113,24 +151,63 @@ namespace Ogre
 
 		stream.write(&mSize);
 		stream.write(&mWorldSize);
-		uint16 splatDimCount;
-		if (mSplatTextureWorldSize.empty())
-		{
-			splatDimCount = 1;
-			Real dim = getSplatTextureWorldSize(0);
-			stream.write(&splatDimCount);
-			stream.write(&dim);
-		}
-		else
-		{
-			splatDimCount = static_cast<uint16>(mSplatTextureWorldSize.size());
-			stream.write(&splatDimCount);
-			stream.write(&mSplatTextureWorldSize[0], mSplatTextureWorldSize.size());
-		}
 		stream.write(&mMaxBatchSize);
 		stream.write(&mMinBatchSize);
 		stream.write(&mPos);
 		stream.write(mHeightData, mSize * mSize);
+
+		// Layer declaration
+		stream.writeChunkBegin(TERRAINLAYERDECLARATION_CHUNK_ID, TERRAINLAYERDECLARATION_CHUNK_VERSION);
+		//  samplers
+		uint8 numSamplers = (uint8)mLayerDecl.samplers.size();
+		stream.write(&numSamplers);
+		for (TerrainLayerSamplerList::const_iterator i = mLayerDecl.samplers.begin(); 
+			i != mLayerDecl.samplers.end(); ++i)
+		{
+			const TerrainLayerSampler& sampler = *i;
+			stream.writeChunkBegin(TERRAINLAYERSAMPLER_CHUNK_ID, TERRAINLAYERSAMPLER_CHUNK_VERSION);
+			stream.write(&sampler.alias);
+			uint8 pixFmt = (uint8)sampler.format;
+			stream.write(&pixFmt);
+			stream.writeChunkEnd(TERRAINLAYERSAMPLER_CHUNK_ID);
+		}
+		//  elements
+		uint8 numElems = (uint8)mLayerDecl.elements.size();
+		stream.write(&numElems);
+		for (TerrainLayerSamplerElementList::const_iterator i = mLayerDecl.elements.begin(); 
+			i != mLayerDecl.elements.end(); ++i)
+		{
+			const TerrainLayerSamplerElement& elem= *i;
+			stream.writeChunkBegin(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID, TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION);
+			stream.write(&elem.source);
+			uint8 sem = (uint8)elem.semantic;
+			stream.write(&sem);
+			stream.write(&elem.elementStart);
+			stream.write(&elem.elementCount);
+			stream.writeChunkEnd(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID);
+		}
+		stream.writeChunkEnd(TERRAINLAYERDECLARATION_CHUNK_ID);
+
+		// Layers
+		checkLayers();
+		uint8 numLayers = (uint8)mLayers.size();
+		stream.write(&numLayers);
+		for (LayerInstanceList::const_iterator i = mLayers.begin(); i != mLayers.end(); ++i)
+		{
+			const LayerInstance& inst = *i;
+			stream.writeChunkBegin(TERRAINLAYERINSTANCE_CHUNK_ID, TERRAINLAYERINSTANCE_CHUNK_VERSION);
+			stream.write(&inst.worldSize);
+			for (StringVector::const_iterator t = inst.textureNames.begin(); 
+				t != inst.textureNames.end(); ++t)
+			{
+				stream.write(&(*t));
+			}
+			stream.writeChunkEnd(TERRAINLAYERINSTANCE_CHUNK_ID);
+		}
+
+		// Packed layer blend data
+		// TODO
+		
 
 		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
 	}
@@ -148,24 +225,79 @@ namespace Ogre
 		stream.read(&align);
 		mAlign = (Alignment)align;
 		stream.read(&mWorldSize);
-		uint16 splatDimCount;
-		stream.read(&splatDimCount);
-		for (uint16 i = 0; i < splatDimCount; ++i)
-		{
-			Real dim;
-			stream.read(&dim);
-			setSplatTextureWorldSize(i, dim);
-		}
+
+		// TODO layers
+
 		stream.read(&mMaxBatchSize);
 		stream.read(&mMinBatchSize);
 		stream.read(&mPos);
 		updateBaseScale();
 		determineLodLevels();
 
-
 		size_t numVertices = mSize * mSize;
 		mHeightData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
 		stream.read(mHeightData, numVertices);
+
+
+		// Layer declaration
+		if (!stream.readChunkBegin(TERRAINLAYERDECLARATION_CHUNK_ID, TERRAINLAYERDECLARATION_CHUNK_VERSION))
+			return false;
+
+		//  samplers
+		uint8 numSamplers;
+		stream.read(&numSamplers);
+		mLayerDecl.samplers.resize(numSamplers);
+		for (uint8 s = 0; s < numSamplers; ++s)
+		{
+			if (!stream.readChunkBegin(TERRAINLAYERSAMPLER_CHUNK_ID, TERRAINLAYERSAMPLER_CHUNK_VERSION))
+				return false;
+
+			stream.read(&(mLayerDecl.samplers[s].alias));
+			uint8 pixFmt;
+			stream.read(&pixFmt);
+			mLayerDecl.samplers[s].format = (PixelFormat)pixFmt;
+			stream.readChunkEnd(TERRAINLAYERSAMPLER_CHUNK_ID);
+		}
+		//  elements
+		uint8 numElems;
+		stream.read(&numElems);
+		mLayerDecl.elements.resize(numElems);
+		for (uint8 e = 0; e < numElems; ++e)
+		{
+			if (!stream.readChunkBegin(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID, TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION))
+				return false;
+
+			stream.read(&(mLayerDecl.elements[e].source));
+			uint8 sem;
+			stream.read(&sem);
+			mLayerDecl.elements[e].semantic = (TerrainLayerSamplerSemantic)sem;
+			stream.read(&(mLayerDecl.elements[e].elementStart));
+			stream.read(&(mLayerDecl.elements[e].elementCount));
+			stream.readChunkEnd(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID);
+		}
+		stream.readChunkEnd(TERRAINLAYERDECLARATION_CHUNK_ID);
+
+		// Layers
+		uint8 numLayers;
+		stream.read(&numLayers);
+		mLayers.resize(numLayers);
+		for (uint8 l = 0; l < numLayers; ++l)
+		{
+			if (!stream.readChunkBegin(TERRAINLAYERINSTANCE_CHUNK_ID, TERRAINLAYERINSTANCE_CHUNK_VERSION))
+				return false;
+			stream.read(&mLayers[l].worldSize);
+			mLayers[l].textureNames.resize(mLayerDecl.samplers.size());
+			for (size_t t = 0; t < mLayerDecl.samplers.size(); ++t)
+			{
+				stream.read(&(mLayers[l].textureNames[t]));
+			}
+			stream.writeChunkEnd(TERRAINLAYERINSTANCE_CHUNK_ID);
+		}
+		deriveUVMultipliers();
+
+		// Packed layer blend data
+		// TODO
+
 
 		stream.readChunkEnd(TERRAIN_CHUNK_ID);
 
@@ -217,10 +349,10 @@ namespace Ogre
 		mAlign = importData.terrainAlign;
 		mSize = importData.terrainSize;
 		mWorldSize = importData.worldSize;
-		for (uint16 i = 0; i < importData.splatTextureWorldSizeList.size(); ++i)
-		{
-			setSplatTextureWorldSize(i, importData.splatTextureWorldSizeList[i]);
-		}
+		mLayerDecl = importData.layerDeclaration;
+		mLayers = importData.layerList;
+		checkLayers();
+		deriveUVMultipliers();
 		mMaxBatchSize = importData.maxBatchSize;
 		mMinBatchSize = importData.minBatchSize;
 		mPos = importData.pos;
@@ -623,15 +755,15 @@ namespace Ogre
 		return mWorldSize;
 	}
 	//---------------------------------------------------------------------
-	Real Terrain::getSplatTextureWorldSize(uint16 index) const
+	Real Terrain::getLayerWorldSize(uint8 index) const
 	{
-		if (index < mSplatTextureWorldSize.size())
+		if (index < mLayers.size())
 		{
-			return mSplatTextureWorldSize[index];
+			return mLayers[index].worldSize;
 		}
-		else if (!mSplatTextureWorldSize.empty())
+		else if (!mLayers.empty())
 		{
-			return mSplatTextureWorldSize[0];
+			return mLayers[0].worldSize;
 		}
 		else
 		{
@@ -640,32 +772,66 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
-	void Terrain::setSplatTextureWorldSize(uint16 index, Real size)
+	void Terrain::setLayerWorldSize(uint8 index, Real size)
 	{
-		if (index >= mSplatTextureWorldSize.size())
+		if (index < mLayers.size())
 		{
-			mSplatTextureWorldSize.resize(index + 1);
-			mSplatTextureUVMultiplier.resize(index + 1);
-		}
 
-		mSplatTextureWorldSize[index] = size;
-		mSplatTextureUVMultiplier[index] = mWorldSize / size;
+			if (index >= mLayerUVMultiplier.size())
+				mLayerUVMultiplier.resize(index + 1);
+
+			mLayers[index].worldSize = size;
+			mLayerUVMultiplier[index] = mWorldSize / size;
+		}
 	}
 	//---------------------------------------------------------------------
-	Real Terrain::getSplatTextureUVMultipler(uint16 index) const
+	Real Terrain::getLayerUVMultipler(uint8 index) const
 	{
-		if (index < mSplatTextureUVMultiplier.size())
+		if (index < mLayerUVMultiplier.size())
 		{
-			return mSplatTextureUVMultiplier[index];
+			return mLayerUVMultiplier[index];
 		}
-		else if (!mSplatTextureUVMultiplier.empty())
+		else if (!mLayerUVMultiplier.empty())
 		{
-			return mSplatTextureUVMultiplier[0];
+			return mLayerUVMultiplier[0];
 		}
 		else
 		{
 			// default to tile 100 times
 			return 100;
+		}
+	}
+	//---------------------------------------------------------------------
+	void Terrain::deriveUVMultipliers()
+	{
+		mLayerUVMultiplier.resize(mLayers.size());
+		for (size_t i = 0; i < mLayers.size(); ++i)
+		{
+			const LayerInstance& inst = mLayers[i];
+
+			mLayerUVMultiplier[i] = mWorldSize / inst.worldSize;
+
+		}
+	}
+	//---------------------------------------------------------------------
+	const String& Terrain::getLayerTextureName(uint8 layerIndex, uint8 samplerIndex) const
+	{
+		if (layerIndex < mLayers.size() && samplerIndex < mLayerDecl.samplers.size())
+		{
+			return mLayers[layerIndex].textureNames[samplerIndex];
+		}
+		else
+		{
+			return StringUtil::BLANK;
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::setLayerTextureName(uint8 layerIndex, uint8 samplerIndex, const String& textureName)
+	{
+		if (layerIndex < mLayers.size() && samplerIndex < mLayerDecl.samplers.size())
+		{
+			mLayers[layerIndex].textureNames[samplerIndex] = textureName;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -1046,9 +1212,38 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	const MaterialPtr& Terrain::getMaterial() const
 	{
-		// TODO - generate material
+		if (!mMaterialGenerator)
+			mMaterialGenerator = TerrainGlobalOptions::getMaterialGenerator(mLayerDecl);
+
+
+		if (mMaterialGenerator && 
+			(mMaterial.isNull() || mMaterialGenerator->getProfileChangeCount() != mMaterialGenerationCount))
+		{
+			mMaterial = mMaterialGenerator->generate(this);
+			mMaterialGenerationCount = mMaterialGenerator->getProfileChangeCount();
+		}
 
 		return mMaterial;
+	}
+	//---------------------------------------------------------------------
+	void Terrain::checkLayers()
+	{
+		for (LayerInstanceList::iterator i = mLayers.begin(); i != mLayers.end(); ++i)
+		{
+			LayerInstance& layer = *i;
+			// If we're missing sampler entries compared to the declaration, initialise them
+			for (size_t i = layer.textureNames.size(); i < mLayerDecl.samplers.size(); ++i)
+			{
+				layer.textureNames.push_back(StringUtil::BLANK);
+			}
+
+			// if we have too many layers for the declaration, trim them
+			if (layer.textureNames.size() > mLayerDecl.samplers.size())
+			{
+				layer.textureNames.resize(mLayerDecl.samplers.size());
+			}
+		}
+
 	}
 
 	

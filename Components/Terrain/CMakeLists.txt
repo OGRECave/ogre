@@ -7,6 +7,7 @@ PROJECT(OgreTerrain)
 # define header and source files for the library
 set (HEADER_FILES
     include/OgreTerrain.h
+	include/OgreTerrainMaterialGenerator.h
 	include/OgreTerrainPrerequisites.h
     include/OgreTerrainQuadTreeNode.h
 )
