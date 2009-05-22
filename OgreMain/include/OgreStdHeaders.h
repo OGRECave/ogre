@@ -44,8 +44,13 @@
 #       include <ext/hash_set>
 #   endif
 #else
-#   include <hash_set>
-#   include <hash_map>
+#   if (OGRE_COMPILER == OGRE_COMPILER_MSVC) && !defined(STLPORT) && OGRE_COMP_VER >= 1600 // VC++ 10.0
+#    	include <unordered_map>
+#    	include <unordered_set>
+#	else
+#   	include <hash_set>
+#   	include <hash_map>
+#	endif
 #endif 
 
 // STL algorithms & functions
