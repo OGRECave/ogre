@@ -36,6 +36,7 @@ Torus Knot Software Ltd.
 #include "OgreAxisAlignedBox.h"
 #include "OgreSceneManager.h"
 #include "OgreTerrainMaterialGenerator.h"
+#include "OgreTerrainLayerBlendMap.h"
 
 namespace Ogre
 {
@@ -108,6 +109,11 @@ namespace Ogre
 		<td>LayerInstance list</td>
 		<td>LayerInstance*</td>
 		<td>A number of LayerInstance definitions based on layer count (see below)</td>
+	</tr>
+	<tr>
+		<td>Layer blend map size</td>
+		<td>uint16</td>
+		<td>The size of the layer blend maps as stored in this file</td>
 	</tr>
 	<tr>
 		<td>Packed blend texture data</td>
@@ -496,6 +502,13 @@ namespace Ogre
 		*/
 		void setLayerTextureName(uint8 layerIndex, uint8 samplerIndex, const String& textureName);
 
+		/** Get the requested size of the blend maps used to blend between layers
+			for this terrain. 
+			Note that where hardware limits this, the actual blend maps may be lower
+			resolution. This option is derived from TerrainGlobalOptions when the
+			terrain is created.
+		*/
+		uint16 getLayerBlendMapSize() const { return mLayerBlendMapSize; }
 
 		/// Get the world position of the terrain centre
 		const Vector3& getPosition() const { return mPos; }
@@ -604,6 +617,42 @@ namespace Ogre
 		void setRenderQueueGroup(uint8 grp) { mRenderQueueGroup = grp; }
 
 
+		/** Retrieve the layer blending map for a given layer, which may
+			be used to edit the blending information for that layer.
+		@param layerIndex The layer index, which should be 1 or higher (since 
+			the bottom layer has no blending).
+		@returns Pointer to the TerrainLayerBlendMap requested. The caller must
+			not delete this instance, use freeTemporaryResources if you want
+			to save the memory after completing your editing.
+		*/
+		TerrainLayerBlendMap* getLayerBlendMap(uint8 layerIndex);
+
+		/** Free as many resources as possible for optimal run-time memory use.
+		@remarks
+			This class keeps some temporary storage around in order to make
+			certain actions (such as editing) possible more quickly. Calling this
+			method will cause as many of those resources as possible to be
+			freed. You might want to do this for example when you are finished
+			editing a particular terrain and want to have optimal runtime
+			efficiency.
+		*/
+		void freeTemporaryResources();
+
+		/** Get a blend texture with a given index.
+		@param index The blend texture index (note: not layer index; derive
+		the texture index from getLayerBlendTextureIndex)
+		*/
+		const TexturePtr& getLayerBlendTexture(uint8 index);
+
+		/** Get the texture index and colour channel of the blend information for 
+			a given layer. 
+		@param layerIndex The index of the layer (1 or higher, layer 0 has no blend data)
+		@returns A pair in which the first value is the texture index, and the 
+			second value is the colour channel (RGBA)
+		*/
+		std::pair<uint8,uint8> getLayerBlendTextureIndex(uint8 layerIndex);
+
+
 	protected:
 
 		void freeCPUResources();
@@ -611,6 +660,7 @@ namespace Ogre
 		void determineLodLevels();
 		void distributeVertexData();
 		void updateBaseScale();
+		void createGPUBlendTextures();
 		/** Get a Vector3 of the world-space point on the terrain, aligned Y-up always.
 		@note This point is relative to Terrain::getPosition
 		*/
@@ -627,6 +677,8 @@ namespace Ogre
 		void copyGlobalOptions();
 		void checkLayers();
 		void deriveUVMultipliers();
+		uint8 getBlendTextureCount(uint8 numLayers);
+		PixelFormat getBlendTextureFormat(uint8 textureIndex, uint8 numLayers);
 
 
 		SceneManager* mSceneMgr;
@@ -665,6 +717,18 @@ namespace Ogre
 		mutable TerrainMaterialGenerator* mMaterialGenerator;
 		mutable unsigned long long int mMaterialGenerationCount;
 
+		uint16 mLayerBlendMapSize;
+		uint16 mLayerBlendMapSizeActual;
+		typedef vector<uint8*>::type BytePointerList;
+		/// Staging post for blend map data
+		BytePointerList mCpuBlendMapStorage;
+		typedef vector<TexturePtr>::type TexturePtrList;
+		TexturePtrList mBlendTextureList;
+		TerrainLayerBlendMapList mLayerBlendMapList;
+
+		static NameGenerator msBlendTextureGenerator;
+
+
 	};
 
 
@@ -694,6 +758,7 @@ namespace Ogre
 		static uint8 msRenderQueueGroup;
 		static bool msUseRayBoxDistanceCalculation;
 		static TerrainMaterialGeneratorList msMatGeneratorList;
+		static uint16 msLayerBlendMapSize;
 	public:
 
 
@@ -863,6 +928,16 @@ namespace Ogre
 			given layer declaration.
 		*/
 		static TerrainMaterialGenerator* getMaterialGenerator(const TerrainLayerDeclaration& decl);
+
+		/** Get the default size of the blend maps for a new terrain. 
+		*/
+		static uint16 getLayerBlendMapSize() { return msLayerBlendMapSize; }
+
+		/** Sets the default size of blend maps for a new terrain.
+		This is the resolution of each blending layer for a new terrain. 
+		Once created, this information will be stored with the terrain. 
+		*/
+		static void setLayerBlendMapSize(uint16 sz) { msLayerBlendMapSize = sz;}
 
 
 	};

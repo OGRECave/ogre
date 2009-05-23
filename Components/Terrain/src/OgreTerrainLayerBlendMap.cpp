@@ -1,0 +1,175 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OGRE
+(Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
+
+Copyright (c) 2000-2009 Torus Knot Software Ltd
+Also see acknowledgements in Readme.html
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place - Suite 330, Boston, MA 02111-1307, USA, or go to
+http://www.gnu.org/copyleft/lesser.txt.
+
+You may alternatively use this source under the terms of a specific version of
+the OGRE Unrestricted License provided you have obtained such a license from
+Torus Knot Software Ltd.
+-----------------------------------------------------------------------------
+*/
+#include "OgreTerrainLayerBlendMap.h"
+#include "OgreHardwarePixelBuffer.h"
+
+namespace Ogre
+{
+	//---------------------------------------------------------------------
+	TerrainLayerBlendMap::TerrainLayerBlendMap(Terrain* parent, uint8 layerIndex, 
+		HardwarePixelBuffer* buf)
+		: mParent(parent)
+		, mLayerIdx(layerIndex)
+		, mChannel((layerIndex-1) % 4)
+		, mDirty(false)
+		, mBuffer(buf)
+		, mData(0)
+	{
+		mData = static_cast<uint8*>(OGRE_MALLOC(mBuffer->getWidth() * mBuffer->getHeight(), MEMCATEGORY_RESOURCE));
+
+		// we know which of RGBA we need to look at, now find it in the format
+		// because we can't guarantee what precise format the RS gives us
+		unsigned char rgbaShift[4];
+		PixelFormat fmt = mBuffer->getFormat();
+		PixelUtil::getBitShifts(fmt, rgbaShift);
+		mChannelOffset = rgbaShift[mChannel] / 8; // /8 to convert to bytes
+		// now invert since we're dealing with this in a bytewise, not uint32 fashion
+		mChannelOffset = 3 - mChannelOffset;
+
+		download();
+
+	}
+	//---------------------------------------------------------------------
+	TerrainLayerBlendMap::~TerrainLayerBlendMap()
+	{
+		OGRE_FREE(mData, MEMCATEGORY_RESOURCE);
+		mData = 0;
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::download()
+	{
+		uint8* pDst = mData;
+		// Download data
+		Image::Box box(0, 0, mBuffer->getWidth(), mBuffer->getHeight());
+		uint8* pSrc = static_cast<uint8*>(mBuffer->lock(box, HardwareBuffer::HBL_READ_ONLY).data);
+		pSrc += mChannelOffset;
+		size_t srcInc = PixelUtil::getNumElemBytes(mBuffer->getFormat());
+		for (size_t y = box.top; y < box.bottom; ++y)
+		{
+			for (size_t x = box.left; x < box.right; ++x)
+			{
+				*pDst++ = *pSrc;
+				pSrc += srcInc;
+			}
+		}
+		mBuffer->unlock();
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::upload()
+	{
+		if (mData && mDirty)
+		{
+			// Upload data
+			uint8* pSrcBase = mData + mDirtyBox.top * mBuffer->getWidth() + mDirtyBox.left;
+			uint8* pDstBase = static_cast<uint8*>(mBuffer->lock(mDirtyBox, HardwarePixelBuffer::HBL_NORMAL).data);
+			pDstBase += mChannelOffset;
+			size_t dstInc = PixelUtil::getNumElemBytes(mBuffer->getFormat());
+			for (size_t y = 0; y < mDirtyBox.getHeight(); ++y)
+			{
+				uint8* pSrc = pSrcBase + y * mBuffer->getWidth();
+				uint8* pDst = pDstBase + y * mBuffer->getWidth() * dstInc;
+				for (size_t x = 0; x < mDirtyBox.getWidth(); ++x)
+				{
+					*pDst = *pSrc++;
+					pDst += dstInc;
+				}
+			}
+			mBuffer->unlock();
+
+			mDirty = false;
+
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::convertWorldToLocalSpace(const Vector3& worldPos, Real *outX, Real* outY)
+	{
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::convertLocalToWorldSpace(Real x, Real y, Vector3* outWorldPos)
+	{
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::convertLocalToImageSpace(Real x, Real y, size_t* outX, size_t* outY)
+	{
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::convertImageToLocalSpace(Real x, Real y, size_t* outX, size_t* outY)
+	{
+
+	}
+	//---------------------------------------------------------------------
+	uint8 TerrainLayerBlendMap::getBlendValue(size_t x, size_t y)
+	{
+		return *(mData + y * mBuffer->getWidth() + x);
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::setBlendValue(size_t x, size_t y, uint8 val)
+	{
+		*(mData + y * mBuffer->getWidth() + x) = val;
+		dirtyRect(Rect(x, y, x+1, y+1));
+
+	}
+	//---------------------------------------------------------------------
+	uint8* TerrainLayerBlendMap::getBlendPointer()
+	{
+		return mData;
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::dirtyRect(const Rect& rect)
+	{
+		if (mDirty)
+		{
+			mDirtyBox.left = std::min(mDirtyBox.left, (size_t)rect.left);
+			mDirtyBox.top = std::min(mDirtyBox.top, (size_t)rect.top);
+			mDirtyBox.right = std::max(mDirtyBox.right, (size_t)rect.right);
+			mDirtyBox.top = std::max(mDirtyBox.top, (size_t)rect.top);
+		}
+		else
+		{
+			mDirtyBox.left = rect.left;
+			mDirtyBox.right = rect.right;
+			mDirtyBox.top = rect.top;
+			mDirtyBox.bottom = rect.bottom;
+			mDirty = true;
+		}
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::update()
+	{
+		upload();
+	}
+	//---------------------------------------------------------------------
+
+}
+

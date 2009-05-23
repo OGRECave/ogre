@@ -39,6 +39,8 @@ Torus Knot Software Ltd.
 #include "OgreStringConverter.h"
 #include "OgreViewport.h"
 #include "OgreLogManager.h"
+#include "OgreHardwarePixelBuffer.h"
+#include "OgreTextureManager.h"
 
 namespace Ogre
 {
@@ -71,6 +73,7 @@ namespace Ogre
 	uint8 TerrainGlobalOptions::msRenderQueueGroup = RENDER_QUEUE_MAIN;
 	bool TerrainGlobalOptions::msUseRayBoxDistanceCalculation = false;
 	TerrainMaterialGeneratorList TerrainGlobalOptions::msMatGeneratorList;
+	uint16 TerrainGlobalOptions::msLayerBlendMapSize = 1024;
 	//---------------------------------------------------------------------
 	void TerrainGlobalOptions::addMaterialGenerator(TerrainMaterialGenerator* gen)
 	{
@@ -99,6 +102,8 @@ namespace Ogre
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
+	NameGenerator Terrain::msBlendTextureGenerator = NameGenerator("TerrBlend");
+	//---------------------------------------------------------------------
 	Terrain::Terrain(SceneManager* sm)
 		: mSceneMgr(sm)
 		, mHeightData(0)
@@ -117,6 +122,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	Terrain::~Terrain()
 	{
+		freeTemporaryResources();
 		freeGPUResources();
 		freeCPUResources();
 		if (mSceneMgr)
@@ -206,7 +212,44 @@ namespace Ogre
 		}
 
 		// Packed layer blend data
-		// TODO
+		if(!mCpuBlendMapStorage.empty())
+		{
+			// save from CPU data if it's there, it means GPU data was never created
+			stream.write(&mLayerBlendMapSize);
+
+			// load packed CPU data
+			int numBlendTex = getBlendTextureCount(numLayers);
+			for (int i = 0; i < numBlendTex; ++i)
+			{
+				PixelFormat fmt = getBlendTextureFormat(i, numLayers);
+				size_t channels = PixelUtil::getNumElemBytes(fmt);
+				size_t dataSz = channels * mLayerBlendMapSize * mLayerBlendMapSize;
+				uint8* pData = mCpuBlendMapStorage[i];
+				stream.write(pData, dataSz);
+			}
+
+
+		}
+		else
+		{
+			if (mLayerBlendMapSize != mLayerBlendMapSizeActual)
+			{
+				LogManager::getSingleton().stream() << 
+					"WARNING: blend maps were requested at a size larger than was supported "
+					"on this hardware, which means the quality has been degraded";
+			}
+			stream.write(&mLayerBlendMapSizeActual);
+			uint8* tmpData = (uint8*)OGRE_MALLOC(mLayerBlendMapSizeActual * mLayerBlendMapSizeActual * 4, MEMCATEGORY_GENERAL);
+			for (TexturePtrList::iterator i = mBlendTextureList.begin(); i != mBlendTextureList.end(); ++i)
+			{
+				PixelBox dst(mLayerBlendMapSizeActual, mLayerBlendMapSizeActual, 1, (*i)->getFormat(), tmpData);
+				(*i)->getBuffer()->blitToMemory(dst);
+				size_t dataSz = PixelUtil::getNumElemBytes((*i)->getFormat()) * 
+					mLayerBlendMapSizeActual * mLayerBlendMapSizeActual;
+				stream.write(tmpData, dataSz);
+			}
+			OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
+		}
 		
 
 		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
@@ -214,6 +257,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool Terrain::prepare(StreamSerialiser& stream)
 	{
+		freeTemporaryResources();
 		freeCPUResources();
 
 		copyGlobalOptions();
@@ -225,8 +269,6 @@ namespace Ogre
 		stream.read(&align);
 		mAlign = (Alignment)align;
 		stream.read(&mWorldSize);
-
-		// TODO layers
 
 		stream.read(&mMaxBatchSize);
 		stream.read(&mMinBatchSize);
@@ -291,13 +333,24 @@ namespace Ogre
 			{
 				stream.read(&(mLayers[l].textureNames[t]));
 			}
-			stream.writeChunkEnd(TERRAINLAYERINSTANCE_CHUNK_ID);
+			stream.readChunkEnd(TERRAINLAYERINSTANCE_CHUNK_ID);
 		}
 		deriveUVMultipliers();
 
 		// Packed layer blend data
-		// TODO
-
+		stream.read(&mLayerBlendMapSize);
+		mLayerBlendMapSizeActual = mLayerBlendMapSize; // for now, until we check
+		// load packed CPU data
+		int numBlendTex = getBlendTextureCount(numLayers);
+		for (int i = 0; i < numBlendTex; ++i)
+		{
+			PixelFormat fmt = getBlendTextureFormat(i, numLayers);
+			size_t channels = PixelUtil::getNumElemBytes(fmt);
+			size_t dataSz = channels * mLayerBlendMapSize * mLayerBlendMapSize;
+			uint8* pData = (uint8*)OGRE_MALLOC(dataSz, MEMCATEGORY_RESOURCE);
+			stream.read(pData, dataSz);
+			mCpuBlendMapStorage.push_back(pData);
+		}
 
 		stream.readChunkEnd(TERRAIN_CHUNK_ID);
 
@@ -318,6 +371,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool Terrain::prepare(const ImportData& importData)
 	{
+		freeTemporaryResources();
 		freeCPUResources();
 
 		copyGlobalOptions();
@@ -444,6 +498,8 @@ namespace Ogre
 		mGenerateShadowMap = TerrainGlobalOptions::getGenerateShadowMap();
 		mGenerateHorizonMap = TerrainGlobalOptions::getGenerateHorizonMap();
 		mRenderQueueGroup = TerrainGlobalOptions::getRenderQueueGroup();
+		mLayerBlendMapSize = TerrainGlobalOptions::getLayerBlendMapSize();
+		mLayerBlendMapSizeActual = mLayerBlendMapSize; // for now, until we check
 
 	}
 	//---------------------------------------------------------------------
@@ -612,6 +668,7 @@ namespace Ogre
 	{
 		if (mQuadTree)
 			mQuadTree->load();
+		createGPUBlendTextures();
 	}
 	//---------------------------------------------------------------------
 	void Terrain::unload()
@@ -891,9 +948,13 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::freeGPUResources()
 	{
-		// delete batched geometry
-
-		// SHARE geometry between Terrain instances!
+		// remove textures
+		TextureManager& tmgr = TextureManager::getSingleton();
+		for (TexturePtrList::iterator i = mBlendTextureList.begin(); i != mBlendTextureList.end(); ++i)
+		{
+			tmgr.remove((*i)->getHandle());
+		}
+		mBlendTextureList.clear();
 
 	}
 	//---------------------------------------------------------------------
@@ -1245,6 +1306,101 @@ namespace Ogre
 		}
 
 	}
+	//---------------------------------------------------------------------
+	TerrainLayerBlendMap* Terrain::getLayerBlendMap(uint8 layerIndex)
+	{
+		if (layerIndex == 0 || layerIndex-1 >= (uint8)mLayerBlendMapList.size())
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+			"Invalid layer index", "Terrain::getLayerBlendMap");
+
+		uint8 idx = layerIndex - 1;
+		if (!mLayerBlendMapList[idx])
+		{
+			const TexturePtr& tex = mBlendTextureList[idx / 4];
+			mLayerBlendMapList[idx] = OGRE_NEW TerrainLayerBlendMap(this, layerIndex, tex->getBuffer().getPointer());
+		}
+
+		return mLayerBlendMapList[idx];
+
+	}
+	//---------------------------------------------------------------------
+	uint8 Terrain::getBlendTextureCount(uint8 numLayers)
+	{
+		return (numLayers - 1) / 4;
+	}
+	//---------------------------------------------------------------------
+	PixelFormat Terrain::getBlendTextureFormat(uint8 textureIndex, uint8 numLayers)
+	{
+		if (numLayers - 1 - (textureIndex * 4) > 3)
+			return PF_BYTE_RGBA;
+		else
+			return PF_BYTE_RGB;
+	}
+	//---------------------------------------------------------------------
+	void Terrain::createGPUBlendTextures()
+	{
+		// Create enough RGBA/RGB textures to cope with blend layers
+		uint8 numTex = getBlendTextureCount(getLayerCount());
+		mBlendTextureList.resize(numTex);
+
+		for (uint8 i = 0; i < numTex; ++i)
+		{
+			PixelFormat fmt = getBlendTextureFormat(i, getLayerCount());
+			mBlendTextureList[i] = TextureManager::getSingleton().createManual(
+				msBlendTextureGenerator.generate(), ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+				TEX_TYPE_2D, mLayerBlendMapSize, mLayerBlendMapSize, 1, 0, fmt);
+
+			mLayerBlendMapSizeActual = mBlendTextureList[i]->getWidth();
+
+			if (!mCpuBlendMapStorage.empty())
+			{
+				// Load blend data
+				PixelBox src(mLayerBlendMapSize, mLayerBlendMapSize, 1, fmt, mCpuBlendMapStorage[i]);
+				mBlendTextureList[i]->getBuffer()->blitFromMemory(src);
+				// release CPU copy, don't need it anymore
+				OGRE_FREE(mCpuBlendMapStorage[i], MEMCATEGORY_RESOURCE);
+			}
+			else
+			{
+				// initialise black
+
+
+			}
+		}
+		mCpuBlendMapStorage.clear();
+	}
+	//---------------------------------------------------------------------
+	void Terrain::freeTemporaryResources()
+	{
+		for (BytePointerList::iterator i = mCpuBlendMapStorage.begin(); 
+			i != mCpuBlendMapStorage.end(); ++i)
+		{
+			OGRE_FREE(*i, MEMCATEGORY_RESOURCE);
+		}
+		mCpuBlendMapStorage.clear();
+
+		for (TerrainLayerBlendMapList::iterator i = mLayerBlendMapList.begin(); 
+			i != mLayerBlendMapList.end(); ++i)
+		{
+			OGRE_DELETE *i;
+			*i = 0;
+		}
+	}
+	//---------------------------------------------------------------------
+	const TexturePtr& Terrain::getLayerBlendTexture(uint8 index)
+	{
+		assert(index < mBlendTextureList.size());
+
+		return mBlendTextureList[index];
+	}
+	//---------------------------------------------------------------------
+	std::pair<uint8,uint8> Terrain::getLayerBlendTextureIndex(uint8 layerIndex)
+	{
+		assert(layerIndex > 0 && layerIndex < mLayers.size());
+		uint8 idx = layerIndex - 1;
+		return std::pair<uint8, uint8>(idx / 4, idx % 4);
+	}
+
 
 	
 	
