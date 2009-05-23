@@ -359,6 +359,11 @@ namespace Ogre {
         */
         static void getBitMasks(PixelFormat format, uint32 rgba[4]);
 
+		/** Gives the bit shifts for R, G, B and A component
+		@note			Only valid for native endian formats
+		*/
+		static void getBitShifts(PixelFormat format, unsigned char rgba[4]);
+
         /** Gets the name of an image format
         */
         static String getFormatName(PixelFormat srcformat);

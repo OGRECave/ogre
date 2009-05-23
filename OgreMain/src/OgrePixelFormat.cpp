@@ -741,6 +741,15 @@ namespace Ogre {
         rgba[2] = des.bmask;
         rgba[3] = des.amask;
     }
+	//---------------------------------------------------------------------
+	void PixelUtil::getBitShifts(PixelFormat format, unsigned char rgba[4])
+	{
+		const PixelFormatDescription &des = getDescriptionFor(format);
+		rgba[0] = des.rshift;
+		rgba[1] = des.gshift;
+		rgba[2] = des.bshift;
+		rgba[3] = des.ashift;
+	}
     //-----------------------------------------------------------------------
     String PixelUtil::getFormatName(PixelFormat srcformat)
     {
