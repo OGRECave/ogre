@@ -449,6 +449,67 @@ namespace Ogre
 		*/
 		void getVectorAlign(Real x, Real y, Real z, Alignment align, Vector3* outVec);
 
+
+		/** Convert a position from terrain basis space to world space. 
+		@param TSpos Terrain space position, where (0,0) is the bottom-left of the
+			terrain, and (1,1) is the top-right. The Z coordinate is in absolute
+			height units.
+		@param outWSpos World space output position (setup according to current alignment). 
+		*/
+		void getPosition(const Vector3& TSpos, Vector3* outWSpos);
+		/** Convert a position from terrain basis space to world space. 
+		@param x,y,z Terrain space position, where (0,0) is the bottom-left of the
+		terrain, and (1,1) is the top-right. The Z coordinate is in absolute
+		height units.
+		@param outWSpos World space output position (setup according to current alignment). 
+		*/
+		void getPosition(Real x, Real y, Real z, Vector3* outWSpos);
+
+		/** Convert a position from world space to terrain basis space. 
+		@param WSpos World space position (setup according to current alignment). 
+		@param outTSpos Terrain space output position, where (0,0) is the bottom-left of the
+		terrain, and (1,1) is the top-right. The Z coordinate is in absolute
+		height units.
+		*/
+		void getTerrainPosition(const Vector3& WSpos, Vector3* outTSpos);
+		/** Convert a position from world space to terrain basis space. 
+		@param x,y,z World space position (setup according to current alignment). 
+		@param outTSpos Terrain space output position, where (0,0) is the bottom-left of the
+		terrain, and (1,1) is the top-right. The Z coordinate is in absolute
+		height units.
+		*/
+		void getTerrainPosition(Real x, Real y, Real z, Vector3* outTSpos);
+		/** Convert a position from terrain basis space to world space based on a specified alignment. 
+		@param TSpos Terrain space position, where (0,0) is the bottom-left of the
+			terrain, and (1,1) is the top-right. The Z coordinate is in absolute
+			height units.
+		@param outWSpos World space output position (setup according to alignment). 
+		*/
+		void getPositionAlign(const Vector3& TSpos, Alignment align, Vector3* outWSpos);
+		/** Convert a position from terrain basis space to world space based on a specified alignment. 
+		@param x,y,z Terrain space position, where (0,0) is the bottom-left of the
+		terrain, and (1,1) is the top-right. The Z coordinate is in absolute
+		height units.
+		@param outWSpos World space output position (setup according to alignment). 
+		*/
+		void getPositionAlign(Real x, Real y, Real z, Alignment align, Vector3* outWSpos);
+
+		/** Convert a position from world space to terrain basis space based on a specified alignment. 
+		@param WSpos World space position (setup according to alignment). 
+		@param outTSpos Terrain space output position, where (0,0) is the bottom-left of the
+		terrain, and (1,1) is the top-right. The Z coordinate is in absolute
+		height units.
+		*/
+		void getTerrainPositionAlign(const Vector3& WSpos, Alignment align, Vector3* outTSpos);
+		/** Convert a position from world space to terrain basis space based on a specified alignment. 
+		@param x,y,z World space position (setup according to alignment). 
+		@param outTSpos Terrain space output position, where (0,0) is the bottom-left of the
+		terrain, and (1,1) is the top-right. The Z coordinate is in absolute
+		height units.
+		*/
+		void getTerrainPositionAlign(Real x, Real y, Real z, Alignment align, Vector3* outTSpos);
+
+
 		/// Get the alignment of the terrain
 		Alignment getAlignment() const;
 		/// Get the size of the terrain in vertices along one side

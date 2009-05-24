@@ -787,6 +787,82 @@ namespace Ogre
 		
 	}
 	//---------------------------------------------------------------------
+	void Terrain::getPosition(const Vector3& TSpos, Vector3* outWSpos)
+	{
+		getPositionAlign(TSpos, mAlign, outWSpos);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getPosition(Real x, Real y, Real z, Vector3* outWSpos)
+	{
+		getPositionAlign(x, y, z, mAlign, outWSpos);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getTerrainPosition(const Vector3& WSpos, Vector3* outTSpos)
+	{
+		getTerrainPositionAlign(WSpos, mAlign, outTSpos);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getTerrainPosition(Real x, Real y, Real z, Vector3* outTSpos)
+	{
+		getTerrainPositionAlign(x, y, z, mAlign, outTSpos);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getPositionAlign(const Vector3& TSpos, Alignment align, Vector3* outWSpos)
+	{
+		getPositionAlign(TSpos.x, TSpos.y, TSpos.z, align, outWSpos);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getPositionAlign(Real x, Real y, Real z, Alignment align, Vector3* outWSpos)
+	{
+		switch(align)
+		{
+		case ALIGN_X_Z:
+			outWSpos->y = z;
+			outWSpos->x = x * (mSize - 1) * mScale + mBase;
+			outWSpos->z = y * (mSize - 1) * -mScale - mBase;
+			break;
+		case ALIGN_Y_Z:
+			outWSpos->x = z;
+			outWSpos->y = x * (mSize - 1) * mScale + mBase;
+			outWSpos->z = y * (mSize - 1) * -mScale - mBase;
+			break;
+		case ALIGN_X_Y:
+			outWSpos->z = z;
+			outWSpos->x = x * (mSize - 1) * mScale + mBase;
+			outWSpos->y = y * (mSize - 1) * mScale + mBase;
+			break;
+		};
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getTerrainPositionAlign(const Vector3& WSpos, Alignment align, Vector3* outTSpos)
+	{
+		getTerrainPositionAlign(WSpos.x, WSpos.y, WSpos.z, align, outTSpos);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getTerrainPositionAlign(Real x, Real y, Real z, Alignment align, Vector3* outTSpos)
+	{
+		switch(align)
+		{
+		case ALIGN_X_Z:
+			outTSpos->x = (x - mBase) / ((mSize - 1) * mScale);
+			outTSpos->y = (z + mBase) / ((mSize - 1) * -mScale);
+			outTSpos->z = y;
+			break;
+		case ALIGN_Y_Z:
+			outTSpos->x = (y - mBase) / ((mSize - 1) * mScale);
+			outTSpos->y = (z + mBase) / ((mSize - 1) * -mScale);
+			outTSpos->z = x;
+			break;
+		case ALIGN_X_Y:
+			outTSpos->x = (x - mBase) / ((mSize - 1) * mScale);
+			outTSpos->y = (y - mBase) / ((mSize - 1) * mScale);
+			outTSpos->z = z;
+			break;
+		};
+
+	}
+	//---------------------------------------------------------------------
 	Terrain::Alignment Terrain::getAlignment() const
 	{
 		return mAlign;
