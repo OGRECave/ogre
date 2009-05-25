@@ -577,17 +577,41 @@ namespace Ogre
 		void setPosition(const Vector3& pos);
 		/// Get the root scene node for the terrain (internal use only)
 		SceneNode* _getRootSceneNode() const;
-		/** Mark the entire terrain as dirty, so that the geometry is
-			updated the next time it is accessed. 
+		/** Mark the entire terrain as dirty. 
+		By marking a section of the terrain as dirty, you are stating that you have
+		changed the height data within this rectangle. This rectangle will be merged with
+		any existing outstanding changes. To finalise the changes, you must 
+		call update().
 		*/
 		void dirty();
 
-		/** Mark a region of the terrain as dirty, so that the geometry is 
-			updated the next time it is accessed. 
+		/** Mark a region of the terrain as dirty. 
+		By marking a section of the terrain as dirty, you are stating that you have
+		changed the height data within this rectangle. This rectangle will be merged with
+		any existing outstanding changes. To finalise the changes, you must 
+		call update().
 		@param rect A rectangle expressed in vertices describing the dirty region;
 			left < right, top < bottom, left & top are inclusive, right & bottom exclusive
 		*/
 		void dirtyRect(const Rect& rect);
+
+		/** Trigger the update process for the terrain.
+		@remarks
+			Updating the terrain will process any dirty sections of the terrain.
+			This may affect many things:
+			<ol><li>The terrain geometry</li>
+			<li>The terrain error metrics which determine LOD transitions</li>
+			<li>The terrain normal map, if present</li>
+			<li>The terrain lighting map, if present</li>
+			<li>The terrain horizon map, if present</li>
+			</ol>
+			If threading is enabled, only item 1 (the geometry) will be updated
+			synchronously, ie will be fully up to date when this method returns.
+			The other elements are more expensive to compute, and will be queued
+			for processing in a background thread, in the order shown above. As these
+			updates complete, the effects will be shown.
+		*/
+		void update();
 
 
 		/** Whether to morph between LODs using a vertex program. 
@@ -773,6 +797,8 @@ namespace Ogre
 		bool mGenerateShadowMap;
 		bool mGenerateHorizonMap;
 		uint8 mRenderQueueGroup;
+
+		Rect mDirtyRect;
 
 		mutable MaterialPtr mMaterial;
 		mutable TerrainMaterialGenerator* mMaterialGenerator;

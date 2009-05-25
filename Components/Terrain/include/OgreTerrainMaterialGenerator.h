@@ -258,6 +258,10 @@ namespace Ogre
 
 	typedef vector<TerrainMaterialGenerator*>::type TerrainMaterialGeneratorList;
 
+
+	/** @} */
+	/** @} */
+
 }
 #endif
 

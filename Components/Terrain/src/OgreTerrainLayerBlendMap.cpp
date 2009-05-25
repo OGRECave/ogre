@@ -28,6 +28,7 @@ Torus Knot Software Ltd.
 */
 #include "OgreTerrainLayerBlendMap.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreTerrain.h"
 
 namespace Ogre
 {
@@ -109,24 +110,29 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void TerrainLayerBlendMap::convertWorldToLocalSpace(const Vector3& worldPos, Real *outX, Real* outY)
+	void TerrainLayerBlendMap::convertWorldToUVSpace(const Vector3& worldPos, Real *outX, Real* outY)
 	{
-
+		Vector3 terrainSpace;
+		mParent->getTerrainPosition(worldPos, &terrainSpace);
+		*outX = terrainSpace.x;
+		*outY = 1.0 - terrainSpace.y;
 	}
 	//---------------------------------------------------------------------
-	void TerrainLayerBlendMap::convertLocalToWorldSpace(Real x, Real y, Vector3* outWorldPos)
+	void TerrainLayerBlendMap::convertUVToWorldSpace(Real x, Real y, Vector3* outWorldPos)
 	{
-
+		mParent->getPosition(x, 1.0 - y, 0, outWorldPos);
 	}
 	//---------------------------------------------------------------------
-	void TerrainLayerBlendMap::convertLocalToImageSpace(Real x, Real y, size_t* outX, size_t* outY)
+	void TerrainLayerBlendMap::convertUVToImageSpace(Real x, Real y, size_t* outX, size_t* outY)
 	{
-
+		*outX = x * (mBuffer->getWidth() - 1);
+		*outY = y * (mBuffer->getHeight() - 1);
 	}
 	//---------------------------------------------------------------------
-	void TerrainLayerBlendMap::convertImageToLocalSpace(Real x, Real y, size_t* outX, size_t* outY)
+	void TerrainLayerBlendMap::convertImageToUVSpace(size_t x, size_t y, Real* outX, Real* outY)
 	{
-
+		*outX = x / (Real)(mBuffer->getWidth() - 1);
+		*outY = y / (Real)(mBuffer->getHeight() - 1);
 	}
 	//---------------------------------------------------------------------
 	uint8 TerrainLayerBlendMap::getBlendValue(size_t x, size_t y)

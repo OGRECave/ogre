@@ -84,29 +84,29 @@ namespace Ogre
 		/// Get the index of the layer this is targetting
 		uint8 getLayerIndex() const { return mLayerIdx; }
 
-		/** Helper method - convert a point in world space to local space based on the
+		/** Helper method - convert a point in world space to UV space based on the
 			terrain settings.
 		@param worldPos World position
 		@param outX, outY Pointers to variables which will be filled in with the
-			local image space value. Note they are deliberately signed Real values, because the
+			local UV space value. Note they are deliberately signed Real values, because the
 			point you supply may be outside of image space and may be between texels.
 			The values will range from 0 to 1, top/bottom, left/right.
 		*/
-		void convertWorldToLocalSpace(const Vector3& worldPos, Real *outX, Real* outY);
+		void convertWorldToUVSpace(const Vector3& worldPos, Real *outX, Real* outY);
 
 		/** Helper method - convert a point in local space to worldspace based on the
 			terrain settings.
 		@param x,y Local position, ranging from 0 to 1, top/bottom, left/right.
 		@param outWorldPos Pointer will be filled in with the world space value
 		*/
-		void convertLocalToWorldSpace(Real x, Real y, Vector3* outWorldPos);
+		void convertUVToWorldSpace(Real x, Real y, Vector3* outWorldPos);
 
 		/** Convert local space values (0,1) to image space (0, imageSize).
 		*/
-		void convertLocalToImageSpace(Real x, Real y, size_t* outX, size_t* outY);
+		void convertUVToImageSpace(Real x, Real y, size_t* outX, size_t* outY);
 		/** Convert image space (0, imageSize) to local space values (0,1).
 		*/
-		void convertImageToLocalSpace(Real x, Real y, size_t* outX, size_t* outY);
+		void convertImageToUVSpace(size_t x, size_t y, Real* outX, Real* outY);
 
 		/** Get a single value of blend information, in image space.
 		@param x,y Coordinates of the point of data to get, in image space (top down)
@@ -143,6 +143,8 @@ namespace Ogre
 
 	typedef vector<TerrainLayerBlendMap*>::type TerrainLayerBlendMapList;
 
+	/** @} */
+	/** @} */
 
 }
 

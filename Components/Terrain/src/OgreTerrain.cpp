@@ -113,6 +113,7 @@ namespace Ogre
 		, mNumLodLevels(0)
 		, mNumLodLevelsPerLeafNode(0)
 		, mTreeDepth(0)
+		, mDirtyRect(0, 0, 0, 0)
 		, mMaterialGenerator(0)
 		, mMaterialGenerationCount(0)
 	{
@@ -990,20 +991,26 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::dirty()
 	{
-		// TODO - geometry
-
-		// calculate entire terrain
 		Rect rect;
 		rect.top = 0; rect.bottom = mSize;
 		rect.left = 0; rect.right = mSize;
-		calculateHeightDeltas(rect);
+		dirtyRect(rect);
 	}
 	//---------------------------------------------------------------------
 	void Terrain::dirtyRect(const Rect& rect)
 	{
-		// TODO - geometry
+		mDirtyRect.merge(rect);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::update()
+	{
+		if (mDirtyRect.width() && mDirtyRect.height())
+		{
+			calculateHeightDeltas(mDirtyRect);
 
-		calculateHeightDeltas(rect);
+			mDirtyRect.left = mDirtyRect.top = mDirtyRect.right = mDirtyRect.bottom = 0;
+
+		}
 
 	}
 	//---------------------------------------------------------------------
