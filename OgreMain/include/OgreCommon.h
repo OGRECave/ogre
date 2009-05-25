@@ -547,6 +547,22 @@ namespace Ogre {
           {
             return bottom - top;
           }
+		  TRect & merge(const TRect& rhs)
+		  {
+			  if (width() == 0)
+			  {
+				  *this = rhs;
+			  }
+			  else
+			  {
+				  left = std::min(left, rhs.left);
+				  right = std::max(right, rhs.right);
+				  top = std::min(top, rhs.top);
+				  bottom = std::max(bottom, rhs.bottom);
+			  }
+
+		  }
+
         };
 
         /** Structure used to define a rectangle in a 2-D floating point space.
