@@ -699,6 +699,9 @@ namespace Ogre {
 		unsigned long long int mNext;
 		OGRE_AUTO_MUTEX
 	public:
+		NameGenerator(const NameGenerator& rhs)
+			: mPrefix(rhs.mPrefix), mNext(rhs.mNext) {}
+		
 		NameGenerator(const String& prefix) : mPrefix(prefix), mNext(1) {}
 
 		/// Generate a new name
