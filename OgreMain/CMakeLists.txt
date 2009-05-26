@@ -241,6 +241,7 @@ set (HEADER_FILES
   include/OgreViewport.h
   include/OgreWindowEventUtilities.h
   include/OgreWireBoundingBox.h
+  include/OgreWorkQueue.h
   include/OgreZip.h
 )
 
@@ -429,6 +430,7 @@ set (SOURCE_FILES
   src/OgreViewport.cpp
   src/OgreWindowEventUtilities.cpp
   src/OgreWireBoundingBox.cpp
+  src/OgreWorkQueue.cpp
   src/OgreZip.cpp
 )
 
