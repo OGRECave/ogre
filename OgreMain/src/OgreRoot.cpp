@@ -106,6 +106,7 @@ namespace Ogre {
     typedef void (*DLL_START_PLUGIN)(void);
     typedef void (*DLL_STOP_PLUGIN)(void);
 
+	const uint16 Root::MAX_USER_WORKQUEUE_CHANNEL = 32767;
 
     //-----------------------------------------------------------------------
     Root::Root(const String& pluginFileName, const String& configFileName, 
@@ -146,6 +147,25 @@ namespace Ogre {
 
 		// ResourceBackgroundQueue
 		mResourceBackgroundQueue = OGRE_NEW ResourceBackgroundQueue();
+
+		// WorkQueue
+		mWorkQueue = OGRE_NEW WorkQueue("Root");
+		// never process responses in main thread for longer than 10ms by default
+		mWorkQueue->setResponseProcessingTimeLimit(10);
+		// match threads to hardware
+#if OGRE_THREAD_SUPPORT
+		unsigned threadCount = boost::thread::hardware_concurrency();
+		if (!threadCount)
+			threadCount = 1;
+		mWorkQueue->setWorkerThreadCount(threadCount);
+#endif
+		// only allow workers to access rendersystem if threadsupport is 1
+#if OGRE_THREAD_SUPPORT == 1
+		mWorkQueue->setWorkersCanAccessRenderSystem(true);
+#else
+		mWorkQueue->setWorkersCanAccessRenderSystem(false);
+#endif
+
 
 		// Create SceneManager enumerator (note - will be managed by singleton)
         mSceneManagerEnum = OGRE_NEW SceneManagerEnumerator();
@@ -743,6 +763,9 @@ namespace Ogre {
 		// Also tell the ResourceBackgroundQueue to propagate background load events
 		ResourceBackgroundQueue::getSingleton()._fireOnFrameCallbacks();
 
+		// Tell the queue to process responses
+		mWorkQueue->processResponses();
+
 		OgreProfileEndGroup("Frame", OGREPROF_GENERAL);
 
         return ret;
@@ -876,6 +899,7 @@ namespace Ogre {
 
         ShadowVolumeExtrudeProgram::shutdown();
 		mResourceBackgroundQueue->shutdown();
+		mWorkQueue->shutdown();
         ResourceGroupManager::getSingleton().shutdownAll();
 
 		// Destroy pools
@@ -1165,6 +1189,7 @@ namespace Ogre {
         {
 			// Background loader
 			mResourceBackgroundQueue->initialise();
+			mWorkQueue->startup();
 			// Initialise material manager
 			mMaterialManager->initialise();
             // Init particle systems manager

@@ -37,6 +37,7 @@ Torus Knot Software Ltd.
 #include "OgreSceneManagerEnumerator.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreLodStrategyManager.h"
+#include "OgreWorkQueue.h"
 
 #include <exception>
 
@@ -137,6 +138,8 @@ namespace Ogre
 
 		/// Are we initialised yet?
 		bool mIsInitialised;
+
+		WorkQueue* mWorkQueue;
 
         /** Method reads a plugins configuration file and instantiates all
             plugins.
@@ -929,6 +932,16 @@ namespace Ogre
 		* Gets the number of display monitors.
 		*/
 		unsigned int getDisplayMonitorCount() const;
+
+		/** Get the WorkQueue for processing background tasks.
+			You are free to add new requests and handlers to this queue to
+			process your custom background tasks using the shared thread pool. 
+			However, you may only use channels up to MAX_USER_WORKQUEUE_CHANNEL,
+			anything above that is reserved for OGRE's own use.
+		*/
+		WorkQueue* getWorkQueue() const { return mWorkQueue; }
+		/// The maximum channel number that may be used by users (above this is reserved for OGRE)
+		static const uint16 MAX_USER_WORKQUEUE_CHANNEL;
     };
 	/** @} */
 	/** @} */

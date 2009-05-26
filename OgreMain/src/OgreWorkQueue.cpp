@@ -63,6 +63,7 @@ namespace Ogre {
 		, mWorkerThreadCount(1)
 		, mWorkerRenderSystemAccess(false)
 		, mIsRunning(false)
+		, mResposeTimeLimitMS(0)
 		, mRequestCount(0)
 		, mPaused(false)
 		, mAcceptRequests(true)
@@ -436,25 +437,42 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::_processNextResponse() 
+	void WorkQueue::processResponses() 
 	{
-		Response* response = 0;
-		{
-			OGRE_LOCK_MUTEX(mResponseMutex)
+		unsigned long msStart = Root::getSingleton().getTimer()->getMilliseconds();
+		unsigned long msCurrent = msStart;
 
-			if (!mResponseQueue.empty())
+		// keep going until we run out of responses or out of time
+		while(true)
+		{
+			Response* response = 0;
 			{
-				response = mResponseQueue.front();
-				mResponseQueue.pop_front();
+				OGRE_LOCK_MUTEX(mResponseMutex)
+
+				if (mResponseQueue.empty())
+					break; // exit loop
+				else
+				{
+					response = mResponseQueue.front();
+					mResponseQueue.pop_front();
+				}
 			}
-		}
 
-		if (response)
-		{
-			processResponse(response);
+			if (response)
+			{
+				processResponse(response);
 
-			OGRE_DELETE response;
+				OGRE_DELETE response;
 
+			}
+
+			// time limit
+			if (mResposeTimeLimitMS)
+			{
+				msCurrent = Root::getSingleton().getTimer()->getMilliseconds();
+				if (msCurrent - msStart > mResposeTimeLimitMS)
+					break;
+			}
 		}
 	}
 	//---------------------------------------------------------------------

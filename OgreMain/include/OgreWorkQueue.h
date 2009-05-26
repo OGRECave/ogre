@@ -75,7 +75,7 @@ namespace Ogre
 		{
 			friend class WorkQueue;
 		protected:
-			/// The request channel, as an integer (user can define enumerations on this, but Ogre reserves channels 0-63)
+			/// The request channel, as an integer 
 			uint16 mChannel;
 			/// The request type, as an integer within the channel (user can define enumerations on this)
 			uint16 mType;
@@ -280,8 +280,7 @@ namespace Ogre
 
 		/** Add a new request to the queue.
 		@param channel The channel this request will go into; the channel is the top-level
-			categorisation of the request, and OGRE reserves channels 0-63, so 
-			users must use channels 64 or higher for their custom requests.
+			categorisation of the request
 		@param requestType An identifier that's unique within this queue which
 			identifies the type of the request (user decides the actual value)
 		@param rData The data required by the request process. 
@@ -358,15 +357,27 @@ namespace Ogre
 		*/
 		virtual void _processNextRequest();
 
-		/** Process the next response on the queue.
+		/** Process the responses in the queue.
 		@remarks
-			This method is public, but intended for only the owner of this
-			WorkQueue to call. It is imperitive that the thread
-			that calls this method is the main render context thread, since
-			ResponseHandler implementations are allowed to access GPU resources.
+			This method is public, and must be called from the main render
+			thread to 'pump' responses through the system. The method will usually
+			try to clear all responses before returning; however, you can specify
+			a time limit on the response processing to limit the impact of
+			spikes in demand by calling setResponseProcessingTimeLimit.
 		*/
-		virtual void _processNextResponse(); 
+		virtual void processResponses(); 
 
+		/** Get the time limit imposed on the processing of responses in a
+			single frame, in milliseconds (0 indicates no limit).
+		*/
+		virtual unsigned long getResponseProcessingTimeLimit() const { return mResposeTimeLimitMS; }
+
+		/** Set the time limit imposed on the processing of responses in a
+		single frame, in milliseconds (0 indicates no limit).
+		This sets the maximum time that will be spent in processResponses() in 
+		a single frame.
+		*/
+		virtual void setResponseProcessingTimeLimit(unsigned long ms) { mResposeTimeLimitMS = ms; }
 		/** To be called by a separate thread; will return immediately if there
 			are items in the queue, or suspend the thread until new items are added
 			otherwise.
@@ -388,6 +399,7 @@ namespace Ogre
 		size_t mWorkerThreadCount;
 		bool mWorkerRenderSystemAccess;
 		bool mIsRunning;
+		unsigned long mResposeTimeLimitMS;
 
 		typedef deque<Request*>::type RequestQueue;
 		typedef deque<Response*>::type ResponseQueue;
