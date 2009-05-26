@@ -561,6 +561,8 @@ namespace Ogre {
 				  bottom = std::max(bottom, rhs.bottom);
 			  }
 
+			  return *this;
+
 		  }
 
         };
