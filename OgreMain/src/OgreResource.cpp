@@ -114,10 +114,8 @@ namespace Ogre
 		//if(mCreator)
 		//	mCreator->_notifyResourcePrepared(this);
 
-		// Fire (deferred) events
-		if (mIsBackgroundLoaded)
-			queueFireBackgroundPreparingComplete();
-		else
+		// Fire events (if not background)
+		if (!mIsBackgroundLoaded)
 			_firePreparingComplete();
 
 
@@ -214,10 +212,8 @@ namespace Ogre
 		if(mCreator)
 			mCreator->_notifyResourceLoaded(this);
 
-		// Fire (deferred) events
-		if (mIsBackgroundLoaded)
-			queueFireBackgroundLoadingComplete();
-		else
+		// Fire events, if not background
+		if (!mIsBackgroundLoaded)
 			_fireLoadingComplete();
 
 
@@ -307,14 +303,6 @@ namespace Ogre
 		mListenerList.remove(lis);
 	}
 	//-----------------------------------------------------------------------
-	void Resource::queueFireBackgroundLoadingComplete(void)
-	{
-		// Lock the listener list
-		OGRE_LOCK_MUTEX(mListenerListMutex)
-		if(!mListenerList.empty())
-			ResourceBackgroundQueue::getSingleton()._queueFireBackgroundLoadingComplete(this);
-	}
-	//-----------------------------------------------------------------------
 	void Resource::_fireLoadingComplete(void)
 	{
 		// Lock the listener list
@@ -328,14 +316,6 @@ namespace Ogre
 
 			(*i)->loadingComplete(this);
 		}
-	}
-	//-----------------------------------------------------------------------
-	void Resource::queueFireBackgroundPreparingComplete(void)
-	{
-		// Lock the listener list
-		OGRE_LOCK_MUTEX(mListenerListMutex)
-		if(!mListenerList.empty())
-			ResourceBackgroundQueue::getSingleton()._queueFireBackgroundPreparingComplete(this);
 	}
 	//-----------------------------------------------------------------------
 	void Resource::_firePreparingComplete(void)

@@ -34,6 +34,7 @@ Torus Knot Software Ltd.
 #include "OgreCommon.h"
 #include "OgreSingleton.h"
 #include "OgreResource.h"
+#include "OgreWorkQueue.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -44,7 +45,7 @@ namespace Ogre {
 	*/
 
 	/// Identifier of a background process
-	typedef unsigned long BackgroundProcessTicket;
+	typedef WorkQueue::RequestID BackgroundProcessTicket;
 
 	/** Encapsulates the result of a background queue request */
 	struct BackgroundProcessResult
@@ -61,10 +62,11 @@ namespace Ogre {
 	/** This class is used to perform Resource operations in a
 		background thread. 
 	@remarks
-		If threading is enabled, Ogre will create a single background thread
-		which can be used to load / unload resources in parallel. Only one
-		resource will be processed at once in this background thread, but it
-		will be in parallel with the main thread. 
+		All these requests are now queued via Root::getWorkQueue in order
+		to share the thread pool amongst all background tasks. You should therefore
+		refer to that class for configuring the behaviour of the threads
+		themselves, this class merely provides an interface that is specific
+		to resource loading around this common functionality.
 	@par
 		The general approach here is that on requesting a background resource
 		process, your request is placed on a queue ready for the background
@@ -74,24 +76,10 @@ namespace Ogre {
 		be performed. In it's own thread, the resource operation will be 
 		performed, and once finished the ticket will be marked as complete. 
 		You can check the status of tickets by calling isProcessComplete() 
-		from your queueing thread. It is also possible to get immediate 
-		callbacks on completion, but these callbacks happen in the background 
-		loading thread (not your calling thread), so should only be used if you
-		really understand multithreading. 
-	@par
-		By default, when threading is enabled this class will start its own 
-		separate thread to perform the actual loading. However, if you would 
-		prefer to use your own existing thread to perform the background load,
-		then be sure to call setStartBackgroundThread(false) before initialise() is
-		called by Root::initialise. Your own thread should call _initThread
-		immediately on startup, before any resources are loaded at all, and
-		_doNextQueuedBackgroundProcess to process background requests.
-	@note
-		This class will only perform tasks in a background thread if 
-		OGRE_THREAD_SUPPORT is defined to be 1. Otherwise, all methods will
-		call their exact equivalents in ResourceGroupManager synchronously. 
+		from your queueing thread. 
 	*/
-	class _OgreExport ResourceBackgroundQueue : public Singleton<ResourceBackgroundQueue>, public ResourceAlloc
+	class _OgreExport ResourceBackgroundQueue : public Singleton<ResourceBackgroundQueue>, public ResourceAlloc, 
+		public WorkQueue::RequestHandler, public WorkQueue::ResponseHandler
 	{
 	public:
 		/** This abstract listener interface lets you get notifications of
@@ -112,42 +100,27 @@ namespace Ogre {
 				so that you don't have to be concerned about thread safety. 
 			*/
 			virtual void operationCompleted(BackgroundProcessTicket ticket, const BackgroundProcessResult& result) = 0;
-			/** Called when a requested operation completes, immediate in background thread. 
-			@note
-				This is the advanced version of the background operation notification,
-				it happens immediately when the background operation is completed, and
-				your callback is executed in the <b>background thread</b>. Therefore if 
-				you use this version, you have to be aware of thread safety issues
-				and what you can and cannot do in your callback implementation.
-			*/
-			virtual void operationCompletedInThread(BackgroundProcessTicket ticket, const BackgroundProcessResult& result) {}
 			/// Need virtual destructor in case subclasses use it
 			virtual ~Listener() {}
 
 		};
-		/// Init notification mutex (must lock before waiting on initCondition)
-		OGRE_MUTEX(initMutex)
-		/// Synchroniser token to wait / notify on thread init (public incase external thread)
-		OGRE_THREAD_SYNCHRONISER(initSync)
 
 	protected:
 		/** Enumerates the type of requests */
 		enum RequestType
 		{
-			RT_INITIALISE_GROUP,
-			RT_INITIALISE_ALL_GROUPS,
-			RT_PREPARE_GROUP,
-			RT_PREPARE_RESOURCE,
-			RT_LOAD_GROUP,
-			RT_LOAD_RESOURCE,
-			RT_UNLOAD_GROUP,
-			RT_UNLOAD_RESOURCE,
-			RT_SHUTDOWN
+			RT_INITIALISE_GROUP = 0,
+			RT_INITIALISE_ALL_GROUPS = 1,
+			RT_PREPARE_GROUP = 2,
+			RT_PREPARE_RESOURCE = 3,
+			RT_LOAD_GROUP = 4,
+			RT_LOAD_RESOURCE = 5,
+			RT_UNLOAD_GROUP = 6,
+			RT_UNLOAD_RESOURCE = 7
 		};
 		/** Encapsulates a queued request for the background queue */
-		struct Request
+		struct ResourceRequest
 		{
-			BackgroundProcessTicket ticketID;
 			RequestType type;
 			String resourceName;
 			ResourceHandle resourceHandle;
@@ -158,112 +131,39 @@ namespace Ogre {
 			const NameValuePairList* loadParams;
 			Listener* listener;
 			BackgroundProcessResult result;
-		};
-		typedef list<Request>::type RequestQueue;
-		typedef map<BackgroundProcessTicket, Request*>::type RequestTicketMap;
-		
-		/// Queue of requests, used to store and order requests
-		RequestQueue mRequestQueue;
-		
-		/// Request lookup by ticket
-		RequestTicketMap mRequestTicketMap;
 
-		/// Next ticket ID
-		unsigned long mNextTicketID;
+			_OgreExport friend std::ostream& operator<<(std::ostream& o, const ResourceRequest& r)
+			{ return o; }
+		};
+
+		typedef set<BackgroundProcessTicket>::type OutstandingRequestSet;	
+		OutstandingRequestSet mOutstandingRequestSet;
 
 		/// Struct that holds details of queued notifications
-		struct QueuedNotification
+		struct ResourceResponse
 		{
-			QueuedNotification(Resource* r, bool load)
-				: load(load), resource(r)
+			ResourceResponse(Resource* r, const ResourceRequest& req)
+				: resource(r), request(req)
 			{}
 
-			QueuedNotification(const Request &req)
-				: load(false), resource(0), req(req)  
-			{}
-
-            bool load;
-			// Type 1 - Resource::Listener kind
 			Resource* resource;
-			// Type 2 - ResourceBackgroundQueue::Listener kind
-            Request req;
+			ResourceRequest request;
+
+			_OgreExport friend std::ostream& operator<<(std::ostream& o, const ResourceResponse& r)
+			{ return o; }
 		};
-		typedef list<QueuedNotification>::type NotificationQueue;
-		/// Queued notifications of background loading being finished
-		NotificationQueue mNotificationQueue;
-		/// Mutex to protect the background event queue]
-		OGRE_MUTEX(mNotificationQueueMutex)
 
-		/// Whether this class should start it's own thread or not
-		bool mStartThread;
-
-#if OGRE_THREAD_SUPPORT
-		/// The single background thread which will process loading requests
-		boost::thread* mThread;
-		/// Synchroniser token to wait / notify on queue
-		boost::condition mCondition;
-		/// Thread function
-		static void threadFunc(void);
-		/// Internal method for adding a request; also assigns a ticketID
-		BackgroundProcessTicket addRequest(Request& req);
-		/// Thread shutdown?
-		bool mShuttingDown;
-#else
-		/// Dummy
-		void* mThread;
-#endif
-
-		/// Private mutex, not allowed to lock from outside
-		OGRE_AUTO_MUTEX
-
-		/** Queue the firing of the 'background loading complete' event to
-			a Resource::Listener event.
-		@remarks
-			The purpose of this is to allow the background loading thread to 
-			call this method to queue the notification to listeners waiting on
-			the background loading of a resource. Rather than allow the resource
-			background loading thread to directly call these listeners, which 
-			would require all the listeners to be thread-safe, this method
-			implements a thread-safe queue which can be processed in the main
-			frame loop thread each frame to clear the events in a simpler 
-			manner.
-		@param listener The listener to be notified
-		@param ticket The ticket for the operation that has completed
-		*/
-		virtual void queueFireBackgroundOperationComplete(Request *req);
+		BackgroundProcessTicket addRequest(ResourceRequest& req);
 
 	public:
 		ResourceBackgroundQueue();
 		virtual ~ResourceBackgroundQueue();
 
-		/** Sets whether or not a thread should be created and started to handle
-			the background loading, or whether a user thread will call the 
-			appropriate hooks.
-		@remarks
-			By default, a new thread will be started to handle the background 
-			load requests. However, the application may well have some threads
-			of its own which is wishes to use to perform the background loading
-			as well as other tasks (for example on most platforms there will be
-			a fixed number of hardware threads which the application will wish
-			to work within). Use this method to turn off the creation of a separate
-			thread if you wish, and call the _doNextQueuedBackgroundProcess
-			method from your own thread to process background requests.
-		@note
-			You <b>must</b> call this method prior to initialisation. Initialisation
-			of this class is automatically done when Root::initialise is called.
-		*/
-		void setStartBackgroundThread(bool startThread) { mStartThread = startThread; }
-
-		/** Gets whether or not a thread should be created and started to handle
-			the background loading, or whether a user thread will call the 
-			appropriate hooks.
-		*/
-		bool getStartBackgroundThread(void) { return mStartThread; }
 		/** Initialise the background queue system. 
 		@note Called automatically by Root::initialise.
 		*/
 		virtual void initialise(void);
-		
+
 		/** Shut down the background queue system. 
 		@note Called automatically by Root::shutdown.
 		*/
@@ -401,77 +301,10 @@ namespace Ogre {
 		*/
 		virtual bool isProcessComplete(BackgroundProcessTicket ticket);
 
-		/** Process a single queued background operation. 
-		@remarks
-			If you are using your own thread to perform background loading, calling
-			this method from that thread triggers the processing of a single
-			background loading request from the queue. This method will not 
-			return until the request has been fully processed. It also returns
-			whether it did in fact process anything - if it returned false, there
-			was nothing more in the queue.
-		@note
-			<b>Do not</b> call this method unless you are using your own thread
-			to perform the background loading and called setStartBackgroundThread(false).
-			You must only have one background loading thread.
-		@returns true if a request was processed, false if the queue was empty.
-		*/
-		bool _doNextQueuedBackgroundProcess();
-
-		/** Initialise processing for a background thread.
-		@remarks
-			You must call this method if you use your own thread rather than 
-			letting this class create its own. Moreover, you must call it after
-			initialise() and after you've started your own thread, but before 
-			any resources have been loaded. There are some
-			per-thread tasks which have to be performed on some rendering APIs
-			and it's important that they are done before rendering resources are
-			created.
-		@par
-			You must call this method in your own background thread, not the main
-			thread. It's important to block the main thread whilst this initialisation
-			is happening, use an OGRE_THREAD_WAIT on the public initSync token
-			after locking the initMutex.
-		*/
-		void _initThread();
-
-		/** Queue the firing of the 'background preparing complete' event to
-			a Resource::Listener event.
-		@remarks
-			The purpose of this is to allow the background thread to 
-			call this method to queue the notification to listeners waiting on
-			the background preparing of a resource. Rather than allow the resource
-			background thread to directly call these listeners, which 
-			would require all the listeners to be thread-safe, this method
-			implements a thread-safe queue which can be processed in the main
-			frame loop thread each frame to clear the events in a simpler 
-			manner.
-		@param res The resource listened on
-		*/
-		virtual void _queueFireBackgroundPreparingComplete(Resource* res);
-
-		/** Queue the firing of the 'background loading complete' event to
-			a Resource::Listener event.
-		@remarks
-			The purpose of this is to allow the background loading thread to 
-			call this method to queue the notification to listeners waiting on
-			the background loading of a resource. Rather than allow the resource
-			background loading thread to directly call these listeners, which 
-			would require all the listeners to be thread-safe, this method
-			implements a thread-safe queue which can be processed in the main
-			frame loop thread each frame to clear the events in a simpler 
-			manner.
-		@param res The resource listened on
-		*/
-		virtual void _queueFireBackgroundLoadingComplete(Resource* res);
-
-		/** Fires all the queued events for background loaded resources.
-		@remarks
-			You should call this from the thread that runs the main frame loop 
-			to avoid having to make the receivers of this event thread-safe.
-			If you use Ogre's built in frame loop you don't need to call this
-			yourself.
-		*/
-		virtual void _fireOnFrameCallbacks(void);
+		/// Implementation for WorkQueue::RequestHandler
+		WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+		/// Implementation for WorkQueue::RequestHandler
+		void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
 
 		/** Override standard Singleton retrieval.
         @remarks

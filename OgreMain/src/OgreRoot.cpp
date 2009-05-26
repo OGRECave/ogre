@@ -145,9 +145,6 @@ namespace Ogre {
 		// ResourceGroupManager
 		mResourceGroupManager = OGRE_NEW ResourceGroupManager();
 
-		// ResourceBackgroundQueue
-		mResourceBackgroundQueue = OGRE_NEW ResourceBackgroundQueue();
-
 		// WorkQueue
 		mWorkQueue = OGRE_NEW WorkQueue("Root");
 		// never process responses in main thread for longer than 10ms by default
@@ -166,6 +163,8 @@ namespace Ogre {
 		mWorkQueue->setWorkersCanAccessRenderSystem(false);
 #endif
 
+		// ResourceBackgroundQueue
+		mResourceBackgroundQueue = OGRE_NEW ResourceBackgroundQueue();
 
 		// Create SceneManager enumerator (note - will be managed by singleton)
         mSceneManagerEnum = OGRE_NEW SceneManagerEnumerator();
@@ -759,9 +758,6 @@ namespace Ogre {
         // Tell buffer manager to free temp buffers used this frame
         if (HardwareBufferManager::getSingletonPtr())
             HardwareBufferManager::getSingleton()._releaseBufferCopies();
-
-		// Also tell the ResourceBackgroundQueue to propagate background load events
-		ResourceBackgroundQueue::getSingleton()._fireOnFrameCallbacks();
 
 		// Tell the queue to process responses
 		mWorkQueue->processResponses();

@@ -218,12 +218,6 @@ namespace Ogre {
 		/** Calculate the size of a resource; this will only be called after 'load' */
 		virtual size_t calculateSize(void) const = 0;
 
-		/// Queue the firing of background loading complete event
-		virtual void queueFireBackgroundLoadingComplete(void);
-
-		/// Queue the firing of background preparing complete event
-		virtual void queueFireBackgroundPreparingComplete(void);
-
     public:
 		/** Standard constructor.
 		@param creator Pointer to the ResourceManager that is creating this resource

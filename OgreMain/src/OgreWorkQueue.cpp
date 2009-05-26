@@ -46,7 +46,7 @@ namespace Ogre {
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
-	WorkQueue::Response::Response(Request* rq, bool success, const Any& data, const String& msg)
+	WorkQueue::Response::Response(const Request* rq, bool success, const Any& data, const String& msg)
 		: mRequest(rq), mSuccess(success), mData(data), mMessages(msg)
 	{
 		
@@ -68,7 +68,6 @@ namespace Ogre {
 		, mPaused(false)
 		, mAcceptRequests(true)
 		, mRequestsQueuedCount(0)
-		, mRequestsInProgressCount(0)
 		, mResponsesQueuedCount(0)
 	{
 	}
@@ -109,6 +108,15 @@ namespace Ogre {
 		}
 
 		mShuttingDown = false;
+
+		LogManager::getSingleton().stream() <<
+			"WorkQueue('" << mName << "') initialising on thread " <<
+#if OGRE_THREAD_SUPPORT
+			boost::this_thread::get_id()
+#else
+			"main"
+#endif
+			<< ".";
 
 #if OGRE_THREAD_SUPPORT
 		if (mWorkerRenderSystemAccess)
@@ -154,6 +162,15 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void WorkQueue::shutdown()
 	{
+		LogManager::getSingleton().stream() <<
+			"WorkQueue('" << mName << "') shutting down on thread " <<
+#if OGRE_THREAD_SUPPORT
+			boost::this_thread::get_id()
+#else
+			"main"
+#endif
+			<< ".";
+
 		mShuttingDown = true;
 		abortAllRequests();
 #if OGRE_THREAD_SUPPORT
@@ -170,7 +187,6 @@ namespace Ogre {
 		mWorkers.clear();
 #endif
 		mRequestsQueuedCount = 0;
-		mRequestsInProgressCount = 0;
 		mResponsesQueuedCount = 0;
 
 		mIsRunning = false;
@@ -248,6 +264,16 @@ namespace Ogre {
 
 		RequestID rid = ++mRequestCount;
 		Request* req = OGRE_NEW Request(channel, requestType, rData, retryCount, rid);
+
+		LogManager::getSingleton().stream(LML_TRIVIAL) << 
+			"WorkQueue('" << mName << "') - QUEUED(thread:" <<
+#if OGRE_THREAD_SUPPORT
+			boost::this_thread::get_id()
+#else
+			"main"
+#endif
+			<< "): ID=" << rid
+			<< " channel=" << channel << " requestType=" << requestType;
 
 #if OGRE_THREAD_SUPPORT
 		if (forceSynchronous)
@@ -338,11 +364,6 @@ namespace Ogre {
 		return mAcceptRequests;
 	}
 	//---------------------------------------------------------------------
-	size_t WorkQueue::getRequestsInProgressCount() const 
-	{
-		return mRequestsInProgressCount;
-	}
-	//---------------------------------------------------------------------
 	size_t WorkQueue::geRequestsQueuedCount() const
 	{
 		return mRequestsQueuedCount;
@@ -364,6 +385,7 @@ namespace Ogre {
 			{
 				request = mRequestQueue.front();
 				mRequestQueue.pop_front();
+				--mRequestsQueuedCount;
 			}
 		}
 
@@ -384,7 +406,7 @@ namespace Ogre {
 			if (!response->succeeded())
 			{
 				// Failed, should we retry?
-				Request* req = response->getRequest();
+				const Request* req = response->getRequest();
 				if (req->getRetryCount())
 				{
 					addRequest(req->getChannel(), req->getType(), req->getData(), 
@@ -403,6 +425,7 @@ namespace Ogre {
 				// Queue response
 				OGRE_LOCK_MUTEX(mResponseMutex)
 				mResponseQueue.push_back(response);
+				++mResponsesQueuedCount;
 				// no need to wake thread, this is processed by the main thread
 			}
 
@@ -455,6 +478,7 @@ namespace Ogre {
 				{
 					response = mResponseQueue.front();
 					mResponseQueue.pop_front();
+					--mResponsesQueuedCount;
 				}
 			}
 
@@ -480,6 +504,21 @@ namespace Ogre {
 	{
 		OGRE_LOCK_MUTEX(mRequestHandlerMutex)
 
+		Response* response = 0;
+
+		StringUtil::StrStreamType dbgMsg;
+		dbgMsg <<
+#if OGRE_THREAD_SUPPORT
+			boost::this_thread::get_id()
+#else
+			"main"
+#endif
+			<< "): ID=" << r->getID() << " channel=" << r->getChannel() 
+			<< " requestType=" << r->getType();
+
+		LogManager::getSingleton().stream(LML_TRIVIAL) << 
+			"WorkQueue('" << mName << "') - PROCESS_REQUEST_START(" << dbgMsg.str();
+
 		RequestHandlerListByChannel::iterator i = mRequestHandlers.find(r->getChannel());
 		if (i != mRequestHandlers.end())
 		{
@@ -488,18 +527,36 @@ namespace Ogre {
 			{
 				if ((*j)->canHandleRequest(r, this))
 				{
-					return (*j)->handleRequest(r, this);
+					response = (*j)->handleRequest(r, this);
 				}
 			}
 		}
 
-		return 0;
+		LogManager::getSingleton().stream(LML_TRIVIAL) << 
+			"WorkQueue('" << mName << "') - PROCESS_REQUEST_END(" << dbgMsg.str()
+			<< " processed=" << (response!=0);
+
+		return response;
 
 	}
 	//---------------------------------------------------------------------
 	void WorkQueue::processResponse(Response* r)
 	{
 		OGRE_LOCK_MUTEX(mResponseHandlerMutex)
+
+		StringUtil::StrStreamType dbgMsg;
+		dbgMsg << "thread:" <<
+#if OGRE_THREAD_SUPPORT
+			boost::this_thread::get_id()
+#else
+			"main"
+#endif
+			<< "): ID=" << r->getRequest()->getID()
+			<< " success=" << r->succeeded() << " messages=[" << r->getMessages() << "] channel=" 
+			<< r->getRequest()->getChannel() << " requestType=" << r->getRequest()->getType();
+
+		LogManager::getSingleton().stream(LML_TRIVIAL) << 
+			"WorkQueue('" << mName << "') - PROCESS_RESPONSE_START(" << dbgMsg.str();
 
 		ResponseHandlerListByChannel::iterator i = mResponseHandlers.find(r->getRequest()->getChannel());
 		if (i != mResponseHandlers.end())
@@ -513,6 +570,8 @@ namespace Ogre {
 				}
 			}
 		}
+		LogManager::getSingleton().stream(LML_TRIVIAL) << 
+			"WorkQueue('" << mName << "') - PROCESS_RESPONSE_END(" << dbgMsg.str();
 
 	}
 	//---------------------------------------------------------------------

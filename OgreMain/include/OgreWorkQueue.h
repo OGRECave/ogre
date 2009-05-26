@@ -108,7 +108,7 @@ namespace Ogre
 		struct _OgreExport Response : public UtilityAlloc
 		{
 			/// Pointer to the request that this response is in relation to
-			Request* mRequest;
+			const Request* mRequest;
 			/// Whether the work item succeeded or not
 			bool mSuccess;
 			/// Any diagnostic messages
@@ -116,11 +116,11 @@ namespace Ogre
 			/// Data associated with the result of the process
 			Any mData;
 
-			Response(Request* rq, bool success, const Any& data, const String& msg = StringUtil::BLANK);
+			Response(const Request* rq, bool success, const Any& data, const String& msg = StringUtil::BLANK);
 		public:
 			~Response();
 			/// Get the request that this is a response to (NB destruction destroys this)
-			Request* getRequest() const { return mRequest; }
+			const Request* getRequest() const { return mRequest; }
 			/// Return whether this is a successful response
 			bool succeeded() const { return mSuccess; }
 			/// Get any diagnostic messages about the process
@@ -331,13 +331,6 @@ namespace Ogre
 		virtual bool getRequestsAccepted() const;
 
 
-		/** Get the number of requests that are currently being processed,
-			that is they've been moved from the queue to a worker, but have
-			not completed yet. 
-			@remarks For obvious reasons this value can never exceed the
-			number of configured worker threads.
-		*/
-		virtual size_t getRequestsInProgressCount() const; 
 		/** Get the number of requests which are currently queued for processing. 
 		These requests have been added to the queue but are waiting for a worker
 		to begin processing them.
@@ -429,7 +422,6 @@ namespace Ogre
 		bool mPaused;
 		bool mAcceptRequests;
 		size_t mRequestsQueuedCount;
-		size_t mRequestsInProgressCount;
 		size_t mResponsesQueuedCount;
 		bool mShuttingDown;
 		size_t mNumThreadsRegisteredWithRS;
