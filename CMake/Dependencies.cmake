@@ -168,7 +168,7 @@ include_directories(
   ${CEGUI_INCLUDE_DIRS}
   ${OIS_INCLUDE_DIRS}
   ${Cg_INCLUDE_DIRS}
-  ${BOOST_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
   ${X11_INCLUDE_DIR}
   ${DirectX_INCLUDE_DIRS}
   ${CppUnit_INCLUDE_DIRS}
@@ -178,7 +178,7 @@ include_directories(
 link_directories(
   ${OPENGL_LIBRARY_DIRS}
   ${Cg_LIBRARY_DIRS}
-  ${BOOST_LIBRARY_DIRS}
+  ${Boost_LIBRARY_DIRS}
   ${X11_LIBRARY_DIRS}
   ${DirectX_LIBRARY_DIRS}
   ${CppUnit_LIBRARY_DIRS}
