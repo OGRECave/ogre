@@ -142,6 +142,12 @@ if (OGRE_STANDALONE_BUILD)
   set(CMAKE_SUPPRESS_REGENERATION true)
 endif()
 
+if (MSVC)
+  # Enable intrinsics on MSVC in debug mode
+  # Not actually necessary in release mode since /O2 implies /Oi but can't easily add this per build type?
+  add_definitions(/Oi)
+endif (MSVC)
+
 ### Commented because the FindOGRE script can currently fill this role better ###
 # # Create the CMake package files
 # if (WIN32)
