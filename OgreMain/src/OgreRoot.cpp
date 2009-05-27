@@ -145,23 +145,24 @@ namespace Ogre {
 		// ResourceGroupManager
 		mResourceGroupManager = OGRE_NEW ResourceGroupManager();
 
-		// WorkQueue
-		mWorkQueue = OGRE_NEW WorkQueue("Root");
+		// WorkQueue (note: users can replace this if they want)
+		DefaultWorkQueue* defaultQ = OGRE_NEW DefaultWorkQueue("Root");
 		// never process responses in main thread for longer than 10ms by default
-		mWorkQueue->setResponseProcessingTimeLimit(10);
+		defaultQ->setResponseProcessingTimeLimit(10);
 		// match threads to hardware
 #if OGRE_THREAD_SUPPORT
 		unsigned threadCount = boost::thread::hardware_concurrency();
 		if (!threadCount)
 			threadCount = 1;
-		mWorkQueue->setWorkerThreadCount(threadCount);
+		defaultQ->setWorkerThreadCount(threadCount);
 #endif
 		// only allow workers to access rendersystem if threadsupport is 1
 #if OGRE_THREAD_SUPPORT == 1
-		mWorkQueue->setWorkersCanAccessRenderSystem(true);
+		defaultQ->setWorkersCanAccessRenderSystem(true);
 #else
-		mWorkQueue->setWorkersCanAccessRenderSystem(false);
+		defaultQ->setWorkersCanAccessRenderSystem(false);
 #endif
+		mWorkQueue = defaultQ;
 
 		// ResourceBackgroundQueue
 		mResourceBackgroundQueue = OGRE_NEW ResourceBackgroundQueue();
@@ -1397,6 +1398,19 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
+	void Root::setWorkQueue(WorkQueue* queue)
+	{
+		if (mWorkQueue != queue)
+		{
+			// delete old one (will shut down)
+			OGRE_DELETE mWorkQueue;
+
+			mWorkQueue = queue;
+			if (mIsInitialised)
+				mWorkQueue->startup();
+
+		}
+	}
 
 
 

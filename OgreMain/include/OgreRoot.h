@@ -940,6 +940,17 @@ namespace Ogre
 			anything above that is reserved for OGRE's own use.
 		*/
 		WorkQueue* getWorkQueue() const { return mWorkQueue; }
+
+		/** Replace the current work queue with an alternative. 
+			You can use this method to replace the internal implementation of
+			WorkQueue with  your own, e.g. to externalise the processing of 
+			background events. Doing so will delete the existing queue and
+			replace it with this one. 
+		@param queue The new WorkQueue instance. Root will delete this work queue
+			at shutdown, so do not destroy it yourself.
+		*/
+		void setWorkQueue(WorkQueue* queue);
+			
 		/// The maximum channel number that may be used by users (above this is reserved for OGRE)
 		static const uint16 MAX_USER_WORKQUEUE_CHANNEL;
     };

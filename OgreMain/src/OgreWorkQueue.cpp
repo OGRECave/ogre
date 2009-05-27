@@ -58,7 +58,7 @@ namespace Ogre {
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
-	WorkQueue::WorkQueue(const String& name)
+	DefaultWorkQueue::DefaultWorkQueue(const String& name)
 		: mName(name)
 		, mWorkerThreadCount(1)
 		, mWorkerRenderSystemAccess(false)
@@ -67,37 +67,35 @@ namespace Ogre {
 		, mRequestCount(0)
 		, mPaused(false)
 		, mAcceptRequests(true)
-		, mRequestsQueuedCount(0)
-		, mResponsesQueuedCount(0)
 	{
 	}
 	//---------------------------------------------------------------------
-	const String& WorkQueue::getName() const
+	const String& DefaultWorkQueue::getName() const
 	{
 		return mName;
 	}
 	//---------------------------------------------------------------------
-	size_t WorkQueue::getWorkerThreadCount() const
+	size_t DefaultWorkQueue::getWorkerThreadCount() const
 	{
 		return mWorkerThreadCount;
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::setWorkerThreadCount(size_t c)
+	void DefaultWorkQueue::setWorkerThreadCount(size_t c)
 	{
 		mWorkerThreadCount = c;
 	}
 	//---------------------------------------------------------------------
-	bool WorkQueue::getWorkersCanAccessRenderSystem() const
+	bool DefaultWorkQueue::getWorkersCanAccessRenderSystem() const
 	{
 		return mWorkerRenderSystemAccess;
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::setWorkersCanAccessRenderSystem(bool access)
+	void DefaultWorkQueue::setWorkersCanAccessRenderSystem(bool access)
 	{
 		mWorkerRenderSystemAccess = access;
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::startup(bool forceRestart)
+	void DefaultWorkQueue::startup(bool forceRestart)
 	{
 		if (mIsRunning)
 		{
@@ -110,7 +108,7 @@ namespace Ogre {
 		mShuttingDown = false;
 
 		LogManager::getSingleton().stream() <<
-			"WorkQueue('" << mName << "') initialising on thread " <<
+			"DefaultWorkQueue('" << mName << "') initialising on thread " <<
 #if OGRE_THREAD_SUPPORT
 			boost::this_thread::get_id()
 #else
@@ -144,7 +142,7 @@ namespace Ogre {
 		mIsRunning = true;
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::_notifyThreadRegistered()
+	void DefaultWorkQueue::_notifyThreadRegistered()
 	{
 		OGRE_LOCK_MUTEX(mInitMutex)
 
@@ -155,15 +153,15 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	WorkQueue::~WorkQueue()
+	DefaultWorkQueue::~DefaultWorkQueue()
 	{
 		shutdown();
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::shutdown()
+	void DefaultWorkQueue::shutdown()
 	{
 		LogManager::getSingleton().stream() <<
-			"WorkQueue('" << mName << "') shutting down on thread " <<
+			"DefaultWorkQueue('" << mName << "') shutting down on thread " <<
 #if OGRE_THREAD_SUPPORT
 			boost::this_thread::get_id()
 #else
@@ -186,15 +184,13 @@ namespace Ogre {
 		}
 		mWorkers.clear();
 #endif
-		mRequestsQueuedCount = 0;
-		mResponsesQueuedCount = 0;
 
 		mIsRunning = false;
 
 
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::addRequestHandler(uint16 channel, RequestHandler* rh)
+	void DefaultWorkQueue::addRequestHandler(uint16 channel, RequestHandler* rh)
 	{
 		OGRE_LOCK_MUTEX(mRequestHandlerMutex)
 
@@ -208,7 +204,7 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::removeRequestHandler(uint16 channel, RequestHandler* rh)
+	void DefaultWorkQueue::removeRequestHandler(uint16 channel, RequestHandler* rh)
 	{
 		OGRE_LOCK_MUTEX(mRequestHandlerMutex)
 
@@ -225,7 +221,7 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::addResponseHandler(uint16 channel, ResponseHandler* rh)
+	void DefaultWorkQueue::addResponseHandler(uint16 channel, ResponseHandler* rh)
 	{
 		OGRE_LOCK_MUTEX(mResponseHandlerMutex)
 
@@ -238,7 +234,7 @@ namespace Ogre {
 			handlers.push_back(rh);
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::removeResponseHandler(uint16 channel, ResponseHandler* rh)
+	void DefaultWorkQueue::removeResponseHandler(uint16 channel, ResponseHandler* rh)
 	{
 		OGRE_LOCK_MUTEX(mResponseHandlerMutex)
 
@@ -254,7 +250,7 @@ namespace Ogre {
 		}
 	}
 	//---------------------------------------------------------------------
-	WorkQueue::RequestID WorkQueue::addRequest(uint16 channel, uint16 requestType, 
+	WorkQueue::RequestID DefaultWorkQueue::addRequest(uint16 channel, uint16 requestType, 
 		const Any& rData, uint8 retryCount, bool forceSynchronous)
 	{
 		OGRE_LOCK_MUTEX(mRequestMutex)
@@ -266,7 +262,7 @@ namespace Ogre {
 		Request* req = OGRE_NEW Request(channel, requestType, rData, retryCount, rid);
 
 		LogManager::getSingleton().stream(LML_TRIVIAL) << 
-			"WorkQueue('" << mName << "') - QUEUED(thread:" <<
+			"DefaultWorkQueue('" << mName << "') - QUEUED(thread:" <<
 #if OGRE_THREAD_SUPPORT
 			boost::this_thread::get_id()
 #else
@@ -283,7 +279,6 @@ namespace Ogre {
 		else
 		{
 			mRequestQueue.push_back(req);
-			++mRequestsQueuedCount;
 			// wake up waiting thread
 			OGRE_THREAD_NOTIFY_ONE(mRequestCondition)
 		}
@@ -295,7 +290,7 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::abortRequest(RequestID id)
+	void DefaultWorkQueue::abortRequest(RequestID id)
 	{
 		OGRE_LOCK_MUTEX(mRequestMutex)
 
@@ -305,13 +300,12 @@ namespace Ogre {
 			{
 				OGRE_DELETE *i;
 				mRequestQueue.erase(i);
-				--mRequestsQueuedCount;
 				break;
 			}
 		}
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::abortRequestsByChannel(uint16 channel)
+	void DefaultWorkQueue::abortRequestsByChannel(uint16 channel)
 	{
 		OGRE_LOCK_MUTEX(mRequestMutex)
 
@@ -321,14 +315,13 @@ namespace Ogre {
 			{
 				OGRE_DELETE *i;
 				i = mRequestQueue.erase(i);
-				--mRequestsQueuedCount;
 			}
 			else
 				++i;
 		}
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::abortAllRequests()
+	void DefaultWorkQueue::abortAllRequests()
 	{
 		OGRE_LOCK_MUTEX(mRequestMutex)
 
@@ -337,44 +330,33 @@ namespace Ogre {
 			OGRE_DELETE *i;
 		}
 		mRequestQueue.clear();
-		mRequestsQueuedCount = 0;
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::setPaused(bool pause)
+	void DefaultWorkQueue::setPaused(bool pause)
 	{
 		OGRE_LOCK_MUTEX(mRequestMutex)
 
 		mPaused = pause;
 	}
 	//---------------------------------------------------------------------
-	bool WorkQueue::isPaused() const
+	bool DefaultWorkQueue::isPaused() const
 	{
 		return mPaused;
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::setRequestsAccepted(bool accept)
+	void DefaultWorkQueue::setRequestsAccepted(bool accept)
 	{
 		OGRE_LOCK_MUTEX(mRequestMutex)
 
 		mAcceptRequests = accept;
 	}
 	//---------------------------------------------------------------------
-	bool WorkQueue::getRequestsAccepted() const
+	bool DefaultWorkQueue::getRequestsAccepted() const
 	{
 		return mAcceptRequests;
 	}
 	//---------------------------------------------------------------------
-	size_t WorkQueue::geRequestsQueuedCount() const
-	{
-		return mRequestsQueuedCount;
-	}
-	//---------------------------------------------------------------------
-	size_t WorkQueue::getResponsesQueuedCount() const
-	{
-		return mResponsesQueuedCount;
-	}
-	//---------------------------------------------------------------------
-	void WorkQueue::_processNextRequest()
+	void DefaultWorkQueue::_processNextRequest()
 	{
 		Request* request = 0;
 		{
@@ -385,7 +367,6 @@ namespace Ogre {
 			{
 				request = mRequestQueue.front();
 				mRequestQueue.pop_front();
-				--mRequestsQueuedCount;
 			}
 		}
 
@@ -397,7 +378,7 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::processRequestResponse(Request* r, bool synchronous)
+	void DefaultWorkQueue::processRequestResponse(Request* r, bool synchronous)
 	{
 		Response* response = processRequest(r);
 
@@ -425,7 +406,6 @@ namespace Ogre {
 				// Queue response
 				OGRE_LOCK_MUTEX(mResponseMutex)
 				mResponseQueue.push_back(response);
-				++mResponsesQueuedCount;
 				// no need to wake thread, this is processed by the main thread
 			}
 
@@ -434,7 +414,7 @@ namespace Ogre {
 		{
 			// no response, delete request
 			LogManager::getSingleton().stream() << 
-				"WorkQueue('" << mName << "') warning: no handler processed request "
+				"DefaultWorkQueue('" << mName << "') warning: no handler processed request "
 				<< r->getID() << ", channel " << r->getChannel()
 				<< ", type " << r->getType();
 			OGRE_DELETE r;
@@ -442,7 +422,7 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::_waitForNextRequest()
+	void DefaultWorkQueue::_waitForNextRequest()
 	{
 #if OGRE_THREAD_SUPPORT
 		// Lock; note that 'boost::condition.wait()' will free the lock
@@ -460,7 +440,7 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::processResponses() 
+	void DefaultWorkQueue::processResponses() 
 	{
 		unsigned long msStart = Root::getSingleton().getTimer()->getMilliseconds();
 		unsigned long msCurrent = msStart;
@@ -478,7 +458,6 @@ namespace Ogre {
 				{
 					response = mResponseQueue.front();
 					mResponseQueue.pop_front();
-					--mResponsesQueuedCount;
 				}
 			}
 
@@ -500,7 +479,7 @@ namespace Ogre {
 		}
 	}
 	//---------------------------------------------------------------------
-	WorkQueue::Response* WorkQueue::processRequest(Request* r)
+	WorkQueue::Response* DefaultWorkQueue::processRequest(Request* r)
 	{
 		OGRE_LOCK_MUTEX(mRequestHandlerMutex)
 
@@ -517,7 +496,7 @@ namespace Ogre {
 			<< " requestType=" << r->getType();
 
 		LogManager::getSingleton().stream(LML_TRIVIAL) << 
-			"WorkQueue('" << mName << "') - PROCESS_REQUEST_START(" << dbgMsg.str();
+			"DefaultWorkQueue('" << mName << "') - PROCESS_REQUEST_START(" << dbgMsg.str();
 
 		RequestHandlerListByChannel::iterator i = mRequestHandlers.find(r->getChannel());
 		if (i != mRequestHandlers.end())
@@ -533,14 +512,14 @@ namespace Ogre {
 		}
 
 		LogManager::getSingleton().stream(LML_TRIVIAL) << 
-			"WorkQueue('" << mName << "') - PROCESS_REQUEST_END(" << dbgMsg.str()
+			"DefaultWorkQueue('" << mName << "') - PROCESS_REQUEST_END(" << dbgMsg.str()
 			<< " processed=" << (response!=0);
 
 		return response;
 
 	}
 	//---------------------------------------------------------------------
-	void WorkQueue::processResponse(Response* r)
+	void DefaultWorkQueue::processResponse(Response* r)
 	{
 		OGRE_LOCK_MUTEX(mResponseHandlerMutex)
 
@@ -556,7 +535,7 @@ namespace Ogre {
 			<< r->getRequest()->getChannel() << " requestType=" << r->getRequest()->getType();
 
 		LogManager::getSingleton().stream(LML_TRIVIAL) << 
-			"WorkQueue('" << mName << "') - PROCESS_RESPONSE_START(" << dbgMsg.str();
+			"DefaultWorkQueue('" << mName << "') - PROCESS_RESPONSE_START(" << dbgMsg.str();
 
 		ResponseHandlerListByChannel::iterator i = mResponseHandlers.find(r->getRequest()->getChannel());
 		if (i != mResponseHandlers.end())
@@ -571,17 +550,17 @@ namespace Ogre {
 			}
 		}
 		LogManager::getSingleton().stream(LML_TRIVIAL) << 
-			"WorkQueue('" << mName << "') - PROCESS_RESPONSE_END(" << dbgMsg.str();
+			"DefaultWorkQueue('" << mName << "') - PROCESS_RESPONSE_END(" << dbgMsg.str();
 
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
-	void WorkQueue::WorkerFunc::operator()()
+	void DefaultWorkQueue::WorkerFunc::operator()()
 	{
 		// default worker thread
 #if OGRE_THREAD_SUPPORT
 		LogManager::getSingleton().stream() << 
-			"WorkQueue('" << mQueue->getName() << "')::WorkerFunc - thread " 
+			"DefaultWorkQueue('" << mQueue->getName() << "')::WorkerFunc - thread " 
 			<< boost::this_thread::get_id() << " starting.";
 
 		// Initialise the thread for RS if necessary
@@ -599,7 +578,7 @@ namespace Ogre {
 		}
 
 		LogManager::getSingleton().stream() << 
-			"WorkQueue('" << mQueue->getName() << "')::WorkerFunc - thread " 
+			"DefaultWorkQueue('" << mQueue->getName() << "')::WorkerFunc - thread " 
 			<< boost::this_thread::get_id() << " stopped.";
 #endif
 	}
