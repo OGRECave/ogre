@@ -399,21 +399,12 @@ namespace Ogre
 			// Vertex declaration
 			// TODO: consider vertex compression
 			size_t offset = 0;
-			// POSITION binding depends on whether we're geomorphing
-			// TODO - should we check that materials have geomorphing?
-			if (mTerrain->getUseLodMorph() && 
-				Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_VERTEX_PROGRAM))
-			{
-				// float4(x, y, z, delta)
-				offset += dcl->addElement(0, offset, VET_FLOAT4, VES_POSITION).getSize();
-			}
-			else
-			{
-				// float3(x, y, z)
-				offset += dcl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
-			}
-
-			offset += dcl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES).getSize();
+			// POSITION 
+			// float3(x, y, z)
+			offset += dcl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
+			// UV0
+			// float3(u, v, delta)
+			offset += dcl->addElement(0, offset, VET_FLOAT3, VES_TEXTURE_COORDINATES).getSize();
 
 			// Calculate number of vertices
 			// Base geometry size * size
@@ -449,9 +440,6 @@ namespace Ogre
 	{
 		// potentially reset our bounds depending on coverage of the update
 		resetBounds(rect);
-
-		bool morph = mTerrain->getUseLodMorph() && 
-			Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_VERTEX_PROGRAM);
 
 		long destOffsetX = rect.left - mOffsetX;
 		long destOffsetY = rect.top - mOffsetY;
@@ -496,16 +484,14 @@ namespace Ogre
 				*pBuf++ = pos.x;
 				*pBuf++ = pos.y;
 				*pBuf++ = pos.z;
-				if (morph)
-				{
-					*pBuf++ = *pDelta;
-					pDelta += inc;
-				}
 
 				// UVs - base UVs vary from 0 to 1, all other values
 				// will be derived using scalings
 				*pBuf++ = x * uvScale;
 				*pBuf++ = 1.0 - (y * uvScale);
+				// delta
+				*pBuf++ = *pDelta;
+				pDelta += inc;
 				
 				// Update bounds
 				mergeIntoBounds(x, y, pos);
@@ -556,12 +542,12 @@ namespace Ogre
 				*pBuf++ = pos.x;
 				*pBuf++ = pos.y;
 				*pBuf++ = pos.z;
-				if (morph)
-					*pBuf++ = 0; // no morphing
 
 				// UVs - same as base
 				*pBuf++ = x * uvScale;
 				*pBuf++ = 1.0 - (y * uvScale);
+				// delta (none)
+				*pBuf++ = 0; 
 			}
 			pBaseHeight += mTerrain->getSize() * skirtSpacing;
 			pRowBuf += destRowSkip;
@@ -589,12 +575,12 @@ namespace Ogre
 				*pBuf++ = pos.x;
 				*pBuf++ = pos.y;
 				*pBuf++ = pos.z;
-				if (morph)
-					*pBuf++ = 0; // no morphing
 
 				// UVs - same as base
 				*pBuf++ = x * uvScale;
 				*pBuf++ = 1.0 - (y * uvScale);
+				// delta (none)
+				*pBuf++ = 0; 
 			}
 			pRowBuf += destRowSkip;
 		}
