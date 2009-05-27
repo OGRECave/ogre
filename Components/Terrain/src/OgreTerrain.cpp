@@ -61,7 +61,6 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool TerrainGlobalOptions::msUseLodMorph = true;
 	Real TerrainGlobalOptions::msSkirtSize = 10;
-	bool TerrainGlobalOptions::msGenerateVertexNormals = false;
 	bool TerrainGlobalOptions::msGenerateNormalMap = true;
 	bool TerrainGlobalOptions::msGenerateShadowMap = false;
 	Vector3 TerrainGlobalOptions::msShadowMapDir = Vector3(1, -1, 0).normalisedCopy();
@@ -494,7 +493,6 @@ namespace Ogre
 	{
 		mUseLodMorph = TerrainGlobalOptions::getUseLodMorph();
 		mSkirtSize = TerrainGlobalOptions::getSkirtSize();
-		mGenerateVertexNormals = TerrainGlobalOptions::getGenerateVertexNormals();
 		mGenerateNormalMap = TerrainGlobalOptions::getGenerateNormalMap();
 		mGenerateShadowMap = TerrainGlobalOptions::getGenerateShadowMap();
 		mGenerateHorizonMap = TerrainGlobalOptions::getGenerateHorizonMap();

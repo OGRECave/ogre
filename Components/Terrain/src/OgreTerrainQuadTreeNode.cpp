@@ -413,11 +413,6 @@ namespace Ogre
 				offset += dcl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
 			}
 
-			if (mTerrain->getGenerateVertexNormals())
-			{
-				offset += dcl->addElement(0, offset, VET_FLOAT3, VES_NORMAL).getSize();
-			}
-
 			offset += dcl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES).getSize();
 
 			// Calculate number of vertices
@@ -507,14 +502,6 @@ namespace Ogre
 					pDelta += inc;
 				}
 
-				if (mTerrain->getGenerateVertexNormals())
-				{
-					// complete these later
-					*pBuf++;
-					*pBuf++;
-					*pBuf++;
-				}
-
 				// UVs - base UVs vary from 0 to 1, all other values
 				// will be derived using scalings
 				*pBuf++ = x * uvScale;
@@ -572,14 +559,6 @@ namespace Ogre
 				if (morph)
 					*pBuf++ = 0; // no morphing
 
-				if (mTerrain->getGenerateVertexNormals())
-				{
-					// complete these later - should be a copy of the main
-					*pBuf++;
-					*pBuf++;
-					*pBuf++;
-				}
-
 				// UVs - same as base
 				*pBuf++ = x * uvScale;
 				*pBuf++ = 1.0 - (y * uvScale);
@@ -612,14 +591,6 @@ namespace Ogre
 				*pBuf++ = pos.z;
 				if (morph)
 					*pBuf++ = 0; // no morphing
-
-				if (mTerrain->getGenerateVertexNormals())
-				{
-					// complete these later - should be a copy of the main
-					*pBuf++;
-					*pBuf++;
-					*pBuf++;
-				}
 
 				// UVs - same as base
 				*pBuf++ = x * uvScale;

@@ -622,18 +622,6 @@ namespace Ogre
 			(default 10, set for new Terrain using TerrainGlobalOptions)
 		*/
 		Real getSkirtSize() const { return mSkirtSize; }
-		/** Whether to include normals in the terrain geometry to support basic dynamic
-		lighting. 
-		@note Including normals in the terrain geometry is usually not recommended, 
-		because as LOD decreases, the vertex lighting becomes approximated and
-		will start to look wrong. Instead, it is better to generate a texture which
-		encodes the normals as an object-space normal map which keeps lighting
-		fidelity constant at all LODs, but does require shaders to use. Even if you're
-		targetting the fixed-function pipeline you're better not to use vertex normals
-		and instead use baked lightmaps.
-		(default false, set for new Terrain using TerrainGlobalOptions)
-		*/
-		bool getGenerateVertexNormals() const { return mGenerateVertexNormals; }
 
 		/** Whether to generate a texture containing the normals of the terrain. 
 		(default true, set for new Terrain using TerrainGlobalOptions)
@@ -792,7 +780,6 @@ namespace Ogre
 
 		bool mUseLodMorph;
 		Real mSkirtSize;
-		bool mGenerateVertexNormals;
 		bool mGenerateNormalMap;
 		bool mGenerateShadowMap;
 		bool mGenerateHorizonMap;
@@ -833,7 +820,6 @@ namespace Ogre
 
 		static bool msUseLodMorph;
 		static Real msSkirtSize;
-		static bool msGenerateVertexNormals;
 		static bool msGenerateNormalMap;
 		static bool msGenerateShadowMap;
 		static Vector3 msShadowMapDir;
@@ -869,24 +855,6 @@ namespace Ogre
 			Changing this value only applies to Terrain instances loaded / reloaded afterwards.
 		*/
 		static void setSkirtSize(Real skirtSz) { msSkirtSize = skirtSz; }
-		/** Whether to include normals in the terrain geometry to support basic dynamic
-		lighting. 
-		@note Including normals in the terrain geometry is usually not recommended, 
-		because as LOD decreases, the vertex lighting becomes approximated and
-		will start to look wrong. Instead, it is better to generate a texture which
-		encodes the normals as an object-space normal map which keeps lighting
-		fidelity constant at all LODs, but does require shaders to use. Even if you're
-		targetting the fixed-function pipeline you're better not to use vertex normals
-		and instead use baked lightmaps.
-		(default false)
-		*/
-		static bool getGenerateVertexNormals() { return msGenerateVertexNormals; }
-		/** Static method - whether to generate Normals on terrain
-		(default true)
-		@remarks
-		Changing this value only applies to Terrain instances loaded / reloaded afterwards.
-		*/
-		static void setGenerateVertexNormals(bool nm) { msGenerateVertexNormals = nm; }
 		/** Whether to generate a texture containing the normals of the terrain.
 		@remarks
 			Because of the variable LOD of the terrain, storing normals in vertices
