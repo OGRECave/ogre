@@ -31,6 +31,7 @@ Torus Knot Software Ltd.
 
 #include "OgrePrerequisites.h"
 #include "OgreAtomicWrappers.h"
+#include "OgreAny.h"
 
 namespace Ogre
 {
