@@ -1311,11 +1311,18 @@ namespace Ogre {
 			val[1] = linear * correction;
 			val[2] = quadratic * correction;
 			val[3] = 1;
+			
+			if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
+				glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+			
+			
 		} 
 		else 
 		{
 			if (maxSize == 0.0f)
 				maxSize = mCurrentCapabilities->getMaxPointSize();
+			if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
+				glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
 		}
 		
 		// no scaling required
