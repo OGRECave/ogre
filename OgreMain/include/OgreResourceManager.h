@@ -398,6 +398,36 @@ namespace Ogre {
         /** Gets whether this manager and its resources habitually produce log output */
         virtual bool getVerbose(void) { return mVerbose; }
 
+		/** Definition of a pool of resources, which users can use to reuse similar
+			resources many times without destroying and recreating them.
+		@remarks
+			This is a simple utility class which allows the reuse of resources
+			between code which has a changing need for them. For example, 
+		*/
+		class _OgreExport ResourcePool : public Pool<ResourcePtr>, public ResourceAlloc
+		{
+		protected:
+			String mName;
+		public:
+			ResourcePool(const String& name);
+			~ResourcePool();
+			/// Get the name of the pool
+			const String& getName() const;
+			void clear();
+		};
+		
+		/// Create a resource pool, or reuse one that already exists
+		ResourcePool* getResourcePool(const String& name);
+		/// Destroy a resource pool
+		void destroyResourcePool(ResourcePool* pool);
+		/// Destroy a resource pool
+		void destroyResourcePool(const String& name);
+		/// destroy all pools
+		void destroyAllResourcePools();
+
+
+
+
     protected:
 
         /** Allocates the next handle. */
@@ -469,6 +499,11 @@ namespace Ogre {
         {
             return ResourceMapIterator(mResourcesByHandle.begin(), mResourcesByHandle.end());
         }
+
+	protected:
+		typedef map<String, ResourcePool*>::type ResourcePoolMap;
+		ResourcePoolMap mResourcePoolMap;
+
 
     
 

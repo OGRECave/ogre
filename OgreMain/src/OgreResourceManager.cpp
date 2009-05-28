@@ -48,6 +48,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ResourceManager::~ResourceManager()
     {
+		destroyAllResourcePools();
         removeAll();
     }
 	//-----------------------------------------------------------------------
@@ -466,8 +467,83 @@ namespace Ogre {
 
 		mMemoryUsage -= res->getSize();
 	}
-	//-----------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	ResourceManager::ResourcePool* ResourceManager::getResourcePool(const String& name)
+	{
+		OGRE_LOCK_AUTO_MUTEX
 
+		ResourcePoolMap::iterator i = mResourcePoolMap.find(name);
+		if (i == mResourcePoolMap.end())
+		{
+			i = mResourcePoolMap.insert(ResourcePoolMap::value_type(name, 
+				OGRE_NEW ResourcePool(name))).first;
+		}
+		return i->second;
+
+	}
+	//---------------------------------------------------------------------
+	void ResourceManager::destroyResourcePool(ResourcePool* pool)
+	{
+		OGRE_LOCK_AUTO_MUTEX
+
+		ResourcePoolMap::iterator i = mResourcePoolMap.find(pool->getName());
+		if (i != mResourcePoolMap.end())
+			mResourcePoolMap.erase(i);
+
+		OGRE_DELETE pool;
+		
+	}
+	//---------------------------------------------------------------------
+	void ResourceManager::destroyResourcePool(const String& name)
+	{
+		OGRE_LOCK_AUTO_MUTEX
+
+		ResourcePoolMap::iterator i = mResourcePoolMap.find(name);
+		if (i != mResourcePoolMap.end())
+		{
+			OGRE_DELETE i->second;
+			mResourcePoolMap.erase(i);
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void ResourceManager::destroyAllResourcePools()
+	{
+		OGRE_LOCK_AUTO_MUTEX
+
+		for (ResourcePoolMap::iterator i = mResourcePoolMap.begin(); 
+			i != mResourcePoolMap.end(); ++i)
+			OGRE_DELETE i->second;
+
+		mResourcePoolMap.clear();
+	}
+	//-----------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	ResourceManager::ResourcePool::ResourcePool(const String& name)
+		: mName(name)
+	{
+
+	}
+	//---------------------------------------------------------------------
+	ResourceManager::ResourcePool::~ResourcePool()
+	{
+		clear();
+	}
+	//---------------------------------------------------------------------
+	const String& ResourceManager::ResourcePool::getName() const
+	{
+		return mName;
+	}
+	//---------------------------------------------------------------------
+	void ResourceManager::ResourcePool::clear()
+	{
+		OGRE_LOCK_AUTO_MUTEX
+		for (ItemList::iterator i = mItems.begin(); i != mItems.end(); ++i)
+		{
+			(*i)->getCreator()->remove((*i)->getHandle());
+		}
+		mItems.clear();
+	}
 }
 
 
