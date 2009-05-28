@@ -1010,7 +1010,7 @@ namespace Ogre
 						mCurrentLod = lodLvl;
 						mSelfOrChildRendered = true;
 
-						if (mTerrain->getUseLodMorph())
+						if (mTerrain->_getMorphRequired())
 						{
 							// calculate the transition percentage
 							// we need a percentage of the total distance for just this LOD, 

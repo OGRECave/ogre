@@ -59,11 +59,10 @@ namespace Ogre
 	const uint16 Terrain::TERRAIN_MAX_BATCH_SIZE = 129; 
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
-	bool TerrainGlobalOptions::msUseLodMorph = true;
 	Real TerrainGlobalOptions::msSkirtSize = 10;
 	bool TerrainGlobalOptions::msGenerateNormalMap = true;
-	bool TerrainGlobalOptions::msGenerateShadowMap = false;
-	Vector3 TerrainGlobalOptions::msShadowMapDir = Vector3(1, -1, 0).normalisedCopy();
+	bool TerrainGlobalOptions::msGenerateLightMap = false;
+	Vector3 TerrainGlobalOptions::msLightMapDir = Vector3(1, -1, 0).normalisedCopy();
 	bool TerrainGlobalOptions::msGenerateHorizonMap = false;
 	Radian TerrainGlobalOptions::msHorizonMapAzimuth = Radian(0);
 	Radian TerrainGlobalOptions::msHorizonMapZenith = Radian(0);
@@ -491,11 +490,10 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::copyGlobalOptions()
 	{
-		mUseLodMorph = TerrainGlobalOptions::getUseLodMorph();
 		mSkirtSize = TerrainGlobalOptions::getSkirtSize();
-		mGenerateNormalMap = TerrainGlobalOptions::getGenerateNormalMap();
-		mGenerateShadowMap = TerrainGlobalOptions::getGenerateShadowMap();
-		mGenerateHorizonMap = TerrainGlobalOptions::getGenerateHorizonMap();
+		mNormalMapRequired = TerrainGlobalOptions::getGenerateNormalMap();
+		mLightMapRequired = TerrainGlobalOptions::getGenerateLightMap();
+		mHorizonMapRequired = TerrainGlobalOptions::getGenerateHorizonMap();
 		mRenderQueueGroup = TerrainGlobalOptions::getRenderQueueGroup();
 		mLayerBlendMapSize = TerrainGlobalOptions::getLayerBlendMapSize();
 		mLayerBlendMapSizeActual = mLayerBlendMapSize; // for now, until we check
@@ -1481,6 +1479,39 @@ namespace Ogre
 		uint8 idx = layerIndex - 1;
 		return std::pair<uint8, uint8>(idx / 4, idx % 4);
 	}
+	//---------------------------------------------------------------------
+	void Terrain::_setNormalMapRequired(bool normalMap)
+	{
+		if (normalMap != mNormalMapRequired)
+		{
+			mNormalMapRequired = normalMap;
+			
+			// TODO - create
+		}
+	}
+	//---------------------------------------------------------------------
+	void Terrain::_setLightMapRequired(bool lightMap, bool shadowsOnly)
+	{
+		if (lightMap != mLightMapRequired || shadowsOnly != mLightMapShadowsOnly)
+		{
+			mLightMapRequired = lightMap;
+			mLightMapShadowsOnly = mLightMapShadowsOnly;
+
+			// TODO - create
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::_setHorizonMapRequired(bool horizonMap)
+	{
+		if (horizonMap != mHorizonMapRequired)
+		{
+			mHorizonMapRequired = horizonMap;
+
+			// TODO - create
+		}
+	}
+
 
 
 	

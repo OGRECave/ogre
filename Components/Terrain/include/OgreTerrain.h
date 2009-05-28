@@ -613,32 +613,10 @@ namespace Ogre
 		*/
 		void update();
 
-
-		/** Whether to morph between LODs using a vertex program. 
-			(default true, set for new Terrain using TerrainGlobalOptions)
-		*/
-		bool getUseLodMorph() const { return mUseLodMorph; }
 		/** The default size of 'skirts' used to hide terrain cracks
 			(default 10, set for new Terrain using TerrainGlobalOptions)
 		*/
 		Real getSkirtSize() const { return mSkirtSize; }
-
-		/** Whether to generate a texture containing the normals of the terrain. 
-		(default true, set for new Terrain using TerrainGlobalOptions)
-		*/
-		bool getGenerateNormalMap() const { return mGenerateNormalMap; }
-		/** Whether to generate a texture containing the shadows of the terrain at
-			a particular time of day.
-		(default false, set for new Terrain using TerrainGlobalOptions)
-		*/
-		bool getGenerateShadowMap() const { return mGenerateShadowMap; }
-
-		/** Whether to generate a horizon map containing the angles of the horizon
-			along a given linear sun track, which allows real-time shadows to be
-			generated for the terrain very cheaply without using shadow textures.
-			(default false, set for new Terrain using TerrainGlobalOptions)		
-		*/
-		bool getGenerateHorizonMap() const { return mGenerateHorizonMap; }
 
 		/// Get the total number of LOD levels in the terrain
 		uint16 getNumLodLevels() const { return mNumLodLevels; }
@@ -725,6 +703,61 @@ namespace Ogre
 		*/
 		std::pair<uint8,uint8> getLayerBlendTextureIndex(uint8 layerIndex);
 
+		/** Request internal implementation options for the terrain material to use, 
+			in this case vertex morphing information. 
+		The TerrainMaterialGenerator should call this method to specify the 
+		options it would like to use when creating a material. Not all the data
+		is guaranteed to be up to date on return from this method - for example som
+		maps may be generated in the background. However, on return from this method
+		all the features that are requested will be referenceable by materials, the
+		data may just take a few frames to be fully populated.
+		@param morph Whether LOD morphing information is required to be calculated
+		*/
+		void _setMorphRequired(bool morph) { mLodMorphRequired = morph; }
+		/// Get whether LOD morphing is needed
+		bool _getMorphRequired() const { return mLodMorphRequired; }
+
+		/** Request internal implementation options for the terrain material to use, 
+		in this case a terrain-wide normal map. 
+		The TerrainMaterialGenerator should call this method to specify the 
+		options it would like to use when creating a material. Not all the data
+		is guaranteed to be up to date on return from this method - for example some
+		maps may be generated in the background. However, on return from this method
+		all the features that are requested will be referenceable by materials, the
+		data may just take a few frames to be fully populated.
+		@param normalMap Whether a terrain-wide normal map is requested. This is usually
+			mutually exclusive with the lightmap option.
+		*/
+		void _setNormalMapRequired(bool normalMap);
+
+		/** Request internal implementation options for the terrain material to use, 
+		in this case a terrain-wide normal map. 
+		The TerrainMaterialGenerator should call this method to specify the 
+		options it would like to use when creating a material. Not all the data
+		is guaranteed to be up to date on return from this method - for example some
+		maps may be generated in the background. However, on return from this method
+		all the features that are requested will be referenceable by materials, the
+		data may just take a few frames to be fully populated.
+		@param lightMap Whether a terrain-wide lightmap including precalculated 
+			lighting is required (light direction in TerrainGlobalOptions)
+		@param shadowsOnly If true, the lightmap contains only shadows, 
+			no directional lighting intensity
+		*/
+		void _setLightMapRequired(bool lightMap, bool shadowsOnly = false);
+
+		/** Request internal implementation options for the terrain material to use, 
+		in this case a terrain-wide horizon map. 
+		The TerrainMaterialGenerator should call this method to specify the 
+		options it would like to use when creating a material. Not all the data
+		is guaranteed to be up to date on return from this method - for example some
+		maps may be generated in the background. However, on return from this method
+		all the features that are requested will be referenceable by materials, the
+		data may just take a few frames to be fully populated.
+		@param horizonMap Whether a terrain-wide horizon map including precalculated 
+			horizon angles is required
+		*/
+		void _setHorizonMapRequired(bool horizonMap);
+
 
 	protected:
 
@@ -778,11 +811,7 @@ namespace Ogre
 		RealVector mLayerUVMultiplier;
 
 
-		bool mUseLodMorph;
 		Real mSkirtSize;
-		bool mGenerateNormalMap;
-		bool mGenerateShadowMap;
-		bool mGenerateHorizonMap;
 		uint8 mRenderQueueGroup;
 
 		Rect mDirtyRect;
@@ -801,7 +830,21 @@ namespace Ogre
 		TerrainLayerBlendMapList mLayerBlendMapList;
 
 		static NameGenerator msBlendTextureGenerator;
+		static NameGenerator msNormalMapNameGenerator;
+		static NameGenerator msLightmapNameGenerator;
+		static NameGenerator msHorizonMapNameGenerator;
 
+		bool mLodMorphRequired;
+		bool mNormalMapRequired;
+		bool mLightMapRequired;
+		bool mLightMapShadowsOnly;
+		bool mHorizonMapRequired;
+		/// Texture storing normals for the whole terrrain
+		TexturePtr mTerrainNormalMap;
+		/// Texture storing lighting for the whole terrrain
+		TexturePtr mTerrainLightmap;
+		/// Texture storing horizon values for the whole terrrain
+		TexturePtr mTerrainHorizonMap;
 
 	};
 
@@ -818,11 +861,10 @@ namespace Ogre
 		// no instantiation
 		TerrainGlobalOptions() {}
 
-		static bool msUseLodMorph;
 		static Real msSkirtSize;
 		static bool msGenerateNormalMap;
-		static bool msGenerateShadowMap;
-		static Vector3 msShadowMapDir;
+		static bool msGenerateLightMap;
+		static Vector3 msLightMapDir;
 		static bool msGenerateHorizonMap;
 		static Radian msHorizonMapAzimuth;
 		static Radian msHorizonMapZenith;
@@ -835,16 +877,6 @@ namespace Ogre
 	public:
 
 
-		/** Static method - whether to morph between LODs using a vertex program. 
-		(default true)
-		*/
-		static bool getUseLodMorph() { return msUseLodMorph; }
-		/** Static method - whether to morph between LODs using a vertex program. 
-		(default true)
-		@remarks
-			Changing this value only applies to Terrain instances loaded / reloaded afterwards.
-		*/
-		static void setUseLodMorph(bool useMorph) { msUseLodMorph = useMorph; }
 		/** Static method - the default size of 'skirts' used to hide terrain cracks
 		(default 10)
 		*/
@@ -855,12 +887,16 @@ namespace Ogre
 			Changing this value only applies to Terrain instances loaded / reloaded afterwards.
 		*/
 		static void setSkirtSize(Real skirtSz) { msSkirtSize = skirtSz; }
-		/** Whether to generate a texture containing the normals of the terrain.
+		/** Whether to generate a texture containing the normals of the terrain in all
+			cases.
 		@remarks
 			Because of the variable LOD of the terrain, storing normals in vertices
 			doesn't produce attractive results. Instead, a terrain-wide normal map
 			is typically used, storing the object-space normals of the terrain
-			(default true)
+			(default true). This option chooses whether to, by default, generate
+			this data. If this option is set to false, the TerrainMaterialGenerator
+			can still override it if it requires that information, it is just
+			likely that it will not be immediately ready.
 		*/
 		static bool getGenerateNormalMap() { return msGenerateNormalMap; }
 		/** Whether to generate a texture containing the normals of the terrain. */
@@ -870,15 +906,17 @@ namespace Ogre
 		@remarks
 			This can be a useful feature for older hardware, or indeed any 
 			situation where dynamic shadows are not required. It requires that
-			the light direction is set too.
+			the light direction is set too. If this option is set to false, the TerrainMaterialGenerator
+			can still override it if it requires that information, it is just
+			likely that it will not be immediately ready.
 		*/
-		static bool getGenerateShadowMap() { return msGenerateShadowMap; }
+		static bool getGenerateLightMap() { return msGenerateLightMap; }
 		/** Whether to generate a texture containing the shadows of the terrain. */
-		static void setGenerateShadowMap(bool sm) { msGenerateShadowMap = sm; }
+		static void setGenerateLightMap(bool sm) { msGenerateLightMap = sm; }
 		/// Get the shadow map light direction to use (world space)
-		static const Vector3& getShadowMapDirection() { return msShadowMapDir; }
+		static const Vector3& getLightMapDirection() { return msLightMapDir; }
 		/** Set the shadow map light direction to use (world space). */
-		static void setShadowMapDirection(const Vector3& v) { msShadowMapDir = v; }
+		static void setLightMapDirection(const Vector3& v) { msLightMapDir = v; }
 
 		/** Whether to generate a horizon map containing the angles of the horizon
 			along a given linear sun track, which allows real-time shadows to be
@@ -893,6 +931,9 @@ namespace Ogre
 			shadowing. 
 		@note This option uses the azimuth setting to detemine the track of the sun.
 			At runtime, it uses the zenith value which represents the time of day.
+			If this option is set to false, the TerrainMaterialGenerator
+			can still override it if it requires that information, it is just
+			likely that it will not be immediately ready.
 		*/
 		static bool getGenerateHorizonMap() { return msGenerateHorizonMap; }
 		/** Whether to generate a texture containing the shadows of the terrain. */
