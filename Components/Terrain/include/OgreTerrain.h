@@ -37,6 +37,7 @@ Torus Knot Software Ltd.
 #include "OgreSceneManager.h"
 #include "OgreTerrainMaterialGenerator.h"
 #include "OgreTerrainLayerBlendMap.h"
+#include "OgreWorkQueue.h"
 
 namespace Ogre
 {
@@ -219,7 +220,8 @@ namespace Ogre
 	</tr>
 	</table>
 	*/
-	class _OgreTerrainExport Terrain : public SceneManager::Listener, public TerrainAlloc
+	class _OgreTerrainExport Terrain : public SceneManager::Listener, 
+		public WorkQueue::RequestHandler, public WorkQueue::ResponseHandler, public TerrainAlloc
 	{
 	public:
 		Terrain(SceneManager* sm);
@@ -581,7 +583,7 @@ namespace Ogre
 		By marking a section of the terrain as dirty, you are stating that you have
 		changed the height data within this rectangle. This rectangle will be merged with
 		any existing outstanding changes. To finalise the changes, you must 
-		call update().
+		call update(), updateGeometry(), or updateDerivedData().
 		*/
 		void dirty();
 
@@ -589,7 +591,7 @@ namespace Ogre
 		By marking a section of the terrain as dirty, you are stating that you have
 		changed the height data within this rectangle. This rectangle will be merged with
 		any existing outstanding changes. To finalise the changes, you must 
-		call update().
+		call update(), updateGeometry(), or updateDerivedData().
 		@param rect A rectangle expressed in vertices describing the dirty region;
 			left < right, top < bottom, left & top are inclusive, right & bottom exclusive
 		*/
@@ -610,8 +612,33 @@ namespace Ogre
 			The other elements are more expensive to compute, and will be queued
 			for processing in a background thread, in the order shown above. As these
 			updates complete, the effects will be shown.
+
+			You can also separate the timing of updating the geometry, LOD and the lighting
+			information if you want, by calling updateGeometry() and
+			updateDerivedData() separately.
+			@param synchronous If true, all updates will happen immediately and not
+			in a separate thread.
 		*/
-		void update();
+		void update(bool synchronous = false);
+
+		/** Performs an update on the terrain geometry based on the dirty region.
+		@remarks
+			Terrain geometry will be updated when this method returns.
+		*/
+		void updateGeometry();
+
+		/** Updates derived data for the terrain (LOD, lighting) to reflect changed height data, in a separate
+		thread if threading is enabled (OGRE_THREAD_SUPPORT). 
+		If threading is enabled, on return from this method the derived
+		data will not necessarily be updated immediately, the calculation 
+		may be done in the background. Only one update will run in the background
+		at once. This derived data can typically survive being out of sync for a 
+		few frames which is why it is not done synchronously
+		@param synchronous If true, the update will happen immediately and not
+			in a separate thread.
+		*/
+		void updateDerivedData(bool synchronous = false);
+
 
 		/** The default size of 'skirts' used to hide terrain cracks
 			(default 10, set for new Terrain using TerrainGlobalOptions)
@@ -627,10 +654,17 @@ namespace Ogre
 		/** Calculate (or recalculate) the delta values of heights between a vertex
 			in its recorded position, and the place it will end up in the LOD
 			in which it is removed. 
-		@param rect Rectangle describing the area to calculate (left <= right, bottom <= top)
-			
+		@param rect Rectangle describing the area to calculate (left <= right, bottom <= top)		
 		*/
 		void calculateHeightDeltas(const Rect& rect);
+
+		/** Finalise the height deltas. 
+		Calculated height deltas are kept in a separate calculation field to make
+		them safe to perform in a background thread. This call promotes those
+		calculations to the runtime values, and must be called in the main thread.
+		@param rect Rectangle describing the area to finalise (left <= right, bottom <= top)		
+		*/
+		void finaliseHeightDeltas(const Rect& rect);
 
 		/** Gets the resolution of the entire terrain (down one edge) at a 
 			given LOD level. 
@@ -758,6 +792,15 @@ namespace Ogre
 		*/
 		void _setHorizonMapRequired(bool horizonMap);
 
+		/// WorkQueue::RequestHandler override
+		WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+		/// WorkQueue::ResponseHandler override
+		void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+
+		static const uint16 WORKQUEUE_CHANNEL;
+		static const uint16 WORKQUEUE_DERIVED_DATA_REQUEST;
+
+
 
 	protected:
 
@@ -814,7 +857,34 @@ namespace Ogre
 		Real mSkirtSize;
 		uint8 mRenderQueueGroup;
 
-		Rect mDirtyRect;
+		Rect mDirtyGeometryRect;
+		Rect mDirtyDerivedDataRect;
+		bool mDerivedDataUpdateInProgress;
+		bool mDerivedUpdatePending; // if another update is requested while one is already running
+
+		/// A data holder for communicating with the background derived data update
+		struct DerivedDataRequest
+		{
+			Terrain* terrain;
+			bool calcNormalMap;
+			bool calcLightMap;
+			bool calcHorizonMap;
+			Rect dirtyRect;
+			_OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const DerivedDataRequest& r)
+			{ return o; }		
+		};
+
+		/// A data holder for communicating with the background derived data update
+		struct DerivedDataResponse
+		{
+			Terrain* terrain;
+			// all CPU-side data, independent of textures; to be blitted in main thread
+			PixelBox* normalMapBox;
+			PixelBox* lightMapBox;
+			PixelBox* horizonMapBox;
+			_OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const DerivedDataResponse& r)
+			{ return o; }		
+		};
 
 		mutable MaterialPtr mMaterial;
 		mutable TerrainMaterialGenerator* mMaterialGenerator;

@@ -71,6 +71,7 @@ namespace Ogre
 			// non-leaf nodes always render with minBatchSize vertices
 			ll->batchSize = terrain->getMinBatchSize();
 			ll->maxHeightDelta = 0;
+			ll->calcMaxHeightDelta = 0;
 			mLodLevels.push_back(ll);
 
 		}
@@ -94,6 +95,7 @@ namespace Ogre
 				LodLevel* ll = OGRE_NEW LodLevel();
 				ll->batchSize = sz;
 				ll->maxHeightDelta = 0;
+				ll->calcMaxHeightDelta = 0;
 				mLodLevels.push_back(ll);
 				if (ownLod)
 					sz = ((sz - 1) * 0.5) + 1;
@@ -234,11 +236,14 @@ namespace Ogre
 			// but that's the price for not recaculating the whole node. If a 
 			// complete recalculation is required, just dirty the entire node. (or terrain)
 
+			// Note we use the 'calc' field here to avoid interfering with any
+			// ongoing LOD calculations (this can be in the background)
+
 			if (rect.left <= mOffsetX && rect.right > mBoundaryX 
 				&& rect.top <= mOffsetY && rect.bottom > mBoundaryY)
 			{
 				for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i)
-					(*i)->maxHeightDelta = 0.0;
+					(*i)->calcMaxHeightDelta = 0.0;
 			}
 
 			// pass on to children
@@ -262,7 +267,7 @@ namespace Ogre
 				// Apply the delta to all LODs equal or lower detail to lod
 				LodLevelList::iterator i = mLodLevels.begin();
 				std::advance(i, lod - mBaseLod);
-				(*i)->maxHeightDelta = std::max((*i)->maxHeightDelta, delta);
+				(*i)->calcMaxHeightDelta = std::max((*i)->calcMaxHeightDelta, delta);
 			}
 
 			// pass on to children
@@ -293,17 +298,17 @@ namespace Ogre
 			if (!isLeaf())
 			{
 				Real maxChildDelta = 0;
-				mChildWithMaxHeightDelta = 0;
+				TerrainQuadTreeNode* childWithMaxHeightDelta = 0;
 				for (int i = 0; i < 4; ++i)
 				{
 					TerrainQuadTreeNode* child = mChildren[i];
 
 					child->postDeltaCalculation(rect);
 
-					Real childDelta = child->getLodLevel(child->getLodCount()-1)->maxHeightDelta;
+					Real childDelta = child->getLodLevel(child->getLodCount()-1)->calcMaxHeightDelta;
 					if (childDelta > maxChildDelta)
 					{
-						mChildWithMaxHeightDelta = child;
+						childWithMaxHeightDelta = child;
 						maxChildDelta = childDelta;
 					}
 
@@ -312,7 +317,8 @@ namespace Ogre
 				// make sure that our highest delta value is greater than all children's
 				// otherwise we could have some crossover problems
 				// for a non-leaf, there is only one LOD level
-				mLodLevels[0]->maxHeightDelta = std::max(mLodLevels[0]->maxHeightDelta, maxChildDelta);
+				mLodLevels[0]->calcMaxHeightDelta = std::max(mLodLevels[0]->calcMaxHeightDelta, maxChildDelta);
+				mChildWithMaxHeightDelta = childWithMaxHeightDelta;
 
 			}
 			else
@@ -322,12 +328,41 @@ namespace Ogre
 				{
 					// the next LOD after this one should have a higher delta
 					// otherwise it won't come into affect further back like it should!
-					mLodLevels[i+1]->maxHeightDelta = 
-						std::max(mLodLevels[i+1]->maxHeightDelta, 
-							mLodLevels[i]->maxHeightDelta);
+					mLodLevels[i+1]->calcMaxHeightDelta = 
+						std::max(mLodLevels[i+1]->calcMaxHeightDelta, 
+							mLodLevels[i]->calcMaxHeightDelta);
 				}
 
 			}
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::finaliseDeltaValues(const Rect& rect)
+	{
+		if (rect.left <= mBoundaryX || rect.right > mOffsetX
+			|| rect.top <= mBoundaryY || rect.bottom > mOffsetY)
+		{
+			// relevant to this node (overlaps)
+
+			// Children
+			if (!isLeaf())
+			{
+				for (int i = 0; i < 4; ++i)
+				{
+					TerrainQuadTreeNode* child = mChildren[i];
+					child->finaliseDeltaValues(rect);
+				}
+
+			}
+
+			// Self
+			for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i)
+			{
+				// copy from 'calc' area to runtime value
+				(*i)->maxHeightDelta = (*i)->calcMaxHeightDelta;
+			}
+
 		}
 
 	}

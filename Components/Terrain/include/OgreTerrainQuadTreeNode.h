@@ -135,6 +135,8 @@ namespace Ogre
 			IndexData* gpuIndexData;
 			/// Maximum delta height between this and the next lower lod
 			Real maxHeightDelta;
+			/// Temp calc area for max height delta
+			Real calcMaxHeightDelta;
 			/// The most recently calculated transition distance
 			Real lastTransitionDist;
 			/// The cFactor value used to calculate transitionDist
@@ -163,6 +165,11 @@ namespace Ogre
 		/** Notify the node (and children) that deltas have finished being calculated.
 		*/
 		void postDeltaCalculation(const Rect& rect);
+
+		/** Promote the delta values calculated to the runtime ones (this must
+			be called in the main thread). 
+		*/
+		void finaliseDeltaValues(const Rect& rect);
 
 		/** Assign vertex data to the tree, from a depth and at a given resolution.
 		@param treeDepthStart The first depth of tree that should use this data, owns the data

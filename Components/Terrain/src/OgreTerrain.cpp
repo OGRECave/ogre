@@ -41,6 +41,7 @@ Torus Knot Software Ltd.
 #include "OgreLogManager.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreTextureManager.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {
@@ -57,6 +58,9 @@ namespace Ogre
 	const uint16 Terrain::TERRAINLAYERINSTANCE_CHUNK_VERSION = 1;
 	// since 129^2 is the greatest power we can address in 16-bit index
 	const uint16 Terrain::TERRAIN_MAX_BATCH_SIZE = 129; 
+	const uint16 Terrain::WORKQUEUE_CHANNEL = Root::MAX_USER_WORKQUEUE_CHANNEL + 10;
+	const uint16 Terrain::WORKQUEUE_DERIVED_DATA_REQUEST = 1;
+
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	Real TerrainGlobalOptions::msSkirtSize = 10;
@@ -111,7 +115,10 @@ namespace Ogre
 		, mNumLodLevels(0)
 		, mNumLodLevelsPerLeafNode(0)
 		, mTreeDepth(0)
-		, mDirtyRect(0, 0, 0, 0)
+		, mDirtyGeometryRect(0, 0, 0, 0)
+		, mDirtyDerivedDataRect(0, 0, 0, 0)
+		, mDerivedDataUpdateInProgress(false)
+		, mDerivedUpdatePending(false)
 		, mMaterialGenerator(0)
 		, mMaterialGenerationCount(0)
 	{
@@ -362,6 +369,7 @@ namespace Ogre
 		rect.top = 0; rect.bottom = mSize;
 		rect.left = 0; rect.right = mSize;
 		calculateHeightDeltas(rect);
+		finaliseHeightDeltas(rect);
 
 		distributeVertexData();
 
@@ -480,6 +488,7 @@ namespace Ogre
 		rect.top = 0; rect.bottom = mSize;
 		rect.left = 0; rect.right = mSize;
 		calculateHeightDeltas(rect);
+		finaliseHeightDeltas(rect);
 
 		distributeVertexData();
 
@@ -995,16 +1004,53 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::dirtyRect(const Rect& rect)
 	{
-		mDirtyRect.merge(rect);
+		mDirtyGeometryRect.merge(rect);
+		mDirtyDerivedDataRect.merge(rect);
 	}
 	//---------------------------------------------------------------------
-	void Terrain::update()
+	void Terrain::update(bool synchronous)
 	{
-		if (mDirtyRect.width() && mDirtyRect.height())
+		updateGeometry();
+		updateDerivedData(synchronous);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::updateGeometry()
+	{
+		if (mDirtyGeometryRect.width() && mDirtyGeometryRect.height())
 		{
-			calculateHeightDeltas(mDirtyRect);
+			// TODO
+		}
+	}
+	//---------------------------------------------------------------------
+	void Terrain::updateDerivedData(bool synchronous)
+	{
+		if (mDirtyDerivedDataRect.width() && mDirtyDerivedDataRect.height())
+		{
+			if (mDerivedDataUpdateInProgress)
+			{
+				// Don't launch many updates, instead wait for the other one 
+				// to finish and issue another afterwards. 
+				mDerivedUpdatePending = true;
+			}
+			else
+			{
+				mDerivedDataUpdateInProgress = true;
+				mDerivedUpdatePending = false;
 
-			mDirtyRect.left = mDirtyRect.top = mDirtyRect.right = mDirtyRect.bottom = 0;
+				DerivedDataRequest req;
+				req.terrain = this;
+				req.dirtyRect = mDirtyDerivedDataRect;
+				req.calcNormalMap = mNormalMapRequired;
+				req.calcLightMap = mLightMapRequired;
+				req.calcHorizonMap = mHorizonMapRequired;
+
+				Root::getSingleton().getWorkQueue()->addRequest(
+					WORKQUEUE_CHANNEL, WORKQUEUE_DERIVED_DATA_REQUEST, 
+					Any(req), 0, synchronous);
+			}
+
+			mDirtyDerivedDataRect.left = mDirtyDerivedDataRect.top = 
+				mDirtyDerivedDataRect.right = mDirtyDerivedDataRect.bottom = 0;
 
 		}
 
@@ -1170,6 +1216,18 @@ namespace Ogre
 		} // targetLevel
 
 		mQuadTree->postDeltaCalculation(clampedRect);
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::finaliseHeightDeltas(const Rect& rect)
+	{
+		Rect clampedRect(rect);
+		clampedRect.left = std::max(0L, clampedRect.left);
+		clampedRect.top = std::max(0L, clampedRect.top);
+		clampedRect.right = std::min((long)mSize, clampedRect.right);
+		clampedRect.bottom = std::min((long)mSize, clampedRect.bottom);
+
+		mQuadTree->finaliseDeltaValues(clampedRect);
 
 	}
 
@@ -1511,6 +1569,47 @@ namespace Ogre
 			// TODO - create
 		}
 	}
+	//---------------------------------------------------------------------
+	WorkQueue::Response* Terrain::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
+	{
+		// Background thread (maybe)
+
+		DerivedDataRequest ddr = any_cast<DerivedDataRequest>(req->getData());
+		DerivedDataResponse ddres;
+		// NB do not use 'this' here, use req->terrain. This way any instance can 
+		// deal with request
+		ddr.terrain->calculateHeightDeltas(ddr.dirtyRect);
+
+		// TODO other data
+
+		ddres.terrain = ddr.terrain;
+		WorkQueue::Response* response = OGRE_NEW WorkQueue::Response(req, true, Any(ddres));
+		return response;
+	}
+	//---------------------------------------------------------------------
+	void Terrain::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
+	{
+		// Main thread
+
+		DerivedDataResponse ddres = any_cast<DerivedDataResponse>(res->getData());
+		DerivedDataRequest ddreq = any_cast<DerivedDataRequest>(res->getRequest()->getData());
+		// NB do not use 'this' here, use req->terrain. This way any instance can 
+		// deal with response
+		ddreq.terrain->finaliseHeightDeltas(ddreq.dirtyRect);
+		
+		// TODO other data
+
+
+		ddreq.terrain->mDerivedDataUpdateInProgress = false;
+		if (ddreq.terrain->mDerivedUpdatePending)
+		{
+			// trigger again
+			updateDerivedData(false);
+		}
+
+	}
+
+
 
 
 
