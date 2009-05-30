@@ -1047,10 +1047,11 @@ namespace Ogre
 				Root::getSingleton().getWorkQueue()->addRequest(
 					WORKQUEUE_CHANNEL, WORKQUEUE_DERIVED_DATA_REQUEST, 
 					Any(req), 0, synchronous);
+
+				mDirtyDerivedDataRect.left = mDirtyDerivedDataRect.top = 
+					mDirtyDerivedDataRect.right = mDirtyDerivedDataRect.bottom = 0;
 			}
 
-			mDirtyDerivedDataRect.left = mDirtyDerivedDataRect.top = 
-				mDirtyDerivedDataRect.right = mDirtyDerivedDataRect.bottom = 0;
 
 		}
 
