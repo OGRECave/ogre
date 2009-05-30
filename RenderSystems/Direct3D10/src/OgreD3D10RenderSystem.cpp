@@ -673,8 +673,7 @@ namespace Ogre
 			}
 			else if (mDriverType == DT_WARP)
 			{
-				// funny Microsoft guys - the joke is that D3D10_DRIVER_TYPE_WARP doesn't work :-)
-				// you have to use D3D10_DRIVER_TYPE_SOFTWARE
+				// you have to use D3D10_DRIVER_TYPE_SOFTWARE (D3D10_DRIVER_TYPE_WARP doesn't work)
 				driverType = D3D10_DRIVER_TYPE_SOFTWARE; 
 				pSelectedAdapter = NULL;
 				Software3d310Dll = LoadLibrary(TEXT("D3D10WARP.dll"));
