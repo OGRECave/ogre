@@ -50,6 +50,21 @@ namespace Ogre
 	class D3D10RenderSystem : public RenderSystem
 	{
 	private:
+
+		// an enum to define the driver type of d3d10
+		enum OGRE_D3D10_DRIVER_TYPE
+		{
+			DT_HARDWARE, // GPU based
+			DT_SOFTWARE, // microsoft original (slow) software driver
+			DT_WARP // microsoft new (faster) software driver
+
+		};
+
+		OGRE_D3D10_DRIVER_TYPE mDriverType; // d3d10 driver type
+
+
+
+
 		/// Direct3D
 		//int			mpD3D;
 		/// Direct3D rendering device

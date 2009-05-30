@@ -116,7 +116,7 @@ namespace Ogre
 		}
 
 		ID3D10Device * device;
-		if(FAILED(D3D10CreateDevice(NULL,D3D10_DRIVER_TYPE_HARDWARE ,0,deviceFlags,D3D10_SDK_VERSION, &device)))
+		if(FAILED(D3D10CreateDevice(NULL, D3D10_DRIVER_TYPE_HARDWARE ,0,deviceFlags, D3D10_SDK_VERSION, &device)))
 		{
 			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
 				"Failed to create Direct3D10 object", 
@@ -211,6 +211,7 @@ namespace Ogre
 		ConfigOption optNVPerfHUD;
 		ConfigOption optSRGB;
 		ConfigOption optExceptionsErrorLevel;
+		ConfigOption optDriverType;
 
 		driverList = this->getDirect3DDrivers();
 
@@ -279,7 +280,7 @@ namespace Ogre
  		optSRGB.possibleValues.push_back("Yes");
  		optSRGB.possibleValues.push_back("No");
  		optSRGB.currentValue = "No";
- 		optSRGB.immutable = false;
+ 		optSRGB.immutable = false;		
 
 
 		// Exceptions Error Level
@@ -297,6 +298,14 @@ namespace Ogre
 		optExceptionsErrorLevel.immutable = false;
 		
 
+		// Driver type
+		optDriverType.name = "Driver type";
+		optDriverType.possibleValues.push_back("Hardware");
+		optDriverType.possibleValues.push_back("Software");
+		optDriverType.possibleValues.push_back("Warp");
+		optDriverType.currentValue = "Hardware";
+		optDriverType.immutable = false;
+
 
 		mOptions[optDevice.name] = optDevice;
 		mOptions[optVideoMode.name] = optVideoMode;
@@ -308,7 +317,8 @@ namespace Ogre
 		mOptions[optNVPerfHUD.name] = optNVPerfHUD;
 		mOptions[optSRGB.name] = optSRGB;
 		mOptions[optExceptionsErrorLevel.name] = optExceptionsErrorLevel;
-
+		mOptions[optDriverType.name] = optDriverType;
+		
 		refreshD3DSettings();
 
 	}
@@ -573,6 +583,28 @@ namespace Ogre
 
 
 
+			// Driver type
+			opt = mOptions.find( "Driver type" );
+			if( opt == mOptions.end() )
+				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find driver type!", "D3D10RenderSystem::initialise" );
+			String driverTypeName = opt->second.currentValue;
+
+			mDriverType = DT_HARDWARE;
+			if ("Hardware" == driverTypeName)
+			{
+				 mDriverType = DT_HARDWARE;
+			}
+			if ("Software" == driverTypeName)
+			{
+				mDriverType = DT_SOFTWARE;
+			}
+			if ("Warp" == driverTypeName)
+			{
+				mDriverType = DT_WARP;
+			}
+
+
+
 			UINT deviceFlags = 0;
 			if (D3D10Device::D3D_NO_EXCEPTION != D3D10Device::getExceptionsErrorLevel())
 			{
@@ -624,7 +656,43 @@ namespace Ogre
 			}
 
 			ID3D10Device * device;
-			if(FAILED(D3D10CreateDevice(pSelectedAdapter,driverType ,0,deviceFlags,D3D10_SDK_VERSION, &device)))         
+
+			HMODULE Software3d310Dll = NULL;
+			if (mDriverType == DT_SOFTWARE)
+			{
+				driverType = D3D10_DRIVER_TYPE_SOFTWARE; 
+				pSelectedAdapter = NULL;
+				Software3d310Dll = LoadLibrary(TEXT("D3D10Ref.dll"));
+				if (Software3d310Dll == NULL) 
+				{
+					OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+						"Failed to load Direct3D10 software DLL (D3D10Ref.dll)", 
+						"D3D10RenderSystem::D3D10RenderSystem" );
+
+				}
+			}
+			else if (mDriverType == DT_WARP)
+			{
+				// funny Microsoft guys - the joke is that D3D10_DRIVER_TYPE_WARP doesn't work :-)
+				// you have to use D3D10_DRIVER_TYPE_SOFTWARE
+				driverType = D3D10_DRIVER_TYPE_SOFTWARE; 
+				pSelectedAdapter = NULL;
+				Software3d310Dll = LoadLibrary(TEXT("D3D10WARP.dll"));
+				if (Software3d310Dll == NULL) 
+				{
+					// try to load the beta that was released
+					Software3d310Dll = LoadLibrary(TEXT("D3D10WARP_beta.dll"));
+					if (Software3d310Dll == NULL) 
+					{
+						OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+							"Failed to load Direct3D10 Wrap DLL (D3D10WARP.dll or D3D10WARP_beta.dll)", 
+							"D3D10RenderSystem::D3D10RenderSystem" );
+
+					}
+				}
+			}
+
+			if(FAILED(D3D10CreateDevice(pSelectedAdapter,driverType , Software3d310Dll, deviceFlags,D3D10_SDK_VERSION, &device)))         
 			{
 				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
 					"Failed to create Direct3D10 object", 
