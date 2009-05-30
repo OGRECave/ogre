@@ -480,7 +480,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void D3D10HLSLProgram::populateDef(D3D10_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def) const
 	{
-		def.arraySize = d3dDesc.Elements;
+		def.arraySize = d3dDesc.Elements + 1;
 		switch(d3dDesc.Type)
 		{
 		case D3D10_SVT_INT:
@@ -618,12 +618,15 @@ namespace Ogre {
 		SAFE_RELEASE(mConstantBuffer);
 
 		// this is a hack - to solve that problem that we are the mAssemblerProgram of ourselves
-		*(mAssemblerProgram.useCountPointer()) = 0;
-		mAssemblerProgram.setNull();
+		if ( !mAssemblerProgram.isNull() )
+		{
+			*( mAssemblerProgram.useCountPointer() ) = 0;
+			mAssemblerProgram.setNull();
+		}
 
 		// have to call this here reather than in Resource destructor
 		// since calling virtual methods in base destructors causes crash
-		if (isLoaded())
+		if ( isLoaded() )
 		{
 			unload();
 		}
