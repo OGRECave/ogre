@@ -401,9 +401,30 @@ namespace Ogre
 		*/
 		float* getHeightData(long x, long y);
 
-		/** Get the height data for a given point. 
+		/** Get the height data for a given terrain point. 
+		@param x, y Discrete coordinates in terrain vertices, values from 0 to size-1,
+			left/right bottom/top
 		*/
-		float getHeight(long x, long y);
+		float getHeightAtPoint(long x, long y);
+
+		/** Get the height data for a given terrain position. 
+		@param x, y Position in terrain space, values from 0 to 1 left/right bottom/top
+		*/
+		float getHeightAtTerrainPosition(Real x, Real y);
+
+		/** Get the height data for a given world position (projecting the point
+			down on to the terrain). 
+		@param x, y,z Position in world space. Positions will be clamped to the edge
+			of the terrain
+		*/
+		float getHeightAtWorldPosition(Real x, Real y, Real z);
+
+		/** Get the height data for a given world position (projecting the point
+		down on to the terrain). 
+		@param pos Position in world space. Positions will be clamped to the edge
+		of the terrain
+		*/
+		float getHeightAtWorldPosition(const Vector3& pos);
 
 		/** Get a pointer to all the delta data for this terrain.
 		@remarks

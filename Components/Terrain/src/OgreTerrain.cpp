@@ -42,6 +42,8 @@ Torus Knot Software Ltd.
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreTextureManager.h"
 #include "OgreRoot.h"
+#include "OgreRay.h"
+#include "OgrePlane.h"
 
 namespace Ogre
 {
@@ -700,9 +702,89 @@ namespace Ogre
 		return &mHeightData[y * mSize + x];
 	}
 	//---------------------------------------------------------------------
-	float Terrain::getHeight(long x, long y)
+	float Terrain::getHeightAtPoint(long x, long y)
 	{
 		return *getHeightData(x, y);
+	}
+	//---------------------------------------------------------------------
+	float Terrain::getHeightAtTerrainPosition(Real x, Real y)
+	{
+		// clamp
+		x = std::min(x, (Real)1.0);
+		x = std::max(x, (Real)0.0);
+		y = std::min(y, (Real)1.0);
+		y = std::max(y, (Real)0.0);
+
+		// get left / bottom points (rounded down)
+		Real factor = mSize - 1;
+		Real invFactor = 1.0 / factor;
+
+		long startX = x * factor;
+		long startY = y * factor;
+		long endX = std::min(startX + 1, (long)mSize-1);
+		long endY = std::min(startY + 1, (long)mSize-1);
+
+		// now get points in terrain space (effectively rounding them to boundaries)
+		Real startXTS = startX * invFactor;
+		Real startYTS = startY * invFactor;
+		Real endXTS = endX * invFactor;
+		Real endYTS = endY * invFactor;
+
+		// get parametric from start coord to next point
+		Real xParam = (x - startXTS) / invFactor;
+		Real yParam = (y - startYTS) / invFactor;
+
+
+		/* For even / odd tri strip rows, triangles are this shape:
+		even     odd
+		3---2   3---2
+		| / |   | \ |
+		0---1   0---1
+		*/
+
+		// Build all 4 positions in terrain space, using point-sampled height
+		Vector3 v0 (startXTS, startYTS, getHeightAtPoint(startX, startY));
+		Vector3 v1 (endXTS, startYTS, getHeightAtPoint(endX, startY));
+		Vector3 v2 (endXTS, endYTS, getHeightAtPoint(endX, endY));
+		Vector3 v3 (startXTS, endYTS, getHeightAtPoint(startX, endY));
+		// define this plane in terrain space
+		Plane plane;
+		if (startY % 2)
+		{
+			// odd row
+			bool secondTri = ((1.0 - yParam) > xParam);
+			if (secondTri)
+				plane.redefine(v1, v2, v3);
+			else
+				plane.redefine(v0, v1, v3);
+		}
+		else
+		{
+			// even row
+			bool secondTri = (yParam > xParam);
+			if (secondTri)
+				plane.redefine(v0, v1, v2);
+			else
+				plane.redefine(v0, v2, v3);
+		}
+
+		// Ray-test
+		Ray ray(Vector3(x, y, 0), Vector3::UNIT_Z);
+		// negative results are ok
+		return static_cast<float>(ray.intersects(plane).second);
+
+	}
+	//---------------------------------------------------------------------
+	float Terrain::getHeightAtWorldPosition(Real x, Real y, Real z)
+	{
+		Vector3 terrPos;
+		getTerrainPosition(x, y, z, &terrPos);
+		return getHeightAtTerrainPosition(terrPos.x, terrPos.y);
+	}
+	//---------------------------------------------------------------------
+	float Terrain::getHeightAtWorldPosition(const Vector3& pos)
+	{
+		return getHeightAtWorldPosition(pos.x, pos.y, pos.z);
 	}
 	//---------------------------------------------------------------------
 	const float* Terrain::getDeltaData()
@@ -1382,9 +1464,28 @@ namespace Ogre
 		Vector3 v2 (x+1, *getHeightData(x+1,z), z);
 		Vector3 v3 (x, *getHeightData(x,z+1), z+1);
 		Vector3 v4 (x+1, *getHeightData(x+1,z+1), z+1);
-		// TODO: Is this the correct triangle order?
-		Plane p1 (v1, v3, v2);
-		Plane p2 (v3, v4, v2);
+
+		Plane p1, p2;
+		if (z % 2)
+		{
+			/* odd
+				3---4
+				| \ |
+				1---2
+			*/
+			p1.redefine(v1, v2, v3);
+			p2.redefine(v2, v4, v3);
+		}
+		else
+		{
+			/* even
+				3---4
+				| / |
+				1---2
+			*/
+			p1.redefine(v1, v4, v3);
+			p2.redefine(v1, v2, v4);
+		}
 		
 		// Test for intersection with the two planes. 
 		// Then test that the intersection points are actually

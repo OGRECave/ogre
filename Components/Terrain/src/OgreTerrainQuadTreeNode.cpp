@@ -602,7 +602,7 @@ namespace Ogre
 			float* pBuf = static_cast<float*>(static_cast<void*>(pRowBuf));
 			for (uint16 y = skirtStartY; y < rect.bottom; y += inc)
 			{
-				mTerrain->getPoint(x, y, mTerrain->getHeight(x, y), &pos);
+				mTerrain->getPoint(x, y, mTerrain->getHeightAtPoint(x, y), &pos);
 				// relative to local centre
 				pos -= mLocalCentre;
 				pos += skirtOffset;
