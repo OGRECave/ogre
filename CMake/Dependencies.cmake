@@ -103,7 +103,7 @@ macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://develop
 # Find Boost
 # Prefer static linking in all cases
 set(Boost_USE_STATIC_LIBS TRUE)
-set(Boost_ADDITIONAL_VERSIONS "1.37.0" "1.37" "1.38.0" "1.38")
+set(Boost_ADDITIONAL_VERSIONS "1.37.0" "1.37" "1.38.0" "1.38" "1.39.0" "1.39")
 # Components that need linking (NB does not include heaader-only components like bind)
 set(OGRE_BOOST_COMPONENTS thread date_time)
 find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
@@ -177,7 +177,6 @@ include_directories(
   ${CEGUI_INCLUDE_DIRS}
   ${OIS_INCLUDE_DIRS}
   ${Cg_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
   ${X11_INCLUDE_DIR}
   ${DirectX_INCLUDE_DIRS}
   ${CppUnit_INCLUDE_DIRS}
@@ -187,9 +186,13 @@ include_directories(
 link_directories(
   ${OPENGL_LIBRARY_DIRS}
   ${Cg_LIBRARY_DIRS}
-  ${Boost_LIBRARY_DIRS}
   ${X11_LIBRARY_DIRS}
   ${DirectX_LIBRARY_DIRS}
   ${CppUnit_LIBRARY_DIRS}
 )
+
+if (Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+  link_directories(${Boost_LIBRARY_DIRS})
+endif ()
 
