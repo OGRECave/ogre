@@ -78,6 +78,7 @@ namespace Ogre
 	bool TerrainGlobalOptions::msUseRayBoxDistanceCalculation = false;
 	TerrainMaterialGeneratorList TerrainGlobalOptions::msMatGeneratorList;
 	uint16 TerrainGlobalOptions::msLayerBlendMapSize = 1024;
+	Real TerrainGlobalOptions::msDefaultLayerTextureWorldSize = 10;
 	//---------------------------------------------------------------------
 	void TerrainGlobalOptions::addMaterialGenerator(TerrainMaterialGenerator* gen)
 	{
@@ -123,6 +124,7 @@ namespace Ogre
 		, mDerivedUpdatePending(false)
 		, mMaterialGenerator(0)
 		, mMaterialGenerationCount(0)
+		, mMaterialDirty(false)
 	{
 		mRootNode = sm->getRootSceneNode()->createChildSceneNode();
 		sm->addListener(this);
@@ -988,8 +990,7 @@ namespace Ogre
 		}
 		else
 		{
-			// default to tile 100 times
-			return mWorldSize * 0.01;
+			return TerrainGlobalOptions::getDefaultLayerTextureWorldSize();
 		}
 	}
 	//---------------------------------------------------------------------
@@ -1003,6 +1004,7 @@ namespace Ogre
 
 			mLayers[index].worldSize = size;
 			mLayerUVMultiplier[index] = mWorldSize / size;
+			mMaterialDirty = true;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -1052,7 +1054,11 @@ namespace Ogre
 	{
 		if (layerIndex < mLayers.size() && samplerIndex < mLayerDecl.samplers.size())
 		{
-			mLayers[layerIndex].textureNames[samplerIndex] = textureName;
+			if (mLayers[layerIndex].textureNames[samplerIndex] != textureName)
+			{
+				mLayers[layerIndex].textureNames[samplerIndex] = textureName;
+				mMaterialDirty = true;
+			}
 		}
 	}
 	//---------------------------------------------------------------------
@@ -1517,10 +1523,13 @@ namespace Ogre
 
 
 		if (mMaterialGenerator && 
-			(mMaterial.isNull() || mMaterialGenerator->getProfileChangeCount() != mMaterialGenerationCount))
+			(mMaterial.isNull() || 
+				mMaterialGenerator->getProfileChangeCount() != mMaterialGenerationCount ||
+				mMaterialDirty))
 		{
 			mMaterial = mMaterialGenerator->generate(this);
 			mMaterialGenerationCount = mMaterialGenerator->getProfileChangeCount();
+			mMaterialDirty = false;
 		}
 
 		return mMaterial;
@@ -1544,6 +1553,35 @@ namespace Ogre
 			}
 		}
 
+	}
+	//---------------------------------------------------------------------
+	void Terrain::addLayer(Real worldSize, const StringVector* textureNames)
+	{
+		if (!worldSize)
+			worldSize = TerrainGlobalOptions::getDefaultLayerTextureWorldSize();
+
+		mLayers.push_back(LayerInstance());
+		if (textureNames)
+		{
+			LayerInstance& inst = mLayers[mLayers.size()-1];
+			inst.textureNames = *textureNames;
+		}
+		// use utility method to update UV scaling
+		setLayerWorldSize(mLayers.size()-1, worldSize);
+		checkLayers();
+		mMaterialDirty = true;
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::removeLayer(uint8 index)
+	{
+		if (index < mLayers.size())
+		{
+			LayerInstanceList::iterator i = mLayers.begin();
+			std::advance(i, index);
+			mLayers.erase(i);
+			mMaterialDirty = true;
+		}
 	}
 	//---------------------------------------------------------------------
 	TerrainLayerBlendMap* Terrain::getLayerBlendMap(uint8 layerIndex)
@@ -1602,8 +1640,9 @@ namespace Ogre
 			else
 			{
 				// initialise black
-
-
+				uchar zeroVal[4] = {0,0,0,0};
+				PixelBox src(1, 1, 1, fmt, zeroVal);
+				mBlendTextureList[i]->getBuffer()->blitFromMemory(src);
 			}
 		}
 		mCpuBlendMapStorage.clear();

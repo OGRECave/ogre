@@ -550,6 +550,18 @@ namespace Ogre
 		/** Get the declaration which describes the layers in this terrain. */
 		const TerrainLayerDeclaration& getLayerDeclaration() const { return mLayerDecl; }
 
+		/** Add a new layer to this terrain.
+		@param worldSize The size of the texture in this layer in world units. Default
+		to zero to use the default
+		@param textureNames A list of textures to assign to the samplers in this
+			layer. Leave blank to provide these later. 
+		*/
+		void addLayer(Real worldSize = 0, const StringVector* textureNames = 0);
+
+		/** Remove a layer from the terrain.
+		*/
+		void removeLayer(uint8 index);
+
 		/** How large an area in world space the texture in a terrain layer covers
 		before repeating. 
 		@param index The layer index.
@@ -910,6 +922,7 @@ namespace Ogre
 		mutable MaterialPtr mMaterial;
 		mutable TerrainMaterialGenerator* mMaterialGenerator;
 		mutable unsigned long long int mMaterialGenerationCount;
+		mutable bool mMaterialDirty;
 
 		uint16 mLayerBlendMapSize;
 		uint16 mLayerBlendMapSizeActual;
@@ -965,6 +978,7 @@ namespace Ogre
 		static bool msUseRayBoxDistanceCalculation;
 		static TerrainMaterialGeneratorList msMatGeneratorList;
 		static uint16 msLayerBlendMapSize;
+		static Real msDefaultLayerTextureWorldSize;
 	public:
 
 
@@ -1126,6 +1140,13 @@ namespace Ogre
 		*/
 		static void setLayerBlendMapSize(uint16 sz) { msLayerBlendMapSize = sz;}
 
+		/** Get the default world size for a layer 'splat' texture to cover. 
+		*/
+		static Real getDefaultLayerTextureWorldSize() { return msDefaultLayerTextureWorldSize; }
+
+		/** Set the default world size for a layer 'splat' texture to cover. 
+		*/
+		static void setDefaultLayerTextureWorldSize(Real sz) { msDefaultLayerTextureWorldSize = sz; }
 
 	};
 
