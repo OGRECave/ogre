@@ -160,6 +160,14 @@ namespace Ogre {
 		}
 		return i->second;
 	}
+	//---------------------------------------------------------------------
+	bool HighLevelGpuProgramManager::isLanguageSupported(const String& lang)
+	{
+		FactoryMap::iterator i = mFactories.find(lang);
+
+		return i != mFactories.end();
+
+	}
     //---------------------------------------------------------------------------
     Resource* HighLevelGpuProgramManager::createImpl(const String& name, ResourceHandle handle, 
         const String& group, bool isManual, ManualResourceLoader* loader,

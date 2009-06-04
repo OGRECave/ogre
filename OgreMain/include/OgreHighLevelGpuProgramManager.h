@@ -97,6 +97,9 @@ namespace Ogre {
 		/** Remove a factory object for high-level programs of a given language. */
 		void removeFactory(HighLevelGpuProgramFactory* factory);
 
+		/** Returns whether a given high-level language is supported. */
+		bool isLanguageSupported(const String& lang);
+
 
         /** Create a new, unloaded HighLevelGpuProgram. 
 		@par
