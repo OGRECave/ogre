@@ -1319,13 +1319,6 @@ namespace Ogre
 								// should never set any value more than once
 								assert(mDeltaData[fulldetailx + (fulldetaily * mSize)] == 0);
 								mDeltaData[fulldetailx + (fulldetaily * mSize)] = delta;
-
-								if (delta > 5)
-								{
-									LogManager::getSingleton().stream() 
-										<< "x: " << fulldetailx << " y: " << fulldetaily 
-										<< " delta: " << delta << " targetLOD: " << targetLevel;
-								}
 							}
 
 						}
