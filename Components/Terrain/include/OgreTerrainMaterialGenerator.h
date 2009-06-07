@@ -31,7 +31,8 @@ Torus Knot Software Ltd.
 #define __Ogre_TerrainMaterialGenerator_H__
 
 #include "OgreTerrainPrerequisites.h"
-
+#include "OgrePixelFormat.h"
+#include "OgreMaterial.h"
 
 namespace Ogre
 {
@@ -55,13 +56,13 @@ namespace Ogre
 	enum TerrainLayerSamplerSemantic
 	{
 		/// Albedo colour (diffuse reflectance colour)
-		LSS_ALBEDO = 0,
+		TLSS_ALBEDO = 0,
 		/// Tangent-space normal information from a detail texture
-		LSS_NORMAL = 1,
+		TLSS_NORMAL = 1,
 		/// Height information for the detail texture
-		LSS_HEIGHT = 2,
+		TLSS_HEIGHT = 2,
 		/// Specular reflectance
-		LSS_SPECULAR = 3
+		TLSS_SPECULAR = 3
 	};
 
 	/** Information about one element of a sampler / texture within a layer. 
@@ -84,6 +85,13 @@ namespace Ogre
 				elementStart == e.elementStart &&
 				elementCount == e.elementCount;
 		}
+
+		TerrainLayerSamplerElement() {}
+		TerrainLayerSamplerElement(uint8 src, TerrainLayerSamplerSemantic sem,
+			uint8 elemStart, uint8 elemCount)
+			: source(src), semantic(sem), elementStart(elemStart), elementCount(elemCount)
+		{
+		}
 	};
 	typedef vector<TerrainLayerSamplerElement>::type TerrainLayerSamplerElementList;
 
@@ -99,6 +107,13 @@ namespace Ogre
 		bool operator==(const TerrainLayerSampler& s) const
 		{
 			return alias == s.alias && format == s.format;
+		}
+
+		TerrainLayerSampler() {}
+
+		TerrainLayerSampler(const String& aliasName, PixelFormat fmt)
+			: alias(aliasName), format(fmt)
+		{
 		}
 	};
 	typedef vector<TerrainLayerSampler>::type TerrainLayerSamplerList;
@@ -160,7 +175,10 @@ namespace Ogre
 			const String& getDescription() const { return mDesc; }
 			
 			/// Generate / resuse a material for the terrain
-			virtual MaterialPtr generate(const Terrain* terrain) = 0;				
+			virtual MaterialPtr generate(const Terrain* terrain) = 0;
+
+			/// Request the options needed from the terrain
+			virtual void requestOptions(Terrain* terrain) = 0;
 
 		};
 
@@ -235,6 +253,15 @@ namespace Ogre
 			return decl == mLayerDecl;
 		}
 
+		/** Triggers the generator to request the options that it needs.
+		*/
+		virtual void requestOptions(Terrain* terrain)
+		{
+			Profile* p = getActiveProfile();
+			if (p)
+				p->requestOptions(terrain);
+
+		}
 		/** Generate a material for the given terrain using the active profile.
 		*/
 		virtual MaterialPtr generate(const Terrain* terrain)

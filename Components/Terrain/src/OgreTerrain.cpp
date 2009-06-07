@@ -44,6 +44,7 @@ Torus Knot Software Ltd.
 #include "OgreRoot.h"
 #include "OgreRay.h"
 #include "OgrePlane.h"
+#include "OgreTerrainMaterialGeneratorA.h"
 
 namespace Ogre
 {
@@ -62,6 +63,8 @@ namespace Ogre
 	const uint16 Terrain::TERRAIN_MAX_BATCH_SIZE = 129; 
 	const uint16 Terrain::WORKQUEUE_CHANNEL = Root::MAX_USER_WORKQUEUE_CHANNEL + 10;
 	const uint16 Terrain::WORKQUEUE_DERIVED_DATA_REQUEST = 1;
+	const size_t Terrain::LOD_MORPH_CUSTOM_PARAM = 1001;
+
 
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
@@ -79,6 +82,7 @@ namespace Ogre
 	TerrainMaterialGeneratorList TerrainGlobalOptions::msMatGeneratorList;
 	uint16 TerrainGlobalOptions::msLayerBlendMapSize = 1024;
 	Real TerrainGlobalOptions::msDefaultLayerTextureWorldSize = 10;
+	TerrainLayerDeclaration TerrainGlobalOptions::msDefaultLayerDecl;
 	//---------------------------------------------------------------------
 	void TerrainGlobalOptions::addMaterialGenerator(TerrainMaterialGenerator* gen)
 	{
@@ -123,11 +127,19 @@ namespace Ogre
 		, mDerivedDataUpdateInProgress(false)
 		, mDerivedUpdatePending(false)
 		, mMaterialGenerator(0)
+		, mOwnMaterialGenerator(false)
 		, mMaterialGenerationCount(0)
 		, mMaterialDirty(false)
 	{
 		mRootNode = sm->getRootSceneNode()->createChildSceneNode();
 		sm->addListener(this);
+
+		// generate a material name, it's important for the terrain material
+		// name to be consistent & unique no matter what generator is being used
+		// so use our own pointer as identifier, use FashHash rather than just casting
+		// the pointer to a long so we support 64-bit pointers
+		Terrain* pTerrain = this;
+		mMaterialName = "OgreTerrain/" + StringConverter::toString(FastHash((const char*)&pTerrain, sizeof(Terrain*)));
 	}
 	//---------------------------------------------------------------------
 	Terrain::~Terrain()
@@ -140,6 +152,8 @@ namespace Ogre
 			mSceneMgr->destroySceneNode(mRootNode);
 			mSceneMgr->removeListener(this);
 		}
+		if (mOwnMaterialGenerator)
+			OGRE_DELETE mMaterialGenerator;
 	}
 	//---------------------------------------------------------------------
 	const AxisAlignedBox& Terrain::getAABB() const
@@ -368,6 +382,7 @@ namespace Ogre
 		mQuadTree->prepare();
 
 		mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
+		memset(mDeltaData, 0, sizeof(float) * numVertices);
 		// calculate entire terrain
 		Rect rect;
 		rect.top = 0; rect.bottom = mSize;
@@ -415,6 +430,7 @@ namespace Ogre
 		mSize = importData.terrainSize;
 		mWorldSize = importData.worldSize;
 		mLayerDecl = importData.layerDeclaration;
+		checkDeclaration();
 		mLayers = importData.layerList;
 		checkLayers();
 		deriveUVMultipliers();
@@ -482,7 +498,7 @@ namespace Ogre
 		}
 
 		mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
-
+		memset(mDeltaData, 0, sizeof(float) * numVertices);
 
 		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
 		mQuadTree->prepare();
@@ -770,10 +786,11 @@ namespace Ogre
 				plane.redefine(v0, v2, v3);
 		}
 
-		// Ray-test
-		Ray ray(Vector3(x, y, 0), Vector3::UNIT_Z);
-		// negative results are ok
-		return static_cast<float>(ray.intersects(plane).second);
+		// Solve plane equation for z
+		return (-plane.normal.x * x 
+				-plane.normal.y * y
+				- plane.d) / plane.normal.z;
+
 
 	}
 	//---------------------------------------------------------------------
@@ -1008,7 +1025,7 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
-	Real Terrain::getLayerUVMultipler(uint8 index) const
+	Real Terrain::getLayerUVMultiplier(uint8 index) const
 	{
 		if (index < mLayerUVMultiplier.size())
 		{
@@ -1206,95 +1223,109 @@ namespace Ogre
 				{
 					// Form planes relating to the lower detail tris to be produced
 					// For even tri strip rows, they are this shape:
-					// x---x
+					// 2---3
 					// | / |
-					// x---x
+					// 0---1
 					// For odd tri strip rows, they are this shape:
-					// x---x
+					// 2---3
 					// | \ |
-					// x---x
+					// 0---1
 
-					Vector3 v1, v2, v3, v4;
-					getPointAlign(i, j, ALIGN_X_Z, &v1);
-					getPointAlign(i + step, j, ALIGN_X_Z, &v2);
-					getPointAlign(i, j + step, ALIGN_X_Z, &v3);
-					getPointAlign(i + step, j + step, ALIGN_X_Z, &v4);
+					Vector3 v0, v1, v2, v3;
+					getPointAlign(i, j, ALIGN_X_Y, &v0);
+					getPointAlign(i + step, j, ALIGN_X_Y, &v1);
+					getPointAlign(i, j + step, ALIGN_X_Y, &v2);
+					getPointAlign(i + step, j + step, ALIGN_X_Y, &v3);
 
 					Plane t1, t2;
 					bool backwardTri = false;
-					if (j % 2 == 0)
+					// Odd or even in terms of target level
+					if ((j / step) % 2 == 0)
 					{
-						t1.redefine(v1, v3, v2);
-						t2.redefine(v2, v3, v4);
+						t1.redefine(v0, v1, v3);
+						t2.redefine(v0, v3, v2);
 					}
 					else
 					{
-						t1.redefine(v1, v3, v4);
-						t2.redefine(v1, v4, v2);
+						t1.redefine(v1, v3, v2);
+						t2.redefine(v0, v1, v2);
 						backwardTri = true;
 					}
 
 					// include the bottommost row of vertices if this is the last row
-					int zubound = (j == (mSize - step)? step : step - 1);
-					for ( int z = 0; z <= zubound; z++ )
+					int yubound = (j == (mSize - step)? step : step - 1);
+					for ( int y = 0; y <= yubound; y++ )
 					{
 						// include the rightmost col of vertices if this is the last col
 						int xubound = (i == (mSize - step)? step : step - 1);
 						for ( int x = 0; x <= xubound; x++ )
 						{
 							int fulldetailx = i + x;
-							int fulldetailz = j + z;
+							int fulldetaily = j + y;
 							if ( fulldetailx % step == 0 && 
-								fulldetailz % step == 0 )
+								fulldetaily % step == 0 )
 							{
 								// Skip, this one is a vertex at this level
 								continue;
 							}
 
-							Real zpct = (Real)z / (Real)step;
+							Real ypct = (Real)y / (Real)step;
 							Real xpct = (Real)x / (Real)step;
 
 							//interpolated height
 							Vector3 actualPos;
-							getPointAlign(fulldetailx, fulldetailz, ALIGN_X_Z, &actualPos);
+							getPointAlign(fulldetailx, fulldetaily, ALIGN_X_Y, &actualPos);
 							Real interp_h;
 							// Determine which tri we're on 
-							if ((xpct + zpct <= 1.0f && !backwardTri) ||
-								(xpct + (1-zpct) <= 1.0f && backwardTri))
+							if ((xpct > ypct && !backwardTri) ||
+								(xpct > (1-ypct) && backwardTri))
 							{
 								// Solve for x/z
 								interp_h = 
-									(-(t1.normal.x * actualPos.x)
-									- t1.normal.z * actualPos.z
-									- t1.d) / t1.normal.y;
+									(-t1.normal.x * actualPos.x
+									- t1.normal.y * actualPos.y
+									- t1.d) / t1.normal.z;
 							}
 							else
 							{
 								// Second tri
 								interp_h = 
-									(-(t2.normal.x * actualPos.x)
-									- t2.normal.z * actualPos.z
-									- t2.d) / t2.normal.y;
+									(-t2.normal.x * actualPos.x
+									- t2.normal.y * actualPos.y
+									- t2.d) / t2.normal.z;
 							}
 
-							Real actual_h = actualPos.y;
+							Real actual_h = actualPos.z;
 							Real delta = interp_h - actual_h;
 
 							// max(delta) is the worst case scenario at this LOD
 							// compared to the original heightmap
 
 							// tell the quadtree about this 
-							mQuadTree->notifyDelta(fulldetailx, fulldetailz, sourceLevel, delta);
+							mQuadTree->notifyDelta(fulldetailx, fulldetaily, sourceLevel, delta);
 
 
 							// If this vertex is being removed at this LOD, 
 							// then save the height difference since that's the move
 							// it will need to make. Vertices to be removed at this LOD
-							// are halfway between the steps
-							if ((fulldetailx % step) == step / 2 || (fulldetailz % step) == step / 2)
+							// are halfway between the steps, but exclude those that
+							// would have been eliminated at earlier levels
+							int halfStep = step / 2;
+							if (
+							 ((fulldetailx % step) == halfStep && (fulldetaily % halfStep) == 0) ||
+							 ((fulldetaily % step) == halfStep && (fulldetailx % halfStep) == 0))
 							{
 								// Save height difference 
-								mDeltaData[fulldetailx + (fulldetailz * mSize)] = delta;
+								// should never set any value more than once
+								assert(mDeltaData[fulldetailx + (fulldetaily * mSize)] == 0);
+								mDeltaData[fulldetailx + (fulldetaily * mSize)] = delta;
+
+								if (delta > 5)
+								{
+									LogManager::getSingleton().stream() 
+										<< "x: " << fulldetailx << " y: " << fulldetaily 
+										<< " delta: " << delta << " targetLOD: " << targetLevel;
+								}
 							}
 
 						}
@@ -1302,6 +1333,7 @@ namespace Ogre
 					}
 				} // i
 			} // j
+
 		} // targetLevel
 
 		mQuadTree->postDeltaCalculation(clampedRect);
@@ -1518,14 +1550,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	const MaterialPtr& Terrain::getMaterial() const
 	{
-		if (!mMaterialGenerator)
-			mMaterialGenerator = TerrainGlobalOptions::getMaterialGenerator(mLayerDecl);
-
-
-		if (mMaterialGenerator && 
-			(mMaterial.isNull() || 
-				mMaterialGenerator->getProfileChangeCount() != mMaterialGenerationCount ||
-				mMaterialDirty))
+		if (mMaterial.isNull() || 
+			mMaterialGenerator->getProfileChangeCount() != mMaterialGenerationCount ||
+			mMaterialDirty)
 		{
 			mMaterial = mMaterialGenerator->generate(this);
 			mMaterialGenerationCount = mMaterialGenerator->getProfileChangeCount();
@@ -1552,6 +1579,34 @@ namespace Ogre
 				layer.textureNames.resize(mLayerDecl.samplers.size());
 			}
 		}
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::checkDeclaration()
+	{
+		if (mLayerDecl.elements.empty())
+		{
+			// default the declaration
+			mLayerDecl = TerrainGlobalOptions::getDefaultLayerDeclaration();
+		}
+
+		if (!mMaterialGenerator)
+		{
+			mOwnMaterialGenerator = false;
+			mMaterialGenerator = TerrainGlobalOptions::getMaterialGenerator(mLayerDecl);
+
+			// Default
+			if (!mMaterialGenerator)
+			{
+				mMaterialGenerator = OGRE_NEW TerrainMaterialGeneratorA();
+				mLayerDecl = mMaterialGenerator->getLayerDeclaration();
+				mOwnMaterialGenerator = true;
+			}
+		}
+
+		mMaterialGenerator->requestOptions(this);
+
+
 
 	}
 	//---------------------------------------------------------------------
@@ -1749,6 +1804,34 @@ namespace Ogre
 		}
 
 	}
+	//---------------------------------------------------------------------
+	uint16 Terrain::getLODLevelWhenVertexEliminated(long x, long y)
+	{
+		// gets eliminated by either row or column first
+		return std::min(getLODLevelWhenVertexEliminated(x), getLODLevelWhenVertexEliminated(y));
+	}
+	//---------------------------------------------------------------------
+	uint16 Terrain::getLODLevelWhenVertexEliminated(long rowOrColulmn)
+	{
+		// LOD levels bisect the domain.
+		// start at the lowest detail
+		uint16 currentElim = (mSize - 1) / (mMinBatchSize - 1);
+		// start at a non-exitant LOD index, this applies to the min batch vertices
+		// which are never eliminated
+		uint16 currentLod =  mNumLodLevels;
+
+		while (rowOrColulmn % currentElim)
+		{
+			// not on this boundary, look finer
+			currentElim = currentElim / 2;
+			--currentLod;
+
+			// This will always terminate since (anything % 1 == 0)
+		}
+
+		return currentLod;
+	}
+
 
 
 

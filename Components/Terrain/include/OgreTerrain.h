@@ -240,6 +240,8 @@ namespace Ogre
 		static const uint32 TERRAINLAYERINSTANCE_CHUNK_ID;
 		static const uint16 TERRAINLAYERINSTANCE_CHUNK_VERSION;
 
+		static const size_t LOD_MORPH_CUSTOM_PARAM;
+
 		typedef vector<Real>::type RealVector;
 
 		/** An instance of a layer, with specific texture names
@@ -582,7 +584,7 @@ namespace Ogre
 			final value.
 		@param index The layer index.
 		*/
-		Real getLayerUVMultipler(uint8 index) const;
+		Real getLayerUVMultiplier(uint8 index) const;
 
 		/** Get the name of the texture bound to a given index within a given layer.
 		See the LayerDeclaration for a list of sampelrs within a layer.
@@ -720,6 +722,11 @@ namespace Ogre
 
 		/// Get the material being used for the terrain
 		const MaterialPtr& getMaterial() const;
+		/// Internal getting of material 
+		const MaterialPtr& _getMaterial() const { return mMaterial; }
+
+		/// Get the name of the material being used for the terrain
+		const String& getMaterialName() const { return mMaterialName; }
 
 		/// Overridden from SceneManager::Listener
 		void preFindVisibleObjects(SceneManager* source, 
@@ -834,6 +841,15 @@ namespace Ogre
 		static const uint16 WORKQUEUE_DERIVED_DATA_REQUEST;
 
 
+		/// Utility method, get the first LOD Level at which this vertex is no longer included
+		uint16 getLODLevelWhenVertexEliminated(long x, long y);
+		/// Utility method, get the first LOD Level at which this vertex is no longer included
+		uint16 getLODLevelWhenVertexEliminated(long rowOrColulmn);
+
+
+		/// Get the top level of the quad tree which is used to divide up the terrain
+		TerrainQuadTreeNode* getQuadTree() { return mQuadTree; }
+
 
 	protected:
 
@@ -858,6 +874,7 @@ namespace Ogre
 
 		void copyGlobalOptions();
 		void checkLayers();
+		void checkDeclaration();
 		void deriveUVMultipliers();
 		uint8 getBlendTextureCount(uint8 numLayers);
 		PixelFormat getBlendTextureFormat(uint8 textureIndex, uint8 numLayers);
@@ -919,8 +936,10 @@ namespace Ogre
 			{ return o; }		
 		};
 
+		String mMaterialName;
 		mutable MaterialPtr mMaterial;
 		mutable TerrainMaterialGenerator* mMaterialGenerator;
+		mutable bool mOwnMaterialGenerator;
 		mutable unsigned long long int mMaterialGenerationCount;
 		mutable bool mMaterialDirty;
 
@@ -979,6 +998,7 @@ namespace Ogre
 		static TerrainMaterialGeneratorList msMatGeneratorList;
 		static uint16 msLayerBlendMapSize;
 		static Real msDefaultLayerTextureWorldSize;
+		static TerrainLayerDeclaration msDefaultLayerDecl;
 	public:
 
 
@@ -1147,6 +1167,10 @@ namespace Ogre
 		/** Set the default world size for a layer 'splat' texture to cover. 
 		*/
 		static void setDefaultLayerTextureWorldSize(Real sz) { msDefaultLayerTextureWorldSize = sz; }
+		/// Get the default layer declaration
+		static TerrainLayerDeclaration getDefaultLayerDeclaration() { return msDefaultLayerDecl; }
+		/// Set the default layer declaration
+		static void setDefaultLayerDeclaration(const TerrainLayerDeclaration& decl) { msDefaultLayerDecl = decl; }
 
 	};
 

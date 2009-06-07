@@ -438,8 +438,8 @@ namespace Ogre
 			// float3(x, y, z)
 			offset += dcl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
 			// UV0
-			// float3(u, v, delta)
-			offset += dcl->addElement(0, offset, VET_FLOAT3, VES_TEXTURE_COORDINATES).getSize();
+			// float4(u, v, delta, deltaLODthreshold)
+			offset += dcl->addElement(0, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES).getSize();
 
 			// Calculate number of vertices
 			// Base geometry size * size
@@ -527,7 +527,11 @@ namespace Ogre
 				// delta
 				*pBuf++ = *pDelta;
 				pDelta += inc;
-				
+				// delta LOD threshold
+				// we want delta to apply to LODs no higher than this value
+				// at runtime this will be combined with a per-renderable parameter
+				// to ensure we only apply morph to the correct LOD
+				*pBuf++ = (float)mTerrain->getLODLevelWhenVertexEliminated(x, y) - 1.0f;
 				// Update bounds
 				mergeIntoBounds(x, y, pos);
 
@@ -583,6 +587,8 @@ namespace Ogre
 				*pBuf++ = 1.0 - (y * uvScale);
 				// delta (none)
 				*pBuf++ = 0; 
+				// delta threshold (irrelevant)
+				*pBuf++ = 99;
 			}
 			pBaseHeight += mTerrain->getSize() * skirtSpacing;
 			pRowBuf += destRowSkip;
@@ -616,6 +622,8 @@ namespace Ogre
 				*pBuf++ = 1.0 - (y * uvScale);
 				// delta (none)
 				*pBuf++ = 0; 
+				// delta threshold (irrelevant)
+				*pBuf++ = 99;
 			}
 			pRowBuf += destRowSkip;
 		}
@@ -1080,13 +1088,19 @@ namespace Ogre
 							mLodTransition = 1.0 - (distRemain / distMorphRegion);
 							mLodTransition = std::min((Real)1.0, mLodTransition);
 							mLodTransition = std::max((Real)0.0, mLodTransition);
+
+							// Pass both the transition % and target LOD (GLOBAL current + 1)
+							// this selectively applies the morph just to the
+							// vertices which would drop out at this LOD, even 
+							// while using the single shared vertex data
+							mRend->setCustomParameter(Terrain::LOD_MORPH_CUSTOM_PARAM, 
+								Vector4(mLodTransition, mCurrentLod + mBaseLod + 1, 0, 0));
+
 						}
+						// since LODs are ordered from highest to lowest detail, 
+						// we can stop looking now
+						break;
 					}
-
-					// since LODs are ordered from highest to lowest detail, 
-					// we can stop looking now
-					break;
-
 
 				}
 			}
