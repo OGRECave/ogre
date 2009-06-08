@@ -186,6 +186,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void FileSystemArchive::load()
     {
+		OGRE_LOCK_AUTO_MUTEX
         // test to see if this folder is writeable
 		String testPath = concatenate_path(mName, "__testwrite.ogre");
 		std::ofstream writeStream;

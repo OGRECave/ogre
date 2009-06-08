@@ -61,6 +61,8 @@ namespace Ogre {
         void checkZzipError(int zzipError, const String& operation) const;
         /// File list (since zziplib seems to only allow scanning of dir tree once)
         FileInfoList mFileList;
+
+		OGRE_AUTO_MUTEX
     public:
         ZipArchive(const String& name, const String& archType );
         ~ZipArchive();

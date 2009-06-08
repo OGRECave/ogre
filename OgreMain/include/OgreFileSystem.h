@@ -61,6 +61,7 @@ namespace Ogre {
         void findFiles(const String& pattern, bool recursive, bool dirs,
             StringVector* simpleList, FileInfoList* detailList);
 
+		OGRE_AUTO_MUTEX
     public:
         FileSystemArchive(const String& name, const String& archType );
         ~FileSystemArchive();
