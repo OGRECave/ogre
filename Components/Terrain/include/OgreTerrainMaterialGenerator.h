@@ -283,8 +283,7 @@ namespace Ogre
 
 	};
 
-	typedef vector<TerrainMaterialGenerator*>::type TerrainMaterialGeneratorList;
-
+	typedef SharedPtr<TerrainMaterialGenerator> TerrainMaterialGeneratorPtr;
 
 	/** @} */
 	/** @} */

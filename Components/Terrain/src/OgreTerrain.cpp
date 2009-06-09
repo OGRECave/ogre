@@ -42,6 +42,7 @@ Torus Knot Software Ltd.
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreTextureManager.h"
 #include "OgreRoot.h"
+#include "OgreRenderSystem.h"
 #include "OgreRay.h"
 #include "OgrePlane.h"
 #include "OgreTerrainMaterialGeneratorA.h"
@@ -59,55 +60,43 @@ namespace Ogre
 	const uint16 Terrain::TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION = 1;
 	const uint32 Terrain::TERRAINLAYERINSTANCE_CHUNK_ID = StreamSerialiser::makeIdentifier("TLIN");;
 	const uint16 Terrain::TERRAINLAYERINSTANCE_CHUNK_VERSION = 1;
+	const uint32 Terrain::TERRAINDERIVEDDATA_CHUNK_ID = StreamSerialiser::makeIdentifier("TDDA");;
+	const uint16 Terrain::TERRAINDERIVEDDATA_CHUNK_VERSION = 1;
 	// since 129^2 is the greatest power we can address in 16-bit index
 	const uint16 Terrain::TERRAIN_MAX_BATCH_SIZE = 129; 
 	const uint16 Terrain::WORKQUEUE_CHANNEL = Root::MAX_USER_WORKQUEUE_CHANNEL + 10;
 	const uint16 Terrain::WORKQUEUE_DERIVED_DATA_REQUEST = 1;
 	const size_t Terrain::LOD_MORPH_CUSTOM_PARAM = 1001;
+	const uint8 Terrain::DERIVED_DATA_DELTAS = 1;
+	const uint8 Terrain::DERIVED_DATA_NORMALS = 2;
 
 
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	Real TerrainGlobalOptions::msSkirtSize = 10;
-	bool TerrainGlobalOptions::msGenerateNormalMap = true;
-	bool TerrainGlobalOptions::msGenerateLightMap = false;
 	Vector3 TerrainGlobalOptions::msLightMapDir = Vector3(1, -1, 0).normalisedCopy();
-	bool TerrainGlobalOptions::msGenerateHorizonMap = false;
-	Radian TerrainGlobalOptions::msHorizonMapAzimuth = Radian(0);
-	Radian TerrainGlobalOptions::msHorizonMapZenith = Radian(0);
 	bool TerrainGlobalOptions::msCastsShadows = false;
 	Real TerrainGlobalOptions::msMaxPixelError = 3.0;
 	uint8 TerrainGlobalOptions::msRenderQueueGroup = RENDER_QUEUE_MAIN;
 	bool TerrainGlobalOptions::msUseRayBoxDistanceCalculation = false;
-	TerrainMaterialGeneratorList TerrainGlobalOptions::msMatGeneratorList;
+	TerrainMaterialGeneratorPtr TerrainGlobalOptions::msDefaultMaterialGenerator;
 	uint16 TerrainGlobalOptions::msLayerBlendMapSize = 1024;
 	Real TerrainGlobalOptions::msDefaultLayerTextureWorldSize = 10;
-	TerrainLayerDeclaration TerrainGlobalOptions::msDefaultLayerDecl;
 	//---------------------------------------------------------------------
-	void TerrainGlobalOptions::addMaterialGenerator(TerrainMaterialGenerator* gen)
+	void TerrainGlobalOptions::setDefaultMaterialGenerator(TerrainMaterialGeneratorPtr gen)
 	{
-		if (std::find(msMatGeneratorList.begin(), msMatGeneratorList.end(), gen) != msMatGeneratorList.end())
-			msMatGeneratorList.push_back(gen);
+		msDefaultMaterialGenerator = gen;
 	}
 	//---------------------------------------------------------------------
-	void TerrainGlobalOptions::removeMaterialGenerator(TerrainMaterialGenerator* gen)
+	TerrainMaterialGeneratorPtr TerrainGlobalOptions::getDefaultMaterialGenerator()
 	{
-		TerrainMaterialGeneratorList::iterator i = std::find(
-			msMatGeneratorList.begin(), msMatGeneratorList.end(), gen);
-		if (i != msMatGeneratorList.end())
-			msMatGeneratorList.erase(i);
-	}
-	//---------------------------------------------------------------------
-	TerrainMaterialGenerator* TerrainGlobalOptions::getMaterialGenerator(const TerrainLayerDeclaration& decl)
-	{
-		for (TerrainMaterialGeneratorList::reverse_iterator i = msMatGeneratorList.rbegin(); 
-			i != msMatGeneratorList.rend(); ++i)
+		if (msDefaultMaterialGenerator.isNull())
 		{
-			if ((*i)->canGenerateUsingDeclaration(decl))
-				return *i;
+			// default
+			msDefaultMaterialGenerator.bind(OGRE_NEW TerrainMaterialGeneratorA());
 		}
 
-		return 0;
+		return msDefaultMaterialGenerator;
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
@@ -125,14 +114,25 @@ namespace Ogre
 		, mDirtyGeometryRect(0, 0, 0, 0)
 		, mDirtyDerivedDataRect(0, 0, 0, 0)
 		, mDerivedDataUpdateInProgress(false)
-		, mDerivedUpdatePending(false)
-		, mMaterialGenerator(0)
-		, mOwnMaterialGenerator(false)
+		, mDerivedUpdatePendingMask(0)
 		, mMaterialGenerationCount(0)
 		, mMaterialDirty(false)
+		, mLodMorphRequired(false)
+		, mNormalMapRequired(false)
+		, mLightMapRequired(false)
+		, mLightMapShadowsOnly(true)
+		, mHorizonMapRequired(false)
+		, mCpuTerrainNormalMap(0)
+		, mCpuTerrainLightMap(0)
+		, mCpuTerrainHorizonMap(0)
+
 	{
 		mRootNode = sm->getRootSceneNode()->createChildSceneNode();
 		sm->addListener(this);
+
+		WorkQueue* wq = Root::getSingleton().getWorkQueue();
+		wq->addRequestHandler(WORKQUEUE_CHANNEL, this);
+		wq->addResponseHandler(WORKQUEUE_CHANNEL, this);
 
 		// generate a material name, it's important for the terrain material
 		// name to be consistent & unique no matter what generator is being used
@@ -152,8 +152,6 @@ namespace Ogre
 			mSceneMgr->destroySceneNode(mRootNode);
 			mSceneMgr->removeListener(this);
 		}
-		if (mOwnMaterialGenerator)
-			OGRE_DELETE mMaterialGenerator;
 	}
 	//---------------------------------------------------------------------
 	const AxisAlignedBox& Terrain::getAABB() const
@@ -251,8 +249,6 @@ namespace Ogre
 				uint8* pData = mCpuBlendMapStorage[i];
 				stream.write(pData, dataSz);
 			}
-
-
 		}
 		else
 		{
@@ -274,6 +270,28 @@ namespace Ogre
 			}
 			OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
 		}
+
+		// derived data
+		// normals
+		stream.writeChunkBegin(TERRAINDERIVEDDATA_CHUNK_ID, TERRAINDERIVEDDATA_CHUNK_VERSION);
+		String normalDataType("normals");
+		stream.write(&normalDataType);
+		stream.write(&mSize);
+		if (mCpuTerrainNormalMap)
+		{
+			// save from CPU data if it's there, it means GPU data was never created
+			stream.write((uint8*)mCpuTerrainNormalMap->data, mSize * mSize * 3);
+		}
+		else
+		{
+			uint8* tmpData = (uint8*)OGRE_MALLOC(mSize * mSize * 3, MEMCATEGORY_GENERAL);
+			PixelBox dst(mSize, mSize, 1, PF_BYTE_RGB, tmpData);
+			mTerrainNormalMap->getBuffer()->blitToMemory(dst);
+			stream.write(tmpData, mSize * mSize * 3);
+			OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
+		}
+		stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
+
 		
 
 		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
@@ -376,6 +394,30 @@ namespace Ogre
 			mCpuBlendMapStorage.push_back(pData);
 		}
 
+		// derived data
+		while (!stream.isEndOfChunk(TERRAIN_CHUNK_ID) && 
+			stream.peekNextChunkID() == TERRAINDERIVEDDATA_CHUNK_ID)
+		{
+			stream.readChunkBegin(TERRAINDERIVEDDATA_CHUNK_ID, TERRAINDERIVEDDATA_CHUNK_VERSION);
+			// name
+			String name;
+			stream.read(&name);
+			uint16 sz;
+			stream.read(&sz);
+			if (name == "normals")
+			{
+				uint8* pData = static_cast<uint8*>(OGRE_MALLOC(sz * sz * 3, MEMCATEGORY_GENERAL));
+				mCpuTerrainNormalMap = OGRE_NEW PixelBox(sz, sz, 1, PF_BYTE_RGB, pData);
+
+				stream.read(pData, sz * sz * 3);
+				
+			}
+
+			stream.readChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
+
+
+		}
+
 		stream.readChunkEnd(TERRAIN_CHUNK_ID);
 
 		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
@@ -391,6 +433,7 @@ namespace Ogre
 		finaliseHeightDeltas(rect);
 
 		distributeVertexData();
+
 
 		return true;
 	}
@@ -512,7 +555,6 @@ namespace Ogre
 
 		distributeVertexData();
 
-
 		return true;
 
 	}
@@ -520,9 +562,6 @@ namespace Ogre
 	void Terrain::copyGlobalOptions()
 	{
 		mSkirtSize = TerrainGlobalOptions::getSkirtSize();
-		mNormalMapRequired = TerrainGlobalOptions::getGenerateNormalMap();
-		mLightMapRequired = TerrainGlobalOptions::getGenerateLightMap();
-		mHorizonMapRequired = TerrainGlobalOptions::getGenerateHorizonMap();
 		mRenderQueueGroup = TerrainGlobalOptions::getRenderQueueGroup();
 		mLayerBlendMapSize = TerrainGlobalOptions::getLayerBlendMapSize();
 		mLayerBlendMapSizeActual = mLayerBlendMapSize; // for now, until we check
@@ -694,7 +733,19 @@ namespace Ogre
 	{
 		if (mQuadTree)
 			mQuadTree->load();
+		
 		createGPUBlendTextures();
+		
+		mMaterialGenerator->requestOptions(this);
+
+		// Upload loaded normal data if present
+		if (mCpuTerrainNormalMap)
+		{
+			mTerrainNormalMap->getBuffer()->blitFromMemory(*mCpuTerrainNormalMap);
+			OGRE_FREE(mCpuTerrainNormalMap->data, MEMCATEGORY_GENERAL);
+			OGRE_DELETE mCpuTerrainNormalMap;
+			mCpuTerrainNormalMap = 0;
+		}
 	}
 	//---------------------------------------------------------------------
 	void Terrain::unload()
@@ -1127,7 +1178,7 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
-	void Terrain::updateDerivedData(bool synchronous)
+	void Terrain::updateDerivedData(bool synchronous, uint8 typeMask)
 	{
 		if (mDirtyDerivedDataRect.width() && mDirtyDerivedDataRect.height())
 		{
@@ -1135,17 +1186,18 @@ namespace Ogre
 			{
 				// Don't launch many updates, instead wait for the other one 
 				// to finish and issue another afterwards. 
-				mDerivedUpdatePending = true;
+				mDerivedUpdatePendingMask = typeMask;
 			}
 			else
 			{
 				mDerivedDataUpdateInProgress = true;
-				mDerivedUpdatePending = false;
+				mDerivedUpdatePendingMask = 0;
 
 				DerivedDataRequest req;
 				req.terrain = this;
 				req.dirtyRect = mDirtyDerivedDataRect;
-				req.calcNormalMap = mNormalMapRequired;
+				req.calcDeltas = (typeMask & DERIVED_DATA_DELTAS);
+				req.calcNormalMap = mNormalMapRequired && (typeMask & DERIVED_DATA_NORMALS);
 				req.calcLightMap = mLightMapRequired;
 				req.calcHorizonMap = mHorizonMapRequired;
 
@@ -1173,8 +1225,26 @@ namespace Ogre
 		OGRE_DELETE mQuadTree;
 		mQuadTree = 0;
 
+		if (mCpuTerrainNormalMap)
+		{
+			OGRE_FREE(mCpuTerrainNormalMap->data, MEMCATEGORY_GENERAL);
+			OGRE_DELETE mCpuTerrainNormalMap;
+			mCpuTerrainNormalMap = 0;
+		}
 
+		if (mCpuTerrainLightMap)
+		{
+			OGRE_FREE(mCpuTerrainLightMap->data, MEMCATEGORY_GENERAL);
+			OGRE_DELETE mCpuTerrainLightMap;
+			mCpuTerrainLightMap = 0;
+		}
 
+		if (mCpuTerrainHorizonMap)
+		{
+			OGRE_FREE(mCpuTerrainHorizonMap->data, MEMCATEGORY_GENERAL);
+			OGRE_DELETE mCpuTerrainHorizonMap;
+			mCpuTerrainHorizonMap = 0;
+		}
 	}
 	//---------------------------------------------------------------------
 	void Terrain::freeGPUResources()
@@ -1548,6 +1618,7 @@ namespace Ogre
 			mMaterialDirty)
 		{
 			mMaterial = mMaterialGenerator->generate(this);
+			mMaterial->load();
 			mMaterialGenerationCount = mMaterialGenerator->getProfileChangeCount();
 			mMaterialDirty = false;
 		}
@@ -1577,29 +1648,17 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::checkDeclaration()
 	{
+		if (mMaterialGenerator.isNull())
+		{
+			mMaterialGenerator = TerrainGlobalOptions::getDefaultMaterialGenerator();
+
+		}
+
 		if (mLayerDecl.elements.empty())
 		{
 			// default the declaration
-			mLayerDecl = TerrainGlobalOptions::getDefaultLayerDeclaration();
+			mLayerDecl = mMaterialGenerator->getLayerDeclaration();
 		}
-
-		if (!mMaterialGenerator)
-		{
-			mOwnMaterialGenerator = false;
-			mMaterialGenerator = TerrainGlobalOptions::getMaterialGenerator(mLayerDecl);
-
-			// Default
-			if (!mMaterialGenerator)
-			{
-				mMaterialGenerator = OGRE_NEW TerrainMaterialGeneratorA();
-				mLayerDecl = mMaterialGenerator->getLayerDeclaration();
-				mOwnMaterialGenerator = true;
-			}
-		}
-
-		mMaterialGenerator->requestOptions(this);
-
-
 
 	}
 	//---------------------------------------------------------------------
@@ -1696,6 +1755,24 @@ namespace Ogre
 		mCpuBlendMapStorage.clear();
 	}
 	//---------------------------------------------------------------------
+	void Terrain::createOrDestroyGPUNormalMap()
+	{
+		if (mNormalMapRequired && mTerrainNormalMap.isNull())
+		{
+			// create
+			mTerrainNormalMap = TextureManager::getSingleton().createManual(
+				mMaterialName + "/nm", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+				TEX_TYPE_2D, mSize, mSize, 1, 0, PF_BYTE_RGB);
+		}
+		else if (!mNormalMapRequired && !mTerrainNormalMap.isNull())
+		{
+			// destroy
+			TextureManager::getSingleton().remove(mTerrainNormalMap->getHandle());
+			mTerrainNormalMap.setNull();
+		}
+
+	}
+	//---------------------------------------------------------------------
 	void Terrain::freeTemporaryResources()
 	{
 		for (BytePointerList::iterator i = mCpuBlendMapStorage.begin(); 
@@ -1732,8 +1809,29 @@ namespace Ogre
 		if (normalMap != mNormalMapRequired)
 		{
 			mNormalMapRequired = normalMap;
+
+			// Check NPOT textures supported. We have to use NPOT textures to map
+			// texels to vertices directly!
+			if (!mNormalMapRequired && Root::getSingleton().getRenderSystem()
+				->getCapabilities()->hasCapability(RSC_NON_POWER_OF_2_TEXTURES))
+			{
+				mNormalMapRequired = false;
+				LogManager::getSingleton().stream(LML_CRITICAL) <<
+					"Terrain: Ignoring request for normal map generation since "
+					"non-power-of-two texture support is required.";
+			}
+
+			createOrDestroyGPUNormalMap();
+
+			// if we enabled, generate normal maps
+			if (mNormalMapRequired)
+			{
+				// update derived data for whole terrain, but just normals
+				mDirtyDerivedDataRect.left = mDirtyDerivedDataRect.top = 0;
+				mDirtyDerivedDataRect.right = mDirtyDerivedDataRect.bottom = mSize;
+				updateDerivedData(false, DERIVED_DATA_NORMALS);
+			}
 			
-			// TODO - create
 		}
 	}
 	//---------------------------------------------------------------------
@@ -1767,7 +1865,11 @@ namespace Ogre
 		DerivedDataResponse ddres;
 		// NB do not use 'this' here, use req->terrain. This way any instance can 
 		// deal with request
-		ddr.terrain->calculateHeightDeltas(ddr.dirtyRect);
+		if (ddr.calcDeltas)
+			ddr.terrain->calculateHeightDeltas(ddr.dirtyRect);
+
+		if (ddr.calcNormalMap)
+			ddres.normalMapBox = ddr.terrain->calculateNormals(ddr.dirtyRect);
 
 		// TODO other data
 
@@ -1784,16 +1886,19 @@ namespace Ogre
 		DerivedDataRequest ddreq = any_cast<DerivedDataRequest>(res->getRequest()->getData());
 		// NB do not use 'this' here, use req->terrain. This way any instance can 
 		// deal with response
-		ddreq.terrain->finaliseHeightDeltas(ddreq.dirtyRect);
+		if (ddreq.calcDeltas)
+			ddreq.terrain->finaliseHeightDeltas(ddreq.dirtyRect);
+		if (ddreq.calcNormalMap)
+			ddreq.terrain->finaliseNormals(ddreq.dirtyRect, ddres.normalMapBox);
 		
 		// TODO other data
 
 
 		ddreq.terrain->mDerivedDataUpdateInProgress = false;
-		if (ddreq.terrain->mDerivedUpdatePending)
+		if (ddreq.terrain->mDerivedUpdatePendingMask)
 		{
 			// trigger again
-			updateDerivedData(false);
+			updateDerivedData(false, mDerivedUpdatePendingMask);
 		}
 
 	}
@@ -1823,6 +1928,131 @@ namespace Ogre
 		}
 
 		return currentLod;
+	}
+	//---------------------------------------------------------------------
+	PixelBox* Terrain::calculateNormals(const Ogre::Rect &rect)
+	{
+		// allocate memory for RGB
+		uint8* pData = static_cast<uint8*>(
+			OGRE_MALLOC(rect.width() * rect.height() * 3, MEMCATEGORY_GENERAL));
+
+		PixelBox* pixbox = OGRE_NEW PixelBox(rect.width(), rect.height(), 1, PF_BYTE_RGB, pData);
+
+		// sample the 6 triangles intersecting; there are 2 general options
+		//      A           B
+		//  6---7---8   6---7---8
+		//  | \ | \ |   | / | / |
+		//	3---4---5   3---4---5  <---- centre
+		//  | / | / |   | \ | \ |
+		//	0---1---2   0---1---2
+		// 
+		//  Option A is where the centre point is on an odd row (ie previous row is even)
+		//  Option B is where the centre point is on an even row (ie previous row is odd)
+		//  Notice how only 6 of the 8 triangles are connected to the centre point
+
+		for (long y = rect.top; y < rect.bottom; ++y)
+		{
+			bool caseA = (y % 2) != 0;
+
+			for (long x = rect.left; x < rect.right; ++x)
+			{
+				// Do them in 4 cells, since if centre point is at the edge then
+				// we skip cells
+				Vector3 cumulativeNormal = Vector3::ZERO;
+				for(long cy = -1; cy < 1; ++cy)
+				{
+					long cellY = y + cy;
+					if (cellY < 0 || cellY + 1 >= mSize)
+						continue;
+					for(long cx = -1; cx < 1; ++cx)
+					{
+						long cellX = x + cx;
+						if (cellX < 0 || cellX + 1 >= mSize)
+							continue;
+						// cell X/Y is the bottom-left of the cell
+
+						// get positions
+						Vector3 pos[4];
+						getPoint(cellX, cellY, &pos[0]);
+						getPoint(cellX + 1, cellY, &pos[1]);
+						getPoint(cellX, cellY + 1, &pos[2]);
+						getPoint(cellX + 1, cellY + 1, &pos[3]);
+
+						bool backwardsTri = (cellY % 2) != 0;
+
+						Plane p1, p2;
+
+						if (backwardsTri)
+						{
+							p1.redefine(pos[0], pos[3], pos[2]);
+							p2.redefine(pos[0], pos[1], pos[3]);
+						}
+						else
+						{
+							p1.redefine(pos[0], pos[1], pos[2]);
+							p2.redefine(pos[1], pos[3], pos[2]);
+						}
+
+						// which ones contribute? All except the 2 at the edge
+						// right edge for case A, left for case B
+						// include tri 1 so long as not left edge and case B
+						if (!(!caseA && cx == -1))
+							cumulativeNormal += p1.normal;
+						// include tri 2 so long as not right edge and case A
+						if (!(caseA && cx == 0))
+							cumulativeNormal += p2.normal;
+
+					}
+				}
+				// normalise & store normal
+				cumulativeNormal.normalise();
+
+				// encode as RGB, object space
+				// invert the Y to deal with image space
+				long storeX = x - rect.left;
+				long storeY = rect.bottom - y - 1;
+
+				uint8* pStore = pData + ((storeY * rect.width()) + storeX) * 3;
+				*pStore++ = (cumulativeNormal.x + 1.0) * 0.5 * 255.0;
+				*pStore++ = (cumulativeNormal.y + 1.0) * 0.5 * 255.0;
+				*pStore++ = (cumulativeNormal.z + 1.0) * 0.5 * 255.0;
+
+
+			}
+		}
+
+		return pixbox;
+	}
+	//---------------------------------------------------------------------
+	void Terrain::finaliseNormals(const Ogre::Rect &rect, Ogre::PixelBox *normalsBox)
+	{
+		createOrDestroyGPUNormalMap();
+		// deal with race condition where nm has been disabled while we were working!
+		if (!mTerrainNormalMap.isNull())
+		{
+			// blit the normals into the texture
+			if (rect.left == 0 && rect.top == 0 && rect.bottom == mSize && rect.right == mSize)
+			{
+				mTerrainNormalMap->getBuffer()->blitFromMemory(*normalsBox);
+			}
+			else
+			{
+				// content of normalsBox is already inverted in Y, but rect is still 
+				// in terrain space for dealing with sub-rect, so invert
+				Image::Box dstBox;
+				dstBox.left = rect.left;
+				dstBox.right = rect.right;
+				dstBox.top = mSize - rect.bottom - 1;
+				dstBox.bottom = mSize - rect.top - 1;
+				mTerrainNormalMap->getBuffer()->blitFromMemory(*normalsBox, dstBox);
+			}
+		}
+		
+
+		// delete memory
+		OGRE_FREE(normalsBox->data, MEMCATEGORY_GENERAL);
+		OGRE_DELETE(normalsBox);
+
 	}
 
 

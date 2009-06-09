@@ -122,6 +122,11 @@ namespace Ogre
 		<td>layerCount-1 sets of blend texture data interleaved as either RGB or RGBA 
 			depending on layer count</td>
 	</tr>
+	<tr>
+		<td>Optional derived map data</td>
+		<td>TerrainDerivedMap list</td>
+		<td>0 or more sets of map data derived from the original terrain</td>
+	</tr>
 	</table>
 	<b>TerrainLayerDeclaration (Identifier 'TDCL')</b>\n
 	[Version 1]
@@ -219,6 +224,30 @@ namespace Ogre
 		<td><b>List of texture names corresponding to the number of samplers in the layer declaration</b></td>
 	</tr>
 	</table>
+	<b>TerrainDerivedData (Identifier 'TDDA')</b>\n
+	[Version 1]
+	<table>
+	<tr>
+		<td><b>Name</b></td>
+		<td><b>Type</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td><b>Derived data type name</b></td>
+		<td><b>String</b></td>
+		<td><b>Name of the derived data type ('normal', 'lightmap' etc)</b></td>
+	</tr>
+	<tr>
+		<td><b>Size</b></td>
+		<td><b>uint16</b></td>
+		<td><b>Size of the data along one edge</b></td>
+	</tr>
+	<tr>
+		<td><b>Data</b></td>
+		<td><b>varies based on type</b></td>
+		<td><b>The data</b></td>
+	</tr>
+	</table>
 	*/
 	class _OgreTerrainExport Terrain : public SceneManager::Listener, 
 		public WorkQueue::RequestHandler, public WorkQueue::ResponseHandler, public TerrainAlloc
@@ -239,6 +268,8 @@ namespace Ogre
 		static const uint16 TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION;
 		static const uint32 TERRAINLAYERINSTANCE_CHUNK_ID;
 		static const uint16 TERRAINLAYERINSTANCE_CHUNK_VERSION;
+		static const uint32 TERRAINDERIVEDDATA_CHUNK_ID;
+		static const uint16 TERRAINDERIVEDDATA_CHUNK_VERSION;
 
 		static const size_t LOD_MORPH_CUSTOM_PARAM;
 
@@ -662,6 +693,11 @@ namespace Ogre
 		*/
 		void updateGeometry();
 
+		/// Used as a type mask for updateDerivedData
+		static const uint8 DERIVED_DATA_DELTAS;
+		/// Used as a type mask for updateDerivedData
+		static const uint8 DERIVED_DATA_NORMALS;
+
 		/** Updates derived data for the terrain (LOD, lighting) to reflect changed height data, in a separate
 		thread if threading is enabled (OGRE_THREAD_SUPPORT). 
 		If threading is enabled, on return from this method the derived
@@ -671,8 +707,9 @@ namespace Ogre
 		few frames which is why it is not done synchronously
 		@param synchronous If true, the update will happen immediately and not
 			in a separate thread.
+		@param typeMask Mask indicating the types of data we should generate
 		*/
-		void updateDerivedData(bool synchronous = false);
+		void updateDerivedData(bool synchronous = false, uint8 typeMask = 0xFF);
 
 
 		/** The default size of 'skirts' used to hide terrain cracks
@@ -701,6 +738,20 @@ namespace Ogre
 		*/
 		void finaliseHeightDeltas(const Rect& rect);
 
+		/** Calculate (or recalculate) the normals on the terrain
+		@param rect Rectangle describing the area to calculate (left <= right, bottom <= top)		
+		@returns Pointer to a PixelBox full of normals (caller responsible for deletion)
+		*/
+		PixelBox* calculateNormals(const Rect& rect);
+
+		/** Finalise the normals. 
+		Calculated normals are kept in a separate calculation area to make
+		them safe to perform in a background thread. This call promotes those
+		calculations to the runtime values, and must be called in the main thread.
+		@param rect Rectangle describing the area to finalise (left <= right, bottom <= top)		
+		@param normalsBox Pointer to a PixelBox full of normals
+		*/
+		void finaliseNormals(const Rect& rect, PixelBox* normalsBox);
 		/** Gets the resolution of the entire terrain (down one edge) at a 
 			given LOD level. 
 		*/
@@ -850,6 +901,9 @@ namespace Ogre
 		/// Get the top level of the quad tree which is used to divide up the terrain
 		TerrainQuadTreeNode* getQuadTree() { return mQuadTree; }
 
+		/// Get the (global) normal map texture
+		TexturePtr getTerrainNormalMap() const { return mTerrainNormalMap; }
+
 
 	protected:
 
@@ -859,6 +913,7 @@ namespace Ogre
 		void distributeVertexData();
 		void updateBaseScale();
 		void createGPUBlendTextures();
+		void createOrDestroyGPUNormalMap();
 		/** Get a Vector3 of the world-space point on the terrain, aligned Y-up always.
 		@note This point is relative to Terrain::getPosition
 		*/
@@ -878,7 +933,6 @@ namespace Ogre
 		void deriveUVMultipliers();
 		uint8 getBlendTextureCount(uint8 numLayers);
 		PixelFormat getBlendTextureFormat(uint8 textureIndex, uint8 numLayers);
-
 
 		SceneManager* mSceneMgr;
 		SceneNode* mRootNode;
@@ -903,19 +957,19 @@ namespace Ogre
 		LayerInstanceList mLayers;
 		RealVector mLayerUVMultiplier;
 
-
 		Real mSkirtSize;
 		uint8 mRenderQueueGroup;
 
 		Rect mDirtyGeometryRect;
 		Rect mDirtyDerivedDataRect;
 		bool mDerivedDataUpdateInProgress;
-		bool mDerivedUpdatePending; // if another update is requested while one is already running
+		uint8 mDerivedUpdatePendingMask; // if another update is requested while one is already running
 
 		/// A data holder for communicating with the background derived data update
 		struct DerivedDataRequest
 		{
 			Terrain* terrain;
+			bool calcDeltas;
 			bool calcNormalMap;
 			bool calcLightMap;
 			bool calcHorizonMap;
@@ -938,8 +992,7 @@ namespace Ogre
 
 		String mMaterialName;
 		mutable MaterialPtr mMaterial;
-		mutable TerrainMaterialGenerator* mMaterialGenerator;
-		mutable bool mOwnMaterialGenerator;
+		mutable TerrainMaterialGeneratorPtr mMaterialGenerator;
 		mutable unsigned long long int mMaterialGenerationCount;
 		mutable bool mMaterialDirty;
 
@@ -969,6 +1022,11 @@ namespace Ogre
 		/// Texture storing horizon values for the whole terrrain
 		TexturePtr mTerrainHorizonMap;
 
+		/// Pending data 
+		PixelBox* mCpuTerrainNormalMap;
+		PixelBox* mCpuTerrainLightMap;
+		PixelBox* mCpuTerrainHorizonMap;
+
 	};
 
 
@@ -985,20 +1043,14 @@ namespace Ogre
 		TerrainGlobalOptions() {}
 
 		static Real msSkirtSize;
-		static bool msGenerateNormalMap;
-		static bool msGenerateLightMap;
 		static Vector3 msLightMapDir;
-		static bool msGenerateHorizonMap;
-		static Radian msHorizonMapAzimuth;
-		static Radian msHorizonMapZenith;
 		static bool msCastsShadows;
 		static Real msMaxPixelError;
 		static uint8 msRenderQueueGroup;
 		static bool msUseRayBoxDistanceCalculation;
-		static TerrainMaterialGeneratorList msMatGeneratorList;
+		static TerrainMaterialGeneratorPtr msDefaultMaterialGenerator;
 		static uint16 msLayerBlendMapSize;
 		static Real msDefaultLayerTextureWorldSize;
-		static TerrainLayerDeclaration msDefaultLayerDecl;
 	public:
 
 
@@ -1012,77 +1064,11 @@ namespace Ogre
 			Changing this value only applies to Terrain instances loaded / reloaded afterwards.
 		*/
 		static void setSkirtSize(Real skirtSz) { msSkirtSize = skirtSz; }
-		/** Whether to generate a texture containing the normals of the terrain in all
-			cases.
-		@remarks
-			Because of the variable LOD of the terrain, storing normals in vertices
-			doesn't produce attractive results. Instead, a terrain-wide normal map
-			is typically used, storing the object-space normals of the terrain
-			(default true). This option chooses whether to, by default, generate
-			this data. If this option is set to false, the TerrainMaterialGenerator
-			can still override it if it requires that information, it is just
-			likely that it will not be immediately ready.
-		*/
-		static bool getGenerateNormalMap() { return msGenerateNormalMap; }
-		/** Whether to generate a texture containing the normals of the terrain. */
-		static void setGenerateNormalMap(bool nm) { msGenerateNormalMap = nm; }
-		/** Whether to generate a texture containing the shadows of the terrain at
-			a particular time of day.
-		@remarks
-			This can be a useful feature for older hardware, or indeed any 
-			situation where dynamic shadows are not required. It requires that
-			the light direction is set too. If this option is set to false, the TerrainMaterialGenerator
-			can still override it if it requires that information, it is just
-			likely that it will not be immediately ready.
-		*/
-		static bool getGenerateLightMap() { return msGenerateLightMap; }
-		/** Whether to generate a texture containing the shadows of the terrain. */
-		static void setGenerateLightMap(bool sm) { msGenerateLightMap = sm; }
 		/// Get the shadow map light direction to use (world space)
 		static const Vector3& getLightMapDirection() { return msLightMapDir; }
 		/** Set the shadow map light direction to use (world space). */
 		static void setLightMapDirection(const Vector3& v) { msLightMapDir = v; }
 
-		/** Whether to generate a horizon map containing the angles of the horizon
-			along a given linear sun track, which allows real-time shadows to be
-			generated for the terrain very cheaply without using shadow textures.
-		@remarks
-			This can be a useful feature for moderate hardware, giving you the ability
-			to self-shadow the terrain without rendering depth shadow maps. Each point
-			in the texture encodes 2 values - the highest point on the terrain that
-			can be seen from that point in the direction of the sun in the morning, 
-			and the same thing in the evening (ie the opposite direction). With these
-			two values and a single 'time of day' value, you can calculate terrain
-			shadowing. 
-		@note This option uses the azimuth setting to detemine the track of the sun.
-			At runtime, it uses the zenith value which represents the time of day.
-			If this option is set to false, the TerrainMaterialGenerator
-			can still override it if it requires that information, it is just
-			likely that it will not be immediately ready.
-		*/
-		static bool getGenerateHorizonMap() { return msGenerateHorizonMap; }
-		/** Whether to generate a texture containing the shadows of the terrain. */
-		static void setGenerateHorizonMap(bool hm) { msGenerateHorizonMap = hm; }
-		/** Get the azimuth angle of the sun track across the terrain for use in 
-			generating the horizon map; zero is  east/west (default)
-		*/
-		static Radian getHorizonMapAzimuth() { return msHorizonMapAzimuth; }
-		/** Set the azimuth angle of the sun track across the terrain; zero is 
-		east/west (default)
-		*/
-		static void setHorizonMapAzimuth(Radian az) { msHorizonMapAzimuth = az; }
-		/** Get the current zenith angle of the sun; zero is midday (default), 
-		    -HALF_PI is sunrise, HALF_PI is sunset. This doesn't affect the 
-			calculation of the horizon map, it controls the current state in 
-			which it is used.
-		*/
-		static Radian getHorizonMapZenith() { return msHorizonMapZenith; }
-		/** Set the current zenith angle of the sun; zero is midday (default), 
-		    -HALF_PI is sunrise, HALF_PI is sunset. This doesn't affect the 
-			calculation of the horizon map, it controls the current state in 
-			which it is used, therefore this can be varied dynamically
-		*/
-		static void setHorizonMapZenith(Radian z) { msHorizonMapZenith = z; }
 
 		/** Whether the terrain will be able to cast shadows (texture shadows
 		only are supported, and you must be using depth shadow maps).
@@ -1133,22 +1119,13 @@ namespace Ogre
 		*/
 		static void setUseRayBoxDistanceCalculation(bool rb) { msUseRayBoxDistanceCalculation = rb; }
 
-		/** Get the list of material generators that are currently available.
+		/** Get the default material generator.
 		*/
-		static const TerrainMaterialGeneratorList& getMaterialGeneratorList() { return msMatGeneratorList; }
+		static TerrainMaterialGeneratorPtr getDefaultMaterialGenerator();
 
-		/** Add a new material generator to the list. Generators added later
-			take precedence over those added earlier. 
+		/** Set the default material generator.
 		*/
-		static void addMaterialGenerator(TerrainMaterialGenerator* gen);
-		/** Remove a material generator from the list 
-		*/
-		static void removeMaterialGenerator(TerrainMaterialGenerator* gen);
-
-		/** Get the first material generator that can generate materials for the
-			given layer declaration.
-		*/
-		static TerrainMaterialGenerator* getMaterialGenerator(const TerrainLayerDeclaration& decl);
+		static void setDefaultMaterialGenerator(TerrainMaterialGeneratorPtr gen);
 
 		/** Get the default size of the blend maps for a new terrain. 
 		*/
@@ -1167,10 +1144,6 @@ namespace Ogre
 		/** Set the default world size for a layer 'splat' texture to cover. 
 		*/
 		static void setDefaultLayerTextureWorldSize(Real sz) { msDefaultLayerTextureWorldSize = sz; }
-		/// Get the default layer declaration
-		static TerrainLayerDeclaration getDefaultLayerDeclaration() { return msDefaultLayerDecl; }
-		/// Set the default layer declaration
-		static void setDefaultLayerDeclaration(const TerrainLayerDeclaration& decl) { msDefaultLayerDecl = decl; }
 
 	};
 

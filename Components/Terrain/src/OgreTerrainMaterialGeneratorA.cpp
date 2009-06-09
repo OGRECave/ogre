@@ -136,9 +136,12 @@ namespace Ogre
 		pass->setVertexProgram(vprog->getName());
 		pass->setFragmentProgram(fprog->getName());
 
+		// global normal map
+		TextureUnitState* tu = pass->createTextureUnitState();
+		tu->setTextureName(terrain->getTerrainNormalMap()->getName());
 
 		// TODO - determine the number of texture units
-		TextureUnitState* tu = pass->createTextureUnitState();
+		tu = pass->createTextureUnitState();
 		tu->setTextureName(terrain->getLayerTextureName(0, 0));
 
 		return mat;
@@ -337,7 +340,8 @@ namespace Ogre
 
 			// TODO - remove this - iterate instead
 			"uniform float uvMul,\n"
-			"uniform sampler2D tex0 : register(s0)\n"
+			"uniform sampler2D globalNormal : register(s0),\n"
+			"uniform sampler2D tex0 : register(s1)\n"
 
 			") : COLOR\n"
 			"{\n"
@@ -346,6 +350,7 @@ namespace Ogre
 			// TODO - remove this - iterate instead
 			"	float2 uv0 = uv * uvMul;\n"
 			"	outputCol = tex2D(tex0, uv0);\n"
+			"	outputCol = tex2D(globalNormal, uv);\n"
 			;
 
 		outStream << fpHeader;
