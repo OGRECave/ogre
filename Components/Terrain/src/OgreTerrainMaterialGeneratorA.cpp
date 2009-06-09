@@ -226,6 +226,12 @@ namespace Ogre
 		GpuProgramParametersSharedPtr params = prog->getDefaultParameters();
 		params->setIgnoreMissingParams(true);
 
+		params->setNamedAutoConstant("ambient", GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR);
+		params->setNamedAutoConstant("lightPosObjSpace", GpuProgramParameters::ACT_LIGHT_POSITION_OBJECT_SPACE, 0);
+		params->setNamedAutoConstant("lightDiffuseColour", GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR, 0);
+		params->setNamedAutoConstant("lightSpecularColour", GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR, 0);
+		params->setNamedAutoConstant("eyePosObjSpace", GpuProgramParameters::ACT_CAMERA_POSITION_OBJECT_SPACE);
+
 		// TODO: temp hack remove!
 		params->setNamedConstant("uvMul", terrain->getLayerUVMultiplier(0));
 		
@@ -293,11 +299,13 @@ namespace Ogre
 			"uniform float2   lodMorph,\n" // morph amount, morph LOD target
 			
 			"out float4 oPos : POSITION,\n"
-			"out float2 oUV	 : TEXCOORD0\n"
+			"out float2 oUV	 : TEXCOORD0, \n"
+			"out float4 oPosObj : TEXCOORD1 \n"
 
 			")\n"
 			"{\n"
 			"	float4 worldPos = mul(worldMatrix, pos);\n"
+			"	oPosObj = pos;"
 
 			// determine whether to apply the LOD morph to this vertex
 			// we store the deltas against all vertices so we only want to apply 
@@ -335,9 +343,23 @@ namespace Ogre
 		const Terrain* terrain, uint8 startLayer, StringUtil::StrStreamType& outStream)
 	{
 		static const String fpHeader = 
+			// helpers
+			"float4 expand(float4 v)\n"
+			"{ \n"
+			"	return v * 2 - 1;\n"
+			"}\n\n\n"
+
 			"float4 main_fp(\n"
 			"float2 uv : TEXCOORD0,\n"
-
+			"float4 position : TEXCOORD1,\n"
+			
+			// Only 1 light supported in this version
+			// deferred shading profile / generator later, ok? :)
+			"uniform float4 ambient,\n"
+			"uniform float4 lightPosObjSpace,\n"
+			"uniform float3 lightDiffuseColour,\n"
+			"uniform float3 lightSpecularColour,\n"
+			"uniform float3 eyePosObjSpace,\n"
 			// TODO - remove this - iterate instead
 			"uniform float uvMul,\n"
 			"uniform sampler2D globalNormal : register(s0),\n"
@@ -346,11 +368,28 @@ namespace Ogre
 			") : COLOR\n"
 			"{\n"
 			"	float4 outputCol;\n"
+			// ambient colour is universal
+			"	outputCol = ambient;\n"
+
+			// global normal
+			"	float3 normal = expand(tex2D(globalNormal, uv)).rgb;\n"
+			// Light - for now, just simple lighting
+			"	float3 lightDir = normalize( \n"
+			"	lightPosObjSpace.xyz -  (position.xyz * lightPosObjSpace.w));\n"
+			
+
+			// for now, just single lighting result (no normal mapping)
+			"	float3 eyeDir = eyePosObjSpace - position.xyz;\n"
+			"	float3 halfAngle = normalize(lightDir + eyeDir);\n"
+			"	float4 litRes = lit(dot(lightDir, normal), dot(halfAngle, normal), 30);\n"
 
 			// TODO - remove this - iterate instead
 			"	float2 uv0 = uv * uvMul;\n"
-			"	outputCol = tex2D(tex0, uv0);\n"
-			"	outputCol = tex2D(globalNormal, uv);\n"
+			"	float3 diffuseTex = tex2D(tex0, uv0).rgb;\n"
+			// diffuse
+			"	outputCol.rgb += litRes.y * lightDiffuseColour * diffuseTex;\n"
+			// specular
+			"	outputCol.rgb += litRes.z * lightSpecularColour;\n"
 			;
 
 		outStream << fpHeader;
