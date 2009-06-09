@@ -1948,12 +1948,11 @@ namespace Ogre
 		// 
 		//  Option A is where the centre point is on an odd row (ie previous row is even)
 		//  Option B is where the centre point is on an even row (ie previous row is odd)
-		//  Notice how only 6 of the 8 triangles are connected to the centre point
+		//  Notice how only 6 of the 8 triangles are connected to the centre point, 
+		//	however we still include them since it gives a better overall result
 
 		for (long y = rect.top; y < rect.bottom; ++y)
 		{
-			bool caseA = (y % 2) != 0;
-
 			for (long x = rect.left; x < rect.right; ++x)
 			{
 				// Do them in 4 cells, since if centre point is at the edge then
@@ -1995,12 +1994,8 @@ namespace Ogre
 
 						// which ones contribute? All except the 2 at the edge
 						// right edge for case A, left for case B
-						// include tri 1 so long as not left edge and case B
-						if (!(!caseA && cx == -1))
-							cumulativeNormal += p1.normal;
-						// include tri 2 so long as not right edge and case A
-						if (!(caseA && cx == 0))
-							cumulativeNormal += p2.normal;
+						cumulativeNormal += p1.normal;
+						cumulativeNormal += p2.normal;
 
 					}
 				}
