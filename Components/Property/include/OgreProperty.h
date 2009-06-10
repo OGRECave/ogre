@@ -331,7 +331,7 @@ namespace Ogre
 		template<typename T>
 		void setValue(const String& name, const T* value)
 		{
-			setPropertyImpl(name, *value, PropertyDef::getTypeForValue(value));
+			setPropertyImpl(name, *value, PropertyDef::getTypeForValue(*value));
 		}
 		/** Set a named property value. 
 		*/
