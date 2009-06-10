@@ -84,7 +84,8 @@ void TerrainTests::testCreate()
 	imp.minBatchSize = 33;
 	imp.maxBatchSize = 65;
 	t->prepare(imp);
-	t->load();
+	// don't load, this requires GPU access
+	//t->load();
 	
 
 	

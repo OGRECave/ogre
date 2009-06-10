@@ -1250,12 +1250,15 @@ namespace Ogre
 	void Terrain::freeGPUResources()
 	{
 		// remove textures
-		TextureManager& tmgr = TextureManager::getSingleton();
-		for (TexturePtrList::iterator i = mBlendTextureList.begin(); i != mBlendTextureList.end(); ++i)
+		TextureManager* tmgr = TextureManager::getSingletonPtr();
+		if (tmgr)
 		{
-			tmgr.remove((*i)->getHandle());
+			for (TexturePtrList::iterator i = mBlendTextureList.begin(); i != mBlendTextureList.end(); ++i)
+			{
+				tmgr->remove((*i)->getHandle());
+			}
+			mBlendTextureList.clear();
 		}
-		mBlendTextureList.clear();
 
 	}
 	//---------------------------------------------------------------------
