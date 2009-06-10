@@ -70,6 +70,18 @@ if (OGRE_BUILD_TESTS)
 	    Components/Terrain/src/TerrainTests.cpp
 	  )
 	endif ()
+	if (OGRE_BUILD_COMPONENT_PROPERTY)
+	  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Property/include
+	    ${CMAKE_SOURCE_DIR}/Components/Property/include)
+	  
+	  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreProperty)
+	  set(HEADER_FILES ${HEADER_FILES}
+	    Components/Property/include/PropertyTests.h
+	  )
+	  set(SOURCE_FILES ${SOURCE_FILES}
+	    Components/Property/src/PropertyTests.cpp
+	  )
+	endif ()
 
 	add_executable(Test_Ogre WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
 	ogre_config_sample(Test_Ogre)
