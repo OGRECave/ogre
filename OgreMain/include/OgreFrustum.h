@@ -629,6 +629,11 @@ namespace Ogre
 		virtual const Vector3& getPositionForViewUpdate(void) const;
 		/** Get the derived orientation of this frustum. */
 		virtual const Quaternion& getOrientationForViewUpdate(void) const;
+
+		/** Gets a world-space list of planes enclosing the frustum.
+		*/
+		PlaneBoundedVolume getPlaneBoundedVolume();
+
     };
 
 	/** @} */

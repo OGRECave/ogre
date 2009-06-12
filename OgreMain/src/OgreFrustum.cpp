@@ -1330,6 +1330,21 @@ namespace Ogre {
 		outbottom = mBottom;
 	}
 	//---------------------------------------------------------------------
+	PlaneBoundedVolume Frustum::getPlaneBoundedVolume()
+	{
+		updateFrustumPlanes();
+
+		PlaneBoundedVolume volume;
+		volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_NEAR]);
+		volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_FAR]);
+		volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_BOTTOM]);
+		volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_TOP]);
+		volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_LEFT]);
+		volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_RIGHT]);
+		return volume;
+	}
+	//---------------------------------------------------------------------
+
 
 
 
