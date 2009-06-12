@@ -159,22 +159,22 @@ namespace Ogre
 		/// Get a string name of a property type
 		static const String& getTypeName(PropertyType theType);
 
-		static PropertyType PropertyDef::getTypeForValue(const short& val) { return PROP_SHORT; }
-		static PropertyType PropertyDef::getTypeForValue(const unsigned short& val) { return PROP_UNSIGNED_SHORT; }
-		static PropertyType PropertyDef::getTypeForValue(const int& val) { return PROP_INT; }
-		static PropertyType PropertyDef::getTypeForValue(const unsigned int& val) { return PROP_UNSIGNED_INT; }
-		static PropertyType PropertyDef::getTypeForValue(const long& val) { return PROP_LONG; }
-		static PropertyType PropertyDef::getTypeForValue(const unsigned long& val) { return PROP_UNSIGNED_LONG; }
-		static PropertyType PropertyDef::getTypeForValue(const Real& val) { return PROP_REAL; }
-		static PropertyType PropertyDef::getTypeForValue(const String& val) { return PROP_STRING; }
-		static PropertyType PropertyDef::getTypeForValue(const Vector2& val) { return PROP_VECTOR2; }
-		static PropertyType PropertyDef::getTypeForValue(const Vector3& val) { return PROP_VECTOR3; }
-		static PropertyType PropertyDef::getTypeForValue(const Vector4& val) { return PROP_VECTOR4; }
-		static PropertyType PropertyDef::getTypeForValue(const ColourValue& val) { return PROP_COLOUR; }
-		static PropertyType PropertyDef::getTypeForValue(const bool& val) { return PROP_BOOL; }
-		static PropertyType PropertyDef::getTypeForValue(const Quaternion& val) { return PROP_QUATERNION; }
-		static PropertyType PropertyDef::getTypeForValue(const Matrix3& val) { return PROP_MATRIX3; }
-		static PropertyType PropertyDef::getTypeForValue(const Matrix4& val) { return PROP_MATRIX4; }
+		static PropertyType getTypeForValue(const short& val) { return PROP_SHORT; }
+		static PropertyType getTypeForValue(const unsigned short& val) { return PROP_UNSIGNED_SHORT; }
+		static PropertyType getTypeForValue(const int& val) { return PROP_INT; }
+		static PropertyType getTypeForValue(const unsigned int& val) { return PROP_UNSIGNED_INT; }
+		static PropertyType getTypeForValue(const long& val) { return PROP_LONG; }
+		static PropertyType getTypeForValue(const unsigned long& val) { return PROP_UNSIGNED_LONG; }
+		static PropertyType getTypeForValue(const Real& val) { return PROP_REAL; }
+		static PropertyType getTypeForValue(const String& val) { return PROP_STRING; }
+		static PropertyType getTypeForValue(const Vector2& val) { return PROP_VECTOR2; }
+		static PropertyType getTypeForValue(const Vector3& val) { return PROP_VECTOR3; }
+		static PropertyType getTypeForValue(const Vector4& val) { return PROP_VECTOR4; }
+		static PropertyType getTypeForValue(const ColourValue& val) { return PROP_COLOUR; }
+		static PropertyType getTypeForValue(const bool& val) { return PROP_BOOL; }
+		static PropertyType getTypeForValue(const Quaternion& val) { return PROP_QUATERNION; }
+		static PropertyType getTypeForValue(const Matrix3& val) { return PROP_MATRIX3; }
+		static PropertyType getTypeForValue(const Matrix4& val) { return PROP_MATRIX4; }
 
 	protected:
 		// no default construction
