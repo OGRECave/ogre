@@ -60,6 +60,20 @@ namespace Ogre
                 "Unable to locate " + progType + " program called " + name + ".",
                 "GpuProgramUsage::setProgramName");
         }
+		// check type
+		if (mProgram->getType() != mType)
+		{
+			String myType = (mType == GPT_VERTEX_PROGRAM ? "vertex" : 
+				(mType == GPT_GEOMETRY_PROGRAM ? "geometry" : "fragment"));
+			String yourType = (mProgram->getType() == GPT_VERTEX_PROGRAM ? "vertex" : 
+				(mProgram->getType() == GPT_GEOMETRY_PROGRAM ? "geometry" : "fragment"));
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				name + "is a " + yourType + " program, but you are assigning it to a " 
+				+ myType + " program slot. This is invalid.",
+				"GpuProgramUsage::setProgramName");
+
+		}
+
         // Reset parameters 
         if (resetParams || mParameters.isNull())
             mParameters = mProgram->createParameters();
