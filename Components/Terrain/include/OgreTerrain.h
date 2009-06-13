@@ -795,6 +795,10 @@ namespace Ogre
 
 		/** Retrieve the layer blending map for a given layer, which may
 			be used to edit the blending information for that layer.
+		@note
+			You can only do this after the terrain has been loaded. You may 
+			edit the content of the blend layer in another thread, but you
+			may only upload it in the main render thread.
 		@param layerIndex The layer index, which should be 1 or higher (since 
 			the bottom layer has no blending).
 		@returns Pointer to the TerrainLayerBlendMap requested. The caller must
@@ -802,6 +806,20 @@ namespace Ogre
 			to save the memory after completing your editing.
 		*/
 		TerrainLayerBlendMap* getLayerBlendMap(uint8 layerIndex);
+
+		/** Get the index of the blend texture that a given layer uses.
+		@param layerIndex The layer index, must be >= 1 and less than the number
+			of layers
+		@returns The index of the shared blend texture
+		*/
+		uint8 getBlendTextureIndex(uint8 layerIndex) const;
+
+
+		/** Get the name of the packed blend texture at a specific index.
+		@param textureIndex This is the blend texture index, not the layer index
+			(multiple layers will share a blend texture)
+		*/
+		const String& getBlendTextureName(uint8 textureIndex) const;
 
 		/** Free as many resources as possible for optimal run-time memory use.
 		@remarks
@@ -913,6 +931,7 @@ namespace Ogre
 		void distributeVertexData();
 		void updateBaseScale();
 		void createGPUBlendTextures();
+		void createLayerBlendMaps();
 		void createOrDestroyGPUNormalMap();
 		/** Get a Vector3 of the world-space point on the terrain, aligned Y-up always.
 		@note This point is relative to Terrain::getPosition
@@ -928,11 +947,12 @@ namespace Ogre
 		std::pair<bool, Vector3> checkQuadIntersection(int x, int z, const Ray& ray); //const;
 
 		void copyGlobalOptions();
-		void checkLayers();
+		void checkLayers(bool includeGPUResources);
 		void checkDeclaration();
 		void deriveUVMultipliers();
 		uint8 getBlendTextureCount(uint8 numLayers);
 		PixelFormat getBlendTextureFormat(uint8 textureIndex, uint8 numLayers);
+		
 
 		SceneManager* mSceneMgr;
 		SceneNode* mRootNode;

@@ -135,6 +135,8 @@ namespace Ogre
 
 
 		/** Publish any changes you made to the blend data back to the blend map. 
+		@note
+			Can only be called in the main render thread.
 		*/
 		void update();
 

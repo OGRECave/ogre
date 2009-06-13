@@ -217,7 +217,7 @@ namespace Ogre
 		stream.writeChunkEnd(TERRAINLAYERDECLARATION_CHUNK_ID);
 
 		// Layers
-		checkLayers();
+		checkLayers(false);
 		uint8 numLayers = (uint8)mLayers.size();
 		stream.write(&numLayers);
 		for (LayerInstanceList::const_iterator i = mLayers.begin(); i != mLayers.end(); ++i)
@@ -475,7 +475,7 @@ namespace Ogre
 		mLayerDecl = importData.layerDeclaration;
 		checkDeclaration();
 		mLayers = importData.layerList;
-		checkLayers();
+		checkLayers(false);
 		deriveUVMultipliers();
 		mMaxBatchSize = importData.maxBatchSize;
 		mMinBatchSize = importData.minBatchSize;
@@ -734,7 +734,7 @@ namespace Ogre
 		if (mQuadTree)
 			mQuadTree->load();
 		
-		createGPUBlendTextures();
+		checkLayers(true);
 		
 		mMaterialGenerator->requestOptions(this);
 
@@ -1254,11 +1254,19 @@ namespace Ogre
 		if (tmgr)
 		{
 			for (TexturePtrList::iterator i = mBlendTextureList.begin(); i != mBlendTextureList.end(); ++i)
-			{
+			{	
 				tmgr->remove((*i)->getHandle());
 			}
 			mBlendTextureList.clear();
 		}
+
+		for (TerrainLayerBlendMapList::iterator i = mLayerBlendMapList.begin(); 
+			i != mLayerBlendMapList.end(); ++i)
+		{
+			OGRE_DELETE *i;
+			*i = 0;
+		}
+
 
 	}
 	//---------------------------------------------------------------------
@@ -1629,7 +1637,7 @@ namespace Ogre
 		return mMaterial;
 	}
 	//---------------------------------------------------------------------
-	void Terrain::checkLayers()
+	void Terrain::checkLayers(bool includeGPUResources)
 	{
 		for (LayerInstanceList::iterator i = mLayers.begin(); i != mLayers.end(); ++i)
 		{
@@ -1645,6 +1653,12 @@ namespace Ogre
 			{
 				layer.textureNames.resize(mLayerDecl.samplers.size());
 			}
+		}
+
+		if (includeGPUResources)
+		{
+			createGPUBlendTextures();
+			createLayerBlendMaps();
 		}
 
 	}
@@ -1678,7 +1692,7 @@ namespace Ogre
 		}
 		// use utility method to update UV scaling
 		setLayerWorldSize(mLayers.size()-1, worldSize);
-		checkLayers();
+		checkLayers(true);
 		mMaterialDirty = true;
 
 	}
@@ -1703,6 +1717,9 @@ namespace Ogre
 		uint8 idx = layerIndex - 1;
 		if (!mLayerBlendMapList[idx])
 		{
+			if (mBlendTextureList.size() < idx / 4)
+				checkLayers(true);
+
 			const TexturePtr& tex = mBlendTextureList[idx / 4];
 			mLayerBlendMapList[idx] = OGRE_NEW TerrainLayerBlendMap(this, layerIndex, tex->getBuffer().getPointer());
 		}
@@ -1713,24 +1730,41 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	uint8 Terrain::getBlendTextureCount(uint8 numLayers)
 	{
-		return (numLayers - 1) / 4;
+		return ((numLayers - 1) / 4) + 1;
 	}
 	//---------------------------------------------------------------------
 	PixelFormat Terrain::getBlendTextureFormat(uint8 textureIndex, uint8 numLayers)
 	{
+		/*
 		if (numLayers - 1 - (textureIndex * 4) > 3)
 			return PF_BYTE_RGBA;
 		else
 			return PF_BYTE_RGB;
+		*/
+		// Always create RGBA; no point trying to create RGB since all cards pad to 32-bit (XRGB)
+		// and it makes it harder to expand layer count dynamically if format has to change
+		return PF_BYTE_RGBA;
 	}
 	//---------------------------------------------------------------------
 	void Terrain::createGPUBlendTextures()
 	{
 		// Create enough RGBA/RGB textures to cope with blend layers
 		uint8 numTex = getBlendTextureCount(getLayerCount());
-		mBlendTextureList.resize(numTex);
+		// delete extras
+		TextureManager* tmgr = TextureManager::getSingletonPtr();
+		if (!tmgr)
+			return;
 
-		for (uint8 i = 0; i < numTex; ++i)
+		while (mBlendTextureList.size() > numTex)
+		{
+			tmgr->remove(mBlendTextureList.back()->getHandle());			
+			mBlendTextureList.pop_back();
+		}
+
+		uint8 currentTex = (uint8)mBlendTextureList.size();
+		mBlendTextureList.resize(numTex);
+		// create new textures
+		for (uint8 i = currentTex; i < numTex; ++i)
 		{
 			PixelFormat fmt = getBlendTextureFormat(i, getLayerCount());
 			mBlendTextureList[i] = TextureManager::getSingleton().createManual(
@@ -1739,7 +1773,7 @@ namespace Ogre
 
 			mLayerBlendMapSizeActual = mBlendTextureList[i]->getWidth();
 
-			if (!mCpuBlendMapStorage.empty())
+			if (mCpuBlendMapStorage.size() > i)
 			{
 				// Load blend data
 				PixelBox src(mLayerBlendMapSize, mLayerBlendMapSize, 1, fmt, mCpuBlendMapStorage[i]);
@@ -1756,6 +1790,22 @@ namespace Ogre
 			}
 		}
 		mCpuBlendMapStorage.clear();
+
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::createLayerBlendMaps()
+	{
+		// delete extra blend layers (affects GPU)
+		while (mLayerBlendMapList.size() > mLayers.size() - 1)
+		{
+			OGRE_DELETE mLayerBlendMapList.back();
+			mLayerBlendMapList.pop_back();
+		}
+
+		// resize up or down (up initialises to 0, populate as necessary)
+		mLayerBlendMapList.resize(mLayers.size() - 1, 0);
+
 	}
 	//---------------------------------------------------------------------
 	void Terrain::createOrDestroyGPUNormalMap()
@@ -1785,12 +1835,6 @@ namespace Ogre
 		}
 		mCpuBlendMapStorage.clear();
 
-		for (TerrainLayerBlendMapList::iterator i = mLayerBlendMapList.begin(); 
-			i != mLayerBlendMapList.end(); ++i)
-		{
-			OGRE_DELETE *i;
-			*i = 0;
-		}
 	}
 	//---------------------------------------------------------------------
 	const TexturePtr& Terrain::getLayerBlendTexture(uint8 index)
@@ -2051,6 +2095,25 @@ namespace Ogre
 		OGRE_FREE(normalsBox->data, MEMCATEGORY_GENERAL);
 		OGRE_DELETE(normalsBox);
 
+	}
+	//---------------------------------------------------------------------
+	uint8 Terrain::getBlendTextureIndex(uint8 layerIndex) const
+	{
+		if (layerIndex == 0 || layerIndex-1 >= (uint8)mLayerBlendMapList.size())
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+			"Invalid layer index", "Terrain::getBlendTextureIndex");
+
+		return (layerIndex - 1) % 4;
+
+	}
+	//---------------------------------------------------------------------
+	const String& Terrain::getBlendTextureName(uint8 textureIndex) const
+	{
+		if (textureIndex >= (uint8)mBlendTextureList.size())
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+			"Invalid texture index", "Terrain::getBlendTextureName");
+		
+		return mBlendTextureList[textureIndex]->getName();
 	}
 
 

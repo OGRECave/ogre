@@ -140,9 +140,18 @@ namespace Ogre
 		TextureUnitState* tu = pass->createTextureUnitState();
 		tu->setTextureName(terrain->getTerrainNormalMap()->getName());
 
+		// blend maps
+		// TODO - determine the actual number
+		tu = pass->createTextureUnitState();
+		tu->setTextureName(terrain->getBlendTextureName(0));
+
+
 		// TODO - determine the number of texture units
+		// TODO - map in normal & specular
 		tu = pass->createTextureUnitState();
 		tu->setTextureName(terrain->getLayerTextureName(0, 0));
+		tu = pass->createTextureUnitState();
+		tu->setTextureName(terrain->getLayerTextureName(1, 0));
 
 		return mat;
 
@@ -233,7 +242,8 @@ namespace Ogre
 		params->setNamedAutoConstant("eyePosObjSpace", GpuProgramParameters::ACT_CAMERA_POSITION_OBJECT_SPACE);
 
 		// TODO: temp hack remove!
-		params->setNamedConstant("uvMul", terrain->getLayerUVMultiplier(0));
+		Vector4 uvMul(terrain->getLayerUVMultiplier(0), terrain->getLayerUVMultiplier(1), 0, 0);
+		params->setNamedConstant("uvMul", uvMul);
 		
 	}
 	//---------------------------------------------------------------------
@@ -361,9 +371,12 @@ namespace Ogre
 			"uniform float3 lightSpecularColour,\n"
 			"uniform float3 eyePosObjSpace,\n"
 			// TODO - remove this - iterate instead
-			"uniform float uvMul,\n"
+			"uniform float4 uvMul,\n"
 			"uniform sampler2D globalNormal : register(s0),\n"
-			"uniform sampler2D tex0 : register(s1)\n"
+			"uniform sampler2D blendTex0 : register(s1)\n"
+
+			", uniform sampler2D tex0 : register(s2)\n"
+			", uniform sampler2D tex1 : register(s3)\n"
 
 			") : COLOR\n"
 			"{\n"
@@ -384,8 +397,15 @@ namespace Ogre
 			"	float4 litRes = lit(dot(lightDir, normal), dot(halfAngle, normal), 30);\n"
 
 			// TODO - remove this - iterate instead
-			"	float2 uv0 = uv * uvMul;\n"
-			"	float3 diffuseTex = tex2D(tex0, uv0).rgb;\n"
+			"	float2 uv0 = uv * uvMul.x;\n"
+			"	float3 diffuseTex0 = tex2D(tex0, uv0).rgb;\n"
+			"	float2 uv1 = uv * uvMul.y;\n"
+			"	float3 diffuseTex1 = tex2D(tex1, uv0).rgb;\n"
+
+			// Blend 
+			"	float4 blend1to4 = tex2D(blendTex0, uv);\n"
+			"	float3 diffuseTex = diffuseTex0;\n"
+			"	diffuseTex = lerp(diffuseTex, diffuseTex1, blend1to4.x);\n"
 			// diffuse
 			"	outputCol.rgb += litRes.y * lightDiffuseColour * diffuseTex;\n"
 			// specular

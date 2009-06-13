@@ -51,7 +51,7 @@ namespace Ogre
 		PixelUtil::getBitShifts(fmt, rgbaShift);
 		mChannelOffset = rgbaShift[mChannel] / 8; // /8 to convert to bytes
 		// now invert since we're dealing with this in a bytewise, not uint32 fashion
-		mChannelOffset = 3 - mChannelOffset;
+		mChannelOffset = PixelUtil::getNumElemBytes(fmt) - mChannelOffset;
 
 		download();
 
@@ -159,7 +159,7 @@ namespace Ogre
 			mDirtyBox.left = std::min(mDirtyBox.left, (size_t)rect.left);
 			mDirtyBox.top = std::min(mDirtyBox.top, (size_t)rect.top);
 			mDirtyBox.right = std::max(mDirtyBox.right, (size_t)rect.right);
-			mDirtyBox.top = std::max(mDirtyBox.top, (size_t)rect.top);
+			mDirtyBox.bottom = std::max(mDirtyBox.bottom, (size_t)rect.bottom);
 		}
 		else
 		{
