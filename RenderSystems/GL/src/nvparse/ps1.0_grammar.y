@@ -14,7 +14,7 @@
 
 */
 
-void yyerror(char* s);
+void yyerror(const char* s);
 int yylex ( void );
 
 #ifdef _WIN32
@@ -308,7 +308,7 @@ Newlines :
 
 %%
 
-void yyerror(char* s)
+void yyerror(const char* s)
 {
 	errors.set("parser: syntax error", line_number);
 }

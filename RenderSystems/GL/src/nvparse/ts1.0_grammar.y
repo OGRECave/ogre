@@ -1,7 +1,7 @@
 %start WholeEnchilada
 %name-prefix="ts10_"
 %{
-void yyerror(char* s);
+void yyerror(const char* s);
 int yylex ( void );
 
 #ifdef _WIN32
@@ -298,7 +298,7 @@ CondDesc :	gequal
 
 
 %%
-void yyerror(char* s)
+void yyerror(const char* s)
 {
      errors.set("unrecognized token");
 }
