@@ -65,22 +65,24 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	Image::~Image()
 	{
+		freeMemory();
+	}
+	//---------------------------------------------------------------------
+	void Image::freeMemory()
+	{
 		//Only delete if this was not a dynamic image (meaning app holds & destroys buffer)
 		if( m_pBuffer && m_bAutoDelete )
 		{
 			OGRE_FREE(m_pBuffer, MEMCATEGORY_GENERAL);
 			m_pBuffer = NULL;
 		}
+
 	}
 
 	//-----------------------------------------------------------------------------
 	Image & Image::operator = ( const Image &img )
 	{
-		if( m_pBuffer && m_bAutoDelete )
-		{
-			OGRE_FREE(m_pBuffer, MEMCATEGORY_GENERAL);
-			m_pBuffer = NULL;
-		}
+		freeMemory();
 		m_uWidth = img.m_uWidth;
 		m_uHeight = img.m_uHeight;
 		m_uDepth = img.m_uDepth;
@@ -237,11 +239,7 @@ namespace Ogre {
 		size_t numFaces, size_t numMipMaps)
 	{
 
-		if( m_pBuffer && m_bAutoDelete )
-		{
-			OGRE_FREE(m_pBuffer, MEMCATEGORY_GENERAL);
-			m_pBuffer = NULL;
-		}
+		freeMemory();
 		// Set image metadata
 		m_uWidth = uWidth;
 		m_uHeight = uHeight;
@@ -381,11 +379,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	Image & Image::load(DataStreamPtr& stream, const String& type )
 	{
-		if( m_pBuffer && m_bAutoDelete )
-		{
-			OGRE_FREE(m_pBuffer, MEMCATEGORY_GENERAL);
-			m_pBuffer = NULL;
-		}
+		freeMemory();
 
 		Codec * pCodec = 0;
 		if (!type.empty())
@@ -431,6 +425,8 @@ namespace Ogre {
 		m_pBuffer = res.first->getPtr();
 		// Make sure stream does not delete
 		res.first->setFreeOnClose(false);
+		// make sure we delete
+		m_bAutoDelete = true;
 
 		return *this;
 	}
@@ -771,5 +767,133 @@ namespace Ogre {
         }
         return size;
     }
+	//---------------------------------------------------------------------
+	Image & Image::loadTwoImagesAsRGBA(const String& rgbFilename, const String& alphaFilename,
+		const String& groupName, PixelFormat fmt)
+	{
+		Image rgb, alpha;
+
+		rgb.load(rgbFilename, groupName);
+		alpha.load(alphaFilename, groupName);
+
+		return combineTwoImagesAsRGBA(rgb, alpha, fmt);
+
+	}
+	//---------------------------------------------------------------------
+	Image & Image::loadTwoImagesAsRGBA(DataStreamPtr& rgbStream, DataStreamPtr& alphaStream,
+		PixelFormat fmt, const String& rgbType, const String& alphaType)
+	{
+		Image rgb, alpha;
+
+		rgb.load(rgbStream, rgbType);
+		alpha.load(alphaStream, alphaType);
+
+		return combineTwoImagesAsRGBA(rgb, alpha, fmt);
+
+	}
+	//---------------------------------------------------------------------
+	Image & Image::combineTwoImagesAsRGBA(const Image& rgb, const Image& alpha, PixelFormat fmt)
+	{
+		// the images should be the same size, have the same number of mipmaps
+		if (rgb.getWidth() != alpha.getWidth() ||
+			rgb.getHeight() != alpha.getHeight() ||
+			rgb.getDepth() != alpha.getDepth())
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Images must be the same dimensions", "Image::combineTwoImagesAsRGBA");
+		}
+		if (rgb.getNumMipmaps() != alpha.getNumMipmaps() ||
+			rgb.getNumFaces() != alpha.getNumFaces())
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Images must have the same number of surfaces (faces & mipmaps)", 
+				"Image::combineTwoImagesAsRGBA");
+		}
+		// Format check
+		if (PixelUtil::getComponentCount(fmt) != 4)
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Target format must have 4 components", 
+				"Image::combineTwoImagesAsRGBA");
+		}
+		if (PixelUtil::isCompressed(fmt) || PixelUtil::isCompressed(rgb.getFormat()) 
+			|| PixelUtil::isCompressed(alpha.getFormat()))
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Compressed formats are not supported in this method", 
+				"Image::combineTwoImagesAsRGBA");
+		}
+
+		freeMemory();
+
+		m_uWidth = rgb.getWidth();
+		m_uHeight = rgb.getHeight();
+		m_uDepth = rgb.getDepth();
+		m_eFormat = fmt;
+		m_uNumMipmaps = rgb.getNumMipmaps();
+		size_t numFaces = rgb.getNumFaces();
+
+		// Set flags
+		m_uFlags = 0;
+		if (m_uDepth != 1)
+			m_uFlags |= IF_3D_TEXTURE;
+		if(numFaces == 6)
+			m_uFlags |= IF_CUBEMAP;
+
+		m_uSize = calculateSize(m_uNumMipmaps, numFaces, m_uWidth, m_uHeight, m_uDepth, m_eFormat);
+
+		m_ucPixelSize = static_cast<uchar>(PixelUtil::getNumElemBytes( m_eFormat ));
+
+		m_pBuffer = static_cast<uchar*>(OGRE_MALLOC(m_uSize, MEMCATEGORY_GENERAL));
+
+		// make sure we delete
+		m_bAutoDelete = true;
+
+
+		for (size_t face = 0; face < numFaces; ++face)
+		{
+			for (size_t mip = 0; mip <= m_uNumMipmaps; ++mip)
+			{
+				// convert the RGB first
+				PixelBox srcRGB = rgb.getPixelBox(face, mip);
+				PixelBox dst = getPixelBox(face, mip);
+				PixelUtil::bulkPixelConversion(srcRGB, dst);
+
+				// now selectively add the alpha
+				PixelBox srcAlpha = alpha.getPixelBox(face, mip);
+				uchar* psrcAlpha = static_cast<uchar*>(srcAlpha.data);
+				uchar* pdst = static_cast<uchar*>(dst.data);
+				for (size_t d = 0; d < m_uDepth; ++d)
+				{
+					for (size_t y = 0; y < m_uHeight; ++y)
+					{
+						for (size_t x = 0; x < m_uWidth; ++x)
+						{
+							ColourValue colRGBA, colA;
+							// read RGB back from dest to save having another pointer
+							PixelUtil::unpackColour(&colRGBA, m_eFormat, pdst);
+							PixelUtil::unpackColour(&colA, alpha.getFormat(), psrcAlpha);
+
+							// combine RGB from alpha source texture
+							colRGBA.a = (colA.r + colA.g + colA.b) / 3.0;
+
+							PixelUtil::packColour(colRGBA, m_eFormat, pdst);
+							
+							psrcAlpha += PixelUtil::getNumElemBytes(alpha.getFormat());
+							pdst += PixelUtil::getNumElemBytes(m_eFormat);
+
+						}
+					}
+				}
+				
+
+			}
+		}
+
+		return *this;
+
+	}
+	//---------------------------------------------------------------------
+
     
 }
