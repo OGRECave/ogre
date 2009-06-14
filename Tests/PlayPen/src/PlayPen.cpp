@@ -7935,11 +7935,11 @@ protected:
 		// textures
 		imp.layerList.resize(2);
 		imp.layerList[0].worldSize = 100;
-		imp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.png");
-		imp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.png");
+		imp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
+		imp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
 		imp.layerList[1].worldSize = 20;
-		imp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.png");
-		imp.layerList[1].textureNames.push_back("grass_green-01_normalheight.png");
+		imp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
+		imp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
 		mTerrain->prepare(imp);
 		mTerrain->load();
 

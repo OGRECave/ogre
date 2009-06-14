@@ -471,16 +471,24 @@ namespace Ogre
 		outStream << "	float2 uv" << layer << " = uv * uvMul" << uvIdx 
 			<< "." << getChannel(layer) << ";\n";
 		// sample diffuse texture
-		outStream << "	float3 diffuseTex" << layer 
-			<< " = tex2D(difftex" << layer << ", uv" << layer << ").rgb;\n";
+		outStream << "	float4 diffuseSpecTex" << layer 
+			<< " = tex2D(difftex" << layer << ", uv" << layer << ");\n";
 		// apply to common
 		if (!layer)
-			outStream << "	diffuse = diffuseTex0;\n";
+		{
+			outStream << "	diffuse = diffuseSpecTex0.rgb;\n";
+			// TODO - check: if (isLayerSpecularMappingEnabled())
+				outStream << "	specular = diffuseSpecTex0.a;\n";
+		}
 		else
 		{
 			uint blendIdx = (layer-1) / 4;
-			outStream << "	diffuse = lerp(diffuse, diffuseTex" << layer 
-				<< ", blendTexVal" << blendIdx << "." << getChannel(layer-1) << ");\n";
+			outStream << "	diffuse = lerp(diffuse, diffuseSpecTex" << layer 
+				<< ".rgb, blendTexVal" << blendIdx << "." << getChannel(layer-1) << ");\n";
+			// TODO - check: if (isLayerSpecularMappingEnabled())
+				outStream << "	specular = lerp(specular, diffuseSpecTex" << layer 
+					<< ".a, blendTexVal" << blendIdx << "." << getChannel(layer-1) << ");\n";
+
 		}
 	}
 	//---------------------------------------------------------------------
@@ -505,7 +513,7 @@ namespace Ogre
 		outStream << "	outputCol.rgb += litRes.y * lightDiffuseColour * diffuse;\n";
 
 		// specular lighting
-		outStream << "	outputCol.rgb += litRes.z * lightSpecularColour;\n";
+		outStream << "	outputCol.rgb += litRes.z * lightSpecularColour * specular;\n";
 
 		// Final return
 		outStream << "	return outputCol;\n"
