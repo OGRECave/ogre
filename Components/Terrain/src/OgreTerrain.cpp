@@ -773,17 +773,17 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	float Terrain::getHeightAtPoint(long x, long y)
 	{
+		// clamp
+		x = std::min(x, (long)mSize - 1L);
+		x = std::max(x, 0L);
+		y = std::min(y, (long)mSize - 1L);
+		y = std::max(y, 0L);
+
 		return *getHeightData(x, y);
 	}
 	//---------------------------------------------------------------------
 	float Terrain::getHeightAtTerrainPosition(Real x, Real y)
 	{
-		// clamp
-		x = std::min(x, (Real)1.0);
-		x = std::max(x, (Real)0.0);
-		y = std::min(y, (Real)1.0);
-		y = std::max(y, (Real)0.0);
-
 		// get left / bottom points (rounded down)
 		Real factor = mSize - 1;
 		Real invFactor = 1.0 / factor;
@@ -1731,6 +1731,11 @@ namespace Ogre
 	uint8 Terrain::getBlendTextureCount(uint8 numLayers)
 	{
 		return ((numLayers - 1) / 4) + 1;
+	}
+	//---------------------------------------------------------------------
+	uint8 Terrain::getBlendTextureCount() const
+	{
+		return (uint8)mBlendTextureList.size();
 	}
 	//---------------------------------------------------------------------
 	PixelFormat Terrain::getBlendTextureFormat(uint8 textureIndex, uint8 numLayers)

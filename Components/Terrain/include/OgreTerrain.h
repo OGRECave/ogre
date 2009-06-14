@@ -814,6 +814,9 @@ namespace Ogre
 		*/
 		uint8 getBlendTextureIndex(uint8 layerIndex) const;
 
+		/// Get the number of blend textures in use
+		uint8 getBlendTextureCount() const;
+
 
 		/** Get the name of the packed blend texture at a specific index.
 		@param textureIndex This is the blend texture index, not the layer index
