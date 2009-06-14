@@ -1658,6 +1658,7 @@ namespace Ogre{
 										(*i2)->getValue() + " is not a valid colour");
 									break;
 								}
+								++i2;
 							}
 
 							if(i2 != prop->values.end())
