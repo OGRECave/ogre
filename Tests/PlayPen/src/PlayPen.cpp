@@ -42,6 +42,8 @@ Description: Somewhere to play in the sand...
 #include "OgreErrorDialog.h"
 #include "OgreFontManager.h"
 #include "OgreDistanceLodStrategy.h"
+#include "OgreTerrain.h"
+#include "OgreTerrainQuadTreeNode.h"
 // Static plugins declaration section
 // Note that every entry in here adds an extra header / library dependency
 #ifdef OGRE_STATIC_LIB
@@ -116,6 +118,8 @@ CompositorInstance* compositorToSwitch = 0;
 int compositorSchemeIndex = 0;
 StringVector compositorSchemeList;
 GpuSharedParametersPtr testSharedParams;
+Terrain* mTerrain = 0;
+Quaternion quat1, quat2;
 
 class RefractionTextureListener : public RenderTargetListener
 {
@@ -265,6 +269,16 @@ public:
 			scissorRect->end();
 
 
+		}
+
+		if (mTerrain)
+		{
+			TerrainQuadTreeNode* quad = mTerrain->getQuadTree();
+			while (!quad->isLeaf())
+				quad = quad->getChild(0);
+
+			mDebugText = "LOD: " + StringConverter::toString(quad->getCurrentLod()) 
+				+ " Transition: " + StringConverter::toString(quad->getLodTransition());
 		}
 
 		return ret;
@@ -2781,6 +2795,9 @@ protected:
         //pEnt->setMaterialName("2 - Default");
         mTestNode[1]->attachObject( pEnt );
         mTestNode[1]->translate(0,-100,0);
+
+		quat1 = Quaternion::IDENTITY;
+		quat2.FromAngleAxis(Degree(360), Vector3::UNIT_Y);
 
         pEnt = mSceneMgr->createEntity( "3", "knot.mesh" );
         mTestNode[2] = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-200, 0, -200));
@@ -7851,6 +7868,119 @@ protected:
 
 	}
 
+	void testImageCombine()
+	{
+		Image combined;
+		
+		// pick 2 files that are the same size, alpha texture will be made greyscale
+		combined.loadTwoImagesAsRGBA("rockwall.tga", "flare.png", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, PF_BYTE_RGBA);
+
+		TexturePtr tex = TextureManager::getSingleton().createManual("1", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 256, 256, 1, 0, PF_BYTE_RGBA);
+		tex->loadImage(combined);
+
+		MaterialManager& mmgr = MaterialManager::getSingleton();
+		MaterialPtr mat = mmgr.create("m1", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		Pass* pass = mat->getTechnique(0)->getPass(0);
+		pass->setLightingEnabled(false);
+		pass->setCullingMode(CULL_NONE);
+		pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);
+		pass->setDepthWriteEnabled(false);
+		pass->createTextureUnitState(tex->getName());
+
+		Entity *e = mSceneMgr->createEntity("test", SceneManager::PT_PLANE);
+		e->setMaterialName(mat->getName());
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
+
+		mCamera->setPosition(0, 0, 200);
+		mCamera->lookAt(Vector3::ZERO);
+
+		mWindow->getViewport(0)->setBackgroundColour(ColourValue::Blue);
+
+	}
+
+	void testNewTerrain()
+	{
+		LogManager::getSingleton().setLogDetail(LL_BOREME);
+
+		// Until material implemented
+		TerrainGlobalOptions::setMaxPixelError(8);
+		//TerrainGlobalOptions::setUseRayBoxDistanceCalculation(true);
+
+		Light* l = mSceneMgr->createLight("tstLight");
+		l->setType(Light::LT_DIRECTIONAL);
+		Vector3 dir(0.55, -1, 0.75);
+		dir.normalise();
+		l->setDirection(dir);
+		l->setDiffuseColour(ColourValue::White);
+		l->setSpecularColour(ColourValue(0.4, 0.4, 0.4));
+
+		mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
+
+		mTerrain = OGRE_NEW Terrain(mSceneMgr);
+
+		//mSceneMgr->showBoundingBoxes(true);
+
+		Image img;
+		img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		//img.load("terrain_flattened.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+		Terrain::ImportData imp;
+		imp.inputImage = &img;
+		imp.terrainSize = 513;
+		imp.worldSize = 4000;
+		imp.inputScale = 400;
+		imp.minBatchSize = 33;
+		imp.maxBatchSize = 65;
+		// textures
+		imp.layerList.resize(2);
+		imp.layerList[0].worldSize = 100;
+		imp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.png");
+		imp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.png");
+		imp.layerList[1].worldSize = 20;
+		imp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.png");
+		imp.layerList[1].textureNames.push_back("grass_green-01_normalheight.png");
+		mTerrain->prepare(imp);
+		mTerrain->load();
+
+		TerrainLayerBlendMap* blendMap = mTerrain->getLayerBlendMap(1);
+		for (size_t y = 0; y < 50; ++y)
+		{
+			for (size_t x = 0; x < 50; ++x)
+			{
+				float val = Math::Sqrt(x*x + y*y);
+				val = val - 20.0f;
+				val /= 25.0f;
+				val = std::min(1.0f, val);
+				val = std::max(0.0f, val);
+
+				blendMap->setBlendValue(x, y, 255 - (val * 255));
+
+
+			}
+		}
+		blendMap->update();
+
+		addTextureDebugOverlay(TextureManager::getSingleton().getByName(mTerrain->getBlendTextureName(0)), 0);
+
+
+
+		mWindow->getViewport(0)->setBackgroundColour(ColourValue::Blue);
+
+		// create a few entities on the terrain
+		for (int i = 0; i < 20; ++i)
+		{
+			Entity* e = mSceneMgr->createEntity("ninja.mesh");
+			Real x = Math::RangeRandom(-2500, 2500);
+			Real z = Math::RangeRandom(-2500, 2500);
+			Real y = mTerrain->getHeightAtWorldPosition(Vector3(x, 0, z));
+			mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(x, y, z))->attachObject(e);
+		}
+		mCamera->setPosition(-2400,300,-2400);
+		mCamera->lookAt(Vector3::ZERO);
+
+	}
+
 	void createScene(void)
     {
 
@@ -7890,6 +8020,8 @@ protected:
 
 		Any anyString(String("test"));
 
+		LogManager::getSingleton().setLogDetail(LL_BOREME);
+
 		//testLiSPSM();
 		//testBug();
 		//testSharedPtrBug();
@@ -7915,7 +8047,7 @@ protected:
 		//testInfiniteAAB();
 
         //testProjection();
-        testStencilShadows(SHADOWTYPE_STENCIL_ADDITIVE, true, true);
+        //testStencilShadows(SHADOWTYPE_STENCIL_ADDITIVE, true, true);
         //testStencilShadows(SHADOWTYPE_STENCIL_MODULATIVE, false, true);
         //testTextureShadows(SHADOWTYPE_TEXTURE_ADDITIVE, true);
 		//testTextureShadows(SHADOWTYPE_TEXTURE_MODULATIVE, true);
@@ -7945,7 +8077,7 @@ protected:
 		//testSimpleMesh();
 		//test2Windows();
 		//testStaticGeometry();
-		testStaticGeometryWithLOD(true);
+		//testStaticGeometryWithLOD(true);
 		//testBillboardTextureCoords();
 		//testBillboardOrigins();
 		//testReloadResources();
@@ -8024,11 +8156,42 @@ protected:
 
         //testLod();
 		//testSharedGpuParameters();
+		testNewTerrain();
+		//testImageCombine();
 
 
+		/*
+		Image combined;
+		combined.loadTwoImagesAsRGBA("dirt_grayrocky_DIFFUSE.png", "dirt_grayrocky_SPECULAR.png", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, PF_BYTE_RGBA);
 
+		combined.save("dirt_grayrocky_diffusespecular.png");
 
+		combined.loadTwoImagesAsRGBA("dirt_grayrocky_NORMAL.png", "dirt_grayrocky_DISP.png", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, PF_BYTE_RGBA);
+
+		combined.save("dirt_grayrocky_normalheight.png");
+
+		combined.loadTwoImagesAsRGBA("grass_green-01_DIFFUSE.png", "grass_green-01_SPECULAR.png", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, PF_BYTE_RGBA);
+
+		combined.save("grass_green-01_diffusespecular.png");
+
+		combined.loadTwoImagesAsRGBA("grass_green-01_NORMAL.png", "grass_green-01_DISP.png", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, PF_BYTE_RGBA);
+
+		combined.save("grass_green-01_normalheight.png");
 		
+		combined.loadTwoImagesAsRGBA("growth_weirdfungus-03_DIFFUSE.png", "growth_weirdfungus-03_SPECULAR.png", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, PF_BYTE_RGBA);
+
+		combined.save("growth_weirdfungus-03_diffusespecular.png");
+
+		combined.loadTwoImagesAsRGBA("growth_weirdfungus-03_NORMAL.png", "growth_weirdfungus-03_DISP.png", 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, PF_BYTE_RGBA);
+
+		combined.save("growth_weirdfungus-03_normalheight.png");
+		*/
     }
     // Create new frame listener
     void createFrameListener(void)

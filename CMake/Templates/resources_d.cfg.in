@@ -10,6 +10,7 @@ FileSystem=@OGRE_MEDIA_DIR_DBG@/fonts
 FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/programs
 FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/scripts
 FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/textures
+FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/textures/nvidia
 FileSystem=@OGRE_MEDIA_DIR_DBG@/models
 FileSystem=@OGRE_MEDIA_DIR_DBG@/overlays
 FileSystem=@OGRE_MEDIA_DIR_DBG@/particle
