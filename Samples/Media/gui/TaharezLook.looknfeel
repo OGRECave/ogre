@@ -3303,8 +3303,8 @@
     ***************************************************
     -->
     <WidgetLook name="TaharezLook/TabContentPane">
-        <PropertyDefinition name="EnableTop" initialValue="0" redrawOnWrite="true" layoutOnwrite="true" />
-        <PropertyDefinition name="EnableBottom" initialValue="0" redrawOnWrite="true" layoutOnwrite="true" />
+        <PropertyDefinition name="EnableTop" initialValue="0" redrawOnWrite="true" layoutOnWrite="true" />
+        <PropertyDefinition name="EnableBottom" initialValue="0" redrawOnWrite="true" layoutOnWrite="true" />
         <ImagerySection name="normal">
             <FrameComponent>
                 <Area>
@@ -3392,8 +3392,8 @@
     ***************************************************
     -->
     <WidgetLook name="TaharezLook/TabButtonPane">
-        <PropertyDefinition name="EnableTop" initialValue="1" redrawOnWrite="true" layoutOnwrite="true" />
-        <PropertyDefinition name="EnableBottom" initialValue="1" redrawOnWrite="true" layoutOnwrite="true" />
+        <PropertyDefinition name="EnableTop" initialValue="1" redrawOnWrite="true" layoutOnWrite="true" />
+        <PropertyDefinition name="EnableBottom" initialValue="1" redrawOnWrite="true" layoutOnWrite="true" />
         <ImagerySection name="normal">
             <FrameComponent>
                 <Area>
@@ -3483,14 +3483,14 @@
                 <Dim type="TopEdge">
                     <PropertyDim widget="__auto_TabPane__" name="EnableBottom">
                         <DimOperator op="Multiply">
-                            <PropertyDim name="TabHeight" type="Height" />
+                            <PropertyDim name="TabHeight" />
                         </DimOperator>
                     </PropertyDim>
                 </Dim>
                 <Dim type="Height">
                     <UnifiedDim scale="1" type="Height">
                         <DimOperator op="Subtract">
-                            <PropertyDim name="TabHeight" type="Height" />
+                            <PropertyDim name="TabHeight" />
                         </DimOperator>
                     </UnifiedDim>
                 </Dim>
@@ -3505,13 +3505,15 @@
                         <DimOperator op="Multiply">
                             <UnifiedDim scale="1" type="Height">
                                 <DimOperator op="Subtract">
-                                    <PropertyDim name="TabHeight" type="Height" />
+                                    <PropertyDim name="TabHeight" />
                                 </DimOperator>
                             </UnifiedDim>
                         </DimOperator>
                     </PropertyDim>
                 </Dim>
-                <Dim type="Height"><PropertyDim name="TabHeight" type="Height" /></Dim>
+                <Dim type="Height"> 
+                    <PropertyDim name="TabHeight" />
+                </Dim>
             </Area>
         </Child>
         <Child type="TaharezLook/SystemButton" nameSuffix="__auto_TabPane__ScrollLeft">
@@ -3563,7 +3565,7 @@
                 <Dim type="TopEdge">
                     <WidgetDim widget="__auto_TabPane__Buttons" dimension="TopEdge" />
                 </Dim>
-                <Dim type="Height"><AbsoluteDim value="0" />
+                <Dim type="Height"><!--AbsoluteDim value="0" /-->
                     <WidgetDim widget="__auto_TabPane__Buttons" dimension="Height" />
                 </Dim>
             </Area>
