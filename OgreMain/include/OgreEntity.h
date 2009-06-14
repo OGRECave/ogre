@@ -195,6 +195,8 @@ namespace Ogre {
         int mSoftwareAnimationRequests;
         /// Counter indicating number of requests for software blended normals.
         int mSoftwareAnimationNormalsRequests;
+		/// Flag indicating whether to skip automatic updating of the Skeleton's AnimationState
+		bool mSkipAnimStateUpdates;
 
 
 		/// The LOD number of the mesh to use, calculated by _notifyCurrentCamera
@@ -760,6 +762,20 @@ namespace Ogre {
 
         /** Get the lod strategy transformation of the mesh lod factor. */
         Real _getMeshLodFactorTransformed() const;
+		
+		/** Entity's skeleton's AnimationState will not be automatically updated when set to true.
+			Useful if you wish to handle AnimationState updates manually.
+		*/
+		void setSkipAnimationStateUpdate(bool skip) {
+			mSkipAnimStateUpdates = skip;
+		}
+		
+		/** Entity's skeleton's AnimationState will not be automatically updated when set to true.
+		 Useful if you wish to handle AnimationState updates manually.
+		 */
+		bool getSkipAnimationStateUpdate() const {
+			return mSkipAnimStateUpdates;
+		}
 
 
 	};

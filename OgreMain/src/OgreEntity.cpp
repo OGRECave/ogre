@@ -86,7 +86,8 @@ namespace Ogre {
 		  mInitialised(false),
 		  mLastParentXform(Matrix4::ZERO),
 		  mMeshStateCount(0),
-          mFullBoundingBox()
+          mFullBoundingBox(),
+		  mSkipAnimStateUpdates(false)
     {
     }
     //-----------------------------------------------------------------------
@@ -121,7 +122,8 @@ namespace Ogre {
 		mInitialised(false),
 		mLastParentXform(Matrix4::ZERO),
 		mMeshStateCount(0),
-        mFullBoundingBox()
+        mFullBoundingBox(),
+		mSkipAnimStateUpdates(false)
 	{
 		_initialise();
     }
@@ -1144,7 +1146,8 @@ namespace Ogre {
         unsigned long currentFrameNumber = root.getNextFrameNumber();
         if (*mFrameBonesLastUpdated  != currentFrameNumber) {
 
-            mSkeletonInstance->setAnimationState(*mAnimationState);
+			if (!mSkipAnimStateUpdates)
+	            mSkeletonInstance->setAnimationState(*mAnimationState);
             mSkeletonInstance->_getBoneMatrices(mBoneMatrices);
             *mFrameBonesLastUpdated  = currentFrameNumber;
         }
