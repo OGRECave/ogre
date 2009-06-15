@@ -153,28 +153,31 @@ namespace Ogre {
 	{
 		if (!mLinked)
 		{
-			// Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
-			// and end up aliasing existing built-ins. So avoid! 
-			// Bind all used attribs - not all possible ones otherwise we'll get 
-			// lots of warnings in the log, and also may end up aliasing names used
-			// as varyings by accident
-			// Because we can't ask GL whether an attribute is used in the shader
-			// until it is linked (chicken and egg!) we have to parse the source
-			
-			size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
-			const String& vpSource = mVertexProgram->getGLSLProgram()->getSource();
-			for (size_t i = 0; i < numAttribs; ++i)
+			if (mVertexProgram)
 			{
-				const CustomAttribute& a = msCustomAttributes[i];
+				// Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
+				// and end up aliasing existing built-ins. So avoid! 
+				// Bind all used attribs - not all possible ones otherwise we'll get 
+				// lots of warnings in the log, and also may end up aliasing names used
+				// as varyings by accident
+				// Because we can't ask GL whether an attribute is used in the shader
+				// until it is linked (chicken and egg!) we have to parse the source
 				
-				// we're looking for 'attribute vec<n> <semantic_name>'
-				// be slightly flexible about formatting
-				String::size_type pos = vpSource.find(a.name);
-				if (pos != String::npos)
+				size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
+				const String& vpSource = mVertexProgram->getGLSLProgram()->getSource();
+				for (size_t i = 0; i < numAttribs; ++i)
 				{
-					String::size_type startpos = vpSource.find("attribute", pos-20);
-					if (startpos != String::npos && startpos < pos)
-						glBindAttribLocationARB(mGLHandle, a.attrib, a.name.c_str());
+					const CustomAttribute& a = msCustomAttributes[i];
+					
+					// we're looking for 'attribute vec<n> <semantic_name>'
+					// be slightly flexible about formatting
+					String::size_type pos = vpSource.find(a.name);
+					if (pos != String::npos)
+					{
+						String::size_type startpos = vpSource.find("attribute", pos-20);
+						if (startpos != String::npos && startpos < pos)
+							glBindAttribLocationARB(mGLHandle, a.attrib, a.name.c_str());
+					}
 				}
 			}
 

@@ -38,6 +38,6 @@ typedef struct IFDEFINFO
 typedef void (*MACROFUNCTIONPTR)(char *, unsigned int *, char **);
 
 typedef struct MACROFUNCTIONS {
-	char *name;
+	const char *name;
 	MACROFUNCTIONPTR function;
 } MACROFUNCTIONS;

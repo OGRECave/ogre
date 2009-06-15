@@ -1,7 +1,7 @@
 %start VS10Program
 %name-prefix="vs10_"
 %{
-void yyerror(char *s);
+void yyerror(const char *s);
 int yylex(void);
 
 #include <math.h>
@@ -14,7 +14,7 @@ int yylex(void);
 
 //extern bool gbTempInsideMacro;
 //extern unsigned int &base_linenumber;
-void LexError(char *format, ...);
+void LexError(const char *format, ...);
 extern int line_incr;
 
 #define do_linenum_incr()		{ line_number+=line_incr; line_incr = 0; }
@@ -448,7 +448,7 @@ TRIop: MAD_INSTR
 
 
 %%
-void yyerror(char* s)
+void yyerror(const char* s)
 {
     LexError( "Syntax Error.\n" );
     //errors.set(s);

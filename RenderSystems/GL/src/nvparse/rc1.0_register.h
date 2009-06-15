@@ -125,8 +125,8 @@ class MappedRegisterStruct {
 public:
 	void Init(RegisterEnum _reg, int _map = GL_UNSIGNED_IDENTITY_NV)
 	{
-		if (RCP_ONE == _reg.bits.name) {
-			_reg.bits.name = RCP_ZERO;
+		if (RCP_ONE == _reg.word) {
+			_reg.word = RCP_ZERO;
 			switch (_map) {
 			case GL_UNSIGNED_IDENTITY_NV:
 				_map = GL_UNSIGNED_INVERT_NV;

@@ -126,7 +126,7 @@ Torus Knot Software Ltd.
 
 */
 
-void yyerror(char* s);
+void yyerror(const char* s);
 int yylex ( void );
 
 #ifdef _WIN32
@@ -1549,7 +1549,7 @@ yyreturn:
 #line 309 "ps1.0_grammar.y"
 
 
-void yyerror(char* s)
+void yyerror(const char* s)
 {
 	errors.set("parser: syntax error", line_number);
 }

@@ -165,7 +165,7 @@ Torus Knot Software Ltd.
 /* Copy the first part of user declarations.  */
 #line 3 "rc1.0_grammar.y"
 
-void yyerror(char* s);
+void yyerror(const char* s);
 int yylex ( void );
 
 #ifdef _WIN32
@@ -2316,7 +2316,7 @@ yyreturn:
 
 #line 679 "rc1.0_grammar.y"
 
-void yyerror(char* s)
+void yyerror(const char* s)
 {
      errors.set("unrecognized token");
 }

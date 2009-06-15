@@ -534,7 +534,7 @@ namespace Ogre
 		
 		if(width != 0 && height != 0)
 		{
-			if (mIsTopLevel)
+			if (!mIsExternal)
 			{
 				XResizeWindow(mGLSupport->getXDisplay(), mWindow, width, height);
 			}

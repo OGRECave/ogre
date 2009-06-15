@@ -238,8 +238,8 @@ namespace Ogre {
         if(GLEW_VERSION_1_4 || GLEW_SGIS_generate_mipmap)
         {
 			bool disableAutoMip = false;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-			// Apple ATI drivers have faults in hardware mipmap generation
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+			// Apple & Linux ATI drivers have faults in hardware mipmap generation
 			if (rsc->getVendor() == GPU_ATI)
 				disableAutoMip = true;
 #endif
@@ -1353,11 +1353,18 @@ namespace Ogre {
 			val[1] = linear * correction;
 			val[2] = quadratic * correction;
 			val[3] = 1;
+			
+			if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
+				glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+			
+			
 		} 
 		else 
 		{
 			if (maxSize == 0.0f)
 				maxSize = mCurrentCapabilities->getMaxPointSize();
+			if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
+				glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
 		}
 		
 		// no scaling required

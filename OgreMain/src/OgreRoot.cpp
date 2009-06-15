@@ -1068,8 +1068,8 @@ namespace Ogre {
         if (!mActiveRenderer)
         {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-            "Cannot create window - no render "
-            "system has been selected.", "Root::destroyRenderWindow");
+            "Cannot detach target - no render "
+            "system has been selected.", "Root::detachRenderTarget");
         }
 
         mActiveRenderer->detachRenderTarget( target->getName() );
@@ -1080,8 +1080,8 @@ namespace Ogre {
         if (!mActiveRenderer)
         {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-            "Cannot create window - no render "
-            "system has been selected.", "Root::destroyRenderWindow");
+            "Cannot detach target - no render "
+            "system has been selected.", "Root::detachRenderTarget");
         }
 
         mActiveRenderer->detachRenderTarget( name );
@@ -1092,8 +1092,8 @@ namespace Ogre {
         if (!mActiveRenderer)
         {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-            "Cannot create window - no render "
-            "system has been selected.", "Root::getRenderWindow");
+            "Cannot get target - no render "
+            "system has been selected.", "Root::getRenderTarget");
         }
 
         return mActiveRenderer->getRenderTarget(name);
