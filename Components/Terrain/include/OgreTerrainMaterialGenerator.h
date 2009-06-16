@@ -161,14 +161,17 @@ namespace Ogre
 		class _OgreTerrainExport Profile : public TerrainAlloc
 		{
 		protected:
+			TerrainMaterialGenerator* mParent;
 			String mName;
 			String mDesc;
 		public:
-			Profile(const String& name, const String& desc)
-				: mName(name), mDesc(desc) {}
+			Profile(TerrainMaterialGenerator* parent, const String& name, const String& desc)
+				: mParent(parent), mName(name), mDesc(desc) {}
 			Profile(const Profile& prof) 
-				: mName(prof.mName), mDesc(prof.mDesc) {}
+				: mParent(prof.mParent), mName(prof.mName), mDesc(prof.mDesc) {}
 			virtual ~Profile() {}
+			/// Get the generator which owns this profile
+			TerrainMaterialGenerator* getParent() const { return mParent; }
 			/// Get the name of this profile
 			const String& getName() const { return mName; }
 			/// Get the description of this profile
@@ -183,7 +186,7 @@ namespace Ogre
 		};
 
 		TerrainMaterialGenerator() 
-			: mActiveProfile(0), mProfileChangeCounter(0) {}
+			: mActiveProfile(0), mChangeCounter(0) {}
 		virtual ~TerrainMaterialGenerator()
 		{
 			for (ProfileList::iterator i = mProfiles.begin(); i != mProfiles.end(); ++i)
@@ -220,7 +223,7 @@ namespace Ogre
 			if (mActiveProfile != p)
 			{
 				mActiveProfile = p;
-				++mProfileChangeCounter;
+				_markChanged();
 			}
 		}
 		/// Get the active profile
@@ -233,11 +236,13 @@ namespace Ogre
 			return mActiveProfile; 
 		}
 
-		/** Returns the number of times an active profile has been changed.
-		This can be used to determine if the profile has changed since a material
-		was last generated.
+		/// Internal method - indicates that a change has been made that would require material regeneration
+		void _markChanged() { ++mChangeCounter; }
+
+		/** Returns the number of times the generator has undergone a change which 
+			would require materials to be regenerated.
 		*/
-		unsigned long long int getProfileChangeCount() const { return mProfileChangeCounter; }
+		unsigned long long int getChangeCount() const { return mChangeCounter; }
 
 		/** Get the layer declaration that this material generator operates with.
 		*/
@@ -276,7 +281,7 @@ namespace Ogre
 
 		ProfileList mProfiles;
 		mutable Profile* mActiveProfile;
-		unsigned long long int mProfileChangeCounter;
+		unsigned long long int mChangeCounter;
 		TerrainLayerDeclaration mLayerDecl;
 
 

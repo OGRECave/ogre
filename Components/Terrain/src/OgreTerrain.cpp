@@ -1625,12 +1625,12 @@ namespace Ogre
 	const MaterialPtr& Terrain::getMaterial() const
 	{
 		if (mMaterial.isNull() || 
-			mMaterialGenerator->getProfileChangeCount() != mMaterialGenerationCount ||
+			mMaterialGenerator->getChangeCount() != mMaterialGenerationCount ||
 			mMaterialDirty)
 		{
 			mMaterial = mMaterialGenerator->generate(this);
 			mMaterial->load();
-			mMaterialGenerationCount = mMaterialGenerator->getProfileChangeCount();
+			mMaterialGenerationCount = mMaterialGenerator->getChangeCount();
 			mMaterialDirty = false;
 		}
 
