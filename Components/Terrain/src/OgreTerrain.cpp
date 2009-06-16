@@ -790,14 +790,19 @@ namespace Ogre
 
 		long startX = x * factor;
 		long startY = y * factor;
-		long endX = std::min(startX + 1, (long)mSize-1);
-		long endY = std::min(startY + 1, (long)mSize-1);
+		long endX = startX + 1;
+		long endY = startY + 1;
 
 		// now get points in terrain space (effectively rounding them to boundaries)
+		// note that we do not clamp! We need a valid plane
 		Real startXTS = startX * invFactor;
 		Real startYTS = startY * invFactor;
 		Real endXTS = endX * invFactor;
 		Real endYTS = endY * invFactor;
+
+		// now clamp
+		endX = std::min(endX, (long)mSize-1);
+		endY = std::min(endY, (long)mSize-1);
 
 		// get parametric from start coord to next point
 		Real xParam = (x - startXTS) / invFactor;

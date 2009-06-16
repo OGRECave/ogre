@@ -136,6 +136,17 @@ namespace Ogre
 		*outY = y / (Real)(mBuffer->getHeight() - 1);
 	}
 	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::convertImageToTerrainSpace(size_t x, size_t y, Real* outX, Real* outY)
+	{
+		convertImageToUVSpace(x, y, outX, outY);
+		*outY = 1.0 - *outY;
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::convertTerrainToImageSpace(Real x, Real y, size_t* outX, size_t* outY)
+	{
+		convertUVToImageSpace(x, 1.0 - y, outX, outY);
+	}
+	//---------------------------------------------------------------------
 	uint8 TerrainLayerBlendMap::getBlendValue(size_t x, size_t y)
 	{
 		return *(mData + y * mBuffer->getWidth() + x);
@@ -151,6 +162,15 @@ namespace Ogre
 	uint8* TerrainLayerBlendMap::getBlendPointer()
 	{
 		return mData;
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::dirty()
+	{
+		Rect rect;
+		rect.top = 0; rect.bottom = mBuffer->getHeight();
+		rect.left = 0; rect.right = mBuffer->getWidth();
+		dirtyRect(rect);
+
 	}
 	//---------------------------------------------------------------------
 	void TerrainLayerBlendMap::dirtyRect(const Rect& rect)

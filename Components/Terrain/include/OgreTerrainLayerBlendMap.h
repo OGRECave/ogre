@@ -109,6 +109,12 @@ namespace Ogre
 		/** Convert image space (0, imageSize) to local space values (0,1).
 		*/
 		void convertImageToUVSpace(size_t x, size_t y, Real* outX, Real* outY);
+		/** Convert image space (0, imageSize) to terrain space values (0,1).
+		*/
+		void convertImageToTerrainSpace(size_t x, size_t y, Real* outX, Real* outY);
+		/** Convert terrain space values (0,1) to image space (0, imageSize).
+		*/
+		void convertTerrainToImageSpace(Real x, Real y, size_t* outX, size_t* outY);
 
 		/** Get a single value of blend information, in image space.
 		@param x,y Coordinates of the point of data to get, in image space (top down)
@@ -129,6 +135,10 @@ namespace Ogre
 			if you want those changes to be recognised. 
 		*/
 		uint8* getBlendPointer();
+
+		/** Indicate that all of the blend data is dirty and needs updating.
+		*/
+		void dirty();
 
 		/** Indicate that a portion of the blend data is dirty and needs updating.
 		@param rect Rectangle in image space
