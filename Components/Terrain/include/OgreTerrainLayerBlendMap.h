@@ -33,9 +33,11 @@ Torus Knot Software Ltd.
 #include "OgreTerrainPrerequisites.h"
 #include "OgreCommon.h"
 #include "OgreVector3.h"
+#include "OgreDataStream.h"
 
 namespace Ogre
 {
+	class Image;
 	/** \addtogroup Optional Components
 	*  @{
 	*/
@@ -133,6 +135,37 @@ namespace Ogre
 		*/
 		void dirtyRect(const Rect& rect);
 
+		/** Blits a set of values into a region on the blend map. 
+		   	@param src		PixelBox containing the source pixels and format 
+		   	@param dstBox	Image::Box describing the destination region in this map
+            @remarks The source and destination regions dimensions don't have to match, in which
+            case scaling is done. 
+			@note You can call this method in a background thread if you want.
+				You still need to call update() to commit the changes to the GPU. 
+		*/
+		void blit(const PixelBox &src, const Box &dstBox);
+		
+		/** Blits a set of values into the entire map. The source data is scaled if needed.
+			@param src		PixelBox containing the source pixels and format
+			@note You can call this method in a background thread if you want.
+				You still need to call update() to commit the changes to the GPU. 
+				
+		*/
+		void blit(const PixelBox &src);
+
+		/** Load an image into this blend layer. 
+		*/
+		void loadImage(const Image& img);
+
+		/** Load an image into this blend layer. 
+		@param stream Stream containing the image data
+		@param ext Extension identifying the image type, if the stream data doesn't identify
+		*/
+		void loadImage(DataStreamPtr& stream, const String& ext = StringUtil::BLANK);
+
+		/** Load an image into this blend layer. 
+		*/
+		void loadImage(const String& filename, const String& groupName);
 
 		/** Publish any changes you made to the blend data back to the blend map. 
 		@note

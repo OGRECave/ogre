@@ -29,6 +29,7 @@ Torus Knot Software Ltd.
 #include "OgreTerrainLayerBlendMap.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreTerrain.h"
+#include "OgreImage.h"
 
 namespace Ogre
 {
@@ -176,6 +177,60 @@ namespace Ogre
 		upload();
 	}
 	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::blit(const PixelBox &src, const Box &dstBox)
+	{
+		const PixelBox* srcBox = &src;
+
+		if (srcBox->getWidth() != dstBox.getWidth() || srcBox->getHeight() != dstBox.getHeight())
+		{
+			// we need to rescale src to dst size first (also confvert format)
+			void* tmpData = OGRE_MALLOC(dstBox.getWidth() * dstBox.getHeight(), MEMCATEGORY_GENERAL);
+			srcBox = OGRE_NEW PixelBox(dstBox.getWidth(), dstBox.getHeight(), 1, PF_L8, tmpData);
+
+			Image::scale(src, *srcBox);
+		}
+
+		// pixel conversion
+		PixelBox dstMemBox(dstBox, PF_L8, mData);
+		PixelUtil::bulkPixelConversion(*srcBox, dstMemBox);
+
+		if (srcBox != &src)
+		{
+			// free temp
+			OGRE_FREE(srcBox->data, MEMCATEGORY_GENERAL);
+			OGRE_DELETE srcBox;
+			srcBox = 0;
+		}
+
+		Rect dRect(dstBox.left, dstBox.top, dstBox.right, dstBox.bottom);
+		dirtyRect(dRect);
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::blit(const PixelBox &src)
+	{
+		blit(src, Box(0,0,0,mBuffer->getWidth(),mBuffer->getHeight(),1));
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::loadImage(const Image& img)
+	{
+		blit(img.getPixelBox());
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::loadImage(DataStreamPtr& stream, const String& ext)
+	{
+		Image img;
+		img.load(stream, ext);
+		loadImage(img);
+	}
+	//---------------------------------------------------------------------
+	void TerrainLayerBlendMap::loadImage(const String& filename, const String& groupName)
+	{
+		Image img;
+		img.load(filename, groupName);
+		loadImage(img);
+	}
+
 
 }
 
