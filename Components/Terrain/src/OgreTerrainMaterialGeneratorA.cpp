@@ -149,7 +149,8 @@ namespace Ogre
 		HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
 		if (!mShaderGen)
 		{
-			if (hmgr.isLanguageSupported("cg"))
+			if (hmgr.isLanguageSupported("cg") && 
+				(gmgr.isSyntaxSupported("fp40") || gmgr.isSyntaxSupported("ps_2_x")))
 				mShaderGen = OGRE_NEW ShaderHelperCg();
 			else if (hmgr.isLanguageSupported("hlsl"))
 				mShaderGen = OGRE_NEW ShaderHelperHLSL();
@@ -603,8 +604,7 @@ namespace Ogre
 		outStream << "	outputCol.rgb += litRes.z * lightSpecularColour * specular;\n";
 		// Final return
 		outStream << "	return outputCol;\n"
-			"}\n"
-			;
+			<< "}\n";
 
 	}
 	//---------------------------------------------------------------------
