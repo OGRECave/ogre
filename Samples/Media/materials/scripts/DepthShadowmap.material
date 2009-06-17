@@ -312,12 +312,12 @@ vertex_program Ogre/DepthShadowmap/NormalMapReceiverVP unified
 	delegate Ogre/DepthShadowmap/NormalMapReceiverVP_HLSL
 	delegate Ogre/DepthShadowmap/NormalMapReceiverVP_GLSL
 }
-vertex_program Ogre/DepthShadowmap/NormalMapReceiverFP unified
+fragment_program Ogre/DepthShadowmap/NormalMapReceiverFP unified
 {
 	delegate Ogre/DepthShadowmap/NormalMapReceiverFP_HLSL
 	delegate Ogre/DepthShadowmap/NormalMapReceiverFP_GLSL
 }
-vertex_program Ogre/DepthShadowmap/NormalMapReceiverFPPCF unified
+fragment_program Ogre/DepthShadowmap/NormalMapReceiverFPPCF unified
 {
 	delegate Ogre/DepthShadowmap/NormalMapReceiverFPPCF_HLSL
 	delegate Ogre/DepthShadowmap/NormalMapReceiverFPPCF_GLSL
