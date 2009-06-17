@@ -1779,9 +1779,12 @@ namespace Ogre
 		for (uint8 i = currentTex; i < numTex; ++i)
 		{
 			PixelFormat fmt = getBlendTextureFormat(i, getLayerCount());
+			// Use TU_STATIC because although we will update this, we won't do it every frame
+			// in normal circumstances, so we don't want TU_DYNAMIC. Also we will 
+			// read it (if we've cleared local temp areas) so no WRITE_ONLY
 			mBlendTextureList[i] = TextureManager::getSingleton().createManual(
 				msBlendTextureGenerator.generate(), ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-				TEX_TYPE_2D, mLayerBlendMapSize, mLayerBlendMapSize, 1, 0, fmt);
+				TEX_TYPE_2D, mLayerBlendMapSize, mLayerBlendMapSize, 1, 0, fmt, TU_STATIC);
 
 			mLayerBlendMapSizeActual = mBlendTextureList[i]->getWidth();
 
@@ -1796,9 +1799,11 @@ namespace Ogre
 			else
 			{
 				// initialise black
-				uchar zeroVal[4] = {0,0,0,0};
-				PixelBox src(1, 1, 1, fmt, zeroVal);
-				mBlendTextureList[i]->getBuffer()->blitFromMemory(src);
+				Box box(0, 0, mLayerBlendMapSize, mLayerBlendMapSize);
+				HardwarePixelBufferSharedPtr buf = mBlendTextureList[i]->getBuffer();
+				uint8* pInit = static_cast<uint8*>(buf->lock(box, HardwarePixelBuffer::HBL_DISCARD).data);
+				memset(pInit, 0, PixelUtil::getNumElemBytes(fmt) * mLayerBlendMapSize * mLayerBlendMapSize);
+				buf->unlock();
 			}
 		}
 		mCpuBlendMapStorage.clear();

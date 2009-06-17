@@ -51,9 +51,10 @@ namespace Ogre
 		PixelFormat fmt = mBuffer->getFormat();
 		PixelUtil::getBitShifts(fmt, rgbaShift);
 		mChannelOffset = rgbaShift[mChannel] / 8; // /8 to convert to bytes
-		// now invert since we're dealing with this in a bytewise, not uint32 fashion
-		mChannelOffset = PixelUtil::getNumElemBytes(fmt) - mChannelOffset;
-
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
+		// invert (dealing bytewise)
+		mChannelOffset = PixelUtil::getNumElemBytes(fmt) - mChannelOffset - 1;
+#endif
 		download();
 
 	}
