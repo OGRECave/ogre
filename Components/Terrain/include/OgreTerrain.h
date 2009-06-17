@@ -905,7 +905,11 @@ namespace Ogre
 		void _setHorizonMapRequired(bool horizonMap);
 
 		/// WorkQueue::RequestHandler override
+		bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+		/// WorkQueue::RequestHandler override
 		WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
+		/// WorkQueue::ResponseHandler override
+		bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
 		/// WorkQueue::ResponseHandler override
 		void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
 

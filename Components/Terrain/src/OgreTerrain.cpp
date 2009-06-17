@@ -154,7 +154,8 @@ namespace Ogre
 		}
 		WorkQueue* wq = Root::getSingleton().getWorkQueue();
 		wq->removeRequestHandler(WORKQUEUE_CHANNEL, this);
-		wq->removeResponseHandler(WORKQUEUE_CHANNEL, this);	}
+		wq->removeResponseHandler(WORKQUEUE_CHANNEL, this);	
+	}
 	//---------------------------------------------------------------------
 	const AxisAlignedBox& Terrain::getAABB() const
 	{
@@ -1921,19 +1922,44 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
+	bool Terrain::canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
+	{
+		DerivedDataRequest ddr = any_cast<DerivedDataRequest>(req->getData());
+		// only deal with own requests
+		// we do this because if we delete a terrain we want any pending tasks to be discarded
+		if (ddr.terrain != this)
+			return false;
+
+	}
+	//---------------------------------------------------------------------
+	bool Terrain::canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
+	{
+		DerivedDataRequest ddreq = any_cast<DerivedDataRequest>(res->getRequest()->getData());
+		// only deal with own requests
+		// we do this because if we delete a terrain we want any pending tasks to be discarded
+		if (ddreq.terrain != this)
+			return false;
+		else
+			return true;
+
+	}
+	//---------------------------------------------------------------------
 	WorkQueue::Response* Terrain::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
 	{
 		// Background thread (maybe)
 
 		DerivedDataRequest ddr = any_cast<DerivedDataRequest>(req->getData());
+		// only deal with own requests; we shouldn't ever get here though
+		if (ddr.terrain != this)
+			return 0;
+
 		DerivedDataResponse ddres;
-		// NB do not use 'this' here, use req->terrain. This way any instance can 
-		// deal with request
+
 		if (ddr.calcDeltas)
-			ddr.terrain->calculateHeightDeltas(ddr.dirtyRect);
+			calculateHeightDeltas(ddr.dirtyRect);
 
 		if (ddr.calcNormalMap)
-			ddres.normalMapBox = ddr.terrain->calculateNormals(ddr.dirtyRect);
+			ddres.normalMapBox = calculateNormals(ddr.dirtyRect);
 
 		// TODO other data
 
@@ -1948,18 +1974,23 @@ namespace Ogre
 
 		DerivedDataResponse ddres = any_cast<DerivedDataResponse>(res->getData());
 		DerivedDataRequest ddreq = any_cast<DerivedDataRequest>(res->getRequest()->getData());
+
+		// only deal with own requests
+		if (ddreq.terrain != this)
+			return;
+
 		// NB do not use 'this' here, use req->terrain. This way any instance can 
 		// deal with response
 		if (ddreq.calcDeltas)
-			ddreq.terrain->finaliseHeightDeltas(ddreq.dirtyRect);
+			finaliseHeightDeltas(ddreq.dirtyRect);
 		if (ddreq.calcNormalMap)
-			ddreq.terrain->finaliseNormals(ddreq.dirtyRect, ddres.normalMapBox);
+			finaliseNormals(ddreq.dirtyRect, ddres.normalMapBox);
 		
 		// TODO other data
 
 
-		ddreq.terrain->mDerivedDataUpdateInProgress = false;
-		if (ddreq.terrain->mDerivedUpdatePendingMask)
+		mDerivedDataUpdateInProgress = false;
+		if (mDerivedUpdatePendingMask)
 		{
 			// trigger again
 			updateDerivedData(false, mDerivedUpdatePendingMask);
