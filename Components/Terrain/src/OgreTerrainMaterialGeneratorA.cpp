@@ -459,8 +459,9 @@ namespace Ogre
 			") : COLOR\n"
 			"{\n"
 			"	float4 outputCol;\n"
-			// ambient colour is universal
-			"	outputCol = ambient;\n"
+
+			// base colour
+			"	outputCol = float4(0,0,0,1);\n"
 
 			// global normal
 			"	float3 normal = expand(tex2D(globalNormal, uv)).rgb;\n"
@@ -594,7 +595,7 @@ namespace Ogre
 		const SM2Profile* prof, const Terrain* terrain, StringUtil::StrStreamType& outStream)
 	{
 		// diffuse lighting
-		outStream << "	outputCol.rgb += litRes.y * lightDiffuseColour * diffuse;\n";
+		outStream << "	outputCol.rgb += ambient * diffuse + litRes.y * lightDiffuseColour * diffuse;\n";
 
 		// specular lighting
 		if (!prof->isLayerSpecularMappingEnabled())
