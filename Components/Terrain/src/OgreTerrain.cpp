@@ -152,7 +152,9 @@ namespace Ogre
 			mSceneMgr->destroySceneNode(mRootNode);
 			mSceneMgr->removeListener(this);
 		}
-	}
+		WorkQueue* wq = Root::getSingleton().getWorkQueue();
+		wq->removeRequestHandler(WORKQUEUE_CHANNEL, this);
+		wq->removeResponseHandler(WORKQUEUE_CHANNEL, this);	}
 	//---------------------------------------------------------------------
 	const AxisAlignedBox& Terrain::getAABB() const
 	{
