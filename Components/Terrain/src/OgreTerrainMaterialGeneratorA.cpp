@@ -348,7 +348,7 @@ namespace Ogre
 			ret->unload();
 		}
 
-		ret->setParameter("profiles", "ps_2_x fp30");
+		ret->setParameter("profiles", "ps_2_x fp40");
 		ret->setParameter("entry_point", "main_fp");
 
 		return ret;
