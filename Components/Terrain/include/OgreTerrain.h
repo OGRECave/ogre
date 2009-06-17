@@ -235,7 +235,7 @@ namespace Ogre
 	<tr>
 		<td><b>Derived data type name</b></td>
 		<td><b>String</b></td>
-		<td><b>Name of the derived data type ('normal', 'lightmap' etc)</b></td>
+		<td><b>Name of the derived data type ('normalmap', 'lightmap', 'colourmap' etc)</b></td>
 	</tr>
 	<tr>
 		<td><b>Size</b></td>
@@ -824,6 +824,27 @@ namespace Ogre
 		*/
 		const String& getBlendTextureName(uint8 textureIndex) const;
 
+		/** Set whether a global colour map is enabled. 
+		@remarks
+			A global colour map can add variation to your terrain and reduce the 
+			perceived tiling effect you might get in areas of continuous lighting
+			and the same texture. 
+			The global colour map is only used when the material generator chooses
+			to use it.
+		@note You must only call this from the main render thread
+		@param enabled Whether the global colour map is enabled or not
+		@param size The resolution of the colour map. A value of zero means 'no change'
+			and the default is set in TerrainGlobalOptions.
+		*/
+		void setGlobalColourMapEnabled(bool enabled, uint16 size = 0);
+		/// Get whether a global colour map is enabled on this terrain
+		bool getGlobalColourMapEnabled() const { return mGlobalColourMapEnabled; }
+		/// Get the size of the global colour map (if used)
+		uint16 getGlobalColourMapSize() const { return mGlobalColourMapSize; }
+		/// Get access to the global colour map, if enabled
+		const TexturePtr& getGlobalColourMap() const { return mColourMap; }
+
+
 		/** Free as many resources as possible for optimal run-time memory use.
 		@remarks
 			This class keeps some temporary storage around in order to make
@@ -940,6 +961,7 @@ namespace Ogre
 		void createGPUBlendTextures();
 		void createLayerBlendMaps();
 		void createOrDestroyGPUNormalMap();
+		void createOrDestroyGPUColourMap();
 		/** Get a Vector3 of the world-space point on the terrain, aligned Y-up always.
 		@note This point is relative to Terrain::getPosition
 		*/
@@ -1032,6 +1054,11 @@ namespace Ogre
 		TexturePtrList mBlendTextureList;
 		TerrainLayerBlendMapList mLayerBlendMapList;
 
+		uint16 mGlobalColourMapSize;
+		bool mGlobalColourMapEnabled;
+		TexturePtr mColourMap;
+		uint8* mCpuColourMapStorage;
+
 		static NameGenerator msBlendTextureGenerator;
 		static NameGenerator msNormalMapNameGenerator;
 		static NameGenerator msLightmapNameGenerator;
@@ -1078,6 +1105,7 @@ namespace Ogre
 		static TerrainMaterialGeneratorPtr msDefaultMaterialGenerator;
 		static uint16 msLayerBlendMapSize;
 		static Real msDefaultLayerTextureWorldSize;
+		static uint16 msDefaultGlobalColourMapSize;
 	public:
 
 
@@ -1171,6 +1199,15 @@ namespace Ogre
 		/** Set the default world size for a layer 'splat' texture to cover. 
 		*/
 		static void setDefaultLayerTextureWorldSize(Real sz) { msDefaultLayerTextureWorldSize = sz; }
+
+		/** Get the default size of the terrain global colour map for a new terrain. 
+		*/
+		static uint16 getDefaultGlobalColourMapSize() { return msDefaultGlobalColourMapSize; }
+
+		/** Set the default size of the terrain global colour map for a new terrain. 
+		Once created, this information will be stored with the terrain. 
+		*/
+		static void setDefaultGlobalColourMapSize(uint16 sz) { msDefaultGlobalColourMapSize = sz;}
 
 	};
 

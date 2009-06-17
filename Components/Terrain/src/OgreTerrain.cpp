@@ -82,6 +82,7 @@ namespace Ogre
 	TerrainMaterialGeneratorPtr TerrainGlobalOptions::msDefaultMaterialGenerator;
 	uint16 TerrainGlobalOptions::msLayerBlendMapSize = 1024;
 	Real TerrainGlobalOptions::msDefaultLayerTextureWorldSize = 10;
+	uint16 TerrainGlobalOptions::msDefaultGlobalColourMapSize = 1024;
 	//---------------------------------------------------------------------
 	void TerrainGlobalOptions::setDefaultMaterialGenerator(TerrainMaterialGeneratorPtr gen)
 	{
@@ -117,6 +118,9 @@ namespace Ogre
 		, mDerivedUpdatePendingMask(0)
 		, mMaterialGenerationCount(0)
 		, mMaterialDirty(false)
+		, mGlobalColourMapSize(0)
+		, mGlobalColourMapEnabled(false)
+		, mCpuColourMapStorage(0)
 		, mLodMorphRequired(false)
 		, mNormalMapRequired(false)
 		, mLightMapRequired(false)
@@ -274,10 +278,10 @@ namespace Ogre
 			OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
 		}
 
-		// derived data
+		// other data
 		// normals
 		stream.writeChunkBegin(TERRAINDERIVEDDATA_CHUNK_ID, TERRAINDERIVEDDATA_CHUNK_VERSION);
-		String normalDataType("normals");
+		String normalDataType("normalmap");
 		stream.write(&normalDataType);
 		stream.write(&mSize);
 		if (mCpuTerrainNormalMap)
@@ -295,7 +299,30 @@ namespace Ogre
 		}
 		stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
 
-		
+
+		// colourmap
+		if (mGlobalColourMapEnabled)
+		{
+			stream.writeChunkBegin(TERRAINDERIVEDDATA_CHUNK_ID, TERRAINDERIVEDDATA_CHUNK_VERSION);
+			String colourDataType("colourmap");
+			stream.write(&colourDataType);
+			stream.write(&mSize);
+			if (mCpuColourMapStorage)
+			{
+				// save from CPU data if it's there, it means GPU data was never created
+				stream.write(mCpuColourMapStorage, mGlobalColourMapSize * mGlobalColourMapSize * 3);
+			}
+			else
+			{
+				uint8* tmpData = (uint8*)OGRE_MALLOC(mGlobalColourMapSize * mGlobalColourMapSize * 3, MEMCATEGORY_GENERAL);
+				PixelBox dst(mGlobalColourMapSize, mGlobalColourMapSize, 1, PF_BYTE_RGB, tmpData);
+				mColourMap->getBuffer()->blitToMemory(dst);
+				stream.write(tmpData, mGlobalColourMapSize * mGlobalColourMapSize * 3);
+				OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
+			}
+			stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
+
+		}
 
 		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
 	}
@@ -407,13 +434,20 @@ namespace Ogre
 			stream.read(&name);
 			uint16 sz;
 			stream.read(&sz);
-			if (name == "normals")
+			if (name == "normalmap")
 			{
 				uint8* pData = static_cast<uint8*>(OGRE_MALLOC(sz * sz * 3, MEMCATEGORY_GENERAL));
 				mCpuTerrainNormalMap = OGRE_NEW PixelBox(sz, sz, 1, PF_BYTE_RGB, pData);
 
 				stream.read(pData, sz * sz * 3);
 				
+			}
+			else if (name == "colourmap")
+			{
+				mGlobalColourMapEnabled = true;
+				mGlobalColourMapSize = sz;
+				mCpuColourMapStorage = static_cast<uint8*>(OGRE_MALLOC(sz * sz * 3, MEMCATEGORY_GENERAL));
+				stream.read(mCpuColourMapStorage, sz * sz * 3);
 			}
 
 			stream.readChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
@@ -738,6 +772,7 @@ namespace Ogre
 			mQuadTree->load();
 		
 		checkLayers(true);
+		createOrDestroyGPUColourMap();
 		
 		mMaterialGenerator->requestOptions(this);
 
@@ -1253,6 +1288,10 @@ namespace Ogre
 			OGRE_DELETE mCpuTerrainHorizonMap;
 			mCpuTerrainHorizonMap = 0;
 		}
+
+		OGRE_FREE(mCpuColourMapStorage, MEMCATEGORY_GENERAL);
+		mCpuColourMapStorage = 0;
+
 	}
 	//---------------------------------------------------------------------
 	void Terrain::freeGPUResources()
@@ -1273,6 +1312,18 @@ namespace Ogre
 		{
 			OGRE_DELETE *i;
 			*i = 0;
+		}
+
+		if (!mTerrainNormalMap.isNull())
+		{
+			tmgr->remove(mTerrainNormalMap->getHandle());
+			mTerrainNormalMap.setNull();
+		}
+
+		if (!mColourMap.isNull())
+		{
+			tmgr->remove(mColourMap->getHandle());
+			mColourMap.setNull();
 		}
 
 
@@ -1929,6 +1980,8 @@ namespace Ogre
 		// we do this because if we delete a terrain we want any pending tasks to be discarded
 		if (ddr.terrain != this)
 			return false;
+		else
+			return true;
 
 	}
 	//---------------------------------------------------------------------
@@ -2162,6 +2215,53 @@ namespace Ogre
 			"Invalid texture index", "Terrain::getBlendTextureName");
 		
 		return mBlendTextureList[textureIndex]->getName();
+	}
+	//---------------------------------------------------------------------
+	void Terrain::setGlobalColourMapEnabled(bool enabled, uint16 sz)
+	{
+		if (!sz)
+			sz = TerrainGlobalOptions::getDefaultGlobalColourMapSize();
+
+		if (enabled != mGlobalColourMapEnabled ||
+			(enabled && mGlobalColourMapSize != sz))
+		{
+			mGlobalColourMapEnabled = enabled;
+			mGlobalColourMapSize = sz;
+
+			createOrDestroyGPUColourMap();
+
+			mMaterialDirty = true;
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::createOrDestroyGPUColourMap()
+	{
+		if (mGlobalColourMapEnabled && mColourMap.isNull())
+		{
+			// create
+			mColourMap = TextureManager::getSingleton().createManual(
+				mMaterialName + "/cm", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+				TEX_TYPE_2D, mGlobalColourMapSize, mGlobalColourMapSize, MIP_DEFAULT, 0, PF_BYTE_RGB);
+
+			if (mCpuColourMapStorage)
+			{
+				// Load cached data
+				PixelBox src(mGlobalColourMapSize, mGlobalColourMapSize, 1, PF_BYTE_RGB, mCpuColourMapStorage);
+				mColourMap->getBuffer()->blitFromMemory(src);
+				// release CPU copy, don't need it anymore
+				OGRE_FREE(mCpuColourMapStorage, MEMCATEGORY_RESOURCE);
+				mCpuColourMapStorage = 0;
+
+			}
+		}
+		else if (!mGlobalColourMapEnabled && !mColourMap.isNull())
+		{
+			// destroy
+			TextureManager::getSingleton().remove(mColourMap->getHandle());
+			mColourMap.setNull();
+		}
+
 	}
 
 
