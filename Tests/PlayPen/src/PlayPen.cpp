@@ -2734,6 +2734,7 @@ protected:
 		//t = debugMat->getTechnique(0)->getPass(0)->createTextureUnitState("spot_shadow_fade.png");
 		//t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 		//t->setColourOperation(LBO_ADD);
+		
 
 		OverlayContainer* debugPanel = (OverlayContainer*)
 			(OverlayManager::getSingleton().createOverlayElement("Panel", "Ogre/DebugTexPanel" + StringConverter::toString(i)));
@@ -7901,6 +7902,9 @@ protected:
 
 	void testNewTerrain()
 	{
+		MaterialManager::getSingleton().setDefaultTextureFiltering(TFO_ANISOTROPIC);
+		MaterialManager::getSingleton().setDefaultAnisotropy(7);
+
 		LogManager::getSingleton().setLogDetail(LL_BOREME);
 
 		// Until material implemented
@@ -7909,7 +7913,7 @@ protected:
 
 		Light* l = mSceneMgr->createLight("tstLight");
 		l->setType(Light::LT_DIRECTIONAL);
-		Vector3 dir(0.55, -1, 0.75);
+		Vector3 dir(0.55, -0.5, 0.75);
 		dir.normalise();
 		l->setDirection(dir);
 		l->setDiffuseColour(ColourValue::White);
@@ -7928,22 +7932,42 @@ protected:
 		Terrain::ImportData imp;
 		imp.inputImage = &img;
 		imp.terrainSize = 513;
-		imp.worldSize = 4000;
-		imp.inputScale = 400;
+		imp.worldSize = 8000;
+		imp.inputScale = 600;
 		imp.minBatchSize = 33;
 		imp.maxBatchSize = 65;
 		// textures
 		imp.layerList.resize(2);
-		imp.layerList[0].worldSize = 100;
-		imp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
-		imp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
-		imp.layerList[1].worldSize = 20;
-		imp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
-		imp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
+		imp.layerList[0].worldSize = 20;
+		imp.layerList[0].textureNames.push_back("grass_green-01_diffusespecular.dds");
+		imp.layerList[0].textureNames.push_back("grass_green-01_normalheight.dds");
+		imp.layerList[1].worldSize = 100;
+		imp.layerList[1].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
+		imp.layerList[1].textureNames.push_back("dirt_grayrocky_normalheight.dds");
 		mTerrain->prepare(imp);
 		mTerrain->load();
 
-		TerrainLayerBlendMap* blendMap = mTerrain->getLayerBlendMap(1);
+		TerrainLayerBlendMap* blendMap0 = mTerrain->getLayerBlendMap(1);
+		Real rockMinHeight = 100;
+		Real rockFadeDist = 15;
+		uint8* pBlend = blendMap0->getBlendPointer();
+		for (uint16 y = 0; y < mTerrain->getLayerBlendMapSize(); ++y)
+		{
+			for (uint16 x = 0; x < mTerrain->getLayerBlendMapSize(); ++x)
+			{
+				Real tx, ty;
+
+				blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
+				Real height = mTerrain->getHeightAtTerrainPosition(tx, ty);
+				Real val = (height - rockMinHeight) / rockFadeDist;
+				val = Math::Clamp(val, (Real)0, (Real)1);
+
+				*pBlend++ = val * 255;
+
+			}
+		}
+		blendMap0->dirty();
+		/*
 		for (size_t y = 0; y < 50; ++y)
 		{
 			for (size_t x = 0; x < 50; ++x)
@@ -7959,14 +7983,15 @@ protected:
 
 			}
 		}
-		blendMap->update();
+		*/
+		//blendMap0->loadImage("blendmap1.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		blendMap0->update();
 
-		addTextureDebugOverlay(TextureManager::getSingleton().getByName(mTerrain->getBlendTextureName(0)), 0);
+		//addTextureDebugOverlay(TextureManager::getSingleton().getByName(mTerrain->getBlendTextureName(0)), 0);
 
+		//mWindow->getViewport(0)->setBackgroundColour(ColourValue::Blue);
 
-
-		mWindow->getViewport(0)->setBackgroundColour(ColourValue::Blue);
-
+		/*
 		// create a few entities on the terrain
 		for (int i = 0; i < 20; ++i)
 		{
@@ -7976,8 +8001,14 @@ protected:
 			Real y = mTerrain->getHeightAtWorldPosition(Vector3(x, 0, z));
 			mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(x, y, z))->attachObject(e);
 		}
+		*/
 		mCamera->setPosition(-2400,300,-2400);
 		mCamera->lookAt(Vector3::ZERO);
+		mCamera->setNearClipDistance(5);
+		mCamera->setFarClipDistance(15000);
+
+		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
+
 
 	}
 
