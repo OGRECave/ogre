@@ -75,6 +75,7 @@ namespace Ogre
 		, mLayerNormalMappingEnabled(true)
 		, mLayerParallaxMappingEnabled(true)
 		, mLayerSpecularMappingEnabled(true)
+		, mGlobalColourMapEnabled(true)
 	{
 
 	}
@@ -115,6 +116,15 @@ namespace Ogre
 		if (enabled != mLayerSpecularMappingEnabled)
 		{
 			mLayerSpecularMappingEnabled = enabled;
+			mParent->_markChanged();
+		}
+	}
+	//---------------------------------------------------------------------
+	void  TerrainMaterialGeneratorA::SM2Profile::setGlobalColourMapEnabled(bool enabled)
+	{
+		if (enabled != mGlobalColourMapEnabled)
+		{
+			mGlobalColourMapEnabled = enabled;
 			mParent->_markChanged();
 		}
 	}
@@ -170,6 +180,13 @@ namespace Ogre
 		// global normal map
 		TextureUnitState* tu = pass->createTextureUnitState();
 		tu->setTextureName(terrain->getTerrainNormalMap()->getName());
+
+		// global colour map
+		if (terrain->getGlobalColourMapEnabled() && isGlobalColourMapEnabled())
+		{
+			tu = pass->createTextureUnitState(terrain->getGlobalColourMap()->getName());
+			tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+		}
 
 		// blend maps
 		for (uint i = 0; i < terrain->getBlendTextureCount(); ++i)
@@ -440,6 +457,12 @@ namespace Ogre
 			;
 
 		uint currentSamplerIdx = 1;
+
+		if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
+		{
+			outStream << ", uniform sampler2D globalColourMap : register(s" 
+				<< currentSamplerIdx++ << ")\n";
+		}
 		// Blend textures - sampler definitions
 		for (uint i = 0; i < terrain->getBlendTextureCount(); ++i)
 		{
@@ -613,6 +636,12 @@ namespace Ogre
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateFpFooter(
 		const SM2Profile* prof, const Terrain* terrain, StringUtil::StrStreamType& outStream)
 	{
+		if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
+		{
+			// sample colour map and apply to diffuse
+			outStream << "	diffuse *= tex2D(globalColourMap, uv).rgb;\n";
+		}
+
 		// diffuse lighting
 		outStream << "	outputCol.rgb += ambient * diffuse + litRes.y * lightDiffuseColour * diffuse;\n";
 

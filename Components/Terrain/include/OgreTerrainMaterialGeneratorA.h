@@ -81,6 +81,14 @@ namespace Ogre
 			/** Whether to support specular mapping per layer in the shader (default true). 
 			*/
 			void setLayerSpecularMappingEnabled(bool enabled);
+			/** Whether to support a global colour map over the terrain in the shader,
+				if it's present (default true). 
+			*/
+			bool isGlobalColourMapEnabled() const  { return mGlobalColourMapEnabled; }
+			/** Whether to support a global colour map over the terrain in the shader,
+			if it's present (default true). 
+			*/
+			void setGlobalColourMapEnabled(bool enabled);
 		
 		protected:
 			/// Interface definition for helper class to generate shaders
@@ -147,6 +155,7 @@ namespace Ogre
 			bool mLayerNormalMappingEnabled;
 			bool mLayerParallaxMappingEnabled;
 			bool mLayerSpecularMappingEnabled;
+			bool mGlobalColourMapEnabled;
 
 		};
 
