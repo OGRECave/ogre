@@ -288,6 +288,9 @@ namespace Ogre
 			params->setNamedConstant("uvMul" + StringConverter::toString(i), uvMul);
 		}
 		
+		// TODO - parameterise this?
+		Vector4 scaleBiasSpecular(0.03, -0.04, 32, 1);
+		params->setNamedConstant("scaleBiasSpecular", scaleBiasSpecular);
 	}
 	//---------------------------------------------------------------------
 	String TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::getChannel(uint idx)
@@ -431,6 +434,8 @@ namespace Ogre
 			"uniform float3 lightDiffuseColour,\n"
 			"uniform float3 lightSpecularColour,\n"
 			"uniform float3 eyePosObjSpace,\n"
+			// pack scale, bias and specular
+			"uniform float4 scaleBiasSpecular,\n"
 			"uniform sampler2D globalNormal : register(s0)\n"
 			;
 
@@ -508,6 +513,8 @@ namespace Ogre
 			// set up lighting result placeholders for interpolation
 			outStream <<  "	float4 litRes, litResLayer;\n";
 			outStream << "	float3 TSlightDir, TSeyeDir, TShalfAngle, TSnormal;\n";
+			if (prof->isLayerParallaxMappingEnabled())
+				outStream << "	float displacement;\n";
 			// move 
 			outStream << "	TSlightDir = normalize(mul(TBN, lightDir));\n";
 			outStream << "	TSeyeDir = normalize(mul(TBN, eyeDir));\n";
@@ -519,7 +526,7 @@ namespace Ogre
 			outStream << "	lightDir = normalize(lightDir);\n";
 			outStream << "	eyeDir = normalize(eyeDir);\n";
 			outStream << "	float3 halfAngle = normalize(lightDir + eyeDir);\n";
-			outStream << "	float4 litRes = lit(dot(lightDir, normal), dot(halfAngle, normal), 30);\n";
+			outStream << "	float4 litRes = lit(dot(lightDir, normal), dot(halfAngle, normal), scaleBiasSpecular.z);\n";
 
 		}
 
@@ -538,20 +545,27 @@ namespace Ogre
 		uint uvIdx = layer / 4;
 		uint blendIdx = (layer-1) / 4;
 
+		StringUtil::StrStreamType uvMulStr;
+		uvMulStr << "uvMul" << uvIdx << "." << getChannel(layer);
+
 		// generate UV
-		outStream << "	float2 uv" << layer << " = uv * uvMul" << uvIdx 
-			<< "." << getChannel(layer) << ";\n";
-		// sample diffuse texture
-		outStream << "	float4 diffuseSpecTex" << layer 
-			<< " = tex2D(difftex" << layer << ", uv" << layer << ");\n";
+		outStream << "	float2 uv" << layer << " = uv * " << uvMulStr.str() << ";\n";
 
 		// calculate lighting here if normal mapping
 		if (prof->isLayerNormalMappingEnabled())
 		{
+			if (prof->isLayerParallaxMappingEnabled())
+			{
+				// modify UV - note we have to sample an extra time
+				outStream << "	displacement = tex2D(normtex" << layer << ", uv" << layer << ").a\n"
+					"		* scaleBiasSpecular.x + scaleBiasSpecular.y;\n";
+				outStream << "	uv" << layer << " += TSeyeDir.xy * displacement;\n";
+			}
+
 			// access TS normal map
-			outStream << "	TSnormal = expand(tex2D(normtex" << layer << ", uv" << layer << "));\n";
+			outStream << "	TSnormal = expand(tex2D(normtex" << layer << ", uv" << layer << ")).rgb;\n";
 			outStream << "	TShalfAngle = normalize(TSlightDir + TSeyeDir);\n";
-			outStream << "	litResLayer = lit(dot(TSlightDir, TSnormal), dot(TShalfAngle, TSnormal), 30);\n";
+			outStream << "	litResLayer = lit(dot(TSlightDir, TSnormal), dot(TShalfAngle, TSnormal), scaleBiasSpecular.z);\n";
 			if (!layer)
 				outStream << "	litRes = litResLayer;\n";
 			else
@@ -559,6 +573,10 @@ namespace Ogre
 					<< blendIdx << "." << getChannel(layer-1) << ");\n";
 
 		}
+
+		// sample diffuse texture
+		outStream << "	float4 diffuseSpecTex" << layer 
+			<< " = tex2D(difftex" << layer << ", uv" << layer << ");\n";
 
 		// apply to common
 		if (!layer)
