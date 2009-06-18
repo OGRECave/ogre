@@ -297,7 +297,7 @@ namespace Ogre
 			// when the parent takes over
 			if (!isLeaf())
 			{
-				Real maxChildDelta = 0;
+				Real maxChildDelta = -1;
 				TerrainQuadTreeNode* childWithMaxHeightDelta = 0;
 				for (int i = 0; i < 4; ++i)
 				{
