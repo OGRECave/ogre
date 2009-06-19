@@ -1511,8 +1511,6 @@ namespace Ogre
 							 ((fulldetaily % step) == halfStep && (fulldetailx % halfStep) == 0))
 							{
 								// Save height difference 
-								// should never set any value more than once
-								assert(mDeltaData[fulldetailx + (fulldetaily * mSize)] == 0);
 								mDeltaData[fulldetailx + (fulldetaily * mSize)] = delta;
 							}
 
