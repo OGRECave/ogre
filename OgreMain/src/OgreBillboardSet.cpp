@@ -563,9 +563,16 @@ namespace Ogre {
             ActiveBillboardList::iterator i, iend;
 
             iend = mActiveBillboards.end();
+			Matrix4 invWorld;
+			if (mWorldSpace && getParentSceneNode())
+				invWorld = getParentSceneNode()->_getFullTransform().inverse();
+
             for (i = mActiveBillboards.begin(); i != iend; ++i)
             {
-                const Vector3& pos = (*i)->getPosition();
+                Vector3 pos = (*i)->getPosition();
+				// transform from world space to local space
+				if (mWorldSpace && getParentSceneNode())
+					pos = invWorld * pos;
                 min.makeFloor(pos);
                 max.makeCeil(pos);
 
