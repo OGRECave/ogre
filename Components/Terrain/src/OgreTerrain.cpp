@@ -1272,7 +1272,9 @@ namespace Ogre
 	{
 		if (mDirtyGeometryRect.width() && mDirtyGeometryRect.height())
 		{
-			// TODO
+			mQuadTree->updateVertexData(mDirtyGeometryRect);
+			mDirtyGeometryRect.left = mDirtyGeometryRect.top = 
+				mDirtyGeometryRect.right = mDirtyGeometryRect.bottom = 0;
 		}
 	}
 	//---------------------------------------------------------------------

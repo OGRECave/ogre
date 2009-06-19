@@ -414,6 +414,35 @@ namespace Ogre
 		createCpuIndexData();
 	}
 	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::updateVertexData(const Rect& rect)
+	{
+		if (rect.left <= mBoundaryX || rect.right > mOffsetX
+			|| rect.top <= mBoundaryY || rect.bottom > mOffsetY)
+		{
+			// Do we have vertex data?
+			if (mVertexDataRecord)
+			{
+				// update the GPU buffer directly
+				// TODO: do we have no use for CPU vertex data after initial load?
+				// if so, destroy it to free RAM, this should be fast enough to 
+				// to direct
+				HardwareVertexBufferSharedPtr vbuf = 
+					mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(0);
+				updateVertexBuffer(vbuf, rect);
+			}
+
+			// pass on to children
+			if (!isLeaf())
+			{
+				for (int i = 0; i < 4; ++i)
+					mChildren[i]->updateVertexData(rect);
+
+			}
+
+		}
+
+	}
+	//---------------------------------------------------------------------
 	const TerrainQuadTreeNode::VertexDataRecord* TerrainQuadTreeNode::getVertexDataRecord() const
 	{
 		return mNodeWithVertexData ? mNodeWithVertexData->mVertexDataRecord : 0;

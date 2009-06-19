@@ -185,6 +185,11 @@ namespace Ogre
 		*/
 		void useAncestorVertexData(TerrainQuadTreeNode* owner, uint16 treeDepthEnd, uint16 resolution);
 
+		/** Tell the node to update its vertex data for a given region. 
+		*/
+		void updateVertexData(const Rect& rect);
+
+
 
 		/** Merge a point (relative to terrain node) into the local bounds, 
 			and that of children if applicable.
