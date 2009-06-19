@@ -1742,7 +1742,7 @@ namespace Ogre
 		{
 			Vector3 where = ray.getPoint(planeInt.second);
 			Vector3 rel = where - v1;
-			if (rel.x >= -0.00001 && rel.x <= 1.00001 && rel.z >= -0.00001 && rel.z <= 1.00001 && 
+			if (rel.x >= -0.05 && rel.x <= 1.05 && rel.z >= -0.05 && rel.z <= 1.05 && 
 				((rel.x >= rel.z && !oddRow) || (rel.x >= (1 - rel.z) && oddRow)))
 				return std::pair<bool, Vector3>(true, where);
 		}
@@ -1751,7 +1751,7 @@ namespace Ogre
 		{
 			Vector3 where = ray.getPoint(planeInt.second);
 			Vector3 rel = where - v1;
-			if (rel.x >= -0.00001 && rel.x <= 1.00001 && rel.z >= -0.00001 && rel.z <= 1.00001 && 
+			if (rel.x >= -0.05 && rel.x <= 1.05 && rel.z >= -0.05 && rel.z <= 1.05 && 
 				((rel.x < rel.z && !oddRow) || (rel.x < (1 - rel.z) && oddRow)))
 				return std::pair<bool, Vector3>(true, where);
 		}
