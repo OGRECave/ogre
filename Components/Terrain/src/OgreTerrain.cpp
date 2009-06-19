@@ -1584,88 +1584,140 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
-	std::pair<bool, Vector3> Terrain::rayIntersects(const Ray& ray) 
+	std::pair<bool, Vector3> Terrain::rayIntersects(const Ray& ray)
 	{
 		typedef std::pair<bool, Vector3> Result;
-		// first step: convert the ray to object space
-		Vector3 OSrayOrigin = ray.getOrigin() - mPos;
+		// first step: convert the ray to a local vertex space
+		// we assume terrain to be in the x-z plane, with the [0,0] vertex
+		// at origin and a plane distance of 1 between vertices.
+		// This makes calculations easier.
+		Vector3 rayOrigin = ray.getOrigin() - getPosition();
+		Vector3 rayDirection = ray.getDirection();
+		// change alignment
+		Vector3 tmp;
+		switch (getAlignment())
+		{
+		case ALIGN_X_Y:
+			std::swap(rayOrigin.y, rayOrigin.z);
+			std::swap(rayDirection.y, rayDirection.z);
+			break;
+		case ALIGN_Y_Z:
+			// x = z, z = y, y = -x
+			tmp.x = rayOrigin.z; 
+			tmp.z = rayOrigin.y; 
+			tmp.y = -rayOrigin.x; 
+			rayOrigin = tmp;
+			tmp.x = rayDirection.z; 
+			tmp.z = rayDirection.y; 
+			tmp.y = -rayDirection.x; 
+			rayDirection = tmp;
+			break;
+		case ALIGN_X_Z:
+			// already in X/Z but values increase in -Z
+			rayOrigin.z = -rayOrigin.z;
+			rayDirection.z = -rayDirection.z;
+			break;
+		}
+		// readjust coordinate origin
+		rayOrigin.x += mWorldSize/2;
+		rayOrigin.z += mWorldSize/2;
+		// scale down to vertex level
+		rayOrigin.x /= mScale;
+		rayOrigin.z /= mScale;
+		rayDirection.x /= mScale;
+		rayDirection.z /= mScale;
+		rayDirection.normalise();
+		Ray localRay (rayOrigin, rayDirection);
 
-		Ray OSray(OSrayOrigin, ray.getDirection());
-		
 		// test if the ray actually hits the terrain's bounds
-		std::pair<bool, Real> aabbTest = OSray.intersects(getAABB());
+		Real maxHeight = getMaxHeight();
+		Real minHeight = getMinHeight();
+
+		AxisAlignedBox aabb (Vector3(0, minHeight, 0), Vector3(mSize, maxHeight, mSize));
+		std::pair<bool, Real> aabbTest = localRay.intersects(aabb);
 		if (!aabbTest.first)
 			return Result(false, Vector3());
 		// get intersection point and move inside
-		Vector3 OSstart = OSray.getPoint(aabbTest.second);
-		OSray.setOrigin(OSstart);
-
-		// now convert to terrain space to make it easier to generalise regardless of alignment
-		Vector3 TScur, TSrayDir;
-		getTerrainPosition(OSstart + mPos, &TScur);
-		getTerrainVector(ray.getDirection(), &TSrayDir);
-		Ray TSray(TScur, TSrayDir);
-
+		Vector3 cur = localRay.getPoint(aabbTest.second);
 
 		// now check every quad the ray touches
-		int quadX = std::min(std::max(static_cast<int>(TScur.x * (mSize-1)), 0), (int)mSize-2);
-		int quadZ = std::min(std::max(static_cast<int>(TScur.y * (mSize-1)), 0), (int)mSize-2);
-		int flipX = (TSrayDir.x < 0 ? 0 : 1);
-		int flipZ = (TSrayDir.y < 0 ? 0 : 1);
-		int xDir = (TSrayDir.x < 0 ? -1 : 1);
-		int zDir = (TSrayDir.y < 0 ? -1 : 1);
+		int quadX = std::min(std::max(static_cast<int>(cur.x), 0), (int)mSize-2);
+		int quadZ = std::min(std::max(static_cast<int>(cur.z), 0), (int)mSize-2);
+		int flipX = (rayDirection.x < 0 ? 0 : 1);
+		int flipZ = (rayDirection.z < 0 ? 0 : 1);
+		int xDir = (rayDirection.x < 0 ? -1 : 1);
+		int zDir = (rayDirection.z < 0 ? -1 : 1);
+
 		Result result;
-		Real minHeight = getMinHeight();
-		Real maxHeight = getMaxHeight();
-		while (TScur.z >= minHeight && TScur.z <= maxHeight)
+		while (cur.y >= minHeight && cur.y <= maxHeight)
 		{
 			if (quadX < 0 || quadX >= (int)mSize-1 || quadZ < 0 || quadZ >= (int)mSize-1)
 				break;
-			
-			result = checkQuadIntersection(quadX, quadZ, OSray);
+
+			result = checkQuadIntersection(quadX, quadZ, localRay);
 			if (result.first)
-			{
-				// result is in object space, relative to mPos
-				result.second += mPos;
 				break;
-			}
-			
+
 			// determine next quad to test
-			Real xDist = (quadX - TScur.x + flipX) / TSrayDir.x;
-			Real zDist = (quadZ - TScur.y + flipZ) / TSrayDir.y;
+			Real xDist = (quadX - cur.x + flipX) / rayDirection.x;
+			Real zDist = (quadZ - cur.z + flipZ) / rayDirection.z;
 			if (xDist < zDist)
 			{
 				quadX += xDir;
-				TScur += TSrayDir * xDist;
+				cur += rayDirection * xDist;
 			}
 			else
 			{
 				quadZ += zDir;
-				TScur += TSrayDir * zDist;
+				cur += rayDirection * zDist;
 			}
-			
+
 		}
-		
+
+		if (result.first)
+		{
+			// transform the point of intersection back to world space
+			result.second.x *= mScale;
+			result.second.z *= mScale;
+			result.second.x -= mWorldSize/2;
+			result.second.z -= mWorldSize/2;
+			switch (getAlignment())
+			{
+			case ALIGN_X_Y:
+				std::swap(result.second.y, result.second.z);
+				break;
+			case ALIGN_Y_Z:
+				// z = x, y = z, x = -y
+				tmp.x = -rayOrigin.y; 
+				tmp.y = rayOrigin.z; 
+				tmp.z = rayOrigin.x; 
+				rayOrigin = tmp;
+				break;
+			case ALIGN_X_Z:
+				result.second.z = -result.second.z;
+				break;
+			}
+			result.second += getPosition();
+		}
 		return result;
 	}
 	//---------------------------------------------------------------------
-	std::pair<bool, Vector3> Terrain::checkQuadIntersection(int x, int y, const Ray& ray)
+	std::pair<bool, Vector3> Terrain::checkQuadIntersection(int x, int z, const Ray& ray)
 	{
-		// build the two planes belonging to the quad's triangles, all object space
-		Vector3 v1, v2, v3, v4;
-		getPoint(x, y, *getHeightData(x,y), &v1);
-		getPoint(x+1, y, *getHeightData(x+1,y), &v2);
-		getPoint(x, y+1, *getHeightData(x,y+1), &v3);
-		getPoint(x+1, y+1, *getHeightData(x+1,y+1), &v4);
+		// build the two planes belonging to the quad's triangles
+		Vector3 v1 (x, *getHeightData(x,z), z);
+		Vector3 v2 (x+1, *getHeightData(x+1,z), z);
+		Vector3 v3 (x, *getHeightData(x,z+1), z+1);
+		Vector3 v4 (x+1, *getHeightData(x+1,z+1), z+1);
 
 		Plane p1, p2;
 		bool oddRow = false;
-		if (y % 2)
+		if (z % 2)
 		{
 			/* odd
-				3---4
-				| \ |
-				1---2
+			3---4
+			| \ |
+			1---2
 			*/
 			p1.redefine(v1, v2, v3);
 			p2.redefine(v2, v4, v3);
@@ -1674,44 +1726,36 @@ namespace Ogre
 		else
 		{
 			/* even
-				3---4
-				| / |
-				1---2
+			3---4
+			| / |
+			1---2
 			*/
-			p1.redefine(v1, v2, v4);
-			p2.redefine(v1, v4, v3);
+			p1.redefine(v1, v4, v3);
+			p2.redefine(v1, v2, v4);
 		}
-		
+
 		// Test for intersection with the two planes. 
 		// Then test that the intersection points are actually
 		// still inside the triangle (with a small error margin)
 		std::pair<bool, Real> planeInt = ray.intersects(p1);
-		// divisor to convert world space dimension to proportion of quad
-		Real quadSize = mWorldSize / mSize;
 		if (planeInt.first)
 		{
 			Vector3 where = ray.getPoint(planeInt.second);
-			Vector3 rel = (where - v1) / quadSize; // to scale quad back to 1 unit
-			// rel is in object space
-			Vector3 TSrel;
-			getTerrainPosition(rel + mPos, &TSrel);
-			if (TSrel.x >= -0.01 && TSrel.x <= 1.01 && TSrel.y >= -0.01 && TSrel.y <= 1.01 && 
-				((TSrel.x >= TSrel.y && !oddRow) || (TSrel.x >= (1 - TSrel.y) && oddRow)))
+			Vector3 rel = where - v1;
+			if (rel.x >= -0.01 && rel.x <= 1.01 && rel.z >= -0.01 && rel.z <= 1.01 && 
+				((rel.x >= rel.y && !oddRow) || (rel.x >= (1 - rel.y) && oddRow)))
 				return std::pair<bool, Vector3>(true, where);
 		}
 		planeInt = ray.intersects(p2);
 		if (planeInt.first)
 		{
 			Vector3 where = ray.getPoint(planeInt.second);
-			Vector3 rel = (where - v1) / quadSize; // to scale quad back to 1 unit
-			// rel is in object space
-			Vector3 TSrel;
-			getTerrainPosition(rel + mPos, &TSrel);
-			if (TSrel.x >= -0.01 && TSrel.x <= 1.01 && TSrel.y >= -0.01 && TSrel.y <= 1.01 && 
-				((TSrel.x < TSrel.y && !oddRow) || (TSrel.x < (1 - TSrel.y) && oddRow)))
+			Vector3 rel = where - v1;
+			if (rel.x >= -0.01 && rel.x <= 1.01 && rel.z >= -0.01 && rel.z <= 1.01 && 
+				((rel.x < rel.y && !oddRow) || (rel.x < (1 - rel.y) && oddRow)))
 				return std::pair<bool, Vector3>(true, where);
 		}
-		
+
 		return std::pair<bool, Vector3>(false, Vector3());
 	}
 	//---------------------------------------------------------------------
