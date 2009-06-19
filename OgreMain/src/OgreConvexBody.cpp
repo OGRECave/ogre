@@ -292,6 +292,9 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void ConvexBody::clip(const AxisAlignedBox& aab)
 	{
+		// only process finite boxes
+		if (!aab.isFinite())
+			return;
 		// ordering of the AAB points:
 		//		1-----2
 		//	   /|    /|
