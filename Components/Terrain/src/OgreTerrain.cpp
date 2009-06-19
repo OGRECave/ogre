@@ -891,9 +891,9 @@ namespace Ogre
 			// even row
 			bool secondTri = (yParam > xParam);
 			if (secondTri)
-				plane.redefine(v0, v1, v2);
-			else
 				plane.redefine(v0, v2, v3);
+			else
+				plane.redefine(v0, v1, v2);
 		}
 
 		// Solve plane equation for z
@@ -1730,8 +1730,8 @@ namespace Ogre
 			| / |
 			1---2
 			*/
-			p1.redefine(v1, v4, v3);
-			p2.redefine(v1, v2, v4);
+			p1.redefine(v1, v2, v4);
+			p2.redefine(v1, v4, v3);
 		}
 
 		// Test for intersection with the two planes. 
@@ -1742,8 +1742,8 @@ namespace Ogre
 		{
 			Vector3 where = ray.getPoint(planeInt.second);
 			Vector3 rel = where - v1;
-			if (rel.x >= -0.01 && rel.x <= 1.01 && rel.z >= -0.01 && rel.z <= 1.01 && 
-				((rel.x >= rel.y && !oddRow) || (rel.x >= (1 - rel.y) && oddRow)))
+			if (rel.x >= -0.00001 && rel.x <= 1.00001 && rel.z >= -0.00001 && rel.z <= 1.00001 && 
+				((rel.x >= rel.z && !oddRow) || (rel.x >= (1 - rel.z) && oddRow)))
 				return std::pair<bool, Vector3>(true, where);
 		}
 		planeInt = ray.intersects(p2);
@@ -1751,8 +1751,8 @@ namespace Ogre
 		{
 			Vector3 where = ray.getPoint(planeInt.second);
 			Vector3 rel = where - v1;
-			if (rel.x >= -0.01 && rel.x <= 1.01 && rel.z >= -0.01 && rel.z <= 1.01 && 
-				((rel.x < rel.y && !oddRow) || (rel.x < (1 - rel.y) && oddRow)))
+			if (rel.x >= -0.00001 && rel.x <= 1.00001 && rel.z >= -0.00001 && rel.z <= 1.00001 && 
+				((rel.x < rel.z && !oddRow) || (rel.x < (1 - rel.z) && oddRow)))
 				return std::pair<bool, Vector3>(true, where);
 		}
 
