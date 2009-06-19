@@ -215,6 +215,10 @@ namespace Ogre
 		Real getBoundingRadius() const;
 		/// Get the local centre of this node, relative to parent terrain centre
 		const Vector3& getLocalCentre() const { return mLocalCentre; }
+		/// Get the minimum height of the node
+		Real getMinHeight() const;
+		/// Get the maximum height of the node
+		Real getMaxHeight() const;
 
 		/** Calculate appropriate LOD for this node and children
 		@param cam The camera to be used (this should already be the LOD camera)
