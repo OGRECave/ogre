@@ -964,6 +964,35 @@ namespace Ogre
 		return mBoundingRadius;
 	}
 	//---------------------------------------------------------------------
+	Real TerrainQuadTreeNode::getMinHeight() const
+	{
+		switch (mTerrain->getAlignment())
+		{
+		case Terrain::ALIGN_X_Y:
+		default:
+			return mAABB.getMinimum().z;
+		case Terrain::ALIGN_X_Z:
+			return mAABB.getMinimum().y;
+		case Terrain::ALIGN_Y_Z:
+			return mAABB.getMinimum().x;
+		};
+	}
+	//---------------------------------------------------------------------
+	Real TerrainQuadTreeNode::getMaxHeight() const
+	{
+		switch (mTerrain->getAlignment())
+		{
+		case Terrain::ALIGN_X_Y:
+		default:
+			return mAABB.getMaximum().z;
+		case Terrain::ALIGN_X_Z:
+			return mAABB.getMaximum().y;
+		case Terrain::ALIGN_Y_Z:
+			return mAABB.getMaximum().x;
+		};
+
+	}
+	//---------------------------------------------------------------------
 	bool TerrainQuadTreeNode::calculateCurrentLod(const Camera* cam, Real cFactor)
 	{
 		mSelfOrChildRendered = false;

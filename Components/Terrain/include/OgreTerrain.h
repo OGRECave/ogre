@@ -482,6 +482,27 @@ namespace Ogre
 		@note This point is relative to Terrain::getPosition
 		*/
 		void getPoint(long x, long y, float height, Vector3* outpos);
+		/** Translate a vector from world space to local terrain space based on the alignment options.
+		@param inVec The vector in basis space, where x/y represents the 
+		terrain plane and z represents the up vector
+		*/
+		void getTerrainVector(const Vector3& inVec, Vector3* outVec);
+		/** Translate a vector from world space to local terrain space based on a specified alignment.
+		@param inVec The vector in basis space, where x/y represents the 
+		terrain plane and z represents the up vector
+		*/
+		void getTerrainVectorAlign(const Vector3& inVec, Alignment align, Vector3* outVec);
+
+		/** Translate a vector from world space to local terrain space based on the alignment options.
+		@param x, y, z The vector in basis space, where x/y represents the 
+		terrain plane and z represents the up vector
+		*/
+		void getTerrainVector(Real x, Real y, Real z, Vector3* outVec);
+		/** Translate a vector from world space to local terrain space based on a specified alignment.
+		@param x, y, z The vector in world space, where x/y represents the 
+		terrain plane and z represents the up vector
+		*/
+		void getTerrainVectorAlign(Real x, Real y, Real z, Alignment align, Vector3* outVec);
 
 		/** Translate a vector into world space based on the alignment options.
 		@param inVec The vector in basis space, where x/y represents the 
@@ -768,6 +789,10 @@ namespace Ogre
 		
 		/// Get the AABB (local coords) of the entire terrain
 		const AxisAlignedBox& getAABB() const;
+		/// Get the minimum height of the terrain
+		Real getMinHeight() const;
+		/// Get the maximum height of the terrain
+		Real getMaxHeight() const;
 		/// Get the bounding radius of the entire terrain
 		Real getBoundingRadius() const;
 
@@ -973,7 +998,7 @@ namespace Ogre
 		void getPointAlign(long x, long y, float height, Alignment align, Vector3* outpos);
 		void calculateCurrentLod(Viewport* vp);
 		/// Test a single quad of the terrain for ray intersection.
-		std::pair<bool, Vector3> checkQuadIntersection(int x, int z, const Ray& ray); //const;
+		std::pair<bool, Vector3> checkQuadIntersection(int x, int y, const Ray& ray); //const;
 
 		void copyGlobalOptions();
 		void checkLayers(bool includeGPUResources);
