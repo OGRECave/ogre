@@ -1737,13 +1737,20 @@ namespace Ogre
 		// Test for intersection with the two planes. 
 		// Then test that the intersection points are actually
 		// still inside the triangle (with a small error margin)
+
+		// Note: we should be checking *which* triangle this hit is within too
+		// however, whenever I try to check for that, I get false misses at some
+		// boundaries which I can't explain. Not checking for the triangle can occasionally
+		// cause false hits between the 2 triangles (cases where a mid-quad triangle edge 
+		// is a ridge for example, but false misses are much worse in their effect,
+		// so for now, err on this side
 		std::pair<bool, Real> planeInt = ray.intersects(p1);
 		if (planeInt.first)
 		{
 			Vector3 where = ray.getPoint(planeInt.second);
 			Vector3 rel = where - v1;
-			if (rel.x >= -0.05 && rel.x <= 1.05 && rel.z >= -0.05 && rel.z <= 1.05 && 
-				((rel.x >= rel.z && !oddRow) || (rel.x >= (1 - rel.z) && oddRow)))
+			if (rel.x >= -0.01 && rel.x <= 1.01 && rel.z >= -0.01 && rel.z <= 1.01)
+				// && ((rel.x >= rel.z && !oddRow) || (rel.x >= (1 - rel.z) && oddRow)))
 				return std::pair<bool, Vector3>(true, where);
 		}
 		planeInt = ray.intersects(p2);
@@ -1751,8 +1758,8 @@ namespace Ogre
 		{
 			Vector3 where = ray.getPoint(planeInt.second);
 			Vector3 rel = where - v1;
-			if (rel.x >= -0.05 && rel.x <= 1.05 && rel.z >= -0.05 && rel.z <= 1.05 && 
-				((rel.x < rel.z && !oddRow) || (rel.x < (1 - rel.z) && oddRow)))
+			if (rel.x >= -0.01 && rel.x <= 1.01 && rel.z >= -0.01 && rel.z <= 1.01)
+				// && ((rel.x < rel.z && !oddRow) || (rel.x < (1 - rel.z) && oddRow)))
 				return std::pair<bool, Vector3>(true, where);
 		}
 
