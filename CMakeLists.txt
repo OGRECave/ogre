@@ -157,7 +157,7 @@ option(OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR "Ogre String uses the custom allo
 option(OGRE_CONFIG_MEMTRACK_DEBUG "Enable Ogre's memory tracker in debug mode" FALSE)
 option(OGRE_CONFIG_MEMTRACK_RELEASE "Enable Ogre's memory tracker in release mode" FALSE)
 if (Boost_FOUND)
-  set(OGRE_CONFIG_THREADS 0 CACHE STRING 
+  set(OGRE_CONFIG_THREADS 2 CACHE STRING 
   "Enable Ogre thread support for background loading. Possible values:
     0 - Threading off.
     1 - Full background loading.
