@@ -59,13 +59,13 @@ namespace Ogre {
         // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
         // article "Quaternion Calculus and Fast Animation".
 
-        Real fTrace = 1.0 + kRot[0][0]+kRot[1][1]+kRot[2][2];
+        Real fTrace = kRot[0][0]+kRot[1][1]+kRot[2][2];
         Real fRoot;
 
-		if ( fTrace > 1e-4 )
+        if ( fTrace > 0.0 )
         {
             // |w| > 1/2, may as well choose w > 1/2
-            fRoot = Math::Sqrt(fTrace);  // 2w
+            fRoot = Math::Sqrt(fTrace + 1.0);  // 2w
             w = 0.5*fRoot;
             fRoot = 0.5/fRoot;  // 1/(4w)
             x = (kRot[2][1]-kRot[1][2])*fRoot;
