@@ -279,6 +279,21 @@ namespace Ogre
 		params->setNamedAutoConstant("lodMorph", GpuProgramParameters::ACT_CUSTOM, 
 			Terrain::LOD_MORPH_CUSTOM_PARAM);
 
+		uint numUVMul = terrain->getLayerCount() / 4;
+		if (terrain->getLayerCount() % 4)
+			++numUVMul;
+		for (uint i = 0; i < numUVMul; ++i)
+		{
+			Vector4 uvMul(
+				terrain->getLayerUVMultiplier(i * 4), 
+				terrain->getLayerUVMultiplier(i * 4 + 1), 
+				terrain->getLayerUVMultiplier(i * 4 + 2), 
+				terrain->getLayerUVMultiplier(i * 4 + 3) 
+				);
+			params->setNamedConstant("uvMul" + StringConverter::toString(i), uvMul);
+		}
+
+
 	}
 	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::defaultFpParams(
@@ -293,17 +308,6 @@ namespace Ogre
 		params->setNamedAutoConstant("lightSpecularColour", GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR, 0);
 		params->setNamedAutoConstant("eyePosObjSpace", GpuProgramParameters::ACT_CAMERA_POSITION_OBJECT_SPACE);
 
-		uint numUVMul = terrain->getLayerCount() / 4 + 1;
-		for (uint i = 0; i < numUVMul; ++i)
-		{
-			Vector4 uvMul(
-				terrain->getLayerUVMultiplier(i * 4), 
-				terrain->getLayerUVMultiplier(i * 4 + 1), 
-				terrain->getLayerUVMultiplier(i * 4 + 2), 
-				terrain->getLayerUVMultiplier(i * 4 + 3) 
-				);
-			params->setNamedConstant("uvMul" + StringConverter::toString(i), uvMul);
-		}
 		
 		// TODO - parameterise this?
 		Vector4 scaleBiasSpecular(0.03, -0.04, 32, 1);
@@ -379,24 +383,43 @@ namespace Ogre
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateVpHeader(
 		const SM2Profile* prof, const Terrain* terrain, StringUtil::StrStreamType& outStream)
 	{
-		static const String vpHeader = 
+		outStream << 
 			"void main_vp(\n"
 			"float4 pos : POSITION,\n"
 			"float4 uv  : TEXCOORD0,\n" // u,v, lodDelta, lodThreshold
 			
 			"uniform float4x4 worldMatrix,\n"
 			"uniform float4x4 viewProjMatrix,\n"
-			"uniform float2   lodMorph,\n" // morph amount, morph LOD target
-			
-			"out float4 oPos : POSITION,\n"
-			"out float2 oUV	 : TEXCOORD0, \n"
-			"out float4 oPosObj : TEXCOORD1 \n"
+			"uniform float2   lodMorph,\n"; // morph amount, morph LOD target
 
+		// uv multipliers
+		uint numUVMultipliers = (terrain->getLayerCount() / 4);
+		if (terrain->getLayerCount() % 4)
+			++numUVMultipliers;
+		for (uint i = 0; i < numUVMultipliers; ++i)
+			outStream << "uniform float4 uvMul" << i << ", \n";
+
+		outStream <<
+			"out float4 oPos : POSITION,\n"
+			"out float2 oUV : TEXCOORD0, \n"
+			"out float4 oPosObj : TEXCOORD1 \n";
+
+		// layer UV's premultiplied, packed as xy/zw
+		uint numUVSets = terrain->getLayerCount() / 2;
+		if (terrain->getLayerCount() % 2)
+			++numUVSets;
+		uint texCoordSet = 2;
+		for (uint i = 0; i < numUVSets; ++i)
+		{
+			outStream <<
+				", out float4 oUV" << i << " : TEXCOORD" << texCoordSet++ << "\n";
+		}
+
+		outStream <<
 			")\n"
 			"{\n"
 			"	float4 worldPos = mul(worldMatrix, pos);\n"
-			"	oPosObj = pos;"
-
+			"	oPosObj = pos;\n"
 			// determine whether to apply the LOD morph to this vertex
 			// we store the deltas against all vertices so we only want to apply 
 			// the morph to the ones which would disappear. The target LOD which is
@@ -411,7 +434,6 @@ namespace Ogre
 
 			;
 
-		outStream << vpHeader;
 
 		// morph
 		switch (terrain->getAlignment())
@@ -419,11 +441,24 @@ namespace Ogre
 		case Terrain::ALIGN_X_Y:
 			break;
 		case Terrain::ALIGN_X_Z:
-			outStream << "worldPos.y += uv.z * toMorph * lodMorph.x;\n";
+			outStream << "	worldPos.y += uv.z * toMorph * lodMorph.x;\n";
 			break;
 		case Terrain::ALIGN_Y_Z:
 			break;
 		};
+
+		// generate UVs
+		for (uint i = 0; i < numUVSets; ++i)
+		{
+			uint layer  =  i * 2;
+			uint uvMulIdx = layer / 4;
+
+			outStream <<
+				"	oUV" << i << ".xy = " << " uv.xy * uvMul" << uvMulIdx << "." << getChannel(layer) << ";\n";
+			outStream <<
+				"	oUV" << i << ".zw = " << " uv.xy * uvMul" << uvMulIdx << "." << getChannel(layer+1) << ";\n";
+			
+		}
 			
 
 
@@ -442,8 +477,21 @@ namespace Ogre
 
 			"float4 main_fp(\n"
 			"float2 uv : TEXCOORD0,\n"
-			"float4 position : TEXCOORD1,\n"
+			"float4 position : TEXCOORD1,\n";
 
+		// UV's premultiplied, packed as xy/zw
+		uint numUVSets = terrain->getLayerCount() / 2;
+		if (terrain->getLayerCount() % 2)
+			++numUVSets;
+		uint texCoordSet = 2;
+		for (uint i = 0; i < numUVSets; ++i)
+		{
+			outStream <<
+				"float4 layerUV" << i << " : TEXCOORD" << texCoordSet++ << ", \n";
+		}
+
+
+		outStream <<
 			// Only 1 light supported in this version
 			// deferred shading profile / generator later, ok? :)
 			"uniform float4 ambient,\n"
@@ -478,11 +526,6 @@ namespace Ogre
 			outStream << ", uniform sampler2D normtex" << i 
 				<< " : register(s" << currentSamplerIdx++ << ")\n";
 		}
-
-		// uv multipliers
-		uint numUVMultipliers = (terrain->getLayerCount() / 4) + 1;
-		for (uint i = 0; i < numUVMultipliers; ++i)
-			outStream << ", uniform float4 uvMul" << i << "\n";
 
 		outStream << 
 			") : COLOR\n"
@@ -565,14 +608,12 @@ namespace Ogre
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateFpLayer(
 		const SM2Profile* prof, const Terrain* terrain, uint layer, StringUtil::StrStreamType& outStream)
 	{
-		uint uvIdx = layer / 4;
+		uint uvIdx = layer / 2;
+		String uvChannels = layer % 2 ? ".zw" : ".xy";
 		uint blendIdx = (layer-1) / 4;
 
-		StringUtil::StrStreamType uvMulStr;
-		uvMulStr << "uvMul" << uvIdx << "." << getChannel(layer);
-
 		// generate UV
-		outStream << "	float2 uv" << layer << " = uv * " << uvMulStr.str() << ";\n";
+		outStream << "	float2 uv" << layer << " = layerUV" << uvIdx << uvChannels << ";\n";
 
 		// calculate lighting here if normal mapping
 		if (prof->isLayerNormalMappingEnabled())
