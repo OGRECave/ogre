@@ -289,7 +289,8 @@ namespace Ogre
 						++j;
 					}
 
-					// Consume all the newlines
+					// Move it backwards once, since the end of the loop moves it forwards again anyway
+					j--;
 					i = j;
 
 					// Insert the node
