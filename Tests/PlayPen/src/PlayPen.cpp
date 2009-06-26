@@ -173,12 +173,6 @@ public:
 
     bool frameStarted(const FrameEvent& evt)
     {
-		//mMoveSpeed = 0.2;
-		if (mKeyboard->isKeyDown(OIS::KC_SCROLL))
-		{
-			mWindow->writeContentsToTimestampedFile("test", ".jpg");
-		}
-
         if (!vertParams.isNull())
         {
             Matrix4 scaleMat = Matrix4::IDENTITY;
@@ -273,12 +267,34 @@ public:
 
 		if (mTerrain)
 		{
-			TerrainQuadTreeNode* quad = mTerrain->getQuadTree();
-			while (!quad->isLeaf())
-				quad = quad->getChild(0);
+			if (mKeyboard->isKeyDown(OIS::KC_SPACE))
+			{
+				// fire ray
+				Ray ray; 
+				ray = mCamera->getCameraToViewportRay(0.5, 0.5);
+				//ray.setOrigin(mCamera->getDerivedPosition());
+				//ray.setDirection(Vector3::NEGATIVE_UNIT_Y);
+				std::pair<bool, Vector3> rayResult = mTerrain->rayIntersects(ray);
 
-			mDebugText = "LOD: " + StringConverter::toString(quad->getCurrentLod()) 
-				+ " Transition: " + StringConverter::toString(quad->getLodTransition());
+				static SceneNode* testNode = 0;
+				if (!testNode)
+				{
+					testNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+					testNode->attachObject(mSceneMgr->createEntity("tst", "sphere.mesh"));
+					testNode->setScale(0.1, 0.1, 0.1);
+				}
+				if (rayResult.first)
+				{
+					testNode->setPosition(rayResult.second);
+					StringUtil::StrStreamType str;
+					str << "HIT: " << rayResult.second;
+					mDebugText = str.str();
+				}
+				else
+				{
+					mDebugText = "MISS";
+				}
+			}
 		}
 
 		return ret;
@@ -7937,20 +7953,27 @@ protected:
 		imp.minBatchSize = 33;
 		imp.maxBatchSize = 65;
 		// textures
-		imp.layerList.resize(2);
-		imp.layerList[0].worldSize = 20;
-		imp.layerList[0].textureNames.push_back("grass_green-01_diffusespecular.dds");
-		imp.layerList[0].textureNames.push_back("grass_green-01_normalheight.dds");
-		imp.layerList[1].worldSize = 100;
-		imp.layerList[1].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
-		imp.layerList[1].textureNames.push_back("dirt_grayrocky_normalheight.dds");
+		imp.layerList.resize(3);
+		imp.layerList[0].worldSize = 100;
+		imp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
+		imp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
+		imp.layerList[1].worldSize = 30;
+		imp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
+		imp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
+		imp.layerList[2].worldSize = 200;
+		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
+		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
 		mTerrain->prepare(imp);
 		mTerrain->load();
 
 		TerrainLayerBlendMap* blendMap0 = mTerrain->getLayerBlendMap(1);
-		Real rockMinHeight = 100;
-		Real rockFadeDist = 15;
-		uint8* pBlend = blendMap0->getBlendPointer();
+		TerrainLayerBlendMap* blendMap1 = mTerrain->getLayerBlendMap(2);
+		Real minHeight0 = 70;
+		Real fadeDist0 = 40;
+		Real minHeight1 = 70;
+		Real fadeDist1 = 15;
+		uint8* pBlend0 = blendMap0->getBlendPointer();
+		uint8* pBlend1 = blendMap1->getBlendPointer();
 		for (uint16 y = 0; y < mTerrain->getLayerBlendMapSize(); ++y)
 		{
 			for (uint16 x = 0; x < mTerrain->getLayerBlendMapSize(); ++x)
@@ -7959,40 +7982,38 @@ protected:
 
 				blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
 				Real height = mTerrain->getHeightAtTerrainPosition(tx, ty);
-				Real val = (height - rockMinHeight) / rockFadeDist;
+				Real val = (height - minHeight0) / fadeDist0;
 				val = Math::Clamp(val, (Real)0, (Real)1);
+				//*pBlend0++ = val * 255;
 
-				*pBlend++ = val * 255;
+				val = (height - minHeight1) / fadeDist1;
+				val = Math::Clamp(val, (Real)0, (Real)1);
+				*pBlend1++ = val * 255;
+
 
 			}
 		}
 		blendMap0->dirty();
-		/*
-		for (size_t y = 0; y < 50; ++y)
-		{
-			for (size_t x = 0; x < 50; ++x)
-			{
-				float val = Math::Sqrt(x*x + y*y);
-				val = val - 20.0f;
-				val /= 25.0f;
-				val = std::min(1.0f, val);
-				val = std::max(0.0f, val);
-
-				blendMap->setBlendValue(x, y, 255 - (val * 255));
-
-
-			}
-		}
-		*/
+		blendMap1->dirty();
 		//blendMap0->loadImage("blendmap1.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		blendMap0->update();
+		blendMap1->update();
+
+		/*
+		// set up a colour map
+		mTerrain->setGlobalColourMapEnabled(true);
+		Image colourMap;
+		colourMap.load("testcolourmap.jpg", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		mTerrain->getGlobalColourMap()->loadImage(colourMap);
+		*/
 
 		//addTextureDebugOverlay(TextureManager::getSingleton().getByName(mTerrain->getBlendTextureName(0)), 0);
 
 		//mWindow->getViewport(0)->setBackgroundColour(ColourValue::Blue);
 
-		/*
+		
 		// create a few entities on the terrain
+		/*
 		for (int i = 0; i < 20; ++i)
 		{
 			Entity* e = mSceneMgr->createEntity("ninja.mesh");
@@ -8002,10 +8023,14 @@ protected:
 			mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(x, y, z))->attachObject(e);
 		}
 		*/
-		mCamera->setPosition(-2400,300,-2400);
+		
+		mCamera->setPosition(-2500,300,2500);
 		mCamera->lookAt(Vector3::ZERO);
 		mCamera->setNearClipDistance(5);
 		mCamera->setFarClipDistance(15000);
+
+		Ray tstRay(Vector3(-3999,600,3999), Vector3::NEGATIVE_UNIT_Y);
+		std::pair<bool, Vector3> res = mTerrain->rayIntersects(tstRay);
 
 		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
 
@@ -8191,8 +8216,8 @@ protected:
 		//testImageCombine();
 
 
-		/*
 		Image combined;
+		/*
 		combined.loadTwoImagesAsRGBA("dirt_grayrocky_DIFFUSE.png", "dirt_grayrocky_SPECULAR.png", 
 			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, PF_BYTE_RGBA);
 
