@@ -77,8 +77,7 @@ void GLHardwarePixelBuffer::freeBuffer()
 PixelBox GLHardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions options)
 {
 	allocateBuffer();
-	if(options != HardwareBuffer::HBL_DISCARD
-		&& (mUsage & HardwareBuffer::HBU_WRITE_ONLY) == 0) 
+	if(options != HardwareBuffer::HBL_DISCARD) 
 	{
 		// Download the old contents of the texture
 		download(mBuffer);
@@ -127,6 +126,7 @@ void GLHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box
 	}
 	else
 	{
+		allocateBuffer();
 		// No scaling or conversion needed
 		scaled = src;
 	}
