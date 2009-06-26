@@ -2415,7 +2415,9 @@ namespace Ogre
 							sz * sizeof(int));
 					}
 					// we'll use this map to resolve autos later
-					srcToDestNamedMap[olddef.physicalIndex] = paramName;
+					// ignore the [0] aliases
+					if (!StringUtil::endsWith(paramName, "[0]"))
+						srcToDestNamedMap[olddef.physicalIndex] = paramName;
 				}
 			}
 
