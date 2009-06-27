@@ -749,7 +749,7 @@ void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveText
 			// Potentially many surfaces
 			for (size_t s = 0; s < subSurf; ++s)
 			{
-				String texName = subSurf > 1 ? getMRTTexLocalName(def->name, subSurf)
+				String texName = subSurf > 1 ? getMRTTexLocalName(def->name, s)
 					: def->name;
 
 				LocalTextureMap::iterator i = mLocalTextures.find(texName);
