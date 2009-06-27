@@ -22,9 +22,11 @@ if (APPLE)
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${CMAKE_SOURCE_DIR}/Samples/Common/include)
+include_directories(
+	${CMAKE_SOURCE_DIR}/Samples/Common/include 
+	${CMAKE_SOURCE_DIR}/Components/Terrain/include)
 add_executable(PlayPen WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
-target_link_libraries(PlayPen ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(PlayPen ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_Terrain_LIBRARIES})
 ogre_config_sample(PlayPen)
 
 add_dependencies(PlayPen ${TEST_DEPENDENCIES})
