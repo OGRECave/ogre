@@ -131,11 +131,14 @@ namespace Ogre
 		for (int i = 0; i < 4; ++i)
 			OGRE_DELETE mChildren[i];
 
+		destroyCpuVertexData();
+		destroyCpuIndexData();
+		destroyGpuVertexData();
+		destroyGpuIndexData();
+
 		for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i)
 			OGRE_DELETE *i;
 
-		destroyCpuVertexData();
-		destroyGpuVertexData();
 		OGRE_DELETE mVertexDataRecord;
 	}
 	//---------------------------------------------------------------------

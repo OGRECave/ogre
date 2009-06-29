@@ -836,6 +836,23 @@ namespace Ogre
 		return *getHeightData(x, y);
 	}
 	//---------------------------------------------------------------------
+	void Terrain::setHeightAtPoint(long x, long y, float h)
+	{
+		// clamp
+		x = std::min(x, (long)mSize - 1L);
+		x = std::max(x, 0L);
+		y = std::min(y, (long)mSize - 1L);
+		y = std::max(y, 0L);
+
+		*getHeightData(x, y) = h;
+		Rect rect;
+		rect.left = x;
+		rect.right = x+1;
+		rect.top = y;
+		rect.bottom = y+1;
+		dirtyRect(rect);
+	}
+	//---------------------------------------------------------------------
 	float Terrain::getHeightAtTerrainPosition(Real x, Real y)
 	{
 		// get left / bottom points (rounded down)

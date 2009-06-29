@@ -267,33 +267,43 @@ public:
 
 		if (mTerrain)
 		{
-			if (mKeyboard->isKeyDown(OIS::KC_SPACE))
-			{
-				// fire ray
-				Ray ray; 
-				ray = mCamera->getCameraToViewportRay(0.5, 0.5);
-				//ray.setOrigin(mCamera->getDerivedPosition());
-				//ray.setDirection(Vector3::NEGATIVE_UNIT_Y);
-				std::pair<bool, Vector3> rayResult = mTerrain->rayIntersects(ray);
+			// fire ray
+			Ray ray; 
+			ray = mCamera->getCameraToViewportRay(0.5, 0.5);
+			//ray.setOrigin(mCamera->getDerivedPosition());
+			//ray.setDirection(Vector3::NEGATIVE_UNIT_Y);
+			std::pair<bool, Vector3> rayResult = mTerrain->rayIntersects(ray);
 
-				static SceneNode* testNode = 0;
-				if (!testNode)
+			static SceneNode* testNode = 0;
+			if (!testNode)
+			{
+				testNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+				testNode->attachObject(mSceneMgr->createEntity("tst", "sphere.mesh"));
+				testNode->setScale(0.05, 0.05, 0.05);
+			}
+			if (rayResult.first)
+			{
+				testNode->setPosition(rayResult.second);
+				StringUtil::StrStreamType str;
+				str << "HIT: " << rayResult.second;
+				mDebugText = str.str();
+
+				if (mKeyboard->isKeyDown(OIS::KC_SPACE))
 				{
-					testNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-					testNode->attachObject(mSceneMgr->createEntity("tst", "sphere.mesh"));
-					testNode->setScale(0.1, 0.1, 0.1);
+					Vector3 tsPos;
+					mTerrain->getTerrainPosition(rayResult.second, &tsPos);
+
+					size_t x = tsPos.x * (mTerrain->getSize()-1);
+					size_t y = tsPos.y * (mTerrain->getSize()-1);
+					float newheight = tsPos.z - 10;
+
+					mTerrain->setHeightAtPoint(x, y, newheight);
+					mTerrain->update();
 				}
-				if (rayResult.first)
-				{
-					testNode->setPosition(rayResult.second);
-					StringUtil::StrStreamType str;
-					str << "HIT: " << rayResult.second;
-					mDebugText = str.str();
-				}
-				else
-				{
-					mDebugText = "MISS";
-				}
+			}
+			else
+			{
+				mDebugText = "MISS";
 			}
 		}
 
@@ -654,6 +664,9 @@ public:
 			delete mFrameListener;
 			mFrameListener = 0;
 		}
+
+		delete mTerrain;
+
 		if (mRoot)
 		{
 			delete mRoot;

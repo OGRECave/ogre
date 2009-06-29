@@ -326,6 +326,8 @@ namespace Ogre {
 		OGRE_DELETE mBillboardChainFactory;
 		OGRE_DELETE mRibbonTrailFactory;
 
+		OGRE_DELETE mWorkQueue;
+
 		OGRE_DELETE mTimer;
 
         OGRE_DELETE mDynLibManager;

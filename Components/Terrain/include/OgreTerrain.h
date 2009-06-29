@@ -440,6 +440,14 @@ namespace Ogre
 		*/
 		float getHeightAtPoint(long x, long y);
 
+		/** Set the height data for a given terrain point. 
+		@note this doesn't take effect until you call update()
+		@param x, y Discrete coordinates in terrain vertices, values from 0 to size-1,
+		left/right bottom/top
+		@param h The new height
+		*/
+		void setHeightAtPoint(long x, long y, float h);
+
 		/** Get the height data for a given terrain position. 
 		@param x, y Position in terrain space, values from 0 to 1 left/right bottom/top
 		*/
