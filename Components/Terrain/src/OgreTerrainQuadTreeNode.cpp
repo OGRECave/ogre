@@ -508,11 +508,11 @@ namespace Ogre
 		// potentially reset our bounds depending on coverage of the update
 		resetBounds(rect);
 
-		long destOffsetX = rect.left - mOffsetX;
-		long destOffsetY = rect.top - mOffsetY;
-		// Fill the buffers
 		// Main data
 		uint16 inc = (mTerrain->getSize()-1) / (mVertexDataRecord->resolution-1);
+		long destOffsetX = rect.left <= mOffsetX ? 0 : (rect.left - mOffsetX) / inc;
+		long destOffsetY = rect.top <= mOffsetY ? 0 : (rect.top - mOffsetY) / inc;
+		// Fill the buffers
 		
 		HardwareBuffer::LockOptions lockMode;
 		if (destOffsetX || destOffsetY || rect.right - rect.left < mSize
@@ -588,6 +588,9 @@ namespace Ogre
 		long skirtStartY = rect.top;
 		if (skirtStartY % skirtSpacing)
 			skirtStartY += skirtSpacing - (skirtStartY % skirtSpacing);
+		skirtStartX = std::max(skirtStartX, (long)mOffsetX);
+		skirtStartY = std::max(skirtStartY, (long)mOffsetY);
+
 		
 		// skirt rows
 		pBaseHeight = mTerrain->getHeightData(skirtStartX, skirtStartY);
