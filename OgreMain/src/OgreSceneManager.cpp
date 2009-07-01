@@ -1254,8 +1254,9 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 					// MUST be specific to this camera / target is done 
 					// AFTER THIS POINT
 					prepareShadowTextures(camera, vp);
-					// reset the cameras because of the re-entrant call
+					// reset the cameras & viewport because of the re-entrant call
 					mCameraInProgress = camera;
+					mCurrentViewport = vp;
 				}
 			}
 		}
