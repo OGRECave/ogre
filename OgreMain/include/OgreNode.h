@@ -31,6 +31,7 @@ Torus Knot Software Ltd.
 
 #include "OgrePrerequisites.h"
 
+#include "OgreCommon.h"
 #include "OgreMatrix3.h"
 #include "OgreMatrix4.h"
 #include "OgreQuaternion.h"
@@ -141,7 +142,7 @@ namespace Ogre {
         String mName;
 
         /// Incremented count for next name extension
-        static unsigned long msNextGeneratedNameExt;
+        static NameGenerator msNameGenerator;
 
         /// Stores the orientation of the node relative to it's parent.
         Quaternion mOrientation;

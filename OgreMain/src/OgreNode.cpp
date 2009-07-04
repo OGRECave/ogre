@@ -44,7 +44,7 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    unsigned long Node::msNextGeneratedNameExt = 1;
+    NameGenerator Node::msNameGenerator("Unnamed_");
 	Node::QueuedUpdates Node::msQueuedUpdates;
     //-----------------------------------------------------------------------
     Node::Node()
@@ -69,9 +69,7 @@ namespace Ogre {
 		mDebug(0)
     {
         // Generate a name
-		StringUtil::StrStreamType str;
-		str << "Unnamed_" << msNextGeneratedNameExt++;
-        mName = str.str();
+        mName = msNameGenerator.generate();
 
         needUpdate();
 

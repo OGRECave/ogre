@@ -37,7 +37,7 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-    typedef unsigned long ResourceHandle;
+    typedef unsigned long long int ResourceHandle;
 
 
 	// Forward declaration
