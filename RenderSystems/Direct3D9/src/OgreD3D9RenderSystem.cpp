@@ -2689,6 +2689,16 @@ namespace Ogre
 
 		HRESULT hr;
 
+
+		// If this is called without going through RenderWindow::update, then 
+		// the device will not have been set. Calling it twice is safe, the 
+		// implementation ensures nothing happens if the same device is set twice
+		if (std::find(mRenderWindows.begin(), mRenderWindows.end(), target) != mRenderWindows.end())
+		{
+			D3D9RenderWindow *window = static_cast<D3D9RenderWindow*>(target);
+			mDeviceManager->setActiveRenderTargetDevice(window->getDevice());
+		}
+
 		// Retrieve render surfaces (up to OGRE_MAX_MULTIPLE_RENDER_TARGETS)
 		IDirect3DSurface9* pBack[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 		memset(pBack, 0, sizeof(pBack));
