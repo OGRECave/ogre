@@ -610,7 +610,8 @@ void D3D9HardwarePixelBuffer::createRenderTextures(bool update, bool writeGamma,
         for (SliceTRT::const_iterator it = mSliceTRT.begin(); it != mSliceTRT.end(); ++it)
         {
             D3D9RenderTexture *trt = static_cast<D3D9RenderTexture*>(*it);
-            trt->rebind(this);
+			if (trt)
+				trt->rebind(this);
         }
         return;
     }
