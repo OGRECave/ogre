@@ -298,13 +298,19 @@ public:
 					float newheight = tsPos.z - 10;
 
 					mTerrain->setHeightAtPoint(x, y, newheight);
-					mTerrain->update();
 				}
 			}
 			else
 			{
 				mDebugText = "MISS";
 			}
+
+			static float updateDelay = 0;
+			if (mKeyboard->isKeyDown(OIS::KC_U) && updateDelay <= 0)
+			{
+				mTerrain->update();
+			}
+			updateDelay -= evt.timeSinceLastFrame;
 		}
 
 		return ret;
@@ -522,38 +528,41 @@ public:
 				}
 			}
 		}
-		if (mKeyboard->isKeyDown(OIS::KC_P))
-        {
-            mTestNode[0]->yaw(Degree(-evt.timeSinceLastFrame * 30));
-        }
-		if (mKeyboard->isKeyDown(OIS::KC_O))
-        {
-            mTestNode[0]->yaw(Degree(evt.timeSinceLastFrame * 30));
-        }
-		if (mKeyboard->isKeyDown(OIS::KC_K))
-        {
-            mTestNode[0]->roll(Degree(-evt.timeSinceLastFrame * 30));
-        }
-		if (mKeyboard->isKeyDown(OIS::KC_L))
-        {
-            mTestNode[0]->roll(Degree(evt.timeSinceLastFrame * 30));
-        }
-		if (mKeyboard->isKeyDown(OIS::KC_U))
-        {
-            mTestNode[0]->translate(0,0,-evt.timeSinceLastFrame * 30);
-        }
-		if (mKeyboard->isKeyDown(OIS::KC_J))
-        {
-            mTestNode[0]->translate(0,0,evt.timeSinceLastFrame * 30);
-        }
-		if (mKeyboard->isKeyDown(OIS::KC_M))
-        {
-            mTestNode[0]->translate(0,evt.timeSinceLastFrame * 30, 0);
-        }
-		if (mKeyboard->isKeyDown(OIS::KC_N))
-        {
-            mTestNode[0]->translate(0,-evt.timeSinceLastFrame * 30, 0);
-        }
+		if (mTestNode[0])
+		{
+			if (mKeyboard->isKeyDown(OIS::KC_P))
+			{
+				mTestNode[0]->yaw(Degree(-evt.timeSinceLastFrame * 30));
+			}
+			if (mKeyboard->isKeyDown(OIS::KC_O))
+			{
+				mTestNode[0]->yaw(Degree(evt.timeSinceLastFrame * 30));
+			}
+			if (mKeyboard->isKeyDown(OIS::KC_K))
+			{
+				mTestNode[0]->roll(Degree(-evt.timeSinceLastFrame * 30));
+			}
+			if (mKeyboard->isKeyDown(OIS::KC_L))
+			{
+				mTestNode[0]->roll(Degree(evt.timeSinceLastFrame * 30));
+			}
+			if (mKeyboard->isKeyDown(OIS::KC_U))
+			{
+				mTestNode[0]->translate(0,0,-evt.timeSinceLastFrame * 30);
+			}
+			if (mKeyboard->isKeyDown(OIS::KC_J))
+			{
+				mTestNode[0]->translate(0,0,evt.timeSinceLastFrame * 30);
+			}
+			if (mKeyboard->isKeyDown(OIS::KC_M))
+			{
+				mTestNode[0]->translate(0,evt.timeSinceLastFrame * 30, 0);
+			}
+			if (mKeyboard->isKeyDown(OIS::KC_N))
+			{
+				mTestNode[0]->translate(0,-evt.timeSinceLastFrame * 30, 0);
+			}
+		}
 
         if (mKeyboard->isKeyDown(OIS::KC_0) && timeUntilNextToggle <= 0)
         {
