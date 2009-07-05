@@ -1342,8 +1342,9 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 					// MUST be specific to this camera / target is done 
 					// AFTER THIS POINT
 					prepareShadowTextures(camera, vp);
-					// reset the cameras because of the re-entrant call
+					// reset the cameras & viewport because of the re-entrant call
 					mCameraInProgress = camera;
+					mCurrentViewport = vp;
 				}
 			}
 		}
@@ -5987,6 +5988,10 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
 					texCam->setDirection(light->getDerivedDirection());
 				if (light->getType() != Light::LT_DIRECTIONAL)
 					texCam->setPosition(light->getDerivedPosition());
+
+				// Use the material scheme of the main viewport 
+				// This is required to pick up the correct shadow_caster_material and similar properties.
+				shadowView->setMaterialScheme(vp->getMaterialScheme());
 
 				// update shadow cam - light mapping
 				ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );

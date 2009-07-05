@@ -383,9 +383,59 @@ namespace Ogre {
 			} // columns
 			break;
 		case D3DXPT_FLOAT:
-			switch(d3dDesc.RegisterCount)
+			switch(d3dDesc.Class)
 			{
-			case 1:
+			case D3DXPC_MATRIX_COLUMNS:
+			case D3DXPC_MATRIX_ROWS:
+				switch(d3dDesc.RegisterCount)
+				{
+				case 2:
+					switch(d3dDesc.Columns)
+					{
+					case 2:
+						def.constType = GCT_MATRIX_2X2;
+						break;
+					case 3:
+						def.constType = GCT_MATRIX_2X3;
+						break;
+					case 4:
+						def.constType = GCT_MATRIX_2X4;
+						break;
+					} // columns
+					break;
+				case 3:
+					switch(d3dDesc.Columns)
+					{
+					case 2:
+						def.constType = GCT_MATRIX_3X2;
+						break;
+					case 3:
+						def.constType = GCT_MATRIX_3X3;
+						break;
+					case 4:
+						def.constType = GCT_MATRIX_3X4;
+						break;
+					} // columns
+					break;
+				case 4:
+					switch(d3dDesc.Columns)
+					{
+					case 2:
+						def.constType = GCT_MATRIX_4X2;
+						break;
+					case 3:
+						def.constType = GCT_MATRIX_4X3;
+						break;
+					case 4:
+						def.constType = GCT_MATRIX_4X4;
+						break;
+					} // columns
+					break;
+
+				} // rows
+				break;
+			case D3DXPC_SCALAR:
+			case D3DXPC_VECTOR:
 				switch(d3dDesc.Columns)
 				{
 				case 1:
@@ -402,52 +452,7 @@ namespace Ogre {
 					break;
 				} // columns
 				break;
-			case 2:
-				switch(d3dDesc.Columns)
-				{
-				case 2:
-					def.constType = GCT_MATRIX_2X2;
-					break;
-				case 3:
-					def.constType = GCT_MATRIX_2X3;
-					break;
-				case 4:
-					def.constType = GCT_MATRIX_2X4;
-					break;
-				} // columns
-				break;
-			case 3:
-				switch(d3dDesc.Columns)
-				{
-				case 2:
-					def.constType = GCT_MATRIX_3X2;
-					break;
-				case 3:
-					def.constType = GCT_MATRIX_3X3;
-					break;
-				case 4:
-					def.constType = GCT_MATRIX_3X4;
-					break;
-				} // columns
-				break;
-			case 4:
-				switch(d3dDesc.Columns)
-				{
-				case 2:
-					def.constType = GCT_MATRIX_4X2;
-					break;
-				case 3:
-					def.constType = GCT_MATRIX_4X3;
-					break;
-				case 4:
-					def.constType = GCT_MATRIX_4X4;
-					break;
-				} // columns
-				break;
-
-			} // rows
-			break;
-			
+			}
 		default:
 			// not mapping samplers, don't need to take the space 
 			break;
