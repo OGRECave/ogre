@@ -5854,6 +5854,10 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
 				if (light->getType() != Light::LT_DIRECTIONAL)
 					texCam->setPosition(light->getDerivedPosition());
 
+				// Use the material scheme of the main viewport 
+				// This is required to pick up the correct shadow_caster_material and similar properties.
+				shadowView->setMaterialScheme(vp->getMaterialScheme());
+
 				// update shadow cam - light mapping
 				ShadowCamLightMapping::iterator camLightIt = mShadowCamLightMapping.find( texCam );
 				assert(camLightIt != mShadowCamLightMapping.end());
