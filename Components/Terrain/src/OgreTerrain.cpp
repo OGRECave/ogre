@@ -1676,7 +1676,7 @@ namespace Ogre
 		int zDir = (rayDirection.z < 0 ? -1 : 1);
 
 		Result result;
-		while (cur.y >= minHeight && cur.y <= maxHeight)
+		while (cur.y >= (minHeight - 1e-3) && cur.y <= (maxHeight + 1e-3))
 		{
 			if (quadX < 0 || quadX >= (int)mSize-1 || quadZ < 0 || quadZ >= (int)mSize-1)
 				break;
