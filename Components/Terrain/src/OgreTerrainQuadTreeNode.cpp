@@ -500,6 +500,7 @@ namespace Ogre
 			
 			Rect updateRect(mOffsetX, mOffsetY, mBoundaryX, mBoundaryY);
 			updateVertexBuffer(vbuf, updateRect);
+			mVertexDataRecord->gpuVertexDataDirty = true;
 			bufbind->setBinding(0, vbuf);
 		}
 	}
@@ -666,8 +667,6 @@ namespace Ogre
 
 		vbuf->unlock();
 		
-		mVertexDataRecord->gpuVertexDataDirty = true;
-
 	}
 	//---------------------------------------------------------------------
 	uint16 TerrainQuadTreeNode::calcSkirtVertexIndex(uint16 mainIndex, bool isCol)
