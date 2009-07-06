@@ -129,6 +129,8 @@ namespace Ogre
 		, mCpuTerrainNormalMap(0)
 		, mCpuTerrainLightMap(0)
 		, mCpuTerrainHorizonMap(0)
+		, mLastLODCamera(0)
+		, mLastLODFrame(0)
 
 	{
 		mRootNode = sm->getRootSceneNode()->createChildSceneNode();
@@ -1566,9 +1568,17 @@ namespace Ogre
 	void Terrain::preFindVisibleObjects(SceneManager* source, 
 		SceneManager::IlluminationRenderStage irs, Viewport* v)
 	{
-		// only calculate LOD on main render passes
-		if (irs == SceneManager::IRS_NONE)
+		// only calculate LOD once per LOD camera, per frame
+		// shadow renders will pick up LOD camera from main viewport and so LOD will only
+		// be calculated once for that case
+		const Camera* lodCamera = v->getCamera()->getLodCamera();
+		unsigned long frameNum = Root::getSingleton().getNextFrameNumber();
+		if (mLastLODCamera != lodCamera || frameNum != mLastLODFrame)
+		{
+			mLastLODCamera = lodCamera;
+			mLastLODFrame = frameNum;
 			calculateCurrentLod(v);
+		}
 	}
 	//---------------------------------------------------------------------
 	void Terrain::sceneManagerDestroyed(SceneManager* source)

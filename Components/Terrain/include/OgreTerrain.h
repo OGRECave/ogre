@@ -1114,6 +1114,9 @@ namespace Ogre
 		PixelBox* mCpuTerrainLightMap;
 		PixelBox* mCpuTerrainHorizonMap;
 
+		const Camera* mLastLODCamera;
+		unsigned long mLastLODFrame;
+
 	};
 
 
