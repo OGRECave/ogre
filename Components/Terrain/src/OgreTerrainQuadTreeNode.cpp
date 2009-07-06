@@ -54,6 +54,7 @@ namespace Ogre
 		, mVertexDataRecord(0)
 		, mMovable(0)
 		, mRend(0)
+		, mCurrentLod(-1)
 	{
 		if (terrain->getMaxBatchSize() < size)
 		{
@@ -962,7 +963,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::resetBounds(const Rect& rect)
 	{
-		if (rectIntersectsNode(rect))
+		if (rectContainsNode(rect))
 		{
 			mAABB.setNull();
 			mBoundingRadius = 0;
@@ -975,6 +976,12 @@ namespace Ogre
 
 			
 		}
+	}
+	//---------------------------------------------------------------------
+	bool TerrainQuadTreeNode::rectContainsNode(const Rect& rect)
+	{
+		return (rect.left <= mOffsetX && rect.right > mBoundaryX &&
+			rect.top <= mOffsetY && rect.bottom > mBoundaryY);
 	}
 	//---------------------------------------------------------------------
 	bool TerrainQuadTreeNode::rectIntersectsNode(const Rect& rect)

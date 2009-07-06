@@ -208,6 +208,11 @@ namespace Ogre
 		 @param rect The region in top-level terrain coords
 		*/
 		bool rectIntersectsNode(const Rect& rect);
+		/** Returns true if the given rectangle completely contains the terrain area that
+		this node references.
+		@param rect The region in top-level terrain coords
+		*/
+		bool rectContainsNode(const Rect& rect);
 		/** Returns true if the given point is in the terrain area that
 		 this node references.
 		 @param x,y The point in top-level terrain coords
