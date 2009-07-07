@@ -368,6 +368,8 @@ namespace Ogre
 			{
 				// copy from 'calc' area to runtime value
 				(*i)->maxHeightDelta = (*i)->calcMaxHeightDelta;
+				// also trash stored cfactor
+				(*i)->lastCFactor = 0;
 			}
 
 		}
