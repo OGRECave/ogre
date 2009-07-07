@@ -1291,7 +1291,7 @@ namespace Ogre
 	{
 		if (mDirtyGeometryRect.width() && mDirtyGeometryRect.height())
 		{
-			mQuadTree->updateVertexData(mDirtyGeometryRect);
+			mQuadTree->updateVertexData(true, false, mDirtyGeometryRect);
 			mDirtyGeometryRect.left = mDirtyGeometryRect.top = 
 				mDirtyGeometryRect.right = mDirtyGeometryRect.bottom = 0;
 		}
@@ -1555,7 +1555,10 @@ namespace Ogre
 		clampedRect.right = std::min((long)mSize, clampedRect.right);
 		clampedRect.bottom = std::min((long)mSize, clampedRect.bottom);
 
+		// min/max information
 		mQuadTree->finaliseDeltaValues(clampedRect);
+		// delta vertex data
+		mQuadTree->updateVertexData(false, true, clampedRect);
 
 	}
 

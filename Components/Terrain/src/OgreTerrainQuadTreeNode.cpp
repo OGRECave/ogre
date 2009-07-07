@@ -36,6 +36,9 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
+	unsigned short TerrainQuadTreeNode::POSITION_BUFFER = 0;
+	unsigned short TerrainQuadTreeNode::DELTA_BUFFER = 1;
+
 	//---------------------------------------------------------------------
 	TerrainQuadTreeNode::TerrainQuadTreeNode(Terrain* terrain, 
 		TerrainQuadTreeNode* parent, uint16 xoff, uint16 yoff, uint16 size, 
@@ -418,7 +421,7 @@ namespace Ogre
 		createCpuIndexData();
 	}
 	//---------------------------------------------------------------------
-	void TerrainQuadTreeNode::updateVertexData(const Rect& rect)
+	void TerrainQuadTreeNode::updateVertexData(bool positions, bool deltas, const Rect& rect)
 	{
 		if (rect.left <= mBoundaryX || rect.right > mOffsetX
 			|| rect.top <= mBoundaryY || rect.bottom > mOffsetY)
@@ -437,16 +440,19 @@ namespace Ogre
 				// TODO: do we have no use for CPU vertex data after initial load?
 				// if so, destroy it to free RAM, this should be fast enough to 
 				// to direct
-				HardwareVertexBufferSharedPtr vbuf = 
-					mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(0);
-				updateVertexBuffer(vbuf, updateRect);
+				HardwareVertexBufferSharedPtr posbuf, deltabuf;
+				if (positions) 
+					posbuf = mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(POSITION_BUFFER);
+				if (deltas)
+					deltabuf = mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(DELTA_BUFFER);
+				updateVertexBuffer(posbuf, deltabuf, updateRect);
 			}
 
 			// pass on to children
 			if (!isLeaf())
 			{
 				for (int i = 0; i < 4; ++i)
-					mChildren[i]->updateVertexData(rect);
+					mChildren[i]->updateVertexData(positions, deltas, rect);
 
 			}
 
@@ -476,10 +482,15 @@ namespace Ogre
 			size_t offset = 0;
 			// POSITION 
 			// float3(x, y, z)
-			offset += dcl->addElement(0, offset, VET_FLOAT3, VES_POSITION).getSize();
+			offset += dcl->addElement(POSITION_BUFFER, offset, VET_FLOAT3, VES_POSITION).getSize();
 			// UV0
-			// float4(u, v, delta, deltaLODthreshold)
-			offset += dcl->addElement(0, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES).getSize();
+			// float2(u, v)
+			// TODO - only include this if needing fixed-function
+			offset += dcl->addElement(POSITION_BUFFER, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0).getSize();
+			// UV1 delta information
+			// float2(delta, deltaLODthreshold)
+			offset = 0;
+			offset += dcl->addElement(DELTA_BUFFER, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 1).getSize();
 
 			// Calculate number of vertices
 			// Base geometry size * size
@@ -499,20 +510,24 @@ namespace Ogre
 			numVerts += mVertexDataRecord->size * mVertexDataRecord->numSkirtRowsCols;
 
 			// manually create CPU-side buffer
-			HardwareVertexBufferSharedPtr vbuf(
-				OGRE_NEW DefaultHardwareVertexBuffer(dcl->getVertexSize(0), numVerts, HardwareBuffer::HBU_STATIC_WRITE_ONLY));
+			HardwareVertexBufferSharedPtr posbuf(
+				OGRE_NEW DefaultHardwareVertexBuffer(dcl->getVertexSize(POSITION_BUFFER), numVerts, HardwareBuffer::HBU_STATIC_WRITE_ONLY));
+			HardwareVertexBufferSharedPtr deltabuf(
+				OGRE_NEW DefaultHardwareVertexBuffer(dcl->getVertexSize(DELTA_BUFFER), numVerts, HardwareBuffer::HBU_STATIC_WRITE_ONLY));
 
 			mVertexDataRecord->cpuVertexData->vertexStart = 0;
 			mVertexDataRecord->cpuVertexData->vertexCount = numVerts;
 			
 			Rect updateRect(mOffsetX, mOffsetY, mBoundaryX, mBoundaryY);
-			updateVertexBuffer(vbuf, updateRect);
+			updateVertexBuffer(posbuf, deltabuf, updateRect);
 			mVertexDataRecord->gpuVertexDataDirty = true;
-			bufbind->setBinding(0, vbuf);
+			bufbind->setBinding(POSITION_BUFFER, posbuf);
+			bufbind->setBinding(DELTA_BUFFER, deltabuf);
 		}
 	}
 	//----------------------------------------------------------------------
-	void TerrainQuadTreeNode::updateVertexBuffer(HardwareVertexBufferSharedPtr& vbuf, const Rect& rect)
+	void TerrainQuadTreeNode::updateVertexBuffer(HardwareVertexBufferSharedPtr& posbuf, 
+		HardwareVertexBufferSharedPtr& deltabuf, const Rect& rect)
 	{
 		assert (rect.left >= mOffsetX && rect.right <= mBoundaryX && 
 			rect.top >= mOffsetY && rect.bottom <= mBoundaryY);
@@ -541,53 +556,85 @@ namespace Ogre
 		const float* pBaseHeight = mTerrain->getHeightData(rect.left, rect.top);
 		const float* pBaseDelta = mTerrain->getDeltaData(rect.left, rect.top);
 		uint16 rowskip = mTerrain->getSize() * inc;
-		uint16 destRowSkip = mVertexDataRecord->size * vbuf->getVertexSize();
+		uint16 destPosRowSkip, destDeltaRowSkip;
+		unsigned char* pRootPosBuf = 0;
+		unsigned char* pRootDeltaBuf = 0;
+		unsigned char* pRowPosBuf = 0;
+		unsigned char* pRowDeltaBuf = 0;
+
+		if (!posbuf.isNull())
+		{
+			destPosRowSkip = mVertexDataRecord->size * posbuf->getVertexSize();
+			pRootPosBuf = static_cast<unsigned char*>(posbuf->lock(lockMode));
+			pRowPosBuf = pRootPosBuf;
+			// skip dest buffer in by left/top
+			pRowPosBuf += destOffsetY * destPosRowSkip + destOffsetX * posbuf->getVertexSize();
+		}
+		if (!deltabuf.isNull())
+		{
+			destDeltaRowSkip = mVertexDataRecord->size * deltabuf->getVertexSize();
+			pRootDeltaBuf = static_cast<unsigned char*>(deltabuf->lock(lockMode));
+			pRowDeltaBuf = pRootDeltaBuf;
+			// skip dest buffer in by left/top
+			pRowDeltaBuf += destOffsetY * destDeltaRowSkip + destOffsetX * deltabuf->getVertexSize();
+		}
 		Vector3 pos;
-		unsigned char* pRootBuf = static_cast<unsigned char*>(vbuf->lock(lockMode));
-		unsigned char* pRowBuf = pRootBuf;
-		// skip dest buffer in by left/top
-		pRowBuf += destOffsetY * destRowSkip + destOffsetX * vbuf->getVertexSize();
+		
 		for (uint16 y = rect.top; y < rect.bottom; y += inc)
 		{
 			const float* pHeight = pBaseHeight;
 			const float* pDelta = pBaseDelta;
-			float* pBuf = static_cast<float*>(static_cast<void*>(pRowBuf));
+			float* pPosBuf = static_cast<float*>(static_cast<void*>(pRowPosBuf));
+			float* pDeltaBuf = static_cast<float*>(static_cast<void*>(pRowDeltaBuf));
 			for (uint16 x = rect.left; x < rect.right; x += inc)
 			{
-				mTerrain->getPoint(x, y, *pHeight, &pos);
-				// relative to local centre
-				pos -= mLocalCentre;
+				if (pPosBuf)
+				{
+					mTerrain->getPoint(x, y, *pHeight, &pos);
+					// relative to local centre
+					pos -= mLocalCentre;
 
-				pHeight += inc;
+					pHeight += inc;
 
-				*pBuf++ = pos.x;
-				*pBuf++ = pos.y;
-				*pBuf++ = pos.z;
+					*pPosBuf++ = pos.x;
+					*pPosBuf++ = pos.y;
+					*pPosBuf++ = pos.z;
 
-				// UVs - base UVs vary from 0 to 1, all other values
-				// will be derived using scalings
-				*pBuf++ = x * uvScale;
-				*pBuf++ = 1.0 - (y * uvScale);
-				// delta
-				*pBuf++ = *pDelta;
-				pDelta += inc;
-				// delta LOD threshold
-				// we want delta to apply to LODs no higher than this value
-				// at runtime this will be combined with a per-renderable parameter
-				// to ensure we only apply morph to the correct LOD
-				*pBuf++ = (float)mTerrain->getLODLevelWhenVertexEliminated(x, y) - 1.0f;
-				// Update bounds
-				mergeIntoBounds(x, y, pos);
+					// UVs - base UVs vary from 0 to 1, all other values
+					// will be derived using scalings
+					*pPosBuf++ = x * uvScale;
+					*pPosBuf++ = 1.0 - (y * uvScale);
+
+					// Update bounds
+					mergeIntoBounds(x, y, pos);
+				}
+
+				if (pDeltaBuf)
+				{
+					// delta
+					*pDeltaBuf++ = *pDelta;
+					pDelta += inc;
+					// delta LOD threshold
+					// we want delta to apply to LODs no higher than this value
+					// at runtime this will be combined with a per-renderable parameter
+					// to ensure we only apply morph to the correct LOD
+					*pDeltaBuf++ = (float)mTerrain->getLODLevelWhenVertexEliminated(x, y) - 1.0f;
+
+				}
 
 				
 			}
 			pBaseHeight += rowskip;
 			pBaseDelta += rowskip;
-			pRowBuf += destRowSkip;
+			if (pRowPosBuf)
+				pRowPosBuf += destPosRowSkip;
+			if (pRowDeltaBuf)
+				pRowDeltaBuf += destDeltaRowSkip;
 
 		}
 
 
+		// Skirts now
 		// skirt spacing based on top-level resolution (* inc to cope with resolution which is not the max)
 		uint16 skirtSpacing = mVertexDataRecord->skirtRowColSkip * inc;
 		Vector3 skirtOffset;
@@ -606,76 +653,127 @@ namespace Ogre
 		
 		// skirt rows
 		pBaseHeight = mTerrain->getHeightData(skirtStartX, skirtStartY);
-		// position dest buffer just after the main vertex data
-		pRowBuf = pRootBuf + vbuf->getVertexSize() 
-			* mVertexDataRecord->size * mVertexDataRecord->size;
-		// move it onwards to skip the skirts we don't need to update
-		pRowBuf += destRowSkip * (skirtStartY - mOffsetY) / skirtSpacing;
-		pRowBuf += vbuf->getVertexSize() * (skirtStartX - mOffsetX) / skirtSpacing;
+		if (!posbuf.isNull())
+		{
+			// position dest buffer just after the main vertex data
+			pRowPosBuf = pRootPosBuf + posbuf->getVertexSize() 
+				* mVertexDataRecord->size * mVertexDataRecord->size;
+			// move it onwards to skip the skirts we don't need to update
+			pRowPosBuf += destPosRowSkip * (skirtStartY - mOffsetY) / skirtSpacing;
+			pRowPosBuf += posbuf->getVertexSize() * (skirtStartX - mOffsetX) / skirtSpacing;
+		}
+		if (!deltabuf.isNull())
+		{
+			// position dest buffer just after the main vertex data
+			pRowDeltaBuf = pRootDeltaBuf + deltabuf->getVertexSize() 
+				* mVertexDataRecord->size * mVertexDataRecord->size;
+			// move it onwards to skip the skirts we don't need to update
+			pRowDeltaBuf += destDeltaRowSkip * (skirtStartY - mOffsetY) / skirtSpacing;
+			pRowDeltaBuf += deltabuf->getVertexSize() * (skirtStartX - mOffsetX) / skirtSpacing;
+		}
 		for (uint16 y = skirtStartY; y < rect.bottom; y += skirtSpacing)
 		{
 			const float* pHeight = pBaseHeight;
-			float* pBuf = static_cast<float*>(static_cast<void*>(pRowBuf));
+			float* pPosBuf = static_cast<float*>(static_cast<void*>(pRowPosBuf));
+			float* pDeltaBuf = static_cast<float*>(static_cast<void*>(pRowDeltaBuf));
 			for (uint16 x = skirtStartX; x < rect.right; x += inc)
 			{
-				mTerrain->getPoint(x, y, *pHeight, &pos);
-				// relative to local centre
-				pos -= mLocalCentre;
-				pHeight += inc;
+				if (pPosBuf)
+				{
+					mTerrain->getPoint(x, y, *pHeight, &pos);
+					// relative to local centre
+					pos -= mLocalCentre;
+					pHeight += inc;
 
-				pos += skirtOffset;
+					pos += skirtOffset;
 
-				*pBuf++ = pos.x;
-				*pBuf++ = pos.y;
-				*pBuf++ = pos.z;
+					*pPosBuf++ = pos.x;
+					*pPosBuf++ = pos.y;
+					*pPosBuf++ = pos.z;
 
-				// UVs - same as base
-				*pBuf++ = x * uvScale;
-				*pBuf++ = 1.0 - (y * uvScale);
-				// delta (none)
-				*pBuf++ = 0; 
-				// delta threshold (irrelevant)
-				*pBuf++ = 99;
+					// UVs - same as base
+					*pPosBuf++ = x * uvScale;
+					*pPosBuf++ = 1.0 - (y * uvScale);
+
+				}
+
+				if (pDeltaBuf)
+				{
+					// delta (none)
+					*pDeltaBuf++ = 0; 
+					// delta threshold (irrelevant)
+					*pDeltaBuf++ = 99;
+				}
 			}
 			pBaseHeight += mTerrain->getSize() * skirtSpacing;
-			pRowBuf += destRowSkip;
+			if (pRowPosBuf)
+				pRowPosBuf += destPosRowSkip;
+			if (pRowDeltaBuf)
+				pRowDeltaBuf += destDeltaRowSkip;
 		}
 		// skirt cols
-		// position dest buffer just after the main vertex data and skirt rows
-		pRowBuf = pRootBuf + vbuf->getVertexSize() 
-			* mVertexDataRecord->size * mVertexDataRecord->size;
-		// skip the row skirts
-		pRowBuf += mVertexDataRecord->numSkirtRowsCols * mVertexDataRecord->size * vbuf->getVertexSize();
-		// move it onwards to skip the skirts we don't need to update
-		pRowBuf += destRowSkip * (skirtStartX - mOffsetX) / skirtSpacing;
-		pRowBuf += vbuf->getVertexSize() * (skirtStartY - mOffsetY) / skirtSpacing;
+		if (!posbuf.isNull())
+		{
+			// position dest buffer just after the main vertex data and skirt rows
+			pRowPosBuf = pRootPosBuf + posbuf->getVertexSize() 
+				* mVertexDataRecord->size * mVertexDataRecord->size;
+			// skip the row skirts
+			pRowPosBuf += mVertexDataRecord->numSkirtRowsCols * mVertexDataRecord->size * posbuf->getVertexSize();
+			// move it onwards to skip the skirts we don't need to update
+			pRowPosBuf += destPosRowSkip * (skirtStartX - mOffsetX) / skirtSpacing;
+			pRowPosBuf += posbuf->getVertexSize() * (skirtStartY - mOffsetY) / skirtSpacing;
+		}
+		if (!deltabuf.isNull())
+		{
+			// Deltaition dest buffer just after the main vertex data and skirt rows
+			pRowDeltaBuf = pRootDeltaBuf + deltabuf->getVertexSize() 
+				* mVertexDataRecord->size * mVertexDataRecord->size;
+			// skip the row skirts
+			pRowDeltaBuf += mVertexDataRecord->numSkirtRowsCols * mVertexDataRecord->size * deltabuf->getVertexSize();
+			// move it onwards to skip the skirts we don't need to update
+			pRowDeltaBuf += destDeltaRowSkip * (skirtStartX - mOffsetX) / skirtSpacing;
+			pRowDeltaBuf += deltabuf->getVertexSize() * (skirtStartY - mOffsetY) / skirtSpacing;
+		}
 		
 		for (uint16 x = skirtStartX; x < rect.right; x += skirtSpacing)
 		{
-			float* pBuf = static_cast<float*>(static_cast<void*>(pRowBuf));
+			float* pPosBuf = static_cast<float*>(static_cast<void*>(pRowPosBuf));
+			float* pDeltaBuf = static_cast<float*>(static_cast<void*>(pRowDeltaBuf));
 			for (uint16 y = skirtStartY; y < rect.bottom; y += inc)
 			{
-				mTerrain->getPoint(x, y, mTerrain->getHeightAtPoint(x, y), &pos);
-				// relative to local centre
-				pos -= mLocalCentre;
-				pos += skirtOffset;
+				if (pPosBuf)
+				{
+					mTerrain->getPoint(x, y, mTerrain->getHeightAtPoint(x, y), &pos);
+					// relative to local centre
+					pos -= mLocalCentre;
+					pos += skirtOffset;
 
-				*pBuf++ = pos.x;
-				*pBuf++ = pos.y;
-				*pBuf++ = pos.z;
+					*pPosBuf++ = pos.x;
+					*pPosBuf++ = pos.y;
+					*pPosBuf++ = pos.z;
 
-				// UVs - same as base
-				*pBuf++ = x * uvScale;
-				*pBuf++ = 1.0 - (y * uvScale);
-				// delta (none)
-				*pBuf++ = 0; 
-				// delta threshold (irrelevant)
-				*pBuf++ = 99;
+					// UVs - same as base
+					*pPosBuf++ = x * uvScale;
+					*pPosBuf++ = 1.0 - (y * uvScale);
+				}
+				if (pDeltaBuf)
+				{
+					// delta (none)
+					*pDeltaBuf++ = 0; 
+					// delta threshold (irrelevant)
+					*pDeltaBuf++ = 99;
+				}
 			}
-			pRowBuf += destRowSkip;
+			if (pRowPosBuf)
+				pRowPosBuf += destPosRowSkip;
+			if (pRowDeltaBuf)
+				pRowDeltaBuf += destDeltaRowSkip;
 		}
 
-		vbuf->unlock();
+		if (!posbuf.isNull())
+			posbuf->unlock();
+		if (!deltabuf.isNull())
+			deltabuf->unlock();
 		
 	}
 	//---------------------------------------------------------------------
@@ -909,8 +1007,10 @@ namespace Ogre
 		// TODO - mutex cpu data
 		if (mVertexDataRecord && mVertexDataRecord->gpuVertexDataDirty)
 		{
-			mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(0)->
-				copyData(*mVertexDataRecord->cpuVertexData->vertexBufferBinding->getBuffer(0).get());
+			mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(POSITION_BUFFER)->
+				copyData(*mVertexDataRecord->cpuVertexData->vertexBufferBinding->getBuffer(POSITION_BUFFER).get());
+			mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(DELTA_BUFFER)->
+				copyData(*mVertexDataRecord->cpuVertexData->vertexBufferBinding->getBuffer(DELTA_BUFFER).get());
 			mVertexDataRecord->gpuVertexDataDirty = false;
 		}
 	}

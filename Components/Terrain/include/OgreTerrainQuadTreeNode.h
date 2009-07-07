@@ -187,7 +187,7 @@ namespace Ogre
 
 		/** Tell the node to update its vertex data for a given region. 
 		*/
-		void updateVertexData(const Rect& rect);
+		void updateVertexData(bool positions, bool deltas, const Rect& rect);
 
 
 
@@ -249,6 +249,12 @@ namespace Ogre
 		float getLodTransition() const { return mLodTransition; }
 		/// Manually set the current LOD transition state, intended for internal use only
 		void setLodTransition(float t) { mLodTransition = t; }
+
+		/// Buffer binding used for holding positions
+		static unsigned short POSITION_BUFFER;
+		/// Buffer binding used for holding delta values
+		static unsigned short DELTA_BUFFER;
+
 
 	protected:
 		Terrain* mTerrain;
@@ -373,10 +379,10 @@ namespace Ogre
 
 		const VertexDataRecord* getVertexDataRecord() const;
 		void createCpuVertexData();
-		/* Update the vertex buffer - the rect in question is relative to the whole terrain, 
+		/* Update the vertex buffers - the rect in question is relative to the whole terrain, 
 			not the local vertex data (which may use a subset)
 		*/
-		void updateVertexBuffer(HardwareVertexBufferSharedPtr& vbuf, const Rect& rect);
+		void updateVertexBuffer(HardwareVertexBufferSharedPtr& posbuf, HardwareVertexBufferSharedPtr& deltabuf, const Rect& rect);
 		void createCpuIndexData();
 		void destroyCpuVertexData();
 		void destroyCpuIndexData();

@@ -386,7 +386,8 @@ namespace Ogre
 		outStream << 
 			"void main_vp(\n"
 			"float4 pos : POSITION,\n"
-			"float4 uv  : TEXCOORD0,\n" // u,v, lodDelta, lodThreshold
+			"float2 uv  : TEXCOORD0,\n" 
+			"float2 delta  : TEXCOORD1,\n" // lodDelta, lodThreshold
 			
 			"uniform float4x4 worldMatrix,\n"
 			"uniform float4x4 viewProjMatrix,\n"
@@ -429,7 +430,7 @@ namespace Ogre
 			// result is negative (it will only be -1 in fact, since after that
 			// the vertex will never be indexed), we will achieve our aim.
 			// sign(vertexLOD - targetLOD) == -1 is to morph
-			"	float toMorph = -min(0, sign(uv.w - lodMorph.y));\n"
+			"	float toMorph = -min(0, sign(delta.y - lodMorph.y));\n"
 			// this will either be 1 (morph) or 0 (don't morph)
 
 			;
@@ -441,7 +442,7 @@ namespace Ogre
 		case Terrain::ALIGN_X_Y:
 			break;
 		case Terrain::ALIGN_X_Z:
-			outStream << "	worldPos.y += uv.z * toMorph * lodMorph.x;\n";
+			outStream << "	worldPos.y += delta.x * toMorph * lodMorph.x;\n";
 			break;
 		case Terrain::ALIGN_Y_Z:
 			break;
