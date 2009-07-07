@@ -588,12 +588,6 @@ namespace Ogre
 		}
 
 
-		// HACK
-		if (lockMode == HardwareBuffer::HBL_DISCARD)
-		{
-			// HACK
-
-
 		// skirt spacing based on top-level resolution (* inc to cope with resolution which is not the max)
 		uint16 skirtSpacing = mVertexDataRecord->skirtRowColSkip * inc;
 		Vector3 skirtOffset;
@@ -680,9 +674,6 @@ namespace Ogre
 			}
 			pRowBuf += destRowSkip;
 		}
-		// HACK
-		}
-		// HACK
 
 		vbuf->unlock();
 		
