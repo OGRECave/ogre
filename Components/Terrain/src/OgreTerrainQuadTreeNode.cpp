@@ -426,13 +426,20 @@ namespace Ogre
 			// Do we have vertex data?
 			if (mVertexDataRecord)
 			{
+				// Trim to our bounds
+				Rect updateRect(mOffsetX, mOffsetY, mBoundaryX, mBoundaryY);
+				updateRect.left = std::max(updateRect.left, rect.left);
+				updateRect.right = std::min(updateRect.right, rect.right);
+				updateRect.top = std::max(updateRect.top, rect.top);
+				updateRect.bottom = std::min(updateRect.bottom, rect.bottom);
+
 				// update the GPU buffer directly
 				// TODO: do we have no use for CPU vertex data after initial load?
 				// if so, destroy it to free RAM, this should be fast enough to 
 				// to direct
 				HardwareVertexBufferSharedPtr vbuf = 
 					mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(0);
-				updateVertexBuffer(vbuf, rect);
+				updateVertexBuffer(vbuf, updateRect);
 			}
 
 			// pass on to children
@@ -507,6 +514,9 @@ namespace Ogre
 	//----------------------------------------------------------------------
 	void TerrainQuadTreeNode::updateVertexBuffer(HardwareVertexBufferSharedPtr& vbuf, const Rect& rect)
 	{
+		assert (rect.left >= mOffsetX && rect.right <= mBoundaryX && 
+			rect.top >= mOffsetY && rect.bottom <= mBoundaryY);
+
 		// potentially reset our bounds depending on coverage of the update
 		resetBounds(rect);
 
@@ -576,6 +586,12 @@ namespace Ogre
 			pRowBuf += destRowSkip;
 
 		}
+
+
+		// HACK
+		if (lockMode == HardwareBuffer::HBL_DISCARD)
+		{
+			// HACK
 
 
 		// skirt spacing based on top-level resolution (* inc to cope with resolution which is not the max)
@@ -664,6 +680,9 @@ namespace Ogre
 			}
 			pRowBuf += destRowSkip;
 		}
+		// HACK
+		}
+		// HACK
 
 		vbuf->unlock();
 		
