@@ -307,7 +307,7 @@ namespace Ogre {
 				"FileSystemArchive::remove");
 		}
 		String full_path = concatenate_path(mName, filename);
-		::remove(filename.c_str());
+		::remove(full_path.c_str());
 
 	}
     //-----------------------------------------------------------------------

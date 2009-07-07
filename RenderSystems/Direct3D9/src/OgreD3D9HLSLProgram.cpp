@@ -599,7 +599,7 @@ namespace Ogre {
 		case OPT_2:
 			return "2";
 		case OPT_3:
-			return "2";
+			return "3";
 		}
 	}
 	void D3D9HLSLProgram::CmdOptimisation::doSet(void *target, const String& val)
