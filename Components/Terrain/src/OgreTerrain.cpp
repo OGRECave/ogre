@@ -1423,9 +1423,18 @@ namespace Ogre
 			// The step of the next higher LOD
 			int higherstep = step >> 1;
 
-			// round the rectangle at this level so that it starts & ends on 
+			// need to widen the dirty rectangle since change will affect surrounding
+			// vertices at lower LOD
+			Rect widenedRect(rect);
+			widenedRect.left = std::max(0L, widenedRect.left - step);
+			widenedRect.top = std::max(0L, widenedRect.top - step);
+			widenedRect.right = std::min((long)mSize, widenedRect.right + step);
+			widenedRect.bottom = std::min((long)mSize, widenedRect.bottom + step);
+			
+
+			// now round the rectangle at this level so that it starts & ends on 
 			// the step boundaries
-			Rect lodRect(clampedRect);
+			Rect lodRect(widenedRect);
 			lodRect.left -= lodRect.left % step;
 			lodRect.top -= lodRect.top % step;
 			if (lodRect.right % step)
