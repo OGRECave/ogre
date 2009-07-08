@@ -157,6 +157,29 @@ namespace Ogre {
 		return sub ;
 	}
     //-----------------------------------------------------------------------
+	void Mesh::destroySubMesh(unsigned short index)
+	{
+        if (index >= mSubMeshList.size())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+						"Index out of bounds.",
+						"Mesh::removeSubMesh");
+        }
+		SubMeshList::iterator i = mSubMeshList.begin();
+		std::advance(i, index);
+		mSubMeshList.erase(i);
+		
+		if (isLoaded())
+			_dirtyState();
+		
+	}
+    //-----------------------------------------------------------------------
+    void Mesh::destroySubMesh(const String& name)
+	{
+		unsigned short index = _getSubMeshIndex(name);
+		destroySubMesh(index);
+	}
+	//-----------------------------------------------------------------------
     unsigned short Mesh::getNumSubMeshes() const
     {
         return static_cast< unsigned short >( mSubMeshList.size() );

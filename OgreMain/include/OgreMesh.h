@@ -250,7 +250,21 @@ namespace Ogre {
 		/** Gets a SubMesh by name
 		*/
 		SubMesh* getSubMesh(const String& name) const ;
+		
+		/** Destroy a SubMesh with the given index. 
+		 @note This will invalidate the contents of any existing Entity, or
+		 any other object that is referring to the SubMesh list. Entity will
+		 detect this and reinitialise, but it is still a disruptive action.
+		*/
+		void destroySubMesh(unsigned short index);
 
+		/** Destroy a SubMesh with the given name. 
+		 @note This will invalidate the contents of any existing Entity, or
+		 any other object that is referring to the SubMesh list. Entity will
+		 detect this and reinitialise, but it is still a disruptive action.
+		 */
+		void destroySubMesh(const String& name);
+		
         typedef VectorIterator<SubMeshList> SubMeshIterator;
         /// Gets an iterator over the available submeshes
         SubMeshIterator getSubMeshIterator(void)
