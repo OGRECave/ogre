@@ -44,6 +44,7 @@ Description: Somewhere to play in the sand...
 #include "OgreDistanceLodStrategy.h"
 #include "OgreTerrain.h"
 #include "OgreTerrainQuadTreeNode.h"
+#include "OgreCommon.h"
 // Static plugins declaration section
 // Note that every entry in here adds an extra header / library dependency
 #ifdef OGRE_STATIC_LIB
@@ -7994,11 +7995,11 @@ protected:
 		Real fadeDist0 = 40;
 		Real minHeight1 = 70;
 		Real fadeDist1 = 15;
-		uint8* pBlend0 = blendMap0->getBlendPointer();
-		uint8* pBlend1 = blendMap1->getBlendPointer();
-		for (uint16 y = 0; y < mTerrain->getLayerBlendMapSize(); ++y)
+		Ogre::uint8* pBlend0 = blendMap0->getBlendPointer();
+		Ogre::uint8* pBlend1 = blendMap1->getBlendPointer();
+		for (Ogre::uint16 y = 0; y < mTerrain->getLayerBlendMapSize(); ++y)
 		{
-			for (uint16 x = 0; x < mTerrain->getLayerBlendMapSize(); ++x)
+			for (Ogre::uint16 x = 0; x < mTerrain->getLayerBlendMapSize(); ++x)
 			{
 				Real tx, ty;
 
