@@ -186,7 +186,7 @@ namespace Ogre
 		};
 
 		TerrainMaterialGenerator() 
-			: mActiveProfile(0), mChangeCounter(0) {}
+			: mActiveProfile(0), mChangeCounter(0), mDebugLevel(0) {}
 		virtual ~TerrainMaterialGenerator()
 		{
 			for (ProfileList::iterator i = mProfiles.begin(); i != mProfiles.end(); ++i)
