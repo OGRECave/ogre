@@ -2138,7 +2138,7 @@ namespace Ogre
 			ddres.deltaUpdateRect = calculateHeightDeltas(ddr.dirtyRect);
 
 		if (ddr.calcNormalMap)
-			ddres.normalMapBox = calculateNormals(ddr.dirtyRect);
+			ddres.normalMapBox = calculateNormals(ddr.dirtyRect, ddres.normalUpdateRect);
 
 		// TODO other data
 
@@ -2163,7 +2163,7 @@ namespace Ogre
 		if (ddreq.calcDeltas)
 			finaliseHeightDeltas(ddres.deltaUpdateRect);
 		if (ddreq.calcNormalMap)
-			finaliseNormals(ddreq.dirtyRect, ddres.normalMapBox);
+			finaliseNormals(ddres.normalUpdateRect, ddres.normalMapBox);
 		
 		// TODO other data
 
@@ -2204,13 +2204,21 @@ namespace Ogre
 		return currentLod;
 	}
 	//---------------------------------------------------------------------
-	PixelBox* Terrain::calculateNormals(const Ogre::Rect &rect)
+	PixelBox* Terrain::calculateNormals(const Rect &rect, Rect& finalRect)
 	{
+		// Widen the rectangle by 1 element in all directions since height
+		// changes affect neighbours normals
+		Rect widenedRect(
+			std::max(0L, rect.left - 1L), 
+			std::max(0L, rect.top - 1L), 
+			std::min((long)mSize, rect.right + 1L), 
+			std::min((long)mSize, rect.bottom + 1L)
+			);
 		// allocate memory for RGB
 		uint8* pData = static_cast<uint8*>(
-			OGRE_MALLOC(rect.width() * rect.height() * 3, MEMCATEGORY_GENERAL));
+			OGRE_MALLOC(widenedRect.width() * widenedRect.height() * 3, MEMCATEGORY_GENERAL));
 
-		PixelBox* pixbox = OGRE_NEW PixelBox(rect.width(), rect.height(), 1, PF_BYTE_RGB, pData);
+		PixelBox* pixbox = OGRE_NEW PixelBox(widenedRect.width(), widenedRect.height(), 1, PF_BYTE_RGB, pData);
 
 		// sample the 6 triangles intersecting; there are 2 general options
 		//      A           B
@@ -2225,9 +2233,9 @@ namespace Ogre
 		//  Notice how only 6 of the 8 triangles are connected to the centre point, 
 		//	however we still include them since it gives a better overall result
 
-		for (long y = rect.top; y < rect.bottom; ++y)
+		for (long y = widenedRect.top; y < widenedRect.bottom; ++y)
 		{
-			for (long x = rect.left; x < rect.right; ++x)
+			for (long x = widenedRect.left; x < widenedRect.right; ++x)
 			{
 				// Do them in 4 cells, since if centre point is at the edge then
 				// we skip cells
@@ -2278,10 +2286,10 @@ namespace Ogre
 
 				// encode as RGB, object space
 				// invert the Y to deal with image space
-				long storeX = x - rect.left;
-				long storeY = rect.bottom - y - 1;
+				long storeX = x - widenedRect.left;
+				long storeY = widenedRect.bottom - y - 1;
 
-				uint8* pStore = pData + ((storeY * rect.width()) + storeX) * 3;
+				uint8* pStore = pData + ((storeY * widenedRect.width()) + storeX) * 3;
 				*pStore++ = (cumulativeNormal.x + 1.0) * 0.5 * 255.0;
 				*pStore++ = (cumulativeNormal.y + 1.0) * 0.5 * 255.0;
 				*pStore++ = (cumulativeNormal.z + 1.0) * 0.5 * 255.0;
@@ -2289,6 +2297,8 @@ namespace Ogre
 
 			}
 		}
+
+		finalRect = widenedRect;
 
 		return pixbox;
 	}

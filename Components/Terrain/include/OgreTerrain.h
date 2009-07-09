@@ -770,16 +770,17 @@ namespace Ogre
 		void finaliseHeightDeltas(const Rect& rect);
 
 		/** Calculate (or recalculate) the normals on the terrain
-		@param rect Rectangle describing the area to calculate (left <= right, bottom <= top)		
+		@param rect Rectangle describing the area to calculate 
+		@param outFinalRect Output rectangle describing the area updated
 		@returns Pointer to a PixelBox full of normals (caller responsible for deletion)
 		*/
-		PixelBox* calculateNormals(const Rect& rect);
+		PixelBox* calculateNormals(const Rect& rect, Rect& outFinalRect);
 
 		/** Finalise the normals. 
 		Calculated normals are kept in a separate calculation area to make
 		them safe to perform in a background thread. This call promotes those
 		calculations to the runtime values, and must be called in the main thread.
-		@param rect Rectangle describing the area to finalise (left <= right, bottom <= top)		
+		@param rect Rectangle describing the area to finalise 
 		@param normalsBox Pointer to a PixelBox full of normals
 		*/
 		void finaliseNormals(const Rect& rect, PixelBox* normalsBox);
@@ -1068,6 +1069,8 @@ namespace Ogre
 			Terrain* terrain;
 			// The area of deltas that was updated
 			Rect deltaUpdateRect;
+			// the area of normals that was updated
+			Rect normalUpdateRect;
 			// all CPU-side data, independent of textures; to be blitted in main thread
 			PixelBox* normalMapBox;
 			PixelBox* lightMapBox;
