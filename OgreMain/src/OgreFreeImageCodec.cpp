@@ -44,7 +44,7 @@ namespace Ogre {
 
 	FreeImageCodec::RegisteredCodecList FreeImageCodec::msCodecList;
 	//---------------------------------------------------------------------
-	void FreeImageErrorHandler(FREE_IMAGE_FORMAT fif, const char *message) 
+	void FreeImageLoadErrorHandler(FREE_IMAGE_FORMAT fif, const char *message) 
 	{
 		// Callback method as required by FreeImage to report problems
 		const char* typeName = FreeImage_GetFormatFromFIF(fif);
@@ -60,6 +60,13 @@ namespace Ogre {
 				<< "FreeImage error: '" << message << "'";
 		}
 
+	}
+	//---------------------------------------------------------------------
+	void FreeImageSaveErrorHandler(FREE_IMAGE_FORMAT fif, const char *message) 
+	{
+		// Callback method as required by FreeImage to report problems
+		OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, 
+					message, "FreeImageCodec::save")
 	}
 	//---------------------------------------------------------------------
 	void FreeImageCodec::startup(void)
@@ -107,7 +114,7 @@ namespace Ogre {
 			strExt.str());
 
 		// Set error handler
-		FreeImage_SetOutputMessage(FreeImageErrorHandler);
+		FreeImage_SetOutputMessage(FreeImageLoadErrorHandler);
 
 
 
@@ -136,6 +143,9 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	FIBITMAP* FreeImageCodec::encode(MemoryDataStreamPtr& input, CodecDataPtr& pData) const
 	{
+		// Set error handler
+		FreeImage_SetOutputMessage(FreeImageSaveErrorHandler);
+
 		FIBITMAP* ret = 0;
 
 		ImageData* pImgData = static_cast< ImageData * >( pData.getPointer() );
@@ -333,6 +343,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     DataStreamPtr FreeImageCodec::code(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
     {        
+		// Set error handler
+		FreeImage_SetOutputMessage(FreeImageSaveErrorHandler);
+
 		FIBITMAP* fiBitmap = encode(input, pData);
 
 		// open memory chunk allocated by FreeImage
@@ -362,6 +375,9 @@ namespace Ogre {
     void FreeImageCodec::codeToFile(MemoryDataStreamPtr& input, 
         const String& outFileName, Codec::CodecDataPtr& pData) const
     {
+		// Set error handler
+		FreeImage_SetOutputMessage(FreeImageSaveErrorHandler);
+
 		FIBITMAP* fiBitmap = encode(input, pData);
 
 		FreeImage_Save((FREE_IMAGE_FORMAT)mFreeImageType, fiBitmap, outFileName.c_str());
@@ -372,6 +388,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Codec::DecodeResult FreeImageCodec::decode(DataStreamPtr& input) const
     {
+		// Set error handler
+		FreeImage_SetOutputMessage(FreeImageLoadErrorHandler);
+
 		// Buffer stream into memory (TODO: override IO functions instead?)
 		MemoryDataStream memStream(input, true);
 
@@ -543,6 +562,9 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	String FreeImageCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const
 	{
+		// Set error handler
+		FreeImage_SetOutputMessage(FreeImageLoadErrorHandler);
+
 		FIMEMORY* fiMem = 
 			FreeImage_OpenMemory((BYTE*)magicNumberPtr, static_cast<DWORD>(maxbytes));
 
