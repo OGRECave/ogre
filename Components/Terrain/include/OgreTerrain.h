@@ -539,6 +539,7 @@ namespace Ogre
 		@param TSpos Terrain space position, where (0,0) is the bottom-left of the
 			terrain, and (1,1) is the top-right. The Z coordinate is in absolute
 			height units.
+		@note This position is relative to Terrain::getPosition
 		@param outWSpos World space output position (setup according to current alignment). 
 		*/
 		void getPosition(const Vector3& TSpos, Vector3* outWSpos);
@@ -546,6 +547,7 @@ namespace Ogre
 		@param x,y,z Terrain space position, where (0,0) is the bottom-left of the
 		terrain, and (1,1) is the top-right. The Z coordinate is in absolute
 		height units.
+		@note This position is relative to Terrain::getPosition
 		@param outWSpos World space output position (setup according to current alignment). 
 		*/
 		void getPosition(Real x, Real y, Real z, Vector3* outWSpos);
@@ -668,6 +670,13 @@ namespace Ogre
 		*/
 		uint16 getLayerBlendMapSize() const { return mLayerBlendMapSize; }
 
+		/** Get the requested size of lightmap for this terrain. 
+		Note that where hardware limits this, the actual lightmap may be lower
+		resolution. This option is derived from TerrainGlobalOptions when the
+		terrain is created.
+		*/
+		uint16 getLightmapSize() const { return mLightmapSize; }
+
 		/// Get the world position of the terrain centre
 		const Vector3& getPosition() const { return mPos; }
 		/// Set the position of the terrain centre in world coordinates
@@ -722,10 +731,10 @@ namespace Ogre
 		*/
 		void updateGeometry();
 
-		/// Used as a type mask for updateDerivedData
+		// Used as a type mask for updateDerivedData
 		static const uint8 DERIVED_DATA_DELTAS;
-		/// Used as a type mask for updateDerivedData
 		static const uint8 DERIVED_DATA_NORMALS;
+		static const uint8 DERIVED_DATA_LIGHTMAP;
 
 		/** Updates derived data for the terrain (LOD, lighting) to reflect changed height data, in a separate
 		thread if threading is enabled (OGRE_THREAD_SUPPORT). 
@@ -770,7 +779,7 @@ namespace Ogre
 		void finaliseHeightDeltas(const Rect& rect);
 
 		/** Calculate (or recalculate) the normals on the terrain
-		@param rect Rectangle describing the area to calculate 
+		@param rect Rectangle describing the area of heights that were changed
 		@param outFinalRect Output rectangle describing the area updated
 		@returns Pointer to a PixelBox full of normals (caller responsible for deletion)
 		*/
@@ -784,6 +793,23 @@ namespace Ogre
 		@param normalsBox Pointer to a PixelBox full of normals
 		*/
 		void finaliseNormals(const Rect& rect, PixelBox* normalsBox);
+
+		/** Calculate (or recalculate) the terrain lightmap
+		@param rect Rectangle describing the area of heights that were changed
+		@param outFinalRect Output rectangle describing the area updated in the lightmap
+		@returns Pointer to a PixelBox full of lighting data (caller responsible for deletion)
+		*/
+		PixelBox* calculateLightmap(const Rect& rect, Rect& outFinalRect);
+
+		/** Finalise the lightmap. 
+		Calculating lightmaps is kept in a separate calculation area to make
+		it safe to perform in a background thread. This call promotes those
+		calculations to the runtime values, and must be called in the main thread.
+		@param rect Rectangle describing the area to finalise 
+		@param normalsBox Pointer to a PixelBox full of normals
+		*/
+		void finaliseLightmap(const Rect& rect, PixelBox* lightmapBox);
+
 		/** Gets the resolution of the entire terrain (down one edge) at a 
 			given LOD level. 
 		*/
@@ -998,6 +1024,7 @@ namespace Ogre
 		void createLayerBlendMaps();
 		void createOrDestroyGPUNormalMap();
 		void createOrDestroyGPUColourMap();
+		void createOrDestroyGPULightmap();
 		/** Get a Vector3 of the world-space point on the terrain, aligned Y-up always.
 		@note This point is relative to Terrain::getPosition
 		*/
@@ -1071,6 +1098,8 @@ namespace Ogre
 			Rect deltaUpdateRect;
 			// the area of normals that was updated
 			Rect normalUpdateRect;
+			// the area of lightmap that was updated
+			Rect lightmapUpdateRect;
 			// all CPU-side data, independent of textures; to be blitted in main thread
 			PixelBox* normalMapBox;
 			PixelBox* lightMapBox;
@@ -1098,6 +1127,11 @@ namespace Ogre
 		bool mGlobalColourMapEnabled;
 		TexturePtr mColourMap;
 		uint8* mCpuColourMapStorage;
+
+		uint16 mLightmapSize;
+		uint16 mLightmapSizeActual;
+		TexturePtr mLightmap;
+		uint8* mCpuLightmapStorage;
 
 		static NameGenerator msBlendTextureGenerator;
 		static NameGenerator msNormalMapNameGenerator;
@@ -1149,6 +1183,7 @@ namespace Ogre
 		static uint16 msLayerBlendMapSize;
 		static Real msDefaultLayerTextureWorldSize;
 		static uint16 msDefaultGlobalColourMapSize;
+		static uint16 msLightmapSize;
 	public:
 
 
@@ -1251,6 +1286,16 @@ namespace Ogre
 		Once created, this information will be stored with the terrain. 
 		*/
 		static void setDefaultGlobalColourMapSize(uint16 sz) { msDefaultGlobalColourMapSize = sz;}
+
+
+		/** Get the default size of the lightmaps for a new terrain. 
+		*/
+		static uint16 getLightMapSize() { return msLightmapSize; }
+
+		/** Sets the default size of lightmaps for a new terrain.
+		*/
+		static void setLightMapSize(uint16 sz) { msLightmapSize = sz;}
+
 
 	};
 

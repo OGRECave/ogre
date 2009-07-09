@@ -69,6 +69,7 @@ namespace Ogre
 	const size_t Terrain::LOD_MORPH_CUSTOM_PARAM = 1001;
 	const uint8 Terrain::DERIVED_DATA_DELTAS = 1;
 	const uint8 Terrain::DERIVED_DATA_NORMALS = 2;
+	const uint8 Terrain::DERIVED_DATA_LIGHTMAP = 4;
 
 
 	//---------------------------------------------------------------------
@@ -83,6 +84,7 @@ namespace Ogre
 	uint16 TerrainGlobalOptions::msLayerBlendMapSize = 1024;
 	Real TerrainGlobalOptions::msDefaultLayerTextureWorldSize = 10;
 	uint16 TerrainGlobalOptions::msDefaultGlobalColourMapSize = 1024;
+	uint16 TerrainGlobalOptions::msLightmapSize = 1024;
 	//---------------------------------------------------------------------
 	void TerrainGlobalOptions::setDefaultMaterialGenerator(TerrainMaterialGeneratorPtr gen)
 	{
@@ -121,6 +123,7 @@ namespace Ogre
 		, mGlobalColourMapSize(0)
 		, mGlobalColourMapEnabled(false)
 		, mCpuColourMapStorage(0)
+		, mCpuLightmapStorage(0)
 		, mLodMorphRequired(false)
 		, mNormalMapRequired(false)
 		, mLightMapRequired(false)
@@ -150,6 +153,15 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	Terrain::~Terrain()
 	{
+		mDerivedUpdatePendingMask = 0;
+		WorkQueue* wq = Root::getSingleton().getWorkQueue();
+		while (mDerivedDataUpdateInProgress)
+		{
+			// we need to wait for this to finish
+		}
+		wq->removeRequestHandler(WORKQUEUE_CHANNEL, this);
+		wq->removeResponseHandler(WORKQUEUE_CHANNEL, this);	
+
 		freeTemporaryResources();
 		freeGPUResources();
 		freeCPUResources();
@@ -158,9 +170,6 @@ namespace Ogre
 			mSceneMgr->destroySceneNode(mRootNode);
 			mSceneMgr->removeListener(this);
 		}
-		WorkQueue* wq = Root::getSingleton().getWorkQueue();
-		wq->removeRequestHandler(WORKQUEUE_CHANNEL, this);
-		wq->removeResponseHandler(WORKQUEUE_CHANNEL, this);	
 	}
 	//---------------------------------------------------------------------
 	const AxisAlignedBox& Terrain::getAABB() const
@@ -342,6 +351,29 @@ namespace Ogre
 
 		}
 
+		// lightmap
+		stream.writeChunkBegin(TERRAINDERIVEDDATA_CHUNK_ID, TERRAINDERIVEDDATA_CHUNK_VERSION);
+		String lightmapDataType("lightmap");
+		stream.write(&lightmapDataType);
+		stream.write(&mLightmapSize);
+		if (mCpuLightmapStorage)
+		{
+			// save from CPU data if it's there, it means GPU data was never created
+			stream.write(mCpuLightmapStorage, mLightmapSize * mLightmapSize);
+		}
+		else
+		{
+			uint8* tmpData = (uint8*)OGRE_MALLOC(mLightmapSize * mLightmapSize, MEMCATEGORY_GENERAL);
+			PixelBox dst(mSize, mSize, 1, PF_L8, tmpData);
+			mLightmap->getBuffer()->blitToMemory(dst);
+			stream.write(tmpData, mLightmapSize * mLightmapSize);
+			OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
+		}
+		stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
+
+
+		// TODO - write depths
+
 		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
 	}
 	//---------------------------------------------------------------------
@@ -466,6 +498,13 @@ namespace Ogre
 				mGlobalColourMapSize = sz;
 				mCpuColourMapStorage = static_cast<uint8*>(OGRE_MALLOC(sz * sz * 3, MEMCATEGORY_GENERAL));
 				stream.read(mCpuColourMapStorage, sz * sz * 3);
+			}
+			else if (name == "lightmap")
+			{
+				mLightMapRequired = true;
+				mLightmapSize = sz;
+				mCpuLightmapStorage = static_cast<uint8*>(OGRE_MALLOC(sz * sz, MEMCATEGORY_GENERAL));
+				stream.read(mCpuLightmapStorage, sz * sz);
 			}
 
 			stream.readChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
@@ -620,6 +659,8 @@ namespace Ogre
 		mRenderQueueGroup = TerrainGlobalOptions::getRenderQueueGroup();
 		mLayerBlendMapSize = TerrainGlobalOptions::getLayerBlendMapSize();
 		mLayerBlendMapSizeActual = mLayerBlendMapSize; // for now, until we check
+		mLightmapSize = TerrainGlobalOptions::getLightMapSize();
+		mLightmapSizeActual = mLightmapSize; // for now, until we check
 
 	}
 	//---------------------------------------------------------------------
@@ -972,8 +1013,8 @@ namespace Ogre
 			break;
 		case ALIGN_Y_Z:
 			outpos->x = height;
-			outpos->y = x * mScale + mBase;
-			outpos->z = y * -mScale - mBase;
+			outpos->z = x * -mScale - mBase;
+			outpos->y = y * mScale + mBase;
 			break;
 		case ALIGN_X_Y:
 			outpos->z = height;
@@ -1059,8 +1100,8 @@ namespace Ogre
 			break;
 		case ALIGN_Y_Z:
 			outWSpos->x = z;
-			outWSpos->y = x * (mSize - 1) * mScale + mBase;
-			outWSpos->z = y * (mSize - 1) * -mScale - mBase;
+			outWSpos->y = y * (mSize - 1) * mScale + mBase;
+			outWSpos->z = x * (mSize - 1) * -mScale - mBase;
 			break;
 		case ALIGN_X_Y:
 			outWSpos->z = z;
@@ -1086,8 +1127,8 @@ namespace Ogre
 			outTSpos->z = y;
 			break;
 		case ALIGN_Y_Z:
-			outTSpos->x = (y - mBase) / ((mSize - 1) * mScale);
-			outTSpos->y = (z + mBase) / ((mSize - 1) * -mScale);
+			outTSpos->x = (z - mBase) / ((mSize - 1) * -mScale);
+			outTSpos->y = (y + mBase) / ((mSize - 1) * mScale);
 			outTSpos->z = x;
 			break;
 		case ALIGN_X_Y:
@@ -1317,7 +1358,7 @@ namespace Ogre
 				req.dirtyRect = mDirtyDerivedDataRect;
 				req.calcDeltas = (typeMask & DERIVED_DATA_DELTAS);
 				req.calcNormalMap = mNormalMapRequired && (typeMask & DERIVED_DATA_NORMALS);
-				req.calcLightMap = mLightMapRequired;
+				req.calcLightMap = mLightMapRequired && (typeMask & DERIVED_DATA_LIGHTMAP);
 				req.calcHorizonMap = mHorizonMapRequired;
 
 				Root::getSingleton().getWorkQueue()->addRequest(
@@ -1368,6 +1409,9 @@ namespace Ogre
 		OGRE_FREE(mCpuColourMapStorage, MEMCATEGORY_GENERAL);
 		mCpuColourMapStorage = 0;
 
+		OGRE_FREE(mCpuLightmapStorage, MEMCATEGORY_GENERAL);
+		mCpuLightmapStorage = 0;
+
 	}
 	//---------------------------------------------------------------------
 	void Terrain::freeGPUResources()
@@ -1402,6 +1446,11 @@ namespace Ogre
 			mColourMap.setNull();
 		}
 
+		if (!mLightmap.isNull())
+		{
+			tmgr->remove(mLightmap->getHandle());
+			mLightmap.setNull();
+		}
 
 	}
 	//---------------------------------------------------------------------
@@ -2084,7 +2133,16 @@ namespace Ogre
 			mLightMapRequired = lightMap;
 			mLightMapShadowsOnly = mLightMapShadowsOnly;
 
-			// TODO - create
+			createOrDestroyGPULightmap();
+
+			// if we enabled, generate normal maps
+			if (mNormalMapRequired)
+			{
+				// update derived data for whole terrain, but just normals
+				mDirtyDerivedDataRect.left = mDirtyDerivedDataRect.top = 0;
+				mDirtyDerivedDataRect.right = mDirtyDerivedDataRect.bottom = mSize;
+				updateDerivedData(false, DERIVED_DATA_LIGHTMAP);
+			}
 		}
 
 	}
@@ -2140,6 +2198,9 @@ namespace Ogre
 		if (ddr.calcNormalMap)
 			ddres.normalMapBox = calculateNormals(ddr.dirtyRect, ddres.normalUpdateRect);
 
+		if (ddr.calcLightMap)
+			ddres.lightMapBox = calculateLightmap(ddr.dirtyRect, ddres.lightmapUpdateRect);
+
 		// TODO other data
 
 		ddres.terrain = ddr.terrain;
@@ -2158,12 +2219,12 @@ namespace Ogre
 		if (ddreq.terrain != this)
 			return;
 
-		// NB do not use 'this' here, use req->terrain. This way any instance can 
-		// deal with response
 		if (ddreq.calcDeltas)
 			finaliseHeightDeltas(ddres.deltaUpdateRect);
 		if (ddreq.calcNormalMap)
 			finaliseNormals(ddres.normalUpdateRect, ddres.normalMapBox);
+		if (ddreq.calcLightMap)
+			finaliseLightmap(ddres.lightmapUpdateRect, ddres.lightMapBox);
 		
 		// TODO other data
 
@@ -2334,6 +2395,153 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	PixelBox* Terrain::calculateLightmap(const Rect& rect, Rect& outFinalRect)
+	{
+		// TODO - allow calculation of all lighting, not just shadows
+		// TODO - handle neighbour page casting
+
+		// as well as calculating the lighting changes for the area that is
+		// dirty, we also need to calculate the effect on casting shadow on
+		// other areas. To do this, we project the dirt rect by the light direction
+		// onto the minimum height
+
+		Vector3 corners[4];
+		getPoint(rect.left, rect.top, &corners[0]);
+		getPoint(rect.right-1, rect.top, &corners[1]);
+		getPoint(rect.left, rect.bottom-1, &corners[2]);
+		getPoint(rect.right-1, rect.bottom-1, &corners[3]);
+
+		const Vector3& lightVec = TerrainGlobalOptions::getLightMapDirection();
+		Plane p;
+		switch(getAlignment())
+		{
+		case ALIGN_X_Y:
+			p.redefine(Vector3::UNIT_Z, Vector3(0, 0, getMinHeight()));
+			break;
+		case ALIGN_X_Z:
+			p.redefine(Vector3::UNIT_Y, Vector3(0, getMinHeight(), 0));
+			break;
+		case ALIGN_Y_Z:
+			p.redefine(Vector3::UNIT_X, Vector3(getMinHeight(), 0, 0));
+			break;
+		}
+
+		Rect widenedRect(rect);
+		for (int i = 0; i < 4; ++i)
+		{
+			Ray ray(corners[i], lightVec);
+			std::pair<bool, Real> rayHit = ray.intersects(p);
+			if(rayHit.first)
+			{
+				Vector3 pt = ray.getPoint(rayHit.second);
+				// convert back to terrain point
+				Vector3 terrainHitPos;
+				getTerrainPosition(pt, &terrainHitPos);
+				// build rectangle which has rounded down & rounded up values
+				// remember right & bottom are exclusive
+				Rect mergeRect(
+					terrainHitPos.x * (mSize - 1), 
+					terrainHitPos.y * (mSize - 1), 
+					(long)(terrainHitPos.x * (float)(mSize - 1) + 0.5) + 1, 
+					(long)(terrainHitPos.y * (float)(mSize - 1) + 0.5) + 1
+					);
+				widenedRect.merge(mergeRect);
+			}
+		}
+
+		// widenedRect now contains terrain point space version of the area we
+		// need to calculate. However, we need to calculate in lightmap image space
+		float terrainToLightmapScale = (float)mLightmapSizeActual / (float)mSize;
+		widenedRect.left *= terrainToLightmapScale;
+		widenedRect.right *= terrainToLightmapScale;
+		widenedRect.top *= terrainToLightmapScale;
+		widenedRect.bottom *= terrainToLightmapScale;
+
+		// clamp 
+		widenedRect.left = std::max(0L, widenedRect.left);
+		widenedRect.top = std::max(0L, widenedRect.top);
+		widenedRect.right = std::min((long)mLightmapSizeActual, widenedRect.right);
+		widenedRect.bottom = std::min((long)mLightmapSizeActual, widenedRect.bottom);
+
+		outFinalRect = widenedRect;
+
+		// allocate memory (L8)
+		uint8* pData = static_cast<uint8*>(
+			OGRE_MALLOC(widenedRect.width() * widenedRect.height(), MEMCATEGORY_GENERAL));
+
+		PixelBox* pixbox = OGRE_NEW PixelBox(widenedRect.width(), widenedRect.height(), 1, PF_L8, pData);
+
+		Real heightPad = (getMaxHeight() - getMinHeight()) * 1e-6;
+
+		for (long y = widenedRect.top; y < widenedRect.bottom; ++y)
+		{
+			for (long x = widenedRect.left; x < widenedRect.right; ++x)
+			{
+				float litVal = 1.0f;
+
+				// convert to terrain space (not points, allow this to go between points)
+				float Tx = (float)x / (float)(mLightmapSizeActual-1);
+				float Ty = (float)y / (float)(mLightmapSizeActual-1);
+
+				// get world space point
+				// add a little height padding to stop shadowing self
+				Vector3 wpos;
+				getPosition(Tx, Ty, getHeightAtPoint(x, y) + heightPad, &wpos);
+				wpos += getPosition();
+				// build ray
+				Ray ray(wpos, lightVec);
+				std::pair<bool, Vector3> rayHit = rayIntersects(ray);
+
+				// TODO - cast multiple rays to antialias?
+				// TODO - fade by distance?
+
+				if (rayHit.first)
+					litVal = 0.0f;
+
+				// encode as L8
+				// invert the Y to deal with image space
+				long storeX = x - widenedRect.left;
+				long storeY = widenedRect.bottom - y - 1;
+
+				uint8* pStore = pData + ((storeY * widenedRect.width()) + storeX);
+				*pStore = litVal * 255.0;
+
+			}
+		}
+
+
+		return pixbox;
+
+
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::finaliseLightmap(const Rect& rect, PixelBox* lightmapBox)
+	{
+		createOrDestroyGPULightmap();
+		// deal with race condition where lm has been disabled while we were working!
+		if (!mLightmap.isNull())
+		{
+			// blit the normals into the texture
+			if (rect.left == 0 && rect.top == 0 && rect.bottom == mLightmapSizeActual && rect.right == mLightmapSizeActual)
+			{
+				mLightmap->getBuffer()->blitFromMemory(*lightmapBox);
+			}
+			else
+			{
+				// content of PixelBox is already inverted in Y, but rect is still 
+				// in terrain space for dealing with sub-rect, so invert
+				Image::Box dstBox;
+				dstBox.left = rect.left;
+				dstBox.right = rect.right;
+				dstBox.top = mLightmapSizeActual - rect.bottom - 1;
+				dstBox.bottom = mLightmapSizeActual - rect.top - 1;
+				mLightmap->getBuffer()->blitFromMemory(*lightmapBox, dstBox);
+			}
+		}
+
+	}
+	//---------------------------------------------------------------------
 	uint8 Terrain::getBlendTextureIndex(uint8 layerIndex) const
 	{
 		if (layerIndex == 0 || layerIndex-1 >= (uint8)mLayerBlendMapList.size())
@@ -2378,7 +2586,7 @@ namespace Ogre
 			// create
 			mColourMap = TextureManager::getSingleton().createManual(
 				mMaterialName + "/cm", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-				TEX_TYPE_2D, mGlobalColourMapSize, mGlobalColourMapSize, MIP_DEFAULT, 0, PF_BYTE_RGB);
+				TEX_TYPE_2D, mGlobalColourMapSize, mGlobalColourMapSize, MIP_DEFAULT, PF_BYTE_RGB);
 
 			if (mCpuColourMapStorage)
 			{
@@ -2399,6 +2607,38 @@ namespace Ogre
 		}
 
 	}
+	//---------------------------------------------------------------------
+	void Terrain::createOrDestroyGPULightmap()
+	{
+		if (mLightMapRequired && mLightmap.isNull())
+		{
+			// create
+			mLightmap = TextureManager::getSingleton().createManual(
+				mMaterialName + "/lm", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+				TEX_TYPE_2D, mLightmapSize, mLightmapSize, MIP_DEFAULT, PF_L8);
+
+			mLightmapSizeActual = mLightmap->getWidth();
+
+			if (mCpuLightmapStorage)
+			{
+				// Load cached data
+				PixelBox src(mLightmapSize, mLightmapSize, 1, PF_L8, mCpuLightmapStorage);
+				mLightmap->getBuffer()->blitFromMemory(src);
+				// release CPU copy, don't need it anymore
+				OGRE_FREE(mCpuLightmapStorage, MEMCATEGORY_RESOURCE);
+				mCpuLightmapStorage = 0;
+
+			}
+		}
+		else if (!mLightMapRequired && !mLightmap.isNull())
+		{
+			// destroy
+			TextureManager::getSingleton().remove(mLightmap->getHandle());
+			mLightmap.setNull();
+		}
+
+	}
+
 
 
 

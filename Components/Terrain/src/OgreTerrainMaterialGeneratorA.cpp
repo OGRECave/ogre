@@ -89,8 +89,7 @@ namespace Ogre
 	{
 		terrain->_setMorphRequired(true);
 		terrain->_setNormalMapRequired(true);
-
-		// TODO - shadow options
+		terrain->_setLightMapRequired(true, true);
 	}
 	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::setLayerNormalMappingEnabled(bool enabled)
