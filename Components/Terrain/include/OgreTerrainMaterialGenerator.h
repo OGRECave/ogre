@@ -277,12 +277,32 @@ namespace Ogre
 			else
 				return p->generate(terrain);
 		}
+
+		/** Set the debug level of the material. 
+		@remarks
+			Sets the level of debug display for this material.
+			What this debug level means is entirely depdendent on the generator, 
+			the only constant is that 0 means 'no debug' and non-zero means 
+			'some level of debugging', with any graduations in non-zero values
+			being generator-specific.
+		*/
+		virtual void setDebugLevel(unsigned int dbg)
+		{
+			if (mDebugLevel != dbg)
+			{
+				mDebugLevel = dbg;
+				_markChanged();
+			}
+		}
+		/// Get the debug level of the material. 
+		virtual unsigned int getDebugLevel() const { return mDebugLevel; }
 	protected:
 
 		ProfileList mProfiles;
 		mutable Profile* mActiveProfile;
 		unsigned long long int mChangeCounter;
 		TerrainLayerDeclaration mLayerDecl;
+		unsigned int mDebugLevel;
 
 
 

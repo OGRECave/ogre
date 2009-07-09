@@ -416,6 +416,11 @@ namespace Ogre
 				", out float4 oUV" << i << " : TEXCOORD" << texCoordSet++ << "\n";
 		}
 
+		if (prof->getParent()->getDebugLevel())
+		{
+			outStream << ", out float2 lodInfo : TEXCOORD" << texCoordSet++ << "\n";
+		}
+
 		outStream <<
 			")\n"
 			"{\n"
@@ -435,6 +440,13 @@ namespace Ogre
 
 			;
 
+		if (prof->getParent()->getDebugLevel())
+		{
+			// x == LOD level
+			outStream << "lodInfo.x = lodMorph.y / " << terrain->getNumLodLevels() << ";\n";
+			// y == LOD morph
+			outStream << "lodInfo.y = toMorph * lodMorph.x;\n";
+		}
 
 		// morph
 		switch (terrain->getAlignment())
@@ -489,6 +501,10 @@ namespace Ogre
 		{
 			outStream <<
 				"float4 layerUV" << i << " : TEXCOORD" << texCoordSet++ << ", \n";
+		}
+		if (prof->getParent()->getDebugLevel())
+		{
+			outStream << "float2 lodInfo : TEXCOORD" << texCoordSet++ << ", \n";
 		}
 
 
@@ -691,6 +707,12 @@ namespace Ogre
 		if (!prof->isLayerSpecularMappingEnabled())
 			outStream << "	specular = 1.0;\n";
 		outStream << "	outputCol.rgb += litRes.z * lightSpecularColour * specular;\n";
+
+		if (prof->getParent()->getDebugLevel())
+		{
+			outStream << "	outputCol.rg += lodInfo.xy;\n";
+		}
+
 		// Final return
 		outStream << "	return outputCol;\n"
 			<< "}\n";
