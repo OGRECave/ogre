@@ -755,15 +755,17 @@ namespace Ogre
 		/** Calculate (or recalculate) the delta values of heights between a vertex
 			in its recorded position, and the place it will end up in the LOD
 			in which it is removed. 
-		@param rect Rectangle describing the area to calculate (left <= right, bottom <= top)		
+		@param rect Rectangle describing the area in which heights have altered 
+		@returns A Rectangle describing the area which was updated (may be wider
+			than the input rectangle)
 		*/
-		void calculateHeightDeltas(const Rect& rect);
+		Rect calculateHeightDeltas(const Rect& rect);
 
 		/** Finalise the height deltas. 
 		Calculated height deltas are kept in a separate calculation field to make
 		them safe to perform in a background thread. This call promotes those
 		calculations to the runtime values, and must be called in the main thread.
-		@param rect Rectangle describing the area to finalise (left <= right, bottom <= top)		
+		@param rect Rectangle describing the area to finalise 
 		*/
 		void finaliseHeightDeltas(const Rect& rect);
 
@@ -1064,6 +1066,8 @@ namespace Ogre
 		struct DerivedDataResponse
 		{
 			Terrain* terrain;
+			// The area of deltas that was updated
+			Rect deltaUpdateRect;
 			// all CPU-side data, independent of textures; to be blitted in main thread
 			PixelBox* normalMapBox;
 			PixelBox* lightMapBox;

@@ -1405,13 +1405,15 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void Terrain::calculateHeightDeltas(const Rect& rect)
+	Rect Terrain::calculateHeightDeltas(const Rect& rect)
 	{
 		Rect clampedRect(rect);
 		clampedRect.left = std::max(0L, clampedRect.left);
 		clampedRect.top = std::max(0L, clampedRect.top);
 		clampedRect.right = std::min((long)mSize, clampedRect.right);
 		clampedRect.bottom = std::min((long)mSize, clampedRect.bottom);
+
+		Rect finalRect(clampedRect);
 
 		mQuadTree->preDeltaCalculation(clampedRect);
 
@@ -1430,6 +1432,9 @@ namespace Ogre
 			widenedRect.top = std::max(0L, widenedRect.top - step);
 			widenedRect.right = std::min((long)mSize, widenedRect.right + step);
 			widenedRect.bottom = std::min((long)mSize, widenedRect.bottom + step);
+
+			// keep a merge of the widest
+			finalRect.merge(widenedRect);
 			
 
 			// now round the rectangle at this level so that it starts & ends on 
@@ -1554,10 +1559,13 @@ namespace Ogre
 
 		mQuadTree->postDeltaCalculation(clampedRect);
 
+		return finalRect;
+
 	}
 	//---------------------------------------------------------------------
 	void Terrain::finaliseHeightDeltas(const Rect& rect)
 	{
+
 		Rect clampedRect(rect);
 		clampedRect.left = std::max(0L, clampedRect.left);
 		clampedRect.top = std::max(0L, clampedRect.top);
@@ -2127,7 +2135,7 @@ namespace Ogre
 		DerivedDataResponse ddres;
 
 		if (ddr.calcDeltas)
-			calculateHeightDeltas(ddr.dirtyRect);
+			ddres.deltaUpdateRect = calculateHeightDeltas(ddr.dirtyRect);
 
 		if (ddr.calcNormalMap)
 			ddres.normalMapBox = calculateNormals(ddr.dirtyRect);
@@ -2153,7 +2161,7 @@ namespace Ogre
 		// NB do not use 'this' here, use req->terrain. This way any instance can 
 		// deal with response
 		if (ddreq.calcDeltas)
-			finaliseHeightDeltas(ddreq.dirtyRect);
+			finaliseHeightDeltas(ddres.deltaUpdateRect);
 		if (ddreq.calcNormalMap)
 			finaliseNormals(ddreq.dirtyRect, ddres.normalMapBox);
 		
