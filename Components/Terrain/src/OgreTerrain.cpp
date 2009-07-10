@@ -2471,7 +2471,7 @@ namespace Ogre
 
 		PixelBox* pixbox = OGRE_NEW PixelBox(widenedRect.width(), widenedRect.height(), 1, PF_L8, pData);
 
-		Real heightPad = (getMaxHeight() - getMinHeight()) * 1e-6;
+		Real heightPad = (getMaxHeight() - getMinHeight()) * 1e-3;
 
 		for (long y = widenedRect.top; y < widenedRect.bottom; ++y)
 		{
@@ -2490,6 +2490,7 @@ namespace Ogre
 				wpos += getPosition();
 				// build ray, cast backwards along light direction
 				Ray ray(wpos, -lightVec);
+
 				std::pair<bool, Vector3> rayHit = rayIntersects(ray);
 
 				// TODO - cast multiple rays to antialias?
