@@ -207,7 +207,7 @@ void OSXWindow::createCGLFullscreen(unsigned int width, unsigned int height, uns
 		//CGLDestroyPixelFormat(pixelFormatObj); 
 				
 		// Set the context to full screen
-#if (MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_5)
+#if (MAC_OS_X_VERSION_MAX_ALLOWED < 1060)
         CGLSetFullScreen(mCGLContext);
 #else
         CGLSetFullScreenOnDisplay(mCGLContext, CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay));
