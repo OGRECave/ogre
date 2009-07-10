@@ -125,11 +125,10 @@ void OSXGLSupport::addConfig( void )
 	// Video mode possiblities
 	optVideoMode.name = "Video Mode";
 	optVideoMode.immutable = false;
-
-#if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6)
-	CFArrayRef displayModes = CGDisplayAvailableModes(CGMainDisplayID());
-#else
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
 	CFArrayRef displayModes = CGDisplayCopyAllDisplayModes(CGMainDisplayID(), NULL);
+#else
+	CFArrayRef displayModes = CGDisplayAvailableModes(CGMainDisplayID());
 #endif
 	CFIndex numModes = CFArrayGetCount(displayModes);
 	CFMutableArrayRef goodModes = NULL;

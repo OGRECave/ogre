@@ -224,11 +224,6 @@ namespace Ogre {
 //For apple, we always have a custom config.h file
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #    include "config.h"
-
-    // Also, define this so we can use the symbol when building for 10.4+
-#   ifndef MAC_OS_X_VERSION_10_6
-#       define MAC_OS_X_VERSION_10_6 1060
-#   endif
 #endif
 
 //----------------------------------------------------------------------------

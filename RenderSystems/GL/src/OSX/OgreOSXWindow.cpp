@@ -111,10 +111,10 @@ void OSXWindow::createCGLFullscreen(unsigned int width, unsigned int height, uns
 {
 		// Find the best match to what was requested
         boolean_t exactMatch = 0;
-#if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6)
-        CFDictionaryRef displayMode = CGDisplayBestModeForParameters(kCGDirectMainDisplay, depth, width, height, &exactMatch);
-#else
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
         CGDisplayModeRef displayMode = CGDisplayCopyDisplayMode(kCGDirectMainDisplay);
+#else
+        CFDictionaryRef displayMode = CGDisplayBestModeForParameters(kCGDirectMainDisplay, depth, width, height, &exactMatch);
 #endif	
 		if(!exactMatch)
 		{
@@ -147,10 +147,10 @@ void OSXWindow::createCGLFullscreen(unsigned int width, unsigned int height, uns
 		CGDisplayCapture(kCGDirectMainDisplay);
 		
 		// Switch to the correct resolution
-#if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6)
-        CGDisplaySwitchToMode(kCGDirectMainDisplay, displayMode);
-#else
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
         CGDisplaySetDisplayMode(kCGDirectMainDisplay, displayMode, NULL);
+#else
+        CGDisplaySwitchToMode(kCGDirectMainDisplay, displayMode);
 #endif
 		
 		// Get a pixel format that best matches what we are looking for
@@ -207,10 +207,10 @@ void OSXWindow::createCGLFullscreen(unsigned int width, unsigned int height, uns
 		//CGLDestroyPixelFormat(pixelFormatObj); 
 				
 		// Set the context to full screen
-#if (MAC_OS_X_VERSION_MAX_ALLOWED < 1060)
-        CGLSetFullScreen(mCGLContext);
-#else
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
         CGLSetFullScreenOnDisplay(mCGLContext, CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay));
+#else
+        CGLSetFullScreen(mCGLContext);
 #endif
 		
 		// Set the context as current
@@ -256,10 +256,10 @@ void OSXWindow::swapCGLBuffers(void)
 	if(curCtx != mCGLContext)
 	{
 		CGLSetCurrentContext(mCGLContext);
-#if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6)
-        CGLSetFullScreen(mCGLContext);
-#else
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
         CGLSetFullScreenOnDisplay(mCGLContext, CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay));
+#else
+        CGLSetFullScreen(mCGLContext);
 #endif
 	}
 }
