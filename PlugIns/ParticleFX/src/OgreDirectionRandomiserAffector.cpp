@@ -72,7 +72,7 @@ namespace Ogre {
     {
         ParticleIterator pi = pSystem->_getIterator();
         Particle *p;
-        Real length;
+        Real length = 0;
 
         while (!pi.end())
         {

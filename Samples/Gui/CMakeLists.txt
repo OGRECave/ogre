@@ -9,7 +9,12 @@
 
 # Configure Gui demo build
 
-set(SOURCE_FILES src/Gui.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Gui.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Gui.mm COPYONLY)
+  set(SOURCE_FILES src/Gui.mm)
+else ()
+  set(SOURCE_FILES src/Gui.cpp)
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/CEGUIRenderer/include)
 add_executable(Demo_Gui WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})

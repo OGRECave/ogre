@@ -9,7 +9,12 @@
 
 # Configure Shadows demo build
 
-set(SOURCE_FILES src/Shadows.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Shadows.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Shadows.mm COPYONLY)
+  set(SOURCE_FILES src/Shadows.mm)
+else ()
+  set(SOURCE_FILES src/Shadows.cpp)
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/CEGUIRenderer/include)
 add_executable(Demo_Shadows WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})

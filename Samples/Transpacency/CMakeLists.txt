@@ -10,7 +10,12 @@
 # Configure Transparency demo build
 
 set(HEADER_FILES include/Transparency.h)
-set(SOURCE_FILES src/Transparency.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Transparency.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Transparency.mm COPYONLY)
+  set(SOURCE_FILES src/Transparency.mm)
+else ()
+  set(SOURCE_FILES src/Transparency.cpp)
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_Transparency WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})

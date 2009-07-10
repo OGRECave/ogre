@@ -89,7 +89,7 @@ namespace Ogre
 		RSC_HWSTENCIL               = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 5),
 		/// Supports hardware vertex and index buffers
 		RSC_VBO                     = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 7),
-		/// Supports vertex programs (vertex shaders
+		/// Supports vertex programs (vertex shaders)
 		RSC_VERTEX_PROGRAM          = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 9),
 		/// Supports fragment programs (pixel shaders)
 		RSC_FRAGMENT_PROGRAM        = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 10),
@@ -134,14 +134,16 @@ namespace Ogre
 		RSC_TEXTURE_COMPRESSION_DXT = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 1),
 		/// Supports compressed textures in the VTC format
 		RSC_TEXTURE_COMPRESSION_VTC = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 2),
+		/// Supports compressed textures in the PVRTC format
+		RSC_TEXTURE_COMPRESSION_PVRTC = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 3),
 		/// Supports fixed-function pipeline
-		RSC_FIXED_FUNCTION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 3),
+		RSC_FIXED_FUNCTION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 4),
 		/// Supports MRTs with different bit depths
-		RSC_MRT_DIFFERENT_BIT_DEPTHS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 4),
+		RSC_MRT_DIFFERENT_BIT_DEPTHS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 5),
 		/// Supports Alpha to Coverage (A2C)
-		RSC_ALPHA_TO_COVERAGE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 5),
+		RSC_ALPHA_TO_COVERAGE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 6),
 		/// Supports Blending operations other than +
-		RSC_ADVANCED_BLEND_OPERATIONS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 6),
+		RSC_ADVANCED_BLEND_OPERATIONS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 7),
 
 		// ***** DirectX specific caps *****
 		/// Is DirectX feature "per stage constants" supported
@@ -217,8 +219,11 @@ namespace Ogre
 		GPU_MATROX = 5,
 		GPU_3DLABS = 6,
 		GPU_SIS = 7,
+        GPU_IMAGINATION_TECHNOLOGIES = 8,
+        GPU_APPLE = 9,  // Apple Software Renderer
+
 		/// placeholder
-		GPU_VENDOR_COUNT = 8
+		GPU_VENDOR_COUNT = 10
 	};
 
 	/** singleton class for storing the capabilities of the graphics card. 
@@ -266,7 +271,7 @@ namespace Ogre
 		ushort mVertexProgramConstantIntCount;           
 		/// The number of boolean constants vertex programs support
 		ushort mVertexProgramConstantBoolCount;           
-		/// The number of floating-point constats geometry programs support
+		/// The number of floating-point constants geometry programs support
 		ushort mGeometryProgramConstantFloatCount;           
 		/// The number of integer constants vertex geometry support
 		ushort mGeometryProgramConstantIntCount;           

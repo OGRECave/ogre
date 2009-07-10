@@ -72,7 +72,7 @@ namespace Ogre {
         ParticleIterator pi = pSystem->_getIterator();
         Particle *p;
 
-        Vector3 scaledVector;
+        Vector3 scaledVector = Vector3::ZERO;
 
         // Precalc scaled force for optimisation
         if (mForceApplication == FA_ADD)

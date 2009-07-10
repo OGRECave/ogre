@@ -14,11 +14,21 @@ set(HEADER_FILES
   include/Julia.h
   include/ThingRenderable.h
 )
-set(SOURCE_FILES 
-  src/VolumeTex.cpp
-  src/ThingRenderable.cpp
-  src/VolumeRenderable.cpp
-)
+
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/VolumeTex.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/VolumeTex.mm COPYONLY)
+  set(SOURCE_FILES 
+    src/VolumeTex.mm
+    src/ThingRenderable.cpp
+    src/VolumeRenderable.cpp
+  )
+else ()
+  set(SOURCE_FILES 
+    src/VolumeTex.cpp
+    src/ThingRenderable.cpp
+    src/VolumeRenderable.cpp
+  )
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_VolumeTex WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})

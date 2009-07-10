@@ -643,7 +643,7 @@ namespace Ogre {
             if (readFaces)
             {
                 TiXmlElement* faces = smElem->FirstChildElement("faces");
-                size_t actualCount = 0;
+                int actualCount = 0;
                 for (TiXmlElement *faceElem = faces->FirstChildElement(); faceElem != 0; faceElem = faceElem->NextSiblingElement())
                 {
                         actualCount++;

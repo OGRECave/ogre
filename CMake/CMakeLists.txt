@@ -47,6 +47,9 @@ if (APPLE)
     Packages/FindCarbon.cmake
     Packages/FindCocoa.cmake
   )
+  set(STATIC_INST_FILES ${STATIC_INST_FILES}
+    Packages/FindiPhoneSDK.cmake
+  )
 endif ()
 
 install(FILES ${INST_FILES} DESTINATION ${OGRE_CMAKE_DIR})

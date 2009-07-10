@@ -9,7 +9,12 @@
 
 # Configure Grass demo build
 
-set(SOURCE_FILES src/Paging.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Paging.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Paging.mm COPYONLY)
+  set(SOURCE_FILES src/Paging.mm)
+else ()
+  set(SOURCE_FILES src/Paging.cpp)
+endif ()
 
 include_directories(${CMAKE_SOURCE_DIR}/Components/Paging/include)
 

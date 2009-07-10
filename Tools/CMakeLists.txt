@@ -8,10 +8,9 @@
 #-------------------------------------------------------------------
 
 # Configure Tools build
-if (APPLE)
-  include_directories("${CMAKE_SOURCE_DIR}/Mac/Ogre/include")
-endif()
 
-add_subdirectory(XMLConverter)
-add_subdirectory(MeshUpgrader)
-
+# Tools can't be run on the iPhone so don't build them
+if (NOT OGRE_BUILD_PLATFORM_IPHONE)
+  add_subdirectory(XMLConverter)
+  add_subdirectory(MeshUpgrader)
+endif (NOT OGRE_BUILD_PLATFORM_IPHONE)

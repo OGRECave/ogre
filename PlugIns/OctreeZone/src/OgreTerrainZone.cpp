@@ -868,7 +868,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void TerrainZone::destroyLevelIndexes()
 	{
-		for ( int i = 0; i < mLevelIndex.size(); i++ )
+		for ( unsigned int i = 0; i < mLevelIndex.size(); i++ )
 		{
 			OGRE_DELETE_T(mLevelIndex[i], IndexMap, MEMCATEGORY_GEOMETRY);
 		}

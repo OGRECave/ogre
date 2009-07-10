@@ -536,6 +536,12 @@ namespace Ogre {
                 // Blend weights/indices can be sharing with their own buffer only
                 splitWithNext = true;
                 break;
+            case VES_DIFFUSE:
+            case VES_SPECULAR:
+            case VES_TEXTURE_COORDINATES:
+            case VES_BINORMAL:
+            case VES_TANGENT:
+                break;
             }
 
             if (splitWithPrev && offset)
@@ -646,7 +652,7 @@ namespace Ogre {
     {
         if (mBindingMap.empty())
             return false;
-        if (mBindingMap.rbegin()->first + 1 == mBindingMap.size())
+        if (mBindingMap.rbegin()->first + 1 == (int) mBindingMap.size())
             return false;
         return true;
     }

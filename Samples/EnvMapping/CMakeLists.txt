@@ -10,7 +10,12 @@
 # Configure EnvMapping demo build
 
 set(HEADER_FILES include/EnvMapping.h)
-set(SOURCE_FILES src/EnvMapping.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/EnvMapping.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/EnvMapping.mm COPYONLY)
+  set(SOURCE_FILES src/EnvMapping.mm)
+else ()
+  set(SOURCE_FILES src/EnvMapping.cpp)
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_EnvMapping WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})

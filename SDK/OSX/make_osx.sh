@@ -6,7 +6,7 @@ ARCH="i386"
 REMOVE_ARCH="ppc"
 
 # invoke xcode build
-xcodebuild -project ../../Mac/Ogre/Ogre.xcodeproj -alltargets -configuration Release
+xcodebuild -project ../../build/OGRE.xcodeproj -alltargets -configuration Release
 # Just release mode, debug is too big
 #xcodebuild -project ../../Mac/Ogre/Ogre.xcodeproj -alltargets -configuration Debug
 
@@ -18,7 +18,7 @@ echo Copying frameworks...
 mkdir sdk_contents/Dependencies
 
 # Stuff we've built
-ditto -arch $ARCH ../../Mac/build/Release/Ogre.framework sdk_contents/Dependencies/Ogre.framework
+ditto -arch $ARCH ../../build/lib/Release/Ogre.framework sdk_contents/Dependencies/Ogre.framework
 
 # dependencies
 ditto -arch $ARCH ../../Dependencies/Cg.framework sdk_contents/Dependencies/Cg.framework

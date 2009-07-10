@@ -37,7 +37,7 @@ namespace Ogre {
     {
     private:
 		NSWindow *mWindow;
-		NSView *mView;		//was OgreView *mView;
+		NSView *mView;
 		NSOpenGLContext *glContext;
 		
         bool mActive;
@@ -50,7 +50,7 @@ namespace Ogre {
         OSXCocoaWindow();
         ~OSXCocoaWindow();
 		
-		OgreView* ogreView() const { return mView; };
+		NSView* ogreView() const { return mView; };
 		NSOpenGLContext* nsopenGLContext() const { return glContext; };
 		void createWithView(OgreView *view);
 

@@ -127,10 +127,6 @@ namespace Ogre {
 		{
 			// Dummy value
 			mTextureCoordIndex[i] = 99;
-		}
-
-		for (i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
-		{
 			mTextureTypes[i] = 0;
 		}
 
@@ -528,7 +524,7 @@ namespace Ogre {
 		// UBYTE4 always supported
 		rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
 
-		// Inifinite far plane always supported
+		// Infinite far plane always supported
 		rsc->setCapability(RSC_INFINITE_FAR_PLANE);
 
 		// Check for non-power-of-2 texture support
@@ -2102,7 +2098,7 @@ namespace Ogre {
 	void GLRenderSystem::_convertProjectionMatrix(const Matrix4& matrix,
 		Matrix4& dest, bool forGpuProgram)
 	{
-		// no any convertion request for OpenGL
+		// no any conversion request for OpenGL
 		dest = matrix;
 	}
 
@@ -2914,7 +2910,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		}
 
         glDisableClientState( GL_VERTEX_ARRAY );
-		// only valid up to GL_MAX_TEXTURE_COORDS, which is recorded in mFixedFunctionTextureUnits
+		// only valid up to GL_MAX_TEXTURE_UNITS, which is recorded in mFixedFunctionTextureUnits
 		if (multitexturing)
         {
 			for (int i = 0; i < mFixedFunctionTextureUnits; i++)
@@ -3374,7 +3370,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		if (mCurrentFragmentProgram)
 			mCurrentFragmentProgram->unbindProgram();
 
-		// It's ready to switching
+		// It's ready for switching
 		if (mCurrentContext)
 			mCurrentContext->endCurrent();
 		mCurrentContext = context;

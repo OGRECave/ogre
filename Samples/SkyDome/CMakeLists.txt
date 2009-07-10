@@ -10,7 +10,12 @@
 # Configure SkyDome demo build
 
 set(HEADER_FILES include/SkyDome.h)
-set(SOURCE_FILES src/SkyDome.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/SkyDome.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/SkyDome.mm COPYONLY)
+  set(SOURCE_FILES src/SkyDome.mm)
+else ()
+  set(SOURCE_FILES src/SkyDome.cpp)
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_SkyDome WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})

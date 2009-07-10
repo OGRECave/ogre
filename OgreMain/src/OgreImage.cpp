@@ -729,7 +729,7 @@ namespace Ogre {
 		// Figure out the offsets 
 		size_t fullFaceSize = 0;
 		size_t finalFaceSize = 0;
-		size_t finalWidth, finalHeight, finalDepth;
+		size_t finalWidth = 0, finalHeight = 0, finalDepth = 0;
 		for(size_t mip=0; mip <= numMips; ++mip)
         {
 			if (mip == mipmap)

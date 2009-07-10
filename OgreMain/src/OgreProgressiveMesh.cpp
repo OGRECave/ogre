@@ -248,8 +248,8 @@ namespace Ogre {
 
         // Build tri list
         size_t numTris = indexData->indexCount / 3;
-		unsigned short* pShort;
-		unsigned int* pInt;
+		unsigned short* pShort = 0;
+		unsigned int* pInt = 0;
 		HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
 		bool use32bitindexes = (ibuf->getType() == HardwareIndexBuffer::IT_32BIT);
 		if (use32bitindexes)
@@ -670,8 +670,8 @@ namespace Ogre {
 			use32bitindexes? HardwareIndexBuffer::IT_32BIT : HardwareIndexBuffer::IT_16BIT,
 			pData->indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
 
-        unsigned short* pShort;
-		unsigned int* pInt;
+        unsigned short* pShort = 0;
+		unsigned int* pInt = 0;
 		if (use32bitindexes)
 		{
 			pInt = static_cast<unsigned int*>(

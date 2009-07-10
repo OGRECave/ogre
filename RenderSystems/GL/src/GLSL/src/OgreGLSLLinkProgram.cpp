@@ -193,6 +193,9 @@ namespace Ogre {
 				case RenderOperation::OT_POINT_LIST:
 				case RenderOperation::OT_LINE_STRIP:
 				case RenderOperation::OT_TRIANGLE_STRIP:
+                case RenderOperation::OT_LINE_LIST:
+                case RenderOperation::OT_TRIANGLE_LIST:
+                case RenderOperation::OT_TRIANGLE_FAN:
 					break;
 				
 				}
@@ -403,6 +406,8 @@ namespace Ogre {
 						glUniform1ivARB(currentUniform->mLocation, 1, 
 							(GLint*)params->getIntPointer(def->physicalIndex));
 						break;
+                    case GCT_UNKNOWN:
+                        break;
 
 					} // end switch
 	#if OGRE_DEBUG_MODE

@@ -32,7 +32,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/OgreMain/include)
 include_directories(${Boost_INCLUDE_DIRS})
 
-
 # setup target
 add_library(OgreProperty ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
 set_target_properties(OgreProperty PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OGRE_VERSION_MAJOR})

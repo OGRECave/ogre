@@ -835,9 +835,10 @@ namespace Ogre {
 		{
 			ManualObject mo("tmp");
 			mo.begin(mMat->getName());
-			// 3 axes, each made up of 2 of these (base plane = XY)
-			//   .------------|\
-			//   '------------|/
+			/* 3 axes, each made up of 2 of these (base plane = XY)
+             *   .------------|\
+			 *   '------------|/
+             */
 			mo.estimateVertexCount(7 * 2 * 3);
 			mo.estimateIndexCount(3 * 2 * 3);
 			Quaternion quat[6];

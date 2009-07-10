@@ -40,7 +40,7 @@ namespace Ogre
 	const uint16 PagedWorld::CHUNK_VERSION = 1;
 	//---------------------------------------------------------------------
 	PagedWorld::PagedWorld(const String& name, PageManager* manager)
-		:mName(name), mManager(manager), mSectionNameGenerator("Section"), mPageProvider(0)
+		:mName(name), mManager(manager), mPageProvider(0), mSectionNameGenerator("Section")
 	{
 
 	}

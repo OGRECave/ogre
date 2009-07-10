@@ -10,7 +10,12 @@
 # Configure Terrain demo build
 
 set(HEADER_FILES include/Terrain.h)
-set(SOURCE_FILES src/Terrain.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Terrain.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Terrain.mm COPYONLY)
+  set(SOURCE_FILES src/Terrain.mm)
+else ()
+  set(SOURCE_FILES src/Terrain.cpp)
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_Terrain WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})

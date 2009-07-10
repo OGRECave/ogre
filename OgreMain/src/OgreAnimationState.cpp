@@ -36,14 +36,14 @@ namespace Ogre
 
 	//---------------------------------------------------------------------
 	AnimationState::AnimationState(AnimationStateSet* parent, const AnimationState &rhs)
-        : mAnimationName(rhs.mAnimationName)
+        : mBlendMask(0)
+        , mAnimationName(rhs.mAnimationName)
         , mParent(parent)
         , mTimePos(rhs.mTimePos)
         , mLength(rhs.mLength)
         , mWeight(rhs.mWeight)
         , mEnabled(rhs.mEnabled)
         , mLoop(rhs.mLoop)
-        , mBlendMask(0)
   {
 		mParent->_notifyDirty();
 	}
@@ -55,14 +55,14 @@ namespace Ogre
     AnimationState::AnimationState(const String& animName, 
 		AnimationStateSet *parent, Real timePos, Real length, Real weight, 
 		bool enabled)
-        : mAnimationName(animName)
+        : mBlendMask(0)
+        , mAnimationName(animName)
         , mParent(parent)
         , mTimePos(timePos)
         , mLength(length)
         , mWeight(weight)
         , mEnabled(enabled)
         , mLoop(true)
-        , mBlendMask(0)
     {
 		mParent->_notifyDirty();
     }

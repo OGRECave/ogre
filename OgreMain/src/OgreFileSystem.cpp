@@ -36,7 +36,8 @@ Torus Knot Software Ltd.
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || \
+    OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #   include "OgreSearchOps.h"
 #   include <sys/param.h>
 #   define MAX_PATH MAXPATHLEN

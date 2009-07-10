@@ -158,7 +158,7 @@ namespace Ogre {
         {
             // Insert into solid list
             IlluminationPass* p = pi.getNext();
-            QueuedRenderableCollection* collection;
+            QueuedRenderableCollection* collection = NULL;
             switch(p->stage)
             {
             case IS_AMBIENT:

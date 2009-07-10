@@ -56,6 +56,12 @@ namespace Ogre {
 	class _OgreExport Viewport : public ViewportAlloc
     {
     public:
+        enum Orientation {
+            OR_LANDSCAPELEFT = 0,
+            OR_LANDSCAPERIGHT = 1,
+            OR_PORTRAIT = 2
+        };
+        
         /** The usual constructor.
             @param
                 cam Pointer to a camera to be the source for the image.
@@ -170,6 +176,19 @@ namespace Ogre {
         */
 
         int getActualHeight(void) const;
+        
+        /** Gets the current orientation of the viewport
+         */
+        int getOrientation(void);
+        
+        /** Sets the orientation of the viewport
+             @remarks
+                Setting the orientation of a viewport is only supported on
+                iPhone at this time.  An exeption is thrown on other platforms.
+             @param
+                orient
+         */
+        void setOrientation(Orientation orient);
 
         /** Sets the dimensions (after creation).
             @param
@@ -332,6 +351,8 @@ namespace Ogre {
         int mActLeft, mActTop, mActWidth, mActHeight;
         /// ZOrder
         int mZOrder;
+        /// Viewport orientation
+        int mOrientation;
         /// Background options
         ColourValue mBackColour;
         bool mClearEveryFrame;

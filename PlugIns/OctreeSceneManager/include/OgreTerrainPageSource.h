@@ -52,6 +52,7 @@ namespace Ogre {
             may modify the data if it wishes.
         */
         virtual void pageConstructed(TerrainSceneManager* manager, size_t pagex, size_t pagez, Real* heightData) = 0;
+        virtual ~TerrainPageSourceListener() {}
     };
 
 	/** Simple manager class to hold onto a list of page source listeners 

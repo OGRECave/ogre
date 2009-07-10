@@ -8,9 +8,6 @@
 #-------------------------------------------------------------------
 
 # Configure Plugins build
-if (APPLE)
-  include_directories("${CMAKE_SOURCE_DIR}/Mac/Ogre/include")
-endif()
 
 if (OGRE_BUILD_PLUGIN_OCTREE)
   add_subdirectory(OctreeSceneManager)

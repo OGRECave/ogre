@@ -58,6 +58,7 @@ template<> GLRTTManager* Singleton<GLRTTManager>::ms_Singleton = 0;
         case PCT_SHORT: format = PF_SHORT_RGBA; break;
         case PCT_FLOAT16: format = PF_FLOAT16_RGBA; break;
         case PCT_FLOAT32: format = PF_FLOAT32_RGBA; break;
+        case PCT_COUNT: break;
         }
         if(checkFormat(format))
             return format;

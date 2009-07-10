@@ -12,10 +12,18 @@
 set(HEADER_FILES 
 	include/AnimationBlender.h 
 	include/StaticPluginLoader.h)
-set(SOURCE_FILES 
-	src/PlayPen.cpp
-	src/AnimationBlender.cpp
-	src/WindowEmbedding.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/PlayPen.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/PlayPen.mm COPYONLY)
+  set(SOURCE_FILES 
+    src/PlayPen.mm
+    src/AnimationBlender.cpp
+    src/WindowEmbedding.cpp)
+else ()
+  set(SOURCE_FILES 
+    src/PlayPen.cpp
+    src/AnimationBlender.cpp
+    src/WindowEmbedding.cpp)
+endif ()
 
 if (APPLE)
   set(OGRE_LIBRARIES ${OGRE_LIBRARIES} IOKit)

@@ -91,7 +91,7 @@ namespace Ogre {
         else
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Oly support lock to Scratch",
+                        "Lock to scratch is only supported",
                         "GLESHardwareIndexBuffer::unlockImpl");
         }
     }
@@ -150,7 +150,7 @@ namespace Ogre {
         else
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Not support read hardware buffer",
+                        "Reading hardware buffer is not supported",
                         "GLESHardwareIndexBuffer::readData");
         }
     }

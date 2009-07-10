@@ -1,12 +1,12 @@
-/* Mac/Project builder specific configuration file */
+/* Mac/Xcode specific configuration file */
 
 /* Big endian machine */
 #if defined(__BIG_ENDIAN__)
 	#define OGRE_CONFIG_BIG_ENDIAN 
-#endif
-
+#else
 /* Little endian machine */
-/* #undef CONFIG_LITTLE_ENDIAN */
+	#define CONFIG_LITTLE_ENDIAN
+#endif
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1

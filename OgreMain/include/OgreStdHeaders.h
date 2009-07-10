@@ -95,7 +95,7 @@ extern "C" {
 }
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 extern "C" {
 #   include <unistd.h>
 #   include <sys/param.h>

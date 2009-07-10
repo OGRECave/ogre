@@ -32,7 +32,7 @@ Torus Knot Software Ltd.
 #include "OgreRoot.h"
 
 namespace Ogre {
-    static const String sPluginName = "GLES RenderSystem";
+    static const String sPluginName = "OpenGL ES 1.x RenderSystem";
 
     GLESPlugin::GLESPlugin()
         : mRenderSystem(0)
@@ -49,6 +49,9 @@ namespace Ogre {
         mRenderSystem = new GLESRenderSystem();
 
         Root::getSingleton().addRenderSystem(mRenderSystem);
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        Root::getSingleton().setRenderSystem(mRenderSystem);
+#endif
     }
 
     void GLESPlugin::initialise()

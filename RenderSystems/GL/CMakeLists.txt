@@ -167,11 +167,6 @@ elseif (APPLE)
     include/OSX/OgreOSXRenderTexture.h
     include/OSX/OgreOSXWindow.h
     src/OSX/OgreGLUtil.h
-  
-    # think about relocating these
-    #${CMAKE_SOURCE_DIR}/Mac/Ogre/include/macBundlePath.h
-    #${CMAKE_SOURCE_DIR}/Mac/Ogre/include/macPlugins.h
-    #${CMAKE_SOURCE_DIR}/Mac/Ogre/include/OgreOSXCocoaView.h
   )
   set(PLATFORM_SOURCES
     src/OSX/OgreOSXCarbonContext.cpp
@@ -183,13 +178,8 @@ elseif (APPLE)
     src/OSX/OgreOSXCocoaWindow.mm
     src/OSX/OgreOSXGLSupport.mm
     src/OSX/OgreOSXWindow.cpp
-    # think about relocating these
-    #${CMAKE_SOURCE_DIR}/Mac/Ogre/src/macBundlePath.cpp
-    #${CMAKE_SOURCE_DIR}/Mac/Ogre/src/macPlugins.cpp
-    #${CMAKE_SOURCE_DIR}/Mac/Ogre/src/OgreOSXCocoaView.mm
   )
-  include_directories(src/OSX include/OSX)
-  include_directories("${CMAKE_SOURCE_DIR}/Mac/Ogre/include")
+  include_directories(src/OSX include/OSX "${CMAKE_SOURCE_DIR}/OgreMain/include/OSX")
   set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
   set(PLATFORM_HEADER_INSTALL "OSX")
 elseif (UNIX)

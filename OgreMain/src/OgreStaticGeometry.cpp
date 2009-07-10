@@ -88,7 +88,7 @@ namespace Ogre {
 		getRegionIndexes(min, minx, miny, minz);
 		getRegionIndexes(max, maxx, maxy, maxz);
 		Real maxVolume = 0.0f;
-		ushort finalx, finaly, finalz;
+		ushort finalx = 0, finaly = 0, finalz = 0;
 		for (ushort x = minx; x <= maxx; ++x)
 		{
 			for (ushort y = miny; y <= maxy; ++y)
@@ -251,7 +251,7 @@ namespace Ogre {
 				vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
 		float* pFloat;
 
-		Vector3 min, max;
+		Vector3 min = Vector3::ZERO, max = Vector3::ZERO;
 		bool first = true;
 
 		for(size_t j = 0; j < vertexData->vertexCount; ++j, vertex += vbuf->getVertexSize())

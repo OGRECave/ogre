@@ -76,7 +76,7 @@ namespace Ogre
         /** (recursive) check the given light against all portals in the zone
         */
         void _checkLightAgainstPortals(PCZLight *, 
-                                       long, 
+                                       unsigned long, 
                                        PCZFrustum *,
                                        Portal *);
 

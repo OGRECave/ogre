@@ -110,9 +110,12 @@ void OSXWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
 void OSXWindow::createCGLFullscreen(unsigned int width, unsigned int height, unsigned int depth, unsigned int fsaa, CGLContextObj sharedContext)
 {
 		// Find the best match to what was requested
-		boolean_t exactMatch;
-		CFDictionaryRef displayMode = CGDisplayBestModeForParameters(kCGDirectMainDisplay, depth, width, height, &exactMatch);
-		
+        boolean_t exactMatch = 0;
+#if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6)
+        CFDictionaryRef displayMode = CGDisplayBestModeForParameters(kCGDirectMainDisplay, depth, width, height, &exactMatch);
+#else
+        CGDisplayModeRef displayMode = CGDisplayCopyDisplayMode(kCGDirectMainDisplay);
+#endif	
 		if(!exactMatch)
 		{
 			// TODO: Report the size difference
@@ -144,7 +147,11 @@ void OSXWindow::createCGLFullscreen(unsigned int width, unsigned int height, uns
 		CGDisplayCapture(kCGDirectMainDisplay);
 		
 		// Switch to the correct resolution
-		CGDisplaySwitchToMode(kCGDirectMainDisplay, displayMode);
+#if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6)
+        CGDisplaySwitchToMode(kCGDirectMainDisplay, displayMode);
+#else
+        CGDisplaySetDisplayMode(kCGDirectMainDisplay, displayMode, NULL);
+#endif
 		
 		// Get a pixel format that best matches what we are looking for
 		CGLPixelFormatAttribute attribs[] = { 
@@ -183,7 +190,7 @@ void OSXWindow::createCGLFullscreen(unsigned int width, unsigned int height, uns
 		if(err != 0)
 		{
 			CGReleaseAllDisplays();
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("CGL Error: " + String(CGLErrorString(err))), "OSXCarbonWindow::create");
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("CGL Error: " + String(CGLErrorString(err))), "OSXWindow::createCGLFullscreen");
 		}
 
 		// Create the CGLcontext from our pixel format, share it with the sharedContext passed in
@@ -191,7 +198,7 @@ void OSXWindow::createCGLFullscreen(unsigned int width, unsigned int height, uns
 		if(err != 0)
 		{
 			CGReleaseAllDisplays();
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("CGL Error: " + String(CGLErrorString(err))), "OSXCarbonWindow::create");
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("CGL Error: " + String(CGLErrorString(err))), "OSXWindow::createCGLFullscreen");
 		}
 				
 		// Once we have the context we can destroy the pixel format
@@ -199,8 +206,12 @@ void OSXWindow::createCGLFullscreen(unsigned int width, unsigned int height, uns
         // Our context class will now manage the life of the pixelFormatObj
 		//CGLDestroyPixelFormat(pixelFormatObj); 
 				
-		// Set the context to drawable
-		CGLSetFullScreen(mCGLContext);
+		// Set the context to full screen
+#if (MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_5)
+        CGLSetFullScreen(mCGLContext);
+#else
+        CGLSetFullScreenOnDisplay(mCGLContext, CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay));
+#endif
 		
 		// Set the context as current
 		CGLSetCurrentContext(mCGLContext);
@@ -245,7 +256,11 @@ void OSXWindow::swapCGLBuffers(void)
 	if(curCtx != mCGLContext)
 	{
 		CGLSetCurrentContext(mCGLContext);
-		CGLSetFullScreen(mCGLContext);
+#if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6)
+        CGLSetFullScreen(mCGLContext);
+#else
+        CGLSetFullScreenOnDisplay(mCGLContext, CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay));
+#endif
 	}
 }
 

@@ -22,7 +22,6 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
 }
 */
 #define maxObjectsPerBatch 80
-#define FLT_MAX         3.402823466e+38F        /* max value */
 const size_t numTypeMeshes = 4;
 class InstancingApplication;
 Ogre::String meshes[]=

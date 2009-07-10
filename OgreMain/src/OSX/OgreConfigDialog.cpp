@@ -5,9 +5,11 @@
 namespace Ogre {
 
 	ConfigDialog* dlg = NULL;
-	static EventHandlerUPP WindowEventHandlerUPP;
+//	static EventHandlerUPP WindowEventHandlerUPP;
 
-	ConfigDialog::ConfigDialog() : iSelectedRenderSystem( NULL ), iVideoModeRef( NULL ), iLogoViewRef( NULL ), iWindowRef( NULL ), iNibRef( NULL ), iMenuRef( NULL )
+	ConfigDialog::ConfigDialog() : 
+        iSelectedRenderSystem( NULL ), iLogoViewRef( NULL ), iVideoModeRef( NULL ),
+        iWindowRef( NULL ), iNibRef( NULL ), iMenuRef( NULL )
 	{
 		dlg = this;
 	}

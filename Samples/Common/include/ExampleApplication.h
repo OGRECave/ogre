@@ -44,35 +44,19 @@ Description: Base class for all the OGRE examples
 #  else
 #    define OGRE_STATIC_OctreeSceneManager
 #  endif
-
+#  if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#     undef OGRE_STATIC_CgProgramManager
+#     undef OGRE_STATIC_GL
+#     define OGRE_STATIC_GLES 1
+#     ifdef __OBJC__
+#       import <UIKit/UIKit.h>
+#     endif
+#  endif
 #  include "OgreStaticPluginLoader.h"
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#include <CoreFoundation/CoreFoundation.h>
-
-// This function will locate the path to our application on OS X,
-// unlike windows you can not rely on the curent working directory
-// for locating your configuration files and resources.
-std::string macBundlePath()
-{
-    char path[1024];
-    CFBundleRef mainBundle = CFBundleGetMainBundle();
-    assert(mainBundle);
-
-    CFURLRef mainBundleURL = CFBundleCopyBundleURL(mainBundle);
-    assert(mainBundleURL);
-
-    CFStringRef cfStringRef = CFURLCopyFileSystemPath( mainBundleURL, kCFURLPOSIXPathStyle);
-    assert(cfStringRef);
-
-    CFStringGetCString(cfStringRef, path, 1024, kCFStringEncodingASCII);
-
-    CFRelease(mainBundleURL);
-    CFRelease(cfStringRef);
-
-    return std::string(path);
-}
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#   include "macUtils.h"
 #endif
 
 using namespace Ogre;
@@ -93,8 +77,13 @@ public:
 		// you must provide the full path, the helper function macBundlePath does this for us.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 		mResourcePath = macBundlePath() + "/Contents/Resources/";
+        mConfigPath = mResourcePath;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        mResourcePath = macBundlePath() + "/";
+        mConfigPath = mResourcePath;
 #else
 		mResourcePath = "";
+        mConfigPath = mResourcePath;
 #endif
     }
     /// Standard destructor
@@ -132,6 +121,7 @@ protected:
     ExampleFrameListener* mFrameListener;
     RenderWindow* mWindow;
 	Ogre::String mResourcePath;
+	Ogre::String mConfigPath;
 
     // These internal methods package up the stages in the startup process
     /** Sets up the application - returns false if the user chooses to abandon configuration. */
@@ -145,7 +135,7 @@ protected:
 #endif
 		
         mRoot = OGRE_NEW Root(pluginsPath, 
-            mResourcePath + "ogre.cfg", mResourcePath + "Ogre.log");
+            mConfigPath + "ogre.cfg", mResourcePath + "Ogre.log");
 #ifdef OGRE_STATIC_LIB
 		mStaticPluginLoader.load();
 #endif
@@ -212,7 +202,11 @@ protected:
     }
     virtual void createFrameListener(void)
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        mFrameListener= new ExampleFrameListener(mWindow, mCamera, true, true, true);
+#else
         mFrameListener= new ExampleFrameListener(mWindow, mCamera);
+#endif
         mFrameListener->showDebugOverlay(true);
         mRoot->addFrameListener(mFrameListener);
     }
@@ -252,7 +246,7 @@ protected:
             {
                 typeName = i->first;
                 archName = i->second;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
                 // OS X does not set the working directory relative to the app,
                 // In order to make things portable on OS X we need to provide
                 // the loading with it's own bundle path location
@@ -281,9 +275,6 @@ protected:
 
 	}
 
-
-
 };
-
 
 #endif

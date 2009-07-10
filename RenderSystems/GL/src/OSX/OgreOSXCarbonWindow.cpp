@@ -76,7 +76,7 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
 	if( miscParams )
 	{
 		
-		NameValuePairList::const_iterator opt = NULL;
+		NameValuePairList::const_iterator opt(NULL);
 		
 		// Full screen anti aliasing
 		opt = miscParams->find( "FSAA" );
@@ -180,7 +180,7 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
 				"with an AGL context.");
 		}
 		
-		NameValuePairList::const_iterator opt = 0;
+		NameValuePairList::const_iterator opt(NULL);
 		if(miscParams)
 			opt = miscParams->find("externalWindowHandle");
 		if(!miscParams || opt == miscParams->end())
@@ -280,13 +280,18 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
 			aglEnable (mAGLContext, AGL_BUFFER_RECT);
 
       		mIsExternal = true;
-    }
+        }
 		
 		// Set the drawable, and current context
 		// If you do this last, there is a moment before the rendering window pops-up
 		// This could go once inside each case above, before the window is displayed,
 		// if desired.
-		aglSetDrawable(mAGLContext, GetWindowPort(mWindow));
+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
+        aglSetDrawable(mAGLContext, GetWindowPort(mWindow));
+#else
+        aglSetWindowRef(mAGLContext, mWindow);
+#endif
+
 		aglSetCurrentContext(mAGLContext);
 
 		// Give a copy of our context to the render system

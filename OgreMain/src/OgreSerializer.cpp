@@ -211,9 +211,9 @@ namespace Ogre {
     {
     //no endian flipping for 1-byte bools
     //XXX Nasty Hack to convert to 1-byte bools
-#	if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#	if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
         char * pCharToWrite = (char *)malloc(sizeof(char) * count);
-        for(int i = 0; i < count; i++)
+        for(unsigned int i = 0; i < count; i++)
         {
             *(char *)(pCharToWrite + i) = *(bool *)(pBool + i);
         }
@@ -279,10 +279,10 @@ namespace Ogre {
     void Serializer::readBools(DataStreamPtr& stream, bool* pDest, size_t count)
     {
         //XXX Nasty Hack to convert 1 byte bools to 4 byte bools
-#	if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#	if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
         char * pTemp = (char *)malloc(1*count); // to hold 1-byte bools
         stream->read(pTemp, 1 * count);
-        for(int i = 0; i < count; i++)
+        for(unsigned int i = 0; i < count; i++)
             *(bool *)(pDest + i) = *(char *)(pTemp + i);
             
         free (pTemp);

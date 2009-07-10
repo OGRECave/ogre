@@ -93,7 +93,7 @@ namespace Ogre
         return true;
     }
     //-----------------------------------------------------------------------
-    void PCZLight::updateZones(PCZone * defaultZone, long frameCount)
+    void PCZLight::updateZones(PCZone * defaultZone, unsigned long frameCount)
     {
         //update the zones this light affects
         PCZone * homeZone;

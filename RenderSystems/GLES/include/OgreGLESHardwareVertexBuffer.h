@@ -35,7 +35,7 @@ Torus Knot Software Ltd.
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
-    /// Specialisation of HardwareVertexBuffer for OpenGLES
+    /// Specialisation of HardwareVertexBuffer for OpenGL ES
     class _OgrePrivate GLESHardwareVertexBuffer : public HardwareVertexBuffer
     {
         private:

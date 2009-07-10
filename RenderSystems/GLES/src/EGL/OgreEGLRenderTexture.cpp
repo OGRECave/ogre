@@ -91,7 +91,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                         "No support for Floating point PBuffers",
-                        "GLRenderTexture::createPBuffer");
+                        "EGLRenderTexture::initEGLPBuffer");
         }
 
         int minAttribs[] = {

@@ -39,8 +39,10 @@ Torus Knot Software Ltd.
 #include "OgreGLTexture.h"
 #include "OgreOSXRenderTexture.h"
 
+#include "macUtils.h"
+#include <dlfcn.h>
+
 #include <OpenGL/OpenGL.h>
-#include <mach-o/dyld.h>
 
 namespace Ogre {
 
@@ -124,7 +126,11 @@ void OSXGLSupport::addConfig( void )
 	optVideoMode.name = "Video Mode";
 	optVideoMode.immutable = false;
 
+#if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6)
 	CFArrayRef displayModes = CGDisplayAvailableModes(CGMainDisplayID());
+#else
+	CFArrayRef displayModes = CGDisplayCopyAllDisplayModes(CGMainDisplayID(), NULL);
+#endif
 	CFIndex numModes = CFArrayGetCount(displayModes);
 	CFMutableArrayRef goodModes = NULL;
 	goodModes = CFArrayCreateMutable(kCFAllocatorDefault, numModes, NULL);
@@ -247,7 +253,7 @@ RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, u
 	
 	if(miscParams)
 	{
-		NameValuePairList::const_iterator opt = NULL;
+		NameValuePairList::const_iterator opt(NULL);
 		
 		// First we must determine if this is a carbon or a cocoa window
 		// that we wish to create
@@ -279,33 +285,32 @@ RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, u
 void OSXGLSupport::start()
 {
 	LogManager::getSingleton().logMessage(
-			"*******************************************\n"
-			"***    Starting OSX OpenGL Subsystem    ***\n"
-			"*******************************************");
+			"********************************************\n"
+			"***  Starting Mac OS X OpenGL Subsystem  ***\n"
+			"********************************************");
 }
 
 void OSXGLSupport::stop()
 {
 	LogManager::getSingleton().logMessage(
-			"*******************************************\n"
-			"***    Stopping OSX OpenGL Subsystem    ***\n"
-			"*******************************************");
+			"********************************************\n"
+			"***  Stopping Mac OS X OpenGL Subsystem  ***\n"
+			"********************************************");
 }
 
 void* OSXGLSupport::getProcAddress( const char* name )
 {
-	NSSymbol symbol;
-    char *symbolName;
-    // Prepend a '_' for the Unix C symbol mangling convention
-    symbolName = (char*)malloc (strlen (name) + 2);
-    strcpy(symbolName + 1, name);
-    symbolName[0] = '_';
+    void *symbol;
     symbol = NULL;
-	// TODO:  dlopen calls, dyld
-    if (NSIsSymbolNameDefined (symbolName))
-        symbol = NSLookupAndBindSymbol (symbolName);
-    free (symbolName);
-    return symbol ? NSAddressOfSymbol (symbol) : NULL;
+    
+    std::string fullPath = macPluginPath() + "RenderSystem_GL.dylib";
+    void *handle = dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+    if(handle) {
+        symbol = dlsym (handle, name);
+    }
+    dlclose(handle);
+    
+    return symbol;
 }
 
 void* OSXGLSupport::getProcAddress( const String& procname )

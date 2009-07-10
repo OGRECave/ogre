@@ -57,7 +57,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     ResourceGroupManager::ResourceGroupManager()
-        : mCurrentGroup(0), mLoadingListener(0)
+        : mLoadingListener(0), mCurrentGroup(0)
     {
         // Create the 'General' group
         createResourceGroup(DEFAULT_RESOURCE_GROUP_NAME);

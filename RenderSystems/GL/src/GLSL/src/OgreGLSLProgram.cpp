@@ -74,7 +74,7 @@ namespace Ogre {
 			checkForGLSLError( "GLSLProgram::GLSLProgram", "GL Errors before creating shader object", 0 );
 			// create shader object
 
-			GLenum shaderType;
+			GLenum shaderType = 0x0000;
 			switch (mType)
 			{
 			case GPT_VERTEX_PROGRAM:

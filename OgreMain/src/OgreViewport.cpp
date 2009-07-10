@@ -49,6 +49,7 @@ namespace Ogre {
         , mRelHeight(height)
         // Actual dimensions will update later
         , mZOrder(ZOrder)
+        , mOrientation(OR_PORTRAIT)
         , mBackColour(ColourValue::Black)
         , mClearEveryFrame(true)
 		, mClearBuffers(FBT_COLOUR | FBT_DEPTH)
@@ -101,7 +102,7 @@ namespace Ogre {
         mActWidth = (int) (mRelWidth * width);
         mActHeight = (int) (mRelHeight * height);
 
-        // This will check if  the cameras getAutoAspectRation() property is set.
+        // This will check if the cameras getAutoAspectRatio() property is set.
         // If it's true its aspect ratio is fit to the current viewport
         // If it's false the camera remains unchanged.
         // This allows cameras to be used to render to many viewports,
@@ -175,6 +176,26 @@ namespace Ogre {
     int Viewport::getActualHeight(void) const
     {
         return mActHeight;
+    }
+    //---------------------------------------------------------------------
+    int Viewport::getOrientation(void)
+    {
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                    "Setting Viewport orientation is only supported on iPhone",
+                    __FUNCTION__);
+#endif
+        return mOrientation;
+    }
+    //---------------------------------------------------------------------
+    void Viewport::setOrientation(Orientation orient)
+    {
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                    "Setting Viewport orientation is only supported on iPhone",
+                    __FUNCTION__);
+#endif
+        mOrientation = orient;
     }
     //---------------------------------------------------------------------
     void Viewport::setDimensions(Real left, Real top, Real width, Real height)

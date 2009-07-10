@@ -1488,7 +1488,12 @@ bool PS_1_4::expandMachineInstruction()
 				updateRegisterWriteState(mInstructionPhase);
 				break;
 
-	
+            case mi_ALPHAOP1:
+            case mi_ALPHAOP2:
+            case mi_ALPHAOP3:
+            case mi_TEXREG2RGB:
+            case mi_NOP:
+                break;
 
 
 		} // end of switch (mOpType)

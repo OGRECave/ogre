@@ -247,7 +247,7 @@ namespace Ogre
 				p16 += i_in->indexStart;
 			}
 			// current triangle
-			size_t vertInd[3];
+			size_t vertInd[3] = { 0, 0, 0 };
 			// loop through all faces to calculate the tangents and normals
 			size_t faceCount = opType == RenderOperation::OT_TRIANGLE_LIST ? 
 				i_in->indexCount / 3 : i_in->indexCount - 2;
@@ -660,7 +660,7 @@ namespace Ogre
 		}
 
 		HardwareVertexBufferSharedPtr targetBuffer, origBuffer;
-		unsigned char* pSrc;
+		unsigned char* pSrc = NULL;
 
 		if (needsToBeCreated)
 		{

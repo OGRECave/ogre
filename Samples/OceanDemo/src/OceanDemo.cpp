@@ -15,6 +15,10 @@ LGPL like the rest of the engine.
 #include "OceanDemo.h"
 #include "Ogre.h"
 
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) || (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE)
+#include "macUtils.h"
+#endif
+
 #include <cstdlib>
 
 inline Ogre::String operator +(const Ogre::String& l,const CEGUI::String& o)
@@ -27,33 +31,6 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
 	return l+o.c_str();
 }
 */
-
-/**********************************************************************
-OS X Specific Resource Location Finding
-**********************************************************************/
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-
-Ogre::String bundlePath()
-{
-    char path[1024];
-    CFBundleRef mainBundle = CFBundleGetMainBundle();
-    assert( mainBundle );
-
-    CFURLRef mainBundleURL = CFBundleCopyBundleURL( mainBundle);
-    assert( mainBundleURL);
-
-    CFStringRef cfStringRef = CFURLCopyFileSystemPath( mainBundleURL, kCFURLPOSIXPathStyle);
-    assert( cfStringRef);
-
-    CFStringGetCString( cfStringRef, path, 1024, kCFStringEncodingASCII);
-
-    CFRelease( mainBundleURL);
-    CFRelease( cfStringRef);
-
-    return Ogre::String( path);
-}
-
-#endif
 
 /**********************************************************************
   Static declarations
@@ -145,6 +122,12 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 int main(int argc, char *argv[])
 #endif
 {
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+        int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
+        [pool release];
+        return retVal;
+#else
 	// Create application object
 	OceanDemo app;
 
@@ -161,10 +144,84 @@ int main(int argc, char *argv[])
     }
 
     return 0;
+#endif
 }
 
 #ifdef __cplusplus
 }
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#   ifdef __OBJC__
+@interface AppDelegate : NSObject <UIApplicationDelegate>
+{
+}
+
+- (void)go;
+
+@end
+
+@implementation AppDelegate
+
+- (void)go {
+	// Create application object
+	OceanDemo app;
+    try {
+        app.go();
+    } catch( Ogre::Exception& e ) {
+        std::cerr << "An exception has occured: " <<
+        e.getFullDescription().c_str() << std::endl;
+    }
+}
+
+- (void)applicationDidFinishLaunching:(UIApplication *)application {
+    // Hide the status bar
+    [[UIApplication sharedApplication] setStatusBarHidden:YES];
+
+    // Create a window
+    UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+
+    // Create an image view
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Default.png"]];
+    [window addSubview:imageView];
+    
+    // Create an indeterminate status indicator
+    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    [indicator setFrame:CGRectMake(150, 280, 20, 20)];
+    [indicator startAnimating];
+    [window addSubview:indicator];
+    
+    // Display our window
+    [window makeKeyAndVisible];
+    
+    // Clean up
+    [imageView release];
+    [indicator release];
+
+    [NSThread detachNewThreadSelector:@selector(go) toTarget:self withObject:nil];
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application {
+    Root::getSingleton().queueEndRendering();
+}
+
+//- (void)applicationWillResignActive:(UIApplication *)application
+//{
+//    // Pause FrameListeners and rendering
+//}
+//
+//- (void)applicationDidBecomeActive:(UIApplication *)application
+//{
+//    // Resume FrameListeners and rendering
+//}
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+@end
+#   endif
+
 #endif
 
 /*************************************************************************
@@ -209,7 +266,7 @@ bool OceanDemo::setup(void)
 	Ogre::String pluginsPath;
 	// only use plugins.cfg if not static
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-	mResourcePath = bundlePath() + "/Contents/Resources/";
+	mResourcePath = Ogre::macBundlePath() + "/Contents/Resources/";
 #endif
 #ifndef OGRE_STATIC_LIB
 	pluginsPath = mResourcePath + "plugins.cfg";
@@ -314,7 +371,7 @@ void OceanDemo::setupResources(void)
 
     #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         Ogre::String mResourcePath;
-        mResourcePath = bundlePath() + "/Contents/Resources/";
+		mResourcePath = Ogre::macBundlePath() + "/Contents/Resources/";
         cf.load(mResourcePath + "resources.cfg");
     #else
         cf.load("resources.cfg");
@@ -338,7 +395,7 @@ void OceanDemo::setupResources(void)
                 // In order to make things portable on OS X we need to provide
                 // the loading with it's own bundle path location
 			if (!Ogre::StringUtil::startsWith(archName, "/", false)) // only adjust relative dirs			
-				archName = bundlePath() + "/" + archName;
+				archName = Ogre::macBundlePath() + "/" + archName;
 #endif
                 Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
                     archName, typeName, secName);
@@ -661,6 +718,9 @@ bool OceanDemo::handleShaderControl(const CEGUI::EventArgs& e)
 				// get the specular values from the material pass
 				mActivePass->setShininess( val );
 				break;
+
+            case MAT_EMISSIVE:
+                break;
 		}
 	}
 

@@ -506,7 +506,7 @@ namespace Ogre
         Real xTex = (1.0f * params.xTile) / params.xsegments;
         Real yTex = (1.0f * params.yTile) / params.ysegments;
         Vector3 vec;
-        Vector3 min, max;
+        Vector3 min = Vector3::ZERO, max = Vector3::ZERO;
         Real maxSquaredLength = 0;
         bool firstTime = true;
 
@@ -650,7 +650,7 @@ namespace Ogre
         Real yTex = (1.0f * params.yTile) / params.ysegments;
         Vector3 vec;
 
-        Vector3 min, max;
+        Vector3 min = Vector3::ZERO, max = Vector3::ZERO;
         Real maxSqLen = 0;
         bool first = true;
 
@@ -825,7 +825,7 @@ namespace Ogre
         Real halfWidth = params.width / 2;
         Real halfHeight = params.height / 2;
         Vector3 vec, norm;
-        Vector3 min, max;
+        Vector3 min = Vector3::ZERO, max = Vector3::ZERO;
         Real maxSquaredLength = 0;
         bool firstTime = true;
 

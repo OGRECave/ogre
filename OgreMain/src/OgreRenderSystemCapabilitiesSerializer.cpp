@@ -134,6 +134,9 @@ namespace Ogre
         file << "\t" << "fragment_program_constant_float_count " << StringConverter::toString(caps->getFragmentProgramConstantFloatCount()) << endl;
         file << "\t" << "fragment_program_constant_int_count " << StringConverter::toString(caps->getFragmentProgramConstantIntCount()) << endl;
         file << "\t" << "fragment_program_constant_bool_count " << StringConverter::toString(caps->getFragmentProgramConstantBoolCount()) << endl;
+        file << "\t" << "geometry_program_constant_float_count " << StringConverter::toString(caps->getGeometryProgramConstantFloatCount()) << endl;
+        file << "\t" << "geometry_program_constant_int_count " << StringConverter::toString(caps->getGeometryProgramConstantIntCount()) << endl;
+        file << "\t" << "geometry_program_constant_bool_count " << StringConverter::toString(caps->getGeometryProgramConstantBoolCount()) << endl;
         file << "\t" << "num_vertex_texture_units " << StringConverter::toString(caps->getNumVertexTextureUnits()) << endl;
 
         file << endl;
@@ -330,6 +333,9 @@ namespace Ogre
         addSetIntMethod("fragment_program_constant_float_count", &RenderSystemCapabilities::setFragmentProgramConstantFloatCount);
         addSetIntMethod("fragment_program_constant_int_count", &RenderSystemCapabilities::setFragmentProgramConstantIntCount);
         addSetIntMethod("fragment_program_constant_bool_count", &RenderSystemCapabilities::setFragmentProgramConstantBoolCount);
+        addSetIntMethod("geometry_program_constant_float_count", &RenderSystemCapabilities::setGeometryProgramConstantFloatCount);
+        addSetIntMethod("geometry_program_constant_int_count", &RenderSystemCapabilities::setGeometryProgramConstantIntCount);
+        addSetIntMethod("geometry_program_constant_bool_count", &RenderSystemCapabilities::setGeometryProgramConstantBoolCount);
         addSetIntMethod("num_vertex_texture_units", &RenderSystemCapabilities::setNumVertexTextureUnits);
 
         // initialize bool types

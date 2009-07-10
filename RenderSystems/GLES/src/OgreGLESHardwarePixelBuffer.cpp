@@ -266,7 +266,7 @@ namespace Ogre {
         mSlicePitch = mHeight*mWidth;
         mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
         mBuffer = PixelBox(mWidth, mHeight, mDepth, mFormat);
-
+        
         if (mWidth==0 || mHeight==0 || mDepth==0)
             return;
 
@@ -399,6 +399,11 @@ namespace Ogre {
                             gl_format,
                             GLESPixelUtil::getGLOriginDataType(data.format),
                             data.data);
+//            LogManager::getSingleton().logMessage("GLESTextureBuffer::upload - Mip: " + StringConverter::toString(mLevel) +
+//                                                  " Width: " + StringConverter::toString(data.getWidth()) +
+//                                                  " Height: " + StringConverter::toString(data.getHeight()) +
+//                                                  " Internal Format: " + StringConverter::toString(gl_format)
+//                                                  );
             GL_CHECK_ERROR;
         }
 
@@ -423,7 +428,6 @@ namespace Ogre {
     {
         int width;
         int height;
-        int mip = 0;
         int logW;
         int logH;
         int level;

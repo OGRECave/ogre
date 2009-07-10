@@ -278,9 +278,19 @@ namespace Ogre {
             mLastViewportHeight != vp->getActualHeight())
         {
             mViewportDimensionsChanged = true;
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+            if ((vp->getOrientation() == Viewport::OR_LANDSCAPELEFT) ||
+                (vp->getOrientation() == Viewport::OR_LANDSCAPERIGHT)) {
+                mLastViewportWidth = vp->getActualHeight();
+                mLastViewportHeight = vp->getActualWidth();
+            } else {
+                mLastViewportWidth = vp->getActualWidth();
+                mLastViewportHeight = vp->getActualHeight();
+            }
+#else
             mLastViewportWidth = vp->getActualWidth();
             mLastViewportHeight = vp->getActualHeight();
-
+#endif
         }
         else
         {

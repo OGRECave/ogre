@@ -42,7 +42,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Option named " + name +  " does not exist.",
-                        "EGLGLESSupport::setConfigOption");
+                        "GLESSupport::setConfigOption");
         }
         else
         {
@@ -90,7 +90,7 @@ namespace Ogre {
 
         while (ext >> str)
         {
-            printf("EXT:%s\n", str.c_str());
+            printf("EXT: %s\n", str.c_str());
             extensionList.insert(str);
         }
     }

@@ -870,7 +870,7 @@ void * nedpmemalign(nedpool *p, size_t alignment, size_t bytes) THROWSPEC
 struct mallinfo nedpmallinfo(nedpool *p) THROWSPEC
 {
 	int n;
-	struct mallinfo ret={0};
+	struct mallinfo ret={0,0,0,0,0,0,0,0,0,0};
 	if(!p) { p=&syspool; if(!syspool.threads) InitPool(&syspool, 0, -1); }
 	for(n=0; p->m[n]; n++)
 	{

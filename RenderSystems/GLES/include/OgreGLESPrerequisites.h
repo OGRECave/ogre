@@ -34,15 +34,25 @@ Torus Knot Software Ltd.
 #include "OgrePrerequisites.h"
 #include "OgreMath.h"
 
-#include <GLES/gl.h>
-#include <GLES/egl.h>
+#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE)
+#   include <OpenGLES/ES1/gl.h>
+#   include <OpenGLES/ES1/glext.h>
+#   ifdef __OBJC__
+#       include <OpenGLES/EAGL.h>
+#   endif
+#else
+#   include <GLES/gl.h>
+#   include <GLES/egl.h>
+#endif
 
 #ifndef None
 	#define None NULL
 #endif
 
-//PowerVR extension
-#define GL_BGRA_PVR 0x80E1
+// PowerVR extension
+#ifndef GL_BGRA_PVR
+#   define GL_BGRA_PVR 0x80E1
+#endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
 #   ifdef OGRE_GLESPLUGIN_EXPORTS
@@ -65,14 +75,14 @@ Torus Knot Software Ltd.
         fprintf(stderr, "%s:%d: %s\n", __FUNCTION__, __LINE__, text); \
     }
 
+#define ENABLE_GL_CHECK 0
 #if ENABLE_GL_CHECK
 #define GL_CHECK_ERROR \
     { \
         int e = glGetError(); \
         if (e != 0) \
         { \
-            fprintf(stderr, "%s:%s:%d - GL ERROR: %x\n", __FILE__, __FUNCTION__, __LINE__, e); \
-            assert(false); \
+            fprintf(stderr, "OpenGL error 0x%04X in %s at line %i in %s\n", e, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
         } \
     }
 #else
@@ -85,7 +95,7 @@ Torus Knot Software Ltd.
         int e = eglGetError(); \
         if ((e != 0) && (e != EGL_SUCCESS))\
         { \
-            fprintf(stderr, "%s:%s:%d - EGL ERROR: %x\n", __FILE__, __FUNCTION__, __LINE__, e); \
+            fprintf(stderr, "OpenGL error 0x%04X in %s at line %i in %s\n", e, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
             assert(false); \
         } \
     }

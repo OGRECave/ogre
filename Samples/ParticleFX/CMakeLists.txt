@@ -10,7 +10,12 @@
 # Configure ParticleFX demo build
 
 set(HEADER_FILES include/ParticleFX.h)
-set(SOURCE_FILES src/ParticleFX.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleFX.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleFX.mm COPYONLY)
+  set(SOURCE_FILES src/ParticleFX.mm)
+else ()
+  set(SOURCE_FILES src/ParticleFX.cpp)
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_ParticleFX WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})

@@ -510,8 +510,8 @@ namespace Ogre {
             "vertex set " + StringConverter::toString(mGeometryList[i].vertexSet) + " - " + 
             "operationType " + StringConverter::toString(mGeometryList[i].opType));
             // Get the indexes ready for reading
-            unsigned short* p16Idx;
-            unsigned int* p32Idx;
+            unsigned short* p16Idx = 0;
+            unsigned int* p32Idx = 0;
 
             if (iData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT)
             {

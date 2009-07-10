@@ -2925,7 +2925,7 @@ namespace Ogre{
 							AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(),
 								*atom1 = (AtomAbstractNode*)(*i1).get(),
 								*atom2 = (AtomAbstractNode*)(*i2).get();
-							FilterOptions tmin, tmax, tmip;
+							FilterOptions tmin = FO_NONE, tmax = FO_NONE, tmip = FO_NONE;
 							switch(atom0->id)
 							{
 							case ID_NONE:
@@ -3622,8 +3622,8 @@ namespace Ogre{
 							(*i3)->type == ANT_ATOM && (*i4)->type == ANT_ATOM && (*i5)->type == ANT_ATOM)
 						{
 							AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
-							TextureUnitState::TextureTransformType type;
-							WaveformType wave;
+							TextureUnitState::TextureTransformType type = TextureUnitState::TT_ROTATE;
+							WaveformType wave = WFT_SINE;
 							Real base = 0.0f, freq = 0.0f, phase = 0.0f, amp = 0.0f;
 
 							switch(atom0->id)

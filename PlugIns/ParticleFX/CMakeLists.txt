@@ -67,6 +67,7 @@ set (SOURCE_FILES
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 add_definitions(-D_USRDLL)
 
 add_library(Plugin_ParticleFX ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})

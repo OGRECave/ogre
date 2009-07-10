@@ -57,7 +57,7 @@ using namespace Ogre;
 DeferredShadingSystem::DeferredShadingSystem(
 		Viewport *vp, SceneManager *sm,  Camera *cam
 	):
-	mSceneMgr(sm), mViewport(vp), mCamera(cam),
+	mViewport(vp), mSceneMgr(sm), mCamera(cam),
 		mLightMaterialGenerator(0)
 {
 	for(int i=0; i<DSM_COUNT; ++i)

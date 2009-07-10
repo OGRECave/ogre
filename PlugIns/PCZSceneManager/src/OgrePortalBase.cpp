@@ -41,8 +41,8 @@ PortalBase::PortalBase(const String& name, const PORTAL_TYPE type)
 	mType(type),
 	mCurrentHomeZone(0),
 	mNewHomeZone(0),
+    mDirection(Vector3::UNIT_Z),
 	mRadius(0.0),
-	mDirection(Vector3::UNIT_Z),
 	mLocalsUpToDate(false),
 	mDerivedUpToDate(false),
 	// set prevWorldTransform to a zero'd out matrix

@@ -90,7 +90,7 @@ namespace Ogre
 
         /** Update the list of zones the light affects 
         */
-        void updateZones(PCZone * defaultZone, long frameCount);
+        void updateZones(PCZone * defaultZone, unsigned long frameCount);
 
 		void removeZoneFromAffectedZonesList(PCZone * zone); // manually remove a zone from the affected list
 

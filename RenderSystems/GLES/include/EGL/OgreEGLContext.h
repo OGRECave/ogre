@@ -41,9 +41,10 @@ namespace Ogre {
         protected:
             ::EGLConfig    mConfig;
             const EGLSupport*    mGLSupport;
-			::EGLSurface   mDrawable;
-			::EGLContext   mContext;
-			EGLDisplay mEglDisplay;
+            ::EGLSurface   mDrawable;
+            ::EGLContext   mContext;
+            EGLDisplay mEglDisplay;
+
         public:
             EGLContext(EGLDisplay eglDisplay, const EGLSupport* glsupport, ::EGLConfig fbconfig, ::EGLSurface drawable);
 

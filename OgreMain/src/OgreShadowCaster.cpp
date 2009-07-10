@@ -154,7 +154,7 @@ namespace Ogre {
             // original number of verts (without extruded copy)
             size_t originalVertexCount = eg.vertexData->vertexCount;
             bool  firstDarkCapTri = true;
-            unsigned short darkCapStart;
+            unsigned short darkCapStart = 0;
 
             EdgeData::EdgeList::const_iterator i, iend;
             iend = eg.edges.end();

@@ -48,7 +48,6 @@ namespace Ogre  {
             case PF_FLOAT16_R:
             case PF_FLOAT32_R:
                 return GL_LUMINANCE;
-                return GL_LUMINANCE;
 
             case PF_BYTE_LA:
             case PF_SHORT_GR:
@@ -69,7 +68,8 @@ namespace Ogre  {
             case PF_A1R5G5B5:
             case PF_A4R4G4B4:
             case PF_A2R10G10B10:
-                return GL_BGRA_PVR;
+// This case in incorrect, swaps R & B channels
+//                return GL_BGRA;
 
             case PF_X8B8G8R8:
             case PF_A8B8G8R8:
@@ -131,7 +131,6 @@ namespace Ogre  {
 #else
             case PF_X8B8G8R8:
             case PF_A8B8G8R8:
-                return GL_UNSIGNED_BYTE;
             case PF_X8R8G8B8:
             case PF_A8R8G8B8:
                 return GL_UNSIGNED_BYTE;
@@ -182,10 +181,11 @@ namespace Ogre  {
             case PF_B8G8R8:
             case PF_X8B8G8R8:
             case PF_X8R8G8B8:
-                if (!hwGamma)
-                {
-                    return GL_RGB;
-                }
+                // DJR - Commenting this out resolves texture problems on iPhone
+//                if (!hwGamma)
+//                {
+//                    return GL_RGB;
+//                }
             case PF_A8R8G8B8:
             case PF_B8G8R8A8:
                 if (!hwGamma)
@@ -215,7 +215,6 @@ namespace Ogre  {
             case PF_DXT1:
             case PF_DXT3:
             case PF_DXT5:
-                // TODO not supported
             default:
                 return 0;
         }
@@ -257,7 +256,8 @@ namespace Ogre  {
                 return PF_X8R8G8B8;
             case GL_RGBA:
                 return PF_A8R8G8B8;
-            case GL_BGRA_PVR:
+            case GL_BGRA:
+//                return PF_X8B8G8R8;
             default:
                 //TODO: not supported
                 return PF_A8R8G8B8;
@@ -330,7 +330,7 @@ namespace Ogre  {
 
             converted = new PixelBox(data);
             uint32 *data = (uint32 *) converted->data;
-            for (int i = 0; i < converted->getWidth() * converted->getHeight(); i++)
+            for (uint i = 0; i < converted->getWidth() * converted->getHeight(); i++)
             {
                 uint32 *color = data;
                 *color = (*color & 0x000000ff) << 16 |

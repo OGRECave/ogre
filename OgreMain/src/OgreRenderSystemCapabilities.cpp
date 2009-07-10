@@ -110,11 +110,38 @@ namespace Ogre {
 			" * Vertex programs: "
 			+ StringConverter::toString(hasCapability(RSC_VERTEX_PROGRAM), true));
 		pLog->logMessage(
+             " * Number of floating-point constants for vertex programs: "
+             + StringConverter::toString(mVertexProgramConstantFloatCount));
+		pLog->logMessage(
+             " * Number of integer constants for vertex programs: "
+             + StringConverter::toString(mVertexProgramConstantIntCount));
+		pLog->logMessage(
+             " * Number of boolean constants for vertex programs: "
+             + StringConverter::toString(mVertexProgramConstantBoolCount));
+		pLog->logMessage(
 			" * Fragment programs: "
 			+ StringConverter::toString(hasCapability(RSC_FRAGMENT_PROGRAM), true));
 		pLog->logMessage(
+             " * Number of floating-point constants for fragment programs: "
+             + StringConverter::toString(mFragmentProgramConstantFloatCount));
+		pLog->logMessage(
+             " * Number of integer constants for fragment programs: "
+             + StringConverter::toString(mFragmentProgramConstantIntCount));
+		pLog->logMessage(
+             " * Number of boolean constants for fragment programs: "
+             + StringConverter::toString(mFragmentProgramConstantBoolCount));
+		pLog->logMessage(
 			" * Geometry programs: "
 			+ StringConverter::toString(hasCapability(RSC_GEOMETRY_PROGRAM), true));
+		pLog->logMessage(
+             " * Number of floating-point constants for geometry programs: "
+             + StringConverter::toString(mGeometryProgramConstantFloatCount));
+		pLog->logMessage(
+             " * Number of integer constants for geometry programs: "
+             + StringConverter::toString(mGeometryProgramConstantIntCount));
+		pLog->logMessage(
+             " * Number of boolean constants for geometry programs: "
+             + StringConverter::toString(mGeometryProgramConstantBoolCount));
 		String profileList = "";
 		for(ShaderProfiles::iterator iter = mSupportedShaderProfiles.begin(), end = mSupportedShaderProfiles.end();
 			iter != end; ++iter)
@@ -134,6 +161,9 @@ namespace Ogre {
 			pLog->logMessage(
 				"   - VTC: "
 				+ StringConverter::toString(hasCapability(RSC_TEXTURE_COMPRESSION_VTC), true));
+			pLog->logMessage(
+                 "   - PVRTC: "
+                 + StringConverter::toString(hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC), true));
 		}
 
 		pLog->logMessage(
@@ -181,6 +211,18 @@ namespace Ogre {
 		pLog->logMessage(
 			" * Vertex texture fetch: "
 			+ StringConverter::toString(hasCapability(RSC_VERTEX_TEXTURE_FETCH), true));
+		pLog->logMessage(
+             " * Number of world matrices: "
+             + StringConverter::toString(mNumWorldMatrices));
+		pLog->logMessage(
+             " * Number of texture units: "
+             + StringConverter::toString(mNumTextureUnits));
+		pLog->logMessage(
+             " * Stencil buffer depth: "
+             + StringConverter::toString(mStencilBufferBitDepth));
+		pLog->logMessage(
+             " * Number of vertex blend matrices: "
+             + StringConverter::toString(mNumVertexBlendMatrices));
 		if (hasCapability(RSC_VERTEX_TEXTURE_FETCH))
 		{
 			pLog->logMessage(
@@ -211,7 +253,7 @@ namespace Ogre {
 				" * Frame Buffer objects (ATI extension): "
 				+ StringConverter::toString(hasCapability(RSC_FBO_ATI), true));
 			pLog->logMessage(
-				" * PBuffer suppport: "
+				" * PBuffer support: "
 				+ StringConverter::toString(hasCapability(RSC_PBUFFER), true));
 			pLog->logMessage(
 				" * GL 1.5 without HW-occlusion workaround: "
@@ -269,6 +311,8 @@ namespace Ogre {
 			msGPUVendorStrings[GPU_S3] = "s3";
 			msGPUVendorStrings[GPU_MATROX] = "matrox";
 			msGPUVendorStrings[GPU_SIS] = "sis";
+			msGPUVendorStrings[GPU_IMAGINATION_TECHNOLOGIES] = "imagination technologies";
+			msGPUVendorStrings[GPU_APPLE] = "apple";    // iPhone Simulator
 		}
 	}
 

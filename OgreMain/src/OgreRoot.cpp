@@ -91,6 +91,10 @@ Torus Knot Software Ltd.
 
 #include "OgreWindowEventUtilities.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#include "macUtils.h"
+#endif
+
 namespace Ogre {
     //-----------------------------------------------------------------------
     template<> Root* Singleton<Root>::ms_Singleton = 0;
@@ -345,11 +349,20 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::saveConfig(void)
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        // Check the Documents directory within the application sandbox
+        Ogre::String outBaseName, extension, configFileName;
+        Ogre::StringUtil::splitFilename(mConfigFileName, outBaseName, extension);
+        configFileName = macBundlePath() + "/../Documents/" + outBaseName;
+		std::ofstream of(configFileName.c_str());
+        if (of)
+            mConfigFileName = configFileName;
+#else
         if (mConfigFileName.empty ())
             return;
 
 		std::ofstream of(mConfigFileName.c_str());
-
+#endif
         if (!of)
             OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "Cannot create settings file.",
             "Root::saveConfig");
@@ -383,7 +396,20 @@ namespace Ogre {
     {
         if (mConfigFileName.empty ())
             return true;
-
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        // Read the config from Documents first(user config) if it exists on iPhone.
+        // If it doesn't exist or is invalid then use mConfigFileName
+        Ogre::String outBaseName, extension, configFileName;
+        Ogre::StringUtil::splitFilename(mConfigFileName, outBaseName, extension);
+        configFileName = macBundlePath() + "/../Documents/" + outBaseName;
+		std::ifstream fp;
+        fp.open(configFileName.c_str(), std::ios::in | std::ios::binary);
+        if(fp)
+            mConfigFileName = configFileName;
+        fp.close();
+#endif
+        
         // Restores configuration from saved state
         // Returns true if a valid saved configuration is
         //   available, and false if no saved config is
@@ -928,7 +954,7 @@ namespace Ogre {
         pluginDir = cfg.getSetting("PluginFolder"); // Ignored on Mac OS X, uses Resources/ directory
         pluginList = cfg.getMultiSetting("Plugin");
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 		if (pluginDir.empty())
 		{
 			// User didn't specify plugins folder, try current one

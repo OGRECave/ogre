@@ -194,7 +194,7 @@ namespace Ogre {
         return 0;
     }
 
-    void GLESHardwareBufferManagerBaseBase::deallocateScratch(void* ptr)
+    void GLESHardwareBufferManagerBase::deallocateScratch(void* ptr)
     {
         OGRE_LOCK_MUTEX(mScratchMutex)
 

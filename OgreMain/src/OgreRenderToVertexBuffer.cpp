@@ -36,8 +36,8 @@ namespace Ogre {
 	RenderToVertexBuffer::RenderToVertexBuffer() :
 		mOperationType(RenderOperation::OT_TRIANGLE_LIST),
 		mResetsEveryUpdate(false),
-		mMaxVertexCount(1000),
-		mResetRequested(true)
+		mResetRequested(true),
+        mMaxVertexCount(1000)
 	{
 		mVertexData = OGRE_NEW VertexData;
 	}

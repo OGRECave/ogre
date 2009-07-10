@@ -39,6 +39,8 @@ Torus Knot Software Ltd.
 # include "GLX/OgreTimerImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 # include "OSX/OgreTimerImp.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+# include "iPhone/OgreTimerImp.h"
 #endif
 
 #endif

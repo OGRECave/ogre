@@ -123,6 +123,9 @@ if (OGRE_BUILD_TESTS)
 	  if (OGRE_BUILD_RENDERSYSTEM_GL)
 		set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} RenderSystem_GL)
 	  endif ()
+	  if (OGRE_BUILD_RENDERSYSTEM_GLES)
+		set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} RenderSystem_GLES)
+	  endif ()
 
 	  if (OGRE_STATIC)
 		# Static linking means we need to directly use plugins
@@ -134,6 +137,7 @@ if (OGRE_BUILD_TESTS)
 		include_directories(${CMAKE_SOURCE_DIR}/PlugIns/PCZSceneManager/include)
 		include_directories(${CMAKE_SOURCE_DIR}/RenderSystems/Direct3D9/include)
 		include_directories(${CMAKE_SOURCE_DIR}/RenderSystems/Direct3D10/include)
+		include_directories(${CMAKE_SOURCE_DIR}/RenderSystems/GLES/include)
 		include_directories(
 			${CMAKE_SOURCE_DIR}/RenderSystems/GL/include
 			${CMAKE_SOURCE_DIR}/RenderSystems/GL/src/GLSL/include

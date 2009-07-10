@@ -101,11 +101,11 @@ namespace Ogre {
 		mLastVisibleFrame(0),
         mTimeController(0),
 		mEmittedEmitterPoolInitialised(false),
+		mIsEmitting(true),
         mRenderer(0),
         mCullIndividual(false),
         mPoolSize(0),
-		mEmittedEmitterPoolSize(0),
-		mIsEmitting(true)
+        mEmittedEmitterPoolSize(0)
 	{
         initParameters();
 
@@ -135,11 +135,11 @@ namespace Ogre {
 		mLastVisibleFrame(Root::getSingleton().getNextFrameNumber()),
         mTimeController(0),
 		mEmittedEmitterPoolInitialised(false),
+		mIsEmitting(true),
         mRenderer(0), 
-		mCullIndividual(false),
+        mCullIndividual(false),
         mPoolSize(0),
-		mEmittedEmitterPoolSize(0),
-		mIsEmitting(true)
+        mEmittedEmitterPoolSize(0)
     {
         setDefaultDimensions( 100, 100 );
         setMaterialName( "BaseWhite" );

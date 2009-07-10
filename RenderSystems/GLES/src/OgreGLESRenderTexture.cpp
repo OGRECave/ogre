@@ -45,8 +45,9 @@ namespace Ogre {
 
     MultiRenderTarget* GLESRTTManager::createMultiRenderTarget(const String & name)
     {
+        // TODO: Check rendersystem capabilities before throwing the exception
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "MultiRenderTarget can only be used with GL_EXT_framebuffer_object extension",
+                    "MultiRenderTarget can only be used with GL_OES_framebuffer_object extension",
                     "GLESRTTManager::createMultiRenderTarget");
     }
 
@@ -73,6 +74,9 @@ namespace Ogre {
                 break;
             case PCT_FLOAT32:
                 format = PF_FLOAT32_RGBA;
+                break;
+            case PCT_COUNT:
+            default:
                 break;
         }
 

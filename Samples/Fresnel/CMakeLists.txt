@@ -9,7 +9,12 @@
 
 # Configure Fresnel demo build
 
-set(SOURCE_FILES src/Fresnel.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Fresnel.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Fresnel.mm COPYONLY)
+  set(SOURCE_FILES src/Fresnel.mm)
+else ()
+  set(SOURCE_FILES src/Fresnel.cpp)
+endif ()
 
 add_executable(Demo_Fresnel WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})
 

@@ -10,7 +10,12 @@
 # Configure TextureFX demo build
 
 set(HEADER_FILES include/TextureFX.h)
-set(SOURCE_FILES src/TextureFX.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/TextureFX.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/TextureFX.mm COPYONLY)
+  set(SOURCE_FILES src/TextureFX.mm)
+else ()
+  set(SOURCE_FILES src/TextureFX.cpp)
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_TextureFX WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})

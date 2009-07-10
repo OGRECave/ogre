@@ -3105,6 +3105,8 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				case CULL_ANTICLOCKWISE:
 					cullMode = CULL_CLOCKWISE;
 					break;
+                case CULL_NONE:
+                    break;
 				};
 			}
 
@@ -6499,7 +6501,7 @@ SceneManager::getShadowCasterBoundsInfo( const Light* light, size_t iteration ) 
 	static VisibleObjectsBoundsInfo nullBox;
 
 	// find light
-	int foundCount = 0;
+	unsigned int foundCount = 0;
 	ShadowCamLightMapping::const_iterator it; 
 	for ( it = mShadowCamLightMapping.begin() ; it != mShadowCamLightMapping.end(); ++it )
 	{

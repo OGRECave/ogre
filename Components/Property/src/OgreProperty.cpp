@@ -164,7 +164,9 @@ namespace Ogre
 			case PROP_MATRIX4:
 				val.val = Ogre::Any(static_cast<Property<Ogre::Matrix4>*>(i->second)->get());
 				break;
-
+            case PROP_UNKNOWN:
+            default:
+                break;
 			};
 			ret[i->second->getName()] = val;
 		}
@@ -241,7 +243,10 @@ namespace Ogre
 				case PROP_MATRIX4:
 					static_cast<Property<Ogre::Matrix4>*>(j->second)->set(Ogre::any_cast<Ogre::Matrix4>(i->second.val));
 					break;
-
+                case PROP_UNKNOWN:
+                default:
+                    break;
+                        
 				};
 
 

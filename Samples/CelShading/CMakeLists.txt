@@ -9,7 +9,12 @@
 
 # Configure CelShading demo build
 
-set(SOURCE_FILES src/CelShading.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/CelShading.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/CelShading.mm COPYONLY)
+  set(SOURCE_FILES src/CelShading.mm)
+else ()
+  set(SOURCE_FILES src/CelShading.cpp)
+endif ()
 
 add_executable(Demo_CelShading WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})
 

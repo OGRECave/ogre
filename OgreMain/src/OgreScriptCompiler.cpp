@@ -37,7 +37,7 @@ namespace Ogre
 {
 	// AbstractNode
 	AbstractNode::AbstractNode(AbstractNode *ptr)
-		:parent(ptr), type(ANT_UNKNOWN), line(0)
+		:line(0), type(ANT_UNKNOWN), parent(ptr)
 	{}
 
 	// AtomAbstractNode
@@ -65,7 +65,7 @@ namespace Ogre
 
 	// ObjectAbstractNode
 	ObjectAbstractNode::ObjectAbstractNode(AbstractNode *ptr)
-		:AbstractNode(ptr), abstract(false), id(0)
+		:AbstractNode(ptr), id(0), abstract(false)
 	{
 		type = ANT_OBJECT;
 	}
@@ -1274,7 +1274,7 @@ namespace Ogre
 
 	// AbstractTreeeBuilder
 	ScriptCompiler::AbstractTreeBuilder::AbstractTreeBuilder(ScriptCompiler *compiler)
-		:mCurrent(0), mNodes(OGRE_NEW_T(AbstractNodeList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T), mCompiler(compiler)
+		:mNodes(OGRE_NEW_T(AbstractNodeList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T), mCurrent(0), mCompiler(compiler)
 	{
 	}
 

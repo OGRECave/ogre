@@ -366,11 +366,6 @@ namespace Ogre {
         class Impl
         {
         protected:
-            /** Declared protected as interface is never used for destruction.
-                gcc will issue a warning here: `class Impl' has virtual functions 
-                but non-virtual destructor. This is no problem because this interface 
-                is never used to delete an object.
-            */
             ~Impl() { };
         };
         /** Get rendersystem specific interface for this RenderTarget.

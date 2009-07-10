@@ -71,7 +71,7 @@ namespace Ogre {
 
     GLESTexture::~GLESTexture()
     {
-        // have to call this here reather than in Resource destructor
+        // have to call this here rather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
         if (isLoaded())
         {
@@ -109,7 +109,7 @@ namespace Ogre {
         glBindTexture(GL_TEXTURE_2D, mTextureID);
         GL_CHECK_ERROR;
         glTexParameteri(GL_TEXTURE_2D,
-                        GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                        GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
         GL_CHECK_ERROR;
         glTexParameteri(GL_TEXTURE_2D,
                         GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -155,6 +155,7 @@ namespace Ogre {
             {
                 size = PixelUtil::getMemorySize(width, height, depth, mFormat);
 
+                // TODO: DJR - Add support for PVRTC here
                 glCompressedTexImage2D(GL_TEXTURE_2D,
                                        mip,
                                        format,
@@ -181,7 +182,7 @@ namespace Ogre {
         }
         else
         {
-            // Run through this process to pregenerate mipmap piramid
+            // Run through this process to pregenerate mipmap pyramid
             for(size_t mip=0; mip<=mNumMipmaps; mip++)
             {
                 glTexImage2D(GL_TEXTURE_2D,
@@ -191,7 +192,11 @@ namespace Ogre {
                              0,
                              format,
                              GL_UNSIGNED_BYTE, 0);
-
+//                LogManager::getSingleton().logMessage("GLESTexture::create - Mip: " + StringConverter::toString(mip) +
+//                                                      " Width: " + StringConverter::toString(width) +
+//                                                      " Height: " + StringConverter::toString(height) +
+//                                                      " Internal Format: " + StringConverter::toString(format)
+//                                                      );
                 GL_CHECK_ERROR;
 
                 if (width > 1)
@@ -241,17 +246,37 @@ namespace Ogre {
             doImageIO(mName, mGroup, ext, *loadedImages, this);
 
             // If this is a cube map, set the texture type flag accordingly.
-            if ((*loadedImages)[0].hasFlag(IF_CUBEMAP))
-            {
-                OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                            "**** Unsuported CUBMAP texture type ****",
-                            "GLESTexture::prepare");
-            }
+//            if ((*loadedImages)[0].hasFlag(IF_CUBEMAP) &&
+//                Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_CUBEMAPPING))
+//            {
+//                if(getSourceFileType() == "dds")
+//                {
+//                    // XX HACK there should be a better way to specify whether 
+//                    // all faces are in the same file or not
+//                    doImageIO(mName, mGroup, ext, *loadedImages, this);
+//                }
+//                else
+//                {
+//                    vector<Image>::type images(6);
+//                    ConstImagePtrList imagePtrs;
+//                    static const String suffixes[6] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
+//                    
+//                    for(size_t i = 0; i < 6; i++)
+//                    {
+//                        String fullName = baseName + suffixes[i];
+//                        if (!ext.empty())
+//                            fullName = fullName + "." + ext;
+//                        // find & load resource data intro stream to allow resource
+//                        // group changes if required
+//                        doImageIO(fullName,mGroup,ext,*loadedImages,this);
+//                    }
+//                }
+//            }
             // If this is a volumetric texture set the texture type flag accordingly.
             if ((*loadedImages)[0].getDepth() > 1)
             {
                 OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                            "**** Unsuported 3D texture type ****",
+                            "**** Unsupported 3D texture type ****",
                             "GLESTexture::prepare" );
             }
         }
@@ -311,7 +336,7 @@ namespace Ogre {
 
         // Do mipmapping in software? (uses GLU) For some cards, this is still needed. Of course,
         // only when mipmap generation is desired.
-        bool doSoftware = true; // seems that hardware doesn't work for OpenGL ES...// wantGeneratedMips && !mMipmapsHardwareGenerated && getNumMipmaps();
+        bool doSoftware = wantGeneratedMips && !mMipmapsHardwareGenerated && getNumMipmaps();
 
         for (size_t face = 0; face < getNumFaces(); face++)
         {
@@ -338,7 +363,7 @@ namespace Ogre {
                         "Zero sized texture surface on texture "+getName()+
                             " face "+StringConverter::toString(face)+
                             " mipmap "+StringConverter::toString(mip)+
-                            ". Probably, the GL driver refused to create the texture.",
+                            ". The GL probably driver refused to create the texture.",
                             "GLESTexture::_createSurfaceList");
                 }
             }

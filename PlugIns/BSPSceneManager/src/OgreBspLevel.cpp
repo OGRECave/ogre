@@ -860,7 +860,7 @@ namespace Ogre {
         char* strEnt;
         String line;
         StringVector vecparams;
-        Vector3 origin;
+        Vector3 origin = Vector3::ZERO;
         Radian angle ( 0 );
         size_t pos;
         char* lineend;

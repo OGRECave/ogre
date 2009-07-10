@@ -47,7 +47,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	WorkQueue::Response::Response(const Request* rq, bool success, const Any& data, const String& msg)
-		: mRequest(rq), mSuccess(success), mData(data), mMessages(msg)
+		: mRequest(rq), mSuccess(success), mMessages(msg), mData(data)
 	{
 		
 	}

@@ -29,49 +29,57 @@ Torus Knot Software Ltd.
 
 #include <CoreFoundation/CoreFoundation.h>
 
-
 #include "OgreString.h"
-#include "macPlugins.h"
+#include "macUtils.h"
+#include <dlfcn.h>
 
 namespace Ogre {
 
-    CFBundleRef mac_loadExeBundle(const char *name) {
+    CFBundleRef mac_loadExeBundle(const char *name)
+    {
         CFBundleRef baseBundle = CFBundleGetBundleWithIdentifier(CFSTR("org.ogre3d.Ogre"));
         CFBundleRef mainBundle = CFBundleGetMainBundle();
         CFStringRef nameRef = CFStringCreateWithCString(NULL, name, kCFStringEncodingASCII);
-        CFURLRef bundleURL = 0; //URL of bundle to load
-        CFBundleRef bundle = 0; //bundle to load
+        CFURLRef bundleURL = 0; // URL of bundle to load
+        CFBundleRef bundle = 0; // Bundle to load
         
-        //cut off .bundle if present
-        if(CFStringHasSuffix(nameRef, CFSTR(".bundle"))) {
+        // Cut off .bundle if present
+        if(CFStringHasSuffix(nameRef, CFSTR(".bundle")))
+        {
             CFStringRef nameTempRef = nameRef;
             int end = CFStringGetLength(nameTempRef) - CFStringGetLength(CFSTR(".bundle"));
             nameRef = CFStringCreateWithSubstring(NULL, nameTempRef, CFRangeMake(0, end));
             CFRelease(nameTempRef);
         }
                 
-        //assume relative to Resources/ directory of Main bundle
+        // Assume relative to Resources/ directory of Main bundle
         bundleURL = CFBundleCopyResourceURL(mainBundle, nameRef, CFSTR("bundle"), NULL);
-        if(bundleURL) {
+        if(bundleURL)
+        {
             bundle = CFBundleCreate(NULL, bundleURL);
             CFRelease(bundleURL);
         }
         
-        //otherwise, try Resources/ directory of Ogre Framework bundle
-        if(!bundle) {
+        // Otherwise, try Resources/ directory of Ogre Framework bundle
+        if(!bundle)
+        {
             bundleURL = CFBundleCopyResourceURL(baseBundle, nameRef, CFSTR("bundle"), NULL);
-            if(bundleURL) {
+            if(bundleURL)
+            {
                bundle = CFBundleCreate(NULL, bundleURL);
                CFRelease(bundleURL);
             }
         }
         CFRelease(nameRef);
        
-        if(bundle) {
-            if(CFBundleLoadExecutable(bundle)) {
+        if(bundle)
+        {
+            if(CFBundleLoadExecutable(bundle))
+            {
                 return bundle;
             }
-            else {
+            else
+            {
                 CFRelease(bundle);
             }
         }
@@ -79,53 +87,55 @@ namespace Ogre {
         return 0;
     }
     
-    void *mac_getBundleSym(CFBundleRef bundle, const char *name) {
+    void * mac_getBundleSym(CFBundleRef bundle, const char *name)
+    {
         CFStringRef nameRef = CFStringCreateWithCString(NULL, name, kCFStringEncodingASCII);
         void *sym = CFBundleGetFunctionPointerForName(bundle, nameRef);
         CFRelease(nameRef);
+
         return sym;
     }
     
-    //returns 1 on error, 0 otherwise
-    bool mac_unloadExeBundle(CFBundleRef bundle) {
-        if(bundle) {
-            //no-op, can't unload Obj-C bundles without crashing
+    // Returns 1 on error, 0 otherwise
+    bool mac_unloadExeBundle(CFBundleRef bundle)
+    {
+        if(bundle)
+        {
+            // No-op, can't unload Obj-C bundles without crashing
             return 0;
         }
         return 1;
     }
-    
-    const char *mac_errorBundle() {
-        return "Unknown Error";
-    }
-	
-	std::string macPluginPath()
-	{
-		char path[1024];
-		CFBundleRef mainBundle = CFBundleGetMainBundle();
-		assert(mainBundle);
-		
-		CFURLRef mainBundleURL = CFBundleCopyBundleURL(mainBundle);
-		assert(mainBundleURL);
-		
-		CFStringRef cfStringRef = CFURLCopyFileSystemPath( mainBundleURL, kCFURLPOSIXPathStyle);
-		assert(cfStringRef);
-		
-		CFStringGetCString(cfStringRef, path, 1024, kCFStringEncodingASCII);
-		
-		CFRelease(mainBundleURL);
-		CFRelease(cfStringRef);
-		
-		return std::string(path) + "/Contents/Plugins/";
-	}
-	
-	void* mac_loadDylib(const char* name)
+
+	void * mac_loadDylib(const char* name)
 	{
 		std::string fullPath = macPluginPath() + name;
 		
 		return dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
 	}
 	
-	
-
+    std::string macBundlePath()
+    {
+        char path[PATH_MAX];
+        CFBundleRef mainBundle = CFBundleGetMainBundle();
+        assert(mainBundle);
+        
+        CFURLRef mainBundleURL = CFBundleCopyBundleURL(mainBundle);
+        assert(mainBundleURL);
+        
+        CFStringRef cfStringRef = CFURLCopyFileSystemPath( mainBundleURL, kCFURLPOSIXPathStyle);
+        assert(cfStringRef);
+        
+        CFStringGetCString(cfStringRef, path, PATH_MAX, kCFStringEncodingASCII);
+        
+        CFRelease(mainBundleURL);
+        CFRelease(cfStringRef);
+        
+        return std::string(path);
+    }
+    
+    std::string macPluginPath()
+	{
+		return macBundlePath() + "/Contents/Plugins/";
+	}
 }

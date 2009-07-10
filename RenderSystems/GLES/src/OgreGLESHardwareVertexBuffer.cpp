@@ -45,7 +45,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Only support with shadowBuffer",
-                        "GLHardwareIndexBuffer");
+                        "GLESHardwareIndexBuffer");
         }
 
         glGenBuffers(1, &mBufferId);
@@ -73,7 +73,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Invalid attempt to lock an index buffer that has already been locked",
-                        "GLHardwareIndexBuffer::lock");
+                        "GLESHardwareIndexBuffer::lock");
         }
 
         void* retPtr = 0;
@@ -100,7 +100,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Invalid Buffer lockSize",
-                        "GLHardwareIndexBuffer::lock");
+                        "GLESHardwareIndexBuffer::lock");
         }
 
         return retPtr;
@@ -125,8 +125,8 @@ namespace Ogre {
         else
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Oly support lock to Scratch",
-                        "GLHardwareIndexBuffer::unlockImpl");
+                        "Only locking to scratch is supported",
+                        "GLESHardwareIndexBuffer::unlockImpl");
         }
     }
 
@@ -142,8 +142,8 @@ namespace Ogre {
         else
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Not support read hardware buffer",
-                        "GLHardwareIndexBuffer::readData");
+                        "Read hardware buffer is not supported",
+                        "GLESHardwareIndexBuffer::readData");
         }
     }
 

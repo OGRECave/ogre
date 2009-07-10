@@ -10,7 +10,12 @@
 # Configure OceanDemo demo build
 
 set(HEADER_FILES include/OceanDemo.h include/MaterialControls.h)
-set(SOURCE_FILES src/OceanDemo.cpp src/MaterialControls.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/OceanDemo.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/OceanDemo.mm COPYONLY)
+  set(SOURCE_FILES src/OceanDemo.mm src/MaterialControls.cpp)
+else ()
+  set(SOURCE_FILES src/OceanDemo.cpp src/MaterialControls.cpp)
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/CEGUIRenderer/include)

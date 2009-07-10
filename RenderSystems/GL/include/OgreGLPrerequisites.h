@@ -66,6 +66,9 @@ namespace Ogre {
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #   include <GL/glew.h>
 #   include <OpenGL/glu.h>
+#elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#   include <OpenGLES/ES1/gl.h>
+#   include <OpenGLES/ES1/glext.h>
 #endif
 
 #if OGRE_THREAD_SUPPORT == 1

@@ -97,6 +97,7 @@ int VS10Reg::ValidateIndex()
         errors.set( "VS10Reg::ValidateIndex() Internal Error: unknown register type\n" );
         return 1;
     }
+	return 1;
 }
 
 void VS10Reg::Translate()
@@ -956,7 +957,7 @@ void VS10Inst::ValidateReadPorts()
 int VS10Inst::Translate()
 {
     int flag;
-    int ninstr;
+    int ninstr = 0;
 
 #if DEBUGGING_PURPOSES
     char mystr[16];

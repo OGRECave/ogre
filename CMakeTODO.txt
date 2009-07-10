@@ -10,9 +10,8 @@ TODO
 To be done after switch-over
 
 * SDK changes - Win32 and OS X scripts will need altering
-* GLES project
+* GLES project - This needs some testing, could be complete
 * OS X
-  * Tidy up files in ogre/Mac - should be moved into OgreMain/OSX
   * Only Debug and Release builds are supported at the moment, since the others still use the same folders. 
 * CPack
   * Investigate .deb, .rpm packages for Linux

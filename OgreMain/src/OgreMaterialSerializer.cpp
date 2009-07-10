@@ -3975,6 +3975,8 @@ namespace Ogre
 				case IS_DECAL:
 					writeValue("decal");
 					break;
+                case IS_UNKNOWN:
+                    break;
 				};
 			}
 

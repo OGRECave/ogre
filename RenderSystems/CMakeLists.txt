@@ -41,7 +41,7 @@ endif ()
 
 if (OGRE_BUILD_RENDERSYSTEM_GLES)
   if (NOT OPENGLES_FOUND)
-    MESSAGE(STATUS "Could not find dependency: GL ES ")
+    MESSAGE(STATUS "Could not find dependency: GLES ")
 	  MESSAGE(STATUS "Skipping GLES rendersystem build")
     set(OGRE_BUILD_RENDERSYSTEM_GLES 0)
   else ()

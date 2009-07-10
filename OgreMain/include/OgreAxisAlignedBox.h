@@ -89,21 +89,22 @@ namespace Ogre {
 			NEAR_LEFT_TOP = 5,
 			NEAR_RIGHT_TOP = 4
 		} CornerEnum;
-		inline AxisAlignedBox() : mpCorners(0)
+		inline AxisAlignedBox() : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mpCorners(0)
 		{
 			// Default to a null box 
 			setMinimum( -0.5, -0.5, -0.5 );
 			setMaximum( 0.5, 0.5, 0.5 );
 			mExtent = EXTENT_NULL;
 		}
-		inline AxisAlignedBox(Extent e) : mpCorners(0)
+		inline AxisAlignedBox(Extent e) : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mpCorners(0)
 		{
 			setMinimum( -0.5, -0.5, -0.5 );
 			setMaximum( 0.5, 0.5, 0.5 );
 			mExtent = e;
 		}
 
-		inline AxisAlignedBox(const AxisAlignedBox & rkBox) : mpCorners(0)
+		inline AxisAlignedBox(const AxisAlignedBox & rkBox) : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mpCorners(0)
+
 		{
 			if (rkBox.isNull())
 				setNull();
@@ -113,14 +114,14 @@ namespace Ogre {
 				setExtents( rkBox.mMinimum, rkBox.mMaximum );
 		}
 
-		inline AxisAlignedBox( const Vector3& min, const Vector3& max ) : mpCorners(0)
+		inline AxisAlignedBox( const Vector3& min, const Vector3& max ) : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mpCorners(0)
 		{
 			setExtents( min, max );
 		}
 
 		inline AxisAlignedBox(
 			Real mx, Real my, Real mz,
-			Real Mx, Real My, Real Mz ) : mpCorners(0)
+			Real Mx, Real My, Real Mz ) : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mpCorners(0)
 		{
 			setExtents( mx, my, mz, Mx, My, Mz );
 		}

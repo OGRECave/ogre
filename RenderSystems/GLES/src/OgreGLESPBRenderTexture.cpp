@@ -75,7 +75,7 @@ namespace Ogre {
             target.zoffset = mZOffset;
         }
     }
-
+    
     GLESPBRTTManager::GLESPBRTTManager(GLESSupport *support, RenderTarget *mainwindow)
         : mSupport(support),
           mMainWindow(mainwindow),
@@ -154,5 +154,4 @@ namespace Ogre {
             mPBuffers[ctype].pb = 0;
         }
     }
-
 }

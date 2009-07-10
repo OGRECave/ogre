@@ -53,6 +53,10 @@ set(OGRE_STATIC @OGRE_STATIC@)
 if (CMAKE_COMPILER_IS_GNUCXX)
   add_definitions(-msse)
 endif ()
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  remove_definitions(-msse)
+  add_definitions(-fno-regmove)
+endif ()
 if (MSVC)
   add_definitions(/fp:fast)
 endif ()
@@ -104,23 +108,17 @@ if (OGRE_STATIC)
   endif ()
 endif ()
 
-
 # Configure Samples build
-
 add_subdirectory(BezierPatch)
 if (OGRE_Plugin_BSPSceneManager_FOUND)
   add_subdirectory(BSP)
 endif ()
 add_subdirectory(CameraTrack)
-add_subdirectory(CelShading)
 add_subdirectory(CubeMapping)
 add_subdirectory(DeferredShading)
-add_subdirectory(Dot3Bump)
 add_subdirectory(DynTex)
 add_subdirectory(EnvMapping)
-add_subdirectory(Fresnel)
 add_subdirectory(Grass)
-add_subdirectory(Isosurf)
 add_subdirectory(Lighting)
 if (OGRE_Paging_FOUND)
   add_subdirectory(Paging)
@@ -128,7 +126,6 @@ endif ()
 if (OGRE_Plugin_ParticleFX_FOUND)
   add_subdirectory(ParticleFX)
 endif ()
-add_subdirectory(ParticleGS)
 if (OGRE_Plugin_PCZSceneManager_FOUND AND OGRE_Plugin_OctreeZone_FOUND)
   add_subdirectory(PCZTestApp)
 endif ()
@@ -143,7 +140,20 @@ if (OGRE_Plugin_OctreeSceneManager_FOUND)
 endif ()
 add_subdirectory(TextureFX)
 add_subdirectory(Transpacency)
+
+# Require vertex and fragment shaders
+add_subdirectory(CelShading)
+add_subdirectory(Dot3Bump)
+add_subdirectory(Fresnel)
+
+# Require geometry shaders
+add_subdirectory(Isosurf)
+add_subdirectory(ParticleGS)
+
+# Requires 3D textures
 add_subdirectory(VolumeTex)
+
+# Requires cube mapping
 add_subdirectory(Water)
 
 if (NOT CEGUI_FOUND)

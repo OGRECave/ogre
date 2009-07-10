@@ -139,3 +139,111 @@ the API documentation for Ogre, type
 This will invoke doxygen (may take a while...).
 Once all is done, you can install the build as usual via
   make install (might need root privileges)
+
+6. Using CMake on Mac OS X
+-------------------------
+
+Check if cmake-gui is available. If so, you can use it in much the same
+way as described in 4. Otherwise you will need to work with the console.
+In the console, first change to the directory of the Ogre sources. Now
+create a build directory and change to it:
+  mkdir build && cd build
+You need to run cmake from the build directory and provide it with the
+location of the build directory. If you followed the above guideline,
+then you can simply type:
+  cmake -G Xcode ..
+CMake will now parse the scripts in the Ogre source tree. Watch the 
+output, especially if all necessary dependencies have been found. If not,
+you might need to install the missing ones or provide their locations
+manually (more in a minute).
+Now, we want to configure the build. Run:
+  ccmake -G Xcode ..
+Which will give you a frontend to configure the CMake build settings.
+You will see several available options, those prefixed with OGRE 
+configure the build process. There's also CMAKE_INSTALL_PATH which
+determines where the final libraries will be installed (see 3).
+CMAKE_BUILD_TYPE determines the type of build you will get. Available
+options are (Release, Debug, MinSizeRel, RelWithDebInfo). Choose
+the one you want. There are more options available which you can toggle
+with 't'. If any dependency was not found, you need to do this to
+set the corresponding variables manually (most importantly 
+PKG_INCLUDE_DIRS and PKG_LIBRARY, with PKG being the dependency that
+wasn't found).
+Once you are content with your choices, hit 'c' to configure the build.
+Afterwards, hit 'g' to generate a build system. Press 'q' to quit ccmake.
+A set of Makefiles have now been generated in the build directory, so
+to start the Ogre build, simply type:
+  make
+as usual. This will build all libraries and samples depending on your 
+CMake settings. Now, if you have doxygen installed and want to create
+the API documentation for Ogre, type
+  make doc
+This will invoke doxygen (may take a while...).
+Once all is done, you can install the build as usual via
+  make install (might need root privileges)
+
+7. Using CMake on Mac OS X for iPhone OS
+Check if cmake-gui is available. If so, you can use it in much the same
+way as described in 4. Otherwise you will need to work with the console.
+In the console, first change to the directory of the Ogre sources. Now
+create a build directory and change to it:
+  mkdir build && cd build
+You need to run cmake from the build directory and provide it with the
+location of the build directory. If you followed the above guideline,
+then you can simply type:
+  cmake -D OGRE_BUILD_PLATFORM_IPHONE=1 -G Xcode ..
+CMake will now parse the scripts in the Ogre source tree. Watch the 
+output, especially if all necessary dependencies have been found. If not,
+you might need to install the missing ones or provide their locations
+manually (more in a minute).
+Now, we want to configure the build. Run:
+  ccmake -D OGRE_BUILD_PLATFORM_IPHONE=1 -G Xcode ..
+Which will give you a frontend to configure the CMake build settings.
+You will see several available options, those prefixed with OGRE 
+configure the build process. There's also CMAKE_INSTALL_PATH which
+determines where the final libraries will be installed (see 3).
+CMAKE_BUILD_TYPE determines the type of build you will get. Available
+options are (Release, Debug, MinSizeRel, RelWithDebInfo). Choose
+the one you want. There are more options available which you can toggle
+with 't'. If any dependency was not found, you need to do this to
+set the corresponding variables manually (most importantly 
+PKG_INCLUDE_DIRS and PKG_LIBRARY, with PKG being the dependency that
+wasn't found).
+Once you are content with your choices, hit 'c' to configure the build.
+Afterwards, hit 'g' to generate a build system. Press 'q' to quit ccmake.
+
+The linker paths are not correctly generated so now you must run the
+following script to take care of this.  Type:
+
+../SDK/iPhone/fix_linker_paths.sh
+
+Then press return or enter.
+
+A Xcode project has now been generated in the build directory, so
+to start the Ogre build, open OGRE.xcodeproj and build as usual.
+
+To run samples on your device you will need to have a valid iPhone Developer
+certificate installed.  For each sample, double click on target in the Groups &
+Files list.  Ensure that a valid identity is selected in the Code Signing Identity
+drop menu.
+
+Also, because we can't tell CMake what Xcode project format you want, you will 
+have to change it yourself.  Open the Project Menu, choose Edit Project Settings.
+Click on the General tab in the settings window.  Change Project Format to
+Xcode 3.1-compatible.
+
+And another thing.  You will need to manually set the Bundle Identifier property of
+the Info.plist file to match the App ID of the chosen code signing identity.
+This can be done from the Target Properties panel.  It must match the bundle
+identifier of a valid developer certificate if you are building for devices.
+
+See the following PDF for information under Generating an App ID:
+http://adcdownload.apple.com/iphone/iphone_developer_program_user_guide/iphone_developer_program_user_guide__standard_program_v2.4.pdf
+
+This will build all libraries and samples depending on your 
+CMake settings. Now, if you have doxygen installed and want to create
+the API documentation for Ogre, type
+  make doc
+This will invoke doxygen (may take a while...).
+Once all is done, you can install the build as usual via
+  make install (might need root privileges)

@@ -87,17 +87,17 @@ Key: "vsync" Description: Synchronize buffer swaps to vsync Values: true, false 
 
 		BOOL hasDepthBuffer = YES;
 		int fsaa_samples = 0;
-		NSString *windowTitle = [NSString stringWithCString:name.c_str()];
+		NSString *windowTitle = [NSString stringWithCString:name.c_str() encoding:NSUTF8StringEncoding];
 		int winx = 0, winy = 0;
 		int depth = 32;
 		
 		if(miscParams)
 		{
-			NameValuePairList::const_iterator opt = 0;
+			NameValuePairList::const_iterator opt(NULL);
 			
 			opt = miscParams->find("title");
 			if(opt != miscParams->end())
-				windowTitle = [NSString stringWithCString:opt->second.c_str()];
+				windowTitle = [NSString stringWithCString:opt->second.c_str() encoding:NSUTF8StringEncoding];
 				
 			opt = miscParams->find("left");
 			if(opt != miscParams->end())
@@ -122,7 +122,7 @@ Key: "vsync" Description: Synchronize buffer swaps to vsync Values: true, false 
 		}		
 		
 
-		NSOpenGLPixelFormat* openglFormat;
+		NSOpenGLPixelFormat* openglFormat = nil;
 		{
 			NSOpenGLPixelFormatAttribute attribs[30];
 			int i=0;
@@ -186,7 +186,7 @@ Key: "vsync" Description: Synchronize buffer swaps to vsync Values: true, false 
 				openglFormat = [[[NSOpenGLPixelFormat alloc] initWithAttributes: attribs] autorelease];
 			}
 			
-			NameValuePairList::const_iterator opt2 = 0;
+			NameValuePairList::const_iterator opt2(NULL);
 			if(miscParams)
 			{
 				opt2 = miscParams->find("pixelFormat");
@@ -199,8 +199,8 @@ Key: "vsync" Description: Synchronize buffer swaps to vsync Values: true, false 
 
 			glContext = [[NSOpenGLContext alloc] initWithFormat: openglFormat shareContext:shareContext];
 			
-			NameValuePairList::const_iterator opt = 0;
-			NameValuePairList::const_iterator param_useNSView_pair = 0;
+			NameValuePairList::const_iterator opt(NULL);
+			NameValuePairList::const_iterator param_useNSView_pair(NULL);
 			if(miscParams) {
 				opt = miscParams->find("externalWindowHandle");
 				param_useNSView_pair = miscParams->find("macAPICocoaUseNSView") ;

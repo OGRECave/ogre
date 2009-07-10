@@ -839,7 +839,7 @@ namespace Ogre {
 		size_t nIndexes = indexCount;
 		size_t nTriangles = nIndexes / 3;
 		size_t i, j;
-		uint16 *source;
+		uint16 *source = 0;
 
 		if (indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT)
 		{

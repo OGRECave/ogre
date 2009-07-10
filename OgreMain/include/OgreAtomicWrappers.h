@@ -111,7 +111,8 @@ namespace Ogre {
 
 }
 
-#if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 412 && OGRE_THREAD_SUPPORT
+// These GCC instrinsics are not supported on ARM - masterfalcon
+#if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 412 && OGRE_THREAD_SUPPORT && OGRE_CPU != OGRE_CPU_ARM
 
 namespace Ogre {
 

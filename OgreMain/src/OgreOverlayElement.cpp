@@ -425,7 +425,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void OverlayElement::_updateFromParent(void)
     {
-        Real parentLeft, parentTop, parentBottom, parentRight;
+        Real parentLeft = 0, parentTop = 0, parentBottom = 0, parentRight = 0;
 
         if (mParent)
         {

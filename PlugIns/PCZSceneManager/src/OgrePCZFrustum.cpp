@@ -58,7 +58,7 @@ namespace Ogre
 {
 
 	PCZFrustum::PCZFrustum() :
-	mProjType(PT_PERSPECTIVE), mUseOriginPlane(false)
+    mUseOriginPlane(false), mProjType(PT_PERSPECTIVE)
 	{ }
 
     PCZFrustum::~PCZFrustum()

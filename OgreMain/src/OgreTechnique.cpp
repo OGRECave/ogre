@@ -1173,6 +1173,8 @@ namespace Ogre {
 					++i; // always increment on decal, since nothing more to do with this pass
 
 					break;
+                case IS_UNKNOWN:
+                    break;
 				}
 			}
 		}

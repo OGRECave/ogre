@@ -522,7 +522,7 @@ private:
 		unsigned int i ;
 		String cubeMapName = availableCubeMaps[currentCubeMapIndex];
 		Pass *pass = material->getTechnique(0)->getPass(0);
-		for(i=0;i<(int)pass->getTextureUnitState(0)->getNumFrames();i++) {
+		for(i=0;i<(unsigned int)pass->getTextureUnitState(0)->getNumFrames();i++) {
 			String oldTexName = pass->getTextureUnitState(0)->
 				getFrameTextureName(i);
 			TexturePtr oldTex = TextureManager::getSingleton().getByName(oldTexName);
@@ -533,7 +533,7 @@ private:
 		MaterialPtr mat2 = 
 			MaterialManager::getSingleton().getByName(SKYBOX_MATERIAL);
         Pass* pass2 = mat2->getTechnique(0)->getPass(0);
-		for(i=0;i<(int)pass2->getTextureUnitState(0)->getNumFrames();i++) {
+		for(i=0;i<(unsigned int)pass2->getTextureUnitState(0)->getNumFrames();i++) {
 			String oldTexName = pass2->getTextureUnitState(0)->
 				getFrameTextureName(i);
 			TexturePtr oldTex = TextureManager::getSingleton().getByName(oldTexName);

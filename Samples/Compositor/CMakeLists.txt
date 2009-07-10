@@ -14,11 +14,21 @@ set(HEADER_FILES
   include/CompositorDemo_FrameListener.h
   include/ItemSelectorViewManager.h
 )
-set(SOURCE_FILES 
-  src/Compositor.cpp
-  src/CompositorDemo_FrameListener.cpp
-  src/ItemSelectorViewManager.cpp
-)
+
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor.mm COPYONLY)
+  set(SOURCE_FILES 
+    src/Compositor.mm
+    src/CompositorDemo_FrameListener.cpp
+    src/ItemSelectorViewManager.cpp
+  )
+else ()
+  set(SOURCE_FILES 
+    src/Compositor.cpp
+    src/CompositorDemo_FrameListener.cpp
+    src/ItemSelectorViewManager.cpp
+  )
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/CEGUIRenderer/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

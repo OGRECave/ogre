@@ -17,15 +17,28 @@ set(HEADER_FILES
   include/MaterialGenerator.h
   include/MLight.h
 )
-set(SOURCE_FILES 
-  src/AmbientLight.cpp
-  src/DeferredShading.cpp
-  src/DeferredShadingDemo.cpp
-  src/GeomUtils.cpp
-  src/LightMaterialGenerator.cpp
-  src/MaterialGenerator.cpp
-  src/MLight.cpp
-)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/DeferredShadingDemo.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/DeferredShadingDemo.mm COPYONLY)
+  set(SOURCE_FILES 
+    src/AmbientLight.cpp
+    src/DeferredShading.cpp
+    src/DeferredShadingDemo.mm
+    src/GeomUtils.cpp
+    src/LightMaterialGenerator.cpp
+    src/MaterialGenerator.cpp
+    src/MLight.cpp
+  )
+else ()
+  set(SOURCE_FILES 
+    src/AmbientLight.cpp
+    src/DeferredShading.cpp
+    src/DeferredShadingDemo.cpp
+    src/GeomUtils.cpp
+    src/LightMaterialGenerator.cpp
+    src/MaterialGenerator.cpp
+    src/MLight.cpp
+  )
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_DeferredShading ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})

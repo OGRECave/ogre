@@ -341,9 +341,11 @@ public:
 		}
 
 		//Check to see which device is not buffered, and handle it
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 		if( !mKeyboard->buffered() )
 			if( processUnbufferedKeyInput(evt) == false )
 				return false;
+#endif
 		if( !mMouse->buffered() )
 			if( processUnbufferedMouseInput(evt) == false )
 				return false;

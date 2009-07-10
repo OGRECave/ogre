@@ -78,7 +78,7 @@ void PixelFormatTests::testFloatPackUnpack()
 
     // Locate errors
     std::stringstream s;
-    int x;
+    unsigned int x;
     for(x=0; x<eob; x++) {
         if(temp2[x] != randomData[x])
             s << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) randomData[x]

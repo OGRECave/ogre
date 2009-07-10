@@ -603,8 +603,8 @@ namespace Ogre {
 		// NB only eliminate middle keys from sequences of 5+ identical keyframes
 		// since we need to preserve the boundary keys in place, and we need
 		// 2 at each end to preserve tangents for spline interpolation
-		Vector3 lasttrans;
-		Vector3 lastscale;
+		Vector3 lasttrans = Vector3::ZERO;
+		Vector3 lastscale = Vector3::ZERO;
 		Quaternion lastorientation;
         KeyFrameList::iterator i = mKeyFrames.begin();
 		Radian quatTolerance(1e-3f);

@@ -91,6 +91,9 @@ test_big_endian(OGRE_TEST_BIG_ENDIAN)
 # Add OgreMain include path
 include_directories("${OGRE_SOURCE_DIR}/OgreMain/include")
 include_directories("${OGRE_BINARY_DIR}/include")
+if (APPLE)
+  include_directories("${CMAKE_SOURCE_DIR}/OgreMain/include/OSX")
+endif (APPLE)
 
 # Find dependencies
 include(Dependencies)
@@ -109,13 +112,46 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OGRE_BINARY_DIR}/bin")
 if (WIN32 OR APPLE)
   if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     # We don't want to install in default system location, install is really for the SDK, so call it that
-    SET(CMAKE_INSTALL_PREFIX
+    set(CMAKE_INSTALL_PREFIX
 	  "${OGRE_BINARY_DIR}/sdk" CACHE PATH "OGRE install prefix" FORCE
     )
   endif (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif(WIN32 OR APPLE)
 
+# Set up iPhone overrides.
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  # Force gcc <= 4.2 on iPhone
+  include(CMakeForceCompiler)
+  CMAKE_FORCE_C_COMPILER(gcc-4.2 GNU)
+  CMAKE_FORCE_CXX_COMPILER(gcc-4.2 GNU)
+  #set(OGRE_GCC_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY -fvisibility=hidden")
+  #set(OGRE_GCC_VISIBILITY_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS} -fvisibility-inlines-hidden")
 
+  include_directories("${CMAKE_SOURCE_DIR}/OgreMain/include/iPhone")
+
+  # Set build variables
+  set(CMAKE_OSX_SYSROOT iphoneos3.0)
+  set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_UNIVERSAL_IPHONE_OS)")
+  set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit ${OGRE_SOURCE_DIR}/iPhoneDependencies/lib/release/libboost_date_time.a ${OGRE_SOURCE_DIR}/iPhoneDependencies/lib/release/libboost_thread.a")
+  set(XCODE_ATTRIBUTE_SDKROOT iphoneos3.0)
+#  set(XCODE_ATTRIBUTE_compatibilityVersion "\"Xcode 3.1\"")
+  set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE)
+  set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iPhone" FORCE)
+  set(OGRE_SET_USE_BOOST TRUE CACHE BOOL "Forcing use of Boost libraries for iPhone" FORCE)
+  set(OGRE_USE_BOOST TRUE CACHE BOOL "Forcing use of Boost libraries for iPhone" FORCE)
+  set(Boost_FOUND TRUE CACHE BOOL "Forcing use of Boost libraries for iPhone" FORCE)
+  set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
+
+  add_definitions(-fno-regmove)
+  remove_definitions(-msse)
+elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+  # Set 10.4 as the base SDK by default
+  set(XCODE_ATTRIBUTE_SDKROOT macosx10.4)
+
+  # Make sure that the OpenGL render system is selected for non-iPhone Apple builds
+  set(OGRE_BUILD_RENDERSYSTEM_GL TRUE)
+  set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
+endif ()
 ######################################################################
 # Provide user options to customise the build process
 ######################################################################
@@ -124,18 +160,20 @@ endif(WIN32 OR APPLE)
 option(OGRE_STATIC "Static build" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D9 "Build Direct3D9 RenderSystem" TRUE "WIN32;DirectX_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D10 "Build Direct3D10 RenderSystem" TRUE "WIN32;DirectX_D3D10_FOUND" FALSE)
-cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND" FALSE)
+cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT OGRE_BUILD_PLATFORM_IPHONE" FALSE)
+cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES "Build OpenGL ES RenderSystem" FALSE "OPENGLES_FOUND" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLATFORM_IPHONE "Build Ogre for iPhone OS" FALSE "iPhoneSDK_FOUND;OPENGLES_FOUND" FALSE)
 option(OGRE_BUILD_PLUGIN_BSP "Build BSP SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_OCTREE "Build Octree SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_PCZ "Build PCZ SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_PFX "Build ParticleFX plugin" TRUE)
 option(OGRE_BUILD_COMPONENT_PAGING "Build Paging component" TRUE)
 option(OGRE_BUILD_COMPONENT_TERRAIN "Build Terrain component" TRUE)
-cmake_dependent_option(OGRE_BUILD_COMPONENT_PROPERTY "Build Property component" TRUE "Boost_FOUND" FALSE)
-cmake_dependent_option(OGRE_BUILD_PLUGIN_CG "Build Cg plugin" TRUE "Cg_FOUND" FALSE)
-cmake_dependent_option(OGRE_BUILD_CEGUIRENDERER "Build CEGUI renderer" TRUE "CEGUI_FOUND" FALSE)
+cmake_dependent_option(OGRE_BUILD_COMPONENT_PROPERTY "Build Property component" TRUE "Boost_FOUND;NOT OGRE_BUILD_PLATFORM_IPHONE" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLUGIN_CG "Build Cg plugin" TRUE "Cg_FOUND;NOT OGRE_BUILD_PLATFORM_IPHONE" FALSE)
+cmake_dependent_option(OGRE_BUILD_CEGUIRENDERER "Build CEGUI renderer" TRUE "CEGUI_FOUND;NOT OGRE_BUILD_PLATFORM_IPHONE" FALSE)
 option(OGRE_BUILD_SAMPLES "Build Ogre demos" TRUE)
-option(OGRE_BUILD_TOOLS "Build the command-line tools" TRUE)
+cmake_dependent_option(OGRE_BUILD_TOOLS "Build the command-line tools" TRUE "NOT OGRE_BUILD_PLATFORM_IPHONE" FALSE)
 option(OGRE_BUILD_TESTS "Build the unit tests & PlayPen" FALSE)
 # Configure the build
 #option(OGRE_CONFIG_PROFILING "Enable Ogre profiling code" FALSE)
@@ -180,9 +218,6 @@ option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE)
 cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" FALSE "MSVC" FALSE)
 option(OGRE_FULL_RPATH "Build executables with the full required RPATH to run from their install location." FALSE)
 option(OGRE_STANDALONE_BUILD "Generate build files that do not reference CMake (e.g. source distro)" FALSE)
-
-
-
 
 ###################################################################
 # configure global build settings based on selected build options

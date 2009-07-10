@@ -39,8 +39,9 @@ Torus Knot Software Ltd.
 #  include <windows.h>
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#   include "macPlugins.h"
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#   include "macUtils.h"
+#   include <dlfcn.h>
 #endif
 
 
@@ -131,10 +132,8 @@ namespace Ogre {
         // Free the buffer.
         LocalFree( lpMsgBuf );
         return ret;
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         return String(dlerror());
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-        return String(mac_errorBundle());
 #else
         return String("");
 #endif

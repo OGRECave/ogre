@@ -10,7 +10,12 @@
 # Configure Lighting demo build
 
 set(HEADER_FILES include/Lighting.h)
-set(SOURCE_FILES src/Lighting.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Lighting.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Lighting.mm COPYONLY)
+  set(SOURCE_FILES src/Lighting.mm)
+else ()
+  set(SOURCE_FILES src/Lighting.cpp)
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_Lighting WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})

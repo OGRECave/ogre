@@ -77,7 +77,7 @@ namespace Ogre {
     class _OgrePrivate OptimisedUtilSSE : public OptimisedUtil
     {
     protected:
-        /// Does we prefer use general SSE version for position/normals shared buffers?
+        /// Do we prefer to use a general SSE version for position/normal shared buffers?
         bool mPreferGeneralVersionForSharedBuffers;
 
     public:
@@ -736,7 +736,7 @@ namespace Ogre {
     {
         // pSrcPos might can't align to 16 bytes because 8 bytes alignment shift per-vertex
 
-        // Instantiating two version only, since other alignement combination not that important.
+        // Instantiating two version only, since other alignment combinations are not that important.
         if (_isAlignedForSSE(pSrcPos) && _isAlignedForSSE(pDestPos))
         {
             SoftwareVertexSkinning_SSE_PosNorm_Shared_Packed<true, true>::apply(

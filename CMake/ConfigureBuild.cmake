@@ -13,6 +13,12 @@
 # also prepare package files for pkg-config and CMake.
 #######################################################################
 
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  set(OGRE_SET_BUILD_PLATFORM_IPHONE 1)
+  set(OGRE_STATIC 1)
+  set(OGRE_STATIC_LIB 1)
+endif()
+
 # should we build static libs?
 if (OGRE_STATIC)
   set(OGRE_LIB_TYPE STATIC)
@@ -88,12 +94,9 @@ endif ()
 configure_file(${OGRE_TEMPLATES_DIR}/buildsettings.h.in ${OGRE_BINARY_DIR}/include/buildsettings.h @ONLY)
 install(FILES ${OGRE_BINARY_DIR}/include/buildsettings.h DESTINATION include/OGRE)
 
-# Read contents of the OgreConfig.h file
-file(READ "${OGRE_SOURCE_DIR}/OgreMain/include/OgreConfig.h" OGRE_CONFIG_H)
-# add HAVE_OGRE_BUILDSETTINGS_H preprocessor define
-file(WRITE ${OGRE_BINARY_DIR}/include/OgreConfig.h "#define HAVE_OGRE_BUILDSETTINGS_H\n${OGRE_CONFIG_H}")
-install(FILES ${OGRE_BINARY_DIR}/include/OgreConfig.h DESTINATION include/OGRE)
-
+# Install OgreConfig.h file
+# This used to add HAVE_OGRE_BUILDSETTINGS_H to the top, which is a duplicate of adding -DHAVE_OGRE_BUILDSETTINGS_H
+install(FILES ${OGRE_SOURCE_DIR}/OgreMain/include/OgreConfig.h DESTINATION include/OGRE)
 
 # Create the pkg-config package files on Unix systems
 if (UNIX)

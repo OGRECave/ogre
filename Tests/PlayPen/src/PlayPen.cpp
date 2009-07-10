@@ -1887,7 +1887,7 @@ protected:
            multiple index sets (submeshes) using a single vertex buffer.
         */
         VertexData vd;
-        IndexData id[4];
+        IndexData ind[4];
         // Test pyramid
         vd.vertexCount = 4;
         vd.vertexStart = 0;
@@ -1902,44 +1902,44 @@ protected:
         *pFloat++ = 0  ; *pFloat++ = 0  ; *pFloat++ = -50;
         vbuf->unlock();
             
-        id[0].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+        ind[0].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT, 3, HardwareBuffer::HBU_STATIC, true);
-        id[0].indexCount = 3;
-        id[0].indexStart = 0;
-        unsigned short* pIdx = static_cast<unsigned short*>(id[0].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+        ind[0].indexCount = 3;
+        ind[0].indexStart = 0;
+        unsigned short* pIdx = static_cast<unsigned short*>(ind[0].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
         *pIdx++ = 0; *pIdx++ = 1; *pIdx++ = 2;
-        id[0].indexBuffer->unlock();
+        ind[0].indexBuffer->unlock();
 
-        id[1].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+        ind[1].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT, 3, HardwareBuffer::HBU_STATIC, true);
-        id[1].indexCount = 3;
-        id[1].indexStart = 0;
-        pIdx = static_cast<unsigned short*>(id[1].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+        ind[1].indexCount = 3;
+        ind[1].indexStart = 0;
+        pIdx = static_cast<unsigned short*>(ind[1].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
         *pIdx++ = 0; *pIdx++ = 2; *pIdx++ = 3;
-        id[1].indexBuffer->unlock();
+        ind[1].indexBuffer->unlock();
 
-        id[2].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+        ind[2].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT, 3, HardwareBuffer::HBU_STATIC, true);
-        id[2].indexCount = 3;
-        id[2].indexStart = 0;
-        pIdx = static_cast<unsigned short*>(id[2].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+        ind[2].indexCount = 3;
+        ind[2].indexStart = 0;
+        pIdx = static_cast<unsigned short*>(ind[2].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
         *pIdx++ = 1; *pIdx++ = 3; *pIdx++ = 2;
-        id[2].indexBuffer->unlock();
+        ind[2].indexBuffer->unlock();
 
-        id[3].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+        ind[3].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT, 3, HardwareBuffer::HBU_STATIC, true);
-        id[3].indexCount = 3;
-        id[3].indexStart = 0;
-        pIdx = static_cast<unsigned short*>(id[3].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+        ind[3].indexCount = 3;
+        ind[3].indexStart = 0;
+        pIdx = static_cast<unsigned short*>(ind[3].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
         *pIdx++ = 0; *pIdx++ = 3; *pIdx++ = 1;
-        id[3].indexBuffer->unlock();
+        ind[3].indexBuffer->unlock();
 
         EdgeListBuilder edgeBuilder;
         edgeBuilder.addVertexData(&vd);
-        edgeBuilder.addIndexData(&id[0]);
-        edgeBuilder.addIndexData(&id[1]);
-        edgeBuilder.addIndexData(&id[2]);
-        edgeBuilder.addIndexData(&id[3]);
+        edgeBuilder.addIndexData(&ind[0]);
+        edgeBuilder.addIndexData(&ind[1]);
+        edgeBuilder.addIndexData(&ind[2]);
+        edgeBuilder.addIndexData(&ind[3]);
         EdgeData* edgeData = edgeBuilder.build();
 
         edgeData->log(LogManager::getSingleton().getDefaultLog());
@@ -1958,7 +1958,7 @@ protected:
         */
 
         VertexData vd[4];
-        IndexData id[4];
+        IndexData ind[4];
         // Test pyramid
         vd[0].vertexCount = 3;
         vd[0].vertexStart = 0;
@@ -2008,47 +2008,47 @@ protected:
         *pFloat++ = 0  ; *pFloat++ = 0  ; *pFloat++ = -50;
         vbuf->unlock();
 
-        id[0].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+        ind[0].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT, 3, HardwareBuffer::HBU_STATIC, true);
-        id[0].indexCount = 3;
-        id[0].indexStart = 0;
-        unsigned short* pIdx = static_cast<unsigned short*>(id[0].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+        ind[0].indexCount = 3;
+        ind[0].indexStart = 0;
+        unsigned short* pIdx = static_cast<unsigned short*>(ind[0].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
         *pIdx++ = 0; *pIdx++ = 1; *pIdx++ = 2;
-        id[0].indexBuffer->unlock();
+        ind[0].indexBuffer->unlock();
 
-        id[1].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+        ind[1].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT, 3, HardwareBuffer::HBU_STATIC, true);
-        id[1].indexCount = 3;
-        id[1].indexStart = 0;
-        pIdx = static_cast<unsigned short*>(id[1].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+        ind[1].indexCount = 3;
+        ind[1].indexStart = 0;
+        pIdx = static_cast<unsigned short*>(ind[1].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
         *pIdx++ = 0; *pIdx++ = 1; *pIdx++ = 2;
-        id[1].indexBuffer->unlock();
+        ind[1].indexBuffer->unlock();
 
-        id[2].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+        ind[2].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT, 3, HardwareBuffer::HBU_STATIC, true);
-        id[2].indexCount = 3;
-        id[2].indexStart = 0;
-        pIdx = static_cast<unsigned short*>(id[2].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+        ind[2].indexCount = 3;
+        ind[2].indexStart = 0;
+        pIdx = static_cast<unsigned short*>(ind[2].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
         *pIdx++ = 0; *pIdx++ = 2; *pIdx++ = 1;
-        id[2].indexBuffer->unlock();
+        ind[2].indexBuffer->unlock();
 
-        id[3].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+        ind[3].indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
             HardwareIndexBuffer::IT_16BIT, 3, HardwareBuffer::HBU_STATIC, true);
-        id[3].indexCount = 3;
-        id[3].indexStart = 0;
-        pIdx = static_cast<unsigned short*>(id[3].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+        ind[3].indexCount = 3;
+        ind[3].indexStart = 0;
+        pIdx = static_cast<unsigned short*>(ind[3].indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
         *pIdx++ = 0; *pIdx++ = 2; *pIdx++ = 1;
-        id[3].indexBuffer->unlock();
+        ind[3].indexBuffer->unlock();
 
         EdgeListBuilder edgeBuilder;
         edgeBuilder.addVertexData(&vd[0]);
         edgeBuilder.addVertexData(&vd[1]);
         edgeBuilder.addVertexData(&vd[2]);
         edgeBuilder.addVertexData(&vd[3]);
-        edgeBuilder.addIndexData(&id[0], 0);
-        edgeBuilder.addIndexData(&id[1], 1);
-        edgeBuilder.addIndexData(&id[2], 2);
-        edgeBuilder.addIndexData(&id[3], 3);
+        edgeBuilder.addIndexData(&ind[0], 0);
+        edgeBuilder.addIndexData(&ind[1], 1);
+        edgeBuilder.addIndexData(&ind[2], 2);
+        edgeBuilder.addIndexData(&ind[3], 3);
         EdgeData* edgeData = edgeBuilder.build();
 
         edgeData->log(LogManager::getSingleton().getDefaultLog());
@@ -8134,8 +8134,8 @@ protected:
 		//testTextureShadowsIntegratedPSSM();
 		//testStencilShadowsMixedOpSubMeshes(false, true);
 		//testTextureShadowsTransparentCaster();
-		//testTextureShadowsCustomCasterMat(SHADOWTYPE_TEXTURE_ADDITIVE);
-		//testTextureShadowsCustomReceiverMat(SHADOWTYPE_TEXTURE_MODULATIVE);
+		//testTextureShadowsCustomCasterMat(SHADOWTYPE_TEXTURE_ADDITIVE, true);
+		//testTextureShadowsCustomReceiverMat(SHADOWTYPE_TEXTURE_MODULATIVE, true);
 		//testCompositorTextureShadows(SHADOWTYPE_TEXTURE_MODULATIVE);
 		//testSplitPassesTooManyTexUnits();
         //testOverlayZOrder();
@@ -8299,7 +8299,7 @@ public:
 #ifdef OGRE_STATIC_LIB
 		mRoot = new Root(StringUtil::BLANK, 
 			mResourcePath + "ogre.cfg", mResourcePath + "Ogre.log");
-		mStaticPluginLoader.load(*mRoot);
+		mStaticPluginLoader.load();
 #else
 		mRoot = new Root(pluginsPath, 
 			mResourcePath + "ogre.cfg", mResourcePath + "Ogre.log");
@@ -8533,6 +8533,12 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 int main(int argc, char **argv)
 #endif
 {
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
+    [pool release];
+    return retVal;
+#else
 	//EmbeddedMain(hInst, 0, strCmdLine, 0);
 
 	// Create application object
@@ -8549,13 +8555,79 @@ int main(int argc, char **argv)
 #endif
     }
 
-
     return 0;
+#endif
 }
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#   ifdef __OBJC__
+@interface AppDelegate : NSObject <UIApplicationDelegate>
+{
+}
 
+- (void)go;
 
+@end
 
+@implementation AppDelegate
 
+- (void)go {
+    // Create application object
+    PlayPenApplication app;
+    try {
+        app.go();
+    } catch( Ogre::Exception& e ) {
+        std::cerr << "An exception has occured: " <<
+        e.getFullDescription().c_str() << std::endl;
+    }
+}
+        
+- (void)applicationDidFinishLaunching:(UIApplication *)application {
+    // Hide the status bar
+    [[UIApplication sharedApplication] setStatusBarHidden:YES];
+    
+    // Create a window
+    UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
+    // Create an image view
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Default.png"]];
+    [window addSubview:imageView];
+    
+    // Create an indeterminate status indicator
+    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    [indicator setFrame:CGRectMake(150, 280, 20, 20)];
+    [indicator startAnimating];
+    [window addSubview:indicator];
+    
+    // Display our window
+    [window makeKeyAndVisible];
+    
+    // Clean up
+    [imageView release];
+    [indicator release];
+    
+    [NSThread detachNewThreadSelector:@selector(go) toTarget:self withObject:nil];
+}
 
+- (void)applicationWillTerminate:(UIApplication *)application {
+    Root::getSingleton().queueEndRendering();
+}
 
+//- (void)applicationWillResignActive:(UIApplication *)application
+//{
+//    // Pause FrameListeners and rendering
+//}
+//
+//- (void)applicationDidBecomeActive:(UIApplication *)application
+//{
+//    // Resume FrameListeners and rendering
+//}
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+@end
+#   endif
+        
+#endif

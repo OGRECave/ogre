@@ -33,11 +33,7 @@ Torus Knot Software Ltd.
 
 #include "OgreGLESPrerequisites.h"
 
-#include "OgrePlatform.h"
 #include "OgreRenderSystem.h"
-#include "OgreVector4.h"
-#include "OgreHardwareBufferManager.h"
-#include "OgreLight.h"
 
 #define MAX_LIGHTS 8
 
@@ -46,6 +42,7 @@ namespace Ogre {
     class GLESSupport;
     class GLESRTTManager;
     class GLESGpuProgramManager;
+    class HardwareBufferManager;
 
     /**
       Implementation of GL as a rendering system.
@@ -112,7 +109,7 @@ namespace Ogre {
             void setShadingType(ShadeOptions so);
             void setLightingEnabled(bool enabled);
             RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
-            bool fullScreen, const NameValuePairList *miscParams = 0);
+                bool fullScreen, const NameValuePairList *miscParams = 0);
             virtual MultiRenderTarget * createMultiRenderTarget(const String & name); 
             void destroyRenderWindow(RenderWindow* pWin);
             String getErrorDescription(long errorNumber) const;
@@ -212,6 +209,9 @@ namespace Ogre {
 			void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
 			/// @copydoc RenderSystem::getDisplayMonitorCount
 			unsigned int getDisplayMonitorCount() const;
+
+            // internal method for anisotrophy validation
+            GLfloat _getCurrentAnisotropy(size_t unit);
 
             void _setSceneBlendingOperation(SceneBlendOperation op);
             void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);

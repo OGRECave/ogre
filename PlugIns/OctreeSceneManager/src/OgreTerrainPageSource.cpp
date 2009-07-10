@@ -102,11 +102,11 @@ namespace Ogre {
 		}
         
         size_t q = 0;
-        for ( size_t j = 0; j < mPageSize - 1; j += ( mTileSize - 1 ) )
+        for ( ushort j = 0; j < mPageSize - 1; j += ( mTileSize - 1 ) )
         {
             size_t p = 0;
 
-            for ( size_t i = 0; i < mPageSize - 1; i += ( mTileSize - 1 ) )
+            for ( ushort i = 0; i < mPageSize - 1; i += ( mTileSize - 1 ) )
             {
 				StringUtil::StrStreamType new_name_str;
 				
@@ -151,11 +151,11 @@ namespace Ogre {
 		if(mSceneManager->getOptions().lit)
 		{
 			q = 0;
-			for ( size_t j = 0; j < mPageSize - 1; j += ( mTileSize - 1 ) )
+			for ( ushort j = 0; j < mPageSize - 1; j += ( mTileSize - 1 ) )
 			{
 				size_t p = 0;
 
-				for ( size_t i = 0; i < mPageSize - 1; i += ( mTileSize - 1 ) )
+				for ( ushort i = 0; i < mPageSize - 1; i += ( mTileSize - 1 ) )
 				{
 					page->tiles[ p ][ q ]->_calculateNormals();
 					p++;

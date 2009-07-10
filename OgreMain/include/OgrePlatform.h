@@ -38,6 +38,7 @@ namespace Ogre {
 #define OGRE_PLATFORM_LINUX 2
 #define OGRE_PLATFORM_APPLE 3
 #define OGRE_PLATFORM_SYMBIAN 4
+#define OGRE_PLATFORM_IPHONE 5
 
 #define OGRE_COMPILER_MSVC 1
 #define OGRE_COMPILER_GNUC 2
@@ -98,7 +99,13 @@ namespace Ogre {
 #elif defined( __WIN32__ ) || defined( _WIN32 )
 #   define OGRE_PLATFORM OGRE_PLATFORM_WIN32
 #elif defined( __APPLE_CC__)
-#   define OGRE_PLATFORM OGRE_PLATFORM_APPLE
+    // Device                                                     Simulator
+    // Both requiring OS version 2.0 or greater
+#   if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 30000 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 30000
+#       define OGRE_PLATFORM OGRE_PLATFORM_IPHONE
+#   else
+#       define OGRE_PLATFORM OGRE_PLATFORM_APPLE
+#   endif
 #else
 #   define OGRE_PLATFORM OGRE_PLATFORM_LINUX
 #endif
@@ -176,7 +183,7 @@ namespace Ogre {
 #endif
 //----------------------------------------------------------------------------
 // Linux/Apple Settings
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 
 // Enable GCC symbol visibility
 #   if defined( OGRE_GCC_VISIBILITY )
@@ -202,8 +209,9 @@ namespace Ogre {
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     #define OGRE_PLATFORM_LIB "OgrePlatform.bundle"
-#else
-    //OGRE_PLATFORM_LINUX
+#elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+    #define OGRE_PLATFORM_LIB "OgrePlatform.a"
+#else //OGRE_PLATFORM_LINUX
     #define OGRE_PLATFORM_LIB "libOgrePlatform.so"
 #endif
 
@@ -216,6 +224,11 @@ namespace Ogre {
 //For apple, we always have a custom config.h file
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #    include "config.h"
+
+    // Also, define this so we can use the symbol when building for 10.4+
+#   ifndef MAC_OS_X_VERSION_10_6
+#       define MAC_OS_X_VERSION_10_6 1060
+#   endif
 #endif
 
 //----------------------------------------------------------------------------

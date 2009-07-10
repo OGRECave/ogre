@@ -7,7 +7,7 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
-# Configure OpenGLES RenderSystem build
+# Configure OpenGL ES RenderSystem build
 
 set(HEADER_FILES
   include/OgreGLESContext.h
@@ -27,11 +27,6 @@ set(HEADER_FILES
   include/OgreGLESSupport.h
   include/OgreGLESTexture.h
   include/OgreGLESTextureManager.h
-  include/EGL/OgreEGLContext.h
-  include/EGL/OgreEGLRenderTexture.h
-  include/EGL/OgreEGLSupport.h
-  include/EGL/OgreEGLWindow.h
-  include/EGL/
 )
 
 
@@ -52,13 +47,7 @@ set(SOURCE_FILES
   src/OgreGLESSupport.cpp
   src/OgreGLESTexture.cpp
   src/OgreGLESTextureManager.cpp
-  src/EGL/OgreEGLContext.cpp
-  src/EGL/OgreEGLRenderTexture.cpp
-  src/EGL/OgreEGLSupport.cpp
-  src/EGL/OgreEGLWindow.cpp
 )
-
-
 
 # Add system specific settings
 if (WIN32)
@@ -68,17 +57,41 @@ if (WIN32)
     include/EGL/WIN32/OgreWin32EGLRenderTexture.h
     include/EGL/WIN32/OgreWin32EGLWindow.h
     include/EGL/WIN32/OgreGLESUtil.h
+    include/EGL/OgreEGLContext.h
+    include/EGL/OgreEGLRenderTexture.h
+    include/EGL/OgreEGLSupport.h
+    include/EGL/OgreEGLWindow.h
   )
   set(PLATFORM_SOURCES
     src/EGL/WIN32/OgreWin32EGLSupport.cpp
     src/EGL/WIN32/OgreWin32EGLRenderTexture.cpp
     src/EGL/WIN32/OgreWin32EGLWindow.cpp
     src/EGL/WIN32/OgreWin32EGLContext.cpp
+    src/EGL/OgreEGLContext.cpp
+    src/EGL/OgreEGLRenderTexture.cpp
+    src/EGL/OgreEGLSupport.cpp
+    src/EGL/OgreEGLWindow.cpp
   )
   include_directories(src/EGL/WIN32 include/EGL/WIN32)
   link_directories(${OPENGLES_LIBRARY_PATH})
   set(PLATFORM_HEADER_INSTALL "WIN32")
-#elseif (APPLE)
+elseif (APPLE)
+  set(PLATFORM_HEADERS 
+    include/EAGL/OgreEAGLESContext.h
+    include/EAGL/OgreEAGLSupport.h
+    include/EAGL/OgreEAGLRenderTexture.h
+    include/EAGL/OgreEAGLWindow.h
+    include/EAGL/OgreGLESUtil.h
+  )
+  set(PLATFORM_SOURCES
+    src/EAGL/OgreEAGLSupport.mm
+    src/EAGL/OgreEAGLRenderTexture.mm
+    src/EAGL/OgreEAGLWindow.mm
+    src/EAGL/OgreEAGLESContext.mm
+  )
+  include_directories(src/EAGL include/EAGL)
+  link_directories(${OPENGLES_LIBRARY_PATH})
+  set(PLATFORM_HEADER_INSTALL "APPLE")
 elseif (UNIX)
   set(PLATFORM_HEADERS
     include/EGL/GTK/OgreGtkEGLContext.h
@@ -86,25 +99,32 @@ elseif (UNIX)
     include/EGL/GTK/OgreGtkEGLRenderTexture.h
     include/EGL/GTK/OgreGtkEGLWindow.h
     include/EGL/GTK/OgreGLESUtil.h
+    include/EGL/OgreEGLContext.h
+    include/EGL/OgreEGLRenderTexture.h
+    include/EGL/OgreEGLSupport.h
+    include/EGL/OgreEGLWindow.h
   )
   set(PLATFORM_SOURCES
     src/EGL/GTK/OgreGtkEGLContext.cpp
     src/EGL/GTK/OgreGtkEGLSupport.cpp
     src/EGL/GTK/OgreGtkEGLRenderTexture.cpp
     src/EGL/GTK/OgreGtkEGLWindow.cpp
+    src/EGL/OgreEGLContext.cpp
+    src/EGL/OgreEGLRenderTexture.cpp
+    src/EGL/OgreEGLSupport.cpp
+    src/EGL/OgreEGLWindow.cpp
   )
   include_directories(src/EGL/GTK include/EGL/GTK)
   set(PLATFORM_HEADER_INSTALL "GTK")
   set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
 endif ()
 
-
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/EAGL
   ${OPENGLES_INCLUDE_DIR}
 )
-
 
 add_library(RenderSystem_GLES ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES})
 target_link_libraries(RenderSystem_GLES OgreMain ${OPENGLES_LIBRARIES} ${PLATFORM_LIBS})
@@ -114,6 +134,7 @@ if (NOT OGRE_STATIC)
     COMPILE_DEFINITIONS OGRE_GLESPLUGIN_EXPORTS
   )
 endif ()
+
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(RenderSystem_GLES ${Boost_LIBRARIES})
 endif ()

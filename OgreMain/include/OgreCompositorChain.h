@@ -48,10 +48,6 @@ namespace Ogre {
     {
     public:
         CompositorChain(Viewport *vp);
-        /** Another gcc warning here, which is no problem because RenderTargetListener is never used
-            to delete an object.
-            warning: `class Ogre::CompositorChain' has virtual functions but non-virtual destructor
-        */
         virtual ~CompositorChain();
         
         /// Data types

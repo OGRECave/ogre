@@ -44,7 +44,7 @@ namespace Ogre {
     #   define OGRE_GL_MAP_BUFFER_THRESHOLD 0
     #endif
 
-    /** Implementation of HardwareBufferManager for OpenGLES. */
+    /** Implementation of HardwareBufferManager for OpenGL ES. */
     class _OgrePrivate GLESHardwareBufferManagerBase : public HardwareBufferManagerBase
     {
         protected:

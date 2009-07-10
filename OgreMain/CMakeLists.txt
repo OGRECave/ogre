@@ -344,7 +344,9 @@ set (SOURCE_FILES
   src/OgreNumerics.cpp
   src/OgreOptimisedUtil.cpp
   src/OgreOptimisedUtilGeneral.cpp
+#  src/OgreOptimisedUtilNEON.cpp
   src/OgreOptimisedUtilSSE.cpp
+#  src/OgreOptimisedUtilVFP.cpp
   src/OgreOverlay.cpp
   src/OgreOverlayContainer.cpp
   src/OgreOverlayElement.cpp
@@ -468,29 +470,43 @@ if (WIN32)
   set(PLATFORM_HEADER_INSTALL "win32")
 
 elseif (APPLE)
-  include_directories("include/OSX")
-  include_directories("${CMAKE_SOURCE_DIR}/Mac/Ogre/include")
-  set(PLATFORM_HEADER_FILES
-    include/OSX/OgreConfigDialogImp.h
-    include/OSX/OgreErrorDialogImp.h
-    include/OSX/OgreTimerImp.h
-    # think about relocating these
-    ${CMAKE_SOURCE_DIR}/Mac/Ogre/include/macBundlePath.h
-    ${CMAKE_SOURCE_DIR}/Mac/Ogre/include/macPlugins.h
-    ${CMAKE_SOURCE_DIR}/Mac/Ogre/include/OgreOSXCocoaView.h
-  )
-  set(PLATFORM_SOURCE_FILES
-    src/OSX/OgreConfigDialog.cpp
-    src/OSX/OgreErrorDialog.cpp
-    src/OSX/OgreTimer.cpp
-    src/OgreSearchOps.cpp
-    # think about relocating these
-    ${CMAKE_SOURCE_DIR}/Mac/Ogre/src/macBundlePath.cpp
-    ${CMAKE_SOURCE_DIR}/Mac/Ogre/src/macPlugins.cpp
-    ${CMAKE_SOURCE_DIR}/Mac/Ogre/src/OgreOSXCocoaView.mm
-  )
-  set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
-  set(PLATFORM_HEADER_INSTALL "OSX")
+  if (OGRE_BUILD_PLATFORM_IPHONE)
+    include_directories("include/iPhone")
+    set(PLATFORM_HEADER_FILES
+      include/iPhone/OgreConfigDialogImp.h
+      include/iPhone/OgreErrorDialogImp.h
+      include/iPhone/OgreTimerImp.h
+      include/iPhone/macUtils.h
+    )
+    set(PLATFORM_SOURCE_FILES
+      src/iPhone/OgreConfigDialog.cpp
+      src/iPhone/OgreErrorDialog.cpp
+      src/iPhone/OgreTimer.cpp
+      src/iPhone/macUtils.mm
+      src/OgreSearchOps.cpp
+    )
+    set(PLATFORM_LIBS "")
+    set(PLATFORM_HEADER_INSTALL "iPhone")
+  else ()
+    include_directories("include/OSX")
+    set(PLATFORM_HEADER_FILES
+      include/OSX/OgreConfigDialogImp.h
+      include/OSX/OgreErrorDialogImp.h
+      include/OSX/OgreTimerImp.h
+      include/OSX/macUtils.h
+      include/OSX/OgreOSXCocoaView.h
+    )
+    set(PLATFORM_SOURCE_FILES
+      src/OSX/OgreConfigDialog.cpp
+      src/OSX/OgreErrorDialog.cpp
+      src/OSX/OgreTimer.cpp
+      src/OSX/macUtils.cpp
+      src/OSX/OgreOSXCocoaView.mm
+      src/OgreSearchOps.cpp
+    )
+    set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
+    set(PLATFORM_HEADER_INSTALL "OSX")
+  endif ()
 elseif (UNIX)
   include_directories(include/GLX ${X11_INCLUDE_DIR})
   set(PLATFORM_HEADER_FILES
@@ -520,16 +536,26 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/nedmalloc)
 add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
 set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OGRE_VERSION_MAJOR})
 if (APPLE)
-  set_target_properties(OgreMain PROPERTIES	FRAMEWORK TRUE)
-  set_target_properties(OgreMain PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADER_FILES}" )
+  if (NOT OGRE_BUILD_PLATFORM_IPHONE)
+    set_target_properties(OgreMain PROPERTIES FRAMEWORK TRUE)
+    # Set the INSTALL_PATH so that Frameworks can be local
+    set_target_properties(OgreMain
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Frameworks"
+    )
+    set_target_properties(OgreMain PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADER_FILES}")
+  else ()
+    set_target_properties(OgreMain PROPERTIES INSTALL_NAME_DIR "OGRE")
+    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_THUMB_SUPPORT "NO")
+    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
+    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
+    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
+    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreStableHeaders.h")
+  endif ()
+
   # Framework is called 'Ogre'
   set_target_properties(OgreMain PROPERTIES	OUTPUT_NAME Ogre)
-  # Set the INSTALL_PATH so that Frameworks can be local
-  set_target_properties(OgreMain
-     PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-     INSTALL_NAME_DIR "@executable_path/../Frameworks"
-  )
-endif()
+endif ()
 target_link_libraries(OgreMain
   ${ZLIB_LIBRARIES}
   ${ZZip_LIBRARIES}
@@ -554,4 +580,3 @@ install(FILES ${HEADER_FILES}
 install(FILES ${PLATFORM_HEADER_FILES}
   DESTINATION include/OGRE/${PLATFORM_HEADER_INSTALL}
 )
-

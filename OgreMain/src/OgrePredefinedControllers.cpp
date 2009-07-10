@@ -301,7 +301,7 @@ namespace Ogre
     Real WaveformControllerFunction::calculate(Real source)
     {
         Real input = getAdjustedInput(source * mFrequency);
-        Real output;
+        Real output = 0;
         // For simplicity, factor input down to {0,1)
         // Use looped subtract rather than divide / round
         while (input >= 1.0)

@@ -8,10 +8,6 @@
 #-------------------------------------------------------------------
 
 # Configure Samples build
-if (APPLE)
-  include_directories("${CMAKE_SOURCE_DIR}/Mac/Ogre/include")
-endif()
-
 
 if (OGRE_BUILD_SAMPLES AND NOT OIS_FOUND)
   message(STATUS "Could not find dependency: OIS")
@@ -55,8 +51,13 @@ if (OGRE_BUILD_SAMPLES)
   if (OGRE_BUILD_RENDERSYSTEM_GL)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GL)
   endif ()
-  if (APPLE)
+  if (OGRE_BUILD_RENDERSYSTEM_GLES)
+  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GLES)
+  endif ()
+  if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
   	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} IOKit)
+  else ()
+    set(OGRE_LIBRARIES ${OGRE_LIBRARIES})
   endif ()
 
   if (OGRE_STATIC)
@@ -69,6 +70,7 @@ if (OGRE_BUILD_SAMPLES)
   	include_directories(${CMAKE_SOURCE_DIR}/PlugIns/PCZSceneManager/include)
   	include_directories(${CMAKE_SOURCE_DIR}/RenderSystems/Direct3D9/include)
   	include_directories(${CMAKE_SOURCE_DIR}/RenderSystems/Direct3D10/include)
+  	include_directories(${CMAKE_SOURCE_DIR}/RenderSystems/GLES/include)
   	include_directories(
 		${CMAKE_SOURCE_DIR}/RenderSystems/GL/include
 		${CMAKE_SOURCE_DIR}/RenderSystems/GL/src/GLSL/include
@@ -91,25 +93,23 @@ if (OGRE_BUILD_SAMPLES)
   endif ()
   
   add_subdirectory(BezierPatch)
-  add_subdirectory(BSP)
+  if (OGRE_BUILD_PLUGIN_BSP)
+    add_subdirectory(BSP)
+  endif ()
   add_subdirectory(CameraTrack)
-  add_subdirectory(CelShading)
   add_subdirectory(CubeMapping)
   add_subdirectory(DeferredShading)
-  add_subdirectory(Dot3Bump)
   add_subdirectory(DynTex)
-  add_subdirectory(Grass)
-  add_subdirectory(Isosurf)
-  add_subdirectory(VolumeTex)
   add_subdirectory(EnvMapping)
-  add_subdirectory(Fresnel)
+  add_subdirectory(Grass)
   add_subdirectory(Lighting)
   if (OGRE_BUILD_COMPONENT_PAGING)
   	add_subdirectory(Paging)
   endif ()
-  add_subdirectory(ParticleFX)
-  add_subdirectory(ParticleGS)
-  if (OGRE_BUILD_PLUGIN_PCZ)
+  if (OGRE_BUILD_PLUGIN_PFX)
+    add_subdirectory(ParticleFX)
+  endif()
+  if (OGRE_BUILD_PLUGIN_PCZ AND OGRE_BUILD_PLUGIN_OCTREE)
   	add_subdirectory(PCZTestApp)
   endif ()
   add_subdirectory(RenderToTexture)
@@ -118,9 +118,25 @@ if (OGRE_BUILD_SAMPLES)
   add_subdirectory(SkyDome)
   add_subdirectory(SkyPlane)
   add_subdirectory(Smoke)
-  add_subdirectory(Terrain)
+  if (OGRE_BUILD_PLUGIN_OCTREE)
+    add_subdirectory(Terrain)
+  endif ()
   add_subdirectory(TextureFX)
   add_subdirectory(Transpacency)
+
+  # Require vertex and fragment shaders
+  add_subdirectory(CelShading)
+  add_subdirectory(Dot3Bump)
+  add_subdirectory(Fresnel)
+
+  # Require geometry shaders
+  add_subdirectory(Isosurf)
+  add_subdirectory(ParticleGS)
+
+  # Requires 3D textures
+  add_subdirectory(VolumeTex)
+
+  # Requires cube mapping
   add_subdirectory(Water)
 
   if (NOT CEGUI_FOUND)

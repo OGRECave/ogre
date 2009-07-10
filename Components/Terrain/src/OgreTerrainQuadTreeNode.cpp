@@ -53,11 +53,11 @@ namespace Ogre
 		, mBaseLod(lod)
 		, mDepth(depth)
 		, mQuadrant(quadrant)
+        , mCurrentLod(-1)
 		, mNodeWithVertexData(0)
 		, mVertexDataRecord(0)
 		, mMovable(0)
-		, mRend(0)
-		, mCurrentLod(-1)
+        , mRend(0)
 	{
 		if (terrain->getMaxBatchSize() < size)
 		{
@@ -934,7 +934,7 @@ namespace Ogre
 			// skirtIncrement is the index offset from one skirt vertex to the next, 
 			// because skirts are packed in rows/cols then there is no row multiplier for
 			// processing columns
-			int edgeIncrement, skirtIncrement;
+			int edgeIncrement = 0, skirtIncrement = 0;
 			switch(s)
 			{
 				case 0: // top
@@ -973,7 +973,7 @@ namespace Ogre
 			}
 		}
 
-		assert (pI - basepI == destData->indexCount);
+		assert ((pI - basepI) == (uint16)destData->indexCount);
 
 
 	}
@@ -1201,7 +1201,7 @@ namespace Ogre
 			// For each LOD, the distance at which the LOD will transition *downwards*
 			// is given by 
 			// distTransition = maxDelta * cFactor;
-			int lodLvl = 0;
+			uint lodLvl = 0;
 			mCurrentLod = -1;
 			for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i, ++lodLvl)
 			{

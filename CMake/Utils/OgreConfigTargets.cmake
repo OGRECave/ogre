@@ -77,6 +77,14 @@ function(ogre_config_common TARGETNAME)
     LIBRARY_OUTPUT_DIRECTORY ${OGRE_BINARY_DIR}/lib
     RUNTIME_OUTPUT_DIRECTORY ${OGRE_BINARY_DIR}/bin
   )
+  if(OGRE_BUILD_PLATFORM_IPHONE)
+    set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_THUMB_SUPPORT "NO")
+    set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
+    set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
+    set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
+    set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
+  endif(OGRE_BUILD_PLATFORM_IPHONE)
+
   ogre_create_vcproj_userfile(${TARGETNAME})
 endfunction(ogre_config_common)
 
@@ -86,6 +94,13 @@ function(ogre_config_lib LIBNAME)
   if (OGRE_STATIC)
     # add static prefix, if compiling static version
     set_target_properties(${LIBNAME} PROPERTIES OUTPUT_NAME ${LIBNAME}Static)
+
+    if(OGRE_BUILD_PLATFORM_IPHONE)
+      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
+      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_THUMB_SUPPORT "NO")
+      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
+      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
+    endif(OGRE_BUILD_PLATFORM_IPHONE)
   else (OGRE_STATIC)
     if (CMAKE_COMPILER_IS_GNUCXX)
       # add GCC visibility flags to shared library build
@@ -124,6 +139,13 @@ function(ogre_config_plugin PLUGINNAME)
   if (OGRE_STATIC)
     # add static prefix, if compiling static version
     set_target_properties(${PLUGINNAME} PROPERTIES OUTPUT_NAME ${PLUGINNAME}Static)
+
+    if(OGRE_BUILD_PLATFORM_IPHONE)
+      set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_THUMB_SUPPORT "NO")
+      set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
+      set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
+      set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
+    endif(OGRE_BUILD_PLATFORM_IPHONE)
   else (OGRE_STATIC)
     if (CMAKE_COMPILER_IS_GNUCXX)
       # add GCC visibility flags to shared library build
@@ -160,6 +182,12 @@ endfunction(ogre_config_plugin)
 
 # setup Ogre demo build
 function(ogre_config_sample SAMPLENAME)
+  # The PRODUCT_NAME target setting cannot contain underscores.  Just remove them
+  # Known bug in Xcode CFBundleIdentifier processing rdar://6187020
+  # Can cause an instant App Store rejection. Also, code signing will fail. 
+  #if (OGRE_BUILD_PLATFORM_IPHONE)
+#    string (REPLACE "_" "" SAMPLENAME ${SAMPLENAME})
+  #endif()
   ogre_config_common(${SAMPLENAME})
 
   # set install RPATH for Unix systems
@@ -172,74 +200,92 @@ function(ogre_config_sample SAMPLENAME)
   if (APPLE)
     # On OS X, create .app bundle
     set_property(TARGET ${SAMPLENAME} PROPERTY MACOSX_BUNDLE TRUE)
-    # also, symlink frameworks so .app is standalone
-    # NOTE: $(CONFIGURATION) is not resolvable at CMake run time, it's only 
-    # valid at build time (hence parenthesis rather than braces)
-    set (OGRE_SAMPLE_CONTENTS_PATH 
-      ${CMAKE_BINARY_DIR}/bin/$(CONFIGURATION)/${SAMPLENAME}.app/Contents)
-    add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
-      COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks
-      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework 
-        ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
-      COMMAND ln ARGS -s -f ${CMAKE_SOURCE_DIR}/Dependencies/Cg.framework 
-        ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
-      COMMAND ln ARGS -s -f ${CMAKE_SOURCE_DIR}/Dependencies/CEGUI.framework 
-        ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
-    )
-    # now cfg files
-    add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
-      COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
-      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/bin/plugins.cfg 
-        ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/bin/resources.cfg 
-        ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/bin/media.cfg 
-        ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/bin/quake3settings.cfg 
-        ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-    )
-    # now plugins
-    add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
-      COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins)
-    if (OGRE_BUILD_RENDERSYSTEM_GL)
+
+	if (OGRE_BUILD_PLATFORM_IPHONE)
+      set (OGRE_SAMPLE_CONTENTS_PATH 
+        ${CMAKE_BINARY_DIR}/bin/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/$(PRODUCT_NAME).app)
       add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
-        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/RenderSystem_GL.dylib 
+        COMMAND cp ARGS ${CMAKE_BINARY_DIR}/bin/*.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/
+	    COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/Samples/Media ${OGRE_SAMPLE_CONTENTS_PATH}/
+	    COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/Samples/Common/misc/Icon.png ${OGRE_SAMPLE_CONTENTS_PATH}/
+	    COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/Samples/Common/misc/Default.png ${OGRE_SAMPLE_CONTENTS_PATH}/
+      )
+	else ()
+      # also, symlink frameworks so .app is standalone
+      # NOTE: $(CONFIGURATION) is not resolvable at CMake run time, it's only 
+      # valid at build time (hence parenthesis rather than braces)
+      set (OGRE_SAMPLE_CONTENTS_PATH 
+        ${CMAKE_BINARY_DIR}/bin/$(CONFIGURATION)/${SAMPLENAME}.app/Contents)
+      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+        COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks
+        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
+        COMMAND ln ARGS -s -f ${CMAKE_SOURCE_DIR}/Dependencies/Cg.framework 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
+        COMMAND ln ARGS -s -f ${CMAKE_SOURCE_DIR}/Dependencies/CEGUI.framework 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
+      )
+      # now cfg files
+      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+        COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
+        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/bin/plugins.cfg 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/bin/resources.cfg 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/bin/media.cfg 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/bin/quake3settings.cfg 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+      )
+      # now plugins
+      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+        COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins)
+      if (OGRE_BUILD_RENDERSYSTEM_GL)
+        add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+          COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/RenderSystem_GL.dylib 
+            ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+        )
+      endif ()
+      if (OGRE_BUILD_RENDERSYSTEM_GLES)
+        add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+          COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/RenderSystem_GLES.a
+            ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+        )
+      endif ()
+      if (OGRE_BUILD_PLUGIN_BSP)    
+        add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_BSPSceneManager.dylib 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+        )
+      endif()
+      if (OGRE_BUILD_PLUGIN_CG)    
+        add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_CgProgramManager.dylib 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+        )
+      endif()
+      if (OGRE_BUILD_PLUGIN_OCTREE)    
+        add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_OctreeSceneManager.dylib 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+       )
+      endif()
+      if (OGRE_BUILD_PLUGIN_PCZ)    
+        add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+          COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_PCZSceneManager.dylib 
+            ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/    
+        )
+        add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_OctreeZone.dylib 
           ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
       )
-    endif ()
-	if (OGRE_BUILD_PLUGIN_BSP)    
-      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
-      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_BSPSceneManager.dylib 
-        ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
-      )
-    endif()
-	if (OGRE_BUILD_PLUGIN_CG)    
-      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
-      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_CgProgramManager.dylib 
-        ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
-      )
-    endif()
-	if (OGRE_BUILD_PLUGIN_OCTREE)    
-      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
-      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_OctreeSceneManager.dylib 
-        ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
-      )
-    endif()
-	if (OGRE_BUILD_PLUGIN_PCZ)    
-      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
-        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_PCZSceneManager.dylib 
-          ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/    
-      )
-      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
-      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_OctreeZone.dylib 
-        ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
-      )
-    endif()
-	if (OGRE_BUILD_PLUGIN_PFX)    
-      add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
-      COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_ParticleFX.dylib 
-        ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
-      )
+      endif()
+      if (OGRE_BUILD_PLUGIN_PFX)    
+        add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_ParticleFX.dylib 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+        )
+      endif()
     endif()
   endif (APPLE)
 

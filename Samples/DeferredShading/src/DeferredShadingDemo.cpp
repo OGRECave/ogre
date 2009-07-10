@@ -33,6 +33,7 @@ This demo source file is in the public domain.
 #include "DeferredShading.h"
 #include "MLight.h"
 #include "GeomUtils.h"
+
 class SharedData : public Ogre::Singleton<SharedData> {
 
 public:
@@ -170,6 +171,10 @@ public:
 			name="ShowNormals"; break;
 		case DeferredShadingSystem::DSM_SHOWDSP:
 			name="ShowDepthSpecular"; break;
+        
+        // This will never happen but it silences a warning
+        case DeferredShadingSystem::DSM_COUNT:
+                break;
 		}
 		OverlayManager::getSingleton().getOverlayElement( "Example/Shadows/Materials" )
 			->setCaption( "[C] Change mode, current is \"" 
@@ -474,12 +479,12 @@ protected:
 		float stations_per_revolution = 3.5f;
 		size_t skip = 2; // stations between lights
 		Vector3 station_pos[stations];
-		for(int x=0; x<s_to_top; ++x)
+		for(unsigned int x=0; x<s_to_top; ++x)
 		{
 			float theta = ((float)x/stations_per_revolution)*2.0f*Math::PI;
 			station_pos[x] = base+Vector3(Math::Sin(theta)*r, ascend*x, Math::Cos(theta)*r);
 		}
-		for(int x=s_to_top; x<stations; ++x)
+		for(unsigned int x=s_to_top; x<stations; ++x)
 		{
 			float theta = ((float)x/stations_per_revolution)*2.0f*Math::PI;
 			station_pos[x] = base+Vector3(Math::Sin(theta)*r, h-ascend*(x-s_to_top), Math::Cos(theta)*r);
@@ -492,7 +497,7 @@ protected:
 		{
 			// Create a track to animate the camera's node
 			NodeAnimationTrack* track = anim->createNodeTrack(x, nodes[x]);
-			for(int y=0; y<=stations; ++y)
+			for(unsigned int y=0; y<=stations; ++y)
 			{
 				// Setup keyframes
 				TransformKeyFrame* key = track->createNodeKeyFrame(y*seconds_per_station); // A start position
@@ -507,9 +512,6 @@ protected:
 	}
 
 };
-
-
-
 
 
 #ifdef __cplusplus
@@ -542,5 +544,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-

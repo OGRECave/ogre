@@ -155,7 +155,7 @@ namespace Ogre
     *       of any zone-specific optimizations for checking portal visibility
     */
     void DefaultZone::_checkLightAgainstPortals(PCZLight *light, 
-                                                long frameCount, 
+                                                unsigned long frameCount, 
                                                 PCZFrustum *portalFrustum,
                                                 Portal * ignorePortal)
     {

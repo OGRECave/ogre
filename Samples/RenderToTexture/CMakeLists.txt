@@ -9,7 +9,12 @@
 
 # Configure RenderToTexture demo build
 
-set(SOURCE_FILES src/RenderToTexture.cpp)
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/RenderToTexture.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/RenderToTexture.mm COPYONLY)
+  set(SOURCE_FILES src/RenderToTexture.mm)
+else ()
+  set(SOURCE_FILES src/RenderToTexture.cpp)
+endif ()
 
 add_executable(Demo_RenderToTexture ${SOURCE_FILES} ${RESOURCE_FILES})
 
