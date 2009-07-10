@@ -180,11 +180,6 @@ namespace Ogre {
     //---------------------------------------------------------------------
     int Viewport::getOrientation(void)
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Setting Viewport orientation is only supported on iPhone",
-                    __FUNCTION__);
-#endif
         return mOrientation;
     }
     //---------------------------------------------------------------------
