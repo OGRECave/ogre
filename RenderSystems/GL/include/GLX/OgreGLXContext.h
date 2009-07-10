@@ -56,6 +56,7 @@ namespace Ogre {
 	private:
 		::GLXFBConfig  mFBConfig;
 		GLXGLSupport*  mGLSupport;
+		bool mExternalContext;
 	};
 }
 
