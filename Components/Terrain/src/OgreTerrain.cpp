@@ -2486,10 +2486,10 @@ namespace Ogre
 				// get world space point
 				// add a little height padding to stop shadowing self
 				Vector3 wpos;
-				getPosition(Tx, Ty, getHeightAtPoint(x, y) + heightPad, &wpos);
+				getPosition(Tx, Ty, getHeightAtTerrainPosition(Tx, Ty) + heightPad, &wpos);
 				wpos += getPosition();
-				// build ray
-				Ray ray(wpos, lightVec);
+				// build ray, cast backwards along light direction
+				Ray ray(wpos, -lightVec);
 				std::pair<bool, Vector3> rayHit = rayIntersects(ray);
 
 				// TODO - cast multiple rays to antialias?

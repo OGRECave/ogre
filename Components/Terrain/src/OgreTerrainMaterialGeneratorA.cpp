@@ -76,6 +76,7 @@ namespace Ogre
 		, mLayerParallaxMappingEnabled(true)
 		, mLayerSpecularMappingEnabled(true)
 		, mGlobalColourMapEnabled(true)
+		, mLightmapEnabled(true)
 	{
 
 	}
@@ -89,7 +90,7 @@ namespace Ogre
 	{
 		terrain->_setMorphRequired(true);
 		terrain->_setNormalMapRequired(true);
-		terrain->_setLightMapRequired(true, true);
+		terrain->_setLightMapRequired(mLightmapEnabled, true);
 	}
 	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::setLayerNormalMappingEnabled(bool enabled)
@@ -124,6 +125,15 @@ namespace Ogre
 		if (enabled != mGlobalColourMapEnabled)
 		{
 			mGlobalColourMapEnabled = enabled;
+			mParent->_markChanged();
+		}
+	}
+	//---------------------------------------------------------------------
+	void  TerrainMaterialGeneratorA::SM2Profile::setLightmapEnabled(bool enabled)
+	{
+		if (enabled != mLightmapEnabled)
+		{
+			mLightmapEnabled = enabled;
 			mParent->_markChanged();
 		}
 	}
@@ -184,6 +194,13 @@ namespace Ogre
 		if (terrain->getGlobalColourMapEnabled() && isGlobalColourMapEnabled())
 		{
 			tu = pass->createTextureUnitState(terrain->getGlobalColourMap()->getName());
+			tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+		}
+
+		// light map
+		if (isLightmapEnabled())
+		{
+			tu = pass->createTextureUnitState(terrain->getLightmap()->getName());
 			tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 		}
 
@@ -527,6 +544,11 @@ namespace Ogre
 			outStream << ", uniform sampler2D globalColourMap : register(s" 
 				<< currentSamplerIdx++ << ")\n";
 		}
+		if (prof->isLightmapEnabled())
+		{
+			outStream << ", uniform sampler2D lightMap : register(s" 
+				<< currentSamplerIdx++ << ")\n";
+		}
 		// Blend textures - sampler definitions
 		for (uint i = 0; i < terrain->getBlendTextureCount(); ++i)
 		{
@@ -547,6 +569,7 @@ namespace Ogre
 			") : COLOR\n"
 			"{\n"
 			"	float4 outputCol;\n"
+			"	float shadow = 1.0;\n"
 
 			// base colour
 			"	outputCol = float4(0,0,0,1);\n"
@@ -698,14 +721,19 @@ namespace Ogre
 			// sample colour map and apply to diffuse
 			outStream << "	diffuse *= tex2D(globalColourMap, uv).rgb;\n";
 		}
+		if (prof->isLightmapEnabled())
+		{
+			// sample lightmap
+			outStream << "	shadow = tex2D(lightMap, uv).r;\n";
+		}
 
 		// diffuse lighting
-		outStream << "	outputCol.rgb += ambient * diffuse + litRes.y * lightDiffuseColour * diffuse;\n";
+		outStream << "	outputCol.rgb += ambient * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
 
 		// specular lighting
 		if (!prof->isLayerSpecularMappingEnabled())
 			outStream << "	specular = 1.0;\n";
-		outStream << "	outputCol.rgb += litRes.z * lightSpecularColour * specular;\n";
+		outStream << "	outputCol.rgb += litRes.z * lightSpecularColour * specular * shadow;\n";
 
 		if (prof->getParent()->getDebugLevel())
 		{

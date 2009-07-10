@@ -677,6 +677,10 @@ namespace Ogre
 		*/
 		uint16 getLightmapSize() const { return mLightmapSize; }
 
+		/// Get access to the lightmap, if enabled (as requested by the material generator)
+		const TexturePtr& getLightmap() const { return mLightmap; }
+
+
 		/// Get the world position of the terrain centre
 		const Vector3& getPosition() const { return mPos; }
 		/// Set the position of the terrain centre in world coordinates

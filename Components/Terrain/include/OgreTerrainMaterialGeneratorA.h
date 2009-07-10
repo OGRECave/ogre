@@ -89,6 +89,14 @@ namespace Ogre
 			if it's present (default true). 
 			*/
 			void setGlobalColourMapEnabled(bool enabled);
+			/** Whether to support a light map over the terrain in the shader,
+			if it's present (default true). 
+			*/
+			bool isLightmapEnabled() const  { return mLightmapEnabled; }
+			/** Whether to support a light map over the terrain in the shader,
+			if it's present (default true). 
+			*/
+			void setLightmapEnabled(bool enabled);
 		
 		protected:
 			/// Interface definition for helper class to generate shaders
@@ -156,6 +164,7 @@ namespace Ogre
 			bool mLayerParallaxMappingEnabled;
 			bool mLayerSpecularMappingEnabled;
 			bool mGlobalColourMapEnabled;
+			bool mLightmapEnabled;
 
 		};
 

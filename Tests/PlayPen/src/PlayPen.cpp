@@ -287,8 +287,7 @@ public:
 				testNode->setPosition(rayResult.second);
 				StringUtil::StrStreamType str;
 				str << "HIT: " << rayResult.second;
-				mDebugText = str.str();
-
+				
 				if (mKeyboard->isKeyDown(OIS::KC_SPACE))
 				{
 					Vector3 tsPos;
@@ -296,10 +295,15 @@ public:
 
 					size_t x = tsPos.x * (mTerrain->getSize()-1);
 					size_t y = tsPos.y * (mTerrain->getSize()-1);
-					float newheight = tsPos.z - 10;
+					float addedHeight = 250.0 * evt.timeSinceLastFrame;
+					float newheight = mTerrain->getHeightAtPoint(x, y) + addedHeight;
 
 					mTerrain->setHeightAtPoint(x, y, newheight);
+					mTerrain->update();
+
 				}
+				mDebugText = str.str();
+
 			}
 			else
 			{
@@ -310,6 +314,7 @@ public:
 			if (mKeyboard->isKeyDown(OIS::KC_U) && updateDelay <= 0)
 			{
 				mTerrain->update();
+				updateDelay = 0.3;
 			}
 			updateDelay -= evt.timeSinceLastFrame;
 		}
@@ -4300,7 +4305,7 @@ protected:
 		man->normal(0, 0, 1);
 		man->textureCoord(0, 1);
 
-		man->position(30, 30, 30);
+		man->position(90, 30, 30);
 		man->normal(0, 0, 1);
 		man->textureCoord(1, 0);
 
@@ -7946,31 +7951,38 @@ protected:
 
 		LogManager::getSingleton().setLogDetail(LL_BOREME);
 
+		Vector3 lightdir(0.55, -0.5, 0.75);
+		lightdir.normalise();
+
+
 		// Until material implemented
 		TerrainGlobalOptions::setMaxPixelError(8);
-		//TerrainGlobalOptions::setUseRayBoxDistanceCalculation(true);
+		TerrainGlobalOptions::setUseRayBoxDistanceCalculation(true);
+		//TerrainGlobalOptions::getDefaultMaterialGenerator()->setDebugLevel(1);
+		//TerrainGlobalOptions::setLightMapSize(256);
+		TerrainGlobalOptions::setLightMapDirection(lightdir);
 
 		Light* l = mSceneMgr->createLight("tstLight");
 		l->setType(Light::LT_DIRECTIONAL);
-		Vector3 dir(0.55, -0.5, 0.75);
-		dir.normalise();
-		l->setDirection(dir);
+		l->setDirection(lightdir);
 		l->setDiffuseColour(ColourValue::White);
 		l->setSpecularColour(ColourValue(0.4, 0.4, 0.4));
 
 		mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
 		mTerrain = OGRE_NEW Terrain(mSceneMgr);
+		
 
 		//mSceneMgr->showBoundingBoxes(true);
 
 		Image img;
 		img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		//img.load("terrain_flattened.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		//img.load("terrain_onehill.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
 		Terrain::ImportData imp;
 		imp.inputImage = &img;
-		imp.terrainSize = 513;
+		imp.terrainSize = 129;
 		imp.worldSize = 8000;
 		imp.inputScale = 600;
 		imp.minBatchSize = 33;
@@ -8047,15 +8059,15 @@ protected:
 		}
 		*/
 		
-		mCamera->setPosition(-2500,300,2500);
+		mCamera->setPosition(-4000,300,4000);
 		mCamera->lookAt(Vector3::ZERO);
 		mCamera->setNearClipDistance(5);
 		mCamera->setFarClipDistance(15000);
 
-		Ray tstRay(Vector3(-3999,600,3999), Vector3::NEGATIVE_UNIT_Y);
-		std::pair<bool, Vector3> res = mTerrain->rayIntersects(tstRay);
-
 		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
+
+
+
 
 
 	}
