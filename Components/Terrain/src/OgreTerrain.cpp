@@ -70,6 +70,8 @@ namespace Ogre
 	const uint8 Terrain::DERIVED_DATA_DELTAS = 1;
 	const uint8 Terrain::DERIVED_DATA_NORMALS = 2;
 	const uint8 Terrain::DERIVED_DATA_LIGHTMAP = 4;
+	// This MUST match the bitwise OR of all the types above with no extra bits!
+	const uint8 Terrain::DERIVED_DATA_ALL = 7;
 
 
 	//---------------------------------------------------------------------
@@ -1350,27 +1352,33 @@ namespace Ogre
 			}
 			else
 			{
-				mDerivedDataUpdateInProgress = true;
-				mDerivedUpdatePendingMask = 0;
-
-				DerivedDataRequest req;
-				req.terrain = this;
-				req.dirtyRect = mDirtyDerivedDataRect;
-				req.calcDeltas = (typeMask & DERIVED_DATA_DELTAS);
-				req.calcNormalMap = mNormalMapRequired && (typeMask & DERIVED_DATA_NORMALS);
-				req.calcLightMap = mLightMapRequired && (typeMask & DERIVED_DATA_LIGHTMAP);
-				req.calcHorizonMap = mHorizonMapRequired;
-
-				Root::getSingleton().getWorkQueue()->addRequest(
-					WORKQUEUE_CHANNEL, WORKQUEUE_DERIVED_DATA_REQUEST, 
-					Any(req), 0, synchronous);
-
+				updateDerivedDataImpl(mDirtyDerivedDataRect, synchronous, typeMask);
 				mDirtyDerivedDataRect.left = mDirtyDerivedDataRect.top = 
 					mDirtyDerivedDataRect.right = mDirtyDerivedDataRect.bottom = 0;
+
 			}
-
-
 		}
+
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::updateDerivedDataImpl(const Rect& rect, bool synchronous, uint8 typeMask)
+	{
+			mDerivedDataUpdateInProgress = true;
+			mDerivedUpdatePendingMask = 0;
+
+			DerivedDataRequest req;
+			req.terrain = this;
+			req.dirtyRect = rect;
+			req.typeMask = typeMask;
+			if (!mNormalMapRequired)
+				req.typeMask = req.typeMask & ~DERIVED_DATA_NORMALS;
+			if (!mLightMapRequired)
+				req.typeMask = req.typeMask & ~DERIVED_DATA_LIGHTMAP;
+
+			Root::getSingleton().getWorkQueue()->addRequest(
+				WORKQUEUE_CHANNEL, WORKQUEUE_DERIVED_DATA_REQUEST, 
+				Any(req), 0, synchronous);
 
 	}
 	//---------------------------------------------------------------------
@@ -2202,15 +2210,27 @@ namespace Ogre
 			return 0;
 
 		DerivedDataResponse ddres;
+		ddres.remainingTypeMask = ddr.typeMask & DERIVED_DATA_ALL;
 
-		if (ddr.calcDeltas)
+		// Do only ONE type of task per background iteration, in order of priority
+		// this means we return faster, can abort faster and we repeat less redundant calcs
+		// we don't do this as separate requests, because we only want one background
+		// task per Terrain instance in flight at once
+		if (ddr.typeMask & DERIVED_DATA_DELTAS)
+		{
 			ddres.deltaUpdateRect = calculateHeightDeltas(ddr.dirtyRect);
-
-		if (ddr.calcNormalMap)
+			ddres.remainingTypeMask &= ~ DERIVED_DATA_DELTAS;
+		}
+		else if (ddr.typeMask & DERIVED_DATA_NORMALS)
+		{
 			ddres.normalMapBox = calculateNormals(ddr.dirtyRect, ddres.normalUpdateRect);
-
-		if (ddr.calcLightMap)
+			ddres.remainingTypeMask &= ~ DERIVED_DATA_NORMALS;
+		}
+		else if (ddr.typeMask & DERIVED_DATA_LIGHTMAP)
+		{
 			ddres.lightMapBox = calculateLightmap(ddr.dirtyRect, ddres.lightmapUpdateRect);
+			ddres.remainingTypeMask &= ~ DERIVED_DATA_LIGHTMAP;
+		}
 
 		// TODO other data
 
@@ -2230,21 +2250,32 @@ namespace Ogre
 		if (ddreq.terrain != this)
 			return;
 
-		if (ddreq.calcDeltas)
+		if ((ddreq.typeMask & DERIVED_DATA_DELTAS) && 
+			!(ddres.remainingTypeMask & DERIVED_DATA_DELTAS))
 			finaliseHeightDeltas(ddres.deltaUpdateRect);
-		if (ddreq.calcNormalMap)
+		if ((ddreq.typeMask & DERIVED_DATA_NORMALS) && 
+			!(ddres.remainingTypeMask & DERIVED_DATA_NORMALS))
 			finaliseNormals(ddres.normalUpdateRect, ddres.normalMapBox);
-		if (ddreq.calcLightMap)
+		if ((ddreq.typeMask & DERIVED_DATA_LIGHTMAP) && 
+			!(ddres.remainingTypeMask & DERIVED_DATA_LIGHTMAP))
 			finaliseLightmap(ddres.lightmapUpdateRect, ddres.lightMapBox);
 		
 		// TODO other data
 
-
 		mDerivedDataUpdateInProgress = false;
+
+		// Re-trigger another request if there are still things to do, or if
+		// we had a new request since this one
+		Rect newRect(0,0,0,0);
+		if (ddres.remainingTypeMask)
+			newRect.merge(ddreq.dirtyRect);
 		if (mDerivedUpdatePendingMask)
+			newRect.merge(mDirtyDerivedDataRect);
+		uint8 newMask = ddres.remainingTypeMask | mDerivedUpdatePendingMask;
+		if (newMask)
 		{
 			// trigger again
-			updateDerivedData(false, mDerivedUpdatePendingMask);
+			updateDerivedDataImpl(newRect, false, newMask);
 		}
 
 	}
@@ -2639,6 +2670,16 @@ namespace Ogre
 				// release CPU copy, don't need it anymore
 				OGRE_FREE(mCpuLightmapStorage, MEMCATEGORY_RESOURCE);
 				mCpuLightmapStorage = 0;
+
+			}
+			else
+			{
+				// initialise to full-bright
+				Box box(0, 0, mLightmapSizeActual, mLightmapSizeActual);
+				HardwarePixelBufferSharedPtr buf = mLightmap->getBuffer();
+				uint8* pInit = static_cast<uint8*>(buf->lock(box, HardwarePixelBuffer::HBL_DISCARD).data);
+				memset(pInit, 255, mLightmapSizeActual * mLightmapSizeActual);
+				buf->unlock();
 
 			}
 		}

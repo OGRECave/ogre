@@ -739,6 +739,7 @@ namespace Ogre
 		static const uint8 DERIVED_DATA_DELTAS;
 		static const uint8 DERIVED_DATA_NORMALS;
 		static const uint8 DERIVED_DATA_LIGHTMAP;
+		static const uint8 DERIVED_DATA_ALL;
 
 		/** Updates derived data for the terrain (LOD, lighting) to reflect changed height data, in a separate
 		thread if threading is enabled (OGRE_THREAD_SUPPORT). 
@@ -1049,6 +1050,9 @@ namespace Ogre
 		void deriveUVMultipliers();
 		uint8 getBlendTextureCount(uint8 numLayers);
 		PixelFormat getBlendTextureFormat(uint8 textureIndex, uint8 numLayers);
+
+		void updateDerivedDataImpl(const Rect& rect, bool synchronous, uint8 typeMask);
+
 		
 
 		SceneManager* mSceneMgr;
@@ -1086,10 +1090,8 @@ namespace Ogre
 		struct DerivedDataRequest
 		{
 			Terrain* terrain;
-			bool calcDeltas;
-			bool calcNormalMap;
-			bool calcLightMap;
-			bool calcHorizonMap;
+			// types requested
+			uint8 typeMask;
 			Rect dirtyRect;
 			_OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const DerivedDataRequest& r)
 			{ return o; }		
@@ -1099,6 +1101,8 @@ namespace Ogre
 		struct DerivedDataResponse
 		{
 			Terrain* terrain;
+			// remaining types not yet processed
+			uint8 remainingTypeMask;
 			// The area of deltas that was updated
 			Rect deltaUpdateRect;
 			// the area of normals that was updated
