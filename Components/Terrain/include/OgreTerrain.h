@@ -1029,6 +1029,7 @@ namespace Ogre
 		void createOrDestroyGPUNormalMap();
 		void createOrDestroyGPUColourMap();
 		void createOrDestroyGPULightmap();
+		void waitForDerivedProcesses();
 		/** Get a Vector3 of the world-space point on the terrain, aligned Y-up always.
 		@note This point is relative to Terrain::getPosition
 		*/

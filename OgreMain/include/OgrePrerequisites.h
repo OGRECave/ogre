@@ -181,6 +181,8 @@ namespace Ogre {
 		#define OGRE_THREAD_POINTER_SET(var, expr) var.reset(expr)
 		#define OGRE_THREAD_POINTER_DELETE(var) var.reset(0)
 		#define OGRE_THREAD_POINTER_GET(var) var.get()
+		// Utility
+		#define OGRE_THREAD_SLEEP(ms) boost::this_thread::sleep(boost::posix_time::millisec(ms));
 	#else
 		#define OGRE_AUTO_MUTEX
 		#define OGRE_LOCK_AUTO_MUTEX
@@ -204,6 +206,7 @@ namespace Ogre {
 		#define OGRE_THREAD_POINTER_SET(var, expr) var = expr
 		#define OGRE_THREAD_POINTER_DELETE(var) OGRE_DELETE var; var = 0
 		#define OGRE_THREAD_POINTER_GET(var) var
+		#define OGRE_THREAD_SLEEP(ms)
 	#endif
 
 

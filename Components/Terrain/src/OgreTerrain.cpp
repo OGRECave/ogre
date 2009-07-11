@@ -154,11 +154,8 @@ namespace Ogre
 	Terrain::~Terrain()
 	{
 		mDerivedUpdatePendingMask = 0;
+		waitForDerivedProcesses();
 		WorkQueue* wq = Root::getSingleton().getWorkQueue();
-		while (mDerivedDataUpdateInProgress)
-		{
-			// we need to wait for this to finish
-		}
 		wq->removeRequestHandler(WORKQUEUE_CHANNEL, this);
 		wq->removeResponseHandler(WORKQUEUE_CHANNEL, this);	
 
@@ -206,6 +203,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::save(StreamSerialiser& stream)
 	{
+		// wait for any queued processes to finish
+		waitForDerivedProcesses();
+
 		stream.writeChunkBegin(TERRAIN_CHUNK_ID, TERRAIN_CHUNK_VERSION);
 
 		uint8 align = (uint8)mAlign;
@@ -1370,6 +1370,17 @@ namespace Ogre
 			}
 
 
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::waitForDerivedProcesses()
+	{
+		while (mDerivedDataUpdateInProgress)
+		{
+			// we need to wait for this to finish
+			OGRE_THREAD_SLEEP(50)
+			Root::getSingleton().getWorkQueue()->processResponses();
 		}
 
 	}
