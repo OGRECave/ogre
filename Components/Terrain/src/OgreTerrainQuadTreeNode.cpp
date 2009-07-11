@@ -642,18 +642,13 @@ namespace Ogre
 		Vector3 skirtOffset;
 		mTerrain->getVector(0, 0, -mTerrain->getSkirtSize(), &skirtOffset);
 
-		// clamp to skirt spacing (round up)
+		// skirt rows
+		// clamp rows to skirt spacing (round up)
 		long skirtStartX = rect.left;
-		if (skirtStartX % skirtSpacing)
-			skirtStartX += skirtSpacing - (skirtStartX % skirtSpacing);
 		long skirtStartY = rect.top;
 		if (skirtStartY % skirtSpacing)
 			skirtStartY += skirtSpacing - (skirtStartY % skirtSpacing);
-		skirtStartX = std::max(skirtStartX, (long)mOffsetX);
 		skirtStartY = std::max(skirtStartY, (long)mOffsetY);
-
-		
-		// skirt rows
 		pBaseHeight = mTerrain->getHeightData(skirtStartX, skirtStartY);
 		if (!posbuf.isNull())
 		{
@@ -662,7 +657,7 @@ namespace Ogre
 				* mVertexDataRecord->size * mVertexDataRecord->size;
 			// move it onwards to skip the skirts we don't need to update
 			pRowPosBuf += destPosRowSkip * (skirtStartY - mOffsetY) / skirtSpacing;
-			pRowPosBuf += posbuf->getVertexSize() * (skirtStartX - mOffsetX) / skirtSpacing;
+			pRowPosBuf += posbuf->getVertexSize() * (skirtStartX - mOffsetX);
 		}
 		if (!deltabuf.isNull())
 		{
@@ -671,7 +666,7 @@ namespace Ogre
 				* mVertexDataRecord->size * mVertexDataRecord->size;
 			// move it onwards to skip the skirts we don't need to update
 			pRowDeltaBuf += destDeltaRowSkip * (skirtStartY - mOffsetY) / skirtSpacing;
-			pRowDeltaBuf += deltabuf->getVertexSize() * (skirtStartX - mOffsetX) / skirtSpacing;
+			pRowDeltaBuf += deltabuf->getVertexSize() * (skirtStartX - mOffsetX);
 		}
 		for (uint16 y = skirtStartY; y < rect.bottom; y += skirtSpacing)
 		{
@@ -714,6 +709,12 @@ namespace Ogre
 				pRowDeltaBuf += destDeltaRowSkip;
 		}
 		// skirt cols
+		// clamp cols to skirt spacing (round up)
+		skirtStartX = rect.left;
+		if (skirtStartX % skirtSpacing)
+			skirtStartX += skirtSpacing - (skirtStartX % skirtSpacing);
+		skirtStartY = rect.top;
+		skirtStartX = std::max(skirtStartX, (long)mOffsetX);
 		if (!posbuf.isNull())
 		{
 			// position dest buffer just after the main vertex data and skirt rows
@@ -723,7 +724,7 @@ namespace Ogre
 			pRowPosBuf += mVertexDataRecord->numSkirtRowsCols * mVertexDataRecord->size * posbuf->getVertexSize();
 			// move it onwards to skip the skirts we don't need to update
 			pRowPosBuf += destPosRowSkip * (skirtStartX - mOffsetX) / skirtSpacing;
-			pRowPosBuf += posbuf->getVertexSize() * (skirtStartY - mOffsetY) / skirtSpacing;
+			pRowPosBuf += posbuf->getVertexSize() * (skirtStartY - mOffsetY);
 		}
 		if (!deltabuf.isNull())
 		{
@@ -734,7 +735,7 @@ namespace Ogre
 			pRowDeltaBuf += mVertexDataRecord->numSkirtRowsCols * mVertexDataRecord->size * deltabuf->getVertexSize();
 			// move it onwards to skip the skirts we don't need to update
 			pRowDeltaBuf += destDeltaRowSkip * (skirtStartX - mOffsetX) / skirtSpacing;
-			pRowDeltaBuf += deltabuf->getVertexSize() * (skirtStartY - mOffsetY) / skirtSpacing;
+			pRowDeltaBuf += deltabuf->getVertexSize() * (skirtStartY - mOffsetY);
 		}
 		
 		for (uint16 x = skirtStartX; x < rect.right; x += skirtSpacing)
