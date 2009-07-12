@@ -7957,7 +7957,7 @@ protected:
 
 		// Until material implemented
 		TerrainGlobalOptions::setMaxPixelError(8);
-		TerrainGlobalOptions::setUseRayBoxDistanceCalculation(true);
+		//TerrainGlobalOptions::setUseRayBoxDistanceCalculation(true);
 		//TerrainGlobalOptions::getDefaultMaterialGenerator()->setDebugLevel(1);
 		//TerrainGlobalOptions::setLightMapSize(256);
 		TerrainGlobalOptions::setLightMapDirection(lightdir);
