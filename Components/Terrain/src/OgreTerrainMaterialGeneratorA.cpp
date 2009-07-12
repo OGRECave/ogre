@@ -458,8 +458,8 @@ namespace Ogre
 
 		if (prof->getParent()->getDebugLevel())
 		{
-			// x == LOD level
-			outStream << "lodInfo.x = lodMorph.y / " << terrain->getNumLodLevels() << ";\n";
+			// x == LOD level (-1 since value is target level, we want to display actual)
+			outStream << "lodInfo.x = (lodMorph.y - 1) / " << terrain->getNumLodLevels() << ";\n";
 			// y == LOD morph
 			outStream << "lodInfo.y = toMorph * lodMorph.x;\n";
 		}

@@ -53,7 +53,11 @@ namespace Ogre
 		, mBaseLod(lod)
 		, mDepth(depth)
 		, mQuadrant(quadrant)
-        , mCurrentLod(75)
+		, mBoundingRadius(0)
+        , mCurrentLod(-1)
+		, mLodTransition(0)
+		, mChildWithMaxHeightDelta(0)
+		, mSelfOrChildRendered(false)
 		, mNodeWithVertexData(0)
 		, mVertexDataRecord(0)
 		, mMovable(0)
@@ -324,7 +328,7 @@ namespace Ogre
 				// make sure that our highest delta value is greater than all children's
 				// otherwise we could have some crossover problems
 				// for a non-leaf, there is only one LOD level
-				mLodLevels[0]->calcMaxHeightDelta = std::max(mLodLevels[0]->calcMaxHeightDelta, maxChildDelta);
+				mLodLevels[0]->calcMaxHeightDelta = std::max(mLodLevels[0]->calcMaxHeightDelta, maxChildDelta * (Real)1.05);
 				mChildWithMaxHeightDelta = childWithMaxHeightDelta;
 
 			}
@@ -337,7 +341,7 @@ namespace Ogre
 					// otherwise it won't come into affect further back like it should!
 					mLodLevels[i+1]->calcMaxHeightDelta = 
 						std::max(mLodLevels[i+1]->calcMaxHeightDelta, 
-							mLodLevels[i]->calcMaxHeightDelta);
+							mLodLevels[i]->calcMaxHeightDelta * (Real)1.05);
 				}
 
 			}
@@ -1155,11 +1159,13 @@ namespace Ogre
 		mSelfOrChildRendered = false;
 
 		// early-out
+		/* disable this, could cause 'jumps' in LOD as children go out of frustum
 		if (!cam->isVisible(mMovable->getWorldBoundingBox(true)))
 		{
 			mCurrentLod = -1;
 			return mSelfOrChildRendered;
 		}
+		*/
 
 		// Check children first
 		int childRenderedCount = 0;
@@ -1175,6 +1181,7 @@ namespace Ogre
 
 		if (childRenderedCount == 0)
 		{
+
 			// no children were within their LOD ranges, so we should consider our own
 			Vector3 localPos = cam->getDerivedPosition() - mLocalCentre;
 			Real dist;

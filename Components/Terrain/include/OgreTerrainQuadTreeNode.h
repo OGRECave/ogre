@@ -142,7 +142,8 @@ namespace Ogre
 			/// The cFactor value used to calculate transitionDist
 			Real lastCFactor;
 
-			LodLevel() : cpuIndexData(0), gpuIndexData(0), lastTransitionDist(0), lastCFactor(0) {}
+			LodLevel() : cpuIndexData(0), gpuIndexData(0), maxHeightDelta(0), calcMaxHeightDelta(0),
+				lastTransitionDist(0), lastCFactor(0) {}
 		};
 		typedef vector<LodLevel*>::type LodLevelList;
 
