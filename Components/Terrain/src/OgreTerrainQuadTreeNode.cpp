@@ -423,7 +423,8 @@ namespace Ogre
 		createCpuIndexData();
 	}
 	//---------------------------------------------------------------------
-	void TerrainQuadTreeNode::updateVertexData(bool positions, bool deltas, const Rect& rect)
+	void TerrainQuadTreeNode::updateVertexData(bool positions, bool deltas, 
+		const Rect& rect, bool cpuData)
 	{
 		if (rect.left <= mBoundaryX || rect.right > mOffsetX
 			|| rect.top <= mBoundaryY || rect.bottom > mOffsetY)
@@ -443,10 +444,12 @@ namespace Ogre
 				// if so, destroy it to free RAM, this should be fast enough to 
 				// to direct
 				HardwareVertexBufferSharedPtr posbuf, deltabuf;
+				VertexData* targetVertexData = cpuData ?
+					mVertexDataRecord->cpuVertexData : mVertexDataRecord->gpuVertexData;
 				if (positions) 
-					posbuf = mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(POSITION_BUFFER);
+					posbuf = targetVertexData->vertexBufferBinding->getBuffer(POSITION_BUFFER);
 				if (deltas)
-					deltabuf = mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(DELTA_BUFFER);
+					deltabuf = targetVertexData->vertexBufferBinding->getBuffer(DELTA_BUFFER);
 				updateVertexBuffer(posbuf, deltabuf, updateRect);
 			}
 
@@ -454,7 +457,7 @@ namespace Ogre
 			if (!isLeaf())
 			{
 				for (int i = 0; i < 4; ++i)
-					mChildren[i]->updateVertexData(positions, deltas, rect);
+					mChildren[i]->updateVertexData(positions, deltas, rect, cpuData);
 
 			}
 

@@ -187,7 +187,7 @@ namespace Ogre
 
 		/** Tell the node to update its vertex data for a given region. 
 		*/
-		void updateVertexData(bool positions, bool deltas, const Rect& rect);
+		void updateVertexData(bool positions, bool deltas, const Rect& rect, bool cpuData);
 
 
 

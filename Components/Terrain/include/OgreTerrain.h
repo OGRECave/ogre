@@ -382,8 +382,22 @@ namespace Ogre
 
 		};
 
-		/// Save terrain data in native form
+		/** Save terrain data in native form to a standalone file
+		@note
+			This is a fairly basic way of saving the terrain, to save to a
+			file in the resource system, or to insert the terrain data into a
+			shared file, use the StreamSerialiser form.
+		*/
+		void save(const String& filename);
+		/// Save terrain data in native form to a serializing stream
 		void save(StreamSerialiser& stream);
+		/** Prepare the terrain from a standalone file.
+		@note
+		This is safe to do in a background thread as it creates no GPU resources.
+		It reads data from a native terrain data chunk. For more advanced uses, 
+		such as loading from a shared file, use the StreamSerialiser form.
+		*/
+		bool prepare(const String& filename);
 		/** Prepare terrain data from saved data.
 		@remarks
 			This is safe to do in a background thread as it creates no GPU resources.
@@ -398,6 +412,20 @@ namespace Ogre
 			This method may be called in a background thread.
 		*/
 		bool prepare(const ImportData& importData);
+
+		/** Prepare and load the terrain in one simple call from a standalone file.
+		@note
+			This method must be called from the primary render thread. To load data
+			in a background thread, use the prepare() method.
+		*/
+		void load(const String& filename);
+
+		/** Prepare and load the terrain in one simple call from a stream.
+		@note
+		This method must be called from the primary render thread. To load data
+		in a background thread, use the prepare() method.
+		*/
+		void load(StreamSerialiser& stream);
 
 		/** Load the terrain based on the data already populated via prepare methods. 
 		@remarks
@@ -780,8 +808,9 @@ namespace Ogre
 		them safe to perform in a background thread. This call promotes those
 		calculations to the runtime values, and must be called in the main thread.
 		@param rect Rectangle describing the area to finalise 
+		@param cpuData When updating vertex data, update the CPU copy (background)
 		*/
-		void finaliseHeightDeltas(const Rect& rect);
+		void finaliseHeightDeltas(const Rect& rect, bool cpuData);
 
 		/** Calculate (or recalculate) the normals on the terrain
 		@param rect Rectangle describing the area of heights that were changed

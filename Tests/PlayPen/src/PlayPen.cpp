@@ -7944,14 +7944,14 @@ protected:
 
 	}
 
-	void testNewTerrain()
+	void testNewTerrain(bool loadTerrain = false, bool saveTerrain = false, const String& filename = "testTerrain.dat")
 	{
 		MaterialManager::getSingleton().setDefaultTextureFiltering(TFO_ANISOTROPIC);
 		MaterialManager::getSingleton().setDefaultAnisotropy(7);
 
 		LogManager::getSingleton().setLogDetail(LL_BOREME);
 
-		Vector3 lightdir(0.55, -0.5, 0.75);
+		Vector3 lightdir(0.55, -0.3, 0.75);
 		lightdir.normalise();
 
 
@@ -7974,73 +7974,79 @@ protected:
 		
 
 		//mSceneMgr->showBoundingBoxes(true);
-
-		Image img;
-		img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		//img.load("terrain_flattened.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		//img.load("terrain_onehill.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-
-		Terrain::ImportData imp;
-		imp.inputImage = &img;
-		imp.terrainSize = 129;
-		imp.worldSize = 8000;
-		imp.inputScale = 600;
-		imp.minBatchSize = 33;
-		imp.maxBatchSize = 65;
-		// textures
-		imp.layerList.resize(3);
-		imp.layerList[0].worldSize = 100;
-		imp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
-		imp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
-		imp.layerList[1].worldSize = 30;
-		imp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
-		imp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
-		imp.layerList[2].worldSize = 200;
-		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
-		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
-		mTerrain->prepare(imp);
-		mTerrain->load();
-
-		TerrainLayerBlendMap* blendMap0 = mTerrain->getLayerBlendMap(1);
-		TerrainLayerBlendMap* blendMap1 = mTerrain->getLayerBlendMap(2);
-		Real minHeight0 = 70;
-		Real fadeDist0 = 40;
-		Real minHeight1 = 70;
-		Real fadeDist1 = 15;
-		Ogre::uint8* pBlend0 = blendMap0->getBlendPointer();
-		Ogre::uint8* pBlend1 = blendMap1->getBlendPointer();
-		for (Ogre::uint16 y = 0; y < mTerrain->getLayerBlendMapSize(); ++y)
+		if (loadTerrain)
 		{
-			for (Ogre::uint16 x = 0; x < mTerrain->getLayerBlendMapSize(); ++x)
-			{
-				Real tx, ty;
-
-				blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
-				Real height = mTerrain->getHeightAtTerrainPosition(tx, ty);
-				Real val = (height - minHeight0) / fadeDist0;
-				val = Math::Clamp(val, (Real)0, (Real)1);
-				//*pBlend0++ = val * 255;
-
-				val = (height - minHeight1) / fadeDist1;
-				val = Math::Clamp(val, (Real)0, (Real)1);
-				*pBlend1++ = val * 255;
-
-
-			}
+			mTerrain->load(filename);
 		}
-		blendMap0->dirty();
-		blendMap1->dirty();
-		//blendMap0->loadImage("blendmap1.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		blendMap0->update();
-		blendMap1->update();
+		else
+		{
+			Image img;
+			img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+			//img.load("terrain_flattened.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+			//img.load("terrain_onehill.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-		/*
-		// set up a colour map
-		mTerrain->setGlobalColourMapEnabled(true);
-		Image colourMap;
-		colourMap.load("testcolourmap.jpg", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		mTerrain->getGlobalColourMap()->loadImage(colourMap);
-		*/
+			Terrain::ImportData imp;
+			imp.inputImage = &img;
+			imp.terrainSize = 513;
+			imp.worldSize = 8000;
+			imp.inputScale = 600;
+			imp.minBatchSize = 33;
+			imp.maxBatchSize = 65;
+			// textures
+			imp.layerList.resize(3);
+			imp.layerList[0].worldSize = 100;
+			imp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
+			imp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
+			imp.layerList[1].worldSize = 30;
+			imp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
+			imp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
+			imp.layerList[2].worldSize = 200;
+			imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
+			imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
+			mTerrain->prepare(imp);
+			mTerrain->load();
+
+			TerrainLayerBlendMap* blendMap0 = mTerrain->getLayerBlendMap(1);
+			TerrainLayerBlendMap* blendMap1 = mTerrain->getLayerBlendMap(2);
+			Real minHeight0 = 70;
+			Real fadeDist0 = 40;
+			Real minHeight1 = 70;
+			Real fadeDist1 = 15;
+			Ogre::uint8* pBlend0 = blendMap0->getBlendPointer();
+			Ogre::uint8* pBlend1 = blendMap1->getBlendPointer();
+			for (Ogre::uint16 y = 0; y < mTerrain->getLayerBlendMapSize(); ++y)
+			{
+				for (Ogre::uint16 x = 0; x < mTerrain->getLayerBlendMapSize(); ++x)
+				{
+					Real tx, ty;
+
+					blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
+					Real height = mTerrain->getHeightAtTerrainPosition(tx, ty);
+					Real val = (height - minHeight0) / fadeDist0;
+					val = Math::Clamp(val, (Real)0, (Real)1);
+					//*pBlend0++ = val * 255;
+
+					val = (height - minHeight1) / fadeDist1;
+					val = Math::Clamp(val, (Real)0, (Real)1);
+					*pBlend1++ = val * 255;
+
+
+				}
+			}
+			blendMap0->dirty();
+			blendMap1->dirty();
+			//blendMap0->loadImage("blendmap1.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+			blendMap0->update();
+			blendMap1->update();
+
+			/*
+			// set up a colour map
+			mTerrain->setGlobalColourMapEnabled(true);
+			Image colourMap;
+			colourMap.load("testcolourmap.jpg", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+			mTerrain->getGlobalColourMap()->loadImage(colourMap);
+			*/
+		}
 
 		//addTextureDebugOverlay(TextureManager::getSingleton().getByName(mTerrain->getBlendTextureName(0)), 0);
 
@@ -8065,6 +8071,12 @@ protected:
 		mCamera->setFarClipDistance(15000);
 
 		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
+
+		if (saveTerrain)
+		{
+			mTerrain->save(filename);
+		}
+
 
 
 
@@ -8248,6 +8260,7 @@ protected:
         //testLod();
 		//testSharedGpuParameters();
 		testNewTerrain();
+		//testNewTerrain(true);
 		//testImageCombine();
 
 

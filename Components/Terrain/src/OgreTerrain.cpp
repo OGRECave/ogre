@@ -203,6 +203,20 @@ namespace Ogre
 			return mQuadTree->getBoundingRadius();
 	}
 	//---------------------------------------------------------------------
+	void Terrain::save(const String& filename)
+	{
+		std::fstream fs;
+		fs.open(filename.c_str(), std::ios::out | std::ios::binary);
+		if (!fs)
+			OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, 
+				"Can't open " + filename + " for writing", __FUNCTION__);
+
+		DataStreamPtr stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename, &fs, false));
+		StreamSerialiser ser(stream);
+		save(ser);
+
+	}
+	//---------------------------------------------------------------------
 	void Terrain::save(StreamSerialiser& stream)
 	{
 		// wait for any queued processes to finish
@@ -366,7 +380,7 @@ namespace Ogre
 		else
 		{
 			uint8* tmpData = (uint8*)OGRE_MALLOC(mLightmapSize * mLightmapSize, MEMCATEGORY_GENERAL);
-			PixelBox dst(mSize, mSize, 1, PF_L8, tmpData);
+			PixelBox dst(mLightmapSize, mLightmapSize, 1, PF_L8, tmpData);
 			mLightmap->getBuffer()->blitToMemory(dst);
 			stream.write(tmpData, mLightmapSize * mLightmapSize);
 			OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
@@ -377,6 +391,30 @@ namespace Ogre
 		// TODO - write depths
 
 		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
+	}
+	//---------------------------------------------------------------------
+	bool Terrain::prepare(const String& filename)
+	{
+		DataStreamPtr stream;
+		if (ResourceGroupManager::getSingleton().resourceExists(
+				ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, filename))
+		{
+			stream = ResourceGroupManager::getSingleton().openResource(
+				filename, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		}
+		else
+		{
+			// try direct
+			std::ifstream *ifs = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL);
+			ifs->open(filename.c_str(), std::ios::in | std::ios::binary);
+			if(!*ifs)
+				OGRE_EXCEPT(
+				Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!", __FUNCTION__);
+			stream.bind(OGRE_NEW FileStreamDataStream(filename, ifs));
+		}
+
+		StreamSerialiser ser(stream);
+		return prepare(ser);
 	}
 	//---------------------------------------------------------------------
 	bool Terrain::prepare(StreamSerialiser& stream)
@@ -392,6 +430,7 @@ namespace Ogre
 		uint8 align;
 		stream.read(&align);
 		mAlign = (Alignment)align;
+		stream.read(&mSize);
 		stream.read(&mWorldSize);
 
 		stream.read(&mMaxBatchSize);
@@ -442,6 +481,8 @@ namespace Ogre
 			stream.readChunkEnd(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID);
 		}
 		stream.readChunkEnd(TERRAINLAYERDECLARATION_CHUNK_ID);
+		checkDeclaration();
+
 
 		// Layers
 		uint8 numLayers;
@@ -526,7 +567,7 @@ namespace Ogre
 		rect.top = 0; rect.bottom = mSize;
 		rect.left = 0; rect.right = mSize;
 		calculateHeightDeltas(rect);
-		finaliseHeightDeltas(rect);
+		finaliseHeightDeltas(rect, true);
 
 		distributeVertexData();
 
@@ -647,7 +688,7 @@ namespace Ogre
 		rect.top = 0; rect.bottom = mSize;
 		rect.left = 0; rect.right = mSize;
 		calculateHeightDeltas(rect);
-		finaliseHeightDeltas(rect);
+		finaliseHeightDeltas(rect, true);
 
 		distributeVertexData();
 
@@ -827,6 +868,26 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void Terrain::load(const String& filename)
+	{
+		if (prepare(filename))
+			load();
+		else
+			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+			"Error while preparing " + filename + ", see log for details", 
+			__FUNCTION__);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::load(StreamSerialiser& stream)
+	{
+		if (prepare(stream))
+			load();
+		else
+			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+			"Error while preparing from stream, see log for details", 
+			__FUNCTION__);
+	}
+	//---------------------------------------------------------------------
 	void Terrain::load()
 	{
 		if (mQuadTree)
@@ -834,17 +895,11 @@ namespace Ogre
 		
 		checkLayers(true);
 		createOrDestroyGPUColourMap();
+		createOrDestroyGPUNormalMap();
+		createOrDestroyGPULightmap();
 		
 		mMaterialGenerator->requestOptions(this);
 
-		// Upload loaded normal data if present
-		if (mCpuTerrainNormalMap)
-		{
-			mTerrainNormalMap->getBuffer()->blitFromMemory(*mCpuTerrainNormalMap);
-			OGRE_FREE(mCpuTerrainNormalMap->data, MEMCATEGORY_GENERAL);
-			OGRE_DELETE mCpuTerrainNormalMap;
-			mCpuTerrainNormalMap = 0;
-		}
 	}
 	//---------------------------------------------------------------------
 	void Terrain::unload()
@@ -1334,7 +1389,7 @@ namespace Ogre
 	{
 		if (mDirtyGeometryRect.width() && mDirtyGeometryRect.height())
 		{
-			mQuadTree->updateVertexData(true, false, mDirtyGeometryRect);
+			mQuadTree->updateVertexData(true, false, mDirtyGeometryRect, false);
 			mDirtyGeometryRect.left = mDirtyGeometryRect.top = 
 				mDirtyGeometryRect.right = mDirtyGeometryRect.bottom = 0;
 		}
@@ -1631,7 +1686,7 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void Terrain::finaliseHeightDeltas(const Rect& rect)
+	void Terrain::finaliseHeightDeltas(const Rect& rect, bool cpuData)
 	{
 
 		Rect clampedRect(rect);
@@ -1643,7 +1698,7 @@ namespace Ogre
 		// min/max information
 		mQuadTree->finaliseDeltaValues(clampedRect);
 		// delta vertex data
-		mQuadTree->updateVertexData(false, true, clampedRect);
+		mQuadTree->updateVertexData(false, true, clampedRect, cpuData);
 
 	}
 
@@ -2079,6 +2134,16 @@ namespace Ogre
 			mTerrainNormalMap = TextureManager::getSingleton().createManual(
 				mMaterialName + "/nm", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
 				TEX_TYPE_2D, mSize, mSize, 1, 0, PF_BYTE_RGB);
+
+			// Upload loaded normal data if present
+			if (mCpuTerrainNormalMap)
+			{
+				mTerrainNormalMap->getBuffer()->blitFromMemory(*mCpuTerrainNormalMap);
+				OGRE_FREE(mCpuTerrainNormalMap->data, MEMCATEGORY_GENERAL);
+				OGRE_DELETE mCpuTerrainNormalMap;
+				mCpuTerrainNormalMap = 0;
+			}
+
 		}
 		else if (!mNormalMapRequired && !mTerrainNormalMap.isNull())
 		{
@@ -2252,7 +2317,7 @@ namespace Ogre
 
 		if ((ddreq.typeMask & DERIVED_DATA_DELTAS) && 
 			!(ddres.remainingTypeMask & DERIVED_DATA_DELTAS))
-			finaliseHeightDeltas(ddres.deltaUpdateRect);
+			finaliseHeightDeltas(ddres.deltaUpdateRect, false);
 		if ((ddreq.typeMask & DERIVED_DATA_NORMALS) && 
 			!(ddres.remainingTypeMask & DERIVED_DATA_NORMALS))
 			finaliseNormals(ddres.normalUpdateRect, ddres.normalMapBox);
