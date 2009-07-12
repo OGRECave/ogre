@@ -53,7 +53,7 @@ namespace Ogre
 		, mBaseLod(lod)
 		, mDepth(depth)
 		, mQuadrant(quadrant)
-        , mCurrentLod(-1)
+        , mCurrentLod(75)
 		, mNodeWithVertexData(0)
 		, mVertexDataRecord(0)
 		, mMovable(0)
@@ -596,6 +596,8 @@ namespace Ogre
 				if (pPosBuf)
 				{
 					mTerrain->getPoint(x, y, *pHeight, &pos);
+					// Update bounds *before* making relative
+					mergeIntoBounds(x, y, pos);
 					// relative to local centre
 					pos -= mLocalCentre;
 
@@ -610,8 +612,6 @@ namespace Ogre
 					*pPosBuf++ = x * uvScale;
 					*pPosBuf++ = 1.0 - (y * uvScale);
 
-					// Update bounds
-					mergeIntoBounds(x, y, pos);
 				}
 
 				if (pDeltaBuf)
@@ -1193,8 +1193,7 @@ namespace Ogre
 			else
 			{
 				// distance to tile centre
-				Vector3 diff = mAABB.getCenter() - localPos;
-				dist = diff.length();
+				dist = localPos.length();
 				// deduct half the radius of the box, assume that on average the 
 				// worst case is best approximated by this
 				dist -= (mBoundingRadius * 0.5);
