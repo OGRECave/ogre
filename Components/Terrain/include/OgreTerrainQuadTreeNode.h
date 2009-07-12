@@ -245,11 +245,11 @@ namespace Ogre
 		/// Returns whether this node or its children are being rendered at the current LOD level
 		bool isSelfOrChildRenderedAtCurrentLod() const;
 		/// Manually set the current LOD, intended for internal use only
-		void setCurrentLod(int lod) { mCurrentLod = lod; }
+		void setCurrentLod(int lod);
 		/// Get the transition state between the current LOD and the next lower one (only valid after calculateCurrentLod)
 		float getLodTransition() const { return mLodTransition; }
 		/// Manually set the current LOD transition state, intended for internal use only
-		void setLodTransition(float t) { mLodTransition = t; }
+		void setLodTransition(float t);
 
 		/// Buffer binding used for holding positions
 		static unsigned short POSITION_BUFFER;

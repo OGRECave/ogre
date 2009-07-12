@@ -1325,6 +1325,20 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::setCurrentLod(int lod)
+	{
+		 mCurrentLod = lod;
+		 mRend->setCustomParameter(Terrain::LOD_MORPH_CUSTOM_PARAM, 
+			 Vector4(mLodTransition, mCurrentLod + mBaseLod + 1, 0, 0));
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::setLodTransition(float t)
+	{
+		mLodTransition = t; 						
+		mRend->setCustomParameter(Terrain::LOD_MORPH_CUSTOM_PARAM, 
+			Vector4(mLodTransition, mCurrentLod + mBaseLod + 1, 0, 0));
+	}
+	//---------------------------------------------------------------------
 	bool TerrainQuadTreeNode::isRenderedAtCurrentLod() const
 	{
 		return mCurrentLod != -1;
