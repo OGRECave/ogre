@@ -94,9 +94,12 @@ endif ()
 configure_file(${OGRE_TEMPLATES_DIR}/buildsettings.h.in ${OGRE_BINARY_DIR}/include/buildsettings.h @ONLY)
 install(FILES ${OGRE_BINARY_DIR}/include/buildsettings.h DESTINATION include/OGRE)
 
-# Install OgreConfig.h file
-# This used to add HAVE_OGRE_BUILDSETTINGS_H to the top, which is a duplicate of adding -DHAVE_OGRE_BUILDSETTINGS_H
-install(FILES ${OGRE_SOURCE_DIR}/OgreMain/include/OgreConfig.h DESTINATION include/OGRE)
+# Read contents of the OgreConfig.h file
+file(READ "${OGRE_SOURCE_DIR}/OgreMain/include/OgreConfig.h" OGRE_CONFIG_H)
+# add HAVE_OGRE_BUILDSETTINGS_H preprocessor define
+file(WRITE ${OGRE_BINARY_DIR}/include/OgreConfig.h "#define HAVE_OGRE_BUILDSETTINGS_H\n${OGRE_CONFIG_H}")
+install(FILES ${OGRE_BINARY_DIR}/include/OgreConfig.h DESTINATION include/OGRE)
+
 
 # Create the pkg-config package files on Unix systems
 if (UNIX)
