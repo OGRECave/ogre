@@ -61,7 +61,6 @@ namespace Ogre {
 
             bool createFramebuffer();
             void destroyFramebuffer();
-            void prepareForNewFrame(void);
 
             /* The pixel dimensions of the backbuffer */
             GLint mBackingWidth;

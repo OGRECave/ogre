@@ -256,6 +256,9 @@ namespace Ogre {
         // Blending support
         rsc->setCapability(RSC_BLENDING);
 
+        // DOT3 support is standard
+        rsc->setCapability(RSC_DOT3);
+        
         // Point size
         float ps;
         glGetFloatv(GL_POINT_SIZE_MAX, &ps);
@@ -1478,10 +1481,6 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
                         "Cannot begin frame - no viewport selected.",
                         "GLESRenderSystem::_beginFrame");
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-        dynamic_cast<EAGLESContext *>(mMainContext)->prepareForNewFrame();
-#endif
 
         if(mCurrentCapabilities->hasCapability(RSC_SCISSOR_TEST)) {
             glEnable(GL_SCISSOR_TEST);

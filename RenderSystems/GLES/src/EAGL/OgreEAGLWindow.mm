@@ -168,6 +168,8 @@ namespace Ogre {
                         __FUNCTION__);
         }
         
+        mView.opaque = YES;
+
         eaglLayer = (CAEAGLLayer *)mView.layer;
         
         eaglLayer.opaque = YES;

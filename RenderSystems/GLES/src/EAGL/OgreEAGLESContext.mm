@@ -31,7 +31,7 @@ Torus Knot Software Ltd.
 #include "OgreGLESRenderSystem.h"
 #include "OgreRoot.h"
 
-// TODO: DJR - Add support for EAGLSharegroups
+// TODO: DJR - Add support for EAGLSharegroups if deemed necessary
 namespace Ogre {
     EAGLESContext::EAGLESContext(CAEAGLLayer *drawable)
         : 
@@ -126,23 +126,16 @@ namespace Ogre {
 
     void EAGLESContext::destroyFramebuffer()
     {
-
         glDeleteFramebuffersOES(1, &mViewFramebuffer);
         mViewFramebuffer = 0;
         glDeleteRenderbuffersOES(1, &mViewRenderbuffer);
         mViewRenderbuffer = 0;
         
-        if(mDepthRenderbuffer) {
+        if(mDepthRenderbuffer)
+        {
             glDeleteRenderbuffersOES(1, &mDepthRenderbuffer);
             mDepthRenderbuffer = 0;
         }
-    }
-
-    void EAGLESContext::prepareForNewFrame()
-    {
-        [EAGLContext setCurrentContext:mContext];
-        glBindFramebufferOES(GL_FRAMEBUFFER_OES, mViewFramebuffer);
-        GL_CHECK_ERROR
     }
 
     void EAGLESContext::setCurrent()
@@ -158,7 +151,7 @@ namespace Ogre {
 
     void EAGLESContext::endCurrent()
     {
-        [EAGLContext setCurrentContext:nil];
+        // Do nothing
     }
 
     GLESContext * EAGLESContext::clone() const
