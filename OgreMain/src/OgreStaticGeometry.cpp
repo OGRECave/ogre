@@ -251,7 +251,7 @@ namespace Ogre {
 				vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
 		float* pFloat;
 
-		Vector3 min = Vector3::ZERO, max = Vector3::ZERO;
+		Vector3 min = Vector3::ZERO, max = Vector3::UNIT_SCALE;
 		bool first = true;
 
 		for(size_t j = 0; j < vertexData->vertexCount; ++j, vertex += vbuf->getVertexSize())

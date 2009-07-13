@@ -119,7 +119,7 @@ namespace Ogre {
 
         // Calculate bounds based on control points
         vector<Vector3>::type::const_iterator ctli;
-        Vector3 min = Vector3::ZERO, max = Vector3::ZERO;
+        Vector3 min = Vector3::ZERO, max = Vector3::UNIT_SCALE;
         Real maxSqRadius;
         bool first = true;
         for (ctli = mVecCtlPoints.begin(); ctli != mVecCtlPoints.end(); ++ctli)
