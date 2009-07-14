@@ -168,8 +168,10 @@ namespace Ogre
 		HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
 		if (!mShaderGen)
 		{
+			bool check2x = mLayerNormalMappingEnabled || mLayerParallaxMappingEnabled;
 			if (hmgr.isLanguageSupported("cg") && 
-				(gmgr.isSyntaxSupported("fp40") || gmgr.isSyntaxSupported("ps_2_x")))
+				(check2x && (gmgr.isSyntaxSupported("fp40") || gmgr.isSyntaxSupported("ps_2_x"))) ||
+				(gmgr.isSyntaxSupported("ps_2_0")))
 				mShaderGen = OGRE_NEW ShaderHelperCg();
 			else if (hmgr.isLanguageSupported("hlsl"))
 				mShaderGen = OGRE_NEW ShaderHelperHLSL();
@@ -229,7 +231,7 @@ namespace Ogre
 		TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::generateVertexProgram(
 			const SM2Profile* prof, const Terrain* terrain)
 	{
-		HighLevelGpuProgramPtr ret = createVertexProgram(terrain);
+		HighLevelGpuProgramPtr ret = createVertexProgram(prof, terrain);
 
 		StringUtil::StrStreamType sourceStr;
 		generateVertexProgramSource(prof, terrain, sourceStr);
@@ -247,7 +249,7 @@ namespace Ogre
 	HighLevelGpuProgramPtr 
 	TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::generateFragmentProgram(const SM2Profile* prof, const Terrain* terrain)
 	{
-		HighLevelGpuProgramPtr ret = createFragmentProgram(terrain);
+		HighLevelGpuProgramPtr ret = createFragmentProgram(prof, terrain);
 
 		StringUtil::StrStreamType sourceStr;
 		generateFragmentProgramSource(prof, terrain, sourceStr);
@@ -349,7 +351,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	HighLevelGpuProgramPtr
-	TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::createVertexProgram(const Terrain* terrain)
+	TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::createVertexProgram(const SM2Profile* prof, const Terrain* terrain)
 	{
 		HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
 		String progName = terrain->getMaterialName() + "/sm2/vp";
@@ -373,7 +375,7 @@ namespace Ogre
 	}
 	//---------------------------------------------------------------------
 	HighLevelGpuProgramPtr
-		TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::createFragmentProgram(const Terrain* terrain)
+		TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::createFragmentProgram(const SM2Profile* prof, const Terrain* terrain)
 	{
 		HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
 		String progName = terrain->getMaterialName() + "/sm2/fp";
@@ -388,8 +390,11 @@ namespace Ogre
 		{
 			ret->unload();
 		}
-
-		ret->setParameter("profiles", "ps_2_x fp40");
+		
+		if(prof->isLayerNormalMappingEnabled() || prof->isLayerParallaxMappingEnabled())
+			ret->setParameter("profiles", "ps_2_x fp40");
+		else
+			ret->setParameter("profiles", "ps_2_0 fp30");
 		ret->setParameter("entry_point", "main_fp");
 
 		return ret;
@@ -748,7 +753,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	HighLevelGpuProgramPtr
-	TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::createVertexProgram(const Terrain* terrain)
+	TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::createVertexProgram(const SM2Profile* prof, const Terrain* terrain)
 	{
 		HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
 		String progName = terrain->getMaterialName() + "/sm2/vp";
@@ -772,7 +777,7 @@ namespace Ogre
 	}
 	//---------------------------------------------------------------------
 	HighLevelGpuProgramPtr
-	TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::createFragmentProgram(const Terrain* terrain)
+	TerrainMaterialGeneratorA::SM2Profile::ShaderHelperHLSL::createFragmentProgram(const SM2Profile* prof, const Terrain* terrain)
 	{
 		HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
 		String progName = terrain->getMaterialName() + "/sm2/fp";
@@ -797,7 +802,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	HighLevelGpuProgramPtr
-	TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::createVertexProgram(const Terrain* terrain)
+	TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::createVertexProgram(const SM2Profile* prof, const Terrain* terrain)
 	{
 		HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
 		String progName = terrain->getMaterialName() + "/sm2/vp";
@@ -818,7 +823,7 @@ namespace Ogre
 	}
 	//---------------------------------------------------------------------
 	HighLevelGpuProgramPtr
-		TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::createFragmentProgram(const Terrain* terrain)
+		TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL::createFragmentProgram(const SM2Profile* prof, const Terrain* terrain)
 	{
 		HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
 		String progName = terrain->getMaterialName() + "/sm2/fp";
