@@ -58,22 +58,24 @@ namespace Ogre {
         optFullScreen.name = "Full Screen";
         optFullScreen.possibleValues.push_back("Yes");
         optFullScreen.possibleValues.push_back("No");
-        optFullScreen.currentValue = optFullScreen.possibleValues[1];
+        optFullScreen.currentValue = "Yes";
         optFullScreen.immutable = false;
 
         optVideoMode.name = "Video Mode";
-        optOrientation.possibleValues.push_back("480 x 320");
+        optVideoMode.possibleValues.push_back("480 x 320");
+        optVideoMode.currentValue = "480 x 320";
         optVideoMode.immutable = false;
 
         optOrientation.name = "Orientation";
-        optOrientation.immutable = false;
         optOrientation.possibleValues.push_back("Landscape Left");
         optOrientation.possibleValues.push_back("Landscape Right");
         optOrientation.possibleValues.push_back("Portrait");
-        
-        optOrientation.currentValue = optOrientation.possibleValues[0];
+        optOrientation.currentValue = "Landscape Left";
+        optOrientation.immutable = false;
         
         optDisplayFrequency.name = "Display Frequency";
+        optDisplayFrequency.possibleValues.push_back("0 Hz");
+        optDisplayFrequency.currentValue = "0 Hz";
         optDisplayFrequency.immutable = false;
 
         optFSAA.name = "FSAA";
@@ -103,20 +105,8 @@ namespace Ogre {
         optRTTMode.name = "RTT Preferred Mode";
         optRTTMode.possibleValues.push_back("Copy");
         optRTTMode.possibleValues.push_back("FBO");
-        optRTTMode.currentValue = optRTTMode.possibleValues[0];
+        optRTTMode.currentValue = "Copy";
         optRTTMode.immutable = false;
-
-        VideoModes::const_iterator value = mVideoModes.begin();
-        VideoModes::const_iterator end = mVideoModes.end();
-
-        for (; value != end; value++)
-        {
-            String mode = StringConverter::toString(value->first.first,4) + " x " + StringConverter::toString(value->first.second,4);
-            optVideoMode.possibleValues.push_back(mode);
-        }
-        removeDuplicates(optVideoMode.possibleValues);
-
-        optVideoMode.currentValue = StringConverter::toString(mCurrentMode.first.first,4) + " x " + StringConverter::toString(mCurrentMode.first.second,4);
 
         mOptions[optFullScreen.name] = optFullScreen;
         mOptions[optVideoMode.name] = optVideoMode;

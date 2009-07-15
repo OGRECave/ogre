@@ -53,15 +53,6 @@ namespace Ogre {
     class _OgrePrivate EAGLSupport : public GLESSupport
     {
         protected:
-
-            typedef std::pair<uint, uint> ScreenSize;
-            typedef short Rate;
-            typedef std::pair<ScreenSize, Rate> VideoMode;
-            typedef std::vector<VideoMode> VideoModes;
-            VideoModes mVideoModes;
-            VideoMode mOriginalMode;
-            VideoMode mCurrentMode;
-
         public:
             EAGLSupport();
             virtual ~EAGLSupport();

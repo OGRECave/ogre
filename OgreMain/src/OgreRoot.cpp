@@ -394,22 +394,27 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Root::restoreConfig(void)
     {
-        if (mConfigFileName.empty ())
-            return true;
-        
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
         // Read the config from Documents first(user config) if it exists on iPhone.
         // If it doesn't exist or is invalid then use mConfigFileName
-        Ogre::String outBaseName, extension, configFileName;
-        Ogre::StringUtil::splitFilename(mConfigFileName, outBaseName, extension);
-        configFileName = macBundlePath() + "/../Documents/" + outBaseName;
-		std::ifstream fp;
-        fp.open(configFileName.c_str(), std::ios::in | std::ios::binary);
-        if(fp)
-            mConfigFileName = configFileName;
-        fp.close();
+        // TODO: I really want to use NSFileManager here but I'll find another way
+
+//        Ogre::String outBaseName, extension, configFileName;
+//        Ogre::StringUtil::splitFilename(mConfigFileName, outBaseName, extension);
+//        configFileName = macBundlePath() + "/../Documents/" + outBaseName;
+//		std::ifstream fp;
+//        fp.open(configFileName.c_str(), std::ios::in | std::ios::binary);
+//        if(fp)
+//            mConfigFileName = configFileName;
+//        else
+//            mConfigFileName = Ogre::StringUtil::BLANK;
+//        fp.close();
+        return true;
 #endif
         
+        if (mConfigFileName.empty ())
+            return true;
+
         // Restores configuration from saved state
         // Returns true if a valid saved configuration is
         //   available, and false if no saved config is
