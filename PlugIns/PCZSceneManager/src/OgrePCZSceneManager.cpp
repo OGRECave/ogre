@@ -49,15 +49,17 @@ email                : ericc@xenopi.com
 
 namespace Ogre
 {
-    PCZSceneManager::PCZSceneManager(const String& name) : SceneManager(name)
-    {
-        mDefaultZone = 0;
-		mActiveCameraZone = 0;
-		mZoneFactoryManager = 0;
-        mShowPortals = false;
-		mDefaultZoneTypeName = "ZoneType_Default";
-		mDefaultZoneFileName = "none";
-    }
+	PCZSceneManager::PCZSceneManager(const String& name) :
+	SceneManager(name),
+	mLastActiveCamera(0),
+	mDefaultZone(0),
+	mActiveCameraZone(0),
+	mZoneFactoryManager(0),
+	mShowPortals(false),
+	mDefaultZoneTypeName("ZoneType_Default"),
+	mDefaultZoneFileName("none")
+	{ }
+
     PCZSceneManager::~PCZSceneManager()
     {
         // we don't delete the root scene node here because the
@@ -1027,8 +1029,7 @@ namespace Ogre
 				// add cam distance for sorting if texture shadows
 				if (isShadowTechniqueTextureBased())
 				{
-					(*j)->tempSquareDist = 
-						(camera->getDerivedPosition() - (*j)->getDerivedPosition()).squaredLength();
+					(*j)->_calcTempSquareDist(camera->getDerivedPosition());
 				}
 			}
 
@@ -1180,18 +1181,37 @@ namespace Ogre
 		}
 	}
 
-    // main visibility determination & render queue filling routine
-    // over-ridden from base/default scene manager.  This is *the*
-    // main call.
-    void PCZSceneManager::_findVisibleObjects(Camera * cam, 
-											  VisibleObjectsBoundsInfo* visibleBounds, 
-											  bool onlyShadowCasters )
-    {
-	
+	// main visibility determination & render queue filling routine
+	// over-ridden from base/default scene manager.  This is *the*
+	// main call.
+	void PCZSceneManager::_findVisibleObjects(Camera* cam,
+											  VisibleObjectsBoundsInfo* visibleBounds,
+											  bool onlyShadowCasters)
+	{
 		// clear the render queue
-        getRenderQueue()->clear();
+		getRenderQueue()->clear();
+
+		// if we are re-rendering the scene again with the same camera, we can just use the cache.
+		// this helps post processing compositors.
+		unsigned long frameCount = Root::getSingleton().getNextFrameNumber();
+		if (mLastActiveCamera == cam && mFrameCount == frameCount)
+		{
+			RenderQueue* queue = getRenderQueue();
+			size_t count = mVisible.size();
+			for (size_t i = 0; i < count; ++i)
+			{
+				((PCZSceneNode*)mVisible[i])->_addToRenderQueue(
+					cam, queue, onlyShadowCasters, visibleBounds);
+			}
+			return;
+		}
+
+		// increment the visibility frame counter
+		mFrameCount = frameCount;
+		mLastActiveCamera = cam;
+
 		// clear the list of visible nodes
-        mVisible.clear();
+		mVisible.clear();
 
 		// turn off sky 
 		enableSky(false);
@@ -1199,17 +1219,13 @@ namespace Ogre
 		// remove all extra culling planes
 		((PCZCamera*)cam)->removeAllExtraCullingPlanes();
 
-        // increment the visibility frame counter
-        //mFrameCount++;
-		mFrameCount = Root::getSingleton().getNextFrameNumber();
-
-        // update the camera
-        ((PCZCamera*)cam)->update();
+		// update the camera
+		((PCZCamera*)cam)->update();
 
 		// get the home zone of the camera
-		PCZone * cameraHomeZone = ((PCZSceneNode*)(cam->getParentSceneNode()))->getHomeZone();
+		PCZone* cameraHomeZone = ((PCZSceneNode*)(cam->getParentSceneNode()))->getHomeZone();
 
-        // walk the zones, starting from the camera home zone,
+		// walk the zones, starting from the camera home zone,
 		// adding all visible scene nodes to the mVisibles list
 		cameraHomeZone->setLastVisibleFrame(mFrameCount);
 		cameraHomeZone->findVisibleNodes((PCZCamera*)cam, 
@@ -1219,8 +1235,7 @@ namespace Ogre
 										  onlyShadowCasters,
 										  mDisplayNodes,
 										  mShowBoundingBoxes);
-
-    }
+	}
 
     void PCZSceneManager::findNodesIn( const AxisAlignedBox &box, 
                                        PCZSceneNodeList &list, 

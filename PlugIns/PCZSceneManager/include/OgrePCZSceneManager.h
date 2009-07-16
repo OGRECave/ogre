@@ -59,8 +59,8 @@ namespace Ogre
     class PCZAxisAlignedBoxSceneQuery;
     class PCZPlaneBoundedVolumeListSceneQuery;
 
-    typedef list< SceneNode * >::type NodeList;
-    typedef list< WireBoundingBox * >::type BoxList;
+	typedef vector<SceneNode*>::type NodeList;
+	typedef list<WireBoundingBox*>::type BoxList;
 
     /** Specialized SceneManager that uses Portal-Connected-Zones to divide the scene spatially.
     */
@@ -337,8 +337,11 @@ namespace Ogre
 		// name of data file for default zone
 		String mDefaultZoneFileName;
 
-		// list of visible nodes 
-        NodeList mVisible;
+		/// list of visible nodes since last _findVisibleObjects()
+		NodeList mVisible;
+
+		/// camera of last _findVisibleObjects()
+		Camera* mLastActiveCamera;
 
         /// The root PCZone;
         PCZone *mDefaultZone;

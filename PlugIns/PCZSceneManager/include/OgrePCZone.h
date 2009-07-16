@@ -72,7 +72,7 @@ namespace Ogre
 	typedef list<Portal*>::type PortalList;
 	typedef list<AntiPortal*>::type AntiPortalList;
 	typedef vector<PortalBase*>::type PortalBaseList;
-	typedef list< SceneNode * >::type NodeList;
+	typedef vector<SceneNode*>::type NodeList;
 	typedef set< PCZSceneNode * >::type PCZSceneNodeList;
     typedef map<String, SceneNode*>::type SceneNodeList;
 
