@@ -279,6 +279,30 @@ public:
 		{
 			mRotX = Degree(-ms.X.rel * 0.13);
 			mRotY = Degree(-ms.Y.rel * 0.13);
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+            // Adjust the input depending upon viewport orientation
+            Radian origRotY, origRotX;
+            switch(mCamera->getViewport()->getOrientation())
+            {
+                case Viewport::OR_LANDSCAPELEFT:
+                    origRotY = mRotY;
+                    origRotX = mRotX;
+                    mRotX = origRotY;
+                    mRotY = -origRotX;
+                    break;
+                case Viewport::OR_LANDSCAPERIGHT:
+                    origRotY = mRotY;
+                    origRotX = mRotX;
+                    mRotX = -origRotY;
+                    mRotY = origRotX;
+                    break;
+                    
+                // Portrait doesn't need any change
+                case Viewport::OR_PORTRAIT:
+                default:
+                    break;
+            }
+#endif
 		}
 
 		return true;
