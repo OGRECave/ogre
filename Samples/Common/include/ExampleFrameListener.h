@@ -166,24 +166,27 @@ public:
 
 	virtual bool processUnbufferedKeyInput(const FrameEvent& evt)
 	{
+		Real moveScale = mMoveScale;
+		if(mKeyboard->isKeyDown(OIS::KC_LSHIFT))
+			moveScale *= 10;
 
 		if(mKeyboard->isKeyDown(OIS::KC_A))
-			mTranslateVector.x = -mMoveScale;	// Move camera left
+			mTranslateVector.x = -moveScale;	// Move camera left
 
 		if(mKeyboard->isKeyDown(OIS::KC_D))
-			mTranslateVector.x = mMoveScale;	// Move camera RIGHT
+			mTranslateVector.x = moveScale;	// Move camera RIGHT
 
 		if(mKeyboard->isKeyDown(OIS::KC_UP) || mKeyboard->isKeyDown(OIS::KC_W) )
-			mTranslateVector.z = -mMoveScale;	// Move camera forward
+			mTranslateVector.z = -moveScale;	// Move camera forward
 
 		if(mKeyboard->isKeyDown(OIS::KC_DOWN) || mKeyboard->isKeyDown(OIS::KC_S) )
-			mTranslateVector.z = mMoveScale;	// Move camera backward
+			mTranslateVector.z = moveScale;	// Move camera backward
 
 		if(mKeyboard->isKeyDown(OIS::KC_PGUP))
-			mTranslateVector.y = mMoveScale;	// Move camera up
+			mTranslateVector.y = moveScale;	// Move camera up
 
 		if(mKeyboard->isKeyDown(OIS::KC_PGDOWN))
-			mTranslateVector.y = -mMoveScale;	// Move camera down
+			mTranslateVector.y = -moveScale;	// Move camera down
 
 		if(mKeyboard->isKeyDown(OIS::KC_RIGHT))
 			mCamera->yaw(-mRotScale);
