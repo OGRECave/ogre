@@ -4314,6 +4314,9 @@ void SceneManager::initShadowVolumeMaterials(void)
                     GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
                 mInfiniteExtrusionParams->setAutoConstant(4, 
                     GpuProgramParameters::ACT_LIGHT_POSITION_OBJECT_SPACE);
+                // Note ignored extra parameter - for compatibility with finite extrusion vertex program
+                mInfiniteExtrusionParams->setAutoConstant(5, 
+					GpuProgramParameters::ACT_SHADOW_EXTRUSION_DISTANCE);
             }	
             matDebug->compile();
 
