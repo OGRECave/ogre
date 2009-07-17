@@ -5136,10 +5136,12 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
             extrudeDist = caster->getPointExtrusionDistance(light); 
         }
 
+        Real darkCapExtrudeDist = extrudeDist;
         if (!extrudeInSoftware && !finiteExtrude)
         {
             // hardware extrusion, to infinity (and beyond!)
             flags |= SRF_EXTRUDE_TO_INFINITY;
+            darkCapExtrudeDist = mShadowDirLightExtrudeDist;
         }
 
 		// Determine whether zfail is required
@@ -5159,7 +5161,7 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
 			// since that extrudes to a single point
 			if(!((flags & SRF_EXTRUDE_TO_INFINITY) && 
 				light->getType() == Light::LT_DIRECTIONAL) &&
-				camera->isVisible(caster->getDarkCapBounds(*light, extrudeDist)))
+				camera->isVisible(caster->getDarkCapBounds(*light, darkCapExtrudeDist)))
 			{
 				flags |= SRF_INCLUDE_DARK_CAP;
 			}
@@ -5175,12 +5177,12 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
 			if ((flags & SRF_EXTRUDE_TO_INFINITY) && 
 				light->getType() != Light::LT_DIRECTIONAL && 
 				isShadowTechniqueModulative() && 
-				camera->isVisible(caster->getDarkCapBounds(*light, extrudeDist)))
+				camera->isVisible(caster->getDarkCapBounds(*light, darkCapExtrudeDist)))
 			{
 				flags |= SRF_INCLUDE_DARK_CAP;
 			}
 			else if (!(flags & SRF_EXTRUDE_TO_INFINITY) && 
-				camera->isVisible(caster->getDarkCapBounds(*light, extrudeDist)))
+				camera->isVisible(caster->getDarkCapBounds(*light, darkCapExtrudeDist)))
 			{
 				flags |= SRF_INCLUDE_DARK_CAP;
 			}
