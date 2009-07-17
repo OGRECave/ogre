@@ -36,7 +36,7 @@ Torus Knot Software Ltd.
 namespace Ogre 
 {
 	GLXContext::GLXContext(GLXGLSupport* glsupport, ::GLXFBConfig fbconfig, ::GLXDrawable drawable, ::GLXContext context) :
-		mGLSupport(glsupport), mDrawable(drawable), mContext(0), mFBConfig(fbconfig)
+		mGLSupport(glsupport), mDrawable(drawable), mContext(0), mFBConfig(fbconfig), mExternalContext(false)
 	{
 		GLRenderSystem *renderSystem = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
 		GLXContext* mainContext = static_cast<GLXContext*>(renderSystem->_getMainContext());
@@ -47,13 +47,14 @@ namespace Ogre
 			shareContext = mainContext->mContext;
 		}
 		
-    if (context)
-    {
-      mContext = context;
-    }
-    else
-    {
-      mContext = mGLSupport->createNewContext(mFBConfig, GLX_RGBA_TYPE, shareContext, GL_TRUE);
+		if (context)
+		{
+			mContext = context;
+			mExternalContext = true;
+		}
+		else
+		{
+			mContext = mGLSupport->createNewContext(mFBConfig, GLX_RGBA_TYPE, shareContext, GL_TRUE);
 		}
 
 		if (! mContext)
@@ -66,7 +67,8 @@ namespace Ogre
 	{
 		GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
 		
-		glXDestroyContext(mGLSupport->getGLDisplay(), mContext);
+		if (!mExternalContext)
+			glXDestroyContext(mGLSupport->getGLDisplay(), mContext);
 		
 		rs->_unregisterContext(this);
 	}

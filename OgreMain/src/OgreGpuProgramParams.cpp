@@ -1969,7 +1969,11 @@ namespace Ogre
 					_writeRawConstant(i->physicalIndex, Vector4(vec3.x, vec3.y, vec3.z, 0.0f),i->elementCount);
 					break;
 				case ACT_SHADOW_EXTRUSION_DISTANCE:
-					_writeRawConstant(i->physicalIndex, source->getShadowExtrusionDistance());
+					// extrusion is in object-space, so we have to rescale by the inverse
+					// of the world scaling to deal with scaled objects
+					source->getWorldMatrix().extract3x3Matrix(m3);
+					_writeRawConstant(i->physicalIndex, source->getShadowExtrusionDistance() / 
+						Math::Sqrt(std::max(std::max(m3.GetColumn(0).squaredLength(), m3.GetColumn(1).squaredLength()), m3.GetColumn(2).squaredLength())));
 					break;
 				case ACT_SHADOW_SCENE_DEPTH_RANGE:
 					_writeRawConstant(i->physicalIndex, source->getShadowSceneDepthRange(i->data));

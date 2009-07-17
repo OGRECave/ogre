@@ -217,7 +217,7 @@ namespace Ogre {
     String ShadowVolumeExtrudeProgram::mPointArbvp1Finite = 
         "!!ARBvp1.0\n" 
         "PARAM c6 = { 1, 0, 0, 0 };\n"
-        "TEMP R0;\n"
+        "TEMP R0, R1;\n"
         "ATTRIB v24 = vertex.texcoord[0];\n"
         "ATTRIB v16 = vertex.position;\n"
         "PARAM c0[4] = { program.local[0..3] };\n"
@@ -226,6 +226,9 @@ namespace Ogre {
         "ADD R0.x, c6.x, -v24.x;\n"
         "MUL R0.w, R0.x, c5.x;\n"
         "ADD R0.xyz, v16.xyzx, -c4.xyzx;\n"
+        "DP3 R1.w, R0.xyzx, R0.xyzx;\n"     // R1.w = Vector3(vertex - lightpos).sqrLength()
+        "RSQ R1.w, R1.w;\n"                 // R1.w = 1 / Vector3(vertex - lightpos).length()
+        "MUL R0.xyz, R1.w, R0.xyzx;\n"      // R0.xyz = Vector3(vertex - lightpos).normalisedCopy()
         "MAD R0.xyz, R0.w, R0.xyzx, v16.xyzx;\n"
         "DPH result.position.x, R0.xyzz, c0[0];\n"
         "DPH result.position.y, R0.xyzz, c0[1];\n"

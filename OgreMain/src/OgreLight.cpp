@@ -454,9 +454,20 @@ namespace Ogre {
 
         // Get worldspace frustum corners
         const Vector3* corners = cam->getWorldSpaceCorners();
-        int winding = cam->isReflected() ? +1 : -1;
+        int windingPt0 = cam->isReflected() ? 1 : 0;
+        int windingPt1 = cam->isReflected() ? 0 : 1;
 
         bool infiniteViewDistance = (cam->getFarClipDistance() == 0);
+
+		Vector3 notSoFarCorners[4];
+		if(infiniteViewDistance)
+		{
+			Vector3 camPosition = cam->getRealPosition();
+			notSoFarCorners[0] = corners[0] + corners[0] - camPosition;
+			notSoFarCorners[1] = corners[1] + corners[1] - camPosition;
+			notSoFarCorners[2] = corners[2] + corners[2] - camPosition;
+			notSoFarCorners[3] = corners[3] + corners[3] - camPosition;
+		}
 
         mFrustumClipVolumes.clear();
         for (unsigned short n = 0; n < 6; ++n)
@@ -492,28 +503,28 @@ namespace Ogre {
                     clockwiseVerts[3] = corners + 4;
                     break;
                 case(FRUSTUM_PLANE_LEFT):
-                    clockwiseVerts[0] = corners + 2;
-                    clockwiseVerts[1] = corners + 6;
-                    clockwiseVerts[2] = corners + 5;
-                    clockwiseVerts[3] = corners + 1;
+                    clockwiseVerts[0] = infiniteViewDistance ? notSoFarCorners + 1 : corners + 5;
+                    clockwiseVerts[1] = corners + 1;
+                    clockwiseVerts[2] = corners + 2;
+                    clockwiseVerts[3] = infiniteViewDistance ? notSoFarCorners + 2 : corners + 6;
                     break;
                 case(FRUSTUM_PLANE_RIGHT):
-                    clockwiseVerts[0] = corners + 7;
+                    clockwiseVerts[0] = infiniteViewDistance ? notSoFarCorners + 3 : corners + 7;
                     clockwiseVerts[1] = corners + 3;
                     clockwiseVerts[2] = corners + 0;
-                    clockwiseVerts[3] = corners + 4;
+                    clockwiseVerts[3] = infiniteViewDistance ? notSoFarCorners + 0 : corners + 4;
                     break;
                 case(FRUSTUM_PLANE_TOP):
-                    clockwiseVerts[0] = corners + 0;
-                    clockwiseVerts[1] = corners + 1;
-                    clockwiseVerts[2] = corners + 5;
-                    clockwiseVerts[3] = corners + 4;
+                    clockwiseVerts[0] = infiniteViewDistance ? notSoFarCorners + 0 : corners + 4;
+                    clockwiseVerts[1] = corners + 0;
+                    clockwiseVerts[2] = corners + 1;
+                    clockwiseVerts[3] = infiniteViewDistance ? notSoFarCorners + 1 : corners + 5;
                     break;
                 case(FRUSTUM_PLANE_BOTTOM):
-                    clockwiseVerts[0] = corners + 7;
-                    clockwiseVerts[1] = corners + 6;
-                    clockwiseVerts[2] = corners + 2;
-                    clockwiseVerts[3] = corners + 3;
+                    clockwiseVerts[0] = infiniteViewDistance ? notSoFarCorners + 2 : corners + 6;
+                    clockwiseVerts[1] = corners + 2;
+                    clockwiseVerts[2] = corners + 3;
+                    clockwiseVerts[3] = infiniteViewDistance ? notSoFarCorners + 3 : corners + 7;
                     break;
                 };
 
@@ -521,11 +532,12 @@ namespace Ogre {
                 // Iterate over world points and form side planes
                 Vector3 normal;
                 Vector3 lightDir;
-                for (unsigned int i = 0; i < 4; ++i)
+				unsigned int infiniteViewDistanceInt = infiniteViewDistance ? 1 : 0;
+                for (unsigned int i = 0; i < 4 - infiniteViewDistanceInt; ++i)
                 {
                     // Figure out light dir
                     lightDir = lightPos3 - (*(clockwiseVerts[i]) * lightPos.w);
-                    Vector3 edgeDir = *(clockwiseVerts[i]) - *(clockwiseVerts[(i+winding)%4]);
+                    Vector3 edgeDir = *(clockwiseVerts[(i+windingPt1)%4]) - *(clockwiseVerts[(i+windingPt0)%4]);
                     // Cross with anticlockwise corner, therefore normal points in
                     normal = edgeDir.crossProduct(lightDir);
                     normal.normalise();

@@ -345,59 +345,43 @@ namespace Ogre {
             extrusionDir.x = currentCorner.x - light.x;
             extrusionDir.y = currentCorner.y - light.y;
             extrusionDir.z = currentCorner.z - light.z;
-            extrusionDir.normalise();
-            extrusionDir *= extrudeDist;
-            box.merge(currentCorner + extrusionDir);
+            box.merge(currentCorner + extrudeDist * extrusionDir.normalisedCopy());
 
             // 6 : min min max
             // only z has changed
             currentCorner.z = oldMax.z;
             extrusionDir.z = currentCorner.z - light.z;
-            extrusionDir.normalise();
-            extrusionDir *= extrudeDist;
-            box.merge(currentCorner + extrusionDir);
+            box.merge(currentCorner + extrudeDist * extrusionDir.normalisedCopy());
 
             // 5 : min max max
             currentCorner.y = oldMax.y;
             extrusionDir.y = currentCorner.y - light.y;
-            extrusionDir.normalise();
-            extrusionDir *= extrudeDist;
-            box.merge(currentCorner + extrusionDir);
+            box.merge(currentCorner + extrudeDist * extrusionDir.normalisedCopy());
 
             // 1 : min max min
             currentCorner.z = oldMin.z;
             extrusionDir.z = currentCorner.z - light.z;
-            extrusionDir.normalise();
-            extrusionDir *= extrudeDist;
-            box.merge(currentCorner + extrusionDir);
+            box.merge(currentCorner + extrudeDist * extrusionDir.normalisedCopy());
 
             // 2 : max max min
             currentCorner.x = oldMax.x;
             extrusionDir.x = currentCorner.x - light.x;
-            extrusionDir.normalise();
-            extrusionDir *= extrudeDist;
-            box.merge(currentCorner + extrusionDir);
+            box.merge(currentCorner + extrudeDist * extrusionDir.normalisedCopy());
 
             // 4 : max max max
             currentCorner.z = oldMax.z;
             extrusionDir.z = currentCorner.z - light.z;
-            extrusionDir.normalise();
-            extrusionDir *= extrudeDist;
-            box.merge(currentCorner + extrusionDir);
+            box.merge(currentCorner + extrudeDist * extrusionDir.normalisedCopy());
 
             // 7 : max min max
             currentCorner.y = oldMin.y;
             extrusionDir.y = currentCorner.y - light.y;
-            extrusionDir.normalise();
-            extrusionDir *= extrudeDist;
-            box.merge(currentCorner + extrusionDir);
+            box.merge(currentCorner + extrudeDist * extrusionDir.normalisedCopy());
 
             // 3 : max min min
             currentCorner.z = oldMin.z;
             extrusionDir.z = currentCorner.z - light.z;
-            extrusionDir.normalise();
-            extrusionDir *= extrudeDist;
-            box.merge(currentCorner + extrusionDir);
+            box.merge(currentCorner + extrudeDist * extrusionDir.normalisedCopy());
 
         }
 
