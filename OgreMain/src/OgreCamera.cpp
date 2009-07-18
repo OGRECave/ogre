@@ -1091,12 +1091,13 @@ namespace Ogre {
 		this->setAspectRatio(cam->getAspectRatio());
 		this->setNearClipDistance(cam->getNearClipDistance());
 		this->setFarClipDistance(cam->getFarClipDistance());
-		this->setLodCamera(cam->getLodCamera());
 		this->setUseRenderingDistance(cam->getUseRenderingDistance());
-		this->setCullingFrustum(cam->getCullingFrustum());
 		this->setFOVy(cam->getFOVy());
 		this->setFocalLength(cam->getFocalLength());
 
+		// Don't do these, they're not base settings and can cause referencing issues
+		//this->setLodCamera(cam->getLodCamera());
+		//this->setCullingFrustum(cam->getCullingFrustum());
 
 	}
 
