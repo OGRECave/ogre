@@ -2553,10 +2553,10 @@ namespace Ogre
 				// build rectangle which has rounded down & rounded up values
 				// remember right & bottom are exclusive
 				Rect mergeRect(
-					terrainHitPos.x * (mSize - 1) - 1, 
-					terrainHitPos.y * (mSize - 1) - 1, 
-					(long)(terrainHitPos.x * (float)(mSize - 1) + 0.5) + 5, 
-					(long)(terrainHitPos.y * (float)(mSize - 1) + 0.5) + 5
+					terrainHitPos.x * (mSize - 1), 
+					terrainHitPos.y * (mSize - 1), 
+					(long)(terrainHitPos.x * (float)(mSize - 1) + 0.5) + 1, 
+					(long)(terrainHitPos.y * (float)(mSize - 1) + 0.5) + 1
 					);
 				widenedRect.merge(mergeRect);
 			}
