@@ -1403,7 +1403,7 @@ namespace Ogre
 			{
 				// Don't launch many updates, instead wait for the other one 
 				// to finish and issue another afterwards. 
-				mDerivedUpdatePendingMask = typeMask;
+				mDerivedUpdatePendingMask |= typeMask;
 			}
 			else
 			{
@@ -2133,7 +2133,7 @@ namespace Ogre
 			// create
 			mTerrainNormalMap = TextureManager::getSingleton().createManual(
 				mMaterialName + "/nm", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-				TEX_TYPE_2D, mSize, mSize, 1, 0, PF_BYTE_RGB);
+				TEX_TYPE_2D, mSize, mSize, 1, 0, PF_BYTE_RGB, TU_STATIC);
 
 			// Upload loaded normal data if present
 			if (mCpuTerrainNormalMap)
@@ -2335,7 +2335,11 @@ namespace Ogre
 		if (ddres.remainingTypeMask)
 			newRect.merge(ddreq.dirtyRect);
 		if (mDerivedUpdatePendingMask)
+		{
 			newRect.merge(mDirtyDerivedDataRect);
+			mDirtyDerivedDataRect.left = mDirtyDerivedDataRect.top = 
+				mDirtyDerivedDataRect.right = mDirtyDerivedDataRect.bottom = 0;
+		}
 		uint8 newMask = ddres.remainingTypeMask | mDerivedUpdatePendingMask;
 		if (newMask)
 		{
@@ -2513,23 +2517,25 @@ namespace Ogre
 		// onto the minimum height
 
 		Vector3 corners[4];
-		getPoint(rect.left, rect.top, &corners[0]);
-		getPoint(rect.right-1, rect.top, &corners[1]);
-		getPoint(rect.left, rect.bottom-1, &corners[2]);
-		getPoint(rect.right-1, rect.bottom-1, &corners[3]);
+		Real maxHeight = getMaxHeight();
+		Real minHeight = getMinHeight();
+		getPoint(rect.left, rect.top, maxHeight, &corners[0]);
+		getPoint(rect.right-1, rect.top, maxHeight, &corners[1]);
+		getPoint(rect.left, rect.bottom-1, maxHeight, &corners[2]);
+		getPoint(rect.right-1, rect.bottom-1, maxHeight, &corners[3]);
 
 		const Vector3& lightVec = TerrainGlobalOptions::getLightMapDirection();
 		Plane p;
 		switch(getAlignment())
 		{
 		case ALIGN_X_Y:
-			p.redefine(Vector3::UNIT_Z, Vector3(0, 0, getMinHeight()));
+			p.redefine(Vector3::UNIT_Z, Vector3(0, 0, minHeight));
 			break;
 		case ALIGN_X_Z:
-			p.redefine(Vector3::UNIT_Y, Vector3(0, getMinHeight(), 0));
+			p.redefine(Vector3::UNIT_Y, Vector3(0, minHeight, 0));
 			break;
 		case ALIGN_Y_Z:
-			p.redefine(Vector3::UNIT_X, Vector3(getMinHeight(), 0, 0));
+			p.redefine(Vector3::UNIT_X, Vector3(minHeight, 0, 0));
 			break;
 		}
 
@@ -2547,10 +2553,10 @@ namespace Ogre
 				// build rectangle which has rounded down & rounded up values
 				// remember right & bottom are exclusive
 				Rect mergeRect(
-					terrainHitPos.x * (mSize - 1), 
-					terrainHitPos.y * (mSize - 1), 
-					(long)(terrainHitPos.x * (float)(mSize - 1) + 0.5) + 1, 
-					(long)(terrainHitPos.y * (float)(mSize - 1) + 0.5) + 1
+					terrainHitPos.x * (mSize - 1) - 1, 
+					terrainHitPos.y * (mSize - 1) - 1, 
+					(long)(terrainHitPos.x * (float)(mSize - 1) + 0.5) + 5, 
+					(long)(terrainHitPos.y * (float)(mSize - 1) + 0.5) + 5
 					);
 				widenedRect.merge(mergeRect);
 			}
@@ -2723,7 +2729,7 @@ namespace Ogre
 			// create
 			mLightmap = TextureManager::getSingleton().createManual(
 				mMaterialName + "/lm", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-				TEX_TYPE_2D, mLightmapSize, mLightmapSize, MIP_DEFAULT, PF_L8);
+				TEX_TYPE_2D, mLightmapSize, mLightmapSize, 0, PF_L8, TU_STATIC);
 
 			mLightmapSizeActual = mLightmap->getWidth();
 
