@@ -337,6 +337,7 @@ namespace Ogre
 			Real getBoundingRadius(void) const;
 			void _updateRenderQueue(RenderQueue* queue);
 			void visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables = false);
+			bool isVisible(void) const;
 
 		};
 		Movable* mMovable;

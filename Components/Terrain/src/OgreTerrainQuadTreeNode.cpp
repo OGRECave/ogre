@@ -461,9 +461,24 @@ namespace Ogre
 			if (!isLeaf())
 			{
 				for (int i = 0; i < 4; ++i)
+				{
 					mChildren[i]->updateVertexData(positions, deltas, rect, cpuData);
 
+					// merge bounds from children
+					AxisAlignedBox childBox = mChildren[i]->getAABB();
+					// this box is relative to child centre
+					Vector3 boxoffset = mChildren[i]->getLocalCentre() - getLocalCentre();
+					childBox.setMinimum(childBox.getMinimum() + boxoffset);
+					childBox.setMaximum(childBox.getMaximum() + boxoffset);
+					mAABB.merge(childBox);
+				}
+
 			}
+			// Make sure node knows to update
+			if (mMovable)
+				mMovable->getParentSceneNode()->needUpdate();
+
+
 
 		}
 
@@ -1067,7 +1082,6 @@ namespace Ogre
 	{
 		if (pointIntersectsNode(x, y))
 		{
-			// Make relative to local centre
 			Vector3 localPos = pos - mLocalCentre;
 			mAABB.merge(localPos);
 			mBoundingRadius = std::max(mBoundingRadius, localPos.length());
@@ -1431,6 +1445,14 @@ namespace Ogre
 	Real TerrainQuadTreeNode::Movable::getBoundingRadius(void) const
 	{
 		return mParent->getBoundingRadius();
+	}
+	//---------------------------------------------------------------------
+	bool TerrainQuadTreeNode::Movable::isVisible(void) const
+	{
+		if (mParent->getCurrentLod() == -1)
+			return false;
+		else
+			return MovableObject::isVisible();
 	}
 	//------------------------------------------------------------------------
 	void TerrainQuadTreeNode::Movable::_updateRenderQueue(RenderQueue* queue)
