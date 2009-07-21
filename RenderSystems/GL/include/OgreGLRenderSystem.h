@@ -44,27 +44,28 @@ namespace Ogre {
     class _OgrePrivate GLRenderSystem : public RenderSystem
     {
     private:
-        // Rendering loop control
+        /// Rendering loop control
         bool mStopRendering;
 
-        // Array of up to 8 lights, indexed as per API
-        // Note that a null value indicates a free slot
+        /** Array of up to 8 lights, indexed as per API
+            Note that a null value indicates a free slot
+          */ 
         #define MAX_LIGHTS 8
         Light* mLights[MAX_LIGHTS];
 
-        // view matrix to set world against
+        /// View matrix to set world against
         Matrix4 mViewMatrix;
         Matrix4 mWorldMatrix;
         Matrix4 mTextureMatrix;
 
-        // Last min & mip filtering options, so we can combine them
+        /// Last min & mip filtering options, so we can combine them
         FilterOptions mMinFilter;
         FilterOptions mMipFilter;
 
-        // What texture coord set each texture unit is using
+        /// What texture coord set each texture unit is using
         size_t mTextureCoordIndex[OGRE_MAX_TEXTURE_LAYERS];
 
-        /// holds texture type settings for every stage
+        /// Holds texture type settings for every stage
         GLenum mTextureTypes[OGRE_MAX_TEXTURE_LAYERS];
 
 		/// Number of fixed-function texture units
@@ -83,20 +84,20 @@ namespace Ogre {
 
         void setLights();
 
-        // Store last depth write state
+        /// Store last depth write state
         bool mDepthWrite;
-		// Store last stencil mask state
+		/// Store last stencil mask state
 		uint32 mStencilMask;
-		// Store last colour write state
+		/// Store last colour write state
 		bool mColourWrite[4];
 
         GLint convertCompareFunction(CompareFunction func) const;
         GLint convertStencilOp(StencilOperation op, bool invert = false) const;
 
-		// internal method for anisotrophy validation
+		/// Internal method for anisotropy validation
 		GLfloat _getCurrentAnisotropy(size_t unit);
 		
-        /// GL support class, used for creating windows etc
+        /// GL support class, used for creating windows etc.
         GLSupport* mGLSupport;
         
         /// Internal method to set pos / direction of a light
@@ -105,8 +106,8 @@ namespace Ogre {
         bool mUseAutoTextureMatrix;
         GLfloat mAutoTextureMatrix[16];
 
-        // check if the GL system has already been initialized
-        bool mGLInitialized;
+        /// Check if the GL system has already been initialised
+        bool mGLInitialised;
 
         HardwareBufferManager* mHardwareBufferManager;
         GLGpuProgramManager* mGpuProgramManager;
@@ -122,7 +123,7 @@ namespace Ogre {
 
 		/* The main GL context - main thread only */
         GLContext *mMainContext;
-        /* The current GL context  - main thread only*/
+        /* The current GL context  - main thread only */
         GLContext *mCurrentContext;
 		typedef list<GLContext*>::type GLContextList;
 		/// List of background thread contexts
@@ -293,8 +294,8 @@ namespace Ogre {
          */
         void _setTextureBorderColour(size_t stage, const ColourValue& colour);
 		/** See
-		RenderSystem
-		*/
+		  RenderSystem
+		 */
 		void _setTextureMipmapBias(size_t unit, float bias);
         /** See
           RenderSystem
@@ -375,8 +376,8 @@ namespace Ogre {
         void _makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 
             Matrix4& dest, bool forGpuProgram = false);
         /** See
-        RenderSystem
-        */
+          RenderSystem
+         */
         void _makeProjectionMatrix(Real left, Real right, Real bottom, Real top, 
             Real nearPlane, Real farPlane, Matrix4& dest, bool forGpuProgram = false);
         /** See
@@ -390,12 +391,12 @@ namespace Ogre {
         void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane, 
             bool forGpuProgram);
         /** See
-        RenderSystem
-        */
+          RenderSystem
+         */
         void setClipPlane (ushort index, Real A, Real B, Real C, Real D);
         /** See
-        RenderSystem
-        */
+          RenderSystem
+         */
         void enableClipPlane (ushort index, bool enable);
         /** See
           RenderSystem
@@ -405,7 +406,8 @@ namespace Ogre {
           RenderSystem
          */
         void setStencilCheckEnabled(bool enabled);
-        /** See RenderSystem.
+        /** See
+          RenderSystem.
          */
         void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
             uint32 refValue = 0, uint32 mask = 0xFFFFFFFF, 
@@ -447,8 +449,8 @@ namespace Ogre {
 		void bindGpuProgramParameters(GpuProgramType gptype, 
 			GpuProgramParametersSharedPtr params, uint16 variabilityMask);
 		/** See
-		RenderSystem
-		*/
+		  RenderSystem
+		 */
 		void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
         /** See
           RenderSystem
