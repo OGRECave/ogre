@@ -3265,6 +3265,39 @@ namespace Ogre{
 						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
 							"colour_op_multiplass_fallback must have at most 2 arguments");
 					}
+					else if(prop->values.size() == 1)
+					{
+						if(prop->values.front()->type == ANT_ATOM)
+						{
+							AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
+							switch(atom->id)
+							{
+							case ID_ADD:
+								mUnit->setColourOpMultipassFallback(SBF_ONE, SBF_ONE);
+								break;
+							case ID_MODULATE:
+								mUnit->setColourOpMultipassFallback(SBF_DEST_COLOUR, SBF_ZERO);
+								break;
+							case ID_COLOUR_BLEND:
+								mUnit->setColourOpMultipassFallback(SBF_SOURCE_COLOUR, SBF_ONE_MINUS_SOURCE_COLOUR);
+								break;
+							case ID_ALPHA_BLEND:
+								mUnit->setColourOpMultipassFallback(SBF_SOURCE_ALPHA, SBF_ONE_MINUS_SOURCE_ALPHA);
+								break;
+							case ID_REPLACE:
+								mUnit->setColourOpMultipassFallback(SBF_ONE, SBF_ZERO);
+								break;
+							default:
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									"argument must be a valid scene blend type (add, modulate, colour_blend, alpha_blend, or replace)");
+							}
+						}
+						else
+						{
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								"argument must be a valid scene blend type (add, modulate, colour_blend, alpha_blend, or replace)");
+						}
+					}
 					else
 					{
 						AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
