@@ -134,7 +134,7 @@ namespace Ogre {
 		mCurrentContext = 0;
 		mMainContext = 0;
 
-		mGLInitialized = false;
+		mGLInitialised = false;
 
 		mCurrentLights = 0;
 		mMinFilter = FO_LINEAR;
@@ -874,7 +874,7 @@ namespace Ogre {
 		/// Create the texture manager        
 		mTextureManager = new GLTextureManager(*mGLSupport); 
 
-		mGLInitialized = true;
+		mGLInitialised = true;
 	}
 
 	void GLRenderSystem::reinitialise(void)
@@ -928,7 +928,7 @@ namespace Ogre {
 		// There will be a new initial window and so forth, thus any call to test
 		//  some params will access an invalid pointer, so it is best to reset
 		//  the whole state.
-		mGLInitialized = 0;
+		mGLInitialised = 0;
 	}
 
 	void GLRenderSystem::setAmbientLight(float r, float g, float b)
@@ -1012,7 +1012,7 @@ namespace Ogre {
 
 		attachRenderTarget( *win );
 
-		if (!mGLInitialized) 
+		if (!mGLInitialised) 
 		{                
 
 			// set up glew and GLSupport
@@ -1771,7 +1771,14 @@ namespace Ogre {
 			break;
 		}
 
-		glBlendEquation(func);
+		if(GLEW_VERSION_1_4 || GLEW_ARB_imaging)
+        {
+			glBlendEquation(func);
+		}
+		else if(GLEW_EXT_blend_minmax && (func == GL_MIN || func == GL_MAX))
+        {
+			glBlendEquationEXT(func);
+		}
 	}
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setSeparateSceneBlending(
@@ -1835,7 +1842,12 @@ namespace Ogre {
 			break;
 		}
 
-		glBlendEquationSeparate(func, alphaFunc);
+		if(GLEW_VERSION_2_0) {
+			glBlendEquationSeparate(func, alphaFunc);
+		}
+		else if(GLEW_EXT_blend_equation_separate) {
+			glBlendEquationSeparateEXT(func, alphaFunc);
+		}
 	}
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)

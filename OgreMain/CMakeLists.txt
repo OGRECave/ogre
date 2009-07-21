@@ -490,15 +490,23 @@ elseif (APPLE)
   else ()
     include_directories("include/OSX")
     set(PLATFORM_HEADER_FILES
+      # Hack around a CMake bug.  The first item has its role set to Project instead of public.
+      # including it twice works around the issue
+      # In addition, include OgreZip.h because of a similar issue
+	  include/OSX/config.h
+	  include/OSX/config.h
+      include/OSX/macUtils.h
       include/OSX/OgreConfigDialogImp.h
       include/OSX/OgreErrorDialogImp.h
       include/OSX/OgreTimerImp.h
-      include/OSX/macUtils.h
       include/OSX/OgreOSXCocoaView.h
+	  include/OgreConfig.h
+	  include/OgreZip.h
+	  ${OGRE_BINARY_DIR}/include/buildsettings.h
     )
     set(PLATFORM_SOURCE_FILES
-      src/OSX/OgreConfigDialog.cpp
-      src/OSX/OgreErrorDialog.cpp
+      src/OSX/OgreConfigDialog.mm
+      src/OSX/OgreErrorDialog.mm
       src/OSX/OgreTimer.cpp
       src/OSX/macUtils.cpp
       src/OSX/OgreOSXCocoaView.mm
