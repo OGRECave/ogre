@@ -539,6 +539,10 @@ Here are the attributes you can use in a 'pass' section of a .material script:
 @item
 @ref{separate_scene_blend}
 @item
+@ref{scene_blend_op}
+@item
+@ref{separate_scene_blend_op}
+@item
 @ref{depth_check}
 @item
 @ref{depth_write}
@@ -730,6 +734,25 @@ Format2: separate_scene_blend <colour_src_factor> <colour_dest_factor> <alpha_sr
 Example: separate_scene_blend one one_minus_dest_alpha one one @*@*
 
 Again the options available in the second format are the same as those in the second format of @ref{scene_blend}.
+
+@anchor{scene_blend_op}
+@subheading scene_blend_op
+
+This directive changes the operation which is applied between the two components of the scene 
+blending equation, which by default is 'add' (sourceFactor * source + destFactor * dest). You may 
+change this to 'add', 'subtract', 'reverse_subtract', 'min' or 'max'.@*@*
+
+Format: scene_blend_op <add|subtract|reverse_subtract|min|max>@*@*
+Default: scene_blend_op add@*@*
+
+@anchor{separate_scene_blend_op}
+@subheading separate_scene_blend_op
+
+This directive is as scene_blend_op, except that you can set the operation for colour and alpha
+separately.
+
+Format: separate_scene_blend_op <colourOp> <alphaOp>@*@*
+Default: separate_scene_blend_op add add@*@*
 
 
 @anchor{depth_check}
