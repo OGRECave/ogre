@@ -3299,7 +3299,7 @@ namespace Ogre{
 								*atom2 = (AtomAbstractNode*)(*i2).get();
 							LayerBlendOperationEx op = LBX_ADD;
 							LayerBlendSource source1 = LBS_CURRENT, source2 = LBS_TEXTURE;
-							Real arg1, arg2;
+							Real arg1 = 0.0f, arg2 = 0.0f;
 							Real manualBlend = 0.0f;
 
 							switch(atom0->id)
@@ -4755,7 +4755,7 @@ namespace Ogre{
 						}
 
 
-						AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
+						AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get();
 
 						String pName = atom0->value;
 						GpuConstantType constType;
