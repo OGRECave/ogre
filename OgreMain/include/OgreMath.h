@@ -577,6 +577,9 @@ namespace Ogre
 		static Matrix4 makeViewMatrix(const Vector3& position, const Quaternion& orientation, 
 			const Matrix4* reflectMatrix = 0);
 
+		/** Get a bounding radius value from a bounding box. */
+		static Real boundingRadiusFromAABB(const AxisAlignedBox& aabb);
+
 
 
         static const Real POS_INFINITY;

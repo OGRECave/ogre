@@ -276,6 +276,7 @@ namespace Ogre {
         if( !_is_initialised )
         {
             ilInit();
+            iluInit();
             ilEnable( IL_FILE_OVERWRITE );
             _is_initialised = true;
         }

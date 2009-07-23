@@ -159,8 +159,7 @@ namespace Ogre {
         mAABB.merge(newMin);
         mAABB.merge(newMax);
 
-		Real sqlen = std::max(newMin.squaredLength(), newMax.squaredLength());
-		mBoundingRadius = std::max(mBoundingRadius, Math::Sqrt(sqlen));
+		mBoundingRadius = Math::boundingRadiusFromAABB(mAABB);
 
         return newBill;
     }

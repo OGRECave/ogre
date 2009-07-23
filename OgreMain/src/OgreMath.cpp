@@ -973,5 +973,18 @@ namespace Ogre
 		return viewMatrix;
 
 	}
+	//---------------------------------------------------------------------
+	Real Math::boundingRadiusFromAABB(const AxisAlignedBox& aabb)
+	{
+		Vector3 max = aabb.getMaximum();
+		Vector3 min = aabb.getMinimum();
+
+		Vector3 magnitude = max;
+		magnitude.makeCeil(-max);
+		magnitude.makeCeil(min);
+		magnitude.makeCeil(-min);
+
+		return magnitude.length();
+	}
 
 }

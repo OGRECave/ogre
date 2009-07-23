@@ -444,13 +444,8 @@ namespace Ogre {
         mAABB = bounds;
         Vector3 max = mAABB.getMaximum();
         Vector3 min = mAABB.getMinimum();
+		mBoundRadius = Math::boundingRadiusFromAABB(mAABB);
 
-        // Set sphere bounds; not the tightest by since we're using
-        // manual AABB it is the only way
-        Real sqLen1 = min.squaredLength();
-        Real sqLen2 = max.squaredLength();
-
-        mBoundRadius = Math::Sqrt(std::max(sqLen1, sqLen2));
         if (pad)
         {
             // Pad out the AABB a little, helps with most bounds tests

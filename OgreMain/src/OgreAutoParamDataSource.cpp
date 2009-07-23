@@ -434,24 +434,36 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     const Vector4& AutoParamDataSource::getCameraPosition(void) const
     {
-        if(mCameraPositionDirty)
-        {
-            Vector3 vec3 = mCurrentCamera->getDerivedPosition();
-            mCameraPosition[0] = vec3[0];
-            mCameraPosition[1] = vec3[1];
-            mCameraPosition[2] = vec3[2];
-            mCameraPosition[3] = 1.0;
-            mCameraPositionDirty = false;
-        }
-        return mCameraPosition;
+		if(mCameraPositionDirty)
+		{
+			Vector3 vec3 = mCurrentCamera->getDerivedPosition();
+			if (mCameraRelativeRendering)
+			{
+				vec3 -= mCameraRelativePosition;
+			}
+			mCameraPosition[0] = vec3[0];
+			mCameraPosition[1] = vec3[1];
+			mCameraPosition[2] = vec3[2];
+			mCameraPosition[3] = 1.0;
+			mCameraPositionDirty = false;
+		}
+		return mCameraPosition;
     }    
     //-----------------------------------------------------------------------------
     const Vector4& AutoParamDataSource::getCameraPositionObjectSpace(void) const
     {
         if (mCameraPositionObjectSpaceDirty)
         {
-            mCameraPositionObjectSpace = 
-                getInverseWorldMatrix().transformAffine(mCurrentCamera->getDerivedPosition());
+			if (mCameraRelativeRendering)
+			{
+				mCameraPositionObjectSpace = 
+					getInverseWorldMatrix().transformAffine(Vector3::ZERO);
+			}
+			else
+			{
+				mCameraPositionObjectSpace = 
+					getInverseWorldMatrix().transformAffine(mCurrentCamera->getDerivedPosition());
+			}
             mCameraPositionObjectSpaceDirty = false;
         }
         return mCameraPositionObjectSpace;
@@ -462,6 +474,10 @@ namespace Ogre {
 		if(mLodCameraPositionDirty)
 		{
 			Vector3 vec3 = mCurrentCamera->getLodCamera()->getDerivedPosition();
+            if (mCameraRelativeRendering)
+            {
+                vec3 -= mCameraRelativePosition;
+            }
 			mLodCameraPosition[0] = vec3[0];
 			mLodCameraPosition[1] = vec3[1];
 			mLodCameraPosition[2] = vec3[2];
@@ -475,9 +491,18 @@ namespace Ogre {
 	{
 		if (mLodCameraPositionObjectSpaceDirty)
 		{
-			mLodCameraPositionObjectSpace = 
-				getInverseWorldMatrix().transformAffine(mCurrentCamera->getLodCamera()->getDerivedPosition());
-			mLodCameraPositionObjectSpaceDirty = false;
+            if (mCameraRelativeRendering)
+			{
+				mLodCameraPositionObjectSpace = 
+					getInverseWorldMatrix().transformAffine(mCurrentCamera->getLodCamera()->getDerivedPosition()
+						- mCameraRelativePosition);
+			}
+			else
+			{
+			    mLodCameraPositionObjectSpace = 
+				    getInverseWorldMatrix().transformAffine(mCurrentCamera->getLodCamera()->getDerivedPosition());
+            }
+            mLodCameraPositionObjectSpaceDirty = false;
 		}
 		return mLodCameraPositionObjectSpace;
 	}

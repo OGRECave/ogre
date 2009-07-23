@@ -1190,8 +1190,7 @@ namespace Ogre {
 			qmesh->worldBounds.getMinimum() ,
 			qmesh->worldBounds.getMaximum());
 		mAABB.merge(localBounds);
-		mBoundingRadius = std::max(mBoundingRadius, localBounds.getMinimum().length());
-		mBoundingRadius = std::max(mBoundingRadius, localBounds.getMaximum().length());
+		mBoundingRadius = Math::boundingRadiusFromAABB(mAABB);
 
 	}
 	//--------------------------------------------------------------------------
