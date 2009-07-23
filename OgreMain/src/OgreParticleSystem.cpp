@@ -1135,9 +1135,7 @@ namespace Ogre {
     void ParticleSystem::setBounds(const AxisAlignedBox& aabb)
     {
         mAABB = aabb;
-        Real sqDist = std::max(mAABB.getMinimum().squaredLength(), 
-            mAABB.getMaximum().squaredLength());
-        mBoundingRadius = Math::Sqrt(sqDist);
+        mBoundingRadius = Math::boundingRadiusFromAABB(mAABB);
 
     }
     //-----------------------------------------------------------------------
