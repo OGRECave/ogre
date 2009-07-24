@@ -83,10 +83,10 @@ protected:
 
 		mPageManager = OGRE_NEW PageManager();
 
-		PagedWorld* world = mPageManager->createWorld();
-		PagedWorldSection* sec = world->createSection("Grid2D", mSceneMgr);
+//		PagedWorld* world = mPageManager->createWorld();
+//		PagedWorldSection* sec = world->createSection("Grid2D", mSceneMgr);
 
-		Grid2DPageStrategyData* data = static_cast<Grid2DPageStrategyData*>(sec->getStrategyData());
+//		Grid2DPageStrategyData* data = static_cast<Grid2DPageStrategyData*>(sec->getStrategyData());
 
 		// accept defaults for now
 

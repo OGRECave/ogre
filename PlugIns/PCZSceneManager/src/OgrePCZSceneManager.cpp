@@ -51,13 +51,13 @@ namespace Ogre
 {
 	PCZSceneManager::PCZSceneManager(const String& name) :
 	SceneManager(name),
+	mDefaultZoneTypeName("ZoneType_Default"),
+	mDefaultZoneFileName("none"),
 	mLastActiveCamera(0),
 	mDefaultZone(0),
-	mActiveCameraZone(0),
-	mZoneFactoryManager(0),
 	mShowPortals(false),
-	mDefaultZoneTypeName("ZoneType_Default"),
-	mDefaultZoneFileName("none")
+	mZoneFactoryManager(0),
+	mActiveCameraZone(0)
 	{ }
 
     PCZSceneManager::~PCZSceneManager()
@@ -922,15 +922,15 @@ namespace Ogre
             "Function doesn't do as advertised",
             "PCZSceneManager::_alertVisibleObjects" );
 
-        NodeList::iterator it = mVisible.begin();
-
-        while ( it != mVisible.end() )
-        {
-            SceneNode * node = *it;
-            // this is where you would do whatever you wanted to the visible node
-            // but right now, it does nothing.
-            ++it;
-        }
+//        NodeList::iterator it = mVisible.begin();
+//
+//        while ( it != mVisible.end() )
+//        {
+//            SceneNode * node = *it;
+//            // this is where you would do whatever you wanted to the visible node
+//            // but right now, it does nothing.
+//            ++it;
+//        }
     }
 
     //-----------------------------------------------------------------------

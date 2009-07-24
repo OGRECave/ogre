@@ -148,7 +148,4 @@ namespace Ogre
 	/*@}*/
 }
 
-
-
-
-#endif 
+#endif

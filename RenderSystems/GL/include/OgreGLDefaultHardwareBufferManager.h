@@ -42,18 +42,19 @@ namespace Ogre {
     {
 	protected:
 		unsigned char* mpData;
-        /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::lock
         void* lockImpl(size_t offset, size_t length, LockOptions options);
-        /** See HardwareBuffer. */
-		void unlockImpl(void);
+        /// @copydoc HardwareBuffer::unlock
+        void unlockImpl(void);
 
     public:
 		GLDefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, 
             HardwareBuffer::Usage usage);
         ~GLDefaultHardwareVertexBuffer();
-        /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::readData
         void readData(size_t offset, size_t length, void* pDest);
-        /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::writeData
+
         void writeData(size_t offset, size_t length, const void* pSource,
 				bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
@@ -70,22 +71,22 @@ namespace Ogre {
     {
 	protected:
 		unsigned char* mpData;
-        /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::lock
         void* lockImpl(size_t offset, size_t length, LockOptions options);
-        /** See HardwareBuffer. */
-		void unlockImpl(void);
+        /// @copydoc HardwareBuffer::unlock
+        void unlockImpl(void);
     public:
 		GLDefaultHardwareIndexBuffer(IndexType idxType, size_t numIndexes, HardwareBuffer::Usage usage);
         ~GLDefaultHardwareIndexBuffer();
-        /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::readData
         void readData(size_t offset, size_t length, void* pDest);
-        /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::writeData
         void writeData(size_t offset, size_t length, const void* pSource,
 				bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
         void* lock(size_t offset, size_t length, LockOptions options);
         /** Override HardwareBuffer to turn off all shadowing. */
-		void unlock(void);
+        void unlock(void);
 
         void* getDataPtr(size_t offset) const { return (void*)(mpData + offset); }
     };
@@ -129,9 +130,6 @@ namespace Ogre {
 			OGRE_DELETE mImpl;
 		}
 	};
-
-
-
 }
 
 #endif

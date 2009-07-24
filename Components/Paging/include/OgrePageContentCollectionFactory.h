@@ -54,15 +54,10 @@ namespace Ogre
 		virtual const String& getName() const = 0;
 		virtual PageContentCollection* createInstance() = 0;
 		virtual void destroyInstance(PageContentCollection*) = 0;
-
-
 	};
 
 	/** @} */
 	/** @} */
 }
 
-
-
-
-#endif 
+#endif

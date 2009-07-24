@@ -73,17 +73,10 @@ namespace Ogre
 		virtual void frameEnd(Real timeElapsed) {}
 		/// Notify a section of the current camera
 		virtual void notifyCamera(Camera* cam) {}
-
-
-
-
 	};
 
 	/** @} */
 	/** @} */
 }
 
-
-
-
-#endif 
+#endif

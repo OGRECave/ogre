@@ -265,9 +265,7 @@ void InstancingListener::createInstanceGeom()
 	{
 		batch->addBatchInstance();
 	}
-	size_t i = 0;
 	InstancedGeometry::BatchInstanceIterator regIt = batch->getBatchInstanceIterator();
-	size_t baseIndexForBatch = 0;
 	size_t k = 0;
 	while (regIt.hasMoreElements ())
 	{
@@ -459,7 +457,6 @@ bool InstancingListener::handleMouseMove(const CEGUI::EventArgs& e)
 
 	if( mLMBDown)
 	{
-		int a =0;
 		// rotate camera
 		mRotX += Ogre::Degree(-((const MouseEventArgs&)e).moveDelta.d_x * mAvgFrameTime * 10.0);
 		mRotY += Ogre::Degree(-((const MouseEventArgs&)e).moveDelta.d_y * mAvgFrameTime * 10.0);

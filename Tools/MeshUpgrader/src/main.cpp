@@ -433,7 +433,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, VertexData* vertexD
 				VertexDeclaration::VertexElementList::iterator i, iend;
 				iend = elemList.end();
 				unsigned short currentBuffer = 999;
-				size_t offset;
+				size_t offset = 0;
 				for (i = elemList.begin(); i != iend; ++i)
 				{
 					// Calc offsets since reorg changes them
@@ -736,7 +736,7 @@ void resolveColourAmbiguities(Mesh* mesh)
 	// Check what we're dealing with 
 	bool hasColour = false;
 	bool hasAmbiguousColour = false;
-	VertexElementType originalType;
+	VertexElementType originalType = VET_FLOAT1;
 	if (mesh->sharedVertexData)
 	{
 		checkColour(mesh->sharedVertexData, hasColour, hasAmbiguousColour, originalType);
@@ -784,7 +784,7 @@ void resolveColourAmbiguities(Mesh* mesh)
 	}
 
 	// Ask what format we want to save in
-	VertexElementType desiredType;
+	VertexElementType desiredType = VET_FLOAT1;
 	if (hasColour)
 	{
 		if (opts.destColourFormatSet)

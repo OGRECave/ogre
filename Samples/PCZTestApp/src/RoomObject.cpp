@@ -238,7 +238,7 @@ Ogre::ManualObject* RoomObject::createRoom(Ogre::SceneManager *scene,
 	// create points
 	createPoints(dimensions, doorDimensions);
 
-	Ogre::Real fade=.5;
+//	Ogre::Real fade=.5;
 	Ogre::Real solid=.8;
 	Ogre::ColourValue color = ColourValue(0, 0, solid, solid);
 

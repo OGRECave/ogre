@@ -401,15 +401,8 @@ namespace Ogre
 
 	};
 
-
-
-
-
 	/** @} */
 	/** @} */
 }
 
-
-
-
-#endif 
+#endif

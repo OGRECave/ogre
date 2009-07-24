@@ -51,6 +51,9 @@
 /* The "const" storage-class-modifier is valid. */
 #define YY_USE_CONST
 
+/* yyunput is never used */
+#define YY_NO_UNPUT
+
 #else	/* ! __cplusplus */
 
 #if __STDC__
@@ -261,7 +264,9 @@ YY_BUFFER_STATE yy_scan_string YY_PROTO(( yyconst char *yy_str ));
 YY_BUFFER_STATE yy_scan_bytes YY_PROTO(( yyconst char *bytes, int len ));
 
 static void *yy_flex_alloc YY_PROTO(( yy_size_t ));
+#if !defined(YY_USES_REJECT) && defined(YY_NO_PUSH_STATE)
 static void *yy_flex_realloc YY_PROTO(( void *, yy_size_t ));
+#endif
 static void yy_flex_free YY_PROTO(( void * ));
 
 #define yy_new_buffer yy_create_buffer
@@ -3746,6 +3751,9 @@ yy_size_t size;
 	return (void *) malloc( size );
 	}
 
+// This function is never referenced under these specific conditions
+// Removes a warning
+#if !defined(YY_USES_REJECT) && defined(YY_NO_PUSH_STATE)
 #ifdef YY_USE_PROTOS
 static void *yy_flex_realloc( void *ptr, yy_size_t size )
 #else
@@ -3763,6 +3771,7 @@ yy_size_t size;
 	 */
 	return (void *) realloc( (char *) ptr, size );
 	}
+#endif
 
 #ifdef YY_USE_PROTOS
 static void yy_flex_free( void *ptr )

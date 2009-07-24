@@ -284,13 +284,10 @@ namespace Ogre
 			// pass on to children
 			if (!isLeaf())
 			{
-				LodLevel* lowestOwnLod = *mLodLevels.rbegin();
-
 				for (int i = 0; i < 4; ++i)
 				{
 					mChildren[i]->notifyDelta(x, y, lod, delta);
-				}
-
+                                }
 			}
 
 		}
@@ -580,7 +577,7 @@ namespace Ogre
 		const float* pBaseHeight = mTerrain->getHeightData(rect.left, rect.top);
 		const float* pBaseDelta = mTerrain->getDeltaData(rect.left, rect.top);
 		uint16 rowskip = mTerrain->getSize() * inc;
-		uint16 destPosRowSkip, destDeltaRowSkip;
+		uint16 destPosRowSkip = 0, destDeltaRowSkip = 0;
 		unsigned char* pRootPosBuf = 0;
 		unsigned char* pRootDeltaBuf = 0;
 		unsigned char* pRowPosBuf = 0;
@@ -997,7 +994,7 @@ namespace Ogre
 		}
 
 		assert ((pI - basepI) == (uint16)destData->indexCount);
-
+        (void)basepI; // Silence warning
 
 	}
 	//---------------------------------------------------------------------

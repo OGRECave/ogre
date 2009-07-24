@@ -1,5 +1,16 @@
-
-
+/*
+ -----------------------------------------------------------------------------
+ This source file is part of OGRE
+ (Object-oriented Graphics Rendering Engine)
+ For the latest info, see http://www.ogre3d.org/
+ 
+ Copyright (c) 2000-2006 Torus Knot Software Ltd
+ Also see acknowledgements in Readme.html
+ 
+ You may use this sample code for anything you like, it is not covered by the
+ LGPL like the rest of the engine.
+ -----------------------------------------------------------------------------
+*/
 
 #include "CEGUI/CEGUI.h"
 #include "OgreCEGUIRenderer.h"
@@ -22,7 +33,10 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
 }
 */
 #define maxObjectsPerBatch 80
-#define FLT_MAX         3.402823466e+38F        /* max value */
+#ifndef FLT_MAX
+#  define FLT_MAX         3.402823466e+38F        /* max value */
+#endif
+
 const size_t numTypeMeshes = 4;
 class InstancingApplication;
 Ogre::String meshes[]=

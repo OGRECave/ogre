@@ -231,7 +231,6 @@ namespace Ogre
 			uint32 *p32 = 0;
 
 			HardwareIndexBufferSharedPtr ibuf = i_in->indexBuffer;
-			bool use32bit = false;
 			if (ibuf->getType() == HardwareIndexBuffer::IT_32BIT)
 			{
 				p32 = static_cast<uint32*>(

@@ -115,7 +115,7 @@ namespace Ogre {
         */
         virtual RenderTexture *createRenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
         
-         /** @copydoc GLRTTManager::checkFormat
+        /** @copydoc GLRTTManager::checkFormat
         */
         virtual bool checkFormat(PixelFormat format);
         

@@ -126,7 +126,7 @@ namespace Ogre {
             bonElem != 0; bonElem = bonElem->NextSiblingElement())
         {
             String name = bonElem->Attribute("name");
-			int id = StringConverter::parseInt(bonElem->Attribute("id"));
+//			int id = StringConverter::parseInt(bonElem->Attribute("id"));
 
 			TiXmlElement* posElem = bonElem->FirstChildElement("position");
 			TiXmlElement* rotElem = bonElem->FirstChildElement("rotation");
@@ -442,15 +442,8 @@ namespace Ogre {
         for (i = 0; i < numBones; ++i)
         {
             Bone* pBone = pSkel->getBone(i);
-            unsigned short handle = pBone->getHandle();
 			String name = pBone->getName() ;
-            /* BEFORE
-			if (handle != 0) // root bone
-            {
-                Bone* pParent = (Bone*)pBone->getParent();
-                writeBoneParent(hierElem, name, pParent->getName());
-            }
-			*//* AFTER */
+
 			if ((pBone->getParent())!=NULL) // root bone
             {
                 Bone* pParent = (Bone*)pBone->getParent();

@@ -1546,7 +1546,7 @@ namespace Ogre
 			int sourceLevel = targetLevel - 1;
 			int step = 1 << targetLevel;
 			// The step of the next higher LOD
-			int higherstep = step >> 1;
+//			int higherstep = step >> 1;
 
 			// need to widen the dirty rectangle since change will affect surrounding
 			// vertices at lower LOD
@@ -1818,7 +1818,7 @@ namespace Ogre
 		int xDir = (rayDirection.x < 0 ? -1 : 1);
 		int zDir = (rayDirection.z < 0 ? -1 : 1);
 
-		Result result;
+		Result result(true, Vector3::ZERO);
 		while (cur.y >= (minHeight - 1e-3) && cur.y <= (maxHeight + 1e-3))
 		{
 			if (quadX < 0 || quadX >= (int)mSize-1 || quadZ < 0 || quadZ >= (int)mSize-1)
@@ -2598,7 +2598,7 @@ namespace Ogre
 
 				// get world space point
 				// add a little height padding to stop shadowing self
-				Vector3 wpos;
+				Vector3 wpos = Vector3::ZERO;
 				getPosition(Tx, Ty, getHeightAtTerrainPosition(Tx, Ty) + heightPad, &wpos);
 				wpos += getPosition();
 				// build ray, cast backwards along light direction

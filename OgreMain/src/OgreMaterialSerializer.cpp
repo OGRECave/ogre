@@ -2186,6 +2186,7 @@ namespace Ogre
         try {
 			const GpuConstantDefinition& def = 
 				context.programParams->getConstantDefinition(vecparams[0]);
+            (void)def; // Silence warning
         }
         catch (Exception& e)
         {
@@ -2218,6 +2219,7 @@ namespace Ogre
         try {
 			const GpuConstantDefinition& def = 
 				context.programParams->getConstantDefinition(vecparams[0]);
+            (void)def; // Silence warning
         }
         catch (Exception& e)
         {

@@ -34,7 +34,7 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
-// Default hreshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)
+// Default threshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)
 #	define OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD (1024 * 32)
 
 

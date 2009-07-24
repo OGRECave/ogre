@@ -49,6 +49,9 @@
 /* The "const" storage-class-modifier is valid. */
 #define YY_USE_CONST
 
+/* yyunput is never used */
+#define YY_NO_UNPUT
+
 #else	/* ! __cplusplus */
 
 #if __STDC__

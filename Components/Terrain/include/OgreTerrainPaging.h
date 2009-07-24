@@ -85,9 +85,6 @@ namespace Ogre
 
 		/// The actual terrain
 		Terrain* mTerrain;
-
-
-
 	};
 
 
@@ -110,8 +107,6 @@ namespace Ogre
 		{
 			OGRE_DELETE c;
 		}
-
-
 	};
 
 
@@ -119,7 +114,4 @@ namespace Ogre
 	/** @} */
 }
 
-
-
-
-#endif 
+#endif

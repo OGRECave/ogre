@@ -47,6 +47,7 @@ const MaterialPtr &MaterialGenerator::getMaterial(Perm permutation)
 	size_t totalBits = bitNames.size();
 	size_t totalPerms = 1<<totalBits;
 	assert(permutation < totalPerms);
+    (void)totalPerms; // Silence warning
 
 	/// Check if material/shader permutation already was generated
 	MaterialMap::iterator i = mMaterials.find(permutation);

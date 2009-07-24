@@ -336,6 +336,8 @@ protected:
 		Controller<Real>* controller = contMgr.createController(
 			contMgr.getFrameTimeSource(), val, func);
 
+        (void)controller;   // Silence warning
+
 		//mLight->setPosition(Vector3(300,250,-300));
 		mLightNode->setPosition(Vector3(300,250,-300));
 
@@ -458,6 +460,8 @@ protected:
 extern "C" {
 #endif
 
+#include "OgreErrorDialog.h"
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 #else
@@ -472,7 +476,7 @@ int main(int argc, char **argv)
 #else
     // Create application object
     Grass_Application app;
-
+    
     try {
         app.go();
     } catch( Exception& e ) {

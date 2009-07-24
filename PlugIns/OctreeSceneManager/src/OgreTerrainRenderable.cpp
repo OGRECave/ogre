@@ -468,7 +468,7 @@ namespace Ogre
 
             int step = 1 << level;
             // The step of the next higher LOD
-            int higherstep = step >> 1;
+//            int higherstep = step >> 1;
 
             float* pDeltas = 0;
             if (mOptions->lodMorph)

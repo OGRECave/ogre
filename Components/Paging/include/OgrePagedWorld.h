@@ -222,10 +222,6 @@ namespace Ogre
 	protected:
 		SectionMap mSections;
 		NameGenerator mSectionNameGenerator;
-
-
-
-
 	};
 	
 	/** @} */
@@ -233,7 +229,4 @@ namespace Ogre
 
 }
 
-
-
-
-#endif 
+#endif

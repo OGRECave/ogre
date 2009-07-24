@@ -277,8 +277,8 @@ namespace Ogre {
                 StringConverter::toString(numFaces));
             // Write each face in turn
             size_t i;
-		    unsigned int* pInt;
-		    unsigned short* pShort;
+		    unsigned int* pInt = 0;
+		    unsigned short* pShort = 0;
 		    HardwareIndexBufferSharedPtr ibuf = s->indexData->indexBuffer;
 		    if (use32BitIndexes)
 		    {
@@ -677,8 +677,8 @@ namespace Ogre {
 							HardwareBuffer::HBU_DYNAMIC,
 							false);
 					sm->indexData->indexBuffer = ibuf;
-					unsigned int *pInt;
-					unsigned short *pShort;
+					unsigned int *pInt = 0;
+					unsigned short *pShort = 0;
 					if (use32BitIndexes)
 					{
 						pInt = static_cast<unsigned int*>(
@@ -753,7 +753,7 @@ namespace Ogre {
         ARGB *pCol;
 
         const char *claimedVertexCount_ = mGeometryNode->Attribute("vertexcount");
-        ptrdiff_t claimedVertexCount;
+        ptrdiff_t claimedVertexCount = 0;
         if (claimedVertexCount_)
         {
                 claimedVertexCount =
@@ -769,7 +769,7 @@ namespace Ogre {
         unsigned short totalTexCoords = 0; // across all buffers
 
         // Information for calculating bounds
-        Vector3 min, max, pos;
+        Vector3 min = Vector3::ZERO, max = Vector3::UNIT_SCALE, pos = Vector3::ZERO;
         Real maxSquaredRadius = -1;
         bool first = true;
 
@@ -1261,8 +1261,8 @@ namespace Ogre {
 				bool use32BitIndexes = (facedata->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
 
 				// Write each face in turn
-				unsigned int* pInt;
-				unsigned short* pShort;
+				unsigned int* pInt = 0;
+				unsigned short* pShort = 0;
 				HardwareIndexBufferSharedPtr ibuf = facedata->indexBuffer;
 				if (use32BitIndexes)
 				{
@@ -1388,7 +1388,7 @@ namespace Ogre {
 	{
 		MeshLodUsage usage;
 		const char* val = manualNode->Attribute("value");
-		Real userValue;
+
         // If value attribute not found check for old name
         if (!val)
         {
@@ -1413,7 +1413,7 @@ namespace Ogre {
 	{
 		MeshLodUsage usage;
 		const char* val = genNode->Attribute("value");
-		Real userValue;
+
         // If value attribute not found check for old name
         if (!val)
         {
@@ -1455,8 +1455,8 @@ namespace Ogre {
 					createIndexBuffer(
 						itype, numFaces * 3, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
 
-				unsigned short *pShort;
-				unsigned int *pInt;
+				unsigned short *pShort = 0;
+				unsigned int *pInt = 0;
 				if (use32bitindexes)
 				{
 					pInt = static_cast<unsigned int*>(

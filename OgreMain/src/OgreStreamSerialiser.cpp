@@ -244,6 +244,7 @@ namespace Ogre
 		const Chunk* c = readChunkBegin();
 		// endian should be flipped now
 		assert(c->id == HEADER_ID);
+        (void)c; // Silence warning
 
 		// read real storage format
 		bool realIsDouble;

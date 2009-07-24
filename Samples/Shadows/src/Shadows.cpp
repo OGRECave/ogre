@@ -203,7 +203,7 @@ public:
 				mat->load();
 				Ogre::GpuProgramParametersSharedPtr fparams = 
 					mat->getBestTechnique()->getPass(0)->getFragmentProgramParameters();
-				const Ogre::String& progName = mat->getBestTechnique()->getPass(0)->getFragmentProgramName();
+//				const Ogre::String& progName = mat->getBestTechnique()->getPass(0)->getFragmentProgramName();
 				// A bit hacky - Cg & HLSL index arrays via [0], GLSL does not
 				fparams->setNamedConstant("sampleOffsets", mBloomTexOffsetsHorz[0], 15);
 				fparams->setNamedConstant("sampleWeights", mBloomTexWeights[0], 15);
@@ -216,7 +216,7 @@ public:
 				mat->load();
 				Ogre::GpuProgramParametersSharedPtr fparams = 
 					mat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-				const Ogre::String& progName = mat->getBestTechnique()->getPass(0)->getFragmentProgramName();
+//				const Ogre::String& progName = mat->getBestTechnique()->getPass(0)->getFragmentProgramName();
 				fparams->setNamedConstant("sampleOffsets", mBloomTexOffsetsVert[0], 15);
 				fparams->setNamedConstant("sampleWeights", mBloomTexWeights[0], 15);
 
@@ -736,6 +736,7 @@ protected:
             mMinFlareSize, mMaxFlareSize));
         Controller<Real>* controller = contMgr.createController(
             contMgr.getFrameTimeSource(), val, func);
+        (void)controller; // Silence warning
 
         //mLight->setPosition(Vector3(300,250,-300));
         mLightNode->setPosition(Vector3(300,1750,-700));

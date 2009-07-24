@@ -70,7 +70,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                 "Invalid attempt to lock an index buffer that has already been locked",
-                "GLHardwareIndexBuffer::lock");
+                "GLHardwareVertexBuffer::lock");
         }
 
 

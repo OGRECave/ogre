@@ -58,7 +58,9 @@ namespace Ogre {
         GLenum getGLTextureTarget(void) const;
 
         GLuint getGLID() const
-        { return mTextureID; }
+        {
+            return mTextureID;
+        }
 
     protected:
 		/// @copydoc Texture::createInternalResourcesImpl

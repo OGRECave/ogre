@@ -253,9 +253,9 @@ protected:
         mWindow->getViewport(0)->setBackgroundColour(fadeColour);
 
 		// create a terrain zone
-        String terrain_cfg("terrain.cfg");
-		String zoneName("Terrain1_Zone");
-		PCZone * terrainZone = createTerrainZone(zoneName, terrain_cfg);
+//        String terrain_cfg("terrain.cfg");
+//		String zoneName("Terrain1_Zone");
+//		PCZone * terrainZone = createTerrainZone(zoneName, terrain_cfg);
 
 /*		// Create another terrain zone
         terrain_cfg = "terrain.cfg";

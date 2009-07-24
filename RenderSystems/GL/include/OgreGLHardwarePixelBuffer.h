@@ -85,24 +85,24 @@ namespace Ogre {
 			GLint level, Usage usage, bool softwareMipmap, bool writeGamma, uint fsaa);
         ~GLTextureBuffer();
         
-        /// @copydoc GLHardwarePixelBuffer::bindToFramebuffer
+        /// @copydoc HardwarePixelBuffer::bindToFramebuffer
         virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
-        /// @copydoc ardwarePixelBuffer::getRenderTarget
+        /// @copydoc HardwarePixelBuffer::getRenderTarget
         RenderTexture* getRenderTarget(size_t);
-        // Upload a box of pixels to this buffer on the card
+        /// Upload a box of pixels to this buffer on the card
 		virtual void upload(const PixelBox &data, const Image::Box &dest);
 		// Download a box of pixels from the card
 		virtual void download(const PixelBox &data);
   
-        // Hardware implementation of blitFromMemory
+        /// Hardware implementation of blitFromMemory
         virtual void blitFromMemory(const PixelBox &src_orig, const Image::Box &dstBox);
         
-        // Notify TextureBuffer of destruction of render target
+        /// Notify TextureBuffer of destruction of render target
         void _clearSliceRTT(size_t zoffset)
         {
             mSliceTRT[zoffset] = 0;
         }
-        // Copy from framebuffer
+        /// Copy from framebuffer
         void copyFromFramebuffer(size_t zoffset);
         /// @copydoc HardwarePixelBuffer::blit
         void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
@@ -131,7 +131,7 @@ namespace Ogre {
         /// @copydoc GLHardwarePixelBuffer::bindToFramebuffer
         virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
     protected:
-        // In case this is a  render buffer
+        // In case this is a render buffer
         GLuint mRenderbufferID;
     };
 };

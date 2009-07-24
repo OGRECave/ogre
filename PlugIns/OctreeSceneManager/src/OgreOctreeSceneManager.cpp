@@ -556,14 +556,14 @@ void OctreeSceneManager::_alertVisibleObjects( void )
         "Function doesn't do as advertised",
         "OctreeSceneManager::_alertVisibleObjects" );
 
-    Octree::NodeList::iterator it = mVisible.begin();
-
-    while ( it != mVisible.end() )
-    {
-        OctreeNode * node = *it;
-
-        ++it;
-    }
+//    Octree::NodeList::iterator it = mVisible.begin();
+//
+//    while ( it != mVisible.end() )
+//    {
+//        OctreeNode * node = *it;
+//
+//        ++it;
+//    }
 }
 
 void OctreeSceneManager::_findVisibleObjects(Camera * cam, 

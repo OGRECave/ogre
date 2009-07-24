@@ -71,7 +71,6 @@ namespace Ogre
 		// Name
 		ser.read(&mName);
 		// Sections
-		bool sectionsOk = true;
 		while(ser.peekNextChunkID() == PagedWorldSection::CHUNK_ID)
 		{
 			PagedWorldSection* sec = OGRE_NEW PagedWorldSection(this);

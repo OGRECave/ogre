@@ -68,7 +68,7 @@ namespace Ogre {
 		/*
 ***Key: "title" Description: The title of the window that will appear in the title bar Values: string Default: RenderTarget name
 
-Key: "colourDepth" Description: Colour depth of the resulting rendering window; only applies if fullScreen is set. Values: 16 or 32 Default: desktop depth Notes: [W32 specific]
+***Key: "colourDepth" Description: Colour depth of the resulting rendering window; only applies if fullScreen is set. Values: 16 or 32 Default: desktop depth Notes: [W32 specific]
 
 ***Key: "left" Description: screen x coordinate from left Values: positive integers Default: 'center window on screen' Notes: Ignored in case of full screen
 
@@ -80,14 +80,14 @@ Key: "colourDepth" Description: Colour depth of the resulting rendering window; 
 
 ***Key: "FSAA" Description: Full screen antialiasing factor Values: 0,2,4,6,... Default: 0
 
-Key: "displayFrequency" Description: Display frequency rate, for fullscreen mode Values: 60...? Default: Desktop vsync rate
+***Key: "displayFrequency" Description: Display frequency rate, for fullscreen mode Values: 60...? Default: Desktop vsync rate
 
-Key: "vsync" Description: Synchronize buffer swaps to vsync Values: true, false Default: 0
+***Key: "vsync" Description: Synchronize buffer swaps to vsync Values: true, false Default: 0
 */
 
 		BOOL hasDepthBuffer = YES;
 		int fsaa_samples = 0;
-		NSString *windowTitle = [NSString stringWithCString:name.c_str() encoding:NSUTF8StringEncoding];
+		NSString *windowTitle = [NSString stringWithCString:name.c_str() encoding:NSASCIIStringEncoding];
 		int winx = 0, winy = 0;
 		int depth = 32;
 		
@@ -97,7 +97,7 @@ Key: "vsync" Description: Synchronize buffer swaps to vsync Values: true, false 
 			
 			opt = miscParams->find("title");
 			if(opt != miscParams->end())
-				windowTitle = [NSString stringWithCString:opt->second.c_str() encoding:NSUTF8StringEncoding];
+				windowTitle = [NSString stringWithCString:opt->second.c_str() encoding:NSASCIIStringEncoding];
 				
 			opt = miscParams->find("left");
 			if(opt != miscParams->end())

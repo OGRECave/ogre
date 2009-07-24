@@ -216,6 +216,7 @@ namespace Ogre {
 		struct stat tagStat;
 		int ret = stat(full_path.c_str(), &tagStat);
 		assert(ret == 0 && "Problem getting file size" );
+        (void)ret;  // Silence warning
 
 		// Always open in binary mode
 		// Also, always include reading

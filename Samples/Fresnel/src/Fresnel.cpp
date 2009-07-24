@@ -284,7 +284,7 @@ protected:
 
             // Generate a random selection of points for the fish to swim to
             fishSplines[fishNo].setAutoCalculate(false);
-            Vector3 lastPos;
+            Vector3 lastPos = Vector3::ZERO;
             for (size_t waypoint = 0; waypoint < NUM_FISH_WAYPOINTS; ++waypoint)
             {
                 Vector3 pos = Vector3(

@@ -379,9 +379,7 @@ OSStatus WindowEventUtilities::_CarbonWindowHandler(EventHandlerCallRef nextHand
     
     // We only get called if a window event happens
     UInt32 eventKind = GetEventKind( event );
-    
-    LogManager* log = LogManager::getSingletonPtr();
-    
+
     switch( eventKind )
     {
         case kEventWindowActivated:

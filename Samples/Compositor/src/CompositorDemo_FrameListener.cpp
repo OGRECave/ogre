@@ -169,7 +169,7 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
 				mat->load();
 				Ogre::GpuProgramParametersSharedPtr fparams =
 					mat->getBestTechnique()->getPass(0)->getFragmentProgramParameters();
-				const Ogre::String& progName = mat->getBestTechnique()->getPass(0)->getFragmentProgramName();
+//				const Ogre::String& progName = mat->getBestTechnique()->getPass(0)->getFragmentProgramName();
 				fparams->setNamedConstant("sampleOffsets", mBloomTexOffsetsHorz[0], 15);
 				fparams->setNamedConstant("sampleWeights", mBloomTexWeights[0], 15);
 
@@ -181,7 +181,7 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
 				mat->load();
 				Ogre::GpuProgramParametersSharedPtr fparams =
 					mat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-				const Ogre::String& progName = mat->getBestTechnique()->getPass(0)->getFragmentProgramName();
+//				const Ogre::String& progName = mat->getBestTechnique()->getPass(0)->getFragmentProgramName();
 				fparams->setNamedConstant("sampleOffsets", mBloomTexOffsetsVert[0], 15);
 				fparams->setNamedConstant("sampleWeights", mBloomTexWeights[0], 15);
 
@@ -261,7 +261,7 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
 				mat->load();
 				Ogre::GpuProgramParametersSharedPtr fparams =
 					mat->getBestTechnique()->getPass(0)->getFragmentProgramParameters();
-				const Ogre::String& progName = mat->getBestTechnique()->getPass(0)->getFragmentProgramName();
+//				const Ogre::String& progName = mat->getBestTechnique()->getPass(0)->getFragmentProgramName();
 				fparams->setNamedConstant("sampleOffsets", mBloomTexOffsetsHorz[0], 15);
 				fparams->setNamedConstant("sampleWeights", mBloomTexWeights[0], 15);
 
@@ -273,7 +273,7 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
 				mat->load();
 				Ogre::GpuProgramParametersSharedPtr fparams =
 					mat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-				const Ogre::String& progName = mat->getBestTechnique()->getPass(0)->getFragmentProgramName();
+//				const Ogre::String& progName = mat->getBestTechnique()->getPass(0)->getFragmentProgramName();
 				fparams->setNamedConstant("sampleOffsets", mBloomTexOffsetsVert[0], 15);
 				fparams->setNamedConstant("sampleWeights", mBloomTexWeights[0], 15);
 
