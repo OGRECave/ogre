@@ -34,17 +34,13 @@ Torus Knot Software Ltd.
 #include "OgreGLESPrerequisites.h"
 
 namespace Ogre {
-    class GLContext;
 
     /** An off-screen rendering context. These contexts are always RGBA for simplicity, speed and
         convience, but the component format is configurable.
     */
+    class GLContext;
     class _OgrePrivate GLESPBuffer
     {
-        protected:
-            PixelComponentType mFormat;
-            size_t mWidth, mHeight;
-
         public:
             GLESPBuffer(PixelComponentType format, size_t width, size_t height);
             virtual ~GLESPBuffer();
@@ -56,6 +52,9 @@ namespace Ogre {
             /** Get PBuffer component format for an OGRE pixel format.
              */
             static PixelComponentType getPixelComponentType(PixelFormat fmt);
+        protected:
+            PixelComponentType mFormat;
+            size_t mWidth, mHeight;
     };
 }
 

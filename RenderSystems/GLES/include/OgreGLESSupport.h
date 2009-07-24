@@ -35,49 +35,70 @@ Torus Knot Software Ltd.
 #include "OgreRenderWindow.h"
 #include "OgreConfigOptionMap.h"
 
-namespace Ogre {
+namespace Ogre
+{
     class GLESRenderSystem;
     class GLESPBuffer;
 
     class _OgreGLESExport GLESSupport
     {
-        private:
-            String mVersion;
-            String mVendor;
-
-        protected:
-            ConfigOptionMap mOptions;
-            std::set<String> extensionList;
-
         public:
             GLESSupport() { }
             virtual ~GLESSupport() { }
 
+            /**
+            * Add any special config values to the system.
+            * Must have a "Full Screen" value that is a bool and a "Video Mode" value
+            * that is a string in the form of wxh
+            */
             virtual void addConfig() = 0;
             virtual void setConfigOption(const String &name, const String &value);
+
+           /**
+            * Make sure all the extra options are valid
+            * @return string with error message
+            */
             virtual String validateConfig() = 0;
             virtual ConfigOptionMap& getConfigOptions(void);
             virtual RenderWindow* createWindow(bool autoCreateWindow,
                                                GLESRenderSystem *renderSystem,
                                                const String& windowTitle) = 0;
 
+            /// @copydoc RenderSystem::_createRenderWindow
             virtual RenderWindow* newWindow(const String &name,
                                             unsigned int width, unsigned int height,
                                             bool fullScreen,
                                             const NameValuePairList *miscParams = 0) = 0;
 
+            /**
+            * Get vendor information
+            */
             const String& getGLVendor(void) const
             {
                 return mVendor;
             }
 
+           /**
+            * Get version information
+            */
             const String& getGLVersion(void) const
             {
                 return mVersion;
             }
 
+            /**
+            * Get the address of a function
+            */
             virtual void* getProcAddress(const String& procname) = 0;
+
+            /** Initialises GL extensions, must be done AFTER the GL context has been
+               established.
+            */
             virtual void initialiseExtensions();
+
+            /**
+            * Check if an extension is available
+            */
             virtual bool checkExtension(const String& ext) const;
 
             virtual unsigned int getDisplayMonitorCount() const
@@ -86,10 +107,26 @@ namespace Ogre {
             }
     
 
+            /**
+            * Start anything special
+            */
             virtual void start() = 0;
+            /**
+            * Stop anything special
+            */
             virtual void stop() = 0;
 
             virtual GLESPBuffer *createPBuffer(PixelComponentType format, size_t width, size_t height) = 0;
+        private:
+            String mVersion;
+            String mVendor;
+
+        protected:
+            // Stored options
+            ConfigOptionMap mOptions;
+
+            // This contains the complete list of supported extensions
+            std::set<String> extensionList;
     };
 
 };

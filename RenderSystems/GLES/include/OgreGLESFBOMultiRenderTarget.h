@@ -27,27 +27,32 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreRoot.h"
-#include "OgreEAGLRenderTexture.h"
+#ifndef __GLESMULTIRENDERTARGET_H__
+#define __GLESMULTIRENDERTARGET_H__
+
+#include "OgreGLESFrameBufferObject.h"
 
 namespace Ogre {
-    EAGLPBuffer::EAGLPBuffer(EAGLSupport* glsupport, PixelComponentType format,
-                           size_t width, size_t height)
-        : GLESPBuffer(format, width, height)
-    {
-        initEAGLPBuffer();
-    }
+    
+    class GLESFBOManager;
 
-	// Changed the constructor to a member function so that the
-	// native constructor would be called first. This member
-	// function is then called from the native constructor.
-    void EAGLPBuffer::initEAGLPBuffer()
-    {
-        LogManager::getSingleton().logMessage(LML_NORMAL, "EAGLPBuffer::initEAGLPBuffer unimplemented");
-    }
+	/** MultiRenderTarget for GL ES. Requires the FBO extension.
+	*/
+	class _OgrePrivate GLESFBOMultiRenderTarget : public MultiRenderTarget
+	{
+	public:
+		GLESFBOMultiRenderTarget(GLESFBOManager *manager, const String &name);
+		~GLESFBOMultiRenderTarget();
 
-    EAGLPBuffer::~EAGLPBuffer()
-    {
-        LogManager::getSingleton().logMessage(LML_NORMAL, "EAGLPBuffer::PBuffer destroyed");
-    }
+		virtual void getCustomAttribute( const String& name, void *pData );
+
+		bool requiresTextureFlipping() const { return true; }
+	private:
+		virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
+		virtual void unbindSurfaceImpl(size_t attachment); 
+		GLESFrameBufferObject fbo;
+	};
+
 }
+
+#endif // __GLESMULTIRENDERTARGET_H__

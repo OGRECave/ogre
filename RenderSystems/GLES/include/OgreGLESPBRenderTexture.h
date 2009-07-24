@@ -34,12 +34,12 @@ Torus Knot Software Ltd.
 #include "OgreGLESRenderTexture.h"
 
 namespace Ogre {
-    class GLESPBRTTManager;
-    class GLESPBuffer;
-    class GLESContext;
 
     /** RenderTexture that uses a PBuffer (offscreen rendering context) for rendering.
     */
+    class GLESPBRTTManager;
+    class GLESPBuffer;
+    class GLESContext;
     class _OgrePrivate GLESPBRenderTexture: public GLESRenderTexture
     {
         public:
@@ -60,26 +60,47 @@ namespace Ogre {
             GLESPBRTTManager(GLESSupport *support, RenderTarget *mainwindow);
             virtual ~GLESPBRTTManager();
 
+        /** @copydoc GLRTTManager::createRenderTexture
+        */
             virtual RenderTexture *createRenderTexture(const String &name,
                                                        const GLESSurfaceDesc &target,
                                                        bool writeGamma, uint fsaa);
 
+            /** @copydoc GLRTTManager::checkFormat
+             */
             virtual bool checkFormat(PixelFormat format);
+
+            /** @copydoc GLRTTManager::bind
+             */
             virtual void bind(RenderTarget *target);
+
+            /** @copydoc GLRTTManager::unbind
+             */
             virtual void unbind(RenderTarget *target);
+
+            /** Create PBuffer for a certain pixel format and size
+             */
             void requestPBuffer(PixelComponentType ctype, size_t width, size_t height);
+
+            /** Release PBuffer for a certain pixel format
+             */
             void releasePBuffer(PixelComponentType ctype);
 
         protected:
+            /** GLESSupport reference, used to create PBuffers */
             GLESSupport *mSupport;
+            /** Primary window reference */
             RenderTarget *mMainWindow;
+            /** Primary window context */
             GLESContext *mMainContext;
+            /** Reference to a PBuffer, with refcount */
             struct PBRef
             {
                 PBRef(): pb(0),refcount(0) {}
                 GLESPBuffer* pb;
                 size_t refcount;
             };
+            /** Type to map each component type to a PBuffer */
             PBRef mPBuffers[PCT_COUNT];
     };
 }

@@ -40,26 +40,29 @@ namespace Ogre {
     /** GL-specific implementation of a TextureManager */
     class _OgrePrivate GLESTextureManager : public TextureManager
     {
-        protected:
-            Resource* createImpl(const String& name, ResourceHandle handle,
-                const String& group, bool isManual, ManualResourceLoader* loader, 
-                const NameValuePairList* createParams);
-
-            /// Internal method to create a warning texture (bound when a texture unit is blank)
-            void createWarningTexture();
-
-            GLESSupport& mGLSupport;
-            GLuint mWarningTextureID;
-
         public:
             GLESTextureManager(GLESSupport& support);
             virtual ~GLESTextureManager();
 
             GLuint getWarningTextureID() { return mWarningTextureID; }
 
+            /// @copydoc TextureManager::getNativeFormat
             PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
+
+            /// @copydoc TextureManager::isHardwareFilteringSupported
             bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
                                               bool preciseFormatOnly = false);
+    protected:
+        /// @copydoc ResourceManager::createImpl
+        Resource* createImpl(const String& name, ResourceHandle handle,
+                             const String& group, bool isManual, ManualResourceLoader* loader, 
+                             const NameValuePairList* createParams);
+        
+        /// Internal method to create a warning texture (bound when a texture unit is blank)
+        void createWarningTexture();
+        
+        GLESSupport& mGLSupport;
+        GLuint mWarningTextureID;
     };
 }
 

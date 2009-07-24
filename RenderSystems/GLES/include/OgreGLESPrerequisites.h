@@ -49,6 +49,9 @@ Torus Knot Software Ltd.
 	#define None NULL
 #endif
 
+// Define GL_NONE for convenience
+#define GL_NONE 0
+
 // PowerVR extension
 #ifndef GL_BGRA_PVR
 #   define GL_BGRA_PVR 0x80E1

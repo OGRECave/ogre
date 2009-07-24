@@ -12,6 +12,9 @@
 set(HEADER_FILES
   include/OgreGLESContext.h
   include/OgreGLESDefaultHardwareBufferManager.h
+  include/OgreGLESFBOMultiRenderTarget.h
+  include/OgreGLESFBORenderTexture.h
+  include/OgreGLESFrameBufferObject.h
   include/OgreGLESGpuProgramManager.h
   include/OgreGLESHardwareBufferManager.h
   include/OgreGLESHardwareIndexBuffer.h
@@ -34,6 +37,9 @@ set(SOURCE_FILES
   src/OgreGLESContext.cpp
   src/OgreGLESDefaultHardwareBufferManager.cpp
   src/OgreGLESEngineDll.cpp
+  src/OgreGLESFBOMultiRenderTarget.cpp
+  src/OgreGLESFBORenderTexture.cpp
+  src/OgreGLESFrameBufferObject.cpp
   src/OgreGLESGpuProgramManager.cpp
   src/OgreGLESHardwareBufferManager.cpp
   src/OgreGLESHardwareIndexBuffer.cpp

@@ -225,10 +225,7 @@ namespace Ogre {
 
     void GLESTexture::prepareImpl()
     {
-        if (mUsage & TU_RENDERTARGET)
-        {
-            return;
-        }
+        if (mUsage & TU_RENDERTARGET) return;
 
         String baseName, ext;
         size_t pos = mName.find_last_of(".");
@@ -343,6 +340,7 @@ namespace Ogre {
             for (size_t mip = 0; mip <= getNumMipmaps(); mip++)
             {
                 GLESHardwarePixelBuffer *buf = new GLESTextureBuffer(mName,
+                                                                     getGLESTextureTarget(),
                                                                      mTextureID,
                                                                      mWidth, mHeight,
                                                                      GLESPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma),

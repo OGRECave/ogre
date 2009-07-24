@@ -34,21 +34,32 @@ Torus Knot Software Ltd.
 #include "OgrePlugin.h"
 #include "OgreGLESRenderSystem.h"
 
-namespace Ogre {
+namespace Ogre 
+{
     /** Plugin instance for GL Manager */
     class GLESPlugin : public Plugin
     {
-    protected:
-        GLESRenderSystem* mRenderSystem;
 
     public:
         GLESPlugin();
 
+        /// @copydoc Plugin::getName
         const String& getName() const;
+
+        /// @copydoc Plugin::install
         void install();
+
+        /// @copydoc Plugin::initialise
         void initialise();
+
+        /// @copydoc Plugin::shutdown
         void shutdown();
+
+        /// @copydoc Plugin::uninstall
         void uninstall();
+    protected:
+        GLESRenderSystem* mRenderSystem;
+
     };
 }
 

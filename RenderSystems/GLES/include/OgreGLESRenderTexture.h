@@ -115,9 +115,20 @@ namespace Ogre {
             GLESCopyingRTTManager();
             virtual ~GLESCopyingRTTManager();
 
+            /** @copydoc GLESRTTManager::createRenderTexture
+            */
             virtual RenderTexture *createRenderTexture(const String &name, const GLESSurfaceDesc &target, bool writeGamma, uint fsaa);
+            
+            /** @copydoc GLESRTTManager::checkFormat
+            */
             virtual bool checkFormat(PixelFormat format);
+
+            /** @copydoc GLESRTTManager::bind
+            */
             virtual void bind(RenderTarget *target);
+
+            /** @copydoc GLESRTTManager::unbind
+            */
             virtual void unbind(RenderTarget *target);
     };
 }

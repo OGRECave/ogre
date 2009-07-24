@@ -27,27 +27,53 @@ Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
 
+#include "OgreGLESFBOMultiRenderTarget.h"
+#include "OgreGLESPixelFormat.h"
 #include "OgreRoot.h"
-#include "OgreEAGLRenderTexture.h"
+#include "OgreGLESHardwarePixelBuffer.h"
 
 namespace Ogre {
-    EAGLPBuffer::EAGLPBuffer(EAGLSupport* glsupport, PixelComponentType format,
-                           size_t width, size_t height)
-        : GLESPBuffer(format, width, height)
-    {
-        initEAGLPBuffer();
-    }
 
-	// Changed the constructor to a member function so that the
-	// native constructor would be called first. This member
-	// function is then called from the native constructor.
-    void EAGLPBuffer::initEAGLPBuffer()
-    {
-        LogManager::getSingleton().logMessage(LML_NORMAL, "EAGLPBuffer::initEAGLPBuffer unimplemented");
-    }
+	GLESFBOMultiRenderTarget::GLESFBOMultiRenderTarget(GLESFBOManager *manager, const String &name):
+		MultiRenderTarget(name),
+		fbo(manager, 0 /* TODO: multisampling on MRTs? */)
+	{
+	}
+	GLESFBOMultiRenderTarget::~GLESFBOMultiRenderTarget()
+	{
+	}
 
-    EAGLPBuffer::~EAGLPBuffer()
-    {
-        LogManager::getSingleton().logMessage(LML_NORMAL, "EAGLPBuffer::PBuffer destroyed");
-    }
+	void GLESFBOMultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
+	{
+		/// Check if the render target is in the rendertarget->FBO map
+        GLESFrameBufferObject *fbobj = 0;
+        target->getCustomAttribute("FBO", &fbobj);
+		assert(fbobj);
+		fbo.bindSurface(attachment, fbobj->getSurface(0));
+        GL_CHECK_ERROR;
+
+		// Initialise?
+
+		// Set width and height
+		mWidth = fbo.getWidth();
+		mHeight = fbo.getHeight();
+	}
+
+	void GLESFBOMultiRenderTarget::unbindSurfaceImpl(size_t attachment)
+	{
+		fbo.unbindSurface(attachment);
+        GL_CHECK_ERROR;
+
+		// Set width and height
+		mWidth = fbo.getWidth();
+		mHeight = fbo.getHeight();
+	}
+
+	void GLESFBOMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
+	{
+		if(name=="FBO")
+        {
+            *static_cast<GLESFrameBufferObject **>(pData) = &fbo;
+        }
+	}
 }

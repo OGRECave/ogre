@@ -41,38 +41,8 @@ Torus Knot Software Ltd.
 namespace Ogre {
     class _OgrePrivate GLESTexture : public Texture
     {
-        private:
-            GLuint mTextureID;
-            GLESSupport& mGLSupport;
-
-            /// Vector of pointers to subsurfaces
-            typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
-            SurfaceList mSurfaceList;
-
-        protected:
-            void createInternalResourcesImpl(void);
-            void prepareImpl(void);
-            void unprepareImpl(void);
-            void loadImpl(void);
-            void freeInternalResourcesImpl(void);
-
-            /** internal method, create GLHardwarePixelBuffers for every face and
-                 mipmap level. This method must be called after the GL texture object was created,
-                the number of mipmaps was set (GL_TEXTURE_MAX_LEVEL) and glTexImageXD was called to
-                actually allocate the buffer
-            */
-            void _createSurfaceList();
-
-            /// Used to hold images between calls to prepare and load.
-            typedef SharedPtr<std::vector<Image> > LoadedImages;
-
-            /** Vector of images that were pulled from disk by
-                prepareLoad but have yet to be pushed into texture memory
-                by loadImpl.  Images should be deleted by loadImpl and unprepareImpl.
-            */
-            LoadedImages mLoadedImages;
-
         public:
+            // Constructor
             GLESTexture(ResourceManager* creator, const String& name, ResourceHandle handle,
                 const String& group, bool isManual, ManualResourceLoader* loader, 
                 GLESSupport& support);
@@ -80,6 +50,7 @@ namespace Ogre {
             virtual ~GLESTexture();
 
             void createRenderTexture();
+            /// @copydoc Texture::getBuffer
             HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 
             // Takes the OGRE texture type (1d/2d/3d/cube) and returns the appropriate GL one
@@ -89,6 +60,43 @@ namespace Ogre {
             {
                 return mTextureID;
             }
+            
+        protected:
+            /// @copydoc Texture::createInternalResourcesImpl
+            void createInternalResourcesImpl(void);
+            /// @copydoc Resource::prepareImpl
+            void prepareImpl(void);
+            /// @copydoc Resource::unprepareImpl
+            void unprepareImpl(void);
+            /// @copydoc Resource::loadImpl
+            void loadImpl(void);
+            /// @copydoc Resource::freeInternalResourcesImpl
+            void freeInternalResourcesImpl(void);
+            
+            /** Internal method, create GLHardwarePixelBuffers for every face and
+             mipmap level. This method must be called after the GL texture object was created,
+             the number of mipmaps was set (GL_TEXTURE_MAX_LEVEL) and glTexImageXD was called to
+             actually allocate the buffer
+             */
+            void _createSurfaceList();
+            
+            /// Used to hold images between calls to prepare and load.
+            typedef SharedPtr<std::vector<Image> > LoadedImages;
+            
+            /** Vector of images that were pulled from disk by
+             prepareLoad but have yet to be pushed into texture memory
+             by loadImpl.  Images should be deleted by loadImpl and unprepareImpl.
+             */
+            LoadedImages mLoadedImages;
+
+        private:
+            GLuint mTextureID;
+            GLESSupport& mGLSupport;
+            
+            /// Vector of pointers to subsurfaces
+            typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
+            SurfaceList mSurfaceList;
+
     };
 
     /** Specialisation of SharedPtr to allow SharedPtr to be assigned to GLESTexturePtr

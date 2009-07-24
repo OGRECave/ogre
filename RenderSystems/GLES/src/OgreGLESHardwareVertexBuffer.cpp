@@ -45,7 +45,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Only support with shadowBuffer",
-                        "GLESHardwareIndexBuffer");
+                        "GLESHardwareVertexBuffer");
         }
 
         glGenBuffers(1, &mBufferId);
@@ -73,7 +73,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Invalid attempt to lock an index buffer that has already been locked",
-                        "GLESHardwareIndexBuffer::lock");
+                        "GLESHardwareVertexBuffer::lock");
         }
 
         void* retPtr = 0;
@@ -100,7 +100,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Invalid Buffer lockSize",
-                        "GLESHardwareIndexBuffer::lock");
+                        "GLESHardwareVertexBuffer::lock");
         }
 
         return retPtr;
@@ -126,7 +126,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Only locking to scratch is supported",
-                        "GLESHardwareIndexBuffer::unlockImpl");
+                        "GLESHardwareVertexBuffer::unlockImpl");
         }
     }
 
@@ -143,7 +143,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Read hardware buffer is not supported",
-                        "GLESHardwareIndexBuffer::readData");
+                        "GLESHardwareVertexBuffer::readData");
         }
     }
 
@@ -209,7 +209,7 @@ namespace Ogre {
     {
         void *ptr;
 
-        ptr = malloc(mSizeInBytes + 1);
+        ptr = OGRE_MALLOC(mSizeInBytes + 1, MEMCATEGORY_GEOMETRY);
         memset(ptr, 0, mSizeInBytes);
 
         glBindBuffer(GL_ARRAY_BUFFER, mBufferId);

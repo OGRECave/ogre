@@ -102,15 +102,15 @@ namespace Ogre {
         public:
             GLESDefaultHardwareBufferManagerBase();
             virtual ~GLESDefaultHardwareBufferManagerBase();
-            // Creates a vertex buffer
+            /// Creates a vertex buffer
             HardwareVertexBufferSharedPtr
                 createVertexBuffer(size_t vertexSize, size_t numVerts,
                     HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-            // Create a hardware vertex buffer
+            /// Create a hardware vertex buffer
             HardwareIndexBufferSharedPtr
                 createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes,
                     HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-
+            /// Create a render to vertex buffer
 	    RenderToVertexBufferSharedPtr createRenderToVertexBuffer(void);
     };
 
@@ -127,8 +127,6 @@ namespace Ogre {
 		{
 			OGRE_DELETE mImpl;
 		}
-
-
 	};
 }
 

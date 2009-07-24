@@ -103,14 +103,10 @@ namespace Ogre {
         glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &mBackingHeight);
         GL_CHECK_ERROR
 
-        // TODO: Add support for specifying the use of the depth buffer
-//        if (USE_DEPTH_BUFFER)
-//        {
-            glGenRenderbuffersOES(1, &mDepthRenderbuffer);
-            glBindRenderbufferOES(GL_RENDERBUFFER_OES, mDepthRenderbuffer);
-            glRenderbufferStorageOES(GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT16_OES, mBackingWidth, mBackingHeight);
-            glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, mDepthRenderbuffer);
-//        }
+        glGenRenderbuffersOES(1, &mDepthRenderbuffer);
+        glBindRenderbufferOES(GL_RENDERBUFFER_OES, mDepthRenderbuffer);
+        glRenderbufferStorageOES(GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT16_OES, mBackingWidth, mBackingHeight);
+        glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, mDepthRenderbuffer);
         
         if(glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) != GL_FRAMEBUFFER_COMPLETE_OES)
         {

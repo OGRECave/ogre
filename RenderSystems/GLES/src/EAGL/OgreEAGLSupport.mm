@@ -105,7 +105,7 @@ namespace Ogre {
         optRTTMode.name = "RTT Preferred Mode";
         optRTTMode.possibleValues.push_back("Copy");
         optRTTMode.possibleValues.push_back("FBO");
-        optRTTMode.currentValue = "Copy";
+        optRTTMode.currentValue = "FBO";
         optRTTMode.immutable = false;
 
         mOptions[optFullScreen.name] = optFullScreen;
