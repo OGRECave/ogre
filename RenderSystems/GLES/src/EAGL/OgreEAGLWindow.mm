@@ -398,8 +398,11 @@ namespace Ogre {
 		RenderSystem* rsys = Root::getSingleton().getRenderSystem();
 		rsys->_setViewport(this->getViewport(0));
 
-		// Must change the packing to ensure no overruns!
-		glPixelStorei(GL_PACK_ALIGNMENT, 1);
+        if((dst.getWidth() * Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
+        {
+            // Standard alignment of 4 is not right
+            glPixelStorei(GL_PACK_ALIGNMENT, 1);
+        }
 
 		glReadPixels((GLint)dst.left, (GLint)dst.top,
 			(GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
