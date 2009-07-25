@@ -184,10 +184,6 @@ int main(int argc, char **argv)
     [NSThread detachNewThreadSelector:@selector(go) toTarget:self withObject:nil];
 }
 
-- (void)applicationWillTerminate:(UIApplication *)application {
-    Root::getSingleton().queueEndRendering();
-}
-
 //- (void)applicationWillResignActive:(UIApplication *)application
 //{
 //    // Pause FrameListeners and rendering

@@ -193,6 +193,17 @@ namespace Ogre
 		/// @copydoc ManualObject::normal(const Vector3&)
 		virtual void normal(Real x, Real y, Real z);
 
+		/** Add a vertex tangent to the current vertex.
+		@remarks
+			Vertex tangents are most often used for dynamic lighting, and 
+			their components should be normalised. 
+			Also, using tangent() you enable VES_TANGENT vertex semantic, which is not
+			supported on old non-SM2 cards.
+		*/
+		virtual void tangent(const Vector3& tan);
+		/// @copydoc ManualObject::tangent(const Vector3&)
+		virtual void tangent(Real x, Real y, Real z);
+
 		/** Add a texture coordinate to the current vertex.
 		@remarks
 			You can call this method multiple times between position() calls
@@ -470,6 +481,7 @@ namespace Ogre
 		{
 			Vector3 position;
 			Vector3 normal;
+			Vector3 tangent;
 			Vector4 texCoord[OGRE_MAX_TEXTURE_COORD_SETS];
 			ushort texCoordDims[OGRE_MAX_TEXTURE_COORD_SETS];
 			ColourValue colour;

@@ -56,14 +56,18 @@ namespace Ogre {
 		mOrientation(Quaternion::IDENTITY),
 		mPosition(Vector3::ZERO),
 		mScale(Vector3::UNIT_SCALE),
+        mShear(Vector3::ZERO), 
         mInheritOrientation(true),
 		mInheritScale(true),
+        mInheritShear(true), 
 		mDerivedOrientation(Quaternion::IDENTITY),
 		mDerivedPosition(Vector3::ZERO),
 		mDerivedScale(Vector3::UNIT_SCALE),
+        mDerivedShear(Vector3::ZERO), 
 		mInitialPosition(Vector3::ZERO),
 		mInitialOrientation(Quaternion::IDENTITY),
 		mInitialScale(Vector3::UNIT_SCALE),
+        mInitialShear(Vector3::ZERO), 
 		mCachedTransformOutOfDate(true),
 		mListener(0), 
 		mDebug(0)
@@ -86,14 +90,18 @@ namespace Ogre {
 		mOrientation(Quaternion::IDENTITY),
 		mPosition(Vector3::ZERO),
 		mScale(Vector3::UNIT_SCALE),
+        mShear(Vector3::ZERO), 
         mInheritOrientation(true),
 		mInheritScale(true),
+        mInheritShear(true), 
 		mDerivedOrientation(Quaternion::IDENTITY),
 		mDerivedPosition(Vector3::ZERO),
 		mDerivedScale(Vector3::UNIT_SCALE),
+        mDerivedShear(Vector3::ZERO), 
 		mInitialPosition(Vector3::ZERO),
 		mInitialOrientation(Quaternion::IDENTITY),
 		mInitialScale(Vector3::UNIT_SCALE),
+        mInitialShear(Vector3::ZERO), 
 		mCachedTransformOutOfDate(true),
 		mListener(0), 
 		mDebug(0)
@@ -168,14 +176,39 @@ namespace Ogre {
         if (mCachedTransformOutOfDate)
         {
             // Use derived values
-            mCachedTransform.makeTransform(
+            _makeTransform(
                 _getDerivedPosition(),
                 _getDerivedScale(),
-                _getDerivedOrientation());
+                _getDerivedShear(),
+                _getDerivedOrientation(),
+                mCachedTransform);
+               
             mCachedTransformOutOfDate = false;
         }
-        return mCachedTransform;
+        return mCachedTransform; 
     }
+    //-----------------------------------------------------------------------
+    void Node::_makeTransform(const Vector3& position, const Vector3& scale, const Vector3& shear,
+                             const Quaternion& orientation, Matrix4& transform)
+    {
+        // Ordering:
+        //    1. Scale
+        //    2. Shear
+        //    3. Rotate
+        //    4. Translate
+
+        Matrix3 rot3x3;
+        orientation.ToRotationMatrix(rot3x3);
+        Matrix3 scale3x3(scale.x,0,0, 0,scale.y,0, 0,0,scale.z);
+        Matrix3 shear3x3(1,shear.z,shear.y, 0,1,shear.x, 0,0,1);
+
+        // Set up final matrix with scale, rotation and translation
+        transform = rot3x3 * shear3x3 * scale3x3;
+        transform.setTrans(position);
+
+        // No projection term
+        transform[3][0] = 0; transform[3][1] = 0; transform[3][2] = 0; transform[3][3] = 1;
+    } 
     //-----------------------------------------------------------------------
     void Node::_update(bool updateChildren, bool parentHasChanged)
     {
@@ -243,37 +276,60 @@ namespace Ogre {
         if (mParent)
         {
             // Update orientation
-            const Quaternion& parentOrientation = mParent->_getDerivedOrientation();
-            if (mInheritOrientation)
+            Quaternion parentOrientation = mParent->_getDerivedOrientation();
+            if (!mInheritOrientation)
             {
-                // Combine orientation with that of parent
-                mDerivedOrientation = parentOrientation * mOrientation;
-            }
-			else
-            {
-                // No inheritence
-                mDerivedOrientation = mOrientation;
+                parentOrientation = Quaternion();
             }
 
             // Update scale
-            const Vector3& parentScale = mParent->_getDerivedScale();
-            if (mInheritScale)
+            Vector3 parentScale = mParent->_getDerivedScale();
+            if (!mInheritScale)
             {
-                // Scale own position by parent scale, NB just combine
-                // as equivalent axes, no shearing
-                mDerivedScale = parentScale * mScale;
+                parentScale = Vector3::UNIT_SCALE;
             }
-            else
+
+            // Update shear
+            Vector3 parentShear = mParent->_getDerivedShear();
+            if (!mInheritShear)
             {
-                // No inheritence
-                mDerivedScale = mScale;
+                parentShear = Vector3::ZERO;
             }
+
+            Matrix3 parentOrientationMatrix;
+            parentOrientation.ToRotationMatrix(parentOrientationMatrix);
+            Matrix3 parentScaleMatrix(parentScale.x,0,0, 0,parentScale.y,0, 0,0,parentScale.z);
+            Matrix3 parentShearMatrix(1,parentShear.z,parentShear.y, 0,1,parentShear.x, 0,0,1);
+            Matrix3 orientationMatrix;
+            mOrientation.ToRotationMatrix(orientationMatrix);
+            Matrix3 scaleMatrix(mScale.x,0,0, 0,mScale.y,0, 0,0,mScale.z);
+            Matrix3 shearMatrix(1,mShear.z,mShear.y, 0,1,mShear.x, 0,0,1);
+
+            // Apply the full transform matrix
+            Matrix3 derivedTransform = parentOrientationMatrix * parentShearMatrix * parentScaleMatrix
+                                       * orientationMatrix * shearMatrix * scaleMatrix;
+
+            // Decompose the matrix into rotation, shear and scale
+            Matrix3 kQ;
+            Vector3 kD, kU;
+            derivedTransform.QDUDecomposition(kQ, kD, kU); // This is QDU
+
+            // Convert to QVD (V upper triangular) and swap x and z
+            Vector3 kV(kU.z*kD.y/kD.z,
+                       kU.y*kD.x/kD.z,
+                       kU.x*kD.x/kD.y );
+            mDerivedOrientation = Quaternion(kQ);
+            mDerivedScale = kD;
+            mDerivedShear = kV;
 
             // Change position vector based on parent's orientation & scale
-            mDerivedPosition = parentOrientation * (parentScale * mPosition);
+            mDerivedPosition = parentScale * mPosition;
+            mDerivedPosition[0] += parentShear[2]*mDerivedPosition[1] + parentShear[1]*mDerivedPosition[2];
+            mDerivedPosition[1] += parentShear[0]*mDerivedPosition[2];
+            mDerivedPosition = parentOrientation * mDerivedPosition;
 
             // Add altered position vector to parents
-            mDerivedPosition += mParent->_getDerivedPosition();
+            mDerivedPosition += mParent->_getDerivedPosition(); 
         }
         else
         {
@@ -281,6 +337,7 @@ namespace Ogre {
             mDerivedOrientation = mOrientation;
             mDerivedPosition = mPosition;
             mDerivedScale = mScale;
+            mDerivedShear = mShear; 
         }
 
 		mCachedTransformOutOfDate = true;
@@ -460,8 +517,10 @@ namespace Ogre {
             // position is relative to parent so transform upwards
             if (mParent)
             {
-                mPosition += (mParent->_getDerivedOrientation().Inverse() * d)
-                    / mParent->_getDerivedScale();
+                const Vector3 & s = _getDerivedShear();
+                Matrix3 inverseShear(1,-s.z,s.z*s.x-s.y, 0,1,-s.x, 0,0,1);
+                mPosition += (inverseShear * (mParent->_getDerivedOrientation().Inverse() * d))
+                    / mParent->_getDerivedScale(); 
             }
             else
             {
@@ -570,6 +629,15 @@ namespace Ogre {
         return mDerivedScale;
     }
     //-----------------------------------------------------------------------
+    const Vector3 & Node::_getDerivedShear(void) const
+    {
+        if (mNeedParentUpdate)
+        {
+            _updateFromParent();
+        }
+        return mDerivedShear;
+    } 
+    //-----------------------------------------------------------------------
     void Node::removeAllChildren(void)
     {
 		ChildNodeMap::iterator i, iend;
@@ -601,6 +669,25 @@ namespace Ogre {
         return mScale;
     }
     //-----------------------------------------------------------------------
+    void Node::setShear(const Vector3& shear)
+    {
+        mShear = shear;
+        needUpdate();
+    }
+    //-----------------------------------------------------------------------
+    void Node::setShear(Real x, Real y, Real z)
+    {
+        mShear.x = x;
+        mShear.y = y;
+        mShear.z = z;
+        needUpdate();
+    }
+    //-----------------------------------------------------------------------
+    const Vector3 & Node::getShear(void) const
+    {
+        return mShear;
+    } 
+    //-----------------------------------------------------------------------
     void Node::setInheritOrientation(bool inherit)
     {
         mInheritOrientation = inherit;
@@ -622,6 +709,17 @@ namespace Ogre {
     {
         return mInheritScale;
     }
+    //-----------------------------------------------------------------------
+    void Node::setInheritShear(bool inherit)
+    {
+        mInheritShear = inherit;
+        needUpdate();
+    }
+    //-----------------------------------------------------------------------
+    bool Node::getInheritShear(void) const
+    {
+        return mInheritShear;
+    } 
     //-----------------------------------------------------------------------
     void Node::scale(const Vector3& scale)
     {
@@ -649,6 +747,7 @@ namespace Ogre {
         mInitialPosition = mPosition;
         mInitialOrientation = mOrientation;
         mInitialScale = mScale;
+        mInitialShear = mShear; 
     }
     //-----------------------------------------------------------------------
     void Node::resetToInitialState(void)
@@ -656,6 +755,7 @@ namespace Ogre {
         mPosition = mInitialPosition;
         mOrientation = mInitialOrientation;
         mScale = mInitialScale;
+        mShear = mInitialShear; 
 
         needUpdate();
     }
@@ -675,6 +775,11 @@ namespace Ogre {
     {
         return mInitialScale;
     }
+    //-----------------------------------------------------------------------
+    const Vector3& Node::getInitialShear(void) const
+    {
+        return mInitialShear;
+    } 
     //-----------------------------------------------------------------------
     Node* Node::getChild(const String& name) const
     {
