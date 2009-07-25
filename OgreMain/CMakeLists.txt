@@ -505,7 +505,7 @@ elseif (APPLE)
 	  ${OGRE_BINARY_DIR}/include/buildsettings.h
     )
     set(PLATFORM_SOURCE_FILES
-      src/OSX/OgreConfigDialog.mm
+      src/OSX/OgreConfigDialog.cpp
       src/OSX/OgreErrorDialog.mm
       src/OSX/OgreTimer.cpp
       src/OSX/macUtils.cpp
