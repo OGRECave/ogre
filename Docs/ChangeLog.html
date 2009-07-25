@@ -31,6 +31,102 @@ Engine)</p>
 <p class="header" align="center">Change Log</p>
 
 <p class="mainheader">
+    v1.6.3 [Shoggoth] (25 July 2009) - Maintenance Release</p>
+ <ul>  
+ 	<li><b>OS X</b>
+ 	<ul>
+ 		<li>Fixed skewed screenshots on OS X for windows with odd width</li>
+		<li>FreeImage 3.9 - 3.11.0 interoperability fix; detect when FreeImage uses big-endian even on Intel Macs & use the data correctly</li> 
+		<li>Fix uninitialised mFullScreen in Cocoa window, and expose WINDOW and VIEW custom params as with Carbon</li>
+
+	</ul></li>
+	<li><b>OpenGL</b>
+	<ul>
+		<li>GLSL: gracefully handle a link error during binding of parameters, so that we do not abort the render</li>
+		<li>OpenGL pixel buffer: download the buffer when lock mode is anything but HBL_DISCARD, and ignore whether the buffer was created as WRITE_ONLY. For consistency with other rendersystems, WRITE_ONLY should only be a hint, and should not prevent the user reading the contents if they choose to. Previously the read buffer would always contain garbage on GL unless you removed the WRITE_ONLY, which was easy to miss because TU_DEFAULT includes it.</li>
+		<li>Prevent deletion of an external GL context when using currentGLContext.</li>
+		<li>GLSLLinkProgram::activate should not access the vertex program (for attribute mapping) without checking it exists.</li>
+		<li>Fixed parentWindowHandle usage for GLX</li>
+		<li>Disabling hardware mipmap generation on ATI/Linux as reported faulty</li>
+		<li>Enable/disable GL_VERTEX_PROGRAM_POINT_SIZE for point size attenuation when vertex programs available</li>
+		<li>Workaround for broken hardware mipmap generation on Intel 915G's (at least - for the moment disable for all Intel chipsets)</li>
+		<li>Identify SiS chipsets and apply same GL automip workaround as for Intel chipsets</li>
+	</ul></li>
+	<li><b>Direct3D</b>
+	<ul>
+		<li>Fix an edge-case in D3D9 where if _canDynamicTextures returned false, the default pool would still be used even though D3DUSAGE_DYNAMIC wasn't specified, which doesn't allow locking. If D3DUSAGE_DYNAMIC could not be specified, then use the managed pool in all cases.</li>
+		<li>Safety check before rebinding D3D9 textures after a device restore where user has destroyed render target but not texture. 
+		<li>D3D9 render texture classes had the wrong update() signature so were not protecting against device lost conditions</li>
+	</ul></li>
+	<li><b>Visual Studio</b>
+	<ul>
+		<li>Fix for Runtime Check Failures with VC 2003 SP1 with alpha_op_ex</li>			<li>Allow OGRE to build with VC 2010, use TR1</li>
+		<li>Added missing OgreShadowCameraSetupPSSM.h/.cpp in VC 2003 project file</li>
+
+	</ul></li>
+	
+	<li>ILImageCodec segfault fix (for those who choose to use it)</li>
+
+	<li>Fix calculation of bounding radius from AABB in some places</li>
+
+	<li>Fix McGuire style dark cap incompatible with multiple edge groups (stencil shadows)</li>
+
+	<li>Make getCameraPosition, getCameraPositionObjectSpace and LOD camera equivalents consistent with other parameters when using camera relative rendering</li>
+
+
+	<li>Fix dark cap clipping in stencil shadows in a few edge case conditions</li>
+
+
+	<li>Fix the use of 2 scene managers with different settings on finite / infinite stencil shadow extrusion</li>
+	
+	<li>Fix Light::_getFrustumClipVolumes(...) numerical instability if infinite camera's far clip plane is used, causing light flickering if light is near camera's side frustum plane.</li>
+	
+	<li>Should propagate material scheme from primary viewport to shadow viewports so that caster/receiver materials are consistent with materials chosen for main view</li>
+	
+	<li>SceneManager should restore mCurrentViewport after rendering the shadow textures</li>
+
+
+	<li>ConvexBody: only process finite AABBs (ignore null & infinite)</li>
+
+	<li>Fix AABB when using BillboardSet with world coordinates and a transformed parent node</li>
+
+
+	<li>Fix 2 typos in scripts where vertex_program should be fragment_program</li>
+
+	<li>Fixed a few warnings</li>
+
+
+	</li>Fix problems with gui sample files schema validation when using Xerces</li>
+
+	</li>Fix to fog_override parsing when using options other than 'none'</li>
+	
+
+	<li>GpuProgramUsage::setProgramName - check the type of the program assigned matches the type of usage it's assigned to (make copy/paste errors in scripts easier to diagnose)</li>
+
+
+
+	<li>Don't pull the AABB out of an unloaded or half-loaded Mesh - if the Mesh is being background loaded, it's possible the AABB could be half-populated and invalid.</li>
+
+	<li>AnimableValue should handle DEGREE and RADIAN types (gcc warned about this)</li>
+
+	<li>Early-out optimisations to setMaterialName methods, to reduce their cost if the same material name is used</li>
+
+	<li>Fix blended scene animation (previously, only one animation would successfully apply, now they can be blended)</li>
+
+	<li>Fix write overflow in GPU parameters when using a (physically) 3x4 matrix - this could occur even if the param was declared as 4x4 but cast to 3x3. </li>
+
+	<li>TextureUnit's rarely-used constructor wasn't initialising everything</li>
+
+	<li>Fixed calling Root::loadPlugin twice for the same plugin caused a crash at shutdown (and also double-calling of init function)</li>
+
+	<li>Return default value properly from ConfigFile::getSetting</li>
+	
+	<li>Fix license statement on Fresnel demo code - all samples are supposed to be public domain / free use.</li>
+
+	<li>SceneManager should destroy its own shadow textures on destruction	</li>
+ </ul>
+ </p>
+  <p class="mainheader">
     v1.6.2 [Shoggoth] (11 April 2009) - Maintenance Release</p>
 <ul>
   <li><b>LGPL static link exclusion</b> clause added to our official license terms. Static linking terms are now the same as dynamic linking.</li>
