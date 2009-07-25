@@ -40,18 +40,6 @@ Torus Knot Software Ltd.
 
 #include <FreeImage.h>
 
-// freeimage 3.9.1~3.11.0 interoperability fix
-#ifndef FREEIMAGE_COLORORDER
-// we have freeimage 3.9.1, define these symbols in such way as 3.9.1 really work (do not use 3.11.0 definition, as color order was changed between these two versions on Apple systems)
-#define FREEIMAGE_COLORORDER_BGR	0
-#define FREEIMAGE_COLORORDER_RGB	1
-#if defined(FREEIMAGE_BIGENDIAN)
-#define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_RGB
-#else
-#define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_BGR
-#endif
-#endif
-
 namespace Ogre {
 
 	FreeImageCodec::RegisteredCodecList FreeImageCodec::msCodecList;
@@ -195,7 +183,7 @@ namespace Ogre {
 			// data in RGB[A] (big endian) and BGR[A] (little endian), always.
 			if (PixelUtil::hasAlpha(determiningFormat))
 			{
-#if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
 				requiredFormat = PF_BYTE_RGBA;
 #else
 				requiredFormat = PF_BYTE_BGRA;
@@ -203,7 +191,7 @@ namespace Ogre {
 			}
 			else
 			{
-#if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
 				requiredFormat = PF_BYTE_RGB;
 #else
 				requiredFormat = PF_BYTE_BGR;
@@ -324,7 +312,7 @@ namespace Ogre {
 			if (bpp == 32 && PixelUtil::hasAlpha(pImgData->format) && FreeImage_FIFSupportsExportBPP((FREE_IMAGE_FORMAT)mFreeImageType, 24))
 			{
 				// drop to 24 bit (lose alpha)
-#if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
 				requiredFormat = PF_BYTE_RGB;
 #else
 				requiredFormat = PF_BYTE_BGR;
@@ -533,14 +521,14 @@ namespace Ogre {
 				// FreeImage differs per platform
 				//     PF_BYTE_BGR[A] for little endian (== PF_ARGB native)
 				//     PF_BYTE_RGB[A] for big endian (== PF_RGBA native)
-#if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
 				imgData->format = PF_BYTE_RGB;
 #else
 				imgData->format = PF_BYTE_BGR;
 #endif
 				break;
 			case 32:
-#if FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB
+#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
 				imgData->format = PF_BYTE_RGBA;
 #else
 				imgData->format = PF_BYTE_BGRA;

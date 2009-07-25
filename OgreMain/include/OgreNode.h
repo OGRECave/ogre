@@ -153,17 +153,11 @@ namespace Ogre {
         /// Stores the scaling factor applied to this node
         Vector3 mScale;
 
-        /// Stores the shear factor applied to this node
-        Vector3 mShear;
-
         /// Stores whether this node inherits orientation from it's parent
         bool mInheritOrientation;
 
         /// Stores whether this node inherits scale from it's parent
         bool mInheritScale;
-
-        /// Stores whether this node inherits shear from it's parent
-        bool mInheritShear;
 
         /// Only available internally - notification of parent.
         virtual void setParent(Node* parent);
@@ -195,15 +189,6 @@ namespace Ogre {
         */
         mutable Vector3 mDerivedScale;
 
-        /** Cached combined shear.
-            @par
-                This member is the shear derived by combining the
-                local transformations and those of it's parents.
-                This is updated when _updateFromParent is called by the
-                SceneManager or the nodes parent.
-        */
-        mutable Vector3 mDerivedShear; 
-
         /** Triggers the node to update it's combined transforms.
             @par
                 This method is called internally by Ogre to ask the node
@@ -233,8 +218,6 @@ namespace Ogre {
         Quaternion mInitialOrientation;
         /// The scale to use as a base for keyframe animation
         Vector3 mInitialScale;
-        /// The shear to use as a base for keyframe animation
-        Vector3 mInitialShear;
 
         /// Cached derived transform as a 4x4 matrix
         mutable Matrix4 mCachedTransform;
@@ -363,42 +346,6 @@ namespace Ogre {
         */
         virtual const Vector3 & getScale(void) const;
 
-        /** Sets the shear on this node.
-        @remarks
-            The shear vector is defined as (Sh_xy, Sh_xz, Sh_yz), where, e.g. Sh_xy is a shear which 
-            modifies x position as a function of y-position.
-            Shearing factors, unlike other transforms, are not always inherited by child nodes.
-            Whether or not shearings affect the size of the child nodes depends on the setInheritShear
-            option of the child. In some cases you want the shear on a parent node to apply to
-            a child node (e.g. where the child node is a part of the same object, so you want it to
-            inherit the same shearing), but not in other cases (e.g. where the child node is just for
-            positioning another object, you want it to maintain it's own shear).
-            The default is to inherit as with other transforms.
-        @par
-            Note that like rotations, shear is oriented around the node's origin.
-        */
-        virtual void setShear(const Vector3& shear);
-
-        /** Sets the shear on this node.
-        @remarks
-            The shear vector is defined as (Sh_xy, Sh_xz, Sh_yz), where, e.g. Sh_xy is a shear which 
-            modifies x position as a function of y-position.
-            Shearing factors, unlike other transforms, are not always inherited by child nodes.
-            Whether or not shearings affect the size of the child nodes depends on the setInheritShear
-            option of the child. In some cases you want the shear on a parent node to apply to
-            a child node (e.g. where the child node is a part of the same object, so you want it to
-            inherit the same shearing), but not in other cases (e.g. where the child node is just for
-            positioning another object, you want it to maintain it's own shear).
-            The default is to inherit as with other transforms.
-        @par
-            Note that like rotations, shear is oriented around the node's origin.
-        */
-        virtual void setShear(Real x, Real y, Real z);
-
-        /** Gets the shear of this node.
-        */
-        virtual const Vector3 & getShear(void) const; 
-
         /** Tells the node whether it should inherit orientation from it's parent node.
         @remarks
             Orientations, unlike other transforms, are not always inherited by child nodes.
@@ -448,26 +395,6 @@ namespace Ogre {
             See setInheritScale for more info.
         */
         virtual bool getInheritScale(void) const;
-
-        /** Tells the node whether it should inherit shear from it's parent node.
-        @remarks
-            Shearing factors, unlike other transforms, are not always inherited by child nodes.
-            Whether or not shearings affect the size of the child nodes depends on the setInheritShear
-            option of the child. In some cases you want the shear on a parent node to apply to
-            a child node (e.g. where the child node is a part of the same object, so you want it to
-            inherit the same shearing), but not in other cases (e.g. where the child node is just for
-            positioning another object, you want it to maintain it's own shear).
-            The default is to inherit as with other transforms.
-        @param inherit If true, this node's shear will be affected by its parent's shear. If false,
-            it will not be affected.
-        */
-        virtual void setInheritShear(bool inherit);
-
-        /** Returns true if this node is affected by shear applied to the parent node.
-        @remarks
-            See setInheritShear for more info.
-        */
-        virtual bool getInheritShear(void) const; 
 
         /** Scales the node, combining it's current scale with the passed in scaling factor. 
         @remarks
@@ -685,10 +612,6 @@ namespace Ogre {
         */
         virtual const Vector3 & _getDerivedScale(void) const;
 
-        /** Gets the shear of the node as derived from all parents.
-        */
-        virtual const Vector3 & _getDerivedShear(void) const; 
-
         /** Gets the full transformation matrix for this node.
             @remarks
                 This method returns the full transformation matrix
@@ -699,13 +622,6 @@ namespace Ogre {
                 Applications using Ogre should just use the relative transforms.
         */
         virtual const Matrix4& _getFullTransform(void) const;
-
-        /** A helper function to compose a matrix from transforms
-            @remarks
-                A helper function which might be better in Matrix3
-        */
-        static void _makeTransform(const Vector3& position, const Vector3& scale, const Vector3& shear,
-                           const Quaternion& orientation, Matrix4& transform); 
 
         /** Internal method to update the Node.
             @note
@@ -759,9 +675,6 @@ namespace Ogre {
 
         /** Gets the initial position of this node, see setInitialState for more info. */
         virtual const Vector3& getInitialScale(void) const;
-
-        /** Gets the initial shear of this node, see setInitialState for more info. */
-        virtual const Vector3& getInitialShear(void) const; 
 
         /** Helper function, get the squared view depth.  */
         Real getSquaredViewDepth(const Camera* cam) const;

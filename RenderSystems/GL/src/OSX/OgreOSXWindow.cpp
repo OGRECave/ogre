@@ -82,19 +82,11 @@ void OSXWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
 					"OSXWindow::copyContentsToMemory" );
 	}
 
-	if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
-	{
-		// Standard alignment of 4 is not right
-		glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	}
-	
 	glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
 	glReadPixels((GLint)dst.left, (GLint)dst.top,
 				 (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
 				 format, type, dst.data);
 
-	glPixelStorei(GL_PACK_ALIGNMENT, 4);
-	
 	//vertical flip
 	{
 		size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);

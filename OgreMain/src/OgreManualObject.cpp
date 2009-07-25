@@ -287,33 +287,6 @@ namespace Ogre {
 		mTempVertex.normal.y = y;
 		mTempVertex.normal.z = z;
 	}
-
-	//-----------------------------------------------------------------------------
-	void ManualObject::tangent(const Vector3& tan)
-	{
-		tangent(tan.x, tan.y, tan.z);
-	}
-	//-----------------------------------------------------------------------------
-	void ManualObject::tangent(Real x, Real y, Real z)
-	{
-		if (!mCurrentSection)
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"You must call begin() before this method",
-				"ManualObject::tangent");
-		}
-		if (mFirstVertex && !mCurrentUpdating)
-		{
-			// defining declaration
-			mCurrentSection->getRenderOperation()->vertexData->vertexDeclaration
-				->addElement(0, mDeclSize, VET_FLOAT3, VES_TANGENT);
-			mDeclSize += VertexElement::getTypeSize(VET_FLOAT3);
-		}
-		mTempVertex.tangent.x = x;
-		mTempVertex.tangent.y = y;
-		mTempVertex.tangent.z = z;
-	}
-
 	//-----------------------------------------------------------------------------
 	void ManualObject::textureCoord(Real u)
 	{
@@ -558,11 +531,6 @@ namespace Ogre {
 				*pFloat++ = mTempVertex.normal.x;
 				*pFloat++ = mTempVertex.normal.y;
 				*pFloat++ = mTempVertex.normal.z;
-				break;
-			case VES_TANGENT:
-				*pFloat++ = mTempVertex.tangent.x;
-				*pFloat++ = mTempVertex.tangent.y;
-				*pFloat++ = mTempVertex.tangent.z;
 				break;
 			case VES_TEXTURE_COORDINATES:
 				dims = VertexElement::getTypeCount(elem.getType());
