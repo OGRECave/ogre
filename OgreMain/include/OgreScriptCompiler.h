@@ -178,6 +178,7 @@ namespace Ogre
 		String getValue() const;
 	};
 
+	class ScriptCompilerEvent;
 	class ScriptCompilerListener;
 
 	/** This is the main class for the compiler. It calls the parser
@@ -251,9 +252,7 @@ namespace Ogre
 		/// Removes a name exclusion
 		void removeNameExclusion(const String &type);
 		/// Internal method for firing the handleEvent method
-		bool _fireEvent(const String &name, const vector<Any>::type &args, Any *retval);
-		/// Internal method for firing the createObject event
-		Any _fireCreateObject(const String &type, const vector<Any>::type &args);
+		bool _fireEvent(ScriptCompilerEvent *evt, void *retval);
 	private: // Tree processing
 		AbstractNodeListPtr convertToAST(const ConcreteNodeListPtr &nodes);
 		/// This built-in function processes import nodes
@@ -321,6 +320,23 @@ namespace Ogre
 		};	
 	};
 
+	/**
+	 * This struct is a base class for events which can be thrown by the compilers and caught by
+	 * subscribers. There are a set number of standard events which are used by Ogre's core.
+	 * New event types may be derived for more custom compiler processing.
+	 */
+	class ScriptCompilerEvent
+	{
+	public:
+		String mType;
+
+		ScriptCompilerEvent(const String &type):mType(type){}
+		virtual ~ScriptCompilerEvent(){}
+	private: // Non-copyable
+		ScriptCompilerEvent(const ScriptCompilerEvent&);
+		ScriptCompilerEvent &operator = (const ScriptCompilerEvent&);
+	};
+
 	/** This is a listener for the compiler. The compiler can be customized with
 		this listener. It lets you listen in on events occuring during compilation,
 		hook them, and change the behavior.
@@ -348,7 +364,8 @@ namespace Ogre
 		/// Called when an event occurs during translation, return true if handled
 		/**
 		 @remarks	This function is called from the translators when an event occurs that
-					that can be responded to. Often this is overriding names. The support events are:
+					that can be responded to. Often this is overriding names, or it can be a request for
+					custom resource creation. The support events are:
 					preApplyTextureAliases - Allows overriding texture aliases before they are set
 						arg1 is a Material*
 						arg2 is an AliasTextureNamePairList* holding the aliases
@@ -366,56 +383,15 @@ namespace Ogre
 						arg1 is a String of the node object's class ("material", "particle_system", etc.)
 						arg2 is an AbstractNode* which is the object's parent
 						No return value
+					createMaterial - Create a material and return it as the return value (pointer to the Material)
+						arg
 		 @arg compiler A reference to the compiler
 		 @arg name The name of the event
 		 @arg args The vector of argument for the event
 		 @arg retval A possible return value from handlers
 		 @return True if the handler processed the event
 		*/
-		virtual bool handleEvent(ScriptCompiler *compiler, const String &name, const vector<Ogre::Any>::type &args, Ogre::Any *retval);
-		/// Called when a translator requests a concrete object to be created
-		/**
-		 @remarks	This function is called when a translator needs to create an Ogre object
-					during comilation. If a valid object is returned from this function it is
-					used instead of a default object created from Ogre's resource managers.
-					The object types are:
-					Material
-						arg1 is a string holding the file where the object is compiled from
-						arg2 is the name for the material specified in the script file
-						arg3 is the resource group of the compiling script file
-					GpuProgram
-						arg1 is a string holding the file where the object is compiled from
-						arg2 is the name for the material specified in the script file
-						arg3 is the resource group of the compiling script file
-						arg4 is the specified source file
-						arg5 is the GpuProgramType
-						arg6 is the program's syntax code
-					UnifiedGpuProgram
-						arg1 is a string holding the file where the object is compiled from
-						arg2 is the name for the material specified in the script file
-						arg3 is the resource group of the compiling script file
-						arg4 is the GpuProgramType
-					HighLevelGpuProgram
-						arg1 is a string holding the file where the object is compiled from
-						arg2 is the name for the material specified in the script file
-						arg3 is the resource group of the compiling script file
-						arg4 is the specified language
-						arg5 is the GpuProgramType
-						arg6 is the specified source file
-					ParticleSystem
-						arg1 is a string holding the file where the object is compiled from
-						arg2 is the name for the material specified in the script file
-						arg3 is the resource group of the compiling script file
-					Compositor
-						arg1 is a string holding the file where the object is compiled from
-						arg2 is the name for the material specified in the script file
-						arg3 is the resource group of the compiling script file
-		 @arg compiler A reference to the compiler
-		 @arg type The type of the requested object
-		 @arg args Creation arguments for the object
-		 @return A reference (pointer) to the created object wrapped in an Any
-	    */
-		virtual Ogre::Any createObject(ScriptCompiler *compiler, const String &type, const vector<Ogre::Any>::type &args);
+		virtual bool handleEvent(ScriptCompiler *compiler, ScriptCompilerEvent *evt, void *retval);
 	};
 
 	class ScriptTranslator;
@@ -500,6 +476,115 @@ namespace Ogre
         preventing link errors.
         */
         static ScriptCompilerManager* getSingletonPtr(void);
+	};
+
+	// Standard event types
+	class PreApplyTextureAliasesScriptCompilerEvent : public ScriptCompilerEvent
+	{
+	public:
+		Material *mMaterial;
+		AliasTextureNamePairList *mAliases;
+		static String eventType;
+
+		PreApplyTextureAliasesScriptCompilerEvent(Material *material, AliasTextureNamePairList *aliases)
+			:ScriptCompilerEvent(eventType), mMaterial(material), mAliases(aliases){}
+	};
+
+	class ProcessResourceNameScriptCompilerEvent : public ScriptCompilerEvent
+	{
+	public:
+		enum ResourceType
+		{
+			TEXTURE,
+			MATERIAL,
+			GPU_PROGRAM,
+			COMPOSITOR
+		};
+		ResourceType mResourceType;
+		String mName;
+		static String eventType;
+
+		ProcessResourceNameScriptCompilerEvent(ResourceType resourceType, const String &name)
+			:ScriptCompilerEvent(eventType), mResourceType(resourceType), mName(name){}     
+	};
+
+	class ProcessNameExclusionScriptCompilerEvent : public ScriptCompilerEvent
+	{
+	public:
+		String mClass;
+		AbstractNode *mParent;
+		static String eventType;
+
+		ProcessNameExclusionScriptCompilerEvent(const String &cls, AbstractNode *parent)
+			:ScriptCompilerEvent(eventType), mClass(cls), mParent(parent){}     
+	};
+
+	class CreateMaterialScriptCompilerEvent : public ScriptCompilerEvent
+	{
+	public:
+		String mFile, mName, mResourceGroup;
+		static String eventType;
+
+		CreateMaterialScriptCompilerEvent(const String &file, const String &name, const String &resourceGroup)
+			:ScriptCompilerEvent(eventType), mFile(file), mName(name), mResourceGroup(resourceGroup){}  
+	};
+
+	class CreateGpuProgramScriptCompilerEvent : public ScriptCompilerEvent
+	{
+	public:
+		String mFile, mName, mResourceGroup, mSource, mSyntax;
+		GpuProgramType mProgramType;
+		static String eventType;
+
+		CreateGpuProgramScriptCompilerEvent(const String &file, const String &name, const String &resourceGroup, const String &source, 
+			const String &syntax, GpuProgramType programType)
+			:ScriptCompilerEvent(eventType), mFile(file), mName(name), mResourceGroup(resourceGroup), mSource(source), 
+			 mSyntax(syntax), mProgramType(programType)
+		{}  
+	};
+
+	class CreateHighLevelGpuProgramScriptCompilerEvent : public ScriptCompilerEvent
+	{
+	public:
+		String mFile, mName, mResourceGroup, mSource, mLanguage;
+		GpuProgramType mProgramType;
+		static String eventType;
+
+		CreateHighLevelGpuProgramScriptCompilerEvent(const String &file, const String &name, const String &resourceGroup, const String &source, 
+			const String &language, GpuProgramType programType)
+			:ScriptCompilerEvent(eventType), mFile(file), mName(name), mResourceGroup(resourceGroup), mSource(source), 
+			 mLanguage(language), mProgramType(programType)
+		{}  
+	};
+
+	class CreateGpuSharedParametersScriptCompilerEvent : public ScriptCompilerEvent
+	{
+	public:
+		String mFile, mName, mResourceGroup;
+		static String eventType;
+
+		CreateGpuSharedParametersScriptCompilerEvent(const String &file, const String &name, const String &resourceGroup)
+			:ScriptCompilerEvent(eventType), mFile(file), mName(name), mResourceGroup(resourceGroup){}  
+	};
+
+	class CreateParticleSystemScriptCompilerEvent : public ScriptCompilerEvent
+	{
+	public:
+		String mFile, mName, mResourceGroup;
+		static String eventType;
+
+		CreateParticleSystemScriptCompilerEvent(const String &file, const String &name, const String &resourceGroup)
+			:ScriptCompilerEvent(eventType), mFile(file), mName(name), mResourceGroup(resourceGroup){}  
+	};
+
+	class CreateCompositorScriptCompilerEvent : public ScriptCompilerEvent
+	{
+	public:
+		String mFile, mName, mResourceGroup;
+		static String eventType;
+
+		CreateCompositorScriptCompilerEvent(const String &file, const String &name, const String &resourceGroup)
+			:ScriptCompilerEvent(eventType), mFile(file), mName(name), mResourceGroup(resourceGroup){}  
 	};
 
 	/// This enum defines the integer ids for keywords this compiler handles

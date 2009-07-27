@@ -237,14 +237,9 @@ namespace Ogre
 		Ogre::LogManager::getSingleton().logMessage(str);
 	}
 
-	bool ScriptCompilerListener::handleEvent(ScriptCompiler *compiler, const String &name, const vector<Ogre::Any>::type &args, Ogre::Any *retval)
+	bool ScriptCompilerListener::handleEvent(ScriptCompiler *compiler, ScriptCompilerEvent *evt, void *retval)
 	{
 		return false;
-	}
-
-	Ogre::Any ScriptCompilerListener::createObject(ScriptCompiler *compiler, const String &type, const vector<Ogre::Any>::type &args)
-	{
-		return Ogre::Any();
 	}
 
 	// ScriptCompiler
@@ -491,18 +486,11 @@ namespace Ogre
 		return mGroup;
 	}
 
-	bool ScriptCompiler::_fireEvent(const Ogre::String &name, const vector<Any>::type &args, Ogre::Any *retval)
+	bool ScriptCompiler::_fireEvent(ScriptCompilerEvent *evt, void *retval)
 	{
 		if(mListener)
-			return mListener->handleEvent(this, name, args, retval);
+			return mListener->handleEvent(this, evt, retval);
 		return false;
-	}
-
-	Any ScriptCompiler::_fireCreateObject(const Ogre::String &type, const vector<Any>::type &args)
-	{
-		if(mListener)
-			return mListener->createObject(this, type, args);
-		return Any();
 	}
 
 	AbstractNodeListPtr ScriptCompiler::convertToAST(const Ogre::ConcreteNodeListPtr &nodes)
@@ -857,13 +845,11 @@ namespace Ogre
 	bool ScriptCompiler::isNameExcluded(const String &cls, AbstractNode *parent)
 	{
 		// Run past the listener
-		Any retval;
-		vector<Any>::type args;
-		args.push_back(Any(cls));
-		args.push_back(Any(parent));
-		_fireEvent("processNameExclusion", args, &retval);
+		bool excludeName = false;
+		ProcessNameExclusionScriptCompilerEvent evt(cls, parent);
+		bool processed = _fireEvent(&evt, (void*)&excludeName);
 
-		if(retval.isEmpty())
+		if(processed)
 		{
 			// Process the built-in name exclusions
 			if(cls == "emitter" || cls == "affector")
@@ -905,7 +891,7 @@ namespace Ogre
 		}
 		else
 		{
-			return any_cast<bool>(retval);
+			return excludeName;
 		}
 		return false;
 	}
@@ -1656,6 +1642,25 @@ namespace Ogre
 		}
         mScriptCompiler->compile(stream->getAsString(), stream->getName(), groupName);
     }
+
+	//-------------------------------------------------------------------------
+	String PreApplyTextureAliasesScriptCompilerEvent::eventType = "preApplyTextureAliases";
+	//-------------------------------------------------------------------------
+	String ProcessResourceNameScriptCompilerEvent::eventType = "processResourceName";
+	//-------------------------------------------------------------------------
+	String ProcessNameExclusionScriptCompilerEvent::eventType = "processNameExclusion";
+	//----------------------------------------------------------------------------
+	String CreateMaterialScriptCompilerEvent::eventType = "createMaterial";
+	//----------------------------------------------------------------------------
+	String CreateGpuProgramScriptCompilerEvent::eventType = "createGpuProgram";
+	//-------------------------------------------------------------------------
+	String CreateHighLevelGpuProgramScriptCompilerEvent::eventType = "createHighLevelGpuProgram";
+	//-------------------------------------------------------------------------
+	String CreateGpuSharedParametersScriptCompilerEvent::eventType = "createGpuSharedParameters";
+	//-------------------------------------------------------------------------
+	String CreateParticleSystemScriptCompilerEvent::eventType = "createParticleSystem";
+	//-------------------------------------------------------------------------
+	String CreateCompositorScriptCompilerEvent::eventType = "createCompositor";
 }
 
 
