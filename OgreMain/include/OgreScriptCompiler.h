@@ -365,29 +365,9 @@ namespace Ogre
 		/**
 		 @remarks	This function is called from the translators when an event occurs that
 					that can be responded to. Often this is overriding names, or it can be a request for
-					custom resource creation. The support events are:
-					preApplyTextureAliases - Allows overriding texture aliases before they are set
-						arg1 is a Material*
-						arg2 is an AliasTextureNamePairList* holding the aliases
-					processTextureNames - Allows overriding referenced textures
-						arg1 is a String*
-						arg2 is the size of the array
-						No return value
-					processMaterialName - Allows overriding referenced materials
-						arg1 is a single String*
-						No return value
-					processGpuProgramName - Allows overriding referenced gpu programs
-						arg1 is a single String*
-						No return value
-					processNameExclusion - Allows forcing a name exclusion
-						arg1 is a String of the node object's class ("material", "particle_system", etc.)
-						arg2 is an AbstractNode* which is the object's parent
-						No return value
-					createMaterial - Create a material and return it as the return value (pointer to the Material)
-						arg
+					custom resource creation.
 		 @arg compiler A reference to the compiler
-		 @arg name The name of the event
-		 @arg args The vector of argument for the event
+		 @arg evt The event object holding information about the event to be processed
 		 @arg retval A possible return value from handlers
 		 @return True if the handler processed the event
 		*/
@@ -479,7 +459,7 @@ namespace Ogre
 	};
 
 	// Standard event types
-	class PreApplyTextureAliasesScriptCompilerEvent : public ScriptCompilerEvent
+	class _OgreExport PreApplyTextureAliasesScriptCompilerEvent : public ScriptCompilerEvent
 	{
 	public:
 		Material *mMaterial;
@@ -490,7 +470,7 @@ namespace Ogre
 			:ScriptCompilerEvent(eventType), mMaterial(material), mAliases(aliases){}
 	};
 
-	class ProcessResourceNameScriptCompilerEvent : public ScriptCompilerEvent
+	class _OgreExport ProcessResourceNameScriptCompilerEvent : public ScriptCompilerEvent
 	{
 	public:
 		enum ResourceType
@@ -508,7 +488,7 @@ namespace Ogre
 			:ScriptCompilerEvent(eventType), mResourceType(resourceType), mName(name){}     
 	};
 
-	class ProcessNameExclusionScriptCompilerEvent : public ScriptCompilerEvent
+	class _OgreExport ProcessNameExclusionScriptCompilerEvent : public ScriptCompilerEvent
 	{
 	public:
 		String mClass;
@@ -519,7 +499,7 @@ namespace Ogre
 			:ScriptCompilerEvent(eventType), mClass(cls), mParent(parent){}     
 	};
 
-	class CreateMaterialScriptCompilerEvent : public ScriptCompilerEvent
+	class _OgreExport CreateMaterialScriptCompilerEvent : public ScriptCompilerEvent
 	{
 	public:
 		String mFile, mName, mResourceGroup;
@@ -529,7 +509,7 @@ namespace Ogre
 			:ScriptCompilerEvent(eventType), mFile(file), mName(name), mResourceGroup(resourceGroup){}  
 	};
 
-	class CreateGpuProgramScriptCompilerEvent : public ScriptCompilerEvent
+	class _OgreExport CreateGpuProgramScriptCompilerEvent : public ScriptCompilerEvent
 	{
 	public:
 		String mFile, mName, mResourceGroup, mSource, mSyntax;
@@ -543,7 +523,7 @@ namespace Ogre
 		{}  
 	};
 
-	class CreateHighLevelGpuProgramScriptCompilerEvent : public ScriptCompilerEvent
+	class _OgreExport CreateHighLevelGpuProgramScriptCompilerEvent : public ScriptCompilerEvent
 	{
 	public:
 		String mFile, mName, mResourceGroup, mSource, mLanguage;
@@ -557,7 +537,7 @@ namespace Ogre
 		{}  
 	};
 
-	class CreateGpuSharedParametersScriptCompilerEvent : public ScriptCompilerEvent
+	class _OgreExport CreateGpuSharedParametersScriptCompilerEvent : public ScriptCompilerEvent
 	{
 	public:
 		String mFile, mName, mResourceGroup;
@@ -567,7 +547,7 @@ namespace Ogre
 			:ScriptCompilerEvent(eventType), mFile(file), mName(name), mResourceGroup(resourceGroup){}  
 	};
 
-	class CreateParticleSystemScriptCompilerEvent : public ScriptCompilerEvent
+	class _OgreExport CreateParticleSystemScriptCompilerEvent : public ScriptCompilerEvent
 	{
 	public:
 		String mFile, mName, mResourceGroup;
@@ -577,7 +557,7 @@ namespace Ogre
 			:ScriptCompilerEvent(eventType), mFile(file), mName(name), mResourceGroup(resourceGroup){}  
 	};
 
-	class CreateCompositorScriptCompilerEvent : public ScriptCompilerEvent
+	class _OgreExport CreateCompositorScriptCompilerEvent : public ScriptCompilerEvent
 	{
 	public:
 		String mFile, mName, mResourceGroup;
