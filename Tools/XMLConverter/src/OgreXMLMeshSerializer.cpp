@@ -519,6 +519,12 @@ namespace Ogre {
     						dataNode->SetAttribute("v", StringConverter::toString(*pFloat++));
     						dataNode->SetAttribute("w", StringConverter::toString(*pFloat++));
                             break;
+                        case VET_FLOAT4:
+    						dataNode->SetAttribute("u", StringConverter::toString(*pFloat++));
+    						dataNode->SetAttribute("v", StringConverter::toString(*pFloat++));
+    						dataNode->SetAttribute("w", StringConverter::toString(*pFloat++));
+    						dataNode->SetAttribute("x", StringConverter::toString(*pFloat++));
+                            break;
                         default:
                             break;
                         }
@@ -1052,6 +1058,11 @@ namespace Ogre {
                         {
                             *pFloat++ = StringConverter::parseReal(
                                 xmlElem->Attribute("w"));
+                        }
+                        if (VertexElement::getTypeCount(elem.getType()) > 3)
+                        {
+                            *pFloat++ = StringConverter::parseReal(
+                                xmlElem->Attribute("x"));
                         }
 
                         break;

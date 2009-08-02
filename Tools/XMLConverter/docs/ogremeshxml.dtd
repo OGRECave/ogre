@@ -111,7 +111,8 @@
 <!ATTLIST texcoord
 	u	CDATA	#REQUIRED	
 	v	CDATA	"0"	
-	w	CDATA	"0" >
+	w	CDATA	"0"	
+	x	CDATA	"0" >
 <!ELEMENT submeshnames (submeshname+)>
 <!ELEMENT submeshname EMPTY>
 <!ATTLIST submeshname 
