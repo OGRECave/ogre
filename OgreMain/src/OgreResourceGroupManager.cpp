@@ -1891,6 +1891,23 @@ namespace Ogre {
 		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME) // lock group mutex
 		return grp->resourceDeclarations;
 	}
+	//---------------------------------------------------------------------
+	const ResourceGroupManager::LocationList& 
+	ResourceGroupManager::getResourceLocationList(const String& group)
+	{
+		OGRE_LOCK_AUTO_MUTEX
+			ResourceGroup* grp = getResourceGroup(group);
+		if (!grp)
+		{
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+				"Cannot locate a resource group called '" + group + "'", 
+				"ResourceGroupManager::getResourceLocationList");
+		}
+
+		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME) // lock group mutex
+		return grp->locationList;
+
+	}
 	//-------------------------------------------------------------------------
 	void ResourceGroupManager::setLoadingListener(ResourceLoadingListener *listener)
 	{

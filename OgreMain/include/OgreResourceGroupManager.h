@@ -269,6 +269,17 @@ namespace Ogre {
         typedef list<ResourceDeclaration>::type ResourceDeclarationList;
 		typedef map<String, ResourceManager*>::type ResourceManagerMap;
 		typedef MapIterator<ResourceManagerMap> ResourceManagerIterator;
+		/// Resource location entry
+		struct ResourceLocation
+		{
+			/// Pointer to the archive which is the destination
+			Archive* archive;
+			/// Whether this location was added recursively
+			bool recursive;
+		};
+		/// List of possible file locations
+		typedef list<ResourceLocation*>::type LocationList;
+
     protected:
 		/// Map of resource types (strings) to ResourceManagers, used to notify them to load / unload group contents
         ResourceManagerMap mResourceManagerMap;
@@ -285,16 +296,6 @@ namespace Ogre {
         /// Resource index entry, resourcename->location 
         typedef map<String, Archive*>::type ResourceLocationIndex;
 
-		/// Resource location entry
-		struct ResourceLocation
-		{
-			/// Pointer to the archive which is the destination
-			Archive* archive;
-			/// Whether this location was added recursively
-			bool recursive;
-		};
-		/// List of possible file locations
-		typedef list<ResourceLocation*>::type LocationList;
 		/// List of resources which can be loaded / unloaded
 		typedef list<ResourcePtr>::type LoadUnloadResourceList;
 		/// Resource group entry
@@ -1023,6 +1024,12 @@ namespace Ogre {
 		@returns A copy of list of currently defined resources.
 		*/
 		ResourceDeclarationList getResourceDeclarationList(const String& groupName);
+
+		/** Get the list of resource locations for the specified group name.
+		@param groupName The name of the group
+		@returns The list of resource locations associated with the given group.
+		*/		
+		const LocationList& getResourceLocationList(const String& groupName);
 
 		/// Sets a new loading listener
 		void setLoadingListener(ResourceLoadingListener *listener);
