@@ -849,7 +849,7 @@ namespace Ogre
 		ProcessNameExclusionScriptCompilerEvent evt(cls, parent);
 		bool processed = _fireEvent(&evt, (void*)&excludeName);
 
-		if(processed)
+		if(!processed)
 		{
 			// Process the built-in name exclusions
 			if(cls == "emitter" || cls == "affector")
