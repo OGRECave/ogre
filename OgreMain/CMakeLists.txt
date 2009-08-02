@@ -539,6 +539,23 @@ endif(WIN32)
 add_definitions(-DOGRE_NONCLIENT_BUILD -DFREEIMAGE_LIB -D_MT -D_USRDLL)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/nedmalloc)
 
+set(LIBRARIES
+  ${ZLIB_LIBRARIES}
+  ${ZZip_LIBRARIES}
+  ${FreeImage_LIBRARIES}
+  ${FREETYPE_LIBRARIES}
+  ${PLATFORM_LIBS}
+)
+
+if (OGRE_CONFIG_THREADS)
+  list(APPEND LIBRARIES ${Boost_LIBRARIES})
+endif ()
+
+if (OGRE_CONFIG_DISABLE_FREEIMAGE)
+  list(REMOVE_ITEM HEADER_FILES include/OgreFreeImageCodec.h)
+  list(REMOVE_ITEM SOURCE_FILES src/OgreFreeImageCodec.cpp)
+  list(REMOVE_ITEM LIBRARIES    "${FreeImage_LIBRARIES}")
+endif()
 
 # setup OgreMain target
 add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
@@ -564,16 +581,8 @@ if (APPLE)
   # Framework is called 'Ogre'
   set_target_properties(OgreMain PROPERTIES	OUTPUT_NAME Ogre)
 endif ()
-target_link_libraries(OgreMain
-  ${ZLIB_LIBRARIES}
-  ${ZZip_LIBRARIES}
-  ${FreeImage_LIBRARIES}
-  ${FREETYPE_LIBRARIES}
-  ${PLATFORM_LIBS}
-)
-if (OGRE_CONFIG_THREADS)
-  target_link_libraries(OgreMain ${Boost_LIBRARIES})
-endif ()
+target_link_libraries(OgreMain ${LIBRARIES})
+
 # specify a precompiled header to use
 use_precompiled_header(OgreMain 
   "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreStableHeaders.h"
