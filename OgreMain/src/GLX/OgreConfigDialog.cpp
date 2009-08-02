@@ -367,7 +367,7 @@ Pixmap GLXConfigurator::CreateBackdrop(Window rootWindow, int depth) {
         PixelUtil::bulkPixelConversion(src, dst);
 	} catch(Exception &e) {
 		// Could not find image; never mind
-		LogManager::getSingleton().logMessage("GLX backdrop image not found: Warning");
+		LogManager::getSingleton().logMessage("WARNING: Can not load backdrop for config dialog. " + e.getDescription(), LML_TRIVIAL);
 		return 0;
 	}
 

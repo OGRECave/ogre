@@ -29,6 +29,7 @@ Torus Knot Software Ltd.
 #include "OgreStableHeaders.h"
 #include "OgreCodec.h"
 #include "OgreException.h"
+#include "OgreStringConverter.h"
 
 
 namespace Ogre {
@@ -57,8 +58,15 @@ namespace Ogre {
         CodecList::const_iterator i = ms_mapCodecs.find(lwrcase);
         if (i == ms_mapCodecs.end())
         {
+            std::string formats_str;
+            if(ms_mapCodecs.empty())
+                formats_str = "There are no formats supported (no codecs registered).";
+            else
+                formats_str = "Supported formats are: " + StringConverter::toString(getExtensions()) + ".";
+
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot find codec for extension " + extension,
+                "Can not find codec for '" + extension + "' image format.\n" + 
+                formats_str,
                 "Codec::getCodec");
         }
 

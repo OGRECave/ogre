@@ -397,14 +397,14 @@ namespace Ogre {
 			// return to start
 			stream->seek(0);
 			pCodec = Codec::getCodec(magicBuf, magicLen);
-		}
 
-		if( !pCodec )
-			OGRE_EXCEPT(
-			Exception::ERR_INVALIDPARAMS, 
-			"Unable to load image - unable to identify codec. Check file extension "
-			"and file format.",
-			"Image::load" );
+      if( !pCodec )
+        OGRE_EXCEPT(
+        Exception::ERR_INVALIDPARAMS, 
+        "Unable to load image: Image format is unknown. Unable to identify codec. "
+        "Check it or specify format explicitly.",
+        "Image::load" );
+		}
 
 		Codec::DecodeResult res = pCodec->decode(stream);
 
