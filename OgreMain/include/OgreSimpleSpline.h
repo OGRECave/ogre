@@ -84,13 +84,13 @@ namespace Ogre {
             whole length of the spline, this method returns an interpolated point.
         @param t Parametric value.
         */
-        Vector3 interpolate(Real t);
+        Vector3 interpolate(Real t) const;
 
         /** Interpolates a single segment of the spline given a parametric value.
         @param fromIndex The point index to treat as t=0. fromIndex + 1 is deemed to be t=1
         @param t Parametric value
         */
-        Vector3 interpolate(unsigned int fromIndex, Real t);
+        Vector3 interpolate(unsigned int fromIndex, Real t) const;
 
 
         /** Tells the spline whether it should automatically calculate tangents on demand

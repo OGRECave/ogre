@@ -73,7 +73,7 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    Vector3 SimpleSpline::interpolate(Real t)
+    Vector3 SimpleSpline::interpolate(Real t) const
     {
         // Currently assumes points are evenly spaced, will cause velocity
         // change where this is not the case
@@ -90,7 +90,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    Vector3 SimpleSpline::interpolate(unsigned int fromIndex, Real t)
+    Vector3 SimpleSpline::interpolate(unsigned int fromIndex, Real t) const
     {
         // Bounds check
         assert (fromIndex < mPoints.size() &&
@@ -123,10 +123,10 @@ namespace Ogre {
 
 
         // Algorithm is ret = powers * mCoeffs * Matrix4(point1, point2, tangent1, tangent2)
-        Vector3& point1 = mPoints[fromIndex];
-        Vector3& point2 = mPoints[fromIndex+1];
-        Vector3& tan1 = mTangents[fromIndex];
-        Vector3& tan2 = mTangents[fromIndex+1];
+        const Vector3& point1 = mPoints[fromIndex];
+        const Vector3& point2 = mPoints[fromIndex+1];
+        const Vector3& tan1 = mTangents[fromIndex];
+        const Vector3& tan2 = mTangents[fromIndex+1];
         Matrix4 pt;
 
         pt[0][0] = point1.x;
