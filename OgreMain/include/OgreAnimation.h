@@ -206,7 +206,19 @@ namespace Ogre {
         */
         void apply(Real timePos, Real weight = 1.0, Real scale = 1.0f);
 
-        /** Applies all node tracks given a specific time point and weight to a given skeleton.
+        /** Applies all node tracks given a specific time point and weight to the specified node.
+        @remarks
+            It does not consider the actual node tracks are attached to.
+			As such, it resembles the apply method for a given skeleton (see below).
+        @param timePos The time position in the animation to apply.
+        @param weight The influence to give to this track, 1.0 for full influence, less to blend with
+          other animations.
+	    @param scale The scale to apply to translations and scalings, useful for 
+			adapting an animation to a different size target.
+        */
+		void Animation::applyToNode(Node* node, Real timePos, Real weight = 1.0, Real scale = 1.0f);
+
+       /** Applies all node tracks given a specific time point and weight to a given skeleton.
         @remarks
         Where you have associated animation tracks with Node objects, you can easily apply
         an animation to those nodes by calling this method.
@@ -245,7 +257,27 @@ namespace Ogre {
 		void apply(Entity* entity, Real timePos, Real weight, bool software, 
 			bool hardware);
 
-        /** Tells the animation how to interpolate between keyframes.
+        /** Applies all numeric tracks given a specific time point and weight to the specified animable value.
+        @remarks
+            It does not applies to actual attached animable values but rather uses all tracks for a single animable value.
+        @param timePos The time position in the animation to apply.
+        @param weight The influence to give to this track, 1.0 for full influence, less to blend with
+          other animations.
+	    @param scale The scale to apply to translations and scalings, useful for 
+			adapting an animation to a different size target.
+        */
+		void Animation::applyToAnimable(const AnimableValuePtr& anim, Real timePos, Real weight = 1.0, Real scale = 1.0f);
+
+        /** Applies all vertex tracks given a specific time point and weight to the specified vertex data.
+        @remarks
+            It does not apply to the actual attached vertex data but rather uses all tracks for a given vertex data.
+        @param timePos The time position in the animation to apply.
+        @param weight The influence to give to this track, 1.0 for full influence, less to blend with
+          other animations.
+        */
+        void applyToVertexData(VertexData* data, Real timePos, Real weight = 1.0);
+
+		/** Tells the animation how to interpolate between keyframes.
         @remarks
             By default, animations normally interpolate linearly between keyframes. This is
             fast, but when animations include quick changes in direction it can look a little

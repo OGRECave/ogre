@@ -329,6 +329,18 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
+	void Animation::applyToNode(Node* node, Real timePos, Real weight, Real scale)
+    {
+        // Calculate time index for fast keyframe search
+        TimeIndex timeIndex = _getTimeIndex(timePos);
+
+        NodeTrackList::iterator i;
+        for (i = mNodeTrackList.begin(); i != mNodeTrackList.end(); ++i)
+        {
+            i->second->applyToNode(node, timeIndex, weight, scale);
+        }
+    }
+    //---------------------------------------------------------------------
     void Animation::apply(Skeleton* skel, Real timePos, Real weight, 
 		Real scale)
     {
@@ -429,6 +441,30 @@ namespace Ogre {
 		}
 
 	}
+    //---------------------------------------------------------------------
+	void Animation::applyToAnimable(const AnimableValuePtr& anim, Real timePos, Real weight, Real scale)
+    {
+        // Calculate time index for fast keyframe search
+        TimeIndex timeIndex = _getTimeIndex(timePos);
+
+		NumericTrackList::iterator j;
+		for (j = mNumericTrackList.begin(); j != mNumericTrackList.end(); ++j)
+		{
+			j->second->applyToAnimable(anim, weight, scale);
+		}
+   }
+    //---------------------------------------------------------------------
+	void Animation::applyToVertexData(VertexData* data, Real timePos, Real weight)
+    {
+        // Calculate time index for fast keyframe search
+        TimeIndex timeIndex = _getTimeIndex(timePos);
+
+		VertexTrackList::iterator k;
+		for (k = mVertexTrackList.begin(); k != mVertexTrackList.end(); ++k)
+		{
+			k->second->applyToVertexData(data, timeIndex, weight);
+		}
+    }
     //---------------------------------------------------------------------
     void Animation::setInterpolationMode(InterpolationMode im)
     {
