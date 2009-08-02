@@ -433,11 +433,12 @@ namespace Ogre {
 		iterator insert(iterator pos, const T& t)
 		{
 			bool recalc = (pos != end());
-			mList.insert(pos, t);
+			iterator ret = mList.insert(pos, t);
 			if (recalc)
 				dirtyHash();
 			else
 				addToHash(t);
+			return ret;
 		}
 
 		template <class InputIterator>
