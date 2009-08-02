@@ -231,6 +231,7 @@ namespace Ogre {
 
 		DebugRenderable* mDebug;
 
+		Any mUserAny;
 
     public:
         /** Constructor, should only be called by parent, not directly.
@@ -709,6 +710,18 @@ namespace Ogre {
 		/** Process queued 'needUpdate' calls. */
 		static void processQueuedUpdates(void);
 
+
+		/** Sets any kind of user value on this object.
+		@remarks
+			This method allows you to associate any user value you like with 
+			this Node. This can be a pointer back to one of your own
+			classes for instance.
+		*/
+		virtual void setUserAny(const Any& anything) { mUserAny = anything; }
+
+		/** Retrieves the custom user value associated with this object.
+		*/
+		virtual const Any& getUserAny(void) const { return mUserAny; }
 
 
     };
