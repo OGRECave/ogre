@@ -216,7 +216,7 @@ namespace Ogre {
 	    @param scale The scale to apply to translations and scalings, useful for 
 			adapting an animation to a different size target.
         */
-		void Animation::applyToNode(Node* node, Real timePos, Real weight = 1.0, Real scale = 1.0f);
+		void applyToNode(Node* node, Real timePos, Real weight = 1.0, Real scale = 1.0f);
 
        /** Applies all node tracks given a specific time point and weight to a given skeleton.
         @remarks
@@ -266,7 +266,7 @@ namespace Ogre {
 	    @param scale The scale to apply to translations and scalings, useful for 
 			adapting an animation to a different size target.
         */
-		void Animation::applyToAnimable(const AnimableValuePtr& anim, Real timePos, Real weight = 1.0, Real scale = 1.0f);
+		void applyToAnimable(const AnimableValuePtr& anim, Real timePos, Real weight = 1.0, Real scale = 1.0f);
 
         /** Applies all vertex tracks given a specific time point and weight to the specified vertex data.
         @remarks
