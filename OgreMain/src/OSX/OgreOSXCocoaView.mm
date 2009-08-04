@@ -37,18 +37,21 @@
 
 - (id)initWithFrame:(NSRect)f
 {
-	[super initWithFrame:f];
-	NSApplicationLoad();
-	
-	window = 0;
-
+	if((self = [super initWithFrame:f]))
+    {
+        NSApplicationLoad();
+        
+        window = 0;
+    }
 	return self;
 }
 
 - (id)initWithGLOSXWindow:(Ogre::RenderWindow*)w
 {
-	[super init];
-	window = w;
+	if((self = [super initWithFrame:[(OgreWindow *)w frame]]))
+    {
+        window = w;
+    }
 	return self;
 }
 
@@ -65,7 +68,8 @@
 - (void)setFrameSize:(NSSize)s
 {
 	[super setFrameSize:s];
-	window->windowMovedOrResized();
+    if (window)
+        window->windowMovedOrResized();
 }
 
 - (void)drawRect:(NSRect)r
