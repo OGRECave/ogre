@@ -1886,14 +1886,15 @@ namespace Ogre{
 
 							if(i2 != prop->values.end())
 							{
-								if(!getColour(i2, prop->values.end(), &clr))
-								{
-									compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-										(*i2)->getValue() + " is not a valid colour");
-									break;
-								}
-								++i2;
-							}
+								  if(!getColour(i2, prop->values.end(), &clr, 3))
+								  {
+									 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									 (*i2)->getValue() + " is not a valid colour");
+									 break;
+								  }
+
+							   i2 = getNodeAt(prop->values, 5);
+							} 
 
 							if(i2 != prop->values.end())
 							{
