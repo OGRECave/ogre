@@ -112,6 +112,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     BillboardParticleRenderer::~BillboardParticleRenderer()
     {
+		// mBillboardSet is never actually attached to a node, we just passthrough
+		// based on the particle system's attachment. So manually notify that it's
+		// no longer attached.
+		mBillboardSet->_notifyAttached(0);
         OGRE_DELETE  mBillboardSet;
     }
     //-----------------------------------------------------------------------

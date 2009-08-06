@@ -3779,6 +3779,12 @@ namespace Ogre
 
 		std::stringstream ss;
 
+		// Reset the texture stages, they will need to be rebound
+		for (size_t i = 0; i < OGRE_MAX_TEXTURE_LAYERS; ++i)
+			_setTexture(i, false, TexturePtr());
+
+		LogManager::getSingleton().logMessage("!!! Direct3D Device successfully restored.");
+
 		ss << "D3D9 device: 0x[" << device->getD3D9Device() << "] was reset";
 		LogManager::getSingleton().logMessage(ss.str());
 

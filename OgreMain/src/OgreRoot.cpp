@@ -714,8 +714,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::removeFrameListener(FrameListener* oldListener)
     {
-        // Remove, 1 only (set)
-        mRemovedFrameListeners.insert(oldListener);
+		// Remove, 1 only (set), and only when this listener was added before.
+		if( mFrameListeners.find( oldListener ) != mFrameListeners.end() )
+			mRemovedFrameListeners.insert(oldListener);
     }
     //-----------------------------------------------------------------------
     bool Root::_fireFrameStarted(FrameEvent& evt)
