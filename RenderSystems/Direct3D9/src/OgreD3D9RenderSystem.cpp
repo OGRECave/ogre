@@ -3488,6 +3488,10 @@ namespace Ogre
 			static_cast<D3D9HardwareOcclusionQuery*>(*it)->recreateResources();
 		}
 
+		// Reset the texture stages, they will need to be rebound
+		for (size_t i = 0; i < OGRE_MAX_TEXTURE_LAYERS; ++i)
+			_setTexture(i, false, TexturePtr());
+
 		LogManager::getSingleton().logMessage("!!! Direct3D Device successfully restored.");
 
 		mDeviceLost = false;
