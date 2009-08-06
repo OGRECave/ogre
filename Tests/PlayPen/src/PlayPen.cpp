@@ -287,6 +287,7 @@ public:
 				testNode->setPosition(rayResult.second);
 				StringUtil::StrStreamType str;
 				str << "HIT: " << rayResult.second;
+
 				
 				if (mKeyboard->isKeyDown(OIS::KC_SPACE))
 				{
@@ -302,6 +303,20 @@ public:
 					mTerrain->update();
 
 				}
+				/*
+				if (mKeyboard->isKeyDown(OIS::KC_SPACE))
+				{
+					Vector3 tsPos;
+					mTerrain->getTerrainPosition(rayResult.second, &tsPos);
+					TerrainLayerBlendMap* map = mTerrain->getLayerBlendMap(1);
+					size_t imgx, imgy;
+					map->convertTerrainToImageSpace(tsPos.x, tsPos.y, &imgx, &imgy);
+
+					map->setBlendValue(imgx, imgy, 255);
+					map->update();
+
+				}
+				*/
 				mDebugText = str.str();
 
 			}
@@ -8048,7 +8063,7 @@ protected:
 			*/
 		}
 
-		//addTextureDebugOverlay(TextureManager::getSingleton().getByName(mTerrain->getBlendTextureName(0)), 0);
+		//addTextureDebugOverlay(TextureManager::getSingleton().getByName(mTerrain->getTerrainNormalMap()->getName()), 0);
 
 		//mWindow->getViewport(0)->setBackgroundColour(ColourValue::Blue);
 
@@ -8125,144 +8140,146 @@ protected:
 
 		LogManager::getSingleton().setLogDetail(LL_BOREME);
 
-		testLiSPSM();
-		testBug();
-		testSharedPtrBug();
-        testMatrices();
-        //testBsp();
-        testAlpha();
-        testAnimation();
-		testAnimationBlend();
+		//testLiSPSM();
+		//testBug();
+		//testSharedPtrBug();
+  //      testMatrices();
+  //      //testBsp();
+  //      testAlpha();
+  //      testAnimation();
+		//testAnimationBlend();
 
-        testGpuPrograms();
-        testMultiViewports();
-        testDistortion();
-        testEdgeBuilderSingleIndexBufSingleVertexBuf();
-        testEdgeBuilderMultiIndexBufSingleVertexBuf();
-        testEdgeBuilderMultiIndexBufMultiVertexBuf();
-        testPrepareShadowVolume();
-        testWindowedViewportMode();
-        testSubEntityVisibility();
-        testAttachObjectsToBones();
-        testSkeletalAnimation();
-        testOrtho();
-        testClearScene();
-		testInfiniteAAB();
+  //      testGpuPrograms();
+  //      testMultiViewports();
+  //      testDistortion();
+  //      testEdgeBuilderSingleIndexBufSingleVertexBuf();
+  //      testEdgeBuilderMultiIndexBufSingleVertexBuf();
+  //      testEdgeBuilderMultiIndexBufMultiVertexBuf();
+  //      testPrepareShadowVolume();
+  //      testWindowedViewportMode();
+  //      testSubEntityVisibility();
+  //      testAttachObjectsToBones();
+  //      testSkeletalAnimation();
+  //      testOrtho();
+  //      testClearScene();
+		//testInfiniteAAB();
 
-        testProjection();
-        testStencilShadows(SHADOWTYPE_STENCIL_ADDITIVE, true, true);
-        testStencilShadows(SHADOWTYPE_STENCIL_MODULATIVE, false, true);
-        testTextureShadows(SHADOWTYPE_TEXTURE_ADDITIVE, true);
-		testTextureShadows(SHADOWTYPE_TEXTURE_MODULATIVE, true);
-		testTextureShadowsIntegrated();
-		testTextureShadowsIntegratedPSSM();
-		testStencilShadowsMixedOpSubMeshes(false, true);
-		testTextureShadowsTransparentCaster();
-		testTextureShadowsCustomCasterMat(SHADOWTYPE_TEXTURE_ADDITIVE, true);
-		testTextureShadowsCustomReceiverMat(SHADOWTYPE_TEXTURE_MODULATIVE, true);
-		testCompositorTextureShadows(SHADOWTYPE_TEXTURE_MODULATIVE);
-		testSplitPassesTooManyTexUnits();
-        testOverlayZOrder();
-		testReflectedBillboards();
-		testBlendDiffuseColour();
+  //      testProjection();
+  //      testStencilShadows(SHADOWTYPE_STENCIL_ADDITIVE, true, true);
+  //      testStencilShadows(SHADOWTYPE_STENCIL_MODULATIVE, false, true);
+  //      testTextureShadows(SHADOWTYPE_TEXTURE_ADDITIVE, true);
+		//testTextureShadows(SHADOWTYPE_TEXTURE_MODULATIVE, true);
+		//testTextureShadowsIntegrated();
+		//testTextureShadowsIntegratedPSSM();
+		//testStencilShadowsMixedOpSubMeshes(false, true);
+		//testTextureShadowsTransparentCaster();
+		//testTextureShadowsCustomCasterMat(SHADOWTYPE_TEXTURE_ADDITIVE, true);
+		//testTextureShadowsCustomReceiverMat(SHADOWTYPE_TEXTURE_MODULATIVE, true);
+		//testCompositorTextureShadows(SHADOWTYPE_TEXTURE_MODULATIVE);
+		//testSplitPassesTooManyTexUnits();
+  //      testOverlayZOrder();
+		//testReflectedBillboards();
+		//testBlendDiffuseColour();
 
-        testRaySceneQuery();
-		testNegativeScale();
-		testMaterialSerializer();
-        testIntersectionSceneQuery();
+  //      testRaySceneQuery();
+		//testNegativeScale();
+		//testMaterialSerializer();
+  //      testIntersectionSceneQuery();
 
-        test2Spotlights();
-		testDepthBias();
+  //      test2Spotlights();
+		//testDepthBias();
 
-		testManualLOD();
-		testGeneratedLOD();
-		testLotsAndLotsOfEntities();
-		testSimpleMesh();
-		test2Windows();
-		testStaticGeometry();
-		testStaticGeometryWithLOD(true);
-		testBillboardTextureCoords();
-		testBillboardOrigins();
-		testReloadResources();
-		testTransparencyMipMaps();
-		testRadixSort();
-		testMorphAnimation();
-		testPoseAnimation();
-		testPoseAnimation2();
-		testNormalMapMirroredUVs();
-		testMRTCompositorScript();
-		testSpotlightViewProj(true);
+		////testMaterialSchemesListener();
+		//testManualLOD();
+		//testGeneratedLOD();
+		//testLotsAndLotsOfEntities();
+		//testSimpleMesh();
+		//test2Windows();
+		//testStaticGeometry();
+		//testStaticGeometryWithLOD(true);
+		//testBillboardTextureCoords();
+		//testBillboardOrigins();
+		//testReloadResources();
+		//testTransparencyMipMaps();
+		//testRadixSort();
+		//testMorphAnimation();
+		//testPoseAnimation();
+		//testPoseAnimation2();
+		//testNormalMapMirroredUVs();
+		//testMRTCompositorScript();
+		//testSpotlightViewProj(true);
 		test16Textures();
-		testProjectSphere();
-		testLightScissoring(true);
-		testLightClipPlanes(false);
-		testManualIlluminationStage(SHADOWTYPE_STENCIL_ADDITIVE);
-		testTimeCreateDestroyObject();
-		testManualBlend();
-		testManualObjectNonIndexed();
-		testManualObjectIndexed();
-		testManualObjectNonIndexedUpdateSmaller();
-		testManualObjectNonIndexedUpdateLarger();
-		testManualObjectIndexedUpdateSmaller();
-		testManualObjectIndexedUpdateLarger();
-		testManualObject2D();
-		testCustomProjectionMatrix();
-		testPointSprites();
-		testFallbackResourceGroup();
-		testSuppressedShadows(SHADOWTYPE_TEXTURE_ADDITIVE);
-		testViewportNoShadows(SHADOWTYPE_TEXTURE_ADDITIVE);
-		testBillboardChain();
-		testRibbonTrail();
-		testSerialisedColour();
-		testBillboardAccurateFacing();
-		testMultiSceneManagersSimple();
-		testMultiSceneManagersComplex();
-		testManualBoneMovement();
-		testMaterialSchemes();
-		testMaterialSchemesListener();
-		testMaterialSchemesWithLOD();
-		testMaterialSchemesWithMismatchedLOD();
-        testSkeletonAnimationOptimise();
-        testBuildTangentOnAnimatedMesh();
-		testOverlayRelativeMode();
-		testShadowLod(false, SHADOWTYPE_TEXTURE_MODULATIVE);
+		//testProjectSphere();
+		//testLightScissoring(true);
+		//testLightClipPlanes(false);
+		//testManualIlluminationStage(SHADOWTYPE_STENCIL_ADDITIVE);
+		//testTimeCreateDestroyObject();
+		//testManualBlend();
+		//testManualObjectNonIndexed();
+		//testManualObjectIndexed();
+		//testManualObjectNonIndexedUpdateSmaller();
+		//testManualObjectNonIndexedUpdateLarger();
+		//testManualObjectIndexedUpdateSmaller();
+		//testManualObjectIndexedUpdateLarger();
+		//testManualObject2D();
+		//testCustomProjectionMatrix();
+		//testPointSprites();
+		//testFallbackResourceGroup();
+		//testSuppressedShadows(SHADOWTYPE_TEXTURE_ADDITIVE);
+		//testViewportNoShadows(SHADOWTYPE_TEXTURE_ADDITIVE);
+		//testBillboardChain();
+		//testRibbonTrail();
+		//testSerialisedColour();
+		//testBillboardAccurateFacing();
+		//testMultiSceneManagersSimple();
+		//testMultiSceneManagersComplex();
+		//testManualBoneMovement();
+		//testMaterialSchemes();
+		//testMaterialSchemesListener();
+		//testMaterialSchemesWithLOD();
+		//testMaterialSchemesWithMismatchedLOD();
+  //      testSkeletonAnimationOptimise();
+  //      testBuildTangentOnAnimatedMesh();
+		//testOverlayRelativeMode();
+		//testShadowLod(false, SHADOWTYPE_TEXTURE_MODULATIVE);
 
-		testCubeDDS();
-		testDxt1();
-		testDxt1FromMemory();
-		testDxt3FromMemory();
-		testDxt1Alpha();
-		testDxt3();
-		testDxt5();
-		testFloat64DDS();
-		testFloat128DDS();
-		testFloat16DDS();
-		testFloat32DDS();
-		testMaterial();
-		testExportPrecompiledAssemblerProgram();
+		//testCubeDDS();
+		//testDxt1();
+		//testDxt1FromMemory();
+		//testDxt3FromMemory();
+		//testDxt1Alpha();
+		//testDxt3();
+		//testDxt5();
+		//testFloat64DDS();
+		//testFloat128DDS();
+		//testFloat16DDS();
+		//testFloat32DDS();
+		//testMaterial();
+		//testExportPrecompiledAssemblerProgram();
 
-		testVertexTexture();
-		testGLSLTangent();
-		testBackgroundLoadResourceGroup();
-		testMRT();
-		testReinitialiseEntityAlteredMesh();
-		testSRGBtexture(true);
-		testLightClipPlanesMoreLights(true);
+		//testVertexTexture();
+		//testGLSLTangent();
+		//testBackgroundLoadResourceGroup();
+		//testMRT();
+		//testReinitialiseEntityAlteredMesh();
+		//testSRGBtexture(true);
+		//testLightClipPlanesMoreLights(true);
 
-		testFarFromOrigin();
-		testGeometryShaders();
-		testAlphaToCoverage();
-		testCompositorTechniqueSwitch(true);
-		testBlitSubTextures();
+		//testFarFromOrigin();
+		//testGeometryShaders();
+		//testAlphaToCoverage();
+		//testCompositorTechniqueSwitch(true);
+		//testBlitSubTextures();
 
-		testDepthShadowMap();
+		//testDepthShadowMap();
 
-        testLod();
-		testSharedGpuParameters();
-		testNewTerrain();
-		testNewTerrain(true);
-		testImageCombine();
-
+  //      testLod();
+		//testSharedGpuParameters();
+		//testNewTerrain(true);
+		//testImageCombine();
+		//testNewTerrain(true);
+		//testNewTerrain(true, false, "flatterrain.dat");
+		//testImageCombine();
 
 		Image combined;
 		/*
