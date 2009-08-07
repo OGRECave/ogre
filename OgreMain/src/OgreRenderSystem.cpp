@@ -430,7 +430,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void RenderSystem::_disableTextureUnitsFrom(size_t texUnit)
     {
-        size_t disableTo = mCurrentCapabilities->getNumTextureUnits();
+        size_t disableTo = OGRE_MAX_TEXTURE_LAYERS;
         if (disableTo > mDisabledTexUnitsFrom)
             disableTo = mDisabledTexUnitsFrom;
         mDisabledTexUnitsFrom = texUnit;
