@@ -382,6 +382,52 @@ namespace Ogre
 
 		};
 
+		/// Enumeration of relative spaces that you might want to use to address the terrain
+		enum Space
+		{
+			/// Simple global world space, axes and positions are all in world space
+			WORLD_SPACE = 0, 
+			/// As world space, but positions are relative to the terrain world position
+			LOCAL_SPACE = 1, 
+			/** x & y are parametric values on the terrain from 0 to 1, with the
+			origin at the bottom left. z is the world space height at that point.
+			*/
+			TERRAIN_SPACE = 2,
+			/** x & y are integer points on the terrain from 0 to size-1, with the
+			origin at the bottom left. z is the world space height at that point.
+			*/
+			POINT_SPACE = 3
+		};
+
+		/** Convert a position from one space to another with respect to this terrain.
+		@param inSpace The space that inPos is expressed as
+		@param inPos The incoming position
+		@param outSpace The space which outPos should be expressed as
+		@param outPos The output position to be populated
+		*/
+		void convertPosition(Space inSpace, const Vector3& inPos, Space outSpace, Vector3& outPos);
+		/** Convert a position from one space to another with respect to this terrain.
+		@param inSpace The space that inPos is expressed as
+		@param inPos The incoming position
+		@param outSpace The space which outPos should be expressed as
+		@returns The output position 
+		*/
+		Vector3 convertPosition(Space inSpace, const Vector3& inPos, Space outSpace);
+		/** Convert a direction from one space to another with respect to this terrain.
+		@param inSpace The space that inDir is expressed as
+		@param inDir The incoming direction
+		@param outSpace The space which outDir should be expressed as
+		@param outDir The output direction to be populated
+		*/
+		void convertDirection(Space inSpace, const Vector3& inDir, Space outSpace, Vector3& outDir);
+		/** Convert a direction from one space to another with respect to this terrain.
+		@param inSpace The space that inDir is expressed as
+		@param inDir The incoming direction
+		@param outSpace The space which outDir should be expressed as
+		@returns The output direction 
+		*/
+		Vector3 convertDirection(Space inSpace, const Vector3& inDir, Space outSpace);
+
 		/** Save terrain data in native form to a standalone file
 		@note
 			This is a fairly basic way of saving the terrain, to save to a
@@ -1060,6 +1106,9 @@ namespace Ogre
 		void createOrDestroyGPUColourMap();
 		void createOrDestroyGPULightmap();
 		void waitForDerivedProcesses();
+		void convertSpace(Space inSpace, const Vector3& inVec, Space outSpace, Vector3& outVec, bool translation);
+		Vector3 convertWorldToTerrainAxes(const Vector3& inVec);
+		Vector3 convertTerrainToWorldAxes(const Vector3& inVec);
 		/** Get a Vector3 of the world-space point on the terrain, aligned Y-up always.
 		@note This point is relative to Terrain::getPosition
 		*/
@@ -1101,7 +1150,9 @@ namespace Ogre
 		uint16 mNumLodLevels;
 		uint16 mNumLodLevelsPerLeafNode;
 		uint16 mTreeDepth;
+		/// Base position in world space, relative to mPos
 		Real mBase;
+		/// Relationship between one point on the terrain and world size
 		Real mScale;
 		TerrainLayerDeclaration mLayerDecl;
 		LayerInstanceList mLayers;
