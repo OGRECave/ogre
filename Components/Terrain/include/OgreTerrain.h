@@ -1151,6 +1151,7 @@ namespace Ogre
 		mutable TerrainMaterialGeneratorPtr mMaterialGenerator;
 		mutable unsigned long long int mMaterialGenerationCount;
 		mutable bool mMaterialDirty;
+		mutable bool mMaterialParamsDirty;
 
 		uint16 mLayerBlendMapSize;
 		uint16 mLayerBlendMapSizeActual;

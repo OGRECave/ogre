@@ -222,8 +222,15 @@ namespace Ogre
 			tu = pass->createTextureUnitState(terrain->getLayerTextureName(i, 1));
 		}
 
+		updateParams(mat, terrain);
+
 		return mat;
 
+	}
+	//---------------------------------------------------------------------
+	void TerrainMaterialGeneratorA::SM2Profile::updateParams(const MaterialPtr& mat, const Terrain* terrain)
+	{
+		mShaderGen->updateParams(this, mat, terrain);
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
@@ -297,21 +304,6 @@ namespace Ogre
 		params->setNamedAutoConstant("lodMorph", GpuProgramParameters::ACT_CUSTOM, 
 			Terrain::LOD_MORPH_CUSTOM_PARAM);
 
-		uint numUVMul = terrain->getLayerCount() / 4;
-		if (terrain->getLayerCount() % 4)
-			++numUVMul;
-		for (uint i = 0; i < numUVMul; ++i)
-		{
-			Vector4 uvMul(
-				terrain->getLayerUVMultiplier(i * 4), 
-				terrain->getLayerUVMultiplier(i * 4 + 1), 
-				terrain->getLayerUVMultiplier(i * 4 + 2), 
-				terrain->getLayerUVMultiplier(i * 4 + 3) 
-				);
-			params->setNamedConstant("uvMul" + StringConverter::toString(i), uvMul);
-		}
-
-
 	}
 	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::defaultFpParams(
@@ -326,10 +318,43 @@ namespace Ogre
 		params->setNamedAutoConstant("lightSpecularColour", GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR, 0);
 		params->setNamedAutoConstant("eyePosObjSpace", GpuProgramParameters::ACT_CAMERA_POSITION_OBJECT_SPACE);
 
-		
+	}
+	//---------------------------------------------------------------------
+	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::updateParams(
+		const SM2Profile* prof, const MaterialPtr& mat, const Terrain* terrain)
+	{
+		Pass* p = mat->getTechnique(0)->getPass(0);
+		updateVpParams(prof, terrain, p->getVertexProgramParameters());
+		updateFpParams(prof, terrain, p->getFragmentProgramParameters());
+	}
+	//---------------------------------------------------------------------
+	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::updateVpParams(
+		const SM2Profile* prof, const Terrain* terrain, const GpuProgramParametersSharedPtr& params)
+	{
+		uint numUVMul = terrain->getLayerCount() / 4;
+		if (terrain->getLayerCount() % 4)
+			++numUVMul;
+		for (uint i = 0; i < numUVMul; ++i)
+		{
+			Vector4 uvMul(
+				terrain->getLayerUVMultiplier(i * 4), 
+				terrain->getLayerUVMultiplier(i * 4 + 1), 
+				terrain->getLayerUVMultiplier(i * 4 + 2), 
+				terrain->getLayerUVMultiplier(i * 4 + 3) 
+				);
+			params->setNamedConstant("uvMul" + StringConverter::toString(i), uvMul);
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::updateFpParams(
+		const SM2Profile* prof, const Terrain* terrain, const GpuProgramParametersSharedPtr& params)
+	{
+
 		// TODO - parameterise this?
 		Vector4 scaleBiasSpecular(0.03, -0.04, 32, 1);
 		params->setNamedConstant("scaleBiasSpecular", scaleBiasSpecular);
+
 	}
 	//---------------------------------------------------------------------
 	String TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::getChannel(uint idx)

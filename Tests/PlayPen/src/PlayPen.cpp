@@ -268,6 +268,15 @@ public:
 
 		if (mTerrain)
 		{
+			if (mKeyboard->isKeyDown(OIS::KC_PERIOD))
+			{
+				mTerrain->setLayerWorldSize(0, mTerrain->getLayerWorldSize(0) + 100 * evt.timeSinceLastFrame);
+			}
+			else if (mKeyboard->isKeyDown(OIS::KC_COMMA))
+			{
+				mTerrain->setLayerWorldSize(0, mTerrain->getLayerWorldSize(0) - 100 * evt.timeSinceLastFrame);
+			}
+
 			// fire ray
 			Ray ray; 
 			ray = mCamera->getCameraToViewportRay(0.5, 0.5);
@@ -8208,7 +8217,7 @@ protected:
 		//testNormalMapMirroredUVs();
 		//testMRTCompositorScript();
 		//testSpotlightViewProj(true);
-		test16Textures();
+		//test16Textures();
 		//testProjectSphere();
 		//testLightScissoring(true);
 		//testLightClipPlanes(false);
@@ -8277,7 +8286,7 @@ protected:
 		//testSharedGpuParameters();
 		//testNewTerrain(true);
 		//testImageCombine();
-		//testNewTerrain(true);
+		testNewTerrain(true);
 		//testNewTerrain(true, false, "flatterrain.dat");
 		//testImageCombine();
 

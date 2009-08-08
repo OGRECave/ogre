@@ -122,6 +122,7 @@ namespace Ogre
 		, mDerivedUpdatePendingMask(0)
 		, mMaterialGenerationCount(0)
 		, mMaterialDirty(false)
+		, mMaterialParamsDirty(false)
 		, mGlobalColourMapSize(0)
 		, mGlobalColourMapEnabled(false)
 		, mCpuColourMapStorage(0)
@@ -1287,7 +1288,7 @@ namespace Ogre
 
 			mLayers[index].worldSize = size;
 			mLayerUVMultiplier[index] = mWorldSize / size;
-			mMaterialDirty = true;
+			mMaterialParamsDirty = true;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -1341,6 +1342,7 @@ namespace Ogre
 			{
 				mLayers[layerIndex].textureNames[samplerIndex] = textureName;
 				mMaterialDirty = true;
+				mMaterialParamsDirty = true;
 			}
 		}
 	}
@@ -1941,6 +1943,10 @@ namespace Ogre
 			mMaterialGenerationCount = mMaterialGenerator->getChangeCount();
 			mMaterialDirty = false;
 		}
+		if (mMaterialParamsDirty)
+		{
+			mMaterialGenerator->updateParams(mMaterial, this);
+		}
 
 		return mMaterial;
 	}
@@ -2002,6 +2008,7 @@ namespace Ogre
 		setLayerWorldSize(mLayers.size()-1, worldSize);
 		checkLayers(true);
 		mMaterialDirty = true;
+		mMaterialParamsDirty = true;
 
 	}
 	//---------------------------------------------------------------------
@@ -2013,6 +2020,7 @@ namespace Ogre
 			std::advance(i, index);
 			mLayers.erase(i);
 			mMaterialDirty = true;
+			mMaterialParamsDirty = true;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -2689,6 +2697,7 @@ namespace Ogre
 			createOrDestroyGPUColourMap();
 
 			mMaterialDirty = true;
+			mMaterialParamsDirty = true;
 		}
 
 	}

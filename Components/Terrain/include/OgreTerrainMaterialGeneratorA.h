@@ -32,9 +32,11 @@ Torus Knot Software Ltd.
 
 #include "OgreTerrainPrerequisites.h"
 #include "OgreTerrainMaterialGenerator.h"
+#include "OgreGpuProgramParams.h"
 
 namespace Ogre
 {
+
 	/** \addtogroup Optional Components
 	*  @{
 	*/
@@ -61,6 +63,7 @@ namespace Ogre
 			SM2Profile(TerrainMaterialGenerator* parent, const String& name, const String& desc);
 			~SM2Profile();
 			MaterialPtr generate(const Terrain* terrain);
+			void updateParams(const MaterialPtr& mat, const Terrain* terrain);
 			void requestOptions(Terrain* terrain);
 
 			/** Whether to support normal mapping per layer in the shader (default true). 
@@ -107,6 +110,7 @@ namespace Ogre
 				virtual ~ShaderHelper() {}
 				virtual HighLevelGpuProgramPtr generateVertexProgram(const SM2Profile* prof, const Terrain* terrain);
 				virtual HighLevelGpuProgramPtr generateFragmentProgram(const SM2Profile* prof, const Terrain* terrain);
+				virtual void updateParams(const SM2Profile* prof, const MaterialPtr& mat, const Terrain* terrain);
 			protected:
 				virtual HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain) = 0;
 				virtual HighLevelGpuProgramPtr createFragmentProgram(const SM2Profile* prof, const Terrain* terrain) = 0;
@@ -120,6 +124,8 @@ namespace Ogre
 				virtual void generateFpFooter(const SM2Profile* prof, const Terrain* terrain, StringUtil::StrStreamType& outStream) = 0;
 				virtual void defaultVpParams(const SM2Profile* prof, const Terrain* terrain, const HighLevelGpuProgramPtr& prog);
 				virtual void defaultFpParams(const SM2Profile* prof, const Terrain* terrain, const HighLevelGpuProgramPtr& prog);
+				virtual void updateVpParams(const SM2Profile* prof, const Terrain* terrain, const GpuProgramParametersSharedPtr& params);
+				virtual void updateFpParams(const SM2Profile* prof, const Terrain* terrain, const GpuProgramParametersSharedPtr& params);
 				virtual String getChannel(uint idx);
 
 			};

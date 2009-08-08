@@ -179,6 +179,8 @@ namespace Ogre
 			
 			/// Generate / resuse a material for the terrain
 			virtual MaterialPtr generate(const Terrain* terrain) = 0;
+			/// Update params for a terrain
+			virtual void updateParams(const MaterialPtr& mat, const Terrain* terrain) = 0;
 
 			/// Request the options needed from the terrain
 			virtual void requestOptions(Terrain* terrain) = 0;
@@ -276,6 +278,15 @@ namespace Ogre
 				return MaterialPtr();
 			else
 				return p->generate(terrain);
+		}
+
+		/** Update parameters for the given terrain using the active profile.
+		*/
+		virtual void updateParams(const MaterialPtr& mat, const Terrain* terrain)
+		{
+			Profile* p = getActiveProfile();
+			if (p)
+				p->updateParams(mat, terrain);
 		}
 
 		/** Set the debug level of the material. 
