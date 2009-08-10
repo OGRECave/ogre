@@ -223,7 +223,8 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void GLSLProgram::populateParameterNames(GpuProgramParametersSharedPtr params)
 	{
-		params->_setNamedConstants(&getConstantDefinitions());
+		getConstantDefinitions();
+		params->_setNamedConstants(mConstantDefs);
 		// Don't set logical / physical maps here, as we can't access parameters by logical index in GLHL.
 	}
 	//-----------------------------------------------------------------------
@@ -234,10 +235,9 @@ namespace Ogre {
 
 
 		// Therefore instead, parse the source code manually and extract the uniforms
-		mConstantDefs.floatBufferSize = 0;
-		mConstantDefs.intBufferSize = 0;
+		createParameterMappingStructures(true);
 		GLSLLinkProgramManager::getSingleton().extractConstantDefs(
-			mSource, mConstantDefs, mName);
+			mSource, *mConstantDefs.get(), mName);
 
 		// Also parse any attached sources
 		for (GLSLProgramContainer::const_iterator i = mAttachedGLSLPrograms.begin();
@@ -246,7 +246,7 @@ namespace Ogre {
 			GLSLProgram* childShader = *i;
 
 			GLSLLinkProgramManager::getSingleton().extractConstantDefs(
-				childShader->getSource(), mConstantDefs, childShader->getName());
+				childShader->getSource(), *mConstantDefs.get(), childShader->getName());
 
 		}
 	}

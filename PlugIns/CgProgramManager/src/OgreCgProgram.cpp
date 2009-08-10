@@ -212,11 +212,7 @@ namespace Ogre {
     void CgProgram::buildConstantDefinitions() const
     {
         // Derive parameter names from Cg
-
-		mFloatLogicalToPhysical.bufferSize = 0;
-		mIntLogicalToPhysical.bufferSize = 0;
-		mConstantDefs.floatBufferSize = 0;
-		mConstantDefs.intBufferSize = 0;
+		createParameterMappingStructures(true);
 
 		if (!mCgProgram)
 			return;
@@ -312,40 +308,40 @@ namespace Ogre {
 						// base position on existing buffer contents
 						if (def.isFloat())
 						{
-							def.physicalIndex = mFloatLogicalToPhysical.bufferSize;
+							def.physicalIndex = mFloatLogicalToPhysical->bufferSize;
 						}
 						else
 						{
-							def.physicalIndex = mIntLogicalToPhysical.bufferSize;
+							def.physicalIndex = mIntLogicalToPhysical->bufferSize;
 						}
 					}
 
 
 					def.logicalIndex = logicalIndex;
-					mConstantDefs.map.insert(GpuConstantDefinitionMap::value_type(paramName, def));
+					mConstantDefs->map.insert(GpuConstantDefinitionMap::value_type(paramName, def));
 
 					// Record logical / physical mapping
 					if (def.isFloat())
 					{
-						OGRE_LOCK_MUTEX(mFloatLogicalToPhysical.mutex)
-						mFloatLogicalToPhysical.map.insert(
+						OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex)
+						mFloatLogicalToPhysical->map.insert(
 							GpuLogicalIndexUseMap::value_type(logicalIndex, 
 								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
-						mFloatLogicalToPhysical.bufferSize += def.arraySize * def.elementSize;
-						mConstantDefs.floatBufferSize = mFloatLogicalToPhysical.bufferSize;
+						mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
+						mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
 					}
 					else
 					{
-						OGRE_LOCK_MUTEX(mIntLogicalToPhysical.mutex)
-						mIntLogicalToPhysical.map.insert(
+						OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex)
+						mIntLogicalToPhysical->map.insert(
 							GpuLogicalIndexUseMap::value_type(logicalIndex, 
 								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
-						mIntLogicalToPhysical.bufferSize += def.arraySize * def.elementSize;
-						mConstantDefs.intBufferSize = mIntLogicalToPhysical.bufferSize;
+						mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
+						mConstantDefs->intBufferSize = mIntLogicalToPhysical->bufferSize;
 					}
 
 					// Deal with array indexing
-					mConstantDefs.generateConstantDefinitionArrayEntries(paramName, def);
+					mConstantDefs->generateConstantDefinitionArrayEntries(paramName, def);
 
 					break;
 		

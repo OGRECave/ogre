@@ -262,7 +262,7 @@ namespace Ogre {
 	typedef ConstMapIterator<GpuConstantDefinitionMap> GpuConstantDefinitionIterator;
 
 	/// Struct collecting together the information for named constants.
-	struct _OgreExport GpuNamedConstants
+	struct _OgreExport GpuNamedConstants : public GpuParamsAlloc
 	{
 		/// Total size of the float buffer required
 		size_t floatBufferSize;
@@ -270,6 +270,8 @@ namespace Ogre {
 		size_t intBufferSize;
 		/// Map of parameter names to GpuConstantDefinition
 		GpuConstantDefinitionMap map;
+
+		GpuNamedConstants() : floatBufferSize(0), intBufferSize(0) {}
 
 		/** Generate additional constant entries for arrays based on a base definition.
 		@remarks
@@ -314,6 +316,7 @@ namespace Ogre {
 		*/
 		static bool msGenerateAllConstantDefinitionArrayEntries;
 	};
+	typedef SharedPtr<GpuNamedConstants> GpuNamedConstantsPtr;
 
 	/// Simple class for loading / saving GpuNamedConstants
 	class _OgreExport GpuNamedConstantsSerializer : public Serializer
@@ -345,7 +348,7 @@ namespace Ogre {
 	};
 	typedef map<size_t, GpuLogicalIndexUse>::type GpuLogicalIndexUseMap;
 	/// Container struct to allow params to safely & update shared list of logical buffer assignments
-	struct _OgreExport GpuLogicalBufferStruct
+	struct _OgreExport GpuLogicalBufferStruct : public GpuParamsAlloc
 	{
 		OGRE_MUTEX(mutex)
 			/// Map from logical index to physical buffer location
@@ -354,6 +357,7 @@ namespace Ogre {
 		size_t bufferSize;
 		GpuLogicalBufferStruct() : bufferSize(0) {}
 	};
+	typedef SharedPtr<GpuLogicalBufferStruct> GpuLogicalBufferStructPtr;
 
 	/** Definition of container that holds the current float constants.
 	@note Not necessarily in direct index order to constant indexes, logical
@@ -1109,12 +1113,12 @@ namespace Ogre {
 		IntConstantList mIntConstants;
 		/** Logical index to physical index map - for low-level programs
 		or high-level programs which pass params this way. */
-		GpuLogicalBufferStruct* mFloatLogicalToPhysical;
+		GpuLogicalBufferStructPtr mFloatLogicalToPhysical;
 		/** Logical index to physical index map - for low-level programs
 		or high-level programs which pass params this way. */
-		GpuLogicalBufferStruct* mIntLogicalToPhysical;
+		GpuLogicalBufferStructPtr mIntLogicalToPhysical;
 		/// Mapping from parameter names to def - high-level programs are expected to populate this
-		const GpuNamedConstants* mNamedConstants;
+		GpuNamedConstantsPtr mNamedConstants;
 		/// List of automatically updated parameters
 		AutoConstantList mAutoConstants;
 		/// The combined variability masks of all parameters
@@ -1155,21 +1159,21 @@ namespace Ogre {
 		GpuProgramParameters& operator=(const GpuProgramParameters& oth);
 
 		/** Internal method for providing a link to a name->definition map for parameters. */
-		void _setNamedConstants(const GpuNamedConstants* constantmap);
+		void _setNamedConstants(const GpuNamedConstantsPtr& constantmap);
 
 		/** Internal method for providing a link to a logical index->physical index map for parameters. */
-		void _setLogicalIndexes(GpuLogicalBufferStruct* floatIndexMap, 
-			GpuLogicalBufferStruct* intIndexMap);
+		void _setLogicalIndexes(const GpuLogicalBufferStructPtr& floatIndexMap, 
+			const GpuLogicalBufferStructPtr&  intIndexMap);
 
 
 		/// Does this parameter set include named parameters?
-		bool hasNamedParameters() const { return mNamedConstants != 0;}
+		bool hasNamedParameters() const { return !mNamedConstants.isNull(); }
 		/** Does this parameter set include logically indexed parameters?
 		@note Not mutually exclusive with hasNamedParameters since some high-level
 		programs still use logical indexes to set the parameters on the 
 		rendersystem.
 		*/
-		bool hasLogicalIndexedParameters() const { return mFloatLogicalToPhysical != 0;}
+		bool hasLogicalIndexedParameters() const { return !mFloatLogicalToPhysical.isNull(); }
 
 		/** Sets a 4-element floating-point parameter to the program.
 		@param index The logical constant index at which to place the parameter 
@@ -1371,7 +1375,7 @@ namespace Ogre {
 		@note
 		Only applicable to low-level programs.
 		*/
-		const GpuLogicalBufferStruct* getFloatLogicalBufferStruct() const { return mFloatLogicalToPhysical; }
+		const GpuLogicalBufferStructPtr& getFloatLogicalBufferStruct() const { return mFloatLogicalToPhysical; }
 
 		/** Retrieves the logical index relating to a physical index in the float
 		buffer, for programs which support that (low-level programs and 
@@ -1391,7 +1395,7 @@ namespace Ogre {
 		@note
 		Only applicable to low-level programs.
 		*/
-		const GpuLogicalBufferStruct* getIntLogicalBufferStruct() const { return mIntLogicalToPhysical; }
+		const GpuLogicalBufferStructPtr& getIntLogicalBufferStruct() const { return mIntLogicalToPhysical; }
 		/// Get a reference to the list of float constants
 		const FloatConstantList& getFloatConstantList() const { return mFloatConstants; }
 		/// Get a pointer to the 'nth' item in the float buffer

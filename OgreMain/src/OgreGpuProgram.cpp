@@ -61,6 +61,7 @@ namespace Ogre
         mVertexTextureFetch(false), mNeedsAdjacencyInfo(false),
 		mCompileError(false), mLoadedManualNamedConstants(false)
     {
+		createParameterMappingStructures();
     }
     //-----------------------------------------------------------------------------
     void GpuProgram::setType(GpuProgramType t)
@@ -110,6 +111,8 @@ namespace Ogre
 			{
 				// Keep a reference to old ones to copy
 				GpuProgramParametersSharedPtr savedParams = mDefaultParams;
+				// reset params to stop them being referenced in the next create
+				mDefaultParams.setNull();
 
 				// Create new params
 				mDefaultParams = createParameters();
@@ -162,6 +165,26 @@ namespace Ogre
         return GpuProgramManager::getSingleton().isSyntaxSupported(mSyntaxCode);
     }
 	//---------------------------------------------------------------------
+	void GpuProgram::createParameterMappingStructures(bool recreateIfExists) const
+	{
+		createLogicalParameterMappingStructures(recreateIfExists);
+		createNamedParameterMappingStructures(recreateIfExists);
+	}
+	//---------------------------------------------------------------------
+	void GpuProgram::createLogicalParameterMappingStructures(bool recreateIfExists) const
+	{
+		if (recreateIfExists || mFloatLogicalToPhysical.isNull())
+			mFloatLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
+		if (recreateIfExists || mIntLogicalToPhysical.isNull())
+			mIntLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
+	}
+	//---------------------------------------------------------------------
+	void GpuProgram::createNamedParameterMappingStructures(bool recreateIfExists) const
+	{
+		if (recreateIfExists || mConstantDefs.isNull())
+			mConstantDefs = GpuNamedConstantsPtr(OGRE_NEW GpuNamedConstants());
+	}
+	//---------------------------------------------------------------------
 	void GpuProgram::setManualNamedConstantsFile(const String& paramDefFile)
 	{
 		mManualNamedConstantsFile = paramDefFile;
@@ -170,15 +193,16 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void GpuProgram::setManualNamedConstants(const GpuNamedConstants& namedConstants)
 	{
-		mConstantDefs = namedConstants;
+		createParameterMappingStructures();
+		*mConstantDefs.get() = namedConstants;
 
-		mFloatLogicalToPhysical.bufferSize = mConstantDefs.floatBufferSize;
-		mIntLogicalToPhysical.bufferSize = mConstantDefs.intBufferSize;
-		mFloatLogicalToPhysical.map.clear();
-		mIntLogicalToPhysical.map.clear();
+		mFloatLogicalToPhysical->bufferSize = mConstantDefs->floatBufferSize;
+		mIntLogicalToPhysical->bufferSize = mConstantDefs->intBufferSize;
+		mFloatLogicalToPhysical->map.clear();
+		mIntLogicalToPhysical->map.clear();
 		// need to set up logical mappings too for some rendersystems
-		for (GpuConstantDefinitionMap::const_iterator i = mConstantDefs.map.begin();
-			i != mConstantDefs.map.end(); ++i)
+		for (GpuConstantDefinitionMap::const_iterator i = mConstantDefs->map.begin();
+			i != mConstantDefs->map.end(); ++i)
 		{
 			const String& name = i->first;
 			const GpuConstantDefinition& def = i->second;
@@ -189,11 +213,11 @@ namespace Ogre
 					GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, def.variability));
 				if (def.isFloat())
 				{
-					mFloatLogicalToPhysical.map.insert(val);
+					mFloatLogicalToPhysical->map.insert(val);
 				}
 				else
 				{
-					mIntLogicalToPhysical.map.insert(val);
+					mIntLogicalToPhysical->map.insert(val);
 				}
 			}
 		}
@@ -231,12 +255,12 @@ namespace Ogre
 		
 		
 		// set up named parameters, if any
-		if (!mConstantDefs.map.empty())
+		if (!mConstantDefs.isNull() && !mConstantDefs->map.empty())
 		{
-			ret->_setNamedConstants(&mConstantDefs);
+			ret->_setNamedConstants(mConstantDefs);
 		}
 		// link shared logical / physical map for low-level use
-		ret->_setLogicalIndexes(&mFloatLogicalToPhysical, &mIntLogicalToPhysical);
+		ret->_setLogicalIndexes(mFloatLogicalToPhysical, mIntLogicalToPhysical);
 
         // Copy in default parameters if present
         if (!mDefaultParams.isNull())

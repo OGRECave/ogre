@@ -153,13 +153,20 @@ namespace Ogre {
 		/// Did we encounter a compilation error?
 		bool mCompileError;
 		/** Record of logical to physical buffer maps. Mandatory for low-level
-			programs or high-level programs which set their params the same way. */
-		mutable GpuLogicalBufferStruct mFloatLogicalToPhysical;
+			programs or high-level programs which set their params the same way. 
+			This is a shared pointer because if the program is recompiled and the parameters
+			change, this definition will alter, but previous params may reference the old def. */
+		mutable GpuLogicalBufferStructPtr mFloatLogicalToPhysical;
 		/** Record of logical to physical buffer maps. Mandatory for low-level
-			programs or high-level programs which set their params the same way. */
-		mutable GpuLogicalBufferStruct mIntLogicalToPhysical;
-		/// Parameter name -> ConstantDefinition map, shared instance used by all parameter objects
-		mutable GpuNamedConstants mConstantDefs;
+			programs or high-level programs which set their params the same way. 
+			This is a shared pointer because if the program is recompiled and the parameters
+			change, this definition will alter, but previous params may reference the old def.*/
+		mutable GpuLogicalBufferStructPtr mIntLogicalToPhysical;
+		/** Parameter name -> ConstantDefinition map, shared instance used by all parameter objects.
+		This is a shared pointer because if the program is recompiled and the parameters
+		change, this definition will alter, but previous params may reference the old def.
+		*/
+		mutable GpuNamedConstantsPtr mConstantDefs;
 		/// File from which to load named constants manually
 		String mManualNamedConstantsFile;
 		bool mLoadedManualNamedConstants;
@@ -184,6 +191,14 @@ namespace Ogre {
 
 		/// @copydoc Resource::loadImpl
 		void loadImpl(void);
+
+		/// Create the internal params logical & named mapping structures
+		void createParameterMappingStructures(bool recreateIfExists = true) const;
+		/// Create the internal params logical mapping structures
+		void createLogicalParameterMappingStructures(bool recreateIfExists = true) const;
+		/// Create the internal params named mapping structures
+		void createNamedParameterMappingStructures(bool recreateIfExists = true) const;
+
 	public:
 
 		GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
@@ -375,7 +390,7 @@ namespace Ogre {
 		virtual void setManualNamedConstants(const GpuNamedConstants& namedConstants);
 
 		/// Get a read-only reference to the named constants registered for this program (manually or automatically)
-		virtual const GpuNamedConstants& getNamedConstants() const { return mConstantDefs; }
+		virtual const GpuNamedConstants& getNamedConstants() const { return *mConstantDefs.get(); }
 
 		/** Specifies the name of a file from which to load named parameters mapping
 			for a program which would not be able to derive named parameters itself.
@@ -399,7 +414,7 @@ namespace Ogre {
 		a high-level program which loads them, or a low-level program which has them
 		specified manually.
 		*/
-		virtual const GpuNamedConstants& getConstantDefinitions() const { return mConstantDefs; }
+		virtual const GpuNamedConstants& getConstantDefinitions() const { return *mConstantDefs.get(); }
 
 
     protected:

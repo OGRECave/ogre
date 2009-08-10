@@ -3076,8 +3076,8 @@ namespace Ogre
 		}
 
 		HRESULT hr;
-		const GpuLogicalBufferStruct* floatLogical = params->getFloatLogicalBufferStruct();
-		const GpuLogicalBufferStruct* intLogical = params->getIntLogicalBufferStruct();
+		GpuLogicalBufferStructPtr floatLogical = params->getFloatLogicalBufferStruct();
+		GpuLogicalBufferStructPtr intLogical = params->getIntLogicalBufferStruct();
 
 		switch(gptype)
 		{

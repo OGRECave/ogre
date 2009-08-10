@@ -4886,7 +4886,7 @@ namespace Ogre
 		// This will represent the values which have been set
 
 		// float params
-		const GpuLogicalBufferStruct* floatLogical = params->getFloatLogicalBufferStruct();
+		GpuLogicalBufferStructPtr floatLogical = params->getFloatLogicalBufferStruct();
 		{
 			OGRE_LOCK_MUTEX(floatLogical->mutex)
 
@@ -4913,7 +4913,7 @@ namespace Ogre
 		}
 
 		// int params
-		const GpuLogicalBufferStruct* intLogical = params->getIntLogicalBufferStruct();
+		GpuLogicalBufferStructPtr intLogical = params->getIntLogicalBufferStruct();
 		{
 			OGRE_LOCK_MUTEX(intLogical->mutex)
 

@@ -354,10 +354,7 @@ namespace Ogre {
 	void D3D10HLSLProgram::buildConstantDefinitions() const
 	{
 
-		mFloatLogicalToPhysical.bufferSize = 0;
-		mIntLogicalToPhysical.bufferSize = 0;
-		mConstantDefs.floatBufferSize = 0;
-		mConstantDefs.intBufferSize = 0;
+		createParameterMappingStructures(true);
 
 		if (mShaderReflectionConstantBuffer)
 		{
@@ -450,29 +447,29 @@ namespace Ogre {
 				populateDef(varRefTypeDesc, def);
 				if (def.isFloat())
 				{
-					def.physicalIndex = mFloatLogicalToPhysical.bufferSize;
-					OGRE_LOCK_MUTEX(mFloatLogicalToPhysical.mutex)
-						mFloatLogicalToPhysical.map.insert(
+					def.physicalIndex = mFloatLogicalToPhysical->bufferSize;
+					OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex)
+						mFloatLogicalToPhysical->map.insert(
 						GpuLogicalIndexUseMap::value_type(paramIndex, 
 						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
-					mFloatLogicalToPhysical.bufferSize += def.arraySize * def.elementSize;
-					mConstantDefs.floatBufferSize = mFloatLogicalToPhysical.bufferSize;
+					mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
+					mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
 				}
 				else
 				{
-					def.physicalIndex = mIntLogicalToPhysical.bufferSize;
-					OGRE_LOCK_MUTEX(mIntLogicalToPhysical.mutex)
-						mIntLogicalToPhysical.map.insert(
+					def.physicalIndex = mIntLogicalToPhysical->bufferSize;
+					OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex)
+						mIntLogicalToPhysical->map.insert(
 						GpuLogicalIndexUseMap::value_type(paramIndex, 
 						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
-					mIntLogicalToPhysical.bufferSize += def.arraySize * def.elementSize;
-					mConstantDefs.intBufferSize = mIntLogicalToPhysical.bufferSize;
+					mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
+					mConstantDefs->intBufferSize = mIntLogicalToPhysical->bufferSize;
 				}
 
-				mConstantDefs.map.insert(GpuConstantDefinitionMap::value_type(name, def));
+				mConstantDefs->map.insert(GpuConstantDefinitionMap::value_type(name, def));
 
 				// Now deal with arrays
-				mConstantDefs.generateConstantDefinitionArrayEntries(name, def);
+				mConstantDefs->generateConstantDefinitionArrayEntries(name, def);
 			}
 		}
 
