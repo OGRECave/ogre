@@ -29,7 +29,7 @@ Torus Knot Software Ltd.
 #ifndef __Win32ConfigDialog_H__
 #define __Win32ConfigDialog_H__
 
-#include "OgrePrerequisites.h"
+#include "../OgrePrerequisites.h"
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX // required to stop windows.h messing up std::min
