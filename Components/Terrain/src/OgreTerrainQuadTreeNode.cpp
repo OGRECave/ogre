@@ -1194,7 +1194,7 @@ namespace Ogre
 		{
 
 			// no children were within their LOD ranges, so we should consider our own
-			Vector3 localPos = cam->getDerivedPosition() - mLocalCentre;
+			Vector3 localPos = cam->getDerivedPosition() - mLocalCentre - mTerrain->getPosition();
 			Real dist;
 			if (TerrainGlobalOptions::getUseRayBoxDistanceCalculation())
 			{
