@@ -340,6 +340,16 @@ public:
 				mTerrain->update();
 				updateDelay = 0.3;
 			}
+			/*
+			if (mKeyboard->isKeyDown(OIS::KC_M) && updateDelay <= 0)
+			{
+				StringVector texNames;
+				texNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
+				texNames.push_back("growth_weirdfungus-03_normalheight.dds");
+				mTerrain->addLayer(500, &texNames);
+				updateDelay = 0.3;
+			}
+			*/
 			updateDelay -= evt.timeSinceLastFrame;
 		}
 
@@ -8076,20 +8086,22 @@ protected:
 
 		//mWindow->getViewport(0)->setBackgroundColour(ColourValue::Blue);
 
-		
+		Vector3 terrainPos(10000,0,5000);
+		mTerrain->setPosition(terrainPos);
+
 		// create a few entities on the terrain
-		/*
 		for (int i = 0; i < 20; ++i)
 		{
 			Entity* e = mSceneMgr->createEntity("ninja.mesh");
-			Real x = Math::RangeRandom(-2500, 2500);
-			Real z = Math::RangeRandom(-2500, 2500);
+			Real x = terrainPos.x + Math::RangeRandom(-2500, 2500);
+			Real z = terrainPos.z + Math::RangeRandom(-2500, 2500);
 			Real y = mTerrain->getHeightAtWorldPosition(Vector3(x, 0, z));
 			mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(x, y, z))->attachObject(e);
 		}
-		*/
-		
-		mCamera->setPosition(-4000,300,4000);
+	
+
+
+		mCamera->setPosition(terrainPos + Vector3(-4000,300,4000));
 		mCamera->lookAt(Vector3::ZERO);
 		mCamera->setNearClipDistance(5);
 		mCamera->setFarClipDistance(15000);
@@ -8282,11 +8294,11 @@ protected:
 
 		//testDepthShadowMap();
 
-  //      testLod();
+        //testLod();
 		//testSharedGpuParameters();
-		//testNewTerrain(true);
-		//testImageCombine();
+		//testNewTerrain(false);
 		testNewTerrain(true);
+		//testImageCombine();
 		//testNewTerrain(true, false, "flatterrain.dat");
 		//testImageCombine();
 

@@ -1316,12 +1316,12 @@ namespace Ogre
 		{
 		case ALIGN_X_Z:
 			outTSpos->x = (x - mBase - mPos.x) / ((mSize - 1) * mScale);
-			outTSpos->y = (z + mBase + mPos.z) / ((mSize - 1) * -mScale);
+			outTSpos->y = (z + mBase - mPos.z) / ((mSize - 1) * -mScale);
 			outTSpos->z = y;
 			break;
 		case ALIGN_Y_Z:
 			outTSpos->x = (z - mBase - mPos.z) / ((mSize - 1) * -mScale);
-			outTSpos->y = (y + mBase + mPos.y) / ((mSize - 1) * mScale);
+			outTSpos->y = (y + mBase - mPos.y) / ((mSize - 1) * mScale);
 			outTSpos->z = x;
 			break;
 		case ALIGN_X_Y:
