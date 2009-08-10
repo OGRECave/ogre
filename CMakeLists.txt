@@ -191,7 +191,7 @@ option(OGRE_CONFIG_CONTAINERS_USE_CUSTOM_ALLOCATOR "STL containers in Ogre use t
 option(OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR "Ogre String uses the custom allocator" FALSE)
 option(OGRE_CONFIG_MEMTRACK_DEBUG "Enable Ogre's memory tracker in debug mode" FALSE)
 option(OGRE_CONFIG_MEMTRACK_RELEASE "Enable Ogre's memory tracker in release mode" FALSE)
-if (Boost_FOUND)
+if (Boost_THREAD_FOUND AND Boost_DATE_TIME_FOUND)
   set(OGRE_CONFIG_THREADS 2 CACHE STRING 
   "Enable Ogre thread support for background loading. Possible values:
     0 - Threading off.
