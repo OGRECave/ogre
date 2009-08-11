@@ -209,7 +209,7 @@ namespace Ogre
 		// blend maps
 		for (uint i = 0; i < terrain->getBlendTextureCount(); ++i)
 		{
-			tu = pass->createTextureUnitState(terrain->getBlendTextureName(0));
+			tu = pass->createTextureUnitState(terrain->getBlendTextureName(i));
 			tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 		}
 
