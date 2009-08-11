@@ -179,6 +179,9 @@ namespace Ogre
 			
 			/// Generate / resuse a material for the terrain
 			virtual MaterialPtr generate(const Terrain* terrain) = 0;
+			/// Get the number of layers supported
+			virtual uint8 getMaxLayers(const Terrain* terrain) const = 0;
+
 			/// Update params for a terrain
 			virtual void updateParams(const MaterialPtr& mat, const Terrain* terrain) = 0;
 
@@ -278,6 +281,17 @@ namespace Ogre
 				return MaterialPtr();
 			else
 				return p->generate(terrain);
+		}
+		/** Get the maximum number of layers supported with the given terrain. 
+		@note When you change the options on the terrain, this value can change. 
+		*/
+		uint8 getMaxLayers(const Terrain* terrain) const
+		{
+			Profile* p = getActiveProfile();
+			if (p)
+				return p->getMaxLayers(terrain);
+			else
+				return 0;
 		}
 
 		/** Update parameters for the given terrain using the active profile.

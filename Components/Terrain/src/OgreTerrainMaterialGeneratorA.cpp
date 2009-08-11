@@ -138,6 +138,25 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
+	uint8 TerrainMaterialGeneratorA::SM2Profile::getMaxLayers(const Terrain* terrain) const
+	{
+		// count the texture units free
+		uint8 freeTextureUnits = 16;
+		// lightmap
+		--freeTextureUnits;
+		// normalmap
+		--freeTextureUnits;
+		// colourmap
+		if (terrain->getGlobalColourMapEnabled())
+			--freeTextureUnits;
+		// TODO shadowmaps
+
+		// each layer needs 2.25 units (1xdiffusespec, 1xnormalheight, 0.25xblend)
+		return static_cast<uint8>(freeTextureUnits / 2.25f);
+		
+
+	}
+	//---------------------------------------------------------------------
 	MaterialPtr TerrainMaterialGeneratorA::SM2Profile::generate(const Terrain* terrain)
 	{
 		// re-use old material if exists
@@ -207,14 +226,17 @@ namespace Ogre
 		}
 
 		// blend maps
-		for (uint i = 0; i < terrain->getBlendTextureCount(); ++i)
+		uint maxLayers = getMaxLayers(terrain);
+		uint numBlendTextures = std::min(maxLayers / 4, static_cast<uint>(terrain->getBlendTextureCount()));
+		uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
+		for (uint i = 0; i < numBlendTextures; ++i)
 		{
 			tu = pass->createTextureUnitState(terrain->getBlendTextureName(i));
 			tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 		}
 
 		// layer textures
-		for (uint i = 0; i < terrain->getLayerCount(); ++i)
+		for (uint i = 0; i < numLayers; ++i)
 		{
 			// diffuse / specular
 			tu = pass->createTextureUnitState(terrain->getLayerTextureName(i, 0));
@@ -276,7 +298,10 @@ namespace Ogre
 	{
 		generateVpHeader(prof, terrain, outStream);
 
-		for (uint i = 0; i < terrain->getLayerCount(); ++i)
+		uint maxLayers = prof->getMaxLayers(terrain);
+		uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
+
+		for (uint i = 0; i < numLayers; ++i)
 			generateVpLayer(prof, terrain, i, outStream);
 
 		generateVpFooter(prof, terrain, outStream);
@@ -288,7 +313,10 @@ namespace Ogre
 	{
 		generateFpHeader(prof, terrain, outStream);
 
-		for (uint i = 0; i < terrain->getLayerCount(); ++i)
+		uint maxLayers = prof->getMaxLayers(terrain);
+		uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
+
+		for (uint i = 0; i < numLayers; ++i)
 			generateFpLayer(prof, terrain, i, outStream);
 
 		generateFpFooter(prof, terrain, outStream);
@@ -331,8 +359,10 @@ namespace Ogre
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::updateVpParams(
 		const SM2Profile* prof, const Terrain* terrain, const GpuProgramParametersSharedPtr& params)
 	{
-		uint numUVMul = terrain->getLayerCount() / 4;
-		if (terrain->getLayerCount() % 4)
+		uint maxLayers = prof->getMaxLayers(terrain);
+		uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
+		uint numUVMul = numLayers / 4;
+		if (numLayers % 4)
 			++numUVMul;
 		for (uint i = 0; i < numUVMul; ++i)
 		{
@@ -440,8 +470,10 @@ namespace Ogre
 			"uniform float2   lodMorph,\n"; // morph amount, morph LOD target
 
 		// uv multipliers
-		uint numUVMultipliers = (terrain->getLayerCount() / 4);
-		if (terrain->getLayerCount() % 4)
+		uint maxLayers = prof->getMaxLayers(terrain);
+		uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
+		uint numUVMultipliers = (numLayers / 4);
+		if (numLayers % 4)
 			++numUVMultipliers;
 		for (uint i = 0; i < numUVMultipliers; ++i)
 			outStream << "uniform float4 uvMul" << i << ", \n";
@@ -452,8 +484,8 @@ namespace Ogre
 			"out float4 oPosObj : TEXCOORD1 \n";
 
 		// layer UV's premultiplied, packed as xy/zw
-		uint numUVSets = terrain->getLayerCount() / 2;
-		if (terrain->getLayerCount() % 2)
+		uint numUVSets = numLayers / 2;
+		if (numLayers % 2)
 			++numUVSets;
 		uint texCoordSet = 2;
 		for (uint i = 0; i < numUVSets; ++i)
@@ -539,8 +571,11 @@ namespace Ogre
 			"float4 position : TEXCOORD1,\n";
 
 		// UV's premultiplied, packed as xy/zw
-		uint numUVSets = terrain->getLayerCount() / 2;
-		if (terrain->getLayerCount() % 2)
+		uint maxLayers = prof->getMaxLayers(terrain);
+		uint numBlendTextures = std::min(maxLayers / 4, static_cast<uint>(terrain->getBlendTextureCount()));
+		uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
+		uint numUVSets = numLayers / 2;
+		if (numLayers % 2)
 			++numUVSets;
 		uint texCoordSet = 2;
 		for (uint i = 0; i < numUVSets; ++i)
@@ -580,14 +615,14 @@ namespace Ogre
 				<< currentSamplerIdx++ << ")\n";
 		}
 		// Blend textures - sampler definitions
-		for (uint i = 0; i < terrain->getBlendTextureCount(); ++i)
+		for (uint i = 0; i < numBlendTextures; ++i)
 		{
 			outStream << ", uniform sampler2D blendTex" << i 
 				<< " : register(s" << currentSamplerIdx++ << ")\n";
 		}
 
 		// Layer textures - sampler definitions & UV multipliers
-		for (uint i = 0; i < terrain->getLayerCount(); ++i)
+		for (uint i = 0; i < numLayers; ++i)
 		{
 			outStream << ", uniform sampler2D difftex" << i 
 				<< " : register(s" << currentSamplerIdx++ << ")\n";
@@ -617,7 +652,7 @@ namespace Ogre
 			"	float specular = 0;\n";
 
 		// set up the blend values
-		for (uint i = 0; i < terrain->getBlendTextureCount(); ++i)
+		for (uint i = 0; i < numBlendTextures; ++i)
 		{
 			outStream << "	float4 blendTexVal" << i << " = tex2D(blendTex" << i << ", uv);\n";
 		}

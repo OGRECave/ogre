@@ -2159,6 +2159,11 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
+	uint8 Terrain::getMaxLayers() const
+	{
+		return mMaterialGenerator->getMaxLayers(this);
+	}
+	//---------------------------------------------------------------------
 	TerrainLayerBlendMap* Terrain::getLayerBlendMap(uint8 layerIndex)
 	{
 		if (layerIndex == 0 || layerIndex-1 >= (uint8)mLayerBlendMapList.size())

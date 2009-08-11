@@ -700,6 +700,11 @@ namespace Ogre
 		*/
 		void removeLayer(uint8 index);
 
+		/** Get the maximum number of layers supported with the current options. 
+		@note When you change the options requested, this value can change. 
+		*/
+		uint8 getMaxLayers() const;
+
 		/** How large an area in world space the texture in a terrain layer covers
 		before repeating. 
 		@param index The layer index.
