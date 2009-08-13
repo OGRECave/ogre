@@ -227,7 +227,7 @@ namespace Ogre
 
 		// blend maps
 		uint maxLayers = getMaxLayers(terrain);
-		uint numBlendTextures = std::min(maxLayers / 4, static_cast<uint>(terrain->getBlendTextureCount()));
+		uint numBlendTextures = std::min(terrain->getBlendTextureCount(maxLayers), terrain->getBlendTextureCount());
 		uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
 		for (uint i = 0; i < numBlendTextures; ++i)
 		{
@@ -572,7 +572,7 @@ namespace Ogre
 
 		// UV's premultiplied, packed as xy/zw
 		uint maxLayers = prof->getMaxLayers(terrain);
-		uint numBlendTextures = std::min(maxLayers / 4, static_cast<uint>(terrain->getBlendTextureCount()));
+		uint numBlendTextures = std::min(terrain->getBlendTextureCount(maxLayers), terrain->getBlendTextureCount());
 		uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
 		uint numUVSets = numLayers / 2;
 		if (numLayers % 2)

@@ -963,6 +963,8 @@ namespace Ogre
 
 		/// Get the number of blend textures in use
 		uint8 getBlendTextureCount() const;
+		/// Get the number of blend textures needed for a given number of layers
+		uint8 getBlendTextureCount(uint8 numLayers) const;
 
 
 		/** Get the name of the packed blend texture at a specific index.
@@ -1131,7 +1133,6 @@ namespace Ogre
 		void checkLayers(bool includeGPUResources);
 		void checkDeclaration();
 		void deriveUVMultipliers();
-		uint8 getBlendTextureCount(uint8 numLayers);
 		PixelFormat getBlendTextureFormat(uint8 textureIndex, uint8 numLayers);
 
 		void updateDerivedDataImpl(const Rect& rect, bool synchronous, uint8 typeMask);
