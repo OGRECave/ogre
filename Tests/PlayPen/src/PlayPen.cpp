@@ -8040,12 +8040,13 @@ protected:
 		blendMap0->update();
 		blendMap1->update();
 
+		/*
 		// set up a colour map
 		terrain->setGlobalColourMapEnabled(true);
 		Image colourMap;
 		colourMap.load("testcolourmap.jpg", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		terrain->getGlobalColourMap()->loadImage(colourMap);
-		
+		*/
 
 		return terrain;
 
@@ -8352,8 +8353,8 @@ protected:
 
         //testLod();
 		//testSharedGpuParameters();
-		//testNewTerrain(false);
-		testNewTerrain(true);
+		testNewTerrain(false);
+		//testNewTerrain(true);
 		//testTwoNewTerrains();
 		//testImageCombine();
 		//testNewTerrain(true, false, "flatterrain.dat");
