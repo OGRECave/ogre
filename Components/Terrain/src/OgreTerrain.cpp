@@ -1638,13 +1638,6 @@ namespace Ogre
 			mBlendTextureList.clear();
 		}
 
-		for (TerrainLayerBlendMapList::iterator i = mLayerBlendMapList.begin(); 
-			i != mLayerBlendMapList.end(); ++i)
-		{
-			OGRE_DELETE *i;
-			*i = 0;
-		}
-
 		if (!mTerrainNormalMap.isNull())
 		{
 			tmgr->remove(mTerrainNormalMap->getHandle());
@@ -2304,12 +2297,21 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::freeTemporaryResources()
 	{
+		// CPU blend maps
 		for (BytePointerList::iterator i = mCpuBlendMapStorage.begin(); 
 			i != mCpuBlendMapStorage.end(); ++i)
 		{
 			OGRE_FREE(*i, MEMCATEGORY_RESOURCE);
 		}
 		mCpuBlendMapStorage.clear();
+
+		// Editable structures for blend layers (not needed at runtime,  only blend textures are)
+		for (TerrainLayerBlendMapList::iterator i = mLayerBlendMapList.begin(); 
+			i != mLayerBlendMapList.end(); ++i)
+		{
+			OGRE_DELETE *i;
+			*i = 0;
+		}
 
 	}
 	//---------------------------------------------------------------------

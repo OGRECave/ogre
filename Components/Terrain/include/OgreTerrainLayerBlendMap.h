@@ -53,7 +53,9 @@ namespace Ogre
 	blend map is packed into one channel of an RGB or RGBA texture in
 	order to use the smallest number of samplers, but this class allows
 	a caller to manipulate the data more easily without worrying about
-	this packing. 
+	this packing. Also, the values you use to interact with the blend map are
+	floating point, which gives you full precision for updating, but in fact the
+	values are packed into 8-bit integers in the actual blend map.
 	@par
 	You shouldn't construct this class directly, use Terrain::getLayerBlendMap().
 	*/
@@ -67,7 +69,7 @@ namespace Ogre
 		Box mDirtyBox;
 		bool mDirty;
 		HardwarePixelBuffer* mBuffer;
-		uint8* mData;
+		float* mData;
 
 		void download();
 		void upload();
@@ -120,13 +122,13 @@ namespace Ogre
 		@param x,y Coordinates of the point of data to get, in image space (top down)
 		@returns The blend data
 		*/
-		uint8 getBlendValue(size_t x, size_t y);
+		float getBlendValue(size_t x, size_t y);
 
 		/** Set a single value of blend information (0 = transparent, 255 = solid)
 		@param x,y Coordinates of the point of data to get, in image space (top down)
-		@param val The blend value to set
+		@param val The blend value to set (0..1)
 		*/
-		void setBlendValue(size_t x, size_t y, uint8 val);
+		void setBlendValue(size_t x, size_t y, float val);
 
 		/** Get a pointer to the whole blend data. 
 		@remarks
@@ -134,7 +136,7 @@ namespace Ogre
 			update it as you like. However, you must then call dirtyRect manually 
 			if you want those changes to be recognised. 
 		*/
-		uint8* getBlendPointer();
+		float* getBlendPointer();
 
 		/** Indicate that all of the blend data is dirty and needs updating.
 		*/

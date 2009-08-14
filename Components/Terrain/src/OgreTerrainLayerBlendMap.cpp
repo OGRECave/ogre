@@ -43,7 +43,7 @@ namespace Ogre
 		, mBuffer(buf)
 		, mData(0)
 	{
-		mData = static_cast<uint8*>(OGRE_MALLOC(mBuffer->getWidth() * mBuffer->getHeight(), MEMCATEGORY_RESOURCE));
+		mData = static_cast<float*>(OGRE_MALLOC(mBuffer->getWidth() * mBuffer->getHeight() * sizeof(float), MEMCATEGORY_RESOURCE));
 
 		// we know which of RGBA we need to look at, now find it in the format
 		// because we can't guarantee what precise format the RS gives us
@@ -67,7 +67,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void TerrainLayerBlendMap::download()
 	{
-		uint8* pDst = mData;
+		float* pDst = mData;
 		// Download data
 		Image::Box box(0, 0, mBuffer->getWidth(), mBuffer->getHeight());
 		uint8* pSrc = static_cast<uint8*>(mBuffer->lock(box, HardwareBuffer::HBL_READ_ONLY).data);
@@ -77,7 +77,7 @@ namespace Ogre
 		{
 			for (size_t x = box.left; x < box.right; ++x)
 			{
-				*pDst++ = *pSrc;
+				*pDst++ = static_cast<float>(*pSrc) / 255.0f;
 				pSrc += srcInc;
 			}
 		}
@@ -90,17 +90,17 @@ namespace Ogre
 		if (mData && mDirty)
 		{
 			// Upload data
-			uint8* pSrcBase = mData + mDirtyBox.top * mBuffer->getWidth() + mDirtyBox.left;
+			float* pSrcBase = mData + mDirtyBox.top * mBuffer->getWidth() + mDirtyBox.left;
 			uint8* pDstBase = static_cast<uint8*>(mBuffer->lock(mDirtyBox, HardwarePixelBuffer::HBL_NORMAL).data);
 			pDstBase += mChannelOffset;
 			size_t dstInc = PixelUtil::getNumElemBytes(mBuffer->getFormat());
 			for (size_t y = 0; y < mDirtyBox.getHeight(); ++y)
 			{
-				uint8* pSrc = pSrcBase + y * mBuffer->getWidth();
+				float* pSrc = pSrcBase + y * mBuffer->getWidth();
 				uint8* pDst = pDstBase + y * mBuffer->getWidth() * dstInc;
 				for (size_t x = 0; x < mDirtyBox.getWidth(); ++x)
 				{
-					*pDst = *pSrc++;
+					*pDst = static_cast<uint8>(*pSrc++ * 255);
 					pDst += dstInc;
 				}
 			}
@@ -148,19 +148,19 @@ namespace Ogre
 		convertUVToImageSpace(x, 1.0 - y, outX, outY);
 	}
 	//---------------------------------------------------------------------
-	uint8 TerrainLayerBlendMap::getBlendValue(size_t x, size_t y)
+	float TerrainLayerBlendMap::getBlendValue(size_t x, size_t y)
 	{
 		return *(mData + y * mBuffer->getWidth() + x);
 	}
 	//---------------------------------------------------------------------
-	void TerrainLayerBlendMap::setBlendValue(size_t x, size_t y, uint8 val)
+	void TerrainLayerBlendMap::setBlendValue(size_t x, size_t y, float val)
 	{
 		*(mData + y * mBuffer->getWidth() + x) = val;
 		dirtyRect(Rect(x, y, x+1, y+1));
 
 	}
 	//---------------------------------------------------------------------
-	uint8* TerrainLayerBlendMap::getBlendPointer()
+	float* TerrainLayerBlendMap::getBlendPointer()
 	{
 		return mData;
 	}

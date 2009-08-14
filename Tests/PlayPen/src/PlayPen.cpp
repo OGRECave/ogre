@@ -8013,8 +8013,8 @@ protected:
 		Real fadeDist0 = 40;
 		Real minHeight1 = 70;
 		Real fadeDist1 = 15;
-		Ogre::uint8* pBlend0 = blendMap0->getBlendPointer();
-		Ogre::uint8* pBlend1 = blendMap1->getBlendPointer();
+		float* pBlend0 = blendMap0->getBlendPointer();
+		float* pBlend1 = blendMap1->getBlendPointer();
 		for (Ogre::uint16 y = 0; y < terrain->getLayerBlendMapSize(); ++y)
 		{
 			for (Ogre::uint16 x = 0; x < terrain->getLayerBlendMapSize(); ++x)
@@ -8025,11 +8025,11 @@ protected:
 				Real height = terrain->getHeightAtTerrainPosition(tx, ty);
 				Real val = (height - minHeight0) / fadeDist0;
 				val = Math::Clamp(val, (Real)0, (Real)1);
-				//*pBlend0++ = val * 255;
+				//*pBlend0++ = val;
 
 				val = (height - minHeight1) / fadeDist1;
 				val = Math::Clamp(val, (Real)0, (Real)1);
-				*pBlend1++ = val * 255;
+				*pBlend1++ = val;
 
 
 			}
@@ -8047,6 +8047,8 @@ protected:
 		colourMap.load("testcolourmap.jpg", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		terrain->getGlobalColourMap()->loadImage(colourMap);
 		*/
+
+		terrain->freeTemporaryResources();
 
 		return terrain;
 
