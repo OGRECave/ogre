@@ -189,7 +189,9 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------------
 	Pass::Pass(Technique *parent, unsigned short index, const Pass& oth)
-        :mParent(parent), mIndex(index), mQueuedForDeletion(false), mPassIterationCount(1)
+        :mParent(parent), mIndex(index), mQueuedForDeletion(false), mPassIterationCount(1),
+		 mVertexProgramUsage(0), mShadowCasterVertexProgramUsage(0), mShadowReceiverVertexProgramUsage(0),
+		 mFragmentProgramUsage(0), mGeometryProgramUsage(0), mShadowReceiverFragmentProgramUsage(0)
     {
         *this = oth;
         mParent = parent;
@@ -202,6 +204,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Pass::~Pass()
     {
+		OGRE_DELETE mVertexProgramUsage;
+		OGRE_DELETE mFragmentProgramUsage;
+		OGRE_DELETE mShadowCasterVertexProgramUsage;
+		OGRE_DELETE mShadowReceiverVertexProgramUsage;
+		OGRE_DELETE mShadowReceiverFragmentProgramUsage;
 
     }
     //-----------------------------------------------------------------------------
@@ -268,7 +275,7 @@ namespace Ogre {
 		mLightClipPlanes = oth.mLightClipPlanes;
 		mIlluminationStage = oth.mIlluminationStage;
 
-
+		OGRE_DELETE mVertexProgramUsage;
 		if (oth.mVertexProgramUsage)
 		{
 			mVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mVertexProgramUsage));
@@ -277,6 +284,8 @@ namespace Ogre {
 		{
 		    mVertexProgramUsage = NULL;
 		}
+
+		OGRE_DELETE mShadowCasterVertexProgramUsage;
         if (oth.mShadowCasterVertexProgramUsage)
         {
             mShadowCasterVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowCasterVertexProgramUsage));
@@ -285,6 +294,8 @@ namespace Ogre {
         {
             mShadowCasterVertexProgramUsage = NULL;
         }
+
+		OGRE_DELETE mShadowReceiverVertexProgramUsage;
         if (oth.mShadowReceiverVertexProgramUsage)
         {
             mShadowReceiverVertexProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowReceiverVertexProgramUsage));
@@ -293,6 +304,8 @@ namespace Ogre {
         {
             mShadowReceiverVertexProgramUsage = NULL;
         }
+
+		OGRE_DELETE mFragmentProgramUsage;
 		if (oth.mFragmentProgramUsage)
 		{
 		    mFragmentProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mFragmentProgramUsage));
@@ -301,6 +314,8 @@ namespace Ogre {
         {
 		    mFragmentProgramUsage = NULL;
         }
+
+		OGRE_DELETE mGeometryProgramUsage;
 		if (oth.mGeometryProgramUsage)
 		{
 		    mGeometryProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mGeometryProgramUsage));
@@ -309,6 +324,8 @@ namespace Ogre {
         {
 		    mGeometryProgramUsage = NULL;
         }
+
+		OGRE_DELETE mShadowReceiverFragmentProgramUsage;
 		if (oth.mShadowReceiverFragmentProgramUsage)
 		{
 			mShadowReceiverFragmentProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowReceiverFragmentProgramUsage));
