@@ -30,9 +30,9 @@ Torus Knot Software Ltd.
 #ifndef __GLXCONFIGDIALOG_H__
 #define __GLXCONFIGDIALOG_H__
 
-#include "OgrePrerequisites.h"
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
+#include "../OgrePrerequisites.h"
+#include "../OgreRoot.h"
+#include "../OgreRenderSystem.h"
 
 #include <gtk/gtk.h>
 

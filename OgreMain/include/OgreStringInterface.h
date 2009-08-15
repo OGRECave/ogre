@@ -161,14 +161,17 @@ namespace Ogre {
     */
     class _OgreExport StringInterface 
     {
-    protected:
+    private:
+		OGRE_STATIC_MUTEX( msDictionaryMutex );
 
         /// Dictionary of parameters
         static ParamDictionaryMap msDictionary;
 
         /// Class name for this instance to be used as a lookup (must be initialised by subclasses)
         String mParamDictName;
+		ParamDictionary* mParamDict;
 
+	protected:
         /** Internal method for creating a parameter dictionary for the class, if it does not already exist.
         @remarks
             This method will check to see if a parameter dictionary exist for this class yet,
@@ -181,17 +184,26 @@ namespace Ogre {
         */
         bool createParamDictionary(const String& className)
         {
-            mParamDictName = className;
-            if (msDictionary.find(className) == msDictionary.end())
-            {
-                msDictionary[className] = ParamDictionary();
-                return true;
-            }
-            return false;
+			OGRE_LOCK_MUTEX( msDictionaryMutex )
 
+			ParamDictionaryMap::iterator it = msDictionary.find(className);
+
+			if ( it == msDictionary.end() )
+			{
+				mParamDict = &msDictionary.insert( std::make_pair( className, ParamDictionary() ) ).first->second;
+				mParamDictName = className;
+				return true;
+			}
+			else
+			{
+				mParamDict = &it->second;
+				mParamDictName = className;
+				return false;
+			}
         }
 
     public:
+		StringInterface() : mParamDict(NULL) { }
 
         /** Virtual destructor, see Effective C++ */
         virtual ~StringInterface() {}
@@ -205,28 +217,12 @@ namespace Ogre {
         */
         ParamDictionary* getParamDictionary(void)
         {
-            ParamDictionaryMap::iterator i = msDictionary.find(mParamDictName);
-            if (i != msDictionary.end())
-            {
-                return &(i->second);
-            }
-            else
-            {
-                return 0;
-            }
+			return mParamDict;
         }
 
 		const ParamDictionary* getParamDictionary(void) const
         {
-            ParamDictionaryMap::const_iterator i = msDictionary.find(mParamDictName);
-            if (i != msDictionary.end())
-            {
-                return &(i->second);
-            }
-            else
-            {
-                return 0;
-            }
+			return mParamDict;
         }
 
         /** Retrieves a list of parameters valid for this object. 

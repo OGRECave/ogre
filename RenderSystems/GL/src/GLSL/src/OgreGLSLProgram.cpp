@@ -199,7 +199,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void GLSLProgram::createLowLevelImpl(void)
 	{
-		mAssemblerProgram = GpuProgramPtr(new GLSLGpuProgram( this ));
+		mAssemblerProgram = GpuProgramPtr(OGRE_NEW GLSLGpuProgram( this ));
 	}
 	//---------------------------------------------------------------------------
 	void GLSLProgram::unloadImpl()

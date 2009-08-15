@@ -215,6 +215,11 @@ void CompositorChain::preRenderTargetUpdate(const RenderTargetEvent& evt)
 	/// ( RenderSystem::setViewport(...) ) if it would have been, the rendering
 	/// order would be screwed up and problems would arise with copying rendertextures.
     Camera *cam = mViewport->getCamera();
+	if (!cam)
+	{
+		return;
+	}
+
     /// Iterate over compiled state
     CompositorInstance::CompiledState::iterator i;
     for(i=mCompiledState.begin(); i!=mCompiledState.end(); ++i)
@@ -255,8 +260,11 @@ void CompositorChain::preViewportUpdate(const RenderTargetViewportEvent& evt)
 	}
 
 	Camera *cam = mViewport->getCamera();
-	/// Prepare for output operation
-	preTargetOperation(mOutputOperation, mViewport, cam);
+	if (cam)
+	{
+		/// Prepare for output operation
+		preTargetOperation(mOutputOperation, mViewport, cam);
+	}
 }
 //-----------------------------------------------------------------------
 void CompositorChain::preTargetOperation(CompositorInstance::TargetOperation &op, Viewport *vp, Camera *cam)
@@ -307,7 +315,11 @@ void CompositorChain::postViewportUpdate(const RenderTargetViewportEvent& evt)
     if(evt.source != mViewport || !mAnyCompositorsEnabled)
         return;
 
-	postTargetOperation(mOutputOperation, mViewport, mViewport->getCamera());
+	Camera *cam = mViewport->getCamera();
+	if (cam)
+	{
+		postTargetOperation(mOutputOperation, mViewport, cam);
+	}
 }
 //-----------------------------------------------------------------------
 void CompositorChain::viewportRemoved(const RenderTargetViewportEvent& evt)

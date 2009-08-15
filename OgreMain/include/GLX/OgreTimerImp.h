@@ -30,7 +30,7 @@ Torus Knot Software Ltd.
 #ifndef __GLXTimer_H__
 #define __GLXTimer_H__
 
-#include "OgrePrerequisites.h"
+#include "../OgrePrerequisites.h"
 
 namespace Ogre
 {

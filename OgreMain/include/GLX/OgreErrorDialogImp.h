@@ -29,7 +29,7 @@ Torus Knot Software Ltd.
 #ifndef __OGRE_GLX_ERROR_DIALOG_H__
 #define __OGRE_GLX_ERROR_DIALOG_H__
 
-#include "OgrePrerequisites.h"
+#include "../OgrePrerequisites.h"
 
 namespace Ogre
 {

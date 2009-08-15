@@ -3431,7 +3431,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		// Bind frame buffer object
 		mRTTManager->bind(target);
 
-		if (GLEW_VERSION_1_2)
+		if (GLEW_EXT_framebuffer_sRGB)
 		{
 		// Enable / disable sRGB states
 		if (target->isHardwareGammaEnabled())

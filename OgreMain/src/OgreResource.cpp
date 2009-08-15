@@ -60,12 +60,19 @@ namespace Ogre
 	void Resource::prepare()
 	{
         // quick check that avoids any synchronisation
-        if (mLoadingState.get() != LOADSTATE_UNLOADED) return;
+        LoadingState old = mLoadingState.get();
+        if (old != LOADSTATE_UNLOADED && old != LOADSTATE_PREPARING) return;
 
         // atomically do slower check to make absolutely sure,
         // and set the load state to PREPARING
 		if (!mLoadingState.cas(LOADSTATE_UNLOADED,LOADSTATE_PREPARING))
+		{
+			while( mLoadingState.get() == LOADSTATE_PREPARING )
+			{
+				OGRE_LOCK_AUTO_MUTEX
+			}
 			return;
+		}
 
 		// Scope lock for actual loading
         try
@@ -134,11 +141,28 @@ namespace Ogre
 
         // quick check that avoids any synchronisation
         LoadingState old = mLoadingState.get();
-        if (old!=LOADSTATE_UNLOADED && old!=LOADSTATE_PREPARED) return;
+
+		if ( old == LOADSTATE_PREPARING )
+		{
+			while( mLoadingState.get() == LOADSTATE_PREPARING )
+			{
+				OGRE_LOCK_AUTO_MUTEX
+			}
+			old = mLoadingState.get();
+		}
+
+		if (old!=LOADSTATE_UNLOADED && old!=LOADSTATE_PREPARED && old!=LOADSTATE_LOADING) return;
 
         // atomically do slower check to make absolutely sure,
         // and set the load state to LOADING
-        if (!mLoadingState.cas(old,LOADSTATE_LOADING)) return;
+        if (old==LOADSTATE_LOADING || !mLoadingState.cas(old,LOADSTATE_LOADING))
+		{
+			while( mLoadingState.get() == LOADSTATE_LOADING )
+			{
+				OGRE_LOCK_AUTO_MUTEX
+			}
+			return;
+		}
 
 		// Scope lock for actual loading
         try

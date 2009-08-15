@@ -358,6 +358,16 @@ namespace Ogre {
 			static_cast<int>(pImgData->height), 
 			bpp);
 
+		if (!ret)
+		{
+			if (conversionRequired)
+				OGRE_FREE(convBox.data, MEMCATEGORY_GENERAL);
+
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"FreeImage_AllocateT failed - possibly out of memory. ", 
+				__FUNCTION__);
+		}
+
 		if (requiredFormat == PF_L8 || requiredFormat == PF_A8)
 		{
 			// Must explicitly tell FreeImage that this is greyscale by setting

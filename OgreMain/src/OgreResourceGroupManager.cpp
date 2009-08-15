@@ -204,8 +204,8 @@ namespace Ogre {
 				oi != grp->loadResourceOrderMap.end(); ++oi)
 			{
 				size_t n = 0;
-				for (LoadUnloadResourceList::iterator l = oi->second->begin();
-					l != oi->second->end(); ++l, ++n)
+				LoadUnloadResourceList::iterator l = oi->second->begin();
+				while (l != oi->second->end())
 				{
 					ResourcePtr res = *l;
 
@@ -213,12 +213,14 @@ namespace Ogre {
                     // or not. This ensures that the number of callbacks
 					// matches the number originally estimated, which is important
 					// for progress bars.
-					fireResourceLoadStarted(res);
+					fireResourcePrepareStarted(res);
 
 					// If preparing one of these resources cascade-prepares another resource, 
 					// the list will get longer! But these should be prepared immediately
 					// Call prepare regardless, already prepared or loaded resources will be skipped
 					res->prepare();
+
+					fireResourcePrepareEnded();
 
 					// Did the resource change group? if so, our iterator will have
 					// been invalidated
@@ -227,8 +229,11 @@ namespace Ogre {
 						l = oi->second->begin();
 						std::advance(l, n);
 					}
-
-					fireResourceLoadEnded();
+					else
+					{
+						++l;
+						++n;
+					}
 				}
 			}
 		}
@@ -295,8 +300,8 @@ namespace Ogre {
 				oi != grp->loadResourceOrderMap.end(); ++oi)
 			{
 				size_t n = 0;
-				for (LoadUnloadResourceList::iterator l = oi->second->begin();
-					l != oi->second->end(); ++l, ++n)
+				LoadUnloadResourceList::iterator l = oi->second->begin();
+				while (l != oi->second->end())
 				{
 					ResourcePtr res = *l;
 
@@ -311,6 +316,8 @@ namespace Ogre {
 					// Call load regardless, already loaded resources will be skipped
 					res->load();
 
+					fireResourceLoadEnded();
+
 					// Did the resource change group? if so, our iterator will have
 					// been invalidated
 					if (res->getGroup() != name)
@@ -318,8 +325,11 @@ namespace Ogre {
 						l = oi->second->begin();
 						std::advance(l, n);
 					}
-
-					fireResourceLoadEnded();
+					else
+					{
+						++l;
+						++n;
+					}
 				}
 			}
 		}

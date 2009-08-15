@@ -30,7 +30,7 @@ Torus Knot Software Ltd.
 #include "OgreStringInterface.h"
 
 namespace Ogre {
-
+	OGRE_STATIC_MUTEX_INSTANCE( StringInterface::msDictionaryMutex )
     ParamDictionaryMap StringInterface::msDictionary;
 
 
@@ -75,7 +75,10 @@ namespace Ogre {
 		}
 	}
     //-----------------------------------------------------------------------
-    void StringInterface::cleanupDictionary () {
-      msDictionary.clear();
-    }
+	void StringInterface::cleanupDictionary ()
+	{
+		OGRE_LOCK_MUTEX( msDictionaryMutex )
+
+		msDictionary.clear();
+	}
 }
