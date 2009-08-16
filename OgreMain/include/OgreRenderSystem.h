@@ -1127,6 +1127,10 @@ namespace Ogre
 		if _updateAllRenderTargets was called with a 'false' parameter. */
 		virtual void _swapAllRenderTargetBuffers(bool waitForVsync = true);
 
+		/** Gets whether or not vertex windings set should be inverted; this can be important
+		for rendering reflections. */
+		virtual bool getInvertVertexWinding(void);
+
 		/** Sets whether or not vertex windings set should be inverted; this can be important
 		for rendering reflections. */
 		virtual void setInvertVertexWinding(bool invert);
