@@ -3000,7 +3000,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 									  const LightList* manualLightList)
 {
     unsigned short numMatrices;
-    static RenderOperation ro;
+    RenderOperation ro;
 
 
     // Set up rendering operation
@@ -4183,6 +4183,7 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
 				LightInfo lightInfo;
 				lightInfo.light = l;
 				lightInfo.type = l->getType();
+				lightInfo.lightMask = l->getLightMask();
 				if (lightInfo.type == Light::LT_DIRECTIONAL)
 				{
 					// Always visible

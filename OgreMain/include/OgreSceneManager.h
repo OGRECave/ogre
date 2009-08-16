@@ -492,11 +492,12 @@ namespace Ogre {
             int type;           // Use int instead of Light::LightTypes to avoid header file dependence
             Real range;         // Sets to zero if directional light
             Vector3 position;   // Sets to zero if directional light
+			uint32 lightMask;   // Light mask
 
             bool operator== (const LightInfo& rhs) const
             {
                 return light == rhs.light && type == rhs.type &&
-                    range == rhs.range && position == rhs.position;
+                    range == rhs.range && position == rhs.position && lightMask == rhs.lightMask;
             }
 
             bool operator!= (const LightInfo& rhs) const
