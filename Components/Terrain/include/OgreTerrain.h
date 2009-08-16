@@ -792,7 +792,6 @@ namespace Ogre
 			<li>The terrain error metrics which determine LOD transitions</li>
 			<li>The terrain normal map, if present</li>
 			<li>The terrain lighting map, if present</li>
-			<li>The terrain horizon map, if present</li>
 			</ol>
 			If threading is enabled, only item 1 (the geometry) will be updated
 			synchronously, ie will be fully up to date when this method returns.
@@ -1061,19 +1060,6 @@ namespace Ogre
 		*/
 		void _setLightMapRequired(bool lightMap, bool shadowsOnly = false);
 
-		/** Request internal implementation options for the terrain material to use, 
-		in this case a terrain-wide horizon map. 
-		The TerrainMaterialGenerator should call this method to specify the 
-		options it would like to use when creating a material. Not all the data
-		is guaranteed to be up to date on return from this method - for example some
-		maps may be generated in the background. However, on return from this method
-		all the features that are requested will be referenceable by materials, the
-		data may just take a few frames to be fully populated.
-		@param horizonMap Whether a terrain-wide horizon map including precalculated 
-			horizon angles is required
-		*/
-		void _setHorizonMapRequired(bool horizonMap);
-
 		/// WorkQueue::RequestHandler override
 		bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
 		/// WorkQueue::RequestHandler override
@@ -1198,7 +1184,6 @@ namespace Ogre
 			// all CPU-side data, independent of textures; to be blitted in main thread
 			PixelBox* normalMapBox;
 			PixelBox* lightMapBox;
-			PixelBox* horizonMapBox;
 			_OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const DerivedDataResponse& r)
 			{ return o; }		
 		};
@@ -1232,24 +1217,19 @@ namespace Ogre
 		static NameGenerator msBlendTextureGenerator;
 		static NameGenerator msNormalMapNameGenerator;
 		static NameGenerator msLightmapNameGenerator;
-		static NameGenerator msHorizonMapNameGenerator;
 
 		bool mLodMorphRequired;
 		bool mNormalMapRequired;
 		bool mLightMapRequired;
 		bool mLightMapShadowsOnly;
-		bool mHorizonMapRequired;
 		/// Texture storing normals for the whole terrrain
 		TexturePtr mTerrainNormalMap;
 		/// Texture storing lighting for the whole terrrain
 		TexturePtr mTerrainLightmap;
-		/// Texture storing horizon values for the whole terrrain
-		TexturePtr mTerrainHorizonMap;
 
 		/// Pending data 
 		PixelBox* mCpuTerrainNormalMap;
 		PixelBox* mCpuTerrainLightMap;
-		PixelBox* mCpuTerrainHorizonMap;
 
 		const Camera* mLastLODCamera;
 		unsigned long mLastLODFrame;

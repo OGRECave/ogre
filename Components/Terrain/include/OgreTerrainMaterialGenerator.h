@@ -49,7 +49,7 @@ namespace Ogre
 
 	/** Enumeration of types of data that can be read from textures that are
 	specific to a given layer. Notice that global texture information 
-	such as shadows, horizons and terrain normals are not represented
+	such as shadows and terrain normals are not represented
 	here because they are not a per-layer attribute, and blending
 	is stored in packed texture structures which are stored separately.
 	*/

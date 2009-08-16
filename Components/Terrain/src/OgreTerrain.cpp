@@ -131,10 +131,8 @@ namespace Ogre
 		, mNormalMapRequired(false)
 		, mLightMapRequired(false)
 		, mLightMapShadowsOnly(true)
-		, mHorizonMapRequired(false)
 		, mCpuTerrainNormalMap(0)
 		, mCpuTerrainLightMap(0)
-		, mCpuTerrainHorizonMap(0)
 		, mLastLODCamera(0)
 		, mLastLODFrame(0)
 
@@ -1610,13 +1608,6 @@ namespace Ogre
 			mCpuTerrainLightMap = 0;
 		}
 
-		if (mCpuTerrainHorizonMap)
-		{
-			OGRE_FREE(mCpuTerrainHorizonMap->data, MEMCATEGORY_GENERAL);
-			OGRE_DELETE mCpuTerrainHorizonMap;
-			mCpuTerrainHorizonMap = 0;
-		}
-
 		OGRE_FREE(mCpuColourMapStorage, MEMCATEGORY_GENERAL);
 		mCpuColourMapStorage = 0;
 
@@ -2379,16 +2370,6 @@ namespace Ogre
 			}
 		}
 
-	}
-	//---------------------------------------------------------------------
-	void Terrain::_setHorizonMapRequired(bool horizonMap)
-	{
-		if (horizonMap != mHorizonMapRequired)
-		{
-			mHorizonMapRequired = horizonMap;
-
-			// TODO - create
-		}
 	}
 	//---------------------------------------------------------------------
 	bool Terrain::canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
