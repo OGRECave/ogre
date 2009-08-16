@@ -366,6 +366,31 @@ namespace Ogre {
 		ResourceGroupManager::getSingleton()._notifyAllResourcesRemoved(this);
 	}
     //-----------------------------------------------------------------------
+    void ResourceManager::removeUnreferencedResources(bool reloadableOnly)
+    {
+        OGRE_LOCK_AUTO_MUTEX
+
+        ResourceMap::iterator i, iend;
+        iend = mResources.end();
+        for (i = mResources.begin(); i != iend; )
+        {
+            // A use count of 3 means that only RGM and RM have references
+            // RGM has one (this one) and RM has 2 (by name and by handle)
+            if (i->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
+            {
+                Resource* res = (i++)->second.get();
+                if (!reloadableOnly || res->isReloadable())
+                {
+                    remove( res->getHandle() );
+                }
+            }
+            else
+            {
+                ++i;
+            }
+        }
+    }
+    //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::getByName(const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {		
 		ResourcePtr res;

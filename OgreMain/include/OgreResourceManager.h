@@ -282,6 +282,22 @@ namespace Ogre {
         */
         virtual void removeAll(void);
 
+		/** Remove all resources which are not referenced by any other object.
+		@remarks
+			This method behaves like removeAll, except that it only removes resources
+            which are not in use, ie not referenced by other objects. This allows you
+            to free up some memory selectively whilst still keeping the group around
+            (and the resources present, just not using much memory).
+        @par
+            Some referenced resource may exists 'weak' pointer to their sub-components
+            (e.g. Entity held pointer to SubMesh), in this case, remove or reload that
+            resource will cause dangerous pointer access. Use this function instead of
+            removeAll allows you avoid fail in those situations.
+		@param reloadableOnly If true (the default), only removes resources
+			which can be subsequently automatically reloaded.
+		*/
+		virtual void removeUnreferencedResources(bool reloadableOnly = true);
+
         /** Retrieves a pointer to a resource by name, or null if the resource does not exist.
         */
         virtual ResourcePtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
