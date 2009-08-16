@@ -1639,7 +1639,11 @@ namespace Ogre {
 		/** Get the hash function used for all passes.
 		*/
 		static HashFunc* getHashFunction(void) { return msHashFunc; }
-        
+
+		/** Get the builtin hash function.
+		*/
+		static HashFunc* getBuiltinHashFunction(BuiltinHashFunction builtin);
+
     };
 
     /** Struct recording a pass which can be used for a specific illumination stage.
