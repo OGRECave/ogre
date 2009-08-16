@@ -195,7 +195,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
 	FloatGpuParameterControllerValue::FloatGpuParameterControllerValue(
-			GpuProgramParameters* params, size_t index) :
+			GpuProgramParametersSharedPtr params, size_t index) :
 		mParams(params), mParamIndex(index)
 	{
 	}
@@ -208,7 +208,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
 	void FloatGpuParameterControllerValue::setValue(Real val)
 	{
-		static Vector4 v4 = Vector4(0,0,0,0);
+		Vector4 v4 = Vector4(0,0,0,0);
 		v4.x = val;
 		mParams->setConstant(mParamIndex, v4);
 	}

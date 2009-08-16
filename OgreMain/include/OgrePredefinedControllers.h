@@ -145,7 +145,7 @@ namespace Ogre {
     {
     protected:
 		/// The parameters to access
-		GpuProgramParameters* mParams;
+		GpuProgramParametersSharedPtr mParams;
 		/// The index of the parameter to e read or set
 		size_t mParamIndex;
     public:
@@ -155,7 +155,7 @@ namespace Ogre {
             @param
                 index The index of the parameter to be set
         */
-        FloatGpuParameterControllerValue(GpuProgramParameters* params,
+        FloatGpuParameterControllerValue(GpuProgramParametersSharedPtr params,
 				size_t index );
 
         ~FloatGpuParameterControllerValue() {}

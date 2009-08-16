@@ -224,7 +224,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     Controller<Real>* ControllerManager::createGpuProgramTimerParam(
-        GpuProgramParameters* params, size_t paramIndex, Real timeFactor)
+        GpuProgramParametersSharedPtr params, size_t paramIndex, Real timeFactor)
     {
         SharedPtr< ControllerValue<Real> > val;
         SharedPtr< ControllerFunction<Real> > func;

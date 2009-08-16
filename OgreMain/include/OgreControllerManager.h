@@ -197,7 +197,7 @@ namespace Ogre {
             retrieve the index beforehand using GpuProgramParameters::getParamIndex
         @param factor The factor by which to adjust the time elapsed by before passing it to the program
         */
-        Controller<Real>* createGpuProgramTimerParam(GpuProgramParameters* params, size_t paramIndex,
+        Controller<Real>* createGpuProgramTimerParam(GpuProgramParametersSharedPtr params, size_t paramIndex,
             Real timeFactor = 1.0f);
 
         /** Removes & destroys the controller passed in as a pointer.
