@@ -87,6 +87,7 @@ namespace Ogre
 	Real TerrainGlobalOptions::msDefaultLayerTextureWorldSize = 10;
 	uint16 TerrainGlobalOptions::msDefaultGlobalColourMapSize = 1024;
 	uint16 TerrainGlobalOptions::msLightmapSize = 1024;
+	uint16 TerrainGlobalOptions::msCompositeMapSize = 1024;
 	//---------------------------------------------------------------------
 	void TerrainGlobalOptions::setDefaultMaterialGenerator(TerrainMaterialGeneratorPtr gen)
 	{
@@ -127,12 +128,15 @@ namespace Ogre
 		, mGlobalColourMapEnabled(false)
 		, mCpuColourMapStorage(0)
 		, mCpuLightmapStorage(0)
+		, mCpuCompositeMapStorage(0)
+		, mCompositeMapDirtyRect(0, 0, 0, 0)
+		, mCompositeMapDirtyRectLightmapUpdate(false)
 		, mLodMorphRequired(false)
 		, mNormalMapRequired(false)
 		, mLightMapRequired(false)
 		, mLightMapShadowsOnly(true)
+		, mCompositeMapRequired(false)
 		, mCpuTerrainNormalMap(0)
-		, mCpuTerrainLightMap(0)
 		, mLastLODCamera(0)
 		, mLastLODFrame(0)
 
@@ -367,27 +371,53 @@ namespace Ogre
 		}
 
 		// lightmap
-		stream.writeChunkBegin(TERRAINDERIVEDDATA_CHUNK_ID, TERRAINDERIVEDDATA_CHUNK_VERSION);
-		String lightmapDataType("lightmap");
-		stream.write(&lightmapDataType);
-		stream.write(&mLightmapSize);
-		if (mCpuLightmapStorage)
+		if (mLightMapRequired)
 		{
-			// save from CPU data if it's there, it means GPU data was never created
-			stream.write(mCpuLightmapStorage, mLightmapSize * mLightmapSize);
+			stream.writeChunkBegin(TERRAINDERIVEDDATA_CHUNK_ID, TERRAINDERIVEDDATA_CHUNK_VERSION);
+			String lightmapDataType("lightmap");
+			stream.write(&lightmapDataType);
+			stream.write(&mLightmapSize);
+			if (mCpuLightmapStorage)
+			{
+				// save from CPU data if it's there, it means GPU data was never created
+				stream.write(mCpuLightmapStorage, mLightmapSize * mLightmapSize);
+			}
+			else
+			{
+				uint8* tmpData = (uint8*)OGRE_MALLOC(mLightmapSize * mLightmapSize, MEMCATEGORY_GENERAL);
+				PixelBox dst(mLightmapSize, mLightmapSize, 1, PF_L8, tmpData);
+				mLightmap->getBuffer()->blitToMemory(dst);
+				stream.write(tmpData, mLightmapSize * mLightmapSize);
+				OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
+			}
+			stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
 		}
-		else
+
+		// composite map
+		if (mCompositeMapRequired)
 		{
-			uint8* tmpData = (uint8*)OGRE_MALLOC(mLightmapSize * mLightmapSize, MEMCATEGORY_GENERAL);
-			PixelBox dst(mLightmapSize, mLightmapSize, 1, PF_L8, tmpData);
-			mLightmap->getBuffer()->blitToMemory(dst);
-			stream.write(tmpData, mLightmapSize * mLightmapSize);
-			OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
+			stream.writeChunkBegin(TERRAINDERIVEDDATA_CHUNK_ID, TERRAINDERIVEDDATA_CHUNK_VERSION);
+			String compositeMapDataType("compositemap");
+			stream.write(&compositeMapDataType);
+			stream.write(&mCompositeMapSize);
+			if (mCpuCompositeMapStorage)
+			{
+				// save from CPU data if it's there, it means GPU data was never created
+				stream.write(mCpuCompositeMapStorage, mCompositeMapSize * mCompositeMapSize * 4);
+			}
+			else
+			{
+				// composite map is 4 channel, 3x diffuse, 1x specular mask
+				uint8* tmpData = (uint8*)OGRE_MALLOC(mCompositeMapSize * mCompositeMapSize * 4, MEMCATEGORY_GENERAL);
+				PixelBox dst(mCompositeMapSize, mCompositeMapSize, 1, PF_BYTE_RGBA, tmpData);
+				mCompositeMap->getBuffer()->blitToMemory(dst);
+				stream.write(tmpData, mCompositeMapSize * mCompositeMapSize * 4);
+				OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
+			}
+			stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
 		}
-		stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
 
-
-		// TODO - write depths
+		// TODO - write deltas
 
 		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
 	}
@@ -548,6 +578,13 @@ namespace Ogre
 				mCpuLightmapStorage = static_cast<uint8*>(OGRE_MALLOC(sz * sz, MEMCATEGORY_GENERAL));
 				stream.read(mCpuLightmapStorage, sz * sz);
 			}
+			else if (name == "compositemap")
+			{
+				mCompositeMapRequired = true;
+				mCompositeMapSize = sz;
+				mCpuCompositeMapStorage = static_cast<uint8*>(OGRE_MALLOC(sz * sz * 4, MEMCATEGORY_GENERAL));
+				stream.read(mCpuCompositeMapStorage, sz * sz * 4);
+			}
 
 			stream.readChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
 
@@ -703,6 +740,8 @@ namespace Ogre
 		mLayerBlendMapSizeActual = mLayerBlendMapSize; // for now, until we check
 		mLightmapSize = TerrainGlobalOptions::getLightMapSize();
 		mLightmapSizeActual = mLightmapSize; // for now, until we check
+		mCompositeMapSize = TerrainGlobalOptions::getCompositeMapSize();
+		mCompositeMapSizeActual = mCompositeMapSize; // for now, until we check
 
 	}
 	//---------------------------------------------------------------------
@@ -896,6 +935,7 @@ namespace Ogre
 		createOrDestroyGPUColourMap();
 		createOrDestroyGPUNormalMap();
 		createOrDestroyGPULightmap();
+		createOrDestroyGPUCompositeMap();
 		
 		mMaterialGenerator->requestOptions(this);
 
@@ -1512,6 +1552,7 @@ namespace Ogre
 	{
 		mDirtyGeometryRect.merge(rect);
 		mDirtyDerivedDataRect.merge(rect);
+		mCompositeMapDirtyRect.merge(rect);
 	}
 	//---------------------------------------------------------------------
 	void Terrain::update(bool synchronous)
@@ -1554,21 +1595,21 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::updateDerivedDataImpl(const Rect& rect, bool synchronous, uint8 typeMask)
 	{
-			mDerivedDataUpdateInProgress = true;
-			mDerivedUpdatePendingMask = 0;
+		mDerivedDataUpdateInProgress = true;
+		mDerivedUpdatePendingMask = 0;
 
-			DerivedDataRequest req;
-			req.terrain = this;
-			req.dirtyRect = rect;
-			req.typeMask = typeMask;
-			if (!mNormalMapRequired)
-				req.typeMask = req.typeMask & ~DERIVED_DATA_NORMALS;
-			if (!mLightMapRequired)
-				req.typeMask = req.typeMask & ~DERIVED_DATA_LIGHTMAP;
+		DerivedDataRequest req;
+		req.terrain = this;
+		req.dirtyRect = rect;
+		req.typeMask = typeMask;
+		if (!mNormalMapRequired)
+			req.typeMask = req.typeMask & ~DERIVED_DATA_NORMALS;
+		if (!mLightMapRequired)
+			req.typeMask = req.typeMask & ~DERIVED_DATA_LIGHTMAP;
 
-			Root::getSingleton().getWorkQueue()->addRequest(
-				WORKQUEUE_CHANNEL, WORKQUEUE_DERIVED_DATA_REQUEST, 
-				Any(req), 0, synchronous);
+		Root::getSingleton().getWorkQueue()->addRequest(
+			WORKQUEUE_CHANNEL, WORKQUEUE_DERIVED_DATA_REQUEST, 
+			Any(req), 0, synchronous);
 
 	}
 	//---------------------------------------------------------------------
@@ -1601,19 +1642,14 @@ namespace Ogre
 			mCpuTerrainNormalMap = 0;
 		}
 
-		if (mCpuTerrainLightMap)
-		{
-			OGRE_FREE(mCpuTerrainLightMap->data, MEMCATEGORY_GENERAL);
-			OGRE_DELETE mCpuTerrainLightMap;
-			mCpuTerrainLightMap = 0;
-		}
-
 		OGRE_FREE(mCpuColourMapStorage, MEMCATEGORY_GENERAL);
 		mCpuColourMapStorage = 0;
 
 		OGRE_FREE(mCpuLightmapStorage, MEMCATEGORY_GENERAL);
 		mCpuLightmapStorage = 0;
 
+		OGRE_FREE(mCpuCompositeMapStorage, MEMCATEGORY_GENERAL);
+		mCpuCompositeMapStorage = 0;
 	}
 	//---------------------------------------------------------------------
 	void Terrain::freeGPUResources()
@@ -1645,6 +1681,12 @@ namespace Ogre
 		{
 			tmgr->remove(mLightmap->getHandle());
 			mLightmap.setNull();
+		}
+
+		if (!mCompositeMap.isNull())
+		{
+			tmgr->remove(mCompositeMap->getHandle());
+			mCompositeMap.setNull();
 		}
 
 	}
@@ -2360,14 +2402,34 @@ namespace Ogre
 
 			createOrDestroyGPULightmap();
 
-			// if we enabled, generate normal maps
+			// if we enabled, generate light maps
 			if (mNormalMapRequired)
 			{
-				// update derived data for whole terrain, but just normals
+				// update derived data for whole terrain, but just lightmap
 				mDirtyDerivedDataRect.left = mDirtyDerivedDataRect.top = 0;
 				mDirtyDerivedDataRect.right = mDirtyDerivedDataRect.bottom = mSize;
 				updateDerivedData(false, DERIVED_DATA_LIGHTMAP);
 			}
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::_setCompositeMapRequired(bool compositeMap)
+	{
+		if (compositeMap != mCompositeMapRequired)
+		{
+			mCompositeMapRequired = compositeMap;
+
+			createOrDestroyGPUCompositeMap();
+			
+			// if we enabled, generate normal maps
+			if (mCompositeMapRequired)
+			{
+				mCompositeMapDirtyRect.left = mCompositeMapDirtyRect.top = 0;
+				mCompositeMapDirtyRect.right = mCompositeMapDirtyRect.bottom = mSize;
+				updateCompositeMap();
+			}
+
 		}
 
 	}
@@ -2454,7 +2516,10 @@ namespace Ogre
 			finaliseNormals(ddres.normalUpdateRect, ddres.normalMapBox);
 		if ((ddreq.typeMask & DERIVED_DATA_LIGHTMAP) && 
 			!(ddres.remainingTypeMask & DERIVED_DATA_LIGHTMAP))
+		{
 			finaliseLightmap(ddres.lightmapUpdateRect, ddres.lightMapBox);
+			mCompositeMapDirtyRectLightmapUpdate = true;
+		}
 		
 		// TODO other data
 
@@ -2476,6 +2541,13 @@ namespace Ogre
 		{
 			// trigger again
 			updateDerivedDataImpl(newRect, false, newMask);
+		}
+		else
+		{
+			// we've finished all the background processes
+			// update the composite map if enabled
+			if (mCompositeMapRequired)
+				updateCompositeMap();
 		}
 
 	}
@@ -2637,43 +2709,39 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	PixelBox* Terrain::calculateLightmap(const Rect& rect, Rect& outFinalRect)
+	void Terrain::widenRectByVector(const Vector3& vec, const Rect& inRect, Rect& outRect)
 	{
-		// TODO - allow calculation of all lighting, not just shadows
-		// TODO - handle neighbour page casting
 
-		// as well as calculating the lighting changes for the area that is
-		// dirty, we also need to calculate the effect on casting shadow on
-		// other areas. To do this, we project the dirt rect by the light direction
-		// onto the minimum height
+		outRect = inRect;
 
-		Vector3 corners[4];
-		Real maxHeight = getMaxHeight();
-		Real minHeight = getMinHeight();
-		getPoint(rect.left, rect.top, maxHeight, &corners[0]);
-		getPoint(rect.right-1, rect.top, maxHeight, &corners[1]);
-		getPoint(rect.left, rect.bottom-1, maxHeight, &corners[2]);
-		getPoint(rect.right-1, rect.bottom-1, maxHeight, &corners[3]);
-
-		const Vector3& lightVec = TerrainGlobalOptions::getLightMapDirection();
 		Plane p;
 		switch(getAlignment())
 		{
 		case ALIGN_X_Y:
-			p.redefine(Vector3::UNIT_Z, Vector3(0, 0, minHeight));
+			p.redefine(Vector3::UNIT_Z, Vector3(0, 0, vec.z < 0.0 ? getMinHeight() : getMaxHeight()));
 			break;
 		case ALIGN_X_Z:
-			p.redefine(Vector3::UNIT_Y, Vector3(0, minHeight, 0));
+			p.redefine(Vector3::UNIT_Y, Vector3(0, vec.y < 0.0 ? getMinHeight() : getMaxHeight(), 0));
 			break;
 		case ALIGN_Y_Z:
-			p.redefine(Vector3::UNIT_X, Vector3(minHeight, 0, 0));
+			p.redefine(Vector3::UNIT_X, Vector3(vec.x < 0.0 ? getMinHeight() : getMaxHeight(), 0, 0));
 			break;
 		}
+		float verticalVal = vec.dotProduct(p.normal);
 
-		Rect widenedRect(rect);
+		if (Math::RealEqual(verticalVal, 0.0))
+			return;
+
+		Vector3 corners[4];
+		Real startHeight = verticalVal < 0.0 ? getMaxHeight() : getMinHeight();
+		getPoint(inRect.left, inRect.top, startHeight, &corners[0]);
+		getPoint(inRect.right-1, inRect.top, startHeight, &corners[1]);
+		getPoint(inRect.left, inRect.bottom-1, startHeight, &corners[2]);
+		getPoint(inRect.right-1, inRect.bottom-1, startHeight, &corners[3]);
+
 		for (int i = 0; i < 4; ++i)
 		{
-			Ray ray(corners[i], lightVec);
+			Ray ray(corners[i] + mPos, vec);
 			std::pair<bool, Real> rayHit = ray.intersects(p);
 			if(rayHit.first)
 			{
@@ -2689,10 +2757,26 @@ namespace Ogre
 					(long)(terrainHitPos.x * (float)(mSize - 1) + 0.5) + 1, 
 					(long)(terrainHitPos.y * (float)(mSize - 1) + 0.5) + 1
 					);
-				widenedRect.merge(mergeRect);
+				outRect.merge(mergeRect);
 			}
 		}
 
+	}
+	//---------------------------------------------------------------------
+	PixelBox* Terrain::calculateLightmap(const Rect& rect, Rect& outFinalRect)
+	{
+		// TODO - allow calculation of all lighting, not just shadows
+		// TODO - handle neighbour page casting
+
+		// as well as calculating the lighting changes for the area that is
+		// dirty, we also need to calculate the effect on casting shadow on
+		// other areas. To do this, we project the dirt rect by the light direction
+		// onto the minimum height
+
+
+		const Vector3& lightVec = TerrainGlobalOptions::getLightMapDirection();
+		Rect widenedRect;
+		widenRectByVector(lightVec, rect, widenedRect);
 		// widenedRect now contains terrain point space version of the area we
 		// need to calculate. However, we need to calculate in lightmap image space
 		float terrainToLightmapScale = (float)mLightmapSizeActual / (float)mSize;
@@ -2785,6 +2869,29 @@ namespace Ogre
 			}
 		}
 
+	}
+	//---------------------------------------------------------------------
+	void Terrain::updateCompositeMap()
+	{
+		// All done in the render thread
+		if (mCompositeMapRequired && mCompositeMapDirtyRect.width() && mCompositeMapDirtyRect.height())
+		{
+			if (mCompositeMapDirtyRectLightmapUpdate)
+			{
+				// widen the dirty rectangle since lighting makes it wider
+				Rect widenedRect;
+				widenRectByVector(TerrainGlobalOptions::getLightMapDirection(), mCompositeMapDirtyRect, widenedRect);
+				mMaterialGenerator->updateCompositeMap(this, widenedRect);	
+			}
+			else
+				mMaterialGenerator->updateCompositeMap(this, mCompositeMapDirtyRect);
+
+			mCompositeMapDirtyRectLightmapUpdate = false;
+			mCompositeMapDirtyRect.left = mCompositeMapDirtyRect.right = 
+				mCompositeMapDirtyRect.top = mCompositeMapDirtyRect.bottom = 0;
+
+
+		}
 	}
 	//---------------------------------------------------------------------
 	uint8 Terrain::getBlendTextureIndex(uint8 layerIndex) const
@@ -2891,6 +2998,47 @@ namespace Ogre
 			// destroy
 			TextureManager::getSingleton().remove(mLightmap->getHandle());
 			mLightmap.setNull();
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::createOrDestroyGPUCompositeMap()
+	{
+		if (mCompositeMapRequired && mCompositeMap.isNull())
+		{
+			// create
+			mCompositeMap = TextureManager::getSingleton().createManual(
+				mMaterialName + "/comp", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+				TEX_TYPE_2D, mCompositeMapSize, mCompositeMapSize, 0, PF_BYTE_RGBA, TU_STATIC);
+
+			mCompositeMapSizeActual = mCompositeMap->getWidth();
+
+			if (mCpuCompositeMapStorage)
+			{
+				// Load cached data
+				PixelBox src(mCompositeMapSize, mCompositeMapSize, 1, PF_BYTE_RGBA, mCpuCompositeMapStorage);
+				mCompositeMap->getBuffer()->blitFromMemory(src);
+				// release CPU copy, don't need it anymore
+				OGRE_FREE(mCpuCompositeMapStorage, MEMCATEGORY_RESOURCE);
+				mCpuCompositeMapStorage = 0;
+
+			}
+			else
+			{
+				// initialise to black
+				Box box(0, 0, mCompositeMapSizeActual, mCompositeMapSizeActual);
+				HardwarePixelBufferSharedPtr buf = mCompositeMap->getBuffer();
+				uint8* pInit = static_cast<uint8*>(buf->lock(box, HardwarePixelBuffer::HBL_DISCARD).data);
+				memset(pInit, 0, mCompositeMapSizeActual * mCompositeMapSizeActual * 4);
+				buf->unlock();
+
+			}
+		}
+		else if (!mCompositeMapRequired && !mCompositeMap.isNull())
+		{
+			// destroy
+			TextureManager::getSingleton().remove(mCompositeMap->getHandle());
+			mCompositeMap.setNull();
 		}
 
 	}

@@ -77,6 +77,7 @@ namespace Ogre
 		, mLayerSpecularMappingEnabled(true)
 		, mGlobalColourMapEnabled(true)
 		, mLightmapEnabled(true)
+		, mCompositeMapEnabled(true)
 	{
 
 	}
@@ -91,6 +92,7 @@ namespace Ogre
 		terrain->_setMorphRequired(true);
 		terrain->_setNormalMapRequired(true);
 		terrain->_setLightMapRequired(mLightmapEnabled, true);
+		terrain->_setCompositeMapRequired(mCompositeMapEnabled);
 	}
 	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::setLayerNormalMappingEnabled(bool enabled)
@@ -134,6 +136,15 @@ namespace Ogre
 		if (enabled != mLightmapEnabled)
 		{
 			mLightmapEnabled = enabled;
+			mParent->_markChanged();
+		}
+	}
+	//---------------------------------------------------------------------
+	void  TerrainMaterialGeneratorA::SM2Profile::setCompositeMapEnabled(bool enabled)
+	{
+		if (enabled != mCompositeMapEnabled)
+		{
+			mCompositeMapEnabled = enabled;
 			mParent->_markChanged();
 		}
 	}
@@ -253,6 +264,17 @@ namespace Ogre
 	void TerrainMaterialGeneratorA::SM2Profile::updateParams(const MaterialPtr& mat, const Terrain* terrain)
 	{
 		mShaderGen->updateParams(this, mat, terrain);
+	}
+	//---------------------------------------------------------------------
+	void TerrainMaterialGeneratorA::SM2Profile::updateCompositeMap(const Terrain* terrain, const Rect& rect)
+	{
+		// TODO
+		// Use a single RTT for all terrains (assuming the sizes are the same, resize if not)
+		// Render an orthographic plane using the terrain material, accessing 
+		// normal maps, lightmaps and blend maps just like the real render would
+		// however turn off specular effects, parallax mapping and any other camera-relative calculations
+		// Encode diffuse result in RGB and specular in A
+
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------

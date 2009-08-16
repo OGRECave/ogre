@@ -181,6 +181,8 @@ namespace Ogre
 			virtual MaterialPtr generate(const Terrain* terrain) = 0;
 			/// Get the number of layers supported
 			virtual uint8 getMaxLayers(const Terrain* terrain) const = 0;
+			/// Update the composite map for a terrain
+			virtual void updateCompositeMap(const Terrain* terrain, const Rect& rect) = 0;
 
 			/// Update params for a terrain
 			virtual void updateParams(const MaterialPtr& mat, const Terrain* terrain) = 0;
@@ -285,7 +287,7 @@ namespace Ogre
 		/** Get the maximum number of layers supported with the given terrain. 
 		@note When you change the options on the terrain, this value can change. 
 		*/
-		uint8 getMaxLayers(const Terrain* terrain) const
+		virtual uint8 getMaxLayers(const Terrain* terrain) const
 		{
 			Profile* p = getActiveProfile();
 			if (p)
@@ -293,6 +295,22 @@ namespace Ogre
 			else
 				return 0;
 		}
+
+		/** Update the composite map for a terrain.
+		The composite map for a terrain must match what the terrain should look like
+		at distance. This method will only be called in the render thread so the
+		generator is free to render into a texture to support this, so long as 
+		the results are blitted into the Terrain's own composite map afterwards.
+		*/
+		virtual void updateCompositeMap(const Terrain* terrain, const Rect& rect)
+		{
+			Profile* p = getActiveProfile();
+			if (!p)
+				return;
+			else
+				p->updateCompositeMap(terrain, rect);
+		}
+
 
 		/** Update parameters for the given terrain using the active profile.
 		*/

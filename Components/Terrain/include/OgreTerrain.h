@@ -235,7 +235,7 @@ namespace Ogre
 	<tr>
 		<td><b>Derived data type name</b></td>
 		<td><b>String</b></td>
-		<td><b>Name of the derived data type ('normalmap', 'lightmap', 'colourmap' etc)</b></td>
+		<td><b>Name of the derived data type ('normalmap', 'lightmap', 'colourmap', 'compositemap')</b></td>
 	</tr>
 	<tr>
 		<td><b>Size</b></td>
@@ -759,6 +759,15 @@ namespace Ogre
 		/// Get access to the lightmap, if enabled (as requested by the material generator)
 		const TexturePtr& getLightmap() const { return mLightmap; }
 
+		/** Get the requested size of composite map for this terrain. 
+		Note that where hardware limits this, the actual texture may be lower
+		resolution. This option is derived from TerrainGlobalOptions when the
+		terrain is created.
+		*/
+		uint16 getCompositeMapSize() const { return mCompositeMapSize; }
+
+		/// Get access to the composite map, if enabled (as requested by the material generator)
+		const TexturePtr& getCompositeMap() const { return mCompositeMap; }
 
 		/// Get the world position of the terrain centre
 		const Vector3& getPosition() const { return mPos; }
@@ -792,6 +801,7 @@ namespace Ogre
 			<li>The terrain error metrics which determine LOD transitions</li>
 			<li>The terrain normal map, if present</li>
 			<li>The terrain lighting map, if present</li>
+			<li>The terrain composite map, if present</li>
 			</ol>
 			If threading is enabled, only item 1 (the geometry) will be updated
 			synchronously, ie will be fully up to date when this method returns.
@@ -992,6 +1002,13 @@ namespace Ogre
 		/// Get access to the global colour map, if enabled
 		const TexturePtr& getGlobalColourMap() const { return mColourMap; }
 
+		/** Widen a rectangular area of terrain to take into account an extrusion vector.
+		@param vec A vector in world space
+		@param inRect Input rectangle
+		@param inRect Output rectangle
+		*/
+		void widenRectByVector(const Vector3& vec, const Rect& inRect, Rect& outRect);
+
 
 		/** Free as many resources as possible for optimal run-time memory use.
 		@remarks
@@ -1060,6 +1077,26 @@ namespace Ogre
 		*/
 		void _setLightMapRequired(bool lightMap, bool shadowsOnly = false);
 
+		/** Request internal implementation options for the terrain material to use, 
+		in this case a terrain-wide composite map. 
+		The TerrainMaterialGenerator should call this method to specify the 
+		options it would like to use when creating a material. Not all the data
+		is guaranteed to be up to date on return from this method - for example some
+		maps may be generated in the background. However, on return from this method
+		all the features that are requested will be referenceable by materials, the
+		data may just take a few frames to be fully populated.
+		@param compositeMap Whether a terrain-wide composite map is needed. A composite
+		map is a texture with all of the blending and lighting baked in, such that
+		at distance this texture can be used as an approximation of the multi-layer
+		blended material. It is actually up to the material generator to render this
+		composite map, because obviously precisely what it looks like depends on what
+		the main material looks like. For this reason, the composite map is one piece
+		of derived terrain data that is always calculated in the render thread, and
+		usually on the GPU. It is expected that if this option is requested, 
+		the material generator will use it to construct distant LOD techniques.
+		*/
+		void _setCompositeMapRequired(bool compositeMap);
+
 		/// WorkQueue::RequestHandler override
 		bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
 		/// WorkQueue::RequestHandler override
@@ -1098,6 +1135,7 @@ namespace Ogre
 		void createOrDestroyGPUNormalMap();
 		void createOrDestroyGPUColourMap();
 		void createOrDestroyGPULightmap();
+		void createOrDestroyGPUCompositeMap();
 		void waitForDerivedProcesses();
 		void convertSpace(Space inSpace, const Vector3& inVec, Space outSpace, Vector3& outVec, bool translation);
 		Vector3 convertWorldToTerrainAxes(const Vector3& inVec);
@@ -1122,6 +1160,7 @@ namespace Ogre
 		PixelFormat getBlendTextureFormat(uint8 textureIndex, uint8 numLayers);
 
 		void updateDerivedDataImpl(const Rect& rect, bool synchronous, uint8 typeMask);
+		void updateCompositeMap();
 
 		
 
@@ -1214,22 +1253,30 @@ namespace Ogre
 		TexturePtr mLightmap;
 		uint8* mCpuLightmapStorage;
 
+		uint16 mCompositeMapSize;
+		uint16 mCompositeMapSizeActual;
+		TexturePtr mCompositeMap;
+		uint8* mCpuCompositeMapStorage;
+		Rect mCompositeMapDirtyRect;
+		/// true if the updates included lightmap changes (widen)
+		bool mCompositeMapDirtyRectLightmapUpdate;
+
+
 		static NameGenerator msBlendTextureGenerator;
 		static NameGenerator msNormalMapNameGenerator;
 		static NameGenerator msLightmapNameGenerator;
+		static NameGenerator msCompositeMapNameGenerator;
 
 		bool mLodMorphRequired;
 		bool mNormalMapRequired;
 		bool mLightMapRequired;
 		bool mLightMapShadowsOnly;
+		bool mCompositeMapRequired;
 		/// Texture storing normals for the whole terrrain
 		TexturePtr mTerrainNormalMap;
-		/// Texture storing lighting for the whole terrrain
-		TexturePtr mTerrainLightmap;
 
 		/// Pending data 
 		PixelBox* mCpuTerrainNormalMap;
-		PixelBox* mCpuTerrainLightMap;
 
 		const Camera* mLastLODCamera;
 		unsigned long mLastLODFrame;
@@ -1260,6 +1307,7 @@ namespace Ogre
 		static Real msDefaultLayerTextureWorldSize;
 		static uint16 msDefaultGlobalColourMapSize;
 		static uint16 msLightmapSize;
+		static uint16 msCompositeMapSize;
 	public:
 
 
@@ -1372,6 +1420,13 @@ namespace Ogre
 		*/
 		static void setLightMapSize(uint16 sz) { msLightmapSize = sz;}
 
+		/** Get the default size of the composite maps for a new terrain. 
+		*/
+		static uint16 getCompositeMapSize() { return msCompositeMapSize; }
+
+		/** Sets the default size of composite maps for a new terrain.
+		*/
+		static void setCompositeMapSize(uint16 sz) { msCompositeMapSize = sz;}
 
 	};
 

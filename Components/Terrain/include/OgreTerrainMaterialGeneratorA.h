@@ -63,6 +63,7 @@ namespace Ogre
 			SM2Profile(TerrainMaterialGenerator* parent, const String& name, const String& desc);
 			~SM2Profile();
 			MaterialPtr generate(const Terrain* terrain);
+			void updateCompositeMap(const Terrain* terrain, const Rect& rect);
 			uint8 getMaxLayers(const Terrain* terrain) const;
 			void updateParams(const MaterialPtr& mat, const Terrain* terrain);
 			void requestOptions(Terrain* terrain);
@@ -101,6 +102,14 @@ namespace Ogre
 			if it's present (default true). 
 			*/
 			void setLightmapEnabled(bool enabled);
+			/** Whether to use the composite map to provide a lower LOD technique
+				in the distance (default true). 
+			*/
+			bool isCompositeMapEnabled() const  { return mCompositeMapEnabled; }
+			/** Whether to use the composite map to provide a lower LOD technique
+			in the distance (default true). 
+			*/
+			void setCompositeMapEnabled(bool enabled);
 		
 		protected:
 			/// Interface definition for helper class to generate shaders
@@ -172,6 +181,7 @@ namespace Ogre
 			bool mLayerSpecularMappingEnabled;
 			bool mGlobalColourMapEnabled;
 			bool mLightmapEnabled;
+			bool mCompositeMapEnabled;
 
 		};
 
