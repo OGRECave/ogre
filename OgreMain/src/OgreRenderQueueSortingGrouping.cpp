@@ -268,6 +268,16 @@ namespace Ogre {
 		mTransparents.sort(cam);
 	}
     //-----------------------------------------------------------------------
+	void RenderPriorityGroup::merge( const RenderPriorityGroup* rhs )
+	{
+		mSolidsBasic.merge( rhs->mSolidsBasic );
+		mSolidsDecal.merge( rhs->mSolidsDecal );
+		mSolidsDiffuseSpecular.merge( rhs->mSolidsDiffuseSpecular );
+		mSolidsNoShadowReceive.merge( rhs->mSolidsNoShadowReceive );
+		mTransparentsUnsorted.merge( rhs->mTransparentsUnsorted );
+		mTransparents.merge( rhs->mTransparents );
+	}
+	//-----------------------------------------------------------------------
 	QueuedRenderableCollection::QueuedRenderableCollection(void)
 		:mOrganisationMode(0)
 	{
@@ -469,6 +479,34 @@ namespace Ogre {
 			visitor->visit(const_cast<RenderablePass*>(&(*i)));
 		}
 
+	}
+    //-----------------------------------------------------------------------
+	void QueuedRenderableCollection::merge( const QueuedRenderableCollection& rhs )
+	{
+		mSortedDescending.insert( mSortedDescending.end(), rhs.mSortedDescending.begin(), rhs.mSortedDescending.end() );
+
+		PassGroupRenderableMap::const_iterator srcGroup;
+		for( srcGroup = rhs.mGrouped.begin(); srcGroup != rhs.mGrouped.end(); ++srcGroup )
+		{
+            PassGroupRenderableMap::iterator dstGroup = mGrouped.find( srcGroup->first );
+            if (dstGroup == mGrouped.end())
+            {
+                std::pair<PassGroupRenderableMap::iterator, bool> retPair;
+                // Create new pass entry, build a new list
+                // Note that this pass and list are never destroyed until the 
+				// engine shuts down, or a pass is destroyed or has it's hash
+				// recalculated, although the lists will be cleared
+                retPair = mGrouped.insert(
+                    PassGroupRenderableMap::value_type(
+						srcGroup->first, OGRE_NEW_T(RenderableList, MEMCATEGORY_SCENE_CONTROL)() ));
+                assert(retPair.second && 
+					"Error inserting new pass entry into PassGroupRenderableMap");
+                dstGroup = retPair.first;
+            }
+
+			// Insert renderable
+            dstGroup->second->insert( dstGroup->second->end(), srcGroup->second->begin(), srcGroup->second->end() );
+		}
 	}
 
 

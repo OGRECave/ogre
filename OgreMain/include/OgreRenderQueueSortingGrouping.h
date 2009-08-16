@@ -296,7 +296,10 @@ namespace Ogre {
 			call before any renderables were added.
 		*/
 		void acceptVisitor(QueuedRenderableVisitor* visitor, OrganisationMode om) const;
-		
+
+		/** Merge renderable collection. 
+		*/
+		void merge( const QueuedRenderableCollection& rhs );
 	};
 
 	/** Collection of renderables by priority.
@@ -445,6 +448,9 @@ namespace Ogre {
 			mShadowCastersNotReceivers = ind;
 		}
 
+		/** Merge group of renderables. 
+		*/
+		void merge( const RenderPriorityGroup* rhs );
 
 
     };
@@ -462,6 +468,7 @@ namespace Ogre {
     public:
         typedef map<ushort, RenderPriorityGroup*, std::less<ushort> >::type PriorityMap;
         typedef MapIterator<PriorityMap> PriorityMapIterator;
+        typedef ConstMapIterator<PriorityMap> ConstPriorityMapIterator;
     protected:
         RenderQueue* mParent;
         bool mSplitPassesByLightingType;
@@ -502,6 +509,12 @@ namespace Ogre {
         PriorityMapIterator getIterator(void)
         {
             return PriorityMapIterator(mPriorityGroups.begin(), mPriorityGroups.end());
+        }
+
+        /** Get a const iterator for browsing through child contents. */
+        ConstPriorityMapIterator getIterator(void) const
+        {
+            return ConstPriorityMapIterator(mPriorityGroups.begin(), mPriorityGroups.end());
         }
 
         /** Add a renderable to this group, with the given priority. */
@@ -670,6 +683,44 @@ namespace Ogre {
 			}
 		}
 
+		/** Merge group of renderables. 
+		*/
+		void merge( const RenderQueueGroup* rhs )
+		{
+			ConstPriorityMapIterator it = rhs->getIterator();
+
+			while( it.hasMoreElements() )
+			{
+				ushort priority = it.peekNextKey();
+				RenderPriorityGroup* pSrcPriorityGrp = it.getNext();
+				RenderPriorityGroup* pDstPriorityGrp;
+
+				// Check if priority group is there
+				PriorityMap::iterator i = mPriorityGroups.find(priority);
+				if (i == mPriorityGroups.end())
+				{
+					// Missing, create
+					pDstPriorityGrp = OGRE_NEW RenderPriorityGroup(this, 
+						mSplitPassesByLightingType,
+						mSplitNoShadowPasses, 
+						mShadowCastersNotReceivers);
+					if (mOrganisationMode)
+					{
+						pDstPriorityGrp->resetOrganisationModes();
+						pDstPriorityGrp->addOrganisationMode((QueuedRenderableCollection::OrganisationMode)mOrganisationMode);
+					}
+
+					mPriorityGroups.insert(PriorityMap::value_type(priority, pDstPriorityGrp));
+				}
+				else
+				{
+					pDstPriorityGrp = i->second;
+				}
+
+				// merge
+				pDstPriorityGrp->merge( pSrcPriorityGrp );
+			}
+		}
     };
 
 	/** @} */
