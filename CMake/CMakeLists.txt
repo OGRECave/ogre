@@ -28,7 +28,6 @@ set(INST_FILES
   Utils/OgreConfigTargets.cmake
   Utils/OgreGetVersion.cmake
   Utils/OgreFindFrameworks.cmake
-  Templates/VisualStudioUserFile.vcproj.user.in
 ) 
 set(STATIC_INST_FILES
   Packages/FindCg.cmake
@@ -39,6 +38,12 @@ set(STATIC_INST_FILES
   Packages/FindZLIB.cmake
   Packages/FindZZip.cmake
 )
+if (WIN32)
+  set(INST_FILES ${INST_FILES}
+    Templates/VisualStudioUserFile.vcproj.user.in
+  )
+endif ()
+
 if (APPLE)
   set(INST_FILES ${INST_FILES}
     Packages/FindIOKit.cmake
