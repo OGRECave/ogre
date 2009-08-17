@@ -33,6 +33,7 @@ Torus Knot Software Ltd.
 #include "OgreTerrainPrerequisites.h"
 #include "OgrePixelFormat.h"
 #include "OgreMaterial.h"
+#include "OgreTexture.h"
 
 namespace Ogre
 {
@@ -179,26 +180,25 @@ namespace Ogre
 			
 			/// Generate / resuse a material for the terrain
 			virtual MaterialPtr generate(const Terrain* terrain) = 0;
+			/// Generate / resuse a material for the terrain
+			virtual MaterialPtr generateForCompositeMap(const Terrain* terrain) = 0;
 			/// Get the number of layers supported
 			virtual uint8 getMaxLayers(const Terrain* terrain) const = 0;
 			/// Update the composite map for a terrain
-			virtual void updateCompositeMap(const Terrain* terrain, const Rect& rect) = 0;
+			virtual void updateCompositeMap(const Terrain* terrain, const Rect& rect);
 
 			/// Update params for a terrain
 			virtual void updateParams(const MaterialPtr& mat, const Terrain* terrain) = 0;
+			/// Update params for a terrain
+			virtual void updateParamsForCompositeMap(const MaterialPtr& mat, const Terrain* terrain) = 0;
 
 			/// Request the options needed from the terrain
 			virtual void requestOptions(Terrain* terrain) = 0;
 
 		};
 
-		TerrainMaterialGenerator() 
-			: mActiveProfile(0), mChangeCounter(0), mDebugLevel(0) {}
-		virtual ~TerrainMaterialGenerator()
-		{
-			for (ProfileList::iterator i = mProfiles.begin(); i != mProfiles.end(); ++i)
-				OGRE_DELETE *i;
-		}
+		TerrainMaterialGenerator();
+		virtual ~TerrainMaterialGenerator();
 
 		/// List of profiles - NB should be ordered in descending complexity
 		typedef vector<Profile*>::type ProfileList;
@@ -284,6 +284,16 @@ namespace Ogre
 			else
 				return p->generate(terrain);
 		}
+		/** Generate a material for the given composite map of the terrain using the active profile.
+		*/
+		virtual MaterialPtr generateForCompositeMap(const Terrain* terrain)
+		{
+			Profile* p = getActiveProfile();
+			if (!p)
+				return MaterialPtr();
+			else
+				return p->generateForCompositeMap(terrain);
+		}
 		/** Get the maximum number of layers supported with the given terrain. 
 		@note When you change the options on the terrain, this value can change. 
 		*/
@@ -320,6 +330,14 @@ namespace Ogre
 			if (p)
 				p->updateParams(mat, terrain);
 		}
+		/** Update parameters for the given terrain composite map using the active profile.
+		*/
+		virtual void updateParamsForCompositeMap(const MaterialPtr& mat, const Terrain* terrain)
+		{
+			Profile* p = getActiveProfile();
+			if (p)
+				p->updateParamsForCompositeMap(mat, terrain);
+		}
 
 		/** Set the debug level of the material. 
 		@remarks
@@ -339,6 +357,16 @@ namespace Ogre
 		}
 		/// Get the debug level of the material. 
 		virtual unsigned int getDebugLevel() const { return mDebugLevel; }
+
+		/** Helper method to render a composite map.
+		@param size The requested composite map size
+		@param rect The region of the composite map to update, in image space
+		@param mat The material to use to render the map
+		@param outBox The box region of the texture which has been updated, and
+			should be copied into your final texture
+		*/
+		virtual void _renderCompositeMap(size_t size, const Rect& rect, 
+			const MaterialPtr& mat, const TexturePtr& destCompositeMap);
 	protected:
 
 		ProfileList mProfiles;
@@ -346,6 +374,11 @@ namespace Ogre
 		unsigned long long int mChangeCounter;
 		TerrainLayerDeclaration mLayerDecl;
 		unsigned int mDebugLevel;
+		SceneManager* mCompositeMapSM;
+		Camera* mCompositeMapCam;
+		Texture* mCompositeMapRTT; // deliberately holding this by raw pointer to avoid shutdown issues
+		ManualObject* mCompositeMapPlane;
+		Light* mCompositeMapLight;
 
 
 

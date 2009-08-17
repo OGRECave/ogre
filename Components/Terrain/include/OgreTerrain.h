@@ -382,6 +382,8 @@ namespace Ogre
 
 		};
 
+		SceneManager* getSceneManager() const { return mSceneMgr; }
+
 		/// Enumeration of relative spaces that you might want to use to address the terrain
 		enum Space
 		{
@@ -405,28 +407,28 @@ namespace Ogre
 		@param outSpace The space which outPos should be expressed as
 		@param outPos The output position to be populated
 		*/
-		void convertPosition(Space inSpace, const Vector3& inPos, Space outSpace, Vector3& outPos);
+		void convertPosition(Space inSpace, const Vector3& inPos, Space outSpace, Vector3& outPos) const;
 		/** Convert a position from one space to another with respect to this terrain.
 		@param inSpace The space that inPos is expressed as
 		@param inPos The incoming position
 		@param outSpace The space which outPos should be expressed as
 		@returns The output position 
 		*/
-		Vector3 convertPosition(Space inSpace, const Vector3& inPos, Space outSpace);
+		Vector3 convertPosition(Space inSpace, const Vector3& inPos, Space outSpace) const;
 		/** Convert a direction from one space to another with respect to this terrain.
 		@param inSpace The space that inDir is expressed as
 		@param inDir The incoming direction
 		@param outSpace The space which outDir should be expressed as
 		@param outDir The output direction to be populated
 		*/
-		void convertDirection(Space inSpace, const Vector3& inDir, Space outSpace, Vector3& outDir);
+		void convertDirection(Space inSpace, const Vector3& inDir, Space outSpace, Vector3& outDir) const;
 		/** Convert a direction from one space to another with respect to this terrain.
 		@param inSpace The space that inDir is expressed as
 		@param inDir The incoming direction
 		@param outSpace The space which outDir should be expressed as
 		@returns The output direction 
 		*/
-		Vector3 convertDirection(Space inSpace, const Vector3& inDir, Space outSpace);
+		Vector3 convertDirection(Space inSpace, const Vector3& inDir, Space outSpace) const;
 
 		/** Save terrain data in native form to a standalone file
 		@note
@@ -931,6 +933,10 @@ namespace Ogre
 		const MaterialPtr& getMaterial() const;
 		/// Internal getting of material 
 		const MaterialPtr& _getMaterial() const { return mMaterial; }
+		/// Get the material being used for the terrain composite map
+		const MaterialPtr& getCompositeMapMaterial() const;
+		/// Internal getting of material  for the terrain composite map
+		const MaterialPtr& _getCompositeMapMaterial() const { return mCompositeMapMaterial; }
 
 		/// Get the name of the material being used for the terrain
 		const String& getMaterialName() const { return mMaterialName; }
@@ -1137,9 +1143,9 @@ namespace Ogre
 		void createOrDestroyGPULightmap();
 		void createOrDestroyGPUCompositeMap();
 		void waitForDerivedProcesses();
-		void convertSpace(Space inSpace, const Vector3& inVec, Space outSpace, Vector3& outVec, bool translation);
-		Vector3 convertWorldToTerrainAxes(const Vector3& inVec);
-		Vector3 convertTerrainToWorldAxes(const Vector3& inVec);
+		void convertSpace(Space inSpace, const Vector3& inVec, Space outSpace, Vector3& outVec, bool translation) const;
+		Vector3 convertWorldToTerrainAxes(const Vector3& inVec) const;
+		Vector3 convertTerrainToWorldAxes(const Vector3& inVec) const;
 		/** Get a Vector3 of the world-space point on the terrain, aligned Y-up always.
 		@note This point is relative to Terrain::getPosition
 		*/
@@ -1260,6 +1266,7 @@ namespace Ogre
 		Rect mCompositeMapDirtyRect;
 		/// true if the updates included lightmap changes (widen)
 		bool mCompositeMapDirtyRectLightmapUpdate;
+		mutable MaterialPtr mCompositeMapMaterial;
 
 
 		static NameGenerator msBlendTextureGenerator;
@@ -1308,6 +1315,9 @@ namespace Ogre
 		static uint16 msDefaultGlobalColourMapSize;
 		static uint16 msLightmapSize;
 		static uint16 msCompositeMapSize;
+		static ColourValue msCompositeMapAmbient;
+		static ColourValue msCompositeMapDiffuse;
+		static Real msCompositeMapDistance;
 	public:
 
 
@@ -1325,6 +1335,18 @@ namespace Ogre
 		static const Vector3& getLightMapDirection() { return msLightMapDir; }
 		/** Set the shadow map light direction to use (world space). */
 		static void setLightMapDirection(const Vector3& v) { msLightMapDir = v; }
+		/// Get the composite map ambient light to use 
+		static const ColourValue& getCompositeMapAmbient() { return msCompositeMapAmbient; }
+		/// Set the composite map ambient light to use 
+		static void setCompositeMapAmbient(const ColourValue& c) { msCompositeMapAmbient = c; }
+		/// Get the composite map iffuse light to use 
+		static const ColourValue& getCompositeMapDiffuse() { return msCompositeMapDiffuse; }
+		/// Set the composite map diffuse light to use 
+		static void setCompositeMapDiffuse(const ColourValue& c) { msCompositeMapDiffuse = c; }
+		/// Get the distance at which to start using a composite map if present
+		static Real getCompositeMapDistance() { return msCompositeMapDistance; }
+		/// Set the distance at which to start using a composite map if present
+		static void setCompositeMapDistance(Real c) { msCompositeMapDistance = c; }
 
 
 		/** Whether the terrain will be able to cast shadows (texture shadows

@@ -26,6 +26,7 @@ set (HEADER_FILES
 set (SOURCE_FILES
 	src/OgreTerrain.cpp
 	src/OgreTerrainLayerBlendMap.cpp
+	src/OgreTerrainMaterialGenerator.cpp
 	src/OgreTerrainMaterialGeneratorA.cpp
 	src/OgreTerrainQuadTreeNode.cpp
 )

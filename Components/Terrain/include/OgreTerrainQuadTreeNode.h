@@ -274,6 +274,7 @@ namespace Ogre
 		AxisAlignedBox mAABB; //relative to mLocalCentre
 		Real mBoundingRadius; //relative to mLocalCentre
 		int mCurrentLod; // -1 = none (do not render)
+		unsigned short mMaterialLodIndex;
 		float mLodTransition; // 0-1 transition to lower LOD
 		/// The child with the largest height delta 
 		TerrainQuadTreeNode* mChildWithMaxHeightDelta;
@@ -353,7 +354,6 @@ namespace Ogre
 			~Rend();
 
 			const MaterialPtr& getMaterial(void) const;
-			// TODO material LOD
 			Technique* getTechnique(void) const;
 			void getRenderOperation(RenderOperation& op);
 			void getWorldTransforms(Matrix4* xform) const;
@@ -370,7 +370,6 @@ namespace Ogre
 		void visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables = false);
 		// actual implementations of Renderable methods
 		const MaterialPtr& getMaterial(void) const;
-		// TODO material LOD
 		Technique* getTechnique(void) const;
 		void getRenderOperation(RenderOperation& op);
 		void getWorldTransforms(Matrix4* xform) const;

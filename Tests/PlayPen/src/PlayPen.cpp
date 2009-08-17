@@ -8065,12 +8065,14 @@ protected:
 		lightdir.normalise();
 
 
-		// Until material implemented
 		TerrainGlobalOptions::setMaxPixelError(8);
+		// testing composite map
+		//TerrainGlobalOptions::setCompositeMapDistance(2000);
 		//TerrainGlobalOptions::setUseRayBoxDistanceCalculation(true);
 		//TerrainGlobalOptions::getDefaultMaterialGenerator()->setDebugLevel(1);
 		//TerrainGlobalOptions::setLightMapSize(256);
-		TerrainGlobalOptions::setLightMapDirection(lightdir);
+
+
 
 		Light* l = mSceneMgr->createLight("tstLight");
 		l->setType(Light::LT_DIRECTIONAL);
@@ -8081,6 +8083,10 @@ protected:
 		mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
 		
+		// Important to set these so that the terrain knows what to use for derived (non-realtime) data
+		TerrainGlobalOptions::setLightMapDirection(lightdir);
+		TerrainGlobalOptions::setCompositeMapAmbient(mSceneMgr->getAmbientLight());
+		TerrainGlobalOptions::setCompositeMapDiffuse(l->getDiffuseColour());
 
 		//mSceneMgr->showBoundingBoxes(true);
 		if (loadTerrain)
@@ -8124,6 +8130,8 @@ protected:
 		{
 			mTerrain->save(filename);
 		}
+
+		addTextureDebugOverlay(mTerrain->getCompositeMap(), 0);
 
 	}
 
@@ -8355,8 +8363,8 @@ protected:
 
         //testLod();
 		//testSharedGpuParameters();
-		testNewTerrain(false);
-		//testNewTerrain(true);
+		//testNewTerrain(false);
+		testNewTerrain(true);
 		//testTwoNewTerrains();
 		//testImageCombine();
 		//testNewTerrain(true, false, "flatterrain.dat");

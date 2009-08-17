@@ -46,6 +46,7 @@ Torus Knot Software Ltd.
 #include "OgreRay.h"
 #include "OgrePlane.h"
 #include "OgreTerrainMaterialGeneratorA.h"
+#include "OgreMaterialManager.h"
 
 namespace Ogre
 {
@@ -88,6 +89,10 @@ namespace Ogre
 	uint16 TerrainGlobalOptions::msDefaultGlobalColourMapSize = 1024;
 	uint16 TerrainGlobalOptions::msLightmapSize = 1024;
 	uint16 TerrainGlobalOptions::msCompositeMapSize = 1024;
+	ColourValue TerrainGlobalOptions::msCompositeMapAmbient = ColourValue::White;
+	ColourValue TerrainGlobalOptions::msCompositeMapDiffuse = ColourValue::White;
+	// set the default composite map usage really high for now since has some artefacts
+	Real TerrainGlobalOptions::msCompositeMapDistance = 10000;
 	//---------------------------------------------------------------------
 	void TerrainGlobalOptions::setDefaultMaterialGenerator(TerrainMaterialGeneratorPtr gen)
 	{
@@ -1083,31 +1088,31 @@ namespace Ogre
 		return &mDeltaData[y * mSize + x];
 	}
 	//---------------------------------------------------------------------
-	Vector3 Terrain::convertPosition(Space inSpace, const Vector3& inPos, Space outSpace)
+	Vector3 Terrain::convertPosition(Space inSpace, const Vector3& inPos, Space outSpace) const
 	{
 		Vector3 ret;
 		convertPosition(inSpace, inPos, outSpace, ret);
 		return ret;
 	}
 	//---------------------------------------------------------------------
-	Vector3 Terrain::convertDirection(Space inSpace, const Vector3& inDir, Space outSpace)
+	Vector3 Terrain::convertDirection(Space inSpace, const Vector3& inDir, Space outSpace) const
 	{
 		Vector3 ret;
 		convertDirection(inSpace, inDir, outSpace, ret);
 		return ret;
 	}
 	//---------------------------------------------------------------------
-	void Terrain::convertPosition(Space inSpace, const Vector3& inPos, Space outSpace, Vector3& outPos)
+	void Terrain::convertPosition(Space inSpace, const Vector3& inPos, Space outSpace, Vector3& outPos) const
 	{
 		convertSpace(inSpace, inPos, outSpace, outPos, true);
 	}
 	//---------------------------------------------------------------------
-	void Terrain::convertDirection(Space inSpace, const Vector3& inDir, Space outSpace, Vector3& outDir)
+	void Terrain::convertDirection(Space inSpace, const Vector3& inDir, Space outSpace, Vector3& outDir) const
 	{
 		convertSpace(inSpace, inDir, outSpace, outDir, false);
 	}
 	//---------------------------------------------------------------------
-	void Terrain::convertSpace(Space inSpace, const Vector3& inVec, Space outSpace, Vector3& outVec, bool translation)
+	void Terrain::convertSpace(Space inSpace, const Vector3& inVec, Space outSpace, Vector3& outVec, bool translation) const
 	{
 		Space currSpace = inSpace;
 		outVec = inVec;
@@ -1172,7 +1177,7 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	Vector3 Terrain::convertWorldToTerrainAxes(const Vector3& inVec)
+	Vector3 Terrain::convertWorldToTerrainAxes(const Vector3& inVec) const
 	{
 		Vector3 ret;
 		switch (mAlign)
@@ -1195,7 +1200,7 @@ namespace Ogre
 		return ret;
 	}
 	//---------------------------------------------------------------------
-	Vector3 Terrain::convertTerrainToWorldAxes(const Vector3& inVec)
+	Vector3 Terrain::convertTerrainToWorldAxes(const Vector3& inVec) const
 	{
 		Vector3 ret;
 		switch (mAlign)
@@ -1689,6 +1694,18 @@ namespace Ogre
 			mCompositeMap.setNull();
 		}
 
+		if (!mMaterial.isNull())
+		{
+			MaterialManager::getSingleton().remove(mMaterial->getHandle());
+			mMaterial.setNull();
+		}
+		if (!mCompositeMapMaterial.isNull())
+		{
+			MaterialManager::getSingleton().remove(mCompositeMapMaterial->getHandle());
+			mCompositeMapMaterial.setNull();
+		}
+
+
 	}
 	//---------------------------------------------------------------------
 	Rect Terrain::calculateHeightDeltas(const Rect& rect)
@@ -2101,15 +2118,30 @@ namespace Ogre
 		{
 			mMaterial = mMaterialGenerator->generate(this);
 			mMaterial->load();
+			if (mCompositeMapRequired)
+			{
+				mCompositeMapMaterial = mMaterialGenerator->generateForCompositeMap(this);
+				mCompositeMapMaterial->load();
+			}
 			mMaterialGenerationCount = mMaterialGenerator->getChangeCount();
 			mMaterialDirty = false;
 		}
 		if (mMaterialParamsDirty)
 		{
 			mMaterialGenerator->updateParams(mMaterial, this);
+			if(mCompositeMapRequired)
+				mMaterialGenerator->updateParamsForCompositeMap(mCompositeMapMaterial, this);
+
 		}
 
 		return mMaterial;
+	}
+	//---------------------------------------------------------------------
+	const MaterialPtr& Terrain::getCompositeMapMaterial() const
+	{
+		// both materials updated together since they change at the same time
+		getMaterial();
+		return mCompositeMapMaterial;
 	}
 	//---------------------------------------------------------------------
 	void Terrain::checkLayers(bool includeGPUResources)
@@ -2403,7 +2435,7 @@ namespace Ogre
 			createOrDestroyGPULightmap();
 
 			// if we enabled, generate light maps
-			if (mNormalMapRequired)
+			if (mLightMapRequired)
 			{
 				// update derived data for whole terrain, but just lightmap
 				mDirtyDerivedDataRect.left = mDirtyDerivedDataRect.top = 0;
@@ -2876,6 +2908,7 @@ namespace Ogre
 		// All done in the render thread
 		if (mCompositeMapRequired && mCompositeMapDirtyRect.width() && mCompositeMapDirtyRect.height())
 		{
+			createOrDestroyGPUCompositeMap();
 			if (mCompositeMapDirtyRectLightmapUpdate)
 			{
 				// widen the dirty rectangle since lighting makes it wider

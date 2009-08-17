@@ -55,6 +55,7 @@ namespace Ogre
 		, mQuadrant(quadrant)
 		, mBoundingRadius(0)
         , mCurrentLod(-1)
+		, mMaterialLodIndex(0)
 		, mLodTransition(0)
 		, mChildWithMaxHeightDelta(0)
 		, mSelfOrChildRendered(false)
@@ -1217,7 +1218,13 @@ namespace Ogre
 				dist -= (mBoundingRadius * 0.5);
 			}
 
-			// TODO: calculate material LOD too
+			// Do material LOD
+			MaterialPtr material = getMaterial();
+			const LodStrategy *materialStrategy = material->getLodStrategy();
+			Real lodValue = materialStrategy->getValue(mMovable, cam);
+			// Get the index at this biased depth
+			mMaterialLodIndex = material->getLodIndex(lodValue);
+
 
 			// For each LOD, the distance at which the LOD will transition *downwards*
 			// is given by 
@@ -1380,8 +1387,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	Technique* TerrainQuadTreeNode::getTechnique(void) const
 	{ 
-		// TODO material LOD
-		return getMaterial()->getBestTechnique(0, mRend); 
+		return getMaterial()->getBestTechnique(mMaterialLodIndex, mRend); 
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::getRenderOperation(RenderOperation& op)
