@@ -85,33 +85,6 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void TerrainLayerBlendMap::upload()
-	{
-		if (mData && mDirty)
-		{
-			// Upload data
-			float* pSrcBase = mData + mDirtyBox.top * mBuffer->getWidth() + mDirtyBox.left;
-			uint8* pDstBase = static_cast<uint8*>(mBuffer->lock(mDirtyBox, HardwarePixelBuffer::HBL_NORMAL).data);
-			pDstBase += mChannelOffset;
-			size_t dstInc = PixelUtil::getNumElemBytes(mBuffer->getFormat());
-			for (size_t y = 0; y < mDirtyBox.getHeight(); ++y)
-			{
-				float* pSrc = pSrcBase + y * mBuffer->getWidth();
-				uint8* pDst = pDstBase + y * mBuffer->getWidth() * dstInc;
-				for (size_t x = 0; x < mDirtyBox.getWidth(); ++x)
-				{
-					*pDst = static_cast<uint8>(*pSrc++ * 255);
-					pDst += dstInc;
-				}
-			}
-			mBuffer->unlock();
-
-			mDirty = false;
-
-		}
-
-	}
-	//---------------------------------------------------------------------
 	void TerrainLayerBlendMap::convertWorldToUVSpace(const Vector3& worldPos, Real *outX, Real* outY)
 	{
 		Vector3 terrainSpace;
@@ -195,7 +168,39 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void TerrainLayerBlendMap::update()
 	{
-		upload();
+		if (mData && mDirty)
+		{
+			// Upload data
+			float* pSrcBase = mData + mDirtyBox.top * mBuffer->getWidth() + mDirtyBox.left;
+			uint8* pDstBase = static_cast<uint8*>(mBuffer->lock(mDirtyBox, HardwarePixelBuffer::HBL_NORMAL).data);
+			pDstBase += mChannelOffset;
+			size_t dstInc = PixelUtil::getNumElemBytes(mBuffer->getFormat());
+			for (size_t y = 0; y < mDirtyBox.getHeight(); ++y)
+			{
+				float* pSrc = pSrcBase + y * mBuffer->getWidth();
+				uint8* pDst = pDstBase + y * mBuffer->getWidth() * dstInc;
+				for (size_t x = 0; x < mDirtyBox.getWidth(); ++x)
+				{
+					*pDst = static_cast<uint8>(*pSrc++ * 255);
+					pDst += dstInc;
+				}
+			}
+			mBuffer->unlock();
+
+			mDirty = false;
+
+			// make sure composite map is updated
+			// mDirtyBox is in image space, convert to terrain units
+			Rect compositeMapRect;
+			float blendToTerrain = (float)mParent->getSize() / (float)mBuffer->getWidth();
+			compositeMapRect.left = mDirtyBox.left * blendToTerrain;
+			compositeMapRect.right = mDirtyBox.right * blendToTerrain;
+			compositeMapRect.top = (mBuffer->getHeight() - mDirtyBox.bottom) * blendToTerrain;
+			compositeMapRect.bottom = (mBuffer->getHeight() - mDirtyBox.top) * blendToTerrain;
+			mParent->_dirtyCompositeMapRect(compositeMapRect);
+			mParent->updateCompositeMapWithDelay();
+
+		}
 	}
 	//---------------------------------------------------------------------
 	void TerrainLayerBlendMap::blit(const PixelBox &src, const Box &dstBox)

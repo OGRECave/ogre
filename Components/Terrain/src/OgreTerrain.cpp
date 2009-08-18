@@ -134,6 +134,8 @@ namespace Ogre
 		, mCpuLightmapStorage(0)
 		, mCpuCompositeMapStorage(0)
 		, mCompositeMapDirtyRect(0, 0, 0, 0)
+		, mCompositeMapUpdateCountdown(0)
+		, mLastMillis(0)
 		, mCompositeMapDirtyRectLightmapUpdate(false)
 		, mLodMorphRequired(false)
 		, mNormalMapRequired(false)
@@ -1559,6 +1561,11 @@ namespace Ogre
 		mCompositeMapDirtyRect.merge(rect);
 	}
 	//---------------------------------------------------------------------
+	void Terrain::_dirtyCompositeMapRect(const Rect& rect)
+	{
+		mCompositeMapDirtyRect.merge(rect);
+	}
+	//---------------------------------------------------------------------
 	void Terrain::update(bool synchronous)
 	{
 		updateGeometry();
@@ -1592,6 +1599,13 @@ namespace Ogre
 					mDirtyDerivedDataRect.right = mDirtyDerivedDataRect.bottom = 0;
 
 			}
+		}
+		else
+		{
+			// Usually the composite map is updated after the other background
+			// data is updated (no point doing it beforehand), but if there's
+			// nothing to update, then we'll do it right now.
+			updateCompositeMap();
 		}
 
 
@@ -1890,6 +1904,20 @@ namespace Ogre
 	void Terrain::preFindVisibleObjects(SceneManager* source, 
 		SceneManager::IlluminationRenderStage irs, Viewport* v)
 	{
+		// check deferred updates
+		unsigned long currMillis = Root::getSingleton().getTimer()->getMilliseconds();
+		unsigned long elapsedMillis = currMillis - mLastMillis;
+		if (mCompositeMapUpdateCountdown > 0 && elapsedMillis)
+		{
+			if (elapsedMillis > mCompositeMapUpdateCountdown)
+				mCompositeMapUpdateCountdown = 0;
+			else
+				mCompositeMapUpdateCountdown -= elapsedMillis;
+
+			if (!mCompositeMapUpdateCountdown)
+				updateCompositeMap();
+		}
+		mLastMillis = currMillis;
 		// only calculate LOD once per LOD camera, per frame
 		// shadow renders will pick up LOD camera from main viewport and so LOD will only
 		// be calculated once for that case
@@ -2930,6 +2958,11 @@ namespace Ogre
 
 
 		}
+	}
+	//---------------------------------------------------------------------
+	void Terrain::updateCompositeMapWithDelay(Real delay)
+	{
+		mCompositeMapUpdateCountdown = delay * 1000;
 	}
 	//---------------------------------------------------------------------
 	uint8 Terrain::getBlendTextureIndex(uint8 layerIndex) const

@@ -795,6 +795,13 @@ namespace Ogre
 		*/
 		void dirtyRect(const Rect& rect);
 
+		/** Mark a region of the terrain composite map as dirty. 
+		@remarks
+			You don't usually need to call this directly, it is inferred from 
+			changing the other data on the terrain.
+		*/
+		void _dirtyCompositeMapRect(const Rect& rect);
+
 		/** Trigger the update process for the terrain.
 		@remarks
 			Updating the terrain will process any dirty sections of the terrain.
@@ -843,6 +850,31 @@ namespace Ogre
 		@param typeMask Mask indicating the types of data we should generate
 		*/
 		void updateDerivedData(bool synchronous = false, uint8 typeMask = 0xFF);
+
+		/** Performs an update on the terrain composite map based on its dirty region.
+		@remarks
+			Rather than calling this directly, call updateDerivedData, which will
+			also call it after the other derived data has been updated (there is
+			no point updating the composite map until lighting has been updated).
+			However the blend maps may call this directly when only the blending 
+			information has been updated.
+		*/
+		void updateCompositeMap();
+
+		/** Performs an update on the terrain composite map based on its dirty region, 
+			but only at a maximum frequency. 
+		@remarks
+		Rather than calling this directly, call updateDerivedData, which will
+		also call it after the other derived data has been updated (there is
+		no point updating the composite map until lighting has been updated).
+		However the blend maps may call this directly when only the blending 
+		information has been updated.
+		@note
+		This method will log the request for an update, but won't do it just yet 
+		unless there are no further requests in the next 'delay' seconds. This means
+		you can call it all the time but only pick up changes in quiet times.
+		*/
+		void updateCompositeMapWithDelay(Real delay = 2);
 
 
 		/** The default size of 'skirts' used to hide terrain cracks
@@ -1166,7 +1198,6 @@ namespace Ogre
 		PixelFormat getBlendTextureFormat(uint8 textureIndex, uint8 numLayers);
 
 		void updateDerivedDataImpl(const Rect& rect, bool synchronous, uint8 typeMask);
-		void updateCompositeMap();
 
 		
 
@@ -1264,6 +1295,8 @@ namespace Ogre
 		TexturePtr mCompositeMap;
 		uint8* mCpuCompositeMapStorage;
 		Rect mCompositeMapDirtyRect;
+		unsigned long mCompositeMapUpdateCountdown;
+		unsigned long mLastMillis;
 		/// true if the updates included lightmap changes (widen)
 		bool mCompositeMapDirtyRectLightmapUpdate;
 		mutable MaterialPtr mCompositeMapMaterial;

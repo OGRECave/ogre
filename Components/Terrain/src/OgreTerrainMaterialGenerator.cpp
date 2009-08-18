@@ -160,7 +160,6 @@ namespace Ogre
 
 		RenderTarget* rtt = mCompositeMapRTT->getBuffer()->getRenderTarget();
 		Viewport* vp = rtt->getViewport(0);
-		vp->setDimensions(vpleft, vptop, vpwidth, vpheight);
 		mCompositeMapCam->setWindow(vpleft, vptop, vpright, vpbottom);
 
 		vp->update();
