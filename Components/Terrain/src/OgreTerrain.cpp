@@ -2456,9 +2456,9 @@ namespace Ogre
 			// if we enabled, generate normal maps
 			if (mCompositeMapRequired)
 			{
-				updateCompositeMap();
 				mCompositeMapDirtyRect.left = mCompositeMapDirtyRect.top = 0;
 				mCompositeMapDirtyRect.right = mCompositeMapDirtyRect.bottom = mSize;
+				updateCompositeMap();
 			}
 
 		}
