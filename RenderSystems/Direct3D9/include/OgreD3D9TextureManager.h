@@ -32,6 +32,9 @@ Torus Knot Software Ltd.
 #include "OgreD3D9Prerequisites.h"
 #include "OgreTextureManager.h"
 
+#include <d3d9.h>
+
+
 namespace Ogre 
 {
 	class D3D9TextureManager : public TextureManager

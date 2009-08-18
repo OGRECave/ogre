@@ -695,12 +695,7 @@ namespace Ogre
 		D3D9RenderWindow* renderWindow = new D3D9RenderWindow(mhInstance);
 		
 		renderWindow->create(name, width, height, fullScreen, miscParams);
-
-		mResourceManager->lockDeviceAccess();
-
 		mDeviceManager->linkRenderWindow(renderWindow);
-
-		mResourceManager->unlockDeviceAccess();
 	
 		mRenderWindows.push_back(renderWindow);		
 		
@@ -784,24 +779,16 @@ namespace Ogre
 			IDirect3DDevice9* d3d9Device = device->getD3D9Device();
 
 			IDirect3DSurface9* pSurf;
-			
+			D3DSURFACE_DESC surfDesc;
 
 			// Check for hardware stencil support
 			d3d9Device->GetDepthStencilSurface(&pSurf);
+			pSurf->GetDesc(&surfDesc);
+			pSurf->Release();
 
-			if (pSurf != NULL)
-			{
-				D3DSURFACE_DESC surfDesc;
+			if (surfDesc.Format != D3DFMT_D24S8 && surfDesc.Format != D3DFMT_D24X8)			
+				rsc->unsetCapability(RSC_HWSTENCIL);												
 
-				pSurf->GetDesc(&surfDesc);
-				pSurf->Release();
-
-				if (surfDesc.Format != D3DFMT_D15S1 &&
-					surfDesc.Format != D3DFMT_D24S8 && 				
-					surfDesc.Format != D3DFMT_D24X4S4 && 
-					surfDesc.Format != D3DFMT_D24FS8)			
-					rsc->unsetCapability(RSC_HWSTENCIL);	
-			}																	
 
 			// Check for hardware occlusion support
 			HRESULT hr = d3d9Device->CreateQuery(D3DQUERYTYPE_OCCLUSION,  NULL);
@@ -1373,7 +1360,7 @@ namespace Ogre
 
 			HRESULT hr = mpD3D->CheckDeviceFormat(
 				currDevice->getAdapterNumber(),
-				currDevice->getDeviceType(),
+				D3DDEVTYPE_HAL,
 				srfDesc.Format,
 				d3dusage,
 				rtype,
@@ -2806,12 +2793,6 @@ namespace Ogre
 		}
 
 		mLastVertexSourceCount = 0;
-
-		// Clear left overs of previous viewport.
-		// I.E: Viewport A can use 3 different textures and light states
-		// When trying to render viewport B these settings should be cleared, otherwise 
-		// graphical artifacts might occur.
- 		mDeviceManager->getActiveDevice()->clearDeviceStreams();
 	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::_endFrame()
@@ -3552,24 +3533,21 @@ namespace Ogre
 	IDirect3DDevice9* D3D9RenderSystem::getResourceCreationDevice(UINT index)
 	{
 		D3D9ResourceCreationPolicy creationPolicy = msD3D9RenderSystem->mResourceManager->getCreationPolicy();
-		IDirect3DDevice9* d3d9Device = NULL;
 
 		if (creationPolicy == RCP_CREATE_ON_ACTIVE_DEVICE)
 		{
-			d3d9Device = msD3D9RenderSystem->getActiveD3D9Device();
+			return msD3D9RenderSystem->getActiveD3D9Device();
 		}
 		else if (creationPolicy == RCP_CREATE_ON_ALL_DEVICES) 
 		{
-			d3d9Device = msD3D9RenderSystem->mDeviceManager->getDevice(index)->getD3D9Device();
-		}
-		else
-		{
-			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-				"Invalid resource creation policy !!!", 
-				"D3D9RenderSystem::getResourceCreationDevice" );
+			return msD3D9RenderSystem->mDeviceManager->getDevice(index)->getD3D9Device();
 		}
 
-		return d3d9Device;
+		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+			"Invalid resource creation policy !!!", 
+			"D3D9RenderSystem::getResourceCreationDevice" );
+
+		return NULL;
 	}
 
 	//---------------------------------------------------------------------
@@ -3626,7 +3604,7 @@ namespace Ogre
 				// Verify that the depth format exists
 				if (mpD3D->CheckDeviceFormat(
 					activeDevice->getAdapterNumber(),
-					activeDevice->getDeviceType(),
+					D3DDEVTYPE_HAL,
 					srfDesc.Format,
 					D3DUSAGE_DEPTHSTENCIL,
 					D3DRTYPE_SURFACE,
@@ -3637,8 +3615,7 @@ namespace Ogre
 				// Verify that the depth format is compatible
 				if(mpD3D->CheckDepthStencilMatch(
 					activeDevice->getAdapterNumber(),
-					activeDevice->getDeviceType(), 
-					srfDesc.Format,
+					D3DDEVTYPE_HAL, srfDesc.Format,
 					fmt, ddDepthStencilFormats[x]) == D3D_OK)
 				{
 					dsfmt = ddDepthStencilFormats[x];

@@ -32,6 +32,8 @@ Torus Knot Software Ltd.
 #include "OgreD3D9Prerequisites.h"
 #include "OgreD3D9Driver.h"
 
+#include <d3d9.h>
+
 namespace Ogre 
 {
 	class D3D9DriverList

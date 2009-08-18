@@ -41,14 +41,4 @@ namespace Ogre
 	{		
 		D3D9RenderSystem::getResourceManager()->_notifyResourceDestroyed(static_cast<D3D9Resource*>(this));
 	}
-	
-	void D3D9Resource::lockDeviceAccess()
-	{		
-		OGRE_LOCK_RECURSIVE_MUTEX(mDeviceAccessMutex);								
-	}
-	
-	void D3D9Resource::unlockDeviceAccess()
-	{		
-		OGRE_UNLOCK_RECURSIVE_MUTEX(mDeviceAccessMutex);				
-	}
 }

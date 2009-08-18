@@ -32,6 +32,8 @@ Torus Knot Software Ltd.
 #include "OgreD3D9Prerequisites.h"
 #include "OgreString.h"
 
+#include <d3d9.h>
+
 namespace Ogre 
 {
 	static unsigned int modeCount = 0;

@@ -65,7 +65,7 @@ namespace Ogre {
 		D3DFORMAT				getBackBufferFormat		() const;
 
 		bool					validate				(D3D9RenderWindow* renderWindow);
-		void					invalidate				(D3D9RenderWindow* renderWindow);
+		void					invalidate				();
 
 		void					present					(D3D9RenderWindow* renderWindow);
 		
@@ -78,7 +78,6 @@ namespace Ogre {
 
 		void					setAdapterOrdinalIndex  (D3D9RenderWindow* renderWindow, uint adapterOrdinalInGroupIndex);
 		void					copyContentsToMemory(D3D9RenderWindow* window, const PixelBox &dst, RenderTarget::FrameBuffer buffer);
-		void					clearDeviceStreams		();
 	
 	public:
 		D3D9Device	(D3D9DeviceManager* deviceManager,
@@ -88,7 +87,7 @@ namespace Ogre {
 					 DWORD behaviorFlags);
 		~D3D9Device	();
 
-	protected:			
+	protected:		
 		D3D9DeviceManager*				mpDeviceManager;			// The manager of this device instance.
 		IDirect3DDevice9*				mpDevice;					// Will hold the device interface.				
 		UINT							mAdapterNumber;				// The adapter that this device belongs to.	
@@ -101,20 +100,20 @@ namespace Ogre {
 																	// an array of presentation parameters in case of multi-head device.				
 		UINT							mPresentationParamsCount;	// Number of presentation parameters elements.		
 		D3DCAPS9						mD3D9DeviceCaps;			// Device caps.	
-		bool							mD3D9DeviceCapsValid;		// True if device caps initialized.				
+		bool							mD3D9DeviceCapsValid;		// True if device caps initialized.
+		bool							mDeviceInvalidated;			// True if device was invalidated.
+		bool							mDeviceValid;				// True if device in valid rendering state.			
 		D3DDEVICE_CREATION_PARAMETERS	mCreationParams;			// Creation parameters.
 		uint							mLastPresentFrame;			// Last frame that this device present method called.
-		bool							mDeviceLost;				// True if device entered lost state.
-	
+
 		struct RenderWindowResources
 		{
-			IDirect3DSwapChain9* 	swapChain;						// Swap chain interface.
-			uint					adapterOrdinalInGroupIndex;		// Relative index of the render window in the group.
-			uint					presentParametersIndex;			// Index of present parameter in the shared array of the device.
-			IDirect3DSurface9*	 	backBuffer;						// The back buffer of the render window.
-			IDirect3DSurface9*	 	depthBuffer;					// The depth buffer of the render window.
-			D3DPRESENT_PARAMETERS	presentParameters;				// Present parameters of the render window.
-			bool					acquired;						// True if resources acquired.			
+			IDirect3DSwapChain9* 	swapChain;						
+			uint					adapterOrdinalInGroupIndex;
+			uint					presentParametersIndex;			
+			IDirect3DSurface9*	 	backBuffer;
+			IDirect3DSurface9*	 	depthBuffer;
+			D3DPRESENT_PARAMETERS	presentParameters;				
 		};		
 		typedef map<D3D9RenderWindow*, RenderWindowResources*>::type RenderWindowToResorucesMap;
 		typedef RenderWindowToResorucesMap::iterator				 RenderWindowToResorucesIterator;
@@ -133,6 +132,7 @@ namespace Ogre {
 		void					createD3D9Device				();
 		void					releaseD3D9Device				();
 		void					releaseRenderWindowResources	(RenderWindowResources* renderWindowResources);
+		void					clearDeviceStreams				();
 		void					acquireRenderWindowResources	(RenderWindowToResorucesIterator it);		
 		void					setupDeviceStates				();
 		void					notifyDeviceLost				();

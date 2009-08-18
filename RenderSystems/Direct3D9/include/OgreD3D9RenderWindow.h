@@ -55,7 +55,6 @@ namespace Ogre
 		bool				isActive			() const;
 		bool				isVisible			() const;
 		bool 				isClosed			() const { return mClosed; }
-		bool				isVSync				() const { return mVSync; }
 		void 				reposition			(int left, int top);
 		void 				resize				(unsigned int width, unsigned int height);
 		void 				swapBuffers			( bool waitForVSync = true );

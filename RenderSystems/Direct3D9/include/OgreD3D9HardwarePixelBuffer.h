@@ -31,13 +31,16 @@ Torus Knot Software Ltd.
 
 #include "OgreD3D9Prerequisites.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreD3D9Resource.h"
 
+#include <d3d9.h>
+#include <d3dx9.h>
 namespace Ogre {
 
 	class D3D9Texture;
 	class D3D9RenderTexture;
 
-	class D3D9HardwarePixelBuffer: public HardwarePixelBuffer
+	class D3D9HardwarePixelBuffer: public HardwarePixelBuffer, public D3D9Resource
 	{
 	protected:		
 		struct BufferResources
@@ -77,11 +80,6 @@ namespace Ogre {
 		
 		// The current lock flags of this surface.
 		DWORD mLockFlags;
-		// Device access mutex.
-		OGRE_MUTEX(mDeviceAccessMutex)
-
-		// Device access lock counter.
-		int mDeviceAccessLockCount;
 
 	protected:
 		/// Lock a box
@@ -107,7 +105,10 @@ namespace Ogre {
 		void blitFromMemory(const PixelBox &src, const Image::Box &dstBox, BufferResources* dstBufferResources);
 
 		void blitToMemory(const Image::Box &srcBox, const PixelBox &dst, BufferResources* srcBufferResources, IDirect3DDevice9* d3d9Device);
-			
+	
+		/// Destroy resources associated with the given device.
+		void destroyBufferResources(IDirect3DDevice9* d3d9Device);
+
 	public:
 		D3D9HardwarePixelBuffer(HardwareBuffer::Usage usage, 
 			D3D9Texture* ownerTexture);
@@ -146,19 +147,12 @@ namespace Ogre {
 		/// Notify TextureBuffer of destruction of render target
         virtual void _clearSliceRTT(size_t zoffset);
 
+		// Called before the Direct3D device is going to be destroyed.
+		virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
+
 		/// Release surfaces held by this pixel buffer.
 		void releaseSurfaces(IDirect3DDevice9* d3d9Device);
 
-		/// Destroy resources associated with the given device.
-		void destroyBufferResources(IDirect3DDevice9* d3d9Device);
-
-		// Called when device state is changing. Access to any device should be locked.
-		// Relevant for multi thread application.
-		void lockDeviceAccess();
-
-		// Called when device state change completed. Access to any device is allowed.
-		// Relevant for multi thread application.
-		void unlockDeviceAccess();
 	};
 };
 #endif

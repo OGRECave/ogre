@@ -56,8 +56,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
     void D3D9GpuProgram::loadImpl(void)
     {
-		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
-
 		for (uint i = 0; i < D3D9RenderSystem::getResourceCreationDeviceCount(); ++i)
 		{
 			IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getResourceCreationDevice(i);
@@ -69,8 +67,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void D3D9GpuProgram::loadImpl(IDirect3DDevice9* d3d9Device)
 	{
-		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
-
 		if (mpExternalMicrocode)
 		{
 			loadFromMicrocode(d3d9Device, mpExternalMicrocode);
@@ -95,8 +91,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
     void D3D9GpuProgram::loadFromSource(void)
     {
-		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
-
 		for (uint i = 0; i < D3D9RenderSystem::getResourceCreationDeviceCount(); ++i)
 		{
 			IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getResourceCreationDevice(i);
@@ -108,8 +102,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void D3D9GpuProgram::loadFromSource(IDirect3DDevice9* d3d9Device)
 	{
-		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
-
 		// Create the shader
 		// Assemble source into microcode
 		LPD3DXBUFFER microcode;
@@ -193,8 +185,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
     void D3D9GpuVertexProgram::unloadImpl(void)
     {
-		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
-
         DeviceToVertexShaderIterator it = mMapDeviceToVertexShader.begin();
 
 		while (it != mMapDeviceToVertexShader.end())
@@ -208,14 +198,12 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void D3D9GpuVertexProgram::notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device)
 	{
-		
+			
 	}
 
 	//-----------------------------------------------------------------------------
 	void D3D9GpuVertexProgram::notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device)
 	{
-		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
-
 		DeviceToVertexShaderIterator it;
 
 		// Find the shader of this device.
@@ -303,8 +291,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
     void D3D9GpuFragmentProgram::unloadImpl(void)
     {
-		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
-
 		DeviceToPixelShaderIterator it = mMapDeviceToPixelShader.begin();
 
 		while (it != mMapDeviceToPixelShader.end())
@@ -318,13 +304,12 @@ namespace Ogre {
 	void D3D9GpuFragmentProgram::notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device)
 	{
 		
+
 	}
 
 	//-----------------------------------------------------------------------------
 	void D3D9GpuFragmentProgram::notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device)
 	{
-		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
-
 		DeviceToPixelShaderIterator it;
 
 		// Find the shader of this device.
