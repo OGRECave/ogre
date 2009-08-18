@@ -2908,11 +2908,17 @@ namespace Ogre
 		if (mCompositeMapRequired && mCompositeMapDirtyRect.width() && mCompositeMapDirtyRect.height())
 		{
 			createOrDestroyGPUCompositeMap();
-			if (mCompositeMapDirtyRectLightmapUpdate)
+			if (mCompositeMapDirtyRectLightmapUpdate &&
+				(mCompositeMapDirtyRect.width() < mSize	|| mCompositeMapDirtyRect.height() < mSize))
 			{
 				// widen the dirty rectangle since lighting makes it wider
 				Rect widenedRect;
 				widenRectByVector(TerrainGlobalOptions::getLightMapDirection(), mCompositeMapDirtyRect, widenedRect);
+				// clamp
+				widenedRect.left = std::max(widenedRect.left, 0L);
+				widenedRect.top = std::max(widenedRect.top, 0L);
+				widenedRect.right = std::min(widenedRect.right, (long)mSize);
+				widenedRect.bottom = std::min(widenedRect.bottom, (long)mSize);
 				mMaterialGenerator->updateCompositeMap(this, widenedRect);	
 			}
 			else
@@ -3041,7 +3047,7 @@ namespace Ogre
 			// create
 			mCompositeMap = TextureManager::getSingleton().createManual(
 				mMaterialName + "/comp", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-				TEX_TYPE_2D, mCompositeMapSize, mCompositeMapSize, 0, PF_R8G8B8A8, TU_DEFAULT);
+				TEX_TYPE_2D, mCompositeMapSize, mCompositeMapSize, 0, PF_BYTE_RGBA, TU_STATIC);
 
 			mCompositeMapSizeActual = mCompositeMap->getWidth();
 
