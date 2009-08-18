@@ -38,6 +38,7 @@ Torus Knot Software Ltd.
 #include "OgreViewport.h"
 #include "OgreRenderTexture.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreRenderSystem.h"
 
 
 namespace Ogre
@@ -98,17 +99,22 @@ namespace Ogre
 			mCompositeMapLight = mCompositeMapSM->createLight();
 			mCompositeMapLight->setType(Light::LT_DIRECTIONAL);
 
+			RenderSystem* rSys = Root::getSingleton().getRenderSystem();
+			Real hOffset = rSys->getHorizontalTexelOffset() / (Real)size;
+			Real vOffset = rSys->getVerticalTexelOffset() / (Real)size;
+
+
 			// set up scene
 			mCompositeMapPlane = mCompositeMapSM->createManualObject();
 			mCompositeMapPlane->begin(mat->getName());
 			mCompositeMapPlane->position(-halfCamDist, halfCamDist, 0);
-			mCompositeMapPlane->textureCoord(0, 0);
+			mCompositeMapPlane->textureCoord(0 - hOffset, 0 - vOffset);
 			mCompositeMapPlane->position(-halfCamDist, -halfCamDist, 0);
-			mCompositeMapPlane->textureCoord(0, 1);
+			mCompositeMapPlane->textureCoord(0 - hOffset, 1 - vOffset);
 			mCompositeMapPlane->position(halfCamDist, -halfCamDist, 0);
-			mCompositeMapPlane->textureCoord(1, 1);
+			mCompositeMapPlane->textureCoord(1 - hOffset, 1 - vOffset);
 			mCompositeMapPlane->position(halfCamDist, halfCamDist, 0);
-			mCompositeMapPlane->textureCoord(1, 0);
+			mCompositeMapPlane->textureCoord(1 - hOffset, 0 - vOffset);
 			mCompositeMapPlane->quad(0, 1, 2, 3);
 			mCompositeMapPlane->end();
 			mCompositeMapSM->getRootSceneNode()->attachObject(mCompositeMapPlane);
@@ -136,17 +142,19 @@ namespace Ogre
 				ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, size, size, 0, PF_BYTE_RGBA, 
 				TU_RENDERTARGET).get();
 			RenderTarget* rtt = mCompositeMapRTT->getBuffer()->getRenderTarget();
-			rtt->addViewport(mCompositeMapCam);
 			// don't render all the time, only on demand
 			rtt->setAutoUpdated(false);
+			Viewport* vp = rtt->addViewport(mCompositeMapCam);
+			// don't render overlays
+			vp->setOverlaysEnabled(false);
 
 		}
 
 		// calculate the area we need to update
 		Real vpleft = (Real)rect.left / (Real)size;
 		Real vptop = (Real)rect.top / (Real)size;
-		Real vpright = (Real)(rect.right-1) / (Real)size;
-		Real vpbottom = (Real)(rect.bottom-1) / (Real)size;
+		Real vpright = (Real)rect.right / (Real)size;
+		Real vpbottom = (Real)rect.bottom / (Real)size;
 		Real vpwidth = (Real)rect.width()/ (Real)size;
 		Real vpheight = (Real)rect.height() / (Real)size;
 

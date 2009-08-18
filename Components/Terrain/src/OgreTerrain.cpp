@@ -91,8 +91,7 @@ namespace Ogre
 	uint16 TerrainGlobalOptions::msCompositeMapSize = 1024;
 	ColourValue TerrainGlobalOptions::msCompositeMapAmbient = ColourValue::White;
 	ColourValue TerrainGlobalOptions::msCompositeMapDiffuse = ColourValue::White;
-	// set the default composite map usage really high for now since has some artefacts
-	Real TerrainGlobalOptions::msCompositeMapDistance = 10000;
+	Real TerrainGlobalOptions::msCompositeMapDistance = 4000;
 	//---------------------------------------------------------------------
 	void TerrainGlobalOptions::setDefaultMaterialGenerator(TerrainMaterialGeneratorPtr gen)
 	{
@@ -2457,9 +2456,9 @@ namespace Ogre
 			// if we enabled, generate normal maps
 			if (mCompositeMapRequired)
 			{
+				updateCompositeMap();
 				mCompositeMapDirtyRect.left = mCompositeMapDirtyRect.top = 0;
 				mCompositeMapDirtyRect.right = mCompositeMapDirtyRect.bottom = mSize;
-				updateCompositeMap();
 			}
 
 		}
@@ -3042,7 +3041,7 @@ namespace Ogre
 			// create
 			mCompositeMap = TextureManager::getSingleton().createManual(
 				mMaterialName + "/comp", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-				TEX_TYPE_2D, mCompositeMapSize, mCompositeMapSize, 0, PF_BYTE_RGBA, TU_STATIC);
+				TEX_TYPE_2D, mCompositeMapSize, mCompositeMapSize, 0, PF_R8G8B8A8, TU_DEFAULT);
 
 			mCompositeMapSizeActual = mCompositeMap->getWidth();
 

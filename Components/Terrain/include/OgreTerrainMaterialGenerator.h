@@ -367,6 +367,8 @@ namespace Ogre
 		*/
 		virtual void _renderCompositeMap(size_t size, const Rect& rect, 
 			const MaterialPtr& mat, const TexturePtr& destCompositeMap);
+
+		Texture* _getCompositeMapRTT() { return mCompositeMapRTT; }
 	protected:
 
 		ProfileList mProfiles;
