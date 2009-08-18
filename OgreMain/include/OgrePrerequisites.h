@@ -164,6 +164,8 @@ namespace Ogre {
 		#define OGRE_STATIC_MUTEX_INSTANCE(name) boost::recursive_mutex name;
 		#define OGRE_LOCK_MUTEX(name) boost::recursive_mutex::scoped_lock ogrenameLock(name);
 		#define OGRE_LOCK_MUTEX_NAMED(mutexName, lockName) boost::recursive_mutex::scoped_lock lockName(mutexName);
+		#define OGRE_LOCK_RECURSIVE_MUTEX(name) boost::detail::thread::lock_ops<boost::recursive_mutex>::lock(name);
+		#define OGRE_UNLOCK_RECURSIVE_MUTEX(name) boost::detail::thread::lock_ops<boost::recursive_mutex>::unlock(name);
 		// like OGRE_AUTO_MUTEX but mutex held by pointer
 		#define OGRE_AUTO_SHARED_MUTEX mutable boost::recursive_mutex *OGRE_AUTO_MUTEX_NAME;
 		#define OGRE_LOCK_AUTO_SHARED_MUTEX assert(OGRE_AUTO_MUTEX_NAME); boost::recursive_mutex::scoped_lock ogreAutoMutexLock(*OGRE_AUTO_MUTEX_NAME);
@@ -191,6 +193,8 @@ namespace Ogre {
 		#define OGRE_STATIC_MUTEX_INSTANCE(name)
 		#define OGRE_LOCK_MUTEX(name)
 		#define OGRE_LOCK_MUTEX_NAMED(mutexName, lockName)
+		#define OGRE_LOCK_RECURSIVE_MUTEX(name)
+		#define OGRE_UNLOCK_RECURSIVE_MUTEX(name)
 		#define OGRE_AUTO_SHARED_MUTEX
 		#define OGRE_LOCK_AUTO_SHARED_MUTEX
 		#define OGRE_NEW_AUTO_SHARED_MUTEX

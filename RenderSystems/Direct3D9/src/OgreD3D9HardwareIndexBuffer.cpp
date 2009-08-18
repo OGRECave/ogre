@@ -43,6 +43,8 @@ namespace Ogre {
         bool useSystemMemory, bool useShadowBuffer)
         : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, useSystemMemory, useShadowBuffer)
     {
+		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
+
 		D3DPOOL eResourcePool;
 
 #if OGRE_D3D_MANAGE_BUFFERS
@@ -75,6 +77,8 @@ namespace Ogre {
 	//---------------------------------------------------------------------
     D3D9HardwareIndexBuffer::~D3D9HardwareIndexBuffer()
     {
+		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
+
 		DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
 
 		while (it != mMapDeviceToBufferResources.end())
@@ -84,12 +88,14 @@ namespace Ogre {
 			++it;
 		}	
 		mMapDeviceToBufferResources.clear();   
-		SAFE_DELETE(mSystemMemoryBuffer);
+		SAFE_DELETE_ARRAY(mSystemMemoryBuffer);
     }
 	//---------------------------------------------------------------------
     void* D3D9HardwareIndexBuffer::lockImpl(size_t offset, 
         size_t length, LockOptions options)
     {		
+		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
+
 		if (options != HBL_READ_ONLY)
 		{
 			DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
@@ -99,10 +105,22 @@ namespace Ogre {
 				BufferResources* bufferResources = it->second;
 
 				bufferResources->mOutOfDate = true;
-				if (offset < bufferResources->mLockOffset)
-					bufferResources->mLockOffset = offset;
-				if (length > bufferResources->mLockLength)
-					bufferResources->mLockLength = length;
+
+				if(bufferResources->mLockLength > 0)
+				{
+					size_t highPoint = std::max( offset + length, 
+						bufferResources->mLockOffset + bufferResources->mLockLength );
+					bufferResources->mLockOffset = std::min( bufferResources->mLockOffset, offset );
+					bufferResources->mLockLength = highPoint - bufferResources->mLockOffset;
+				}
+				else
+				{
+					if (offset < bufferResources->mLockOffset)
+						bufferResources->mLockOffset = offset;
+					if (length > bufferResources->mLockLength)
+						bufferResources->mLockLength = length;
+				}
+			
 				if (bufferResources->mLockOptions != HBL_DISCARD)
 					bufferResources->mLockOptions = options;
 
@@ -115,6 +133,8 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void D3D9HardwareIndexBuffer::unlockImpl(void)
     {	
+		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
+
 		DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
 		uint nextFrameNumber = Root::getSingleton().getNextFrameNumber();
 
@@ -155,12 +175,18 @@ namespace Ogre {
 	}
 	//---------------------------------------------------------------------
 	void D3D9HardwareIndexBuffer::notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device)
-	{	
+	{			
+		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
+
+		if (D3D9RenderSystem::getResourceManager()->getCreationPolicy() == RCP_CREATE_ON_ALL_DEVICES)
+			createBuffer(d3d9Device, mBufferDesc.Pool);	
 
 	}
 	//---------------------------------------------------------------------
 	void D3D9HardwareIndexBuffer::notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device)
 	{		
+		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
+
 		DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.find(d3d9Device);
 
 		if (it != mMapDeviceToBufferResources.end())	
@@ -172,7 +198,9 @@ namespace Ogre {
 	}
 	//---------------------------------------------------------------------
 	void D3D9HardwareIndexBuffer::notifyOnDeviceLost(IDirect3DDevice9* d3d9Device)
-	{
+	{		
+		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
+
 		if (mBufferDesc.Pool == D3DPOOL_DEFAULT)
 		{
 			DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.find(d3d9Device);
@@ -185,13 +213,17 @@ namespace Ogre {
 	}
 	//---------------------------------------------------------------------
 	void D3D9HardwareIndexBuffer::notifyOnDeviceReset(IDirect3DDevice9* d3d9Device)
-	{
+	{		
+		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
+
 		if (D3D9RenderSystem::getResourceManager()->getCreationPolicy() == RCP_CREATE_ON_ALL_DEVICES)
 			createBuffer(d3d9Device, mBufferDesc.Pool);		
 	}
 	//---------------------------------------------------------------------
 	void D3D9HardwareIndexBuffer::createBuffer(IDirect3DDevice9* d3d9Device, D3DPOOL ePool)
 	{
+		OGRE_LOCK_MUTEX(mDeviceAccessMutex)
+
 		BufferResources* bufferResources;		
 		HRESULT hr;
 

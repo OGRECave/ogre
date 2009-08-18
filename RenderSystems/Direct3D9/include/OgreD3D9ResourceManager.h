@@ -31,10 +31,6 @@ Torus Knot Software Ltd.
 
 #include "OgreD3D9Prerequisites.h"
 
-#include <d3d9.h>
-#include <d3dx9.h>
-#include <dxerr9.h>
-
 namespace Ogre {
 
 	enum D3D9ResourceCreationPolicy
@@ -70,9 +66,17 @@ namespace Ogre {
 		// Called immediately after the Direct3D device has entered a lost state.
 		void notifyOnDeviceLost		(IDirect3DDevice9* d3d9Device);
 
-		// Called immediately after the Direct3D device has been reset
+		// Called immediately after the Direct3D device has been reset.
 		void notifyOnDeviceReset	(IDirect3DDevice9* d3d9Device);
 
+		// Called when device state is changing. Access to any device should be locked.
+		// Relevant for multi thread application.
+		void lockDeviceAccess		();
+
+		// Called when device state change completed. Access to any device is allowed.
+		// Relevant for multi thread application.
+		void unlockDeviceAccess		();
+		
 		D3D9ResourceManager			();
 		~D3D9ResourceManager		();		
 
@@ -90,18 +94,21 @@ namespace Ogre {
 
 	// Protected methods.
 	protected:
-		// Internal method - called when new resource created.
+		
+		// Called when new resource created.
 		void _notifyResourceCreated		(D3D9Resource* pResource);
 
-		// Internal method - called when resource is about to be destroyed.
-		void _notifyResourceDestroyed	(D3D9Resource* pResource);					
+		// Called when resource is about to be destroyed.
+		void _notifyResourceDestroyed	(D3D9Resource* pResource);
+
 
 	// Attributes.
 	protected:
+		OGRE_MUTEX(mDeviceAccessMutex)
 		OGRE_MUTEX(mResourcesMutex)
 		ResourceContainer			mResources;
 		D3D9ResourceCreationPolicy	mResourceCreationPolicy;
-
+		long						mDeviceAccessLockCount;		
 	};
 }
 

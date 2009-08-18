@@ -75,8 +75,8 @@ namespace Ogre
 		mVSyncInterval = 1;
 		String title = name;
 		unsigned int colourDepth = 32;
-		int left = -1; // Defaults to screen center
-		int top = -1; // Defaults to screen center
+		int left = INT_MAX; // Defaults to screen center
+		int top = INT_MAX;  // Defaults to screen center
 		bool depthBuffer = true;
 		String border = "";
 		bool outerSize = false;
@@ -213,7 +213,7 @@ namespace Ogre
 
 
 			// No specified top left -> Center the window in the middle of the monitor
-			if (left == -1 || top == -1)
+			if (left == INT_MAX || top == INT_MAX)
 			{				
 				int screenw = monitorInfo.rcMonitor.right  - monitorInfo.rcMonitor.left;
 				int screenh = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
@@ -225,12 +225,12 @@ namespace Ogre
 				int outerw = (rc.right-rc.left < screenw)? rc.right-rc.left : screenw;
 				int outerh = (rc.bottom-rc.top < screenh)? rc.bottom-rc.top : screenh;
 
-				if (left == -1)
+				if (left == INT_MAX)
 					left = monitorInfo.rcMonitor.left + (screenw - outerw) / 2;
 				else if (monitorIndex != -1)
 					left += monitorInfo.rcMonitor.left;
 
-				if (top == -1)
+				if (top == INT_MAX)
 					top = monitorInfo.rcMonitor.top + (screenh - outerh) / 2;
 				else if (monitorIndex != -1)
 					top += monitorInfo.rcMonitor.top;
@@ -407,7 +407,7 @@ namespace Ogre
 			// Have to release & trigger device reset
 			// NB don't use windowMovedOrResized since Win32 doesn't know
 			// about the size change yet				
-			mDevice->invalidate();
+			mDevice->invalidate(this);
 			// Notify viewports of resize
 			ViewportList::iterator it = mViewportList.begin();
 			while(it != mViewportList.end()) (*it++).second->_updateDimensions();
@@ -450,6 +450,10 @@ namespace Ogre
 		// Set up the presentation parameters		
 		IDirect3D9* pD3D = D3D9RenderSystem::getDirect3D9();
 		D3DDEVTYPE devType = D3DDEVTYPE_HAL;
+
+		if (mDevice != NULL)		
+			devType = mDevice->getDeviceType();		
+	
 
 		ZeroMemory( presentParams, sizeof(D3DPRESENT_PARAMETERS) );
 		presentParams->Windowed					= !mIsFullScreen;

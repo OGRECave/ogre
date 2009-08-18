@@ -37,10 +37,6 @@ Torus Knot Software Ltd.
 #include "OgreD3D9HardwarePixelBuffer.h"
 #include "OgreD3D9Resource.h"
 
-#include <d3d9.h>
-#include <d3dx9.h>
-#include <dxerr9.h>
-
 namespace Ogre {
 	class D3D9Texture : public Texture, public D3D9Resource
 	{
@@ -150,9 +146,9 @@ namespace Ogre {
 		/// Loads this texture into the specified device.
 		void loadImpl(IDirect3DDevice9* d3d9Device);
         /// overriden from Resource
-        void prepareImpl();
-        /// overriden from Resource
-        void unprepareImpl();
+        void preLoadImpl();        
+		/// overriden from Resource
+		void postLoadImpl();
 
 		/// gets the texture resources attached to the given device.
 		TextureResources* getTextureResources(IDirect3DDevice9* d3d9Device);
@@ -220,8 +216,13 @@ namespace Ogre {
 		// Called immediately after the Direct3D device has been reset
 		virtual void notifyOnDeviceReset(IDirect3DDevice9* d3d9Device);
 
-		// Reload this texture.
-		void reloadTexture();		
+		// Called when device state is changing. Access to any device should be locked.
+		// Relevant for multi thread application.
+		virtual void lockDeviceAccess();
+
+		// Called when device state change completed. Access to any device is allowed.
+		// Relevant for multi thread application.
+		virtual void unlockDeviceAccess();		
     };
 
     /** Specialisation of SharedPtr to allow SharedPtr to be assigned to D3D9TexturePtr 

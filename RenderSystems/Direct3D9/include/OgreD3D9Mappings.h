@@ -37,10 +37,6 @@ Torus Knot Software Ltd.
 #include "OgreHardwareBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
 
-#include <d3d9.h>
-#include <d3dx9.h>
-#include <dxerr9.h>
-
 namespace Ogre 
 {
 	class D3D9Mappings
