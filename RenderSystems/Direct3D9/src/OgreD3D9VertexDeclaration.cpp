@@ -96,6 +96,8 @@ namespace Ogre {
 	 //-----------------------------------------------------------------------
 	void D3D9VertexDeclaration::notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device)
 	{
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+
 		DeviceToDeclarationIterator it = mMapDeviceToDeclaration.find(d3d9Device);
 
 		if (it != mMapDeviceToDeclaration.end())	
@@ -177,6 +179,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void D3D9VertexDeclaration::releaseDeclaration()
 	{
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+
 		DeviceToDeclarationIterator it = mMapDeviceToDeclaration.begin();
 
 		while (it != mMapDeviceToDeclaration.end())

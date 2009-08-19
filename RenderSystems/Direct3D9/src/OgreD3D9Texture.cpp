@@ -58,7 +58,9 @@ namespace Ogre
 	}
 	/****************************************************************************************/
 	D3D9Texture::~D3D9Texture()
-	{		
+	{	
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+		
         // have to call this here reather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
 		if (isLoaded())
@@ -68,7 +70,7 @@ namespace Ogre
 		else
 		{
 			freeInternalResources();
-		}		
+		}				
 
 		// Free memory allocated per device.
 		DeviceToTextureResourcesIterator it = mMapDeviceToTextureResources.begin();
@@ -80,6 +82,7 @@ namespace Ogre
 			++it;
 		}		
 		mMapDeviceToTextureResources.clear();
+		mSurfaceList.clear();		
 	}
 	/****************************************************************************************/
 	void D3D9Texture::copyToTexture(TexturePtr& target)
@@ -202,23 +205,38 @@ namespace Ogre
 			mD3DPool = D3DPOOL_MANAGED;
 		}
 
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+
 		for (uint i = 0; i < D3D9RenderSystem::getResourceCreationDeviceCount(); ++i)
 		{
 			IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getResourceCreationDevice(i);
 
 			loadImpl(d3d9Device);
-		}
-
-		mLoadedStreams.setNull();
+		}		
 	}
 
 	/****************************************************************************************/
 	void D3D9Texture::loadImpl(IDirect3DDevice9* d3d9Device)
-	{
+	{		
 		if (mUsage & TU_RENDERTARGET)
 		{
 			createInternalResourcesImpl(d3d9Device);
 			return;
+		}
+
+		// Make sure streams prepared.
+		if (mLoadedStreams.isNull())
+		{
+			prepareImpl();
+		}
+		
+
+		// Set reading positions of loaded streams to the beginning.
+		for (uint i = 0; i < mLoadedStreams->size(); ++i)
+		{
+			MemoryDataStreamPtr curDataStream = (*mLoadedStreams)[i];
+
+			curDataStream->seek(0);
 		}
 
 		// only copy is on the stack so well-behaved if exception thrown
@@ -239,25 +257,18 @@ namespace Ogre
 			break;
 		default:
 			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Unknown texture type", "D3D9Texture::loadImpl" );
-		}
-
-		for (uint i = 0; i < mLoadedStreams->size(); ++i)
-		{
-			MemoryDataStreamPtr curDataStream = (*mLoadedStreams)[i];
-
-			curDataStream->seek(0);
-		}
-		
-
+		}				
 	}
 	/****************************************************************************************/
 	void D3D9Texture::prepareImpl()
-	{
-		if (mUsage & TU_RENDERTARGET)
+	{		
+		if (mUsage & TU_RENDERTARGET || isManuallyLoaded())
 		{
 			return;
 		}
 
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+		
         LoadedStreams loadedStreams;
 
 		// prepare load based on tex.type
@@ -268,8 +279,8 @@ namespace Ogre
 			loadedStreams = _prepareNormTex();
 			break;
 		case TEX_TYPE_3D:
-            loadedStreams = _prepareVolumeTex();
-            break;
+			loadedStreams = _prepareVolumeTex();
+			break;
 		case TEX_TYPE_CUBE_MAP:
 			loadedStreams = _prepareCubeTex();
 			break;
@@ -277,7 +288,7 @@ namespace Ogre
 			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Unknown texture type", "D3D9Texture::prepareImpl" );
 		}
 
-        mLoadedStreams = loadedStreams;
+		mLoadedStreams = loadedStreams;		
 	}
     /****************************************************************************************/
 	D3D9Texture::LoadedStreams D3D9Texture::_prepareCubeTex()
@@ -353,15 +364,19 @@ namespace Ogre
 	}
 	/****************************************************************************************/
 	void D3D9Texture::unprepareImpl()
-	{
-		if (mUsage & TU_RENDERTARGET)
+	{		
+		if (mUsage & TU_RENDERTARGET || isManuallyLoaded())
 		{
 			return;
-		}
-
-        mLoadedStreams.setNull();
-
+		}   
 	}
+
+	/****************************************************************************************/
+	void D3D9Texture::postLoadImpl(void)
+	{
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+		mLoadedStreams.setNull();
+	}	
 
 	/****************************************************************************************/
 	void D3D9Texture::freeInternalResources(void)
@@ -372,6 +387,8 @@ namespace Ogre
 	/****************************************************************************************/
 	void D3D9Texture::freeInternalResourcesImpl()
 	{
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+
 		DeviceToTextureResourcesIterator it = mMapDeviceToTextureResources.begin();
 
 		while (it != mMapDeviceToTextureResources.end())
@@ -385,7 +402,7 @@ namespace Ogre
 
 	/****************************************************************************************/
 	D3D9Texture::TextureResources* D3D9Texture::getTextureResources(IDirect3DDevice9* d3d9Device)
-	{
+	{		
 		DeviceToTextureResourcesIterator it = mMapDeviceToTextureResources.find(d3d9Device);
 
 		if (it == mMapDeviceToTextureResources.end())		
@@ -414,8 +431,8 @@ namespace Ogre
 
 	/****************************************************************************************/
 	void D3D9Texture::createTextureResources(IDirect3DDevice9* d3d9Device)
-	{
-		OGRE_LOCK_AUTO_MUTEX
+	{				
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 		
 		if (mIsManual)
 		{
@@ -433,16 +450,21 @@ namespace Ogre
 		}
 		else
 		{			
-			prepareImpl();
-			preLoadImpl();							
+			prepareImpl();		
+
+			preLoadImpl();
+
 			loadImpl(d3d9Device);
-			postLoadImpl();
+
+			postLoadImpl();			
 		}		
 	}
 
 	/****************************************************************************************/
 	void D3D9Texture::freeTextureResources(IDirect3DDevice9* d3d9Device, D3D9Texture::TextureResources* textureResources)
-	{
+	{		
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+
 		// Release surfaces from each mip level.
 		for(unsigned int i = 0; i < mSurfaceList.size(); ++i)
 		{
@@ -672,6 +694,27 @@ namespace Ogre
 	
 			DataStreamPtr stream((*loadedStreams)[0]);
 			img.load(stream, ext);
+
+			if (img.getHeight() == 0)
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+					"Image height == 0 in " + getName(),
+					"D3D9Texture::_loadVolumeTex");
+			}
+
+			if (img.getWidth() == 0)
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+					"Image width == 0 in " + getName(),
+					"D3D9Texture::_loadVolumeTex");
+			}
+
+			if (img.getDepth() == 0)
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+					"Image depth == 0 in " + getName(),
+					"D3D9Texture::_loadVolumeTex");
+			}
 			// Call internal _loadImages, not loadImage since that's external and 
 			// will determine load status etc again
 			ConstImagePtrList imagePtrs;
@@ -788,6 +831,21 @@ namespace Ogre
 
 			DataStreamPtr stream((*loadedStreams)[0]);
 			img.load(stream, ext);
+
+			if (img.getHeight() == 0)
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+					"Image height == 0 in " + getName(),
+					"D3D9Texture::_loadNormTex");
+			}
+
+			if (img.getWidth() == 0)
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+					"Image width == 0 in " + getName(),
+					"D3D9Texture::_loadNormTex");
+			}
+
 			// Call internal _loadImages, not loadImage since that's external and 
 			// will determine load status etc again
 			ConstImagePtrList imagePtrs;
@@ -827,6 +885,8 @@ namespace Ogre
 	/****************************************************************************************/
     void D3D9Texture::createInternalResourcesImpl(void)
 	{
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+
 		for (uint i = 0; i < D3D9RenderSystem::getResourceCreationDeviceCount(); ++i)
 		{
 			IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getResourceCreationDevice(i);
@@ -837,7 +897,7 @@ namespace Ogre
 
 	/****************************************************************************************/
 	void D3D9Texture::createInternalResourcesImpl(IDirect3DDevice9* d3d9Device)
-	{
+	{		
 		TextureResources* textureResources;			
 
 		// Check if resources already exist.
@@ -1635,12 +1695,12 @@ namespace Ogre
 		 				"D3D9Texture::_createSurfaceList");
 
 				D3D9HardwarePixelBuffer* currPixelBuffer = GETLEVEL(0, mip);
-				
-				currPixelBuffer->bind(d3d9Device, surface, textureResources->pFSAASurface,
-					mHwGammaWriteSupported, mFSAA, mName, textureResources->pBaseTex);
-
+								
 				if (mip == 0 && mNumRequestedMipmaps != 0 && (mUsage & TU_AUTOMIPMAP))
 					currPixelBuffer->_setMipmapping(true, mMipmapsHardwareGenerated);
+
+				currPixelBuffer->bind(d3d9Device, surface, textureResources->pFSAASurface,
+					mHwGammaWriteSupported, mFSAA, mName, textureResources->pBaseTex);
 
 				// decrement reference count, the GetSurfaceLevel call increments this
 				// this is safe because the pixel buffer keeps a reference as well
@@ -1661,12 +1721,12 @@ namespace Ogre
 
 					D3D9HardwarePixelBuffer* currPixelBuffer = GETLEVEL(face, mip);
 					
-					currPixelBuffer->bind(d3d9Device, surface, textureResources->pFSAASurface,
-						mHwGammaWriteSupported, mFSAA, mName, textureResources->pBaseTex);
-
+					
 					if (mip == 0 && mNumRequestedMipmaps != 0 && (mUsage & TU_AUTOMIPMAP))
 						currPixelBuffer->_setMipmapping(true, mMipmapsHardwareGenerated);
 
+					currPixelBuffer->bind(d3d9Device, surface, textureResources->pFSAASurface,
+						mHwGammaWriteSupported, mFSAA, mName, textureResources->pBaseTex);
 
 					// decrement reference count, the GetSurfaceLevel call increments this
 					// this is safe because the pixel buffer keeps a reference as well
@@ -1733,14 +1793,18 @@ namespace Ogre
 	
 	//---------------------------------------------------------------------
 	void D3D9Texture::notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device) 
-	{	
+	{		
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+
 		if (D3D9RenderSystem::getResourceManager()->getCreationPolicy() == RCP_CREATE_ON_ALL_DEVICES)
 			createTextureResources(d3d9Device);
 	}
 
 	//---------------------------------------------------------------------
 	void D3D9Texture::notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device) 
-	{						
+	{				
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+
 		DeviceToTextureResourcesIterator it = mMapDeviceToTextureResources.find(d3d9Device);
 
 		if (it != mMapDeviceToTextureResources.end())
@@ -1751,6 +1815,14 @@ namespace Ogre
 			LogManager::getSingleton().logMessage(ss.str());
 
 			TextureResources* textureResource = it->second;
+
+			// Destroy surfaces from each mip level.
+			for(unsigned int i = 0; i < mSurfaceList.size(); ++i)
+			{
+				D3D9HardwarePixelBuffer* pixelBuffer = static_cast<D3D9HardwarePixelBuffer*>(mSurfaceList[i].get());
+
+				pixelBuffer->destroyBufferResources(d3d9Device);			
+			}
 
 			// Just free any internal resources, don't call unload() here
 			// because we want the un-touched resource to keep its unloaded status
@@ -1767,7 +1839,9 @@ namespace Ogre
 
 	//---------------------------------------------------------------------
 	void D3D9Texture::notifyOnDeviceLost(IDirect3DDevice9* d3d9Device) 
-	{
+	{		
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+
 		if(mD3DPool == D3DPOOL_DEFAULT)
 		{
 			DeviceToTextureResourcesIterator it = mMapDeviceToTextureResources.find(d3d9Device);
@@ -1779,7 +1853,7 @@ namespace Ogre
 				ss << "D3D9 device: 0x[" << d3d9Device << "] lost. Releasing D3D9 texture: " << mName;
 				LogManager::getSingleton().logMessage(ss.str());
 
-				TextureResources* textureResource = it->second;
+				TextureResources* textureResource = it->second;				
 
 				// Just free any internal resources, don't call unload() here
 				// because we want the un-touched resource to keep its unloaded status
@@ -1794,41 +1868,12 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9Texture::notifyOnDeviceReset(IDirect3DDevice9* d3d9Device) 
 	{		
-		if(mD3DPool == D3DPOOL_DEFAULT)
-		{
-			reloadTexture();
-		}
-	}
+		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
-	//---------------------------------------------------------------------
-	void D3D9Texture::reloadTexture()
-	{
-		LogManager::getSingleton().logMessage(
-			"Recreating D3D9 default pool texture: " + mName);
-		// We just want to create the texture resources if:
-		// 1. This is a render texture, or
-		// 2. This is a manual texture with no loader, or
-		// 3. This was an unloaded regular texture (preserve unloaded state)
-		if ((mIsManual && !mLoader) || (mUsage & TU_RENDERTARGET) || !isLoaded())
-		{
-			// just recreate any internal resources
-			createInternalResources();
+		if(mD3DPool == D3DPOOL_DEFAULT)
+		{			
+			createTextureResources(d3d9Device);
 		}
-		// Otherwise, this is a regular loaded texture, or a manual texture with a loader
-		else
-		{
-			// The internal resources already freed, need unload/load here:
-			// 1. Make sure resource memory usage statistic correction.
-			// 2. Don't call unload() in releaseIfDefaultPool() because we want
-			//    the un-touched resource keep unload status after device reset.
-			unload();
-			// if manual, we need to recreate internal resources since load() won't do that
-			if (mIsManual)
-				createInternalResources();
-			load();
-		}
-		LogManager::getSingleton().logMessage(
-			"Recreated D3D9 default pool texture: " + mName);
 	}
 
 	//---------------------------------------------------------------------
