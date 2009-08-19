@@ -2026,6 +2026,9 @@ namespace Ogre
 		int zDir = (rayDirection.z < 0 ? -1 : 1);
 
 		Result result(true, Vector3::ZERO);
+		Real dummyHighValue = mSize * 10000;
+
+
 		while (cur.y >= (minHeight - 1e-3) && cur.y <= (maxHeight + 1e-3))
 		{
 			if (quadX < 0 || quadX >= (int)mSize-1 || quadZ < 0 || quadZ >= (int)mSize-1)
@@ -2036,8 +2039,10 @@ namespace Ogre
 				break;
 
 			// determine next quad to test
-			Real xDist = (quadX - cur.x + flipX) / rayDirection.x;
-			Real zDist = (quadZ - cur.z + flipZ) / rayDirection.z;
+			Real xDist = Math::RealEqual(rayDirection.x, 0.0) ? dummyHighValue : 
+				(quadX - cur.x + flipX) / rayDirection.x;
+			Real zDist = Math::RealEqual(rayDirection.z, 0.0) ? dummyHighValue : 
+				(quadZ - cur.z + flipZ) / rayDirection.z;
 			if (xDist < zDist)
 			{
 				quadX += xDir;
