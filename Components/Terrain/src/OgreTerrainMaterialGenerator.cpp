@@ -162,7 +162,7 @@ namespace Ogre
 		Viewport* vp = rtt->getViewport(0);
 		mCompositeMapCam->setWindow(vpleft, vptop, vpright, vpbottom);
 
-		vp->update();
+		rtt->update();
 
 		// We have an RTT, we want to copy the results into a regular texture
 		// That's because in non-update scenarios we don't want to keep an RTT
