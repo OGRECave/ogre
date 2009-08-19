@@ -2572,11 +2572,15 @@ namespace Ogre
 			finaliseHeightDeltas(ddres.deltaUpdateRect, false);
 		if ((ddreq.typeMask & DERIVED_DATA_NORMALS) && 
 			!(ddres.remainingTypeMask & DERIVED_DATA_NORMALS))
+		{
 			finaliseNormals(ddres.normalUpdateRect, ddres.normalMapBox);
+			mCompositeMapDirtyRect.merge(ddreq.dirtyRect);
+		}
 		if ((ddreq.typeMask & DERIVED_DATA_LIGHTMAP) && 
 			!(ddres.remainingTypeMask & DERIVED_DATA_LIGHTMAP))
 		{
 			finaliseLightmap(ddres.lightmapUpdateRect, ddres.lightMapBox);
+			mCompositeMapDirtyRect.merge(ddreq.dirtyRect);
 			mCompositeMapDirtyRectLightmapUpdate = true;
 		}
 		
