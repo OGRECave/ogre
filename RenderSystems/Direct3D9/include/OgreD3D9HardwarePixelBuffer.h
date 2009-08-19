@@ -94,7 +94,7 @@ namespace Ogre {
 		/// destroy render texture.
 		void destroyRenderTexture();
 
-		void blit(const HardwarePixelBufferSharedPtr &src,
+		void blit(IDirect3DDevice9* d3d9Device, const HardwarePixelBufferSharedPtr &src,
 				const Image::Box &srcBox, const Image::Box &dstBox, 
 				BufferResources* srcBufferResources, 
 				BufferResources* dstBufferResources);

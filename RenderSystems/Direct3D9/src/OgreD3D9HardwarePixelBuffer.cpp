@@ -486,13 +486,14 @@ void D3D9HardwarePixelBuffer::blit(const HardwarePixelBufferSharedPtr &rsrc,
 				"D3D9HardwarePixelBuffer::blit");	
 		}
 
-		blit(rsrc, srcBox, dstBox, srcBufferResources, dstBufferResources);
+		blit(it->first, rsrc, srcBox, dstBox, srcBufferResources, dstBufferResources);
 		++it;
 	}
 }
 
 //-----------------------------------------------------------------------------  
-void D3D9HardwarePixelBuffer::blit(const HardwarePixelBufferSharedPtr &rsrc, 
+void D3D9HardwarePixelBuffer::blit(IDirect3DDevice9* d3d9Device, 
+								   const HardwarePixelBufferSharedPtr &rsrc, 
 								   const Image::Box &srcBox, 
 								   const Image::Box &dstBox,
 								   BufferResources* srcBufferResources, 
@@ -503,6 +504,63 @@ void D3D9HardwarePixelBuffer::blit(const HardwarePixelBufferSharedPtr &rsrc,
 		// Surface-to-surface
 		RECT dsrcRect = toD3DRECT(srcBox);
 		RECT ddestRect = toD3DRECT(dstBox);
+
+		D3DSURFACE_DESC srcDesc;
+		if(srcBufferResources->surface->GetDesc(&srcDesc) != D3D_OK)
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Could not get surface information",
+			"D3D9HardwarePixelBuffer::blit");
+
+		// If we're blitting from a RTT, try GetRenderTargetData
+		// if we're going to try to use GetRenderTargetData, need to use system mem pool
+		bool tryGetRenderTargetData = false;
+		if ((srcDesc.Usage & D3DUSAGE_RENDERTARGET) != 0
+			&& srcDesc.MultiSampleType == D3DMULTISAMPLE_NONE)
+		{
+
+			// Temp texture
+			IDirect3DTexture9 *tmptex;
+			IDirect3DSurface9 *tmpsurface;
+
+			if(D3DXCreateTexture(
+				d3d9Device,
+				srcDesc.Width, srcDesc.Height,
+				1, // 1 mip level ie topmost, generate no mipmaps
+				0, srcDesc.Format, D3DPOOL_SYSTEMMEM,
+				&tmptex
+				) != D3D_OK)
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Create temporary texture failed",
+					"D3D9HardwarePixelBuffer::blit");
+			}
+			if(tmptex->GetSurfaceLevel(0, &tmpsurface) != D3D_OK)
+			{
+				tmptex->Release();
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Get surface level failed",
+					"D3D9HardwarePixelBuffer::blit");
+			}
+			if(d3d9Device->GetRenderTargetData(srcBufferResources->surface, tmpsurface) == D3D_OK)
+			{
+				// Hey, it worked
+				// Copy from this surface instead
+				if(D3DXLoadSurfaceFromSurface(
+					dstBufferResources->surface, NULL, &ddestRect, 
+					tmpsurface, NULL, &dsrcRect,
+					D3DX_DEFAULT, 0) != D3D_OK)
+				{
+					tmpsurface->Release();
+					tmptex->Release();
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "D3DXLoadSurfaceFromSurface failed",
+						"D3D9HardwarePixelBuffer::blit");
+				}
+				tmpsurface->Release();
+				tmptex->Release();
+				return;
+			}
+
+		}
+
+		// Otherwise, try the normal method
+
 		// D3DXLoadSurfaceFromSurface
 		if(D3DXLoadSurfaceFromSurface(
 			dstBufferResources->surface, NULL, &ddestRect, 
