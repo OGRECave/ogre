@@ -194,9 +194,9 @@ namespace Ogre
 			Rect compositeMapRect;
 			float blendToTerrain = (float)mParent->getSize() / (float)mBuffer->getWidth();
 			compositeMapRect.left = mDirtyBox.left * blendToTerrain;
-			compositeMapRect.right = mDirtyBox.right * blendToTerrain;
+			compositeMapRect.right = mDirtyBox.right * blendToTerrain + 1;
 			compositeMapRect.top = (mBuffer->getHeight() - mDirtyBox.bottom) * blendToTerrain;
-			compositeMapRect.bottom = (mBuffer->getHeight() - mDirtyBox.top) * blendToTerrain;
+			compositeMapRect.bottom = (mBuffer->getHeight() - mDirtyBox.top) * blendToTerrain + 1;
 			mParent->_dirtyCompositeMapRect(compositeMapRect);
 			mParent->updateCompositeMapWithDelay();
 
