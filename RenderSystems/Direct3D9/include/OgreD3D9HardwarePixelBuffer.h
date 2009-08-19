@@ -75,9 +75,6 @@ namespace Ogre {
 		// The owner texture if exists.
 		D3D9Texture* mOwnerTexture;
 		
-		// The current locked box of this surface.
-		Image::Box mLockedBox;
-		
 		// The current lock flags of this surface.
 		DWORD mLockFlags;
 

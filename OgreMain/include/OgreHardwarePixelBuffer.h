@@ -59,8 +59,11 @@ namespace Ogre {
         size_t mRowPitch, mSlicePitch;
         // Internal format
         PixelFormat mFormat;
-        // Currently locked region
+        // Currently locked region (local coords)
         PixelBox mCurrentLock;
+		// The current locked box of this surface (entire surface coords)
+		Image::Box mLockedBox;
+
         
         /// Internal implementation of lock(), must be overridden in subclasses
         virtual PixelBox lockImpl(const Image::Box lockBox,  LockOptions options) = 0;

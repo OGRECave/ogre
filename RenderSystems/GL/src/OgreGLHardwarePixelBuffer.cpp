@@ -83,6 +83,7 @@ PixelBox GLHardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions 
 		download(mBuffer);
 	}
 	mCurrentLockOptions = options;
+	mLockedBox = lockBox;
 	return mBuffer.getSubVolume(lockBox);
 }
 //-----------------------------------------------------------------------------  
@@ -91,7 +92,7 @@ void GLHardwarePixelBuffer::unlockImpl(void)
 	if (mCurrentLockOptions != HardwareBuffer::HBL_READ_ONLY)
 	{
 		// From buffer to card, only upload if was locked for writing
-		upload(mCurrentLock, Box(0,0,0,mWidth,mHeight,mDepth));
+		upload(mCurrentLock, mLockedBox);
 	}
 	
 	freeBuffer();
