@@ -189,9 +189,13 @@ namespace Ogre
 		inVec.x = rect.right - 1;
 		inVec.y = rect.top; // this is 'bottom' in image space
 		terrain->convertPosition(Terrain::POINT_SPACE, inVec, Terrain::TERRAIN_SPACE, outVec);
-		imgRect.right = outVec.x * (Real)compSize; 
-		imgRect.bottom = (1.0 - outVec.y) * compSize;
+		imgRect.right = outVec.x * (Real)compSize + 1; 
+		imgRect.bottom = (1.0 - outVec.y) * compSize + 1;
 
+		imgRect.left = std::max(0L, imgRect.left);
+		imgRect.top = std::max(0L, imgRect.top);
+		imgRect.right = std::min((long)compSize, imgRect.right);
+		imgRect.bottom = std::min((long)compSize, imgRect.bottom);
 		
 
 		mParent->_renderCompositeMap(
