@@ -81,7 +81,7 @@ endmacro(make_library_set)
 # Generate debug names from given release names
 macro(get_debug_names PREFIX)
   foreach(i ${${PREFIX}})
-    set(${PREFIX}_DBG ${${PREFIX}_DBG} ${i}d ${i}D ${i}_d ${i}_D ${i})
+    set(${PREFIX}_DBG ${${PREFIX}_DBG} ${i}d ${i}D ${i}_d ${i}_D ${i}_debug ${i})
   endforeach(i)
 endmacro(get_debug_names)
 

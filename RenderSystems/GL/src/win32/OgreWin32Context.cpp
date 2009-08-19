@@ -102,13 +102,14 @@ namespace Ogre {
 // declared in OgreGLPrerequisites.h 
 WGLEWContext * wglewGetContext()
 {
-	static boost::thread_specific_ptr<WGLEWContext> WGLEWContextsPtr;
+	using namespace Ogre;
+	static OGRE_THREAD_POINTER_VAR(WGLEWContext, WGLEWContextsPtr);
 
-	WGLEWContext * currentWGLEWContextsPtr = WGLEWContextsPtr.get();
+	WGLEWContext * currentWGLEWContextsPtr = OGRE_THREAD_POINTER_GET(WGLEWContextsPtr);
 	if (currentWGLEWContextsPtr == NULL)
 	{
 		currentWGLEWContextsPtr = new WGLEWContext();
-		WGLEWContextsPtr.reset(currentWGLEWContextsPtr);
+		OGRE_THREAD_POINTER_SET(WGLEWContextsPtr, currentWGLEWContextsPtr);
 		ZeroMemory(currentWGLEWContextsPtr, sizeof(WGLEWContext));
 		wglewInit();
 

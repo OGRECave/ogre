@@ -149,6 +149,7 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
   set(OGRE_BUILD_RENDERSYSTEM_GL TRUE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
 endif ()
+
 ######################################################################
 # Provide user options to customise the build process
 ######################################################################
@@ -191,16 +192,8 @@ option(OGRE_CONFIG_CONTAINERS_USE_CUSTOM_ALLOCATOR "STL containers in Ogre use t
 option(OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR "Ogre String uses the custom allocator" FALSE)
 option(OGRE_CONFIG_MEMTRACK_DEBUG "Enable Ogre's memory tracker in debug mode" FALSE)
 option(OGRE_CONFIG_MEMTRACK_RELEASE "Enable Ogre's memory tracker in release mode" FALSE)
-if (Boost_THREAD_FOUND AND Boost_DATE_TIME_FOUND)
-  set(OGRE_CONFIG_THREADS 2 CACHE STRING 
-  "Enable Ogre thread support for background loading. Possible values:
-    0 - Threading off.
-    1 - Full background loading.
-    2 - Background resource preparation."
-  )
-else ()
-  set(OGRE_CONFIG_THREADS 0)
-endif ()
+# determine threading options
+include(PrepareThreadingOptions)
 cmake_dependent_option(OGRE_CONFIG_DISABLE_FREEIMAGE "Don't build FreeImage codec. If you use this option, you need to provide your own image handling codecs." FALSE "FreeImage_FOUND" TRUE)
 option(OGRE_CONFIG_DISABLE_DDS "Don't build DDS codec." FALSE)
 option(OGRE_CONFIG_NEW_COMPILERS "Use the new script compilers." TRUE)

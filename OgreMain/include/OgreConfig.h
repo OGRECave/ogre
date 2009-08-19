@@ -148,6 +148,21 @@ OGRE_THREAD_SUPPORT = 2
 #define OGRE_THREAD_SUPPORT 1
 #endif
 
+/** Provider for threading functionality, there are 4 options.
+
+OGRE_THREAD_PROVIDER = 0
+	No support for threading.
+OGRE_THREAD_PROVIDER = 1
+	Boost libraries provide threading functionality.
+OGRE_THREAD_PROVIDER = 2
+	Poco libraries provide threading functionality.
+OGRE_THREAD_PROVIDER = 3
+	TBB library provides threading functionality.
+*/
+#ifndef OGRE_THREAD_PROVIDER
+#define OGRE_THREAD_PROVIDER 0
+#endif
+
 /** Disables use of the FreeImage image library for loading images.
 WARNING: Use only when you want to provide your own image loading code via codecs.
 */

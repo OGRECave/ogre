@@ -50,7 +50,7 @@ CompositorManager& CompositorManager::getSingleton(void)
 	assert( ms_Singleton );  return ( *ms_Singleton );  
 }//-----------------------------------------------------------------------
 CompositorManager::CompositorManager():
-	mRectangle(0)
+	mRectangle(0), OGRE_THREAD_POINTER_INIT(mSerializer)
 {
 	initialise();
 
@@ -142,15 +142,15 @@ void CompositorManager::parseScript(DataStreamPtr& stream, const String& groupNa
 	ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
 #else // OGRE_USE_NEW_COMPILERS
 #  if OGRE_THREAD_SUPPORT
-	// check we have an instance for this thread 
-	if (!mSerializer.get())
+	// check we have an instance for this thread
+	if (!OGRE_THREAD_POINTER_GET(mSerializer))
 	{
 		// create a new instance for this thread - will get deleted when
 		// the thread dies
-		mSerializer.reset(OGRE_NEW CompositorSerializer());
+		OGRE_THREAD_POINTER_SET(mSerializer, OGRE_NEW CompositorSerializer());
 	}
 #  endif
-    mSerializer->parseScript(stream, groupName);
+    OGRE_THREAD_POINTER_GET(mSerializer)->parseScript(stream, groupName);
 #endif // OGRE_USE_NEW_COMPILERS
 
 }

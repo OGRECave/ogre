@@ -28,6 +28,7 @@ Torus Knot Software Ltd.
 */
 
 #include "OgreGLContext.h"
+#include "OgreSharedPtr.h"
 
 namespace Ogre {
     // Empty base class
@@ -48,13 +49,14 @@ namespace Ogre {
 // declared in OgreGLPrerequisites.h 
 GLEWContext * glewGetContext()
 {
-	static boost::thread_specific_ptr<GLEWContext> GLEWContextsPtr;
+	using namespace Ogre;
+	static OGRE_THREAD_POINTER_VAR(GLEWContext, GLEWContextsPtr);
 
-	GLEWContext * currentGLEWContextsPtr =  GLEWContextsPtr.get();
+	GLEWContext * currentGLEWContextsPtr =  OGRE_THREAD_POINTER_GET(GLEWContextsPtr);
 	if (currentGLEWContextsPtr == NULL)
 	{
 		currentGLEWContextsPtr = new GLEWContext();
-		GLEWContextsPtr.reset(currentGLEWContextsPtr);
+		OGRE_THREAD_POINTER_SET(GLEWContextsPtr, currentGLEWContextsPtr);
 		memset(currentGLEWContextsPtr, 0, sizeof(GLEWContext));
 		glewInit();
 	}

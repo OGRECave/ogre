@@ -27,15 +27,33 @@ else ()
 endif ()
 
 # configure threading options
+set(OGRE_THREAD_PROVIDER 0)
 if (OGRE_CONFIG_THREADS)
-  if (UNIX)
-    add_definitions(-pthread)
-  endif ()
-  include_directories(${Boost_INCLUDE_DIRS})
-  # On MSVC Boost usually tries to autolink boost libraries. However since
-  # this behaviour is not available on all compilers, we need to find the libraries
-  # ourselves, anyway. Disable auto-linking to avoid mess-ups.
-  add_definitions(-DBOOST_ALL_NO_LIB)
+	if (UNIX)
+		add_definitions(-pthread)
+	endif ()
+
+	if (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "boost")
+		set(OGRE_THREAD_PROVIDER 1)
+		include_directories(${Boost_INCLUDE_DIRS})
+		# On MSVC Boost usually tries to autolink boost libraries. However since
+		# this behaviour is not available on all compilers, we need to find the libraries
+		# ourselves, anyway. Disable auto-linking to avoid mess-ups.
+		add_definitions(-DBOOST_ALL_NO_LIB)
+		set(OGRE_THREAD_LIBRARIES ${Boost_LIBRARIES})
+	endif ()
+
+	if (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "poco")
+		set(OGRE_THREAD_PROVIDER 2)
+		include_directories(${POCO_INCLUDE_DIRS})
+		set(OGRE_THREAD_LIBRARIES ${POCO_LIBRARIES})
+	endif ()
+
+	if (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "tbb")
+		set(OGRE_THREAD_PROVIDER 3)
+		include_directories(${TBB_INCLUDE_DIRS})
+		set(OGRE_THREAD_LIBRARIES ${TBB_LIBRARIES})
+	endif ()
 endif()
 
 
@@ -47,6 +65,7 @@ set(OGRE_SET_STRING_USE_ALLOCATOR 0)
 set(OGRE_SET_MEMTRACK_DEBUG 0)
 set(OGRE_SET_MEMTRACK_RELEASE 0)
 set(OGRE_SET_THREADS ${OGRE_CONFIG_THREADS})
+set(OGRE_SET_THREAD_PROVIDER ${OGRE_THREAD_PROVIDER})
 set(OGRE_SET_DISABLE_FREEIMAGE 0)
 set(OGRE_SET_DISABLE_DDS 0)
 set(OGRE_SET_NEW_COMPILERS 0)

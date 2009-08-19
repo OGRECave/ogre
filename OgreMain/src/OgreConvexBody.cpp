@@ -46,7 +46,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	ConvexBody::PolygonList ConvexBody::msFreePolygons;
 #if OGRE_THREAD_SUPPORT
-	boost::recursive_mutex ConvexBody::msFreePolygonsMutex;
+	OGRE_STATIC_MUTEX_INSTANCE(ConvexBody::msFreePolygonsMutex)
 #endif
 	//-----------------------------------------------------------------------
 	void ConvexBody::_initialisePool()

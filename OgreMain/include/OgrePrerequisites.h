@@ -155,60 +155,7 @@ namespace Ogre {
 
 
 	// Useful threading defines
-	#define OGRE_AUTO_MUTEX_NAME mutex
-	#if OGRE_THREAD_SUPPORT
-		#define OGRE_AUTO_MUTEX mutable boost::recursive_mutex OGRE_AUTO_MUTEX_NAME;
-		#define OGRE_LOCK_AUTO_MUTEX boost::recursive_mutex::scoped_lock ogreAutoMutexLock(OGRE_AUTO_MUTEX_NAME);
-		#define OGRE_MUTEX(name) mutable boost::recursive_mutex name;
-		#define OGRE_STATIC_MUTEX(name) static boost::recursive_mutex name;
-		#define OGRE_STATIC_MUTEX_INSTANCE(name) boost::recursive_mutex name;
-		#define OGRE_LOCK_MUTEX(name) boost::recursive_mutex::scoped_lock ogrenameLock(name);
-		#define OGRE_LOCK_MUTEX_NAMED(mutexName, lockName) boost::recursive_mutex::scoped_lock lockName(mutexName);
-		// like OGRE_AUTO_MUTEX but mutex held by pointer
-		#define OGRE_AUTO_SHARED_MUTEX mutable boost::recursive_mutex *OGRE_AUTO_MUTEX_NAME;
-		#define OGRE_LOCK_AUTO_SHARED_MUTEX assert(OGRE_AUTO_MUTEX_NAME); boost::recursive_mutex::scoped_lock ogreAutoMutexLock(*OGRE_AUTO_MUTEX_NAME);
-		#define OGRE_NEW_AUTO_SHARED_MUTEX assert(!OGRE_AUTO_MUTEX_NAME); OGRE_AUTO_MUTEX_NAME = new boost::recursive_mutex();
-        #define OGRE_DELETE_AUTO_SHARED_MUTEX assert(OGRE_AUTO_MUTEX_NAME); delete OGRE_AUTO_MUTEX_NAME;
-		#define OGRE_COPY_AUTO_SHARED_MUTEX(from) assert(!OGRE_AUTO_MUTEX_NAME); OGRE_AUTO_MUTEX_NAME = from;
-        #define OGRE_SET_AUTO_SHARED_MUTEX_NULL OGRE_AUTO_MUTEX_NAME = 0;
-        #define OGRE_MUTEX_CONDITIONAL(mutex) if (mutex)
-		#define OGRE_THREAD_SYNCHRONISER(sync) boost::condition sync;
-		#define OGRE_THREAD_WAIT(sync, lock) sync.wait(lock);
-		#define OGRE_THREAD_NOTIFY_ONE(sync) sync.notify_one(); 
-		#define OGRE_THREAD_NOTIFY_ALL(sync) sync.notify_all(); 
-		// Thread-local pointer
-		#define OGRE_THREAD_POINTER(T, var) boost::thread_specific_ptr<T> var
-		#define OGRE_THREAD_POINTER_SET(var, expr) var.reset(expr)
-		#define OGRE_THREAD_POINTER_DELETE(var) var.reset(0)
-		#define OGRE_THREAD_POINTER_GET(var) var.get()
-		// Utility
-		#define OGRE_THREAD_SLEEP(ms) boost::this_thread::sleep(boost::posix_time::millisec(ms));
-	#else
-		#define OGRE_AUTO_MUTEX
-		#define OGRE_LOCK_AUTO_MUTEX
-		#define OGRE_MUTEX(name)
-		#define OGRE_STATIC_MUTEX(name)
-		#define OGRE_STATIC_MUTEX_INSTANCE(name)
-		#define OGRE_LOCK_MUTEX(name)
-		#define OGRE_LOCK_MUTEX_NAMED(mutexName, lockName)
-		#define OGRE_AUTO_SHARED_MUTEX
-		#define OGRE_LOCK_AUTO_SHARED_MUTEX
-		#define OGRE_NEW_AUTO_SHARED_MUTEX
-		#define OGRE_DELETE_AUTO_SHARED_MUTEX
-		#define OGRE_COPY_AUTO_SHARED_MUTEX(from)
-        #define OGRE_SET_AUTO_SHARED_MUTEX_NULL
-        #define OGRE_MUTEX_CONDITIONAL(name) if(true)
-		#define OGRE_THREAD_SYNCHRONISER(sync) 
-		#define OGRE_THREAD_WAIT(sync, lock) 
-		#define OGRE_THREAD_NOTIFY_ONE(sync) 
-		#define OGRE_THREAD_NOTIFY_ALL(sync) 
-		#define OGRE_THREAD_POINTER(T, var) T* var
-		#define OGRE_THREAD_POINTER_SET(var, expr) var = expr
-		#define OGRE_THREAD_POINTER_DELETE(var) OGRE_DELETE var; var = 0
-		#define OGRE_THREAD_POINTER_GET(var) var
-		#define OGRE_THREAD_SLEEP(ms)
-	#endif
-
+#include "Threading/OgreThreadDefines.h"
 
 // Pre-declare classes
 // Allows use of pointers in header files without including individual .h
@@ -236,6 +183,7 @@ namespace Ogre {
     template <typename T> class ControllerFunction;
     class ControllerManager;
     template <typename T> class ControllerValue;
+	class DefaultWorkQueue;
     class Degree;
     class DynLib;
     class DynLibManager;
@@ -393,6 +341,7 @@ namespace Ogre {
     class VertexDeclaration;
 	class VertexMorphKeyFrame;
     class WireBoundingBox;
+	class WorkQueue;
     class Compositor;
     class CompositorManager;
     class CompositorChain;

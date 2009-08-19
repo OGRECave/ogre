@@ -319,12 +319,9 @@ namespace Ogre
 
 	};
 
-	/** Implementation of a general purpose request / response style background work queue.
-	@remarks
-		This default implementation of a work queue starts a thread pool and 
-		provides queues to process requests. 
+	/** Base for a general purpose request / response style background work queue.
 	*/
-	class _OgreExport DefaultWorkQueue : public WorkQueue
+	class _OgreExport DefaultWorkQueueBase : public WorkQueue
 	{
 	public:
 
@@ -332,8 +329,8 @@ namespace Ogre
 			Call startup() to initialise.
 		@param name Optional name, just helps to identify logging output
 		*/
-		DefaultWorkQueue(const String& name = StringUtil::BLANK);
-		virtual ~DefaultWorkQueue();
+		DefaultWorkQueueBase(const String& name = StringUtil::BLANK);
+		virtual ~DefaultWorkQueueBase();
 		/// Get the name of the work queue
 		const String& getName() const;
 		/** Get the number of worker threads that this queue will start when 
@@ -381,23 +378,13 @@ namespace Ogre
 			method will be the thread used to call the RequestHandler.
 		*/
 		virtual void _processNextRequest();
-		/** To be called by a separate thread; will return immediately if there
-			are items in the queue, or suspend the thread until new items are added
-			otherwise.
-		*/
-		virtual void _waitForNextRequest();
 
-		/// Notify that a thread has registered itself with the render system
-		virtual void _notifyThreadRegistered();
+		/// Main function for each thread spawned.
+		virtual void _threadMain() = 0;
 
 		/** Returns whether the queue is trying to shut down. */
 		virtual bool isShuttingDown() const { return mShuttingDown; }
 
-		/// @copydoc WorkQueue::shutdown
-		virtual void shutdown();
-
-		/// @copydoc WorkQueue::startup
-		virtual void startup(bool forceRestart = true);
 		/// @copydoc WorkQueue::addRequestHandler
 		virtual void addRequestHandler(uint16 channel, RequestHandler* rh);
 		/// @copydoc WorkQueue::removeRequestHandler
@@ -443,16 +430,18 @@ namespace Ogre
 		ResponseQueue mResponseQueue;
 
 		/// Thread function
-		struct WorkerFunc
+		struct WorkerFunc OGRE_THREAD_WORKER_INHERIT
 		{
-			DefaultWorkQueue* mQueue;
-			bool mRenderSysAccess;
+			DefaultWorkQueueBase* mQueue;
 
-			WorkerFunc(DefaultWorkQueue* q, bool renderSysAccess) 
-				: mQueue(q), mRenderSysAccess(renderSysAccess) {}
+			WorkerFunc(DefaultWorkQueueBase* q) 
+				: mQueue(q) {}
 
 			void operator()();
+
+			void run();
 		};
+		WorkerFunc mWorkerFunc;
 
 		typedef list<RequestHandler*>::type RequestHandlerList;
 		typedef list<ResponseHandler*>::type ResponseHandlerList;
@@ -465,29 +454,19 @@ namespace Ogre
 		bool mPaused;
 		bool mAcceptRequests;
 		bool mShuttingDown;
-		size_t mNumThreadsRegisteredWithRS;
-		/// Init notification mutex (must lock before waiting on initCondition)
-		OGRE_MUTEX(mInitMutex)
-		/// Synchroniser token to wait / notify on thread init 
-		OGRE_THREAD_SYNCHRONISER(mInitSync)
 
 		OGRE_MUTEX(mRequestMutex)
 		OGRE_MUTEX(mResponseMutex)
-		OGRE_MUTEX(mRequestHandlerMutex)
-		OGRE_MUTEX(mResponseHandlerMutex)
-		OGRE_THREAD_SYNCHRONISER(mRequestCondition)
-#if OGRE_THREAD_SUPPORT
-		typedef vector<boost::thread*>::type WorkerThreadList;
-		WorkerThreadList mWorkers;
-#endif
+		OGRE_RW_MUTEX(mRequestHandlerMutex);
 
 
 		void processRequestResponse(Request* r, bool synchronous);
 		Response* processRequest(Request* r);
 		void processResponse(Response* r);
-
-
-
+		/// Notify workers about a new request. 
+		virtual void notifyWorkers() = 0;
+		/// Put a Request on the queue with a specific RequestID.
+		void addRequestWithRID(RequestID rid, uint16 channel, uint16 requestType, const Any& rData, uint8 retryCount);
 
 	};
 
@@ -499,5 +478,7 @@ namespace Ogre
 	/** @} */
 
 }
+
+
 #endif
 

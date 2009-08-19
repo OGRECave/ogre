@@ -67,6 +67,7 @@ Torus Knot Software Ltd.
 #include "OgreRenderQueueInvocation.h"
 #include "OgrePlatformInformation.h"
 #include "OgreConvexBody.h"
+#include "Threading/OgreDefaultWorkQueue.h"
 	
 #if OGRE_NO_FREEIMAGE == 0
 #include "OgreFreeImageCodec.h"
@@ -155,7 +156,7 @@ namespace Ogre {
 		defaultQ->setResponseProcessingTimeLimit(10);
 		// match threads to hardware
 #if OGRE_THREAD_SUPPORT
-		unsigned threadCount = boost::thread::hardware_concurrency();
+		unsigned threadCount = OGRE_THREAD_HARDWARE_CONCURRENCY;
 		if (!threadCount)
 			threadCount = 1;
 		defaultQ->setWorkerThreadCount(threadCount);

@@ -459,6 +459,20 @@ namespace Ogre
 
 #endif // OGRE_DEBUG_MODE
 
+
+namespace Ogre
+{
+	/** Function which invokes OGRE_DELETE on a given pointer. 
+	@remarks
+		Useful to pass custom deletion policies to external libraries (e. g. boost).
+	*/
+	template<typename T>
+	void deletePtr(T* ptr)
+	{
+		OGRE_DELETE ptr;
+	}
+}
+
 /** @} */
 /** @} */
 

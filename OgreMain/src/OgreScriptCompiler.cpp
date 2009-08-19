@@ -1536,7 +1536,7 @@ namespace Ogre
     }
 	//-----------------------------------------------------------------------
 	ScriptCompilerManager::ScriptCompilerManager()
-		:mListener(0)
+		:mListener(0), OGRE_THREAD_POINTER_INIT(mScriptCompiler)
 	{
 		OGRE_LOCK_AUTO_MUTEX
 #if OGRE_USE_NEW_COMPILERS == 1
@@ -1628,19 +1628,19 @@ namespace Ogre
     {
 #if OGRE_THREAD_SUPPORT
 		// check we have an instance for this thread (should always have one for main thread)
-		if (!mScriptCompiler.get())
+		if (!OGRE_THREAD_POINTER_GET(mScriptCompiler))
 		{
 			// create a new instance for this thread - will get deleted when
 			// the thread dies
-			mScriptCompiler.reset(OGRE_NEW ScriptCompiler());
+			OGRE_THREAD_POINTER_SET(mScriptCompiler, OGRE_NEW ScriptCompiler());
 		}
 #endif
 		// Set the listener on the compiler before we continue
 		{
 			OGRE_LOCK_AUTO_MUTEX
-			mScriptCompiler->setListener(mListener);
+			OGRE_THREAD_POINTER_GET(mScriptCompiler)->setListener(mListener);
 		}
-        mScriptCompiler->compile(stream->getAsString(), stream->getName(), groupName);
+        OGRE_THREAD_POINTER_GET(mScriptCompiler)->compile(stream->getAsString(), stream->getName(), groupName);
     }
 
 	//-------------------------------------------------------------------------

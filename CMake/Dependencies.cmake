@@ -144,6 +144,10 @@ endif(NOT OGRE_BUILD_PLATFORM_IPHONE)
 find_package(POCO)
 macro_log_feature(POCO_FOUND "POCO" "POCO framework" "http://pocoproject.org/" FALSE "" "")
 
+# ThreadingBuildingBlocks
+find_package(TBB)
+macro_log_feature(TBB_FOUND "tbb" "Threading Building Blocks" "http://openttb.org/" FALSE "" "")
+
 
 
 #######################################################################

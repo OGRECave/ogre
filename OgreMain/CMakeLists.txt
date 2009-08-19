@@ -535,6 +535,50 @@ elseif (UNIX)
 endif(WIN32)
 
 
+# Configure threading files
+set(THREAD_HEADER_FILES
+	include/Threading/OgreThreadDefines.h
+	include/Threading/OgreThreadHeaders.h
+	include/Threading/OgreDefaultWorkQueue.h
+)
+if (OGRE_THREAD_PROVIDER EQUAL 0)
+	list(APPEND THREAD_HEADER_FILES
+		include/Threading/OgreThreadDefinesNone.h
+		include/Threading/OgreDefaultWorkQueueStandard.h
+	)
+	set(THREAD_SOURCE_FILES
+		src/Threading/OgreDefaultWorkQueueStandard.cpp
+	)
+elseif (OGRE_THREAD_PROVIDER EQUAL 1)
+	list(APPEND THREAD_HEADER_FILES
+		include/Threading/OgreThreadDefinesBoost.h
+		include/Threading/OgreThreadHeadersBoost.h
+		include/Threading/OgreDefaultWorkQueueStandard.h
+	)
+	set(THREAD_SOURCE_FILES
+		src/Threading/OgreDefaultWorkQueueStandard.cpp
+	)
+elseif (OGRE_THREAD_PROVIDER EQUAL 2)
+	list(APPEND THREAD_HEADER_FILES
+		include/Threading/OgreThreadDefinesPoco.h
+		include/Threading/OgreThreadHeadersPoco.h
+		include/Threading/OgreDefaultWorkQueueStandard.h
+	)
+	set(THREAD_SOURCE_FILES
+		src/Threading/OgreDefaultWorkQueueStandard.cpp
+	)
+elseif (OGRE_THREAD_PROVIDER EQUAL 3)
+	list(APPEND THREAD_HEADER_FILES
+		include/Threading/OgreThreadDefinesTBB.h
+		include/Threading/OgreThreadHeadersTBB.h
+		include/Threading/OgreDefaultWorkQueueTBB.h
+	)
+	set(THREAD_SOURCE_FILES
+		src/Threading/OgreDefaultWorkQueueTBB.cpp
+	)
+endif ()
+
+
 # Add needed definitions and nedmalloc include dir
 add_definitions(-DOGRE_NONCLIENT_BUILD -DFREEIMAGE_LIB -D_MT -D_USRDLL)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/nedmalloc)
@@ -548,7 +592,7 @@ set(LIBRARIES
 )
 
 if (OGRE_CONFIG_THREADS)
-  list(APPEND LIBRARIES ${Boost_LIBRARIES})
+  list(APPEND LIBRARIES ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 if (OGRE_CONFIG_DISABLE_FREEIMAGE)
@@ -558,7 +602,7 @@ if (OGRE_CONFIG_DISABLE_FREEIMAGE)
 endif()
 
 # setup OgreMain target
-add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
+add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES})
 set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OGRE_VERSION_MAJOR})
 if (APPLE)
   if (NOT OGRE_BUILD_PLATFORM_IPHONE)
@@ -596,4 +640,7 @@ install(FILES ${HEADER_FILES}
 )
 install(FILES ${PLATFORM_HEADER_FILES}
   DESTINATION include/OGRE/${PLATFORM_HEADER_INSTALL}
+)
+install(FILES ${THREAD_HEADER_FILES}
+	DESTINATION include/OGRE/Threading
 )
