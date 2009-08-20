@@ -766,22 +766,6 @@ namespace Ogre {
         offset += VertexElement::getTypeSize(VET_FLOAT3);
         decl->addElement(0, offset, VET_COLOUR, VES_DIFFUSE);
         offset += VertexElement::getTypeSize(VET_COLOUR);
-
-		// Make sure material is aware of colour per vertex.
-		if (mpMaterial.isNull() == false)
-		{
-			Pass* srcPass = NULL;
-			
-			if (mpMaterial->getTechnique(0) != NULL &&
-				mpMaterial->getTechnique(0)->getPass(0) != NULL)
-			{
-				srcPass = mpMaterial->getTechnique(0)->getPass(0);
-			}			
-
-			if (srcPass != NULL)			
-				srcPass->setVertexColourTracking(TVC_DIFFUSE);			
-		}
-
         // Texture coords irrelevant when enabled point rendering (generated
         // in point sprite mode, and unused in standard point mode)
         if (!mPointRendering)

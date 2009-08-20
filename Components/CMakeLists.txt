@@ -20,5 +20,3 @@ endif ()
 if (OGRE_BUILD_COMPONENT_TERRAIN)
   add_subdirectory(Terrain)
 endif ()
-
-add_subdirectory(CRTShaderSystem)

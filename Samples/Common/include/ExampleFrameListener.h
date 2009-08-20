@@ -38,7 +38,6 @@ D:        Step right
 #include "Ogre.h"
 #include "OgreStringConverter.h"
 #include "OgreException.h"
-#include "../../../Components/CRTShaderSystem/include/OgreCRTShaderSystem.h"
 
 //Use this define to signify OIS will be used as a DLL
 //(so that dll import/export macros are in effect)
@@ -46,55 +45,6 @@ D:        Step right
 #include <OIS/OIS.h>
 
 using namespace Ogre;
-#define _SHADER_GENERATOR_SCHEME_1	"ShaderGeneratorScheme_1"
-
-class ShaderGeneratorTechniqueResolverListener : public MaterialManager::Listener
-{
-public:
-	virtual Technique* handleSchemeNotFound(unsigned short schemeIndex, 
-		const String& schemeName, Material* originalMaterial, unsigned short lodIndex, 
-		const Renderable* rend)
-	{
-		//CRTShader::ShaderGenerator::getSingleton().setMaxLightCount();
-	
-		if (schemeName == _SHADER_GENERATOR_SCHEME_1)
-		{
-			MaterialRegisterIterator itFind = mRegisteredMaterials.find(originalMaterial);
-			bool techniqueCreated = false;
-
-			if (itFind == mRegisteredMaterials.end())
-			{
-				techniqueCreated = CRTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
-					originalMaterial->getName(), 
-					MaterialManager::DEFAULT_SCHEME_NAME, 
-					_SHADER_GENERATOR_SCHEME_1);
-
-				if (techniqueCreated)
-				{
-					CRTShader::ShaderGenerator::getSingleton().validateScheme(_SHADER_GENERATOR_SCHEME_1, originalMaterial->getName());
-				}
-			}
-			mRegisteredMaterials[originalMaterial] = techniqueCreated;
-		}
-
-		return NULL;
-	}
-
-
-	void clearRegisteredMaterials()
-	{
-		mRegisteredMaterials.clear();
-	}
-
-
-protected:
-	typedef std::map<Material*, bool>		MaterialRegisterMap;
-	typedef MaterialRegisterMap::iterator	MaterialRegisterIterator;
-
-
-protected:
-	MaterialRegisterMap		mRegisteredMaterials;
-};
 
 class ExampleFrameListener: public FrameListener, public WindowEventListener
 {
@@ -175,9 +125,6 @@ public:
 
 		//Register as a Window listener
 		WindowEventUtilities::addWindowEventListener(mWindow, this);
-
-		// Register the material manager listener.
-		MaterialManager::getSingleton().addListener(&mMaterialMgrListener);
 	}
 
 	//Adjust mouse clipping area
@@ -425,33 +372,6 @@ public:
 		if( !mKeyboard->buffered() )
 			if( processUnbufferedKeyInput(evt) == false )
 				return false;
-
-		// Switch to default scheme.
-		if (mKeyboard->isKeyDown(OIS::KC_F2))
-		{	
-			mCamera->getViewport()->setMaterialScheme(MaterialManager::DEFAULT_SCHEME_NAME);			
-			mDebugText = "Active Viewport Scheme: ";
-			mDebugText += MaterialManager::DEFAULT_SCHEME_NAME;
-		}
-
-		// Switch to shader generator scheme.
-		if (mKeyboard->isKeyDown(OIS::KC_F3))
-		{	
-			SceneManager* sceneMgr = CRTShader::ShaderGenerator::getSingleton().getSceneManager();
-			const LightList& lightList =  sceneMgr->_getLightsAffectingFrustum();
-			int maxLightCount[3] = {0};
-
-			for (unsigned int i=0; i < lightList.size(); ++i)
-			{
-				maxLightCount[lightList[i]->getType()]++;
-			}
-			CRTShader::ShaderGenerator::getSingleton().setMaxLightCount(maxLightCount);
-
-			mMaterialMgrListener.clearRegisteredMaterials();
-			mCamera->getViewport()->setMaterialScheme(_SHADER_GENERATOR_SCHEME_1);
-			mDebugText = "Active Viewport Scheme: ";
-			mDebugText += _SHADER_GENERATOR_SCHEME_1;
-		}
 #endif
 		if( !mMouse->buffered() )
 			if( processUnbufferedMouseInput(evt) == false )
@@ -521,7 +441,6 @@ protected:
 	OIS::Mouse*    mMouse;
 	OIS::Keyboard* mKeyboard;
 	OIS::JoyStick* mJoy;
-	ShaderGeneratorTechniqueResolverListener mMaterialMgrListener;
 };
 
 #endif

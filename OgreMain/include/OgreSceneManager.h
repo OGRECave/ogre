@@ -630,8 +630,6 @@ namespace Ogre {
         typedef vector<RenderQueueListener*>::type RenderQueueListenerList;
         RenderQueueListenerList mRenderQueueListeners;
 
-		typedef vector<RenderObjectListener*>::type RenderObjectListenerList;
-		RenderObjectListenerList mRenderObjectListeners;
         typedef vector<Listener*>::type ListenerList;
         ListenerList mListeners;
 		/// Internal method for firing the queue start event
@@ -642,9 +640,6 @@ namespace Ogre {
         virtual bool fireRenderQueueStarted(uint8 id, const String& invocation);
         /// Internal method for firing the queue end event, returns true if queue is to be repeated
         virtual bool fireRenderQueueEnded(uint8 id, const String& invocation);
-		/// Internal method for firing when rendering a single object.
-		virtual void fireRenderSingleObject(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, 
-			const LightList* pLightList, bool suppressRenderStateChanges);
 
 		/// Internal method for firing the texture shadows updated event
         virtual void fireShadowTexturesUpdated(size_t numberOfShadowTextures);
@@ -2366,14 +2361,6 @@ namespace Ogre {
 
         /** Removes a listener previously added with addRenderQueueListener. */
         virtual void removeRenderQueueListener(RenderQueueListener* delListener);
-
-		/** Registers a new Render Object Listener which will be notified when rendering an object.
-
-		/** Registers a new Render Object Listener which will be notified when rendering an object.		
-		*/
-		virtual void addRenderObjectListener(RenderObjectListener* newListener);
-		/** Removes a listener previously added with addRenderObjectListener. */
-		virtual void removeRenderObjectListener(RenderObjectListener* delListener);
 
 		/** Adds an item to the 'special case' render queue list.
 		@remarks
