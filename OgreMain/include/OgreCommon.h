@@ -53,6 +53,13 @@ namespace Ogre {
 
 	/// Fast general hashing algorithm
 	uint32 _OgreExport FastHash (const char * data, int len, uint32 hashSoFar = 0);
+	/// Combine hashes with same style as boost::hash_combine
+	template <typename T>
+	uint32 HashCombine (uint32 hashSoFar, const T& data)
+	{
+		return FastHash(&data, sizeof(T), hashSoFar);
+	}
+
 
     /** Comparison functions used for the depth/stencil buffer operations and 
 		others. */
