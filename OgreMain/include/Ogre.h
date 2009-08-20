@@ -85,6 +85,7 @@ Torus Knot Software Ltd.
 #include "OgreRadixSort.h"
 #include "OgreRenderQueueInvocation.h"
 #include "OgreRenderQueueListener.h"
+#include "OgreRenderObjectListener.h"
 #include "OgreRenderSystem.h"
 #include "OgreRenderTargetListener.h"
 #include "OgreRenderTexture.h"

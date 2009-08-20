@@ -131,6 +131,21 @@ namespace Ogre {
 			{
 				decl->addElement(0, offset, VET_COLOUR, VES_DIFFUSE);
 				offset += VertexElement::getTypeSize(VET_COLOUR);
+
+				// Make sure material is aware of colour per vertex.
+				if (mMaterial.isNull() == false)
+				{
+					Pass* srcPass = NULL;
+
+					if (mMaterial->getTechnique(0) != NULL &&
+						mMaterial->getTechnique(0)->getPass(0) != NULL)
+					{
+						srcPass = mMaterial->getTechnique(0)->getPass(0);
+					}			
+
+					if (srcPass != NULL)			
+						srcPass->setVertexColourTracking(TVC_DIFFUSE);			
+				}
 			}
 
 			if (mUseTexCoords)

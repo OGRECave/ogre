@@ -48,6 +48,7 @@ Torus Knot Software Ltd.
 #include "OgreOverlayManager.h"
 #include "OgreStringConverter.h"
 #include "OgreRenderQueueListener.h"
+#include "OgreRenderObjectListener.h"
 #include "OgreBillboardSet.h"
 #include "OgrePass.h"
 #include "OgreTechnique.h"
@@ -3283,6 +3284,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					lightsLeft = 0;
 				}
 
+				fireRenderSingleObject(rend, pass, mAutoParamDataSource, pLightListToUse, mSuppressRenderStateChanges);
 
 				// Do we need to update GPU program parameters?
 				if (pass->isProgrammable())
@@ -3375,6 +3377,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 
 			if (!skipBecauseOfLightType)
 			{
+				fireRenderSingleObject(rend, pass, mAutoParamDataSource, manualLightList, mSuppressRenderStateChanges);
 				// Do we need to update GPU program parameters?
 				if (pass->isProgrammable())
 				{
@@ -3429,6 +3432,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 	}
 	else // mSuppressRenderStateChanges
 	{
+		fireRenderSingleObject(rend, pass, mAutoParamDataSource, NULL, mSuppressRenderStateChanges);
 		// Just render
 		mDestRenderSystem->setCurrentPassIterationCount(1);
 		if (rend->preRender(this, mDestRenderSystem))
@@ -3834,6 +3838,24 @@ void SceneManager::removeRenderQueueListener(RenderQueueListener* delListener)
 
 }
 //---------------------------------------------------------------------
+void SceneManager::addRenderObjectListener(RenderObjectListener* newListener)
+{
+	mRenderObjectListeners.push_back(newListener);
+}
+//---------------------------------------------------------------------
+void SceneManager::removeRenderObjectListener(RenderObjectListener* delListener)
+{
+	RenderObjectListenerList::iterator i, iend;
+	iend = mRenderObjectListeners.end();
+	for (i = mRenderObjectListeners.begin(); i != iend; ++i)
+	{
+		if (*i == delListener)
+		{
+			mRenderObjectListeners.erase(i);
+			break;
+		}
+	}
+}
 void SceneManager::addListener(Listener* newListener)
 {
     mListeners.push_back(newListener);
@@ -3896,6 +3918,19 @@ bool SceneManager::fireRenderQueueEnded(uint8 id, const String& invocation)
         (*i)->renderQueueEnded(id, invocation, repeat);
     }
     return repeat;
+}
+//---------------------------------------------------------------------
+void SceneManager::fireRenderSingleObject(Renderable* rend, const Pass* pass,
+										   const AutoParamDataSource* source, 
+										   const LightList* pLightList, bool suppressRenderStateChanges)
+{
+	RenderObjectListenerList::iterator i, iend;
+
+	iend = mRenderObjectListeners.end();
+	for (i = mRenderObjectListeners.begin(); i != iend; ++i)
+	{
+		(*i)->notifyRenderSingleObject(rend, pass, source, pLightList, suppressRenderStateChanges);
+	}
 }
 //---------------------------------------------------------------------
 void SceneManager::fireShadowTexturesUpdated(size_t numberOfShadowTextures)

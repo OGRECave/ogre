@@ -1,0 +1,15 @@
+//-----------------------------------------------------------------------------
+// Program Name: FFPLib_Transform
+// Program Desc: Transform functions of the FFP.
+// Program Type: Vertex shader
+// Language: CG
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+void FFP_Transform(in float4x4 m, 
+				   in float4 v, 
+				   out float4 vOut)
+{
+	vOut = mul(m, v);
+}

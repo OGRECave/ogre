@@ -85,6 +85,7 @@ public:
 		mResourcePath = "";
         mConfigPath = mResourcePath;
 #endif
+		mCreateExtraRenderWindows = false;
     }
     /// Standard destructor
     virtual ~ExampleApplication()
@@ -109,6 +110,7 @@ public:
 
         // clean up
         destroyScene();
+		CRTShader::ShaderGenerator::finalize();
     }
 
 protected:
@@ -120,8 +122,10 @@ protected:
     SceneManager* mSceneMgr;
     ExampleFrameListener* mFrameListener;
     RenderWindow* mWindow;
+	RenderWindowList mRenderWindows;
 	Ogre::String mResourcePath;
 	Ogre::String mConfigPath;
+	bool mCreateExtraRenderWindows;
 
     // These internal methods package up the stages in the startup process
     /** Sets up the application - returns false if the user chooses to abandon configuration. */
@@ -159,6 +163,10 @@ protected:
 		// Create the scene
         createScene();
 
+		ResourceGroupManager::getSingleton().addResourceLocation("../../../Samples/Media/CRTShaderLib", "FileSystem");		
+		CRTShader::ShaderGenerator::initialize(mSceneMgr);
+		CRTShader::ShaderGenerator::getSingleton().setShaderCachePath("../../../Samples/Media/CRTShaderLib/");
+		
         createFrameListener();
 
         return true;
@@ -175,6 +183,24 @@ protected:
             // If returned true, user clicked OK so initialise
             // Here we choose to let the system create a default rendering window by passing 'true'
             mWindow = mRoot->initialise(true);
+
+			if (mCreateExtraRenderWindows)
+			{
+				for (unsigned i = 1; i < mRoot->getDisplayMonitorCount(); ++i)
+				{
+					String strWindowName = mWindow->getName() + "_" + StringConverter::toString(i);
+					NameValuePairList nvList;
+
+					nvList["monitorIndex"] = StringConverter::toString(i);
+
+					RenderWindow* currRenderWindow = mRoot->createRenderWindow(strWindowName,
+						mWindow->getWidth(), mWindow->getHeight(), mWindow->isFullScreen(), &nvList);
+
+					currRenderWindow->setDeactivateOnFocusChange(false);
+
+					mRenderWindows.push_back(currRenderWindow);
+				}
+			}
             return true;
         }
         else
@@ -224,6 +250,11 @@ protected:
         // Alter the camera aspect ratio to match the viewport
         mCamera->setAspectRatio(
             Real(vp->getActualWidth()) / Real(vp->getActualHeight()));
+
+		for (uint i = 0; i < mRenderWindows.size(); ++i)
+		{
+			mRenderWindows[i]->addViewport(mCamera);
+		}
     }
 
     /// Method which will define the source of resources (other than current folder)

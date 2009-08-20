@@ -278,6 +278,7 @@ namespace Ogre {
 	class RenderQueueInvocation;
 	class RenderQueueInvocationSequence;
     class RenderQueueListener;
+	class RenderObjectListener;
     class RenderSystem;
     class RenderSystemCapabilities;
     class RenderSystemCapabilitiesManager;

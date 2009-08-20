@@ -59,6 +59,8 @@ if (OGRE_BUILD_SAMPLES)
   else ()
     set(OGRE_LIBRARIES ${OGRE_LIBRARIES})
   endif ()
+  
+  set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} CRTShaderGenerator)
 
   if (OGRE_STATIC)
   	# Static linking means we need to directly use plugins

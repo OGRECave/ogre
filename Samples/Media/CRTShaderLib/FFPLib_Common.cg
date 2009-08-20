@@ -1,0 +1,168 @@
+//-----------------------------------------------------------------------------
+// Program Name: FFPLib_Common
+// Program Desc: Common functions of the FFP.
+// Program Type: Vertex/Pixel shader
+// Language: CG
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+void FFP_Assign(in float vIn, out float vOut)
+{
+	vOut = vIn;
+}
+//-----------------------------------------------------------------------------
+void FFP_Assign(in float2 vIn, out float2 vOut)
+{
+	vOut = vIn;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Assign(in float3 vIn, out float3 vOut)
+{
+	vOut = vIn;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Assign(in float4 vIn, out float4 vOut)
+{
+	vOut = vIn;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Construct(in float r, 
+				   in float g,
+				   in float b,
+				   in float a,
+				   out float4 vOut)
+{
+	vOut = float4(r,g,b,a);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Modulate(in float vIn0, in float vIn1, out float vOut)
+{
+	vOut = vIn0 * vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Modulate(in float2 vIn0, in float2 vIn1, out float2 vOut)
+{
+	vOut = vIn0 * vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Modulate(in float3 vIn0, in float3 vIn1, out float3 vOut)
+{
+	vOut = vIn0 * vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Modulate(in float4 vIn0, in float4 vIn1, out float4 vOut)
+{
+	vOut = vIn0 * vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Add(in float vIn0, in float vIn1, out float vOut)
+{
+	vOut = vIn0 + vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Add(in float2 vIn0, in float2 vIn1, out float2 vOut)
+{
+	vOut = vIn0 + vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Add(in float3 vIn0, in float3 vIn1, out float3 vOut)
+{
+	vOut = vIn0 + vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Add(in float4 vIn0, in float4 vIn1, out float4 vOut)
+{
+	vOut = vIn0 + vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Subtract(in float vIn0, in float vIn1, out float vOut)
+{
+	vOut = vIn0 - vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Subtract(in float2 vIn0, in float2 vIn1, out float2 vOut)
+{
+	vOut = vIn0 - vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Subtract(in float3 vIn0, in float3 vIn1, out float3 vOut)
+{
+	vOut = vIn0 - vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Subtract(in float4 vIn0, in float4 vIn1, out float4 vOut)
+{
+	vOut = vIn0 - vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Lerp(in float vIn0, in float vIn1, float T, out float vOut)
+{
+	vOut = lerp(vIn0, vIn1, T);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Lerp(in float2 vIn0, in float2 vIn1, float T, out float2 vOut)
+{
+	vOut = lerp(vIn0, vIn1, T);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Lerp(in float3 vIn0, in float3 vIn1, float T, out float3 vOut)
+{
+	vOut = lerp(vIn0, vIn1, T);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Lerp(in float4 vIn0, in float4 vIn1, float T, out float4 vOut)
+{
+	vOut = lerp(vIn0, vIn1, T);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Lerp(in float4 vIn0, in float4 vIn1, float4 T, out float4 vOut)
+{
+	vOut = lerp(vIn0, vIn1, T);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_DotProduct(in float vIn0, in float vIn1, out float vOut)
+{
+	vOut = dot(vIn0, vIn1);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_DotProduct(in float2 vIn0, in float2 vIn1, out float2 vOut)
+{
+	vOut = dot(vIn0, vIn1);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_DotProduct(in float3 vIn0, in float3 vIn1, out float3 vOut)
+{
+	vOut = dot(vIn0, vIn1);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_DotProduct(in float4 vIn0, in float4 vIn1, out float4 vOut)
+{
+	vOut = dot(vIn0, vIn1);
+}
+
+
+
