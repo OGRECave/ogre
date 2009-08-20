@@ -581,6 +581,14 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         GL_FOG_BIT | GL_LIGHTING_BIT | GL_POLYGON_BIT | GL_SCISSOR_BIT | GL_STENCIL_BUFFER_BIT |
         GL_TEXTURE_BIT | GL_VIEWPORT_BIT);
 
+	RenderSystem* rsys = Root::getSingleton().getRenderSystem();
+	rsys->_disableTextureUnitsFrom(1);
+	if (GLEW_VERSION_1_2)
+	{
+		glActiveTextureARB(GL_TEXTURE0);
+	}
+
+
     /// Disable alpha, depth and scissor testing, disable blending, 
     /// disable culling, disble lighting, disable fog and reset foreground
     /// colour.
@@ -694,7 +702,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         /// Normalise to texture coordinate in 0.0 .. 1.0
         w = (w+0.5f) / (float)src->mDepth;
         
-        /// Finally we're ready to rumble
+        /// Finally we're ready to rumble	
         glBindTexture(src->mTarget, src->mTextureID);
         glEnable(src->mTarget);
         glBegin(GL_QUADS);
