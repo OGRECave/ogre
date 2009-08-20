@@ -550,7 +550,10 @@ void GLTextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Image:
     /// Check for FBO support first
     /// Destination texture must be 1D, 2D, 3D, or Cube
     /// Source texture must be 1D, 2D or 3D
-    if(GLEW_EXT_framebuffer_object &&
+	
+	// This does not sem to work for RTTs after the first update
+	// I have no idea why! For the moment, disable 
+    if(GLEW_EXT_framebuffer_object && (src->getUsage() & TU_RENDERTARGET) == 0 &&
         (srct->mTarget==GL_TEXTURE_1D||srct->mTarget==GL_TEXTURE_2D||srct->mTarget==GL_TEXTURE_3D))
     {
         blitFromTexture(srct, srcBox, dstBox);
@@ -581,8 +584,9 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         GL_FOG_BIT | GL_LIGHTING_BIT | GL_POLYGON_BIT | GL_SCISSOR_BIT | GL_STENCIL_BUFFER_BIT |
         GL_TEXTURE_BIT | GL_VIEWPORT_BIT);
 
+	// Important to disable all other texture units
 	RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-	rsys->_disableTextureUnitsFrom(1);
+	rsys->_disableTextureUnitsFrom(0);
 	if (GLEW_VERSION_1_2)
 	{
 		glActiveTextureARB(GL_TEXTURE0);
