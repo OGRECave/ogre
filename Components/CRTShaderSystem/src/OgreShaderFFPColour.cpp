@@ -292,7 +292,7 @@ uint32 FFPColour::getHashCode()
 {	
 	uint32 hashCode   = 0;
 				
-	boost::hash_combine(hashCode, __super::getHashCode());
+	boost::hash_combine(hashCode, SubRenderState::getHashCode());
 	boost::hash_combine(hashCode, mResolveStageFlags);
 	
 	return hashCode;

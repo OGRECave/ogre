@@ -98,7 +98,7 @@ uint32 FFPLighting::getHashCode()
 {
 	uint32 hashCode = 0;
 	
-	boost::hash_combine(hashCode, __super::getHashCode());
+	boost::hash_combine(hashCode, SubRenderState::getHashCode());
 
 	LightParamsIterator it = mLightParamsList.begin();
 

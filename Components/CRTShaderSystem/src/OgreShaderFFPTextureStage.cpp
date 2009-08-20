@@ -799,7 +799,7 @@ uint32 FFPTextureStage::getHashCode()
 {
 	uint32 hashCode = 0;
 	
-	boost::hash_combine(hashCode, __super::getHashCode());
+	boost::hash_combine(hashCode, SubRenderState::getHashCode());
 	boost::hash_combine(hashCode, mTextureSamplerIndex);
 	boost::hash_combine(hashCode, mTextureUnitState->getTextureType());
 

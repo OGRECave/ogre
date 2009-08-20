@@ -232,11 +232,12 @@ void ProgramWriter::writeFunctionParameter(std::ostream& os, Parameter* paramete
 		os << " : " << mParamSemanticMap[parameter->getSemantic()];
 		if (parameter->getIndex() >= 0)
 		{
-			char indexString[10 + 1];
+			//char indexString[10 + 1];
 
-			_itoa_s(parameter->getIndex(), indexString, 10, 10);
+			//_itoa_s(parameter->getIndex(), indexString, 10, 10);
 
-			os << indexString;
+			//os << indexString;
+			os << parameter->getIndex();
 		}
 	}
 }

@@ -31,7 +31,7 @@ Torus Knot Software Ltd.
 #include "OgreShaderGenerator.h"
 #include "OgreLogManager.h"
 #include "OgreShaderProgram.h"
-#include "OgreShaderProgramset.h"
+#include "OgreShaderProgramSet.h"
 #include "OgreStringConverter.h"
 #include "OgreShaderProgramManager.h"
 

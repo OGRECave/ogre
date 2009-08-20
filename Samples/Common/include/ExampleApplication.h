@@ -251,7 +251,7 @@ protected:
         mCamera->setAspectRatio(
             Real(vp->getActualWidth()) / Real(vp->getActualHeight()));
 
-		for (uint i = 0; i < mRenderWindows.size(); ++i)
+		for (Ogre::uint i = 0; i < mRenderWindows.size(); ++i)
 		{
 			mRenderWindows[i]->addViewport(mCamera);
 		}

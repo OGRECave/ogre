@@ -302,7 +302,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		std::ofstream outFile(programFileName.c_str());
 
 		if (!outFile)
-			return HighLevelGpuProgramPtr();
+			return GpuProgramPtr(HighLevelGpuProgramPtr());
 
 		programWriter->writeSourceCode(outFile, shaderProgram);		
 		outFile.close();
@@ -329,7 +329,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 	if (pGpuProgram->hasCompileError())
 	{
 		pGpuProgram.setNull();
-		return pGpuProgram;
+		return GpuProgramPtr(pGpuProgram);
 	}
 
 	// Bind auto parameters.
@@ -370,7 +370,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		}
 	}
 
-	return pGpuProgram;
+	return GpuProgramPtr(pGpuProgram);
 }
 
 }

@@ -26,7 +26,7 @@ the OGRE Unrestricted License provided you have obtained such a license from
 Torus Knot Software Ltd.
 -----------------------------------------------------------------------------
 */
-#include <boost\functional\hash\hash.hpp>
+#include <boost/functional/hash/hash.hpp>
 #include "OgreShaderGenerator.h"
 #include "OgreShaderProgram.h"
 #include "OgreShaderProgramManager.h"
