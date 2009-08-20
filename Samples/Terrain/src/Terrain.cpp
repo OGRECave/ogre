@@ -23,11 +23,9 @@ LGPL like the rest of the engine.
 #include "OgreTerrain.h"
 #include "OgreTerrainQuadTreeNode.h"
 
-#define LOAD_TERRAIN
-//#define SAVE_TERRAIN
 #define TERRAIN_FILE "testTerrain.dat"
 
-Terrain* mTerrain;
+Terrain* mTerrain = 0;
 
 // Event handler to add ability to alter curvature
 class TerrainFrameListener : public ExampleFrameListener, public OIS::KeyListener
@@ -83,6 +81,11 @@ public:
 		case OIS::KC_SPACE:
 			mMode = (Mode)((mMode + 1) & MODE_COUNT);
 			break;
+		case OIS::KC_S:
+			// CTRL-S to save
+			if (mKeyboard->isKeyDown(OIS::KC_LCONTROL) || mKeyboard->isKeyDown(OIS::KC_RCONTROL))
+				mTerrain->save(TERRAIN_FILE);
+
 		}
 
 		return true;
@@ -356,6 +359,81 @@ protected:
 		mCamera->setFarClipDistance( 50000 );
 
 	}
+	Terrain* createTerrain()
+	{
+		Terrain* terrain = OGRE_NEW Terrain(mSceneMgr);
+		Image img;
+		img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		//img.load("terrain_flattened.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		//img.load("terrain_onehill.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+		Terrain::ImportData imp;
+		imp.inputImage = &img;
+		imp.terrainSize = 513;
+		imp.worldSize = 8000;
+		imp.inputScale = 600;
+		imp.minBatchSize = 33;
+		imp.maxBatchSize = 65;
+		// textures
+		imp.layerList.resize(3);
+		imp.layerList[0].worldSize = 100;
+		imp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
+		imp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
+		imp.layerList[1].worldSize = 30;
+		imp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
+		imp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
+		imp.layerList[2].worldSize = 200;
+		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
+		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
+		terrain->prepare(imp);
+		terrain->load();
+
+		TerrainLayerBlendMap* blendMap0 = terrain->getLayerBlendMap(1);
+		TerrainLayerBlendMap* blendMap1 = terrain->getLayerBlendMap(2);
+		Real minHeight0 = 70;
+		Real fadeDist0 = 40;
+		Real minHeight1 = 70;
+		Real fadeDist1 = 15;
+		float* pBlend0 = blendMap0->getBlendPointer();
+		float* pBlend1 = blendMap1->getBlendPointer();
+		for (Ogre::uint16 y = 0; y < terrain->getLayerBlendMapSize(); ++y)
+		{
+			for (Ogre::uint16 x = 0; x < terrain->getLayerBlendMapSize(); ++x)
+			{
+				Real tx, ty;
+
+				blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
+				Real height = terrain->getHeightAtTerrainPosition(tx, ty);
+				Real val = (height - minHeight0) / fadeDist0;
+				val = Math::Clamp(val, (Real)0, (Real)1);
+				//*pBlend0++ = val;
+
+				val = (height - minHeight1) / fadeDist1;
+				val = Math::Clamp(val, (Real)0, (Real)1);
+				*pBlend1++ = val;
+
+
+			}
+		}
+		blendMap0->dirty();
+		blendMap1->dirty();
+		//blendMap0->loadImage("blendmap1.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		blendMap0->update();
+		blendMap1->update();
+
+		/*
+		// set up a colour map
+		terrain->setGlobalColourMapEnabled(true);
+		Image colourMap;
+		colourMap.load("testcolourmap.jpg", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		terrain->getGlobalColourMap()->loadImage(colourMap);
+		*/
+
+		terrain->freeTemporaryResources();
+
+		return terrain;
+
+	}
 
 	// Just override the mandatory create scene method
 	void createScene(void)
@@ -393,12 +471,19 @@ protected:
 		//TerrainGlobalOptions::setCompositeMapAmbient(ColourValue::Red);
 		TerrainGlobalOptions::setCompositeMapDiffuse(l->getDiffuseColour());
 
-#ifdef LOAD_TERRAIN
+		bool saveTerrain = false;
+		try
+		{
 			mTerrain = OGRE_NEW Terrain(mSceneMgr);
 			mTerrain->load(TERRAIN_FILE);
-#else
-		mTerrain = createTerrain();
-#endif
+		}
+		catch (Exception& e)
+		{
+			OGRE_DELETE mTerrain;
+			mTerrain = 0;
+		}
+		if (!mTerrain)
+			mTerrain = createTerrain();
 
 		//addTextureDebugOverlay(TextureManager::getSingleton().getByName(mTerrain->getTerrainNormalMap()->getName()), 0);
 
@@ -429,9 +514,6 @@ protected:
 
 		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
 
-#ifdef SAVE_TERRAIN
-		mTerrain->save(TERRAIN_FILE);
-#endif
 		//addTextureDebugOverlay(mTerrain->getCompositeMap()->getName(), 0);
 
 
