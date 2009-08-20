@@ -581,7 +581,15 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         GL_FOG_BIT | GL_LIGHTING_BIT | GL_POLYGON_BIT | GL_SCISSOR_BIT | GL_STENCIL_BUFFER_BIT |
         GL_TEXTURE_BIT | GL_VIEWPORT_BIT);
 
-    /// Disable alpha, depth and scissor testing, disable blending, 
+	// Important to disable all other texture units
+	RenderSystem* rsys = Root::getSingleton().getRenderSystem();
+	rsys->_disableTextureUnitsFrom(1);
+	if (GLEW_VERSION_1_2)
+	{
+		glActiveTextureARB(GL_TEXTURE0);
+	}
+
+	/// Disable alpha, depth and scissor testing, disable blending, 
     /// disable culling, disble lighting, disable fog and reset foreground
     /// colour.
     glDisable(GL_ALPHA_TEST);
