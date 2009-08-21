@@ -441,6 +441,8 @@ protected:
 		MaterialManager::getSingleton().setDefaultTextureFiltering(TFO_ANISOTROPIC);
 		MaterialManager::getSingleton().setDefaultAnisotropy(7);
 
+		mSceneMgr->setFog(FOG_LINEAR, ColourValue(0.7, 0.7, 0.8), 0, 2000, 10000);
+
 		LogManager::getSingleton().setLogDetail(LL_BOREME);
 
 		Vector3 lightdir(0.55, -0.3, 0.75);

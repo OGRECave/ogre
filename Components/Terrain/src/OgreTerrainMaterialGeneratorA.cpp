@@ -415,6 +415,8 @@ namespace Ogre
 		params->setNamedAutoConstant("viewProjMatrix", GpuProgramParameters::ACT_VIEWPROJ_MATRIX);
 		params->setNamedAutoConstant("lodMorph", GpuProgramParameters::ACT_CUSTOM, 
 			Terrain::LOD_MORPH_CUSTOM_PARAM);
+		params->setNamedAutoConstant("fogParams", GpuProgramParameters::ACT_FOG_PARAMS);
+
 
 	}
 	//---------------------------------------------------------------------
@@ -429,6 +431,8 @@ namespace Ogre
 		params->setNamedAutoConstant("lightDiffuseColour", GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR, 0);
 		params->setNamedAutoConstant("lightSpecularColour", GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR, 0);
 		params->setNamedAutoConstant("eyePosObjSpace", GpuProgramParameters::ACT_CAMERA_POSITION_OBJECT_SPACE);
+		params->setNamedAutoConstant("fogColour", GpuProgramParameters::ACT_FOG_COLOUR);
+
 
 	}
 	//---------------------------------------------------------------------
@@ -649,6 +653,14 @@ namespace Ogre
 			outStream << ", out float2 lodInfo : TEXCOORD" << texCoordSet++ << "\n";
 		}
 
+		bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
+		if (fog)
+		{
+			outStream <<
+				", uniform float4 fogParams\n"
+				", out float fogVal : TEXCOORD" << texCoordSet++ << "\n";
+		}
+
 		outStream <<
 			")\n"
 			"{\n"
@@ -753,6 +765,14 @@ namespace Ogre
 		if (prof->getParent()->getDebugLevel() && tt != RENDER_COMPOSITE_MAP)
 		{
 			outStream << "float2 lodInfo : TEXCOORD" << texCoordSet++ << ", \n";
+		}
+
+		bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
+		if (fog)
+		{
+			outStream <<
+				"uniform float4 fogColour,"
+				"float fogVal : TEXCOORD" << texCoordSet++ << ",\n";
 		}
 
 
@@ -961,13 +981,28 @@ namespace Ogre
 		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
 	{
 
-		static const String vpFooter = 
+		outStream << 
 			"	oPos = mul(viewProjMatrix, worldPos);\n"
-			"	oUV = uv.xy;\n"
-			"}\n"
-			;
+			"	oUV = uv.xy;\n";
 
-		outStream << vpFooter;
+		bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
+		if (fog)
+		{
+			if (terrain->getSceneManager()->getFogMode() == FOG_LINEAR)
+			{
+				outStream <<
+					"	fogVal = saturate((oPos.z - fogParams.y) * fogParams.w);\n";
+			}
+			else
+			{
+				outStream <<
+					"	fogVal = saturate(1 / (exp(oPos.z * fogParams.x)));\n";
+			}
+		}
+		
+		outStream << 
+			"}\n";
+
 
 	}
 	//---------------------------------------------------------------------
@@ -1016,6 +1051,12 @@ namespace Ogre
 					outStream << "	outputCol.rg += lodInfo.xy;\n";
 				}
 			}
+		}
+
+		bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
+		if (fog)
+		{
+			outStream << "	outputCol.rgb = lerp(outputCol.rgb, fogColour, fogVal);\n";
 		}
 
 		// Final return

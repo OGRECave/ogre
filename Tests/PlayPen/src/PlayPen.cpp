@@ -312,8 +312,7 @@ public:
 					mTerrain->update();
 
 				}
-				/*
-				if (mKeyboard->isKeyDown(OIS::KC_SPACE))
+				if (mKeyboard->isKeyDown(OIS::KC_P))
 				{
 					Vector3 tsPos;
 					mTerrain->getTerrainPosition(rayResult.second, &tsPos);
@@ -321,11 +320,10 @@ public:
 					size_t imgx, imgy;
 					map->convertTerrainToImageSpace(tsPos.x, tsPos.y, &imgx, &imgy);
 
-					map->setBlendValue(imgx, imgy, 255);
+					map->setBlendValue(imgx, imgy, 1);
 					map->update();
 
 				}
-				*/
 				mDebugText = str.str();
 
 			}
@@ -337,6 +335,7 @@ public:
 			static float updateDelay = 0;
 			if (mKeyboard->isKeyDown(OIS::KC_U) && updateDelay <= 0)
 			{
+				mTerrain->dirty();
 				mTerrain->update();
 				updateDelay = 0.3;
 			}
@@ -2800,6 +2799,10 @@ protected:
 	}
 	void addTextureDebugOverlay(TexturePtr tex, size_t i)
 	{
+		addTextureDebugOverlay(tex->getName(), i);
+	}
+	void addTextureDebugOverlay(const String& texname, size_t i)
+	{
 		Overlay* debugOverlay = OverlayManager::getSingleton().getByName("Core/DebugOverlay");
 
 		// Set up a debug panel to display the shadow
@@ -2807,7 +2810,7 @@ protected:
 			"Ogre/DebugTexture" + StringConverter::toString(i), 
 			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		debugMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
-		TextureUnitState *t = debugMat->getTechnique(0)->getPass(0)->createTextureUnitState(tex->getName());
+		TextureUnitState *t = debugMat->getTechnique(0)->getPass(0)->createTextureUnitState(texname);
 		t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 		//t = debugMat->getTechnique(0)->getPass(0)->createTextureUnitState("spot_shadow_fade.png");
 		//t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
@@ -8061,13 +8064,13 @@ protected:
 
 		LogManager::getSingleton().setLogDetail(LL_BOREME);
 
-		Vector3 lightdir(0.55, -0.3, 0.75);
+		Vector3 lightdir(0, -0.3, 0.75);
 		lightdir.normalise();
 
 
 		TerrainGlobalOptions::setMaxPixelError(8);
 		// testing composite map
-		//TerrainGlobalOptions::setCompositeMapDistance(2000);
+		TerrainGlobalOptions::setCompositeMapDistance(2000);
 		//TerrainGlobalOptions::setUseRayBoxDistanceCalculation(true);
 		//TerrainGlobalOptions::getDefaultMaterialGenerator()->setDebugLevel(1);
 		//TerrainGlobalOptions::setLightMapSize(256);
@@ -8086,6 +8089,7 @@ protected:
 		// Important to set these so that the terrain knows what to use for derived (non-realtime) data
 		TerrainGlobalOptions::setLightMapDirection(lightdir);
 		TerrainGlobalOptions::setCompositeMapAmbient(mSceneMgr->getAmbientLight());
+		//TerrainGlobalOptions::setCompositeMapAmbient(ColourValue::Red);
 		TerrainGlobalOptions::setCompositeMapDiffuse(l->getDiffuseColour());
 
 		//mSceneMgr->showBoundingBoxes(true);
@@ -8107,6 +8111,7 @@ protected:
 		Vector3 terrainPos(10000,0,5000);
 		mTerrain->setPosition(terrainPos);
 
+		/*
 		// create a few entities on the terrain
 		for (int i = 0; i < 20; ++i)
 		{
@@ -8116,13 +8121,14 @@ protected:
 			Real y = mTerrain->getHeightAtWorldPosition(Vector3(x, 0, z));
 			mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(x, y, z))->attachObject(e);
 		}
+		*/
 	
 
 
 		mCamera->setPosition(terrainPos + Vector3(-4000,300,4000));
-		mCamera->lookAt(Vector3::ZERO);
+		mCamera->lookAt(terrainPos);
 		mCamera->setNearClipDistance(5);
-		mCamera->setFarClipDistance(15000);
+		mCamera->setFarClipDistance(50000);
 
 		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
 
@@ -8131,7 +8137,7 @@ protected:
 			mTerrain->save(filename);
 		}
 
-		addTextureDebugOverlay(mTerrain->getCompositeMap(), 0);
+		//addTextureDebugOverlay(mTerrain->getCompositeMap()->getName(), 0);
 
 	}
 
