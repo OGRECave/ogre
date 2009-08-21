@@ -91,7 +91,7 @@ public:
 		return true;
 	}
 
-	bool OIS::KeyListener::keyReleased(const OIS::KeyEvent &)
+	bool keyReleased(const OIS::KeyEvent &)
 	{
 		return true;
 	}
@@ -479,7 +479,7 @@ protected:
 			mTerrain = OGRE_NEW Terrain(mSceneMgr);
 			mTerrain->load(TERRAIN_FILE);
 		}
-		catch (Exception& e)
+		catch (Exception&)
 		{
 			OGRE_DELETE mTerrain;
 			mTerrain = 0;
