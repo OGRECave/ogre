@@ -181,20 +181,8 @@ void OctreeNode::_addToRenderQueue( Camera* cam, RenderQueue *queue,
     while ( mit != mObjectsByName.end() )
     {
         MovableObject * mo = mit->second;
-
-        mo->_notifyCurrentCamera(cam);
-        if ( mo->isVisible() &&
-            (!onlyShadowCasters || mo->getCastShadows()))
-        {
-            mo -> _updateRenderQueue( queue );
-
-			if (visibleBounds)
-			{
-				visibleBounds->merge(mo->getWorldBoundingBox(true), 
-					mo->getWorldBoundingSphere(true), cam, 
-					queue->getQueueGroup(mo->getRenderQueueGroup())->getShadowsEnabled());
-			}
-        }
+		
+		queue->processVisibleObject(mo, cam, onlyShadowCasters, visibleBounds);
 
         ++mit;
     }

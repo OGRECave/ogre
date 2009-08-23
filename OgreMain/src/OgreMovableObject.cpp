@@ -395,6 +395,29 @@ namespace Ogre {
 			return 0xFFFFFFFF;
 		}
 	}
+	class MORecvShadVisitor : public Renderable::Visitor
+	{
+	public:
+		bool anyReceiveShadows;
+		MORecvShadVisitor() : anyReceiveShadows(false)
+		{
+
+		}
+		void visit(Renderable* rend, ushort lodIndex, bool isDebug, 
+			Any* pAny = 0)
+		{
+			anyReceiveShadows = anyReceiveShadows || 
+				rend->getTechnique()->getParent()->getReceiveShadows();
+		}
+	};
+	//---------------------------------------------------------------------
+	bool MovableObject::getReceivesShadows()
+	{
+		MORecvShadVisitor visitor;
+		visitRenderables(&visitor);
+		return visitor.anyReceiveShadows;		
+
+	}
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	MovableObject* MovableObjectFactory::createInstance(

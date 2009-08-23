@@ -422,27 +422,8 @@ namespace Ogre {
             {
                 // It hasn't been seen yet
                 MovableObject *mov = const_cast<MovableObject*>(*oi); // hacky
-                if (mov->isVisible() && 
-                    (!onlyShadowCasters || mov->getCastShadows()) && 
-					cam->isVisible(mov->getWorldBoundingBox()))
-                {
-                    mov->_notifyCurrentCamera(cam);
-                    mov->_updateRenderQueue(getRenderQueue());
-                    // Check if the bounding box should be shown.
-                    SceneNode* sn = static_cast<SceneNode*>(mov->getParentNode());
-                    if (sn->getShowBoundingBox() || mShowBoundingBoxes)
-                    {
-                        sn->_addBoundingBoxToQueue(getRenderQueue());
-                    }
-                    mMovablesForRendering.insert(*oi);
 
-					// update visible boundaries aab
-					if (visibleBounds)
-					{
-						visibleBounds->merge((*oi)->getWorldBoundingBox(true), 
-							(*oi)->getWorldBoundingSphere(true), cam);
-					}
-                }
+				getRenderQueue()->processVisibleObject(mov, cam, onlyShadowCasters, visibleBounds);
 
             }
         }

@@ -35,6 +35,9 @@ Torus Knot Software Ltd.
 #include "OgreRenderQueueSortingGrouping.h"
 #include "OgrePass.h"
 #include "OgreMaterialManager.h"
+#include "OgreSceneManager.h"
+#include "OgreMovableObject.h"
+#include "OgreCamera.h"
 
 
 namespace Ogre {
@@ -239,6 +242,38 @@ namespace Ogre {
 		{
 			i->second->setShadowCastersCannotBeReceivers(ind);
 		}
+	}
+	//---------------------------------------------------------------------
+	void RenderQueue::processVisibleObject(MovableObject* mo, 
+		Camera* cam, 
+		bool onlyShadowCasters, 
+		VisibleObjectsBoundsInfo* visibleBounds)
+	{
+		bool receiveShadows = getQueueGroup(mo->getRenderQueueGroup())->getShadowsEnabled()
+			&& mo->getReceivesShadows();
+
+		mo->_notifyCurrentCamera(cam);
+		if ( mo->isVisible() &&
+			(!onlyShadowCasters || mo->getCastShadows()))
+		{
+			mo -> _updateRenderQueue( this );
+
+			if (visibleBounds)
+			{
+				visibleBounds->merge(mo->getWorldBoundingBox(true), 
+					mo->getWorldBoundingSphere(true), cam, 
+					receiveShadows);
+			}
+		}
+		// not shadow caster, receiver only?
+		else if (mo->isVisible() &&
+			onlyShadowCasters && !mo->getCastShadows() && 
+			receiveShadows)
+		{
+			visibleBounds->mergeNonRenderedButInFrustum(mo->getWorldBoundingBox(true), 
+				mo->getWorldBoundingSphere(true), cam);
+		}
+
 	}
 
 }

@@ -34,6 +34,10 @@ Torus Knot Software Ltd.
 
 namespace Ogre {
 
+	class Camera;
+	class MovableObject;
+	struct VisibleObjectsBoundsInfo;
+
     /** Enumeration of queue groups, by which the application may group queued renderables
         so that they are rendered together with events in between
 	@remarks
@@ -251,6 +255,16 @@ namespace Ogre {
 
 		RenderableListener* getRenderableListener(void) const
 		{ return mRenderableListener; }
+
+		/** Utility method to perform the standard actions associated with 
+			getting a visible object to add itself to the queue. This is 
+			a replacement for SceneManager implementations of the associated
+			tasks related to calling MovableObject::_updateRenderQueue.
+		*/
+		void processVisibleObject(MovableObject* mo, 
+			Camera* cam, 
+			bool onlyShadowCasters, 
+			VisibleObjectsBoundsInfo* visibleBounds);
 
     };
 
