@@ -293,21 +293,9 @@ namespace Ogre {
         ObjectMap::iterator iobjend = mObjectsByName.end();
         for (iobj = mObjectsByName.begin(); iobj != iobjend; ++iobj)
         {
-            // Tell attached objects about camera position (incase any extra processing they want to do)
-            iobj->second->_notifyCurrentCamera(cam);
-            if (iobj->second->isVisible() && 
-                (!onlyShadowCasters || iobj->second->getCastShadows()))
-            {
-                iobj->second->_updateRenderQueue(queue);
+			MovableObject* mo = iobj->second;
 
-				// update visible boundaries aab
-				if (visibleBounds)
-				{
-					visibleBounds->merge(iobj->second->getWorldBoundingBox(true), 
-						iobj->second->getWorldBoundingSphere(true), cam, 
-						queue->getQueueGroup(iobj->second->getRenderQueueGroup())->getShadowsEnabled());
-				}
-            }
+			queue->processVisibleObject(mo, cam, onlyShadowCasters, visibleBounds);
         }
 
         if (includeChildren)

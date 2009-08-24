@@ -481,6 +481,11 @@ namespace Ogre {
         void setCastShadows(bool enabled) { mCastShadows = enabled; }
         /** Returns whether shadow casting is enabled for this object. */
         bool getCastShadows(void) const { return mCastShadows; }
+		/** Returns whether the Material of any Renderable that this MovableObject will add to 
+			the render queue will receive shadows. 
+		*/
+		bool getReceivesShadows();
+			
         /** Get the distance to extrude for a point/spot light */
         Real getPointExtrusionDistance(const Light* l) const;
 		/** Get the 'type flags' for this MovableObject.

@@ -1049,13 +1049,24 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	const Vector4& AutoParamDataSource::getSceneDepthRange() const
 	{
+		static Vector4 dummy(0, 100000, 100000, 1/100000);
+
 		if (mSceneDepthRangeDirty)
 		{
 			// calculate depth information
-			mSceneDepthRange.x = mMainCamBoundsInfo->minDistance;
-			mSceneDepthRange.y = mMainCamBoundsInfo->maxDistance;
-			mSceneDepthRange.z = mMainCamBoundsInfo->maxDistance - mMainCamBoundsInfo->minDistance;
-			mSceneDepthRange.w = 1.0f / mSceneDepthRange.z;
+			Real depthRange = mMainCamBoundsInfo->maxDistanceInFrustum - mMainCamBoundsInfo->minDistanceInFrustum;
+			if (depthRange > std::numeric_limits<Real>::epsilon())
+			{
+				mSceneDepthRange = Vector4(
+					mMainCamBoundsInfo->minDistanceInFrustum,
+					mMainCamBoundsInfo->maxDistanceInFrustum,
+					depthRange,
+					1.0f / depthRange);
+			}
+			else
+			{
+				mSceneDepthRange = dummy;
+			}
 			mSceneDepthRangeDirty = false;
 		}
 
@@ -1078,12 +1089,12 @@ namespace Ogre {
 					mCurrentSceneManager->getVisibleObjectsBoundsInfo(
 						(Camera*)mCurrentTextureProjector[index]);
 
-				Real depthRange = info.maxDistance - info.minDistance;
+				Real depthRange = info.maxDistanceInFrustum - info.minDistanceInFrustum;
 				if (depthRange > std::numeric_limits<Real>::epsilon())
 				{
 					mShadowCamDepthRanges[index] = Vector4(
-						info.minDistance,
-						info.maxDistance,
+						info.minDistanceInFrustum,
+						info.maxDistanceInFrustum,
 						depthRange,
 						1.0f / depthRange);
 				}

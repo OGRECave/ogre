@@ -414,6 +414,30 @@ namespace Ogre {
 		//make sure to request a new light list from the scene manager if mask changed
 		mLightListUpdated = 0;
 	}
+	//---------------------------------------------------------------------
+	class MORecvShadVisitor : public Renderable::Visitor
+	{
+	public:
+		bool anyReceiveShadows;
+		MORecvShadVisitor() : anyReceiveShadows(false)
+		{
+
+		}
+		void visit(Renderable* rend, ushort lodIndex, bool isDebug, 
+			Any* pAny = 0)
+		{
+			anyReceiveShadows = anyReceiveShadows || 
+				rend->getTechnique()->getParent()->getReceiveShadows();
+		}
+	};
+	//---------------------------------------------------------------------
+	bool MovableObject::getReceivesShadows()
+	{
+		MORecvShadVisitor visitor;
+		visitRenderables(&visitor);
+		return visitor.anyReceiveShadows;		
+
+	}
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	MovableObject* MovableObjectFactory::createInstance(
