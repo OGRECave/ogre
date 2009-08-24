@@ -221,8 +221,8 @@ namespace Ogre
 
 				// Vista and SP1 or SP2 - multi-head device can not be reset - it causes memory corruption.
 				if (osVersionInfo.dwMajorVersion == 6 &&
-					(strcmpi(osVersionInfo.szCSDVersion, "Service Pack 1") == 0 ||
-					 strcmpi(osVersionInfo.szCSDVersion, "Service Pack 2") == 0))
+					(_stricmp(osVersionInfo.szCSDVersion, "Service Pack 1") == 0 ||
+					 _stricmp(osVersionInfo.szCSDVersion, "Service Pack 2") == 0))
 
 				{
 					bTryUsingMultiheadDevice = FALSE;
