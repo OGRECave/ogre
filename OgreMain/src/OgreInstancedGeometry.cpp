@@ -1731,28 +1731,28 @@ namespace Ogre {
 		}
 
 
-		size_t offset=0, tcOffset=0;
+		size_t offset=0;	
 		unsigned short texCoordOffset=0;
 		unsigned short texCoordSource=0;
+
+		const Ogre::VertexElement*elem=mRenderOp.vertexData->vertexDeclaration->findElementBySemantic(VES_TEXTURE_COORDINATES);
+	
+		texCoordSource=elem->getSource();
 		for(ushort i=0;i<mRenderOp.vertexData->vertexDeclaration->getElementCount();i++)
 		{
-		
 			if(mRenderOp.vertexData->vertexDeclaration->getElement(i)->getSemantic() == VES_TEXTURE_COORDINATES)
 			{
 				texCoordOffset++;
-				texCoordSource=mRenderOp.vertexData->vertexDeclaration->getElement(i)->getSource();
-				tcOffset=mRenderOp.vertexData->vertexDeclaration->getElement(i)->getOffset()+VertexElement::getTypeSize(
-						mRenderOp.vertexData->vertexDeclaration->getElement(i)->getType());
 			}
-			offset+= VertexElement::getTypeSize(
-			mRenderOp.vertexData->vertexDeclaration->getElement(i)->getType());
+			if(texCoordSource==mRenderOp.vertexData->vertexDeclaration->getElement(i)->getSource())
+			{
+				offset+= VertexElement::getTypeSize(
+				mRenderOp.vertexData->vertexDeclaration->getElement(i)->getType());
+			}		
 		}
 
-		mRenderOp.vertexData->vertexDeclaration->addElement(texCoordSource,tcOffset, VET_FLOAT1, VES_TEXTURE_COORDINATES,texCoordOffset);
-
-		mTexCoordIndex=texCoordOffset;
-		
-		
+		mRenderOp.vertexData->vertexDeclaration->addElement(texCoordSource, offset, VET_FLOAT1, VES_TEXTURE_COORDINATES, texCoordOffset);
+ 		mTexCoordIndex = texCoordOffset;
 
 	}
 	//--------------------------------------------------------------------------
