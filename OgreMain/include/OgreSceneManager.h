@@ -2544,10 +2544,16 @@ namespace Ogre {
         CameraIterator getCameraIterator(void) {
             return CameraIterator(mCameras.begin(), mCameras.end());
         }
+		/** Returns a const version of the camera list. 
+		*/
+		const CameraList& getCameras() const { return mCameras; }
         /** Returns a specialised MapIterator over all animations in the scene. */
         AnimationIterator getAnimationIterator(void) {
             return AnimationIterator(mAnimationsList.begin(), mAnimationsList.end());
         }
+		/** Returns a const version of the animation list. 
+		*/
+		const AnimationList& getAnimations() const { return mAnimationsList; }
         /** Returns a specialised MapIterator over all animation states in the scene. */
         AnimationStateIterator getAnimationStateIterator(void) {
             return mAnimationStates.getAnimationStateIterator();
