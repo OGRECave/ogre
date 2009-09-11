@@ -427,7 +427,7 @@ namespace Ogre {
 			Any* pAny = 0)
 		{
 			anyReceiveShadows = anyReceiveShadows || 
-				rend->getTechnique()->getParent()->getReceiveShadows();
+				(!rend->getTechnique() || rend->getTechnique()->getParent()->getReceiveShadows());
 		}
 	};
 	//---------------------------------------------------------------------
