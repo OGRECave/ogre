@@ -505,13 +505,20 @@ elseif (APPLE)
 	  ${OGRE_BINARY_DIR}/include/buildsettings.h
     )
     set(PLATFORM_SOURCE_FILES
-      src/OSX/OgreConfigDialog.cpp
+      src/OSX/OgreConfigDialog.mm
       src/OSX/OgreErrorDialog.mm
       src/OSX/OgreTimer.cpp
       src/OSX/macUtils.cpp
       src/OSX/OgreOSXCocoaView.mm
       src/OgreSearchOps.cpp
+	  include/OSX/ogrelogo.png
     )
+
+    set(RESOURCE_FILES
+	  include/OSX/ogrelogo.png
+    )
+    source_group(Resources FILES ${RESOURCE_FILES})
+
     set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
     set(PLATFORM_HEADER_INSTALL "OSX")
   endif ()
@@ -612,7 +619,9 @@ if (APPLE)
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1
        INSTALL_NAME_DIR "@executable_path/../Frameworks"
     )
-    set_target_properties(OgreMain PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADER_FILES}")
+    set_target_properties(OgreMain PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADER_FILES} ${THREAD_HEADER_FILES}")
+	set_target_properties(OgreMain PROPERTIES RESOURCE "${RESOURCE_FILES}")
+	set_source_files_properties("${RESOURCE_FILES}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
   else ()
     set_target_properties(OgreMain PROPERTIES INSTALL_NAME_DIR "OGRE")
     set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_THUMB_SUPPORT "NO")

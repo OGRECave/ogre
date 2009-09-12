@@ -106,6 +106,19 @@ function(ogre_config_lib LIBNAME)
       # add GCC visibility flags to shared library build
       set_target_properties(${LIBNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
 	endif (CMAKE_COMPILER_IS_GNUCXX)
+	
+	# Set some Mac OS X specific framework settings, including installing the headers in subdirs
+	if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
+      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
+      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
+      add_custom_command(TARGET ${LIBNAME} POST_BUILD
+        COMMAND mkdir ARGS -p ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/Threading
+	    COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp ARGS -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/OgreMain/include/Threading/* ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/Threading/
+        COMMAND mkdir ARGS -p ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/OSX
+	    COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp ARGS -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/OgreMain/include/OSX/*.h ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/OSX/
+    )
+	endif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
   endif (OGRE_STATIC)
   ogre_install_target(${LIBNAME} "")
   

@@ -142,6 +142,11 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   add_definitions(-fno-regmove)
   remove_definitions(-msse)
 elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+  # Force gcc <= 4.0 on Mac OS X because 4.2 is not supported prior to Mac OS X 10.5
+  include(CMakeForceCompiler)
+  CMAKE_FORCE_C_COMPILER(gcc-4.0 GNU)
+  CMAKE_FORCE_CXX_COMPILER(gcc-4.0 GNU)
+
   # Set 10.4 as the base SDK by default
   set(XCODE_ATTRIBUTE_SDKROOT macosx10.4)
 
