@@ -62,6 +62,8 @@ namespace Ogre
     	virtual bool isVisible(void) const;
         /** Overridden - see RenderWindow */
 		virtual void swapBuffers( bool waitForVSync );
+        /** Overridden - see RenderWindow */
+        virtual void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
    	    /** Overridden - see RenderTarget */
 		virtual void windowMovedOrResized();
 

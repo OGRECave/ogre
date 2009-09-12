@@ -44,9 +44,5 @@ http://www.gnu.org/copyleft/lesser.txt.
 
 @end
 
-@interface OgreWindow : NSWindow
-{}
-@end
-
 #endif
 

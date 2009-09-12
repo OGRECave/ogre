@@ -258,7 +258,7 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
 		}
 		else
 		{
-			// TODO: The Contol is going to report the incorrect location with a
+			// TODO: The Control is going to report the incorrect location with a
 			// Metalic / Textured window.  The default windows work just fine.
 			
 			// First get the HIViewRef / ControlRef
@@ -301,6 +301,8 @@ void OSXCarbonWindow::create( const String& name, unsigned int width, unsigned i
 	mName = name;
 	mWidth = width;
 	mHeight = height;
+    mColourDepth = depth;
+    mFSAA = fsaa_samples;
 	mActive = true;
     mClosed = false;
     mCreated = true;
@@ -547,4 +549,30 @@ void OSXCarbonWindow::getCustomAttribute( const String& name, void* pData )
 		return;
 	}
 }
+    
+void OSXCarbonWindow::setFullscreen(bool fullScreen, unsigned int width, unsigned int height)
+{
+    GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
+    OSXContext *mainContext = (OSXContext*)rs->_getMainContext();
+
+    CGLContextObj share = NULL;
+    if(mainContext == 0)
+    {
+        share = NULL;
+    }
+    else if(mainContext->getContextType() == "AGL")
+    {
+        OSXCarbonContext* aglShare = static_cast<OSXCarbonContext*>(mainContext);
+        aglGetCGLContext(aglShare->getContext(), (void**)&share);
+    }
+    else if(mainContext->getContextType() == "CGL")
+    {
+        OSXCGLContext* cglShare = static_cast<OSXCGLContext*>(mainContext);
+        share = cglShare->getContext();
+    }
+
+    // create the context, keeping the current colour depth and FSAA settings
+    createCGLFullscreen(width, height, getColourDepth(), getFSAA(), share);
+}
+
 }

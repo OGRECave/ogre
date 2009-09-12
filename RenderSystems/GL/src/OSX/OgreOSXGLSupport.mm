@@ -268,7 +268,6 @@ RenderWindow* OSXGLSupport::createWindow( bool autoCreateWindow, GLRenderSystem*
         // Parse FSAA config
 		NameValuePairList winOptions;
 		winOptions[ "title" ] = windowTitle;
-//        int fsaa_x_samples = 0;
         opt = mOptions.find( "FSAA" );
         if( opt != mOptions.end() )
         {

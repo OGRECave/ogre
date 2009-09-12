@@ -60,8 +60,7 @@ namespace Ogre {
 	void OSXCocoaWindow::create(const String& name, unsigned int width, unsigned int height,
 	            bool fullScreen, const NameValuePairList *miscParams)
     {
-		mIsFullScreen=fullScreen;
-		NSAutoreleasePool *arp = [[NSAutoreleasePool alloc] init];
+		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 		NSApplicationLoad();
 		//OgreWindowDelegate *delegate = [[OgreWindowDelegate alloc] initWithGLOSXCocoaWindow:this];
 		//[window setDelegate:delegate];
@@ -213,7 +212,7 @@ namespace Ogre {
 				//Not sure why this should be but it is required for the window to work at fullscreen.
 				int styleMask = fullScreen? NSBorderlessWindowMask : NSResizableWindowMask;
 			
-				mWindow = [[OgreWindow alloc] initWithContentRect:NSMakeRect(winx, winy, width, height) styleMask:styleMask backing:NSBackingStoreBuffered defer:NO];
+				mWindow = [[NSWindow alloc] initWithContentRect:NSMakeRect(winx, winy, width, height) styleMask:styleMask backing:NSBackingStoreBuffered defer:NO];
 				[mWindow setTitle:windowTitle];
 				
 				if(winx == 0 && winy == 0) [mWindow center];
@@ -252,7 +251,10 @@ namespace Ogre {
 			mName = name;
 			mWidth = width;
 			mHeight = height;
-			
+            mColourDepth = depth;
+            mFSAA = fsaa_samples;
+            mIsFullScreen = fullScreen;
+
 			// Create register the context with the rendersystem and associate it with this window
 			mContext = new OSXCocoaContext(glContext);
 			/*rs->_registerContext(this, newContext);
@@ -264,11 +266,13 @@ namespace Ogre {
 			if(mWindow)
 				[mWindow performSelectorOnMainThread:@selector(makeKeyAndOrderFront:) withObject:NULL waitUntilDone:NO];
 				
-			[arp release];
 		}
 		
 		// make active
 		mActive = true;
+        mClosed = false;
+
+        [pool drain];
     }
 
     void OSXCocoaWindow::destroy(void)
@@ -375,4 +379,30 @@ namespace Ogre {
 			return;
 		} 
 	}
+
+    void OSXCocoaWindow::setFullscreen(bool fullScreen, unsigned int width, unsigned int height)
+    {
+        GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
+        OSXContext *mainContext = (OSXContext*)rs->_getMainContext();
+		
+        CGLContextObj share = NULL;
+        if(mainContext == 0)
+        {
+            share = NULL;
+        }
+        else if(mainContext->getContextType() == "NSOpenGL")
+        {
+            OSXCocoaContext* cocoaContext = static_cast<OSXCocoaContext*>(mainContext);
+            NSOpenGLContext* nsShare = cocoaContext->getContext();
+            share = (CGLContextObj)[nsShare CGLContextObj];
+        }
+        else if(mainContext->getContextType() == "CGL")
+        {
+            OSXCGLContext* cglShare = static_cast<OSXCGLContext*>(mainContext);
+            share = cglShare->getContext();
+        }
+        
+        // create the context
+        createCGLFullscreen(width, height, getColourDepth(), getFSAA(), share);
+    }
 }
