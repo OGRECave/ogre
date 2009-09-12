@@ -114,7 +114,6 @@ namespace Ogre {
                 return GL_STATIC_DRAW;
             case HardwareBuffer::HBU_DYNAMIC:
             case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY:
-                return GL_DYNAMIC_DRAW;
             case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE:
             default:
                 return GL_DYNAMIC_DRAW;

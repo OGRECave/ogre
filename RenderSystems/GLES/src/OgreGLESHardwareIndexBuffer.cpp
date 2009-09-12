@@ -55,6 +55,7 @@ namespace Ogre {
         }
 
         glGenBuffers(1, &mBufferId);
+        GL_CHECK_ERROR;
 
         if (!mBufferId)
         {
@@ -70,6 +71,7 @@ namespace Ogre {
     GLESHardwareIndexBuffer::~GLESHardwareIndexBuffer()
     {
         glDeleteBuffers(1, &mBufferId);
+        GL_CHECK_ERROR;
     }
 
     void Ogre::GLESHardwareIndexBuffer::unlockImpl(void)
@@ -160,6 +162,7 @@ namespace Ogre {
                                             bool discardWholeBuffer)
     {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+        GL_CHECK_ERROR;
 
         // Update the shadow buffer
         if (mUseShadowBuffer)
@@ -174,6 +177,7 @@ namespace Ogre {
         {
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, pSource,
                          GLESHardwareBufferManager::getGLUsage(mUsage));
+            GL_CHECK_ERROR;
         }
         else
         {
@@ -184,6 +188,7 @@ namespace Ogre {
 
             // Now update the real buffer
             glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, length, pSource);
+            GL_CHECK_ERROR;
         }
     }
 
@@ -195,17 +200,20 @@ namespace Ogre {
                                                        HBL_READ_ONLY);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+            GL_CHECK_ERROR;
 
             // Update whole buffer if possible, otherwise normal
             if (mLockStart == 0 && mLockSize == mSizeInBytes)
             {
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, srcData,
                              GLESHardwareBufferManager::getGLUsage(mUsage));
+                GL_CHECK_ERROR;
             }
             else
             {
                 glBufferSubData(GL_ELEMENT_ARRAY_BUFFER,
                                 mLockStart, mLockSize, srcData);
+                GL_CHECK_ERROR;
             }
 
             mpShadowBuffer->unlock();
@@ -217,13 +225,15 @@ namespace Ogre {
     {
         void *ptr;
 
-        ptr = malloc(mSizeInBytes);
+        ptr = OGRE_MALLOC(mSizeInBytes, MEMCATEGORY_GEOMETRY);
         memset(ptr, 0, mSizeInBytes);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+        GL_CHECK_ERROR;
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, ptr,
                      GLESHardwareBufferManager::getGLUsage(mUsage));
+        GL_CHECK_ERROR;
 
-        free(ptr);
+        OGRE_FREE(ptr, MEMCATEGORY_GEOMETRY);
     }
 }

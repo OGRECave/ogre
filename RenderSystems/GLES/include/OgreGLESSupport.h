@@ -89,7 +89,7 @@ namespace Ogre
             /**
             * Get the address of a function
             */
-            virtual void* getProcAddress(const String& procname) = 0;
+            virtual void *getProcAddress(const String& procname) = 0;
 
             /** Initialises GL extensions, must be done AFTER the GL context has been
                established.
@@ -105,7 +105,6 @@ namespace Ogre
             {
                 return 1;
             }
-    
 
             /**
             * Start anything special

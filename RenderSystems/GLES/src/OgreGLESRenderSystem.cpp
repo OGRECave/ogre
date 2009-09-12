@@ -43,6 +43,23 @@ Torus Knot Software Ltd.
 #   include "OgreEAGLWindow.h"
 #else
 #   include "OgreEGLWindow.h"
+
+    // Function pointers for FBO extension
+    PFNGLISRENDERBUFFEROESPROC glIsRenderbufferOES;
+    PFNGLBINDRENDERBUFFEROESPROC glBindRenderbufferOES;
+    PFNGLDELETERENDERBUFFERSOESPROC glDeleteRenderbuffersOES;
+    PFNGLGENRENDERBUFFERSOESPROC glGenRenderbuffersOES;
+    PFNGLRENDERBUFFERSTORAGEOESPROC glRenderbufferStorageOES;
+    PFNGLGETRENDERBUFFERPARAMETERIVOESPROC glGetRenderbufferParameterivOES;
+    PFNGLISFRAMEBUFFEROESPROC glIsFramebufferOES;
+    PFNGLBINDFRAMEBUFFEROESPROC glBindFramebufferOES;
+    PFNGLDELETEFRAMEBUFFERSOESPROC glDeleteFramebuffersOES;
+    PFNGLGENFRAMEBUFFERSOESPROC glGenFramebuffersOES;
+    PFNGLCHECKFRAMEBUFFERSTATUSOESPROC glCheckFramebufferStatusOES;
+    PFNGLFRAMEBUFFERRENDERBUFFEROESPROC glFramebufferRenderbufferOES;
+    PFNGLFRAMEBUFFERTEXTURE2DOESPROC glFramebufferTexture2DOES;
+    PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVOESPROC glGetFramebufferAttachmentParameterivOES;
+    PFNGLGENERATEMIPMAPOESPROC glGenerateMipmapOES;
 #endif
 
 #include "OgreCamera.h"
@@ -59,6 +76,24 @@ namespace Ogre {
           mHardwareBufferManager(0),
           mRTTManager(0)
     {
+            // Get function pointers on non-iPhone platforms
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+            ::glIsRenderbufferOES = (PFNGLISRENDERBUFFEROESPROC)eglGetProcAddress("glIsRenderbufferOES");
+            ::glBindRenderbufferOES = (PFNGLBINDRENDERBUFFEROESPROC)eglGetProcAddress("glBindRenderbufferOES");
+            ::glDeleteRenderbuffersOES = (PFNGLDELETERENDERBUFFERSOESPROC)eglGetProcAddress("glDeleteRenderbuffersOES");
+            ::glGenRenderbuffersOES = (PFNGLGENRENDERBUFFERSOESPROC)eglGetProcAddress("glGenRenderbuffersOES");
+            ::glRenderbufferStorageOES = (PFNGLRENDERBUFFERSTORAGEOESPROC)eglGetProcAddress("glRenderbufferStorageOES");
+            ::glGetRenderbufferParameterivOES = (PFNGLGETRENDERBUFFERPARAMETERIVOESPROC)eglGetProcAddress("glGetRenderbufferParameterivOES");
+            ::glIsFramebufferOES = (PFNGLISFRAMEBUFFEROESPROC)eglGetProcAddress("glIsFramebufferOES");
+            ::glBindFramebufferOES = (PFNGLBINDFRAMEBUFFEROESPROC)eglGetProcAddress("glBindFramebufferOES");
+            ::glDeleteFramebuffersOES = (PFNGLDELETEFRAMEBUFFERSOESPROC)eglGetProcAddress("glDeleteFramebuffersOES");
+            ::glGenFramebuffersOES = (PFNGLGENFRAMEBUFFERSOESPROC)eglGetProcAddress("glGenFramebuffersOES");
+            ::glCheckFramebufferStatusOES = (PFNGLCHECKFRAMEBUFFERSTATUSOESPROC)eglGetProcAddress("glCheckFramebufferStatusOES");
+            ::glFramebufferRenderbufferOES = (PFNGLFRAMEBUFFERRENDERBUFFEROESPROC)eglGetProcAddress("glFramebufferRenderbufferOES");
+            ::glFramebufferTexture2DOES = (PFNGLFRAMEBUFFERTEXTURE2DOESPROC)eglGetProcAddress("glFramebufferTexture2DOES");
+            ::glGetFramebufferAttachmentParameterivOES = (PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVOESPROC)eglGetProcAddress("glGetFramebufferAttachmentParameterivOES");
+            ::glGenerateMipmapOES = (PFNGLGENERATEMIPMAPOESPROC)eglGetProcAddress("glGenerateMipmapOES");
+#endif
         GL_CHECK_ERROR;
         size_t i;
 
@@ -1225,10 +1260,12 @@ namespace Ogre {
     {
         if (mCurrentCapabilities->hasCapability(RSC_MIPMAP_LOD_BIAS))
         {
+#if GL_EXT_texture_lod_bias	// This extension only seems to be supported on iPhone OS, block it out to fix Linux build
             glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, bias);
             GL_CHECK_ERROR;
             glActiveTexture(GL_TEXTURE0);
             GL_CHECK_ERROR;
+#endif
         }
     }
 

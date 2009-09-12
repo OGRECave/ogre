@@ -256,7 +256,9 @@ namespace Ogre  {
                 return PF_X8R8G8B8;
             case GL_RGBA:
                 return PF_A8R8G8B8;
+#ifdef GL_BGRA
             case GL_BGRA:
+#endif
 //                return PF_X8B8G8R8;
             default:
                 //TODO: not supported

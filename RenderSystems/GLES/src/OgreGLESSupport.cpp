@@ -93,6 +93,25 @@ namespace Ogre {
             printf("EXT: %s\n", str.c_str());
             extensionList.insert(str);
         }
+        
+        // Get function pointers on non-iPhone platforms
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+        glIsRenderbufferOES = (PFNGLISRENDERBUFFEROES)getProcAddress("glIsRenderbufferOES");
+        glBindRenderbufferOES = (PFNGLBINDRENDERBUFFEROES)getProcAddress("glBindRenderbufferOES");
+        glDeleteRenderbuffersOES = (PFNGLDELETERENDERBUFFERSOES)getProcAddress("glDeleteRenderbuffersOES");
+        glGenRenderbuffersOES = (PFNGLGENRENDERBUFFERSOES)getProcAddress("glGenRenderbuffersOES");
+        glRenderbufferStorageOES = (PFNGLRENDERBUFFERSTORAGEOES)getProcAddress("glRenderbufferStorageOES");
+        glGetRenderbufferParameterivOES = (PFNGLGETRENDERBUFFERPARAMETERIVOES)getProcAddress("glGetRenderbufferParameterivOES");
+        glIsFramebufferOES = (PFNGLISFRAMEBUFFEROES)getProcAddress("glIsFramebufferOES");
+        glBindFramebufferOES = (PFNGLBINDFRAMEBUFFEROES)getProcAddress("glBindFramebufferOES");
+        glDeleteFramebuffersOES = (PFNGLDELETEFRAMEBUFFERSOES)getProcAddress("glDeleteFramebuffersOES");
+        glGenFramebuffersOES = (PFNGLGENFRAMEBUFFERSOES)getProcAddress("glGenFramebuffersOES");
+        glCheckFramebufferStatusOES = (PFNGLCHECKFRAMEBUFFERSTATUSOES)getProcAddress("glCheckFramebufferStatusOES");
+        glFramebufferRenderbufferOES = (PFNGLFRAMEBUFFERRENDERBUFFEROES)getProcAddress("glFramebufferRenderbufferOES");
+        glFramebufferTexture2DOES = (PFNGLFRAMEBUFFERTEXTURE2DOES)getProcAddress("glFramebufferTexture2DOES");
+        glGetFramebufferAttachmentParameterivOES = (PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVOES)getProcAddress("glGetFramebufferAttachmentParameterivOES");
+        glGenerateMipmapOES = (PFNGLGENERATEMIPMAPOES)getProcAddress("glGenerateMipmapOES");
+#endif
     }
 
     bool GLESSupport::checkExtension(const String& ext) const

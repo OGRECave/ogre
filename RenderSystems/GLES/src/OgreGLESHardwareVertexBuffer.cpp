@@ -49,6 +49,7 @@ namespace Ogre {
         }
 
         glGenBuffers(1, &mBufferId);
+        GL_CHECK_ERROR;
 
         if (!mBufferId)
         {
@@ -63,6 +64,7 @@ namespace Ogre {
     GLESHardwareVertexBuffer::~GLESHardwareVertexBuffer()
     {
         glDeleteBuffers(1, &mBufferId);
+        GL_CHECK_ERROR;
     }
 
     void* GLESHardwareVertexBuffer::lockImpl(size_t offset,
@@ -153,6 +155,7 @@ namespace Ogre {
                                            bool discardWholeBuffer)
     {
         glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
+        GL_CHECK_ERROR;
 
         // Update the shadow buffer
         if(mUseShadowBuffer)
@@ -167,6 +170,7 @@ namespace Ogre {
         {
             glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, pSource,
                          GLESHardwareBufferManager::getGLUsage(mUsage));
+            GL_CHECK_ERROR;
         }
         else
         {
@@ -176,6 +180,7 @@ namespace Ogre {
             }
 
             glBufferSubData(GL_ARRAY_BUFFER, offset, length, pSource);
+            GL_CHECK_ERROR;
         }
     }
 
@@ -188,16 +193,19 @@ namespace Ogre {
                                                        HBL_READ_ONLY);
 
             glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
+            GL_CHECK_ERROR;
 
             // Update whole buffer if possible, otherwise normal
             if (mLockStart == 0 && mLockSize == mSizeInBytes)
             {
                 glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, srcData,
                              GLESHardwareBufferManager::getGLUsage(mUsage));
+                GL_CHECK_ERROR;
             }
             else
             {
                 glBufferSubData(GL_ARRAY_BUFFER, mLockStart, mLockSize, srcData);
+                GL_CHECK_ERROR;
             }
 
             mpShadowBuffer->unlock();
@@ -213,9 +221,11 @@ namespace Ogre {
         memset(ptr, 0, mSizeInBytes);
 
         glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
+        GL_CHECK_ERROR;
         glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, ptr,
                      GLESHardwareBufferManager::getGLUsage(mUsage));
+        GL_CHECK_ERROR;
 
-        free(ptr);
+        OGRE_FREE(ptr, MEMCATEGORY_GEOMETRY);
     }
 }

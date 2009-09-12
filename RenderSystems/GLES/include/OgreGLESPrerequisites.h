@@ -42,7 +42,27 @@ Torus Knot Software Ltd.
 #   endif
 #else
 #   include <GLES/gl.h>
+#   include <GLES/glext.h>
 #   include <GLES/egl.h>
+
+// Function pointers for FBO extension methods
+// Declare them here since we don't have GLEW to do it for us
+
+extern PFNGLISRENDERBUFFEROESPROC glIsRenderbufferOES;
+extern PFNGLBINDRENDERBUFFEROESPROC glBindRenderbufferOES;
+extern PFNGLDELETERENDERBUFFERSOESPROC glDeleteRenderbuffersOES;
+extern PFNGLGENRENDERBUFFERSOESPROC glGenRenderbuffersOES;
+extern PFNGLRENDERBUFFERSTORAGEOESPROC glRenderbufferStorageOES;
+extern PFNGLGETRENDERBUFFERPARAMETERIVOESPROC glGetRenderbufferParameterivOES;
+extern PFNGLISFRAMEBUFFEROESPROC glIsFramebufferOES;
+extern PFNGLBINDFRAMEBUFFEROESPROC glBindFramebufferOES;
+extern PFNGLDELETEFRAMEBUFFERSOESPROC glDeleteFramebuffersOES;
+extern PFNGLGENFRAMEBUFFERSOESPROC glGenFramebuffersOES;
+extern PFNGLCHECKFRAMEBUFFERSTATUSOESPROC glCheckFramebufferStatusOES;
+extern PFNGLFRAMEBUFFERRENDERBUFFEROESPROC glFramebufferRenderbufferOES;
+extern PFNGLFRAMEBUFFERTEXTURE2DOESPROC glFramebufferTexture2DOES;
+extern PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVOESPROC glGetFramebufferAttachmentParameterivOES;
+extern PFNGLGENERATEMIPMAPOESPROC glGenerateMipmapOES;
 #endif
 
 #ifndef None
