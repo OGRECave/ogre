@@ -47,6 +47,14 @@ if (NOT OGRE_STATIC)
   ) 
 endif ()
 
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Plugins can be installed in the application package
+    set_target_properties(Plugin_BSPSceneManager
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
+
 if (OGRE_INSTALL_PLUGINS_HEADERS)
   install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/BSPSceneManager)
 endif ()
