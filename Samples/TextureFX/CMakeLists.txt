@@ -10,11 +10,10 @@
 # Configure TextureFX demo build
 
 set(HEADER_FILES include/TextureFX.h)
+set(SOURCE_FILES src/TextureFX.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/TextureFX.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/TextureFX.mm COPYONLY)
-  set(SOURCE_FILES src/TextureFX.mm)
-else ()
-  set(SOURCE_FILES src/TextureFX.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/TextureFX.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

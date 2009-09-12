@@ -9,11 +9,10 @@
 
 # Configure CameraTrack demo build
 
+set(SOURCE_FILES src/CameraTrack.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/CameraTrack.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/CameraTrack.mm COPYONLY)
-  set(SOURCE_FILES src/CameraTrack.mm)
-else ()
-  set(SOURCE_FILES src/CameraTrack.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/CameraTrack.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 add_executable(Demo_CameraTrack WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})

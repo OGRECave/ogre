@@ -9,11 +9,10 @@
 
 # Configure Gui demo build
 
+set(SOURCE_FILES src/Gui.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Gui.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Gui.mm COPYONLY)
-  set(SOURCE_FILES src/Gui.mm)
-else ()
-  set(SOURCE_FILES src/Gui.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Gui.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/CEGUIRenderer/include)

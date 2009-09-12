@@ -9,11 +9,10 @@
 
 # Configure DynTex demo build
 
+set(SOURCE_FILES src/DynTex.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/DynTex.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/DynTex.mm COPYONLY)
-  set(SOURCE_FILES src/DynTex.mm)
-else ()
-  set(SOURCE_FILES src/DynTex.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/DynTex.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 add_executable(Demo_DynTex WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})

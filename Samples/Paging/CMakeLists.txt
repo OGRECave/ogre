@@ -7,13 +7,12 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
-# Configure Grass demo build
+# Configure Paging demo build
+
+set(SOURCE_FILES src/Paging.cpp)
 
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Paging.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Paging.mm COPYONLY)
-  set(SOURCE_FILES src/Paging.mm)
-else ()
-  set(SOURCE_FILES src/Paging.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Paging.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_SOURCE_DIR}/Components/Paging/include)

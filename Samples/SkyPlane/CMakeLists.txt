@@ -10,11 +10,10 @@
 # Configure SkyPlane demo build
 
 set(HEADER_FILES include/SkyPlane.h)
+set(SOURCE_FILES src/SkyPlane.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/SkyPlane.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/SkyPlane.mm COPYONLY)
-  set(SOURCE_FILES src/SkyPlane.mm)
-else ()
-  set(SOURCE_FILES src/SkyPlane.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SkyPlane.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

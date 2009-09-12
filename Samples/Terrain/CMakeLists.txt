@@ -9,11 +9,10 @@
 
 # Configure Terrain demo build
 
+set(SOURCE_FILES src/Terrain.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Terrain.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Terrain.mm COPYONLY)
-  set(SOURCE_FILES src/Terrain.mm)
-else ()
-  set(SOURCE_FILES src/Terrain.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Terrain.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_SOURCE_DIR}/Components/Terrain/include)

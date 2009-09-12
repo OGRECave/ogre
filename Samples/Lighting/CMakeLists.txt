@@ -10,11 +10,10 @@
 # Configure Lighting demo build
 
 set(HEADER_FILES include/Lighting.h)
+set(SOURCE_FILES src/Lighting.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Lighting.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Lighting.mm COPYONLY)
-  set(SOURCE_FILES src/Lighting.mm)
-else ()
-  set(SOURCE_FILES src/Lighting.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Lighting.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

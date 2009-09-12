@@ -9,17 +9,13 @@
 
 # Configure Isosurf demo build
 
+set(SOURCE_FILES 
+  src/Isosurf.cpp
+  src/ProceduralTools.cpp
+)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Isosurf.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Isosurf.mm COPYONLY)
-  set(SOURCE_FILES 
-    src/Isosurf.mm
-    src/ProceduralTools.cpp
-  )
-else ()
-  set(SOURCE_FILES 
-    src/Isosurf.cpp
-    src/ProceduralTools.cpp
-  )
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Isosurf.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 add_executable(Demo_Isosurf WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})

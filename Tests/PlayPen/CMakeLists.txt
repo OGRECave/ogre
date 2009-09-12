@@ -7,22 +7,18 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
-# Configure Bezier demo build
+# Configure PlayPen build
 
 set(HEADER_FILES 
 	include/AnimationBlender.h 
 	include/StaticPluginLoader.h)
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/PlayPen.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/PlayPen.mm COPYONLY)
-  set(SOURCE_FILES 
-    src/PlayPen.mm
-    src/AnimationBlender.cpp
-    src/WindowEmbedding.cpp)
-else ()
-  set(SOURCE_FILES 
+set(SOURCE_FILES 
     src/PlayPen.cpp
     src/AnimationBlender.cpp
     src/WindowEmbedding.cpp)
+
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/PlayPen.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 if (APPLE)

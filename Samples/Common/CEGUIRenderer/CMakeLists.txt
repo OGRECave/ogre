@@ -7,7 +7,7 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
-# Configure Octree SceneManager build
+# Configure CEGUI Renderer build
 
 set (HEADER_FILES
   include/OgreCEGUIRenderer.h
@@ -33,6 +33,14 @@ if (NOT OGRE_STATIC)
     COMPILE_DEFINITIONS OGRE_GUIRENDERER_EXPORTS
   ) 
 ENDIF (NOT OGRE_STATIC)
+
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Plugins can be installed in the application package
+    set_target_properties(CEGUIOgreRenderer
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
 
 ogre_config_lib(CEGUIOgreRenderer)
 install(FILES ${HEADER_FILES}

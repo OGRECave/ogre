@@ -10,11 +10,10 @@
 # Configure Bezier demo build
 
 set(HEADER_FILES include/Bezier.h)
+set(SOURCE_FILES src/Bezier.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Bezier.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Bezier.mm COPYONLY)
-  set(SOURCE_FILES src/Bezier.mm)
-else ()
-  set(SOURCE_FILES src/Bezier.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Bezier.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

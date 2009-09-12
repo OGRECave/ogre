@@ -10,11 +10,10 @@
 # Configure PCZTestApp demo build
 
 set(HEADER_FILES include/PCZTestApp.h include/RoomObject.h)
+set(SOURCE_FILES src/PCZTestApp.cpp src/RoomObject.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/PCZTestApp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/PCZTestApp.mm COPYONLY)
-  set(SOURCE_FILES src/PCZTestApp.mm src/RoomObject.cpp)
-else ()
-  set(SOURCE_FILES src/PCZTestApp.cpp src/RoomObject.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/PCZTestApp.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(

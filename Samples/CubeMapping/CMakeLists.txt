@@ -10,11 +10,10 @@
 # Configure CubeMapping demo build
 
 set(HEADER_FILES include/CubeMapping.h)
+set(SOURCE_FILES src/CubeMapping.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/CubeMapping.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/CubeMapping.mm COPYONLY)
-  set(SOURCE_FILES src/CubeMapping.mm)
-else ()
-  set(SOURCE_FILES src/CubeMapping.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/CubeMapping.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

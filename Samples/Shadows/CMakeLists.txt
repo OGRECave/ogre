@@ -9,11 +9,10 @@
 
 # Configure Shadows demo build
 
+set(SOURCE_FILES src/Shadows.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Shadows.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Shadows.mm COPYONLY)
-  set(SOURCE_FILES src/Shadows.mm)
-else ()
-  set(SOURCE_FILES src/Shadows.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Shadows.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/CEGUIRenderer/include)

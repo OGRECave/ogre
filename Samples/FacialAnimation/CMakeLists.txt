@@ -9,11 +9,10 @@
 
 # Configure FacialAnimation demo build
 
+set(SOURCE_FILES src/FacialAnimation.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/FacialAnimation.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/FacialAnimation.mm COPYONLY)
-  set(SOURCE_FILES src/FacialAnimation.mm)
-else ()
-  set(SOURCE_FILES src/FacialAnimation.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/FacialAnimation.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/CEGUIRenderer/include)

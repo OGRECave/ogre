@@ -15,19 +15,14 @@ set(HEADER_FILES
   include/ThingRenderable.h
 )
 
+set(SOURCE_FILES 
+  src/VolumeTex.cpp
+  src/ThingRenderable.cpp
+  src/VolumeRenderable.cpp
+)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/VolumeTex.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/VolumeTex.mm COPYONLY)
-  set(SOURCE_FILES 
-    src/VolumeTex.mm
-    src/ThingRenderable.cpp
-    src/VolumeRenderable.cpp
-  )
-else ()
-  set(SOURCE_FILES 
-    src/VolumeTex.cpp
-    src/ThingRenderable.cpp
-    src/VolumeRenderable.cpp
-  )
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/VolumeTex.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

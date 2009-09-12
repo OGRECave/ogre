@@ -9,11 +9,10 @@
 
 # Configure Dot3Bump demo build
 
+set(SOURCE_FILES src/Dot3Bump.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Dot3Bump.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Dot3Bump.mm COPYONLY)
-  set(SOURCE_FILES src/Dot3Bump.mm)
-else ()
-  set(SOURCE_FILES src/Dot3Bump.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Dot3Bump.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 add_executable(Demo_Dot3Bump WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})

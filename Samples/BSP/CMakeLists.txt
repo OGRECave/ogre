@@ -9,11 +9,10 @@
 
 # Configure BSP demo build
 
+set(SOURCE_FILES src/BSP.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/BSP.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/BSP.mm COPYONLY)
-  set(SOURCE_FILES src/BSP.mm)
-else ()
-  set(SOURCE_FILES src/BSP.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/BSP.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 add_executable(Demo_BSP WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})

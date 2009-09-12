@@ -10,11 +10,10 @@
 # Configure Water demo build
 
 set(HEADER_FILES include/WaterMesh.h)
+set(SOURCE_FILES src/Water.cpp src/WaterMesh.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Water.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Water.mm COPYONLY)
-  set(SOURCE_FILES src/Water.mm src/WaterMesh.cpp)
-else ()
-  set(SOURCE_FILES src/Water.cpp src/WaterMesh.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/WaterMesh.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

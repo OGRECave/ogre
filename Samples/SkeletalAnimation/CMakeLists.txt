@@ -10,11 +10,10 @@
 # Configure SkeletalAnimation demo build
 
 set(HEADER_FILES include/SkeletalAnimation.h)
+set(SOURCE_FILES src/SkeletalAnimation.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/SkeletalAnimation.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/SkeletalAnimation.mm COPYONLY)
-  set(SOURCE_FILES src/SkeletalAnimation.mm)
-else ()
-  set(SOURCE_FILES src/SkeletalAnimation.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SkeletalAnimation.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

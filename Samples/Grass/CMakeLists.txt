@@ -9,11 +9,10 @@
 
 # Configure Grass demo build
 
+set(SOURCE_FILES src/Grass.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Grass.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Grass.mm COPYONLY)
-  set(SOURCE_FILES src/Grass.mm)
-else ()
-  set(SOURCE_FILES src/Grass.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Grass.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 add_executable(Demo_Grass WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})

@@ -10,11 +10,10 @@
 # Configure Smoke demo build
 
 set(HEADER_FILES include/Smoke.h)
+set(SOURCE_FILES src/Smoke.cpp)
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Smoke.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/Smoke.mm COPYONLY)
-  set(SOURCE_FILES src/Smoke.mm)
-else ()
-  set(SOURCE_FILES src/Smoke.cpp)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Smoke.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
