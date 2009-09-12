@@ -146,7 +146,7 @@ macro_log_feature(POCO_FOUND "POCO" "POCO framework" "http://pocoproject.org/" F
 
 # ThreadingBuildingBlocks
 find_package(TBB)
-macro_log_feature(TBB_FOUND "tbb" "Threading Building Blocks" "http://openttb.org/" FALSE "" "")
+macro_log_feature(TBB_FOUND "tbb" "Threading Building Blocks" "http://www.threadingbuildingblocks.org/" FALSE "" "")
 
 
 
