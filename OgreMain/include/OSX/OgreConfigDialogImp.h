@@ -40,35 +40,35 @@
 #import <AppKit/AppKit.h>
 
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
-@interface OgreConfigWindowController : NSWindowController <NSTableViewDelegate, NSTableViewDataSource>
+@interface OgreConfigWindowDelegate : NSObject <NSWindowDelegate, NSTableViewDelegate, NSTableViewDataSource>
 #else
-@interface OgreConfigWindowController : NSWindowController
+@interface OgreConfigWindowDelegate : NSObject <NSWindowDelegate>
 #endif
 {
-    IBOutlet NSWindow *configWindow;
-    IBOutlet NSImageView *ogreLogo;
-    IBOutlet NSPopUpButton *renderSystemsPopUp;
-    IBOutlet NSPopUpButton *optionsPopUp;
-    IBOutlet NSTableView *optionsTable;
-    IBOutlet NSButton *okButton;
-    IBOutlet NSButton *cancelButton;
-    IBOutlet NSTextField *optionLabel;
+    NSWindow *mConfigWindow;
+    NSImageView *mOgreLogo;
+    NSPopUpButton *mRenderSystemsPopUp;
+    NSPopUpButton *mOptionsPopUp;
+    NSTableView *mOptionsTable;
+    NSButton *mOkButton;
+    NSButton *mCancelButton;
+    NSTextField *mOptionLabel;
     
-    NSDictionary *options;
+    NSDictionary *mOptions;
 }
 
-- (IBAction)cancelButtonPressed:(id)sender;
-- (IBAction)okButtonPressed:(id)sender;
+- (void)cancelButtonPressed:(id)sender;
+- (void)okButtonPressed:(id)sender;
 
 // Getters and setters
 - (void)setOptions:(NSDictionary *)dict;
 - (NSDictionary *)getOptions;
 - (void)setRenderSystemsPopUp:(NSPopUpButton *)button;
 - (NSPopUpButton *)getRenderSystemsPopUp;
-- (void)setConfigWindow:(NSWindow *)window;
-- (NSWindow *)getConfigWindow;
 - (void)setOgreLogo:(NSImageView *)image;
 - (NSImageView *)getOgreLogo;
+- (void)setConfigWindow:(NSWindow *)window;
+- (NSWindow *)getConfigWindow;
 - (void)setOptionsTable:(NSTableView *)table;
 - (NSTableView *)getOptionsTable;
 - (void)setOptionsPopUp:(NSPopUpButton *)button;
@@ -90,7 +90,7 @@ namespace Ogre
 
 	protected:
 #ifdef __OBJC__
-        OgreConfigWindowController *mWindowController;
+        OgreConfigWindowDelegate *mWindowDelegate;
 #endif
 		RenderSystem *mSelectedRenderSystem;
 	};

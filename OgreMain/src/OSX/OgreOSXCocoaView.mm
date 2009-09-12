@@ -29,10 +29,6 @@
 
 #include "OgreOSXCocoaView.h"
 
-@implementation OgreWindow
-
-@end
-
 @implementation OgreView
 
 - (id)initWithFrame:(NSRect)f
@@ -48,7 +44,7 @@
 
 - (id)initWithGLOSXWindow:(Ogre::RenderWindow*)w
 {
-	if((self = [super initWithFrame:[(OgreWindow *)w frame]]))
+	if((self = [super initWithFrame:NSMakeRect(0, 0, w->getWidth(), w->getHeight())]))
     {
         window = w;
     }
