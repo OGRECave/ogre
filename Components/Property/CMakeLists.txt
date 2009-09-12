@@ -40,6 +40,14 @@ if (OGRE_CONFIG_THREADS)
   target_link_libraries(OgreProperty ${Boost_LIBRARIES})
 endif ()
 
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Plugins can be installed in the application package
+    set_target_properties(OgreProperty
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
+
 # install 
 ogre_config_lib(OgreProperty)
 install(FILES ${HEADER_FILES}
