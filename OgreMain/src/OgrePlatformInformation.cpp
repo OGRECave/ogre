@@ -479,6 +479,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
     static String _detectCpuIdentifier(void)
     {
+        String cpuID;
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
         // Get the size of the CPU subtype struct
         size_t size;
         sysctlbyname("hw.cpusubtype", NULL, &size, NULL, 0);
@@ -486,8 +488,6 @@ namespace Ogre {
         // Get the ARM CPU subtype
         cpu_subtype_t cpusubtype = 0;
         sysctlbyname("hw.cpusubtype", &cpusubtype, &size, NULL, 0);
-        
-        String cpuID;
 
         switch(cpusubtype)
         {
@@ -510,7 +510,34 @@ namespace Ogre {
                 cpuID = "Unknown ARM";
                 break;
         }
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+//        FILE *cpuinfo;
+//        int proccount = -1;
+//        cpuinfo = fopen("/proc/cpuinfo", "r");
+//        if (!cpuinfo)
+//            return -1;
+//        while (!feof(cpuinfo)) {
+//            if (fscanf(cpuinfo, "processor\t: %d\n", &proccount) < 1) {
+//                /* Failure to match: advance the file */
+//                if (feof(cpuinfo))
+//                    goto done;
+//                fseek(cpuinfo, 1, SEEK_CUR);
+//            } else {
+//                proccount++;
+//            }
+//        }
+//    done:
+//        fclose(cpuinfo); 
+        
+        static char processor[257];
+        size_t s = sizeof processor;
+        static int mib[] = { CTL_HW, HW_MODEL };
+        if (sysctl (mib, 2, processor, &s, 0, 0) >= 0)
+            cpuID = processor;
+        else
+            cpuID = "Unknown ARM";
 
+#endif
         return cpuID;
     }
     
