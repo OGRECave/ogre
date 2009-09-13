@@ -1296,8 +1296,8 @@ namespace Ogre
 							Real distRemain = distTransition - dist;
 
 							mLodTransition = 1.0 - (distRemain / distMorphRegion);
-							mLodTransition = std::min((Real)1.0, mLodTransition);
-							mLodTransition = std::max((Real)0.0, mLodTransition);
+							mLodTransition = std::min(1.0f, mLodTransition);
+							mLodTransition = std::max(0.0f, mLodTransition);
 
 							// Pass both the transition % and target LOD (GLOBAL current + 1)
 							// this selectively applies the morph just to the
