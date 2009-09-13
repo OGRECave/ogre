@@ -300,10 +300,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardSet::setMaterialName( const String& name )
     {
-		// early-out
-		if (name == mMaterialName)
-			return;
-		
         mMaterialName = name;
 
         mpMaterial = MaterialManager::getSingleton().getByName(name);

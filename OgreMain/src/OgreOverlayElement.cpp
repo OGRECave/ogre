@@ -323,10 +323,6 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void OverlayElement::setMaterialName(const String& matName)
     {
-		// early-out
-		if (matName == mMaterialName)
-			return;
-		
         mMaterialName = matName;
 		if (matName != StringUtil::BLANK)
 		{
