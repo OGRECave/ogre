@@ -829,7 +829,7 @@ namespace Ogre {
 		// Renormalise any normals which were not unit length
 		for(int i=0; i<6; i++ ) 
 		{
-			float length = mFrustumPlanes[i].normal.normalise();
+			Real length = mFrustumPlanes[i].normal.normalise();
 			mFrustumPlanes[i].d /= length;
 		}
 
