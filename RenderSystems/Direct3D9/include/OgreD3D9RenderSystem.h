@@ -38,7 +38,7 @@ Torus Knot Software Ltd.
 
 #include <d3d9.h>
 #include <d3dx9.h>
-#include <dxerr9.h>
+#include <dxerr.h>
 #include <dxdiag.h>
 
 namespace Ogre 

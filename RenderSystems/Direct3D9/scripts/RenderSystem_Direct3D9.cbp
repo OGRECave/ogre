@@ -22,7 +22,7 @@
 					<Add library="gdi32" />
 					<Add library="d3d9" />
 					<Add library="d3dx9d_30" />
-					<Add library="dxerr9" />
+					<Add library="dxerr" />
 					<Add library="dxguid" />
 					<Add directory="..\..\..\Dependencies\lib\Debug" />
 				</Linker>
@@ -47,7 +47,7 @@
 					<Add library="gdi32" />
 					<Add library="d3d9" />
 					<Add library="d3dx9_30" />
-					<Add library="dxerr9" />
+					<Add library="dxerr" />
 					<Add library="dxguid" />
 					<Add directory="..\..\..\Dependencies\lib\Release" />
 				</Linker>

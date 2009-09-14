@@ -38,7 +38,7 @@ Torus Knot Software Ltd.
 #include "OgreRenderSystem.h"
 
 #include <d3dx9.h>
-#include <dxerr9.h>
+#include <dxerr.h>
 
 namespace Ogre {
 

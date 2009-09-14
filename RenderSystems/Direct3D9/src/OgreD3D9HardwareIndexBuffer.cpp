@@ -59,7 +59,7 @@ namespace Ogre {
             
         if (FAILED(hr))
         {
-			String msg = DXGetErrorDescription9(hr);
+			String msg = DXGetErrorDescription(hr);
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Cannot create D3D9 Index buffer: " + msg, 
                 "D3D9HardwareIndexBuffer::D3D9HardwareIndexBuffer");
@@ -84,7 +84,7 @@ namespace Ogre {
 
         if (FAILED(hr))
         {
-			String msg = DXGetErrorDescription9(hr);
+			String msg = DXGetErrorDescription(hr);
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Cannot lock D3D9 Index buffer: " + msg, 
                 "D3D9HardwareIndexBuffer::lock");
@@ -150,7 +150,7 @@ namespace Ogre {
 
 			if (FAILED(hr))
 			{
-				String msg = DXGetErrorDescription9(hr);
+				String msg = DXGetErrorDescription(hr);
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 					"Cannot create D3D9 Index buffer: " + msg, 
 					"D3D9HardwareIndexBuffer::D3D9HardwareIndexBuffer");

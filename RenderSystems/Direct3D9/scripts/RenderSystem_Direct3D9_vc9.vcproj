@@ -67,7 +67,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="OgreMain_d.lib d3d9.lib d3dx9.lib dxerr9.lib dxguid.lib"
+				AdditionalDependencies="OgreMain_d.lib d3d9.lib d3dx9.lib dxerr.lib dxguid.lib"
 				OutputFile="$(OutDir)/RenderSystem_Direct3D9_d.dll"
 				Version=""
 				LinkIncremental="2"
@@ -162,7 +162,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="OgreMain.lib d3d9.lib d3dx9.lib dxerr9.lib dxguid.lib"
+				AdditionalDependencies="OgreMain.lib d3d9.lib d3dx9.lib dxerr.lib dxguid.lib"
 				OutputFile="$(OutDir)/RenderSystem_Direct3D9.dll"
 				Version="0.99"
 				LinkIncremental="1"
@@ -257,7 +257,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dxerr9.lib dxguid.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dxerr.lib dxguid.lib"
 				OutputFile="$(OutDir)\$(ProjectName)Static.lib"
 			/>
 			<Tool
@@ -328,7 +328,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dxerr9.lib dxguid.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dxerr.lib dxguid.lib"
 				OutputFile="$(OutDir)\$(ProjectName)Static_d.lib"
 			/>
 			<Tool
