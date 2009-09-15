@@ -31,46 +31,834 @@ Rendering Engine)</p>
 
 <p class="mainheader" align="left">License Summary</p>
 
-<p>OGRE is primarily released under an <a href="http://www.opensource.org/">open source</a> license. You have two licensing options when using OGRE:</p>
-<ul><li>Ogre&#8217;s default  license is the <a href="#LGPL">GNU  Lesser Public License (LGPL) with some specific exceptions</a>. This license is free as in beer and as in speech.</li>
-<li>Alternatively, you can license OGRE under a non-open source license called the <a href="#OUL">OGRE 'Unrestricted' License (OUL)</a>, for a fee.</li>
-</ul>
+<p>OGRE is released under an <a href="http://www.opensource.org/">open source</a> license, specifically the <a href="../COPYING">MIT License</a>. Previous versions of OGRE (up to 1.6) were licensed under the LGPL (with exceptions) but from 1.7 onwards the more permissive MIT license is now the default.
 	
-<a name="LGPL"></a><p class="mainheader" align="left">LGPL (with exceptions)</p>
+<a name="MIT"></a><p class="mainheader" align="left">MIT License</p>
 			
 				
-<p>Under  the <a href="licenses/lgpl.txt">LGPL</a> you may use Ogre for any purpose you wish, and modify it if you require, as long as you:</p>
+<p>Under  the <a href="../COPYING">MIT License</a> you may use Ogre for any purpose you wish, without warranty, and modify it if you require, subject to one condition:</p>
 <ol>
-<li>Pass on the (potentially modified) Ogre source code with your software, with original copyrights intact
-<ol>
-<li>If you distribute electronically, the source can be a separate download (either from your own site if you modified Ogre, or to www.ogre3d.org if you used an unmodified version) - just include a link in your documentation</li>
-<li>If you distribute physical media, the Ogre source that you used to build your application should be included on that media, whether you modified it or not</li>
-
+<li>"The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software."</li>
 </ol>
-</li>
-<li>Make it clear where you have customised it.</li>
-</ol>
-<p>The  above is a precis, please do read the <a href="licenses/lgpl.txt">full license text</a>. However, in order to make the use of OGRE simpler, we make exceptions / clarifications to the standard LGPL as described below.
-<p><b><u>Exceptions To The LGPL For OGRE</u></b></p>
-<p>The following exceptions / clarifications shall apply to the LGPL license in the case of the OGRE source code:
-<ol><li>Making modifications to OGRE configuration files, build scripts and configuration headers such as OgreConfig.h in order to create a customised build setup of OGRE with the otherwise unmodified source code, does not constitute a derived work</li>
-	<li>Building against OGRE headers which have inlined code does not constitute a derived work</li>
-	<li>User code which subclasses OGRE classes does not form a derivative work</li>
-	<li>Statically linking the OGRE libraries into a user application does not make the user application a derived work, and therefore does not require the user to pass on the source code or object code to their own application. The OGRE source code with all modifications must still be passed on in the same way as using OGRE as a shared library. </li>
-	<li>Using source code obsfucation on the OGRE source code when distributing it is not permitted .</li>
-	</ol>
-	</p>
+
+In practice this means that whenever you distribute your application, whether as binary or as source code, you must include somewhere in your distribution the text <a href="../COPYING">in this file</a>. This might be in the printed documentation, as a file on delivered media, or even on the credits / acknowledgements of the runtime application itself; any of those would satisfy the requirement.
 
 
-<a name="OUL"></a><p class="mainheader" align="left">OGRE 'Unrestricted' License (OUL)</p>
-<p>For whatever reason some users feel that they cannot comply with, or would prefer not to comply with the conditions of the LGPL described above. Reasons might include:</p>
-<ul>
-<li>You wish to alter the OGRE core without releasing those changes publicly</li>
-<li>Despite the quite lenient conditions of the LGPL, you are constrained by licensing policies that prevent you using an open source license</li>
-</ul>
-<p>To allow users with these issues to still consider using OGRE, an alternative license, the OGRE &#8220;Unrestricted&#8221; License (OUL), is available for a license fee. Thus users who have a specific need to avoid the conditions of the LGPL for their projects have the option of paying for a different license.<p><strong>If you are interested in obtaining this alternative license, please <a href="http://www.torusknot.com/contact.php">contact Torus Knot Software</a> for more details.</strong></p></blockquote>
+<p class="mainheader" align="left">Licenses for 3rd-party libraries used in OGRE</p>
 
 
+Several 3rd-party libraries are used in OGRE for various purposes, and the licensing details of each are given here.<br>
+
+
+<br>
+
+
+<span style="text-decoration: underline; font-weight: bold;">Core Dependencies<br>
+
+
+</span><br>
+
+These are the libraries which the core of OGRE depends on, and are
+therefore prerequisites for any use of OGRE. None of these libraries
+have been modified from their original distributions, and they are all
+licensed under liberal terms. You should read the detail of the
+licenses when distributing an application since most require you to
+include the license in your documentation. All the license texts are
+included in the Docs/licenses folder.<br>
+
+
+<br>
+<span style="font-weight: bold;">FreeImage</span><br>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 20%;">Original Authors:</td>
+
+
+      <td>Herv&eacute; Drolon and Floris van den Berg<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Website:</td>
+
+
+      <td>http://freeimage.sourceforge.net<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Licensed Under:</td>
+
+
+	  <td><a href="licenses/freeimage.txt">FreeImage Public License</a></td>
+
+
+    </tr>
+
+
+  
+  
+  </tbody>
+</table>
+
+<br>
+
+<span style="font-weight: bold;">FreeType</span><br>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 20%;">Original Authors:</td>
+
+
+      <td>David Turner, Robert Wilhelm, and Werner Lemberg<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Website:</td>
+
+
+      <td>http://www.freetype.org<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Licensed Under:</td>
+
+
+	  <td><a href="licenses/freetype.txt">FreeType License</a></td>
+
+
+    </tr>
+
+
+  
+  
+  </tbody>
+</table>
+
+<br>
+<span style="font-weight: bold;">LibJPEG</span><br>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 20%;">Original Authors:</td>
+
+
+      <td>Thomas G. Lane, Independent JPEG Group<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Website:</td>
+
+
+      <td>http://www.ijg.org/<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Licensed Under:</td>
+
+
+	  <td><a href="licenses/libjpeg.txt">LibJPEG License</a><br>
+      </td>
+
+
+    </tr>
+
+
+  
+  
+  </tbody>
+</table>
+
+<br>
+<span style="font-weight: bold;">LibMNG</span><br>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 20%;">Original Authors:</td>
+
+
+      <td>Gerard Juyn, Glenn Randers-Pehrson, Raphael Assenat, John Stiles<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Website:</td>
+
+
+      <td>http://www.libmng.com<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Licensed Under:</td>
+
+
+	  <td><a href="licenses/libmng.txt">LibMNG License</a><br>
+      </td>
+
+
+    </tr>
+
+
+  
+  
+  </tbody>
+</table>
+
+<br>
+<span style="font-weight: bold;">LibPNG</span><br>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 20%;">Original Authors:</td>
+
+
+      <td>Guy Eric Schalnat, Andreas Dilger, Glenn Randers-Pehrson and others<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Website:</td>
+
+
+      <td>http://www.libpng.org<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Licensed Under:</td>
+
+
+	  <td><a href="licenses/libpng.txt">LibPNG License</a><br>
+      </td>
+
+
+    </tr>
+
+
+  
+  
+  </tbody>
+</table>
+<br>
+
+<span style="font-weight: bold; text-decoration: underline;"></span><span style="font-weight: bold;">LibTIFF</span><br>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 20%;">Original Authors:</td>
+
+
+      <td>Sam Leffler, Silicon Graphics Inc<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Website:</td>
+
+
+      <td>http://www.libtiff.org/<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Licensed Under:</td>
+
+
+	  <td><a href="licenses/libtiff.txt">LibTIFF License</a><br>
+      </td>
+
+
+    </tr>
+
+
+  
+  
+  </tbody>
+</table>
+<br>
+
+<span style="font-weight: bold; text-decoration: underline;"></span><br>
+
+
+<span style="font-weight: bold;">Zlib<br>
+
+
+</span>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 20%;">Original Authors:</td>
+
+
+      <td>Jean-loup Gailly and Mark
+	Adler</td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Website:</td>
+
+
+      <td>http://www.zlib.net</td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Licensed Under:</td>
+
+
+	  <td><a href="licenses/zlib.txt">Zlib License</a></td>
+
+
+    </tr>
+
+
+  
+  
+  </tbody>
+</table>
+
+
+<span style="font-weight: bold;"><br>
+
+
+Zziplib</span><br>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 20%;">Original Author:</td>
+
+
+      <td>Guido Draheim</td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Website:</td>
+
+
+      <td>http://zziplib.sourceforge.net<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Licensed Under:</td>
+
+
+	  <td><a href="licenses/mpl.txt">Mozilla Public License 1.1</a></td>
+
+
+    </tr>
+
+
+  
+  
+  </tbody>
+</table>
+
+<br>
+
+<span style="font-weight: bold;"></span><span style="font-weight: bold; text-decoration: underline;">Optional Dependencies<br>
+
+<span style="text-decoration: underline;"><span style="font-weight: bold;"><br>
+
+</span></span></span>These dependencies are only needed if you use the plugins they relate to, or you enable them in the source build.<br>
+    <br />
+    <strong>Boost</strong><table style="text-align: left; width: 100%" border="0" cellpadding="0" cellspacing="0">
+        <tbody>
+            <tr>
+                <td style="width: 20%;">
+                    Original Authors:</td>
+                <td>
+                    Many</td>
+            </tr>
+            <tr>
+                <td>
+                    Website:</td>
+                <td>
+                    http://www.boost.org</td>
+            </tr>
+            <tr>
+                <td>
+                    Licensed Under:</td>
+                <td>
+                    <a href="licenses/nedmalloc_boost.txt">Boost License</a></td>
+            </tr>
+            <tr>
+                <td>
+                    Needed By:</td>
+                <td>
+                    If you enable OGRE_THREAD_SUPPORT</td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <strong>NedMalloc</strong><table style="text-align: left; width: 100%" border="0" cellpadding="0" cellspacing="0">
+        <tbody>
+            <tr>
+                <td style="width: 20%;">
+                    Original Authors:</td>
+                <td>
+                    Niall Douglas</td>
+            </tr>
+            <tr>
+                <td>
+                    Website:</td>
+                <td>
+                    http://www.nedprod.com/programs/portable/nedmalloc/</td>
+            </tr>
+            <tr>
+                <td>
+                    Licensed Under:</td>
+                <td>
+                    <a href="licenses/nedmalloc_boost.txt">Boost License</a></td>
+            </tr>
+            <tr>
+                <td>
+                    Needed By:</td>
+                <td>
+                    If you set OGRE_MEMORY_ALLOCATOR to OGRE_MEMORY_ALLOCATOR_NED</td>
+            </tr>
+        </tbody>
+    </table>
+
+<br>
+
+<span style="font-weight: bold;">NVidia Cg<br>
+
+</span>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 20%;">Original Authors:</td>
+
+
+      <td>NVidia</td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Website:</td>
+
+
+      <td>http://developer.nvidia.com</td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Licensed Under:</td>
+
+
+      <td>Custom free license (binary only)<br>
+
+      </td>
+
+
+    </tr>
+
+
+  <tr>
+
+      <td>Needed By:</td>
+
+      <td>Plugin_CgProgramManager</td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+<br />
+<span style="font-weight: bold;">OpenEXR<br>
+
+</span>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 20%;">Original Authors:</td>
+
+
+      <td>Industrial Light and Magic</td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Website:</td>
+
+
+      <td>http://www.openexr.com</td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Licensed Under:</td>
+
+
+	  <td><a href="http://www.xfree86.org/3.3.6/COPYRIGHT2.html#5">Modified BSD License</a><br>
+
+      </td>
+
+
+    </tr>
+
+
+  <tr>
+
+      <td>Needed By:</td>
+
+	  <td>Plugin_EXRCodec</td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+<br>
+
+<span style="font-weight: bold; text-decoration: underline;"><span style="text-decoration: underline;"><span style="font-weight: bold;"></span></span>Sample Program Dependencies<br>
+
+<br>
+
+</span>These dependencies are only used by our sample programs, and
+thus you do not need to use them to use OGRE,&nbsp;if you don't want to.<br>
+
+<br>
+
+<span style="font-weight: bold;">OIS</span><br>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 20%;">Original Authors:</td>
+
+
+      <td>Phillip Castaneda</td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Website:</td>
+
+
+      <td>http://www.wreckedgames.com/wiki/index.php/WreckedLibs:OIS<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Licensed Under:</td>
+
+
+      <td>Zlib License</td>
+
+
+    </tr>
+
+
+  
+  
+  </tbody>
+</table>
+
+<br>
+
+<span style="font-weight: bold; text-decoration: underline;"></span><span style="font-weight: bold;">CEGUI</span><br>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 20%;">Original Authors:</td>
+
+
+      <td>Paul D Turner, Tomas Lindquist Olsen and others<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Website:</td>
+
+
+      <td>http://www.cegui.org.uk<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Licensed Under:</td>
+
+
+      <td>MIT License</td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<br>
+
+<span style="font-weight: bold;">ODE</span><br>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+
+  <tbody>
+
+
+    <tr>
+
+
+      <td style="width: 20%;">Original Authors:</td>
+
+
+      <td>Russell Smith<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Website:</td>
+
+
+      <td>http://www.ode.org/<br>
+
+      </td>
+
+
+    </tr>
+
+
+    <tr>
+
+
+      <td>Licensed Under:</td>
+
+
+      <td>BSD License</td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+<br>
 
 <p>Copyright &copy; 2009 by The OGRE Team
 <script>
