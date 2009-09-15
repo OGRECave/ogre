@@ -17,6 +17,7 @@ FileSystem=@OGRE_MEDIA_DIR_DBG@/particle
 FileSystem=@OGRE_MEDIA_DIR_DBG@/gui
 FileSystem=@OGRE_MEDIA_DIR_DBG@/DeferredShadingMedia
 FileSystem=@OGRE_MEDIA_DIR_DBG@/PCZAppMedia
+FileSystem=@OGRE_MEDIA_DIR_DBG@/RTShaderLib
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/cubemap.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/cubemapsJS.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/dragon.zip

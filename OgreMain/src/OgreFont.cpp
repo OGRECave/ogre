@@ -176,6 +176,9 @@ namespace Ogre
             blendByAlpha = mTexture->hasAlpha();
             texLayer = mpMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(mSource);
         }
+
+		// Make sure material is aware of colour per vertex.
+		mpMaterial->getTechnique(0)->getPass(0)->setVertexColourTracking(TVC_DIFFUSE);
         // Clamp to avoid fuzzy edges
         texLayer->setTextureAddressingMode( TextureUnitState::TAM_CLAMP );
 		// Allow min/mag filter, but no mip

@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreLight.h"
 #include "OgreTextureUnitState.h"
+#include "OgreAny.h"
 
 namespace Ogre {
 
@@ -229,6 +230,7 @@ namespace Ogre {
 		bool mLightClipPlanes;
 		/// Illumination stage?
 		IlluminationStage mIlluminationStage;
+		Any mUserAny;
 
 		// Used to get scene blending flags from a blending type
 		void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);
@@ -1643,6 +1645,17 @@ namespace Ogre {
 		*/
 		static HashFunc* getBuiltinHashFunction(BuiltinHashFunction builtin);
 
+		/** Sets any kind of user value on this object.
+		@remarks
+		This method allows you to associate any user value you like with 
+		this Pass. This can be a pointer back to one of your own
+		classes for instance.		
+		*/
+		virtual void setUserAny(const Any& anything) { mUserAny = anything; }
+
+		/** Retrieves the custom user value associated with this pass.
+		*/
+		virtual const Any& getUserAny(void) const { return mUserAny; }
     };
 
     /** Struct recording a pass which can be used for a specific illumination stage.

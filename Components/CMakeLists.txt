@@ -20,3 +20,7 @@ endif ()
 if (OGRE_BUILD_COMPONENT_TERRAIN)
   add_subdirectory(Terrain)
 endif ()
+
+if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
+	add_subdirectory(RTShaderSystem)
+endif ()

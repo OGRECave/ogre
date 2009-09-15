@@ -169,6 +169,7 @@ set (HEADER_FILES
   include/OgreRectangle.h
   include/OgreRectangle2D.h
   include/OgreRenderable.h
+  include/OgreRenderObjectListener.h
   include/OgreRenderOperation.h
   include/OgreRenderQueue.h
   include/OgreRenderQueueInvocation.h

@@ -108,7 +108,13 @@ public:
         mRoot->startRendering();
 
         // clean up
-        destroyScene();
+        destroyScene();	
+
+#ifdef USE_RTSHADER_SYSTEM
+		// Finalize shader generator.
+		mFrameListener->finalizeShaderGenerator();
+#endif
+
     }
 
 protected:
@@ -160,6 +166,11 @@ protected:
         createScene();
 
         createFrameListener();
+
+#ifdef USE_RTSHADER_SYSTEM
+		// Initialize shader generator.
+		mFrameListener->initializeShaderGenerator(mSceneMgr);
+#endif
 
         return true;
 
