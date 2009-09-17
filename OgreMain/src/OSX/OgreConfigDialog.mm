@@ -346,11 +346,7 @@ namespace Ogre {
 }
 
 // Intercept the request to select a new row.  Update the popup's values.
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
 - (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(NSInteger)rowIndex
-#else
-- (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(long)rowIndex
-#endif
 {
     // Clear out the options popup menu
     [mOptionsPopUp removeAllItems];
