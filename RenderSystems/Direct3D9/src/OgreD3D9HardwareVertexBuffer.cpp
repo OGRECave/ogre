@@ -258,7 +258,7 @@ namespace Ogre {
 
 		if (FAILED(hr))
 		{
-			String msg = DXGetErrorDescription9(hr);
+			String msg = DXGetErrorDescription(hr);
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Cannot restore D3D9 vertex buffer: " + msg, 
 				"D3D9HardwareVertexBuffer::createBuffer");
@@ -267,7 +267,7 @@ namespace Ogre {
 		hr = bufferResources->mBuffer->GetDesc(&mBufferDesc);
 		if (FAILED(hr))
 		{
-			String msg = DXGetErrorDescription9(hr);
+			String msg = DXGetErrorDescription(hr);
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Cannot get D3D9 Vertex buffer desc: " + msg, 
 				"D3D9HardwareVertexBuffer::createBuffer");
@@ -317,7 +317,7 @@ namespace Ogre {
 
 		if (FAILED(hr))
 		{
-			String msg = DXGetErrorDescription9(hr);
+			String msg = DXGetErrorDescription(hr);
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Cannot lock D3D9 vertex buffer: " + msg, 
 				"D3D9HardwareVertexBuffer::updateBuffer");
@@ -329,7 +329,7 @@ namespace Ogre {
 		hr = bufferResources->mBuffer->Unlock();
 		if (FAILED(hr))
 		{
-			String msg = DXGetErrorDescription9(hr);
+			String msg = DXGetErrorDescription(hr);
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Cannot unlock D3D9 vertex buffer: " + msg, 
 				"D3D9HardwareVertexBuffer::updateBuffer");

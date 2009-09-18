@@ -2110,7 +2110,7 @@ namespace Ogre
 		hr = mDevice->SetRenderTarget(x, pBack[x]);
 		if (FAILED(hr))
 		{
-		String msg ;//= DXGetErrorDescription9(hr);
+		String msg ;//= DXGetErrorDescription(hr);
 		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setRenderTarget : " + msg, "D3D10RenderSystem::_setViewport" );
 		}
 		}
@@ -2153,7 +2153,7 @@ namespace Ogre
 		/*	hr = mDevice->SetDepthStencilSurface(pDepth);
 		if (FAILED(hr))
 		{
-		String msg ;//= DXGetErrorDescription9(hr);
+		String msg ;//= DXGetErrorDescription(hr);
 		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setDepthStencil : " + msg, "D3D10RenderSystem::_setViewport" );
 		}
 		*/
@@ -2219,7 +2219,7 @@ namespace Ogre
 /*
 		if( FAILED( hr = mDevice->BeginScene() ) )
 		{
-			String msg = DXGetErrorDescription9(hr);
+			String msg = DXGetErrorDescription(hr);
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error beginning frame :" + msg, "D3D10RenderSystem::_beginFrame" );
 		}
 
@@ -2231,7 +2231,7 @@ namespace Ogre
 			hr = __SetRenderState(D3DRS_SPECULARENABLE, TRUE);
 			if (FAILED(hr))
 			{
-				String msg = DXGetErrorDescription9(hr);
+				String msg = DXGetErrorDescription(hr);
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error enabling alpha blending option : " + msg, "D3D10RenderSystem::_beginFrame");
 			}
 			mBasicStatesInitialised = true;
@@ -3421,7 +3421,7 @@ namespace Ogre
 				NULL);
 			if(FAILED(hr))
 			{
-				String msg = DXGetErrorDescription9(hr);
+				String msg = DXGetErrorDescription(hr);
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error CreateDepthStencilSurface : " + msg, "D3D10RenderSystem::_getDepthStencilFor" );
 			}
 			/// And cache it

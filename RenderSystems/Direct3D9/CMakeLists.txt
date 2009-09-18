@@ -74,10 +74,7 @@ add_definitions(-D_USRDLL)
 add_library(RenderSystem_Direct3D9 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(RenderSystem_Direct3D9
   OgreMain
-  d3d9
-  d3dx9
-  dxerr9
-  dxguid
+  ${DirectX_LIBRARIES}
 )
 
 if (NOT OGRE_STATIC)

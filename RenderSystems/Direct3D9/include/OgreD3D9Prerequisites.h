@@ -66,7 +66,7 @@ THE SOFTWARE.
 #define NOMINMAX // required to stop windows.h messing up std::min
 #include <d3d9.h>
 #include <d3dx9.h>
-#include <dxerr9.h>
+#include <dxerr.h>
 
 
 namespace Ogre

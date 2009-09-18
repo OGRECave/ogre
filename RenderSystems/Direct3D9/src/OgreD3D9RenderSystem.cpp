@@ -1419,7 +1419,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	String D3D9RenderSystem::getErrorDescription( long errorNumber ) const
 	{
-		const String errMsg = DXGetErrorDescription9( errorNumber );
+		const String errMsg = DXGetErrorDescription( errorNumber );
 		return errMsg;
 	}
 	//---------------------------------------------------------------------
@@ -2737,14 +2737,14 @@ namespace Ogre
 			hr = getActiveD3D9Device()->SetRenderTarget(x, pBack[x]);
 			if (FAILED(hr))
 			{
-				String msg = DXGetErrorDescription9(hr);
+				String msg = DXGetErrorDescription(hr);
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setRenderTarget : " + msg, "D3D9RenderSystem::_setViewport" );
 			}
 		}
 		hr = getActiveD3D9Device()->SetDepthStencilSurface(pDepth);
 		if (FAILED(hr))
 		{
-			String msg = DXGetErrorDescription9(hr);
+			String msg = DXGetErrorDescription(hr);
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setDepthStencil : " + msg, "D3D9RenderSystem::_setViewport" );
 		}
 	}
@@ -2800,7 +2800,7 @@ namespace Ogre
 
 		if( FAILED( hr = getActiveD3D9Device()->BeginScene() ) )
 		{
-			String msg = DXGetErrorDescription9(hr);
+			String msg = DXGetErrorDescription(hr);
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error beginning frame :" + msg, "D3D9RenderSystem::_beginFrame" );
 		}
 
@@ -3004,7 +3004,7 @@ namespace Ogre
 
 		if( FAILED( hr ) )
 		{
-			String msg = DXGetErrorDescription9(hr);
+			String msg = DXGetErrorDescription(hr);
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to DrawPrimitive : " + msg, "D3D9RenderSystem::_render" );
 		}
 
@@ -3364,7 +3364,7 @@ namespace Ogre
 			depth, 
 			stencil ) ) )
 		{
-			String msg = DXGetErrorDescription9(hr);
+			String msg = DXGetErrorDescription(hr);
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error clearing frame buffer : " 
 				+ msg, "D3D9RenderSystem::clearFrameBuffer" );
 		}
@@ -3694,7 +3694,7 @@ namespace Ogre
 				NULL);
 			if(FAILED(hr))
 			{
-				String msg = DXGetErrorDescription9(hr);
+				String msg = DXGetErrorDescription(hr);
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error CreateDepthStencilSurface : " + msg, "D3D9RenderSystem::_getDepthStencilFor" );
 			}
 			/// And cache it
