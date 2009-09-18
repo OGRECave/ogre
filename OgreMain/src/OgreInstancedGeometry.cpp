@@ -1532,7 +1532,10 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	InstancedGeometry::MaterialBucket::MaterialBucket(LODBucket* parent,
 		const String& materialName)
-		: mParent(parent), mMaterialName(materialName),mLastIndex(0)
+		: mParent(parent)
+		, mMaterialName(materialName)
+		, mTechnique(0)
+		, mLastIndex(0)
 	{
 						mMaterial = MaterialManager::getSingleton().getByName(mMaterialName);
 	}
