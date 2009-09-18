@@ -1453,8 +1453,6 @@ namespace Ogre {
 						s->operationType != RenderOperation::OT_TRIANGLE_LIST && 
 						s->operationType != RenderOperation::OT_TRIANGLE_STRIP)
 					{
-                        // create empty edge data and skip
-						usage.edgeData = OGRE_NEW EdgeData();
                         continue;
 					}
                     if (s->useSharedVertices)
@@ -1505,7 +1503,11 @@ namespace Ogre {
 					LogManager::getSingleton().destroyLog(log);
                 #endif
 				}
-
+				else
+				{
+					// create empty edge data
+					usage.edgeData = OGRE_NEW EdgeData();
+				}
             }
         }
         mEdgeListsBuilt = true;
