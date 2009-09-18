@@ -336,6 +336,7 @@ namespace Ogre {
 			if (synchronous)
 			{
 				processResponse(response);
+				OGRE_DELETE response;
 			}
 			else
 			{
