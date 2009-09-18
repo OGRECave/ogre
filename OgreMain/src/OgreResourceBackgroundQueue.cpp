@@ -382,6 +382,7 @@ namespace Ogre {
 				ResourceGroupManager::getSingleton().loadResourceGroup(req.groupName);
 			}
 #endif
+			mOutstandingRequestSet.erase(res->getRequest()->getID());
 
 			// Call resource listener
 			if (resresp.resource) 
