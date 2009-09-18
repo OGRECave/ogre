@@ -40,7 +40,7 @@ protected:
 		MODE_COUNT = 3
 	};
 	Mode mMode;
-	uint8 mLayerEdit;
+	Ogre::uint8 mLayerEdit;
 	Real mBrushSizeTerrainSpace;
 	SceneNode* mEditNode;
 	Entity* mEditMarker;
