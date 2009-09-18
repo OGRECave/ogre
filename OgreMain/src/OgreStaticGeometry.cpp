@@ -1245,7 +1245,9 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	StaticGeometry::MaterialBucket::MaterialBucket(LODBucket* parent,
 		const String& materialName)
-		: mParent(parent), mMaterialName(materialName)
+		: mParent(parent)
+		, mMaterialName(materialName)
+		, mTechnique(0)
 	{
 	}
 	//--------------------------------------------------------------------------
