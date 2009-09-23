@@ -53,7 +53,6 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreArchiveManager.h"
 #include "OgrePlugin.h"
-#include "OgreZip.h"
 #include "OgreFileSystem.h"
 #include "OgreShadowVolumeExtrudeProgram.h"
 #include "OgreResourceBackgroundQueue.h"
@@ -76,6 +75,9 @@ THE SOFTWARE.
 #endif
 #if OGRE_NO_DDS_CODEC == 0
 #include "OgreDDSCodec.h"
+#endif
+#if OGRE_NO_ZIP_ARCHIVE == 0
+#include "OgreZip.h"
 #endif
 
 #include "OgreFontManager.h"
@@ -220,8 +222,10 @@ namespace Ogre {
 #endif
         mFileSystemArchiveFactory = OGRE_NEW FileSystemArchiveFactory();
         ArchiveManager::getSingleton().addArchiveFactory( mFileSystemArchiveFactory );
+#if OGRE_NO_ZIP_ARCHIVE == 0
         mZipArchiveFactory = OGRE_NEW ZipArchiveFactory();
         ArchiveManager::getSingleton().addArchiveFactory( mZipArchiveFactory );
+#endif
 #if OGRE_NO_FREEIMAGE == 0
 		// Register image codecs
 		FreeImageCodec::startup();
@@ -301,7 +305,9 @@ namespace Ogre {
         OGRE_DELETE mFontManager;
 		OGRE_DELETE mLodStrategyManager;
         OGRE_DELETE mArchiveManager;
+#if OGRE_NO_ZIP_ARCHIVE == 0
         OGRE_DELETE mZipArchiveFactory;
+#endif
         OGRE_DELETE mFileSystemArchiveFactory;
         OGRE_DELETE mSkeletonManager;
         OGRE_DELETE mMeshManager;

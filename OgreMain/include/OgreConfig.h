@@ -184,6 +184,13 @@ WARNING: Use only when you want to provide your own image loading code via codec
 #define OGRE_NO_DDS_CODEC 0
 #endif
 
+/** Disables use of the ZIP archive support.
+WARNING: Disabling this will make the samples unusable.
+*/
+#ifndef OGRE_NO_ZIP_ARCHIVE
+#define OGRE_NO_ZIP_ARCHIVE 0
+#endif
+
 /** Enables the use of the new script compilers when Ogre compiles resource scripts.
 */
 #ifndef OGRE_USE_NEW_COMPILERS

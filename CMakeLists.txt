@@ -202,6 +202,7 @@ option(OGRE_CONFIG_MEMTRACK_RELEASE "Enable Ogre's memory tracker in release mod
 include(PrepareThreadingOptions)
 cmake_dependent_option(OGRE_CONFIG_DISABLE_FREEIMAGE "Don't build FreeImage codec. If you use this option, you need to provide your own image handling codecs." FALSE "FreeImage_FOUND" TRUE)
 option(OGRE_CONFIG_DISABLE_DDS "Don't build DDS codec." FALSE)
+cmake_dependent_option(OGRE_CONFIG_DISABLE_ZIP "Don't build ZIP archive support. If you use this option, you cannot use ZIP archives resource locations. The samples won't work." FALSE "ZZip_FOUND" TRUE)
 option(OGRE_CONFIG_NEW_COMPILERS "Use the new script compilers." TRUE)
 cmake_dependent_option(OGRE_USE_BOOST "Use Boost extensions" TRUE "Boost_FOUND" FALSE)
 # Customise what to install
