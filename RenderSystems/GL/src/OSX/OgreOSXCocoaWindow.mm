@@ -256,7 +256,7 @@ namespace Ogre {
             mIsFullScreen = fullScreen;
 
 			// Create register the context with the rendersystem and associate it with this window
-			mContext = new OSXCocoaContext(glContext);
+			mContext = new OSXCocoaContext(glContext, openglFormat);
 			/*rs->_registerContext(this, newContext);
 			
 			if (rs->_getMainContext() == 0)

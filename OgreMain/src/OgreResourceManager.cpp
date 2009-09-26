@@ -99,11 +99,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::load(const String& name, 
         const String& group, bool isManual, ManualResourceLoader* loader, 
-        const NameValuePairList* loadParams)
+        const NameValuePairList* loadParams, bool backgroundThread)
     {
         ResourcePtr r = createOrRetrieve(name,group,isManual,loader,loadParams).first;
 		// ensure loaded
-        r->load();
+        r->load(backgroundThread);
         return r;
     }
     //-----------------------------------------------------------------------

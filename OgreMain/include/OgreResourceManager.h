@@ -359,10 +359,13 @@ namespace Ogre {
 			for the previous parameter
         @param loadParams Optional pointer to a list of name/value pairs 
             containing loading parameters for this type of resource.
+		@param backgroundThread Optional boolean which lets the load routine know if it
+			is being run on the background resource loading thread
 		*/
 		virtual ResourcePtr load(const String& name, 
             const String& group, bool isManual = false, 
-			ManualResourceLoader* loader = 0, const NameValuePairList* loadParams = 0);
+			ManualResourceLoader* loader = 0, const NameValuePairList* loadParams = 0,
+			bool backgroundThread = false);
 
 		/** Gets the file patterns which should be used to find scripts for this
 			ResourceManager.

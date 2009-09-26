@@ -36,7 +36,7 @@ namespace Ogre {
     class OSXCocoaContext: public OSXContext
     {
     public:
-        OSXCocoaContext(NSOpenGLContext *context);
+        OSXCocoaContext(NSOpenGLContext *context, NSOpenGLPixelFormat *pixelFormat);
 
         virtual ~OSXCocoaContext();
 
@@ -60,8 +60,12 @@ namespace Ogre {
 		/** Grab the NSOpenGLContext if it exists */
 		NSOpenGLContext* getContext();
 		
+		/** Grab the NSOpenGLPixelFormat if it exists */
+		NSOpenGLPixelFormat* getPixelFormat();
+		
 	private:
 		NSOpenGLContext* mNSGLContext;
+		NSOpenGLPixelFormat *mNSGLPixelFormat;
     };
 }
 

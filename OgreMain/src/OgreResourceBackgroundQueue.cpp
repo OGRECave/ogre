@@ -330,7 +330,7 @@ namespace Ogre {
 					resreq.loader, resreq.loadParams).get();
 	#else
 				resource = rm->load(resreq.resourceName, resreq.groupName, resreq.isManual, 
-					resreq.loader, resreq.loadParams).get();
+					resreq.loader, resreq.loadParams, true).get();
 	#endif
 				break;
 			case RT_UNLOAD_RESOURCE:

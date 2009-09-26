@@ -31,12 +31,15 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-    OSXCocoaContext::OSXCocoaContext(NSOpenGLContext *context) : mNSGLContext(context)
+    OSXCocoaContext::OSXCocoaContext(NSOpenGLContext *context, NSOpenGLPixelFormat *pixelFormat)
+      : mNSGLContext(context), mNSGLPixelFormat(pixelFormat)
 	{
+		[mNSGLPixelFormat retain];
 	}
 	    
 	OSXCocoaContext::~OSXCocoaContext()
 	{
+		[mNSGLPixelFormat release];
     }
 
     void OSXCocoaContext::setCurrent()
@@ -51,8 +54,9 @@ namespace Ogre
 	
 	GLContext* OSXCocoaContext::clone() const
 	{
-		NSLog(@"ERROR: OgreGLOSXContext doesn't implement clone.");
-        return nil;
+		NSOpenGLContext *clone = [[[NSOpenGLContext alloc] initWithFormat:mNSGLPixelFormat shareContext:mNSGLContext];
+		[clone copyAttributesFromContext:mNSGLContext withMask:GL_ALL_ATTRIB_BITS];
+		return new OSXCocoaContext(clone, mNSGLPixelFormat);
 	}
 	
 	String OSXCocoaContext::getContextType()
@@ -64,4 +68,9 @@ namespace Ogre
 	{
 		return mNSGLContext;
     }
+  
+	NSOpenGLPixelFormat* OSXCocoaContext::getPixelFormat()
+	{
+		return mNSGLPixelFormat;
+	}
 }
