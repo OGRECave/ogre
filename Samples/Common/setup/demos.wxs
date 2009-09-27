@@ -2,10 +2,10 @@
 <Wix xmlns='http://schemas.microsoft.com/wix/2003/01/wi'>
 
   <Product 
-	  Name='OGRE Demos 1.6.3' 
+	  Name='OGRE Demos 1.6.4' 
 		Id='B3483083-1A14-4250-B196-AB82DE686742'
 		Language='1033' Codepage='1252' 
-		Version='1.6.3' Manufacturer='OGRE Project'>
+		Version='1.6.4' Manufacturer='OGRE Project'>
 
     <Package Id='????????-????-????-????-????????????' Keywords='Installer'
     Description="OGRE Demos Installer"
