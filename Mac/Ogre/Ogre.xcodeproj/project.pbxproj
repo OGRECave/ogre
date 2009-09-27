@@ -726,7 +726,7 @@
 
 /* Begin PBXFileReference section */
 		000E1D350B38D380004EA2DF /* Ogre.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ogre.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		000E1D370B38D380004EA2DF /* Ogre-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "Ogre-Info.plist"; path = "plist/Ogre-Info.plist"; sourceTree = "<group>"; };
+		000E1D370B38D380004EA2DF /* Ogre-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Ogre-Info.plist"; path = "plist/Ogre-Info.plist"; sourceTree = "<group>"; };
 		000E1D450B38D4E5004EA2DF /* config.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = config.nib; path = nib/config.nib; sourceTree = "<group>"; };
 		000E1D460B38D4E5004EA2DF /* main.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = main.nib; path = nib/main.nib; sourceTree = "<group>"; };
 		000E1D4C0B38D565004EA2DF /* asm_math.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = asm_math.h; path = ../../OgreMain/include/asm_math.h; sourceTree = SOURCE_ROOT; };
@@ -1101,7 +1101,7 @@
 		000E204D0B38D5C8004EA2DF /* OgreErrorDialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreErrorDialog.cpp; path = ../../OgreMain/src/OSX/OgreErrorDialog.cpp; sourceTree = SOURCE_ROOT; };
 		000E204E0B38D5C8004EA2DF /* OgreTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreTimer.cpp; path = ../../OgreMain/src/OSX/OgreTimer.cpp; sourceTree = SOURCE_ROOT; };
 		000E20560B38D600004EA2DF /* RenderSystem_GL.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RenderSystem_GL.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
-		000E20570B38D600004EA2DF /* GL Render System-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "GL Render System-Info.plist"; path = "plist/GL Render System-Info.plist"; sourceTree = "<group>"; };
+		000E20570B38D600004EA2DF /* GL Render System-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "GL Render System-Info.plist"; path = "plist/GL Render System-Info.plist"; sourceTree = "<group>"; };
 		000E206B0B38D82E004EA2DF /* OgreGLATIFSInit.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreGLATIFSInit.h; path = ../../RenderSystems/GL/include/OgreGLATIFSInit.h; sourceTree = SOURCE_ROOT; };
 		000E206C0B38D82E004EA2DF /* OgreGLContext.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreGLContext.h; path = ../../RenderSystems/GL/include/OgreGLContext.h; sourceTree = SOURCE_ROOT; };
 		000E206D0B38D82E004EA2DF /* OgreGLDefaultHardwareBufferManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreGLDefaultHardwareBufferManager.h; path = ../../RenderSystems/GL/include/OgreGLDefaultHardwareBufferManager.h; sourceTree = SOURCE_ROOT; };
@@ -1231,7 +1231,7 @@
 		000E23210B38EE0E004EA2DF /* vs1.0_inst_list.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = vs1.0_inst_list.cpp; path = ../../RenderSystems/GL/src/nvparse/vs1.0_inst_list.cpp; sourceTree = SOURCE_ROOT; };
 		000E23220B38EE0E004EA2DF /* vsp1.0_impl.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = vsp1.0_impl.cpp; path = ../../RenderSystems/GL/src/nvparse/vsp1.0_impl.cpp; sourceTree = SOURCE_ROOT; };
 		000E235C0B38F852004EA2DF /* Plugin_ParticleFX.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Plugin_ParticleFX.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
-		000E235D0B38F852004EA2DF /* ParticleFX Plugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "ParticleFX Plugin-Info.plist"; path = "plist/ParticleFX Plugin-Info.plist"; sourceTree = "<group>"; };
+		000E235D0B38F852004EA2DF /* ParticleFX Plugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "ParticleFX Plugin-Info.plist"; path = "plist/ParticleFX Plugin-Info.plist"; sourceTree = "<group>"; };
 		000E23760B38FA5B004EA2DF /* OgreAreaEmitter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreAreaEmitter.h; path = ../../PlugIns/ParticleFX/include/OgreAreaEmitter.h; sourceTree = SOURCE_ROOT; };
 		000E23770B38FA5B004EA2DF /* OgreBoxEmitter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreBoxEmitter.h; path = ../../PlugIns/ParticleFX/include/OgreBoxEmitter.h; sourceTree = SOURCE_ROOT; };
 		000E23780B38FA5B004EA2DF /* OgreBoxEmitterFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreBoxEmitterFactory.h; path = ../../PlugIns/ParticleFX/include/OgreBoxEmitterFactory.h; sourceTree = SOURCE_ROOT; };
@@ -1282,7 +1282,7 @@
 		000E23A50B38FA75004EA2DF /* OgreRotationAffector.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreRotationAffector.cpp; path = ../../PlugIns/ParticleFX/src/OgreRotationAffector.cpp; sourceTree = SOURCE_ROOT; };
 		000E23A60B38FA75004EA2DF /* OgreScaleAffector.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreScaleAffector.cpp; path = ../../PlugIns/ParticleFX/src/OgreScaleAffector.cpp; sourceTree = SOURCE_ROOT; };
 		000E23C80B38FD6F004EA2DF /* Plugin_BSPSceneManager.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Plugin_BSPSceneManager.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
-		000E23C90B38FD6F004EA2DF /* BSPSceneManager Plugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "BSPSceneManager Plugin-Info.plist"; path = "plist/BSPSceneManager Plugin-Info.plist"; sourceTree = "<group>"; };
+		000E23C90B38FD6F004EA2DF /* BSPSceneManager Plugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "BSPSceneManager Plugin-Info.plist"; path = "plist/BSPSceneManager Plugin-Info.plist"; sourceTree = "<group>"; };
 		000E23D20B38FF94004EA2DF /* OgreBspLevel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreBspLevel.h; path = ../../PlugIns/BSPSceneManager/include/OgreBspLevel.h; sourceTree = SOURCE_ROOT; };
 		000E23D30B38FF94004EA2DF /* OgreBspNode.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreBspNode.h; path = ../../PlugIns/BSPSceneManager/include/OgreBspNode.h; sourceTree = SOURCE_ROOT; };
 		000E23D40B38FF94004EA2DF /* OgreBspPrerequisites.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreBspPrerequisites.h; path = ../../PlugIns/BSPSceneManager/include/OgreBspPrerequisites.h; sourceTree = SOURCE_ROOT; };
@@ -1303,7 +1303,7 @@
 		000E23E30B38FFB0004EA2DF /* OgreQuake3Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreQuake3Shader.cpp; path = ../../PlugIns/BSPSceneManager/src/OgreQuake3Shader.cpp; sourceTree = SOURCE_ROOT; };
 		000E23E40B38FFB0004EA2DF /* OgreQuake3ShaderManager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreQuake3ShaderManager.cpp; path = ../../PlugIns/BSPSceneManager/src/OgreQuake3ShaderManager.cpp; sourceTree = SOURCE_ROOT; };
 		000E23F60B39009B004EA2DF /* Plugin_OctreeSceneManager.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Plugin_OctreeSceneManager.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
-		000E23F70B39009B004EA2DF /* OctreeSceneManager Plugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "OctreeSceneManager Plugin-Info.plist"; path = "plist/OctreeSceneManager Plugin-Info.plist"; sourceTree = "<group>"; };
+		000E23F70B39009B004EA2DF /* OctreeSceneManager Plugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "OctreeSceneManager Plugin-Info.plist"; path = "plist/OctreeSceneManager Plugin-Info.plist"; sourceTree = "<group>"; };
 		000E23FF0B390148004EA2DF /* OgreHeightmapTerrainPageSource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreHeightmapTerrainPageSource.h; path = ../../PlugIns/OctreeSceneManager/include/OgreHeightmapTerrainPageSource.h; sourceTree = SOURCE_ROOT; };
 		000E24000B390148004EA2DF /* OgreOctree.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreOctree.h; path = ../../PlugIns/OctreeSceneManager/include/OgreOctree.h; sourceTree = SOURCE_ROOT; };
 		000E24010B390148004EA2DF /* OgreOctreeCamera.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreOctreeCamera.h; path = ../../PlugIns/OctreeSceneManager/include/OgreOctreeCamera.h; sourceTree = SOURCE_ROOT; };
@@ -1329,7 +1329,7 @@
 		000E24150B390164004EA2DF /* OgreTerrainSceneManager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreTerrainSceneManager.cpp; path = ../../PlugIns/OctreeSceneManager/src/OgreTerrainSceneManager.cpp; sourceTree = SOURCE_ROOT; };
 		000E24160B390164004EA2DF /* OgreTerrainVertexProgram.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreTerrainVertexProgram.cpp; path = ../../PlugIns/OctreeSceneManager/src/OgreTerrainVertexProgram.cpp; sourceTree = SOURCE_ROOT; };
 		000E24350B3902ED004EA2DF /* Plugin_CgProgramManager.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Plugin_CgProgramManager.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
-		000E24360B3902ED004EA2DF /* CgProgramManager Plugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "CgProgramManager Plugin-Info.plist"; path = "plist/CgProgramManager Plugin-Info.plist"; sourceTree = "<group>"; };
+		000E24360B3902ED004EA2DF /* CgProgramManager Plugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "CgProgramManager Plugin-Info.plist"; path = "plist/CgProgramManager Plugin-Info.plist"; sourceTree = "<group>"; };
 		000E243E0B390499004EA2DF /* OgreCgPrerequisites.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreCgPrerequisites.h; path = ../../PlugIns/CgProgramManager/include/OgreCgPrerequisites.h; sourceTree = SOURCE_ROOT; };
 		000E243F0B390499004EA2DF /* OgreCgProgram.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreCgProgram.h; path = ../../PlugIns/CgProgramManager/include/OgreCgProgram.h; sourceTree = SOURCE_ROOT; };
 		000E24400B390499004EA2DF /* OgreCgProgramFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreCgProgramFactory.h; path = ../../PlugIns/CgProgramManager/include/OgreCgProgramFactory.h; sourceTree = SOURCE_ROOT; };
@@ -1337,7 +1337,7 @@
 		000E24420B3904B0004EA2DF /* OgreCgProgramFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreCgProgramFactory.cpp; path = ../../PlugIns/CgProgramManager/src/OgreCgProgramFactory.cpp; sourceTree = SOURCE_ROOT; };
 		000E24430B3904B0004EA2DF /* OgreCgProgramManagerDll.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreCgProgramManagerDll.cpp; path = ../../PlugIns/CgProgramManager/src/OgreCgProgramManagerDll.cpp; sourceTree = SOURCE_ROOT; };
 		000E244C0B39050D004EA2DF /* Cg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cg.framework; path = ../../Dependencies/Cg.framework; sourceTree = SOURCE_ROOT; };
-		000E24550B390583004EA2DF /* EXRCodec Plugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "EXRCodec Plugin-Info.plist"; path = "plist/EXRCodec Plugin-Info.plist"; sourceTree = "<group>"; };
+		000E24550B390583004EA2DF /* EXRCodec Plugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "EXRCodec Plugin-Info.plist"; path = "plist/EXRCodec Plugin-Info.plist"; sourceTree = "<group>"; };
 		003C21070B51AB990090A344 /* OgreOSXWindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgreOSXWindow.h; path = ../../RenderSystems/GL/include/OSX/OgreOSXWindow.h; sourceTree = SOURCE_ROOT; };
 		003C21110B51AE990090A344 /* OgreOSXWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OgreOSXWindow.cpp; path = ../../RenderSystems/GL/src/OSX/OgreOSXWindow.cpp; sourceTree = SOURCE_ROOT; };
 		0054A4FF0B5465250037D8B9 /* OgrePrefabFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OgrePrefabFactory.h; path = ../../OgreMain/include/OgrePrefabFactory.h; sourceTree = SOURCE_ROOT; };
@@ -3409,6 +3409,7 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_VERSION = 4.0;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				SHARED_PRECOMPS_DIR = ../build/PCH;
 			};
@@ -3423,6 +3424,7 @@
 				);
 				COPY_PHASE_STRIP = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_VERSION = 4.0;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				SHARED_PRECOMPS_DIR = ../build/PCH;
 			};
@@ -3449,6 +3451,7 @@
 				);
 				INFOPLIST_FILE = "./plist/Ogre-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
+				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
 					../../Dependencies/lib/Debug,
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
