@@ -54,7 +54,7 @@ namespace Ogre
 	
 	GLContext* OSXCocoaContext::clone() const
 	{
-		NSOpenGLContext *clone = [[[NSOpenGLContext alloc] initWithFormat:mNSGLPixelFormat shareContext:mNSGLContext];
+		NSOpenGLContext *clone = [[NSOpenGLContext alloc] initWithFormat:mNSGLPixelFormat shareContext:mNSGLContext];
 		[clone copyAttributesFromContext:mNSGLContext withMask:GL_ALL_ATTRIB_BITS];
 		return new OSXCocoaContext(clone, mNSGLPixelFormat);
 	}
