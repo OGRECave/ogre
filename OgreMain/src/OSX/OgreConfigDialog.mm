@@ -299,7 +299,7 @@ namespace Ogre {
     Ogre::String selectedRenderSystemName = Ogre::String([[[mRenderSystemsPopUp selectedItem] title] UTF8String]);
     
     // Save the current config value
-    if((0 < [mOptionsTable selectedRow]) && [mOptionsPopUp selectedItem])
+    if((0 <= [mOptionsTable selectedRow]) && [mOptionsPopUp selectedItem])
     {
         Ogre::String value = Ogre::String([[[mOptionsPopUp selectedItem] title] UTF8String]);
         Ogre::String name = Ogre::String([[[[mOptions keyEnumerator] allObjects] objectAtIndex:[mOptionsTable selectedRow]] UTF8String]);
@@ -335,7 +335,11 @@ namespace Ogre {
 }
 
 #pragma mark NSTableView delegate and datasource methods
+#if defined(MAC_OS_X_VERSION_10_5) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+#else
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+#endif
 {
     return [[[mOptions keyEnumerator] allObjects] objectAtIndex:rowIndex];
 }
@@ -346,7 +350,11 @@ namespace Ogre {
 }
 
 // Intercept the request to select a new row.  Update the popup's values.
+#if defined(MAC_OS_X_VERSION_10_5) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
 - (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(NSInteger)rowIndex
+#else
+- (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(int)rowIndex
+#endif
 {
     // Clear out the options popup menu
     [mOptionsPopUp removeAllItems];
