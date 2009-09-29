@@ -390,18 +390,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::setOrientation( const Quaternion & q )
     {
-        mOrientation = q;
+		assert(!q.isNaN() && "Invalid orientation supplied as parameter");
+		mOrientation = q;
 		mOrientation.normalise();
         needUpdate();
     }
     //-----------------------------------------------------------------------
     void Node::setOrientation( Real w, Real x, Real y, Real z)
     {
-        mOrientation.w = w;
-        mOrientation.x = x;
-        mOrientation.y = y;
-        mOrientation.z = z;
-        needUpdate();
+		setOrientation(Quaternion(w, x, y, z));
     }
     //-----------------------------------------------------------------------
     void Node::resetOrientation(void)
@@ -413,6 +410,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::setPosition(const Vector3& pos)
     {
+		assert(!pos.isNaN() && "Invalid vector supplied as parameter");
         mPosition = pos;
         needUpdate();
     }
@@ -583,16 +581,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::setScale(const Vector3& scale)
     {
+		assert(!scale.isNaN() && "Invalid vector supplied as parameter");
         mScale = scale;
         needUpdate();
     }
     //-----------------------------------------------------------------------
     void Node::setScale(Real x, Real y, Real z)
     {
-        mScale.x = x;
-        mScale.y = y;
-        mScale.z = z;
-        needUpdate();
+		setScale(Vector3(x, y, z));
     }
     //-----------------------------------------------------------------------
     const Vector3 & Node::getScale(void) const

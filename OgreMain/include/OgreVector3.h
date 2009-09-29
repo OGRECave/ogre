@@ -764,7 +764,13 @@ namespace Ogre
 
 		}
 
-        // special points
+		/// Check whether this vector contains valid values
+		inline bool isNaN() const
+		{
+			return Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z);
+		}
+
+		// special points
         static const Vector3 ZERO;
         static const Vector3 UNIT_X;
         static const Vector3 UNIT_Y;

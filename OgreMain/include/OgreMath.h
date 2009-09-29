@@ -244,6 +244,12 @@ namespace Ogre
 		static inline Radian ATan (Real fValue) { return Radian(atan(fValue)); }
 		static inline Radian ATan2 (Real fY, Real fX) { return Radian(atan2(fY,fX)); }
 		static inline Real Ceil (Real fValue) { return Real(ceil(fValue)); }
+		static inline bool isNaN(Real f)
+		{
+			// std::isnan() is C99, not supported by all compilers
+			// However NaN always fails this next test, no other number does.
+			return f != f;
+		}
 
         /** Cosine function.
             @param

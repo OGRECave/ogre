@@ -249,6 +249,12 @@ namespace Ogre {
 
 		Real w, x, y, z;
 
+		/// Check whether this quaternion contains valid values
+		inline bool isNaN() const
+		{
+			return Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z) || Math::isNaN(w);
+		}
+
         /** Function for writing to a stream. Outputs "Quaternion(w, x, y, z)" with w,x,y,z
             being the member values of the quaternion.
         */

@@ -390,6 +390,11 @@ namespace Ogre
         {
             return x * vec.x + y * vec.y + z * vec.z + w * vec.w;
         }
+		/// Check whether this vector contains valid values
+		inline bool isNaN() const
+		{
+			return Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z) || Math::isNaN(w);
+		}
         /** Function for writing to a stream.
         */
         inline _OgreExport friend std::ostream& operator <<

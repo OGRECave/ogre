@@ -542,6 +542,11 @@ namespace Ogre
         {
             return Vector2( *this - ( 2 * this->dotProduct(normal) * normal ) );
         }
+		/// Check whether this vector contains valid values
+		inline bool isNaN() const
+		{
+			return Math::isNaN(x) || Math::isNaN(y);
+		}
 
         // special points
         static const Vector2 ZERO;
