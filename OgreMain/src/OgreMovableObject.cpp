@@ -228,7 +228,7 @@ namespace Ogre {
             return false;
 
         SceneManager* sm = Root::getSingleton()._getCurrentSceneManager();
-        if (sm && !(mVisibilityFlags & sm->_getCombinedVisibilityMask()))
+        if (sm && !(getVisibilityFlags() & sm->_getCombinedVisibilityMask()))
             return false;
 
         return true;

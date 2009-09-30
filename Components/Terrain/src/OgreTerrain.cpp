@@ -81,6 +81,7 @@ namespace Ogre
 	bool TerrainGlobalOptions::msCastsShadows = false;
 	Real TerrainGlobalOptions::msMaxPixelError = 3.0;
 	uint8 TerrainGlobalOptions::msRenderQueueGroup = RENDER_QUEUE_MAIN;
+	uint32 TerrainGlobalOptions::msVisibilityFlags = 0xFFFFFFFF;
 	bool TerrainGlobalOptions::msUseRayBoxDistanceCalculation = false;
 	TerrainMaterialGeneratorPtr TerrainGlobalOptions::msDefaultMaterialGenerator;
 	uint16 TerrainGlobalOptions::msLayerBlendMapSize = 1024;
@@ -741,6 +742,7 @@ namespace Ogre
 	{
 		mSkirtSize = TerrainGlobalOptions::getSkirtSize();
 		mRenderQueueGroup = TerrainGlobalOptions::getRenderQueueGroup();
+		mVisibilityFlags = TerrainGlobalOptions::getVisibilityFlags();
 		mLayerBlendMapSize = TerrainGlobalOptions::getLayerBlendMapSize();
 		mLayerBlendMapSizeActual = mLayerBlendMapSize; // for now, until we check
 		mLightmapSize = TerrainGlobalOptions::getLightMapSize();

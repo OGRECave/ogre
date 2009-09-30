@@ -1456,6 +1456,12 @@ namespace Ogre
 		else
 			return MovableObject::isVisible();
 	}
+	//---------------------------------------------------------------------
+	uint32 TerrainQuadTreeNode::Movable::getVisibilityFlags(void) const
+	{
+		// Combine own vis (in case anyone sets this) and terrain overall
+		return mVisibilityFlags & mParent->getTerrain()->getVisibilityFlags();
+	}
 	//------------------------------------------------------------------------
 	void TerrainQuadTreeNode::Movable::_updateRenderQueue(RenderQueue* queue)
 	{

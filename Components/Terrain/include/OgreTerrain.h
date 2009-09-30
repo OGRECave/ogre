@@ -985,6 +985,12 @@ namespace Ogre
 		*/
 		void setRenderQueueGroup(uint8 grp) { mRenderQueueGroup = grp; }
 
+		/// Get the visibility flags for this terrain.
+		uint32 getVisibilityFlags(void) const { return mVisibilityFlags; }
+		/** Set the visibility flags for this terrain.
+		@remarks The default is specified in TerrainGlobalOptions
+		*/
+		void setVisibilityFlags(uint32 flags);
 
 		/** Retrieve the layer blending map for a given layer, which may
 			be used to edit the blending information for that layer.
@@ -1227,6 +1233,7 @@ namespace Ogre
 
 		Real mSkirtSize;
 		uint8 mRenderQueueGroup;
+		uint32 mVisibilityFlags;
 
 		Rect mDirtyGeometryRect;
 		Rect mDirtyDerivedDataRect;
@@ -1340,6 +1347,7 @@ namespace Ogre
 		static bool msCastsShadows;
 		static Real msMaxPixelError;
 		static uint8 msRenderQueueGroup;
+		static uint32 msVisibilityFlags;
 		static bool msUseRayBoxDistanceCalculation;
 		static TerrainMaterialGeneratorPtr msDefaultMaterialGenerator;
 		static uint16 msLayerBlendMapSize;
@@ -1410,6 +1418,14 @@ namespace Ogre
 			maintain their own queue group settings
 		*/
 		static void setRenderQueueGroup(uint8 grp) { msRenderQueueGroup = grp; }
+
+		/// Get the visbility flags that terrains will be rendered with
+		static uint32 getVisibilityFlags(void) { return msVisibilityFlags; }
+		/** Set the visbility flags that terrains will be rendered with
+		@remarks This applies to newly created terrains, after which they will
+		maintain their own settings
+		*/
+		static void setVisibilityFlags(uint32 flags) { msVisibilityFlags = flags; }
 
 		/** Returns whether or not to use an accurate calculation of camera distance
 			from a terrain tile (ray / AABB intersection) or whether to use the
