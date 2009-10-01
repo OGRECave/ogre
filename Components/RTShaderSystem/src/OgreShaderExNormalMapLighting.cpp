@@ -96,6 +96,7 @@ NormalMapLighting::NormalMapLighting()
 	mNormalMapSamplerIndex			= 0;
 	mVSTexCoordSetIndex				= 0;
 	mSpeuclarEnable					= false;
+	mNormalMapSpace					= NMS_TANGENT;
 
 	msBlankLight.setDiffuseColour(ColourValue::Black);
 	msBlankLight.setSpecularColour(ColourValue::Black);
@@ -136,6 +137,7 @@ uint32 NormalMapLighting::getHashCode()
 	sh_hash_combine(hashCode, mTrackVertexColourType);
 	sh_hash_combine(hashCode, mNormalMapSamplerIndex);	
 	sh_hash_combine(hashCode, mVSTexCoordSetIndex);
+	sh_hash_combine(hashCode, mNormalMapSpace);
 
 	return hashCode;
 }
@@ -388,10 +390,18 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 		return false;
 
 	// Resolve input vertex shader tangent.
-	mVSInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, GCT_FLOAT3);
-	if (mVSInTangent == NULL)
-		return false;
+	if (mNormalMapSpace == NMS_TANGENT)
+	{
+		mVSInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, GCT_FLOAT3);
+		if (mVSInTangent == NULL)
+			return false;
 
+		// Resolve local vertex shader TNB matrix.
+		mVSTBNMatrix = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, GCT_MATRIX_3X3, "lTNBMatrix");
+		if (mVSTBNMatrix == NULL)
+			return false;
+	}
+	
 	// Resolve input vertex shader texture coordinates.
 	mVSInTexcoord = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSTexCoordSetIndex, GCT_FLOAT2);
 	if (mVSInTexcoord == NULL)
@@ -402,11 +412,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 	if (mVSOutTexcoord == NULL)
 		return false;
 
-	// Resolve local vertex shader TNB matrix.
-	mVSTBNMatrix = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, GCT_MATRIX_3X3, "lTNBMatrix");
-	if (mVSTBNMatrix == NULL)
-		return false;
-
+	
 	// Resolve pixel input texture coordinates normal.
 	mPSInTexcoord = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
 		mVSOutTexcoord->getIndex(), mVSOutTexcoord->getType());
@@ -755,11 +761,15 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder, 
 	FunctionInvocation* curFuncInvocation = NULL;
 
 	// Construct TNB matrix.
-	curFuncInvocation = new FunctionInvocation(SGX_FUNC_CONSTRUCT_TBNMATRIX, groupOrder, internalCounter++); 
-	curFuncInvocation->getParameterList().push_back(mVSInNormal->getName());
-	curFuncInvocation->getParameterList().push_back(mVSInTangent->getName());
-	curFuncInvocation->getParameterList().push_back(mVSTBNMatrix->getName());	
-	vsMain->addAtomInstace(curFuncInvocation);
+	if (mNormalMapSpace == NMS_TANGENT)
+	{
+		curFuncInvocation = new FunctionInvocation(SGX_FUNC_CONSTRUCT_TBNMATRIX, groupOrder, internalCounter++); 
+		curFuncInvocation->getParameterList().push_back(mVSInNormal->getName());
+		curFuncInvocation->getParameterList().push_back(mVSInTangent->getName());
+		curFuncInvocation->getParameterList().push_back(mVSTBNMatrix->getName());	
+		vsMain->addAtomInstace(curFuncInvocation);
+	}
+	
 
 	// Output texture coordinates.
 	curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
@@ -796,12 +806,24 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder, 
 		curFuncInvocation->getParameterList().push_back(mVSLocalDir->getName());	
 		vsMain->addAtomInstace(curFuncInvocation);
 
-		// Transform to texture space.
-		curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
-		curFuncInvocation->getParameterList().push_back(mVSTBNMatrix->getName());
-		curFuncInvocation->getParameterList().push_back(mVSLocalDir->getName());
-		curFuncInvocation->getParameterList().push_back(mVSOutView->getName());	
-		vsMain->addAtomInstace(curFuncInvocation);
+		// Transform to tangent space.
+		if (mNormalMapSpace == NMS_TANGENT)
+		{
+			curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
+			curFuncInvocation->getParameterList().push_back(mVSTBNMatrix->getName());
+			curFuncInvocation->getParameterList().push_back(mVSLocalDir->getName());
+			curFuncInvocation->getParameterList().push_back(mVSOutView->getName());	
+			vsMain->addAtomInstace(curFuncInvocation);
+		}
+
+		// Output object space.
+		else if (mNormalMapSpace == NMS_OBJECT)
+		{
+			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
+			curFuncInvocation->getParameterList().push_back(mVSLocalDir->getName());
+			curFuncInvocation->getParameterList().push_back(mVSOutView->getName());					
+			vsMain->addAtomInstace(curFuncInvocation);
+		}
 	}
 
 	// Add per light functions.
@@ -832,7 +854,7 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
 		vsMain->addAtomInstace(curFuncInvocation);
 	}
 	
-	// Transform view space position if need to.
+	// Transform light vector in target space..
 	if (curLightParams->mPosition != NULL &&
 		curLightParams->mVSOutToLightDir != NULL)
 	{
@@ -850,12 +872,24 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
 		curFuncInvocation->getParameterList().push_back(mVSLocalDir->getName());	
 		vsMain->addAtomInstace(curFuncInvocation);
 
-		// Transform to texture space.
-		curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
-		curFuncInvocation->getParameterList().push_back(mVSTBNMatrix->getName());
-		curFuncInvocation->getParameterList().push_back(mVSLocalDir->getName());
-		curFuncInvocation->getParameterList().push_back(curLightParams->mVSOutToLightDir->getName());	
-		vsMain->addAtomInstace(curFuncInvocation);
+		// Transform to tangent space.		
+		if (mNormalMapSpace == NMS_TANGENT)
+		{
+			curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
+			curFuncInvocation->getParameterList().push_back(mVSTBNMatrix->getName());
+			curFuncInvocation->getParameterList().push_back(mVSLocalDir->getName());
+			curFuncInvocation->getParameterList().push_back(curLightParams->mVSOutToLightDir->getName());	
+			vsMain->addAtomInstace(curFuncInvocation);
+		}
+		
+		// Output object space.
+		else if (mNormalMapSpace == NMS_OBJECT)
+		{
+			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
+			curFuncInvocation->getParameterList().push_back(mVSLocalDir->getName());
+			curFuncInvocation->getParameterList().push_back(curLightParams->mVSOutToLightDir->getName());					
+			vsMain->addAtomInstace(curFuncInvocation);
+		}
 	}
 
 
@@ -1098,6 +1132,10 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
 
 	rhsLighting.getLightCount(lightCount);
 	setLightCount(lightCount);
+
+	mTrackVertexColourType = rhsLighting.mTrackVertexColourType;
+	mSpeuclarEnable = rhsLighting.mSpeuclarEnable;
+	mNormalMapSpace = rhsLighting.mNormalMapSpace;
 }
 
 //-----------------------------------------------------------------------
@@ -1269,8 +1307,33 @@ SubRenderState*	NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 				
 				pass->setUserAny(NormalMapLighting::NormalMapTextureNameKey, Any(strValue));
 
-				// Read extra parameters.
+				// Read normal map space type.
 				if (prop->values.size() >= 3)
+				{
+					NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
+
+					++it;
+					if (false == SGScriptTranslator::getString(*it, &strValue))
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						return NULL;
+					}
+
+					// Normal map defines normals in tangent space.
+					if (strValue == "tangent_space")
+					{
+						normalMapSubRenderState->setNormalMapSpace(NormalMapLighting::NMS_TANGENT);
+					}
+
+					// Normal map defines normals in object space.
+					if (strValue == "object_space")
+					{
+						normalMapSubRenderState->setNormalMapSpace(NormalMapLighting::NMS_OBJECT);
+					}
+				}
+
+				// Read texture coordinate index.
+				if (prop->values.size() >= 4)
 				{
 					NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
 

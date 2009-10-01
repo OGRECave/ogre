@@ -104,6 +104,30 @@ public:
 	/// I.E pass->setUserAny(NormalMapTextureNameKey, Any(NormalMap.dds)).
 	static String NormalMapTextureNameKey;
 
+	// Normal map space definition.
+	enum NormalMapSpace
+	{
+		NMS_TANGENT,		// Normal map contains normal data in tangent space.
+							// This is the default normal mapping behavior and it requires that the
+							// target mesh will have valid tangents within its vertex data.
+		
+		NMS_OBJECT			// Normal map contains normal data in object local space.
+							// This normal mapping technique has the advantages of better visualization results,
+							// lack of artifacts that comes from texture mirroring usage, it doesn't requires tangent
+							// and it also saves some instruction in the vertex shader stage.
+							// The main drawback of using this kind of normal map is that the target object must be static
+							// in terms of local space rotations and translations.
+	};
+
+	/** Set the normal map space.
+	@param
+	*/
+	void					setNormalMapSpace			(NormalMapSpace normalMapSpace) { mNormalMapSpace = normalMapSpace; }
+
+	/** Return the normal map space. */
+	NormalMapSpace			getNormalMapSpace			() const { return mNormalMapSpace; }
+
+
 // Protected types:
 protected:
 	
@@ -229,6 +253,7 @@ protected:
 	LightParamsList			mLightParamsList;				// Light list.
 	unsigned short			mNormalMapSamplerIndex;			// Normal map texture sampler index.
 	unsigned int			mVSTexCoordSetIndex;			// Vertex shader input texture coordinate set index.
+	NormalMapSpace			mNormalMapSpace;				// The normal map space.
 	Parameter*				mWorldMatrix;					// World matrix parameter.
 	Parameter*				mWorldInvRotMatrix;				// World matrix inverse rotation matrix parameter.
 	Parameter*				mCamPosWorldSpace;				// Camera position in world space parameter.	
