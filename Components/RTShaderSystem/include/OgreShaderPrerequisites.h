@@ -59,6 +59,9 @@ class Viewport;
 class RenderObjectListener;
 class TextureUnitState;
 class Frustum;
+class ScriptTranslator;
+class ScriptCompiler;
+class PropertyAbstractNode;
 
 namespace RTShader 
 {
@@ -76,10 +79,9 @@ class Function;
 class FFPRenderStateBuilder;
 class ShaderGenerator;
 
-
 /// Utility function with same style as boost::hash_combine
 template <class T>
-inline void sh_hash_combine(std::size_t& seed, T const& v)
+inline void sh_hash_combine(uint32& seed, T const& v)
 {
 	seed ^= FastHash((const char*)&v, sizeof(T)) + 0x9e3779b9 + (seed<<6) + (seed>>2);
 }

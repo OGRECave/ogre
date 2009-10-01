@@ -289,6 +289,16 @@ uint32 FFPColour::getHashCode()
 	return hashCode;
 }
 
+//-----------------------------------------------------------------------
+bool FFPColour::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass)
+{
+	TrackVertexColourType trackColour = srcPass->getVertexColourTracking();
+
+	if (trackColour != 0)			
+		addResolveStageMask(FFPColour::SF_VS_INPUT_DIFFUSE);
+	
+	return true;
+}
 
 //-----------------------------------------------------------------------
 const String& FFPColourFactory::getType() const

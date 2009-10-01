@@ -36,6 +36,8 @@ THE SOFTWARE.
 #include "OgreShaderFFPLighting.h"
 #include "OgreShaderFFPTexturing.h"
 #include "OgreShaderFFPFog.h"
+#include "OgreShaderExPerPixelLighting.h"
+#include "OgreShaderExNormalMapLighting.h"
 
 /** \addtogroup Core
 *  @{

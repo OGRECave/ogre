@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreShaderProgramSet.h"
 #include "OgreGpuProgram.h"
 #include "OgrePass.h"
+#include "OgreShaderGenerator.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -54,6 +55,7 @@ FFPFog::FFPFog()
 	mVSOutDepth				= NULL;
 	mPSInDepth				= NULL;
 	mPSOutDiffuse			= NULL;
+	mPassOverrideParams		= false;
 }
 
 //-----------------------------------------------------------------------
@@ -77,7 +79,8 @@ uint32 FFPFog::getHashCode()
 	sh_hash_combine(hashCode, SubRenderState::getHashCode());
 	sh_hash_combine(hashCode, mFogMode);
 	sh_hash_combine(hashCode, mCalcMode);
-
+	sh_hash_combine(hashCode, mPassOverrideParams);
+	
 	return hashCode;
 }
 
@@ -89,6 +92,32 @@ void FFPFog::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoPar
 		return;
 
 	GpuProgramParametersSharedPtr psGpuParams = pass->getFragmentProgramParameters();
+
+	FogMode fogMode;
+	ColourValue newFogColour;
+	Real newFogStart, newFogEnd, newFogDensity;
+
+	if (mPassOverrideParams)
+	{
+		fogMode			= pass->getFogMode();
+		newFogColour	= pass->getFogColour();
+		newFogStart		= pass->getFogStart();
+		newFogEnd		= pass->getFogEnd();
+		newFogDensity	= pass->getFogDensity();
+	}
+	else
+	{
+		SceneManager* sceneMgr = ShaderGenerator::getSingleton().getSceneManager();
+
+		fogMode			= sceneMgr->getFogMode();
+		newFogColour	= sceneMgr->getFogColour();
+		newFogStart		= sceneMgr->getFogStart();
+		newFogEnd		= sceneMgr->getFogEnd();
+		newFogDensity	= sceneMgr->getFogDensity();
+	}
+
+	// Set fog properties.
+	setFogProperties(mFogMode, newFogColour, newFogStart, newFogEnd, newFogDensity);
 
 	// Per pixel fog.
 	if (mCalcMode == CM_PER_PIXEL)
@@ -308,6 +337,44 @@ void FFPFog::copyFrom(const SubRenderState& rhs)
 	mFogParamsValue		= rhsFog.mFogParamsValue;
 
 	setCalcMode(rhsFog.mCalcMode);
+}
+
+//-----------------------------------------------------------------------
+bool FFPFog::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass)
+{	
+	FogMode fogMode;
+	ColourValue newFogColour;
+	Real newFogStart, newFogEnd, newFogDensity;
+
+	if (srcPass->getFogOverride())
+	{
+		fogMode			= srcPass->getFogMode();
+		newFogColour	= srcPass->getFogColour();
+		newFogStart		= srcPass->getFogStart();
+		newFogEnd		= srcPass->getFogEnd();
+		newFogDensity	= srcPass->getFogDensity();
+		mPassOverrideParams = true;
+	}
+	else
+	{
+		SceneManager* sceneMgr = ShaderGenerator::getSingleton().getSceneManager();
+
+		fogMode			= sceneMgr->getFogMode();
+		newFogColour	= sceneMgr->getFogColour();
+		newFogStart		= sceneMgr->getFogStart();
+		newFogEnd		= sceneMgr->getFogEnd();
+		newFogDensity	= sceneMgr->getFogDensity();
+		mPassOverrideParams = false;
+	}
+
+	// Set fog properties.
+	setFogProperties(fogMode, newFogColour, newFogStart, newFogEnd, newFogDensity);
+	
+	
+	// Override scene fog since it will happen in shader.
+	dstPass->setFog(true, FOG_NONE, newFogColour, newFogDensity, newFogStart, newFogEnd);	
+
+	return true;
 }
 
 //-----------------------------------------------------------------------

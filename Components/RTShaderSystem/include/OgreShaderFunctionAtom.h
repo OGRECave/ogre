@@ -73,7 +73,7 @@ protected:
 
 /** A class that represents function invocation code from shader based program function.
 */
-class FunctionInvocation : public FunctionAtom
+class OGRE_RTSHADERSYSTEM_API FunctionInvocation : public FunctionAtom
 {
 	// Interface.
 public:	

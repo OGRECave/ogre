@@ -89,7 +89,7 @@ bool mLightState[NUM_LIGHTS] =
 	false
 };
 // The materials
-#define NUM_MATERIALS 6
+#define NUM_MATERIALS 7
 String mMaterialNames[NUM_ENTITIES][NUM_MATERIALS] = 
 {
     // athene
@@ -98,21 +98,24 @@ String mMaterialNames[NUM_ENTITIES][NUM_MATERIALS] =
     "Examples/Athene/NormalMapped",
 	"Examples/ShowUV",
 	"Examples/ShowNormals",
-	"Examples/ShowTangents" },
+	"Examples/ShowTangents",
+	"Examples/RTShaderSystem/BumpMapping" },
     // knot
     { "Examples/BumpMapping/MultiLight",
 	"Examples/BumpMapping/MultiLightSpecular",
     "Examples/OffsetMapping/Specular",
 	"Examples/ShowUV",
 	"Examples/ShowNormals",
-	"Examples/ShowTangents" },
+	"Examples/ShowTangents",
+	"Examples/RTShaderSystem/BumpMapping" },
     // ogre head
     { "Examples/BumpMapping/MultiLight",
     "Examples/BumpMapping/MultiLightSpecular",
     "Examples/OffsetMapping/Specular",
 	"Examples/ShowUV",
 	"Examples/ShowNormals",
-	"Examples/ShowTangents" }
+	"Examples/ShowTangents",
+	"Examples/RTShaderSystem/BumpMapping" }
 };
 size_t mCurrentMaterial = 0;
 

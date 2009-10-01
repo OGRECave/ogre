@@ -42,7 +42,6 @@ namespace RTShader {
 /*                                                                      */
 /************************************************************************/
 String FFPLighting::Type = "FFP_Lighting";
-
 Light FFPLighting::msBlankLight;
 
 //-----------------------------------------------------------------------
@@ -190,7 +189,7 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 			vsGpuParams->setNamedConstant(curParams.mPosition->getName(), vParameter);
 			
 							
-			vec3 = matViewIT * srcLight->getDirection();
+			vec3 = matViewIT * srcLight->getDerivedDirection();
 			vec3.normalise();
 
 			vParameter.x = -vec3.x;
@@ -322,6 +321,14 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 	mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, GCT_FLOAT3);
 	if (mVSInNormal == NULL)
 		return false;
+
+	if (mTrackVertexColourType != 0)
+	{
+		mVSDiffuse = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 0, GCT_FLOAT4);
+		if (mVSDiffuse == NULL)
+			return false;
+	}
+	
 
 	// Resolve output vertex shader diffuse colour.
 	mVSOutDiffuse = vsMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, GCT_FLOAT4);
@@ -498,7 +505,7 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 		{
 			curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
 			curFuncInvocation->getParameterList().push_back(mLightAmbientColour->getName());
-			curFuncInvocation->getParameterList().push_back(mSurfaceAmbientColour->getName());			
+			curFuncInvocation->getParameterList().push_back(mVSDiffuse->getName());			
 			curFuncInvocation->getParameterList().push_back(mVSOutDiffuse->getName());	
 			vsMain->addAtomInstace(curFuncInvocation);
 		}
@@ -680,6 +687,70 @@ void FFPLighting::copyFrom(const SubRenderState& rhs)
 
 	rhsLighting.getLightCount(lightCount);
 	setLightCount(lightCount);
+}
+
+//-----------------------------------------------------------------------
+bool FFPLighting::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass)
+{
+	if (srcPass->getLightingEnabled() == false)
+		return false;
+
+	int lightCount[3];
+
+	renderState->getLightCount(lightCount);
+
+	// No lights allowed.
+	if (lightCount[0] + lightCount[1] + lightCount[2] == 0)
+		return false;
+
+	
+	setTrackVertexColourType(srcPass->getVertexColourTracking());			
+
+	if (srcPass->getShininess() > 0.0 &&
+		srcPass->getSpecular() != ColourValue::Black)
+	{
+		setSpecularEnable(true);
+	}
+	else
+	{
+		setSpecularEnable(false);	
+	}
+
+	// Case this pass should run once per light -> override the light policy.
+	if (srcPass->getIteratePerLight())
+	{		
+		if (srcPass->getRunOnlyForOneLightType())
+		{
+			if (srcPass->getOnlyLightType() == Light::LT_POINT)
+			{
+				lightCount[0] = 1;
+				lightCount[1] = 0;
+				lightCount[2] = 0;
+			}
+			else if (srcPass->getOnlyLightType() == Light::LT_DIRECTIONAL)
+			{
+				lightCount[0] = 0;
+				lightCount[1] = 1;
+				lightCount[2] = 0;
+			}
+			else if (srcPass->getOnlyLightType() == Light::LT_SPOTLIGHT)
+			{
+				lightCount[0] = 0;
+				lightCount[1] = 0;
+				lightCount[2] = 1;
+			}
+		}
+		else
+		{
+			lightCount[0] = 1;
+			lightCount[1] = 1;
+			lightCount[2] = 1;
+		}			
+	}
+
+	setLightCount(lightCount);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------

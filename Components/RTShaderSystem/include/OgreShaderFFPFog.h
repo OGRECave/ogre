@@ -45,7 +45,7 @@ namespace RTShader {
 @see http://msdn.microsoft.com/en-us/library/bb173398(VS.85).aspx
 Derives from SubRenderState class.
 */
-class FFPFog : public SubRenderState
+class OGRE_RTSHADERSYSTEM_API FFPFog : public SubRenderState
 {
 public:
 
@@ -86,7 +86,18 @@ public:
 	@see SubRenderState::copyFrom.
 	*/
 	virtual void			copyFrom				(const SubRenderState& rhs);
-	
+
+	/** 
+	@see SubRenderState::preAddToRenderState.
+	*/
+	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass);
+
+
+	static String Type;
+
+// Protected methods
+protected:
+
 	/** 
 	Set the fog properties this fog sub render state should emulate.
 	@param fogMode The fog mode to emulate (FOG_NONE, FOG_EXP, FOG_EXP2, FOG_LINEAR).
@@ -113,10 +124,6 @@ public:
 	*/
 	CalcMode		getCalcMode						() const { return mCalcMode; }
 
-	static String Type;
-
-// Protected methods
-protected:
 	/** 
 	@see SubRenderState::resolveParameters.
 	*/
@@ -138,6 +145,7 @@ protected:
 	FogMode				mFogMode;				// Fog formula. 
 	ColourValue			mFogColourValue;		// Fog colour value.
 	Vector4				mFogParamsValue;		// Fog parameters (density, start, end, 1/end-start).
+	bool				mPassOverrideParams;	// True if the fog parameters should be taken from the pass.
 
 	Parameter*			mWorldViewProjMatrix;	// World view projection parameter.		
 	Parameter*			mFogColour;				// Fog colour parameter.	

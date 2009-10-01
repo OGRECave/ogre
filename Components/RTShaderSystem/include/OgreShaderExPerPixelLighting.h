@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ShaderFFPLighting_
-#define _ShaderFFPLighting_
+#ifndef _ShaderExPerPixelLighting_
+#define _ShaderExPerPixelLighting_
 
 #include "OgreShaderPrerequisites.h"
 #include "OgreShaderSubRenderState.h"
@@ -36,7 +36,6 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 
-
 /** \addtogroup Core
 *  @{
 */
@@ -44,18 +43,16 @@ namespace RTShader {
 *  @{
 */
 
-/** Lighting sub render state implementation of the Fixed Function Pipeline.
-@see http://msdn.microsoft.com/en-us/library/bb147178(VS.85).aspx
+/** Per pixel Lighting extension sub render state implementation.
 Derives from SubRenderState class.
 */
-class OGRE_RTSHADERSYSTEM_API FFPLighting : public SubRenderState
+class OGRE_RTSHADERSYSTEM_API PerPixelLighting : public SubRenderState
 {
 
 // Interface.
 public:
-	
-	/** Class default constructor */
-	FFPLighting();
+	/** Class default constructor */	
+	PerPixelLighting();
 
 	/** 
 	@see SubRenderState::getType.
@@ -82,17 +79,19 @@ public:
 	*/
 	virtual void			copyFrom				(const SubRenderState& rhs);
 
+
 	/** 
 	@see SubRenderState::preAddToRenderState.
 	*/
 	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
 
+	
 	static String Type;
 
 // Protected types:
 protected:
-
+	
 	// Per light parameters.
 	struct LightParams
 	{
@@ -112,6 +111,7 @@ protected:
 
 // Protected methods
 protected:
+
 	/** 
 	Set the track per vertex colour type. Ambient, Diffuse, Specular and Emissive lighting components source
 	can be the vertex colour component. To establish such a link one should provide the matching flags to this
@@ -124,6 +124,7 @@ protected:
 	*/
 	TrackVertexColourType	getTrackVertexColourType() const { return mTrackVertexColourType; }
 
+
 	/** 
 	Set the light count per light type that this sub render state will generate.
 	@see ShaderGenerator::setLightCount.
@@ -135,7 +136,6 @@ protected:
 	@see ShaderGenerator::getLightCount.
 	*/
 	void					getLightCount			(int lightCount[3]) const;
-
 	/** 
 	Set the specular component state. If set to true this sub render state will compute a specular
 	lighting component in addition to the diffuse component.
@@ -148,10 +148,17 @@ protected:
 	*/
 	bool					getSpecularEnable		() const	  { return mSpeuclarEnable; }
 
+
 	/** 
 	@see SubRenderState::resolveParameters.
 	*/
-	virtual bool			resolveParameters		(ProgramSet* programSet);
+	virtual bool			resolveParameters			(ProgramSet* programSet);
+
+	/** Resolve global lighting parameters */
+	bool					resolveGlobalParameters		(ProgramSet* programSet);
+
+	/** Resolve per light parameters */
+	bool					resolvePerLightParameters	(ProgramSet* programSet);
 
 	/** 
 	@see SubRenderState::resolveDependencies.
@@ -162,17 +169,28 @@ protected:
 	@see SubRenderState::addFunctionInvocations.
 	*/
 	virtual bool			addFunctionInvocations	(ProgramSet* programSet);
+	
 
+	/** 
+	Internal method that adds related vertex shader functions invocations.
+	*/
+	bool			addVSInvocation						(Function* vsMain, const int groupOrder, int& internalCounter);
 
+	
 	/** 
 	Internal method that adds global illumination component functions invocations.
 	*/
-	bool			addGlobalIlluminationInvocation	(Function* vsMain, const int groupOrder, int& internalCounter);
-			
+	bool			addPSGlobalIlluminationInvocation	(Function* psMain, const int groupOrder, int& internalCounter);
+
 	/** 
 	Internal method that adds per light illumination component functions invocations.
 	*/
-	bool			addIlluminationInvocation		(LightParams* curLightParams, Function* vsMain, const int groupOrder, int& internalCounter);
+	bool			addPSIlluminationInvocation		(LightParams* curLightParams, Function* psMain, const int groupOrder, int& internalCounter);
+
+	/** 
+	Internal method that adds the final colour assignments.
+	*/
+	bool			addPSFinalAssignmentInvocation	(Function* psMain, const int groupOrder, int& internalCounter);
 
 
 // Attributes.
@@ -183,10 +201,17 @@ protected:
 	Parameter*				mWorldViewMatrix;				// World view matrix parameter.
 	Parameter*				mWorldViewITMatrix;				// World view matrix inverse transpose parameter.
 	Parameter*				mVSInPosition;					// Vertex shader input position parameter.
+	Parameter*				mVSOutViewPos;					// Vertex shader output view position (position in camera space) parameter.
+	Parameter*				mPSInViewPos;					// Pixel shader input view position (position in camera space) parameter.
 	Parameter*				mVSInNormal;					// Vertex shader input normal.
-	Parameter*				mVSDiffuse;						// Vertex shader diffuse.
-	Parameter*				mVSOutDiffuse;					// Vertex shader output diffuse colour parameter.
-	Parameter*				mVSOutSpecular;					// Vertex shader output specular colour parameter.
+	Parameter*				mVSOutNormal;					// Vertex shader output normal.
+	Parameter*				mPSInNormal;					// Pixel shader input normal.
+	Parameter*				mPSTempDiffuseColour;			// Pixel shader temporary diffuse calculation parameter.
+	Parameter*				mPSTempSpecularColour;			// Pixel shader temporary specular calculation parameter.
+	Parameter*				mPSDiffuse;						// Pixel shader input/local diffuse parameter.	
+	Parameter*				mPSSpecular;					// Pixel shader input/local specular parameter.	
+	Parameter*				mPSOutDiffuse;					// Pixel shader output diffuse parameter.	
+	Parameter*				mPSOutSpecular;					// Pixel shader output specular parameter.	
 	Parameter*				mDerivedSceneColour;			// Derived scene colour parameter.
 	Parameter*				mLightAmbientColour;			// Ambient light colour parameter.
 	Parameter*				mDerivedAmbientLightColour;		// Derived ambient light colour parameter.
@@ -196,15 +221,14 @@ protected:
 	Parameter*				mSurfaceEmissiveColour;			// Surface emissive colour parameter.
 	Parameter*				mSurfaceShininess;				// Surface shininess parameter.
 	static Light			msBlankLight;					// Shared blank light.
-
 };
 
 
 /** 
-A factory that enables creation of FFPLighting instances.
+A factory that enables creation of PerPixelLighting instances.
 @remarks Sub class of SubRenderStateFactory
 */
-class FFPLightingFactory : public SubRenderStateFactory
+class PerPixelLightingFactory : public SubRenderStateFactory
 {
 public:
 
@@ -212,6 +236,12 @@ public:
 	@see SubRenderStateFactory::getType.
 	*/
 	virtual const String&	getType				() const;
+
+	/** 
+	@see SubRenderStateFactory::createInstance.
+	*/
+	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass);
+
 	
 protected:
 

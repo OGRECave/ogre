@@ -230,7 +230,9 @@ namespace Ogre {
 		bool mLightClipPlanes;
 		/// Illumination stage?
 		IlluminationStage mIlluminationStage;
-		Any mUserAny;
+		/// Custom user data.
+		typedef map<String, Any>::type UserAnyMap;
+		UserAnyMap mUserAnyMap;
 
 		// Used to get scene blending flags from a blending type
 		void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);
@@ -1649,13 +1651,15 @@ namespace Ogre {
 		@remarks
 		This method allows you to associate any user value you like with 
 		this Pass. This can be a pointer back to one of your own
-		classes for instance.		
+		classes for instance.
+		@param key The key that this data is associate with.
+		@param anything The data to associate with the given key.
 		*/
-		virtual void setUserAny(const Any& anything) { mUserAny = anything; }
+		virtual void setUserAny(const String& key, const Any& anything) { mUserAnyMap[key] = anything; }
 
-		/** Retrieves the custom user value associated with this pass.
+		/** Retrieves the custom user value associated with this pass and key.
 		*/
-		virtual const Any& getUserAny(void) const { return mUserAny; }
+		virtual const Any& getUserAny(const String& key) const;
     };
 
     /** Struct recording a pass which can be used for a specific illumination stage.

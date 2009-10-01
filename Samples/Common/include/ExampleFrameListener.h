@@ -29,6 +29,9 @@ D:        Step right
              T:        Cycle texture filtering
                        Bilinear, Trilinear, Anisotropic(8)
              P:        Toggle on/off display of camera position / orientation
+			 F2:	   Set the main viewport material scheme to default material manager scheme.
+			 F3:	   Set the main viewport material scheme to shader generator default scheme.
+			 F4:	   Toggle default shader generator lighting model from per vertex to per pixel.
 -----------------------------------------------------------------------------
 */
 
@@ -50,76 +53,7 @@ D:        Step right
 using namespace Ogre;
 
 #ifdef USE_RTSHADER_SYSTEM
-
 #include "OgreRTShaderSystem.h"
-
-/** This class simply demonstrates basic usage of the CRTShader system.
-It sub class the material manager listener class and when a target scheme callback
-is invoked with the shader generator scheme it tries to create an equvialent shader
-based technique based on the default technique of the given material.
-*/
-class ShaderGeneratorTechniqueResolverListener : public MaterialManager::Listener
-{
-public:
-
-	ShaderGeneratorTechniqueResolverListener(RTShader::ShaderGenerator* pShaderGenerator)
-	{
-		mShaderGenerator = pShaderGenerator;
-	}
-
-	virtual Technique* handleSchemeNotFound(unsigned short schemeIndex, 
-		const String& schemeName, Material* originalMaterial, unsigned short lodIndex, 
-		const Renderable* rend)
-	{		
-		// Case this is the default shader generator scheme.
-		if (schemeName == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
-		{
-			MaterialRegisterIterator itFind = mRegisteredMaterials.find(originalMaterial);
-			bool techniqueCreated = false;
-
-			// This material was not registered before.
-			if (itFind == mRegisteredMaterials.end())
-			{
-				techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
-					originalMaterial->getName(), 
-					MaterialManager::DEFAULT_SCHEME_NAME, 
-					RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);				
-			}
-			mRegisteredMaterials[originalMaterial] = techniqueCreated;
-		}
-
-		return NULL;
-	}
-
-
-	void clearRegisteredMaterials()
-	{
-		MaterialRegisterIterator itMat    = mRegisteredMaterials.begin();
-		MaterialRegisterIterator itMatEnd = mRegisteredMaterials.end();
-
-		// Remove the shader based technique of the registered materials.
-		for (; itMat != itMatEnd; ++itMat)
-		{
-			if (itMat->second)
-			{
-				mShaderGenerator->removeShaderBasedTechnique(itMat->first->getName(), 
-					MaterialManager::DEFAULT_SCHEME_NAME, 
-					RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-			}			
-		}
-		mRegisteredMaterials.clear();
-	}
-
-
-protected:
-	typedef std::map<Material*, bool>		MaterialRegisterMap;
-	typedef MaterialRegisterMap::iterator	MaterialRegisterIterator;
-
-
-protected:
-	MaterialRegisterMap				mRegisteredMaterials;		// Registered mateirla map.
-	RTShader::ShaderGenerator*		mShaderGenerator;			// The shader generator instance.
-};
 #endif
 
 class ExampleFrameListener: public FrameListener, public WindowEventListener
@@ -204,103 +138,56 @@ public:
 	}
 
 #ifdef USE_RTSHADER_SYSTEM
-	virtual void initializeShaderGenerator(SceneManager* sceneMgr)
-	{
-		mShaderGenerator	 = NULL;		
-		mMaterialMgrListener = NULL;
-
-		if (RTShader::ShaderGenerator::initialize())
-		{
-			mShaderGenerator = RTShader::ShaderGenerator::getSingletonPtr();
-
-			// Set the scene manager.
-			mShaderGenerator->setSceneManager(sceneMgr);
-
-			// Setup shader cache path.
-			ResourceGroupManager::LocationList resLocationsList = ResourceGroupManager::getSingleton().getResourceLocationList(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-			ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
-			ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
-			String shaderCachePath;
-			
-			// Default cache path is current directory;
-			shaderCachePath = "./";
-
-			// Try to find the location of the core shader lib functions and use it
-			// as shader cache path as well - this will reduce the number of generated files
-			// when running from different directories.
-			for (; it != itEnd; ++it)
-			{
-				
-				if ((*it)->archive->getName().find("RTShaderLib") != String::npos)
-				{
-					shaderCachePath = (*it)->archive->getName() + "/";
-					break;
-				}
-			}
-						
-
-			ResourceGroupManager::getSingleton().addResourceLocation(shaderCachePath , "FileSystem");			
-			mShaderGenerator->setShaderCachePath(shaderCachePath);	
-				
-			// Create and register the material manager listener.
-			mMaterialMgrListener = new ShaderGeneratorTechniqueResolverListener(mShaderGenerator);				
-			MaterialManager::getSingleton().addListener(mMaterialMgrListener);								
-		}
-	}
-
-	virtual void finalizeShaderGenerator()
-	{
-		// Unregister the material manager listener.
-		if (mMaterialMgrListener != NULL)
-		{			
-			MaterialManager::getSingleton().removeListener(mMaterialMgrListener);
-			delete mMaterialMgrListener;
-			mMaterialMgrListener = NULL;
-		}
-
-		// Finalize CRTShader system.
-		if (mShaderGenerator != NULL)
-		{
-			RTShader::ShaderGenerator::finalize();
-
-			mShaderGenerator = NULL;
-		}
-	}
-
 	virtual void processShaderGeneratorInput()
-	{
-		if (mShaderGenerator != NULL)
-		{
-			// Switch to default scheme.
-			if (mKeyboard->isKeyDown(OIS::KC_F2))
-			{	
-				mCamera->getViewport()->setMaterialScheme(MaterialManager::DEFAULT_SCHEME_NAME);			
-				mDebugText = "Active Viewport Scheme: ";
-				mDebugText += MaterialManager::DEFAULT_SCHEME_NAME;
-				
-				// Clear registered materials.
-				mMaterialMgrListener->clearRegisteredMaterials();
-			}
-
-			// Switch to shader generator scheme.
-			if (mKeyboard->isKeyDown(OIS::KC_F3))
-			{	
-				// Update light information.
-				SceneManager* sceneMgr = mShaderGenerator->getSceneManager();
-				const LightList& lightList =  sceneMgr->_getLightsAffectingFrustum();
-				int maxLightCount[3] = {0};
-
-				for (unsigned int i=0; i < lightList.size(); ++i)
-				{
-					maxLightCount[lightList[i]->getType()]++;
-				}
-				mShaderGenerator->setLightCount(maxLightCount);
-				
-				mCamera->getViewport()->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-				mDebugText = "Active Viewport Scheme: ";
-				mDebugText += RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME;
-			}
+	{		
+		// Switch to default scheme.
+		if (mKeyboard->isKeyDown(OIS::KC_F2))
+		{	
+			mCamera->getViewport()->setMaterialScheme(MaterialManager::DEFAULT_SCHEME_NAME);			
+			mDebugText = "Active Viewport Scheme: ";
+			mDebugText += MaterialManager::DEFAULT_SCHEME_NAME;						
 		}
+
+		// Switch to shader generator scheme.
+		if (mKeyboard->isKeyDown(OIS::KC_F3))
+		{
+			mCamera->getViewport()->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+			mDebugText = "Active Viewport Scheme: ";
+			mDebugText += RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME;
+		}	
+
+		// Toggles per pixel per light model.
+		if (mKeyboard->isKeyDown(OIS::KC_F4) && mTimeUntilNextToggle <= 0)
+		{	
+			mTimeUntilNextToggle = 1.0;
+
+			static bool userPerPixelLightModel = true;
+			RTShader::ShaderGenerator* shaderGenerator = RTShader::ShaderGenerator::getSingletonPtr();			
+			RTShader::RenderState* renderState = shaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+			// Remove all global sub render states.
+			renderState->reset();
+
+			// Add per pixel lighting sub render state to the global scheme render state.
+			// It will override the default FFP lighting sub render state.
+			if (userPerPixelLightModel)
+			{
+				RTShader::SubRenderState* perPixelLightModel = shaderGenerator->createSubRenderState(RTShader::PerPixelLighting::Type);
+				renderState->addSubRenderState(perPixelLightModel);
+
+				mDebugText = "Per pixel lighting model applied to shader generator default scheme";
+			}
+			else
+			{
+				mDebugText = "Per vertex lighting model applied to shader generator default scheme";
+			}
+
+			// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
+			shaderGenerator->invalidateScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+			userPerPixelLightModel = !userPerPixelLightModel;
+		}	
+		
 	}
 
 #endif
@@ -554,7 +441,7 @@ public:
 #ifdef USE_RTSHADER_SYSTEM
 		processShaderGeneratorInput();
 #endif
-		
+
 #endif
 		if( !mMouse->buffered() )
 			if( processUnbufferedMouseInput(evt) == false )
@@ -624,12 +511,6 @@ protected:
 	OIS::Mouse*    mMouse;
 	OIS::Keyboard* mKeyboard;
 	OIS::JoyStick* mJoy;
-
-#ifdef USE_RTSHADER_SYSTEM
-	RTShader::ShaderGenerator* mShaderGenerator;						// The Shader generator instance.
-	ShaderGeneratorTechniqueResolverListener* mMaterialMgrListener;		// Material manager listener.
-#endif
-	
 };
 
 #endif

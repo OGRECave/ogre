@@ -116,29 +116,10 @@ protected:
 protected:
 
 	/** 
-	Internal method that builds the transform sub state.
+	Internal method that builds FFP sub render state.
 	*/
-	void		buildTransformSubState		(ShaderGenerator::SGPass* sgPass, RenderState* renderState);
-
-	/** 
-	Internal method that builds the colour sub state.
-	*/
-	void		buildColourSubState			(ShaderGenerator::SGPass* sgPass, RenderState* renderState);
-
-	/** 
-	Internal method that builds the lighting sub state.
-	*/
-	void		buildLightingSubState		(ShaderGenerator::SGPass* sgPass, RenderState* renderState);
-
-	/** 
-	Internal method that builds the texturing sub state.
-	*/
-	void		buildTexturingSubState		(ShaderGenerator::SGPass* sgPass, RenderState* renderState);
-
-	/** 
-	Internal method that builds the fog sub state.
-	*/
-	void		buildFogSubState			(ShaderGenerator::SGPass* sgPass, RenderState* renderState);
+	void		builFFPSubRenderState			(int subRenderStateOrder, const String& subRenderStateType, 
+												 ShaderGenerator::SGPass* sgPass, RenderState* renderState);
 	
 	/** 
 	Internal method that resolves the colour stage flags.

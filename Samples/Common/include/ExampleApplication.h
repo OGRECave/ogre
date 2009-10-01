@@ -59,6 +59,57 @@ Description: Base class for all the OGRE examples
 #   include "macUtils.h"
 #endif
 
+#ifdef USE_RTSHADER_SYSTEM
+
+/** This class simply demonstrates basic usage of the CRTShader system.
+It sub class the material manager listener class and when a target scheme callback
+is invoked with the shader generator scheme it tries to create an equvialent shader
+based technique based on the default technique of the given material.
+*/
+class ShaderGeneratorTechniqueResolverListener : public MaterialManager::Listener
+{
+public:
+
+	ShaderGeneratorTechniqueResolverListener(RTShader::ShaderGenerator* pShaderGenerator)
+	{
+		mShaderGenerator = pShaderGenerator;
+	}
+
+	virtual Technique* handleSchemeNotFound(unsigned short schemeIndex, 
+		const String& schemeName, Material* originalMaterial, unsigned short lodIndex, 
+		const Renderable* rend)
+	{		
+		// Case this is the default shader generator scheme.
+		if (schemeName == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+		{
+			MaterialRegisterIterator itFind = mRegisteredMaterials.find(originalMaterial);
+			bool techniqueCreated = false;
+
+			// This material was not registered before.
+			if (itFind == mRegisteredMaterials.end())
+			{
+				techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
+					originalMaterial->getName(), 
+					MaterialManager::DEFAULT_SCHEME_NAME, 
+					schemeName);				
+			}
+			mRegisteredMaterials[originalMaterial] = techniqueCreated;
+		}
+
+		return NULL;
+	}
+
+protected:
+	typedef std::map<Material*, bool>		MaterialRegisterMap;
+	typedef MaterialRegisterMap::iterator	MaterialRegisterIterator;
+
+
+protected:
+	MaterialRegisterMap				mRegisteredMaterials;		// Registered material map.
+	RTShader::ShaderGenerator*		mShaderGenerator;			// The shader generator instance.
+};
+#endif
+
 using namespace Ogre;
 
 /** Base class which manages the standard startup of an Ogre application.
@@ -84,6 +135,11 @@ public:
 #else
 		mResourcePath = "";
         mConfigPath = mResourcePath;
+#endif
+
+#ifdef USE_RTSHADER_SYSTEM
+		mShaderGenerator	 = NULL;		
+		mMaterialMgrListener = NULL;
 #endif
     }
     /// Standard destructor
@@ -112,7 +168,7 @@ public:
 
 #ifdef USE_RTSHADER_SYSTEM
 		// Finalize shader generator.
-		mFrameListener->finalizeShaderGenerator();
+		finalizeShaderGenerator();
 #endif
 
     }
@@ -128,6 +184,10 @@ protected:
     RenderWindow* mWindow;
 	Ogre::String mResourcePath;
 	Ogre::String mConfigPath;
+#ifdef USE_RTSHADER_SYSTEM
+	RTShader::ShaderGenerator*					mShaderGenerator;			// The Shader generator instance.
+	ShaderGeneratorTechniqueResolverListener*	mMaterialMgrListener;		// Material manager listener.	
+#endif
 
     // These internal methods package up the stages in the startup process
     /** Sets up the application - returns false if the user chooses to abandon configuration. */
@@ -148,11 +208,18 @@ protected:
         setupResources();
 
         bool carryOn = configure();
-        if (!carryOn) return false;
+        if (!carryOn) 
+			return false;
 
         chooseSceneManager();
         createCamera();
         createViewports();
+#ifdef USE_RTSHADER_SYSTEM
+		// Initialize shader generator.
+		carryOn = initializeShaderGenerator(mSceneMgr);
+		if (!carryOn) 
+			return false;
+#endif
 
         // Set default mipmap level (NB some APIs ignore this)
         TextureManager::getSingleton().setDefaultNumMipmaps(5);
@@ -167,14 +234,79 @@ protected:
 
         createFrameListener();
 
-#ifdef USE_RTSHADER_SYSTEM
-		// Initialize shader generator.
-		mFrameListener->initializeShaderGenerator(mSceneMgr);
-#endif
-
         return true;
 
     }
+#ifdef USE_RTSHADER_SYSTEM
+	virtual bool initializeShaderGenerator(SceneManager* sceneMgr)
+	{	
+		if (RTShader::ShaderGenerator::initialize())
+		{
+			mShaderGenerator = RTShader::ShaderGenerator::getSingletonPtr();
+
+			// Set the scene manager.
+			mShaderGenerator->setSceneManager(sceneMgr);
+
+			// Setup core libraries and shader cache path.
+			ResourceGroupManager::LocationList resLocationsList = ResourceGroupManager::getSingleton().getResourceLocationList(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+			ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
+			ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
+			String shaderCoreLibsPath;
+			String shaderCachePath;
+
+			// Default cache path is current directory;
+			shaderCachePath = "./";
+
+			// Try to find the location of the core shader lib functions and use it
+			// as shader cache path as well - this will reduce the number of generated files
+			// when running from different directories.
+			for (; it != itEnd; ++it)
+			{
+
+				if ((*it)->archive->getName().find("RTShaderLib") != String::npos)
+				{
+					shaderCoreLibsPath = (*it)->archive->getName() + "/";
+					shaderCachePath    = shaderCoreLibsPath;
+					break;
+				}
+			}
+
+			// Core shader libs not found -> shader generating will fail.
+			if (shaderCoreLibsPath.empty())			
+				return false;			
+
+			// Add resource location for the core shader libs. 
+			ResourceGroupManager::getSingleton().addResourceLocation(shaderCoreLibsPath , "FileSystem");
+				
+			// Set shader cache path.
+			mShaderGenerator->setShaderCachePath(shaderCachePath);		
+									
+			// Create and register the material manager listener.
+			mMaterialMgrListener = new ShaderGeneratorTechniqueResolverListener(mShaderGenerator);				
+			MaterialManager::getSingleton().addListener(mMaterialMgrListener);
+		}
+
+		return true;
+	}
+
+	virtual void finalizeShaderGenerator()
+	{
+		// Unregister the material manager listener.
+		if (mMaterialMgrListener != NULL)
+		{			
+			MaterialManager::getSingleton().removeListener(mMaterialMgrListener);
+			delete mMaterialMgrListener;
+			mMaterialMgrListener = NULL;
+		}
+
+		// Finalize CRTShader system.
+		if (mShaderGenerator != NULL)
+		{
+			RTShader::ShaderGenerator::finalize();
+			mShaderGenerator = NULL;
+		}
+	}
+#endif
     /** Configures the application - returns false if the user chooses to abandon configuration. */
     virtual bool configure(void)
     {

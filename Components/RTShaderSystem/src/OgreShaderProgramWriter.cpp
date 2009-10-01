@@ -217,6 +217,15 @@ void ProgramWriter::writeUniformParameter(std::ostream& os, Parameter* parameter
 	os << mGpuConstTypeMap[parameter->getType()];
 	os << "\t";	
 	os << parameter->getName();	
+
+	if (parameter->isSampler())
+	{
+		if (getTargetLanguage() == "cg")
+		{
+			os << " : register(s" << parameter->getIndex() << ")";
+		}		
+	}
+	
 }
 
 //-----------------------------------------------------------------------
@@ -228,8 +237,8 @@ void ProgramWriter::writeFunctionParameter(std::ostream& os, Parameter* paramete
 
 	if (parameter->getSemantic() != Parameter::SPS_UNKNOWN)
 	{
-		os << " : " << mParamSemanticMap[parameter->getSemantic()];
-		if (parameter->getIndex() >= 0)
+		os << " : " << mParamSemanticMap[parameter->getSemantic()];				
+		if (parameter->getSemantic() != Parameter::SPS_POSITION && parameter->getIndex() >= 0)
 		{			
 			os << StringConverter::toString(parameter->getIndex()).c_str();
 		}

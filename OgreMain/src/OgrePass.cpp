@@ -1907,5 +1907,19 @@ namespace Ogre {
 
 	}
 
+	//-----------------------------------------------------------------------
+	const Any& Pass::getUserAny( const String& key ) const
+	{
+		UserAnyMap::const_iterator it = mUserAnyMap.find(key);
 
+		// Case user data found.
+		if (it != mUserAnyMap.end())
+		{
+			return it->second;
+		}
+
+		// Return empty Any object.
+		static Any sEmptyAny;
+		return sEmptyAny;
+	}
 }

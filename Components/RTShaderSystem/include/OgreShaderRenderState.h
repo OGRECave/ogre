@@ -68,10 +68,18 @@ public:
 	*/
 	void		addSubRenderState			(SubRenderState* subRenderState);
 
-	/** Append the given render state to this render state.
-	@param other The other render state to append to this state.
+	/** Remove sub render state from this render state.
+	@param subRenderState The sub render state to remove.
 	*/
-	void		append						(const RenderState& other);
+	void		removeSubRenderState			(SubRenderState* subRenderState);
+
+	/** Merge the given render state into this render state.
+	Only sub render states with execution order that don't exist in this render state will be added.	
+	@param other The other render state to append to this state.
+	@param srcPass The source pass that this render state is constructed from.
+	@param dstPass The destination pass that constructed from this render state.
+	*/
+	void		merge						(const RenderState& other, Pass* srcPass, Pass* dstPass);
 	
 	/** Copy the given render state to this render state.
 	@param rhs The other render state to copy to this state.
@@ -104,14 +112,39 @@ public:
 	const SubRenderStateList&	getSubStateList() const { return mSubRenderStateList; }
 
 	/** 
-	@see ShaderGenerator::setLightCount.
+	Set the light count per light type.
+	@param 
+	lightCount The light count per type.
+	lightCount[0] defines the point light count.
+	lightCount[1] defines the directional light count.
+	lightCount[2] defines the spot light count.
 	*/
-	void			setLightCount		(const int lightCount[3]);
+	void			setLightCount			(const int lightCount[3]);
 
 	/** 
-	@see ShaderGenerator::getLightCount.
+	Get the light count per light type.
+	@param 
+	lightCount The light count per type.
+	lightCount[0] defines the point light count.
+	lightCount[1] defines the directional light count.
+	lightCount[2] defines the spot light count.
 	*/
-	void			getLightCount		(int lightCount[3]) const;
+	void			getLightCount			(int lightCount[3]) const;
+
+	
+	/** 
+	Set the light count auto update state.
+	If the value is false the light count will remain static for the values that were set by the user.
+	If the value is true the light count will be updated from the owner shader generator scheme based on current scene lights.
+	The default is true.
+	*/
+	void			setLightCountAutoUpdate	(bool autoUpdate) { mLightCountAutoUpdate = autoUpdate; }
+
+	/** 
+	Return true if this render state override the light count. 
+	If light count is not overridden it will be updated from the shader generator based on current scene lights.
+	*/
+	bool			getLightCountAutoUpdate	() const { return mLightCountAutoUpdate; }
 	
 // Protected methods
 protected:
@@ -130,6 +163,7 @@ protected:
 	uint32				mHashCode;						// The hash of this render states.
 	bool				mHashCodeValid;					// Tells if the hash code is valid or has to be computed again.
 	int					mLightCount[3];					// The light count per light type definition.
+	bool				mLightCountAutoUpdate;			// True if light count was explicitly set.
 		
 };
 

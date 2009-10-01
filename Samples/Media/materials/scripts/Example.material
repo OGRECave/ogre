@@ -482,6 +482,7 @@ material Examples/Flare
 			lighting off
 			scene_blend add
 			depth_write off
+			diffuse vertexcolour
 
 			texture_unit
 			{
@@ -499,6 +500,7 @@ material Examples/Flare2
 			lighting off
 			scene_blend add
 			depth_write off
+			diffuse vertexcolour
 
 			texture_unit
 			{
@@ -516,6 +518,7 @@ material Examples/FlarePointSprite
 			lighting off
 			scene_blend add
 			depth_write off
+			diffuse vertexcolour
 
 			point_sprites on
 			point_size 2
@@ -537,6 +540,7 @@ material Examples/Droplet
 		{
 			scene_blend colour_blend
 			depth_write off
+			diffuse vertexcolour
 
 			texture_unit
 			{
@@ -1362,6 +1366,7 @@ material Examples/Aureola
 			scene_blend alpha_blend
 			depth_write off
 			cull_hardware none
+			diffuse vertexcolour
 
 			texture_unit
 			{
@@ -1490,6 +1495,7 @@ material Examples/LightRibbonTrail
 			lighting off
 			scene_blend add
 			depth_write off
+			diffuse vertexcolour
 
 			texture_unit
 			{

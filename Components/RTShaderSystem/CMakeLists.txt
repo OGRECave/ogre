@@ -29,6 +29,9 @@ set (HEADER_FILES
   include/OgreShaderProgramWriter.h
   include/OgreShaderRenderState.h
   include/OgreShaderSubRenderState.h
+  include/OgreShaderExNormalMapLighting.h
+  include/OgreShaderExPerPixelLighting.h
+  include/OgreShaderScriptTranslator.h
 )
 
 set (SOURCE_FILES
@@ -48,6 +51,9 @@ set (SOURCE_FILES
   src/OgreShaderProgramWriter.cpp
   src/OgreShaderRenderState.cpp
   src/OgreShaderSubRenderState.cpp
+  src/OgreShaderExNormalMapLighting.cpp
+  src/OgreShaderExPerPixelLighting.cpp
+  src/OgreShaderScriptTranslator.cpp
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

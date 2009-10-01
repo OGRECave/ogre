@@ -24,11 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ShaderFFPTransform_
-#define _ShaderFFPTransform_
+#ifndef _ShaderScriptTranslator_
+#define _ShaderScriptTranslator_
 
 #include "OgreShaderPrerequisites.h"
-#include "OgreShaderSubRenderState.h"
+#include "OgreScriptTranslator.h"
+#include "OgreScriptCompiler.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -40,71 +41,63 @@ namespace RTShader {
 *  @{
 */
 
-/** Transform sub render state implementation of the Fixed Function Pipeline.
-@see http://msdn.microsoft.com/en-us/library/bb206269(VS.85).aspx
-Derives from SubRenderState class.
+/** This class responsible for translating core features of the RT Shader System for
+Ogre material scripts.
 */
-class OGRE_RTSHADERSYSTEM_API FFPTransform : public SubRenderState
+class OGRE_RTSHADERSYSTEM_API SGScriptTranslator : public ScriptTranslator
 {
-
-// Interface.
 public:
+	/**
+	*@see ScriptTranslator::translate.
+	*/
+	virtual void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+
+	/**
+	*@see ScriptTranslator::getBoolean.
+	*/
+	ScriptTranslator::getBoolean;
 	
-	/** 
-	@see SubRenderState::getType.
+	/**
+	*@see ScriptTranslator::getBoolean.
 	*/
-	virtual const String&	getType					() const;
-
-	/** 
-	@see SubRenderState::getExecutionOrder.
+	ScriptTranslator::getString;
+	
+	/**
+	*@see ScriptTranslator::getReal.
 	*/
-	virtual int				getExecutionOrder		() const;
-
-	/** 
-	@see SubRenderState::copyFrom.
+	ScriptTranslator::getReal;
+	
+	/**
+	*@see ScriptTranslator::getFloat.
 	*/
-	virtual void			copyFrom				(const SubRenderState& rhs);
+	ScriptTranslator::getFloat;
 
-	/** 
-	@see SubRenderState::createCpuSubPrograms.
+	/**
+	*@see ScriptTranslator::getInt.
 	*/
-	virtual bool			createCpuSubPrograms	(ProgramSet* programSet);
+	ScriptTranslator::getInt; 
 
-
-	static String Type;
-};
-
-
-/** 
-A factory that enables creation of FFPTransform instances.
-@remarks Sub class of SubRenderStateFactory
-*/
-class FFPTransformFactory : public SubRenderStateFactory
-{
-public:
-
-	/** 
-	@see SubRenderStateFactory::getType.
+	/**
+	*@see ScriptTranslator::getUInt.
 	*/
-	virtual const String&	getType				() const;
+	ScriptTranslator::getUInt; 
 
+	/**
+	*@see ScriptTranslator::getColour.
+	*/
+	ScriptTranslator::getColour;
+	
 protected:
 
-	/** 
-	@see SubRenderStateFactory::createInstanceImpl.
+	/**
+	* Translates RT Shader System section within a pass context.
+	* @param compiler The compiler invoking this translator
+	* @param node The current AST node to be translated
 	*/
-	virtual SubRenderState*	createInstanceImpl	();
-
-
-
+	void translatePass(ScriptCompiler *compiler, const AbstractNodePtr &node);
 };
-
-/** @} */
-/** @} */
-
 
 }
 }
 
 #endif
-

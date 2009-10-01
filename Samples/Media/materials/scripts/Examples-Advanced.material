@@ -333,6 +333,34 @@ material Examples/BumpMapping/MultiLightTangentParity : Examples/BumpMapping/Mul
 
 }
 
+// RTShader system material for bump mapping.
+// All scene lights will be applied in one rendering pass. 
+material Examples/RTShaderSystem/BumpMapping
+{
+	technique
+	{
+		pass
+		{
+			// Turn off specular in order to use only diffuse based bump map technique.
+			specular 1.0 1.0 1.0 32
+			
+			texture_unit
+			{
+				texture RustedMetal.jpg
+			}				
+			
+			// RT Shader system section.
+ 			rtshader_system
+ 			{	 	
+ 				// Light model will be normal map based. 			
+ 				light_model sgx_normal_map NMBumpsOut.png 				
+ 			}			
+		}				
+	}
+}
+		
+
+
 //---------------------------
 // Projective texture section
 //---------------------------

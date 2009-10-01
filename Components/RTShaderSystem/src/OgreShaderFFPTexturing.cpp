@@ -789,6 +789,22 @@ void FFPTexturing::copyFrom(const SubRenderState& rhs)
 }
 
 //-----------------------------------------------------------------------
+bool FFPTexturing::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass)
+{
+	setTextureUnitCount(srcPass->getNumTextureUnitStates());
+
+	// Build texture stage sub states.
+	for (unsigned short i=0; i < srcPass->getNumTextureUnitStates(); ++i)
+	{		
+		TextureUnitState* texUnitState = srcPass->getTextureUnitState(i);								
+
+		setTextureUnit(i, texUnitState);			
+	}	
+
+	return true;
+}
+
+//-----------------------------------------------------------------------
 uint32 FFPTexturing::getHashCode()
 {
 	uint32 hashCode = 0;

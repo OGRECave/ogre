@@ -26,36 +26,46 @@ THE SOFTWARE.
 */
 
 //-----------------------------------------------------------------------------
-// Program Name: FFPLib_Lighting
-// Program Desc: Lighting functions of the FFP.
-// Program Type: Vertex shader
+// Program Name: SGXLib_Lighting
+// Program Desc: Per pixel lighting functions.
+// Program Type: Vertex/Pixel shader
 // Language: CG
-// Notes: Implements core functions for FFPLighting class.
-// based on lighting engine. 
-// See http://msdn.microsoft.com/en-us/library/bb147178(VS.85).aspx
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+void SGX_TransformNormal(in float4x4 m, 
+				   in float3 v, 
+				   out float3 vOut)
+{
+	vOut = mul((float3x3)m, v);
+}
 
 //-----------------------------------------------------------------------------
-void FFP_Light_Directional_Diffuse(in float4x4 mWorldViewIT, 
+void SGX_TransformPosition(in float4x4 mWorldView, 
+				   in float4 vPos, 
+				   out float3 vOut)
+{
+	vOut = mul(mWorldView, vPos).xyz;
+}
+
+//-----------------------------------------------------------------------------
+void SGX_Light_Directional_Diffuse(
 				   in float3 vNormal,
 				   in float3 vNegLightDirView,
 				   in float3 vDiffuseColour, 
 				   in float3 vBaseColour, 
 				   out float3 vOut)
 {
-	float3 vNormalView = normalize(mul((float3x3)mWorldViewIT, vNormal));
+	float3 vNormalView = normalize(vNormal);
 	float nDotL = dot(vNormalView, vNegLightDirView);
 	
 	vOut = vBaseColour + vDiffuseColour * saturate(nDotL);
 }
 
-
 //-----------------------------------------------------------------------------
-void FFP_Light_Directional_DiffuseSpecular(in float4x4 mWorldView, 
-					in float4 vPos,
-					in float4x4 mWorldViewIT, 
+void SGX_Light_Directional_DiffuseSpecular(
 					in float3 vNormal,
+					in float3 vViewPos,					
 					in float3 vNegLightDirView,
 					in float3 vDiffuseColour, 
 					in float3 vSpecularColour, 
@@ -68,9 +78,9 @@ void FFP_Light_Directional_DiffuseSpecular(in float4x4 mWorldView,
 	vOutDiffuse  = vBaseDiffuseColour;
 	vOutSpecular = vBaseSpecularColour;
 	
-	float3 vNormalView = normalize(mul((float3x3)mWorldViewIT, vNormal));		
+	float3 vNormalView = normalize(vNormal);		
 	float nDotL		   = dot(vNormalView, vNegLightDirView);			
-	float3 vView       = -normalize(mul(mWorldView, vPos).xyz);
+	float3 vView       = -normalize(vViewPos);
 	float3 vHalfWay    = normalize(vView + vNegLightDirView);
 	float nDotH        = dot(vNormalView, vHalfWay);
 	
@@ -81,12 +91,10 @@ void FFP_Light_Directional_DiffuseSpecular(in float4x4 mWorldView,
 	}
 }
 
-
 //-----------------------------------------------------------------------------
-void FFP_Light_Point_Diffuse(in float4x4 mWorldView, 
-					in float4 vPos,
-					in float4x4 mWorldViewIT, 
+void SGX_Light_Point_Diffuse(
 				    in float3 vNormal,
+				    in float3 vViewPos,
 				    in float3 vLightPosView,
 				    in float4 vAttParams,
 				    in float3 vDiffuseColour, 
@@ -94,11 +102,10 @@ void FFP_Light_Point_Diffuse(in float4x4 mWorldView,
 				    out float3 vOut)
 {
 	vOut = vBaseColour;		
-
-	float3 vViewPos    = mul(mWorldView, vPos).xyz;
+	
 	float3 vLightView  = vLightPosView - vViewPos;
 	float fLightD      = length(vLightView);
-	float3 vNormalView = normalize(mul((float3x3)mWorldViewIT, vNormal));
+	float3 vNormalView = normalize(vNormal);
 	float nDotL        = dot(vNormalView, normalize(vLightView));
 	
 	if (nDotL > 0 && fLightD <= vAttParams.x)
@@ -109,11 +116,12 @@ void FFP_Light_Point_Diffuse(in float4x4 mWorldView,
 	}		
 }
 
+
+
 //-----------------------------------------------------------------------------
-void FFP_Light_Point_DiffuseSpecular(in float4x4 mWorldView, 
-					in float4 vPos,
-					in float4x4 mWorldViewIT, 
+void SGX_Light_Point_DiffuseSpecular(
 				    in float3 vNormal,
+				    in float3 vViewPos,
 				    in float3 vLightPosView,
 				    in float4 vAttParams,
 				    in float3 vDiffuseColour, 
@@ -127,12 +135,10 @@ void FFP_Light_Point_DiffuseSpecular(in float4x4 mWorldView,
 	vOutDiffuse  = vBaseDiffuseColour;
 	vOutSpecular = vBaseSpecularColour;
 
-	float3 vViewPos    = mul(mWorldView, vPos).xyz;
 	float3 vLightView  = vLightPosView - vViewPos;
 	float fLightD      = length(vLightView);
-	
 	vLightView		   = normalize(vLightView);	
-	float3 vNormalView = normalize(mul((float3x3)mWorldViewIT, vNormal));
+	float3 vNormalView = normalize(vNormal);
 	float nDotL        = dot(vNormalView, vLightView);	
 		
 	if (nDotL > 0 && fLightD <= vAttParams.x)
@@ -148,10 +154,9 @@ void FFP_Light_Point_DiffuseSpecular(in float4x4 mWorldView,
 }
 
 //-----------------------------------------------------------------------------
-void FFP_Light_Spot_Diffuse(in float4x4 mWorldView, 
-					in float4 vPos,
-					in float4x4 mWorldViewIT, 
+void SGX_Light_Spot_Diffuse(
 				    in float3 vNormal,
+				    in float3 vViewPos,
 				    in float3 vLightPosView,
 				    in float3 vNegLightDirView,
 				    in float4 vAttParams,
@@ -161,12 +166,11 @@ void FFP_Light_Spot_Diffuse(in float4x4 mWorldView,
 				    out float3 vOut)
 {
 	vOut = vBaseColour;		
-
-	float3 vViewPos    = mul(mWorldView, vPos).xyz;
+	
 	float3 vLightView  = vLightPosView - vViewPos;
 	float fLightD      = length(vLightView);
 	vLightView		   = normalize(vLightView);
-	float3 vNormalView = normalize(mul((float3x3)mWorldViewIT, vNormal));
+	float3 vNormalView = normalize(vNormal);
 	float nDotL        = dot(vNormalView, vLightView);
 	
 	if (nDotL > 0 && fLightD <= vAttParams.x)
@@ -181,10 +185,9 @@ void FFP_Light_Spot_Diffuse(in float4x4 mWorldView,
 }
 
 //-----------------------------------------------------------------------------
-void FFP_Light_Spot_DiffuseSpecular(in float4x4 mWorldView, 
-					in float4 vPos,
-					in float4x4 mWorldViewIT, 
+void SGX_Light_Spot_DiffuseSpecular(
 				    in float3 vNormal,
+				    in float3 vViewPos,
 				    in float3 vLightPosView,
 				    in float3 vNegLightDirView,
 				    in float4 vAttParams,
@@ -199,14 +202,12 @@ void FFP_Light_Spot_DiffuseSpecular(in float4x4 mWorldView,
 {
 	vOutDiffuse  = vBaseDiffuseColour;		
 	vOutSpecular = vBaseSpecularColour;
-
-	float3 vViewPos    = mul(mWorldView, vPos).xyz;
+	
 	float3 vLightView  = vLightPosView - vViewPos;
 	float fLightD      = length(vLightView);
 	vLightView		   = normalize(vLightView);
-	float3 vNormalView = normalize(mul((float3x3)mWorldViewIT, vNormal));
+	float3 vNormalView = normalize(vNormal);
 	float nDotL        = dot(vNormalView, vLightView);
-	
 	
 	
 	if (nDotL > 0 && fLightD <= vAttParams.x)

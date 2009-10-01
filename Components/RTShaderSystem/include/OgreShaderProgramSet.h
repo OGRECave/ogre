@@ -43,7 +43,7 @@ namespace RTShader {
 /** Container class for shader based programs. 
 Holds both a CPU representation and GPU representation of vertex and fragment program.
 */
-class OGRE_RTSHADERSYSTEM_INTERNAL ProgramSet
+class OGRE_RTSHADERSYSTEM_API ProgramSet
 {
 
 	// Interface.

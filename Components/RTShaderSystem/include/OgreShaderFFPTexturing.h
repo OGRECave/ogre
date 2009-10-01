@@ -50,7 +50,7 @@ Implements texture blending operation:
 @see http://msdn.microsoft.com/en-us/library/bb206241(VS.85).aspx
 Derives from SubRenderState class.
 */
-class FFPTexturing : public SubRenderState
+class OGRE_RTSHADERSYSTEM_API FFPTexturing : public SubRenderState
 {
 
 // Interface.
@@ -85,22 +85,9 @@ public:
 	virtual void			copyFrom				(const SubRenderState& rhs);
 
 	/** 
-	Set the number of texture units this texturing sub state has to handle.
-	@param count The number of texture unit states.
+	@see SubRenderState::preAddToRenderState.
 	*/
-	void					setTextureUnitCount		(size_t count);
-
-	/** 
-	Return the number of texture units this sub state handle. 
-	*/
-	size_t					getTextureUnitCount		() const { return mTextureUnitParamsList.size(); }
-
-	/** 
-	Set texture unit of a given stage index.
-	@param index The stage index of the given texture unit state.
-	@param textureUnitState The texture unit state to bound the the stage index.
-	*/
-	void					setTextureUnit			(unsigned short index, TextureUnitState* textureUnitState);
+	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
 	static String Type;
 
@@ -131,6 +118,25 @@ protected:
 
 // Protected methods
 protected:
+
+	/** 
+	Set the number of texture units this texturing sub state has to handle.
+	@param count The number of texture unit states.
+	*/
+	void					setTextureUnitCount		(size_t count);
+
+	/** 
+	Return the number of texture units this sub state handle. 
+	*/
+	size_t					getTextureUnitCount		() const { return mTextureUnitParamsList.size(); }
+
+	/** 
+	Set texture unit of a given stage index.
+	@param index The stage index of the given texture unit state.
+	@param textureUnitState The texture unit state to bound the the stage index.
+	*/
+	void					setTextureUnit			(unsigned short index, TextureUnitState* textureUnitState);
+
 	/** 
 	@see SubRenderState::resolveParameters.
 	*/

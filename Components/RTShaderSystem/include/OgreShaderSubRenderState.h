@@ -114,7 +114,14 @@ public:
 	*/
 	virtual void			updateGpuProgramsParams	(Renderable* rend, Pass* pass,  const AutoParamDataSource* source, 	const LightList* pLightList) { }
 
-	
+	/** Called before adding this sub render state to the given render state.
+	Allows this sub render state class to configure specific parameters depending on source pass or parent render state.
+	Return of false value will cause canceling the add operation.
+	@param renderState The target render state container this sub render state is about to be added.	
+	@param srcPass The source pass.
+	@param dstPass The destination pass.
+	*/
+	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass) { return true;}
 
 // Protected methods
 protected:
@@ -159,7 +166,7 @@ SubRenderStateFactory subclasses must allow the creation and destruction of SubR
 subclasses. They must also be registered with the ShaderGenerator::addSubRenderStateFactory. 
 All factories have a type which identifies them and the sub class of SubRenderState they creates.
 */
-class SubRenderStateFactory
+class OGRE_RTSHADERSYSTEM_API SubRenderStateFactory
 {
 
 public:
@@ -176,6 +183,15 @@ public:
 	/** Create an instance of the SubRenderState sub class it suppose to create.	
 	*/
 	virtual SubRenderState*	createInstance		();
+
+	/** Create an instance of the SubRenderState based on script properties.	
+	This method is called in the context of script parsing and let this factory
+	the opportunity to create custom SubRenderState instances based on extended script properties.
+	@param compiler The compiler instance.
+	@param prop The abstract property node.
+	@param pass The pass that is the parent context of this node.
+	*/
+	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass) { return NULL; }
 
 	/** Destroy the given instance.	
 	@param subRenderState The instance to destroy.

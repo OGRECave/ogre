@@ -33,6 +33,9 @@ THE SOFTWARE.
 #include "OgreRenderObjectListener.h"
 #include "OgreSceneManager.h"
 #include "OgreShaderRenderState.h"
+#include "OgreScriptTranslator.h"
+#include "OgreShaderScriptTranslator.h"
+
 
 namespace Ogre {
 namespace RTShader {
@@ -170,14 +173,13 @@ public:
 	RenderState*	getRenderState				(const String& schemeName);
 
 	/** 
-	Get render state list of specific material technique. The result will be stored in the
-	renderStateList parameter and will hold up to N instances of render state where N is the number of passes in the 
-	destination technique. Using this method allows the user to customize the behavior of a specific pass.
+	Get render state of specific pass.
+	Using this method allows the user to customize the behavior of a specific pass.
 	@param schemeName The destination scheme name.
 	@param materialName The specific material name.
-	@param renderStateList The render states of the given material.
+	@param passIndex The pass index.
 	*/
-	void			getRenderStateList			(const String& schemeName, const String& materialName, RenderStateList& renderStateList);
+	RenderState*	getRenderState				(const String& schemeName, const String& materialName, unsigned short passIndex);
 
 	/** 
 	Add sub render state factory. Plugins or 3d party applications may implement sub classes of
@@ -199,11 +201,22 @@ public:
 	*/
 	SubRenderState*	createSubRenderState		(const String& type);
 
+	
 	/** 
 	Destroy an instance of sub render state. 
 	@param subRenderState The instance to destroy.
 	*/
 	void			destroySubRenderState		(SubRenderState* subRenderState);
+
+	/** Create an instance of the SubRenderState based on script properties using the
+	current sub render state factories.
+	@see SubRenderStateFactory::createInstance	
+	@param compiler The compiler instance.
+	@param prop The abstract property node.
+	@param pass The pass that is the parent context of this node.
+	*/
+	SubRenderState*	createSubRenderState		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass);
+
 
 	/** 
 	Create shader based technique from a given technique. 
@@ -225,6 +238,15 @@ public:
 	@param dstTechniqueSchemeName The destination shader based technique scheme name.
 	*/
 	bool			removeShaderBasedTechnique	(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName);
+
+
+	/** 
+	Remove all shader based techniques of the given material. 
+	Return true upon success.
+	@param materialName The source material name.	
+	*/
+	bool			removeAllShaderBasedTechniques	(const String& materialName);
+
 
 
 	/** 
@@ -255,27 +277,7 @@ public:
 	@param schemeName The scheme to validate.
 	@param materialName The material to validate.
 	*/
-	bool			validateMaterial			(const String& schemeName, const String& materialName);
-
-	/** 
-	Set the light count per light type.
-	@param 
-		lightCount The light count per type.
-		lightCount[0] defines the point light count.
-		lightCount[1] defines the directional light count.
-		lightCount[2] defines the spot light count.
-	*/
-	void			setLightCount			(const int lightCount[3]);
-
-	/** 
-	Get the light count per light type.
-	@param 
-		lightCount The light count per type.
-		lightCount[0] defines the point light count.
-		lightCount[1] defines the directional light count.
-		lightCount[2] defines the spot light count.
-	*/
-	void			getLightCount			(int lightCount[3]) const;
+	bool			validateMaterial			(const String& schemeName, const String& materialName);	
 
 
 	/// Default material scheme of the shader generator.
@@ -287,6 +289,31 @@ protected:
 	class SGTechnique;
 	class SGMaterial;
 	class SGScheme;
+
+	typedef std::vector<SGPass*>					SGPassList;
+	typedef SGPassList::iterator					SGPassIterator;
+	typedef SGPassList::const_iterator				SGPassConstIterator;
+
+	typedef std::vector<SGTechnique*>				SGTechniqueList;
+	typedef SGTechniqueList::iterator				SGTechniqueIterator;
+	typedef SGTechniqueList::const_iterator			SGTechniqueConstIterator;
+
+	typedef std::map<SGTechnique*, SGTechnique*>	SGTechniqueMap;
+	typedef SGTechniqueMap::iterator				SGTechniqueMapIterator;
+	
+	typedef std::map<const String, SGMaterial*>		SGMaterialMap;
+	typedef SGMaterialMap::iterator					SGMaterialIterator;
+	typedef SGMaterialMap::const_iterator			SGMaterialConstIterator;
+
+	typedef std::map<const String, SGScheme*>		SGSchemeMap;
+	typedef SGSchemeMap::iterator					SGSchemeIterator;
+	typedef SGMaterialMap::const_iterator			SGSchemeConstIterator;
+
+	typedef std::map<const String, ScriptTranslator*>	SGScriptTranslatorMap;
+	typedef SGScriptTranslatorMap::iterator				SGScriptTranslatorIterator;
+	typedef SGScriptTranslatorMap::const_iterator		SGScriptTranslatorConstIterator;
+
+
 	
 	/** Shader generator pass wrapper class. */
 	class SGPass
@@ -316,33 +343,41 @@ protected:
 		/** Get custom render state of this pass. */
 		RenderState*	getCustomRenderState		();
 
-	protected:
-		SubRenderState*	getCustomFFPSubState		(int subStateOrder, const RenderState* renderState);
+		/** Set the custom render state of this pass. */
+		void			setCustomRenderState		(RenderState* customRenderState) { mCustomRenderState = customRenderState; }
+
+		static String	UserKey;					// Key name for associating with a Pass instance.
 	
 	protected:
-		SGTechnique*	mParent;				// Parent technique.
-		Pass*			mSrcPass;				// Source pass.
-		Pass*			mDstPass;				// Destination pass.
-		RenderState*	mCustomRenderState;		// Custom render state.
-		RenderStatePtr	mFinalRenderState;		// Final render state.
+		SubRenderState*	getCustomFFPSubState		(int subStateOrder, const RenderState* renderState);
+
+	protected:
+		SGTechnique*		mParent;				// Parent technique.
+		Pass*				mSrcPass;				// Source pass.
+		Pass*				mDstPass;				// Destination pass.
+		RenderState*		mCustomRenderState;		// Custom render state.
+		RenderStatePtr		mFinalRenderState;		// Final render state.		
 	};
 
-	typedef std::vector<SGPass*>			SGPassList;
-	typedef SGPassList::iterator			SGPassIterator;
-	typedef SGPassList::const_iterator		SGPassConstIterator;
-
+	
 	/** Shader generator technique wrapper class. */
 	class SGTechnique
 	{
 	public:
-		SGTechnique			(SGMaterial* parent, Technique* srcTechnique, const String& dstTechniqueSchemeName);
+		SGTechnique			(SGMaterial* parent, Technique* srcTechnique, const String& dstTechniqueSchemeName);		
 		~SGTechnique		();
-
+		
+		/** Get the parent SGMaterial */
+		const SGMaterial*	getParent						() const { return mParent; }
+		
 		/** Get the source technique. */
 		Technique*			getSourceTechnique				() { return mSrcTechnique; }
 
 		/** Get the destination technique. */
 		Technique*			getDestinationTechnique			() { return mDstTechnique; }
+
+		/** Get the destination technique scheme name. */
+		const String&		getDestinationTechniqueSchemeName() const { return mDstTechniqueSchemeName; }
 		
 		/** Build the render state. */
 		void				buildRenderState				();
@@ -356,47 +391,62 @@ protected:
 		/** Tells if the destination technique should be build. */
 		bool				getBuildDestinationTechnique	() const				{ return mBuildDstTechnique; }
 
-		/** Get a collection of render states from all pass entries */
-		void				getRenderStateList				(RenderStateList& renderStateList);
+		/** Get render state of specific pass.
+		@param passIndex The pass index.
+		*/
+		RenderState*		getRenderState					(unsigned short passIndex);
+
+		/** Get custom render state list. */
+		const RenderStateList&	getCustomRenderStateList	() const { return mCustomRenderStates; }
+
+	protected:
+		
+		/** Create the passes entries. */
+		void				createSGPasses			();
+
+		/** Destroy the passes entries. */
+		void				destroySGPasses			();
 
 		
 	protected:
-		SGMaterial*		mParent;				// Parent material.
-		Technique*		mSrcTechnique;			// Source technique.
-		Technique*		mDstTechnique;			// Destination technique.
-		SGPassList		mPassEntries;			// All passes entries.
-		bool			mBuildDstTechnique;		// Flag that tells if destination technique should be build.
+		SGMaterial*				mParent;					// Parent material.		
+		Technique*				mSrcTechnique;				// Source technique.
+		Technique*				mDstTechnique;				// Destination technique.
+		SGPassList				mPassEntries;				// All passes entries.
+		RenderStateList			mCustomRenderStates;		// The custom render states of all passes.
+		bool					mBuildDstTechnique;			// Flag that tells if destination technique should be build.		
+		String					mDstTechniqueSchemeName;	// Scheme name of destination technique.
 	};
 
-	typedef std::vector<SGTechnique*>			SGTechniqueList;
-	typedef SGTechniqueList::iterator			SGTechniqueIterator;
-	typedef SGTechniqueList::const_iterator		SGTechniqueConstIterator;
-
+	
 	/** Shader generator material wrapper class. */
 	class SGMaterial
 	{	
 	
 	public:
+		/** Class constructor. */
+		SGMaterial(const String& materialName)					{ mName = materialName; }
+
+		/** Get the material name. */
+		const String& getMaterialName				() const	{ return mName; }
 		
 		/** Get the const techniques list of this material. */
-		const SGTechniqueList&	getTechniqueList	() const				 { return mTechniqueEntires; }
+		const SGTechniqueList&	getTechniqueList	() const	 { return mTechniqueEntires; }
 
 		/** Get the techniques list of this material. */
 		SGTechniqueList&	getTechniqueList		() 			 { return mTechniqueEntires; }
 	
 	protected:
+		String				mName;					// The material name.
 		SGTechniqueList		mTechniqueEntires;		// All passes entries.
 	};
 
-	typedef std::map<const String, SGMaterial*>		SGMaterialMap;
-	typedef SGMaterialMap::iterator					SGMaterialIterator;
-	typedef SGMaterialMap::const_iterator			SGMaterialConstIterator;
-
+	
 	/** Shader generator scheme class. */
 	class SGScheme
 	{	
 	public:
-		SGScheme		();
+		SGScheme		(const String& schemeName);
 		~SGScheme		();	
 
 
@@ -436,21 +486,27 @@ protected:
 		*/
 		RenderState*			getRenderState			();
 
-		/** Get specific material render state list. 
-		@see ShaderGenerator::getRenderStateList.
+		/** Get specific pass render state. 
+		@see ShaderGenerator::getRenderState.
 		*/
-		void					getRenderStateList		(const String& materialName, RenderStateList& renderStateList);
+		RenderState*			getRenderState			(const String& materialName, unsigned short passIndex);
 
 	protected:
+		/** Check changes in the scene's light state and apply to all affected materials */
+		void					validateLightState		();
+
+		/** Check changes in the scene's fog state and apply to all affected materials */
+		void					validateFogState		();
+
+
+	protected:
+		String					mName;					// Scheme name.
 		SGTechniqueList			mTechniqueEntires;		// Technique entries.
 		bool					mOutOfDate;				// Tells if this scheme is out of date.
 		RenderState*			mRenderState;			// The global render state of this scheme.
+		FogMode					mFogMode;				// Current fog mode.
 	};
 
-	typedef std::map<const String, SGScheme*>			SGSchemeMap;
-	typedef SGSchemeMap::iterator						SGSchemeIterator;
-	typedef SGMaterialMap::const_iterator				SGSchemeConstIterator;
-	
 
 // Protected types.
 protected:
@@ -520,7 +576,32 @@ protected:
 		}
 
 	protected:
-		ShaderGenerator* mOwner;
+		ShaderGenerator* mOwner;			// The shader generator instance.
+	};
+
+	/** Shader generator ScriptTranslatorManager sub class. */
+	class SGScriptTranslatorManager : public ScriptTranslatorManager
+	{
+	public:
+		SGScriptTranslatorManager(ShaderGenerator* owner)
+		{
+			mOwner = owner;
+		}
+
+		/// Returns the number of translators being managed
+		virtual size_t getNumTranslators() const
+		{
+			return mOwner->getNumTranslators();
+		}
+		
+		/// Returns a manager for the given object abstract node, or null if it is not supported
+		virtual ScriptTranslator *getTranslator(const AbstractNodePtr& node)
+		{
+			return mOwner->getTranslator(node);
+		}
+
+	protected:
+		ShaderGenerator* mOwner;		// The shader generator instance.
 	};
 
 	//-----------------------------------------------------------------------------
@@ -530,14 +611,19 @@ protected:
 
 	//-----------------------------------------------------------------------------
 	typedef std::map<uint32, RenderStatePtr> 			RenderStateMap;
-	typedef RenderStateMap::iterator 					RenderStateIterator;
-	typedef RenderStateMap::const_iterator				RenderStateConstIterator;
+	typedef RenderStateMap::iterator 					RenderStateMapIterator;
+	typedef RenderStateMap::const_iterator				RenderStateMapConstIterator;
 
 protected:
+	/** Class default constructor */
+	ShaderGenerator		();
+
+	/** Class destructor */
+	~ShaderGenerator	();
 
 	/** Initialize the shader generator instance. */
 	bool				_initialize			();
-
+	
 	/** Finalize the shader generator instance. */
 	void				_finalize			();
 
@@ -547,7 +633,6 @@ protected:
 	/** Called from the sub class of the RenderObjectLister when single object is rendered. */
 	void				notifyRenderSingleObject		(Renderable* rend, const Pass* pass,  const AutoParamDataSource* source, const LightList* pLightList, bool suppressRenderStateChanges);
 
-
 	/** Called from the sub class of the SceneManager::Listener when finding visible object process starts. */
 	void				preFindVisibleObjects			(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v);
 
@@ -556,19 +641,43 @@ protected:
 
 	/** Add render state to cache.*/
 	void				addRenderStateToCache			(RenderStatePtr renderStatePtr);			
-	
-protected:
-	/** Class default constructor */
-	ShaderGenerator		();
 
-	/** Class destructor */
-	~ShaderGenerator	();
+	/** Create sub render state core extensions factories */
+	void				createSubRenderStateExFactories			();
+
+	/** Destroy sub render state core extensions factories */
+	void				destroySubRenderStateExFactories		();
+
+	/** 
+	Add custom script translator. 
+	Return true upon success.
+	@param key The key name of the given translator.
+	@param translator The translator to associate with the given key.
+	*/
+	bool				addCustomScriptTranslator			(const String& key, ScriptTranslator* translator);
+
+	/** 
+	Remove custom script translator. 
+	Return true upon success.
+	@param key The key name of the translator to remove.	
+	*/
+	bool				removeCustomScriptTranslator			(const String& key);
+
+	/** Return number of script translators. */
+	size_t				getNumTranslators						() const;
+
+	/** Return a matching script translator. */
+	ScriptTranslator*	getTranslator							(const AbstractNodePtr& node);
+
 
 protected:	
 	OGRE_AUTO_MUTEX												// Auto mutex.
 	SceneManager*				mSceneMgr;						// The current scene manager.
 	SGRenderObjectListener*		mRenderObjectListener;			// Render object listener.
 	SGSceneManagerListener*		mSceneManagerListener;			// Scene manager listener.
+	SGScriptTranslatorManager*	mScriptTranslatorManager;		// Script translator manager.
+	SGScriptTranslatorMap		mScriptTranslatorsMap;			// A map of the registered custom script translators.
+	SGScriptTranslator			mCoreScriptTranslaotr;			// The core translator of the RT Shader System.
 	String						mShaderLanguage;				// The target shader language (currently only cg supported).
 	String						mVertexShaderProfiles;			// The target vertex shader profile. Will be used as argument for program compilation.
 	String						mFragmentShaderProfiles;		// The target Fragment shader profile. Will be used as argument for program compilation.
@@ -577,15 +686,17 @@ protected:
 	FFPRenderStateBuilder*		mFFPRenderStateBuilder;			// Fixed Function Render state builder.
 	SGMaterialMap				mMaterialEntriesMap;			// Material entries map.
 	SGSchemeMap					mSchemeEntriesMap;				// Scheme entries map.
-	SGTechniqueList				mTechniqueEntriesList;			// All technique entries.
+	SGTechniqueMap				mTechniqueEntriesMap;			// All technique entries map.
 	RenderStateMap				mCachedRenderStates;			// All cached render states.
 	SubRenderStateFactoryMap	mSubRenderStateFactoryMap;		// Sub render state registered factories.
+	SubRenderStateFactoryMap	mSubRenderStateExFactories;		// Sub render state core extension factories.
 	bool						mActiveViewportValid;			// True if active view port use a valid SGScheme.
 	int							mLightCount[3];					// Light count per light type.
-
+	
 private:
 	friend class SGPass;
 	friend class FFPRenderStateBuilder;
+	friend class SGScriptTranslatorManager;
 	
 };
 

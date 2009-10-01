@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreShaderProgramSet.h"
 #include "OgreStringConverter.h"
 #include "OgreShaderProgramManager.h"
+#include "OgreShaderFFPRenderState.h"
 
 
 namespace Ogre {
@@ -44,7 +45,7 @@ RenderState::RenderState()
 	mSubRenderStateSortValid = false;
 	mHashCodeValid			 = false;
 	mHashCode				 = 0;
-	ShaderGenerator::getSingleton().getLightCount(mLightCount);
+	mLightCountAutoUpdate	 = true;
 }
 
 //-----------------------------------------------------------------------
@@ -72,18 +73,82 @@ void RenderState::addSubRenderState(SubRenderState* subRenderState)
 }
 
 //-----------------------------------------------------------------------
-void RenderState::append(const RenderState& rhs)
+void RenderState::removeSubRenderState(SubRenderState* subRenderState)
+{
+	for (SubRenderStateIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
+	{
+		if ((*it) == subRenderState)
+		{
+			ShaderGenerator::getSingleton().destroySubRenderState(*it);
+			break;
+		}		
+	}
+}
+
+//-----------------------------------------------------------------------
+void RenderState::merge(const RenderState& rhs, Pass* srcPass, Pass* dstPass)
 {	
-	// Add the source sub render states to current list of sub render states.
+	SubRenderStateList customSubRenderStates;
+
+	// Sort current render states.
+	sortSubRenderStates();
+
+	// Insert all custom sub render states. (I.E Not FFP sub render states).
 	for (SubRenderStateConstIterator itSrc=rhs.mSubRenderStateList.begin(); itSrc != rhs.mSubRenderStateList.end(); ++itSrc)
 	{
 		const SubRenderState* srcSubRenderState = *itSrc;
-		SubRenderState* dstSubRenderState = NULL;
+		bool isCustomSubRenderState = true;
 
+		if (srcSubRenderState->getExecutionOrder() == FFP_TRANSFORM ||
+			srcSubRenderState->getExecutionOrder() == FFP_COLOUR ||
+			srcSubRenderState->getExecutionOrder() == FFP_LIGHTING ||
+			srcSubRenderState->getExecutionOrder() == FFP_TEXTURING ||
+			srcSubRenderState->getExecutionOrder() == FFP_FOG)
+		{
+			isCustomSubRenderState = false;
+		}		
+	
 
-		dstSubRenderState = ShaderGenerator::getSingleton().createSubRenderState(srcSubRenderState->getType());
-		*dstSubRenderState = *srcSubRenderState;
-		addSubRenderState(dstSubRenderState);			
+		// Case it is a custom sub render state.
+		if (isCustomSubRenderState)
+		{
+			bool subStateTypeExists = false;
+
+			// Check if this type of sub render state already exists.
+			for (SubRenderStateConstIterator itDst=mSubRenderStateList.begin(); itDst != mSubRenderStateList.end(); ++itDst)
+			{
+				if ((*itDst)->getType() == srcSubRenderState->getType())
+				{
+					subStateTypeExists = true;
+					break;
+				}				
+			}
+			
+			// Case custom sub render state not exits -> add it to custom list.
+			if (subStateTypeExists == false)
+			{
+				SubRenderState* newSubRenderState = NULL;
+
+				newSubRenderState = ShaderGenerator::getSingleton().createSubRenderState(srcSubRenderState->getType());
+				*newSubRenderState = *srcSubRenderState;
+				customSubRenderStates.push_back(newSubRenderState);			
+			}						
+		}						
+	}	
+
+	// Merge the local custom sub render states.
+	for (SubRenderStateIterator itSrc=customSubRenderStates.begin(); itSrc != customSubRenderStates.end(); ++itSrc)
+	{
+		SubRenderState* customSubRenderState = *itSrc;
+
+		if (customSubRenderState->preAddToRenderState(this, srcPass, dstPass))
+		{
+			addSubRenderState(customSubRenderState);
+		}
+		else
+		{
+			ShaderGenerator::getSingleton().destroySubRenderState(customSubRenderState);
+		}		
 	}	
 }
 
@@ -112,6 +177,10 @@ void RenderState::copyFrom(const RenderState& rhs)
 	mLightCount[0] = rhs.mLightCount[0];
 	mLightCount[1] = rhs.mLightCount[1];
 	mLightCount[2] = rhs.mLightCount[2];
+	mLightCountAutoUpdate = rhs.mLightCountAutoUpdate;
+
+	mHashCode		= rhs.mHashCode;
+	mHashCodeValid	= rhs.mHashCodeValid;
 }
 
 //-----------------------------------------------------------------------
