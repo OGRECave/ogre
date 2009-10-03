@@ -847,11 +847,22 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
 		curLightParams->mVSOutDirection != NULL)
 	{
 		// Transform to texture space.
-		curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
-		curFuncInvocation->getParameterList().push_back(mVSTBNMatrix->getName());
-		curFuncInvocation->getParameterList().push_back(curLightParams->mDirection->getName() + ".xyz");
-		curFuncInvocation->getParameterList().push_back(curLightParams->mVSOutDirection->getName());	
-		vsMain->addAtomInstace(curFuncInvocation);
+		if (mNormalMapSpace == NMS_TANGENT)
+		{
+			curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
+			curFuncInvocation->getParameterList().push_back(mVSTBNMatrix->getName());
+			curFuncInvocation->getParameterList().push_back(curLightParams->mDirection->getName() + ".xyz");
+			curFuncInvocation->getParameterList().push_back(curLightParams->mVSOutDirection->getName());	
+			vsMain->addAtomInstace(curFuncInvocation);
+		}
+		// Output object space.
+		else if (mNormalMapSpace == NMS_OBJECT)
+		{
+			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
+			curFuncInvocation->getParameterList().push_back(curLightParams->mDirection->getName() + ".xyz");
+			curFuncInvocation->getParameterList().push_back(curLightParams->mVSOutDirection->getName());					
+			vsMain->addAtomInstace(curFuncInvocation);
+		}
 	}
 	
 	// Transform light vector in target space..
