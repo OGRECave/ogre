@@ -296,6 +296,10 @@ namespace Ogre {
         size_t mPoolSize;
         /// Is external billboard data in use?
         bool mExternalData;
+		/// Tell if vertex buffer should be update automatically.
+		bool mAutoUpdate;
+		/// True if the billboard data changed. Will cause vertex buffer update.
+		bool mBillboardDataChanged;
 
         /** Internal method creates vertex and index buffers.
         */
@@ -821,6 +825,26 @@ namespace Ogre {
 		
 		/// Override to return specific type flag
 		uint32 getTypeFlags(void) const;
+
+		/** Set the auto update state of this billboard set.
+		@remarks
+			This methods controls the updating policy of the vertex buffer.
+			By default auto update is true so the vertex buffer is being update every time this billboard set
+			is about to be rendered. This behavior best fit when the billboards of this set changes frequently.
+			When using static or semi-static billboards, it is recommended to set auto update to false.
+			In that case one should call notifyBillboardDataChanged method to reflect changes made to the
+			billboards data.			
+		*/
+		void setAutoUpdate(bool autoUpdate);
+
+		/** Return the auto update state of this billboard set.*/
+		bool getAutoUpdate(void) const { return mAutoUpdate; }
+
+		/** When billboard set is not auto updating its GPU buffer, the user is responsible to inform it
+			about any billboard changes in order to reflect them at the rendering stage.
+			Calling this method will cause GPU buffers update in the next render queue update.
+		*/			
+		void notifyBillboardDataChanged(void) { mBillboardDataChanged = true; }
 
     };
 

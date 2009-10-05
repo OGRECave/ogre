@@ -67,7 +67,9 @@ namespace Ogre {
         mPointRendering(false),
         mBuffersCreated(false),
         mPoolSize(0),
-		mExternalData(false)
+		mExternalData(false),
+		mAutoUpdate(true),
+		mBillboardDataChanged(true)
     {
         setDefaultDimensions( 100, 100 );
         setMaterialName( "BaseWhite" );
@@ -99,7 +101,9 @@ namespace Ogre {
 		mPointRendering(false),
         mBuffersCreated(false),
         mPoolSize(poolSize),
-        mExternalData(externalData)
+        mExternalData(externalData),
+		mAutoUpdate(true),
+		mBillboardDataChanged(true)
     {
         setDefaultDimensions( 100, 100 );
         setMaterialName( "BaseWhite" );
@@ -462,11 +466,13 @@ namespace Ogre {
 
 			mLockPtr = static_cast<float*>(
 				mMainBuf->lock(0, numBillboards * billboardSize, 
-				HardwareBuffer::HBL_DISCARD) );
+				mMainBuf->getUsage() & HardwareBuffer::HBU_DYNAMIC ?
+				HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL) );
 		}
 		else // lock the entire thing
 			mLockPtr = static_cast<float*>(
-				mMainBuf->lock(HardwareBuffer::HBL_DISCARD) );
+			mMainBuf->lock(mMainBuf->getUsage() & HardwareBuffer::HBU_DYNAMIC ?
+			HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL) );
 
     }
     //-----------------------------------------------------------------------
@@ -596,8 +602,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BillboardSet::_updateRenderQueue(RenderQueue* queue)
     {
-        // If we're driving this from our own data, update geometry now
-        if (!mExternalData)
+        // If we're driving this from our own data, update geometry if need to.
+        if (!mExternalData && (mAutoUpdate || mBillboardDataChanged || !mBuffersCreated))
         {
             if (mSortingEnabled)
             {
@@ -613,6 +619,7 @@ namespace Ogre {
                 injectBillboard(*(*it));
             }
             endBillboards();
+			mBillboardDataChanged = false;
         }
 
         //only set the render queue group if it has been explicitly set.
@@ -772,7 +779,8 @@ namespace Ogre {
             HardwareBufferManager::getSingleton().createVertexBuffer(
                 decl->getVertexSize(0),
                 mVertexData->vertexCount,
-                HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE);
+				mAutoUpdate ? HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE : 
+				HardwareBuffer::HBU_STATIC_WRITE_ONLY);
         // bind position and diffuses
         binding->setBinding(0, mMainBuf);
 
@@ -1445,6 +1453,19 @@ namespace Ogre {
 			_destroyBuffers();
 		}
 	}
+
+	//-----------------------------------------------------------------------
+	void BillboardSet::setAutoUpdate(bool autoUpdate)
+	{
+		// Case auto update buffers changed we have to destroy the current buffers
+		// since their usage will be different.
+		if (autoUpdate != mAutoUpdate)
+		{
+			mAutoUpdate = autoUpdate;
+			_destroyBuffers();
+		}
+	}
+
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	String BillboardSetFactory::FACTORY_TYPE_NAME = "BillboardSet";
