@@ -1141,11 +1141,11 @@ void ShaderGenerator::SGScheme::removeTechniqueEntry(SGTechnique* techEntry)
 void ShaderGenerator::SGScheme::validate()
 {
 
-	// Validate light state.
-	validateLightState();
+	// Synchronize with light settings.
+	synchronizeWithLightSettings();
 
-	// Validate fog state.
-	validateFogState();
+	// Synchronize with fog settings.
+	synchronizeWithFogSettings();
 
 	// The target scheme is up to date.
 	if (mOutOfDate == false)
@@ -1184,7 +1184,7 @@ void ShaderGenerator::SGScheme::validate()
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::SGScheme::validateLightState()
+void ShaderGenerator::SGScheme::synchronizeWithLightSettings()
 {
 	SceneManager* sceneManager = ShaderGenerator::getSingleton().getSceneManager();
 	const LightList& lightList =  sceneManager->_getLightsAffectingFrustum();
@@ -1214,7 +1214,7 @@ void ShaderGenerator::SGScheme::validateLightState()
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::SGScheme::validateFogState()
+void ShaderGenerator::SGScheme::synchronizeWithFogSettings()
 {
 	SceneManager* sceneManager = ShaderGenerator::getSingleton().getSceneManager();
 

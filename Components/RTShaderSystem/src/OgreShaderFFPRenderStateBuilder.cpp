@@ -124,19 +124,19 @@ void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, Re
 	renderState->reset();
 
 	// Build transformation sub state.
-	builFFPSubRenderState(FFP_TRANSFORM, FFPTransform::Type, sgPass, renderState);	
+	buildFFPSubRenderState(FFP_TRANSFORM, FFPTransform::Type, sgPass, renderState);	
 
 	// Build colour sub state.
-	builFFPSubRenderState(FFP_COLOUR, FFPColour::Type, sgPass, renderState);
+	buildFFPSubRenderState(FFP_COLOUR, FFPColour::Type, sgPass, renderState);
 
 	// Build lighting sub state.
-	builFFPSubRenderState(FFP_LIGHTING, FFPLighting::Type, sgPass, renderState);
+	buildFFPSubRenderState(FFP_LIGHTING, FFPLighting::Type, sgPass, renderState);
 
 	// Build texturing sub state.
-	builFFPSubRenderState(FFP_TEXTURING, FFPTexturing::Type, sgPass, renderState);	
+	buildFFPSubRenderState(FFP_TEXTURING, FFPTexturing::Type, sgPass, renderState);	
 	
 	// Build fog sub state.
-	builFFPSubRenderState(FFP_FOG, FFPFog::Type, sgPass, renderState);
+	buildFFPSubRenderState(FFP_FOG, FFPFog::Type, sgPass, renderState);
 	
 	// Resolve colour stage flags.
 	resolveColourStageFlags(sgPass, renderState);
@@ -145,7 +145,7 @@ void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, Re
 
 
 //-----------------------------------------------------------------------------
-void FFPRenderStateBuilder::builFFPSubRenderState(int subRenderStateOrder, const String& subRenderStateType,
+void FFPRenderStateBuilder::buildFFPSubRenderState(int subRenderStateOrder, const String& subRenderStateType,
 												ShaderGenerator::SGPass* sgPass, RenderState* renderState)
 {
 	SubRenderState* subRenderState;
@@ -162,11 +162,8 @@ void FFPRenderStateBuilder::builFFPSubRenderState(int subRenderStateOrder, const
 		renderState->addSubRenderState(subRenderState);
 	}
 	else
-	{
-		if (subRenderState->getType() == FFPColour::Type)
-		{
-			ShaderGenerator::getSingleton().destroySubRenderState(subRenderState);
-		}		
+	{		
+		ShaderGenerator::getSingleton().destroySubRenderState(subRenderState);				
 	}
 }
 

@@ -492,11 +492,11 @@ protected:
 		RenderState*			getRenderState			(const String& materialName, unsigned short passIndex);
 
 	protected:
-		/** Check changes in the scene's light state and apply to all affected materials */
-		void					validateLightState		();
+		/** Synchronize the current light settings of this scheme with the current settings of the scene. */
+		void					synchronizeWithLightSettings	();
 
-		/** Check changes in the scene's fog state and apply to all affected materials */
-		void					validateFogState		();
+		/** Synchronize the fog settings of this scheme with the current settings of the scene. */
+		void					synchronizeWithFogSettings		();
 
 
 	protected:

@@ -118,7 +118,7 @@ protected:
 	/** 
 	Internal method that builds FFP sub render state.
 	*/
-	void		builFFPSubRenderState			(int subRenderStateOrder, const String& subRenderStateType, 
+	void		buildFFPSubRenderState			(int subRenderStateOrder, const String& subRenderStateType, 
 												 ShaderGenerator::SGPass* sgPass, RenderState* renderState);
 	
 	/** 
