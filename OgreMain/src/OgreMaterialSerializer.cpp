@@ -3533,10 +3533,21 @@ namespace Ogre
     void MaterialSerializer::writeMaterial(const MaterialPtr& pMat)
     {
         LogManager::getSingleton().logMessage("MaterialSerializer : writing material " + pMat->getName() + " to queue.", LML_CRITICAL);
+
+		bool skipWriting = false;
+
+		// Fire pre-write event.
+		fireMaterialEvent(MSE_PRE_WRITE, skipWriting, pMat.get());
+		if (skipWriting)		
+			return;		
+
         // Material name
         writeAttribute(0, "material " + pMat->getName());
         beginSection(0);
         {
+			// Fire write begin event.
+			fireMaterialEvent(MSE_WRITE_BEGIN, skipWriting, pMat.get());
+
             // Write LOD information
             Material::LodValueIterator valueIt = pMat->getLodValueIterator();
             // Skip zero value
@@ -3579,13 +3590,26 @@ namespace Ogre
                 writeTechnique(it.getNext());
                 mBuffer += "\n";
             }
+
+			// Fire write end event.
+			fireMaterialEvent(MSE_WRITE_END, skipWriting, pMat.get());
         }
         endSection(0);
         mBuffer += "\n";
+
+		// Fire post section write event.
+		fireMaterialEvent(MSE_POST_WRITE, skipWriting, pMat.get());
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeTechnique(const Technique* pTech)
     {
+		bool skipWriting = false;
+
+		// Fire pre-write event.
+		fireTechniqueEvent(MSE_PRE_WRITE, skipWriting, pTech);
+		if (skipWriting)		
+			return;	
+		
         // Technique header
         writeAttribute(1, "technique");
         // only output technique name if it exists.
@@ -3594,6 +3618,9 @@ namespace Ogre
 
         beginSection(1);
         {
+			// Fire write begin event.
+			fireTechniqueEvent(MSE_WRITE_BEGIN, skipWriting, pTech);
+
 			// Lod index
 			if (mDefaults ||
 				pTech->getLodIndex() != 0)
@@ -3654,13 +3681,26 @@ namespace Ogre
                 writePass(it.getNext());
                 mBuffer += "\n";
             }
+
+			// Fire write end event.
+			fireTechniqueEvent(MSE_WRITE_END, skipWriting, pTech);
         }
         endSection(1);
+
+		// Fire post section write event.
+		fireTechniqueEvent(MSE_POST_WRITE, skipWriting, pTech);
 
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writePass(const Pass* pPass)
     {
+		bool skipWriting = false;
+
+		// Fire pre-write event.
+		firePassEvent(MSE_PRE_WRITE, skipWriting, pPass);
+		if (skipWriting)		
+			return;
+		
         writeAttribute(2, "pass");
         // only output pass name if its not the default name
         if (pPass->getName() != StringConverter::toString(pPass->getIndex()))
@@ -3668,6 +3708,9 @@ namespace Ogre
 
         beginSection(2);
         {
+			// Fire write begin event.
+			firePassEvent(MSE_WRITE_BEGIN, skipWriting, pPass);
+
             //lighting
             if (mDefaults ||
                 pPass->getLightingEnabled() != true)
@@ -4143,9 +4186,16 @@ namespace Ogre
             {
                 writeTextureUnit(it.getNext());
             }
+
+			// Fire write end event.
+			firePassEvent(MSE_WRITE_END, skipWriting, pPass);
         }
         endSection(2);
-        LogManager::getSingleton().logMessage("MaterialSerializer : done.", LML_CRITICAL);
+		
+		// Fire post section write event.
+		firePassEvent(MSE_POST_WRITE, skipWriting, pPass);
+        
+		LogManager::getSingleton().logMessage("MaterialSerializer : done.", LML_CRITICAL);
     }
     //-----------------------------------------------------------------------
     String MaterialSerializer::convertFiltering(FilterOptions fo)
@@ -4184,6 +4234,13 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeTextureUnit(const TextureUnitState *pTex)
     {
+		bool skipWriting = false;
+
+		// Fire pre-write event.
+		fireTextureUnitStateEvent(MSE_PRE_WRITE, skipWriting, pTex);
+		if (skipWriting)		
+			return;
+	
         LogManager::getSingleton().logMessage("MaterialSerializer : parsing texture layer.", LML_CRITICAL);
         mBuffer += "\n";
         writeAttribute(3, "texture_unit");
@@ -4193,6 +4250,9 @@ namespace Ogre
 
         beginSection(3);
         {
+			// Fire write begin event.
+			fireTextureUnitStateEvent(MSE_WRITE_BEGIN, skipWriting, pTex);
+
             // texture_alias
             if (!pTex->getTextureNameAlias().empty())
             {
@@ -4503,8 +4563,13 @@ namespace Ogre
 				};
 			}
 
+			// Fire write end event.
+			fireTextureUnitStateEvent(MSE_WRITE_END, skipWriting, pTex);
         }
         endSection(3);
+
+		// Fire post section write event.
+		fireTextureUnitStateEvent(MSE_POST_WRITE, skipWriting, pTex);
 
     }
     //-----------------------------------------------------------------------
@@ -4809,7 +4874,14 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeGpuProgramRef(const String& attrib,
         const GpuProgramPtr& program, const GpuProgramParametersSharedPtr& params)
-    {
+    {		
+		bool skipWriting = false;
+
+		// Fire pre-write event.
+		fireGpuProgramRefEvent(MSE_PRE_WRITE, skipWriting, attrib, program, params, NULL);
+		if (skipWriting)		
+			return;
+
         mBuffer += "\n";
         writeAttribute(3, attrib);
         writeValue(program->getName());
@@ -4821,12 +4893,21 @@ namespace Ogre
             if (program->hasDefaultParameters())
                 defaultParams = program->getDefaultParameters().getPointer();
 
+			// Fire write begin event.
+			fireGpuProgramRefEvent(MSE_WRITE_BEGIN, skipWriting, attrib, program, params, defaultParams);
+
             writeGPUProgramParameters(params, defaultParams);
+
+			// Fire write end event.
+			fireGpuProgramRefEvent(MSE_WRITE_END, skipWriting, attrib, program, params, defaultParams);
         }
         endSection(3);
 
         // add to GpuProgram contatiner
         mGpuProgramDefinitionContainer.insert(program->getName());
+
+		// Fire post section write event.
+		fireGpuProgramRefEvent(MSE_POST_WRITE, skipWriting, attrib, program, params, NULL);		
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeGPUProgramParameters(
@@ -5155,4 +5236,104 @@ namespace Ogre
         mGpuProgramBuffer += "\n";
     }
 
+	//---------------------------------------------------------------------
+	void MaterialSerializer::addListener(Listener* listener)
+	{
+		mListeners.push_back(listener);
+	}
+
+	//---------------------------------------------------------------------
+	void MaterialSerializer::removeListener(Listener* listener)
+	{
+		ListenerListIterator i, iend;
+		iend = mListeners.end();
+		for (i = mListeners.begin(); i != iend; ++i)
+		{
+			if (*i == listener)
+			{
+				mListeners.erase(i);
+				break;
+			}
+		}
+	}
+
+	//---------------------------------------------------------------------
+	void MaterialSerializer::fireMaterialEvent(SerializeEvent event, bool& skip, const Material* mat)
+	{
+		ListenerListIterator it	   = mListeners.begin();
+		ListenerListIterator itEnd = mListeners.end();
+
+		while (it != itEnd)
+		{
+			(*it)->materialEventRaised(this, event, skip, mat);			
+			if (skip)
+				break;
+			++it;
+		}		
+	}
+
+	//---------------------------------------------------------------------
+	void MaterialSerializer::fireTechniqueEvent(SerializeEvent event, bool& skip, const Technique* tech)
+	{
+		ListenerListIterator it	   = mListeners.begin();
+		ListenerListIterator itEnd = mListeners.end();
+
+		while (it != itEnd)
+		{
+			(*it)->techniqueEventRaised(this, event, skip, tech);
+			if (skip)
+				break;
+			++it;
+		}
+	}
+
+	//---------------------------------------------------------------------
+	void MaterialSerializer::firePassEvent(SerializeEvent event, bool& skip, const Pass* pass)
+	{
+		ListenerListIterator it	   = mListeners.begin();
+		ListenerListIterator itEnd = mListeners.end();
+
+		while (it != itEnd)
+		{
+			(*it)->passEventRaised(this, event, skip, pass);
+			if (skip)
+				break;
+			++it;
+		}
+	}
+
+	//---------------------------------------------------------------------
+	void MaterialSerializer::fireGpuProgramRefEvent(SerializeEvent event, bool& skip,
+		const String& attrib, 
+		const GpuProgramPtr& program, 
+		const GpuProgramParametersSharedPtr& params,
+		GpuProgramParameters* defaultParams)
+	{
+		ListenerListIterator it	   = mListeners.begin();
+		ListenerListIterator itEnd = mListeners.end();
+
+		while (it != itEnd)
+		{
+			(*it)->gpuProgramRefEventRaised(this, event, skip, attrib, program, params, defaultParams);
+			if (skip)
+				break;
+			++it;
+		}
+	}	
+
+	//---------------------------------------------------------------------
+	void MaterialSerializer::fireTextureUnitStateEvent(SerializeEvent event, bool& skip,
+		const TextureUnitState* textureUnit)
+	{
+		ListenerListIterator it	   = mListeners.begin();
+		ListenerListIterator itEnd = mListeners.end();
+
+		while (it != itEnd)
+		{
+			(*it)->textureUnitStateEventRaised(this, event, skip, textureUnit);
+			if (skip)
+				break;
+			++it;
+		}
+	}	
 }

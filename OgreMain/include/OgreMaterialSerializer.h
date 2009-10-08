@@ -102,7 +102,84 @@ namespace Ogre {
 
     /** Class for serializing Materials to / from a .material script.*/
 	class _OgreExport MaterialSerializer : public SerializerAlloc
-    {
+    {	
+	public:
+
+		// Material serizliae event.
+		enum SerializeEvent
+		{
+			MSE_PRE_WRITE,
+			MSE_WRITE_BEGIN,
+			MSE_WRITE_END,
+			MSE_POST_WRITE,
+		};
+
+		/** Class that allows listening in on the various stages of material serialization process.
+		Sub-classing it enable extending the attribute set of any part in the material.
+		*/
+		class Listener
+		{
+		public:
+			virtual ~Listener() {}
+			
+			/** Called when material section event raised.					
+			@param ser The MaterialSerializer instance that writes the given material.
+			@param stage The current section writing stage.
+			@param skip May set to true by sub-class instances in order to skip the following section write.
+			This parameter relevant only when stage equals MSE_PRE_WRITE. 
+			@param mat The material that is being written.			
+			*/
+			virtual void materialEventRaised(MaterialSerializer* ser, 
+				SerializeEvent event, bool& skip, const Material* mat) {}
+			
+			/** Called when technique section event raised.				
+			@param ser The MaterialSerializer instance that writes the given material.
+			@param stage The current section writing stage.
+			@param skip May set to true by sub-class instances in order to skip the following section write.
+			This parameter relevant only when stage equals MSE_PRE_WRITE. 
+			@param tech The technique that is being written.		
+			*/
+			virtual void techniqueEventRaised(MaterialSerializer* ser, 
+				SerializeEvent event, bool& skip, const Technique* tech) {}
+		
+			/** Called when pass section event raised.					
+			@param ser The MaterialSerializer instance that writes the given material.
+			@param stage The current section writing stage.
+			@param skip May set to true by sub-class instances in order to skip the following section write.
+			This parameter relevant only when stage equals MSE_PRE_WRITE. 
+			@param pass The pass that is being written.		
+			*/
+			virtual void passEventRaised(MaterialSerializer* ser, 
+				SerializeEvent event, bool& skip, const Pass* pass) {}
+
+			/** Called when GPU program reference section event raised.				
+			@param ser The MaterialSerializer instance that writes the given material.
+			@param stage The current section writing stage.
+			@param skip May set to true by sub-class instances in order to skip the following section write.
+			This parameter relevant only when stage equals MSE_PRE_WRITE. 
+			@param attrib The GPU program reference description (vertex_program_ref, fragment_program_ref, etc).		
+			@param program The program being written.
+			@param params The program parameters.
+			@param defaultParams The default program parameters.
+			*/
+			void gpuProgramRefEventRaised(MaterialSerializer* ser, 
+				SerializeEvent event, bool& skip,
+				const String& attrib, 
+				const GpuProgramPtr& program, 
+				const GpuProgramParametersSharedPtr& params,
+				GpuProgramParameters* defaultParams) {}
+
+			/** Called when texture unit state section event raised.					
+			@param ser The MaterialSerializer instance that writes the given material.
+			@param stage The current section writing stage.
+			@param skip May set to true by sub-class instances in order to skip the following section write.
+			This parameter relevant only when stage equals MSE_PRE_WRITE. 
+			@param textureUnit The texture unit state that is being written.		
+			*/
+			virtual void textureUnitStateEventRaised(MaterialSerializer* ser, 
+				SerializeEvent event, bool& skip, const TextureUnitState* textureUnit) {}			
+		};
+
     protected:
         /// Keyword-mapped attribute parsers.
         typedef map<String, ATTRIBUTE_PARSER>::type AttribParserList;
@@ -135,6 +212,13 @@ namespace Ogre {
         AttribParserList mProgramAttribParsers;
         /// Parsers for the program definition section of a script
         AttribParserList mProgramDefaultParamAttribParsers;
+
+		/// Listeners list of this Serializer.
+		typedef vector<Listener*>::type			ListenerList;
+		typedef ListenerList::iterator			ListenerListIterator;
+		typedef ListenerList::const_iterator	ListenerListConstIterator;
+		ListenerList mListeners;
+
 
         void writeMaterial(const MaterialPtr& pMat);
         void writeTechnique(const Technique* pTech);
@@ -177,7 +261,39 @@ namespace Ogre {
 		void writeEnvironmentMapEffect(const TextureUnitState::TextureEffect& effect, const TextureUnitState *pTex);
 
         String convertFiltering(FilterOptions fo);
-    public:
+
+		
+		/** Internal methods that invokes registered listeners callback.
+		@see Listener::materialEventRaised.
+		*/
+		void fireMaterialEvent(SerializeEvent event, bool& skip, const Material* mat);
+
+		/** Internal methods that invokes registered listeners callback.
+		@see Listener::techniqueEventRaised.
+		*/
+		void fireTechniqueEvent(SerializeEvent event, bool& skip, const Technique* tech);
+		
+		/** Internal methods that invokes registered listeners callback.
+		@see Listener::passEventRaised.
+		*/
+		void firePassEvent(SerializeEvent event, bool& skip, const Pass* pass);
+		
+		/** Internal methods that invokes registered listeners callback.
+		@see Listener::gpuProgramRefEventRaised.
+		*/
+		void fireGpuProgramRefEvent(SerializeEvent event, bool& skip,
+			const String& attrib, 
+			const GpuProgramPtr& program, 
+			const GpuProgramParametersSharedPtr& params,
+			GpuProgramParameters* defaultParams);
+	
+
+		/** Internal methods that invokes registered listeners callback.
+		@see Listener::textureUnitStateEventRaised.
+		*/
+		void fireTextureUnitStateEvent(SerializeEvent event, bool& skip, const TextureUnitState* textureUnit);
+		
+   public:		
 		/** default constructor*/
 		MaterialSerializer();
 		/** default destructor*/
@@ -221,7 +337,15 @@ namespace Ogre {
         */
         void parseScript(DataStreamPtr& stream, const String& groupName);
 
+		/** Register a listener to this Serializer.
+		@see MaterialSerializer::Listener
+		*/
+		void addListener(Listener* listener);
 
+		/** Remove a listener from this Serializer.
+		@see MaterialSerializer::Listener
+		*/
+		void removeListener(Listener* listener);
 
 	private:
 		String mBuffer;
@@ -230,7 +354,8 @@ namespace Ogre {
         typedef GpuProgramDefinitionContainer::iterator GpuProgramDefIterator;
         GpuProgramDefinitionContainer mGpuProgramDefinitionContainer;
 		bool mDefaults;
-
+		
+	public:
         void beginSection(unsigned short level, const bool useMainBuffer = true)
 		{
             String& buffer = (useMainBuffer ? mBuffer : mGpuProgramBuffer);
@@ -279,6 +404,8 @@ namespace Ogre {
             }
             buffer += "// " + comment;
 		}
+
+
 
     };
 	/** @} */
