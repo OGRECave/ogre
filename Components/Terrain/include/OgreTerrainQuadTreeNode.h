@@ -339,6 +339,7 @@ namespace Ogre
 			void visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables = false);
 			bool isVisible(void) const;
 			uint32 getVisibilityFlags(void) const;
+			uint32 getQueryFlags(void) const;
 
 		};
 		Movable* mMovable;

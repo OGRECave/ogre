@@ -1462,6 +1462,12 @@ namespace Ogre
 		// Combine own vis (in case anyone sets this) and terrain overall
 		return mVisibilityFlags & mParent->getTerrain()->getVisibilityFlags();
 	}
+	//---------------------------------------------------------------------
+	uint32 TerrainQuadTreeNode::Movable::getQueryFlags(void) const
+	{
+		// Combine own vis (in case anyone sets this) and terrain overall
+		return mQueryFlags & mParent->getTerrain()->getQueryFlags();
+	}
 	//------------------------------------------------------------------------
 	void TerrainQuadTreeNode::Movable::_updateRenderQueue(RenderQueue* queue)
 	{

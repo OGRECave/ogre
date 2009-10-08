@@ -990,7 +990,21 @@ namespace Ogre
 		/** Set the visibility flags for this terrain.
 		@remarks The default is specified in TerrainGlobalOptions
 		*/
-		void setVisibilityFlags(uint32 flags);
+		void setVisibilityFlags(uint32 flags) { mVisibilityFlags = flags; }
+
+		/// Get the query flags for this terrain.
+		uint32 getQueryFlags(void) const { return mQueryFlags; }
+		/** Set the query flags for this terrain.
+		@remarks The default is specified in TerrainGlobalOptions
+		*/
+		void setQueryFlags(uint32 flags) { mQueryFlags = flags; }
+		
+		/** As setQueryFlags, except the flags passed as parameters are appended to the existing flags on this object. */
+		void addQueryFlags(uint32 flags) { mQueryFlags |= flags; }
+		
+		/* As setQueryFlags, except the flags passed as parameters are removed from the existing flags on this object. */
+		void removeQueryFlags(uint32 flags) { mQueryFlags &= ~flags; }
+		
 
 		/** Retrieve the layer blending map for a given layer, which may
 			be used to edit the blending information for that layer.
@@ -1234,6 +1248,7 @@ namespace Ogre
 		Real mSkirtSize;
 		uint8 mRenderQueueGroup;
 		uint32 mVisibilityFlags;
+		uint32 mQueryFlags;
 
 		Rect mDirtyGeometryRect;
 		Rect mDirtyDerivedDataRect;
@@ -1348,6 +1363,7 @@ namespace Ogre
 		static Real msMaxPixelError;
 		static uint8 msRenderQueueGroup;
 		static uint32 msVisibilityFlags;
+		static uint32 msQueryFlags;
 		static bool msUseRayBoxDistanceCalculation;
 		static TerrainMaterialGeneratorPtr msDefaultMaterialGenerator;
 		static uint16 msLayerBlendMapSize;
@@ -1426,6 +1442,21 @@ namespace Ogre
 		maintain their own settings
 		*/
 		static void setVisibilityFlags(uint32 flags) { msVisibilityFlags = flags; }
+
+		/** Set the default query flags for terrains.
+		@remarks This applies to newly created terrains, after which they will
+		maintain their own settings
+		*/
+		static void  setQueryFlags(uint32 flags) { msQueryFlags = flags; }
+		/** Get the default query flags for terrains.
+		*/
+		static uint32 getQueryFlags(void) { return msQueryFlags; }
+
+		/** As setQueryFlags, except the flags passed as parameters are appended to the existing flags on this object. */
+		static void addQueryFlags(uint32 flags) { msQueryFlags |= flags; }
+
+		/* As setQueryFlags, except the flags passed as parameters are removed from the existing flags on this object. */
+		static void removeQueryFlags(uint32 flags) { msQueryFlags &= ~flags; }
 
 		/** Returns whether or not to use an accurate calculation of camera distance
 			from a terrain tile (ray / AABB intersection) or whether to use the
