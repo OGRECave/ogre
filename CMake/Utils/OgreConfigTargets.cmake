@@ -299,6 +299,12 @@ function(ogre_config_sample SAMPLENAME)
           ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
         )
       endif()
+      if (OGRE_BUILD_CEGUIRENDERER)    
+        add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
+        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/libCEGUIOgreRenderer.dylib 
+          ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+        )
+      endif()
     endif()
   endif (APPLE)
 
