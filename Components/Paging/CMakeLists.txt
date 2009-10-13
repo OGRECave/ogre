@@ -60,20 +60,13 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/OgreMain/include)
 
 # setup target
-add_library(OgrePaging ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
+add_library(OgrePaging STATIC ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
 set_target_properties(OgrePaging PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OGRE_VERSION_MAJOR})
 target_link_libraries(OgrePaging OgreMain)
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(OgrePaging ${Boost_LIBRARIES})
 endif ()
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
-    # Set the INSTALL_PATH so that Plugins can be installed in the application package
-    set_target_properties(OgrePaging
-       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-       INSTALL_NAME_DIR "@executable_path/../Plugins"
-    )
-endif()
 
 # install 
 ogre_config_lib(OgrePaging)
