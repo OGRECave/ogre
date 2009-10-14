@@ -62,8 +62,7 @@ namespace Ogre {
 		"<PixelFormat> ::= 'PF_A8R8G8B8' | 'PF_R8G8B8A8' | 'PF_R8G8B8' | 'PF_FLOAT16_RGBA' | \n"
         "   'PF_FLOAT16_RGB' | 'PF_FLOAT16_R' | 'PF_FLOAT32_RGBA' | 'PF_FLOAT32_RGB' | 'PF_FLOAT32_R' | \n"
 		"   'PF_FLOAT16_GR' | 'PF_FLOAT32_GR' \n"
-		//TODO GSOC : Change this to pooled later on
-		"<Shared> ::= 'shared' \n"
+		"<Pooled> ::= 'pooled' \n"
 		"<Scope> ::= 'local_scope' | 'chain_scope' | 'global_scope' \n"
 		// Target
 		"<Target> ::= 'target ' <Label> '{' {<TargetOptions>} {<Pass>} '}' \n"
@@ -175,7 +174,7 @@ namespace Ogre {
 		addLexemeToken("PF_FLOAT32_GR", ID_PF_FLOAT32_GR);
 		addLexemeToken("PF_FLOAT32_RGB", ID_PF_FLOAT32_RGB);
 		addLexemeToken("PF_FLOAT32_RGBA", ID_PF_FLOAT32_RGBA);
-		addLexemeToken("shared", ID_POOLED); //TODO GSOC : change name string later too
+		addLexemeToken("pooled", ID_POOLED);
 		addLexemeToken("local_scope", ID_SCOPE_LOCAL); 
 		addLexemeToken("chain_scope", ID_SCOPE_CHAIN); 
 		addLexemeToken("global_scope", ID_SCOPE_GLOBAL);
