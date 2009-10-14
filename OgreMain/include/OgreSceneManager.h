@@ -787,9 +787,28 @@ namespace Ogre {
         virtual void ensureShadowTexturesCreated();
         /// Internal method for destroying shadow textures (texture-based shadows)
         virtual void destroyShadowTextures(void);
-        /// Internal method for preparing shadow textures ready for use in a regular render
-        virtual void prepareShadowTextures(Camera* cam, Viewport* vp);
+        
+	public:
+		/// Method for preparing shadow textures ready for use in a regular render
+		/// Do not call manually unless before frame start or rendering is paused
+		/// If lightList is not supplied, will render all lights in frustum
+        virtual void prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList = 0);
 
+		//A render context, used to store internal data for pausing/resuming rendering
+		//TODO GSOC : Should the struct be declared here so that other SM implementations
+		//will be able to subclass here?
+		struct RenderContext;
+
+		/** Pause rendering of the frame. This has to be called when inside a renderScene call
+			(Usually using a listener of some sort)
+		*/
+		virtual RenderContext* _pauseRendering();
+		/** Resume rendering of the frame. This has to be called after a _pauseRendering call
+		@param context The rendring context, as returned by the _pauseRendering call
+		*/
+		virtual void _resumeRendering(RenderContext* context);
+
+	protected:
         /** Internal method for rendering all the objects for a given light into the 
             stencil buffer.
         @param light The light source
@@ -3177,7 +3196,8 @@ namespace Ogre {
 			@param rend		Renderable to render
 			@param shadowDerivation Whether passes should be replaced with shadow caster / receiver passes
 		 */
-		virtual void _injectRenderWithPass(Pass *pass, Renderable *rend, bool shadowDerivation = true);
+		virtual void _injectRenderWithPass(Pass *pass, Renderable *rend, bool shadowDerivation = true,
+			bool doLightIteration = false, const LightList* manualLightList = 0);
 
 		/** Indicates to the SceneManager whether it should suppress changing
 			the RenderSystem states when rendering objects.

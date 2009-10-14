@@ -156,7 +156,19 @@ CompositorInstance *CompositorChain::getCompositor(size_t index)
     assert (index < mInstances.size() && "Index out of bounds.");
     return mInstances[index];
 }
-
+//-----------------------------------------------------------------------
+CompositorInstance *CompositorChain::getCompositor(const String& name)
+{
+	for (Instances::iterator it = mInstances.begin(); it != mInstances.end(); ++it) 
+	{
+		if ((*it)->getCompositor()->getName() == name) 
+		{
+			return *it;
+		}
+	}
+	OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Invalid compositor name",
+		"CompositorChain::getCompositor");
+}
 //-----------------------------------------------------------------------
 CompositorChain::InstanceIterator CompositorChain::getCompositors()
 {
@@ -180,7 +192,7 @@ void CompositorChain::setCompositorEnabled(size_t position, bool state)
 				CompositionTargetPass* tp = tpit.getNext();
 				if (tp->getInputMode() == CompositionTargetPass::IM_PREVIOUS)
 				{
-					if (nextInstance->getTechnique()->getTextureDefinition(tp->getOutputName())->shared)
+					if (nextInstance->getTechnique()->getTextureDefinition(tp->getOutputName())->pooled)
 					{
 						// recreate
 						nextInstance->freeResources(false, true);

@@ -51,8 +51,10 @@ namespace Ogre {
 		"<Script> ::= {<Compositor>} \n"
 		"<Compositor> ::= 'compositor' <Flex_Label> '{' {<Technique>} '}' \n"
 		// Technique
-		"<Technique> ::= 'technique' '{' {<Texture>} {<Target>} <TargetOutput> '}' \n"
-		"<Texture> ::= 'texture' <Label> <WidthOption> <HeightOption> <PixelFormat> {<PixelFormat>} [<Shared>] \n"
+		"<Technique> ::= 'technique' '{' {<Logic>} {<Texture>} {<TextureReference>} {<Target>} <TargetOutput> '}' \n"
+		"<Logic> ::= 'compositor_logic' <Label> \n"
+		"<Texture> ::= 'texture' <Label> <WidthOption> <HeightOption> <PixelFormat> {<PixelFormat>} [<Shared>] [<Scope>] \n"
+		"<TextureReference> ::= 'texture_ref' <Label> <RefCompositorName> <RefTextureName> \n"
 		"<WidthOption> ::= <TargetWidthScaled> | 'target_width' | <#width> \n"
 		"<HeightOption> ::= <TargetHeightScaled> | 'target_height' | <#height> \n"
 		"<TargetWidthScaled> ::= 'target_width_scaled' <#scaling> \n"
@@ -60,7 +62,9 @@ namespace Ogre {
 		"<PixelFormat> ::= 'PF_A8R8G8B8' | 'PF_R8G8B8A8' | 'PF_R8G8B8' | 'PF_FLOAT16_RGBA' | \n"
         "   'PF_FLOAT16_RGB' | 'PF_FLOAT16_R' | 'PF_FLOAT32_RGBA' | 'PF_FLOAT32_RGB' | 'PF_FLOAT32_R' | \n"
 		"   'PF_FLOAT16_GR' | 'PF_FLOAT32_GR' \n"
+		//TODO GSOC : Change this to pooled later on
 		"<Shared> ::= 'shared' \n"
+		"<Scope> ::= 'local_scope' | 'chain_scope' | 'global_scope' \n"
 		// Target
 		"<Target> ::= 'target ' <Label> '{' {<TargetOptions>} {<Pass>} '}' \n"
 	    "<TargetOptions> ::=	<TargetInput> | <OnlyInitial> | <VisibilityMask> | \n"
@@ -153,6 +157,8 @@ namespace Ogre {
 		// Technique section
 		addLexemeAction("technique", &CompositorScriptCompiler::parseTechnique);
 		addLexemeAction("texture", &CompositorScriptCompiler::parseTexture);
+		addLexemeAction("texture_ref", &CompositorScriptCompiler::parseTextureRef);
+		addLexemeAction("compositor_logic", &CompositorScriptCompiler::parseCompositorLogic);
 		addLexemeAction("scheme", &CompositorScriptCompiler::parseScheme);
 		addLexemeToken("target_width_scaled", ID_TARGET_WIDTH_SCALED);
 		addLexemeToken("target_height_scaled", ID_TARGET_HEIGHT_SCALED);
@@ -169,7 +175,10 @@ namespace Ogre {
 		addLexemeToken("PF_FLOAT32_GR", ID_PF_FLOAT32_GR);
 		addLexemeToken("PF_FLOAT32_RGB", ID_PF_FLOAT32_RGB);
 		addLexemeToken("PF_FLOAT32_RGBA", ID_PF_FLOAT32_RGBA);
-		addLexemeToken("shared", ID_SHARED);
+		addLexemeToken("shared", ID_POOLED); //TODO GSOC : change name string later too
+		addLexemeToken("local_scope", ID_SCOPE_LOCAL); 
+		addLexemeToken("chain_scope", ID_SCOPE_CHAIN); 
+		addLexemeToken("global_scope", ID_SCOPE_GLOBAL);
 		addLexemeToken("gamma", ID_GAMMA);
 		addLexemeToken("no_fsaa", ID_NO_FSAA);
 
@@ -440,8 +449,8 @@ namespace Ogre {
 			case ID_PF_FLOAT32_RGBA:
 				textureDef->formatList.push_back(PF_FLOAT32_RGBA);
 				break;
-			case ID_SHARED:
-				textureDef->shared = true;
+			case ID_POOLED:
+				textureDef->pooled = true;
 				break;
 			case ID_GAMMA:
 				textureDef->hwGammaWrite = true;
@@ -449,11 +458,40 @@ namespace Ogre {
 			case ID_NO_FSAA:
 				textureDef->fsaa = false;
 				break;
+			case ID_SCOPE_LOCAL:
+				textureDef->scope = CompositionTechnique::TS_LOCAL;
+				break;
+			case ID_SCOPE_CHAIN:
+				textureDef->scope = CompositionTechnique::TS_CHAIN;
+				break;
+			case ID_SCOPE_GLOBAL:
+				textureDef->scope = CompositionTechnique::TS_GLOBAL;
+				break;
 			default:
 				// should never get here?
 				break;
 			}
 		}
+	}
+	//-----------------------------------------------------------------------
+	void CompositorScriptCompiler::parseTextureRef(void)
+	{
+	    assert(mScriptContext.technique);
+		const String textureName = getNextTokenLabel();
+		const String compositorName = getNextTokenLabel();
+		const String compositorTextureName = getNextTokenLabel();
+
+        CompositionTechnique::TextureDefinition* textureDef = mScriptContext.technique->createTextureDefinition(textureName);
+		textureDef->refCompName = compositorName;
+		textureDef->refTexName = compositorTextureName;
+	}
+	//-----------------------------------------------------------------------
+	void CompositorScriptCompiler::parseCompositorLogic(void)
+	{
+	    assert(mScriptContext.technique);
+		const String compositorLogicName = getNextTokenLabel();
+
+		mScriptContext.technique->setCompositorLogicName(compositorLogicName);
 	}
 	//-----------------------------------------------------------------------
 	void CompositorScriptCompiler::parseScheme(void)
@@ -562,6 +600,11 @@ namespace Ogre {
         case ID_RENDER_SCENE:
             passType = CompositionPass::PT_RENDERSCENE;
             break;
+
+		case ID_RENDER_CUSTOM:
+			passType = CompositionPass::PT_RENDERCUSTOM;
+			mScriptContext.pass->setCustomType(getNextTokenLabel());
+			break;
 
         default:
             break;

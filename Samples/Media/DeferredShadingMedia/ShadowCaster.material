@@ -1,0 +1,15 @@
+material DeferredShading/Shadows/Caster
+{
+	technique
+	{
+		pass
+		{
+			vertex_program_ref DeferredShading/Shadows/CasterVP
+			{
+			}
+			fragment_program_ref DeferredShading/Shadows/CasterFP
+			{
+			}
+		}
+	}
+}

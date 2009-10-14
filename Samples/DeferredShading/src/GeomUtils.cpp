@@ -22,8 +22,8 @@ same license as the rest of the engine.
 using namespace Ogre;
 
 void GeomUtils::createSphere(  const String& strName
-							 , const float radius
-							 , const int nRings, const int nSegments
+							 , float radius
+							 , int nRings, int nSegments
 							 , bool bNormals
 							 , bool bTexCoords)
 {
@@ -168,4 +168,87 @@ void GeomUtils::createQuad(VertexData*& vertexData)
 		1,1,-1,   // corner 3
 		1,-1,-1}; // corner 4
 		vbuf->writeData(0, sizeof(data), data, true);
+}
+
+void GeomUtils::createCone(const Ogre::String& strName , float radius , float height, int nVerticesInBase)
+{
+	MeshPtr pCone = MeshManager::getSingleton().createManual(strName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	SubMesh *pConeVertex = pCone->createSubMesh();
+	pCone->sharedVertexData = new VertexData();
+
+	createCone(pCone->sharedVertexData, pConeVertex->indexData
+		, radius
+		, height
+		, nVerticesInBase);
+
+	// Generate face list
+	pConeVertex->useSharedVertices = true;
+
+	// the original code was missing this line:
+	pCone->_setBounds( AxisAlignedBox( 
+		Vector3(-radius, 0, -radius), 
+		Vector3(radius, height, radius) ), false );
+
+	pCone->_setBoundingSphereRadius(Math::Sqrt(height*height + radius*radius));
+	// this line makes clear the mesh is loaded (avoids memory leaks)
+	pCone->load();
+}
+
+
+void GeomUtils::createCone(Ogre::VertexData*& vertexData, Ogre::IndexData*& indexData, 
+					   float radius , float height, int nVerticesInBase)
+{
+	assert(vertexData && indexData);
+
+	// define the vertex format
+	VertexDeclaration* vertexDecl = vertexData->vertexDeclaration;
+	// positions
+	vertexDecl->addElement(0, 0, VET_FLOAT3, VES_POSITION);
+	
+	// allocate the vertex buffer
+	vertexData->vertexCount = nVerticesInBase + 1;
+	HardwareVertexBufferSharedPtr vBuf = HardwareBufferManager::getSingleton().createVertexBuffer(vertexDecl->getVertexSize(0), vertexData->vertexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+	VertexBufferBinding* binding = vertexData->vertexBufferBinding;
+	binding->setBinding(0, vBuf);
+	float* pVertex = static_cast<float*>(vBuf->lock(HardwareBuffer::HBL_DISCARD));
+
+	// allocate index buffer - cone and base
+	indexData->indexCount = (3 * nVerticesInBase) + (3 * (nVerticesInBase - 2));
+	indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(HardwareIndexBuffer::IT_16BIT, indexData->indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+	HardwareIndexBufferSharedPtr iBuf = indexData->indexBuffer;
+	unsigned short* pIndices = static_cast<unsigned short*>(iBuf->lock(HardwareBuffer::HBL_DISCARD));
+
+	//Positions : cone head and base
+	for (int i=0; i<3; i++)
+		*pVertex++ = 0.0f;
+
+	//Base :
+	float fDeltaBaseAngle = (2 * Math::PI) / nVerticesInBase;
+	for (int i=0; i<nVerticesInBase; i++)
+	{
+		float angle = i * fDeltaBaseAngle;
+		*pVertex++ = radius * cosf(angle);
+		*pVertex++ = height;
+		*pVertex++ = radius * sinf(angle);
+	}
+
+	//Indices :
+	//Cone head to vertices
+	for (int i=0; i<nVerticesInBase; i++)
+	{
+		*pIndices++ = 0;
+		*pIndices++ = (i%nVerticesInBase) + 1;
+		*pIndices++ = ((i+1)%nVerticesInBase) + 1;
+	}
+	//Cone base
+	for (int i=0; i<nVerticesInBase-2; i++)
+	{
+		*pIndices++ = 1;
+		*pIndices++ = i + 3;
+		*pIndices++ = i + 2;
+	}
+
+	// Unlock
+	vBuf->unlock();
+	iBuf->unlock();
 }

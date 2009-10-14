@@ -43,12 +43,6 @@ MaterialGenerator::~MaterialGenerator()
 
 const MaterialPtr &MaterialGenerator::getMaterial(Perm permutation)
 {
-	/// Check input validity
-	size_t totalBits = bitNames.size();
-	size_t totalPerms = 1<<totalBits;
-	assert(permutation < totalPerms);
-    (void)totalPerms; // Silence warning
-
 	/// Check if material/shader permutation already was generated
 	MaterialMap::iterator i = mMaterials.find(permutation);
 	if(i != mMaterials.end())
@@ -63,10 +57,7 @@ const MaterialPtr &MaterialGenerator::getMaterial(Perm permutation)
 		GpuProgramPtr fs = getFragmentShader(permutation & fsMask);
 		
 		/// Create material name
-		String name=materialBaseName;
-		for(size_t bit=0; bit<totalBits; ++bit)
-			if(permutation & (1<<bit))
-				name += bitNames[bit];
+		String name = materialBaseName + StringConverter::toString(permutation);
 
 		std::cerr << name << " " << vs->getName() << " " << fs->getName() << std::endl;
 		/// Create material from template, and set shaders

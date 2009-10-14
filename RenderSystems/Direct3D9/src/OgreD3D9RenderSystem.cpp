@@ -2719,7 +2719,16 @@ namespace Ogre
 			return;
 
 		IDirect3DSurface9* pDepth = NULL;
-		target->getCustomAttribute( "D3DZBUFFER", &pDepth );
+
+		//Check if we saved a depth buffer for this target
+		TargetDepthStencilMap::iterator savedTexture = mCheckedOutTextures.find(target);
+		if (savedTexture != mCheckedOutTextures.end())
+		{
+			pDepth = savedTexture->second.surface;
+		}
+
+		if (!pDepth)
+			target->getCustomAttribute( "D3DZBUFFER", &pDepth );
 		if (!pDepth)
 		{
 			/// No depth buffer provided, use our own
@@ -2820,7 +2829,80 @@ namespace Ogre
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error ending frame", "D3D9RenderSystem::_endFrame" );
 
 		mDeviceManager->destroyInactiveRenderDevices();
-	}	
+	}
+	//---------------------------------------------------------------------
+	struct D3D9RenderContext : public RenderSystem::RenderSystemContext
+	{
+		RenderTarget* target;
+	};
+	//---------------------------------------------------------------------
+	D3D9RenderSystem::ZBufferIdentifier D3D9RenderSystem::getZBufferIdentifier(RenderTarget* rt)
+	{
+		// Retrieve render surfaces (up to OGRE_MAX_MULTIPLE_RENDER_TARGETS)
+		IDirect3DSurface9* pBack[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+		memset(pBack, 0, sizeof(pBack));
+		rt->getCustomAttribute( "DDBACKBUFFER", &pBack );
+		assert(pBack[0]);
+
+		/// Request a depth stencil that is compatible with the format, multisample type and
+		/// dimensions of the render target.
+		D3DSURFACE_DESC srfDesc;
+		HRESULT hr = pBack[0]->GetDesc(&srfDesc);
+		assert(!(FAILED(hr)));
+		D3DFORMAT dsfmt = _getDepthStencilFormatFor(srfDesc.Format);
+		assert(dsfmt != D3DFMT_UNKNOWN);
+
+		/// Build identifier and return
+		ZBufferIdentifier zBufferIdentifier;
+		zBufferIdentifier.format = dsfmt;
+		zBufferIdentifier.multisampleType = srfDesc.MultiSampleType;
+		zBufferIdentifier.device = getActiveD3D9Device();
+		return zBufferIdentifier;
+	}
+	//---------------------------------------------------------------------
+	RenderSystem::RenderSystemContext* D3D9RenderSystem::_pauseFrame(void)
+	{
+		//Stop rendering
+		_endFrame();
+
+		D3D9RenderContext* context = new D3D9RenderContext;
+		context->target = mActiveRenderTarget;
+
+		//Get the matching z buffer identifier and queue
+		ZBufferIdentifier zBufferIdentifier = getZBufferIdentifier(mActiveRenderTarget);
+		ZBufferRefQueue& zBuffers = mZBufferHash[zBufferIdentifier];
+		
+#ifdef OGRE_DEBUG_MODE
+		//Check that queue handling works as expected
+		IDirect3DSurface9* pDepth;
+		getActiveD3D9Device()->GetDepthStencilSurface(&pDepth);		
+		assert(zBuffers.front().surface == pDepth);
+#endif
+
+		//Store the depth buffer in the side and remove it from the queue
+		mCheckedOutTextures[mActiveRenderTarget] = zBuffers.front();
+		zBuffers.pop_front();
+		
+		return context;
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::_resumeFrame(RenderSystemContext* context)
+	{
+		//Resume rendering
+		_beginFrame();
+		D3D9RenderContext* d3dContext = static_cast<D3D9RenderContext*>(context);
+
+		///Find the stored depth buffer
+		ZBufferIdentifier zBufferIdentifier = getZBufferIdentifier(d3dContext->target);
+		ZBufferRefQueue& zBuffers = mZBufferHash[zBufferIdentifier];
+		assert(mCheckedOutTextures.find(d3dContext->target) != mCheckedOutTextures.end());
+		
+		//Return it to the general queue
+		zBuffers.push_front(mCheckedOutTextures[d3dContext->target]);
+		mCheckedOutTextures.erase(d3dContext->target);
+		
+		delete context;
+	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::setVertexDeclaration(VertexDeclaration* decl)
 	{
@@ -3665,19 +3747,21 @@ namespace Ogre
 		zBufferIdentifer.multisampleType = multisample;
 		zBufferIdentifer.device = getActiveD3D9Device();
 
-		ZBufferHash::iterator i = mZBufferHash.find(zBufferIdentifer);
-		if(i != mZBufferHash.end())
+		ZBufferRefQueue& zBuffers = mZBufferHash[zBufferIdentifer];
+		
+		if(!zBuffers.empty())
 		{
+			const ZBufferRef& zBuffer = zBuffers.front();
 			/// Check if size is larger or equal
-			if(i->second.width >= width && i->second.height >= height)
+			if(zBuffer.width >= width && zBuffer.height >= height)
 			{
-				surface = i->second.surface;
+				surface = zBuffer.surface;
 			} 
 			else
 			{
 				/// If not, destroy current buffer
-				i->second.surface->Release();
-				mZBufferHash.erase(i);
+				zBuffer.surface->Release();
+				zBuffers.pop_front();
 			}
 		}
 		if(!surface)
@@ -3702,7 +3786,7 @@ namespace Ogre
 			zb.surface = surface;
 			zb.width = width;
 			zb.height = height;
-			mZBufferHash[zBufferIdentifer] = zb;
+			zBuffers.push_front(zb);
 		}
 		return surface;
 	}
@@ -3715,7 +3799,11 @@ namespace Ogre
 			/// Release buffer
 			if (i->first.device == d3d9Device)
 			{
-				i->second.surface->Release();
+				while (i->second.empty())
+				{
+					i->second.front().surface->Release();
+					i->second.pop_front();
+				}
 				i = mZBufferHash.erase(i);
 			}			
 			else

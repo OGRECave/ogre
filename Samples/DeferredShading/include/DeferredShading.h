@@ -1,22 +1,18 @@
 /**
 Implementation of a Deferred Shading engine in OGRE, using Multiple Render Targets and
-HLSL/GLSL high level language shaders.
-	// W.J. :wumpus: van der Laan 2005 //
+CG high level language shaders.
+	// W.J. :wumpus: van der Laan 2005 / Noam Gat 2009 //
 
 Deferred shading renders the scene to a 'fat' texture format, using a shader that outputs colour, 
 normal, depth, and possible other attributes per fragment. Multi Render Target is required as we 
 are dealing with many outputs which get written into multiple render textures in the same pass.
 
 After rendering the scene in this format, the shading (lighting) can be done as a post process. 
-This means that lighting is done in screen space. Adding them requires nothing more than rendering 
-a screenful quad; thus the method allows for an enormous amount of lights without noticeable 
-performance loss.
+This means that lighting is done in screen space, using light-representing geometry (sphere for
+point light, cone for spot light and quad for directional) to render their contribution.
 
-Little lights affecting small area ("Minilights") can be even further optimised by rendering 
-their convex bounding geometry. This is also shown in this demo by 6 swarming lights.
-
-The paper for GDC2004 on Deferred Shading can be found here:
-  http://www.talula.demon.co.uk/DeferredShading.pdf
+The wiki article explaining this demo can be found here :
+  http://www.ogre3d.org/wiki/index.php/Deferred_Shading
 *******************************************************************************
 Copyright (c) W.J. van der Laan
 
@@ -47,11 +43,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "OgreMaterial.h"
 #include "OgreRenderTargetListener.h"
 
-class MLight;
-class AmbientLight;
-class MaterialGenerator;
-
 /** System to manage Deferred Shading for a camera/render target.
+ *  @note With the changes to the compositor framework, this class just
+ *		selects which compositors to enable.
  */
 class DeferredShadingSystem : public Ogre::RenderTargetListener
 {
@@ -68,69 +62,48 @@ public:
 		DSM_COUNT = 4
 	};
 
+	//The first render queue that does get rendered into the GBuffer
+	//place objects (like skies) that should be before gbuffer before this one.
+	static const Ogre::uint8 PRE_GBUFFER_RENDER_QUEUE;
+	
+	//The first render queue that does not get rendered into the GBuffer
+	//place transparent (or other non gbuffer) objects after this one
+	static const Ogre::uint8 POST_GBUFFER_RENDER_QUEUE;
+
+	void initialize();
+
 	/** Set rendering mode (one of DSMode)
 	 */
 	void setMode(DSMode mode);
 
 	DSMode getMode(void) const;
 
+	/** Set screen space ambient occlusion mode
+	 */
+	void setSSAO(bool ssao);
+	
+	bool getSSAO() const;
+
 	/** Activate or deactivate system
 	 */
 	void setActive(bool active);
-
-	/** Create a new MiniLight 
-	 */
-	MLight *createMLight();
-
-	/** Destroy a MiniLight
-	 */
-	void destroyMLight(MLight *m);
-
-	/// Visibility mask for scene
-	static const Ogre::uint32 SceneVisibilityMask = 0x00000001;
-	/// Visibility mask for post-processing geometry (lights, unlit particles)
-	static const Ogre::uint32 PostVisibilityMask = 0x00000002;
-
-	// Render Target Listener overrides
-	virtual void preRenderTargetUpdate(const Ogre::RenderTargetEvent& evt);
+	
 protected:
 	Ogre::Viewport *mViewport;
 	Ogre::SceneManager *mSceneMgr;
 	Ogre::Camera *mCamera;
 	
+	Ogre::CompositorInstance *mGBufferInstance;
 	// Filters
 	Ogre::CompositorInstance *mInstance[DSM_COUNT];
+	Ogre::CompositorInstance* mSSAOInstance;
 	// Active/inactive
 	bool mActive;
 	DSMode mCurrentMode;
+	bool mSSAO;
 
-	typedef Ogre::set<MLight*>::type LightList;
-
-	LightList mLights;
-
-	bool mLightMaterialsDirty;
-	LightList mDirtyLightList;
-
-	MaterialGenerator *mLightMaterialGenerator;
-
-	void createAmbientLight(void);
-	void setUpAmbientLightMaterial(void);
-	AmbientLight* mAmbientLight;
-
-    void createResources();
-	void initialiseLightGeometry();
-
-	// iterates through all the lights and sets up their materials
-
-	// when you enable the compositor, if the compositor is the lit mode, we have to set up the light materials 
-	// to that of the mrt
-	void setupLightMaterials(void);
-
-	// sets up the materials' pass' texture units 0 and 1 to texName0 and texName1
-	void setupMaterial(const Ogre::MaterialPtr &mat
-		, const Ogre::String& texName0
-		, const Ogre::String& texName1);
-
+	void createResources();
+	
 	void logCurrentMode(void);
 };
 

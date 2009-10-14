@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreRectangle2D.h"
 #include "OgreCompositorSerializer.h"
 #include "OgreRenderSystem.h"
+#include "OgreCompositionTechnique.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -121,23 +122,39 @@ namespace Ogre {
 
 		typedef set<Texture*>::type UniqueTextureSet;
 
-		/** Utility function to get an existing shared texture matching a given
+		/** Utility function to get an existing pooled texture matching a given
 			definition, or creating one if one doesn't exist. It also takes into
-			account whether a shared texture has already been supplied to this
+			account whether a pooled texture has already been supplied to this
 			same requester already, in which case it won't give the same texture
 			twice (this is important for example if you request 2 ping-pong textures, 
 			you don't want to get the same texture for both requests!
 		*/
-		TexturePtr getSharedTexture(const String& name, const String& localName, 
+		TexturePtr getPooledTexture(const String& name, const String& localName, 
 			size_t w, size_t h, 
 			PixelFormat f, uint aa, const String& aaHint, bool srgb, UniqueTextureSet& texturesAlreadyAssigned, 
-			CompositorInstance* inst);
+			CompositorInstance* inst, CompositionTechnique::TextureScope scope);
 
-		/** Free shared textures from the shared pool (compositor instances still 
+		/** Free pooled textures from the shared pool (compositor instances still 
 			using them will keep them in memory though). 
 		*/
-		void freeSharedTextures(bool onlyIfUnreferenced = true);
+		void freePooledTextures(bool onlyIfUnreferenced = true);
 
+		/** Register a compositor logic for listening in to expecting composition
+			techniques.
+		*/
+		void registerCompositorLogic(const String& name, CompositorLogic* logic);
+		
+		/** Get a compositor logic by its name
+		*/
+		CompositorLogic* getCompositorLogic(const String& name);
+
+		/** Register a custom composition pass.
+		*/
+		void registerCustomCompositionPass(const String& name, CustomCompositionPass* customPass);
+		
+		/** Get a custom composition pass by its name 
+		*/
+		CustomCompositionPass* getCustomCompositionPass(const String& name);
 
 		/** Override standard Singleton retrieval.
 		@remarks
@@ -189,6 +206,14 @@ namespace Ogre {
 		/// List of instances
 		typedef vector<CompositorInstance *>::type Instances;
 		Instances mInstances;
+
+		/// Map of registered compositor logics
+		typedef map<String, CompositorLogic*>::type CompositorLogicMap;
+		CompositorLogicMap mCompositorLogics;
+
+		/// Map of registered custom composition passes
+		typedef map<String, CustomCompositionPass*>::type CustomCompositionPassMap;
+		CustomCompositionPassMap mCustomCompositionPasses;
 
 		typedef vector<TexturePtr>::type TextureList;
 		typedef VectorIterator<TextureList> TextureIterator;
@@ -246,6 +271,11 @@ namespace Ogre {
 		typedef map<TextureDef, TextureList*, TextureDefLess>::type TexturesByDef;
 		TexturesByDef mTexturesByDef;
 
+		typedef std::pair<String, String> StringPair;
+		typedef map<TextureDef, TexturePtr, TextureDefLess>::type TextureDefMap;
+		typedef std::map<StringPair, TextureDefMap> ChainTexturesByDef;
+		
+		ChainTexturesByDef mChainTexturesByDef;
 
 		bool isInputPreviousTarget(CompositorInstance* inst, const Ogre::String& localName);
 		bool isInputPreviousTarget(CompositorInstance* inst, TexturePtr tex);

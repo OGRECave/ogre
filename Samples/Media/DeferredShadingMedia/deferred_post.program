@@ -1,0 +1,97 @@
+fragment_program DeferredShading/post/Ambient_ps cg
+{
+	source DeferredShading/post/Ambient_ps.cg
+	profiles ps_2_0 arbfp1
+	entry_point main
+	
+	default_params
+	{
+		param_named_auto ambientColor ambient_light_colour 0		
+		param_named_auto proj projection_matrix
+		param_named_auto farClipDistance far_clip_distance
+	}
+}
+
+fragment_program DeferredShading/post/ShowNormal_ps cg
+{
+	source DeferredShading/post/ShowNormal_ps.cg
+	profiles ps_2_0 arbfp1
+	entry_point main
+}
+
+fragment_program DeferredShading/post/ShowDS_ps cg
+{
+	source DeferredShading/post/ShowDS_ps.cg
+	profiles ps_2_0 arbfp1
+	entry_point main
+}
+
+fragment_program DeferredShading/post/ShowColour_ps cg
+{
+	source DeferredShading/post/ShowColour_ps.cg
+	profiles ps_2_0 arbfp1
+	entry_point main
+}
+
+fragment_program DeferredShading/post/ShowNormal_ps cg
+{
+	source DeferredShading/post/ShowNormal_ps.cg
+	profiles ps_2_0 arbfp1
+	entry_point main
+}
+fragment_program DeferredShading/post/ShowDS_ps cg
+{
+	source DeferredShading/post/ShowDS_ps.cg
+	profiles ps_2_0 arbfp1
+	entry_point main
+}
+fragment_program DeferredShading/post/ShowColour_ps cg
+{
+	source DeferredShading/post/ShowColour_ps.cg
+	profiles ps_2_0 arbfp1
+	entry_point main
+}
+
+// Auxilary lights
+// cg
+vertex_program DeferredShading/post/LightMaterial_vs cg
+{
+	source DeferredShading/post/LightMaterial_vs.cg
+	profiles vs_1_1 arbvp1
+	entry_point main
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+		//param_named_auto invProj inverse_projection_matrix
+		//param_named_auto vpWidth viewport_width
+		//param_named_auto vpHeight viewport_height
+	}
+}
+
+// Post processors
+fragment_program DeferredShading/post/Ambient_ps cg
+{
+	source DeferredShading/post/Ambient_ps.cg
+	profiles ps_2_0 arbfp1
+	entry_point main
+	
+	default_params
+	{
+		param_named_auto ambientColor ambient_light_colour 0		
+		param_named_auto proj projection_matrix
+	}
+}
+
+// Post processors
+vertex_program DeferredShading/post/vs cg
+{
+	source DeferredShading/post/vs.cg
+	profiles vs_1_1 arbvp1
+	entry_point main
+	default_params
+	{
+		//param_named_auto invProj inverse_projection_matrix
+		param_named_auto flip render_target_flipping
+		param_named farCorner float3 1 1 1
+	}
+}

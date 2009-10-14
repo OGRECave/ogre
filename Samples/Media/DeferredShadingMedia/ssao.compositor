@@ -1,0 +1,93 @@
+compositor DeferredShading/SSAO
+{
+    technique
+    {
+		compositor_logic SSAOLogic
+		
+        texture_ref geom DeferredShading/GBuffer mrt_output
+        texture scene target_width target_height PF_R8G8B8A8
+        texture ssao target_width_scaled 0.5 target_height_scaled 0.5 PF_R8G8B8
+        texture ssaoBlurX target_width target_height PF_R8G8B8
+        texture ssaoBlurY target_width target_height PF_R8G8B8
+
+        // the scene we want to modulate
+        target scene
+        {
+            input previous
+        }
+
+        
+
+        target ssao
+        {
+            input none
+
+            pass clear
+            {
+            }
+
+            pass render_quad
+            {
+                // our SSAO listener number
+                identifier 42
+
+                material ssao
+                // pass in the "geometry map"
+                input 0 geom 1
+            }
+        }
+
+        target ssaoBlurX
+        {
+            input none
+
+            pass clear
+            {
+            }
+
+            pass render_quad
+            {
+                identifier 43
+
+                material ssaoBlurX
+                input 0 ssao
+                input 1 geom 1
+            }
+        }
+
+        target ssaoBlurY
+        {
+            input none
+
+            pass clear
+            {
+            }
+
+            pass render_quad
+            {
+                identifier 43
+
+                material ssaoBlurY
+                input 0 ssaoBlurX
+                input 1 geom 1
+            }
+        }
+
+
+
+        target_output
+        {
+            input none
+
+            pass render_quad
+            {
+                // just output something, for example, use a modulate
+                // material to just multiply the scene by the ssao
+                material modulate
+                input 0 scene
+                input 1 ssaoBlurY
+                //input 1 ssao
+            }
+        }
+    }
+}

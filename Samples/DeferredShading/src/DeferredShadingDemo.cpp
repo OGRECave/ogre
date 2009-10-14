@@ -31,47 +31,13 @@ This demo source file is in the public domain.
 #endif
 
 #include "DeferredShading.h"
-#include "MLight.h"
 #include "GeomUtils.h"
+#include "SharedData.h"
 
-class SharedData : public Ogre::Singleton<SharedData> {
-
-public:
-
-	SharedData()
-		: iRoot(0),
-		  iCamera(0),
-		  iWindow(0),
-		  mAnimState(0),
-		  mMLAnimState(0),
-		  iMainLight(0)
-	{
-		iActivate = false;
-	}
-
-		~SharedData() {}
-
-		// shared data across the application
-		Real iLastFrameTime;
-		Root *iRoot;
-		Camera *iCamera;
-		RenderWindow *iWindow;
-
-		DeferredShadingSystem *iSystem;
-		bool iActivate;
-		bool iGlobalActivate;
-
-		// Animation state for big lights
-		AnimationState* mAnimState;
-		// Animation state for light swarm
-		AnimationState* mMLAnimState;
-
-		MLight *iMainLight;
-
-		vector<Node*>::type mLightNodes;
-
-};
 template<> SharedData* Singleton<SharedData>::ms_Singleton = 0;
+const ColourValue SAMPLE_COLORS[] = 
+    {   ColourValue::Red, ColourValue::Green, ColourValue::Blue, 
+    ColourValue::White, ColourValue(1,1,0,1), ColourValue(1,0,1,1) };
 
 class RenderToTextureFrameListener : public ExampleFrameListener
 {
@@ -85,7 +51,7 @@ public:
 		oldCamPos(0,0,0), oldCamOri(0,0,0,0)
 	{
 		timeoutDelay = 0;
-		mMoveSpeed = 200;
+		mMoveSpeed = 10;
 	}
 
 	bool frameRenderingQueued(const FrameEvent& evt)
@@ -94,8 +60,6 @@ public:
 			return false;
 		SharedData::getSingleton().iLastFrameTime = evt.timeSinceLastFrame;
 
-		if (SharedData::getSingleton().mAnimState)
-			SharedData::getSingleton().mAnimState->addTime(evt.timeSinceLastFrame);
 		if (SharedData::getSingleton().mMLAnimState)
 			SharedData::getSingleton().mMLAnimState->addTime(evt.timeSinceLastFrame);
 		return true;
@@ -143,6 +107,15 @@ public:
 			updateOverlays();
 		}
 
+		// "V" activate/deactivate ssao
+		if (mKeyboard->isKeyDown(OIS::KC_V) && timeoutDelay==0) 
+		{
+			timeoutDelay = 0.5f;
+			bool curMode = SharedData::getSingleton().iSystem->getSSAO();
+			SharedData::getSingleton().iSystem->setSSAO(!curMode);
+			updateOverlays();
+		}
+
 		timeoutDelay -= evt.timeSinceLastFrame;
 		if (timeoutDelay <= 0) timeoutDelay = 0;
 
@@ -171,15 +144,10 @@ public:
 			name="ShowNormals"; break;
 		case DeferredShadingSystem::DSM_SHOWDSP:
 			name="ShowDepthSpecular"; break;
-        
-        // This will never happen but it silences a warning
-        case DeferredShadingSystem::DSM_COUNT:
-                break;
 		}
 		OverlayManager::getSingleton().getOverlayElement( "Example/Shadows/Materials" )
-			->setCaption( "[C] Change mode, current is \"" 
-			+ name 
-			+ "\"");
+			->setCaption( "[C] Change mode, current is \"" + name  + "\". " +
+			"[V] SSAO on ? " + StringConverter::toString( SharedData::getSingleton().iSystem->getSSAO() ) );
 
 		OverlayManager::getSingleton().getOverlayElement( "Example/Shadows/Info" )
 			->setCaption( "[G] Global lights active: " + StringConverter::toString( SharedData::getSingleton().iGlobalActivate ) );
@@ -212,6 +180,16 @@ protected:
     SceneNode* mPlaneNode;
 	DeferredShadingSystem *mSystem;
 
+    //Utility function to help set scene up
+    void setEntityHeight(Entity* ent, Real newHeight)
+    {
+        Real curHeight = ent->getMesh()->getBounds().getSize().y;
+        Real scaleFactor = newHeight / curHeight;
+
+        SceneNode* parentNode = ent->getParentSceneNode();
+        parentNode->setScale(scaleFactor, scaleFactor, scaleFactor);
+    }
+
     // Just override the mandatory create scene method
     void createScene(void)
     {
@@ -243,77 +221,122 @@ protected:
             pAthene->buildTangentVectors(VES_TANGENT, src, dest);
 
         // Set ambient light
-        mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.15));
+        mSceneMgr->setAmbientLight(ColourValue(0.15, 0.00, 0.00));
         // Skybox
-        mSceneMgr->setSkyBox(true, "DeferredDemo/SkyBox");
+        mSceneMgr->setSkyBox(true, "DeferredDemo/SkyBox", 500);
+        // Create main, static light
+		Light* l1 = mSceneMgr->createLight();
+        l1->setType(Light::LT_DIRECTIONAL);
+        l1->setDiffuseColour(0.5f, 0.45f, 0.1f);
+		l1->setDirection(1, -0.5, -0.2);
+		l1->setShadowFarClipDistance(250);
+		l1->setShadowFarDistance(75);
+		//Turn this on to have the directional light cast shadows
+		l1->setCastShadows(false);
 
 		// Create "root" node
 		SceneNode* rootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 
-		Entity* athena = mSceneMgr->createEntity("Athena", "athene.mesh");
-		athena->setMaterialName("DeferredDemo/DeferredAthena");
-		SceneNode *aNode = rootNode->createChildSceneNode();
-		aNode->attachObject( athena );
-		aNode->setPosition(-100, 40, 100);
+        // Create the cathedral - this will be the static scene
+		Entity* cathedralEnt = mSceneMgr->createEntity("Cathedral", "sibenik.mesh");
+        SceneNode* cathedralNode = rootNode->createChildSceneNode();
+        cathedralNode->attachObject(cathedralEnt);
+        //cathedralNode->scale(10, 20, 20);
+		
+        // Create ogre heads to decorate the wall
+		Entity* ogreHead = mSceneMgr->createEntity("Head", "ogrehead.mesh");
+		//rootNode->createChildSceneNode( "Head" )->attachObject( ogreHead );
+        Vector3 headStartPos[2] = { Vector3(25.25,11,3), Vector3(25.25,11,-3) };
+        Vector3 headDiff(-3.7,0,0);
+        for (int i=0; i < 12; i++) 
+        {
+            char cloneName[16];
+			sprintf(cloneName, "OgreHead%d", i);
+            Entity* cloneHead = ogreHead->clone(cloneName);
+            Vector3 clonePos = headStartPos[i%2] + headDiff*(i/2);
+            if ((i/2) >= 4) clonePos.x -= 0.75;
+			SceneNode* cloneNode = rootNode->createChildSceneNode(clonePos);
+            cloneNode->attachObject(cloneHead);
+            setEntityHeight(cloneHead, 1.5);
+            if (i % 2 == 0)
+            {
+                cloneNode->yaw(Degree(180));
+            }
+        }
 
-		// Create a prefab plane
-		mPlane = new MovablePlane("ReflectPlane");
-		mPlane->d = 0;
-		mPlane->normal = Vector3::UNIT_Y;
-		MeshManager::getSingleton().createCurvedPlane("ReflectionPlane", 
-			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-			*mPlane,
-			2000, 2000, -1000,
-			20, 20, 
-			true, 1, 10, 10, Vector3::UNIT_Z);
-		mPlaneEnt = mSceneMgr->createEntity( "Plane", "ReflectionPlane" );
-		mPlaneNode = rootNode->createChildSceneNode();
-		mPlaneNode->attachObject(mPlaneEnt);
-		mPlaneNode->translate(-5, -30, 0);
-		//mPlaneNode->roll(Degree(5));
-		mPlaneEnt->setMaterialName("DeferredDemo/Ground");
 
-		// Create an entity from a model (will be loaded automatically)
+        // Create a pile of wood pallets
+        Entity* woodPallet = mSceneMgr->createEntity("Pallet", "WoodPallet.mesh");
+        Vector3 woodStartPos(10, 0.5, -5.5);
+        Vector3 woodDiff(0, 0.3, 0);
+        for (int i=0; i < 5; i++)
+        {
+            char cloneName[16];
+			sprintf(cloneName, "WoodPallet%d", i);
+            Entity* clonePallet = woodPallet->clone(cloneName);
+            Vector3 clonePos = woodStartPos + woodDiff*i;
+			SceneNode* cloneNode = rootNode->createChildSceneNode(clonePos);
+            cloneNode->attachObject(clonePallet);
+            setEntityHeight(clonePallet, 0.3);
+            cloneNode->yaw(Degree(i*20));
+        }
+
+        // Create a bunch of knots
 		Entity* knotEnt = mSceneMgr->createEntity("Knot", "knot.mesh");
 		knotEnt->setMaterialName("DeferredDemo/RockWall");
-		knotEnt->setMeshLodBias(0.25f);
+		//knotEnt->setMeshLodBias(0.25f);
+        Vector3 knotStartPos(25.5, 2, 5.5);
+        Vector3 knotDiff(-3.7, 0, 0);
+        for (int i=0; i < 5; i++)
+        {
+            char cloneName[16];
+			sprintf(cloneName, "Knot%d", i);
+            Entity* cloneKnot = knotEnt->clone(cloneName);
+            Vector3 clonePos = knotStartPos + knotDiff*i;
+			SceneNode* cloneNode = rootNode->createChildSceneNode(clonePos);
+            cloneNode->attachObject(cloneKnot);
+            setEntityHeight(cloneKnot, 3);
+            cloneNode->yaw(Degree(i*17));
+            cloneNode->roll(Degree(i*31));
 
-		// Create an entity from a model (will be loaded automatically)
-		Entity* ogreHead = mSceneMgr->createEntity("Head", "ogrehead.mesh");
-		ogreHead->getSubEntity(0)->setMaterialName("DeferredDemo/Ogre/Eyes");// eyes
-		ogreHead->getSubEntity(1)->setMaterialName("DeferredDemo/Ogre/Skin"); 
-		ogreHead->getSubEntity(2)->setMaterialName("DeferredDemo/Ogre/EarRing"); // earrings
-		ogreHead->getSubEntity(3)->setMaterialName("DeferredDemo/Ogre/Tusks"); // tusks
-		rootNode->createChildSceneNode( "Head" )->attachObject( ogreHead );
-
+            sprintf(cloneName, "KnotLight%d", i);
+            Light* knotLight = mSceneMgr->createLight(cloneName);
+            knotLight->setType(Light::LT_SPOTLIGHT);
+            knotLight->setDiffuseColour(SAMPLE_COLORS[i]);
+            knotLight->setSpecularColour(ColourValue::White);
+            knotLight->setPosition(clonePos + Vector3(0,3,0));
+            knotLight->setDirection(Vector3::NEGATIVE_UNIT_Y);
+            knotLight->setSpotlightRange(Degree(25), Degree(45), 1);
+            knotLight->setAttenuation(6, 1, 0.2, 0);
+        }
+		
 		// Add a whole bunch of extra entities to fill the scene a bit
-		Entity *cloneEnt;
-		int N=4;
-		for (int n = 0; n < N; ++n)
-		{
-			float theta = 2.0f*Math::PI*(float)n/(float)N;
-			// Create a new node under the root
-			SceneNode* node = mSceneMgr->createSceneNode();
-			// Random translate
-			Vector3 nodePos;
-			nodePos.x = Math::SymmetricRandom() * 40.0 + Math::Sin(theta) * 500.0;
-			nodePos.y = Math::SymmetricRandom() * 20.0 - 40.0;
-			nodePos.z = Math::SymmetricRandom() * 40.0 + Math::Cos(theta) * 500.0;
-			node->setPosition(nodePos);
-			Quaternion orientation(Math::SymmetricRandom(),Math::SymmetricRandom(),Math::SymmetricRandom(),Math::SymmetricRandom());
-			orientation.normalise();
-			node->setOrientation(orientation);
-			rootNode->addChild(node);
-			// Clone knot
-			char cloneName[12];
-			sprintf(cloneName, "Knot%d", n);
-			cloneEnt = knotEnt->clone(cloneName);
-			// Attach to new node
-			node->attachObject(cloneEnt);
+		//Entity *cloneEnt;
+		//int N=4;
+		//for (int n = 0; n < N; ++n)
+		//{
+		//	float theta = 2.0f*Math::PI*(float)n/(float)N;
+		//	// Create a new node under the root
+		//	SceneNode* node = mSceneMgr->createSceneNode();
+		//	// Random translate
+		//	Vector3 nodePos;
+		//	nodePos.x = Math::SymmetricRandom() * 40.0 + Math::Sin(theta) * 500.0;
+		//	nodePos.y = Math::SymmetricRandom() * 20.0 - 40.0;
+		//	nodePos.z = Math::SymmetricRandom() * 40.0 + Math::Cos(theta) * 500.0;
+		//	node->setPosition(nodePos);
+		//	Quaternion orientation(Math::SymmetricRandom(),Math::SymmetricRandom(),Math::SymmetricRandom(),Math::SymmetricRandom());
+		//	orientation.normalise();
+		//	node->setOrientation(orientation);
+		//	rootNode->addChild(node);
+		//	// Clone knot
+		//	char cloneName[12];
+		//	sprintf(cloneName, "Knot%d", n);
+		//	cloneEnt = knotEnt->clone(cloneName);
+		//	// Attach to new node
+		//	node->attachObject(cloneEnt);
+		//}
 
-		}
-
-        mCamera->setPosition(-50, 100, 500);
+        mCamera->setPosition(25, 5, 0);
         mCamera->lookAt(0,0,0);
 
 		// show overlay
@@ -321,37 +344,40 @@ protected:
 		overlay->show();
 
 		mSystem = new DeferredShadingSystem(mWindow->getViewport(0), mSceneMgr, mCamera);
+		SharedData::getSingleton().iSystem = mSystem;
+		mSystem->initialize();
+        
+        
+		//// Create a track for the light
+  //      Animation* anim = mSceneMgr->createAnimation("LightTrack", 16);
+  //      // Spline it for nice curves
+  //      anim->setInterpolationMode(Animation::IM_SPLINE);
+  //      // Create a track to animate the camera's node
+  //      NodeAnimationTrack* track = anim->createNodeTrack(0, lightNode);
+  //      // Setup keyframes
+  //      TransformKeyFrame* key = track->createNodeKeyFrame(0); // A start position
+  //      key->setTranslate(Vector3(300,300,-300));
+  //      key = track->createNodeKeyFrame(4);//B
+  //      key->setTranslate(Vector3(300,300,300));
+  //      key = track->createNodeKeyFrame(8);//C
+  //      key->setTranslate(Vector3(-300,300,300));
+  //      key = track->createNodeKeyFrame(12);//D
+  //      key->setTranslate(Vector3(-300,300,-300));
+		//key = track->createNodeKeyFrame(16);//D
+  //      key->setTranslate(Vector3(300,300,-300));
+  //      // Create a new animation state to track this
+  //      SharedData::getSingleton().mAnimState = mSceneMgr->createAnimationState("LightTrack");
+  //      SharedData::getSingleton().mAnimState->setEnabled(true);
 
-		// Create main, moving light
-		MLight* l1 = mSystem->createMLight();//"MainLight");
-        l1->setDiffuseColour(0.75f, 0.7f, 0.8f);
-		l1->setSpecularColour(0.85f, 0.9f, 1.0f);
-		
-		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		lightNode->attachObject(l1);
-
-		// Create a track for the light
-        Animation* anim = mSceneMgr->createAnimation("LightTrack", 16);
-        // Spline it for nice curves
-        anim->setInterpolationMode(Animation::IM_SPLINE);
-        // Create a track to animate the camera's node
-        NodeAnimationTrack* track = anim->createNodeTrack(0, lightNode);
-        // Setup keyframes
-        TransformKeyFrame* key = track->createNodeKeyFrame(0); // A start position
-        key->setTranslate(Vector3(300,300,-300));
-        key = track->createNodeKeyFrame(4);//B
-        key->setTranslate(Vector3(300,300,300));
-        key = track->createNodeKeyFrame(8);//C
-        key->setTranslate(Vector3(-300,300,300));
-        key = track->createNodeKeyFrame(12);//D
-        key->setTranslate(Vector3(-300,300,-300));
-		key = track->createNodeKeyFrame(16);//D
-        key->setTranslate(Vector3(300,300,-300));
-        // Create a new animation state to track this
-        SharedData::getSingleton().mAnimState = mSceneMgr->createAnimationState("LightTrack");
-        SharedData::getSingleton().mAnimState->setEnabled(true);
-
-		// Create some happy little lights
+        //Create an athena statue
+        Entity* athena = mSceneMgr->createEntity("Athena", "athene.mesh");
+		athena->setMaterialName("DeferredDemo/DeferredAthena");
+		SceneNode *aNode = rootNode->createChildSceneNode();
+		aNode->attachObject( athena );
+		aNode->setPosition(-8.5, 4.5, 0);
+        setEntityHeight(athena, 4.0);
+        aNode->yaw(Ogre::Degree(90));
+		// Create some happy little lights to decorate the athena statue
 		createSampleLights();
 
 		// safely setup application's (not postfilter!) shared data
@@ -360,8 +386,10 @@ protected:
 		SharedData::getSingleton().iWindow = mWindow;
 		SharedData::getSingleton().iActivate = true;
 		SharedData::getSingleton().iGlobalActivate = true;
-		SharedData::getSingleton().iSystem = mSystem;
 		SharedData::getSingleton().iMainLight = l1;
+
+        mCamera->setFarClipDistance(1000.0);
+        mCamera->setNearClipDistance(0.5);
 	}
 
     void createFrameListener(void)
@@ -375,67 +403,70 @@ protected:
 	void createSampleLights()
 	{
 		// Create some lights		
-		vector<MLight*>::type lights;
+		vector<Light*>::type lights;
 		SceneNode *parentNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("LightsParent");
 		// Create light nodes
 		vector<Node*>::type nodes;
 
-		MLight *a = mSystem->createMLight();
+        Vector4 attParams = Vector4(3,1,0,5);
+        Real lightRadius = 25;
+
+		Light *a = mSceneMgr->createLight();
 		SceneNode *an = parentNode->createChildSceneNode();
 		an->attachObject(a);
-		a->setAttenuation(1.0f, 0.001f, 0.002f);
+		a->setAttenuation(attParams.x, attParams.y, attParams.z, attParams.w);
 		//a->setAttenuation(1.0f, 0.000f, 0.000f);
-		an->setPosition(0,0,25);
+		an->setPosition(0,0,lightRadius);
 		a->setDiffuseColour(1,0,0);
 		//a->setSpecularColour(0.5,0,0);
 		lights.push_back(a);
 		nodes.push_back(an);
 
-		MLight *b = mSystem->createMLight();
+		Light *b = mSceneMgr->createLight();
 		SceneNode *bn = parentNode->createChildSceneNode();
 		bn->attachObject(b);
-		b->setAttenuation(1.0f, 0.001f, 0.003f);
-		bn->setPosition(25,0,0);
+		b->setAttenuation(attParams.x, attParams.y, attParams.z, attParams.w);
+		bn->setPosition(lightRadius,0,0);
 		b->setDiffuseColour(1,1,0);
 		//b->setSpecularColour(0.5,0.5,0);
 		lights.push_back(b);
 		nodes.push_back(bn);
 
-		MLight *c = mSystem->createMLight();
+		Light *c = mSceneMgr->createLight();
 		SceneNode *cn = parentNode->createChildSceneNode();
 		cn->attachObject(c);
-		c->setAttenuation(1.0f, 0.001f, 0.004f);
-		cn->setPosition(0,0,-25);
+		c->setAttenuation(attParams.x, attParams.y, attParams.z, attParams.w);
+		cn->setPosition(0,0,-lightRadius);
 		c->setDiffuseColour(0,1,1);
 		c->setSpecularColour(0.25,1.0,1.0); // Cyan light has specular component
 		lights.push_back(c);
 		nodes.push_back(cn);
 
-		MLight *d = mSystem->createMLight();
+		Light *d = mSceneMgr->createLight();
 		SceneNode *dn = parentNode->createChildSceneNode();
 		dn->attachObject(d);
-		d->setAttenuation(1.0f, 0.002f, 0.002f);
-		dn->setPosition(-25,0,0);
+		d->setAttenuation(attParams.x, attParams.y, attParams.z, attParams.w);
+		dn->setPosition(-lightRadius,0,0);
 		d->setDiffuseColour(1,0,1);
 		d->setSpecularColour(0.0,0,0.0);
 		lights.push_back(d);
 		nodes.push_back(dn);
 
-		MLight *e = mSystem->createMLight();
+		Light *e = mSceneMgr->createLight();
 		SceneNode *en = parentNode->createChildSceneNode();
 		en->attachObject(e);
-		e->setAttenuation(1.0f, 0.002f, 0.0025f);
-		en->setPosition(25,0,25);
+		e->setAttenuation(attParams.x, attParams.y, attParams.z, attParams.w);
+		en->setPosition(lightRadius,0,lightRadius);
 		e->setDiffuseColour(0,0,1);
 		e->setSpecularColour(0,0,0);
 		lights.push_back(e);
 		nodes.push_back(en);
 		
-		MLight *f = mSystem->createMLight();
+		Light *f = mSceneMgr->createLight();
 		SceneNode *fn = parentNode->createChildSceneNode();
 		fn->attachObject(f);
-		f->setAttenuation(1.0f, 0.0015f, 0.0021f);
-		fn->setPosition(-25,0,-25);
+		f->setAttenuation(attParams.x, attParams.y, attParams.z, attParams.w);
+		fn->setPosition(-lightRadius,0,-lightRadius);
 		f->setDiffuseColour(0,1,0);
 		f->setSpecularColour(0,0.0,0.0);
 		lights.push_back(f);
@@ -443,10 +474,10 @@ protected:
 
 		// Create marker meshes to show user where the lights are
 		Entity *ent;
-		GeomUtils::createSphere("PointLightMesh", 1.0f, 5, 5, true, true);
-		for(vector<MLight*>::type::iterator i=lights.begin(); i!=lights.end(); ++i)
+		GeomUtils::createSphere("PointLightMesh", 0.05f, 5, 5, true, true);
+		for(vector<Light*>::type::iterator i=lights.begin(); i!=lights.end(); ++i)
 		{
-			MLight* light = *i;
+			Light* light = *i;
 			ent = mSceneMgr->createEntity(light->getName()+"v", "PointLightMesh");
 			String matname = light->getName()+"m";
 			// Create coloured material
@@ -458,8 +489,10 @@ protected:
 			pass->setSelfIllumination(light->getDiffuseColour());
 
 			ent->setMaterialName(matname);
-			ent->setRenderQueueGroup(light->getRenderQueueGroup());
+			//ent->setRenderQueueGroup(light->getRenderQueueGroup());
+			ent->setRenderQueueGroup(DeferredShadingSystem::POST_GBUFFER_RENDER_QUEUE);
 			static_cast<SceneNode*>(light->getParentNode())->attachObject(ent);
+			ent->setVisible(true);
 		}		
 
 		// Store nodes for hiding/showing
@@ -468,23 +501,23 @@ protected:
 		// Do some animation for node a-f
 		// Generate helix structure
 		float seconds_per_station = 1.0f;
-		float r=35;
+		float r = 1.0;
 		//Vector3 base(0,-30,0);
-		Vector3 base(-100, -30, 85);
+		Vector3 base(-8.75, 3.5, 0);
 
-		float h=120;
+		float h=3;
 		const size_t s_to_top = 16;
 		const size_t stations = s_to_top*2-1;
 		float ascend = h/((float)s_to_top);
 		float stations_per_revolution = 3.5f;
 		size_t skip = 2; // stations between lights
 		Vector3 station_pos[stations];
-		for(unsigned int x=0; x<s_to_top; ++x)
+		for(int x=0; x<s_to_top; ++x)
 		{
 			float theta = ((float)x/stations_per_revolution)*2.0f*Math::PI;
 			station_pos[x] = base+Vector3(Math::Sin(theta)*r, ascend*x, Math::Cos(theta)*r);
 		}
-		for(unsigned int x=s_to_top; x<stations; ++x)
+		for(int x=s_to_top; x<stations; ++x)
 		{
 			float theta = ((float)x/stations_per_revolution)*2.0f*Math::PI;
 			station_pos[x] = base+Vector3(Math::Sin(theta)*r, h-ascend*(x-s_to_top), Math::Cos(theta)*r);
@@ -497,7 +530,7 @@ protected:
 		{
 			// Create a track to animate the camera's node
 			NodeAnimationTrack* track = anim->createNodeTrack(x, nodes[x]);
-			for(unsigned int y=0; y<=stations; ++y)
+			for(int y=0; y<=stations; ++y)
 			{
 				// Setup keyframes
 				TransformKeyFrame* key = track->createNodeKeyFrame(y*seconds_per_station); // A start position
@@ -509,9 +542,21 @@ protected:
 		// Create a new animation state to track this
 		SharedData::getSingleton().mMLAnimState = mSceneMgr->createAnimationState("LightSwarmTrack");
 		SharedData::getSingleton().mMLAnimState->setEnabled(true);
+
+		/*Light* spotLight = mSceneMgr->createLight("Spotlight1");
+		spotLight->setType(Light::LT_SPOTLIGHT);
+		spotLight->setAttenuation(200, 1.0f, 0, 0);
+		spotLight->setSpotlightRange(Degree(30.0), Degree(45.0), 0.8);
+		spotLight->setPosition(0,120,0);
+		spotLight->setDirection(0, -1, 0);
+		spotLight->setDiffuseColour(1,1,1);
+		spotLight->setSpecularColour(1,1,1);*/
 	}
 
 };
+
+
+
 
 
 #ifdef __cplusplus
@@ -544,3 +589,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+

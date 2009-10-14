@@ -47,11 +47,24 @@ namespace Ogre {
         CompositionTechnique(Compositor *parent);
         virtual ~CompositionTechnique();
     
+        //The scope of a texture defined by the compositor
+        enum TextureScope { 
+            //Local texture - only available to the compositor passes in this technique
+            TS_LOCAL, 
+            //Chain texture - available to the other compositors in the chain
+            TS_CHAIN, 
+            //Global texture - available to everyone in every scope
+            TS_GLOBAL 
+        };
+
         /// Local texture definition
         class TextureDefinition : public CompositorInstAlloc
         {
         public:
             String name;
+			//Texture definition being a reference is determined by these two fields not being empty.
+			String refCompName; //If a reference, the name of the compositor being referenced
+			String refTexName;	//If a reference, the name of the texture in the compositor being referenced
             size_t width;       // 0 means adapt to target width
             size_t height;      // 0 means adapt to target height
 			float widthFactor;  // multiple of target width to use (if width = 0)
@@ -59,10 +72,11 @@ namespace Ogre {
             PixelFormatList formatList; // more than one means MRT
 			bool fsaa;			// FSAA enabled; true = determine from main target (if render_scene), false = disable
 			bool hwGammaWrite;	// Do sRGB gamma correction on write (only 8-bit per channel formats) 
-			bool shared;		// whether to use shared textures for this one
+			bool pooled;		// whether to use pooled textures for this one
+            TextureScope scope; // Which scope has access to this texture
 
 			TextureDefinition() :width(0), height(0), widthFactor(1.0f), heightFactor(1.0f), 
-				fsaa(true), hwGammaWrite(false), shared(false) {}
+				fsaa(true), hwGammaWrite(false), pooled(false), scope(TS_LOCAL) {}
         };
         /// Typedefs for several iterators
         typedef vector<CompositionTargetPass *>::type TargetPasses;
@@ -137,6 +151,14 @@ namespace Ogre {
 		/** Get the scheme name assigned to this technique. */
 		const String& getSchemeName() const { return mSchemeName; }
         
+		/** Set the name of the compositor logic assigned to this technique.
+			Instances of this technique will be auto-coupled with the matching logic.
+		*/
+		void setCompositorLogicName(const String& compositorLogicName) 
+			{ mCompositorLogicName = compositorLogicName; }
+		/** Get the compositor logic name assigned to this technique */
+		const String& getCompositorLogicName() const { return mCompositorLogicName; }
+
         /** Get parent object */
         Compositor *getParent();
     private:
@@ -152,6 +174,9 @@ namespace Ogre {
 
 		/// Optional scheme name
 		String mSchemeName;
+		
+		/// Optional compositor logic name
+		String mCompositorLogicName;
 
     };
 	/** @} */

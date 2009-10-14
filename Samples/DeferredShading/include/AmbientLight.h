@@ -41,6 +41,10 @@ public:
 	virtual Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const;
 	/** @copydoc Renderable::getMaterial */
 	virtual const Ogre::MaterialPtr& getMaterial(void) const;
+
+	virtual void getWorldTransforms(Ogre::Matrix4* xform) const;
+
+	void updateFromCamera(Ogre::Camera* camera);
 protected:
 	Ogre::Real mRadius;
 	Ogre::MaterialPtr mMatPtr;

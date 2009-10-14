@@ -32,12 +32,13 @@ same license as the rest of the engine.
 #define WIN32_LEAN_AND_MEAN
 #include "windows.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-#include "macUtils.h"
+#   include "macUtils.h"
 #endif
 
 
 #include "Compositor.h"
 #include "CompositorDemo_FrameListener.h"
+#include "HelperLogics.h"
 
 /*************************************************************************
 	                    CompositorDemo Methods
@@ -189,17 +190,15 @@ void CompositorDemo::createViewports(void)
             {
                 typeName = i->first;
                 archName = i->second;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
                 // OS X does not set the working directory relative to the app,
                 // In order to make things portable on OS X we need to provide
                 // the loading with it's own bundle path location
 				if (!Ogre::StringUtil::startsWith(archName, "/", false)) // only adjust relative dirs
-					archName = Ogre::macBundlePath() + "/" + archName;
+					archName = Ogre::String(Ogre::macBundlePath() + "/" + archName);
 #endif
-				Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-                       archName, typeName, secName);
-				
-
+                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+                    archName, typeName, secName);
             }
         }
 
@@ -212,7 +211,13 @@ void CompositorDemo::createViewports(void)
 	{
 		// Initialise, parse all scripts etc
         Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-
+		
+		// Register the compositor logics
+		// See comment in beginning of HelperLogics.h for explanation
+		Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
+		compMgr.registerCompositorLogic("GaussianBlur", new GaussianBlurLogic);
+		compMgr.registerCompositorLogic("HDR", new HDRLogic);
+		compMgr.registerCompositorLogic("HeatVision", new HeatVisionLogic);
 	}
 
 //-----------------------------------------------------------------------------------
@@ -455,6 +460,7 @@ void CompositorDemo::createViewports(void)
 			);
 		{
 			Ogre::CompositionTechnique *t = comp4->createTechnique();
+			t->setCompositorLogicName("HeatVision");
 			{
 				Ogre::CompositionTechnique::TextureDefinition *def = t->createTextureDefinition("scene");
 				def->width = 256;
@@ -591,12 +597,6 @@ extern "C" {
 	int main(int argc, char *argv[])
 #endif
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-        NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-        int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
-        [pool release];
-        return retVal;
-#else
    // Create application object
     CompositorDemo app;
 
@@ -610,83 +610,10 @@ extern "C" {
 #endif
     }
 
+
     return 0;
-#endif
 }
 
 #ifdef __cplusplus
 }
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-#   ifdef __OBJC__
-@interface AppDelegate : NSObject <UIApplicationDelegate>
-{
-}
-
-- (void)go;
-
-@end
-
-@implementation AppDelegate
-
-- (void)go {
-    // Create application object
-    CompositorDemo app;
-    try {
-        app.go();
-    } catch( Ogre::Exception& e ) {
-        std::cerr << "An exception has occured: " <<
-        e.getFullDescription().c_str() << std::endl;
-    }
-}
-
-- (void)applicationDidFinishLaunching:(UIApplication *)application {
-    // Hide the status bar
-    [[UIApplication sharedApplication] setStatusBarHidden:YES];
-
-    // Create a window
-    UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-
-    // Create an image view
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Default.png"]];
-    [window addSubview:imageView];
-    
-    // Create an indeterminate status indicator
-    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    [indicator setFrame:CGRectMake(150, 280, 20, 20)];
-    [indicator startAnimating];
-    [window addSubview:indicator];
-    
-    // Display our window
-    [window makeKeyAndVisible];
-    
-    // Clean up
-    [imageView release];
-    [indicator release];
-
-    [NSThread detachNewThreadSelector:@selector(go) toTarget:self withObject:nil];
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application {
-    Root::getSingleton().queueEndRendering();
-}
-
-//- (void)applicationWillResignActive:(UIApplication *)application
-//{
-//    // Pause FrameListeners and rendering
-//}
-//
-//- (void)applicationDidBecomeActive:(UIApplication *)application
-//{
-//    // Resume FrameListeners and rendering
-//}
-
-- (void)dealloc {
-    [super dealloc];
-}
-
-@end
-#   endif
-
 #endif

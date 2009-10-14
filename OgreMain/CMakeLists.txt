@@ -50,6 +50,7 @@ set (HEADER_FILES
   include/OgreCompositionTechnique.h
   include/OgreCompositor.h
   include/OgreCompositorChain.h
+  include/OgreCompositorLogic.h
   include/OgreCompositorInstance.h
   include/OgreCompositorManager.h
   include/OgreCompositorScriptCompiler.h
@@ -61,6 +62,7 @@ set (HEADER_FILES
   include/OgreController.h
   include/OgreControllerManager.h
   include/OgreConvexBody.h
+  include/OgreCustomCompositionPass.h
   include/OgreDataStream.h
   include/OgreDDSCodec.h
   include/OgreDefaultHardwareBufferManager.h

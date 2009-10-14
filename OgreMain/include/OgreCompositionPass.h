@@ -56,7 +56,8 @@ namespace Ogre {
             PT_CLEAR,           // Clear target to one colour
 			PT_STENCIL,			// Set stencil operation
             PT_RENDERSCENE,     // Render the scene or part of it
-            PT_RENDERQUAD       // Render a full screen quad
+            PT_RENDERQUAD,      // Render a full screen quad
+			PT_RENDERCUSTOM		// Render a custom sequence
         };
         
         /** Set the type of composition pass */
@@ -90,7 +91,7 @@ namespace Ogre {
 		/** Get the first render queue to be rendered in this pass (inclusive) 
 			@note applies when PassType is RENDERSCENE
 		*/
-		uint8 getFirstRenderQueue();
+		uint8 getFirstRenderQueue() const;
 		/** Set the last render queue to be rendered in this pass (inclusive) 
 			@note applies when PassType is RENDERSCENE
 		*/
@@ -98,7 +99,7 @@ namespace Ogre {
 		/** Get the last render queue to be rendered in this pass (inclusive) 
 			@note applies when PassType is RENDERSCENE
 		*/
-		uint8 getLastRenderQueue();
+		uint8 getLastRenderQueue() const;
 
 		/** Would be nice to have for RENDERSCENE:
 			flags to:
@@ -114,7 +115,7 @@ namespace Ogre {
         /** Get the viewport clear buffers.
 			@note applies when PassType is CLEAR
         */
-        uint32 getClearBuffers();
+        uint32 getClearBuffers() const;
         /** Set the viewport clear colour (defaults to 0,0,0,0) 
 			@note applies when PassType is CLEAR
 		 */
@@ -122,7 +123,7 @@ namespace Ogre {
         /** Get the viewport clear colour (defaults to 0,0,0,0)	
 			@note applies when PassType is CLEAR
 		 */
-        const ColourValue &getClearColour();
+        const ColourValue &getClearColour() const;
         /** Set the viewport clear depth (defaults to 1.0) 
 			@note applies when PassType is CLEAR
 		*/
@@ -130,7 +131,7 @@ namespace Ogre {
         /** Get the viewport clear depth (defaults to 1.0) 
 			@note applies when PassType is CLEAR
 		*/
-        Real getClearDepth();
+        Real getClearDepth() const;
 		/** Set the viewport clear stencil value (defaults to 0) 
 			@note applies when PassType is CLEAR
 		*/
@@ -138,7 +139,7 @@ namespace Ogre {
         /** Get the viewport clear stencil value (defaults to 0) 
 			@note applies when PassType is CLEAR
 		*/
-        uint32 getClearStencil();
+        uint32 getClearStencil() const;
 
 		/** Set stencil check on or off.
 			@note applies when PassType is STENCIL
@@ -147,7 +148,7 @@ namespace Ogre {
 		/** Get stencil check enable.
 			@note applies when PassType is STENCIL
 		*/
-		bool getStencilCheck();
+		bool getStencilCheck() const;
 		/** Set stencil compare function.
 			@note applies when PassType is STENCIL
 		*/
@@ -155,7 +156,7 @@ namespace Ogre {
 		/** Get stencil compare function.
 			@note applies when PassType is STENCIL
 		*/
-		CompareFunction getStencilFunc(); 
+		CompareFunction getStencilFunc() const; 
 		/** Set stencil reference value.
 			@note applies when PassType is STENCIL
 		*/
@@ -163,7 +164,7 @@ namespace Ogre {
 		/** Get stencil reference value.
 			@note applies when PassType is STENCIL
 		*/
-		uint32 getStencilRefValue();
+		uint32 getStencilRefValue() const;
 		/** Set stencil mask.
 			@note applies when PassType is STENCIL
 		*/
@@ -171,7 +172,7 @@ namespace Ogre {
 		/** Get stencil mask.
 			@note applies when PassType is STENCIL
 		*/
-		uint32 getStencilMask();
+		uint32 getStencilMask() const;
 		/** Set stencil fail operation.
 			@note applies when PassType is STENCIL
 		*/
@@ -179,7 +180,7 @@ namespace Ogre {
 		/** Get stencil fail operation.
 			@note applies when PassType is STENCIL
 		*/
-		StencilOperation getStencilFailOp();
+		StencilOperation getStencilFailOp() const;
 		/** Set stencil depth fail operation.
 			@note applies when PassType is STENCIL
 		*/
@@ -187,7 +188,7 @@ namespace Ogre {
 		/** Get stencil depth fail operation.
 			@note applies when PassType is STENCIL
 		*/
-		StencilOperation getStencilDepthFailOp();
+		StencilOperation getStencilDepthFailOp() const;
 		/** Set stencil pass operation.
 			@note applies when PassType is STENCIL
 		*/
@@ -195,7 +196,7 @@ namespace Ogre {
 		/** Get stencil pass operation.
 			@note applies when PassType is STENCIL
 		*/
-		StencilOperation getStencilPassOp();
+		StencilOperation getStencilPassOp() const;
 		/** Set two sided stencil operation.
 			@note applies when PassType is STENCIL
 		*/
@@ -203,7 +204,7 @@ namespace Ogre {
 		/** Get two sided stencil operation.
 			@note applies when PassType is STENCIL
 		*/
-		bool getStencilTwoSidedOperation();
+		bool getStencilTwoSidedOperation() const;
 
 		/// Inputs (for material used for rendering the quad)
 		struct InputTex
@@ -229,12 +230,12 @@ namespace Ogre {
             @param id    Input to get. Must be in 0..OGRE_MAX_TEXTURE_LAYERS-1.
 			@note applies when PassType is RENDERQUAD 
         */
-        const InputTex &getInput(size_t id);
+        const InputTex &getInput(size_t id) const;
         
         /** Get the number of inputs used.
 			@note applies when PassType is RENDERQUAD 
         */
-        size_t getNumInputs();
+        size_t getNumInputs() const;
         
         /** Clear all inputs.
 			@note applies when PassType is RENDERQUAD 
@@ -274,6 +275,19 @@ namespace Ogre {
 			@note applies when PassType is RENDERQUAD 
 		*/
 		bool getQuadFarCornersViewSpace() const;
+
+		/** Set the type name of this custom composition pass.
+			@note applies when PassType is RENDERCUSTOM
+			@see CompositorManager::registerCustomCompositionPass
+		*/
+		void setCustomType(const String& customType);
+
+		/** Get the type name of this custom composition pass.
+			@note applies when PassType is RENDERCUSTOM
+			@see CompositorManager::registerCustomCompositionPass
+		*/
+		const String& getCustomType() const;
+
     private:
         /// Parent technique
         CompositionTargetPass *mParent;
@@ -316,6 +330,8 @@ namespace Ogre {
         Real mQuadBottom;
 
 		bool mQuadFarCorners, mQuadFarCornersViewSpace;
+		//The type name of the custom composition pass.
+		String mCustomType;
     };
 	/** @} */
 	/** @} */

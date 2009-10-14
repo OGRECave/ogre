@@ -1,9 +1,4 @@
 // Materials for deferred shading test
-
-// bring in shared material definitions
-import * from "deferred.material"
-
-// Materials for deferred shading test
 // Sky box
 material DeferredDemo/SkyBox
 {
@@ -22,7 +17,7 @@ material DeferredDemo/SkyBox
 	}
 }
 // Ground plane
-material DeferredDemo/Ground : DeferredShading/Material/TexturedPhong
+material DeferredDemo/Ground
 {
 	technique
 	{
@@ -36,17 +31,20 @@ material DeferredDemo/Ground : DeferredShading/Material/TexturedPhong
 	}
 }
 // Rock wall texture [bumpmapped]
-material DeferredDemo/RockWall : DeferredShading/Material/TexturedNormalMapped
+material DeferredDemo/RockWall
 {
 	technique
 	{
 		pass main
 		{
+			specular 0 0 0 1 0.6
 			texture_unit
 			{
 				texture rockwall.tga
 			}
-			texture_unit
+			//This directive will allow the framework to pick up on the fact
+			//that this texture is a normal map
+			texture_unit NormalMap
 			{
 				texture rockwall_NH.tga
 			}
@@ -55,83 +53,20 @@ material DeferredDemo/RockWall : DeferredShading/Material/TexturedNormalMapped
 }
 
 // Athena texture [bumpmapped, untextured]
-material DeferredDemo/DeferredAthena  : DeferredShading/Material/UntexturedNormalMapped
+material DeferredDemo/DeferredAthena
 {
 	technique
 	{
 		pass main
 		{
-			fragment_program_ref DeferredShading/material/nm_notex_ps
-			{
-				param_named specularity float 0.5
-			}
+			diffuse 0.7 0.7 0.7
+			specular 1.0 1.0 1.0 1.0 0.5
+			
 			texture_unit
 			{
+				//The fact that the texture has 'normal' in the name will allow the framework
+				//to understand that it is a normal map
 				texture atheneNormalMap.png
-			}
-		}
-	}
-}
-/// Ogre parts
-material DeferredDemo/Ogre/Skin : DeferredShading/Material/TexturedPhong
-{
-	technique
-	{
-		pass main
-		{
-			cull_hardware none
-			texture_unit
-			{
-				texture GreenSkin.jpg
-				tex_address_mode mirror
-			}
-		}
-	}
-}
-material DeferredDemo/Ogre/EarRing : DeferredShading/Material/UntexturedPhong
-{
-	technique
-	{
-		pass main
-		{
-			fragment_program_ref DeferredShading/material/notex_ps
-			{
-				param_named specularity float 1.5
-				param_named colour float3 0.5 0.5 0
-			}
-		}
-	}
-}
-material DeferredDemo/Ogre/Tusks : DeferredShading/Material/TexturedPhong
-{
-	technique
-	{
-		pass main
-		{
-			fragment_program_ref DeferredShading/material/ps
-			{
-				param_named specularity float 0.5
-			}
-			texture_unit
-			{
-				texture dirt01.jpg
-			}
-		}
-	}
-}
-material DeferredDemo/Ogre/Eyes  : DeferredShading/Material/TexturedPhong
-{
-	technique
-	{
-		pass main
-		{
-			fragment_program_ref DeferredShading/material/ps
-			{
-				param_named specularity float 1.0
-			}
-			texture_unit
-			{
-				texture WeirdEye.png
 			}
 		}
 	}

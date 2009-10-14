@@ -1,0 +1,144 @@
+// Post processors
+
+//Ambient light
+material DeferredShading/AmbientLight
+{
+    technique
+    {
+		pass
+		{
+			lighting off
+			
+			depth_write on
+			depth_check on
+			
+			vertex_program_ref DeferredShading/post/vs
+			{
+			
+			}
+			fragment_program_ref DeferredShading/post/Ambient_ps
+			{
+			
+			}
+			
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+}
+
+material DeferredShading/Post/ShowNormal
+{
+    technique
+    {
+    	pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+			fragment_program_ref DeferredShading/post/ShowNormal_ps
+			{
+			}
+			vertex_program_ref DeferredShading/post/vs
+			{
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+			texture_unit
+			{
+				tex_coord_set 1
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+}
+material DeferredShading/Post/ShowDS
+{
+    technique
+    {
+    	pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+			fragment_program_ref DeferredShading/post/ShowDS_ps
+			{
+			}
+			vertex_program_ref DeferredShading/post/vs
+			{
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+			texture_unit
+			{
+				tex_coord_set 1
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+
+}
+material DeferredShading/Post/ShowColour
+{
+    technique
+    {
+    	pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+			fragment_program_ref DeferredShading/post/ShowColour_ps
+			{
+			}
+			vertex_program_ref DeferredShading/post/vs
+			{
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+			texture_unit
+			{
+				tex_coord_set 1
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+}
+
+material DeferredShading/Post/SimpleQuad
+{
+    technique
+    {
+        pass
+        {
+            lighting off
+			depth_write off
+			depth_check off
+			
+            texture_unit
+            {
+                texture white.bmp
+                filtering none
+            }
+		}
+	}
+}

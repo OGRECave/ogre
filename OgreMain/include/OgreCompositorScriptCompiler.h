@@ -84,11 +84,12 @@ namespace Ogre {
 			ID_PF_FLOAT16_R, ID_PF_FLOAT16_RGB, ID_PF_FLOAT16_RGBA,
 			ID_PF_FLOAT32_R, ID_PF_FLOAT32_RGB, ID_PF_FLOAT32_RGBA,
 			ID_PF_FLOAT16_GR, ID_PF_FLOAT32_GR,
-			ID_SHARED, ID_GAMMA, ID_NO_FSAA,
+			ID_POOLED, ID_GAMMA, ID_NO_FSAA,
+			ID_SCOPE_LOCAL, ID_SCOPE_CHAIN, ID_SCOPE_GLOBAL,
 			// Targets
 			ID_PREVIOUS, ID_NONE,
 			// Passes
-			ID_RENDER_QUAD, ID_CLEAR, ID_STENCIL, ID_RENDER_SCENE,
+			ID_RENDER_QUAD, ID_CLEAR, ID_STENCIL, ID_RENDER_SCENE, ID_RENDER_CUSTOM,
 			// Clear section
 			ID_CLR_COLOUR, ID_CLR_DEPTH,
 			// Stencil section
@@ -161,6 +162,8 @@ namespace Ogre {
 		void parseCompositor(void);
 		void parseTechnique(void);
 		void parseTexture(void);
+		void parseTextureRef(void);
+		void parseCompositorLogic(void);
 		void parseScheme(void);
 		void parseTarget(void);
 		void parseInput(void);

@@ -1,0 +1,305 @@
+
+material sibenik/Default
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.698039 0.698039 0.698039 1
+			diffuse 0.698039 0.698039 0.698039 1
+		}
+
+	}
+
+}
+
+material sibenik/poplocenje
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.65098 0.647059 0.596078 1
+
+			texture_unit
+			{
+				texture KAMEN320x240.jpg
+			}
+		}
+
+	}
+
+}
+
+material sibenik/kuce
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.733333 0.729412 0.670588 1
+
+			texture_unit
+			{
+				texture KAMEN320x240.jpg
+			}
+		}
+
+	}
+
+}
+
+material sibenik/staklo_zuto
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.498039 0.443137 0.00392157 1.19
+		}
+
+	}
+
+}
+
+material sibenik/kamen_zid_prozor
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.733333 0.729412 0.670588 1
+
+			texture_unit
+			{
+				texture KAMEN320x240.jpg
+			}
+		}
+
+	}
+
+}
+
+material sibenik/pod-rub
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.733333 0.729412 0.670588 1
+
+			texture_unit
+			{
+				texture KAMEN320x240.jpg
+			}
+		}
+
+	}
+
+}
+
+material sibenik/staklo_plavo
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.0392157 0.0705882 0.392157 1.19
+		}
+
+	}
+
+}
+
+material sibenik/staklo_crveno
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.439216 0.101961 0.0470588 1.19
+		}
+
+	}
+
+}
+
+material sibenik/sprljci
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.784314 0.784314 0.784314 1
+		}
+
+	}
+
+}
+
+material sibenik/staklo_zeleno
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.0313726 0.313726 0.0352941 1.19
+		}
+
+	}
+
+}
+
+material sibenik/rozeta
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.733333 0.729412 0.670588 1
+
+			texture_unit
+			{
+				texture KAMEN-stup.jpg
+			}
+		}
+
+	}
+
+}
+
+material sibenik/kamen_zid_parape
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.733333 0.729412 0.670588 1
+
+			texture_unit
+			{
+				texture KAMEN-stup.jpg
+			}
+		}
+
+	}
+
+}
+
+material sibenik/zid_vani
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.733333 0.729412 0.670588 1
+
+			texture_unit
+			{
+				texture KAMEN320x240.jpg
+			}
+		}
+
+	}
+
+}
+
+material sibenik/glas
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.639216 0.639216 0.639216 1
+			diffuse 1 1 1 0.5
+			scene_blend alpha_blend
+			depth_write off
+		}
+
+	}
+
+}
+
+material sibenik/pod
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.733333 0.705882 0.670588 1
+
+			texture_unit
+			{
+				texture MRAMOR6X6.jpg
+			}
+		}
+
+	}
+
+}
+
+material sibenik/pod_tepih
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.545098 0.219608 0.180392 1
+		}
+
+	}
+
+}
+
+material sibenik/stupovi
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 0.733333 0.729412 0.670588 1
+
+			texture_unit
+			{
+				texture KAMEN-stup.jpg
+			}
+		}
+
+	}
+
+}
+
+material sibenik/kamen_zid
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.733333 0.729412 0.670588 1
+			diffuse 0.733333 0.729412 0.670588 1
+			cull_hardware none
+
+			texture_unit
+			{
+				texture KAMEN320x240.jpg
+			}
+		}
+
+	}
+
+}

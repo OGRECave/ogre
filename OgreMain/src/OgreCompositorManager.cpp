@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreCompositor.h"
 #include "OgreCompositorChain.h"
 #include "OgreCompositionPass.h"
+#include "OgreCustomCompositionPass.h"
 #include "OgreCompositionTargetPass.h"
 #include "OgreCompositionTechnique.h"
 #include "OgreRoot.h"
@@ -75,7 +76,7 @@ CompositorManager::CompositorManager():
 CompositorManager::~CompositorManager()
 {
     freeChains();
-	freeSharedTextures(false);
+	freePooledTextures(false);
 	OGRE_DELETE mRectangle;
 
 	OGRE_THREAD_POINTER_DELETE(mSerializer);
@@ -286,13 +287,40 @@ void CompositorManager::_reconstructAllCompositorResources()
 	}
 }
 //---------------------------------------------------------------------
-TexturePtr CompositorManager::getSharedTexture(const String& name, 
+TexturePtr CompositorManager::getPooledTexture(const String& name, 
 	const String& localName,
 	size_t w, size_t h, PixelFormat f, uint aa, const String& aaHint, bool srgb, 
 	CompositorManager::UniqueTextureSet& texturesAssigned, 
-	CompositorInstance* inst)
+	CompositorInstance* inst, CompositionTechnique::TextureScope scope)
 {
+	if (scope == CompositionTechnique::TS_GLOBAL) 
+	{
+		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+			"Global scope texture can not be pooled.",
+			"CompositorManager::getPooledTexture");
+	}
+
 	TextureDef def(w, h, f, aa, aaHint, srgb);
+
+	if (scope == CompositionTechnique::TS_CHAIN)
+	{
+		StringPair pair = std::make_pair(inst->getCompositor()->getName(), localName);
+		TextureDefMap& defMap = mChainTexturesByDef[pair];
+		TextureDefMap::iterator it = defMap.find(def);
+		if (it != defMap.end())
+		{
+			return it->second;
+		}
+		// ok, we need to create a new one
+		TexturePtr newTex = TextureManager::getSingleton().createManual(
+			name, 
+			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
+			(uint)w, (uint)h, 0, f, TU_RENDERTARGET, 0,
+			srgb, aa, aaHint);
+		defMap.insert(TextureDefMap::value_type(def, newTex));
+		return newTex;
+	}
+
 	TexturesByDef::iterator i = mTexturesByDef.find(def);
 	if (i == mTexturesByDef.end())
 	{
@@ -440,7 +468,7 @@ bool CompositorManager::isInputToOutputTarget(CompositorInstance* inst, TextureP
 
 }
 //---------------------------------------------------------------------
-void CompositorManager::freeSharedTextures(bool onlyIfUnreferenced)
+void CompositorManager::freePooledTextures(bool onlyIfUnreferenced)
 {
 	if (onlyIfUnreferenced)
 	{
@@ -461,7 +489,21 @@ void CompositorManager::freeSharedTextures(bool onlyIfUnreferenced)
 					++j;
 			}
 		}
-		
+		for (ChainTexturesByDef::iterator i = mChainTexturesByDef.begin(); i != mChainTexturesByDef.end(); ++i)
+		{
+			TextureDefMap& texMap = i->second;
+			for (TextureDefMap::iterator j = texMap.begin(); j != texMap.end();) 
+			{
+				const TexturePtr& tex = j->second;
+				if (tex.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+				{
+					TextureManager::getSingleton().remove(tex->getHandle());
+					texMap.erase(j++);
+				}
+				else
+					++j;
+			}
+		}
 	}
 	else
 	{
@@ -471,10 +513,67 @@ void CompositorManager::freeSharedTextures(bool onlyIfUnreferenced)
 			OGRE_DELETE_T(i->second, TextureList, MEMCATEGORY_GENERAL);
 		}
 		mTexturesByDef.clear();
-
+		mChainTexturesByDef.clear();
 	}
 
 }
-
-
+//---------------------------------------------------------------------
+void CompositorManager::registerCompositorLogic(const String& name, CompositorLogic* logic)
+{	
+	if (name.empty()) 
+	{
+		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+			"Compositor logic name must not be empty.",
+			"CompositorManager::registerCompositorLogic");
+	}
+	if (mCompositorLogics.find(name) != mCompositorLogics.end())
+	{
+		OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
+			"Compositor logic '" + name + "' already exists.",
+			"CompositorManager::registerCompositorLogic");
+	}
+	mCompositorLogics[name] = logic;
+}
+//---------------------------------------------------------------------
+CompositorLogic* CompositorManager::getCompositorLogic(const String& name)
+{
+	CompositorLogicMap::iterator it = mCompositorLogics.find(name);
+	if (it == mCompositorLogics.end())
+	{
+		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+			"Compositor logic '" + name + "' not registered.",
+			"CompositorManager::getCompositorLogic");
+	}
+	return it->second;
+}
+//---------------------------------------------------------------------
+void CompositorManager::registerCustomCompositionPass(const String& name, CustomCompositionPass* logic)
+{	
+	if (name.empty()) 
+	{
+		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+			"Custom composition pass name must not be empty.",
+			"CompositorManager::registerCustomCompositionPass");
+	}
+	if (mCustomCompositionPasses.find(name) != mCustomCompositionPasses.end())
+	{
+		OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
+			"Custom composition pass  '" + name + "' already exists.",
+			"CompositorManager::registerCustomCompositionPass");
+	}
+	mCustomCompositionPasses[name] = logic;
+}
+//---------------------------------------------------------------------
+CustomCompositionPass* CompositorManager::getCustomCompositionPass(const String& name)
+{
+	CustomCompositionPassMap::iterator it = mCustomCompositionPasses.find(name);
+	if (it == mCustomCompositionPasses.end())
+	{
+		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+			"Custom composition pass '" + name + "' not registered.",
+			"CompositorManager::getCustomCompositionPass");
+	}
+	return it->second;
+}
+//---------------------------------------------------------------------
 }

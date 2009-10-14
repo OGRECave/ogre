@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreResource.h"
+#include "OgreTexture.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -112,6 +113,28 @@ namespace Ogre {
 		*/
 		CompositionTechnique *getSupportedTechnique(const String& schemeName = StringUtil::BLANK);
 
+		/** Get the instance name for a global texture.
+		@param name The name of the texture in the original compositor definition
+		@param mrtIndex If name identifies a MRT, which texture attachment to retrieve
+		@returns The instance name for the texture, corresponds to a real texture
+		*/
+		const String& getTextureInstanceName(const String& name, size_t mrtIndex);
+
+		/** Get the instance of a global texture.
+		@param name The name of the texture in the original compositor definition
+		@param mrtIndex If name identifies a MRT, which texture attachment to retrieve
+		@returns The texture pointer, corresponds to a real texture
+		*/
+		TexturePtr getTextureInstance(const String& name, size_t mrtIndex);
+
+		/** Get the render target for a given render texture name. 
+		@remarks
+			You can use this to add listeners etc, but do not use it to update the
+			targets manually or any other modifications, the compositor instance 
+			is in charge of this.
+		*/
+		RenderTarget* getRenderTarget(const String& name);
+
     protected:
         /// @copydoc Resource::loadImpl
         void loadImpl(void);
@@ -132,6 +155,22 @@ namespace Ogre {
         /// This is set if the techniques change and the supportedness of techniques has to be
         /// re-evaluated.
         bool mCompilationRequired;
+
+		/** Create global rendertextures.
+        */
+        void createGlobalTextures();
+        
+        /** Destroy global rendertextures.
+        */
+        void freeGlobalTextures();
+
+		//TODO GSOC : These typedefs are duplicated from CompositorInstance. Solve?
+		/// Map from name->local texture
+        typedef map<String,TexturePtr>::type GlobalTextureMap;
+        GlobalTextureMap mGlobalTextures;
+		/// Store a list of MRTs we've created
+		typedef map<String,MultiRenderTarget*>::type GlobalMRTMap;
+		GlobalMRTMap mGlobalMRTs;
     };
 
     /** Specialisation of SharedPtr to allow SharedPtr to be assigned to CompositorPtr 

@@ -134,8 +134,10 @@ namespace Ogre {
 		/// Current material scheme
 		unsigned short mActiveSchemeIndex;
 
+		/// The list of per-scheme (and general) material listeners
 		typedef list<Listener*>::type ListenerList;
-		ListenerList mListenerList;
+		typedef std::map<String, ListenerList> ListenerMap;
+		ListenerMap mListenerMap;
 
     public:
 		/// Default material scheme
@@ -244,10 +246,17 @@ namespace Ogre {
 		*/
 		virtual void setActiveScheme(const String& schemeName);
 
-		/** Add a listener to handle material events. */
-		virtual void addListener(Listener* l);
-		/** Remove a listener handling material events. */
-		virtual void removeListener(Listener* l);
+		/** 
+		Add a listener to handle material events. 
+		If schemeName is supplied, the listener will only receive events for that certain scheme.
+		*/
+		virtual void addListener(Listener* l, const Ogre::String& schemeName = StringUtil::BLANK);
+
+		/** 
+		Remove a listener handling material events. 
+		If the listener was added with a custom scheme name, it needs to be supplied here as well.
+		*/
+		virtual void removeListener(Listener* l, const Ogre::String& schemeName = StringUtil::BLANK);
 
 		/// Internal method for sorting out missing technique for a scheme
 		virtual Technique* _arbitrateMissingTechniqueForActiveScheme(

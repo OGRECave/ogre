@@ -79,12 +79,18 @@ namespace Ogre {
 								it was cloned from.
 			 */
 			virtual void notifyMaterialRender(uint32 pass_id, MaterialPtr &mat);
+
+			/** Notification after resources have been created (or recreated).
+				@param resizeOnly Was the creation because the viewport was resized?
+			 */
+			virtual void notifyResourcesCreated(bool forResizeOnly);
+			
 		};
         /** Specific render system operation. A render target operation does special operations
 		    between render queues like rendering a quad, clearing the frame buffer or 
 			setting stencil state.
 		*/
-		class RenderSystemOperation : public CompositorInstAlloc
+		class _OgreExport RenderSystemOperation : public CompositorInstAlloc
 		{
 		public:
 			virtual ~RenderSystemOperation();
@@ -265,6 +271,10 @@ namespace Ogre {
 		/** Notify listeners of a material render.
 		*/
 		void _fireNotifyMaterialRender(uint32 pass_id, MaterialPtr &mat);
+
+		/** Notify listeners of a material render.
+		*/
+		void _fireNotifyResourcesCreated(bool forResizeOnly);
 	private:
         /// Compositor of which this is an instance
         Compositor *mCompositor;

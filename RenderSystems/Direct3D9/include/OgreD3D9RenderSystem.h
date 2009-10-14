@@ -175,7 +175,8 @@ namespace Ogre
 			bool operator()(const ZBufferIdentifier& z0, const ZBufferIdentifier& z1) const;
 		};
 		
-		typedef map<ZBufferIdentifier, ZBufferRef, ZBufferIdentifierComparator>::type ZBufferHash;
+		typedef deque<ZBufferRef>::type ZBufferRefQueue;
+		typedef map<ZBufferIdentifier, ZBufferRefQueue, ZBufferIdentifierComparator>::type ZBufferHash;
 		ZBufferHash mZBufferHash;		
 
 	protected:
@@ -253,6 +254,8 @@ namespace Ogre
 		void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
 		void _setViewport( Viewport *vp );		
 		void _beginFrame();
+		virtual RenderSystemContext* _pauseFrame(void);
+		virtual void _resumeFrame(RenderSystemContext* context);
 		void _endFrame();		
 		void _setCullingMode( CullingMode mode );
 		void _setDepthBufferParams( bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL );
@@ -316,6 +319,11 @@ namespace Ogre
 		static IDirect3DDevice9* getResourceCreationDevice(UINT index);
 		static IDirect3DDevice9* getActiveD3D9Device();
 		
+		/**
+			Get the matching Z-Buffer identifier for a certain render target
+		*/
+		ZBufferIdentifier getZBufferIdentifier(RenderTarget* rt);
+
 		/** Check which depthStencil formats can be used with a certain pixel format,
 			and return the best suited.
 		*/
@@ -350,6 +358,9 @@ namespace Ogre
 		/// Notify when a device has been reset.
 		void notifyOnDeviceReset(D3D9Device* device);
 		
+		typedef map<RenderTarget*, ZBufferRef>::type TargetDepthStencilMap;
+		TargetDepthStencilMap mCheckedOutTextures;
+
 	private:
 		friend class D3D9Device;
 		friend class D3D9DeviceManager;		

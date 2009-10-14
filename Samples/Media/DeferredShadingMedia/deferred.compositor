@@ -1,44 +1,103 @@
 // Postfilter doing full deferred shading
 
-compositor DeferredShading/ShowLit
+compositor DeferredShading/GBuffer
 {
 	technique
 	{
 		// temporary textures
-		texture mrt_output target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_RGBA		
+		texture mrt_output target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_RGBA chain_scope
 		
 		target mrt_output
-        {
-            input none
-        	pass clear
+		{
+			input none
+			pass clear
 			{
 			}
+			
+			shadows off
+			material_scheme GBuffer
 			
 			// everything but the lights and their meshes
 			// could do this with something like a visibility mask too
 			pass render_scene
 			{
-				first_render_queue 22
-				last_render_queue  90	
+				//These values are synchronized with the code
+				first_render_queue 10
+				last_render_queue  79	
 			}
-        }
-	
-        target_output
+		}
+	}
+}
+
+compositor DeferredShading/ShowLit
+{
+
+	technique
+	{
+		texture rt0 target_width target_height PF_A8R8G8B8
+		//Reference the main Gbuffer texture
+		texture_ref mrt_output DeferredShading/GBuffer mrt_output
+		
+        target rt0
         {
 			input none
+			//We will dispatch the shadow texture rendering ourselves
+			shadows off
 			
-			// render skies
-			pass render_scene
+			pass clear
 			{
-				first_render_queue 5
-				last_render_queue  5			
+				
 			}
-						
-			// just the lights and their meshes
+			
+			// render skies and other pre-gbuffer objects
 			pass render_scene
 			{
-				first_render_queue 20
-				last_render_queue 21
+				first_render_queue 1
+				last_render_queue  9			
+			}
+			
+			//Render the lights and their meshes
+			pass render_custom DeferredLight
+			{
+				input 0 mrt_output 0
+				input 1 mrt_output 1
+			}
+			
+			pass render_scene
+			{
+				//This value is synchronized with the code
+				first_render_queue 80
+			}
+		}
+		
+		//Render the passes that did not get rendered to the GBuffer (transparent)
+		//target rt0
+        //{
+		//	//shadows off?
+		//	shadows off
+		//	material_scheme NoGBuffer
+		//	pass render_scene
+		//	{
+		//		first_render_queue 10
+		//		last_render_queue 79
+		//	}
+		//}
+		
+		// Render the post-gbuffer objects
+		//target rt0
+        //{
+		//	//shadows off?
+		//	shadows off
+		//	
+		//}
+		
+		target_output
+		{
+			input none
+			pass render_quad
+			{
+				material DeferredShading/Post/SimpleQuad
+				input 0 rt0
 			}
 		}
 	}
@@ -49,23 +108,9 @@ compositor DeferredShading/ShowColour
 {
 	technique 
 	{
-		// temporary textures
-		texture mrt_output target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_RGBA		
+		//Reference the main Gbuffer texture
+		texture_ref mrt_output DeferredShading/GBuffer mrt_output
 		
-		target mrt_output
-        {
-            input none
-        	pass clear
-			{
-			}
-			
-			pass render_scene
-			{
-				first_render_queue 22
-				last_render_queue  90	
-			}
-        }
-
 		target_output
         {
 			input none
@@ -85,23 +130,9 @@ compositor DeferredShading/ShowNormals
 {
 	technique 
 	{
-		// temporary textures
-		texture mrt_output target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_RGBA		
+		//Reference the main Gbuffer texture
+		texture_ref mrt_output DeferredShading/GBuffer mrt_output
 		
-		target mrt_output
-        {
-            input none
-        	pass clear
-			{
-			}
-			
-			pass render_scene
-			{
-				first_render_queue 22
-				last_render_queue  90	
-			}
-        }
-
 		target_output
         {
 			input none
@@ -121,22 +152,8 @@ compositor DeferredShading/ShowDepthSpecular
 {
 	technique 
 	{
-		// temporary textures
-		texture mrt_output target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_RGBA		
-		
-		target mrt_output
-        {
-            input none
-        	pass clear
-			{
-			}
-			
-			pass render_scene
-			{
-				first_render_queue 22
-				last_render_queue  90	
-			}
-        }
+		//Reference the main Gbuffer texture
+		texture_ref mrt_output DeferredShading/GBuffer mrt_output
 
 		target_output
         {

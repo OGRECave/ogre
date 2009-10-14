@@ -1,0 +1,23 @@
+// Auxilary lights
+vertex_program DeferredShading/Shadows/CasterVP cg
+{
+	source ShadowCaster.cg
+	profiles vs_1_1 arbvp1
+	entry_point ShadowCasterVP
+	default_params
+	{
+		param_named_auto cWorldViewProj worldviewproj_matrix
+		param_named_auto cWorldView worldview_matrix
+	}
+}
+fragment_program DeferredShading/Shadows/CasterFP cg
+{
+	source ShadowCaster.cg
+	profiles ps_2_0 arbfp1
+	entry_point ShadowCasterFP
+
+	default_params
+	{
+		param_named_auto cFarDistance far_clip_distance
+	}
+}

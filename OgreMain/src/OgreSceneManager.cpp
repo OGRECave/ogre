@@ -5947,7 +5947,7 @@ void SceneManager::destroyShadowTextures(void)
         
 }
 //---------------------------------------------------------------------
-void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
+void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
 {
 	// create shadow textures if needed
 	ensureShadowTexturesCreated();
@@ -5955,6 +5955,9 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
     // Set the illumination stage, prevents recursive calls
     IlluminationRenderStage savedStage = mIlluminationStage;
     mIlluminationStage = IRS_RENDER_TO_TEXTURE;
+
+	if (lightList == 0)
+		lightList = &mLightsAffectingFrustum;
 
 	try
 	{
@@ -5989,15 +5992,15 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
 		// start of the light list, therefore we do not need to deal with potential
 		// mismatches in the light<->shadow texture list any more
 
-		LightList::iterator i, iend;
+		LightList::const_iterator i, iend;
 		ShadowTextureList::iterator si, siend;
 		ShadowTextureCameraList::iterator ci;
-		iend = mLightsAffectingFrustum.end();
+		iend = lightList->end();
 		siend = mShadowTextures.end();
 		ci = mShadowTextureCameras.begin();
 		mShadowTextureIndexLightList.clear();
 		size_t shadowTextureIndex = 0;
-		for (i = mLightsAffectingFrustum.begin(), si = mShadowTextures.begin();
+		for (i = lightList->begin(), si = mShadowTextures.begin();
 			i != iend && si != siend; ++i)
 		{
 			Light* light = *i;
@@ -6073,10 +6076,91 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
     mIlluminationStage = savedStage;
 
 	fireShadowTexturesUpdated(
-		std::min(mLightsAffectingFrustum.size(), mShadowTextures.size()));
+		std::min(lightList->size(), mShadowTextures.size()));
 
 	ShadowTextureManager::getSingleton().clearUnused();
 
+}
+//---------------------------------------------------------------------
+struct SceneManager::RenderContext {
+	RenderQueue* renderQueue;
+	Viewport* viewport;
+	Camera* camera;
+	RenderSystem::RenderSystemContext* rsContext;
+};
+//---------------------------------------------------------------------
+SceneManager::RenderContext* SceneManager::_pauseRendering()
+{
+	RenderContext* context = new RenderContext;
+	context->renderQueue = mRenderQueue;
+	context->viewport = mCurrentViewport;
+	context->camera = mCameraInProgress;
+	
+	context->rsContext = mDestRenderSystem->_pauseFrame();
+	mRenderQueue = 0;
+	return context;
+}
+//---------------------------------------------------------------------
+void SceneManager::_resumeRendering(SceneManager::RenderContext* context) 
+{
+	if (mRenderQueue != 0) 
+	{
+		delete mRenderQueue;
+	}
+	mRenderQueue = context->renderQueue;
+
+	Ogre::Viewport* vp = context->viewport;
+	Ogre::Camera* camera = context->camera;
+
+	// Tell params about viewport
+	mAutoParamDataSource->setCurrentViewport(vp);
+	// Set the viewport - this is deliberately after the shadow texture update
+	setViewport(vp);
+
+	// Tell params about camera
+	mAutoParamDataSource->setCurrentCamera(camera, mCameraRelativeRendering);
+	// Set autoparams for finite dir light extrusion
+	mAutoParamDataSource->setShadowDirLightExtrusionDistance(mShadowDirLightExtrudeDist);
+
+	// Tell params about current ambient light
+	mAutoParamDataSource->setAmbientLightColour(mAmbientLight);
+	// Tell rendersystem
+	mDestRenderSystem->setAmbientLight(mAmbientLight.r, mAmbientLight.g, mAmbientLight.b);
+
+	// Tell params about render target
+	mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
+
+
+	// Set camera window clipping planes (if any)
+	if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_USER_CLIP_PLANES))
+	{
+		mDestRenderSystem->resetClipPlanes();
+		if (camera->isWindowSet())  
+		{
+			mDestRenderSystem->setClipPlanes(camera->getWindowPlanes());
+		}
+	}
+	mCameraInProgress = context->camera;
+	mDestRenderSystem->_resumeFrame(context->rsContext);
+
+	// Set rasterisation mode
+    mDestRenderSystem->_setPolygonMode(mCameraInProgress->getPolygonMode());
+
+	// Set initial camera state
+	mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());
+	
+	mCachedViewMatrix = mCameraInProgress->getViewMatrix(true);
+
+	if (mCameraRelativeRendering)
+	{
+		mCachedViewMatrix.setTrans(Vector3::ZERO);
+		mCameraRelativePosition = mCameraInProgress->getDerivedPosition();
+	}
+	mDestRenderSystem->_setTextureProjectionRelativeTo(mCameraRelativeRendering, mCameraInProgress->getDerivedPosition());
+
+	
+	setViewMatrix(mCachedViewMatrix);
+	delete context;
 }
 //---------------------------------------------------------------------
 StaticGeometry* SceneManager::createStaticGeometry(const String& name)
@@ -6503,11 +6587,12 @@ void SceneManager::extractAllMovableObjectsByType(const String& typeName)
 	}
 }
 //---------------------------------------------------------------------
-void SceneManager::_injectRenderWithPass(Pass *pass, Renderable *rend, bool shadowDerivation )
+void SceneManager::_injectRenderWithPass(Pass *pass, Renderable *rend, bool shadowDerivation,
+	bool doLightIteration, const LightList* manualLightList)
 {
 	// render something as if it came from the current queue
     const Pass *usedPass = _setPass(pass, false, shadowDerivation);
-    renderSingleObject(rend, usedPass, false, false);
+    renderSingleObject(rend, usedPass, false, doLightIteration, manualLightList);
 }
 //---------------------------------------------------------------------
 RenderSystem *SceneManager::getDestinationRenderSystem()

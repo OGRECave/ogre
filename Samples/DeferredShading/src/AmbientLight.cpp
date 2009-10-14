@@ -16,6 +16,8 @@ same license as the rest of the engine.
 #include "AmbientLight.h"
 #include "GeomUtils.h"
 #include "OgreMaterialManager.h"
+#include "OgreRoot.h"
+#include "OgreRenderSystem.h"
 
 using namespace Ogre;
 
@@ -38,6 +40,12 @@ AmbientLight::AmbientLight()
 	mMatPtr = MaterialManager::getSingleton().getByName("DeferredShading/AmbientLight");
 	assert(mMatPtr.isNull()==false);
 	mMatPtr->load();
+
+    //This shader needs to be aware if its running under OpenGL or DirectX.
+    //Real depthFactor = (Root::getSingleton().getRenderSystem()->getName() ==
+    //    "OpenGL Rendering Subsystem") ? 2.0 : 1.0;
+    //mMatPtr->getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant(
+    //        "depthFactor", depthFactor);
 }
 
 AmbientLight::~AmbientLight()
@@ -62,4 +70,28 @@ Real AmbientLight::getSquaredViewDepth(const Camera*) const
 const MaterialPtr& AmbientLight::getMaterial(void) const
 {
 	return mMatPtr;
+}
+
+void AmbientLight::getWorldTransforms(Ogre::Matrix4* xform) const
+{
+	*xform = Matrix4::IDENTITY;
+}
+void AmbientLight::updateFromCamera(Ogre::Camera* camera)
+{
+	Ogre::Technique* tech = getMaterial()->getBestTechnique();
+	Ogre::Vector3 farCorner = camera->getViewMatrix(true) * camera->getWorldSpaceCorners()[4];
+
+	for (unsigned short i=0; i<tech->getNumPasses(); i++) 
+	{
+		Ogre::Pass* pass = tech->getPass(i);
+		// get the vertex shader parameters
+		Ogre::GpuProgramParametersSharedPtr params = pass->getVertexProgramParameters();
+		// set the camera's far-top-right corner
+		if (params->_findNamedConstantDefinition("farCorner"))
+			params->setNamedConstant("farCorner", farCorner);
+	    
+		params = pass->getFragmentProgramParameters();
+		if (params->_findNamedConstantDefinition("farCorner"))
+			params->setNamedConstant("farCorner", farCorner);
+	}
 }

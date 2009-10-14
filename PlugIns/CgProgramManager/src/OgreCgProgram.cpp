@@ -181,6 +181,12 @@ namespace Ogre {
 			{
 
 				String shaderAssemblerCode = cgGetProgramString(mCgProgram, CG_COMPILED_PROGRAM);
+
+                if (mType == GPT_FRAGMENT_PROGRAM) {
+                    //HACK : http://developer.nvidia.com/forums/index.php?showtopic=1063&pid=2378&mode=threaded&start=#entry2378
+                    //Still happens in CG 2.2. Remove hack when fixed.
+                    shaderAssemblerCode = StringUtil::replaceAll(shaderAssemblerCode, "oDepth.z", "oDepth");
+                }
 				// Create a low-level program, give it the same name as us
 				mAssemblerProgram = 
 					GpuProgramManager::getSingleton().createProgramFromString(

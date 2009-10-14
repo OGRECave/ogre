@@ -1,11 +1,11 @@
 // Auxilary lights
 
 // Reference material [geometry]
-material DeferredShading/LightMaterial
+material DeferredShading/LightMaterial/Geometry
 {
-    technique
-    {
-		pass
+	technique DeferredTechnique
+	{
+		pass DeferredPass
 		{
 			// Don't disable depth test, because the light doesn't have to be rendered
 			// if the bounding geometry is obscured.
@@ -14,38 +14,12 @@ material DeferredShading/LightMaterial
 			depth_check on
 			lighting off
 			
-			
-			texture_unit
+			texture_unit GBuffer1
 			{
 				tex_address_mode clamp
 				filtering none
 			}
-			texture_unit
-			{
-				tex_address_mode clamp
-				filtering none
-			}
-		}
-	}
-}
-// Reference material [quad]
-material DeferredShading/LightMaterialQuad
-{
-    technique
-    {
-		pass
-		{
-			scene_blend add
-			depth_write off
-			depth_check off
-			lighting off
-			
-			texture_unit
-			{
-				tex_address_mode clamp
-				filtering none
-			}
-			texture_unit
+			texture_unit GBuffer2
 			{
 				tex_address_mode clamp
 				filtering none
@@ -54,3 +28,42 @@ material DeferredShading/LightMaterialQuad
 	}
 }
 
+// Reference material [geometry w/shadows]
+material DeferredShading/LightMaterial/GeometryShadow : DeferredShading/LightMaterial/Geometry
+{
+	technique DeferredTechnique
+	{
+		pass DeferredPass
+		{
+			texture_unit ShadowMap
+			{
+				content_type shadow
+			}
+		}
+	}
+}
+
+// Reference material [quad]
+material DeferredShading/LightMaterial/Quad : DeferredShading/LightMaterial/Geometry
+{
+    technique DeferredTechnique
+    {
+		pass DeferredPass
+		{
+			depth_check off
+		}
+	}
+}
+
+
+// Reference material [quad w/shadows]
+material DeferredShading/LightMaterial/QuadShadow : DeferredShading/LightMaterial/GeometryShadow
+{
+    technique DeferredTechnique
+    {
+		pass DeferredPass
+		{
+			depth_check off
+		}
+	}
+}
