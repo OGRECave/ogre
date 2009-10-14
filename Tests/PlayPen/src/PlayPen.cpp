@@ -3274,7 +3274,7 @@ protected:
 		CompositionTechnique::TextureDefinition* tdef =	ctech1->createTextureDefinition("rt0");
 		tdef->formatList.push_back(PF_A8B8G8R8);
 		tdef->width = tdef->height = 0;
-		tdef->shared = sharedTextures;
+		tdef->pooled = sharedTextures;
 
 		CompositionTargetPass* tpass = ctech1->createTargetPass();
 		tpass->setOutputName("rt0");
@@ -3292,7 +3292,7 @@ protected:
 		tdef =	ctech1->createTextureDefinition("rt0");
 		tdef->formatList.push_back(PF_A8B8G8R8);
 		tdef->width = tdef->height = 0;
-		tdef->shared = sharedTextures;
+		tdef->pooled = sharedTextures;
 
 		tpass = ctech1->createTargetPass();
 		tpass->setOutputName("rt0");
