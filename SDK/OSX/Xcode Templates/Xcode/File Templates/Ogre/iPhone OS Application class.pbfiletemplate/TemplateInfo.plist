@@ -1,0 +1,5 @@
+{
+	MainTemplateFile = "class.mm";
+	"CounterpartTemplateFile" = "class.h";
+	Description = "An Objective-C class file that targets iPhone OS, with an optional header which is a class that provides a basic skeleton for an Ogre application.";
+}

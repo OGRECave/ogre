@@ -1,0 +1,4 @@
+{
+	MainTemplateFile = "file.os";
+	Description = "A generic, multi-purpose Ogre script compatible with the new script compilers.";
+}

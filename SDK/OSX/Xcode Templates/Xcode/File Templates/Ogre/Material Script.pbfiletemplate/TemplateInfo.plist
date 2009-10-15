@@ -1,0 +1,4 @@
+{
+	MainTemplateFile = "file.material";
+	Description = "An Ogre material script.";
+}

@@ -1,0 +1,320 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		28FD15000DC6FC520079059D /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD14FF0DC6FC520079059D /* OpenGLES.framework */; };
+		28FD15080DC6FC5B0079059D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD15070DC6FC5B0079059D /* QuartzCore.framework */; };
+		9C3648C3106DE694006B0F4F /* InputHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C3648BE106DE694006B0F4F /* InputHandler.cpp */; };
+		9C3648C4106DE694006B0F4F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C3648C0106DE694006B0F4F /* main.cpp */; };
+		9C3648C5106DE694006B0F4F /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C3648C1106DE694006B0F4F /* Simulation.cpp */; };
+		9C3648C8106DE706006B0F4F /* ogre.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 9C3648C6106DE706006B0F4F /* ogre.cfg */; };
+		9C364926106DEAFC006B0F4F /* libboost_date_time.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C364920106DEAFC006B0F4F /* libboost_date_time.a */; };
+		9C364927106DEAFC006B0F4F /* libboost_thread.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C364921106DEAFC006B0F4F /* libboost_thread.a */; };
+		9C364928106DEAFC006B0F4F /* libFreeImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C364922106DEAFC006B0F4F /* libFreeImage.a */; };
+		9C364929106DEAFC006B0F4F /* libFreeType.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C364923106DEAFC006B0F4F /* libFreeType.a */; };
+		9C36492A106DEAFC006B0F4F /* libOIS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C364924106DEAFC006B0F4F /* libOIS.a */; };
+		9C36492B106DEAFC006B0F4F /* libzzip.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C364925106DEAFC006B0F4F /* libzzip.a */; };
+		9C364941106DEF8B006B0F4F /* libOgreMainStatic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C364940106DEF8B006B0F4F /* libOgreMainStatic.a */; };
+		9C364943106DEF8F006B0F4F /* libRenderSystem_GLESStatic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C364942106DEF8F006B0F4F /* libRenderSystem_GLESStatic.a */; };
+		9C364974106DF319006B0F4F /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 9C364973106DF319006B0F4F /* Default.png */; };
+		9C3649E8106DF9F3006B0F4F /* libPlugin_BSPSceneManagerStatic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C3649E5106DF9F3006B0F4F /* libPlugin_BSPSceneManagerStatic.a */; };
+		9C3649E9106DF9F3006B0F4F /* libPlugin_OctreeSceneManagerStatic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C3649E6106DF9F3006B0F4F /* libPlugin_OctreeSceneManagerStatic.a */; };
+		9C3649EA106DF9F3006B0F4F /* libPlugin_ParticleFXStatic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C3649E7106DF9F3006B0F4F /* libPlugin_ParticleFXStatic.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1D6058910D05DD3D006BFB54 /* ___PROJECTNAME___.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "___PROJECTNAME___.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		28FD14FF0DC6FC520079059D /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		28FD15070DC6FC5B0079059D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		32CA4F630368D1EE00C91783 /* ___PROJECTNAMEASIDENTIFIER____Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "___PROJECTNAMEASIDENTIFIER____Prefix.pch"; sourceTree = "<group>"; };
+		8D1107310486CEB800E47090 /* ___PROJECTNAMEASIDENTIFIER___-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "___PROJECTNAMEASIDENTIFIER___-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		9C3648BE106DE694006B0F4F /* InputHandler.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = InputHandler.cpp; path = Classes/InputHandler.cpp; sourceTree = SOURCE_ROOT; };
+		9C3648BF106DE694006B0F4F /* InputHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InputHandler.h; path = Classes/InputHandler.h; sourceTree = SOURCE_ROOT; };
+		9C3648C0106DE694006B0F4F /* main.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = main.cpp; path = Classes/main.cpp; sourceTree = SOURCE_ROOT; };
+		9C3648C1106DE694006B0F4F /* Simulation.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = Simulation.cpp; path = Classes/Simulation.cpp; sourceTree = SOURCE_ROOT; };
+		9C3648C2106DE694006B0F4F /* Simulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Simulation.h; path = Classes/Simulation.h; sourceTree = SOURCE_ROOT; };
+		9C3648C6106DE706006B0F4F /* ogre.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ogre.cfg; path = Resources/ogre.cfg; sourceTree = "<group>"; };
+		9C364920106DEAFC006B0F4F /* libboost_date_time.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_date_time.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libboost_date_time.a; sourceTree = "<absolute>"; };
+		9C364921106DEAFC006B0F4F /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libboost_thread.a; sourceTree = "<absolute>"; };
+		9C364922106DEAFC006B0F4F /* libFreeImage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreeImage.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libFreeImage.a; sourceTree = "<absolute>"; };
+		9C364923106DEAFC006B0F4F /* libFreeType.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreeType.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libFreeType.a; sourceTree = "<absolute>"; };
+		9C364924106DEAFC006B0F4F /* libOIS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOIS.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libOIS.a; sourceTree = "<absolute>"; };
+		9C364925106DEAFC006B0F4F /* libzzip.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzzip.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libzzip.a; sourceTree = "<absolute>"; };
+		9C364940106DEF8B006B0F4F /* libOgreMainStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOgreMainStatic.a; path = _OGRESDK_ROOT_/lib/libOgreMainStatic.a; sourceTree = "<absolute>"; };
+		9C364942106DEF8F006B0F4F /* libRenderSystem_GLESStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRenderSystem_GLESStatic.a; path = _OGRESDK_ROOT_/lib/libRenderSystem_GLESStatic.a; sourceTree = "<absolute>"; };
+		9C364973106DF319006B0F4F /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = Resources/Default.png; sourceTree = "<group>"; };
+		9C3649E5106DF9F3006B0F4F /* libPlugin_BSPSceneManagerStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPlugin_BSPSceneManagerStatic.a; path = _OGRESDK_ROOT_/lib/libPlugin_BSPSceneManagerStatic.a; sourceTree = "<absolute>"; };
+		9C3649E6106DF9F3006B0F4F /* libPlugin_OctreeSceneManagerStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPlugin_OctreeSceneManagerStatic.a; path = _OGRESDK_ROOT_/lib/libPlugin_OctreeSceneManagerStatic.a; sourceTree = "<absolute>"; };
+		9C3649E7106DF9F3006B0F4F /* libPlugin_ParticleFXStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPlugin_ParticleFXStatic.a; path = _OGRESDK_ROOT_/lib/libPlugin_ParticleFXStatic.a; sourceTree = "<absolute>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1D60588F0D05DD3D006BFB54 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
+				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
+				28FD15000DC6FC520079059D /* OpenGLES.framework in Frameworks */,
+				28FD15080DC6FC5B0079059D /* QuartzCore.framework in Frameworks */,
+				9C364926106DEAFC006B0F4F /* libboost_date_time.a in Frameworks */,
+				9C364927106DEAFC006B0F4F /* libboost_thread.a in Frameworks */,
+				9C364928106DEAFC006B0F4F /* libFreeImage.a in Frameworks */,
+				9C364929106DEAFC006B0F4F /* libFreeType.a in Frameworks */,
+				9C36492A106DEAFC006B0F4F /* libOIS.a in Frameworks */,
+				9C36492B106DEAFC006B0F4F /* libzzip.a in Frameworks */,
+				9C364941106DEF8B006B0F4F /* libOgreMainStatic.a in Frameworks */,
+				9C364943106DEF8F006B0F4F /* libRenderSystem_GLESStatic.a in Frameworks */,
+				9C3649E8106DF9F3006B0F4F /* libPlugin_BSPSceneManagerStatic.a in Frameworks */,
+				9C3649E9106DF9F3006B0F4F /* libPlugin_OctreeSceneManagerStatic.a in Frameworks */,
+				9C3649EA106DF9F3006B0F4F /* libPlugin_ParticleFXStatic.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				9C3648BE106DE694006B0F4F /* InputHandler.cpp */,
+				9C3648BF106DE694006B0F4F /* InputHandler.h */,
+				9C3648C0106DE694006B0F4F /* main.cpp */,
+				9C3648C1106DE694006B0F4F /* Simulation.cpp */,
+				9C3648C2106DE694006B0F4F /* Simulation.h */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1D6058910D05DD3D006BFB54 /* ___PROJECTNAME___.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
+			isa = PBXGroup;
+			children = (
+				080E96DDFE201D6D7F000001 /* Classes */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = CustomTemplate;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				32CA4F630368D1EE00C91783 /* ___PROJECTNAMEASIDENTIFIER____Prefix.pch */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				9C364973106DF319006B0F4F /* Default.png */,
+				9C3648C6106DE706006B0F4F /* ogre.cfg */,
+				8D1107310486CEB800E47090 /* ___PROJECTNAMEASIDENTIFIER___-Info.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1D30AB110D05D00D00671497 /* Foundation.framework */,
+				9C364920106DEAFC006B0F4F /* libboost_date_time.a */,
+				9C364921106DEAFC006B0F4F /* libboost_thread.a */,
+				9C364922106DEAFC006B0F4F /* libFreeImage.a */,
+				9C364923106DEAFC006B0F4F /* libFreeType.a */,
+				9C364940106DEF8B006B0F4F /* libOgreMainStatic.a */,
+				9C364924106DEAFC006B0F4F /* libOIS.a */,
+				9C3649E5106DF9F3006B0F4F /* libPlugin_BSPSceneManagerStatic.a */,
+				9C3649E6106DF9F3006B0F4F /* libPlugin_OctreeSceneManagerStatic.a */,
+				9C3649E7106DF9F3006B0F4F /* libPlugin_ParticleFXStatic.a */,
+				9C364942106DEF8F006B0F4F /* libRenderSystem_GLESStatic.a */,
+				9C364925106DEAFC006B0F4F /* libzzip.a */,
+				28FD14FF0DC6FC520079059D /* OpenGLES.framework */,
+				28FD15070DC6FC5B0079059D /* QuartzCore.framework */,
+				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1D6058900D05DD3D006BFB54 /* ___PROJECTNAME___ */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "___PROJECTNAME___" */;
+			buildPhases = (
+				1D60588D0D05DD3D006BFB54 /* Resources */,
+				1D60588E0D05DD3D006BFB54 /* Sources */,
+				1D60588F0D05DD3D006BFB54 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "___PROJECTNAME___";
+			productName = __PROJECTNAME__;
+			productReference = 1D6058910D05DD3D006BFB54 /* ___PROJECTNAME___.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "___PROJECTNAME___" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1D6058900D05DD3D006BFB54 /* ___PROJECTNAME___ */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1D60588D0D05DD3D006BFB54 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C3648C8106DE706006B0F4F /* ogre.cfg in Resources */,
+				9C364974106DF319006B0F4F /* Default.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1D60588E0D05DD3D006BFB54 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C3648C3106DE694006B0F4F /* InputHandler.cpp in Sources */,
+				9C3648C4106DE694006B0F4F /* main.cpp in Sources */,
+				9C3648C5106DE694006B0F4F /* Simulation.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1D6058940D05DD3E006BFB54 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "___PROJECTNAMEASIDENTIFIER____Prefix.pch";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
+				HEADER_SEARCH_PATHS = (
+					_OGRESDK_ROOT_/iPhoneDependencies/include,
+					_OGRESDK_ROOT_/include,
+					_OGRESDK_ROOT_/include/iPhone,
+				);
+				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					_OGRESDK_ROOT_/lib,
+					"_OGRESDK_ROOT_/iPhoneDependencies/lib/$(CONFIGURATION)",
+				);
+				PRODUCT_NAME = "___PROJECTNAME___";
+			};
+			name = Debug;
+		};
+		1D6058950D05DD3E006BFB54 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "___PROJECTNAMEASIDENTIFIER____Prefix.pch";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
+				HEADER_SEARCH_PATHS = (
+					_OGRESDK_ROOT_/iPhoneDependencies/include,
+					_OGRESDK_ROOT_/include,
+					_OGRESDK_ROOT_/include/iPhone,
+				);
+				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					_OGRESDK_ROOT_/lib,
+					"_OGRESDK_ROOT_/iPhoneDependencies/lib/$(CONFIGURATION)",
+				);
+				PRODUCT_NAME = "___PROJECTNAME___";
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = iphonesimulator3.0;
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = iphonesimulator3.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "___PROJECTNAME___" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D6058940D05DD3E006BFB54 /* Debug */,
+				1D6058950D05DD3E006BFB54 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "___PROJECTNAME___" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}

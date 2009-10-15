@@ -1,0 +1,4 @@
+{
+	MainTemplateFile = "file.overlay";
+	Description = "An Ogre overlay script.";
+}

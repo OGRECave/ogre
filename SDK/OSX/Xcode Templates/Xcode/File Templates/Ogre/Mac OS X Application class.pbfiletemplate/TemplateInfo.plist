@@ -1,0 +1,5 @@
+{
+	MainTemplateFile = "class.cpp";
+	"CounterpartTemplateFile" = "class.h";
+	Description = "An C++ class file that targets Mac OS X, with an optional header which is a class that provides a basic skeleton for an Ogre application";
+}

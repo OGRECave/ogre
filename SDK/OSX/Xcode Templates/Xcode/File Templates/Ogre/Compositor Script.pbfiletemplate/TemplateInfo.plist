@@ -1,0 +1,5 @@
+{
+	CFBundleIconFile = "TemplateIcons.icns";
+	MainTemplateFile = "file.compositor";
+	Description = "An Ogre compositor script.";
+}

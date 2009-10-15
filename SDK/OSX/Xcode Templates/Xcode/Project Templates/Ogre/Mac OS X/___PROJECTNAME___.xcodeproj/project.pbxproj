@@ -1,0 +1,390 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
+		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		9C4991E5105B462300CD2FB6 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C4991E4105B462300CD2FB6 /* Carbon.framework */; };
+		9C4991E9105B462300CD2FB6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C4991E8105B462300CD2FB6 /* OpenGL.framework */; };
+		9C4991F4105B46AC00CD2FB6 /* CEGUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C4991F1105B46AC00CD2FB6 /* CEGUI.framework */; };
+		9C4991F5105B46AC00CD2FB6 /* Cg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C4991F2105B46AC00CD2FB6 /* Cg.framework */; };
+		9C4991F6105B46AC00CD2FB6 /* Ogre.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C4991F3105B46AC00CD2FB6 /* Ogre.framework */; };
+		9C49939F105B46B700CD2FB6 /* libois.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C49939E105B46B700CD2FB6 /* libois.a */; };
+		9C98EE43105B6E3F007B4280 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C98EE42105B6E3F007B4280 /* IOKit.framework */; };
+		9C98EE56105B6E94007B4280 /* CEGUI.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9C4991F1105B46AC00CD2FB6 /* CEGUI.framework */; };
+		9C98EE57105B6E94007B4280 /* Cg.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9C4991F2105B46AC00CD2FB6 /* Cg.framework */; };
+		9C98EE58105B6E94007B4280 /* Ogre.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 9C4991F3105B46AC00CD2FB6 /* Ogre.framework */; };
+		9CB3F745106D837B00C72815 /* InputHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9CB3F740106D837B00C72815 /* InputHandler.cpp */; };
+		9CB3F746106D837B00C72815 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9CB3F742106D837B00C72815 /* main.cpp */; };
+		9CB3F747106D837B00C72815 /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9CB3F743106D837B00C72815 /* Simulation.cpp */; };
+		9CB3F78B106D84E100C72815 /* gui.zip in Resources */ = {isa = PBXBuildFile; fileRef = 9CB3F748106D838A00C72815 /* gui.zip */; };
+		9CB3F7B3106D8B0000C72815 /* Plugin_CgProgramManager.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CB3F7B0106D8B0000C72815 /* Plugin_CgProgramManager.dylib */; };
+		9CB3F7B4106D8B0100C72815 /* Plugin_OctreeSceneManager.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CB3F7B1106D8B0000C72815 /* Plugin_OctreeSceneManager.dylib */; };
+		9CB3F7B5106D8B0100C72815 /* RenderSystem_GL.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CB3F7B2106D8B0000C72815 /* RenderSystem_GL.dylib */; };
+		9CB3F7B6106D8B1400C72815 /* Plugin_CgProgramManager.dylib in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 9CB3F7B0106D8B0000C72815 /* Plugin_CgProgramManager.dylib */; };
+		9CB3F7B7106D8B1400C72815 /* Plugin_OctreeSceneManager.dylib in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 9CB3F7B1106D8B0000C72815 /* Plugin_OctreeSceneManager.dylib */; };
+		9CB3F7B8106D8B1400C72815 /* RenderSystem_GL.dylib in Copy PlugIns */ = {isa = PBXBuildFile; fileRef = 9CB3F7B2106D8B0000C72815 /* RenderSystem_GL.dylib */; };
+		9CB3F867106DABDD00C72815 /* ogre.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 9CB3F866106DABDD00C72815 /* ogre.cfg */; };
+		9CB3F88C106DAF3900C72815 /* plugins.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 9CB3F88B106DAF3900C72815 /* plugins.cfg */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9C98F01C105B6EB3007B4280 /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				9C98EE56105B6E94007B4280 /* CEGUI.framework in Copy Frameworks */,
+				9C98EE57105B6E94007B4280 /* Cg.framework in Copy Frameworks */,
+				9C98EE58105B6E94007B4280 /* Ogre.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9CB3F7A1106D859000C72815 /* Copy PlugIns */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				9CB3F7B6106D8B1400C72815 /* Plugin_CgProgramManager.dylib in Copy PlugIns */,
+				9CB3F7B7106D8B1400C72815 /* Plugin_OctreeSceneManager.dylib in Copy PlugIns */,
+				9CB3F7B8106D8B1400C72815 /* RenderSystem_GL.dylib in Copy PlugIns */,
+			);
+			name = "Copy PlugIns";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		256AC3F00F4B6AF500CF3369 /* ___PROJECTNAMEASIDENTIFIER____Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "___PROJECTNAMEASIDENTIFIER____Prefix.pch"; sourceTree = "<group>"; };
+		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		8D1107310486CEB800E47090 /* ___PROJECTNAMEASIDENTIFIER___-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "___PROJECTNAMEASIDENTIFIER___-Info.plist"; sourceTree = "<group>"; };
+		8D1107320486CEB800E47090 /* ___PROJECTNAME___.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "___PROJECTNAME___.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C4991E4105B462300CD2FB6 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		9C4991E8105B462300CD2FB6 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		9C4991F1105B46AC00CD2FB6 /* CEGUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CEGUI.framework; path = _OGRESDK_ROOT_/Dependencies/CEGUI.framework; sourceTree = "<absolute>"; };
+		9C4991F2105B46AC00CD2FB6 /* Cg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cg.framework; path = _OGRESDK_ROOT_/Dependencies/Cg.framework; sourceTree = "<absolute>"; };
+		9C4991F3105B46AC00CD2FB6 /* Ogre.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ogre.framework; path = _OGRESDK_ROOT_/Dependencies/Ogre.framework; sourceTree = "<absolute>"; };
+		9C49939E105B46B700CD2FB6 /* libois.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libois.a; path = _OGRESDK_ROOT_/Dependencies/lib/Release/libois.a; sourceTree = "<absolute>"; };
+		9C98EE42105B6E3F007B4280 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		9CB3F740106D837B00C72815 /* InputHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InputHandler.cpp; path = Classes/InputHandler.cpp; sourceTree = "<group>"; };
+		9CB3F741106D837B00C72815 /* InputHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InputHandler.h; path = Classes/InputHandler.h; sourceTree = "<group>"; };
+		9CB3F742106D837B00C72815 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = Classes/main.cpp; sourceTree = "<group>"; };
+		9CB3F743106D837B00C72815 /* Simulation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Simulation.cpp; path = Classes/Simulation.cpp; sourceTree = "<group>"; };
+		9CB3F744106D837B00C72815 /* Simulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Simulation.h; path = Classes/Simulation.h; sourceTree = "<group>"; };
+		9CB3F748106D838A00C72815 /* gui.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; name = gui.zip; path = Resources/gui.zip; sourceTree = "<group>"; };
+		9CB3F7B0106D8B0000C72815 /* Plugin_CgProgramManager.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = Plugin_CgProgramManager.dylib; path = _OGRESDK_ROOT_/Dependencies/Plugin_CgProgramManager.dylib; sourceTree = "<absolute>"; };
+		9CB3F7B1106D8B0000C72815 /* Plugin_OctreeSceneManager.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = Plugin_OctreeSceneManager.dylib; path = _OGRESDK_ROOT_/Dependencies/Plugin_OctreeSceneManager.dylib; sourceTree = "<absolute>"; };
+		9CB3F7B2106D8B0000C72815 /* RenderSystem_GL.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = RenderSystem_GL.dylib; path = _OGRESDK_ROOT_/Dependencies/RenderSystem_GL.dylib; sourceTree = "<absolute>"; };
+		9CB3F866106DABDD00C72815 /* ogre.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ogre.cfg; path = Resources/ogre.cfg; sourceTree = "<group>"; };
+		9CB3F88B106DAF3900C72815 /* plugins.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = plugins.cfg; path = Resources/plugins.cfg; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D11072E0486CEB800E47090 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
+				9C4991E5105B462300CD2FB6 /* Carbon.framework in Frameworks */,
+				9C4991E9105B462300CD2FB6 /* OpenGL.framework in Frameworks */,
+				9C4991F4105B46AC00CD2FB6 /* CEGUI.framework in Frameworks */,
+				9C4991F5105B46AC00CD2FB6 /* Cg.framework in Frameworks */,
+				9C4991F6105B46AC00CD2FB6 /* Ogre.framework in Frameworks */,
+				9C49939F105B46B700CD2FB6 /* libois.a in Frameworks */,
+				9C98EE43105B6E3F007B4280 /* IOKit.framework in Frameworks */,
+				9CB3F7B3106D8B0000C72815 /* Plugin_CgProgramManager.dylib in Frameworks */,
+				9CB3F7B4106D8B0100C72815 /* Plugin_OctreeSceneManager.dylib in Frameworks */,
+				9CB3F7B5106D8B0100C72815 /* RenderSystem_GL.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				9CB3F740106D837B00C72815 /* InputHandler.cpp */,
+				9CB3F741106D837B00C72815 /* InputHandler.h */,
+				9CB3F742106D837B00C72815 /* main.cpp */,
+				9CB3F743106D837B00C72815 /* Simulation.cpp */,
+				9CB3F744106D837B00C72815 /* Simulation.h */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9C4991F1105B46AC00CD2FB6 /* CEGUI.framework */,
+				9C4991F2105B46AC00CD2FB6 /* Cg.framework */,
+				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+				9C49939E105B46B700CD2FB6 /* libois.a */,
+				9C4991F3105B46AC00CD2FB6 /* Ogre.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9CB3F7B0106D8B0000C72815 /* Plugin_CgProgramManager.dylib */,
+				9CB3F7B1106D8B0000C72815 /* Plugin_OctreeSceneManager.dylib */,
+				9CB3F7B2106D8B0000C72815 /* RenderSystem_GL.dylib */,
+				9C4991E4105B462300CD2FB6 /* Carbon.framework */,
+				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
+				9C98EE42105B6E3F007B4280 /* IOKit.framework */,
+				9C4991E8105B462300CD2FB6 /* OpenGL.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D1107320486CEB800E47090 /* ___PROJECTNAME___.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* ___PROJECTNAMEASXML___ */ = {
+			isa = PBXGroup;
+			children = (
+				080E96DDFE201D6D7F000001 /* Classes */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = "___PROJECTNAMEASXML___";
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				256AC3F00F4B6AF500CF3369 /* ___PROJECTNAMEASIDENTIFIER____Prefix.pch */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				9CB3F866106DABDD00C72815 /* ogre.cfg */,
+				9CB3F88B106DAF3900C72815 /* plugins.cfg */,
+				8D1107310486CEB800E47090 /* ___PROJECTNAMEASIDENTIFIER___-Info.plist */,
+				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
+				9CB3F748106D838A00C72815 /* gui.zip */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
+				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D1107260486CEB800E47090 /* ___PROJECTNAME___ */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "___PROJECTNAME___" */;
+			buildPhases = (
+				8D1107290486CEB800E47090 /* Resources */,
+				9CB3F7A1106D859000C72815 /* Copy PlugIns */,
+				9C98F01C105B6EB3007B4280 /* Copy Frameworks */,
+				8D11072C0486CEB800E47090 /* Sources */,
+				8D11072E0486CEB800E47090 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "___PROJECTNAME___";
+			productInstallPath = "$(HOME)/Applications";
+			productName = "___PROJECTNAME___";
+			productReference = 8D1107320486CEB800E47090 /* ___PROJECTNAME___.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "___PROJECTNAME___" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 1;
+			mainGroup = 29B97314FDCFA39411CA2CEA /* ___PROJECTNAMEASXML___ */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D1107260486CEB800E47090 /* ___PROJECTNAME___ */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D1107290486CEB800E47090 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CB3F78B106D84E100C72815 /* gui.zip in Resources */,
+				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
+				9CB3F867106DABDD00C72815 /* ogre.cfg in Resources */,
+				9CB3F88C106DAF3900C72815 /* plugins.cfg in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D11072C0486CEB800E47090 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CB3F745106D837B00C72815 /* InputHandler.cpp in Sources */,
+				9CB3F746106D837B00C72815 /* main.cpp in Sources */,
+				9CB3F747106D837B00C72815 /* Simulation.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		089C165CFE840E0CC02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C165DFE840E0CC02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		C01FCF4B08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					_OGRESDK_ROOT_/Dependencies,
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "___PROJECTNAMEASIDENTIFIER____Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					_OGRESDK_ROOT_/Dependencies/Ogre.framework/Headers,
+					_OGRESDK_ROOT_/Dependencies/include,
+				);
+				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					_OGRESDK_ROOT_/Dependencies/lib/Release,
+					_OGRESDK_ROOT_/Dependencies,
+				);
+				PRODUCT_NAME = "___PROJECTNAME___";
+			};
+			name = Debug;
+		};
+		C01FCF4C08A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					_OGRESDK_ROOT_/Dependencies,
+				);
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "___PROJECTNAMEASIDENTIFIER____Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					_OGRESDK_ROOT_/Dependencies/Ogre.framework/Headers,
+					_OGRESDK_ROOT_/Dependencies/include,
+				);
+				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					_OGRESDK_ROOT_/Dependencies/lib/Release,
+					_OGRESDK_ROOT_/Dependencies,
+				);
+				PRODUCT_NAME = "___PROJECTNAME___";
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ONLY_ACTIVE_ARCH_PRE_XCODE_3_1)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = 4.0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH_PRE_XCODE_3_1 = "$(NATIVE_ARCH)";
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ONLY_ACTIVE_ARCH_PRE_XCODE_3_1)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = 4.0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH_PRE_XCODE_3_1 = "$(NATIVE_ARCH)";
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "___PROJECTNAME___" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4B08A954540054247B /* Debug */,
+				C01FCF4C08A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "___PROJECTNAME___" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}

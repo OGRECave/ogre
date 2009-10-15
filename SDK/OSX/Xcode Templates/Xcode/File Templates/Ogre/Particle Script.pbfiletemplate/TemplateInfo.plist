@@ -1,0 +1,4 @@
+{
+	MainTemplateFile = "file.particle";
+	Description = "An Ogre particle script.";
+}
