@@ -66,7 +66,7 @@ namespace Ogre {
         mActive = true;
         mWindow = nil;
         mContext = NULL;
-        mAnimationTimer = new Ogre::Timer();
+        mAnimationTimer = OGRE_NEW Ogre::Timer();
     }
 
     EAGLWindow::~EAGLWindow()
@@ -75,7 +75,7 @@ namespace Ogre {
 
         if (mContext == NULL)
         {
-            delete mContext;
+            OGRE_DELETE mContext;
         }
 
         mContext = NULL;
@@ -91,7 +91,7 @@ namespace Ogre {
         mClosed = true;
         mActive = false;
         
-        delete mAnimationTimer;
+        OGRE_DELETE mAnimationTimer;
 
         if (!mIsExternal)
         {
@@ -125,7 +125,32 @@ namespace Ogre {
 		frame.size.width = width;
 		frame.size.height = height;
 		[mWindow setFrame:frame];
+        mWidth = width;
+        mHeight = height;
 	}
+    
+    void EAGLWindow::changeOrientation(Viewport::Orientation orient)
+    {
+        if(orient == Viewport::OR_LANDSCAPELEFT)
+        {
+            mTop = 320;
+            mLeft = 0;
+            mWidth = 320;
+            mHeight = 480;
+        }
+        else if(orient == Viewport::OR_LANDSCAPERIGHT)
+        {
+            mLeft = 480;
+            mWidth = 320;
+            mHeight = 480;
+        }
+        else
+        {
+            mLeft = mTop = 0;
+        };
+        mCurrentOrientation = orient;
+        resize(mWidth, mHeight);
+    }
     
 	void EAGLWindow::windowMovedOrResized()
 	{
@@ -414,7 +439,7 @@ namespace Ogre {
 		{
 			size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
 			size_t height = dst.getHeight();
-			uchar *tmpData = new uchar[rowSpan * height];
+			uchar *tmpData = OGRE_NEW uchar[rowSpan * height];
 			uchar *srcRow = (uchar *)dst.data, *tmpRow = tmpData + (height - 1) * rowSpan;
 
 			while (tmpRow >= tmpData)
@@ -425,7 +450,7 @@ namespace Ogre {
 			}
 			memcpy(dst.data, tmpData, rowSpan * height);
 
-			delete [] tmpData;
+			OGRE_DELETE [] tmpData;
 		}
 
     }

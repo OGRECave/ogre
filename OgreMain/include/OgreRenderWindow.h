@@ -110,11 +110,11 @@ namespace Ogre
         */
         virtual void resize(unsigned int width, unsigned int height) = 0;
 
-	/** Notify that the window has been resized
-	@remarks
-		You don't need to call this unless you created the window externally.
-	*/
-	virtual void windowMovedOrResized() {}
+        /** Notify that the window has been resized
+        @remarks
+            You don't need to call this unless you created the window externally.
+        */
+        virtual void windowMovedOrResized() {}
 
         /** Reposition the window.
         */
@@ -166,6 +166,12 @@ namespace Ogre
           * \note 'true' is the default behavior.
           */
         void setDeactivateOnFocusChange(bool deactivate);
+
+		/** Change the orientation of the window.
+         @note Currently only available on iPhone.
+         @param orient Orientation to change the window to.
+         */
+        virtual void changeOrientation(Viewport::Orientation orient) {}
 
     protected:
         bool mIsFullScreen;

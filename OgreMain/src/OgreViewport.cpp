@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreMaterialManager.h"
 #include "OgreRenderSystem.h"
-
+#include "OgreRenderWindow.h"
 
 namespace Ogre {
     //---------------------------------------------------------------------
@@ -190,6 +190,19 @@ namespace Ogre {
                     __FUNCTION__);
 #endif
         mOrientation = orient;
+        
+        // Tell the render window to resize
+		RenderWindow* rw = Root::getSingleton().getAutoCreatedWindow();
+        rw->changeOrientation(orient);
+
+		// Update the render system config
+        RenderSystem* rs = Root::getSingleton().getRenderSystem();
+        if(orient == OR_LANDSCAPELEFT)
+            rs->setConfigOption("Orientation", "Landscape Left");
+        else if(orient == OR_LANDSCAPERIGHT)
+            rs->setConfigOption("Orientation", "Landscape Right");
+        else if(orient == OR_PORTRAIT)
+            rs->setConfigOption("Orientation", "Portrait");
     }
     //---------------------------------------------------------------------
     void Viewport::setDimensions(Real left, Real top, Real width, Real height)

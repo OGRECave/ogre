@@ -95,6 +95,7 @@ THE SOFTWARE.
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #include "macUtils.h"
+#include "OgrePVRCodec.h"
 #endif
 
 namespace Ogre {
@@ -239,6 +240,10 @@ namespace Ogre {
 		DDSCodec::startup();
 #endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        PVRCodec::startup();
+#endif
+
         mHighLevelGpuProgramManager = OGRE_NEW HighLevelGpuProgramManager();
 
 		mExternalTextureSourceManager = OGRE_NEW ExternalTextureSourceManager();
@@ -361,10 +366,12 @@ namespace Ogre {
         Ogre::StringUtil::splitFilename(mConfigFileName, outBaseName, extension);
         configFileName = macBundlePath() + "/../Documents/" + outBaseName;
 		std::ofstream of(configFileName.c_str());
-        if (of)
+        if (of.is_open())
             mConfigFileName = configFileName;
+        else
+            mConfigFileName.clear();
 #else
-        if (mConfigFileName.empty ())
+        if (mConfigFileName.empty())
             return;
 
 		std::ofstream of(mConfigFileName.c_str());
@@ -403,19 +410,34 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
         // Read the config from Documents first(user config) if it exists on iPhone.
         // If it doesn't exist or is invalid then use mConfigFileName
-        // TODO: I really want to use NSFileManager here but I'll find another way
 
-//        Ogre::String outBaseName, extension, configFileName;
-//        Ogre::StringUtil::splitFilename(mConfigFileName, outBaseName, extension);
-//        configFileName = macBundlePath() + "/../Documents/" + outBaseName;
-//		std::ifstream fp;
-//        fp.open(configFileName.c_str(), std::ios::in | std::ios::binary);
-//        if(fp)
-//            mConfigFileName = configFileName;
-//        else
-//            mConfigFileName = Ogre::StringUtil::BLANK;
-//        fp.close();
-        return true;
+        Ogre::String outBaseName, extension, configFileName;
+        Ogre::StringUtil::splitFilename(mConfigFileName, outBaseName, extension);
+        configFileName = macBundlePath() + "/../Documents/" + outBaseName;
+
+		std::ifstream fp;
+        fp.open(configFileName.c_str(), std::ios::in);
+        if(fp.is_open())
+        {
+            // A config file exists in the users Documents dir, we'll use it
+            mConfigFileName = configFileName;
+        }
+        else
+        {
+            // This might be the first run because there is no config file in the
+            // Documents directory.  It could also mean that a config file isn't being used at all
+            // Check to see if one was included in the app bundle
+            std::ifstream configFp;
+            configFp.open(mConfigFileName.c_str(), std::ios::in);
+
+            // If we can't open this file then we have no config file at all to work with
+            if(!configFp.is_open())
+                mConfigFileName.clear();
+
+            configFp.close();
+        }
+
+        fp.close();
 #endif
         
         if (mConfigFileName.empty ())

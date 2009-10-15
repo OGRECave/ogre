@@ -96,6 +96,7 @@ namespace Ogre {
             void setClosed(bool closed);
             void swapBuffers(bool waitForVSync);
             void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+            void changeOrientation(Viewport::Orientation orient);
 
             /**
                @remarks
