@@ -95,7 +95,7 @@ THE SOFTWARE.
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #include "macUtils.h"
-#include "OgrePVRCodec.h"
+//#include "OgrePVRCodec.h"
 #endif
 
 namespace Ogre {
