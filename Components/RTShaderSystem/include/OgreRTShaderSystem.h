@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreShaderFFPFog.h"
 #include "OgreShaderExPerPixelLighting.h"
 #include "OgreShaderExNormalMapLighting.h"
+#include "OgreShaderMaterialSerializerListener.h"
 
 /** \addtogroup Core
 *  @{

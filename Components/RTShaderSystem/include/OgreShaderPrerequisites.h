@@ -30,23 +30,9 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(OGRE_STATIC_LIB)
-#   ifdef OGRE_RTSHADERSYSTEM_EXPORTS
-#       define OGRE_RTSHADERSYSTEM_API __declspec(dllexport)
-#   else
-#       if defined(__MINGW32__)
-#           define OGRE_RTSHADERSYSTEM_API
-#       else
-#           define OGRE_RTSHADERSYSTEM_API __declspec(dllimport)
-#       endif
-#   endif
-#elif defined ( OGRE_GCC_VISIBILITY )
-#    define OGRE_RTSHADERSYSTEM_API  __attribute__ ((visibility("default")))
-#else
-#    define OGRE_RTSHADERSYSTEM_API
-#endif
-
-#define OGRE_RTSHADERSYSTEM_INTERNAL _OgrePrivate 
+// Component compiles as static library.
+#define OGRE_RTSHADERSYSTEM_API
+#define OGRE_RTSHADERSYSTEM_INTERNAL
 
 namespace Ogre 
 {
@@ -62,6 +48,7 @@ class Frustum;
 class ScriptTranslator;
 class ScriptCompiler;
 class PropertyAbstractNode;
+class MaterialSerializer;
 
 namespace RTShader 
 {
@@ -78,6 +65,7 @@ class Parameter;
 class Function;
 class FFPRenderStateBuilder;
 class ShaderGenerator;
+class SGMaterialSerializerListener;
 
 /// Utility function with same style as boost::hash_combine
 template <class T>

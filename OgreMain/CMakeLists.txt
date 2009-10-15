@@ -243,7 +243,7 @@ set (HEADER_FILES
   include/OgreTextureUnitState.h
   include/OgreTimer.h
   include/OgreUnifiedHighLevelGpuProgram.h
-  include/OgreUserDefinedObject.h
+  include/OgreUserObjectBindings.h
   include/OgreUTFString.h
   include/OgreVector2.h
   include/OgreVector3.h
@@ -436,7 +436,7 @@ set (SOURCE_FILES
   src/OgreTextureManager.cpp
   src/OgreTextureUnitState.cpp
   src/OgreUnifiedHighLevelGpuProgram.cpp
-  src/OgreUserDefinedObject.cpp
+  src/OgreUserObjectBindings.cpp
   src/OgreVector2.cpp
   src/OgreVector3.cpp
   src/OgreVector4.cpp

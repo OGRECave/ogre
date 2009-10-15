@@ -108,12 +108,12 @@ void FFPFog::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoPar
 	else
 	{
 		SceneManager* sceneMgr = ShaderGenerator::getSingleton().getSceneManager();
-
+		
 		fogMode			= sceneMgr->getFogMode();
 		newFogColour	= sceneMgr->getFogColour();
 		newFogStart		= sceneMgr->getFogStart();
 		newFogEnd		= sceneMgr->getFogEnd();
-		newFogDensity	= sceneMgr->getFogDensity();
+		newFogDensity	= sceneMgr->getFogDensity();				
 	}
 
 	// Set fog properties.
@@ -358,13 +358,24 @@ bool FFPFog::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* 
 	else
 	{
 		SceneManager* sceneMgr = ShaderGenerator::getSingleton().getSceneManager();
-
-		fogMode			= sceneMgr->getFogMode();
-		newFogColour	= sceneMgr->getFogColour();
-		newFogStart		= sceneMgr->getFogStart();
-		newFogEnd		= sceneMgr->getFogEnd();
-		newFogDensity	= sceneMgr->getFogDensity();
-		mPassOverrideParams = false;
+		
+		if (sceneMgr == NULL)
+		{
+			fogMode			= FOG_NONE;
+			newFogColour	= ColourValue::White;
+			newFogStart		= 0.0;
+			newFogEnd		= 0.0;
+			newFogDensity	= 0.0;
+		}
+		else
+		{
+			fogMode			= sceneMgr->getFogMode();
+			newFogColour	= sceneMgr->getFogColour();
+			newFogStart		= sceneMgr->getFogStart();
+			newFogEnd		= sceneMgr->getFogEnd();
+			newFogDensity	= sceneMgr->getFogDensity();
+			mPassOverrideParams = false;
+		}		
 	}
 
 	// Set fog properties.

@@ -68,7 +68,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreStringInterface.h"
 #include "OgreStringVector.h"
-#include "OgreUserDefinedObject.h"
+#include "OgreUserObjectBindings.h"
 #include "OgreVector2.h"
 #include "OgreVector3.h"
 #include "OgreVector4.h"

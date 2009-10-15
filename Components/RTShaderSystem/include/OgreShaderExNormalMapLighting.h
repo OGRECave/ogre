@@ -93,7 +93,7 @@ public:
 	/** 
 	Return the index of the input vertex shader texture coordinate set.
 	*/
-	unsigned int			getVSTexCoordIndex		() const { return mVSTexCoordSetIndex; }
+	unsigned int			getTexCoordIndex		() const { return mVSTexCoordSetIndex; }
 
 	// Type of this render state.
 	static String Type;
@@ -305,6 +305,11 @@ public:
 	@see SubRenderStateFactory::createInstance.
 	*/
 	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass);
+
+	/** 
+	@see SubRenderStateFactory::writeInstance.
+	*/
+	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
 
 	
 protected:

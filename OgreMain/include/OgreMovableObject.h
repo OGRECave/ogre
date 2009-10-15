@@ -38,7 +38,7 @@ THE SOFTWARE.
 #include "OgreFactoryObj.h"
 #include "OgreAnimable.h"
 #include "OgreAny.h"
-#include "OgreUserDefinedObject.h"
+#include "OgreUserObjectBindings.h"
 
 namespace Ogre {
 
@@ -122,9 +122,9 @@ namespace Ogre {
 		Real mUpperDistance;
 		Real mSquaredUpperDistance;
 		/// Hidden because of distance?
-		bool mBeyondFarDistance;
-		/// User defined link to another object / value / whatever
-		Any mUserAny;
+		bool mBeyondFarDistance;	
+		/// User objects binding.
+		UserObjectBindings mUserObjectBindings;
         /// The render queue to use when rendering this object
         uint8 mRenderQueueID;
 		/// Flags whether the RenderQueue's default should be used.
@@ -294,35 +294,33 @@ namespace Ogre {
 		}
 
 		/** Gets the distance at which batches are no longer rendered. */
-		virtual Real getRenderingDistance(void) const { return mUpperDistance; }
+		virtual Real getRenderingDistance(void) const { return mUpperDistance; }		
 
-        /** Call this to associate your own custom user object instance with this MovableObject.
-        @remarks
-            By simply making your game / application object a subclass of UserDefinedObject, you
-            can establish a link between an OGRE instance of MovableObject and your own application
-            classes. Call this method to establish the link.
-        */
-        virtual void setUserObject(UserDefinedObject* obj) { mUserAny = Any(obj); }
-        /** Retrieves a pointer to a custom application object associated with this movable by an earlier
-            call to setUserObject.
-        */
-        virtual UserDefinedObject* getUserObject(void) 
-		{ 
-			return mUserAny.isEmpty() ? 0 : any_cast<UserDefinedObject*>(mUserAny); 
-		}
-
-		/** Sets any kind of user value on this object.
+		/** @deprecated use UserObjectBindings::setUserAny via getUserObjectBindings() instead.
+			Sets any kind of user value on this object.
 		@remarks
 			This method allows you to associate any user value you like with 
 			this MovableObject. This can be a pointer back to one of your own
-			classes for instance.
-		@note This value is shared with setUserObject so don't use both!
+			classes for instance.		
 		*/
-		virtual void setUserAny(const Any& anything) { mUserAny = anything; }
+		virtual void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
 
-		/** Retrieves the custom user value associated with this object.
+		/** @deprecated use UserObjectBindings::getUserAny via getUserObjectBindings() instead.
+			Retrieves the custom user value associated with this object.
 		*/
-		virtual const Any& getUserAny(void) const { return mUserAny; }
+		virtual const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
+
+		/** Return an instance of user objects binding associated with this class.
+		You can use it to associate one or more custom objects with this class instance.
+		@see UserObjectBindings::setUserAny.		
+		*/
+		UserObjectBindings&	getUserObjectBindings() { return mUserObjectBindings; }
+
+		/** Return an instance of user objects binding associated with this class.
+		You can use it to associate one or more custom objects with this class instance.
+		@see UserObjectBindings::setUserAny.		
+		*/
+		const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
 
         /** Sets the render queue group this entity will be rendered through.
         @remarks

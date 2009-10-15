@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreShaderGenerator.h"
 #include "OgreSceneManager.h"
 #include "OgreViewport.h"
+#include "OgreMaterialSerializer.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -128,7 +129,10 @@ uint32 PerPixelLighting::getHashCode()
 //-----------------------------------------------------------------------
 void PerPixelLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 	const LightList* pLightList)
-{		
+{
+	if (mLightParamsList.size() == 0)
+		return;
+
 	GpuProgramParametersSharedPtr psGpuParams = pass->getFragmentProgramParameters();
 	SceneManager* sceneMgr = ShaderGenerator::getSingleton().getSceneManager();
 
@@ -858,10 +862,6 @@ bool PerPixelLighting::preAddToRenderState(RenderState* renderState, Pass* srcPa
 
 	renderState->getLightCount(lightCount);
 
-	// No lights allowed.
-	if (lightCount[0] + lightCount[1] + lightCount[2] == 0)
-		return false;
-
 	setTrackVertexColourType(srcPass->getVertexColourTracking());			
 
 	if (srcPass->getShininess() > 0.0 &&
@@ -990,6 +990,14 @@ SubRenderState*	PerPixelLightingFactory::createInstance(ScriptCompiler* compiler
 	}
 
 	return NULL;
+}
+
+//-----------------------------------------------------------------------
+void PerPixelLightingFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, 
+											Pass* srcPass, Pass* dstPass)
+{
+	ser->writeAttribute(4, "light_model");
+	ser->writeValue("sgx_per_pixel");
 }
 
 //-----------------------------------------------------------------------

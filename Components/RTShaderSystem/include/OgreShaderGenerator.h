@@ -208,15 +208,6 @@ public:
 	*/
 	void			destroySubRenderState		(SubRenderState* subRenderState);
 
-	/** Create an instance of the SubRenderState based on script properties using the
-	current sub render state factories.
-	@see SubRenderStateFactory::createInstance	
-	@param compiler The compiler instance.
-	@param prop The abstract property node.
-	@param pass The pass that is the parent context of this node.
-	*/
-	SubRenderState*	createSubRenderState		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass);
-
 
 	/** 
 	Create shader based technique from a given technique. 
@@ -246,6 +237,11 @@ public:
 	@param materialName The source material name.	
 	*/
 	bool			removeAllShaderBasedTechniques	(const String& materialName);
+
+	/** 
+	Remove all shader based techniques that created by this shader generator.	
+	*/
+	void			removeAllShaderBasedTechniques	();
 
 
 
@@ -278,6 +274,20 @@ public:
 	@param materialName The material to validate.
 	*/
 	bool			validateMaterial			(const String& schemeName, const String& materialName);	
+
+
+	/** 
+	Return custom material Serializer of the shader generator.
+	This is useful when you'd like to export certain material that contains shader generator effects.
+	I.E - when writing an exporter you may want mark your material as shader generated material 
+	so in the next time you will load it by your application it will automatically generate shaders with custom
+	attributes you wanted. To do it you'll have to do the following steps:
+	1. Create shader based technique for you material via the createShaderBasedTechnique() method.
+	2. Create MaterialSerializer instance.
+	3. Add the return instance of serializer listener to the MaterialSerializer.
+	4. Call one of the export methods of MaterialSerializer.
+	*/
+	SGMaterialSerializerListener*	getMaterialSerializerListener();
 
 
 	/// Default material scheme of the shader generator.
@@ -341,7 +351,7 @@ protected:
 		SubRenderState*	getCustomFFPSubState		(int subStateOrder);
 
 		/** Get custom render state of this pass. */
-		RenderState*	getCustomRenderState		();
+		RenderState*	getCustomRenderState		() { return mCustomRenderState; }
 
 		/** Set the custom render state of this pass. */
 		void			setCustomRenderState		(RenderState* customRenderState) { mCustomRenderState = customRenderState; }
@@ -398,6 +408,8 @@ protected:
 
 		/** Get custom render state list. */
 		const RenderStateList&	getCustomRenderStateList	() const { return mCustomRenderStates; }
+
+		static String	UserKey;					// Key name for associating with a Technique instance.
 
 	protected:
 		
@@ -648,6 +660,15 @@ protected:
 	/** Destroy sub render state core extensions factories */
 	void				destroySubRenderStateExFactories		();
 
+	/** Create an instance of the SubRenderState based on script properties using the
+	current sub render state factories.
+	@see SubRenderStateFactory::createInstance	
+	@param compiler The compiler instance.
+	@param prop The abstract property node.
+	@param pass The pass that is the parent context of this node.
+	*/
+	SubRenderState*		createSubRenderState				(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass);
+
 	/** 
 	Add custom script translator. 
 	Return true upon success.
@@ -661,42 +682,54 @@ protected:
 	Return true upon success.
 	@param key The key name of the translator to remove.	
 	*/
-	bool				removeCustomScriptTranslator			(const String& key);
+	bool				removeCustomScriptTranslator		(const String& key);
 
 	/** Return number of script translators. */
-	size_t				getNumTranslators						() const;
+	size_t				getNumTranslators					() const;
 
 	/** Return a matching script translator. */
-	ScriptTranslator*	getTranslator							(const AbstractNodePtr& node);
+	ScriptTranslator*	getTranslator						(const AbstractNodePtr& node);
+
+
+	/** This method called by instance of SGMaterialSerializerListener and 
+	serialize a given pass entry attributes.
+	@param ser The material serializer.
+	@param passEntry The SGPass instance.
+	*/
+	void				serializePassAttributes				(MaterialSerializer* ser, SGPass* passEntry);
+
 
 
 protected:	
-	OGRE_AUTO_MUTEX												// Auto mutex.
-	SceneManager*				mSceneMgr;						// The current scene manager.
-	SGRenderObjectListener*		mRenderObjectListener;			// Render object listener.
-	SGSceneManagerListener*		mSceneManagerListener;			// Scene manager listener.
-	SGScriptTranslatorManager*	mScriptTranslatorManager;		// Script translator manager.
-	SGScriptTranslatorMap		mScriptTranslatorsMap;			// A map of the registered custom script translators.
-	SGScriptTranslator			mCoreScriptTranslaotr;			// The core translator of the RT Shader System.
-	String						mShaderLanguage;				// The target shader language (currently only cg supported).
-	String						mVertexShaderProfiles;			// The target vertex shader profile. Will be used as argument for program compilation.
-	String						mFragmentShaderProfiles;		// The target Fragment shader profile. Will be used as argument for program compilation.
-	String						mShaderCachePath;				// Path for caching the generated shaders.
-	ProgramManager*				mProgramManager;				// Shader program manager.
-	FFPRenderStateBuilder*		mFFPRenderStateBuilder;			// Fixed Function Render state builder.
-	SGMaterialMap				mMaterialEntriesMap;			// Material entries map.
-	SGSchemeMap					mSchemeEntriesMap;				// Scheme entries map.
-	SGTechniqueMap				mTechniqueEntriesMap;			// All technique entries map.
-	RenderStateMap				mCachedRenderStates;			// All cached render states.
-	SubRenderStateFactoryMap	mSubRenderStateFactoryMap;		// Sub render state registered factories.
-	SubRenderStateFactoryMap	mSubRenderStateExFactories;		// Sub render state core extension factories.
-	bool						mActiveViewportValid;			// True if active view port use a valid SGScheme.
-	int							mLightCount[3];					// Light count per light type.
+	OGRE_AUTO_MUTEX													// Auto mutex.
+	SceneManager*					mSceneMgr;						// The current scene manager.
+	SGRenderObjectListener*			mRenderObjectListener;			// Render object listener.
+	SGSceneManagerListener*			mSceneManagerListener;			// Scene manager listener.
+	SGScriptTranslatorManager*		mScriptTranslatorManager;		// Script translator manager.
+	SGMaterialSerializerListener*	mMaterialSerializerListener;	// Custom material Serializer listener - allows exporting material that contains shader generated techniques.
+	SGScriptTranslatorMap			mScriptTranslatorsMap;			// A map of the registered custom script translators.
+	SGScriptTranslator				mCoreScriptTranslaotr;			// The core translator of the RT Shader System.
+	String							mShaderLanguage;				// The target shader language (currently only cg supported).
+	String							mVertexShaderProfiles;			// The target vertex shader profile. Will be used as argument for program compilation.
+	String							mFragmentShaderProfiles;		// The target Fragment shader profile. Will be used as argument for program compilation.
+	String							mShaderCachePath;				// Path for caching the generated shaders.
+	ProgramManager*					mProgramManager;				// Shader program manager.
+	FFPRenderStateBuilder*			mFFPRenderStateBuilder;			// Fixed Function Render state builder.
+	SGMaterialMap					mMaterialEntriesMap;			// Material entries map.
+	SGSchemeMap						mSchemeEntriesMap;				// Scheme entries map.
+	SGTechniqueMap					mTechniqueEntriesMap;			// All technique entries map.
+	RenderStateMap					mCachedRenderStates;			// All cached render states.
+	SubRenderStateFactoryMap		mSubRenderStateFactoryMap;		// Sub render state registered factories.
+	SubRenderStateFactoryMap		mSubRenderStateExFactories;		// Sub render state core extension factories.
+	bool							mActiveViewportValid;			// True if active view port use a valid SGScheme.
+	int								mLightCount[3];					// Light count per light type.
 	
 private:
 	friend class SGPass;
 	friend class FFPRenderStateBuilder;
 	friend class SGScriptTranslatorManager;
+	friend class SGScriptTranslator;
+	friend class SGMaterialSerializerListener;
 	
 };
 

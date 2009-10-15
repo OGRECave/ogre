@@ -9,6 +9,8 @@
 
 # Configure Ogre RTShader System build
 
+PROJECT(OgreRTShaderSystem)
+
 set (HEADER_FILES
   include/OgreRTShaderSystem.h
   include/OgreShaderPrerequisites.h
@@ -32,6 +34,7 @@ set (HEADER_FILES
   include/OgreShaderExNormalMapLighting.h
   include/OgreShaderExPerPixelLighting.h
   include/OgreShaderScriptTranslator.h
+  include/OgreShaderMaterialSerializerListener.h
 )
 
 set (SOURCE_FILES
@@ -54,6 +57,7 @@ set (SOURCE_FILES
   src/OgreShaderExNormalMapLighting.cpp
   src/OgreShaderExPerPixelLighting.cpp
   src/OgreShaderScriptTranslator.cpp
+  src/OgreShaderMaterialSerializerListener.cpp
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -61,12 +65,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(OgreRTShaderSystem STATIC ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreRTShaderSystem PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OGRE_VERSION_MAJOR})
 target_link_libraries(OgreRTShaderSystem OgreMain)
-
-if (NOT OGRE_STATIC)
-  set_target_properties(OgreRTShaderSystem PROPERTIES
-    COMPILE_DEFINITIONS OGRE_RTSHADERSYSTEM_EXPORTS
-  ) 
-ENDIF (NOT OGRE_STATIC)
 
 ogre_config_lib(OgreRTShaderSystem)
 install(FILES ${HEADER_FILES}

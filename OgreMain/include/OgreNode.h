@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreRenderable.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreMesh.h"
+#include "OgreUserObjectBindings.h"
 
 namespace Ogre {
 
@@ -230,7 +231,8 @@ namespace Ogre {
 
 		DebugRenderable* mDebug;
 
-		Any mUserAny;
+		/// User objects binding.
+		UserObjectBindings mUserObjectBindings;
 
     public:
         /** Constructor, should only be called by parent, not directly.
@@ -710,18 +712,31 @@ namespace Ogre {
 		static void processQueuedUpdates(void);
 
 
-		/** Sets any kind of user value on this object.
+		/** @deprecated use UserObjectBindings::setUserAny via getUserObjectBindings() instead.
+		Sets any kind of user value on this object.
 		@remarks
-			This method allows you to associate any user value you like with 
-			this Node. This can be a pointer back to one of your own
-			classes for instance.
+		This method allows you to associate any user value you like with 
+		this Node. This can be a pointer back to one of your own
+		classes for instance.
 		*/
-		virtual void setUserAny(const Any& anything) { mUserAny = anything; }
+		virtual void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
 
-		/** Retrieves the custom user value associated with this object.
+		/** @deprecated use UserObjectBindings::getUserAny via getUserObjectBindings() instead.
+		Retrieves the custom user value associated with this object.
 		*/
-		virtual const Any& getUserAny(void) const { return mUserAny; }
+		virtual const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
 
+		/** Return an instance of user objects binding associated with this class.
+		You can use it to associate one or more custom objects with this class instance.
+		@see UserObjectBindings::setUserAny.
+		*/
+		UserObjectBindings&	getUserObjectBindings() { return mUserObjectBindings; }
+
+		/** Return an instance of user objects binding associated with this class.
+		You can use it to associate one or more custom objects with this class instance.
+		@see UserObjectBindings::setUserAny.		
+		*/
+		const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
 
     };
 	/** @} */

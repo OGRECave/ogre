@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgrePass.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreRenderSystemCapabilities.h"
+#include "OgreUserObjectBindings.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -102,6 +103,9 @@ namespace Ogre {
 		* shadow caster behavior. There only material name is stored so that it can be loaded once all file parsed in a resource group.
 		*/
 		String mShadowReceiverMaterialName;	
+
+		// User objects binding.
+		UserObjectBindings	mUserObjectBindings;
 
 	public:
 		/** Directive used to manually control technique support based on the
@@ -688,6 +692,18 @@ namespace Ogre {
 		typedef ConstVectorIterator<GPUDeviceNameRuleList> GPUDeviceNameRuleIterator;
 		/// Get an iterator over the currently registered device name rules.
 		GPUDeviceNameRuleIterator getGPUDeviceNameRuleIterator() const;
+
+		/** Return an instance of user objects binding associated with this class.
+		You can use it to associate one or more custom objects with this class instance.
+		@see UserObjectBindings::setUserAny.
+		*/
+		UserObjectBindings&	getUserObjectBindings() { return mUserObjectBindings; }
+
+		/** Return an instance of user objects binding associated with this class.
+		You can use it to associate one or more custom objects with this class instance.
+		@see UserObjectBindings::setUserAny.		
+		*/
+		const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
 
     };
 

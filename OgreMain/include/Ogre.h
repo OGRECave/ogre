@@ -110,7 +110,6 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgreTextureManager.h"
 #include "OgreTextureUnitState.h"
-#include "OgreUserDefinedObject.h"
 #include "OgreVector2.h"
 #include "OgreViewport.h"
 #include "OgreCompositor.h"

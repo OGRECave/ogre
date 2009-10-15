@@ -332,7 +332,7 @@ namespace Ogre {
     class TextureManager;
     class TransformKeyFrame;
 	class Timer;
-    class UserDefinedObject;
+	class UserObjectBindings;
     class Vector2;
     class Vector3;
     class Vector4;

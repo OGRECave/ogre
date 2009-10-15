@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreShaderGenerator.h"
 #include "OgreSceneManager.h"
 #include "OgreViewport.h"
+#include "OgreMaterialSerializer.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -146,6 +147,9 @@ uint32 NormalMapLighting::getHashCode()
 void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 	const LightList* pLightList)
 {		
+	if (mLightParamsList.size() == 0)
+		return;
+
 	GpuProgramParametersSharedPtr vsGpuParams = pass->getVertexProgramParameters();
 	GpuProgramParametersSharedPtr psGpuParams = pass->getFragmentProgramParameters();
 	SceneManager* sceneMgr = ShaderGenerator::getSingleton().getSceneManager();	
@@ -1159,12 +1163,7 @@ bool NormalMapLighting::preAddToRenderState(RenderState* renderState, Pass* srcP
 
 	renderState->getLightCount(lightCount);
 
-	// No lights allowed.
-	if (lightCount[0] + lightCount[1] + lightCount[2] == 0)
-		return false;
-
-
-	const Any& passUserData = srcPass->getUserAny(NormalMapLighting::NormalMapTextureNameKey);
+	const Any& passUserData = srcPass->getUserObjectBindings().getUserAny(NormalMapLighting::NormalMapTextureNameKey);
 
 	if (passUserData.isEmpty())	
 		return false;	
@@ -1316,7 +1315,7 @@ SubRenderState*	NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 				unsigned int textureCoordinateIndex = 0;
 				SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
 				
-				pass->setUserAny(NormalMapLighting::NormalMapTextureNameKey, Any(strValue));
+				pass->getUserObjectBindings().setUserAny(NormalMapLighting::NormalMapTextureNameKey, Any(strValue));
 
 				// Read normal map space type.
 				if (prop->values.size() >= 3)
@@ -1361,6 +1360,35 @@ SubRenderState*	NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 	}
 
 	return NULL;
+}
+
+//-----------------------------------------------------------------------
+void NormalMapLightingFactory::writeInstance(MaterialSerializer* ser, 
+											 SubRenderState* subRenderState, 
+											 Pass* srcPass, Pass* dstPass)
+{
+	const Any& passUserData = srcPass->getUserObjectBindings().getUserAny(NormalMapLighting::NormalMapTextureNameKey);
+	if (passUserData.isEmpty())	
+		return;	
+
+	const String normalMapTextureName = any_cast<const String>(passUserData);
+
+	ser->writeAttribute(4, "light_model");
+	ser->writeValue("sgx_normal_map");
+	ser->writeValue(normalMapTextureName);	
+
+	NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
+
+	if (normalMapSubRenderState->getNormalMapSpace() == NormalMapLighting::NMS_TANGENT)
+	{
+		ser->writeValue("tangent_space");
+	}
+	else if (normalMapSubRenderState->getNormalMapSpace() == NormalMapLighting::NMS_OBJECT)
+	{
+		ser->writeValue("object_space");
+	}
+
+	ser->writeValue(StringConverter::toString(normalMapSubRenderState->getTexCoordIndex()));
 }
 
 //-----------------------------------------------------------------------

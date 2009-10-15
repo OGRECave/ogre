@@ -111,6 +111,9 @@ uint32 FFPLighting::getHashCode()
 void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 										  const LightList* pLightList)
 {		
+	if (mLightParamsList.size() == 0)
+		return;
+
 	GpuProgramParametersSharedPtr vsGpuParams = pass->getVertexProgramParameters();
 	SceneManager* sceneMgr = ShaderGenerator::getSingleton().getSceneManager();
 
@@ -698,11 +701,6 @@ bool FFPLighting::preAddToRenderState(RenderState* renderState, Pass* srcPass, P
 	int lightCount[3];
 
 	renderState->getLightCount(lightCount);
-
-	// No lights allowed.
-	if (lightCount[0] + lightCount[1] + lightCount[2] == 0)
-		return false;
-
 	
 	setTrackVertexColourType(srcPass->getVertexColourTracking());			
 

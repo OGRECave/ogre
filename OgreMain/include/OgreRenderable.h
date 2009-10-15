@@ -38,7 +38,7 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgreVector4.h"
 #include "OgreException.h"
-#include "OgreAny.h"
+#include "OgreUserObjectBindings.h"
 
 namespace Ogre {
 
@@ -69,14 +69,15 @@ namespace Ogre {
 		*/
 		class RenderSystemData {}; 
     public:
-		Renderable() : mPolygonModeOverrideable(true), mUseIdentityProjection(false), mUseIdentityView(false), mRenderSystemData(NULL){}
+		Renderable() : mPolygonModeOverrideable(true), mUseIdentityProjection(false), mUseIdentityView(false), mRenderSystemData(NULL) {}
         /** Virtual destructor needed as class has virtual methods. */
         virtual ~Renderable() 
 		{
 			if (mRenderSystemData)
 			{
 				delete mRenderSystemData;
-			}
+				mRenderSystemData = NULL;
+			}			
 		}
         /** Retrieves a weak reference to the material this renderable object uses.
         @remarks
@@ -311,30 +312,45 @@ namespace Ogre {
 			return mPolygonModeOverrideable;
 		}
 
-		/** Sets any kind of user value on this object.
+		/** @deprecated use UserObjectBindings::setUserAny via getUserObjectBindings() instead.
+			Sets any kind of user value on this object.
 		@remarks
 			This method allows you to associate any user value you like with 
 			this Renderable. This can be a pointer back to one of your own
 			classes for instance.
 		*/
-		virtual void setUserAny(const Any& anything) { mUserAny = anything; }
+		virtual void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
 
-		/** Retrieves the custom user value associated with this object.
+		/** @deprecated use UserObjectBindings::getUserAny via getUserObjectBindings() instead.
+			Retrieves the custom user value associated with this object.
 		*/
-		virtual const Any& getUserAny(void) const { return mUserAny; }
+		virtual const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
+
+		/** Return an instance of user objects binding associated with this class.
+		You can use it to associate one or more custom objects with this class instance.
+		@see UserObjectBindings::setUserAny.
+		*/
+		UserObjectBindings&	getUserObjectBindings() { return mUserObjectBindings; }
+
+		/** Return an instance of user objects binding associated with this class.
+		You can use it to associate one or more custom objects with this class instance.
+		@see UserObjectBindings::setUserAny.		
+		*/
+		const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
+
 
 		/** Visitor object that can be used to iterate over a collection of Renderable
-			instances abstractly.
+		instances abstractly.
 		@remarks
-			Different scene objects use Renderable differently; some will have a 
-			single Renderable, others will have many. This visitor interface allows
-			classes using Renderable to expose a clean way for external code to
-			get access to the contained Renderable instance(s) that it will
-			eventually add to the render queue.
+		Different scene objects use Renderable differently; some will have a 
+		single Renderable, others will have many. This visitor interface allows
+		classes using Renderable to expose a clean way for external code to
+		get access to the contained Renderable instance(s) that it will
+		eventually add to the render queue.
 		@par
-			To actually have this method called, you have to call a method on the
-			class containing the Renderable instances. One example is 
-			MovableObject::visitRenderables.
+		To actually have this method called, you have to call a method on the
+		class containing the Renderable instances. One example is 
+		MovableObject::visitRenderables.
 		*/
 		class Visitor
 		{
@@ -378,7 +394,7 @@ namespace Ogre {
 		bool mPolygonModeOverrideable;
         bool mUseIdentityProjection;
         bool mUseIdentityView;
-		Any mUserAny;		
+		UserObjectBindings mUserObjectBindings;		 // User objects binding.
 		mutable RenderSystemData * mRenderSystemData;// this should be used only by a render system for internal use
 	};
 

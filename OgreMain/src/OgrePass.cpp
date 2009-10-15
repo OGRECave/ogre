@@ -195,7 +195,7 @@ namespace Ogre {
 		, mContentTypeLookupBuilt(false)
 		, mLightScissoring(false)
 		, mLightClipPlanes(false)
-		, mIlluminationStage(IS_UNKNOWN)
+		, mIlluminationStage(IS_UNKNOWN)		
     {
 		mPointAttenuationCoeffs[0] = 1.0f;
 		mPointAttenuationCoeffs[1] = mPointAttenuationCoeffs[2] = 0.0f;
@@ -228,8 +228,7 @@ namespace Ogre {
 		OGRE_DELETE mFragmentProgramUsage;
 		OGRE_DELETE mShadowCasterVertexProgramUsage;
 		OGRE_DELETE mShadowReceiverVertexProgramUsage;
-		OGRE_DELETE mShadowReceiverFragmentProgramUsage;
-
+		OGRE_DELETE mShadowReceiverFragmentProgramUsage;		
     }
     //-----------------------------------------------------------------------------
     Pass& Pass::operator=(const Pass& oth)
@@ -1905,21 +1904,5 @@ namespace Ogre {
 		// not found - return out of range
 		return static_cast<unsigned short>(mTextureUnitStates.size() + 1);
 
-	}
-
-	//-----------------------------------------------------------------------
-	const Any& Pass::getUserAny( const String& key ) const
-	{
-		UserAnyMap::const_iterator it = mUserAnyMap.find(key);
-
-		// Case user data found.
-		if (it != mUserAnyMap.end())
-		{
-			return it->second;
-		}
-
-		// Return empty Any object.
-		static Any sEmptyAny;
-		return sEmptyAny;
 	}
 }

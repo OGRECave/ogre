@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreLight.h"
 #include "OgreTextureUnitState.h"
-#include "OgreAny.h"
+#include "OgreUserObjectBindings.h"
 
 namespace Ogre {
 
@@ -230,9 +230,9 @@ namespace Ogre {
 		bool mLightClipPlanes;
 		/// Illumination stage?
 		IlluminationStage mIlluminationStage;
-		/// Custom user data.
-		typedef map<String, Any>::type UserAnyMap;
-		UserAnyMap mUserAnyMap;
+		// User objects binding.
+		UserObjectBindings	mUserObjectBindings;
+		
 
 		// Used to get scene blending flags from a blending type
 		void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);
@@ -1647,19 +1647,17 @@ namespace Ogre {
 		*/
 		static HashFunc* getBuiltinHashFunction(BuiltinHashFunction builtin);
 
-		/** Sets any kind of user value on this object.
-		@remarks
-		This method allows you to associate any user value you like with 
-		this Pass. This can be a pointer back to one of your own
-		classes for instance.
-		@param key The key that this data is associate with.
-		@param anything The data to associate with the given key.
+		/** Return an instance of user objects binding associated with this class.
+		You can use it to associate one or more custom objects with this class instance.
+		@see UserObjectBindings::setUserAny.
 		*/
-		virtual void setUserAny(const String& key, const Any& anything) { mUserAnyMap[key] = anything; }
+		UserObjectBindings&	getUserObjectBindings() { return mUserObjectBindings; }
 
-		/** Retrieves the custom user value associated with this pass and key.
+		/** Return an instance of user objects binding associated with this class.
+		You can use it to associate one or more custom objects with this class instance.
+		@see UserObjectBindings::setUserAny.		
 		*/
-		virtual const Any& getUserAny(const String& key) const;
+		const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
     };
 
     /** Struct recording a pass which can be used for a specific illumination stage.
