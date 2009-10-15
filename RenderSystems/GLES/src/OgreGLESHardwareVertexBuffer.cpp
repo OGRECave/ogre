@@ -57,7 +57,11 @@ namespace Ogre {
                         "GLESHardwareVertexBuffer::GLESHardwareVertexBuffer");
         }
 
-        clearData();
+        glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
+        GL_CHECK_ERROR;
+        glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
+                     GLESHardwareBufferManager::getGLUsage(usage));
+        GL_CHECK_ERROR;
     }
 
     GLESHardwareVertexBuffer::~GLESHardwareVertexBuffer()
@@ -175,7 +179,8 @@ namespace Ogre {
         {
             if(discardWholeBuffer)
             {
-                clearData();
+                glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL, 
+                                GLESHardwareBufferManager::getGLUsage(mUsage));
             }
 
             glBufferSubData(GL_ARRAY_BUFFER, offset, length, pSource);
@@ -210,21 +215,5 @@ namespace Ogre {
             mpShadowBuffer->unlock();
             mShadowUpdated = false;
         }
-    }
-
-    void GLESHardwareVertexBuffer::clearData(void)
-    {
-        void *ptr;
-
-        ptr = OGRE_MALLOC(mSizeInBytes + 1, MEMCATEGORY_GEOMETRY);
-        memset(ptr, 0, mSizeInBytes);
-
-        glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
-        GL_CHECK_ERROR;
-        glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, ptr,
-                     GLESHardwareBufferManager::getGLUsage(mUsage));
-        GL_CHECK_ERROR;
-
-        OGRE_FREE(ptr, MEMCATEGORY_GEOMETRY);
     }
 }

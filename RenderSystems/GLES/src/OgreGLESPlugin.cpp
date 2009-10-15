@@ -45,7 +45,7 @@ namespace Ogre {
 
     void GLESPlugin::install()
     {
-        mRenderSystem = new GLESRenderSystem();
+        mRenderSystem = OGRE_NEW GLESRenderSystem();
 
         Root::getSingleton().addRenderSystem(mRenderSystem);
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
@@ -65,7 +65,7 @@ namespace Ogre {
 
     void GLESPlugin::uninstall()
     {
-        delete mRenderSystem;
+        OGRE_DELETE mRenderSystem;
         mRenderSystem = 0;
     }
 }

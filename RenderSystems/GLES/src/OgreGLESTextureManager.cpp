@@ -58,7 +58,7 @@ namespace Ogre {
                                            ManualResourceLoader* loader,
                                            const NameValuePairList* createParams)
     {
-        return new GLESTexture(this, name, handle, group, isManual, loader, mGLSupport);
+        return OGRE_NEW GLESTexture(this, name, handle, group, isManual, loader, mGLSupport);
     }
 
     //-----------------------------------------------------------------------------
@@ -69,7 +69,7 @@ namespace Ogre {
         size_t height = 8;
 
         // TODO convert to 5_6_5
-        uint32* data = new uint32[width * height]; // 0xXXRRGGBB
+        uint32* data = OGRE_NEW uint32[width * height]; // 0xXXRRGGBB
 
         // Yellow/black stripes
         for(size_t y = 0; y < height; ++y)
@@ -90,7 +90,7 @@ namespace Ogre {
                      GL_UNSIGNED_BYTE, (void*)data);
         GL_CHECK_ERROR;
         // Free memory
-        delete [] data;
+        OGRE_DELETE [] data;
     }
 
     PixelFormat GLESTextureManager::getNativeFormat(TextureType ttype, PixelFormat format, int usage)
@@ -101,7 +101,7 @@ namespace Ogre {
         // Check compressed texture support
         // if a compressed format not supported, revert to PF_A8R8G8B8
         if (PixelUtil::isCompressed(format) &&
-            (!caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT) || !caps->hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC)))
+            !caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT) && !caps->hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC))
         {
             return PF_A8R8G8B8;
         }

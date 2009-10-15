@@ -114,7 +114,7 @@ namespace Ogre {
 			void loadFromSource(void){};
 
 		};
-		return new DummyGpuProgram(this, name, handle, group, 
+		return OGRE_NEW DummyGpuProgram(this, name, handle, group, 
 			isManual, loader);
     }
 }

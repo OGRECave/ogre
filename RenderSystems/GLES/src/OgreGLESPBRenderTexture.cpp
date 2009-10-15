@@ -88,7 +88,7 @@ namespace Ogre {
         // Delete remaining PBuffers
         for (size_t x = 0; x < PCT_COUNT; ++x)
         {
-            delete mPBuffers[x].pb;
+            OGRE_DELETE mPBuffers[x].pb;
         }
     }
 
@@ -96,7 +96,7 @@ namespace Ogre {
                                                          const GLESSurfaceDesc &target,
                                                          bool writeGamma, uint fsaa)
     {
-        return new GLESPBRenderTexture(this, name, target, writeGamma, fsaa);
+        return OGRE_NEW GLESPBRenderTexture(this, name, target, writeGamma, fsaa);
     }
 
     bool GLESPBRTTManager::checkFormat(PixelFormat format)
@@ -131,7 +131,7 @@ namespace Ogre {
                 mPBuffers[ctype].pb->getHeight() < height)
             {
                 // If the current PBuffer is too small, destroy it and create a new one
-                delete mPBuffers[ctype].pb;
+                OGRE_DELETE mPBuffers[ctype].pb;
                 mPBuffers[ctype].pb = 0;
             }
         }
@@ -149,7 +149,7 @@ namespace Ogre {
         --mPBuffers[ctype].refcount;
         if (mPBuffers[ctype].refcount == 0)
         {
-            delete mPBuffers[ctype].pb;
+            OGRE_DELETE mPBuffers[ctype].pb;
             mPBuffers[ctype].pb = 0;
         }
     }

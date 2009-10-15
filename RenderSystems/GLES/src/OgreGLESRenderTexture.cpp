@@ -131,7 +131,7 @@ namespace Ogre {
                                                               const GLESSurfaceDesc &target,
                                                               bool writeGamma, uint fsaa)
     {
-        return new GLESCopyingRenderTexture(this, name, target, writeGamma, fsaa);
+        return OGRE_NEW GLESCopyingRenderTexture(this, name, target, writeGamma, fsaa);
     }
 
     bool GLESCopyingRTTManager::checkFormat(PixelFormat format)

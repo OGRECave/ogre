@@ -69,7 +69,7 @@ namespace Ogre {
     GLESHardwarePixelBuffer::~GLESHardwarePixelBuffer()
     {
         // Force free buffer
-        delete [] (uint8*)mBuffer.data;
+        OGRE_DELETE [] (uint8*)mBuffer.data;
     }
 
     void GLESHardwarePixelBuffer::allocateBuffer()
@@ -78,7 +78,7 @@ namespace Ogre {
             // Already allocated
             return;
 
-        mBuffer.data = new uint8[mSizeInBytes];
+        mBuffer.data = OGRE_NEW uint8[mSizeInBytes];
         // TODO use PBO if we're HBU_DYNAMIC
     }
 
@@ -87,7 +87,7 @@ namespace Ogre {
         // Free buffer if we're STATIC to save memory
         if (mUsage & HBU_STATIC)
         {
-            delete [] (uint8*)mBuffer.data;
+            OGRE_DELETE [] (uint8*)mBuffer.data;
             mBuffer.data = 0;
         }
     }
@@ -138,8 +138,7 @@ namespace Ogre {
             Image::scale(src, scaled, Image::FILTER_BILINEAR);
         }
         else if ((src.format != mFormat) ||
-                 ((GLESPixelUtil::getGLOriginFormat(src.format) == 0) &&
-                  (src.format != PF_R8G8B8)))
+                 ((GLESPixelUtil::getGLOriginFormat(src.format) == 0) && (src.format != PF_R8G8B8)))
         {
             // Extents match, but format is not accepted as valid source format for GL
             // do conversion in temporary buffer
@@ -672,7 +671,7 @@ namespace Ogre {
         if(GLESPixelUtil::getGLOriginFormat(src_orig.format) == 0)
         {
             /// Convert to buffer internal format
-            buf.bind(new MemoryDataStream(PixelUtil::getMemorySize(src_orig.getWidth(), src_orig.getHeight(), src_orig.getDepth(),
+            buf.bind(OGRE_NEW MemoryDataStream(PixelUtil::getMemorySize(src_orig.getWidth(), src_orig.getHeight(), src_orig.getDepth(),
                                                                    mFormat)));
             src = PixelBox(src_orig.getWidth(), src_orig.getHeight(), src_orig.getDepth(), mFormat, buf->getPtr());
             PixelUtil::bulkPixelConversion(src_orig, src);
@@ -772,7 +771,7 @@ namespace Ogre {
 
             if (mip != 0)
             {
-                delete[] (uint8*) scaled.data;
+                OGRE_DELETE[] (uint8*) scaled.data;
                 scaled.data = 0;
             }
 
@@ -789,7 +788,7 @@ namespace Ogre {
             int sizeInBytes = PixelUtil::getMemorySize(width, height, 1,
                                                        data.format);
             scaled = PixelBox(width, height, 1, data.format);
-            scaled.data = new uint8[sizeInBytes];
+            scaled.data = OGRE_NEW uint8[sizeInBytes];
             Image::scale(data, scaled, Image::FILTER_LINEAR);
         }
     }

@@ -211,7 +211,7 @@ namespace Ogre {
 
     GLESPBuffer * EAGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
 	{
-		return new EAGLPBuffer(this, format, width, height);
+		return OGRE_NEW EAGLPBuffer(this, format, width, height);
 	}
     
     void EAGLSupport::switchMode(void)
@@ -279,7 +279,7 @@ namespace Ogre {
                                         bool fullScreen,
                                         const NameValuePairList *miscParams)
     {
-        EAGLWindow *window = new EAGLWindow(this);
+        EAGLWindow *window = OGRE_NEW EAGLWindow(this);
         window->create(name, width, height, fullScreen, miscParams);
 
         return window;
@@ -287,7 +287,7 @@ namespace Ogre {
 
     EAGLESContext * EAGLSupport::createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable) const //, EAGLESContext shareList) const
     {
-        EAGLESContext *context = new EAGLESContext(drawable);
+        EAGLESContext *context = OGRE_NEW EAGLESContext(drawable);
         if (context == NULL)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,

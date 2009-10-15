@@ -63,8 +63,11 @@ namespace Ogre {
                 "GLESHardwareIndexBuffer::GLESHardwareIndexBuffer");
         }
 
-        // Initialise buffer and set usage
-        clearData();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+        GL_CHECK_ERROR;
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, NULL,
+                     GLESHardwareBufferManager::getGLUsage(usage));
+        GL_CHECK_ERROR;
     }
 
     GLESHardwareIndexBuffer::~GLESHardwareIndexBuffer()
@@ -182,7 +185,8 @@ namespace Ogre {
         {
             if (discardWholeBuffer)
             {
-                clearData();
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, NULL,
+                                GLESHardwareBufferManager::getGLUsage(mUsage));
             }
 
             // Now update the real buffer
@@ -218,21 +222,5 @@ namespace Ogre {
             mpShadowBuffer->unlock();
             mShadowUpdated = false;
         }
-    }
-
-    void GLESHardwareIndexBuffer::clearData(void)
-    {
-        void *ptr;
-
-        ptr = OGRE_MALLOC(mSizeInBytes, MEMCATEGORY_GEOMETRY);
-        memset(ptr, 0, mSizeInBytes);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
-        GL_CHECK_ERROR;
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, ptr,
-                     GLESHardwareBufferManager::getGLUsage(mUsage));
-        GL_CHECK_ERROR;
-
-        OGRE_FREE(ptr, MEMCATEGORY_GEOMETRY);
     }
 }

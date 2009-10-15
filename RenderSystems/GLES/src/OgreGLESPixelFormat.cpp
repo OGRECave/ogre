@@ -54,6 +54,16 @@ namespace Ogre  {
             case PF_FLOAT32_GR:
                 return GL_LUMINANCE_ALPHA;
 
+            // PVR compressed formats
+            case PF_PVR_RGB2:
+                return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+            case PF_PVR_RGB4:
+                return GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+            case PF_PVR_RGBA2:
+                return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+            case PF_PVR_RGBA4:
+                return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+                
             case PF_R3G3B2:
             case PF_R5G6B5:
             case PF_FLOAT16_RGB:
@@ -109,6 +119,10 @@ namespace Ogre  {
             case PF_R8G8B8:
             case PF_B8G8R8:
             case PF_BYTE_LA:
+            case PF_PVR_RGB2:
+            case PF_PVR_RGB4:
+            case PF_PVR_RGBA2:
+            case PF_PVR_RGBA4:
                 return GL_UNSIGNED_BYTE;
             case PF_R5G6B5:
             case PF_B5G6R5:
@@ -176,6 +190,15 @@ namespace Ogre  {
             case PF_BYTE_LA:
                 return GL_LUMINANCE_ALPHA;
 
+            case PF_PVR_RGB2:
+                return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+            case PF_PVR_RGB4:
+                return GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+            case PF_PVR_RGBA2:
+                return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+            case PF_PVR_RGBA4:
+                return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+                
             case PF_R8G8B8:
             case PF_B8G8R8:
             case PF_X8B8G8R8:
@@ -245,6 +268,14 @@ namespace Ogre  {
     {
         switch (fmt)
         {
+            case GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
+                return PF_PVR_RGB2;
+            case GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
+                return PF_PVR_RGBA2;
+            case GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
+                return PF_PVR_RGB4;
+            case GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
+                return PF_PVR_RGBA4;
             case GL_LUMINANCE:
                 return PF_L8;
             case GL_ALPHA:
@@ -318,7 +349,7 @@ namespace Ogre  {
         if (glFormat != 0)
         {
             // format already supported
-            return new PixelBox(data);
+            return OGRE_NEW PixelBox(data);
         }
 
         PixelBox *converted = 0;
@@ -329,7 +360,7 @@ namespace Ogre  {
             converted->format = PF_B8G8R8;
             *outputFormat = GL_RGB;
 
-            converted = new PixelBox(data);
+            converted = OGRE_NEW PixelBox(data);
             uint32 *data = (uint32 *) converted->data;
             for (uint i = 0; i < converted->getWidth() * converted->getHeight(); i++)
             {

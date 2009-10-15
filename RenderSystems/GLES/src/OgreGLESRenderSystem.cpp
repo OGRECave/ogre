@@ -135,11 +135,11 @@ namespace Ogre {
         RenderTargetMap::iterator i;
         for (i = mRenderTargets.begin(); i != mRenderTargets.end(); ++i)
         {
-            delete i->second;
+            OGRE_DELETE i->second;
         }
 
         mRenderTargets.clear();
-        delete mGLSupport;
+        OGRE_DELETE mGLSupport;
     }
 
     const String& GLESRenderSystem::getName(void) const
@@ -177,7 +177,7 @@ namespace Ogre {
 
     RenderSystemCapabilities* GLESRenderSystem::createRenderSystemCapabilities() const
     {
-        RenderSystemCapabilities* rsc = new RenderSystemCapabilities();
+        RenderSystemCapabilities* rsc = OGRE_NEW RenderSystemCapabilities();
 
         rsc->setCategoryRelevant(CAPS_CATEGORY_GL, true);
         rsc->setDriverVersion(mDriverVersion);
@@ -344,18 +344,18 @@ namespace Ogre {
                         "GLESRenderSystem::initialiseFromRenderSystemCapabilities");
         }
 
-        mGpuProgramManager = new GLESGpuProgramManager();
+        mGpuProgramManager = OGRE_NEW GLESGpuProgramManager();
 
         // set texture the number of texture units
         mFixedFunctionTextureUnits = caps->getNumTextureUnits();
 
         if(caps->hasCapability(RSC_VBO))
         {
-            mHardwareBufferManager = new GLESHardwareBufferManager;
+            mHardwareBufferManager = OGRE_NEW GLESHardwareBufferManager;
         }
         else
         {
-            mHardwareBufferManager = new GLESDefaultHardwareBufferManager;
+            mHardwareBufferManager = OGRE_NEW GLESDefaultHardwareBufferManager;
         }
 
         // Check for framebuffer object extension
@@ -365,7 +365,7 @@ namespace Ogre {
 			{
 				// Create FBO manager
 				LogManager::getSingleton().logMessage("GL ES: Using GL_OES_framebuffer_object for rendering to textures (best)");
-				mRTTManager = new GLESFBOManager();
+				mRTTManager = OGRE_NEW GLESFBOManager();
 			}
 		}
 		else
@@ -376,7 +376,7 @@ namespace Ogre {
 				if(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE))
 				{
 					// Use PBuffers
-					mRTTManager = new GLESPBRTTManager(mGLSupport, primary);
+					mRTTManager = OGRE_NEW GLESPBRTTManager(mGLSupport, primary);
 					LogManager::getSingleton().logMessage("GL ES: Using PBuffers for rendering to textures");
 				}
 			}
@@ -392,7 +392,7 @@ namespace Ogre {
 			caps->log(defaultLog);
 		}
 
-        mTextureManager = new GLESTextureManager(*mGLSupport);
+        mTextureManager = OGRE_NEW GLESTextureManager(*mGLSupport);
         GL_CHECK_ERROR;
         mGLInitialised = true;
     }
@@ -407,18 +407,18 @@ namespace Ogre {
     {
         RenderSystem::shutdown();
 
-        delete mGpuProgramManager;
+        OGRE_DELETE mGpuProgramManager;
         mGpuProgramManager = 0;
 
-        delete mHardwareBufferManager;
+        OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;
 
-        delete mRTTManager;
+        OGRE_DELETE mRTTManager;
         mRTTManager = 0;
 
         mGLSupport->stop();
 
-        delete mTextureManager;
+        OGRE_DELETE mTextureManager;
         mTextureManager = 0;
 
         mGLInitialised = 0;
@@ -544,7 +544,7 @@ namespace Ogre {
             if (i->second == pWin)
             {
                 mRenderTargets.erase(i);
-                delete pWin;
+                OGRE_DELETE pWin;
                 break;
             }
         }

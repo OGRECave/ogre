@@ -74,7 +74,7 @@ namespace Ogre {
     {
         // always use shadowBuffer
         GLESHardwareVertexBuffer* buf =
-            new GLESHardwareVertexBuffer(this, vertexSize, numVerts, usage, true);
+            OGRE_NEW GLESHardwareVertexBuffer(this, vertexSize, numVerts, usage, true);
         {
             OGRE_LOCK_MUTEX(mVertexBuffersMutex)
             mVertexBuffers.insert(buf);
@@ -89,7 +89,7 @@ namespace Ogre {
     {
         // always use shadowBuffer
         GLESHardwareIndexBuffer* buf =
-            new GLESHardwareIndexBuffer(this, itype, numIndexes, usage, true);
+            OGRE_NEW GLESHardwareIndexBuffer(this, itype, numIndexes, usage, true);
         {
             OGRE_LOCK_MUTEX(mIndexBuffersMutex)
             mIndexBuffers.insert(buf);

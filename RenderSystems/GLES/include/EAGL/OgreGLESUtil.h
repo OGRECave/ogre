@@ -31,7 +31,7 @@ http://www.gnu.org/copyleft/gpl.html.
 namespace Ogre {
     inline GLESSupport* getGLSupport()
     {
-        return new EAGLSupport();
+        return OGRE_NEW EAGLSupport();
     }
 };
 

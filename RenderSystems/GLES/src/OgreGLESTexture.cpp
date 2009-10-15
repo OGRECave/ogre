@@ -145,16 +145,15 @@ namespace Ogre {
 
             // Provide temporary buffer filled with zeroes as glCompressedTexImageXD does not
             // accept a 0 pointer like normal glTexImageXD
-            // Run through this process for every mipmap to pregenerate mipmap piramid
+            // Run through this process for every mipmap to pregenerate mipmap pyramid
 
-            uint8* tmpdata = new uint8[size];
+            uint8* tmpdata = OGRE_NEW uint8[size];
             memset(tmpdata, 0, size);
 
             for (size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
                 size = PixelUtil::getMemorySize(width, height, depth, mFormat);
 
-                // TODO: DJR - Add support for PVRTC here
                 glCompressedTexImage2D(GL_TEXTURE_2D,
                                        mip,
                                        format,
@@ -177,7 +176,7 @@ namespace Ogre {
                     depth = depth / 2;
                 }
             }
-            delete [] tmpdata;
+            OGRE_DELETE [] tmpdata;
         }
         else
         {
@@ -235,39 +234,12 @@ namespace Ogre {
             ext = mName.substr(pos+1);
         }
 
-        LoadedImages loadedImages = LoadedImages(new std::vector<Image>());
+        LoadedImages loadedImages = LoadedImages(OGRE_NEW std::vector<Image>());
 
         if (mTextureType == TEX_TYPE_2D)
         {
             doImageIO(mName, mGroup, ext, *loadedImages, this);
 
-            // If this is a cube map, set the texture type flag accordingly.
-//            if ((*loadedImages)[0].hasFlag(IF_CUBEMAP) &&
-//                Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_CUBEMAPPING))
-//            {
-//                if(getSourceFileType() == "dds")
-//                {
-//                    // XX HACK there should be a better way to specify whether 
-//                    // all faces are in the same file or not
-//                    doImageIO(mName, mGroup, ext, *loadedImages, this);
-//                }
-//                else
-//                {
-//                    vector<Image>::type images(6);
-//                    ConstImagePtrList imagePtrs;
-//                    static const String suffixes[6] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
-//                    
-//                    for(size_t i = 0; i < 6; i++)
-//                    {
-//                        String fullName = baseName + suffixes[i];
-//                        if (!ext.empty())
-//                            fullName = fullName + "." + ext;
-//                        // find & load resource data intro stream to allow resource
-//                        // group changes if required
-//                        doImageIO(fullName,mGroup,ext,*loadedImages,this);
-//                    }
-//                }
-//            }
             // If this is a volumetric texture set the texture type flag accordingly.
             if ((*loadedImages)[0].getDepth() > 1)
             {
@@ -338,7 +310,7 @@ namespace Ogre {
         {
             for (size_t mip = 0; mip <= getNumMipmaps(); mip++)
             {
-                GLESHardwarePixelBuffer *buf = new GLESTextureBuffer(mName,
+                GLESHardwarePixelBuffer *buf = OGRE_NEW GLESTextureBuffer(mName,
                                                                      getGLESTextureTarget(),
                                                                      mTextureID,
                                                                      mWidth, mHeight,

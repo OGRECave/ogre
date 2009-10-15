@@ -46,8 +46,6 @@ namespace Ogre {
             void* mScratchPtr;
             bool mScratchUploadOnUnlock;
 
-            void clearData(void);
-
         protected:
             /** See HardwareBuffer. */
             void* lockImpl(size_t offset, size_t length, LockOptions options);

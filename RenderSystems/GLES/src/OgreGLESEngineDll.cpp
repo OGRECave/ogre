@@ -35,13 +35,13 @@ namespace Ogre {
 
     extern "C" void _OgreGLESExport dllStartPlugin(void) throw()
     {
-        plugin = new GLESPlugin();
+        plugin = OGRE_NEW GLESPlugin();
         Root::getSingleton().installPlugin(plugin);
     }
 
     extern "C" void _OgreGLESExport dllStopPlugin(void)
     {
         Root::getSingleton().uninstallPlugin(plugin);
-        delete plugin;
+        OGRE_DELETE plugin;
     }
 }

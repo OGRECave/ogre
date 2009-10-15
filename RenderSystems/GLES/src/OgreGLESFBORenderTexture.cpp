@@ -383,12 +383,12 @@ static const size_t depthBits[] =
     GLESFBORenderTexture *GLESFBOManager::createRenderTexture(const String &name, 
 		const GLESSurfaceDesc &target, bool writeGamma, uint fsaa)
     {
-        GLESFBORenderTexture *retval = new GLESFBORenderTexture(this, name, target, writeGamma, fsaa);
+        GLESFBORenderTexture *retval = OGRE_NEW GLESFBORenderTexture(this, name, target, writeGamma, fsaa);
         return retval;
     }
 	MultiRenderTarget *GLESFBOManager::createMultiRenderTarget(const String & name)
 	{
-		return new GLESFBOMultiRenderTarget(this, name);
+		return OGRE_NEW GLESFBOMultiRenderTarget(this, name);
 	}
 
     void GLESFBOManager::bind(RenderTarget *target)
@@ -428,7 +428,7 @@ static const size_t depthBits[] =
             else
             {
                 // New one
-                GLESRenderBuffer *rb = new GLESRenderBuffer(format, width, height, fsaa);
+                GLESRenderBuffer *rb = OGRE_NEW GLESRenderBuffer(format, width, height, fsaa);
                 mRenderBufferMap[key] = RBRef(rb);
                 retval.buffer = rb;
                 retval.zoffset = 0;
@@ -467,7 +467,7 @@ static const size_t depthBits[] =
 			if(it->second.refcount==0)
 			{
 				// If refcount reaches zero, delete buffer and remove from map
-				delete it->second.buffer;
+				OGRE_DELETE it->second.buffer;
 				mRenderBufferMap.erase(it);
 				//std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
 				//        << " of " << key.width << "x" << key.height << std::endl;

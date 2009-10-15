@@ -83,7 +83,7 @@ extern PFNGLGENERATEMIPMAPOESPROC glGenerateMipmapOES;
 #       if defined( __MINGW32__ )
 #           define _OgreGLESExport
 #       else
-#           define _OgreGLExport __declspec(dllimport)
+#           define _OgreGLESExport __declspec(dllimport)
 #       endif
 #   endif
 #elif defined ( OGRE_GCC_VISIBILITY )
