@@ -55,14 +55,14 @@ namespace Ogre  {
                 return GL_LUMINANCE_ALPHA;
 
             // PVR compressed formats
-            case PF_PVR_RGB2:
-                return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
-            case PF_PVR_RGB4:
-                return GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
-            case PF_PVR_RGBA2:
-                return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
-            case PF_PVR_RGBA4:
-                return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+//            case PF_PVR_RGB2:
+//                return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+//            case PF_PVR_RGB4:
+//                return GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+//            case PF_PVR_RGBA2:
+//                return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+//            case PF_PVR_RGBA4:
+//                return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
                 
             case PF_R3G3B2:
             case PF_R5G6B5:
@@ -119,10 +119,10 @@ namespace Ogre  {
             case PF_R8G8B8:
             case PF_B8G8R8:
             case PF_BYTE_LA:
-            case PF_PVR_RGB2:
-            case PF_PVR_RGB4:
-            case PF_PVR_RGBA2:
-            case PF_PVR_RGBA4:
+//            case PF_PVR_RGB2:
+//            case PF_PVR_RGB4:
+//            case PF_PVR_RGBA2:
+//            case PF_PVR_RGBA4:
                 return GL_UNSIGNED_BYTE;
             case PF_R5G6B5:
             case PF_B5G6R5:
@@ -190,14 +190,14 @@ namespace Ogre  {
             case PF_BYTE_LA:
                 return GL_LUMINANCE_ALPHA;
 
-            case PF_PVR_RGB2:
-                return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
-            case PF_PVR_RGB4:
-                return GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
-            case PF_PVR_RGBA2:
-                return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
-            case PF_PVR_RGBA4:
-                return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+//            case PF_PVR_RGB2:
+//                return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+//            case PF_PVR_RGB4:
+//                return GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+//            case PF_PVR_RGBA2:
+//                return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+//            case PF_PVR_RGBA4:
+//                return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
                 
             case PF_R8G8B8:
             case PF_B8G8R8:
@@ -268,14 +268,14 @@ namespace Ogre  {
     {
         switch (fmt)
         {
-            case GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
-                return PF_PVR_RGB2;
-            case GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
-                return PF_PVR_RGBA2;
-            case GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
-                return PF_PVR_RGB4;
-            case GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
-                return PF_PVR_RGBA4;
+//            case GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
+//                return PF_PVR_RGB2;
+//            case GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
+//                return PF_PVR_RGBA2;
+//            case GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
+//                return PF_PVR_RGB4;
+//            case GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
+//                return PF_PVR_RGBA4;
             case GL_LUMINANCE:
                 return PF_L8;
             case GL_ALPHA:
