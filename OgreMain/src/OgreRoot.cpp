@@ -241,7 +241,7 @@ namespace Ogre {
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-        PVRCodec::startup();
+//        PVRCodec::startup();
 #endif
 
         mHighLevelGpuProgramManager = OGRE_NEW HighLevelGpuProgramManager();
