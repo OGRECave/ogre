@@ -233,7 +233,7 @@ namespace Ogre {
 		@param reuseTextures If textures have already been created for the current
 			technique, whether to try to re-use them if sizes & formats match.
 			Note that for this feature to be of benefit, the textures must have been created
-			with the 'shared' option enabled.
+			with the 'pooled' option enabled.
 		*/
 		void setScheme(const String& schemeName, bool reuseTextures = true);
 
