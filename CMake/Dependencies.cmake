@@ -114,8 +114,10 @@ endif()
 #######################################################################
 
 # Find Cg
-find_package(Cg)
-macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
+if (NOT OGRE_BUILD_PLATFORM_IPHONE)
+  find_package(Cg)
+  macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
+endif (NOT OGRE_BUILD_PLATFORM_IPHONE)
 
 # Find Boost
 # Prefer static linking in all cases
@@ -178,17 +180,19 @@ macro_log_feature(CppUnit_FOUND "CppUnit" "Library for performing unit tests" "h
 # Apple-specific
 #######################################################################
 if (APPLE)
-  find_package(Carbon)
-  macro_log_feature(Carbon_FOUND "Carbon" "Carbon" "http://developer.apple.com/mac" TRUE "" "")
+  if (OGRE_BUILD_PLATFORM_IPHONE)
+    find_package(iPhoneSDK)
+    macro_log_feature(iPhoneSDK_FOUND "iPhone SDK" "iPhone SDK" "http://developer.apple.com/iphone" FALSE "" "")
+  else()
+    find_package(Carbon)
+    macro_log_feature(Carbon_FOUND "Carbon" "Carbon" "http://developer.apple.com/mac" TRUE "" "")
 
-  find_package(Cocoa)
-  macro_log_feature(Cocoa_FOUND "Cocoa" "Cocoa" "http://developer.apple.com/mac" TRUE "" "")
+    find_package(Cocoa)
+    macro_log_feature(Cocoa_FOUND "Cocoa" "Cocoa" "http://developer.apple.com/mac" TRUE "" "")
 
-  find_package(IOKit)
-  macro_log_feature(IOKit_FOUND "IOKit" "IOKit HID framework needed by the samples" "http://developer.apple.com/mac" FALSE "" "")
-
-  find_package(iPhoneSDK)
-  macro_log_feature(iPhoneSDK_FOUND "iPhone SDK" "iPhone SDK" "http://developer.apple.com/iphone" FALSE "" "")
+    find_package(IOKit)
+    macro_log_feature(IOKit_FOUND "IOKit" "IOKit HID framework needed by the samples" "http://developer.apple.com/mac" FALSE "" "")
+  endif (OGRE_BUILD_PLATFORM_IPHONE)
 endif(APPLE)
 
 # Display results, terminate if anything required is missing
