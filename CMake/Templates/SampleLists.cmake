@@ -136,7 +136,7 @@ if (OGRE_Plugin_OctreeSceneManager_FOUND)
   add_subdirectory(Terrain)
 endif ()
 add_subdirectory(TextureFX)
-add_subdirectory(Transpacency)
+add_subdirectory(Transparency)
 
 # Require vertex and fragment shaders
 add_subdirectory(CelShading)
