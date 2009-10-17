@@ -1,235 +1,203 @@
-/*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+#ifndef __SkeletalAnimation_H__
+#define __SkeletalAnimation_H__
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
-Also see acknowledgements in Readme.html
+#include "SdkSample.h"
 
-You may use this sample code for anything you like, it is not covered by the
-same license as the rest of the engine.
------------------------------------------------------------------------------
-*/
-/*
------------------------------------------------------------------------------
-Filename:    SkeletalAnimation.h
-Description: Specialisation of OGRE's framework application to show the
-             skeletal animation feature, including spline animation.
------------------------------------------------------------------------------
-*/
+using namespace Ogre;
+using namespace OgreBites;
 
-
-#include "ExampleApplication.h"
-
-#define NUM_JAIQUAS 6
-AnimationState* mAnimState[NUM_JAIQUAS];
-Real mAnimationSpeed[NUM_JAIQUAS];
-Vector3 mSneakStartOffset;
-Vector3 mSneakEndOffset;
-
-Quaternion mOrientations[NUM_JAIQUAS];
-Vector3 mBasePositions[NUM_JAIQUAS];
-SceneNode* mSceneNode[NUM_JAIQUAS];
-Degree mAnimationRotation(-60);
-Real mAnimChop = 7.96666f;
-Real mAnimChopBlend = 0.3f;
-
-// Event handler to animate
-class SkeletalAnimationFrameListener : public ExampleFrameListener
+class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 {
-protected:
 public:
-	SkeletalAnimationFrameListener(RenderWindow* win, Camera* cam, const String &debugText)
-        : ExampleFrameListener(win, cam)
-    {
-		mDebugText = debugText;
-    }
+
+	Sample_SkeletalAnimation() : NUM_MODELS(6), ANIM_CHOP(8)
+	{
+		mInfo["Title"] = "Skeletal Animation";
+		mInfo["Description"] = "A demo of the skeletal animation feature, including spline animation.";
+		mInfo["Thumbnail"] = "thumb_skelanim.png";
+		mInfo["Category"] = "Unsorted";
+	}
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {
-	if( ExampleFrameListener::frameRenderingQueued(evt) == false )
-		return false;
-
-        for (int i = 0; i < NUM_JAIQUAS; ++i)
+        for (unsigned int i = 0; i < NUM_MODELS; i++)
         {
-			Real inc = evt.timeSinceLastFrame * mAnimationSpeed[i]; 
-			if ((mAnimState[i]->getTimePosition() + inc) >= mAnimChop)
-			{
-				// Loop
-				// Need to reposition the scene node origin since animation includes translation
-				// Calculate as an offset to the end position, rotated by the
-				// amount the animation turns the character
-				Quaternion rot(mAnimationRotation, Vector3::UNIT_Y);
-				Vector3 startoffset = mSceneNode[i]->getOrientation() * -mSneakStartOffset;
-				Vector3 endoffset = mSneakEndOffset;
-				Vector3 offset = rot * startoffset;
-				Vector3 currEnd = mSceneNode[i]->getOrientation() * endoffset + mSceneNode[i]->getPosition();
-				mSceneNode[i]->setPosition(currEnd + offset);
-				mSceneNode[i]->rotate(rot);
+			// update sneaking animation based on speed
+			mAnimStates[i]->addTime(mAnimSpeeds[i] * evt.timeSinceLastFrame);
 
-				mAnimState[i]->setTimePosition((mAnimState[i]->getTimePosition() + inc) - mAnimChop);
-			}
-			else
+			if (mAnimStates[i]->getTimePosition() >= ANIM_CHOP)   // when it's time to loop...
 			{
-				mAnimState[i]->addTime(inc);
+				/* We need reposition the scene node origin, since the animation includes translation.
+				Position is calculated from an offset to the end position, and rotation is calculated
+				from how much the animation turns the character. */
+
+				Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
+
+				// find current end position and the offset
+				Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
+				Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
+
+				mModelNodes[i]->setPosition(currEnd + offset);
+				mModelNodes[i]->rotate(rot);
+
+				mAnimStates[i]->setTimePosition(0);   // reset animation time
 			}
         }
 
-        return true;
+		return SdkSample::frameRenderingQueued(evt);
     }
-};
-
-
-
-class SkeletalApplication : public ExampleApplication
-{
-public:
-    SkeletalApplication() {}
 
 protected:
-	String mDebugText;
 
-    // Just override the mandatory create scene method
-    void createScene(void)
-    {
+	void setupContent()
+	{
+		// set shadow properties
 		mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
 		mSceneMgr->setShadowTextureSize(512);
 		mSceneMgr->setShadowColour(ColourValue(0.6, 0.6, 0.6));
 
-        // Setup animation default
-        Animation::setDefaultInterpolationMode(Animation::IM_LINEAR);
-        Animation::setDefaultRotationInterpolationMode(Animation::RIM_LINEAR);
-
-        // Set ambient light
+		// add a little ambient lighting
         mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 
-		// The jaiqua sneak animation doesn't loop properly, so lets hack it so it does
-		// We want to copy the initial keyframes of all bones, but alter the Spineroot
-		// to give it an offset of where the animation ends
-		SkeletonPtr skel = SkeletonManager::getSingleton().load("jaiqua.skeleton", 
+		// add a blue spotlight
+        Light* l = mSceneMgr->createLight();
+		l->setType(Light::LT_SPOTLIGHT);
+        l->setPosition(-200, 150, -100);
+		l->setDirection(-l->getPosition());
+        l->setDiffuseColour(0.5, 0.5, 1.0);
+
+		// add a green spotlight
+        l = mSceneMgr->createLight();
+		l->setType(Light::LT_SPOTLIGHT);
+        l->setPosition(0, 150, -100);
+		l->setDirection(-l->getPosition());
+        l->setDiffuseColour(0.5, 1.0, 0.5);
+
+		// create a floor mesh resource
+		MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+			Plane(Vector3::UNIT_Y, -1), 250, 250, 25, 25, true, 1, 15, 15, Vector3::UNIT_Z);
+
+		// add a floor to our scene using the floor mesh we created
+		Entity* floor = mSceneMgr->createEntity("Floor", "floor");
+		floor->setMaterialName("Examples/Rockwall");
+		floor->setCastShadows(false);
+		mSceneMgr->getRootSceneNode()->attachObject(floor);
+
+		// set camera initial transform and speed
+        mCamera->setPosition(100, 20, 0);
+        mCamera->lookAt(0, 10, 0);
+		mCameraMan->setTopSpeed(50);
+
+		setupModels();
+	}
+
+	void setupModels()
+	{
+		tweakSneakAnim();
+
+		SceneNode* sn = NULL;
+		Entity* ent = NULL;
+		AnimationState* as = NULL;
+
+        for (unsigned int i = 0; i < NUM_MODELS; i++)
+        {
+			// create scene nodes for the models at regular angular intervals
+			sn = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+			sn->yaw(Radian(Math::TWO_PI * (float)i / (float)NUM_MODELS));
+			sn->translate(0, 0, -20, Node::TS_LOCAL);
+			mModelNodes.push_back(sn);
+
+			// create and attach a jaiqua entity
+            ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
+			sn->attachObject(ent);
+			
+			// enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
+			as = ent->getAnimationState("Sneak");
+            as->setEnabled(true);
+			as->setLoop(false);
+			mAnimSpeeds.push_back(Math::RangeRandom(0.5, 1.5));
+			mAnimStates.push_back(as);
+        }
+
+		// create name and value for skinning mode
+		StringVector names;
+		names.push_back("Skinning");
+		String value = "Software";
+
+		// change the value if hardware skinning is enabled
+        Pass* pass = ent->getSubEntity(0)->getMaterial()->getBestTechnique()->getPass(0);
+		if (pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) value = "Hardware";
+
+		// create a params panel to display the skinning mode
+		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 150, names)->setParamValue(0, value);
+	}
+	
+	/*-----------------------------------------------------------------------------
+	| The jaiqua sneak animation doesn't loop properly. This method tweaks the
+	| animation to loop properly by altering the Spineroot bone track.
+	-----------------------------------------------------------------------------*/
+	void tweakSneakAnim()
+	{
+		// get the skeleton, animation, and the node track iterator
+		SkeletonPtr skel = SkeletonManager::getSingleton().load("jaiqua.skeleton",
 			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		Animation* anim = skel->getAnimation("Sneak");
-		Animation::NodeTrackIterator trackIter = anim->getNodeTrackIterator();
-		while (trackIter.hasMoreElements())
+		Animation::NodeTrackIterator tracks = anim->getNodeTrackIterator();
+
+		while (tracks.hasMoreElements())   // for every node track...
 		{
-			NodeAnimationTrack* track = trackIter.getNext();
+			NodeAnimationTrack* track = tracks.getNext();
 
+			// get the keyframe at the chopping point
 			TransformKeyFrame oldKf(0, 0);
-			track->getInterpolatedKeyFrame(mAnimChop, &oldKf);
+			track->getInterpolatedKeyFrame(ANIM_CHOP, &oldKf);
 
-			// Drop all keyframes after the chop
-			while (track->getKeyFrame(track->getNumKeyFrames()-1)->getTime() >= mAnimChop - mAnimChopBlend)
+			// drop all keyframes after the chopping point
+			while (track->getKeyFrame(track->getNumKeyFrames()-1)->getTime() >= ANIM_CHOP - 0.3f)
 				track->removeKeyFrame(track->getNumKeyFrames()-1);
 
-			TransformKeyFrame* newKf = track->createNodeKeyFrame(mAnimChop);
+			// create a new keyframe at chopping point, and get the first keyframe
+			TransformKeyFrame* newKf = track->createNodeKeyFrame(ANIM_CHOP);
 			TransformKeyFrame* startKf = track->getNodeKeyFrame(0);
 
 			Bone* bone = skel->getBone(track->getHandle());
-			if (bone->getName() == "Spineroot")
+
+			if (bone->getName() == "Spineroot")   // adjust spine root relative to new location
 			{
-				mSneakStartOffset = startKf->getTranslate() + bone->getInitialPosition();
-				mSneakEndOffset = oldKf.getTranslate() + bone->getInitialPosition();
-				mSneakStartOffset.y = mSneakEndOffset.y;
-				// Adjust spine root relative to new location
-				newKf->setRotation(oldKf.getRotation());
+				mSneakStartPos = startKf->getTranslate() + bone->getInitialPosition();
+				mSneakEndPos = oldKf.getTranslate() + bone->getInitialPosition();
+				mSneakStartPos.y = mSneakEndPos.y;
+
 				newKf->setTranslate(oldKf.getTranslate());
+				newKf->setRotation(oldKf.getRotation());
 				newKf->setScale(oldKf.getScale());
-
-
 			}
-			else
+			else   // make all other bones loop back
 			{
-				newKf->setRotation(startKf->getRotation());
 				newKf->setTranslate(startKf->getTranslate());
+				newKf->setRotation(startKf->getRotation());
 				newKf->setScale(startKf->getScale());
 			}
 		}
+	}
 
+	void cleanupContent()
+	{
+		mModelNodes.clear();
+		mAnimStates.clear();
+		mAnimSpeeds.clear();
+		MeshManager::getSingleton().remove("floor");
+	}
 
+	const unsigned int NUM_MODELS;
+	const Real ANIM_CHOP;
 
+	std::vector<SceneNode*> mModelNodes;
+	std::vector<AnimationState*> mAnimStates;
+	std::vector<Real> mAnimSpeeds;
 
-        Entity *ent;
-		Real rotInc = Math::TWO_PI / (float)NUM_JAIQUAS;
-		Real rot = 0.0f;
-        for (int i = 0; i < NUM_JAIQUAS; ++i)
-        {
-			Quaternion q;
-			q.FromAngleAxis(Radian(rot), Vector3::UNIT_Y);
-
-			mOrientations[i] = q;
-			mBasePositions[i] = q * Vector3(0,0,-20);
-
-            ent = mSceneMgr->createEntity("jaiqua" + StringConverter::toString(i), "jaiqua.mesh");
-            // Add entity to the scene node
-			mSceneNode[i] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-			mSceneNode[i]->attachObject(ent);
-			mSceneNode[i]->rotate(q);
-			mSceneNode[i]->translate(mBasePositions[i]);
-			
-            mAnimState[i] = ent->getAnimationState("Sneak");
-            mAnimState[i]->setEnabled(true);
-			mAnimState[i]->setLoop(false); // manual loop since translation involved
-            mAnimationSpeed[i] = Math::RangeRandom(0.5, 1.5);
-
-			rot += rotInc;
-        }
-
-
-
-        // Give it a little ambience with lights
-        Light* l;
-        l = mSceneMgr->createLight("BlueLight");
-		l->setType(Light::LT_SPOTLIGHT);
-        l->setPosition(-200,150,-100);
-		Vector3 dir(-l->getPosition());
-		dir.normalise();
-		l->setDirection(dir);
-        l->setDiffuseColour(0.5, 0.5, 1.0);
-
-        l = mSceneMgr->createLight("GreenLight");
-		l->setType(Light::LT_SPOTLIGHT);
-        l->setPosition(0,150,-100);
-		dir = -l->getPosition();
-		dir.normalise();
-		l->setDirection(dir);
-        l->setDiffuseColour(0.5, 1.0, 0.5);
-
-        // Position the camera
-        mCamera->setPosition(100,20,0);
-        mCamera->lookAt(0,10,0);
-
-        // Report whether hardware skinning is enabled or not
-        Technique* t = ent->getSubEntity(0)->getMaterial()->getBestTechnique();
-        Pass* p = t->getPass(0);
-        if (p->hasVertexProgram() && p->getVertexProgram()->isSkeletalAnimationIncluded())
-            mDebugText = "Hardware skinning is enabled";
-        else
-            mDebugText = "Software skinning is enabled";
-
-		Plane plane;
-		plane.normal = Vector3::UNIT_Y;
-		plane.d = 100;
-		MeshManager::getSingleton().createPlane("Myplane",
-			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
-			1500,1500,20,20,true,1,60,60,Vector3::UNIT_Z);
-		Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
-		pPlaneEnt->setMaterialName("Examples/Rockwall");
-		pPlaneEnt->setCastShadows(false);
-		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,99,0))->attachObject(pPlaneEnt);
-
-
-
-
-    }
-
-    // Create new frame listener
-    void createFrameListener(void)
-    {
-        mFrameListener= new SkeletalAnimationFrameListener(mWindow, mCamera, mDebugText);
-        mRoot->addFrameListener(mFrameListener);
-    }
-
-
+	Vector3 mSneakStartPos;
+	Vector3 mSneakEndPos;
 };
 
+#endif

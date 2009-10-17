@@ -99,7 +99,6 @@ endif (APPLE)
 include(Dependencies)
 # definitions for samples
 set(OGRE_LIBRARIES OgreMain) 
-set(OGRE_CEGUIRenderer_LIBRARIES CEGUIOgreRenderer)
 set(OGRE_Paging_LIBRARIES OgrePaging)
 set(OGRE_Terrain_LIBRARIES OgreTerrain)
 set(OGRE_Plugin_PCZSceneManager_LIBRARIES Plugin_PCZSceneManager)
@@ -174,7 +173,6 @@ option(OGRE_BUILD_COMPONENT_PAGING "Build Paging component" TRUE)
 option(OGRE_BUILD_COMPONENT_TERRAIN "Build Terrain component" TRUE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_PROPERTY "Build Property component" TRUE "Boost_FOUND;NOT OGRE_BUILD_PLATFORM_IPHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLUGIN_CG "Build Cg plugin" TRUE "Cg_FOUND;NOT OGRE_BUILD_PLATFORM_IPHONE" FALSE)
-cmake_dependent_option(OGRE_BUILD_CEGUIRENDERER "Build CEGUI renderer" TRUE "CEGUI_FOUND;NOT OGRE_BUILD_PLATFORM_IPHONE" FALSE)
 option(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM "Build RTShader System component" FALSE)
 option(OGRE_BUILD_SAMPLES "Build Ogre demos" TRUE)
 cmake_dependent_option(OGRE_BUILD_TOOLS "Build the command-line tools" TRUE "NOT OGRE_BUILD_PLATFORM_IPHONE" FALSE)
@@ -240,11 +238,6 @@ add_subdirectory(PlugIns)
 
 # Setup Components
 add_subdirectory(Components)
-
-# Setup CEGUI renderer
-if (OGRE_BUILD_CEGUIRENDERER)
-  add_subdirectory(Samples/Common/CEGUIRenderer)
-endif ()
 
 # Setup samples
 add_subdirectory(Samples) 

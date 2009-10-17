@@ -1,62 +1,41 @@
-/*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+#ifndef __SkyPlane_H__
+#define __SkyPlane_H__
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
-Also see acknowledgements in Readme.html
+#include "SdkSample.h"
 
-You may use this sample code for anything you like, it is not covered by the
-same license as the rest of the engine.
------------------------------------------------------------------------------
-*/
+using namespace Ogre;
+using namespace OgreBites;
 
-/**
-    \file 
-        SkyPlane.h
-    \brief
-        Specialisation of OGRE's framework application to show the
-        skyplane feature where a fixed constant-distance
-        skyplane is displayed in the background.
-*/
-
-#include "ExampleApplication.h"
-
-class SkyPlaneApplication : public ExampleApplication
+class _OgreSampleClassExport Sample_SkyPlane : public SdkSample
 {
 public:
-    SkyPlaneApplication() {}
+
+	Sample_SkyPlane()
+	{
+		mInfo["Title"] = "Sky Plane";
+		mInfo["Description"] = "Shows how to use skyplanes (fixed-distance planes used for backgrounds).";
+		mInfo["Thumbnail"] = "thumb_skyplane.png";
+		mInfo["Category"] = "Unsorted";
+	}
 
 protected:
-    // Just override the mandatory create scene method
-    void createScene(void)
-    {
-        // Set ambient light
-        mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 
-        // Define the required skyplane
-        Plane plane;
-        // 5000 world units from the camera
-        plane.d = 5000;
-        // Above the camera, facing down
-        plane.normal = -Vector3::UNIT_Y;
-        // Create the plane 10000 units wide, tile the texture 3 times
-        mSceneMgr->setSkyPlane(true, plane, "Examples/SpaceSkyPlane",10000,3);
+	void setupContent()
+	{     
+		// setup some basic lighting for our scene
+        mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
+        mSceneMgr->createLight()->setPosition(20, 80, 50);
+        
+		// create a skyplane 5000 units away, facing down, 10000 square units large, with 3x texture tiling
+        mSceneMgr->setSkyPlane(true, Plane(0, -1, 0, 5000), "Examples/SpaceSkyPlane", 10000, 3);
 
-        // Create a light
-        Light* l = mSceneMgr->createLight("MainLight");
-        // Accept default settings: point light, white diffuse, just set position
-        // NB I could attach the light to a SceneNode if I wanted it to move automatically with
-        //  other objects, but I don't
-        l->setPosition(20,80,50);
+        // and finally... omg it's a DRAGON!
+        mSceneMgr->getRootSceneNode()->attachObject(mSceneMgr->createEntity("Dragon", "dragon.mesh"));
 
-        // Also add a nice dragon in
-        Entity *ent = mSceneMgr->createEntity("dragon", "dragon.mesh");
-        mSceneMgr->getRootSceneNode()->attachObject(ent);
-
-
-
-    }
-
+		// turn around and look at the DRAGON!
+		mCamera->yaw(Degree(210));
+		mCamera->pitch(Degree(-10));
+	}
 };
+
+#endif

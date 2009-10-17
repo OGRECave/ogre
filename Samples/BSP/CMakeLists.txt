@@ -1,27 +1,27 @@
-#-------------------------------------------------------------------
-# This file is part of the CMake build system for OGRE
-#     (Object-oriented Graphics Rendering Engine)
-# For the latest info, see http://www.ogre3d.org/
-#
-# The contents of this file are placed in the public domain. Feel
-# free to make use of it in any way you like.
-#-------------------------------------------------------------------
-
 # Configure BSP demo build
 
 set(SOURCE_FILES src/BSP.cpp)
+set(HEADER_FILES include/BSP.h)
 
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/BSP.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-endif ()
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_executable(Demo_BSP WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})
+add_library(Sample_BSP ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Demo_BSP ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Sample_BSP ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+ogre_config_sample(Sample_BSP)
 
-ogre_config_sample(Demo_BSP)
-
-if (SAMPLE_DEPENDENCIES)
-  add_dependencies(Demo_BSP ${SAMPLE_DEPENDENCIES})
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Samples can be installed in the application package
+    set_target_properties(Sample_BSP
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
 endif()
+
+if (OGRE_STATIC)
+  add_dependencies(SampleBrowser Sample_BSP)
+else ()
+  add_dependencies(Sample_BSP SampleBrowser)
+endif (OGRE_STATIC)
+
 

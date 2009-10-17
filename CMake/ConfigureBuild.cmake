@@ -160,11 +160,6 @@ if (UNIX)
 
   # configure additional packages
   
-  if (OGRE_BUILD_CEGUIRENDERER)
-    configure_file(${OGRE_TEMPLATES_DIR}/CEGUI-OGRE.pc.in ${OGRE_BINARY_DIR}/pkgconfig/CEGUI-OGRE${OGRE_LIB_SUFFIX}.pc @ONLY)
-    install(FILES ${OGRE_BINARY_DIR}/pkgconfig/CEGUI-OGRE${OGRE_LIB_SUFFIX}.pc DESTINATION lib/pkgconfig)
-  endif ()
-
   if (OGRE_BUILD_PLUGIN_PCZ)
     configure_file(${OGRE_TEMPLATES_DIR}/OGRE-PCZ.pc.in ${OGRE_BINARY_DIR}/pkgconfig/OGRE-PCZ${OGRE_LIB_SUFFIX}.pc @ONLY)
     install(FILES ${OGRE_BINARY_DIR}/pkgconfig/OGRE-PCZ${OGRE_LIB_SUFFIX}.pc DESTINATION lib/pkgconfig)

@@ -2,22 +2,10 @@
 fragment_program Radial_Blur_ps_cg cg
 {
 	source Radial_Blur_FP.cg
-	profiles ps_2_0 arbfp1 
+	profiles ps_2_0 arbfp1
 	entry_point main
 }
 
-fragment_program Radial_Blur_ps_hlsl10 hlsl
-{
-	source Radial_Blur_FP.hlsl
-	target ps_4_0 
-	entry_point main
-}
-
-fragment_program Radial_Blur_psUnified unified
-{
-			delegate Radial_Blur_ps_cg
-			delegate Radial_Blur_ps_hlsl10
-}
 
 //Effect: Radial Blur
 material Ogre/Compositor/Radial_Blur
@@ -31,11 +19,7 @@ material Ogre/Compositor/Radial_Blur
 			cull_software none
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
-			{
-			}
-
-			fragment_program_ref Radial_Blur_psUnified
+			fragment_program_ref Radial_Blur_ps_cg
 			{
 	            param_named sampleDist float 1.0
 	            param_named sampleStrength float 2.2

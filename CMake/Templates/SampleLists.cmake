@@ -64,15 +64,12 @@ endif ()
 # Find dependencies
 find_package(OGRE REQUIRED)
 find_package(OIS REQUIRED)
-find_package(CEGUI)
 
 include_directories(
   ${OGRE_INCLUDE_DIRS}
   ${OGRE_Plugin_PCZSceneManager_INCLUDE_DIRS}
   ${OGRE_Plugin_OctreeZone_INCLUDE_DIRS}
   ${OIS_INCLUDE_DIRS}
-  ${CEGUI_INCLUDE_DIRS}
-  ${OGRE_CEGUIRenderer_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/Common/include
 )
 
@@ -156,17 +153,9 @@ add_subdirectory(VolumeTex)
 # Requires cube mapping
 add_subdirectory(Water)
 
-if (NOT CEGUI_FOUND)
-  message(STATUS "Could not find dependency: CEGUI")
-  message(STATUS "Skipping GUI samples build")
-elseif (NOT OGRE_CEGUIRenderer_FOUND)
-  message(STATUS "CEGUI OGRE renderer was not found")
-  message(STATUS "Skipping GUI samples build")
-else ()
-  add_subdirectory(Compositor)
-  add_subdirectory(FacialAnimation)
-  add_subdirectory(Gui)
-  add_subdirectory(Instancing)
-  add_subdirectory(OceanDemo)
-  add_subdirectory(Shadows)
-endif ()
+add_subdirectory(Compositor)
+add_subdirectory(FacialAnimation)
+add_subdirectory(Gui)
+add_subdirectory(Instancing)
+add_subdirectory(OceanDemo)
+add_subdirectory(Shadows)

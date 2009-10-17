@@ -20,7 +20,6 @@ else(WIN32)
 endif(WIN32)
 
 set(INST_FILES
-  Packages/FindCEGUI.cmake
   Packages/FindOIS.cmake
   Packages/FindOGRE.cmake
   Utils/FindPkgMacros.cmake

@@ -1,91 +1,59 @@
-/*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+#ifndef __Smoke_H__
+#define __Smoke_H__
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
-Also see acknowledgements in Readme.html
+#include "SdkSample.h"
 
-You may use this sample code for anything you like, it is not covered by the
-same license as the rest of the engine.
------------------------------------------------------------------------------
-*/
-/*
------------------------------------------------------------------------------
-Filename:    ParticleApplication.cpp
-Description: Specialisation of OGRE's framework application to show the
-             environment mapping feature.
------------------------------------------------------------------------------
-*/
+using namespace Ogre;
+using namespace OgreBites;
 
-
-#include "ExampleApplication.h"
-
-
-// Event handler to add ability to alter curvature
-class ParticleFrameListener : public ExampleFrameListener
-{
-protected:
-    SceneNode* mFountainNode;
-public:
-    ParticleFrameListener(RenderWindow* win, Camera* cam, SceneNode* fountainNode)
-        : ExampleFrameListener(win, cam)
-    {
-        mFountainNode = fountainNode;
-    }
-
-    bool frameRenderingQueued(const FrameEvent& evt)
-    {
-
-        // Rotate fountains
-//        mFountainNode->yaw(evt.timeSinceLastFrame * 30);
-
-        // Call default
-        return ExampleFrameListener::frameRenderingQueued(evt);
-
-    }
-};
-
-
-
-class ParticleApplication : public ExampleApplication
+class _OgreSampleClassExport Sample_Smoke : public SdkSample
 {
 public:
-    ParticleApplication() {}
+
+	Sample_Smoke()
+	{
+		mInfo["Title"] = "Smoke";
+		mInfo["Description"] = "Demonstrates depth-sorting of particles in particle systems.";
+		mInfo["Thumbnail"] = "thumb_smoke.png";
+		mInfo["Category"] = "Unsorted";
+		mInfo["Help"] = "Proof that OGRE is just the hottest thing. Bleh. So there. ^_^";
+	}
+
+	bool frameRenderingQueued(const FrameEvent& evt)
+	{
+		// spin the head around and make it float up and down
+		mPivot->setPosition(0, Math::Sin(mRoot->getTimer()->getMilliseconds() / 150.0) * 10, 0);
+		mPivot->yaw(Radian(-evt.timeSinceLastFrame * 1.5));
+		return SdkSample::frameRenderingQueued(evt);
+	}
 
 protected:
-    SceneNode* mFountainNode;
 
-    // Just override the mandatory create scene method
-    void createScene(void)
-    {
-        // Set ambient light
-        mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+	void setupContent()
+	{     
 
-        // Create a skydome
-        mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
+		mSceneMgr->setSkyBox(true, "Examples/EveningSkyBox");
 
-       
-        // Create shared node for 2 fountains
-        mFountainNode = static_cast<SceneNode*>(mSceneMgr->getRootSceneNode()->createChild());
+		// dim orange ambient and two bright orange lights to match the skybox
+		mSceneMgr->setAmbientLight(ColourValue(0.3, 0.2, 0));
+		Light* light = mSceneMgr->createLight();
+		light->setPosition(2000, 1000, -1000);
+		light->setDiffuseColour(1, 0.5, 0);
+		light = mSceneMgr->createLight();
+        light->setPosition(-2000, 1000, 1000);
+		light->setDiffuseColour(1, 0.5, 0);
 
-        // smoke
-        ParticleSystem* pSys2 = mSceneMgr->createParticleSystem("fountain1", 
-            "Examples/Smoke");
-        // Point the fountain at an angle
-        SceneNode* fNode = static_cast<SceneNode*>(mFountainNode->createChild());
-        fNode->attachObject(pSys2);
+		mPivot = mSceneMgr->getRootSceneNode()->createChildSceneNode();  // create a pivot node
 
-    }
+		// create a child node and attach an ogre head and some smoke to it
+		SceneNode* headNode = mPivot->createChildSceneNode(Vector3(100, 0, 0));
+		headNode->attachObject(mSceneMgr->createEntity("Head", "ogrehead.mesh"));
+        headNode->attachObject(mSceneMgr->createParticleSystem("Smoke", "Examples/Smoke"));
 
-    // Create new frame listener
-    void createFrameListener(void)
-    {
-        mFrameListener= new ParticleFrameListener(mWindow, mCamera, mFountainNode);
-        mRoot->addFrameListener(mFrameListener);
-    }
+		mCamera->setPosition(0, 30, 350);
+	}
 
-
+	SceneNode* mPivot;
 };
 
+#endif

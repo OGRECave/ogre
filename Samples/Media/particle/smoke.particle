@@ -3,41 +3,42 @@
 // smoke
 particle_system Examples/Smoke
 {
-    	material        	Examples/Smoke
-    	particle_width  	55
-    	particle_height 	55
-    	cull_each       	true
-    	quota           	500
-    	billboard_type  	point
-		sorted				true
+	material        	Examples/Smoke
+	particle_width  	35
+	particle_height 	35
+	cull_each       	true
+	quota           	500
+	billboard_type  	point
+	sorted				true
     
-    	// Area emitter
-    	emitter Point
-    	{
-		angle               		11
-        	emission_rate       		15
-        	time_to_live        		4
-        	direction           		0 1 0
-        	velocity_min        		150
-        	velocity_max        		240    	
+	// Area emitter
+	emitter Point
+	{
+		position 0 15 -15
+		angle 35
+		emission_rate 15
+		time_to_live 4
+		direction 0 1 0
+		velocity_min 50
+		velocity_max 80    	
 	}
 
 	affector ColourImage
 	{
-		image		smokecolors.png
+		image smokecolors.png
 	}
 
    	affector Rotator
    	{
-        	rotation_range_start  		0
-        	rotation_range_end   	 	360
-        	rotation_speed_range_start  	-60
-        	rotation_speed_range_end    	200
+		rotation_range_start 0
+		rotation_range_end 360
+		rotation_speed_range_start -60
+		rotation_speed_range_end 200
    	}
 
    	affector Scaler
    	{
-       	rate 	100
+       	rate 50
    	}
 
 }

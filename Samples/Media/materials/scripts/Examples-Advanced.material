@@ -1,11 +1,11 @@
 // -------------------------------
 // Cel Shading Section
 // -------------------------------
-vertex_program Ogre/CelShadingVPCg cg
+vertex_program Ogre/CelShadingVP cg
 {
 	source Example_CelShading.cg
 	entry_point main_vp
-	profiles vs_1_1 arbvp1 vs_4_0
+	profiles vs_1_1 arbvp1
 
 	default_params
 	{
@@ -16,43 +16,11 @@ vertex_program Ogre/CelShadingVPCg cg
 	}
 }
 
-fragment_program Ogre/CelShadingFPCg cg
+fragment_program Ogre/CelShadingFP cg
 {
 	source Example_CelShading.cg
 	entry_point main_fp
-	profiles ps_1_1 arbfp1 fp20 ps_4_0
-}
-
-vertex_program Ogre/CelShadingVPHLSL  hlsl
-{
-	source Example_CelShading.hlsl
-	target vs_4_0
-	entry_point main_vp
-	default_params
-	{
-		param_named_auto lightPosition light_position_object_space 0
-		param_named_auto eyePosition camera_position_object_space
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named shininess float 10 
-	}
-}
-
-fragment_program Ogre/CelShadingFPHLSL  hlsl
-{
-	source Example_CelShading.hlsl
-	target ps_4_0
-	entry_point main_fp
-}
-
-vertex_program Ogre/CelShadingVP unified
-{
-	delegate Ogre/CelShadingVPCg
-//	delegate Ogre/CelShadingVPHLSL
-}
-fragment_program Ogre/CelShadingFP unified
-{
-	delegate Ogre/CelShadingFPCg
-//	delegate Ogre/CelShadingFPHLSL
+	profiles ps_1_1 arbfp1 fp20
 }
 
 
@@ -333,34 +301,6 @@ material Examples/BumpMapping/MultiLightTangentParity : Examples/BumpMapping/Mul
 
 }
 
-// RTShader system material for bump mapping.
-// All scene lights will be applied in one rendering pass. 
-material Examples/RTShaderSystem/BumpMapping
-{
-	technique
-	{
-		pass
-		{
-			// Turn off specular in order to use only diffuse based bump map technique.
-			specular 1.0 1.0 1.0 32
-			
-			texture_unit
-			{
-				texture RustedMetal.jpg
-			}				
-			
-			// RT Shader system section.
- 			rtshader_system
- 			{	 	
- 				// Light model will be normal map based. 			
- 				light_model sgx_normal_map NMBumpsOut.png 				
- 			}			
-		}				
-	}
-}
-		
-
-
 //---------------------------
 // Projective texture section
 //---------------------------
@@ -484,14 +424,14 @@ material Examples/FresnelReflectionRefraction
 			texture_unit
 			{
 				// Will be filled in at runtime
-				texture Reflection
+				texture reflection
 				tex_address_mode clamp
 			}
 			// Refraction
 			texture_unit
 			{
 				// Will be filled in at runtime
-				texture Refraction
+				texture refraction
 				tex_address_mode clamp
 			}
 		}
@@ -640,7 +580,6 @@ material Examples/Athene/NormalMappedSpecular : Examples/BumpMapping/MultiLightS
 
 	}
 }
-
 
 
 

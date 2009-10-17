@@ -1,10 +1,12 @@
-# Resource locations to be added to the 'boostrap' path
-# This also contains the minimum you need to use the Ogre example framework
-[Bootstrap]
-Zip=@OGRE_MEDIA_DIR_DBG@/packs/OgreCore.zip
+# Resources required by the sample browser and most samples.
+[Essential]
+Zip=@OGRE_MEDIA_DIR_DBG@/packs/SdkTrays.zip
+FileSystem=@OGRE_MEDIA_DIR_DBG@/thumbnails
 
-# Resource locations to be added to the default path
-[General]
+# Common sample resources needed by many of the samples.
+# Rarely used resources should be separately loaded by the
+# samples which require them.
+[Popular]
 FileSystem=@OGRE_MEDIA_DIR_DBG@
 FileSystem=@OGRE_MEDIA_DIR_DBG@/fonts
 FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/programs
@@ -12,9 +14,7 @@ FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/scripts
 FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/textures
 FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/textures/nvidia
 FileSystem=@OGRE_MEDIA_DIR_DBG@/models
-FileSystem=@OGRE_MEDIA_DIR_DBG@/overlays
 FileSystem=@OGRE_MEDIA_DIR_DBG@/particle
-FileSystem=@OGRE_MEDIA_DIR_DBG@/gui
 FileSystem=@OGRE_MEDIA_DIR_DBG@/DeferredShadingMedia
 FileSystem=@OGRE_MEDIA_DIR_DBG@/PCZAppMedia
 FileSystem=@OGRE_MEDIA_DIR_DBG@/RTShaderLib

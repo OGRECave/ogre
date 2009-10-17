@@ -1,26 +1,24 @@
-#-------------------------------------------------------------------
-# This file is part of the CMake build system for OGRE
-#     (Object-oriented Graphics Rendering Engine)
-# For the latest info, see http://www.ogre3d.org/
-#
-# The contents of this file are placed in the public domain. Feel
-# free to make use of it in any way you like.
-#-------------------------------------------------------------------
-
 # Configure FacialAnimation demo build
 
+set(HEADER_FILES include/FacialAnimation.h)
 set(SOURCE_FILES src/FacialAnimation.cpp)
 
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/FacialAnimation.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-endif ()
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_library(Sample_FacialAnimation ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/CEGUIRenderer/include)
-add_executable(Demo_FacialAnimation WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})
+target_link_libraries(Sample_FacialAnimation ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+ogre_config_sample(Sample_FacialAnimation)
 
-target_link_libraries(Demo_FacialAnimation ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${CEGUI_LIBRARIES} ${OGRE_CEGUIRenderer_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample(Demo_FacialAnimation)
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Samples can be installed in the application package
+    set_target_properties(Sample_FacialAnimation
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
 
-if (SAMPLE_DEPENDENCIES)
-  add_dependencies(Demo_FacialAnimation ${SAMPLE_DEPENDENCIES})
-endif ()
+if (OGRE_STATIC)
+  add_dependencies(SampleBrowser Sample_FacialAnimation)
+else ()
+  add_dependencies(Sample_FacialAnimation SampleBrowser)
+endif (OGRE_STATIC)

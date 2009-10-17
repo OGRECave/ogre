@@ -1,12 +1,11 @@
-
 material Ogre/Earring
 {
 	technique
 	{
 		pass
 		{
-			ambient 0.5 0.5 0
-			diffuse 1 1 0
+			ambient 0.7 0.7 0
+			diffuse 0.7 0.7 0
 
 			texture_unit
 			{
@@ -18,14 +17,14 @@ material Ogre/Earring
 		}
 	}
 }
+
 material Ogre/Skin
 {
 	technique
 	{
 		pass
 		{
-			ambient 0.7 0.7 0.7
-			cull_hardware none
+			ambient 0.3 0.8 0.3
 
 			texture_unit
 			{
@@ -35,85 +34,33 @@ material Ogre/Skin
 		}
 	}
 }
+
 material Ogre/Tusks
 {
 	technique
 	{
 		pass
 		{
-			ambient 0.5 0.5 0.4
-			diffuse 1 1 0.8
+			ambient 0.7 0.7 0.6
 
 			texture_unit
 			{
-				texture dirt01.jpg
-				colour_op_ex add src_texture src_current
-				colour_op_multipass_fallback one one
+				texture tusk.jpg
+				scale 0.2 0.2
 			}
 		}
 	}
 }
+
 material Ogre/Eyes
 {
 	technique
 	{
 		pass
 		{
-
-			texture_unit
-			{
-				texture WeirdEye.png
-			}
-		}
-	}
-}
-material Cursor/default
-{
-	technique
-	{
-		pass
-		{
-			scene_blend alpha_blend
-
-			texture_unit
-			{
-				texture cursor.png
-				tex_address_mode clamp
-			}
-		}
-	}
-}
-material Core/StatsBlockBorder/Down
-{
-	technique
-	{
-		pass
-		{
-			lighting off
-			scene_blend alpha_blend
-			depth_check off
-
-			texture_unit
-			{
-				texture ogreborder.png
-			}
-		}
-	}
-}
-material Core/StatsBlockBorder/Up
-{
-	technique
-	{
-		pass
-		{
-			lighting off
-			scene_blend alpha_blend
-			depth_check off
-
-			texture_unit
-			{
-				texture ogreborderUp.png
-			}
+			ambient 1 0.4 0.4
+			diffuse 1 0.7 0
+			emissive 0.3 0.1 0
 		}
 	}
 }

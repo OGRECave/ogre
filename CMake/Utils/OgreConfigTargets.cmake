@@ -19,6 +19,7 @@ if (WIN32)
   set(OGRE_LIB_MINSIZE_PATH "/MinSizeRel")
   set(OGRE_LIB_DEBUG_PATH "/Debug")
   set(OGRE_PLUGIN_PATH "/opt")
+  set(OGRE_SAMPLE_PATH "/opt/samples")
 elseif (UNIX)
   set(OGRE_RELEASE_PATH "")
   set(OGRE_RELWDBG_PATH "")
@@ -29,6 +30,7 @@ elseif (UNIX)
   set(OGRE_LIB_MINSIZE_PATH "")
   set(OGRE_LIB_DEBUG_PATH "")
   set(OGRE_PLUGIN_PATH "/OGRE")
+  set(OGRE_SAMPLE_PATH "/OGRE/Samples")
 endif ()
 
 # create vcproj.user file for Visual Studio to set debug working directory
@@ -193,7 +195,7 @@ function(ogre_config_plugin PLUGINNAME)
   endif ()
 endfunction(ogre_config_plugin)
 
-# setup Ogre demo build
+# setup Ogre sample build
 function(ogre_config_sample SAMPLENAME)
   # The PRODUCT_NAME target setting cannot contain underscores.  Just remove them
   # Known bug in Xcode CFBundleIdentifier processing rdar://6187020
@@ -234,8 +236,6 @@ function(ogre_config_sample SAMPLENAME)
         COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework 
           ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
         COMMAND ln ARGS -s -f ${CMAKE_SOURCE_DIR}/Dependencies/Cg.framework 
-          ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
-        COMMAND ln ARGS -s -f ${CMAKE_SOURCE_DIR}/Dependencies/CEGUI.framework 
           ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
       )
       # now cfg files
@@ -299,28 +299,27 @@ function(ogre_config_sample SAMPLENAME)
           ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
         )
       endif()
-      if (OGRE_BUILD_CEGUIRENDERER)    
-        add_custom_command(TARGET ${SAMPLENAME} POST_BUILD
-        COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/libCEGUIOgreRenderer.dylib 
-          ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
-        )
-      endif()
     endif()
   endif (APPLE)
+  if (CMAKE_COMPILER_IS_GNUCXX)
+    # add GCC visibility flags to shared library build
+    set_target_properties(${SAMPLENAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
+    # disable "lib" prefix on Unix
+    set_target_properties(${SAMPLENAME} PROPERTIES PREFIX "")
+  endif (CMAKE_COMPILER_IS_GNUCXX)	
+  ogre_install_target(${SAMPLENAME} ${OGRE_SAMPLE_PATH})
 
-  if (OGRE_INSTALL_SAMPLES)
-    ogre_install_target(${SAMPLENAME} "")
-    if (OGRE_INSTALL_PDB)
-      # install debug pdb files
-      install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}.pdb
-        DESTINATION bin${OGRE_DEBUG_PATH} CONFIGURATIONS Debug
-        )
-      install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_RELWDBG_PATH}/${SAMPLENAME}.pdb
-        DESTINATION bin${OGRE_RELWDBG_PATH} CONFIGURATIONS RelWithDebInfo
-        )
-    endif ()
-  endif ()	
-
+  if (OGRE_INSTALL_PDB)
+	  # install debug pdb files
+	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}_d.pdb
+		  DESTINATION bin${OGRE_DEBUG_PATH}
+		  CONFIGURATIONS Debug
+		  )
+	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_RELWDBG_PATH}/${SAMPLENAME}.pdb
+		  DESTINATION bin${OGRE_RELWDBG_PATH}
+		  CONFIGURATIONS RelWithDebInfo
+		  )
+  endif ()
 endfunction(ogre_config_sample)
 
 # setup Ogre tool build

@@ -1,27 +1,27 @@
-#-------------------------------------------------------------------
-# This file is part of the CMake build system for OGRE
-#     (Object-oriented Graphics Rendering Engine)
-# For the latest info, see http://www.ogre3d.org/
-#
-# The contents of this file are placed in the public domain. Feel
-# free to make use of it in any way you like.
-#-------------------------------------------------------------------
-
 # Configure Terrain demo build
 
+set(HEADER_FILES include/Terrain.h)
 set(SOURCE_FILES src/Terrain.cpp)
 
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Terrain.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-endif ()
+include_directories(
+	${CMAKE_CURRENT_SOURCE_DIR}/include
+	${CMAKE_SOURCE_DIR}/Components/Terrain/include)
 
-include_directories(${CMAKE_SOURCE_DIR}/Components/Terrain/include)
+add_library(Sample_Terrain ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-add_executable(Demo_Terrain WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+target_link_libraries(Sample_Terrain ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_Terrain_LIBRARIES})
+ogre_config_sample(Sample_Terrain)
 
-target_link_libraries(Demo_Terrain ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_Terrain_LIBRARIES})
-ogre_config_sample(Demo_Terrain)
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Samples can be installed in the application package
+    set_target_properties(Sample_Terrain
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
 
-if (SAMPLE_DEPENDENCIES)
-  add_dependencies(Demo_Terrain ${SAMPLE_DEPENDENCIES})
-endif ()
+if (OGRE_STATIC)
+  add_dependencies(SampleBrowser Sample_Terrain)
+else ()
+  add_dependencies(Sample_Terrain SampleBrowser)
+endif (OGRE_STATIC)

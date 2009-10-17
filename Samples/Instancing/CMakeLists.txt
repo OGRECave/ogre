@@ -23,6 +23,14 @@ add_executable(Demo_Instancing WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_
 target_link_libraries(Demo_Instancing ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${CEGUI_LIBRARIES} ${OGRE_CEGUIRenderer_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample(Demo_Instancing)
 
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Samples can be installed in the application package
+    set_target_properties(Sample_Instancing
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
+
 if (SAMPLE_DEPENDENCIES)
   add_dependencies(Demo_Instancing ${SAMPLE_DEPENDENCIES})
 endif ()

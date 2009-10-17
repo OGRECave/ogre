@@ -1,13 +1,8 @@
-#-------------------------------------------------------------------
-# This file is part of the CMake build system for OGRE
-#     (Object-oriented Graphics Rendering Engine)
-# For the latest info, see http://www.ogre3d.org/
-#
-# The contents of this file are placed in the public domain. Feel
-# free to make use of it in any way you like.
-#-------------------------------------------------------------------
-
 # Configure Samples build
+if (APPLE)
+  include_directories("${CMAKE_SOURCE_DIR}/Mac/Ogre/include")
+endif()
+
 
 if (OGRE_BUILD_SAMPLES AND NOT OIS_FOUND)
   message(STATUS "Could not find dependency: OIS")
@@ -42,6 +37,13 @@ if (OGRE_BUILD_SAMPLES)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} Plugin_OctreeZone)
   endif ()
   
+  if (OGRE_BUILD_COMPONENT_PAGING)
+  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgrePaging)
+  endif ()
+  if (OGRE_BUILD_COMPONENT_TERRAIN)
+  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreTerrain)
+  endif ()
+
   if (OGRE_BUILD_RENDERSYSTEM_D3D9)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_Direct3D9)
   endif ()
@@ -53,16 +55,9 @@ if (OGRE_BUILD_SAMPLES)
   endif ()
   if (OGRE_BUILD_RENDERSYSTEM_GLES)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GLES)
-  endif ()  
-  if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)  	
-  	add_definitions(-DUSE_RTSHADER_SYSTEM)
-  	include_directories("${OGRE_SOURCE_DIR}/Components/RTShaderSystem/include")
-	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreRTShaderSystem)
-  endif ()    
-  if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+  endif ()
+  if (APPLE)
   	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} IOKit)
-  else ()
-    set(OGRE_LIBRARIES ${OGRE_LIBRARIES})
   endif ()
 
   if (OGRE_STATIC)
@@ -84,7 +79,7 @@ if (OGRE_BUILD_SAMPLES)
 		)
 
 	# Link to all enabled plugins
-	set(OGRE_PLUGIN_LIBRARIES ${SAMPLE_DEPENDENCIES})
+	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${SAMPLE_DEPENDENCIES})
 
 	# Need to include resource files so that icons are linked
 	if (WIN32)
@@ -96,68 +91,32 @@ if (OGRE_BUILD_SAMPLES)
 		source_group(Resources FILES ${RESOURCE_FILES})
 	endif ()	
   endif ()
+
+  add_subdirectory(Browser)
   
   add_subdirectory(BezierPatch)
-  if (OGRE_BUILD_PLUGIN_BSP)
-    add_subdirectory(BSP)
-  endif ()
+  add_subdirectory(BSP)
   add_subdirectory(CameraTrack)
+  add_subdirectory(CelShading)
   add_subdirectory(CubeMapping)
-  add_subdirectory(DeferredShading)
+  add_subdirectory(Dot3Bump)
   add_subdirectory(DynTex)
-  add_subdirectory(EnvMapping)
+  add_subdirectory(FacialAnimation)
+  add_subdirectory(Fresnel)
   add_subdirectory(Grass)
   add_subdirectory(Lighting)
-  if (OGRE_BUILD_COMPONENT_PAGING)
-  	add_subdirectory(Paging)
-  endif ()
-  if (OGRE_BUILD_PLUGIN_PFX)
-    add_subdirectory(ParticleFX)
-  endif()
-  if (OGRE_BUILD_PLUGIN_PCZ AND OGRE_BUILD_PLUGIN_OCTREE)
-  	add_subdirectory(PCZTestApp)
-  endif ()
-  add_subdirectory(RenderToTexture)
+  add_subdirectory(ParticleFX)
   add_subdirectory(SkeletalAnimation)
   add_subdirectory(SkyBox)
   add_subdirectory(SkyDome)
   add_subdirectory(SkyPlane)
   add_subdirectory(Smoke)
-  if (OGRE_BUILD_COMPONENT_TERRAIN)
-    add_subdirectory(Terrain)
-  endif ()
+  add_subdirectory(SphereMapping)
+if (OGRE_BUILD_COMPONENT_TERRAIN)
+  add_subdirectory(Terrain)
+endif ()
   add_subdirectory(TextureFX)
-  add_subdirectory(Transpacency)
-
-  # Require vertex and fragment shaders
-  add_subdirectory(CelShading)
-  add_subdirectory(Dot3Bump)
-  add_subdirectory(Fresnel)
-
-  # Require geometry shaders
-  add_subdirectory(Isosurf)
-  add_subdirectory(ParticleGS)
-
-  # Requires 3D textures
-  add_subdirectory(VolumeTex)
-
-  # Requires cube mapping
-  add_subdirectory(Water)
-
-  if (NOT CEGUI_FOUND)
-    message(STATUS "Could not find dependency: CEGUI")
-    message(STATUS "Skipping GUI samples build")
-  elseif (NOT OGRE_BUILD_CEGUIRENDERER)
-    message(STATUS "CEGUI renderer was not built")
-    message(STATUS "Skipping GUI samples build")
-  else ()
-    add_subdirectory(Compositor)
-    add_subdirectory(Instancing)
-    add_subdirectory(FacialAnimation)
-    add_subdirectory(Gui)
-    add_subdirectory(OceanDemo)
-    add_subdirectory(Shadows)
-  endif ()
+  add_subdirectory(Transparency)
 endif ()
 
 
@@ -173,7 +132,6 @@ if (OGRE_INSTALL_SAMPLES_SOURCE)
     PATTERN "Makefile.am" EXCLUDE
     PATTERN "Media" EXCLUDE
     PATTERN "bin" EXCLUDE
-    PATTERN "CEGUIRenderer" EXCLUDE
     PATTERN "misc" EXCLUDE
     PATTERN "setup" EXCLUDE
     PATTERN ".svn" EXCLUDE

@@ -1,25 +1,25 @@
-#-------------------------------------------------------------------
-# This file is part of the CMake build system for OGRE
-#     (Object-oriented Graphics Rendering Engine)
-# For the latest info, see http://www.ogre3d.org/
-#
-# The contents of this file are placed in the public domain. Feel
-# free to make use of it in any way you like.
-#-------------------------------------------------------------------
-
 # Configure CameraTrack demo build
 
 set(SOURCE_FILES src/CameraTrack.cpp)
+set(HEADER_FILES include/CameraTrack.h)
 
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/CameraTrack.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-endif ()
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_executable(Demo_CameraTrack WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})
+add_library(Sample_CameraTrack ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 
-target_link_libraries(Demo_CameraTrack ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample(Demo_CameraTrack)
+target_link_libraries(Sample_CameraTrack ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+ogre_config_sample(Sample_CameraTrack)
 
-if (SAMPLE_DEPENDENCIES)
-  add_dependencies(Demo_CameraTrack ${SAMPLE_DEPENDENCIES})
-endif ()
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Samples can be installed in the application package
+    set_target_properties(Sample_CameraTrack
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
+
+if (OGRE_STATIC)
+  add_dependencies(SampleBrowser Sample_CameraTrack)
+else ()
+  add_dependencies(Sample_CameraTrack SampleBrowser)
+endif (OGRE_STATIC)

@@ -27,7 +27,7 @@
 #  Plugin_OctreeSceneManager, Plugin_OctreeZone,
 #  Plugin_ParticleFX, Plugin_PCZSceneManager,
 #  RenderSystem_GL, RenderSystem_Direct3D9, RenderSystem_Direct3D10,
-#  CEGUIRenderer, Paging, Terrain
+#  Paging, Terrain
 #
 # For each of these components, the following variables are defined:
 #
@@ -110,7 +110,7 @@ else()
 endif ()
 
 # redo search if any of the environmental hints changed
-set(OGRE_COMPONENTS Paging Terrain CEGUIRenderer
+set(OGRE_COMPONENTS Paging Terrain 
   Plugin_BSPSceneManager Plugin_CgProgramManager Plugin_OctreeSceneManager
   Plugin_OctreeZone Plugin_PCZSceneManager Plugin_ParticleFX
   RenderSystem_Direct3D10 RenderSystem_Direct3D9 RenderSystem_GL RenderSystem_GLES)
@@ -297,31 +297,6 @@ if (OGRE_Terrain_INCLUDE_DIR AND OGRE_Terrain_LIBRARY)
   set(OGRE_Terrain_LIBRARIES ${OGRE_Terrain_LIBRARIES} ${OGRE_Terrain_LIBRARY})
 endif ()
 mark_as_advanced(OGRE_Terrain_INCLUDE_DIR OGRE_Terrain_LIBRARY_REL OGRE_Terrain_LIBRARY_DBG OGRE_Terrain_LIBRARY_FWK)
-
-# look for CEGUI Ogre Renderer
-find_package(CEGUI QUIET)
-if (CEGUI_FOUND)
-  get_filename_component(CEGUI_LIBRARY_DIR_REL ${CEGUI_LIBRARY_REL} PATH)
-  get_filename_component(CEGUI_LIBRARY_DIR_DBG ${CEGUI_LIBRARY_DBG} PATH)
-  set(CEGUI_LIBRARY_DIRS ${CEGUI_LIBRARY_DIR_REL} ${CEGUI_LIBRARY_DIR_DBG})
-  find_path(OGRE_CEGUIRenderer_INCLUDE_DIR NAMES OgreCEGUIRenderer.h 
-    HINTS ${OGRE_INCLUDE_DIRS} ${OGRE_PREFIX_SOURCE} ${CEGUI_INCLUDE_DIRS} PATH_SUFFIXES CEGUIRenderer OGRE OGRE/CEGUIRenderer CEGUI Samples/Common/CEGUIRenderer/include)
-  set(OGRE_CEGUIRenderer_LIBRARY_NAMES "CEGUIOgreRenderer${OGRE_LIB_SUFFIX}" "OgreCEGUIRenderer${OGRE_LIB_SUFFIX}" "OgreGUIRenderer${OGRE_LIB_SUFFIX}")
-  get_debug_names(OGRE_CEGUIRenderer_LIBRARY_NAMES)
-  find_library(OGRE_CEGUIRenderer_LIBRARY_REL NAMES ${OGRE_CEGUIRenderer_LIBRARY_NAMES} HINTS ${OGRE_LIBRARY_DIRS} ${CEGUI_LIBRARY_DIRS}
-    ${OGRE_FRAMEWORK_SEARCH_PATH} PATH_SUFFIXES "" "release" "relwithdebinfo" "minsizerel") 
-  find_library(OGRE_CEGUIRenderer_LIBRARY_DBG NAMES ${OGRE_CEGUIRenderer_LIBRARY_NAMES_DBG} HINTS ${OGRE_LIBRARY_DIRS} ${CEGUI_LIBRARY_DIRS}
-    ${OGRE_FRAMEWORK_SEARCH_PATH} PATH_SUFFIXES "" "debug") 
-  make_library_set(OGRE_CEGUIRenderer_LIBRARY)
-  
-  if (OGRE_CEGUIRenderer_INCLUDE_DIR AND OGRE_CEGUIRenderer_LIBRARY)
-    set(OGRE_CEGUIRenderer_FOUND TRUE)
-    set(OGRE_CEGUIRenderer_INCLUDE_DIRS ${OGRE_CEGUIRenderer_INCLUDE_DIR} ${CEGUI_INCLUDE_DIRS})
-    set(OGRE_CEGUIRenderer_LIBRARIES ${OGRE_CEGUIRenderer_LIBRARY} ${CEGUI_LIBRARIES})
-  endif()
-
-  mark_as_advanced(OGRE_CEGUIRenderer_INCLUDE_DIR OGRE_CEGUIRenderer_LIBRARY_REL OGRE_CEGUIRenderer_LIBRARY_DBG OGRE_CEGUIRenderer_LIBRARY_FWK)
-endif ()
 
 
 #########################################################

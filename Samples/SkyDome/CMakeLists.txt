@@ -1,27 +1,25 @@
-#-------------------------------------------------------------------
-# This file is part of the CMake build system for OGRE
-#     (Object-oriented Graphics Rendering Engine)
-# For the latest info, see http://www.ogre3d.org/
-#
-# The contents of this file are placed in the public domain. Feel
-# free to make use of it in any way you like.
-#-------------------------------------------------------------------
-
 # Configure SkyDome demo build
 
 set(HEADER_FILES include/SkyDome.h)
 set(SOURCE_FILES src/SkyDome.cpp)
 
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SkyDome.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-endif ()
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_executable(Demo_SkyDome WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
-target_link_libraries(Demo_SkyDome ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample(Demo_SkyDome)
+add_library(Sample_SkyDome ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-if (SAMPLE_DEPENDENCIES)
-  add_dependencies(Demo_SkyDome ${SAMPLE_DEPENDENCIES})
-endif ()
+target_link_libraries(Sample_SkyDome ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+ogre_config_sample(Sample_SkyDome)
+
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Samples can be installed in the application package
+    set_target_properties(Sample_SkyDome
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
+
+if (OGRE_STATIC)
+  add_dependencies(SampleBrowser Sample_SkyDome)
+else ()
+  add_dependencies(Sample_SkyDome SampleBrowser)
+endif (OGRE_STATIC)

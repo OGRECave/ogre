@@ -4,9 +4,9 @@ compositor Bloom
     technique
     {
         // Temporary textures
-        texture rt_output target_width target_height PF_R8G8B8 pooled
-        texture rt0 target_width_scaled 0.25 target_height_scaled 0.25 PF_R8G8B8 pooled
-        texture rt1 target_width_scaled 0.25 target_height_scaled 0.25 PF_R8G8B8 pooled
+        texture rt_output target_width target_height PF_R8G8B8
+        texture rt0 target_width_scaled 0.25 target_height_scaled 0.25 PF_R8G8B8
+        texture rt1 target_width_scaled 0.25 target_height_scaled 0.25 PF_R8G8B8
 
         target rt_output
         {
@@ -73,7 +73,7 @@ compositor Glass
 {
     technique
     {
-        texture rt0 target_width target_height PF_R8G8B8 pooled
+        texture rt0 target_width target_height PF_R8G8B8
 
         target rt0 { input previous }
 
@@ -95,7 +95,7 @@ compositor "Old TV"
 {
     technique
     {
-        texture rt0 target_width target_height PF_R8G8B8 pooled
+        texture rt0 target_width target_height PF_R8G8B8
 
         // render scene to a texture
         target rt0 { input previous }
@@ -123,7 +123,7 @@ compositor B&W
     technique
     {
         // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
 
         target rt0
         {
@@ -208,7 +208,7 @@ compositor Embossed
     technique
     {
         // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
 
         target rt0
         {
@@ -237,7 +237,7 @@ compositor "Sharpen Edges"
     technique
     {
         // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
 
         target rt0
         {
@@ -266,7 +266,7 @@ compositor Invert
     technique
     {
         // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
 
         target rt0
         {
@@ -295,7 +295,7 @@ compositor Posterize
     technique
     {
         // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
 
         target rt0
         {
@@ -324,7 +324,7 @@ compositor Laplace
     technique
     {
         // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
 
         target rt0
         {
@@ -353,7 +353,7 @@ compositor Tiling
     technique
     {
         // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
 
         target rt0
         {
@@ -382,7 +382,7 @@ compositor "Old Movie"
     technique
     {
         // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
 
         target rt0
         {
@@ -411,21 +411,20 @@ compositor HDR
 	// floating point only for now
 	technique
 	{
-		compositor_logic HDR
         // Temporary textures
 		// Fullsize HDR render target, used as tone mapping source
-        texture rt_full target_width target_height PF_FLOAT16_RGB pooled
+        texture rt_full target_width target_height PF_FLOAT16_RGB
 		// Targets used for luminance evaluation (3x3 downsample, point filtering)
-		texture rt_lum0 1 1 PF_FLOAT16_RGB pooled
-		texture rt_lum1 4 4 PF_FLOAT16_RGB pooled
-		texture rt_lum2 16 16 PF_FLOAT16_RGB pooled
-		texture rt_lum3 64 64 PF_FLOAT16_RGB pooled
-		texture rt_lum4 128 128 PF_FLOAT16_RGB pooled
+		texture rt_lum0 1 1 PF_FLOAT16_RGB
+		texture rt_lum1 4 4 PF_FLOAT16_RGB
+		texture rt_lum2 16 16 PF_FLOAT16_RGB
+		texture rt_lum3 64 64 PF_FLOAT16_RGB
+		texture rt_lum4 128 128 PF_FLOAT16_RGB
 		// Bright-pass filtered target (tone mapped)
-		texture rt_brightpass 128 128 PF_R8G8B8 pooled
+		texture rt_brightpass 128 128 PF_R8G8B8
 		// Bloom filter targets
-		texture rt_bloom0 128 128 PF_R8G8B8 pooled
-		texture rt_bloom1 128 128 PF_R8G8B8 pooled
+		texture rt_bloom0 128 128 PF_R8G8B8
+		texture rt_bloom1 128 128 PF_R8G8B8
 
 
 		target rt_full
@@ -567,11 +566,9 @@ compositor "Gaussian Blur"
 {
     technique
     {
-		compositor_logic GaussianBlur
-		
         // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
-        texture rt1 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
+        texture rt1 target_width target_height PF_A8R8G8B8
 
         target rt0
         {
@@ -655,7 +652,7 @@ compositor "Radial Blur"
     technique
     {
         // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
 
         target rt0
         {
@@ -684,7 +681,7 @@ compositor ASCII
     technique
     {
         // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
         target rt0
         {
             // Render output from previous compositor (or original scene)
@@ -712,7 +709,7 @@ compositor Halftone
     technique
     {
         // Temporary textures
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
 
         target rt0
         {
@@ -740,7 +737,7 @@ compositor "Night Vision"
 {
     technique
     {
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
 	
 	target rt0
 	{
@@ -765,7 +762,7 @@ compositor Dither
 {
     technique
     {
-        texture rt0 target_width target_height PF_A8R8G8B8 pooled
+        texture rt0 target_width target_height PF_A8R8G8B8
 	
 	target rt0
 	{

@@ -1,112 +1,51 @@
-/*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+#ifndef __TextureFX_H__
+#define __TextureFX_H__
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
-Also see acknowledgements in Readme.html
+#include "SdkSample.h"
 
-You may use this sample code for anything you like, it is not covered by the
-same license as the rest of the engine.
------------------------------------------------------------------------------
-*/
+using namespace Ogre;
+using namespace OgreBites;
 
-/**
-    \file 
-        TextureFX.h
-    \brief
-        Shows OGRE's ability to handle different types of texture effects.
-*/
-
-
-#include "ExampleApplication.h"
-
-class TextureEffectsApplication : public ExampleApplication
+class _OgreSampleClassExport Sample_TextureFX : public SdkSample
 {
 public:
-    TextureEffectsApplication() {}
+
+	Sample_TextureFX()
+	{
+		mInfo["Title"] = "Texture Effects";
+		mInfo["Description"] = "Demonstrates OGRE's many different animated texture effects.";
+		mInfo["Thumbnail"] = "thumb_texfx.png";
+		mInfo["Category"] = "Unsorted";
+		mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
+	}
 
 protected:
 
-    void createScalingPlane()
-    {
-        // Set up a material for the plane
+	void setupContent()
+	{
+		mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");
 
-        // Create a prefab plane
-        Entity *planeEnt = mSceneMgr->createEntity("Plane", SceneManager::PT_PLANE);
-        // Give the plane a texture
-        planeEnt->setMaterialName("Examples/TextureEffect1");
+		// set our camera to orbit around the origin and show cursor
+		mCameraMan->setStyle(CS_ORBIT);
+		mTrayMgr->showCursor();
 
-        SceneNode* node = 
-            mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-250,-40,-100));
+		// the names of the four materials we will use
+		String matNames[] = {"Examples/OgreDance", "Examples/OgreParade", "Examples/OgreSpin", "Examples/OgreWobble"};
 
-        node->attachObject(planeEnt);
-    }
+		for (unsigned int i = 0; i < 4; i++)
+		{
+			// create a standard plane entity
+			Entity* ent = mSceneMgr->createEntity("Plane" + StringConverter::toString(i + 1), SceneManager::PT_PLANE);
 
-    void createScrollingKnot()
-    {
-        Entity *ent = mSceneMgr->createEntity("knot", "knot.mesh");
+			// attach it to a node, scale it, and position appropriately
+			SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+			node->setPosition(i % 2 ? 25 : -25, i / 2 ? -25 : 25, 0);
+			node->setScale(0.25, 0.25, 0.25);
+			node->attachObject(ent);
 
-
-        ent->setMaterialName("Examples/TextureEffect2");
-        // Add entity to the root scene node
-        SceneNode* node = 
-            mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(200,50,150));
-
-        node->attachObject(ent);
-
-    }
-
-    void createWateryPlane()
-    {
-        // Create a prefab plane
-        Entity *planeEnt = mSceneMgr->createEntity("WaterPlane", SceneManager::PT_PLANE);
-        // Give the plane a texture
-        planeEnt->setMaterialName("Examples/TextureEffect3");
-
-        mSceneMgr->getRootSceneNode()->attachObject(planeEnt);
-    }
-
-    // Just override the mandatory create scene method
-    void createScene(void)
-    {
-
-        // Set ambient light
-        mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
-
-        // Create a point light
-        Light* l = mSceneMgr->createLight("MainLight");
-        // Accept default settings: point light, white diffuse, just set position
-        // NB I could attach the light to a SceneNode if I wanted it to move automatically with
-        //  other objects, but I don't
-        l->setPosition(20,80,50);
-
-
-        createScalingPlane();
-        createScrollingKnot();
-        createWateryPlane();
-
-
-        // Set up a material for the skydome
-        MaterialPtr skyMat = MaterialManager::getSingleton().create("SkyMat",
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        // Perform no dynamic lighting on the sky
-        skyMat->setLightingEnabled(false);
-        // Use a cloudy sky
-        TextureUnitState* t = skyMat->getTechnique(0)->getPass(0)->createTextureUnitState("clouds.jpg");
-        // Scroll the clouds
-        t->setScrollAnimation(0.15, 0);
-
-        // System will automatically set no depth write
-
-        // Create a skydome
-        mSceneMgr->setSkyDome(true, "SkyMat", -5, 2);
-
-
-
-
-
-    }
-
+			ent->setMaterialName(matNames[i]);  // give it the material we prepared
+		}
+	}
 };
+
+#endif

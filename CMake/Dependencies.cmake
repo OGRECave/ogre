@@ -156,10 +156,6 @@ macro_log_feature(TBB_FOUND "tbb" "Threading Building Blocks" "http://www.thread
 # Samples dependencies
 #######################################################################
 
-# Find CEGUI
-find_package(CEGUI)
-macro_log_feature(CEGUI_FOUND "CEGUI" "GUI system used for some of the samples" "http://www.cegui.org.uk" FALSE "" "")
-
 # Find OIS
 find_package(OIS)
 macro_log_feature(OIS_FOUND "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
@@ -206,7 +202,6 @@ include_directories(
   ${FREETYPE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIRS}
   ${OPENGLES_INCLUDE_DIRS}
-  ${CEGUI_INCLUDE_DIRS}
   ${OIS_INCLUDE_DIRS}
   ${Cg_INCLUDE_DIRS}
   ${X11_INCLUDE_DIR}
