@@ -1,0 +1,1726 @@
+material Examples/SphereMappedRustySteel
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture RustySteel.jpg
+			}
+
+			texture_unit
+			{
+				texture spheremap.png
+				colour_op_ex add src_texture src_current
+				colour_op_multipass_fallback one one
+				env_map spherical
+			}
+		}
+	}
+}
+
+material Examples/OgreLogo
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.8 0.8 0.8
+
+			texture_unit
+			{
+				texture ogrelogo.png
+			}
+		}
+	}
+}
+
+material Examples/BeachStones
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.1 0.1 0.1
+
+			texture_unit
+			{
+				texture BeachStones.jpg
+			}
+		}
+	}
+}
+
+material Examples/TrippySkyBox
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				cubic_texture nm.png separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material Examples/SpaceSkyBox
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				cubic_texture stevecube.jpg separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material Examples/SceneSkyBox1
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				cubic_texture cubemap_fr.jpg cubemap_bk.jpg cubemap_lf.jpg cubemap_rt.jpg cubemap_up.jpg cubemap_dn.jpg separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material Examples/SceneCubeMap1
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+
+			texture_unit
+			{
+				cubic_texture cubemap.jpg combinedUVW
+				tex_address_mode clamp
+				env_map cubic_reflection
+			}
+		}
+	}
+}
+
+material Examples/SceneSkyBox2
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				cubic_texture cubescene_fr.jpg cubescene_bk.jpg cubescene_lf.jpg cubescene_rt.jpg cubescene_up.jpg cubescene_dn.jpg separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material Examples/SceneCubeMap2
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+
+			texture_unit
+			{
+				cubic_texture cubescene.jpg combinedUVW
+				tex_address_mode clamp
+				env_map cubic_reflection
+			}
+		}
+	}
+}
+
+material Examples/CloudyNoonSkyBox
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				cubic_texture cloudy_noon.jpg separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material Examples/StormySkyBox
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				cubic_texture stormy.jpg separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material Examples/EarlyMorningSkyBox
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				cubic_texture early_morning.jpg separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+
+fragment_program Examples/MorningSkyBoxHDRfp cg
+{
+	source hdr.cg
+	entry_point morningskybox_fp
+	profiles ps_2_0 arbfp1
+
+}
+
+material Examples/MorningSkyBox
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				cubic_texture morning.jpg separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+
+	// HDR technique (fake)
+	technique
+	{
+		scheme HDR
+
+		pass
+		{
+			lighting off
+			depth_write off
+
+			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
+			{
+				param_named_auto worldViewProj worldviewproj_matrix
+				param_named ambient float4 1 1 1 1
+			}
+			fragment_program_ref Examples/MorningSkyBoxHDRfp
+			{
+			}
+
+			texture_unit
+			{
+				cubic_texture morning.jpg separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+fragment_program Examples/MorningCubeMapHDRfp cg
+{
+	source hdr.cg
+	entry_point morningcubemap_fp
+	profiles ps_2_0 arbfp1
+
+}
+
+material Examples/MorningCubeMap
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+
+			texture_unit
+			{
+				cubic_texture morning.jpg combinedUVW
+				tex_address_mode clamp
+				env_map cubic_reflection
+			}
+		}
+	}
+	// HDR technique (fake)
+	technique
+	{
+		scheme HDR
+
+		pass
+		{
+			lighting off
+
+			fragment_program_ref Examples/MorningCubeMapHDRfp
+			{
+			}
+			texture_unit
+			{
+				cubic_texture morning.jpg combinedUVW
+				tex_address_mode clamp
+				env_map cubic_reflection
+			}
+		}
+	}
+}
+
+material Examples/EveningSkyBox
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				cubic_texture evening.jpg separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material Examples/DynamicCubeMap
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				# will be filled in at runtime
+				cubic_texture dyncubemap combinedUVW
+				tex_address_mode clamp
+				env_map cubic_reflection
+			}
+		}
+	}
+}
+
+material Examples/CloudySky
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				texture clouds.jpg
+				scroll_anim 0.15 0
+			}
+		}
+	}
+}
+
+material Examples/RustySteel
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture RustySteel.jpg
+			}
+		}
+	}
+}
+
+material Examples/Chrome
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture Chrome.jpg
+				env_map spherical
+			}
+		}
+	}
+}
+
+material Examples/SpaceSkyPlane
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				texture spacesky.jpg
+			}
+		}
+	}
+}
+
+material Examples/OgreDance
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend alpha_blend
+			cull_hardware none
+			cull_software none
+
+			texture_unit
+			{
+				anim_texture ogredance.png 8 2
+				filtering none
+			}
+		}
+	}
+}
+
+material Examples/OgreParade : Examples/OgreDance
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				scroll 0.5 0
+				scale 0.5 0.5
+				scroll_anim 0 0.5
+			}
+		}
+	}
+}
+
+material Examples/OgreSpin : Examples/OgreDance
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture ogredance_1.png
+				rotate_anim 0.25
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material Examples/OgreWobble : Examples/OgreDance
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture ogredance_6.png
+				wave_xform scale_x sine 1 1.2 0 0.35
+				wave_xform scale_y sine 1 1 0.5 0.25
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material Examples/BumpyMetal
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.75 0.75 0.75
+
+			texture_unit
+			{
+				texture BumpyMetal.jpg
+			}
+		}
+	}
+}
+
+material Examples/WaterStream
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.1 0.1 0.1
+			scene_blend add
+			depth_write off
+			cull_software none
+			cull_hardware none
+
+			texture_unit
+			{
+				texture Water01.jpg
+				scroll_anim 0.125 0
+			}
+
+			texture_unit
+			{
+				texture Water01.jpg
+				wave_xform scroll_y sine 0 0.1 0 0.25
+			}
+		}
+	}
+}
+
+material Examples/Flare
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend add
+			depth_write off
+
+			texture_unit
+			{
+				texture flare.png
+			}
+		}
+	}
+}
+material Examples/Flare2
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend add
+			depth_write off
+
+			texture_unit
+			{
+				texture flaretrail.png
+			}
+		}
+	}
+}
+material Examples/FlarePointSprite
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend add
+			depth_write off
+
+			point_sprites on
+			point_size 2
+			point_size_attenuation on
+
+			texture_unit
+			{
+				texture flare.png
+			}
+		}
+	}
+}
+
+material Examples/Droplet
+{
+	technique
+	{
+		pass
+		{
+			emissive 0.3 0.3 0.3
+			scene_blend colour_blend
+			depth_write off
+
+			texture_unit
+			{
+				texture basic_droplet.png
+			}
+		}
+	}
+}
+material Examples/Hilite/Yellow
+{
+	technique
+	{
+		pass
+		{
+
+			texture_unit
+			{
+				texture dkyellow.png
+			}
+		}
+	}
+}
+material Examples/Rocky
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.2 0.2 0.2
+
+			texture_unit
+			{
+				texture egyptrockyfull.jpg
+			}
+		}
+	}
+}
+material Examples/10PointBlock
+{
+	technique
+	{
+		pass
+		{
+
+			texture_unit
+			{
+				texture 10points.png
+			}
+		}
+	}
+}
+material Material__25
+{
+	technique
+	{
+		pass
+		{
+
+			texture_unit
+			{
+				texture texmap2.jpg
+			}
+		}
+	}
+}
+material "2 - Default"
+{
+	technique
+	{
+		pass
+		{
+
+			texture_unit
+			{
+				texture MtlPlat2.jpg
+			}
+		}
+	}
+}
+material "Material #8"
+{
+	technique
+	{
+		pass
+		{
+
+			texture_unit
+			{
+				texture BODY.jpg
+			}
+		}
+	}
+}
+material "Material #3"
+{
+	technique
+	{
+		pass
+		{
+
+			texture_unit
+			{
+				texture HEAD4.jpg
+			}
+		}
+	}
+}
+material "Material #9"
+{
+	technique
+	{
+		pass
+		{
+
+			texture_unit
+			{
+				texture LEGS.jpg
+			}
+		}
+	}
+}
+
+material Examples/Fish
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture steelhead.png
+			}
+		}
+	}
+}
+material Examples/Ninja
+{
+	technique
+	{
+		pass
+		{
+		
+			texture_unit
+			{
+				texture nskingr.jpg
+			}
+		}
+	}
+}
+
+material Examples/Robot
+{
+	// Hardware skinning techniique
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Ogre/HardwareSkinningOneWeight
+			{
+				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+				param_named_auto viewProjectionMatrix viewproj_matrix
+				param_named_auto lightPos[0] light_position 0
+				param_named_auto lightPos[1] light_position 1
+				param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
+				param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
+				param_named_auto ambient ambient_light_colour
+			
+			}
+			// alternate shadow caster program
+			shadow_caster_vertex_program_ref Ogre/HardwareSkinningOneWeightShadowCaster
+			{
+				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+				param_named_auto viewProjectionMatrix viewproj_matrix
+				param_named_auto ambient ambient_light_colour
+			
+			}
+
+			texture_unit
+			{
+				texture r2skin.jpg
+			}
+		}
+	}
+
+	// Software blending technique
+	technique
+	{
+		pass
+		{
+
+			texture_unit
+			{
+				texture r2skin.jpg
+			}
+		}
+	}
+}
+
+material Examples/GrassFloor
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture grass_1024.jpg
+			}
+		}
+	}
+}
+
+vertex_program Examples/GrassWaverVp cg
+{
+	source Grass.cg
+	entry_point grass_vp
+	profiles vs_1_1 arbvp1
+    
+    default_params
+    {    
+        param_named_auto worldViewProj worldviewproj_matrix
+        
+        param_named_auto camObjPos camera_position_object_space
+        
+        param_named_auto ambient ambient_light_colour
+        param_named_auto objSpaceLight light_position_object_space 0
+        param_named_auto lightColour light_diffuse_colour 0
+        
+        param_named_auto offset custom 999
+    }
+  }
+  
+vertex_program Examples/GrassWaverTexVp cg
+  {
+	source Grass.cg
+	entry_point grassTex_vp
+	profiles vs_1_1 arbvp1
+    
+    default_params
+      {
+        param_named_auto worldViewProj worldviewproj_matrix        
+        param_named_auto offset custom 999
+    }
+}
+vertex_program Examples/GrassWaverAmbientVp cg
+          {
+	source Grass.cg
+	entry_point grassAmbient_vp
+	profiles vs_1_1 arbvp1
+    
+    default_params
+  			{
+  				param_named_auto worldViewProj worldviewproj_matrix
+  				param_named_auto ambient ambient_light_colour
+        param_named_auto offset custom 999
+    }
+}
+fragment_program Examples/GrassWaverAmbientFp cg
+{
+	source Grass.cg
+	entry_point grassAmbient_fp
+	profiles ps_2_0 arbfp1
+    default_params
+    {
+    }
+}
+
+vertex_program Examples/GrassWaverCasterVp cg
+{
+	source Grass.cg
+	entry_point grasscaster_vp
+	profiles vs_1_1 arbvp1
+    
+    default_params
+    {    
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto offset custom 999
+		param_named_auto texelOffsets texel_offsets
+    }
+}
+fragment_program Examples/GrassWaverCasterFp cg
+{
+	source Grass.cg
+	entry_point grasscaster_fp
+	profiles ps_2_0 arbfp1
+    default_params
+    {
+    }
+}
+
+vertex_program Examples/GrassWaverReceiverVp cg
+{
+	source Grass.cg
+	entry_point grassreceiver_vp
+	profiles vs_1_1 arbvp1
+    
+    default_params
+    {
+        param_named_auto world world_matrix
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto texViewProj texture_viewproj_matrix
+        
+        param_named_auto camObjPos camera_position_object_space
+        
+  				param_named_auto objSpaceLight light_position_object_space 0
+  				param_named_auto lightColour light_diffuse_colour 0
+        
+  				param_named_auto offset custom 999
+  			}
+}
+
+
+fragment_program Examples/GrassWaverReceiverFp cg
+{
+	source Grass.cg
+	entry_point grassreceiver_fp
+	profiles ps_2_0 arbfp1
+   
+	default_params
+    {
+        //param_named inverseShadowmapSize float 0.0009765625
+		param_named fixedDepthBias float 0.0005
+		param_named gradientClamp float 0.0098
+		param_named gradientScaleBias float 0
+    }
+}
+
+
+material Examples/GrassBladesShadowCaster
+{
+	// Vertex program waving grass
+    technique
+    {
+        pass
+        {
+			vertex_program_ref Examples/GrassWaverCasterVp
+			{
+			}
+			fragment_program_ref Examples/GrassWaverCasterFp
+			{
+			}
+            
+  			alpha_rejection greater 150 
+            
+  			scene_blend alpha_blend
+            
+  		    cull_hardware none
+              cull_software none
+            
+              texture_unit
+              {
+				tex_address_mode clamp
+                  texture gras_02.png 
+              }
+          }
+        
+      }
+}
+
+material Examples/GrassBladesShadowReceiver
+{
+	// Vertex program waving grass
+    technique
+    {
+        pass 
+		{
+			scene_blend add
+  
+			alpha_rejection greater 150       
+            
+		    cull_hardware none
+            cull_software none 
+            
+			vertex_program_ref Examples/GrassWaverReceiverVp
+			{
+			}
+			fragment_program_ref Examples/GrassWaverReceiverFp
+			{
+			}
+            
+            texture_unit ShadowMap
+            {
+                 tex_address_mode border
+                 tex_border_colour 1.0 1.0 1.0 0.0                
+                 content_type shadow
+                 filtering linear linear none		
+                 tex_coord_set 0
+            }
+           
+           texture_unit
+           {
+				tex_address_mode clamp				
+                tex_coord_set 1
+                texture gras_02.png
+           }
+        }
+        
+    }
+}
+
+material Examples/GrassBladesAdditiveFloatTransparentBest
+{
+    
+    transparency_casts_shadows on
+    receive_shadows on
+     
+	// This is the preferred technique which uses both vertex and
+	// fragment programs, supports coloured lights
+    technique
+    {
+        shadow_caster_material Examples/GrassBladesShadowCaster
+        shadow_receiver_material Examples/GrassBladesShadowReceiver
+
+		// Base ambient pass
+		pass
+		{
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			ambient 1 1 1
+			diffuse 0 0 0 
+			specular 0 0 0 0 
+            
+			alpha_rejection greater 150 
+            
+			scene_blend alpha_blend  
+            
+		    cull_hardware none
+            cull_software none
+            
+			// Really basic vertex program		
+			vertex_program_ref Examples/GrassWaverAmbientVp
+			{
+			}
+            
+			fragment_program_ref Examples/GrassWaverAmbientFp
+			{
+			}
+            
+            texture_unit
+            {
+				tex_address_mode clamp
+                texture gras_02.png 
+            }
+			
+		}
+        pass lighting
+		{
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			ambient 0 0 0 
+			
+			// do this for each light
+			iteration once_per_light
+
+		
+			scene_blend add
+
+       
+			vertex_program_ref Examples/GrassWaverAmbientVp
+			{
+			}
+            
+			fragment_program_ref Examples/GrassWaverAmbientFp
+			{
+			}
+            
+            
+			alpha_rejection greater 150 
+            
+		    cull_hardware none
+            cull_software none
+            
+            texture_unit ShadowMap
+            {
+                 tex_address_mode border
+                 tex_border_colour 1.0 1.0 1.0 0.0                
+                 content_type shadow
+                 filtering linear linear none		
+                 tex_coord_set 0
+            }
+           
+            
+            texture_unit
+            {
+				tex_address_mode clamp
+                texture gras_02.png 
+            }
+        }
+		// Decal pass
+		pass
+		{
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			lighting off
+            
+			alpha_rejection greater 150 
+            
+			//scene_blend alpha_blend            
+			scene_blend dest_colour zero
+            
+		    cull_hardware none
+            cull_software none
+            
+            texture_unit
+            {
+				tex_address_mode clamp
+                texture gras_02.png 
+            }
+            
+			vertex_program_ref Examples/GrassWaverVp
+			{
+			}
+            
+            
+        }
+    }
+}
+
+material Examples/GrassBladesAdditiveFloatTransparent
+{
+    
+    transparency_casts_shadows on
+    receive_shadows on
+     
+	// This is the preferred technique which uses both vertex and
+	// fragment programs, supports coloured lights
+  	technique
+      {
+        shadow_caster_material Examples/GrassBladesShadowCaster
+        shadow_receiver_material Examples/GrassBladesShadowReceiver
+
+		// Base ambient pass
+          pass
+          {
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			ambient 1 1 1
+			diffuse 0 0 0 
+			specular 0 0 0 0 
+            
+  			alpha_rejection greater 150 
+            
+  			scene_blend alpha_blend
+            
+		    cull_hardware none
+            cull_software none
+            
+			// Really basic vertex program		
+			vertex_program_ref Examples/GrassWaverAmbientVp
+			{
+			}
+            
+			fragment_program_ref Examples/GrassWaverAmbientFp
+			{
+			}
+            
+            texture_unit
+            {
+				tex_address_mode clamp
+                texture gras_02.png 
+            }
+			
+		}
+        pass lighting
+		{
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			ambient 0 0 0 
+			
+			// do this for each light
+			iteration once_per_light
+
+		
+			scene_blend add
+
+       
+			vertex_program_ref Examples/GrassWaverAmbientVp
+			{
+			}
+            
+			fragment_program_ref Examples/GrassWaverAmbientFp
+			{
+			}
+            
+            
+			alpha_rejection greater 150 
+            
+  		    cull_hardware none
+              cull_software none
+            
+            texture_unit ShadowMap
+            {
+                 tex_address_mode border
+                 tex_border_colour 1.0 1.0 1.0 0.0                
+                 content_type shadow
+                 filtering linear linear none		
+                 tex_coord_set 0
+            }
+           
+            
+              texture_unit
+              {
+				tex_address_mode clamp
+                  texture gras_02.png 
+              }
+          }
+		// Decal pass
+		pass
+		{
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			lighting off
+            
+			alpha_rejection greater 150 
+            
+			//scene_blend alpha_blend            
+			scene_blend dest_colour zero
+            
+		    cull_hardware none
+            cull_software none
+            
+            texture_unit
+            {
+				tex_address_mode clamp
+                texture gras_02.png 
+      }
+            
+			vertex_program_ref Examples/GrassWaverTexVp
+			{
+			}
+            
+            
+        }
+    }
+}
+
+material Examples/GrassBladesAdditiveFloat
+{
+    transparency_casts_shadows on
+    receive_shadows on
+     
+	// This is the preferred technique which uses both vertex and
+	// fragment programs, supports coloured lights
+    technique
+    {
+        shadow_caster_material Ogre/DepthShadowmap/Caster/Float
+        shadow_receiver_material Ogre/DepthShadowmap/Receiver/Float
+
+		// Base ambient pass
+		pass
+		{
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			ambient 1 1 1
+			diffuse 0 0 0 
+			specular 0 0 0 0 
+			// Really basic vertex program
+			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
+			{
+  }
+  
+		}
+        pass lighting
+		{
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			ambient 0 0 0 
+			
+			// do this for each light
+			iteration once_per_light
+
+		
+			scene_blend add
+
+       
+			vertex_program_ref Examples/GrassWaverAmbientVp
+			{
+			}
+            
+			fragment_program_ref Examples/GrassWaverAmbientFp
+			{
+			}
+            
+            
+			alpha_rejection greater 150 
+			scene_blend alpha_blend
+            
+		    cull_hardware none
+            cull_software none
+            
+            texture_unit
+            {
+				tex_address_mode clamp
+                texture gras_02.png 
+            }
+        }
+		// Decal pass
+		pass
+		{
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			lighting off
+            
+			alpha_rejection greater 150 
+			scene_blend alpha_blend
+            
+		    cull_hardware none
+            cull_software none
+            
+            texture_unit
+            {
+				tex_address_mode clamp
+                texture gras_02.png 
+            }
+            
+			vertex_program_ref Examples/GrassWaverAmbientVp
+			{
+			}
+            
+			fragment_program_ref Examples/GrassWaverAmbientFp
+			{
+			}
+            
+        }
+    }
+    
+}
+
+material Examples/GrassBladesAdditive
+{
+    transparency_casts_shadows on
+    receive_shadows on
+	// Vertex program waving grass    
+    technique
+    {
+        pass
+        {
+			vertex_program_ref Examples/GrassWaverAmbientVp
+			{
+			}            
+            
+			alpha_rejection greater 150 
+			scene_blend alpha_blend
+            
+		    cull_hardware none
+            cull_software none
+            
+            texture_unit
+            {
+				tex_address_mode clamp
+                texture gras_02.png 
+            }
+        }
+    }
+}
+
+material Examples/GrassBlades
+{
+    transparency_casts_shadows on
+    receive_shadows on
+	// Vertex program waving grass    
+    technique
+    {
+        pass
+        {
+			vertex_program_ref Examples/GrassWaverVp
+			{
+			}            
+            
+			alpha_rejection greater 150 
+			scene_blend alpha_blend
+            
+		    cull_hardware none
+            cull_software none
+            
+            texture_unit
+            {
+				tex_address_mode clamp
+                texture gras_02.png 
+            }
+        }
+    }
+    // fallback
+    technique
+    {
+        pass
+        {
+			alpha_rejection greater 150 
+			scene_blend alpha_blend
+            
+		    cull_hardware none
+            cull_software none
+            
+            texture_unit
+            {
+				tex_address_mode clamp
+                texture gras_02.png 
+            }
+        }
+    }
+}
+
+
+material Examples/Rockwall
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture rockwall.tga
+			}
+		}
+	}
+}
+
+material Examples/Aureola
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend alpha_blend
+			depth_write off
+			cull_hardware none
+
+			texture_unit
+			{
+				texture aureola.png PF_BYTE_LA
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+// Test hardware morph animation
+material Examples/HardwareMorphAnimation
+{
+	technique
+	{
+		pass
+		{
+			
+			vertex_program_ref Ogre/HardwareMorphAnimation
+			{
+				// all default
+			}
+
+			texture_unit
+			{
+				tex_coord_set 0
+				colour_op_ex source1 src_current src_current
+			}
+			// need to define these texture units otherwise GL won't use the uv sets			
+			texture_unit
+			{
+				tex_coord_set 1
+				// also need to set blending to ignore texture which is GL warning texture
+				colour_op_ex source1 src_current src_current
+			}
+			texture_unit
+			{
+				tex_coord_set 2
+				colour_op_ex source1 src_current src_current
+			}
+		
+		}
+	}
+}
+
+// Test hardware pose animation
+material Examples/HardwarePoseAnimation
+{
+	technique
+	{
+		pass
+		{
+			
+			vertex_program_ref Ogre/HardwarePoseAnimation
+			{
+				// all default
+			}
+			texture_unit
+			{
+				tex_coord_set 0
+				colour_op_ex source1 src_current src_current
+			}
+			// need to define these texture units otherwise GL won't use the uv sets			
+			texture_unit
+			{
+				tex_coord_set 1
+				// also need to set blending to ignore texture which is GL warning texture
+				colour_op_ex source1 src_current src_current
+			}
+			texture_unit
+			{
+				tex_coord_set 2
+				colour_op_ex source1 src_current src_current
+			}
+
+		
+		}
+	}
+}
+
+material RustyBarrel
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.5 0.5 0.5 1.0
+			diffuse 1.0 1.0 1.0 1.0
+			specular 0.0 0.0 0.0 1.0 12.5
+			emissive 0.0 0.0 0.0 1.0
+			texture_unit
+			{
+				texture RustyBarrel.png
+				filtering trilinear
+			}
+		}
+	}
+}
+
+material WoodPallet
+{
+	receive_shadows on
+	technique
+	{
+		pass
+		{
+			ambient 0.5 0.5 0.5 1.0
+			diffuse 1.0 1.0 1.0 1.0
+			specular 0.0 0.0 0.0 1.0 12.5
+
+			texture_unit
+			{
+				texture WoodPallet.png
+				filtering trilinear
+			}
+		}
+	}
+}
+
+material Examples/LightRibbonTrail
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend add
+			depth_write off
+
+			texture_unit
+			{
+				texture ribbonband.png 1d
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+}
+
+material Examples/TudorHouse
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture fw12b.jpg
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material jaiqua
+{
+	// Hardware skinning techniique
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Ogre/HardwareSkinningTwoWeights
+			{
+			
+			}
+			// alternate shadow caster program
+			shadow_caster_vertex_program_ref Ogre/HardwareSkinningTwoWeightsShadowCaster
+			{
+				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+				param_named_auto viewProjectionMatrix viewproj_matrix
+				param_named_auto ambient ambient_light_colour
+			
+			}
+
+			texture_unit
+			{
+				texture blue_jaiqua.jpg
+				tex_address_mode clamp
+			}
+		}
+	}
+
+	// Software blending technique
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture blue_jaiqua.jpg
+				tex_address_mode clamp
+			}
+		}
+	}
+	
+}
+
+
+material Examples/Plane/IntegratedShadows
+{
+	technique
+	{
+		pass
+		{
+			// Single-pass shadowing
+			texture_unit
+			{
+				texture MtlPlat2.jpg
+			}
+			texture_unit
+			{
+				// standard modulation blend
+				content_type shadow
+				tex_address_mode clamp
+			}
+		}
+	}
+	
+}
+
+
+fragment_program Examples/ShowUV_p cg
+{
+	source Example_Basic.cg
+	entry_point showuv_p
+	profiles ps_2_0 arbfp1
+}
+fragment_program Examples/ShowUVdir3D cg
+{
+	source Example_Basic.cg
+	entry_point showuvdir3d_p
+	profiles ps_2_0 arbfp1
+}
+vertex_program Examples/ShowTangents_v cg
+{
+	source Example_Basic.cg
+	entry_point basicPassthroughTangent_v
+	profiles vs_2_0 arbvp1
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+vertex_program Examples/ShowNormals_v cg
+{
+	source Example_Basic.cg
+	entry_point basicPassthroughNormal_v
+	profiles vs_2_0 arbvp1
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+material Examples/ShowUV
+{
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
+			{
+			}
+			fragment_program_ref Examples/ShowUV_p
+			{
+			}
+
+			
+		}
+	}
+}
+material Examples/ShowTangents
+{
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Examples/ShowTangents_v
+			{
+			}
+			fragment_program_ref Examples/ShowUVdir3D
+			{
+			}
+
+			
+		}
+	}
+}
+material Examples/ShowNormals
+{
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Examples/ShowNormals_v
+			{
+			}
+			fragment_program_ref Examples/ShowUVdir3D
+			{
+			}
+
+			
+		}
+	}
+}
+
+

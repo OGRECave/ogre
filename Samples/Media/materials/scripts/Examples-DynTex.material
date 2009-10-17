@@ -1,0 +1,23 @@
+material Examples/Frost
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+			scene_blend colour_blend
+			
+			texture_unit
+			{
+				texture frost.png
+				scale 0.5 0.5
+			}
+
+			texture_unit
+			{
+				texture thaw
+			}
+		}
+	}
+}
