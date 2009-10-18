@@ -301,6 +301,102 @@ material Examples/BumpMapping/MultiLightTangentParity : Examples/BumpMapping/Mul
 
 }
 
+// RTShader system materials for bump mapping.
+
+// This is a single pass lighting material.
+// All scene lights will be applied within a single rendering pass.
+// It saves geometry overdraw but it consumes more instructions during vertex and pixel shaders.
+// Use this method when your scene uses small amount of lights. (1-3).
+material RTShaderSystem/BumpMapping_SinglePass
+{
+	technique
+	{
+		pass
+		{
+			// Turn off specular in order to use only diffuse based bump map technique.
+			specular 1.0 1.0 1.0 32
+			
+			texture_unit
+			{
+				texture RustedMetal.jpg
+			}				
+			
+			// RT Shader system section.
+ 			rtshader_system
+ 			{	 	
+ 				// Light model will be normal map based. 			
+ 				light_model sgx_normal_map NMBumpsOut.png 				
+ 			}			
+		}				
+	}
+}
+
+// This is a multi pass lighting material.
+// It acts as any other multi light material.
+// It support any number of lights drawing but it uses more geometery drawing. 
+// Use this method when your scene uses large amount of lights. (3-8).
+material RTShaderSystem/BumpMapping_MultiPass
+{
+	technique
+	{
+		// Base ambient pass
+		pass ambient
+		{
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			ambient 1 1 1
+			diffuse 0 0 0 
+			specular 0 0 0 0 
+			
+			// RT Shader system section.			
+ 			rtshader_system
+ 			{	
+ 				// Tell the system to do only ambient lighting pass otherwise it will do full lighting calculation in this pass.
+				light_count 0 0 0
+			}
+		}
+		pass perlight
+		{
+			// Turn off specular in order to use only diffuse based bump map technique.
+			specular 1.0 1.0 1.0 32
+			
+			// base colours, not needed for rendering, but as information
+			// to lighting pass categorisation routine
+			ambient 0 0 0 
+			
+			// do this for each point light
+			// It is important to mention the light type when working with the RT Shader System in iterative lighting method. 
+			// If not specified, it will generate a generic shaders that supports all 3 kinds of lights and you'll suffer from
+			// performance hit.
+			iteration once_per_light point
+
+			scene_blend add		
+			
+			// RT Shader system section.
+ 			rtshader_system
+ 			{	 	
+ 				// Light model will be normal map based. 			
+ 				light_model sgx_normal_map NMBumpsOut.png 				
+ 			}			
+		}	
+		
+		// Decal pass
+		pass decal
+		{
+			
+			lighting off
+			
+			scene_blend dest_colour zero
+			texture_unit decalmap
+			{
+				texture RustedMetal.jpg 
+			}			
+		}			
+	}
+}
+		
+
+
 //---------------------------
 // Projective texture section
 //---------------------------

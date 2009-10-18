@@ -177,7 +177,7 @@ namespace RTShader {
 
 //-----------------------------------------------------------------------
 Parameter::Parameter(GpuConstantType type, const String& name, 
-			const Semantic& semantic, int index)
+			const Semantic& semantic, int index, uint16 variability)
 {
 	mName					= name;
 	mType					= type;
@@ -186,6 +186,7 @@ Parameter::Parameter(GpuConstantType type, const String& name,
 	mIsAutoConstantReal		= false;	
 	mIsAutoConstantInt		= false;	
 	mAutoConstantRealData	= 0.0f;
+	mVariability			= variability;
 }
 
 //-----------------------------------------------------------------------
@@ -203,6 +204,7 @@ Parameter::Parameter(GpuProgramParameters::AutoConstantType autoType, Real fAuto
 	mIsAutoConstantInt	= false;
 	mAutoConstantType	= autoType;
 	mAutoConstantRealData = fAutoConstantData;
+	mVariability		= (uint16)GPV_GLOBAL;
 }
 
 //-----------------------------------------------------------------------
@@ -220,6 +222,7 @@ Parameter::Parameter(GpuProgramParameters::AutoConstantType autoType, size_t nAu
 	mIsAutoConstantInt	= true;
 	mAutoConstantType	= autoType;
 	mAutoConstantIntData = nAutoConstantData;
+	mVariability		= (uint16)GPV_GLOBAL;
 }
 
 //-----------------------------------------------------------------------
@@ -265,61 +268,61 @@ bool Parameter::isSampler() const
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createInPosition(int index)
 {
-	return new Parameter(GCT_FLOAT4, "iPos_" + StringConverter::toString(index), Parameter::SPS_POSITION, index);
+	return new Parameter(GCT_FLOAT4, "iPos_" + StringConverter::toString(index), Parameter::SPS_POSITION, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createOutPosition(int index)
 {
-	return new Parameter(GCT_FLOAT4, "oPos_" + StringConverter::toString(index), Parameter::SPS_POSITION, index);
+	return new Parameter(GCT_FLOAT4, "oPos_" + StringConverter::toString(index), Parameter::SPS_POSITION, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createInNormal(int index)
 {
-	return new Parameter(GCT_FLOAT3, "iNormal_" + StringConverter::toString(index), Parameter::SPS_NORMAL, index);
+	return new Parameter(GCT_FLOAT3, "iNormal_" + StringConverter::toString(index), Parameter::SPS_NORMAL, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createInBiNormal(int index)
 {
-	return new Parameter(GCT_FLOAT3, "iBiNormal_" + StringConverter::toString(index), Parameter::SPS_BINORMAL, index);
+	return new Parameter(GCT_FLOAT3, "iBiNormal_" + StringConverter::toString(index), Parameter::SPS_BINORMAL, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createInTangent(int index)
 {
-	return new Parameter(GCT_FLOAT3, "iTangent_" + StringConverter::toString(index), Parameter::SPS_TANGENT, index);
+	return new Parameter(GCT_FLOAT3, "iTangent_" + StringConverter::toString(index), Parameter::SPS_TANGENT, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createOutNormal(int index)
 {
-	return new Parameter(GCT_FLOAT3, "oNormal_" + StringConverter::toString(index), Parameter::SPS_NORMAL, index);
+	return new Parameter(GCT_FLOAT3, "oNormal_" + StringConverter::toString(index), Parameter::SPS_NORMAL, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createOutBiNormal(int index)
 {
-	return new Parameter(GCT_FLOAT3, "oBiNormal_" + StringConverter::toString(index), Parameter::SPS_BINORMAL, index);
+	return new Parameter(GCT_FLOAT3, "oBiNormal_" + StringConverter::toString(index), Parameter::SPS_BINORMAL, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createOutTangent(int index)
 {
-	return new Parameter(GCT_FLOAT3, "oTangent_" + StringConverter::toString(index), Parameter::SPS_TANGENT, index);
+	return new Parameter(GCT_FLOAT3, "oTangent_" + StringConverter::toString(index), Parameter::SPS_TANGENT, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createInColor(int index)
 {
-	return new Parameter(GCT_FLOAT4, "iColor_" + StringConverter::toString(index), Parameter::SPS_COLOR, index);
+	return new Parameter(GCT_FLOAT4, "iColor_" + StringConverter::toString(index), Parameter::SPS_COLOR, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createOutColor(int index)
 {
-	return new Parameter(GCT_FLOAT4, "oColor_" + StringConverter::toString(index), Parameter::SPS_COLOR, index);
+	return new Parameter(GCT_FLOAT4, "oColor_" + StringConverter::toString(index), Parameter::SPS_COLOR, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
@@ -367,51 +370,52 @@ Parameter* ParameterFactory::createOutTexcoord(GpuConstantType type, int index)
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createInTexcoord1(int index)
 {
-	return new Parameter(GCT_FLOAT1, "iTexcoord1_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index);
+	return new Parameter(GCT_FLOAT1, "iTexcoord1_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createOutTexcoord1(int index)
 {
-	return new Parameter(GCT_FLOAT1, "oTexcoord1_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index);
+	return new Parameter(GCT_FLOAT1, "oTexcoord1_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createInTexcoord2(int index)
 {
-	return new Parameter(GCT_FLOAT2, "iTexcoord2_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index);
+	return new Parameter(GCT_FLOAT2, "iTexcoord2_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createOutTexcoord2(int index)
 {
-	return new Parameter(GCT_FLOAT2, "oTexcoord2_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index);
+	return new Parameter(GCT_FLOAT2, "oTexcoord2_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createInTexcoord3(int index)
 {
-	return new Parameter(GCT_FLOAT3, "iTexcoord3_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index);
+	return new Parameter(GCT_FLOAT3, "iTexcoord3_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createOutTexcoord3(int index)
 {
-	return new Parameter(GCT_FLOAT3, "oTexcoord3_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index);
+	return new Parameter(GCT_FLOAT3, "oTexcoord3_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createInTexcoord4(int index)
 {
-	return new Parameter(GCT_FLOAT4, "iTexcoord4_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index);
+	return new Parameter(GCT_FLOAT4, "iTexcoord4_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createOutTexcoord4(int index)
 {
-	return new Parameter(GCT_FLOAT4, "oTexcoord4_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index);
+	return new Parameter(GCT_FLOAT4, "oTexcoord4_" + StringConverter::toString(index), Parameter::SPS_TEXTURE_COORDINATES, index, (uint16)GPV_GLOBAL);
 }
 
+//-----------------------------------------------------------------------
 Parameter* ParameterFactory::createSampler(GpuConstantType type, int index)
 {
 	switch (type)
@@ -436,25 +440,25 @@ Parameter* ParameterFactory::createSampler(GpuConstantType type, int index)
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createSampler1D(int index)
 {
-	return new Parameter(GCT_SAMPLER1D, "gSampler1D_" + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index);
+	return new Parameter(GCT_SAMPLER1D, "gSampler1D_" + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createSampler2D(int index)
 {
-	return new Parameter(GCT_SAMPLER2D, "gSampler2D_" + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index);
+	return new Parameter(GCT_SAMPLER2D, "gSampler2D_" + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createSampler3D(int index)
 {
-	return new Parameter(GCT_SAMPLER3D, "gSampler3D_" + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index);
+	return new Parameter(GCT_SAMPLER3D, "gSampler3D_" + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index, (uint16)GPV_GLOBAL);
 }
 
 //-----------------------------------------------------------------------
 Parameter* ParameterFactory::createSamplerCUBE(int index)
 {
-	return new Parameter(GCT_SAMPLERCUBE, "gSamplerCUBE_" + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index);
+	return new Parameter(GCT_SAMPLERCUBE, "gSamplerCUBE_" + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index, (uint16)GPV_GLOBAL);
 }
 
 }

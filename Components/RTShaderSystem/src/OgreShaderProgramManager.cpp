@@ -300,7 +300,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 	pGpuProgram->setParameter("profiles", profiles);
 
 
-	GpuProgramParametersSharedPtr pParams = pGpuProgram->getDefaultParameters();
+	GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
 	const ShaderParameterList& progParams = shaderProgram->getParameters();
 	ShaderParameterConstIterator itParams;
 
@@ -315,14 +315,16 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 	for (itParams=progParams.begin(); itParams != progParams.end(); ++itParams)
 	{
 		const Parameter* pCurParam = *itParams;
+		const GpuConstantDefinition* gpuConstDef = pGpuParams->_findNamedConstantDefinition(pCurParam->getName());
+		
 
 		if (pCurParam->isAutoConstantParameter())
 		{
 			if (pCurParam->isAutoConstantRealParameter())
 			{
-				if (pParams->_findNamedConstantDefinition(pCurParam->getName()) != NULL)
+				if (gpuConstDef != NULL)
 				{
-					pParams->setNamedAutoConstantReal(pCurParam->getName(), 
+					pGpuParams->setNamedAutoConstantReal(pCurParam->getName(), 
 						pCurParam->getAutoConstantType(), 
 						pCurParam->getAutoConstantRealData());
 				}	
@@ -334,9 +336,9 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 			}
 			else if (pCurParam->isAutoConstantIntParameter())
 			{
-				if (pParams->_findNamedConstantDefinition(pCurParam->getName()) != NULL)
+				if (gpuConstDef != NULL)
 				{
-					pParams->setNamedAutoConstant(pCurParam->getName(), 
+					pGpuParams->setNamedAutoConstant(pCurParam->getName(), 
 						pCurParam->getAutoConstantType(), 
 						pCurParam->getAutoConstantIntData());
 				}
@@ -346,6 +348,29 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 						pCurParam->getName() << " to program named " << shaderProgram->getName();
 				}
 			}						
+		}
+		else
+		{
+			// No auto constant - we have to update its variability ourself.
+			if (gpuConstDef != NULL)
+			{
+				gpuConstDef->variability |= pCurParam->getVariability();
+				
+				// Update variability in the float map.
+				if (gpuConstDef->isSampler() == false)
+				{
+					GpuLogicalBufferStructPtr floatLogical = pGpuParams->getFloatLogicalBufferStruct();
+				
+					for (GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin(); i != floatLogical->map.end(); ++i)
+					{
+						if (i->second.physicalIndex == gpuConstDef->physicalIndex)
+						{
+							i->second.variability |= gpuConstDef->variability;
+							break;
+						}
+					}
+				}							
+			}
 		}
 	}
 

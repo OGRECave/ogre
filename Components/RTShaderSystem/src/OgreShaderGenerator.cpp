@@ -95,8 +95,12 @@ bool ShaderGenerator::initialize()
 	if (ms_Singleton == NULL)
 	{
 		ms_Singleton = new ShaderGenerator;
-		if (ms_Singleton->_initialize())
-			return true;
+		if (false == ms_Singleton->_initialize())
+		{
+			OGRE_DELETE ms_Singleton;
+			ms_Singleton = NULL;
+			return false;
+		}
 	}
 		
 	return true;

@@ -437,7 +437,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 		switch (mLightParamsList[i].mType)
 		{
 		case Light::LT_DIRECTIONAL:
-			mLightParamsList[i].mDirection = psProgram->resolveParameter(GCT_FLOAT4, -1, "light_direction_view_space");
+			mLightParamsList[i].mDirection = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_view_space");
 			if (mLightParamsList[i].mDirection == NULL)
 				return false;
 			break;
@@ -451,11 +451,11 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 			if (mVSInPosition == NULL)
 				return false;
 
-			mLightParamsList[i].mPosition = psProgram->resolveParameter(GCT_FLOAT4, -1, "light_position_view_space");
+			mLightParamsList[i].mPosition = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_view_space");
 			if (mLightParamsList[i].mPosition == NULL)
 				return false;
 
-			mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, "light_attenuation");
+			mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
 			if (mLightParamsList[i].mAttenuatParams == NULL)
 				return false;	
 
@@ -481,19 +481,19 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 			if (mVSInPosition == NULL)
 				return false;
 
-			mLightParamsList[i].mPosition = psProgram->resolveParameter(GCT_FLOAT4, -1, "light_position_view_space");
+			mLightParamsList[i].mPosition = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_view_space");
 			if (mLightParamsList[i].mPosition == NULL)
 				return false;
 
-			mLightParamsList[i].mDirection = psProgram->resolveParameter(GCT_FLOAT4, -1, "light_direction_view_space");
+			mLightParamsList[i].mDirection = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_view_space");
 			if (mLightParamsList[i].mDirection == NULL)
 				return false;
 
-			mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, "light_attenuation");
+			mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
 			if (mLightParamsList[i].mAttenuatParams == NULL)
 				return false;	
 
-			mLightParamsList[i].mSpotParams = psProgram->resolveParameter(GCT_FLOAT3, -1, "spotlight_params");
+			mLightParamsList[i].mSpotParams = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "spotlight_params");
 			if (mLightParamsList[i].mSpotParams == NULL)
 				return false;
 
@@ -514,13 +514,13 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 		// Resolve diffuse colour.
 		if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
 		{
-			mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, "derived_light_diffuse");
+			mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS | (uint16)GPV_GLOBAL, "derived_light_diffuse");
 			if (mLightParamsList[i].mDiffuseColour == NULL)
 				return false;
 		}
 		else
 		{
-			mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, "light_diffuse");
+			mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_diffuse");
 			if (mLightParamsList[i].mDiffuseColour == NULL)
 				return false;
 		}		
@@ -530,13 +530,13 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 			// Resolve specular colour.
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
 			{
-				mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, "derived_light_specular");
+				mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS | (uint16)GPV_GLOBAL, "derived_light_specular");
 				if (mLightParamsList[i].mSpecularColour == NULL)
 					return false;
 			}
 			else
 			{
-				mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, "light_specular");
+				mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_specular");
 				if (mLightParamsList[i].mSpecularColour == NULL)
 					return false;
 			}						

@@ -94,7 +94,7 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
 	
 	
 	// Resolve texture sampler parameter.		
-	textureUnitParams->mTextureSampler = psProgram->resolveParameter(textureUnitParams->mTextureSamplerType, textureUnitParams->mTextureSamplerIndex, "gTextureSampler");
+	textureUnitParams->mTextureSampler = psProgram->resolveParameter(textureUnitParams->mTextureSamplerType, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSampler");
 	if (textureUnitParams->mTextureSampler == NULL)
 		return false;
 	
@@ -149,7 +149,7 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
 		if (mWorldMatrix == NULL)		
 			return false;	
 
-		textureUnitParams->mTextureViewProjImageMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, "gTexViewProjImageMatrix");
+		textureUnitParams->mTextureViewProjImageMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_LIGHTS, "gTexViewProjImageMatrix");
 		if (textureUnitParams->mTextureViewProjImageMatrix == NULL)		
 			return false;	
 

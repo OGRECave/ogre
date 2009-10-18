@@ -74,9 +74,10 @@ public:
 	@param type The type of this parameter.
 	@param name The name of this parameter.
 	@param index The index of this parameter.
+	@param variability How this parameter varies (bitwise combination of GpuProgramVariability).
 	*/
 	Parameter(GpuConstantType type, const String& name, 
-		const Semantic& semantic, int index);
+		const Semantic& semantic, int index, uint16 variability);
 
 	/** Class constructor.
 	@param autoType The auto type of this parameter.
@@ -129,6 +130,9 @@ public:
 	/** Return the auto constant type of this parameter. */
 	GpuProgramParameters::AutoConstantType getAutoConstantType	() const { return mAutoConstantType; }
 
+	/** Return the variability of this parameter. */
+	uint16					getVariability						() const { return mVariability; }
+
 // Attributes.
 protected:
 	String									mName;					// Name of this parameter.
@@ -143,6 +147,7 @@ protected:
 		size_t	mAutoConstantIntData;								// Auto constant int data.
 		Real	mAutoConstantRealData;								// Auto constant real data.
 	};		
+	uint16									mVariability;			// How this parameter varies (bitwise combination of GpuProgramVariability).
 };
 
 

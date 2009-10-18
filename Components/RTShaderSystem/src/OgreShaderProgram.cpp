@@ -174,8 +174,8 @@ Parameter* Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantTy
 
 //-----------------------------------------------------------------------------
 Parameter* Program::resolveParameter(GpuConstantType type, 
-										   int index,
-										   const String& suggestedName)
+									int index, uint16 variability,
+									const String& suggestedName)
 {
 	Parameter* param = NULL;
 
@@ -208,7 +208,7 @@ Parameter* Program::resolveParameter(GpuConstantType type,
 
 	
 	// Create new parameter.
-	param = new Parameter(type, suggestedName + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index);
+	param = new Parameter(type, suggestedName + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index, variability);
 	addParameter(param);
 
 	return param;

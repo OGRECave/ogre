@@ -79,10 +79,11 @@ public:
 	@param type The type of the desired parameter.
 	@param index The index of the desired parameter.
 	@param suggestedName The suggested name for the parameter in case new one should be create.	
+	@param variability How this parameter varies (bitwise combination of GpuProgramVariability).
 	Return parameter instance in case of that resolve operation succeeded.
 	@remarks Pass -1 as index parameter to create a new parameter with the desired type and index.
 	*/
-	Parameter*			resolveParameter			(GpuConstantType type, int index, const String& suggestedName);
+	Parameter*			resolveParameter			(GpuConstantType type, int index, uint16 variability, const String& suggestedName);
 	
 	/** Get parameter by a given name.	
 	@param name The name of the parameter to search for.

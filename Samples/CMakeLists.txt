@@ -40,6 +40,13 @@ if (OGRE_BUILD_SAMPLES)
   if (OGRE_BUILD_COMPONENT_PAGING)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgrePaging)
   endif ()
+  
+  if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
+	add_definitions(-DUSE_RTSHADER_SYSTEM)
+	include_directories(${CMAKE_SOURCE_DIR}/Components/RTShaderSystem/include)
+  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreRTShaderSystem)
+  endif ()
+  
   if (OGRE_BUILD_COMPONENT_TERRAIN)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreTerrain)
   endif ()

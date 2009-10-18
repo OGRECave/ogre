@@ -161,7 +161,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 
 	
 	// Resolve fog colour.
-	mFogColour = psProgram->resolveParameter(GCT_FLOAT4, -1, "gFogColor");
+	mFogColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "gFogColor");
 	if (mFogColour == NULL)
 		return false;
 		
@@ -175,7 +175,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 	if (mCalcMode == CM_PER_PIXEL)
 	{
 		// Resolve fog params.		
-		mFogParams = psProgram->resolveParameter(GCT_FLOAT4, -1, "gFogParams");
+		mFogParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "gFogParams");
 		if (mFogParams == NULL)
 			return false;
 
@@ -197,7 +197,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 	else
 	{		
 		// Resolve fog params.		
-		mFogParams = vsProgram->resolveParameter(GCT_FLOAT4, -1, "gFogParams");
+		mFogParams = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "gFogParams");
 		if (mFogParams == NULL)
 			return false;
 		

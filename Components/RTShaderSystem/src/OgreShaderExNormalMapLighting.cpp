@@ -330,7 +330,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 	Function* psMain = psProgram->getEntryPointFunction();
 	
 	// Resolve normal map texture sampler parameter.		
-	mNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, mNormalMapSamplerIndex, "gNormalMapSampler");
+	mNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, mNormalMapSamplerIndex, (uint16)GPV_PER_OBJECT, "gNormalMapSampler");
 	if (mNormalMapSampler == NULL)
 		return false;
 
@@ -494,7 +494,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 			return false;	
 
 		// Resolve inverse world rotation matrix.
-		mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, "gMatInvRotation");
+		mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "gMatInvRotation");
 		if (mWorldInvRotMatrix == NULL)		
 			return false;	
 		
@@ -518,7 +518,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 		switch (mLightParamsList[i].mType)
 		{
 		case Light::LT_DIRECTIONAL:
-			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, "light_direction_obj_space");
+			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_obj_space");
 			if (mLightParamsList[i].mDirection == NULL)
 				return false;
 
@@ -539,7 +539,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			if (mVSInPosition == NULL)
 				return false;
 
-			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, "light_position_world_space");
+			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_world_space");
 			if (mLightParamsList[i].mPosition == NULL)
 				return false;
 
@@ -553,7 +553,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			if (mLightParamsList[i].mPSInToLightDir == NULL)
 				return false;
 
-			mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, "light_attenuation");
+			mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
 			if (mLightParamsList[i].mAttenuatParams == NULL)
 				return false;	
 
@@ -584,7 +584,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			// Resolve inverse world rotation matrix.
 			if (mWorldInvRotMatrix == NULL)
 			{				
-				mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, "inv_world_rotation_matrix");
+				mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_GLOBAL, "inv_world_rotation_matrix");
 				if (mWorldInvRotMatrix == NULL)		
 					return false;	
 			}				
@@ -595,7 +595,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			if (mVSInPosition == NULL)
 				return false;
 
-			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, "light_position_world_space");
+			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_world_space");
 			if (mLightParamsList[i].mPosition == NULL)
 				return false;
 
@@ -609,7 +609,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			if (mLightParamsList[i].mPSInToLightDir == NULL)
 				return false;
 
-			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, "light_direction_obj_space");
+			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_obj_space");
 			if (mLightParamsList[i].mDirection == NULL)
 				return false;
 
@@ -623,11 +623,11 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			if (mLightParamsList[i].mPSInDirection == NULL)
 				return false;
 
-			mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, "light_attenuation");
+			mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
 			if (mLightParamsList[i].mAttenuatParams == NULL)
 				return false;	
 
-			mLightParamsList[i].mSpotParams = psProgram->resolveParameter(GCT_FLOAT3, -1, "spotlight_params");
+			mLightParamsList[i].mSpotParams = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "spotlight_params");
 			if (mLightParamsList[i].mSpotParams == NULL)
 				return false;
 
@@ -658,7 +658,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			// Resolve inverse world rotation matrix.
 			if (mWorldInvRotMatrix == NULL)
 			{				
-				mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, "gMatInvRotation");
+				mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "gMatInvRotation");
 				if (mWorldInvRotMatrix == NULL)		
 					return false;	
 			}						
@@ -668,13 +668,13 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 		// Resolve diffuse colour.
 		if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
 		{
-			mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, "derived_light_diffuse");
+			mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "derived_light_diffuse");
 			if (mLightParamsList[i].mDiffuseColour == NULL)
 				return false;
 		}
 		else
 		{
-			mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, "light_diffuse");
+			mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_diffuse");
 			if (mLightParamsList[i].mDiffuseColour == NULL)
 				return false;
 		}		
@@ -684,13 +684,13 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			// Resolve specular colour.
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
 			{
-				mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, "derived_light_specular");
+				mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "derived_light_specular");
 				if (mLightParamsList[i].mSpecularColour == NULL)
 					return false;
 			}
 			else
 			{
-				mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, "light_specular");
+				mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_specular");
 				if (mLightParamsList[i].mSpecularColour == NULL)
 					return false;
 			}						

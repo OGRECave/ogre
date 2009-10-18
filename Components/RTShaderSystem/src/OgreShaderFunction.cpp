@@ -262,7 +262,7 @@ Parameter* Function::resolveLocalParameter(Parameter::Semantic semantic, int ind
 		}		
 	}
 		
-	param = new Parameter(type, name, semantic, index);
+	param = new Parameter(type, name, semantic, index, (uint16)GPV_GLOBAL);
 	addParameter(mLocalParameters, param);
 			
 	return param;
