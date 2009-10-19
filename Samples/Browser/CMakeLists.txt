@@ -52,12 +52,19 @@ set (HEADER_FILES
 )
 
 if (OGRE_STATIC)
-  file (GLOB SAMPLES_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/Samples/*/include)
+  # Find all samples headers, and copy them to a single include folder
+  # We do this instead of including every sample in the include_directories directive, 
+  # because this creates a list that is too long for the MSVC command line sometimes.
+  file (GLOB SAMPLES_HEADERS ${CMAKE_SOURCE_DIR}/Samples/*/include/*.h)
+  foreach(SAMPLE_HEADER_FULLPATH ${SAMPLES_HEADERS})
+	get_filename_component(SAMPLE_HEADER_NAME ${SAMPLE_HEADER_FULLPATH} NAME)
+	configure_file(${SAMPLE_HEADER_FULLPATH} ${CMAKE_BINARY_DIR}/Samples/include/${SAMPLE_HEADER_NAME} COPYONLY)
+  endforeach(SAMPLE_HEADER_FULLPATH)
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/Components/Paging/include
     ${CMAKE_SOURCE_DIR}/Components/Terrain/include
-    ${SAMPLES_INCLUDE_DIRS})
+	${CMAKE_BINARY_DIR}/Samples/include)
 else()
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 endif()

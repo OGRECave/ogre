@@ -39,7 +39,7 @@ namespace OgreBites
 	| Base class responsible for everything specific to one sample.
 	| Designed to be subclassed for each sample.
 	=============================================================================*/
-	class Sample
+	class Sample : public Ogre::GeneralAllocatedObject
     {
     public:
 
