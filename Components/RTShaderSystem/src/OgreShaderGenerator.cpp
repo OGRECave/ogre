@@ -1035,7 +1035,14 @@ ShaderGenerator::SGTechnique::~SGTechnique()
 		{
 			if (mDstTechnique == mat->getTechnique(i))
 			{
-				mat->removeTechnique(i);			
+				// Unload the generated technique in order tor free referenced resources.
+				mDstTechnique->_unload();
+
+				// Remove the generated technique in order to restore the material to its original state.
+				mat->removeTechnique(i);
+
+				// Make sure the material goes back to its original state.
+				mat->touch();
 				break;
 			}		
 		}

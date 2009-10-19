@@ -74,6 +74,7 @@ ProgramManager::~ProgramManager()
 	destroyProgramsWriters();
 }
 
+//-----------------------------------------------------------------------------
 void ProgramManager::acquireGpuPrograms(Pass* pass, RenderState* renderState)
 {
 	uint32 renderStateHashCode    = renderState->getHashCode();
