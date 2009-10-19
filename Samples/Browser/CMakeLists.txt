@@ -52,18 +52,12 @@ set (HEADER_FILES
 )
 
 if (OGRE_STATIC)
-  if (OGRE_BUILD_PLATFORM_IPHONE)
-	include_directories(
-      ${CMAKE_CURRENT_SOURCE_DIR}/include
-      ${CMAKE_SOURCE_DIR}/Components/Paging/include
-      ${CMAKE_SOURCE_DIR}/Components/Terrain/include
-      ${CMAKE_SOURCE_DIR}/Samples/**)
-  else()
-    include_directories(
-      ${CMAKE_CURRENT_SOURCE_DIR}/include
-      ${CMAKE_SOURCE_DIR}/Components/Paging/include
-      ${CMAKE_SOURCE_DIR}/Components/Terrain/include)
-  endif()
+  file (GLOB SAMPLES_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/Samples/*/include)
+  include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/Components/Paging/include
+    ${CMAKE_SOURCE_DIR}/Components/Terrain/include
+    ${SAMPLES_INCLUDE_DIRS})
 else()
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 endif()
