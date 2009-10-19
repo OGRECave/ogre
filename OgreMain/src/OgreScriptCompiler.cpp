@@ -1619,6 +1619,11 @@ namespace Ogre
 		return translator;
 	}
 	//-----------------------------------------------------------------------
+	void ScriptCompilerManager::addScriptPattern(const String &pattern)
+	{
+		mScriptPatterns.push_back(pattern);
+	}
+	//-----------------------------------------------------------------------
     const StringVector& ScriptCompilerManager::getScriptPatterns(void) const
     {
         return mScriptPatterns;

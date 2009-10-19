@@ -416,6 +416,8 @@ namespace Ogre
 		/// Retrieves a ScriptTranslator from the supported managers
 		ScriptTranslator *getTranslator(const AbstractNodePtr &node);
 
+		/// Adds a script extension that can be handled (e.g. *.material, *.pu, etc.)
+		void addScriptPattern(const String &pattern);
 		/// @copydoc ScriptLoader::getScriptPatterns
         const StringVector& getScriptPatterns(void) const;
         /// @copydoc ScriptLoader::parseScript
