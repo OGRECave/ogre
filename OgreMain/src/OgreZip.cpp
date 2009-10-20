@@ -302,15 +302,21 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     size_t ZipDataStream::read(void* buf, size_t count)
     {
-        zzip_ssize_t r = zzip_file_read(mZzipFile, (char*)buf, count);
-        if (r<0) {
-            ZZIP_DIR *dir = zzip_dirhandle(mZzipFile);
-            String msg = zzip_strerror_of(dir);
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        mName+" - error from zziplib: "+msg,
-                        "ZipDataStream::read");
-        }
-        return (size_t) r;
+		size_t was_avail = mCache.read(buf, count);
+		zzip_ssize_t r = 0;
+		if (was_avail < count)
+		{
+			r = zzip_file_read(mZzipFile, (char*)buf + was_avail, count - was_avail);
+			if (r<0) {
+				ZZIP_DIR *dir = zzip_dirhandle(mZzipFile);
+				String msg = zzip_strerror_of(dir);
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+					mName+" - error from zziplib: "+msg,
+					"ZipDataStream::read");
+			}
+			mCache.cacheData((char*)buf + was_avail, (size_t)r);
+		}
+		return was_avail + (size_t)r;
     }
 	//---------------------------------------------------------------------
 	size_t ZipDataStream::write(void* buf, size_t count)
@@ -321,27 +327,53 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ZipDataStream::skip(long count)
     {
-        zzip_seek(mZzipFile, static_cast<zzip_off_t>(count), SEEK_CUR);
+        long was_avail = static_cast<long>(mCache.avail());
+		if (count > 0)
+		{
+			if (!mCache.ff(count))
+				zzip_seek(mZzipFile, static_cast<zzip_off_t>(count - was_avail), SEEK_CUR);
+		}
+		else if (count < 0)
+		{
+			if (!mCache.rewind((size_t)(-count)))
+				zzip_seek(mZzipFile, static_cast<zzip_off_t>(count + was_avail), SEEK_CUR);
+		}
     }
     //-----------------------------------------------------------------------
     void ZipDataStream::seek( size_t pos )
     {
-		zzip_seek(mZzipFile, static_cast<zzip_off_t>(pos), SEEK_SET);
+		zzip_off_t newPos = static_cast<zzip_off_t>(pos);
+		zzip_off_t prevPos = static_cast<zzip_off_t>(tell());
+		if (prevPos < 0)
+		{
+			// seek set after invalid pos
+			mCache.clear();
+			zzip_seek(mZzipFile, newPos, SEEK_SET);
+		}
+		else
+		{
+			// everything is going all right, relative seek
+			skip(newPos - prevPos);
+		}
     }
     //-----------------------------------------------------------------------
     size_t ZipDataStream::tell(void) const
     {
-		return zzip_tell(mZzipFile);
+		zzip_off_t pos = zzip_tell(mZzipFile);
+		if (pos<0)
+			return (size_t)(-1);
+		return static_cast<size_t>(pos) - mCache.avail();
     }
     //-----------------------------------------------------------------------
     bool ZipDataStream::eof(void) const
     {
-        return (zzip_tell(mZzipFile) >= static_cast<zzip_off_t>(mSize));
+        return (tell() >= mSize);
     }
     //-----------------------------------------------------------------------
     void ZipDataStream::close(void)
     {
         zzip_file_close(mZzipFile);
+		mCache.clear();
     }
     //-----------------------------------------------------------------------
     const String& ZipArchiveFactory::getType(void) const
