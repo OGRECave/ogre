@@ -86,6 +86,9 @@ namespace Ogre {
 		*/
 		const Any& getUserAny(const String& key) const;
 
+		/** Clear all user objects from this binding.	*/
+		void clear() const;
+
 		/** Returns empty user any object.
 		*/
 		static const Any& getEmptyUserAny() { return msEmptyAny; }
@@ -98,7 +101,7 @@ namespace Ogre {
 
 		/** Internal class that uses as data storage container.
 		*/
-		class Attributes
+		class Attributes : public GeneralAllocatedObject
 		{
 		public:
 			/** Attribute storage ctor. */

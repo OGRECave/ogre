@@ -1283,6 +1283,9 @@ namespace Ogre {
         {
             // TODO
         }
+		
+		// Clear user object bindings.
+		mUserObjectBindings.clear();
 	}
     //-----------------------------------------------------------------------
 	void Pass::setVertexProgram(const String& name, bool resetParams)

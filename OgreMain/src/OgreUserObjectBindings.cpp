@@ -41,11 +41,7 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	UserObjectBindings::~UserObjectBindings()
 	{
-		if (mAttributes != NULL)
-		{			
-			delete mAttributes;
-			mAttributes = NULL;
-		}
+		clear();
 	}
 
 	//-----------------------------------------------------------------------
@@ -53,7 +49,7 @@ namespace Ogre {
 	{
 		// Allocate attributes on demand.
 		if (mAttributes == NULL)
-			mAttributes = new UserObjectBindings::Attributes;
+			mAttributes = OGRE_NEW UserObjectBindings::Attributes;
 		
 		mAttributes->mKeylessAny = anything;
 	}
@@ -63,7 +59,7 @@ namespace Ogre {
 	{
 		// Allocate attributes on demand.
 		if (mAttributes == NULL)
-			mAttributes = new UserObjectBindings::Attributes;
+			mAttributes = OGRE_NEW UserObjectBindings::Attributes;
 
 		return mAttributes->mKeylessAny;
 	}
@@ -73,7 +69,7 @@ namespace Ogre {
 	{
 		// Allocate attributes on demand.
 		if (mAttributes == NULL)
-			mAttributes = new UserObjectBindings::Attributes;
+			mAttributes = OGRE_NEW UserObjectBindings::Attributes;
 
 		// Case map doesn't exists.
 		if (mAttributes->mpUserObjectsMap == NULL)
@@ -87,7 +83,7 @@ namespace Ogre {
 	{
 		// Allocate attributes on demand.
 		if (mAttributes == NULL)
-			mAttributes = new UserObjectBindings::Attributes;
+			mAttributes = OGRE_NEW UserObjectBindings::Attributes;
 
 		// Case map doesn't exists.
 		if (mAttributes->mpUserObjectsMap == NULL)
@@ -102,5 +98,15 @@ namespace Ogre {
 		}
 		
 		return msEmptyAny;
+	}
+
+	//-----------------------------------------------------------------------
+	void UserObjectBindings::clear() const
+	{
+		if (mAttributes != NULL)
+		{			
+			OGRE_DELETE mAttributes;
+			mAttributes = NULL;
+		}
 	}
 }

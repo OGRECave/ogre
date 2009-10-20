@@ -634,6 +634,9 @@ namespace Ogre {
 		{
 			(*i)->_unload();
 		}
+
+		// Clear user object bindings.
+		mUserObjectBindings.clear();
     }
     //-----------------------------------------------------------------------------
     bool Technique::isLoaded(void) const
