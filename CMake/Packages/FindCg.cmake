@@ -7,129 +7,46 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
+# - Try to find Cg
+# Once done, this will define
 #
-# Try to find nVidia's Cg compiler, runtime libraries, and include path.
-# Once done this will define
-#
-# Cg_FOUND        - system has NVidia Cg and it can be used. 
-# Cg_INCLUDE_DIRS = directory where cg.h resides
-# Cg_LIBRARIES = full path to libCg.so (Cg.DLL on win32)
-# Cg_GL_LIBRARIES = full path to libCgGL.so (CgGL.dll on win32)
-# Cg_COMPILER = full path to cgc (cgc.exe on win32)
-# 
+#  Cg_FOUND - system has Cg
+#  Cg_INCLUDE_DIRS - the Cg include directories 
+#  Cg_LIBRARIES - link these to use Cg
 
-# On OSX default to using the framework version of Cg.
-include(OgreFindFrameworks)
+include(FindPkgMacros)
+findpkg_begin(Cg)
 
-IF (APPLE)
-  SET(Cg_FRAMEWORK_INCLUDES)
-  OGRE_FIND_FRAMEWORKS(Cg)
-  IF (Cg_FRAMEWORKS)
-    FOREACH(dir ${Cg_FRAMEWORKS})
-      SET(Cg_FRAMEWORK_INCLUDES ${Cg_FRAMEWORK_INCLUDES}
-        ${dir}/Headers ${dir}/PrivateHeaders)
-    ENDFOREACH(dir)
+# Get path, convert backslashes as ${ENV_${var}}
+getenv_path(Cg_HOME)
+getenv_path(OGRE_SOURCE)
+getenv_path(OGRE_HOME)
 
-    #Find the include  dir
-    FIND_PATH(Cg_INCLUDE_DIRS cg.h
-      ${Cg_FRAMEWORK_INCLUDES}
-      )
+# construct search paths
+set(Cg_PREFIX_PATH ${Cg_HOME} ${ENV_Cg_HOME}
+  ${OGRE_SOURCE}/Dependencies
+  ${ENV_OGRE_SOURCE}/Dependencies
+  ${OGRE_HOME} ${ENV_OGRE_HOME})
+create_search_paths(Cg)
+# redo search if prefix path changed
+clear_if_changed(Cg_PREFIX_PATH
+  Cg_LIBRARY_FWK
+  Cg_LIBRARY_REL
+  Cg_LIBRARY_DBG
+  Cg_INCLUDE_DIR
+)
 
-    #Since we are using Cg framework, we must link to it.
-    SET(Cg_LIBRARIES "-framework Cg" CACHE STRING "Cg library")
-    SET(Cg_GL_LIBRARIES "-framework Cg" CACHE STRING "Cg GL library")
-  ENDIF (Cg_FRAMEWORKS)
-  FIND_PROGRAM(Cg_COMPILER cgc
-    /usr/bin
-    /usr/local/bin
-    DOC "The Cg compiler"
-    )
-ELSE (APPLE)
-  IF (WIN32)
-    FIND_PROGRAM( Cg_COMPILER cgc
-      "C:/Program Files/NVIDIA Corporation/Cg/bin"
-      "C:/Program Files/Cg"
-      ${PROJECT_SOURCE_DIR}/../Cg
-      DOC "The Cg Compiler"
-      )
-    IF (Cg_COMPILER)
-      GET_FILENAME_COMPONENT(Cg_COMPILER_DIR ${Cg_COMPILER} PATH)
-      GET_FILENAME_COMPONENT(Cg_COMPILER_SUPER_DIR ${Cg_COMPILER_DIR} PATH)
-    ELSE (Cg_COMPILER)
-      SET (Cg_COMPILER_DIR .)
-      SET (Cg_COMPILER_SUPER_DIR ..)
-    ENDIF (Cg_COMPILER)
-    FIND_PATH( Cg_INCLUDE_DIRS Cg/cg.h
-      "C:/Program Files/NVIDIA Corporation/Cg/include"
-      "C:/Program Files/Cg"
-      ${PROJECT_SOURCE_DIR}/../Cg
-      ${Cg_COMPILER_SUPER_DIR}/include
-      ${Cg_COMPILER_DIR}
-      DOC "The directory where Cg/cg.h resides"
-      )
-    FIND_LIBRARY( Cg_LIBRARIES
-      NAMES Cg
-      PATHS
-      "C:/Program Files/NVIDIA Corporation/Cg/lib"
-      "C:/Program Files/Cg"
-      ${PROJECT_SOURCE_DIR}/../Cg
-      ${Cg_COMPILER_SUPER_DIR}/lib
-      ${Cg_COMPILER_DIR}
-      DOC "The Cg runtime library"
-      PATH_SUFFIXES "" release relwithdebinfo minsizerel debug
-      )
-    FIND_LIBRARY( Cg_GL_LIBRARIES
-      NAMES CgGL
-      PATHS
-      "C:/Program Files/NVIDIA Corporation/Cg/lib"
-      "C:/Program Files/Cg"
-      ${PROJECT_SOURCE_DIR}/../Cg
-      ${Cg_COMPILER_SUPER_DIR}/lib
-      ${Cg_COMPILER_DIR}
-      DOC "The Cg runtime library"
-      PATH_SUFFIXES "" release relwithdebinfo minsizerel debug
-      )
-  ELSE (WIN32)
-    FIND_PROGRAM( Cg_COMPILER cgc
-      /usr/bin
-      /usr/local/bin
-      DOC "The Cg Compiler"
-      )
-    GET_FILENAME_COMPONENT(Cg_COMPILER_DIR "${Cg_COMPILER}" PATH)
-    GET_FILENAME_COMPONENT(Cg_COMPILER_SUPER_DIR "${Cg_COMPILER_DIR}" PATH)
-    FIND_PATH( Cg_INCLUDE_DIRS Cg/cg.h
-      /usr/include
-      /usr/local/include
-      ${Cg_COMPILER_SUPER_DIR}/include
-      DOC "The directory where Cg/cg.h resides"
-      )
-    FIND_LIBRARY( Cg_LIBRARIES Cg
-      PATHS
-      /usr/lib64
-      /usr/lib
-      /usr/local/lib64
-      /usr/local/lib
-      ${Cg_COMPILER_SUPER_DIR}/lib64
-      ${Cg_COMPILER_SUPER_DIR}/lib
-      DOC "The Cg runtime library"
-      PATH_SUFFIXES "" release relwithdebinfo minsizerel debug
-      )
-    FIND_LIBRARY( Cg_GL_LIBRARIES CgGL
-      PATHS
-      /usr/lib64
-      /usr/lib
-      /usr/local/lib64
-      /usr/local/lib
-      ${Cg_COMPILER_SUPER_DIR}/lib64
-      ${Cg_COMPILER_SUPER_DIR}/lib
-      DOC "The Cg runtime library"
-      PATH_SUFFIXES "" release relwithdebinfo minsizerel debug
-      )
-  ENDIF (WIN32)
-ENDIF (APPLE)
+set(Cg_LIBRARY_NAMES Cg)
+get_debug_names(Cg_LIBRARY_NAMES)
 
-IF (Cg_INCLUDE_DIRS AND Cg_LIBRARIES)
-  SET( Cg_FOUND TRUE)
-ENDIF ()
+use_pkgconfig(Cg_PKGC Cg)
 
-MARK_AS_ADVANCED( Cg_INCLUDE_DIRS Cg_COMPILER Cg_LIBRARIES Cg_GL_LIBRARIES )
+findpkg_framework(Cg)
+
+find_path(Cg_INCLUDE_DIR NAMES cg.h HINTS ${Cg_FRAMEWORK_INCLUDES} ${Cg_INC_SEARCH_PATH} ${Cg_PKGC_INCLUDE_DIRS} PATH_SUFFIXES Cg)
+find_library(Cg_LIBRARY_REL NAMES ${Cg_LIBRARY_NAMES} HINTS ${Cg_LIB_SEARCH_PATH} ${Cg_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" release relwithdebinfo minsizerel)
+find_library(Cg_LIBRARY_DBG NAMES ${Cg_LIBRARY_NAMES_DBG} HINTS ${Cg_LIB_SEARCH_PATH} ${Cg_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" debug)
+make_library_set(Cg_LIBRARY)
+
+findpkg_finish(Cg)
+add_parent_dir(Cg_INCLUDE_DIRS Cg_INCLUDE_DIR)
