@@ -1,0 +1,13 @@
+Component:  wxScintilla
+Release:    1.69.2
+Documents:  http://wxcode.sourceforge.net/components/wxscintilla/index.php
+wxWidgets:  2.6.x
+Maintainer: Otto Wyss (wyo)
+Subdir:     wxscintilla
+
+Description:
+wxScintilla implements the Scintilla editing control (see
+http://scintilla.sourceforge.net/) with the wxWidgets API. It's derived
+from wxStyledTextCtrl and has the same functionality and a similar API.
+
+For further instructions see the BuildInfo.txt inside the "build" directory.
