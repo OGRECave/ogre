@@ -61,6 +61,7 @@ namespace Ogre {
 		mHalfBatchInstanceDimensions(Vector3(500,500,500)),
 		mOrigin(Vector3(0,0,0)),
 		mVisible(true),
+        mProvideWorldInverses(false),
         mRenderQueueID(RENDER_QUEUE_MAIN),
         mRenderQueueIDSet(false),
 		mObjectCount(0),
@@ -885,6 +886,11 @@ namespace Ogre {
 		}
 		of << "-------------------------------------------------" << std::endl;
 	}
+	//--------------------------------------------------------------------------
+    void InstancedGeometry::setProvideWorldInverses(bool flag)
+    {
+        mProvideWorldInverses = flag;
+    }
 	//---------------------------------------------------------------------
 	void InstancedGeometry::visitRenderables(Renderable::Visitor* visitor, 
 		bool debugRenderables)
@@ -1808,13 +1814,31 @@ namespace Ogre {
 			itbegin=mParent->getParent()->getParent()->getInstancesMap().begin();
 			itend=mParent->getParent()->getParent()->getInstancesMap().end();
 
-			for (it=itbegin;
-				it!=itend;
-				++it,++xform)
-			{
-				
-					*xform = it->second->mTransformation;
-			}
+            if( mParent->getParent()->getParent()->getParent()->getProvideWorldInverses() )
+            {
+                // For shaders that use normal maps on instanced geometry objects,
+                // we can pass the world transform inverse matrices alongwith with
+                // the world matrices. This reduces our usable geometry limit by
+                // half in each instance.
+			    for (it=itbegin;
+				    it!=itend;
+				    ++it,xform+=2)
+			    {
+    				
+					    *xform = it->second->mTransformation;
+                        *(xform+1) = xform->inverse();
+			    }
+            }
+            else
+            {
+                for (it=itbegin;
+                    it!=itend;
+                    ++it,xform++)
+                {
+
+                    *xform = it->second->mTransformation;
+                }
+            }
 		}
 		else
 		{
@@ -1827,10 +1851,21 @@ namespace Ogre {
 				++it)
 			{
 				
-				for(int i=0;i<it->second->mNumBoneMatrices;++i,++xform)
-				{
-					*xform = it->second->mBoneWorldMatrices[i];
-				}
+                if( mParent->getParent()->getParent()->getParent()->getProvideWorldInverses() )
+                {
+				    for(int i=0;i<it->second->mNumBoneMatrices;++i,xform+=2)
+				    {
+					    *xform = it->second->mBoneWorldMatrices[i];
+                        *(xform+1) = xform->inverse();
+				    }
+                }
+                else
+                {
+                    for(int i=0;i<it->second->mNumBoneMatrices;++i,xform++)
+                    {
+                        *xform = it->second->mBoneWorldMatrices[i];
+                    }
+                }
 			}
 				
 		}
@@ -1839,16 +1874,18 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	unsigned short InstancedGeometry::GeometryBucket::getNumWorldTransforms(void) const 
 	{
+        bool bSendInverseXfrm = mParent->getParent()->getParent()->getParent()->getProvideWorldInverses();
+
 		if(mBatch->getBaseSkeleton().isNull())
 		{
 			BatchInstance* batch=mParent->getParent()->getParent();
-			return static_cast<ushort>(batch->getInstancesMap().size());
+            return static_cast<ushort>(batch->getInstancesMap().size() * (bSendInverseXfrm ? 2 : 1));
 		}
 		else
 		{
 			BatchInstance* batch=mParent->getParent()->getParent();
 			return static_cast<ushort>(
-				mBatch->getBaseSkeleton()->getNumBones()*batch->getInstancesMap().size());
+				mBatch->getBaseSkeleton()->getNumBones()*batch->getInstancesMap().size() * (bSendInverseXfrm ? 2 : 1));
 		}
 	}
 	//--------------------------------------------------------------------------

@@ -539,6 +539,8 @@ namespace Ogre {
 		Vector3 mHalfBatchInstanceDimensions;
 		Vector3 mOrigin;
 		bool mVisible;
+        /// Flags to indicate whether the World Transform Inverse matrices are passed to the shaders
+        bool mProvideWorldInverses;
         /// The render queue to use when rendering this object
         uint8 mRenderQueueID;
 		/// Flags whether the RenderQueue's default should be used.
@@ -855,9 +857,21 @@ namespace Ogre {
 		return the total number of object that are in all the batches
 		*/
 		unsigned int getObjectCount(void){return mObjectCount;}
-		                  
 
+        /**
+        @remarks
+        Allows World Transform Inverse matrices to be passed as shader constants along with the world
+        transform matrix list. Reduces the number of usable geometries in an instance to 40 instead of 80.
+		The inverse matrices are interleaved with the world matrices at n+1.
+        */
+        virtual void setProvideWorldInverses(bool flag);
 
+        /**
+        @remarks
+        Returns the toggle state indicating whether the World Transform INVERSE matrices would
+        be passed to the shaders.
+        */
+        virtual bool getProvideWorldInverses(void) const { return mProvideWorldInverses; }
 	};
 
 	/** @} */
