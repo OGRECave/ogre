@@ -27,7 +27,6 @@ THE SOFTWARE.
 
 #include "OgreShaderProgramSet.h"
 #include "OgreShaderProgramManager.h"
-#include "OgreHighLevelGpuProgramManager.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -55,13 +54,13 @@ ProgramSet::~ProgramSet()
 
 	if (mVSGpuProgram.get() != NULL)
 	{
-		HighLevelGpuProgramManager::getSingleton().remove(mVSGpuProgram->getName());
+		ProgramManager::getSingleton().destroyGpuProgram(mVSGpuProgram->getName());
 		mVSGpuProgram.setNull();
 	}
 
 	if (mPSGpuProgram.get() != NULL)
 	{
-		HighLevelGpuProgramManager::getSingleton().remove(mPSGpuProgram->getName());
+		ProgramManager::getSingleton().destroyGpuProgram(mPSGpuProgram->getName());		
 		mPSGpuProgram.setNull();
 	}
 }

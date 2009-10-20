@@ -11,6 +11,7 @@ Sample=Sample_Fresnel_d
 Sample=Sample_Grass_d
 Sample=Sample_Lighting_d
 Sample=Sample_ParticleFX_d
+Sample=Sample_ShaderSystem_d
 Sample=Sample_SkeletalAnimation_d
 Sample=Sample_SkyBox_d
 Sample=Sample_SkyDome_d

@@ -33,6 +33,59 @@
 #define OIS_DYNAMIC_LIB
 #include "OIS/OIS.h"
 
+#ifdef USE_RTSHADER_SYSTEM
+#include "OgreRTShaderSystem.h"
+#endif
+
+
+
+#ifdef USE_RTSHADER_SYSTEM
+
+/** This class demonstrates basic usage of the RTShader system.
+It sub class the material manager listener class and when a target scheme callback
+is invoked with the shader generator scheme it tries to create an equivalent shader
+based technique based on the default technique of the given material.
+*/
+class ShaderGeneratorTechniqueResolverListener : public Ogre::MaterialManager::Listener
+{
+public:
+
+	ShaderGeneratorTechniqueResolverListener(Ogre::RTShader::ShaderGenerator* pShaderGenerator)
+	{
+		mShaderGenerator = pShaderGenerator;			
+	}
+
+	/** This is the hook point where shader based technique will be created.
+	It will be called whenever the material manager won't find appropriate technique
+	that satisfy the target scheme name. If the scheme name is out target RT Shader System
+	scheme name we will try to create shader generated technique for it. 
+	*/
+	virtual Ogre::Technique* handleSchemeNotFound(unsigned short schemeIndex, 
+		const Ogre::String& schemeName, Ogre::Material* originalMaterial, unsigned short lodIndex, 
+		const Ogre::Renderable* rend)
+	{		
+		// Case this is the default shader generator scheme.
+		if (schemeName == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+		{
+			bool techniqueCreated;
+
+			// Create shader generated technique for this material.
+			// Note: Actual material technique and shaders will be generated upon scheme validation within the 
+			// ShaderGenerator::validateScheme method.
+			techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
+				originalMaterial->getName(), 
+				Ogre::MaterialManager::DEFAULT_SCHEME_NAME, 
+				schemeName);				
+		}
+
+		return NULL;
+	}
+
+protected:	
+	Ogre::RTShader::ShaderGenerator*	mShaderGenerator;			// The shader generator instance.		
+};
+#endif
+
 namespace OgreBites
 {
 	/*=============================================================================
@@ -67,6 +120,11 @@ namespace OgreBites
 			mDone = true;
 			mResourcesLoaded = false;
 			mContentSetup = false;
+
+#ifdef USE_RTSHADER_SYSTEM
+			mShaderGenerator	 = NULL;		
+			mMaterialMgrListener = NULL;
+#endif
         }
 
 		virtual ~Sample() {}
@@ -131,6 +189,19 @@ namespace OgreBites
 			locateResources();
 			createSceneManager();
 			setupView();
+
+#ifdef USE_RTSHADER_SYSTEM
+			// Initialize shader generator.
+			// Must be before resource loading in order to allow parsing extended material attributes.
+			bool success = initializeRTShaderSystem(mSceneMgr);
+			if (!success) 
+			{
+				OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND, 
+					"Shader Generator Initialization failed - Core shader libs path not found", 
+					"Sample::_setup");
+			}
+#endif
+
 			loadResources();
 			mResourcesLoaded = true;
 			setupContent();
@@ -143,7 +214,12 @@ namespace OgreBites
 		| Shuts down a sample. Used by the SampleContext class. Do not call directly.
 		-----------------------------------------------------------------------------*/
 		virtual void _shutdown()
+
 		{
+#ifdef USE_RTSHADER_SYSTEM
+			// Finalize the RT Shader System.
+			finalizeRTShaderSystem();
+#endif
 			if (mSceneMgr) mSceneMgr->clearScene();
 			if (mContentSetup) cleanupContent();
 			mContentSetup = false;
@@ -250,7 +326,93 @@ namespace OgreBites
 			{
 				resMgrs.getNext()->unloadUnreferencedResources();
 			}
+		}	
+
+
+#ifdef USE_RTSHADER_SYSTEM
+
+		/*-----------------------------------------------------------------------------
+		| Initialize the RT Shader system.	
+		-----------------------------------------------------------------------------*/
+		virtual bool initializeRTShaderSystem(Ogre::SceneManager* sceneMgr)
+		{			
+			if (Ogre::RTShader::ShaderGenerator::initialize())
+			{
+				mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
+
+				mShaderGenerator->setSceneManager(sceneMgr);
+
+				// Setup core libraries and shader cache path.
+				Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
+				Ogre::StringVector::iterator itGroup = groupVector.begin();
+				Ogre::StringVector::iterator itGroupEnd = groupVector.end();
+				Ogre::String shaderCoreLibsPath;
+				Ogre::String shaderCachePath;
+
+				// Default cache path is current directory;
+				shaderCachePath = "./";
+				for (; itGroup != itGroupEnd; ++itGroup)
+				{
+					Ogre::ResourceGroupManager::LocationList resLocationsList = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(*itGroup);
+					Ogre::ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
+					Ogre::ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
+					bool coreLibsFound = false;
+
+					// Try to find the location of the core shader lib functions and use it
+					// as shader cache path as well - this will reduce the number of generated files
+					// when running from different directories.
+					for (; it != itEnd; ++it)
+					{
+						if ((*it)->archive->getName().find("RTShaderLib") != Ogre::String::npos)
+						{
+							shaderCoreLibsPath = (*it)->archive->getName() + "/";
+							shaderCachePath = shaderCoreLibsPath;
+							coreLibsFound = true;
+							break;
+						}
+					}
+					// Core libs path found in the current group.
+					if (coreLibsFound) 
+						break; 
+				}
+
+				// Core shader libs not found -> shader generating will fail.
+				if (shaderCoreLibsPath.empty())			
+					return false;			
+				
+				// Set shader cache path.
+				mShaderGenerator->setShaderCachePath(shaderCachePath);		
+
+				// Create and register the material manager listener.
+				mMaterialMgrListener = new ShaderGeneratorTechniqueResolverListener(mShaderGenerator);				
+				Ogre::MaterialManager::getSingleton().addListener(mMaterialMgrListener);
+			}
+
+			return true;
 		}
+
+		/*-----------------------------------------------------------------------------
+		| Finalize the RT Shader system.	
+		-----------------------------------------------------------------------------*/
+		virtual void finalizeRTShaderSystem()
+		{
+			// Unregister the material manager listener.
+			if (mMaterialMgrListener != NULL)
+			{			
+				Ogre::MaterialManager::getSingleton().removeListener(mMaterialMgrListener);
+				delete mMaterialMgrListener;
+				mMaterialMgrListener = NULL;
+			}
+
+			// Finalize CRTShader system.
+			if (mShaderGenerator != NULL)
+			{
+				mShaderGenerator->setSceneManager(NULL);
+				Ogre::RTShader::ShaderGenerator::finalize();
+				mShaderGenerator = NULL;
+			}
+		}
+#endif
 
 		Ogre::Root* mRoot;                // OGRE root object
 		Ogre::RenderWindow* mWindow;      // context render window
@@ -266,6 +428,11 @@ namespace OgreBites
 		bool mDone;                       // flag to mark the end of the sample
 		bool mResourcesLoaded;    // whether or not resources have been loaded
 		bool mContentSetup;       // whether or not scene was created
+
+#ifdef USE_RTSHADER_SYSTEM
+		Ogre::RTShader::ShaderGenerator*			mShaderGenerator;			// The Shader generator instance.
+		ShaderGeneratorTechniqueResolverListener*	mMaterialMgrListener;		// Shader generator material manager listener.	
+#endif
     };
 
 	typedef std::set<Sample*, Sample::Comparer> SampleSet;

@@ -378,5 +378,11 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 	return GpuProgramPtr(pGpuProgram);
 }
 
+//-----------------------------------------------------------------------------
+void ProgramManager::destroyGpuProgram(const String& name)
+{	
+	HighLevelGpuProgramManager::getSingleton().remove(name);
+}
+
 }
 }

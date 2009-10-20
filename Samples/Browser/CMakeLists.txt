@@ -27,6 +27,7 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
        ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Grass.a
        ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Lighting.a
        ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_ParticleFX.a
+       ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_ShaderSystem.a
        ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_SkeletalAnimation.a
        ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_SkyBox.a
        ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_SkyDome.a
@@ -66,7 +67,7 @@ if (OGRE_STATIC)
     ${CMAKE_SOURCE_DIR}/Components/Terrain/include
 	${CMAKE_BINARY_DIR}/Samples/include)
 else()
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
 endif()
 
 add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
@@ -252,6 +253,10 @@ if (APPLE)
 		)
 	add_custom_command(TARGET SampleBrowser POST_BUILD
 		COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Sample_ParticleFX.dylib 
+		${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+		)
+	add_custom_command(TARGET SampleBrowser POST_BUILD
+		COMMAND ln ARGS -s -f ${CMAKE_BINARY_DIR}/lib/$(CONFIGURATION)/Sample_ShaderSystem.dylib 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
 		)
 	add_custom_command(TARGET SampleBrowser POST_BUILD

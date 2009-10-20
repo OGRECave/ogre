@@ -163,7 +163,7 @@ void ShaderGenerator::finalize()
 void ShaderGenerator::_finalize()
 {
 	OGRE_LOCK_AUTO_MUTEX
-
+	
 	mCachedRenderStates.clear();
 	
 	// Delete technique entries.
@@ -860,6 +860,21 @@ void ShaderGenerator::serializePassAttributes(MaterialSerializer* ser, SGPass* p
 	ser->endSection(3);		
 }
 
+//-----------------------------------------------------------------------------
+size_t ShaderGenerator::getVertexShaderCount() const
+{
+	// Each programs set contains 1 vertex shader and 1 fragment shader.
+	// Future implementation may hold different count for each type.
+	return mProgramManager->getProgramSetCount();
+}
+
+//-----------------------------------------------------------------------------
+size_t ShaderGenerator::getFragmentShaderCount() const
+{
+	// Each programs set contains 1 vertex shader and 1 fragment shader.
+	// Future implementation may hold different count for each type.
+	return mProgramManager->getProgramSetCount();
+}
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGPass::SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPass)
 {

@@ -340,7 +340,7 @@ material Examples/DynamicCubeMap
 		{
 			texture_unit
 			{
-				# will be filled in at runtime
+				// will be filled in at runtime
 				cubic_texture dyncubemap combinedUVW
 				tex_address_mode clamp
 				env_map cubic_reflection
@@ -534,6 +534,7 @@ material Examples/Flare
 			lighting off
 			scene_blend add
 			depth_write off
+			diffuse vertexcolour
 
 			texture_unit
 			{
@@ -551,6 +552,7 @@ material Examples/Flare2
 			lighting off
 			scene_blend add
 			depth_write off
+			diffuse vertexcolour
 
 			texture_unit
 			{
@@ -568,6 +570,7 @@ material Examples/FlarePointSprite
 			lighting off
 			scene_blend add
 			depth_write off
+			diffuse vertexcolour
 
 			point_sprites on
 			point_size 2
@@ -590,6 +593,7 @@ material Examples/Droplet
 			emissive 0.3 0.3 0.3
 			scene_blend colour_blend
 			depth_write off
+			diffuse vertexcolour
 
 			texture_unit
 			{
@@ -1415,7 +1419,8 @@ material Examples/Aureola
 		{
 			lighting off
 			scene_blend alpha_blend
-			depth_write off
+			depth_write off			
+			diffuse vertexcolour
 			cull_hardware none
 
 			texture_unit
@@ -1545,6 +1550,7 @@ material Examples/LightRibbonTrail
 			lighting off
 			scene_blend add
 			depth_write off
+			diffuse vertexcolour
 
 			texture_unit
 			{

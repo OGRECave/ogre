@@ -290,6 +290,15 @@ public:
 	SGMaterialSerializerListener*	getMaterialSerializerListener();
 
 
+	/** Return the current number of generated vertex shaders. */
+	size_t							getVertexShaderCount			() const;
+
+
+	/** Return the current number of generated fragment shaders. */
+	size_t							getFragmentShaderCount			() const;
+
+
+
 	/// Default material scheme of the shader generator.
 	static String DEFAULT_SCHEME_NAME;
 

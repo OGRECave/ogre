@@ -32,6 +32,10 @@
 #include "SdkTrays.h"
 #include "SdkCameraMan.h"
 
+#ifdef USE_RTSHADER_SYSTEM
+#include "OgreRTShaderSystem.h"
+#endif
+
 namespace OgreBites
 {
 	/*=============================================================================
@@ -107,6 +111,14 @@ namespace OgreBites
 					mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().y));
 					mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));
 				}
+
+#ifdef USE_RTSHADER_SYSTEM
+				if (mRTShaderSystemPanel->isVisible())
+				{
+					mRTShaderSystemPanel->setParamValue(2, Ogre::StringConverter::toString(mShaderGenerator->getVertexShaderCount()));
+					mRTShaderSystemPanel->setParamValue(3, Ogre::StringConverter::toString(mShaderGenerator->getFragmentShaderCount()));
+				}				
+#endif
 			}
 
 			return true;
@@ -213,8 +225,68 @@ namespace OgreBites
 				mWindow->writeContentsToFile(path + Ogre::StringConverter::toString(mRoot->getNextFrameNumber()) + ".jpg");
 			}
 
-			mCameraMan->injectKeyDown(evt);
+#ifdef USE_RTSHADER_SYSTEM		
+			// Toggle schemes.
+			else if (evt.key == OIS::KC_F2)
+			{	
+				Ogre::Viewport* mainVP = mCamera->getViewport();
+				const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
 
+				if (curMaterialScheme == Ogre::MaterialManager::DEFAULT_SCHEME_NAME)
+				{
+					mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+					mRTShaderSystemPanel->setParamValue(0, "On");
+				}
+				else if (curMaterialScheme == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+				{
+					mainVP->setMaterialScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
+					mRTShaderSystemPanel->setParamValue(0, "Off");
+				}														
+			}			
+			// Toggles per pixel per light model.
+			else if (evt.key == OIS::KC_F3)
+			{
+				static bool usePerPixelLighting = true;					
+				Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+				// Remove all global sub render states.
+				renderState->reset();
+
+				if (usePerPixelLighting)
+					mRTShaderSystemPanel->setParamValue(1, "Per pixel");
+				else
+					mRTShaderSystemPanel->setParamValue(1, "Per vertex");
+
+				// Add per pixel lighting sub render state to the global scheme render state.
+				// It will override the default FFP lighting sub render state.
+				if (usePerPixelLighting)
+				{
+					Ogre::RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
+					renderState->addSubRenderState(perPixelLightModel);					
+				}
+				
+				// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
+				mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+				usePerPixelLighting = !usePerPixelLighting;				
+			}	
+
+			else if (evt.key == OIS::KC_F4)   // toggle visibility of even rarer debugging details
+			{
+				if (mRTShaderSystemPanel->getTrayLocation() == TL_NONE)
+				{
+					mTrayMgr->moveWidgetToTray(mRTShaderSystemPanel, TL_TOP, 0);
+					mRTShaderSystemPanel->show();
+				}
+				else
+				{
+					mTrayMgr->removeWidgetFromTray(mRTShaderSystemPanel);
+					mRTShaderSystemPanel->hide();
+				}
+			}
+
+#endif
+
+			mCameraMan->injectKeyDown(evt);
 			return true;
 		}
 
@@ -307,9 +379,35 @@ namespace OgreBites
 			locateResources();
 			createSceneManager();
 			setupView();
-			
-			mTrayMgr = new SdkTrayManager("SampleControls", window, mouse, this);  // create a tray interface
 
+			mTrayMgr = new SdkTrayManager("SampleControls", window, mouse, this);  // create a tray interface
+			
+#ifdef USE_RTSHADER_SYSTEM
+			// Initialize shader generator.
+			// Must be before resource loading in order to allow parsing extended material attributes.
+			bool success = initializeRTShaderSystem(mSceneMgr);
+			if (!success) 
+			{
+				OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND, 
+					"Shader Generator Initialization failed - Core shader libs path not found", 
+					"SdkSample::_setup");
+			}
+
+			Ogre::StringVector rtShaderItems;
+
+			rtShaderItems.clear();
+			rtShaderItems.push_back("RT Shader System");
+			rtShaderItems.push_back("Lighting Model");
+			rtShaderItems.push_back("Generated VS");
+			rtShaderItems.push_back("Generated FS");
+
+			mRTShaderSystemPanel = mTrayMgr->createParamsPanel(TL_TOP, "RTShaderSystemPanel", 200, rtShaderItems);
+			mRTShaderSystemPanel->setParamValue(0, "Off");
+			mRTShaderSystemPanel->setParamValue(1, "Per vertex");
+			mRTShaderSystemPanel->setParamValue(2, "0");
+			mRTShaderSystemPanel->setParamValue(3, "0");			
+#endif
+			
 			loadResources();
 			mResourcesLoaded = true;
 
@@ -331,7 +429,8 @@ namespace OgreBites
 			items.push_back("");
 			items.push_back("Filtering");
 			items.push_back("Poly Mode");
-			mDetailsPanel = mTrayMgr->createParamsPanel(TL_NONE, "DetailsPanel", 180, items);
+
+			mDetailsPanel = mTrayMgr->createParamsPanel(TL_NONE, "DetailsPanel", 200, items);
 			mDetailsPanel->setParamValue(9, "Bilinear");
 			mDetailsPanel->setParamValue(10, "Solid");
 			mDetailsPanel->hide();
@@ -367,12 +466,15 @@ namespace OgreBites
 			mCameraMan = new SdkCameraMan(mCamera);   // create a default camera controller
 		}
 
-		Ogre::Viewport* mViewport;    // main viewport
-		Ogre::Camera* mCamera;        // main camera
-		SdkTrayManager* mTrayMgr;     // tray interface manager
-		SdkCameraMan* mCameraMan;     // basic camera controller
-		ParamsPanel* mDetailsPanel;   // sample details panel
-		bool mCursorWasVisible;       // was cursor visible before dialog appeared
+		Ogre::Viewport* mViewport;    		// main viewport
+		Ogre::Camera* mCamera;        		// main camera
+		SdkTrayManager* mTrayMgr;     		// tray interface manager
+		SdkCameraMan* mCameraMan;     		// basic camera controller
+		ParamsPanel* mDetailsPanel;   		// sample details panel
+#ifdef  USE_RTSHADER_SYSTEM
+		ParamsPanel* mRTShaderSystemPanel;	// RT Shader System info panel.
+#endif
+		bool mCursorWasVisible;				// was cursor visible before dialog appeared
     };
 }
 

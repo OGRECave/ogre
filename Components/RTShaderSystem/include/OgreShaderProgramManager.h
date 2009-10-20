@@ -87,15 +87,14 @@ public:
 	but the implementation stays in this single compilation unit,
 	preventing link errors.
 	*/
-	static ProgramManager*			getSingletonPtr	();
+	static ProgramManager*			getSingletonPtr				();
 
 	/** Acquire GPU programs associated with the given render state and bind them to the pass.
 	@param pass The pass to bind the program to.
 	@param renderState The render state that describes to program that need to be generated.
 	*/
-	void							acquireGpuPrograms		(Pass* pass, RenderState* renderState);
+	void							acquireGpuPrograms			(Pass* pass, RenderState* renderState);
 	
-
 protected:
 
 	//-----------------------------------------------------------------------------
@@ -153,8 +152,14 @@ protected:
 		const String& language,
 		const String& profiles,
 		const String& cachePath);
-	
 
+	/** Destroy a GPU program by name.
+	@param name The name of the program to destroy.
+	*/
+	void			destroyGpuProgram		(const String& name);
+	
+	/** Return the current number of program set. */
+	size_t			getProgramSetCount		() const { return mHashToProgramSetMap.size(); }
 
 protected:
 	NameToProgramMap			mNameToProgramMap;				// Map between a name and shader program.					
@@ -165,6 +170,7 @@ protected:
 private:
 	friend class ProgramSet;
 	friend class RenderState;
+	friend class ShaderGenerator;
 };
 
 /** @} */
