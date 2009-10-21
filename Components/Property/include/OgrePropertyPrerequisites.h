@@ -37,21 +37,8 @@ namespace Ogre
 	typedef GeneralAllocatedObject PropertyAlloc;
 
 }
+// Always static 
+#define _OgrePropertyExport
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(OGRE_STATIC_LIB)
-#	ifdef OGRE_PROPERTY_EXPORTS
-#		define _OgrePropertyExport __declspec(dllexport)
-#	else
-#       if defined( __MINGW32__ )
-#           define _OgrePropertyExport
-#       else
-#    		define _OgrePropertyExport __declspec(dllimport)
-#       endif
-#   endif
-#elif defined ( OGRE_GCC_VISIBILITY )
-#    define _OgrePropertyExport  __attribute__ ((visibility("default")))
-#else
-#	define _OgrePropertyExport
-#endif	// OGRE_WIN32
 
 #endif 

@@ -59,20 +59,8 @@ namespace Ogre
 
 }
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(OGRE_STATIC_LIB)
-#	ifdef OGRE_PAGING_EXPORTS
-#		define _OgrePagingExport __declspec(dllexport)
-#	else
-#       if defined( __MINGW32__ )
-#           define _OgrePagingExport
-#       else
-#    		define _OgrePagingExport __declspec(dllimport)
-#       endif
-#   endif
-#elif defined ( OGRE_GCC_VISIBILITY )
-#    define _OgrePagingExport  __attribute__ ((visibility("default")))
-#else
-#	define _OgrePagingExport
-#endif	// OGRE_WIN32
+// Always static 
+#define _OgrePagingExport
+
 
 #endif 
