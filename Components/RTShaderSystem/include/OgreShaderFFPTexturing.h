@@ -191,7 +191,8 @@ protected:
 												int samplerIndex,
 												const LayerBlendModeEx& blendMode,
 												const int groupOrder, 
-												int& internalCounter);
+												int& internalCounter,
+												const char* targetChannels);
 	
 	/** 
 	Determines the texture coordinates calculation method of the given texture unit state.

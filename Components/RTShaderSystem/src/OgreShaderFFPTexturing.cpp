@@ -462,15 +462,20 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 		colourBlend.source2, colourBlend.colourArg2, 
 		colourBlend.alphaArg2, false, groupOrder, internalCounter);
 
-	// Build colours blend
-	addPSBlendInvocations(psMain, source1, source2, texel, 
-		textureUnitParams->mTextureSamplerIndex,
-		colourBlend, groupOrder, internalCounter);
-
-	// Case we need different alpha channel code.
+	bool needDifferentAlphaBlend = false;
 	if (alphaBlend.operation != colourBlend.operation ||
 		alphaBlend.source1 != colourBlend.source1 ||
 		alphaBlend.source2 != colourBlend.source2)
+		needDifferentAlphaBlend = true;
+
+	// Build colours blend
+	addPSBlendInvocations(psMain, source1, source2, texel, 
+		textureUnitParams->mTextureSamplerIndex,
+		colourBlend, groupOrder, internalCounter, 
+		needDifferentAlphaBlend ? ".rgb" : NULL);
+
+	// Case we need different alpha channel code.
+	if (needDifferentAlphaBlend)
 	{
 		// Build alpha argument for source1.
 		addPSArgumentInvocations(psMain, source1, texel,
@@ -487,7 +492,8 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 		// Build alpha blend
 		addPSBlendInvocations(psMain, source1, source2, texel, 
 			textureUnitParams->mTextureSamplerIndex, 
-			alphaBlend, groupOrder, internalCounter);
+			alphaBlend, groupOrder, internalCounter,
+			".a");
 	}
 	
 	
@@ -568,18 +574,19 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
 										  int samplerIndex,
 										  const LayerBlendModeEx& blendMode,
 										  const int groupOrder, 
-										  int& internalCounter)
+										  int& internalCounter,
+										  const char* targetChannels)
 {
 	FunctionInvocation* curFuncInvocation = NULL;
 	String arg1ParamName = arg1->getName();
 	String arg2ParamName = arg2->getName();
 	String outParamName = mPSOutDiffuse->getName();
 
-	if (blendMode.blendType == LBT_ALPHA)	
+	if (targetChannels != NULL)	
 	{
-		arg1ParamName += ".a";
-		arg2ParamName += ".a";
-		outParamName += ".a";	
+		arg1ParamName += targetChannels;
+		arg2ParamName += targetChannels;
+		outParamName += targetChannels;	
 	}
 	
 
