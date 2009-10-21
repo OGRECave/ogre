@@ -718,6 +718,9 @@ namespace OgreBites
             mPluginNameMap["Sample_Grass"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Grass();
             mPluginNameMap["Sample_Lighting"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Lighting();
             mPluginNameMap["Sample_ParticleFX"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_ParticleFX();
+#if USE_RTSHADER_SYSTEM
+            mPluginNameMap["Sample_ShaderSystem"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystem();
+#endif
             mPluginNameMap["Sample_SkeletalAnimation"]  = (OgreBites::SdkSample *) OGRE_NEW Sample_SkeletalAnimation();
             mPluginNameMap["Sample_SkyBox"]             = (OgreBites::SdkSample *) OGRE_NEW Sample_SkyBox();
             mPluginNameMap["Sample_SkyDome"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_SkyDome();
@@ -848,10 +851,13 @@ namespace OgreBites
 				{
 #ifdef OGRE_STATIC_LIB
                     OgreBites::SdkSample *pluginInstance = (OgreBites::SdkSample *) mPluginNameMap[*i];
-                    OgreBites::SamplePlugin* sp = OGRE_NEW SamplePlugin(pluginInstance->getInfo()["Title"] + " Sample");
+                    if(pluginInstance)
+                    {
+                        OgreBites::SamplePlugin* sp = OGRE_NEW SamplePlugin(pluginInstance->getInfo()["Title"] + " Sample");
 
-                    sp->addSample(pluginInstance);
-					mRoot->installPlugin(sp);
+                        sp->addSample(pluginInstance);
+                        mRoot->installPlugin(sp);
+                    }
 #else
 					mRoot->loadPlugin(sampleDir + *i);
 #endif

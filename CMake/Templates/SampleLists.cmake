@@ -135,26 +135,28 @@ add_subdirectory(SkyBox)
 add_subdirectory(SkyDome)
 add_subdirectory(SkyPlane)
 add_subdirectory(Smoke)
-if (OGRE_Plugin_OctreeSceneManager_FOUND)
+if (OGRE_BUILD_COMPONENT_TERRAIN)
   add_subdirectory(Terrain)
 endif ()
 add_subdirectory(TextureFX)
 add_subdirectory(Transparency)
 
 # Require vertex and fragment shaders
-add_subdirectory(CelShading)
-add_subdirectory(Dot3Bump)
-add_subdirectory(Fresnel)
+if (NOT OGRE_BUILD_RENDERSYSTEM_GLES)
+  add_subdirectory(CelShading)
+  add_subdirectory(Dot3Bump)
+  add_subdirectory(Fresnel)
 
-# Require geometry shaders
-add_subdirectory(Isosurf)
-add_subdirectory(ParticleGS)
+  # Require geometry shaders
+  add_subdirectory(Isosurf)
+  add_subdirectory(ParticleGS)
 
-# Requires 3D textures
-add_subdirectory(VolumeTex)
+  # Requires 3D textures
+  add_subdirectory(VolumeTex)
 
-# Requires cube mapping
-add_subdirectory(Water)
+  # Requires cube mapping
+  add_subdirectory(Water)
+endif()
 
 add_subdirectory(Compositor)
 add_subdirectory(FacialAnimation)
