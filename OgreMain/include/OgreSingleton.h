@@ -62,7 +62,14 @@ namespace Ogre {
     */
     template <typename T> class Singleton
     {
-    protected:
+	private:
+		/** \brief Explicit private copy constructor. This is a forbidden operation.*/
+		Singleton(const Singleton<T> &);
+
+		/** \brief Private operator= . This is a forbidden operation. */
+		Singleton& operator=(const Singleton<T> &);
+    
+	protected:
 
         static T* ms_Singleton;
 
