@@ -22,8 +22,8 @@ This demo source file is in the public domain.
 */
 
 #include "Ogre.h"
-#include "ExampleApplication.h"
-#include "ExampleFrameListener.h"
+#include "SamplePlugin.h"
+#include "SdkSample.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -34,29 +34,52 @@ This demo source file is in the public domain.
 #include "GeomUtils.h"
 #include "SharedData.h"
 
+using namespace Ogre;
+using namespace OgreBites;
+
 template<> SharedData* Singleton<SharedData>::ms_Singleton = 0;
+
 const ColourValue SAMPLE_COLORS[] = 
     {   ColourValue::Red, ColourValue::Green, ColourValue::Blue, 
     ColourValue::White, ColourValue(1,1,0,1), ColourValue(1,0,1,1) };
 
-class RenderToTextureFrameListener : public ExampleFrameListener
+class _OgreSampleClassExport Sample_DeferredShading : public SdkSample, public RenderTargetListener
 {
 protected:
-	Real timeoutDelay ;
-	Vector3 oldCamPos;
-	Quaternion oldCamOri;
+	MovablePlane* mPlane;
+    Entity* mPlaneEnt;
+    SceneNode* mPlaneNode;
+	DeferredShadingSystem *mSystem;
+	SelectMenu* mDisplayModeMenu;
+
 public:
-	RenderToTextureFrameListener(RenderWindow* window, Camera* maincam)
-		:ExampleFrameListener(window, maincam), 
-		oldCamPos(0,0,0), oldCamOri(0,0,0,0)
+    Sample_DeferredShading() : mPlane(0) 
 	{
-		timeoutDelay = 0;
-		mMoveSpeed = 10;
+		mInfo["Title"] = "Deferred Shading";
+		mInfo["Description"] = "A sample implementation of a deferred renderer using the compositor framework.";
+		mInfo["Thumbnail"] = "thumb_deferred.png";
+		mInfo["Category"] = "Unsorted";
+		mInfo["Help"] = "See http://www.ogre3d.org/wiki/index.php/Deferred_Shading for more info";
+	}
+    
+	~Sample_DeferredShading()
+    {
+		
+	}
+
+protected:
+
+	void cleanupContent(void)
+	{
+		delete ( SharedData::getSingletonPtr() );
+
+        delete mPlane;
+		delete mSystem;
 	}
 
 	bool frameRenderingQueued(const FrameEvent& evt)
 	{
-		if( ExampleFrameListener::frameRenderingQueued(evt) == false )
+		if( SdkSample::frameRenderingQueued(evt) == false )
 			return false;
 		SharedData::getSingleton().iLastFrameTime = evt.timeSinceLastFrame;
 
@@ -65,120 +88,68 @@ public:
 		return true;
 	}
 
-	virtual bool processUnbufferedKeyInput(const FrameEvent& evt) {
-		bool retval = ExampleFrameListener::processUnbufferedKeyInput(evt);
-
-		// "C" switch filters
-		if (mKeyboard->isKeyDown(OIS::KC_C) && timeoutDelay==0) 
-		{
-			timeoutDelay = 0.5f;
-
-			DeferredShadingSystem* iSystem = SharedData::getSingleton().iSystem;
-
-			iSystem->setMode(
-				(DeferredShadingSystem::DSMode)
-				((iSystem->getMode() + 1)%DeferredShadingSystem::DSM_COUNT)
-				);
-
-			updateOverlays();
-		}
-
-		// "B" activate/deactivate minilight rendering
-		if (mKeyboard->isKeyDown(OIS::KC_B) && timeoutDelay==0) 
-		{
-			timeoutDelay = 0.5f;
-			SharedData::getSingleton().iActivate = !SharedData::getSingleton().iActivate;
-			// Hide/show all minilights
-			vector<Node*>::type::iterator i = SharedData::getSingleton().mLightNodes.begin();
-			vector<Node*>::type::iterator iend = SharedData::getSingleton().mLightNodes.end();
-			for(; i!=iend; ++i)
-			{
-				static_cast<SceneNode*>(*i)->setVisible(SharedData::getSingleton().iActivate, true);
-			}
-			
-			updateOverlays();
-		}
-		// "G" activate/deactivate global light rendering
-		if (mKeyboard->isKeyDown(OIS::KC_G) && timeoutDelay==0) 
-		{
-			timeoutDelay = 0.5f;
-			SharedData::getSingleton().iGlobalActivate = !SharedData::getSingleton().iGlobalActivate;
-			SharedData::getSingleton().iMainLight->setVisible(SharedData::getSingleton().iGlobalActivate);
-			updateOverlays();
-		}
-
-		// "V" activate/deactivate ssao
-		if (mKeyboard->isKeyDown(OIS::KC_V) && timeoutDelay==0) 
-		{
-			timeoutDelay = 0.5f;
-			bool curMode = SharedData::getSingleton().iSystem->getSSAO();
-			SharedData::getSingleton().iSystem->setSSAO(!curMode);
-			updateOverlays();
-		}
-
-		timeoutDelay -= evt.timeSinceLastFrame;
-		if (timeoutDelay <= 0) timeoutDelay = 0;
-
-		return retval;
-	}
-
-	void updateOverlays() 
+	void setupControls()
 	{
-		OverlayManager::getSingleton().getOverlayElement( "Example/Shadows/ShadowTechniqueInfo" )
-			->setCaption( "" );
+		// make room for the controls
+		mTrayMgr->showLogo(TL_TOPRIGHT);
+		mTrayMgr->showFrameStats(TL_TOPRIGHT);
+		mTrayMgr->toggleAdvancedFrameStats();
 
-		OverlayManager::getSingleton().getOverlayElement( "Example/Shadows/MaterialInfo" )
-			->setCaption( "");
+		// create checkboxs to toggle ssao and shadows
+		mTrayMgr->createCheckBox(TL_TOPLEFT, "SSAO", "Screen space ambient occlusion (2)")->setChecked(false, false);
+		mTrayMgr->createCheckBox(TL_TOPLEFT, "GlobalLight", "Global light (3)")->setChecked(true, false);
+		//mTrayMgr->createCheckBox(TL_TOPLEFT, "Shadows", "Shadows")->setChecked(true, false);
+		
+		// create a menu to choose the model displayed
+		mDisplayModeMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "DisplayMode", "Display Mode (1)", 500, 290, 4);
+		mDisplayModeMenu->addItem("Regular view");
+		mDisplayModeMenu->addItem("Debug colours");
+		mDisplayModeMenu->addItem("Debug normals");
+		mDisplayModeMenu->addItem("Debug depth / specular");
+	}
 
-		OverlayManager::getSingleton().getOverlayElement( "Example/Shadows/ShadowTechnique" )
-			->setCaption( "[B] MiniLights active: " + StringConverter::toString( SharedData::getSingleton().iActivate ) );
+	void itemSelected(SelectMenu* menu)
+	{
+		//Options are aligned with the mode enum
+		SharedData::getSingleton().iSystem->setMode(
+			(DeferredShadingSystem::DSMode)menu->getSelectionIndex());
+	}
 
-		std::string name;
-		switch(SharedData::getSingleton().iSystem->getMode())
+	bool keyPressed (const OIS::KeyEvent &e)
+	{
+		switch (e.key)
 		{
-		case DeferredShadingSystem::DSM_SHOWLIT:
-			name="ShowLit"; break;
-		case DeferredShadingSystem::DSM_SHOWCOLOUR:
-			name="ShowColour"; break;
-		case DeferredShadingSystem::DSM_SHOWNORMALS:
-			name="ShowNormals"; break;
-		case DeferredShadingSystem::DSM_SHOWDSP:
-			name="ShowDepthSpecular"; break;
+		case OIS::KC_1:
+			mDisplayModeMenu->selectItem((mDisplayModeMenu->getSelectionIndex() + 1) % mDisplayModeMenu->getNumItems());
+			break;
+		case OIS::KC_2:
+			(static_cast<CheckBox*>(mTrayMgr->getWidget("SSAO")))->toggle();
+			break;
+		case OIS::KC_3:
+			(static_cast<CheckBox*>(mTrayMgr->getWidget("GlobalLight")))->toggle();
+			break;
 		}
-		OverlayManager::getSingleton().getOverlayElement( "Example/Shadows/Materials" )
-			->setCaption( "[C] Change mode, current is \"" + name  + "\". " +
-			"[V] SSAO on ? " + StringConverter::toString( SharedData::getSingleton().iSystem->getSSAO() ) );
 
-		OverlayManager::getSingleton().getOverlayElement( "Example/Shadows/Info" )
-			->setCaption( "[G] Global lights active: " + StringConverter::toString( SharedData::getSingleton().iGlobalActivate ) );
-
+		return SdkSample::keyPressed(e);
 	}
-};
-
-
-class RenderToTextureApplication : public ExampleApplication, public RenderTargetListener
-{
-public:
-    RenderToTextureApplication() : mPlane(0) {
-		new SharedData();
-		mPlane = 0;
-		mSystem = 0;
+	void checkBoxToggled(CheckBox* box)
+	{
+		if (box->getName() == "SSAO")
+		{
+			SharedData::getSingleton().iSystem->setSSAO(box->isChecked());
+		}
+		else if (box->getName() == "GlobalLight")
+		{
+			SharedData::getSingleton().iGlobalActivate = box->isChecked();
+			SharedData::getSingleton().iMainLight->setVisible(box->isChecked());
+		}
+		//else if (box->getName() == "Shadows")
+		//{
+		//	mSceneMgr->setShadowTechnique(box->isChecked() ? 
+		//		SHADOWTYPE_TEXTURE_ADDITIVE :
+		//		SHADOWTYPE_NONE);
+		//}
 	}
-    
-	~RenderToTextureApplication()
-    {
-		delete ( SharedData::getSingletonPtr() );
-
-        delete mPlane;
-		delete mSystem;
-	}
-
-
-protected:
-    MovablePlane* mPlane;
-    Entity* mPlaneEnt;
-    SceneNode* mPlaneNode;
-	DeferredShadingSystem *mSystem;
 
     //Utility function to help set scene up
     void setEntityHeight(Entity* ent, Real newHeight)
@@ -191,8 +162,13 @@ protected:
     }
 
     // Just override the mandatory create scene method
-    void createScene(void)
+    void setupContent(void)
     {
+		mCameraMan->setTopSpeed(20.0);
+		new SharedData();
+		mPlane = 0;
+		mSystem = 0;
+
 		RenderSystem *rs = Root::getSingleton().getRenderSystem();
 		const RenderSystemCapabilities* caps = rs->getCapabilities();
         if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !(caps->hasCapability(RSC_FRAGMENT_PROGRAM)))
@@ -340,8 +316,8 @@ protected:
         mCamera->lookAt(0,0,0);
 
 		// show overlay
-		Overlay* overlay = OverlayManager::getSingleton().getByName("Example/ShadowsOverlay");    
-		overlay->show();
+		//Overlay* overlay = OverlayManager::getSingleton().getByName("Example/ShadowsOverlay");    
+		//overlay->show();
 
 		mSystem = new DeferredShadingSystem(mWindow->getViewport(0), mSceneMgr, mCamera);
 		SharedData::getSingleton().iSystem = mSystem;
@@ -390,8 +366,12 @@ protected:
 
         mCamera->setFarClipDistance(1000.0);
         mCamera->setNearClipDistance(0.5);
+
+		setupControls();
 	}
 
+	
+	/*
     void createFrameListener(void)
     {
         mFrameListener= new RenderToTextureFrameListener(mWindow, mCamera);
@@ -399,6 +379,7 @@ protected:
 		static_cast<RenderToTextureFrameListener*>(mFrameListener)->updateOverlays();
         mRoot->addFrameListener(mFrameListener);
     }
+	*/
 
 	void createSampleLights()
 	{
@@ -555,39 +536,20 @@ protected:
 
 };
 
+SamplePlugin* sp;
+Sample* s;
 
-
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-//#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-//	INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-//#else
-	int main(int argc, char *argv[])
-//#endif
-	{
-		// Create application object
-		RenderToTextureApplication app;
-
-		try {
-			app.go();
-		} catch( Ogre::Exception& e ) {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-			MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occurred!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
-#else
-			std::cerr << "An exception has occurred: " <<
-				e.getFullDescription().c_str() << std::endl;
-#endif
-		}
-
-		return 0;
-	}
-
-#ifdef __cplusplus
+extern "C" _OgreSampleExport void dllStartPlugin()
+{
+	s = new Sample_DeferredShading;
+	sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
+	sp->addSample(s);
+	Root::getSingleton().installPlugin(sp);
 }
-#endif
 
-
+extern "C" _OgreSampleExport void dllStopPlugin()
+{
+	Root::getSingleton().uninstallPlugin(sp); 
+	OGRE_DELETE sp;
+	delete s;
+}

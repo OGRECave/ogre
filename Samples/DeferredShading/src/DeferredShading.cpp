@@ -75,6 +75,7 @@ DeferredShadingSystem::~DeferredShadingSystem()
 	CompositorChain *chain = CompositorManager::getSingleton().getCompositorChain(mViewport);
 	for(int i=0; i<DSM_COUNT; ++i)
 		chain->_removeInstance(mInstance[i]);
+	CompositorManager::getSingleton().removeCompositorChain(mViewport);
 }
 
 void DeferredShadingSystem::setMode(DSMode mode)
@@ -141,11 +142,17 @@ void DeferredShadingSystem::createResources(void)
 
 	//Hook up the compositor logic and scheme handlers.
 	//This can theoretically happen in a loaded plugin, but in this case the demo contains the code.
-	MaterialManager::getSingleton().addListener(new GBufferSchemeHandler, "GBuffer");
-	MaterialManager::getSingleton().addListener(new NullSchemeHandler, "NoGBuffer");
+	static bool firstTime = true;
+	if (firstTime)
+	{
+		MaterialManager::getSingleton().addListener(new GBufferSchemeHandler, "GBuffer");
+		MaterialManager::getSingleton().addListener(new NullSchemeHandler, "NoGBuffer");
 
-	compMan.registerCompositorLogic("SSAOLogic", new SSAOLogic);
-	compMan.registerCustomCompositionPass("DeferredLight", new DeferredLightCompositionPass);
+		compMan.registerCompositorLogic("SSAOLogic", new SSAOLogic);
+		compMan.registerCustomCompositionPass("DeferredLight", new DeferredLightCompositionPass);
+		firstTime = false;
+	}
+	
 	
 	// Create the main GBuffer compositor
 	mGBufferInstance = compMan.addCompositor(mViewport, "DeferredShading/GBuffer");

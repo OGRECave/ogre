@@ -39,16 +39,22 @@ set(SOURCE_FILES
   src/SSAOLogic.cpp
 )
 
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/DeferredShadingDemo.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-endif ()
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_executable(Demo_DeferredShading ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+add_library(Sample_DeferredShading ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Demo_DeferredShading ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample(Demo_DeferredShading)
+target_link_libraries(Sample_DeferredShading ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+ogre_config_sample(Sample_DeferredShading)
 
-if (SAMPLE_DEPENDENCIES)
-  add_dependencies(Demo_DeferredShading ${SAMPLE_DEPENDENCIES})
-endif ()
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Samples can be installed in the application package
+    set_target_properties(Sample_DeferredShading
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
+
+if (OGRE_STATIC)
+  add_dependencies(SampleBrowser Sample_DeferredShading)
+else ()
+  add_dependencies(Sample_DeferredShading SampleBrowser)
+endif (OGRE_STATIC)
