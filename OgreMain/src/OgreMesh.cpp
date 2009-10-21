@@ -1245,7 +1245,31 @@ namespace Ogre {
 						}
 						
 					}
+				}
 
+				// Update poses (some vertices might have been duplicated)
+				// we will just check which vertices have been split and copy
+				// the offset for the original vertex to the corresponding new vertex
+				PoseIterator pose_it = getPoseIterator();
+
+				while( pose_it.hasMoreElements() )
+				{
+					Pose* current_pose = pose_it.getNext();
+					const Pose::VertexOffsetMap& offset_map = current_pose->getVertexOffsets();
+
+					for( TangentSpaceCalc::VertexSplits::iterator it = res.vertexSplits.begin();
+						it != res.vertexSplits.end(); ++it )
+					{
+						TangentSpaceCalc::VertexSplit& split = *it;
+
+						Pose::VertexOffsetMap::const_iterator found_offset = offset_map.find( split.first );
+
+						// copy the offset
+						if( found_offset != offset_map.end() )
+						{
+							current_pose->addVertex( split.second, found_offset->second );
+						}
+					}
 				}
 			}
 		}
