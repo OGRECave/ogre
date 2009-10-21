@@ -539,6 +539,21 @@ namespace Ogre {
         }
         needUpdate();
     }
+
+	
+	//-----------------------------------------------------------------------
+	void Node::_setDerivedPosition( const Vector3& pos )
+	{
+		//find where the node would end up in parent's local space
+		setPosition( mParent->convertWorldToLocalPosition( pos ) );
+	}
+	//-----------------------------------------------------------------------
+	void Node::_setDerivedOrientation( const Quaternion& q )
+	{
+		//find where the node would end up in parent's local space
+		setOrientation( mParent->convertWorldToLocalOrientation( q ) );
+	}
+
     //-----------------------------------------------------------------------
     const Quaternion & Node::_getDerivedOrientation(void) const
     {
@@ -566,6 +581,43 @@ namespace Ogre {
         }
         return mDerivedScale;
     }
+	//-----------------------------------------------------------------------
+    Vector3 Node::convertWorldToLocalPosition( const Vector3 &worldPos )
+	{
+		if (mNeedParentUpdate)
+        {
+            _updateFromParent();
+        }
+		return mDerivedOrientation.Inverse() * (worldPos - mDerivedPosition) / mDerivedScale;
+	}
+	//-----------------------------------------------------------------------
+	Vector3 Node::convertLocalToWorldPosition( const Vector3 &localPos )
+	{
+		if (mNeedParentUpdate)
+        {
+            _updateFromParent();
+        }
+		return (mDerivedOrientation * localPos * mDerivedScale) + mDerivedPosition;
+	}
+	//-----------------------------------------------------------------------
+	Quaternion Node::convertWorldToLocalOrientation( const Quaternion &worldOrientation )
+	{
+		if (mNeedParentUpdate)
+		{
+			_updateFromParent();
+		}
+		return mDerivedOrientation.Inverse() * worldOrientation;
+	}
+	//-----------------------------------------------------------------------
+	Quaternion Node::convertLocalToWorldOrientation( const Quaternion &localOrientation )
+	{
+		if (mNeedParentUpdate)
+		{
+			_updateFromParent();
+		}
+		return mDerivedOrientation * localOrientation;
+
+	}
     //-----------------------------------------------------------------------
     void Node::removeAllChildren(void)
     {

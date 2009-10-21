@@ -601,8 +601,21 @@ namespace Ogre {
             this parent, potentially to be reattached elsewhere.
         */
         virtual void removeAllChildren(void);
+		
+		/** Sets the final world position of the node directly.
+		@remarks 
+			It's advisable to use the local setPosition if possible
+		*/
+		virtual void _setDerivedPosition(const Vector3& pos);
 
-        /** Gets the orientation of the node as derived from all parents.
+		/** Sets the final world orientation of the node directly.
+		@remarks 
+		It's advisable to use the local setOrientation if possible, this simply does
+		the conversion for you.
+		*/
+		virtual void _setDerivedOrientation(const Quaternion& q);
+
+		/** Gets the orientation of the node as derived from all parents.
         */
         virtual const Quaternion & _getDerivedOrientation(void) const;
 
@@ -671,8 +684,22 @@ namespace Ogre {
             Also resets the cumulative animation weight used for blending.
         */
         virtual const Vector3& getInitialPosition(void) const;
+		
+		/** Gets the local position, relative to this node, of the given world-space position */
+		virtual Vector3 convertWorldToLocalPosition( const Vector3 &worldPos );
 
-        /** Gets the initial orientation of this node, see setInitialState for more info. */
+		/** Gets the world position of a point in the node local space
+			useful for simple transforms that don't require a child node.*/
+		virtual Vector3 convertLocalToWorldPosition( const Vector3 &localPos );
+
+		/** Gets the local orientation, relative to this node, of the given world-space orientation */
+		virtual Quaternion convertWorldToLocalOrientation( const Quaternion &worldOrientation );
+
+		/** Gets the world orientation of an orientation in the node local space
+			useful for simple transforms that don't require a child node.*/
+		virtual Quaternion convertLocalToWorldOrientation( const Quaternion &localOrientation );
+
+		/** Gets the initial orientation of this node, see setInitialState for more info. */
         virtual const Quaternion& getInitialOrientation(void) const;
 
         /** Gets the initial position of this node, see setInitialState for more info. */
