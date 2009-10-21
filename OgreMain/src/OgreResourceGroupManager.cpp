@@ -1752,6 +1752,14 @@ namespace Ogre {
 		return 0;
 	}
     //-----------------------------------------------------------------------
+	bool ResourceGroupManager::resourceExistsInAnyGroup(const String& filename)
+	{
+		ResourceGroup* grp = findGroupContainingResourceImpl(filename);
+		if (!grp)
+			return false;
+		return true;
+	}
+	//-----------------------------------------------------------------------
 	const String& ResourceGroupManager::findGroupContainingResource(const String& filename)
 	{
 		ResourceGroup* grp = findGroupContainingResourceImpl(filename);

@@ -794,6 +794,12 @@ namespace Ogre {
         @param filename Fully qualified name of the file to test for
         */
         bool resourceExists(ResourceGroup* group, const String& filename);
+		
+        /** Find out if the named file exists in any group. 
+        @param filename Fully qualified name of the file to test for
+        */
+        bool resourceExistsInAnyGroup(const String& filename);
+
 		/** Find the group in which a resource exists.
 		@param filename Fully qualified name of the file the resource should be
 			found as
