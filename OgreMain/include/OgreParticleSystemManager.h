@@ -218,6 +218,15 @@ namespace Ogre {
         */
         void removeAllTemplates(bool deleteTemplate = true);
 
+
+        /** Removes all templates that belong to a secific Resource Group from the ParticleSystemManager.
+        @remarks
+            This method removes all templates that belong in a particular resource group from the ParticleSystemManager.
+        @param
+            resourceGroup to delete templates for
+        */
+        void removeTemplatesByResourceGroup(const String& resourceGroup);
+
         /** Create a new particle system template. 
         @remarks
             This method is similar to the addTemplate method, except this just creates a new template

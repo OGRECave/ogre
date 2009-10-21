@@ -1,4 +1,4 @@
-/*
+moveremove/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -259,6 +259,23 @@ namespace Ogre {
 
         mSystemTemplates.clear();
     }
+    //-----------------------------------------------------------------------
+    void ParticleSystemManager::removeTemplatesByResourceGroup(const String& resourceGroup)
+    {
+        OGRE_LOCK_AUTO_MUTEX
+		
+		ParticleTemplateMap::iterator i = mSystemTemplates.begin();
+		while (i != mSystemTemplates.end())
+		{
+			ParticleTemplateMap::iterator icur = i++;
+
+			if(icur->second->getResourceGroupName() == resourceGroup)
+			{
+				delete icur->second;
+				mSystemTemplates.erase(icur);
+			}
+		}    
+	}
     //-----------------------------------------------------------------------
     ParticleSystem* ParticleSystemManager::createTemplate(const String& name, 
         const String& resourceGroup)
