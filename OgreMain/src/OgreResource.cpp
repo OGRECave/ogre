@@ -70,6 +70,13 @@ namespace Ogre
 			{
 				OGRE_LOCK_AUTO_MUTEX
 			}
+
+			LoadingState state = mLoadingState.get();
+			if( state != LOADSTATE_PREPARED && state != LOADSTATE_LOADING && state != LOADSTATE_LOADED )
+			{
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Another thread failed in resource operation",
+					"Resource::prepare");
+			}
 			return;
 		}
 
@@ -126,7 +133,7 @@ namespace Ogre
 
 
 	}
-
+	//---------------------------------------------------------------------
     void Resource::load(bool background)
 	{
 		// Early-out without lock (mitigate perf cost of ensuring loaded)
@@ -138,29 +145,49 @@ namespace Ogre
 
         if (mIsBackgroundLoaded && !background) return;
 
-        // quick check that avoids any synchronisation
-        LoadingState old = mLoadingState.get();
-
-		if ( old == LOADSTATE_PREPARING )
+		// This next section is to deal with cases where 2 threads are fighting over
+		// who gets to prepare / load - this will only usually happen if loading is escalated
+		bool keepChecking = true;
+		LoadingState old;
+		while (keepChecking)
 		{
-			while( mLoadingState.get() == LOADSTATE_PREPARING )
-			{
-				OGRE_LOCK_AUTO_MUTEX
-			}
+			// quick check that avoids any synchronisation
 			old = mLoadingState.get();
-		}
 
-		if (old!=LOADSTATE_UNLOADED && old!=LOADSTATE_PREPARED && old!=LOADSTATE_LOADING) return;
-
-        // atomically do slower check to make absolutely sure,
-        // and set the load state to LOADING
-        if (old==LOADSTATE_LOADING || !mLoadingState.cas(old,LOADSTATE_LOADING))
-		{
-			while( mLoadingState.get() == LOADSTATE_LOADING )
+			if ( old == LOADSTATE_PREPARING )
 			{
-				OGRE_LOCK_AUTO_MUTEX
+				while( mLoadingState.get() == LOADSTATE_PREPARING )
+				{
+					OGRE_LOCK_AUTO_MUTEX
+				}
+				old = mLoadingState.get();
 			}
-			return;
+
+			if (old!=LOADSTATE_UNLOADED && old!=LOADSTATE_PREPARED && old!=LOADSTATE_LOADING) return;
+
+			// atomically do slower check to make absolutely sure,
+			// and set the load state to LOADING
+			if (old==LOADSTATE_LOADING || !mLoadingState.cas(old,LOADSTATE_LOADING))
+			{
+				while( mLoadingState.get() == LOADSTATE_LOADING )
+				{
+					OGRE_LOCK_AUTO_MUTEX
+				}
+
+				LoadingState state = mLoadingState.get();
+				if( state == LOADSTATE_PREPARED || state == LOADSTATE_PREPARING )
+				{
+					// another thread is preparing, loop around
+					continue;
+				}
+				else if( state != LOADSTATE_LOADED )
+				{
+					OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Another thread failed in resource operation",
+						"Resource::load");
+				}
+				return;
+			}
+			keepChecking = false;
 		}
 
 		// Scope lock for actual loading

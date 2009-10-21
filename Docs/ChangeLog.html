@@ -31,6 +31,44 @@ Engine)</p>
 <p class="header" align="center">Change Log</p>
 
 <p class="mainheader">
+    v1.6.4 [Shoggoth] (27 Sept 2009) - Maintenance Release</p>
+ <ul>  
+	<li><b>DirectX:</b>
+		<ul>
+			<li>Fix texture samplers over #8 becoming blank after a device restore</li>
+			<li>Compatibility with August 09 DirectX SDK: dxerr9->dxerr in all cases (works for older versions too)</li>
+		</ul></li>
+	<li><b>OpenGL:</b>
+		<ul>
+			<li>Fix 'invalid enumerant' problem (this time for good) on some cards in GL </li>
+			<li>When locking a sub-area of a pixel buffer, we must remember the original lock area and not just the PixelBox that is returned (which is rebased). 
+				Upload should only upload the area which was locked.</li>
+			<li>Fix a 'new' call that should have been OGRE_NEW in GLSLProgram.</li>
+			<li>Fix a problem in GL when using HardwarePixelBuffer::blit - it wasn't disabling higher texture units which could cause some incorrect results in the FBO rendered version</li>
+		</ul></li>
+	<li>Root::removeFrameListener would queue up removal even if the listener wasn't in the list yet, which could mean if you added it again it would get removed. Now it doesn't queue the removal if the entry isn't in the listener list already.</li>
+	<li>Use PixelUtil::packColour instead of memset to initialise the contents of a null shadow texture. This bug could result in different results on nvidia / ati cards if this texture was floating-point</li>
+	<li>Fix BillboardParticleRenderer calling detachobject() incorrectly.</li>
+	<li>Fix OgreOSXCocoaView causing application crash if you save the window attributes to the preferences</li>
+	<li>Fix leftover texture sampler settings above fixed-function units when switching between shaders using 9+ samplers and fixed-function techniques</li>
+	<li>Fixed some edge-case issues with Resource loading and preparing in multiple threads.</li>
+	<li>Make it unnecessary for the parent directory to be in the search path for platform-specific subfolder includes</li>
+	<li>Correctly trap errors in FreeImage_AllocateT</li>
+	<li>Rearrange CEGUI files to be friendly to layout editor</li>
+	<li>Fix a crash in CompositorChain when incorrectly given a null camera</li>
+	<li>Fix a small memory leak in Pass when shaders were used</li>
+	<li>Thread safety for StringInterface</li>
+	<li>Fix scene_depth_range and shadow_scene_depth_range when using LiSPSM or other ShadowCameraSetup classes that use custom matrices and don't use a 'real' camera position</li>
+	<li>Revert revision 8591, "Early-out optimisations to setMaterialName methods, to reduce their cost if the same material name is used"
+		This actually causes problems with applications that delete & recreate materials with the same name, such as Hikari. Of course, it would be better for those apps to regenerate the material in-place instead of creating a new one but since this was breaking behaviour it needs to be undone in the stable release.</li>
+	<li>Fix edge list memory leak in Mesh if more than one SubMesh had non-triangle geometry</li>
+	<li>FileHandleDataStream: Don't pass 0 to fclose.</li>
+	<li>ZipDataStream: Don't double-close zip files.</li>
+	<li>Fix a bug in RibbonTrail; you couldn't extend the number of chains from the amount that were initially created without problems, the ordering of the elements in mFreeChains was not consistent.</li>
+	<li>
+</ul>
+
+<p class="mainheader">
     v1.6.3 [Shoggoth] (25 July 2009) - Maintenance Release</p>
  <ul>  
  	<li><b>OS X</b>

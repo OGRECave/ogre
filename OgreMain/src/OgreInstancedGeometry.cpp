@@ -1594,6 +1594,7 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	void InstancedGeometry::MaterialBucket::build()
 	{
+		mTechnique = 0;
 		mMaterial = MaterialManager::getSingleton().getByName(mMaterialName);
 		if (mMaterial.isNull())
 		{

@@ -196,10 +196,10 @@ namespace Ogre
 		}
 		else if (oldChains < numChains)
 		{
-			// add new chains, in reverse order to preserve previous ordering (pop_back)
+			// add new chains, at front to preserve previous ordering (pop_back)
 			int count = static_cast<int>(numChains - oldChains);
-			for (size_t i = numChains - 1; count > 0; --i, --count)
-				mFreeChains.push_back(i);
+			for (size_t i = oldChains; i < numChains; ++i)
+				mFreeChains.insert(mFreeChains.begin(), i);
 		}
         resetAllTrails();
 	}

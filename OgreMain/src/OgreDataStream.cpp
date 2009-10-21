@@ -699,8 +699,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void FileHandleDataStream::close(void)
     {
-        fclose(mFileHandle);
-        mFileHandle = 0;
+		if (mFileHandle != 0)
+		{
+			fclose(mFileHandle);
+			mFileHandle = 0;
+		}
     }
     //-----------------------------------------------------------------------
 

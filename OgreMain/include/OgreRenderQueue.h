@@ -231,7 +231,8 @@ namespace Ogre {
         ushort getDefaultRenderablePriority(void) const;
 
         /** Sets the current default queue group, which will be used for all renderable which do not
-            specify which group they wish to be on.
+            specify which group they wish to be on. See the enum RenderQueueGroupID for what kind of
+			values can be used here.
         */
         void setDefaultQueueGroup(uint8 grp);
         

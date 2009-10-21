@@ -331,7 +331,8 @@ namespace Ogre {
             a 3D menu system or such.
         @par
             See RenderQueue for more details.
-        @param queueID Enumerated value of the queue group to use.
+        @param queueID Enumerated value of the queue group to use. See the
+			enum RenderQueueGroupID for what kind of values can be used here.
         */
         virtual void setRenderQueueGroup(uint8 queueID);
 
