@@ -85,6 +85,13 @@ public:
 	*/
 	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
+
+	/** 
+	@see SubRenderState::preRemoveFromRenderState.
+	*/
+	virtual void			preRemoveFromRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass);
+
+
 	/** 
 	Set the index of the input vertex shader texture coordinate set 
 	*/

@@ -1040,12 +1040,28 @@ void ShaderGenerator::SGTechnique::createSGPasses()
 ShaderGenerator::SGTechnique::~SGTechnique()
 {
 	const String& materialName = mParent->getMaterialName();
-	
-	// Remove the destination technique from parent material.
+		
 	if (MaterialManager::getSingleton().resourceExists(materialName))
 	{
 		MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName);
+	
+		// Do per pass cleanup.
+		for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
+		{
+			SGPass*		 curPassEntry = *itPass;
+			RenderState* renderState  = curPassEntry->getFinalRenderState();
+			const SubRenderStateList& subRenderStateList = renderState->getSubStateList();
 
+			// Let sub render states do some cleanup on the source and destination passes.	
+			for (SubRenderStateConstIterator it=subRenderStateList.begin(); it != subRenderStateList.end(); ++it)
+			{
+				SubRenderState* curSubRenderState = *it;
+
+				curSubRenderState->preRemoveFromRenderState(renderState, curPassEntry->getSrcPass(), curPassEntry->getDstPass());
+			}		
+		}		
+	
+		// Remove the destination technique from parent material.
 		for (unsigned int i=0; i < mat->getNumTechniques(); ++i)
 		{
 			if (mDstTechnique == mat->getTechnique(i))

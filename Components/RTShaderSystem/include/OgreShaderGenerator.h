@@ -362,6 +362,9 @@ protected:
 		/** Get custom render state of this pass. */
 		RenderState*	getCustomRenderState		() { return mCustomRenderState; }
 
+		/** Get the final render state of this pass. */
+		RenderState*	getFinalRenderState			() { return mFinalRenderState.get(); }
+
 		/** Set the custom render state of this pass. */
 		void			setCustomRenderState		(RenderState* customRenderState) { mCustomRenderState = customRenderState; }
 

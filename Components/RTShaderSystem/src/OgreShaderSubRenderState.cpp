@@ -55,7 +55,8 @@ uint32 SubRenderState::getHashCode()
 //-----------------------------------------------------------------------
 SubRenderStateFactory::~SubRenderStateFactory()
 {
-	destroyAllInstances();
+	assert(mSubRenderStateList.size() == 0 &&
+		"SubRenderStateFactory::~SubRenderStateFactory -> Sub render states still exists !!!");
 }
 
 //-----------------------------------------------------------------------

@@ -633,10 +633,7 @@ namespace Ogre {
 		for (i = mPasses.begin(); i != iend; ++i)
 		{
 			(*i)->_unload();
-		}
-
-		// Clear user object bindings.
-		mUserObjectBindings.clear();
+		}	
     }
     //-----------------------------------------------------------------------------
     bool Technique::isLoaded(void) const

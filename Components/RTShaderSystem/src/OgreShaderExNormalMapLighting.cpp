@@ -1226,6 +1226,13 @@ bool NormalMapLighting::preAddToRenderState(RenderState* renderState, Pass* srcP
 }
 
 //-----------------------------------------------------------------------
+void NormalMapLighting::preRemoveFromRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass) 
+{	
+	// Erase the normal map texture association.
+	srcPass->getUserObjectBindings().eraseUserAny(NormalMapLighting::NormalMapTextureNameKey);	
+}
+
+//-----------------------------------------------------------------------
 void NormalMapLighting::setLightCount(const int lightCount[3])
 {
 	for (int type=0; type < 3; ++type)

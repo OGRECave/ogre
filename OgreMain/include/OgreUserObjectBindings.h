@@ -86,6 +86,11 @@ namespace Ogre {
 		*/
 		const Any& getUserAny(const String& key) const;
 
+		/** Erase the custom user object associated with this class and key from this binding.
+		@param key The key that the requested user object is associated with.		
+		*/
+		void eraseUserAny(const String& key);
+
 		/** Clear all user objects from this binding.	*/
 		void clear() const;
 

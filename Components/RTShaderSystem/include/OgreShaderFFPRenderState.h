@@ -98,7 +98,7 @@ enum FFPShaderStage
 #define FFP_FUNC_LIGHT_SPOT_DIFFUSESPECULAR			"FFP_Light_Spot_DiffuseSpecular"
 
 // Fixed Function Library: Texturing functions
-#define FFP_LIB_TEXTURESTAGE						"FFPLib_Texturing"
+#define FFP_LIB_TEXTURING							"FFPLib_Texturing"
 #define FFP_FUNC_TRANSFORM_TEXCOORD					"FFP_TransformTexCoord"
 #define FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL		"FFP_GenerateTexCoord_EnvMap_Normal"
 #define FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE		"FFP_GenerateTexCoord_EnvMap_Sphere"

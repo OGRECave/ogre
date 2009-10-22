@@ -276,9 +276,9 @@ bool FFPTexturing::resolveDependencies(ProgramSet* programSet)
 	Program* psProgram = programSet->getCpuFragmentProgram();
 
 	vsProgram->addDependency(FFP_LIB_COMMON);
-	vsProgram->addDependency(FFP_LIB_TEXTURESTAGE);	
+	vsProgram->addDependency(FFP_LIB_TEXTURING);	
 	psProgram->addDependency(FFP_LIB_COMMON);
-	psProgram->addDependency(FFP_LIB_TEXTURESTAGE);
+	psProgram->addDependency(FFP_LIB_TEXTURING);
 
 	return true;
 }

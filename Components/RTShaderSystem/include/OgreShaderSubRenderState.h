@@ -121,8 +121,18 @@ public:
 	@param srcPass The source pass.
 	@param dstPass The destination pass.
 	*/
-	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass) { return true;}
+	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass) { return true; }
 
+	/** Called before removing this sub render state from the given render state.
+	Allows this sub render state class to cleanup extra attributes it added before to source/destination pass.
+	This stage is important especially in the context of memory allocation. Every allocation made by this class
+	and binded to one or both of these passes should be freed here, otherwise memory deallocation might occur in other context and
+	will cause the system to crash.	
+	@param renderState The target render state container this sub render state is about to be removed from.	
+	@param srcPass The source pass.
+	@param dstPass The destination pass.
+	*/
+	virtual void			preRemoveFromRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass) {}
 // Protected methods
 protected:
 

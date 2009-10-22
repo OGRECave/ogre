@@ -101,6 +101,22 @@ namespace Ogre {
 	}
 
 	//-----------------------------------------------------------------------
+	void UserObjectBindings::eraseUserAny(const String& key)
+	{
+		// Case attributes and map allocated.
+		if (mAttributes != NULL && mAttributes->mpUserObjectsMap != NULL)
+		{
+			UserObjectsMapIterator it = mAttributes->mpUserObjectsMap->find(key);
+
+			// Case object found -> erase it from the map.
+			if (it != mAttributes->mpUserObjectsMap->end())
+			{
+				mAttributes->mpUserObjectsMap->erase(it);
+			}
+		}
+	}
+
+	//-----------------------------------------------------------------------
 	void UserObjectBindings::clear() const
 	{
 		if (mAttributes != NULL)
