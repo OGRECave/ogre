@@ -26,10 +26,11 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __MemoryNedAlloc_H__
-#define __MemoryNedAlloc_H__
 
-#if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_NED
+#ifndef __MemoryNedPooling_H__
+#define __MemoryNedPooling_H__
+
+#if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_NEDPOOLING
 
 namespace Ogre
 {
@@ -41,7 +42,7 @@ namespace Ogre
 	*/
 	/** Non-templated utility class just to hide nedmalloc.
 	*/
-	class _OgreExport NedAllocImpl
+	class _OgreExport NedPoolingImpl
 	{
 	public:
 		static void* allocBytes(size_t count, 
@@ -61,26 +62,27 @@ namespace Ogre
 	This allocation policy uses nedmalloc 
 		(http://nedprod.com/programs/portable/nedmalloc/index.html). 
 	*/
-	class _OgreExport NedAllocPolicy
+	class _OgreExport NedPoolingPolicy
 	{
 	public:
 		static inline void* allocateBytes(size_t count, 
 			const char* file = 0, int line = 0, const char* func = 0)
 		{
-			return NedAllocImpl::allocBytes(count, file, line, func);
+			return NedPoolingImpl::allocBytes(count, file, line, func);
 		}
 		static inline void deallocateBytes(void* ptr)
 		{
-			NedAllocImpl::deallocBytes(ptr);
+			NedPoolingImpl::deallocBytes(ptr);
 		}
 		/// Get the maximum size of a single allocation
 		static inline size_t getMaxAllocationSize()
 		{
 			return std::numeric_limits<size_t>::max();
 		}
+
 	private:
 		// No instantiation
-		NedAllocPolicy()
+		NedPoolingPolicy()
 		{ }
 	};
 
@@ -98,7 +100,7 @@ namespace Ogre
 		platform dependent alignment.
 	*/
 	template <size_t Alignment = 0>
-	class NedAlignedAllocPolicy
+	class NedPoolingAlignedPolicy
 	{
 	public:
 		// compile-time check alignment is available.
@@ -108,12 +110,12 @@ namespace Ogre
 		static inline void* allocateBytes(size_t count, 
 			const char* file = 0, int line = 0, const char* func = 0)
 		{
-			return NedAllocImpl::allocBytesAligned(Alignment, count, file, line, func);
+			return NedPoolingImpl::allocBytesAligned(Alignment, count, file, line, func);
 		}
 
 		static inline void deallocateBytes(void* ptr)
 		{
-			NedAllocImpl::deallocBytesAligned(Alignment, ptr);
+			NedPoolingImpl::deallocBytesAligned(Alignment, ptr);
 		}
 
 		/// Get the maximum size of a single allocation
@@ -123,9 +125,10 @@ namespace Ogre
 		}
 	private:
 		// no instantiation allowed
-		NedAlignedAllocPolicy()
+		NedPoolingAlignedPolicy()
 		{ }
 	};
+
 
 
 
@@ -136,5 +139,5 @@ namespace Ogre
 
 #endif 
 
-#endif // __MemoryNedAlloc_H__
+#endif // __MemoryNedPooling_H__
 

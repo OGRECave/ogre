@@ -186,11 +186,12 @@ option(OGRE_BUILD_TESTS "Build the unit tests & PlayPen" FALSE)
 #  2 - Exceptions in debug and release"
 #)
 option(OGRE_CONFIG_DOUBLE "Use doubles instead of floats in Ogre" FALSE)
-set(OGRE_CONFIG_ALLOCATOR 2 CACHE STRING
+set(OGRE_CONFIG_ALLOCATOR 4 CACHE STRING
 "Specify the memory allocator to use. Possible values:
   1 - Standard allocator
   2 - nedmalloc
-  3 - User-provided allocator"
+  3 - User-provided allocator
+  4 - nedmalloc with pooling"
 )
 option(OGRE_CONFIG_CONTAINERS_USE_CUSTOM_ALLOCATOR "STL containers in Ogre use the custom allocator" TRUE)
 option(OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR "Ogre String uses the custom allocator" FALSE)

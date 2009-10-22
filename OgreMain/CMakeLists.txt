@@ -117,6 +117,7 @@ set (HEADER_FILES
   include/OgreMemoryAllocatedObject.h
   include/OgreMemoryAllocatorConfig.h
   include/OgreMemoryNedAlloc.h
+  include/OgreMemoryNedPooling.h
   include/OgreMemoryStdAlloc.h
   include/OgreMemorySTLAllocator.h
   include/OgreMemoryTracker.h
@@ -336,6 +337,7 @@ set (SOURCE_FILES
   src/OgreMatrix4.cpp
   src/OgreMemoryAllocatedObject.cpp
   src/OgreMemoryNedAlloc.cpp
+  src/OgreMemoryNedPooling.cpp
   src/OgreMemoryTracker.cpp
   src/OgreMesh.cpp
   src/OgreMeshManager.cpp
