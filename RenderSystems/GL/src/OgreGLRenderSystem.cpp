@@ -3381,6 +3381,17 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		if (mCurrentFragmentProgram)
 			mCurrentFragmentProgram->unbindProgram();
 
+		// Disable lights
+		for (unsigned short i = 0; i < mCurrentLights; ++i)
+		{
+			setGLLight(i, NULL);
+			mLights[i] = NULL;
+		}
+		mCurrentLights = 0;
+
+		// Disable textures
+		_disableTextureUnitsFrom(0);
+
 		// It's ready for switching
 		if (mCurrentContext)
 			mCurrentContext->endCurrent();
