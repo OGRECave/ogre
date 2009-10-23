@@ -1660,12 +1660,15 @@ namespace Ogre {
 
 
         // Get buffers for source
-        HardwareVertexBufferSharedPtr srcPosBuf, srcNormBuf, srcIdxBuf, srcWeightBuf;
-        srcPosBuf = sourceVertexData->vertexBufferBinding->getBuffer(srcElemPos->getSource());
+        HardwareVertexBufferSharedPtr srcPosBuf = sourceVertexData->vertexBufferBinding->getBuffer(srcElemPos->getSource());
+		HardwareVertexBufferSharedPtr srcIdxBuf = sourceVertexData->vertexBufferBinding->getBuffer(srcElemBlendIndices->getSource());
+		HardwareVertexBufferSharedPtr srcWeightBuf = sourceVertexData->vertexBufferBinding->getBuffer(srcElemBlendWeights->getSource());
+		HardwareVertexBufferSharedPtr srcNormBuf;
+
         srcPosStride = srcPosBuf->getVertexSize();
-        srcIdxBuf = sourceVertexData->vertexBufferBinding->getBuffer(srcElemBlendIndices->getSource());
+        
         blendIdxStride = srcIdxBuf->getVertexSize();
-        srcWeightBuf = sourceVertexData->vertexBufferBinding->getBuffer(srcElemBlendWeights->getSource());
+        
         blendWeightStride = srcWeightBuf->getVertexSize();
         if (includeNormals)
         {
@@ -1673,8 +1676,8 @@ namespace Ogre {
             srcNormStride = srcNormBuf->getVertexSize();
         }
         // Get buffers for target
-        HardwareVertexBufferSharedPtr destPosBuf, destNormBuf;
-        destPosBuf = targetVertexData->vertexBufferBinding->getBuffer(destElemPos->getSource());
+        HardwareVertexBufferSharedPtr destPosBuf = targetVertexData->vertexBufferBinding->getBuffer(destElemPos->getSource());
+		HardwareVertexBufferSharedPtr destNormBuf;
         destPosStride = destPosBuf->getVertexSize();
         if (includeNormals)
         {

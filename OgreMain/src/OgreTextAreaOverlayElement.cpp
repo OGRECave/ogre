@@ -165,7 +165,7 @@ namespace Ogre {
 
 		mRenderOp.vertexData->vertexCount = charlen * 6;
 		// Get position / texcoord buffer
-		HardwareVertexBufferSharedPtr vbuf = 
+		const HardwareVertexBufferSharedPtr& vbuf = 
 			mRenderOp.vertexData->vertexBufferBinding->getBuffer(POS_TEX_BINDING);
 		pVert = static_cast<float*>(
 			vbuf->lock(HardwareBuffer::HBL_DISCARD) );
