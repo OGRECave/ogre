@@ -511,6 +511,11 @@ namespace Ogre {
 		}
 		return (grp->groupStatus == ResourceGroup::LOADED);
     }
+	//-----------------------------------------------------------------------
+	bool ResourceGroupManager::resourceGroupExists(const String& name)
+	{
+		return getResourceGroup(name) ? true : false;
+	}
     //-----------------------------------------------------------------------
     bool ResourceGroupManager::resourceLocationExists(const String& name, 
         const String& resGroup)

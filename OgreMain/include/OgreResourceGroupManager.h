@@ -593,6 +593,11 @@ namespace Ogre {
 		*/
 		bool isResourceGroupLoaded(const String& name);
 
+		/*** Verify if a resource group exists
+		@param name The name of the resource group to look for
+		*/
+		bool resourceGroupExists(const String& name);
+
         /** Method to add a resource location to for a given resource group. 
         @remarks
             Resource locations are places which are searched to load resource files.
