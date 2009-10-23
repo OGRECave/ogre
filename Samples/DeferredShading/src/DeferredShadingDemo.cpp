@@ -161,103 +161,37 @@ protected:
         parentNode->setScale(scaleFactor, scaleFactor, scaleFactor);
     }
 
-    // Just override the mandatory create scene method
-    void setupContent(void)
-    {
-		mCameraMan->setTopSpeed(20.0);
-		new SharedData();
-		mPlane = 0;
-		mSystem = 0;
-
-		RenderSystem *rs = Root::getSingleton().getRenderSystem();
-		const RenderSystemCapabilities* caps = rs->getCapabilities();
-        if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !(caps->hasCapability(RSC_FRAGMENT_PROGRAM)))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support vertex and fragment programs, so cannot "
-                "run this demo. Sorry!", 
-                "DeferredShading::createScene");
-        }
-		if (caps->getNumMultiRenderTargets()<2)
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support at least two simultaneous render targets, so cannot "
-                "run this demo. Sorry!", 
-                "DeferredShading::createScene");
-        }
-
+	void createAtheneScene(SceneNode* rootNode)
+	{
 		// Prepare athene mesh for normalmapping
         MeshPtr pAthene = MeshManager::getSingleton().load("athene.mesh", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         unsigned short src, dest;
         if (!pAthene->suggestTangentVectorBuildParams(VES_TANGENT, src, dest))
             pAthene->buildTangentVectors(VES_TANGENT, src, dest);
+
+		//Create an athena statue
+        Entity* athena = mSceneMgr->createEntity("Athena", "athene.mesh");
+		athena->setMaterialName("DeferredDemo/DeferredAthena");
+		SceneNode *aNode = rootNode->createChildSceneNode();
+		aNode->attachObject( athena );
+		aNode->setPosition(-8.5, 4.5, 0);
+        setEntityHeight(athena, 4.0);
+        aNode->yaw(Ogre::Degree(90));
+		// Create some happy little lights to decorate the athena statue
+		createSampleLights();
+	}
+
+	void createKnotScene(SceneNode* rootNode)
+	{
 		// Prepare knot mesh for normal mapping
-		pAthene = MeshManager::getSingleton().load("knot.mesh", 
+		MeshPtr pKnot = MeshManager::getSingleton().load("knot.mesh", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        if (!pAthene->suggestTangentVectorBuildParams(VES_TANGENT, src, dest))
-            pAthene->buildTangentVectors(VES_TANGENT, src, dest);
+		unsigned short src, dest;
+        if (!pKnot->suggestTangentVectorBuildParams(VES_TANGENT, src, dest))
+            pKnot->buildTangentVectors(VES_TANGENT, src, dest);
 
-        // Set ambient light
-        mSceneMgr->setAmbientLight(ColourValue(0.15, 0.00, 0.00));
-        // Skybox
-        mSceneMgr->setSkyBox(true, "DeferredDemo/SkyBox", 500);
-        // Create main, static light
-		Light* l1 = mSceneMgr->createLight();
-        l1->setType(Light::LT_DIRECTIONAL);
-        l1->setDiffuseColour(0.5f, 0.45f, 0.1f);
-		l1->setDirection(1, -0.5, -0.2);
-		l1->setShadowFarClipDistance(250);
-		l1->setShadowFarDistance(75);
-		//Turn this on to have the directional light cast shadows
-		l1->setCastShadows(false);
-
-		// Create "root" node
-		SceneNode* rootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-
-        // Create the cathedral - this will be the static scene
-		Entity* cathedralEnt = mSceneMgr->createEntity("Cathedral", "sibenik.mesh");
-        SceneNode* cathedralNode = rootNode->createChildSceneNode();
-        cathedralNode->attachObject(cathedralEnt);
-        //cathedralNode->scale(10, 20, 20);
-		
-        // Create ogre heads to decorate the wall
-		Entity* ogreHead = mSceneMgr->createEntity("Head", "ogrehead.mesh");
-		//rootNode->createChildSceneNode( "Head" )->attachObject( ogreHead );
-        Vector3 headStartPos[2] = { Vector3(25.25,11,3), Vector3(25.25,11,-3) };
-        Vector3 headDiff(-3.7,0,0);
-        for (int i=0; i < 12; i++) 
-        {
-            char cloneName[16];
-			sprintf(cloneName, "OgreHead%d", i);
-            Entity* cloneHead = ogreHead->clone(cloneName);
-            Vector3 clonePos = headStartPos[i%2] + headDiff*(i/2);
-            if ((i/2) >= 4) clonePos.x -= 0.75;
-			SceneNode* cloneNode = rootNode->createChildSceneNode(clonePos);
-            cloneNode->attachObject(cloneHead);
-            setEntityHeight(cloneHead, 1.5);
-            if (i % 2 == 0)
-            {
-                cloneNode->yaw(Degree(180));
-            }
-        }
-
-
-        // Create a pile of wood pallets
-        Entity* woodPallet = mSceneMgr->createEntity("Pallet", "WoodPallet.mesh");
-        Vector3 woodStartPos(10, 0.5, -5.5);
-        Vector3 woodDiff(0, 0.3, 0);
-        for (int i=0; i < 5; i++)
-        {
-            char cloneName[16];
-			sprintf(cloneName, "WoodPallet%d", i);
-            Entity* clonePallet = woodPallet->clone(cloneName);
-            Vector3 clonePos = woodStartPos + woodDiff*i;
-			SceneNode* cloneNode = rootNode->createChildSceneNode(clonePos);
-            cloneNode->attachObject(clonePallet);
-            setEntityHeight(clonePallet, 0.3);
-            cloneNode->yaw(Degree(i*20));
-        }
-
-        // Create a bunch of knots
+		// Create a bunch of knots with spotlights hanging from above
 		Entity* knotEnt = mSceneMgr->createEntity("Knot", "knot.mesh");
 		knotEnt->setMaterialName("DeferredDemo/RockWall");
 		//knotEnt->setMeshLodBias(0.25f);
@@ -285,78 +219,98 @@ protected:
             knotLight->setSpotlightRange(Degree(25), Degree(45), 1);
             knotLight->setAttenuation(6, 1, 0.2, 0);
         }
+	}
+
+	void createObjects(SceneNode* rootNode)
+	{
+		// Create ogre heads to decorate the wall
+		Entity* ogreHead = mSceneMgr->createEntity("Head", "ogrehead.mesh");
+		//rootNode->createChildSceneNode( "Head" )->attachObject( ogreHead );
+        Vector3 headStartPos[2] = { Vector3(25.25,11,3), Vector3(25.25,11,-3) };
+        Vector3 headDiff(-3.7,0,0);
+        for (int i=0; i < 12; i++) 
+        {
+            char cloneName[16];
+			sprintf(cloneName, "OgreHead%d", i);
+            Entity* cloneHead = ogreHead->clone(cloneName);
+            Vector3 clonePos = headStartPos[i%2] + headDiff*(i/2);
+            if ((i/2) >= 4) clonePos.x -= 0.75;
+			SceneNode* cloneNode = rootNode->createChildSceneNode(clonePos);
+            cloneNode->attachObject(cloneHead);
+            setEntityHeight(cloneHead, 1.5);
+            if (i % 2 == 0)
+            {
+                cloneNode->yaw(Degree(180));
+            }
+        }
+
+		// Create a pile of wood pallets
+        Entity* woodPallet = mSceneMgr->createEntity("Pallet", "WoodPallet.mesh");
+        Vector3 woodStartPos(10, 0.5, -5.5);
+        Vector3 woodDiff(0, 0.3, 0);
+        for (int i=0; i < 5; i++)
+        {
+            char cloneName[16];
+			sprintf(cloneName, "WoodPallet%d", i);
+            Entity* clonePallet = woodPallet->clone(cloneName);
+            Vector3 clonePos = woodStartPos + woodDiff*i;
+			SceneNode* cloneNode = rootNode->createChildSceneNode(clonePos);
+            cloneNode->attachObject(clonePallet);
+            setEntityHeight(clonePallet, 0.3);
+            cloneNode->yaw(Degree(i*20));
+        }
+
+	}
+
+    // Just override the mandatory create scene method
+    void setupContent(void)
+    {
+		mCameraMan->setTopSpeed(20.0);
+		new SharedData();
+		mPlane = 0;
+		mSystem = 0;
+
+		RenderSystem *rs = Root::getSingleton().getRenderSystem();
+		const RenderSystemCapabilities* caps = rs->getCapabilities();
+        if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !(caps->hasCapability(RSC_FRAGMENT_PROGRAM)))
+        {
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support vertex and fragment programs, so cannot "
+                "run this demo. Sorry!", 
+                "DeferredShading::createScene");
+        }
+		if (caps->getNumMultiRenderTargets()<2)
+        {
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support at least two simultaneous render targets, so cannot "
+                "run this demo. Sorry!", 
+                "DeferredShading::createScene");
+        }
+
 		
-		// Add a whole bunch of extra entities to fill the scene a bit
-		//Entity *cloneEnt;
-		//int N=4;
-		//for (int n = 0; n < N; ++n)
-		//{
-		//	float theta = 2.0f*Math::PI*(float)n/(float)N;
-		//	// Create a new node under the root
-		//	SceneNode* node = mSceneMgr->createSceneNode();
-		//	// Random translate
-		//	Vector3 nodePos;
-		//	nodePos.x = Math::SymmetricRandom() * 40.0 + Math::Sin(theta) * 500.0;
-		//	nodePos.y = Math::SymmetricRandom() * 20.0 - 40.0;
-		//	nodePos.z = Math::SymmetricRandom() * 40.0 + Math::Cos(theta) * 500.0;
-		//	node->setPosition(nodePos);
-		//	Quaternion orientation(Math::SymmetricRandom(),Math::SymmetricRandom(),Math::SymmetricRandom(),Math::SymmetricRandom());
-		//	orientation.normalise();
-		//	node->setOrientation(orientation);
-		//	rootNode->addChild(node);
-		//	// Clone knot
-		//	char cloneName[12];
-		//	sprintf(cloneName, "Knot%d", n);
-		//	cloneEnt = knotEnt->clone(cloneName);
-		//	// Attach to new node
-		//	node->attachObject(cloneEnt);
-		//}
 
-        mCamera->setPosition(25, 5, 0);
+        // Set ambient light
+        mSceneMgr->setAmbientLight(ColourValue(0.15, 0.00, 0.00));
+        // Skybox
+        mSceneMgr->setSkyBox(true, "DeferredDemo/SkyBox", 500);
+        // Create main, static light
+		Light* l1 = mSceneMgr->createLight();
+        l1->setType(Light::LT_DIRECTIONAL);
+        l1->setDiffuseColour(0.5f, 0.45f, 0.1f);
+		l1->setDirection(1, -0.5, -0.2);
+		l1->setShadowFarClipDistance(250);
+		l1->setShadowFarDistance(75);
+		//Turn this on to have the directional light cast shadows
+		l1->setCastShadows(false);
+		
+		mCamera->setPosition(25, 5, 0);
         mCamera->lookAt(0,0,0);
-
-		// show overlay
-		//Overlay* overlay = OverlayManager::getSingleton().getByName("Example/ShadowsOverlay");    
-		//overlay->show();
+		mCamera->setFarClipDistance(1000.0);
+        mCamera->setNearClipDistance(0.5);
 
 		mSystem = new DeferredShadingSystem(mWindow->getViewport(0), mSceneMgr, mCamera);
 		SharedData::getSingleton().iSystem = mSystem;
 		mSystem->initialize();
         
-        
-		//// Create a track for the light
-  //      Animation* anim = mSceneMgr->createAnimation("LightTrack", 16);
-  //      // Spline it for nice curves
-  //      anim->setInterpolationMode(Animation::IM_SPLINE);
-  //      // Create a track to animate the camera's node
-  //      NodeAnimationTrack* track = anim->createNodeTrack(0, lightNode);
-  //      // Setup keyframes
-  //      TransformKeyFrame* key = track->createNodeKeyFrame(0); // A start position
-  //      key->setTranslate(Vector3(300,300,-300));
-  //      key = track->createNodeKeyFrame(4);//B
-  //      key->setTranslate(Vector3(300,300,300));
-  //      key = track->createNodeKeyFrame(8);//C
-  //      key->setTranslate(Vector3(-300,300,300));
-  //      key = track->createNodeKeyFrame(12);//D
-  //      key->setTranslate(Vector3(-300,300,-300));
-		//key = track->createNodeKeyFrame(16);//D
-  //      key->setTranslate(Vector3(300,300,-300));
-  //      // Create a new animation state to track this
-  //      SharedData::getSingleton().mAnimState = mSceneMgr->createAnimationState("LightTrack");
-  //      SharedData::getSingleton().mAnimState->setEnabled(true);
-
-        //Create an athena statue
-        Entity* athena = mSceneMgr->createEntity("Athena", "athene.mesh");
-		athena->setMaterialName("DeferredDemo/DeferredAthena");
-		SceneNode *aNode = rootNode->createChildSceneNode();
-		aNode->attachObject( athena );
-		aNode->setPosition(-8.5, 4.5, 0);
-        setEntityHeight(athena, 4.0);
-        aNode->yaw(Ogre::Degree(90));
-		// Create some happy little lights to decorate the athena statue
-		createSampleLights();
-
-		// safely setup application's (not postfilter!) shared data
+        // safely setup application's (not postfilter!) shared data
 		SharedData::getSingleton().iCamera = mCamera;
 		SharedData::getSingleton().iRoot = mRoot;
 		SharedData::getSingleton().iWindow = mWindow;
@@ -364,22 +318,21 @@ protected:
 		SharedData::getSingleton().iGlobalActivate = true;
 		SharedData::getSingleton().iMainLight = l1;
 
-        mCamera->setFarClipDistance(1000.0);
-        mCamera->setNearClipDistance(0.5);
+		//Create the scene
+		// Create "root" node
+		SceneNode* rootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+
+        // Create the cathedral - this will be the static scene
+		Entity* cathedralEnt = mSceneMgr->createEntity("Cathedral", "sibenik.mesh");
+        SceneNode* cathedralNode = rootNode->createChildSceneNode();
+        cathedralNode->attachObject(cathedralEnt);
+		
+        createAtheneScene(rootNode);
+		createKnotScene(rootNode);
+		createObjects(rootNode);
 
 		setupControls();
 	}
-
-	
-	/*
-    void createFrameListener(void)
-    {
-        mFrameListener= new RenderToTextureFrameListener(mWindow, mCamera);
-		// initialize overlays
-		static_cast<RenderToTextureFrameListener*>(mFrameListener)->updateOverlays();
-        mRoot->addFrameListener(mFrameListener);
-    }
-	*/
 
 	void createSampleLights()
 	{
