@@ -111,6 +111,7 @@ namespace Ogre
         CompositorManager* mCompositorManager;      
         unsigned long mNextFrame;
 		Real mFrameSmoothingTime;
+		bool mRemoveQueueStructuresOnClear;
 
 	public:
 		typedef vector<DynLib*>::type PluginLibList;
@@ -324,6 +325,16 @@ namespace Ogre
             less advanced GPUs. This method MUST be called before creating the first RenderWindow
         */
         void useCustomRenderSystemCapabilities(RenderSystemCapabilities* capabilities);
+
+		/** Get whether the entire render queue structure should be emptied on clearing, 
+			or whether just the objects themselves should be cleared.
+		*/
+		bool getRemoveRenderQueueStructuresOnClear() const { return mRemoveQueueStructuresOnClear; }
+
+		/** Set whether the entire render queue structure should be emptied on clearing, 
+		or whether just the objects themselves should be cleared.
+		*/
+		void setRemoveRenderQueueStructuresOnClear(bool r) { mRemoveQueueStructuresOnClear = r; }
 
 		/** Register a new SceneManagerFactory, a factory object for creating instances
 			of specific SceneManagers. 

@@ -1188,7 +1188,7 @@ void SceneManager::prepareRenderQueue(void)
 {
 	RenderQueue* q = getRenderQueue();
 	// Clear the render queue
-	q->clear();
+	q->clear(Root::getSingleton().getRemoveRenderQueueStructuresOnClear());
 
 	// Prep the ordering options
 
