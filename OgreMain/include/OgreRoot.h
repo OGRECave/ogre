@@ -69,7 +69,7 @@ namespace Ogre
         // To allow update of active renderer if
         // RenderSystem::initialise is used directly
         friend class RenderSystem;
-    private:
+	protected:
         RenderSystemList mRenderers;
         RenderSystem* mActiveRenderer;
         String mVersion;
