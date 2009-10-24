@@ -71,17 +71,17 @@ compositor DeferredShading/ShowLit
 		}
 		
 		//Render the passes that did not get rendered to the GBuffer (transparent)
-		//target rt0
-        //{
-		//	//shadows off?
-		//	shadows off
-		//	material_scheme NoGBuffer
-		//	pass render_scene
-		//	{
-		//		first_render_queue 10
-		//		last_render_queue 79
-		//	}
-		//}
+		target rt0
+        {
+			//shadows off?
+			shadows off
+			material_scheme NoGBuffer
+			pass render_scene
+			{
+				first_render_queue 10
+				last_render_queue 79
+			}
+		}
 		
 		// Render the post-gbuffer objects
 		//target rt0

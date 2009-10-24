@@ -44,7 +44,7 @@ Technique* GBufferSchemeHandler::handleSchemeNotFound(unsigned short schemeIndex
 		Pass* originalPass = originalTechnique->getPass(i);
 		PassProperties props = inspectPass(originalPass, lodIndex, rend);
 		
-		if (props.isTransparent)
+		if (!props.isDeferred)
 		{
 			//Just copy the technique so it gets rendered regularly
 			Pass* clonePass = noGBufferTech->createPass();
@@ -124,6 +124,10 @@ GBufferSchemeHandler::PassProperties GBufferSchemeHandler::inspectPass(
 		{
 			props.regularTextures.push_back(tus);
 		}
+		if (tus->getEffects().size() > 0)
+		{
+			props.isDeferred = false;
+		}
 		
 	}
 
@@ -136,7 +140,7 @@ GBufferSchemeHandler::PassProperties GBufferSchemeHandler::inspectPass(
     if (pass->getDestBlendFactor() != Ogre::SBF_ZERO)
     {
         //TODO : Better ways to do this
-        props.isTransparent = true;
+        props.isDeferred = false;
     }
 	return props;
 }

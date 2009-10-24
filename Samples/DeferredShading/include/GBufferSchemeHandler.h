@@ -44,13 +44,14 @@ protected:
 	//You might need to expand this class to support more options
 	struct PassProperties 
 	{
-		PassProperties() : normalMap(0), isSkinned(false), isTransparent(false) {}
+		PassProperties() : normalMap(0), isSkinned(false), isDeferred(true) {}
+
+		bool isDeferred;
 		Ogre::vector<Ogre::TextureUnitState*>::type regularTextures;
 		Ogre::TextureUnitState* normalMap;
 		bool isSkinned;
         bool hasDiffuseColour;
-		bool isTransparent;
-
+		
 		//Example of possible extension : vertex colours
 		//Ogre::TrackVertexColourType vertexColourType;
 	};
