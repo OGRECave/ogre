@@ -487,6 +487,16 @@ protected:
 		spotLight->setSpecularColour(1,1,1);*/
 	}
 
+#ifdef USE_RTSHADER_SYSTEM
+	/*-----------------------------------------------------------------------------
+	| Disable rt shader system on this demo
+	-----------------------------------------------------------------------------*/
+	virtual bool initializeRTShaderSystem(Ogre::SceneManager* sceneMgr)
+	{
+		return true;
+	}
+#endif
+
 };
 
 SamplePlugin* sp;

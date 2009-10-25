@@ -120,7 +120,9 @@ protected:
 	RTShader::SubRenderStateFactory*	mReflectionMapFactory;	// The custom reflection map shader extension factory.
 	bool								mReflectionMapEnable;	// The current reflection map effect state.
 	SceneNode*							mPointLightNode;		// Point light scene node.
-	SceneNode*							mDirectionalLightNode;	// Directional light scene node.
+	SceneNode*							mDirectionalLightNode;	// Directional light scene node.	
+	Label*								mMainEntityVS;			// The main entity vertex shader label.
+	Label*								mMainEntityFS;			// The main entity fragment shader label.
 };
 
 #endif

@@ -12,6 +12,7 @@ const String SPOT_LIGHT_NAME			= "SpotLight";
 const String MAIN_ENTITY_MESH			= "ShaderSystem.mesh";
 const String SPECULAR_BOX				= "SpecularBox";
 const String REFLECTIONMAP_BOX			= "ReflectionMapBox";
+const String MAIN_ENTITY_NAME			= "MainEntity";
 
 SamplePlugin* sp;
 Sample* s;
@@ -114,6 +115,35 @@ bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
 		mPointLightNode->yaw(Degree(evt.timeSinceLastFrame * 15));
 		mPointLightNode->setPosition(0.0, Math::Sin(sToatalTime) * 30.0, 0.0);
 	}
+
+	if (mViewport->getMaterialScheme() == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+	{
+		const String& mainEntMaterial = mSceneMgr->getEntity(MAIN_ENTITY_NAME)->getSubEntity(0)->getMaterialName();
+		MaterialPtr matMainEnt        = MaterialManager::getSingleton().getByName(mainEntMaterial);
+		Technique* shaderGeneratedTech = NULL;
+
+		for (unsigned int i=0; i < matMainEnt->getNumTechniques(); ++i)
+		{
+			Technique* curTech = matMainEnt->getTechnique(i);
+
+			if (curTech->getSchemeName() == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+			{
+				shaderGeneratedTech = curTech;
+				break;
+			}
+		}
+
+		if (shaderGeneratedTech != NULL)
+		{			
+			mMainEntityVS->setCaption("Main Entity VS: " + shaderGeneratedTech->getPass(0)->getVertexProgramName());
+			mMainEntityFS->setCaption("Main Entity FS: " + shaderGeneratedTech->getPass(0)->getFragmentProgramName());
+		}				
+	}
+	else
+	{
+		mMainEntityVS->setCaption("Main Entity VS: N/A");
+		mMainEntityFS->setCaption("Main Entity FS: N/A");
+	}
 	
 	return SdkSample::frameRenderingQueued(evt);
 }
@@ -136,7 +166,7 @@ void Sample_ShaderSystem::setupContent()
 {
 	// Setup defualt effects values.
 	mCurLightingModel 		= SSLM_PerVertexLighting;
-	mSpecularEnable   		= false;
+	mSpecularEnable   		= true;
 	mReflectionMapEnable	= false;
 
 	// Set ambient lighting.
@@ -174,7 +204,7 @@ void Sample_ShaderSystem::setupContent()
 	}
 
 	// Load main target object.
-	Entity* mainEntity = mSceneMgr->createEntity("MainEntity", MAIN_ENTITY_MESH);
+	Entity* mainEntity = mSceneMgr->createEntity(MAIN_ENTITY_NAME, MAIN_ENTITY_MESH);
 
 	mTargetEntities.push_back(mainEntity);
 
@@ -193,10 +223,18 @@ void Sample_ShaderSystem::setupContent()
 	mTrayMgr->createCheckBox(TL_TOPLEFT, SPOT_LIGHT_NAME, "Spot Light")->setChecked(false);
 	
 	// create target model widgets.
-	mTrayMgr->createLabel(TL_BOTTOM, "TargetModel", "Target Model Attributes");
-
+	mMainEntityVS = mTrayMgr->createLabel(TL_BOTTOM, "MainEntityVS", "");
+	mMainEntityFS = mTrayMgr->createLabel(TL_BOTTOM, "MainEntityFS", "");
 	mTrayMgr->createCheckBox(TL_BOTTOM, SPECULAR_BOX, "Specular")->setChecked(mSpecularEnable);
-	mTrayMgr->createCheckBox(TL_BOTTOM, REFLECTIONMAP_BOX, "Reflection Map")->setChecked(mReflectionMapEnable);
+
+
+	// Allow reflection map only on PS3 and above since with all lights on + specular + bump we 
+	// exceed the instruction count limits of PS2.
+	if (GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0") ||
+		GpuProgramManager::getSingleton().isSyntaxSupported("fp30"))		
+	{
+		mTrayMgr->createCheckBox(TL_BOTTOM, REFLECTIONMAP_BOX, "Reflection Map")->setChecked(mReflectionMapEnable);
+	}
 	
 	mLightingModelMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "TargetModelLighting", "Target Model", 470, 290, 10);	
 	mLightingModelMenu ->addItem("Per Vertex");
@@ -227,11 +265,7 @@ void Sample_ShaderSystem::setupContent()
 void Sample_ShaderSystem::cleanupContent()
 {	
 	if (mReflectionMapFactory != NULL)
-	{
-		if (mShaderGenerator != NULL)
-		{			
-			mShaderGenerator->removeSubRenderStateFactory(mReflectionMapFactory);
-		}		
+	{			
 		delete mReflectionMapFactory;
 		mReflectionMapFactory = NULL;
 	}
@@ -344,7 +378,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 			else if (mCurLightingModel == SSLM_NormalMapLightingTangentSpace)
 			{
 				// Apply normal map only on main entity.
-				if (entity->getName() == "MainEntity")
+				if (entity->getName() == MAIN_ENTITY_NAME)
 				{
 					RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(RTShader::NormalMapLighting::Type);
 					RTShader::NormalMapLighting* normalMapSubRS = static_cast<RTShader::NormalMapLighting*>(subRenderState);
@@ -365,7 +399,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 			else if (mCurLightingModel == SSLM_NormalMapLightingObjectSpace)
 			{
 				// Apply normal map only on main entity.
-				if (entity->getName() == "MainEntity")
+				if (entity->getName() == MAIN_ENTITY_NAME)
 				{
 					RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(RTShader::NormalMapLighting::Type);
 					RTShader::NormalMapLighting* normalMapSubRS = static_cast<RTShader::NormalMapLighting*>(subRenderState);
@@ -578,14 +612,14 @@ void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps
 	if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !(caps->hasCapability(RSC_FRAGMENT_PROGRAM)))
 	{
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment programs, "
-			"so you cannot run this sample. Sorry!", "Dot3BumpSample::testCapabilities");
+			"so you cannot run this sample. Sorry!", "Sample_ShaderSystem::testCapabilities");
 	}
 
 	if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1") &&
 		!GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0"))
 	{
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support shader model 2, "
-			"so you cannot run this sample. Sorry!", "Dot3BumpSample::testCapabilities");
+			"so you cannot run this sample. Sorry!", "Sample_ShaderSystem::testCapabilities");
 	}
 }
 
