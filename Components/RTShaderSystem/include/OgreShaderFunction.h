@@ -57,30 +57,37 @@ public:
 	/** Resolve input parameter of this function
 	@param semantic The desired parameter semantic.
 	@param index The index of the desired parameter.
+	@param content The content of the parameter.
 	@param type The type of the desired parameter.
 	Return parameter instance in case of that resolve operation succeeded.
 	@remarks Pass -1 as index parameter to create a new parameter with the desired semantic and type.
 	*/
-	Parameter*						resolveInputParameter	(Parameter::Semantic semantic, int index, GpuConstantType type);
+	Parameter*						resolveInputParameter	(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
 
 	/** Resolve output parameter of this function
-	@param semantic The desired parameter semantic.
+	@param semantic The desired parameter semantic.	
 	@param index The index of the desired parameter.
+	@param content The content of the parameter.
 	@param type The type of the desired parameter.
 	Return parameter instance in case of that resolve operation succeeded.
 	@remarks Pass -1 as index parameter to create a new parameter with the desired semantic and type.
 	*/
-	Parameter*						resolveOutputParameter	(Parameter::Semantic semantic, int index, GpuConstantType type);
+	Parameter*						resolveOutputParameter	(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
-	/** Resolve local parameter of this function
-	@param semantic The desired parameter semantic.
-	@param index The index of the desired parameter.
-	@param type The type of the desired parameter.
-	@param name The name of the parameter to create if such not defined yet.
+	/** Resolve local parameter of this function	
+	@param name The name of the parameter.
+	@param type The type of the desired parameter.	
 	Return parameter instance in case of that resolve operation succeeded.
 	*/
-	Parameter*						resolveLocalParameter	(Parameter::Semantic semantic, int index, GpuConstantType type, const String& name);
+	Parameter*						resolveLocalParameter	(const String& name, GpuConstantType type);
+
+	/** Resolve local parameter of this function	
+	@param content The content of the parameter.
+	@param type The type of the desired parameter.	
+	Return parameter instance in case of that resolve operation succeeded.
+	*/
+	Parameter*						resolveLocalParameter	(const Parameter::Content content, GpuConstantType type);
 	
 
 	/** 
@@ -99,6 +106,17 @@ public:
 	@remarks Return NULL if no matching parameter found.
 	*/
 	Parameter*					getParameterBySemantic	(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index);
+
+
+	/** 
+	Get parameter by a given content and type from the given parameter list.
+	@param parameterList The parameters list to look in.
+	@param content The content of the parameter to search in the list.
+	@param type The type of the parameter to search in the list.
+	@remarks Return NULL if no matching parameter found.
+	*/
+	Parameter*					getParameterByContent	(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type);
+
 
 	
 	/** Return a list of input parameters. */

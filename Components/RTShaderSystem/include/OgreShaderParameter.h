@@ -48,7 +48,7 @@ public:
 	// Shader parameter semantic.
 	enum Semantic
 	{
-		/// Unknonw semantic
+		/// Unknown semantic
 		SPS_UNKNOWN = 0,
 		/// Position
 		SPS_POSITION = 1,
@@ -68,16 +68,212 @@ public:
 		SPS_TANGENT = 9		
 	};
 
+	// Shader parameter content.
+	enum Content
+	{
+		/// Unknown content
+		SPC_UNKNOWN,
+
+		/// Position in object space
+		SPC_POSITION_OBJECT_SPACE,
+
+		/// Position in world space
+		SPC_POSITION_WORLD_SPACE,
+
+		/// Position in view space
+		SPC_POSITION_VIEW_SPACE,
+
+		/// Position in projective space
+		SPC_POSITION_PROJECTIVE_SPACE,
+
+		/// Normal in object space
+		SPC_NORMAL_OBJECT_SPACE,
+
+		/// Normal in world space
+		SPC_NORMAL_WORLD_SPACE,
+
+		/// Normal in view space
+		SPC_NORMAL_VIEW_SPACE,
+
+		/// Normal in tangent space
+		SPC_NORMAL_TANGENT_SPACE,
+
+		/// View vector in object space
+		SPC_POSTOCAMERA_OBJECT_SPACE,
+
+		/// View vector in world space
+		SPC_POSTOCAMERA_WORLD_SPACE,
+
+		/// View vector in view space
+		SPC_POSTOCAMERA_VIEW_SPACE,
+
+		/// View vector in tangent space
+		SPC_POSTOCAMERA_TANGENT_SPACE,
+
+		/// Light vector in object space index 0-7
+		SPC_POSTOLIGHT_OBJECT_SPACE0,
+		SPC_POSTOLIGHT_OBJECT_SPACE1,
+		SPC_POSTOLIGHT_OBJECT_SPACE2,
+		SPC_POSTOLIGHT_OBJECT_SPACE3,
+		SPC_POSTOLIGHT_OBJECT_SPACE4,
+		SPC_POSTOLIGHT_OBJECT_SPACE5,
+		SPC_POSTOLIGHT_OBJECT_SPACE6,
+		SPC_POSTOLIGHT_OBJECT_SPACE7,
+
+		/// Light vector in world space index 0-7
+		SPC_POSTOLIGHT_WORLD_SPACE0,
+		SPC_POSTOLIGHT_WORLD_SPACE1,
+		SPC_POSTOLIGHT_WORLD_SPACE2,
+		SPC_POSTOLIGHT_WORLD_SPACE3,
+		SPC_POSTOLIGHT_WORLD_SPACE4,
+		SPC_POSTOLIGHT_WORLD_SPACE5,
+		SPC_POSTOLIGHT_WORLD_SPACE6,
+		SPC_POSTOLIGHT_WORLD_SPACE7,
+
+		/// Light vector in view space index 0-7
+		SPC_POSTOLIGHT_VIEW_SPACE0,
+		SPC_POSTOLIGHT_VIEW_SPACE1,
+		SPC_POSTOLIGHT_VIEW_SPACE2,
+		SPC_POSTOLIGHT_VIEW_SPACE3,
+		SPC_POSTOLIGHT_VIEW_SPACE4,
+		SPC_POSTOLIGHT_VIEW_SPACE5,
+		SPC_POSTOLIGHT_VIEW_SPACE6,
+		SPC_POSTOLIGHT_VIEW_SPACE7,
+
+		/// Light vector in tangent space index 0-7
+		SPC_POSTOLIGHT_TANGENT_SPACE0,
+		SPC_POSTOLIGHT_TANGENT_SPACE1,
+		SPC_POSTOLIGHT_TANGENT_SPACE2,
+		SPC_POSTOLIGHT_TANGENT_SPACE3,
+		SPC_POSTOLIGHT_TANGENT_SPACE4,
+		SPC_POSTOLIGHT_TANGENT_SPACE5,
+		SPC_POSTOLIGHT_TANGENT_SPACE6,
+		SPC_POSTOLIGHT_TANGENT_SPACE7,
+
+
+
+		/// Light direction in object space index 0-7
+		SPC_LIGHTDIRECTION_OBJECT_SPACE0,
+		SPC_LIGHTDIRECTION_OBJECT_SPACE1,
+		SPC_LIGHTDIRECTION_OBJECT_SPACE2,
+		SPC_LIGHTDIRECTION_OBJECT_SPACE3,
+		SPC_LIGHTDIRECTION_OBJECT_SPACE4,
+		SPC_LIGHTDIRECTION_OBJECT_SPACE5,
+		SPC_LIGHTDIRECTION_OBJECT_SPACE6,
+		SPC_LIGHTDIRECTION_OBJECT_SPACE7,
+
+		/// Light direction in world space index 0-7
+		SPC_LIGHTDIRECTION_WORLD_SPACE0,
+		SPC_LIGHTDIRECTION_WORLD_SPACE1,
+		SPC_LIGHTDIRECTION_WORLD_SPACE2,
+		SPC_LIGHTDIRECTION_WORLD_SPACE3,
+		SPC_LIGHTDIRECTION_WORLD_SPACE4,
+		SPC_LIGHTDIRECTION_WORLD_SPACE5,
+		SPC_LIGHTDIRECTION_WORLD_SPACE6,
+		SPC_LIGHTDIRECTION_WORLD_SPACE7,
+
+		/// Light direction in view space index 0-7
+		SPC_LIGHTDIRECTION_VIEW_SPACE0,
+		SPC_LIGHTDIRECTION_VIEW_SPACE1,
+		SPC_LIGHTDIRECTION_VIEW_SPACE2,
+		SPC_LIGHTDIRECTION_VIEW_SPACE3,
+		SPC_LIGHTDIRECTION_VIEW_SPACE4,
+		SPC_LIGHTDIRECTION_VIEW_SPACE5,
+		SPC_LIGHTDIRECTION_VIEW_SPACE6,
+		SPC_LIGHTDIRECTION_VIEW_SPACE7,
+
+		/// Light direction in tangent space index 0-7
+		SPC_LIGHTDIRECTION_TANGENT_SPACE0,
+		SPC_LIGHTDIRECTION_TANGENT_SPACE1,
+		SPC_LIGHTDIRECTION_TANGENT_SPACE2,
+		SPC_LIGHTDIRECTION_TANGENT_SPACE3,
+		SPC_LIGHTDIRECTION_TANGENT_SPACE4,
+		SPC_LIGHTDIRECTION_TANGENT_SPACE5,
+		SPC_LIGHTDIRECTION_TANGENT_SPACE6,
+		SPC_LIGHTDIRECTION_TANGENT_SPACE7,
+
+		/// Light position in object space index 0-7
+		SPC_LIGHTPOSITION_OBJECT_SPACE0,
+		SPC_LIGHTPOSITION_OBJECT_SPACE1,
+		SPC_LIGHTPOSITION_OBJECT_SPACE2,
+		SPC_LIGHTPOSITION_OBJECT_SPACE3,
+		SPC_LIGHTPOSITION_OBJECT_SPACE4,
+		SPC_LIGHTPOSITION_OBJECT_SPACE5,
+		SPC_LIGHTPOSITION_OBJECT_SPACE6,
+		SPC_LIGHTPOSITION_OBJECT_SPACE7,
+
+		/// Light position in world space index 0-7
+		SPC_LIGHTPOSITION_WORLD_SPACE0,
+		SPC_LIGHTPOSITION_WORLD_SPACE1,
+		SPC_LIGHTPOSITION_WORLD_SPACE2,
+		SPC_LIGHTPOSITION_WORLD_SPACE3,
+		SPC_LIGHTPOSITION_WORLD_SPACE4,
+		SPC_LIGHTPOSITION_WORLD_SPACE5,
+		SPC_LIGHTPOSITION_WORLD_SPACE6,
+		SPC_LIGHTPOSITION_WORLD_SPACE7,
+
+		/// Light position in view space index 0-7
+		SPC_LIGHTPOSITIONVIEW_SPACE0,
+		SPC_LIGHTPOSITIONVIEW_SPACE1,
+		SPC_LIGHTPOSITIONVIEW_SPACE2,
+		SPC_LIGHTPOSITIONVIEW_SPACE3,
+		SPC_LIGHTPOSITIONVIEW_SPACE4,
+		SPC_LIGHTPOSITIONVIEW_SPACE5,
+		SPC_LIGHTPOSITIONVIEW_SPACE6,
+		SPC_LIGHTPOSITIONVIEW_SPACE7,
+
+		/// Light position in tangent space index 0-7
+		SPC_LIGHTPOSITION_TANGENT_SPACE,
+
+		/// Tangent vector
+		SPC_TANGENT,
+
+		/// Binormal vector
+		SPC_BINORMAL,
+
+		/// Diffuse color
+		SPC_COLOR_DIFFUSE,
+
+		/// Specular color
+		SPC_COLOR_SPECULAR,
+
+		/// Depth in object space
+		SPC_DEPTH_OBJECT_SPACE,
+
+		/// Depth in world space
+		SPC_DEPTH_WORLD_SPACE,
+
+		/// Depth in view space
+		SPC_DEPTH_VIEW_SPACE,
+
+		/// Depth in projective space
+		SPC_DEPTH_PROJECTIVE_SPACE,
+
+		/// Texture coordinate set index 0-7
+		SPC_TEXTURE_COORDINATE0,		
+		SPC_TEXTURE_COORDINATE1,		
+		SPC_TEXTURE_COORDINATE2,		
+		SPC_TEXTURE_COORDINATE3,	
+		SPC_TEXTURE_COORDINATE4,
+		SPC_TEXTURE_COORDINATE5,
+		SPC_TEXTURE_COORDINATE6,
+		SPC_TEXTURE_COORDINATE7
+	};
+
 // Interface.
 public:
 	/** Class constructor.
 	@param type The type of this parameter.
 	@param name The name of this parameter.
+	@param semantic The semantic of this parameter.
 	@param index The index of this parameter.
+	@param content The content of this parameter.
 	@param variability How this parameter varies (bitwise combination of GpuProgramVariability).
 	*/
 	Parameter(GpuConstantType type, const String& name, 
-		const Semantic& semantic, int index, uint16 variability);
+		const Semantic& semantic, int index, 
+		const Content& content,
+		uint16 variability);
 
 	/** Class constructor.
 	@param autoType The auto type of this parameter.
@@ -133,12 +329,17 @@ public:
 	/** Return the variability of this parameter. */
 	uint16					getVariability						() const { return mVariability; }
 
+	/** Return the content of this parameter. */
+	Content					getContent							() const { return mContent; }
+
+
 // Attributes.
 protected:
 	String									mName;					// Name of this parameter.
 	GpuConstantType							mType;					// Type of this parameter.
 	Semantic								mSemantic;				// Semantic of this parameter.
 	int										mIndex;					// Index of this parameter.
+	Content									mContent;				// The content of this parameter.
 	bool									mIsAutoConstantReal;	// Is it auto constant real based parameter.
 	bool									mIsAutoConstantInt;		// Is it auto constant int based parameter.
 	GpuProgramParameters::AutoConstantType	mAutoConstantType;		// The auto constant type of this parameter.
@@ -172,22 +373,23 @@ public:
 	static Parameter*	createInColor		(int index);
 	static Parameter*	createOutColor		(int index);
 
-	static Parameter*	createInTexcoord	(GpuConstantType type, int index);
-	static Parameter*	createOutTexcoord	(GpuConstantType type, int index);
-	static Parameter*	createInTexcoord1	(int index);
-	static Parameter*	createOutTexcoord1	(int index);
-	static Parameter*	createInTexcoord2	(int index);
-	static Parameter*	createOutTexcoord2	(int index);
-	static Parameter*	createInTexcoord3	(int index);
-	static Parameter*	createOutTexcoord3	(int index);
-	static Parameter*	createInTexcoord4	(int index);			
-	static Parameter*	createOutTexcoord4	(int index);
+	static Parameter*	createInTexcoord	(GpuConstantType type, int index, Parameter::Content content);
+	static Parameter*	createOutTexcoord	(GpuConstantType type, int index, Parameter::Content content);
+	static Parameter*	createInTexcoord1	(int index, Parameter::Content content);
+	static Parameter*	createOutTexcoord1	(int index, Parameter::Content content);
+	static Parameter*	createInTexcoord2	(int index, Parameter::Content content);
+	static Parameter*	createOutTexcoord2	(int index, Parameter::Content content);
+	static Parameter*	createInTexcoord3	(int index, Parameter::Content content);
+	static Parameter*	createOutTexcoord3	(int index, Parameter::Content content);
+	static Parameter*	createInTexcoord4	(int index, Parameter::Content content);			
+	static Parameter*	createOutTexcoord4	(int index, Parameter::Content content);
 
 	static Parameter*	createSampler		(GpuConstantType type, int index);
 	static Parameter*	createSampler1D		(int index);
 	static Parameter*	createSampler2D		(int index);
 	static Parameter*	createSampler3D		(int index);
 	static Parameter*	createSamplerCUBE	(int index);	
+	
 };
 
 typedef std::vector<Parameter*>						ShaderParameterList;

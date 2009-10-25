@@ -65,13 +65,13 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
 	assert(vsEntry != NULL);
 
 	// Resolve input position parameter.
-	Parameter* positionIn = vsEntry->resolveInputParameter(Parameter::SPS_POSITION, 0, GCT_FLOAT4);	
+	Parameter* positionIn = vsEntry->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);	
 	if (positionIn == NULL)	
 		return false;
 	
 
 	// Resolve output position parameter.
-	Parameter* positionOut = vsEntry->resolveOutputParameter(Parameter::SPS_POSITION, 0, GCT_FLOAT4);
+	Parameter* positionOut = vsEntry->resolveOutputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_PROJECTIVE_SPACE, GCT_FLOAT4);
 	if (positionOut == NULL)	
 		return false;
 	

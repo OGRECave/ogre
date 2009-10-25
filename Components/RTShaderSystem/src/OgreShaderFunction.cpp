@@ -61,10 +61,16 @@ Function::~Function()
 
 //-----------------------------------------------------------------------------
 Parameter* Function::resolveInputParameter(Parameter::Semantic semantic,
-												 int index,
-												 GpuConstantType type)
+										int index,
+										const Parameter::Content content,
+										GpuConstantType type)
 {
 	Parameter* param = NULL;
+
+	// Check if desired parameter already defined.
+	param = getParameterByContent(mInputParameters, content, type);
+	if (param != NULL)
+		return param;
 
 	// Case we have to create new parameter.
 	if (index == -1)
@@ -86,7 +92,7 @@ Parameter* Function::resolveInputParameter(Parameter::Semantic semantic,
 	{
 		// Check if desired parameter already defined.
 		param = getParameterBySemantic(mInputParameters, semantic, index);
-		if (param != NULL)
+		if (param != NULL && param->getContent() == content)
 		{
 			if (param->getType() == type)
 			{
@@ -96,7 +102,7 @@ Parameter* Function::resolveInputParameter(Parameter::Semantic semantic,
 			{
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
 					"Can not resolve parameter - semantic: " + StringConverter::toString(semantic) + " - index: " + StringConverter::toString(index) + " due to type mismatch. Function <" + getName() + ">", 			
-					"ShaderFunction::resolveInputParameter" );
+					"Function::resolveInputParameter" );
 			}
 		}
 	}
@@ -115,7 +121,7 @@ Parameter* Function::resolveInputParameter(Parameter::Semantic semantic,
 	case Parameter::SPS_BLEND_INDICES:
 		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
 					"Can not resolve parameter - semantic: " + StringConverter::toString(semantic) + " - index: " + StringConverter::toString(index) + " since support in it is not implemented yet. Function <" + getName() + ">", 			
-					"ShaderFunction::resolveInputParameter" );
+					"Function::resolveInputParameter" );
 		break;
 			
 	case Parameter::SPS_NORMAL:
@@ -129,7 +135,7 @@ Parameter* Function::resolveInputParameter(Parameter::Semantic semantic,
 		break;
 						
 	case Parameter::SPS_TEXTURE_COORDINATES:		
-		param = ParameterFactory::createInTexcoord(type, index);				
+		param = ParameterFactory::createInTexcoord(type, index, content);				
 		break;
 			
 	case Parameter::SPS_BINORMAL:
@@ -150,11 +156,17 @@ Parameter* Function::resolveInputParameter(Parameter::Semantic semantic,
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Function::resolveOutputParameter(Parameter::Semantic semantic,												  
+Parameter* Function::resolveOutputParameter(Parameter::Semantic semantic,
 											int index,
+											Parameter::Content content,											
 											GpuConstantType type)
 {
 	Parameter* param = NULL;
+
+	// Check if desired parameter already defined.
+	param = getParameterByContent(mOutputParameters, content, type);
+	if (param != NULL)
+		return param;
 
 	// Case we have to create new parameter.
 	if (index == -1)
@@ -176,7 +188,7 @@ Parameter* Function::resolveOutputParameter(Parameter::Semantic semantic,
 	{
 		// Check if desired parameter already defined.
 		param = getParameterBySemantic(mOutputParameters, semantic, index);
-		if (param != NULL)
+		if (param != NULL && param->getContent() == content)
 		{
 			if (param->getType() == type)
 			{
@@ -186,7 +198,7 @@ Parameter* Function::resolveOutputParameter(Parameter::Semantic semantic,
 			{
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
 					"Can not resolve parameter - semantic: " + StringConverter::toString(semantic) + " - index: " + StringConverter::toString(index) + " due to type mismatch. Function <" + getName() + ">", 			
-					"ShaderFunction::resolveOutputParameter" );
+					"Function::resolveOutputParameter" );
 			}
 		}
 	}
@@ -204,7 +216,7 @@ Parameter* Function::resolveOutputParameter(Parameter::Semantic semantic,
 	case Parameter::SPS_BLEND_INDICES:
 		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
 			"Can not resolve parameter - semantic: " + StringConverter::toString(semantic) + " - index: " + StringConverter::toString(index) + " since support in it is not implemented yet. Function <" + getName() + ">", 			
-			"ShaderFunction::resolveOutputParameter" );
+			"Function::resolveOutputParameter" );
 		break;
 
 	case Parameter::SPS_NORMAL:
@@ -218,7 +230,7 @@ Parameter* Function::resolveOutputParameter(Parameter::Semantic semantic,
 		break;
 
 	case Parameter::SPS_TEXTURE_COORDINATES:		
-		param = ParameterFactory::createOutTexcoord(type, index);				
+		param = ParameterFactory::createOutTexcoord(type, index, content);				
 		break;
 
 	case Parameter::SPS_BINORMAL:
@@ -239,32 +251,45 @@ Parameter* Function::resolveOutputParameter(Parameter::Semantic semantic,
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Function::resolveLocalParameter(Parameter::Semantic semantic, int index, 
-											GpuConstantType type, const String& name)
+Parameter* Function::resolveLocalParameter(const String& name,
+										   GpuConstantType type)
 {
 	Parameter* param = NULL;
 
 	param = getParameterByName(mLocalParameters, name);
-
 	if (param != NULL)
 	{
-		if (param->getType() == type &&
-			param->getSemantic() == semantic &&
-			param->getIndex() == index)
+		if (param->getType() == type)
 		{
 			return param;
 		}
-		else 
+		else
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-				"Can not resolve parameter " + name + " due to type mismatch. Function <" + getName() + ">", 			
-				"ShaderFunction::resolveLocalParameter" );
-		}		
+				"Can not resolve local parameter due to type mismatch. Function <" + getName() + ">", 			
+				"Function::resolveLocalParameter" );
+		}
 	}
 		
-	param = new Parameter(type, name, semantic, index, (uint16)GPV_GLOBAL);
+	param = new Parameter(type, name, Parameter::SPS_UNKNOWN, 0, Parameter::SPC_UNKNOWN, (uint16)GPV_GLOBAL);
 	addParameter(mLocalParameters, param);
 			
+	return param;
+}
+
+//-----------------------------------------------------------------------------
+Parameter* Function::resolveLocalParameter(const Parameter::Content content,
+										   GpuConstantType type)
+{
+	Parameter* param = NULL;
+
+	param = getParameterByContent(mLocalParameters, content, type);
+	if (param != NULL)	
+		return param;	
+
+	param = new Parameter(type, "lLocalParam_" + StringConverter::toString(mLocalParameters.size()), Parameter::SPS_UNKNOWN, 0, content, (uint16)GPV_GLOBAL);
+	addParameter(mLocalParameters, param);
+
 	return param;
 }
 
@@ -277,7 +302,7 @@ void Function::addInputParameter(Parameter* parameter)
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
 			"Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">", 			
-			"ShaderFunction::addInputParameter" );
+			"Function::addInputParameter" );
 	}
 
 	addParameter(mInputParameters, parameter);
@@ -291,7 +316,7 @@ void Function::addOutputParameter(Parameter* parameter)
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
 			"Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">", 			
-			"ShaderFunction::addOutputParameter" );
+			"Function::addOutputParameter" );
 	}
 
 	addParameter(mOutputParameters, parameter);
@@ -318,7 +343,7 @@ void Function::addParameter(ShaderParameterList& parameterList, Parameter* param
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
 			"Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">", 			
-			"ShaderFunction::addParameter" );
+			"Function::addParameter" );
 	}
 
 	// Check that parameter with the same name doest exist in output parameters list.
@@ -326,7 +351,7 @@ void Function::addParameter(ShaderParameterList& parameterList, Parameter* param
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
 			"Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">", 			
-			"ShaderFunction::addParameter" );
+			"Function::addParameter" );
 	}
 
 
@@ -384,6 +409,24 @@ Parameter* Function::getParameterBySemantic(const ShaderParameterList& parameter
 
 	return NULL;
 }
+
+//-----------------------------------------------------------------------------
+Parameter* Function::getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
+{
+	ShaderParameterConstIterator it;
+
+	for (it = parameterList.begin(); it != parameterList.end(); ++it)
+	{
+		if ((*it)->getContent() == content &&
+			(*it)->getType() == type)
+		{
+			return *it;
+		}
+	}
+
+	return NULL;
+}
+
 
 //-----------------------------------------------------------------------------
 void Function::addAtomInstace(FunctionAtom* atomInstance)

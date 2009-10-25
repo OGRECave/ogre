@@ -208,7 +208,7 @@ Parameter* Program::resolveParameter(GpuConstantType type,
 
 	
 	// Create new parameter.
-	param = new Parameter(type, suggestedName + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index, variability);
+	param = new Parameter(type, suggestedName + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index, Parameter::SPC_UNKNOWN, variability);
 	addParameter(param);
 
 	return param;

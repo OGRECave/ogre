@@ -352,65 +352,69 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
 		return false;
 
 	// Resolve input vertex shader normal.
-	mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, GCT_FLOAT3);
+	mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
 	if (mVSInNormal == NULL)
 		return false;
 
 	// Resolve output vertex shader normal.
-	mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, GCT_FLOAT3);
+	mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_NORMAL_VIEW_SPACE, GCT_FLOAT3);
 	if (mVSOutNormal == NULL)
 		return false;
 
 	// Resolve input pixel shader normal.
 	mPSInNormal = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-		mVSOutNormal->getIndex(), GCT_FLOAT3);
+		mVSOutNormal->getIndex(), 
+		mVSOutNormal->getContent(),
+		GCT_FLOAT3);
 	if (mPSInNormal == NULL)
 		return false;
 
 	const ShaderParameterList& inputParams = psMain->getInputParameters();
 	const ShaderParameterList& localParams = psMain->getLocalParameters();
 
-	mPSDiffuse = psMain->getParameterBySemantic(inputParams, Parameter::SPS_COLOR, 0);
+	mPSDiffuse = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 	if (mPSDiffuse == NULL)
 	{
-		mPSDiffuse = psMain->getParameterBySemantic(localParams, Parameter::SPS_COLOR, 0);
+		mPSDiffuse = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 		if (mPSDiffuse == NULL)
 			return false;
 	}
 
-	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, GCT_FLOAT4);
+	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 	if (mPSOutDiffuse == NULL)
 		return false;
 
-	mPSTempDiffuseColour = psMain->resolveLocalParameter(Parameter::SPS_COLOR, -1, GCT_FLOAT4, "lDiffusePerPixelColour");
+	mPSTempDiffuseColour = psMain->resolveLocalParameter("lPerPixelDiffuse", GCT_FLOAT4);
 	if (mPSTempDiffuseColour == NULL)
 		return false;
 
 	if (mSpeuclarEnable)
 	{
-		mPSSpecular = psMain->getParameterBySemantic(inputParams, Parameter::SPS_COLOR, 1);
+		mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
 		if (mPSSpecular == NULL)
 		{
-			mPSSpecular = psMain->getParameterBySemantic(localParams, Parameter::SPS_COLOR, 1);
+			mPSSpecular = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
 			if (mPSSpecular == NULL)
 				return false;
 		}
 
-		mPSTempSpecularColour = psMain->resolveLocalParameter(Parameter::SPS_COLOR, -1, GCT_FLOAT4, "lSpecularPerPixelColour");
+		mPSTempSpecularColour = psMain->resolveLocalParameter("lPerPixelSpecular", GCT_FLOAT4);
 		if (mPSTempSpecularColour == NULL)
 			return false;
 
 
-		mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, GCT_FLOAT4);
+		mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 		if (mVSInPosition == NULL)
 			return false;
 
-		mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, GCT_FLOAT3);
+		mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_VIEW_SPACE, GCT_FLOAT3);
 		if (mVSOutViewPos == NULL)
 			return false;	
 
 		mPSInViewPos = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-			mVSOutViewPos->getIndex(), GCT_FLOAT3);
+			mVSOutViewPos->getIndex(), 
+			mVSOutViewPos->getContent(),
+			GCT_FLOAT3);
 		if (mPSInViewPos == NULL)
 			return false;
 
@@ -447,7 +451,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 			if (mWorldViewMatrix == NULL)		
 				return false;	
 
-			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, GCT_FLOAT4);
+			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0,  Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 			if (mVSInPosition == NULL)
 				return false;
 
@@ -461,12 +465,14 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 
 			if (mVSOutViewPos == NULL)
 			{
-				mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, GCT_FLOAT3);
+				mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_VIEW_SPACE, GCT_FLOAT3);
 				if (mVSOutViewPos == NULL)
 					return false;	
 
 				mPSInViewPos = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-					mVSOutViewPos->getIndex(), GCT_FLOAT3);
+					mVSOutViewPos->getIndex(),
+					mVSOutViewPos->getContent(),
+					GCT_FLOAT3);
 				if (mPSInViewPos == NULL)
 					return false;
 			}			
@@ -477,7 +483,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 			if (mWorldViewMatrix == NULL)		
 				return false;	
 
-			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, GCT_FLOAT4);
+			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 			if (mVSInPosition == NULL)
 				return false;
 
@@ -499,12 +505,14 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 
 			if (mVSOutViewPos == NULL)
 			{
-				mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, GCT_FLOAT3);
+				mVSOutViewPos = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_VIEW_SPACE, GCT_FLOAT3);
 				if (mVSOutViewPos == NULL)
 					return false;	
 
 				mPSInViewPos = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-					mVSOutViewPos->getIndex(), GCT_FLOAT3);
+					mVSOutViewPos->getIndex(), 
+					mVSOutViewPos->getContent(),
+					GCT_FLOAT3);
 				if (mPSInViewPos == NULL)
 					return false;
 			}		

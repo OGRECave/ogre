@@ -155,7 +155,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 		return false;
 	
 	// Resolve vertex shader input position.
-	mVSInPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, GCT_FLOAT4);
+	mVSInPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 	if (mVSInPos == NULL)
 		return false;
 
@@ -167,7 +167,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 		
 
 	// Resolve pixel shader output diffuse color.
-	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, GCT_FLOAT4);
+	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 	if (mPSOutDiffuse == NULL)	
 		return false;
 	
@@ -181,13 +181,17 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 
 
 		// Resolve vertex shader output depth.		
-		mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, GCT_FLOAT1);
+		mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
+			Parameter::SPC_DEPTH_VIEW_SPACE,
+			GCT_FLOAT1);
 		if (NULL == mVSOutDepth)
 			return false;
 
 
 		// Resolve pixel shader input depth.
-		mPSInDepth = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutDepth->getIndex(), GCT_FLOAT1);
+		mPSInDepth = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutDepth->getIndex(), 
+			mVSOutDepth->getContent(),
+			GCT_FLOAT1);
 		if (NULL == mPSInDepth)
 			return false;		
 		
@@ -203,13 +207,17 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 		
 											
 		// Resolve vertex shader output fog factor.		
-		mVSOutFogFactor = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, GCT_FLOAT1);
+		mVSOutFogFactor = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
+			Parameter::SPC_UNKNOWN,
+			GCT_FLOAT1);
 		if (NULL == mVSOutFogFactor)
 			return false;
 		
 	
 		// Resolve pixel shader input fog factor.
-		mPSInFogFactor = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutFogFactor->getIndex(), GCT_FLOAT1);
+		mPSInFogFactor = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutFogFactor->getIndex(), 
+			mVSOutFogFactor->getContent(),
+			GCT_FLOAT1);
 		if (NULL == mPSInFogFactor)
 			return false;			
 	}

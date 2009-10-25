@@ -184,13 +184,21 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 	Program* vsProgram = programSet->getCpuVertexProgram();
 	Program* psProgram = programSet->getCpuFragmentProgram();
 	Function* vsMain   = vsProgram->getEntryPointFunction();
-	Function* psMain   = psProgram->getEntryPointFunction();	
+	Function* psMain   = psProgram->getEntryPointFunction();
+	Parameter::Content texCoordContent = Parameter::SPC_UNKNOWN;
 	
 	switch (textureUnitParams->mTexCoordCalcMethod)
 	{
 		case TEXCALC_NONE:					
 			// Resolve explicit vs input texture coordinates.
-			textureUnitParams->mVSInputTexCoord = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, textureUnitParams->mTextureUnitState->getTextureCoordSet(), textureUnitParams->mVSInTextureCoordinateType);	
+			
+			if (textureUnitParams->mTextureMatrix == NULL)
+				texCoordContent = Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + textureUnitParams->mTextureUnitState->getTextureCoordSet());
+
+			textureUnitParams->mVSInputTexCoord = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
+				textureUnitParams->mTextureUnitState->getTextureCoordSet(), 
+				Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + textureUnitParams->mTextureUnitState->getTextureCoordSet()),
+				textureUnitParams->mVSInTextureCoordinateType);	
 			if (textureUnitParams->mVSInputTexCoord == NULL)			
 				return false;		
 			break;
@@ -199,7 +207,7 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 		case TEXCALC_ENVIRONMENT_MAP_PLANAR:		
 		case TEXCALC_ENVIRONMENT_MAP_NORMAL:
 			// Resolve vertex normal.
-			mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, GCT_FLOAT3);
+			mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
 			if (mVSInputNormal == NULL)			
 				return false;									
 			break;	
@@ -207,19 +215,19 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 		case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
 
 			// Resolve vertex normal.
-			mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, GCT_FLOAT3);
+			mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
 			if (mVSInputNormal == NULL)			
 				return false;		
 
 			// Resolve vertex position.
-			mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, GCT_FLOAT4);
+			mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 			if (mVSInputPos == NULL)			
 				return false;		
 			break;
 
 		case TEXCALC_PROJECTIVE_TEXTURE:
 			// Resolve vertex position.
-			mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, GCT_FLOAT4);
+			mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 			if (mVSInputPos == NULL)			
 				return false;		
 			break;
@@ -228,6 +236,7 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 	// Resolve vs output texture coordinates.
 	textureUnitParams->mVSOutputTexCoord = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
 		-1,
+		texCoordContent,
 		textureUnitParams->mVSOutTextureCoordinateType);
 
 	if (textureUnitParams->mVSOutputTexCoord == NULL)
@@ -237,6 +246,7 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 	// Resolve ps input texture coordinates.
 	textureUnitParams->mPSInputTexCoord = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
 		textureUnitParams->mVSOutputTexCoord->getIndex(),
+		textureUnitParams->mVSOutputTexCoord->getContent(),
 		textureUnitParams->mVSOutTextureCoordinateType);
 
 	if (textureUnitParams->mPSInputTexCoord == NULL)
@@ -245,23 +255,23 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 	const ShaderParameterList& inputParams = psMain->getInputParameters();
 	const ShaderParameterList& localParams = psMain->getLocalParameters();
 
-	mPSDiffuse = psMain->getParameterBySemantic(inputParams, Parameter::SPS_COLOR, 0);
+	mPSDiffuse = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 	if (mPSDiffuse == NULL)
 	{
-		mPSDiffuse = psMain->getParameterBySemantic(localParams, Parameter::SPS_COLOR, 0);
+		mPSDiffuse = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 		if (mPSDiffuse == NULL)
 			return false;
 	}
 
-	mPSSpecular = psMain->getParameterBySemantic(inputParams, Parameter::SPS_COLOR, 1);
+	mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
 	if (mPSSpecular == NULL)
 	{
-		mPSSpecular = psMain->getParameterBySemantic(localParams, Parameter::SPS_COLOR, 1);
+		mPSSpecular = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
 		if (mPSSpecular == NULL)
 			return false;
 	}
 
-	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, GCT_FLOAT4);
+	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 	if (mPSOutDiffuse == NULL)	
 		return false;
 
@@ -433,7 +443,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 	
 			
 	// Add texture sampling code.
-	Parameter* texel = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, GCT_FLOAT4, "texel");
+	Parameter* texel = psMain->resolveLocalParameter("texel", GCT_FLOAT4);
 	FunctionInvocation* curFuncInvocation = NULL;
 	
 	if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
@@ -447,7 +457,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 	psMain->addAtomInstace(curFuncInvocation);
 
 	// Build colour argument for source1.
-	source1 = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, GCT_FLOAT4, "source1");
+	source1 = psMain->resolveLocalParameter("source1", GCT_FLOAT4);
 		
 	addPSArgumentInvocations(psMain, source1, texel, 
 		textureUnitParams->mTextureSamplerIndex,
@@ -455,7 +465,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 		colourBlend.alphaArg1, false, groupOrder, internalCounter);
 
 	// Build colour argument for source2.
-	source2 = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, GCT_FLOAT4, "source2");
+	source2 = psMain->resolveLocalParameter("source2", GCT_FLOAT4);
 
 	addPSArgumentInvocations(psMain, source2, texel, 
 		textureUnitParams->mTextureSamplerIndex,

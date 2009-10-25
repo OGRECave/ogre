@@ -320,20 +320,20 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 		return false;
 
 	// Resolve input vertex shader normal.
-	mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, GCT_FLOAT3);
+	mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
 	if (mVSInNormal == NULL)
 		return false;
 
 	if (mTrackVertexColourType != 0)
 	{
-		mVSDiffuse = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 0, GCT_FLOAT4);
+		mVSDiffuse = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 		if (mVSDiffuse == NULL)
 			return false;
 	}
 	
 
 	// Resolve output vertex shader diffuse colour.
-	mVSOutDiffuse = vsMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, GCT_FLOAT4);
+	mVSOutDiffuse = vsMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 	if (mVSOutDiffuse == NULL)
 		return false;
 
@@ -356,7 +356,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 			if (mWorldViewMatrix == NULL)		
 				return false;	
 
-			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, GCT_FLOAT4);
+			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 			if (mVSInPosition == NULL)
 				return false;
 
@@ -374,7 +374,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 			if (mWorldViewMatrix == NULL)		
 				return false;	
 
-			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, GCT_FLOAT4);
+			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 			if (mVSInPosition == NULL)
 				return false;
 
@@ -428,14 +428,14 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 
 			if (mVSOutSpecular == NULL)
 			{
-				mVSOutSpecular = vsMain->resolveOutputParameter(Parameter::SPS_COLOR, 1, GCT_FLOAT4);
+				mVSOutSpecular = vsMain->resolveOutputParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
 				if (mVSOutSpecular == NULL)
 					return false;
 			}
 			
 			if (mVSInPosition == NULL)
 			{
-				mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, GCT_FLOAT4);
+				mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 				if (mVSInPosition == NULL)
 					return false;
 			}
