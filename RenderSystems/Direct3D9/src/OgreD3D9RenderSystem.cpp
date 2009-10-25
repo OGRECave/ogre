@@ -3799,7 +3799,7 @@ namespace Ogre
 			/// Release buffer
 			if (i->first.device == d3d9Device)
 			{
-				while (i->second.empty())
+				while (!i->second.empty())
 				{
 					i->second.front().surface->Release();
 					i->second.pop_front();
