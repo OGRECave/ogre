@@ -1,7 +1,14 @@
 # Configure ShaderSystem demo build
 
-set(HEADER_FILES include/ShaderSystem.h)
-set(SOURCE_FILES src/ShaderSystem.cpp)
+set(HEADER_FILES 
+	include/ShaderSystem.h
+	include/ShaderExReflectionMap.h
+	)
+
+set(SOURCE_FILES 
+	src/ShaderSystem.cpp
+	src/ShaderExReflectionMap.cpp
+	)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 

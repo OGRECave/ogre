@@ -50,6 +50,12 @@ public:
 	
 	/** Return current specular state. */
 	bool getSpecularEnable() const { return mSpecularEnable; }
+
+	/** Set reflection map enable state. */
+	void setReflectionMapEnable(bool enable);
+
+	/** Return current reflection map state. */
+	bool getReflectionMapEnable() const { return mReflectionMapEnable; }
 	
 	/** Create directional light. */
 	void createDirectionalLight();
@@ -107,12 +113,14 @@ protected:
 	typedef StringMap::iterator		 StringMapIterator;
 
 protected:
-	EntityList						mTargetEntities;		// Target entities that will use runtime shader generated materials.	
-	ShaderSystemLightingModel		mCurLightingModel;		// The current lighting model.
-	SelectMenu*						mLightingModelMenu;		// The lighting model menu.
-	bool							mSpecularEnable;		// The current specular state.	
-	SceneNode*						mPointLightNode;		// Point light scene node.
-	SceneNode*						mDirectionalLightNode;	// Directional light scene node.
+	EntityList							mTargetEntities;		// Target entities that will use runtime shader generated materials.	
+	ShaderSystemLightingModel			mCurLightingModel;		// The current lighting model.
+	SelectMenu*							mLightingModelMenu;		// The lighting model menu.
+	bool								mSpecularEnable;		// The current specular state.	
+	RTShader::SubRenderStateFactory*	mReflectionMapFactory;	// The custom reflection map shader extension factory.
+	bool								mReflectionMapEnable;	// The current reflection map effect state.
+	SceneNode*							mPointLightNode;		// Point light scene node.
+	SceneNode*							mDirectionalLightNode;	// Directional light scene node.
 };
 
 #endif

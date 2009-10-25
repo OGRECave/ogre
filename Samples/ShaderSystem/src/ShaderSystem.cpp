@@ -1,5 +1,6 @@
 #include "SamplePlugin.h"
 #include "ShaderSystem.h"
+#include "ShaderExReflectionMap.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -10,6 +11,7 @@ const String POINT_LIGHT_NAME			= "PointLight";
 const String SPOT_LIGHT_NAME			= "SpotLight";
 const String MAIN_ENTITY_MESH			= "ShaderSystem.mesh";
 const String SPECULAR_BOX				= "SpecularBox";
+const String REFLECTIONMAP_BOX			= "ReflectionMapBox";
 
 SamplePlugin* sp;
 Sample* s;
@@ -48,6 +50,7 @@ Sample_ShaderSystem::Sample_ShaderSystem()
 	mInfo["Category"] = "Unsorted";
 	mInfo["Help"] = "F2 Toggle Shader System globally. F3 Toggles Global Lighting Model. Modify target model attributes and scene settings and observe the generated shaders count.";
 	mPointLightNode = NULL;
+	mReflectionMapFactory = NULL;
 }
 
 
@@ -60,6 +63,10 @@ void Sample_ShaderSystem::checkBoxToggled(CheckBox* box)
 	{
 		setSpecularEnable(box->isChecked());
 	}
+	else if (cbName == REFLECTIONMAP_BOX)
+	{
+		setReflectionMapEnable(box->isChecked());
+	}
 	else if (cbName == DIRECTIONAL_LIGHT_NAME)
 	{
 		setLightVisible(cbName, box->isChecked());		
@@ -67,7 +74,6 @@ void Sample_ShaderSystem::checkBoxToggled(CheckBox* box)
 	else if (cbName == POINT_LIGHT_NAME)
 	{
 		setLightVisible(cbName, box->isChecked());
-
 	}
 	else if (cbName == SPOT_LIGHT_NAME)
 	{
@@ -128,15 +134,16 @@ void Sample_ShaderSystem::setupView()
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setupContent()
 {
-	// Default to per vertex lighting + specular.
-	mCurLightingModel = SSLM_PerVertexLighting;
-	mSpecularEnable   = true;
+	// Setup defualt effects values.
+	mCurLightingModel 		= SSLM_PerVertexLighting;
+	mSpecularEnable   		= false;
+	mReflectionMapEnable	= false;
 
 	// Set ambient lighting.
 	mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
 	// Setup the sky box,
-	mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
+	mSceneMgr->setSkyBox(true, "Examples/SceneCubeMap2");
 
 	Plane plane;
 	plane.normal = Vector3::UNIT_Y;
@@ -188,7 +195,8 @@ void Sample_ShaderSystem::setupContent()
 	// create target model widgets.
 	mTrayMgr->createLabel(TL_BOTTOM, "TargetModel", "Target Model Attributes");
 
-	mTrayMgr->createCheckBox(TL_BOTTOM, SPECULAR_BOX, "Specular")->setChecked(true);
+	mTrayMgr->createCheckBox(TL_BOTTOM, SPECULAR_BOX, "Specular")->setChecked(mSpecularEnable);
+	mTrayMgr->createCheckBox(TL_BOTTOM, REFLECTIONMAP_BOX, "Reflection Map")->setChecked(mReflectionMapEnable);
 	
 	mLightingModelMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "TargetModelLighting", "Target Model", 470, 290, 10);	
 	mLightingModelMenu ->addItem("Per Vertex");
@@ -217,7 +225,17 @@ void Sample_ShaderSystem::setupContent()
 
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::cleanupContent()
-{
+{	
+	if (mReflectionMapFactory != NULL)
+	{
+		if (mShaderGenerator != NULL)
+		{			
+			mShaderGenerator->removeSubRenderStateFactory(mReflectionMapFactory);
+		}		
+		delete mReflectionMapFactory;
+		mReflectionMapFactory = NULL;
+	}
+	
 	MeshManager::getSingleton().remove(MAIN_ENTITY_MESH);
 	mTargetEntities.clear();
 }
@@ -245,6 +263,17 @@ void Sample_ShaderSystem::setSpecularEnable(bool enable)
 	if (mSpecularEnable != enable)
 	{
 		mSpecularEnable = enable;
+		updateSystemShaders();
+	}
+}
+
+
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::setReflectionMapEnable(bool enable)
+{
+	if (mReflectionMapEnable != enable)
+	{
+		mReflectionMapEnable = enable;
 		updateSystemShaders();
 	}
 }
@@ -353,6 +382,27 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 					RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(RTShader::PerPixelLighting::Type);
 					renderState->addSubRenderState(perPixelLightModel);
 				}				
+			}
+
+			if (mReflectionMapEnable)
+			{
+				// Create and add the custom reflection map shader extension factory to the shader generator.
+				if (mReflectionMapFactory == NULL)
+				{
+					mReflectionMapFactory = new ShaderExReflectionMapFactory;
+					mShaderGenerator->addSubRenderStateFactory(mReflectionMapFactory);
+				}
+
+				RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(ShaderExReflectionMap::Type);
+				ShaderExReflectionMap* reflectionMapSubRS = static_cast<ShaderExReflectionMap*>(subRenderState);
+
+				reflectionMapSubRS->setReflectionMapType(TEX_TYPE_CUBE_MAP);
+
+				// Setup the textures needed by the reflection effect.
+				curPass->getUserObjectBindings().setUserAny(ShaderExReflectionMap::MaskMapTextureNameKey, Any(String("Panels_refmask.png")));	
+				curPass->getUserObjectBindings().setUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey, Any(String("cubescene.jpg")));
+											
+				renderState->addSubRenderState(subRenderState);
 			}
 								
 			// Invalidate this material in order to re-generate its shaders.
