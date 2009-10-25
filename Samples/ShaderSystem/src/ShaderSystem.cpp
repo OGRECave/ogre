@@ -166,7 +166,7 @@ void Sample_ShaderSystem::setupContent()
 {
 	// Setup defualt effects values.
 	mCurLightingModel 		= SSLM_PerVertexLighting;
-	mSpecularEnable   		= true;
+	mSpecularEnable   		= false;
 	mReflectionMapEnable	= false;
 
 	// Set ambient lighting.
@@ -352,6 +352,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 			}
 			else
 			{
+				curPass->setSpecular(ColourValue::Black);
 				curPass->setShininess(0.0);
 			}
 			

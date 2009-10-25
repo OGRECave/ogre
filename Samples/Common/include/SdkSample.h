@@ -113,8 +113,7 @@ namespace OgreBites
 				}
 
 #ifdef USE_RTSHADER_SYSTEM
-				if (mRTShaderSystemPanel != NULL &&
-					mRTShaderSystemPanel->isVisible())
+				if (mRTShaderSystemPanel->isVisible())
 				{
 					mRTShaderSystemPanel->setParamValue(2, Ogre::StringConverter::toString(mShaderGenerator->getVertexShaderCount()));
 					mRTShaderSystemPanel->setParamValue(3, Ogre::StringConverter::toString(mShaderGenerator->getFragmentShaderCount()));
@@ -227,66 +226,63 @@ namespace OgreBites
 			}
 
 #ifdef USE_RTSHADER_SYSTEM		
-			// Toggle schemes.
-			if (mShaderGenerator != NULL)
-			{
-				if (evt.key == OIS::KC_F2)
-				{	
-					Ogre::Viewport* mainVP = mCamera->getViewport();
-					const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
+			// Toggle schemes.			
+			else if (evt.key == OIS::KC_F2)
+			{	
+				Ogre::Viewport* mainVP = mCamera->getViewport();
+				const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
 
-					if (curMaterialScheme == Ogre::MaterialManager::DEFAULT_SCHEME_NAME)
-					{
-						mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-						mRTShaderSystemPanel->setParamValue(0, "On");
-					}
-					else if (curMaterialScheme == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
-					{
-						mainVP->setMaterialScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
-						mRTShaderSystemPanel->setParamValue(0, "Off");
-					}														
-				}			
-				// Toggles per pixel per light model.
-				else if (evt.key == OIS::KC_F3)
+				if (curMaterialScheme == Ogre::MaterialManager::DEFAULT_SCHEME_NAME)
 				{
-					static bool usePerPixelLighting = true;					
-					Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
-					// Remove all global sub render states.
-					renderState->reset();
-
-					if (usePerPixelLighting)
-						mRTShaderSystemPanel->setParamValue(1, "Per pixel");
-					else
-						mRTShaderSystemPanel->setParamValue(1, "Per vertex");
-
-					// Add per pixel lighting sub render state to the global scheme render state.
-					// It will override the default FFP lighting sub render state.
-					if (usePerPixelLighting)
-					{
-						Ogre::RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
-						renderState->addSubRenderState(perPixelLightModel);					
-					}
-
-					// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
-					mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-					usePerPixelLighting = !usePerPixelLighting;				
-				}	
-
-				else if (evt.key == OIS::KC_F4)   // toggle visibility of even rarer debugging details
-				{
-					if (mRTShaderSystemPanel->getTrayLocation() == TL_NONE)
-					{
-						mTrayMgr->moveWidgetToTray(mRTShaderSystemPanel, TL_TOP, 0);
-						mRTShaderSystemPanel->show();
-					}
-					else
-					{
-						mTrayMgr->removeWidgetFromTray(mRTShaderSystemPanel);
-						mRTShaderSystemPanel->hide();
-					}
+					mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+					mRTShaderSystemPanel->setParamValue(0, "On");
 				}
+				else if (curMaterialScheme == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+				{
+					mainVP->setMaterialScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
+					mRTShaderSystemPanel->setParamValue(0, "Off");
+				}														
 			}			
+			// Toggles per pixel per light model.
+			else if (evt.key == OIS::KC_F3)
+			{
+				static bool usePerPixelLighting = true;					
+				Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+				// Remove all global sub render states.
+				renderState->reset();
+
+				if (usePerPixelLighting)
+					mRTShaderSystemPanel->setParamValue(1, "Per pixel");
+				else
+					mRTShaderSystemPanel->setParamValue(1, "Per vertex");
+
+				// Add per pixel lighting sub render state to the global scheme render state.
+				// It will override the default FFP lighting sub render state.
+				if (usePerPixelLighting)
+				{
+					Ogre::RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
+					renderState->addSubRenderState(perPixelLightModel);					
+				}
+
+				// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
+				mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+				usePerPixelLighting = !usePerPixelLighting;				
+			}	
+
+			else if (evt.key == OIS::KC_F4)   // toggle visibility of even rarer debugging details
+			{
+				if (mRTShaderSystemPanel->getTrayLocation() == TL_NONE)
+				{
+					mTrayMgr->moveWidgetToTray(mRTShaderSystemPanel, TL_TOP, 0);
+					mRTShaderSystemPanel->show();
+				}
+				else
+				{
+					mTrayMgr->removeWidgetFromTray(mRTShaderSystemPanel);
+					mRTShaderSystemPanel->hide();
+				}
+			}				
 #endif
 
 			mCameraMan->injectKeyDown(evt);
@@ -395,28 +391,20 @@ namespace OgreBites
 					"Shader Generator Initialization failed - Core shader libs path not found", 
 					"SdkSample::_setup");
 			}
+			
+			Ogre::StringVector rtShaderItems;
 
-			if (mShaderGenerator != NULL)
-			{
-				Ogre::StringVector rtShaderItems;
+			rtShaderItems.clear();
+			rtShaderItems.push_back("RT Shader System");
+			rtShaderItems.push_back("Lighting Model");
+			rtShaderItems.push_back("Generated VS");
+			rtShaderItems.push_back("Generated FS");
 
-				rtShaderItems.clear();
-				rtShaderItems.push_back("RT Shader System");
-				rtShaderItems.push_back("Lighting Model");
-				rtShaderItems.push_back("Generated VS");
-				rtShaderItems.push_back("Generated FS");
-
-				mRTShaderSystemPanel = mTrayMgr->createParamsPanel(TL_TOP, "RTShaderSystemPanel", 200, rtShaderItems);
-				mRTShaderSystemPanel->setParamValue(0, "Off");
-				mRTShaderSystemPanel->setParamValue(1, "Per vertex");
-				mRTShaderSystemPanel->setParamValue(2, "0");
-				mRTShaderSystemPanel->setParamValue(3, "0");							
-			}
-			else
-			{
-				mRTShaderSystemPanel = NULL;
-			}
-					
+			mRTShaderSystemPanel = mTrayMgr->createParamsPanel(TL_TOP, "RTShaderSystemPanel", 200, rtShaderItems);
+			mRTShaderSystemPanel->setParamValue(0, "Off");
+			mRTShaderSystemPanel->setParamValue(1, "Per vertex");
+			mRTShaderSystemPanel->setParamValue(2, "0");
+			mRTShaderSystemPanel->setParamValue(3, "0");															
 #endif
 			
 			loadResources();

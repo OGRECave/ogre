@@ -149,6 +149,32 @@ protected:
 		mCamera->setPosition(0, 0, 500);
 	}
 
+
+
+	void loadResources()
+	{		
+#ifdef USE_RTSHADER_SYSTEM
+		ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
+		
+		// Create the resource group of the RT Shader System.
+		rgm.createResourceGroup("RTShaderSystemMaterialsGroup");
+		rgm.addResourceLocation(mShaderGenerator->getShaderCachePath() + "materials", "FileSystem", "RTShaderSystemMaterialsGroup");		
+		rgm.initialiseResourceGroup("RTShaderSystemMaterialsGroup");
+		rgm.loadResourceGroup("RTShaderSystemMaterialsGroup", true);
+#endif
+	}
+
+	void unloadResources()
+	{
+#ifdef USE_RTSHADER_SYSTEM
+		ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
+		
+		// Destroy the resource group of the RT Shader System			
+		rgm.destroyResourceGroup("RTShaderSystemMaterialsGroup");
+#endif
+
+	}
+
 	void setupModels()
 	{
 		StringVector matNames;
@@ -160,6 +186,12 @@ protected:
 		matNames.push_back("Examples/ShowNormals");
 		matNames.push_back("Examples/ShowTangents");
 
+#ifdef USE_RTSHADER_SYSTEM
+		matNames.push_back("RTShaderSystem/BumpMapping_SinglePass");
+		matNames.push_back("RTShaderSystem/BumpMapping_MultiPass");
+#endif
+
+	
 		mPossibilities["ogrehead.mesh"] = matNames;
 		mPossibilities["knot.mesh"] = matNames;
 
@@ -170,6 +202,10 @@ protected:
 		matNames.push_back("Examples/ShowUV");
 		matNames.push_back("Examples/ShowNormals");
 		matNames.push_back("Examples/ShowTangents");
+#ifdef USE_RTSHADER_SYSTEM
+		matNames.push_back("RTShaderSystem/BumpMapping_SinglePass");
+		matNames.push_back("RTShaderSystem/BumpMapping_MultiPass");
+#endif
 
 		mPossibilities["athene.mesh"] = matNames;
 

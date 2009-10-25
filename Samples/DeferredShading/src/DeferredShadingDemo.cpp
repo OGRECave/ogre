@@ -22,6 +22,15 @@ This demo source file is in the public domain.
 */
 
 #include "Ogre.h"
+
+
+/*-----------------------------------------------------------------------------
+| Disable rt shader system on this demo
+-----------------------------------------------------------------------------*/
+#ifdef USE_RTSHADER_SYSTEM
+#undef USE_RTSHADER_SYSTEM
+#endif
+
 #include "SamplePlugin.h"
 #include "SdkSample.h"
 
@@ -486,17 +495,6 @@ protected:
 		spotLight->setDiffuseColour(1,1,1);
 		spotLight->setSpecularColour(1,1,1);*/
 	}
-
-#ifdef USE_RTSHADER_SYSTEM
-	/*-----------------------------------------------------------------------------
-	| Disable rt shader system on this demo
-	-----------------------------------------------------------------------------*/
-	virtual bool initializeRTShaderSystem(Ogre::SceneManager* sceneMgr)
-	{
-		return true;
-	}
-#endif
-
 };
 
 SamplePlugin* sp;
