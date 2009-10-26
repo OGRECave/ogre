@@ -173,7 +173,7 @@ void ProgramWriter::writeProgramTitle(std::ostream& os, Program* program)
 	}
 	os << std::endl;
 	os << "// Language: " <<  getTargetLanguage() << std::endl;
-	os << "// Created by Ogre CRT Shader Generator. All rights reserved." << std::endl;
+	os << "// Created by Ogre RT Shader System. All rights reserved." << std::endl;
 	os << "//-----------------------------------------------------------------------------" << std::endl;
 }
 
@@ -212,7 +212,7 @@ void ProgramWriter::writeFunctionTitle(std::ostream& os, Function* function)
 
 
 //-----------------------------------------------------------------------
-void ProgramWriter::writeUniformParameter(std::ostream& os, Parameter* parameter)
+void ProgramWriter::writeUniformParameter(std::ostream& os, ParameterPtr parameter)
 {
 	os << mGpuConstTypeMap[parameter->getType()];
 	os << "\t";	
@@ -229,7 +229,7 @@ void ProgramWriter::writeUniformParameter(std::ostream& os, Parameter* parameter
 }
 
 //-----------------------------------------------------------------------
-void ProgramWriter::writeFunctionParameter(std::ostream& os, Parameter* parameter)
+void ProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter)
 {
 	os << mGpuConstTypeMap[parameter->getType()];
 	os << "\t";	
@@ -246,7 +246,7 @@ void ProgramWriter::writeFunctionParameter(std::ostream& os, Parameter* paramete
 }
 
 //-----------------------------------------------------------------------
-void ProgramWriter::writeLocalParameter(std::ostream& os, Parameter* parameter)
+void ProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
 {
 	os << mGpuConstTypeMap[parameter->getType()];
 	os << "\t";	

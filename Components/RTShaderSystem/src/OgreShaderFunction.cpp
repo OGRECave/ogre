@@ -46,30 +46,30 @@ Function::~Function()
 	mAtomInstances.clear();
 
 	for (ShaderParameterIterator it = mInputParameters.begin(); it != mInputParameters.end(); ++it)
-		delete *it;
+		(*it).setNull();
 	mInputParameters.clear();
 
 	for (ShaderParameterIterator it = mOutputParameters.begin(); it != mOutputParameters.end(); ++it)
-		delete *it;
+		(*it).setNull();
 	mOutputParameters.clear();
 
 	for (ShaderParameterIterator it = mLocalParameters.begin(); it != mLocalParameters.end(); ++it)
-		delete *it;
+		(*it).setNull();
 	mLocalParameters.clear();
 
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Function::resolveInputParameter(Parameter::Semantic semantic,
+ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
 										int index,
 										const Parameter::Content content,
 										GpuConstantType type)
 {
-	Parameter* param = NULL;
+	ParameterPtr param;
 
 	// Check if desired parameter already defined.
 	param = getParameterByContent(mInputParameters, content, type);
-	if (param != NULL)
+	if (param.get() != NULL)
 		return param;
 
 	// Case we have to create new parameter.
@@ -92,7 +92,7 @@ Parameter* Function::resolveInputParameter(Parameter::Semantic semantic,
 	{
 		// Check if desired parameter already defined.
 		param = getParameterBySemantic(mInputParameters, semantic, index);
-		if (param != NULL && param->getContent() == content)
+		if (param.get() != NULL && param->getContent() == content)
 		{
 			if (param->getType() == type)
 			{
@@ -149,23 +149,23 @@ Parameter* Function::resolveInputParameter(Parameter::Semantic semantic,
 		break;
 	}
 
-	if (param != NULL)
+	if (param.get() != NULL)
 		addInputParameter(param);
 
 	return param;
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Function::resolveOutputParameter(Parameter::Semantic semantic,
+ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
 											int index,
 											Parameter::Content content,											
 											GpuConstantType type)
 {
-	Parameter* param = NULL;
+	ParameterPtr param;
 
 	// Check if desired parameter already defined.
 	param = getParameterByContent(mOutputParameters, content, type);
-	if (param != NULL)
+	if (param.get() != NULL)
 		return param;
 
 	// Case we have to create new parameter.
@@ -188,7 +188,7 @@ Parameter* Function::resolveOutputParameter(Parameter::Semantic semantic,
 	{
 		// Check if desired parameter already defined.
 		param = getParameterBySemantic(mOutputParameters, semantic, index);
-		if (param != NULL && param->getContent() == content)
+		if (param.get() != NULL && param->getContent() == content)
 		{
 			if (param->getType() == type)
 			{
@@ -244,21 +244,21 @@ Parameter* Function::resolveOutputParameter(Parameter::Semantic semantic,
 		break;
 	}
 
-	if (param != NULL)
+	if (param.get() != NULL)
 		addOutputParameter(param);
 
 	return param;
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Function::resolveLocalParameter(Parameter::Semantic semantic, int index,
+ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int index,
 										   const String& name,
 										   GpuConstantType type)
 {
-	Parameter* param = NULL;
+	ParameterPtr param;
 
 	param = getParameterByName(mLocalParameters, name);
-	if (param != NULL)
+	if (param.get() != NULL)
 	{
 		if (param->getType() == type &&
 			param->getSemantic() == semantic &&
@@ -274,35 +274,35 @@ Parameter* Function::resolveLocalParameter(Parameter::Semantic semantic, int ind
 		}		
 	}
 		
-	param = new Parameter(type, name, semantic, index, Parameter::SPC_UNKNOWN, (uint16)GPV_GLOBAL);
+	param = ParameterPtr(new Parameter(type, name, semantic, index, Parameter::SPC_UNKNOWN, (uint16)GPV_GLOBAL));
 	addParameter(mLocalParameters, param);
 			
 	return param;
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Function::resolveLocalParameter(Parameter::Semantic semantic, int index,
+ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int index,
 										   const Parameter::Content content,
 										   GpuConstantType type)
 {
-	Parameter* param = NULL;
+	ParameterPtr param;
 
 	param = getParameterByContent(mLocalParameters, content, type);
-	if (param != NULL)	
+	if (param.get() != NULL)	
 		return param;
 
-	param = new Parameter(type, "lLocalParam_" + StringConverter::toString(mLocalParameters.size()), semantic, index, content, (uint16)GPV_GLOBAL);
+	param = ParameterPtr(new Parameter(type, "lLocalParam_" + StringConverter::toString(mLocalParameters.size()), semantic, index, content, (uint16)GPV_GLOBAL));
 	addParameter(mLocalParameters, param);
 
 	return param;
 }
 
 //-----------------------------------------------------------------------------
-void Function::addInputParameter(Parameter* parameter)
+void Function::addInputParameter(ParameterPtr parameter)
 {
 
 	// Check that parameter with the same semantic and index in input parameters list.
-	if (getParameterBySemantic(mInputParameters, parameter->getSemantic(), parameter->getIndex()) != NULL)
+	if (getParameterBySemantic(mInputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
 			"Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">", 			
@@ -313,10 +313,10 @@ void Function::addInputParameter(Parameter* parameter)
 }
 
 //-----------------------------------------------------------------------------
-void Function::addOutputParameter(Parameter* parameter)
+void Function::addOutputParameter(ParameterPtr parameter)
 {
 	// Check that parameter with the same semantic and index in output parameters list.
-	if (getParameterBySemantic(mOutputParameters, parameter->getSemantic(), parameter->getIndex()) != NULL)
+	if (getParameterBySemantic(mOutputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
 			"Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">", 			
@@ -327,23 +327,23 @@ void Function::addOutputParameter(Parameter* parameter)
 }
 
 //-----------------------------------------------------------------------------
-void Function::deleteInputParameter(Parameter* parameter)
+void Function::deleteInputParameter(ParameterPtr parameter)
 {
 	deleteParameter(mInputParameters, parameter);
 }
 
 //-----------------------------------------------------------------------------
-void Function::deleteOutputParameter(Parameter* parameter)
+void Function::deleteOutputParameter(ParameterPtr parameter)
 {
 	deleteParameter(mOutputParameters, parameter);
 }
 
 //-----------------------------------------------------------------------------
-void Function::addParameter(ShaderParameterList& parameterList, Parameter* parameter)
+void Function::addParameter(ShaderParameterList& parameterList, ParameterPtr parameter)
 										
 {
 	// Check that parameter with the same name doest exist in input parameters list.
-	if (getParameterByName(mInputParameters, parameter->getName()) != NULL)
+	if (getParameterByName(mInputParameters, parameter->getName()).get() != NULL)
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
 			"Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">", 			
@@ -351,7 +351,7 @@ void Function::addParameter(ShaderParameterList& parameterList, Parameter* param
 	}
 
 	// Check that parameter with the same name doest exist in output parameters list.
-	if (getParameterByName(mOutputParameters, parameter->getName()) != NULL)
+	if (getParameterByName(mOutputParameters, parameter->getName()).get() != NULL)
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
 			"Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">", 			
@@ -364,7 +364,7 @@ void Function::addParameter(ShaderParameterList& parameterList, Parameter* param
 }
 
 //-----------------------------------------------------------------------------
-void Function::deleteParameter(ShaderParameterList& parameterList, Parameter* parameter)
+void Function::deleteParameter(ShaderParameterList& parameterList, ParameterPtr parameter)
 {
 	ShaderParameterIterator it;
 
@@ -372,7 +372,7 @@ void Function::deleteParameter(ShaderParameterList& parameterList, Parameter* pa
 	{
 		if (*it == parameter)
 		{
-			delete *it;
+			(*it).setNull();
 			parameterList.erase(it);
 			break;
 		}
@@ -380,7 +380,7 @@ void Function::deleteParameter(ShaderParameterList& parameterList, Parameter* pa
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Function::getParameterByName( const ShaderParameterList& parameterList, const String& name )
+ParameterPtr Function::getParameterByName( const ShaderParameterList& parameterList, const String& name )
 {
 	ShaderParameterConstIterator it;
 
@@ -392,11 +392,11 @@ Parameter* Function::getParameterByName( const ShaderParameterList& parameterLis
 		}
 	}
 
-	return NULL;
+	return ParameterPtr();
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Function::getParameterBySemantic(const ShaderParameterList& parameterList, 
+ParameterPtr Function::getParameterBySemantic(const ShaderParameterList& parameterList, 
 												const Parameter::Semantic semantic, 
 												int index)
 {
@@ -411,28 +411,28 @@ Parameter* Function::getParameterBySemantic(const ShaderParameterList& parameter
 		}
 	}
 
-	return NULL;
+	return ParameterPtr();
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Function::getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
+ParameterPtr Function::getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
 {
 	ShaderParameterConstIterator it;
 
-	// Ignore parameters with unknown content.
-	if (content == Parameter::SPC_UNKNOWN)	
-		return NULL;	
-
-	for (it = parameterList.begin(); it != parameterList.end(); ++it)
+	// Search only for known content.
+	if (content != Parameter::SPC_UNKNOWN)	
 	{
-		if ((*it)->getContent() == content &&
-			(*it)->getType() == type)
+		for (it = parameterList.begin(); it != parameterList.end(); ++it)
 		{
-			return *it;
+			if ((*it)->getContent() == content &&
+				(*it)->getType() == type)
+			{
+				return *it;
+			}
 		}
 	}
-
-	return NULL;
+	
+	return ParameterPtr();
 }
 
 

@@ -45,14 +45,6 @@ String FFPTexturing::Type = "FFP_Texturing";
 //-----------------------------------------------------------------------
 FFPTexturing::FFPTexturing()
 {	
-	mWorldMatrix				= NULL;
-	mWorldITMatrix				= NULL;
-	mViewMatrix					= NULL;	
-	mVSInputNormal				= NULL;
-	mPSOutDiffuse				= NULL;
-	mPSDiffuse					= NULL;
-	mPSSpecular					= NULL;
-	mVSInputPos					= NULL;	
 }
 
 //-----------------------------------------------------------------------
@@ -95,7 +87,7 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
 	
 	// Resolve texture sampler parameter.		
 	textureUnitParams->mTextureSampler = psProgram->resolveParameter(textureUnitParams->mTextureSamplerType, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSampler");
-	if (textureUnitParams->mTextureSampler == NULL)
+	if (textureUnitParams->mTextureSampler.get() == NULL)
 		return false;
 	
 		
@@ -103,7 +95,7 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
 	if (needsTextureMatrix(textureUnitParams->mTextureUnitState))
 	{				
 		textureUnitParams->mTextureMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_TEXTURE_MATRIX, textureUnitParams->mTextureSamplerIndex);
-		if (textureUnitParams->mTextureMatrix == NULL)
+		if (textureUnitParams->mTextureMatrix.get() == NULL)
 			return false;
 	}
 
@@ -118,26 +110,26 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
 	case TEXCALC_ENVIRONMENT_MAP_NORMAL:
 		
 		mWorldITMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLD_MATRIX, 0);
-		if (mWorldITMatrix == NULL)		
+		if (mWorldITMatrix.get() == NULL)		
 			return false;	
 		
 		mViewMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEW_MATRIX, 0);
-		if (mViewMatrix == NULL)		
+		if (mViewMatrix.get() == NULL)		
 			return false;				
 		
 		break;
 
 	case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
 		mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
-		if (mWorldMatrix == NULL)		
+		if (mWorldMatrix.get() == NULL)		
 			return false;	
 
 		mWorldITMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLD_MATRIX, 0);
-		if (mWorldITMatrix == NULL)		
+		if (mWorldITMatrix.get() == NULL)		
 			return false;	
 
 		mViewMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEW_MATRIX, 0);
-		if (mViewMatrix == NULL)		
+		if (mViewMatrix.get() == NULL)		
 			return false;	
 
 		break;
@@ -146,11 +138,11 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
 	case TEXCALC_PROJECTIVE_TEXTURE:
 
 		mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
-		if (mWorldMatrix == NULL)		
+		if (mWorldMatrix.get() == NULL)		
 			return false;	
 
 		textureUnitParams->mTextureViewProjImageMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_LIGHTS, "gTexViewProjImageMatrix");
-		if (textureUnitParams->mTextureViewProjImageMatrix == NULL)		
+		if (textureUnitParams->mTextureViewProjImageMatrix.get() == NULL)		
 			return false;	
 
 		const TextureUnitState::EffectMap&		effectMap = textureUnitParams->mTextureUnitState->getEffects();	
@@ -192,14 +184,14 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 		case TEXCALC_NONE:					
 			// Resolve explicit vs input texture coordinates.
 			
-			if (textureUnitParams->mTextureMatrix == NULL)
+			if (textureUnitParams->mTextureMatrix.get() == NULL)
 				texCoordContent = Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + textureUnitParams->mTextureUnitState->getTextureCoordSet());
 
 			textureUnitParams->mVSInputTexCoord = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
 				textureUnitParams->mTextureUnitState->getTextureCoordSet(), 
 				Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + textureUnitParams->mTextureUnitState->getTextureCoordSet()),
 				textureUnitParams->mVSInTextureCoordinateType);	
-			if (textureUnitParams->mVSInputTexCoord == NULL)			
+			if (textureUnitParams->mVSInputTexCoord.get() == NULL)			
 				return false;		
 			break;
 
@@ -208,7 +200,7 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 		case TEXCALC_ENVIRONMENT_MAP_NORMAL:
 			// Resolve vertex normal.
 			mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
-			if (mVSInputNormal == NULL)			
+			if (mVSInputNormal.get() == NULL)			
 				return false;									
 			break;	
 
@@ -216,19 +208,19 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 
 			// Resolve vertex normal.
 			mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
-			if (mVSInputNormal == NULL)			
+			if (mVSInputNormal.get() == NULL)			
 				return false;		
 
 			// Resolve vertex position.
 			mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
-			if (mVSInputPos == NULL)			
+			if (mVSInputPos.get() == NULL)			
 				return false;		
 			break;
 
 		case TEXCALC_PROJECTIVE_TEXTURE:
 			// Resolve vertex position.
 			mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
-			if (mVSInputPos == NULL)			
+			if (mVSInputPos.get() == NULL)			
 				return false;		
 			break;
 	}
@@ -239,7 +231,7 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 		texCoordContent,
 		textureUnitParams->mVSOutTextureCoordinateType);
 
-	if (textureUnitParams->mVSOutputTexCoord == NULL)
+	if (textureUnitParams->mVSOutputTexCoord.get() == NULL)
 		return false;
 		
 
@@ -249,30 +241,30 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 		textureUnitParams->mVSOutputTexCoord->getContent(),
 		textureUnitParams->mVSOutTextureCoordinateType);
 
-	if (textureUnitParams->mPSInputTexCoord == NULL)
+	if (textureUnitParams->mPSInputTexCoord.get() == NULL)
 		return false;
 
 	const ShaderParameterList& inputParams = psMain->getInputParameters();
 	const ShaderParameterList& localParams = psMain->getLocalParameters();
 
 	mPSDiffuse = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-	if (mPSDiffuse == NULL)
+	if (mPSDiffuse.get() == NULL)
 	{
 		mPSDiffuse = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-		if (mPSDiffuse == NULL)
+		if (mPSDiffuse.get() == NULL)
 			return false;
 	}
 
 	mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
-	if (mPSSpecular == NULL)
+	if (mPSSpecular.get() == NULL)
 	{
 		mPSSpecular = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
-		if (mPSSpecular == NULL)
+		if (mPSSpecular.get() == NULL)
 			return false;
 	}
 
 	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-	if (mPSOutDiffuse == NULL)	
+	if (mPSOutDiffuse.get() == NULL)	
 		return false;
 
 	
@@ -325,7 +317,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 	switch (textureUnitParams->mTexCoordCalcMethod)
 	{
 	case TEXCALC_NONE:
-		if (textureUnitParams->mTextureMatrix == NULL)
+		if (textureUnitParams->mTextureMatrix.get() == NULL)
 		{
 			texCoordCalcFunc = new FunctionInvocation(FFP_FUNC_ASSIGN,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
@@ -344,7 +336,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 
 	case TEXCALC_ENVIRONMENT_MAP:
 	case TEXCALC_ENVIRONMENT_MAP_PLANAR:
-		if (textureUnitParams->mTextureMatrix == NULL)
+		if (textureUnitParams->mTextureMatrix.get() == NULL)
 		{
 			texCoordCalcFunc = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
@@ -367,7 +359,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 
 			
 	case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
-		if (textureUnitParams->mTextureMatrix == NULL)
+		if (textureUnitParams->mTextureMatrix.get() == NULL)
 		{
 			texCoordCalcFunc = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
@@ -393,7 +385,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 		break;
 
 	case TEXCALC_ENVIRONMENT_MAP_NORMAL:
-		if (textureUnitParams->mTextureMatrix == NULL)
+		if (textureUnitParams->mTextureMatrix.get() == NULL)
 		{
 			texCoordCalcFunc = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
@@ -437,13 +429,13 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 {
 	const LayerBlendModeEx& colourBlend = textureUnitParams->mTextureUnitState->getColourBlendMode();
 	const LayerBlendModeEx& alphaBlend  = textureUnitParams->mTextureUnitState->getAlphaBlendMode();
-	Parameter* source1 = NULL;
-	Parameter* source2 = NULL;
+	ParameterPtr source1;
+	ParameterPtr source2;
 	int groupOrder = FFP_PS_TEXTURING;
 	
 			
 	// Add texture sampling code.
-	Parameter* texel = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "texel", GCT_FLOAT4);
+	ParameterPtr texel = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "texel", GCT_FLOAT4);
 	FunctionInvocation* curFuncInvocation = NULL;
 	
 	if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
@@ -513,8 +505,8 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 
 //-----------------------------------------------------------------------
 void FFPTexturing::addPSArgumentInvocations(Function* psMain, 
-											 Parameter* arg,
-											 Parameter* texel,
+											 ParameterPtr arg,
+											 ParameterPtr texel,
 											 int samplerIndex,
 											 LayerBlendSource blendSrc,
 											 const ColourValue& colourValue,
@@ -578,9 +570,9 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
 
 //-----------------------------------------------------------------------
 void FFPTexturing::addPSBlendInvocations(Function* psMain, 
-										  Parameter* arg1,
-										  Parameter* arg2,
-										  Parameter* texel,
+										  ParameterPtr arg1,
+										  ParameterPtr arg2,
+										  ParameterPtr texel,
 										  int samplerIndex,
 										  const LayerBlendModeEx& blendMode,
 										  const int groupOrder, 
@@ -907,7 +899,7 @@ void FFPTexturing::updateGpuProgramsParams(Renderable* rend, Pass* pass, const A
 	{
 		TextureUnitParams* curParams = &mTextureUnitParamsList[i];
 
-		if (curParams->mTextureProjector != NULL && curParams->mTextureViewProjImageMatrix != NULL)
+		if (curParams->mTextureProjector != NULL && curParams->mTextureViewProjImageMatrix.get() != NULL)
 		{		
 			GpuProgramParametersSharedPtr vsGpuParams = pass->getVertexProgramParameters();
 			Matrix4 matTexViewProjImage;
@@ -936,13 +928,7 @@ void FFPTexturing::setTextureUnitCount(size_t count)
 		curParams.mTextureSamplerIndex			= NULL;			  
 		curParams.mTextureSamplerType			= GCT_SAMPLER2D;		
 		curParams.mVSInTextureCoordinateType	= GCT_FLOAT2;	
-		curParams.mVSOutTextureCoordinateType	= GCT_FLOAT2;
-		curParams.mTextureMatrix				= NULL;				
-		curParams.mTextureViewProjImageMatrix	= NULL;
-		curParams.mTextureSampler				= NULL;			
-		curParams.mVSInputTexCoord				= NULL;			
-		curParams.mVSOutputTexCoord				= NULL;			
-		curParams.mPSInputTexCoord				= NULL;			
+		curParams.mVSOutTextureCoordinateType	= GCT_FLOAT2;		
 	}
 }
 

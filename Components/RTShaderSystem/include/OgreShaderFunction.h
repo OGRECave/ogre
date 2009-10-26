@@ -49,10 +49,10 @@ class OGRE_RTSHADERSYSTEM_API Function
 public:
 
 	/** Get the name of this function */
-	const String&					getName					() const { return m_name; }
+	const String&				getName					() const { return m_name; }
 
 	/** Get the description of this function */
-	const String&					getDescription			() const { return m_description; }
+	const String&				getDescription			() const { return m_description; }
 
 	/** Resolve input parameter of this function
 	@param semantic The desired parameter semantic.
@@ -62,7 +62,7 @@ public:
 	Return parameter instance in case of that resolve operation succeeded.
 	@remarks Pass -1 as index parameter to create a new parameter with the desired semantic and type.
 	*/
-	Parameter*						resolveInputParameter	(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
+	ParameterPtr				resolveInputParameter	(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
 
 	/** Resolve output parameter of this function
@@ -73,7 +73,7 @@ public:
 	Return parameter instance in case of that resolve operation succeeded.
 	@remarks Pass -1 as index parameter to create a new parameter with the desired semantic and type.
 	*/
-	Parameter*						resolveOutputParameter	(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
+	ParameterPtr				resolveOutputParameter	(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
 	/** Resolve local parameter of this function	
 	@param semantic The desired parameter semantic.	
@@ -82,7 +82,7 @@ public:
 	@param type The type of the desired parameter.	
 	Return parameter instance in case of that resolve operation succeeded.
 	*/
-	Parameter*						resolveLocalParameter	(Parameter::Semantic semantic, int index, const String& name, GpuConstantType type);
+	ParameterPtr				resolveLocalParameter	(Parameter::Semantic semantic, int index, const String& name, GpuConstantType type);
 
 	/** Resolve local parameter of this function	
 	@param semantic The desired parameter semantic.	
@@ -91,7 +91,7 @@ public:
 	@param type The type of the desired parameter.	
 	Return parameter instance in case of that resolve operation succeeded.
 	*/
-	Parameter*						resolveLocalParameter	(Parameter::Semantic semantic, int index, const Parameter::Content content, GpuConstantType type);
+	ParameterPtr				resolveLocalParameter	(Parameter::Semantic semantic, int index, const Parameter::Content content, GpuConstantType type);
 	
 
 	/** 
@@ -100,7 +100,7 @@ public:
 	@param name The name of the parameter to search in the list.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	Parameter*					getParameterByName		(const ShaderParameterList& parameterList, const String& name);
+	ParameterPtr				getParameterByName		(const ShaderParameterList& parameterList, const String& name);
 
 	/** 
 	Get parameter by a given semantic and index from the given parameter list.
@@ -109,7 +109,7 @@ public:
 	@param index The index of the parameter to search in the list.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	Parameter*					getParameterBySemantic	(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index);
+	ParameterPtr				getParameterBySemantic	(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index);
 
 
 	/** 
@@ -119,7 +119,7 @@ public:
 	@param type The type of the parameter to search in the list.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	Parameter*					getParameterByContent	(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type);
+	ParameterPtr				getParameterByContent	(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type);
 
 
 	
@@ -161,22 +161,22 @@ protected:
 	~Function			();
 
 	/** Add input parameter to this function. */
-	void						addInputParameter			(Parameter* parameter);
+	void						addInputParameter			(ParameterPtr parameter);
 
 	/** Add output parameter to this function. */
-	void						addOutputParameter			(Parameter* parameter);
+	void						addOutputParameter			(ParameterPtr parameter);
 
 	/** Delete input parameter to this function. */
-	void						deleteInputParameter		(Parameter* parameter);
+	void						deleteInputParameter		(ParameterPtr parameter);
 
 	/** Delete output parameter to this function. */
-	void						deleteOutputParameter		(Parameter* parameter);
+	void						deleteOutputParameter		(ParameterPtr parameter);
 
 	/** Add parameter to given list */
-	void						addParameter				(ShaderParameterList& parameterList, Parameter* parameter);
+	void						addParameter				(ShaderParameterList& parameterList, ParameterPtr parameter);
 
 	/** Delete parameter from a given list */
-	void						deleteParameter				(ShaderParameterList& parameterList, Parameter* parameter);
+	void						deleteParameter				(ShaderParameterList& parameterList, ParameterPtr parameter);
 
 	/** Function atom comparison function used to sort atoms. */
 	static int					sAtomInstanceCompare		(const void * p0, const void *p1);

@@ -355,7 +355,7 @@ protected:
 	uint16									mVariability;			// How this parameter varies (bitwise combination of GpuProgramVariability).
 };
 
-
+typedef SharedPtr<Parameter> ParameterPtr;
 
 /** Helper utility class that creates common parameters.
 */
@@ -365,38 +365,38 @@ class OGRE_RTSHADERSYSTEM_API ParameterFactory
 // Interface.
 public:
 
-	static Parameter*	createInPosition	(int index);	
-	static Parameter*	createOutPosition	(int index);
+	static ParameterPtr	createInPosition	(int index);	
+	static ParameterPtr	createOutPosition	(int index);
 	
-	static Parameter*	createInNormal		(int index);
-	static Parameter*	createOutNormal		(int index);
-	static Parameter*	createInBiNormal	(int index);
-	static Parameter*	createOutBiNormal	(int index);
-	static Parameter*	createInTangent		(int index);
-	static Parameter*	createOutTangent	(int index);
-	static Parameter*	createInColor		(int index);
-	static Parameter*	createOutColor		(int index);
+	static ParameterPtr	createInNormal		(int index);
+	static ParameterPtr	createOutNormal		(int index);
+	static ParameterPtr	createInBiNormal	(int index);
+	static ParameterPtr	createOutBiNormal	(int index);
+	static ParameterPtr	createInTangent		(int index);
+	static ParameterPtr	createOutTangent	(int index);
+	static ParameterPtr	createInColor		(int index);
+	static ParameterPtr	createOutColor		(int index);
 
-	static Parameter*	createInTexcoord	(GpuConstantType type, int index, Parameter::Content content);
-	static Parameter*	createOutTexcoord	(GpuConstantType type, int index, Parameter::Content content);
-	static Parameter*	createInTexcoord1	(int index, Parameter::Content content);
-	static Parameter*	createOutTexcoord1	(int index, Parameter::Content content);
-	static Parameter*	createInTexcoord2	(int index, Parameter::Content content);
-	static Parameter*	createOutTexcoord2	(int index, Parameter::Content content);
-	static Parameter*	createInTexcoord3	(int index, Parameter::Content content);
-	static Parameter*	createOutTexcoord3	(int index, Parameter::Content content);
-	static Parameter*	createInTexcoord4	(int index, Parameter::Content content);			
-	static Parameter*	createOutTexcoord4	(int index, Parameter::Content content);
+	static ParameterPtr	createInTexcoord	(GpuConstantType type, int index, Parameter::Content content);
+	static ParameterPtr	createOutTexcoord	(GpuConstantType type, int index, Parameter::Content content);
+	static ParameterPtr	createInTexcoord1	(int index, Parameter::Content content);
+	static ParameterPtr	createOutTexcoord1	(int index, Parameter::Content content);
+	static ParameterPtr	createInTexcoord2	(int index, Parameter::Content content);
+	static ParameterPtr	createOutTexcoord2	(int index, Parameter::Content content);
+	static ParameterPtr	createInTexcoord3	(int index, Parameter::Content content);
+	static ParameterPtr	createOutTexcoord3	(int index, Parameter::Content content);
+	static ParameterPtr	createInTexcoord4	(int index, Parameter::Content content);			
+	static ParameterPtr	createOutTexcoord4	(int index, Parameter::Content content);
 
-	static Parameter*	createSampler		(GpuConstantType type, int index);
-	static Parameter*	createSampler1D		(int index);
-	static Parameter*	createSampler2D		(int index);
-	static Parameter*	createSampler3D		(int index);
-	static Parameter*	createSamplerCUBE	(int index);	
+	static ParameterPtr	createSampler		(GpuConstantType type, int index);
+	static ParameterPtr	createSampler1D		(int index);
+	static ParameterPtr	createSampler2D		(int index);
+	static ParameterPtr	createSampler3D		(int index);
+	static ParameterPtr	createSamplerCUBE	(int index);	
 	
 };
 
-typedef std::vector<Parameter*>						ShaderParameterList;
+typedef std::vector<ParameterPtr>					ShaderParameterList;
 typedef ShaderParameterList::iterator 				ShaderParameterIterator;
 typedef ShaderParameterList::const_iterator			ShaderParameterConstIterator;
 

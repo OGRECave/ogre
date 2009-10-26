@@ -28,7 +28,6 @@ THE SOFTWARE.
 #define _ShaderGenerator_
 
 #include "OgreShaderPrerequisites.h"
-#include "OgreShaderPrerequisites.h"
 #include "OgreSingleton.h"
 #include "OgreRenderObjectListener.h"
 #include "OgreSceneManager.h"

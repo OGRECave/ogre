@@ -28,6 +28,7 @@ THE SOFTWARE.
 #define _ShaderExNormalMapLighting_
 
 #include "OgreShaderPrerequisites.h"
+#include "OgreShaderParameter.h"
 #include "OgreShaderSubRenderState.h"
 #include "OgreVector4.h"
 #include "OgreLight.h"
@@ -142,16 +143,16 @@ protected:
 	struct LightParams
 	{
 		Light::LightTypes	mType;				// Light type.		
-		Parameter*			mPosition;			// Light position.
-		Parameter*			mVSOutToLightDir;	// Vertex shader output vertex position to light position direction (texture space).
-		Parameter*			mPSInToLightDir;	// Pixel shader input vertex position to light position direction (texture space).
-		Parameter*			mDirection;			// Light direction.
-		Parameter*			mVSOutDirection;	// Vertex shader output light direction (texture space).
-		Parameter*			mPSInDirection;		// Pixel shader input light direction (texture space).		
-		Parameter*			mAttenuatParams;	// Attenuation parameters.
-		Parameter*			mSpotParams;		// Spot light parameters.
-		Parameter*			mDiffuseColour;		// Diffuse colour.
-		Parameter*			mSpecularColour;	// Specular colour.
+		ParameterPtr		mPosition;			// Light position.
+		ParameterPtr		mVSOutToLightDir;	// Vertex shader output vertex position to light position direction (texture space).
+		ParameterPtr		mPSInToLightDir;	// Pixel shader input vertex position to light position direction (texture space).
+		ParameterPtr		mDirection;			// Light direction.
+		ParameterPtr		mVSOutDirection;	// Vertex shader output light direction (texture space).
+		ParameterPtr		mPSInDirection;		// Pixel shader input light direction (texture space).		
+		ParameterPtr		mAttenuatParams;	// Attenuation parameters.
+		ParameterPtr		mSpotParams;		// Spot light parameters.
+		ParameterPtr		mDiffuseColour;		// Diffuse colour.
+		ParameterPtr		mSpecularColour;	// Specular colour.
 
 	};
 
@@ -261,36 +262,36 @@ protected:
 	unsigned short			mNormalMapSamplerIndex;			// Normal map texture sampler index.
 	unsigned int			mVSTexCoordSetIndex;			// Vertex shader input texture coordinate set index.
 	NormalMapSpace			mNormalMapSpace;				// The normal map space.
-	Parameter*				mWorldMatrix;					// World matrix parameter.
-	Parameter*				mWorldInvRotMatrix;				// World matrix inverse rotation matrix parameter.
-	Parameter*				mCamPosWorldSpace;				// Camera position in world space parameter.	
-	Parameter*				mVSInPosition;					// Vertex shader input position parameter.
-	Parameter*				mVSWorldPosition;				// Vertex shader world position parameter.
-	Parameter*				mVSOutView;						// Vertex shader output view vector (position in camera space) parameter.
-	Parameter*				mPSInView;						// Pixel shader input view position (position in camera space) parameter.
-	Parameter*				mVSInNormal;					// Vertex shader input normal.
-	Parameter*				mVSInTangent;					// Vertex shader input tangent.
-	Parameter*				mVSTBNMatrix;					// Vertex shader local TNB matrix.
-	Parameter*				mVSLocalDir;					// Vertex shader local light direction.
-	Parameter*				mNormalMapSampler;				// Normal map texture sampler parameter.
-	Parameter*				mPSNormal;						// Pixel shader normal parameter.
-	Parameter*				mVSInTexcoord;					// Vertex shader input texture coordinates.
-	Parameter*				mVSOutTexcoord;					// Vertex shader output texture coordinates.
-	Parameter*				mPSInTexcoord;					// Pixel shader input texture coordinates.
-	Parameter*				mPSTempDiffuseColour;			// Pixel shader temporary diffuse calculation parameter.
-	Parameter*				mPSTempSpecularColour;			// Pixel shader temporary specular calculation parameter.
-	Parameter*				mPSDiffuse;						// Pixel shader input/local diffuse parameter.	
-	Parameter*				mPSSpecular;					// Pixel shader input/local specular parameter.	
-	Parameter*				mPSOutDiffuse;					// Pixel shader output diffuse parameter.	
-	Parameter*				mPSOutSpecular;					// Pixel shader output specular parameter.	
-	Parameter*				mDerivedSceneColour;			// Derived scene colour parameter.
-	Parameter*				mLightAmbientColour;			// Ambient light colour parameter.
-	Parameter*				mDerivedAmbientLightColour;		// Derived ambient light colour parameter.
-	Parameter*				mSurfaceAmbientColour;			// Surface ambient colour parameter.
-	Parameter*				mSurfaceDiffuseColour;			// Surface diffuse colour parameter.
-	Parameter*				mSurfaceSpecularColour;			// Surface specular colour parameter.
-	Parameter*				mSurfaceEmissiveColour;			// Surface emissive colour parameter.
-	Parameter*				mSurfaceShininess;				// Surface shininess parameter.
+	ParameterPtr			mWorldMatrix;					// World matrix parameter.
+	ParameterPtr			mWorldInvRotMatrix;				// World matrix inverse rotation matrix parameter.
+	ParameterPtr			mCamPosWorldSpace;				// Camera position in world space parameter.	
+	ParameterPtr			mVSInPosition;					// Vertex shader input position parameter.
+	ParameterPtr			mVSWorldPosition;				// Vertex shader world position parameter.
+	ParameterPtr			mVSOutView;						// Vertex shader output view vector (position in camera space) parameter.
+	ParameterPtr			mPSInView;						// Pixel shader input view position (position in camera space) parameter.
+	ParameterPtr			mVSInNormal;					// Vertex shader input normal.
+	ParameterPtr			mVSInTangent;					// Vertex shader input tangent.
+	ParameterPtr			mVSTBNMatrix;					// Vertex shader local TNB matrix.
+	ParameterPtr			mVSLocalDir;					// Vertex shader local light direction.
+	ParameterPtr			mNormalMapSampler;				// Normal map texture sampler parameter.
+	ParameterPtr			mPSNormal;						// Pixel shader normal parameter.
+	ParameterPtr			mVSInTexcoord;					// Vertex shader input texture coordinates.
+	ParameterPtr			mVSOutTexcoord;					// Vertex shader output texture coordinates.
+	ParameterPtr			mPSInTexcoord;					// Pixel shader input texture coordinates.
+	ParameterPtr			mPSTempDiffuseColour;			// Pixel shader temporary diffuse calculation parameter.
+	ParameterPtr			mPSTempSpecularColour;			// Pixel shader temporary specular calculation parameter.
+	ParameterPtr			mPSDiffuse;						// Pixel shader input/local diffuse parameter.	
+	ParameterPtr			mPSSpecular;					// Pixel shader input/local specular parameter.	
+	ParameterPtr			mPSOutDiffuse;					// Pixel shader output diffuse parameter.	
+	ParameterPtr			mPSOutSpecular;					// Pixel shader output specular parameter.	
+	ParameterPtr			mDerivedSceneColour;			// Derived scene colour parameter.
+	ParameterPtr			mLightAmbientColour;			// Ambient light colour parameter.
+	ParameterPtr			mDerivedAmbientLightColour;		// Derived ambient light colour parameter.
+	ParameterPtr			mSurfaceAmbientColour;			// Surface ambient colour parameter.
+	ParameterPtr			mSurfaceDiffuseColour;			// Surface diffuse colour parameter.
+	ParameterPtr			mSurfaceSpecularColour;			// Surface specular colour parameter.
+	ParameterPtr			mSurfaceEmissiveColour;			// Surface emissive colour parameter.
+	ParameterPtr			mSurfaceShininess;				// Surface shininess parameter.
 	static Light			msBlankLight;					// Shared blank light.
 };
 

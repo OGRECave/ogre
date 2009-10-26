@@ -57,22 +57,22 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
 	Program* vsProgram = programSet->getCpuVertexProgram();
 	
 	// Resolve World View Projection Matrix.
-	Parameter* wvpMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX, 0);
-	if (wvpMatrix == NULL)	
+	ParameterPtr wvpMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX, 0);
+	if (wvpMatrix.get() == NULL)
 		return false;
 		
 	Function* vsEntry = vsProgram->getEntryPointFunction();
 	assert(vsEntry != NULL);
 
 	// Resolve input position parameter.
-	Parameter* positionIn = vsEntry->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);	
-	if (positionIn == NULL)	
+	ParameterPtr positionIn = vsEntry->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);	
+	if (positionIn.get() == NULL)
 		return false;
 	
 
 	// Resolve output position parameter.
-	Parameter* positionOut = vsEntry->resolveOutputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_PROJECTIVE_SPACE, GCT_FLOAT4);
-	if (positionOut == NULL)	
+	ParameterPtr positionOut = vsEntry->resolveOutputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_PROJECTIVE_SPACE, GCT_FLOAT4);
+	if (positionOut.get() == NULL)
 		return false;
 	
 

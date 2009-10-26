@@ -46,15 +46,6 @@ FFPFog::FFPFog()
 {
 	mFogMode				= FOG_NONE;
 	mCalcMode				= CM_PER_VERTEX;	
-	mWorldViewProjMatrix	= NULL;	
-	mFogParams				= NULL;	
-	mFogColour				= NULL;	
-	mVSInPos				= NULL;
-	mVSOutFogFactor			= NULL;	
-	mPSInFogFactor			= NULL;
-	mVSOutDepth				= NULL;
-	mPSInDepth				= NULL;
-	mPSOutDiffuse			= NULL;
 	mPassOverrideParams		= false;
 }
 
@@ -151,24 +142,24 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 
 	// Resolve world view matrix.
 	mWorldViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX, 0);
-	if (mWorldViewProjMatrix == NULL)
+	if (mWorldViewProjMatrix.get() == NULL)
 		return false;
 	
 	// Resolve vertex shader input position.
 	mVSInPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
-	if (mVSInPos == NULL)
+	if (mVSInPos.get() == NULL)
 		return false;
 
 	
 	// Resolve fog colour.
 	mFogColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "gFogColor");
-	if (mFogColour == NULL)
+	if (mFogColour.get() == NULL)
 		return false;
 		
 
 	// Resolve pixel shader output diffuse color.
 	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-	if (mPSOutDiffuse == NULL)	
+	if (mPSOutDiffuse.get() == NULL)	
 		return false;
 	
 	// Per pixel fog.
@@ -176,7 +167,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 	{
 		// Resolve fog params.		
 		mFogParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "gFogParams");
-		if (mFogParams == NULL)
+		if (mFogParams.get() == NULL)
 			return false;
 
 
@@ -184,7 +175,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 		mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
 			Parameter::SPC_DEPTH_VIEW_SPACE,
 			GCT_FLOAT1);
-		if (NULL == mVSOutDepth)
+		if (mVSOutDepth.get() == NULL)
 			return false;
 
 
@@ -192,7 +183,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 		mPSInDepth = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutDepth->getIndex(), 
 			mVSOutDepth->getContent(),
 			GCT_FLOAT1);
-		if (NULL == mPSInDepth)
+		if (mPSInDepth.get() == NULL)
 			return false;		
 		
 	}
@@ -202,7 +193,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 	{		
 		// Resolve fog params.		
 		mFogParams = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "gFogParams");
-		if (mFogParams == NULL)
+		if (mFogParams.get() == NULL)
 			return false;
 		
 											
@@ -210,7 +201,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 		mVSOutFogFactor = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
 			Parameter::SPC_UNKNOWN,
 			GCT_FLOAT1);
-		if (NULL == mVSOutFogFactor)
+		if (mVSOutFogFactor.get() == NULL)
 			return false;
 		
 	
@@ -218,7 +209,7 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 		mPSInFogFactor = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutFogFactor->getIndex(), 
 			mVSOutFogFactor->getContent(),
 			GCT_FLOAT1);
-		if (NULL == mPSInFogFactor)
+		if (mPSInFogFactor.get() == NULL)
 			return false;			
 	}
 

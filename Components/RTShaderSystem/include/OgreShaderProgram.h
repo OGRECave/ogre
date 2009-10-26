@@ -66,14 +66,14 @@ public:
 	@param data The data to associate with the auto parameter.
 	Return parameter instance in case of that resolve operation succeeded.	
 	*/
-	Parameter*			resolveAutoParameterReal	(GpuProgramParameters::AutoConstantType autoType, Real data);
+	ParameterPtr		resolveAutoParameterReal	(GpuProgramParameters::AutoConstantType autoType, Real data);
 
 	/** Resolve uniform auto constant parameter with associated int data of this program.
 	@param autoType The auto type of the desired parameter.	
 	@param data The data to associate with the auto parameter.
 	Return parameter instance in case of that resolve operation succeeded.	
 	*/
-	Parameter*			resolveAutoParameterInt		(GpuProgramParameters::AutoConstantType autoType, size_t data);
+	ParameterPtr		resolveAutoParameterInt		(GpuProgramParameters::AutoConstantType autoType, size_t data);
 
 	/** Resolve uniform parameter of this program.
 	@param type The type of the desired parameter.
@@ -83,26 +83,26 @@ public:
 	Return parameter instance in case of that resolve operation succeeded.
 	@remarks Pass -1 as index parameter to create a new parameter with the desired type and index.
 	*/
-	Parameter*			resolveParameter			(GpuConstantType type, int index, uint16 variability, const String& suggestedName);
+	ParameterPtr		resolveParameter			(GpuConstantType type, int index, uint16 variability, const String& suggestedName);
 	
 	/** Get parameter by a given name.	
 	@param name The name of the parameter to search for.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	Parameter*			getParameterByName			(const String& name);
+	ParameterPtr		getParameterByName			(const String& name);
 
 	/** Get parameter by a given auto constant type.	
 	@param autoType The auto type of the parameter to search for.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	Parameter*			getParameterByAutoType		(GpuProgramParameters::AutoConstantType autoType);
+	ParameterPtr		getParameterByAutoType		(GpuProgramParameters::AutoConstantType autoType);
 
 	/** Get parameter by a given type and index.	
 	@param type The type of the parameter to search for.
 	@param index The index of the parameter to search for.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	Parameter*			getParameterByType			(GpuConstantType type, int index);
+	ParameterPtr		getParameterByType			(GpuConstantType type, int index);
 
 	/** Get the list of uniform parameters of this program.
 	*/
@@ -167,10 +167,10 @@ protected:
 	void						destroyFunctions	();
 
 	/** Add parameter to this program. */
-	void						addParameter				(Parameter* parameter);
+	void						addParameter				(ParameterPtr parameter);
 		
 	/** Remove parameter from this program. */
-	void						removeParameter				(Parameter* parameter);
+	void						removeParameter				(ParameterPtr parameter);
 
 
 // Attributes.

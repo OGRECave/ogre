@@ -64,36 +64,6 @@ Light NormalMapLighting::msBlankLight;
 NormalMapLighting::NormalMapLighting()
 {
 	mTrackVertexColourType			= TVC_NONE;
-	mCamPosWorldSpace				= NULL;
-	mVSInPosition					= NULL;
-	mVSWorldPosition				= NULL;
-	mVSOutView						= NULL;
-	mPSInView						= NULL;
-	mVSInNormal						= NULL;
-	mVSInTangent					= NULL;
-	mVSLocalDir						= NULL;
-	mPSNormal						= NULL;
-	mPSDiffuse						= NULL;
-	mPSSpecular						= NULL;
-	mPSTempDiffuseColour			= NULL;
-	mPSTempSpecularColour			= NULL;
-	mPSOutDiffuse					= NULL;
-	mPSOutSpecular					= NULL;
-	mVSInTexcoord					= NULL;
-	mVSOutTexcoord					= NULL;
-	mPSInTexcoord					= NULL;
-	mDerivedSceneColour				= NULL;
-	mLightAmbientColour				= NULL;
-	mDerivedAmbientLightColour		= NULL;
-	mSurfaceAmbientColour			= NULL;
-	mSurfaceDiffuseColour			= NULL;
-	mSurfaceSpecularColour			= NULL;	
-	mSurfaceEmissiveColour			= NULL;
-	mSurfaceShininess				= NULL;	
-	mVSTBNMatrix					= NULL;		
-	mNormalMapSampler				= NULL;
-	mWorldMatrix					= NULL;
-	mWorldInvRotMatrix				= NULL;
 	mNormalMapSamplerIndex			= 0;
 	mVSTexCoordSetIndex				= 0;
 	mSpecularEnable					= false;
@@ -171,7 +141,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 	matWorldInvRotation.SetColumn(2, vRow2);
 
 	// Update inverse rotation parameter.
-	if (mWorldInvRotMatrix != NULL)	
+	if (mWorldInvRotMatrix.get() != NULL)	
 		vsGpuParams->setNamedConstant(mWorldInvRotMatrix->getName(), matWorldInvRotation);	
 		
 	// Update per light parameters.
@@ -331,24 +301,24 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 	
 	// Resolve normal map texture sampler parameter.		
 	mNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, mNormalMapSamplerIndex, (uint16)GPV_PER_OBJECT, "gNormalMapSampler");
-	if (mNormalMapSampler == NULL)
+	if (mNormalMapSampler.get() == NULL)
 		return false;
 
 	// Get surface ambient colour if need to.
 	if ((mTrackVertexColourType & TVC_AMBIENT) == 0)
 	{		
 		mDerivedAmbientLightColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_DERIVED_AMBIENT_LIGHT_COLOUR, 0);
-		if (mDerivedAmbientLightColour == NULL)		
+		if (mDerivedAmbientLightColour.get() == NULL)		
 			return false;
 	}
 	else
 	{
 		mLightAmbientColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_AMBIENT_LIGHT_COLOUR, 0);
-		if (mLightAmbientColour == NULL)		
+		if (mLightAmbientColour.get() == NULL)		
 			return false;	
 
 		mSurfaceAmbientColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR, 0);
-		if (mSurfaceAmbientColour == NULL)		
+		if (mSurfaceAmbientColour.get() == NULL)		
 			return false;	
 
 	}
@@ -357,7 +327,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 	if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
 	{
 		mSurfaceDiffuseColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR, 0);
-		if (mSurfaceDiffuseColour == NULL)		
+		if (mSurfaceDiffuseColour.get() == NULL)		
 			return false;	 
 	}
 
@@ -365,7 +335,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 	if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
 	{
 		mSurfaceSpecularColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_SPECULAR_COLOUR, 0);
-		if (mSurfaceSpecularColour == NULL)		
+		if (mSurfaceSpecularColour.get() == NULL)		
 			return false;	 
 	}
 
@@ -374,35 +344,35 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 	if ((mTrackVertexColourType & TVC_EMISSIVE) == 0)
 	{
 		mSurfaceEmissiveColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_EMISSIVE_COLOUR, 0);
-		if (mSurfaceEmissiveColour == NULL)		
+		if (mSurfaceEmissiveColour.get() == NULL)		
 			return false;	 
 	}
 
 	// Get derived scene colour.
 	mDerivedSceneColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR, 0);
-	if (mDerivedSceneColour == NULL)		
+	if (mDerivedSceneColour.get() == NULL)		
 		return false;
 
 	// Get surface shininess.
 	mSurfaceShininess = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_SURFACE_SHININESS, 0);
-	if (mSurfaceShininess == NULL)		
+	if (mSurfaceShininess.get() == NULL)		
 		return false;
 
 	// Resolve input vertex shader normal.
 	mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
-	if (mVSInNormal == NULL)
+	if (mVSInNormal.get() == NULL)
 		return false;
 
 	// Resolve input vertex shader tangent.
 	if (mNormalMapSpace == NMS_TANGENT)
 	{
 		mVSInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT, GCT_FLOAT3);
-		if (mVSInTangent == NULL)
+		if (mVSInTangent.get() == NULL)
 			return false;
 
 		// Resolve local vertex shader TNB matrix.
 		mVSTBNMatrix = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lMatTBN", GCT_MATRIX_3X3);
-		if (mVSTBNMatrix == NULL)
+		if (mVSTBNMatrix.get() == NULL)
 			return false;
 	}
 	
@@ -410,14 +380,14 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 	mVSInTexcoord = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSTexCoordSetIndex, 
 		Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex),
 		GCT_FLOAT2);
-	if (mVSInTexcoord == NULL)
+	if (mVSInTexcoord.get() == NULL)
 		return false;
 
 	// Resolve output vertex shader texture coordinates.
 	mVSOutTexcoord = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
 		Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + mVSTexCoordSetIndex),
 		GCT_FLOAT2);
-	if (mVSOutTexcoord == NULL)
+	if (mVSOutTexcoord.get() == NULL)
 		return false;
 
 	
@@ -426,20 +396,20 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 		mVSOutTexcoord->getIndex(), 
 		mVSOutTexcoord->getContent(),
 		mVSOutTexcoord->getType());
-	if (mPSInTexcoord == NULL)
+	if (mPSInTexcoord.get() == NULL)
 		return false;
 
 	// Resolve pixel shader normal.
 	if (mNormalMapSpace == NMS_OBJECT)
 	{
 		mPSNormal = psMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
-		if (mPSNormal == NULL)
+		if (mPSNormal.get() == NULL)
 			return false;
 	}
 	else if (mNormalMapSpace == NMS_TANGENT)
 	{
 		mPSNormal = psMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_TANGENT_SPACE, GCT_FLOAT3);
-		if (mPSNormal == NULL)
+		if (mPSNormal.get() == NULL)
 			return false;
 	}
 	
@@ -448,52 +418,52 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 	const ShaderParameterList& localParams = psMain->getLocalParameters();
 
 	mPSDiffuse = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-	if (mPSDiffuse == NULL)
+	if (mPSDiffuse.get() == NULL)
 	{
 		mPSDiffuse = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-		if (mPSDiffuse == NULL)
+		if (mPSDiffuse.get() == NULL)
 			return false;
 	}
 
 	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-	if (mPSOutDiffuse == NULL)
+	if (mPSOutDiffuse.get() == NULL)
 		return false;
 
 	mPSTempDiffuseColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapDiffuse", GCT_FLOAT4);
-	if (mPSTempDiffuseColour == NULL)
+	if (mPSTempDiffuseColour.get() == NULL)
 		return false;
 
 	if (mSpecularEnable)
 	{
 		mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
-		if (mPSSpecular == NULL)
+		if (mPSSpecular.get() == NULL)
 		{
 			mPSSpecular = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
-			if (mPSSpecular == NULL)
+			if (mPSSpecular.get() == NULL)
 				return false;
 		}
 
 		mPSTempSpecularColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapSpecular", GCT_FLOAT4);
-		if (mPSTempSpecularColour == NULL)
+		if (mPSTempSpecularColour.get() == NULL)
 			return false;
 
 
 		mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
-		if (mVSInPosition == NULL)
+		if (mVSInPosition.get() == NULL)
 			return false;
 
 		if (mNormalMapSpace == NMS_TANGENT)
 		{
 			mVSOutView = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
 				Parameter::SPC_POSTOCAMERA_TANGENT_SPACE, GCT_FLOAT3);
-			if (mVSOutView == NULL)
+			if (mVSOutView.get() == NULL)
 				return false;	
 		}
 		else if (mNormalMapSpace == NMS_OBJECT)
 		{
 			mVSOutView = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
 				Parameter::SPC_POSTOCAMERA_OBJECT_SPACE, GCT_FLOAT3);
-			if (mVSOutView == NULL)
+			if (mVSOutView.get() == NULL)
 				return false;
 		}
 		
@@ -502,30 +472,30 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 			mVSOutView->getIndex(), 
 			mVSOutView->getContent(),
 			mVSOutView->getType());
-		if (mPSInView == NULL)
+		if (mPSInView.get() == NULL)
 			return false;	
 
 		// Resolve camera position world space.
 		mCamPosWorldSpace = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_CAMERA_POSITION, 0);
-		if (mCamPosWorldSpace == NULL)		
+		if (mCamPosWorldSpace.get() == NULL)		
 			return false;	
 		
 		mVSLocalDir = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapTempDir", GCT_FLOAT3);
-		if (mVSLocalDir == NULL)
+		if (mVSLocalDir.get() == NULL)
 			return false;	
 
 		mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
-		if (mVSWorldPosition == NULL)
+		if (mVSWorldPosition.get() == NULL)
 			return false;
 
 		// Resolve world matrix.				
 		mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
-		if (mWorldMatrix == NULL)		
+		if (mWorldMatrix.get() == NULL)		
 			return false;	
 
 		// Resolve inverse world rotation matrix.
 		mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "gMatInvRotation");
-		if (mWorldInvRotMatrix == NULL)		
+		if (mWorldInvRotMatrix.get() == NULL)		
 			return false;	
 		
 	}
@@ -549,7 +519,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 		{
 		case Light::LT_DIRECTIONAL:
 			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_obj_space");
-			if (mLightParamsList[i].mDirection == NULL)
+			if (mLightParamsList[i].mDirection.get() == NULL)
 				return false;
 
 			if (mNormalMapSpace == NMS_TANGENT)
@@ -564,25 +534,25 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 					Parameter::Content(Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE0 + i),
 					GCT_FLOAT3);
 			}
-			if (mLightParamsList[i].mVSOutDirection == NULL)
+			if (mLightParamsList[i].mVSOutDirection.get() == NULL)
 				return false;
 
 			mLightParamsList[i].mPSInDirection = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
 				mLightParamsList[i].mVSOutDirection->getIndex(), 
 				mLightParamsList[i].mVSOutDirection->getContent(), 
 				mLightParamsList[i].mVSOutDirection->getType());
-			if (mLightParamsList[i].mPSInDirection == NULL)
+			if (mLightParamsList[i].mPSInDirection.get() == NULL)
 				return false;
 
 			break;
 
 		case Light::LT_POINT:		
 			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
-			if (mVSInPosition == NULL)
+			if (mVSInPosition.get() == NULL)
 				return false;
 
 			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_world_space");
-			if (mLightParamsList[i].mPosition == NULL)
+			if (mLightParamsList[i].mPosition.get() == NULL)
 				return false;
 
 			if (mNormalMapSpace == NMS_TANGENT)
@@ -598,60 +568,60 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 					GCT_FLOAT3);
 			}
 			
-			if (mLightParamsList[i].mVSOutToLightDir == NULL)
+			if (mLightParamsList[i].mVSOutToLightDir.get() == NULL)
 				return false;
 
 			mLightParamsList[i].mPSInToLightDir = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
 				mLightParamsList[i].mVSOutToLightDir->getIndex(), 
 				mLightParamsList[i].mVSOutToLightDir->getContent(), 
 				mLightParamsList[i].mVSOutToLightDir->getType());
-			if (mLightParamsList[i].mPSInToLightDir == NULL)
+			if (mLightParamsList[i].mPSInToLightDir.get() == NULL)
 				return false;
 
 			mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
-			if (mLightParamsList[i].mAttenuatParams == NULL)
+			if (mLightParamsList[i].mAttenuatParams.get() == NULL)
 				return false;	
 
 			// Resolve local dir.
-			if (mVSLocalDir == NULL)
+			if (mVSLocalDir.get() == NULL)
 			{
 				mVSLocalDir = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapTempDir", GCT_FLOAT3);
-				if (mVSLocalDir == NULL)
+				if (mVSLocalDir.get() == NULL)
 					return false;	
 			}	
 
 			// Resolve world position.
-			if (mVSWorldPosition == NULL)
+			if (mVSWorldPosition.get() == NULL)
 			{
 				mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
-				if (mVSWorldPosition == NULL)
+				if (mVSWorldPosition.get() == NULL)
 					return false;	
 			}	
 
 			// Resolve world matrix.
-			if (mWorldMatrix == NULL)
+			if (mWorldMatrix.get() == NULL)
 			{				
 				mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
-				if (mWorldMatrix == NULL)		
+				if (mWorldMatrix.get() == NULL)		
 					return false;	
 			}
 
 			// Resolve inverse world rotation matrix.
-			if (mWorldInvRotMatrix == NULL)
+			if (mWorldInvRotMatrix.get() == NULL)
 			{				
 				mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_GLOBAL, "inv_world_rotation_matrix");
-				if (mWorldInvRotMatrix == NULL)		
+				if (mWorldInvRotMatrix.get() == NULL)		
 					return false;	
 			}				
 			break;
 
 		case Light::LT_SPOTLIGHT:		
 			mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
-			if (mVSInPosition == NULL)
+			if (mVSInPosition.get() == NULL)
 				return false;
 
 			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_world_space");
-			if (mLightParamsList[i].mPosition == NULL)
+			if (mLightParamsList[i].mPosition.get() == NULL)
 				return false;
 
 			if (mNormalMapSpace == NMS_TANGENT)
@@ -666,18 +636,18 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 					Parameter::Content(Parameter::SPC_POSTOLIGHT_OBJECT_SPACE0 + i),
 					GCT_FLOAT3);
 			}
-			if (mLightParamsList[i].mVSOutToLightDir == NULL)
+			if (mLightParamsList[i].mVSOutToLightDir.get() == NULL)
 				return false;
 
 			mLightParamsList[i].mPSInToLightDir = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
 				mLightParamsList[i].mVSOutToLightDir->getIndex(), 
 				mLightParamsList[i].mVSOutToLightDir->getContent(), 
 				mLightParamsList[i].mVSOutToLightDir->getType());
-			if (mLightParamsList[i].mPSInToLightDir == NULL)
+			if (mLightParamsList[i].mPSInToLightDir.get() == NULL)
 				return false;
 
 			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_obj_space");
-			if (mLightParamsList[i].mDirection == NULL)
+			if (mLightParamsList[i].mDirection.get() == NULL)
 				return false;
 
 			if (mNormalMapSpace == NMS_TANGENT)
@@ -692,7 +662,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 					Parameter::Content(Parameter::SPC_LIGHTDIRECTION_OBJECT_SPACE0 + i),
 					GCT_FLOAT3);
 			}
-			if (mLightParamsList[i].mVSOutDirection == NULL)
+			if (mLightParamsList[i].mVSOutDirection.get() == NULL)
 				return false;
 
 
@@ -700,46 +670,46 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 				mLightParamsList[i].mVSOutDirection->getIndex(), 
 				mLightParamsList[i].mVSOutDirection->getContent(), 
 				mLightParamsList[i].mVSOutDirection->getType());
-			if (mLightParamsList[i].mPSInDirection == NULL)
+			if (mLightParamsList[i].mPSInDirection.get() == NULL)
 				return false;
 
 			mLightParamsList[i].mAttenuatParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_attenuation");
-			if (mLightParamsList[i].mAttenuatParams == NULL)
+			if (mLightParamsList[i].mAttenuatParams.get() == NULL)
 				return false;	
 
 			mLightParamsList[i].mSpotParams = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_LIGHTS, "spotlight_params");
-			if (mLightParamsList[i].mSpotParams == NULL)
+			if (mLightParamsList[i].mSpotParams.get() == NULL)
 				return false;
 
 			// Resolve local dir.
-			if (mVSLocalDir == NULL)
+			if (mVSLocalDir.get() == NULL)
 			{
 				mVSLocalDir = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapTempDir", GCT_FLOAT3);
-				if (mVSLocalDir == NULL)
+				if (mVSLocalDir.get() == NULL)
 					return false;	
 			}	
 
 			// Resolve world position.
-			if (mVSWorldPosition == NULL)
+			if (mVSWorldPosition.get() == NULL)
 			{
 				mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
-				if (mVSWorldPosition == NULL)
+				if (mVSWorldPosition.get() == NULL)
 					return false;	
 			}	
 
 			// Resolve world matrix.
-			if (mWorldMatrix == NULL)
+			if (mWorldMatrix.get() == NULL)
 			{				
 				mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
-				if (mWorldMatrix == NULL)		
+				if (mWorldMatrix.get() == NULL)		
 					return false;	
 			}
 
 			// Resolve inverse world rotation matrix.
-			if (mWorldInvRotMatrix == NULL)
+			if (mWorldInvRotMatrix.get() == NULL)
 			{				
 				mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "gMatInvRotation");
-				if (mWorldInvRotMatrix == NULL)		
+				if (mWorldInvRotMatrix.get() == NULL)		
 					return false;	
 			}						
 			break;
@@ -749,13 +719,13 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 		if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
 		{
 			mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "derived_light_diffuse");
-			if (mLightParamsList[i].mDiffuseColour == NULL)
+			if (mLightParamsList[i].mDiffuseColour.get() == NULL)
 				return false;
 		}
 		else
 		{
 			mLightParamsList[i].mDiffuseColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_diffuse");
-			if (mLightParamsList[i].mDiffuseColour == NULL)
+			if (mLightParamsList[i].mDiffuseColour.get() == NULL)
 				return false;
 		}		
 
@@ -765,13 +735,13 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
 			{
 				mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "derived_light_specular");
-				if (mLightParamsList[i].mSpecularColour == NULL)
+				if (mLightParamsList[i].mSpecularColour.get() == NULL)
 					return false;
 			}
 			else
 			{
 				mLightParamsList[i].mSpecularColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_specular");
-				if (mLightParamsList[i].mSpecularColour == NULL)
+				if (mLightParamsList[i].mSpecularColour.get() == NULL)
 					return false;
 			}						
 		}		
@@ -862,7 +832,7 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder, 
 	vsMain->addAtomInstace(curFuncInvocation);
 
 	// Compute world space position.
-	if (mVSWorldPosition != NULL)
+	if (mVSWorldPosition.get() != NULL)
 	{
 		curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMPOSITION, groupOrder, internalCounter++); 
 		curFuncInvocation->getParameterList().push_back(mWorldMatrix->getName());
@@ -873,8 +843,8 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder, 
 	
 
 	// Compute view vector.
-	if (mVSInPosition != NULL && 
-		mVSOutView != NULL)
+	if (mVSInPosition.get() != NULL && 
+		mVSOutView.get() != NULL)
 	{	
 		// View vector in world space.
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder, internalCounter++); 
@@ -927,8 +897,8 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
 	FunctionInvocation* curFuncInvocation = NULL;
 
 	// Compute light direction in texture space.
-	if (curLightParams->mDirection != NULL &&
-		curLightParams->mVSOutDirection != NULL)
+	if (curLightParams->mDirection.get() != NULL &&
+		curLightParams->mVSOutDirection.get() != NULL)
 	{
 		// Transform to texture space.
 		if (mNormalMapSpace == NMS_TANGENT)
@@ -950,8 +920,8 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
 	}
 	
 	// Transform light vector to target space..
-	if (curLightParams->mPosition != NULL &&
-		curLightParams->mVSOutToLightDir != NULL)
+	if (curLightParams->mPosition.get() != NULL &&
+		curLightParams->mVSOutToLightDir.get() != NULL)
 	{
 		// Compute light vector.
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder, internalCounter++); 
@@ -1327,17 +1297,6 @@ void NormalMapLighting::setLightCount(const int lightCount[3])
 				curParams.mType = Light::LT_DIRECTIONAL;
 			else if (type == 2)
 				curParams.mType = Light::LT_SPOTLIGHT;
-
-			curParams.mPosition			= NULL;
-			curParams.mDirection		= NULL;
-			curParams.mAttenuatParams	= NULL;
-			curParams.mSpotParams		= NULL;
-			curParams.mDiffuseColour	= NULL;
-			curParams.mSpecularColour	= NULL;	
-			curParams.mVSOutDirection	= NULL;
-			curParams.mPSInDirection	= NULL;
-			curParams.mVSOutToLightDir	= NULL;
-			curParams.mPSInToLightDir	= NULL;
 
 			mLightParamsList.push_back(curParams);
 		}

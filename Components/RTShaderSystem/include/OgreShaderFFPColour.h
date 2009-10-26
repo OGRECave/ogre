@@ -128,14 +128,14 @@ protected:
 
 // Attributes.
 protected:
-	Parameter*		mVSInputDiffuse;			// Vertex shader input diffuse component.
-	Parameter*		mVSInputSpecular;			// Vertex shader input specular component.
-	Parameter*		mVSOutputDiffuse;			// Vertex shader output diffuse component.
-	Parameter*		mVSOutputSpecular;			// Vertex shader input specular component.
-	Parameter*		mPSInputDiffuse;			// Pixel shader input diffuse component.
-	Parameter*		mPSInputSpecular;			// Pixel shader input specular component.
-	Parameter*		mPSOutputDiffuse;			// Pixel shader output diffuse component.
-	Parameter*		mPSOutputSpecular;			// Pixel shader input specular component.
+	ParameterPtr	mVSInputDiffuse;			// Vertex shader input diffuse component.
+	ParameterPtr	mVSInputSpecular;			// Vertex shader input specular component.
+	ParameterPtr	mVSOutputDiffuse;			// Vertex shader output diffuse component.
+	ParameterPtr	mVSOutputSpecular;			// Vertex shader input specular component.
+	ParameterPtr	mPSInputDiffuse;			// Pixel shader input diffuse component.
+	ParameterPtr	mPSInputSpecular;			// Pixel shader input specular component.
+	ParameterPtr	mPSOutputDiffuse;			// Pixel shader output diffuse component.
+	ParameterPtr	mPSOutputSpecular;			// Pixel shader input specular component.
 	unsigned int	mResolveStageFlags;			// Stage flags that defines resolve parameters definitions.
 };
 

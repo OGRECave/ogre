@@ -50,17 +50,6 @@ ShaderExReflectionMap::ShaderExReflectionMap()
 	mMaskMapSamplerIndex				= 0;			
 	mReflectionMapSamplerIndex			= 0;
 	mReflectionMapType					= TEX_TYPE_2D;
-	mMaskMapSampler						= NULL;
-	mReflectionMapSampler				= NULL;
-	mVSInMaskTexcoord					= NULL;
-	mVSOutMaskTexcoord					= NULL;
-	mVSOutReflectionTexcoord			= NULL;	
-	mWorldMatrix						= NULL;
-	mWorldITMatrix						= NULL;
-	mViewMatrix							= NULL;
-	mVSInputNormal						= NULL;
-	mVSInputPos							= NULL;
-	mPSOutDiffuse						= NULL;	
 }
 
 //-----------------------------------------------------------------------
@@ -93,9 +82,6 @@ uint32 ShaderExReflectionMap::getHashCode()
 
 	// Mix in the reflection map type.
 	sh_hash_combine(hashCode, mReflectionMapType);
-
-	
-
 	
 	return hashCode;
 }
@@ -172,12 +158,12 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
 	// NOTE: We use the first texture coordinate hard coded here
 	// You may want to parametrize this as well - just remember to add it to hash and copy methods. 
 	mVSInMaskTexcoord = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 0, Parameter::SPC_TEXTURE_COORDINATE0, GCT_FLOAT2);
-	if (mVSInMaskTexcoord == 0)
+	if (mVSInMaskTexcoord.get() == 0)
 		return false;
 
 	// Resolve vs output mask texture coordinates.
 	mVSOutMaskTexcoord = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, mVSInMaskTexcoord->getContent(), GCT_FLOAT2);
-	if (mVSOutMaskTexcoord == 0)
+	if (mVSOutMaskTexcoord.get() == 0)
 		return false;
 
 	// Resolve ps input mask texture coordinates.
@@ -190,7 +176,7 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
 	mVSOutReflectionTexcoord = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
 		Parameter::SPC_UNKNOWN,
 		mReflectionMapType == TEX_TYPE_2D ? GCT_FLOAT2 : GCT_FLOAT3);
-	if (mVSOutReflectionTexcoord == 0)
+	if (mVSOutReflectionTexcoord.get() == 0)
 		return false;
 
 	// Resolve ps input reflection texture coordinates.
@@ -202,44 +188,44 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
 
 	// Resolve world matrix.	
 	mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
-	if (mWorldMatrix == NULL)		
+	if (mWorldMatrix.get() == NULL)
 		return false;	
 
 	// Resolve world inverse transpose matrix.	
 	mWorldITMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLD_MATRIX, 0);
-	if (mWorldITMatrix == NULL)		
+	if (mWorldITMatrix.get() == NULL)
 		return false;	
 
 
 	// Resolve view matrix.
 	mViewMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEW_MATRIX, 0);
-	if (mViewMatrix == NULL)		
+	if (mViewMatrix.get() == NULL)
 		return false;	
 
 	// Resolve vertex position.
 	mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
-	if (mVSInputPos == NULL)			
+	if (mVSInputPos.get() == NULL)
 		return false;		
 
 	// Resolve vertex normal.
 	mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
-	if (mVSInputNormal == NULL)			
+	if (mVSInputNormal.get() == NULL)
 		return false;		
 
 	// Resolve mask texture sampler parameter.		
 	mMaskMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, mMaskMapSamplerIndex, (uint16)GPV_GLOBAL, "mask_sampler");
-	if (mMaskMapSampler == NULL)
+	if (mMaskMapSampler.get() == NULL)
 		return false;
 
 	// Resolve reflection texture sampler parameter.		
 	mReflectionMapSampler = psProgram->resolveParameter(mReflectionMapType == TEX_TYPE_2D ? GCT_SAMPLER2D : GCT_SAMPLERCUBE, 
 		mReflectionMapSamplerIndex, (uint16)GPV_GLOBAL, "reflection_texture");
-	if (mReflectionMapSampler == NULL)
+	if (mReflectionMapSampler.get() == NULL)
 		return false;
 
 	// Resolve ps output diffuse colour.
 	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-	if (mPSOutDiffuse == NULL)	
+	if (mPSOutDiffuse.get() == NULL)
 		return false;
 
 	return true;

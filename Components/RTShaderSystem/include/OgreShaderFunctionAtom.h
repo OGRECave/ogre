@@ -92,6 +92,8 @@ public:
 	/** Get a list of parameters this function invocation will use in the function call as arguments. */
 	StringVector&			getParameterList	() { return mParameters; }
 	
+	/** Return the function name */
+	const String&			getFunctionName		() const {return mFunctionName; }
 	// Attributes.
 protected:	
 	String		 mFunctionName;

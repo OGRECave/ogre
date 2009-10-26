@@ -89,13 +89,13 @@ protected:
 	void		writeFunctionTitle			(std::ostream& os, Function* function);
 
 	/** Write a uniform parameter. */
-	void		writeUniformParameter		(std::ostream& os, Parameter* parameter);
+	void		writeUniformParameter		(std::ostream& os, ParameterPtr parameter);
 
 	/** Write a function parameter. */
-	void		writeFunctionParameter		(std::ostream& os, Parameter* parameter);
+	void		writeFunctionParameter		(std::ostream& os, ParameterPtr parameter);
 
 	/** Write a local parameter. */
-	void		writeLocalParameter			(std::ostream& os, Parameter* parameter);
+	void		writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
 
 	/** Write a function declaration. */
 	void		writeFunctionDeclaration	(std::ostream& os, Function* function);

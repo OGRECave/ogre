@@ -315,7 +315,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 	// Bind auto parameters.
 	for (itParams=progParams.begin(); itParams != progParams.end(); ++itParams)
 	{
-		const Parameter* pCurParam = *itParams;
+		const ParameterPtr pCurParam = *itParams;
 		const GpuConstantDefinition* gpuConstDef = pGpuParams->_findNamedConstantDefinition(pCurParam->getName());
 		
 
@@ -361,13 +361,15 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 				if (gpuConstDef->isSampler() == false)
 				{
 					GpuLogicalBufferStructPtr floatLogical = pGpuParams->getFloatLogicalBufferStruct();
-				
-					for (GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin(); i != floatLogical->map.end(); ++i)
+					if (floatLogical.get())
 					{
-						if (i->second.physicalIndex == gpuConstDef->physicalIndex)
+						for (GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin(); i != floatLogical->map.end(); ++i)
 						{
-							i->second.variability |= gpuConstDef->variability;
-							break;
+							if (i->second.physicalIndex == gpuConstDef->physicalIndex)
+							{
+								i->second.variability |= gpuConstDef->variability;
+								break;
+							}
 						}
 					}
 				}							

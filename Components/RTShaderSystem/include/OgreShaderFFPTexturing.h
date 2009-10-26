@@ -104,12 +104,12 @@ protected:
 		GpuConstantType			mVSInTextureCoordinateType;		// Vertex shader input texture coordinate type.
 		GpuConstantType			mVSOutTextureCoordinateType;	// Vertex shader output texture coordinates type.		
 		TexCoordCalcMethod		mTexCoordCalcMethod;			// Texture coordinates calculation method.
-		Parameter*				mTextureMatrix;					// Texture matrix parameter.
-		Parameter*  			mTextureViewProjImageMatrix;	// Texture View Projection Image space matrix parameter.
-		Parameter*				mTextureSampler;				// Texture sampler parameter.
-		Parameter*				mVSInputTexCoord;				// Vertex shader input texture coordinates parameter.
-		Parameter*				mVSOutputTexCoord;				// Vertex shader output texture coordinates parameter.
-		Parameter*				mPSInputTexCoord;				// Pixel shader input texture coordinates parameter.
+		ParameterPtr			mTextureMatrix;					// Texture matrix parameter.
+		ParameterPtr  			mTextureViewProjImageMatrix;	// Texture View Projection Image space matrix parameter.
+		ParameterPtr			mTextureSampler;				// Texture sampler parameter.
+		ParameterPtr			mVSInputTexCoord;				// Vertex shader input texture coordinates parameter.
+		ParameterPtr			mVSOutputTexCoord;				// Vertex shader output texture coordinates parameter.
+		ParameterPtr			mPSInputTexCoord;				// Pixel shader input texture coordinates parameter.
 	};
 
 	typedef std::vector<TextureUnitParams>			TextureUnitParamsList;
@@ -174,8 +174,8 @@ protected:
 	bool					addPSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* psMain, int& internalCounter);
 
 	void					addPSArgumentInvocations(Function* psMain, 
-													 Parameter* arg,
-													 Parameter* texel,
+													 ParameterPtr arg,
+													 ParameterPtr texel,
 													 int samplerIndex,
 													 LayerBlendSource blendSrc,
 													 const ColourValue& colourValue,
@@ -185,9 +185,9 @@ protected:
 													 int& internalCounter);
 
 	void					addPSBlendInvocations(Function* psMain, 
-												Parameter* arg1,
-												Parameter* arg2,
-												Parameter* texel,
+												ParameterPtr arg1,
+												ParameterPtr arg2,
+												ParameterPtr texel,
 												int samplerIndex,
 												const LayerBlendModeEx& blendMode,
 												const int groupOrder, 
@@ -207,14 +207,14 @@ protected:
 // Attributes.
 protected:
 	TextureUnitParamsList	mTextureUnitParamsList;		// Texture units list. 		
-	Parameter*				mWorldMatrix;				// World matrix parameter.
-	Parameter*				mWorldITMatrix;				// World inverse transpose matrix parameter.
-	Parameter*				mViewMatrix;				// View matrix parameter.			
-	Parameter*				mVSInputNormal;				// Vertex shader input normal parameter.
-	Parameter*  			mVSInputPos;				// Vertex shader input position parameter.		
-	Parameter*				mPSOutDiffuse;				// Pixel shader output colour.
-	Parameter*				mPSDiffuse;					// Pixel shader diffuse colour.
-	Parameter*				mPSSpecular;				// Pixel shader specular colour.
+	ParameterPtr			mWorldMatrix;				// World matrix parameter.
+	ParameterPtr			mWorldITMatrix;				// World inverse transpose matrix parameter.
+	ParameterPtr			mViewMatrix;				// View matrix parameter.			
+	ParameterPtr			mVSInputNormal;				// Vertex shader input normal parameter.
+	ParameterPtr  			mVSInputPos;				// Vertex shader input position parameter.		
+	ParameterPtr			mPSOutDiffuse;				// Pixel shader output colour.
+	ParameterPtr			mPSDiffuse;					// Pixel shader diffuse colour.
+	ParameterPtr			mPSSpecular;				// Pixel shader specular colour.
 };
 
 

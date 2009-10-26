@@ -134,19 +134,19 @@ protected:
 	unsigned short			mMaskMapSamplerIndex;				// Mask map texture sampler index.
 	unsigned short			mReflectionMapSamplerIndex;			// Reflection map texture sampler index.
 	TextureType				mReflectionMapType;					// Reflection map type. Valid are 2D or Cube.
-	Parameter*				mMaskMapSampler;					// Normal map texture sampler parameter.
-	Parameter*				mReflectionMapSampler;				// Reflection map texture sampler parameter.
-	Parameter*				mVSInMaskTexcoord;					// Vertex shader input mask texture coordinates.
-	Parameter*				mVSOutMaskTexcoord;					// Vertex shader output mask texture coordinates.
-	Parameter*				mVSOutReflectionTexcoord;			// Vertex shader output reflection texture coordinates.
-	Parameter*				mPSInMaskTexcoord;					// Pixel shader input mask texture coordinates.
-	Parameter*				mPSInReflectionTexcoord;			// Pixel shader input reflection texture coordinates.
-	Parameter*				mWorldMatrix;						// World matrix parameter.
-	Parameter*				mWorldITMatrix;						// World inverse transpose matrix parameter.
-	Parameter*				mViewMatrix;						// View matrix parameter.			
-	Parameter*				mVSInputNormal;						// Vertex shader input normal parameter.
-	Parameter*  			mVSInputPos;						// Vertex shader input position parameter.		
-	Parameter*				mPSOutDiffuse;						// Pixel shader output colour.
+	ParameterPtr			mMaskMapSampler;					// Normal map texture sampler parameter.
+	ParameterPtr			mReflectionMapSampler;				// Reflection map texture sampler parameter.
+	ParameterPtr			mVSInMaskTexcoord;					// Vertex shader input mask texture coordinates.
+	ParameterPtr			mVSOutMaskTexcoord;					// Vertex shader output mask texture coordinates.
+	ParameterPtr			mVSOutReflectionTexcoord;			// Vertex shader output reflection texture coordinates.
+	ParameterPtr			mPSInMaskTexcoord;					// Pixel shader input mask texture coordinates.
+	ParameterPtr			mPSInReflectionTexcoord;			// Pixel shader input reflection texture coordinates.
+	ParameterPtr			mWorldMatrix;						// World matrix parameter.
+	ParameterPtr			mWorldITMatrix;						// World inverse transpose matrix parameter.
+	ParameterPtr			mViewMatrix;						// View matrix parameter.			
+	ParameterPtr			mVSInputNormal;						// Vertex shader input normal parameter.
+	ParameterPtr 			mVSInputPos;						// Vertex shader input position parameter.		
+	ParameterPtr			mPSOutDiffuse;						// Pixel shader output colour.
 };
 
 

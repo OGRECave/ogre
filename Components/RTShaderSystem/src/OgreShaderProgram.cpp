@@ -51,15 +51,6 @@ Program::~Program()
 //-----------------------------------------------------------------------------
 void Program::destroyParameters()
 {
-	ShaderParameterIterator it;
-
-	for (it = mParameters.begin(); it != mParameters.end(); ++it)
-	{
-		if (*it != NULL)
-		{
-			delete *it;
-		}	
-	}
 	mParameters.clear();
 }
 
@@ -97,9 +88,9 @@ GpuProgramType Program::getType() const
 }
 
 //-----------------------------------------------------------------------------
-void Program::addParameter(Parameter* parameter)
+void Program::addParameter(ParameterPtr parameter)
 {
-	if (getParameterByName(parameter->getName()) != NULL)
+	if (getParameterByName(parameter->getName()).get() != NULL)
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
 			"Parameter <" + parameter->getName() + "> already declared in program <" + getName() +">", 
@@ -110,7 +101,7 @@ void Program::addParameter(Parameter* parameter)
 }
 
 //-----------------------------------------------------------------------------
-void Program::removeParameter(Parameter* parameter)
+void Program::removeParameter(ParameterPtr parameter)
 {
 	ShaderParameterIterator it;
 
@@ -118,21 +109,21 @@ void Program::removeParameter(Parameter* parameter)
 	{
 		if ((*it) == parameter)
 		{
-			delete *it;
+			(*it).setNull();
 			mParameters.erase(it);
 		}
 	}
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, 
-										   Real data)
+ParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, 
+												Real data)
 {
-	Parameter* param = NULL;
+	ParameterPtr param;
 
 	// Check if parameter already exists.
 	param = getParameterByAutoType(autoType);
-	if (param != NULL)
+	if (param.get() != NULL)
 	{
 		if (param->isAutoConstantRealParameter() &&
 			param->getAutoConstantRealData() == data)
@@ -142,21 +133,21 @@ Parameter* Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstantT
 	}
 	
 	// Create new parameter.
-	param = new Parameter(autoType, data);
+	param = ParameterPtr(new Parameter(autoType, data));
 	addParameter(param);
 
 	return param;
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, 
+ParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, 
 										   size_t data)
 {
-	Parameter* param = NULL;
+	ParameterPtr param;
 
 	// Check if parameter already exists.
 	param = getParameterByAutoType(autoType);
-	if (param != NULL)
+	if (param.get() != NULL)
 	{
 		if (param->isAutoConstantIntParameter() &&
 			param->getAutoConstantIntData() == data)
@@ -166,18 +157,18 @@ Parameter* Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantTy
 	}
 
 	// Create new parameter.
-	param = new Parameter(autoType, data);
+	param = ParameterPtr(new Parameter(autoType, data));
 	addParameter(param);
 
 	return param;
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Program::resolveParameter(GpuConstantType type, 
+ParameterPtr Program::resolveParameter(GpuConstantType type, 
 									int index, uint16 variability,
 									const String& suggestedName)
 {
-	Parameter* param = NULL;
+	ParameterPtr param;
 
 	if (index == -1)
 	{
@@ -199,7 +190,7 @@ Parameter* Program::resolveParameter(GpuConstantType type,
 	{
 		// Check if parameter already exists.
 		param = getParameterByType(type, index);
-		if (param != NULL)
+		if (param.get() != NULL)
 		{		
 			return param;		
 		}
@@ -208,7 +199,7 @@ Parameter* Program::resolveParameter(GpuConstantType type,
 
 	
 	// Create new parameter.
-	param = new Parameter(type, suggestedName + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index, Parameter::SPC_UNKNOWN, variability);
+	param = ParameterPtr(new Parameter(type, suggestedName + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index, Parameter::SPC_UNKNOWN, variability));
 	addParameter(param);
 
 	return param;
@@ -217,7 +208,7 @@ Parameter* Program::resolveParameter(GpuConstantType type,
 
 
 //-----------------------------------------------------------------------------
-Parameter* Program::getParameterByName(const String& name)
+ParameterPtr Program::getParameterByName(const String& name)
 {
 	ShaderParameterIterator it;
 
@@ -229,11 +220,11 @@ Parameter* Program::getParameterByName(const String& name)
 		}
 	}
 
-	return NULL;
+	return ParameterPtr();
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Program::getParameterByType(GpuConstantType type, int index)
+ParameterPtr Program::getParameterByType(GpuConstantType type, int index)
 {
 	ShaderParameterIterator it;
 
@@ -246,11 +237,11 @@ Parameter* Program::getParameterByType(GpuConstantType type, int index)
 		}
 	}
 
-	return NULL;
+	return ParameterPtr();
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Program::getParameterByAutoType(GpuProgramParameters::AutoConstantType autoType)
+ParameterPtr Program::getParameterByAutoType(GpuProgramParameters::AutoConstantType autoType)
 {
 	ShaderParameterIterator it;
 
@@ -262,7 +253,7 @@ Parameter* Program::getParameterByAutoType(GpuProgramParameters::AutoConstantTyp
 		}
 	}
 
-	return NULL;
+	return ParameterPtr();
 }
 
 //-----------------------------------------------------------------------------

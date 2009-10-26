@@ -28,6 +28,7 @@ THE SOFTWARE.
 #define _ShaderFFPFog_
 
 #include "OgreShaderPrerequisites.h"
+#include "OgreShaderParameter.h"
 #include "OgreShaderSubRenderState.h"
 #include "OgreVector4.h"
 
@@ -147,15 +148,15 @@ protected:
 	Vector4				mFogParamsValue;		// Fog parameters (density, start, end, 1/end-start).
 	bool				mPassOverrideParams;	// True if the fog parameters should be taken from the pass.
 
-	Parameter*			mWorldViewProjMatrix;	// World view projection parameter.		
-	Parameter*			mFogColour;				// Fog colour parameter.	
-	Parameter*			mFogParams;				// Fog parameters program parameter.	
-	Parameter*			mVSInPos;				// Vertex shader input position parameter.
-	Parameter*			mVSOutFogFactor;		// Vertex shader output fog colour parameter.
-	Parameter*			mPSInFogFactor;			// Pixel shader input fog factor.
-	Parameter*			mVSOutDepth;			// Vertex shader output depth.
-	Parameter*			mPSInDepth;				// Pixel shader input depth.
-	Parameter*			mPSOutDiffuse;			// Pixel shader output diffuse colour.
+	ParameterPtr		mWorldViewProjMatrix;	// World view projection parameter.		
+	ParameterPtr		mFogColour;				// Fog colour parameter.	
+	ParameterPtr		mFogParams;				// Fog parameters program parameter.	
+	ParameterPtr		mVSInPos;				// Vertex shader input position parameter.
+	ParameterPtr		mVSOutFogFactor;		// Vertex shader output fog colour parameter.
+	ParameterPtr		mPSInFogFactor;			// Pixel shader input fog factor.
+	ParameterPtr		mVSOutDepth;			// Vertex shader output depth.
+	ParameterPtr		mPSInDepth;				// Pixel shader input depth.
+	ParameterPtr		mPSOutDiffuse;			// Pixel shader output diffuse colour.
 };
 
 
