@@ -82,7 +82,7 @@ PerPixelLighting::PerPixelLighting()
 	mSurfaceSpecularColour			= NULL;	
 	mSurfaceEmissiveColour			= NULL;
 	mSurfaceShininess				= NULL;		
-	mSpeuclarEnable					= false;
+	mSpecularEnable					= false;
 
 	msBlankLight.setDiffuseColour(ColourValue::Black);
 	msBlankLight.setSpecularColour(ColourValue::Black);
@@ -112,7 +112,7 @@ uint32 PerPixelLighting::getHashCode()
 	LightParamsIterator it = mLightParamsList.begin();
 
 
-	sh_hash_combine(hashCode, mSpeuclarEnable);	
+	sh_hash_combine(hashCode, mSpecularEnable);	
 
 	while(it != mLightParamsList.end())
 	{
@@ -254,7 +254,7 @@ void PerPixelLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, con
 		}
 
 		// Update specular colour if need to.
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{
 			// Update diffuse colour.
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
@@ -388,7 +388,7 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
 	if (mPSTempDiffuseColour == NULL)
 		return false;
 
-	if (mSpeuclarEnable)
+	if (mSpecularEnable)
 	{
 		mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
 		if (mPSSpecular == NULL)
@@ -533,7 +533,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 				return false;
 		}		
 
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{
 			// Resolve specular colour.
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
@@ -683,7 +683,7 @@ bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const
 		}		
 	}
 
-	if (mSpeuclarEnable)
+	if (mSpecularEnable)
 	{
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 		curFuncInvocation->getParameterList().push_back(mPSSpecular->getName());
@@ -710,7 +710,7 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 	}
 
 	// Merge specular colour with vertex colour if need to.
-	if (mSpeuclarEnable && mTrackVertexColourType & TVC_SPECULAR)
+	if (mSpecularEnable && mTrackVertexColourType & TVC_SPECULAR)
 	{							
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
 		curFuncInvocation->getParameterList().push_back(mPSDiffuse->getName() + ".xyz");	
@@ -723,7 +723,7 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 	{
 
 	case Light::LT_DIRECTIONAL:			
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{				
 			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR, groupOrder, internalCounter++); 
 			curFuncInvocation->getParameterList().push_back(mPSInNormal->getName());
@@ -752,7 +752,7 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 		break;
 
 	case Light::LT_POINT:	
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{
 			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
 			curFuncInvocation->getParameterList().push_back(mPSInNormal->getName());			
@@ -784,7 +784,7 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 		break;
 
 	case Light::LT_SPOTLIGHT:
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{
 			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
 			curFuncInvocation->getParameterList().push_back(mPSInNormal->getName());
@@ -837,7 +837,7 @@ bool PerPixelLighting::addPSFinalAssignmentInvocation( Function* psMain, const i
 	curFuncInvocation->getParameterList().push_back(mPSOutDiffuse->getName());	
 	psMain->addAtomInstace(curFuncInvocation);
 
-	if (mSpeuclarEnable)
+	if (mSpecularEnable)
 	{
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 
 		curFuncInvocation->getParameterList().push_back(mPSTempSpecularColour->getName());

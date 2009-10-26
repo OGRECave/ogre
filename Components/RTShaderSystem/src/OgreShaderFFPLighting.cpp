@@ -63,7 +63,7 @@ FFPLighting::FFPLighting()
 	mSurfaceSpecularColour			= NULL;	
 	mSurfaceEmissiveColour			= NULL;
 	mSurfaceShininess				= NULL;		
-	mSpeuclarEnable					= false;
+	mSpecularEnable					= false;
 
 	msBlankLight.setDiffuseColour(ColourValue::Black);
 	msBlankLight.setSpecularColour(ColourValue::Black);
@@ -93,7 +93,7 @@ uint32 FFPLighting::getHashCode()
 	LightParamsIterator it = mLightParamsList.begin();
 
 
-	sh_hash_combine(hashCode, mSpeuclarEnable);	
+	sh_hash_combine(hashCode, mSpecularEnable);	
 
 	while(it != mLightParamsList.end())
 	{
@@ -234,7 +234,7 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 		}
 
 		// Update specular colour if need to.
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{
 			// Update diffuse colour.
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
@@ -410,7 +410,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 				return false;
 		}		
 
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{
 			// Resolve specular colour.
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
@@ -556,7 +556,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 	}
 
 	// Merge specular colour with vertex colour if need to.
-	if (mSpeuclarEnable && mTrackVertexColourType & TVC_SPECULAR)
+	if (mSpecularEnable && mTrackVertexColourType & TVC_SPECULAR)
 	{							
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
 		curFuncInvocation->getParameterList().push_back(mVSDiffuse->getName() + ".xyz");	
@@ -569,7 +569,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 	{
 		
 	case Light::LT_DIRECTIONAL:			
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{				
 			curFuncInvocation = new FunctionInvocation(FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR, groupOrder, internalCounter++); 
 			curFuncInvocation->getParameterList().push_back(mWorldViewMatrix->getName());
@@ -601,7 +601,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 		break;
 
 	case Light::LT_POINT:	
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{
 			curFuncInvocation = new FunctionInvocation(FFP_FUNC_LIGHT_POINT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
 			curFuncInvocation->getParameterList().push_back(mWorldViewMatrix->getName());			
@@ -637,7 +637,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 		break;
 
 	case Light::LT_SPOTLIGHT:
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{
 			curFuncInvocation = new FunctionInvocation(FFP_FUNC_LIGHT_SPOT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
 			curFuncInvocation->getParameterList().push_back(mWorldViewMatrix->getName());			

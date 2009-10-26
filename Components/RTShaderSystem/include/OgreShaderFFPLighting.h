@@ -141,12 +141,12 @@ protected:
 	lighting component in addition to the diffuse component.
 	@param enable Pass true to enable specular component computation.
 	*/
-	void					setSpecularEnable		(bool enable) { mSpeuclarEnable = enable; }
+	void					setSpecularEnable		(bool enable) { mSpecularEnable = enable; }
 
 	/** 
 	Get the specular component state. 
 	*/
-	bool					getSpecularEnable		() const	  { return mSpeuclarEnable; }
+	bool					getSpecularEnable		() const	  { return mSpecularEnable; }
 
 	/** 
 	@see SubRenderState::resolveParameters.
@@ -178,7 +178,7 @@ protected:
 // Attributes.
 protected:	
 	TrackVertexColourType	mTrackVertexColourType;			// Track per vertex colour type.
-	bool					mSpeuclarEnable;				// Specular component enabled/disabled.
+	bool					mSpecularEnable;				// Specular component enabled/disabled.
 	LightParamsList			mLightParamsList;				// Light list.
 	Parameter*				mWorldViewMatrix;				// World view matrix parameter.
 	Parameter*				mWorldViewITMatrix;				// World view matrix inverse transpose parameter.

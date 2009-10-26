@@ -96,7 +96,7 @@ NormalMapLighting::NormalMapLighting()
 	mWorldInvRotMatrix				= NULL;
 	mNormalMapSamplerIndex			= 0;
 	mVSTexCoordSetIndex				= 0;
-	mSpeuclarEnable					= false;
+	mSpecularEnable					= false;
 	mNormalMapSpace					= NMS_TANGENT;
 
 	msBlankLight.setDiffuseColour(ColourValue::Black);
@@ -127,7 +127,7 @@ uint32 NormalMapLighting::getHashCode()
 	LightParamsIterator it = mLightParamsList.begin();
 
 
-	sh_hash_combine(hashCode, mSpeuclarEnable);	
+	sh_hash_combine(hashCode, mSpecularEnable);	
 
 	while(it != mLightParamsList.end())
 	{
@@ -292,7 +292,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 		}
 
 		// Update specular colour if need to.
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{
 			// Update diffuse colour.
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
@@ -463,7 +463,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 	if (mPSTempDiffuseColour == NULL)
 		return false;
 
-	if (mSpeuclarEnable)
+	if (mSpecularEnable)
 	{
 		mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
 		if (mPSSpecular == NULL)
@@ -759,7 +759,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 				return false;
 		}		
 
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{
 			// Resolve specular colour.
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
@@ -1054,7 +1054,7 @@ bool NormalMapLighting::addPSGlobalIlluminationInvocation(Function* psMain, cons
 		}		
 	}
 
-	if (mSpeuclarEnable)
+	if (mSpecularEnable)
 	{
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 		curFuncInvocation->getParameterList().push_back(mPSSpecular->getName());
@@ -1081,7 +1081,7 @@ bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams,
 	}
 
 	// Merge specular colour with vertex colour if need to.
-	if (mSpeuclarEnable && mTrackVertexColourType & TVC_SPECULAR)
+	if (mSpecularEnable && mTrackVertexColourType & TVC_SPECULAR)
 	{							
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
 		curFuncInvocation->getParameterList().push_back(mPSDiffuse->getName() + ".xyz");	
@@ -1094,7 +1094,7 @@ bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams,
 	{
 
 	case Light::LT_DIRECTIONAL:			
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{				
 			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR, groupOrder, internalCounter++); 
 			curFuncInvocation->getParameterList().push_back(mPSNormal->getName());
@@ -1123,7 +1123,7 @@ bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams,
 		break;
 
 	case Light::LT_POINT:	
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{
 			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
 			curFuncInvocation->getParameterList().push_back(mPSNormal->getName());			
@@ -1154,7 +1154,7 @@ bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams,
 		break;
 
 	case Light::LT_SPOTLIGHT:
-		if (mSpeuclarEnable)
+		if (mSpecularEnable)
 		{
 			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
 			curFuncInvocation->getParameterList().push_back(mPSNormal->getName());
@@ -1206,7 +1206,7 @@ bool NormalMapLighting::addPSFinalAssignmentInvocation( Function* psMain, const 
 	curFuncInvocation->getParameterList().push_back(mPSOutDiffuse->getName());	
 	psMain->addAtomInstace(curFuncInvocation);
 
-	if (mSpeuclarEnable)
+	if (mSpecularEnable)
 	{
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 
 		curFuncInvocation->getParameterList().push_back(mPSTempSpecularColour->getName());
@@ -1229,7 +1229,7 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
 	setLightCount(lightCount);
 
 	mTrackVertexColourType = rhsLighting.mTrackVertexColourType;
-	mSpeuclarEnable = rhsLighting.mSpeuclarEnable;
+	mSpecularEnable = rhsLighting.mSpecularEnable;
 	mNormalMapSpace = rhsLighting.mNormalMapSpace;
 }
 
