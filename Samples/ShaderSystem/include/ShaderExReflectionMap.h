@@ -27,11 +27,12 @@ THE SOFTWARE.
 #ifndef _ShaderExReflectionMap_
 #define _ShaderExReflectionMap_
 
-#include "OgreShaderPrerequisites.h"
-#include "OgreShaderSubRenderState.h"
+#include "OgreRTShaderSystem.h"
+
 
 using namespace Ogre;
 using namespace Ogre::RTShader;
+
 
 /** Reflection map sub render state implementation.
 It will use as extension for the RT Shader System.
@@ -161,6 +162,17 @@ public:
 	@see SubRenderStateFactory::getType.
 	*/
 	virtual const String&	getType				() const;
+
+	/** 
+	@see SubRenderStateFactory::createInstance.
+	*/
+	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass);
+
+	/** 
+	@see SubRenderStateFactory::writeInstance.
+	*/
+	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
+
 
 protected:
 

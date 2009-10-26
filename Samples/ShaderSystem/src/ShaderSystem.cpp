@@ -13,6 +13,14 @@ const String MAIN_ENTITY_MESH			= "ShaderSystem.mesh";
 const String SPECULAR_BOX				= "SpecularBox";
 const String REFLECTIONMAP_BOX			= "ReflectionMapBox";
 const String MAIN_ENTITY_NAME			= "MainEntity";
+const String EXPORT_BUTTON_NAME			=  "ExportMaterial";
+const String SAMPLE_MATERIAL_GROUP		= "RTShaderSystemMaterialsGroup";
+const int MESH_ARRAY_SIZE = 2;
+const String MESH_ARRAY[MESH_ARRAY_SIZE] =
+{
+	MAIN_ENTITY_MESH,
+	"Knot.mesh"
+};
 
 SamplePlugin* sp;
 Sample* s;
@@ -93,6 +101,18 @@ void Sample_ShaderSystem::itemSelected(SelectMenu* menu)
 		{
 			setCurrentLightingModel((ShaderSystemLightingModel)curModelIndex);
 		}
+	}
+}
+
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::buttonHit( Button* b )
+{
+	// Case the current material of the main entity should be exported.
+	if (b->getName() == EXPORT_BUTTON_NAME)
+	{		
+		const String& materialName = mSceneMgr->getEntity(MAIN_ENTITY_NAME)->getSubEntity(0)->getMaterialName();
+		
+		exportRTShaderSystemMaterial(mShaderGenerator->getShaderCachePath() + "materials/ShaderSystemExport.material", materialName);				
 	}
 }
 
@@ -188,31 +208,62 @@ void Sample_ShaderSystem::setupContent()
 	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0))->attachObject(pPlaneEnt);
 
 
-	// Load the main entity mesh.
-	MeshPtr pMesh = MeshManager::getSingleton().load(MAIN_ENTITY_MESH,
-		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,    
-		HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, 
-		HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-		true, true); //so we can still read it
-	
-	// Build tangent vectors, all our meshes use only 1 texture coordset 
-	// Note we can build into VES_TANGENT now (SM2+)
-	unsigned short src, dest;
-	if (!pMesh->suggestTangentVectorBuildParams(VES_TANGENT, src, dest))
+	// Load sample meshes and generate tangent vectors.
+	for (int i=0; i < MESH_ARRAY_SIZE; ++i)
 	{
-		pMesh->buildTangentVectors(VES_TANGENT, src, dest);		
+		const String& curMeshName = MESH_ARRAY[i];
+
+		MeshPtr pMesh = MeshManager::getSingleton().load(curMeshName,
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,    
+			HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY, 
+			HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+			true, true); //so we can still read it
+
+		// Build tangent vectors, all our meshes use only 1 texture coordset 
+		// Note we can build into VES_TANGENT now (SM2+)
+		unsigned short src, dest;
+		if (!pMesh->suggestTangentVectorBuildParams(VES_TANGENT, src, dest))
+		{
+			pMesh->buildTangentVectors(VES_TANGENT, src, dest);		
+		}
 	}
+	
 
-	// Load main target object.
-	Entity* mainEntity = mSceneMgr->createEntity(MAIN_ENTITY_NAME, MAIN_ENTITY_MESH);
 
-	mTargetEntities.push_back(mainEntity);
+	Entity* entity;
+	SceneNode* childNode;
 
-	// Attach the head to the scene
-	SceneNode* childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		
-	childNode->attachObject(mainEntity);
+	// Create the main entity.
+	entity = mSceneMgr->createEntity(MAIN_ENTITY_NAME, MAIN_ENTITY_MESH);
+	mTargetEntities.push_back(entity);
+	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();		
+	childNode->attachObject(entity);
 
+	// Create reflection entity that will show the exported material.
+	const String& mainExportedMaterial = mSceneMgr->getEntity(MAIN_ENTITY_NAME)->getSubEntity(0)->getMaterialName() + "_RTSS";
+	MaterialPtr matMainEnt        = MaterialManager::getSingleton().getByName(mainExportedMaterial, SAMPLE_MATERIAL_GROUP);
+
+	entity = mSceneMgr->createEntity("ExportedMaterialEntity", MAIN_ENTITY_MESH);
+	entity->setMaterial(matMainEnt);
+	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	childNode->setPosition(0.0, 200.0, -200.0);
+	childNode->attachObject(entity);
+
+	// Create secondary entities that will be using custom RT Shader materials.
+	entity = mSceneMgr->createEntity("PerPixelEntity", "Knot.mesh");
+	entity->setMaterialName("RTSS/PerPixel_SinglePass");
+	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	childNode->setPosition(300.0, 100.0, -100.0);
+	childNode->attachObject(entity);
+
+	// Create secondary entities that will be using custom RT Shader materials.
+	entity = mSceneMgr->createEntity("NormalMapEntity", "Knot.mesh");
+	entity->setMaterialName("RTSS/NormalMapping_SinglePass");
+	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	childNode->setPosition(-300.0, 100.0, -100.0);
+	childNode->attachObject(entity);
+
+	
 	createDirectionalLight();
 	createPointLight();
 	createSpotLight();
@@ -242,8 +293,10 @@ void Sample_ShaderSystem::setupContent()
 	mLightingModelMenu ->addItem("Normal Map - Tangent Space");
 	mLightingModelMenu ->addItem("Normal Map - Object Space");
 
-	mCamera->setPosition(0.0, 300.0, 350.0);
-	mCamera->lookAt(0.0, 80.0, 0.0);
+	mTrayMgr->createButton(TL_BOTTOM, EXPORT_BUTTON_NAME, "Export Material");
+
+	mCamera->setPosition(0.0, 300.0, 450.0);
+	mCamera->lookAt(0.0, 150.0, 0.0);
 
 	// Make this viewport work with shader generator scheme.
 	mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
@@ -264,10 +317,11 @@ void Sample_ShaderSystem::setupContent()
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::cleanupContent()
 {	
-	if (mReflectionMapFactory != NULL)
-	{			
-		delete mReflectionMapFactory;
-		mReflectionMapFactory = NULL;
+	// UnLoad sample meshes and generate tangent vectors.
+	for (int i=0; i < MESH_ARRAY_SIZE; ++i)
+	{
+		const String& curMeshName = MESH_ARRAY[i];
+		MeshManager::getSingleton().unload(curMeshName); 
 	}
 	
 	MeshManager::getSingleton().remove(MAIN_ENTITY_MESH);
@@ -421,12 +475,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 
 			if (mReflectionMapEnable)
 			{
-				// Create and add the custom reflection map shader extension factory to the shader generator.
-				if (mReflectionMapFactory == NULL)
-				{
-					mReflectionMapFactory = new ShaderExReflectionMapFactory;
-					mShaderGenerator->addSubRenderStateFactory(mReflectionMapFactory);
-				}
+				
 
 				RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(ShaderExReflectionMap::Type);
 				ShaderExReflectionMap* reflectionMapSubRS = static_cast<ShaderExReflectionMap*>(subRenderState);
@@ -573,10 +622,10 @@ void Sample_ShaderSystem::setLightVisible(const String& lightName, bool visible)
 }
 
 //-----------------------------------------------------------------------
-void Sample_ShaderSystem::exportShaderMaterial(const String& fileName, const String& materialName)
+void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, const String& materialName)
 {
 	// Grab material pointer.
-	MaterialPtr matSerTest = MaterialManager::getSingleton().getByName(materialName);
+	MaterialPtr materialPtr = MaterialManager::getSingleton().getByName(materialName);
 
 	// Create shader based technique.
 	bool success = mShaderGenerator->createShaderBasedTechnique(materialName,
@@ -589,13 +638,17 @@ void Sample_ShaderSystem::exportShaderMaterial(const String& fileName, const Str
 		// Force shader generation of the given material.
 		RTShader::ShaderGenerator::getSingleton().validateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, materialName);
 
-		// Grab the shader generator material serializer listener.
-		MaterialSerializer::Listener* matSGListener = RTShader::ShaderGenerator::getSingleton().getMaterialSerializerListener();
+		// Grab the RTSS material serializer listener.
+		MaterialSerializer::Listener* matRTSSListener = RTShader::ShaderGenerator::getSingleton().getMaterialSerializerListener();
 		MaterialSerializer matSer;
 
-		// Add the listener and export.
-		matSer.addListener(matSGListener);
-		matSer.exportMaterial(matSerTest, fileName);
+		// Add the custom RTSS listener to the serializer.
+		// It will make sure that every custom parameter needed by the RTSS 
+		// will be added to the exported material script.
+		matSer.addListener(matRTSSListener);
+
+		// Simply export the material.
+		matSer.exportMaterial(materialPtr, fileName, false, false, "", materialPtr->getName() + "_RTSS");
 	}
 }
 
@@ -624,10 +677,52 @@ void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps
 	}
 }
 
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::loadResources()
+{
+	// Create and add the custom reflection map shader extension factory to the shader generator.	
+	mReflectionMapFactory = new ShaderExReflectionMapFactory;
+	mShaderGenerator->addSubRenderStateFactory(mReflectionMapFactory);
+	
+	createPrivateResourceGroup();
+}
 
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::createPrivateResourceGroup()
+{
+	// Create the resource group of the RT Shader System.
+	ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
+
+	rgm.createResourceGroup(SAMPLE_MATERIAL_GROUP, false);
+	rgm.addResourceLocation(mShaderGenerator->getShaderCachePath() + "materials", "FileSystem", SAMPLE_MATERIAL_GROUP);		
+	rgm.initialiseResourceGroup(SAMPLE_MATERIAL_GROUP);
+	rgm.loadResourceGroup(SAMPLE_MATERIAL_GROUP, true);
+}
+
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::unloadResources()
+{
+	destroyPrivateResourceGroup();
+
+	if (mReflectionMapFactory != NULL)
+	{			
+		delete mReflectionMapFactory;
+		mReflectionMapFactory = NULL;
+	}
+}
+
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::destroyPrivateResourceGroup()
+{
+	// Destroy the resource group of the RT Shader System	
+	ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
+
+	rgm.destroyResourceGroup(SAMPLE_MATERIAL_GROUP);
+}
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 
+//-----------------------------------------------------------------------
 bool Sample_ShaderSystem::touchPressed( const OIS::MultiTouchEvent& evt )
 {
 	if (mTrayMgr->injectMouseDown(evt)) 
@@ -637,6 +732,7 @@ bool Sample_ShaderSystem::touchPressed( const OIS::MultiTouchEvent& evt )
 	return true;
 }
 
+//-----------------------------------------------------------------------
 bool Sample_ShaderSystem::touchReleased( const OIS::MultiTouchEvent& evt )
 {
 	if (mTrayMgr->injectMouseUp(evt)) 
@@ -646,6 +742,7 @@ bool Sample_ShaderSystem::touchReleased( const OIS::MultiTouchEvent& evt )
 	return true;
 }
 
+//-----------------------------------------------------------------------
 bool Sample_ShaderSystem::touchMoved( const OIS::MultiTouchEvent& evt )
 {
 	// only rotate the camera if cursor is hidden
@@ -658,6 +755,7 @@ bool Sample_ShaderSystem::touchMoved( const OIS::MultiTouchEvent& evt )
 
 #else
 
+//-----------------------------------------------------------------------
 bool Sample_ShaderSystem::mousePressed( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
 {
 	if (mTrayMgr->injectMouseDown(evt, id)) 
@@ -668,6 +766,7 @@ bool Sample_ShaderSystem::mousePressed( const OIS::MouseEvent& evt, OIS::MouseBu
 	return true;
 }
 
+//-----------------------------------------------------------------------
 bool Sample_ShaderSystem::mouseReleased( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
 {
 	if (mTrayMgr->injectMouseUp(evt, id)) 
@@ -678,6 +777,7 @@ bool Sample_ShaderSystem::mouseReleased( const OIS::MouseEvent& evt, OIS::MouseB
 	return true;
 }
 
+//-----------------------------------------------------------------------
 bool Sample_ShaderSystem::mouseMoved( const OIS::MouseEvent& evt )
 {
 	// only rotate the camera if cursor is hidden
@@ -688,4 +788,5 @@ bool Sample_ShaderSystem::mouseMoved( const OIS::MouseEvent& evt )
 
 	return true;
 }
+
 #endif

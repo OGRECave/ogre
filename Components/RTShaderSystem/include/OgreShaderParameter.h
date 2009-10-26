@@ -257,7 +257,11 @@ public:
 		SPC_TEXTURE_COORDINATE4,
 		SPC_TEXTURE_COORDINATE5,
 		SPC_TEXTURE_COORDINATE6,
-		SPC_TEXTURE_COORDINATE7
+		SPC_TEXTURE_COORDINATE7,
+
+		/// Reserved custom content range to be used by user custom shader extensions.
+		SPC_CUSTOM_CONTENT_BEGIN	= 1000,
+		SPC_CUSTOM_CONTENT_END		= 2000
 	};
 
 // Interface.

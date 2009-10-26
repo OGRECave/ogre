@@ -384,7 +384,7 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
 	if (mPSOutDiffuse == NULL)
 		return false;
 
-	mPSTempDiffuseColour = psMain->resolveLocalParameter("lPerPixelDiffuse", GCT_FLOAT4);
+	mPSTempDiffuseColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lPerPixelDiffuse", GCT_FLOAT4);
 	if (mPSTempDiffuseColour == NULL)
 		return false;
 
@@ -398,7 +398,7 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
 				return false;
 		}
 
-		mPSTempSpecularColour = psMain->resolveLocalParameter("lPerPixelSpecular", GCT_FLOAT4);
+		mPSTempSpecularColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lPerPixelSpecular", GCT_FLOAT4);
 		if (mPSTempSpecularColour == NULL)
 			return false;
 

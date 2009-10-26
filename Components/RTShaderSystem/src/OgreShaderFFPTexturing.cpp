@@ -443,7 +443,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 	
 			
 	// Add texture sampling code.
-	Parameter* texel = psMain->resolveLocalParameter("texel", GCT_FLOAT4);
+	Parameter* texel = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "texel", GCT_FLOAT4);
 	FunctionInvocation* curFuncInvocation = NULL;
 	
 	if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
@@ -457,7 +457,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 	psMain->addAtomInstace(curFuncInvocation);
 
 	// Build colour argument for source1.
-	source1 = psMain->resolveLocalParameter("source1", GCT_FLOAT4);
+	source1 = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "source1", GCT_FLOAT4);
 		
 	addPSArgumentInvocations(psMain, source1, texel, 
 		textureUnitParams->mTextureSamplerIndex,
@@ -465,7 +465,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 		colourBlend.alphaArg1, false, groupOrder, internalCounter);
 
 	// Build colour argument for source2.
-	source2 = psMain->resolveLocalParameter("source2", GCT_FLOAT4);
+	source2 = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "source2", GCT_FLOAT4);
 
 	addPSArgumentInvocations(psMain, source2, texel, 
 		textureUnitParams->mTextureSamplerIndex,

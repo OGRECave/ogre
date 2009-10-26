@@ -1,11 +1,39 @@
 
-// RTShader system materials.
+// RTShader System materials.
+
+// This is a single pass per pixel lighting based material.
+// All scene lights will be applied within a single rendering pass.
+// It saves geometry overdraw but it consumes more instructions during vertex and pixel shaders.
+// Use this method when your scene uses small amount of lights. (1-3).
+material RTSS/PerPixel_SinglePass
+{
+	technique
+	{
+		pass
+		{
+			// Turn off specular in order to use only diffuse based bump map technique.
+			specular 1.0 1.0 1.0 32
+			
+			texture_unit
+			{
+				texture RustedMetal.jpg
+			}				
+			
+			// RT Shader system section.
+ 			rtshader_system
+ 			{	 	
+ 				// Light model will be normal map based. 			
+ 				light_model sgx_per_pixel				
+ 			}			
+		}				
+	}
+}
 
 // This is a single pass normal map lighting based material.
 // All scene lights will be applied within a single rendering pass.
 // It saves geometry overdraw but it consumes more instructions during vertex and pixel shaders.
 // Use this method when your scene uses small amount of lights. (1-3).
-material RTShaderSystem/BumpMapping_SinglePass
+material RTSS/NormalMapping_SinglePass
 {
 	technique
 	{
@@ -33,7 +61,7 @@ material RTShaderSystem/BumpMapping_SinglePass
 // It acts as any other multi light material.
 // It support any number of lights drawing but it uses more geometery drawing. 
 // Use this method when your scene uses large amount of lights. (3-8).
-material RTShaderSystem/BumpMapping_MultiPass
+material RTSS/NormalMapping_MultiPass
 {
 	technique
 	{

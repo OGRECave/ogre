@@ -76,18 +76,22 @@ public:
 	Parameter*						resolveOutputParameter	(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
 	/** Resolve local parameter of this function	
+	@param semantic The desired parameter semantic.	
+	@param index The index of the desired parameter.
 	@param name The name of the parameter.
 	@param type The type of the desired parameter.	
 	Return parameter instance in case of that resolve operation succeeded.
 	*/
-	Parameter*						resolveLocalParameter	(const String& name, GpuConstantType type);
+	Parameter*						resolveLocalParameter	(Parameter::Semantic semantic, int index, const String& name, GpuConstantType type);
 
 	/** Resolve local parameter of this function	
+	@param semantic The desired parameter semantic.	
+	@param index The index of the desired parameter.
 	@param content The content of the parameter.
 	@param type The type of the desired parameter.	
 	Return parameter instance in case of that resolve operation succeeded.
 	*/
-	Parameter*						resolveLocalParameter	(const Parameter::Content content, GpuConstantType type);
+	Parameter*						resolveLocalParameter	(Parameter::Semantic semantic, int index, const Parameter::Content content, GpuConstantType type);
 	
 
 	/** 

@@ -152,7 +152,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 	}
 	else
 	{
-		vsDiffuse = vsMain->resolveLocalParameter(Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+		vsDiffuse = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_CONSTRUCT, FFP_VS_COLOUR, internalCounter++);
 		curFuncInvocation->getParameterList().push_back("1.0");
 		curFuncInvocation->getParameterList().push_back("1.0");
@@ -176,7 +176,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 	}
 	else
 	{
-		vsSpecular = vsMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+		vsSpecular = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
 
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_CONSTRUCT, FFP_VS_COLOUR, internalCounter++);
 		curFuncInvocation->getParameterList().push_back("0.0");
@@ -209,7 +209,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 	}
 	else
 	{
-		psDiffuse = psMain->resolveLocalParameter(Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+		psDiffuse = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_CONSTRUCT, FFP_PS_COLOUR_BEGIN, internalCounter++);
 		curFuncInvocation->getParameterList().push_back("1.0");
 		curFuncInvocation->getParameterList().push_back("1.0");
@@ -226,7 +226,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 	}
 	else
 	{
-		psSpecular = psMain->resolveLocalParameter(Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
+		psSpecular = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_CONSTRUCT, FFP_PS_COLOUR_BEGIN, internalCounter++);
 		curFuncInvocation->getParameterList().push_back("0.0");
 		curFuncInvocation->getParameterList().push_back("0.0");

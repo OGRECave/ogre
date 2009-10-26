@@ -401,7 +401,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 			return false;
 
 		// Resolve local vertex shader TNB matrix.
-		mVSTBNMatrix = vsMain->resolveLocalParameter("lMatTBN", GCT_MATRIX_3X3);
+		mVSTBNMatrix = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lMatTBN", GCT_MATRIX_3X3);
 		if (mVSTBNMatrix == NULL)
 			return false;
 	}
@@ -432,13 +432,13 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 	// Resolve pixel shader normal.
 	if (mNormalMapSpace == NMS_OBJECT)
 	{
-		mPSNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
+		mPSNormal = psMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
 		if (mPSNormal == NULL)
 			return false;
 	}
 	else if (mNormalMapSpace == NMS_TANGENT)
 	{
-		mPSNormal = psMain->resolveLocalParameter(Parameter::SPC_NORMAL_TANGENT_SPACE, GCT_FLOAT3);
+		mPSNormal = psMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_TANGENT_SPACE, GCT_FLOAT3);
 		if (mPSNormal == NULL)
 			return false;
 	}
@@ -459,7 +459,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 	if (mPSOutDiffuse == NULL)
 		return false;
 
-	mPSTempDiffuseColour = psMain->resolveLocalParameter("lNormalMapDiffuse", GCT_FLOAT4);
+	mPSTempDiffuseColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapDiffuse", GCT_FLOAT4);
 	if (mPSTempDiffuseColour == NULL)
 		return false;
 
@@ -473,7 +473,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 				return false;
 		}
 
-		mPSTempSpecularColour = psMain->resolveLocalParameter("lNormalMapSpecular", GCT_FLOAT4);
+		mPSTempSpecularColour = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapSpecular", GCT_FLOAT4);
 		if (mPSTempSpecularColour == NULL)
 			return false;
 
@@ -510,11 +510,11 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 		if (mCamPosWorldSpace == NULL)		
 			return false;	
 		
-		mVSLocalDir = vsMain->resolveLocalParameter("lNormalMapTempDir", GCT_FLOAT3);
+		mVSLocalDir = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapTempDir", GCT_FLOAT3);
 		if (mVSLocalDir == NULL)
 			return false;	
 
-		mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
+		mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
 		if (mVSWorldPosition == NULL)
 			return false;
 
@@ -615,7 +615,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			// Resolve local dir.
 			if (mVSLocalDir == NULL)
 			{
-				mVSLocalDir = vsMain->resolveLocalParameter("lNormalMapTempDir", GCT_FLOAT3);
+				mVSLocalDir = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapTempDir", GCT_FLOAT3);
 				if (mVSLocalDir == NULL)
 					return false;	
 			}	
@@ -623,7 +623,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			// Resolve world position.
 			if (mVSWorldPosition == NULL)
 			{
-				mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
+				mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
 				if (mVSWorldPosition == NULL)
 					return false;	
 			}	
@@ -714,7 +714,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			// Resolve local dir.
 			if (mVSLocalDir == NULL)
 			{
-				mVSLocalDir = vsMain->resolveLocalParameter("lNormalMapTempDir", GCT_FLOAT3);
+				mVSLocalDir = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lNormalMapTempDir", GCT_FLOAT3);
 				if (mVSLocalDir == NULL)
 					return false;	
 			}	
@@ -722,7 +722,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			// Resolve world position.
 			if (mVSWorldPosition == NULL)
 			{
-				mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
+				mVSWorldPosition = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT3);
 				if (mVSWorldPosition == NULL)
 					return false;	
 			}	

@@ -30,6 +30,9 @@ public:
 	/** @see Sample::itemSelected. */
 	void itemSelected(SelectMenu* menu);
 
+	/** @see Sample::buttonHit. */
+	virtual void buttonHit(Button* b);
+
 	/** @see Sample::getRequiredPlugins. */
 	StringVector getRequiredPlugins();
 
@@ -72,8 +75,8 @@ public:
 	/** Update runtime generated shaders of the target entities in this demo. */
 	void updateSystemShaders();
 
-	/** Export a given material including shader generator materials.*/
-	void exportShaderMaterial(const String& fileName, const String& materialName);
+	/** Export a given material including RTSS extended attributes.*/
+	void exportRTShaderSystemMaterial(const String& fileName, const String& materialName);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 	bool touchPressed(const OIS::MultiTouchEvent& evt);
@@ -106,6 +109,16 @@ protected:
 	/** @see Sample::setupContent. */
 	virtual void cleanupContent();
 
+	/** @see Sample::loadResources. */
+	void loadResources();
+	void createPrivateResourceGroup();
+	
+	/** @see Sample::unloadResources. */
+	void unloadResources();
+	void destroyPrivateResourceGroup();
+
+// Types.
+protected:
 	typedef vector<Entity*>::type	EntityList;
 	typedef EntityList::iterator	EntityListIterator;
 

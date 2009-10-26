@@ -251,7 +251,8 @@ Parameter* Function::resolveOutputParameter(Parameter::Semantic semantic,
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Function::resolveLocalParameter(const String& name,
+Parameter* Function::resolveLocalParameter(Parameter::Semantic semantic, int index,
+										   const String& name,
 										   GpuConstantType type)
 {
 	Parameter* param = NULL;
@@ -259,35 +260,38 @@ Parameter* Function::resolveLocalParameter(const String& name,
 	param = getParameterByName(mLocalParameters, name);
 	if (param != NULL)
 	{
-		if (param->getType() == type)
+		if (param->getType() == type &&
+			param->getSemantic() == semantic &&
+			param->getIndex() == index)
 		{
 			return param;
 		}
-		else
+		else 
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
 				"Can not resolve local parameter due to type mismatch. Function <" + getName() + ">", 			
 				"Function::resolveLocalParameter" );
-		}
+		}		
 	}
 		
-	param = new Parameter(type, name, Parameter::SPS_UNKNOWN, 0, Parameter::SPC_UNKNOWN, (uint16)GPV_GLOBAL);
+	param = new Parameter(type, name, semantic, index, Parameter::SPC_UNKNOWN, (uint16)GPV_GLOBAL);
 	addParameter(mLocalParameters, param);
 			
 	return param;
 }
 
 //-----------------------------------------------------------------------------
-Parameter* Function::resolveLocalParameter(const Parameter::Content content,
+Parameter* Function::resolveLocalParameter(Parameter::Semantic semantic, int index,
+										   const Parameter::Content content,
 										   GpuConstantType type)
 {
 	Parameter* param = NULL;
 
 	param = getParameterByContent(mLocalParameters, content, type);
 	if (param != NULL)	
-		return param;	
+		return param;
 
-	param = new Parameter(type, "lLocalParam_" + StringConverter::toString(mLocalParameters.size()), Parameter::SPS_UNKNOWN, 0, content, (uint16)GPV_GLOBAL);
+	param = new Parameter(type, "lLocalParam_" + StringConverter::toString(mLocalParameters.size()), semantic, index, content, (uint16)GPV_GLOBAL);
 	addParameter(mLocalParameters, param);
 
 	return param;
@@ -414,6 +418,10 @@ Parameter* Function::getParameterBySemantic(const ShaderParameterList& parameter
 Parameter* Function::getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
 {
 	ShaderParameterConstIterator it;
+
+	// Ignore parameters with unknown content.
+	if (content == Parameter::SPC_UNKNOWN)	
+		return NULL;	
 
 	for (it = parameterList.begin(); it != parameterList.end(); ++it)
 	{

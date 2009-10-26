@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
 #include "OgreShaderProgramSet.h"
+#include "OgreScriptCompiler.h"
 
 
 
@@ -306,13 +307,6 @@ bool ShaderExReflectionMap::addVSInvocations( Function* vsMain, const int groupO
 	}
 	else
 	{
-// 		funcInvoaction = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL,  groupOrder, internalCounter++); 
-// 		funcInvoaction->getParameterList().push_back(mWorldITMatrix->getName());
-// 		funcInvoaction->getParameterList().push_back(mViewMatrix->getName());	
-// 		funcInvoaction->getParameterList().push_back(mVSInputNormal->getName());	
-// 		funcInvoaction->getParameterList().push_back(mVSOutReflectionTexcoord->getName());
-//		vsMain->addAtomInstace(funcInvoaction);
-
 		funcInvoaction = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT, groupOrder, internalCounter++); 
 		funcInvoaction->getParameterList().push_back(mWorldMatrix->getName());
 		funcInvoaction->getParameterList().push_back(mWorldITMatrix->getName());
@@ -357,6 +351,104 @@ void ShaderExReflectionMap::setReflectionMapType( TextureType type )
 			"ShaderExReflectionMap::setReflectionMapType");
 	}
 	mReflectionMapType = type;
+}
+
+//-----------------------------------------------------------------------
+SubRenderState*	ShaderExReflectionMapFactory::createInstance(ScriptCompiler* compiler, 
+														 PropertyAbstractNode* prop, Pass* pass)
+{
+	if (prop->name == "rtss_ext_reflection_map")
+	{
+		if(prop->values.size() >= 2)
+		{
+			String strValue;
+			AbstractNodeList::const_iterator it = prop->values.begin();
+
+			// Read reflection map type.
+			if(false == SGScriptTranslator::getString(*it, &strValue))
+			{
+				compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+				return NULL;
+			}
+			++it;
+
+			SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
+			ShaderExReflectionMap* reflectionMapSubRenderState = static_cast<ShaderExReflectionMap*>(subRenderState);
+
+
+			// Reflection map is cubic texture.
+			if (strValue == "cube_map")
+			{
+				reflectionMapSubRenderState->setReflectionMapType(TEX_TYPE_CUBE_MAP);
+			}
+
+			// Reflection map is 2d texture.
+			else if (strValue == "2d_map")
+			{
+				reflectionMapSubRenderState->setReflectionMapType(TEX_TYPE_2D);
+			}
+	
+			// Read mask texture.
+			if (false == SGScriptTranslator::getString(*it, &strValue))
+			{
+				compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+				return NULL;
+			}
+			++it;
+			pass->getUserObjectBindings().setUserAny(ShaderExReflectionMap::MaskMapTextureNameKey, Any(strValue));
+
+			// Read reflection texture.
+			if (false == SGScriptTranslator::getString(*it, &strValue))
+			{
+				compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+				return NULL;
+			}
+			pass->getUserObjectBindings().setUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey, Any(strValue));
+				
+			return subRenderState;								
+			
+		}
+	}
+
+	return NULL;
+}
+
+//-----------------------------------------------------------------------
+void ShaderExReflectionMapFactory::writeInstance(MaterialSerializer* ser, 
+											 SubRenderState* subRenderState, 
+											 Pass* srcPass, Pass* dstPass)
+{
+	// Validate mask texture name.
+	const Any& maskUser = srcPass->getUserObjectBindings().getUserAny(ShaderExReflectionMap::MaskMapTextureNameKey);
+	if (maskUser.isEmpty())	
+		return;	
+
+	// Validate reflection map texture name.
+	const Any& reflectionUser = srcPass->getUserObjectBindings().getUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey);
+	if (reflectionUser.isEmpty())	
+		return;
+
+	const String maskMapTextureName			= any_cast<const String>(maskUser);
+	const String reflectionMapTextureName	= any_cast<const String>(reflectionUser);
+
+
+	ser->writeAttribute(4, "rtss_ext_reflection_map");
+	
+
+	ShaderExReflectionMap* reflectionMapSubRenderState = static_cast<ShaderExReflectionMap*>(subRenderState);
+
+	if (reflectionMapSubRenderState->getReflectionMapType() == TEX_TYPE_CUBE_MAP)
+	{
+		ser->writeValue("cube_map");
+	}
+	else if (reflectionMapSubRenderState->getReflectionMapType() == TEX_TYPE_2D)
+	{
+		ser->writeValue("2d_map");
+	}	
+
+	ser->writeValue(maskMapTextureName);
+	ser->writeValue(reflectionMapTextureName);
+
 }
 
 
