@@ -860,36 +860,41 @@ bool PerPixelLighting::preAddToRenderState(RenderState* renderState, Pass* srcPa
 		setSpecularEnable(false);	
 	}
 
-	// Case this pass should run once per light -> override the light policy.
+	// Case this pass should run once per light(s) -> override the light policy.
 	if (srcPass->getIteratePerLight())
 	{		
+
+		// This is the preferred case -> only one type of light is handled.
 		if (srcPass->getRunOnlyForOneLightType())
 		{
 			if (srcPass->getOnlyLightType() == Light::LT_POINT)
 			{
-				lightCount[0] = 1;
+				lightCount[0] = srcPass->getLightCountPerIteration();
 				lightCount[1] = 0;
 				lightCount[2] = 0;
 			}
 			else if (srcPass->getOnlyLightType() == Light::LT_DIRECTIONAL)
 			{
 				lightCount[0] = 0;
-				lightCount[1] = 1;
+				lightCount[1] = srcPass->getLightCountPerIteration();
 				lightCount[2] = 0;
 			}
 			else if (srcPass->getOnlyLightType() == Light::LT_SPOTLIGHT)
 			{
 				lightCount[0] = 0;
 				lightCount[1] = 0;
-				lightCount[2] = 1;
+				lightCount[2] = srcPass->getLightCountPerIteration();
 			}
 		}
+
+		// This is worse case -> all light types expected to be handled.
+		// Can not handle this request in efficient way - throw an exception.
 		else
 		{
-			lightCount[0] = 1;
-			lightCount[1] = 1;
-			lightCount[2] = 1;
-		}			
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+				"Using iterative lighting method with RT Shader System requires specifieng explicit light type.",
+				"PerPixelLighting::preAddToRenderState");			
+		}
 	}
 
 	setLightCount(lightCount);

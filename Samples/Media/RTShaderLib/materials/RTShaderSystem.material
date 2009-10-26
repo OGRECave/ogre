@@ -16,7 +16,7 @@ material RTSS/PerPixel_SinglePass
 			
 			texture_unit
 			{
-				texture RustedMetal.jpg
+				texture Panels_Diffuse.png
 			}				
 			
 			// RT Shader system section.
@@ -31,6 +31,7 @@ material RTSS/PerPixel_SinglePass
 
 // This is a single pass normal map lighting based material.
 // All scene lights will be applied within a single rendering pass.
+// Supports all kind of lights - directional, point and spot.
 // It saves geometry overdraw but it consumes more instructions during vertex and pixel shaders.
 // Use this method when your scene uses small amount of lights. (1-3).
 material RTSS/NormalMapping_SinglePass
@@ -39,19 +40,19 @@ material RTSS/NormalMapping_SinglePass
 	{
 		pass
 		{
-			// Turn off specular in order to use only diffuse based bump map technique.
+			// Comment the specular in order to use only diffuse based normal map technique.
 			specular 1.0 1.0 1.0 32
 			
 			texture_unit
 			{
-				texture RustedMetal.jpg
+				texture Panels_Diffuse.png
 			}				
 			
 			// RT Shader system section.
  			rtshader_system
  			{	 	
  				// Light model will be normal map based. 			
- 				light_model sgx_normal_map NMBumpsOut.png 				
+ 				light_model sgx_normal_map Panels_Normal_Tangent.png tangent_space 0
  			}			
 		}				
 	}
@@ -59,6 +60,8 @@ material RTSS/NormalMapping_SinglePass
 
 // This is a multi pass nroaml map lighting based material.
 // It acts as any other multi light material.
+// This material defined to use only one type of light per lighting pass because the RTSS need to
+// know what code to produce for the iterative lighting pass, otherwise it will throw an exception.
 // It support any number of lights drawing but it uses more geometery drawing. 
 // Use this method when your scene uses large amount of lights. (3-8).
 material RTSS/NormalMapping_MultiPass
@@ -81,9 +84,11 @@ material RTSS/NormalMapping_MultiPass
 				light_count 0 0 0
 			}
 		}
-		pass perlight
+		
+		// Lighting pass.
+		pass lighting
 		{
-			// Turn off specular in order to use only diffuse based bump map technique.
+			// Comment the specular in order to use only diffuse based normal map technique.
 			specular 1.0 1.0 1.0 32
 			
 			// base colours, not needed for rendering, but as information
@@ -91,9 +96,8 @@ material RTSS/NormalMapping_MultiPass
 			ambient 0 0 0 
 			
 			// do this for each point light
-			// It is important to mention the light type when working with the RT Shader System in iterative lighting method. 
-			// If not specified, it will generate a generic shaders that supports all 3 kinds of lights and you'll suffer from
-			// performance hit.
+			// You MUST specify the light type when working with the RT Shader System in iterative lighting method. 
+			// otherwise an exception will be thrown.
 			iteration once_per_light point
 
 			scene_blend add		
@@ -102,7 +106,7 @@ material RTSS/NormalMapping_MultiPass
  			rtshader_system
  			{	 	
  				// Light model will be normal map based. 			
- 				light_model sgx_normal_map NMBumpsOut.png 				
+ 				light_model sgx_normal_map Panels_Normal_Tangent.png tangent_space 0	
  			}			
 		}	
 		
@@ -115,9 +119,73 @@ material RTSS/NormalMapping_MultiPass
 			scene_blend dest_colour zero
 			texture_unit decalmap
 			{
-				texture RustedMetal.jpg 
+				texture Panels_Diffuse.png
 			}			
 		}			
+	}
+}
+
+// Athene single multi pass material override.
+material RTSS/Athene/NormalMapping_SinglePass : RTSS/NormalMapping_SinglePass
+{	
+	technique
+	{			
+		pass
+		{	
+			// Override the diffuse map.
+			texture_unit
+			{
+				texture egyptrockyfull.jpg 
+			}	
+										
+			// Override the normal map.
+ 			rtshader_system
+ 			{	 	 						
+ 				light_model sgx_normal_map atheneNormalMap.png tangent_space 0	
+ 			}
+		}				
+	}
+}
+
+// Athene model multi pass material override.
+material RTSS/Athene/NormalMapping_MultiPass : RTSS/NormalMapping_MultiPass
+{	
+	technique
+	{
+		pass lighting
+		{								
+			// Override the normal map.
+ 			rtshader_system
+ 			{	 	 						
+ 				light_model sgx_normal_map atheneNormalMap.png tangent_space 0	
+ 			}
+		}
+		
+		// Decal pass
+		pass decal
+		{
+			// Override the decal map.
+			texture_unit decalmap
+			{
+				texture egyptrockyfull.jpg 
+			}			
+		}
+	}
+}
+
+// This material derive from the multi pass normal map material.
+// The only difference is that it process 2 point lights at each lighting pass.
+material RTSS/NormalMapping_MultiPass_2lights : RTSS/NormalMapping_MultiPass
+{
+	technique
+	{		
+		pass lighting
+		{
+			// do this for each point light
+			// You MUST specify the light type when working with the RT Shader System in iterative lighting method. 
+			// otherwise an exception will be thrown.
+			iteration 1 per_n_lights 2 point										
+		}							
 	}
 }
 		

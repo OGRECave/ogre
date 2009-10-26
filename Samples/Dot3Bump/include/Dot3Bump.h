@@ -203,8 +203,8 @@ protected:
 		matNames.push_back("Examples/ShowNormals");
 		matNames.push_back("Examples/ShowTangents");
 #ifdef USE_RTSHADER_SYSTEM
-		matNames.push_back("RTSS/NormalMapping_SinglePass");
-		matNames.push_back("RTSS/NormalMapping_MultiPass");
+		matNames.push_back("RTSS/Athene/NormalMapping_SinglePass");
+		matNames.push_back("RTSS/Athene/NormalMapping_MultiPass");
 #endif
 
 		mPossibilities["athene.mesh"] = matNames;
