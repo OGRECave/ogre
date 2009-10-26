@@ -60,7 +60,8 @@ D3D9HardwarePixelBuffer::~D3D9HardwarePixelBuffer()
 		SAFE_RELEASE(it->second->surface);
 		SAFE_RELEASE(it->second->volume);
 		SAFE_DELETE(it->second);
-		it = mMapDeviceToBufferResources.erase(it);
+		DeviceToBufferResourcesIterator deadi = it++;
+		mMapDeviceToBufferResources.erase(deadi);
 	}
 }
 //-----------------------------------------------------------------------------  

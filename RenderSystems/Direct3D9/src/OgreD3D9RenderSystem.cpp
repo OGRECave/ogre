@@ -3804,7 +3804,8 @@ namespace Ogre
 					i->second.front().surface->Release();
 					i->second.pop_front();
 				}
-				i = mZBufferHash.erase(i);
+				ZBufferHash::iterator deadi = i++;
+				mZBufferHash.erase(deadi);
 			}			
 			else
 			{
