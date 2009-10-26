@@ -230,7 +230,7 @@ function(ogre_config_sample SAMPLENAME)
 
   if (OGRE_INSTALL_PDB)
 	  # install debug pdb files
-	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}_d.pdb
+	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}.pdb
 		  DESTINATION bin${OGRE_DEBUG_PATH}
 		  CONFIGURATIONS Debug
 		  )
