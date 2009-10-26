@@ -3458,11 +3458,11 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::exportMaterial(const MaterialPtr& pMat, const String &fileName, bool exportDefaults,
-        const bool includeProgDef, const String& programFilename)
+        const bool includeProgDef, const String& programFilename, const String& materialName)
     {
         clearQueue();
         mDefaults = exportDefaults;
-        writeMaterial(pMat);
+        writeMaterial(pMat, materialName);
         exportQueued(fileName, includeProgDef, programFilename);
     }
     //-----------------------------------------------------------------------
@@ -3509,13 +3509,13 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::queueForExport(const MaterialPtr& pMat,
-		bool clearQueued, bool exportDefaults)
+		bool clearQueued, bool exportDefaults, const String& materialName)
     {
         if (clearQueued)
             clearQueue();
 
         mDefaults = exportDefaults;
-        writeMaterial(pMat);
+        writeMaterial(pMat, materialName);
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::clearQueue()
@@ -3530,9 +3530,20 @@ namespace Ogre
         return mBuffer;
     }
     //-----------------------------------------------------------------------
-    void MaterialSerializer::writeMaterial(const MaterialPtr& pMat)
+    void MaterialSerializer::writeMaterial(const MaterialPtr& pMat, const String& materialName)
     {
-        LogManager::getSingleton().logMessage("MaterialSerializer : writing material " + pMat->getName() + " to queue.", LML_CRITICAL);
+		String outMaterialName;
+
+		if (materialName.length() > 0)
+		{
+			outMaterialName = materialName;
+		}
+		else
+		{
+			outMaterialName = pMat->getName();
+		}
+
+        LogManager::getSingleton().logMessage("MaterialSerializer : writing material " + outMaterialName + " to queue.", LML_CRITICAL);
 
 		bool skipWriting = false;
 
@@ -3542,7 +3553,7 @@ namespace Ogre
 			return;		
 
         // Material name
-        writeAttribute(0, "material " + pMat->getName());
+		writeAttribute(0, "material " + outMaterialName);
         beginSection(0);
         {
 			// Fire write begin event.

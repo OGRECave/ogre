@@ -220,7 +220,7 @@ namespace Ogre {
 		ListenerList mListeners;
 
 
-        void writeMaterial(const MaterialPtr& pMat);
+        void writeMaterial(const MaterialPtr& pMat, const String& materialName = "");
         void writeTechnique(const Technique* pTech);
         void writePass(const Pass* pPass);
         void writeVertexProgramRef(const Pass* pPass);
@@ -304,9 +304,11 @@ namespace Ogre {
 		@param clearQueued If true, any materials already queued will be removed
 		@param exportDefaults If true, attributes which are defaulted will be
 			included in the script exported, otherwise they will be omitted
+		@param materialName Allow exporting the given material under a different name.
+			In case of empty string the original material name will be used.
 		*/
         void queueForExport(const MaterialPtr& pMat, bool clearQueued = false, 
-			bool exportDefaults = false);
+			bool exportDefaults = false, const String& materialName = "");
         /** Exports queued material(s) to a named material script file.
         @param filename the file name of the material script to be exported
 		@param includeProgDef If true, vertex program and fragment program 
@@ -325,9 +327,12 @@ namespace Ogre {
             programFilename is not empty
         @param programFilename the file name of the vertex / fragment program 
 			script to be exported. This is only used if includeProgDef is false.
+		@param materialName Allow exporting the given material under a different name.
+			In case of empty string the original material name will be used.
         */
         void exportMaterial(const MaterialPtr& pMat, const String& filename, bool exportDefaults = false,
-            const bool includeProgDef = false, const String& programFilename = "");
+            const bool includeProgDef = false, const String& programFilename = "", 
+			const String& materialName = "");
 		/** Returns a string representing the parsed material(s) */
 		const String &getQueuedAsString() const;
 		/** Clears the internal buffer */
