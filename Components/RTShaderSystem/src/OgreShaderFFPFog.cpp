@@ -409,11 +409,79 @@ const String& FFPFogFactory::getType() const
 }
 
 //-----------------------------------------------------------------------
+SubRenderState*	FFPFogFactory::createInstance(ScriptCompiler* compiler, 
+													PropertyAbstractNode* prop, Pass* pass)
+{
+	if (prop->name == "fog_stage")
+	{
+		if(prop->values.size() >= 1)
+		{
+			String strValue;
+
+			if(false == SGScriptTranslator::getString(prop->values.front(), &strValue))
+			{
+				compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+				return NULL;
+			}
+
+			if (strValue == "ffp")
+			{
+				SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
+				FFPFog* fogSubRenderState = static_cast<FFPFog*>(subRenderState);
+				AbstractNodeList::const_iterator it = prop->values.begin();
+
+				if(prop->values.size() >= 2)
+				{
+					++it;
+					if (false == SGScriptTranslator::getString(*it, &strValue))
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						return NULL;
+					}
+
+					if (strValue == "per_vertex")
+					{
+						fogSubRenderState->setCalcMode(FFPFog::CM_PER_VERTEX);
+					}
+					else if (strValue == "per_pixel")
+					{
+						fogSubRenderState->setCalcMode(FFPFog::CM_PER_PIXEL);
+					}
+				}
+				
+				return subRenderState;
+			}
+		}		
+	}
+
+	return NULL;
+}
+
+//-----------------------------------------------------------------------
+void FFPFogFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, 
+										Pass* srcPass, Pass* dstPass)
+{
+	ser->writeAttribute(4, "fog_stage");
+	ser->writeValue("ffp");
+
+	FFPFog* fogSubRenderState = static_cast<FFPFog*>(subRenderState);
+
+
+	if (fogSubRenderState->getCalcMode() == FFPFog::CM_PER_VERTEX)
+	{
+		ser->writeValue("per_vertex");
+	}
+	else if (fogSubRenderState->getCalcMode() == FFPFog::CM_PER_PIXEL)
+	{
+		ser->writeValue("per_pixel");
+	}
+}
+
+//-----------------------------------------------------------------------
 SubRenderState*	FFPFogFactory::createInstanceImpl()
 {
 	return new FFPFog;
 }
-
 
 }
 }

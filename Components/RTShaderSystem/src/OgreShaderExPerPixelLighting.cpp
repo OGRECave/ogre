@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreShaderGenerator.h"
 #include "OgreSceneManager.h"
 #include "OgreViewport.h"
-#include "OgreMaterialSerializer.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -954,7 +953,7 @@ const String& PerPixelLightingFactory::getType() const
 SubRenderState*	PerPixelLightingFactory::createInstance(ScriptCompiler* compiler, 
 														PropertyAbstractNode* prop, Pass* pass)
 {
-	if (prop->name == "light_model")
+	if (prop->name == "lighting_stage")
 	{
 		if(prop->values.size() == 1)
 		{
@@ -966,7 +965,7 @@ SubRenderState*	PerPixelLightingFactory::createInstance(ScriptCompiler* compiler
 				return NULL;
 			}
 			
-			if (modelType == "sgx_per_pixel")
+			if (modelType == "per_pixel")
 			{
 				return SubRenderStateFactory::createInstance();
 			}
@@ -980,8 +979,8 @@ SubRenderState*	PerPixelLightingFactory::createInstance(ScriptCompiler* compiler
 void PerPixelLightingFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, 
 											Pass* srcPass, Pass* dstPass)
 {
-	ser->writeAttribute(4, "light_model");
-	ser->writeValue("sgx_per_pixel");
+	ser->writeAttribute(4, "lighting_stage");
+	ser->writeValue("per_pixel");
 }
 
 //-----------------------------------------------------------------------

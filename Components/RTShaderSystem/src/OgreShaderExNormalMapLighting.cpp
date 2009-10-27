@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreShaderGenerator.h"
 #include "OgreSceneManager.h"
 #include "OgreViewport.h"
-#include "OgreMaterialSerializer.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -1339,7 +1338,7 @@ const String& NormalMapLightingFactory::getType() const
 SubRenderState*	NormalMapLightingFactory::createInstance(ScriptCompiler* compiler, 
 														PropertyAbstractNode* prop, Pass* pass)
 {
-	if (prop->name == "light_model")
+	if (prop->name == "lighting_stage")
 	{
 		if(prop->values.size() >= 2)
 		{
@@ -1353,8 +1352,8 @@ SubRenderState*	NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 				return NULL;
 			}
 
-			// Case light model type us normal map
-			if (strValue == "sgx_normal_map")
+			// Case light model type is normal map
+			if (strValue == "normal_map")
 			{
 				++it;
 				if (false == SGScriptTranslator::getString(*it, &strValue))
@@ -1424,8 +1423,8 @@ void NormalMapLightingFactory::writeInstance(MaterialSerializer* ser,
 
 	const String normalMapTextureName = any_cast<const String>(passUserData);
 
-	ser->writeAttribute(4, "light_model");
-	ser->writeValue("sgx_normal_map");
+	ser->writeAttribute(4, "lighting_stage");
+	ser->writeValue("normal_map");
 	ser->writeValue(normalMapTextureName);	
 
 	NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);

@@ -103,6 +103,39 @@ const String& FFPTransformFactory::getType() const
 	return FFPTransform::Type;
 }
 
+//-----------------------------------------------------------------------
+SubRenderState*	FFPTransformFactory::createInstance(ScriptCompiler* compiler, 
+												   PropertyAbstractNode* prop, Pass* pass)
+{
+	if (prop->name == "transform_stage")
+	{
+		if(prop->values.size() == 1)
+		{
+			String modelType;
+
+			if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
+			{
+				compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+				return NULL;
+			}
+
+			if (modelType == "ffp")
+			{
+				return SubRenderStateFactory::createInstance();
+			}
+		}		
+	}
+
+	return NULL;
+}
+
+//-----------------------------------------------------------------------
+void FFPTransformFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, 
+									   Pass* srcPass, Pass* dstPass)
+{
+	ser->writeAttribute(4, "transform_stage");
+	ser->writeValue("ffp");
+}
 
 //-----------------------------------------------------------------------
 SubRenderState*	FFPTransformFactory::createInstanceImpl()

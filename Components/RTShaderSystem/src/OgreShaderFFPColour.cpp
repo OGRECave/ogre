@@ -298,6 +298,39 @@ const String& FFPColourFactory::getType() const
 	return FFPColour::Type;
 }
 
+//-----------------------------------------------------------------------
+SubRenderState*	FFPColourFactory::createInstance(ScriptCompiler* compiler, 
+													PropertyAbstractNode* prop, Pass* pass)
+{
+	if (prop->name == "colour_stage")
+	{
+		if(prop->values.size() == 1)
+		{
+			String modelType;
+
+			if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
+			{
+				compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+				return NULL;
+			}
+
+			if (modelType == "ffp")
+			{
+				return SubRenderStateFactory::createInstance();
+			}
+		}		
+	}
+
+	return NULL;
+}
+
+//-----------------------------------------------------------------------
+void FFPColourFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, 
+										Pass* srcPass, Pass* dstPass)
+{
+	ser->writeAttribute(4, "colour_stage");
+	ser->writeValue("ffp");
+}
 
 //-----------------------------------------------------------------------
 SubRenderState*	FFPColourFactory::createInstanceImpl()

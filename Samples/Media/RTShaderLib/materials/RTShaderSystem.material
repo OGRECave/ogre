@@ -22,8 +22,8 @@ material RTSS/PerPixel_SinglePass
 			// RT Shader system section.
  			rtshader_system
  			{	 	
- 				// Light model will be normal map based. 			
- 				light_model sgx_per_pixel				
+ 				// Override lighting stage with per pixel lighting. 			
+ 				lighting_stage per_pixel				
  			}			
 		}				
 	}
@@ -51,8 +51,8 @@ material RTSS/NormalMapping_SinglePass
 			// RT Shader system section.
  			rtshader_system
  			{	 	
- 				// Light model will be normal map based. 			
- 				light_model sgx_normal_map Panels_Normal_Tangent.png tangent_space 0
+ 				// Override lighting stage with normal map lighting.
+ 				lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0
  			}			
 		}				
 	}
@@ -80,7 +80,11 @@ material RTSS/NormalMapping_MultiPass
 			// RT Shader system section.			
  			rtshader_system
  			{	
- 				// Tell the system to do only ambient lighting pass otherwise it will do full lighting calculation in this pass.
+ 				// Override dynamic light count with zero light count.
+ 				// Doing this will cause the RTSS to create 
+ 				// ambient lighting shaders.
+ 				// If not doing that the RTSS it will use the current scene light count
+ 				// which will result in full lighting calculation in this pass.
 				light_count 0 0 0
 			}
 		}
@@ -105,8 +109,8 @@ material RTSS/NormalMapping_MultiPass
 			// RT Shader system section.
  			rtshader_system
  			{	 	
- 				// Light model will be normal map based. 			
- 				light_model sgx_normal_map Panels_Normal_Tangent.png tangent_space 0	
+ 				// Override lighting stage with normal map lighting.
+ 				lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0	
  			}			
 		}	
 		
@@ -141,7 +145,7 @@ material RTSS/Athene/NormalMapping_SinglePass : RTSS/NormalMapping_SinglePass
 			// Override the normal map.
  			rtshader_system
  			{	 	 						
- 				light_model sgx_normal_map atheneNormalMap.png tangent_space 0	
+ 				lighting_stage normal_map atheneNormalMap.png tangent_space 0	
  			}
 		}				
 	}
@@ -157,7 +161,7 @@ material RTSS/Athene/NormalMapping_MultiPass : RTSS/NormalMapping_MultiPass
 			// Override the normal map.
  			rtshader_system
  			{	 	 						
- 				light_model sgx_normal_map atheneNormalMap.png tangent_space 0	
+ 				lighting_stage normal_map atheneNormalMap.png tangent_space 0	
  			}
 		}
 		
@@ -181,9 +185,7 @@ material RTSS/NormalMapping_MultiPass_2lights : RTSS/NormalMapping_MultiPass
 	{		
 		pass lighting
 		{
-			// do this for each point light
-			// You MUST specify the light type when working with the RT Shader System in iterative lighting method. 
-			// otherwise an exception will be thrown.
+			// Override light iteration definition.
 			iteration 1 per_n_lights 2 point										
 		}							
 	}

@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreViewport.h"
 
+
 namespace Ogre {
 namespace RTShader {
 
@@ -785,6 +786,40 @@ void FFPLighting::getLightCount(int lightCount[3]) const
 const String& FFPLightingFactory::getType() const
 {
 	return FFPLighting::Type;
+}
+
+//-----------------------------------------------------------------------
+SubRenderState*	FFPLightingFactory::createInstance(ScriptCompiler* compiler, 
+												PropertyAbstractNode* prop, Pass* pass)
+{
+	if (prop->name == "lighting_stage")
+	{
+		if(prop->values.size() == 1)
+		{
+			String modelType;
+
+			if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
+			{
+				compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+				return NULL;
+			}
+
+			if (modelType == "ffp")
+			{
+				return SubRenderStateFactory::createInstance();
+			}
+		}		
+	}
+
+	return NULL;
+}
+
+//-----------------------------------------------------------------------
+void FFPLightingFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, 
+											Pass* srcPass, Pass* dstPass)
+{
+	ser->writeAttribute(4, "lighting_stage");
+	ser->writeValue("ffp");
 }
 
 //-----------------------------------------------------------------------

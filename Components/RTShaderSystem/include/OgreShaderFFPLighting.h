@@ -213,6 +213,17 @@ public:
 	@see SubRenderStateFactory::getType.
 	*/
 	virtual const String&	getType				() const;
+
+	/** 
+	@see SubRenderStateFactory::createInstance.
+	*/
+	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass);
+
+	/** 
+	@see SubRenderStateFactory::writeInstance.
+	*/
+	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
+
 	
 protected:
 

@@ -93,12 +93,6 @@ public:
 	*/
 	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
-
-	static String Type;
-
-// Protected methods
-protected:
-
 	/** 
 	Set the fog properties this fog sub render state should emulate.
 	@param fogMode The fog mode to emulate (FOG_NONE, FOG_EXP, FOG_EXP2, FOG_LINEAR).
@@ -109,10 +103,10 @@ protected:
 	@see http://msdn.microsoft.com/en-us/library/bb173401(VS.85).aspx
 	*/
 	void			setFogProperties				(FogMode fogMode, 
-													const ColourValue& fogColour, 
-													float fogStart, 
-													float fogEnd, 
-													float fogDensity);
+		const ColourValue& fogColour, 
+		float fogStart, 
+		float fogEnd, 
+		float fogDensity);
 
 	/** 
 	Set the fog calculation mode. Either per vertex or per pixel.
@@ -124,6 +118,11 @@ protected:
 	Return the current calculation mode.
 	*/
 	CalcMode		getCalcMode						() const { return mCalcMode; }
+
+	static String Type;
+
+// Protected methods
+protected:
 
 	/** 
 	@see SubRenderState::resolveParameters.
@@ -172,6 +171,17 @@ public:
 	@see SubRenderStateFactory::getType.
 	*/
 	virtual const String&	getType				() const;
+
+	/** 
+	@see SubRenderStateFactory::createInstance.
+	*/
+	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass);
+
+	/** 
+	@see SubRenderStateFactory::writeInstance.
+	*/
+	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
+
 	
 protected:
 

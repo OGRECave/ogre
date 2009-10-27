@@ -991,6 +991,40 @@ const String& FFPTexturingFactory::getType() const
 }
 
 //-----------------------------------------------------------------------
+SubRenderState*	FFPTexturingFactory::createInstance(ScriptCompiler* compiler, 
+												 PropertyAbstractNode* prop, Pass* pass)
+{
+	if (prop->name == "texturing_stage")
+	{
+		if(prop->values.size() == 1)
+		{
+			String modelType;
+
+			if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
+			{
+				compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+				return NULL;
+			}
+
+			if (modelType == "ffp")
+			{
+				return SubRenderStateFactory::createInstance();
+			}
+		}		
+	}
+
+	return NULL;
+}
+
+//-----------------------------------------------------------------------
+void FFPTexturingFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, 
+									 Pass* srcPass, Pass* dstPass)
+{
+	ser->writeAttribute(4, "texturing_stage");
+	ser->writeValue("ffp");
+}
+
+//-----------------------------------------------------------------------
 SubRenderState*	FFPTexturingFactory::createInstanceImpl()
 {
 	return new FFPTexturing;
