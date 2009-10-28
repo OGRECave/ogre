@@ -80,6 +80,7 @@ void RenderState::removeSubRenderState(SubRenderState* subRenderState)
 		if ((*it) == subRenderState)
 		{
 			ShaderGenerator::getSingleton().destroySubRenderState(*it);
+			mSubRenderStateList.erase(it);
 			break;
 		}		
 	}

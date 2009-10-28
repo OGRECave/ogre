@@ -247,26 +247,49 @@ namespace OgreBites
 			else if (evt.key == OIS::KC_F3)
 			{
 				static bool usePerPixelLighting = true;					
-				Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+								
+				// Grab the scheme render state.												
+				Ogre::RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
-				// Remove all global sub render states.
-				renderState->reset();
-
-				if (usePerPixelLighting)
-					mRTShaderSystemPanel->setParamValue(1, "Per pixel");
-				else
-					mRTShaderSystemPanel->setParamValue(1, "Per vertex");
-
+				
 				// Add per pixel lighting sub render state to the global scheme render state.
 				// It will override the default FFP lighting sub render state.
 				if (usePerPixelLighting)
 				{
 					Ogre::RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
-					renderState->addSubRenderState(perPixelLightModel);					
+					
+					schemRenderState->addSubRenderState(perPixelLightModel);					
+				}
+
+				// Search the per pixel sub render state and remove it.
+				else
+				{
+					const Ogre::RTShader::SubRenderStateList& subRenderStateList = schemRenderState->getSubStateList();
+					Ogre::RTShader::SubRenderStateConstIterator it = subRenderStateList.begin();
+					Ogre::RTShader::SubRenderStateConstIterator itEnd = subRenderStateList.end();
+						
+					for (; it != itEnd; ++it)
+					{
+						Ogre::RTShader::SubRenderState* curSubRenderState = *it;
+
+						// This is the per pixel sub render state -> remove it.
+						if (curSubRenderState->getType() == Ogre::RTShader::PerPixelLighting::Type)
+						{
+							schemRenderState->removeSubRenderState(*it);
+							break;
+						}
+					}
 				}
 
 				// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
 				mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+
+				// Update UI.
+				if (usePerPixelLighting)
+					mRTShaderSystemPanel->setParamValue(1, "Per pixel");
+				else
+					mRTShaderSystemPanel->setParamValue(1, "Per vertex");
 				usePerPixelLighting = !usePerPixelLighting;				
 			}	
 

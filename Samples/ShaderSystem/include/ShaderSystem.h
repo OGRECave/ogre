@@ -42,42 +42,7 @@ public:
 	/** @see Sample::frameRenderingQueued. */
     bool frameRenderingQueued(const FrameEvent& evt);
 	
-	/** Set the current lighting model. */
-	void setCurrentLightingModel(ShaderSystemLightingModel lightingModel);
-
-	/** Return the current lighting model. */
-	ShaderSystemLightingModel getCurrentLightingMode() const { return mCurLightingModel; }
-
-	/** Set specular enable state. */
-	void setSpecularEnable(bool enable);
 	
-	/** Return current specular state. */
-	bool getSpecularEnable() const { return mSpecularEnable; }
-
-	/** Set reflection map enable state. */
-	void setReflectionMapEnable(bool enable);
-
-	/** Return current reflection map state. */
-	bool getReflectionMapEnable() const { return mReflectionMapEnable; }
-	
-	/** Create directional light. */
-	void createDirectionalLight();
-
-	/** Create point light. */
-	void createPointLight();
-
-	/** Create spot light. */
-	void createSpotLight();
-
-	/** Toggle light visibility. */
-	void setLightVisible(const String& lightName, bool visible);
-
-	/** Update runtime generated shaders of the target entities in this demo. */
-	void updateSystemShaders();
-
-	/** Export a given material including RTSS extended attributes.*/
-	void exportRTShaderSystemMaterial(const String& fileName, const String& materialName);
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 	bool touchPressed(const OIS::MultiTouchEvent& evt);
 
@@ -97,6 +62,45 @@ public:
 
 protected:
 
+	/** Set the current lighting model. */
+	void setCurrentLightingModel(ShaderSystemLightingModel lightingModel);
+
+	/** Return the current lighting model. */
+	ShaderSystemLightingModel getCurrentLightingMode() const { return mCurLightingModel; }
+
+	/** Set specular enable state. */
+	void setSpecularEnable(bool enable);
+
+	/** Return current specular state. */
+	bool getSpecularEnable() const { return mSpecularEnable; }
+
+	/** Set reflection map enable state. */
+	void setReflectionMapEnable(bool enable);
+
+	/** Return current reflection map state. */
+	bool getReflectionMapEnable() const { return mReflectionMapEnable; }
+
+	/** Set fog per pixel enable state. */
+	void setPerPixelFogEnable(bool enable);
+
+	/** Create directional light. */
+	void createDirectionalLight();
+
+	/** Create point light. */
+	void createPointLight();
+
+	/** Create spot light. */
+	void createSpotLight();
+
+	/** Toggle light visibility. */
+	void setLightVisible(const String& lightName, bool visible);
+
+	/** Update runtime generated shaders of the target entities in this demo. */
+	void updateSystemShaders();
+
+	/** Export a given material including RTSS extended attributes.*/
+	void exportRTShaderSystemMaterial(const String& fileName, const String& materialName);
+
 	/** Create shaders based techniques using the given entity based on its sub entities material set. */
 	void generateShaders(Entity* entity);
 
@@ -106,15 +110,22 @@ protected:
 	/** @see Sample::setupContent. */
 	virtual void setupContent();
 
+	/** Setup the UI for the sample. */
+	void setupUI();
+	
 	/** @see Sample::setupContent. */
 	virtual void cleanupContent();
 
 	/** @see Sample::loadResources. */
 	void loadResources();
+
+	/** Create private resource group. */
 	void createPrivateResourceGroup();
 	
 	/** @see Sample::unloadResources. */
 	void unloadResources();
+
+	/** Destroy private resource group. */
 	void destroyPrivateResourceGroup();
 
 // Types.
@@ -129,6 +140,8 @@ protected:
 	EntityList							mTargetEntities;		// Target entities that will use runtime shader generated materials.	
 	ShaderSystemLightingModel			mCurLightingModel;		// The current lighting model.
 	SelectMenu*							mLightingModelMenu;		// The lighting model menu.
+	SelectMenu*							mFogModeMenu;			// The fog mode menu.
+	bool								mPerPixelFogEnable;		// When true the RTSS will do per pixel fog calculations.
 	bool								mSpecularEnable;		// The current specular state.	
 	RTShader::SubRenderStateFactory*	mReflectionMapFactory;	// The custom reflection map shader extension factory.
 	bool								mReflectionMapEnable;	// The current reflection map effect state.

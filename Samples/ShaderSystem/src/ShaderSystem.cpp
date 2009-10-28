@@ -9,6 +9,7 @@ using namespace OgreBites;
 const String DIRECTIONAL_LIGHT_NAME		= "DirectionalLight";
 const String POINT_LIGHT_NAME			= "PointLight";
 const String SPOT_LIGHT_NAME			= "SpotLight";
+const String PER_PIXEL_FOG_BOX			= "PerPixelFog";
 const String MAIN_ENTITY_MESH			= "ShaderSystem.mesh";
 const String SPECULAR_BOX				= "SpecularBox";
 const String REFLECTIONMAP_BOX			= "ReflectionMapBox";
@@ -57,7 +58,12 @@ Sample_ShaderSystem::Sample_ShaderSystem()
 		;
 	mInfo["Thumbnail"] = "thumb_shadersystem.png";
 	mInfo["Category"] = "Unsorted";
-	mInfo["Help"] = "F2 Toggle Shader System globally. F3 Toggles Global Lighting Model. Modify target model attributes and scene settings and observe the generated shaders count.";
+	mInfo["Help"] = "F2 Toggle Shader System globally. "
+				    "F3 Toggles Global Lighting Model. "
+					"Modify target model attributes and scene settings and observe the generated shaders count."
+					"Press the export button in order to export current target model material. "
+					"The model above the target will import this material next time the sample reloads."
+					;
 	mPointLightNode = NULL;
 	mReflectionMapFactory = NULL;
 }
@@ -88,6 +94,10 @@ void Sample_ShaderSystem::checkBoxToggled(CheckBox* box)
 	{
 		setLightVisible(cbName, box->isChecked());
 	}
+	else if (cbName == PER_PIXEL_FOG_BOX)
+	{
+		setPerPixelFogEnable(box->isChecked());
+	}
 }
 
 //-----------------------------------------------------------------------
@@ -101,6 +111,15 @@ void Sample_ShaderSystem::itemSelected(SelectMenu* menu)
 		{
 			setCurrentLightingModel((ShaderSystemLightingModel)curModelIndex);
 		}
+	}
+	else if (menu == mFogModeMenu)
+	{
+		int curModeIndex = menu->getSelectionIndex();
+
+		if (curModeIndex >= FOG_NONE && curModeIndex <= FOG_LINEAR)
+		{
+			mSceneMgr->setFog((FogMode)curModeIndex, ColourValue::White, 0.0015, 350.0, 1500.0);
+		}		
 	}
 }
 
@@ -184,8 +203,9 @@ void Sample_ShaderSystem::setupView()
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setupContent()
 {
-	// Setup defualt effects values.
+	// Setup default effects values.
 	mCurLightingModel 		= SSLM_PerVertexLighting;
+	mPerPixelFogEnable		= false;
 	mSpecularEnable   		= false;
 	mReflectionMapEnable	= false;
 
@@ -200,7 +220,7 @@ void Sample_ShaderSystem::setupContent()
 	plane.d = 0;
 	MeshManager::getSingleton().createPlane("Myplane",
 		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
-		1500,1500,20,20,true,1,60,60,Vector3::UNIT_Z);
+		1500,1500,1,1,true,1,60,60,Vector3::UNIT_Z);
 
 	Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
 	pPlaneEnt->setMaterialName("Examples/Rockwall");
@@ -268,10 +288,43 @@ void Sample_ShaderSystem::setupContent()
 	createPointLight();
 	createSpotLight();
 	
+	setupUI();
+
+
+	mCamera->setPosition(0.0, 300.0, 450.0);
+	mCamera->lookAt(0.0, 150.0, 0.0);
+
+	// Make this viewport work with shader generator scheme.
+	mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+	// Mark system as on.
+	mRTShaderSystemPanel->setParamValue(0, "On");
+
+	
+	// a friendly reminder
+	StringVector names;
+	names.push_back("Help");
+	mTrayMgr->createParamsPanel(TL_TOPLEFT, "Help", 100, names)->setParamValue(0, "H/F1");
+
+	updateSystemShaders();
+}
+
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::setupUI()
+{
 	// create check boxes to toggle lights.	
 	mTrayMgr->createCheckBox(TL_TOPLEFT, DIRECTIONAL_LIGHT_NAME, "Directional Light")->setChecked(true);
 	mTrayMgr->createCheckBox(TL_TOPLEFT, POINT_LIGHT_NAME, "Point Light")->setChecked(true);
 	mTrayMgr->createCheckBox(TL_TOPLEFT, SPOT_LIGHT_NAME, "Spot Light")->setChecked(false);
+	mTrayMgr->createCheckBox(TL_TOPLEFT, PER_PIXEL_FOG_BOX, "Per Pixel Fog")->setChecked(mPerPixelFogEnable);
+
+	// Create fog widgets.
+	mFogModeMenu = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "FogMode", "Fog Mode", 220, 120, 10);	
+	mFogModeMenu ->addItem("None");
+	mFogModeMenu ->addItem("Exp");
+	mFogModeMenu ->addItem("Exp2");
+	mFogModeMenu ->addItem("Linear");
+
 	
 	// create target model widgets.
 	mMainEntityVS = mTrayMgr->createLabel(TL_BOTTOM, "MainEntityVS", "");
@@ -286,8 +339,8 @@ void Sample_ShaderSystem::setupContent()
 	{
 		mTrayMgr->createCheckBox(TL_BOTTOM, REFLECTIONMAP_BOX, "Reflection Map")->setChecked(mReflectionMapEnable);
 	}
-	
-	mLightingModelMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "TargetModelLighting", "Target Model", 470, 290, 10);	
+
+	mLightingModelMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "TargetModelLighting", "Target Model", 400, 290, 10);	
 	mLightingModelMenu ->addItem("Per Vertex");
 	mLightingModelMenu ->addItem("Per Pixel");
 	mLightingModelMenu ->addItem("Normal Map - Tangent Space");
@@ -295,23 +348,7 @@ void Sample_ShaderSystem::setupContent()
 
 	mTrayMgr->createButton(TL_BOTTOM, EXPORT_BUTTON_NAME, "Export Material");
 
-	mCamera->setPosition(0.0, 300.0, 450.0);
-	mCamera->lookAt(0.0, 150.0, 0.0);
-
-	// Make this viewport work with shader generator scheme.
-	mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
-	// Mark system as on.
-	mRTShaderSystemPanel->setParamValue(0, "On");
-
 	mTrayMgr->showCursor();
-
-	// a friendly reminder
-	StringVector names;
-	names.push_back("Help");
-	mTrayMgr->createParamsPanel(TL_TOPLEFT, "Help", 100, names)->setParamValue(0, "H/F1");
-
-	updateSystemShaders();
 }
 
 //-----------------------------------------------------------------------
@@ -363,6 +400,57 @@ void Sample_ShaderSystem::setReflectionMapEnable(bool enable)
 	{
 		mReflectionMapEnable = enable;
 		updateSystemShaders();
+	}
+}
+
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
+{
+	if (mPerPixelFogEnable != enable)
+	{
+		mPerPixelFogEnable = enable;
+
+		// Grab the scheme render state.
+		RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+		const SubRenderStateList& subRenderStateList = schemRenderState->getSubStateList();
+		SubRenderStateConstIterator it = subRenderStateList.begin();
+		SubRenderStateConstIterator itEnd = subRenderStateList.end();
+		FFPFog* fogSubRenderState = NULL;
+		
+		// Search for the fog sub state.
+		for (; it != itEnd; ++it)
+		{
+			SubRenderState* curSubRenderState = *it;
+
+			if (curSubRenderState->getType() == FFPFog::Type)
+			{
+				fogSubRenderState = static_cast<FFPFog*>(curSubRenderState);
+				break;
+			}
+		}
+
+		// Create the fog sub render state if need to.
+		if (fogSubRenderState == NULL)
+		{			
+			SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(FFPFog::Type);
+			
+			fogSubRenderState = static_cast<FFPFog*>(subRenderState);
+			schemRenderState->addSubRenderState(fogSubRenderState);
+		}
+			
+		
+		// Select the desired fog calculation mode.
+		if (mPerPixelFogEnable)
+		{
+			fogSubRenderState->setCalcMode(FFPFog::CM_PER_PIXEL);
+		}
+		else
+		{
+			fogSubRenderState->setCalcMode(FFPFog::CM_PER_VERTEX);
+		}
+
+		// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
+		mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 	}
 }
 
@@ -474,9 +562,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 			}
 
 			if (mReflectionMapEnable)
-			{
-				
-
+			{				
 				RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(ShaderExReflectionMap::Type);
 				ShaderExReflectionMap* reflectionMapSubRS = static_cast<ShaderExReflectionMap*>(subRenderState);
 
@@ -788,5 +874,6 @@ bool Sample_ShaderSystem::mouseMoved( const OIS::MouseEvent& evt )
 
 	return true;
 }
+
 
 #endif
