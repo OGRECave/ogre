@@ -8,7 +8,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(Sample_SkyBox ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
 target_link_libraries(Sample_SkyBox ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample(Sample_SkyBox)
+ogre_config_sample_lib(Sample_SkyBox)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
     # Set the INSTALL_PATH so that Samples can be installed in the application package

@@ -31,7 +31,7 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/Components/Terrain/include)
 add_executable(PlayPen WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
 target_link_libraries(PlayPen ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_Terrain_LIBRARIES})
-ogre_config_sample(PlayPen)
+ogre_config_sample_exe(PlayPen)
 
 add_dependencies(PlayPen ${TEST_DEPENDENCIES})
 

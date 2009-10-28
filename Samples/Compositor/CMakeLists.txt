@@ -32,7 +32,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_Compositor WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
 target_link_libraries(Demo_Compositor ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${CEGUI_LIBRARIES} ${OGRE_CEGUIRenderer_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample(Demo_Compositor)
+ogre_config_sample_exe(Demo_Compositor)
 
 if (SAMPLE_DEPENDENCIES)
   add_dependencies(Demo_Compositor ${SAMPLE_DEPENDENCIES})

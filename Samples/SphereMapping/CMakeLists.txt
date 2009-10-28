@@ -8,7 +8,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(Sample_SphereMapping ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
 target_link_libraries(Sample_SphereMapping ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample(Sample_SphereMapping)
+ogre_config_sample_lib(Sample_SphereMapping)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
     # Set the INSTALL_PATH so that Samples can be installed in the application package

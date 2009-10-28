@@ -10,7 +10,7 @@ include_directories(
 add_library(Sample_Terrain ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
 target_link_libraries(Sample_Terrain ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_Terrain_LIBRARIES})
-ogre_config_sample(Sample_Terrain)
+ogre_config_sample_lib(Sample_Terrain)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
     # Set the INSTALL_PATH so that Samples can be installed in the application package

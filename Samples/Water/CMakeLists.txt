@@ -20,7 +20,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_Water WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
 target_link_libraries(Demo_Water ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample(Demo_Water)
+ogre_config_sample_exe(Demo_Water)
 
 if (SAMPLE_DEPENDENCIES)
   add_dependencies(Demo_Water ${SAMPLE_DEPENDENCIES})

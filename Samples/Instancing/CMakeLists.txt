@@ -21,7 +21,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_executable(Demo_Instancing WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
 target_link_libraries(Demo_Instancing ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${CEGUI_LIBRARIES} ${OGRE_CEGUIRenderer_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample(Demo_Instancing)
+ogre_config_sample_exe(Demo_Instancing)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
     # Set the INSTALL_PATH so that Samples can be installed in the application package

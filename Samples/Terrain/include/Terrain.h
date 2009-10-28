@@ -376,6 +376,8 @@ protected:
 		mEditNode->attachObject(mEditMarker);
 		mEditNode->setScale(0.05, 0.05, 0.05);
 
+		mTrayMgr->showCursor();
+
 		mCameraMan->setTopSpeed(50);
 
 		MaterialManager::getSingleton().setDefaultTextureFiltering(TFO_ANISOTROPIC);

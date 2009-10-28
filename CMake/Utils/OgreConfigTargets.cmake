@@ -200,7 +200,7 @@ function(ogre_config_plugin PLUGINNAME)
 endfunction(ogre_config_plugin)
 
 # setup Ogre sample build
-function(ogre_config_sample SAMPLENAME)
+function(ogre_config_sample_common SAMPLENAME)
   # The PRODUCT_NAME target setting cannot contain underscores.  Just remove them
   # Known bug in Xcode CFBundleIdentifier processing rdar://6187020
   # Can cause an instant App Store rejection. Also, code signing will fail. 
@@ -228,8 +228,12 @@ function(ogre_config_sample SAMPLENAME)
   endif (CMAKE_COMPILER_IS_GNUCXX)	
   ogre_install_target(${SAMPLENAME} ${OGRE_SAMPLE_PATH})
 
+endfunction(ogre_config_sample_common)
+
+function(ogre_config_sample_exe SAMPLENAME)
+  ogre_config_sample_common(${SAMPLENAME})
   if (OGRE_INSTALL_PDB)
-	  # install debug pdb files
+	  # install debug pdb files - no _d on exe
 	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}.pdb
 		  DESTINATION bin${OGRE_DEBUG_PATH}
 		  CONFIGURATIONS Debug
@@ -239,7 +243,23 @@ function(ogre_config_sample SAMPLENAME)
 		  CONFIGURATIONS RelWithDebInfo
 		  )
   endif ()
-endfunction(ogre_config_sample)
+endfunction(ogre_config_sample_exe)
+
+function(ogre_config_sample_lib SAMPLENAME)
+  ogre_config_sample_common(${SAMPLENAME})
+  if (OGRE_INSTALL_PDB)
+	  # install debug pdb files - with a _d on lib
+	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}_d.pdb
+		  DESTINATION bin${OGRE_DEBUG_PATH}
+		  CONFIGURATIONS Debug
+		  )
+	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_RELWDBG_PATH}/${SAMPLENAME}.pdb
+		  DESTINATION bin${OGRE_RELWDBG_PATH}
+		  CONFIGURATIONS RelWithDebInfo
+		  )
+  endif ()
+endfunction(ogre_config_sample_lib)
+
 
 # setup Ogre tool build
 function(ogre_config_tool TOOLNAME)

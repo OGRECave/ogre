@@ -24,7 +24,7 @@ include_directories(
 add_executable(Demo_PCZTestApp WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
 target_link_libraries(Demo_PCZTestApp ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OGRE_Plugin_PCZSceneManager_LIBRARIES} ${OGRE_Plugin_OctreeZone_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample(Demo_PCZTestApp)
+ogre_config_sample_exe(Demo_PCZTestApp)
 # need to include plugins directory in RPATH for the demo to be able to find the PCZ libs
 set_property(TARGET Demo_PCZTestApp APPEND PROPERTY
   INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/OGRE
