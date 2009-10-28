@@ -19,7 +19,7 @@ const int MESH_ARRAY_SIZE = 2;
 const String MESH_ARRAY[MESH_ARRAY_SIZE] =
 {
 	MAIN_ENTITY_MESH,
-	"Knot.mesh"
+	"knot.mesh"
 };
 
 SamplePlugin* sp;
@@ -250,14 +250,14 @@ void Sample_ShaderSystem::setupContent()
 	childNode->attachObject(entity);
 
 	// Create secondary entities that will be using custom RT Shader materials.
-	entity = mSceneMgr->createEntity("PerPixelEntity", "Knot.mesh");
+	entity = mSceneMgr->createEntity("PerPixelEntity", "knot.mesh");
 	entity->setMaterialName("RTSS/PerPixel_SinglePass");
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	childNode->setPosition(300.0, 100.0, -100.0);
 	childNode->attachObject(entity);
 
 	// Create secondary entities that will be using custom RT Shader materials.
-	entity = mSceneMgr->createEntity("NormalMapEntity", "Knot.mesh");
+	entity = mSceneMgr->createEntity("NormalMapEntity", "knot.mesh");
 	entity->setMaterialName("RTSS/NormalMapping_SinglePass");
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	childNode->setPosition(-300.0, 100.0, -100.0);
