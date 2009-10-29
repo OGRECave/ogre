@@ -44,7 +44,7 @@ namespace RTShader {
 @see http://msdn.microsoft.com/en-us/library/bb206269(VS.85).aspx
 Derives from SubRenderState class.
 */
-class OGRE_RTSHADERSYSTEM_API FFPTransform : public SubRenderState
+class FFPTransform : public SubRenderState
 {
 
 // Interface.

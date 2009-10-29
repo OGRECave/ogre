@@ -30,10 +30,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
 
-// Component compiles as static library.
-#define OGRE_RTSHADERSYSTEM_API
-#define OGRE_RTSHADERSYSTEM_INTERNAL
-
 namespace Ogre 
 {
 

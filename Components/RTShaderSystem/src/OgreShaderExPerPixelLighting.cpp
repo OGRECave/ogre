@@ -591,18 +591,18 @@ bool PerPixelLighting::addVSInvocation(Function* vsMain, const int groupOrder, i
 
 	// Transform normal in view space.
 	curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
-	curFuncInvocation->getParameterList().push_back(mWorldViewITMatrix->getName());
-	curFuncInvocation->getParameterList().push_back(mVSInNormal->getName());
-	curFuncInvocation->getParameterList().push_back(mVSOutNormal->getName());	
+	curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
+	curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
+	curFuncInvocation->pushOperand(mVSOutNormal, Operand::OPS_OUT);	
 	vsMain->addAtomInstace(curFuncInvocation);
 
 	// Transform view space position if need to.
 	if (mVSOutViewPos.get() != NULL)
 	{
 		curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMPOSITION, groupOrder, internalCounter++); 
-		curFuncInvocation->getParameterList().push_back(mWorldViewMatrix->getName());
-		curFuncInvocation->getParameterList().push_back(mVSInPosition->getName());
-		curFuncInvocation->getParameterList().push_back(mVSOutViewPos->getName());	
+		curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mVSOutViewPos, Operand::OPS_OUT);	
 		vsMain->addAtomInstace(curFuncInvocation);
 	}
 	
@@ -620,8 +620,8 @@ bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const
 		(mTrackVertexColourType & TVC_EMISSIVE) == 0)
 	{
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
-		curFuncInvocation->getParameterList().push_back(mDerivedSceneColour->getName());
-		curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName());	
+		curFuncInvocation->pushOperand(mDerivedSceneColour, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT);	
 		psMain->addAtomInstace(curFuncInvocation);		
 	}
 	else
@@ -629,33 +629,33 @@ bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const
 		if (mTrackVertexColourType & TVC_AMBIENT)
 		{
 			curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
-			curFuncInvocation->getParameterList().push_back(mLightAmbientColour->getName());
-			curFuncInvocation->getParameterList().push_back(mPSDiffuse->getName());			
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName());	
+			curFuncInvocation->pushOperand(mLightAmbientColour, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);			
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT);	
 			psMain->addAtomInstace(curFuncInvocation);
 		}
 		else
 		{
 			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
-			curFuncInvocation->getParameterList().push_back(mDerivedAmbientLightColour->getName() + ".xyz");	
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName() + ".xyz");	
+			curFuncInvocation->pushOperand(mDerivedAmbientLightColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			psMain->addAtomInstace(curFuncInvocation);
 		}
 
 		if (mTrackVertexColourType & TVC_EMISSIVE)
 		{
 			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ADD, groupOrder, internalCounter++); 
-			curFuncInvocation->getParameterList().push_back(mPSDiffuse->getName() );
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName());
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName());	
+			curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT);	
 			psMain->addAtomInstace(curFuncInvocation);
 		}
 		else
 		{
 			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ADD, groupOrder, internalCounter++); 
-			curFuncInvocation->getParameterList().push_back(mSurfaceEmissiveColour->getName());
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName());
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName());	
+			curFuncInvocation->pushOperand(mSurfaceEmissiveColour, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT);	
 			psMain->addAtomInstace(curFuncInvocation);
 		}		
 	}
@@ -663,8 +663,8 @@ bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const
 	if (mSpecularEnable)
 	{
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
-		curFuncInvocation->getParameterList().push_back(mPSSpecular->getName());
-		curFuncInvocation->getParameterList().push_back(mPSTempSpecularColour->getName());	
+		curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT);	
 		psMain->addAtomInstace(curFuncInvocation);	
 	}
 	
@@ -680,9 +680,9 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 	if (mTrackVertexColourType & TVC_DIFFUSE)			
 	{
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
-		curFuncInvocation->getParameterList().push_back(mPSDiffuse->getName() + ".xyz");	
-		curFuncInvocation->getParameterList().push_back(curLightParams->mDiffuseColour->getName() + ".xyz");
-		curFuncInvocation->getParameterList().push_back(curLightParams->mDiffuseColour->getName() + ".xyz");
+		curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
+		curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+		curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 		psMain->addAtomInstace(curFuncInvocation);
 	}
 
@@ -690,9 +690,9 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 	if (mSpecularEnable && mTrackVertexColourType & TVC_SPECULAR)
 	{							
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
-		curFuncInvocation->getParameterList().push_back(mPSDiffuse->getName() + ".xyz");	
-		curFuncInvocation->getParameterList().push_back(curLightParams->mSpecularColour->getName() + ".xyz");
-		curFuncInvocation->getParameterList().push_back(curLightParams->mSpecularColour->getName() + ".xyz");
+		curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
+		curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+		curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 		psMain->addAtomInstace(curFuncInvocation);
 	}
 
@@ -703,27 +703,27 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 		if (mSpecularEnable)
 		{				
 			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR, groupOrder, internalCounter++); 
-			curFuncInvocation->getParameterList().push_back(mPSInNormal->getName());
-			curFuncInvocation->getParameterList().push_back(mPSInViewPos->getName());			
-			curFuncInvocation->getParameterList().push_back(curLightParams->mDirection->getName() + ".xyz");
-			curFuncInvocation->getParameterList().push_back(curLightParams->mDiffuseColour->getName() + ".xyz");			
-			curFuncInvocation->getParameterList().push_back(curLightParams->mSpecularColour->getName() + ".xyz");			
-			curFuncInvocation->getParameterList().push_back(mSurfaceShininess->getName());
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName() + ".xyz");	
-			curFuncInvocation->getParameterList().push_back(mPSTempSpecularColour->getName() + ".xyz");
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName() + ".xyz");	
-			curFuncInvocation->getParameterList().push_back(mPSTempSpecularColour->getName() + ".xyz");	
+			curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mPSInViewPos, Operand::OPS_IN);			
+			curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));			
+			curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));			
+			curFuncInvocation->pushOperand(mSurfaceShininess, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
+			curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
+			curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			psMain->addAtomInstace(curFuncInvocation);
 		}
 
 		else
 		{
 			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, groupOrder, internalCounter++); 			
-			curFuncInvocation->getParameterList().push_back(mPSInNormal->getName());
-			curFuncInvocation->getParameterList().push_back(curLightParams->mDirection->getName() + ".xyz");
-			curFuncInvocation->getParameterList().push_back(curLightParams->mDiffuseColour->getName() + ".xyz");					
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName() + ".xyz");	
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName() + ".xyz");	
+			curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));					
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			psMain->addAtomInstace(curFuncInvocation);	
 		}	
 		break;
@@ -732,29 +732,29 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 		if (mSpecularEnable)
 		{
 			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
-			curFuncInvocation->getParameterList().push_back(mPSInNormal->getName());			
-			curFuncInvocation->getParameterList().push_back(mPSInViewPos->getName());	
-			curFuncInvocation->getParameterList().push_back(curLightParams->mPosition->getName() + ".xyz");
-			curFuncInvocation->getParameterList().push_back(curLightParams->mAttenuatParams->getName());
-			curFuncInvocation->getParameterList().push_back(curLightParams->mDiffuseColour->getName() + ".xyz");
-			curFuncInvocation->getParameterList().push_back(curLightParams->mSpecularColour->getName() + ".xyz");			
-			curFuncInvocation->getParameterList().push_back(mSurfaceShininess->getName());
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName() + ".xyz");	
-			curFuncInvocation->getParameterList().push_back(mPSTempSpecularColour->getName() + ".xyz");
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName() + ".xyz");	
-			curFuncInvocation->getParameterList().push_back(mPSTempSpecularColour->getName() + ".xyz");	
+			curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);			
+			curFuncInvocation->pushOperand(mPSInViewPos, Operand::OPS_IN);	
+			curFuncInvocation->pushOperand(curLightParams->mPosition, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+			curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+			curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));			
+			curFuncInvocation->pushOperand(mSurfaceShininess, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
+			curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
+			curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			psMain->addAtomInstace(curFuncInvocation);		
 		}
 		else
 		{
 			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_POINT_DIFFUSE, groupOrder, internalCounter++); 			
-			curFuncInvocation->getParameterList().push_back(mPSInNormal->getName());			
-			curFuncInvocation->getParameterList().push_back(mPSInViewPos->getName());
-			curFuncInvocation->getParameterList().push_back(curLightParams->mPosition->getName() + ".xyz");
-			curFuncInvocation->getParameterList().push_back(curLightParams->mAttenuatParams->getName());
-			curFuncInvocation->getParameterList().push_back(curLightParams->mDiffuseColour->getName() + ".xyz");					
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName() + ".xyz");	
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName() + ".xyz");	
+			curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);			
+			curFuncInvocation->pushOperand(mPSInViewPos, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(curLightParams->mPosition, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+			curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));					
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			psMain->addAtomInstace(curFuncInvocation);	
 		}
 
@@ -764,33 +764,33 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 		if (mSpecularEnable)
 		{
 			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
-			curFuncInvocation->getParameterList().push_back(mPSInNormal->getName());
-			curFuncInvocation->getParameterList().push_back(mPSInViewPos->getName());
-			curFuncInvocation->getParameterList().push_back(curLightParams->mPosition->getName() + ".xyz");
-			curFuncInvocation->getParameterList().push_back(curLightParams->mDirection->getName() + ".xyz");
-			curFuncInvocation->getParameterList().push_back(curLightParams->mAttenuatParams->getName());
-			curFuncInvocation->getParameterList().push_back(curLightParams->mSpotParams->getName());
-			curFuncInvocation->getParameterList().push_back(curLightParams->mDiffuseColour->getName() + ".xyz");
-			curFuncInvocation->getParameterList().push_back(curLightParams->mSpecularColour->getName() + ".xyz");			
-			curFuncInvocation->getParameterList().push_back(mSurfaceShininess->getName());
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName() + ".xyz");	
-			curFuncInvocation->getParameterList().push_back(mPSTempSpecularColour->getName() + ".xyz");
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName() + ".xyz");	
-			curFuncInvocation->getParameterList().push_back(mPSTempSpecularColour->getName() + ".xyz");	
+			curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mPSInViewPos, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(curLightParams->mPosition, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+			curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+			curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(curLightParams->mSpotParams, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+			curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));			
+			curFuncInvocation->pushOperand(mSurfaceShininess, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
+			curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
+			curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			psMain->addAtomInstace(curFuncInvocation);			
 		}
 		else
 		{
 			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_SPOT_DIFFUSE, groupOrder, internalCounter++); 						
-			curFuncInvocation->getParameterList().push_back(mPSInNormal->getName());
-			curFuncInvocation->getParameterList().push_back(mPSInViewPos->getName());
-			curFuncInvocation->getParameterList().push_back(curLightParams->mPosition->getName() + ".xyz");
-			curFuncInvocation->getParameterList().push_back(curLightParams->mDirection->getName() + ".xyz");
-			curFuncInvocation->getParameterList().push_back(curLightParams->mAttenuatParams->getName());
-			curFuncInvocation->getParameterList().push_back(curLightParams->mSpotParams->getName());
-			curFuncInvocation->getParameterList().push_back(curLightParams->mDiffuseColour->getName() + ".xyz");					
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName() + ".xyz");	
-			curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName() + ".xyz");	
+			curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mPSInViewPos, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(curLightParams->mPosition, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+			curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
+			curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(curLightParams->mSpotParams, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));					
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
+			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			psMain->addAtomInstace(curFuncInvocation);	
 		}
 		break;
@@ -805,20 +805,20 @@ bool PerPixelLighting::addPSFinalAssignmentInvocation( Function* psMain, const i
 	FunctionInvocation* curFuncInvocation;
 
 	curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 								
-	curFuncInvocation->getParameterList().push_back(mPSTempDiffuseColour->getName());	
-	curFuncInvocation->getParameterList().push_back(mPSDiffuse->getName());	
+	curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);	
+	curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_OUT);	
 	psMain->addAtomInstace(curFuncInvocation);	
 
 	curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 								
-	curFuncInvocation->getParameterList().push_back(mPSDiffuse->getName());	
-	curFuncInvocation->getParameterList().push_back(mPSOutDiffuse->getName());	
+	curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);	
+	curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);	
 	psMain->addAtomInstace(curFuncInvocation);
 
 	if (mSpecularEnable)
 	{
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 
-		curFuncInvocation->getParameterList().push_back(mPSTempSpecularColour->getName());
-		curFuncInvocation->getParameterList().push_back(mPSSpecular->getName());			
+		curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_OUT);			
 		psMain->addAtomInstace(curFuncInvocation);	
 	}
 

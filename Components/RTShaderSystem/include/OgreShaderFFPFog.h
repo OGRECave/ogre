@@ -46,7 +46,7 @@ namespace RTShader {
 @see http://msdn.microsoft.com/en-us/library/bb173398(VS.85).aspx
 Derives from SubRenderState class.
 */
-class OGRE_RTSHADERSYSTEM_API FFPFog : public SubRenderState
+class FFPFog : public SubRenderState
 {
 public:
 

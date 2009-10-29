@@ -50,7 +50,7 @@ Implements texture blending operation:
 @see http://msdn.microsoft.com/en-us/library/bb206241(VS.85).aspx
 Derives from SubRenderState class.
 */
-class OGRE_RTSHADERSYSTEM_API FFPTexturing : public SubRenderState
+class FFPTexturing : public SubRenderState
 {
 
 // Interface.
@@ -192,7 +192,7 @@ protected:
 												const LayerBlendModeEx& blendMode,
 												const int groupOrder, 
 												int& internalCounter,
-												const char* targetChannels);
+												int targetChannels);
 	
 	/** 
 	Determines the texture coordinates calculation method of the given texture unit state.

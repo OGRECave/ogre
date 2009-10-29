@@ -49,7 +49,7 @@ namespace RTShader {
 /** Shader generator system main interface. This singleton based class
 enables automatic generation of shader code based on existing material techniques.
 */
-class OGRE_RTSHADERSYSTEM_API ShaderGenerator : public Singleton<ShaderGenerator>
+class ShaderGenerator : public Singleton<ShaderGenerator>
 {
 	// Interface.
 public:
@@ -300,6 +300,9 @@ public:
 
 	/// Default material scheme of the shader generator.
 	static String DEFAULT_SCHEME_NAME;
+
+	/// Key for the shared object bindings.
+	static String BINDING_OBJECT_KEY;
 
 // Protected types.
 protected:

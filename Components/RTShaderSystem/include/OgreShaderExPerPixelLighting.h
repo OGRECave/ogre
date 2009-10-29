@@ -47,7 +47,7 @@ namespace RTShader {
 /** Per pixel Lighting extension sub render state implementation.
 Derives from SubRenderState class.
 */
-class OGRE_RTSHADERSYSTEM_API PerPixelLighting : public SubRenderState
+class PerPixelLighting : public SubRenderState
 {
 
 // Interface.

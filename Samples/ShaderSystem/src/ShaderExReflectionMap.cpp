@@ -100,13 +100,15 @@ void ShaderExReflectionMap::copyFrom(const SubRenderState& rhs)
 //-----------------------------------------------------------------------
 bool ShaderExReflectionMap::preAddToRenderState( RenderState* renderState, Pass* srcPass, Pass* dstPass )
 {
+	UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(srcPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
+
 	// Validate mask texture name.
-	const Any& maskUser = srcPass->getUserObjectBindings().getUserAny(ShaderExReflectionMap::MaskMapTextureNameKey);
+	const Any& maskUser = rtssBindings->getUserAny(ShaderExReflectionMap::MaskMapTextureNameKey);
 	if (maskUser.isEmpty())	
 		return false;	
 
 	// Validate reflection map texture name.
-	const Any& reflectionUser = srcPass->getUserObjectBindings().getUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey);
+	const Any& reflectionUser = rtssBindings->getUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey);
 	if (reflectionUser.isEmpty())	
 		return false;
 
@@ -136,14 +138,6 @@ bool ShaderExReflectionMap::preAddToRenderState( RenderState* renderState, Pass*
 	mReflectionMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
 	return true;
-}
-
-//-----------------------------------------------------------------------
-void ShaderExReflectionMap::preRemoveFromRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass) 
-{	
-	// Erase the normal map texture association.
-	srcPass->getUserObjectBindings().eraseUserAny(ShaderExReflectionMap::MaskMapTextureNameKey);	
-	srcPass->getUserObjectBindings().eraseUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey);	
 }
 
 //-----------------------------------------------------------------------
@@ -277,29 +271,29 @@ bool ShaderExReflectionMap::addVSInvocations( Function* vsMain, const int groupO
 
 	// Output mask texture coordinates.
 	funcInvoaction = new FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder, internalCounter++); 
-	funcInvoaction->getParameterList().push_back(mVSInMaskTexcoord->getName());
-	funcInvoaction->getParameterList().push_back(mVSOutMaskTexcoord->getName());
+	funcInvoaction->pushOperand(mVSInMaskTexcoord, Operand::OPS_IN);
+	funcInvoaction->pushOperand(mVSOutMaskTexcoord, Operand::OPS_OUT);
 	vsMain->addAtomInstace(funcInvoaction);
 
 	// Output reflection texture coordinates.
 	if (mReflectionMapType == TEX_TYPE_2D)
 	{
 		funcInvoaction = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  groupOrder, internalCounter++); 
-		funcInvoaction->getParameterList().push_back(mWorldITMatrix->getName());
-		funcInvoaction->getParameterList().push_back(mViewMatrix->getName());	
-		funcInvoaction->getParameterList().push_back(mVSInputNormal->getName());	
-		funcInvoaction->getParameterList().push_back(mVSOutReflectionTexcoord->getName());
+		funcInvoaction->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+		funcInvoaction->pushOperand(mViewMatrix, Operand::OPS_IN);	
+		funcInvoaction->pushOperand(mVSInputNormal, Operand::OPS_IN);	
+		funcInvoaction->pushOperand(mVSOutReflectionTexcoord, Operand::OPS_OUT);
 		vsMain->addAtomInstace(funcInvoaction);
 	}
 	else
 	{
 		funcInvoaction = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT, groupOrder, internalCounter++); 
-		funcInvoaction->getParameterList().push_back(mWorldMatrix->getName());
-		funcInvoaction->getParameterList().push_back(mWorldITMatrix->getName());
-		funcInvoaction->getParameterList().push_back(mViewMatrix->getName());					
-		funcInvoaction->getParameterList().push_back(mVSInputNormal->getName());	
-		funcInvoaction->getParameterList().push_back(mVSInputPos->getName());				
-		funcInvoaction->getParameterList().push_back(mVSOutReflectionTexcoord->getName());
+		funcInvoaction->pushOperand(mWorldMatrix, Operand::OPS_IN);
+		funcInvoaction->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+		funcInvoaction->pushOperand(mViewMatrix, Operand::OPS_IN);					
+		funcInvoaction->pushOperand(mVSInputNormal, Operand::OPS_IN);	
+		funcInvoaction->pushOperand(mVSInputPos, Operand::OPS_IN);				
+		funcInvoaction->pushOperand(mVSOutReflectionTexcoord, Operand::OPS_IN);
 		vsMain->addAtomInstace(funcInvoaction);
 	}
 	
@@ -315,12 +309,12 @@ bool ShaderExReflectionMap::addPSInvocations( Function* psMain, const int groupO
 	int internalCounter = 0;
 
 	funcInvoaction = new FunctionInvocation(SGX_FUNC_APPLY_REFLECTION_MAP, groupOrder, internalCounter++);
-	funcInvoaction->getParameterList().push_back(mMaskMapSampler->getName());
-	funcInvoaction->getParameterList().push_back(mPSInMaskTexcoord->getName());
-	funcInvoaction->getParameterList().push_back(mReflectionMapSampler->getName());
-	funcInvoaction->getParameterList().push_back(mPSInReflectionTexcoord->getName());	
-	funcInvoaction->getParameterList().push_back(mPSOutDiffuse->getName() + ".xyz");
-	funcInvoaction->getParameterList().push_back(mPSOutDiffuse->getName() + ".xyz");
+	funcInvoaction->pushOperand(mMaskMapSampler, Operand::OPS_IN);
+	funcInvoaction->pushOperand(mPSInMaskTexcoord, Operand::OPS_IN);
+	funcInvoaction->pushOperand(mReflectionMapSampler, Operand::OPS_IN);
+	funcInvoaction->pushOperand(mPSInReflectionTexcoord, Operand::OPS_IN);	
+	funcInvoaction->pushOperand(mPSOutDiffuse, Operand::OPS_IN,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
+	funcInvoaction->pushOperand(mPSOutDiffuse, Operand::OPS_OUT,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
 	
 	psMain->addAtomInstace(funcInvoaction);
 
@@ -360,6 +354,7 @@ SubRenderState*	ShaderExReflectionMapFactory::createInstance(ScriptCompiler* com
 
 			SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
 			ShaderExReflectionMap* reflectionMapSubRenderState = static_cast<ShaderExReflectionMap*>(subRenderState);
+			UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(pass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
 
 
 			// Reflection map is cubic texture.
@@ -381,7 +376,7 @@ SubRenderState*	ShaderExReflectionMapFactory::createInstance(ScriptCompiler* com
 				return NULL;
 			}
 			++it;
-			pass->getUserObjectBindings().setUserAny(ShaderExReflectionMap::MaskMapTextureNameKey, Any(strValue));
+			rtssBindings->setUserAny(ShaderExReflectionMap::MaskMapTextureNameKey, Any(strValue));
 
 			// Read reflection texture.
 			if (false == SGScriptTranslator::getString(*it, &strValue))
@@ -389,7 +384,7 @@ SubRenderState*	ShaderExReflectionMapFactory::createInstance(ScriptCompiler* com
 				compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
 				return NULL;
 			}
-			pass->getUserObjectBindings().setUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey, Any(strValue));
+			rtssBindings->setUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey, Any(strValue));
 				
 			return subRenderState;								
 			
@@ -404,13 +399,15 @@ void ShaderExReflectionMapFactory::writeInstance(MaterialSerializer* ser,
 											 SubRenderState* subRenderState, 
 											 Pass* srcPass, Pass* dstPass)
 {
+	UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(srcPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
+
 	// Validate mask texture name.
-	const Any& maskUser = srcPass->getUserObjectBindings().getUserAny(ShaderExReflectionMap::MaskMapTextureNameKey);
+	const Any& maskUser = rtssBindings->getUserAny(ShaderExReflectionMap::MaskMapTextureNameKey);
 	if (maskUser.isEmpty())	
 		return;	
 
 	// Validate reflection map texture name.
-	const Any& reflectionUser = srcPass->getUserObjectBindings().getUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey);
+	const Any& reflectionUser = rtssBindings->getUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey);
 	if (reflectionUser.isEmpty())	
 		return;
 

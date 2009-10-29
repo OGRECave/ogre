@@ -146,19 +146,19 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 	{
 		vsDiffuse = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_CONSTRUCT, FFP_VS_COLOUR, internalCounter++);
-		curFuncInvocation->getParameterList().push_back("1.0");
-		curFuncInvocation->getParameterList().push_back("1.0");
-		curFuncInvocation->getParameterList().push_back("1.0");
-		curFuncInvocation->getParameterList().push_back("1.0");
-		curFuncInvocation->getParameterList().push_back(vsDiffuse->getName());
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(vsDiffuse, Operand::OPS_OUT);
 		vsMain->addAtomInstace(curFuncInvocation);
 	}
 
 	if (mVSOutputDiffuse.get() != NULL)
 	{
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_COLOUR, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(vsDiffuse->getName());
-		curFuncInvocation->getParameterList().push_back(mVSOutputDiffuse->getName());
+		curFuncInvocation->pushOperand(vsDiffuse, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mVSOutputDiffuse, Operand::OPS_OUT);
 		vsMain->addAtomInstace(curFuncInvocation);
 	}
 	
@@ -171,19 +171,19 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 		vsSpecular = vsMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
 
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_CONSTRUCT, FFP_VS_COLOUR, internalCounter++);
-		curFuncInvocation->getParameterList().push_back("0.0");
-		curFuncInvocation->getParameterList().push_back("0.0");
-		curFuncInvocation->getParameterList().push_back("0.0");
-		curFuncInvocation->getParameterList().push_back("0.0");
-		curFuncInvocation->getParameterList().push_back(vsSpecular->getName());
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(vsSpecular, Operand::OPS_OUT);
 		vsMain->addAtomInstace(curFuncInvocation);
 	}
 
 	if (mVSOutputSpecular.get() != NULL)
 	{
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_COLOUR, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(vsSpecular->getName());
-		curFuncInvocation->getParameterList().push_back(mVSOutputSpecular->getName());
+		curFuncInvocation->pushOperand(vsSpecular, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mVSOutputSpecular, Operand::OPS_OUT);
 		vsMain->addAtomInstace(curFuncInvocation);
 	}
 	
@@ -203,11 +203,11 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 	{
 		psDiffuse = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_CONSTRUCT, FFP_PS_COLOUR_BEGIN, internalCounter++);
-		curFuncInvocation->getParameterList().push_back("1.0");
-		curFuncInvocation->getParameterList().push_back("1.0");
-		curFuncInvocation->getParameterList().push_back("1.0");
-		curFuncInvocation->getParameterList().push_back("1.0");
-		curFuncInvocation->getParameterList().push_back(psDiffuse->getName());
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(psDiffuse, Operand::OPS_OUT);
 		psMain->addAtomInstace(curFuncInvocation);
 	}
 
@@ -220,11 +220,11 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 	{
 		psSpecular = psMain->resolveLocalParameter(Parameter::SPS_COLOR, 1, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_CONSTRUCT, FFP_PS_COLOUR_BEGIN, internalCounter++);
-		curFuncInvocation->getParameterList().push_back("0.0");
-		curFuncInvocation->getParameterList().push_back("0.0");
-		curFuncInvocation->getParameterList().push_back("0.0");
-		curFuncInvocation->getParameterList().push_back("0.0");
-		curFuncInvocation->getParameterList().push_back(psSpecular->getName());
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(psSpecular, Operand::OPS_OUT);
 		psMain->addAtomInstace(curFuncInvocation);
 	}
 
@@ -232,8 +232,8 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 	if (mPSOutputDiffuse.get() != NULL)
 	{	
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(psDiffuse->getName());
-		curFuncInvocation->getParameterList().push_back(mPSOutputDiffuse->getName());		
+		curFuncInvocation->pushOperand(psDiffuse, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_OUT);		
 		psMain->addAtomInstace(curFuncInvocation);
 	}
 
@@ -241,8 +241,8 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 	if (mPSOutputSpecular.get() != NULL)
 	{
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(psSpecular->getName());
-		curFuncInvocation->getParameterList().push_back(mPSOutputSpecular->getName());		
+		curFuncInvocation->pushOperand(psSpecular, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mPSOutputSpecular, Operand::OPS_OUT);		
 		psMain->addAtomInstace(curFuncInvocation);
 	}
 
@@ -251,12 +251,11 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 	if (mPSOutputDiffuse.get() != NULL && psSpecular.get() != NULL)
 	{
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ADD, FFP_PS_COLOUR_END, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(mPSOutputDiffuse->getName() + ".xyz");
-		curFuncInvocation->getParameterList().push_back(psSpecular->getName() + ".xyz");
-		curFuncInvocation->getParameterList().push_back(mPSOutputDiffuse->getName() + ".xyz");		
+		curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_IN,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
+		curFuncInvocation->pushOperand(psSpecular, Operand::OPS_IN,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
+		curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_OUT,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
 		psMain->addAtomInstace(curFuncInvocation);
-	}
-	
+	}	
 
 	return true;
 }

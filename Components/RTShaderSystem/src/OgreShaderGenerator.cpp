@@ -46,9 +46,10 @@ RTShader::ShaderGenerator* Singleton<RTShader::ShaderGenerator>::ms_Singleton = 
 
 namespace RTShader {
 
-String ShaderGenerator::DEFAULT_SCHEME_NAME = "ShaderGeneratorDefaultScheme";
-String ShaderGenerator::SGPass::UserKey = "SGPass";
-String ShaderGenerator::SGTechnique::UserKey = "SGTechnique";
+String ShaderGenerator::DEFAULT_SCHEME_NAME		= "ShaderGeneratorDefaultScheme";
+String ShaderGenerator::BINDING_OBJECT_KEY		= "RTSSBindingObjectKey";
+String ShaderGenerator::SGPass::UserKey			= "SGPass";
+String ShaderGenerator::SGTechnique::UserKey	= "SGTechnique";
 
 //-----------------------------------------------------------------------
 ShaderGenerator* ShaderGenerator::getSingletonPtr()
@@ -1017,6 +1018,20 @@ ShaderGenerator::SGTechnique::SGTechnique(SGMaterial* parent, Technique* srcTech
 	mDstTechniqueSchemeName =  dstTechniqueSchemeName;
 	mDstTechnique			= NULL;
 	mBuildDstTechnique		= true;
+
+	// Create the shared binding object for each soruce pass.
+	for (unsigned short i=0; i < mSrcTechnique->getNumPasses(); ++i)
+	{
+		Pass* srcPass = mSrcTechnique->getPass(i);
+		UserObjectBindings& passBindings = srcPass->getUserObjectBindings();
+		const Any& rtssAnyBindings = passBindings.getUserAny(ShaderGenerator::BINDING_OBJECT_KEY);
+
+		// Allocate dedicated RTSS binding object if need to.
+		if (rtssAnyBindings.isEmpty())
+		{
+			passBindings.setUserAny(ShaderGenerator::BINDING_OBJECT_KEY, Any(OGRE_NEW UserObjectBindings()));
+		}		
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1048,16 +1063,17 @@ ShaderGenerator::SGTechnique::~SGTechnique()
 		// Do per pass cleanup.
 		for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
 		{
-			SGPass*		 curPassEntry = *itPass;
-			RenderState* renderState  = curPassEntry->getFinalRenderState();
-			const SubRenderStateList& subRenderStateList = renderState->getSubStateList();
+			SGPass*				curPassEntry = *itPass;
+			Pass*				srcPass		 = (*itPass)->getSrcPass();
+			UserObjectBindings& passBindings = srcPass->getUserObjectBindings();
+			const Any& rtssAnyBindings		 = passBindings.getUserAny(ShaderGenerator::BINDING_OBJECT_KEY);
 
-			// Let sub render states do some cleanup on the source and destination passes.	
-			for (SubRenderStateConstIterator it=subRenderStateList.begin(); it != subRenderStateList.end(); ++it)
+			if (rtssAnyBindings.isEmpty() == false)
 			{
-				SubRenderState* curSubRenderState = *it;
+				UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(rtssAnyBindings);	
 
-				curSubRenderState->preRemoveFromRenderState(renderState, curPassEntry->getSrcPass(), curPassEntry->getDstPass());
+				srcPass->getUserObjectBindings().eraseUserAny(ShaderGenerator::BINDING_OBJECT_KEY);
+				OGRE_DELETE rtssBindings;
 			}		
 		}		
 	

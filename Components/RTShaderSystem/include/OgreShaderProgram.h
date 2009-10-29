@@ -47,7 +47,7 @@ namespace RTShader {
 
 /** A class that represents a shader based program.
 */
-class OGRE_RTSHADERSYSTEM_API Program
+class Program
 {
 
 // Interface.

@@ -78,11 +78,6 @@ public:
 	*/
 	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
-	/** 
-	@see SubRenderState::preRemoveFromRenderState.
-	*/
-	virtual void			preRemoveFromRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass);
-
 	/** Sets the reflection map type. */
 	void					setReflectionMapType	(TextureType type);
 

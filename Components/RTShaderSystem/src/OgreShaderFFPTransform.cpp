@@ -81,9 +81,9 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
 
 	FunctionInvocation* transformFunc = new FunctionInvocation(FFP_FUNC_TRANSFORM,  FFP_VS_TRANSFORM, 0); 
 
-	transformFunc->getParameterList().push_back(wvpMatrix->getName());
-	transformFunc->getParameterList().push_back(positionIn->getName());
-	transformFunc->getParameterList().push_back(positionOut->getName());
+	transformFunc->pushOperand(wvpMatrix, Operand::OPS_IN);
+	transformFunc->pushOperand(positionIn, Operand::OPS_IN);
+	transformFunc->pushOperand(positionOut, Operand::OPS_OUT);
 
 	vsEntry->addAtomInstace(transformFunc);
 

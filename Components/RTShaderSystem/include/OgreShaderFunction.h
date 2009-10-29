@@ -43,7 +43,7 @@ namespace RTShader {
 
 /** A class that represents a shader based program function.
 */
-class OGRE_RTSHADERSYSTEM_API Function
+class Function
 {
 // Interface.
 public:

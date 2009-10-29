@@ -321,16 +321,16 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 		{
 			texCoordCalcFunc = new FunctionInvocation(FFP_FUNC_ASSIGN,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mVSInputTexCoord->getName());
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mVSOutputTexCoord->getName());					
+			texCoordCalcFunc->pushOperand(textureUnitParams->mVSInputTexCoord, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);					
 		}
 		else
 		{
 			texCoordCalcFunc = new FunctionInvocation(FFP_FUNC_TRANSFORM_TEXCOORD,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mTextureMatrix->getName());
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mVSInputTexCoord->getName());
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mVSOutputTexCoord->getName());
+			texCoordCalcFunc->pushOperand(textureUnitParams->mTextureMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(textureUnitParams->mVSInputTexCoord, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
 		}						
 		break;
 
@@ -340,20 +340,20 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 		{
 			texCoordCalcFunc = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
-			texCoordCalcFunc->getParameterList().push_back(mWorldITMatrix->getName());
-			texCoordCalcFunc->getParameterList().push_back(mViewMatrix->getName());	
-			texCoordCalcFunc->getParameterList().push_back(mVSInputNormal->getName());	
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mVSOutputTexCoord->getName());
+			texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);	
+			texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN);	
+			texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
 		}
 		else
 		{
 			texCoordCalcFunc = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
-			texCoordCalcFunc->getParameterList().push_back(mWorldITMatrix->getName());
-			texCoordCalcFunc->getParameterList().push_back(mViewMatrix->getName());	
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mTextureMatrix->getName());
-			texCoordCalcFunc->getParameterList().push_back(mVSInputNormal->getName());	
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mVSOutputTexCoord->getName());
+			texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);	
+			texCoordCalcFunc->pushOperand(textureUnitParams->mTextureMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN);	
+			texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
 		}			
 		break;
 
@@ -363,24 +363,24 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 		{
 			texCoordCalcFunc = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
-			texCoordCalcFunc->getParameterList().push_back(mWorldMatrix->getName());
-			texCoordCalcFunc->getParameterList().push_back(mWorldITMatrix->getName());
-			texCoordCalcFunc->getParameterList().push_back(mViewMatrix->getName());					
-			texCoordCalcFunc->getParameterList().push_back(mVSInputNormal->getName());	
-			texCoordCalcFunc->getParameterList().push_back(mVSInputPos->getName());				
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mVSOutputTexCoord->getName());
+			texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);					
+			texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN);	
+			texCoordCalcFunc->pushOperand(mVSInputPos, Operand::OPS_IN);				
+			texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
 		}
 		else
 		{
 			texCoordCalcFunc = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
-			texCoordCalcFunc->getParameterList().push_back(mWorldMatrix->getName());
-			texCoordCalcFunc->getParameterList().push_back(mWorldITMatrix->getName());
-			texCoordCalcFunc->getParameterList().push_back(mViewMatrix->getName());					
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mTextureMatrix->getName());	
-			texCoordCalcFunc->getParameterList().push_back(mVSInputNormal->getName());	
-			texCoordCalcFunc->getParameterList().push_back(mVSInputPos->getName());				
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mVSOutputTexCoord->getName());
+			texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);					
+			texCoordCalcFunc->pushOperand(textureUnitParams->mTextureMatrix, Operand::OPS_IN);	
+			texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN);	
+			texCoordCalcFunc->pushOperand(mVSInputPos, Operand::OPS_IN);				
+			texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
 		}			
 		break;
 
@@ -389,20 +389,20 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 		{
 			texCoordCalcFunc = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
-			texCoordCalcFunc->getParameterList().push_back(mWorldITMatrix->getName());
-			texCoordCalcFunc->getParameterList().push_back(mViewMatrix->getName());	
-			texCoordCalcFunc->getParameterList().push_back(mVSInputNormal->getName());	
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mVSOutputTexCoord->getName());
+			texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);	
+			texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN);	
+			texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
 		}
 		else
 		{
 			texCoordCalcFunc = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_NORMAL,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
-			texCoordCalcFunc->getParameterList().push_back(mWorldITMatrix->getName());
-			texCoordCalcFunc->getParameterList().push_back(mViewMatrix->getName());	
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mTextureMatrix->getName());
-			texCoordCalcFunc->getParameterList().push_back(mVSInputNormal->getName());	
-			texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mVSOutputTexCoord->getName());
+			texCoordCalcFunc->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mViewMatrix, Operand::OPS_IN);	
+			texCoordCalcFunc->pushOperand(textureUnitParams->mTextureMatrix, Operand::OPS_IN);
+			texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN);	
+			texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
 		}			
 		break;
 		break;
@@ -411,10 +411,10 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 
 		texCoordCalcFunc = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_PROJECTION,  FFP_VS_TEXTURING, textureUnitParams->mTextureSamplerIndex); 
 
-		texCoordCalcFunc->getParameterList().push_back(mWorldMatrix->getName());
-		texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mTextureViewProjImageMatrix->getName());	
-		texCoordCalcFunc->getParameterList().push_back(mVSInputPos->getName());		
-		texCoordCalcFunc->getParameterList().push_back(textureUnitParams->mVSOutputTexCoord->getName());
+		texCoordCalcFunc->pushOperand(mWorldMatrix, Operand::OPS_IN);
+		texCoordCalcFunc->pushOperand(textureUnitParams->mTextureViewProjImageMatrix, Operand::OPS_IN);	
+		texCoordCalcFunc->pushOperand(mVSInputPos, Operand::OPS_IN);		
+		texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
 
 		break;
 	}
@@ -443,9 +443,9 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 	else	
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder, internalCounter++);
 
-	curFuncInvocation->getParameterList().push_back(textureUnitParams->mTextureSampler->getName());
-	curFuncInvocation->getParameterList().push_back(textureUnitParams->mPSInputTexCoord->getName());
-	curFuncInvocation->getParameterList().push_back(texel->getName());
+	curFuncInvocation->pushOperand(textureUnitParams->mTextureSampler, Operand::OPS_IN);
+	curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
+	curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
 	psMain->addAtomInstace(curFuncInvocation);
 
 	// Build colour argument for source1.
@@ -474,7 +474,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 	addPSBlendInvocations(psMain, source1, source2, texel, 
 		textureUnitParams->mTextureSamplerIndex,
 		colourBlend, groupOrder, internalCounter, 
-		needDifferentAlphaBlend ? ".rgb" : NULL);
+		needDifferentAlphaBlend ? (Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z )  : Operand::OPM_ALL);
 
 	// Case we need different alpha channel code.
 	if (needDifferentAlphaBlend)
@@ -495,7 +495,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 		addPSBlendInvocations(psMain, source1, source2, texel, 
 			textureUnitParams->mTextureSamplerIndex, 
 			alphaBlend, groupOrder, internalCounter,
-			".a");
+			Operand::OPM_W);
 	}
 	
 	
@@ -522,28 +522,28 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
 	case LBS_CURRENT:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
 		if (samplerIndex == 0)
-			curFuncInvocation->getParameterList().push_back(mPSDiffuse->getName());
+			curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);
 		else
-			curFuncInvocation->getParameterList().push_back(mPSOutDiffuse->getName());
-		curFuncInvocation->getParameterList().push_back(arg->getName());		
+			curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);		
 		psMain->addAtomInstace(curFuncInvocation);		
 		break;
 	case LBS_TEXTURE:		
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(texel->getName());
-		curFuncInvocation->getParameterList().push_back(arg->getName());		
+		curFuncInvocation->pushOperand(texel, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);		
 		psMain->addAtomInstace(curFuncInvocation);		
 		break;
 	case LBS_DIFFUSE:		
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);	
-		curFuncInvocation->getParameterList().push_back(mPSDiffuse->getName());		
-		curFuncInvocation->getParameterList().push_back(arg->getName());		
+		curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);		
+		curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);		
 		psMain->addAtomInstace(curFuncInvocation);		
 		break;
 	case LBS_SPECULAR:		
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);	
-		curFuncInvocation->getParameterList().push_back(mPSSpecular->getName());		
-		curFuncInvocation->getParameterList().push_back(arg->getName());		
+		curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_IN);		
+		curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);		
 		psMain->addAtomInstace(curFuncInvocation);	
 		break;
 
@@ -552,17 +552,17 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
 
 		if (isAlphaArgument == false)
 		{
-			curFuncInvocation->getParameterList().push_back(StringConverter::toString(alphaValue));						
+			curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(alphaValue), Operand::OPS_IN);						
 		}
 		else
-		{
-			curFuncInvocation->getParameterList().push_back(StringConverter::toString(colourValue.r));		
-			curFuncInvocation->getParameterList().push_back(StringConverter::toString(colourValue.g));		
-			curFuncInvocation->getParameterList().push_back(StringConverter::toString(colourValue.b));		
-			curFuncInvocation->getParameterList().push_back(StringConverter::toString(colourValue.a));		
+		{				
+			curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.r), Operand::OPS_IN);		
+			curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.g), Operand::OPS_IN);		
+			curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.b), Operand::OPS_IN);		
+			curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.a), Operand::OPS_IN);		
 		}
 		
-		curFuncInvocation->getParameterList().push_back(arg->getName());	
+		curFuncInvocation->pushOperand(arg, Operand::OPS_IN);	
 		psMain->addAtomInstace(curFuncInvocation);	
 		break;
 	}
@@ -577,133 +577,122 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
 										  const LayerBlendModeEx& blendMode,
 										  const int groupOrder, 
 										  int& internalCounter,
-										  const char* targetChannels)
+										  int targetChannels)
 {
 	FunctionInvocation* curFuncInvocation = NULL;
-	String arg1ParamName = arg1->getName();
-	String arg2ParamName = arg2->getName();
-	String outParamName = mPSOutDiffuse->getName();
-
-	if (targetChannels != NULL)	
-	{
-		arg1ParamName += targetChannels;
-		arg2ParamName += targetChannels;
-		outParamName += targetChannels;	
-	}
-	
 
 	switch(blendMode.operation)
 	{
 	case LBX_SOURCE1:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);						
 		break;
 	case LBX_SOURCE2:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);							
 		break;
 	case LBX_MODULATE:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);			
 		break;
 	case LBX_MODULATE_X2:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATEX2, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);			
 		break;
 	case LBX_MODULATE_X4:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATEX4, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);	
 		break;
 	case LBX_ADD:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ADD, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);			
 		break;
 	case LBX_ADD_SIGNED:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ADDSIGNED, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);				
 		break;
 	case LBX_ADD_SMOOTH:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ADDMOOTH, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);			
 		break;
 	case LBX_SUBTRACT:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);	
 		break;
 	case LBX_BLEND_DIFFUSE_ALPHA:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);
-		curFuncInvocation->getParameterList().push_back(mPSDiffuse->getName() + ".a");
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, Operand::OPM_W);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);		
 		break;
 	case LBX_BLEND_TEXTURE_ALPHA:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);
-		curFuncInvocation->getParameterList().push_back(texel->getName() + ".a");
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(texel, Operand::OPS_IN, Operand::OPM_W);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);		
 		break;
 	case LBX_BLEND_CURRENT_ALPHA:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_OUT, targetChannels);
 
 		if (samplerIndex == 0)
-			curFuncInvocation->getParameterList().push_back(mPSDiffuse->getName() + ".a");
+			curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, Operand::OPM_W);
 		else
-			curFuncInvocation->getParameterList().push_back(mPSOutDiffuse->getName() + ".a");
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+			curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN, Operand::OPM_W);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);		
 		break;
 	case LBX_BLEND_MANUAL:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);
-		curFuncInvocation->getParameterList().push_back(StringConverter::toString(blendMode.factor));
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(blendMode.factor), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);
 		break;
 	case LBX_DOTPRODUCT:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_DOTPRODUCT, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);		
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);		
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);		
 		break;
 	case LBX_BLEND_DIFFUSE_COLOUR:
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(arg2ParamName);
-		curFuncInvocation->getParameterList().push_back(arg1ParamName);
-		curFuncInvocation->getParameterList().push_back(mPSDiffuse->getName());
-		curFuncInvocation->getParameterList().push_back(outParamName);		
+		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
+		curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
 		psMain->addAtomInstace(curFuncInvocation);		
 		break;
 	}

@@ -118,7 +118,7 @@ void Sample_ShaderSystem::itemSelected(SelectMenu* menu)
 
 		if (curModeIndex >= FOG_NONE && curModeIndex <= FOG_LINEAR)
 		{
-			mSceneMgr->setFog((FogMode)curModeIndex, ColourValue::White, 0.0015, 350.0, 1500.0);
+			mSceneMgr->setFog((FogMode)curModeIndex, ColourValue(1.0, 1.0, 1.0, 0.0), 0.0015, 350.0, 1500.0);
 		}		
 	}
 }
@@ -525,9 +525,10 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 				{
 					RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(RTShader::NormalMapLighting::Type);
 					RTShader::NormalMapLighting* normalMapSubRS = static_cast<RTShader::NormalMapLighting*>(subRenderState);
+					UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
 
 					normalMapSubRS->setNormalMapSpace(RTShader::NormalMapLighting::NMS_TANGENT);
-					curPass->getUserObjectBindings().setUserAny(RTShader::NormalMapLighting::NormalMapTextureNameKey, Any(String("Panels_Normal_Tangent.png")));	
+					rtssBindings->setUserAny(RTShader::NormalMapLighting::NormalMapTextureNameKey, Any(String("Panels_Normal_Tangent.png")));	
 
 					renderState->addSubRenderState(normalMapSubRS);
 				}
@@ -546,9 +547,10 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 				{
 					RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(RTShader::NormalMapLighting::Type);
 					RTShader::NormalMapLighting* normalMapSubRS = static_cast<RTShader::NormalMapLighting*>(subRenderState);
+					UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
 
 					normalMapSubRS->setNormalMapSpace(RTShader::NormalMapLighting::NMS_OBJECT);
-					curPass->getUserObjectBindings().setUserAny(RTShader::NormalMapLighting::NormalMapTextureNameKey, Any(String("Panels_Normal_Obj.png")));	
+					rtssBindings->setUserAny(RTShader::NormalMapLighting::NormalMapTextureNameKey, Any(String("Panels_Normal_Obj.png")));	
 
 					renderState->addSubRenderState(normalMapSubRS);
 				}
@@ -565,12 +567,13 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 			{				
 				RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(ShaderExReflectionMap::Type);
 				ShaderExReflectionMap* reflectionMapSubRS = static_cast<ShaderExReflectionMap*>(subRenderState);
+				UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
 
 				reflectionMapSubRS->setReflectionMapType(TEX_TYPE_CUBE_MAP);
 
 				// Setup the textures needed by the reflection effect.
-				curPass->getUserObjectBindings().setUserAny(ShaderExReflectionMap::MaskMapTextureNameKey, Any(String("Panels_refmask.png")));	
-				curPass->getUserObjectBindings().setUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey, Any(String("cubescene.jpg")));
+				rtssBindings->setUserAny(ShaderExReflectionMap::MaskMapTextureNameKey, Any(String("Panels_refmask.png")));	
+				rtssBindings->setUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey, Any(String("cubescene.jpg")));
 											
 				renderState->addSubRenderState(subRenderState);
 			}
@@ -603,7 +606,7 @@ void Sample_ShaderSystem::createDirectionalLight()
 
 	// Create billboard set.
 	bbs = mSceneMgr->createBillboardSet();
-	bbs->setMaterialName("Examples/Flare");
+	bbs->setMaterialName("Examples/Flare3");
 	bbs->createBillboard(-dir * 500.0)->setColour(light->getDiffuseColour());
 	
 	mDirectionalLightNode->attachObject(bbs);
@@ -634,7 +637,7 @@ void Sample_ShaderSystem::createPointLight()
 	
 	// Create billboard set.
 	bbs = mSceneMgr->createBillboardSet();
-	bbs->setMaterialName("Examples/Flare");
+	bbs->setMaterialName("Examples/Flare3");
 	bbs->createBillboard(200, 100, 0)->setColour(light->getDiffuseColour());
 
 	mPointLightNode->attachObject(bbs);

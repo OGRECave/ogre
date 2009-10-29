@@ -27,9 +27,126 @@ THE SOFTWARE.
 
 #include "OgreShaderParameter.h"
 #include "OgreStringConverter.h"
+#include "OgreMatrix4.h"
+#include "OgreVector2.h"
+#include "OgreVector3.h"
+#include "OgreVector4.h"
 
 namespace Ogre {
 namespace RTShader {
+
+	//-----------------------------------------------------------------------
+	// Define some ConstParameterTypes
+	//-----------------------------------------------------------------------
+
+	/** ConstParameterVec2 represents a Vector2 constant.
+	*/
+	class ConstParameterVec2 : public ConstParameter<Vector2>
+	{
+	public:
+		ConstParameterVec2(	Vector2 val, 
+			GpuConstantType type, 
+			const Semantic& semantic,  
+			const Content& content) 
+			: ConstParameter<Vector2>(val, type, semantic, content)
+		{
+		}
+
+		~ConstParameterVec2() {}
+
+		/** 
+		@see Parameter::toString.
+		*/
+		virtual String toString () const
+		{
+			return	Ogre::StringConverter::toString(mValue.x) + "," + 
+				Ogre::StringConverter::toString(mValue.y);
+		}
+	};
+
+	/** ConstParameterVec3 represents a Vector3 constant.
+	*/
+	class ConstParameterVec3 : public ConstParameter<Vector3>
+	{
+	public:
+		ConstParameterVec3(	Vector3 val, 
+			GpuConstantType type, 
+			const Semantic& semantic,  
+			const Content& content) 
+			: ConstParameter<Vector3>(val, type, semantic, content)
+		{
+		}
+		~ConstParameterVec3() {}
+
+		/** 
+		@see Parameter::toString.
+		*/
+		virtual String toString () const
+		{
+			return	Ogre::StringConverter::toString(mValue.x) + "," + 
+				Ogre::StringConverter::toString(mValue.y) + "," + 
+				Ogre::StringConverter::toString(mValue.z);
+		}
+	};
+
+	/** ConstParameterVec4 represents a Vector2 Vector4.
+	*/
+	class ConstParameterVec4 : public ConstParameter<Vector4>
+	{
+	public:
+		ConstParameterVec4(	Vector4 val, 
+			GpuConstantType type, 
+			const Semantic& semantic,  
+			const Content& content) 
+			: ConstParameter<Vector4>(val, type, semantic, content)
+		{
+		}
+		~ConstParameterVec4() {}
+
+		/** 
+		@see Parameter::toString.
+		*/
+		virtual String toString () const
+		{
+			return	Ogre::StringConverter::toString(mValue.x) + "," + 
+				Ogre::StringConverter::toString(mValue.y) + "," + 
+				Ogre::StringConverter::toString(mValue.z) + "," + 
+				Ogre::StringConverter::toString(mValue.w);
+		}
+	};
+
+	/** ConstParameterFloat represents a float constant.
+	*/
+	class ConstParameterFloat : public ConstParameter<float>
+	{
+	public:
+		ConstParameterFloat(float val, 
+			GpuConstantType type, 
+			const Semantic& semantic,  
+			const Content& content) 
+			: ConstParameter<float>(val, type, semantic, content)
+		{
+		}
+
+		~ConstParameterFloat() {}
+
+		/** 
+		@see Parameter::toString.
+		*/
+		virtual String toString () const
+		{
+			String val = Ogre::StringConverter::toString(mValue);
+
+			// Make sure that float params have always this representation #.#
+			if(val.find(".") == String.npos)
+			{
+				val += ".0";
+			}
+
+			return val;
+		}
+	};
+	//-----------------------------------------------------------------------
 
 	struct AutoShaderParameter
 	{
@@ -267,9 +384,6 @@ bool Parameter::isSampler() const
 		return false;
 	};
 }
-
-
-
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInPosition(int index)
 {
@@ -530,6 +644,41 @@ ParameterPtr ParameterFactory::createSamplerCUBE(int index)
 		Parameter::SPS_UNKNOWN, index, 
 		Parameter::SPC_UNKNOWN,
 		(uint16)GPV_GLOBAL));
+}
+//-----------------------------------------------------------------------
+ParameterPtr ParameterFactory::createConstParamVector2(Vector2 val)
+{
+	return ParameterPtr((Parameter*)new ConstParameterVec2(val, 
+													GCT_FLOAT2, 
+													Parameter::SPS_UNKNOWN,  
+													Parameter::SPC_UNKNOWN));
+}
+
+//-----------------------------------------------------------------------
+ParameterPtr ParameterFactory::createConstParamVector3(Vector3 val)
+{
+	return ParameterPtr((Parameter*)new ConstParameterVec3(val, 
+													GCT_FLOAT3, 
+													Parameter::SPS_UNKNOWN,  
+													Parameter::SPC_UNKNOWN));
+}
+
+//-----------------------------------------------------------------------
+ParameterPtr ParameterFactory::createConstParamVector4(Vector4 val)
+{
+	return ParameterPtr((Parameter*)new ConstParameterVec4(val, 
+													GCT_FLOAT4, 
+													Parameter::SPS_UNKNOWN,  
+													Parameter::SPC_UNKNOWN));
+}
+
+//-----------------------------------------------------------------------
+ParameterPtr ParameterFactory::createConstParamFloat(float val)
+{
+	return ParameterPtr((Parameter*)new ConstParameterFloat(val, 
+												  GCT_FLOAT1, 
+												  Parameter::SPS_UNKNOWN,  
+												  Parameter::SPC_UNKNOWN));
 }
 
 }

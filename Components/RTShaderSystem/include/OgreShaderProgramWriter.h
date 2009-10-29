@@ -47,7 +47,7 @@ namespace RTShader {
 /** A class that perform the actual writing operation of a given CPU program to stream.
 The main usage of this class is to generate the actual shader source code from a CPU program representation.
 */
-class OGRE_RTSHADERSYSTEM_INTERNAL ProgramWriter
+class ProgramWriter
 {
 // Interface.
 public:

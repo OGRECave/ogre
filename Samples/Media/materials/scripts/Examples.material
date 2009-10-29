@@ -561,6 +561,24 @@ material Examples/Flare2
 		}
 	}
 }
+material Examples/Flare3
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend alpha_blend
+			depth_write off
+			diffuse vertexcolour
+
+			texture_unit
+			{
+				texture flare_alpha.dds
+			}
+		}
+	}
+}
 material Examples/FlarePointSprite
 {
 	technique

@@ -44,7 +44,7 @@ namespace RTShader {
 /** This class responsible for translating core features of the RT Shader System for
 Ogre material scripts.
 */
-class OGRE_RTSHADERSYSTEM_API SGScriptTranslator : public ScriptTranslator
+class SGScriptTranslator : public ScriptTranslator
 {
 public:
 	/**

@@ -44,7 +44,7 @@ namespace RTShader {
 /** Colour sub render state implementation of the Fixed Function Pipeline.
 Derives from SubRenderState class.
 */
-class OGRE_RTSHADERSYSTEM_API FFPColour : public SubRenderState
+class FFPColour : public SubRenderState
 {
 public:
 

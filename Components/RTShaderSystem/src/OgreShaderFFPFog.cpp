@@ -258,9 +258,9 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 	{
 		internalCounter = 0;
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_PIXELFOG_DEPTH, FFP_VS_FOG, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(mWorldViewProjMatrix->getName());
-		curFuncInvocation->getParameterList().push_back(mVSInPos->getName());	
-		curFuncInvocation->getParameterList().push_back(mVSOutDepth->getName());	
+		curFuncInvocation->pushOperand(mWorldViewProjMatrix, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mVSInPos, Operand::OPS_IN);	
+		curFuncInvocation->pushOperand(mVSOutDepth, Operand::OPS_OUT);	
 		vsMain->addAtomInstace(curFuncInvocation);		
 
 		internalCounter = 0;
@@ -277,11 +277,11 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 			break;
 		}
 
-		curFuncInvocation->getParameterList().push_back(mPSInDepth->getName());
-		curFuncInvocation->getParameterList().push_back(mFogParams->getName());	
-		curFuncInvocation->getParameterList().push_back(mFogColour->getName());		
-		curFuncInvocation->getParameterList().push_back(mPSOutDiffuse->getName());
-		curFuncInvocation->getParameterList().push_back(mPSOutDiffuse->getName());
+		curFuncInvocation->pushOperand(mPSInDepth, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mFogParams, Operand::OPS_IN);	
+		curFuncInvocation->pushOperand(mFogColour, Operand::OPS_IN);		
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);
 		psMain->addAtomInstace(curFuncInvocation);	
 		
 	}
@@ -304,20 +304,20 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 			break;
 		}
 			
-		curFuncInvocation->getParameterList().push_back(mWorldViewProjMatrix->getName());
-		curFuncInvocation->getParameterList().push_back(mVSInPos->getName());		
-		curFuncInvocation->getParameterList().push_back(mFogParams->getName());		
-		curFuncInvocation->getParameterList().push_back(mVSOutFogFactor->getName());
+		curFuncInvocation->pushOperand(mWorldViewProjMatrix, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mVSInPos, Operand::OPS_IN);		
+		curFuncInvocation->pushOperand(mFogParams, Operand::OPS_IN);		
+		curFuncInvocation->pushOperand(mVSOutFogFactor, Operand::OPS_OUT);
 		vsMain->addAtomInstace(curFuncInvocation);		
 
 
 		internalCounter = 0;
 
 		curFuncInvocation = new FunctionInvocation(FFP_FUNC_LERP, FFP_PS_FOG, internalCounter++);
-		curFuncInvocation->getParameterList().push_back(mFogColour->getName());
-		curFuncInvocation->getParameterList().push_back(mPSOutDiffuse->getName());
-		curFuncInvocation->getParameterList().push_back(mPSInFogFactor->getName());
-		curFuncInvocation->getParameterList().push_back(mPSOutDiffuse->getName());
+		curFuncInvocation->pushOperand(mFogColour, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mPSInFogFactor, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);
 		psMain->addAtomInstace(curFuncInvocation);	
 	}
 

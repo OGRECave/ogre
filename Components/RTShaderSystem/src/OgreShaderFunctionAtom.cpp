@@ -29,7 +29,67 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace RTShader {
+//-----------------------------------------------------------------------------
+Operand::Operand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask)
+{
+	mParameter = parameter;
+	mSemantic = opSemantic;
+	mMask = opMask;
+}
+//-----------------------------------------------------------------------------
+Operand::Operand(const Operand& other) 
+{
+	*this = other;
+}
+//-----------------------------------------------------------------------------
+Operand& Operand::operator= (const Operand & other)
+{
+	if (this != &other) 
+	{
+		mParameter = other.mParameter;
+		mSemantic = other.mSemantic;
+		mMask = other.mMask;
+	}		
+	return *this;
+}
+//-----------------------------------------------------------------------------
+Operand::~Operand()
+{
+	// nothing todo
+}
+//-----------------------------------------------------------------------------
+String Operand::toString() const
+{
+	String retVal = mParameter->toString();
+	if ((mMask & OPM_ALL) || ((mMask & OPM_X) && (mMask & OPM_Y) && (mMask & OPM_Z) && (mMask & OPM_W)))
+	{
+		return retVal;
+	}
 
+	retVal += ".";
+
+	if (mMask & OPM_X)
+	{
+		retVal += "x";
+	}
+
+	if (mMask & OPM_Y)
+	{
+		retVal += "y";
+	}
+
+	if (mMask & OPM_Z)
+	{
+		retVal += "z";
+	}
+
+	if (mMask & OPM_W)
+	{
+		retVal += "w";
+	}
+
+	return retVal;
+}
 //-----------------------------------------------------------------------------
 FunctionAtom::FunctionAtom()
 {
@@ -51,28 +111,28 @@ int	FunctionAtom::getInternalExecutionOrder() const
 
 //-----------------------------------------------------------------------
 FunctionInvocation::FunctionInvocation(const String& functionName, 
-									   int groupOrder, int internalOrder)
+									   int groupOrder, int internalOrder, String returnType)
 {
 	mFunctionName = functionName;
 	mGroupExecutionOrder = groupOrder;
 	mInteralExecutionOrder = internalOrder;
+	mReturnType = returnType;
 }
 
 //-----------------------------------------------------------------------
-void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetLanguage)
+void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetLanguage) const
 {
 	// Write function name.
 	os << mFunctionName << "(";
 
-
 	// Write parameters.
-	for (StringVector::iterator it = mParameters.begin(); it != mParameters.end(); )
+	for (OperandVector::const_iterator it = mOperands.begin(); it != mOperands.end(); )
 	{
-		os << (*it);
+		os << (*it).toString();
 
 		++it;
 
-		if (it != mParameters.end())
+		if (it != mOperands.end())
 		{
 			os << ", ";
 		}
@@ -82,6 +142,11 @@ void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetL
 	os << ");";
 }
 
+//-----------------------------------------------------------------------
+void FunctionInvocation::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask)
+{
+	mOperands.push_back(Operand(parameter, opSemantic, opMask));
+}
 
 }
 }

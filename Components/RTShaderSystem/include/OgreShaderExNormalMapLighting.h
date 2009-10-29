@@ -47,7 +47,7 @@ namespace RTShader {
 /** Normal Map Lighting extension sub render state implementation.
 Derives from SubRenderState class.
 */
-class OGRE_RTSHADERSYSTEM_API NormalMapLighting : public SubRenderState
+class NormalMapLighting : public SubRenderState
 {
 
 // Interface.
@@ -86,13 +86,6 @@ public:
 	*/
 	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
-
-	/** 
-	@see SubRenderState::preRemoveFromRenderState.
-	*/
-	virtual void			preRemoveFromRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass);
-
-
 	/** 
 	Set the index of the input vertex shader texture coordinate set 
 	*/
@@ -106,10 +99,7 @@ public:
 	// Type of this render state.
 	static String Type;
 
-	/// The normal map texture name key.
-	/// Use this as the key parameter when calling Pass::setUserAny to associate a normal map texture
-	/// when using NormalMapLighting sub render state.
-	/// I.E pass->setUserAny(NormalMapTextureNameKey, Any(NormalMap.dds)).
+	/// The normal map texture name key.	
 	static String NormalMapTextureNameKey;
 
 	// Normal map space definition.

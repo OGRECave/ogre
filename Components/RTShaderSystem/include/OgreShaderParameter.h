@@ -42,7 +42,7 @@ namespace RTShader {
 
 /** A class that represents a shader based program parameter.
 */
-class OGRE_RTSHADERSYSTEM_API Parameter
+class Parameter
 {
 public:
 	// Shader parameter semantic.
@@ -336,6 +336,11 @@ public:
 	/** Return the content of this parameter. */
 	Content					getContent							() const { return mContent; }
 
+	/** Returns true if this instance is a ConstParameter otherwise false. */
+	virtual bool			isConstParameter					() const { return false; }
+
+	/** Returns the string representation of this parameter. */
+	virtual String			toString							() const { return mName; }
 
 // Attributes.
 protected:
@@ -355,50 +360,90 @@ protected:
 	uint16									mVariability;			// How this parameter varies (bitwise combination of GpuProgramVariability).
 };
 
-typedef SharedPtr<Parameter> ParameterPtr;
+typedef SharedPtr<Parameter>					ParameterPtr; 
+typedef std::vector<ParameterPtr>				ShaderParameterList;
+typedef ShaderParameterList::iterator 			ShaderParameterIterator;
+typedef ShaderParameterList::const_iterator		ShaderParameterConstIterator;
+
+/** Helper template which is the base for our ConstParameters
+*/
+template <class valueType>
+class ConstParameter : public Parameter
+{
+public:
+
+	ConstParameter(	valueType val, 
+		GpuConstantType type, 
+		const Semantic& semantic,  
+		const Content& content) 
+		: Parameter(type, "Constant", semantic, 0, content,	0)
+	{
+		mValue = val;
+	}
+
+	virtual				~ConstParameter		() {}
+
+	/** Returns the native value of this parameter. (for example a Vector3) */
+	const valueType&	getValue			() const { return mValue; }
+
+	/** 
+	@see Parameter::isConstParameter.
+	*/
+	virtual bool		isConstParameter	() const { return true; }
+
+	/** 
+	@see Parameter::toString.
+	*/
+	virtual String		toString			() const = 0;
+
+protected:
+	valueType mValue;
+};
 
 /** Helper utility class that creates common parameters.
 */
-class OGRE_RTSHADERSYSTEM_API ParameterFactory
+class ParameterFactory
 {
 
-// Interface.
+	// Interface.
 public:
 
-	static ParameterPtr	createInPosition	(int index);	
-	static ParameterPtr	createOutPosition	(int index);
-	
-	static ParameterPtr	createInNormal		(int index);
-	static ParameterPtr	createOutNormal		(int index);
-	static ParameterPtr	createInBiNormal	(int index);
-	static ParameterPtr	createOutBiNormal	(int index);
-	static ParameterPtr	createInTangent		(int index);
-	static ParameterPtr	createOutTangent	(int index);
-	static ParameterPtr	createInColor		(int index);
-	static ParameterPtr	createOutColor		(int index);
+	static ParameterPtr	createInPosition		(int index);	
+	static ParameterPtr	createOutPosition		(int index);
 
-	static ParameterPtr	createInTexcoord	(GpuConstantType type, int index, Parameter::Content content);
-	static ParameterPtr	createOutTexcoord	(GpuConstantType type, int index, Parameter::Content content);
-	static ParameterPtr	createInTexcoord1	(int index, Parameter::Content content);
-	static ParameterPtr	createOutTexcoord1	(int index, Parameter::Content content);
-	static ParameterPtr	createInTexcoord2	(int index, Parameter::Content content);
-	static ParameterPtr	createOutTexcoord2	(int index, Parameter::Content content);
-	static ParameterPtr	createInTexcoord3	(int index, Parameter::Content content);
-	static ParameterPtr	createOutTexcoord3	(int index, Parameter::Content content);
-	static ParameterPtr	createInTexcoord4	(int index, Parameter::Content content);			
-	static ParameterPtr	createOutTexcoord4	(int index, Parameter::Content content);
+	static ParameterPtr	createInNormal			(int index);
+	static ParameterPtr	createOutNormal			(int index);
+	static ParameterPtr	createInBiNormal		(int index);
+	static ParameterPtr	createOutBiNormal		(int index);
+	static ParameterPtr	createInTangent			(int index);
+	static ParameterPtr	createOutTangent		(int index);
+	static ParameterPtr	createInColor			(int index);
+	static ParameterPtr	createOutColor			(int index);
 
-	static ParameterPtr	createSampler		(GpuConstantType type, int index);
-	static ParameterPtr	createSampler1D		(int index);
-	static ParameterPtr	createSampler2D		(int index);
-	static ParameterPtr	createSampler3D		(int index);
-	static ParameterPtr	createSamplerCUBE	(int index);	
-	
+	static ParameterPtr	createInTexcoord		(GpuConstantType type, int index, Parameter::Content content);
+	static ParameterPtr	createOutTexcoord		(GpuConstantType type, int index, Parameter::Content content);
+	static ParameterPtr	createInTexcoord1		(int index, Parameter::Content content);
+	static ParameterPtr	createOutTexcoord1		(int index, Parameter::Content content);
+	static ParameterPtr	createInTexcoord2		(int index, Parameter::Content content);
+	static ParameterPtr	createOutTexcoord2		(int index, Parameter::Content content);
+	static ParameterPtr	createInTexcoord3		(int index, Parameter::Content content);
+	static ParameterPtr	createOutTexcoord3		(int index, Parameter::Content content);
+	static ParameterPtr	createInTexcoord4		(int index, Parameter::Content content);			
+	static ParameterPtr	createOutTexcoord4		(int index, Parameter::Content content);
+
+	static ParameterPtr	createSampler			(GpuConstantType type, int index);
+	static ParameterPtr	createSampler1D			(int index);
+	static ParameterPtr	createSampler2D			(int index);
+	static ParameterPtr	createSampler3D			(int index);
+	static ParameterPtr	createSamplerCUBE		(int index);	
+
+	static ParameterPtr	createConstParamVector2	(Vector2 val);
+	static ParameterPtr	createConstParamVector3	(Vector3 val);
+	static ParameterPtr	createConstParamVector4	(Vector4 val);
+	static ParameterPtr	createConstParamFloat	(float val);	
 };
 
-typedef std::vector<ParameterPtr>					ShaderParameterList;
-typedef ShaderParameterList::iterator 				ShaderParameterIterator;
-typedef ShaderParameterList::const_iterator			ShaderParameterConstIterator;
+
 
 /** @} */
 /** @} */

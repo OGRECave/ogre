@@ -50,7 +50,7 @@ namespace RTShader {
 A simple example of sub class of this interface will be the transform sub state of the
 fixed pipeline.
 */
-class OGRE_RTSHADERSYSTEM_API SubRenderState
+class SubRenderState
 {
 
 // Interface.
@@ -126,16 +126,6 @@ public:
 	*/
 	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass) { return true; }
 
-	/** Called before removing this sub render state from the given render state.
-	Allows this sub render state class to cleanup extra attributes it added before to source/destination pass.
-	This stage is important especially in the context of memory allocation. Every allocation made by this class
-	and binded to one or both of these passes should be freed here, otherwise memory deallocation might occur in other context and
-	will cause the system to crash.	
-	@param renderState The target render state container this sub render state is about to be removed from.	
-	@param srcPass The source pass.
-	@param dstPass The destination pass.
-	*/
-	virtual void			preRemoveFromRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass) {}
 // Protected methods
 protected:
 
@@ -179,7 +169,7 @@ SubRenderStateFactory subclasses must allow the creation and destruction of SubR
 subclasses. They must also be registered with the ShaderGenerator::addSubRenderStateFactory. 
 All factories have a type which identifies them and the sub class of SubRenderState they creates.
 */
-class OGRE_RTSHADERSYSTEM_API SubRenderStateFactory
+class SubRenderStateFactory
 {
 
 public:

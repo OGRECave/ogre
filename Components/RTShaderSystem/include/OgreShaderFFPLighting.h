@@ -49,7 +49,7 @@ namespace RTShader {
 @see http://msdn.microsoft.com/en-us/library/bb147178(VS.85).aspx
 Derives from SubRenderState class.
 */
-class OGRE_RTSHADERSYSTEM_API FFPLighting : public SubRenderState
+class FFPLighting : public SubRenderState
 {
 
 // Interface.
