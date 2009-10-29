@@ -83,7 +83,7 @@ public:
 		/// The parameter is a output parameter
 		OPS_OUT,
 		/// The parameter is a input/output parameter
-		OPS_INT_OUT
+		OPS_INOUT
 	};
 
 	// Used field mask
