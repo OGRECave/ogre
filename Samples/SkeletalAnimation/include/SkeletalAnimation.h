@@ -55,23 +55,44 @@ protected:
 		mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
 		mSceneMgr->setShadowTextureSize(512);
 		mSceneMgr->setShadowColour(ColourValue(0.6, 0.6, 0.6));
+		mSceneMgr->setShadowTextureCount(2);
 
 		// add a little ambient lighting
         mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 
+		SceneNode* lightsBbsNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		BillboardSet* bbs;
+
+		// Create billboard set for lights .
+		bbs = mSceneMgr->createBillboardSet();
+		bbs->setMaterialName("Examples/Flare");
+		lightsBbsNode->attachObject(bbs);
+
+
 		// add a blue spotlight
         Light* l = mSceneMgr->createLight();
+		Vector3 dir;
 		l->setType(Light::LT_SPOTLIGHT);
-        l->setPosition(-200, 150, -100);
-		l->setDirection(-l->getPosition());
-        l->setDiffuseColour(0.5, 0.5, 1.0);
+        l->setPosition(-40, 180, -10);
+		dir = -l->getPosition();
+		dir.normalise();
+		l->setDirection(dir);
+        l->setDiffuseColour(0.0, 0.0, 0.5);
+		bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
+		
 
-		// add a green spotlight
+		// add a green spotlight.
         l = mSceneMgr->createLight();
 		l->setType(Light::LT_SPOTLIGHT);
         l->setPosition(0, 150, -100);
-		l->setDirection(-l->getPosition());
-        l->setDiffuseColour(0.5, 1.0, 0.5);
+		dir = -l->getPosition();
+		dir.normalise();
+		l->setDirection(dir);
+        l->setDiffuseColour(0.0, 0.5, 0.0);		
+		bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
+			
+	
+	
 
 		// create a floor mesh resource
 		MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
