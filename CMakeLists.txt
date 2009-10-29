@@ -82,6 +82,11 @@ if (CMAKE_COMPILER_IS_GNUCXX)
       set(OGRE_GCC_VISIBILITY_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS} -fvisibility-inlines-hidden")
     endif ()
   endif (OGRE_GCC_VISIBILITY)
+  
+  # Fix x64 issues on Linux
+  if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" AND NOT APPLE)
+    add_definitions(-fPIC)
+  endif()  
 endif (CMAKE_COMPILER_IS_GNUCXX)
 
 # determine system endianess
