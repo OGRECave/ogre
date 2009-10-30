@@ -147,7 +147,7 @@ namespace Ogre {
             // accept a 0 pointer like normal glTexImageXD
             // Run through this process for every mipmap to pregenerate mipmap pyramid
 
-            uint8* tmpdata = OGRE_NEW uint8[size];
+            uint8* tmpdata = OGRE_NEW_FIX_FOR_WIN32 uint8[size];
             memset(tmpdata, 0, size);
 
             for (size_t mip = 0; mip <= mNumMipmaps; mip++)
@@ -234,7 +234,7 @@ namespace Ogre {
             ext = mName.substr(pos+1);
         }
 
-        LoadedImages loadedImages = LoadedImages(OGRE_NEW std::vector<Image>());
+        LoadedImages loadedImages = LoadedImages(OGRE_NEW_FIX_FOR_WIN32 std::vector<Image>());
 
         if (mTextureType == TEX_TYPE_2D)
         {

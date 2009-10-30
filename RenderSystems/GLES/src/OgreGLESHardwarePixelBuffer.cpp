@@ -78,7 +78,7 @@ namespace Ogre {
             // Already allocated
             return;
 
-        mBuffer.data = OGRE_NEW uint8[mSizeInBytes];
+        mBuffer.data = OGRE_NEW_FIX_FOR_WIN32 uint8[mSizeInBytes];
         // TODO use PBO if we're HBU_DYNAMIC
     }
 
@@ -650,7 +650,7 @@ namespace Ogre {
         /// - Either source or target is luminance due doesn't looks like supported by hardware
         /// - the source dimensions match the destination ones, in which case no scaling is needed
         // TODO: Check that extension is NOT available
-        if(//!GLEW_EXT_framebuffer_object ||
+        if(!glIsRenderbufferOES || // checks that GL_OES_framebuffer_object is NOT available - same as mGLSupport->checkExtension("GL_OES_framebuffer_object")
            PixelUtil::isLuminance(src_orig.format) ||
            PixelUtil::isLuminance(mFormat) ||
            (src_orig.getWidth() == dstBox.getWidth() &&
@@ -788,7 +788,7 @@ namespace Ogre {
             int sizeInBytes = PixelUtil::getMemorySize(width, height, 1,
                                                        data.format);
             scaled = PixelBox(width, height, 1, data.format);
-            scaled.data = OGRE_NEW uint8[sizeInBytes];
+            scaled.data = OGRE_NEW_FIX_FOR_WIN32 uint8[sizeInBytes];
             Image::scale(data, scaled, Image::FILTER_LINEAR);
         }
     }

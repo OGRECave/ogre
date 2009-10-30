@@ -26,7 +26,8 @@ IF (WIN32)
     IF(BORLAND)
       SET (OPENGLES_gl_LIBRARY import32 CACHE STRING "OpenGL library for win32")
     ELSE(BORLAND)
-      SET (OPENGLES_gl_LIBRARY libgles_cm CACHE STRING "OpenGL library for win32")
+	  #MS compiler - todo - fix the following line:
+      SET (OPENGLES_gl_LIBRARY ${OGRE_SOURCE_DIR}/Dependencies/lib/release/libgles_cm.lib CACHE STRING "OpenGL library for win32")
     ENDIF(BORLAND)
 
   ENDIF (CYGWIN)

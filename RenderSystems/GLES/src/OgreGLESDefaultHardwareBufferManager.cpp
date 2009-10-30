@@ -100,7 +100,7 @@ namespace Ogre {
 				"32 bit hardware buffers are not allowed in OpenGL ES.",
 				"GLESDefaultHardwareIndexBuffer");
 		}
-        mpData = OGRE_NEW unsigned char[mSizeInBytes];
+        mpData = OGRE_NEW_FIX_FOR_WIN32 unsigned char[mSizeInBytes];
     }
 
     GLESDefaultHardwareIndexBuffer::~GLESDefaultHardwareIndexBuffer()

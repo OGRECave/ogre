@@ -43,6 +43,7 @@ THE SOFTWARE.
 #else
 #   include "OgreEGLWindow.h"
 
+#	ifndef GL_GLEXT_PROTOTYPES
     // Function pointers for FBO extension
     PFNGLISRENDERBUFFEROESPROC glIsRenderbufferOES;
     PFNGLBINDRENDERBUFFEROESPROC glBindRenderbufferOES;
@@ -59,6 +60,8 @@ THE SOFTWARE.
     PFNGLFRAMEBUFFERTEXTURE2DOESPROC glFramebufferTexture2DOES;
     PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVOESPROC glGetFramebufferAttachmentParameterivOES;
     PFNGLGENERATEMIPMAPOESPROC glGenerateMipmapOES;
+#	endif
+
 #endif
 
 #include "OgreCamera.h"
@@ -75,8 +78,8 @@ namespace Ogre {
           mHardwareBufferManager(0),
           mRTTManager(0)
     {
-            // Get function pointers on non-iPhone platforms
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+            // Get function pointers on platforms that doesn't have prototypes
+#ifndef GL_GLEXT_PROTOTYPES
             ::glIsRenderbufferOES = (PFNGLISRENDERBUFFEROESPROC)eglGetProcAddress("glIsRenderbufferOES");
             ::glBindRenderbufferOES = (PFNGLBINDRENDERBUFFEROESPROC)eglGetProcAddress("glBindRenderbufferOES");
             ::glDeleteRenderbuffersOES = (PFNGLDELETERENDERBUFFERSOESPROC)eglGetProcAddress("glDeleteRenderbuffersOES");
@@ -296,7 +299,7 @@ namespace Ogre {
         rsc->setCapability(RSC_DOT3);
         
         // Point size
-        float ps;
+        float ps = 0;
         glGetFloatv(GL_POINT_SIZE_MAX, &ps);
         GL_CHECK_ERROR;
         rsc->setMaxPointSize(ps);
@@ -365,7 +368,7 @@ namespace Ogre {
 			{
 				// Create FBO manager
 				LogManager::getSingleton().logMessage("GL ES: Using GL_OES_framebuffer_object for rendering to textures (best)");
-				mRTTManager = OGRE_NEW GLESFBOManager();
+				mRTTManager = OGRE_NEW_FIX_FOR_WIN32 GLESFBOManager();
 			}
 		}
 		else
@@ -376,7 +379,7 @@ namespace Ogre {
 				if(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE))
 				{
 					// Use PBuffers
-					mRTTManager = OGRE_NEW GLESPBRTTManager(mGLSupport, primary);
+					mRTTManager = OGRE_NEW_FIX_FOR_WIN32 GLESPBRTTManager(mGLSupport, primary);
 					LogManager::getSingleton().logMessage("GL ES: Using PBuffers for rendering to textures");
 				}
 			}

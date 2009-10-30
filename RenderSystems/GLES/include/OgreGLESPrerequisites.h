@@ -30,6 +30,20 @@ THE SOFTWARE.
 #ifndef __GLESPrerequisites_H__
 #define __GLESPrerequisites_H__
 
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
+#	if !defined( __MINGW32__ )
+#		ifndef WIN32_LEAN_AND_MEAN
+#			define WIN32_LEAN_AND_MEAN 1
+#		endif
+#		ifndef NOMINMAX
+#			define NOMINMAX // required to stop windows.h messing up std::min
+#		endif
+#	endif
+#	define OGRE_NEW_FIX_FOR_WIN32 new 
+#else
+#	define OGRE_NEW_FIX_FOR_WIN32 OGRE_NEW
+#endif
+
 #include "OgrePrerequisites.h"
 #include "OgreMath.h"
 
@@ -39,6 +53,9 @@ THE SOFTWARE.
 #   ifdef __OBJC__
 #       include <OpenGLES/EAGL.h>
 #   endif
+#	ifndef GL_GLEXT_PROTOTYPES
+#		define  GL_GLEXT_PROTOTYPES
+#	endif
 #else
 #   include <GLES/gl.h>
 #   include <GLES/glext.h>
@@ -47,6 +64,7 @@ THE SOFTWARE.
 // Function pointers for FBO extension methods
 // Declare them here since we don't have GLEW to do it for us
 
+#	ifndef GL_GLEXT_PROTOTYPES
 extern PFNGLISRENDERBUFFEROESPROC glIsRenderbufferOES;
 extern PFNGLBINDRENDERBUFFEROESPROC glBindRenderbufferOES;
 extern PFNGLDELETERENDERBUFFERSOESPROC glDeleteRenderbuffersOES;
@@ -62,6 +80,8 @@ extern PFNGLFRAMEBUFFERRENDERBUFFEROESPROC glFramebufferRenderbufferOES;
 extern PFNGLFRAMEBUFFERTEXTURE2DOESPROC glFramebufferTexture2DOES;
 extern PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVOESPROC glGetFramebufferAttachmentParameterivOES;
 extern PFNGLGENERATEMIPMAPOESPROC glGenerateMipmapOES;
+#	endif
+
 #endif
 
 #ifndef None
