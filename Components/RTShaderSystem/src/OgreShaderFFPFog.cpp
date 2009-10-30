@@ -68,9 +68,12 @@ uint32 FFPFog::getHashCode()
 	uint32 hashCode = 0;
 	
 	sh_hash_combine(hashCode, SubRenderState::getHashCode());
-	sh_hash_combine(hashCode, mFogMode);
-	sh_hash_combine(hashCode, mCalcMode);
+	sh_hash_combine(hashCode, mFogMode);	
 	sh_hash_combine(hashCode, mPassOverrideParams);
+
+	if (mFogMode != FOG_NONE)	
+		sh_hash_combine(hashCode, mCalcMode);	
+
 	
 	return hashCode;
 }

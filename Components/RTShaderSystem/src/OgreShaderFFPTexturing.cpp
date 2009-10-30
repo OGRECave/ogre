@@ -869,10 +869,44 @@ uint32 FFPTexturing::getHashCode()
 
 		const TextureUnitState::EffectMap&		effectMap = curParams->mTextureUnitState->getEffects();	
 		TextureUnitState::EffectMap::const_iterator	effi;
+		bool hasEnvEffect = false;
+		bool hasProjEffect = false;
+		bool hasTransformEffect = false;
 
+		// Check which effects applied on the current texture unit.
 		for (effi = effectMap.begin(); effi != effectMap.end(); ++effi)
 		{
-			sh_hash_combine(hashCode, _INT_VALUE(effi->second.type));		
+			if (effi->second.type == TextureUnitState::ET_ENVIRONMENT_MAP)
+			{
+				hasEnvEffect = true;
+			}
+			else if (effi->second.type == TextureUnitState::ET_PROJECTIVE_TEXTURE)
+			{
+				hasProjEffect = true;
+			}
+			else if (effi->second.type == TextureUnitState::ET_UVSCROLL ||
+				effi->second.type == TextureUnitState::ET_USCROLL ||
+				effi->second.type == TextureUnitState::ET_VSCROLL ||
+				effi->second.type == TextureUnitState::ET_ROTATE ||
+				effi->second.type == TextureUnitState::ET_TRANSFORM)
+			{
+				hasTransformEffect = true;
+			}			
+		}
+
+		if (hasEnvEffect)
+		{
+			sh_hash_combine(hashCode, TextureUnitState::ET_ENVIRONMENT_MAP);		
+		}
+
+		if (hasProjEffect)
+		{
+			sh_hash_combine(hashCode, TextureUnitState::ET_PROJECTIVE_TEXTURE);		
+		}
+
+		if (hasTransformEffect)
+		{
+			sh_hash_combine(hashCode, TextureUnitState::ET_TRANSFORM);		
 		}
 	}
 			

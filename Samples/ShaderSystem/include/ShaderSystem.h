@@ -41,7 +41,9 @@ public:
 	
 	/** @see Sample::frameRenderingQueued. */
     bool frameRenderingQueued(const FrameEvent& evt);
-	
+
+	void updateTargetObjInfo();
+
 	
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 	bool touchPressed(const OIS::MultiTouchEvent& evt);
@@ -58,6 +60,7 @@ public:
 
 	/** @see Sample::mouseMoved. */
 	bool mouseMoved(const OIS::MouseEvent& evt);
+
 #endif
 
 protected:
@@ -128,6 +131,9 @@ protected:
 	/** Destroy private resource group. */
 	void destroyPrivateResourceGroup();
 
+	/** Pick the target object. */
+	void pickTargetObject( const OIS::MouseEvent &evt );
+
 // Types.
 protected:
 	typedef vector<Entity*>::type	EntityList;
@@ -146,9 +152,12 @@ protected:
 	RTShader::SubRenderStateFactory*	mReflectionMapFactory;	// The custom reflection map shader extension factory.
 	bool								mReflectionMapEnable;	// The current reflection map effect state.
 	SceneNode*							mPointLightNode;		// Point light scene node.
-	SceneNode*							mDirectionalLightNode;	// Directional light scene node.	
-	Label*								mMainEntityVS;			// The main entity vertex shader label.
-	Label*								mMainEntityFS;			// The main entity fragment shader label.
+	SceneNode*							mDirectionalLightNode;	// Directional light scene node.		
+	RaySceneQuery*						mRayQuery;				// The ray scene query.
+	MovableObject*						mTargetObj;				// The current picked target object.
+	Label*								mTargetObjMatName;		// The target object material name label.
+	Label*								mTargetObjVS;			// The target object vertex shader label.
+	Label*								mTargetObjFS;			// The target object fragment shader label.
 };
 
 #endif

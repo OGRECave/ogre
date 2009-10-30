@@ -60,9 +60,10 @@ Sample_ShaderSystem::Sample_ShaderSystem()
 	mInfo["Category"] = "Unsorted";
 	mInfo["Help"] = "F2 Toggle Shader System globally. "
 				    "F3 Toggles Global Lighting Model. "
-					"Modify target model attributes and scene settings and observe the generated shaders count."
+					"Modify target model attributes and scene settings and observe the generated shaders count. "
 					"Press the export button in order to export current target model material. "
-					"The model above the target will import this material next time the sample reloads."
+					"The model above the target will import this material next time the sample reloads. "
+					"Right click on object to see the shaders it currently uses. "
 					;
 	mPointLightNode = NULL;
 	mReflectionMapFactory = NULL;
@@ -155,34 +156,7 @@ bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
 		mPointLightNode->setPosition(0.0, Math::Sin(sToatalTime) * 30.0, 0.0);
 	}
 
-	if (mViewport->getMaterialScheme() == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
-	{
-		const String& mainEntMaterial = mSceneMgr->getEntity(MAIN_ENTITY_NAME)->getSubEntity(0)->getMaterialName();
-		MaterialPtr matMainEnt        = MaterialManager::getSingleton().getByName(mainEntMaterial);
-		Technique* shaderGeneratedTech = NULL;
-
-		for (unsigned int i=0; i < matMainEnt->getNumTechniques(); ++i)
-		{
-			Technique* curTech = matMainEnt->getTechnique(i);
-
-			if (curTech->getSchemeName() == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
-			{
-				shaderGeneratedTech = curTech;
-				break;
-			}
-		}
-
-		if (shaderGeneratedTech != NULL)
-		{			
-			mMainEntityVS->setCaption("Main Entity VS: " + shaderGeneratedTech->getPass(0)->getVertexProgramName());
-			mMainEntityFS->setCaption("Main Entity FS: " + shaderGeneratedTech->getPass(0)->getFragmentProgramName());
-		}				
-	}
-	else
-	{
-		mMainEntityVS->setCaption("Main Entity VS: N/A");
-		mMainEntityFS->setCaption("Main Entity FS: N/A");
-	}
+	updateTargetObjInfo();
 	
 	return SdkSample::frameRenderingQueued(evt);
 }
@@ -209,6 +183,10 @@ void Sample_ShaderSystem::setupContent()
 	mSpecularEnable   		= false;
 	mReflectionMapEnable	= false;
 
+	mRayQuery = mSceneMgr->createRayQuery(Ray());
+	mTargetObj = NULL;
+
+
 	// Set ambient lighting.
 	mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
@@ -220,7 +198,7 @@ void Sample_ShaderSystem::setupContent()
 	plane.d = 0;
 	MeshManager::getSingleton().createPlane("Myplane",
 		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
-		1500,1500,1,1,true,1,60,60,Vector3::UNIT_Z);
+		1500,1500,25,25,true,1,60,60,Vector3::UNIT_Z);
 
 	Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
 	pPlaneEnt->setMaterialName("Examples/Rockwall");
@@ -253,11 +231,13 @@ void Sample_ShaderSystem::setupContent()
 	Entity* entity;
 	SceneNode* childNode;
 
-	// Create the main entity.
+	// Create the main entity and mark it as the current target object.
 	entity = mSceneMgr->createEntity(MAIN_ENTITY_NAME, MAIN_ENTITY_MESH);
 	mTargetEntities.push_back(entity);
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();		
 	childNode->attachObject(entity);
+	mTargetObj = entity;
+	childNode->showBoundingBox(true);
 
 	// Create reflection entity that will show the exported material.
 	const String& mainExportedMaterial = mSceneMgr->getEntity(MAIN_ENTITY_NAME)->getSubEntity(0)->getMaterialName() + "_RTSS";
@@ -327,8 +307,12 @@ void Sample_ShaderSystem::setupUI()
 
 	
 	// create target model widgets.
-	mMainEntityVS = mTrayMgr->createLabel(TL_BOTTOM, "MainEntityVS", "");
-	mMainEntityFS = mTrayMgr->createLabel(TL_BOTTOM, "MainEntityFS", "");
+	mTargetObjMatName = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjMatName", "");
+	mTargetObjVS = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjVS", "");
+	mTargetObjFS = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjFS", "");
+
+
+	mTrayMgr->createLabel(TL_BOTTOM, "MainEntityLabel", "Main Entity Settings");
 	mTrayMgr->createCheckBox(TL_BOTTOM, SPECULAR_BOX, "Specular")->setChecked(mSpecularEnable);
 
 
@@ -340,7 +324,7 @@ void Sample_ShaderSystem::setupUI()
 		mTrayMgr->createCheckBox(TL_BOTTOM, REFLECTIONMAP_BOX, "Reflection Map")->setChecked(mReflectionMapEnable);
 	}
 
-	mLightingModelMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "TargetModelLighting", "Target Model", 400, 290, 10);	
+	mLightingModelMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "TargetModelLighting", "", 240, 230, 10);	
 	mLightingModelMenu ->addItem("Per Vertex");
 	mLightingModelMenu ->addItem("Per Pixel");
 	mLightingModelMenu ->addItem("Normal Map - Tangent Space");
@@ -363,6 +347,8 @@ void Sample_ShaderSystem::cleanupContent()
 	
 	MeshManager::getSingleton().remove(MAIN_ENTITY_MESH);
 	mTargetEntities.clear();
+
+	mSceneMgr->destroyQuery(mRayQuery);
 }
 
 //-----------------------------------------------------------------------
@@ -809,6 +795,87 @@ void Sample_ShaderSystem::destroyPrivateResourceGroup()
 	rgm.destroyResourceGroup(SAMPLE_MATERIAL_GROUP);
 }
 
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::pickTargetObject( const OIS::MouseEvent &evt )
+{
+	int xPos   = evt.state.X.abs;
+	int yPos   = evt.state.Y.abs;
+	int width  = evt.state.width;
+	int height = evt.state.height;
+
+	Ray mouseRay = mCamera->getCameraToViewportRay(xPos / float(width), yPos/float(height));
+	mRayQuery->setRay(mouseRay);
+
+	RaySceneQueryResult &result = mRayQuery->execute();
+	RaySceneQueryResult::iterator it = result.begin();
+	RaySceneQueryResult::iterator itEnd = result.end();
+
+	for (; it != itEnd; ++it)
+	{
+		RaySceneQueryResultEntry& curEntry = *it;
+		
+		if (mTargetObj != NULL)
+		{
+			mTargetObj->getParentSceneNode()->showBoundingBox(false);			
+		}
+
+		mTargetObj = curEntry.movable;
+		mTargetObj ->getParentSceneNode()->showBoundingBox(true);		
+	}
+}
+
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::updateTargetObjInfo()
+{
+	if (mTargetObj == NULL)
+		return;
+
+	String targetObjMaterialName;
+
+	if (mTargetObj->getMovableType() == "Entity")
+	{
+		Entity* targetEnt = static_cast<Entity*>(mTargetObj);
+		targetObjMaterialName = targetEnt->getSubEntity(0)->getMaterialName();
+	}
+	
+	mTargetObjMatName->setCaption(targetObjMaterialName);
+
+	if (mViewport->getMaterialScheme() == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+	{		
+		MaterialPtr matMainEnt        = MaterialManager::getSingleton().getByName(targetObjMaterialName);
+
+		if (matMainEnt.isNull() == false)
+		{
+			Technique* shaderGeneratedTech = NULL;
+
+			for (unsigned int i=0; i < matMainEnt->getNumTechniques(); ++i)
+			{
+				Technique* curTech = matMainEnt->getTechnique(i);
+
+				if (curTech->getSchemeName() == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+				{
+					shaderGeneratedTech = curTech;
+					break;
+				}
+			}
+
+			if (shaderGeneratedTech != NULL)
+			{			
+				mTargetObjVS->setCaption("VS: " + shaderGeneratedTech->getPass(0)->getVertexProgramName());
+				mTargetObjFS->setCaption("FS: " + shaderGeneratedTech->getPass(0)->getFragmentProgramName());
+			}	
+
+		}
+
+
+	}
+	else
+	{		
+		mTargetObjVS->setCaption("VS: N/A");
+		mTargetObjFS->setCaption("FS: N/A");
+	}
+}
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 
 //-----------------------------------------------------------------------
@@ -849,8 +916,10 @@ bool Sample_ShaderSystem::mousePressed( const OIS::MouseEvent& evt, OIS::MouseBu
 {
 	if (mTrayMgr->injectMouseDown(evt, id)) 
 		return true;
-	if (id == OIS::MB_Left) 
-		mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
+	if (id == OIS::MB_Left) 	
+		mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene			
+	if (id == OIS::MB_Right) 
+		pickTargetObject(evt);
 
 	return true;
 }
@@ -875,8 +944,7 @@ bool Sample_ShaderSystem::mouseMoved( const OIS::MouseEvent& evt )
 	else 
 		mCameraMan->injectMouseMove(evt);
 
+	
 	return true;
 }
-
-
 #endif
