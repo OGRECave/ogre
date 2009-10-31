@@ -2887,7 +2887,12 @@ namespace Ogre
 #ifdef OGRE_DEBUG_MODE
 		//Check that queue handling works as expected
 		IDirect3DSurface9* pDepth;
-		getActiveD3D9Device()->GetDepthStencilSurface(&pDepth);		
+		getActiveD3D9Device()->GetDepthStencilSurface(&pDepth);	
+		
+		// Release immediately -> each get increase the ref count.
+		if (pDepth != NULL)		
+			pDepth->Release();		
+
 		assert(zBuffers.front().surface == pDepth);
 #endif
 
@@ -3808,6 +3813,11 @@ namespace Ogre
 	{
 		IDirect3DSurface9* deviceSurface;
 		d3d9Device->GetDepthStencilSurface(&deviceSurface);
+
+		// Release immediately -> each get increase the ref count.
+		if (deviceSurface != NULL)		
+			deviceSurface->Release();		
+
 		for(ZBufferHash::iterator i = mZBufferHash.begin(); i != mZBufferHash.end();)
 		{
 			/// Release buffer
