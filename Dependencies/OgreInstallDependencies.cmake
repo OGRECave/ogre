@@ -42,29 +42,39 @@ if (OGRE_INSTALL_DEPENDENCIES)
     
   # copy the dependency DLLs to the right places
   install(FILES
-    ${OGRE_DEP_BIN_DIR}/debug/cg.dll
     ${OGRE_DEP_BIN_DIR}/debug/OIS_d.dll
-    ${OGRE_DEP_BIN_DIR}/debug/libgles_cm.dll
+	  DESTINATION bin/debug CONFIGURATIONS Debug
+  )
+  install(FILES
+    ${OGRE_DEP_BIN_DIR}/release/OIS.dll
+	  DESTINATION bin/release CONFIGURATIONS Release None ""
+  )  
+  install(FILES
+    ${OGRE_DEP_BIN_DIR}/release/OIS.dll
+	  DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo
+  )  
+  install(FILES
+    ${OGRE_DEP_BIN_DIR}/release/OIS.dll
+	  DESTINATION bin/minsizerel CONFIGURATIONS MinSizeRel
+  )  
+  if (OGRE_BUILD_PLUGIN_CG)
+  install(FILES
+    ${OGRE_DEP_BIN_DIR}/debug/cg.dll
 	  DESTINATION bin/debug CONFIGURATIONS Debug
   )
   install(FILES
     ${OGRE_DEP_BIN_DIR}/release/cg.dll
-    ${OGRE_DEP_BIN_DIR}/release/OIS.dll
-    ${OGRE_DEP_BIN_DIR}/release/libgles_cm.dll
 	  DESTINATION bin/release CONFIGURATIONS Release None ""
   )  
   install(FILES
     ${OGRE_DEP_BIN_DIR}/release/cg.dll
-    ${OGRE_DEP_BIN_DIR}/release/OIS.dll
-    ${OGRE_DEP_BIN_DIR}/release/libgles_cm.dll
 	  DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo
   )  
   install(FILES
     ${OGRE_DEP_BIN_DIR}/release/cg.dll
-    ${OGRE_DEP_BIN_DIR}/release/OIS.dll
-    ${OGRE_DEP_BIN_DIR}/release/libgles_cm.dll
 	  DESTINATION bin/minsizerel CONFIGURATIONS MinSizeRel
   )  
+  endif ()
   
   # install GLES dlls
   if (OGRE_BUILD_RENDERSYSTEM_GLES)
@@ -88,17 +98,17 @@ if (OGRE_INSTALL_DEPENDENCIES)
 endif ()
 
 # copy the required DLLs to the build directory (configure_file is the only copy-like op I found in CMake)
-configure_file(${OGRE_DEP_BIN_DIR}/debug/cg.dll ${OGRE_BINARY_DIR}/bin/debug/cg.dll COPYONLY)
 configure_file(${OGRE_DEP_BIN_DIR}/debug/OIS_d.dll ${OGRE_BINARY_DIR}/bin/debug/OIS_d.dll COPYONLY)
-
-configure_file(${OGRE_DEP_BIN_DIR}/release/cg.dll ${OGRE_BINARY_DIR}/bin/release/cg.dll COPYONLY)
 configure_file(${OGRE_DEP_BIN_DIR}/release/OIS.dll ${OGRE_BINARY_DIR}/bin/release/OIS.dll COPYONLY)
-
-configure_file(${OGRE_DEP_BIN_DIR}/release/cg.dll ${OGRE_BINARY_DIR}/bin/relwithdebinfo/cg.dll COPYONLY)
 configure_file(${OGRE_DEP_BIN_DIR}/release/OIS.dll ${OGRE_BINARY_DIR}/bin/relwithdebinfo/OIS.dll COPYONLY)
-
-configure_file(${OGRE_DEP_BIN_DIR}/release/cg.dll ${OGRE_BINARY_DIR}/bin/minsizerel/cg.dll COPYONLY)
 configure_file(${OGRE_DEP_BIN_DIR}/release/OIS.dll ${OGRE_BINARY_DIR}/bin/minsizerel/OIS.dll COPYONLY)
+
+if (OGRE_BUILD_PLUGIN_CG)
+	configure_file(${OGRE_DEP_BIN_DIR}/debug/cg.dll ${OGRE_BINARY_DIR}/bin/debug/cg.dll COPYONLY)
+	configure_file(${OGRE_DEP_BIN_DIR}/release/cg.dll ${OGRE_BINARY_DIR}/bin/release/cg.dll COPYONLY)
+	configure_file(${OGRE_DEP_BIN_DIR}/release/cg.dll ${OGRE_BINARY_DIR}/bin/relwithdebinfo/cg.dll COPYONLY)
+	configure_file(${OGRE_DEP_BIN_DIR}/release/cg.dll ${OGRE_BINARY_DIR}/bin/minsizerel/cg.dll COPYONLY)
+endif ()
 
 if (OGRE_BUILD_RENDERSYSTEM_GLES)
 	configure_file(${OGRE_DEP_BIN_DIR}/debug/libgles_cm.dll ${OGRE_BINARY_DIR}/bin/debug/libgles_cm.dll COPYONLY)
