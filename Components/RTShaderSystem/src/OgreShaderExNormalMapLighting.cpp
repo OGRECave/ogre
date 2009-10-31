@@ -816,7 +816,7 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder, 
 	// Construct TNB matrix.
 	if (mNormalMapSpace == NMS_TANGENT)
 	{
-		curFuncInvocation = new FunctionInvocation(SGX_FUNC_CONSTRUCT_TBNMATRIX, groupOrder, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_CONSTRUCT_TBNMATRIX, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSInTangent, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSTBNMatrix, Operand::OPS_OUT);	
@@ -825,7 +825,7 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder, 
 	
 
 	// Output texture coordinates.
-	curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
+	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 	curFuncInvocation->pushOperand(mVSInTexcoord, Operand::OPS_IN);
 	curFuncInvocation->pushOperand(mVSOutTexcoord, Operand::OPS_OUT);	
 	vsMain->addAtomInstace(curFuncInvocation);
@@ -833,7 +833,7 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder, 
 	// Compute world space position.
 	if (mVSWorldPosition.get() != NULL)
 	{
-		curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMPOSITION, groupOrder, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRANSFORMPOSITION, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mWorldMatrix, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);	
 		curFuncInvocation->pushOperand(mVSWorldPosition, Operand::OPS_OUT);	
@@ -846,14 +846,14 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder, 
 		mVSOutView.get() != NULL)
 	{	
 		// View vector in world space.
-		curFuncInvocation = new FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mCamPosWorldSpace, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 		curFuncInvocation->pushOperand(mVSWorldPosition, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 		curFuncInvocation->pushOperand(mVSLocalDir, Operand::OPS_OUT);	
 		vsMain->addAtomInstace(curFuncInvocation);
 
 		// Transform to object space.
-		curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mWorldInvRotMatrix, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSLocalDir, Operand::OPS_IN);	
 		curFuncInvocation->pushOperand(mVSLocalDir, Operand::OPS_OUT);	
@@ -862,7 +862,7 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder, 
 		// Transform to tangent space.
 		if (mNormalMapSpace == NMS_TANGENT)
 		{
-			curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mVSTBNMatrix, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSLocalDir, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSOutView, Operand::OPS_OUT);	
@@ -872,7 +872,7 @@ bool NormalMapLighting::addVSInvocation(Function* vsMain, const int groupOrder, 
 		// Output object space.
 		else if (mNormalMapSpace == NMS_OBJECT)
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mVSLocalDir, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSOutView, Operand::OPS_OUT);					
 			vsMain->addAtomInstace(curFuncInvocation);
@@ -902,7 +902,7 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
 		// Transform to texture space.
 		if (mNormalMapSpace == NMS_TANGENT)
 		{
-			curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mVSTBNMatrix, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 			curFuncInvocation->pushOperand(curLightParams->mVSOutDirection, Operand::OPS_OUT);	
@@ -911,7 +911,7 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
 		// Output object space.
 		else if (mNormalMapSpace == NMS_OBJECT)
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 			curFuncInvocation->pushOperand(curLightParams->mVSOutDirection, Operand::OPS_OUT);					
 			vsMain->addAtomInstace(curFuncInvocation);
@@ -923,14 +923,14 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
 		curLightParams->mVSOutToLightDir.get() != NULL)
 	{
 		// Compute light vector.
-		curFuncInvocation = new FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(curLightParams->mPosition, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 		curFuncInvocation->pushOperand(mVSWorldPosition, Operand::OPS_IN);	
 		curFuncInvocation->pushOperand(mVSLocalDir, Operand::OPS_OUT);	
 		vsMain->addAtomInstace(curFuncInvocation);
 
 		// Transform to object space.
-		curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mWorldInvRotMatrix, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSLocalDir, Operand::OPS_IN);	
 		curFuncInvocation->pushOperand(mVSLocalDir, Operand::OPS_OUT);	
@@ -939,7 +939,7 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
 		// Transform to tangent space.		
 		if (mNormalMapSpace == NMS_TANGENT)
 		{
-			curFuncInvocation = new FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRANSFORMNORMAL, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mVSTBNMatrix, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSLocalDir, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(curLightParams->mVSOutToLightDir, Operand::OPS_OUT);	
@@ -949,7 +949,7 @@ bool NormalMapLighting::addVSIlluminationInvocation(LightParams* curLightParams,
 		// Output object space.
 		else if (mNormalMapSpace == NMS_OBJECT)
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mVSLocalDir, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(curLightParams->mVSOutToLightDir, Operand::OPS_OUT);					
 			vsMain->addAtomInstace(curFuncInvocation);
@@ -965,7 +965,7 @@ bool NormalMapLighting::addPSNormalFetchInvocation(Function* psMain, const int g
 {
 	FunctionInvocation* curFuncInvocation = NULL;	
 
-	curFuncInvocation = new FunctionInvocation(SGX_FUNC_FETCHNORMAL, groupOrder, internalCounter++); 
+	curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_FETCHNORMAL, groupOrder, internalCounter++); 
 	curFuncInvocation->pushOperand(mNormalMapSampler, Operand::OPS_IN);
 	curFuncInvocation->pushOperand(mPSInTexcoord, Operand::OPS_IN);
 	curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_OUT);	
@@ -982,7 +982,7 @@ bool NormalMapLighting::addPSGlobalIlluminationInvocation(Function* psMain, cons
 	if ((mTrackVertexColourType & TVC_AMBIENT) == 0 && 
 		(mTrackVertexColourType & TVC_EMISSIVE) == 0)
 	{
-		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mDerivedSceneColour, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT);	
 		psMain->addAtomInstace(curFuncInvocation);		
@@ -991,7 +991,7 @@ bool NormalMapLighting::addPSGlobalIlluminationInvocation(Function* psMain, cons
 	{
 		if (mTrackVertexColourType & TVC_AMBIENT)
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mLightAmbientColour, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);			
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT);	
@@ -999,7 +999,7 @@ bool NormalMapLighting::addPSGlobalIlluminationInvocation(Function* psMain, cons
 		}
 		else
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mDerivedAmbientLightColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			psMain->addAtomInstace(curFuncInvocation);
@@ -1007,7 +1007,7 @@ bool NormalMapLighting::addPSGlobalIlluminationInvocation(Function* psMain, cons
 
 		if (mTrackVertexColourType & TVC_EMISSIVE)
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ADD, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT);	
@@ -1015,7 +1015,7 @@ bool NormalMapLighting::addPSGlobalIlluminationInvocation(Function* psMain, cons
 		}
 		else
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ADD, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mSurfaceEmissiveColour, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT);	
@@ -1025,7 +1025,7 @@ bool NormalMapLighting::addPSGlobalIlluminationInvocation(Function* psMain, cons
 
 	if (mSpecularEnable)
 	{
-		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT);	
 		psMain->addAtomInstace(curFuncInvocation);	
@@ -1042,7 +1042,7 @@ bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams,
 	// Merge diffuse colour with vertex colour if need to.
 	if (mTrackVertexColourType & TVC_DIFFUSE)			
 	{
-		curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 		curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 		curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
@@ -1052,7 +1052,7 @@ bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams,
 	// Merge specular colour with vertex colour if need to.
 	if (mSpecularEnable && mTrackVertexColourType & TVC_SPECULAR)
 	{							
-		curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 		curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 		curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
@@ -1065,7 +1065,7 @@ bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams,
 	case Light::LT_DIRECTIONAL:			
 		if (mSpecularEnable)
 		{				
-			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSInView, Operand::OPS_IN);			
 			curFuncInvocation->pushOperand(curLightParams->mPSInDirection, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
@@ -1081,7 +1081,7 @@ bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams,
 
 		else
 		{
-			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, groupOrder, internalCounter++); 			
+			curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, groupOrder, internalCounter++); 			
 			curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(curLightParams->mPSInDirection, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));					
@@ -1094,7 +1094,7 @@ bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams,
 	case Light::LT_POINT:	
 		if (mSpecularEnable)
 		{
-			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
+			curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
 			curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_IN);			
 			curFuncInvocation->pushOperand(mPSInView, Operand::OPS_IN);	
 			curFuncInvocation->pushOperand(curLightParams->mPSInToLightDir, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
@@ -1110,7 +1110,7 @@ bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams,
 		}
 		else
 		{
-			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_POINT_DIFFUSE, groupOrder, internalCounter++); 			
+			curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_POINT_DIFFUSE, groupOrder, internalCounter++); 			
 			curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_IN);						
 			curFuncInvocation->pushOperand(curLightParams->mPSInToLightDir, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 			curFuncInvocation->pushOperand(curLightParams->mAttenuatParams, Operand::OPS_IN);
@@ -1125,7 +1125,7 @@ bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams,
 	case Light::LT_SPOTLIGHT:
 		if (mSpecularEnable)
 		{
-			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
+			curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
 			curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSInView, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(curLightParams->mPSInToLightDir, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
@@ -1143,7 +1143,7 @@ bool NormalMapLighting::addPSIlluminationInvocation(LightParams* curLightParams,
 		}
 		else
 		{
-			curFuncInvocation = new FunctionInvocation(SGX_FUNC_LIGHT_SPOT_DIFFUSE, groupOrder, internalCounter++); 						
+			curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_LIGHT_SPOT_DIFFUSE, groupOrder, internalCounter++); 						
 			curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(curLightParams->mPSInToLightDir, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 			curFuncInvocation->pushOperand(curLightParams->mPSInDirection, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
@@ -1165,19 +1165,19 @@ bool NormalMapLighting::addPSFinalAssignmentInvocation( Function* psMain, const 
 {
 	FunctionInvocation* curFuncInvocation;
 
-	curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 								
+	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 								
 	curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);	
 	curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_OUT);	
 	psMain->addAtomInstace(curFuncInvocation);	
 
-	curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 								
+	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 								
 	curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);	
 	curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);	
 	psMain->addAtomInstace(curFuncInvocation);
 
 	if (mSpecularEnable)
 	{
-		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 
 		curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_OUT);			
 		psMain->addAtomInstace(curFuncInvocation);	
@@ -1440,7 +1440,7 @@ void NormalMapLightingFactory::writeInstance(MaterialSerializer* ser,
 //-----------------------------------------------------------------------
 SubRenderState*	NormalMapLightingFactory::createInstanceImpl()
 {
-	return new NormalMapLighting;
+	return OGRE_NEW NormalMapLighting;
 }
 
 }

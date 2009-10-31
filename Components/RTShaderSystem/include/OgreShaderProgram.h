@@ -47,7 +47,7 @@ namespace RTShader {
 
 /** A class that represents a shader based program.
 */
-class Program
+class Program : public RTShaderSystemAlloc
 {
 
 // Interface.

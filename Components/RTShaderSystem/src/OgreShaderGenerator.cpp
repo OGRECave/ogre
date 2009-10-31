@@ -95,7 +95,7 @@ bool ShaderGenerator::initialize()
 {
 	if (ms_Singleton == NULL)
 	{
-		ms_Singleton = new ShaderGenerator;
+		ms_Singleton = OGRE_NEW ShaderGenerator;
 		if (false == ms_Singleton->_initialize())
 		{
 			OGRE_DELETE ms_Singleton;
@@ -113,10 +113,10 @@ bool ShaderGenerator::_initialize()
 	OGRE_LOCK_AUTO_MUTEX
 
 	// Allocate program manager.
-	mProgramManager			= new ProgramManager;
+	mProgramManager			= OGRE_NEW ProgramManager;
 
 	// Allocate and initialize FFP render state builder.
-	mFFPRenderStateBuilder	= new FFPRenderStateBuilder;
+	mFFPRenderStateBuilder	= OGRE_NEW FFPRenderStateBuilder;
 	if (false == mFFPRenderStateBuilder->initialize())
 		return false;
 
@@ -124,7 +124,7 @@ bool ShaderGenerator::_initialize()
 	createSubRenderStateExFactories();
 
 	// Allocate script translator manager.
-	mScriptTranslatorManager = new SGScriptTranslatorManager(this);
+	mScriptTranslatorManager = OGRE_NEW SGScriptTranslatorManager(this);
 	ScriptCompilerManager::getSingleton().addTranslatorManager(mScriptTranslatorManager);
 
 	addCustomScriptTranslator("rtshader_system", &mCoreScriptTranslaotr);
@@ -139,11 +139,11 @@ void ShaderGenerator::createSubRenderStateExFactories()
 
 	SubRenderStateFactory* curFactory;
 
-	curFactory = new PerPixelLightingFactory;	
+	curFactory = OGRE_NEW PerPixelLightingFactory;	
 	addSubRenderStateFactory(curFactory);
 	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 
-	curFactory = new NormalMapLightingFactory;	
+	curFactory = OGRE_NEW NormalMapLightingFactory;	
 	addSubRenderStateFactory(curFactory);
 	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 }
@@ -155,7 +155,7 @@ void ShaderGenerator::finalize()
 	{
 		ms_Singleton->_finalize();
 
-		delete ms_Singleton;
+		OGRE_DELETE ms_Singleton;
 		ms_Singleton = NULL;
 	}
 }
@@ -170,21 +170,21 @@ void ShaderGenerator::_finalize()
 	// Delete technique entries.
 	for (SGTechniqueMapIterator itTech = mTechniqueEntriesMap.begin(); itTech != mTechniqueEntriesMap.end(); ++itTech)
 	{			
-		delete (itTech->second);
+		OGRE_DELETE (itTech->second);
 	}
 	mTechniqueEntriesMap.clear();
 
 	// Delete material entries.
 	for (SGMaterialIterator itMat = mMaterialEntriesMap.begin(); itMat != mMaterialEntriesMap.end(); ++itMat)
 	{		
-		delete (itMat->second);
+		OGRE_DELETE (itMat->second);
 	}
 	mMaterialEntriesMap.clear();
 
 	// Delete scheme entries.
 	for (SGSchemeIterator itScheme = mSchemeEntriesMap.begin(); itScheme != mSchemeEntriesMap.end(); ++itScheme)
 	{		
-		delete (itScheme->second);
+		OGRE_DELETE (itScheme->second);
 	}
 	mSchemeEntriesMap.clear();
 	
@@ -196,14 +196,14 @@ void ShaderGenerator::_finalize()
 	if (mFFPRenderStateBuilder != NULL)
 	{
 		mFFPRenderStateBuilder->finalize();
-		delete mFFPRenderStateBuilder;
+		OGRE_DELETE mFFPRenderStateBuilder;
 		mFFPRenderStateBuilder = NULL;
 	}
 
 	// Delete Program manager.
 	if (mProgramManager != NULL)
 	{
-		delete mProgramManager;
+		OGRE_DELETE mProgramManager;
 		mProgramManager = NULL;
 	}
 
@@ -213,14 +213,14 @@ void ShaderGenerator::_finalize()
 	if (mScriptTranslatorManager != NULL)
 	{
 		ScriptCompilerManager::getSingleton().removeTranslatorManager(mScriptTranslatorManager);
-		delete mScriptTranslatorManager;
+		OGRE_DELETE mScriptTranslatorManager;
 		mScriptTranslatorManager = NULL;
 	}
 
 	// Delete material Serializer listener.
 	if (mMaterialSerializerListener != NULL)
 	{
-		delete mMaterialSerializerListener;
+		OGRE_DELETE mMaterialSerializerListener;
 		mMaterialSerializerListener = NULL;
 	}
 
@@ -230,14 +230,14 @@ void ShaderGenerator::_finalize()
 	// Delete render object listener.
 	if (mRenderObjectListener != NULL)
 	{
-		delete mRenderObjectListener;
+		OGRE_DELETE mRenderObjectListener;
 		mRenderObjectListener = NULL;
 	}
 
 	// Delete scene manager listener.
 	if (mSceneManagerListener != NULL)
 	{
-		delete mSceneManagerListener;
+		OGRE_DELETE mSceneManagerListener;
 		mSceneManagerListener = NULL;
 	}		
 }
@@ -252,7 +252,7 @@ void ShaderGenerator::destroySubRenderStateExFactories()
 	for (it = mSubRenderStateExFactories.begin(); it != mSubRenderStateExFactories.end(); ++it)
 	{
 		removeSubRenderStateFactory(it->second);		
-		delete it->second;		
+		OGRE_DELETE it->second;		
 	}
 	mSubRenderStateExFactories.clear();
 }
@@ -353,7 +353,7 @@ RenderState* ShaderGenerator::getRenderState(const String& schemeName)
 	}	
 	else
 	{
-		schemeEntry = new SGScheme(schemeName);
+		schemeEntry = OGRE_NEW SGScheme(schemeName);
 		mSchemeEntriesMap[schemeName] = schemeEntry;
 	}
 
@@ -395,12 +395,12 @@ void ShaderGenerator::setSceneManager(SceneManager* sceneMgr)
 		if (mSceneMgr != NULL)
 		{
 			if (mRenderObjectListener == NULL)
-				mRenderObjectListener = new SGRenderObjectListener(this);
+				mRenderObjectListener = OGRE_NEW SGRenderObjectListener(this);
 			
 			mSceneMgr->addRenderObjectListener(mRenderObjectListener);
 
 			if (mSceneManagerListener == NULL)
-				mSceneManagerListener = new SGSceneManagerListener(this);
+				mSceneManagerListener = OGRE_NEW SGSceneManagerListener(this);
 			
 			mSceneMgr->addListener(mSceneManagerListener);
 		}
@@ -468,7 +468,7 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 
 	if (itMatEntry == mMaterialEntriesMap.end())
 	{
-		matEntry = new SGMaterial(materialName);
+		matEntry = OGRE_NEW SGMaterial(materialName);
 		mMaterialEntriesMap[materialName] = matEntry;
 	}
 	else
@@ -477,7 +477,7 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 	}
 
 	// Create the new technique entry.
-	SGTechnique* techEntry = new SGTechnique(matEntry, srcTechnique, dstTechniqueSchemeName);
+	SGTechnique* techEntry = OGRE_NEW SGTechnique(matEntry, srcTechnique, dstTechniqueSchemeName);
 					
 
 	// Add to material entry map.
@@ -492,7 +492,7 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 
 	if (itScheme == mSchemeEntriesMap.end())
 	{
-		schemeEntry = new SGScheme(dstTechniqueSchemeName);
+		schemeEntry = OGRE_NEW SGScheme(dstTechniqueSchemeName);
 		mSchemeEntriesMap[dstTechniqueSchemeName] = schemeEntry;
 	}
 	else
@@ -558,7 +558,7 @@ bool ShaderGenerator::removeShaderBasedTechnique(const String& materialName,
 	if (itTechMap != mTechniqueEntriesMap.end())	
 		mTechniqueEntriesMap.erase(itTechMap);				
 	
-	delete dstTechnique;
+	OGRE_DELETE dstTechnique;
 		
 	return true;
 }
@@ -587,7 +587,7 @@ bool ShaderGenerator::removeAllShaderBasedTechniques(const String& materialName)
 			(*itTechEntry)->getDestinationTechniqueSchemeName());		
 	}
 
-	delete itMatEntry->second;
+	OGRE_DELETE itMatEntry->second;
 	mMaterialEntriesMap.erase(itMatEntry);
 	
 	return true;
@@ -752,7 +752,7 @@ bool ShaderGenerator::validateMaterial(const String& schemeName, const String& m
 SGMaterialSerializerListener* ShaderGenerator::getMaterialSerializerListener()
 {
 	if (mMaterialSerializerListener == NULL)
-		mMaterialSerializerListener = new SGMaterialSerializerListener;
+		mMaterialSerializerListener = OGRE_NEW SGMaterialSerializerListener;
 
 	return mMaterialSerializerListener;
 }
@@ -897,7 +897,7 @@ void ShaderGenerator::SGPass::buildRenderState()
 {	
 	const String& schemeName = mParent->getDestinationTechniqueSchemeName();
 	const RenderState* renderStateGlobal = ShaderGenerator::getSingleton().getRenderState(schemeName);
-	RenderState* localRenderState = new RenderState;
+	RenderState* localRenderState = OGRE_NEW RenderState;
 	
 
 	// Set light properties.
@@ -944,10 +944,10 @@ void ShaderGenerator::SGPass::buildRenderState()
 		ShaderGenerator::getSingleton().addRenderStateToCache(mFinalRenderState);
 	}
 
-	// The final pass render state is already cached -> delete local one.
+	// The final pass render state is already cached -> OGRE_DELETE local one.
 	else
 	{
-		delete localRenderState;
+		OGRE_DELETE localRenderState;
 	}					
 }
 
@@ -1043,7 +1043,7 @@ void ShaderGenerator::SGTechnique::createSGPasses()
 		Pass* srcPass = mSrcTechnique->getPass(i);
 		Pass* dstPass = mDstTechnique->getPass(i);
 
-		SGPass* passEntry = new SGPass(this, srcPass, dstPass);				
+		SGPass* passEntry = OGRE_NEW SGPass(this, srcPass, dstPass);				
 
 		if (i < mCustomRenderStates.size())
 			passEntry->setCustomRenderState(mCustomRenderStates[i]);
@@ -1103,7 +1103,7 @@ ShaderGenerator::SGTechnique::~SGTechnique()
 	{
 		if (mCustomRenderStates[i] != NULL)
 		{
-			delete mCustomRenderStates[i];
+			OGRE_DELETE mCustomRenderStates[i];
 			mCustomRenderStates[i] = NULL;
 		}		
 	}
@@ -1116,7 +1116,7 @@ void ShaderGenerator::SGTechnique::destroySGPasses()
 {
 	for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
 	{
-		delete (*itPass);
+		OGRE_DELETE (*itPass);
 	}
 	mPassEntries.clear();
 }
@@ -1176,7 +1176,7 @@ RenderState* ShaderGenerator::SGTechnique::getRenderState(unsigned short passInd
 	renderState = mCustomRenderStates[passIndex];
 	if (renderState == NULL)
 	{
-		renderState = new RenderState;
+		renderState = OGRE_NEW RenderState;
 		mCustomRenderStates[passIndex] = renderState;
 	}
 	
@@ -1197,7 +1197,7 @@ ShaderGenerator::SGScheme::~SGScheme()
 {
 	if (mRenderState != NULL)
 	{
-		delete mRenderState;
+		OGRE_DELETE mRenderState;
 		mRenderState = NULL;
 	}
 }
@@ -1206,7 +1206,7 @@ ShaderGenerator::SGScheme::~SGScheme()
 RenderState* ShaderGenerator::SGScheme::getRenderState()
 {
 	if (mRenderState == NULL)
-		mRenderState = new RenderState;
+		mRenderState = OGRE_NEW RenderState;
 
 	return mRenderState;
 }

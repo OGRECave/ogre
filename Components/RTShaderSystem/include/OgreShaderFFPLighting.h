@@ -107,7 +107,7 @@ protected:
 
 	};
 
-	typedef std::vector<LightParams>				LightParamsList;
+	typedef vector<LightParams>::type				LightParamsList;
 	typedef LightParamsList::iterator				LightParamsIterator;
 	typedef LightParamsList::const_iterator			LightParamsConstIterator;
 

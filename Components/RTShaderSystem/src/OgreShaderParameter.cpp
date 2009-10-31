@@ -387,7 +387,7 @@ bool Parameter::isSampler() const
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInPosition(int index)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT4, "iPos_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iPos_" + StringConverter::toString(index), 
 		Parameter::SPS_POSITION, index, 
 		Parameter::SPC_POSITION_OBJECT_SPACE,
 		(uint16)GPV_GLOBAL));
@@ -396,7 +396,7 @@ ParameterPtr ParameterFactory::createInPosition(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutPosition(int index)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT4, "oPos_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "oPos_" + StringConverter::toString(index), 
 		Parameter::SPS_POSITION, index, 
 		Parameter::SPC_POSITION_PROJECTIVE_SPACE,
 		(uint16)GPV_GLOBAL));
@@ -405,7 +405,7 @@ ParameterPtr ParameterFactory::createOutPosition(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInNormal(int index)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT3, "iNormal_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iNormal_" + StringConverter::toString(index), 
 		Parameter::SPS_NORMAL, index, 
 		Parameter::SPC_NORMAL_OBJECT_SPACE,
 		(uint16)GPV_GLOBAL));
@@ -414,7 +414,7 @@ ParameterPtr ParameterFactory::createInNormal(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInBiNormal(int index)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT3, "iBiNormal_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iBiNormal_" + StringConverter::toString(index), 
 		Parameter::SPS_BINORMAL, index, 
 		Parameter::SPC_BINORMAL,
 		(uint16)GPV_GLOBAL));
@@ -423,7 +423,7 @@ ParameterPtr ParameterFactory::createInBiNormal(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInTangent(int index)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT3, "iTangent_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iTangent_" + StringConverter::toString(index), 
 		Parameter::SPS_TANGENT, index, 
 		Parameter::SPC_TANGENT,
 		(uint16)GPV_GLOBAL));
@@ -432,7 +432,7 @@ ParameterPtr ParameterFactory::createInTangent(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutNormal(int index)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT3, "oNormal_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "oNormal_" + StringConverter::toString(index), 
 		Parameter::SPS_NORMAL, index, 
 		Parameter::SPC_NORMAL_OBJECT_SPACE,
 		(uint16)GPV_GLOBAL));
@@ -441,7 +441,7 @@ ParameterPtr ParameterFactory::createOutNormal(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutBiNormal(int index)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT3, "oBiNormal_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "oBiNormal_" + StringConverter::toString(index), 
 		Parameter::SPS_BINORMAL, index, 
 		Parameter::SPC_BINORMAL,
 		(uint16)GPV_GLOBAL));
@@ -450,7 +450,7 @@ ParameterPtr ParameterFactory::createOutBiNormal(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutTangent(int index)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT3, "oTangent_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "oTangent_" + StringConverter::toString(index), 
 		Parameter::SPS_TANGENT, index, 
 		Parameter::SPC_TANGENT,
 		(uint16)GPV_GLOBAL));
@@ -459,7 +459,7 @@ ParameterPtr ParameterFactory::createOutTangent(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInColor(int index)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT4, "iColor_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iColor_" + StringConverter::toString(index), 
 		Parameter::SPS_COLOR, index, 
 		index == 0 ? Parameter::SPC_COLOR_DIFFUSE : Parameter::SPC_COLOR_SPECULAR,
 		(uint16)GPV_GLOBAL));
@@ -468,7 +468,7 @@ ParameterPtr ParameterFactory::createInColor(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutColor(int index)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT4, "oColor_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "oColor_" + StringConverter::toString(index), 
 		Parameter::SPS_COLOR, index, 
 		index == 0 ? Parameter::SPC_COLOR_DIFFUSE : Parameter::SPC_COLOR_SPECULAR,
 		(uint16)GPV_GLOBAL));
@@ -519,7 +519,7 @@ ParameterPtr ParameterFactory::createOutTexcoord(GpuConstantType type, int index
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInTexcoord1(int index, Parameter::Content content)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT1, "iTexcoord1_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT1, "iTexcoord1_" + StringConverter::toString(index), 
 		Parameter::SPS_TEXTURE_COORDINATES, index, 
 		content,
 		(uint16)GPV_GLOBAL));
@@ -528,7 +528,7 @@ ParameterPtr ParameterFactory::createInTexcoord1(int index, Parameter::Content c
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutTexcoord1(int index, Parameter::Content content)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT1, "oTexcoord1_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT1, "oTexcoord1_" + StringConverter::toString(index), 
 		Parameter::SPS_TEXTURE_COORDINATES, index, 
 		content,
 		(uint16)GPV_GLOBAL));
@@ -537,7 +537,7 @@ ParameterPtr ParameterFactory::createOutTexcoord1(int index, Parameter::Content 
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInTexcoord2(int index, Parameter::Content content)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT2, "iTexcoord2_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT2, "iTexcoord2_" + StringConverter::toString(index), 
 		Parameter::SPS_TEXTURE_COORDINATES, index, 
 		content,
 		(uint16)GPV_GLOBAL));
@@ -546,7 +546,7 @@ ParameterPtr ParameterFactory::createInTexcoord2(int index, Parameter::Content c
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutTexcoord2(int index, Parameter::Content content)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT2, "oTexcoord2_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT2, "oTexcoord2_" + StringConverter::toString(index), 
 		Parameter::SPS_TEXTURE_COORDINATES, index, 
 		content,
 		(uint16)GPV_GLOBAL));
@@ -555,7 +555,7 @@ ParameterPtr ParameterFactory::createOutTexcoord2(int index, Parameter::Content 
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInTexcoord3(int index, Parameter::Content content)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT3, "iTexcoord3_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iTexcoord3_" + StringConverter::toString(index), 
 		Parameter::SPS_TEXTURE_COORDINATES, index, 
 		content,
 		(uint16)GPV_GLOBAL));
@@ -564,7 +564,7 @@ ParameterPtr ParameterFactory::createInTexcoord3(int index, Parameter::Content c
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutTexcoord3(int index, Parameter::Content content)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT3, "oTexcoord3_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "oTexcoord3_" + StringConverter::toString(index), 
 		Parameter::SPS_TEXTURE_COORDINATES, index, 
 		content,
 		(uint16)GPV_GLOBAL));
@@ -573,7 +573,7 @@ ParameterPtr ParameterFactory::createOutTexcoord3(int index, Parameter::Content 
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInTexcoord4(int index, Parameter::Content content)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT4, "iTexcoord4_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iTexcoord4_" + StringConverter::toString(index), 
 		Parameter::SPS_TEXTURE_COORDINATES, index, 
 		content,
 		(uint16)GPV_GLOBAL));
@@ -582,7 +582,7 @@ ParameterPtr ParameterFactory::createInTexcoord4(int index, Parameter::Content c
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createOutTexcoord4(int index, Parameter::Content content)
 {
-	return ParameterPtr(new Parameter(GCT_FLOAT4, "oTexcoord4_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "oTexcoord4_" + StringConverter::toString(index), 
 		Parameter::SPS_TEXTURE_COORDINATES, index, 
 		content,
 		(uint16)GPV_GLOBAL));
@@ -613,7 +613,7 @@ ParameterPtr ParameterFactory::createSampler(GpuConstantType type, int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createSampler1D(int index)
 {
-	return ParameterPtr(new Parameter(GCT_SAMPLER1D, "gSampler1D_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_SAMPLER1D, "gSampler1D_" + StringConverter::toString(index), 
 		Parameter::SPS_UNKNOWN, index, 
 		Parameter::SPC_UNKNOWN,
 		(uint16)GPV_GLOBAL));
@@ -622,7 +622,7 @@ ParameterPtr ParameterFactory::createSampler1D(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createSampler2D(int index)
 {
-	return ParameterPtr(new Parameter(GCT_SAMPLER2D, "gSampler2D_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_SAMPLER2D, "gSampler2D_" + StringConverter::toString(index), 
 		Parameter::SPS_UNKNOWN, index, 
 		Parameter::SPC_UNKNOWN,
 		(uint16)GPV_GLOBAL));
@@ -631,7 +631,7 @@ ParameterPtr ParameterFactory::createSampler2D(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createSampler3D(int index)
 {
-	return ParameterPtr(new Parameter(GCT_SAMPLER3D, "gSampler3D_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_SAMPLER3D, "gSampler3D_" + StringConverter::toString(index), 
 		Parameter::SPS_UNKNOWN, index, 
 		Parameter::SPC_UNKNOWN,
 		(uint16)GPV_GLOBAL));
@@ -640,7 +640,7 @@ ParameterPtr ParameterFactory::createSampler3D(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createSamplerCUBE(int index)
 {
-	return ParameterPtr(new Parameter(GCT_SAMPLERCUBE, "gSamplerCUBE_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(GCT_SAMPLERCUBE, "gSamplerCUBE_" + StringConverter::toString(index), 
 		Parameter::SPS_UNKNOWN, index, 
 		Parameter::SPC_UNKNOWN,
 		(uint16)GPV_GLOBAL));
@@ -648,7 +648,7 @@ ParameterPtr ParameterFactory::createSamplerCUBE(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createConstParamVector2(Vector2 val)
 {
-	return ParameterPtr((Parameter*)new ConstParameterVec2(val, 
+	return ParameterPtr((Parameter*)OGRE_NEW ConstParameterVec2(val, 
 													GCT_FLOAT2, 
 													Parameter::SPS_UNKNOWN,  
 													Parameter::SPC_UNKNOWN));
@@ -657,7 +657,7 @@ ParameterPtr ParameterFactory::createConstParamVector2(Vector2 val)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createConstParamVector3(Vector3 val)
 {
-	return ParameterPtr((Parameter*)new ConstParameterVec3(val, 
+	return ParameterPtr((Parameter*)OGRE_NEW ConstParameterVec3(val, 
 													GCT_FLOAT3, 
 													Parameter::SPS_UNKNOWN,  
 													Parameter::SPC_UNKNOWN));
@@ -666,7 +666,7 @@ ParameterPtr ParameterFactory::createConstParamVector3(Vector3 val)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createConstParamVector4(Vector4 val)
 {
-	return ParameterPtr((Parameter*)new ConstParameterVec4(val, 
+	return ParameterPtr((Parameter*)OGRE_NEW ConstParameterVec4(val, 
 													GCT_FLOAT4, 
 													Parameter::SPS_UNKNOWN,  
 													Parameter::SPC_UNKNOWN));
@@ -675,7 +675,7 @@ ParameterPtr ParameterFactory::createConstParamVector4(Vector4 val)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createConstParamFloat(float val)
 {
-	return ParameterPtr((Parameter*)new ConstParameterFloat(val, 
+	return ParameterPtr((Parameter*)OGRE_NEW ConstParameterFloat(val, 
 												  GCT_FLOAT1, 
 												  Parameter::SPS_UNKNOWN,  
 												  Parameter::SPC_UNKNOWN));

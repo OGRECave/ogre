@@ -756,7 +756,7 @@ void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps
 void Sample_ShaderSystem::loadResources()
 {
 	// Create and add the custom reflection map shader extension factory to the shader generator.	
-	mReflectionMapFactory = new ShaderExReflectionMapFactory;
+	mReflectionMapFactory = OGRE_NEW ShaderExReflectionMapFactory;
 	mShaderGenerator->addSubRenderStateFactory(mReflectionMapFactory);
 	
 	createPrivateResourceGroup();
@@ -781,7 +781,7 @@ void Sample_ShaderSystem::unloadResources()
 
 	if (mReflectionMapFactory != NULL)
 	{			
-		delete mReflectionMapFactory;
+		OGRE_DELETE mReflectionMapFactory;
 		mReflectionMapFactory = NULL;
 	}
 }

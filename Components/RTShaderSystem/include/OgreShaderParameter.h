@@ -42,7 +42,7 @@ namespace RTShader {
 
 /** A class that represents a shader based program parameter.
 */
-class Parameter
+class Parameter : public RTShaderSystemAlloc
 {
 public:
 	// Shader parameter semantic.
@@ -361,7 +361,7 @@ protected:
 };
 
 typedef SharedPtr<Parameter>					ParameterPtr; 
-typedef std::vector<ParameterPtr>				ShaderParameterList;
+typedef vector<ParameterPtr>::type				ShaderParameterList;
 typedef ShaderParameterList::iterator 			ShaderParameterIterator;
 typedef ShaderParameterList::const_iterator		ShaderParameterConstIterator;
 

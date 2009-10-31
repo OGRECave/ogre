@@ -45,7 +45,7 @@ namespace RTShader {
 This class builds RenderState from a given pass that represents the fixed function pipeline
 that the source pass describes.
 */
-class FFPRenderStateBuilder : public Singleton<FFPRenderStateBuilder>
+class FFPRenderStateBuilder : public Singleton<FFPRenderStateBuilder>, public RTShaderSystemAlloc
 {
 // Interface.
 public:
@@ -108,7 +108,7 @@ public:
 	
 // Protected types.
 protected:
-	typedef std::vector<SubRenderStateFactory*> 				SubRenderStateFactoryList;
+	typedef vector<SubRenderStateFactory*>::type 				SubRenderStateFactoryList;
 	typedef SubRenderStateFactoryList::iterator 				SubRenderStateFactoryIterator;
 	typedef SubRenderStateFactoryList::const_iterator			SubRenderStateFactoryConstIterator;
 

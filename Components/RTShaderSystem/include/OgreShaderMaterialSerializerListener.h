@@ -44,7 +44,7 @@ namespace RTShader {
 /** This class responsible for translating core features of the RT Shader System for
 Ogre material scripts.
 */
-class SGMaterialSerializerListener : public MaterialSerializer::Listener
+class SGMaterialSerializerListener : public MaterialSerializer::Listener, public RTShaderSystemAlloc
 {
 
 // Interface.
@@ -70,7 +70,7 @@ public:
 
 // Types.
 protected:
-	typedef std::vector<ShaderGenerator::SGPass*>	SGPassList;
+	typedef vector<ShaderGenerator::SGPass*>::type	SGPassList;
 	typedef SGPassList::iterator					SGPassListIterator;
 	typedef SGPassList::const_iterator				SGPassListConstIterator;
 

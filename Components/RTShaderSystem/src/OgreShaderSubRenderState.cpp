@@ -78,7 +78,7 @@ void SubRenderStateFactory::destroyInstance(SubRenderState* subRenderState)
 	{
 		if (*it == subRenderState)
 		{
-			delete *it;
+			OGRE_DELETE *it;
 			mSubRenderStateList.erase(it);
 			break;
 		}
@@ -92,7 +92,7 @@ void SubRenderStateFactory::destroyAllInstances()
 
 	for (it = mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
 	{		
-		delete *it;			
+		OGRE_DELETE *it;			
 	}
 	mSubRenderStateList.clear();
 

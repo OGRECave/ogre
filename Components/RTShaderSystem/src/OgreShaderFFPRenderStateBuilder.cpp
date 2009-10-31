@@ -81,23 +81,23 @@ bool FFPRenderStateBuilder::initialize()
 {
 	SubRenderStateFactory* curFactory;
 
-	curFactory = new FFPTransformFactory;	
+	curFactory = OGRE_NEW FFPTransformFactory;	
 	ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
 	mFFPSubRenderStateFactoyList.push_back(curFactory);
 
-	curFactory = new FFPColourFactory;	
+	curFactory = OGRE_NEW FFPColourFactory;	
 	ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
 	mFFPSubRenderStateFactoyList.push_back(curFactory);
 
-	curFactory = new FFPLightingFactory;
+	curFactory = OGRE_NEW FFPLightingFactory;
 	ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
 	mFFPSubRenderStateFactoyList.push_back(curFactory);
 
-	curFactory = new FFPTexturingFactory;
+	curFactory = OGRE_NEW FFPTexturingFactory;
 	ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
 	mFFPSubRenderStateFactoyList.push_back(curFactory);
 
-	curFactory = new FFPFogFactory;	
+	curFactory = OGRE_NEW FFPFogFactory;	
 	ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
 	mFFPSubRenderStateFactoyList.push_back(curFactory);
 
@@ -112,7 +112,7 @@ void FFPRenderStateBuilder::finalize()
 	for (it = mFFPSubRenderStateFactoyList.begin(); it != mFFPSubRenderStateFactoyList.end(); ++it)
 	{
 		ShaderGenerator::getSingleton().removeSubRenderStateFactory(*it);		
-		delete *it;		
+		OGRE_DELETE *it;		
 	}
 	mFFPSubRenderStateFactoyList.clear();
 }

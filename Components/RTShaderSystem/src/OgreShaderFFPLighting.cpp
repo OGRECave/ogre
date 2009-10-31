@@ -482,7 +482,7 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 	if ((mTrackVertexColourType & TVC_AMBIENT) == 0 && 
 		(mTrackVertexColourType & TVC_EMISSIVE) == 0)
 	{
-		curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mDerivedSceneColour, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT);	
 		vsMain->addAtomInstace(curFuncInvocation);		
@@ -491,7 +491,7 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 	{
 		if (mTrackVertexColourType & TVC_AMBIENT)
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mLightAmbientColour, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSDiffuse, Operand::OPS_IN);			
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT);	
@@ -499,7 +499,7 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 		}
 		else
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mDerivedAmbientLightColour, Operand::OPS_IN, (Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, (Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));	
 			vsMain->addAtomInstace(curFuncInvocation);
@@ -507,7 +507,7 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 
 		if (mTrackVertexColourType & TVC_EMISSIVE)
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ADD, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mVSDiffuse, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT);	
@@ -515,7 +515,7 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 		}
 		else
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_ADD, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mSurfaceEmissiveColour, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT);	
@@ -534,7 +534,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 	// Merge diffuse colour with vertex colour if need to.
 	if (mTrackVertexColourType & TVC_DIFFUSE)			
 	{
-		curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mVSDiffuse, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 		curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 		curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
@@ -544,7 +544,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 	// Merge specular colour with vertex colour if need to.
 	if (mSpecularEnable && mTrackVertexColourType & TVC_SPECULAR)
 	{							
-		curFuncInvocation = new FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mVSDiffuse, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 		curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 		curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
@@ -557,7 +557,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 	case Light::LT_DIRECTIONAL:			
 		if (mSpecularEnable)
 		{				
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);			
 			curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
@@ -575,7 +575,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 
 		else
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, groupOrder, internalCounter++); 
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LIGHT_DIRECTIONAL_DIFFUSE, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(curLightParams->mDirection, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
@@ -589,7 +589,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 	case Light::LT_POINT:	
 		if (mSpecularEnable)
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_LIGHT_POINT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LIGHT_POINT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
 			curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);			
 			curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
@@ -607,7 +607,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 		}
 		else
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_LIGHT_POINT_DIFFUSE, groupOrder, internalCounter++); 			
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LIGHT_POINT_DIFFUSE, groupOrder, internalCounter++); 			
 			curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);			
 			curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
@@ -625,7 +625,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 	case Light::LT_SPOTLIGHT:
 		if (mSpecularEnable)
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_LIGHT_SPOT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LIGHT_SPOT_DIFFUSESPECULAR, groupOrder, internalCounter++); 			
 			curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);			
 			curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
@@ -645,7 +645,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 		}
 		else
 		{
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_LIGHT_SPOT_DIFFUSE, groupOrder, internalCounter++); 			
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LIGHT_SPOT_DIFFUSE, groupOrder, internalCounter++); 			
 			curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);			
 			curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
@@ -825,7 +825,7 @@ void FFPLightingFactory::writeInstance(MaterialSerializer* ser, SubRenderState* 
 //-----------------------------------------------------------------------
 SubRenderState*	FFPLightingFactory::createInstanceImpl()
 {
-	return new FFPLighting;
+	return OGRE_NEW FFPLighting;
 }
 
 }

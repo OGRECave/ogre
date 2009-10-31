@@ -43,7 +43,7 @@ namespace RTShader {
 
 /** A singleton manager class that manages shader based programs.
 */
-class ProgramManager : public Singleton<ProgramManager>
+class ProgramManager : public Singleton<ProgramManager>, public RTShaderSystemAlloc
 {
 // Interface.
 public:
@@ -98,14 +98,14 @@ public:
 protected:
 
 	//-----------------------------------------------------------------------------
-	typedef std::map<uint32, ProgramSet*>				ProgramSetMap;
+	typedef map<uint32, ProgramSet*>::type				ProgramSetMap;
 	typedef ProgramSetMap::iterator						ProgramSetIterator;
 	typedef ProgramSetMap::const_iterator				ProgramSetConstIterator;
 
 	//-----------------------------------------------------------------------------
-	typedef std::map<String, Program*>					NameToProgramMap;
+	typedef map<String, Program*>::type					NameToProgramMap;
 	typedef NameToProgramMap::iterator					NameToProgramIterator;
-	typedef std::map<String, ProgramWriter*>			NameToProgramWriterMap;
+	typedef map<String, ProgramWriter*>::type			NameToProgramWriterMap;
 	typedef NameToProgramWriterMap::iterator			NameToProgramWriterIterator;
 
 	

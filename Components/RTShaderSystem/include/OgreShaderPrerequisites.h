@@ -46,6 +46,8 @@ class ScriptCompiler;
 class PropertyAbstractNode;
 class MaterialSerializer;
 
+typedef GeneralAllocatedObject	RTShaderSystemAlloc;
+
 namespace RTShader 
 {
 

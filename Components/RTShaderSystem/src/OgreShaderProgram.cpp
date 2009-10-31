@@ -63,7 +63,7 @@ void Program::destroyFunctions()
 	{
 		if (*it != NULL)
 		{
-			delete *it;
+			OGRE_DELETE *it;
 		}	
 	}
 	mFunctions.clear();
@@ -133,7 +133,7 @@ ParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstan
 	}
 	
 	// Create new parameter.
-	param = ParameterPtr(new Parameter(autoType, data));
+	param = ParameterPtr(OGRE_NEW Parameter(autoType, data));
 	addParameter(param);
 
 	return param;
@@ -157,7 +157,7 @@ ParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstant
 	}
 
 	// Create new parameter.
-	param = ParameterPtr(new Parameter(autoType, data));
+	param = ParameterPtr(OGRE_NEW Parameter(autoType, data));
 	addParameter(param);
 
 	return param;
@@ -199,7 +199,7 @@ ParameterPtr Program::resolveParameter(GpuConstantType type,
 
 	
 	// Create new parameter.
-	param = ParameterPtr(new Parameter(type, suggestedName + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index, Parameter::SPC_UNKNOWN, variability));
+	param = ParameterPtr(OGRE_NEW Parameter(type, suggestedName + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index, Parameter::SPC_UNKNOWN, variability));
 	addParameter(param);
 
 	return param;
@@ -269,7 +269,7 @@ Function* Program::createFunction(const String& name, const String& desc)
 			"Program::createFunction" );
 	}
 
-	shaderFunction = new Function(name, desc);
+	shaderFunction = OGRE_NEW Function(name, desc);
 	mFunctions.push_back(shaderFunction);
 
 	return shaderFunction;

@@ -260,7 +260,7 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 	if (mCalcMode == CM_PER_PIXEL)
 	{
 		internalCounter = 0;
-		curFuncInvocation = new FunctionInvocation(FFP_FUNC_PIXELFOG_DEPTH, FFP_VS_FOG, internalCounter++);
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_DEPTH, FFP_VS_FOG, internalCounter++);
 		curFuncInvocation->pushOperand(mWorldViewProjMatrix, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSInPos, Operand::OPS_IN);	
 		curFuncInvocation->pushOperand(mVSOutDepth, Operand::OPS_OUT);	
@@ -270,13 +270,13 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 		switch (mFogMode)
 		{
 		case FOG_LINEAR:
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_PIXELFOG_LINEAR, FFP_PS_FOG, internalCounter++);
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_LINEAR, FFP_PS_FOG, internalCounter++);
 			break;
 		case FOG_EXP:
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_PIXELFOG_EXP, FFP_PS_FOG, internalCounter++);
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_EXP, FFP_PS_FOG, internalCounter++);
 			break;
 		case FOG_EXP2:
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_PIXELFOG_EXP2, FFP_PS_FOG, internalCounter++);
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_EXP2, FFP_PS_FOG, internalCounter++);
 			break;
 		}
 
@@ -297,13 +297,13 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 		switch (mFogMode)
 		{
 		case FOG_LINEAR:
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_VERTEXFOG_LINEAR, FFP_VS_FOG, internalCounter++);
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_VERTEXFOG_LINEAR, FFP_VS_FOG, internalCounter++);
 			break;
 		case FOG_EXP:
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_VERTEXFOG_EXP, FFP_VS_FOG, internalCounter++);
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_VERTEXFOG_EXP, FFP_VS_FOG, internalCounter++);
 			break;
 		case FOG_EXP2:
-			curFuncInvocation = new FunctionInvocation(FFP_FUNC_VERTEXFOG_EXP2, FFP_VS_FOG, internalCounter++);
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_VERTEXFOG_EXP2, FFP_VS_FOG, internalCounter++);
 			break;
 		}
 			
@@ -316,7 +316,7 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 
 		internalCounter = 0;
 
-		curFuncInvocation = new FunctionInvocation(FFP_FUNC_LERP, FFP_PS_FOG, internalCounter++);
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, FFP_PS_FOG, internalCounter++);
 		curFuncInvocation->pushOperand(mFogColour, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSInFogFactor, Operand::OPS_IN);
@@ -483,7 +483,7 @@ void FFPFogFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRe
 //-----------------------------------------------------------------------
 SubRenderState*	FFPFogFactory::createInstanceImpl()
 {
-	return new FFPFog;
+	return OGRE_NEW FFPFog;
 }
 
 }

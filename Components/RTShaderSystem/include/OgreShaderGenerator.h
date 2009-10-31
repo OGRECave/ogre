@@ -49,7 +49,7 @@ namespace RTShader {
 /** Shader generator system main interface. This singleton based class
 enables automatic generation of shader code based on existing material techniques.
 */
-class ShaderGenerator : public Singleton<ShaderGenerator>
+class ShaderGenerator : public Singleton<ShaderGenerator>, public RTShaderSystemAlloc
 {
 	// Interface.
 public:
@@ -311,33 +311,33 @@ protected:
 	class SGMaterial;
 	class SGScheme;
 
-	typedef std::vector<SGPass*>					SGPassList;
+	typedef vector<SGPass*>::type					SGPassList;
 	typedef SGPassList::iterator					SGPassIterator;
 	typedef SGPassList::const_iterator				SGPassConstIterator;
 
-	typedef std::vector<SGTechnique*>				SGTechniqueList;
+	typedef vector<SGTechnique*>::type				SGTechniqueList;
 	typedef SGTechniqueList::iterator				SGTechniqueIterator;
 	typedef SGTechniqueList::const_iterator			SGTechniqueConstIterator;
 
-	typedef std::map<SGTechnique*, SGTechnique*>	SGTechniqueMap;
+	typedef map<SGTechnique*, SGTechnique*>::type	SGTechniqueMap;
 	typedef SGTechniqueMap::iterator				SGTechniqueMapIterator;
 	
-	typedef std::map<const String, SGMaterial*>		SGMaterialMap;
+	typedef map<String, SGMaterial*>::type			SGMaterialMap;
 	typedef SGMaterialMap::iterator					SGMaterialIterator;
 	typedef SGMaterialMap::const_iterator			SGMaterialConstIterator;
 
-	typedef std::map<const String, SGScheme*>		SGSchemeMap;
+	typedef map<String, SGScheme*>::type			SGSchemeMap;
 	typedef SGSchemeMap::iterator					SGSchemeIterator;
 	typedef SGMaterialMap::const_iterator			SGSchemeConstIterator;
 
-	typedef std::map<const String, ScriptTranslator*>	SGScriptTranslatorMap;
-	typedef SGScriptTranslatorMap::iterator				SGScriptTranslatorIterator;
-	typedef SGScriptTranslatorMap::const_iterator		SGScriptTranslatorConstIterator;
+	typedef map<String, ScriptTranslator*>::type	SGScriptTranslatorMap;
+	typedef SGScriptTranslatorMap::iterator			SGScriptTranslatorIterator;
+	typedef SGScriptTranslatorMap::const_iterator	SGScriptTranslatorConstIterator;
 
 
 	
 	/** Shader generator pass wrapper class. */
-	class SGPass
+	class SGPass : public RTShaderSystemAlloc
 	{
 	public:
 		SGPass			(SGTechnique* parent, Pass* srcPass, Pass* dstPass);
@@ -385,7 +385,7 @@ protected:
 
 	
 	/** Shader generator technique wrapper class. */
-	class SGTechnique
+	class SGTechnique : public RTShaderSystemAlloc
 	{
 	public:
 		SGTechnique			(SGMaterial* parent, Technique* srcTechnique, const String& dstTechniqueSchemeName);		
@@ -446,7 +446,7 @@ protected:
 
 	
 	/** Shader generator material wrapper class. */
-	class SGMaterial
+	class SGMaterial : public RTShaderSystemAlloc
 	{	
 	
 	public:
@@ -469,7 +469,7 @@ protected:
 
 	
 	/** Shader generator scheme class. */
-	class SGScheme
+	class SGScheme : public RTShaderSystemAlloc
 	{	
 	public:
 		SGScheme		(const String& schemeName);
@@ -538,7 +538,7 @@ protected:
 protected:
 	
 	/** Shader generator RenderObjectListener sub class. */
-	class SGRenderObjectListener : public RenderObjectListener
+	class SGRenderObjectListener : public RenderObjectListener, public RTShaderSystemAlloc
 	{
 	public:
 		SGRenderObjectListener(ShaderGenerator* owner)
@@ -561,7 +561,7 @@ protected:
 	};
 
 	/** Shader generator scene manager sub class. */
-	class SGSceneManagerListener : public SceneManager::Listener
+	class SGSceneManagerListener : public SceneManager::Listener, public RTShaderSystemAlloc
 	{
 	public:
 		SGSceneManagerListener(ShaderGenerator* owner)
@@ -631,12 +631,12 @@ protected:
 	};
 
 	//-----------------------------------------------------------------------------
-	typedef std::map<String, SubRenderStateFactory*> 		SubRenderStateFactoryMap;
+	typedef map<String, SubRenderStateFactory*>::type 		SubRenderStateFactoryMap;
 	typedef SubRenderStateFactoryMap::iterator 				SubRenderStateFactoryIterator;
 	typedef SubRenderStateFactoryMap::const_iterator		SubRenderStateFactoryConstIterator;
 
 	//-----------------------------------------------------------------------------
-	typedef std::map<uint32, RenderStatePtr> 			RenderStateMap;
+	typedef map<uint32, RenderStatePtr>::type 			RenderStateMap;
 	typedef RenderStateMap::iterator 					RenderStateMapIterator;
 	typedef RenderStateMap::const_iterator				RenderStateMapConstIterator;
 

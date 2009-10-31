@@ -47,7 +47,7 @@ namespace RTShader {
 /** A class that perform the actual writing operation of a given CPU program to stream.
 The main usage of this class is to generate the actual shader source code from a CPU program representation.
 */
-class ProgramWriter
+class ProgramWriter : public RTShaderSystemAlloc
 {
 // Interface.
 public:
@@ -105,8 +105,8 @@ protected:
 
 	
 protected:
-	typedef		std::map<GpuConstantType, const char*>		GpuConstTypeToStringMap;
-	typedef		std::map<Parameter::Semantic, const char*>	ParamSemanticToStringMap;
+	typedef		map<GpuConstantType, const char*>::type		GpuConstTypeToStringMap;
+	typedef		map<Parameter::Semantic, const char*>::type	ParamSemanticToStringMap;
 
 // Attributes.
 protected:

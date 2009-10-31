@@ -270,7 +270,7 @@ bool ShaderExReflectionMap::addVSInvocations( Function* vsMain, const int groupO
 	int internalCounter = 0;
 
 	// Output mask texture coordinates.
-	funcInvoaction = new FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder, internalCounter++); 
+	funcInvoaction = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder, internalCounter++); 
 	funcInvoaction->pushOperand(mVSInMaskTexcoord, Operand::OPS_IN);
 	funcInvoaction->pushOperand(mVSOutMaskTexcoord, Operand::OPS_OUT);
 	vsMain->addAtomInstace(funcInvoaction);
@@ -278,7 +278,7 @@ bool ShaderExReflectionMap::addVSInvocations( Function* vsMain, const int groupO
 	// Output reflection texture coordinates.
 	if (mReflectionMapType == TEX_TYPE_2D)
 	{
-		funcInvoaction = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  groupOrder, internalCounter++); 
+		funcInvoaction = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  groupOrder, internalCounter++); 
 		funcInvoaction->pushOperand(mWorldITMatrix, Operand::OPS_IN);
 		funcInvoaction->pushOperand(mViewMatrix, Operand::OPS_IN);	
 		funcInvoaction->pushOperand(mVSInputNormal, Operand::OPS_IN);	
@@ -287,7 +287,7 @@ bool ShaderExReflectionMap::addVSInvocations( Function* vsMain, const int groupO
 	}
 	else
 	{
-		funcInvoaction = new FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT, groupOrder, internalCounter++); 
+		funcInvoaction = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT, groupOrder, internalCounter++); 
 		funcInvoaction->pushOperand(mWorldMatrix, Operand::OPS_IN);
 		funcInvoaction->pushOperand(mWorldITMatrix, Operand::OPS_IN);
 		funcInvoaction->pushOperand(mViewMatrix, Operand::OPS_IN);					
@@ -308,7 +308,7 @@ bool ShaderExReflectionMap::addPSInvocations( Function* psMain, const int groupO
 	FunctionInvocation* funcInvoaction = NULL;
 	int internalCounter = 0;
 
-	funcInvoaction = new FunctionInvocation(SGX_FUNC_APPLY_REFLECTION_MAP, groupOrder, internalCounter++);
+	funcInvoaction = OGRE_NEW FunctionInvocation(SGX_FUNC_APPLY_REFLECTION_MAP, groupOrder, internalCounter++);
 	funcInvoaction->pushOperand(mMaskMapSampler, Operand::OPS_IN);
 	funcInvoaction->pushOperand(mPSInMaskTexcoord, Operand::OPS_IN);
 	funcInvoaction->pushOperand(mReflectionMapSampler, Operand::OPS_IN);
@@ -446,5 +446,5 @@ const String& ShaderExReflectionMapFactory::getType() const
 //-----------------------------------------------------------------------
 SubRenderState*	ShaderExReflectionMapFactory::createInstanceImpl()
 {
-	return new ShaderExReflectionMap;
+	return OGRE_NEW ShaderExReflectionMap;
 }

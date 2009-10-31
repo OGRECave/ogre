@@ -45,10 +45,15 @@ namespace RTShader {
 
 /** A class that represents an atomic code section of shader based program function.
 */
-class FunctionAtom
+class FunctionAtom : public RTShaderSystemAlloc
 {
 // Interface.
 public:
+	/** Class default constructor. */
+	FunctionAtom			();
+
+	/** Class default destructor. */
+	virtual ~FunctionAtom	() {}
 
 	/** Get the group execution order of this function atom. */
 	int						getGroupExecutionOrder		() const;
@@ -59,9 +64,6 @@ public:
 	/** Abstract method that writes a source code to the given output stream in the target shader language. */
 	virtual void			writeSourceCode				(std::ostream& os, const String& targetLanguage) const = 0;
 	
-protected:
-	/** Class default constructor */
-	FunctionAtom		();
 
 // Attributes.
 protected:
@@ -179,7 +181,7 @@ protected:
 	OperandVector		mOperands;	
 };
 
-typedef std::vector<FunctionAtom*> 					FunctionAtomInstanceList;
+typedef vector<FunctionAtom*>::type					FunctionAtomInstanceList;
 typedef FunctionAtomInstanceList::iterator 			FunctionAtomInstanceIterator;
 typedef FunctionAtomInstanceList::const_iterator	FunctionAtomInstanceConstIterator;
 

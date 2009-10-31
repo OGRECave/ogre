@@ -79,7 +79,7 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
 	// Add dependency.
 	vsProgram->addDependency(FFP_LIB_TRANSFORM);
 
-	FunctionInvocation* transformFunc = new FunctionInvocation(FFP_FUNC_TRANSFORM,  FFP_VS_TRANSFORM, 0); 
+	FunctionInvocation* transformFunc = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM,  FFP_VS_TRANSFORM, 0); 
 
 	transformFunc->pushOperand(wvpMatrix, Operand::OPS_IN);
 	transformFunc->pushOperand(positionIn, Operand::OPS_IN);
@@ -140,7 +140,7 @@ void FFPTransformFactory::writeInstance(MaterialSerializer* ser, SubRenderState*
 //-----------------------------------------------------------------------
 SubRenderState*	FFPTransformFactory::createInstanceImpl()
 {
-	return new FFPTransform;
+	return OGRE_NEW FFPTransform;
 }
 
 

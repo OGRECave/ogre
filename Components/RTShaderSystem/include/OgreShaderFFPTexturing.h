@@ -112,7 +112,7 @@ protected:
 		ParameterPtr			mPSInputTexCoord;				// Pixel shader input texture coordinates parameter.
 	};
 
-	typedef std::vector<TextureUnitParams>			TextureUnitParamsList;
+	typedef vector<TextureUnitParams>::type			TextureUnitParamsList;
 	typedef TextureUnitParamsList::iterator			TextureUnitParamsIterator;
 	typedef TextureUnitParamsList::const_iterator	TextureUnitParamsConstIterator;
 

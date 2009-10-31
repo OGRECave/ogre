@@ -42,7 +42,7 @@ Function::Function(const String& name, const String& desc)
 Function::~Function()
 {
 	for (FunctionAtomInstanceIterator it=mAtomInstances.begin(); it != mAtomInstances.end(); ++it)		
-		delete (*it);
+		OGRE_DELETE (*it);
 	mAtomInstances.clear();
 
 	for (ShaderParameterIterator it = mInputParameters.begin(); it != mInputParameters.end(); ++it)
@@ -274,7 +274,7 @@ ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int i
 		}		
 	}
 		
-	param = ParameterPtr(new Parameter(type, name, semantic, index, Parameter::SPC_UNKNOWN, (uint16)GPV_GLOBAL));
+	param = ParameterPtr(OGRE_NEW Parameter(type, name, semantic, index, Parameter::SPC_UNKNOWN, (uint16)GPV_GLOBAL));
 	addParameter(mLocalParameters, param);
 			
 	return param;
@@ -291,7 +291,7 @@ ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int i
 	if (param.get() != NULL)	
 		return param;
 
-	param = ParameterPtr(new Parameter(type, "lLocalParam_" + StringConverter::toString(mLocalParameters.size()), semantic, index, content, (uint16)GPV_GLOBAL));
+	param = ParameterPtr(OGRE_NEW Parameter(type, "lLocalParam_" + StringConverter::toString(mLocalParameters.size()), semantic, index, content, (uint16)GPV_GLOBAL));
 	addParameter(mLocalParameters, param);
 
 	return param;
@@ -451,7 +451,7 @@ bool Function::deleteAtomInstance(FunctionAtom* atomInstance)
 	{
 		if (*it == atomInstance)
 		{
-			delete atomInstance;
+			OGRE_DELETE atomInstance;
 			mAtomInstances.erase(it);
 			return true;
 		}		

@@ -90,7 +90,7 @@ void ProgramManager::acquireGpuPrograms(Pass* pass, RenderState* renderState)
 	// Case we have to generate gpu programs for the given render state.
 	else
 	{
-		programSet = new ProgramSet;
+		programSet = OGRE_NEW ProgramSet;
 
 		if (false == renderState->createCpuPrograms(programSet))
 		{
@@ -121,7 +121,7 @@ void ProgramManager::destroyProgramSets()
 
 	for (it=mHashToProgramSetMap.begin(); it != mHashToProgramSetMap.end(); ++it)
 	{
-		delete it->second;
+		OGRE_DELETE it->second;
 	}
 	mHashToProgramSetMap.clear();
 }
@@ -133,7 +133,7 @@ void ProgramManager::destroyPrograms()
 
 	for (it=mNameToProgramMap.begin(); it != mNameToProgramMap.end(); ++it)
 	{
-		delete it->second;
+		OGRE_DELETE it->second;
 	}
 	mNameToProgramMap.clear();
 }
@@ -147,7 +147,7 @@ void ProgramManager::destroyProgramsWriters()
 	{
 		if (it->second != NULL)
 		{
-			delete it->second;
+			OGRE_DELETE it->second;
 			it->second = NULL;
 		}					
 	}
@@ -167,7 +167,7 @@ Program* ProgramManager::createCpuProgram(const String& name, const String& desc
 			"ProgramManager::createCpuProgram" );		
 	}
 	
-	shaderProgram = new Program(name, desc, type);
+	shaderProgram = OGRE_NEW Program(name, desc, type);
 	mNameToProgramMap[name] = shaderProgram;
 
 	return shaderProgram;
@@ -193,7 +193,7 @@ bool ProgramManager::destroyCpuProgram(const String& name)
 
 	if (itFind != mNameToProgramMap.end())
 	{
-		delete itFind->second;
+		OGRE_DELETE itFind->second;
 		mNameToProgramMap.erase(itFind);
 
 		return true;
@@ -271,7 +271,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		// No writer found -> create new one.
 		if (itWriter == mNameToProgramWritersMap.end())
 		{
-			programWriter = new ProgramWriter(language);
+			programWriter = OGRE_NEW ProgramWriter(language);
 			mNameToProgramWritersMap[language] = programWriter;
 		}
 		else

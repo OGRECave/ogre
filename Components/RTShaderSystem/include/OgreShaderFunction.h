@@ -43,7 +43,7 @@ namespace RTShader {
 
 /** A class that represents a shader based program function.
 */
-class Function
+class Function : public RTShaderSystemAlloc
 {
 // Interface.
 public:
@@ -138,7 +138,7 @@ public:
 	void							addAtomInstace			(FunctionAtom* atomInstance);
 
 	/** Delete a function atom instance from this function. 
-	@param atomInstance The atom instance to delete.
+	@param atomInstance The atom instance to OGRE_DELETE.
 	*/
 	bool							deleteAtomInstance		(FunctionAtom* atomInstance);
 
@@ -193,7 +193,7 @@ private:
 	friend class Program;
 };
 
-typedef std::vector<Function*> 						ShaderFunctionList;
+typedef vector<Function*>::type						ShaderFunctionList;
 typedef ShaderFunctionList::iterator 				ShaderFunctionIterator;
 typedef ShaderFunctionList::const_iterator			ShaderFunctionConstIterator;
 
