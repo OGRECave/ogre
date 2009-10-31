@@ -41,7 +41,7 @@ if (OGRE_CONFIG_THREADS)
 endif ()
 
 # install 
-ogre_config_lib(OgreProperty)
+ogre_config_component(OgreProperty)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Property
 )

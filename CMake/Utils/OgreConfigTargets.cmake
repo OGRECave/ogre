@@ -152,6 +152,24 @@ function(ogre_config_lib LIBNAME)
   endif ()
 endfunction(ogre_config_lib)
 
+function(ogre_config_component LIBNAME)
+  ogre_config_common(${LIBNAME})
+  ogre_install_target(${LIBNAME} "")
+  
+  if (OGRE_INSTALL_PDB)
+    # install debug pdb files
+    install(FILES ${OGRE_BINARY_DIR}/lib${OGRE_DEBUG_PATH}/${LIBNAME}_d.pdb
+	  DESTINATION bin${OGRE_DEBUG_PATH}
+	  CONFIGURATIONS Debug
+	)
+	install(FILES ${OGRE_BINARY_DIR}/lib${OGRE_RELWDBG_PATH}/${LIBNAME}.pdb
+	  DESTINATION bin${OGRE_RELWDBG_PATH}
+	  CONFIGURATIONS RelWithDebInfo
+	)
+  endif ()
+endfunction(ogre_config_component)
+
+
 # setup plugin build
 function(ogre_config_plugin PLUGINNAME)
   ogre_config_common(${PLUGINNAME})

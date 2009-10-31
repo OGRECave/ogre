@@ -66,7 +66,7 @@ add_library(OgreRTShaderSystem STATIC ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreRTShaderSystem PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OGRE_VERSION_MAJOR})
 target_link_libraries(OgreRTShaderSystem OgreMain)
 
-ogre_config_lib(OgreRTShaderSystem)
+ogre_config_component(OgreRTShaderSystem)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/RTShaderSystem
 )
