@@ -136,24 +136,24 @@ namespace Ogre
 		<td><b>Description</b></td>
 	</tr>
 	<tr>
-		<td><b>TerrainLayerSampler Count</b></td>
-		<td><b>uint8</b></td>
-		<td><b>Number of samplers in this declaration</b></td>
+		<td>TerrainLayerSampler Count</td>
+		<td>uint8</td>
+		<td>Number of samplers in this declaration</td>
 	</tr>
 	<tr>
-		<td><b>TerrainLayerSampler List</b></td>
-		<td><b>TerrainLayerSampler*</b></td>
-		<td><b>List of TerrainLayerSampler structures</b></td>
+		<td>TerrainLayerSampler List</td>
+		<td>TerrainLayerSampler*</td>
+		<td>List of TerrainLayerSampler structures</td>
 	</tr>
 	<tr>
-		<td><b>Sampler Element Count</b></td>
-		<td><b>uint8</b></td>
-		<td><b>Number of sampler elements in this declaration</b></td>
+		<td>Sampler Element Count</td>
+		<td>uint8</td>
+		<td>Number of sampler elements in this declaration</td>
 	</tr>
 	<tr>
-		<td><b>TerrainLayerSamplerElement List</b></td>
-		<td><b>TerrainLayerSamplerElement*</b></td>
-		<td><b>List of TerrainLayerSamplerElement structures</b></td>
+		<td>TerrainLayerSamplerElement List</td>
+		<td>TerrainLayerSamplerElement*</td>
+		<td>List of TerrainLayerSamplerElement structures</td>
 	</tr>
 	</table>
 	<b>TerrainLayerSampler (Identifier 'TSAM')</b>\n
@@ -165,14 +165,14 @@ namespace Ogre
 		<td><b>Description</b></td>
 	</tr>
 	<tr>
-		<td><b>Alias</b></td>
-		<td><b>String</b></td>
-		<td><b>Alias name of this sampler</b></td>
+		<td>Alias</td>
+		<td>String</td>
+		<td>Alias name of this sampler</td>
 	</tr>
 	<tr>
-		<td><b>Format</b></td>
-		<td><b>uint8</b></td>
-		<td><b>Desired pixel format</b></td>
+		<td>Format</td>
+		<td>uint8</td>
+		<td>Desired pixel format</td>
 	</tr>
 	</table>
 	<b>TerrainLayerSamplerElement (Identifier 'TSEL')</b>\n
@@ -184,24 +184,24 @@ namespace Ogre
 		<td><b>Description</b></td>
 	</tr>
 	<tr>
-		<td><b>Source</b></td>
-		<td><b>uint8</b></td>
-		<td><b>Sampler source index</b></td>
+		<td>Source</td>
+		<td>uint8</td>
+		<td>Sampler source index</td>
 	</tr>
 	<tr>
-		<td><b>Semantic</b></td>
-		<td><b>uint8</b></td>
-		<td><b>Semantic interpretation of this element</b></td>
+		<td>Semantic</td>
+		<td>uint8</td>
+		<td>Semantic interpretation of this element</td>
 	</tr>
 	<tr>
-		<td><b>Element start</b></td>
-		<td><b>uint8</b></td>
-		<td><b>Start of this element in the sampler</b></td>
+		<td>Element start</td>
+		<td>uint8</td>
+		<td>Start of this element in the sampler</td>
 	</tr>
 	<tr>
-		<td><b>Element count</b></td>
-		<td><b>uint8</b></td>
-		<td><b>Number of elements in the sampler used by this entry</b></td>
+		<td>Element count</td>
+		<td>uint8</td>
+		<td>Number of elements in the sampler used by this entry</td>
 	</tr>
 	</table>
 	<b>LayerInstance (Identifier 'TLIN')</b>\n
@@ -213,14 +213,14 @@ namespace Ogre
 		<td><b>Description</b></td>
 	</tr>
 	<tr>
-		<td><b>World size</b></td>
-		<td><b>Real</b></td>
-		<td><b>The world size of this layer (determines UV scaling)</b></td>
+		<td>World size</td>
+		<td>Real</td>
+		<td>The world size of this layer (determines UV scaling)</td>
 	</tr>
 	<tr>
-		<td><b>Texture list</b></td>
-		<td><b>String*</b></td>
-		<td><b>List of texture names corresponding to the number of samplers in the layer declaration</b></td>
+		<td>Texture list</td>
+		<td>String*</td>
+		<td>List of texture names corresponding to the number of samplers in the layer declaration</td>
 	</tr>
 	</table>
 	<b>TerrainDerivedData (Identifier 'TDDA')</b>\n
@@ -232,19 +232,19 @@ namespace Ogre
 		<td><b>Description</b></td>
 	</tr>
 	<tr>
-		<td><b>Derived data type name</b></td>
-		<td><b>String</b></td>
-		<td><b>Name of the derived data type ('normalmap', 'lightmap', 'colourmap', 'compositemap')</b></td>
+		<td>Derived data type name</td>
+		<td>String</td>
+		<td>Name of the derived data type ('normalmap', 'lightmap', 'colourmap', 'compositemap')</td>
 	</tr>
 	<tr>
-		<td><b>Size</b></td>
-		<td><b>uint16</b></td>
-		<td><b>Size of the data along one edge</b></td>
+		<td>Size</td>
+		<td>uint16</td>
+		<td>Size of the data along one edge</td>
 	</tr>
 	<tr>
-		<td><b>Data</b></td>
-		<td><b>varies based on type</b></td>
-		<td><b>The data</b></td>
+		<td>Data</td>
+		<td>varies based on type</td>
+		<td>The data</td>
 	</tr>
 	</table>
 	*/
@@ -379,6 +379,21 @@ namespace Ogre
 
 			}
 
+		};
+
+		/// Neighbour index enumeration - indexed anticlockwise from East like angles
+		enum NeighbourIndex
+		{
+			NEIGHBOUR_EAST = 0, 
+			NEIGHBOUR_NORTHEAST = 1, 
+			NEIGHBOUR_NORTH = 2, 
+			NEIGHBOUR_NORTHWEST = 3, 
+			NEIGHBOUR_WEST = 4, 
+			NEIGHBOUR_SOUTHWEST = 5, 
+			NEIGHBOUR_SOUTH = 6, 
+			NEIGHBOUR_SOUTHEAST = 7,
+
+			NEIGHBOUR_COUNT = 8
 		};
 
 		SceneManager* getSceneManager() const { return mSceneMgr; }
@@ -1066,6 +1081,15 @@ namespace Ogre
 		*/
 		void widenRectByVector(const Vector3& vec, const Rect& inRect, Rect& outRect);
 
+		/** Widen a rectangular area of terrain to take into account an extrusion vector, 
+			but specify the min / max heights to extrude manually.
+		@param vec A vector in world space
+		@param inRect Input rectangle
+		@param minHeight, maxHeight The extents of the height to extrude
+		@param inRect Output rectangle
+		*/
+		void widenRectByVector(const Vector3& vec, const Rect& inRect, 
+			Real minHeight, Real maxHeight, Rect& outRect);
 
 		/** Free as many resources as possible for optimal run-time memory use.
 		@remarks
@@ -1179,6 +1203,58 @@ namespace Ogre
 		/// Get the (global) normal map texture
 		TexturePtr getTerrainNormalMap() const { return mTerrainNormalMap; }
 
+		/** Retrieve the terrain's neighbour, or null if not present.
+		@remarks
+			Terrains only know about their neighbours if they are notified via
+			setNeighbour. This information is not saved with the terrain since every
+			tile must be able to be independent.
+		@param index The index of the neighbour
+		*/
+		Terrain* getNeighbour(NeighbourIndex index);
+
+		/** Set a terrain's neighbour, or null to detach one. 
+		@remarks
+			This information is not saved with the terrain since every
+			tile must be able to be independent. However if modifications are
+			made to a tile which can affect its neighbours, while connected the
+			changes will be propagated. 
+		@param index The index of the neighbour
+		@param neighbour The terrain instance to become the neighbour, or null to reset.
+		@param recalculate If true, this terrain instance will recalculate elements
+			that could be affected by the connection of this tile (e.g. matching 
+			heights, calcaulting normals, calculating shadows crossing the boundary). 
+			If false, this terrain's state is assumed to be up to date already 
+			(e.g. was calculated with this tile present before and the state saved). 
+		*/
+		void setNeighbour(NeighbourIndex index, Terrain* neighbour, bool recalculate = false);
+
+		/** Get the opposite neighbour relationship (useful for finding the 
+			neighbour index from the perspective of the tile the other side of the
+			boundary).
+		*/
+		NeighbourIndex getOppositeNeighbour(NeighbourIndex index);
+
+		/** Tell this instance to notify all neighbours that will be affected
+			by a height change that has taken place. 
+		@remarks
+			This method will determine which neighbours need notification and call
+			their neighbourModified method.
+		@param dirtyRect The area of this tile which has changed heights
+		@param lightmapRect The affected lightmap area in this tile (should be
+			calculated already by own update process)
+		*/
+		void notifyNeighbours(const Rect& dirtyRect, const Rect& lightmapRect);
+
+		/** Notify that a neighbour has just finished updating and that this
+			change affects this tile. 
+		@param index The neighbour index (from this tile's perspective)
+		@param edgerect The area at the edge of this tile that needs height / normal
+			recalculation (may be null)
+		@param shadowrect The area on this tile where shadows need recalculating (may be null)
+		*/
+		void neighbourModified(NeighbourIndex index, const Rect& edgerect, const Rect& shadowrect);
+		
+
 
 	protected:
 
@@ -1217,6 +1293,9 @@ namespace Ogre
 		PixelFormat getBlendTextureFormat(uint8 textureIndex, uint8 numLayers);
 
 		void updateDerivedDataImpl(const Rect& rect, bool synchronous, uint8 typeMask);
+
+		void getEdgeRect(NeighbourIndex index, Rect* outRect);
+		void getNeighbourEdgeRect(NeighbourIndex index, const Rect& inRect, Rect* outRect);
 
 		
 
@@ -1341,6 +1420,8 @@ namespace Ogre
 
 		const Camera* mLastLODCamera;
 		unsigned long mLastLODFrame;
+
+		Terrain* mNeighbours[NEIGHBOUR_COUNT];
 
 	};
 

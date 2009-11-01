@@ -68,7 +68,8 @@ public:
 		{
 			// fire ray
 			Ray ray; 
-			ray = mCamera->getCameraToViewportRay(0.5, 0.5);
+			//ray = mCamera->getCameraToViewportRay(0.5, 0.5);
+			ray = mTrayMgr->getCursorRay(mCamera);
 			std::pair<bool, Vector3> rayResult = mTerrain->rayIntersects(ray);
 			if (rayResult.first)
 			{

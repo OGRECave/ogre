@@ -161,6 +161,8 @@ namespace Ogre
 		// the pointer to a long so we support 64-bit pointers
 		Terrain* pTerrain = this;
 		mMaterialName = "OgreTerrain/" + StringConverter::toString(FastHash((const char*)&pTerrain, sizeof(Terrain*)));
+
+		memset(mNeighbours, 0, sizeof(Terrain*) * NEIGHBOUR_COUNT);
 	}
 	//---------------------------------------------------------------------
 	Terrain::~Terrain()
@@ -1577,7 +1579,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::updateGeometry()
 	{
-		if (mDirtyGeometryRect.width() && mDirtyGeometryRect.height())
+		if (!mDirtyGeometryRect.isNull())
 		{
 			mQuadTree->updateVertexData(true, false, mDirtyGeometryRect, false);
 			mDirtyGeometryRect.left = mDirtyGeometryRect.top = 
@@ -1587,7 +1589,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::updateDerivedData(bool synchronous, uint8 typeMask)
 	{
-		if (mDirtyDerivedDataRect.width() && mDirtyDerivedDataRect.height())
+		if (!mDirtyDerivedDataRect.isNull())
 		{
 			if (mDerivedDataUpdateInProgress)
 			{
@@ -2619,6 +2621,8 @@ namespace Ogre
 			// update the composite map if enabled
 			if (mCompositeMapRequired)
 				updateCompositeMap();
+			// also notify neighbours
+			notifyNeighbours(ddreq.dirtyRect, ddres.lightmapUpdateRect);
 		}
 
 	}
@@ -2782,6 +2786,12 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::widenRectByVector(const Vector3& vec, const Rect& inRect, Rect& outRect)
 	{
+		widenRectByVector(vec, inRect, getMinHeight(), getMaxHeight(), outRect);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::widenRectByVector(const Vector3& vec, const Rect& inRect, 
+		Real minHeight, Real maxHeight, Rect& outRect)
+	{
 
 		outRect = inRect;
 
@@ -2789,13 +2799,13 @@ namespace Ogre
 		switch(getAlignment())
 		{
 		case ALIGN_X_Y:
-			p.redefine(Vector3::UNIT_Z, Vector3(0, 0, vec.z < 0.0 ? getMinHeight() : getMaxHeight()));
+			p.redefine(Vector3::UNIT_Z, Vector3(0, 0, vec.z < 0.0 ? minHeight : maxHeight));
 			break;
 		case ALIGN_X_Z:
-			p.redefine(Vector3::UNIT_Y, Vector3(0, vec.y < 0.0 ? getMinHeight() : getMaxHeight(), 0));
+			p.redefine(Vector3::UNIT_Y, Vector3(0, vec.y < 0.0 ? minHeight : maxHeight, 0));
 			break;
 		case ALIGN_Y_Z:
-			p.redefine(Vector3::UNIT_X, Vector3(vec.x < 0.0 ? getMinHeight() : getMaxHeight(), 0, 0));
+			p.redefine(Vector3::UNIT_X, Vector3(vec.x < 0.0 ? minHeight : maxHeight, 0, 0));
 			break;
 		}
 		float verticalVal = vec.dotProduct(p.normal);
@@ -2804,7 +2814,7 @@ namespace Ogre
 			return;
 
 		Vector3 corners[4];
-		Real startHeight = verticalVal < 0.0 ? getMaxHeight() : getMinHeight();
+		Real startHeight = verticalVal < 0.0 ? maxHeight : minHeight;
 		getPoint(inRect.left, inRect.top, startHeight, &corners[0]);
 		getPoint(inRect.right-1, inRect.top, startHeight, &corners[1]);
 		getPoint(inRect.left, inRect.bottom-1, startHeight, &corners[2]);
@@ -2945,7 +2955,7 @@ namespace Ogre
 	void Terrain::updateCompositeMap()
 	{
 		// All done in the render thread
-		if (mCompositeMapRequired && mCompositeMapDirtyRect.width() && mCompositeMapDirtyRect.height())
+		if (mCompositeMapRequired && !mCompositeMapDirtyRect.isNull())
 		{
 			createOrDestroyGPUCompositeMap();
 			if (mCompositeMapDirtyRectLightmapUpdate &&
@@ -3125,8 +3135,181 @@ namespace Ogre
 		}
 
 	}
+	//---------------------------------------------------------------------
+	Terrain* Terrain::getNeighbour(NeighbourIndex index)
+	{
+		return mNeighbours[index];
+	}
+	//---------------------------------------------------------------------
+	void Terrain::setNeighbour(NeighbourIndex index, Terrain* neighbour, bool recalculate /*= false*/)
+	{
+		if (mNeighbours[index] != neighbour)
+		{
+			mNeighbours[index] = neighbour;
+			if (recalculate)
+			{
+				Rect rect;
+				rect.top = 0; rect.bottom = neighbour->getSize();
+				rect.left = 0; rect.right = rect.bottom;
+				neighbourModified(index, rect, rect);
+			}
+		}
+	}
+	//---------------------------------------------------------------------
+	Terrain::NeighbourIndex Terrain::getOppositeNeighbour(NeighbourIndex index)
+	{
+		int intindex = static_cast<int>(index);
+		intindex += NEIGHBOUR_COUNT / 2;
+		intindex = intindex % NEIGHBOUR_COUNT;
+		return static_cast<NeighbourIndex>(intindex);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::notifyNeighbours(const Rect& dirtyRect, const Rect& lightmapRect)
+	{
+		// There are 3 things that can need updating:
+		// Height at edge - match to neighbour (first one to update 'loses' to other since read-only)
+		// Normal at edge - use heights from across boundary too
+		// Shadows across edge
+
+		// The extent to which these can affect the current tile vary:
+		// Height at edge - only affected by a change at the adjoining edge / corner
+		// Normal at edge - only affected by a change to the 2 rows adjoining the edge / corner
+		// Shadows across edge - possible effect extends based on the projection of the
+		//   neighbour AABB along the light direction (worst case scenario)
+
+		for (int i = 0; i < (int)NEIGHBOUR_COUNT; ++i)
+		{
+			NeighbourIndex ni = static_cast<NeighbourIndex>(i);
+			Terrain* neighbour = getNeighbour(ni);
+			if (!neighbour)
+				continue;
+
+			// Intersect the incoming rectangles with the edge regions related to this neighbour
+			Rect edgeRect;
+			getEdgeRect(ni, &edgeRect);
+			Rect heightEdgeRect = edgeRect.intersect(dirtyRect);
+			Rect lightmapEdgeRect = edgeRect.intersect(lightmapRect);
+
+			if (!heightEdgeRect.isNull() || !lightmapRect.isNull())
+			{
+				// ok, we have something valid to pass on
+				Rect neighbourHeightEdgeRect, neighbourLightmapEdgeRect;
+				if (!heightEdgeRect.isNull())
+					getNeighbourEdgeRect(ni, heightEdgeRect, &neighbourHeightEdgeRect);
+				if (!lightmapRect.isNull())
+					getNeighbourEdgeRect(ni, lightmapEdgeRect, &neighbourLightmapEdgeRect);
+
+				neighbour->neighbourModified(getOppositeNeighbour(ni), 
+					neighbourHeightEdgeRect, neighbourLightmapEdgeRect);
+				
+			}
+
+		}
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::neighbourModified(NeighbourIndex index, const Rect& edgerect, const Rect& shadowrect)
+	{
+		// We can safely assume that we would not have been contacted if it wasn't 
+		// important
+
+		const Terrain* neighbour = getNeighbour(index);
+		if (!neighbour)
+			return; // bogus request
 
 
+		if (!edgerect.isNull())
+		{
+			// update edges; match heights first, then calculate normals
+			// TODO
+		}
+
+		if (!shadowrect.isNull())
+		{
+			// update shadows
+			// here we need to widen the rect passed in based on the min/max height 
+			// of the *neighbour*
+			const Vector3& lightVec = TerrainGlobalOptions::getLightMapDirection();
+			Rect widenedRect;
+			widenRectByVector(lightVec, shadowrect, neighbour->getMinHeight(), neighbour->getMaxHeight(), widenedRect);
+
+			// need to pass this on to lightmap calculation, not have it auto-calculated
+			// TODO
+
+
+		}
+
+
+
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getEdgeRect(NeighbourIndex index, Rect* outRect)
+	{
+		// We make the edge rectangle 2 rows / columns at the edge of the tile
+		// 2 because this copes with normal changes and potentially filtered
+		// shadows.
+		// all right / bottom values are exclusive
+		// terrain origin is bottom-left remember so north is highest value
+
+		// set left/right
+		switch(index)
+		{
+		case NEIGHBOUR_EAST:
+		case NEIGHBOUR_NORTHEAST:
+		case NEIGHBOUR_SOUTHEAST:
+			outRect->left = mSize - 2;
+			outRect->right = mSize;
+			break;
+		case NEIGHBOUR_WEST:
+		case NEIGHBOUR_NORTHWEST:
+		case NEIGHBOUR_SOUTHWEST:
+			outRect->left = 0;
+			outRect->right = 2;
+			break;
+		case NEIGHBOUR_NORTH:
+		case NEIGHBOUR_SOUTH: 
+			outRect->left = 0;
+			outRect->right = mSize;
+			break;
+		};
+
+		// set top / bottom
+		switch(index)
+		{
+		case NEIGHBOUR_NORTH:
+		case NEIGHBOUR_NORTHEAST:
+		case NEIGHBOUR_NORTHWEST:
+			outRect->top = mSize - 2;
+			outRect->bottom = mSize;
+			break;
+		case NEIGHBOUR_SOUTH: 
+		case NEIGHBOUR_SOUTHWEST:
+		case NEIGHBOUR_SOUTHEAST:
+			outRect->top = 0;
+			outRect->bottom = 2;
+			break;
+		case NEIGHBOUR_EAST:
+		case NEIGHBOUR_WEST:
+			outRect->top = 0;
+			outRect->bottom = mSize;
+			break;
+		};
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getNeighbourEdgeRect(NeighbourIndex index, const Rect& inRect, Rect* outRect)
+	{
+		assert (mSize == getNeighbour(index)->getSize());
+
+		// Basically just reflect the rect 
+		// remember index is neighbour relationship from OUR perspective so
+		// arrangement is backwards to getEdgeRect
+
+		outRect->left = mSize - inRect.right;
+		outRect->right = mSize = inRect.left;
+		outRect->top = mSize - inRect.bottom;
+		outRect->bottom = mSize = inRect.top;
+	}
 
 
 

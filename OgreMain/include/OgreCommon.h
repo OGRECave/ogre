@@ -529,7 +529,7 @@ namespace Ogre {
         template< typename T > struct TRect
         {
           T left, top, right, bottom;
-          TRect() {}
+          TRect() : left(0), top(0), right(0), bottom(0) {}
           TRect( T const & l, T const & t, T const & r, T const & b )
             : left( l ), top( t ), right( r ), bottom( b )
           {
@@ -554,13 +554,17 @@ namespace Ogre {
           {
             return bottom - top;
           }
+		  bool isNull() const
+		  {
+			  return width() == 0 || height() == 0;
+		  }
 		  TRect & merge(const TRect& rhs)
 		  {
-			  if (width() == 0)
+			  if (isNull())
 			  {
 				  *this = rhs;
 			  }
-			  else
+			  else if (!rhs.isNull())
 			  {
 				  left = std::min(left, rhs.left);
 				  right = std::max(right, rhs.right);
@@ -569,6 +573,31 @@ namespace Ogre {
 			  }
 
 			  return *this;
+
+		  }
+		  TRect intersect(const TRect& rhs) const
+		  {
+			  TRect ret;
+			  if (isNull() || rhs.isNull())
+			  {
+				  // empty
+				  return ret;
+			  }
+			  else
+			  {
+				  ret.left = std::max(left, rhs.left);
+				  ret.right = std::min(right, rhs.right);
+				  ret.top = std::max(top, rhs.top);
+				  ret.bottom = std::min(bottom, rhs.bottom);
+			  }
+
+			  if (ret.left > ret.right || ret.top > ret.bottom)
+			  {
+				  // no intersection, return empty
+				  ret.left = ret.top = ret.right = ret.bottom = 0;
+			  }
+
+			  return ret;
 
 		  }
 
