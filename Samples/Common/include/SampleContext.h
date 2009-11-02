@@ -67,8 +67,7 @@
 #include "macUtils.h"
 #endif
 
-#define OIS_DYNAMIC_LIB
-#include "OIS/OIS.h"
+#include "OIS.h"
 
 namespace OgreBites
 {
