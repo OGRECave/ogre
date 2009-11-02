@@ -138,7 +138,7 @@ namespace RTShader {
 			String val = Ogre::StringConverter::toString(mValue);
 
 			// Make sure that float params have always this representation #.#
-			if(val.find(".") == String.npos)
+			if(val.find(".") == String::npos)
 			{
 				val += ".0";
 			}
