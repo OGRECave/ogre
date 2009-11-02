@@ -111,7 +111,7 @@ namespace Ogre {
 		@param language Code of the language to use (e.g. "cg")
 		@param gptype The type of program to create
 		*/
-		virtual HighLevelGpuProgramPtr createProgram(
+		HighLevelGpuProgramPtr createProgram(
 			const String& name, const String& groupName, 
             const String& language, GpuProgramType gptype);
 
