@@ -411,6 +411,8 @@ compositor HDR
 	// floating point only for now
 	technique
 	{
+		compositor_logic HDR
+		
         // Temporary textures
 		// Fullsize HDR render target, used as tone mapping source
         texture rt_full target_width target_height PF_FLOAT16_RGB
@@ -566,6 +568,8 @@ compositor "Gaussian Blur"
 {
     technique
     {
+		compositor_logic GaussianBlur
+		
         // Temporary textures
         texture rt0 target_width target_height PF_A8R8G8B8
         texture rt1 target_width target_height PF_A8R8G8B8

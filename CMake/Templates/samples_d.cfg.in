@@ -3,6 +3,7 @@ Sample=Sample_BezierPatch_d
 Sample=Sample_BSP_d
 Sample=Sample_CameraTrack_d
 Sample=Sample_CelShading_d
+Sample=Sample_Compositor_d
 Sample=Sample_CubeMapping_d
 Sample=Sample_DeferredShading_d
 Sample=Sample_Dot3Bump_d

@@ -108,6 +108,7 @@ if (OGRE_BUILD_SAMPLES)
   
   add_subdirectory(BezierPatch)
   add_subdirectory(CameraTrack)
+  add_subdirectory(Compositor)
   add_subdirectory(FacialAnimation)
   add_subdirectory(Grass)
   add_subdirectory(Lighting)

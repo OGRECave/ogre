@@ -28,281 +28,231 @@ same license as the rest of the engine.
 
 #include <Ogre.h>
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#define WIN32_LEAN_AND_MEAN
-#include "windows.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-#   include "macUtils.h"
-#endif
-
-
 #include "Compositor.h"
-#include "CompositorDemo_FrameListener.h"
+//#include "CompositorDemo_FrameListener.h"
 #include "HelperLogics.h"
 
 /*************************************************************************
-	                    CompositorDemo Methods
+	                    Sample_Compositor Methods
 *************************************************************************/
-    CompositorDemo::~CompositorDemo()
-    {
-        delete mGUISystem;
-        delete mGUIRenderer;
-        delete mFrameListener;
-
-        delete mRoot;
-#ifdef OGRE_STATIC_LIB
-		mStaticPluginLoader.unload();
-#endif
-
-    }
-
-//--------------------------------------------------------------------------
-    void CompositorDemo::go(void)
-    {
-        if (!setup())
-            return;
-
-        mRoot->startRendering();
-    }
-
-//--------------------------------------------------------------------------
-    bool CompositorDemo::setup(void)
-    {
-		Ogre::String mResourcePath;
-		Ogre::String pluginsPath;
-		// only use plugins.cfg if not static
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-		mResourcePath = Ogre::macBundlePath() + "/Contents/Resources/";
-#endif
-#ifndef OGRE_STATIC_LIB
-		pluginsPath = mResourcePath + "plugins.cfg";
-#endif
-
-		mRoot = new Ogre::Root(pluginsPath,
-			mResourcePath + "ogre.cfg", mResourcePath + "Ogre.log");
-
-#ifdef OGRE_STATIC_LIB
-		mStaticPluginLoader.load();
-#endif
-
-        setupResources();
-        bool carryOn = configure();
-        if (!carryOn) return false;
-
-        chooseSceneManager();
-        createCamera();
-        createViewports();
-
-        // Set default mipmap level (NB some APIs ignore this)
-        Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
-        loadResources();
-
-        // Create the scene
-        createScene();
-
-        createFrameListener();
-
-        // load some GUI stuff for demo.
-        //loadAllMaterialControlFiles(mMaterialControlsContainer);
-
-        return true;
-
-    }
-
-//--------------------------------------------------------------------------
-    bool CompositorDemo::configure(void)
-    {
-        // Show the configuration dialog and initialise the system
-        // You can skip this and use root.restoreConfig() to load configuration
-        // settings if you were sure there are valid ones saved in ogre.cfg
-        if(mRoot->showConfigDialog())
-        {
-            // If returned true, user clicked OK so initialise
-            // Here we choose to let the system create a default rendering window by passing 'true'
-            mWindow = mRoot->initialise(true);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-//--------------------------------------------------------------------------
-    void CompositorDemo::chooseSceneManager(void)
-    {
-        // Get the SceneManager, in this case a generic one
-        mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC, "ExampleSMInstance");
-    }
-
-//--------------------------------------------------------------------------
-    void CompositorDemo::createCamera(void)
-    {
-        // Create the camera
-        mCamera = mSceneMgr->createCamera("PlayerCam");
-
-        // Position it at 500 in Z direction
-        mCamera->setPosition(Ogre::Vector3(0,0,0));
-        // Look back along -Z
-        mCamera->lookAt(Ogre::Vector3(0,0,-300));
-        mCamera->setNearClipDistance(1);
-
-    }
-
-//--------------------------------------------------------------------------
-void CompositorDemo::createViewports(void)
+Sample_Compositor::~Sample_Compositor()
 {
-    // Create one viewport, entire window
-    Ogre::Viewport* vp = mWindow->addViewport(mCamera);
-    vp->setBackgroundColour(Ogre::ColourValue(0,0,0));
-
-    // Alter the camera aspect ratio to match the viewport
-    mCamera->setAspectRatio(
-        Ogre::Real(vp->getActualWidth()) / Ogre::Real(vp->getActualHeight()));
+    //delete mFrameListener;
 }
 
 //--------------------------------------------------------------------------
-    void CompositorDemo::setupResources(void)
-    {
-        // Load resource paths from config file
-        Ogre::ConfigFile cf;
-		
-		#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-                Ogre::String mResourcePath;
-                mResourcePath = Ogre::macBundlePath() + "/Contents/Resources/";
-                cf.load(mResourcePath + "resources.cfg");
-        #else
-		
-			cf.load("resources.cfg");
-		
-		#endif
+void Sample_Compositor::createCamera(void)
+{
+    // Create the camera
+    mCamera = mSceneMgr->createCamera("PlayerCam");
 
-        // Go through all sections & settings in the file
-        Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
+    // Position it at 500 in Z direction
+    mCamera->setPosition(Ogre::Vector3(0,0,0));
+    // Look back along -Z
+    mCamera->lookAt(Ogre::Vector3(0,0,-300));
+    mCamera->setNearClipDistance(1);
 
-        Ogre::String secName, typeName, archName;
-        while (seci.hasMoreElements())
-        {
-            secName = seci.peekNextKey();
-            Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
-            Ogre::ConfigFile::SettingsMultiMap::iterator i;
-            for (i = settings->begin(); i != settings->end(); ++i)
-            {
-                typeName = i->first;
-                archName = i->second;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-                // OS X does not set the working directory relative to the app,
-                // In order to make things portable on OS X we need to provide
-                // the loading with it's own bundle path location
-				if (!Ogre::StringUtil::startsWith(archName, "/", false)) // only adjust relative dirs
-					archName = Ogre::String(Ogre::macBundlePath() + "/" + archName);
-#endif
-                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-                    archName, typeName, secName);
-            }
-        }
+}
 
-        Ogre::LogManager::getSingleton().logMessage( "Resource directories setup" );
-
-    }
+//--------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------------
-	void CompositorDemo::loadResources(void)
+void Sample_Compositor::setupContent(void)
+{
+	static bool firstTime = true;
+	if (firstTime)
 	{
-		// Initialise, parse all scripts etc
-        Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-		
 		// Register the compositor logics
 		// See comment in beginning of HelperLogics.h for explanation
 		Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
 		compMgr.registerCompositorLogic("GaussianBlur", new GaussianBlurLogic);
 		compMgr.registerCompositorLogic("HDR", new HDRLogic);
 		compMgr.registerCompositorLogic("HeatVision", new HeatVisionLogic);
+		firstTime = false;
+	}
+	
+	createTextures();
+    /// Create a couple of hard coded postfilter effects as an example of how to do it
+	/// but the preferred method is to use compositor scripts.
+	createEffects();
+
+	createScene();
+	//createFrameListener();
+
+	registerCompositors();
+	createControls();
+}
+	
+
+void Sample_Compositor::registerCompositors(void)
+{
+	Ogre::Viewport *vp = mViewport;
+    
+    //iterate through Compositor Managers resources and add name keys ast Item selectors to Compositor selector view manager
+    Ogre::CompositorManager::ResourceMapIterator resourceIterator =
+        Ogre::CompositorManager::getSingleton().getResourceIterator();
+
+    // add all compositor resources to the view container
+    while (resourceIterator.hasMoreElements())
+    {
+        Ogre::ResourcePtr resource = resourceIterator.getNext();
+        const Ogre::String& compositorName = resource->getName();
+        // Don't add base Ogre/Scene compositor to view
+        if (compositorName == "Ogre/Scene")
+            continue;
+		// Don't add the deferred shading compositors, thats a different demo.
+		if (Ogre::StringUtil::startsWith(compositorName, "DeferredShading", false))
+			continue;
+
+		mCompositorNames.push_back(compositorName);
+		int addPosition = -1;
+		if (compositorName == "HDR")
+		{
+			// HDR must be first in the chain
+			addPosition = 0;
+		}
+		try 
+		{
+			Ogre::CompositorInstance *instance = Ogre::CompositorManager::getSingleton().addCompositor(vp, compositorName, addPosition);
+			Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, compositorName, false);
+		} catch (...) {
+		}
+    }
+
+	mNumCompositorPages = (mCompositorNames.size() / COMPOSITORS_PER_PAGE) +
+		((mCompositorNames.size() % COMPOSITORS_PER_PAGE == 0) ? 0 : 1);
+}
+
+void Sample_Compositor::changePage(size_t pageNum)
+{
+	assert(pageNum < mNumCompositorPages);
+	
+	mActiveCompositorPage = pageNum;
+	size_t maxCompositorsInPage = mCompositorNames.size() - (pageNum * COMPOSITORS_PER_PAGE);
+	for (size_t i=0; i < COMPOSITORS_PER_PAGE; i++)
+	{
+		String checkBoxName = "Compositor_" + Ogre::StringConverter::toString(i);
+		CheckBox* cb = static_cast<CheckBox*>(mTrayMgr->getWidget(TL_TOPLEFT, checkBoxName));
+		if (i < maxCompositorsInPage)
+		{
+			String compositorName = mCompositorNames[pageNum * COMPOSITORS_PER_PAGE + i];
+			cb->setCaption(compositorName);
+			cb->setChecked(CompositorManager::getSingleton().getCompositorChain(mViewport)
+				->getCompositor(compositorName)->getEnabled(), false);
+			cb->show();
+		}
+		else
+		{
+			cb->hide();
+		}
 	}
 
+	Button* pageButton = static_cast<Button*>(mTrayMgr->getWidget(TL_TOPLEFT, "PageButton"));
+	Ogre::StringStream ss;
+	ss << "Page " << pageNum+1 << " / " << mNumCompositorPages;
+	pageButton->setCaption(ss.str());
+}
+
+void Sample_Compositor::cleanupContent(void)
+{
+	CompositorManager::getSingleton().removeCompositorChain(mViewport);
+}
+void Sample_Compositor::createControls(void) 
+{
+	mTrayMgr->createButton(TL_TOPLEFT, "PageButton", "Page");
+	for (size_t i=0; i < COMPOSITORS_PER_PAGE; i++)
+	{
+		String checkBoxName = "Compositor_" + Ogre::StringConverter::toString(i);
+		CheckBox* cb = mTrayMgr->createCheckBox(TL_TOPLEFT, checkBoxName, "Compositor");
+		cb->hide();
+	}
+	changePage(0);
+	mTrayMgr->showCursor();
+}
 //-----------------------------------------------------------------------------------
-    void CompositorDemo::createScene(void)
-    {
-		mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-		mSceneMgr->setShadowFarDistance(1000);
-        // setup GUI system
-        mGUIRenderer = new CEGUI::OgreCEGUIRenderer(mWindow, Ogre::RENDER_QUEUE_OVERLAY, false, 3000, mSceneMgr);
-        // load scheme and set up defaults
-        mGUISystem = new CEGUI::System(mGUIRenderer, (CEGUI::ResourceProvider *)0, (CEGUI::XMLParser*)0,
-            (CEGUI::ScriptModule*)0, (CEGUI::utf8*)"CompositorDemoCegui.config");
-        CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
-
-		Ogre::MovableObject::setDefaultVisibilityFlags(0x00000001);
-
-		// Set ambient light
-		mSceneMgr->setAmbientLight(Ogre::ColourValue(0.3, 0.3, 0.2));
-
-		Ogre::Light* l = mSceneMgr->createLight("Light2");
-		Ogre::Vector3 dir(-1,-1,0);
-		dir.normalise();
-		l->setType(Ogre::Light::LT_DIRECTIONAL);
-		l->setDirection(dir);
-		l->setDiffuseColour(1, 1, 0.8);
-		l->setSpecularColour(1, 1, 1);
-
-
-		Ogre::Entity* pEnt;
-
-		// House
-		pEnt = mSceneMgr->createEntity( "1", "tudorhouse.mesh" );
-		Ogre::SceneNode* n1 = mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(350, 450, -200));
-		n1->attachObject( pEnt );
-
-		pEnt = mSceneMgr->createEntity( "2", "tudorhouse.mesh" );
-		Ogre::SceneNode* n2 = mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(-350, 450, -200));
-		n2->attachObject( pEnt );
-
-		pEnt = mSceneMgr->createEntity( "3", "knot.mesh" );
-		mSpinny = mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0, 0, 300));
-		mSpinny->attachObject( pEnt );
-		pEnt->setMaterialName("Examples/MorningCubeMap");
-
-		mSceneMgr->setSkyBox(true, "Examples/MorningSkyBox");
-
-
-		Ogre::Plane plane;
-		plane.normal = Ogre::Vector3::UNIT_Y;
-		plane.d = 100;
-		Ogre::MeshManager::getSingleton().createPlane("Myplane",
-			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
-			1500, 1500, 10, 10, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
-		Ogre::Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
-		pPlaneEnt->setMaterialName("Examples/Rockwall");
-		pPlaneEnt->setCastShadows(false);
-		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
-
-		mCamera->setPosition(-400, 50, 900);
-		mCamera->lookAt(0,80,0);
-		
-		createTextures();
-
-        connectEventHandlers();
-		/// Create a couple of hard coded postfilter effects as an example of how to do it
-		/// but the preferred method is to use compositor scripts.
-		createEffects();
-    }
+void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
+{
+	if (Ogre::StringUtil::startsWith(box->getName(), "Compositor_", false))
+	{
+		String compositorName = box->getCaption();
+		Ogre::CompositorManager::getSingleton().setCompositorEnabled(mViewport, compositorName, box->isChecked());
+	}
+}
 //-----------------------------------------------------------------------------------
-    void CompositorDemo::createFrameListener(void)
-    {
-        mFrameListener = new CompositorDemo_FrameListener(this);
-		mFrameListener->setSpinningNode(mSpinny);
+void Sample_Compositor::buttonHit(OgreBites::Button* button)
+{
+	size_t nextPage = (mActiveCompositorPage + 1) % mNumCompositorPages;
+	changePage(nextPage);
+}
+//-----------------------------------------------------------------------------------
+void Sample_Compositor::createScene(void)
+{
+	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+	mSceneMgr->setShadowFarDistance(1000);
+    
+	Ogre::MovableObject::setDefaultVisibilityFlags(0x00000001);
 
-    }
-//--------------------------------------------------------------------------
-    void CompositorDemo::connectEventHandlers(void)
-    {
-        CEGUI::WindowManager::getSingleton().getWindow("ExitDemoBtn")->
-            subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&CompositorDemo::handleQuit, this));
-    }
+	// Set ambient light
+	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.3, 0.3, 0.2));
 
+	Ogre::Light* l = mSceneMgr->createLight("Light2");
+	Ogre::Vector3 dir(-1,-1,0);
+	dir.normalise();
+	l->setType(Ogre::Light::LT_DIRECTIONAL);
+	l->setDirection(dir);
+	l->setDiffuseColour(1, 1, 0.8);
+	l->setSpecularColour(1, 1, 1);
+
+
+	Ogre::Entity* pEnt;
+
+	// House
+	pEnt = mSceneMgr->createEntity( "1", "tudorhouse.mesh" );
+	Ogre::SceneNode* n1 = mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(350, 450, -200));
+	n1->attachObject( pEnt );
+
+	pEnt = mSceneMgr->createEntity( "2", "tudorhouse.mesh" );
+	Ogre::SceneNode* n2 = mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(-350, 450, -200));
+	n2->attachObject( pEnt );
+
+	pEnt = mSceneMgr->createEntity( "3", "knot.mesh" );
+	mSpinny = mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(0, 0, 300));
+	mSpinny->attachObject( pEnt );
+	pEnt->setMaterialName("Examples/MorningCubeMap");
+
+	mSceneMgr->setSkyBox(true, "Examples/MorningSkyBox");
+
+
+	Ogre::Plane plane;
+	plane.normal = Ogre::Vector3::UNIT_Y;
+	plane.d = 100;
+	Ogre::MeshManager::getSingleton().createPlane("Myplane",
+		Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+		1500, 1500, 10, 10, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
+	Ogre::Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+	pPlaneEnt->setMaterialName("Examples/Rockwall");
+	pPlaneEnt->setCastShadows(false);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
+
+	mCamera->setPosition(-400, 50, 900);
+	mCamera->lookAt(0,80,0);
+}
+//-----------------------------------------------------------------------------------
+//void Sample_Compositor::createFrameListener(void)
+//{
+//    mFrameListener = new CompositorDemo_FrameListener(this);
+//	mFrameListener->setSpinningNode(mSpinny);
+
+//}
+
+bool Sample_Compositor::frameRenderingQueued(const FrameEvent& evt)
+{
+	mSpinny->yaw(Ogre::Degree(10 * evt.timeSinceLastFrame));
+	return SdkSample::frameRenderingQueued(evt);
+}
 //-----------------------------------------------------------------------------------
 	/// Create the hard coded postfilter effects
-	void CompositorDemo::createEffects(void)
+	void Sample_Compositor::createEffects(void)
 	{
 	    // Bloom compositor is loaded from script but here is the hard coded equivalent
 //		CompositorPtr comp = CompositorManager::getSingleton().create(
@@ -507,7 +457,7 @@ void CompositorDemo::createViewports(void)
 	}
 	
 //--------------------------------------------------------------------------
-	void CompositorDemo::createTextures(void)
+	void Sample_Compositor::createTextures(void)
 	{
 		using namespace Ogre;
 
@@ -580,40 +530,22 @@ void CompositorDemo::createViewports(void)
 		ptr2->unlock();
 	}
 //--------------------------------------------------------------------------
-    bool CompositorDemo::handleQuit(const CEGUI::EventArgs& e)
-    {
-        mRoot->queueEndRendering();
-        return true;
-    }
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+SamplePlugin* sp;
+Sample* s;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-	INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
-	int main(int argc, char *argv[])
-#endif
+extern "C" _OgreSampleExport void dllStartPlugin()
 {
-   // Create application object
-    CompositorDemo app;
-
-    try {
-        app.go();
-    } catch( Ogre::Exception& e ) {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
-#else
-        std::cerr << "An exception has occured: " << e.getFullDescription();
-#endif
-    }
-
-
-    return 0;
+	s = new Sample_Compositor;
+	sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
+	sp->addSample(s);
+	Root::getSingleton().installPlugin(sp);
 }
 
-#ifdef __cplusplus
+extern "C" _OgreSampleExport void dllStopPlugin()
+{
+	Root::getSingleton().uninstallPlugin(sp); 
+	OGRE_DELETE sp;
+	delete s;
 }
-#endif

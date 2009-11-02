@@ -11,29 +11,30 @@
 
 set(HEADER_FILES 
   include/Compositor.h
-  include/CompositorDemo_FrameListener.h
-  include/ItemSelectorViewManager.h
   include/HelperLogics.h
 )
 
 set(SOURCE_FILES 
   src/Compositor.cpp
-  src/CompositorDemo_FrameListener.cpp
-  src/ItemSelectorViewManager.cpp
   src/HelperLogics.cpp
 )
 
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Compositor.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-endif ()
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/CEGUIRenderer/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_executable(Demo_Compositor WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+add_library(Sample_Compositor ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Demo_Compositor ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${CEGUI_LIBRARIES} ${OGRE_CEGUIRenderer_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample_exe(Demo_Compositor)
+target_link_libraries(Sample_Compositor ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+ogre_config_sample_lib(Sample_Compositor)
 
-if (SAMPLE_DEPENDENCIES)
-  add_dependencies(Demo_Compositor ${SAMPLE_DEPENDENCIES})
-endif ()
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Samples can be installed in the application package
+    set_target_properties(Sample_Compositor
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
+
+if (OGRE_STATIC)
+  add_dependencies(SampleBrowser Sample_Compositor)
+else ()
+  add_dependencies(Sample_Compositor SampleBrowser)
+endif (OGRE_STATIC)
