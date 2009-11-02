@@ -327,9 +327,12 @@ namespace Ogre
 		ZoneIterator getZoneIterator(void) {return ZoneIterator(mZones.begin(), mZones.end());}
 
 		// clear portal update flag from all zones 
-		void _clearAllZonesPortalUpdateFlag(void);   
+		void _clearAllZonesPortalUpdateFlag(void);
 
-    protected:
+		/// See SceneManager::prepareShadowTextures.
+		virtual void prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList = 0);
+
+	protected:
 		// type of default zone to be used
 		String mDefaultZoneTypeName;
 
@@ -377,8 +380,6 @@ namespace Ogre
 		virtual void ensureShadowTexturesCreated();
 		/// Internal method for destroying shadow textures (texture-based shadows)
 		virtual void destroyShadowTextures(void);
-		/// Internal method for preparing shadow textures ready for use in a regular render
-		virtual void prepareShadowTextures(Camera* cam, Viewport* vp);
 		/// Internal method for firing the pre caster texture shadows event
 		virtual void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
     };

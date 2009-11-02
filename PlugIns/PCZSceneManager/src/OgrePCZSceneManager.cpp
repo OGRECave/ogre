@@ -1093,12 +1093,6 @@ namespace Ogre
 		SceneManager::destroyShadowTextures();
 	}
 	//---------------------------------------------------------------------
-	void PCZSceneManager::prepareShadowTextures(Camera* cam, Viewport* vp)
-	{
-		mActiveCameraZone = ((PCZSceneNode*)cam->getParentSceneNode())->getHomeZone();
-		SceneManager::prepareShadowTextures(cam, vp);
-	}
-	//---------------------------------------------------------------------
 	void PCZSceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration)
 	{
 		PCZSceneNode* camNode = (PCZSceneNode*)camera->getParentSceneNode();
@@ -1455,7 +1449,13 @@ namespace Ogre
 			zoneIterator++;
 		}
 	}
-
+	//---------------------------------------------------------------------
+	/// See SceneManager::prepareShadowTextures.
+	void PCZSceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList)
+	{
+		mActiveCameraZone = ((PCZSceneNode*)cam->getParentSceneNode())->getHomeZone();
+		SceneManager::prepareShadowTextures(cam, vp);
+	}
 
     //-----------------------------------------------------------------------
     const String PCZSceneManagerFactory::FACTORY_TYPE_NAME = "PCZSceneManager";
