@@ -420,9 +420,6 @@ protected:
 		*/
 		RenderState*		getRenderState					(unsigned short passIndex);
 
-		/** Get custom render state list. */
-		const RenderStateList&	getCustomRenderStateList	() const { return mCustomRenderStates; }
-
 		static String	UserKey;					// Key name for associating with a Technique instance.
 
 	protected:

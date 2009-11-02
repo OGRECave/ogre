@@ -52,12 +52,6 @@ class Program : public RTShaderSystemAlloc
 
 // Interface.
 public:	
-	/** Get the name of this program. */
-	const String&				getName						() const;
-
-	/** Get the description of this program. */
-	const String&				getDescription				() const;
-
 	/** Get the type of this program. */
 	GpuProgramType				getType						() const;
 
@@ -151,11 +145,9 @@ public:
 protected:
 
 	/** Class constructor.
-	@param name The name of this program.
-	@param desc The description of this program.
 	@param type The type of this program.
 	*/
-	Program			(const String& name, const String& desc, GpuProgramType type);
+	Program			(GpuProgramType type);
 
 	/** Class destructor */
 	~Program		();
@@ -175,8 +167,6 @@ protected:
 
 // Attributes.
 protected:
-	String							mName;						// Program name.
-	String							mDescription;				// Program description.
 	GpuProgramType					mType;						// Program type. (Vertex, Fragment, Geometry).
 	ShaderParameterList				mParameters;				// Program global parameters.	
 	ShaderFunctionList				mFunctions;					// Function list.

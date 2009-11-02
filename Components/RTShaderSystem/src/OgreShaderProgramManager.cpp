@@ -61,7 +61,8 @@ ProgramManager& ProgramManager::getSingleton()
 //-----------------------------------------------------------------------------
 ProgramManager::ProgramManager()
 {
-	
+	mVertexShaderCount   = 0;
+	mFragmentShaderCount = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -129,13 +130,15 @@ void ProgramManager::destroyProgramSets()
 //-----------------------------------------------------------------------------
 void ProgramManager::destroyPrograms()
 {
-	NameToProgramIterator it;
+	ProgramListIterator it    = mCpuProgramsList.begin();
+	ProgramListIterator itEnd = mCpuProgramsList.end();
 
-	for (it=mNameToProgramMap.begin(); it != mNameToProgramMap.end(); ++it)
+
+	for (; it != itEnd; ++it)
 	{
-		OGRE_DELETE it->second;
+		OGRE_DELETE *it;
 	}
-	mNameToProgramMap.clear();
+	mCpuProgramsList.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -155,48 +158,31 @@ void ProgramManager::destroyProgramsWriters()
 }
 
 //-----------------------------------------------------------------------------
-Program* ProgramManager::createCpuProgram(const String& name, const String& desc, GpuProgramType type)
+Program* ProgramManager::createCpuProgram(GpuProgramType type)
 {
-	Program* shaderProgram; 
-
-	shaderProgram = getCpuProgram(name);
-	if (shaderProgram != NULL)
-	{
-		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-			"Shader program named " + name + " already exists !!", 
-			"ProgramManager::createCpuProgram" );		
-	}
 	
-	shaderProgram = OGRE_NEW Program(name, desc, type);
-	mNameToProgramMap[name] = shaderProgram;
+	Program* shaderProgram = OGRE_NEW Program(type);
+
+	mCpuProgramsList.push_back(shaderProgram);
 
 	return shaderProgram;
 }
 
-//-----------------------------------------------------------------------------
-Program* ProgramManager::getCpuProgram(const String& name)
-{
-	NameToProgramIterator itFind = mNameToProgramMap.find(name);
-
-	if (itFind != mNameToProgramMap.end())
-	{
-		return itFind->second;
-	}
-	
-	return NULL;
-}
 
 //-----------------------------------------------------------------------------
-bool ProgramManager::destroyCpuProgram(const String& name)
+bool ProgramManager::destroyCpuProgram(Program* shaderProgram)
 {
-	NameToProgramIterator itFind = mNameToProgramMap.find(name);
+	ProgramListIterator it    = mCpuProgramsList.begin();
+	ProgramListIterator itEnd = mCpuProgramsList.end();
 
-	if (itFind != mNameToProgramMap.end())
+	for (; it != itEnd; ++it)
 	{
-		OGRE_DELETE itFind->second;
-		mNameToProgramMap.erase(itFind);
-
-		return true;
+		if (*it == shaderProgram)
+		{			
+			OGRE_DELETE *it;			
+			mCpuProgramsList.erase(it);
+			return true;			
+		}		
 	}
 
 	return false;
@@ -240,149 +226,202 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 											   const String& profiles,
 											   const String& cachePath)
 {
-	const String  programFileName = cachePath + shaderProgram->getName() + "." + language;	
-	std::ifstream programFile;
-	bool		  writeFile = true;
 
-	
-	// Check if program file already exists.
-	programFile.open(programFileName.c_str());
-	
-	// Case no matching file found -> we have to write it.
-	if (!programFile)
+	// Grab the matching writer.
+	NameToProgramWriterIterator itWriter = mNameToProgramWritersMap.find(language);
+	ProgramWriter* programWriter = NULL;
+
+
+	// No writer found -> create new one.
+	if (itWriter == mNameToProgramWritersMap.end())
 	{
-		writeFile = true;
+		programWriter = OGRE_NEW ProgramWriter(language);
+		mNameToProgramWritersMap[language] = programWriter;
 	}
 	else
 	{
-		writeFile = false;
-		programFile.close();
+		programWriter = itWriter->second;
 	}
 
+	std::stringstream sourceCodeStringStream;
+	_StringHash stringHash;
+	uint32 programHashCode;
+	String programName;
 
-	// Case we have to write the program to a file.
-	if (writeFile)
+	// Generate source code.
+	programWriter->writeSourceCode(sourceCodeStringStream, shaderProgram);	
+
+	// Generate program hash code.
+	programHashCode = static_cast<uint32>(stringHash(sourceCodeStringStream.str()));
+
+	// Generate program name.
+	programName = StringConverter::toString(programHashCode);
+	
+	if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
 	{
-		// Generate source code.
-		NameToProgramWriterIterator itWriter = mNameToProgramWritersMap.find(language);
-		ProgramWriter* programWriter = NULL;
+		programName += "_VS";
+	}
+	else if (shaderProgram->getType() == GPT_FRAGMENT_PROGRAM)
+	{
+		programName += "_FS";
+	}
+
+	HighLevelGpuProgramPtr pGpuProgram;
+
+	// Try to get program by name.
+	pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
+
+	// Case the program doesn't exist yet.
+	if (pGpuProgram.isNull())
+	{
+		const String  programFileName = cachePath + programName + "." + language;	
+		std::ifstream programFile;
+		bool		  writeFile = true;
 
 
-		// No writer found -> create new one.
-		if (itWriter == mNameToProgramWritersMap.end())
+		// Check if program file already exist.
+		programFile.open(programFileName.c_str());
+
+		// Case no matching file found -> we have to write it.
+		if (!programFile)
 		{
-			programWriter = OGRE_NEW ProgramWriter(language);
-			mNameToProgramWritersMap[language] = programWriter;
+			writeFile = true;
 		}
 		else
 		{
-			programWriter = itWriter->second;
+			writeFile = false;
+			programFile.close();
 		}
 
-		std::ofstream outFile(programFileName.c_str());
-
-		if (!outFile)
-			return GpuProgramPtr();
-
-		programWriter->writeSourceCode(outFile, shaderProgram);		
-		outFile.close();
-	}
-
-
-
-	// Create new GPU program.
-	HighLevelGpuProgramPtr pGpuProgram = HighLevelGpuProgramManager::getSingleton().createProgram(shaderProgram->getName(),
-		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, language, shaderProgram->getType());
-
-
-	pGpuProgram->setSourceFile(programFileName);
-	pGpuProgram->setParameter("entry_point", shaderProgram->getEntryPointFunction()->getName());
-	pGpuProgram->setParameter("target", profiles);
-	pGpuProgram->setParameter("profiles", profiles);
-
-
-	GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
-	const ShaderParameterList& progParams = shaderProgram->getParameters();
-	ShaderParameterConstIterator itParams;
-
-	// Case an error occurred.
-	if (pGpuProgram->hasCompileError())
-	{
-		pGpuProgram.setNull();
-		return GpuProgramPtr(pGpuProgram);
-	}
-
-	// Bind auto parameters.
-	for (itParams=progParams.begin(); itParams != progParams.end(); ++itParams)
-	{
-		const ParameterPtr pCurParam = *itParams;
-		const GpuConstantDefinition* gpuConstDef = pGpuParams->_findNamedConstantDefinition(pCurParam->getName());
-		
-
-		if (pCurParam->isAutoConstantParameter())
+		// Case we have to write the program to a file.
+		if (writeFile)
 		{
-			if (pCurParam->isAutoConstantRealParameter())
-			{
-				if (gpuConstDef != NULL)
-				{
-					pGpuParams->setNamedAutoConstantReal(pCurParam->getName(), 
-						pCurParam->getAutoConstantType(), 
-						pCurParam->getAutoConstantRealData());
-				}	
-				else
-				{
-					LogManager::getSingleton().stream() << "RTShader::ProgramManager: Can not bind auto param named " << 
-						pCurParam->getName() << " to program named " << shaderProgram->getName();
-				}
-			}
-			else if (pCurParam->isAutoConstantIntParameter())
-			{
-				if (gpuConstDef != NULL)
-				{
-					pGpuParams->setNamedAutoConstant(pCurParam->getName(), 
-						pCurParam->getAutoConstantType(), 
-						pCurParam->getAutoConstantIntData());
-				}
-				else
-				{
-					LogManager::getSingleton().stream() << "RTShader::ProgramManager: Can not bind auto param named " << 
-						pCurParam->getName() << " to program named " << shaderProgram->getName();
-				}
-			}						
+			std::ofstream outFile(programFileName.c_str());
+
+			if (!outFile)
+				return GpuProgramPtr();
+
+			outFile << sourceCodeStringStream.str();
+			outFile.close();
 		}
-		else
+
+
+
+		// Create new GPU program.
+		pGpuProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, language, shaderProgram->getType());
+
+
+		pGpuProgram->setSourceFile(programFileName);
+		pGpuProgram->setParameter("entry_point", shaderProgram->getEntryPointFunction()->getName());
+		pGpuProgram->setParameter("target", profiles);
+		pGpuProgram->setParameter("profiles", profiles);
+
+
+		GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
+		const ShaderParameterList& progParams = shaderProgram->getParameters();
+		ShaderParameterConstIterator itParams;
+
+		// Case an error occurred.
+		if (pGpuProgram->hasCompileError())
 		{
-			// No auto constant - we have to update its variability ourself.
-			if (gpuConstDef != NULL)
+			pGpuProgram.setNull();
+			return GpuProgramPtr(pGpuProgram);
+		}
+
+		// Bind auto parameters.
+		for (itParams=progParams.begin(); itParams != progParams.end(); ++itParams)
+		{
+			const ParameterPtr pCurParam = *itParams;
+			const GpuConstantDefinition* gpuConstDef = pGpuParams->_findNamedConstantDefinition(pCurParam->getName());
+
+
+			if (pCurParam->isAutoConstantParameter())
 			{
-				gpuConstDef->variability |= pCurParam->getVariability();
-				
-				// Update variability in the float map.
-				if (gpuConstDef->isSampler() == false)
+				if (pCurParam->isAutoConstantRealParameter())
 				{
-					GpuLogicalBufferStructPtr floatLogical = pGpuParams->getFloatLogicalBufferStruct();
-					if (floatLogical.get())
+					if (gpuConstDef != NULL)
 					{
-						for (GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin(); i != floatLogical->map.end(); ++i)
+						pGpuParams->setNamedAutoConstantReal(pCurParam->getName(), 
+							pCurParam->getAutoConstantType(), 
+							pCurParam->getAutoConstantRealData());
+					}	
+					else
+					{
+						LogManager::getSingleton().stream() << "RTShader::ProgramManager: Can not bind auto param named " << 
+							pCurParam->getName() << " to program named " << pGpuProgram->getName();
+					}
+				}
+				else if (pCurParam->isAutoConstantIntParameter())
+				{
+					if (gpuConstDef != NULL)
+					{
+						pGpuParams->setNamedAutoConstant(pCurParam->getName(), 
+							pCurParam->getAutoConstantType(), 
+							pCurParam->getAutoConstantIntData());
+					}
+					else
+					{
+						LogManager::getSingleton().stream() << "RTShader::ProgramManager: Can not bind auto param named " << 
+							pCurParam->getName() << " to program named " << pGpuProgram->getName();
+					}
+				}						
+			}
+			else
+			{
+				// No auto constant - we have to update its variability ourself.
+				if (gpuConstDef != NULL)
+				{
+					gpuConstDef->variability |= pCurParam->getVariability();
+
+					// Update variability in the float map.
+					if (gpuConstDef->isSampler() == false)
+					{
+						GpuLogicalBufferStructPtr floatLogical = pGpuParams->getFloatLogicalBufferStruct();
+						if (floatLogical.get())
 						{
-							if (i->second.physicalIndex == gpuConstDef->physicalIndex)
+							for (GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin(); i != floatLogical->map.end(); ++i)
 							{
-								i->second.variability |= gpuConstDef->variability;
-								break;
+								if (i->second.physicalIndex == gpuConstDef->physicalIndex)
+								{
+									i->second.variability |= gpuConstDef->variability;
+									break;
+								}
 							}
 						}
-					}
-				}							
+					}							
+				}
 			}
 		}
+
+		if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
+		{
+			mVertexShaderCount++;
+		}
+		else if (shaderProgram->getType() == GPT_FRAGMENT_PROGRAM)
+		{
+			mFragmentShaderCount++;
+		}
 	}
+	
 
 	return GpuProgramPtr(pGpuProgram);
 }
 
 //-----------------------------------------------------------------------------
-void ProgramManager::destroyGpuProgram(const String& name)
+void ProgramManager::destroyGpuProgram(const String& name, GpuProgramType type)
 {	
+	if (type == GPT_VERTEX_PROGRAM)
+	{
+		assert(mVertexShaderCount > 0);
+		mVertexShaderCount--;
+	}
+	else if (type == GPT_FRAGMENT_PROGRAM)
+	{
+		assert(mFragmentShaderCount > 0);
+		mFragmentShaderCount--;
+	}
+
 	HighLevelGpuProgramManager::getSingleton().remove(name);
 }
 

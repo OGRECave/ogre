@@ -242,8 +242,8 @@ bool RenderState::createCpuPrograms(ProgramSet* programSet)
 	sortSubRenderStates();
 
 	const String baseName = StringConverter::toString(getHashCode());
-	Program* vsProgram = ProgramManager::getSingleton().createCpuProgram(baseName + "_VS", "Vertex Shader Program", GPT_VERTEX_PROGRAM);
-	Program* psProgram = ProgramManager::getSingleton().createCpuProgram(baseName + "_PS", "Fragment Shader Program", GPT_FRAGMENT_PROGRAM);
+	Program* vsProgram = ProgramManager::getSingleton().createCpuProgram(GPT_VERTEX_PROGRAM);
+	Program* psProgram = ProgramManager::getSingleton().createCpuProgram(GPT_FRAGMENT_PROGRAM);
 	RTShader::Function* vsMainFunc = NULL;
 
 

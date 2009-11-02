@@ -395,6 +395,9 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void finalizeRTShaderSystem()
 		{
+			// Restore default scheme.
+			Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
+
 			// Unregister the material manager listener.
 			if (mMaterialMgrListener != NULL)
 			{			

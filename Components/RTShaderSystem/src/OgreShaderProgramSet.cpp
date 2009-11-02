@@ -27,6 +27,7 @@ THE SOFTWARE.
 
 #include "OgreShaderProgramSet.h"
 #include "OgreShaderProgramManager.h"
+#include "OgreResourceGroupManager.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -42,25 +43,33 @@ ProgramSet::~ProgramSet()
 {
 	if (mVSCpuProgram != NULL)
 	{
-		ProgramManager::getSingleton().destroyCpuProgram(mVSCpuProgram->getName());
+		ProgramManager::getSingleton().destroyCpuProgram(mVSCpuProgram);
 		mVSCpuProgram = NULL;
 	}
 
 	if (mPSCpuProgram != NULL)
 	{
-		ProgramManager::getSingleton().destroyCpuProgram(mPSCpuProgram->getName());
+		ProgramManager::getSingleton().destroyCpuProgram(mPSCpuProgram);
 		mPSCpuProgram = NULL;
 	}
 
 	if (mVSGpuProgram.get() != NULL)
 	{
-		ProgramManager::getSingleton().destroyGpuProgram(mVSGpuProgram->getName());
+		// Destroy only when this set is the last one that uses this GPU program.
+		if (mVSGpuProgram.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+		{
+			ProgramManager::getSingleton().destroyGpuProgram(mVSGpuProgram->getName(), mVSGpuProgram->getType());
+		}		
 		mVSGpuProgram.setNull();
 	}
 
 	if (mPSGpuProgram.get() != NULL)
 	{
-		ProgramManager::getSingleton().destroyGpuProgram(mPSGpuProgram->getName());		
+		// Destroy only when this set is the last one that uses this GPU program.
+		if (mPSGpuProgram.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+		{
+			ProgramManager::getSingleton().destroyGpuProgram(mPSGpuProgram->getName(), mPSGpuProgram->getType());
+		}			
 		mPSGpuProgram.setNull();
 	}
 }

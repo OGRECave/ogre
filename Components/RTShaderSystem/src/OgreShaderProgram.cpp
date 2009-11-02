@@ -32,10 +32,8 @@ namespace Ogre {
 namespace RTShader {
 
 //-----------------------------------------------------------------------------
-Program::Program(const String& name, const String& desc, GpuProgramType type)
+Program::Program(GpuProgramType type)
 {
-	mName				= name;
-	mDescription		= desc;
 	mType				= type;
 	mEntryPointFunction = NULL;
 }
@@ -70,18 +68,6 @@ void Program::destroyFunctions()
 }
 
 //-----------------------------------------------------------------------------
-const String& Program::getName() const
-{
-	return mName;
-}
-
-//-----------------------------------------------------------------------------
-const String& Program::getDescription() const
-{
-	return mDescription;
-}
-
-//-----------------------------------------------------------------------------
 GpuProgramType Program::getType() const
 {
 	return mType;
@@ -93,7 +79,7 @@ void Program::addParameter(ParameterPtr parameter)
 	if (getParameterByName(parameter->getName()).get() != NULL)
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-			"Parameter <" + parameter->getName() + "> already declared in program <" + getName() +">", 
+			"Parameter <" + parameter->getName() + "> already declared in program.", 
 			"Program::addParameter" );
 	}
 
@@ -265,7 +251,7 @@ Function* Program::createFunction(const String& name, const String& desc)
 	if (shaderFunction != NULL)
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-			"Function " + name + " already declared in program " + getName(), 
+			"Function " + name + " already declared in program.", 
 			"Program::createFunction" );
 	}
 

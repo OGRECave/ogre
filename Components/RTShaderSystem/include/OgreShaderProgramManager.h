@@ -103,8 +103,8 @@ protected:
 	typedef ProgramSetMap::const_iterator				ProgramSetConstIterator;
 
 	//-----------------------------------------------------------------------------
-	typedef map<String, Program*>::type					NameToProgramMap;
-	typedef NameToProgramMap::iterator					NameToProgramIterator;
+	typedef vector<Program*>::type						ProgramList;
+	typedef ProgramList::iterator						ProgramListIterator;
 	typedef map<String, ProgramWriter*>::type			NameToProgramWriterMap;
 	typedef NameToProgramWriterMap::iterator			NameToProgramWriterIterator;
 
@@ -120,22 +120,15 @@ protected:
 	/** Destroy all program writers. */
 	void			destroyProgramsWriters	();
 
-	/** Create CPU program . 
-	@param name The name of the program to create.
-	@param desc The description of the program to create.
+	/** Create CPU program . 	
 	@param type The type of the program to create.
 	*/
-	Program*		createCpuProgram		(const String& name, const String& desc, GpuProgramType type);
-
-	/** Get a CPU program by name. Return NULL if no matching program found.
-	@param name The name of the program to get.
-	*/
-	Program*		getCpuProgram			(const String& name);
+	Program*		createCpuProgram		(GpuProgramType type);
 
 	/** Destroy a CPU program by name.
-	@param name The name of the program to destroy.
+	@param shaderProgram The CPU program instance to destroy.
 	*/
-	bool			destroyCpuProgram		(const String& name);
+	bool			destroyCpuProgram		(Program* shaderProgram);
 
 	/** Create GPU programs for the given program set based on the CPU programs it contains.
 	@param programSet The program set container.
@@ -155,16 +148,25 @@ protected:
 
 	/** Destroy a GPU program by name.
 	@param name The name of the program to destroy.
+	@param type The type of the program to destroy.
 	*/
-	void			destroyGpuProgram		(const String& name);
+	void			destroyGpuProgram		(const String& name, GpuProgramType type);
 	
 	/** Return the current number of program set. */
 	size_t			getProgramSetCount		() const { return mHashToProgramSetMap.size(); }
 
+	/** Return the number of created vertex shaders. */
+	size_t			getVertexShaderCount		() const { return mVertexShaderCount; }
+
+	/** Return the number of created fragment shaders. */
+	size_t			getFragmentShaderCount		() const { return mFragmentShaderCount; }
+
 protected:
-	NameToProgramMap			mNameToProgramMap;				// Map between a name and shader program.					
+	ProgramList					mCpuProgramsList;				// CPU programs list.					
 	NameToProgramWriterMap		mNameToProgramWritersMap;		// Map between a name and shader program writer.					
 	ProgramSetMap				mHashToProgramSetMap;			// Map between hash code of render state to program set.
+	size_t						mVertexShaderCount;				// Vertex shader count.
+	size_t						mFragmentShaderCount;			// Fragment shader count.
 
 
 private:

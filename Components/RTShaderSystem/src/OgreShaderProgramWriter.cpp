@@ -154,8 +154,6 @@ void ProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 void ProgramWriter::writeProgramTitle(std::ostream& os, Program* program)
 {
 	os << "//-----------------------------------------------------------------------------" << std::endl;
-	os << "// Program Name: " <<  program->getName() << std::endl;
-	os << "// Program Desc: " <<  program->getDescription() << std::endl;
 	os << "// Program Type: ";
 	switch(program->getType())
 	{

@@ -864,17 +864,13 @@ void ShaderGenerator::serializePassAttributes(MaterialSerializer* ser, SGPass* p
 //-----------------------------------------------------------------------------
 size_t ShaderGenerator::getVertexShaderCount() const
 {
-	// Each programs set contains 1 vertex shader and 1 fragment shader.
-	// Future implementation may hold different count for each type.
-	return mProgramManager->getProgramSetCount();
+	return mProgramManager->getVertexShaderCount();
 }
 
 //-----------------------------------------------------------------------------
 size_t ShaderGenerator::getFragmentShaderCount() const
 {
-	// Each programs set contains 1 vertex shader and 1 fragment shader.
-	// Future implementation may hold different count for each type.
-	return mProgramManager->getProgramSetCount();
+	return mProgramManager->getFragmentShaderCount();
 }
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGPass::SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPass)
