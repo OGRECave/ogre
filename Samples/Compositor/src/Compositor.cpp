@@ -189,7 +189,7 @@ void Sample_Compositor::changePage(size_t pageNum)
 		}
 	}
 
-	Button* pageButton = static_cast<Button*>(mTrayMgr->getWidget(TL_TOPLEFT, "PageButton"));
+	OgreBites::Button* pageButton = static_cast<OgreBites::Button*>(mTrayMgr->getWidget(TL_TOPLEFT, "PageButton"));
 	Ogre::StringStream ss;
 	ss << "Page " << pageNum+1 << " / " << mNumCompositorPages;
 	pageButton->setCaption(ss.str());
