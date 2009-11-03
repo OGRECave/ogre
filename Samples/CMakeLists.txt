@@ -137,6 +137,7 @@ if (NOT OGRE_BUILD_RENDERSYSTEM_GLES)
   add_subdirectory(DynTex)
   add_subdirectory(Fresnel)
   add_subdirectory(Isosurf)
+  add_subdirectory(ParticleGS)
 endif ()
 
 endif ()

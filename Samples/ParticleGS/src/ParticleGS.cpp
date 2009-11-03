@@ -21,10 +21,14 @@ Description: Demonstrates the use of the geometry shader and render to vertex
 -----------------------------------------------------------------------------
 */
 
-#include "ExampleApplication.h"
 #include "ProceduralManualObject.h"
 #include "OgreRenderToVertexBuffer.h"
 #include "RandomTools.h"
+#include "SamplePlugin.h"
+#include "SdkSample.h"
+
+using namespace Ogre;
+using namespace OgreBites;
 
 //#define LOG_GENERATED_BUFFER
 Vector3 GRAVITY_VECTOR = Vector3(0, -9.8, 0);
@@ -41,68 +45,18 @@ struct FireworkParticle
 };
 #endif
 
-class ParticleGSListener : public FrameListener
-{
-	bool frameStarted(const FrameEvent& evt) 
-	{ 
-		//Set shader parameters
-		GpuProgramParametersSharedPtr geomParams = particleSystem->
-			getRenderToVertexBuffer()->getRenderToBufferMaterial()->
-			getTechnique(0)->getPass(0)->getGeometryProgramParameters();
-		geomParams->setNamedConstant("elapsedTime", evt.timeSinceLastFrame);
-		demoTime += evt.timeSinceLastFrame;
-		geomParams->setNamedConstant("globalTime", demoTime);
-		geomParams->setNamedConstant("frameGravity", GRAVITY_VECTOR * evt.timeSinceLastFrame);
-		
-		return true; 
-	}
-
-	bool frameEnded(const FrameEvent& evt) 
-	{ 
-#ifdef LOG_GENERATED_BUFFER
-		//This will only work if the vertex buffer usage is dynamic (see R2VB implementation)
-		LogManager::getSingleton().getDefaultLog()->stream() << 
-			"Particle system for frame " <<	Root::getSingleton().getNextFrameNumber();
-		RenderOperation renderOp;
-		particleSystem->getRenderToVertexBuffer()->getRenderOperation(renderOp);
-		const HardwareVertexBufferSharedPtr& vertexBuffer = 
-			renderOp.vertexData->vertexBufferBinding->getBuffer(0);
-		
-		assert(vertexBuffer->getVertexSize() == sizeof(FireworkParticle));
-		FireworkParticle* particles = static_cast<FireworkParticle*>
-			(vertexBuffer->lock(HardwareBuffer::HBL_READ_ONLY));
-		
-		for (size_t i=0; i<renderOp.vertexData->vertexCount; i++)
-		{
-			FireworkParticle& p = particles[i];
-			LogManager::getSingleton().getDefaultLog()->stream() <<
-				"FireworkParticle " << i+1 << " : " <<
-				"Position : " << p.pos[0] << " " << p.pos[1] << " " << p.pos[2] << " , " <<
-				"Timer : " << p.timer << " , " <<
-				"Type : " << p.type << " , " <<
-				"Velocity : " << p.vel[0] << " " << p.vel[1] << " " << p.vel[2];
-		}
-		
-		vertexBuffer->unlock();
-#endif
-		return true; 
-	}
-};
-
-class ParticleGSApplication : public ExampleApplication
+class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
 {
 public:
-    ParticleGSApplication() { 
+    Sample_ParticleGS() 
+	{
+		mInfo["Title"] = "Particle Effects (GPU)";
+		mInfo["Description"] = "A demo of GPU-accelerated particle systems using geometry shaders and 'render to vertex buffer's.";
+		mInfo["Thumbnail"] = "thumb_particlegs.png";
+		mInfo["Category"] = "Unsorted";
     }
 
-    ~ParticleGSApplication() {  }
 protected:
-
-	virtual void chooseSceneManager(void)
-    {
-        // Create the SceneManager, in this case a generic one
-        mSceneMgr = mRoot->createSceneManager("DefaultSceneManager", "ExampleSMInstance");
-    }
 
 	ProceduralManualObject* createProceduralParticleSystem()
 	{
@@ -154,26 +108,30 @@ protected:
 		return particleSystem;
 	}
 
-    // Just override the mandatory create scene method
-    void createScene(void)
+    
+	void setupContent(void)
     {
         // Check capabilities
 		const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
         if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
         {
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support geometry programs, so cannot "
-                "run this demo. Sorry!", 
-                "ParticleGSApplication::createScene");
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support geometry programs, "
+				"so cannot run this demo. Sorry!", 
+                "Sample_ParticleGS::createScene");
         }
 		if (!caps->hasCapability(RSC_HWRENDER_TO_VERTEX_BUFFER))
         {
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support render to vertex buffer, "
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support render to vertex buffers, "
 				"so cannot run this demo. Sorry!", 
-                "ParticleGSApplication::createScene");
+                "Sample_ParticleGS::createScene");
         }
 
-		Root::getSingleton().addMovableObjectFactory(new ProceduralManualObjectFactory);
-		mRoot->addFrameListener(new ParticleGSListener);
+		static bool firstTime = true;
+		if (firstTime)
+		{
+			Root::getSingleton().addMovableObjectFactory(new ProceduralManualObjectFactory);
+			firstTime = false;
+		}
 		ProceduralManualObject* particleSystem = createProceduralParticleSystem();
 
 		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(particleSystem);
@@ -200,121 +158,68 @@ protected:
 		pPlaneEnt->setCastShadows(false);
 		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,95,0))->attachObject(pPlaneEnt);
     }
+
+	bool frameStarted(const FrameEvent& evt) 
+	{ 
+		//Set shader parameters
+		GpuProgramParametersSharedPtr geomParams = particleSystem->
+			getRenderToVertexBuffer()->getRenderToBufferMaterial()->
+			getTechnique(0)->getPass(0)->getGeometryProgramParameters();
+		geomParams->setNamedConstant("elapsedTime", evt.timeSinceLastFrame);
+		demoTime += evt.timeSinceLastFrame;
+		geomParams->setNamedConstant("globalTime", demoTime);
+		geomParams->setNamedConstant("frameGravity", GRAVITY_VECTOR * evt.timeSinceLastFrame);
+		
+		return SdkSample::frameStarted(evt); 
+	}
+
+#ifdef LOG_GENERATED_BUFFER
+	bool frameEnded(const FrameEvent& evt) 
+	{ 
+		//This will only work if the vertex buffer usage is dynamic (see R2VB implementation)
+		LogManager::getSingleton().getDefaultLog()->stream() << 
+			"Particle system for frame " <<	Root::getSingleton().getNextFrameNumber();
+		RenderOperation renderOp;
+		particleSystem->getRenderToVertexBuffer()->getRenderOperation(renderOp);
+		const HardwareVertexBufferSharedPtr& vertexBuffer = 
+			renderOp.vertexData->vertexBufferBinding->getBuffer(0);
+		
+		assert(vertexBuffer->getVertexSize() == sizeof(FireworkParticle));
+		FireworkParticle* particles = static_cast<FireworkParticle*>
+			(vertexBuffer->lock(HardwareBuffer::HBL_READ_ONLY));
+		
+		for (size_t i=0; i<renderOp.vertexData->vertexCount; i++)
+		{
+			FireworkParticle& p = particles[i];
+			LogManager::getSingleton().getDefaultLog()->stream() <<
+				"FireworkParticle " << i+1 << " : " <<
+				"Position : " << p.pos[0] << " " << p.pos[1] << " " << p.pos[2] << " , " <<
+				"Timer : " << p.timer << " , " <<
+				"Type : " << p.type << " , " <<
+				"Velocity : " << p.vel[0] << " " << p.vel[1] << " " << p.vel[2];
+		}
+		
+		vertexBuffer->unlock();
+		return SdkSample::frameEnded(evt); 
+	}
+#endif
 };
 
+SamplePlugin* sp;
+Sample* s;
 
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#define WIN32_LEAN_AND_MEAN
-#include "windows.h"
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
-int main(int argc, char **argv)
-#endif
+extern "C" _OgreSampleExport void dllStartPlugin()
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-        NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-        int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
-        [pool release];
-        return retVal;
-#else
-    // Create application object
-    ParticleGSApplication app;
-
-    try {
-        app.go();
-    } catch( Exception& e ) {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
-#else
-        std::cerr << "An exception has occured: " << e.getFullDescription();
-#endif
-    }
-
-    return 0;
-#endif
+	s = new Sample_ParticleGS;
+	sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
+	sp->addSample(s);
+	Root::getSingleton().installPlugin(sp);
 }
 
-#ifdef __cplusplus
-}
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-#   ifdef __OBJC__
-@interface AppDelegate : NSObject <UIApplicationDelegate>
+extern "C" _OgreSampleExport void dllStopPlugin()
 {
+	Root::getSingleton().uninstallPlugin(sp); 
+	OGRE_DELETE sp;
+	delete s;
 }
 
-- (void)go;
-
-@end
-
-@implementation AppDelegate
-
-- (void)go {
-    // Create application object
-    ParticleGSApplication app;
-    try {
-        app.go();
-    } catch( Ogre::Exception& e ) {
-        std::cerr << "An exception has occured: " <<
-        e.getFullDescription().c_str() << std::endl;
-    }
-}
-
-- (void)applicationDidFinishLaunching:(UIApplication *)application {
-    // Hide the status bar
-    [[UIApplication sharedApplication] setStatusBarHidden:YES];
-
-    // Create a window
-    UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-
-    // Create an image view
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Default.png"]];
-    [window addSubview:imageView];
-    
-    // Create an indeterminate status indicator
-    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    [indicator setFrame:CGRectMake(150, 280, 20, 20)];
-    [indicator startAnimating];
-    [window addSubview:indicator];
-    
-    // Display our window
-    [window makeKeyAndVisible];
-    
-    // Clean up
-    [imageView release];
-    [indicator release];
-
-    [NSThread detachNewThreadSelector:@selector(go) toTarget:self withObject:nil];
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application {
-    Root::getSingleton().queueEndRendering();
-}
-
-//- (void)applicationWillResignActive:(UIApplication *)application
-//{
-//    // Pause FrameListeners and rendering
-//}
-//
-//- (void)applicationDidBecomeActive:(UIApplication *)application
-//{
-//    // Resume FrameListeners and rendering
-//}
-
-- (void)dealloc {
-    [super dealloc];
-}
-
-@end
-#   endif
-
-#endif
