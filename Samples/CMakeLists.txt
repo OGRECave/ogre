@@ -128,7 +128,7 @@ endif ()
   add_subdirectory(TextureFX)
   add_subdirectory(Transparency)
 
-if (NOT OGRE_BUILD_RENDERSYSTEM_GLES)
+if (NOT OGRE_BUILD_PLATFORM_IPHONE)
   add_subdirectory(BSP)
   add_subdirectory(CelShading)
   add_subdirectory(DeferredShading)
