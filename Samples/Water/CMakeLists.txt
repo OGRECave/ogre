@@ -9,19 +9,31 @@
 
 # Configure Water demo build
 
-set(HEADER_FILES include/WaterMesh.h)
-set(SOURCE_FILES src/Water.cpp src/WaterMesh.cpp)
+set(HEADER_FILES 
+  include/WaterMesh.h
+)
 
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/WaterMesh.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-endif ()
+set(SOURCE_FILES 
+  src/Water.cpp 
+  src/WaterMesh.cpp
+)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_executable(Demo_Water WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+add_library(Sample_Water ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Demo_Water ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample_exe(Demo_Water)
+target_link_libraries(Sample_Water ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+ogre_config_sample_lib(Sample_Water)
 
-if (SAMPLE_DEPENDENCIES)
-  add_dependencies(Demo_Water ${SAMPLE_DEPENDENCIES})
-endif ()
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Samples can be installed in the application package
+    set_target_properties(Sample_Water
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
+
+if (OGRE_STATIC)
+  add_dependencies(SampleBrowser Sample_Water)
+else ()
+  add_dependencies(Sample_Water SampleBrowser)
+endif (OGRE_STATIC)

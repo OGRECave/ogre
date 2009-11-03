@@ -14,11 +14,16 @@ same license as the rest of the engine.
 /* Static water simulation by eru
  * Started 29.05.2003, 20:54:37
  */
-#include "ExampleApplication.h"
+
+#include "SdkSample.h"
+#include "SamplePlugin.h"
+
 #include "OgreBillboardParticleRenderer.h"
 #include "WaterMesh.h"
 
 #include <iostream>
+using namespace Ogre;
+using namespace OgreBites;
 
 AnimationState* mAnimState;
 
@@ -251,300 +256,69 @@ HardwareIndexBufferSharedPtr WaterCircle::indexBuffer =
 	HardwareIndexBufferSharedPtr() ;
 HardwareVertexBufferSharedPtr* WaterCircle::texcoordsVertexBuffers = 0 ;
 
-/* =========================================================================*/
-/*               WaterListener class                                          */
-/* =========================================================================*/
-// Event handler
-class WaterListener: public ExampleFrameListener
+class _OgreSampleClassExport Sample_Water : public SdkSample
 {
+public:
+    Sample_Water(): waterMesh(0)
+    {
+		mInfo["Title"] = "Water";
+		mInfo["Description"] = "A demo of a simple water effect.";
+		mInfo["Thumbnail"] = "thumb_water.png";
+		mInfo["Category"] = "Unsorted";
+    }
+    
 protected:
 	WaterMesh *waterMesh ;
 	Entity *waterEntity ;
-	int materialNumber ;
-	bool skyBoxOn ;
-	Real timeoutDelay ;
 
-#define RAIN_HEIGHT_RANDOM 5
-#define RAIN_HEIGHT_CONSTANT 5
-
-
-	typedef vector<WaterCircle*>::type WaterCircles ;
-	WaterCircles circles ;
-
-	void processCircles(Real timeSinceLastFrame)
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+	bool touchPressed(const OIS::MultiTouchEvent& evt)
 	{
-		for(unsigned int i=0;i<circles.size();i++) {
-			circles[i]->animate(timeSinceLastFrame);
-		}
-		bool found ;
-		do {
-			found = false ;
-			for(WaterCircles::iterator it = circles.begin() ;
-					it != circles.end();
-					++it) {
-				if ((*it)->lvl>=16) {
-					delete (*it);
-					circles.erase(it);
-					found = true ;
-					break ;
-				}
-			}
-		} while (found) ;
-	}
-
-	void processParticles()
-	{
-		static int pindex = 0 ;
-		ParticleIterator pit = particleSystem->_getIterator() ;
-		while(!pit.end()) {
-			Particle *particle = pit.getNext();
-			Vector3 ppos = particle->position;
-			if (ppos.y<=0 && particle->timeToLive>0) { // hits the water!
-				// delete particle
-				particle->timeToLive = 0.0f;
-				// push the water
-				float x = ppos.x / PLANE_SIZE * COMPLEXITY ;
-				float y = ppos.z / PLANE_SIZE * COMPLEXITY ;
-				float h = rand() % RAIN_HEIGHT_RANDOM + RAIN_HEIGHT_CONSTANT ;
-				if (x<1) x=1 ;
-				if (x>COMPLEXITY-1) x=COMPLEXITY-1;
-				if (y<1) y=1 ;
-				if (y>COMPLEXITY-1) y=COMPLEXITY-1;
-				waterMesh->push(x,y,-h) ;
-				WaterCircle *circle = new WaterCircle(
-					"Circle#"+StringConverter::toString(pindex++),
-					x, y);
-				circles.push_back(circle);
-			}
-		}
-	}
-
-	/** Head animation */
-	Real headDepth ;
-	void animateHead(Real timeSinceLastFrame)
-	{
-		// sine track? :)
-		static double sines[4] = {0,100,200,300};
-		static const double adds[4] = {0.3,-1.6,1.1,0.5};
-		static Vector3 oldPos = Vector3::UNIT_Z;
-		for(int i=0;i<4;i++) {
-			sines[i]+=adds[i]*timeSinceLastFrame;
-		}
-		Real tx = ((sin(sines[0]) + sin(sines[1])) / 4 + 0.5 ) * (float)(COMPLEXITY-2) + 1 ;
-		Real ty = ((sin(sines[2]) + sin(sines[3])) / 4 + 0.5 ) * (float)(COMPLEXITY-2) + 1 ;
-		waterMesh->push(tx,ty, -headDepth);
-		Real step = PLANE_SIZE / COMPLEXITY ;
-		headNode->resetToInitialState();
-		headNode->scale(3,3,3);
-		Vector3 newPos = Vector3(step*tx, headDepth, step*ty);
-		Vector3 diffPos = newPos - oldPos ;
-		Quaternion headRotation = Vector3::UNIT_Z.getRotationTo(diffPos);
-		oldPos = newPos ;
-		headNode->translate(newPos);
-		headNode->rotate(headRotation);
-	}
-
-	// GUI updaters
-	void updateInfoParamC()
-	{
-		OverlayManager::getSingleton().getOverlayElement("Example/Water/Param_C") \
-			->setCaption("[1/2]Ripple speed: "+StringConverter::toString(waterMesh->PARAM_C));
-	}
-	void updateInfoParamD()
-	{
-		OverlayManager::getSingleton().getOverlayElement("Example/Water/Param_D") \
-			->setCaption("[3/4]Distance: "+StringConverter::toString(waterMesh->PARAM_D));
-	}
-	void updateInfoParamU()
-	{
-		OverlayManager::getSingleton().getOverlayElement("Example/Water/Param_U") \
-			->setCaption("[5/6]Viscosity: "+StringConverter::toString(waterMesh->PARAM_U));
-	}
-	void updateInfoParamT()
-	{
-		OverlayManager::getSingleton().getOverlayElement("Example/Water/Param_T") \
-			->setCaption("[7/8]Frame time: "+StringConverter::toString(waterMesh->PARAM_T));
-	}
-	void updateInfoNormals()
-	{
-		OverlayManager::getSingleton().getOverlayElement("Example/Water/Normals") \
-			->setCaption(String("[N]Normals: ")+((waterMesh->useFakeNormals)?"fake":"real"));
-	}
-	void switchNormals()
-	{
-		waterMesh->useFakeNormals = !waterMesh->useFakeNormals ;
-		updateInfoNormals() ;
-	}
-	void updateInfoHeadDepth()
-	{
-		OverlayManager::getSingleton().getOverlayElement("Example/Water/Depth") \
-			->setCaption(String("[U/J]Head depth: ")+StringConverter::toString(headDepth));
-	}
-	void updateInfoSkyBox()
-	{
-		OverlayManager::getSingleton().getOverlayElement("Example/Water/SkyBox")
-			->setCaption(String("[B]SkyBox: ")+String((skyBoxOn)?"On":"Off") );
-	}
-	void updateMaterial()
-	{
-		String materialName = MATERIAL_PREFIX+StringConverter::toString(materialNumber);
-		MaterialPtr material = MaterialManager::getSingleton().getByName(materialName);
-		if (material.isNull())
-        {
-			if(materialNumber)
-            {
-				materialNumber = 0 ;
-				updateMaterial();
-				return ;
-			}
-            else
-            {
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-					"Material "+materialName+"doesn't exist!",
-					"WaterListener::updateMaterial");
-			}
-		}
-		waterEntity->setMaterialName(materialName);
-		OverlayManager::getSingleton().getOverlayElement("Example/Water/Material") \
-			->setCaption(String("[M]Material: ")+materialName);
-	}
-
-	void switchMaterial()
-	{
-		materialNumber++;
-		updateMaterial();
-	}
-	void switchSkyBox()
-	{
-		skyBoxOn = !skyBoxOn;
-		sceneMgr->setSkyBox(skyBoxOn, "Examples/SceneSkyBox2");
-		updateInfoSkyBox();
-	}
-
-public:
-    WaterListener(RenderWindow* win, Camera* cam,
-		WaterMesh *waterMesh, Entity *waterEntity)
-        : ExampleFrameListener(win, cam)
-    {
-		this->waterMesh = waterMesh ;
-		this->waterEntity = waterEntity ;
-		materialNumber = 8;
-		timeoutDelay = 0.0f;
-		headDepth = 2.0f;
-		skyBoxOn = false ;
-
-		updateMaterial();
-		updateInfoParamC();
-		updateInfoParamD();
-		updateInfoParamU();
-		updateInfoParamT();
-		updateInfoNormals();
-		updateInfoHeadDepth();
-		updateInfoSkyBox();
-    }
-
- 	virtual ~WaterListener ()
- 	{
- 		// If when you finish the application is still raining there
- 		// are water circles that are still being processed
- 		unsigned int activeCircles = this->circles.size ();
-
- 		// Kill the active water circles
- 		for (unsigned int i = 0; i < activeCircles; i++)
- 			delete (this->circles[i]);
- 	}
-
-    bool frameRenderingQueued(const FrameEvent& evt)
-    {
-
-		if( ExampleFrameListener::frameRenderingQueued(evt) == false )
-		{
-			// check if we are exiting, if so, clear static HardwareBuffers to avoid segfault
-			WaterCircle::clearStaticBuffers();
-			return false;
-		}
-
-        mAnimState->addTime(evt.timeSinceLastFrame);
-
-		// process keyboard events
-		Real changeSpeed = evt.timeSinceLastFrame ;
-
-		// adjust keyboard speed with SHIFT (increase) and CONTROL (decrease)
-		if (mKeyboard->isKeyDown(OIS::KC_LSHIFT) || mKeyboard->isKeyDown(OIS::KC_RSHIFT)) {
-			changeSpeed *= 10.0f ;
-		}
-		if (mKeyboard->isKeyDown(OIS::KC_LCONTROL)) { 
-			changeSpeed /= 10.0f ;
-		}
-
-		// rain
-		processCircles(evt.timeSinceLastFrame);
-		if (mKeyboard->isKeyDown(OIS::KC_SPACE)) {
-			particleEmitter->setEmissionRate(20.0f);
-		} else {
-			particleEmitter->setEmissionRate(0.0f);
-		}
-		processParticles();
-
-		// adjust values (some macros for faster change
-#define ADJUST_RANGE(_value,_plus,_minus,_minVal,_maxVal,_change,_macro) {\
-	if (mKeyboard->isKeyDown(_plus)) \
-		{ _value+=_change ; if (_value>=_maxVal) _value = _maxVal ; _macro ; } ; \
-	if (mKeyboard->isKeyDown(_minus)) \
-		{ _value-=_change; if (_value<=_minVal) _value = _minVal ; _macro ; } ; \
-}
-
-		ADJUST_RANGE(headDepth, OIS::KC_U, OIS::KC_J, 0, 10, 0.5*changeSpeed, updateInfoHeadDepth()) ;
-
-		ADJUST_RANGE(waterMesh->PARAM_C, OIS::KC_2, OIS::KC_1, 0, 10, 0.1f*changeSpeed, updateInfoParamC()) ;
-
-		ADJUST_RANGE(waterMesh->PARAM_D, OIS::KC_4, OIS::KC_3, 0.1, 10, 0.1f*changeSpeed, updateInfoParamD()) ;
-
-		ADJUST_RANGE(waterMesh->PARAM_U, OIS::KC_6, OIS::KC_5, -2, 10, 0.1f*changeSpeed, updateInfoParamU()) ;
-
-		ADJUST_RANGE(waterMesh->PARAM_T, OIS::KC_8, OIS::KC_7, 0, 10, 0.1f*changeSpeed, updateInfoParamT()) ;
-
-		timeoutDelay-=evt.timeSinceLastFrame ;
-		if (timeoutDelay<=0)
-			timeoutDelay = 0;
-
-#define SWITCH_VALUE(_key,_timeDelay, _macro) { \
-		if (mKeyboard->isKeyDown(_key) && timeoutDelay==0) { \
-			timeoutDelay = _timeDelay ; _macro ;} }
-
-		SWITCH_VALUE(OIS::KC_N, 0.5f, switchNormals());
-
-		SWITCH_VALUE(OIS::KC_M, 0.5f, switchMaterial());
-
-		SWITCH_VALUE(OIS::KC_B, 0.5f, switchSkyBox());
-
-		animateHead(evt.timeSinceLastFrame);
-
-		waterMesh->updateMesh(evt.timeSinceLastFrame);
-
+		if (mTrayMgr->injectMouseDown(evt)) return true;
+		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
 		return true;
-    }
-};
+	}
 
-class WaterApplication : public ExampleApplication
-{
-public:
-    WaterApplication()
-        : waterMesh(0)
-    {
+	bool touchReleased(const OIS::MultiTouchEvent& evt)
+	{
+		if (mTrayMgr->injectMouseUp(evt)) return true;
+		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
+		return true;
+	}
 
-    }
-
-    ~WaterApplication() {
-        delete waterMesh;
-    }
-
-protected:
-	WaterMesh *waterMesh ;
-	Entity *waterEntity ;
+	bool touchMoved(const OIS::MultiTouchEvent& evt)
+	{
+		// only rotate the camera if cursor is hidden
+		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
+		else mCameraMan->injectMouseMove(evt);
+		return true;
+	}
+#else
+	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+	{
+		if (mTrayMgr->injectMouseDown(evt, id)) return true;
+		if (id == OIS::MB_Left) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
+		return true;
+	}
+    
+	bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+	{
+		if (mTrayMgr->injectMouseUp(evt, id)) return true;
+		if (id == OIS::MB_Left) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
+		return true;
+	}
+    
+	bool mouseMoved(const OIS::MouseEvent& evt)
+	{
+		// only rotate the camera if cursor is hidden
+		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
+		else mCameraMan->injectMouseMove(evt);
+		return true;
+	}
+#endif
 
 // Just override the mandatory create scene method
-    void createScene(void)
+    void setupContent(void)
     {
 		sceneMgr = mSceneMgr ;
         // Set ambient light
@@ -608,11 +382,7 @@ protected:
         // Put in a bit of fog for the hell of it
         //mSceneMgr->setFog(FOG_EXP, ColourValue::White, 0.0002);
 
-		// show overlay
-		waterOverlay = OverlayManager::getSingleton().getByName("Example/WaterOverlay");
-		waterOverlay->show();
-
-        // Let there be rain
+		// Let there be rain
         particleSystem = mSceneMgr->createParticleSystem("rain",
             "Examples/Water/Rain");
 		particleEmitter = particleSystem->getEmitter(0);
@@ -625,131 +395,233 @@ protected:
 		static_cast<BillboardParticleRenderer*>(particleSystem->getRenderer())->setBillboardOrigin(BBO_BOTTOM_CENTER);
 
 		prepareCircleMaterial();
+
+		setupControls();
+
+		timeoutDelay = 0.0f;
 	}
 
-    // Create new frame listener
-    void createFrameListener(void)
-    {
-        mFrameListener= new WaterListener(mWindow, mCamera, waterMesh, waterEntity);
-        mRoot->addFrameListener(mFrameListener);
-    }
+#define PANEL_WIDTH 200
+	void setupControls()
+	{
+		mTrayMgr->createLabel(TL_TOPLEFT, "GeneralLabel", "General", PANEL_WIDTH);
+		mTrayMgr->createCheckBox(TL_TOPLEFT, "FakeNormalsCB", "Fake normals", PANEL_WIDTH);
+		mTrayMgr->createCheckBox(TL_TOPLEFT, "SkyboxCB", "Skybox", PANEL_WIDTH);
+		mTrayMgr->createThickSlider(TL_TOPLEFT, "HeadDepthSlider", "Head Depth", PANEL_WIDTH, 80, 1, 3, 50)->setValue(2.0f);
+		SelectMenu* waterMaterial = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "WaterMaterialMenu", "Water material", PANEL_WIDTH, 9);
+		for (size_t i = 0; i < 9; i++)
+		{
+			waterMaterial->addItem(MATERIAL_PREFIX + StringConverter::toString(i));
+		}
+		waterMaterial->selectItem(8);
+		mTrayMgr->createLabel(TL_TOPLEFT, "RainLabel", "Rain : [Space]", PANEL_WIDTH);
+		
+		mTrayMgr->createLabel(TL_TOPRIGHT, "AdvancedLabel", "Advanced", PANEL_WIDTH);
+		mTrayMgr->createThickSlider(TL_TOPRIGHT, "RippleSpeedSlider", "Ripple Speed", PANEL_WIDTH, 80, 0, 2, 50)->setValue(0.3, false);
+		mTrayMgr->createThickSlider(TL_TOPRIGHT, "DistanceSlider", "Distance", PANEL_WIDTH, 80, 0.1, 5.0, 50)->setValue(0.4, false);
+		mTrayMgr->createThickSlider(TL_TOPRIGHT, "ViscositySlider", "Viscosity", PANEL_WIDTH, 80, 0, 1, 50)->setValue(0.05, false);
+		mTrayMgr->createThickSlider(TL_TOPRIGHT, "FrameTimeSlider", "FrameTime", PANEL_WIDTH, 80, 0, 1, 61)->setValue(0.13, false);
 
+		mTrayMgr->showCursor();
+	}
+
+	void cleanupContent()
+	{
+		// If when you finish the application is still raining there
+ 		// are water circles that are still being processed
+ 		unsigned int activeCircles = this->circles.size ();
+
+ 		// Kill the active water circles
+ 		for (unsigned int i = 0; i < activeCircles; i++)
+ 			delete (this->circles[i]);
+
+		delete waterMesh;
+		waterMesh = 0;
+	}
+
+    protected:
+	Real timeoutDelay ;
+
+#define RAIN_HEIGHT_RANDOM 5
+#define RAIN_HEIGHT_CONSTANT 5
+
+
+	typedef vector<WaterCircle*>::type WaterCircles ;
+	WaterCircles circles ;
+
+	void processCircles(Real timeSinceLastFrame)
+	{
+		for(unsigned int i=0;i<circles.size();i++) {
+			circles[i]->animate(timeSinceLastFrame);
+		}
+		bool found ;
+		do {
+			found = false ;
+			for(WaterCircles::iterator it = circles.begin() ;
+					it != circles.end();
+					++it) {
+				if ((*it)->lvl>=16) {
+					delete (*it);
+					circles.erase(it);
+					found = true ;
+					break ;
+				}
+			}
+		} while (found) ;
+	}
+
+	void processParticles()
+	{
+		static int pindex = 0 ;
+		ParticleIterator pit = particleSystem->_getIterator() ;
+		while(!pit.end()) {
+			Particle *particle = pit.getNext();
+			Vector3 ppos = particle->position;
+			if (ppos.y<=0 && particle->timeToLive>0) { // hits the water!
+				// delete particle
+				particle->timeToLive = 0.0f;
+				// push the water
+				float x = ppos.x / PLANE_SIZE * COMPLEXITY ;
+				float y = ppos.z / PLANE_SIZE * COMPLEXITY ;
+				float h = rand() % RAIN_HEIGHT_RANDOM + RAIN_HEIGHT_CONSTANT ;
+				if (x<1) x=1 ;
+				if (x>COMPLEXITY-1) x=COMPLEXITY-1;
+				if (y<1) y=1 ;
+				if (y>COMPLEXITY-1) y=COMPLEXITY-1;
+				waterMesh->push(x,y,-h) ;
+				WaterCircle *circle = new WaterCircle(
+					"Circle#"+StringConverter::toString(pindex++),
+					x, y);
+				circles.push_back(circle);
+			}
+		}
+	}
+
+	void sliderMoved(Slider* slider)
+	{
+		if (slider->getName() == "HeadDepthSlider")
+		{
+			headDepth = slider->getValue();
+		}
+		else if (slider->getName() == "RippleSpeedSlider")
+		{
+			waterMesh->PARAM_C = slider->getValue();
+		}
+		else if (slider->getName() == "DistanceSlider")
+		{
+			waterMesh->PARAM_D = slider->getValue();
+		}
+		else if (slider->getName() == "ViscositySlider")
+		{
+			waterMesh->PARAM_U = slider->getValue();
+		}
+		else if (slider->getName() == "FrameTimeSlider")
+		{
+			waterMesh->PARAM_T = slider->getValue();
+		}
+	}
+
+	void checkBoxToggled(CheckBox* checkBox)
+	{
+		if (checkBox->getName() == "FakeNormalsCB")
+		{
+			waterMesh->useFakeNormals = checkBox->isChecked();
+		}
+		else if (checkBox->getName() == "SkyboxCB")
+		{
+			sceneMgr->setSkyBox(checkBox->isChecked(), "Examples/SceneSkyBox2");
+		}
+	}
+
+	void itemSelected(SelectMenu* menu)
+	{
+		//Only one menu in this demo
+		const String& materialName = menu->getSelectedItem();
+		MaterialPtr material = MaterialManager::getSingleton().getByName(materialName);
+		if (material.isNull())
+        {
+			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+				"Material "+materialName+"doesn't exist!",
+				"WaterListener::updateMaterial");
+		}
+		waterEntity->setMaterialName(materialName);
+	}
+
+	/** Head animation */
+	Real headDepth ;
+	void animateHead(Real timeSinceLastFrame)
+	{
+		// sine track? :)
+		static double sines[4] = {0,100,200,300};
+		static const double adds[4] = {0.3,-1.6,1.1,0.5};
+		static Vector3 oldPos = Vector3::UNIT_Z;
+		for(int i=0;i<4;i++) {
+			sines[i]+=adds[i]*timeSinceLastFrame;
+		}
+		Real tx = ((sin(sines[0]) + sin(sines[1])) / 4 + 0.5 ) * (float)(COMPLEXITY-2) + 1 ;
+		Real ty = ((sin(sines[2]) + sin(sines[3])) / 4 + 0.5 ) * (float)(COMPLEXITY-2) + 1 ;
+		waterMesh->push(tx,ty, -headDepth);
+		Real step = PLANE_SIZE / COMPLEXITY ;
+		headNode->resetToInitialState();
+		headNode->scale(3,3,3);
+		Vector3 newPos = Vector3(step*tx, headDepth, step*ty);
+		Vector3 diffPos = newPos - oldPos ;
+		Quaternion headRotation = Vector3::UNIT_Z.getRotationTo(diffPos);
+		oldPos = newPos ;
+		headNode->translate(newPos);
+		headNode->rotate(headRotation);
+	}
+
+public:
+    
+
+    bool frameRenderingQueued(const FrameEvent& evt)
+    {
+		if( SdkSample::frameRenderingQueued(evt) == false )
+		{
+			// check if we are exiting, if so, clear static HardwareBuffers to avoid segfault
+			WaterCircle::clearStaticBuffers();
+			return false;
+		}
+
+        mAnimState->addTime(evt.timeSinceLastFrame);
+
+		// rain
+		processCircles(evt.timeSinceLastFrame);
+		if (mKeyboard->isKeyDown(OIS::KC_SPACE)) {
+			particleEmitter->setEmissionRate(20.0f);
+		} else {
+			particleEmitter->setEmissionRate(0.0f);
+		}
+		processParticles();
+
+
+		timeoutDelay-=evt.timeSinceLastFrame ;
+		if (timeoutDelay<=0)
+			timeoutDelay = 0;
+
+		animateHead(evt.timeSinceLastFrame);
+
+		waterMesh->updateMesh(evt.timeSinceLastFrame);
+
+		return true;
+    }
 };
 
+SamplePlugin* sp;
+Sample* s;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#define WIN32_LEAN_AND_MEAN
-#include "windows.h"
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
-int main(int argc, char **argv)
-#endif
+extern "C" _OgreSampleExport void dllStartPlugin()
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-        NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-        int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
-        [pool release];
-        return retVal;
-#else
-    // Create application object
-    WaterApplication app;
-
-	srand(time(0));
-
-    try {
-        app.go();
-    } catch( Exception& e ) {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
-#else
-        std::cerr << "An exception has occured: " << e.getFullDescription();
-#endif
-    }
-
-    return 0;
-#endif
+	s = new Sample_Water;
+	sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
+	sp->addSample(s);
+	Root::getSingleton().installPlugin(sp);
 }
 
-#ifdef __cplusplus
-}
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-#   ifdef __OBJC__
-@interface AppDelegate : NSObject <UIApplicationDelegate>
+extern "C" _OgreSampleExport void dllStopPlugin()
 {
+	Root::getSingleton().uninstallPlugin(sp); 
+	OGRE_DELETE sp;
+	delete s;
 }
-
-- (void)go;
-
-@end
-
-@implementation AppDelegate
-
-- (void)go {
-    // Create application object
-    WaterApplication app;
-    try {
-        app.go();
-    } catch( Ogre::Exception& e ) {
-        std::cerr << "An exception has occured: " <<
-        e.getFullDescription().c_str() << std::endl;
-    }
-}
-
-- (void)applicationDidFinishLaunching:(UIApplication *)application {
-    // Hide the status bar
-    [[UIApplication sharedApplication] setStatusBarHidden:YES];
-
-    // Create a window
-    UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-
-    // Create an image view
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Default.png"]];
-    [window addSubview:imageView];
-    
-    // Create an indeterminate status indicator
-    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    [indicator setFrame:CGRectMake(150, 280, 20, 20)];
-    [indicator startAnimating];
-    [window addSubview:indicator];
-    
-    // Display our window
-    [window makeKeyAndVisible];
-    
-    // Clean up
-    [imageView release];
-    [indicator release];
-
-    [NSThread detachNewThreadSelector:@selector(go) toTarget:self withObject:nil];
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application {
-    Root::getSingleton().queueEndRendering();
-}
-
-//- (void)applicationWillResignActive:(UIApplication *)application
-//{
-//    // Pause FrameListeners and rendering
-//}
-//
-//- (void)applicationDidBecomeActive:(UIApplication *)application
-//{
-//    // Resume FrameListeners and rendering
-//}
-
-- (void)dealloc {
-    [super dealloc];
-}
-
-@end
-#   endif
-
-#endif
