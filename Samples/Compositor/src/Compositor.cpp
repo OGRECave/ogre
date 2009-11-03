@@ -202,11 +202,11 @@ void Sample_Compositor::cleanupContent(void)
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::createControls(void) 
 {
-	mTrayMgr->createButton(TL_TOPLEFT, "PageButton", "Page");
+	mTrayMgr->createButton(TL_TOPLEFT, "PageButton", "Page", 175);
 	for (size_t i=0; i < COMPOSITORS_PER_PAGE; i++)
 	{
 		String checkBoxName = "Compositor_" + Ogre::StringConverter::toString(i);
-		CheckBox* cb = mTrayMgr->createCheckBox(TL_TOPLEFT, checkBoxName, "Compositor");
+		CheckBox* cb = mTrayMgr->createCheckBox(TL_TOPLEFT, checkBoxName, "Compositor", 175);
 		cb->hide();
 	}
 	changePage(0);
