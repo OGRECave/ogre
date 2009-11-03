@@ -198,6 +198,7 @@ void Sample_Compositor::changePage(size_t pageNum)
 void Sample_Compositor::cleanupContent(void)
 {
 	CompositorManager::getSingleton().removeCompositorChain(mViewport);
+	mCompositorNames.clear();
 }
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::createControls(void) 
