@@ -12,33 +12,24 @@
  -----------------------------------------------------------------------------
 */
 
-#include "CEGUI/CEGUI.h"
-#include "OgreCEGUIRenderer.h"
 #include "OgreConfigFile.h"
 #include "OgreStringConverter.h"
 #include "OgreException.h"
 #include "OgreFrameListener.h"
-#include "ExampleApplication.h"
 #include "OgreInstancedGeometry.h"
+#include "SdkSample.h"
+#include "SamplePlugin.h"
 
 using namespace Ogre;
-inline Ogre::String operator +(const Ogre::String& l,const CEGUI::String& o)
-{
-	return l+o.c_str();
-}
-/*
-inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
-{
-	return l+o.c_str();
-}
-*/
+using namespace OgreBites;
+
 #define maxObjectsPerBatch 80
 #ifndef FLT_MAX
 #  define FLT_MAX         3.402823466e+38F        /* max value */
 #endif
 
 const size_t numTypeMeshes = 4;
-class InstancingApplication;
+class Sample_Instancing;
 Ogre::String meshes[]=
 { 
 	"razor", //0
@@ -54,27 +45,14 @@ enum CurrentGeomOpt{
 	ENTITY_OPT
 };
 
-CEGUI::MouseButton convertOISMouseButtonToCegui(int buttonID)
-{
-  switch (buttonID)
-    {
-	case 0: return CEGUI::LeftButton;
-	case 1: return CEGUI::RightButton;
-	case 2:	return CEGUI::MiddleButton;
-	case 3: return CEGUI::X1Button;
-	default: return CEGUI::LeftButton;
-    }
-}
+
 //out of the listener class...if set as a member, the sample crashes when moving the mouse!
 
 // Event handler to add ability to alter subdivision
-class InstancingListener : public ExampleFrameListener, public OIS::KeyListener, public OIS::MouseListener
+class InstancingListener : public FrameListener
 {
 protected:
-	InstancingApplication * mMain;
-	bool mRequestShutDown;
-	bool mLMBDown;
-	bool mRMBDown;
+	Sample_Instancing* mMain;
 	double mAvgFrameTime;
 	size_t meshSelected;
 	size_t numMesh;
@@ -82,6 +60,7 @@ protected:
 	String mDebugText;
 	CurrentGeomOpt currentGeomOpt;
 	
+	Camera* mCamera;
 	size_t numRender;
 
 	Ogre::Timer*timer;
@@ -93,19 +72,10 @@ protected:
 	vector <SceneNode *>::type			nodes; 
 	vector <Vector3 *>::type			posMatrices;
 
-	CEGUI::Renderer* mGUIRenderer;
-	CEGUI::Window* mGuiAvg;
-	CEGUI::Window* mGuiCurr;
-	CEGUI::Window* mGuiBest;
-	CEGUI::Window* mGuiWorst;
-	CEGUI::Window* mGuiTris;
-	CEGUI::Window* mGuiDbg;
-	CEGUI::Window* mRoot;
-	CEGUI::Point mLastMousePosition;
 public:
 
 	//-----------------------------------------------------------------------
-	InstancingListener(RenderWindow* win, Camera* cam,CEGUI::Renderer* renderer, InstancingApplication*main);
+	InstancingListener(Camera* cam, Sample_Instancing* main);
 	//-----------------------------------------------------------------------
 	~InstancingListener();
 	//-----------------------------------------------------------------------
@@ -143,70 +113,81 @@ public:
 		mBurnAmount=timeBurned;
 	};
 	//-----------------------------------------------------------------------
-	void changSelectedMesh(size_t number)
+	void changeSelectedMesh(size_t number)
 	{	
 		meshSelected=number;
 	}
 	 //-----------------------------------------------------------------------
-	void mouseReleased (OIS::MouseEvent *e);
-	void mouseClicked(OIS::MouseEvent* e);
-	void mouseEntered(OIS::MouseEvent* e) ;
-	void mouseExited(OIS::MouseEvent* e);
 	void requestShutdown(void);
 	void setCurrentGeometryOpt(CurrentGeomOpt opt);
-	bool handleMouseMove(const CEGUI::EventArgs& e);
-	bool handleMouseButtonDown(const CEGUI::EventArgs& e);
-	bool handleMouseButtonUp(const CEGUI::EventArgs& e);
-	//----------------------------------------------------------------//
-	bool mouseMoved( const OIS::MouseEvent &arg );
-	//----------------------------------------------------------------//
-	bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
-	//----------------------------------------------------------------//
-	bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 	//--------------------------------------------------------------------------
-	void updateStats(void);
-		//----------------------------------------------------------------//
-	bool keyPressed( const OIS::KeyEvent &arg )
-	{
-		if( arg.key == OIS::KC_ESCAPE )
-			mRequestShutDown = true;
-		return true;
-	}
-
-	//----------------------------------------------------------------//
-	bool keyReleased( const OIS::KeyEvent &arg )
-	{
-		return true;
-	}
+	
 };
 
 //-----------------------------------------------------------------------
 //-----------------------------------------------------------------------
-class InstancingApplication : public ExampleApplication
+class _OgreSampleClassExport  Sample_Instancing : public SdkSample
 {
 
 public:
-	//-----------------------------------------------------------------------
-	InstancingApplication():mGUIRenderer(0),
-        mGUISystem(0),
-        mEditorGuiSheet(0)  { }
-	//-----------------------------------------------------------------------
-	~InstancingApplication()
+	#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+	bool touchPressed(const OIS::MultiTouchEvent& evt)
 	{
-		 if(mEditorGuiSheet)
-       {
-           CEGUI::WindowManager::getSingleton().destroyWindow(mEditorGuiSheet);
-       }
-       if(mGUISystem)
-       {
-           delete mGUISystem;
-           mGUISystem = 0;
-       }
-       if(mGUIRenderer)
-       {
-           delete mGUIRenderer;
-           mGUIRenderer = 0;
-       }
+		if (mTrayMgr->injectMouseDown(evt)) return true;
+		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
+		return true;
+	}
+
+	bool touchReleased(const OIS::MultiTouchEvent& evt)
+	{
+		if (mTrayMgr->injectMouseUp(evt)) return true;
+		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
+		return true;
+	}
+
+	bool touchMoved(const OIS::MultiTouchEvent& evt)
+	{
+		// only rotate the camera if cursor is hidden
+		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
+		else mCameraMan->injectMouseMove(evt);
+		return true;
+	}
+#else
+	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+	{
+		if (mTrayMgr->injectMouseDown(evt, id)) return true;
+		if (id == OIS::MB_Left) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
+		return true;
+	}
+    
+	bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+	{
+		if (mTrayMgr->injectMouseUp(evt, id)) return true;
+		if (id == OIS::MB_Left) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
+		return true;
+	}
+    
+	bool mouseMoved(const OIS::MouseEvent& evt)
+	{
+		// only rotate the camera if cursor is hidden
+		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
+		else mCameraMan->injectMouseMove(evt);
+		return true;
+	}
+#endif
+
+	//-----------------------------------------------------------------------
+	Sample_Instancing()  
+	{ 
+		mInfo["Title"] = "Instancing";
+		mInfo["Description"] = "A demo of different methods to handle a large number of objects.";
+		mInfo["Thumbnail"] = "thumb_instancing.png";
+		mInfo["Category"] = "Unsorted";
+	}
+	//-----------------------------------------------------------------------
+	~Sample_Instancing()
+	{
+		 
 	
 	}
 	RenderWindow*getRenderWindow(void)
@@ -214,16 +195,14 @@ public:
 		return mWindow;
 	}
 
-protected:
-   CEGUI::OgreCEGUIRenderer* mGUIRenderer;
-   CEGUI::System* mGUISystem;
-   CEGUI::Window* mEditorGuiSheet;
+	InstancingListener* mFrameListener;
 
+protected:
+   
 	//-----------------------------------------------------------------------
 	// Just override the mandatory create scene method
-	void createScene(void)
+	void setupContent(void)
 	{
-		
 		// Set ambient light
 		mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 		Light* l = mSceneMgr->createLight("MainLight");
@@ -245,213 +224,101 @@ protected:
         pPlaneEnt->setMaterialName("Examples/Rockwall");
         pPlaneEnt->setCastShadows(false);
         mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
-		setupGUI();
-		setupEventHandlers();
-
-		//set up the compositor
-		Ogre::Viewport* pViewport = mWindow->getViewport(0);
-		pViewport->setCamera(mCamera);
-		CompositorManager::getSingleton().addCompositor(pViewport,"Bloom");
-
 		
+		CompositorManager::getSingleton().addCompositor(mViewport,"Bloom");
+
+		setupControls();
+		createFrameListener();
 	}
+
 	//-----------------------------------------------------------------------
-	void destroyScene(void)
+	void cleanupContent(void)
 	{
+
 	}
 	//-----------------------------------------------------------------------
 	void createFrameListener(void)
 	{
 		// This is where we instantiate our own frame listener
-		mFrameListener= new InstancingListener(mWindow, mCamera,mGUIRenderer,this);
+		mFrameListener= new InstancingListener(mCamera, this);
 		mRoot->addFrameListener(mFrameListener);
 	}
-	//-----------------------------------------------------------------------
-	void setupResources(void)
-	{
-		ExampleApplication::setupResources();
 
-		/*ResourceGroupManager *rsm = ResourceGroupManager::getSingletonPtr ();
-		StringVector groups = rsm->getResourceGroups ();        
-		if (std::find(groups.begin(), groups.end(), String("Instancing")) == groups.end())
+	//-----------------------------------------------------------------------
+	void setupControls(void)
+	{
+		SelectMenu* technique = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "TechniqueType", "Instancing Technique", 200, 3);
+		technique->addItem("Instancing");
+		technique->addItem("Static Geometry");
+		technique->addItem("Independent Entities");
+
+		mTrayMgr->createThickSlider(TL_TOPLEFT, "ObjectCountSlider", "Object count", 200, 50, 0, 1000, 101)->setValue(100, false);
+
+		mTrayMgr->createCheckBox(TL_TOPLEFT, "ShadowCheckBox", "Shadows", 200);
+		
+		SelectMenu* objectType = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "ObjectType", "Object : ", 200, 4);
+		objectType->addItem("razor");
+		objectType->addItem("knot");
+		objectType->addItem("tudorhouse");
+		objectType->addItem("woodpallet");
+
+		mTrayMgr->createThickSlider(TL_TOPLEFT, "CPUOccupationSlider", "CPU Load (ms)", 200, 75, 0, 1000.0f / 60, 20);
+
+		mTrayMgr->createCheckBox(TL_TOPLEFT, "PostEffectCheckBox", "Post Effect", 200);
+
+		mTrayMgr->showCursor();
+	}
+	
+	void sliderMoved(Slider* slider)
+	{
+		if (slider->getName() == "ObjectCountSlider")
 		{
-			rsm->createResourceGroup("Instancing");
-			try
+			mFrameListener->destroyCurrentGeomOpt();
+			mFrameListener->setObjectCount((size_t)slider->getValue());
+			mFrameListener->createCurrentGeomOpt();
+		}
+		else if (slider->getName() == "CPUOccupationSlider")
+		{
+			mFrameListener->setBurnedTime(slider->getValue() / 1000.0f);
+		}
+	}
+
+	void itemSelected(SelectMenu* menu)
+	{
+		if (menu->getName() == "TechniqueType")
+		{
+			//Menu items are synchronized with enum
+			CurrentGeomOpt selectedOption = (CurrentGeomOpt)menu->getSelectionIndex();
+			mFrameListener->destroyCurrentGeomOpt();
+			mFrameListener->setCurrentGeometryOpt(selectedOption);
+			mFrameListener->createCurrentGeomOpt();
+		}
+		else if (menu->getName() == "ObjectType")
+		{
+			mFrameListener->destroyCurrentGeomOpt();
+			mFrameListener->changeSelectedMesh(menu->getSelectionIndex());
+			mFrameListener->createCurrentGeomOpt();
+		}
+	}
+
+	void checkBoxToggled(CheckBox* box)
+	{
+		if (box->getName() == "ShadowCheckBox")
+		{
+			if (box->isChecked())
 			{
-				rsm->addResourceLocation("../../../../../ogreaddons/instancing/Media/materials/programs","FileSystem", "Instancing");
-				rsm->addResourceLocation("../../../../../ogreaddons/instancing/Media/materials/scripts","FileSystem", "Instancing");
-				rsm->addResourceLocation("../../../../../ogreaddons/instancing/Media/models","FileSystem", "Instancing");
+				mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
 			}
-			catch (Ogre::Exception& e)
+			else
 			{
-				String error = e.getFullDescription();
-				rsm->addResourceLocation("../../../Instancing/Media/materials/programs","FileSystem", "Instancing");
-				rsm->addResourceLocation("../../../Instancing/Media/materials/scripts","FileSystem", "Instancing");
-				rsm->addResourceLocation("../../../Instancing/Media/models","FileSystem", "Instancing");
+				mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
 			}
-		}*/
-	}
-	void setupGUI(void)
-	{
-		// Set up GUI system
-       mGUIRenderer = new CEGUI::OgreCEGUIRenderer(mWindow, Ogre::RENDER_QUEUE_OVERLAY, true, 3000, mSceneMgr);
-       mGUISystem = new CEGUI::System(mGUIRenderer);
-       CEGUI::Logger::getSingleton().setLoggingLevel(CEGUI::Informative);
-
-	   CEGUI::SchemeManager::getSingleton().loadScheme((CEGUI::utf8*)"TaharezLookSkin.scheme");
-       mGUISystem->setDefaultMouseCursor((CEGUI::utf8*)"TaharezLook", (CEGUI::utf8*)"MouseArrow");
-       CEGUI::MouseCursor::getSingleton().setImage("TaharezLook", "MouseMoveCursor");
-       mEditorGuiSheet= CEGUI::WindowManager::getSingleton().createWindow((CEGUI::utf8*)"DefaultWindow", (CEGUI::utf8*)"Sheet");  
-       mGUISystem->setGUISheet(mEditorGuiSheet);
-	 
-
-
-	    mEditorGuiSheet = CEGUI::WindowManager::getSingleton().loadWindowLayout((CEGUI::utf8*)"InstancingDemo.layout");
-		mGUISystem->setGUISheet(mEditorGuiSheet);
-	}
-	void setupEventHandlers(void)
-	{
-		using namespace CEGUI;
-		CEGUI::WindowManager& wmgr = CEGUI::WindowManager::getSingleton();
-		wmgr.getWindow((CEGUI::utf8*)"ExitDemoBtn")->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&InstancingApplication::handleQuit, this));
-
-		wmgr.getWindow((CEGUI::utf8*)"tInstancing")->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged, CEGUI::Event::Subscriber(&InstancingApplication::handleTechniqueChanged, this));
-		wmgr.getWindow((CEGUI::utf8*)"tStaticGeometry")->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged, CEGUI::Event::Subscriber(&InstancingApplication::handleTechniqueChanged, this));
-		wmgr.getWindow((CEGUI::utf8*)"tIndependantEntities")->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged, CEGUI::Event::Subscriber(&InstancingApplication::handleTechniqueChanged, this));
-		wmgr.getWindow((CEGUI::utf8*)"Object Count")->subscribeEvent(CEGUI::Scrollbar::EventScrollPositionChanged,CEGUI::Event::Subscriber(&InstancingApplication::handleObjectCountChanged, this));
-		wmgr.getWindow((CEGUI::utf8*)"Time Burner")->subscribeEvent(CEGUI::Scrollbar::EventScrollPositionChanged,CEGUI::Event::Subscriber(&InstancingApplication::handleTimeBurnerChanged, this));
-		wmgr.getWindow((CEGUI::utf8*)"PostEffect")->subscribeEvent(CEGUI::Checkbox::EventCheckStateChanged,CEGUI::Event::Subscriber(&InstancingApplication::handlePostEffectChanged, this));
-		wmgr.getWindow((CEGUI::utf8*)"Shadows")->subscribeEvent(CEGUI::Checkbox::EventCheckStateChanged,CEGUI::Event::Subscriber(&InstancingApplication::handleShadowsChanged, this));
-		CEGUI::Combobox*ObjectList=((CEGUI::Combobox*)(wmgr.getWindow((CEGUI::utf8*)"Objects")));
-		for(size_t i=0;i<numTypeMeshes;++i)
+		} 
+		else if (box->getName() == "PostEffectCheckBox")
 		{
-			CEGUI::ListboxTextItem*item=new CEGUI::ListboxTextItem(meshes[i].c_str(),i);
-			ObjectList->addItem(item);
-				
+			CompositorManager::getSingleton().setCompositorEnabled(mViewport,"Bloom",box->isChecked());
 		}
-		ObjectList->subscribeEvent(CEGUI::Combobox::EventListSelectionAccepted,CEGUI::Event::Subscriber(&InstancingApplication::handleObjectChanged,this));
-		
-		
-
-		CEGUI::Window* wndw = CEGUI::WindowManager::getSingleton().getWindow("root");
-
-		wndw->subscribeEvent(Window::EventMouseMove, CEGUI::Event::Subscriber(&InstancingApplication::handleMouseMove,this));
-
-		wndw->subscribeEvent(Window::EventMouseButtonUp, CEGUI::Event::Subscriber(&InstancingApplication::handleMouseButtonUp,this));
-
-		wndw->subscribeEvent(Window::EventMouseButtonDown, CEGUI::Event::Subscriber(&InstancingApplication::handleMouseButtonDown,this));
-
-}
-	//-----------------------------------------------------------------------
-	bool handleQuit(const CEGUI::EventArgs& e)
-	{
-		static_cast<InstancingListener*>(mFrameListener)->requestShutdown();
-		return true;
 	}
-	//-----------------------------------------------------------------------
-	bool handleMouseMove(const CEGUI::EventArgs& e)
-	{
-		static_cast<InstancingListener*>(mFrameListener)->handleMouseMove(e);
-		return true;
-	}
-	//-----------------------------------------------------------------------
-	bool handleMouseButtonDown(const CEGUI::EventArgs& e)
-	{
-		static_cast<InstancingListener*>(mFrameListener)->handleMouseButtonDown(e);
-		return true;
-	}
-	//-----------------------------------------------------------------------
-	bool handleMouseButtonUp(const CEGUI::EventArgs& e)
-	{
-		static_cast<InstancingListener*>(mFrameListener)->handleMouseButtonUp(e);
-		return true;
-	}
-	//-----------------------------------------------------------------------
-	bool handleTechniqueChanged(const CEGUI::EventArgs& e)
-	{
-
-		static_cast<InstancingListener*>(mFrameListener)->destroyCurrentGeomOpt();
-				
-		CEGUI::uint id = ((CEGUI::RadioButton*)((const CEGUI::WindowEventArgs&)e).window)->getSelectedButtonInGroup()->getID();
-		if (id == 0)
-		{
-			static_cast<InstancingListener*>(mFrameListener)->setCurrentGeometryOpt(INSTANCE_OPT);
-		}
-		if (id == 1)
-		{
-			static_cast<InstancingListener*>(mFrameListener)->setCurrentGeometryOpt(STATIC_OPT);
-		}
-		if (id == 2)
-		{
-			static_cast<InstancingListener*>(mFrameListener)->setCurrentGeometryOpt(ENTITY_OPT);
-		}
-		static_cast<InstancingListener*>(mFrameListener)->createCurrentGeomOpt();
-		return true;
-	}
-	//-----------------------------------------------------------------------
-	bool handleObjectCountChanged(const CEGUI::EventArgs& e)
-	{
-		static_cast<InstancingListener*>(mFrameListener)->destroyCurrentGeomOpt();
-		float scrollval = ((CEGUI::Scrollbar*)((const CEGUI::WindowEventArgs&)e).window)->getScrollPosition();
-		int objectCount = 1000*scrollval;
-		static_cast<InstancingListener*>(mFrameListener)->setObjectCount(objectCount );
-		static_cast<InstancingListener*>(mFrameListener)->createCurrentGeomOpt();
-		String value=StringConverter::toString(objectCount);
-		CEGUI::WindowManager::getSingleton().getWindow((CEGUI::utf8*)"Object Count Number")->setText(CEGUI::String(value.c_str()));
-
-		return true;
-	}
-	//-----------------------------------------------------------------------
-	bool handleTimeBurnerChanged(const CEGUI::EventArgs& e)
-	{
-		
-		float scrollval = ((CEGUI::Scrollbar*)((const CEGUI::WindowEventArgs&)e).window)->getScrollPosition();
-		double timeBurned = 0.0166f*scrollval;
-		char* timeChar= new char[10];
-		sprintf(timeChar,"%0.1f ms",timeBurned*1000.0f);
-		CEGUI::String timeText(timeChar);
-		CEGUI::WindowManager::getSingleton().getWindow("Time Burner Value")->setText(timeText);
-
-		static_cast<InstancingListener*>(mFrameListener)->setBurnedTime(timeBurned);
-		delete[] timeChar;
-		return true;
-	}
-		//-----------------------------------------------------------------------
-	bool handlePostEffectChanged(const CEGUI::EventArgs& e)
-	{
-		Ogre::Viewport* pViewport = mWindow->getViewport(0);
-		if(((CEGUI::Checkbox*)((const CEGUI::WindowEventArgs&)e).window)->isSelected())
-		{
-				CompositorManager::getSingleton().setCompositorEnabled(pViewport,"Bloom",true);
-		}
-		else
-		{
-				CompositorManager::getSingleton().setCompositorEnabled(pViewport,"Bloom",false);
-		}
-		return true;
-	}
-	//-----------------------------------------------------------------------
-	bool handleShadowsChanged(const CEGUI::EventArgs&e)
-	{
-		if(((CEGUI::Checkbox*)((const CEGUI::WindowEventArgs&)e).window)->isSelected())
-		{
-			mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
-		}
-		else
-		{
-			mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
-		}
-		return true;
-	}
-	//-----------------------------------------------------------------------
-	bool handleObjectChanged(const CEGUI::EventArgs&e)
-	{
-		CEGUI::Combobox*combo=((CEGUI::Combobox*)((const CEGUI::WindowEventArgs&)e).window);
-		static_cast<InstancingListener*>(mFrameListener)->destroyCurrentGeomOpt();
-		static_cast<InstancingListener*>(mFrameListener)->changSelectedMesh(combo->getSelectedItem()->getID());
-		static_cast<InstancingListener*>(mFrameListener)->createCurrentGeomOpt();
-		return true;
-	}
-
+	
 	
 };
