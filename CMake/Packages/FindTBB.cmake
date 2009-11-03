@@ -39,6 +39,37 @@ clear_if_changed(TBB_PREFIX_PATH
 create_search_paths(TBB)
 set(TBB_INC_SEARCH_PATH ${TBB_INC_SEARCH_PATH} ${TBB_PREFIX_PATH})
 
+# For Windows, let's assume that the user might be using the precompiled
+# TBB packages from the main website. These use a rather awkward directory
+# structure (at least for automatically finding the right files) depending
+# on platform and compiler, but we'll do our best to accomodate it.
+# Not adding the same effort for the precompiled linux builds, though. Those
+# have different versions for CC compiler versions and linux kernels which
+# will never adequately match the user's setup, so there is no feasible way
+# to detect the "best" version to use. The user will have to manually
+# select the right files. (Chances are the distributions are shipping their
+# custom version of tbb, anyway, so the problem is probably nonexistant.)
+if (WIN32)
+  set(COMPILER_PREFIX "vc7.1")
+  if (MSVC80)
+    set(COMPILER_PREFIX "vc8")
+  endif ()
+  if (MSVC90)
+    set(COMPILER_PREFIX "vc9")
+  endif ()
+  
+  # for each prefix path, add ia32/64\${COMPILER_PREFIX}\lib to the lib search path
+  foreach (dir ${TBB_PREFIX_PATH})
+    if (CMAKE_CL_64)
+      list(APPEND TBB_LIB_SEARCH_PATH ${dir}/ia64/${COMPILER_PREFIX}/lib)
+      list(APPEND TBB_LIB_SEARCH_PATH ${dir}/intel64/${COMPILER_PREFIX}/lib)
+    else ()
+      list(APPEND TBB_LIB_SEARCH_PATH ${dir}/ia32/${COMPILER_PREFIX}/lib)
+    endif ()
+  endforeach ()
+endif ()
+
+
 
 set(TBB_LIBRARY_NAMES tbb)
 get_debug_names(TBB_LIBRARY_NAMES)

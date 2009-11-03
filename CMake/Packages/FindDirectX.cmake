@@ -21,11 +21,16 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
   
   # Get path, convert backslashes as ${ENV_DXSDK_DIR}
   getenv_path(DXSDK_DIR)
+  getenv_path(DIRECTX_HOME)
+  getenv_path(DIRECTX_ROOT)
+  getenv_path(DIRECTX_BASE)
   
   # construct search paths
   set(DirectX_PREFIX_PATH 
-    "${DXSDK_DIR}" 
-	"${ENV_DXSDK_DIR}"
+    "${DXSDK_DIR}" "${ENV_DXSDK_DIR}"
+    "${DIRECTX_HOME}" "${ENV_DIRECTX_HOME}"
+    "${DIRECTX_ROOT}" "${ENV_DIRECTX_ROOT}"
+    "${DIRECTX_BASE}" "${ENV_DIRECTX_BASE}"
     "C:/apps_x86/Microsoft DirectX SDK*"
     "C:/Program Files (x86)/Microsoft DirectX SDK*"
     "C:/apps/Microsoft DirectX SDK*"
