@@ -136,6 +136,7 @@ if (NOT OGRE_BUILD_RENDERSYSTEM_GLES)
   add_subdirectory(Dot3Bump)
   add_subdirectory(DynTex)
   add_subdirectory(Fresnel)
+  add_subdirectory(Isosurf)
 endif ()
 
 endif ()

@@ -9,20 +9,31 @@
 
 # Configure Isosurf demo build
 
-set(SOURCE_FILES 
-  src/Isosurf.cpp
-  src/ProceduralTools.cpp
+set(HEADER_FILES 
+  include/ProceduralTools.h
 )
 
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Isosurf.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-endif ()
+set(SOURCE_FILES 
+  src/ProceduralTools.cpp
+  src/Isosurf.cpp
+)
 
-add_executable(Demo_Isosurf WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_library(Sample_Isosurf ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Demo_Isosurf ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample_exe(Demo_Isosurf)
+target_link_libraries(Sample_Isosurf ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+ogre_config_sample_lib(Sample_Isosurf)
 
-if (SAMPLE_DEPENDENCIES)
-  add_dependencies(Demo_Isosurf ${SAMPLE_DEPENDENCIES})
-endif ()
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Samples can be installed in the application package
+    set_target_properties(Sample_Isosurf
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
+
+if (OGRE_STATIC)
+  add_dependencies(SampleBrowser Sample_Isosurf)
+else ()
+  add_dependencies(Sample_Isosurf SampleBrowser)
+endif (OGRE_STATIC)
