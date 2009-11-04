@@ -56,6 +56,7 @@ set (HEADER_FILES
   include/OgreCompositorScriptCompiler.h
   include/OgreCompositorScriptCompiler2.h
   include/OgreCompositorSerializer.h
+  include/OgreConfig.h
   include/OgreConfigDialog.h
   include/OgreConfigFile.h
   include/OgreConfigOptionMap.h
@@ -505,7 +506,6 @@ elseif (APPLE)
       include/OSX/OgreErrorDialogImp.h
       include/OSX/OgreTimerImp.h
       include/OSX/OgreOSXCocoaView.h
-	  include/OgreConfig.h
 	  include/OgreZip.h
 	  ${OGRE_BINARY_DIR}/include/buildsettings.h
     )

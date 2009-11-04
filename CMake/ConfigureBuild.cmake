@@ -105,7 +105,6 @@ endif()
 if (OGRE_USE_BOOST)
   set(OGRE_SET_USE_BOOST 1)
 endif()
-add_definitions(-DHAVE_OGRE_BUILDSETTINGS_H)
 
 if (OGRE_TEST_BIG_ENDIAN)
   set(OGRE_CONFIG_BIG_ENDIAN 1)
@@ -114,14 +113,8 @@ else ()
 endif ()
 
 # generate buildsettings.h 
-configure_file(${OGRE_TEMPLATES_DIR}/buildsettings.h.in ${OGRE_BINARY_DIR}/include/buildsettings.h @ONLY)
-install(FILES ${OGRE_BINARY_DIR}/include/buildsettings.h DESTINATION include/OGRE)
-
-# Read contents of the OgreConfig.h file
-file(READ "${OGRE_SOURCE_DIR}/OgreMain/include/OgreConfig.h" OGRE_CONFIG_H)
-# add HAVE_OGRE_BUILDSETTINGS_H preprocessor define
-file(WRITE ${OGRE_BINARY_DIR}/include/OgreConfig.h "#define HAVE_OGRE_BUILDSETTINGS_H\n${OGRE_CONFIG_H}")
-install(FILES ${OGRE_BINARY_DIR}/include/OgreConfig.h DESTINATION include/OGRE)
+configure_file(${OGRE_TEMPLATES_DIR}/OgreBuildSettings.h.in ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h @ONLY)
+install(FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h DESTINATION include/OGRE)
 
 
 # Create the pkg-config package files on Unix systems

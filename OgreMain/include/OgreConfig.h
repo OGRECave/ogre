@@ -28,17 +28,11 @@ THE SOFTWARE.
 #ifndef __Config_H_
 #define __Config_H_
 
-// Include the CMake-generated build settings, if applicable
-#ifdef HAVE_OGRE_BUILDSETTINGS_H
-#include "buildsettings.h"
-#endif
-
-// Read configuration options; some systems use an auto-generated config.h,
-// other use a manually generated config.h; in any case just define
-// HAVE_CONFIG_H to include the custom config.h file.
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+// Include the CMake-generated build settings.
+// If you get complaints that this file is missing, then you're probably
+// trying to link directly against your source dir. You must then add
+// %BUILD_DIR%/include to your include search path to find OgreBuildSettings.h.
+#include "OgreBuildSettings.h"
 
 /** If set to 1, profiling code will be included in the application. When you
 	are deploying your application you will probably want to set this to 0 */
