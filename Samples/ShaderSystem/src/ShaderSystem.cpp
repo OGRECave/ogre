@@ -293,10 +293,10 @@ void Sample_ShaderSystem::setupContent()
 void Sample_ShaderSystem::setupUI()
 {
 	// create check boxes to toggle lights.	
-	mTrayMgr->createCheckBox(TL_TOPLEFT, DIRECTIONAL_LIGHT_NAME, "Directional Light")->setChecked(true);
-	mTrayMgr->createCheckBox(TL_TOPLEFT, POINT_LIGHT_NAME, "Point Light")->setChecked(true);
-	mTrayMgr->createCheckBox(TL_TOPLEFT, SPOT_LIGHT_NAME, "Spot Light")->setChecked(false);
-	mTrayMgr->createCheckBox(TL_TOPLEFT, PER_PIXEL_FOG_BOX, "Per Pixel Fog")->setChecked(mPerPixelFogEnable);
+	mTrayMgr->createCheckBox(TL_TOPLEFT, DIRECTIONAL_LIGHT_NAME, "Directional Light", 220)->setChecked(true);
+	mTrayMgr->createCheckBox(TL_TOPLEFT, POINT_LIGHT_NAME, "Point Light", 220)->setChecked(true);
+	mTrayMgr->createCheckBox(TL_TOPLEFT, SPOT_LIGHT_NAME, "Spot Light", 220)->setChecked(false);
+	mTrayMgr->createCheckBox(TL_TOPLEFT, PER_PIXEL_FOG_BOX, "Per Pixel Fog", 220)->setChecked(mPerPixelFogEnable);
 
 	// Create fog widgets.
 	mFogModeMenu = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "FogMode", "Fog Mode", 220, 120, 10);	
@@ -307,13 +307,13 @@ void Sample_ShaderSystem::setupUI()
 
 	
 	// create target model widgets.
-	mTargetObjMatName = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjMatName", "");
-	mTargetObjVS = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjVS", "");
-	mTargetObjFS = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjFS", "");
+	mTargetObjMatName = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjMatName", "", 220);
+	mTargetObjVS = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjVS", "", 220);
+	mTargetObjFS = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjFS", "", 220);
 
 
-	mTrayMgr->createLabel(TL_BOTTOM, "MainEntityLabel", "Main Entity Settings");
-	mTrayMgr->createCheckBox(TL_BOTTOM, SPECULAR_BOX, "Specular")->setChecked(mSpecularEnable);
+	mTrayMgr->createLabel(TL_BOTTOM, "MainEntityLabel", "Main Entity Settings", 240);
+	mTrayMgr->createCheckBox(TL_BOTTOM, SPECULAR_BOX, "Specular", 240)->setChecked(mSpecularEnable);
 
 
 	// Allow reflection map only on PS3 and above since with all lights on + specular + bump we 
@@ -321,7 +321,7 @@ void Sample_ShaderSystem::setupUI()
 	if (GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0") ||
 		GpuProgramManager::getSingleton().isSyntaxSupported("fp30"))		
 	{
-		mTrayMgr->createCheckBox(TL_BOTTOM, REFLECTIONMAP_BOX, "Reflection Map")->setChecked(mReflectionMapEnable);
+		mTrayMgr->createCheckBox(TL_BOTTOM, REFLECTIONMAP_BOX, "Reflection Map", 240)->setChecked(mReflectionMapEnable);
 	}
 
 	mLightingModelMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "TargetModelLighting", "", 240, 230, 10);	
@@ -330,7 +330,7 @@ void Sample_ShaderSystem::setupUI()
 	mLightingModelMenu ->addItem("Normal Map - Tangent Space");
 	mLightingModelMenu ->addItem("Normal Map - Object Space");
 
-	mTrayMgr->createButton(TL_BOTTOM, EXPORT_BUTTON_NAME, "Export Material");
+	mTrayMgr->createButton(TL_BOTTOM, EXPORT_BUTTON_NAME, "Export Material", 240);
 
 	mTrayMgr->showCursor();
 }
