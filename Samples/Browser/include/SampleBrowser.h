@@ -497,6 +497,20 @@ namespace OgreBites
 				}
 				else buttonHit((Button*)mTrayMgr->getWidget("Back"));  // if we're in config, just go back
 			}
+			else if (evt.key == OIS::KC_UP || evt.key == OIS::KC_DOWN && mTitleLabel->getTrayLocation() != TL_NONE)
+			{
+				// if we're in the main screen, use the up and down arrow keys to cycle through samples
+				int newIndex = mSampleMenu->getSelectionIndex() + (evt.key == OIS::KC_UP ? -1 : 1);
+				mSampleMenu->selectItem(Ogre::Math::Clamp<int>(newIndex, 0, mSampleMenu->getNumItems() - 1));
+			}
+			else if (evt.key == OIS::KC_RETURN)   // start or stop sample
+			{
+				if (!mLoadedSamples.empty())
+				{
+					Sample* newSample = Ogre::any_cast<Sample*>(mThumbs[mSampleMenu->getSelectionIndex()]->getUserAny());
+					runSample(newSample == mCurrentSample ? 0 : newSample);
+				}
+			}
 
 			try
 			{
@@ -744,7 +758,8 @@ namespace OgreBites
             
 			createDummyScene();
 			loadResources();
-			loadSamples();
+
+			Sample* startupSample = loadSamples();
             
 			Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
             
@@ -758,6 +773,9 @@ namespace OgreBites
             
 			setupWidgets();
 			windowResized(mWindow);   // adjust menus for resolution
+
+			// if this is our first time running, and there's a startup sample, run it
+			if (startupSample && mFirstRun) runSample(startupSample);
 		}
         
 	protected:
@@ -813,8 +831,10 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Loads sample plugins from a configuration file.
 		-----------------------------------------------------------------------------*/
-		virtual void loadSamples()
+		virtual Sample* loadSamples()
 		{
+			Sample* startupSample = 0;
+
 			Ogre::StringVector unloadedSamplePlugins;
 
 			Ogre::ConfigFile cfg;
@@ -827,7 +847,8 @@ namespace OgreBites
 #endif
 
 			Ogre::String sampleDir = cfg.getSetting("SampleFolder");        // Mac OS X just uses Resources/ directory
-			Ogre::StringVector sampleList = cfg.getMultiSetting("Sample");
+			Ogre::StringVector sampleList = cfg.getMultiSetting("SamplePlugin");
+			Ogre::String startupSampleTitle = cfg.getSetting("StartupSample");
 
 			#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 			if (sampleDir.empty()) sampleDir = ".";   // user didn't specify plugins folder, try current one
@@ -901,6 +922,8 @@ namespace OgreBites
 
 					mLoadedSamples.insert(*j);                    // add sample only after ensuring title for sorting
 					mSampleCategories.insert(info["Category"]);   // add sample category
+
+					if (info["Title"] == startupSampleTitle) startupSample = *j;   // we found the startup sample
 				}
 			}
 
@@ -917,6 +940,8 @@ namespace OgreBites
 
 				mTrayMgr->showOkDialog("Error!", message);
 			}
+
+			return startupSample;
 		}
 
 		/*-----------------------------------------------------------------------------

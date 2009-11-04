@@ -94,6 +94,7 @@ namespace OgreBites
 			mWindow = 0;
 			mCurrentSample = 0;
 			mSamplePaused = false;
+			mFirstRun = true;
 			mLastRun = false;
 			mLastSample = 0;
 		}
@@ -176,15 +177,14 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void go(Sample* initialSample = 0)
 		{
-			bool firstRun = true;
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
             createRoot();
 
-            if (!firstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
+            if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
 
             setup();
 
-            if (!firstRun) recoverLastSample();
+            if (!mFirstRun) recoverLastSample();
             else if (initialSample) runSample(initialSample);
 #else
 			while (!mLastRun)
@@ -195,12 +195,12 @@ namespace OgreBites
 				if (!oneTimeConfig()) return;
 
 				// if the context was reconfigured, set requested renderer
-				if (!firstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
+				if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
 
 				setup();
 
 				// restore the last sample if there was one or, if not, start initial sample
-				if (!firstRun) recoverLastSample();
+				if (!mFirstRun) recoverLastSample();
 				else if (initialSample) runSample(initialSample);
 
 				mRoot->startRendering();    // start the render loop
@@ -211,7 +211,7 @@ namespace OgreBites
 #ifdef OGRE_STATIC_LIB
                 mStaticPluginLoader.unload();
 #endif
-				firstRun = false;
+				mFirstRun = false;
 			}
 #endif
 		}
@@ -627,6 +627,7 @@ namespace OgreBites
 #endif
 		Sample* mCurrentSample;         // currently running sample
 		bool mSamplePaused;             // whether current sample is paused
+		bool mFirstRun;                 // whether or not this is the first run
 		bool mLastRun;                  // whether or not this is the final run
 		Ogre::String mNextRenderer;     // name of renderer used for next run
 		Sample* mLastSample;            // last sample run before reconfiguration
