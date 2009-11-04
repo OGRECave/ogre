@@ -19,7 +19,8 @@ same license as the rest of the engine.
 	@author W.J. van der Laan
 */
 
-#include "ExampleApplication.h"
+#include "SdkSample.h"
+#include "SamplePlugin.h"
 #include <OgreTexture.h>
 #include <OgreHardwarePixelBuffer.h>
 #include <OgreTextureManager.h>
@@ -30,6 +31,9 @@ same license as the rest of the engine.
 #include "ThingRenderable.h"
 #include "Julia.h"
 
+using namespace Ogre;
+using namespace OgreBites;
+
 TexturePtr ptex;
 SimpleRenderable *vrend;
 SimpleRenderable *trend;
@@ -38,173 +42,33 @@ float xtime = 0.0f;
 SceneNode *snode,*fnode;
 AnimationState* mOgreAnimState = 0;
 
-class VolumeTexFrameListener : public ExampleFrameListener
+class _OgreSampleClassExport Sample_VolumeTex : public SdkSample
 {
 public:
-	float global_real, global_imag, global_theta;
-	
-    VolumeTexFrameListener(RenderWindow* win, Camera* cam) : ExampleFrameListener( win, cam )
-    {
-		global_real = 0.4f;
-		global_imag = 0.6f;
-		global_theta = 0.0f;
-		generate();
-		
-		updateInfoParamReal();
-		updateInfoParamImag();
-		updateInfoParamTheta();
-    }
-	
-	void generate()
+    Sample_VolumeTex()
 	{
-		/* Evaluate julia fractal for each point */
-		Julia julia(global_real, global_imag, global_theta);
-		const float scale = 2.5;
-		const float vcut = 29.0f;
-		const float vscale = 1.0f/vcut;
-		
-		HardwarePixelBufferSharedPtr buffer = ptex->getBuffer(0, 0);
-		Ogre::StringStream d;
-		d << "HardwarePixelBuffer " << buffer->getWidth() << " " << buffer->getHeight() << " " << buffer->getDepth();
-		LogManager::getSingleton().logMessage(d.str());
-		
-		buffer->lock(HardwareBuffer::HBL_NORMAL);
-		const PixelBox &pb = buffer->getCurrentLock();
-		d.str("");
-		d << "PixelBox " << pb.getWidth() << " " << pb.getHeight() << " " << pb.getDepth() << " " << pb.rowPitch << " " << pb.slicePitch << " " << pb.data << " " << PixelUtil::getFormatName(pb.format);
-		LogManager::getSingleton().logMessage(d.str());
-		
-		Ogre::uint32 *pbptr = static_cast<Ogre::uint32*>(pb.data);
-		for(size_t z=pb.front; z<pb.back; z++) 
-        {
-            for(size_t y=pb.top; y<pb.bottom; y++)
-            {
-                for(size_t x=pb.left; x<pb.right; x++)
-                {
-                    if(z==pb.front || z==(pb.back-1) || y==pb.top|| y==(pb.bottom-1) ||
-						x==pb.left || x==(pb.right-1))
-					{
-						// On border, must be zero
-						pbptr[x] = 0;
-                    } 
-					else
-					{
-						float val = julia.eval(((float)x/pb.getWidth()-0.5f) * scale, 
-								((float)y/pb.getHeight()-0.5f) * scale, 
-								((float)z/pb.getDepth()-0.5f) * scale);
-						if(val > vcut)
-							val = vcut;
-						
-						PixelUtil::packColour((float)x/pb.getWidth(), (float)y/pb.getHeight(), (float)z/pb.getDepth(), (1.0f-(val*vscale))*0.7f, PF_A8R8G8B8, &pbptr[x]);
-						
-					}	
-                }
-                pbptr += pb.rowPitch;
-            }
-            pbptr += pb.getSliceSkip();
-        }
-		buffer->unlock();
+		mInfo["Title"] = "Volume Textures";
+		mInfo["Description"] = "Demonstrates the use of volume textures.";
+		mInfo["Thumbnail"] = "thumb_voltex.png";
+		mInfo["Category"] = "Unsorted";
 	}
-	void updateInfoParamReal()
-	{
-		OverlayManager::getSingleton().getOverlayElement("Example/VolTex/Param_real") \
-			->setCaption("[1/2]real: "+StringConverter::toString(global_real));
-	}
-	void updateInfoParamImag()
-	{
-		OverlayManager::getSingleton().getOverlayElement("Example/VolTex/Param_imag") \
-			->setCaption("[3/4]imag: "+StringConverter::toString(global_imag));
-	}
-	void updateInfoParamTheta()
-	{
-		OverlayManager::getSingleton().getOverlayElement("Example/VolTex/Param_theta") \
-			->setCaption("[5/6]theta: "+StringConverter::toString(global_theta));
-	}
-
-    bool frameRenderingQueued( const FrameEvent& evt )
-    {
-	static float mTimeUntilNextToggle = 0.0f;
-        if( ExampleFrameListener::frameRenderingQueued( evt ) == false )
-		return false;
-		
-		mTimeUntilNextToggle -= evt.timeSinceLastFrame;
-		
-        if( (mKeyboard->isKeyDown( OIS::KC_1 ) || mKeyboard->isKeyDown( OIS::KC_2 )) 
-				&& mTimeUntilNextToggle <= 0) {
-        	global_real += mKeyboard->isKeyDown( OIS::KC_1 )? -0.1f : 0.1f;
-			generate();
-			mTimeUntilNextToggle = 0.5;
-			updateInfoParamReal();
-		}
-		 if( (mKeyboard->isKeyDown( OIS::KC_3 ) || mKeyboard->isKeyDown( OIS::KC_4 )) 
-				&& mTimeUntilNextToggle <= 0) {
-        	global_imag += mKeyboard->isKeyDown( OIS::KC_3 )? -0.1f : 0.1f;
-			generate();
-			mTimeUntilNextToggle = 0.5;
-			updateInfoParamImag();
-		}
-		if( (mKeyboard->isKeyDown( OIS::KC_5 ) || mKeyboard->isKeyDown( OIS::KC_6 )) 
-				&& mTimeUntilNextToggle <= 0) {
-        	global_theta += mKeyboard->isKeyDown( OIS::KC_5 )? -0.1f : 0.1f;
-			generate();
-			mTimeUntilNextToggle = 0.5;
-			updateInfoParamTheta();
-		}
-		
-		xtime += evt.timeSinceLastFrame;
-		xtime = fmod(xtime, 10.0f);
-		//snode->roll(Degree(evt.timeSinceLastFrame * 20.0f));
-		//fnode->roll(Degree(evt.timeSinceLastFrame * 20.0f));
-		static_cast<ThingRenderable*>(trend)->addTime(evt.timeSinceLastFrame * 0.05f);
-		mOgreAnimState->addTime(evt.timeSinceLastFrame);
-        return true;
-    }
-	~VolumeTexFrameListener()
-	{
-		delete vrend;
-		delete trend;
-	}
-};
-
-
-
-class VolumeTexApplication : public ExampleApplication
-{
-public:
-    VolumeTexApplication() {}
 
 
 protected:
-	
-    virtual void createFrameListener(void)
-    {
-        mFrameListener= new VolumeTexFrameListener(mWindow, mCamera);
-        mFrameListener->showDebugOverlay(true);
-        mRoot->addFrameListener(mFrameListener);
-    }
+	float global_real, global_imag, global_theta;
 
-
-	virtual void createViewports(void)
-    {
-		// Create one viewport, entire window
-        Viewport* vp = mWindow->addViewport(mCamera);
-        vp->setBackgroundColour(ColourValue(0,0,0));
-
-        // Alter the camera aspect ratio to match the viewport
-        mCamera->setAspectRatio( 
-            Real(vp->getActualWidth()) / Real(vp->getActualHeight()));
-    }
-	void createCamera(void)
+    void setupView(void)
 	{
+		SdkSample::setupView();
+
 		// Create the camera
-        mCamera = mSceneMgr->createCamera("PlayerCam");
         mCamera->setPosition(Vector3(220,-2,176));
         mCamera->lookAt(Vector3(0,0,0));
         mCamera->setNearClipDistance(5);
 		mCamera->setFixedYawAxis(false);
 	}
-    // Just override the mandatory create scene method
-    void createScene(void)
+
+    void setupContent(void)
     {
 		// Check capabilities
 		const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
@@ -218,8 +82,6 @@ protected:
         // Create dynamic texture
 		ptex = TextureManager::getSingleton().createManual(
 			"DynaTex","General", TEX_TYPE_3D, 64, 64, 64, 0, PF_A8R8G8B8);
-		
-
 
 		// Set ambient light
         mSceneMgr->setAmbientLight(ColourValue(0.6, 0.6, 0.6));
@@ -272,131 +134,175 @@ protected:
         mOgreAnimState->setEnabled(true);
      
         //mFountainNode->attachObject(pSys2);
+
+		//Setup defaults
+		global_real = 0.4f;
+		global_imag = 0.6f;
+		global_theta = 0.0f;
+
 		// show GUI
-		overlay = OverlayManager::getSingleton().getByName("Example/VolTexOverlay");    
-		overlay->show();
+		createControls();
+
+		generate();
     }
 
-	void destroyScene()
+	bool frameRenderingQueued( const FrameEvent& evt )
+    {
+		xtime += evt.timeSinceLastFrame;
+		xtime = fmod(xtime, 10.0f);
+		//snode->roll(Degree(evt.timeSinceLastFrame * 20.0f));
+		//fnode->roll(Degree(evt.timeSinceLastFrame * 20.0f));
+		static_cast<ThingRenderable*>(trend)->addTime(evt.timeSinceLastFrame * 0.05f);
+		mOgreAnimState->addTime(evt.timeSinceLastFrame);
+		return SdkSample::frameRenderingQueued(evt);
+    }
+
+	void cleanupContent(void)
 	{
 		ptex.setNull();
+		delete vrend;
+		delete trend;
 	}
 
+	void createControls()
+	{
+		mTrayMgr->createLabel(TL_TOPLEFT, "JuliaParamLabel", "Julia Parameters", 200);
+		mTrayMgr->createThickSlider(TL_TOPLEFT, "RealSlider", "Real", 200, 80, -1, 1, 50)->setValue(global_real, false);
+		mTrayMgr->createThickSlider(TL_TOPLEFT, "ImagSlider", "Imag", 200, 80, -1, 1, 50)->setValue(global_imag, false);
+		mTrayMgr->createThickSlider(TL_TOPLEFT, "ThetaSlider", "Theta", 200, 80, -1, 1, 50)->setValue(global_theta, false);
+		mTrayMgr->showCursor();
+	}
+
+	void sliderMoved(Slider* slider)
+	{
+		if (slider->getName() == "RealSlider")
+		{
+			global_real = slider->getValue();
+		}
+		else if (slider->getName() == "ImagSlider")
+		{
+			global_imag = slider->getValue();
+		} 
+		else if (slider->getName() == "ThetaSlider")
+		{
+			global_theta = slider->getValue();
+		}
+		generate();
+	}
+
+	void generate()
+	{
+		/* Evaluate julia fractal for each point */
+		Julia julia(global_real, global_imag, global_theta);
+		const float scale = 2.5;
+		const float vcut = 29.0f;
+		const float vscale = 1.0f/vcut;
+		
+		HardwarePixelBufferSharedPtr buffer = ptex->getBuffer(0, 0);
+		Ogre::StringStream d;
+		d << "HardwarePixelBuffer " << buffer->getWidth() << " " << buffer->getHeight() << " " << buffer->getDepth();
+		LogManager::getSingleton().logMessage(d.str());
+		
+		buffer->lock(HardwareBuffer::HBL_NORMAL);
+		const PixelBox &pb = buffer->getCurrentLock();
+		d.str("");
+		d << "PixelBox " << pb.getWidth() << " " << pb.getHeight() << " " << pb.getDepth() << " " << pb.rowPitch << " " << pb.slicePitch << " " << pb.data << " " << PixelUtil::getFormatName(pb.format);
+		LogManager::getSingleton().logMessage(d.str());
+		
+		Ogre::uint32 *pbptr = static_cast<Ogre::uint32*>(pb.data);
+		for(size_t z=pb.front; z<pb.back; z++) 
+        {
+            for(size_t y=pb.top; y<pb.bottom; y++)
+            {
+                for(size_t x=pb.left; x<pb.right; x++)
+                {
+                    if(z==pb.front || z==(pb.back-1) || y==pb.top|| y==(pb.bottom-1) ||
+						x==pb.left || x==(pb.right-1))
+					{
+						// On border, must be zero
+						pbptr[x] = 0;
+                    } 
+					else
+					{
+						float val = julia.eval(((float)x/pb.getWidth()-0.5f) * scale, 
+								((float)y/pb.getHeight()-0.5f) * scale, 
+								((float)z/pb.getDepth()-0.5f) * scale);
+						if(val > vcut)
+							val = vcut;
+						
+						PixelUtil::packColour((float)x/pb.getWidth(), (float)y/pb.getHeight(), (float)z/pb.getDepth(), (1.0f-(val*vscale))*0.7f, PF_A8R8G8B8, &pbptr[x]);
+						
+					}	
+                }
+                pbptr += pb.rowPitch;
+            }
+            pbptr += pb.getSliceSkip();
+        }
+		buffer->unlock();
+	}
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+	bool touchPressed(const OIS::MultiTouchEvent& evt)
+	{
+		if (mTrayMgr->injectMouseDown(evt)) return true;
+		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
+		return true;
+	}
+
+	bool touchReleased(const OIS::MultiTouchEvent& evt)
+	{
+		if (mTrayMgr->injectMouseUp(evt)) return true;
+		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
+		return true;
+	}
+
+	bool touchMoved(const OIS::MultiTouchEvent& evt)
+	{
+		// only rotate the camera if cursor is hidden
+		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
+		else mCameraMan->injectMouseMove(evt);
+		return true;
+	}
+#else
+	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+	{
+		if (mTrayMgr->injectMouseDown(evt, id)) return true;
+		if (id == OIS::MB_Left) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
+		return true;
+	}
+    
+	bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+	{
+		if (mTrayMgr->injectMouseUp(evt, id)) return true;
+		if (id == OIS::MB_Left) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
+		return true;
+	}
+    
+	bool mouseMoved(const OIS::MouseEvent& evt)
+	{
+		// only rotate the camera if cursor is hidden
+		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
+		else mCameraMan->injectMouseMove(evt);
+		return true;
+	}
+#endif
+	
 };
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#define WIN32_LEAN_AND_MEAN
-#include "windows.h"
-#endif
+SamplePlugin* sp;
+Sample* s;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
-int main(int argc, char *argv[])
-#endif
+extern "C" _OgreSampleExport void dllStartPlugin()
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-        NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-        int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
-        [pool release];
-        return retVal;
-#else
-    // Create application object
-    VolumeTexApplication app;
-
-    try {
-        app.go();
-    } catch( Ogre::Exception& e ) {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
-#else
-        std::cerr << "An exception has occured: " <<
-            e.getFullDescription().c_str() << std::endl;
-#endif
-    }
-
-    return 0;
-#endif
+	s = new Sample_VolumeTex;
+	sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
+	sp->addSample(s);
+	Root::getSingleton().installPlugin(sp);
 }
 
-#ifdef __cplusplus
-}
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-#   ifdef __OBJC__
-@interface AppDelegate : NSObject <UIApplicationDelegate>
+extern "C" _OgreSampleExport void dllStopPlugin()
 {
+	Root::getSingleton().uninstallPlugin(sp); 
+	OGRE_DELETE sp;
+	delete s;
 }
-
-- (void)go;
-
-@end
-
-@implementation AppDelegate
-
-- (void)go {
-    // Create application object
-    VolumeTexApplication app;
-    try {
-        app.go();
-    } catch( Ogre::Exception& e ) {
-        std::cerr << "An exception has occured: " <<
-        e.getFullDescription().c_str() << std::endl;
-    }
-}
-
-- (void)applicationDidFinishLaunching:(UIApplication *)application {
-    // Hide the status bar
-    [[UIApplication sharedApplication] setStatusBarHidden:YES];
-
-    // Create a window
-    UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-
-    // Create an image view
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Default.png"]];
-    [window addSubview:imageView];
-    
-    // Create an indeterminate status indicator
-    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    [indicator setFrame:CGRectMake(150, 280, 20, 20)];
-    [indicator startAnimating];
-    [window addSubview:indicator];
-    
-    // Display our window
-    [window makeKeyAndVisible];
-    
-    // Clean up
-    [imageView release];
-    [indicator release];
-
-    [NSThread detachNewThreadSelector:@selector(go) toTarget:self withObject:nil];
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application {
-    Root::getSingleton().queueEndRendering();
-}
-
-//- (void)applicationWillResignActive:(UIApplication *)application
-//{
-//    // Pause FrameListeners and rendering
-//}
-//
-//- (void)applicationDidBecomeActive:(UIApplication *)application
-//{
-//    // Resume FrameListeners and rendering
-//}
-
-
-- (void)dealloc {
-    [super dealloc];
-}
-
-@end
-#   endif
-
-#endif

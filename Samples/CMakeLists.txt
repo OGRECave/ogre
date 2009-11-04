@@ -128,6 +128,7 @@ if (OGRE_BUILD_COMPONENT_TERRAIN)
 endif ()
   add_subdirectory(TextureFX)
   add_subdirectory(Transparency)
+  add_subdirectory(VolumeTex)
   add_subdirectory(Water)
 
 if (NOT OGRE_BUILD_PLATFORM_IPHONE)

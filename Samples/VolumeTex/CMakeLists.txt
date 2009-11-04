@@ -21,16 +21,22 @@ set(SOURCE_FILES
   src/VolumeRenderable.cpp
 )
 
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/VolumeTex.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-endif ()
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_executable(Demo_VolumeTex WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+add_library(Sample_VolumeTex ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Demo_VolumeTex ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample_exe(Demo_VolumeTex)
+target_link_libraries(Sample_VolumeTex ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+ogre_config_sample_lib(Sample_VolumeTex)
 
-if (SAMPLE_DEPENDENCIES)
-  add_dependencies(Demo_VolumeTex ${SAMPLE_DEPENDENCIES})
-endif ()
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Samples can be installed in the application package
+    set_target_properties(Sample_VolumeTex
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
+
+if (OGRE_STATIC)
+  add_dependencies(SampleBrowser Sample_VolumeTex)
+else ()
+  add_dependencies(Sample_VolumeTex SampleBrowser)
+endif (OGRE_STATIC)

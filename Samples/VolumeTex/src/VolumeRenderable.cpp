@@ -194,6 +194,10 @@ void VolumeRenderable::initialise()
 	mRenderOp.useIndexes = true;
 	
 	 // Create a brand new private material
+	if (!ResourceGroupManager::getSingleton().resourceGroupExists("VolumeRenderable"))
+	{
+		ResourceGroupManager::getSingleton().createResourceGroup("VolumeRenderable");
+	}
 	MaterialPtr material = 
 		MaterialManager::getSingleton().create(mTexture, "VolumeRenderable",
 			false, 0); // Manual, loader
