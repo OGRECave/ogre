@@ -249,6 +249,50 @@ public:
 		return true;
 	}
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+	virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
+	{
+		if (mTrayMgr->injectMouseDown(evt)) return true;
+		mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
+		return true;
+	}
+#else
+	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+	{
+		if (mTrayMgr->injectMouseDown(evt, id)) return true;
+		if (id == OIS::MB_Left) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
+		return true;
+	}
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+	virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
+	{
+		if (mTrayMgr->injectMouseUp(evt, id)) return true;
+		mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
+		return true;
+	}
+#else
+	bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+	{
+		if (mTrayMgr->injectMouseUp(evt, id)) return true;
+		if (id == OIS::MB_Left) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
+		return true;
+	}
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+	virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
+#else
+	virtual bool mouseMoved(const OIS::MouseEvent& evt)
+#endif
+	{
+		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
+		else mCameraMan->injectMouseMove(evt);
+		return true;
+	}
+
+
 protected:
 
 	Terrain* mTerrain;

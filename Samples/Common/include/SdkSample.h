@@ -325,15 +325,9 @@ namespace OgreBites
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 		virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
-		{
-			if (mTrayMgr->injectMouseMove(evt)) return true;
-            
-			mCameraMan->injectMouseMove(evt);
-            
-			return true;
-		}
 #else
 		virtual bool mouseMoved(const OIS::MouseEvent& evt)
+#endif
 		{
 			if (mTrayMgr->injectMouseMove(evt)) return true;
 
@@ -341,7 +335,6 @@ namespace OgreBites
 
 			return true;
 		}
-#endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 		virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
