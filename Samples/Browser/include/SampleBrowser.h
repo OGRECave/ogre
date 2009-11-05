@@ -50,7 +50,9 @@
 #include "Grass.h"
 #include "Lighting.h"
 #include "ParticleFX.h"
+#if USE_RTSHADER_SYSTEM
 #include "ShaderSystem.h"
+#endif
 #include "SkeletalAnimation.h"
 #include "SkyBox.h"
 #include "SkyDome.h"

@@ -51,7 +51,7 @@ public:
 	{
         if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
         {
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertext or fragment shaders, "
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex or fragment shaders, "
                         "so you cannot run this sample. Sorry!", "TerrainSample::testCapabilities");
         }
 	}
@@ -250,7 +250,7 @@ public:
 	}
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
+	virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
 	{
 		if (mTrayMgr->injectMouseDown(evt)) return true;
 		mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
@@ -268,7 +268,7 @@ public:
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 	virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
 	{
-		if (mTrayMgr->injectMouseUp(evt, id)) return true;
+		if (mTrayMgr->injectMouseUp(evt)) return true;
 		mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
 		return true;
 	}
