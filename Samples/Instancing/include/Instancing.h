@@ -252,7 +252,7 @@ protected:
 		technique->addItem("Static Geometry");
 		technique->addItem("Independent Entities");
 
-		mTrayMgr->createThickSlider(TL_TOPLEFT, "ObjectCountSlider", "Object count", 200, 50, 0, 1000, 101)->setValue(100, false);
+		mTrayMgr->createThickSlider(TL_TOPLEFT, "ObjectCountSlider", "Object count", 200, 50, 0, 1000, 101)->setValue(160, false);
 
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "ShadowCheckBox", "Shadows", 200);
 		

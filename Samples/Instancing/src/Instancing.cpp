@@ -32,7 +32,7 @@ mBurnAmount(0)
 		LogManager::getSingleton().logMessage("supported syntax : "+(*iter));
 	}
 	
-	numMesh = 100;
+	numMesh = 160;
 	numRender = 0;
 	meshSelected = 0;
 	currentGeomOpt = INSTANCE_OPT;
