@@ -24,7 +24,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 __author__ = 'Michael Reimpell (Maintainer: Lih-Hern Pang)'
-__version__ = '1.1'
+__version__ = '1.3'
 __url__ = ["Help, http://www.ogre3d.org/phpBB2/search.php", "Ogre3D, http://www.ogre3d.org"]
 __bpydoc__ = "Please see the external documentation that comes with the script."
 
@@ -1309,7 +1309,7 @@ else:
 				for proxyManager in self.armatureAnimationProxyManagerDict.values():
 					proxyManager.savePackageSettings()
 				return
-			def export(self, exportPath, exportMaterial, materialScriptName, customMaterial, customMaterialTplPath, colouredAmbient, gameEngineMaterials, exportMesh, fixUpAxis, skeletonUseMeshName, convertXML, copyTextures, requireFaceMats):
+			def export(self, exportPath, exportMaterial, materialScriptName, customMaterial, customMaterialTplPath, colouredAmbient, gameEngineMaterials, exportMesh, fixUpAxis, skeletonUseMeshName, applyModifiers, convertXML, copyTextures, requireFaceMats):
 				# create MaterialManager
 				if len(self.selectedList):
 					materialManager = MaterialManager(exportPath, materialScriptName, gameEngineMaterials, customMaterial, customMaterialTplPath, requireFaceMats)
@@ -1325,7 +1325,7 @@ else:
 						if self.armatureAnimationProxyManagerDict.has_key(name):
 							self.armatureAnimationProxyManagerDict[name].toAnimations(meshExporter.getArmatureExporter())
 						# export
-						meshExporter.export(exportPath, materialManager, fixUpAxis, exportMesh, colouredAmbient, convertXML)
+						meshExporter.export(exportPath, materialManager, fixUpAxis, exportMesh, colouredAmbient, applyModifiers, convertXML)
 					# export materials
 					if (exportMaterial):
 						materialManager.export(exportPath, materialScriptName, copyTextures)
@@ -1635,6 +1635,7 @@ else:
 				self.copyTextures = ToggleModel(0)
 				self.requireFaceMats = ToggleModel(True)
 				self.skeletonUseMeshName = ToggleModel(1)
+				self.applyModifiers = ToggleModel(0)
 
 				matTglGrp = ToggleGroup()
 				matTglGrp.addToggle(self.renderingMaterial)
@@ -1709,6 +1710,8 @@ else:
 				ToggleView(globalSettingLayout1, Size([Size.INFINITY, 20], [150, 20]), self.skeletonUseMeshName, T("Skeleton name follow mesh"), \
 					T("Use mesh name for the exported skeleton name instead of the armature name."))
 				globalSettingLayout2 = HorizontalLayout(globalSettingLayout)
+				ToggleView(globalSettingLayout2, Size([Size.INFINITY, 20], [150, 20]), self.applyModifiers, T("Apply Modifiers"), \
+					T("Apply mesh modifier before export. This option is slow and may break vert order for morph targets."))
 				ToggleView(globalSettingLayout2, Size([Size.INFINITY, 20], [100, 20]), self.convertXML, T("OgreXMLConverter"), \
 					T("Run OgreXMLConverter on the exported XML files."))
 				## buttons
@@ -1778,6 +1781,9 @@ else:
 				skeletonUseMeshName = PackageSettings.getSingleton().getSetting('skeletonUseMeshName')
 				if skeletonUseMeshName is not None:
 					self.skeletonUseMeshName.setValue(skeletonUseMeshName)
+				applyModifiers = PackageSettings.getSingleton().getSetting('applyModifiers')
+				if applyModifiers is not None:
+					self.applyModifiers.setValue(applyModifiers)
 				convertXML = PackageSettings.getSingleton().getSetting('convertXML')
 				if convertXML is not None:
 					self.convertXML.setValue(convertXML)
@@ -1798,6 +1804,7 @@ else:
 				PackageSettings.getSingleton().setSetting('exportMesh', self.exportMesh.getValue())
 				PackageSettings.getSingleton().setSetting('fixUpAxis', self.fixUpAxis.getValue())
 				PackageSettings.getSingleton().setSetting('skeletonUseMeshName', self.skeletonUseMeshName.getValue())
+				PackageSettings.getSingleton().setSetting('applyModifiers', self.applyModifiers.getValue())
 				PackageSettings.getSingleton().setSetting('convertXML', self.convertXML.getValue())
 				PackageSettings.getSingleton().setSetting('exportPath', self.exportPath.getValue())
 				PackageSettings.getSingleton().save()
@@ -1873,6 +1880,7 @@ else:
 						self.app.exportMesh.getValue(), \
 						self.app.fixUpAxis.getValue(), \
 						self.app.skeletonUseMeshName.getValue(), \
+						self.app.applyModifiers.getValue(), \
 						self.app.convertXML.getValue(), \
 						self.app.copyTextures.getValue(), \
 						self.app.requireFaceMats.getValue(), \
