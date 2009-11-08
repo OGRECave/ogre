@@ -507,7 +507,6 @@ elseif (APPLE)
       include/OSX/OgreTimerImp.h
       include/OSX/OgreOSXCocoaView.h
 	  include/OgreZip.h
-	  ${OGRE_BINARY_DIR}/include/buildsettings.h
     )
     set(PLATFORM_SOURCE_FILES
       src/OSX/OgreConfigDialog.mm
