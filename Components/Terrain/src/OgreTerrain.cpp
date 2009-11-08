@@ -124,6 +124,7 @@ namespace Ogre
 		, mTreeDepth(0)
 		, mDirtyGeometryRect(0, 0, 0, 0)
 		, mDirtyDerivedDataRect(0, 0, 0, 0)
+		, mDirtyLightmapFromNeighboursRect(0, 0, 0, 0)
 		, mDerivedDataUpdateInProgress(false)
 		, mDerivedUpdatePendingMask(0)
 		, mMaterialGenerationCount(0)
@@ -964,18 +965,18 @@ namespace Ogre
 			mQuadTree->unprepare();
 	}
 	//---------------------------------------------------------------------
-	float* Terrain::getHeightData()
+	float* Terrain::getHeightData() const
 	{
 		return mHeightData;
 	}
 	//---------------------------------------------------------------------
-	float* Terrain::getHeightData(long x, long y)
+	float* Terrain::getHeightData(long x, long y) const
 	{
 		assert (x >= 0 && x < mSize && y >= 0 && y < mSize);
 		return &mHeightData[y * mSize + x];
 	}
 	//---------------------------------------------------------------------
-	float Terrain::getHeightAtPoint(long x, long y)
+	float Terrain::getHeightAtPoint(long x, long y) const
 	{
 		// clamp
 		x = std::min(x, (long)mSize - 1L);
@@ -1582,14 +1583,13 @@ namespace Ogre
 		if (!mDirtyGeometryRect.isNull())
 		{
 			mQuadTree->updateVertexData(true, false, mDirtyGeometryRect, false);
-			mDirtyGeometryRect.left = mDirtyGeometryRect.top = 
-				mDirtyGeometryRect.right = mDirtyGeometryRect.bottom = 0;
+			mDirtyGeometryRect.setNull();
 		}
 	}
 	//---------------------------------------------------------------------
 	void Terrain::updateDerivedData(bool synchronous, uint8 typeMask)
 	{
-		if (!mDirtyDerivedDataRect.isNull())
+		if (!mDirtyDerivedDataRect.isNull() || !mDirtyLightmapFromNeighboursRect.isNull())
 		{
 			if (mDerivedDataUpdateInProgress)
 			{
@@ -1599,10 +1599,10 @@ namespace Ogre
 			}
 			else
 			{
-				updateDerivedDataImpl(mDirtyDerivedDataRect, synchronous, typeMask);
-				mDirtyDerivedDataRect.left = mDirtyDerivedDataRect.top = 
-					mDirtyDerivedDataRect.right = mDirtyDerivedDataRect.bottom = 0;
-
+				updateDerivedDataImpl(mDirtyDerivedDataRect, mDirtyLightmapFromNeighboursRect, 
+					synchronous, typeMask);
+				mDirtyDerivedDataRect.setNull();
+				mDirtyLightmapFromNeighboursRect.setNull();
 			}
 		}
 		else
@@ -1616,7 +1616,8 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void Terrain::updateDerivedDataImpl(const Rect& rect, bool synchronous, uint8 typeMask)
+	void Terrain::updateDerivedDataImpl(const Rect& rect, const Rect& lightmapExtraRect, 
+		bool synchronous, uint8 typeMask)
 	{
 		mDerivedDataUpdateInProgress = true;
 		mDerivedUpdatePendingMask = 0;
@@ -1624,6 +1625,7 @@ namespace Ogre
 		DerivedDataRequest req;
 		req.terrain = this;
 		req.dirtyRect = rect;
+		req.lightmapExtraDirtyRect = lightmapExtraRect;
 		req.typeMask = typeMask;
 		if (!mNormalMapRequired)
 			req.typeMask = req.typeMask & ~DERIVED_DATA_NORMALS;
@@ -2268,7 +2270,7 @@ namespace Ogre
 		uint8 idx = layerIndex - 1;
 		if (!mLayerBlendMapList[idx])
 		{
-			if (mBlendTextureList.size() < idx / 4)
+			if (mBlendTextureList.size() < static_cast<size_t>(idx / 4))
 				checkLayers(true);
 
 			const TexturePtr& tex = mBlendTextureList[idx / 4];
@@ -2555,7 +2557,7 @@ namespace Ogre
 		}
 		else if (ddr.typeMask & DERIVED_DATA_LIGHTMAP)
 		{
-			ddres.lightMapBox = calculateLightmap(ddr.dirtyRect, ddres.lightmapUpdateRect);
+			ddres.lightMapBox = calculateLightmap(ddr.dirtyRect, ddr.lightmapExtraDirtyRect, ddres.lightmapUpdateRect);
 			ddres.remainingTypeMask &= ~ DERIVED_DATA_LIGHTMAP;
 		}
 
@@ -2606,14 +2608,21 @@ namespace Ogre
 		if (mDerivedUpdatePendingMask)
 		{
 			newRect.merge(mDirtyDerivedDataRect);
-			mDirtyDerivedDataRect.left = mDirtyDerivedDataRect.top = 
-				mDirtyDerivedDataRect.right = mDirtyDerivedDataRect.bottom = 0;
+			mDirtyDerivedDataRect.setNull();
+		}
+		Rect newLightmapExtraRect(0,0,0,0);
+		if (ddres.remainingTypeMask)
+			newLightmapExtraRect.merge(ddreq.lightmapExtraDirtyRect);
+		if (mDerivedUpdatePendingMask)
+		{
+			newLightmapExtraRect.merge(mDirtyLightmapFromNeighboursRect);
+			mDirtyLightmapFromNeighboursRect.setNull();
 		}
 		uint8 newMask = ddres.remainingTypeMask | mDerivedUpdatePendingMask;
 		if (newMask)
 		{
 			// trigger again
-			updateDerivedDataImpl(newRect, false, newMask);
+			updateDerivedDataImpl(newRect, newLightmapExtraRect, false, newMask);
 		}
 		else
 		{
@@ -2844,9 +2853,8 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	PixelBox* Terrain::calculateLightmap(const Rect& rect, Rect& outFinalRect)
+	PixelBox* Terrain::calculateLightmap(const Rect& rect, const Rect& extraTargetRect, Rect& outFinalRect)
 	{
-		// TODO - allow calculation of all lighting, not just shadows
 		// TODO - handle neighbour page casting
 
 		// as well as calculating the lighting changes for the area that is
@@ -2858,6 +2866,10 @@ namespace Ogre
 		const Vector3& lightVec = TerrainGlobalOptions::getLightMapDirection();
 		Rect widenedRect;
 		widenRectByVector(lightVec, rect, widenedRect);
+
+		// merge in the extra area (e.g. from neighbours)
+		widenedRect.merge(extraTargetRect);
+
 		// widenedRect now contains terrain point space version of the area we
 		// need to calculate. However, we need to calculate in lightmap image space
 		float terrainToLightmapScale = (float)mLightmapSizeActual / (float)mSize;
@@ -2975,8 +2987,7 @@ namespace Ogre
 				mMaterialGenerator->updateCompositeMap(this, mCompositeMapDirtyRect);
 
 			mCompositeMapDirtyRectLightmapUpdate = false;
-			mCompositeMapDirtyRect.left = mCompositeMapDirtyRect.right = 
-				mCompositeMapDirtyRect.top = mCompositeMapDirtyRect.bottom = 0;
+			mCompositeMapDirtyRect.setNull();
 
 
 		}
@@ -3217,11 +3228,43 @@ namespace Ogre
 		if (!neighbour)
 			return; // bogus request
 
+		bool updateGeom = false;
+		uint8 updateDerived = 0;
+
 
 		if (!edgerect.isNull())
 		{
-			// update edges; match heights first, then calculate normals
-			// TODO
+			// update edges; match heights first, then recalculate normals
+			// reduce to just single line / corner
+			Rect heightMatchRect(edgerect);
+			if (heightMatchRect.left == 0)
+				heightMatchRect.right = 1;
+			else
+				heightMatchRect.left = mSize - 1;
+			if (heightMatchRect.top == 0)
+				heightMatchRect.bottom = 1;
+			else
+				heightMatchRect.top = mSize - 1;
+
+			for (long y = heightMatchRect.top; y < heightMatchRect.bottom; ++y)
+			{
+				for (long x = heightMatchRect.left; y < heightMatchRect.right; ++y)
+				{
+					long nx, ny;
+					getNeighbourPoint(index, x, y, &nx, &ny);
+					float neighbourHeight = neighbour->getHeightAtPoint(nx, ny); 
+					if (!Math::RealEqual(neighbourHeight, getHeightAtPoint(x, y), 1e-3f))
+					{
+						setHeightAtPoint(x, y, neighbourHeight);
+						if (!updateGeom)
+						{
+							updateGeom = true;
+							updateDerived |= DERIVED_DATA_ALL;
+						}
+
+					}
+				}
+			}
 		}
 
 		if (!shadowrect.isNull())
@@ -3233,12 +3276,15 @@ namespace Ogre
 			Rect widenedRect;
 			widenRectByVector(lightVec, shadowrect, neighbour->getMinHeight(), neighbour->getMaxHeight(), widenedRect);
 
-			// need to pass this on to lightmap calculation, not have it auto-calculated
-			// TODO
-
-
+			// set the special-case lightmap dirty rectangle
+			mDirtyLightmapFromNeighboursRect.merge(widenedRect);
+			updateDerived |= DERIVED_DATA_LIGHTMAP;
 		}
 
+		if (updateGeom)
+			updateGeometry();
+		if (updateDerived)
+			updateDerivedData(false, updateDerived);
 
 
 
@@ -3309,6 +3355,21 @@ namespace Ogre
 		outRect->right = mSize = inRect.left;
 		outRect->top = mSize - inRect.bottom;
 		outRect->bottom = mSize = inRect.top;
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getNeighbourPoint(NeighbourIndex index, long x, long y, long *outx, long *outy)
+	{
+		// Get the index of the point we should be looking at on a neighbour
+		// in order to match up points
+		assert (mSize == getNeighbour(index)->getSize());
+
+		// Basically just reflect the vertex 
+		// remember index is neighbour relationship from OUR perspective
+		// the points returned are in relation to neighbour
+		*outx = mSize - x;
+		*outy = mSize - y;
+		
+
 	}
 
 

@@ -518,17 +518,17 @@ namespace Ogre
 			wish. However, changes will not be propagated until you call 
 			Terrain::dirty or Terrain::dirtyRect.
 		*/
-		float* getHeightData();
+		float* getHeightData() const;
 
 		/** Get a pointer to the height data for a given point. 
 		*/
-		float* getHeightData(long x, long y);
+		float* getHeightData(long x, long y) const;
 
 		/** Get the height data for a given terrain point. 
 		@param x, y Discrete coordinates in terrain vertices, values from 0 to size-1,
 			left/right bottom/top
 		*/
-		float getHeightAtPoint(long x, long y);
+		float getHeightAtPoint(long x, long y) const;
 
 		/** Set the height data for a given terrain point. 
 		@note this doesn't take effect until you call update()
@@ -938,10 +938,12 @@ namespace Ogre
 
 		/** Calculate (or recalculate) the terrain lightmap
 		@param rect Rectangle describing the area of heights that were changed
+		@param extraTargetRect Rectangle describing a target area of the terrain that
+			needs to be calculated additionally (e.g. from a neighbour)
 		@param outFinalRect Output rectangle describing the area updated in the lightmap
 		@returns Pointer to a PixelBox full of lighting data (caller responsible for deletion)
 		*/
-		PixelBox* calculateLightmap(const Rect& rect, Rect& outFinalRect);
+		PixelBox* calculateLightmap(const Rect& rect, const Rect& extraTargetRect, Rect& outFinalRect);
 
 		/** Finalise the lightmap. 
 		Calculating lightmaps is kept in a separate calculation area to make
@@ -1292,10 +1294,11 @@ namespace Ogre
 		void deriveUVMultipliers();
 		PixelFormat getBlendTextureFormat(uint8 textureIndex, uint8 numLayers);
 
-		void updateDerivedDataImpl(const Rect& rect, bool synchronous, uint8 typeMask);
+		void updateDerivedDataImpl(const Rect& rect, const Rect& lightmapExtraRect, bool synchronous, uint8 typeMask);
 
 		void getEdgeRect(NeighbourIndex index, Rect* outRect);
 		void getNeighbourEdgeRect(NeighbourIndex index, const Rect& inRect, Rect* outRect);
+		void getNeighbourPoint(NeighbourIndex index, long x, long y, long *outx, long *outy);
 
 		
 
@@ -1331,6 +1334,7 @@ namespace Ogre
 
 		Rect mDirtyGeometryRect;
 		Rect mDirtyDerivedDataRect;
+		Rect mDirtyLightmapFromNeighboursRect;
 		bool mDerivedDataUpdateInProgress;
 		uint8 mDerivedUpdatePendingMask; // if another update is requested while one is already running
 
@@ -1341,6 +1345,7 @@ namespace Ogre
 			// types requested
 			uint8 typeMask;
 			Rect dirtyRect;
+			Rect lightmapExtraDirtyRect;
 			_OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const DerivedDataRequest& r)
 			{ return o; }		
 		};
