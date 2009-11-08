@@ -558,6 +558,10 @@ namespace Ogre {
 		  {
 			  return width() == 0 || height() == 0;
 		  }
+		  void setNull()
+		  {
+			  left = right = top = bottom = 0;
+		  }
 		  TRect & merge(const TRect& rhs)
 		  {
 			  if (isNull())
