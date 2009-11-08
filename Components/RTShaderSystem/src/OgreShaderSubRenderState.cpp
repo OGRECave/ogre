@@ -27,6 +27,7 @@ THE SOFTWARE.
 
 #include "OgreShaderSubRenderState.h"
 #include "OgreException.h"
+#include "OgreShaderGenerator.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -47,9 +48,13 @@ SubRenderState::~SubRenderState()
 
 uint32 SubRenderState::getHashCode()
 {
+	uint32 hashCode = 0;
 	_StringHash H;
 
-	return static_cast<uint32>(H(getType()));
+	sh_hash_combine(hashCode, static_cast<uint32>(H(getType())));
+	sh_hash_combine(hashCode, ShaderGenerator::getSingleton().getVertexShaderOutputsCompactPolicy());	
+	
+	return hashCode;
 }
 
 //-----------------------------------------------------------------------

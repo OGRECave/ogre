@@ -51,7 +51,7 @@ enables automatic generation of shader code based on existing material technique
 */
 class ShaderGenerator : public Singleton<ShaderGenerator>, public RTShaderSystemAlloc
 {
-	// Interface.
+// Interface.
 public:
 
 	/** 
@@ -159,8 +159,13 @@ public:
 	Get the output shader cache path.
 	*/
 	const String&	getShaderCachePath			() const { return mShaderCachePath; }
-	
 
+	/** 
+	Flush the shader cache. This operation will cause all active sachems to be invalidated and will
+	destroy any CPU/GPU program that created by this shader generator.
+	*/
+	void			flushShaderCache			();
+	
 	/** 
 	Return a global render state associated with the given scheme name.
 	Modifying this render state will affect all techniques that belongs to that scheme.
@@ -298,6 +303,17 @@ public:
 
 
 
+	/** Set the vertex shader outputs compaction policy. 
+	@see VSOutputCompactPolicy.
+	@param policy The policy to set.
+	*/
+	void							setVertexShaderOutputsCompactPolicy		(VSOutputCompactPolicy policy)  { mVSOutputCompactPolicy = policy; }
+	
+	/** Get the vertex shader outputs compaction policy. 
+	@see VSOutputCompactPolicy.	
+	*/
+	VSOutputCompactPolicy			getVertexShaderOutputsCompactPolicy		() const { return mVSOutputCompactPolicy; }
+
 	/// Default material scheme of the shader generator.
 	static String DEFAULT_SCHEME_NAME;
 
@@ -346,8 +362,12 @@ protected:
 		/** Build the render state. */
 		void			buildRenderState			();
 
-		/** Acquire the GPU programs for the destination pass. */
-		void			acquireGpuPrograms			();
+		/** Acquire the CPU/GPU programs for this pass. */
+		void			acquirePrograms			();
+
+		/** Release the CPU/GPU programs of this pass. */
+		void			releasePrograms			();
+
 
 		/** Called when a single object is about to be rendered. */
 		void			notifyRenderSingleObject	(Renderable* rend, const AutoParamDataSource* source, const LightList* pLightList, bool suppressRenderStateChanges);
@@ -406,8 +426,11 @@ protected:
 		/** Build the render state. */
 		void				buildRenderState				();
 
-		/** Acquire the GPU programs for the destination technique. */
-		void				acquireGpuPrograms				();
+		/** Acquire the CPU/GPU programs for this technique. */
+		void				acquirePrograms				();
+
+		/** Release the CPU/GPU programs of this technique. */
+		void				releasePrograms				();
 
 		/** Tells the technique that it needs to generate shader code. */
 		void				setBuildDestinationTechnique	(bool buildTechnique)	{ mBuildDstTechnique = buildTechnique; }		
@@ -663,7 +686,10 @@ protected:
 	RenderStatePtr		getCachedRenderState			(uint hashCode);
 
 	/** Add render state to cache.*/
-	void				addRenderStateToCache			(RenderStatePtr renderStatePtr);			
+	void				addRenderStateToCache			(RenderStatePtr renderStatePtr);
+
+	/** Remove render state from cache.*/
+	void				removeRenderStateFromCache		(RenderStatePtr renderStatePtr);
 
 	/** Create sub render state core extensions factories */
 	void				createSubRenderStateExFactories			();
@@ -730,10 +756,11 @@ protected:
 	SGSchemeMap						mSchemeEntriesMap;				// Scheme entries map.
 	SGTechniqueMap					mTechniqueEntriesMap;			// All technique entries map.
 	RenderStateMap					mCachedRenderStates;			// All cached render states.
-	SubRenderStateFactoryMap		mSubRenderStateFactoryMap;		// Sub render state registered factories.
+	SubRenderStateFactoryMap		mSubRenderStateFactories;		// Sub render state registered factories.
 	SubRenderStateFactoryMap		mSubRenderStateExFactories;		// Sub render state core extension factories.
 	bool							mActiveViewportValid;			// True if active view port use a valid SGScheme.
 	int								mLightCount[3];					// Light count per light type.
+	VSOutputCompactPolicy			mVSOutputCompactPolicy;			// Vertex shader outputs compact policy.
 	
 private:
 	friend class SGPass;

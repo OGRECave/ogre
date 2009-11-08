@@ -119,10 +119,8 @@ public:
 	@param type The type of the parameter to search in the list.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	ParameterPtr				getParameterByContent	(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type);
+	ParameterPtr					getParameterByContent	(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type);
 
-
-	
 	/** Return a list of input parameters. */
 	const ShaderParameterList&		getInputParameters		() const { return mInputParameters; }	
 
@@ -146,19 +144,10 @@ public:
 	void							sortAtomInstances		();
 
 	/** Return list of atom instances composing this function. */
+	FunctionAtomInstanceList&		getAtomInstances		() { return mAtomInstances; }
+
+	/** Return list of atom instances composing this function. (Const version) */
 	const FunctionAtomInstanceList&	getAtomInstances		() const { return mAtomInstances; }
-
-protected:
-
-	/** Class constructor.
-	@param name The name of this function.
-	@param desc The description of this function.
-	@remarks This class is allocated via an instance of Program class. 
-	*/
-	Function			(const String& name, const String& desc);
-
-	/** Class destructor */
-	~Function			();
 
 	/** Add input parameter to this function. */
 	void						addInputParameter			(ParameterPtr parameter);
@@ -171,6 +160,18 @@ protected:
 
 	/** Delete output parameter to this function. */
 	void						deleteOutputParameter		(ParameterPtr parameter);
+
+protected:
+
+	/** Class constructor.
+	@param name The name of this function.
+	@param desc The description of this function.
+	@remarks This class is allocated via an instance of Program class. 
+	*/
+	Function			(const String& name, const String& desc);
+
+	/** Class destructor */
+	~Function			();
 
 	/** Add parameter to given list */
 	void						addParameter				(ShaderParameterList& parameterList, ParameterPtr parameter);

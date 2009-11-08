@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreShaderGenerator.h"
 #include "OgrePass.h"
 #include "OgreLogManager.h"
+#include "OgreShaderProgramProcessor.h"
+#include "OgreShaderCGProgramProcessor.h"
 
 
 namespace Ogre {
@@ -63,20 +65,22 @@ ProgramManager::ProgramManager()
 {
 	mVertexShaderCount   = 0;
 	mFragmentShaderCount = 0;
+
+	createDefaultProgramProcessors();
 }
 
 //-----------------------------------------------------------------------------
 ProgramManager::~ProgramManager()
 {
+	destroyDefaultProgramProcessors();
+
 	destroyProgramSets();
 
-	destroyPrograms();
-
-	destroyProgramsWriters();
+	destroyProgramWriters();
 }
 
 //-----------------------------------------------------------------------------
-void ProgramManager::acquireGpuPrograms(Pass* pass, RenderState* renderState)
+void ProgramManager::acquirePrograms(Pass* pass, RenderState* renderState)
 {
 	uint32 renderStateHashCode    = renderState->getHashCode();
 	ProgramSetIterator itPrograms = mHashToProgramSetMap.find(renderStateHashCode);
@@ -116,6 +120,42 @@ void ProgramManager::acquireGpuPrograms(Pass* pass, RenderState* renderState)
 }
 
 //-----------------------------------------------------------------------------
+void ProgramManager::releasePrograms(RenderState* renderState)
+{
+	uint32 renderStateHashCode    = renderState->getHashCode();
+	ProgramSetIterator itPrograms = mHashToProgramSetMap.find(renderStateHashCode);
+	
+	// Cached programs for the given render state found.
+	if (itPrograms != mHashToProgramSetMap.end())
+	{
+		OGRE_DELETE itPrograms->second;	
+		mHashToProgramSetMap.erase(itPrograms);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void ProgramManager::createDefaultProgramProcessors()
+{
+	mDefaultProgramProcessors.push_back(OGRE_NEW CGProgramProcessor);
+
+	for (unsigned int i=0; i < mDefaultProgramProcessors.size(); ++i)
+	{
+		addProgramProcessor(mDefaultProgramProcessors[i]);
+	}
+}
+
+//-----------------------------------------------------------------------------
+void ProgramManager::destroyDefaultProgramProcessors()
+{
+	for (unsigned int i=0; i < mDefaultProgramProcessors.size(); ++i)
+	{
+		removeProgramProcessor(mDefaultProgramProcessors[i]);
+		OGRE_DELETE mDefaultProgramProcessors[i];
+	}
+	mDefaultProgramProcessors.clear();
+}
+
+//-----------------------------------------------------------------------------
 void ProgramManager::destroyProgramSets()
 {
 	ProgramSetIterator it;
@@ -128,25 +168,12 @@ void ProgramManager::destroyProgramSets()
 }
 
 //-----------------------------------------------------------------------------
-void ProgramManager::destroyPrograms()
+void ProgramManager::destroyProgramWriters()
 {
-	ProgramListIterator it    = mCpuProgramsList.begin();
-	ProgramListIterator itEnd = mCpuProgramsList.end();
-
+	ProgramWriterIterator it    = mProgramWritersMap.begin();
+	ProgramWriterIterator itEnd = mProgramWritersMap.end();
 
 	for (; it != itEnd; ++it)
-	{
-		OGRE_DELETE *it;
-	}
-	mCpuProgramsList.clear();
-}
-
-//-----------------------------------------------------------------------------
-void ProgramManager::destroyProgramsWriters()
-{
-	NameToProgramWriterIterator it;
-
-	for (it=mNameToProgramWritersMap.begin(); it != mNameToProgramWritersMap.end(); ++it)
 	{
 		if (it->second != NULL)
 		{
@@ -154,7 +181,7 @@ void ProgramManager::destroyProgramsWriters()
 			it->second = NULL;
 		}					
 	}
-	mNameToProgramWritersMap.clear();
+	mProgramWritersMap.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -191,10 +218,49 @@ bool ProgramManager::destroyCpuProgram(Program* shaderProgram)
 //-----------------------------------------------------------------------------
 bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 {
+	// Grab the matching writer.
+	const String& language = ShaderGenerator::getSingleton().getShaderLanguage();
+	ProgramWriterIterator itWriter = mProgramWritersMap.find(language);
+	ProgramWriter* programWriter = NULL;
+
+
+	// No writer found -> create new one.
+	if (itWriter == mProgramWritersMap.end())
+	{
+		programWriter = OGRE_NEW ProgramWriter(language);
+		mProgramWritersMap[language] = programWriter;
+	}
+	else
+	{
+		programWriter = itWriter->second;
+	}
+
+	ProgramProcessorIterator itProcessor = mProgramProcessorsMap.find(language);
+	ProgramProcessor* programProcessor = NULL;
+
+	if (itProcessor != mProgramProcessorsMap.end())
+	{
+		programProcessor = itProcessor->second;
+	}
+
+	// Case program processor found.
+	if (programProcessor != NULL)
+	{
+		bool success;
+
+		// Call the pre creation of GPU programs method.
+		success = programProcessor->preCreateGpuPrograms(programSet);
+		if (success == false)	
+			return false;	
+	}
+
+
+	// Create the vertex shader program.
 	GpuProgramPtr vsGpuProgram;
 	
 	vsGpuProgram = createGpuProgram(programSet->getCpuVertexProgram(), 
-		ShaderGenerator::getSingleton().getShaderLanguage(), 
+		programWriter,
+		language, 
 		ShaderGenerator::getSingleton().getVertexShaderProfiles(),
 		ShaderGenerator::getSingleton().getShaderCachePath());
 
@@ -204,10 +270,12 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 	programSet->setGpuVertexProgram(vsGpuProgram);
 
 
+	// Create the fragment shader program.
 	GpuProgramPtr psGpuProgram;
 
 	psGpuProgram = createGpuProgram(programSet->getCpuFragmentProgram(), 
-		ShaderGenerator::getSingleton().getShaderLanguage(), 
+		programWriter,
+		language, 
 		ShaderGenerator::getSingleton().getFragmentShaderProfiles(),
 		ShaderGenerator::getSingleton().getShaderCachePath());
 
@@ -222,26 +290,13 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 
 //-----------------------------------------------------------------------------
 GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram, 
+											   ProgramWriter* programWriter,
 											   const String& language,
 											   const String& profiles,
 											   const String& cachePath)
 {
 
-	// Grab the matching writer.
-	NameToProgramWriterIterator itWriter = mNameToProgramWritersMap.find(language);
-	ProgramWriter* programWriter = NULL;
-
-
-	// No writer found -> create new one.
-	if (itWriter == mNameToProgramWritersMap.end())
-	{
-		programWriter = OGRE_NEW ProgramWriter(language);
-		mNameToProgramWritersMap[language] = programWriter;
-	}
-	else
-	{
-		programWriter = itWriter->second;
-	}
+	
 
 	std::stringstream sourceCodeStringStream;
 	_StringHash stringHash;
@@ -409,20 +464,51 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 }
 
 //-----------------------------------------------------------------------------
+void ProgramManager::addProgramProcessor(ProgramProcessor* processor)
+{
+	
+	ProgramProcessorIterator itFind = mProgramProcessorsMap.find(processor->getTargetLanguage());
+
+	if (itFind != mProgramProcessorsMap.end())
+	{
+		OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
+			"A processor for language '" + processor->getTargetLanguage() + "' already exists.",
+			"ProgramManager::addProgramProcessor");
+	}		
+
+	mProgramProcessorsMap[processor->getTargetLanguage()] = processor;
+}
+
+//-----------------------------------------------------------------------------
+void ProgramManager::removeProgramProcessor(ProgramProcessor* processor)
+{
+	ProgramProcessorIterator itFind = mProgramProcessorsMap.find(processor->getTargetLanguage());
+
+	if (itFind != mProgramProcessorsMap.end())
+		mProgramProcessorsMap.erase(itFind);
+
+}
+
+//-----------------------------------------------------------------------------
 void ProgramManager::destroyGpuProgram(const String& name, GpuProgramType type)
 {	
-	if (type == GPT_VERTEX_PROGRAM)
+	ResourcePtr res = HighLevelGpuProgramManager::getSingleton().getByName(name);
+	
+	if (res.isNull() == false)
 	{
-		assert(mVertexShaderCount > 0);
-		mVertexShaderCount--;
-	}
-	else if (type == GPT_FRAGMENT_PROGRAM)
-	{
-		assert(mFragmentShaderCount > 0);
-		mFragmentShaderCount--;
-	}
+		if (type == GPT_VERTEX_PROGRAM)
+		{
+			assert(mVertexShaderCount > 0);
+			mVertexShaderCount--;
+		}
+		else if (type == GPT_FRAGMENT_PROGRAM)
+		{
+			assert(mFragmentShaderCount > 0);
+			mFragmentShaderCount--;
+		}
 
-	HighLevelGpuProgramManager::getSingleton().remove(name);
+		HighLevelGpuProgramManager::getSingleton().remove(name);
+	}
 }
 
 }

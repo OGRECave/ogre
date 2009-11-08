@@ -14,7 +14,8 @@ const String MAIN_ENTITY_MESH			= "ShaderSystem.mesh";
 const String SPECULAR_BOX				= "SpecularBox";
 const String REFLECTIONMAP_BOX			= "ReflectionMapBox";
 const String MAIN_ENTITY_NAME			= "MainEntity";
-const String EXPORT_BUTTON_NAME			=  "ExportMaterial";
+const String EXPORT_BUTTON_NAME			= "ExportMaterial";
+const String FLUSH_BUTTON_NAME			= "FlushShaderCache";
 const String SAMPLE_MATERIAL_GROUP		= "RTShaderSystemMaterialsGroup";
 const int MESH_ARRAY_SIZE = 2;
 const String MESH_ARRAY[MESH_ARRAY_SIZE] =
@@ -132,7 +133,12 @@ void Sample_ShaderSystem::buttonHit( Button* b )
 	{		
 		const String& materialName = mSceneMgr->getEntity(MAIN_ENTITY_NAME)->getSubEntity(0)->getMaterialName();
 		
-		exportRTShaderSystemMaterial(mShaderGenerator->getShaderCachePath() + "materials/ShaderSystemExport.material", materialName);				
+		exportRTShaderSystemMaterial(mShaderGenerator->getShaderCachePath() + "materials/ShaderSystemExport.material", materialName);						
+	}
+	// Case the shader cache should be flushed.
+	else if (b->getName() == FLUSH_BUTTON_NAME)
+	{				
+		mShaderGenerator->flushShaderCache();
 	}
 }
 
@@ -305,13 +311,16 @@ void Sample_ShaderSystem::setupUI()
 	mFogModeMenu ->addItem("Exp2");
 	mFogModeMenu ->addItem("Linear");
 
+	// Flush shader cache button.
+	mTrayMgr->createButton(TL_TOPLEFT, FLUSH_BUTTON_NAME, "Flush Shader Cache", 220);
 	
 	// create target model widgets.
 	mTargetObjMatName = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjMatName", "", 220);
 	mTargetObjVS = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjVS", "", 220);
 	mTargetObjFS = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjFS", "", 220);
 
-
+	
+	// Create main entity widgets.
 	mTrayMgr->createLabel(TL_BOTTOM, "MainEntityLabel", "Main Entity Settings", 240);
 	mTrayMgr->createCheckBox(TL_BOTTOM, SPECULAR_BOX, "Specular", 240)->setChecked(mSpecularEnable);
 
@@ -331,6 +340,8 @@ void Sample_ShaderSystem::setupUI()
 	mLightingModelMenu ->addItem("Normal Map - Object Space");
 
 	mTrayMgr->createButton(TL_BOTTOM, EXPORT_BUTTON_NAME, "Export Material", 240);
+	
+	
 
 	mTrayMgr->showCursor();
 }

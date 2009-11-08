@@ -115,8 +115,8 @@ namespace OgreBites
 #ifdef USE_RTSHADER_SYSTEM
 				if (mRTShaderSystemPanel->isVisible())
 				{
-					mRTShaderSystemPanel->setParamValue(2, Ogre::StringConverter::toString(mShaderGenerator->getVertexShaderCount()));
-					mRTShaderSystemPanel->setParamValue(3, Ogre::StringConverter::toString(mShaderGenerator->getFragmentShaderCount()));
+					mRTShaderSystemPanel->setParamValue(3, Ogre::StringConverter::toString(mShaderGenerator->getVertexShaderCount()));
+					mRTShaderSystemPanel->setParamValue(4, Ogre::StringConverter::toString(mShaderGenerator->getFragmentShaderCount()));
 				}				
 #endif
 			}
@@ -293,7 +293,33 @@ namespace OgreBites
 				usePerPixelLighting = !usePerPixelLighting;				
 			}	
 
-			else if (evt.key == OIS::KC_F4)   // toggle visibility of even rarer debugging details
+			// Switch vertex shader outputs compaction policy.
+			else if (evt.key == OIS::KC_F4)   
+			{
+				switch (mShaderGenerator->getVertexShaderOutputsCompactPolicy())
+				{
+				case Ogre::RTShader::VSOCP_LOW:
+					mShaderGenerator->setVertexShaderOutputsCompactPolicy(Ogre::RTShader::VSOCP_MEDIUM);
+					mRTShaderSystemPanel->setParamValue(2, "Medium");
+					break;
+
+				case Ogre::RTShader::VSOCP_MEDIUM:
+					mShaderGenerator->setVertexShaderOutputsCompactPolicy(Ogre::RTShader::VSOCP_HIGH);
+					mRTShaderSystemPanel->setParamValue(2, "High");
+					break;
+
+				case Ogre::RTShader::VSOCP_HIGH:
+					mShaderGenerator->setVertexShaderOutputsCompactPolicy(Ogre::RTShader::VSOCP_LOW);
+					mRTShaderSystemPanel->setParamValue(2, "Low");
+					break;
+				}
+				
+				// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
+				mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+			}	
+
+			// Toggle panel visibility.
+			if (evt.key == OIS::KC_F)
 			{
 				if (mRTShaderSystemPanel->getTrayLocation() == TL_NONE)
 				{
@@ -305,7 +331,7 @@ namespace OgreBites
 					mTrayMgr->removeWidgetFromTray(mRTShaderSystemPanel);
 					mRTShaderSystemPanel->hide();
 				}
-			}				
+			}
 #endif
 
 			mCameraMan->injectKeyDown(evt);
@@ -413,14 +439,16 @@ namespace OgreBites
 			rtShaderItems.clear();
 			rtShaderItems.push_back("RT Shader System");
 			rtShaderItems.push_back("Lighting Model");
+			rtShaderItems.push_back("Compaction Policy");
 			rtShaderItems.push_back("Generated VS");
 			rtShaderItems.push_back("Generated FS");
 
 			mRTShaderSystemPanel = mTrayMgr->createParamsPanel(TL_TOP, "RTShaderSystemPanel", 200, rtShaderItems);
 			mRTShaderSystemPanel->setParamValue(0, "Off");
 			mRTShaderSystemPanel->setParamValue(1, "Per vertex");
-			mRTShaderSystemPanel->setParamValue(2, "0");
-			mRTShaderSystemPanel->setParamValue(3, "0");															
+			mRTShaderSystemPanel->setParamValue(2, "Low");
+			mRTShaderSystemPanel->setParamValue(3, "0");
+			mRTShaderSystemPanel->setParamValue(4, "0");															
 #endif
 			
 			loadResources();

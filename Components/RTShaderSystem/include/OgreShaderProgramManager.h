@@ -89,11 +89,16 @@ public:
 	*/
 	static ProgramManager*			getSingletonPtr				();
 
-	/** Acquire GPU programs associated with the given render state and bind them to the pass.
-	@param pass The pass to bind the program to.
-	@param renderState The render state that describes to program that need to be generated.
+	/** Acquire CPU/GPU programs set associated with the given render state and bind them to the pass.
+	@param pass The pass to bind the programs to.
+	@param renderState The render state that describes the program that need to be generated.
 	*/
-	void							acquireGpuPrograms			(Pass* pass, RenderState* renderState);
+	void							acquirePrograms			(Pass* pass, RenderState* renderState);
+
+	/** Release CPU/GPU programs set associated with the given render state.	
+	@param renderState The render state that describes the programs set.
+	*/
+	void							releasePrograms			(RenderState* renderState);
 	
 protected:
 
@@ -105,20 +110,28 @@ protected:
 	//-----------------------------------------------------------------------------
 	typedef vector<Program*>::type						ProgramList;
 	typedef ProgramList::iterator						ProgramListIterator;
-	typedef map<String, ProgramWriter*>::type			NameToProgramWriterMap;
-	typedef NameToProgramWriterMap::iterator			NameToProgramWriterIterator;
+	typedef map<String, ProgramWriter*>::type			ProgramWriterMap;
+	typedef ProgramWriterMap::iterator					ProgramWriterIterator;
+
+	//-----------------------------------------------------------------------------
+	typedef map<String, ProgramProcessor*>::type 		ProgramProcessorMap;
+	typedef ProgramProcessorMap::iterator 				ProgramProcessorIterator;
+	typedef ProgramProcessorMap::const_iterator			ProgramProcessorConstIterator;
+	typedef vector<ProgramProcessor*>::type 			ProgramProcessorList;
 
 	
 protected:
+	/** Create default program processors. */
+	void			createDefaultProgramProcessors	();
+	
+	/** Destroy default program processors. */
+	void			destroyDefaultProgramProcessors	();
 
 	/** Destroy all program sets. */
 	void			destroyProgramSets		();
 
-	/** Destroy all programs. */
-	void			destroyPrograms			();	
-
 	/** Destroy all program writers. */
-	void			destroyProgramsWriters	();
+	void			destroyProgramWriters	();
 
 	/** Create CPU program . 	
 	@param type The type of the program to create.
@@ -137,14 +150,28 @@ protected:
 
 	/** Create GPU program based on the give CPU program.
 	@param shaderProgram The CPU program instance.
+	@param programWriter The program writer instance.
 	@param language The target shader language.
 	@param profiles The profiles string for program compilation.
 	@param cachePath The output path to write the program into.
 	*/
 	GpuProgramPtr	createGpuProgram		(Program* shaderProgram, 
+		ProgramWriter* programWriter,
 		const String& language,
 		const String& profiles,
 		const String& cachePath);
+
+	/** 
+	Add program processor instance to this manager.
+	@param processor The instance to add.
+	*/
+	void			addProgramProcessor		(ProgramProcessor* processor);
+
+	/** 
+	Remove program processor instance from this manager. 
+	@param processor The instance to remove.
+	*/
+	void			removeProgramProcessor	(ProgramProcessor* processor);
 
 	/** Destroy a GPU program by name.
 	@param name The name of the program to destroy.
@@ -162,11 +189,16 @@ protected:
 	size_t			getFragmentShaderCount		() const { return mFragmentShaderCount; }
 
 protected:
+	
+
+protected:
 	ProgramList					mCpuProgramsList;				// CPU programs list.					
-	NameToProgramWriterMap		mNameToProgramWritersMap;		// Map between a name and shader program writer.					
+	ProgramWriterMap			mProgramWritersMap;				// Map between target language and shader program writer.					
+	ProgramProcessorMap			mProgramProcessorsMap;			// Map between target language and shader program processor.
 	ProgramSetMap				mHashToProgramSetMap;			// Map between hash code of render state to program set.
 	size_t						mVertexShaderCount;				// Vertex shader count.
 	size_t						mFragmentShaderCount;			// Fragment shader count.
+	ProgramProcessorList		mDefaultProgramProcessors;		// The default program processors.
 
 
 private:

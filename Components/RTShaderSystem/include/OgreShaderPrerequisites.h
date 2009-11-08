@@ -57,6 +57,7 @@ class SubRenderState;
 class SubRenderStateFactory;
 class ProgramManager;
 class Program;
+class ProgramProcessor;
 class ProgramSet;
 class RenderState;
 class Parameter;
@@ -71,6 +72,14 @@ inline void sh_hash_combine(uint32& seed, T const& v)
 {
 	seed ^= FastHash((const char*)&v, sizeof(T)) + 0x9e3779b9 + (seed<<6) + (seed>>2);
 }
+
+// Vertex shader output parameters compact policy.
+enum VSOutputCompactPolicy
+{	
+	VSOCP_LOW		= 0,		// VS Outputs will be compacted just in case the maximum slot count exceeded.
+	VSOCP_MEDIUM	= 1,		// VS Outputs will be compacted always without parameter splits.
+	VSOCP_HIGH		= 2,		// VS Outputs will be compacted always including parameter splits.
+};
 
 }
 }

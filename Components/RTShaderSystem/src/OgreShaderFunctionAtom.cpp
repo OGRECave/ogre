@@ -90,6 +90,7 @@ String Operand::toString() const
 
 	return retVal;
 }
+
 //-----------------------------------------------------------------------------
 FunctionAtom::FunctionAtom()
 {
@@ -108,6 +109,9 @@ int	FunctionAtom::getInternalExecutionOrder() const
 {
 	return mInteralExecutionOrder;
 }
+
+
+String FunctionInvocation::Type = "FunctionInvocation";
 
 //-----------------------------------------------------------------------
 FunctionInvocation::FunctionInvocation(const String& functionName, 

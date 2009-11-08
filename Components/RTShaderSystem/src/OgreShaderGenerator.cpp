@@ -81,7 +81,8 @@ ShaderGenerator::ShaderGenerator()
 	mActiveViewportValid		= false;
 	mLightCount[0]				= 0;
 	mLightCount[1]				= 0;
-	mLightCount[2]				= 0;	
+	mLightCount[2]				= 0;
+	mVSOutputCompactPolicy		= VSOCP_LOW;
 }
 
 //-----------------------------------------------------------------------------
@@ -165,7 +166,6 @@ void ShaderGenerator::_finalize()
 {
 	OGRE_LOCK_AUTO_MUTEX
 	
-	mCachedRenderStates.clear();
 	
 	// Delete technique entries.
 	for (SGTechniqueMapIterator itTech = mTechniqueEntriesMap.begin(); itTech != mTechniqueEntriesMap.end(); ++itTech)
@@ -187,7 +187,9 @@ void ShaderGenerator::_finalize()
 		OGRE_DELETE (itScheme->second);
 	}
 	mSchemeEntriesMap.clear();
-	
+
+	// Clear cached render states.
+	mCachedRenderStates.clear();
 
 	// Destroy extensions factories.
 	destroySubRenderStateExFactories();
@@ -262,16 +264,16 @@ void ShaderGenerator::addSubRenderStateFactory(SubRenderStateFactory* factory)
 {
 	OGRE_LOCK_AUTO_MUTEX
 
-	SubRenderStateFactoryIterator itFind = mSubRenderStateFactoryMap.find(factory->getType());
+	SubRenderStateFactoryIterator itFind = mSubRenderStateFactories.find(factory->getType());
 
-	if (itFind != mSubRenderStateFactoryMap.end())
+	if (itFind != mSubRenderStateFactories.end())
 	{
 		OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
 			"A factory of type '" + factory->getType() + "' already exists.",
 			"ShaderGenerator::addSubRenderStateFactory");
 	}		
 	
-	mSubRenderStateFactoryMap[factory->getType()] = factory;
+	mSubRenderStateFactories[factory->getType()] = factory;
 }
 
 //-----------------------------------------------------------------------------
@@ -279,10 +281,10 @@ void ShaderGenerator::removeSubRenderStateFactory(SubRenderStateFactory* factory
 {
 	OGRE_LOCK_AUTO_MUTEX
 
-	SubRenderStateFactoryIterator itFind = mSubRenderStateFactoryMap.find(factory->getType());
+	SubRenderStateFactoryIterator itFind = mSubRenderStateFactories.find(factory->getType());
 
-	if (itFind != mSubRenderStateFactoryMap.end())
-		mSubRenderStateFactoryMap.erase(itFind);
+	if (itFind != mSubRenderStateFactories.end())
+		mSubRenderStateFactories.erase(itFind);
 
 }
 
@@ -291,9 +293,9 @@ SubRenderState*	ShaderGenerator::createSubRenderState(const String& type)
 {
 	OGRE_LOCK_AUTO_MUTEX
 
-	SubRenderStateFactoryIterator itFind = mSubRenderStateFactoryMap.find(type);
+	SubRenderStateFactoryIterator itFind = mSubRenderStateFactories.find(type);
 
-	if (itFind != mSubRenderStateFactoryMap.end())
+	if (itFind != mSubRenderStateFactories.end())
 		return itFind->second->createInstance();
 
 
@@ -309,9 +311,9 @@ void ShaderGenerator::destroySubRenderState(SubRenderState* subRenderState)
 {
 	OGRE_LOCK_AUTO_MUTEX
 
-	SubRenderStateFactoryIterator itFind = mSubRenderStateFactoryMap.find(subRenderState->getType());
+	SubRenderStateFactoryIterator itFind = mSubRenderStateFactories.find(subRenderState->getType());
 
-	if (itFind != mSubRenderStateFactoryMap.end())
+	if (itFind != mSubRenderStateFactories.end())
 	{
 		 itFind->second->destroyInstance(subRenderState);
 	}	
@@ -323,8 +325,8 @@ SubRenderState*	ShaderGenerator::createSubRenderState(ScriptCompiler* compiler,
 {
 	OGRE_LOCK_AUTO_MUTEX
 
-	SubRenderStateFactoryIterator it = mSubRenderStateFactoryMap.begin();
-	SubRenderStateFactoryIterator itEnd = mSubRenderStateFactoryMap.end();
+	SubRenderStateFactoryIterator it = mSubRenderStateFactories.begin();
+	SubRenderStateFactoryIterator itEnd = mSubRenderStateFactories.end();
 	SubRenderState* subRenderState = NULL;
 
 	while (it != itEnd)
@@ -696,6 +698,19 @@ void ShaderGenerator::addRenderStateToCache(RenderStatePtr renderStatePtr)
 }
 
 //-----------------------------------------------------------------------------
+void ShaderGenerator::removeRenderStateFromCache(RenderStatePtr renderStatePtr)
+{
+	OGRE_LOCK_AUTO_MUTEX
+
+	RenderStateMapIterator itFind = mCachedRenderStates.find(renderStatePtr->getHashCode());
+
+	if (itFind != mCachedRenderStates.end())
+	{
+		mCachedRenderStates.erase(itFind);
+	}		
+}
+
+//-----------------------------------------------------------------------------
 void ShaderGenerator::invalidateScheme(const String& schemeName)
 {
 	OGRE_LOCK_AUTO_MUTEX
@@ -765,6 +780,38 @@ void ShaderGenerator::setShaderCachePath( const String& cachePath )
 	
 	mShaderCachePath = cachePath;
 	ResourceGroupManager::getSingleton().addResourceLocation(mShaderCachePath, "FileSystem");
+}
+
+//-----------------------------------------------------------------------------
+void ShaderGenerator::flushShaderCache()
+{
+	SGTechniqueMapIterator itTech = mTechniqueEntriesMap.begin();
+	SGTechniqueMapIterator itTechEnd = mTechniqueEntriesMap.end();
+
+	// Release all programs.
+	for (; itTech != itTechEnd; ++itTech)
+	{			
+		itTech->second->releasePrograms();
+	}
+	
+	RenderStateMapIterator itRenderState = mCachedRenderStates.begin();
+	RenderStateMapIterator itRenderStateEnd = mCachedRenderStates.end();
+	
+	// Release all cached render states.
+	for (; itRenderState != itRenderStateEnd; ++itRenderState)
+	{			
+		ProgramManager::getSingleton().releasePrograms(itRenderState->second.get());
+	}
+	mCachedRenderStates.clear();
+
+	SGSchemeIterator itScheme = mSchemeEntriesMap.begin();
+	SGSchemeIterator itSchemeEnd = mSchemeEntriesMap.end();
+
+	// Invalidate all schemes.
+	for (; itScheme != itSchemeEnd; ++itScheme)
+	{
+		itScheme->second->invalidate();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -846,9 +893,9 @@ void ShaderGenerator::serializePassAttributes(MaterialSerializer* ser, SGPass* p
 		for (; it != itEnd; ++it)
 		{
 			SubRenderState* curSubRenderState = *it;
-			SubRenderStateFactoryIterator itFactory = mSubRenderStateFactoryMap.find(curSubRenderState->getType());
+			SubRenderStateFactoryIterator itFactory = mSubRenderStateFactories.find(curSubRenderState->getType());
 
-			if (itFactory != mSubRenderStateFactoryMap.end())
+			if (itFactory != mSubRenderStateFactories.end())
 			{
 				SubRenderStateFactory* curFactory = itFactory->second;
 
@@ -948,9 +995,20 @@ void ShaderGenerator::SGPass::buildRenderState()
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::SGPass::acquireGpuPrograms()
+void ShaderGenerator::SGPass::acquirePrograms()
 {
-	ProgramManager::getSingleton().acquireGpuPrograms(mDstPass, mFinalRenderState.get());
+	ProgramManager::getSingleton().acquirePrograms(mDstPass, mFinalRenderState.get());
+}
+
+//-----------------------------------------------------------------------------
+void ShaderGenerator::SGPass::releasePrograms()
+{
+	// Case this pass is the last one that uses this render state.
+	if (mFinalRenderState.useCount() == 2)
+	{
+		ShaderGenerator::getSingleton().removeRenderStateFromCache(mFinalRenderState);
+		ProgramManager::getSingleton().releasePrograms(mFinalRenderState.get());		
+	}	
 }
 
 //-----------------------------------------------------------------------------
@@ -1011,7 +1069,7 @@ ShaderGenerator::SGTechnique::SGTechnique(SGMaterial* parent, Technique* srcTech
 {
 	mParent					= parent;
 	mSrcTechnique			= srcTechnique;
-	mDstTechniqueSchemeName =  dstTechniqueSchemeName;
+	mDstTechniqueSchemeName = dstTechniqueSchemeName;
 	mDstTechnique			= NULL;
 	mBuildDstTechnique		= true;
 
@@ -1090,6 +1148,12 @@ ShaderGenerator::SGTechnique::~SGTechnique()
 			}		
 		}
 	}
+
+	// Release CPU/GPU programs that associated with this technique passes.
+	for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
+	{
+		(*itPass)->releasePrograms();
+	}
 	
 	// Destroy the passes.
 	destroySGPasses();
@@ -1153,12 +1217,41 @@ void ShaderGenerator::SGTechnique::buildRenderState()
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::SGTechnique::acquireGpuPrograms()
+void ShaderGenerator::SGTechnique::acquirePrograms()
 {
 	for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
 	{
-		(*itPass)->acquireGpuPrograms();
+		(*itPass)->acquirePrograms();
 	}
+}
+
+//-----------------------------------------------------------------------------
+void ShaderGenerator::SGTechnique::releasePrograms()
+{
+	// Remove destination technique.
+	if (mDstTechnique != NULL)
+	{
+		Material* mat = mSrcTechnique->getParent();
+
+		for (unsigned short i=0; i < mat->getNumTechniques(); ++i)
+		{
+			if (mat->getTechnique(i) == mDstTechnique)
+			{
+				mat->removeTechnique(i);
+				break;
+			}
+		}
+		mDstTechnique = NULL;
+	}
+
+	// Release CPU/GPU programs that associated with this technique passes.
+	for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
+	{
+		(*itPass)->releasePrograms();
+	}
+
+	// Destroy the passes.
+	destroySGPasses();
 }
 
 //-----------------------------------------------------------------------------
@@ -1285,7 +1378,7 @@ void ShaderGenerator::SGScheme::validate()
 		SGTechnique* curTechEntry = *itTech;
 
 		if (curTechEntry->getBuildDestinationTechnique())
-			curTechEntry->acquireGpuPrograms();		
+			curTechEntry->acquirePrograms();		
 	}
 
 	// Turn off the build destination technique flag.
@@ -1361,8 +1454,8 @@ bool ShaderGenerator::SGScheme::validate(const String& materialName)
 			// Build render state for each technique.
 			curTechEntry->buildRenderState();
 
-			// Acquire the GPU programs.
-			curTechEntry->acquireGpuPrograms();
+			// Acquire the CPU/GPU programs.
+			curTechEntry->acquirePrograms();
 
 			// Turn off the build destination technique flag.
 			curTechEntry->setBuildDestinationTechnique(false);

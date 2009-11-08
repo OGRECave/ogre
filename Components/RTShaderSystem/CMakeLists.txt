@@ -35,6 +35,8 @@ set (HEADER_FILES
   include/OgreShaderExPerPixelLighting.h
   include/OgreShaderScriptTranslator.h
   include/OgreShaderMaterialSerializerListener.h
+  include/OgreShaderProgramProcessor.h
+  include/OgreShaderCGProgramProcessor.h
 )
 
 set (SOURCE_FILES
@@ -58,6 +60,8 @@ set (SOURCE_FILES
   src/OgreShaderExPerPixelLighting.cpp
   src/OgreShaderScriptTranslator.cpp
   src/OgreShaderMaterialSerializerListener.cpp
+  src/OgreShaderProgramProcessor.cpp
+  src/OgreShaderCGProgramProcessor.cpp
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

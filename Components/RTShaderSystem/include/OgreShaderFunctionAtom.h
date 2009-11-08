@@ -64,6 +64,8 @@ public:
 	/** Abstract method that writes a source code to the given output stream in the target shader language. */
 	virtual void			writeSourceCode				(std::ostream& os, const String& targetLanguage) const = 0;
 	
+	/** Return the type of this atom instance implementation. */
+	virtual const String&	getFunctionAtomType			() = 0;
 
 // Attributes.
 protected:
@@ -91,11 +93,11 @@ public:
 	// Used field mask
 	enum OpMask
 	{
-		OPM_ALL = 1,
-		OPM_X = 2,
-		OPM_Y = 4,
-		OPM_Z = 8,
-		OPM_W = 16
+		OPM_ALL = 1 << 0,
+		OPM_X	= 1 << 1,
+		OPM_Y	= 1 << 2,
+		OPM_Z	= 1 << 3,
+		OPM_W	= 1 << 4
 	};
 
 	/** Class constructor 
@@ -158,6 +160,12 @@ public:
 	*/
 	virtual void			writeSourceCode	(std::ostream& os, const String& targetLanguage) const;
 
+
+	/** 
+	@see FunctionAtom::getFunctionAtomType
+	*/
+	virtual const String&	getFunctionAtomType			() { return Type; }
+
 	/** Get a list of parameters this function invocation will use in the function call as arguments. */
 	OperandVector&			getOperandList	() { return mOperands; }
 	
@@ -173,6 +181,9 @@ public:
 
 	/** Return the return type */
 	const String&			getReturnType	() const {return mReturnType; }
+
+	/// The type of this class.
+	static String Type;
 
 	// Attributes.
 protected:	
