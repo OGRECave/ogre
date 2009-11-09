@@ -575,6 +575,13 @@ namespace Ogre
 		*/
 		void getPoint(long x, long y, Vector3* outpos);
 
+		/** Get a Vector3 of the world-space point on the terrain, aligned as per
+		options. Cascades into neighbours if out of bounds.
+		@note This point is relative to Terrain::getPosition - neighbours are
+			adjusted to be relative to this tile
+		*/
+		void getPointFromSelfOrNeighbour(long x, long y, Vector3* outpos);
+
 		/** Get a Vector3 of the world-space point on the terrain, supplying the
 			height data manually (can be more optimal). 
 		@note This point is relative to Terrain::getPosition
@@ -1297,8 +1304,12 @@ namespace Ogre
 		void updateDerivedDataImpl(const Rect& rect, const Rect& lightmapExtraRect, bool synchronous, uint8 typeMask);
 
 		void getEdgeRect(NeighbourIndex index, Rect* outRect);
+		// get the equivalent of the passed in edge rectangle in neighbour
 		void getNeighbourEdgeRect(NeighbourIndex index, const Rect& inRect, Rect* outRect);
+		// get the equivalent of the passed in edge point in neighbour
 		void getNeighbourPoint(NeighbourIndex index, long x, long y, long *outx, long *outy);
+		// overflow a point into a neighbour index and point
+		void getNeighbourPointOverflow(long x, long y, NeighbourIndex *outindex, long *outx, long *outy);
 
 		
 

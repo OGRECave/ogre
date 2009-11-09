@@ -231,12 +231,6 @@ public:
 #if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 		switch (e.key)
 		{
-		case OIS::KC_RETURN:
-			mFly = !mFly;
-			break;
-		case OIS::KC_SPACE:
-			mMode = (Mode)((mMode + 1) & MODE_COUNT);
-			break;
 		case OIS::KC_S:
 			// CTRL-S to save
 			if (mKeyboard->isKeyDown(OIS::KC_LCONTROL) || mKeyboard->isKeyDown(OIS::KC_RCONTROL))
@@ -291,7 +285,21 @@ public:
 		else mCameraMan->injectMouseMove(evt);
 		return true;
 	}
+	void itemSelected(SelectMenu* menu)
+	{
+		if (menu == mEditMenu)
+		{
+			mMode = (Mode)mEditMenu->getSelectionIndex();
+		}
+	}
 
+	void checkBoxToggled(CheckBox* box)
+	{
+		if (box == mFlyBox)
+		{
+			mFly = mFlyBox->isChecked();
+		}
+	}
 
 protected:
 
@@ -312,6 +320,9 @@ protected:
 	Real mUpdateCountDown;
 	Real mUpdateRate;
 	Vector3 mTerrainPos;
+	SelectMenu* mEditMenu;
+	CheckBox* mFlyBox;
+
 
 
 	Terrain* createTerrain()
@@ -414,6 +425,31 @@ protected:
         }
 	}
 
+	void setupControls()
+	{
+		mTrayMgr->showCursor();
+
+		// make room for the controls
+		mTrayMgr->showLogo(TL_TOPRIGHT);
+		mTrayMgr->showFrameStats(TL_TOPRIGHT);
+		mTrayMgr->toggleAdvancedFrameStats();
+
+		mEditMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "EditMode", "Edit Mode", 370, 250, 3);
+		mEditMenu->addItem("None");
+		mEditMenu->addItem("Elevation");
+		mEditMenu->addItem("Blend");
+
+		mFlyBox = mTrayMgr->createCheckBox(TL_BOTTOM, "Fly", "Fly");
+		mFlyBox->setChecked(false, false);
+
+		// a friendly reminder
+		StringVector names;
+		names.push_back("Help");
+		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Help", 100, names)->setParamValue(0, "H/F1");
+
+		mEditMenu->selectItem(0);  // no edit mode
+	}
+
 	void setupContent()
 	{
 		mEditMarker = mSceneMgr->createEntity("editMarker", "sphere.mesh");
@@ -421,7 +457,7 @@ protected:
 		mEditNode->attachObject(mEditMarker);
 		mEditNode->setScale(0.05, 0.05, 0.05);
 
-		mTrayMgr->showCursor();
+		setupControls();
 
 		mCameraMan->setTopSpeed(50);
 

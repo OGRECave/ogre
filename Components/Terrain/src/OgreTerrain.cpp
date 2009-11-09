@@ -2712,11 +2712,12 @@ namespace Ogre
 						// cell X/Y is the bottom-left of the cell
 
 						// get positions
+						// can access neighbour information if out of bounds
 						Vector3 pos[4];
-						getPoint(cellX, cellY, &pos[0]);
-						getPoint(cellX + 1, cellY, &pos[1]);
-						getPoint(cellX, cellY + 1, &pos[2]);
-						getPoint(cellX + 1, cellY + 1, &pos[3]);
+						getPointFromSelfOrNeighbour(cellX, cellY, &pos[0]);
+						getPointFromSelfOrNeighbour(cellX + 1, cellY, &pos[1]);
+						getPointFromSelfOrNeighbour(cellX, cellY + 1, &pos[2]);
+						getPointFromSelfOrNeighbour(cellX + 1, cellY + 1, &pos[3]);
 
 						bool backwardsTri = (cellY % 2) != 0;
 
@@ -3265,6 +3266,17 @@ namespace Ogre
 					}
 				}
 			}
+			// if we didn't need to update heights, we still need to update normals
+			// because this was called only if neighbor changed
+			if (!updateGeom)
+			{
+				// ideally we would deal with normal dirty rect separately (as we do with
+				// lightmaps) because a dirty geom rectangle will actually grow by one 
+				// element in each direction for normals recalculation. However for
+				// the sake of one row/column it's really not worth it.
+				mDirtyDerivedDataRect.merge(edgerect);
+				updateDerived |= DERIVED_DATA_NORMALS;
+			}
 		}
 
 		if (!shadowrect.isNull())
@@ -3370,6 +3382,69 @@ namespace Ogre
 		*outy = mSize - y;
 		
 
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getPointFromSelfOrNeighbour(long x, long y, Vector3* outpos)
+	{
+		if (x >= 0 && y >=0 && x < mSize && y < mSize)
+			getPoint(x, y, outpos);
+		else
+		{
+			long nx, ny;
+			NeighbourIndex ni;
+			getNeighbourPointOverflow(x, y,&ni, &nx, &ny);
+			Terrain* neighbour = getNeighbour(ni);
+			if (neighbour)
+			{
+				Vector3 neighbourPos;
+				neighbour->getPoint(nx, ny, &neighbourPos);
+				// adjust to make it relative to our position
+				*outpos = neighbourPos + neighbour->getPosition() - getPosition();
+			}
+			else
+			{
+				// use our getPoint() after all, it will just be clamped
+				getPoint(x, y, outpos);
+			}
+
+		}
+	}
+	//---------------------------------------------------------------------
+	void Terrain::getNeighbourPointOverflow(long x, long y, NeighbourIndex *outindex, long *outx, long *outy)
+	{
+		if (x < 0)
+		{
+			*outx = x + mSize;
+			if (y < 0)
+				*outindex = NEIGHBOUR_SOUTHWEST;
+			else if (y >= mSize)
+				*outindex = NEIGHBOUR_NORTHWEST;
+			else
+				*outindex = NEIGHBOUR_WEST;
+		}
+		else if (x >= mSize)
+		{
+			*outx = x - mSize;
+			if (y < 0)
+				*outindex = NEIGHBOUR_SOUTHEAST;
+			else if (y >= mSize)
+				*outindex = NEIGHBOUR_NORTHEAST;
+			else
+				*outindex = NEIGHBOUR_EAST;
+		}
+
+		if (y < 0)
+		{
+			*outy = y + mSize;
+			if (x >= 0 && x < mSize)
+				*outindex = NEIGHBOUR_SOUTH;
+		}
+		else if (y >= mSize)
+		{
+			*outy = y - mSize;
+			if (x >= 0 && x < mSize)
+				*outindex = NEIGHBOUR_NORTH;
+		}
 	}
 
 
