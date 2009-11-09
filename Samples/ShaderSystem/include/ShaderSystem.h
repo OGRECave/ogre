@@ -31,7 +31,7 @@ public:
 	void itemSelected(SelectMenu* menu);
 
 	/** @see Sample::buttonHit. */
-	virtual void buttonHit(Button* b);
+	virtual void buttonHit(OgreBites::Button* b);
 
 	/** @see Sample::getRequiredPlugins. */
 	StringVector getRequiredPlugins();

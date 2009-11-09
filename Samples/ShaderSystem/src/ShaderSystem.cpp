@@ -126,7 +126,7 @@ void Sample_ShaderSystem::itemSelected(SelectMenu* menu)
 }
 
 //-----------------------------------------------------------------------
-void Sample_ShaderSystem::buttonHit( Button* b )
+void Sample_ShaderSystem::buttonHit( OgreBites::Button* b )
 {
 	// Case the current material of the main entity should be exported.
 	if (b->getName() == EXPORT_BUTTON_NAME)
