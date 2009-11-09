@@ -55,10 +55,10 @@ public:
 	/** Class constructor.
 	@param type The type of this program.
 	*/
-	ProgramProcessor		();
+	ProgramProcessor			();
 
 	/** Class destructor */
-	~ProgramProcessor		();
+	virtual ~ProgramProcessor	();
 
 	/** Return the target language of this processor. */
 	virtual const String&		getTargetLanguage	() const = 0;
