@@ -18,10 +18,6 @@ if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
     )
 endif()
 
-if (OGRE_STATIC)
-  add_dependencies(SampleBrowser Sample_BSP)
-else ()
-  add_dependencies(Sample_BSP SampleBrowser)
-endif (OGRE_STATIC)
+add_dependencies(SampleBrowser Sample_BSP)
 
 

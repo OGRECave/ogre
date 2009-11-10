@@ -17,8 +17,4 @@ if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
     )
 endif()
 
-if (OGRE_STATIC)
 add_dependencies(SampleBrowser Sample_BezierPatch)
-else ()
-add_dependencies(Sample_BezierPatch SampleBrowser)
-endif (OGRE_STATIC)
