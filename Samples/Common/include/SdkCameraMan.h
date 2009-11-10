@@ -45,21 +45,21 @@ namespace OgreBites
 	class SdkCameraMan
     {
     public:
-
 		SdkCameraMan(Ogre::Camera* cam)
+		: mCamera(0)
+		, mTarget(0)
+		, mOrbiting(false)
+		, mZooming(false)
+		, mTopSpeed(150)
+		, mVelocity(Ogre::Vector3::ZERO)
+		, mGoingForward(false)
+		, mGoingBack(false)
+		, mGoingLeft(false)
+		, mGoingRight(false)
+		, mGoingUp(false)
+		, mGoingDown(false)
+		, mFastMove(false)
 		{
-			mTarget = 0;
-			mOrbiting = false;
-			mZooming = false;
-			mCamera = 0;
-			mTopSpeed = 150;
-			mGoingForward = false;
-			mGoingBack = false;
-			mGoingLeft = false;
-			mGoingRight = false;
-			mGoingUp = false;
-			mGoingDown = false;
-			mVelocity = Ogre::Vector3::ZERO;
 
 			setCamera(cam);
 			setStyle(CS_FREELOOK);
@@ -187,19 +187,20 @@ namespace OgreBites
 				if (mGoingDown) accel -= mCamera->getUp();
 
 				// if accelerating, try to reach top speed in a certain time
+				Ogre::Real topSpeed = mFastMove ? mTopSpeed * 20 : mTopSpeed;
 				if (accel.squaredLength() != 0)
 				{
 					accel.normalise();
-					mVelocity += accel * mTopSpeed * evt.timeSinceLastFrame * 10;
+					mVelocity += accel * topSpeed * evt.timeSinceLastFrame * 10;
 				}
 				// if not accelerating, try to stop in a certain time
 				else mVelocity -= mVelocity * evt.timeSinceLastFrame * 10;
 
 				// keep camera velocity below top speed and above zero
-				if (mVelocity.squaredLength() > mTopSpeed * mTopSpeed)
+				if (mVelocity.squaredLength() > topSpeed * topSpeed)
 				{
 					mVelocity.normalise();
-					mVelocity *= mTopSpeed;
+					mVelocity *= topSpeed;
 				}
 				else if (mVelocity.squaredLength() < 0.1) mVelocity = Ogre::Vector3::ZERO;
 
@@ -222,6 +223,7 @@ namespace OgreBites
 				else if (evt.key == OIS::KC_D || evt.key == OIS::KC_RIGHT) mGoingRight = true;
 				else if (evt.key == OIS::KC_PGUP) mGoingUp = true;
 				else if (evt.key == OIS::KC_PGDOWN) mGoingDown = true;
+				else if (evt.key == OIS::KC_LSHIFT) mFastMove = true;
 			}
 		}
 
@@ -238,6 +240,7 @@ namespace OgreBites
 				else if (evt.key == OIS::KC_D || evt.key == OIS::KC_RIGHT) mGoingRight = false;
 				else if (evt.key == OIS::KC_PGUP) mGoingUp = false;
 				else if (evt.key == OIS::KC_PGDOWN) mGoingDown = false;
+				else if (evt.key == OIS::KC_LSHIFT) mFastMove = false;
 			}
 		}
 
@@ -359,7 +362,6 @@ namespace OgreBites
     protected:
 
 		Ogre::Camera* mCamera;
-		Ogre::String mName;
 		CameraStyle mStyle;
 		Ogre::SceneNode* mTarget;
 		bool mOrbiting;
@@ -372,6 +374,7 @@ namespace OgreBites
 		bool mGoingRight;
 		bool mGoingUp;
 		bool mGoingDown;
+		bool mFastMove;
     };
 }
 
