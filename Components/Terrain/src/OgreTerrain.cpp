@@ -2781,8 +2781,8 @@ namespace Ogre
 				Image::Box dstBox;
 				dstBox.left = rect.left;
 				dstBox.right = rect.right;
-				dstBox.top = mSize - rect.bottom - 1;
-				dstBox.bottom = mSize - rect.top - 1;
+				dstBox.top = mSize - rect.bottom;
+				dstBox.bottom = mSize - rect.top;
 				mTerrainNormalMap->getBuffer()->blitFromMemory(*normalsBox, dstBox);
 			}
 		}
@@ -2957,8 +2957,8 @@ namespace Ogre
 				Image::Box dstBox;
 				dstBox.left = rect.left;
 				dstBox.right = rect.right;
-				dstBox.top = mLightmapSizeActual - rect.bottom - 1;
-				dstBox.bottom = mLightmapSizeActual - rect.top - 1;
+				dstBox.top = mLightmapSizeActual - rect.bottom;
+				dstBox.bottom = mLightmapSizeActual - rect.top;
 				mLightmap->getBuffer()->blitFromMemory(*lightmapBox, dstBox);
 			}
 		}
@@ -3153,17 +3153,25 @@ namespace Ogre
 		return mNeighbours[index];
 	}
 	//---------------------------------------------------------------------
-	void Terrain::setNeighbour(NeighbourIndex index, Terrain* neighbour, bool recalculate /*= false*/)
+	void Terrain::setNeighbour(NeighbourIndex index, Terrain* neighbour, 
+		bool recalculate /*= false*/, bool notifyOther /* = true */)
 	{
 		if (mNeighbours[index] != neighbour)
 		{
+			// detach existing
+			if (mNeighbours[index] && notifyOther)
+				mNeighbours[index]->setNeighbour(getOppositeNeighbour(index), 0, false, false);
+
 			mNeighbours[index] = neighbour;
+			if (neighbour && notifyOther)
+				mNeighbours[index]->setNeighbour(getOppositeNeighbour(index), this, recalculate, false);
+
 			if (recalculate)
 			{
-				Rect rect;
-				rect.top = 0; rect.bottom = neighbour->getSize();
-				rect.left = 0; rect.right = rect.bottom;
-				neighbourModified(index, rect, rect);
+				// Recalculate, pass OUR edge rect
+				Rect edgerect;
+				getEdgeRect(index, &edgerect);
+				neighbourModified(index, edgerect, edgerect);
 			}
 		}
 	}
@@ -3238,13 +3246,13 @@ namespace Ogre
 			// update edges; match heights first, then recalculate normals
 			// reduce to just single line / corner
 			Rect heightMatchRect(edgerect);
-			if (heightMatchRect.left == 0)
+			if (heightMatchRect.right < mSize)
 				heightMatchRect.right = 1;
-			else
+			if (heightMatchRect.left > 0)
 				heightMatchRect.left = mSize - 1;
-			if (heightMatchRect.top == 0)
+			if (heightMatchRect.bottom < mSize)
 				heightMatchRect.bottom = 1;
-			else
+			if (heightMatchRect.top > 0)
 				heightMatchRect.top = mSize - 1;
 
 			for (long y = heightMatchRect.top; y < heightMatchRect.bottom; ++y)
@@ -3363,10 +3371,40 @@ namespace Ogre
 		// remember index is neighbour relationship from OUR perspective so
 		// arrangement is backwards to getEdgeRect
 
-		outRect->left = mSize - inRect.right;
-		outRect->right = mSize = inRect.left;
-		outRect->top = mSize - inRect.bottom;
-		outRect->bottom = mSize = inRect.top;
+		// left/right
+		switch(index)
+		{
+		case NEIGHBOUR_EAST:
+		case NEIGHBOUR_NORTHEAST:
+		case NEIGHBOUR_SOUTHEAST:
+		case NEIGHBOUR_WEST:
+		case NEIGHBOUR_NORTHWEST:
+		case NEIGHBOUR_SOUTHWEST:
+			outRect->left = mSize - inRect.right;
+			outRect->right = mSize - inRect.left;
+			break;
+		default:
+			// do nothing
+			break;
+		};
+
+		// top / bottom
+		switch(index)
+		{
+		case NEIGHBOUR_NORTH:
+		case NEIGHBOUR_NORTHEAST:
+		case NEIGHBOUR_NORTHWEST:
+		case NEIGHBOUR_SOUTH: 
+		case NEIGHBOUR_SOUTHWEST:
+		case NEIGHBOUR_SOUTHEAST:
+			outRect->top = mSize - inRect.bottom;
+			outRect->bottom = mSize - inRect.top;
+			break;
+		default:
+			// do nothing
+			break;
+		};
+
 	}
 	//---------------------------------------------------------------------
 	void Terrain::getNeighbourPoint(NeighbourIndex index, long x, long y, long *outx, long *outy)
@@ -3375,13 +3413,37 @@ namespace Ogre
 		// in order to match up points
 		assert (mSize == getNeighbour(index)->getSize());
 
-		// Basically just reflect the vertex 
-		// remember index is neighbour relationship from OUR perspective
-		// the points returned are in relation to neighbour
-		*outx = mSize - x;
-		*outy = mSize - y;
-		
+		// left/right
+		switch(index)
+		{
+		case NEIGHBOUR_EAST:
+		case NEIGHBOUR_NORTHEAST:
+		case NEIGHBOUR_SOUTHEAST:
+		case NEIGHBOUR_WEST:
+		case NEIGHBOUR_NORTHWEST:
+		case NEIGHBOUR_SOUTHWEST:
+			*outx = mSize - x - 1;
+			break;
+		default:
+			*outx = x;
+			break;
+		};
 
+		// top / bottom
+		switch(index)
+		{
+		case NEIGHBOUR_NORTH:
+		case NEIGHBOUR_NORTHEAST:
+		case NEIGHBOUR_NORTHWEST:
+		case NEIGHBOUR_SOUTH: 
+		case NEIGHBOUR_SOUTHWEST:
+		case NEIGHBOUR_SOUTHEAST:
+			*outy = mSize - y - 1;
+			break;
+		default:
+			*outy = y;
+			break;
+		};
 	}
 	//---------------------------------------------------------------------
 	void Terrain::getPointFromSelfOrNeighbour(long x, long y, Vector3* outpos)
@@ -3414,7 +3476,7 @@ namespace Ogre
 	{
 		if (x < 0)
 		{
-			*outx = x + mSize;
+			*outx = x + mSize - 1;
 			if (y < 0)
 				*outindex = NEIGHBOUR_SOUTHWEST;
 			else if (y >= mSize)
@@ -3424,7 +3486,7 @@ namespace Ogre
 		}
 		else if (x >= mSize)
 		{
-			*outx = x - mSize;
+			*outx = x - mSize + 1;
 			if (y < 0)
 				*outindex = NEIGHBOUR_SOUTHEAST;
 			else if (y >= mSize)
@@ -3435,13 +3497,13 @@ namespace Ogre
 
 		if (y < 0)
 		{
-			*outy = y + mSize;
+			*outy = y + mSize - 1;
 			if (x >= 0 && x < mSize)
 				*outindex = NEIGHBOUR_SOUTH;
 		}
 		else if (y >= mSize)
 		{
-			*outy = y - mSize;
+			*outy = y - mSize + 1;
 			if (x >= 0 && x < mSize)
 				*outindex = NEIGHBOUR_NORTH;
 		}

@@ -1234,8 +1234,11 @@ namespace Ogre
 			heights, calcaulting normals, calculating shadows crossing the boundary). 
 			If false, this terrain's state is assumed to be up to date already 
 			(e.g. was calculated with this tile present before and the state saved). 
+		@param notifyOther Whether the neighbour should also be notified (recommended
+			to leave this at the default so relationships are up to date before
+			background updates are triggered)
 		*/
-		void setNeighbour(NeighbourIndex index, Terrain* neighbour, bool recalculate = false);
+		void setNeighbour(NeighbourIndex index, Terrain* neighbour, bool recalculate = false, bool notifyOther = true);
 
 		/** Get the opposite neighbour relationship (useful for finding the 
 			neighbour index from the perspective of the tile the other side of the
