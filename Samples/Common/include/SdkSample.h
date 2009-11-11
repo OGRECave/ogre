@@ -218,11 +218,7 @@ namespace OgreBites
 			}
 			else if (evt.key == OIS::KC_SYSRQ)   // take a screenshot
 			{
-				Ogre::String path = "screenshots/screenshot_";
-				#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-				path = "screenshots\\screenshot_";
-				#endif
-				mWindow->writeContentsToFile(path + Ogre::StringConverter::toString(mRoot->getNextFrameNumber()) + ".jpg");
+				mWindow->writeContentsToTimestampedFile("screenshot", ".png");
 			}
 
 #ifdef USE_RTSHADER_SYSTEM		
