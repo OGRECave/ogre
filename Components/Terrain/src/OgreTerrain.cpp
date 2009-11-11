@@ -124,6 +124,7 @@ namespace Ogre
 		, mTreeDepth(0)
 		, mDirtyGeometryRect(0, 0, 0, 0)
 		, mDirtyDerivedDataRect(0, 0, 0, 0)
+		, mDirtyGeometryRectForNeighbours(0, 0, 0, 0)
 		, mDirtyLightmapFromNeighboursRect(0, 0, 0, 0)
 		, mDerivedDataUpdateInProgress(false)
 		, mDerivedUpdatePendingMask(0)
@@ -1563,6 +1564,7 @@ namespace Ogre
 	void Terrain::dirtyRect(const Rect& rect)
 	{
 		mDirtyGeometryRect.merge(rect);
+		mDirtyGeometryRectForNeighbours.merge(rect);
 		mDirtyDerivedDataRect.merge(rect);
 		mCompositeMapDirtyRect.merge(rect);
 	}
@@ -1585,6 +1587,9 @@ namespace Ogre
 			mQuadTree->updateVertexData(true, false, mDirtyGeometryRect, false);
 			mDirtyGeometryRect.setNull();
 		}
+
+		// propagate changes
+		notifyNeighbours();
 	}
 	//---------------------------------------------------------------------
 	void Terrain::updateDerivedData(bool synchronous, uint8 typeMask)
@@ -2630,8 +2635,6 @@ namespace Ogre
 			// update the composite map if enabled
 			if (mCompositeMapRequired)
 				updateCompositeMap();
-			// also notify neighbours
-			notifyNeighbours(ddreq.dirtyRect, ddres.lightmapUpdateRect);
 		}
 
 	}
@@ -2702,12 +2705,12 @@ namespace Ogre
 				for(long cy = -1; cy < 1; ++cy)
 				{
 					long cellY = y + cy;
-					if (cellY < 0 || cellY + 1 >= mSize)
+					if (cellY < 0 || cellY + 1 > mSize)
 						continue;
 					for(long cx = -1; cx < 1; ++cx)
 					{
 						long cellX = x + cx;
-						if (cellX < 0 || cellX + 1 >= mSize)
+						if (cellX < 0 || cellX + 1 > mSize)
 							continue;
 						// cell X/Y is the bottom-left of the cell
 
@@ -3184,48 +3187,56 @@ namespace Ogre
 		return static_cast<NeighbourIndex>(intindex);
 	}
 	//---------------------------------------------------------------------
-	void Terrain::notifyNeighbours(const Rect& dirtyRect, const Rect& lightmapRect)
+	void Terrain::notifyNeighbours()
 	{
 		// There are 3 things that can need updating:
 		// Height at edge - match to neighbour (first one to update 'loses' to other since read-only)
 		// Normal at edge - use heights from across boundary too
 		// Shadows across edge
-
 		// The extent to which these can affect the current tile vary:
 		// Height at edge - only affected by a change at the adjoining edge / corner
 		// Normal at edge - only affected by a change to the 2 rows adjoining the edge / corner
 		// Shadows across edge - possible effect extends based on the projection of the
 		//   neighbour AABB along the light direction (worst case scenario)
 
-		for (int i = 0; i < (int)NEIGHBOUR_COUNT; ++i)
+		if (!mDirtyGeometryRectForNeighbours.isNull())
 		{
-			NeighbourIndex ni = static_cast<NeighbourIndex>(i);
-			Terrain* neighbour = getNeighbour(ni);
-			if (!neighbour)
-				continue;
+			Rect dirtyRect(mDirtyGeometryRectForNeighbours);
+			mDirtyGeometryRectForNeighbours.setNull();
+			// calculate light update rectangle
+			const Vector3& lightVec = TerrainGlobalOptions::getLightMapDirection();
+			Rect lightmapRect;
+			widenRectByVector(lightVec, dirtyRect, getMinHeight(), getMaxHeight(), lightmapRect);
 
-			// Intersect the incoming rectangles with the edge regions related to this neighbour
-			Rect edgeRect;
-			getEdgeRect(ni, 2, &edgeRect);
-			Rect heightEdgeRect = edgeRect.intersect(dirtyRect);
-			Rect lightmapEdgeRect = edgeRect.intersect(lightmapRect);
-
-			if (!heightEdgeRect.isNull() || !lightmapRect.isNull())
+			for (int i = 0; i < (int)NEIGHBOUR_COUNT; ++i)
 			{
-				// ok, we have something valid to pass on
-				Rect neighbourHeightEdgeRect, neighbourLightmapEdgeRect;
-				if (!heightEdgeRect.isNull())
-					getNeighbourEdgeRect(ni, heightEdgeRect, &neighbourHeightEdgeRect);
-				if (!lightmapRect.isNull())
-					getNeighbourEdgeRect(ni, lightmapEdgeRect, &neighbourLightmapEdgeRect);
+				NeighbourIndex ni = static_cast<NeighbourIndex>(i);
+				Terrain* neighbour = getNeighbour(ni);
+				if (!neighbour)
+					continue;
 
-				neighbour->neighbourModified(getOppositeNeighbour(ni), 
-					neighbourHeightEdgeRect, neighbourLightmapEdgeRect);
-				
+				// Intersect the incoming rectangles with the edge regions related to this neighbour
+				Rect edgeRect;
+				getEdgeRect(ni, 2, &edgeRect);
+				Rect heightEdgeRect = edgeRect.intersect(dirtyRect);
+				Rect lightmapEdgeRect = edgeRect.intersect(lightmapRect);
+
+				if (!heightEdgeRect.isNull() || !lightmapRect.isNull())
+				{
+					// ok, we have something valid to pass on
+					Rect neighbourHeightEdgeRect, neighbourLightmapEdgeRect;
+					if (!heightEdgeRect.isNull())
+						getNeighbourEdgeRect(ni, heightEdgeRect, &neighbourHeightEdgeRect);
+					if (!lightmapRect.isNull())
+						getNeighbourEdgeRect(ni, lightmapEdgeRect, &neighbourLightmapEdgeRect);
+
+					neighbour->neighbourModified(getOppositeNeighbour(ni), 
+						neighbourHeightEdgeRect, neighbourLightmapEdgeRect);
+					
+				}
+
 			}
-
 		}
-
 	}
 	//---------------------------------------------------------------------
 	void Terrain::neighbourModified(NeighbourIndex index, const Rect& edgerect, const Rect& shadowrect)
@@ -3450,7 +3461,7 @@ namespace Ogre
 		{
 			long nx, ny;
 			NeighbourIndex ni;
-			getNeighbourPointOverflow(x, y,&ni, &nx, &ny);
+			getNeighbourPointOverflow(x, y, &ni, &nx, &ny);
 			Terrain* neighbour = getNeighbour(ni);
 			if (neighbour)
 			{
@@ -3461,7 +3472,11 @@ namespace Ogre
 			}
 			else
 			{
-				// use our getPoint() after all, it will just be clamped
+				// use our getPoint() after all, just clamp
+				x = std::min(x, mSize - 1L);
+				y = std::min(y, mSize - 1L);
+				x = std::max(x, 0L);
+				y = std::max(y, 0L);
 				getPoint(x, y, outpos);
 			}
 
@@ -3490,6 +3505,8 @@ namespace Ogre
 			else
 				*outindex = NEIGHBOUR_EAST;
 		}
+		else
+			*outx = x;
 
 		if (y < 0)
 		{
@@ -3503,6 +3520,8 @@ namespace Ogre
 			if (x >= 0 && x < mSize)
 				*outindex = NEIGHBOUR_NORTH;
 		}
+		else
+			*outy = y;
 	}
 
 

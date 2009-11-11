@@ -1250,12 +1250,10 @@ namespace Ogre
 			by a height change that has taken place. 
 		@remarks
 			This method will determine which neighbours need notification and call
-			their neighbourModified method.
-		@param dirtyRect The area of this tile which has changed heights
-		@param lightmapRect The affected lightmap area in this tile (should be
-			calculated already by own update process)
+			their neighbourModified method. It is called automatically by 
+			updateGeometry().
 		*/
-		void notifyNeighbours(const Rect& dirtyRect, const Rect& lightmapRect);
+		void notifyNeighbours();
 
 		/** Notify that a neighbour has just finished updating and that this
 			change affects this tile. 
@@ -1348,6 +1346,7 @@ namespace Ogre
 
 		Rect mDirtyGeometryRect;
 		Rect mDirtyDerivedDataRect;
+		Rect mDirtyGeometryRectForNeighbours;
 		Rect mDirtyLightmapFromNeighboursRect;
 		bool mDerivedDataUpdateInProgress;
 		uint8 mDerivedUpdatePendingMask; // if another update is requested while one is already running
