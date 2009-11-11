@@ -216,7 +216,7 @@ namespace OgreBites
 			{
 				Ogre::TextureManager::getSingleton().reloadAll();
 			}
-			else if (evt.key == OIS::KC_F9)   // take a screenshot
+			else if (evt.key == OIS::KC_SYSRQ)   // take a screenshot
 			{
 				Ogre::String path = "screenshots/screenshot_";
 				#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
