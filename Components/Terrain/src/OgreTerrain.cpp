@@ -3170,7 +3170,7 @@ namespace Ogre
 			{
 				// Recalculate, pass OUR edge rect
 				Rect edgerect;
-				getEdgeRect(index, &edgerect);
+				getEdgeRect(index, 2, &edgerect);
 				neighbourModified(index, edgerect, edgerect);
 			}
 		}
@@ -3206,7 +3206,7 @@ namespace Ogre
 
 			// Intersect the incoming rectangles with the edge regions related to this neighbour
 			Rect edgeRect;
-			getEdgeRect(ni, &edgeRect);
+			getEdgeRect(ni, 2, &edgeRect);
 			Rect heightEdgeRect = edgeRect.intersect(dirtyRect);
 			Rect lightmapEdgeRect = edgeRect.intersect(lightmapRect);
 
@@ -3245,19 +3245,13 @@ namespace Ogre
 		{
 			// update edges; match heights first, then recalculate normals
 			// reduce to just single line / corner
-			Rect heightMatchRect(edgerect);
-			if (heightMatchRect.right < mSize)
-				heightMatchRect.right = 1;
-			if (heightMatchRect.left > 0)
-				heightMatchRect.left = mSize - 1;
-			if (heightMatchRect.bottom < mSize)
-				heightMatchRect.bottom = 1;
-			if (heightMatchRect.top > 0)
-				heightMatchRect.top = mSize - 1;
+			Rect heightMatchRect;
+			getEdgeRect(index, 1, &heightMatchRect);
+			heightMatchRect = heightMatchRect.intersect(edgerect);
 
 			for (long y = heightMatchRect.top; y < heightMatchRect.bottom; ++y)
 			{
-				for (long x = heightMatchRect.left; y < heightMatchRect.right; ++y)
+				for (long x = heightMatchRect.left; x < heightMatchRect.right; ++x)
 				{
 					long nx, ny;
 					getNeighbourPoint(index, x, y, &nx, &ny);
@@ -3310,7 +3304,7 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void Terrain::getEdgeRect(NeighbourIndex index, Rect* outRect)
+	void Terrain::getEdgeRect(NeighbourIndex index, long range, Rect* outRect)
 	{
 		// We make the edge rectangle 2 rows / columns at the edge of the tile
 		// 2 because this copes with normal changes and potentially filtered
@@ -3324,14 +3318,14 @@ namespace Ogre
 		case NEIGHBOUR_EAST:
 		case NEIGHBOUR_NORTHEAST:
 		case NEIGHBOUR_SOUTHEAST:
-			outRect->left = mSize - 2;
+			outRect->left = mSize - range;
 			outRect->right = mSize;
 			break;
 		case NEIGHBOUR_WEST:
 		case NEIGHBOUR_NORTHWEST:
 		case NEIGHBOUR_SOUTHWEST:
 			outRect->left = 0;
-			outRect->right = 2;
+			outRect->right = range;
 			break;
 		case NEIGHBOUR_NORTH:
 		case NEIGHBOUR_SOUTH: 
@@ -3346,14 +3340,14 @@ namespace Ogre
 		case NEIGHBOUR_NORTH:
 		case NEIGHBOUR_NORTHEAST:
 		case NEIGHBOUR_NORTHWEST:
-			outRect->top = mSize - 2;
+			outRect->top = mSize - range;
 			outRect->bottom = mSize;
 			break;
 		case NEIGHBOUR_SOUTH: 
 		case NEIGHBOUR_SOUTHWEST:
 		case NEIGHBOUR_SOUTHEAST:
 			outRect->top = 0;
-			outRect->bottom = 2;
+			outRect->bottom = range;
 			break;
 		case NEIGHBOUR_EAST:
 		case NEIGHBOUR_WEST:
@@ -3384,7 +3378,8 @@ namespace Ogre
 			outRect->right = mSize - inRect.left;
 			break;
 		default:
-			// do nothing
+			outRect->left = inRect.left;
+			outRect->right = inRect.right;
 			break;
 		};
 
@@ -3401,7 +3396,8 @@ namespace Ogre
 			outRect->bottom = mSize - inRect.top;
 			break;
 		default:
-			// do nothing
+			outRect->top = inRect.top;
+			outRect->bottom = inRect.bottom;
 			break;
 		};
 

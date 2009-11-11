@@ -1306,7 +1306,7 @@ namespace Ogre
 
 		void updateDerivedDataImpl(const Rect& rect, const Rect& lightmapExtraRect, bool synchronous, uint8 typeMask);
 
-		void getEdgeRect(NeighbourIndex index, Rect* outRect);
+		void getEdgeRect(NeighbourIndex index, long range, Rect* outRect);
 		// get the equivalent of the passed in edge rectangle in neighbour
 		void getNeighbourEdgeRect(NeighbourIndex index, const Rect& inRect, Rect* outRect);
 		// get the equivalent of the passed in edge point in neighbour

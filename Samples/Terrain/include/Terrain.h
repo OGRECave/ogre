@@ -29,6 +29,7 @@ public:
 
 	Sample_Terrain()
 		: mTerrain(0)
+		, mTerrain2(0)
 		, mFly(false)
 		, mMode(MODE_NORMAL)
 		, mLayerEdit(1)
@@ -221,6 +222,7 @@ public:
 			if (mUpdateCountDown <= 0)
 			{
 				mTerrain->update();
+				mTerrain2->update();
 				mUpdateCountDown = 0;
 			}
 		}
@@ -306,6 +308,7 @@ public:
 protected:
 
 	Terrain* mTerrain;
+	Terrain* mTerrain2;
 	bool mFly;
 	enum Mode
 	{
@@ -327,11 +330,15 @@ protected:
 
 
 
-	Terrain* createTerrain()
+	Terrain* createTerrain(bool flipX = false, bool flipY = false)
 	{
 		Terrain* terrain = OGRE_NEW Terrain(mSceneMgr);
 		Image img;
 		img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		if (flipX)
+			img.flipAroundY();
+		if (flipY)
+			img.flipAroundX();
 		//img.load("terrain_flattened.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		//img.load("terrain_onehill.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
@@ -511,12 +518,23 @@ protected:
 		if (!mTerrain)
 			mTerrain = createTerrain();
 
+
 		//addTextureDebugOverlay(TextureManager::getSingleton().getByName(mTerrain->getTerrainNormalMap()->getName()), 0);
 
 		//mWindow->getViewport(0)->setBackgroundColour(ColourValue::Blue);
 
 		// Testing
 		mTerrain->setPosition(mTerrainPos);
+
+
+		mTerrain2 = createTerrain(true);
+		Vector3 secondTerrainPos = mTerrainPos + Vector3(mTerrain->getWorldSize(), 0, 0);
+		mTerrain2->setPosition(secondTerrainPos);
+		mCamera->setPosition(mTerrainPos + Vector3(mTerrain->getWorldSize() * 0.48, mTerrain->getWorldSize() * 0.48, 0));
+		// set neighbour (let it notify other itself)
+		mTerrain2->setNeighbour(Terrain::NEIGHBOUR_WEST, mTerrain, true);
+
+
 
 		/*
 		// create a few entities on the terrain
