@@ -65,6 +65,111 @@ public:
 		return names;
 	}
 
+	std::pair<bool, Vector3> getAnyTerrainIntersection(const Ray& ray)
+	{
+		std::pair<bool, Vector3> rayResult = mTerrain->rayIntersects(ray);
+		if (!rayResult.first)
+			rayResult = mTerrain2->rayIntersects(ray);
+
+		return rayResult;
+
+	}
+
+
+	void doTerrainModify(Terrain* terrain, const Vector3& centrepos, Real timeElapsed)
+	{
+		Vector3 tsPos;
+		terrain->getTerrainPosition(centrepos, &tsPos);
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+		if (mKeyboard->isKeyDown(OIS::KC_EQUALS) || mKeyboard->isKeyDown(OIS::KC_MINUS))
+		{
+			switch(mMode)
+			{
+			case MODE_EDIT_HEIGHT:
+				{
+					// we need point coords
+					Real terrainSize = (terrain->getSize() - 1);
+					long startx = (tsPos.x - mBrushSizeTerrainSpace) * terrainSize;
+					long starty = (tsPos.y - mBrushSizeTerrainSpace) * terrainSize;
+					long endx = (tsPos.x + mBrushSizeTerrainSpace) * terrainSize;
+					long endy= (tsPos.y + mBrushSizeTerrainSpace) * terrainSize;
+					startx = std::max(startx, 0L);
+					starty = std::max(starty, 0L);
+					endx = std::min(endx, (long)terrainSize);
+					endy = std::min(endy, (long)terrainSize);
+					for (long y = starty; y <= endy; ++y)
+					{
+						for (long x = startx; x <= endx; ++x)
+						{
+							Real tsXdist = (x / terrainSize) - tsPos.x;
+							Real tsYdist = (y / terrainSize)  - tsPos.y;
+
+							Real weight = std::min((Real)1.0, 
+								Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Real(0.5 * mBrushSizeTerrainSpace));
+							weight = 1.0 - (weight * weight);
+
+							float addedHeight = weight * 250.0 * timeElapsed;
+							float newheight;
+							if (mKeyboard->isKeyDown(OIS::KC_EQUALS))
+								newheight = terrain->getHeightAtPoint(x, y) + addedHeight;
+							else
+								newheight = terrain->getHeightAtPoint(x, y) - addedHeight;
+							terrain->setHeightAtPoint(x, y, newheight);
+							if (mUpdateCountDown == 0)
+								mUpdateCountDown = mUpdateRate;
+
+						}
+					}
+				}
+				break;
+			case MODE_EDIT_BLEND:
+				{
+					TerrainLayerBlendMap* layer = terrain->getLayerBlendMap(mLayerEdit);
+					// we need image coords
+					Real imgSize = terrain->getLayerBlendMapSize();
+					long startx = (tsPos.x - mBrushSizeTerrainSpace) * imgSize;
+					long starty = (tsPos.y - mBrushSizeTerrainSpace) * imgSize;
+					long endx = (tsPos.x + mBrushSizeTerrainSpace) * imgSize;
+					long endy= (tsPos.y + mBrushSizeTerrainSpace) * imgSize;
+					startx = std::max(startx, 0L);
+					starty = std::max(starty, 0L);
+					endx = std::min(endx, (long)imgSize);
+					endy = std::min(endy, (long)imgSize);
+					for (long y = starty; y <= endy; ++y)
+					{
+						for (long x = startx; x <= endx; ++x)
+						{
+							Real tsXdist = (x / imgSize) - tsPos.x;
+							Real tsYdist = (y / imgSize)  - tsPos.y;
+
+							Real weight = std::min((Real)1.0, 
+								Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Real(0.5 * mBrushSizeTerrainSpace));
+							weight = 1.0 - (weight * weight);
+
+							float paint = weight * timeElapsed;
+							size_t imgY = imgSize - y;
+							float val;
+							if (mKeyboard->isKeyDown(OIS::KC_EQUALS))
+								val = layer->getBlendValue(x, imgY) + paint;
+							else
+								val = layer->getBlendValue(x, imgY) - paint;
+							val = Math::Clamp(val, 0.0f, 1.0f);
+							layer->setBlendValue(x, imgY, val);
+							layer->update();
+
+						}
+					}
+				}
+				break;
+
+
+
+			};
+
+		}
+#endif
+
+	}
     bool frameRenderingQueued(const FrameEvent& evt)
     {
 		if (mMode != MODE_NORMAL)
@@ -73,131 +178,23 @@ public:
 			Ray ray; 
 			//ray = mCamera->getCameraToViewportRay(0.5, 0.5);
 			ray = mTrayMgr->getCursorRay(mCamera);
-			std::pair<bool, Vector3> rayResult = mTerrain->rayIntersects(ray);
+
+			std::pair<bool, Vector3> rayResult = getAnyTerrainIntersection(ray);
 			if (rayResult.first)
 			{
 				mEditMarker->setVisible(true);
 				mEditNode->setPosition(rayResult.second);
 
-				Vector3 tsPos;
-				mTerrain->getTerrainPosition(rayResult.second, &tsPos);
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
-				if (mKeyboard->isKeyDown(OIS::KC_EQUALS) || mKeyboard->isKeyDown(OIS::KC_MINUS))
-				{
-					switch(mMode)
-					{
-					case MODE_EDIT_HEIGHT:
-						{
-							// we need point coords
-							Real terrainSize = (mTerrain->getSize() - 1);
-							long startx = (tsPos.x - mBrushSizeTerrainSpace) * terrainSize;
-							long starty = (tsPos.y - mBrushSizeTerrainSpace) * terrainSize;
-							long endx = (tsPos.x + mBrushSizeTerrainSpace) * terrainSize;
-							long endy= (tsPos.y + mBrushSizeTerrainSpace) * terrainSize;
-							startx = std::max(startx, 0L);
-							starty = std::max(starty, 0L);
-							endx = std::min(endx, (long)terrainSize);
-							endy = std::min(endy, (long)terrainSize);
-							for (long y = starty; y <= endy; ++y)
-							{
-								for (long x = startx; x <= endx; ++x)
-								{
-									Real tsXdist = (x / terrainSize) - tsPos.x;
-									Real tsYdist = (y / terrainSize)  - tsPos.y;
-
-									Real weight = std::min((Real)1.0, 
-										Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Real(0.5 * mBrushSizeTerrainSpace));
-									weight = 1.0 - (weight * weight);
-
-									float addedHeight = weight * 250.0 * evt.timeSinceLastFrame;
-									float newheight;
-									if (mKeyboard->isKeyDown(OIS::KC_EQUALS))
-										newheight = mTerrain->getHeightAtPoint(x, y) + addedHeight;
-									else
-										newheight = mTerrain->getHeightAtPoint(x, y) - addedHeight;
-									mTerrain->setHeightAtPoint(x, y, newheight);
-									if (mUpdateCountDown == 0)
-										mUpdateCountDown = mUpdateRate;
-
-								}
-							}
-						}
-						break;
-					case MODE_EDIT_BLEND:
-						{
-							TerrainLayerBlendMap* layer = mTerrain->getLayerBlendMap(mLayerEdit);
-							// we need image coords
-							Real imgSize = mTerrain->getLayerBlendMapSize();
-							long startx = (tsPos.x - mBrushSizeTerrainSpace) * imgSize;
-							long starty = (tsPos.y - mBrushSizeTerrainSpace) * imgSize;
-							long endx = (tsPos.x + mBrushSizeTerrainSpace) * imgSize;
-							long endy= (tsPos.y + mBrushSizeTerrainSpace) * imgSize;
-							startx = std::max(startx, 0L);
-							starty = std::max(starty, 0L);
-							endx = std::min(endx, (long)imgSize);
-							endy = std::min(endy, (long)imgSize);
-							for (long y = starty; y <= endy; ++y)
-							{
-								for (long x = startx; x <= endx; ++x)
-								{
-									Real tsXdist = (x / imgSize) - tsPos.x;
-									Real tsYdist = (y / imgSize)  - tsPos.y;
-
-									Real weight = std::min((Real)1.0, 
-										Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Real(0.5 * mBrushSizeTerrainSpace));
-									weight = 1.0 - (weight * weight);
-
-									float paint = weight * evt.timeSinceLastFrame;
-									size_t imgY = imgSize - y;
-									float val;
-									if (mKeyboard->isKeyDown(OIS::KC_EQUALS))
-										val = layer->getBlendValue(x, imgY) + paint;
-									else
-										val = layer->getBlendValue(x, imgY) - paint;
-									val = Math::Clamp(val, 0.0f, 1.0f);
-									layer->setBlendValue(x, imgY, val);
-									layer->update();
-
-								}
-							}
-						}
-						break;
-
-
-
-					};
-
-				}
-#endif
-
+				doTerrainModify(mTerrain, rayResult.second, evt.timeSinceLastFrame);
+				doTerrainModify(mTerrain2, rayResult.second, evt.timeSinceLastFrame);
 			}
 			else
 			{
 				mEditMarker->setVisible(false);
 			}
+
 		}
 
-		switch(mMode)
-		{
-		case MODE_NORMAL:
-			// TODO - new tray
-			//mDebugText = "";
-			break;
-		case MODE_EDIT_HEIGHT:
-			// TODO - new tray
-			//mDebugText = "Height Edit Mode";
-			break;
-		case MODE_EDIT_BLEND:
-			// TODO - new tray
-			//mDebugText = "Blend Edit Mode";
-			break;
-        case MODE_COUNT:
-            // TODO - new tray
-            //mDebugText = "";
-            break;
-        default:
-            break;
-		}
 
 		if (!mFly)
 		{
@@ -206,7 +203,7 @@ public:
 			ray.setOrigin(mCamera->getPosition());
 			ray.setDirection(Vector3::NEGATIVE_UNIT_Y);
 
-			std::pair<bool, Vector3> rayResult = mTerrain->rayIntersects(ray);
+			std::pair<bool, Vector3> rayResult = getAnyTerrainIntersection(ray);
 			if (rayResult.first)
 			{
 				mCamera->setPosition(mCamera->getPosition().x, 

@@ -969,11 +969,16 @@ namespace Ogre
 		/** Test for intersection of a given ray with the terrain. If the ray hits
 		 the terrain, the point of intersection is returned.
 		 @param ray The ray to test for intersection
+		 @param cascadeToNeighbours Whether the ray will be projected onto neighbours if
+			no intersection is found
+		 @param distanceLimit The distance from the ray origin at which we will stop looking,
+			0 indicates no limit
 		 @return A pair which contains whether the ray hit the terrain and, if so, where.
 		 @remarks This can be called from any thread as long as no parallel write to
 		 the heightmap data occurs.
 		 */
-		std::pair<bool, Vector3> rayIntersects(const Ray& ray); //const;
+		std::pair<bool, Vector3> rayIntersects(const Ray& ray, 
+			bool cascadeToNeighbours = false, Real distanceLimit = 0); //const;
 		
 		/// Get the AABB (local coords) of the entire terrain
 		const AxisAlignedBox& getAABB() const;
@@ -1263,6 +1268,13 @@ namespace Ogre
 		@param shadowrect The area on this tile where shadows need recalculating (may be null)
 		*/
 		void neighbourModified(NeighbourIndex index, const Rect& edgerect, const Rect& shadowrect);
+
+		/** Utility method to pick a neighbour based on a ray. 
+		@param ray The ray in world space
+		@param distanceLimit Limit beyond which we want to ignore neighbours (0 for infinite)
+		@returns The first neighbour along this ray, or null
+		*/
+		Terrain* raySelectNeighbour(const Ray& ray, Real distanceLimit = 0);
 		
 
 

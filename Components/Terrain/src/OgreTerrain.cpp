@@ -1973,7 +1973,8 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
-	std::pair<bool, Vector3> Terrain::rayIntersects(const Ray& ray)
+	std::pair<bool, Vector3> Terrain::rayIntersects(const Ray& ray, 
+		bool cascadeToNeighbours /* = false */, Real distanceLimit /* = 0 */)
 	{
 		typedef std::pair<bool, Vector3> Result;
 		// first step: convert the ray to a local vertex space
@@ -2092,6 +2093,12 @@ namespace Ogre
 				break;
 			}
 			result.second += getPosition();
+		}
+		else if (cascadeToNeighbours)
+		{
+			Terrain* neighbour = raySelectNeighbour(ray, distanceLimit);
+			if (neighbour)
+				result = neighbour->rayIntersects(ray, cascadeToNeighbours, distanceLimit);
 		}
 		return result;
 	}
@@ -2916,7 +2923,9 @@ namespace Ogre
 				// build ray, cast backwards along light direction
 				Ray ray(wpos, -lightVec);
 
-				std::pair<bool, Vector3> rayHit = rayIntersects(ray);
+				// Cascade into neighbours when casting, but don't travel further
+				// than world size
+				std::pair<bool, Vector3> rayHit = rayIntersects(ray, true, mWorldSize);
 
 				// TODO - cast multiple rays to antialias?
 				// TODO - fade by distance?
@@ -3523,6 +3532,55 @@ namespace Ogre
 		else
 			*outy = y;
 	}
+	//---------------------------------------------------------------------
+	Terrain* Terrain::raySelectNeighbour(const Ray& ray, Real distanceLimit /* = 0 */)
+	{
+		Real dNear, dFar;
+		Ray localRay(ray.getOrigin() - getPosition(), ray.getDirection());
+		if (Math::intersects(localRay, getAABB(), &dNear, &dFar))
+		{
+			// discard out of range
+			if (dFar <= 0 || (distanceLimit && dFar > distanceLimit))
+				return 0;
+
+			// we're interested in the exit point
+			// convert to standard form so we can use x/y always
+			Ray terrainRay(convertWorldToTerrainAxes(localRay.getOrigin()), 
+				convertWorldToTerrainAxes(localRay.getDirection()));
+
+
+			Vector3 terrainIntersectPos = terrainRay.getPoint(dFar);
+			Real x = terrainIntersectPos.x;
+			Real y = terrainIntersectPos.y;
+			Real dx = terrainRay.getDirection().x;
+			Real dy = terrainRay.getDirection().y;
+
+			if (Math::RealEqual(Math::Abs(x), Math::Abs(y)))
+			{
+				if (x > 0 && y > 0 && dx > 0 && dy > 0)
+					return getNeighbour(NEIGHBOUR_NORTHEAST);
+				if (x > 0 && y < 0 && dx > 0 && dy < 0)
+					return getNeighbour(NEIGHBOUR_SOUTHEAST);
+				if (x < 0 && y > 0 && dx < 0 && dy > 0)
+					return getNeighbour(NEIGHBOUR_NORTHWEST);
+				if (x < 0 && y < 0 && dx < 0 && dy < 0)
+					return getNeighbour(NEIGHBOUR_SOUTHWEST);
+			}
+			if (x > 0 && x > y && dx > 0)
+				return getNeighbour(NEIGHBOUR_EAST);
+			if (x < 0 && x < y && dx < 0)
+				return getNeighbour(NEIGHBOUR_WEST);
+			if (y > 0 && y > x && dy > 0)
+				return getNeighbour(NEIGHBOUR_NORTH);
+			if (y < 0 && y < x && dy < 0)
+				return getNeighbour(NEIGHBOUR_SOUTH);
+
+		}
+
+		return 0;
+	}
+
+
 
 
 
