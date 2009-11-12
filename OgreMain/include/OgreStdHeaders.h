@@ -104,8 +104,9 @@ extern "C" {
 #endif
 
 #if OGRE_THREAD_SUPPORT
-#	undef NOMINMAX
-#	define NOMINMAX
+#	if !defined(NOMINMAX) && defined(_MSC_VER)
+#		define NOMINMAX // required to stop windows.h messing up std::min
+#	endif
 #   include "Threading/OgreThreadHeaders.h"
 #endif
 

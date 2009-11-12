@@ -39,8 +39,9 @@ THE SOFTWARE.
 #define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
 
 
-#undef NOMINMAX
-#define NOMINMAX // required to stop windows.h screwing up std::min definition
+#if !defined(NOMINMAX) && defined(_MSC_VER)
+#	define NOMINMAX // required to stop windows.h messing up std::min
+#endif
 #include <d3d10.h>
 #include <d3dx10.h>
 #include <d3d10_1shader.h>

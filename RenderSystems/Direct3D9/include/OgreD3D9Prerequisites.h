@@ -63,7 +63,9 @@ THE SOFTWARE.
 #endif
 
 #define WIN32_LEAN_AND_MEAN
-#define NOMINMAX // required to stop windows.h messing up std::min
+#if !defined(NOMINMAX) && defined(_MSC_VER)
+#	define NOMINMAX // required to stop windows.h messing up std::min
+#endif
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <dxerr.h>
