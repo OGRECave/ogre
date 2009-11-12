@@ -17,8 +17,9 @@ same license as the rest of the engine.
 #include "SdkSample.h"
 #include "OgreTerrain.h"
 #include "OgreTerrainQuadTreeNode.h"
+#include "OgreTerrainMaterialGeneratorA.h"
 
-#define TERRAIN_FILE "testTerrain.dat"
+#define TERRAIN_FILE_PREFIX String("testTerrain")
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -235,7 +236,18 @@ public:
 		case OIS::KC_S:
 			// CTRL-S to save
 			if (mKeyboard->isKeyDown(OIS::KC_LCONTROL) || mKeyboard->isKeyDown(OIS::KC_RCONTROL))
-				mTerrain->save(TERRAIN_FILE);
+			{
+				mTerrain->save(TERRAIN_FILE_PREFIX + ".dat");
+				mTerrain2->save(TERRAIN_FILE_PREFIX + "2.dat");
+			}
+			else
+				return SdkSample::keyPressed(e);
+			break;
+		case OIS::KC_F10:
+			// dump
+			mTerrain->_dumpTextures("terrain1", ".png");
+			mTerrain2->_dumpTextures("terrain2", ".png");
+			break;
 		default:
 			return SdkSample::keyPressed(e);
 		}
@@ -470,7 +482,7 @@ protected:
 		MaterialManager::getSingleton().setDefaultTextureFiltering(TFO_ANISOTROPIC);
 		MaterialManager::getSingleton().setDefaultAnisotropy(7);
 
-		mSceneMgr->setFog(FOG_LINEAR, ColourValue(0.7, 0.7, 0.8), 0, 2000, 10000);
+		mSceneMgr->setFog(FOG_LINEAR, ColourValue(0.7, 0.7, 0.8), 0, 5000, 14000);
 
 		LogManager::getSingleton().setLogDetail(LL_BOREME);
 
@@ -484,6 +496,8 @@ protected:
 		//TerrainGlobalOptions::setUseRayBoxDistanceCalculation(true);
 		//TerrainGlobalOptions::getDefaultMaterialGenerator()->setDebugLevel(1);
 		//TerrainGlobalOptions::setLightMapSize(256);
+		//static_cast<TerrainMaterialGeneratorA::SM2Profile*>(TerrainGlobalOptions::getDefaultMaterialGenerator()->getActiveProfile())
+		//	->setLightmapEnabled(false);
 
 
 
@@ -501,11 +515,11 @@ protected:
 		TerrainGlobalOptions::setCompositeMapAmbient(mSceneMgr->getAmbientLight());
 		//TerrainGlobalOptions::setCompositeMapAmbient(ColourValue::Red);
 		TerrainGlobalOptions::setCompositeMapDiffuse(l->getDiffuseColour());
-
+		bool neighbourRecalc = false;
 		try
 		{
 			mTerrain = OGRE_NEW Terrain(mSceneMgr);
-			mTerrain->load(TERRAIN_FILE);
+			mTerrain->load(TERRAIN_FILE_PREFIX + ".dat");
 		}
 		catch (Exception&)
 		{
@@ -513,7 +527,10 @@ protected:
 			mTerrain = 0;
 		}
 		if (!mTerrain)
+		{
+			neighbourRecalc = true;
 			mTerrain = createTerrain();
+		}
 
 
 		//addTextureDebugOverlay(TextureManager::getSingleton().getByName(mTerrain->getTerrainNormalMap()->getName()), 0);
@@ -523,13 +540,27 @@ protected:
 		// Testing
 		mTerrain->setPosition(mTerrainPos);
 
-
-		mTerrain2 = createTerrain(true);
+		try
+		{
+			mTerrain2 = OGRE_NEW Terrain(mSceneMgr);
+			mTerrain2->load(TERRAIN_FILE_PREFIX + "2.dat");
+		}
+		catch (Exception&)
+		{
+			OGRE_DELETE mTerrain2;
+			mTerrain2 = 0;
+		}
+		if (!mTerrain2)
+		{
+			neighbourRecalc = true;
+			mTerrain2 = createTerrain(true);
+		}
 		Vector3 secondTerrainPos = mTerrainPos + Vector3(mTerrain->getWorldSize(), 0, 0);
 		mTerrain2->setPosition(secondTerrainPos);
 		mCamera->setPosition(mTerrainPos + Vector3(mTerrain->getWorldSize() * 0.48, mTerrain->getWorldSize() * 0.48, 0));
 		// set neighbour (let it notify other itself)
-		mTerrain2->setNeighbour(Terrain::NEIGHBOUR_WEST, mTerrain, true);
+		mTerrain2->setNeighbour(Terrain::NEIGHBOUR_WEST, mTerrain, neighbourRecalc);
+
 
 
 

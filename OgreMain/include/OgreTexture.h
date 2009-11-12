@@ -366,6 +366,14 @@ namespace Ogre {
 		*/
 		virtual HardwarePixelBufferSharedPtr getBuffer(size_t face=0, size_t mipmap=0) = 0;
 
+
+		/** Populate an Image with the contents of this texture. 
+		@param destImage The target image (contents will be overwritten)
+		@param includeMipMaps Whether to embed mipmaps in the image
+		*/
+		virtual void convertToImage(Image& destImage, bool includeMipMaps = false);
+
+
     protected:
         size_t mHeight;
         size_t mWidth;

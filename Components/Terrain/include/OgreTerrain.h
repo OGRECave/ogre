@@ -1275,6 +1275,12 @@ namespace Ogre
 		@returns The first neighbour along this ray, or null
 		*/
 		Terrain* raySelectNeighbour(const Ray& ray, Real distanceLimit = 0);
+
+		/** Dump textures to files.
+		@remarks
+			This is a debugging method.
+		*/
+		void _dumpTextures(const String& prefix, const String& suffix);
 		
 
 

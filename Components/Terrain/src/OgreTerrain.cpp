@@ -3562,6 +3562,49 @@ namespace Ogre
 
 		return 0;
 	}
+	//---------------------------------------------------------------------
+	void Terrain::_dumpTextures(const String& prefix, const String& suffix)
+	{
+		if (!mTerrainNormalMap.isNull())
+		{
+			Image img;
+			mTerrainNormalMap->convertToImage(img);
+			img.save(prefix + "_normalmap" + suffix);
+		}
+
+		if (!mColourMap.isNull())
+		{
+			Image img;
+			mColourMap->convertToImage(img);
+			img.save(prefix + "_colourmap" + suffix);
+		}
+
+		if (!mLightmap.isNull())
+		{
+			Image img;
+			mLightmap->convertToImage(img);
+			img.save(prefix + "_lightmap" + suffix);
+		}
+
+		if (!mCompositeMap.isNull())
+		{
+			Image img;
+			mCompositeMap->convertToImage(img);
+			img.save(prefix + "_compositemap" + suffix);
+		}
+
+		int blendTexture = 0;
+		for (TexturePtrList::iterator i = mBlendTextureList.begin(); i != mBlendTextureList.end(); ++i, ++blendTexture)
+		{
+			if (!i->isNull())
+			{
+				Image img;
+				(*i)->convertToImage(img);
+				img.save(prefix + "_blendtexture" + StringConverter::toString(blendTexture) + suffix);
+			}
+		}
+
+	}
 
 
 
