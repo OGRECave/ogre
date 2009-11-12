@@ -2026,7 +2026,15 @@ namespace Ogre
 		AxisAlignedBox aabb (Vector3(0, minHeight, 0), Vector3(mSize, maxHeight, mSize));
 		std::pair<bool, Real> aabbTest = localRay.intersects(aabb);
 		if (!aabbTest.first)
+		{
+			if (cascadeToNeighbours)
+			{
+				Terrain* neighbour = raySelectNeighbour(ray, distanceLimit);
+				if (neighbour)
+					return neighbour->rayIntersects(ray, cascadeToNeighbours, distanceLimit);
+			}
 			return Result(false, Vector3());
+		}
 		// get intersection point and move inside
 		Vector3 cur = localRay.getPoint(aabbTest.second);
 
@@ -3508,6 +3516,10 @@ namespace Ogre
 	{
 		Real dNear, dFar;
 		Ray localRay(ray.getOrigin() - getPosition(), ray.getDirection());
+		// Move back half a square - if we're on the edge of the AABB we might
+		// miss the intersection otherwise; it's ok for everywhere else since
+		// we want the far intersection anyway
+		localRay.setOrigin(localRay.getPoint(-mWorldSize/mSize * 0.5));
 		if (Math::intersects(localRay, getAABB(), &dNear, &dFar))
 		{
 			// discard out of range
