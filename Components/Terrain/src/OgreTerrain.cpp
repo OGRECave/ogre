@@ -2689,68 +2689,39 @@ namespace Ogre
 
 		PixelBox* pixbox = OGRE_NEW PixelBox(widenedRect.width(), widenedRect.height(), 1, PF_BYTE_RGB, pData);
 
-		// sample the 6 triangles intersecting; there are 2 general options
-		//      A           B
-		//  6---7---8   6---7---8
-		//  | \ | \ |   | / | / |
-		//	3---4---5   3---4---5  <---- centre
-		//  | / | / |   | \ | \ |
-		//	0---1---2   0---1---2
-		// 
-		//  Option A is where the centre point is on an odd row (ie previous row is even)
-		//  Option B is where the centre point is on an even row (ie previous row is odd)
-		//  Notice how only 6 of the 8 triangles are connected to the centre point, 
-		//	however we still include them since it gives a better overall result
+		// Evaluate normal like this
+		//  3---2---1
+		//  | \ | / |
+		//	4---P---0
+		//  | / | \ |
+		//	5---6---7
 
+		Plane plane;
 		for (long y = widenedRect.top; y < widenedRect.bottom; ++y)
 		{
 			for (long x = widenedRect.left; x < widenedRect.right; ++x)
 			{
-				// Do them in 4 cells, since if centre point is at the edge then
-				// we skip cells
 				Vector3 cumulativeNormal = Vector3::ZERO;
-				for(long cy = -1; cy < 1; ++cy)
+
+				// Build points to sample
+				Vector3 centrePoint;
+				Vector3 adjacentPoints[8];
+				getPointFromSelfOrNeighbour(x  , y,   &centrePoint);
+				getPointFromSelfOrNeighbour(x+1, y,   &adjacentPoints[0]);
+				getPointFromSelfOrNeighbour(x+1, y+1, &adjacentPoints[1]);
+				getPointFromSelfOrNeighbour(x,   y+1, &adjacentPoints[2]);
+				getPointFromSelfOrNeighbour(x-1, y+1, &adjacentPoints[3]);
+				getPointFromSelfOrNeighbour(x-1, y,   &adjacentPoints[4]);
+				getPointFromSelfOrNeighbour(x-1, y-1, &adjacentPoints[5]);
+				getPointFromSelfOrNeighbour(x,   y-1, &adjacentPoints[6]);
+				getPointFromSelfOrNeighbour(x+1, y-1, &adjacentPoints[7]);
+
+				for (int i = 0; i < 8; ++i)
 				{
-					long cellY = y + cy;
-					if (cellY < 0 || cellY + 1 > mSize)
-						continue;
-					for(long cx = -1; cx < 1; ++cx)
-					{
-						long cellX = x + cx;
-						if (cellX < 0 || cellX + 1 > mSize)
-							continue;
-						// cell X/Y is the bottom-left of the cell
-
-						// get positions
-						// can access neighbour information if out of bounds
-						Vector3 pos[4];
-						getPointFromSelfOrNeighbour(cellX, cellY, &pos[0]);
-						getPointFromSelfOrNeighbour(cellX + 1, cellY, &pos[1]);
-						getPointFromSelfOrNeighbour(cellX, cellY + 1, &pos[2]);
-						getPointFromSelfOrNeighbour(cellX + 1, cellY + 1, &pos[3]);
-
-						bool backwardsTri = (cellY % 2) != 0;
-
-						Plane p1, p2;
-
-						if (backwardsTri)
-						{
-							p1.redefine(pos[0], pos[3], pos[2]);
-							p2.redefine(pos[0], pos[1], pos[3]);
-						}
-						else
-						{
-							p1.redefine(pos[0], pos[1], pos[2]);
-							p2.redefine(pos[1], pos[3], pos[2]);
-						}
-
-						// which ones contribute? All except the 2 at the edge
-						// right edge for case A, left for case B
-						cumulativeNormal += p1.normal;
-						cumulativeNormal += p2.normal;
-
-					}
+					plane.redefine(centrePoint, adjacentPoints[i], adjacentPoints[(i+1)%8]);
+					cumulativeNormal += plane.normal;
 				}
+
 				// normalise & store normal
 				cumulativeNormal.normalise();
 
