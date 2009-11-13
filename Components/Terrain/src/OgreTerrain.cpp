@@ -76,7 +76,7 @@ namespace Ogre
 
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
-	Real TerrainGlobalOptions::msSkirtSize = 10;
+	Real TerrainGlobalOptions::msSkirtSize = 30;
 	Vector3 TerrainGlobalOptions::msLightMapDir = Vector3(1, -1, 0).normalisedCopy();
 	bool TerrainGlobalOptions::msCastsShadows = false;
 	Real TerrainGlobalOptions::msMaxPixelError = 3.0;
@@ -3231,6 +3231,9 @@ namespace Ogre
 	{
 		// We can safely assume that we would not have been contacted if it wasn't 
 		// important
+
+		LogManager::getSingleton().stream() << "neighbourModified(" << (unsigned long)this <<
+			") edgeRect:" << edgerect << " shadowrect:" << shadowrect;
 
 		const Terrain* neighbour = getNeighbour(index);
 		if (!neighbour)

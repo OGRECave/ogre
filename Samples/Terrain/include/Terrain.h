@@ -32,11 +32,13 @@ public:
 		: mTerrain(0)
 		, mTerrain2(0)
 		, mFly(false)
+		, mFallVelocity(0)
 		, mMode(MODE_NORMAL)
 		, mLayerEdit(1)
 		, mBrushSizeTerrainSpace(0.02)
 		, mUpdateCountDown(0)
 		, mTerrainPos(1000,0,5000)
+		, mAutoSave(false)
 
 	{
 		mInfo["Title"] = "Terrain";
@@ -200,16 +202,27 @@ public:
 		if (!mFly)
 		{
 			// clamp to terrain
+			Vector3 camPos = mCamera->getPosition();
 			Ray ray;
-			ray.setOrigin(mCamera->getPosition());
+			ray.setOrigin(Vector3(camPos.x, 10000, camPos.z));
 			ray.setDirection(Vector3::NEGATIVE_UNIT_Y);
 
 			std::pair<bool, Vector3> rayResult = getAnyTerrainIntersection(ray);
+			Real distanceAboveTerrain = 50;
+			Real fallSpeed = 300;
+			Real newy = camPos.y;
 			if (rayResult.first)
 			{
-				mCamera->setPosition(mCamera->getPosition().x, 
-					rayResult.second.y + 30, 
-					mCamera->getPosition().z);
+				if (camPos.y > rayResult.second.y + distanceAboveTerrain)
+				{
+					mFallVelocity += evt.timeSinceLastFrame * 20;
+					mFallVelocity = std::min(mFallVelocity, fallSpeed);
+					newy = camPos.y - mFallVelocity * evt.timeSinceLastFrame;
+
+				}
+				newy = std::max(rayResult.second.y + distanceAboveTerrain, newy);
+				mCamera->setPosition(camPos.x, newy, camPos.z);
+				
 			}
 
 		}
@@ -222,11 +235,39 @@ public:
 				mTerrain->update();
 				mTerrain2->update();
 				mUpdateCountDown = 0;
+
+			}
+
+		}
+
+		if (mTerrain->isDerivedDataUpdateInProgress() || mTerrain2->isDerivedDataUpdateInProgress())
+		{
+			mInfoLabel->setCaption("Computing textures, patience...");
+			mTrayMgr->moveWidgetToTray(mInfoLabel, TL_TOP, 0);
+			mInfoLabel->show();
+		}
+		else
+		{
+			mTrayMgr->removeWidgetFromTray(mInfoLabel);
+			mInfoLabel->hide();
+			if (mAutoSave)
+			{
+				saveTerrains();
+				mAutoSave = false;
 			}
 		}
 
+
+
+
 		return SdkSample::frameRenderingQueued(evt);  // don't forget the parent updates!
     }
+
+	void saveTerrains()
+	{
+		mTerrain->save(TERRAIN_FILE_PREFIX + ".dat");
+		mTerrain2->save(TERRAIN_FILE_PREFIX + "2.dat");
+	}
 
 	bool keyPressed (const OIS::KeyEvent &e)
 	{
@@ -237,8 +278,27 @@ public:
 			// CTRL-S to save
 			if (mKeyboard->isKeyDown(OIS::KC_LCONTROL) || mKeyboard->isKeyDown(OIS::KC_RCONTROL))
 			{
-				mTerrain->save(TERRAIN_FILE_PREFIX + ".dat");
-				mTerrain2->save(TERRAIN_FILE_PREFIX + "2.dat");
+				saveTerrains();
+			}
+			else
+				return SdkSample::keyPressed(e);
+			break;
+		case OIS::KC_1:
+			// force update terrain 1
+			if (mKeyboard->isKeyDown(OIS::KC_LCONTROL) || mKeyboard->isKeyDown(OIS::KC_RCONTROL))
+			{
+				mTerrain->dirty();
+				mTerrain->update();
+			}
+			else
+				return SdkSample::keyPressed(e);
+			break;
+		case OIS::KC_2:
+			// force update terrain 2
+			if (mKeyboard->isKeyDown(OIS::KC_LCONTROL) || mKeyboard->isKeyDown(OIS::KC_RCONTROL))
+			{
+				mTerrain2->dirty();
+				mTerrain2->update();
 			}
 			else
 				return SdkSample::keyPressed(e);
@@ -319,6 +379,7 @@ protected:
 	Terrain* mTerrain;
 	Terrain* mTerrain2;
 	bool mFly;
+	Real mFallVelocity;
 	enum Mode
 	{
 		MODE_NORMAL = 0,
@@ -336,6 +397,8 @@ protected:
 	Vector3 mTerrainPos;
 	SelectMenu* mEditMenu;
 	CheckBox* mFlyBox;
+	OgreBites::Label* mInfoLabel;
+	bool mAutoSave;
 
 
 
@@ -354,7 +417,7 @@ protected:
 		Terrain::ImportData imp;
 		imp.inputImage = &img;
 		imp.terrainSize = 513;
-		imp.worldSize = 8000;
+		imp.worldSize = 12000;
 		imp.inputScale = 600;
 		imp.minBatchSize = 33;
 		imp.maxBatchSize = 65;
@@ -432,7 +495,7 @@ protected:
 	{
 		SdkSample::setupView();
 
-		mCamera->setPosition(mTerrainPos + Vector3(-1000,300,1000));
+		mCamera->setPosition(mTerrainPos + Vector3(-1000,50,1000));
 		mCamera->lookAt(mTerrainPos);
 		mCamera->setNearClipDistance(5);
 		mCamera->setFarClipDistance(50000);
@@ -447,10 +510,17 @@ protected:
 	{
 		mTrayMgr->showCursor();
 
+#ifdef USE_RTSHADER_SYSTEM
+		// we don't need this right now (maybe in future!)
+		mTrayMgr->removeWidgetFromTray(mRTShaderSystemPanel);
+		mRTShaderSystemPanel->hide();
+#endif
 		// make room for the controls
 		mTrayMgr->showLogo(TL_TOPRIGHT);
 		mTrayMgr->showFrameStats(TL_TOPRIGHT);
 		mTrayMgr->toggleAdvancedFrameStats();
+
+		mInfoLabel = mTrayMgr->createLabel(TL_TOP, "TInfo", "", 350);
 
 		mEditMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "EditMode", "Edit Mode", 370, 250, 3);
 		mEditMenu->addItem("None");
@@ -529,6 +599,7 @@ protected:
 		if (!mTerrain)
 		{
 			neighbourRecalc = true;
+			mAutoSave = true;
 			mTerrain = createTerrain();
 		}
 
@@ -553,11 +624,11 @@ protected:
 		if (!mTerrain2)
 		{
 			neighbourRecalc = true;
+			mAutoSave = true;
 			mTerrain2 = createTerrain(true);
 		}
 		Vector3 secondTerrainPos = mTerrainPos + Vector3(mTerrain->getWorldSize(), 0, 0);
 		mTerrain2->setPosition(secondTerrainPos);
-		mCamera->setPosition(mTerrainPos + Vector3(mTerrain->getWorldSize() * 0.48, mTerrain->getWorldSize() * 0.48, 0));
 		// set neighbour (let it notify other itself)
 		mTerrain2->setNeighbour(Terrain::NEIGHBOUR_WEST, mTerrain, neighbourRecalc);
 

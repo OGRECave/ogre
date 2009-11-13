@@ -1281,6 +1281,9 @@ namespace Ogre
 			This is a debugging method.
 		*/
 		void _dumpTextures(const String& prefix, const String& suffix);
+
+		/** Query whether a derived data update is in progress or not. */
+		bool isDerivedDataUpdateInProgress() const { return mDerivedDataUpdateInProgress; }
 		
 
 
