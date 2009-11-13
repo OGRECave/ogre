@@ -3231,10 +3231,6 @@ namespace Ogre
 	{
 		// We can safely assume that we would not have been contacted if it wasn't 
 		// important
-
-		LogManager::getSingleton().stream() << "neighbourModified(" << (unsigned long)this <<
-			") edgeRect:" << edgerect << " shadowrect:" << shadowrect;
-
 		const Terrain* neighbour = getNeighbour(index);
 		if (!neighbour)
 			return; // bogus request
