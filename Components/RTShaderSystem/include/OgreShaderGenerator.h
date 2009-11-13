@@ -114,17 +114,16 @@ public:
 	SceneManager*	getSceneManager				();
 	
 	/** 
-	Set the output shader code language.
-	@param shaderLanguage The output language.
-	@remarks Current implementation supports only CG as shader language.
+	Set the target shader language.
+	@param shaderLanguage The output shader language to use.	
+	@remarks The default shader language is cg.
 	*/
-	void			setShaderLanguage			(const String& shaderLanguage) { mShaderLanguage = shaderLanguage; }
+	void			setTargetLanguage			(const String& shaderLanguage);
 
 	/** 
-	Return the output shader code language.	
-	@remarks Current implementation supports only CG as shader language.
+	Return the target shader language currently in use.		
 	*/
-	const String&	getShaderLanguage			() const { return mShaderLanguage; }
+	const String&	getTargetLanguage			() const { return mShaderLanguage; }
 
 	/** 
 	Set the output vertex shader target profiles.
@@ -656,9 +655,9 @@ protected:
 	typedef SubRenderStateFactoryMap::const_iterator		SubRenderStateFactoryConstIterator;
 
 	//-----------------------------------------------------------------------------
-	typedef map<uint32, RenderStatePtr>::type 			RenderStateMap;
-	typedef RenderStateMap::iterator 					RenderStateMapIterator;
-	typedef RenderStateMap::const_iterator				RenderStateMapConstIterator;
+	typedef map<uint32, RenderStatePtr>::type 				RenderStateMap;
+	typedef RenderStateMap::iterator 						RenderStateMapIterator;
+	typedef RenderStateMap::const_iterator					RenderStateMapConstIterator;
 
 protected:
 	/** Class default constructor */
@@ -751,6 +750,7 @@ protected:
 	String							mFragmentShaderProfiles;		// The target Fragment shader profile. Will be used as argument for program compilation.
 	String							mShaderCachePath;				// Path for caching the generated shaders.
 	ProgramManager*					mProgramManager;				// Shader program manager.
+	ProgramWriterManager*			mProgramWriterManager;			// Shader program writer manager.
 	FFPRenderStateBuilder*			mFFPRenderStateBuilder;			// Fixed Function Render state builder.
 	SGMaterialMap					mMaterialEntriesMap;			// Material entries map.
 	SGSchemeMap						mSchemeEntriesMap;				// Scheme entries map.

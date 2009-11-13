@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreShaderFunction.h"
 #include "OgreShaderFFPRenderState.h"
 #include "OgreShaderGenerator.h"
+#include "OgreShaderProgramSet.h"
+#include "OgreShaderProgram.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -47,6 +49,79 @@ ProgramProcessor::ProgramProcessor()
 ProgramProcessor::~ProgramProcessor()
 {
 	
+}
+
+//-----------------------------------------------------------------------------
+void ProgramProcessor::bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pGpuProgram)
+{
+	GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
+	const ShaderParameterList& progParams = pCpuProgram->getParameters();
+	ShaderParameterConstIterator itParams;
+
+	// Bind auto parameters.
+	for (itParams=progParams.begin(); itParams != progParams.end(); ++itParams)
+	{
+		const ParameterPtr pCurParam = *itParams;
+		const GpuConstantDefinition* gpuConstDef = pGpuParams->_findNamedConstantDefinition(pCurParam->getName());
+
+
+		if (pCurParam->isAutoConstantParameter())
+		{
+			if (pCurParam->isAutoConstantRealParameter())
+			{
+				if (gpuConstDef != NULL)
+				{
+					pGpuParams->setNamedAutoConstantReal(pCurParam->getName(), 
+						pCurParam->getAutoConstantType(), 
+						pCurParam->getAutoConstantRealData());
+				}	
+				else
+				{
+					LogManager::getSingleton().stream() << "ProgramProcessor::bindAutoParameters: Can not bind auto param named " << 
+						pCurParam->getName() << " to program named " << pGpuProgram->getName();
+				}
+			}
+			else if (pCurParam->isAutoConstantIntParameter())
+			{
+				if (gpuConstDef != NULL)
+				{
+					pGpuParams->setNamedAutoConstant(pCurParam->getName(), 
+						pCurParam->getAutoConstantType(), 
+						pCurParam->getAutoConstantIntData());
+				}
+				else
+				{
+					LogManager::getSingleton().stream() << "ProgramProcessor::bindAutoParameters: Can not bind auto param named " << 
+						pCurParam->getName() << " to program named " << pGpuProgram->getName();
+				}
+			}						
+		}
+		else
+		{
+			// No auto constant - we have to update its variability ourself.
+			if (gpuConstDef != NULL)
+			{
+				gpuConstDef->variability |= pCurParam->getVariability();
+
+				// Update variability in the float map.
+				if (gpuConstDef->isSampler() == false)
+				{
+					GpuLogicalBufferStructPtr floatLogical = pGpuParams->getFloatLogicalBufferStruct();
+					if (floatLogical.get())
+					{
+						for (GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin(); i != floatLogical->map.end(); ++i)
+						{
+							if (i->second.physicalIndex == gpuConstDef->physicalIndex)
+							{
+								i->second.variability |= gpuConstDef->variability;
+								break;
+							}
+						}
+					}
+				}							
+			}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -661,7 +736,15 @@ void ProgramProcessor::replaceParametersReferences(MergeParameterList& mergedPar
 
 						if (srcOperandPtr->getMask() == Operand::OPM_ALL)
 						{
-							dstOpMask = getParameterMaskByType(curSrcParam->getType()) << paramBitMaskOffset;							
+							// Case the merged parameter contains only one source - no point in adding special mask.
+							if (curMergeParameter.getSourceParameterCount() == 1)
+							{
+								dstOpMask = Operand::OPM_ALL;
+							}
+							else
+							{
+								dstOpMask = getParameterMaskByType(curSrcParam->getType()) << paramBitMaskOffset;							
+							}
 						}
 						else
 						{
@@ -883,18 +966,7 @@ void ProgramProcessor::MergeParameter::addSourceParameter(ParameterPtr srcParam,
 	}
 	else
 	{		
-		int componentBitMask   = mask;
-		int srcParamFloatCount = 0;
-
-		while (componentBitMask != 0)
-		{
-			if ((componentBitMask & Operand::OPM_X) != 0)
-			{
-				srcParamFloatCount++;
-				
-			}			
-			componentBitMask = componentBitMask >> 1;
-		}
+		int srcParamFloatCount = Operand::getFloatCount(mask);
 
 		mDstParameterMask[mSrcParameterCount] = getParameterMaskByFloatCount(srcParamFloatCount) << mUsedFloatCount;			
 		mUsedFloatCount += srcParamFloatCount;

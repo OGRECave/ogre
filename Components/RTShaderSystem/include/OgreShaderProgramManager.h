@@ -112,7 +112,7 @@ protected:
 	typedef ProgramList::iterator						ProgramListIterator;
 	typedef map<String, ProgramWriter*>::type			ProgramWriterMap;
 	typedef ProgramWriterMap::iterator					ProgramWriterIterator;
-
+	typedef vector<ProgramWriterFactory*>::type	ProgramWriterFactoryList;
 	//-----------------------------------------------------------------------------
 	typedef map<String, ProgramProcessor*>::type 		ProgramProcessorMap;
 	typedef ProgramProcessorMap::iterator 				ProgramProcessorIterator;
@@ -126,6 +126,12 @@ protected:
 	
 	/** Destroy default program processors. */
 	void			destroyDefaultProgramProcessors	();
+
+	/** Create default program processors. */
+	void			createDefaultProgramWriterFactories	();
+
+	/** Destroy default program processors. */
+	void			destroyDefaultProgramWriterFactories();
 
 	/** Destroy all program sets. */
 	void			destroyProgramSets		();
@@ -196,10 +202,11 @@ protected:
 	ProgramWriterMap			mProgramWritersMap;				// Map between target language and shader program writer.					
 	ProgramProcessorMap			mProgramProcessorsMap;			// Map between target language and shader program processor.
 	ProgramSetMap				mHashToProgramSetMap;			// Map between hash code of render state to program set.
+	ProgramWriterFactoryList	mProgramWriterFactories;		// Holds standard shader writer factories
+
 	size_t						mVertexShaderCount;				// Vertex shader count.
 	size_t						mFragmentShaderCount;			// Fragment shader count.
 	ProgramProcessorList		mDefaultProgramProcessors;		// The default program processors.
-
 
 private:
 	friend class ProgramSet;

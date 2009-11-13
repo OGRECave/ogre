@@ -1,3 +1,4 @@
+#version 120
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
@@ -24,65 +25,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ShaderCGProgramProcessor_
-#define _ShaderCGProgramProcessor_
 
-#include "OgreShaderPrerequisites.h"
-#include "OgreShaderProgramProcessor.h"
+//-----------------------------------------------------------------------------
+// Program Name: FFPLib_Transform
+// Program Desc: Transform functions of the FFP.
+// Program Type: Vertex shader
+// Language: GLSL
+// Notes: Implements core functions for FFPTransform class.
+// based on transform engine. 
+// See http://msdn.microsoft.com/en-us/library/bb206269(VS.85).aspx
+//-----------------------------------------------------------------------------
 
 
-namespace Ogre {
-namespace RTShader {
-
-/** \addtogroup Core
-*  @{
-*/
-/** \addtogroup RTShader
-*  @{
-*/
-
-/** CG Language program processor class.
-*/
-class CGProgramProcessor : public ProgramProcessor
+//-----------------------------------------------------------------------------
+void FFP_Transform(in mat4 m, 
+			 in vec4 v, 
+			 out vec4 vOut)
 {
-
-// Interface.
-public:	
-
-	/** Class constructor.
-	@param type The type of this program.
-	*/
-	CGProgramProcessor			();
-
-	/** Class destructor */
-	virtual ~CGProgramProcessor	();
-
-	/** Return the target language of this processor. */
-	virtual const String&		getTargetLanguage	() const { return TargetLanguage; }
-	
-	/** Called before creation of the GPU programs.
-	Do several preparation operation such as validation, register compaction and specific target language optimizations.
-	@param programSet The program set container.
-	Return true on success.
-	*/
-	virtual bool				preCreateGpuPrograms			(ProgramSet* programSet);
- 
-	/** Called after creation of the GPU programs.
-	@param programSet The program set container.
-	Return true on success.
-	*/
-	virtual bool				postCreateGpuPrograms			(ProgramSet* programSet);
-
-	static String TargetLanguage;
-	
-};
-
-
-/** @} */
-/** @} */
-
+	vOut = m * v;
 }
-}
-
-#endif
 

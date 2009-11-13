@@ -58,6 +58,88 @@ Operand::~Operand()
 	// nothing todo
 }
 //-----------------------------------------------------------------------------
+String Operand::getMaskAsString(int mask)
+{
+	String retVal = "";
+
+	if (mask & ~OPM_ALL) 
+	{
+		if (mask & OPM_X)
+		{
+			retVal += "x";
+		}
+
+		if (mask & OPM_Y)
+		{
+			retVal += "y";
+		}
+
+		if (mask & OPM_Z)
+		{
+			retVal += "z";
+		}
+
+		if (mask & OPM_W)
+		{
+			retVal += "w";
+		}
+	}
+
+	return retVal;
+}
+
+//-----------------------------------------------------------------------------
+int Operand::getFloatCount(int mask)
+{
+	int floatCount = 0;
+
+	while (mask != 0)
+	{
+		if ((mask & Operand::OPM_X) != 0)
+		{
+			floatCount++;
+
+		}			
+		mask = mask >> 1;
+	}
+
+	return floatCount;
+}
+
+//-----------------------------------------------------------------------------
+GpuConstantType	Operand::getGpuConstantType(int mask)
+{
+	int floatCount = getFloatCount(mask);
+	GpuConstantType type;
+
+	switch (floatCount)
+	{
+
+	case 1:
+		type = GCT_FLOAT1;
+		break;
+
+	case 2:
+		type = GCT_FLOAT2;
+		break;
+
+	case 3:
+		type = GCT_FLOAT3;
+		break;
+
+	case 4:
+		type = GCT_FLOAT4;
+		break;
+
+	default:
+		type = GCT_UNKNOWN;
+		break;
+	}
+
+	return type;
+}
+
+//-----------------------------------------------------------------------------
 String Operand::toString() const
 {
 	String retVal = mParameter->toString();
@@ -66,27 +148,7 @@ String Operand::toString() const
 		return retVal;
 	}
 
-	retVal += ".";
-
-	if (mMask & OPM_X)
-	{
-		retVal += "x";
-	}
-
-	if (mMask & OPM_Y)
-	{
-		retVal += "y";
-	}
-
-	if (mMask & OPM_Z)
-	{
-		retVal += "z";
-	}
-
-	if (mMask & OPM_W)
-	{
-		retVal += "w";
-	}
+	retVal += "." + getMaskAsString(mMask);
 
 	return retVal;
 }

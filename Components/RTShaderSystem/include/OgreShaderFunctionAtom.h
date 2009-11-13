@@ -75,7 +75,7 @@ protected:
 
 /** A class that represents a function operand (its the combination of a parameter the in/out semantic and the used fields)
 */
-class Operand
+class Operand : public RTShaderSystemAlloc
 {
 public:
 
@@ -132,6 +132,15 @@ public:
 
 	/** Returns the parameter name and the usage mask like this 'color.xyz' */
 	String				toString		()	const;
+
+	/** Returns the given mask as string representation. */
+	static String				getMaskAsString		(int mask);
+
+	/** Return the float count of the given mask. */
+	static int					getFloatCount		(int mask);
+
+	/** Return the gpu constant type of the given mask. */
+	static GpuConstantType		getGpuConstantType	(int mask);
 
 protected:
 	ParameterPtr	mParameter;

@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include "OgreShaderExPerPixelLighting.h"
 #include "OgreShaderExNormalMapLighting.h"
 #include "OgreShaderMaterialSerializerListener.h"
-
+#include "OgreShaderProgramWriterManager.h"
 
 namespace Ogre {
 
@@ -71,6 +71,8 @@ ShaderGenerator::ShaderGenerator()
 	mShaderLanguage				= "cg";
 	mVertexShaderProfiles		= "gpu_vp gp4vp vp40 vp30 arbvp1 vs_3_0 vs_2_x vs_2_a vs_2_0 vs_1_1";
 	mFragmentShaderProfiles		= "ps_3_x ps_3_0 fp40 fp30 fp20 arbfp1 ps_2_x ps_2_a ps_2_b ps_2_0 ps_1_4 ps_1_3 ps_1_2 ps_1_1";
+	
+	mProgramWriterManager		= NULL;
 	mProgramManager				= NULL;
 	mFFPRenderStateBuilder		= NULL;
 	mSceneMgr					= NULL;
@@ -112,6 +114,9 @@ bool ShaderGenerator::initialize()
 bool ShaderGenerator::_initialize()
 {
 	OGRE_LOCK_AUTO_MUTEX
+
+	// Allocate program writer manager.
+	mProgramWriterManager = OGRE_NEW ProgramWriterManager;
 
 	// Allocate program manager.
 	mProgramManager			= OGRE_NEW ProgramManager;
@@ -207,6 +212,13 @@ void ShaderGenerator::_finalize()
 	{
 		OGRE_DELETE mProgramManager;
 		mProgramManager = NULL;
+	}
+
+	// Delete Program writer manager.
+	if(mProgramWriterManager != NULL)
+	{
+		OGRE_DELETE mProgramWriterManager;
+		mProgramWriterManager = NULL;
 	}
 
 	removeCustomScriptTranslator("rtshader_system");
@@ -919,6 +931,26 @@ size_t ShaderGenerator::getFragmentShaderCount() const
 {
 	return mProgramManager->getFragmentShaderCount();
 }
+
+//-----------------------------------------------------------------------------
+void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
+{
+	// Make sure that the shader language is supported.
+	if (mProgramWriterManager->isLanguageSupported(shaderLanguage) == false)
+	{
+		OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+			"The language " + shaderLanguage + " is not supported !!",
+			"ShaderGenerator::setShaderLanguage");
+	}
+
+	// Case target language changed -> flush the shaders cache.
+	if (mShaderLanguage != shaderLanguage)
+	{
+		mShaderLanguage = shaderLanguage;
+		flushShaderCache();
+	}
+}
+
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGPass::SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPass)
 {

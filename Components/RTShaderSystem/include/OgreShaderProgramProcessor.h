@@ -68,7 +68,13 @@ public:
 	@param programSet The program set container.
 	Return true on success.
 	*/
-	virtual bool				preCreateGpuPrograms			(ProgramSet* programSet) = 0;
+	virtual bool				preCreateGpuPrograms	(ProgramSet* programSet) = 0;
+
+	/** Called after creation of the GPU programs.
+	@param programSet The program set container.
+	Return true on success.
+	*/
+	virtual bool				postCreateGpuPrograms	(ProgramSet* programSet) = 0;
  
 // Protected types.
 protected:
@@ -82,7 +88,10 @@ protected:
 		/** Class constructor. */
 		MergeParameter();
 
-		void clear();
+
+		/** Clear the state of this merge parameter. */
+		void			clear						();
+		
 		/** Add source parameter to this merged */
 		void			addSourceParameter			(ParameterPtr srcParam, int mask);
 
@@ -235,6 +244,9 @@ protected:
 	/** Return the parameter mask of by the float count type (I.E: X|Y for 2 etc..) */
 	static int		getParameterMaskByFloatCount		(int floatCount);
 	
+	/** Bind the auto parameters for a given CPU and GPU program set. */
+	void			bindAutoParameters					(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
+
 protected:
 	MergeCombinationList	mParamMergeCombinations;		// Merging combinations defs.
 	int						mMaxTexCoordSlots;				// Maximum texcoord slots.

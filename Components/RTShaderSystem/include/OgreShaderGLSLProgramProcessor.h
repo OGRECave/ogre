@@ -24,11 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ShaderCGProgramProcessor_
-#define _ShaderCGProgramProcessor_
+#ifndef _ShaderGLSLProgramProcessor_
+#define _ShaderGLSLProgramProcessor_
 
 #include "OgreShaderPrerequisites.h"
 #include "OgreShaderProgramProcessor.h"
+#include "OgreStringVector.h"
 
 
 namespace Ogre {
@@ -41,9 +42,9 @@ namespace RTShader {
 *  @{
 */
 
-/** CG Language program processor class.
+/** GLSL Language program processor class.
 */
-class CGProgramProcessor : public ProgramProcessor
+class GLSLProgramProcessor : public ProgramProcessor
 {
 
 // Interface.
@@ -52,29 +53,40 @@ public:
 	/** Class constructor.
 	@param type The type of this program.
 	*/
-	CGProgramProcessor			();
+	GLSLProgramProcessor			();
 
 	/** Class destructor */
-	virtual ~CGProgramProcessor	();
+	virtual ~GLSLProgramProcessor	();
 
 	/** Return the target language of this processor. */
 	virtual const String&		getTargetLanguage	() const { return TargetLanguage; }
-	
+
 	/** Called before creation of the GPU programs.
 	Do several preparation operation such as validation, register compaction and specific target language optimizations.
 	@param programSet The program set container.
 	Return true on success.
 	*/
 	virtual bool				preCreateGpuPrograms			(ProgramSet* programSet);
- 
+
 	/** Called after creation of the GPU programs.
 	@param programSet The program set container.
 	Return true on success.
 	*/
 	virtual bool				postCreateGpuPrograms			(ProgramSet* programSet);
 
+
+private:
+
+	/** Bind texture samplers. */
+	void						bindTextureSamplers				(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
+
+	/** Compiles sub shaders (only if the not exists) and attach them to the main gpu program. */
+	void						bindSubShaders					(Program* program, GpuProgramPtr pGpuProgram);
+
 	static String TargetLanguage;
-	
+
+	StringVector	mLibraryPrograms;		// The list of created library shaders.
+
 };
 
 

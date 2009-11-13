@@ -1,8 +1,9 @@
+#version 120
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,54 +26,38 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreShaderCGProgramProcessor.h"
-#include "OgreShaderProgramSet.h"
-#include "OgreShaderProgram.h"
-
-namespace Ogre {
-namespace RTShader {
-
-String CGProgramProcessor::TargetLanguage = "cg";
 
 //-----------------------------------------------------------------------------
-CGProgramProcessor::CGProgramProcessor()
+// Simple masked reflection map effect.
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+void SGX_ApplyReflectionMap(in sampler2D maskSampler, 
+						    in vec2 maskSamplerTexCoord,
+						    in sampler2D reflectionSampler, 
+						    in vec2 reflectionSamplerTexCoord,						    
+						    in vec3 baseColor,
+						    out vec3 vOut)
 {
+	vec3 maskTexel	   = texture2D(maskSampler, maskSamplerTexCoord).xyz;
+	reflectionSamplerTexCoord.y = -reflectionSamplerTexCoord.y; // Hack for gl 
+	vec3 reflectionTexel = texture2D(reflectionSampler, reflectionSamplerTexCoord).xyz;
 	
+	vOut = baseColor + reflectionTexel.xyz*maskTexel.xyz;
 }
 
 //-----------------------------------------------------------------------------
-CGProgramProcessor::~CGProgramProcessor()
+void SGX_ApplyReflectionMap(in sampler2D maskSampler, 
+						    in vec2 maskSamplerTexCoord,
+						    in samplerCube reflectionSampler, 
+						    in vec3 reflectionSamplerTexCoord,						   
+						    in vec3 baseColor,
+						    out vec3 vOut)
 {
+	vec3 maskTexel	   = texture2D(maskSampler, maskSamplerTexCoord).xyz;
+	reflectionSamplerTexCoord.z = -reflectionSamplerTexCoord.z; // Hack for gl 
+	vec3 reflectionTexel = textureCube(reflectionSampler, reflectionSamplerTexCoord).xyz;
 	
+	vOut = baseColor + reflectionTexel.xyz*maskTexel.xyz;
 }
-
-//-----------------------------------------------------------------------------
-bool CGProgramProcessor::preCreateGpuPrograms( ProgramSet* programSet )
-{
-	Program* vsProgram = programSet->getCpuVertexProgram();
-	Program* psProgram = programSet->getCpuFragmentProgram();
-	Function* vsMain   = vsProgram->getEntryPointFunction();
-	Function* fsMain   = psProgram->getEntryPointFunction();	
-	bool success;
-
-	// Compact vertex shader outputs.
-	success = ProgramProcessor::compactVsOutputs(vsMain, fsMain);
-	if (success == false)	
-		return false;	
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-bool CGProgramProcessor::postCreateGpuPrograms( ProgramSet* programSet )
-{
-	// Bind vertex shader auto parameters.
-	bindAutoParameters(programSet->getCpuVertexProgram(), programSet->getGpuVertexProgram());
-
-	// Bind fragment shader auto parameters.
-	bindAutoParameters(programSet->getCpuFragmentProgram(), programSet->getGpuFragmentProgram());
-
-	return true;
-}
-}
-}
+	

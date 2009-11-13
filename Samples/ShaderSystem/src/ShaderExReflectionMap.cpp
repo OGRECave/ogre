@@ -293,7 +293,7 @@ bool ShaderExReflectionMap::addVSInvocations( Function* vsMain, const int groupO
 		funcInvoaction->pushOperand(mViewMatrix, Operand::OPS_IN);					
 		funcInvoaction->pushOperand(mVSInputNormal, Operand::OPS_IN);	
 		funcInvoaction->pushOperand(mVSInputPos, Operand::OPS_IN);				
-		funcInvoaction->pushOperand(mVSOutReflectionTexcoord, Operand::OPS_IN);
+		funcInvoaction->pushOperand(mVSOutReflectionTexcoord, Operand::OPS_OUT);
 		vsMain->addAtomInstace(funcInvoaction);
 	}
 	

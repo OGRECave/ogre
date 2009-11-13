@@ -123,6 +123,10 @@ void Sample_ShaderSystem::itemSelected(SelectMenu* menu)
 			mSceneMgr->setFog((FogMode)curModeIndex, ColourValue(1.0, 1.0, 1.0, 0.0), 0.0015, 350.0, 1500.0);
 		}		
 	}
+	else if(menu == mLanguageMenu)
+	{
+		ShaderGenerator::getSingletonPtr()->setTargetLanguage(menu->getSelectedItem());		
+	}
 }
 
 //-----------------------------------------------------------------------
@@ -298,6 +302,15 @@ void Sample_ShaderSystem::setupContent()
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setupUI()
 {
+	// Create language selection 
+	mLanguageMenu = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "LangMode", "Language", 220, 120, 10);	
+	if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL") != String::npos)
+	{
+		mLanguageMenu->addItem("glsl");
+		ShaderGenerator::getSingletonPtr()->setTargetLanguage("glsl");		
+	}
+	mLanguageMenu->addItem("cg");
+
 	// create check boxes to toggle lights.	
 	mTrayMgr->createCheckBox(TL_TOPLEFT, DIRECTIONAL_LIGHT_NAME, "Directional Light", 220)->setChecked(true);
 	mTrayMgr->createCheckBox(TL_TOPLEFT, POINT_LIGHT_NAME, "Point Light", 220)->setChecked(true);
@@ -313,7 +326,7 @@ void Sample_ShaderSystem::setupUI()
 
 	// Flush shader cache button.
 	mTrayMgr->createButton(TL_TOPLEFT, FLUSH_BUTTON_NAME, "Flush Shader Cache", 220);
-	
+
 	// create target model widgets.
 	mTargetObjMatName = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjMatName", "", 220);
 	mTargetObjVS = mTrayMgr->createLabel(TL_TOPLEFT, "TargetObjVS", "", 220);
@@ -341,8 +354,6 @@ void Sample_ShaderSystem::setupUI()
 
 	mTrayMgr->createButton(TL_BOTTOM, EXPORT_BUTTON_NAME, "Export Material", 240);
 	
-	
-
 	mTrayMgr->showCursor();
 }
 

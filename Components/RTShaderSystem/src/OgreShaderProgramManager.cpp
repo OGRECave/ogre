@@ -33,9 +33,11 @@ THE SOFTWARE.
 #include "OgreShaderGenerator.h"
 #include "OgrePass.h"
 #include "OgreLogManager.h"
+#include "OgreShaderCGProgramWriter.h"
+#include "OgreShaderGLSLProgramWriter.h"
 #include "OgreShaderProgramProcessor.h"
 #include "OgreShaderCGProgramProcessor.h"
-
+#include "OgreShaderGLSLProgramProcessor.h"
 
 namespace Ogre {
 
@@ -67,15 +69,15 @@ ProgramManager::ProgramManager()
 	mFragmentShaderCount = 0;
 
 	createDefaultProgramProcessors();
+	createDefaultProgramWriterFactories();
 }
 
 //-----------------------------------------------------------------------------
 ProgramManager::~ProgramManager()
 {
+	destroyDefaultProgramWriterFactories();
 	destroyDefaultProgramProcessors();
-
 	destroyProgramSets();
-
 	destroyProgramWriters();
 }
 
@@ -134,9 +136,33 @@ void ProgramManager::releasePrograms(RenderState* renderState)
 }
 
 //-----------------------------------------------------------------------------
+void ProgramManager::createDefaultProgramWriterFactories()
+{
+	// Add standard shader writer factories 
+	ProgramWriterFactory* cgFactory = OGRE_NEW ShaderProgramWriterCGFactory();
+	ProgramWriterFactory* glslFactory = OGRE_NEW ShaderProgramWriterGLSLFactory();
+	mProgramWriterFactories.push_back(cgFactory);
+	mProgramWriterFactories.push_back(glslFactory);
+	ProgramWriterManager::getSingletonPtr()->addFactory(cgFactory);
+	ProgramWriterManager::getSingletonPtr()->addFactory(glslFactory);
+}
+
+//-----------------------------------------------------------------------------
+void ProgramManager::destroyDefaultProgramWriterFactories()
+{ 
+	for (unsigned int i=0; i<mProgramWriterFactories.size(); i++)
+	{
+		ProgramWriterManager::getSingletonPtr()->removeFactory(mProgramWriterFactories[i]);
+		OGRE_DELETE mProgramWriterFactories[i];
+	}
+	mProgramWriterFactories.clear();
+}
+
+//-----------------------------------------------------------------------------
 void ProgramManager::createDefaultProgramProcessors()
 {
 	mDefaultProgramProcessors.push_back(OGRE_NEW CGProgramProcessor);
+	mDefaultProgramProcessors.push_back(OGRE_NEW GLSLProgramProcessor);
 
 	for (unsigned int i=0; i < mDefaultProgramProcessors.size(); ++i)
 	{
@@ -219,7 +245,7 @@ bool ProgramManager::destroyCpuProgram(Program* shaderProgram)
 bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 {
 	// Grab the matching writer.
-	const String& language = ShaderGenerator::getSingleton().getShaderLanguage();
+	const String& language = ShaderGenerator::getSingleton().getTargetLanguage();
 	ProgramWriterIterator itWriter = mProgramWritersMap.find(language);
 	ProgramWriter* programWriter = NULL;
 
@@ -227,7 +253,7 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 	// No writer found -> create new one.
 	if (itWriter == mProgramWritersMap.end())
 	{
-		programWriter = OGRE_NEW ProgramWriter(language);
+		programWriter = ProgramWriterManager::getSingletonPtr()->createProgramWriter(language);
 		mProgramWritersMap[language] = programWriter;
 	}
 	else
@@ -238,21 +264,22 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 	ProgramProcessorIterator itProcessor = mProgramProcessorsMap.find(language);
 	ProgramProcessor* programProcessor = NULL;
 
-	if (itProcessor != mProgramProcessorsMap.end())
+	if (itProcessor == mProgramProcessorsMap.end())
 	{
-		programProcessor = itProcessor->second;
+		OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
+			"Could not find processor for language '" + language,
+			"ProgramManager::createGpuPrograms");		
 	}
 
-	// Case program processor found.
-	if (programProcessor != NULL)
-	{
-		bool success;
+	programProcessor = itProcessor->second;
 
-		// Call the pre creation of GPU programs method.
-		success = programProcessor->preCreateGpuPrograms(programSet);
-		if (success == false)	
-			return false;	
-	}
+	bool success;
+
+	// Call the pre creation of GPU programs method.
+	success = programProcessor->preCreateGpuPrograms(programSet);
+	if (success == false)	
+		return false;	
+	
 
 
 	// Create the vertex shader program.
@@ -283,6 +310,12 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 		return false;
 
 	programSet->setGpuFragmentProgram(psGpuProgram);
+
+
+	// Call the post creation of GPU programs method.
+	success = programProcessor->postCreateGpuPrograms(programSet);
+	if (success == false)	
+		return false;	
 
 	return true;
 	
@@ -340,6 +373,8 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		// Case no matching file found -> we have to write it.
 		if (!programFile)
 		{
+			programWriter = ProgramWriterManager::getSingletonPtr()->createProgramWriter(language);
+			mProgramWritersMap[language] = programWriter;
 			writeFile = true;
 		}
 		else
@@ -382,71 +417,6 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		{
 			pGpuProgram.setNull();
 			return GpuProgramPtr(pGpuProgram);
-		}
-
-		// Bind auto parameters.
-		for (itParams=progParams.begin(); itParams != progParams.end(); ++itParams)
-		{
-			const ParameterPtr pCurParam = *itParams;
-			const GpuConstantDefinition* gpuConstDef = pGpuParams->_findNamedConstantDefinition(pCurParam->getName());
-
-
-			if (pCurParam->isAutoConstantParameter())
-			{
-				if (pCurParam->isAutoConstantRealParameter())
-				{
-					if (gpuConstDef != NULL)
-					{
-						pGpuParams->setNamedAutoConstantReal(pCurParam->getName(), 
-							pCurParam->getAutoConstantType(), 
-							pCurParam->getAutoConstantRealData());
-					}	
-					else
-					{
-						LogManager::getSingleton().stream() << "RTShader::ProgramManager: Can not bind auto param named " << 
-							pCurParam->getName() << " to program named " << pGpuProgram->getName();
-					}
-				}
-				else if (pCurParam->isAutoConstantIntParameter())
-				{
-					if (gpuConstDef != NULL)
-					{
-						pGpuParams->setNamedAutoConstant(pCurParam->getName(), 
-							pCurParam->getAutoConstantType(), 
-							pCurParam->getAutoConstantIntData());
-					}
-					else
-					{
-						LogManager::getSingleton().stream() << "RTShader::ProgramManager: Can not bind auto param named " << 
-							pCurParam->getName() << " to program named " << pGpuProgram->getName();
-					}
-				}						
-			}
-			else
-			{
-				// No auto constant - we have to update its variability ourself.
-				if (gpuConstDef != NULL)
-				{
-					gpuConstDef->variability |= pCurParam->getVariability();
-
-					// Update variability in the float map.
-					if (gpuConstDef->isSampler() == false)
-					{
-						GpuLogicalBufferStructPtr floatLogical = pGpuParams->getFloatLogicalBufferStruct();
-						if (floatLogical.get())
-						{
-							for (GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin(); i != floatLogical->map.end(); ++i)
-							{
-								if (i->second.physicalIndex == gpuConstDef->physicalIndex)
-								{
-									i->second.variability |= gpuConstDef->variability;
-									break;
-								}
-							}
-						}
-					}							
-				}
-			}
 		}
 
 		if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)

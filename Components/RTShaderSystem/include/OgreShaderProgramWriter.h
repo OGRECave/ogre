@@ -44,75 +44,39 @@ namespace RTShader {
 *  @{
 */
 
-/** A class that perform the actual writing operation of a given CPU program to stream.
-The main usage of this class is to generate the actual shader source code from a CPU program representation.
+/** Base class interface for shader program writers.
+The main usage of this class is to generate a shader source code from the given CPU program.
+In order to support specific shader language one should subclass this interface and implement the pure methods.
 */
+
 class ProgramWriter : public RTShaderSystemAlloc
 {
 // Interface.
 public:
 
-	/** Class constructor. 
-	@param language The target shader language.
-	*/
-	ProgramWriter	(const String& language);
-
 	/** Class destructor */
-	~ProgramWriter	();
-	
+	virtual ~ProgramWriter	() {}
+
 
 	/** Write the program shader source code.
 	@param os The output stream to write to code into.
 	@param program The source CPU program for the GPU program code.
 	*/
-	void			writeSourceCode				(std::ostream& os, Program* program);
+	virtual void				writeSourceCode			(std::ostream& os, Program* program) = 0;
 
-	
+	/** Return the target language of this writer. */
+	virtual const String&		getTargetLanguage	() const = 0;
+
 // Protected methods.
 protected:
-	/** Get the target language of this writer. */
-	const String&	getTargetLanguage		() { return mTargetLanguage; }
-
-	/** Initialize string maps. */
-	void		initializeStringMaps		();
-
 	/** Write the program title. */
-	void		writeProgramTitle			(std::ostream& os, Program* program);
-
-	/** Write the program dependencies. */
-	void		writeProgramDependencies	(std::ostream& os, Program* program);
+	void				writeProgramTitle			(std::ostream& os, Program* program);
 
 	/** Write the uniform parameters title. */
-	void		writeUniformParametersTitle	(std::ostream& os, Program* program);
+	void				writeUniformParametersTitle	(std::ostream& os, Program* program);
 
 	/** Write a function title. */
-	void		writeFunctionTitle			(std::ostream& os, Function* function);
-
-	/** Write a uniform parameter. */
-	void		writeUniformParameter		(std::ostream& os, ParameterPtr parameter);
-
-	/** Write a function parameter. */
-	void		writeFunctionParameter		(std::ostream& os, ParameterPtr parameter);
-
-	/** Write a local parameter. */
-	void		writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
-
-	/** Write a function declaration. */
-	void		writeFunctionDeclaration	(std::ostream& os, Function* function);
-
-	/** Write function atom instance. */
-	void		writeAtomInstance			(std::ostream& os, FunctionAtom* atom);
-
-	
-protected:
-	typedef		map<GpuConstantType, const char*>::type		GpuConstTypeToStringMap;
-	typedef		map<Parameter::Semantic, const char*>::type	ParamSemanticToStringMap;
-
-// Attributes.
-protected:
-	String						mTargetLanguage;		// The target language.
-	GpuConstTypeToStringMap		mGpuConstTypeMap;		// Map between GPU constant type to string value.
-	ParamSemanticToStringMap	mParamSemanticMap;		// Map between parameter semantic to string value.
+	void				writeFunctionTitle			(std::ostream& os, Function* function);
 };
 
 /** @} */
@@ -120,5 +84,7 @@ protected:
 
 }
 }
+
+
 
 #endif

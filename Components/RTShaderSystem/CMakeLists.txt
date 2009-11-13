@@ -37,6 +37,10 @@ set (HEADER_FILES
   include/OgreShaderMaterialSerializerListener.h
   include/OgreShaderProgramProcessor.h
   include/OgreShaderCGProgramProcessor.h
+  include/OgreShaderCGProgramWriter.h
+  include/OgreShaderGLSLProgramProcessor.h
+  include/OgreShaderGLSLProgramWriter.h
+  include/OgreShaderProgramWriterManager.h
 )
 
 set (SOURCE_FILES
@@ -62,6 +66,10 @@ set (SOURCE_FILES
   src/OgreShaderMaterialSerializerListener.cpp
   src/OgreShaderProgramProcessor.cpp
   src/OgreShaderCGProgramProcessor.cpp
+  src/OgreShaderCGProgramWriter.cpp
+  src/OgreShaderGLSLProgramProcessor.cpp
+  src/OgreShaderGLSLProgramWriter.cpp
+  src/OgreShaderProgramWriterManager.cpp
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
