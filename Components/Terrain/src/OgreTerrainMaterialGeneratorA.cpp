@@ -270,6 +270,7 @@ namespace Ogre
 			// global normal map
 			TextureUnitState* tu = pass->createTextureUnitState();
 			tu->setTextureName(terrain->getTerrainNormalMap()->getName());
+			tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 
 			// global colour map
 			if (terrain->getGlobalColourMapEnabled() && isGlobalColourMapEnabled())
