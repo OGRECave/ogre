@@ -1201,7 +1201,6 @@ namespace Ogre
 		/// WorkQueue::ResponseHandler override
 		void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
 
-		static const uint16 WORKQUEUE_CHANNEL;
 		static const uint16 WORKQUEUE_DERIVED_DATA_REQUEST;
 
 
@@ -1335,6 +1334,7 @@ namespace Ogre
 
 		
 
+		uint16 mWorkQueueChannel;
 		SceneManager* mSceneMgr;
 		SceneNode* mRootNode;
 		
