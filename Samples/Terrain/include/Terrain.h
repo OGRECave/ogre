@@ -400,6 +400,35 @@ protected:
 	OgreBites::Label* mInfoLabel;
 	bool mAutoSave;
 
+	Terrain* createBlankTerrain()
+	{
+		Terrain* terrain = OGRE_NEW Terrain(mSceneMgr);
+		Terrain::ImportData imp;
+		imp.terrainSize = 513;
+		imp.worldSize = 12000;
+		imp.inputScale = 600;
+		imp.minBatchSize = 33;
+		imp.maxBatchSize = 65;
+		// textures
+		imp.layerList.resize(3);
+		imp.layerList[0].worldSize = 100;
+		imp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
+		imp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
+		imp.layerList[1].worldSize = 30;
+		imp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
+		imp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
+		imp.layerList[2].worldSize = 200;
+		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
+		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
+		terrain->prepare(imp);
+		terrain->load();
+
+		terrain->freeTemporaryResources();
+
+		return terrain;
+
+
+	}
 
 
 	Terrain* createTerrain(bool flipX = false, bool flipY = false)
@@ -540,6 +569,9 @@ protected:
 
 	void setupContent()
 	{
+		bool blankTerrain = false;
+		//blankTerrain = true;
+
 		mEditMarker = mSceneMgr->createEntity("editMarker", "sphere.mesh");
 		mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		mEditNode->attachObject(mEditMarker);
@@ -586,47 +618,48 @@ protected:
 		//TerrainGlobalOptions::setCompositeMapAmbient(ColourValue::Red);
 		TerrainGlobalOptions::setCompositeMapDiffuse(l->getDiffuseColour());
 		bool neighbourRecalc = false;
-		try
+		if (blankTerrain)
 		{
-			mTerrain = OGRE_NEW Terrain(mSceneMgr);
-			mTerrain->load(TERRAIN_FILE_PREFIX + ".dat");
+			mTerrain = createBlankTerrain();
+			mTerrain2 = createBlankTerrain();
 		}
-		catch (Exception&)
+		else
 		{
-			OGRE_DELETE mTerrain;
-			mTerrain = 0;
+			try
+			{
+				mTerrain = OGRE_NEW Terrain(mSceneMgr);
+				mTerrain->load(TERRAIN_FILE_PREFIX + ".dat");
+			}
+			catch (Exception&)
+			{
+				OGRE_DELETE mTerrain;
+				mTerrain = 0;
+			}
+			if (!mTerrain)
+			{
+				neighbourRecalc = true;
+				mAutoSave = true;
+				mTerrain = createTerrain();
+			}
+			try
+			{
+				mTerrain2 = OGRE_NEW Terrain(mSceneMgr);
+				mTerrain2->load(TERRAIN_FILE_PREFIX + "2.dat");
+			}
+			catch (Exception&)
+			{
+				OGRE_DELETE mTerrain2;
+				mTerrain2 = 0;
+			}
+			if (!mTerrain2)
+			{
+				neighbourRecalc = true;
+				mAutoSave = true;
+				mTerrain2 = createTerrain(true);
+			}
 		}
-		if (!mTerrain)
-		{
-			neighbourRecalc = true;
-			mAutoSave = true;
-			mTerrain = createTerrain();
-		}
 
-
-		//addTextureDebugOverlay(TextureManager::getSingleton().getByName(mTerrain->getTerrainNormalMap()->getName()), 0);
-
-		//mWindow->getViewport(0)->setBackgroundColour(ColourValue::Blue);
-
-		// Testing
 		mTerrain->setPosition(mTerrainPos);
-
-		try
-		{
-			mTerrain2 = OGRE_NEW Terrain(mSceneMgr);
-			mTerrain2->load(TERRAIN_FILE_PREFIX + "2.dat");
-		}
-		catch (Exception&)
-		{
-			OGRE_DELETE mTerrain2;
-			mTerrain2 = 0;
-		}
-		if (!mTerrain2)
-		{
-			neighbourRecalc = true;
-			mAutoSave = true;
-			mTerrain2 = createTerrain(true);
-		}
 		Vector3 secondTerrainPos = mTerrainPos + Vector3(mTerrain->getWorldSize(), 0, 0);
 		mTerrain2->setPosition(secondTerrainPos);
 		// set neighbour (let it notify other itself)
