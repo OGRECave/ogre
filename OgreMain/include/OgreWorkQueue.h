@@ -67,6 +67,11 @@ namespace Ogre
 	*/
 	class _OgreExport WorkQueue : public UtilityAlloc
 	{
+	protected:
+		typedef std::map<String, uint16> ChannelMap;
+		ChannelMap mChannelMap;
+		uint16 mNextChannel;
+		OGRE_MUTEX(mChannelMapMutex)
 	public:
 		/// Numeric identifier for a request
 		typedef unsigned long long int RequestID;
@@ -204,10 +209,10 @@ namespace Ogre
 			virtual void handleResponse(const Response* res, const WorkQueue* srcQ) = 0;
 		};
 
-		WorkQueue() {}
+		WorkQueue() : mNextChannel(0) {}
 		virtual ~WorkQueue() {}
 
-				/** Start up the queue with the options that have been set.
+		/** Start up the queue with the options that have been set.
 		@param forceRestart If the queue is already running, whether to shut it
 			down and restart.
 		*/
@@ -315,6 +320,15 @@ namespace Ogre
 		/** Shut down the queue.
 		*/
 		virtual void shutdown() = 0;
+
+		/** Get a channel ID for a given channel name. 
+		@remarks
+			Channels are assigned on a first-come, first-served basis and are
+			not persistent across application instances. This method allows 
+			applications to not worry about channel clashes through manually
+			assigned channel numbers.
+		*/
+		virtual uint16 getChannel(const String& channelName);
 
 	};
 

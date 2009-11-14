@@ -64,7 +64,6 @@ namespace Ogre
 	const uint16 Terrain::TERRAINDERIVEDDATA_CHUNK_VERSION = 1;
 	// since 129^2 is the greatest power we can address in 16-bit index
 	const uint16 Terrain::TERRAIN_MAX_BATCH_SIZE = 129; 
-	const uint16 Terrain::WORKQUEUE_CHANNEL = Root::MAX_USER_WORKQUEUE_CHANNEL + 10;
 	const uint16 Terrain::WORKQUEUE_DERIVED_DATA_REQUEST = 1;
 	const size_t Terrain::LOD_MORPH_CUSTOM_PARAM = 1001;
 	const uint8 Terrain::DERIVED_DATA_DELTAS = 1;
@@ -154,8 +153,9 @@ namespace Ogre
 		sm->addListener(this);
 
 		WorkQueue* wq = Root::getSingleton().getWorkQueue();
-		wq->addRequestHandler(WORKQUEUE_CHANNEL, this);
-		wq->addResponseHandler(WORKQUEUE_CHANNEL, this);
+		mWorkQueueChannel = wq->getChannel("Ogre/Terrain");
+		wq->addRequestHandler(mWorkQueueChannel, this);
+		wq->addResponseHandler(mWorkQueueChannel, this);
 
 		// generate a material name, it's important for the terrain material
 		// name to be consistent & unique no matter what generator is being used
@@ -172,8 +172,8 @@ namespace Ogre
 		mDerivedUpdatePendingMask = 0;
 		waitForDerivedProcesses();
 		WorkQueue* wq = Root::getSingleton().getWorkQueue();
-		wq->removeRequestHandler(WORKQUEUE_CHANNEL, this);
-		wq->removeResponseHandler(WORKQUEUE_CHANNEL, this);	
+		wq->removeRequestHandler(mWorkQueueChannel, this);
+		wq->removeResponseHandler(mWorkQueueChannel, this);	
 
 		freeTemporaryResources();
 		freeGPUResources();
@@ -1638,7 +1638,7 @@ namespace Ogre
 			req.typeMask = req.typeMask & ~DERIVED_DATA_LIGHTMAP;
 
 		Root::getSingleton().getWorkQueue()->addRequest(
-			WORKQUEUE_CHANNEL, WORKQUEUE_DERIVED_DATA_REQUEST, 
+			mWorkQueueChannel, WORKQUEUE_DERIVED_DATA_REQUEST, 
 			Any(req), 0, synchronous);
 
 	}

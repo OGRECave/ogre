@@ -33,6 +33,18 @@ THE SOFTWARE.
 
 namespace Ogre {
 	//---------------------------------------------------------------------
+	uint16 WorkQueue::getChannel(const String& channelName)
+	{
+		OGRE_LOCK_MUTEX(mChannelMapMutex)
+
+		ChannelMap::iterator i = mChannelMap.find(channelName);
+		if (i == mChannelMap.end())
+		{
+			i = mChannelMap.insert(ChannelMap::value_type(channelName, mNextChannel++)).first;
+		}
+		return i->second;
+	}
+	//---------------------------------------------------------------------
 	WorkQueue::Request::Request(uint16 channel, uint16 rtype, const Any& rData, uint8 retry, RequestID rid)
 		: mChannel(channel), mType(rtype), mData(rData), mRetryCount(retry), mID(rid)
 	{

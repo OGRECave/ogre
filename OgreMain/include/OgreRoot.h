@@ -946,8 +946,8 @@ namespace Ogre
 		/** Get the WorkQueue for processing background tasks.
 			You are free to add new requests and handlers to this queue to
 			process your custom background tasks using the shared thread pool. 
-			However, you may only use channels up to MAX_USER_WORKQUEUE_CHANNEL,
-			anything above that is reserved for OGRE's own use.
+			However, you must remember to assign yourself a new channel through 
+			which to process your tasks.
 		*/
 		WorkQueue* getWorkQueue() const { return mWorkQueue; }
 
@@ -961,8 +961,6 @@ namespace Ogre
 		*/
 		void setWorkQueue(WorkQueue* queue);
 			
-		/// The maximum channel number that may be used by users (above this is reserved for OGRE)
-		static const uint16 MAX_USER_WORKQUEUE_CHANNEL;
     };
 	/** @} */
 	/** @} */

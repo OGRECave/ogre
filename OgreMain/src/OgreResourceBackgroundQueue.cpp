@@ -38,9 +38,6 @@ namespace Ogre {
 
 	// Note, no locks are required here anymore because all of the parallelisation
 	// is now contained in WorkQueue - this class is entirely single-threaded
-
-#define RESOURCE_CHANNEL Root::MAX_USER_WORKQUEUE_CHANNEL + 1
-
 	//------------------------------------------------------------------------
     //-----------------------------------------------------------------------
     template<> ResourceBackgroundQueue* Singleton<ResourceBackgroundQueue>::ms_Singleton = 0;
@@ -65,14 +62,17 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void ResourceBackgroundQueue::initialise()
 	{
-		Root::getSingleton().getWorkQueue()->addResponseHandler(RESOURCE_CHANNEL, this);
-		Root::getSingleton().getWorkQueue()->addRequestHandler(RESOURCE_CHANNEL, this);
+		WorkQueue* wq = Root::getSingleton().getWorkQueue();
+		mWorkQueueChannel = wq->getChannel("Ogre/ResourceBGQ");
+		wq->addResponseHandler(mWorkQueueChannel, this);
+		wq->addRequestHandler(mWorkQueueChannel, this);
 	}
 	//---------------------------------------------------------------------
 	void ResourceBackgroundQueue::shutdown()
 	{
-		Root::getSingleton().getWorkQueue()->removeRequestHandler(RESOURCE_CHANNEL, this);
-		Root::getSingleton().getWorkQueue()->removeResponseHandler(RESOURCE_CHANNEL, this);
+		WorkQueue* wq = Root::getSingleton().getWorkQueue();
+		wq->removeRequestHandler(mWorkQueueChannel, this);
+		wq->removeResponseHandler(mWorkQueueChannel, this);
 	}
 	//------------------------------------------------------------------------
 	BackgroundProcessTicket ResourceBackgroundQueue::initialiseResourceGroup(
@@ -272,7 +272,7 @@ namespace Ogre {
 		Any data(req);
 
 		WorkQueue::RequestID requestID = 
-			queue->addRequest(RESOURCE_CHANNEL, (uint16)req.type, data);
+			queue->addRequest(mWorkQueueChannel, (uint16)req.type, data);
 
 
 		mOutstandingRequestSet.insert(requestID);

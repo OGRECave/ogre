@@ -105,6 +105,8 @@ namespace Ogre {
 		};
 
 	protected:
+
+		uint16 mWorkQueueChannel;
 		/** Enumerates the type of requests */
 		enum RequestType
 		{
@@ -337,7 +339,6 @@ namespace Ogre {
         preventing link errors.
         */
         static ResourceBackgroundQueue* getSingletonPtr(void);
-		
 
 	};
 

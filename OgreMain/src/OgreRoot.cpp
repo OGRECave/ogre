@@ -113,8 +113,6 @@ namespace Ogre {
     typedef void (*DLL_START_PLUGIN)(void);
     typedef void (*DLL_STOP_PLUGIN)(void);
 
-	const uint16 Root::MAX_USER_WORKQUEUE_CHANNEL = 32767;
-
     //-----------------------------------------------------------------------
     Root::Root(const String& pluginFileName, const String& configFileName, 
 		const String& logFileName)
