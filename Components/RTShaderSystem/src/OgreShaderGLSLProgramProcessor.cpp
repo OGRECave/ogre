@@ -108,7 +108,11 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
 {
 	if (program->getDependencyCount() > 0)
 	{
+		// Get all attached shaders so we do not attach shaders twice.
+		// maybe GLSLProgram should take care of that ( prevent add duplicate shaders )
+		String attachedShaders = pGpuProgram->getParameter("attach");
 		String subShaderDef = "";
+
 		for (unsigned int i=0; i < program->getDependencyCount(); ++i)
 		{
 			// Here we append _VS and _FS to the library shaders (so max each lib shader
@@ -145,10 +149,19 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
 				mLibraryPrograms.push_back(subShaderName);
 			}
 
-			// Append the shader name to subShaders
-			subShaderDef += subShaderName + " ";
+			// Check if the lib shader already attached to this shader
+			if (attachedShaders.find(subShaderName) == String::npos)
+			{
+				// Append the shader name to subShaders
+				subShaderDef += subShaderName + " ";
+			}
 		}
-		pGpuProgram->setParameter("attach", subShaderDef);
+
+		// Check if we have something to attach
+		if (subShaderDef.length() > 0)
+		{
+			pGpuProgram->setParameter("attach", subShaderDef);
+		}
 	}
 	
 }
