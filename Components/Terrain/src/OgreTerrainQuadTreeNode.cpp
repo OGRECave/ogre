@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreRenderSystemCapabilities.h"
 
+#define DO_SKIRTS 1
+
 namespace Ogre
 {
 	unsigned short TerrainQuadTreeNode::POSITION_BUFFER = 0;
@@ -517,6 +519,7 @@ namespace Ogre
 			// Base geometry size * size
 			size_t baseNumVerts = Math::Sqr(mVertexDataRecord->size);
 			size_t numVerts = baseNumVerts;
+#if DO_SKIRTS
 			// Now add space for skirts
 			// Skirts will be rendered as copies of the edge vertices translated downwards
 			// Some people use one big fan with only 3 vertices at the bottom, 
@@ -529,7 +532,7 @@ namespace Ogre
 			mVertexDataRecord->skirtRowColSkip = (mVertexDataRecord->size - 1) / (mVertexDataRecord->numSkirtRowsCols - 1);
 			numVerts += mVertexDataRecord->size * mVertexDataRecord->numSkirtRowsCols;
 			numVerts += mVertexDataRecord->size * mVertexDataRecord->numSkirtRowsCols;
-
+#endif
 			// manually create CPU-side buffer
 			HardwareVertexBufferSharedPtr posbuf(
 				OGRE_NEW DefaultHardwareVertexBuffer(dcl->getVertexSize(POSITION_BUFFER), numVerts, HardwareBuffer::HBU_STATIC_WRITE_ONLY));
@@ -563,8 +566,8 @@ namespace Ogre
 		// Fill the buffers
 		
 		HardwareBuffer::LockOptions lockMode;
-		if (destOffsetX || destOffsetY || rect.right - rect.left < mSize
-			|| rect.bottom - rect.top < mSize)
+		if (destOffsetX || destOffsetY || rect.width() < mSize
+			|| rect.height() < mSize)
 		{
 			lockMode = HardwareBuffer::HBL_NORMAL;
 		}
@@ -654,7 +657,7 @@ namespace Ogre
 
 		}
 
-
+#if DO_SKIRTS
 		// Skirts now
 		// skirt spacing based on top-level resolution (* inc to cope with resolution which is not the max)
 		uint16 skirtSpacing = mVertexDataRecord->skirtRowColSkip * inc;
@@ -675,8 +678,8 @@ namespace Ogre
 			pRowPosBuf = pRootPosBuf + posbuf->getVertexSize() 
 				* mVertexDataRecord->size * mVertexDataRecord->size;
 			// move it onwards to skip the skirts we don't need to update
-			pRowPosBuf += destPosRowSkip * (skirtStartY - mOffsetY) / skirtSpacing;
-			pRowPosBuf += posbuf->getVertexSize() * (skirtStartX - mOffsetX);
+			pRowPosBuf += destPosRowSkip * ((skirtStartY - mOffsetY) / skirtSpacing);
+			pRowPosBuf += posbuf->getVertexSize() * (skirtStartX - mOffsetX) / inc;
 		}
 		if (!deltabuf.isNull())
 		{
@@ -685,7 +688,7 @@ namespace Ogre
 				* mVertexDataRecord->size * mVertexDataRecord->size;
 			// move it onwards to skip the skirts we don't need to update
 			pRowDeltaBuf += destDeltaRowSkip * (skirtStartY - mOffsetY) / skirtSpacing;
-			pRowDeltaBuf += deltabuf->getVertexSize() * (skirtStartX - mOffsetX);
+			pRowDeltaBuf += deltabuf->getVertexSize() * (skirtStartX - mOffsetX) / inc;
 		}
 		for (uint16 y = skirtStartY; y < rect.bottom; y += skirtSpacing)
 		{
@@ -743,18 +746,18 @@ namespace Ogre
 			pRowPosBuf += mVertexDataRecord->numSkirtRowsCols * mVertexDataRecord->size * posbuf->getVertexSize();
 			// move it onwards to skip the skirts we don't need to update
 			pRowPosBuf += destPosRowSkip * (skirtStartX - mOffsetX) / skirtSpacing;
-			pRowPosBuf += posbuf->getVertexSize() * (skirtStartY - mOffsetY);
+			pRowPosBuf += posbuf->getVertexSize() * (skirtStartY - mOffsetY) / inc;
 		}
 		if (!deltabuf.isNull())
 		{
-			// Deltaition dest buffer just after the main vertex data and skirt rows
+			// Delta dest buffer just after the main vertex data and skirt rows
 			pRowDeltaBuf = pRootDeltaBuf + deltabuf->getVertexSize() 
 				* mVertexDataRecord->size * mVertexDataRecord->size;
 			// skip the row skirts
 			pRowDeltaBuf += mVertexDataRecord->numSkirtRowsCols * mVertexDataRecord->size * deltabuf->getVertexSize();
 			// move it onwards to skip the skirts we don't need to update
 			pRowDeltaBuf += destDeltaRowSkip * (skirtStartX - mOffsetX) / skirtSpacing;
-			pRowDeltaBuf += deltabuf->getVertexSize() * (skirtStartY - mOffsetY);
+			pRowDeltaBuf += deltabuf->getVertexSize() * (skirtStartY - mOffsetY) / inc;
 		}
 		
 		for (uint16 x = skirtStartX; x < rect.right; x += skirtSpacing)
@@ -791,6 +794,7 @@ namespace Ogre
 			if (pRowDeltaBuf)
 				pRowDeltaBuf += destDeltaRowSkip;
 		}
+#endif
 
 		if (!posbuf.isNull())
 			posbuf->unlock();
@@ -893,13 +897,15 @@ namespace Ogre
 		size_t mainIndexesPerRow = batchSize * 2 + 1;
 		size_t numRows = batchSize - 1;
 		size_t mainIndexCount = mainIndexesPerRow * numRows;
+		destData->indexStart = 0;
+		destData->indexCount = mainIndexCount;
+#if DO_SKIRTS
 		// skirts share edges, so they take 1 less row per side than batchSize, 
 		// but with 2 extra at the end (repeated) to finish the strip
 		// * 2 for the vertical line, * 4 for the sides, +2 to finish
 		size_t skirtIndexCount = (batchSize - 1) * 2 * 4 + 2;
-		
-		destData->indexStart = 0;
-		destData->indexCount = mainIndexCount + skirtIndexCount;
+		destData->indexCount += skirtIndexCount;
+#endif
 		destData->indexBuffer.bind(OGRE_NEW DefaultHardwareIndexBuffer(
 			HardwareIndexBuffer::IT_16BIT, destData->indexCount, HardwareBuffer::HBU_STATIC)); 
 		
@@ -945,7 +951,7 @@ namespace Ogre
 			*pI++ = currentVertex;
 		}
 		
-		
+#if DO_SKIRTS
 		// Skirts
 		for (uint16 s = 0; s < 4; ++s)
 		{
@@ -992,7 +998,7 @@ namespace Ogre
 				skirtIndex += skirtIncrement;
 			}
 		}
-
+#endif
 		assert ((pI - basepI) == (uint16)destData->indexCount);
         (void)basepI; // Silence warning
 
