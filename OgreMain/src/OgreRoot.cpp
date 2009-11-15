@@ -95,7 +95,9 @@ THE SOFTWARE.
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #include "macUtils.h"
-//#include "OgrePVRCodec.h"
+    #if OGRE_NO_PVRTC_CODEC == 0
+        #include "OgrePVRTCCodec.h"
+    #endif
 #endif
 
 namespace Ogre {
@@ -238,9 +240,8 @@ namespace Ogre {
 		// Register image codecs
 		DDSCodec::startup();
 #endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-//        PVRCodec::startup();
+#if OGRE_NO_PVRTC_CODEC == 0
+        PVRTCCodec::startup();
 #endif
 
         mHighLevelGpuProgramManager = OGRE_NEW HighLevelGpuProgramManager();
@@ -302,6 +303,9 @@ namespace Ogre {
 #if OGRE_NO_DDS_CODEC == 0
 		DDSCodec::shutdown();
 #endif
+#if OGRE_NO_PVRTC_CODEC == 0
+		PVRTCCodec::shutdown();
+#endif
 #if OGRE_PROFILING
         OGRE_DELETE mProfiler;
 #endif
@@ -316,7 +320,6 @@ namespace Ogre {
         OGRE_DELETE mSkeletonManager;
         OGRE_DELETE mMeshManager;
         OGRE_DELETE mParticleManager;
-		//OGRE_DELETE mCompilerManager;
 
         if( mControllerManager )
             OGRE_DELETE mControllerManager;

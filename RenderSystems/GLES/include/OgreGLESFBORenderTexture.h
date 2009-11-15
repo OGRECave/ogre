@@ -32,10 +32,6 @@ THE SOFTWARE.
 #include "OgreGLESContext.h"
 #include "OgreGLESFrameBufferObject.h"
 
-/// Extra GL constants
-#define GL_DEPTH24_STENCIL8_EXT                           0x88F0
-
-
 namespace Ogre {
     class GLESFBOManager;
     class GLESRenderBuffer;

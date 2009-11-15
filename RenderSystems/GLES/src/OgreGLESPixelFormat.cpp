@@ -54,16 +54,17 @@ namespace Ogre  {
             case PF_FLOAT32_GR:
                 return GL_LUMINANCE_ALPHA;
 
-            // PVR compressed formats
-//            case PF_PVR_RGB2:
-//                return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
-//            case PF_PVR_RGB4:
-//                return GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
-//            case PF_PVR_RGBA2:
-//                return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
-//            case PF_PVR_RGBA4:
-//                return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
-                
+            // PVRTC compressed formats
+#if GL_IMG_texture_compression_pvrtc
+            case PF_PVRTC_RGB2:
+                return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+            case PF_PVRTC_RGB4:
+                return GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+            case PF_PVRTC_RGBA2:
+                return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+            case PF_PVRTC_RGBA4:
+                return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+#endif                
             case PF_R3G3B2:
             case PF_R5G6B5:
             case PF_FLOAT16_RGB:
@@ -119,10 +120,6 @@ namespace Ogre  {
             case PF_R8G8B8:
             case PF_B8G8R8:
             case PF_BYTE_LA:
-//            case PF_PVR_RGB2:
-//            case PF_PVR_RGB4:
-//            case PF_PVR_RGBA2:
-//            case PF_PVR_RGBA4:
                 return GL_UNSIGNED_BYTE;
             case PF_R5G6B5:
             case PF_B5G6R5:
@@ -190,24 +187,19 @@ namespace Ogre  {
             case PF_BYTE_LA:
                 return GL_LUMINANCE_ALPHA;
 
-//            case PF_PVR_RGB2:
-//                return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
-//            case PF_PVR_RGB4:
-//                return GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
-//            case PF_PVR_RGBA2:
-//                return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
-//            case PF_PVR_RGBA4:
-//                return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+            case PF_PVRTC_RGB2:
+                return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+            case PF_PVRTC_RGB4:
+                return GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+            case PF_PVRTC_RGBA2:
+                return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+            case PF_PVRTC_RGBA4:
+                return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
                 
             case PF_R8G8B8:
             case PF_B8G8R8:
             case PF_X8B8G8R8:
             case PF_X8R8G8B8:
-                // DJR - Commenting this out resolves texture problems on iPhone
-//                if (!hwGamma)
-//                {
-//                    return GL_RGB;
-//                }
             case PF_A8R8G8B8:
             case PF_B8G8R8A8:
                 if (!hwGamma)
@@ -246,7 +238,7 @@ namespace Ogre  {
                                                    bool hwGamma)
     {
         GLenum format = getGLInternalFormat(mFormat, hwGamma);
-        if (format==0)
+        if (format == 0)
         {
             if (hwGamma)
             {
@@ -268,20 +260,21 @@ namespace Ogre  {
     {
         switch (fmt)
         {
-//            case GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
-//                return PF_PVR_RGB2;
-//            case GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
-//                return PF_PVR_RGBA2;
-//            case GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
-//                return PF_PVR_RGB4;
-//            case GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
-//                return PF_PVR_RGBA4;
+            case GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
+                return PF_PVRTC_RGB2;
+            case GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
+                return PF_PVRTC_RGBA2;
+            case GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
+                return PF_PVRTC_RGB4;
+            case GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
+                return PF_PVRTC_RGBA4;
             case GL_LUMINANCE:
                 return PF_L8;
             case GL_ALPHA:
                 return PF_A8;
             case GL_LUMINANCE_ALPHA:
                 return PF_BYTE_LA;
+            
             case GL_RGB:
                 return PF_X8R8G8B8;
             case GL_RGBA:

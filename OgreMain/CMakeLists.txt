@@ -40,6 +40,7 @@ set (HEADER_FILES
   include/OgreBlendMode.h
   include/OgreBone.h
   include/OgreBorderPanelOverlayElement.h
+  ${CMAKE_BINARY_DIR}/include/OgreBuildSettings.h
   include/OgreCamera.h
   include/OgreCodec.h
   include/OgreColourValue.h
@@ -167,6 +168,7 @@ set (HEADER_FILES
   include/OgrePrerequisites.h
   include/OgreProfiler.h
   include/OgreProgressiveMesh.h
+  include/OgrePVRTCCodec.h
   include/OgreQuaternion.h
   include/OgreRadixSort.h
   include/OgreRay.h
@@ -380,6 +382,7 @@ set (SOURCE_FILES
   src/OgrePrefabFactory.cpp
   src/OgreProfiler.cpp
   src/OgreProgressiveMesh.cpp
+  src/OgrePVRTCCodec.cpp
   src/OgreQuaternion.cpp
   src/OgreRectangle2D.cpp
   src/OgreRenderQueue.cpp
@@ -615,6 +618,11 @@ endif()
 if (OGRE_CONFIG_DISABLE_DDS)
   list(REMOVE_ITEM HEADER_FILES include/OgreDDSCodec.h)
   list(REMOVE_ITEM SOURCE_FILES src/OgreDDSCodec.cpp)
+endif ()
+
+if (OGRE_CONFIG_DISABLE_PVRTC)
+  list(REMOVE_ITEM HEADER_FILES include/OgrePVRTCCodec.h)
+  list(REMOVE_ITEM SOURCE_FILES src/OgrePVRTCCodec.cpp)
 endif ()
 
 if (OGRE_CONFIG_DISABLE_ZIP)

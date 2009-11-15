@@ -65,6 +65,13 @@ namespace Ogre {
             FilterOptions mMinFilter;
             FilterOptions mMipFilter;
 
+            /** Used to store the number of mipmaps in the currently bound texture.  This is then
+             used to modify the texture unit filtering.  Some GL ES implementations e.g. iPhone, 
+             have a more strict implementation, if the current texture has no mipmaps and a filter that 
+             requires them is requested, it is as if the texture is unbound.
+             */
+            size_t mTextureMipmapCount;
+
             /// What texture coord set each texture unit is using
             size_t mTextureCoordIndex[OGRE_MAX_TEXTURE_LAYERS];
 
@@ -84,7 +91,6 @@ namespace Ogre {
 
             bool mUseAutoTextureMatrix;
             size_t mTextureCount;
-
             bool mTextureEnabled;
 
             /// GL support class, used for creating windows etc.
@@ -118,8 +124,6 @@ namespace Ogre {
             /// Internal method to set pos / direction of a light
             void setGLLightPositionDirection(Light* lt, GLenum lightindex);
             void setLights();
-
-        protected:
 
         public:
             // Default constructor / destructor
@@ -435,6 +439,7 @@ namespace Ogre {
             void _setRenderTarget(RenderTarget *target);
 
             GLint convertCompareFunction(CompareFunction func) const;
+            GLint convertStencilOp(StencilOperation op, bool invert = false) const;
 
             void bindGpuProgram(GpuProgram* prg);
             void unbindGpuProgram(GpuProgramType gptype);

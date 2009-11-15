@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include "OgreGLESSupport.h"
 
 namespace Ogre {
-    /** GL-specific implementation of a TextureManager */
+    /** GL ES-specific implementation of a TextureManager */
     class _OgrePrivate GLESTextureManager : public TextureManager
     {
         public:

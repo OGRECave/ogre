@@ -70,16 +70,16 @@ namespace Ogre {
     PixelFormatDescription _pixelFormats[PF_COUNT] = {
 	//-----------------------------------------------------------------------
         {"PF_UNKNOWN",
-            /* Bytes per element */
-            0,
-            /* Flags */
-            0,
-            /* Component type and count */
-            PCT_BYTE, 0,
-            /* rbits, gbits, bbits, abits */
-            0, 0, 0, 0,
-            /* Masks and shifts */
-            0, 0, 0, 0, 0, 0, 0, 0
+        /* Bytes per element */
+        0,
+        /* Flags */
+        0,
+        /* Component type and count */
+        PCT_BYTE, 0,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
         },
 	//-----------------------------------------------------------------------
         {"PF_L8",
@@ -578,6 +578,59 @@ namespace Ogre {
         /* Masks and shifts */
 		0, 0, 0, 0, 0, 0, 0, 0
         },
+    //-----------------------------------------------------------------------
+		{"PF_PVRTC_RGB2",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED,
+        /* Component type and count */
+        PCT_BYTE, 3,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+		{"PF_PVRTC_RGBA2",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED | PFF_HASALPHA,
+        /* Component type and count */
+        PCT_BYTE, 4,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+		{"PF_PVRTC_RGB4",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED,
+        /* Component type and count */
+        PCT_BYTE, 3,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+		{"PF_PVRTC_RGBA4",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED | PFF_HASALPHA,
+        /* Component type and count */
+        PCT_BYTE, 4,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+        
     };
     //-----------------------------------------------------------------------
 	size_t PixelBox::getConsecutiveSize() const
@@ -650,6 +703,18 @@ namespace Ogre {
 				case PF_DXT5:
 					assert(depth == 1);
 					return ((width+3)/4)*((height+3)/4)*16;
+
+                // Size calculations from the PVRTC OpenGL extension spec
+                // http://www.khronos.org/registry/gles/extensions/IMG/IMG_texture_compression_pvrtc.txt
+                // Basically, 32 bytes is the minimum texture size.  Smaller textures are padded up to 32 bytes
+                case PF_PVRTC_RGB2:
+                case PF_PVRTC_RGBA2:
+					assert(depth == 1);
+                    return (std::max((int)width, 16) * std::max((int)height, 8) * 2 + 7) / 8;
+                case PF_PVRTC_RGB4:
+                case PF_PVRTC_RGBA4:
+					assert(depth == 1);
+                    return (std::max((int)width, 8) * std::max((int)height, 8) * 4 + 7) / 8;
 				default:
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid compressed pixel format",
 					"PixelUtil::getMemorySize");

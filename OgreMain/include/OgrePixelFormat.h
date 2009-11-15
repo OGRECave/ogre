@@ -125,7 +125,7 @@ namespace Ogre {
         PF_FLOAT16_RGBA = 23,
 		// 16-bit pixel format, 16 bits (float) for red
         PF_FLOAT32_R = 33,
-       // 96-bit pixel format, 32 bits (float) for red, 32 bits (float) for green, 32 bits (float) for blue
+        // 96-bit pixel format, 32 bits (float) for red, 32 bits (float) for green, 32 bits (float) for blue
         PF_FLOAT32_RGB = 24,
         // 128-bit pixel format, 32 bits (float) for red, 32 bits (float) for green, 32 bits (float) for blue, 32 bits (float) for alpha
         PF_FLOAT32_RGBA = 25,
@@ -141,8 +141,16 @@ namespace Ogre {
 		PF_SHORT_GR = 34,
 		// 48-bit pixel format, 16 bits for red, green and blue
 		PF_SHORT_RGB = 37,
+        /// PVRTC (PowerVR) RGB 2 bpp
+        PF_PVRTC_RGB2 = 38,
+        /// PVRTC (PowerVR) RGBA 2 bpp
+        PF_PVRTC_RGBA2 = 39,
+        /// PVRTC (PowerVR) RGB 4 bpp
+        PF_PVRTC_RGB4 = 40,
+        /// PVRTC (PowerVR) RGBA 4 bpp
+        PF_PVRTC_RGBA4 = 41,
 		// Number of pixel formats currently defined
-        PF_COUNT = 38
+        PF_COUNT = 42
     };
 	typedef vector<PixelFormat>::type PixelFormatList;
 

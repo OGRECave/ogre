@@ -125,7 +125,7 @@ namespace Ogre {
         mMainContext = 0;
         mGLInitialised = false;
         mCurrentLights = 0;
-
+        mTextureMipmapCount = 0;
         mMinFilter = FO_LINEAR;
         mMipFilter = FO_POINT;
     }
@@ -202,11 +202,8 @@ namespace Ogre {
         else
             rsc->setVendor(GPU_UNKNOWN);
 
-        // Check if this is OpenGL ES 2.0 and enable the fixed function capability
-        const char* apiVersion = (const char*)glGetString(GL_VERSION);
-        bool isVersion2 = Ogre::StringUtil::match(String(apiVersion), "*2.0*");
-        if(!isVersion2)
-            rsc->setCapability(RSC_FIXED_FUNCTION);
+        // GL ES 1.x is fixed function only
+        rsc->setCapability(RSC_FIXED_FUNCTION);
 
         // Multitexturing support and set number of texture units
         GLint units;
@@ -255,11 +252,6 @@ namespace Ogre {
 //            rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 
         if (mGLSupport->checkExtension("GL_OES_framebuffer_object")) {
-//            GLint buffers;
-//            glGetIntegerv(GL_MAX_DRAW_BUFFERS, &buffers);
-//            rsc->setNumMultiRenderTargets(std::min<int>(buffers, (GLint)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
-//            rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
-            
             rsc->setCapability(RSC_FBO);
             rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
         } else {
@@ -308,15 +300,6 @@ namespace Ogre {
         if (mGLSupport->checkExtension("GL_OES_point_sprite"))
             rsc->setCapability(RSC_POINT_SPRITES);
         rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
-
-        // Vertex/Fragment Program: TODO
-        if(isVersion2) {
-            rsc->setCapability(RSC_VERTEX_PROGRAM);
-            rsc->setCapability(RSC_FRAGMENT_PROGRAM);
-            rsc->setVertexProgramConstantBoolCount(0);
-            rsc->setVertexProgramConstantIntCount(0);
-            rsc->addShaderProfile("glsl");
-        }
 
         // UBYTE4 always supported
         rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
@@ -540,6 +523,7 @@ namespace Ogre {
 
     void GLESRenderSystem::destroyRenderWindow(RenderWindow* pWin)
     {
+		// Find it to remove from list
         RenderTargetMap::iterator i = mRenderTargets.begin();
 
         while (i != mRenderTargets.end())
@@ -570,15 +554,11 @@ namespace Ogre {
     void GLESRenderSystem::setNormaliseNormals(bool normalise)
     {
         if (normalise)
-        {
             glEnable(GL_NORMALIZE);
-            GL_CHECK_ERROR;
-        }
         else
-        {
             glDisable(GL_NORMALIZE);
-            GL_CHECK_ERROR;
-        }
+
+        GL_CHECK_ERROR;
     }
 
     void GLESRenderSystem::_useLights(const LightList& lights, unsigned short limit)
@@ -874,6 +854,9 @@ namespace Ogre {
             glEnable(GL_TEXTURE_2D);
             GL_CHECK_ERROR;
 
+            // Store the number of mipmaps
+            mTextureMipmapCount = tex->getNumMipmaps();
+            
             if (!tex.isNull())
             {
                 glBindTexture(GL_TEXTURE_2D, tex->getGLID());
@@ -896,7 +879,7 @@ namespace Ogre {
             GL_CHECK_ERROR;
 
             // bind zero texture
-            glBindTexture (GL_TEXTURE_2D, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
             GL_CHECK_ERROR;
         }
 
@@ -1131,37 +1114,51 @@ namespace Ogre {
         {
             glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, cmd);
             GL_CHECK_ERROR;
-            // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, src1op);
-            // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, src2op);
-            // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_CONSTANT);
+            glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_RGB, src1op);
+            GL_CHECK_ERROR;
+            glTexEnvi(GL_TEXTURE_ENV, GL_SRC1_RGB, src2op);
+            GL_CHECK_ERROR;
+            glTexEnvi(GL_TEXTURE_ENV, GL_SRC2_RGB, GL_CONSTANT);
+            GL_CHECK_ERROR;
         }
         else
         {
             glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, cmd);
             GL_CHECK_ERROR;
-            // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, src1op);
-            // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA, src2op);
-            // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA, GL_CONSTANT);
+            glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_ALPHA, src1op);
+            GL_CHECK_ERROR;
+            glTexEnvi(GL_TEXTURE_ENV, GL_SRC1_ALPHA, src2op);
+            GL_CHECK_ERROR;
+            glTexEnvi(GL_TEXTURE_ENV, GL_SRC2_ALPHA, GL_CONSTANT);
+            GL_CHECK_ERROR;
         }
 
         float blendValue[4] = {0, 0, 0, bm.factor};
         switch (bm.operation)
         {
             case LBX_BLEND_DIFFUSE_COLOUR:
-                // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_PRIMARY_COLOR);
-                // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA, GL_PRIMARY_COLOR);
+                glTexEnvi(GL_TEXTURE_ENV, GL_SRC2_RGB, GL_PRIMARY_COLOR);
+                GL_CHECK_ERROR;
+                glTexEnvi(GL_TEXTURE_ENV, GL_SRC2_ALPHA, GL_PRIMARY_COLOR);
+                GL_CHECK_ERROR;
                 break;
             case LBX_BLEND_DIFFUSE_ALPHA:
-                // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_PRIMARY_COLOR);
-                // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA, GL_PRIMARY_COLOR);
+                glTexEnvi(GL_TEXTURE_ENV, GL_SRC2_RGB, GL_PRIMARY_COLOR);
+                GL_CHECK_ERROR;
+                glTexEnvi(GL_TEXTURE_ENV, GL_SRC2_ALPHA, GL_PRIMARY_COLOR);
+                GL_CHECK_ERROR;
                 break;
             case LBX_BLEND_TEXTURE_ALPHA:
-                // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_TEXTURE);
-                // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA, GL_TEXTURE);
+                glTexEnvi(GL_TEXTURE_ENV, GL_SRC2_RGB, GL_TEXTURE);
+                GL_CHECK_ERROR;
+                glTexEnvi(GL_TEXTURE_ENV, GL_SRC2_ALPHA, GL_TEXTURE);
+                GL_CHECK_ERROR;
                 break;
             case LBX_BLEND_CURRENT_ALPHA:
-                // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_PREVIOUS);
-                // glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA, GL_PREVIOUS);
+                glTexEnvi(GL_TEXTURE_ENV, GL_SRC2_RGB, GL_PREVIOUS);
+                GL_CHECK_ERROR;
+                glTexEnvi(GL_TEXTURE_ENV, GL_SRC2_ALPHA, GL_PREVIOUS);
+                GL_CHECK_ERROR;
                 break;
             case LBX_BLEND_MANUAL:
                 glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, blendValue);
@@ -1233,6 +1230,9 @@ namespace Ogre {
             case TextureUnitState::TAM_BORDER:
                 return GL_CLAMP_TO_EDGE;
             case TextureUnitState::TAM_MIRROR:
+#if GL_OES_texture_mirrored_repeat
+                return GL_MIRRORED_REPEAT_OES;
+#endif
             case TextureUnitState::TAM_WRAP:
             default:
                 return GL_REPEAT;
@@ -1263,6 +1263,7 @@ namespace Ogre {
         if (mCurrentCapabilities->hasCapability(RSC_MIPMAP_LOD_BIAS))
         {
 #if GL_EXT_texture_lod_bias	// This extension only seems to be supported on iPhone OS, block it out to fix Linux build
+            glActiveTexture(GL_TEXTURE0 + unit);
             glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, bias);
             GL_CHECK_ERROR;
             glActiveTexture(GL_TEXTURE0);
@@ -1355,6 +1356,34 @@ namespace Ogre {
 			glBlendFunc(sourceBlend, destBlend);
 			GL_CHECK_ERROR;
 		}
+        
+#if GL_OES_blend_subtract
+        GLint func = GL_FUNC_ADD_OES;
+		switch(op)
+		{
+		case SBO_ADD:
+			func = GL_FUNC_ADD_OES;
+			break;
+		case SBO_SUBTRACT:
+			func = GL_FUNC_SUBTRACT_OES;
+			break;
+		case SBO_REVERSE_SUBTRACT:
+			func = GL_FUNC_REVERSE_SUBTRACT_OES;
+			break;
+		case SBO_MIN:
+#if GL_EXT_blend_minmax
+            func = GL_MIN_EXT;
+#endif
+            break;
+		case SBO_MAX:
+#if GL_EXT_blend_minmax
+            func = GL_MAX_EXT;
+#endif
+			break;
+		}
+        glBlendEquationOES(func);
+        GL_CHECK_ERROR;
+#endif
 	}
 
 	void GLESRenderSystem::_setSeparateSceneBlending(
@@ -1363,7 +1392,7 @@ namespace Ogre {
         SceneBlendOperation op, SceneBlendOperation alphaOp )
 	{
         // Kinda hacky way to prevent this from compiling if the extensions aren't available
-#if defined(GL_MIN_EXT) && defined(GL_MAX_EXT)
+#if defined(GL_OES_blend_func_separate) && defined(GL_OES_blend_equation_separate) && defined(GL_EXT_blend_minmax)
         if (mGLSupport->checkExtension("GL_OES_blend_equation_separate") &&
             mGLSupport->checkExtension("GL_OES_blend_func_separate"))
         {
@@ -1444,6 +1473,9 @@ namespace Ogre {
 		{
 			glEnable(GL_ALPHA_TEST);
 			GL_CHECK_ERROR;
+
+			a2c = alphaToCoverage;
+
 			glAlphaFunc(convertCompareFunction(func), value / 255.0f);
 			GL_CHECK_ERROR;
 		}
@@ -1453,6 +1485,8 @@ namespace Ogre {
 				glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
 			else
 				glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+
+			GL_CHECK_ERROR;
 
 			lasta2c = a2c;
 		} 
@@ -1664,6 +1698,8 @@ namespace Ogre {
                 fogMode = GL_EXP2;
                 break;
             case FOG_LINEAR:
+                fogMode = GL_LINEAR;
+                break;
             default:
                 // Give up on it
                 glDisable(GL_FOG);
@@ -1843,7 +1879,21 @@ namespace Ogre {
                                                 StencilOperation passOp,
                                                 bool twoSidedOperation)
     {
-        // Not implemented
+		bool flip;
+		mStencilMask = mask;
+
+        // NB: We should always treat CCW as front face for consistent with default
+        // culling mode. Therefore, we must take care with two-sided stencil settings.
+        flip = (mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping()) ||
+            (!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
+
+        flip = false;
+        glStencilMask(mask);
+        glStencilFunc(convertCompareFunction(func), refValue, mask);
+        glStencilOp(
+            convertStencilOp(stencilFailOp, flip),
+            convertStencilOp(depthFailOp, flip), 
+            convertStencilOp(passOp, flip));
     }
 
     GLuint GLESRenderSystem::getCombinedMinMipFilter(void) const
@@ -1896,7 +1946,15 @@ namespace Ogre {
         switch (ftype)
         {
             case FT_MIN:
-                mMinFilter = fo;
+                if(mTextureMipmapCount == 0)
+                {
+                    mMinFilter = FO_NONE;
+                }
+                else
+                {
+                    mMinFilter = fo;
+                }
+
                 // Combine with existing mip filter
                 glTexParameteri(GL_TEXTURE_2D,
                                 GL_TEXTURE_MIN_FILTER,
@@ -1924,12 +1982,19 @@ namespace Ogre {
                 }
                 break;
             case FT_MIP:
-                mMipFilter = fo;
+                if(mTextureMipmapCount == 0)
+                {
+                    mMipFilter = FO_NONE;
+                }
+                else
+                {
+                    mMipFilter = fo;
+                }
+
                 // Combine with existing min filter
                 glTexParameteri(GL_TEXTURE_2D,
                                 GL_TEXTURE_MIN_FILTER,
                                 getCombinedMinMipFilter());
-
                 GL_CHECK_ERROR;
                 break;
         }
@@ -2575,6 +2640,29 @@ namespace Ogre {
         return GL_ALWAYS;
     }
 
+	GLint GLESRenderSystem::convertStencilOp(StencilOperation op, bool invert) const
+	{
+		switch(op)
+		{
+		case SOP_KEEP:
+			return GL_KEEP;
+		case SOP_ZERO:
+			return GL_ZERO;
+		case SOP_REPLACE:
+			return GL_REPLACE;
+		case SOP_INCREMENT_WRAP:
+        case SOP_INCREMENT:
+			return invert ? GL_DECR : GL_INCR;
+		case SOP_DECREMENT_WRAP:
+		case SOP_DECREMENT:
+			return invert ? GL_INCR : GL_DECR;
+		case SOP_INVERT:
+			return GL_INVERT;
+		};
+		// to keep compiler happy
+		return SOP_KEEP;
+	}
+    
     void GLESRenderSystem::setLights()
     {
         for (size_t i = 0; i < MAX_LIGHTS; ++i)

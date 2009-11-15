@@ -84,10 +84,6 @@ extern PFNGLGENERATEMIPMAPOESPROC glGenerateMipmapOES;
 
 #endif
 
-#ifndef None
-	#define None NULL
-#endif
-
 // Define GL_NONE for convenience
 #define GL_NONE 0
 
@@ -128,7 +124,7 @@ extern PFNGLGENERATEMIPMAPOESPROC glGenerateMipmapOES;
         } \
     }
 #else
-#define GL_CHECK_ERROR {}
+    #define GL_CHECK_ERROR {}
 #endif
 
 #if ENABLE_GL_CHECK
@@ -142,7 +138,7 @@ extern PFNGLGENERATEMIPMAPOESPROC glGenerateMipmapOES;
         } \
     }
 #else
-    #define EGL_CHECK_ERROR  {}
+    #define EGL_CHECK_ERROR {}
 #endif
 
 #endif

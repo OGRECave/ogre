@@ -37,7 +37,7 @@ namespace Ogre {
     /** An off-screen rendering context. These contexts are always RGBA for simplicity, speed and
         convience, but the component format is configurable.
     */
-    class GLContext;
+    class GLESContext;
     class _OgrePrivate GLESPBuffer
     {
         public:

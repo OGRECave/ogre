@@ -81,8 +81,8 @@ static const GLenum depthFormats[] =
 {
     GL_NONE,
     GL_DEPTH_COMPONENT16_OES,
-    GL_DEPTH_COMPONENT24_OES,    // Prefer 24 bit depth
-    GL_DEPTH24_STENCIL8_EXT // packed depth / stencil
+    GL_DEPTH_COMPONENT24_OES,   // Prefer 24 bit depth
+    GL_DEPTH24_STENCIL8_OES     // packed depth / stencil
 };
 static const size_t depthBits[] =
 {
@@ -256,12 +256,7 @@ static const size_t depthBits[] =
                                 target, tid, 0);
                 GL_CHECK_ERROR;
             }
-			else
-			{
-				// Draw to nowhere -- stencil/depth only
-//				glDrawBuffer(GL_NONE);
-//				glReadBuffer(GL_NONE);
-			}
+
             // Check status
             GLuint status = glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES);
             GL_CHECK_ERROR;
@@ -279,7 +274,7 @@ static const size_t depthBits[] =
                 // For each depth/stencil formats
                 for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
                 {
-                    if (depthFormats[depth] != GL_DEPTH24_STENCIL8_EXT)
+                    if (depthFormats[depth] != GL_DEPTH24_STENCIL8_OES)
                     {
                         // General depth/stencil combination
 
@@ -366,7 +361,7 @@ static const size_t depthBits[] =
                 desirability += 2000;
             if(depthBits[props.modes[mode].depth]==24) // Prefer 24 bit for now
                 desirability += 500;
-			if(depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8_EXT) // Prefer 24/8 packed 
+			if(depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8_OES) // Prefer 24/8 packed 
 				desirability += 5000;
             desirability += stencilBits[props.modes[mode].stencil] + depthBits[props.modes[mode].depth];
             

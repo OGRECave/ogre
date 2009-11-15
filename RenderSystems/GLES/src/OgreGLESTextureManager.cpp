@@ -85,9 +85,13 @@ namespace Ogre {
         GL_CHECK_ERROR;
         glBindTexture(GL_TEXTURE_2D, mWarningTextureID);
         GL_CHECK_ERROR;
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+#if GL_OES_rgb8_rgba8
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8_OES, width, height, 0, GL_BGRA,
                      GL_UNSIGNED_BYTE, (void*)data);
+#else
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGRA,
+                     GL_UNSIGNED_BYTE, (void*)data);
+#endif
         GL_CHECK_ERROR;
         // Free memory
         OGRE_DELETE [] data;
@@ -132,7 +136,7 @@ namespace Ogre {
             return false;
         }
 
-        // Check natively format
+        // Check native format
         PixelFormat nativeFormat = getNativeFormat(ttype, format, usage);
         if (preciseFormatOnly && format != nativeFormat)
         {

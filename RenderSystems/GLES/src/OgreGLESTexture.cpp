@@ -33,16 +33,7 @@ THE SOFTWARE.
 #include "OgreGLESRenderSystem.h"
 #include "OgreGLESHardwarePixelBuffer.h"
 
-#include "OgreTextureManager.h"
-#include "OgreImage.h"
-#include "OgreLogManager.h"
-#include "OgreCamera.h"
-#include "OgreException.h"
 #include "OgreRoot.h"
-#include "OgreCodec.h"
-#include "OgreImageCodec.h"
-#include "OgreStringConverter.h"
-#include "OgreBitwise.h"
 
 namespace Ogre {
     static inline void doImageIO(const String &name, const String &group,
@@ -90,23 +81,33 @@ namespace Ogre {
     // Creation / loading methods
     void GLESTexture::createInternalResourcesImpl(void)
     {
-        GL_CHECK_ERROR;
-
+		// Convert to nearest power-of-two size if required
         mWidth = GLESPixelUtil::optionalPO2(mWidth);
         mHeight = GLESPixelUtil::optionalPO2(mHeight);
         mDepth = GLESPixelUtil::optionalPO2(mDepth);
 
-        mFormat = TextureManager::getSingleton().getNativeFormat(TEX_TYPE_2D,
-                                                                 mFormat, mUsage);
+		// Adjust format if required
+        mFormat = TextureManager::getSingleton().getNativeFormat(TEX_TYPE_2D, mFormat, mUsage);
+
+		// Check requested number of mipmaps
         size_t maxMips = GLESPixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
+        
+        if(PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0))
+            mNumRequestedMipmaps = 0;
+        
         mNumMipmaps = mNumRequestedMipmaps;
         if (mNumMipmaps > maxMips)
             mNumMipmaps = maxMips;
 
+		// Generate texture name
         glGenTextures(1, &mTextureID);
         GL_CHECK_ERROR;
+
+		// Set texture type
         glBindTexture(GL_TEXTURE_2D, mTextureID);
         GL_CHECK_ERROR;
+
+        // Set some misc default parameters, these can of course be changed later
         glTexParameteri(GL_TEXTURE_2D,
                         GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
         GL_CHECK_ERROR;
@@ -120,8 +121,9 @@ namespace Ogre {
                         GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         GL_CHECK_ERROR;
 
+		// If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated =
-            Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP);
+            Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
 
         if ((mUsage & TU_AUTOMIPMAP) &&
             mNumRequestedMipmaps && mMipmapsHardwareGenerated)
@@ -133,7 +135,6 @@ namespace Ogre {
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
         GLenum format = GLESPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
-
         size_t width = mWidth;
         size_t height = mHeight;
         size_t depth = mDepth;
@@ -149,7 +150,6 @@ namespace Ogre {
 
             uint8* tmpdata = OGRE_NEW_FIX_FOR_WIN32 uint8[size];
             memset(tmpdata, 0, size);
-
             for (size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
                 size = PixelUtil::getMemorySize(width, height, depth, mFormat);
@@ -162,6 +162,12 @@ namespace Ogre {
                                        size,
                                        tmpdata);
                 GL_CHECK_ERROR;
+
+//                LogManager::getSingleton().logMessage("GLESTexture::create - Mip: " + StringConverter::toString(mip) +
+//                                                      " Width: " + StringConverter::toString(width) +
+//                                                      " Height: " + StringConverter::toString(height) +
+//                                                      " Internal Format: " + StringConverter::toString(format)
+//                                                      );
 
                 if(width > 1)
                 {
@@ -181,7 +187,7 @@ namespace Ogre {
         else
         {
             // Run through this process to pregenerate mipmap pyramid
-            for(size_t mip=0; mip<=mNumMipmaps; mip++)
+            for(size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
                 glTexImage2D(GL_TEXTURE_2D,
                              mip,
@@ -190,11 +196,6 @@ namespace Ogre {
                              0,
                              format,
                              GL_UNSIGNED_BYTE, 0);
-//                LogManager::getSingleton().logMessage("GLESTexture::create - Mip: " + StringConverter::toString(mip) +
-//                                                      " Width: " + StringConverter::toString(width) +
-//                                                      " Height: " + StringConverter::toString(height) +
-//                                                      " Internal Format: " + StringConverter::toString(format)
-//                                                      );
                 GL_CHECK_ERROR;
 
                 if (width > 1)
@@ -280,7 +281,7 @@ namespace Ogre {
         // will determine load status etc again
         ConstImagePtrList imagePtrs;
 
-        for (size_t i=0 ; i<loadedImages->size() ; ++i)
+        for (size_t i = 0; i < loadedImages->size(); ++i)
         {
             imagePtrs.push_back(&(*loadedImages)[i]);
         }

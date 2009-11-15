@@ -264,11 +264,10 @@ namespace Ogre {
         // Log a message
 //        std::stringstream str;
 //        str << "GLESHardwarePixelBuffer constructed for texture " << mTextureID 
-//            << " face " << mFace << " level " << mLevel << ":"
-//            << " width=" << mWidth << " height="<< mHeight << " depth=" << mDepth
+//            << " face " << face << " level " << level << ":"
+//            << " width=" << width << " height="<< height << " depth=" << mDepth
 //            << " format=" << PixelUtil::getFormatName(mFormat);
-//        LogManager::getSingleton().logMessage( 
-//                    LML_NORMAL, str.str());
+//        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
         // Set up a pixel box
         mBuffer = PixelBox(mWidth, mHeight, mDepth, mFormat);
@@ -326,7 +325,7 @@ namespace Ogre {
             // for compressed formats
             if (dest.left == 0 && dest.top == 0)
             {
-                glCompressedTexImage2D(mFaceTarget, mLevel,
+                glCompressedTexImage2D(GL_TEXTURE_2D, mLevel,
                                        format,
                                        dest.getWidth(),
                                        dest.getHeight(),
@@ -337,7 +336,7 @@ namespace Ogre {
             }
             else
             {
-                glCompressedTexSubImage2D(mFaceTarget, mLevel,
+                glCompressedTexSubImage2D(GL_TEXTURE_2D, mLevel,
                                           dest.left, dest.top,
                                           dest.getWidth(), dest.getHeight(),
                                           format, data.getConsecutiveSize(),
@@ -353,7 +352,7 @@ namespace Ogre {
                 // TODO
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                             "Unsupported texture format",
-                            "GLESHardwarePixelBuffer::upload");
+                            "GLESTextureBuffer::upload");
             }
 
             if (data.getHeight() * data.getWidth() != data.slicePitch)
@@ -361,7 +360,7 @@ namespace Ogre {
                 // TODO
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                             "Unsupported texture format",
-                            "GLESHardwarePixelBuffer::upload");
+                            "GLESTextureBuffer::upload");
             }
 
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -382,8 +381,8 @@ namespace Ogre {
             {
                 // TODO
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                    "Unsupported texture format",
-                    "GLESTextureBuffer::upload");
+                            "Unsupported texture format",
+                            "GLESTextureBuffer::upload");
             }
 
             if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3) {
@@ -437,7 +436,7 @@ namespace Ogre {
         /// TODO: Check for FBO support first
         /// Destination texture must be 2D
         /// Source texture must be 2D
-        if(srct->mTarget == GL_TEXTURE_2D)
+        if((src->getUsage() & TU_RENDERTARGET) == 0 && (srct->mTarget == GL_TEXTURE_2D))
         {
             blitFromTexture(srct, srcBox, dstBox);
         }
@@ -449,8 +448,8 @@ namespace Ogre {
     
     //-----------------------------------------------------------------------------  
     /// Very fast texture-to-texture blitter and hardware bi/trilinear scaling implementation using FBO
-    /// Destination texture must be 1D, 2D, 3D, or Cube
-    /// Source texture must be 1D, 2D or 3D
+    /// Destination texture must be 2D
+    /// Source texture must be 2D
     /// Supports compressed formats as both source and destination format, it will use the hardware DXT compressor
     /// if available.
     /// @author W.J. van der Laan
@@ -466,6 +465,9 @@ namespace Ogre {
         /// Save and clear GL state for rendering
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
         
+        RenderSystem* rsys = Root::getSingleton().getRenderSystem();
+        rsys->_disableTextureUnitsFrom(0);
+
         /// Disable alpha, depth and scissor testing, disable blending, 
         /// disable culling, disble lighting, disable fog and reset foreground
         /// colour.
@@ -501,7 +503,7 @@ namespace Ogre {
            srcBox.getDepth()==dstBox.getDepth())
         {
             /// Dimensions match -- use nearest filtering (fastest and pixel correct)
-            glTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
             GL_CHECK_ERROR;
             glTexParameteri(src->mTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             GL_CHECK_ERROR;
@@ -523,7 +525,7 @@ namespace Ogre {
             {
                 /// Manual mipmaps, stay safe with bilinear filtering so that no
                 /// intermipmap leakage occurs.
-                glTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
                 GL_CHECK_ERROR;
                 glTexParameteri(src->mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 GL_CHECK_ERROR;
@@ -580,15 +582,6 @@ namespace Ogre {
                 /// Bind directly
                 bindToFramebuffer(GL_COLOR_ATTACHMENT0_OES, slice);
             }
-            
-            /// Finally we're ready to rumble
-            glBindTexture(src->mTarget, src->mTextureID);
-            GL_CHECK_ERROR;
-            glEnable(src->mTarget);
-            GL_CHECK_ERROR;
-
-            glDisable(src->mTarget);
-            GL_CHECK_ERROR;
 
             if(tempTex)
             {
@@ -649,8 +642,7 @@ namespace Ogre {
         /// - FBO is not supported
         /// - Either source or target is luminance due doesn't looks like supported by hardware
         /// - the source dimensions match the destination ones, in which case no scaling is needed
-        // TODO: Check that extension is NOT available
-        if(!glIsRenderbufferOES || // checks that GL_OES_framebuffer_object is NOT available - same as mGLSupport->checkExtension("GL_OES_framebuffer_object")
+        if(!GL_OES_framebuffer_object ||
            PixelUtil::isLuminance(src_orig.format) ||
            PixelUtil::isLuminance(mFormat) ||
            (src_orig.getWidth() == dstBox.getWidth() &&
@@ -807,12 +799,7 @@ namespace Ogre {
         GL_CHECK_ERROR;
         
         /// Allocate storage for depth buffer
-        if (numSamples > 0)
-        {
-//            glRenderbufferStorageMultisampleOES(GL_RENDERBUFFER_OES, 
-//                                                numSamples, format, width, height);
-        }
-        else
+        if (numSamples <= 0)
         {
             glRenderbufferStorageOES(GL_RENDERBUFFER_OES, format,
                                      width, height);

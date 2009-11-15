@@ -173,11 +173,8 @@ namespace Ogre {
 
 	Ogre::RenderToVertexBufferSharedPtr GLESDefaultHardwareBufferManagerBase::createRenderToVertexBuffer( void )
 	{
-	        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-	                "Cannot create RenderToVertexBuffer in GLESDefaultHardwareBufferManagerBase", 
-	                "GLESDefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
-
-		Ogre::RenderToVertexBufferSharedPtr  todo;
-		return todo;
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                "Cannot create RenderToVertexBuffer in GLESDefaultHardwareBufferManagerBase", 
+                "GLESDefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
 	}
 }

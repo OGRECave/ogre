@@ -173,7 +173,7 @@ namespace Ogre {
         
         /// Request surfaces
         mDepth = mManager->requestRenderBuffer(depthFormat, width, height, mNumSamples);
-		if (depthFormat == GL_DEPTH24_STENCIL8_EXT)
+		if (depthFormat == GL_DEPTH24_STENCIL8_OES)
 		{
 			// bind same buffer to depth and stencil attachments
             mManager->requestRenderBuffer(mDepth);
