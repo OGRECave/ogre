@@ -30,9 +30,40 @@
 
 @implementation Select_Ogre_Install_LocationPane
 
+- (id)initWithSection:(id)parent
+{
+    if((self = [super initWithSection:parent]))
+        validSDKChosen = NO;
+    
+    return self;
+}
+
 - (NSString *)title
 {
 	return [[NSBundle bundleForClass:[self class]] localizedStringForKey:@"InstallerPaneTitle" value:nil table:nil];
+}
+
+- (BOOL)shouldExitPane:(InstallerSectionDirection)dir
+{
+    if(!validSDKChosen)
+    {
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert addButtonWithTitle:@"OK"];
+        [alert setMessageText:@"No SDK chosen!"];
+        [alert setInformativeText:@"Please choose the location of your OGRE SDK."];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert beginSheetModalForWindow:[ogreLocationLabel window]
+                          modalDelegate:self
+                         didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
+                            contextInfo:nil];
+        return NO;
+    }
+    return YES;
+}
+
+- (void)alertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+    [[alert window] orderOut:nil];
 }
 
 - (IBAction)chooseOgreSDKLocation:(id)sender
@@ -42,7 +73,7 @@
     [openPanel setCanChooseFiles:NO];
     [openPanel setCanChooseDirectories:YES];
     [openPanel setAllowsMultipleSelection:NO];
-    [openPanel setMessage:@"Select where the Ogre SDK is installed."];
+    [openPanel setMessage:@"Select where the OGRE SDK is installed."];
 
     [openPanel beginSheetForDirectory:nil
                                  file:nil
@@ -97,6 +128,9 @@
         
         // Update the GUI
         [ogreLocationLabel setStringValue:ogreDirectory];
+
+        // Set the flag to show that will be ok to move on to the next installer section
+        validSDKChosen = YES;
 
         // Replace the placeholder string in the project files with the SDK root chosen by the user
         NSMutableString *projectFileContents = [NSMutableString stringWithContentsOfFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/Mac OS X/___PROJECTNAME___.xcodeproj/project.pbxproj"];

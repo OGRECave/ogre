@@ -31,6 +31,7 @@
 @interface Select_Ogre_Install_LocationPane : InstallerPane {
     IBOutlet NSTextField *ogreLocationLabel;
     IBOutlet NSTextField *ogreInfoLabel;
+    BOOL validSDKChosen;
 }
 
 - (IBAction)chooseOgreSDKLocation:(id)sender;
