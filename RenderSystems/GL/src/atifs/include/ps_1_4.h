@@ -56,6 +56,7 @@ THE SOFTWARE.
 
 //---------------------------------------------------------------------------
 // macro to get the size of a static array
+#undef ARRAYSIZE
 #define ARRAYSIZE(array) (sizeof(array)/sizeof(array[0]))
 
 #define ALPHA_BIT 0x08
