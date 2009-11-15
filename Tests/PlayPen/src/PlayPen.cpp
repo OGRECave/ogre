@@ -265,6 +265,8 @@ public:
 
 		}
 
+        // Neither Terrain nor keyboard input works on iPhone
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 		if (mTerrain)
 		{
 			if (mKeyboard->isKeyDown(OIS::KC_PERIOD))
@@ -350,6 +352,7 @@ public:
 			*/
 			updateDelay -= evt.timeSinceLastFrame;
 		}
+#endif
 
 		return ret;
 
@@ -377,6 +380,7 @@ public:
             timeUntilNextToggle -= evt.timeSinceLastFrame;
 
 		static bool mWireframe = false;
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 		if (mKeyboard->isKeyDown(OIS::KC_G) && timeUntilNextToggle <= 0)
         {
 			mWireframe = !mWireframe;
@@ -411,7 +415,7 @@ public:
 			timeUntilNextToggle = 0.5;
 
 		}
-
+#endif
 
 
         MaterialPtr mat = MaterialManager::getSingleton().getByName("Core/StatsBlockBorder/Up");
@@ -447,6 +451,7 @@ public:
 			(*animi)->addTime(evt.timeSinceLastFrame);
 		}
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
         if (mKeyboard->isKeyDown(OIS::KC_R) && timeUntilNextToggle <= 0)
         {
             rotate = !rotate;
@@ -457,7 +462,7 @@ public:
             animate = !animate;
             timeUntilNextToggle = 0.5;
         }
-
+#endif
 
         if (rayQuery)
         {
@@ -544,6 +549,7 @@ public:
         }
         */
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
 		{
 			if (testremoveNode)
@@ -627,6 +633,7 @@ public:
 			compositorToSwitch->setScheme(compositorSchemeList[compositorSchemeIndex]);
 			timeUntilNextToggle = 0.5;		
 		}
+#endif
 
 		/** Hack to test frustum vols
         if (testCam)
@@ -4879,7 +4886,85 @@ protected:
 
 	}
 
-
+    void test4bppPVR()
+    {
+		ResourceGroupManager::getSingleton().addResourceLocation("../../../../Tests/Media", "FileSystem");
+        
+		MaterialPtr mat = MaterialManager::getSingleton().create("testpvr", 
+                                                                 ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		Pass* p = mat->getTechnique(0)->getPass(0);
+		p->setLightingEnabled(false);
+		p->setCullingMode(CULL_NONE);
+		p->setSceneBlending(SBT_TRANSPARENT_ALPHA);
+		TextureUnitState* t = p->createTextureUnitState("ogreborderUp_pvr4.pvr");
+		Entity *e = mSceneMgr->createEntity("Plane", SceneManager::PT_PLANE);
+		e->setMaterialName(mat->getName());
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
+		mWindow->getViewport(0)->setBackgroundColour(ColourValue::Red);
+        
+		mCamera->setPosition(0,0,300);
+		mCamera->lookAt(Vector3::ZERO);
+    }
+    
+    void test4bppAlphaPVR()
+    {
+		ResourceGroupManager::getSingleton().addResourceLocation("../../../../Tests/Media", "FileSystem");
+        
+		MaterialPtr mat = MaterialManager::getSingleton().create("testpvr", 
+                                                                 ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		Pass* p = mat->getTechnique(0)->getPass(0);
+		p->setLightingEnabled(false);
+		p->setCullingMode(CULL_NONE);
+		p->setSceneBlending(SBT_TRANSPARENT_ALPHA);
+		TextureUnitState* t = p->createTextureUnitState("ogreborderUp_pvr4a.pvr");
+		Entity *e = mSceneMgr->createEntity("Plane", SceneManager::PT_PLANE);
+		e->setMaterialName(mat->getName());
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
+		mWindow->getViewport(0)->setBackgroundColour(ColourValue::Red);
+        
+		mCamera->setPosition(0,0,300);
+		mCamera->lookAt(Vector3::ZERO);
+    }
+    
+    void test2bppPVR()
+    {
+		ResourceGroupManager::getSingleton().addResourceLocation("../../../../Tests/Media", "FileSystem");
+        
+		MaterialPtr mat = MaterialManager::getSingleton().create("testpvr", 
+                                                                 ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		Pass* p = mat->getTechnique(0)->getPass(0);
+		p->setLightingEnabled(false);
+		p->setCullingMode(CULL_NONE);
+		p->setSceneBlending(SBT_TRANSPARENT_ALPHA);
+		TextureUnitState* t = p->createTextureUnitState("ogreborderUp_pvr2.pvr");
+		Entity *e = mSceneMgr->createEntity("Plane", SceneManager::PT_PLANE);
+		e->setMaterialName(mat->getName());
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
+		mWindow->getViewport(0)->setBackgroundColour(ColourValue::Red);
+        
+		mCamera->setPosition(0,0,300);
+		mCamera->lookAt(Vector3::ZERO);
+    }
+    
+    void test2bppAlphaPVR()
+    {
+		ResourceGroupManager::getSingleton().addResourceLocation("../../../../Tests/Media", "FileSystem");
+        
+		MaterialPtr mat = MaterialManager::getSingleton().create("testpvr", 
+                                                                 ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		Pass* p = mat->getTechnique(0)->getPass(0);
+		p->setLightingEnabled(false);
+		p->setCullingMode(CULL_NONE);
+		p->setSceneBlending(SBT_TRANSPARENT_ALPHA);
+		TextureUnitState* t = p->createTextureUnitState("ogreborderUp_pvr2a.pvr");
+		Entity *e = mSceneMgr->createEntity("Plane", SceneManager::PT_PLANE);
+		e->setMaterialName(mat->getName());
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
+		mWindow->getViewport(0)->setBackgroundColour(ColourValue::Red);
+        
+		mCamera->setPosition(0,0,300);
+		mCamera->lookAt(Vector3::ZERO);
+    }
 
 	void testRibbonTrail()
 	{
@@ -8347,6 +8432,10 @@ protected:
 		//testFloat128DDS();
 		//testFloat16DDS();
 		//testFloat32DDS();
+		//test4bppPVR();
+		//test4bppAlphaPVR();
+		//test2bppPVR();
+		//test2bppAlphaPVR();
 		//testMaterial();
 		//testExportPrecompiledAssemblerProgram();
 
@@ -8433,8 +8522,17 @@ public:
 		String pluginsPath = mResourcePath + "plugins.cfg";
 		// only use plugins.cfg if not static
 #ifdef OGRE_STATIC_LIB
+    #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        Ogre::String workDir = Ogre::StringUtil::BLANK;
+        workDir = Ogre::macBundlePath() + "/";
+
 		mRoot = new Root(StringUtil::BLANK, 
-			mResourcePath + "ogre.cfg", mResourcePath + "Ogre.log");
+                         workDir + "ogre.cfg", mResourcePath + "Ogre.log");
+    #else
+		mRoot = new Root(StringUtil::BLANK, 
+                         mResourcePath + "ogre.cfg", mResourcePath + "Ogre.log");
+    #endif
+        
 		mStaticPluginLoader.load();
 #else
 		mRoot = new Root(pluginsPath, 
@@ -8721,26 +8819,6 @@ int main(int argc, char **argv)
 - (void)applicationDidFinishLaunching:(UIApplication *)application {
     // Hide the status bar
     [[UIApplication sharedApplication] setStatusBarHidden:YES];
-    
-    // Create a window
-    UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    
-    // Create an image view
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Default.png"]];
-    [window addSubview:imageView];
-    
-    // Create an indeterminate status indicator
-    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    [indicator setFrame:CGRectMake(150, 280, 20, 20)];
-    [indicator startAnimating];
-    [window addSubview:indicator];
-    
-    // Display our window
-    [window makeKeyAndVisible];
-    
-    // Clean up
-    [imageView release];
-    [indicator release];
     
     [NSThread detachNewThreadSelector:@selector(go) toTarget:self withObject:nil];
 }

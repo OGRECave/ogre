@@ -35,6 +35,8 @@ Description: Stuff your windows full of OGRE
 
 using namespace Ogre;
 
+void setupResources(void); // Just a prototype
+
 void setupResources(void)
 {
 	// Load resource paths from config file
@@ -195,7 +197,7 @@ INT WINAPI EmbeddedMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 	catch( Exception& e ) 
 	{
 		MessageBox( NULL, e.getFullDescription().c_str(), 
-			"An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
+			"An exception has occurred!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
 	}
 
 

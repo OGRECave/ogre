@@ -17,10 +17,6 @@ set(SOURCE_FILES
     src/AnimationBlender.cpp
     src/WindowEmbedding.cpp)
 
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/PlayPen.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-endif ()
-
 if (APPLE)
   set(OGRE_LIBRARIES ${OGRE_LIBRARIES} IOKit)
 endif ()
@@ -35,3 +31,12 @@ ogre_config_sample_exe(PlayPen)
 
 add_dependencies(PlayPen ${TEST_DEPENDENCIES})
 
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/PlayPen.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
+  set (OGRE_PLAYPEN_CONTENTS_PATH ${CMAKE_BINARY_DIR}/bin/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PlayPen.app)
+
+  add_custom_command(TARGET PlayPen POST_BUILD
+    COMMAND cp ARGS ${CMAKE_BINARY_DIR}/bin/*.cfg ${OGRE_PLAYPEN_CONTENTS_PATH}/
+    COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/Tests/Media ${OGRE_PLAYPEN_CONTENTS_PATH}/
+  )
+endif ()
