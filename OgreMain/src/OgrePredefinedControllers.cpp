@@ -123,7 +123,7 @@ namespace Ogre
     Real TextureFrameControllerValue::getValue(void) const
     {
         int numFrames = mTextureLayer->getNumFrames();
-        return (mTextureLayer->getCurrentFrame() / numFrames);
+        return ((Real)mTextureLayer->getCurrentFrame() / (Real)numFrames);
     }
     //-----------------------------------------------------------------------
     void TextureFrameControllerValue::setValue(Real value)
@@ -318,33 +318,33 @@ namespace Ogre
             if (input < 0.25)
                 output = input * 4;
             else if (input >= 0.25 && input < 0.75)
-                output = 1.0 - ((input - 0.25) * 4);
+                output = 1.0f - ((input - 0.25f) * 4.0f);
             else
-                output = ((input - 0.75) * 4) - 1.0;
+                output = ((input - 0.75f) * 4.0f) - 1.0f;
 
             break;
         case WFT_SQUARE:
-            if (input <= 0.5)
-                output = 1.0;
+            if (input <= 0.5f)
+                output = 1.0f;
             else
-                output = -1.0;
+                output = -1.0f;
             break;
         case WFT_SAWTOOTH:
-            output = (input * 2) - 1;
+            output = (input * 2.0f) - 1.0f;
             break;
         case WFT_INVERSE_SAWTOOTH:
-            output = -((input * 2) - 1);
+            output = -((input * 2.0f) - 1.0f);
             break;
 		case WFT_PWM:
 			if( input <= mDutyCycle )
-				output = 1.0;
+				output = 1.0f;
 			else
-				output = -1.0;
+				output = -1.0f;
 			break;
         }
 
         // Scale output into 0..1 range and then by base + amplitude
-        return mBase + ((output + 1.0) * 0.5 * mAmplitude);
+        return mBase + ((output + 1.0f) * 0.5f * mAmplitude);
 
 
     }

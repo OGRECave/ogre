@@ -307,7 +307,7 @@ public:
 	int						getIndex						() const { return mIndex; }	
 
 	/** Get auto constant int data of this parameter, in case it is auto constant parameter. */
-	Real					getAutoConstantIntData			() const { return mAutoConstantIntData; }	
+	size_t					getAutoConstantIntData			() const { return mAutoConstantIntData; }	
 
 	/** Get auto constant real data of this parameter, in case it is auto constant parameter. */
 	Real					getAutoConstantRealData			() const { return mAutoConstantRealData; }	

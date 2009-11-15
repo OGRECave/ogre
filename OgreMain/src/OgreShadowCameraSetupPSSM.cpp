@@ -65,7 +65,7 @@ namespace Ogre
 		{
 			Real fraction = (Real)i / (Real)mSplitCount;
 			Real splitPoint = lambda * nearDist * Math::Pow(farDist / nearDist, fraction) +
-				(1.0 - lambda) * (nearDist + fraction * (farDist - nearDist));
+				(1.0f - lambda) * (nearDist + fraction * (farDist - nearDist));
 
 			mSplitPoints[i] = splitPoint;
 		}

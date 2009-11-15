@@ -512,8 +512,8 @@ namespace Ogre {
         restoreConfig();
 
         dlg = OGRE_NEW ConfigDialog();
-
-        if ((isOk = dlg->display()))
+		isOk = dlg->display();
+        if (isOk)
             saveConfig();
 
         OGRE_DELETE dlg;

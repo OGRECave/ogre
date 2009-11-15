@@ -630,7 +630,7 @@ namespace Ogre {
         if (mDisplaySkeleton && hasSkeleton())
         {
             int numBones = mSkeletonInstance->getNumBones();
-            for (int b = 0; b < numBones; ++b)
+            for (unsigned short b = 0; b < numBones; ++b)
             {
                 Bone* bone = mSkeletonInstance->getBone(b);
                 if(mRenderQueueIDSet)

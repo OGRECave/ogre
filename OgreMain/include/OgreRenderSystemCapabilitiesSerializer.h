@@ -156,7 +156,7 @@ namespace Ogre {
             mSetIntMethodDispatchTable.insert(SetIntMethodDispatchTable::value_type(keyword, method));
         }
 
-        inline void callSetIntMethod(String& keyword, int val)
+        inline void callSetIntMethod(String& keyword, ushort val)
         {
             SetIntMethodDispatchTable::iterator methodIter = mSetIntMethodDispatchTable.find(keyword);
             if (methodIter != mSetIntMethodDispatchTable.end())

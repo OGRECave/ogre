@@ -159,7 +159,6 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Object index out of bounds.", "SceneNode::getAttachedObject");
         }
-        return 0;
     }
     //-----------------------------------------------------------------------
     MovableObject* SceneNode::getAttachedObject(const String& name)
@@ -201,7 +200,6 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Object index out of bounds.", "SceneNode::getAttchedEntity");
         }
-        return 0;
 
     }
     //-----------------------------------------------------------------------

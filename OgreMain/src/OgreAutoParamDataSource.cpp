@@ -232,8 +232,8 @@ namespace Ogre {
 		const Light& l = getLight(index);
 		if (l.getType() == Light::LT_SPOTLIGHT)
 		{
-			return Vector4(Math::Cos(l.getSpotlightInnerAngle().valueRadians() * 0.5),
-						   Math::Cos(l.getSpotlightOuterAngle().valueRadians() * 0.5),
+			return Vector4(Math::Cos(l.getSpotlightInnerAngle().valueRadians() * 0.5f),
+						   Math::Cos(l.getSpotlightOuterAngle().valueRadians() * 0.5f),
 						   l.getSpotlightFalloff(),
 						   1.0);
 		}
@@ -547,9 +547,9 @@ namespace Ogre {
 				static_cast<unsigned short>(index))->_getTexturePtr();
             if (!tex.isNull())
             {
-                size.x = tex->getWidth();
-                size.y = tex->getHeight();
-                size.z = tex->getDepth();
+                size.x = static_cast<Real>(tex->getWidth());
+                size.y = static_cast<Real>(tex->getHeight());
+                size.z = static_cast<Real>(tex->getDepth());
             }
         }
 
@@ -983,12 +983,12 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	Real AutoParamDataSource::getViewportWidth() const
 	{ 
-		return mCurrentViewport->getActualWidth(); 
+		return static_cast<Real>(mCurrentViewport->getActualWidth()); 
 	}
 	//-----------------------------------------------------------------------------
 	Real AutoParamDataSource::getViewportHeight() const
 	{ 
-		return mCurrentViewport->getActualHeight(); 
+		return static_cast<Real>(mCurrentViewport->getActualHeight()); 
 	}
 	//-----------------------------------------------------------------------------
 	Real AutoParamDataSource::getInverseViewportWidth() const

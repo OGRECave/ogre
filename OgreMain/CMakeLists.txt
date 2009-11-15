@@ -45,7 +45,6 @@ set (HEADER_FILES
   include/OgreCodec.h
   include/OgreColourValue.h
   include/OgreCommon.h
-  include/OgreCompiler2Pass.h
   include/OgreCompositionPass.h
   include/OgreCompositionTargetPass.h
   include/OgreCompositionTechnique.h
@@ -54,9 +53,6 @@ set (HEADER_FILES
   include/OgreCompositorLogic.h
   include/OgreCompositorInstance.h
   include/OgreCompositorManager.h
-  include/OgreCompositorScriptCompiler.h
-  include/OgreCompositorScriptCompiler2.h
-  include/OgreCompositorSerializer.h
   include/OgreConfig.h
   include/OgreConfigDialog.h
   include/OgreConfigFile.h
@@ -94,6 +90,8 @@ set (HEADER_FILES
   include/OgreHardwareOcclusionQuery.h
   include/OgreHardwarePixelBuffer.h
   include/OgreHardwareVertexBuffer.h
+  include/OgreHeaderPrefix.h
+  include/OgreHeaderSuffix.h
   include/OgreHighLevelGpuProgram.h
   include/OgreHighLevelGpuProgramManager.h
   include/OgreImage.h
@@ -280,7 +278,6 @@ set (SOURCE_FILES
   src/OgreCodec.cpp
   src/OgreColourValue.cpp
   src/OgreCommon.cpp
-  src/OgreCompiler2Pass.cpp
   src/OgreCompositionPass.cpp
   src/OgreCompositionTargetPass.cpp
   src/OgreCompositionTechnique.cpp
@@ -288,8 +285,6 @@ set (SOURCE_FILES
   src/OgreCompositorChain.cpp
   src/OgreCompositorInstance.cpp
   src/OgreCompositorManager.cpp
-  src/OgreCompositorScriptCompiler.cpp
-  src/OgreCompositorSerializer.cpp
   src/OgreConfigFile.cpp
   src/OgreControllerManager.cpp
   src/OgreConvexBody.cpp

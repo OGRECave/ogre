@@ -241,28 +241,28 @@ namespace Ogre {
                 }
                 m = (m | 0x00800000) >> (1 - e);
         
-                return s | (m >> 13);
+                return static_cast<uint16>(s | (m >> 13));
             }
             else if (e == 0xff - (127 - 15))
             {
                 if (m == 0) // Inf
                 {
-                    return s | 0x7c00;
+                    return static_cast<uint16>(s | 0x7c00);
                 } 
                 else    // NAN
                 {
                     m >>= 13;
-                    return s | 0x7c00 | m | (m == 0);
+                    return static_cast<uint16>(s | 0x7c00 | m | (m == 0));
                 }
             }
             else
             {
                 if (e > 30) // Overflow
                 {
-                    return s | 0x7c00;
+                    return static_cast<uint16>(s | 0x7c00);
                 }
         
-                return s | (e << 10) | (m >> 13);
+                return static_cast<uint16>(s | (e << 10) | (m >> 13));
             }
         }
         

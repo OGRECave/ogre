@@ -55,7 +55,7 @@ namespace Ogre {
         const Viewport *viewport = camera->getViewport();
 
         // Get viewport area
-        Real viewportArea = viewport->getActualWidth() * viewport->getActualHeight();
+        Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
 
         // Get area of unprojected circle with object bounding radius
         Real boundingArea = Math::PI * Math::Sqr(movableObject->getBoundingRadius());

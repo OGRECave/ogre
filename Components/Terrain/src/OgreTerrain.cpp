@@ -47,6 +47,11 @@ THE SOFTWARE.
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreMaterialManager.h"
 
+
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+// we do lots of conversions here, casting them all is tedious & cluttered, we know what we're doing
+#   pragma warning (disable : 4244)
+#endif
 namespace Ogre
 {
 	//---------------------------------------------------------------------
@@ -790,8 +795,8 @@ namespace Ogre
 			17 vertices (per side) or 33. This makes buffer re-use much easier while
 			still giving the full range of LODs.
 		*/
-		mNumLodLevelsPerLeafNode = Math::Log2(mMaxBatchSize - 1) - Math::Log2(mMinBatchSize - 1) + 1;
-		mNumLodLevels = Math::Log2(mSize - 1) - Math::Log2(mMinBatchSize - 1) + 1;
+		mNumLodLevelsPerLeafNode = Math::Log2(mMaxBatchSize - 1.0f) - Math::Log2(mMinBatchSize - 1.0f) + 1.0f;
+		mNumLodLevels = Math::Log2(mSize - 1.0f) - Math::Log2(mMinBatchSize - 1.0f) + 1.0f;
 		//mTreeDepth = Math::Log2(mMaxBatchSize - 1) - Math::Log2(mMinBatchSize - 1) + 2;
 		mTreeDepth = mNumLodLevels - mNumLodLevelsPerLeafNode + 1;
 
@@ -1008,11 +1013,11 @@ namespace Ogre
 	float Terrain::getHeightAtTerrainPosition(Real x, Real y)
 	{
 		// get left / bottom points (rounded down)
-		Real factor = mSize - 1;
-		Real invFactor = 1.0 / factor;
+		Real factor = (Real)mSize - 1.0f;
+		Real invFactor = 1.0f / factor;
 
-		long startX = x * factor;
-		long startY = y * factor;
+		long startX = static_cast<long>(x * factor);
+		long startY = static_cast<long>(y * factor);
 		long endX = startX + 1;
 		long endY = startY + 1;
 
@@ -1961,10 +1966,10 @@ namespace Ogre
 			// W. de Boer 2000 calculation
 			// A = vp_near / abs(vp_top)
 			// A = 1 / tan(fovy*0.5)    (== 1 for fovy=45*2)
-			Real A = 1.0 / Math::Tan(cam->getFOVy() * 0.5);
+			Real A = 1.0f / Math::Tan(cam->getFOVy() * 0.5f);
 			// T = 2 * maxPixelError / vertRes
 			Real maxPixelError = TerrainGlobalOptions::getMaxPixelError() * cam->_getLodBiasInverse();
-			Real T = 2.0 * maxPixelError / (Real)vp->getActualHeight();
+			Real T = 2.0f * maxPixelError / (Real)vp->getActualHeight();
 
 			// CFactor = A / T
 			Real cFactor = A / T;
@@ -2047,7 +2052,7 @@ namespace Ogre
 		int zDir = (rayDirection.z < 0 ? -1 : 1);
 
 		Result result(true, Vector3::ZERO);
-		Real dummyHighValue = mSize * 10000;
+		Real dummyHighValue = (Real)mSize * 10000.0f;
 
 
 		while (cur.y >= (minHeight - 1e-3) && cur.y <= (maxHeight + 1e-3))
@@ -2114,10 +2119,10 @@ namespace Ogre
 	std::pair<bool, Vector3> Terrain::checkQuadIntersection(int x, int z, const Ray& ray)
 	{
 		// build the two planes belonging to the quad's triangles
-		Vector3 v1 (x, *getHeightData(x,z), z);
-		Vector3 v2 (x+1, *getHeightData(x+1,z), z);
-		Vector3 v3 (x, *getHeightData(x,z+1), z+1);
-		Vector3 v4 (x+1, *getHeightData(x+1,z+1), z+1);
+		Vector3 v1 ((Real)x, *getHeightData(x,z), (Real)z);
+		Vector3 v2 ((Real)x+1, *getHeightData(x+1,z), (Real)z);
+		Vector3 v3 ((Real)x, *getHeightData(x,z+1), (Real)z+1);
+		Vector3 v4 ((Real)x+1, *getHeightData(x+1,z+1), (Real)z+1);
 
 		Plane p1, p2;
 		bool oddRow = false;
@@ -2739,9 +2744,9 @@ namespace Ogre
 				long storeY = widenedRect.bottom - y - 1;
 
 				uint8* pStore = pData + ((storeY * widenedRect.width()) + storeX) * 3;
-				*pStore++ = (cumulativeNormal.x + 1.0) * 0.5 * 255.0;
-				*pStore++ = (cumulativeNormal.y + 1.0) * 0.5 * 255.0;
-				*pStore++ = (cumulativeNormal.z + 1.0) * 0.5 * 255.0;
+				*pStore++ = static_cast<uint8>((cumulativeNormal.x + 1.0f) * 0.5f * 255.0f);
+				*pStore++ = static_cast<uint8>((cumulativeNormal.y + 1.0f) * 0.5f * 255.0f);
+				*pStore++ = static_cast<uint8>((cumulativeNormal.z + 1.0f) * 0.5f * 255.0f);
 
 
 			}
@@ -2832,8 +2837,8 @@ namespace Ogre
 				// build rectangle which has rounded down & rounded up values
 				// remember right & bottom are exclusive
 				Rect mergeRect(
-					terrainHitPos.x * (mSize - 1), 
-					terrainHitPos.y * (mSize - 1), 
+					(long)(terrainHitPos.x * (mSize - 1)), 
+					(long)(terrainHitPos.y * (mSize - 1)), 
 					(long)(terrainHitPos.x * (float)(mSize - 1) + 0.5) + 1, 
 					(long)(terrainHitPos.y * (float)(mSize - 1) + 0.5) + 1
 					);
@@ -2882,7 +2887,7 @@ namespace Ogre
 
 		PixelBox* pixbox = OGRE_NEW PixelBox(widenedRect.width(), widenedRect.height(), 1, PF_L8, pData);
 
-		Real heightPad = (getMaxHeight() - getMinHeight()) * 1e-3;
+		Real heightPad = (getMaxHeight() - getMinHeight()) * 1.0e-3f;
 
 		for (long y = widenedRect.top; y < widenedRect.bottom; ++y)
 		{
@@ -3518,7 +3523,7 @@ namespace Ogre
 		// Move back half a square - if we're on the edge of the AABB we might
 		// miss the intersection otherwise; it's ok for everywhere else since
 		// we want the far intersection anyway
-		localRay.setOrigin(localRay.getPoint(-mWorldSize/mSize * 0.5));
+		localRay.setOrigin(localRay.getPoint(-mWorldSize/mSize * 0.5f));
 		if (Math::intersects(localRay, getAABB(), &dNear, &dFar))
 		{
 			// discard out of range

@@ -34,9 +34,7 @@ THE SOFTWARE.
 #include "OgreCompositionTargetPass.h"
 #include "OgreCompositionTechnique.h"
 #include "OgreRoot.h"
-#if OGRE_USE_NEW_COMPILERS == 1
-#  include "OgreScriptCompiler.h"
-#endif
+#include "OgreScriptCompiler.h"
 
 namespace Ogre {
 
@@ -50,23 +48,15 @@ CompositorManager& CompositorManager::getSingleton(void)
 	assert( ms_Singleton );  return ( *ms_Singleton );  
 }//-----------------------------------------------------------------------
 CompositorManager::CompositorManager():
-	mRectangle(0), OGRE_THREAD_POINTER_INIT(mSerializer)
+	mRectangle(0)
 {
 	initialise();
 
 	// Loading order (just after materials)
 	mLoadOrder = 110.0f;
-	// Scripting is supported by this manager
-#if OGRE_USE_NEW_COMPILERS == 0
-	mScriptPatterns.push_back("*.compositor");
-	ResourceGroupManager::getSingleton()._registerScriptLoader(this);
-#endif
 
 	// Resource type
 	mResourceType = "Compositor";
-
-	// Create default thread serializer instance (also non-threaded)
-	OGRE_THREAD_POINTER_SET(mSerializer, OGRE_NEW CompositorSerializer());
 
 	// Register with resource group manager
 	ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
@@ -78,8 +68,6 @@ CompositorManager::~CompositorManager()
     freeChains();
 	freePooledTextures(false);
 	OGRE_DELETE mRectangle;
-
-	OGRE_THREAD_POINTER_DELETE(mSerializer);
 
 	// Resources cleared by superclass
 	// Unregister with resource group manager
@@ -138,21 +126,7 @@ void CompositorManager::initialise(void)
 //-----------------------------------------------------------------------
 void CompositorManager::parseScript(DataStreamPtr& stream, const String& groupName)
 {
-#if OGRE_USE_NEW_COMPILERS == 1
 	ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
-#else // OGRE_USE_NEW_COMPILERS
-#  if OGRE_THREAD_SUPPORT
-	// check we have an instance for this thread
-	if (!OGRE_THREAD_POINTER_GET(mSerializer))
-	{
-		// create a new instance for this thread - will get deleted when
-		// the thread dies
-		OGRE_THREAD_POINTER_SET(mSerializer, OGRE_NEW CompositorSerializer());
-	}
-#  endif
-    OGRE_THREAD_POINTER_GET(mSerializer)->parseScript(stream, groupName);
-#endif // OGRE_USE_NEW_COMPILERS
-
 }
 //-----------------------------------------------------------------------
 CompositorChain *CompositorManager::getCompositorChain(Viewport *vp)
@@ -214,8 +188,8 @@ Renderable *CompositorManager::_getTexturedRectangle2D()
 	}
 	RenderSystem* rs = Root::getSingleton().getRenderSystem();
 	Viewport* vp = rs->_getViewport();
-	Real hOffset = rs->getHorizontalTexelOffset() / (0.5 * vp->getActualWidth());
-	Real vOffset = rs->getVerticalTexelOffset() / (0.5 * vp->getActualHeight());
+	Real hOffset = rs->getHorizontalTexelOffset() / (0.5f * vp->getActualWidth());
+	Real vOffset = rs->getVerticalTexelOffset() / (0.5f * vp->getActualHeight());
 	mRectangle->setCorners(-1 + hOffset, 1 - vOffset, 1 + hOffset, -1 - vOffset);
 	return mRectangle;
 }

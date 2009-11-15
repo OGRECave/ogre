@@ -433,7 +433,7 @@ namespace Ogre {
 		StringUtil::toLowerCase(vecparams[0]);
         if (vecparams[0] == "zorder")
         {
-            pOverlay->setZOrder(StringConverter::parseUnsignedInt(vecparams[1]));
+            pOverlay->setZOrder((ushort)StringConverter::parseUnsignedInt(vecparams[1]));
         }
         else
         {

@@ -146,6 +146,8 @@ namespace Ogre {
         /// Index of the item, only applicable for some elements like texture coords
         unsigned short mIndex;
     public:
+		/// Constructor, should not be called directly, only needed because of list
+		VertexElement() {}
         /// Constructor, should not be called directly, call VertexDeclaration::addElement
         VertexElement(unsigned short source, size_t offset, VertexElementType theType,
             VertexElementSemantic semantic, unsigned short index = 0);

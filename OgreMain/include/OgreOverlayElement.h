@@ -470,7 +470,7 @@ namespace Ogre {
         Real getSquaredViewDepth(const Camera* cam) const 
         { 
             (void)cam;
-            return 10000 - getZOrder(); 
+            return 10000.0f - (Real)getZOrder(); 
         }
 
         /** @copydoc Renderable::getLights */

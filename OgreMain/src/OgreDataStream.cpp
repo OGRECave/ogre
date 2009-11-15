@@ -96,7 +96,7 @@ namespace Ogre {
         size_t chunkSize = std::min(maxCount, (size_t)OGRE_STREAM_TEMP_SIZE-1);
         size_t totalCount = 0;
         size_t readCount; 
-        while (chunkSize && (readCount = read(tmpBuf, chunkSize)))
+        while (chunkSize && (readCount = read(tmpBuf, chunkSize)) != 0)
         {
             // Terminate
             tmpBuf[readCount] = '\0';
@@ -186,7 +186,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     MemoryDataStream::MemoryDataStream(void* pMem, size_t size, bool freeOnClose, bool readOnly)
-		: DataStream(readOnly ? READ : (READ | WRITE))
+		: DataStream(static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
         mData = mPos = static_cast<uchar*>(pMem);
         mSize = size;
@@ -197,7 +197,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     MemoryDataStream::MemoryDataStream(const String& name, void* pMem, size_t size, 
         bool freeOnClose, bool readOnly)
-        : DataStream(name, readOnly ? READ : (READ | WRITE))
+        : DataStream(name, static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
         mData = mPos = static_cast<uchar*>(pMem);
         mSize = size;
@@ -208,7 +208,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     MemoryDataStream::MemoryDataStream(DataStream& sourceStream, 
         bool freeOnClose, bool readOnly)
-        : DataStream(readOnly ? READ : (READ | WRITE))
+        : DataStream(static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
         // Copy data from incoming stream
         mSize = sourceStream.size();
@@ -221,7 +221,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     MemoryDataStream::MemoryDataStream(DataStreamPtr& sourceStream, 
         bool freeOnClose, bool readOnly)
-        : DataStream(readOnly ? READ : (READ | WRITE))
+        : DataStream(static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
         // Copy data from incoming stream
         mSize = sourceStream->size();
@@ -234,7 +234,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     MemoryDataStream::MemoryDataStream(const String& name, DataStream& sourceStream, 
         bool freeOnClose, bool readOnly)
-        : DataStream(name, readOnly ? READ : (READ | WRITE))
+        : DataStream(name, static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
         // Copy data from incoming stream
         mSize = sourceStream.size();
@@ -247,7 +247,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     MemoryDataStream::MemoryDataStream(const String& name, const DataStreamPtr& sourceStream, 
         bool freeOnClose, bool readOnly)
-        : DataStream(name, readOnly ? READ : (READ | WRITE))
+        : DataStream(name, static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
         // Copy data from incoming stream
         mSize = sourceStream->size();
@@ -259,7 +259,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     MemoryDataStream::MemoryDataStream(size_t size, bool freeOnClose, bool readOnly)
-        : DataStream(readOnly ? READ : (READ | WRITE))
+        : DataStream(static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
         mSize = size;
         mFreeOnClose = freeOnClose;
@@ -271,7 +271,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     MemoryDataStream::MemoryDataStream(const String& name, size_t size, 
         bool freeOnClose, bool readOnly)
-        : DataStream(name, readOnly ? READ : (READ | WRITE))
+        : DataStream(name, static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
         mSize = size;
         mFreeOnClose = freeOnClose;

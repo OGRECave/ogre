@@ -3,14 +3,19 @@
 
 #include "OgrePrerequisites.h"
 
+#if  OGRE_COMPILER == OGRE_COMPILER_MSVC
+#  pragma warning (push)
+// disable "instruction may be inaccurate on some Pentiums"
+#  pragma warning (disable : 4725)
+#endif
 namespace Ogre
 {
 
 /*=============================================================================
  ASM math routines posted by davepermen et al on flipcode forums
 =============================================================================*/
-const float pi = 4.0 * atan( 1.0 );
-const float half_pi = 0.5 * pi;
+const float pi = 4.0f * atan( 1.0f );
+const float half_pi = 0.5f * pi;
 
 /*=============================================================================
 	NO EXPLICIT RETURN REQUIRED FROM THESE METHODS!! 
@@ -320,7 +325,6 @@ float asm_ln( float r ) {
 
 #if  OGRE_COMPILER == OGRE_COMPILER_MSVC &&  OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_32
 
-    const float asm_e = 2.71828182846f;
     const float asm_1_div_log2_e = .693147180559f;
     const float asm_neg1_div_3 = -.33333333333333333333333333333f;
     const float asm_neg2_div_3 = -.66666666666666666666666666667f;
@@ -364,4 +368,9 @@ float asm_ln( float r ) {
 #	pragma warning( pop )
 #endif
 } // namespace
+
+#if  OGRE_COMPILER == OGRE_COMPILER_MSVC
+#  pragma warning (pop)
+#endif
+
 #endif

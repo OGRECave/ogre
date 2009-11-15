@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 // Precompiler options
 #include "OgrePrerequisites.h"
+#include "OgreHeaderPrefix.h"
 #include "OgreString.h"
 #include <exception>
 
@@ -345,4 +346,6 @@ namespace Ogre {
 	/** @} */
 
 } // Namespace Ogre
+
+#include "OgreHeaderSuffix.h"
 #endif

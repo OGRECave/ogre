@@ -299,7 +299,7 @@ namespace Ogre
 		size_t rawSize = (max_width + char_spacer) *
 							((max_height >> 6) + char_spacer) * glyphCount;
 
-		uint32 tex_side = static_cast<uint32>(Math::Sqrt(rawSize));
+		uint32 tex_side = static_cast<uint32>(Math::Sqrt((Real)rawSize));
 		// just in case the size might chop a glyph in half, add another glyph width/height
 		tex_side += std::max(max_width, (max_height>>6));
 		// Now round up to nearest power of two
@@ -317,7 +317,7 @@ namespace Ogre
 		}
 		finalWidth = roundUpSize;
 
-		Real textureAspect = finalWidth / finalHeight;
+		Real textureAspect = (Real)finalWidth / (Real)finalHeight;
 
 		const size_t pixel_bytes = 2;
 		size_t data_width = finalWidth * pixel_bytes;

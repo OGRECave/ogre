@@ -903,7 +903,8 @@ namespace Ogre {
 
 	}
 	//--------------------------------------------------------------------------
-	InstancedGeometry::InstancedObject::InstancedObject(int index,SkeletonInstance *skeleton, AnimationStateSet*animations):mIndex(index),
+	InstancedGeometry::InstancedObject::InstancedObject(unsigned short index,SkeletonInstance *skeleton, AnimationStateSet*animations)
+		: mIndex(index),
 		mTransformation(Matrix4::ZERO),
 		mOrientation(Quaternion::IDENTITY),
 		mScale(Vector3::UNIT_SCALE),
@@ -932,7 +933,8 @@ namespace Ogre {
 			
 	}
 	//--------------------------------------------------------------------------
-	InstancedGeometry::InstancedObject::InstancedObject(int index):mIndex(index),
+	InstancedGeometry::InstancedObject::InstancedObject(unsigned short index)
+		:mIndex(index),
 		mTransformation(Matrix4::ZERO),
 		mOrientation(Quaternion::IDENTITY),
 		mScale(Vector3::UNIT_SCALE),
@@ -1296,12 +1298,12 @@ namespace Ogre {
 	
 	
 	//--------------------------------------------------------------------------
-	void InstancedGeometry::BatchInstance::addInstancedObject(int index,InstancedObject* object)
+	void InstancedGeometry::BatchInstance::addInstancedObject(unsigned short index,InstancedObject* object)
 	{
 		mInstancesMap[index]=object;
 	}
 	//--------------------------------------------------------------------------
-	 InstancedGeometry::InstancedObject* InstancedGeometry::BatchInstance::isInstancedObjectPresent(int index)
+	 InstancedGeometry::InstancedObject* InstancedGeometry::BatchInstance::isInstancedObjectPresent(unsigned short index)
 	{
 		if (mInstancesMap.find(index)!=mInstancesMap.end())
 			return mInstancesMap[index];
@@ -1997,7 +1999,7 @@ namespace Ogre {
 		Ymax=0;
 		Zmax=0;
 		QueuedGeometry* precGeom = *(mQueuedGeometry.begin());
-		int index=0;
+		unsigned short index=0;
 		if( mParent->getLastIndex()!=0)
 			index=mParent->getLastIndex()+1;
 
@@ -2098,7 +2100,7 @@ namespace Ogre {
 						if(elem.getSemantic()==VES_TEXTURE_COORDINATES && elem.getIndex()==mTexCoordIndex)
 						{
 							isTheBufferWithIndex=true;
-							*pDstReal++=index;
+							*pDstReal++ = static_cast<float>(index);
 						}
 						else
 						{

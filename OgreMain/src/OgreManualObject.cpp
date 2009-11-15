@@ -956,7 +956,7 @@ namespace Ogre {
 				mat->load();
 				bool vertexProgram = false;
 				Technique* t = mat->getBestTechnique(0, *seci);
-				for (int p = 0; p < t->getNumPasses(); ++p)
+				for (unsigned short p = 0; p < t->getNumPasses(); ++p)
 				{
 					Pass* pass = t->getPass(p);
 					if (pass->hasVertexProgram())

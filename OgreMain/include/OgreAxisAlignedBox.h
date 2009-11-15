@@ -697,9 +697,9 @@ namespace Ogre {
 			assert( (mExtent == EXTENT_FINITE) && "Can't get center of a null or infinite AAB" );
 
 			return Vector3(
-				(mMaximum.x + mMinimum.x) * 0.5,
-				(mMaximum.y + mMinimum.y) * 0.5,
-				(mMaximum.z + mMinimum.z) * 0.5);
+				(mMaximum.x + mMinimum.x) * 0.5f,
+				(mMaximum.y + mMinimum.y) * 0.5f,
+				(mMaximum.z + mMinimum.z) * 0.5f);
 		}
 		/// Gets the size of the box
 		Vector3 getSize(void) const

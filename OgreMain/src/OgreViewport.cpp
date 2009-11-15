@@ -188,7 +188,7 @@ namespace Ogre {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "Setting Viewport orientation is only supported on iPhone",
                     __FUNCTION__);
-#endif
+#else
         mOrientation = orient;
         
         // Tell the render window to resize
@@ -203,6 +203,7 @@ namespace Ogre {
             rs->setConfigOption("Orientation", "Landscape Right");
         else if(orient == OR_PORTRAIT)
             rs->setConfigOption("Orientation", "Portrait");
+#endif
     }
     //---------------------------------------------------------------------
     void Viewport::setDimensions(Real left, Real top, Real width, Real height)

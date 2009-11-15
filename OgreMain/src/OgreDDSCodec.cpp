@@ -614,7 +614,7 @@ namespace Ogre {
 
 		if (header.caps.caps1 & DDSCAPS_MIPMAP)
 		{
-	        imgData->num_mipmaps = header.mipMapCount - 1;
+	        imgData->num_mipmaps = static_cast<ushort>(header.mipMapCount - 1);
 		}
 		else
 		{

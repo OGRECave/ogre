@@ -139,7 +139,7 @@ namespace Ogre {
             writeGeometry(pMesh->sharedVertexData);
 
         // Write Submeshes
-        for (int i = 0; i < pMesh->getNumSubMeshes(); ++i)
+        for (unsigned short i = 0; i < pMesh->getNumSubMeshes(); ++i)
         {
             LogManager::getSingleton().logMessage("Writing submesh...");
             writeSubMesh(pMesh->getSubMesh(i));
@@ -303,7 +303,7 @@ namespace Ogre {
     void MeshSerializerImpl::writeExtremes(const Mesh *pMesh)
     {
         bool has_extremes = false;
-        for (int i = 0; i < pMesh->getNumSubMeshes(); ++i)
+        for (unsigned short i = 0; i < pMesh->getNumSubMeshes(); ++i)
         {
             SubMesh *sm = pMesh->getSubMesh(i);
             if (sm->extremityPoints.empty())
@@ -1801,13 +1801,13 @@ namespace Ogre {
                             else
                             {
                                 edgeGroup.vertexData = pMesh->getSubMesh(
-                                    edgeGroup.vertexSet-1)->vertexData;
+                                    (unsigned short)edgeGroup.vertexSet-1)->vertexData;
                             }
                         }
                         else
                         {
                             edgeGroup.vertexData = pMesh->getSubMesh(
-                                edgeGroup.vertexSet)->vertexData;
+                                (unsigned short)edgeGroup.vertexSet)->vertexData;
                         }
                     }
                 }
@@ -3012,7 +3012,7 @@ namespace Ogre {
             for (size_t i = 0; i < dest->vertexCount; ++i)
             {
                 ++pFloat; // skip u
-                *pFloat = 1.0 - *pFloat; // v = 1 - v
+                *pFloat = 1.0f - *pFloat; // v = 1 - v
                 ++pFloat;
             }
 

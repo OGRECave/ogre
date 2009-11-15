@@ -603,7 +603,7 @@ namespace Ogre {
             }
 
 			if (frameTime > maxFrameTime)
-				maxFrameTime = frameTime;
+				maxFrameTime = (Real)frameTime;
 
         }
 
@@ -611,12 +611,12 @@ namespace Ogre {
 		if (mCurrentFrame == 0)
 			mAverageFrameTime = maxFrameTime;
 		else
-			mAverageFrameTime = (mAverageFrameTime + maxFrameTime) * 0.5;
+			mAverageFrameTime = (mAverageFrameTime + maxFrameTime) * 0.5f;
 
 		if ((Real)mMaxTotalFrameTime > mAverageFrameTime * 4)
 		{
 			mResetExtents = true;
-			mMaxTotalFrameTime = mAverageFrameTime;
+			mMaxTotalFrameTime = (ulong)mAverageFrameTime;
 		}
 		else
 			mResetExtents = false;
@@ -656,7 +656,7 @@ namespace Ogre {
                 g = *bIter;
                 g->show();
                 g->setCaption(String((*iter).name + " (" + StringConverter::toString((*iter).numCallsThisFrame) + ")"));
-                g->setLeft(10 + (*iter).hierarchicalLvl * 15);
+                g->setLeft(10 + (*iter).hierarchicalLvl * 15.0f);
 
                 // display the main bar that show the percentage of the frame time that this
                 // profile has taken

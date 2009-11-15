@@ -121,8 +121,8 @@ namespace Ogre {
 		const int NUM_VERTEX_ENTRIES = NUM_VERTICES * NUM_ENTRIES_PER_VERTEX;
 		const int NUM_INDICES = 3 * 2 * 6; // 3 indices per face * 2 faces per side * 6 sides
 
-		const Real CUBE_SIZE = 100.0;
-		const Real CUBE_HALF_SIZE = CUBE_SIZE / 2.0;
+		const Real CUBE_SIZE = 100.0f;
+		const Real CUBE_HALF_SIZE = CUBE_SIZE / 2.0f;
 
 		// Create 4 vertices per side instead of 6 that are shared for the whole cube.
 		// The reason for this is with only 6 vertices the normals will look bad

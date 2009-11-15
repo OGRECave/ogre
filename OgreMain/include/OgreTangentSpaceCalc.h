@@ -62,7 +62,8 @@ namespace Ogre
 			size_t faceIndex;
 			/// The old and new vertex index
 			VertexSplit splitVertex;
-
+		
+			IndexRemap() {} // to keep container happy
 			IndexRemap(size_t i, size_t f, const VertexSplit& s) : indexSet(i), faceIndex(f), splitVertex(s) {}
 		};
 		/** List of indexes that were remapped (split vertices).

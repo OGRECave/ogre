@@ -242,11 +242,11 @@ namespace Ogre
 		Real dot = Math::Abs(cam->getDerivedDirection().dotProduct(light->getDerivedDirection()));
 		if (dot >= mCosCamLightDirThreshold)
 		{
-			mOptAdjustFactorTweak = 1.0 + (20 * ((dot - mCosCamLightDirThreshold) / (1.0 - mCosCamLightDirThreshold)) );
+			mOptAdjustFactorTweak = 1.0f + (20.0f * ((dot - mCosCamLightDirThreshold) / (1.0f - mCosCamLightDirThreshold)) );
 		}
 		else
 		{
-			mOptAdjustFactorTweak = 1.0;
+			mOptAdjustFactorTweak = 1.0f;
 		}
 
 		// build scene bounding box

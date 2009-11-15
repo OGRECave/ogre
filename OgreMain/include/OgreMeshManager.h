@@ -197,7 +197,7 @@ namespace Ogre {
             const String& name, const String& groupName, const Plane& plane,
             Real width, Real height,
             int xsegments = 1, int ysegments = 1,
-            bool normals = true, int numTexCoordSets = 1,
+            bool normals = true, unsigned short numTexCoordSets = 1,
             Real uTile = 1.0f, Real vTile = 1.0f, const Vector3& upVector = Vector3::UNIT_Y,
 			HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
 			HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
@@ -258,7 +258,7 @@ namespace Ogre {
             const String& name, const String& groupName, const Plane& plane,
             Real width, Real height, Real curvature,
             int xsegments = 1, int ysegments = 1,
-            bool normals = true, int numTexCoordSets = 1,
+            bool normals = true, unsigned short numTexCoordSets = 1,
             Real uTile = 1.0f, Real vTile = 1.0f, const Vector3& upVector = Vector3::UNIT_Y,
             const Quaternion& orientation = Quaternion::IDENTITY,
 			HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
@@ -311,7 +311,7 @@ namespace Ogre {
 			const String& name, const String& groupName, const Plane& plane, 
 			Real width, Real height, Real bow = 0.5f, 
 			int xsegments = 1, int ysegments = 1,
-			bool normals = false, int numTexCoordSets = 1, 
+			bool normals = false, unsigned short numTexCoordSets = 1, 
 			Real xTile = 1.0f, Real yTile = 1.0f, const Vector3& upVector = Vector3::UNIT_Y,
 			HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
 			HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
@@ -431,7 +431,7 @@ namespace Ogre {
         
         /** Utility method for tessellating 2D meshes.
         */
-        void tesselate2DMesh(SubMesh* pSub, int meshWidth, int meshHeight, 
+        void tesselate2DMesh(SubMesh* pSub, unsigned short meshWidth, unsigned short meshHeight, 
 			bool doubleSided = false, 
 			HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
 			bool indexSysMem = false);
@@ -458,7 +458,7 @@ namespace Ogre {
             int xsegments;
             int ysegments;
             bool normals;
-            int numTexCoordSets;
+            unsigned short numTexCoordSets;
             Real xTile;
             Real yTile;
             Vector3 upVector;

@@ -1,11 +1,10 @@
-/*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+/*-------------------------------------------------------------------------
+This source file is a part of OGRE
+(Object-oriented Graphics Rendering Engine)
+
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2009 Torus Knot Software Ltd
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -22,27 +21,24 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
-*/
-#include "OgreStableHeaders.h"
-#include "OgreCompositorSerializer.h"
-#include "OgreCompositorScriptCompiler.h"
+THE SOFTWARE
+-------------------------------------------------------------------------*/
+#ifndef __OgreHeaderPrefix_H__
+#define __OgreHeaderPrefix_H__
 
-namespace Ogre {
-//-----------------------------------------------------------------------
-	CompositorSerializer::CompositorSerializer()
-	{
-        mScriptCompiler = OGRE_NEW CompositorScriptCompiler();
-	}
-//-----------------------------------------------------------------------
-	CompositorSerializer::~CompositorSerializer()
-	{
-	    OGRE_DELETE mScriptCompiler;
-	}
-//-----------------------------------------------------------------------
-    void CompositorSerializer::parseScript(DataStreamPtr& stream, const String& groupName)
-    {
-        mScriptCompiler->parseScript(stream,  groupName);
-    }
-}
+#include "OgrePrerequisites.h"
+
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+
+// restore previous warnings settings
+#   pragma warning (pop)
+
+
+#endif
+
+
+#endif
+// allow inclusion of prefix again now (this is scoped)
+#undef __OgreHeaderPrefix_H__
+
+

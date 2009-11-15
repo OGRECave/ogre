@@ -396,7 +396,7 @@ namespace Ogre
 	void GpuProgram::CmdPose::doSet(void* target, const String& val)
 	{
 		GpuProgram* t = static_cast<GpuProgram*>(target);
-		t->setPoseAnimationIncluded(StringConverter::parseUnsignedInt(val));
+		t->setPoseAnimationIncluded((ushort)StringConverter::parseUnsignedInt(val));
 	}
 	//-----------------------------------------------------------------------
 	String GpuProgram::CmdVTF::doGet(const void* target) const

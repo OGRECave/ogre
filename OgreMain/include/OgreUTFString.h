@@ -186,7 +186,7 @@ namespace Ogre {
 		//! size type used to indicate string size and character positions within the string
 		typedef size_t size_type;
 		//! the usual constant representing: not found, no limit, etc
-		static const size_type npos = ~0;
+		static const size_type npos = static_cast<size_type>(~0);
 
 		//! a single 32-bit Unicode character
 		typedef uint32 unicode_char;
@@ -968,7 +968,7 @@ namespace Ogre {
 		//! appends \a val to the end of the string
 		void push_back( wchar_t val ) {
 			// we do this because the Unicode method still preserves UTF-16 code points
-			mData.push_back( static_cast<unicode_char>( val ) );
+			mData.push_back( static_cast<code_point>( val ) );
 		}
 #endif
 		//! appends \a val to the end of the string
@@ -1987,7 +1987,7 @@ namespace Ogre {
 		making it a safe method of ensuring a stream that is unknown UTF-32 or UTF-16 is truly UTF-16.*/
 		static size_t _utf32_to_utf16( const unicode_char& in_uc, code_point out_cp[2] ) {
 			if ( in_uc <= 0xFFFF ) { // we blindly preserve sentinel values because our decoder understands them
-				out_cp[0] = in_uc;
+				out_cp[0] = static_cast<code_point>(in_uc);
 				return 1;
 			}
 			unicode_char uc = in_uc; // copy to writable buffer
@@ -1995,12 +1995,12 @@ namespace Ogre {
 			uc -= 0x10000; // subtract value offset
 
 			//process upper word
-			tmp = ( uc >> 10 ) & 0x03FF; // grab the upper 10 bits
+			tmp = static_cast<unsigned short>(( uc >> 10 ) & 0x03FF); // grab the upper 10 bits
 			tmp += 0xD800; // add encoding offset
 			out_cp[0] = tmp; // write
 
 			// process lower word
-			tmp = uc & 0x03FF; // grab the lower 10 bits
+			tmp = static_cast<unsigned short>(uc & 0x03FF); // grab the lower 10 bits
 			tmp += 0xDC00; // add encoding offset
 			out_cp[1] = tmp; // write
 
@@ -2090,30 +2090,30 @@ namespace Ogre {
 
 			//stuff all of the lower bits
 			for ( size_t i = len - 1; i > 0; i-- ) {
-				out_cp[i] = (( c ) & _cont_mask ) | _cont;
+				out_cp[i] = static_cast<unsigned char>((( c ) & _cont_mask ) | _cont);
 				c >>= 6;
 			}
 
 			//now write the header byte
 			switch ( len ) {
 			case 6:
-				out_cp[0] = (( c ) & _lead5_mask ) | _lead5;
+				out_cp[0] = static_cast<unsigned char>((( c ) & _lead5_mask ) | _lead5);
 				break;
 			case 5:
-				out_cp[0] = (( c ) & _lead4_mask ) | _lead4;
+				out_cp[0] = static_cast<unsigned char>((( c ) & _lead4_mask ) | _lead4);
 				break;
 			case 4:
-				out_cp[0] = (( c ) & _lead3_mask ) | _lead3;
+				out_cp[0] = static_cast<unsigned char>((( c ) & _lead3_mask ) | _lead3);
 				break;
 			case 3:
-				out_cp[0] = (( c ) & _lead2_mask ) | _lead2;
+				out_cp[0] = static_cast<unsigned char>((( c ) & _lead2_mask ) | _lead2);
 				break;
 			case 2:
-				out_cp[0] = (( c ) & _lead1_mask ) | _lead1;
+				out_cp[0] = static_cast<unsigned char>((( c ) & _lead1_mask ) | _lead1);
 				break;
 			case 1:
 			default:
-				out_cp[0] = ( c ) & 0x7F;
+				out_cp[0] = static_cast<unsigned char>(( c ) & 0x7F);
 				break;
 			}
 

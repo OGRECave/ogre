@@ -120,7 +120,7 @@ namespace Ogre
 	{
 		mLoadRadiusInCells = mLoadRadius / mCellSize;
 		mHoldRadiusInCells = mHoldRadius / mCellSize;
-		mBottomLeft = mOrigin - Vector2(mCellSize * mGridExtentsHorz * 0.5, mCellSize * mGridExtentsVert* 0.5);
+		mBottomLeft = mOrigin - Vector2(mCellSize * mGridExtentsHorz * 0.5f, mCellSize * mGridExtentsVert* 0.5f);
 	}
 	//---------------------------------------------------------------------
 	void Grid2DPageStrategyData::determineGridLocation(const Vector2& gridpos, uint16* row, uint16* col)
@@ -146,8 +146,8 @@ namespace Ogre
 	void Grid2DPageStrategyData::getMidPointGridSpace(uint16 row, uint16 col, Vector2& mid)
 	{
 		getBottomLeftGridSpace(row, col, mid);
-		mid.x += mCellSize * 0.5;
-		mid.y += mCellSize * 0.5;
+		mid.x += mCellSize * 0.5f;
+		mid.y += mCellSize * 0.5f;
 	}
 	//---------------------------------------------------------------------
 	void Grid2DPageStrategyData::getCornersGridSpace(uint16 row, uint16 col, Vector2* pFourPoints)

@@ -472,7 +472,7 @@ namespace Ogre
                     break;
                 case SET_INT_METHOD:
                 {
-                    int integer = StringConverter::parseInt(tokens[1]);
+                    ushort integer = (ushort)StringConverter::parseInt(tokens[1]);
                     callSetIntMethod(keyword, integer);
                     break;
                 }

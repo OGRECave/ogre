@@ -168,7 +168,7 @@ namespace Ogre {
             imgData->depth = 1;
             imgData->width = header.width;
             imgData->height = header.height;
-            imgData->num_mipmaps = header.numMipmaps;
+            imgData->num_mipmaps = static_cast<ushort>(header.numMipmaps);
 
             // PVRTC is a compressed format
             imgData->flags |= IF_COMPRESSED;

@@ -148,7 +148,7 @@ namespace Ogre
 		// This next section is to deal with cases where 2 threads are fighting over
 		// who gets to prepare / load - this will only usually happen if loading is escalated
 		bool keepChecking = true;
-		LoadingState old;
+		LoadingState old = LOADSTATE_UNLOADED;
 		while (keepChecking)
 		{
 			// quick check that avoids any synchronisation

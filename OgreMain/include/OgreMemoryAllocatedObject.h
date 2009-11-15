@@ -78,6 +78,7 @@ namespace Ogre
 		/// placement operator new
 		void* operator new(size_t sz, void* ptr)
 		{
+			(void) sz;
 			return ptr;
 		}
 

@@ -371,8 +371,8 @@ namespace Ogre {
                 vpWidth = (Real) (oMgr.getViewportWidth());
                 vpHeight = (Real) (oMgr.getViewportHeight());
 
-                mPixelScaleX = 1.0 / vpWidth;
-                mPixelScaleY = 1.0 / vpHeight;
+                mPixelScaleX = 1.0f / vpWidth;
+                mPixelScaleY = 1.0f / vpHeight;
 
                 mLeft = mPixelLeft * mPixelScaleX;
                 mTop = mPixelTop * mPixelScaleY;
@@ -389,8 +389,8 @@ namespace Ogre {
                 vpWidth = (Real) (oMgr.getViewportWidth());
                 vpHeight = (Real) (oMgr.getViewportHeight());
 
-                mPixelScaleX = 1.0 / (10000.0 * (vpWidth / vpHeight));
-                mPixelScaleY = 1.0 /  10000.0;
+                mPixelScaleX = 1.0f / (10000.0f * (vpWidth / vpHeight));
+                mPixelScaleY = 1.0f /  10000.0f;
 
                 mLeft = mPixelLeft * mPixelScaleX;
                 mTop = mPixelTop * mPixelScaleY;
@@ -580,8 +580,8 @@ namespace Ogre {
                 vpWidth = (Real) (oMgr.getViewportWidth());
                 vpHeight = (Real) (oMgr.getViewportHeight());
 
-                mPixelScaleX = 1.0 / vpWidth;
-                mPixelScaleY = 1.0 / vpHeight;
+                mPixelScaleX = 1.0f / vpWidth;
+                mPixelScaleY = 1.0f / vpHeight;
             }
             break;
 
@@ -592,8 +592,8 @@ namespace Ogre {
                 vpWidth = (Real) (oMgr.getViewportWidth());
                 vpHeight = (Real) (oMgr.getViewportHeight());
 
-                mPixelScaleX = 1.0 / (10000.0 * (vpWidth / vpHeight));
-                mPixelScaleY = 1.0 /  10000.0;
+                mPixelScaleX = 1.0f / (10000.0f * (vpWidth / vpHeight));
+                mPixelScaleY = 1.0f /  10000.0f;
             }
             break;
 
@@ -713,8 +713,8 @@ namespace Ogre {
 				vpWidth = vpWidth == 0.0f? 1.0f : vpWidth;
 				vpHeight = vpHeight == 0.0f? 1.0f : vpHeight;
 
-                mPixelScaleX = 1.0 / vpWidth;
-                mPixelScaleY = 1.0 / vpHeight;
+                mPixelScaleX = 1.0f / vpWidth;
+                mPixelScaleY = 1.0f / vpHeight;
 
                 if (mMetricsMode == GMM_RELATIVE)
                 {
@@ -733,8 +733,8 @@ namespace Ogre {
                 vpWidth = (Real) (oMgr.getViewportWidth());
                 vpHeight = (Real) (oMgr.getViewportHeight());
 
-                mPixelScaleX = 1.0 / (10000.0 * (vpWidth / vpHeight));
-                mPixelScaleY = 1.0 /  10000.0;
+                mPixelScaleX = 1.0f / (10000.0f * (vpWidth / vpHeight));
+                mPixelScaleY = 1.0f /  10000.0f;
 
                 if (mMetricsMode == GMM_RELATIVE)
                 {

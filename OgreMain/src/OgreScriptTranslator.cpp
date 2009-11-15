@@ -479,10 +479,6 @@ namespace Ogre{
 		CreateMaterialScriptCompilerEvent evt(node->file, obj->name, compiler->getResourceGroup());
 		bool processed = compiler->_fireEvent(&evt, (void*)&mMaterial);
 
-		if (obj->name == "DeferredShading/LightMaterial/GeometryShadow")
-		{
-			bool debug = true;
-		}
 		if(!processed)
 		{
 			mMaterial = reinterpret_cast<Ogre::Material*>(MaterialManager::getSingleton().create(obj->name, compiler->getResourceGroup()).get());
@@ -718,7 +714,7 @@ namespace Ogre{
 						AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0);
 						uint32 v = 0;
 						if(getUInt(*i0, &v))
-							mTechnique->setLodIndex(v);
+							mTechnique->setLodIndex(static_cast<unsigned short>(v));
 						else
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 								"lod_index cannot accept argument \"" + (*i0)->getValue() + "\"");
@@ -1477,7 +1473,7 @@ namespace Ogre{
 							{
 								uint32 val = 0;
 								if(getUInt(*i1, &val))
-									mPass->setAlphaRejectSettings(func, val);
+									mPass->setAlphaRejectSettings(func, static_cast<unsigned char>(val));
 								else
 									compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 										(*i1)->getValue() + " is not a valid integer");
@@ -1973,7 +1969,7 @@ namespace Ogre{
 					{
 						uint32 val = 0;
 						if(getUInt(prop->values.front(), &val))
-							mPass->setMaxSimultaneousLights(val);
+							mPass->setMaxSimultaneousLights(static_cast<unsigned short>(val));
 						else
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 								prop->values.front()->getValue() + " is not a valid integer");
@@ -1993,7 +1989,7 @@ namespace Ogre{
 					{
 						uint32 val = 0;
 						if(getUInt(prop->values.front(), &val))
-							mPass->setStartLight(val);
+							mPass->setStartLight(static_cast<unsigned short>(val));
 						else
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 								prop->values.front()->getValue() + " is not a valid integer");
@@ -2085,7 +2081,8 @@ namespace Ogre{
 											atom = (AtomAbstractNode*)(*i2).get();
 											if(StringConverter::isNumber(atom->value))
 											{
-												mPass->setLightCountPerIteration(StringConverter::parseInt(atom->value));
+												mPass->setLightCountPerIteration(
+													static_cast<unsigned short>(StringConverter::parseInt(atom->value)));
 												
 												AbstractNodeList::const_iterator i3 = getNodeAt(prop->values, 3);
 												if(i3 != prop->values.end() && (*i3)->type == ANT_ATOM)
@@ -4375,7 +4372,7 @@ namespace Ogre{
 							{
 								// Find the number of parameters
 								bool isValid = true;
-								GpuProgramParameters::ElementType type;
+								GpuProgramParameters::ElementType type = GpuProgramParameters::ET_REAL;
 								int count = 0;
 								if(atom1->value.find("float") != String::npos)
 								{
@@ -5783,7 +5780,7 @@ namespace Ogre{
 						uint32 val;
 						if(getUInt(prop->values.front(), &val))
 						{
-							mPass->setFirstRenderQueue(val);
+							mPass->setFirstRenderQueue(static_cast<uint8>(val));
 						}
 						else
 						{
@@ -5807,7 +5804,7 @@ namespace Ogre{
 						uint32 val;
 						if(getUInt(prop->values.front(), &val))
 						{
-							mPass->setLastRenderQueue(val);
+							mPass->setLastRenderQueue(static_cast<uint8>(val));
 						}
 						else
 						{

@@ -851,7 +851,7 @@ namespace Ogre {
                 {
                     // If so, write weight
                     *pWeight++ = i->second.weight;
-                    *pIndex++ = boneIndexToBlendIndexMap[i->second.boneIndex];
+                    *pIndex++ = static_cast<unsigned char>(boneIndexToBlendIndexMap[i->second.boneIndex]);
                     ++i;
                 }
                 else
@@ -1443,7 +1443,7 @@ namespace Ogre {
             return;
 
         // Loop over LODs
-        for (unsigned int lodIndex = 0; lodIndex < mMeshLodUsageList.size(); ++lodIndex)
+        for (unsigned short lodIndex = 0; lodIndex < (unsigned short)mMeshLodUsageList.size(); ++lodIndex)
         {
             // use getLodLevel to enforce loading of manual mesh lods
             MeshLodUsage& usage = const_cast<MeshLodUsage&>(getLodLevel(lodIndex));
@@ -1591,7 +1591,7 @@ namespace Ogre {
         mPreparedForShadowVolumes = true;
     }
     //---------------------------------------------------------------------
-    EdgeData* Mesh::getEdgeList(unsigned int lodIndex)
+    EdgeData* Mesh::getEdgeList(unsigned short lodIndex)
     {
         // Build edge list on demand
         if (!mEdgeListsBuilt && mAutoBuildEdgeLists)
@@ -1602,7 +1602,7 @@ namespace Ogre {
         return getLodLevel(lodIndex).edgeData;
     }
     //---------------------------------------------------------------------
-    const EdgeData* Mesh::getEdgeList(unsigned int lodIndex) const
+    const EdgeData* Mesh::getEdgeList(unsigned short lodIndex) const
     {
         return getLodLevel(lodIndex).edgeData;
     }

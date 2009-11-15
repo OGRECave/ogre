@@ -119,7 +119,7 @@ namespace Ogre {
         // Calculate bounds based on control points
         vector<Vector3>::type::const_iterator ctli;
         Vector3 min = Vector3::ZERO, max = Vector3::UNIT_SCALE;
-        Real maxSqRadius;
+        Real maxSqRadius = 0;
         bool first = true;
         for (ctli = mVecCtlPoints.begin(); ctli != mVecCtlPoints.end(); ++ctli)
         {
@@ -658,9 +658,9 @@ namespace Ogre {
         elemPos->baseVertexPointerToElement(pLeft, &pLeftReal);
         elemPos->baseVertexPointerToElement(pRight, &pRightReal);
 
-        *pDestReal++ = (*pLeftReal++ + *pRightReal++) * 0.5;
-        *pDestReal++ = (*pLeftReal++ + *pRightReal++) * 0.5;
-        *pDestReal++ = (*pLeftReal++ + *pRightReal++) * 0.5;
+        *pDestReal++ = (*pLeftReal++ + *pRightReal++) * 0.5f;
+        *pDestReal++ = (*pLeftReal++ + *pRightReal++) * 0.5f;
+        *pDestReal++ = (*pLeftReal++ + *pRightReal++) * 0.5f;
 
         if (elemNorm)
         {
@@ -668,9 +668,9 @@ namespace Ogre {
             elemNorm->baseVertexPointerToElement(pLeft, &pLeftReal);
             elemNorm->baseVertexPointerToElement(pRight, &pRightReal);
             Vector3 norm;
-            norm.x = (*pLeftReal++ + *pRightReal++) * 0.5;
-            norm.y = (*pLeftReal++ + *pRightReal++) * 0.5;
-            norm.z = (*pLeftReal++ + *pRightReal++) * 0.5;
+            norm.x = (*pLeftReal++ + *pRightReal++) * 0.5f;
+            norm.y = (*pLeftReal++ + *pRightReal++) * 0.5f;
+            norm.z = (*pLeftReal++ + *pRightReal++) * 0.5f;
             norm.normalise();
 
             *pDestReal++ = norm.x;
@@ -696,7 +696,7 @@ namespace Ogre {
             elemTex0->baseVertexPointerToElement(pRight, &pRightReal);
 
             for (size_t dim = 0; dim < VertexElement::getTypeCount(elemTex0->getType()); ++dim)
-                *pDestReal++ = ((*pLeftReal++) + (*pRightReal++)) * 0.5;
+                *pDestReal++ = ((*pLeftReal++) + (*pRightReal++)) * 0.5f;
         }
         if (elemTex1)
         {
@@ -705,7 +705,7 @@ namespace Ogre {
             elemTex1->baseVertexPointerToElement(pRight, &pRightReal);
 
             for (size_t dim = 0; dim < VertexElement::getTypeCount(elemTex1->getType()); ++dim)
-                *pDestReal++ = ((*pLeftReal++) + (*pRightReal++)) * 0.5;
+                *pDestReal++ = ((*pLeftReal++) + (*pRightReal++)) * 0.5f;
         }
     }
 

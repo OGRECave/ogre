@@ -1071,19 +1071,19 @@ namespace Ogre {
                 ((uint16*)dest)[3] = Bitwise::floatToHalf(a);
                 break;
             case PF_SHORT_RGB:
-				((uint16*)dest)[0] = Bitwise::floatToFixed(r, 16);
-                ((uint16*)dest)[1] = Bitwise::floatToFixed(g, 16);
-                ((uint16*)dest)[2] = Bitwise::floatToFixed(b, 16);
+				((uint16*)dest)[0] = (uint16)Bitwise::floatToFixed(r, 16);
+                ((uint16*)dest)[1] = (uint16)Bitwise::floatToFixed(g, 16);
+                ((uint16*)dest)[2] = (uint16)Bitwise::floatToFixed(b, 16);
                 break;
 			case PF_SHORT_RGBA:
-				((uint16*)dest)[0] = Bitwise::floatToFixed(r, 16);
-                ((uint16*)dest)[1] = Bitwise::floatToFixed(g, 16);
-                ((uint16*)dest)[2] = Bitwise::floatToFixed(b, 16);
-                ((uint16*)dest)[3] = Bitwise::floatToFixed(a, 16);
+				((uint16*)dest)[0] = (uint16)Bitwise::floatToFixed(r, 16);
+                ((uint16*)dest)[1] = (uint16)Bitwise::floatToFixed(g, 16);
+                ((uint16*)dest)[2] = (uint16)Bitwise::floatToFixed(b, 16);
+                ((uint16*)dest)[3] = (uint16)Bitwise::floatToFixed(a, 16);
 				break;
 			case PF_BYTE_LA:
-				((uint8*)dest)[0] = Bitwise::floatToFixed(r, 8);
-                ((uint8*)dest)[1] = Bitwise::floatToFixed(a, 8);
+				((uint8*)dest)[0] = (uint8)Bitwise::floatToFixed(r, 8);
+                ((uint8*)dest)[1] = (uint8)Bitwise::floatToFixed(a, 8);
 				break;
             default:
                 // Not yet supported
@@ -1110,18 +1110,18 @@ namespace Ogre {
             if(des.flags & PFF_LUMINANCE)
             {
                 // Luminance format -- only rbits used
-                *r = *g = *b = Bitwise::fixedToFixed(
+                *r = *g = *b = (uint8)Bitwise::fixedToFixed(
                     (value & des.rmask)>>des.rshift, des.rbits, 8);
             }
             else
             {
-                *r = Bitwise::fixedToFixed((value & des.rmask)>>des.rshift, des.rbits, 8);
-                *g = Bitwise::fixedToFixed((value & des.gmask)>>des.gshift, des.gbits, 8);
-                *b = Bitwise::fixedToFixed((value & des.bmask)>>des.bshift, des.bbits, 8);
+                *r = (uint8)Bitwise::fixedToFixed((value & des.rmask)>>des.rshift, des.rbits, 8);
+                *g = (uint8)Bitwise::fixedToFixed((value & des.gmask)>>des.gshift, des.gbits, 8);
+                *b = (uint8)Bitwise::fixedToFixed((value & des.bmask)>>des.bshift, des.bbits, 8);
             }
             if(des.flags & PFF_HASALPHA)
             {
-                *a = Bitwise::fixedToFixed((value & des.amask)>>des.ashift, des.abits, 8);
+                *a = (uint8)Bitwise::fixedToFixed((value & des.amask)>>des.ashift, des.abits, 8);
             }
             else
             {
@@ -1131,10 +1131,10 @@ namespace Ogre {
             // Do the operation with the more generic floating point
             float rr, gg, bb, aa;
             unpackColour(&rr,&gg,&bb,&aa, pf, src);
-            *r = Bitwise::floatToFixed(rr, 8);
-            *g = Bitwise::floatToFixed(gg, 8);
-            *b = Bitwise::floatToFixed(bb, 8);
-            *a = Bitwise::floatToFixed(aa, 8);
+            *r = (uint8)Bitwise::floatToFixed(rr, 8);
+            *g = (uint8)Bitwise::floatToFixed(gg, 8);
+            *b = (uint8)Bitwise::floatToFixed(bb, 8);
+            *a = (uint8)Bitwise::floatToFixed(aa, 8);
         }
     }
     //-----------------------------------------------------------------------

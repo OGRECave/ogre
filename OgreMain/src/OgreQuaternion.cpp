@@ -64,9 +64,9 @@ namespace Ogre {
         if ( fTrace > 0.0 )
         {
             // |w| > 1/2, may as well choose w > 1/2
-            fRoot = Math::Sqrt(fTrace + 1.0);  // 2w
-            w = 0.5*fRoot;
-            fRoot = 0.5/fRoot;  // 1/(4w)
+            fRoot = Math::Sqrt(fTrace + 1.0f);  // 2w
+            w = 0.5f*fRoot;
+            fRoot = 0.5f/fRoot;  // 1/(4w)
             x = (kRot[2][1]-kRot[1][2])*fRoot;
             y = (kRot[0][2]-kRot[2][0])*fRoot;
             z = (kRot[1][0]-kRot[0][1])*fRoot;
@@ -83,10 +83,10 @@ namespace Ogre {
             size_t j = s_iNext[i];
             size_t k = s_iNext[j];
 
-            fRoot = Math::Sqrt(kRot[i][i]-kRot[j][j]-kRot[k][k] + 1.0);
+            fRoot = Math::Sqrt(kRot[i][i]-kRot[j][j]-kRot[k][k] + 1.0f);
             Real* apkQuat[3] = { &x, &y, &z };
-            *apkQuat[i] = 0.5*fRoot;
-            fRoot = 0.5/fRoot;
+            *apkQuat[i] = 0.5f*fRoot;
+            fRoot = 0.5f/fRoot;
             w = (kRot[k][j]-kRot[j][k])*fRoot;
             *apkQuat[j] = (kRot[j][i]+kRot[i][j])*fRoot;
             *apkQuat[k] = (kRot[k][i]+kRot[i][k])*fRoot;
@@ -95,9 +95,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Quaternion::ToRotationMatrix (Matrix3& kRot) const
     {
-        Real fTx  = 2.0*x;
-        Real fTy  = 2.0*y;
-        Real fTz  = 2.0*z;
+        Real fTx  = 2.0f*x;
+        Real fTy  = 2.0f*y;
+        Real fTz  = 2.0f*z;
         Real fTwx = fTx*w;
         Real fTwy = fTy*w;
         Real fTwz = fTz*w;
@@ -108,15 +108,15 @@ namespace Ogre {
         Real fTyz = fTz*y;
         Real fTzz = fTz*z;
 
-        kRot[0][0] = 1.0-(fTyy+fTzz);
+        kRot[0][0] = 1.0f-(fTyy+fTzz);
         kRot[0][1] = fTxy-fTwz;
         kRot[0][2] = fTxz+fTwy;
         kRot[1][0] = fTxy+fTwz;
-        kRot[1][1] = 1.0-(fTxx+fTzz);
+        kRot[1][1] = 1.0f-(fTxx+fTzz);
         kRot[1][2] = fTyz-fTwx;
         kRot[2][0] = fTxz-fTwy;
         kRot[2][1] = fTyz+fTwx;
-        kRot[2][2] = 1.0-(fTxx+fTyy);
+        kRot[2][2] = 1.0f-(fTxx+fTyy);
     }
     //-----------------------------------------------------------------------
     void Quaternion::FromAngleAxis (const Radian& rfAngle,
@@ -210,8 +210,8 @@ namespace Ogre {
     Vector3 Quaternion::xAxis(void) const
     {
         //Real fTx  = 2.0*x;
-        Real fTy  = 2.0*y;
-        Real fTz  = 2.0*z;
+        Real fTy  = 2.0f*y;
+        Real fTz  = 2.0f*z;
         Real fTwy = fTy*w;
         Real fTwz = fTz*w;
         Real fTxy = fTy*x;
@@ -219,14 +219,14 @@ namespace Ogre {
         Real fTyy = fTy*y;
         Real fTzz = fTz*z;
 
-        return Vector3(1.0-(fTyy+fTzz), fTxy+fTwz, fTxz-fTwy);
+        return Vector3(1.0f-(fTyy+fTzz), fTxy+fTwz, fTxz-fTwy);
     }
     //-----------------------------------------------------------------------
     Vector3 Quaternion::yAxis(void) const
     {
-        Real fTx  = 2.0*x;
-        Real fTy  = 2.0*y;
-        Real fTz  = 2.0*z;
+        Real fTx  = 2.0f*x;
+        Real fTy  = 2.0f*y;
+        Real fTz  = 2.0f*z;
         Real fTwx = fTx*w;
         Real fTwz = fTz*w;
         Real fTxx = fTx*x;
@@ -234,14 +234,14 @@ namespace Ogre {
         Real fTyz = fTz*y;
         Real fTzz = fTz*z;
 
-        return Vector3(fTxy-fTwz, 1.0-(fTxx+fTzz), fTyz+fTwx);
+        return Vector3(fTxy-fTwz, 1.0f-(fTxx+fTzz), fTyz+fTwx);
     }
     //-----------------------------------------------------------------------
     Vector3 Quaternion::zAxis(void) const
     {
-        Real fTx  = 2.0*x;
-        Real fTy  = 2.0*y;
-        Real fTz  = 2.0*z;
+        Real fTx  = 2.0f*x;
+        Real fTy  = 2.0f*y;
+        Real fTz  = 2.0f*z;
         Real fTwx = fTx*w;
         Real fTwy = fTy*w;
         Real fTxx = fTx*x;
@@ -249,7 +249,7 @@ namespace Ogre {
         Real fTyy = fTy*y;
         Real fTyz = fTz*y;
 
-        return Vector3(fTxz+fTwy, fTyz-fTwx, 1.0-(fTxx+fTyy));
+        return Vector3(fTxz+fTwy, fTyz-fTwx, 1.0f-(fTxx+fTyy));
     }
     //-----------------------------------------------------------------------
     void Quaternion::ToAxes (Vector3& xaxis, Vector3& yaxis, Vector3& zaxis) const
@@ -327,7 +327,7 @@ namespace Ogre {
         Real fNorm = w*w+x*x+y*y+z*z;
         if ( fNorm > 0.0 )
         {
-            Real fInvNorm = 1.0/fNorm;
+            Real fInvNorm = 1.0f/fNorm;
             return Quaternion(w*fInvNorm,-x*fInvNorm,-y*fInvNorm,-z*fInvNorm);
         }
         else
@@ -480,8 +480,8 @@ namespace Ogre {
 
         Real fSin = Math::Sin(fAngle);
         Radian fPhase ( Math::PI*iExtraSpins*fT );
-        Real fInvSin = 1.0/fSin;
-        Real fCoeff0 = Math::Sin((1.0-fT)*fAngle - fPhase)*fInvSin;
+        Real fInvSin = 1.0f/fSin;
+        Real fCoeff0 = Math::Sin((1.0f-fT)*fAngle - fPhase)*fInvSin;
         Real fCoeff1 = Math::Sin(fT*fAngle + fPhase)*fInvSin;
         return fCoeff0*rkP + fCoeff1*rkQ;
     }
@@ -507,7 +507,7 @@ namespace Ogre {
         const Quaternion& rkP, const Quaternion& rkA,
         const Quaternion& rkB, const Quaternion& rkQ, bool shortestPath)
     {
-        Real fSlerpT = 2.0*fT*(1.0-fT);
+        Real fSlerpT = 2.0f*fT*(1.0f-fT);
         Quaternion kSlerpP = Slerp(fT, rkP, rkQ, shortestPath);
         Quaternion kSlerpQ = Slerp(fT, rkA, rkB);
         return Slerp(fSlerpT, kSlerpP ,kSlerpQ);
@@ -528,8 +528,8 @@ namespace Ogre {
 			// roll = atan2(localx.y, localx.x)
 			// pick parts of xAxis() implementation that we need
 //			Real fTx  = 2.0*x;
-			Real fTy  = 2.0*y;
-			Real fTz  = 2.0*z;
+			Real fTy  = 2.0f*y;
+			Real fTz  = 2.0f*z;
 			Real fTwz = fTz*w;
 			Real fTxy = fTy*x;
 			Real fTyy = fTy*y;
@@ -537,7 +537,7 @@ namespace Ogre {
 
 			// Vector3(1.0-(fTyy+fTzz), fTxy+fTwz, fTxz-fTwy);
 
-			return Radian(Math::ATan2(fTxy+fTwz, 1.0-(fTyy+fTzz)));
+			return Radian(Math::ATan2(fTxy+fTwz, 1.0f-(fTyy+fTzz)));
 
 		}
 		else
@@ -552,16 +552,16 @@ namespace Ogre {
 		{
 			// pitch = atan2(localy.z, localy.y)
 			// pick parts of yAxis() implementation that we need
-			Real fTx  = 2.0*x;
-//			Real fTy  = 2.0*y;
-			Real fTz  = 2.0*z;
+			Real fTx  = 2.0f*x;
+//			Real fTy  = 2.0f*y;
+			Real fTz  = 2.0f*z;
 			Real fTwx = fTx*w;
 			Real fTxx = fTx*x;
 			Real fTyz = fTz*y;
 			Real fTzz = fTz*z;
 
 			// Vector3(fTxy-fTwz, 1.0-(fTxx+fTzz), fTyz+fTwx);
-			return Radian(Math::ATan2(fTyz+fTwx, 1.0-(fTxx+fTzz)));
+			return Radian(Math::ATan2(fTyz+fTwx, 1.0f-(fTxx+fTzz)));
 		}
 		else
 		{
@@ -576,9 +576,9 @@ namespace Ogre {
 		{
 			// yaw = atan2(localz.x, localz.z)
 			// pick parts of zAxis() implementation that we need
-			Real fTx  = 2.0*x;
-			Real fTy  = 2.0*y;
-			Real fTz  = 2.0*z;
+			Real fTx  = 2.0f*x;
+			Real fTy  = 2.0f*y;
+			Real fTz  = 2.0f*z;
 			Real fTwy = fTy*w;
 			Real fTxx = fTx*x;
 			Real fTxz = fTz*x;
@@ -586,7 +586,7 @@ namespace Ogre {
 
 			// Vector3(fTxz+fTwy, fTyz-fTwx, 1.0-(fTxx+fTyy));
 
-			return Radian(Math::ATan2(fTxz+fTwy, 1.0-(fTxx+fTyy)));
+			return Radian(Math::ATan2(fTxz+fTwy, 1.0f-(fTxx+fTyy)));
 
 		}
 		else

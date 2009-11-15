@@ -283,8 +283,8 @@ namespace Ogre {
 			/// Records the last frame in which animation was updated
 			unsigned long mFrameAnimationLastUpdated;
 		public:
-			InstancedObject(int index);
-			InstancedObject(int index,SkeletonInstance *skeleton,AnimationStateSet*animations);
+			InstancedObject(unsigned short index);
+			InstancedObject(unsigned short index,SkeletonInstance *skeleton,AnimationStateSet*animations);
 			~InstancedObject();
 			void setPosition( Vector3  position);
 			Vector3 & getPosition(void);
@@ -430,7 +430,7 @@ namespace Ogre {
 
 			/// list of LOD Buckets in this BatchInstance
 			typedef vector<LODBucket*>::type LODBucketList;
-			typedef map<int, InstancedObject*>::type ObjectsMap;
+			typedef map<unsigned short, InstancedObject*>::type ObjectsMap;
 			typedef MapIterator<ObjectsMap> InstancedObjectIterator;
 		protected:
 			
@@ -509,8 +509,8 @@ namespace Ogre {
 			void updateContainers(LODBucket* bucket );
 			/// attach the BatchInstance to the scene
 			void attachToScene();
-			void addInstancedObject(int index, InstancedObject* object);
-			InstancedObject*  isInstancedObjectPresent(int index);
+			void addInstancedObject(unsigned short index, InstancedObject* object);
+			InstancedObject*  isInstancedObjectPresent(unsigned short index);
 			InstancedObjectIterator getObjectIterator();
 			SceneNode*getSceneNode(void){return mNode;}
 			ObjectsMap& getInstancesMap(void){return  mInstancesMap;}

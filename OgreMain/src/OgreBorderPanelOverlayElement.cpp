@@ -152,7 +152,7 @@ namespace Ogre {
 					mRenderOp2.indexData->indexBuffer->getSizeInBytes(), 
 					HardwareBuffer::HBL_DISCARD) );
 
-			for (int cell = 0; cell < 8; ++cell)
+			for (ushort cell = 0; cell < 8; ++cell)
 			{
 				ushort base = cell * 4;
 				*pIdx++ = base;
@@ -235,7 +235,7 @@ namespace Ogre {
         if (mMetricsMode != GMM_RELATIVE)
         {
             mPixelLeftBorderSize = mPixelRightBorderSize = 
-                mPixelTopBorderSize = mPixelBottomBorderSize = static_cast<unsigned>(size);
+                mPixelTopBorderSize = mPixelBottomBorderSize = static_cast<unsigned short>(size);
         }
         else
         {
@@ -249,8 +249,8 @@ namespace Ogre {
     {
         if (mMetricsMode != GMM_RELATIVE)
         {
-            mPixelLeftBorderSize = mPixelRightBorderSize = static_cast<unsigned>(sides);
-            mPixelTopBorderSize = mPixelBottomBorderSize = static_cast<unsigned>(topAndBottom);
+            mPixelLeftBorderSize = mPixelRightBorderSize = static_cast<unsigned short>(sides);
+            mPixelTopBorderSize = mPixelBottomBorderSize = static_cast<unsigned short>(topAndBottom);
         }
         else
         {
@@ -266,10 +266,10 @@ namespace Ogre {
     {
         if (mMetricsMode != GMM_RELATIVE)
         {
-            mPixelLeftBorderSize = static_cast<unsigned>(left);
-            mPixelRightBorderSize = static_cast<unsigned>(right);
-            mPixelTopBorderSize = static_cast<unsigned>(top);
-            mPixelBottomBorderSize = static_cast<unsigned>(bottom);
+            mPixelLeftBorderSize = static_cast<unsigned short>(left);
+            mPixelRightBorderSize = static_cast<unsigned short>(right);
+            mPixelTopBorderSize = static_cast<unsigned short>(top);
+            mPixelBottomBorderSize = static_cast<unsigned short>(bottom);
         }
         else
         {
@@ -621,10 +621,10 @@ namespace Ogre {
         PanelOverlayElement::setMetricsMode(gmm);
         if (gmm != GMM_RELATIVE)
         {
-            mPixelBottomBorderSize = static_cast<unsigned>(mBottomBorderSize);
-            mPixelLeftBorderSize = static_cast<unsigned>(mLeftBorderSize);
-            mPixelRightBorderSize = static_cast<unsigned>(mRightBorderSize);
-            mPixelTopBorderSize = static_cast<unsigned>(mTopBorderSize);
+            mPixelBottomBorderSize = static_cast<unsigned short>(mBottomBorderSize);
+            mPixelLeftBorderSize = static_cast<unsigned short>(mLeftBorderSize);
+            mPixelRightBorderSize = static_cast<unsigned short>(mRightBorderSize);
+            mPixelTopBorderSize = static_cast<unsigned short>(mTopBorderSize);
         }
     }
     //-----------------------------------------------------------------------

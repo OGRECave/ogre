@@ -184,7 +184,7 @@ namespace Ogre
 
 		// Compare vertices. They may differ in its starting position.
 		// find start
-		size_t start;
+		size_t start = 0;
 		bool foundStart = false;
 		for (size_t i = 0; i < getVertexCount(); ++i )
 		{	

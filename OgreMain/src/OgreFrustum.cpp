@@ -49,7 +49,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Frustum::Frustum() : 
         mProjType(PT_PERSPECTIVE), 
-        mFOVy(Radian(Math::PI/4.0)), 
+        mFOVy(Radian(Math::PI/4.0f)), 
         mFarDist(100000.0f), 
         mNearDist(100.0f), 
         mAspect(1.33333333333333f), 
@@ -373,8 +373,8 @@ namespace Ogre {
 			else
 			{
 				// Unknown how to apply frustum offset to orthographic camera, just ignore here
-				Real half_w = getOrthoWindowWidth() * 0.5;
-				Real half_h = getOrthoWindowHeight() * 0.5;
+				Real half_w = getOrthoWindowWidth() * 0.5f;
+				Real half_h = getOrthoWindowHeight() * 0.5f;
 
 				left   = - half_w;
 				right  = + half_w;
@@ -1086,9 +1086,9 @@ namespace Ogre {
 			// b = -2rLx
 			// c = r^2 - Lz^2
 			Real a = Lxz;
-			Real b = -2.0 * r * eyeSpacePos.x;
+			Real b = -2.0f * r * eyeSpacePos.x;
 			Real c = rsq - Math::Sqr(eyeSpacePos.z);
-			Real D = b*b - 4*a*c;
+			Real D = b*b - 4.0f*a*c;
 
 			// two roots?
 			if (D > 0)
@@ -1154,9 +1154,9 @@ namespace Ogre {
 			// b = -2rLy
 			// c = r^2 - Lz^2
 			a = Lyz;
-			b = -2.0 * r * eyeSpacePos.y;
+			b = -2.0f * r * eyeSpacePos.y;
 			c = rsq - Math::Sqr(eyeSpacePos.z);
-			D = b*b - 4*a*c;
+			D = b*b - 4.0f*a*c;
 
 			// two roots?
 			if (D > 0)

@@ -215,7 +215,7 @@ namespace Ogre
         {
             assert( fScalar != 0.0 );
 
-            Real fInv = 1.0 / fScalar;
+            Real fInv = 1.0f / fScalar;
 
             return Vector4(
                 x * fInv,
@@ -359,7 +359,7 @@ namespace Ogre
         {
             assert( fScalar != 0.0 );
 
-            Real fInv = 1.0 / fScalar;
+            Real fInv = 1.0f / fScalar;
 
             x *= fInv;
             y *= fInv;

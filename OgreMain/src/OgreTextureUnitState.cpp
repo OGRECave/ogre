@@ -850,8 +850,8 @@ namespace Ogre {
             xform[0][0] = 1/mUScale;
             xform[1][1] = 1/mVScale;
             // Skip matrix concat since first matrix update
-            xform[0][3] = (-0.5 * xform[0][0]) + 0.5;
-            xform[1][3] = (-0.5 * xform[1][1]) + 0.5;
+            xform[0][3] = (-0.5f * xform[0][0]) + 0.5f;
+            xform[1][3] = (-0.5f * xform[1][1]) + 0.5f;
         }
 
         if (mUMod || mVMod)
@@ -876,8 +876,8 @@ namespace Ogre {
             rot[1][0] = sinTheta;
             rot[1][1] = cosTheta;
             // Offset center of rotation to center of texture
-            rot[0][3] = 0.5 + ( (-0.5 * cosTheta) - (-0.5 * sinTheta) );
-            rot[1][3] = 0.5 + ( (-0.5 * sinTheta) + (-0.5 * cosTheta) );
+            rot[0][3] = 0.5f + ( (-0.5f * cosTheta) - (-0.5f * sinTheta) );
+            rot[1][3] = 0.5f + ( (-0.5f * sinTheta) + (-0.5f * cosTheta) );
 
             xform = rot * xform;
         }

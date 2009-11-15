@@ -61,6 +61,8 @@ namespace Ogre {
             size_t vertIndex[3];/// Vertex indexes, relative to the original buffer
             size_t sharedVertIndex[3]; /// Vertex indexes, relative to a shared vertex buffer with 
                                         // duplicates eliminated (this buffer is not exposed)
+
+			Triangle() :indexSet(0), vertexSet(0) {}
         };
         /** Edge data. */
         struct Edge {

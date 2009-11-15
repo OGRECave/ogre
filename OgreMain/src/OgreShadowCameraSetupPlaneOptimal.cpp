@@ -33,6 +33,14 @@ http://www.gnu.org/copyleft/lesser.txt.
 #include "OgreViewport.h"
 
 
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+// we do a lot of PreciseReal -> Real in here, casting is messy
+// disable: "conversion from 'double' to 'float', possible loss of data
+#   pragma warning (disable : 4244)
+#   pragma warning (disable : 4305)
+#endif
+
+
 namespace Ogre 
 {
 	// --------------------------------------------------------------------

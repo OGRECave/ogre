@@ -390,7 +390,7 @@ namespace Ogre {
 		GpuNamedConstants mNamedConstants;
 		FloatConstantList mFloatConstants;
 		IntConstantList mIntConstants;
-		const String& mName;
+		String mName;
 
 		// Optional data the rendersystem might want to store
 		mutable Any mRenderSystemData;

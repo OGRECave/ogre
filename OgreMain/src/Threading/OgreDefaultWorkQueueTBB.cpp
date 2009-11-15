@@ -60,6 +60,8 @@ namespace Ogre
 		}
 
 		mShuttingDown = false;
+		
+		mWorkerFunc = OGRE_NEW_T(WorkerFunc(this), MEMCATEGORY_GENERAL);
 
 		LogManager::getSingleton().stream() <<
 			"DefaultWorkQueue('" << mName << "') initialising.";
@@ -122,6 +124,12 @@ namespace Ogre
 		if (mTaskScheduler.is_active())
 			mTaskScheduler.terminate();
 
+		if (mWorkerFunc)
+		{
+			OGRE_DELETE_T(mWorkerFunc, WorkerFunc, MEMCATEGORY_GENERAL);
+			mWorkerFunc = 0;
+		}
+			
 		mIsRunning = false;
 
 	}
@@ -143,7 +151,7 @@ namespace Ogre
 	void DefaultWorkQueue::notifyWorkers()
 	{
 		// create a new task
-		mTaskGroup.run(mWorkerFunc);
+		mTaskGroup.run(*mWorkerFunc);
 	}
 }
 

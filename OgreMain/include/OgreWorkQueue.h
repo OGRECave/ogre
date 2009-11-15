@@ -98,9 +98,9 @@ namespace Ogre
 			Request(uint16 channel, uint16 rtype, const Any& rData, uint8 retry, RequestID rid);
 			~Request();
 			/// Get the request channel (top level categorisation)
-			uint32 getChannel() const { return mChannel; }
+			uint16 getChannel() const { return mChannel; }
 			/// Get the type of this request within the given channel
-			uint32 getType() const { return mType; }
+			uint16 getType() const { return mType; }
 			/// Get the user details of this request
 			const Any& getData() const { return mData; }
 			/// Get the remaining retry count
@@ -454,7 +454,7 @@ namespace Ogre
 
 			void run();
 		};
-		WorkerFunc mWorkerFunc;
+		WorkerFunc* mWorkerFunc;
 
 		typedef list<RequestHandler*>::type RequestHandlerList;
 		typedef list<ResponseHandler*>::type ResponseHandlerList;

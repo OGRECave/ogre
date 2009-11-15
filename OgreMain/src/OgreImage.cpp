@@ -874,7 +874,7 @@ namespace Ogre {
 							PixelUtil::unpackColour(&colA, alpha.getFormat(), psrcAlpha);
 
 							// combine RGB from alpha source texture
-							colRGBA.a = (colA.r + colA.g + colA.b) / 3.0;
+							colRGBA.a = (colA.r + colA.g + colA.b) / 3.0f;
 
 							PixelUtil::packColour(colRGBA, m_eFormat, pdst);
 							

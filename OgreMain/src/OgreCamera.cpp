@@ -62,7 +62,7 @@ namespace Ogre {
     {
 
         // Reasonable defaults to camera params
-        mFOVy = Radian(Math::PI/4.0);
+        mFOVy = Radian(Math::PI/4.0f);
         mNearDist = 100.0f;
         mFarDist = 100000.0f;
         mAspect = 1.33333333333333f;
@@ -798,7 +798,7 @@ namespace Ogre {
     {
         // return a little bigger than the near distance
         // just to keep things just outside
-        return mNearDist * 1.5;
+        return mNearDist * 1.5f;
 
     }
     //-----------------------------------------------------------------------

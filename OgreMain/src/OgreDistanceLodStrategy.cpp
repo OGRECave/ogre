@@ -70,7 +70,7 @@ namespace Ogre {
             Viewport *viewport = camera->getViewport();
 
             // Get viewport area
-            Real viewportArea = viewport->getActualWidth() * viewport->getActualHeight();
+            Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
 
             // Get projection matrix (this is done to avoid computation of tan(fov / 2))
             const Matrix4& projectionMatrix = camera->getProjectionMatrix();

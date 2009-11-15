@@ -139,7 +139,7 @@ namespace Ogre {
         // Fill index of the first key
         if (firstKeyIndex)
         {
-            *firstKeyIndex = std::distance(mKeyFrames.begin(), i);
+            *firstKeyIndex = static_cast<unsigned short>(std::distance(mKeyFrames.begin(), i));
         }
 
         *keyFrame1 = *i;

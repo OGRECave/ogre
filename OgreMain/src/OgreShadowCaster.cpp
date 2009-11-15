@@ -126,8 +126,7 @@ namespace Ogre {
 					lfi = edgeData->triangleLightFacings.begin() + eg.triStart;
 					for ( ; ti != tiend; ++ti, ++lfi)
 					{
-						const EdgeData::Triangle& t = *ti;
-						assert(t.vertexSet == eg.vertexSet);
+						assert(ti->vertexSet == eg.vertexSet);
 						// Check it's light facing
 						if (*lfi)
 						{
@@ -151,8 +150,7 @@ namespace Ogre {
 					lfi = edgeData->triangleLightFacings.begin() + eg.triStart;
 					for ( ; ti != tiend; ++ti, ++lfi)
 					{
-						const EdgeData::Triangle& t = *ti;
-						assert(t.vertexSet == eg.vertexSet);
+						assert(ti->vertexSet == eg.vertexSet);
 						// Check it's light facing
 						if (*lfi)
 							preCountIndexes += increment;

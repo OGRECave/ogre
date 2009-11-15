@@ -226,7 +226,7 @@ namespace Ogre
         if ( Math::Abs(fDet) <= fTolerance )
             return false;
 
-        Real fInvDet = 1.0/fDet;
+        Real fInvDet = 1.0f/fDet;
         for (size_t iRow = 0; iRow < 3; iRow++)
         {
             for (size_t iCol = 0; iCol < 3; iCol++)
@@ -272,13 +272,13 @@ namespace Ogre
             kA[2][0]*kA[2][0]);
         if ( fLength > 0.0 )
         {
-            fSign = (kA[0][0] > 0.0 ? 1.0 : -1.0);
+            fSign = (kA[0][0] > 0.0f ? 1.0f : -1.0f);
             fT1 = kA[0][0] + fSign*fLength;
-            fInvT1 = 1.0/fT1;
+            fInvT1 = 1.0f/fT1;
             afV[1] = kA[1][0]*fInvT1;
             afV[2] = kA[2][0]*fInvT1;
 
-            fT2 = -2.0/(1.0+afV[1]*afV[1]+afV[2]*afV[2]);
+            fT2 = -2.0f/(1.0f+afV[1]*afV[1]+afV[2]*afV[2]);
             afW[0] = fT2*(kA[0][0]+kA[1][0]*afV[1]+kA[2][0]*afV[2]);
             afW[1] = fT2*(kA[0][1]+kA[1][1]*afV[1]+kA[2][1]*afV[2]);
             afW[2] = fT2*(kA[0][2]+kA[1][2]*afV[1]+kA[2][2]*afV[2]);
@@ -290,12 +290,12 @@ namespace Ogre
             kA[2][1] += afV[2]*afW[1];
             kA[2][2] += afV[2]*afW[2];
 
-            kL[0][0] = 1.0+fT2;
+            kL[0][0] = 1.0f+fT2;
             kL[0][1] = kL[1][0] = fT2*afV[1];
             kL[0][2] = kL[2][0] = fT2*afV[2];
-            kL[1][1] = 1.0+fT2*afV[1]*afV[1];
+            kL[1][1] = 1.0f+fT2*afV[1]*afV[1];
             kL[1][2] = kL[2][1] = fT2*afV[1]*afV[2];
-            kL[2][2] = 1.0+fT2*afV[2]*afV[2];
+            kL[2][2] = 1.0f+fT2*afV[2]*afV[2];
             bIdentity = false;
         }
         else
@@ -308,11 +308,11 @@ namespace Ogre
         fLength = Math::Sqrt(kA[0][1]*kA[0][1]+kA[0][2]*kA[0][2]);
         if ( fLength > 0.0 )
         {
-            fSign = (kA[0][1] > 0.0 ? 1.0 : -1.0);
+            fSign = (kA[0][1] > 0.0f ? 1.0f : -1.0f);
             fT1 = kA[0][1] + fSign*fLength;
             afV[2] = kA[0][2]/fT1;
 
-            fT2 = -2.0/(1.0+afV[2]*afV[2]);
+            fT2 = -2.0f/(1.0f+afV[2]*afV[2]);
             afW[0] = fT2*(kA[0][1]+kA[0][2]*afV[2]);
             afW[1] = fT2*(kA[1][1]+kA[1][2]*afV[2]);
             afW[2] = fT2*(kA[2][1]+kA[2][2]*afV[2]);
@@ -325,9 +325,9 @@ namespace Ogre
             kR[0][0] = 1.0;
             kR[0][1] = kR[1][0] = 0.0;
             kR[0][2] = kR[2][0] = 0.0;
-            kR[1][1] = 1.0+fT2;
+            kR[1][1] = 1.0f+fT2;
             kR[1][2] = kR[2][1] = fT2*afV[2];
-            kR[2][2] = 1.0+fT2*afV[2]*afV[2];
+            kR[2][2] = 1.0f+fT2*afV[2]*afV[2];
         }
         else
         {
@@ -338,20 +338,20 @@ namespace Ogre
         fLength = Math::Sqrt(kA[1][1]*kA[1][1]+kA[2][1]*kA[2][1]);
         if ( fLength > 0.0 )
         {
-            fSign = (kA[1][1] > 0.0 ? 1.0 : -1.0);
+            fSign = (kA[1][1] > 0.0f ? 1.0f : -1.0f);
             fT1 = kA[1][1] + fSign*fLength;
             afV[2] = kA[2][1]/fT1;
 
-            fT2 = -2.0/(1.0+afV[2]*afV[2]);
+            fT2 = -2.0f/(1.0f+afV[2]*afV[2]);
             afW[1] = fT2*(kA[1][1]+kA[2][1]*afV[2]);
             afW[2] = fT2*(kA[1][2]+kA[2][2]*afV[2]);
             kA[1][1] += afW[1];
             kA[1][2] += afW[2];
             kA[2][2] += afV[2]*afW[2];
 
-            Real fA = 1.0+fT2;
+            Real fA = 1.0f+fT2;
             Real fB = fT2*afV[2];
-            Real fC = 1.0+fB*afV[2];
+            Real fC = 1.0f+fB*afV[2];
 
             if ( bIdentity )
             {
@@ -383,9 +383,9 @@ namespace Ogre
         Real fT12 = kA[1][1]*kA[1][2];
         Real fTrace = fT11+fT22;
         Real fDiff = fT11-fT22;
-        Real fDiscr = Math::Sqrt(fDiff*fDiff+4.0*fT12*fT12);
-        Real fRoot1 = 0.5*(fTrace+fDiscr);
-        Real fRoot2 = 0.5*(fTrace-fDiscr);
+        Real fDiscr = Math::Sqrt(fDiff*fDiff+4.0f*fT12*fT12);
+        Real fRoot1 = 0.5f*(fTrace+fDiscr);
+        Real fRoot2 = 0.5f*(fTrace-fDiscr);
 
         // adjust right
         Real fY = kA[0][0] - (Math::Abs(fRoot1-fT22) <=
@@ -514,8 +514,8 @@ namespace Ogre
                     // 2x2 closed form factorization
                     fTmp = (kA[1][1]*kA[1][1] - kA[2][2]*kA[2][2] +
                         kA[1][2]*kA[1][2])/(kA[1][2]*kA[2][2]);
-                    fTan0 = 0.5*(fTmp+Math::Sqrt(fTmp*fTmp + 4.0));
-                    fCos0 = Math::InvSqrt(1.0+fTan0*fTan0);
+                    fTan0 = 0.5f*(fTmp+Math::Sqrt(fTmp*fTmp + 4.0f));
+                    fCos0 = Math::InvSqrt(1.0f+fTan0*fTan0);
                     fSin0 = fTan0*fCos0;
 
                     for (iCol = 0; iCol < 3; iCol++)
@@ -527,7 +527,7 @@ namespace Ogre
                     }
 
                     fTan1 = (kA[1][2]-kA[2][2]*fTan0)/kA[1][1];
-                    fCos1 = Math::InvSqrt(1.0+fTan1*fTan1);
+                    fCos1 = Math::InvSqrt(1.0f+fTan1*fTan1);
                     fSin1 = -fTan1*fCos1;
 
                     for (iRow = 0; iRow < 3; iRow++)
@@ -553,8 +553,8 @@ namespace Ogre
                     // 2x2 closed form factorization
                     fTmp = (kA[0][0]*kA[0][0] + kA[1][1]*kA[1][1] -
                         kA[0][1]*kA[0][1])/(kA[0][1]*kA[1][1]);
-                    fTan0 = 0.5*(-fTmp+Math::Sqrt(fTmp*fTmp + 4.0));
-                    fCos0 = Math::InvSqrt(1.0+fTan0*fTan0);
+                    fTan0 = 0.5f*(-fTmp+Math::Sqrt(fTmp*fTmp + 4.0f));
+                    fCos0 = Math::InvSqrt(1.0f+fTan0*fTan0);
                     fSin0 = fTan0*fCos0;
 
                     for (iCol = 0; iCol < 3; iCol++)
@@ -566,7 +566,7 @@ namespace Ogre
                     }
 
                     fTan1 = (kA[0][1]-kA[1][1]*fTan0)/kA[0][0];
-                    fCos1 = Math::InvSqrt(1.0+fTan1*fTan1);
+                    fCos1 = Math::InvSqrt(1.0f+fTan1*fTan1);
                     fSin1 = -fTan1*fCos1;
 
                     for (iRow = 0; iRow < 3; iRow++)
@@ -789,7 +789,7 @@ namespace Ogre
         kD[2] = kR[2][2];
 
         // the shear component
-        Real fInvD0 = 1.0/kD[0];
+        Real fInvD0 = 1.0f/kD[0];
         kU[0] = kR[0][1]*fInvD0;
         kU[1] = kR[0][2]*fInvD0;
         kU[2] = kR[1][2]/kD[1];
@@ -804,7 +804,7 @@ namespace Ogre
         // quick out for uniform scale (triple root)
         const Real fOneThird = 1.0/3.0;
         const Real fEpsilon = 1e-06;
-        Real fDiscr = afCoeff[2]*afCoeff[2] - 3.0*afCoeff[1];
+        Real fDiscr = afCoeff[2]*afCoeff[2] - 3.0f*afCoeff[1];
         if ( fDiscr <= fEpsilon )
             return -fOneThird*afCoeff[2];
 
@@ -816,23 +816,23 @@ namespace Ogre
         {
             // uses a matrix norm to find an upper bound on maximum root
             fX = Math::Abs(afCoeff[0]);
-            Real fTmp = 1.0+Math::Abs(afCoeff[1]);
+            Real fTmp = 1.0f+Math::Abs(afCoeff[1]);
             if ( fTmp > fX )
                 fX = fTmp;
-            fTmp = 1.0+Math::Abs(afCoeff[2]);
+            fTmp = 1.0f+Math::Abs(afCoeff[2]);
             if ( fTmp > fX )
                 fX = fTmp;
         }
 
         // Newton's method to find root
-        Real fTwoC2 = 2.0*afCoeff[2];
+        Real fTwoC2 = 2.0f*afCoeff[2];
         for (int i = 0; i < 16; i++)
         {
             fPoly = afCoeff[0]+fX*(afCoeff[1]+fX*(afCoeff[2]+fX));
             if ( Math::Abs(fPoly) <= fEpsilon )
                 return fX;
 
-            Real fDeriv = afCoeff[1]+fX*(fTwoC2+3.0*fX);
+            Real fDeriv = afCoeff[1]+fX*(fTwoC2+3.0f*fX);
             fX -= fPoly/fDeriv;
         }
 
@@ -859,7 +859,7 @@ namespace Ogre
             }
         }
 
-        Real fInvPmax = 1.0/fPmax;
+        Real fInvPmax = 1.0f/fPmax;
         for (iRow = 0; iRow < 3; iRow++)
         {
             for (iCol = 0; iCol < 3; iCol++)
@@ -905,7 +905,7 @@ namespace Ogre
         // it does not matter which sign you choose on the square roots.
 
         Real fTrace = m[0][0] + m[1][1] + m[2][2];
-        Real fCos = 0.5*(fTrace-1.0);
+        Real fCos = 0.5f*(fTrace-1.0f);
         rfRadians = Math::ACos(fCos);  // in [0,PI]
 
         if ( rfRadians > Radian(0.0) )
@@ -927,18 +927,18 @@ namespace Ogre
                     if ( m[0][0] >= m[2][2] )
                     {
                         // r00 is maximum diagonal term
-                        rkAxis.x = 0.5*Math::Sqrt(m[0][0] -
-                            m[1][1] - m[2][2] + 1.0);
-                        fHalfInverse = 0.5/rkAxis.x;
+                        rkAxis.x = 0.5f*Math::Sqrt(m[0][0] -
+                            m[1][1] - m[2][2] + 1.0f);
+                        fHalfInverse = 0.5f/rkAxis.x;
                         rkAxis.y = fHalfInverse*m[0][1];
                         rkAxis.z = fHalfInverse*m[0][2];
                     }
                     else
                     {
                         // r22 is maximum diagonal term
-                        rkAxis.z = 0.5*Math::Sqrt(m[2][2] -
-                            m[0][0] - m[1][1] + 1.0);
-                        fHalfInverse = 0.5/rkAxis.z;
+                        rkAxis.z = 0.5f*Math::Sqrt(m[2][2] -
+                            m[0][0] - m[1][1] + 1.0f);
+                        fHalfInverse = 0.5f/rkAxis.z;
                         rkAxis.x = fHalfInverse*m[0][2];
                         rkAxis.y = fHalfInverse*m[1][2];
                     }
@@ -949,18 +949,18 @@ namespace Ogre
                     if ( m[1][1] >= m[2][2] )
                     {
                         // r11 is maximum diagonal term
-                        rkAxis.y = 0.5*Math::Sqrt(m[1][1] -
-                            m[0][0] - m[2][2] + 1.0);
-                        fHalfInverse  = 0.5/rkAxis.y;
+                        rkAxis.y = 0.5f*Math::Sqrt(m[1][1] -
+                            m[0][0] - m[2][2] + 1.0f);
+                        fHalfInverse  = 0.5f/rkAxis.y;
                         rkAxis.x = fHalfInverse*m[0][1];
                         rkAxis.z = fHalfInverse*m[1][2];
                     }
                     else
                     {
                         // r22 is maximum diagonal term
-                        rkAxis.z = 0.5*Math::Sqrt(m[2][2] -
-                            m[0][0] - m[1][1] + 1.0);
-                        fHalfInverse = 0.5/rkAxis.z;
+                        rkAxis.z = 0.5f*Math::Sqrt(m[2][2] -
+                            m[0][0] - m[1][1] + 1.0f);
+                        fHalfInverse = 0.5f/rkAxis.z;
                         rkAxis.x = fHalfInverse*m[0][2];
                         rkAxis.y = fHalfInverse*m[1][2];
                     }
@@ -981,7 +981,7 @@ namespace Ogre
     {
         Real fCos = Math::Cos(fRadians);
         Real fSin = Math::Sin(fRadians);
-        Real fOneMinusCos = 1.0-fCos;
+        Real fOneMinusCos = 1.0f-fCos;
         Real fX2 = rkAxis.x*rkAxis.x;
         Real fY2 = rkAxis.y*rkAxis.y;
         Real fZ2 = rkAxis.z*rkAxis.z;
@@ -1355,10 +1355,10 @@ namespace Ogre
         if ( Math::Abs(fC) >= EPSILON )
         {
             Real fLength = Math::Sqrt(fB*fB+fC*fC);
-            Real fInvLength = 1.0/fLength;
+            Real fInvLength = 1.0f/fLength;
             fB *= fInvLength;
             fC *= fInvLength;
-            Real fQ = 2.0*fB*fE+fC*(fF-fD);
+            Real fQ = 2.0f*fB*fE+fC*(fF-fD);
             afDiag[1] = fD+fC*fQ;
             afDiag[2] = fF-fC*fQ;
             afSubDiag[0] = fLength;
@@ -1413,8 +1413,8 @@ namespace Ogre
                 if ( i1 == i0 )
                     break;
 
-                Real fTmp0 = (afDiag[i0+1]-afDiag[i0])/(2.0*afSubDiag[i0]);
-                Real fTmp1 = Math::Sqrt(fTmp0*fTmp0+1.0);
+                Real fTmp0 = (afDiag[i0+1]-afDiag[i0])/(2.0f*afSubDiag[i0]);
+                Real fTmp1 = Math::Sqrt(fTmp0*fTmp0+1.0f);
                 if ( fTmp0 < 0.0 )
                     fTmp0 = afDiag[i1]-afDiag[i0]+afSubDiag[i0]/(fTmp0-fTmp1);
                 else
@@ -1429,21 +1429,21 @@ namespace Ogre
                     if ( Math::Abs(fTmp3) >= Math::Abs(fTmp0) )
                     {
                         fCos = fTmp0/fTmp3;
-                        fTmp1 = Math::Sqrt(fCos*fCos+1.0);
+                        fTmp1 = Math::Sqrt(fCos*fCos+1.0f);
                         afSubDiag[i2+1] = fTmp3*fTmp1;
-                        fSin = 1.0/fTmp1;
+                        fSin = 1.0f/fTmp1;
                         fCos *= fSin;
                     }
                     else
                     {
                         fSin = fTmp3/fTmp0;
-                        fTmp1 = Math::Sqrt(fSin*fSin+1.0);
+                        fTmp1 = Math::Sqrt(fSin*fSin+1.0f);
                         afSubDiag[i2+1] = fTmp0*fTmp1;
-                        fCos = 1.0/fTmp1;
+                        fCos = 1.0f/fTmp1;
                         fSin *= fCos;
                     }
                     fTmp0 = afDiag[i2+1]-fTmp2;
-                    fTmp1 = (afDiag[i2]-fTmp0)*fSin+2.0*fTmp4*fCos;
+                    fTmp1 = (afDiag[i2]-fTmp0)*fSin+2.0f*fTmp4*fCos;
                     fTmp2 = fSin*fTmp1;
                     afDiag[i2+1] = fTmp0+fTmp2;
                     fTmp0 = fCos*fTmp1-fTmp4;

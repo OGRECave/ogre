@@ -56,6 +56,8 @@ namespace Ogre
 
 		mShuttingDown = false;
 
+		mWorkerFunc = OGRE_NEW_T(WorkerFunc(this), MEMCATEGORY_GENERAL);
+
 		LogManager::getSingleton().stream() <<
 			"DefaultWorkQueue('" << mName << "') initialising on thread " <<
 #if OGRE_THREAD_SUPPORT
@@ -72,7 +74,7 @@ namespace Ogre
 		mNumThreadsRegisteredWithRS = 0;
 		for (uint8 i = 0; i < mWorkerThreadCount; ++i)
 		{
-			OGRE_THREAD_CREATE(t, mWorkerFunc);
+			OGRE_THREAD_CREATE(t, *mWorkerFunc);
 			mWorkers.push_back(t);
 		}
 
@@ -127,6 +129,13 @@ namespace Ogre
 		}
 		mWorkers.clear();
 #endif
+
+		if (mWorkerFunc)
+		{
+			OGRE_DELETE_T(mWorkerFunc, WorkerFunc, MEMCATEGORY_GENERAL);
+			mWorkerFunc = 0;
+		}
+
 
 		mIsRunning = false;
 

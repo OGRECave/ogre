@@ -587,17 +587,14 @@ namespace Ogre {
             of << "-- Animation '" << anim->getName() << "' (length " << anim->getLength() << ") --" << std::endl;
             of << "Number of tracks: " << anim->getNumNodeTracks() << std::endl;
 
-            int ti;
-            for (ti = 0; ti < anim->getNumNodeTracks(); ++ti)
+            for (unsigned short ti = 0; ti < anim->getNumNodeTracks(); ++ti)
             {
                 NodeAnimationTrack* track = anim->getNodeTrack(ti);
                 of << "  -- AnimationTrack " << ti << " --" << std::endl;
                 of << "  Affects bone: " << ((Bone*)track->getAssociatedNode())->getHandle() << std::endl;
                 of << "  Number of keyframes: " << track->getNumKeyFrames() << std::endl;
 
-                int ki;
-                
-                for (ki = 0; ki < track->getNumKeyFrames(); ++ki)
+                for (unsigned short ki = 0; ki < track->getNumKeyFrames(); ++ki)
                 {
                     TransformKeyFrame* key = track->getNodeKeyFrame(ki);
                     of << "    -- KeyFrame " << ki << " --" << std::endl;

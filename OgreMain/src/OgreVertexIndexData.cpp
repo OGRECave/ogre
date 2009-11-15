@@ -164,7 +164,7 @@ namespace Ogre {
         if (posElem)
         {
             size_t v;
-            unsigned posOldSource = posElem->getSource();
+            unsigned short posOldSource = posElem->getSource();
 
             HardwareVertexBufferSharedPtr vbuf = vertexBufferBinding->getBuffer(posOldSource);
             bool wasSharedBuffer = false;
@@ -892,9 +892,9 @@ namespace Ogre {
 			for (i = 0; i < nTriangles; ++i)
 			{
 				Triangle *t = &triangles[destlist[i]];
-				source[j++] = t->a;
-				source[j++] = t->b;
-				source[j++] = t->c;
+				source[j++] = (uint16)t->a;
+				source[j++] = (uint16)t->b;
+				source[j++] = (uint16)t->c;
 			}
 			OGRE_FREE(triangles, MEMCATEGORY_GEOMETRY);
 		}

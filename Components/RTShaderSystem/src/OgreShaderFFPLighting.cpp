@@ -194,8 +194,8 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 			vsGpuParams->setNamedConstant(curParams.mAttenuatParams->getName(), vParameter);
 
 			// Update spotlight parameters.
-			Real phi   = Math::Cos(srcLight->getSpotlightOuterAngle().valueRadians() * 0.5);
-			Real theta = Math::Cos(srcLight->getSpotlightInnerAngle().valueRadians() * 0.5);
+			Real phi   = Math::Cos(srcLight->getSpotlightOuterAngle().valueRadians() * 0.5f);
+			Real theta = Math::Cos(srcLight->getSpotlightInnerAngle().valueRadians() * 0.5f);
 
 			vec3.x = theta;
 			vec3.y = phi;

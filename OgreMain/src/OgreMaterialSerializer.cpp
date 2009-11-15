@@ -551,13 +551,13 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseMaxLights(String& params, MaterialScriptContext& context)
     {
-		context.pass->setMaxSimultaneousLights(StringConverter::parseInt(params));
+		context.pass->setMaxSimultaneousLights((ushort)StringConverter::parseInt(params));
         return false;
     }
 	//-----------------------------------------------------------------------
 	bool parseStartLight(String& params, MaterialScriptContext& context)
 	{
-		context.pass->setStartLight(StringConverter::parseInt(params));
+		context.pass->setStartLight((ushort)StringConverter::parseInt(params));
 		return false;
 	}
     //-----------------------------------------------------------------------
@@ -647,7 +647,7 @@ namespace Ogre
 						{
 							// Parse num lights
 							context.pass->setLightCountPerIteration(
-								StringConverter::parseInt(vecparams[2]));
+								(ushort)StringConverter::parseInt(vecparams[2]));
 							// Light type
 							if (vecparams.size() == 4)
 							{
@@ -1154,7 +1154,7 @@ namespace Ogre
             return false;
         }
 
-        context.pass->setAlphaRejectSettings(cmp, StringConverter::parseInt(vecparams[1]));
+        context.pass->setAlphaRejectSettings(cmp, (unsigned char)StringConverter::parseInt(vecparams[1]));
 
         return false;
     }
@@ -1722,7 +1722,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseLodIndex(String& params, MaterialScriptContext& context)
     {
-        context.technique->setLodIndex(StringConverter::parseInt(params));
+        context.technique->setLodIndex((ushort)StringConverter::parseInt(params));
         return false;
     }
 	//-----------------------------------------------------------------------
@@ -2325,7 +2325,7 @@ namespace Ogre
         // Create a new technique if it doesn't already exist
         if (context.material->getNumTechniques() > context.techLev)
         {
-            context.technique = context.material->getTechnique(context.techLev);
+            context.technique = context.material->getTechnique((ushort)context.techLev);
         }
         else
         {
@@ -2369,7 +2369,7 @@ namespace Ogre
 
         if (context.technique->getNumPasses() > context.passLev)
         {
-            context.pass = context.technique->getPass(context.passLev);
+            context.pass = context.technique->getPass((ushort)context.passLev);
         }
         else
         {
@@ -2417,7 +2417,7 @@ namespace Ogre
 
         if (context.pass->getNumTextureUnitStates() > static_cast<size_t>(context.stateLev))
         {
-            context.textureUnit = context.pass->getTextureUnitState(context.stateLev);
+            context.textureUnit = context.pass->getTextureUnitState((ushort)context.stateLev);
         }
         else
         {
@@ -2796,7 +2796,7 @@ namespace Ogre
 	{
 		// Source filename, preserve case
 		context.programDef->supportsPoseAnimation
-			= StringConverter::parseInt(params);
+			= (ushort)StringConverter::parseInt(params);
 
 		return false;
 	}
@@ -4923,7 +4923,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeGPUProgramParameters(
 		const GpuProgramParametersSharedPtr& params,
-		GpuProgramParameters* defaultParams, const int level,
+		GpuProgramParameters* defaultParams, unsigned short level,
 		const bool useMainBuffer)
     {
         // iterate through the constant definitions
@@ -4939,7 +4939,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void MaterialSerializer::writeNamedGpuProgramParameters(
 		const GpuProgramParametersSharedPtr& params,
-		GpuProgramParameters* defaultParams, const int level,
+		GpuProgramParameters* defaultParams, unsigned short level,
 		const bool useMainBuffer)
 	{
 		GpuConstantDefinitionIterator constIt = params->getConstantDefinitionIterator();
@@ -4970,7 +4970,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void MaterialSerializer::writeLowLevelGpuProgramParameters(
 		const GpuProgramParametersSharedPtr& params,
-		GpuProgramParameters* defaultParams, const int level,
+		GpuProgramParameters* defaultParams, unsigned short level,
 		const bool useMainBuffer)
 	{
 		// Iterate over the logical->physical mappings
@@ -5039,7 +5039,7 @@ namespace Ogre
 		const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry, 
 		bool isFloat, size_t physicalIndex, size_t physicalSize,
 		const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
-		const int level, const bool useMainBuffer)
+		const ushort level, const bool useMainBuffer)
 	{
 		// Skip any params with array qualifiers
 		// These are only for convenience of setters, the full array will be

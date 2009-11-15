@@ -1719,7 +1719,7 @@ void SceneManager::_setSkyBox(
 
         MaterialManager& matMgr = MaterialManager::getSingleton();
         // Set up the box (6 planes)
-        for (int i = 0; i < 6; ++i)
+        for (uint16 i = 0; i < 6; ++i)
         {
 			Plane plane;
 			String meshName;
@@ -5847,7 +5847,7 @@ void SceneManager::ensureShadowTexturesCreated()
 			// Create camera for this texture, but note that we have to rebind
 			// in prepareShadowTextures to coexist with multiple SMs
 			Camera* cam = createCamera(camName);
-			cam->setAspectRatio(shadowTex->getWidth() / shadowTex->getHeight());
+			cam->setAspectRatio((Real)shadowTex->getWidth() / (Real)shadowTex->getHeight());
 			mShadowTextureCameras.push_back(cam);
 
 			// Create a viewport, if not there already

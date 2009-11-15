@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreResourceManager.h"
 #include "OgreCompositor.h"
 #include "OgreRectangle2D.h"
-#include "OgreCompositorSerializer.h"
 #include "OgreRenderSystem.h"
 #include "OgreCompositionTechnique.h"
 
@@ -193,9 +192,6 @@ namespace Ogre {
 	private:
         typedef map<Viewport*, CompositorChain*>::type Chains;
         Chains mChains;
-
-		/// Serializer - Hold instance per thread if necessary
-		OGRE_THREAD_POINTER(CompositorSerializer, mSerializer);
 
         /** Clear composition chains for all viewports
          */

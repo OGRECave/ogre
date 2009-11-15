@@ -171,13 +171,13 @@ namespace Ogre {
 			vbuf->lock(HardwareBuffer::HBL_DISCARD) );
 
 		float largestWidth = 0;
-		float left = _getDerivedLeft() * 2.0 - 1.0;
-		float top = -( (_getDerivedTop() * 2.0 ) - 1.0 );
+		float left = _getDerivedLeft() * 2.0f - 1.0f;
+		float top = -( (_getDerivedTop() * 2.0f ) - 1.0f );
 
 		// Derive space with from a number 0
 		if (mSpaceWidth == 0)
 		{
-			mSpaceWidth = mpFont->getGlyphAspectRatio(UNICODE_ZERO) * mCharHeight * 2.0 * mViewportAspectCoef;
+			mSpaceWidth = mpFont->getGlyphAspectRatio(UNICODE_ZERO) * mCharHeight * 2.0f * mViewportAspectCoef;
 		}
 
 		// Use iterator
@@ -204,14 +204,14 @@ namespace Ogre {
 					}
 					else 
 					{
-						len += mpFont->getGlyphAspectRatio(character) * mCharHeight * 2.0 * mViewportAspectCoef;
+						len += mpFont->getGlyphAspectRatio(character) * mCharHeight * 2.0f * mViewportAspectCoef;
 					}
 				}
 
 				if( mAlignment == Right )
 					left -= len;
 				else if( mAlignment == Center )
-					left -= len * 0.5;
+					left -= len * 0.5f;
 
 				newLine = false;
 			}
@@ -221,8 +221,8 @@ namespace Ogre {
 				|| character == UNICODE_NEL
 				|| character == UNICODE_LF)
 			{
-				left = _getDerivedLeft() * 2.0 - 1.0;
-				top -= mCharHeight * 2.0;
+				left = _getDerivedLeft() * 2.0f - 1.0f;
+				top -= mCharHeight * 2.0f;
 				newLine = true;
 				// Also reduce tri count
 				mRenderOp.vertexData->vertexCount -= 6;
@@ -265,7 +265,7 @@ namespace Ogre {
 			*pVert++ = uvRect.left;
 			*pVert++ = uvRect.top;
 
-			top -= mCharHeight * 2.0;
+			top -= mCharHeight * 2.0f;
 
 			// Bottom left
 			*pVert++ = left;
@@ -274,8 +274,8 @@ namespace Ogre {
 			*pVert++ = uvRect.left;
 			*pVert++ = uvRect.bottom;
 
-			top += mCharHeight * 2.0;
-			left += horiz_height * mCharHeight * 2.0;
+			top += mCharHeight * 2.0f;
+			left += horiz_height * mCharHeight * 2.0f;
 
 			// Top right
 			*pVert++ = left;
@@ -295,8 +295,8 @@ namespace Ogre {
 			*pVert++ = uvRect.right;
 			*pVert++ = uvRect.top;
 
-			top -= mCharHeight * 2.0;
-			left -= horiz_height  * mCharHeight * 2.0;
+			top -= mCharHeight * 2.0f;
+			left -= horiz_height  * mCharHeight * 2.0f;
 
 			// Bottom left (again)
 			*pVert++ = left;
@@ -305,7 +305,7 @@ namespace Ogre {
 			*pVert++ = uvRect.left;
 			*pVert++ = uvRect.bottom;
 
-			left += horiz_height  * mCharHeight * 2.0;
+			left += horiz_height  * mCharHeight * 2.0f;
 
 			// Bottom right
 			*pVert++ = left;
@@ -316,7 +316,7 @@ namespace Ogre {
 			//-------------------------------------------------------------------------------------
 
 			// Go back up with top
-			top += mCharHeight * 2.0;
+			top += mCharHeight * 2.0f;
 
 			float currentWidth = (left + 1)/2 - _getDerivedLeft();
 			if (currentWidth > largestWidth)
@@ -376,7 +376,7 @@ namespace Ogre {
     {
         if (mMetricsMode != GMM_RELATIVE)
         {
-            mPixelCharHeight = static_cast<unsigned>(height);
+            mPixelCharHeight = static_cast<unsigned short>(height);
         }
         else
         {
@@ -400,7 +400,7 @@ namespace Ogre {
     {
         if (mMetricsMode != GMM_RELATIVE)
         {
-            mPixelSpaceWidth = static_cast<unsigned>(width);
+            mPixelSpaceWidth = static_cast<unsigned short>(width);
         }
         else
         {
@@ -559,14 +559,14 @@ namespace Ogre {
 		{
 		case GMM_PIXELS:
 			// set pixel variables based on viewport multipliers
-			mPixelCharHeight = static_cast<unsigned>(mCharHeight * vpHeight);
-			mPixelSpaceWidth = static_cast<unsigned>(mSpaceWidth * vpHeight);
+			mPixelCharHeight = static_cast<unsigned short>(mCharHeight * vpHeight);
+			mPixelSpaceWidth = static_cast<unsigned short>(mSpaceWidth * vpHeight);
 			break;
 
 		case GMM_RELATIVE_ASPECT_ADJUSTED:
 			// set pixel variables multiplied by the height constant
-			mPixelCharHeight = static_cast<unsigned>(mCharHeight * 10000.0);
-			mPixelSpaceWidth = static_cast<unsigned>(mSpaceWidth * 10000.0);
+			mPixelCharHeight = static_cast<unsigned short>(mCharHeight * 10000.0);
+			mPixelSpaceWidth = static_cast<unsigned short>(mSpaceWidth * 10000.0);
 			break;
 
 		default:
@@ -599,8 +599,8 @@ namespace Ogre {
 			if(OverlayManager::getSingleton().hasViewportChanged() || mGeomPositionsOutOfDate)
 			{
 				// recalculate character size
-				mCharHeight = (Real) mPixelCharHeight / 10000.0;
-				mSpaceWidth = (Real) mPixelSpaceWidth / 10000.0;
+				mCharHeight = (Real) mPixelCharHeight / 10000.0f;
+				mSpaceWidth = (Real) mPixelSpaceWidth / 10000.0f;
 				mGeomPositionsOutOfDate = true;
 			}
 			break;

@@ -192,7 +192,7 @@ namespace Ogre
         {
             assert( fScalar != 0.0 );
 
-            Real fInv = 1.0 / fScalar;
+            Real fInv = 1.0f / fScalar;
 
             return Vector3(
                 x * fInv,
@@ -323,7 +323,7 @@ namespace Ogre
         {
             assert( fScalar != 0.0 );
 
-            Real fInv = 1.0 / fScalar;
+            Real fInv = 1.0f / fScalar;
 
             x *= fInv;
             y *= fInv;
@@ -446,7 +446,7 @@ namespace Ogre
             // Will also work for zero-sized vectors, but will change nothing
             if ( fLength > 1e-08 )
             {
-                Real fInvLength = 1.0 / fLength;
+                Real fInvLength = 1.0f / fLength;
                 x *= fInvLength;
                 y *= fInvLength;
                 z *= fInvLength;
@@ -497,9 +497,9 @@ namespace Ogre
         inline Vector3 midPoint( const Vector3& vec ) const
         {
             return Vector3(
-                ( x + vec.x ) * 0.5,
-                ( y + vec.y ) * 0.5,
-                ( z + vec.z ) * 0.5 );
+                ( x + vec.x ) * 0.5f,
+                ( y + vec.y ) * 0.5f,
+                ( z + vec.z ) * 0.5f );
         }
 
         /** Returns true if the vector's scalar components are all greater
@@ -690,7 +690,7 @@ namespace Ogre
     	        q.x = c.x * invs;
         	    q.y = c.y * invs;
             	q.z = c.z * invs;
-            	q.w = s * 0.5;
+            	q.w = s * 0.5f;
 				q.normalise();
 			}
             return q;

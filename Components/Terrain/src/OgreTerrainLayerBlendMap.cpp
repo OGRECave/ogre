@@ -89,12 +89,12 @@ namespace Ogre
 		Vector3 terrainSpace;
 		mParent->getTerrainPosition(worldPos, &terrainSpace);
 		*outX = terrainSpace.x;
-		*outY = 1.0 - terrainSpace.y;
+		*outY = 1.0f - terrainSpace.y;
 	}
 	//---------------------------------------------------------------------
 	void TerrainLayerBlendMap::convertUVToWorldSpace(Real x, Real y, Vector3* outWorldPos)
 	{
-		mParent->getPosition(x, 1.0 - y, 0, outWorldPos);
+		mParent->getPosition(x, 1.0f - y, 0, outWorldPos);
 	}
 	//---------------------------------------------------------------------
 	void TerrainLayerBlendMap::convertUVToImageSpace(Real x, Real y, size_t* outX, size_t* outY)
@@ -112,12 +112,12 @@ namespace Ogre
 	void TerrainLayerBlendMap::convertImageToTerrainSpace(size_t x, size_t y, Real* outX, Real* outY)
 	{
 		convertImageToUVSpace(x, y, outX, outY);
-		*outY = 1.0 - *outY;
+		*outY = 1.0f - *outY;
 	}
 	//---------------------------------------------------------------------
 	void TerrainLayerBlendMap::convertTerrainToImageSpace(Real x, Real y, size_t* outX, size_t* outY)
 	{
-		convertUVToImageSpace(x, 1.0 - y, outX, outY);
+		convertUVToImageSpace(x, 1.0f - y, outX, outY);
 	}
 	//---------------------------------------------------------------------
 	float TerrainLayerBlendMap::getBlendValue(size_t x, size_t y)

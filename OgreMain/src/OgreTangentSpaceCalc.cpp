@@ -469,7 +469,7 @@ namespace Ogre
 		tsN.normalise();
 
 
-		Real uvarea = deltaUV1.crossProduct(deltaUV2) * 0.5;
+		Real uvarea = deltaUV1.crossProduct(deltaUV2) * 0.5f;
 		if (Math::RealEqual(uvarea, 0.0f))
 		{
 			// no tangent, null uv area
@@ -727,7 +727,7 @@ namespace Ogre
 			*pTangent++ = vertInfo.tangent.y;
 			*pTangent++ = vertInfo.tangent.z;
 			if (mStoreParityInW)
-				*pTangent++ = vertInfo.parity;
+				*pTangent++ = (float)vertInfo.parity;
 
 			// Next target vertex
 			pDest += newVertSize;

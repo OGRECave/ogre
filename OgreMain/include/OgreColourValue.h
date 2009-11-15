@@ -235,7 +235,7 @@ namespace Ogre {
 
             ColourValue kDiv;
 
-            float fInv = 1.0 / fScalar;
+            float fInv = 1.0f / fScalar;
             kDiv.r = r * fInv;
             kDiv.g = g * fInv;
             kDiv.b = b * fInv;
@@ -290,7 +290,7 @@ namespace Ogre {
         {
             assert( fScalar != 0.0 );
 
-            float fInv = 1.0 / fScalar;
+            float fInv = 1.0f / fScalar;
 
             r *= fInv;
             g *= fInv;

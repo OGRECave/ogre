@@ -669,7 +669,7 @@ namespace Ogre {
             rendering if you intend to use this information for that purpose.
         @lodIndex The LOD at which to get the edge list, 0 being the highest.
         */
-        EdgeData* getEdgeList(unsigned int lodIndex = 0);
+        EdgeData* getEdgeList(unsigned short lodIndex = 0);
 
         /** Return the edge list for this mesh, building it if required. 
         @remarks
@@ -677,7 +677,7 @@ namespace Ogre {
             rendering if you intend to use this information for that purpose.
         @lodIndex The LOD at which to get the edge list, 0 being the highest.
         */
-        const EdgeData* getEdgeList(unsigned int lodIndex = 0) const;
+        const EdgeData* getEdgeList(unsigned short lodIndex = 0) const;
 
         /** Returns whether this mesh has already had it's geometry prepared for use in 
             rendering shadow volumes. */

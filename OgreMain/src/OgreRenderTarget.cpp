@@ -223,12 +223,12 @@ namespace Ogre {
 
     float RenderTarget::getBestFrameTime() const
     {
-        return mStats.bestFrameTime;
+        return (float)mStats.bestFrameTime;
     }
 
     float RenderTarget::getWorstFrameTime() const
     {
-        return mStats.worstFrameTime;
+        return (float)mStats.worstFrameTime;
     }
 
     void RenderTarget::resetStatistics(void)
@@ -263,7 +263,7 @@ namespace Ogre {
         if (thisTime - mLastSecond > 1000) 
         { 
             // new second - not 100% precise
-            mStats.lastFPS = (float)mFrameCount / (float)(thisTime - mLastSecond) * 1000.0;
+            mStats.lastFPS = (float)mFrameCount / (float)(thisTime - mLastSecond) * 1000.0f;
 
             if (mStats.avgFPS == 0)
                 mStats.avgFPS = mStats.lastFPS;

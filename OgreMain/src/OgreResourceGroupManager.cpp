@@ -756,10 +756,6 @@ namespace Ogre {
 			resourceName + " in resource group " + groupName + ".", 
 			"ResourceGroupManager::openResource");
 
-		// Keep compiler happy
-		return DataStreamPtr();
-
-
     }
     //-----------------------------------------------------------------------
     DataStreamListPtr ResourceGroupManager::openResources(

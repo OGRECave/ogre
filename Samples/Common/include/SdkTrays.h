@@ -34,6 +34,11 @@
 #include "OgreTextAreaOverlayElement.h"
 #include <math.h>
 
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+// TODO - remove this
+#   pragma warning (disable : 4244)
+#endif
+
 namespace OgreBites
 {
 	enum TrayLocation   // enumerator values for widget tray anchoring locations

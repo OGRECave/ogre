@@ -266,15 +266,14 @@ namespace Ogre {
         removeAllAffectors();
 
         // Copy emitters
-        unsigned int i;
-        for(i = 0; i < rhs.getNumEmitters(); ++i)
+        for(unsigned short i = 0; i < rhs.getNumEmitters(); ++i)
         {
             ParticleEmitter* rhsEm = rhs.getEmitter(i);
             ParticleEmitter* newEm = addEmitter(rhsEm->getType());
             rhsEm->copyParametersTo(newEm);
         }
         // Copy affectors
-        for(i = 0; i < rhs.getNumAffectors(); ++i)
+        for(unsigned short i = 0; i < rhs.getNumAffectors(); ++i)
         {
             ParticleAffector* rhsAf = rhs.getAffector(i);
             ParticleAffector* newAf = addAffector(rhsAf->getType());

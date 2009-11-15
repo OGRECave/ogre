@@ -73,7 +73,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Overlay::assignZOrders()
 	{
-		ushort zorder = mZOrder * 100;
+		ushort zorder = static_cast<ushort>(mZOrder * 100.0f);
 
         // Notify attached 2D elements
         OverlayContainerList::iterator i, iend;
@@ -96,7 +96,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     ushort Overlay::getZOrder(void) const
     {
-        return mZOrder;
+        return (ushort)mZOrder;
     }
     //---------------------------------------------------------------------
     bool Overlay::isVisible(void) const
@@ -288,7 +288,7 @@ namespace Ogre {
             uint8 oldgrp = queue->getDefaultQueueGroup();
             ushort oldPriority = queue-> getDefaultRenderablePriority();
             queue->setDefaultQueueGroup(RENDER_QUEUE_OVERLAY);
-            queue->setDefaultRenderablePriority((mZOrder*100)-1);
+            queue->setDefaultRenderablePriority(static_cast<ushort>((mZOrder*100)-1));
             mRootNode->_findVisibleObjects(cam, queue, NULL, true, false);
             // Reset the group
             queue->setDefaultQueueGroup(oldgrp);

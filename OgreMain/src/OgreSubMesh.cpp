@@ -287,7 +287,7 @@ namespace Ogre {
         Cluster split (int split_axis, const VertexElement *poselem,
                        uint8 *vdata, size_t vsz)
         {
-            Real r = (mMin [split_axis] + mMax [split_axis]) * 0.5;
+            Real r = (mMin [split_axis] + mMax [split_axis]) * 0.5f;
             Cluster newbox;
 
             // Separate all points that are inside the new bbox

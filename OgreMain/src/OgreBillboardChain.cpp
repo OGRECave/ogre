@@ -517,7 +517,7 @@ namespace Ogre {
 					Vector3 vP1ToEye = eyePos - elem.position;
 					Vector3 vPerpendicular = chainTangent.crossProduct(vP1ToEye);
 					vPerpendicular.normalise();
-					vPerpendicular *= (elem.width * 0.5);
+					vPerpendicular *= (elem.width * 0.5f);
 
 					Vector3 pos0 = elem.position - vPerpendicular;
 					Vector3 pos1 = elem.position + vPerpendicular;

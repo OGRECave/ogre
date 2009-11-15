@@ -889,9 +889,9 @@ bool PortalBase::closeTo(const PortalBase* otherPortal)
 		{
 			// quad portals must be within 1/4 sphere of each other
 			Sphere quarterSphere1 = mDerivedSphere;
-			quarterSphere1.setRadius(quarterSphere1.getRadius()*0.25);
+			quarterSphere1.setRadius(quarterSphere1.getRadius()*0.25f);
 			Sphere quarterSphere2 = otherPortal->getDerivedSphere();
-			quarterSphere2.setRadius(quarterSphere2.getRadius()*0.25);
+			quarterSphere2.setRadius(quarterSphere2.getRadius()*0.25f);
 			close = quarterSphere1.intersects(quarterSphere2);
 		}
 		break;

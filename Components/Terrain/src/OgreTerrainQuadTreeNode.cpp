@@ -35,6 +35,11 @@ THE SOFTWARE.
 
 #define DO_SKIRTS 1
 
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+// we do lots of conversions here, casting them all is tedious & cluttered, we know what we're doing
+#   pragma warning (disable : 4244)
+#endif
+
 namespace Ogre
 {
 	unsigned short TerrainQuadTreeNode::POSITION_BUFFER = 0;
@@ -67,7 +72,7 @@ namespace Ogre
 	{
 		if (terrain->getMaxBatchSize() < size)
 		{
-			uint16 childSize = ((size - 1) * 0.5) + 1;
+			uint16 childSize = ((size - 1) * 0.5f) + 1;
 			uint16 childOff = childSize - 1;
 			uint16 childLod = lod - 1; // LOD levels decrease down the tree (higher detail)
 			uint16 childDepth = depth + 1;
@@ -576,7 +581,7 @@ namespace Ogre
 			lockMode = HardwareBuffer::HBL_DISCARD;
 		}
 
-		Real uvScale = 1.0 / (mTerrain->getSize() - 1);
+		Real uvScale = 1.0f / (mTerrain->getSize() - 1);
 		const float* pBaseHeight = mTerrain->getHeightData(rect.left, rect.top);
 		const float* pBaseDelta = mTerrain->getDeltaData(rect.left, rect.top);
 		uint16 rowskip = mTerrain->getSize() * inc;
@@ -629,7 +634,7 @@ namespace Ogre
 					// UVs - base UVs vary from 0 to 1, all other values
 					// will be derived using scalings
 					*pPosBuf++ = x * uvScale;
-					*pPosBuf++ = 1.0 - (y * uvScale);
+					*pPosBuf++ = 1.0f - (y * uvScale);
 
 				}
 
@@ -715,7 +720,7 @@ namespace Ogre
 
 					// UVs - same as base
 					*pPosBuf++ = x * uvScale;
-					*pPosBuf++ = 1.0 - (y * uvScale);
+					*pPosBuf++ = 1.0f - (y * uvScale);
 
 				}
 
@@ -785,7 +790,7 @@ namespace Ogre
 
 					// UVs - same as base
 					*pPosBuf++ = x * uvScale;
-					*pPosBuf++ = 1.0 - (y * uvScale);
+					*pPosBuf++ = 1.0f - (y * uvScale);
 				}
 				if (pDeltaBuf)
 				{
@@ -1226,7 +1231,7 @@ namespace Ogre
 				dist = localPos.length();
 				// deduct half the radius of the box, assume that on average the 
 				// worst case is best approximated by this
-				dist -= (mBoundingRadius * 0.5);
+				dist -= (mBoundingRadius * 0.5f);
 			}
 
 			// Do material LOD
@@ -1303,10 +1308,10 @@ namespace Ogre
 								distTotal -= childLod->lastTransitionDist;
 							}
 							// fade from 0 to 1 in the last 25% of the distance
-							Real distMorphRegion = distTotal * 0.25;
+							Real distMorphRegion = distTotal * 0.25f;
 							Real distRemain = distTransition - dist;
 
-							mLodTransition = 1.0 - (distRemain / distMorphRegion);
+							mLodTransition = 1.0f - (distRemain / distMorphRegion);
 							mLodTransition = std::min(1.0f, mLodTransition);
 							mLodTransition = std::max(0.0f, mLodTransition);
 

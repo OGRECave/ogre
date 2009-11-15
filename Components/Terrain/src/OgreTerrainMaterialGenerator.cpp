@@ -40,6 +40,12 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 
 
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+// we do lots of conversions here, casting them all is tedious & cluttered, we know what we're doing
+#   pragma warning (disable : 4244)
+#endif
+
+
 namespace Ogre
 {
 	//---------------------------------------------------------------------
@@ -184,7 +190,7 @@ namespace Ogre
 		inVec.y = rect.bottom - 1; // this is 'top' in image space, also make inclusive
 		terrain->convertPosition(Terrain::POINT_SPACE, inVec, Terrain::TERRAIN_SPACE, outVec);
 		imgRect.left = outVec.x * compSize;
-		imgRect.top = (1.0 - outVec.y) * compSize;
+		imgRect.top = (1.0f - outVec.y) * compSize;
 		inVec.x = rect.right - 1;
 		inVec.y = rect.top; // this is 'bottom' in image space
 		terrain->convertPosition(Terrain::POINT_SPACE, inVec, Terrain::TERRAIN_SPACE, outVec);

@@ -208,8 +208,8 @@ public:
 		if (mQuadCornerModified)
 		{
 			// insure positions are using peculiar render system offsets 
-			Real hOffset = rs->getHorizontalTexelOffset() / (0.5 * vp->getActualWidth());
-			Real vOffset = rs->getVerticalTexelOffset() / (0.5 * vp->getActualHeight());
+			Real hOffset = rs->getHorizontalTexelOffset() / (0.5f * vp->getActualWidth());
+			Real vOffset = rs->getVerticalTexelOffset() / (0.5f * vp->getActualHeight());
 			rect->setCorners(mQuadLeft + hOffset, mQuadTop - vOffset, mQuadRight + hOffset, mQuadBottom - vOffset);
 		}
 
@@ -258,7 +258,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
 				pass->getClearBuffers(),
 				pass->getClearColour(),
 				pass->getClearDepth(),
-				pass->getClearStencil()
+				(ushort)pass->getClearStencil()
 				));
             break;
 		case CompositionPass::PT_STENCIL:
