@@ -58,19 +58,19 @@ namespace Ogre {
     
     typedef struct _PVRTCTexHeader
     {
-        uint32_t headerLength;
-        uint32_t height;
-        uint32_t width;
-        uint32_t numMipmaps;
-        uint32_t flags;
-        uint32_t dataLength;
-        uint32_t bpp;
-        uint32_t bitmaskRed;
-        uint32_t bitmaskGreen;
-        uint32_t bitmaskBlue;
-        uint32_t bitmaskAlpha;
-        uint32_t pvrTag;
-        uint32_t numSurfs;
+        uint32 headerLength;
+        uint32 height;
+        uint32 width;
+        uint32 numMipmaps;
+        uint32 flags;
+        uint32 dataLength;
+        uint32 bpp;
+        uint32 bitmaskRed;
+        uint32 bitmaskGreen;
+        uint32 bitmaskBlue;
+        uint32 bitmaskAlpha;
+        uint32 pvrTag;
+        uint32 numSurfs;
     } PVRTCTexHeader;
 	
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
@@ -128,7 +128,7 @@ namespace Ogre {
     Codec::DecodeResult PVRTCCodec::decode(DataStreamPtr& stream) const
     {
         PVRTCTexHeader header;
-        uint32_t flags = 0, pvrTag = 0, formatFlags = 0;
+        uint32 flags = 0, pvrTag = 0, formatFlags = 0;
         size_t numFaces = 1; // Assume one face until we know otherwise
 
         ImageData *imgData = OGRE_NEW ImageData();
@@ -148,11 +148,11 @@ namespace Ogre {
 
         // Get format flags
         flags = header.flags;
-        flipEndian((void *)flags, sizeof(uint32_t));
+        flipEndian((void *)flags, sizeof(uint32));
         formatFlags = flags & PVR_TEXTURE_FLAG_TYPE_MASK;
 
-        uint32_t bitmaskAlpha = header.bitmaskAlpha;
-        flipEndian((void *)bitmaskAlpha, sizeof(uint32_t));
+        uint32 bitmaskAlpha = header.bitmaskAlpha;
+        flipEndian((void *)bitmaskAlpha, sizeof(uint32));
 
         if (formatFlags == kPVRTextureFlagTypePVRTC_4 || formatFlags == kPVRTextureFlagTypePVRTC_2)
         {

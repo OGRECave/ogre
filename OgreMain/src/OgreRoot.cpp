@@ -94,10 +94,10 @@ THE SOFTWARE.
 #include "OgreWindowEventUtilities.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-#include "macUtils.h"
-    #if OGRE_NO_PVRTC_CODEC == 0
-        #include "OgrePVRTCCodec.h"
-    #endif
+#  include "macUtils.h"
+#endif
+#if OGRE_NO_PVRTC_CODEC == 0
+#  include "OgrePVRTCCodec.h"
 #endif
 
 namespace Ogre {
