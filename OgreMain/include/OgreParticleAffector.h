@@ -92,7 +92,11 @@ namespace Ogre {
         @param
             pParticle Pointer to a Particle to initialize.
         */
-		virtual void _initParticle(Particle* pParticle) { /* by default do nothing */ }
+		virtual void _initParticle(Particle* pParticle)
+                {
+                    /* by default do nothing */
+                    (void)pParticle;
+                }
 
         /** Method called to allow the affector to 'do it's stuff' on all active particles in the system.
         @remarks

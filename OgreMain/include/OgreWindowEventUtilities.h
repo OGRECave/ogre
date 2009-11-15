@@ -66,7 +66,8 @@ namespace Ogre
 		@param rw
 			The RenderWindow which created this events
 		*/
-		virtual void windowMoved(RenderWindow* rw)   {}
+		virtual void windowMoved(RenderWindow* rw)
+                { (void)rw; }
 
 		/**
 		@Remarks
@@ -74,7 +75,8 @@ namespace Ogre
 		@param rw
 			The RenderWindow which created this events
 		*/
-		virtual void windowResized(RenderWindow* rw) {}
+		virtual void windowResized(RenderWindow* rw)
+                { (void)rw; }
 
 		/**
 		@Remarks
@@ -84,7 +86,7 @@ namespace Ogre
 		@return True will close the window(default).
 		*/
 		virtual bool windowClosing(RenderWindow* rw)
-		{ return true; }
+		{ (void)rw; return true; }
 
 		/**
 		@Remarks
@@ -96,7 +98,8 @@ namespace Ogre
 			all windowClosed events are triggered. This allows apps to deinitialise properly if they
 			have services that needs the window to exist when deinitialising.
 		*/
-		virtual void windowClosed(RenderWindow* rw)  {}
+		virtual void windowClosed(RenderWindow* rw)
+                { (void)rw; }
 
 		/**
 		@Remarks
@@ -104,7 +107,8 @@ namespace Ogre
 		@param rw
 			The RenderWindow which created this events
 		*/
-		virtual void windowFocusChange(RenderWindow* rw) {}
+		virtual void windowFocusChange(RenderWindow* rw)
+                { (void)rw; }
 	};
 
 	/**

@@ -469,6 +469,7 @@ namespace Ogre {
         /** Overridden from Renderable */
         Real getSquaredViewDepth(const Camera* cam) const 
         { 
+            (void)cam;
             return 10000 - getZOrder(); 
         }
 

@@ -153,6 +153,7 @@ namespace Ogre {
 		*/
 		virtual DataStreamPtr create(const String& filename) const
 		{
+                        (void)filename;
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
 				"This archive does not support creation of files.", 
 				"Archive::create");
@@ -164,6 +165,7 @@ namespace Ogre {
 		*/
 		virtual void remove(const String& filename) const
 		{
+                        (void)filename;
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
 				"This archive does not support removal of files.", 
 				"Archive::remove");

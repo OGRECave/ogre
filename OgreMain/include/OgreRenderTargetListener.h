@@ -97,7 +97,9 @@ namespace Ogre {
             clear the viewports yourself in this event handler before doing your rendering
             or just render over the top if you don't need to.
         */
-        virtual void preRenderTargetUpdate(const RenderTargetEvent& evt) { }
+        virtual void preRenderTargetUpdate(const RenderTargetEvent& evt)
+        { (void)evt; }
+
         /** Called just after a RenderTarget has been rendered to.
         @remarks
             This event is called just after all the viewports attached to the target
@@ -106,7 +108,8 @@ namespace Ogre {
             the contents of the target already there (depending on the material settings 
             you use etc).
         */
-        virtual void postRenderTargetUpdate(const RenderTargetEvent& evt) { }
+        virtual void postRenderTargetUpdate(const RenderTargetEvent& evt)
+        { (void)evt; }
 
         /* Called just before a Viewport on a RenderTarget is to be updated.
         @remarks
@@ -114,23 +117,27 @@ namespace Ogre {
             rendered to. You can use this to perform per-viewport settings changes,
             such as showing / hiding particular overlays.
         */
-        virtual void preViewportUpdate(const RenderTargetViewportEvent& evt) { }
+        virtual void preViewportUpdate(const RenderTargetViewportEvent& evt)
+        { (void)evt; }
 
         /* Called just after a Viewport on a RenderTarget is to be updated.
         @remarks
             This method is called after each viewport on the RenderTarget is
             rendered to. 
         */
-        virtual void postViewportUpdate(const RenderTargetViewportEvent& evt) { }
+        virtual void postViewportUpdate(const RenderTargetViewportEvent& evt)
+        { (void)evt; }
 
 		/** Called to notify listener that a Viewport has been added to the 
 			target in question.
 		*/
-		virtual void viewportAdded(const RenderTargetViewportEvent& evt) {}
+		virtual void viewportAdded(const RenderTargetViewportEvent& evt)
+                { (void)evt; }
 		/** Called to notify listener that a Viewport has been removed from the 
 			target in question.
 		*/
-		virtual void viewportRemoved(const RenderTargetViewportEvent& evt) {}
+		virtual void viewportRemoved(const RenderTargetViewportEvent& evt)
+                { (void)evt; }
     };
 	/** @} */
 	/** @} */

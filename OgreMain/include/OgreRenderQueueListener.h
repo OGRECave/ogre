@@ -78,7 +78,8 @@ namespace Ogre {
 			for this queue group.
         */
         virtual void renderQueueStarted(uint8 queueGroupId, const String& invocation, 
-			bool& skipThisInvocation) {}
+			bool& skipThisInvocation)
+        { (void)queueGroupId; (void)invocation; (void)skipThisInvocation; }
 
         /** Event raised after a queue group is rendered. 
         @remarks
@@ -93,7 +94,8 @@ namespace Ogre {
 			events will also be fired for it again.
         */
         virtual void renderQueueEnded(uint8 queueGroupId, const String& invocation, 
-			bool& repeatThisInvocation) {}
+			bool& repeatThisInvocation)
+        { (void)queueGroupId; (void)invocation; (void)repeatThisInvocation; }
     };
 	/** @} */
 	/** @} */

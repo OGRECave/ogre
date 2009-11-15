@@ -232,6 +232,7 @@ namespace Ogre {
 
 			Stream& operator<< (const Flush& v)
 			{
+                                (void)v;
 				mTarget->logMessage(mCache.str(), mLevel, mMaskDebug);
 				mCache.str(StringUtil::BLANK);
 				return *this;

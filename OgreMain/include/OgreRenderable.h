@@ -119,10 +119,13 @@ namespace Ogre {
 			true if the automatic render should proceed, false to skip it on 
 			the assumption that the Renderable has done it manually.
 		*/
-		virtual bool preRender(SceneManager* sm, RenderSystem* rsys) { return true; }
+		virtual bool preRender(SceneManager* sm, RenderSystem* rsys)
+                { (void)sm; (void)rsys; return true; }
+
 		/** Called immediately after the Renderable has been rendered. 
 		*/
-		virtual void postRender(SceneManager* sm, RenderSystem* rsys) {}
+		virtual void postRender(SceneManager* sm, RenderSystem* rsys)
+                { (void)sm; (void)rsys; }
 
         /** Gets the world transform matrix / matrices for this renderable object.
             @remarks

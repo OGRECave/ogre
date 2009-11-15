@@ -100,7 +100,8 @@ namespace Ogre
 		@param width The new width to use
 		@param height The new height to use
 		*/
-		virtual void setFullscreen(bool fullScreen, unsigned int width, unsigned int height) {}
+		virtual void setFullscreen(bool fullScreen, unsigned int width, unsigned int height)
+                { (void)fullScreen; (void)width; (void)height; }
         
         /** Destroys the window.
         */
@@ -126,7 +127,8 @@ namespace Ogre
 
         /** Set the visibility state
         */
-        virtual void setVisible(bool visible) {}
+        virtual void setVisible(bool visible)
+        { (void)visible; }
 
         /** Overridden from RenderTarget, flags invisible windows as inactive
         */

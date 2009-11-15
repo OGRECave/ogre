@@ -397,7 +397,8 @@ namespace Ogre {
 			then the resources discovered in this script will be loaded / unloaded
 			with it.
 		*/
-		virtual void parseScript(DataStreamPtr& stream, const String& groupName) {}
+		virtual void parseScript(DataStreamPtr& stream, const String& groupName)
+                { (void)stream; (void)groupName; }
 
 		/** Gets the relative loading order of resources of this type.
 		@remarks

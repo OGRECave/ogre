@@ -165,7 +165,7 @@ namespace Ogre
             return m[iRow];
         }
 
-        inline const Real *const operator [] ( size_t iRow ) const
+        inline const Real *operator [] ( size_t iRow ) const
         {
             assert( iRow < 4 );
             return m[iRow];

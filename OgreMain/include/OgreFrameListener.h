@@ -97,7 +97,8 @@ namespace Ogre {
                 True to go ahead, false to abort rendering and drop
                 out of the rendering loop.
         */
-        virtual bool frameStarted(const FrameEvent& evt) { return true; }
+        virtual bool frameStarted(const FrameEvent& evt)
+        { (void)evt; return true; }
 		
 		/** Called after all render targets have had their rendering commands 
 			issued, but before render windows have been asked to flip their 
@@ -115,7 +116,9 @@ namespace Ogre {
 		@return
 			True to continue rendering, false to drop out of the rendering loop.
 		*/
-		virtual bool frameRenderingQueued(const FrameEvent& evt) { return true; }
+		virtual bool frameRenderingQueued(const FrameEvent& evt)
+                { (void)evt; return true; }
+
         /** Called just after a frame has been rendered.
 		@remarks
 			This event happens after all render targets have been fully updated
@@ -124,7 +127,8 @@ namespace Ogre {
                 True to continue with the next frame, false to drop
                 out of the rendering loop.
         */
-        virtual bool frameEnded(const FrameEvent& evt) { return true; }
+        virtual bool frameEnded(const FrameEvent& evt)
+        { (void)evt; return true; }
 
 		virtual ~FrameListener() {}
 		

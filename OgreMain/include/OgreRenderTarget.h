@@ -150,7 +150,8 @@ namespace Ogre {
                 resulting from flipping buffers when the beam is
                 in the progress of drawing the last frame).
         */
-        virtual void swapBuffers(bool waitForVSync = true) {}
+        virtual void swapBuffers(bool waitForVSync = true)
+        { (void)waitForVSync; }
 
         /** Adds a viewport to the rendering target.
             @remarks

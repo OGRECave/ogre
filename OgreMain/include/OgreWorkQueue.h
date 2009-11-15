@@ -162,7 +162,7 @@ namespace Ogre
 			this method. 
 			*/
 			virtual bool canHandleRequest(const Request* req, const WorkQueue* srcQ) 
-			{ return true; }
+			{ (void)req; (void)srcQ; return true; }
 
 			/** The handler method every subclass must implement. 
 			If a failure is encountered, return a Response with a failure
@@ -197,7 +197,7 @@ namespace Ogre
 			this method. 
 			*/
 			virtual bool canHandleResponse(const Response* res, const WorkQueue* srcQ) 
-			{ return true; }
+			{ (void)res; (void)srcQ; return true; }
 
 			/** The handler method every subclass must implement. 
 			@param res The Response structure. The caller is responsible for

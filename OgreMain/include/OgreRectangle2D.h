@@ -71,7 +71,8 @@ namespace Ogre {
 		*/
 		void setNormals(const Ogre::Vector3 &topLeft, const Ogre::Vector3 &bottomLeft, const Ogre::Vector3 &topRight, const Ogre::Vector3 &bottomRight);
 
-        Real getSquaredViewDepth(const Camera* cam) const { return 0; }
+        Real getSquaredViewDepth(const Camera* cam) const
+        { (void)cam; return 0; }
 
         Real getBoundingRadius(void) const { return 0; }
 

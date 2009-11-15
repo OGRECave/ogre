@@ -127,6 +127,7 @@ namespace Ogre {
 		void mergeNonRenderedButInFrustum(const AxisAlignedBox& boxBounds, 
 			const Sphere& sphereBounds, const Camera* cam)
 		{
+                        (void)boxBounds;
 			// use view matrix to determine distance, works with custom view matrices
 			Vector3 vsSpherePos = cam->getViewMatrix(true) * sphereBounds.getCenter();
 			Real camDistToCenter = vsSpherePos.length();
@@ -262,7 +263,9 @@ namespace Ogre {
 			@param v The viewport being updated. You can get the camera from here.
 			*/
 			virtual void preFindVisibleObjects(SceneManager* source, 
-				IlluminationRenderStage irs, Viewport* v) {}
+				IlluminationRenderStage irs, Viewport* v)
+                        { (void)source; (void)irs; (void)v; }
+
 			/** Called after searching for visible objects in this SceneManager.
 			@remarks
 				Note that the render queue at this stage will be full of the current
@@ -274,7 +277,8 @@ namespace Ogre {
 			@param v The viewport being updated. You can get the camera from here.
 			*/
 			virtual void postFindVisibleObjects(SceneManager* source, 
-				IlluminationRenderStage irs, Viewport* v) {}
+				IlluminationRenderStage irs, Viewport* v)
+                        { (void)source; (void)irs; (void)v; }
 
 			/** Event raised after all shadow textures have been rendered into for 
 				all queues / targets but before any other geometry has been rendered
@@ -290,7 +294,8 @@ namespace Ogre {
 				This event will only be fired when texture shadows are in use.
 			@param numberOfShadowTextures The number of shadow textures in use
 			*/
-			virtual void shadowTexturesUpdated(size_t numberOfShadowTextures) {}
+			virtual void shadowTexturesUpdated(size_t numberOfShadowTextures)
+                        { (void)numberOfShadowTextures; }
 
 			/** This event occurs just before the view & projection matrices are
 		 		set for rendering into a shadow texture.
@@ -306,7 +311,9 @@ namespace Ogre {
 			@param iteration For lights that use multiple shadow textures, the iteration number
 			*/
 			virtual void shadowTextureCasterPreViewProj(Light* light, 
-				Camera* camera, size_t iteration) {}
+				Camera* camera, size_t iteration)
+                        { (void)light; (void)camera; (void)iteration; }
+
 			/** This event occurs just before the view & projection matrices are
 		 		set for re-rendering a shadow receiver.
 			@remarks
@@ -321,7 +328,8 @@ namespace Ogre {
 				the shadow texture
 			*/
 			virtual void shadowTextureReceiverPreViewProj(Light* light, 
-				Frustum* frustum) {}
+				Frustum* frustum)
+                        { (void)light; (void)frustum; }
 
 			/** Hook to allow the listener to override the ordering of lights for
 				the entire frustum.
@@ -345,13 +353,12 @@ namespace Ogre {
 				may sort.
 			@returns true if you sorted the list, false otherwise.
 			*/
-			virtual bool sortLightsAffectingFrustum(LightList& lightList) { return false; }
+			virtual bool sortLightsAffectingFrustum(LightList& lightList)
+                        { (void)lightList; return false; }
 
 			/** Event notifying the listener of the SceneManager's destruction. */
-			virtual void sceneManagerDestroyed(SceneManager* source) {}
-
-
-
+			virtual void sceneManagerDestroyed(SceneManager* source)
+                        { (void)source; }
 		};
 
 		/** Inner helper class to implement the visitor pattern for rendering objects
@@ -1658,7 +1665,8 @@ namespace Ogre {
         @note 
             The default is to return 0, ie to not report progress. 
         */
-        virtual size_t estimateWorldGeometry(const String& filename) { return 0; }
+        virtual size_t estimateWorldGeometry(const String& filename)
+        { (void)filename; return 0; }
 
         /** Estimate the number of loading stages required to load the named
             world geometry. 
@@ -1673,7 +1681,9 @@ namespace Ogre {
 			supports one type of world geometry.
 		*/		
         virtual size_t estimateWorldGeometry(DataStreamPtr& stream, 
-			const String& typeName = StringUtil::BLANK) { return 0; }
+			const String& typeName = StringUtil::BLANK)
+        { (void)stream; (void)typeName; return 0; }
+
         /** Asks the SceneManager to provide a suggested viewpoint from which the scene should be viewed.
             @remarks
                 Typically this method returns the origin unless a) world geometry has been loaded using
@@ -1703,7 +1713,8 @@ namespace Ogre {
             @par
                 On failiure, false is returned.
         */
-        virtual bool setOption( const String& strKey, const void* pValue ) { return false; }
+        virtual bool setOption( const String& strKey, const void* pValue )
+        { (void)strKey; (void)pValue; return false; }
 
         /** Method for getting the value of an implementation-specific Scene Manager option.
             @param
@@ -1718,7 +1729,8 @@ namespace Ogre {
             @par
                 On failiure, false is returned and pDestValue is set to NULL.
         */
-        virtual bool getOption( const String& strKey, void* pDestValue ) { return false; }
+        virtual bool getOption( const String& strKey, void* pDestValue )
+        { (void)strKey; (void)pDestValue; return false; }
 
         /** Method for verifying wether the scene manager has an implementation-specific
             option.
@@ -1729,7 +1741,9 @@ namespace Ogre {
             @remarks
                 If it does not, false is returned.
         */
-        virtual bool hasOption( const String& strKey ) const { return false; }
+        virtual bool hasOption( const String& strKey ) const
+        { (void)strKey; return false; }
+
         /** Method for getting all possible values for a specific option. When this list is too large
             (i.e. the option expects, for example, a float), the return value will be true, but the
             list will contain just one element whose size will be set to 0.
@@ -1744,7 +1758,8 @@ namespace Ogre {
             @par
                 On failure, false is returned.
         */
-        virtual bool getOptionValues( const String& strKey, StringVector& refValueList ) { return false; }
+        virtual bool getOptionValues( const String& strKey, StringVector& refValueList )
+        { (void)strKey; (void)refValueList; return false; }
 
         /** Method for getting all the implementation-specific options of the scene manager.
             @param
@@ -1752,7 +1767,8 @@ namespace Ogre {
             @return
                 On success, true is returned. On failiure, false is returned.
         */
-        virtual bool getOptionKeys( StringVector& refKeys ) { return false; }
+        virtual bool getOptionKeys( StringVector& refKeys )
+        { (void)refKeys; return false; }
 
         /** Internal method for updating the scene graph ie the tree of SceneNode instances managed by this class.
             @remarks

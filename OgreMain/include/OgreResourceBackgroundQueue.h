@@ -134,7 +134,7 @@ namespace Ogre {
 			BackgroundProcessResult result;
 
 			_OgreExport friend std::ostream& operator<<(std::ostream& o, const ResourceRequest& r)
-			{ return o; }
+			{ (void)r; return o; }
 		};
 
 		typedef set<BackgroundProcessTicket>::type OutstandingRequestSet;	
@@ -151,7 +151,7 @@ namespace Ogre {
 			ResourceRequest request;
 
 			_OgreExport friend std::ostream& operator<<(std::ostream& o, const ResourceResponse& r)
-			{ return o; }
+			{ (void)r; return o; }
 		};
 
 		BackgroundProcessTicket addRequest(ResourceRequest& req);

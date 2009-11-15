@@ -518,7 +518,8 @@ namespace Ogre {
          * this callback.  Do that stuff in loadResource.
 		@param resource The resource which wishes to load
 		*/
-		virtual void prepareResource(Resource* resource) { }
+		virtual void prepareResource(Resource* resource)
+                { (void)resource; }
 
 		/** Called when a resource wishes to prepare.
 		@param resource The resource which wishes to prepare

@@ -117,11 +117,15 @@ namespace Ogre {
 		@param resourceCount The number of resources which will be prepared, including
             a number of stages required to prepare any linked world geometry
 		*/
-		virtual void resourceGroupPrepareStarted(const String& groupName, size_t resourceCount) {}
+		virtual void resourceGroupPrepareStarted(const String& groupName, size_t resourceCount)
+                { (void)groupName; (void)resourceCount; }
+
 		/** This event is fired when a declared resource is about to be prepared. 
 		@param resource Weak reference to the resource prepared.
 		*/
-		virtual void resourcePrepareStarted(const ResourcePtr& resource) {}
+		virtual void resourcePrepareStarted(const ResourcePtr& resource)
+                { (void)resource; }
+
         /** This event is fired when the resource has been prepared. 
         */
         virtual void resourcePrepareEnded(void) {}
@@ -130,7 +134,9 @@ namespace Ogre {
             included in the resourceCount passed in resourceGroupLoadStarted.
         @param description Text description of what was just prepared
         */
-        virtual void worldGeometryPrepareStageStarted(const String& description) {}
+        virtual void worldGeometryPrepareStageStarted(const String& description)
+        { (void)description; }
+
         /** This event is fired when a stage of preparing linked world geometry 
             has been completed. The number of stages required will have been 
             included in the resourceCount passed in resourceGroupLoadStarted.
@@ -138,7 +144,8 @@ namespace Ogre {
         */
         virtual void worldGeometryPrepareStageEnded(void) {}
         /** This event is fired when a resource group finished preparing. */
-        virtual void resourceGroupPrepareEnded(const String& groupName) {}
+        virtual void resourceGroupPrepareEnded(const String& groupName)
+        { (void)groupName; }
 
 		/** This event is fired  when a resource group begins loading.
 		@param groupName The name of the group being loaded

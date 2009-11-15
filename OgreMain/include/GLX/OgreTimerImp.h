@@ -58,7 +58,8 @@ namespace Ogre
             @par
                 On failure, false is returned.
         */
-        bool setOption( const String& strKey, const void* pValue ) { return false; }
+        bool setOption( const String& strKey, const void* pValue )
+        { (void)strKey; (void)pValue; return false; }
 
 		/** Resets timer */
 		void reset();

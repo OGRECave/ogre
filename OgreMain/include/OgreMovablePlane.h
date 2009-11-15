@@ -88,7 +88,12 @@ namespace Ogre {
         const Plane& _getDerivedPlane(void) const;
 		/// @copydoc MovableObject::visitRenderables
 		void visitRenderables(Renderable::Visitor* visitor, 
-			bool debugRenderables = false) {/* do nothing */}
+			bool debugRenderables = false)
+                {
+                    /* do nothing */
+                    (void)visitor;
+                    (void)debugRenderables;
+                }
 
     };
 	/** @} */

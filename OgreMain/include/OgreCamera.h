@@ -94,11 +94,16 @@ namespace Ogre {
 			virtual ~Listener() {}
 
 			/// Called prior to the scene being rendered with this camera
-			virtual void cameraPreRenderScene(Camera* cam) {}
+			virtual void cameraPreRenderScene(Camera* cam)
+                        { (void)cam; }
+
 			/// Called after the scene has been rendered with this camera
-			virtual void cameraPostRenderScene(Camera* cam) {}
+			virtual void cameraPostRenderScene(Camera* cam)
+                        { (void)cam; }
+
 			/// Called when the camera is being destroyed
-			virtual void cameraDestroyed(Camera* cam) {}
+			virtual void cameraDestroyed(Camera* cam)
+                        { (void)cam; }
 
 		};
     protected:

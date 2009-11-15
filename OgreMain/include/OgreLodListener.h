@@ -131,7 +131,8 @@ namespace Ogre {
             postqueueMovableObjectLodChanged called after
             rendering is complete.
         */
-        virtual bool prequeueMovableObjectLodChanged(const MovableObjectLodChangedEvent& evt) { return false; };
+        virtual bool prequeueMovableObjectLodChanged(const MovableObjectLodChangedEvent& evt)
+        { (void)evt; return false; }
 
         /**
         Called after a movable object's lod has changed.
@@ -139,7 +140,8 @@ namespace Ogre {
             May be called even if not requested from prequeueMovableObjectLodChanged
             as only one event queue is maintained per SceneManger instance.
         */
-        virtual void postqueueMovableObjectLodChanged(const MovableObjectLodChangedEvent& evt) { };
+        virtual void postqueueMovableObjectLodChanged(const MovableObjectLodChangedEvent& evt)
+        { (void)evt; }
 
         /**
         Called before an entity's mesh lod has changed.
@@ -157,7 +159,8 @@ namespace Ogre {
             postqueueEntityMeshLodChanged called after
             rendering is complete.
         */
-        virtual bool prequeueEntityMeshLodChanged(EntityMeshLodChangedEvent& evt) { return false; };
+        virtual bool prequeueEntityMeshLodChanged(EntityMeshLodChangedEvent& evt)
+        { (void)evt; return false; }
 
         /**
         Called after an entity's mesh lod has changed.
@@ -165,7 +168,8 @@ namespace Ogre {
             May be called even if not requested from prequeueEntityMeshLodChanged
             as only one event queue is maintained per SceneManger instance.
         */
-        virtual void postqueueEntityMeshLodChanged(const EntityMeshLodChangedEvent& evt) { };
+        virtual void postqueueEntityMeshLodChanged(const EntityMeshLodChangedEvent& evt)
+        { (void)evt; }
 
         /**
         Called before an entity's material lod has changed.
@@ -183,7 +187,8 @@ namespace Ogre {
             postqueueMaterialLodChanged called after
             rendering is complete.
         */
-        virtual bool prequeueEntityMaterialLodChanged(EntityMaterialLodChangedEvent& evt) { return false; };
+        virtual bool prequeueEntityMaterialLodChanged(EntityMaterialLodChangedEvent& evt)
+        { (void)evt; return false; }
 
         /**
         Called after an entity's material lod has changed.
@@ -191,7 +196,8 @@ namespace Ogre {
             May be called even if not requested from prequeueEntityMaterialLodChanged
             as only one event queue is maintained per SceneManger instance.
         */
-        virtual void postqueueEntityMaterialLodChanged(const EntityMaterialLodChangedEvent& evt) { };
+        virtual void postqueueEntityMaterialLodChanged(const EntityMaterialLodChangedEvent& evt)
+        { (void)evt; }
 
     };
 	/** @} */

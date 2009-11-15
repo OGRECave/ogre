@@ -109,6 +109,8 @@ namespace Ogre {
 		*/
 		virtual size_t write(const void* buf, size_t count)
 		{
+                        (void)buf;
+                        (void)count;
 			// default to not supported
 			return 0;
 		}
