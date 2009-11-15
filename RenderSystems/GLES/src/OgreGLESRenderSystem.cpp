@@ -60,6 +60,9 @@ THE SOFTWARE.
     PFNGLFRAMEBUFFERTEXTURE2DOESPROC glFramebufferTexture2DOES;
     PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVOESPROC glGetFramebufferAttachmentParameterivOES;
     PFNGLGENERATEMIPMAPOESPROC glGenerateMipmapOES;
+	PFNGLBLENDEQUATIONOESPROC glBlendEquationOES;
+	PFNGLBLENDFUNCSEPARATEOESPROC glBlendFuncSeparateOES;
+	PFNGLBLENDEQUATIONSEPARATEOESPROC glBlendEquationSeparateOES;
 #	endif
 
 #endif
@@ -95,6 +98,9 @@ namespace Ogre {
             ::glFramebufferTexture2DOES = (PFNGLFRAMEBUFFERTEXTURE2DOESPROC)eglGetProcAddress("glFramebufferTexture2DOES");
             ::glGetFramebufferAttachmentParameterivOES = (PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVOESPROC)eglGetProcAddress("glGetFramebufferAttachmentParameterivOES");
             ::glGenerateMipmapOES = (PFNGLGENERATEMIPMAPOESPROC)eglGetProcAddress("glGenerateMipmapOES");
+			::glBlendEquationOES = (PFNGLBLENDEQUATIONOESPROC)eglGetProcAddress("glBlendEquationOES");
+			::glBlendFuncSeparateOES = (PFNGLBLENDFUNCSEPARATEOESPROC)eglGetProcAddress("glBlendFuncSeparateOES");
+			::glBlendEquationSeparateOES = (PFNGLBLENDEQUATIONSEPARATEOESPROC)eglGetProcAddress("glBlendEquationSeparateOES");
 #endif
         GL_CHECK_ERROR;
         size_t i;

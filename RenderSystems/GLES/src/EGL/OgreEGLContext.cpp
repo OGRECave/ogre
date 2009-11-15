@@ -89,7 +89,7 @@ namespace Ogre {
 
     void EGLContext::endCurrent()
     {
-		eglMakeCurrent(mEglDisplay, None, None, None);
+		eglMakeCurrent(mEglDisplay, 0, 0, 0);
     }
 
 	EGLSurface EGLContext::getDrawable() const

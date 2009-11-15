@@ -221,7 +221,7 @@ namespace Ogre {
                         __FUNCTION__);
 
             *nElements = 0;
-            return None;
+            return 0;
 		}
 
         configs = (EGLConfig*) malloc(*nElements * sizeof(EGLConfig));
@@ -233,7 +233,7 @@ namespace Ogre {
 
             *nElements = 0;
             free(configs);
-			return None;
+			return 0;
         }
 
         return configs;

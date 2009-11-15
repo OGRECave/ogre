@@ -118,6 +118,10 @@ namespace Ogre {
 		typedef void (GL_APIENTRY *PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVOES)(GLenum target, GLenum attachment,GLenum pname, GLint *params);
 		typedef void (GL_APIENTRY *PFNGLGENERATEMIPMAPOES)(GLenum target);
 
+		typedef void (GL_APIENTRY *PFNGLBLENDEQUATIONOES)(GLenum mode);
+		typedef void (GL_APIENTRY *PFNGLBLENDFUNCSEPARATEOES)(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha);
+		typedef void (GL_APIENTRY *PFNGLBLENDEQUATIONSEPARATEOES)(GLenum modeRGB, GLenum modeAlpha);
+
 		// GL_OES_point_size_array
 		typedef void (GL_APIENTRY *PFNGLPOINTSIZEPOINTEROES)(GLenum type, GLsizei stride, const void *ptr );
 #	endif
@@ -137,6 +141,10 @@ namespace Ogre {
         glFramebufferTexture2DOES = (PFNGLFRAMEBUFFERTEXTURE2DOES)getProcAddress("glFramebufferTexture2DOES");
         glGetFramebufferAttachmentParameterivOES = (PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVOES)getProcAddress("glGetFramebufferAttachmentParameterivOES");
         glGenerateMipmapOES = (PFNGLGENERATEMIPMAPOES)getProcAddress("glGenerateMipmapOES");
+
+		glBlendEquationOES = (PFNGLBLENDEQUATIONOES)getProcAddress("glBlendEquationOES");
+		glBlendFuncSeparateOES = (PFNGLBLENDFUNCSEPARATEOES)getProcAddress("glBlendFuncSeparateOES");
+		glBlendEquationSeparateOES = (PFNGLBLENDEQUATIONSEPARATEOES)getProcAddress("glBlendEquationSeparateOES");
 #endif
     }
 
