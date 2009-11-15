@@ -149,7 +149,7 @@ if (OGRE_INCLUDE_DIR AND OGRE_CONFIG_INCLUDE_DIR)
 
   # determine configuration settings
   set(OGRE_CONFIG_HEADERS
-    ${OGRE_CONFIG_INCLUDE_DIR}/buildsettings.h
+    ${OGRE_CONFIG_INCLUDE_DIR}/OgreBuildSettings.h
     ${OGRE_CONFIG_INCLUDE_DIR}/config.h
     ${OGRE_CONFIG_INCLUDE_DIR}/OgreConfig.h
   )
