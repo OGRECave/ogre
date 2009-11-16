@@ -90,9 +90,8 @@ extern PFNGLBLENDEQUATIONSEPARATEOESPROC glBlendEquationSeparateOES;
 // Define GL_NONE for convenience
 #define GL_NONE 0
 
-// PowerVR extension
-#ifndef GL_BGRA_PVR
-#   define GL_BGRA_PVR 0x80E1
+#ifndef GL_BGRA
+#   define GL_BGRA  0x80E1
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)

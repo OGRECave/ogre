@@ -85,13 +85,8 @@ namespace Ogre {
         GL_CHECK_ERROR;
         glBindTexture(GL_TEXTURE_2D, mWarningTextureID);
         GL_CHECK_ERROR;
-#if GL_OES_rgb8_rgba8
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8_OES, width, height, 0, GL_BGRA_EXT,
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                      GL_UNSIGNED_BYTE, (void*)data);
-#else
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGRA_EXT,
-                     GL_UNSIGNED_BYTE, (void*)data);
-#endif
         GL_CHECK_ERROR;
         // Free memory
         OGRE_DELETE [] data;
