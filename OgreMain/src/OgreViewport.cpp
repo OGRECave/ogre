@@ -191,8 +191,20 @@ namespace Ogre {
 #else
         mOrientation = orient;
         
-        // Tell the render window to resize
+        // Tell the render window to resize.  Try to use the auto created window first.
 		RenderWindow* rw = Root::getSingleton().getAutoCreatedWindow();
+        if(!rw)
+        {
+            if(!mTarget)
+            {
+                OGRE_EXCEPT(Exception:: ERR_RENDERINGAPI_ERROR,
+                    "This viewport does not have a valid RenderTarget",
+                    __FUNCTION__);
+            }
+
+            // If there is no auto created window then use this viewport's RenderTarget
+            rw = (RenderWindow *)mTarget;
+        }
         rw->changeOrientation(orient);
 
 		// Update the render system config
