@@ -47,7 +47,7 @@ endif ()
 
 # include headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${CMAKE_SOURCE_DIR}/OgreMain/include)
+include_directories(${OGRE_SOURCE_DIR}/OgreMain/include)
 
 # setup target
 add_library(OgreTerrain STATIC ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})

@@ -5,7 +5,7 @@ set(SOURCE_FILES src/Terrain.cpp)
 
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/include
-	${CMAKE_SOURCE_DIR}/Components/Terrain/include)
+	${OGRE_SOURCE_DIR}/Components/Terrain/include)
 
 add_library(Sample_Terrain ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 

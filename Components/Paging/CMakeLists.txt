@@ -57,7 +57,7 @@ add_definitions(-DOGRE_PAGING_EXPORTS -D_MT -D_USRDLL)
 
 # include headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${CMAKE_SOURCE_DIR}/OgreMain/include)
+include_directories(${OGRE_SOURCE_DIR}/OgreMain/include)
 
 # setup target
 add_library(OgrePaging STATIC ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})

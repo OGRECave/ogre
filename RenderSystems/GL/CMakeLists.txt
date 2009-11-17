@@ -179,7 +179,7 @@ elseif (APPLE)
     src/OSX/OgreOSXGLSupport.mm
     src/OSX/OgreOSXWindow.cpp
   )
-  include_directories(src/OSX include/OSX "${CMAKE_SOURCE_DIR}/OgreMain/include/OSX")
+  include_directories(src/OSX include/OSX "${OGRE_SOURCE_DIR}/OgreMain/include/OSX")
   set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
   set(PLATFORM_HEADER_INSTALL "OSX")
 elseif (UNIX)

@@ -23,8 +23,8 @@ endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(
-	${CMAKE_SOURCE_DIR}/Samples/Common/include 
-	${CMAKE_SOURCE_DIR}/Components/Terrain/include)
+	${OGRE_SOURCE_DIR}/Samples/Common/include 
+	${OGRE_SOURCE_DIR}/Components/Terrain/include)
 add_executable(PlayPen WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
 target_link_libraries(PlayPen ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_Terrain_LIBRARIES})
 ogre_config_sample_exe(PlayPen)
@@ -33,10 +33,10 @@ add_dependencies(PlayPen ${TEST_DEPENDENCIES})
 
 if (OGRE_BUILD_PLATFORM_IPHONE)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/PlayPen.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-  set (OGRE_PLAYPEN_CONTENTS_PATH ${CMAKE_BINARY_DIR}/bin/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PlayPen.app)
+  set (OGRE_PLAYPEN_CONTENTS_PATH ${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PlayPen.app)
 
   add_custom_command(TARGET PlayPen POST_BUILD
-    COMMAND cp ARGS ${CMAKE_BINARY_DIR}/bin/*.cfg ${OGRE_PLAYPEN_CONTENTS_PATH}/
+    COMMAND cp ARGS ${OGRE_BINARY_DIR}/bin/*.cfg ${OGRE_PLAYPEN_CONTENTS_PATH}/
     COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/Tests/Media ${OGRE_PLAYPEN_CONTENTS_PATH}/
   )
 endif ()

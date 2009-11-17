@@ -40,7 +40,7 @@ set (HEADER_FILES
   include/OgreBlendMode.h
   include/OgreBone.h
   include/OgreBorderPanelOverlayElement.h
-  ${CMAKE_BINARY_DIR}/include/OgreBuildSettings.h
+  ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
   include/OgreCamera.h
   include/OgreCodec.h
   include/OgreColourValue.h

@@ -98,9 +98,9 @@ include_directories("${OGRE_SOURCE_DIR}/OgreMain/include")
 include_directories("${OGRE_BINARY_DIR}/include")
 if (APPLE)
   if (OGRE_BUILD_PLATFORM_IPHONE)
-    include_directories("${CMAKE_SOURCE_DIR}/OgreMain/include/iPhone")
+    include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iPhone")
   else ()
-    include_directories("${CMAKE_SOURCE_DIR}/OgreMain/include/OSX")
+    include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/OSX")
   endif ()
 endif (APPLE)
 
@@ -133,7 +133,7 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   CMAKE_FORCE_C_COMPILER(gcc-4.2 GNU)
   CMAKE_FORCE_CXX_COMPILER(gcc-4.2 GNU)
 
-  include_directories("${CMAKE_SOURCE_DIR}/OgreMain/include/iPhone")
+  include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iPhone")
 
   # Set build variables
   set(CMAKE_OSX_SYSROOT iphoneos3.0)

@@ -48,7 +48,7 @@ if (OGRE_BUILD_TESTS)
 
 	if (OGRE_BUILD_COMPONENT_PAGING)
 	  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Paging/include
-	    ${CMAKE_SOURCE_DIR}/Components/Paging/include)
+	    ${OGRE_SOURCE_DIR}/Components/Paging/include)
 	  
 	  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgrePaging)
 	  set(HEADER_FILES ${HEADER_FILES}
@@ -60,7 +60,7 @@ if (OGRE_BUILD_TESTS)
 	endif ()
 	if (OGRE_BUILD_COMPONENT_TERRAIN)
 	  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Terrain/include
-	    ${CMAKE_SOURCE_DIR}/Components/Terrain/include)
+	    ${OGRE_SOURCE_DIR}/Components/Terrain/include)
 	  
 	  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreTerrain)
 	  set(HEADER_FILES ${HEADER_FILES}
@@ -72,7 +72,7 @@ if (OGRE_BUILD_TESTS)
 	endif ()
 	if (OGRE_BUILD_COMPONENT_PROPERTY)
 	  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Property/include
-	    ${CMAKE_SOURCE_DIR}/Components/Property/include)
+	    ${OGRE_SOURCE_DIR}/Components/Property/include)
 	  
 	  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreProperty)
 	  set(HEADER_FILES ${HEADER_FILES}
@@ -129,20 +129,20 @@ if (OGRE_BUILD_TESTS)
 
 	  if (OGRE_STATIC)
 		# Static linking means we need to directly use plugins
-		include_directories(${CMAKE_SOURCE_DIR}/PlugIns/BSPSceneManager/include)
-		include_directories(${CMAKE_SOURCE_DIR}/PlugIns/CgProgramManager/include)
-		include_directories(${CMAKE_SOURCE_DIR}/PlugIns/OctreeSceneManager/include)
-		include_directories(${CMAKE_SOURCE_DIR}/PlugIns/OctreeZone/include)
-		include_directories(${CMAKE_SOURCE_DIR}/PlugIns/ParticleFX/include)
-		include_directories(${CMAKE_SOURCE_DIR}/PlugIns/PCZSceneManager/include)
-		include_directories(${CMAKE_SOURCE_DIR}/RenderSystems/Direct3D9/include)
-		include_directories(${CMAKE_SOURCE_DIR}/RenderSystems/Direct3D10/include)
-		include_directories(${CMAKE_SOURCE_DIR}/RenderSystems/GLES/include)
+		include_directories(${OGRE_SOURCE_DIR}/PlugIns/BSPSceneManager/include)
+		include_directories(${OGRE_SOURCE_DIR}/PlugIns/CgProgramManager/include)
+		include_directories(${OGRE_SOURCE_DIR}/PlugIns/OctreeSceneManager/include)
+		include_directories(${OGRE_SOURCE_DIR}/PlugIns/OctreeZone/include)
+		include_directories(${OGRE_SOURCE_DIR}/PlugIns/ParticleFX/include)
+		include_directories(${OGRE_SOURCE_DIR}/PlugIns/PCZSceneManager/include)
+		include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D9/include)
+		include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D10/include)
+		include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
 		include_directories(
-			${CMAKE_SOURCE_DIR}/RenderSystems/GL/include
-			${CMAKE_SOURCE_DIR}/RenderSystems/GL/src/GLSL/include
-			${CMAKE_SOURCE_DIR}/RenderSystems/GL/src/atifs/include
-			${CMAKE_SOURCE_DIR}/RenderSystems/GL/src/nvparse
+			${OGRE_SOURCE_DIR}/RenderSystems/GL/include
+			${OGRE_SOURCE_DIR}/RenderSystems/GL/src/GLSL/include
+			${OGRE_SOURCE_DIR}/RenderSystems/GL/src/atifs/include
+			${OGRE_SOURCE_DIR}/RenderSystems/GL/src/nvparse
 			)
 
 		# Link to all enabled plugins
@@ -151,9 +151,9 @@ if (OGRE_BUILD_TESTS)
 		# Need to include resource files so that icons are linked
 		if (WIN32)
 			set(RESOURCE_FILES
-				${CMAKE_SOURCE_DIR}/OgreMain/src/WIN32/resource.h
-				${CMAKE_SOURCE_DIR}/OgreMain/src/WIN32/OgreWin32Resources.rc
-				${CMAKE_SOURCE_DIR}/OgreMain/src/WIN32/winres.h
+				${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/resource.h
+				${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/OgreWin32Resources.rc
+				${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/winres.h
 			)
 			source_group(Resources FILES ${RESOURCE_FILES})
 		endif ()	

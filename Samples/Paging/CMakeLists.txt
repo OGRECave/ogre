@@ -15,7 +15,7 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Paging.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
-include_directories(${CMAKE_SOURCE_DIR}/Components/Paging/include)
+include_directories(${OGRE_SOURCE_DIR}/Components/Paging/include)
 
 add_executable(Demo_Paging WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})
 
