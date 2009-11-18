@@ -329,9 +329,12 @@ namespace Ogre
 			}
 			stream.write(&mLayerBlendMapSizeActual);
 			uint8* tmpData = (uint8*)OGRE_MALLOC(mLayerBlendMapSizeActual * mLayerBlendMapSizeActual * 4, MEMCATEGORY_GENERAL);
-			for (TexturePtrList::iterator i = mBlendTextureList.begin(); i != mBlendTextureList.end(); ++i)
+			uint8 texIndex = 0;
+			for (TexturePtrList::iterator i = mBlendTextureList.begin(); i != mBlendTextureList.end(); ++i, ++texIndex)
 			{
-				PixelBox dst(mLayerBlendMapSizeActual, mLayerBlendMapSizeActual, 1, (*i)->getFormat(), tmpData);
+				// Must blit back in CPU format!
+				PixelFormat cpuFormat = getBlendTextureFormat(texIndex, getLayerCount());
+				PixelBox dst(mLayerBlendMapSizeActual, mLayerBlendMapSizeActual, 1, cpuFormat, tmpData);
 				(*i)->getBuffer()->blitToMemory(dst);
 				size_t dataSz = PixelUtil::getNumElemBytes((*i)->getFormat()) * 
 					mLayerBlendMapSizeActual * mLayerBlendMapSizeActual;
