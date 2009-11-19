@@ -209,9 +209,10 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------------
 	Pass::Pass(Technique *parent, unsigned short index, const Pass& oth)
-        :mParent(parent), mIndex(index), mQueuedForDeletion(false), mPassIterationCount(1),
-		 mVertexProgramUsage(0), mShadowCasterVertexProgramUsage(0), mShadowReceiverVertexProgramUsage(0),
-		 mFragmentProgramUsage(0), mGeometryProgramUsage(0), mShadowReceiverFragmentProgramUsage(0)
+        :mParent(parent), mIndex(index), mVertexProgramUsage(0), mShadowCasterVertexProgramUsage(0), 
+		mShadowReceiverVertexProgramUsage(0), mFragmentProgramUsage(0), 
+		mShadowReceiverFragmentProgramUsage(0), mGeometryProgramUsage(0),
+		mQueuedForDeletion(false), mPassIterationCount(1)
     {
         *this = oth;
         mParent = parent;
