@@ -137,6 +137,7 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
 
   # Set build variables
   set(CMAKE_OSX_SYSROOT iphoneos3.0)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "")
   set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_UNIVERSAL_IPHONE_OS)")
   set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit ${OGRE_SOURCE_DIR}/iPhoneDependencies/lib/release/libboost_date_time.a ${OGRE_SOURCE_DIR}/iPhoneDependencies/lib/release/libboost_thread.a")
   set(XCODE_ATTRIBUTE_SDKROOT iphoneos3.0)
