@@ -134,6 +134,9 @@ protected:
 	/** Pick the target object. */
 	void pickTargetObject( const OIS::MouseEvent &evt );
 
+	/** Apply shadow type from the given shadow menu selected index. */
+	void applyShadowType(int menuIndex);
+
 // Types.
 protected:
 	typedef vector<Entity*>::type	EntityList;
@@ -148,6 +151,7 @@ protected:
 	SelectMenu*							mLightingModelMenu;		// The lighting model menu.
 	SelectMenu*							mFogModeMenu;			// The fog mode menu.
 	SelectMenu*							mLanguageMenu;			// The shading language menu.
+	SelectMenu*							mShadowMenu;			// The shadow type menu.
 	bool								mPerPixelFogEnable;		// When true the RTSS will do per pixel fog calculations.
 	bool								mSpecularEnable;		// The current specular state.	
 	RTShader::SubRenderStateFactory*	mReflectionMapFactory;	// The custom reflection map shader extension factory.
@@ -159,6 +163,9 @@ protected:
 	Label*								mTargetObjMatName;		// The target object material name label.
 	Label*								mTargetObjVS;			// The target object vertex shader label.
 	Label*								mTargetObjFS;			// The target object fragment shader label.
+	CheckBox*							mDirLightCheckBox;		// The directional light check box.
+	CheckBox*							mPointLightCheckBox;	// The point light check box.
+	CheckBox*							mSpotLightCheckBox;		// The spot light check box.
 };
 
 #endif

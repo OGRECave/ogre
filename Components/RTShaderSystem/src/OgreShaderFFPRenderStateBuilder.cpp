@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #include "OgreShaderGenerator.h"
 #include "OgreShaderFFPRenderStateBuilder.h"
 #include "OgreShaderRenderState.h"
@@ -213,3 +213,5 @@ void FFPRenderStateBuilder::resolveColourStageFlags( ShaderGenerator::SGPass* sg
 
 }
 }
+
+#endif

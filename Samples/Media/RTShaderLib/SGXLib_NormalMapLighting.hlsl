@@ -29,7 +29,7 @@ THE SOFTWARE.
 // Program Name: SGXLib_NormalMapLighting 
 // Program Desc: Normal map lighting functions. 
 // Program Type: Vertex/Pixel shader 
-// Language: CG
+// Language: HLSL
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------

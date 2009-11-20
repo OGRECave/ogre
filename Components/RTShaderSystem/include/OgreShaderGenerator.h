@@ -129,24 +129,34 @@ public:
 	Set the output vertex shader target profiles.
 	@param vertexShaderProfile The target profiles for the vertex shader.	
 	*/
-	void			setVertexShaderProfiles		(const String& vertexShaderProfile) { mVertexShaderProfiles = vertexShaderProfile; }
+	void			setVertexShaderProfiles		(const String& vertexShaderProfiles);
 
 	/** 
 	Get the output vertex shader target profiles.	
 	*/
 	const String&	getVertexShaderProfiles		() const { return mVertexShaderProfiles; }
 
+	/** 
+	Get the output vertex shader target profiles as list of strings.	
+	*/
+	const StringVector&	getVertexShaderProfilesList		() const { return mVertexShaderProfilesList; }
+
 
 	/** 
 	Set the output fragment shader target profiles.
 	@param fragmentShaderProfile The target profiles for the fragment shader.	
 	*/
-	void			setFragmentShaderProfiles	(const String& fragmentShaderProfile) { mFragmentShaderProfiles = fragmentShaderProfile; }
+	void			setFragmentShaderProfiles	(const String& fragmentShaderProfiles);
 
 	/** 
 	Get the output fragment shader target profiles.	
 	*/
 	const String&	getFragmentShaderProfiles	() const { return mFragmentShaderProfiles; }
+
+	/** 
+	Get the output fragment shader target profiles as list of strings.
+	*/
+	const StringVector&	getFragmentShaderProfilesList	() const { return mFragmentShaderProfilesList; }
 
 	/** 
 	Set the output shader cache path. Generated shader code will be written to this path.
@@ -747,7 +757,9 @@ protected:
 	SGScriptTranslator				mCoreScriptTranslaotr;			// The core translator of the RT Shader System.
 	String							mShaderLanguage;				// The target shader language (currently only cg supported).
 	String							mVertexShaderProfiles;			// The target vertex shader profile. Will be used as argument for program compilation.
-	String							mFragmentShaderProfiles;		// The target Fragment shader profile. Will be used as argument for program compilation.
+	StringVector					mVertexShaderProfilesList;		// List of target vertex shader profiles.
+	String							mFragmentShaderProfiles;		// The target fragment shader profile. Will be used as argument for program compilation.
+	StringVector					mFragmentShaderProfilesList;	// List of target fragment shader profiles..
 	String							mShaderCachePath;				// Path for caching the generated shaders.
 	ProgramManager*					mProgramManager;				// Shader program manager.
 	ProgramWriterManager*			mProgramWriterManager;			// Shader program writer manager.

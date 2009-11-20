@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreShaderFFPFog.h"
 #include "OgreShaderExPerPixelLighting.h"
 #include "OgreShaderExNormalMapLighting.h"
+#include "OgreShaderExIntegratedPSSM3.h"
 #include "OgreShaderMaterialSerializerListener.h"
 
 /** \addtogroup Core
@@ -48,7 +49,7 @@ THE SOFTWARE.
 */
 
 /**
-* The CRT Shader System enables GPU program generation during the runtime of a process.
+* The RT Shader System enables GPU program generation during the runtime of a process.
 * The main interface to do that is the ShaderGenerator singleton.
 * A typical usage of this system would be to create shader based technique from an existing technique and
 * associate it with a destination scheme name. @see ShaderGenerator::createShaderBasedTechnique.

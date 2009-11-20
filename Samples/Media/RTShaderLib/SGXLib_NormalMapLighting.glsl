@@ -100,6 +100,20 @@ void SGX_Light_Directional_Diffuse(
 }
 
 //-----------------------------------------------------------------------------
+void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
+						in vec2 texCoord,
+						in vec3 eyeVec,
+						in vec2 scaleBias,
+						out vec2 newTexCoord)
+{
+	eyeVec = normalize(eyeVec);
+	float height = texture2D(normalHeightMap, texCoord).a;
+	float displacement = (height * scaleBias.x) + scaleBias.y;
+	vec3 scaledEyeDir = eyeVec * displacement;
+	newTexCoord = (scaledEyeDir  + vec3(texCoord, 1.0)).xy;
+}
+
+//-----------------------------------------------------------------------------
 void SGX_Light_Directional_DiffuseSpecular(
 					in vec3 vTSNormal,
 					in vec3 vTSView,					

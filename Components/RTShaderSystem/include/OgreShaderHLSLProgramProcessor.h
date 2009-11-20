@@ -24,12 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-#ifndef _ShaderFFPTransform_
-#define _ShaderFFPTransform_
+#ifndef _ShaderHLSLProgramProcessor_
+#define _ShaderHLSLProgramProcessor_
 
 #include "OgreShaderPrerequisites.h"
-#include "OgreShaderSubRenderState.h"
+#include "OgreShaderProgramProcessor.h"
+
 
 namespace Ogre {
 namespace RTShader {
@@ -41,81 +41,48 @@ namespace RTShader {
 *  @{
 */
 
-/** Transform sub render state implementation of the Fixed Function Pipeline.
-@see http://msdn.microsoft.com/en-us/library/bb206269(VS.85).aspx
-Derives from SubRenderState class.
+/** CG Language program processor class.
 */
-class FFPTransform : public SubRenderState
+class HLSLProgramProcessor : public ProgramProcessor
 {
 
-// Interface.
-public:
-	
-	/** 
-	@see SubRenderState::getType.
+	// Interface.
+public:	
+
+	/** Class constructor.
+	@param type The type of this program.
 	*/
-	virtual const String&	getType					() const;
+	HLSLProgramProcessor			();
 
-	/** 
-	@see SubRenderState::getExecutionOrder.
+	/** Class destructor */
+	virtual ~HLSLProgramProcessor	();
+
+	/** Return the target language of this processor. */
+	virtual const String&		getTargetLanguage	() const { return TargetLanguage; }
+
+	/** Called before creation of the GPU programs.
+	Do several preparation operation such as validation, register compaction and specific target language optimizations.
+	@param programSet The program set container.
+	Return true on success.
 	*/
-	virtual int				getExecutionOrder		() const;
+	virtual bool				preCreateGpuPrograms			(ProgramSet* programSet);
 
-	/** 
-	@see SubRenderState::copyFrom.
+	/** Called after creation of the GPU programs.
+	@param programSet The program set container.
+	Return true on success.
 	*/
-	virtual void			copyFrom				(const SubRenderState& rhs);
+	virtual bool				postCreateGpuPrograms			(ProgramSet* programSet);
 
-	/** 
-	@see SubRenderState::createCpuSubPrograms.
-	*/
-	virtual bool			createCpuSubPrograms	(ProgramSet* programSet);
+	static String TargetLanguage;
 
-
-	static String Type;
 };
 
 
-/** 
-A factory that enables creation of FFPTransform instances.
-@remarks Sub class of SubRenderStateFactory
-*/
-class FFPTransformFactory : public SubRenderStateFactory
-{
-public:
-
-	/** 
-	@see SubRenderStateFactory::getType.
-	*/
-	virtual const String&	getType				() const;
-
-	/** 
-	@see SubRenderStateFactory::createInstance.
-	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass);
-
-	/** 
-	@see SubRenderStateFactory::writeInstance.
-	*/
-	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
-
-protected:
-
-	/** 
-	@see SubRenderStateFactory::createInstanceImpl.
-	*/
-	virtual SubRenderState*	createInstanceImpl	();
-
-
-
-};
-
 /** @} */
 /** @} */
-
 
 }
 }
 
 #endif
-#endif
+

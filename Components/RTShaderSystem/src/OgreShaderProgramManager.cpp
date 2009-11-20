@@ -34,10 +34,13 @@ THE SOFTWARE.
 #include "OgrePass.h"
 #include "OgreLogManager.h"
 #include "OgreShaderCGProgramWriter.h"
+#include "OgreShaderHLSLProgramWriter.h"
 #include "OgreShaderGLSLProgramWriter.h"
 #include "OgreShaderProgramProcessor.h"
 #include "OgreShaderCGProgramProcessor.h"
+#include "OgreShaderHLSLProgramProcessor.h"
 #include "OgreShaderGLSLProgramProcessor.h"
+#include "OgreGpuProgramManager.h"
 
 namespace Ogre {
 
@@ -139,12 +142,14 @@ void ProgramManager::releasePrograms(RenderState* renderState)
 void ProgramManager::createDefaultProgramWriterFactories()
 {
 	// Add standard shader writer factories 
-	ProgramWriterFactory* cgFactory = OGRE_NEW ShaderProgramWriterCGFactory();
-	ProgramWriterFactory* glslFactory = OGRE_NEW ShaderProgramWriterGLSLFactory();
-	mProgramWriterFactories.push_back(cgFactory);
-	mProgramWriterFactories.push_back(glslFactory);
-	ProgramWriterManager::getSingletonPtr()->addFactory(cgFactory);
-	ProgramWriterManager::getSingletonPtr()->addFactory(glslFactory);
+	mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterCGFactory());
+	mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterGLSLFactory());
+	mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterHLSLFactory());
+	
+	for (unsigned int i=0; i < mProgramWriterFactories.size(); ++i)
+	{
+		ProgramWriterManager::getSingletonPtr()->addFactory(mProgramWriterFactories[i]);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -161,8 +166,10 @@ void ProgramManager::destroyDefaultProgramWriterFactories()
 //-----------------------------------------------------------------------------
 void ProgramManager::createDefaultProgramProcessors()
 {
+	// Add standard shader processors
 	mDefaultProgramProcessors.push_back(OGRE_NEW CGProgramProcessor);
 	mDefaultProgramProcessors.push_back(OGRE_NEW GLSLProgramProcessor);
+	mDefaultProgramProcessors.push_back(OGRE_NEW HLSLProgramProcessor);
 
 	for (unsigned int i=0; i < mDefaultProgramProcessors.size(); ++i)
 	{
@@ -289,6 +296,7 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 		programWriter,
 		language, 
 		ShaderGenerator::getSingleton().getVertexShaderProfiles(),
+		ShaderGenerator::getSingleton().getVertexShaderProfilesList(),
 		ShaderGenerator::getSingleton().getShaderCachePath());
 
 	if (vsGpuProgram.isNull())	
@@ -304,6 +312,7 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 		programWriter,
 		language, 
 		ShaderGenerator::getSingleton().getFragmentShaderProfiles(),
+		ShaderGenerator::getSingleton().getFragmentShaderProfilesList(),
 		ShaderGenerator::getSingleton().getShaderCachePath());
 
 	if (psGpuProgram.isNull())	
@@ -326,6 +335,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 											   ProgramWriter* programWriter,
 											   const String& language,
 											   const String& profiles,
+											   const StringVector& profilesList,
 											   const String& cachePath)
 {
 
@@ -395,8 +405,6 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 			outFile.close();
 		}
 
-
-
 		// Create new GPU program.
 		pGpuProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
 			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, language, shaderProgram->getType());
@@ -404,9 +412,25 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 
 		pGpuProgram->setSourceFile(programFileName);
 		pGpuProgram->setParameter("entry_point", shaderProgram->getEntryPointFunction()->getName());
-		pGpuProgram->setParameter("target", profiles);
-		pGpuProgram->setParameter("profiles", profiles);
 
+		// HLSL program requires specific target profile settings - we have to split the profile string.
+		if (language == "hlsl")
+		{
+			StringVector::const_iterator it = profilesList.begin();
+			StringVector::const_iterator itEnd = profilesList.end();
+			
+			for (; it != itEnd; ++it)
+			{
+				if (GpuProgramManager::getSingleton().isSyntaxSupported(*it))
+				{
+					pGpuProgram->setParameter("target", *it);
+					break;
+				}
+			}
+		}
+		
+		pGpuProgram->setParameter("profiles", profiles);
+		pGpuProgram->load();
 
 		GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
 		const ShaderParameterList& progParams = shaderProgram->getParameters();

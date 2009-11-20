@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #ifndef _ShaderFFPLighting_
 #define _ShaderFFPLighting_
 
@@ -242,4 +243,4 @@ protected:
 }
 
 #endif
-
+#endif

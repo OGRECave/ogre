@@ -123,6 +123,12 @@ void Sample_ShaderSystem::itemSelected(SelectMenu* menu)
 			mSceneMgr->setFog((FogMode)curModeIndex, ColourValue(1.0, 1.0, 1.0, 0.0), 0.0015, 350.0, 1500.0);
 		}		
 	}
+	else if (menu == mShadowMenu)
+	{
+		int curShadowTypeIndex = menu->getSelectionIndex();
+
+		applyShadowType(curShadowTypeIndex);		
+	}
 	else if(menu == mLanguageMenu)
 	{
 		ShaderGenerator::getSingletonPtr()->setTargetLanguage(menu->getSelectedItem());		
@@ -272,7 +278,6 @@ void Sample_ShaderSystem::setupContent()
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	childNode->setPosition(-300.0, 100.0, -100.0);
 	childNode->attachObject(entity);
-
 	
 	createDirectionalLight();
 	createPointLight();
@@ -304,25 +309,51 @@ void Sample_ShaderSystem::setupUI()
 {
 	// Create language selection 
 	mLanguageMenu = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "LangMode", "Language", 220, 120, 10);	
+
+	// Use GLSL in case of OpenGL render sytem.
 	if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL") != String::npos)
 	{
 		mLanguageMenu->addItem("glsl");
-		ShaderGenerator::getSingletonPtr()->setTargetLanguage("glsl");		
+		mShaderGenerator->setTargetLanguage("glsl");		
+	}
+
+	// Use HLSL in case of D3D9 render system.
+	else if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("Direct3D9") != String::npos)
+	{
+		mLanguageMenu->addItem("hlsl");
+		mShaderGenerator->setTargetLanguage("hlsl");				
 	}
 	mLanguageMenu->addItem("cg");
 
 	// create check boxes to toggle lights.	
-	mTrayMgr->createCheckBox(TL_TOPLEFT, DIRECTIONAL_LIGHT_NAME, "Directional Light", 220)->setChecked(true);
-	mTrayMgr->createCheckBox(TL_TOPLEFT, POINT_LIGHT_NAME, "Point Light", 220)->setChecked(true);
-	mTrayMgr->createCheckBox(TL_TOPLEFT, SPOT_LIGHT_NAME, "Spot Light", 220)->setChecked(false);
+	mDirLightCheckBox = mTrayMgr->createCheckBox(TL_TOPLEFT, DIRECTIONAL_LIGHT_NAME, "Directional Light", 220);
+	mPointLightCheckBox = mTrayMgr->createCheckBox(TL_TOPLEFT, POINT_LIGHT_NAME, "Point Light", 220);
+	mSpotLightCheckBox = mTrayMgr->createCheckBox(TL_TOPLEFT, SPOT_LIGHT_NAME, "Spot Light", 220);
+
+	mDirLightCheckBox->setChecked(true);
+	mPointLightCheckBox->setChecked(true);
+	mSpotLightCheckBox->setChecked(false);
+
+
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 	mTrayMgr->createCheckBox(TL_TOPLEFT, PER_PIXEL_FOG_BOX, "Per Pixel Fog", 220)->setChecked(mPerPixelFogEnable);
+#endif
 
 	// Create fog widgets.
 	mFogModeMenu = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "FogMode", "Fog Mode", 220, 120, 10);	
-	mFogModeMenu ->addItem("None");
-	mFogModeMenu ->addItem("Exp");
-	mFogModeMenu ->addItem("Exp2");
-	mFogModeMenu ->addItem("Linear");
+	mFogModeMenu->addItem("None");
+	mFogModeMenu->addItem("Exp");
+	mFogModeMenu->addItem("Exp2");
+	mFogModeMenu->addItem("Linear");
+
+	// Create shadow menu.
+	mShadowMenu = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "ShadowType", "Shadow", 220, 120, 10);	
+	mShadowMenu->addItem("None");
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+	mShadowMenu->addItem("PSSM 3");
+#endif
+
 
 	// Flush shader cache button.
 	mTrayMgr->createButton(TL_TOPLEFT, FLUSH_BUTTON_NAME, "Flush Shader Cache", 220);
@@ -337,7 +368,6 @@ void Sample_ShaderSystem::setupUI()
 	mTrayMgr->createLabel(TL_BOTTOM, "MainEntityLabel", "Main Entity Settings", 240);
 	mTrayMgr->createCheckBox(TL_BOTTOM, SPECULAR_BOX, "Specular", 240)->setChecked(mSpecularEnable);
 
-
 	// Allow reflection map only on PS3 and above since with all lights on + specular + bump we 
 	// exceed the instruction count limits of PS2.
 	if (GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0") ||
@@ -348,9 +378,12 @@ void Sample_ShaderSystem::setupUI()
 
 	mLightingModelMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "TargetModelLighting", "", 240, 230, 10);	
 	mLightingModelMenu ->addItem("Per Vertex");
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 	mLightingModelMenu ->addItem("Per Pixel");
 	mLightingModelMenu ->addItem("Normal Map - Tangent Space");
 	mLightingModelMenu ->addItem("Normal Map - Object Space");
+#endif
 
 	mTrayMgr->createButton(TL_BOTTOM, EXPORT_BUTTON_NAME, "Export Material", 240);
 	
@@ -400,7 +433,6 @@ void Sample_ShaderSystem::setSpecularEnable(bool enable)
 	}
 }
 
-
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setReflectionMapEnable(bool enable)
 {
@@ -414,6 +446,7 @@ void Sample_ShaderSystem::setReflectionMapEnable(bool enable)
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
 {
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 	if (mPerPixelFogEnable != enable)
 	{
 		mPerPixelFogEnable = enable;
@@ -460,6 +493,8 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
 		// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
 		mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 	}
+#endif
+
 }
 
 //-----------------------------------------------------------------------
@@ -514,12 +549,17 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 			// Remove all sub render states.
 			renderState->reset();
 
+
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 			if (mCurLightingModel == SSLM_PerVertexLighting)
 			{
 				RTShader::SubRenderState* perPerVertexLightModel = mShaderGenerator->createSubRenderState(RTShader::FFPLighting::Type);
 
 				renderState->addSubRenderState(perPerVertexLightModel);	
 			}
+#endif
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 			else if (mCurLightingModel == SSLM_PerPixelLighting)
 			{
 				RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(RTShader::PerPixelLighting::Type);
@@ -534,7 +574,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 					RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(RTShader::NormalMapLighting::Type);
 					RTShader::NormalMapLighting* normalMapSubRS = static_cast<RTShader::NormalMapLighting*>(subRenderState);
 					UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
-
+				
 					normalMapSubRS->setNormalMapSpace(RTShader::NormalMapLighting::NMS_TANGENT);
 					rtssBindings->setUserAny(RTShader::NormalMapLighting::NormalMapTextureNameKey, Any(String("Panels_Normal_Tangent.png")));	
 
@@ -556,7 +596,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 					RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(RTShader::NormalMapLighting::Type);
 					RTShader::NormalMapLighting* normalMapSubRS = static_cast<RTShader::NormalMapLighting*>(subRenderState);
 					UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
-
+				
 					normalMapSubRS->setNormalMapSpace(RTShader::NormalMapLighting::NMS_OBJECT);
 					rtssBindings->setUserAny(RTShader::NormalMapLighting::NormalMapTextureNameKey, Any(String("Panels_Normal_Obj.png")));	
 
@@ -570,6 +610,8 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 					renderState->addSubRenderState(perPixelLightModel);
 				}				
 			}
+
+#endif
 
 			if (mReflectionMapEnable)
 			{				
@@ -600,6 +642,7 @@ void Sample_ShaderSystem::createDirectionalLight()
 
 	light = mSceneMgr->createLight(DIRECTIONAL_LIGHT_NAME);
     light->setType(Light::LT_DIRECTIONAL);
+	light->setCastShadows(true);
     dir.x = 0.5;
 	dir.y = -1.0;
 	dir.z = 0.3;
@@ -616,6 +659,7 @@ void Sample_ShaderSystem::createDirectionalLight()
 	bbs = mSceneMgr->createBillboardSet();
 	bbs->setMaterialName("Examples/Flare3");
 	bbs->createBillboard(-dir * 500.0)->setColour(light->getDiffuseColour());
+	bbs->setCastShadows(false);
 	
 	mDirectionalLightNode->attachObject(bbs);
 	mDirectionalLightNode->attachObject(light);
@@ -629,6 +673,7 @@ void Sample_ShaderSystem::createPointLight()
 
 	light = mSceneMgr->createLight(POINT_LIGHT_NAME);
 	light->setType(Light::LT_POINT);
+	light->setCastShadows(false);
 	dir.x = 0.5;
 	dir.y = 0.0;
 	dir.z = 0.0f;
@@ -647,6 +692,7 @@ void Sample_ShaderSystem::createPointLight()
 	bbs = mSceneMgr->createBillboardSet();
 	bbs->setMaterialName("Examples/Flare3");
 	bbs->createBillboard(200, 100, 0)->setColour(light->getDiffuseColour());
+	bbs->setCastShadows(false);
 
 	mPointLightNode->attachObject(bbs);
 	mPointLightNode->createChildSceneNode(Vector3(200, 100, 0))->attachObject(light);
@@ -660,6 +706,7 @@ void Sample_ShaderSystem::createSpotLight()
 
 	light = mSceneMgr->createLight(SPOT_LIGHT_NAME);
 	light->setType(Light::LT_SPOTLIGHT);
+	light->setCastShadows(false);
 	dir.x = 0.0;
 	dir.y = 0.0;
 	dir.z = -1.0f;
@@ -716,6 +763,87 @@ void Sample_ShaderSystem::setLightVisible(const String& lightName, bool visible)
 			mSceneMgr->getLight(lightName)->setVisible(visible);
 		}		
 	}
+}
+
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::applyShadowType(int menuIndex)
+{
+	// Grab the scheme render state.												
+	Ogre::RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+
+	// No shadow
+	if (menuIndex == 0)
+	{
+		mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+		const Ogre::RTShader::SubRenderStateList& subRenderStateList = schemRenderState->getSubStateList();
+		Ogre::RTShader::SubRenderStateConstIterator it = subRenderStateList.begin();
+		Ogre::RTShader::SubRenderStateConstIterator itEnd = subRenderStateList.end();
+
+		for (; it != itEnd; ++it)
+		{
+			Ogre::RTShader::SubRenderState* curSubRenderState = *it;
+
+			// This is the pssm3 sub render state -> remove it.
+			if (curSubRenderState->getType() == Ogre::RTShader::IntegratedPSSM3::Type)
+			{
+				schemRenderState->removeSubRenderState(*it);
+				break;
+			}
+		}
+#endif
+
+	}
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+	// Integrated shadow PSSM with 3 splits.
+	else if (menuIndex == 1)
+	{
+		mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+
+		// 3 textures per directional light
+		mSceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
+		mSceneMgr->setShadowTextureSettings(512, 3, PF_FLOAT32_R);
+		mSceneMgr->setShadowTextureSelfShadow(true);
+
+		// Leave only directional light.
+		mDirLightCheckBox->setChecked(true);
+		mPointLightCheckBox->setChecked(false);
+		mSpotLightCheckBox->setChecked(false);
+		
+		// Set up caster material - this is just a standard depth/shadow map caster
+		mSceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
+
+		// shadow camera setup
+		PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
+		pssmSetup->calculateSplitPoints(3, 5, 3000);
+		pssmSetup->setSplitPadding(10);
+		pssmSetup->setOptimalAdjustFactor(0, 2);
+		pssmSetup->setOptimalAdjustFactor(1, 1);
+		pssmSetup->setOptimalAdjustFactor(2, 0.5);
+
+		mSceneMgr->setShadowCameraSetup(ShadowCameraSetupPtr(pssmSetup));
+
+	
+		Ogre::RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(Ogre::RTShader::IntegratedPSSM3::Type);	
+		Ogre::RTShader::IntegratedPSSM3* pssm3SubRenderState = static_cast<Ogre::RTShader::IntegratedPSSM3*>(subRenderState);
+		const PSSMShadowCameraSetup::SplitPointList& srcSplitPoints = pssmSetup->getSplitPoints();
+		Ogre::RTShader::IntegratedPSSM3::SplitPointList dstSplitPoints;
+
+		for (unsigned int i=0; i < srcSplitPoints.size(); ++i)
+		{
+			dstSplitPoints.push_back(srcSplitPoints[i]);
+		}
+
+		pssm3SubRenderState->setSplitPoints(dstSplitPoints);
+		schemRenderState->addSubRenderState(subRenderState);		
+	}
+#endif
+
+	// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
+	mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 }
 
 //-----------------------------------------------------------------------

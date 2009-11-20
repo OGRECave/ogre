@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #ifndef _ShaderExPerPixelLighting_
 #define _ShaderExPerPixelLighting_
 
@@ -265,5 +266,6 @@ protected:
 }
 }
 
+#endif
 #endif
 

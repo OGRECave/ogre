@@ -77,6 +77,23 @@ void FFP_Construct(in float r,
 }
 
 //-----------------------------------------------------------------------------
+void FFP_Construct(in float r, 
+			 in float g,
+			 in float b,
+			 out vec3 vOut)
+{
+	vOut = vec3(r,g,b);
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Construct(in float r, 
+			 in float g,
+			 out vec2 vOut)
+{
+	vOut = vec2(r,g);
+}
+
+//-----------------------------------------------------------------------------
 void FFP_Modulate(in float vIn0, in float vIn1, out float vOut)
 {
 	vOut = vIn0 * vIn1;

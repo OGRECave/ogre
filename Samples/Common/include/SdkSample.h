@@ -239,6 +239,9 @@ namespace OgreBites
 					mRTShaderSystemPanel->setParamValue(0, "Off");
 				}														
 			}			
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+
 			// Toggles per pixel per light model.
 			else if (evt.key == OIS::KC_F3)
 			{
@@ -288,6 +291,7 @@ namespace OgreBites
 					mRTShaderSystemPanel->setParamValue(1, "Per vertex");
 				usePerPixelLighting = !usePerPixelLighting;				
 			}	
+#endif
 
 			// Switch vertex shader outputs compaction policy.
 			else if (evt.key == OIS::KC_F4)   

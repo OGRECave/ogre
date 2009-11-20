@@ -2,9 +2,10 @@
 -----------------------------------------------------------------------------
 This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2009 Torus Knot Software Ltd
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -24,13 +25,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ShaderProgramWriterGLSL_
-#define _ShaderProgramWriterGLSL_
+#ifndef __ShaderProgramWriterHLSL_H__
+#define __ShaderProgramWriterHLSL_H__
 
 #include "OgreShaderProgramWriterManager.h"
 
 namespace Ogre {
-namespace RTShader {
+	namespace RTShader {
 
 /** \addtogroup Core
 *  @{
@@ -39,22 +40,22 @@ namespace RTShader {
 *  @{
 */
 
-/** GLSL target language writer implementation.
+/** HLSL target language writer implementation.
 @see ProgramWriter.
 */
-class GLSLProgramWriter : public ProgramWriter
+class HLSLProgramWriter : public ProgramWriter
 {
+
 	// Interface.
 public:
 
 	/** Class constructor. 
 	@param language The target shader language.
 	*/
-	GLSLProgramWriter	();
+	HLSLProgramWriter	();
 
 	/** Class destructor */
-	virtual ~GLSLProgramWriter	();
-
+	virtual ~HLSLProgramWriter ();
 
 	/** 
 	@see ProgramWriter::writeSourceCode.
@@ -68,53 +69,52 @@ public:
 
 	static String TargetLanguage;
 
-
 	// Protected methods.
 protected:
 
 	/** Initialize string maps. */
-	void				initializeStringMaps		();
+	void		initializeStringMaps		();
+
+	/** Write the program dependencies. */
+	void		writeProgramDependencies	(std::ostream& os, Program* program);
+
+	/** Write a uniform parameter. */
+	void		writeUniformParameter		(std::ostream& os, ParameterPtr parameter);
+
+	/** Write a function parameter. */
+	void		writeFunctionParameter		(std::ostream& os, ParameterPtr parameter);
 
 	/** Write a local parameter. */
-	void				writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
+	void		writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
 
-	/** Write forward declarations. This is needed so that we can attach library shader at a later step. */
-	void				writeForwardDeclartions		(std::ostream& os, Program* program);
+	/** Write a function declaration. */
+	void		writeFunctionDeclaration	(std::ostream& os, Function* function);
 
-	/** Write the input params of the function */
-	void				writeInputParameters		(std::ostream& os, Function* function, GpuProgramType gpuType);
-	
-	/** Write the output params of the function */
-	void				writeOutParameters			(std::ostream& os, Function* function, GpuProgramType gpuType);
+	/** Write function atom instance. */
+	void		writeAtomInstance			(std::ostream& os, FunctionAtom* atom);
+
 
 protected:
-	typedef		std::map<GpuConstantType, const char*>		GpuConstTypeToStringMap;
-	typedef		std::map<Parameter::Semantic, const char*>	ParamSemanticToStringMap;
-	typedef		std::map<Parameter::Content, const char*>	ParamContentToStringMap;
-	typedef		std::map<String, String>					StringMap;
+	typedef		map<GpuConstantType, const char*>::type		GpuConstTypeToStringMap;
+	typedef		map<Parameter::Semantic, const char*>::type	ParamSemanticToStringMap;
 
 	// Attributes.
 protected:
-	GpuConstTypeToStringMap		mGpuConstTypeMap;				// Map between GPU constant type to string value.
-	ParamSemanticToStringMap	mParamSemanticMap;				// Map between parameter semantic to string value.
-
-	StringMap					mInputToGLStatesMap;			// Map parameter name to a new parameter name (sometime renaming is required to match names between vertex and fragment shader)
-	ParamContentToStringMap		mContentToPerVertexAttributes;	// Map parameter content to vertex attributes 
-	int							mGLSLVersion;					// Holds the current glsl version
-	StringVector				mFragInputParams;				// Holds the fragment input params 
+	GpuConstTypeToStringMap		mGpuConstTypeMap;		// Map between GPU constant type to string value.
+	ParamSemanticToStringMap	mParamSemanticMap;		// Map between parameter semantic to string value.
 };
 
-/** GLSL program writer factory implementation.
+/** HLSL program writer factory implementation.
 @see ProgramWriterFactory
 */
-class ShaderProgramWriterGLSLFactory : public ProgramWriterFactory
+class ShaderProgramWriterHLSLFactory : public ProgramWriterFactory
 {
 public:
-	ShaderProgramWriterGLSLFactory()
+	ShaderProgramWriterHLSLFactory()
 	{
-		mLanguage = "glsl";
+		mLanguage = "hlsl";
 	}
-	virtual ~ShaderProgramWriterGLSLFactory() {}
+	virtual ~ShaderProgramWriterHLSLFactory() {}
 
 	/** 
 	@see ProgramWriterFactory::getTargetLanguage
@@ -129,7 +129,7 @@ public:
 	*/
 	virtual ProgramWriter* create(void)
 	{
-		return OGRE_NEW GLSLProgramWriter();
+		return OGRE_NEW HLSLProgramWriter();
 	}
 
 private:
@@ -139,7 +139,6 @@ private:
 
 /** @} */
 /** @} */
-
 }
 }
 

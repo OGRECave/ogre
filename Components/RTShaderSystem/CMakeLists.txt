@@ -33,6 +33,7 @@ set (HEADER_FILES
   include/OgreShaderSubRenderState.h
   include/OgreShaderExNormalMapLighting.h
   include/OgreShaderExPerPixelLighting.h
+  include/OgreShaderExIntegratedPSSM3.h
   include/OgreShaderScriptTranslator.h
   include/OgreShaderMaterialSerializerListener.h
   include/OgreShaderProgramProcessor.h
@@ -41,6 +42,8 @@ set (HEADER_FILES
   include/OgreShaderGLSLProgramProcessor.h
   include/OgreShaderGLSLProgramWriter.h
   include/OgreShaderProgramWriterManager.h
+  include/OgreShaderHLSLProgramProcessor.h
+  include/OgreShaderHLSLProgramWriter.h
 )
 
 set (SOURCE_FILES
@@ -62,6 +65,7 @@ set (SOURCE_FILES
   src/OgreShaderSubRenderState.cpp
   src/OgreShaderExNormalMapLighting.cpp
   src/OgreShaderExPerPixelLighting.cpp
+  src/OgreShaderExIntegratedPSSM3.cpp
   src/OgreShaderScriptTranslator.cpp
   src/OgreShaderMaterialSerializerListener.cpp
   src/OgreShaderProgramProcessor.cpp
@@ -70,6 +74,8 @@ set (SOURCE_FILES
   src/OgreShaderGLSLProgramProcessor.cpp
   src/OgreShaderGLSLProgramWriter.cpp
   src/OgreShaderProgramWriterManager.cpp
+  src/OgreShaderHLSLProgramProcessor.cpp
+  src/OgreShaderHLSLProgramWriter.cpp
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -77,6 +83,14 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(OgreRTShaderSystem STATIC ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreRTShaderSystem PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OGRE_VERSION_MAJOR})
 target_link_libraries(OgreRTShaderSystem OgreMain)
+
+if (OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS)
+	add_definitions(-DRTSHADER_SYSTEM_BUILD_CORE_SHADERS)
+endif ()
+
+if (OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS)
+	add_definitions(-DRTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+endif ()
 
 ogre_config_component(OgreRTShaderSystem)
 install(FILES ${HEADER_FILES}

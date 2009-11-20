@@ -106,6 +106,9 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 			"ProgramWriterGLSL::writeSourceCode" );	
 	}
 
+	// Clear out old input params
+	mFragInputParams.clear();
+
 	const ShaderFunctionList& functionList = program->getFunctions();
 	ShaderFunctionConstIterator itFunction;
 
@@ -154,7 +157,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 		// Write inout params and fill mInputToGLStatesMap
 		writeInputParameters(os, curFunction, gpuType);
 		writeOutParameters(os, curFunction, gpuType);
-
+					
 		// The function name must always main.
 		os << "void main() {" << std::endl;
 
@@ -173,7 +176,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 
 		// Sort function atoms.
 		curFunction->sortAtomInstances();
-
+		
 		const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
 		FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
 		FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
@@ -184,25 +187,56 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 			FunctionInvocation::OperandVector::iterator itOperand = pFuncInvoc->getOperandList().begin();
 			FunctionInvocation::OperandVector::iterator itOperandEnd = pFuncInvoc->getOperandList().end();
 
-			// Write function name
-			os << "\t" << pFuncInvoc->getFunctionName() << "(";
+			// Local string stream
+			std::stringstream localOs;
+
+			// Write function name			
+			localOs << "\t" << pFuncInvoc->getFunctionName() << "(";
 
 			for (; itOperand != itOperandEnd; )
 			{
 				Operand op = *itOperand;
+				Operand::OpSemantic opSemantic = op.getSemantic();
 				String paramName = op.getParameter()->getName();
 				Parameter::Content content = op.getParameter()->getContent();
+
+				// Check if we write to an varying because the are only readable in fragment programs 
+				if (gpuType == GPT_FRAGMENT_PROGRAM &&
+					(opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT))
+				{	
+					StringVector::iterator itFound = std::find(mFragInputParams.begin(), mFragInputParams.end(), paramName);	
+					if(itFound != mFragInputParams.end())
+					{						
+						// Declare the copy variable
+						String newVar = "local_" + paramName;
+						String tempVar = paramName;
+
+						// We stored the original values in the mFragInputParams thats why we have to replace the first var with o
+						// because all vertex output vars are prefixed with o in glsl the name has to match in the fragment program.
+						tempVar.replace(tempVar.begin(), tempVar.begin() + 1, "o");
+
+						// Declare the copy variable and assign the original
+					    os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << std::endl;	
+
+						// From now on we replace it automatic 
+						mInputToGLStatesMap[paramName] = newVar;
+
+						// Remove the param because now it is replaced automatic with the local variable
+						// (which could be written).
+						mFragInputParams.erase(itFound++);
+					}
+				}
 
 				if(mInputToGLStatesMap.find(paramName) != mInputToGLStatesMap.end())
 				{
 					int mask = op.getMask(); // our swizzle mask
 
 					// Here we insert the renamed param name
-					os << mInputToGLStatesMap[paramName];
+					localOs << mInputToGLStatesMap[paramName];
 
 					if(mask != Operand::OPM_ALL)
 					{
-						os << "." << Operand::getMaskAsString(mask);
+						localOs << "." << Operand::getMaskAsString(mask);
 					}	
 					// Now that every texcoord is a vec4 (passed as vertex attributes) we
 					// have to swizzle them according the desired type.
@@ -221,16 +255,16 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 						switch(op.getParameter()->getType())
 						{
 						case GCT_FLOAT1:
-							os << ".x";
+							localOs << ".x";
 							break;
 						case GCT_FLOAT2:
-							os << ".xy";
+							localOs << ".xy";
 							break;
 						case GCT_FLOAT3:
-							os << ".xyz";
+							localOs << ".xyz";
 							break;
 						case GCT_FLOAT4:
-							os << ".xyzw";
+							localOs << ".xyzw";
 							break;
 
 						default:
@@ -240,7 +274,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 				}
 				else
 				{
-					os << op.toString();
+					localOs << op.toString();
 				}
 				
 				++itOperand;
@@ -248,13 +282,14 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 				// Prepare for the next operand
 				if (itOperand != itOperandEnd)
 				{
-					os << ", ";
+					localOs << ", ";
 				}
 			}
 
 			// Write function call closer.
-			os << ");" << std::endl;
-			os << std::endl;
+			localOs << ");" << std::endl;
+			localOs << std::endl;
+			os << localOs.str();
 		}
 		os << "}" << std::endl;
 	}
@@ -386,11 +421,15 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
 		String paramName = pParam->getName();
 
 		if (gpuType == GPT_FRAGMENT_PROGRAM)
-		{							
+		{					
+			// push fragment inputs they all could be written (in glsl you can not write
+			// input params in the fragment program)
+			mFragInputParams.push_back(paramName);
+
 			// In the vertex and fragment program the variable names must match.
 			// Unfortunately now the input params are prefixed with an 'i' and output params with 'o'.
 			// Thats why we are using a map for name mapping (we rename the params which are used in function atoms).
-			paramName.replace(paramName.begin(), paramName.begin() + 1, "o");
+			paramName.replace(paramName.begin(), paramName.begin() + 1, "o");	
 			mInputToGLStatesMap[pParam->getName()] = paramName;
 
 			// After glsl 120 varying is deprecated

@@ -45,6 +45,14 @@ if (OGRE_BUILD_SAMPLES)
 	add_definitions(-DUSE_RTSHADER_SYSTEM)
 	include_directories(${OGRE_SOURCE_DIR}/Components/RTShaderSystem/include)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreRTShaderSystem)
+  	
+  	if (OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS)
+		add_definitions(-DRTSHADER_SYSTEM_BUILD_CORE_SHADERS)
+	endif ()
+
+	if (OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS)
+		add_definitions(-DRTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+	endif ()
   endif ()
   
   if (OGRE_BUILD_COMPONENT_TERRAIN)

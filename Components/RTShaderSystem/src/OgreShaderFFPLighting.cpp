@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #include "OgreShaderFFPLighting.h"
 #include "OgreShaderFFPRenderState.h"
 #include "OgreShaderProgram.h"
@@ -831,3 +832,4 @@ SubRenderState*	FFPLightingFactory::createInstanceImpl()
 }
 }
 
+#endif

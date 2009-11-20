@@ -35,8 +35,10 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 #include "OgreShaderExPerPixelLighting.h"
 #include "OgreShaderExNormalMapLighting.h"
+#include "OgreShaderExIntegratedPSSM3.h"
 #include "OgreShaderMaterialSerializerListener.h"
 #include "OgreShaderProgramWriterManager.h"
+
 
 namespace Ogre {
 
@@ -68,10 +70,6 @@ ShaderGenerator& ShaderGenerator::getSingleton()
 //-----------------------------------------------------------------------------
 ShaderGenerator::ShaderGenerator()
 {
-	mShaderLanguage				= "cg";
-	mVertexShaderProfiles		= "gpu_vp gp4vp vp40 vp30 arbvp1 vs_3_0 vs_2_x vs_2_a vs_2_0 vs_1_1";
-	mFragmentShaderProfiles		= "ps_3_x ps_3_0 fp40 fp30 fp20 arbfp1 ps_2_x ps_2_a ps_2_b ps_2_0 ps_1_4 ps_1_3 ps_1_2 ps_1_1";
-	
 	mProgramWriterManager		= NULL;
 	mProgramManager				= NULL;
 	mFFPRenderStateBuilder		= NULL;
@@ -85,6 +83,10 @@ ShaderGenerator::ShaderGenerator()
 	mLightCount[1]				= 0;
 	mLightCount[2]				= 0;
 	mVSOutputCompactPolicy		= VSOCP_LOW;
+
+	mShaderLanguage				= "cg";
+	setVertexShaderProfiles("gpu_vp gp4vp vp40 vp30 arbvp1 vs_3_0 vs_2_x vs_2_a vs_2_0 vs_1_1");
+	setFragmentShaderProfiles("ps_3_x ps_3_0 fp40 fp30 fp20 arbfp1 ps_2_x ps_2_a ps_2_b ps_2_0 ps_1_4 ps_1_3 ps_1_2 ps_1_1");
 }
 
 //-----------------------------------------------------------------------------
@@ -122,9 +124,11 @@ bool ShaderGenerator::_initialize()
 	mProgramManager			= OGRE_NEW ProgramManager;
 
 	// Allocate and initialize FFP render state builder.
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 	mFFPRenderStateBuilder	= OGRE_NEW FFPRenderStateBuilder;
 	if (false == mFFPRenderStateBuilder->initialize())
 		return false;
+#endif
 
 	// Create extensions factories.
 	createSubRenderStateExFactories();
@@ -138,9 +142,12 @@ bool ShaderGenerator::_initialize()
 	return true;
 }
 
+
+
 //-----------------------------------------------------------------------------
 void ShaderGenerator::createSubRenderStateExFactories()
 {
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 	OGRE_LOCK_AUTO_MUTEX
 
 	SubRenderStateFactory* curFactory;
@@ -152,6 +159,12 @@ void ShaderGenerator::createSubRenderStateExFactories()
 	curFactory = OGRE_NEW NormalMapLightingFactory;	
 	addSubRenderStateFactory(curFactory);
 	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+
+	curFactory = OGRE_NEW IntegratedPSSM3Factory;	
+	addSubRenderStateFactory(curFactory);
+	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -199,6 +212,7 @@ void ShaderGenerator::_finalize()
 	// Destroy extensions factories.
 	destroySubRenderStateExFactories();
 
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 	// Delete FFP Emulator.
 	if (mFFPRenderStateBuilder != NULL)
 	{
@@ -206,6 +220,7 @@ void ShaderGenerator::_finalize()
 		OGRE_DELETE mFFPRenderStateBuilder;
 		mFFPRenderStateBuilder = NULL;
 	}
+#endif
 
 	// Delete Program manager.
 	if (mProgramManager != NULL)
@@ -425,6 +440,19 @@ void ShaderGenerator::setSceneManager(SceneManager* sceneMgr)
 SceneManager* ShaderGenerator::getSceneManager()
 {
 	return mSceneMgr;
+}
+
+//-----------------------------------------------------------------------------
+void ShaderGenerator::setVertexShaderProfiles(const String& vertexShaderProfiles)
+{
+	mVertexShaderProfiles = vertexShaderProfiles;
+	mVertexShaderProfilesList = StringUtil::split(vertexShaderProfiles);
+}
+//-----------------------------------------------------------------------------
+void ShaderGenerator::setFragmentShaderProfiles(const String& fragmentShaderProfiles)
+{
+	mFragmentShaderProfiles = fragmentShaderProfiles;
+	mFragmentShaderProfilesList = StringUtil::split(fragmentShaderProfiles);
 }
 
 //-----------------------------------------------------------------------------
@@ -993,8 +1021,10 @@ void ShaderGenerator::SGPass::buildRenderState()
 	
 	localRenderState->setLightCount(lightCount);
 			
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 	// Build the FFP state.	
 	FFPRenderStateBuilder::getSingleton().buildRenderState(this, localRenderState);
+#endif
 
 
 	// Merge custom render state of this pass if exists.
