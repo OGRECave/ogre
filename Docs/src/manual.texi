@@ -1426,10 +1426,17 @@ Tells this texture unit where it should get its content from. The default is to 
 	The default option, this derives texture content from a texture name, loaded by ordinary means from a file or having been manually created with a given name.
 @item shadow
 	This option allows you to pull in a shadow texture, and is only valid when you use texture shadows and one of the 'custom sequence' shadowing types (@xref{Shadows}). The shadow texture in question will be from the 'n'th closest light that casts shadows, unless you use light-based pass iteration or the light_start option which may start the light index higher. When you use this option in multiple texture units within the same pass, each one references the next shadow texture. The shadow texture index is reset in the next pass, in case you want to take into account the same shadow textures again in another pass (e.g. a separate specular / gloss pass). By using this option, the correct light frustum projection is set up for you for use in fixed-function, if you use shaders just reference the texture_viewproj_matrix auto parameter in your shader.
+@item compositor
+	This option allows you to reference a texture from a compositor, and is only valid when the pass is rendered within a compositor sequence. This can be either in a render_scene directive inside a compositor script, or in a general pass in a viewport that has a compositor attached. Note that this is a reference only, meaning that it does not change the render order. You must make sure that the order is reasonable for what you are trying to achieve (for example, texture pooling might cause the referenced texture to be overwritten by something else by the time it is referenced). @*@*
+	The extra parameters for the content_type are only required for this type: @*@*
+	The first is the name of the compositor being referenced. (Required) @*@*
+	The second is the name of the texture to reference in the compositor. (Required) @*@*
+	The third is the index of the texture to take, in case of an MRT. (Optional)
 @end table
 
-Format: content_type <named|shadow>
-Default: content_type named
+Format: content_type <named|shadow|compositor> [<Referenced Compositor Name>] [<Referenced Texture Name>] [<Referenced MRT Index>] @*@*
+Default: content_type named @*@*
+Example: content_type compositor DepthCompositor OutputTexture @*@*
 
 @anchor{tex_coord_set}
 @subheading tex_coord_set

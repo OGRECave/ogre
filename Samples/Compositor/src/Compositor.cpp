@@ -211,6 +211,18 @@ void Sample_Compositor::createControls(void)
 		cb->hide();
 	}
 	changePage(0);
+	
+
+	mTrayMgr->createLabel(TL_TOPRIGHT, "DebugRTTLabel", "Debug RTTs", 256);
+	mDebugTextureSelectMenu = mTrayMgr->createLongSelectMenu(
+		TL_TOPRIGHT, "DebugRTTSelectMenu", "Texture", 256, 175, 5);
+	mDebugTextureSelectMenu->addItem("None");
+	DecorWidget* debugRTTPanel = mTrayMgr->createDecorWidget(
+		TL_TOPRIGHT, "DebugRTTPanel", "Panel", "CompositorDemo/DebugView");
+	mDebugTextureTUS = debugRTTPanel->getOverlayElement()->getMaterial()
+		->getBestTechnique()->getPass(0)->getTextureUnitState(0);
+	debugRTTPanel->hide();
+
 	mTrayMgr->showCursor();
 }
 //-----------------------------------------------------------------------------------
@@ -219,7 +231,52 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
 	if (Ogre::StringUtil::startsWith(box->getName(), "Compositor_", false))
 	{
 		String compositorName = box->getCaption();
-		Ogre::CompositorManager::getSingleton().setCompositorEnabled(mViewport, compositorName, box->isChecked());
+
+		if (!box->isChecked())
+		{
+			//Remove the items from the debug menu and remove debug texture if from disabled compositor
+			String activeTex = mDebugTextureSelectMenu->getSelectedItem();
+			if (StringUtil::startsWith(activeTex, compositorName, false))
+			{
+				mDebugTextureTUS->setContentType(TextureUnitState::CONTENT_NAMED);
+				mDebugTextureSelectMenu->selectItem(0, true);
+			}
+			for (unsigned int i = 1; i < mDebugTextureSelectMenu->getNumItems(); i++)
+			{
+				if (StringUtil::startsWith(mDebugTextureSelectMenu->getItems()[i], compositorName, false))
+				{
+					mDebugTextureSelectMenu->removeItem(i);
+					i--;
+				}
+			}
+		}
+
+		CompositorManager::getSingleton().setCompositorEnabled(mViewport, compositorName, box->isChecked());
+
+		
+		if (box->isChecked())
+		{
+			//Add the items to the selectable texture menu
+			CompositorInstance* instance = CompositorManager::getSingleton().getCompositorChain(mViewport)->getCompositor(compositorName);
+			CompositionTechnique::TextureDefinitionIterator it = instance->getTechnique()->getTextureDefinitionIterator();
+			while (it.hasMoreElements())
+			{
+				CompositionTechnique::TextureDefinition* texDef = it.getNext();
+				size_t numTextures = texDef->formatList.size();
+				if (numTextures > 1)
+				{
+					for (size_t i=0; i<numTextures; i++)
+					{
+						//Dirty string composition. NOT ROBUST!
+						mDebugTextureSelectMenu->addItem(compositorName + ";" + texDef->name + ";" + i);
+					}
+				}
+				else
+				{
+					mDebugTextureSelectMenu->addItem(compositorName + ";" + texDef->name);
+				}
+			}
+		}
 	}
 }
 //-----------------------------------------------------------------------------------
@@ -227,6 +284,30 @@ void Sample_Compositor::buttonHit(OgreBites::Button* button)
 {
 	size_t nextPage = (mActiveCompositorPage + 1) % mNumCompositorPages;
 	changePage(nextPage);
+}
+//-----------------------------------------------------------------------------------
+void Sample_Compositor::itemSelected(OgreBites::SelectMenu* menu)
+{
+	if (menu->getSelectionIndex() == 0)
+	{
+		mDebugTextureTUS->setContentType(TextureUnitState::CONTENT_NAMED);
+		mTrayMgr->getWidget("DebugRTTPanel")->hide();
+		return;
+	}
+
+	mTrayMgr->getWidget("DebugRTTPanel")->show();
+	StringVector parts = StringUtil::split(menu->getSelectedItem(), ";");
+	mDebugTextureTUS->setContentType(TextureUnitState::CONTENT_COMPOSITOR);
+	if (parts.size() == 2)
+	{
+		mDebugTextureTUS->setCompositorReference(parts[0], parts[1]);
+	}
+	else
+	{
+		mDebugTextureTUS->setCompositorReference(parts[0], parts[1], 
+			StringConverter::parseUnsignedInt(parts[2]));
+	}
+	
 }
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::createScene(void)

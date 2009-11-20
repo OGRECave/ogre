@@ -166,8 +166,7 @@ CompositorInstance *CompositorChain::getCompositor(const String& name)
 			return *it;
 		}
 	}
-	OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Invalid compositor name",
-		"CompositorChain::getCompositor");
+	return 0;
 }
 //-----------------------------------------------------------------------
 CompositorChain::InstanceIterator CompositorChain::getCompositors()

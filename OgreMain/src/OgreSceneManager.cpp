@@ -69,6 +69,8 @@ THE SOFTWARE.
 #include "OgreRibbonTrail.h"
 #include "OgreParticleSystemManager.h"
 #include "OgreProfiler.h"
+#include "OgreCompositorManager.h"
+#include "OgreCompositorChain.h"
 // This class implements the most basic scene manager
 
 #include <cstdio>
@@ -1132,6 +1134,35 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 				{
 					mAutoParamDataSource->setTextureProjector(effi->second.frustum, unit);
 				}
+			}
+			if (pTex->getContentType() == TextureUnitState::CONTENT_COMPOSITOR)
+			{
+				CompositorManager& compMgr = CompositorManager::getSingleton();
+				//TODO : Working with current viewport is not good enough
+				if (!compMgr.hasCompositorChain(mCurrentViewport))
+				{
+					OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+						"An pass that wishes to reference a compositor texutre "
+						"attempted to render on a viewport without a compositor",
+						"SceneManager::_setPass");
+				}
+				CompositorChain* currentChain = compMgr.getCompositorChain(mCurrentViewport);
+				CompositorInstance* refComp = currentChain->getCompositor(pTex->getReferencedCompositorName());
+				if (refComp == 0)
+				{
+					OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+						"Invalid compositor content_type compositor name",
+						"SceneManager::_setPass");
+				}
+				Ogre::TexturePtr refTex = refComp->getTextureInstance(
+					pTex->getReferencedTextureName(), pTex->getReferencedMRTIndex());
+				if (refTex.isNull())
+				{
+					OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+						"Invalid compositor content_type texture name",
+						"SceneManager::_setPass");
+				}
+				pTex->_setTexturePtr(refTex);
 			}
 			mDestRenderSystem->_setTextureUnitSettings(unit, *pTex);
 			++unit;

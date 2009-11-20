@@ -1,0 +1,8 @@
+template container Panel(CompositorDemo/DebugView)
+{
+	metrics_mode pixels
+	material CompositorDemo/DebugView
+	horz_align center
+	width 256
+	height 256
+}

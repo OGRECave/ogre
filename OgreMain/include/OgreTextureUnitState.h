@@ -423,7 +423,9 @@ namespace Ogre {
 			/// Normal texture identified by name
 			CONTENT_NAMED = 0,
 			/// A shadow texture, automatically bound by engine
-			CONTENT_SHADOW = 1
+			CONTENT_SHADOW = 1,
+			/// A compositor texture, automatically linked to active viewport's chain
+			CONTENT_COMPOSITOR = 2
 		};
 
 		/** Sets the type of unit these texture settings should be bound to. 
@@ -1024,6 +1026,22 @@ namespace Ogre {
 		*/
 		float getTextureMipmapBias(void) const { return mMipmapBias; }
 
+		/** Set the compositor reference for this texture unit state.
+		@remarks 
+			Only valid when content type is compositor.
+		@param compositorName the name of the compositor to reference
+		@param textureName the name of the texture to reference
+		@param mrtIndex the index of the wanted texture, if referencing an MRT
+		*/
+		void setCompositorReference(const String& compositorName, const String& textureName, size_t mrtIndex = 0);
+
+		/** Gets the name of the compositor that this texture referneces */
+		const String& getReferencedCompositorName() const { return mCompositorRefName; }
+		/** Gets the name of the texture in the compositor that this texture references */
+		const String& getReferencedTextureName() const { return mCompositorRefTexName; }
+		/** Gets the MRT index of the texture in the compositor that this texture references */ 
+		size_t getReferencedMRTIndex() const { return mCompositorRefMrtIndex; }
+	
         /// Gets the parent Pass object
         Pass* getParent(void) const { return mParent; }
 
@@ -1142,6 +1160,8 @@ protected:
 		BindingType mBindingType;
 		/// Content type of texture (normal loaded texture, auto-texture)
 		ContentType mContentType;
+		/// The index of the referenced texture if referencing an MRT in a compositor
+		size_t mCompositorRefMrtIndex;
 
         //-----------------------------------------------------------------------------
         // Complex members (those that can't be copied using memcpy) are at the end to 
@@ -1152,6 +1172,9 @@ protected:
         String mName;               // optional name for the TUS
         String mTextureNameAlias;       // optional alias for texture frames
         EffectMap mEffects;
+		///The data that references the compositor
+		String mCompositorRefName;
+		String mCompositorRefTexName;
         //-----------------------------------------------------------------------------
 
         //-----------------------------------------------------------------------------

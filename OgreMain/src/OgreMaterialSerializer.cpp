@@ -1666,13 +1666,37 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	bool parseContentType(String& params, MaterialScriptContext& context)
 	{
-		if (params == "named")
+		StringVector vecparams = StringUtil::split(params, " \t");
+		if (vecparams.empty())
+		{
+			logParseError("No content_type specified", context);
+			return false;
+		}
+		String& paramType = vecparams[0];
+		if (paramType == "named")
 		{
 			context.textureUnit->setContentType(TextureUnitState::CONTENT_NAMED);
 		}
-		else if (params == "shadow")
+		else if (paramType == "shadow")
 		{
 			context.textureUnit->setContentType(TextureUnitState::CONTENT_SHADOW);
+		}
+		else if (paramType == "compositor")
+		{
+			context.textureUnit->setContentType(TextureUnitState::CONTENT_COMPOSITOR);
+			if (vecparams.size() == 3)
+			{
+				context.textureUnit->setCompositorReference(vecparams[1], vecparams[2]);
+			}
+			else if (vecparams.size() == 4)
+			{
+				context.textureUnit->setCompositorReference(vecparams[1], vecparams[2], 
+					StringConverter::parseUnsignedInt(vecparams[3]));
+			}
+			else
+			{
+				logParseError("compositor content_type requires 2 or 3 extra params", context);
+			}
 		}
 		else
 		{
@@ -4570,6 +4594,12 @@ namespace Ogre
 					break;
 				case TextureUnitState::CONTENT_SHADOW:
 					writeValue("shadow");
+					break;
+				case TextureUnitState::CONTENT_COMPOSITOR:
+					writeValue("compositor");
+					writeValue(pTex->getReferencedCompositorName());
+					writeValue(pTex->getReferencedTextureName());
+					writeValue(StringConverter::toString(pTex->getReferencedMRTIndex()));
 					break;
 				};
 			}

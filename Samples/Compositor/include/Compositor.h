@@ -49,6 +49,7 @@ public:
 	
 	void checkBoxToggled(OgreBites::CheckBox * box);
 	void buttonHit(OgreBites::Button* button);        
+	void itemSelected(OgreBites::SelectMenu* menu);
 
 protected:
 	
@@ -65,6 +66,11 @@ protected:
 	StringVector mCompositorNames;
 	size_t mActiveCompositorPage;
 	size_t mNumCompositorPages;	
+
+	String mDebugCompositorName;
+	SelectMenu* mDebugTextureSelectMenu;
+	TextureUnitState* mDebugTextureTUS;
+
 };
 
 

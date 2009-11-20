@@ -163,7 +163,8 @@ namespace Ogre {
         mEffects = oth.mEffects;
 
         mTextureNameAlias = oth.mTextureNameAlias;
-
+		mCompositorRefName = oth.mCompositorRefName;
+		mCompositorRefTexName = oth.mCompositorRefTexName;
         // Can't sharing controllers with other TUS, reset to null to avoid potential bug.
         for (EffectMap::iterator j = mEffects.begin(); j != mEffects.end(); ++j)
         {
@@ -248,7 +249,7 @@ namespace Ogre {
 	void TextureUnitState::setContentType(TextureUnitState::ContentType ct)
 	{
 		mContentType = ct;
-		if (ct == CONTENT_SHADOW)
+		if (ct == CONTENT_SHADOW || ct == CONTENT_COMPOSITOR)
 		{
 			// Clear out texture frames, not applicable
 			mFrames.clear();
@@ -1452,5 +1453,11 @@ namespace Ogre {
 	{
 		mParent = parent;
 	}
-
+	//-----------------------------------------------------------------------------
+	void TextureUnitState::setCompositorReference(const String& compositorName, const String& textureName, size_t mrtIndex)
+	{  
+		mCompositorRefName = compositorName; 
+		mCompositorRefTexName = textureName; 
+		mCompositorRefMrtIndex = mrtIndex; 
+	}
 }

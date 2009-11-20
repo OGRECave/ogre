@@ -86,7 +86,7 @@ namespace Ogre {
          */
         CompositorInstance *getCompositor(size_t index);
 
-		/** Get compositor instance by name.
+		/** Get compositor instance by name. Returns null if not found.
          */
         CompositorInstance *getCompositor(const String& name);
 

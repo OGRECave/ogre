@@ -1,0 +1,18 @@
+material CompositorDemo/DebugView
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+            scene_blend alpha_blend
+            depth_check off
+			
+			texture_unit
+			{	
+				//Will be filled by code, need to set specific on runtime
+			}
+		}
+	}
+	
+}
