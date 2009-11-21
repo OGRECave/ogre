@@ -806,7 +806,16 @@ namespace OgreBites
 				i++;
 			}
 
-			if (it != mItems.end()) mItems.erase(it);
+			if (it != mItems.end())
+			{
+				mItems.erase(it);
+				if (mItems.size() < mItemsShown)
+				{
+					mItemsShown = mItems.size();
+					nukeOverlayElement(mItemElements.back());
+					mItemElements.pop_back();
+				}
+			}
 			else 
 			{
 				Ogre::String desc = "Menu \"" + getName() + "\" contains no item at position " +
