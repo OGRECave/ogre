@@ -268,7 +268,8 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
 					for (size_t i=0; i<numTextures; i++)
 					{
 						//Dirty string composition. NOT ROBUST!
-						mDebugTextureSelectMenu->addItem(compositorName + ";" + texDef->name + ";" + (uint32)i);
+						mDebugTextureSelectMenu->addItem(compositorName + ";" + texDef->name + ";" + 
+							Ogre::StringConverter::toString((uint32)i));
 					}
 				}
 				else
