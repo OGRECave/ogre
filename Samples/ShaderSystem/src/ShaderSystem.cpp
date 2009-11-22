@@ -815,6 +815,12 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 		
 		// Set up caster material - this is just a standard depth/shadow map caster
 		mSceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
+		
+		
+		// Disable fog on the caster pass.
+		MaterialPtr passCaterMaterial = MaterialManager::getSingleton().getByName("PSSM/shadow_caster");
+		Pass* pssmCasterPass = passCaterMaterial->getTechnique(0)->getPass(0);
+		pssmCasterPass->setFog(true);
 
 		// shadow camera setup
 		PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
