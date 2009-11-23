@@ -61,11 +61,13 @@ namespace Ogre {
         /** Sets the corners of the rectangle, in relative coordinates.
         @param
         left Left position in screen relative coordinates, -1 = left edge, 1.0 = right edge
-        top Top position in screen relative coordinates, 1 = top edge, -1 = bottom edge
-        right Right position in screen relative coordinates
-        bottom Bottom position in screen relative coordinates
+        @param top Top position in screen relative coordinates, 1 = top edge, -1 = bottom edge
+        @param right Right position in screen relative coordinates
+        @param bottom Bottom position in screen relative coordinates
+		@param updateAABB Tells if you want to recalculate the AABB according to 
+		the new corners. If false, the axis aligned bounding box will remain identical.
         */
-        void setCorners(Real left, Real top, Real right, Real bottom);
+        void setCorners(Real left, Real top, Real right, Real bottom, bool updateAABB = true);
 
 		/** Sets the normals of the rectangle
 		*/

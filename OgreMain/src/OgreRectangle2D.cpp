@@ -132,7 +132,7 @@ namespace Ogre {
         OGRE_DELETE mRenderOp.vertexData;
     }
 
-    void Rectangle2D::setCorners(Real left, Real top, Real right, Real bottom) 
+    void Rectangle2D::setCorners(Real left, Real top, Real right, Real bottom, bool updateAABB) 
     {
         HardwareVertexBufferSharedPtr vbuf = 
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(POSITION_BINDING);
@@ -156,10 +156,12 @@ namespace Ogre {
 
         vbuf->unlock();
 
-        mBox.setExtents(
-            std::min(left, right), std::min(top, bottom), 0,
-            std::max(left, right), std::max(top, bottom), 0);
-
+		if(updateAABB)
+		{
+			mBox.setExtents(
+				std::min(left, right), std::min(top, bottom), 0,
+				std::max(left, right), std::max(top, bottom), 0);
+		}
     }
 
 	void Rectangle2D::setNormals(const Ogre::Vector3 &topLeft, const Ogre::Vector3 &bottomLeft, const Ogre::Vector3 &topRight, const Ogre::Vector3 &bottomRight)
