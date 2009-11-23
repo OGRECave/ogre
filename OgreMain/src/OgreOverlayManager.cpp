@@ -592,6 +592,11 @@ namespace Ogre {
 		return getOverlayElementImpl(name, getElementMap(isTemplate));
 	}
 	//---------------------------------------------------------------------
+	bool OverlayManager::hasOverlayElement(const String& name, bool isTemplate)
+	{
+		return hasOverlayElementImpl(name, getElementMap(isTemplate));
+	}
+	//---------------------------------------------------------------------
 	OverlayElement* OverlayManager::getOverlayElementImpl(const String& name, ElementMap& elementMap)
 	{
 		// Locate instance
@@ -603,6 +608,12 @@ namespace Ogre {
 		}
 
 		return ii->second;
+	}
+	//---------------------------------------------------------------------
+	bool OverlayManager::hasOverlayElementImpl(const String& name, ElementMap& elementMap)
+	{
+		ElementMap::iterator ii = elementMap.find(name);
+		return ii != elementMap.end();
 	}
 	//---------------------------------------------------------------------
 	void OverlayManager::destroyOverlayElement(const String& instanceName, bool isTemplate)

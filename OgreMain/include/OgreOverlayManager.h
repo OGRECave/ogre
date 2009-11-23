@@ -86,6 +86,8 @@ namespace Ogre {
 		OverlayElement* createOverlayElementImpl(const String& typeName, const String& instanceName, ElementMap& elementMap);
 
 		OverlayElement* getOverlayElementImpl(const String& name, ElementMap& elementMap);
+		
+		bool hasOverlayElementImpl(const String& name, ElementMap& elementMap);
 
 		void destroyOverlayElementImpl(const String& instanceName, ElementMap& elementMap);
 
@@ -148,6 +150,9 @@ namespace Ogre {
 		/** Gets a reference to an existing element. */
 		OverlayElement* getOverlayElement(const String& name, bool isTemplate = false);
 
+		/** Tests if an element exists. */
+		bool hasOverlayElement(const String& name, bool isTemplate = false);
+		
 		/** Destroys a OverlayElement. 
 		@remarks
 		Make sure you're not still using this in an Overlay. If in
