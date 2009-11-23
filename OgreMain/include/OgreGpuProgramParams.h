@@ -687,6 +687,9 @@ namespace Ogre {
 			*/
 			ACT_RENDER_TARGET_FLIPPING,
 
+			/** -1 if the winding has been inverted (e.g. for reflections), +1 otherwise.
+			*/
+			ACT_VERTEX_WINDING,
 
 			/// Fog colour
 			ACT_FOG_COLOUR,

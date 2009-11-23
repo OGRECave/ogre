@@ -584,6 +584,11 @@ namespace Ogre {
     {
         mInvertVertexWinding = invert;
     }
+	//-----------------------------------------------------------------------
+	bool RenderSystem::getVertexWindingInverted(void) const
+	{
+		return mInvertVertexWinding;
+	}
 	//---------------------------------------------------------------------
 	void RenderSystem::addClipPlane (const Plane &p)
 	{

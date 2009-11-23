@@ -193,6 +193,7 @@ namespace RTShader {
 		AutoShaderParameter(GpuProgramParameters::ACT_TRANSPOSE_WORLDVIEWPROJ_MATRIX,			"transpose_worldviewproj_matrix",		GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLDVIEWPROJ_MATRIX, "inverse_transpose_worldviewproj_matrix", GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_RENDER_TARGET_FLIPPING,					"render_target_flipping",				GCT_FLOAT1),
+		AutoShaderParameter(GpuProgramParameters::ACT_VERTEX_WINDING,							"vertex_winding",					GCT_FLOAT1),
 		AutoShaderParameter(GpuProgramParameters::ACT_FOG_COLOUR,								"fog_colour",							GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_FOG_PARAMS,								"fog_params",							GCT_FLOAT4),
 		AutoShaderParameter(GpuProgramParameters::ACT_SURFACE_AMBIENT_COLOUR,         		"surface_ambient_colour",				GCT_FLOAT4),

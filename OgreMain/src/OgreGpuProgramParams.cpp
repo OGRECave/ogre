@@ -79,6 +79,7 @@ namespace Ogre
 		AutoConstantDefinition(ACT_INVERSE_TRANSPOSE_WORLDVIEWPROJ_MATRIX, "inverse_transpose_worldviewproj_matrix", 16, ET_REAL, ACDT_NONE),
 
 		AutoConstantDefinition(ACT_RENDER_TARGET_FLIPPING,          "render_target_flipping",         1, ET_REAL, ACDT_NONE),
+		AutoConstantDefinition(ACT_VERTEX_WINDING,          "vertex_winding",         1, ET_REAL, ACDT_NONE),
 
 		AutoConstantDefinition(ACT_FOG_COLOUR,                    "fog_colour",                   4, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_FOG_PARAMS,                    "fog_params",                   4, ET_REAL, ACDT_NONE),
@@ -983,6 +984,7 @@ namespace Ogre
 		case ACT_TRANSPOSE_VIEWPROJ_MATRIX:
 		case ACT_INVERSE_TRANSPOSE_VIEWPROJ_MATRIX:
 		case ACT_RENDER_TARGET_FLIPPING:
+		case ACT_VERTEX_WINDING:
 		case ACT_AMBIENT_LIGHT_COLOUR: 
 		case ACT_DERIVED_AMBIENT_LIGHT_COLOUR:
 		case ACT_DERIVED_SCENE_COLOUR:
@@ -1630,6 +1632,12 @@ namespace Ogre
 					break;
 				case ACT_RENDER_TARGET_FLIPPING:
 					_writeRawConstant(i->physicalIndex, source->getCurrentRenderTarget()->requiresTextureFlipping() ? -1.f : +1.f);
+					break;
+				case ACT_VERTEX_WINDING:
+					{
+						RenderSystem* rsys = Root::getSingleton().getRenderSystem();
+						_writeRawConstant(i->physicalIndex, rsys->getVertexWindingInverted() ? -1.f : +1.f);
+					}
 					break;
 
 					// NB ambient light still here because it's not related to a specific light

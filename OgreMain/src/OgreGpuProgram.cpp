@@ -89,6 +89,7 @@ namespace Ogre
         mLoadFromFile = false;
 		mCompileError = false;
     }
+		
 
     //-----------------------------------------------------------------------------
     void GpuProgram::loadImpl(void)
@@ -460,3 +461,4 @@ namespace Ogre
     }
 
 }
+

@@ -2243,6 +2243,8 @@ The transform matrix of a given texture unit, as it would usually be seen in the
 
 @item render_target_flipping
 The value use to adjust transformed y position if bypassed projection matrix transform. It's -1 if the render target requires texture flipping, +1 otherwise.
+@item vertex_winding
+Indicates what vertex winding mode the render state is in at this point; +1 for standard, -1 for inverted (e.g. when processing reflections).
 
 @item light_diffuse_colour
 The diffuse colour of a given light; this requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light - note that directional lights are always first in the list and always present). NB if there are no lights this close, then the parameter will be set to black.
