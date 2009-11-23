@@ -123,7 +123,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	os<< std::endl;
 
 	// Write forward declarations
-	writeForwardDeclartions(os, program);
+	writeForwardDeclarations(os, program);
 	os<< std::endl;
 	
 	// Generate global variable code.
@@ -297,7 +297,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 }
 
 //-----------------------------------------------------------------------
-void GLSLProgramWriter::writeForwardDeclartions(std::ostream& os, Program* program)
+void GLSLProgramWriter::writeForwardDeclarations(std::ostream& os, Program* program)
 {
 	os << "//-----------------------------------------------------------------------------" << std::endl;
 	os << "//                         FORWARD DECLARTIONS" << std::endl;
@@ -372,7 +372,7 @@ void GLSLProgramWriter::writeForwardDeclartions(std::ostream& os, Program* progr
 				{
 					OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
 						"Can not convert Operand::OpMask to GpuConstantType", 
-						"GLSLProgramWriter::writeForwardDeclartions" );	
+						"GLSLProgramWriter::writeForwardDeclarations" );	
 				}
 
 				// Write the operand type.

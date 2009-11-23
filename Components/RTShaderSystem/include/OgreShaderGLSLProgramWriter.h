@@ -79,7 +79,7 @@ protected:
 	void				writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
 
 	/** Write forward declarations. This is needed so that we can attach library shader at a later step. */
-	void				writeForwardDeclartions		(std::ostream& os, Program* program);
+	void				writeForwardDeclarations	(std::ostream& os, Program* program);
 
 	/** Write the input params of the function */
 	void				writeInputParameters		(std::ostream& os, Function* function, GpuProgramType gpuType);

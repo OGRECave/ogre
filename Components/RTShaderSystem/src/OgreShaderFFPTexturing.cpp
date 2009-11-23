@@ -963,14 +963,14 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
 	{
 		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
 			"FFPTexturing unit index out of bounds !!!",
-			"FFPTexturing::setTextureState");
+			"FFPTexturing::setTextureUnit");
 	}
 
 	if (textureUnitState->getBindingType() == TextureUnitState::BT_VERTEX)
 	{
 		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
 			"FFP Texture unit does not support vertex texture fetch !!!",
-			"FFPTexturing::setTextureState");
+			"FFPTexturing::setTextureUnit");
 	}
 	
 
