@@ -230,6 +230,10 @@ namespace Ogre {
 		/** Gives a name to a SubMesh
 		*/
 		void nameSubMesh(const String& name, ushort index);
+
+		/** Removes a name from a SubMesh
+		*/
+		void unnameSubMesh(const String& name);
 		
 		/** Gets the index of a submesh with a given name.
         @remarks

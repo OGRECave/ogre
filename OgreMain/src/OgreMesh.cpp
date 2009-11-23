@@ -190,6 +190,13 @@ namespace Ogre {
 		mSubMeshNameMap[name] = index ;
 	}
 
+	//---------------------------------------------------------------------
+	void Mesh::unnameSubMesh(const String& name)
+	{
+		SubMeshNameMap::iterator i = mSubMeshNameMap.find(name);
+		if (i != mSubMeshNameMap.end())
+			mSubMeshNameMap.erase(i);
+	}
     //-----------------------------------------------------------------------
     SubMesh* Mesh::getSubMesh(const String& name) const
 	{
