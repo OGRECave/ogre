@@ -56,6 +56,13 @@ namespace OgreBites
 
 			mTrayMgr = 0;
 			mCameraMan = 0;
+			mCamera = 0;
+			mViewport = 0;
+			mDetailsPanel = 0;
+			mCursorWasVisible = false;
+#ifdef  USE_RTSHADER_SYSTEM
+			mRTShaderSystemPanel = 0;
+#endif
 		}
 
 		virtual ~SdkSample() {}

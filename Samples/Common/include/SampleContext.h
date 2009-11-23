@@ -97,6 +97,14 @@ namespace OgreBites
 			mFirstRun = true;
 			mLastRun = false;
 			mLastSample = 0;
+			mInputMgr = 0;
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+			mMouse = 0;
+			mAccelerometer = 0;
+#else
+			mKeyboard = 0;
+			mMouse = 0;
+#endif
 		}
 
 		virtual ~SampleContext() {}

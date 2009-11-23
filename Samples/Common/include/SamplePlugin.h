@@ -54,8 +54,8 @@ namespace OgreBites
     public:
 
 		SamplePlugin(const Ogre::String& name)
+		: mName(name)
 		{
-			mName = name;
 		}
 
 		const Ogre::String& getName() const

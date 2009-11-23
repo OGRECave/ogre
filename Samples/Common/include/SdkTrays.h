@@ -660,6 +660,9 @@ namespace OgreBites
 		// Do not instantiate any widgets directly. Use SdkTrayManager.
 		SelectMenu(const Ogre::String& name, const Ogre::DisplayString& caption, Ogre::Real width,
 			Ogre::Real boxWidth, unsigned int maxItemsShown)
+			: mHighlightIndex(0)
+			, mDisplayIndex(0)
+			, mDragOffset(0.0f)
 		{
 			mSelectionIndex = -1;
 			mFitToContents = false;
@@ -1181,6 +1184,11 @@ namespace OgreBites
 		// Do not instantiate any widgets directly. Use SdkTrayManager.
 		Slider(const Ogre::String& name, const Ogre::DisplayString& caption, Ogre::Real width, Ogre::Real trackWidth,
 			Ogre::Real valueBoxWidth, Ogre::Real minValue, Ogre::Real maxValue, unsigned int snaps)
+			: mDragOffset(0.0f)
+			, mValue(0.0f)
+			, mMinValue(0.0f)
+			, mMaxValue(0.0f)
+			, mInterval(0.0f)
 		{
 			mDragging = false;
 			mFitToContents = false;
@@ -1612,6 +1620,7 @@ namespace OgreBites
 
 		// Do not instantiate any widgets directly. Use SdkTrayManager.
 		ProgressBar(const Ogre::String& name, const Ogre::DisplayString& caption, Ogre::Real width, Ogre::Real commentBoxWidth)
+			: mProgress(0.0f)
 		{
 			mElement = Ogre::OverlayManager::getSingleton().createOverlayElementFromTemplate
 				("SdkTrays/ProgressBar", "BorderPanel", name);
@@ -1692,7 +1701,8 @@ namespace OgreBites
 #endif
 		  mName(name), mWindow(window), mMouse(mouse), mListener(listener), mWidgetPadding(8), mWidgetSpacing(2),
                 mTrayPadding(0), mTrayDrag(false), mExpandedMenu(0), mDialog(0), mOk(0), mYes(0), mNo(0),
-                mFpsLabel(0), mStatsPanel(0), mLogo(0), mLoadBar(0)
+                mFpsLabel(0), mStatsPanel(0), mLogo(0), mLoadBar(0),mWidgetDeathRow(),mCursorWasVisible(false),
+				mGroupInitProportion(0.0f),mGroupLoadProportion(0.0f),mLoadInc(0.0f)
 		{
 			Ogre::OverlayManager& om = Ogre::OverlayManager::getSingleton();
 

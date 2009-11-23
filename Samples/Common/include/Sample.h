@@ -120,6 +120,14 @@ namespace OgreBites
 			mResourcesLoaded = false;
 			mContentSetup = false;
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+			mMouse = 0;
+			mAccelerometer = 0;
+#else
+			mKeyboard = 0;
+			mMouse = 0;
+#endif
+
 #ifdef USE_RTSHADER_SYSTEM
 			mShaderGenerator	 = NULL;		
 			mMaterialMgrListener = NULL;

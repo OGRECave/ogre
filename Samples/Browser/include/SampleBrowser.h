@@ -98,6 +98,16 @@ namespace OgreBites
 			mLastViewCategory = 0;
 			mLastViewTitle = 0;
 			mLastSampleIndex = -1;
+			mCategoryMenu = 0;
+			mSampleMenu = 0;
+			mSampleSlider = 0;
+			mTitleLabel = 0;
+			mDescBox = 0;
+			mRendererMenu = 0;
+			mCarouselPlace = 0.0f;
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+			mGestureView = 0;
+#endif
 		}
 
 		/*-----------------------------------------------------------------------------
