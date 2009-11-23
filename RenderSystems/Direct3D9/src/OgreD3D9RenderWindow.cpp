@@ -779,7 +779,7 @@ namespace Ogre
 			}
 			else
 			{
-				hr = mpD3DDevice->Present( NULL, NULL, 0, NULL );
+				hr = mpD3DDevice->Present( NULL, NULL, NULL, NULL );
 			}
 			if( D3DERR_DEVICELOST == hr )
 			{
