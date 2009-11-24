@@ -426,6 +426,12 @@ void GLXConfigurator::SetRenderer(RenderSystem *r) {
 	// Process each option and create an optionmenu widget for it
 	for (ConfigOptionMap::iterator it = options.begin();
 					it != options.end(); it++) {
+		// if the config option does not have any possible value, then skip it.
+		// if we create a popup with zero entries, it will crash when you click
+		// on it.
+		if (it->second.possibleValues.empty())
+			continue;
+
 		Widget lb1 = XtVaCreateManagedWidget("topLabel", labelWidgetClass, box, XtNlabel, it->second.name.c_str(), XtNborderWidth, 0,
 			XtNwidth, col1w, 	// Fixed width
 			XtNheight, 18,

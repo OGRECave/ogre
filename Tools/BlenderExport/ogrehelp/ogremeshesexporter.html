@@ -194,8 +194,14 @@ This does only work for materials for which TexFace is not set.</dd>
   <dt>Fix Up Axis to Y</dt>
   <dd>Blender uses Z as up axis. This toggle switch allows changing the mesh to use Y as up axis.</dd>
 
+  <dt>Require Materials</dt>
+  <dd>Generate Error message when part of a mesh is not assigned with a material.</dd>
+
   <dt>Skeleton name follow mesh</dt>
   <dd>Force skeleton name to follow mesh name. Uncheck to make it use armature name instead.</dd>
+
+  <dt>Apply Modifiers</dt>
+  <dd>Apply mesh modifiers before export. This option is slow and may break vert order for morph targets. Not recommended for animated meshes.</dd>
 
   <dt>OgreXMLConverter</dt>
   <dd>Convert the XML files to binary files via the OgreXMLConverter. The exporter must be able to find the converter executable. You can specify its location in the preferences.</dd>
@@ -465,12 +471,6 @@ Bellow are a list of default properties based on Blender's material.
 	<li>[textureName]._tex_address_mode</li>
 	<li>[textureName]._filtering</li>
 	<li>[textureName]._colour_op</li>
-	<li>[textureName]._sizeX</li>
-	<li>[textureName]._sizeY</li>
-	<li>[textureName]._sizeZ</li>
-	<li>[textureName]._offsetX</li>
-	<li>[textureName]._offsetY</li>
-	<li>[textureName]._offsetZ</li>
 </ul>
 
 <p>

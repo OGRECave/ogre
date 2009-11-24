@@ -858,7 +858,7 @@ class MeshExporter:
 		# populated on export
 		self.submeshManager = None
 		return
-	def export(self, dir, materialManager, fixUpAxis=True, exportMesh=True, colouredAmbient=False, convertXML=False):
+	def export(self, dir, materialManager, fixUpAxis=True, exportMesh=True, colouredAmbient=False, applyModifiers=False, convertXML=False):
 		# leave editmode
 		editmode = Blender.Window.EditMode()
 		if editmode:
@@ -871,7 +871,7 @@ class MeshExporter:
 				self.armatureExporter.export(dir, fixUpAxis, convertXML)
 
 		## export meshdata
-		self._generateSubmeshes(fixUpAxis, materialManager, colouredAmbient, exportMesh)
+		self._generateSubmeshes(fixUpAxis, materialManager, colouredAmbient, applyModifiers, exportMesh)
 
 		if exportMesh:
 			## export vertex animations
@@ -895,11 +895,15 @@ class MeshExporter:
 		return self.armatureExporter
 	def getSubmeshManager(self):
 		return self.submeshManager
-	def _generateSubmeshes(self, fixUpAxis, materialManager, colouredAmbient, exportMesh):
+	def _generateSubmeshes(self, fixUpAxis, materialManager, colouredAmbient, applyModifiers, exportMesh):
 		"""Generates submeshes of the mesh.
 		"""
 		#NMesh# Blender.Mesh.Mesh does not provide access to mesh shape keys, use Blender.NMesh.NMesh
-		bMesh = self.bObject.getData(mesh=True)
+		if applyModifiers:
+			bMesh = Blender.Mesh.New('tmp')
+			bMesh.getFromObject(self.bObject)
+		else:
+			bMesh = self.bObject.getData(mesh=True)
 		self.submeshManager = SubmeshManager(bMesh, fixUpAxis, self.armatureExporter)
 		for bMFace in bMesh.faces:
 			faceMaterial = materialManager.getMaterial(bMesh, bMFace, colouredAmbient, self.name)

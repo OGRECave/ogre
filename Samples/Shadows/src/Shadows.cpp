@@ -1389,7 +1389,7 @@ protected:
 				switch(mat)
 				{
 				case MAT_STANDARD:
-					mSceneMgr->setShadowTexturePixelFormat(PF_L8);
+					mSceneMgr->setShadowTexturePixelFormat(PF_X8R8G8B8);
 					mSceneMgr->setShadowTextureCasterMaterial(StringUtil::BLANK);
 					mSceneMgr->setShadowTextureReceiverMaterial(StringUtil::BLANK);
 					mSceneMgr->setShadowTextureSelfShadow(false);	

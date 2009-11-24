@@ -431,11 +431,14 @@ namespace Ogre {
         assert(triangleFaceNormals.size() == triangleLightFacings.size());
 
         // Use optimised util to determine if triangle's face normal are light facing
-        OptimisedUtil::getImplementation()->calculateLightFacing(
-            lightPos,
-            &triangleFaceNormals.front(),
-            &triangleLightFacings.front(),
-            triangleLightFacings.size());
+		if(!triangleFaceNormals.empty())
+		{
+			OptimisedUtil::getImplementation()->calculateLightFacing(
+				lightPos,
+				&triangleFaceNormals.front(),
+				&triangleLightFacings.front(),
+				triangleLightFacings.size());
+		}
     }
     //---------------------------------------------------------------------
     void EdgeData::updateFaceNormals(size_t vertexSet, 

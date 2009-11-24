@@ -969,7 +969,7 @@ namespace Ogre
 			// Only the master will call present method results in synchronized
 			// buffer swap for the rest of the implicit swap chain.
 			if (getPrimaryWindow() == renderWindow)
-				hr = mpDevice->Present( NULL, NULL, 0, NULL );
+				hr = mpDevice->Present( NULL, NULL, NULL, NULL );
 			else
 				hr = S_OK;
 		}
