@@ -795,6 +795,13 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 		}
 #endif
 
+		mTrayMgr->moveWidgetToTray(mDirLightCheckBox, TL_TOPLEFT, 1);
+		mTrayMgr->moveWidgetToTray(mPointLightCheckBox, TL_TOPLEFT, 2);
+		mTrayMgr->moveWidgetToTray(mSpotLightCheckBox, TL_TOPLEFT, 3);
+		mDirLightCheckBox->show();
+		mPointLightCheckBox->show();
+		mSpotLightCheckBox->show();
+
 	}
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
@@ -812,6 +819,14 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 		mDirLightCheckBox->setChecked(true);
 		mPointLightCheckBox->setChecked(false);
 		mSpotLightCheckBox->setChecked(false);
+
+		mTrayMgr->removeWidgetFromTray(mDirLightCheckBox);
+		mTrayMgr->removeWidgetFromTray(mPointLightCheckBox);
+		mTrayMgr->removeWidgetFromTray(mSpotLightCheckBox);
+		mDirLightCheckBox->hide();
+		mPointLightCheckBox->hide();
+		mSpotLightCheckBox->hide();
+		
 		
 		// Set up caster material - this is just a standard depth/shadow map caster
 		mSceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
