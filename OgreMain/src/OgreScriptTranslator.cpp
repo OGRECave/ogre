@@ -3777,10 +3777,10 @@ namespace Ogre{
 					{
 						compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
 					}
-					else if(prop->values.size() > 1)
+					else if(prop->values.size() > 4)
 					{
 						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-							"content_type must have at most 1 argument");
+							"content_type must have at most 4 arguments");
 					}
 					else
 					{
@@ -3795,9 +3795,36 @@ namespace Ogre{
 							case ID_SHADOW:
 								mUnit->setContentType(TextureUnitState::CONTENT_SHADOW);
 								break;
+							case ID_COMPOSITOR:
+								mUnit->setContentType(TextureUnitState::CONTENT_COMPOSITOR);
+								if (prop->values.size() >= 3)
+								{
+									String compositorName;
+									getString(*getNodeAt(prop->values, 1), &compositorName);
+									String textureName;
+									getString(*getNodeAt(prop->values, 2), &textureName);
+									
+									if (prop->values.size() == 4)
+									{
+										size_t mrtIndex;
+										getUInt(*getNodeAt(prop->values, 3), &mrtIndex);
+										mUnit->setCompositorReference(compositorName, textureName, mrtIndex);
+									}
+									else
+									{
+										mUnit->setCompositorReference(compositorName, textureName);
+									}
+								}
+								else
+								{
+									compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+										"content_type compositor must have an additional 2 or 3 parameters");
+								}
+								
+								break;
 							default:
 								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-									atom->value + " is not a valid content type (must be \"named\" or \"shadows\")");
+									atom->value + " is not a valid content type (must be \"named\" or \"shadow\" or \"compositor\")");
 							}
 						}
 						else
