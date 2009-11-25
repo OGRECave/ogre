@@ -448,11 +448,6 @@ namespace Ogre
 	typedef _StringStreamBase StringStream;
 	typedef StringStream stringstream;
 
-#if OGRE_WCHAR_T_STRINGS
-#define		_Char L
-#else
-#define		_Char 
-#endif
 }
 
 //for stl containter
