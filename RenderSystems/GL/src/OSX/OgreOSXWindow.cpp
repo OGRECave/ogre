@@ -113,6 +113,22 @@ void OSXWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
 	}
 }
 
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+uint32 OSXWindow::bitDepthFromDisplayMode(CGDisplayModeRef mode)
+{
+    uint32 depth = 0;
+    CFStringRef pixEnc = CGDisplayModeCopyPixelEncoding(mode);
+    if(CFStringCompare(pixEnc, CFSTR(IO32BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+        depth = 32;
+    else if(CFStringCompare(pixEnc, CFSTR(IO16BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+        depth = 16;
+    else if(CFStringCompare(pixEnc, CFSTR(IO8BitIndexedPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+        depth = 8;
+    
+    return depth;
+}
+#endif
+
 //-------------------------------------------------------------------------------------------------//
 void OSXWindow::createCGLFullscreen(unsigned int width, unsigned int height, unsigned int depth, unsigned int fsaa, CGLContextObj sharedContext)
 {
@@ -120,11 +136,56 @@ void OSXWindow::createCGLFullscreen(unsigned int width, unsigned int height, uns
     boolean_t exactMatch = 0;
     int reqWidth, reqHeight, reqDepth;
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+    
+    // Get a copy of the current display mode
     CGDisplayModeRef displayMode = CGDisplayCopyDisplayMode(kCGDirectMainDisplay);
+
+    // Loop through all display modes to determine the closest match.
+    // CGDisplayBestModeForParameters is deprecated on 10.6 so we will emulate it's behavior
+    // Try to find a mode with the requested depth and equal or greater dimensions first.
+    // If no match is found, try to find a mode with greater depth and same or greater dimensions.
+    // If still no match is found, just use the current mode.
+    CFArrayRef allModes = CGDisplayCopyAllDisplayModes(kCGDirectMainDisplay, NULL);
+    for(int i = 0; i < CFArrayGetCount(allModes); i++)
+    {
+        CGDisplayModeRef mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(allModes, i);
+        String modeString = StringConverter::toString(CGDisplayModeGetWidth(mode)) + String(" x ") +
+            StringConverter::toString(CGDisplayModeGetHeight(mode)) + String(" @ ") +
+            StringConverter::toString(bitDepthFromDisplayMode(mode)) + "bpp.";
+
+        LogManager::getSingleton().logMessage(modeString);
+        if(bitDepthFromDisplayMode(mode) != depth)
+            continue;
+
+        if((CGDisplayModeGetWidth(mode) >= width) && (CGDisplayModeGetHeight(mode) >= height))
+        {
+            displayMode = mode;
+            exactMatch = 1;
+            break;
+        }
+    }
+
+    // No depth match was found
+    if(!exactMatch)
+    {
+        for(int i = 0; i < CFArrayGetCount(allModes); i++)
+        {
+            CGDisplayModeRef mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(allModes, i);
+            if(bitDepthFromDisplayMode(mode) >= depth)
+                continue;
+
+            if((CGDisplayModeGetWidth(mode) >= width) && (CGDisplayModeGetHeight(mode) >= height))
+            {
+                displayMode = mode;
+                exactMatch = 1;
+                break;
+            }
+        }
+    }
     
     reqWidth = CGDisplayModeGetWidth(displayMode);
     reqHeight = CGDisplayModeGetHeight(displayMode);
-    reqDepth = depth;   // TODO: Replace this whenever Apple provides and method to get this property
+    reqDepth = bitDepthFromDisplayMode(displayMode);
 #else
     CFDictionaryRef displayMode = CGDisplayBestModeForParameters(kCGDirectMainDisplay, depth, width, height, &exactMatch);
     const void *value = NULL;
