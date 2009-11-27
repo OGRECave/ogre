@@ -3806,7 +3806,7 @@ namespace Ogre{
 									
 									if (prop->values.size() == 4)
 									{
-										size_t mrtIndex;
+										uint32 mrtIndex;
 										getUInt(*getNodeAt(prop->values, 3), &mrtIndex);
 										mUnit->setCompositorReference(compositorName, textureName, mrtIndex);
 									}
