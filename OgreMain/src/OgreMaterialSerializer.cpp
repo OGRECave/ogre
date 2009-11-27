@@ -1666,7 +1666,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	bool parseContentType(String& params, MaterialScriptContext& context)
 	{
-		StringVector vecparams = StringUtil::split(params, " \t");
+		StringVector vecparams = StringUtil::tokenise(params, " \t");
 		if (vecparams.empty())
 		{
 			logParseError("No content_type specified", context);
@@ -1700,7 +1700,7 @@ namespace Ogre
 		}
 		else
 		{
-			logParseError("Invalid content_type specified.", context);
+			logParseError("Invalid content_type specified : " + paramType, context);
 		}
 		return false;
 	}

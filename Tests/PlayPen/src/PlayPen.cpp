@@ -6122,6 +6122,24 @@ protected:
 		  }
 	};
 
+	void testStringTokenising()
+	{
+		static const String TEST_STRINGS[] = {
+			"this is just a normal sample",
+			"This one actually \"uses quotes\" and stuff",
+			"\"This one\" started with a quote",
+			"\"This one\" has more \"than one\" quote in it",
+			"\"This one\"\"has no delimeter\"between the two quotes",
+			"This one has		many spaces that should be disregarded"
+		};
+		static const size_t NUM_STRINGS = sizeof(TEST_STRINGS) / sizeof(TEST_STRINGS[0]);
+
+		for (size_t i=0; i<NUM_STRINGS; i++)
+		{
+			StringVector tokenised = StringUtil::tokenise(TEST_STRINGS[i]);
+		}
+	}
+
 	void testTextureShadowsTransparentCaster()
 	{
 		mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE);
@@ -8459,6 +8477,7 @@ protected:
 		//testSharedGpuParameters();
 		//testNewTerrain(false);
 		testNewTerrain(true);
+		//testStringTokenising();
 		//testTwoNewTerrains();
 		//testImageCombine();
 		//testNewTerrain(true, false, "flatterrain.dat");

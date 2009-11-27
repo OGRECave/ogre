@@ -109,7 +109,74 @@ namespace Ogre {
 
         return ret;
     }
+	//-----------------------------------------------------------------------
+	vector< String >::type StringUtil::tokenise( const String& str, const String& singleDelims, const String& doubleDelims, unsigned int maxSplits)
+	{
+        vector<String>::type ret;
+        // Pre-allocate some space for performance
+        ret.reserve(maxSplits ? maxSplits+1 : 10);    // 10 is guessed capacity for most case
 
+        unsigned int numSplits = 0;
+		String delims = singleDelims + doubleDelims;
+
+		// Use STL methods 
+        size_t start, pos;
+		char curDoubleDelim = 0;
+        start = 0;
+        do 
+        {
+			if (curDoubleDelim != 0)
+			{
+				pos = str.find(curDoubleDelim, start);
+			}
+			else
+			{
+				pos = str.find_first_of(delims, start);
+			}
+
+            if (pos == start)
+            {
+				char curDelim = str.at(pos);
+				if (doubleDelims.find_first_of(curDelim) != String::npos)
+				{
+					curDoubleDelim = curDelim;
+				}
+                // Do nothing
+                start = pos + 1;
+            }
+            else if (pos == String::npos || (maxSplits && numSplits == maxSplits))
+            {
+				if (curDoubleDelim != 0)
+				{
+					//Missing closer. Warn or throw exception?
+				}
+                // Copy the rest of the string
+                ret.push_back( str.substr(start) );
+                break;
+            }
+            else
+            {
+				if (curDoubleDelim != 0)
+				{
+					curDoubleDelim = 0;
+				}
+
+				// Copy up to delimiter
+				ret.push_back( str.substr(start, pos - start) );
+				start = pos + 1;
+            }
+			if (curDoubleDelim == 0)
+			{
+				// parse up to next real data
+				start = str.find_first_not_of(singleDelims, start);
+			}
+            
+            ++numSplits;
+
+        } while (pos != String::npos);
+
+        return ret;
+    }
     //-----------------------------------------------------------------------
     void StringUtil::toLowerCase(String& str)
     {
