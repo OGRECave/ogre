@@ -734,7 +734,6 @@ namespace Ogre
 
 		D3D9RenderSystem::getDeviceManager()->setActiveRenderTargetDevice(NULL);	
 	}
-
 	//-----------------------------------------------------------------------------
 	IDirect3DDevice9* D3D9RenderWindow::getD3D9Device()
 	{
@@ -822,5 +821,15 @@ namespace Ogre
 	bool D3D9RenderWindow::isNvPerfHUDEnable() const
 	{
 		return mUseNVPerfHUD;
+	}
+	//---------------------------------------------------------------------
+	bool D3D9RenderWindow::_validateDevice()
+	{
+		if (!mDeviceValid)
+		{
+			mDeviceValid = mDevice->validate(this);
+		}
+		return mDeviceValid;
+
 	}
 }

@@ -2721,6 +2721,9 @@ namespace Ogre
 		{
 			D3D9RenderWindow *window = static_cast<D3D9RenderWindow*>(target);
 			mDeviceManager->setActiveRenderTargetDevice(window->getDevice());
+			// also make sure we validate the device; if this never went 
+			// through update() it won't be set
+			window->_validateDevice();
 		}
 
 		// Retrieve render surfaces (up to OGRE_MAX_MULTIPLE_RENDER_TARGETS)

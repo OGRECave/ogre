@@ -94,6 +94,9 @@ namespace Ogre
 		/// Returns true if this window should use NV perf hud adapter.
 		bool isNvPerfHUDEnable() const;
 
+		/** Validate the device for this window. */
+		bool _validateDevice();
+
 	protected:
 		HINSTANCE					mInstance;				// Process instance
 		D3D9Device* 				mDevice;				// D3D9 device wrapper class.
