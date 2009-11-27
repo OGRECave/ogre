@@ -152,7 +152,8 @@ mCameraRelativeRendering(false),
 mLastLightHash(0),
 mLastLightLimit(0),
 mLastLightHashGpuProgram(0),
-mGpuParamsDirty((uint16)GPV_ALL)
+mGpuParamsDirty((uint16)GPV_ALL),
+mActiveCompositorChain(0)
 {
 
     // init sky
@@ -1137,16 +1138,14 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			}
 			if (pTex->getContentType() == TextureUnitState::CONTENT_COMPOSITOR)
 			{
-				CompositorManager& compMgr = CompositorManager::getSingleton();
-				//TODO : Working with current viewport is not good enough
-				if (!compMgr.hasCompositorChain(mCurrentViewport))
+				CompositorChain* currentChain = _getActiveCompositorChain();
+				if (!currentChain)
 				{
 					OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
 						"An pass that wishes to reference a compositor texutre "
-						"attempted to render on a viewport without a compositor",
+						"attempted to render in a pipeline without a compositor",
 						"SceneManager::_setPass");
 				}
-				CompositorChain* currentChain = compMgr.getCompositorChain(mCurrentViewport);
 				CompositorInstance* refComp = currentChain->getCompositor(pTex->getReferencedCompositorName());
 				if (refComp == 0)
 				{
@@ -6113,20 +6112,14 @@ void SceneManager::prepareShadowTextures(Camera* cam, Viewport* vp, const LightL
 
 }
 //---------------------------------------------------------------------
-struct SceneManager::RenderContext {
-	RenderQueue* renderQueue;
-	Viewport* viewport;
-	Camera* camera;
-	RenderSystem::RenderSystemContext* rsContext;
-};
-//---------------------------------------------------------------------
 SceneManager::RenderContext* SceneManager::_pauseRendering()
 {
 	RenderContext* context = new RenderContext;
 	context->renderQueue = mRenderQueue;
 	context->viewport = mCurrentViewport;
 	context->camera = mCameraInProgress;
-	
+	context->activeChain = _getActiveCompositorChain();
+
 	context->rsContext = mDestRenderSystem->_pauseFrame();
 	mRenderQueue = 0;
 	return context;
@@ -6139,7 +6132,7 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
 		delete mRenderQueue;
 	}
 	mRenderQueue = context->renderQueue;
-
+	_setActiveCompositorChain(context->activeChain);
 	Ogre::Viewport* vp = context->viewport;
 	Ogre::Camera* camera = context->camera;
 

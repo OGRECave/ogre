@@ -107,6 +107,8 @@ namespace Ogre {
     
         /** @see RenderTargetListener::preRenderTargetUpdate */
 		virtual void preRenderTargetUpdate(const RenderTargetEvent& evt);
+		/** @see RenderTargetListener::postRenderTargetUpdate */
+		virtual void postRenderTargetUpdate(const RenderTargetEvent& evt);
 		/** @see RenderTargetListener::preViewportUpdate */
         virtual void preViewportUpdate(const RenderTargetViewportEvent& evt);
         /** @see RenderTargetListener::postViewportUpdate */

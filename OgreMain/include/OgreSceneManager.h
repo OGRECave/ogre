@@ -53,7 +53,7 @@ Torus Knot Software Ltd.
 #include "OgreCamera.h"
 #include "OgreInstancedGeometry.h"
 #include "OgreLodListener.h"
-
+#include "OgreRenderSystem.h"
 namespace Ogre {
 	/** \addtogroup Core
 	*  @{
@@ -74,6 +74,7 @@ namespace Ogre {
 	class DefaultRaySceneQuery;
 	class DefaultSphereSceneQuery;
 	class DefaultAxisAlignedBoxSceneQuery;
+	class CompositorChain;
 
 	/** Structure collecting together information about the visible objects
 	that have been discovered in a scene.
@@ -727,6 +728,7 @@ namespace Ogre {
 
         /// Utility class for calculating automatic parameters for gpu programs
         AutoParamDataSource* mAutoParamDataSource;
+		CompositorChain* mActiveCompositorChain;
 
         ShadowTechnique mShadowTechnique;
         bool mDebugShadows;
@@ -802,9 +804,14 @@ namespace Ogre {
         virtual void prepareShadowTextures(Camera* cam, Viewport* vp, const LightList* lightList = 0);
 
 		//A render context, used to store internal data for pausing/resuming rendering
-		//TODO GSOC : Should the struct be declared here so that other SM implementations
-		//will be able to subclass here?
-		struct RenderContext;
+		struct RenderContext
+		{
+			RenderQueue* renderQueue;	
+			Viewport* viewport;
+			Camera* camera;
+			CompositorChain* activeChain;
+			RenderSystem::RenderSystemContext* rsContext;
+		};
 
 		/** Pause rendering of the frame. This has to be called when inside a renderScene call
 			(Usually using a listener of some sort)
@@ -3010,6 +3017,14 @@ namespace Ogre {
 		planes should be used to restrict light rendering.
 		*/
 		virtual bool getShadowUseLightClipPlanes() const { return mShadowAdditiveLightClip; }
+
+		/** Sets the active compositor chain of the current scene being rendered.
+			@note CompositorChain does this automatically, no need to call manually.
+		*/
+		virtual void _setActiveCompositorChain(CompositorChain* chain) { mActiveCompositorChain = chain; }
+
+		/** Gets the active compositor chain of the current scene being rendered */
+		virtual CompositorChain* _getActiveCompositorChain() { return mActiveCompositorChain; }
 
 		/** Add a listener which will get called back on scene manager events.
 		*/
