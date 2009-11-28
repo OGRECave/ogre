@@ -168,14 +168,26 @@ namespace Ogre {
 				{
 					const CustomAttribute& a = msCustomAttributes[i];
 					
-					// we're looking for 'attribute vec<n> <semantic_name>'
+					// we're looking for either: 
+					//   attribute vec<n> <semantic_name>
+					//   in vec<n> <semantic_name>
+					// The latter is recommended in GLSL 1.3 onwards 
 					// be slightly flexible about formatting
 					String::size_type pos = vpSource.find(a.name);
 					if (pos != String::npos)
 					{
 						String::size_type startpos = vpSource.find("attribute", pos-20);
+						if (startpos == String::npos)
+							vpSource.find("in", pos-20);
 						if (startpos != String::npos && startpos < pos)
-							glBindAttribLocationARB(mGLHandle, a.attrib, a.name.c_str());
+						{
+							// final check 
+							String expr = vpSource.substr(startpos, pos + a.name.length() - startpos);
+							StringVector vec = StringUtil::split(expr);
+							if (vec[0] == "in" || vec[0] == "attribute" && vec[2] == a.name)
+								glBindAttribLocationARB(mGLHandle, a.attrib, a.name.c_str());
+						}
+
 					}
 				}
 			}
