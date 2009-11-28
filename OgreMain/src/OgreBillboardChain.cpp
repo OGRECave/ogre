@@ -41,8 +41,10 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 
+#include <limits>
+
 namespace Ogre {
-	const size_t BillboardChain::SEGMENT_EMPTY = 0xffffffff;
+	const size_t BillboardChain::SEGMENT_EMPTY = std::numeric_limits<size_t>::max();
 	//-----------------------------------------------------------------------
 	BillboardChain::Element::Element()
 	{
