@@ -262,16 +262,28 @@ namespace Ogre {
             // Faces
             TiXmlElement* facesNode = 
                 subMeshNode->InsertEndChild(TiXmlElement("faces"))->ToElement();
-            if (s->operationType == RenderOperation::OT_TRIANGLE_LIST)
-            {
-                // tri list
-                numFaces = s->indexData->indexCount / 3;
-            }
-            else
-            {
-                // triangle fan or triangle strip
-                numFaces = s->indexData->indexCount - 2;
-            }
+            switch(s->operationType)
+			{
+			case RenderOperation::OT_TRIANGLE_LIST:
+				// tri list
+				numFaces = s->indexData->indexCount / 3;
+
+				break;
+			case RenderOperation::OT_LINE_LIST:
+				numFaces = s->indexData->indexCount / 2;
+
+				break;
+			case RenderOperation::OT_TRIANGLE_FAN:
+			case RenderOperation::OT_TRIANGLE_STRIP:
+				// triangle fan or triangle strip
+				numFaces = s->indexData->indexCount - 2;
+
+				break;
+			default:
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+					"Unsupported render operation type", 
+					__FUNCTION__);
+			}
             facesNode->SetAttribute("count", 
                 StringConverter::toString(numFaces));
             // Write each face in turn
@@ -296,8 +308,12 @@ namespace Ogre {
 			    if (use32BitIndexes)
 			    {
 				    faceNode->SetAttribute("v1", StringConverter::toString(*pInt++));
+					if(s->operationType == RenderOperation::OT_LINE_LIST)
+					{
+				        faceNode->SetAttribute("v2", StringConverter::toString(*pInt++));
+					}
                     /// Only need all 3 vertex indices if trilist or first face
-                    if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
+					else if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
                     {
 				        faceNode->SetAttribute("v2", StringConverter::toString(*pInt++));
 				        faceNode->SetAttribute("v3", StringConverter::toString(*pInt++));
@@ -306,8 +322,12 @@ namespace Ogre {
 			    else
 			    {
 				    faceNode->SetAttribute("v1", StringConverter::toString(*pShort++));
+ 					if(s->operationType == RenderOperation::OT_LINE_LIST)
+					{
+				        faceNode->SetAttribute("v2", StringConverter::toString(*pShort++));
+					}
                     /// Only need all 3 vertex indices if trilist or first face
-                    if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
+                    else if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
                     {
 				        faceNode->SetAttribute("v2", StringConverter::toString(*pShort++));
 				        faceNode->SetAttribute("v3", StringConverter::toString(*pShort++));
@@ -626,7 +646,7 @@ namespace Ogre {
                 else if (!strcmp(optype, "line_list"))
                 {
                     sm->operationType = RenderOperation::OT_LINE_LIST;
-                    readFaces = false;
+                    //readFaces = false;
                 }
                 else if (!strcmp(optype, "point_list"))
                 {
@@ -665,13 +685,25 @@ namespace Ogre {
                 if (actualCount > 0)
 				{
 					// Faces
-					if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST)
+					switch(sm->operationType)
 					{
-							// tri list
-							sm->indexData->indexCount = actualCount * 3;
-					} else {
-							// tri strip or fan
-							sm->indexData->indexCount = actualCount + 2;
+					case RenderOperation::OT_TRIANGLE_LIST:
+						// tri list
+						sm->indexData->indexCount = actualCount * 3;
+
+						break;
+					case RenderOperation::OT_LINE_LIST:
+						sm->indexData->indexCount = actualCount * 2;
+
+						break;
+					case RenderOperation::OT_TRIANGLE_FAN:
+					case RenderOperation::OT_TRIANGLE_STRIP:
+						// triangle fan or triangle strip
+						sm->indexData->indexCount = actualCount + 2;
+
+						break;
+					default:
+						throw std::runtime_error("not implemented");
 					}
 
 					// Allocate space
@@ -702,8 +734,12 @@ namespace Ogre {
 						if (use32BitIndexes)
 						{
 							*pInt++ = StringConverter::parseInt(faceElem->Attribute("v1"));
+							if(sm->operationType == RenderOperation::OT_LINE_LIST)
+							{
+								*pInt++ = StringConverter::parseInt(faceElem->Attribute("v2"));
+							}
 							// only need all 3 vertices if it's a trilist or first tri
-							if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
+							else if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
 							{
 								*pInt++ = StringConverter::parseInt(faceElem->Attribute("v2"));
 								*pInt++ = StringConverter::parseInt(faceElem->Attribute("v3"));
@@ -712,8 +748,12 @@ namespace Ogre {
 						else
 						{
 							*pShort++ = StringConverter::parseInt(faceElem->Attribute("v1"));
+							if(sm->operationType == RenderOperation::OT_LINE_LIST)
+							{
+								*pShort++ = StringConverter::parseInt(faceElem->Attribute("v2"));
+							}
 							// only need all 3 vertices if it's a trilist or first tri
-							if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
+							else if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
 							{
 								*pShort++ = StringConverter::parseInt(faceElem->Attribute("v2"));
 								*pShort++ = StringConverter::parseInt(faceElem->Attribute("v3"));
