@@ -59,6 +59,7 @@ namespace Ogre {
 		, mVisibilityMask(0xFFFFFFFF)
 		, mRQSequence(0)
 		, mMaterialSchemeName(MaterialManager::DEFAULT_SCHEME_NAME)
+		, mIsAutoUpdated(true)
     {
 #if OGRE_COMPILER != OGRE_COMPILER_GCCE
 		LogManager::getSingleton().stream(LML_TRIVIAL)
@@ -297,11 +298,28 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Viewport::setCamera(Camera* cam)
     {
+		if(mCamera)
+		{
+			if(mCamera->getViewport() == this)
+			{
+				mCamera->_notifyViewport(0);
+			}
+		}
         mCamera = cam;
 		_updateDimensions();
 		if(cam) mCamera->_notifyViewport(this);
     }
     //---------------------------------------------------------------------
+	void Viewport::setAutoUpdated(bool isAutoUpdated)
+	{
+		mIsAutoUpdated = isAutoUpdated;
+	}
+	//---------------------------------------------------------------------
+	bool Viewport::isAutoUpdated() const
+	{
+		return mIsAutoUpdated;
+	}
+	//---------------------------------------------------------------------
     void Viewport::setOverlaysEnabled(bool enabled)
     {
         mShowOverlays = enabled;

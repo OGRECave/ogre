@@ -374,6 +374,71 @@ namespace Ogre {
             and framebuffer objects.
         */
         virtual Impl *_getImpl();
+
+		/** Method for manual management of rendering : fires 'preRenderTargetUpdate'
+			and initialises statistics etc.
+		@remarks 
+		<ul>
+		<li>_beginUpdate resets statistics and fires 'preRenderTargetUpdate'.</li>
+		<li>_updateViewport renders the given viewport (even if it is not autoupdated),
+		fires preViewportUpdate and postViewportUpdate and manages statistics.</li>
+		<li>_updateAutoUpdatedViewports renders only viewports that are auto updated,
+		fires preViewportUpdate and postViewportUpdate and manages statistics.</li>
+		<li>_endUpdate() ends statistics calculation and fires postRenderTargetUpdate.</li>
+		</ul>
+		you can use it like this for example :
+		<pre>
+			renderTarget->_beginUpdate();
+			renderTarget->_updateViewport(1); // which is not auto updated
+			renderTarget->_updateViewport(2); // which is not auto updated
+			renderTarget->_updateAutoUpdatedViewports();
+			renderTarget->_endUpdate();
+			renderTarget->swapBuffers(true);
+		</pre>
+			Please note that in that case, the zorder may not work as you expect,
+			since you are responsible for calling _updateViewport in the correct order.
+        */
+		void _beginUpdate();
+
+		/** Method for manual management of rendering - renders the given 
+		viewport (even if it is not autoupdated)
+		@remarks
+		This also fires preViewportUpdate and postViewportUpdate, and manages statistics.
+		You should call it between _beginUpdate() and _endUpdate().
+		@see _beginUpdate for more details.
+		@param zorder The zorder of the viewport to update.
+		@param updateStatistics Whether you want to update statistics or not.
+		*/
+		void _updateViewport(int zorder, bool updateStatistics = true);
+
+		/** Method for manual management of rendering - renders the given viewport (even if it is not autoupdated)
+		@remarks
+		This also fires preViewportUpdate and postViewportUpdate, and manages statistics
+		if needed. You should call it between _beginUpdate() and _endUpdate().
+		@see _beginUpdate for more details.
+		@param viewport The viewport you want to update, it must be bound to the rendertarget.
+		@param updateStatistics Whether you want to update statistics or not.
+		*/
+		void _updateViewport(Viewport* viewport, bool updateStatistics = true);
+
+		/** Method for manual management of rendering - renders only viewports that are auto updated
+		@remarks
+		This also fires preViewportUpdate and postViewportUpdate, and manages statistics.
+		You should call it between _beginUpdate() and _endUpdate().
+		See _beginUpdate for more details.
+		@param updateStatistics Whether you want to update statistics or not.
+		@see _beginUpdate()
+		*/
+		void _updateAutoUpdatedViewports(bool updateStatistics = true);
+		
+		/** Method for manual management of rendering - finishes statistics calculation 
+			and fires 'postRenderTargetUpdate'.
+		@remarks
+		You should call it after a _beginUpdate
+		@see _beginUpdate for more details.
+		*/
+		void _endUpdate();
+
     protected:
         /// The name of this target.
         String mName;

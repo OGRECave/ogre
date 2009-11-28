@@ -97,33 +97,74 @@ namespace Ogre {
 
     void RenderTarget::updateImpl(void)
     {
+		_beginUpdate();
+		_updateAutoUpdatedViewports(true);
+		_endUpdate();
+    }
 
-        // notify listeners (pre)
+	void RenderTarget::_beginUpdate()
+	{
+		// notify listeners (pre)
         firePreUpdate();
 
         mStats.triangleCount = 0;
         mStats.batchCount = 0;
-        // Go through viewports in Z-order
+	}
+
+	void RenderTarget::_updateAutoUpdatedViewports(bool updateStatistics)
+	{
+		// Go through viewports in Z-order
         // Tell each to refresh
-        ViewportList::iterator it = mViewportList.begin();
+		ViewportList::iterator it = mViewportList.begin();
         while (it != mViewportList.end())
         {
-            fireViewportPreUpdate((*it).second);
-            (*it).second->update();
-            mStats.triangleCount += (*it).second->_getNumRenderedFaces();
-            mStats.batchCount += (*it).second->_getNumRenderedBatches();
-            fireViewportPostUpdate((*it).second);
-            ++it;
-        }
+			Viewport* viewport = (*it).second;
+			if(viewport->isAutoUpdated())
+			{
+				_updateViewport(viewport,updateStatistics);
+			}
+			++it;
+		}
+	}
 
-        // notify listeners (post)
+	void RenderTarget::_endUpdate()
+	{
+		 // notify listeners (post)
         firePostUpdate();
 
         // Update statistics (always on top)
         updateStats();
+	}
 
+	void RenderTarget::_updateViewport(Viewport* viewport, bool updateStatistics)
+	{
+		assert(viewport->getTarget() == this &&
+				"RenderTarget::_updateViewport the requested viewport is "
+				"not bound to the rendertarget!");
 
-    }
+		fireViewportPreUpdate(viewport);
+		viewport->update();
+		if(updateStatistics)
+		{
+			mStats.triangleCount += viewport->_getNumRenderedFaces();
+			mStats.batchCount += viewport->_getNumRenderedBatches();
+		}
+		fireViewportPostUpdate(viewport);
+	}
+
+	void RenderTarget::_updateViewport(int zorder, bool updateStatistics)
+	{
+		ViewportList::iterator it = mViewportList.find(zorder);
+        if (it != mViewportList.end())
+        {
+			_updateViewport((*it).second,updateStatistics);
+		}
+		else
+		{
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,"No viewport with given zorder : "
+				+ StringConverter::toString(zorder), "RenderTarget::_updateViewport");
+		}
+	}
 
     Viewport* RenderTarget::addViewport(Camera* cam, int ZOrder, float left, float top ,
         float width , float height)

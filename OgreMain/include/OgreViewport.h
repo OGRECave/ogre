@@ -230,6 +230,23 @@ namespace Ogre {
 		/** Gets which buffers are to be cleared each frame. */
         unsigned int getClearBuffers(void) const;
 
+		/** Sets whether this viewport should be automatically updated 
+			if Ogre's rendering loop or RenderTarget::update is being used.
+        @remarks
+            By default, if you use Ogre's own rendering loop (Root::startRendering)
+            or call RenderTarget::update, all viewports are updated automatically.
+            This method allows you to control that behaviour, if for example you 
+			have a viewport which you only want to update periodically.
+        @param autoupdate If true, the viewport is updated during the automatic
+            render loop or when RenderTarget::update() is called. If false, the 
+            viewport is only updated when its update() method is called explicitly.
+        */
+		void setAutoUpdated(bool autoupdate);
+		/** Gets whether this viewport is automatically updated if 
+			Ogre's rendering loop or RenderTarget::update is being used.
+        */
+		bool isAutoUpdated() const;
+
 		/** Set the material scheme which the viewport should use.
 		@remarks
 			This allows you to tell the system to use a particular
@@ -366,6 +383,9 @@ namespace Ogre {
 		RenderQueueInvocationSequence* mRQSequence;
 		/// Material scheme
 		String mMaterialSchemeName;
+
+		/// Automatic rendering on/off
+		bool mIsAutoUpdated;
     };
 	/** @} */
 	/** @} */
