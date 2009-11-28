@@ -3721,20 +3721,25 @@ void SceneManager::manualRender(RenderOperation* rend,
                                 const Matrix4& viewMatrix, const Matrix4& projMatrix, 
                                 bool doBeginEndFrame) 
 {
-    mDestRenderSystem->_setViewport(vp);
-    mDestRenderSystem->_setWorldMatrix(worldMatrix);
-    setViewMatrix(viewMatrix);
-    mDestRenderSystem->_setProjectionMatrix(projMatrix);
+	if (vp)
+		mDestRenderSystem->_setViewport(vp);
 
     if (doBeginEndFrame)
         mDestRenderSystem->_beginFrame();
 
-    _setPass(pass);
+	mDestRenderSystem->_setWorldMatrix(worldMatrix);
+	setViewMatrix(viewMatrix);
+	mDestRenderSystem->_setProjectionMatrix(projMatrix);
+
+	_setPass(pass);
 	// Do we need to update GPU program parameters?
 	if (pass->isProgrammable())
 	{
-		mAutoParamDataSource->setCurrentViewport(vp);
-		mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
+		if (vp)
+		{
+			mAutoParamDataSource->setCurrentViewport(vp);
+			mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
+		}
 		mAutoParamDataSource->setCurrentSceneManager(this);
 		mAutoParamDataSource->setWorldMatrices(&worldMatrix, 1);
 		Camera dummyCam(StringUtil::BLANK, 0);
@@ -3747,6 +3752,46 @@ void SceneManager::manualRender(RenderOperation* rend,
 
     if (doBeginEndFrame)
         mDestRenderSystem->_endFrame();
+
+}
+//---------------------------------------------------------------------
+void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp,
+	const Matrix4& viewMatrix, 
+	const Matrix4& projMatrix,bool doBeginEndFrame,
+	bool lightScissoringClipping, bool doLightIteration, const LightList* manualLightList)
+{
+	if (vp)
+		mDestRenderSystem->_setViewport(vp);
+
+	if (doBeginEndFrame)
+		mDestRenderSystem->_beginFrame();
+
+	setViewMatrix(viewMatrix);
+	mDestRenderSystem->_setProjectionMatrix(projMatrix);
+
+	_setPass(pass);
+	Camera dummyCam(StringUtil::BLANK, 0);
+	dummyCam.setCustomViewMatrix(true, viewMatrix);
+	dummyCam.setCustomProjectionMatrix(true, projMatrix);
+	// Do we need to update GPU program parameters?
+	if (pass->isProgrammable())
+	{
+		if (vp)
+		{
+			mAutoParamDataSource->setCurrentViewport(vp);
+			mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
+		}
+		mAutoParamDataSource->setCurrentSceneManager(this);
+		mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
+		updateGpuProgramParameters(pass);
+	}
+	if (vp)
+		mCurrentViewport = vp;
+	renderSingleObject(rend, pass, lightScissoringClipping, doLightIteration, manualLightList);
+
+
+	if (doBeginEndFrame)
+		mDestRenderSystem->_endFrame();
 
 }
 //---------------------------------------------------------------------

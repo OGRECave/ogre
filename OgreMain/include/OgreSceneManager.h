@@ -2399,7 +2399,7 @@ namespace Ogre {
             Calling it regularly per frame will cause frame rate drops!
         @param rend A RenderOperation object describing the rendering op
         @param pass The Pass to use for this render
-        @param vp Pointer to the viewport to render to
+        @param vp Pointer to the viewport to render to, or 0 to use the current viewport
         @param worldMatrix The transform to apply from object to world space
         @param viewMatrix The transform to apply from world to view space
         @param projMatrix The transform to apply from view to screen space
@@ -2411,7 +2411,31 @@ namespace Ogre {
             const Matrix4& worldMatrix, const Matrix4& viewMatrix, const Matrix4& projMatrix, 
             bool doBeginEndFrame = false) ;
 
-        /** Retrieves the internal render queue, for advanced users only.
+		/** Manual rendering method for rendering a single object. 
+		@remarks
+		@param rend The renderable to issue to the pipeline
+		@param pass The pass to use
+		@param vp Pointer to the viewport to render to, or 0 to use the existing viewport
+		@param doBeginEndFrame If true, beginFrame() and endFrame() are called, 
+		otherwise not. You should leave this as false if you are calling
+		this within the main render loop.
+        @param viewMatrix The transform to apply from world to view space
+        @param projMatrix The transform to apply from view to screen space
+		@param lightScissoringClipping If true, passes that have the getLightScissorEnabled
+		and/or getLightClipPlanesEnabled flags will cause calculation and setting of 
+		scissor rectangle and user clip planes. 
+		@param doLightIteration If true, this method will issue the renderable to
+		the pipeline possibly multiple times, if the pass indicates it should be
+		done once per light
+		@param manualLightList Only applicable if doLightIteration is false, this
+		method allows you to pass in a previously determined set of lights
+		which will be used for a single render of this object.
+		*/
+		virtual void manualRender(Renderable* rend, const Pass* pass, Viewport* vp, 
+			const Matrix4& viewMatrix, const Matrix4& projMatrix, bool doBeginEndFrame = false, bool lightScissoringClipping = true, 
+			bool doLightIteration = true, const LightList* manualLightList = 0);
+
+		/** Retrieves the internal render queue, for advanced users only.
         @remarks
             The render queue is mainly used internally to manage the scene object 
 			rendering queue, it also exports some methods to allow advanced users 
