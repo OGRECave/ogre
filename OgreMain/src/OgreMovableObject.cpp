@@ -227,8 +227,7 @@ namespace Ogre {
         if (!mVisible || mBeyondFarDistance || mRenderingDisabled)
             return false;
 
-        SceneManager* sm = Root::getSingleton()._getCurrentSceneManager();
-        if (sm && !(getVisibilityFlags() & sm->_getCombinedVisibilityMask()))
+        if (mManager && !(getVisibilityFlags() & mManager->_getCombinedVisibilityMask()))
             return false;
 
         return true;
