@@ -254,8 +254,9 @@ namespace Ogre {
             loading a resource between load() and prepare().  It is best to try and
             do as much work in prepare(), however, since this will leave less work for
             the main render thread to do and thus increase FPS.
+			@param backgroundThread Whether this is occurring in a background thread
         */
-        virtual void prepare();
+        virtual void prepare(bool backgroundThread = false);
 
      /** Loads the resource, if it is not already.
 		@remarks
@@ -441,8 +442,9 @@ namespace Ogre {
 			to avoid having to make the receivers of this event thread-safe.
 			If you use Ogre's built in frame loop you don't need to call this
 			yourself.
+			@param wasBackgroundLoaded Whether this was a background loaded event
 		*/
-		virtual void _fireLoadingComplete(void);
+		virtual void _fireLoadingComplete(bool wasBackgroundLoaded);
 
 		/** Firing of preparing complete event
 		@remarks
@@ -450,8 +452,9 @@ namespace Ogre {
 			to avoid having to make the receivers of this event thread-safe.
 			If you use Ogre's built in frame loop you don't need to call this
 			yourself.
+			@param wasBackgroundLoaded Whether this was a background loaded event
 		*/
-		virtual void _firePreparingComplete(void);
+		virtual void _firePreparingComplete(bool wasBackgroundLoaded);
 
 		/** Firing of unloading complete event
 		@remarks

@@ -129,7 +129,7 @@ namespace Ogre {
 			String groupName;
 			bool isManual; 
 			ManualResourceLoader* loader;
-			const NameValuePairList* loadParams;
+			NameValuePairList* loadParams;
 			Listener* listener;
 			BackgroundProcessResult result;
 
@@ -143,11 +143,11 @@ namespace Ogre {
 		/// Struct that holds details of queued notifications
 		struct ResourceResponse
 		{
-			ResourceResponse(Resource* r, const ResourceRequest& req)
+			ResourceResponse(ResourcePtr r, const ResourceRequest& req)
 				: resource(r), request(req)
 			{}
 
-			Resource* resource;
+			ResourcePtr resource;
 			ResourceRequest request;
 
 			_OgreExport friend std::ostream& operator<<(std::ostream& o, const ResourceResponse& r)
@@ -302,9 +302,17 @@ namespace Ogre {
 		*/
 		virtual bool isProcessComplete(BackgroundProcessTicket ticket);
 
+		/** Aborts background process.
+		*/
+		void abortRequest( BackgroundProcessTicket ticket );
+
+		/// Implementation for WorkQueue::RequestHandler
+		bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
 		/// Implementation for WorkQueue::RequestHandler
 		WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
-		/// Implementation for WorkQueue::RequestHandler
+		/// Implementation for WorkQueue::ResponseHandler
+		bool canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+		/// Implementation for WorkQueue::ResponseHandler
 		void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
 
 		/** Override standard Singleton retrieval.

@@ -46,7 +46,7 @@ namespace Ogre {
 	}
 	//---------------------------------------------------------------------
 	WorkQueue::Request::Request(uint16 channel, uint16 rtype, const Any& rData, uint8 retry, RequestID rid)
-		: mChannel(channel), mType(rtype), mData(rData), mRetryCount(retry), mID(rid)
+		: mChannel(channel), mType(rtype), mData(rData), mRetryCount(retry), mID(rid), mAborted(false)
 	{
 
 	}
@@ -110,6 +110,18 @@ namespace Ogre {
 	DefaultWorkQueueBase::~DefaultWorkQueueBase()
 	{
 		//shutdown(); // can't call here; abstract function
+
+		for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
+		{
+			OGRE_DELETE (*i);
+		}
+		mRequestQueue.clear();
+
+		for (ResponseQueue::iterator i = mResponseQueue.begin(); i != mResponseQueue.end(); ++i)
+		{
+			OGRE_DELETE (*i);
+		}
+		mResponseQueue.clear();
 	}
 	//---------------------------------------------------------------------
 	void DefaultWorkQueueBase::addRequestHandler(uint16 channel, RequestHandler* rh)
@@ -240,44 +252,110 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void DefaultWorkQueueBase::abortRequest(RequestID id)
 	{
-		OGRE_LOCK_MUTEX(mRequestMutex)
+		OGRE_LOCK_MUTEX(mProcessMutex)
 
-		for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
+		// NOTE: Pending requests are exist any of RequestQueue, ProcessQueue and
+		// ResponseQueue when keeping ProcessMutex, so we check all of these queues.
+
+		for (RequestQueue::iterator i = mProcessQueue.begin(); i != mProcessQueue.end(); ++i)
 		{
 			if ((*i)->getID() == id)
 			{
-				OGRE_DELETE *i;
-				mRequestQueue.erase(i);
+				(*i)->abortRequest();
 				break;
+			}
+		}
+
+		{
+			OGRE_LOCK_MUTEX(mRequestMutex)
+
+			for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
+			{
+				if ((*i)->getID() == id)
+				{
+					(*i)->abortRequest();
+					break;
+				}
+			}
+		}
+
+		{
+			OGRE_LOCK_MUTEX(mResponseMutex)
+
+			for (ResponseQueue::iterator i = mResponseQueue.begin(); i != mResponseQueue.end(); ++i)
+			{
+				if( (*i)->getRequest()->getID() == id )
+				{
+					(*i)->abortRequest();
+					break;
+				}
 			}
 		}
 	}
 	//---------------------------------------------------------------------
 	void DefaultWorkQueueBase::abortRequestsByChannel(uint16 channel)
 	{
-		OGRE_LOCK_MUTEX(mRequestMutex)
+		OGRE_LOCK_MUTEX(mProcessMutex)
 
-		for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end();)
+		for (RequestQueue::iterator i = mProcessQueue.begin(); i != mProcessQueue.end(); ++i)
 		{
 			if ((*i)->getChannel() == channel)
 			{
-				OGRE_DELETE *i;
-				i = mRequestQueue.erase(i);
+				(*i)->abortRequest();
 			}
-			else
-				++i;
+		}
+
+		{
+			OGRE_LOCK_MUTEX(mRequestMutex)
+
+			for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
+			{
+				if ((*i)->getChannel() == channel)
+				{
+					(*i)->abortRequest();
+				}
+			}
+		}
+
+		{
+			OGRE_LOCK_MUTEX(mResponseMutex)
+
+			for (ResponseQueue::iterator i = mResponseQueue.begin(); i != mResponseQueue.end(); ++i)
+			{
+				if( (*i)->getRequest()->getChannel() == channel )
+				{
+					(*i)->abortRequest();
+				}
+			}
 		}
 	}
 	//---------------------------------------------------------------------
 	void DefaultWorkQueueBase::abortAllRequests()
 	{
-		OGRE_LOCK_MUTEX(mRequestMutex)
+		OGRE_LOCK_MUTEX(mProcessMutex)
 
-		for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end();)
+		for (RequestQueue::iterator i = mProcessQueue.begin(); i != mProcessQueue.end(); ++i)
 		{
-			OGRE_DELETE *i;
+			(*i)->abortRequest();
 		}
-		mRequestQueue.clear();
+
+		{
+			OGRE_LOCK_MUTEX(mRequestMutex)
+
+			for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
+			{
+				(*i)->abortRequest();
+			}
+		}
+
+		{
+			OGRE_LOCK_MUTEX(mResponseMutex)
+
+			for (ResponseQueue::iterator i = mResponseQueue.begin(); i != mResponseQueue.end(); ++i)
+			{
+				(*i)->abortRequest();
+			}
+		}
 	}
 	//---------------------------------------------------------------------
 	void DefaultWorkQueueBase::setPaused(bool pause)
@@ -309,12 +387,16 @@ namespace Ogre {
 		Request* request = 0;
 		{
 			// scoped to only lock while retrieving the next request
-			OGRE_LOCK_MUTEX(mRequestMutex)
-
-			if (!mRequestQueue.empty())
+			OGRE_LOCK_MUTEX(mProcessMutex)
 			{
-				request = mRequestQueue.front();
-				mRequestQueue.pop_front();
+				OGRE_LOCK_MUTEX(mRequestMutex)
+
+				if (!mRequestQueue.empty())
+				{
+					request = mRequestQueue.front();
+					mRequestQueue.pop_front();
+					mProcessQueue.push_back( request );
+				}
 			}
 		}
 
@@ -329,6 +411,18 @@ namespace Ogre {
 	void DefaultWorkQueueBase::processRequestResponse(Request* r, bool synchronous)
 	{
 		Response* response = processRequest(r);
+
+		OGRE_LOCK_MUTEX(mProcessMutex)
+
+		RequestQueue::iterator it;
+		for( it = mProcessQueue.begin(); it != mProcessQueue.end(); ++it )
+		{
+			if( (*it) == r )
+			{
+				mProcessQueue.erase( it );
+				break;
+			}
+		}
 
 		if (response)
 		{
@@ -352,6 +446,11 @@ namespace Ogre {
 			}
 			else
 			{
+				if( response->getRequest()->getAborted() )
+				{
+					// destroy response user data
+					response->abortRequest();
+				}
 				// Queue response
 				OGRE_LOCK_MUTEX(mResponseMutex)
 				mResponseQueue.push_back(response);

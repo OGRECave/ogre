@@ -106,6 +106,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void DefaultWorkQueue::shutdown()
 	{
+		if( !mIsRunning )
+			return;
+
 		LogManager::getSingleton().stream() <<
 			"DefaultWorkQueue('" << mName << "') shutting down on thread " <<
 #if OGRE_THREAD_SUPPORT

@@ -955,12 +955,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::shutdown(void)
     {
+		// Since background thread might be access resources,
+		// ensure shutdown before destroying resource manager.
+		mResourceBackgroundQueue->shutdown();
+		mWorkQueue->shutdown();
+
 		SceneManagerEnumerator::getSingleton().shutdownAll();
 		shutdownPlugins();
 
         ShadowVolumeExtrudeProgram::shutdown();
-		mResourceBackgroundQueue->shutdown();
-		mWorkQueue->shutdown();
         ResourceGroupManager::getSingleton().shutdownAll();
 
 		// Destroy pools

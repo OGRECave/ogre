@@ -75,7 +75,7 @@ namespace Ogre
 
         virtual ~Any()
         {
-            OGRE_DELETE_T(mContent, placeholder, MEMCATEGORY_GENERAL);
+            destroy();
         }
 
     public: // modifiers
@@ -119,6 +119,11 @@ namespace Ogre
 			return o;
 		}
 
+		void destroy()
+		{
+			OGRE_DELETE_T(mContent, placeholder, MEMCATEGORY_GENERAL);
+			mContent = NULL;
+		}
 
     protected: // types
 

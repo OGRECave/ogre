@@ -54,9 +54,10 @@ namespace Ogre
 		// Just call load as if this is the background thread, locking on
 		// load status will prevent race conditions
 		load(true);
+		_fireLoadingComplete(true);
 	}
 	//-----------------------------------------------------------------------
-	void Resource::prepare()
+	void Resource::prepare(bool background)
 	{
         // quick check that avoids any synchronisation
         LoadingState old = mLoadingState.get();
@@ -128,8 +129,8 @@ namespace Ogre
 		//	mCreator->_notifyResourcePrepared(this);
 
 		// Fire events (if not background)
-		if (!mIsBackgroundLoaded)
-			_firePreparingComplete();
+		if (!background)
+			_firePreparingComplete(false);
 
 
 	}
@@ -263,8 +264,8 @@ namespace Ogre
 			mCreator->_notifyResourceLoaded(this);
 
 		// Fire events, if not background
-		if (!mIsBackgroundLoaded)
-			_fireLoadingComplete();
+		if (!background)
+			_fireLoadingComplete(false);
 
 
 	}
@@ -353,7 +354,7 @@ namespace Ogre
 		mListenerList.remove(lis);
 	}
 	//-----------------------------------------------------------------------
-	void Resource::_fireLoadingComplete(void)
+	void Resource::_fireLoadingComplete(bool wasBackgroundLoaded)
 	{
 		// Lock the listener list
 		OGRE_LOCK_MUTEX(mListenerListMutex)
@@ -361,14 +362,14 @@ namespace Ogre
 			i != mListenerList.end(); ++i)
 		{
 			// deprecated call
-			if (isBackgroundLoaded())
+			if (wasBackgroundLoaded)
 				(*i)->backgroundLoadingComplete(this);
 
 			(*i)->loadingComplete(this);
 		}
 	}
 	//-----------------------------------------------------------------------
-	void Resource::_firePreparingComplete(void)
+	void Resource::_firePreparingComplete(bool wasBackgroundLoaded)
 	{
 		// Lock the listener list
 		OGRE_LOCK_MUTEX(mListenerListMutex)
@@ -376,7 +377,7 @@ namespace Ogre
 			i != mListenerList.end(); ++i)
 		{
 			// deprecated call
-			if (isBackgroundLoaded())
+			if (wasBackgroundLoaded)
 				(*i)->backgroundPreparingComplete(this);
 
 			(*i)->preparingComplete(this);

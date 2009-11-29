@@ -92,11 +92,15 @@ namespace Ogre
 			uint8 mRetryCount;
 			/// Identifier (assigned by the system)
 			RequestID mID;
+			/// Abort Flag
+			mutable bool mAborted;
 
 		public:
 			/// Constructor 
 			Request(uint16 channel, uint16 rtype, const Any& rData, uint8 retry, RequestID rid);
 			~Request();
+			/// Set the abort flag
+			void abortRequest() const { mAborted = true; }
 			/// Get the request channel (top level categorisation)
 			uint16 getChannel() const { return mChannel; }
 			/// Get the type of this request within the given channel
@@ -107,7 +111,8 @@ namespace Ogre
 			uint8 getRetryCount() const { return mRetryCount; }
 			/// Get the identifier of this request
 			RequestID getID() const { return mID; }
-
+			/// Get the abort flag
+			bool getAborted() const { return mAborted; }
 		};
 
 		/** General purpose response structure. 
@@ -134,6 +139,8 @@ namespace Ogre
 			const String& getMessages() const { return mMessages; }
 			/// Return the response data (user defined, only valid on success)
 			const Any& getData() const { return mData; }
+			/// Abort the request
+			void abortRequest() { mRequest->abortRequest(); mData.destroy(); }
 		};
 
 		/** Interface definition for a handler of requests. 
@@ -162,7 +169,7 @@ namespace Ogre
 			this method. 
 			*/
 			virtual bool canHandleRequest(const Request* req, const WorkQueue* srcQ) 
-			{ (void)req; (void)srcQ; return true; }
+			{ (void)srcQ; return !req->getAborted(); }
 
 			/** The handler method every subclass must implement. 
 			If a failure is encountered, return a Response with a failure
@@ -197,7 +204,7 @@ namespace Ogre
 			this method. 
 			*/
 			virtual bool canHandleResponse(const Response* res, const WorkQueue* srcQ) 
-			{ (void)res; (void)srcQ; return true; }
+			{ (void)srcQ; return !res->getRequest()->getAborted(); }
 
 			/** The handler method every subclass must implement. 
 			@param res The Response structure. The caller is responsible for
@@ -440,6 +447,7 @@ namespace Ogre
 		typedef deque<Request*>::type RequestQueue;
 		typedef deque<Response*>::type ResponseQueue;
 		RequestQueue mRequestQueue;
+		RequestQueue mProcessQueue;
 		ResponseQueue mResponseQueue;
 
 		/// Thread function
@@ -469,6 +477,7 @@ namespace Ogre
 		bool mShuttingDown;
 
 		OGRE_MUTEX(mRequestMutex)
+		OGRE_MUTEX(mProcessMutex)
 		OGRE_MUTEX(mResponseMutex)
 		OGRE_RW_MUTEX(mRequestHandlerMutex);
 

@@ -71,6 +71,7 @@ namespace Ogre {
 	void ResourceBackgroundQueue::shutdown()
 	{
 		WorkQueue* wq = Root::getSingleton().getWorkQueue();
+		wq->abortRequestsByChannel(mWorkQueueChannel);
 		wq->removeRequestHandler(mWorkQueueChannel, this);
 		wq->removeResponseHandler(mWorkQueueChannel, this);
 	}
@@ -159,7 +160,8 @@ namespace Ogre {
 		req.groupName = group;
 		req.isManual = isManual;
 		req.loader = loader;
-		req.loadParams = loadParams;
+		// Make instance copy of loadParams for thread independence
+		req.loadParams = ( loadParams ? OGRE_NEW_T(NameValuePairList, MEMCATEGORY_GENERAL)( *loadParams ) : 0 );
 		req.listener = listener;
 		return addRequest(req);
 #else
@@ -187,7 +189,8 @@ namespace Ogre {
 		req.groupName = group;
 		req.isManual = isManual;
 		req.loader = loader;
-		req.loadParams = loadParams;
+		// Make instance copy of loadParams for thread independence
+		req.loadParams = ( loadParams ? OGRE_NEW_T(NameValuePairList, MEMCATEGORY_GENERAL)( *loadParams ) : 0 );
 		req.listener = listener;
 		return addRequest(req);
 #else
@@ -265,6 +268,13 @@ namespace Ogre {
 		return mOutstandingRequestSet.find(ticket) == mOutstandingRequestSet.end();
 	}
 	//------------------------------------------------------------------------
+    void ResourceBackgroundQueue::abortRequest( BackgroundProcessTicket ticket )
+    {
+		WorkQueue* queue = Root::getSingleton().getWorkQueue();
+
+		queue->abortRequest( ticket );
+	}
+	//------------------------------------------------------------------------
 	BackgroundProcessTicket ResourceBackgroundQueue::addRequest(ResourceRequest& req)
 	{
 		WorkQueue* queue = Root::getSingleton().getWorkQueue();
@@ -280,13 +290,30 @@ namespace Ogre {
 		return requestID;
 	}
 	//-----------------------------------------------------------------------
+	bool ResourceBackgroundQueue::canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
+	{
+		return true;
+	}
+	//-----------------------------------------------------------------------
 	WorkQueue::Response* ResourceBackgroundQueue::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
 	{
 
 		ResourceRequest resreq = any_cast<ResourceRequest>(req->getData());
-		
+
+		if( req->getAborted() )
+		{
+			if( resreq.type == RT_PREPARE_RESOURCE || resreq.type == RT_LOAD_RESOURCE )
+			{
+				OGRE_DELETE_T(resreq.loadParams, NameValuePairList, MEMCATEGORY_GENERAL);
+				resreq.loadParams = 0;
+			}
+			resreq.result.error = false;
+			ResourceResponse resresp(ResourcePtr(), resreq);
+			return OGRE_NEW WorkQueue::Response(req, true, Any(resresp));
+		}
+
 		ResourceManager* rm = 0;
-		Resource* resource = 0;
+		ResourcePtr resource;
 		try
 		{
 
@@ -320,17 +347,17 @@ namespace Ogre {
 				rm = ResourceGroupManager::getSingleton()._getResourceManager(
 					resreq.resourceType);
 				resource = rm->prepare(resreq.resourceName, resreq.groupName, resreq.isManual, 
-					resreq.loader, resreq.loadParams).get();
+					resreq.loader, resreq.loadParams, true);
 				break;
 			case RT_LOAD_RESOURCE:
 				rm = ResourceGroupManager::getSingleton()._getResourceManager(
 					resreq.resourceType);
 	#if OGRE_THREAD_SUPPORT == 2
 				resource = rm->prepare(resreq.resourceName, resreq.groupName, resreq.isManual, 
-					resreq.loader, resreq.loadParams).get();
+					resreq.loader, resreq.loadParams, true);
 	#else
 				resource = rm->load(resreq.resourceName, resreq.groupName, resreq.isManual, 
-					resreq.loader, resreq.loadParams, true).get();
+					resreq.loader, resreq.loadParams, true);
 	#endif
 				break;
 			case RT_UNLOAD_RESOURCE:
@@ -345,6 +372,11 @@ namespace Ogre {
 		}
 		catch (Exception& e)
 		{
+			if( resreq.type == RT_PREPARE_RESOURCE || resreq.type == RT_LOAD_RESOURCE )
+			{
+				OGRE_DELETE_T(resreq.loadParams, NameValuePairList, MEMCATEGORY_GENERAL);
+				resreq.loadParams = 0;
+			}
 			resreq.result.error = true;
 			resreq.result.message = e.getFullDescription();
 
@@ -355,14 +387,30 @@ namespace Ogre {
 
 
 		// success
+		if( resreq.type == RT_PREPARE_RESOURCE || resreq.type == RT_LOAD_RESOURCE )
+		{
+			OGRE_DELETE_T(resreq.loadParams, NameValuePairList, MEMCATEGORY_GENERAL);
+			resreq.loadParams = 0;
+		}
 		resreq.result.error = false;
 		ResourceResponse resresp(resource, resreq);
 		return OGRE_NEW WorkQueue::Response(req, true, Any(resresp));
 
 	}
 	//------------------------------------------------------------------------
+	bool ResourceBackgroundQueue::canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
+	{
+		return true;
+	}
+	//------------------------------------------------------------------------
 	void ResourceBackgroundQueue::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
 	{
+		if( res->getRequest()->getAborted() )
+		{
+			mOutstandingRequestSet.erase(res->getRequest()->getID());
+			return ;
+		}
+
 		if (res->succeeded())
 		{
 			ResourceResponse resresp = any_cast<ResourceResponse>(res->getData());
@@ -375,7 +423,7 @@ namespace Ogre {
 			{
 				ResourceManager *rm = ResourceGroupManager::getSingleton()
 					._getResourceManager(req.resourceType);
-				rm->load(req.resourceName, req.groupName, req.isManual, req.loader, req.loadParams);
+				rm->load(req.resourceName, req.groupName, req.isManual, req.loader, req.loadParams, true);
 			} 
 			else if (req.type == RT_LOAD_GROUP) 
 			{
@@ -385,16 +433,16 @@ namespace Ogre {
 			mOutstandingRequestSet.erase(res->getRequest()->getID());
 
 			// Call resource listener
-			if (resresp.resource) 
+			if (!resresp.resource.isNull()) 
 			{
 
 				if (req.type == RT_LOAD_RESOURCE) 
 				{
-					resresp.resource->_fireLoadingComplete();
+					resresp.resource->_fireLoadingComplete( true );
 				} 
 				else 
 				{
-					resresp.resource->_firePreparingComplete();
+					resresp.resource->_firePreparingComplete( true );
 				}
 			} 
 
