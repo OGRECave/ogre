@@ -5228,7 +5228,10 @@ namespace Ogre
 
                 while (currentParam != endParam)
                 {
-                    if (currentParam->name != "type")
+                    if (currentParam->name != "type" &&
+						currentParam->name !="assemble_code" &&
+						currentParam->name !="micro_code" &&
+						currentParam->name !="external_micro_code")
                     {
                         String paramstr = program->getParameter(currentParam->name);
                         if ((currentParam->name == "includes_skeletal_animation")
