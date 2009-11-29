@@ -150,7 +150,43 @@ namespace Ogre
 			// Flip bindings over to new buffers (old buffers released)
 			HardwareBufferManager::getSingleton().destroyVertexBufferBinding(mVData->vertexBufferBinding);
 			mVData->vertexBufferBinding = newBindings;
-			
+
+			// If vertex size requires 32bit index buffer
+			if (mVData->vertexCount > 65536)
+			{
+				for (size_t i = 0; i < mIDataList.size(); ++i)
+				{
+					// check index size
+					IndexData* idata = mIDataList[i];
+					HardwareIndexBufferSharedPtr srcbuf = idata->indexBuffer;
+					if (srcbuf->getType() == HardwareIndexBuffer::IT_16BIT)
+					{
+						size_t indexCount = srcbuf->getNumIndexes();
+
+						// convert index buffer to 32bit.
+						HardwareIndexBufferSharedPtr newBuf =
+							HardwareBufferManager::getSingleton().createIndexBuffer(
+							HardwareIndexBuffer::IT_32BIT, indexCount,
+							srcbuf->getUsage(), srcbuf->hasShadowBuffer());
+
+						uint16* pSrcBase = static_cast<uint16*>(srcbuf->lock(HardwareBuffer::HBL_NORMAL));
+						uint32* pBase = static_cast<uint32*>(newBuf->lock(HardwareBuffer::HBL_NORMAL));
+
+						size_t j = 0;
+						while (j < indexCount)
+						{
+							*pBase++ = *pSrcBase++;
+							++j;
+						}
+
+						srcbuf->unlock();
+						newBuf->unlock();
+
+						// assign new index buffer.
+						idata->indexBuffer = newBuf;
+					}
+				}
+			}
 		}
 
 	}
