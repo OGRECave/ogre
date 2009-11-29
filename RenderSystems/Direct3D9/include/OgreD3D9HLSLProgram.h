@@ -80,6 +80,21 @@ namespace Ogre {
 			void doSet(void* target, const String& val);
 		};
 
+		/// Command object for getting/setting micro code
+		class CmdMicrocode : public ParamCommand
+		{
+		public:
+			String doGet(const void* target) const;
+			void doSet(void* target, const String& val);
+		};
+
+		/// Command object for getting/setting assembler code
+		class CmdAssemblerCode : public ParamCommand
+		{
+		public:
+			String doGet(const void* target) const;
+			void doSet(void* target, const String& val);
+		};
     protected:
 
         static CmdEntryPoint msCmdEntryPoint;
@@ -87,6 +102,8 @@ namespace Ogre {
         static CmdPreprocessorDefines msCmdPreprocessorDefines;
         static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
 		static CmdOptimisation msCmdOptimisation;
+		static CmdMicrocode msCmdMicrocode;
+		static CmdAssemblerCode msCmdAssemblerCode;
 
         /** Internal load implementation, must be implemented by subclasses.
         */
@@ -110,6 +127,9 @@ namespace Ogre {
 
         LPD3DXBUFFER mpMicroCode;
         LPD3DXCONSTANTTABLE mpConstTable;
+
+	public:
+		LPD3DXBUFFER getMicroCode();
 	public:
 		/// Shader optimisation level
 		enum OptimisationLevel

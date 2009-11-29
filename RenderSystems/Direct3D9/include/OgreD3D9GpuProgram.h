@@ -37,24 +37,53 @@ namespace Ogre {
 
     /** Direct3D implementation of a few things common to low-level vertex & fragment programs. */
     class D3D9GpuProgram : public GpuProgram, public D3D9Resource
-    {   	
+    {   
+	public:
+        /// Command object for setting matrix packing in column-major order
+        class CmdColumnMajorMatrices : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+		/// Command object for getting/setting external micro code (void*)
+		class CmdExternalMicrocode : public ParamCommand
+		{
+		public:
+			String doGet(const void* target) const;
+			void doSet(void* target, const String& val);
+		};
+	protected:
+		static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
+		static CmdExternalMicrocode msCmdExternalMicrocode;
     public:
         D3D9GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
         ~D3D9GpuProgram();
 
+
+        /** Sets whether matrix packing in column-major order. */ 
+        void setColumnMajorMatrices(bool columnMajor) { mColumnMajorMatrices = columnMajor; }
+        /** Gets whether matrix packed in column-major order. */
+        bool getColumnMajorMatrices(void) const { return mColumnMajorMatrices; }
+
+		/** Tells the program to load from some externally created microcode instead of a file or source. 
+		*/
+		void setExternalMicrocode(const void* pMicrocode, size_t size);
         /** Tells the program to load from some externally created microcode instead of a file or source. 
         @remarks
-            It is the callers responsibility to delete the microcode buffer.
+            add ref count to pMicrocode when setting
         */ 
-        void setExternalMicrocode(ID3DXBuffer* pMicrocode) { mpExternalMicrocode = pMicrocode; }
+        void setExternalMicrocode(ID3DXBuffer* pMicrocode);
         /** Gets the external microcode buffer, if any. */
-        LPD3DXBUFFER getExternalMicrocode(void) { return mpExternalMicrocode; }
+        LPD3DXBUFFER getExternalMicrocode(void);
     protected:
         /** @copydoc Resource::loadImpl */
         void loadImpl(void);
 		/** Loads this program to specified device */
 		void loadImpl(IDirect3DDevice9* d3d9Device);
+		/** Overridden from GpuProgram */
+		void unloadImpl(void);
         /** Overridden from GpuProgram */
         void loadFromSource(void);
 		/** Loads this program from source to specified device */
@@ -62,8 +91,18 @@ namespace Ogre {
 		/** Loads this program from microcode, must be overridden by subclasses. */
         virtual void loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode) = 0;
 
+
+        /** Creates a new parameters object compatible with this program definition. 
+        @remarks
+            It is recommended that you use this method of creating parameters objects
+            rather than going direct to GpuProgramManager, because this method will
+            populate any implementation-specific extras (like named parameters) where
+            they are appropriate.
+        */
+        virtual GpuProgramParametersSharedPtr createParameters(void);
 	protected:    
-		ID3DXBuffer* mpExternalMicrocode; // microcode from elsewhere, we do NOT delete this ourselves	
+		bool mColumnMajorMatrices;
+		ID3DXBuffer* mpExternalMicrocode;
 
     };
 

@@ -35,14 +35,49 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    D3D9GpuProgram::CmdColumnMajorMatrices D3D9GpuProgram::msCmdColumnMajorMatrices;
+	D3D9GpuProgram::CmdExternalMicrocode D3D9GpuProgram::msCmdExternalMicrocode;
+
+   //-----------------------------------------------------------------------
+    String D3D9GpuProgram::CmdColumnMajorMatrices::doGet(const void *target) const
+    {
+        return StringConverter::toString(static_cast<const D3D9GpuProgram*>(target)->getColumnMajorMatrices());
+    }
+    void D3D9GpuProgram::CmdColumnMajorMatrices::doSet(void *target, const String& val)
+    {
+        static_cast<D3D9GpuProgram*>(target)->setColumnMajorMatrices(StringConverter::parseBool(val));
+    }
+    //-----------------------------------------------------------------------
+    String D3D9GpuProgram::CmdExternalMicrocode::doGet(const void *target) const
+    {
+		//D3D9GpuProgram* program=const_cast<D3D9GpuProgram*>(static_cast<const D3D9GpuProgram*>(target));
+		//LPD3DXBUFFER ptr=program->getExternalMicrocode();
+		//nothing to do
+		return String();
+    }
+    void D3D9GpuProgram::CmdExternalMicrocode::doSet(void *target, const String& val)
+    {
+		D3D9GpuProgram* program = const_cast<D3D9GpuProgram*>(static_cast<const D3D9GpuProgram*>(target));
+		const void* buffer = val.data();
+		program->setExternalMicrocode(buffer, val.size());
+    }
+
     //-----------------------------------------------------------------------------
     D3D9GpuProgram::D3D9GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader) 
-        : GpuProgram(creator, name, handle, group, isManual, loader), mpExternalMicrocode(NULL)
+        : GpuProgram(creator, name, handle, group, isManual, loader), mpExternalMicrocode(NULL), mColumnMajorMatrices(true)
     {			
         if (createParamDictionary("D3D9GpuProgram"))
         {
             setupBaseParamDictionary();
+
+            ParamDictionary* dict = getParamDictionary();
+            dict->addParameter(ParameterDef("column_major_matrices", 
+                "Whether matrix packing in column-major order.",
+                PT_BOOL),&msCmdColumnMajorMatrices);
+			dict->addParameter(ParameterDef("external_micro_code", 
+				"the cached external micro code data.",
+				PT_STRING),&msCmdExternalMicrocode);
         }
     }
 
@@ -50,6 +85,34 @@ namespace Ogre {
 	D3D9GpuProgram::~D3D9GpuProgram()
 	{
 
+	}
+    
+	//-----------------------------------------------------------------------------
+	void D3D9GpuProgram::setExternalMicrocode(const void* pMicrocode, size_t size)
+	{
+		LPD3DXBUFFER pBuffer=0;
+		HRESULT hr=D3DXCreateBuffer(size, &pBuffer);
+		if(pBuffer)
+		{
+			memcpy(pBuffer->GetBufferPointer(), pMicrocode, size);
+			this->setExternalMicrocode(pBuffer);
+			SAFE_RELEASE(pBuffer);
+		}
+	}
+	//-----------------------------------------------------------------------------
+	void D3D9GpuProgram::setExternalMicrocode(ID3DXBuffer* pMicrocode)
+	{ 
+		SAFE_RELEASE(mpExternalMicrocode);
+		mpExternalMicrocode = pMicrocode;
+		if(mpExternalMicrocode)
+		{
+			mpExternalMicrocode->AddRef();	
+		}
+	}
+    //-----------------------------------------------------------------------------
+	LPD3DXBUFFER D3D9GpuProgram::getExternalMicrocode(void)
+	{
+		return mpExternalMicrocode;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -90,7 +153,11 @@ namespace Ogre {
 			loadFromSource(d3d9Device);
 		}
 	}
-
+	//-----------------------------------------------------------------------------
+	void D3D9GpuProgram::unloadImpl(void)
+	{
+		SAFE_RELEASE(mpExternalMicrocode);
+	}
 	//-----------------------------------------------------------------------------
     void D3D9GpuProgram::loadFromSource(void)
     {
@@ -109,6 +176,10 @@ namespace Ogre {
 	{
 		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
+
+		// Populate compile flags
+        DWORD compileFlags = 0;
+
 		// Create the shader
 		// Assemble source into microcode
 		LPD3DXBUFFER microcode;
@@ -118,7 +189,7 @@ namespace Ogre {
 			static_cast<UINT>(mSource.length()),
 			NULL,               // no #define support
 			NULL,               // no #include support
-			0,                  // standard compile options
+			compileFlags,       // standard compile options
 			&microcode,
 			&errors);
 
@@ -129,7 +200,6 @@ namespace Ogre {
 			errors->Release();
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
 				"D3D9GpuProgram::loadFromSource");
-
 		}
 	
 		loadFromMicrocode(d3d9Device, microcode);		
@@ -137,7 +207,17 @@ namespace Ogre {
 		SAFE_RELEASE(microcode);
 		SAFE_RELEASE(errors);
 	}
-	
+    //-----------------------------------------------------------------------
+    GpuProgramParametersSharedPtr D3D9GpuProgram::createParameters(void)
+    {
+        // Call superclass
+        GpuProgramParametersSharedPtr params = GpuProgram::createParameters();
+
+        // Need to transpose matrices if compiled with column-major matrices
+        params->setTransposeMatrices(mColumnMajorMatrices);
+
+        return params;
+    }	
 	//-----------------------------------------------------------------------------
     D3D9GpuVertexProgram::D3D9GpuVertexProgram(ResourceManager* creator, 
         const String& name, ResourceHandle handle, const String& group, 
@@ -202,6 +282,7 @@ namespace Ogre {
 			++it;
 		}
 		mMapDeviceToVertexShader.clear();		
+		D3D9GpuProgram::unloadImpl();
     }
 
 	//-----------------------------------------------------------------------------
@@ -311,7 +392,8 @@ namespace Ogre {
 			SAFE_RELEASE(it->second);
 			++it;
 		}
-		mMapDeviceToPixelShader.clear();		
+		mMapDeviceToPixelShader.clear();	
+		D3D9GpuProgram::unloadImpl();
     }
 	//-----------------------------------------------------------------------------
 	void D3D9GpuFragmentProgram::notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device)
