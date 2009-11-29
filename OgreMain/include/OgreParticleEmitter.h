@@ -491,7 +491,7 @@ namespace Ogre {
 		/** Sets the name of the emitter to be emitted*/
 		virtual void setEmittedEmitter(const String& emittedEmitter);
 
-		/** Return ´true´ if the emitter is emitted by another emitter */
+		/** Return true if the emitter is emitted by another emitter */
 		virtual bool isEmitted(void) const;
 
 		/** Set the indication (true/false) to indicate that the emitter is emitted by another emitter */
