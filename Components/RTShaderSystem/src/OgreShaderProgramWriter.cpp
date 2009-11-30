@@ -59,7 +59,7 @@ void ProgramWriter::writeProgramTitle(std::ostream& os, Program* program)
 void ProgramWriter::writeUniformParametersTitle(std::ostream& os, Program* program)
 {
 	os << "//-----------------------------------------------------------------------------" << std::endl;
-	os << "//                         GLOBAL PARAMETES" << std::endl;
+	os << "//                         GLOBAL PARAMETERS" << std::endl;
 	os << "//-----------------------------------------------------------------------------" << std::endl;
 }
 //-----------------------------------------------------------------------

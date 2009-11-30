@@ -161,7 +161,7 @@ bool ProgramProcessor::compactVsOutputs(Function* vsMain, Function* fsMain)
 	ShaderParameterList fsSplitParams;
 	bool hasMergedParameters = false;
 	
-	mergeParametes(vsOutParamsTable, vsMergedParamsList, vsSplitParams);
+	mergeParameters(vsOutParamsTable, vsMergedParamsList, vsSplitParams);
 
 	
 	// Check if any parameter has been merged - means at least two parameters takes the same slot.
@@ -178,14 +178,14 @@ bool ProgramProcessor::compactVsOutputs(Function* vsMain, Function* fsMain)
 	if (hasMergedParameters == false)
 		return true;
 
-	mergeParametes(fsInParamsTable, fsMergedParamsList, fsSplitParams);
+	mergeParameters(fsInParamsTable, fsMergedParamsList, fsSplitParams);
 
 	// Generate local params for split source parameters.
 	LocalParameterMap vsLocalParamsMap;
 	LocalParameterMap fsLocalParamsMap;
 
-	generateLocalSplitParametes(vsMain, GPT_VERTEX_PROGRAM, vsMergedParamsList, vsSplitParams, vsLocalParamsMap);
-	generateLocalSplitParametes(fsMain, GPT_FRAGMENT_PROGRAM, fsMergedParamsList, fsSplitParams, fsLocalParamsMap);
+	generateLocalSplitParameters(vsMain, GPT_VERTEX_PROGRAM, vsMergedParamsList, vsSplitParams, vsLocalParamsMap);
+	generateLocalSplitParameters(fsMain, GPT_FRAGMENT_PROGRAM, fsMergedParamsList, fsSplitParams, fsLocalParamsMap);
 
 	
 	// Rebuild functions parameter lists.
@@ -262,7 +262,7 @@ void ProgramProcessor::buildTexcoordTable(const ShaderParameterList& paramList, 
 }
 
 //-----------------------------------------------------------------------------
-void ProgramProcessor::mergeParametes(ShaderParameterList paramsTable[4], MergeParameterList& mergedParams, 
+void ProgramProcessor:: mergeParameters(ShaderParameterList paramsTable[4], MergeParameterList& mergedParams, 
 									  ShaderParameterList& splitParams)
 {
 	// Merge using the predefined combinations.
@@ -299,7 +299,7 @@ void ProgramProcessor::mergeParametersByPredefinedCombinations(ShaderParameterLi
 
 		MergeParameter curMergeParam;
 
-		while (mergeParametesByCombination(curCombination, paramsTable, &curMergeParam))
+		while (mergeParametersByCombination(curCombination, paramsTable, &curMergeParam))
 		{
 			mergedParams.push_back(curMergeParam);
 			curMergeParam.clear();
@@ -418,7 +418,7 @@ void ProgramProcessor::mergeParametersByPredefinedCombinations(ShaderParameterLi
 
 			MergeParameter curMergeParam;
 
-			while (mergeParametesByCombination(curCombination, paramsTable, &curMergeParam))
+			while (mergeParametersByCombination(curCombination, paramsTable, &curMergeParam))
 			{
 				mergedParams.push_back(curMergeParam);
 				curMergeParam.clear();
@@ -428,7 +428,7 @@ void ProgramProcessor::mergeParametersByPredefinedCombinations(ShaderParameterLi
 }
 
 //-----------------------------------------------------------------------------
-bool ProgramProcessor::mergeParametesByCombination(const MergeCombination& combination, 
+bool ProgramProcessor::mergeParametersByCombination(const MergeCombination& combination, 
 									ShaderParameterList paramsTable[4], 
 									MergeParameter* mergedParameter)
 {
@@ -605,7 +605,7 @@ void ProgramProcessor::rebuildParameterList(Function* func, int paramsUsage, Mer
 }
 
 //-----------------------------------------------------------------------------
-void ProgramProcessor::generateLocalSplitParametes(Function* func, GpuProgramType progType,
+void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramType progType,
 												   MergeParameterList& mergedParams, 
 												   ShaderParameterList& splitParams, LocalParameterMap& localParamsMap)
 {

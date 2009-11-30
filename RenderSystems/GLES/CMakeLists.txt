@@ -7,7 +7,7 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
-# Configure OpenGL ES RenderSystem build
+# Configure OpenGL ES 1.x RenderSystem build
 
 set(HEADER_FILES
   include/OgreGLESContext.h

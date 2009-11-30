@@ -102,8 +102,8 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	if(gpuType == GPT_GEOMETRY_PROGRAM)
 	{
 		OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, 
-			"Geomtry Program not supported in GLSL writer ", 
-			"ProgramWriterGLSL::writeSourceCode" );	
+			"Geometry Program not supported in GLSL writer ", 
+			"GLSLProgramWriter::writeSourceCode" );	
 	}
 
 	// Clear out old input params
@@ -300,7 +300,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 void GLSLProgramWriter::writeForwardDeclarations(std::ostream& os, Program* program)
 {
 	os << "//-----------------------------------------------------------------------------" << std::endl;
-	os << "//                         FORWARD DECLARTIONS" << std::endl;
+	os << "//                         FORWARD DECLARATIONS" << std::endl;
 	os << "//-----------------------------------------------------------------------------" << std::endl;
 
 	StringVector forwardDecl; // holds all generated function declarations 

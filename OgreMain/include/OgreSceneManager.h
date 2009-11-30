@@ -1666,7 +1666,7 @@ namespace Ogre {
             This method should be overridden by SceneManagers that provide
             custom world geometry that can take some time to load. They should
             return from this method a count of the number of stages of progress
-            they can report on whilst loading. During real loading (setWorldGeomtry),
+            they can report on whilst loading. During real loading (setWorldGeometry),
             they should call ResourceGroupManager::_notifyWorldGeometryProgress exactly
             that number of times when loading the geometry for real.
         @note 

@@ -191,7 +191,7 @@ protected:
 	@param paramsTable Source parameters table.
 	@param mergedParams Will hold the merged parameters list.
 	*/
-	void			mergeParametes					(ShaderParameterList paramsTable[4], MergeParameterList& mergedParams, ShaderParameterList& splitParams);
+	void			mergeParameters					(ShaderParameterList paramsTable[4], MergeParameterList& mergedParams, ShaderParameterList& splitParams);
 
 
 	/** Internal function that creates merged parameter using pre defined combinations. 
@@ -205,7 +205,7 @@ protected:
 	@param paramsTable The params table sorted by types in each row.	
 	@param mergedParameter Will hold the merged parameter.
 	*/
-	bool			mergeParametesByCombination				(const MergeCombination& combination, ShaderParameterList paramsTable[4], 
+	bool			mergeParametersByCombination			(const MergeCombination& combination, ShaderParameterList paramsTable[4], 
 																 MergeParameter* mergedParameter);
 
 	/** Merge reminders parameters that could not be merged into one slot using the predefined combinations.
@@ -217,7 +217,7 @@ protected:
 
 
 	/** Generates local parameters for the split parameters and perform packing/unpacking operation using them. */
-	void			generateLocalSplitParametes					(Function* func, GpuProgramType progType, MergeParameterList& mergedParams, ShaderParameterList& splitParams, LocalParameterMap& localParamsMap);
+	void			generateLocalSplitParameters				(Function* func, GpuProgramType progType, MergeParameterList& mergedParams, ShaderParameterList& splitParams, LocalParameterMap& localParamsMap);
 	
 	/** Rebuild the given parameters list using the merged parameters.	
 	*/
