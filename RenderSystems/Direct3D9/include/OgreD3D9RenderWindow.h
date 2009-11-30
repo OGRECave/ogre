@@ -76,9 +76,16 @@ namespace Ogre
 		/// Build the presentation parameters used with this window
 		void				buildPresentParameters	(D3DPRESENT_PARAMETERS* presentParams);
 		
-		/// @copydoc RenderTarget::update
-		void update(bool swap);				
+
+		/// @copydoc RenderTarget::_beginUpdate
+		void _beginUpdate();
 	
+		/// @copydoc RenderTarget::_updateViewport
+		void _updateViewport(Viewport* viewport, bool updateStatistics = true);
+
+		/// @copydoc RenderTarget::_endUpdate
+		void _endUpdate();
+
 		/// Accessor for render surface
 		IDirect3DSurface9* getRenderSurface();
 

@@ -398,7 +398,7 @@ namespace Ogre {
 			Please note that in that case, the zorder may not work as you expect,
 			since you are responsible for calling _updateViewport in the correct order.
         */
-		void _beginUpdate();
+		virtual void _beginUpdate();
 
 		/** Method for manual management of rendering - renders the given 
 		viewport (even if it is not autoupdated)
@@ -409,7 +409,7 @@ namespace Ogre {
 		@param zorder The zorder of the viewport to update.
 		@param updateStatistics Whether you want to update statistics or not.
 		*/
-		void _updateViewport(int zorder, bool updateStatistics = true);
+		virtual void _updateViewport(int zorder, bool updateStatistics = true);
 
 		/** Method for manual management of rendering - renders the given viewport (even if it is not autoupdated)
 		@remarks
@@ -419,7 +419,7 @@ namespace Ogre {
 		@param viewport The viewport you want to update, it must be bound to the rendertarget.
 		@param updateStatistics Whether you want to update statistics or not.
 		*/
-		void _updateViewport(Viewport* viewport, bool updateStatistics = true);
+		virtual void _updateViewport(Viewport* viewport, bool updateStatistics = true);
 
 		/** Method for manual management of rendering - renders only viewports that are auto updated
 		@remarks
@@ -429,7 +429,7 @@ namespace Ogre {
 		@param updateStatistics Whether you want to update statistics or not.
 		@see _beginUpdate()
 		*/
-		void _updateAutoUpdatedViewports(bool updateStatistics = true);
+		virtual void _updateAutoUpdatedViewports(bool updateStatistics = true);
 		
 		/** Method for manual management of rendering - finishes statistics calculation 
 			and fires 'postRenderTargetUpdate'.
@@ -437,7 +437,7 @@ namespace Ogre {
 		You should call it after a _beginUpdate
 		@see _beginUpdate for more details.
 		*/
-		void _endUpdate();
+		virtual void _endUpdate();
 
     protected:
         /// The name of this target.

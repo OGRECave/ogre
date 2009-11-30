@@ -703,7 +703,7 @@ namespace Ogre
 		mDevice->copyContentsToMemory(this, dst, buffer);
 	}
 	//-----------------------------------------------------------------------------
-	void D3D9RenderWindow::update(bool swap)
+	void D3D9RenderWindow::_beginUpdate()
 	{		
 		// External windows should update per frame
 		// since it dosen't get the window resize/move messages.
@@ -719,7 +719,7 @@ namespace Ogre
 		}
 
 		D3D9RenderSystem::getDeviceManager()->setActiveRenderTargetDevice(mDevice);
-		
+
 		// Check that device can be used for rendering operations.
 		mDeviceValid = mDevice->validate(this);
 		if (mDeviceValid)
@@ -727,12 +727,25 @@ namespace Ogre
 			// Finish window / fullscreen mode switch.
 			if (_getSwitchingFullscreen())		
 				_finishSwitchingFullscreen();		
-
-			
-			RenderWindow::update(swap);					
 		}
 
+		RenderWindow::_beginUpdate();
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderWindow::_updateViewport(Viewport* viewport, bool updateStatistics)
+	{
+		if (mDeviceValid)
+		{
+			RenderWindow::_updateViewport(viewport, updateStatistics);
+		}
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderWindow::_endUpdate()
+	{
+		RenderWindow::_endUpdate();
+
 		D3D9RenderSystem::getDeviceManager()->setActiveRenderTargetDevice(NULL);	
+
 	}
 	//-----------------------------------------------------------------------------
 	IDirect3DDevice9* D3D9RenderWindow::getD3D9Device()
@@ -825,11 +838,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool D3D9RenderWindow::_validateDevice()
 	{
-		if (!mDeviceValid)
-		{
-			mDeviceValid = mDevice->validate(this);
-		}
+		mDeviceValid = mDevice->validate(this);
 		return mDeviceValid;
-
 	}
 }
