@@ -191,12 +191,15 @@ namespace Ogre
 		addTechnique(mat, terrain, HIGH_LOD);
 
 		// LOD
-		addTechnique(mat, terrain, LOW_LOD);
-		Material::LodValueList lodValues;
-		lodValues.push_back(TerrainGlobalOptions::getCompositeMapDistance());
-		mat->setLodLevels(lodValues);
-		Technique* lowLodTechnique = mat->getTechnique(1);
-		lowLodTechnique->setLodIndex(1);
+		if(mCompositeMapEnabled)
+		{
+			addTechnique(mat, terrain, LOW_LOD);
+			Material::LodValueList lodValues;
+			lodValues.push_back(TerrainGlobalOptions::getCompositeMapDistance());
+			mat->setLodLevels(lodValues);
+			Technique* lowLodTechnique = mat->getTechnique(1);
+			lowLodTechnique->setLodIndex(1);
+		}
 
 		updateParams(mat, terrain);
 
@@ -451,11 +454,13 @@ namespace Ogre
 			updateVpParams(prof, terrain, HIGH_LOD, p->getVertexProgramParameters());
 			updateFpParams(prof, terrain, HIGH_LOD, p->getFragmentProgramParameters());
 
-			// low lod
-			p = mat->getTechnique(1)->getPass(0);
-			updateVpParams(prof, terrain, LOW_LOD, p->getVertexProgramParameters());
-			updateFpParams(prof, terrain, LOW_LOD, p->getFragmentProgramParameters());
-
+			if(prof->isCompositeMapEnabled())
+			{
+				// low lod
+				p = mat->getTechnique(1)->getPass(0);
+				updateVpParams(prof, terrain, LOW_LOD, p->getVertexProgramParameters());
+				updateFpParams(prof, terrain, LOW_LOD, p->getFragmentProgramParameters());
+			}
 		}
 	}
 	//---------------------------------------------------------------------
