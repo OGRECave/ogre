@@ -27,6 +27,7 @@ set(CMAKE_MODULE_PATH
   "${OGRE_SOURCE_DIR}/CMake/Packages"
 )
 include(CMakeDependentOption)
+include(CheckCXXCompilerFlag)
 include(MacroLogFeature)
 include(OgreConfigTargets)
 include(PreprocessorUtils)
@@ -56,7 +57,10 @@ endif ()
 
 # Set compiler specific build flags
 if (CMAKE_COMPILER_IS_GNUCXX)
-  add_definitions(-msse)
+  check_cxx_compiler_flag(-msse OGRE_GCC_HAS_SSE)
+  if (OGRE_GCC_HAS_SSE)
+    add_definitions(-msse)
+  endif ()
 endif ()
 if (MSVC)
   add_definitions(/fp:fast)
