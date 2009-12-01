@@ -274,6 +274,8 @@ Here are the attributes you can use in a 'pass' section of a .compositor script:
 @item
 @ref{last_render_queue}
 @item 
+@ref{compositor_pass_material_scheme,material_scheme}
+@item
 @ref{compositor_clear,clear}
 @item 
 @ref{compositor_stencil,stencil}
@@ -316,6 +318,13 @@ Default: first_render_queue 0@*@*
 For passes of type 'render_scene', this sets the last render queue id that is included in the render. Defaults to the value of RENDER_QUEUE_SKIES_LATE.@*@*
 Format: last_render_queue <id>@*@*
 Default: last_render_queue 95
+
+@anchor{compositor_pass_material_scheme}
+@subheading material_scheme
+If set, indicates the material scheme to use for this pass only. Useful for performing special-case rendering effects.@*@*
+This will overwrite the scheme if set at the target scope as well.@*@*
+Format: material_scheme <scheme name>@*@*
+Default: None@*@*
 
 @anchor{compositor_clear}
 @heading Clear Section

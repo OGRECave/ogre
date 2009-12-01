@@ -37,6 +37,7 @@ CompositionPass::CompositionPass(CompositionTargetPass *parent):
 	mIdentifier(0),
 	mFirstRenderQueue(RENDER_QUEUE_BACKGROUND),
 	mLastRenderQueue(RENDER_QUEUE_SKIES_LATE),
+	mMaterialScheme(StringUtil::BLANK),
     mClearBuffers(FBT_COLOUR|FBT_DEPTH),
     mClearColour(0.0,0.0,0.0,0.0),
 	mClearDepth(1.0f),
@@ -167,6 +168,16 @@ uint8 CompositionPass::getFirstRenderQueue() const
 void CompositionPass::setLastRenderQueue(uint8 id)
 {
 	mLastRenderQueue = id;
+}
+//-----------------------------------------------------------------------
+void CompositionPass::setMaterialScheme(const String& schemeName)
+{
+	mMaterialScheme = schemeName;
+}
+//-----------------------------------------------------------------------
+const String& CompositionPass::getMaterialScheme(void) const
+{
+	return mMaterialScheme;
 }
 //-----------------------------------------------------------------------
 uint8 CompositionPass::getLastRenderQueue() const

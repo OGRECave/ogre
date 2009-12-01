@@ -1,5 +1,4 @@
-// Postfilter doing full deferred shading
-
+//Postfilter generating the GBuffer
 compositor DeferredShading/GBuffer
 {
 	technique
@@ -29,16 +28,16 @@ compositor DeferredShading/GBuffer
 	}
 }
 
+//Postfilter lighting the scene using the GBuffer
 compositor DeferredShading/ShowLit
 {
 
 	technique
 	{
-		texture rt0 target_width target_height PF_A8R8G8B8
 		//Reference the main Gbuffer texture
 		texture_ref mrt_output DeferredShading/GBuffer mrt_output
 		
-        target rt0
+        target_output
         {
 			input none
 			//We will dispatch the shadow texture rendering ourselves
@@ -63,41 +62,19 @@ compositor DeferredShading/ShowLit
 				input 1 mrt_output 1
 			}
 			
+			//Render the objects that skipped rendering into the gbuffer
+			pass render_scene
+			{
+				material_scheme NoGBuffer
+				first_render_queue 10
+				last_render_queue 79
+			}
+			
+			//Render the post-GBuffer render queue objects
 			pass render_scene
 			{
 				//This value is synchronized with the code
 				first_render_queue 80
-			}
-		}
-		
-		//Render the passes that did not get rendered to the GBuffer (transparent)
-		target rt0
-        {
-			//shadows off?
-			shadows off
-			material_scheme NoGBuffer
-			pass render_scene
-			{
-				first_render_queue 10
-				last_render_queue 79
-			}
-		}
-		
-		// Render the post-gbuffer objects
-		//target rt0
-        //{
-		//	//shadows off?
-		//	shadows off
-		//	
-		//}
-		
-		target_output
-		{
-			input none
-			pass render_quad
-			{
-				material DeferredShading/Post/SimpleQuad
-				input 0 rt0
 			}
 		}
 	}

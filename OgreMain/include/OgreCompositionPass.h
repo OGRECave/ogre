@@ -101,6 +101,19 @@ namespace Ogre {
 		*/
 		uint8 getLastRenderQueue() const;
 
+		/** Set the material scheme used by this pass.
+		@remarks
+			Only applicable to passes that render the scene.
+			@see Technique::setScheme.
+		*/
+		void setMaterialScheme(const String& schemeName);
+		/** Get the material scheme used by this pass.
+		@remarks
+			Only applicable to passes that render the scene.
+			@see Technique::setScheme.
+		*/
+		const String& getMaterialScheme(void) const;
+
 		/** Would be nice to have for RENDERSCENE:
 			flags to:
 				exclude transparents
@@ -300,6 +313,8 @@ namespace Ogre {
         /// [first,last] render queue to render this pass (in case of PT_RENDERSCENE)
 		uint8 mFirstRenderQueue;
 		uint8 mLastRenderQueue;
+		/// Material scheme name
+		String mMaterialScheme;
         /// Clear buffers (in case of PT_CLEAR)
         uint32 mClearBuffers;
         /// Clear colour (in case of PT_CLEAR)

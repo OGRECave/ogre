@@ -728,7 +728,9 @@ namespace Ogre {
 
         /// Utility class for calculating automatic parameters for gpu programs
         AutoParamDataSource* mAutoParamDataSource;
+
 		CompositorChain* mActiveCompositorChain;
+		bool mLateMaterialResolving;
 
         ShadowTechnique mShadowTechnique;
         bool mDebugShadows;
@@ -3047,8 +3049,19 @@ namespace Ogre {
 		*/
 		virtual void _setActiveCompositorChain(CompositorChain* chain) { mActiveCompositorChain = chain; }
 
+		/** Sets whether to use late material resolving or not. If set, materials will be resolved
+			from the materials at the pass-setting stage and not at the render queue building stage.
+			This is useful when the active material scheme during the render queue building stage
+			is different from the one during the rendering stage.
+		*/
+		virtual void setLateMaterialResolving(bool isLate) { mLateMaterialResolving = isLate; }
+		
+		/** Gets whether using late material resolving or not.
+			@see setLateMaterialResolving */
+		virtual bool isLateMaterialResolving() const { return mLateMaterialResolving; }
+
 		/** Gets the active compositor chain of the current scene being rendered */
-		virtual CompositorChain* _getActiveCompositorChain() { return mActiveCompositorChain; }
+		virtual CompositorChain* _getActiveCompositorChain() const { return mActiveCompositorChain; }
 
 		/** Add a listener which will get called back on scene manager events.
 		*/

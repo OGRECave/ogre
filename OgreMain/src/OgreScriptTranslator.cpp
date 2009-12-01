@@ -5839,6 +5839,30 @@ namespace Ogre{
 						}
 					}
 					break;
+				case ID_MATERIAL_SCHEME:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						return;
+					}
+					else if (prop->values.size() > 1)
+					{
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+						return;
+					}
+					else
+					{
+						String val;
+						if(getString(prop->values.front(), &val))
+						{
+							mPass->setMaterialScheme(val);
+						}
+						else
+						{
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						}
+					}
+					break;
 				case ID_QUAD_NORMALS:
 					if(prop->values.empty())
 					{

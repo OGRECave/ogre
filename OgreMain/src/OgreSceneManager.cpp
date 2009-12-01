@@ -153,7 +153,8 @@ mLastLightHash(0),
 mLastLightLimit(0),
 mLastLightHashGpuProgram(0),
 mGpuParamsDirty((uint16)GPV_ALL),
-mActiveCompositorChain(0)
+mActiveCompositorChain(0),
+mLateMaterialResolving(false)
 {
 
     // init sky
@@ -907,6 +908,17 @@ bool SceneManager::hasSceneNode(const String& name) const
 const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed, 
 								   bool shadowDerivation)
 {
+	//If using late material resolving, swap now.
+	if (isLateMaterialResolving()) 
+	{
+		Technique* lateTech = pass->getParent()->getParent()->getBestTechnique();
+		if (lateTech->getNumPasses() > pass->getIndex())
+		{
+			pass = lateTech->getPass(pass->getIndex());
+		}
+		//Should we warn or throw an exception if an illegal state was achieved?
+	}
+
 	if (!mSuppressRenderStateChanges || evenIfSuppressed)
 	{
 		if (mIlluminationStage == IRS_RENDER_TO_TEXTURE && shadowDerivation)
@@ -2878,6 +2890,17 @@ bool SceneManager::validatePassForRendering(const Pass* pass)
     {
         return false;
     }
+
+	// If using late material resolving, check if there is a pass with the same index
+	// as this one in the 'late' material. If not, skip.
+	if (isLateMaterialResolving())
+	{
+		Technique* lateTech = pass->getParent()->getParent()->getBestTechnique();
+		if (lateTech->getNumPasses() <= pass->getIndex())
+		{
+			return false;
+		}
+	}
 
     return true;
 }

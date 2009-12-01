@@ -240,6 +240,48 @@ public:
 	}
 };
 
+/** "Set material scheme" RenderSystem operation
+ */
+class RSSetSchemeOperation: public CompositorInstance::RenderSystemOperation
+{
+public:
+	RSSetSchemeOperation(const String& schemeName) : mSchemeName(schemeName) {}
+	
+	String mPreviousScheme;
+	bool mPreviousLateResolving;
+
+	String mSchemeName;
+
+	virtual void execute(SceneManager *sm, RenderSystem *rs)
+	{
+		MaterialManager& matMgr = MaterialManager::getSingleton();
+		mPreviousScheme = matMgr.getActiveScheme();
+		matMgr.setActiveScheme(mSchemeName);
+
+		mPreviousLateResolving = sm->isLateMaterialResolving();
+		sm->setLateMaterialResolving(true);
+	}
+
+	const String& getPreviousScheme() const { return mPreviousScheme; }
+	bool getPreviousLateResolving() const { return mPreviousLateResolving; }
+};
+
+/** Restore the settings changed by the set scheme operation */
+class RSRestoreSchemeOperation: public CompositorInstance::RenderSystemOperation
+{
+public:
+	RSRestoreSchemeOperation(const RSSetSchemeOperation* setOperation) : 
+	  mSetOperation(setOperation) {}
+	
+	const RSSetSchemeOperation* mSetOperation;
+
+	virtual void execute(SceneManager *sm, RenderSystem *rs)
+	{
+		MaterialManager::getSingleton().setActiveScheme(mSetOperation->getPreviousScheme());
+		sm->setLateMaterialResolving(mSetOperation->getPreviousLateResolving());
+	}
+};
+
 void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionTargetPass *target)
 {
 	/// Here, passes are converted into render target operations
@@ -268,7 +310,8 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
 				pass->getStencilPassOp(), pass->getStencilTwoSidedOperation()
 				));
             break;
-        case CompositionPass::PT_RENDERSCENE:
+		case CompositionPass::PT_RENDERSCENE: 
+		{
 			if(pass->getFirstRenderQueue() < finalState.currentQueueGroupID)
 			{
 				/// Mismatch -- warn user
@@ -278,6 +321,16 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
 					StringConverter::toString(pass->getFirstRenderQueue())+" before "+
 					StringConverter::toString(finalState.currentQueueGroupID));
 			}
+
+			RSSetSchemeOperation* setSchemeOperation = 0;
+			if (pass->getMaterialScheme() != StringUtil::BLANK)
+			{
+				//Add the triggers that will set the scheme and restore it each frame
+				finalState.currentQueueGroupID = pass->getFirstRenderQueue();
+				setSchemeOperation = OGRE_NEW RSSetSchemeOperation(pass->getMaterialScheme());
+				queueRenderSystemOp(finalState, setSchemeOperation);
+			}
+			
 			/// Add render queues
 			for(int x=pass->getFirstRenderQueue(); x<=pass->getLastRenderQueue(); ++x)
 			{
@@ -285,11 +338,20 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
 				finalState.renderQueues.set(x);
 			}
 			finalState.currentQueueGroupID = pass->getLastRenderQueue()+1;
+
+			if (setSchemeOperation != 0)
+			{
+				//Restoring the scheme after the queues have been rendered
+				queueRenderSystemOp(finalState, 
+					OGRE_NEW RSRestoreSchemeOperation(setSchemeOperation));
+			}
+
 			finalState.findVisibleObjects = true;
 			finalState.materialScheme = target->getMaterialScheme();
 			finalState.shadowsEnabled = target->getShadowsEnabled();
 
             break;
+		}
 		case CompositionPass::PT_RENDERQUAD: {
             srcmat = pass->getMaterial();
 			if(srcmat.isNull())
