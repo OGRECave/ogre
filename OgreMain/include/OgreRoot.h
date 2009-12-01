@@ -82,7 +82,8 @@ namespace Ogre
         LogManager* mLogManager;
         ControllerManager* mControllerManager;
         SceneManagerEnumerator* mSceneManagerEnum;
-        SceneManager* mCurrentSceneManager;
+		typedef deque<SceneManager*>::type SceneManagerStack;
+		SceneManagerStack mSceneManagerStack;
         DynLibManager* mDynLibManager;
         ArchiveManager* mArchiveManager;
         MaterialManager* mMaterialManager;
@@ -780,12 +781,17 @@ namespace Ogre
             This is only intended for internal use; it is only valid during the
             rendering of a frame.
         */
-        SceneManager* _getCurrentSceneManager(void) const { return mCurrentSceneManager; }
-        /** Sets the scene manager currently being used to render a frame.
+        SceneManager* _getCurrentSceneManager(void) const;
+        /** Pushes the scene manager currently being used to render.
         @remarks
             This is only intended for internal use.
         */
-        void _setCurrentSceneManager(SceneManager* sm);
+        void _pushCurrentSceneManager(SceneManager* sm);
+		/** Pops the scene manager currently being used to render.
+		@remarks
+		This is only intended for internal use.
+		*/
+		void _popCurrentSceneManager(SceneManager* sm);
 
         /** Internal method used for updating all RenderTarget objects (windows, 
             renderable textures etc) which are set to auto-update.

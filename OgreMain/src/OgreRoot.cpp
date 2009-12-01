@@ -177,7 +177,6 @@ namespace Ogre {
 
 		// Create SceneManager enumerator (note - will be managed by singleton)
         mSceneManagerEnum = OGRE_NEW SceneManagerEnumerator();
-        mCurrentSceneManager = NULL;
 
 		mShadowTextureManager = OGRE_NEW ShadowTextureManager();
 
@@ -574,10 +573,25 @@ namespace Ogre {
     {
         mRenderers.push_back(newRend);
     }
-    //-----------------------------------------------------------------------
-	void Root::_setCurrentSceneManager(SceneManager* sm)
+	//-----------------------------------------------------------------------
+	SceneManager* Root::_getCurrentSceneManager(void) const
 	{
-		mCurrentSceneManager = sm;
+		if (mSceneManagerStack.empty())
+			return 0;
+		else
+			return mSceneManagerStack.back();
+	}
+	//-----------------------------------------------------------------------
+	void Root::_pushCurrentSceneManager(SceneManager* sm)
+	{
+		mSceneManagerStack.push_back(sm);
+	}
+	//-----------------------------------------------------------------------
+	void Root::_popCurrentSceneManager(SceneManager* sm)
+	{
+		assert (_getCurrentSceneManager() == sm && "Mismatched push/pop of SceneManager");
+
+		mSceneManagerStack.pop_back();
 	}
     //-----------------------------------------------------------------------
     RenderSystem* Root::getRenderSystem(void)
