@@ -16,6 +16,7 @@ PROJECT(OgreTerrain)
 # define header and source files for the library
 set (HEADER_FILES
     include/OgreTerrain.h
+    include/OgreTerrainGroup.h
 	include/OgreTerrainLayerBlendMap.h
 	include/OgreTerrainMaterialGenerator.h
 	include/OgreTerrainMaterialGeneratorA.h
@@ -25,6 +26,7 @@ set (HEADER_FILES
 
 set (SOURCE_FILES
 	src/OgreTerrain.cpp
+    src/OgreTerrainGroup.cpp
 	src/OgreTerrainLayerBlendMap.cpp
 	src/OgreTerrainMaterialGenerator.cpp
 	src/OgreTerrainMaterialGeneratorA.cpp

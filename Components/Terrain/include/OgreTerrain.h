@@ -348,6 +348,15 @@ namespace Ogre
 			*/
 			float* inputFloat;
 
+			/** Whether this structure should 'own' the input data (inputImage and
+				inputFloat), and therefore delete it on destruction. 
+				The default is false so you have to manage your own memory. If you
+				set it to true, then you must have allocated the memory through
+				OGRE_NEW (for Image) and OGRE_ALLOC_T (for inputFloat), the latter
+				with the category MEMCATEGORY_GEOMETRY.
+			*/
+			bool deleteInputData;
+
 			/// How to scale the input values provided (if any)
 			Real inputScale;
 			/// How to bias the input values provided (if any)
@@ -373,10 +382,29 @@ namespace Ogre
 				, worldSize(1000)
 				, inputImage(0)
 				, inputFloat(0)
+				, deleteInputData(false)
 				, inputScale(1.0)
 				, inputBias(0.0)
 			{
 
+			}
+
+			/// Delete any input data if this struct is set to do so
+			void destroy()
+			{
+				if (deleteInputData)
+				{
+					OGRE_DELETE inputImage;
+					OGRE_FREE(inputFloat, MEMCATEGORY_GEOMETRY);
+					inputImage = 0;
+					inputFloat = 0;
+				}
+
+			}
+
+			~ImportData()
+			{
+				destroy();
 			}
 
 		};
@@ -494,6 +522,13 @@ namespace Ogre
 			This method must be called in the main render thread. 
 		*/
 		void load();
+
+		/** Return whether the terrain is loaded. 
+		@remarks
+			Should only be called from the render thread really, since this is
+			where the loaded state changes.
+		*/
+		bool isLoaded() const { return mIsLoaded; }
 
 
 		/** Unload the terrain and free GPU resources. 
@@ -982,6 +1017,8 @@ namespace Ogre
 		
 		/// Get the AABB (local coords) of the entire terrain
 		const AxisAlignedBox& getAABB() const;
+		/// Get the AABB (world coords) of the entire terrain
+		AxisAlignedBox getWorldAABB() const;
 		/// Get the minimum height of the terrain
 		Real getMinHeight() const;
 		/// Get the maximum height of the terrain
@@ -1248,7 +1285,11 @@ namespace Ogre
 			neighbour index from the perspective of the tile the other side of the
 			boundary).
 		*/
-		NeighbourIndex getOppositeNeighbour(NeighbourIndex index);
+		static NeighbourIndex getOppositeNeighbour(NeighbourIndex index);
+
+		/** Get the neighbour enum for a given offset in a grid (signed).
+		*/
+		static NeighbourIndex getNeighbourIndex(long offsetx, long offsety);
 
 		/** Tell this instance to notify all neighbours that will be affected
 			by a height change that has taken place. 
@@ -1283,8 +1324,12 @@ namespace Ogre
 
 		/** Query whether a derived data update is in progress or not. */
 		bool isDerivedDataUpdateInProgress() const { return mDerivedDataUpdateInProgress; }
-		
 
+
+		/// Utility method to convert axes from world space to terrain space (xy terrain, z up)
+		static void convertWorldToTerrainAxes(Alignment align, const Vector3& worldVec, Vector3* terrainVec);
+		/// Utility method to convert axes from terrain space (xy terrain, z up) tp world space
+		static void convertTerrainToWorldAxes(Alignment align, const Vector3& terrainVec, Vector3* worldVec);
 
 	protected:
 
@@ -1337,6 +1382,7 @@ namespace Ogre
 		uint16 mWorkQueueChannel;
 		SceneManager* mSceneMgr;
 		SceneNode* mRootNode;
+		bool mIsLoaded;
 		
 		/// The height data (world coords relative to mPos)
 		float* mHeightData;

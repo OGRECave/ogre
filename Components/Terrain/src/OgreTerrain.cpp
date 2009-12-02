@@ -119,6 +119,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	Terrain::Terrain(SceneManager* sm)
 		: mSceneMgr(sm)
+		, mIsLoaded(false)
 		, mHeightData(0)
 		, mDeltaData(0)
 		, mPos(Vector3::ZERO)
@@ -196,6 +197,16 @@ namespace Ogre
 			return AxisAlignedBox::BOX_NULL;
 		else
 			return mQuadTree->getAABB();
+	}
+	//---------------------------------------------------------------------
+	AxisAlignedBox Terrain::getWorldAABB() const
+	{
+		Matrix4 m;
+		m.setTrans(getPosition());
+
+		AxisAlignedBox ret = getAABB();
+		ret.transformAffine(m);
+		return ret;
 	}
 	//---------------------------------------------------------------------
 	Real Terrain::getMinHeight() const
@@ -949,6 +960,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::load()
 	{
+		if (mIsLoaded)
+			return;
+
 		if (mQuadTree)
 			mQuadTree->load();
 		
@@ -960,12 +974,19 @@ namespace Ogre
 		
 		mMaterialGenerator->requestOptions(this);
 
+		mIsLoaded = true;
+
 	}
 	//---------------------------------------------------------------------
 	void Terrain::unload()
 	{
+		if (!mIsLoaded)
+			return;
+
 		if (mQuadTree)
 			mQuadTree->unload();
+
+		mIsLoaded = false;
 	}
 	//---------------------------------------------------------------------
 	void Terrain::unprepare()
@@ -1193,25 +1214,52 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void Terrain::convertWorldToTerrainAxes(Alignment align, const Vector3& worldVec, Vector3* terrainVec) 
+	{
+		switch (align)
+		{
+		case ALIGN_X_Z:
+			terrainVec->z = worldVec.y;
+			terrainVec->x = worldVec.x;
+			terrainVec->y = -worldVec.z;
+			break;
+		case ALIGN_Y_Z:
+			terrainVec->z = worldVec.x;
+			terrainVec->x = -worldVec.z;
+			terrainVec->y = worldVec.y;
+			break;
+		case ALIGN_X_Y:
+			*terrainVec = worldVec;
+			break;
+		};
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::convertTerrainToWorldAxes(Alignment align, const Vector3& terrainVec, Vector3* worldVec)
+	{
+		switch (align)
+		{
+		case ALIGN_X_Z:
+			worldVec->x = terrainVec.x;
+			worldVec->y = terrainVec.z;
+			worldVec->z = -terrainVec.y;
+			break;
+		case ALIGN_Y_Z:
+			worldVec->x = terrainVec.z;
+			worldVec->y = terrainVec.y;
+			worldVec->z = -terrainVec.x;
+			break;
+		case ALIGN_X_Y:
+			*worldVec = terrainVec;
+			break;
+		};
+
+	}
+	//---------------------------------------------------------------------
 	Vector3 Terrain::convertWorldToTerrainAxes(const Vector3& inVec) const
 	{
 		Vector3 ret;
-		switch (mAlign)
-		{
-		case ALIGN_X_Z:
-			ret.z = inVec.y;
-			ret.x = inVec.x;
-			ret.y = -inVec.z;
-			break;
-		case ALIGN_Y_Z:
-			ret.z = inVec.x;
-			ret.x = -inVec.z;
-			ret.y = inVec.y;
-			break;
-		case ALIGN_X_Y:
-			ret = inVec;
-			break;
-		};
+		convertWorldToTerrainAxes(mAlign, inVec, &ret);
 
 		return ret;
 	}
@@ -1219,22 +1267,7 @@ namespace Ogre
 	Vector3 Terrain::convertTerrainToWorldAxes(const Vector3& inVec) const
 	{
 		Vector3 ret;
-		switch (mAlign)
-		{
-		case ALIGN_X_Z:
-			ret.x = inVec.x;
-			ret.y = inVec.z;
-			ret.z = -inVec.y;
-			break;
-		case ALIGN_Y_Z:
-			ret.x = inVec.z;
-			ret.y = inVec.y;
-			ret.z = -inVec.x;
-			break;
-		case ALIGN_X_Y:
-			ret = inVec;
-			break;
-		};
+		convertTerrainToWorldAxes(mAlign, inVec, &ret);
 
 		return ret;
 	}
@@ -3181,6 +3214,42 @@ namespace Ogre
 		intindex += NEIGHBOUR_COUNT / 2;
 		intindex = intindex % NEIGHBOUR_COUNT;
 		return static_cast<NeighbourIndex>(intindex);
+	}
+	//---------------------------------------------------------------------
+	Terrain::NeighbourIndex Terrain::getNeighbourIndex(long x, long y)
+	{
+		if (x < 0)
+		{
+			if (y < 0)
+				return NEIGHBOUR_SOUTHWEST;
+			else if (y > 0)
+				return NEIGHBOUR_NORTHWEST;
+			else
+				return NEIGHBOUR_WEST;
+		}
+		else if (x > 0)
+		{
+			if (y < 0)
+				return NEIGHBOUR_SOUTHEAST;
+			else if (y > 0)
+				return NEIGHBOUR_NORTHEAST;
+			else
+				return NEIGHBOUR_EAST;
+		}
+
+		if (y < 0)
+		{
+			if (x == 0)
+				return NEIGHBOUR_SOUTH;
+		}
+		else if (y > 0)
+		{
+			if (x == 0)
+				return NEIGHBOUR_NORTH;
+		}
+
+		return NEIGHBOUR_NORTH;
+
 	}
 	//---------------------------------------------------------------------
 	void Terrain::notifyNeighbours()
