@@ -121,7 +121,8 @@ namespace Ogre {
                 {
                     *NumOfFragments = 100000;
                     mPixelCount = 100000;
-                    mpDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, &mpQuery);
+					releaseResources();
+					recreateResources();
                     break;
                 }
             } 
@@ -150,7 +151,8 @@ namespace Ogre {
         if (hr == D3DERR_DEVICELOST)
         {
             mPixelCount = 100000;
-            mpDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, &mpQuery);
+			releaseResources();
+			recreateResources();
         }
         mPixelCount = pixels;
         mIsQueryResultStillOutstanding = false;
