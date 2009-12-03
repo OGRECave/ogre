@@ -16,10 +16,14 @@ same license as the rest of the engine.
 
 #include "SdkSample.h"
 #include "OgreTerrain.h"
+#include "OgreTerrainGroup.h"
 #include "OgreTerrainQuadTreeNode.h"
 #include "OgreTerrainMaterialGeneratorA.h"
 
 #define TERRAIN_FILE_PREFIX String("testTerrain")
+#define TERRAIN_FILE_SUFFIX String("dat")
+#define TERRAIN_WORLD_SIZE 12000.0f
+#define TERRAIN_SIZE 513
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -29,8 +33,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 public:
 
 	Sample_Terrain()
-		: mTerrain(0)
-		, mTerrain2(0)
+		: mTerrainGroup(0)
 		, mFly(false)
 		, mFallVelocity(0)
 		, mMode(MODE_NORMAL)
@@ -38,7 +41,7 @@ public:
 		, mBrushSizeTerrainSpace(0.02)
 		, mUpdateCountDown(0)
 		, mTerrainPos(1000,0,5000)
-		, mAutoSave(false)
+		, mTerrainsImported(false)
 
 	{
 		mInfo["Title"] = "Terrain";
@@ -67,17 +70,6 @@ public:
 		StringVector names;
 		return names;
 	}
-
-	std::pair<bool, Vector3> getAnyTerrainIntersection(const Ray& ray)
-	{
-		std::pair<bool, Vector3> rayResult = mTerrain->rayIntersects(ray);
-		if (!rayResult.first)
-			rayResult = mTerrain2->rayIntersects(ray);
-
-		return rayResult;
-
-	}
-
 
 	void doTerrainModify(Terrain* terrain, const Vector3& centrepos, Real timeElapsed)
 	{
@@ -182,14 +174,21 @@ public:
 			//ray = mCamera->getCameraToViewportRay(0.5, 0.5);
 			ray = mTrayMgr->getCursorRay(mCamera);
 
-			std::pair<bool, Vector3> rayResult = getAnyTerrainIntersection(ray);
-			if (rayResult.first)
+			TerrainGroup::RayResult rayResult = mTerrainGroup->rayIntersects(ray);
+			if (rayResult.hit)
 			{
 				mEditMarker->setVisible(true);
-				mEditNode->setPosition(rayResult.second);
+				mEditNode->setPosition(rayResult.position);
 
-				doTerrainModify(mTerrain, rayResult.second, evt.timeSinceLastFrame);
-				doTerrainModify(mTerrain2, rayResult.second, evt.timeSinceLastFrame);
+				// figure out which terrains this affects
+				TerrainGroup::TerrainList terrainList;
+				Real brushSizeWorldSpace = TERRAIN_WORLD_SIZE * mBrushSizeTerrainSpace;
+				Sphere sphere(rayResult.position, brushSizeWorldSpace);
+				mTerrainGroup->sphereIntersects(sphere, &terrainList);
+
+				for (TerrainGroup::TerrainList::iterator ti = terrainList.begin();
+					ti != terrainList.end(); ++ti)
+					doTerrainModify(*ti, rayResult.position, evt.timeSinceLastFrame);
 			}
 			else
 			{
@@ -207,20 +206,20 @@ public:
 			ray.setOrigin(Vector3(camPos.x, 10000, camPos.z));
 			ray.setDirection(Vector3::NEGATIVE_UNIT_Y);
 
-			std::pair<bool, Vector3> rayResult = getAnyTerrainIntersection(ray);
+			TerrainGroup::RayResult rayResult = mTerrainGroup->rayIntersects(ray);
 			Real distanceAboveTerrain = 50;
 			Real fallSpeed = 300;
 			Real newy = camPos.y;
-			if (rayResult.first)
+			if (rayResult.hit)
 			{
-				if (camPos.y > rayResult.second.y + distanceAboveTerrain)
+				if (camPos.y > rayResult.position.y + distanceAboveTerrain)
 				{
 					mFallVelocity += evt.timeSinceLastFrame * 20;
 					mFallVelocity = std::min(mFallVelocity, fallSpeed);
 					newy = camPos.y - mFallVelocity * evt.timeSinceLastFrame;
 
 				}
-				newy = std::max(rayResult.second.y + distanceAboveTerrain, newy);
+				newy = std::max(rayResult.position.y + distanceAboveTerrain, newy);
 				mCamera->setPosition(camPos.x, newy, camPos.z);
 				
 			}
@@ -232,15 +231,14 @@ public:
 			mUpdateCountDown -= evt.timeSinceLastFrame;
 			if (mUpdateCountDown <= 0)
 			{
-				mTerrain->update();
-				mTerrain2->update();
+				mTerrainGroup->update();
 				mUpdateCountDown = 0;
 
 			}
 
 		}
 
-		if (mTerrain->isDerivedDataUpdateInProgress() || mTerrain2->isDerivedDataUpdateInProgress())
+		if (mTerrainGroup->isDerivedDataUpdateInProgress())
 		{
 			mInfoLabel->setCaption("Computing textures, patience...");
 			mTrayMgr->moveWidgetToTray(mInfoLabel, TL_TOP, 0);
@@ -250,10 +248,10 @@ public:
 		{
 			mTrayMgr->removeWidgetFromTray(mInfoLabel);
 			mInfoLabel->hide();
-			if (mAutoSave)
+			if (mTerrainsImported)
 			{
-				saveTerrains();
-				mAutoSave = false;
+				saveTerrains(false);
+				mTerrainsImported = false;
 			}
 		}
 
@@ -263,10 +261,9 @@ public:
 		return SdkSample::frameRenderingQueued(evt);  // don't forget the parent updates!
     }
 
-	void saveTerrains()
+	void saveTerrains(bool onlyIfModified)
 	{
-		mTerrain->save(TERRAIN_FILE_PREFIX + ".dat");
-		mTerrain2->save(TERRAIN_FILE_PREFIX + "2.dat");
+		mTerrainGroup->saveAllTerrains(onlyIfModified);
 	}
 
 	bool keyPressed (const OIS::KeyEvent &e)
@@ -278,35 +275,27 @@ public:
 			// CTRL-S to save
 			if (mKeyboard->isKeyDown(OIS::KC_LCONTROL) || mKeyboard->isKeyDown(OIS::KC_RCONTROL))
 			{
-				saveTerrains();
-			}
-			else
-				return SdkSample::keyPressed(e);
-			break;
-		case OIS::KC_1:
-			// force update terrain 1
-			if (mKeyboard->isKeyDown(OIS::KC_LCONTROL) || mKeyboard->isKeyDown(OIS::KC_RCONTROL))
-			{
-				mTerrain->dirty();
-				mTerrain->update();
-			}
-			else
-				return SdkSample::keyPressed(e);
-			break;
-		case OIS::KC_2:
-			// force update terrain 2
-			if (mKeyboard->isKeyDown(OIS::KC_LCONTROL) || mKeyboard->isKeyDown(OIS::KC_RCONTROL))
-			{
-				mTerrain2->dirty();
-				mTerrain2->update();
+				saveTerrains(true);
 			}
 			else
 				return SdkSample::keyPressed(e);
 			break;
 		case OIS::KC_F10:
 			// dump
-			mTerrain->_dumpTextures("terrain1", ".png");
-			mTerrain2->_dumpTextures("terrain2", ".png");
+			{
+				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
+				while (ti.hasMoreElements())
+				{
+					uint32 tkey = ti.peekNextKey();
+					TerrainGroup::TerrainSlot* ts = ti.getNext();
+					if (ts->instance && ts->instance->isLoaded())
+					{
+						ts->instance->_dumpTextures("terrain_" + StringConverter::toString(tkey), ".png");
+					}
+
+
+				}
+			}
 			break;
 		default:
 			return SdkSample::keyPressed(e);
@@ -376,8 +365,7 @@ public:
 
 protected:
 
-	Terrain* mTerrain;
-	Terrain* mTerrain2;
+	TerrainGroup* mTerrainGroup;
 	bool mFly;
 	Real mFallVelocity;
 	enum Mode
@@ -398,14 +386,51 @@ protected:
 	SelectMenu* mEditMenu;
 	CheckBox* mFlyBox;
 	OgreBites::Label* mInfoLabel;
-	bool mAutoSave;
+	bool mTerrainsImported;
 
-	Terrain* createBlankTerrain()
+
+	void defineTerrain(long x, long y, bool flat = false)
 	{
-		Terrain* terrain = OGRE_NEW Terrain(mSceneMgr);
-		Terrain::ImportData imp;
-		imp.terrainSize = 513;
-		imp.worldSize = 12000;
+		// if a file is available, use it
+		// if not, generate file from import
+
+		// Usually in a real project you'll know whether the compact terrain data is
+		// available or not; I'm doing it this way to save distribution size
+
+		if (flat)
+		{
+			mTerrainGroup->defineTerrain(x, y, 0.0f);
+		}
+		else
+		{
+			String filename = mTerrainGroup->generateFilename(x, y);
+			if (ResourceGroupManager::getSingleton().resourceExists(mTerrainGroup->getResourceGroup(), filename))
+			{
+				mTerrainGroup->defineTerrain(x, y);
+			}
+			else
+			{
+				Terrain::ImportData imp;
+				createTerrainImportData(x % 2 != 0, y % 2 != 0, imp);
+				mTerrainGroup->defineTerrain(x, y, &imp);
+				mTerrainsImported = true;
+			}
+
+		}
+	}
+
+	void createTerrainImportData(bool flipX, bool flipY, Terrain::ImportData& imp)
+	{
+		Image* img = OGRE_NEW Image();
+		img->load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		if (flipX)
+			img->flipAroundY();
+		if (flipY)
+			img->flipAroundX();
+
+		imp.inputImage = img;
+		imp.terrainSize = TERRAIN_SIZE;
+		imp.worldSize = TERRAIN_WORLD_SIZE;
 		imp.inputScale = 600;
 		imp.minBatchSize = 33;
 		imp.maxBatchSize = 65;
@@ -420,50 +445,11 @@ protected:
 		imp.layerList[2].worldSize = 200;
 		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
 		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
-		terrain->prepare(imp);
-		terrain->load();
-
-		terrain->freeTemporaryResources();
-
-		return terrain;
-
 
 	}
 
-
-	Terrain* createTerrain(bool flipX = false, bool flipY = false)
+	void initBlendMaps(Terrain* terrain)
 	{
-		Terrain* terrain = OGRE_NEW Terrain(mSceneMgr);
-		Image img;
-		img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		if (flipX)
-			img.flipAroundY();
-		if (flipY)
-			img.flipAroundX();
-		//img.load("terrain_flattened.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		//img.load("terrain_onehill.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-
-		Terrain::ImportData imp;
-		imp.inputImage = &img;
-		imp.terrainSize = 513;
-		imp.worldSize = 12000;
-		imp.inputScale = 600;
-		imp.minBatchSize = 33;
-		imp.maxBatchSize = 65;
-		// textures
-		imp.layerList.resize(3);
-		imp.layerList[0].worldSize = 100;
-		imp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
-		imp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
-		imp.layerList[1].worldSize = 30;
-		imp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
-		imp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
-		imp.layerList[2].worldSize = 200;
-		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
-		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
-		terrain->prepare(imp);
-		terrain->load();
-
 		TerrainLayerBlendMap* blendMap0 = terrain->getLayerBlendMap(1);
 		TerrainLayerBlendMap* blendMap1 = terrain->getLayerBlendMap(2);
 		Real minHeight0 = 70;
@@ -505,11 +491,8 @@ protected:
 		terrain->getGlobalColourMap()->loadImage(colourMap);
 		*/
 
-		terrain->freeTemporaryResources();
-
-		return terrain;
-
 	}
+
 
     void createSceneManager()
     {
@@ -617,68 +600,38 @@ protected:
 		TerrainGlobalOptions::setCompositeMapAmbient(mSceneMgr->getAmbientLight());
 		//TerrainGlobalOptions::setCompositeMapAmbient(ColourValue::Red);
 		TerrainGlobalOptions::setCompositeMapDiffuse(l->getDiffuseColour());
-		bool neighbourRecalc = false;
-		if (blankTerrain)
+		
+		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
+		mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
+		mTerrainGroup->setOrigin(mTerrainPos);
+
+		defineTerrain(0, 0, blankTerrain);
+		defineTerrain(1, 0, blankTerrain);
+
+
+		// sync load since we want everything in place when we start
+		mTerrainGroup->loadAllTerrains(true);
+
+		if (mTerrainsImported)
 		{
-			mTerrain = createBlankTerrain();
-			mTerrain2 = createBlankTerrain();
-		}
-		else
-		{
-			try
+			TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
+			while(ti.hasMoreElements())
 			{
-				mTerrain = OGRE_NEW Terrain(mSceneMgr);
-				mTerrain->load(TERRAIN_FILE_PREFIX + ".dat");
-			}
-			catch (Exception&)
-			{
-				OGRE_DELETE mTerrain;
-				mTerrain = 0;
-			}
-			if (!mTerrain)
-			{
-				neighbourRecalc = true;
-				mAutoSave = true;
-				mTerrain = createTerrain();
-			}
-			try
-			{
-				mTerrain2 = OGRE_NEW Terrain(mSceneMgr);
-				mTerrain2->load(TERRAIN_FILE_PREFIX + "2.dat");
-			}
-			catch (Exception&)
-			{
-				OGRE_DELETE mTerrain2;
-				mTerrain2 = 0;
-			}
-			if (!mTerrain2)
-			{
-				neighbourRecalc = true;
-				mAutoSave = true;
-				mTerrain2 = createTerrain(true);
+				Terrain* t = ti.getNext()->instance;
+				initBlendMaps(t);
 			}
 		}
 
-		mTerrain->setPosition(mTerrainPos);
-		Vector3 secondTerrainPos = mTerrainPos + Vector3(mTerrain->getWorldSize(), 0, 0);
-		mTerrain2->setPosition(secondTerrainPos);
-		// set neighbour (let it notify other itself)
-		mTerrain2->setNeighbour(Terrain::NEIGHBOUR_WEST, mTerrain, neighbourRecalc);
 
-
-
-
-		/*
 		// create a few entities on the terrain
 		for (int i = 0; i < 20; ++i)
 		{
 			Entity* e = mSceneMgr->createEntity("ninja.mesh");
 			Real x = mTerrainPos.x + Math::RangeRandom(-2500, 2500);
 			Real z = mTerrainPos.z + Math::RangeRandom(-2500, 2500);
-			Real y = mTerrain->getHeightAtWorldPosition(Vector3(x, 0, z));
+			Real y = mTerrainGroup->getHeightAtWorldPosition(Vector3(x, 0, z));
 			mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(x, y, z))->attachObject(e);
 		}
-		*/
 
 
 
