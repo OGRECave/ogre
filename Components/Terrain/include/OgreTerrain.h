@@ -252,6 +252,9 @@ namespace Ogre
 		public WorkQueue::RequestHandler, public WorkQueue::ResponseHandler, public TerrainAlloc
 	{
 	public:
+		/** Constructor.
+		@param sm The SceneManager to use.
+		*/
 		Terrain(SceneManager* sm);
 		virtual ~Terrain();
 
@@ -348,6 +351,11 @@ namespace Ogre
 			*/
 			float* inputFloat;
 
+			/** If neither inputImage or inputFloat are supplied, the constant
+				height at which the initial terrain should be created (flat). 
+			*/
+			float constantHeight;
+
 			/** Whether this structure should 'own' the input data (inputImage and
 				inputFloat), and therefore delete it on destruction. 
 				The default is false so you have to manage your own memory. If you
@@ -382,11 +390,53 @@ namespace Ogre
 				, worldSize(1000)
 				, inputImage(0)
 				, inputFloat(0)
+				, constantHeight(0)
 				, deleteInputData(false)
 				, inputScale(1.0)
 				, inputBias(0.0)
 			{
 
+			}
+
+			ImportData(const ImportData& rhs)
+			{
+				*this = rhs;
+			}
+
+			ImportData& operator=(const ImportData& rhs)
+			{
+				// basic copy
+				terrainAlign = rhs.terrainAlign;
+				terrainSize = rhs.terrainSize;
+				maxBatchSize = rhs.maxBatchSize;
+				minBatchSize = rhs.minBatchSize;
+				pos = rhs.pos;
+				worldSize = rhs.worldSize;
+				constantHeight = rhs.constantHeight;
+				deleteInputData = rhs.deleteInputData;
+				inputScale = rhs.inputScale;
+				inputBias = rhs.inputBias;
+				layerDeclaration = rhs.layerDeclaration;
+				layerList = rhs.layerList;
+
+				// By-value copies in ownership cases
+				if (rhs.deleteInputData)
+				{
+					if (rhs.inputImage)
+						inputImage = OGRE_NEW Image(*rhs.inputImage);
+					if (rhs.inputFloat)
+					{
+						inputFloat = OGRE_ALLOC_T(float, terrainSize*terrainSize, MEMCATEGORY_GEOMETRY);
+						memcpy(inputFloat, rhs.inputFloat, sizeof(float) * terrainSize*terrainSize);
+					}
+				}
+				else
+				{
+					// re-use pointers
+					inputImage = rhs.inputImage;
+					inputFloat = rhs.inputFloat;
+				}
+				return *this;
 			}
 
 			/// Delete any input data if this struct is set to do so
@@ -472,15 +522,37 @@ namespace Ogre
 		*/
 		Vector3 convertDirection(Space inSpace, const Vector3& inDir, Space outSpace) const;
 
+		/** Set the resource group to use when loading / saving. 
+		@param resGroup Resource group name - you can set this to blank to use
+			the default in TerrainGlobalOptions.
+		*/
+		void setResourceGroup(const String& resGroup) { mResourceGroup = resGroup; }
+
+		/** Get the resource group to use when loading / saving. 
+			If this is blank, the default in TerrainGlobalOptions will be used.
+		*/
+		const String& getResourceGroup() const { return mResourceGroup; }
+
+		/** Get the final resource group to use when loading / saving. 
+		*/
+		const String& _getDerivedResourceGroup() const;
+
 		/** Save terrain data in native form to a standalone file
-		@note
-			This is a fairly basic way of saving the terrain, to save to a
-			file in the resource system, or to insert the terrain data into a
-			shared file, use the StreamSerialiser form.
+		@param filename The name of the file to save to. If this is a filename with
+			no path elements, then it is saved in the first writeable location
+			available in the resource group you have chosen to use for this
+			terrain. If the filename includes path specifiers then it is saved
+			directly instead (but note that it may not be reloadable via the
+			resource system if the location is not on the path). 
 		*/
 		void save(const String& filename);
-		/// Save terrain data in native form to a serializing stream
+		/** Save terrain data in native form to a serializing stream.
+		@remarks
+			If you want complete control over where the terrain data goes, use
+			this form.
+		*/
 		void save(StreamSerialiser& stream);
+
 		/** Prepare the terrain from a standalone file.
 		@note
 		This is safe to do in a background thread as it creates no GPU resources.
@@ -529,6 +601,12 @@ namespace Ogre
 			where the loaded state changes.
 		*/
 		bool isLoaded() const { return mIsLoaded; }
+
+		/** Returns whether this terrain has been modified since it was first loaded / defined. 
+		@remarks
+			This flag is reset on save().
+		*/
+		bool isModified() const { return mModified; }
 
 
 		/** Unload the terrain and free GPU resources. 
@@ -1382,7 +1460,9 @@ namespace Ogre
 		uint16 mWorkQueueChannel;
 		SceneManager* mSceneMgr;
 		SceneNode* mRootNode;
+		String mResourceGroup;
 		bool mIsLoaded;
+		bool mModified;
 		
 		/// The height data (world coords relative to mPos)
 		float* mHeightData;
@@ -1540,6 +1620,8 @@ namespace Ogre
 		static ColourValue msCompositeMapAmbient;
 		static ColourValue msCompositeMapDiffuse;
 		static Real msCompositeMapDistance;
+		static String msResourceGroup;
+
 	public:
 
 
@@ -1694,6 +1776,14 @@ namespace Ogre
 		/** Sets the default size of composite maps for a new terrain.
 		*/
 		static void setCompositeMapSize(uint16 sz) { msCompositeMapSize = sz;}
+
+		/** Set the default resource group to use to load / save terrains.
+		*/
+		static void setDefaultResourceGroup(const String& grp) { msResourceGroup = grp; }
+
+		/** Get the default resource group to use to load / save terrains.
+		*/
+		static const String& getDefaultResourceGroup() { return msResourceGroup; }
 
 	};
 

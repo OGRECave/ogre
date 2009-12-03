@@ -40,6 +40,9 @@ namespace Ogre
 		, mAlignment(align)
 		, mTerrainSize(terrainSize)
 		, mTerrainWorldSize(terrainWorldSize)
+		, mFilenamePrefix("terrain")
+		, mFilenameExtension("dat")
+		, mResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
 	{
 		mDefaultImportData.terrainAlign = align;
 		mDefaultImportData.terrainSize = terrainSize;
@@ -75,6 +78,41 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void TerrainGroup::setFilenameConvention(const String& prefix, const String& extension)
+	{
+		mFilenamePrefix = prefix;
+		mFilenameExtension = extension;
+	}
+	//---------------------------------------------------------------------
+	void TerrainGroup::setFilenamePrefix(const String& prefix)
+	{
+		mFilenamePrefix = prefix;
+	}
+	//---------------------------------------------------------------------
+	void TerrainGroup::setFilenameExtension(const String& extension)
+	{
+		mFilenameExtension = extension;
+	}
+	//---------------------------------------------------------------------
+	void TerrainGroup::defineTerrain(long x, long y)
+	{
+		defineTerrain(x, y, generateFilename(x, y));
+	}
+	//---------------------------------------------------------------------
+	void TerrainGroup::defineTerrain(long x, long y, float constantHeight)
+	{
+		TerrainSlot* slot = getTerrainSlot(x, y, true);
+
+		slot->def.useImportData();
+
+		// Copy all settings, but make sure our primary settings are immutable
+		*slot->def.importData = mDefaultImportData;
+		slot->def.importData->constantHeight = constantHeight;
+		slot->def.importData->terrainAlign = mAlignment;
+		slot->def.importData->terrainSize = mTerrainSize;
+		slot->def.importData->worldSize = mTerrainWorldSize;
+	}
+	//---------------------------------------------------------------------
 	void TerrainGroup::defineTerrain(long x, long y, const Terrain::ImportData* importData)
 	{
 		TerrainSlot* slot = getTerrainSlot(x, y, true);
@@ -89,7 +127,7 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void TerrainGroup::defineTerrain(long x, long y, const Image* img /*= 0*/, 
+	void TerrainGroup::defineTerrain(long x, long y, const Image* img, 
 		const Terrain::LayerInstanceList* layers /*= 0*/)
 	{
 		TerrainSlot* slot = getTerrainSlot(x, y, true);
@@ -100,11 +138,8 @@ namespace Ogre
 		*slot->def.importData = mDefaultImportData;
 
 		// Copy all settings, but make sure our primary settings are immutable
-		if(img)
-		{
-			// copy image - this will get deleted by importData
-			slot->def.importData->inputImage = OGRE_NEW Image(*img);
-		}
+		// copy image - this will get deleted by importData
+		slot->def.importData->inputImage = OGRE_NEW Image(*img);
 		if (layers)
 		{
 			// copy (held by value)
@@ -166,6 +201,36 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void TerrainGroup::saveAllTerrains(bool onlyIfModified, bool replaceFilenames)
+	{
+		for (TerrainSlotMap::iterator i = mTerrainSlots.begin(); i != mTerrainSlots.end(); ++i)
+		{
+			TerrainSlot* slot = i->second;
+			if (slot->instance)
+			{
+				Terrain* t = slot->instance;
+				if (t->isLoaded() && 
+					(!onlyIfModified || t->isModified()))
+				{
+					// Overwrite the file names?
+					if (replaceFilenames)
+						slot->def.filename = generateFilename(slot->x, slot->y);
+
+					String filename;
+					if (!slot->def.filename.empty())
+						filename = slot->def.filename;
+					else
+						filename = generateFilename(slot->x, slot->y);
+
+					t->save(filename);
+
+				}
+			}
+			
+		}
+
+	}
+	//---------------------------------------------------------------------
 	void TerrainGroup::loadTerrain(long x, long y, bool synchronous /*= false*/)
 	{
 		TerrainSlot* slot = getTerrainSlot(x, y, false);
@@ -183,6 +248,7 @@ namespace Ogre
 		{
 			// Allocate in main thread so no race conditions
 			slot->instance = OGRE_NEW Terrain(mSceneManager);
+			slot->instance->setResourceGroup(mResourceGroup);
 
 			LoadRequest req;
 			req.slot = slot;
@@ -245,13 +311,38 @@ namespace Ogre
 			return 0;
 	}
 	//---------------------------------------------------------------------
-	TerrainGroup::TerrainGroupRayResult TerrainGroup::rayIntersects(const Ray& ray, Real distanceLimit /* = 0*/) const 
+	float TerrainGroup::getHeightAtWorldPosition(Real x, Real y, Real z, Terrain** ppTerrain /* = 0*/)
+	{
+		return getHeightAtWorldPosition(Vector3(x, y, z), ppTerrain);
+
+	}
+	//---------------------------------------------------------------------
+	float TerrainGroup::getHeightAtWorldPosition(const Vector3& pos, Terrain** ppTerrain /*= 0*/)
+	{
+		long x, y;
+		convertWorldPositionToTerrainSlot(pos, &x, &y);
+		TerrainSlot* slot = getTerrainSlot(x, y);
+		if (slot && slot->instance && slot->instance->isLoaded())
+		{
+			if (ppTerrain)
+				*ppTerrain = slot->instance;
+			return slot->instance->getHeightAtWorldPosition(pos);
+		}
+		else
+		{
+			if (ppTerrain)
+				*ppTerrain = 0;
+			return 0;
+		}
+	}
+	//---------------------------------------------------------------------
+	TerrainGroup::RayResult TerrainGroup::rayIntersects(const Ray& ray, Real distanceLimit /* = 0*/) const 
 	{
 		long curr_x, curr_z;
 		convertWorldPositionToTerrainSlot(ray.getOrigin(), &curr_x, &curr_z);
 		TerrainSlot* slot = getTerrainSlot(curr_x, curr_z);
 		Real dist = 0;
-		TerrainGroupRayResult result(false, 0, Vector3::ZERO);
+		RayResult result(false, 0, Vector3::ZERO);
 
 		Vector3 tmp, localRayDir, centreOrigin, offset;
 		// get the middle of the current tile
@@ -406,7 +497,7 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	bool TerrainGroup::isDerivedUpdateInProgress() const
+	bool TerrainGroup::isDerivedDataUpdateInProgress() const
 	{
 		for (TerrainSlotMap::const_iterator i = mTerrainSlots.begin(); i != mTerrainSlots.end(); ++i)
 		{
@@ -523,6 +614,13 @@ namespace Ogre
 		return key;
 
 
+	}
+	//---------------------------------------------------------------------
+	String TerrainGroup::generateFilename(long x, long y) const
+	{
+		StringUtil::StrStreamType str;
+		str << mFilenamePrefix << "_" << packIndex(x, y) << "." << mFilenameExtension;
+		return str.str();
 	}
 	//---------------------------------------------------------------------
 	Vector3 TerrainGroup::getTerrainSlotPosition(long x, long y)

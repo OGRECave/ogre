@@ -97,6 +97,7 @@ namespace Ogre
 	ColourValue TerrainGlobalOptions::msCompositeMapAmbient = ColourValue::White;
 	ColourValue TerrainGlobalOptions::msCompositeMapDiffuse = ColourValue::White;
 	Real TerrainGlobalOptions::msCompositeMapDistance = 4000;
+	String TerrainGlobalOptions::msResourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 	//---------------------------------------------------------------------
 	void TerrainGlobalOptions::setDefaultMaterialGenerator(TerrainMaterialGeneratorPtr gen)
 	{
@@ -119,7 +120,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	Terrain::Terrain(SceneManager* sm)
 		: mSceneMgr(sm)
+		, mResourceGroup(StringUtil::BLANK)
 		, mIsLoaded(false)
+		, mModified(false)
 		, mHeightData(0)
 		, mDeltaData(0)
 		, mPos(Vector3::ZERO)
@@ -235,16 +238,37 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::save(const String& filename)
 	{
-		std::fstream fs;
-		fs.open(filename.c_str(), std::ios::out | std::ios::binary);
-		if (!fs)
-			OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, 
+		// Does this file include path specifiers?
+		String path, basename;
+		StringUtil::splitFilename(filename, basename, path);
+
+		// no path elements, try the resource system first
+		DataStreamPtr stream;
+		if (path.empty())
+		{
+			try
+			{
+				stream = ResourceGroupManager::getSingleton().createResource(
+					filename, _getDerivedResourceGroup(), true);
+			}
+			catch (...) {}
+
+		}
+
+		if (stream.isNull())		
+		{
+			// save direct in filesystem
+			std::fstream fs;
+			fs.open(filename.c_str(), std::ios::out | std::ios::binary);
+			if (!fs)
+				OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, 
 				"Can't open " + filename + " for writing", __FUNCTION__);
 
-		DataStreamPtr stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename, &fs, false));
+			stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename, &fs, false));
+		}
+
 		StreamSerialiser ser(stream);
 		save(ser);
-
 	}
 	//---------------------------------------------------------------------
 	void Terrain::save(StreamSerialiser& stream)
@@ -450,16 +474,27 @@ namespace Ogre
 		// TODO - write deltas
 
 		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
+
+		mModified = false;
+
+	}
+	//---------------------------------------------------------------------
+	const String& Terrain::_getDerivedResourceGroup() const
+	{
+		if (mResourceGroup.empty())
+			return TerrainGlobalOptions::getDefaultResourceGroup();
+		else
+			return mResourceGroup;
 	}
 	//---------------------------------------------------------------------
 	bool Terrain::prepare(const String& filename)
 	{
 		DataStreamPtr stream;
 		if (ResourceGroupManager::getSingleton().resourceExists(
-				ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, filename))
+				_getDerivedResourceGroup(), filename))
 		{
 			stream = ResourceGroupManager::getSingleton().openResource(
-				filename, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+				filename, _getDerivedResourceGroup());
 		}
 		else
 		{
@@ -740,7 +775,15 @@ namespace Ogre
 		else
 		{
 			// start with flat terrain
-			memset(mHeightData, 0, sizeof(float) * mSize * mSize);
+			if (importData.constantHeight == 0)
+				memset(mHeightData, 0, sizeof(float) * mSize * mSize);
+			else
+			{
+				float* pFloat = mHeightData;
+				for (long i = 0 ; i < mSize * mSize; ++i)
+					*pFloat++ = importData.constantHeight;
+
+			}
 		}
 
 		mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
@@ -975,6 +1018,7 @@ namespace Ogre
 		mMaterialGenerator->requestOptions(this);
 
 		mIsLoaded = true;
+		mModified = false;
 
 	}
 	//---------------------------------------------------------------------
@@ -987,6 +1031,8 @@ namespace Ogre
 			mQuadTree->unload();
 
 		mIsLoaded = false;
+		mModified = false;
+
 	}
 	//---------------------------------------------------------------------
 	void Terrain::unprepare()
@@ -1608,11 +1654,15 @@ namespace Ogre
 		mDirtyGeometryRectForNeighbours.merge(rect);
 		mDirtyDerivedDataRect.merge(rect);
 		mCompositeMapDirtyRect.merge(rect);
+
+		mModified = true;
+
 	}
 	//---------------------------------------------------------------------
 	void Terrain::_dirtyCompositeMapRect(const Rect& rect)
 	{
 		mCompositeMapDirtyRect.merge(rect);
+		mModified = true;
 	}
 	//---------------------------------------------------------------------
 	void Terrain::update(bool synchronous)
@@ -1637,6 +1687,7 @@ namespace Ogre
 	{
 		if (!mDirtyDerivedDataRect.isNull() || !mDirtyLightmapFromNeighboursRect.isNull())
 		{
+			mModified = true;
 			if (mDerivedDataUpdateInProgress)
 			{
 				// Don't launch many updates, instead wait for the other one 
@@ -2390,7 +2441,7 @@ namespace Ogre
 			// in normal circumstances, so we don't want TU_DYNAMIC. Also we will 
 			// read it (if we've cleared local temp areas) so no WRITE_ONLY
 			mBlendTextureList[i] = TextureManager::getSingleton().createManual(
-				msBlendTextureGenerator.generate(), ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+				msBlendTextureGenerator.generate(), _getDerivedResourceGroup(), 
 				TEX_TYPE_2D, mLayerBlendMapSize, mLayerBlendMapSize, 1, 0, fmt, TU_STATIC);
 
 			mLayerBlendMapSizeActual = mBlendTextureList[i]->getWidth();
@@ -2438,7 +2489,7 @@ namespace Ogre
 		{
 			// create
 			mTerrainNormalMap = TextureManager::getSingleton().createManual(
-				mMaterialName + "/nm", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+				mMaterialName + "/nm", _getDerivedResourceGroup(), 
 				TEX_TYPE_2D, mSize, mSize, 1, 0, PF_BYTE_RGB, TU_STATIC);
 
 			// Upload loaded normal data if present
@@ -3002,6 +3053,7 @@ namespace Ogre
 		// All done in the render thread
 		if (mCompositeMapRequired && !mCompositeMapDirtyRect.isNull())
 		{
+			mModified = true;
 			createOrDestroyGPUCompositeMap();
 			if (mCompositeMapDirtyRectLightmapUpdate &&
 				(mCompositeMapDirtyRect.width() < mSize	|| mCompositeMapDirtyRect.height() < mSize))
@@ -3075,7 +3127,7 @@ namespace Ogre
 		{
 			// create
 			mColourMap = TextureManager::getSingleton().createManual(
-				mMaterialName + "/cm", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+				mMaterialName + "/cm", _getDerivedResourceGroup(), 
 				TEX_TYPE_2D, mGlobalColourMapSize, mGlobalColourMapSize, MIP_DEFAULT, PF_BYTE_RGB);
 
 			if (mCpuColourMapStorage)
@@ -3104,7 +3156,7 @@ namespace Ogre
 		{
 			// create
 			mLightmap = TextureManager::getSingleton().createManual(
-				mMaterialName + "/lm", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+				mMaterialName + "/lm", _getDerivedResourceGroup(), 
 				TEX_TYPE_2D, mLightmapSize, mLightmapSize, 0, PF_L8, TU_STATIC);
 
 			mLightmapSizeActual = mLightmap->getWidth();
@@ -3145,7 +3197,7 @@ namespace Ogre
 		{
 			// create
 			mCompositeMap = TextureManager::getSingleton().createManual(
-				mMaterialName + "/comp", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+				mMaterialName + "/comp", _getDerivedResourceGroup(), 
 				TEX_TYPE_2D, mCompositeMapSize, mCompositeMapSize, 0, PF_BYTE_RGBA, TU_STATIC);
 
 			mCompositeMapSizeActual = mCompositeMap->getWidth();

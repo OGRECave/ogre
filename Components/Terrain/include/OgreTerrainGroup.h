@@ -119,9 +119,59 @@ namespace Ogre
 		*/
 		virtual SceneManager* getSceneManager() const { return mSceneManager; }
 
+		/** Set the naming convention for file names in this terrain group. 
+		@remarks
+			You can more easily generate file names for saved / loaded terrain slots
+			if you define a naming prefix. When you call saveAllTerrains(), all the
+			terrain instances currently loaded will be saved to a file named
+			&lt;prefix&gt;_&lt;index&gt;.&lt;extension&gt;, where &lt;index&gt; is
+			given by packing the x and y coordinates of the entry into a 32-bit
+			index (@see packIndex). 
+		*/
+		void setFilenameConvention(const String& prefix, const String& extension);
+		/// @see setFilenameConvention
+		void setFilenamePrefix(const String& prefix);
+		/// @see setFilenameConvention
+		void setFilenameExtension(const String& extension);
+		/// @see setFilenameConvention
+		const String& getFilenamePrefix() const { return mFilenamePrefix; }
+		/// @see setFilenameConvention
+		const String& getFilenameExtension() const { return mFilenameExtension; }
+
+		/** Set the resource group in which files will be located. */
+		void setResourceGroup(const String& grp) { mResourceGroup = grp; }
+		/** Get the resource group in which files will be located. */
+		const String& getResourceGroup() const { return mResourceGroup; }
+		/** Define a 'slot' in the terrain grid - in this case to be loaded from 
+			a generated file name.
+		@remarks
+			At this stage the terrain instance isn't actually present in the grid, 
+			you're merely expressing an intention for it to take its place there
+			once it's loaded. The reason we do it like this is to support
+			background preparation of this terrain instance. 
+		@note This method assumes that you want a file name to be generated from 
+			the naming convention that you have supplied (@see setFilenameConvention).
+			If a file of that name isn't found during loading, then a flat terrain is
+			created instead at height 0.
+		@param x, y The coordinates of the terrain slot relative to the centre slot (signed).
+		*/
+		virtual void defineTerrain(long x, long y);
+
+		/** Define a 'slot' in the terrain grid - in this case a flat terrain.
+		@remarks
+			At this stage the terrain instance isn't actually present in the grid, 
+			you're merely expressing an intention for it to take its place there
+			once it's loaded. The reason we do it like this is to support
+			background preparation of this terrain instance. 
+		@param x, y The coordinates of the terrain slot relative to the centre slot (signed).
+		@param constantHeight The constant, uniform height that you want the terrain
+			to start at
+		*/
+		virtual void defineTerrain(long x, long y, float constantHeight);
+
 		/** Define the content of a 'slot' in the terrain grid.
 		@remarks
-			At this stage the terrain instance isn't actually present in the drid, 
+			At this stage the terrain instance isn't actually present in the grid, 
 			you're merely expressing an intention for it to take its place there
 			once it's loaded. The reason we do it like this is to support
 			background preparation of this terrain instance. 
@@ -133,36 +183,35 @@ namespace Ogre
 
 		/** Define the content of a 'slot' in the terrain grid.
 		@remarks
-			At this stage the terrain instance isn't actually present in the drid, 
+			At this stage the terrain instance isn't actually present in the grid, 
 			you're merely expressing an intention for it to take its place there
 			once it's loaded. The reason we do it like this is to support
 			background preparation of this terrain instance. 
 		@param x, y The coordinates of the terrain slot relative to the centre slot (signed).
-		@param img Optional heightfield image (if not supplied, terrain will be flat)
-			- this data is copied during the call so  you may destroy your copy afterwards.
+		@param img Heightfield image - this data is copied during the call so  you may destroy your copy afterwards.
 		@param layers Optional texture layers to use (if not supplied, default import
 			data layers will be used) - this data is copied during the
 			call so  you may destroy your copy afterwards.
 		*/
-		virtual void defineTerrain(long x, long y, const Image* img = 0, const Terrain::LayerInstanceList* layers = 0);
+		virtual void defineTerrain(long x, long y, const Image* img, const Terrain::LayerInstanceList* layers = 0);
 
 		/** Define the content of a 'slot' in the terrain grid.
 		@remarks
-			At this stage the terrain instance isn't actually present in the drid, 
+			At this stage the terrain instance isn't actually present in the grid, 
 			you're merely expressing an intention for it to take its place there
 			once it's loaded. The reason we do it like this is to support
 			background preparation of this terrain instance. 
 		@param x, y The coordinates of the terrain slot relative to the centre slot (signed).
-		@param pFloat Optional heights array (if not supplied, terrain will be flat)
+		@param pFloat Heights array 
 		@param layers Optional texture layers to use (if not supplied, default import
 			data layers will be used) - this data is copied during the
 			call so  you may destroy your copy afterwards.
 		*/
-		virtual void defineTerrain(long x, long y, const float* pFloat = 0, const Terrain::LayerInstanceList* layers = 0);
+		virtual void defineTerrain(long x, long y, const float* pFloat, const Terrain::LayerInstanceList* layers = 0);
 
 		/** Define the content of a 'slot' in the terrain grid.
 		@remarks
-			At this stage the terrain instance isn't actually present in the drid, 
+			At this stage the terrain instance isn't actually present in the grid, 
 			you're merely expressing an intention for it to take its place there
 			once it's loaded. The reason we do it like this is to support
 			background preparation of this terrain instance. 
@@ -212,6 +261,22 @@ namespace Ogre
 		/** Remove all terrain instances. 
 		*/
 		void removeAllTerrains();
+
+		/** Save all terrain instances using the assigned file names, or
+			via the filename convention.
+		@see setFilenameConvention
+		@see setResourceGroup
+		@param onlyIfModified If true, only terrains that have been modified since load(),
+			or since the last save(), will be saved. You want to set this to true if
+			you loaded the terrain from these same files, but false if you 
+			defined them using some other input data since the files wouldn't exist.
+		@param replaceManualFilenames If true, replaces any manually defined filenames
+			in the TerrainSlotDefinition with the generated names from the convention.
+			This is recommended since it makes everything more consistent, although
+			you might want to use manual filenames in the original definition to import 
+			previously separate data. 
+		*/
+		void saveAllTerrains(bool onlyIfModified, bool replaceManualFilenames = true);
 		
 		/** Definition of how to populate a 'slot' in the terrain group.
 		*/
@@ -289,7 +354,7 @@ namespace Ogre
 		
 		/** Result from a terrain ray intersection with the terrain group. 
 		*/
-		struct _OgreTerrainExport TerrainGroupRayResult
+		struct _OgreTerrainExport RayResult
 		{
 			/// Whether an intersection occurred
 			bool hit;
@@ -298,10 +363,28 @@ namespace Ogre
 			/// Position at which the intersection occurred
 			Vector3 position;
 
-			TerrainGroupRayResult(bool _hit, Terrain* _terrain, const Vector3& _pos)
+			RayResult(bool _hit, Terrain* _terrain, const Vector3& _pos)
 				: hit(_hit), terrain(_terrain), position(_pos) {}
 		};
 		
+		/** Get the height data for a given world position (projecting the point
+		down on to the terrain underneath). 
+		@param x, y,z Position in world space. Positions will be clamped to the edge
+		of the terrain
+		@param ppTerrain Pointer to a pointer to a terrain which will be completed
+			with the terrain that was found to resolve this query, or null if none were
+		*/
+		float getHeightAtWorldPosition(Real x, Real y, Real z, Terrain** ppTerrain = 0);
+
+		/** Get the height data for a given world position (projecting the point
+		down on to the terrain). 
+		@param pos Position in world space. Positions will be clamped to the edge
+		of the terrain
+		@param ppTerrain Pointer to a pointer to a terrain which will be completed
+		with the terrain that was found to resolve this query, or null if none were
+		*/
+		float getHeightAtWorldPosition(const Vector3& pos, Terrain** ppTerrain = 0);
+
 		/** Test for intersection of a given ray with any terrain in the group. If the ray hits
 		 a terrain, the point of intersection and terrain instance is returned.
 		 @param ray The ray to test for intersection
@@ -311,7 +394,7 @@ namespace Ogre
 		 @remarks This can be called from any thread as long as no parallel write to
 		 the terrain data occurs.
 		 */
-		TerrainGroupRayResult rayIntersects(const Ray& ray, Real distanceLimit = 0) const; 
+		RayResult rayIntersects(const Ray& ray, Real distanceLimit = 0) const; 
 		
 		typedef vector<Terrain*>::type TerrainList; 
 		/** Test intersection of a box with the terrain. 
@@ -347,10 +430,10 @@ namespace Ogre
 		*/
 		void convertTerrainSlotToWorldPosition(long x, long y, Vector3* pos) const;
 		
-		/** Calls Terrain::isDerivedUpdateInProgress on each loaded instance and returns true
+		/** Calls Terrain::isDerivedDataUpdateInProgress on each loaded instance and returns true
 			if any of them are undergoing a derived update.
 		*/
-		bool isDerivedUpdateInProgress() const;
+		bool isDerivedDataUpdateInProgress() const;
 
 		/// Packed map, signed 16 bits for each axis from -32767 to +32767
 		typedef map<uint32, TerrainSlot*>::type TerrainSlotMap;
@@ -371,6 +454,12 @@ namespace Ogre
 		/// WorkQueue::ResponseHandler override
 		void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
 
+		/// Convert coordinates to a packed integer index
+		uint32 packIndex(long x, long y) const;
+
+		/// Generate a file name based on the current naming convention
+		String generateFilename(long x, long y) const;
+
 		static const uint16 WORKQUEUE_LOAD_REQUEST;
 
 	protected:
@@ -382,9 +471,10 @@ namespace Ogre
 		Vector3 mOrigin;
 		TerrainSlotMap mTerrainSlots;
 		uint16 mWorkQueueChannel;
+		String mFilenamePrefix;
+		String mFilenameExtension;
+		String mResourceGroup;
 		
-		/// Convert coordinates to a packed integer index
-		uint32 packIndex(long x, long y) const;
 		/// Get the position of a terrain instance
 		Vector3 getTerrainSlotPosition(long x, long y);
 		/// Retrieve a slot, potentially allocate one
