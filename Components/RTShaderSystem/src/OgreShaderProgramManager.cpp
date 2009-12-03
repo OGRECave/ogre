@@ -372,45 +372,54 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 	// Case the program doesn't exist yet.
 	if (pGpuProgram.isNull())
 	{
-		const String  programFileName = cachePath + programName + "." + language;	
-		std::ifstream programFile;
-		bool		  writeFile = true;
-
-
-		// Check if program file already exist.
-		programFile.open(programFileName.c_str());
-
-		// Case no matching file found -> we have to write it.
-		if (!programFile)
-		{
-			programWriter = ProgramWriterManager::getSingletonPtr()->createProgramWriter(language);
-			mProgramWritersMap[language] = programWriter;
-			writeFile = true;
-		}
-		else
-		{
-			writeFile = false;
-			programFile.close();
-		}
-
-		// Case we have to write the program to a file.
-		if (writeFile)
-		{
-			std::ofstream outFile(programFileName.c_str());
-
-			if (!outFile)
-				return GpuProgramPtr();
-
-			outFile << sourceCodeStringStream.str();
-			outFile.close();
-		}
-
 		// Create new GPU program.
 		pGpuProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
 			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, language, shaderProgram->getType());
 
+		// Case cache directory specified -> create program from file.
+		if (cachePath.empty() == false)
+		{
+			const String  programFileName = cachePath + programName + "." + language;	
+			std::ifstream programFile;
+			bool		  writeFile = true;
 
-		pGpuProgram->setSourceFile(programFileName);
+
+			// Check if program file already exist.
+			programFile.open(programFileName.c_str());
+
+			// Case no matching file found -> we have to write it.
+			if (!programFile)
+			{			
+				writeFile = true;
+			}
+			else
+			{
+				writeFile = false;
+				programFile.close();
+			}
+
+			// Case we have to write the program to a file.
+			if (writeFile)
+			{
+				std::ofstream outFile(programFileName.c_str());
+
+				if (!outFile)
+					return GpuProgramPtr();
+
+				outFile << sourceCodeStringStream.str();
+				outFile.close();
+			}
+
+			pGpuProgram->setSourceFile(programFileName);
+		}
+
+		// No cache directory specified -> create program from system memory.
+		else
+		{
+			pGpuProgram->setSource(sourceCodeStringStream.str());
+		}
+		
+		
 		pGpuProgram->setParameter("entry_point", shaderProgram->getEntryPointFunction()->getName());
 
 		// HLSL program requires specific target profile settings - we have to split the profile string.
