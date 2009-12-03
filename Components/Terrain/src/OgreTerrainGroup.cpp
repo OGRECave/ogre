@@ -176,6 +176,7 @@ namespace Ogre
 		slot->def.importData->terrainAlign = mAlignment;
 		slot->def.importData->terrainSize = mTerrainSize;
 		slot->def.importData->worldSize = mTerrainWorldSize;
+
 	}
 	//---------------------------------------------------------------------
 	void TerrainGroup::defineTerrain(long x, long y, const String& filename)
@@ -249,7 +250,6 @@ namespace Ogre
 			// Allocate in main thread so no race conditions
 			slot->instance = OGRE_NEW Terrain(mSceneManager);
 			slot->instance->setResourceGroup(mResourceGroup);
-			slot->instance->setPosition(getTerrainSlotPosition(slot->x, slot->y));
 
 			LoadRequest req;
 			req.slot = slot;
@@ -347,7 +347,7 @@ namespace Ogre
 
 		Vector3 tmp, localRayDir, centreOrigin, offset;
 		// get the middle of the current tile
-		convertTerrainSlotToWorldPosition(curr_z, curr_z, &centreOrigin);
+		convertTerrainSlotToWorldPosition(curr_x, curr_z, &centreOrigin);
 		offset = ray.getOrigin() - centreOrigin;
 		localRayDir = ray.getDirection();
 		switch (getAlignment())
@@ -377,8 +377,8 @@ namespace Ogre
 		offset /= mTerrainWorldSize;
 		// this is our counter moving away from the 'current' square
 		Vector3 inc(Math::Abs(localRayDir.x), Math::Abs(localRayDir.y), Math::Abs(localRayDir.z));
-		long xdir = localRayDir.x > 0.0f ? 1 : 0;
-		long zdir = localRayDir.z > 0.0f ? 1 : 0;
+		long xdir = localRayDir.x > 0.0f ? 1 : -1;
+		long zdir = localRayDir.z > 0.0f ? 1 : -1;
 
 		// find next slot
 		bool keepSearching = true;
@@ -478,7 +478,7 @@ namespace Ogre
 		// 0,0 terrain is centred at the origin
 		Vector3 terrainPos;
 		// convert to standard xy base (z up)
-		Terrain::convertWorldToTerrainAxes(mAlignment, pos, &terrainPos);
+		Terrain::convertWorldToTerrainAxes(mAlignment, pos - mOrigin, &terrainPos);
 		// centre
 		terrainPos.x += mTerrainWorldSize * 0.5f;
 		terrainPos.y += mTerrainWorldSize * 0.5f;
@@ -492,11 +492,9 @@ namespace Ogre
 	void TerrainGroup::convertTerrainSlotToWorldPosition(long x, long y, Vector3* pos) const
 	{
 		Vector3 terrainPos(x * mTerrainWorldSize, y * mTerrainWorldSize, 0);
-		// adjust for centre
-		terrainPos.x -= mTerrainWorldSize * 0.5f;
-		terrainPos.y -= mTerrainWorldSize * 0.5f;
 
 		Terrain::convertTerrainToWorldAxes(mAlignment, terrainPos, pos);
+		*pos += mOrigin;
 
 
 	}
@@ -573,8 +571,13 @@ namespace Ogre
 
 		if (res->succeeded())
 		{
+			TerrainSlot* slot = lreq.slot;
+			Terrain* terrain = slot->instance;
 			// do final load now we've prepared in the background
-			lreq.slot->instance->load();
+			// we must set the position
+			terrain->setPosition(getTerrainSlotPosition(slot->x, slot->y));
+
+			terrain->load();
 
 			// hook up with neighbours
 			for (int i = -1; i <= 1; ++i)
@@ -582,7 +585,7 @@ namespace Ogre
 				for (int j = -1; j <= 1; ++j)
 				{
 					if (i != 0 || j != 0)
-						connectNeighbour(lreq.slot, i, j);
+						connectNeighbour(slot, i, j);
 				}
 
 			}

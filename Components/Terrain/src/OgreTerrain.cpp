@@ -204,7 +204,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	AxisAlignedBox Terrain::getWorldAABB() const
 	{
-		Matrix4 m;
+		Matrix4 m = Matrix4::IDENTITY;
 		m.setTrans(getPosition());
 
 		AxisAlignedBox ret = getAABB();
