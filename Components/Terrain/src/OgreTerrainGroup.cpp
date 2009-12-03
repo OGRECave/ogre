@@ -249,6 +249,7 @@ namespace Ogre
 			// Allocate in main thread so no race conditions
 			slot->instance = OGRE_NEW Terrain(mSceneManager);
 			slot->instance->setResourceGroup(mResourceGroup);
+			slot->instance->setPosition(getTerrainSlotPosition(slot->x, slot->y));
 
 			LoadRequest req;
 			req.slot = slot;
@@ -384,6 +385,9 @@ namespace Ogre
 		int numGaps = 0;
 		while(keepSearching)
 		{
+			if (Math::RealEqual(inc.x, 0.0f) && Math::RealEqual(inc.z, 0.0f))
+				keepSearching = false;
+
 			while (!slot && keepSearching)
 			{
 				++numGaps;
