@@ -342,7 +342,17 @@ namespace Ogre
 		DXGI_FORMAT d3dPF = this->_chooseD3DFormat();
 
 		// Use D3DX to help us create the texture, this way it can adjust any relevant sizes
-		UINT numMips = static_cast<UINT>(mNumRequestedMipmaps + 1);
+		UINT numMips = 0;
+		
+		if (mNumRequestedMipmaps == MIP_UNLIMITED)
+		{
+			numMips = 0;
+			mNumMipmaps = 0; // TODO - get this value from the created texture
+		}
+		else
+		{
+			numMips = static_cast<UINT>(mNumRequestedMipmaps + 1);
+		}
 
 		D3D10_TEXTURE2D_DESC desc;
 		desc.Width			= static_cast<UINT>(mSrcWidth);
