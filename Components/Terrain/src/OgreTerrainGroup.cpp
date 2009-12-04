@@ -47,6 +47,9 @@ namespace Ogre
 		mDefaultImportData.terrainAlign = align;
 		mDefaultImportData.terrainSize = terrainSize;
 		mDefaultImportData.worldSize = terrainWorldSize;
+		// by default we delete input data because we copy it, unless user
+		// passes us an ImportData where they explicitly don't want it copied
+		mDefaultImportData.deleteInputData = true;
 
 		WorkQueue* wq = Root::getSingleton().getWorkQueue();
 		mWorkQueueChannel = wq->getChannel("Ogre/TerrainGroup");
@@ -373,12 +376,19 @@ namespace Ogre
 			offset.z = -offset.z;
 			break;
 		}
-		// Normalise the offset  based on the world size of a square
+		// Normalise the offset  based on the world size of a square, and rebase to the bottom left
 		offset /= mTerrainWorldSize;
+		offset += 0.5f;
 		// this is our counter moving away from the 'current' square
 		Vector3 inc(Math::Abs(localRayDir.x), Math::Abs(localRayDir.y), Math::Abs(localRayDir.z));
 		long xdir = localRayDir.x > 0.0f ? 1 : -1;
 		long zdir = localRayDir.z > 0.0f ? 1 : -1;
+
+		// We're always counting from 0 to 1 regardless of what direction we're heading
+		if (xdir < 0)
+			offset.x = 1.0f - offset.x;
+		if (zdir < 0)
+			offset.z = 1.0f - offset.z;
 
 		// find next slot
 		bool keepSearching = true;
@@ -405,7 +415,7 @@ namespace Ogre
 					curr_x += xdir;
 					offset.x -= 1.0f;
 				}
-				if (offset.z >= 1.0f)
+				else if (offset.z >= 1.0f)
 				{
 					curr_z += zdir;
 					offset.z -= 1.0f;
