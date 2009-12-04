@@ -3242,6 +3242,8 @@ namespace Ogre
 	{
 		if (mNeighbours[index] != neighbour)
 		{
+			assert(neighbour != this && "Can't set self as own neighbour!");
+
 			// detach existing
 			if (mNeighbours[index] && notifyOther)
 				mNeighbours[index]->setNeighbour(getOppositeNeighbour(index), 0, false, false);

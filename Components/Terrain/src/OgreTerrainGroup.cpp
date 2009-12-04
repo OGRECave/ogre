@@ -622,8 +622,13 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	uint32 TerrainGroup::packIndex(long x, long y) const
 	{
-		int16 x16 = static_cast<int16>(x);
-		int16 y16 = static_cast<int16>(y);
+		// Convert to signed 16-bit so sign bit is in bit 15
+		int16 xs16 = static_cast<int16>(x);
+		int16 ys16 = static_cast<int16>(y);
+
+		// convert to unsigned because we do not want to propagate sign bit to 32-bits
+		uint16 x16 = static_cast<uint16>(xs16);
+		uint16 y16 = static_cast<uint16>(ys16);
 
 		uint32 key = 0;
 		key = (x16 << 16) | y16;
