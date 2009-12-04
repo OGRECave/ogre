@@ -641,7 +641,9 @@ namespace Ogre
 	String TerrainGroup::generateFilename(long x, long y) const
 	{
 		StringUtil::StrStreamType str;
-		str << mFilenamePrefix << "_" << packIndex(x, y) << "." << mFilenameExtension;
+		str << mFilenamePrefix << "_" << 
+			std::setw(8) << std::setfill('0') << std::hex << packIndex(x, y) << 
+			"." << mFilenameExtension;
 		return str.str();
 	}
 	//---------------------------------------------------------------------
