@@ -410,41 +410,22 @@ protected:
 			}
 			else
 			{
-				Terrain::ImportData imp;
-				createTerrainImportData(x % 2 != 0, y % 2 != 0, imp);
-				mTerrainGroup->defineTerrain(x, y, &imp);
+				Image img;
+				getTerrainImage(x % 2 != 0, y % 2 != 0, img);
+				mTerrainGroup->defineTerrain(x, y, &img);
 				mTerrainsImported = true;
 			}
 
 		}
 	}
 
-	void createTerrainImportData(bool flipX, bool flipY, Terrain::ImportData& imp)
+	void getTerrainImage(bool flipX, bool flipY, Image& img)
 	{
-		Image* img = OGRE_NEW Image();
-		img->load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		if (flipX)
-			img->flipAroundY();
+			img.flipAroundY();
 		if (flipY)
-			img->flipAroundX();
-
-		imp.inputImage = img;
-		imp.terrainSize = TERRAIN_SIZE;
-		imp.worldSize = TERRAIN_WORLD_SIZE;
-		imp.inputScale = 600;
-		imp.minBatchSize = 33;
-		imp.maxBatchSize = 65;
-		// textures
-		imp.layerList.resize(3);
-		imp.layerList[0].worldSize = 100;
-		imp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
-		imp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
-		imp.layerList[1].worldSize = 30;
-		imp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
-		imp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
-		imp.layerList[2].worldSize = 200;
-		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
-		imp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
+			img.flipAroundX();
 
 	}
 
@@ -493,6 +474,44 @@ protected:
 
 	}
 
+	void configureTerrainDefaults(Light* l)
+	{
+		// Configure global
+		TerrainGlobalOptions::setMaxPixelError(8);
+		// testing composite map
+		TerrainGlobalOptions::setCompositeMapDistance(3000);
+		//TerrainGlobalOptions::setUseRayBoxDistanceCalculation(true);
+		//TerrainGlobalOptions::getDefaultMaterialGenerator()->setDebugLevel(1);
+		//TerrainGlobalOptions::setLightMapSize(256);
+		//static_cast<TerrainMaterialGeneratorA::SM2Profile*>(TerrainGlobalOptions::getDefaultMaterialGenerator()->getActiveProfile())
+		//	->setLightmapEnabled(false);
+		// Important to set these so that the terrain knows what to use for derived (non-realtime) data
+		TerrainGlobalOptions::setLightMapDirection(l->getDerivedDirection());
+		TerrainGlobalOptions::setCompositeMapAmbient(mSceneMgr->getAmbientLight());
+		//TerrainGlobalOptions::setCompositeMapAmbient(ColourValue::Red);
+		TerrainGlobalOptions::setCompositeMapDiffuse(l->getDiffuseColour());
+
+		// Configure default import settings for if we use imported image
+		Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
+		defaultimp.terrainSize = TERRAIN_SIZE;
+		defaultimp.worldSize = TERRAIN_WORLD_SIZE;
+		defaultimp.inputScale = 600;
+		defaultimp.minBatchSize = 33;
+		defaultimp.maxBatchSize = 65;
+		// textures
+		defaultimp.layerList.resize(3);
+		defaultimp.layerList[0].worldSize = 100;
+		defaultimp.layerList[0].textureNames.push_back("dirt_grayrocky_diffusespecular.dds");
+		defaultimp.layerList[0].textureNames.push_back("dirt_grayrocky_normalheight.dds");
+		defaultimp.layerList[1].worldSize = 30;
+		defaultimp.layerList[1].textureNames.push_back("grass_green-01_diffusespecular.dds");
+		defaultimp.layerList[1].textureNames.push_back("grass_green-01_normalheight.dds");
+		defaultimp.layerList[2].worldSize = 200;
+		defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
+		defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
+
+
+	}
 
     void createSceneManager()
     {
@@ -575,17 +594,6 @@ protected:
 		lightdir.normalise();
 
 
-		TerrainGlobalOptions::setMaxPixelError(8);
-		// testing composite map
-		TerrainGlobalOptions::setCompositeMapDistance(3000);
-		//TerrainGlobalOptions::setUseRayBoxDistanceCalculation(true);
-		//TerrainGlobalOptions::getDefaultMaterialGenerator()->setDebugLevel(1);
-		//TerrainGlobalOptions::setLightMapSize(256);
-		//static_cast<TerrainMaterialGeneratorA::SM2Profile*>(TerrainGlobalOptions::getDefaultMaterialGenerator()->getActiveProfile())
-		//	->setLightmapEnabled(false);
-
-
-
 		Light* l = mSceneMgr->createLight("tstLight");
 		l->setType(Light::LT_DIRECTIONAL);
 		l->setDirection(lightdir);
@@ -595,15 +603,11 @@ protected:
 		mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
 
-		// Important to set these so that the terrain knows what to use for derived (non-realtime) data
-		TerrainGlobalOptions::setLightMapDirection(lightdir);
-		TerrainGlobalOptions::setCompositeMapAmbient(mSceneMgr->getAmbientLight());
-		//TerrainGlobalOptions::setCompositeMapAmbient(ColourValue::Red);
-		TerrainGlobalOptions::setCompositeMapDiffuse(l->getDiffuseColour());
-		
 		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
 		mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
 		mTerrainGroup->setOrigin(mTerrainPos);
+
+		configureTerrainDefaults(l);
 
 		defineTerrain(0, 0, blankTerrain);
 		defineTerrain(1, 0, blankTerrain);
@@ -625,6 +629,7 @@ protected:
 		mTerrainGroup->freeTemporaryResources();
 
 
+		/*
 		// create a few entities on the terrain
 		for (int i = 0; i < 20; ++i)
 		{
@@ -634,7 +639,7 @@ protected:
 			Real y = mTerrainGroup->getHeightAtWorldPosition(Vector3(x, 0, z));
 			mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(x, y, z))->attachObject(e);
 		}
-
+		*/
 
 
 		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
