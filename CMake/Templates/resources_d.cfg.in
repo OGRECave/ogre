@@ -7,7 +7,6 @@ FileSystem=@OGRE_MEDIA_DIR_DBG@/thumbnails
 # Rarely used resources should be separately loaded by the
 # samples which require them.
 [Popular]
-FileSystem=@OGRE_MEDIA_DIR_DBG@
 FileSystem=@OGRE_MEDIA_DIR_DBG@/fonts
 FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/programs
 FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/scripts
@@ -25,3 +24,6 @@ Zip=@OGRE_MEDIA_DIR_DBG@/packs/fresneldemo.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/ogretestmap.zip
 Zip=@OGRE_MEDIA_DIR_REL@/packs/ogredance.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/skybox.zip
+
+[General]
+FileSystem=@OGRE_MEDIA_DIR_DBG@
