@@ -487,14 +487,15 @@ namespace Ogre
 	{
 		// 0,0 terrain is centred at the origin
 		Vector3 terrainPos;
-		// convert to standard xy base (z up)
+		// convert to standard xy base (z up), make relative to origin
 		Terrain::convertWorldToTerrainAxes(mAlignment, pos - mOrigin, &terrainPos);
-		// centre
-		terrainPos.x += mTerrainWorldSize * 0.5f;
-		terrainPos.y += mTerrainWorldSize * 0.5f;
 
-		*x = static_cast<long>(terrainPos.x / mTerrainWorldSize);
-		*y = static_cast<long>(terrainPos.y / mTerrainWorldSize);
+		Real offset = mTerrainWorldSize * 0.5f;
+		terrainPos.x += offset;
+		terrainPos.y += offset;
+
+		*x = static_cast<long>(floor(terrainPos.x / mTerrainWorldSize));
+		*y = static_cast<long>(floor(terrainPos.y / mTerrainWorldSize));
 
 
 	}
