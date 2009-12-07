@@ -14,6 +14,7 @@ SamplePlugin=Sample_Grass_d
 SamplePlugin=Sample_Isosurf_d
 SamplePlugin=Sample_Instancing_d
 SamplePlugin=Sample_Lighting_d
+SamplePlugin=Sample_Paging_d
 SamplePlugin=Sample_ParticleGS_d
 SamplePlugin=Sample_ParticleFX_d
 SamplePlugin=Sample_ShaderSystem_d

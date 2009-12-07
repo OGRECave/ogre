@@ -48,14 +48,44 @@ namespace Ogre
 		, mMode(G2D_X_Z)
 		, mWorldOrigin(Vector3::ZERO)
 		, mOrigin(Vector2::ZERO)
-		, mGridExtentsHorz(65536)
-		, mGridExtentsVert(65536)
 		, mCellSize(1000)
 		, mLoadRadius(2000)
 		, mHoldRadius(3000)
+		, mMinCellX(-32768)
+		, mMaxCellX(32767)
+		, mMinCellY(-32768)
+		, mMaxCellY(32767)
 	{
 		updateDerivedMetrics();
 		
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::setCellRange(int32 minX, int32 minY, int32 maxX, int32 maxY)
+	{
+		mMinCellX = minX;
+		mMinCellY = minY;
+		mMaxCellX = maxX;
+		mMaxCellY = maxY;
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::setCellRangeMinX(int32 minX)
+	{
+		mMinCellX = minX;
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::setCellRangeMinY(int32 minY)
+	{
+		mMinCellY = minY;
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::setCellRangeMaxX(int32 maxX)
+	{
+		mMaxCellX = maxX;
+	}
+	//---------------------------------------------------------------------
+	void Grid2DPageStrategyData::setCellRangeMaxY(int32 maxY)
+	{
+		mMaxCellY = maxY;
 	}
 	//---------------------------------------------------------------------
 	Grid2DPageStrategyData::~Grid2DPageStrategyData()
@@ -120,39 +150,36 @@ namespace Ogre
 	{
 		mLoadRadiusInCells = mLoadRadius / mCellSize;
 		mHoldRadiusInCells = mHoldRadius / mCellSize;
-		mBottomLeft = mOrigin - Vector2(mCellSize * mGridExtentsHorz * 0.5f, mCellSize * mGridExtentsVert* 0.5f);
 	}
 	//---------------------------------------------------------------------
-	void Grid2DPageStrategyData::determineGridLocation(const Vector2& gridpos, uint16* row, uint16* col)
+	void Grid2DPageStrategyData::determineGridLocation(const Vector2& gridpos, int32 *x, int32 *y)
 	{
-		// get distance from bottom-left (indexing start)
-		Vector2 localPos = gridpos - mBottomLeft;
-		// in cells
-		localPos = localPos / mCellSize;
+		Vector2 relPos = gridpos - mOrigin;
+		Real offset = mCellSize * 0.5f;
+		relPos.x += offset;
+		relPos.y += offset;
 
-		// truncate
-		*col = static_cast<uint16>(localPos.x);
-		*row = static_cast<uint16>(localPos.y);
-
+		*x = static_cast<long>(floor(relPos.x / mCellSize));
+		*y = static_cast<long>(floor(relPos.y / mCellSize));
 
 	}
 	//---------------------------------------------------------------------
-	void Grid2DPageStrategyData::getBottomLeftGridSpace(uint16 row, uint16 col, Vector2& bl)
+	void Grid2DPageStrategyData::getBottomLeftGridSpace(int32 x, int32 y, Vector2& bl)
 	{
-		bl.x = mBottomLeft.x + col * mCellSize;
-		bl.y = mBottomLeft.y + row * mCellSize;
+		Real offset = mCellSize * 0.5f;
+		bl.x = mOrigin.x - offset + x * mCellSize;
+		bl.y = mOrigin.y - offset + y * mCellSize;
 	}
 	//---------------------------------------------------------------------
-	void Grid2DPageStrategyData::getMidPointGridSpace(uint16 row, uint16 col, Vector2& mid)
+	void Grid2DPageStrategyData::getMidPointGridSpace(int32 x, int32 y, Vector2& mid)
 	{
-		getBottomLeftGridSpace(row, col, mid);
-		mid.x += mCellSize * 0.5f;
-		mid.y += mCellSize * 0.5f;
+		mid.x = mOrigin.x + x * mCellSize;
+		mid.y = mOrigin.y + y * mCellSize;
 	}
 	//---------------------------------------------------------------------
-	void Grid2DPageStrategyData::getCornersGridSpace(uint16 row, uint16 col, Vector2* pFourPoints)
+	void Grid2DPageStrategyData::getCornersGridSpace(int32 x, int32 y, Vector2* pFourPoints)
 	{
-		getBottomLeftGridSpace(row, col, pFourPoints[0]);
+		getBottomLeftGridSpace(x, y, pFourPoints[0]);
 		pFourPoints[1] = pFourPoints[0] + Vector2(mCellSize, 0);
 		pFourPoints[2] = pFourPoints[0] + Vector2(mCellSize, mCellSize);
 		pFourPoints[3] = pFourPoints[0] + Vector2(0, mCellSize);
@@ -162,35 +189,6 @@ namespace Ogre
 	{
 		mCellSize = sz;
 		updateDerivedMetrics();
-	}
-	//---------------------------------------------------------------------
-	void Grid2DPageStrategyData::setCellCount(uint32 horz, uint32 vert)
-	{
-		mGridExtentsHorz = horz;
-		mGridExtentsVert = vert;
-		updateDerivedMetrics();
-	}
-	//---------------------------------------------------------------------
-	void Grid2DPageStrategyData::setCellCountHorz(uint32 horz)
-	{
-		mGridExtentsHorz = horz;
-		updateDerivedMetrics();
-	}
-	//---------------------------------------------------------------------
-	void Grid2DPageStrategyData::setCellCountVert(uint32 vert)
-	{
-		mGridExtentsVert = vert;
-		updateDerivedMetrics();
-	}
-	//---------------------------------------------------------------------
-	uint32 Grid2DPageStrategyData::getCellCountHorz() const
-	{
-		return mGridExtentsHorz;
-	}
-	//---------------------------------------------------------------------
-	uint32 Grid2DPageStrategyData::getCellCountVert() const
-	{
-		return mGridExtentsVert;
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
@@ -206,16 +204,33 @@ namespace Ogre
 		updateDerivedMetrics();
 	}
 	//---------------------------------------------------------------------
-	PageID Grid2DPageStrategyData::calculatePageID(uint16 row, uint16 col)
+	PageID Grid2DPageStrategyData::calculatePageID(int32 x, int32 y)
 	{
-		return (PageID)row * mGridExtentsHorz + col;
+		// Convert to signed 16-bit so sign bit is in bit 15
+		int16 xs16 = static_cast<int16>(x);
+		int16 ys16 = static_cast<int16>(y);
+
+		// convert to unsigned because we do not want to propagate sign bit to 32-bits
+		uint16 x16 = static_cast<uint16>(xs16);
+		uint16 y16 = static_cast<uint16>(ys16);
+
+		uint32 key = 0;
+		key = (x16 << 16) | y16;
+
+		return (PageID)key;
+
 	}
 	//---------------------------------------------------------------------
-	void Grid2DPageStrategyData::calculateRowCol(PageID inPageID, uint16 *row, uint16 *col)
+	void Grid2DPageStrategyData::calculateCell(PageID inPageID, int32 *x, int32 *y)
 	{
 		// inverse of calculatePageID
-		*row = inPageID / mGridExtentsHorz;
-		*col = inPageID % mGridExtentsHorz;
+		// unsigned versions
+		uint16 y16 = static_cast<uint16>(inPageID & 0xFFFF);
+		uint16 x16 = static_cast<uint16>((inPageID >> 16) & 0xFFFF);
+
+		*x = static_cast<int16>(x16);
+		*y = static_cast<int16>(y16);
+
 	}
 	//---------------------------------------------------------------------
 	bool Grid2DPageStrategyData::load(StreamSerialiser& ser)
@@ -234,6 +249,10 @@ namespace Ogre
 		ser.read(&mCellSize);
 		ser.read(&mLoadRadius);
 		ser.read(&mHoldRadius);
+		ser.read(&mMinCellX);
+		ser.read(&mMaxCellX);
+		ser.read(&mMinCellY);
+		ser.read(&mMaxCellY);
 
 		ser.readChunkEnd(CHUNK_ID);
 
@@ -251,6 +270,10 @@ namespace Ogre
 		ser.write(&mCellSize);
 		ser.write(&mLoadRadius);
 		ser.write(&mHoldRadius);
+		ser.write(&mMinCellX);
+		ser.write(&mMaxCellX);
+		ser.write(&mMinCellY);
+		ser.write(&mMaxCellY);
 
 		ser.writeChunkEnd(CHUNK_ID);
 	}
@@ -274,42 +297,44 @@ namespace Ogre
 		const Vector3& pos = cam->getDerivedPosition();
 		Vector2 gridpos;
 		stratData->convertWorldToGridSpace(pos, gridpos);
-		uint16 row, col;
-		stratData->determineGridLocation(gridpos, &row, &col);
+		int32 x, y;
+		stratData->determineGridLocation(gridpos, &x, &y);
 
 		Real loadRadius = stratData->getLoadRadiusInCells();
 		Real holdRadius = stratData->getHoldRadiusInCells();
 		// scan the whole Hold range
-		Real frowmin = (Real)row - holdRadius;
-		Real frowmax = (Real)row + holdRadius;
-		Real fcolmin = (Real)col - holdRadius;
-		Real fcolmax = (Real)col + holdRadius;
+		Real fxmin = (Real)x - holdRadius;
+		Real fxmax = (Real)x + holdRadius;
+		Real fymin = (Real)y - holdRadius;
+		Real fymax = (Real)y + holdRadius;
 
-		uint16 clampRowAt = stratData->getCellCountVert() - 1;
-		uint16 clampColAt = stratData->getCellCountHorz() - 1;
+		int32 xmin = stratData->getCellRangeMinX();
+		int32 xmax = stratData->getCellRangeMaxX();
+		int32 ymin = stratData->getCellRangeMinY();
+		int32 ymax = stratData->getCellRangeMaxY();
 
 		// Round UP max, round DOWN min
-		uint16 rowmin = frowmin < 0 ? 0 : (uint16)floor(frowmin);
-		uint16 rowmax = frowmax > clampRowAt ? clampRowAt : (uint16)ceil(frowmax);
-		uint16 colmin = fcolmin < 0 ? 0 : (uint16)floor(fcolmin);
-		uint16 colmax = fcolmax > clampColAt ? clampColAt : (uint16)ceil(fcolmax);
+		xmin = fxmin < xmin ? xmin : (int32)floor(fxmin);
+		xmax = fxmax > xmax ? xmax : (int32)ceil(fxmax);
+		ymin = fymin < ymin ? ymin : (int32)floor(fymin);
+		ymax = fymax > ymax ? ymax : (int32)ceil(fymax);
 		// the inner, active load range
-		frowmin = (Real)row - loadRadius;
-		frowmax = (Real)row + loadRadius;
-		fcolmin = (Real)col - loadRadius;
-		fcolmax = (Real)col + loadRadius;
+		fxmin = (Real)x - loadRadius;
+		fxmax = (Real)x + loadRadius;
+		fymin = (Real)y - loadRadius;
+		fymax = (Real)y + loadRadius;
 		// Round UP max, round DOWN min
-		uint16 loadrowmin = frowmin < 0 ? 0 : (uint16)floor(frowmin);
-		uint16 loadrowmax = frowmax > clampRowAt ? clampRowAt : (uint16)ceil(frowmax);
-		uint16 loadcolmin = fcolmin < 0 ? 0 : (uint16)floor(fcolmin);
-		uint16 loadcolmax = fcolmax > clampColAt ? clampColAt : (uint16)ceil(fcolmax);
+		int32 loadxmin = fxmin < xmin ? xmin : (int32)floor(fxmin);
+		int32 loadxmax = fxmax > xmax ? xmax : (int32)ceil(fxmax);
+		int32 loadymin = fymin < ymin ? ymin : (int32)floor(fymin);
+		int32 loadymax = fymax > ymax ? ymax : (int32)ceil(fymax);
 
-		for (uint16 r = rowmin; r <= rowmax; ++r)
+		for (int32 cy = ymin; cy <= ymax; ++cy)
 		{
-			for (uint16 c = colmin; c <= colmax; ++c)
+			for (int32 cx = xmin; cx <= xmax; ++cx)
 			{
-				PageID pageID = stratData->calculatePageID(r, c);
-				if (r >= loadrowmin && r <= loadrowmax && c >= loadcolmin && c <= loadcolmax)
+				PageID pageID = stratData->calculatePageID(cx, cy);
+				if (cx >= loadxmin && cx <= loadxmax && cy >= loadymin && cy <= loadymax)
 				{
 					// in the 'load' range, request it
 					section->loadPage(pageID);
@@ -345,10 +370,10 @@ namespace Ogre
 			// we could try to avoid updating the geometry every time here, but this 
 			// wouldn't easily deal with paging parameter changes. There shouldn't 
 			// be that many pages anyway, and this is debug after all, so update every time
-			uint16 row, col;
+			int32 x, y;
 			Grid2DPageStrategyData* stratData = static_cast<Grid2DPageStrategyData*>(
 				p->getParentSection()->getStrategyData());
-			stratData->calculateRowCol(p->getID(), &row, &col);
+			stratData->calculateCell(p->getID(), &x, &y);
 
 			Grid2DPageStrategyData* data = static_cast<Grid2DPageStrategyData*>(p->getParentSection()->getStrategyData());
 
@@ -357,7 +382,7 @@ namespace Ogre
 			// are updated by the grid data (we could display this grid anywhere)
 			Vector2 gridMidPoint;
 			Vector3 worldMidPoint = Vector3::ZERO;
-			data->getMidPointGridSpace(row, col, gridMidPoint);
+			data->getMidPointGridSpace(x, y, gridMidPoint);
 			data->convertGridToWorldSpace(gridMidPoint, worldMidPoint);
 
 			sn->setPosition(worldMidPoint);
@@ -365,7 +390,7 @@ namespace Ogre
 			Vector2 gridCorners[4];
 			Vector3 worldCorners[4];
 
-			data->getCornersGridSpace(row, col, gridCorners);
+			data->getCornersGridSpace(x, y, gridCorners);
 			for (int i = 0; i < 4; ++i)
 			{
 				worldCorners[i] = Vector3::ZERO;
@@ -422,9 +447,9 @@ namespace Ogre
 
 		Vector2 gridpos;
 		stratData->convertWorldToGridSpace(worldPos, gridpos);
-		uint16 row, col;
-		stratData->determineGridLocation(gridpos, &row, &col);
-		return stratData->calculatePageID(row, col);
+		int32 x, y;
+		stratData->determineGridLocation(gridpos, &x, &y);
+		return stratData->calculatePageID(x, y);
 		
 	}
 

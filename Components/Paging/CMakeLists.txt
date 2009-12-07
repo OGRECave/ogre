@@ -37,17 +37,13 @@ set (HEADER_FILES
 set (SOURCE_FILES
 	src/OgreGrid2DPageStrategy.cpp
 	src/OgrePage.cpp
-	src/OgrePageConnection.cpp
 	src/OgrePageContent.cpp
 	src/OgrePageContentCollection.cpp
-	src/OgrePageContentCollectionFactory.cpp
-	src/OgrePageContentFactory.cpp
 	src/OgrePagedWorld.cpp
 	src/OgrePagedWorldSection.cpp
 	src/OgrePageLoadableUnit.cpp
 	src/OgrePageManager.cpp
 	src/OgrePageRequestQueue.cpp
-	src/OgrePageStrategy.cpp
 	src/OgreSimplePageContentCollection.cpp
 )
 

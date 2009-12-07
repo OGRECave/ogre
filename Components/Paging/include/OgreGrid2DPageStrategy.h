@@ -59,13 +59,19 @@ namespace Ogre
 	/** Specialisation of PageStrategyData for GridPageStrategy.
 	@remarks
 		Structurally this data defines with a grid of pages, with the logical 
-		origin in the middle of the entire grid, but with an indexing system 
-		of rows and columns which starts in the bottom left and works to the right
-		and up. Therefore the page at row 0 and column 0 is in the bottom left, but
-		this is actually at -(CellSize * 65536 / 2) in terms of coordinates from 
-		the origin. It's done this way because most people want to specify the 
-		'origin' to be the middle, stretching in all directions of the plane, 
-		but the row/column indexes are always positive for simplicity.
+		origin in the middle of the entire grid.
+		The grid cells are indexed from 0 as a 'centre' slot, supporting both 
+		positive and negative values. so (0,0) is the centre cell, (1,0) is the
+		cell to the right of the centre, (1,0) is the cell above the centre, (-2,1) 
+		is the cell two to the left of the centre and one up, etc. The maximum
+		extent of each axis is -32768 to +32767, so in other words enough for
+		over 4 billion entries. 
+	@par
+		To limit the page load requests that are generated to a fixed region, 
+		you can set the min and max cell indexes (inclusive)for each direction;
+		if a page request would address a cell outside this range it is ignored
+		so you don't have the expense of checking for page data that will never
+		exist.
 	@par
 		The data format for this in a file is:<br/>
 		<b>Grid2DPageStrategyData (Identifier 'G2DD')</b>\n
@@ -92,6 +98,11 @@ namespace Ogre
 			<td>The size of each cell (page) in the grid</td>
 		</tr>
 		<tr>
+			<td>Grid cell range (minx, maxx, miny, maxy)</td>
+			<td>int16 * 4</td>
+			<td>The extents of the world in cell indexes</td>
+		</tr>
+		<tr>
 			<td>Load radius</td>
 			<td>Real</td>
 			<td>The outer radius at which new pages should start loading</td>
@@ -114,12 +125,6 @@ namespace Ogre
 		Vector3 mWorldOrigin;
 		/// Origin (grid-aligned world space)
 		Vector2 mOrigin;
-		/// Grid horizontal extent in cells
-		uint32 mGridExtentsHorz;
-		/// Grid vertical extent in cells
-		uint32 mGridExtentsVert;
-		/// Bottom-left position (grid-aligned world space)
-		Vector2 mBottomLeft;
 		/// Grid cell (page) size
 		Real mCellSize;
 		/// Load radius
@@ -128,6 +133,10 @@ namespace Ogre
 		Real mHoldRadius;
 		Real mLoadRadiusInCells;
 		Real mHoldRadiusInCells;
+		int32 mMinCellX;
+		int32 mMinCellY;
+		int32 mMaxCellX;
+		int32 mMaxCellY;
 
 		void updateDerivedMetrics();
 
@@ -152,16 +161,6 @@ namespace Ogre
 		virtual void setCellSize(Real sz);
 		/// Get the size of the cells in the grid
 		virtual Real getCellSize() const { return mCellSize; }
-		/// Set the number of cells in the grid in each dimension (defaults to max of 65536)
-		virtual void setCellCount(uint32 horz, uint32 vert);
-		/// Set the number of cells in the grid horizontally (defaults to max of 65536)
-		virtual void setCellCountHorz(uint32 horz);
-		/// Set the number of cells in the grid horizontally (defaults to max of 65536)
-		virtual void setCellCountVert(uint32 vert);
-		/// Get the number of cells in the grid horizontally (defaults to max of 65536)
-		virtual uint32 getCellCountHorz() const;
-		/// Get the number of cells in the grid horizontally (defaults to max of 65536)
-		virtual uint32 getCellCountVert() const;
 		/// Set the loading radius 
 		virtual void setLoadRadius(Real sz);
 		/// Get the loading radius 
@@ -175,6 +174,25 @@ namespace Ogre
 		/// Get the Hold radius as a multiple of cells
 		virtual Real getHoldRadiusInCells(){ return mHoldRadiusInCells; }
 
+		/// Set the index range of all cells (values outside this will be ignored)
+		virtual void setCellRange(int32 minX, int32 minY, int32 maxX, int32 maxY);
+		/// Set the index range of all cells (values outside this will be ignored)
+		virtual void setCellRangeMinX(int32 minX);
+		/// Set the index range of all cells (values outside this will be ignored)
+		virtual void setCellRangeMinY(int32 minY);
+		/// Set the index range of all cells (values outside this will be ignored)
+		virtual void setCellRangeMaxX(int32 maxX);
+		/// Set the index range of all cells (values outside this will be ignored)
+		virtual void setCellRangeMaxY(int32 maxY);
+		/// get the index range of all cells (values outside this will be ignored)
+		virtual int32 getCellRangeMinX() const { return mMinCellX; }
+		/// get the index range of all cells (values outside this will be ignored)
+		virtual int32 getCellRangeMinY() const { return mMinCellY; }
+		/// get the index range of all cells (values outside this will be ignored)
+		virtual int32 getCellRangeMaxX() const { return mMaxCellX; }
+		/// get the index range of all cells (values outside this will be ignored)
+		virtual int32 getCellRangeMaxY() const { return mMaxCellY; }
+
 		/// Load this data from a stream (returns true if successful)
 		bool load(StreamSerialiser& stream);
 		/// Save this data to a stream
@@ -185,20 +203,20 @@ namespace Ogre
 		/// Convert a grid point to world space - note only 2 axes populated
 		virtual void convertGridToWorldSpace(const Vector2& grid, Vector3& world);
 		/// Get the (grid space) mid point of a cell
-		virtual void getMidPointGridSpace(uint16 row, uint16 col, Vector2& mid);
+		virtual void getMidPointGridSpace(int32 x, int32 y, Vector2& mid);
 		/// Get the (grid space) bottom-left of a cell
-		virtual void getBottomLeftGridSpace(uint16 row, uint16 col, Vector2& bl);
+		virtual void getBottomLeftGridSpace(int32 x, int32 y, Vector2& bl);
 		/** Get the (grid space) corners of a cell.
 		@remarks
 			Populates pFourPoints in anticlockwise order from the bottom left point.
 		*/
-		virtual void getCornersGridSpace(uint16 row, uint16 col, Vector2* pFourPoints);
+		virtual void getCornersGridSpace(int32 x, int32 y, Vector2* pFourPoints);
 		
 		/// Convert a grid position into a row and column index
-		void determineGridLocation(const Vector2& gridpos, uint16* row, uint16* col);
+		void determineGridLocation(const Vector2& gridpos, int32* x, int32* y);
 
-		PageID calculatePageID(uint16 row, uint16 col);
-		void calculateRowCol(PageID inPageID, uint16 *row, uint16 *col);
+		PageID calculatePageID(int32 x, int32 y);
+		void calculateCell(PageID inPageID, int32* x, int32* y);
 
 	};
 
