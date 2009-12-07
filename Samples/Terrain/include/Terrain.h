@@ -513,12 +513,6 @@ protected:
 
 	}
 
-    void createSceneManager()
-    {
-		// we're going to need a special terrain scene manager for this sample
-        mSceneMgr = mRoot->createSceneManager("TerrainSceneManager");
-    }
-
 	/*-----------------------------------------------------------------------------
 	| Extends setupView to change some initial camera settings for this sample.
 	-----------------------------------------------------------------------------*/
