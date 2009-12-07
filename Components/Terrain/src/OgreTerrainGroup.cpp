@@ -617,7 +617,9 @@ namespace Ogre
 		TerrainSlot* neighbourSlot = getTerrainSlot(slot->x + offsetx, slot->y + offsety);
 		if (neighbourSlot && neighbourSlot->instance && neighbourSlot->instance->isLoaded())
 		{
-			slot->instance->setNeighbour(Terrain::getNeighbourIndex(offsetx, offsety), neighbourSlot->instance);
+			// reclaculate if imported
+			slot->instance->setNeighbour(Terrain::getNeighbourIndex(offsetx, offsety), neighbourSlot->instance, 
+				slot->def.importData != 0);
 		}
 	}
 	//---------------------------------------------------------------------
