@@ -707,19 +707,6 @@ namespace Ogre
 
 		attachRenderTarget( *renderWindow );
 		
-		if (renderWindow->isDepthBuffered())
-		{
-			//Insert the (automatically created) depth buffer to the pool
-			IDirect3DSurface9* depthBuffer = renderWindow->getDevice()->getDepthBuffer(renderWindow);
-			ZBufferIdentifier zBufferIdentifier = getZBufferIdentifier(renderWindow);
-			ZBufferRefQueue& zBuffers = mZBufferHash[zBufferIdentifier];
-			ZBufferRef newRef;
-			newRef.surface = depthBuffer;
-			newRef.height = height;
-			newRef.width = width;
-			zBuffers.push_back(newRef);
-		}
-
 		return renderWindow;
 	}	
 	//---------------------------------------------------------------------
@@ -3814,13 +3801,6 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::_cleanupDepthStencils(IDirect3DDevice9* d3d9Device)
 	{
-		IDirect3DSurface9* deviceSurface;
-		d3d9Device->GetDepthStencilSurface(&deviceSurface);
-
-		// Release immediately -> each get increase the ref count.
-		if (deviceSurface != NULL)		
-			deviceSurface->Release();		
-
 		for(ZBufferHash::iterator i = mZBufferHash.begin(); i != mZBufferHash.end();)
 		{
 			/// Release buffer
@@ -3829,11 +3809,6 @@ namespace Ogre
 				while (!i->second.empty())
 				{
 					IDirect3DSurface9* surface = i->second.front().surface;
-					if (surface != deviceSurface)
-					{
-						//Only free the manually created surfaces
-						surface->Release();
-					}
 					i->second.pop_front();
 				}
 				ZBufferHash::iterator deadi = i++;
