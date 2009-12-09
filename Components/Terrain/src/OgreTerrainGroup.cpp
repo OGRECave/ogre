@@ -62,6 +62,10 @@ namespace Ogre
 	{
 		removeAllTerrains();
 
+		WorkQueue* wq = Root::getSingleton().getWorkQueue();
+		wq->removeRequestHandler(mWorkQueueChannel, this);
+		wq->removeResponseHandler(mWorkQueueChannel, this);
+
 	}
 	//---------------------------------------------------------------------
 	void TerrainGroup::setOrigin(const Vector3& pos)

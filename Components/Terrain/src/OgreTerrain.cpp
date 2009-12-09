@@ -502,8 +502,11 @@ namespace Ogre
 			std::ifstream *ifs = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL);
 			ifs->open(filename.c_str(), std::ios::in | std::ios::binary);
 			if(!*ifs)
+			{
+				OGRE_DELETE_T(ifs, basic_ifstream, MEMCATEGORY_GENERAL);
 				OGRE_EXCEPT(
-				Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!", __FUNCTION__);
+					Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!", __FUNCTION__);
+			}
 			stream.bind(OGRE_NEW FileStreamDataStream(filename, ifs));
 		}
 
