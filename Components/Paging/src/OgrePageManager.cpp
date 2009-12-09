@@ -29,10 +29,10 @@ THE SOFTWARE.
 #include "OgrePagedWorld.h"
 #include "OgrePageStrategy.h"
 #include "OgrePageContentCollectionFactory.h"
+#include "OgrePagedWorldSection.h"
 #include "OgrePageContentFactory.h"
 #include "OgreStringConverter.h"
 #include "OgreException.h"
-#include "OgrePageRequestQueue.h"
 #include "OgrePagedWorldSection.h"
 #include "OgrePagedWorld.h"
 #include "OgreGrid2DPageStrategy.h"
@@ -46,14 +46,12 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	PageManager::PageManager()
 		: mWorldNameGenerator("World")
-		, mQueue(0)
 		, mPageProvider(0)
 		, mPageResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
 		, mDebugDisplayLvl(0)
 		, mGrid2DPageStrategy(0)
 		, mSimpleCollectionFactory(0)
 	{
-		mQueue = OGRE_NEW PageRequestQueue(this);
 
 		mEventRouter.pManager = this;
 		mEventRouter.pWorldMap = &mWorlds;
@@ -67,7 +65,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	PageManager::~PageManager()
 	{
-		OGRE_DELETE mQueue;
+		Root::getSingleton().removeFrameListener(&mEventRouter);
 
 		OGRE_DELETE mGrid2DPageStrategy;
 		OGRE_DELETE mSimpleCollectionFactory;
@@ -124,30 +122,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void PageManager::destroyWorld(PagedWorld* world)
 	{
-		detachWorld(world);
-		OGRE_DELETE world;
-	}
-	//---------------------------------------------------------------------
-	void PageManager::attachWorld(PagedWorld* world)
-	{
-		if(mWorlds.find(world->getName()) != mWorlds.end())
-		{
-			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
-				"World named '" + world->getName() + "' already exists!",
-				"PageManager::attachWorld");
-		}
-
-		mWorlds[world->getName()] = world;
-		
-	}
-	//---------------------------------------------------------------------
-	void PageManager::detachWorld(PagedWorld* world)
-	{
-		WorldMap::iterator i = mWorlds.find(world->getName());
-		if (i != mWorlds.end() && i->second == world)
-		{
-			mWorlds.erase(i);
-		}
+		destroyWorld(world->getName());
 	}
 	//---------------------------------------------------------------------
 	PagedWorld* PageManager::loadWorld(const String& filename, const String& name)
@@ -321,6 +296,56 @@ namespace Ogre
 			OGRE_DELETE c; // normally a safe fallback
 	}
 	//---------------------------------------------------------------------
+	void PageManager::addWorldSectionFactory(PagedWorldSectionFactory* f)
+	{
+		// note - deliberately allowing overriding
+		mWorldSectionFactories[f->getName()] = f;
+	}
+	//---------------------------------------------------------------------
+	void PageManager::removeWorldSectionFactory(PagedWorldSectionFactory* f)
+	{
+		WorldSectionFactoryMap::iterator i = mWorldSectionFactories.find(f->getName());
+		if (i != mWorldSectionFactories.end() && i->second == f)
+		{
+			mWorldSectionFactories.erase(i);
+		}
+	}
+	//---------------------------------------------------------------------
+	PagedWorldSectionFactory* PageManager::getWorldSectionFactory(const String& name)
+	{
+		WorldSectionFactoryMap::iterator i = mWorldSectionFactories.find(name);
+		if (i != mWorldSectionFactories.end())
+			return i->second;
+		else
+			return 0;
+
+	}
+	//---------------------------------------------------------------------
+	const PageManager::WorldSectionFactoryMap& PageManager::getWorldSectionFactories() const
+	{
+		return mWorldSectionFactories;
+	}
+	//---------------------------------------------------------------------
+	PagedWorldSection* PageManager::createWorldSection(const String& typeName)
+	{
+		PagedWorldSectionFactory* fact = getWorldSectionFactory(typeName);
+		if (!fact)
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+			typeName + " is not the name of a valid PagedWorldSectionFactory", 
+			"PageManager::createWorldSection");
+
+		return fact->createInstance();
+	}
+	//---------------------------------------------------------------------
+	void PageManager::destroyWorldSection(PagedWorldSection* coll)
+	{
+		PagedWorldSectionFactory* fact = getWorldSectionFactory(coll->getType());
+		if (fact)
+			fact->destroyInstance(coll);
+		else
+			OGRE_DELETE coll; // normally a safe fallback
+	}
+	//---------------------------------------------------------------------
 	StreamSerialiser* PageManager::_readPageStream(PageID pageID, PagedWorldSection* section)
 	{
 		StreamSerialiser* ser = 0;
@@ -487,8 +512,6 @@ namespace Ogre
 
 		for(WorldMap::iterator i = pWorldMap->begin(); i != pWorldMap->end(); ++i)
 			i->second->frameStart(evt.timeSinceLastFrame);
-
-		pManager->getQueue()->processRenderThreadRequests();
 
 		return true;
 	}

@@ -54,6 +54,11 @@ namespace Ogre
 		their definitions are loaded in their entirety when the PagedWorld is
 		loaded. However, no Page instances are initially loaded - those are the
 		responsibility of the PageStrategy.
+	@par
+		PagedWorldSection can be subclassed and derived types provided by a
+		PagedWorldSectionFactory. These subclasses might come preconfigured
+		with a strategy for example, or with additional metadata used only for
+		that particular type of section.
 	*/
 	class PagedWorldSection : public PageAlloc
 	{
@@ -237,20 +242,6 @@ namespace Ogre
 		*/
 		virtual Page* getPage(PageID pageID);
 
-		/** Attach a page to this section. 
-		@remarks
-			This method is usually called by the loading routine and not directly. 
-			This class becomes responsible for deleting the Page.
-		*/
-		virtual void attachPage(Page* page);
-
-		/** Detach a page to this section. 
-		@remarks
-		This method is usually called by the unloading routine and not directly. 
-		This class is no longer responsible for deleting the Page.
-		*/
-		virtual void detachPage(Page* page);
-
 		/** Remove all pages immediately. 
 		@remarks
 			Effectively 'resets' this section by deleting all pages. 
@@ -268,10 +259,10 @@ namespace Ogre
 		@note
 			The caller remains responsible for the destruction of the provider.
 		*/
-		void setPageProvider(PageProvider* provider) { mPageProvider = provider; }
+		virtual void setPageProvider(PageProvider* provider) { mPageProvider = provider; }
 		
 		/** Get the PageProvider which can provide streams for Pages in this section. */
-		PageProvider* getPageProvider() const { return mPageProvider; }
+		virtual PageProvider* getPageProvider() const { return mPageProvider; }
 
 		/** Get a serialiser set up to read Page data for the given PageID. 
 		@param pageID The ID of the page being requested
@@ -279,7 +270,7 @@ namespace Ogre
 		The StreamSerialiser returned is the responsibility of the caller to
 		delete. 
 		*/
-		StreamSerialiser* _readPageStream(PageID pageID);
+		virtual StreamSerialiser* _readPageStream(PageID pageID);
 
 		/** Get a serialiser set up to write Page data for the given PageID. 
 		@param pageID The ID of the page being requested
@@ -287,11 +278,27 @@ namespace Ogre
 		The StreamSerialiser returned is the responsibility of the caller to
 		delete. 
 		*/
-		StreamSerialiser* _writePageStream(PageID pageID);
+		virtual StreamSerialiser* _writePageStream(PageID pageID);
 
 		/** Function for writing to a stream.
 		*/
 		_OgrePagingExport friend std::ostream& operator <<( std::ostream& o, const PagedWorldSection& p );
+
+		/** Get the type name of this section. */
+		virtual const String& getType();
+
+	};
+
+
+	/** A factory class for creating types of world section.
+	*/
+	class _OgrePagingExport PagedWorldSectionFactory : public PageAlloc
+	{
+	public:
+		virtual const String& getName() const = 0;
+		virtual PagedWorldSection* createInstance() = 0;
+		virtual void destroyInstance(PagedWorldSection*) = 0;
+
 
 	};
 

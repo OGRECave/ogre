@@ -44,7 +44,6 @@ namespace Ogre
 	class PagedWorld;
 	class PagedWorldSection;
 	class PageManager;
-	class PageRequestQueue;
 	class PageStrategy;
 	class PageStrategyData;
 	class PageProvider;

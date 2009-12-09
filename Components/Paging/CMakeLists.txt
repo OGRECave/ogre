@@ -25,9 +25,7 @@ set (HEADER_FILES
 	include/OgrePagedWorld.h
 	include/OgrePagedWorldSection.h
 	include/OgrePageFileFormats.h
-	include/OgrePageLoadableUnit.h
 	include/OgrePageManager.h
-	include/OgrePageRequestQueue.h
 	include/OgrePageStrategy.h
 	include/OgrePaging.h
 	include/OgrePagingPrerequisites.h
@@ -41,9 +39,7 @@ set (SOURCE_FILES
 	src/OgrePageContentCollection.cpp
 	src/OgrePagedWorld.cpp
 	src/OgrePagedWorldSection.cpp
-	src/OgrePageLoadableUnit.cpp
 	src/OgrePageManager.cpp
-	src/OgrePageRequestQueue.cpp
 	src/OgreSimplePageContentCollection.cpp
 )
 

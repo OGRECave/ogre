@@ -31,54 +31,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	//---------------------------------------------------------------------
-	TerrainPageContent::TerrainPageContent(PageContentFactory* creator)
-		: PageContent(creator)
-		, mTerrain(0)
-	{
-	}
-	//---------------------------------------------------------------------
-	TerrainPageContent::~TerrainPageContent()
-	{
-		destroy();
-
-		OGRE_DELETE mTerrain;
-	}
-	//---------------------------------------------------------------------
-	void TerrainPageContent::save(StreamSerialiser& stream)
-	{
-		mTerrain->save(stream);
-	}
-	//---------------------------------------------------------------------
-	bool TerrainPageContent::prepareImpl(StreamSerialiser& stream)
-	{
-		if (!mTerrain)
-		{
-			mTerrain = OGRE_NEW Terrain(getSceneManager());
-		}
-		return mTerrain->prepare(stream);
-	}
-	//---------------------------------------------------------------------
-	void TerrainPageContent::loadImpl()
-	{
-		mTerrain->load();
-	}
-	//---------------------------------------------------------------------
-	void TerrainPageContent::unloadImpl()
-	{
-		mTerrain->unload();
-	}
-	//---------------------------------------------------------------------
-	void TerrainPageContent::unprepareImpl()
-	{
-		mTerrain->unprepare();
-		OGRE_DELETE mTerrain;
-		mTerrain = 0;
-	}
-	//---------------------------------------------------------------------
-	//---------------------------------------------------------------------
-	String TerrainPageContentFactory::FACTORY_NAME = "Terrain";
-	//---------------------------------------------------------------------
 
 }
 

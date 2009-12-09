@@ -30,7 +30,6 @@ THE SOFTWARE.
 #define __Ogre_PageContentCollection_H__
 
 #include "OgrePagingPrerequisites.h"
-#include "OgrePageLoadableUnit.h"
 
 
 namespace Ogre
@@ -53,7 +52,7 @@ namespace Ogre
 		if required. For example, potentially you might want to define Page-level LOD
 		in which different collections of PageContent are loaded at different times.
 	*/
-	class _OgrePagingExport PageContentCollection : public PageLoadableUnit
+	class _OgrePagingExport PageContentCollection : public PageAlloc
 	{
 	protected:
 		PageContentCollectionFactory* mCreator;
@@ -72,7 +71,7 @@ namespace Ogre
 		/// Get the type of the collection, which will match it's factory
 		virtual const String& getType() const;
 
-		/// Internal method to notify a page that it is attached
+		/// Internal method to notify a collection that it is attached
 		virtual void _notifyAttached(Page* parent);
 		/// Save the collection to a stream
 		virtual void save(StreamSerialiser& stream) = 0;
@@ -82,6 +81,16 @@ namespace Ogre
 		virtual void frameEnd(Real timeElapsed) = 0;
 		/// Notify a section of the current camera
 		virtual void notifyCamera(Camera* cam) = 0;
+
+
+		/// Prepare data - may be called in the background
+		virtual bool prepare(StreamSerialiser& ser) = 0;
+		/// Load - will be called in main thread
+		virtual void load() = 0;
+		/// Unload - will be called in main thread
+		virtual void unload() = 0;
+		/// Unprepare data - may be called in the background
+		virtual void unprepare() = 0;
 
 
 	};

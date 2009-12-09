@@ -44,8 +44,6 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	SimplePageContentCollection::~SimplePageContentCollection()
 	{
-		destroy();
-
 		for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
 			delete *i;
 		mContentList.clear();
@@ -54,26 +52,16 @@ namespace Ogre
 	PageContent* SimplePageContentCollection::createContent(const String& typeName)
 	{
 		PageContent* c = getManager()->createContent(typeName);
-		attachContent(c);
+		mContentList.push_back(c);
 		return c;
 	}
 	//---------------------------------------------------------------------
 	void SimplePageContentCollection::destroyContent(PageContent* c)
 	{
-		detachContent(c);
-		getManager()->destroyContent(c);
-	}
-	//---------------------------------------------------------------------
-	void SimplePageContentCollection::attachContent(PageContent* content)
-	{
-		mContentList.push_back(content);
-	}
-	//---------------------------------------------------------------------
-	void SimplePageContentCollection::detachContent(PageContent* content)
-	{
-		ContentList::iterator i = std::find(mContentList.begin(), mContentList.end(), content);
+		ContentList::iterator i = std::find(mContentList.begin(), mContentList.end(), c);
 		if (i != mContentList.end())
 			mContentList.erase(i);
+		getManager()->destroyContent(c);
 	}
 	//---------------------------------------------------------------------
 	void SimplePageContentCollection::save(StreamSerialiser& stream)
@@ -105,7 +93,7 @@ namespace Ogre
 			(*i)->notifyCamera(cam);
 	}
 	//---------------------------------------------------------------------
-	bool SimplePageContentCollection::prepareImpl(StreamSerialiser& stream)
+	bool SimplePageContentCollection::prepare(StreamSerialiser& stream)
 	{
 		if (!stream.readChunkBegin(SUBCLASS_CHUNK_ID, SUBCLASS_CHUNK_VERSION, "SimplePageContentCollection"))
 			return false;
@@ -121,21 +109,21 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void SimplePageContentCollection::loadImpl()
+	void SimplePageContentCollection::load()
 	{
 		for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
 			(*i)->load();
 
 	}
 	//---------------------------------------------------------------------
-	void SimplePageContentCollection::unloadImpl()
+	void SimplePageContentCollection::unload()
 	{
 		for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
 			(*i)->unload();
 
 	}
 	//---------------------------------------------------------------------
-	void SimplePageContentCollection::unprepareImpl()
+	void SimplePageContentCollection::unprepare()
 	{
 		for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
 			(*i)->unprepare();

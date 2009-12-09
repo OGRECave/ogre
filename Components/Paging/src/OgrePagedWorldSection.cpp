@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgrePagedWorld.h"
 #include "OgrePageManager.h"
 #include "OgrePage.h"
-#include "OgrePageRequestQueue.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 
@@ -160,10 +159,14 @@ namespace Ogre
 		// Page Strategy Data
 		mStrategyData->save(ser);
 
-		// save all pages
-		// TODO
-
 		ser.writeChunkEnd(CHUNK_ID);
+
+		// save all pages (in separate files)
+		for (PageMap::iterator i = mPages.begin(); i != mPages.end(); ++i)
+		{
+			i->second->save();
+		}
+
 
 	}
 	//---------------------------------------------------------------------
@@ -186,10 +189,22 @@ namespace Ogre
 		PageMap::iterator i = mPages.find(pageID);
 		if (i == mPages.end())
 		{
-			Page* page = OGRE_NEW Page(pageID);
-			// attach page immediately, but notice that it's not loaded yet
-			attachPage(page);
-			getManager()->getQueue()->loadPage(page, this, sync);
+			Page* page = OGRE_NEW Page(pageID, this);
+			// try to insert
+			std::pair<PageMap::iterator, bool> ret = mPages.insert(
+				PageMap::value_type(page->getID(), page));
+
+			if (!ret.second)
+			{
+				// page with this ID already in map
+				if (ret.first->second != page)
+				{
+					// replacing a page, delete the old one
+					OGRE_DELETE ret.first->second;
+					ret.first->second = page;
+				}
+			}
+			page->load(sync);
 		}
 		else
 			i->second->touch();
@@ -202,9 +217,10 @@ namespace Ogre
 		{
 			Page* page = i->second;
 			mPages.erase(i);
-			page->_notifyAttached(0);
 
-			getManager()->getQueue()->unloadPage(page, this, sync);
+			page->unload();
+
+			OGRE_DELETE page;
 			
 		}
 	}
@@ -274,43 +290,10 @@ namespace Ogre
 			return 0;
 	}
 	//---------------------------------------------------------------------
-	void PagedWorldSection::attachPage(Page* page)
-	{
-		// try to insert
-		std::pair<PageMap::iterator, bool> ret = mPages.insert(
-			PageMap::value_type(page->getID(), page));
-
-		if (!ret.second)
-		{
-			// page with this ID already in map
-			if (ret.first->second != page)
-			{
-				// replacing a page, delete the old one
-				getManager()->getQueue()->cancelOperationsForPage(ret.first->second);
-				OGRE_DELETE ret.first->second;
-				ret.first->second = page;
-			}
-		}
-		page->_notifyAttached(this);
-			
-	}
-	//---------------------------------------------------------------------
-	void PagedWorldSection::detachPage(Page* page)
-	{
-		PageMap::iterator i = mPages.find(page->getID());
-		if (i != mPages.end() && i->second == page)
-		{
-			mPages.erase(i);
-			page->_notifyAttached(0);
-		}
-
-	}
-	//---------------------------------------------------------------------
 	void PagedWorldSection::removeAllPages()
 	{
 		for (PageMap::iterator i= mPages.begin(); i != mPages.end(); ++i)
 		{
-			getManager()->getQueue()->cancelOperationsForPage(i->second);
 			OGRE_DELETE i->second;
 		}
 		mPages.clear();
@@ -371,6 +354,12 @@ namespace Ogre
 			ser = mParent->_writePageStream(pageID, this);
 		return ser;
 
+	}
+	//---------------------------------------------------------------------
+	const String& PagedWorldSection::getType()
+	{
+		static const String stype("General");
+		return stype;
 	}
 	//---------------------------------------------------------------------
 	std::ostream& operator <<( std::ostream& o, const PagedWorldSection& p )

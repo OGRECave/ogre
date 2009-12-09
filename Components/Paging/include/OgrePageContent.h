@@ -30,7 +30,6 @@ THE SOFTWARE.
 #define __Ogre_PageContent_H__
 
 #include "OgrePagingPrerequisites.h"
-#include "OgrePageLoadableUnit.h"
 
 
 
@@ -47,7 +46,7 @@ namespace Ogre
 
 	/** Interface definition for a unit of content within a page. 
 	*/
-	class _OgrePagingExport PageContent : public PageLoadableUnit
+	class _OgrePagingExport PageContent : public PageAlloc
 	{
 	protected:
 		PageContentFactory* mCreator;
@@ -72,6 +71,16 @@ namespace Ogre
 		virtual void frameEnd(Real timeElapsed) {}
 		/// Notify a section of the current camera
 		virtual void notifyCamera(Camera* cam) {}
+
+		/// Prepare data - may be called in the background
+		virtual bool prepare(StreamSerialiser& ser) = 0;
+		/// Load - will be called in main thread
+		virtual void load() = 0;
+		/// Unload - will be called in main thread
+		virtual void unload() = 0;
+		/// Unprepare data - may be called in the background
+		virtual void unprepare() = 0;
+
 	};
 
 	/** @} */

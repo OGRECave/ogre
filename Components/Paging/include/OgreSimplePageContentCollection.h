@@ -76,8 +76,6 @@ namespace Ogre
 		~SimplePageContentCollection();
 
 		/** Create a new PageContent within this collection.
-		This is equivalent to calling PageManager::createContent and 
-		then attachContent.
 		@param typeName The name of the type of content  (see PageManager::getContentFactories)
 		*/
 		virtual PageContent* createContent(const String& typeName);
@@ -88,16 +86,6 @@ namespace Ogre
 		*/
 		virtual void destroyContent(PageContent* coll);
 
-		/** Add content to this collection.
-		@remarks
-			This collection will be responsible for deleting the content. 
-		*/
-		virtual void attachContent(PageContent* content);
-		/** Remove content from this collection.
-		@remarks
-		This collection will no longer be responsible for deleting the content. 
-		*/
-		virtual void detachContent(PageContent* content);
 		/// Get const access to the list of content
 		virtual const ContentList& getContentList() const { return mContentList; }
 
@@ -106,13 +94,12 @@ namespace Ogre
 		virtual void frameStart(Real timeSinceLastFrame);
 		virtual void frameEnd(Real timeElapsed);
 		virtual void notifyCamera(Camera* cam);
+		bool prepare(StreamSerialiser& stream);
+		void load();
+		void unload();
+		void unprepare();
 
 	protected:
-		// Overridden from PageLoadableUnit
-		bool prepareImpl(StreamSerialiser& stream);
-		void loadImpl();
-		void unloadImpl();
-		void unprepareImpl();
 
 
 

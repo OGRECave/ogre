@@ -46,6 +46,10 @@ namespace Ogre
 	*  @{
 	*/
 
+	class PagedWorldSection;
+	class PagedWorldSectionFactory;
+
+
 	/** Abstract class that can be implemented by the user application to 
 		provide a way to retrieve or generate page data from a source of their choosing.
 	@note
@@ -146,13 +150,6 @@ namespace Ogre
 		/** Destroy a world. */
 		void destroyWorld(PagedWorld* world);
 
-		/** Attach a pre-created PagedWorld instance to this manager. 
-		*/
-		void attachWorld(PagedWorld* world);
-		/** Detach a PagedWorld instance from this manager (note: the caller then
-			becomes responsible for the correct destruction of this instance)
-		*/
-		void detachWorld(PagedWorld* world);
 		/** Load a new PagedWorld from a file. 
 		@param filename The name of the file to load (standard is .world)
 		@param name Optionally give a name to the world (if no name is given, one
@@ -268,8 +265,36 @@ namespace Ogre
 		/** Destroy an instance of PageContent. */
 		void destroyContent(PageContent* c);
 
-		/// Get the request queue
-		PageRequestQueue* getQueue() const { return mQueue; }
+
+		typedef map<String, PagedWorldSectionFactory*>::type WorldSectionFactoryMap;
+		/** Add a new PagedWorldSectionFactory implementation. 
+		@remarks
+		The caller remains resonsible for destruction of this instance. 
+		*/
+		void addWorldSectionFactory(PagedWorldSectionFactory* f);
+
+		/** Remove a PagedWorldSectionFactory implementation. 
+		*/
+		void removeWorldSectionFactory(PagedWorldSectionFactory* f);
+
+		/** Get a PagedWorldSectionFactory.
+		@param name The name of the factory to retrieve
+		@returns Pointer to a PagedWorldSectionFactory, or null if the WorldSection was not found.
+		*/
+		PagedWorldSectionFactory* getWorldSectionFactory(const String& name);
+
+		/** Create a new instance of PagedWorldSection using the registered
+		factories.
+		@param typeName The name of the type of collection to create
+		*/
+		PagedWorldSection* createWorldSection(const String& typeName);
+
+		/** Destroy an instance of PagedWorldSection. */
+		void destroyWorldSection(PagedWorldSection* coll);
+
+		/** Get a reference to the registered strategies.
+		*/
+		const WorldSectionFactoryMap& getWorldSectionFactories() const;
 
 
 		/** Set the PageProvider which can provide streams for any Page. 
@@ -358,7 +383,7 @@ namespace Ogre
 		/** Set the resource group that will be used to read/write files when the
 		default load routines are used. 
 		*/
-		void getPageResourceGroup(const String& g) { mPageResourceGroup = g; }
+		void setPageResourceGroup(const String& g) { mPageResourceGroup = g; }
 
 		/** Tells the paging system to start tracking a given camera. 
 		@remarks
@@ -419,8 +444,8 @@ namespace Ogre
 		StrategyMap mStrategies;
 		ContentCollectionFactoryMap mContentCollectionFactories;
 		ContentFactoryMap mContentFactories;
+		WorldSectionFactoryMap mWorldSectionFactories;
 		NameGenerator mWorldNameGenerator;
-		PageRequestQueue* mQueue;
 		PageProvider* mPageProvider;
 		String mPageResourceGroup;
 		CameraList mCameraList;

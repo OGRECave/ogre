@@ -424,8 +424,7 @@ namespace Ogre
 				mo->beginUpdate(0);
 			}
 
-			ColourValue vcol = p->getStatus() == Page::STATUS_LOADED ? 
-				ColourValue::Green : ColourValue::Red;
+			ColourValue vcol = ColourValue::Green;
 			for(int i = 0; i < 5; ++i)
 			{
 				mo->position(worldCorners[i%4]);
