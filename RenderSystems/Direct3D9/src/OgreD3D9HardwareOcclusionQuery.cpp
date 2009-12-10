@@ -74,7 +74,7 @@ namespace Ogre {
 		DeviceToQueryIterator it      = mMapDeviceToQuery.find(pCurDevice);
 
 		// No resource exits for current device -> create it.
-		if (it == mMapDeviceToQuery.end())		
+		if (it == mMapDeviceToQuery.end() || it->second == NULL)		
 			createQuery(pCurDevice);			
 		
 

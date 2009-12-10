@@ -2435,6 +2435,9 @@ namespace Ogre {
 		if (!mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
 			return;
 
+		if (!activateGLTextureUnit(unit))
+			return;
+
 		GLfloat largest_supported_anisotropy = 0;
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
 		if (maxAnisotropy > largest_supported_anisotropy)
@@ -2442,6 +2445,8 @@ namespace Ogre {
 			static_cast<uint>(largest_supported_anisotropy) : 1;
 		if (_getCurrentAnisotropy(unit) != maxAnisotropy)
 			glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+
+		activateGLTextureUnit(0);
 	}
 	//-----------------------------------------------------------------------------
 	void GLRenderSystem::_setTextureBlendMode(size_t stage, const LayerBlendModeEx& bm)
