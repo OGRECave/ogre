@@ -64,9 +64,7 @@ void PageCoreTests::testSimpleCreateSaveLoadWorld()
 	SimplePageContentCollection* coll = static_cast<SimplePageContentCollection*>(
 		p->createContentCollection("Simple"));
 
-	// manually set page to loaded since we've populated it
-	p->setLoaded();
-	
+
 	world->save(filename);
 
 	mPageManager->destroyWorld(world);
