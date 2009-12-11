@@ -20,6 +20,8 @@ set (HEADER_FILES
 	include/OgreTerrainLayerBlendMap.h
 	include/OgreTerrainMaterialGenerator.h
 	include/OgreTerrainMaterialGeneratorA.h
+	include/OgreTerrainPaging.h
+	include/OgreTerrainPagedWorldSection.h
 	include/OgreTerrainPrerequisites.h
     include/OgreTerrainQuadTreeNode.h
 )
@@ -30,6 +32,8 @@ set (SOURCE_FILES
 	src/OgreTerrainLayerBlendMap.cpp
 	src/OgreTerrainMaterialGenerator.cpp
 	src/OgreTerrainMaterialGeneratorA.cpp
+	src/OgreTerrainPaging.cpp
+	src/OgreTerrainPagedWorldSection.cpp
 	src/OgreTerrainQuadTreeNode.cpp
 )
 

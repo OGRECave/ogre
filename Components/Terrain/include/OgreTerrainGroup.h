@@ -78,6 +78,12 @@ namespace Ogre
 		*/
 		TerrainGroup(SceneManager* sm, Terrain::Alignment align, uint16 terrainSize, 
 			Real terrainWorldSize);
+		/** Alternate constructor.
+		@remarks
+			You can ONLY use this constructor if you subsequently call loadGroupDefinition
+			to populate the rest.
+		*/
+		TerrainGroup(SceneManager* sm);
 		virtual ~TerrainGroup();
 
 		/** Retrieve a shared structure which will provide the base settings for
@@ -456,11 +462,30 @@ namespace Ogre
 
 		/// Convert coordinates to a packed integer index
 		uint32 packIndex(long x, long y) const;
+		
+		/// Convert a packed integer index to coordinates
+		void unpackIndex(uint32 key, long *x, long *y);
 
 		/// Generate a file name based on the current naming convention
 		String generateFilename(long x, long y) const;
 
+		/** Save the group data only in native form to a file.
+		*/
+		void saveGroupDefinition(const String& filename);
+		/** Save the group data only in native form to a serializing stream.
+		*/
+		void saveGroupDefinition(StreamSerialiser& stream);
+		/** Load the group definition only in native form from a file.
+		*/
+		void loadGroupDefinition(const String& filename);
+		/** Load the group definition only in native form from a serializing stream.
+		*/
+		void loadGroupDefinition(StreamSerialiser& stream);
+
+
 		static const uint16 WORKQUEUE_LOAD_REQUEST;
+		static const uint32 CHUNK_ID;
+		static const uint16 CHUNK_VERSION;
 
 	protected:
 		SceneManager *mSceneManager;

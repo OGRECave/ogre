@@ -265,27 +265,8 @@ namespace Ogre
 		// Background loading
 		String filename = generateFilename();
 
-		DataStreamPtr stream;
-		if (ResourceGroupManager::getSingleton().resourceExists(
-			getManager()->getPageResourceGroup(), filename))
-		{
-			stream = ResourceGroupManager::getSingleton().openResource(
-				filename, getManager()->getPageResourceGroup());
-		}
-		else
-		{
-			// try direct
-			std::ifstream *ifs = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL);
-			ifs->open(filename.c_str(), std::ios::in | std::ios::binary);
-			if(!*ifs)
-			{
-				OGRE_DELETE_T(ifs, basic_ifstream, MEMCATEGORY_GENERAL);
-				OGRE_EXCEPT(
-					Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!", __FUNCTION__);
-			}
-			stream.bind(OGRE_NEW FileStreamDataStream(filename, ifs));
-		}
-
+		DataStreamPtr stream = Root::getSingleton().openFileStream(filename, 
+			getManager()->getPageResourceGroup());
 		StreamSerialiser ser(stream);
 		return prepareImpl(ser, dataToPopulate);
 
@@ -294,7 +275,11 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Page::loadImpl()
 	{
-
+		for (ContentCollectionList::iterator i = mContentCollections.begin();
+			i != mContentCollections.end(); ++i)
+		{
+			(*i)->load();
+		}
 	}
 	//---------------------------------------------------------------------
 	void Page::save()
@@ -305,35 +290,8 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Page::save(const String& filename)
 	{
-		// Does this file include path specifiers?
-		String path, basename;
-		StringUtil::splitFilename(filename, basename, path);
-
-		// no path elements, try the resource system first
-		DataStreamPtr stream;
-		if (path.empty())
-		{
-			try
-			{
-				stream = ResourceGroupManager::getSingleton().createResource(
-					filename, getManager()->getPageResourceGroup(), true);
-			}
-			catch (...) {}
-
-		}
-
-		if (stream.isNull())		
-		{
-			// save direct in filesystem
-			std::fstream fs;
-			fs.open(filename.c_str(), std::ios::out | std::ios::binary);
-			if (!fs)
-				OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, 
-				"Can't open " + filename + " for writing", __FUNCTION__);
-
-			stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename, &fs, false));
-		}
-
+		DataStreamPtr stream = Root::getSingleton().createFileStream(filename, 
+			getManager()->getPageResourceGroup(), true);
 		StreamSerialiser ser(stream);
 		save(ser);
 	}

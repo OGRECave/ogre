@@ -1409,6 +1409,14 @@ namespace Ogre
 		/// Utility method to convert axes from terrain space (xy terrain, z up) tp world space
 		static void convertTerrainToWorldAxes(Alignment align, const Vector3& terrainVec, Vector3* worldVec);
 
+		/// Utility method to write a layer declaration to a stream
+		static void writeLayerDeclaration(const TerrainLayerDeclaration& decl, StreamSerialiser& ser);
+		/// Utility method to read a layer declaration from a stream
+		static bool readLayerDeclaration(StreamSerialiser& ser, TerrainLayerDeclaration& targetdecl);
+		/// Utility method to write a layer instance list to a stream
+		static void writeLayerInstanceList(const Terrain::LayerInstanceList& lst, StreamSerialiser& ser);
+		/// Utility method to read a layer instance list from a stream
+		static bool readLayerInstanceList(StreamSerialiser& ser, size_t numSamplers, Terrain::LayerInstanceList& targetlst);
 	protected:
 
 		void freeCPUResources();

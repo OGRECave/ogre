@@ -28,11 +28,13 @@ THE SOFTWARE.
 #include "OgreTerrainGroup.h"
 #include "OgreRoot.h"
 #include "OgreWorkQueue.h"
-
+#include "OgreStreamSerialiser.h"
 
 namespace Ogre
 {
 	const uint16 TerrainGroup::WORKQUEUE_LOAD_REQUEST = 1;
+	const uint32 TerrainGroup::CHUNK_ID = StreamSerialiser::makeIdentifier("TERG");
+	const uint16 TerrainGroup::CHUNK_VERSION = 1;
 	//---------------------------------------------------------------------
 	TerrainGroup::TerrainGroup(SceneManager* sm, Terrain::Alignment align, 
 		uint16 terrainSize, Real terrainWorldSize)
@@ -56,6 +58,28 @@ namespace Ogre
 		wq->addRequestHandler(mWorkQueueChannel, this);
 		wq->addResponseHandler(mWorkQueueChannel, this);
 
+	}
+	//---------------------------------------------------------------------
+	TerrainGroup::TerrainGroup(SceneManager* sm)
+		: mSceneManager(sm)
+		, mAlignment(Terrain::ALIGN_X_Z)
+		, mTerrainSize(0)
+		, mTerrainWorldSize(0)
+		, mFilenamePrefix("terrain")
+		, mFilenameExtension("dat")
+		, mResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+	{
+		mDefaultImportData.terrainAlign = mAlignment;
+		mDefaultImportData.terrainSize = 0;
+		mDefaultImportData.worldSize = 0;
+		// by default we delete input data because we copy it, unless user
+		// passes us an ImportData where they explicitly don't want it copied
+		mDefaultImportData.deleteInputData = true;
+
+		WorkQueue* wq = Root::getSingleton().getWorkQueue();
+		mWorkQueueChannel = wq->getChannel("Ogre/TerrainGroup");
+		wq->addRequestHandler(mWorkQueueChannel, this);
+		wq->addResponseHandler(mWorkQueueChannel, this);
 	}
 	//---------------------------------------------------------------------
 	TerrainGroup::~TerrainGroup()
@@ -645,6 +669,19 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void TerrainGroup::unpackIndex(uint32 key, long *x, long *y)
+	{
+		// inverse of packIndex
+		// unsigned versions
+		uint16 y16 = static_cast<uint16>(key & 0xFFFF);
+		uint16 x16 = static_cast<uint16>((key >> 16) & 0xFFFF);
+
+		*x = static_cast<int16>(x16);
+		*y = static_cast<int16>(y16);
+
+	}
+
+	//---------------------------------------------------------------------
 	String TerrainGroup::generateFilename(long x, long y) const
 	{
 		StringUtil::StrStreamType str;
@@ -735,6 +772,83 @@ namespace Ogre
 	TerrainGroup::ConstTerrainIterator TerrainGroup::getTerrainIterator() const
 	{
 		return ConstTerrainIterator(mTerrainSlots.begin(), mTerrainSlots.end());
+	}
+	//---------------------------------------------------------------------
+	void TerrainGroup::saveGroupDefinition(const String& filename)
+	{
+		DataStreamPtr stream = Root::getSingleton().createFileStream(filename, 
+			getResourceGroup(), true);
+		StreamSerialiser ser(stream);
+		saveGroupDefinition(ser);
+	}
+	//---------------------------------------------------------------------
+	void TerrainGroup::saveGroupDefinition(StreamSerialiser& ser)
+	{
+		ser.writeChunkBegin(CHUNK_ID, CHUNK_VERSION);
+		// Base details
+		ser.write(&mAlignment);
+		ser.write(&mTerrainSize);
+		ser.write(&mTerrainWorldSize);
+		ser.write(&mFilenamePrefix);
+		ser.write(&mFilenameExtension);
+		ser.write(&mResourceGroup);
+		ser.write(&mOrigin);
+
+		// Default import settings (those not duplicated by the above)
+		ser.write(&mDefaultImportData.constantHeight);
+		ser.write(&mDefaultImportData.inputBias);
+		ser.write(&mDefaultImportData.inputScale);
+		ser.write(&mDefaultImportData.maxBatchSize);
+		ser.write(&mDefaultImportData.minBatchSize);
+		Terrain::writeLayerDeclaration(mDefaultImportData.layerDeclaration, ser);
+		Terrain::writeLayerInstanceList(mDefaultImportData.layerList, ser);
+
+
+		ser.writeChunkEnd(CHUNK_ID);
+	}
+	//---------------------------------------------------------------------
+	void TerrainGroup::loadGroupDefinition(const String& filename)
+	{
+		DataStreamPtr stream = Root::getSingleton().openFileStream(filename, 
+			getResourceGroup());
+		StreamSerialiser ser(stream);
+		loadGroupDefinition(ser);
+	}
+	//---------------------------------------------------------------------
+	void TerrainGroup::loadGroupDefinition(StreamSerialiser& ser)
+	{
+		if (!ser.readChunkBegin(CHUNK_ID, CHUNK_VERSION))
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+				"Stream does not contain TerrainGroup data", __FUNCTION__);
+
+		// Base details
+		ser.read(&mAlignment);
+		ser.read(&mTerrainSize);
+		ser.read(&mTerrainWorldSize);
+		ser.read(&mFilenamePrefix);
+		ser.read(&mFilenameExtension);
+		ser.read(&mResourceGroup);
+		ser.read(&mOrigin);
+
+		// Default import settings (those not duplicated by the above)
+		ser.read(&mDefaultImportData.constantHeight);
+		ser.read(&mDefaultImportData.inputBias);
+		ser.read(&mDefaultImportData.inputScale);
+		ser.read(&mDefaultImportData.maxBatchSize);
+		ser.read(&mDefaultImportData.minBatchSize);
+		Terrain::readLayerDeclaration(ser, mDefaultImportData.layerDeclaration);
+		Terrain::readLayerInstanceList(ser, mDefaultImportData.layerDeclaration.samplers.size(), 
+			mDefaultImportData.layerList);
+
+		// copy data that would have normally happened on construction
+		mDefaultImportData.terrainAlign = mAlignment;
+		mDefaultImportData.terrainSize = mTerrainSize;
+		mDefaultImportData.worldSize = mTerrainWorldSize;
+		mDefaultImportData.deleteInputData = true;
+
+		ser.readChunkEnd(CHUNK_ID);
+
+
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------

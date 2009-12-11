@@ -238,35 +238,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::save(const String& filename)
 	{
-		// Does this file include path specifiers?
-		String path, basename;
-		StringUtil::splitFilename(filename, basename, path);
-
-		// no path elements, try the resource system first
-		DataStreamPtr stream;
-		if (path.empty())
-		{
-			try
-			{
-				stream = ResourceGroupManager::getSingleton().createResource(
-					filename, _getDerivedResourceGroup(), true);
-			}
-			catch (...) {}
-
-		}
-
-		if (stream.isNull())		
-		{
-			// save direct in filesystem
-			std::fstream fs;
-			fs.open(filename.c_str(), std::ios::out | std::ios::binary);
-			if (!fs)
-				OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, 
-				"Can't open " + filename + " for writing", __FUNCTION__);
-
-			stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename, &fs, false));
-		}
-
+		DataStreamPtr stream = Root::getSingleton().createFileStream(filename, _getDerivedResourceGroup(), true);
 		StreamSerialiser ser(stream);
 		save(ser);
 	}
@@ -288,54 +260,12 @@ namespace Ogre
 		stream.write(&mPos);
 		stream.write(mHeightData, mSize * mSize);
 
-		// Layer declaration
-		stream.writeChunkBegin(TERRAINLAYERDECLARATION_CHUNK_ID, TERRAINLAYERDECLARATION_CHUNK_VERSION);
-		//  samplers
-		uint8 numSamplers = (uint8)mLayerDecl.samplers.size();
-		stream.write(&numSamplers);
-		for (TerrainLayerSamplerList::const_iterator i = mLayerDecl.samplers.begin(); 
-			i != mLayerDecl.samplers.end(); ++i)
-		{
-			const TerrainLayerSampler& sampler = *i;
-			stream.writeChunkBegin(TERRAINLAYERSAMPLER_CHUNK_ID, TERRAINLAYERSAMPLER_CHUNK_VERSION);
-			stream.write(&sampler.alias);
-			uint8 pixFmt = (uint8)sampler.format;
-			stream.write(&pixFmt);
-			stream.writeChunkEnd(TERRAINLAYERSAMPLER_CHUNK_ID);
-		}
-		//  elements
-		uint8 numElems = (uint8)mLayerDecl.elements.size();
-		stream.write(&numElems);
-		for (TerrainLayerSamplerElementList::const_iterator i = mLayerDecl.elements.begin(); 
-			i != mLayerDecl.elements.end(); ++i)
-		{
-			const TerrainLayerSamplerElement& elem= *i;
-			stream.writeChunkBegin(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID, TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION);
-			stream.write(&elem.source);
-			uint8 sem = (uint8)elem.semantic;
-			stream.write(&sem);
-			stream.write(&elem.elementStart);
-			stream.write(&elem.elementCount);
-			stream.writeChunkEnd(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID);
-		}
-		stream.writeChunkEnd(TERRAINLAYERDECLARATION_CHUNK_ID);
+		writeLayerDeclaration(mLayerDecl, stream);
 
 		// Layers
 		checkLayers(false);
 		uint8 numLayers = (uint8)mLayers.size();
-		stream.write(&numLayers);
-		for (LayerInstanceList::const_iterator i = mLayers.begin(); i != mLayers.end(); ++i)
-		{
-			const LayerInstance& inst = *i;
-			stream.writeChunkBegin(TERRAINLAYERINSTANCE_CHUNK_ID, TERRAINLAYERINSTANCE_CHUNK_VERSION);
-			stream.write(&inst.worldSize);
-			for (StringVector::const_iterator t = inst.textureNames.begin(); 
-				t != inst.textureNames.end(); ++t)
-			{
-				stream.write(&(*t));
-			}
-			stream.writeChunkEnd(TERRAINLAYERINSTANCE_CHUNK_ID);
-		}
+		writeLayerInstanceList(mLayers, stream);
 
 		// Packed layer blend data
 		if(!mCpuBlendMapStorage.empty())
@@ -479,6 +409,122 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void Terrain::writeLayerDeclaration(const TerrainLayerDeclaration& decl, StreamSerialiser& stream)
+	{
+		// Layer declaration
+		stream.writeChunkBegin(TERRAINLAYERDECLARATION_CHUNK_ID, TERRAINLAYERDECLARATION_CHUNK_VERSION);
+		//  samplers
+		uint8 numSamplers = (uint8)decl.samplers.size();
+		stream.write(&numSamplers);
+		for (TerrainLayerSamplerList::const_iterator i = decl.samplers.begin(); 
+			i != decl.samplers.end(); ++i)
+		{
+			const TerrainLayerSampler& sampler = *i;
+			stream.writeChunkBegin(TERRAINLAYERSAMPLER_CHUNK_ID, TERRAINLAYERSAMPLER_CHUNK_VERSION);
+			stream.write(&sampler.alias);
+			uint8 pixFmt = (uint8)sampler.format;
+			stream.write(&pixFmt);
+			stream.writeChunkEnd(TERRAINLAYERSAMPLER_CHUNK_ID);
+		}
+		//  elements
+		uint8 numElems = (uint8)decl.elements.size();
+		stream.write(&numElems);
+		for (TerrainLayerSamplerElementList::const_iterator i = decl.elements.begin(); 
+			i != decl.elements.end(); ++i)
+		{
+			const TerrainLayerSamplerElement& elem= *i;
+			stream.writeChunkBegin(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID, TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION);
+			stream.write(&elem.source);
+			uint8 sem = (uint8)elem.semantic;
+			stream.write(&sem);
+			stream.write(&elem.elementStart);
+			stream.write(&elem.elementCount);
+			stream.writeChunkEnd(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID);
+		}
+		stream.writeChunkEnd(TERRAINLAYERDECLARATION_CHUNK_ID);
+	}
+	//---------------------------------------------------------------------
+	bool Terrain::readLayerDeclaration(StreamSerialiser& stream, TerrainLayerDeclaration& targetdecl)
+	{
+		if (!stream.readChunkBegin(TERRAINLAYERDECLARATION_CHUNK_ID, TERRAINLAYERDECLARATION_CHUNK_VERSION))
+			return false;
+		//  samplers
+		uint8 numSamplers;
+		stream.read(&numSamplers);
+		targetdecl.samplers.resize(numSamplers);
+		for (uint8 s = 0; s < numSamplers; ++s)
+		{
+			if (!stream.readChunkBegin(TERRAINLAYERSAMPLER_CHUNK_ID, TERRAINLAYERSAMPLER_CHUNK_VERSION))
+				return false;
+
+			stream.read(&(targetdecl.samplers[s].alias));
+			uint8 pixFmt;
+			stream.read(&pixFmt);
+			targetdecl.samplers[s].format = (PixelFormat)pixFmt;
+			stream.readChunkEnd(TERRAINLAYERSAMPLER_CHUNK_ID);
+		}
+		//  elements
+		uint8 numElems;
+		stream.read(&numElems);
+		targetdecl.elements.resize(numElems);
+		for (uint8 e = 0; e < numElems; ++e)
+		{
+			if (!stream.readChunkBegin(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID, TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION))
+				return false;
+
+			stream.read(&(targetdecl.elements[e].source));
+			uint8 sem;
+			stream.read(&sem);
+			targetdecl.elements[e].semantic = (TerrainLayerSamplerSemantic)sem;
+			stream.read(&(targetdecl.elements[e].elementStart));
+			stream.read(&(targetdecl.elements[e].elementCount));
+			stream.readChunkEnd(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID);
+		}
+		stream.readChunkEnd(TERRAINLAYERDECLARATION_CHUNK_ID);
+
+		return true;
+	}
+	//---------------------------------------------------------------------
+	void Terrain::writeLayerInstanceList(const Terrain::LayerInstanceList& layers, StreamSerialiser& stream)
+	{
+		uint8 numLayers = (uint8)layers.size();
+		stream.write(&numLayers);
+		for (LayerInstanceList::const_iterator i = layers.begin(); i != layers.end(); ++i)
+		{
+			const LayerInstance& inst = *i;
+			stream.writeChunkBegin(TERRAINLAYERINSTANCE_CHUNK_ID, TERRAINLAYERINSTANCE_CHUNK_VERSION);
+			stream.write(&inst.worldSize);
+			for (StringVector::const_iterator t = inst.textureNames.begin(); 
+				t != inst.textureNames.end(); ++t)
+			{
+				stream.write(&(*t));
+			}
+			stream.writeChunkEnd(TERRAINLAYERINSTANCE_CHUNK_ID);
+		}
+
+	}
+	//---------------------------------------------------------------------
+	bool Terrain::readLayerInstanceList(StreamSerialiser& stream, size_t numSamplers, Terrain::LayerInstanceList& targetlayers)
+	{
+		uint8 numLayers;
+		stream.read(&numLayers);
+		targetlayers.resize(numLayers);
+		for (uint8 l = 0; l < numLayers; ++l)
+		{
+			if (!stream.readChunkBegin(TERRAINLAYERINSTANCE_CHUNK_ID, TERRAINLAYERINSTANCE_CHUNK_VERSION))
+				return false;
+			stream.read(&targetlayers[l].worldSize);
+			targetlayers[l].textureNames.resize(numSamplers);
+			for (size_t t = 0; t < numSamplers; ++t)
+			{
+				stream.read(&(targetlayers[l].textureNames[t]));
+			}
+			stream.readChunkEnd(TERRAINLAYERINSTANCE_CHUNK_ID);
+		}
+
+		return true;
+	}
+	//---------------------------------------------------------------------
 	const String& Terrain::_getDerivedResourceGroup() const
 	{
 		if (mResourceGroup.empty())
@@ -489,27 +535,8 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool Terrain::prepare(const String& filename)
 	{
-		DataStreamPtr stream;
-		if (ResourceGroupManager::getSingleton().resourceExists(
-				_getDerivedResourceGroup(), filename))
-		{
-			stream = ResourceGroupManager::getSingleton().openResource(
-				filename, _getDerivedResourceGroup());
-		}
-		else
-		{
-			// try direct
-			std::ifstream *ifs = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL);
-			ifs->open(filename.c_str(), std::ios::in | std::ios::binary);
-			if(!*ifs)
-			{
-				OGRE_DELETE_T(ifs, basic_ifstream, MEMCATEGORY_GENERAL);
-				OGRE_EXCEPT(
-					Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!", __FUNCTION__);
-			}
-			stream.bind(OGRE_NEW FileStreamDataStream(filename, ifs));
-		}
-
+		DataStreamPtr stream = Root::getSingleton().openFileStream(filename, 
+			_getDerivedResourceGroup());
 		StreamSerialiser ser(stream);
 		return prepare(ser);
 	}
@@ -542,64 +569,18 @@ namespace Ogre
 
 
 		// Layer declaration
-		if (!stream.readChunkBegin(TERRAINLAYERDECLARATION_CHUNK_ID, TERRAINLAYERDECLARATION_CHUNK_VERSION))
+		if (!readLayerDeclaration(stream, mLayerDecl))
 			return false;
-
-		//  samplers
-		uint8 numSamplers;
-		stream.read(&numSamplers);
-		mLayerDecl.samplers.resize(numSamplers);
-		for (uint8 s = 0; s < numSamplers; ++s)
-		{
-			if (!stream.readChunkBegin(TERRAINLAYERSAMPLER_CHUNK_ID, TERRAINLAYERSAMPLER_CHUNK_VERSION))
-				return false;
-
-			stream.read(&(mLayerDecl.samplers[s].alias));
-			uint8 pixFmt;
-			stream.read(&pixFmt);
-			mLayerDecl.samplers[s].format = (PixelFormat)pixFmt;
-			stream.readChunkEnd(TERRAINLAYERSAMPLER_CHUNK_ID);
-		}
-		//  elements
-		uint8 numElems;
-		stream.read(&numElems);
-		mLayerDecl.elements.resize(numElems);
-		for (uint8 e = 0; e < numElems; ++e)
-		{
-			if (!stream.readChunkBegin(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID, TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION))
-				return false;
-
-			stream.read(&(mLayerDecl.elements[e].source));
-			uint8 sem;
-			stream.read(&sem);
-			mLayerDecl.elements[e].semantic = (TerrainLayerSamplerSemantic)sem;
-			stream.read(&(mLayerDecl.elements[e].elementStart));
-			stream.read(&(mLayerDecl.elements[e].elementCount));
-			stream.readChunkEnd(TERRAINLAYERSAMPLERELEMENT_CHUNK_ID);
-		}
-		stream.readChunkEnd(TERRAINLAYERDECLARATION_CHUNK_ID);
 		checkDeclaration();
 
 
 		// Layers
-		uint8 numLayers;
-		stream.read(&numLayers);
-		mLayers.resize(numLayers);
-		for (uint8 l = 0; l < numLayers; ++l)
-		{
-			if (!stream.readChunkBegin(TERRAINLAYERINSTANCE_CHUNK_ID, TERRAINLAYERINSTANCE_CHUNK_VERSION))
-				return false;
-			stream.read(&mLayers[l].worldSize);
-			mLayers[l].textureNames.resize(mLayerDecl.samplers.size());
-			for (size_t t = 0; t < mLayerDecl.samplers.size(); ++t)
-			{
-				stream.read(&(mLayers[l].textureNames[t]));
-			}
-			stream.readChunkEnd(TERRAINLAYERINSTANCE_CHUNK_ID);
-		}
+		if (!readLayerInstanceList(stream, mLayerDecl.samplers.size(), mLayers))
+			return false;
 		deriveUVMultipliers();
 
 		// Packed layer blend data
+		uint8 numLayers = (uint8)mLayers.size();
 		stream.read(&mLayerBlendMapSize);
 		mLayerBlendMapSizeActual = mLayerBlendMapSize; // for now, until we check
 		// load packed CPU data
