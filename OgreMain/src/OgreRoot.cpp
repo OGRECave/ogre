@@ -1092,6 +1092,68 @@ namespace Ogre {
 		ResourceGroupManager::getSingleton().removeResourceLocation(
 			name, groupName);
 	}
+	//---------------------------------------------------------------------
+	DataStreamPtr Root::createFileStream(const String& filename, const String& groupName, 
+		bool overwrite, const String& locationPattern)
+	{
+		// Does this file include path specifiers?
+		String path, basename;
+		StringUtil::splitFilename(filename, basename, path);
+
+		// no path elements, try the resource system first
+		DataStreamPtr stream;
+		if (path.empty())
+		{
+			try
+			{
+				stream = ResourceGroupManager::getSingleton().createResource(
+					filename, groupName, overwrite, locationPattern);
+			}
+			catch (...) {}
+
+		}
+
+		if (stream.isNull())		
+		{
+			// save direct in filesystem
+			std::fstream fs;
+			fs.open(filename.c_str(), std::ios::out | std::ios::binary);
+			if (!fs)
+				OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, 
+				"Can't open " + filename + " for writing", __FUNCTION__);
+
+			stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename, &fs, false));
+		}
+
+		return stream;
+
+	}
+	//---------------------------------------------------------------------
+	DataStreamPtr Root::openFileStream(const String& filename, const String& groupName, 
+		const String& locationPattern)
+	{
+		DataStreamPtr stream;
+		if (ResourceGroupManager::getSingleton().resourceExists(
+			groupName, filename))
+		{
+			stream = ResourceGroupManager::getSingleton().openResource(
+				filename, groupName);
+		}
+		else
+		{
+			// try direct
+			std::ifstream *ifs = OGRE_NEW_T(std::ifstream, MEMCATEGORY_GENERAL);
+			ifs->open(filename.c_str(), std::ios::in | std::ios::binary);
+			if(!*ifs)
+			{
+				OGRE_DELETE_T(ifs, basic_ifstream, MEMCATEGORY_GENERAL);
+				OGRE_EXCEPT(
+					Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!", __FUNCTION__);
+			}
+			stream.bind(OGRE_NEW FileStreamDataStream(filename, ifs));
+		}
+		return stream;
+	}
     //-----------------------------------------------------------------------
     void Root::convertColourValue(const ColourValue& colour, uint32* pDest)
     {

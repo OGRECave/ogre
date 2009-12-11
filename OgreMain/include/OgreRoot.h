@@ -584,6 +584,47 @@ namespace Ogre
 		void removeResourceLocation(const String& name, 
 			const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
+		/** Helper method to assist you in creating writeable file streams.
+		@remarks
+			This is a high-level utility method which you can use to find a place to 
+			save a file more easily. If the filename you specify is either an
+			absolute or relative filename (ie it includes path separators), then
+			the file will be created in the normal filesystem using that specification.
+			If it doesn't, then the method will look for a writeable resource location
+			via ResourceGroupManager::createResource using the other params provided.
+		@param filename The name of the file to create. If it includes path separators, 
+			the filesystem will be accessed direct. If no path separators are
+			present the resource system is used, falling back on the raw filesystem after.
+		@param groupName The name of the group in which to create the file, if the 
+			resource system is used
+		@param overwrite If true, an existing file will be overwritten, if false
+			an error will occur if the file already exists
+		@param locationPattern If the resource group contains multiple locations, 
+			then usually the file will be created in the first writable location. If you 
+			want to be more specific, you can include a location pattern here and 
+			only locations which match that pattern (as determined by StringUtil::match)
+			will be considered candidates for creation.
+		*/
+		DataStreamPtr createFileStream(const String& filename, const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+			bool overwrite = false, const String& locationPattern = StringUtil::BLANK);
+
+		/** Helper method to assist you in accessing readable file streams.
+		@remarks
+			This is a high-level utility method which you can use to find a place to 
+			open a file more easily. It checks the resource system first, and if
+			that fails falls back on accessing the file system directly.
+		@param filename The name of the file to open. 
+		@param groupName The name of the group in which to create the file, if the 
+			resource system is used
+		@param locationPattern If the resource group contains multiple locations, 
+			then usually the file will be created in the first writable location. If you 
+			want to be more specific, you can include a location pattern here and 
+			only locations which match that pattern (as determined by StringUtil::match)
+			will be considered candidates for creation.
+		*/		
+		DataStreamPtr openFileStream(const String& filename, const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+			const String& locationPattern = StringUtil::BLANK);
+
         /** Generates a packed data version of the passed in ColourValue suitable for
             use with the current RenderSystem.
         @remarks
