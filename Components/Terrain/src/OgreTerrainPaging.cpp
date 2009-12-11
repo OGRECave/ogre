@@ -55,6 +55,7 @@ namespace Ogre
 		ret->init(terrainGroup);
 		ret->setLoadRadius(loadRadius);
 		ret->setHoldRadius(holdRadius);
+		ret->setPageRange(minX, minY, maxX, maxY);
 
 		return ret;
 
