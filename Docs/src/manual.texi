@@ -1794,13 +1794,13 @@ Another one of the DirectX vertex shader assembler syntaxes. @*
 Supported on cards from: ATI Radeon X series, nVidia GeForce FX 6 series @*
 @item vs_3_0
 Another one of the DirectX vertex shader assembler syntaxes. @*
-Supported on cards from: nVidia GeForce FX 6 series
+Supported on cards from: ATI Radeon HD 2000+, nVidia GeForce FX 6 series
 @item arbvp1
 This is the OpenGL standard assembler format for vertex programs. It's roughly equivalent to DirectX vs_1_1.
 @item vp20
-This is an nVidia-specific OpenGL vertex shader syntax which is a superset of vs 1.1. 
+This is an nVidia-specific OpenGL vertex shader syntax which is a superset of vs 1.1. ATI Radeon HD 2000+ also supports it. 
 @item vp30
-Another nVidia-specific OpenGL vertex shader syntax. It is a superset of vs 2.0, which is supported on nVidia GeForce FX 5 series and higher.
+Another nVidia-specific OpenGL vertex shader syntax. It is a superset of vs 2.0, which is supported on nVidia GeForce FX 5 series and higher. ATI Radeon HD 2000+ also supports it. 
 @item vp40
 Another nVidia-specific OpenGL vertex shader syntax. It is a superset of vs 3.0, which is supported on nVidia GeForce FX 6 series and higher.
 @item ps_1_1, ps_1_2, ps_1_3
@@ -1820,7 +1820,7 @@ ps_2_0 with a higher number of instructions. @*
 Supported cards: ATI Radeon X series, nVidia GeForce FX 6 series@*
 @item ps_3_0
 DirectX pixel shader (ie fragment program) assembler syntax. @*
-Supported cards: nVidia GeForce FX6 series@*
+Supported cards: ATI Radeon HD 2000+, nVidia GeForce FX6 series@*
 @item ps_3_x
 DirectX pixel shader (ie fragment program) assembler syntax. @*
 Supported cards: nVidia GeForce FX7 series@*
@@ -1829,7 +1829,7 @@ This is the OpenGL standard assembler format for fragment programs. It's roughly
 @item fp20
 This is an nVidia-specific OpenGL fragment syntax which is a superset of ps 1.3. It allows you to use the 'nvparse' format for basic fragment programs. It actually uses NV_texture_shader and NV_register_combiners to provide functionality equivalent to DirectX's ps_1_1 under GL, but only for nVidia cards. However, since ATI cards adopted arbfp1 a little earlier than nVidia, it is mainly nVidia cards like the GeForce3 and GeForce4 that this will be useful for. You can find more information about nvparse at http://developer.nvidia.com/object/nvparse.html.
 @item fp30
-Another nVidia-specific OpenGL fragment shader syntax. It is a superset of ps 2.0, which is supported on nVidia GeForce FX 5 series and higher.
+Another nVidia-specific OpenGL fragment shader syntax. It is a superset of ps 2.0, which is supported on nVidia GeForce FX 5 series and higher. ATI Radeon HD 2000+ also supports it. 
 @item fp40
 Another nVidia-specific OpenGL fragment shader syntax. It is a superset of ps 3.0, which is supported on nVidia GeForce FX 6 series and higher.
 @item gpu_gp, gp4_gp
