@@ -36,6 +36,7 @@ namespace Ogre
 {
 	//---------------------------------------------------------------------
 	const uint32 PagedWorld::CHUNK_ID = StreamSerialiser::makeIdentifier("PWLD");
+	const uint32 PagedWorld::CHUNK_SECTIONDECLARATION_ID = StreamSerialiser::makeIdentifier("PWLS");
 	const uint16 PagedWorld::CHUNK_VERSION = 1;
 	//---------------------------------------------------------------------
 	PagedWorld::PagedWorld(const String& name, PageManager* manager)
@@ -46,7 +47,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	PagedWorld::~PagedWorld()
 	{
-
+		destroyAllSections();
 	}
 	//---------------------------------------------------------------------
 	void PagedWorld::load(const String& filename)
@@ -70,17 +71,18 @@ namespace Ogre
 		// Name
 		ser.read(&mName);
 		// Sections
-		while(ser.peekNextChunkID() == PagedWorldSection::CHUNK_ID)
+		while(ser.peekNextChunkID() == CHUNK_SECTIONDECLARATION_ID)
 		{
-			PagedWorldSection* sec = OGRE_NEW PagedWorldSection(this);
+			ser.readChunkBegin();
+			String sectionType, sectionName;
+			ser.read(&sectionType);
+			ser.read(&sectionName);
+			ser.readChunkEnd(CHUNK_SECTIONDECLARATION_ID);
+			// Scene manager will be loaded
+			PagedWorldSection* sec = createSection(0, sectionType, sectionName);
 			bool sectionsOk = sec->load(ser);
-			if (sectionsOk)
-				mSections[sec->getName()] = sec;
-			else
-			{
-				OGRE_DELETE sec;
-				break;
-			}
+			if (!sectionsOk)
+				destroySection(sec);
 		}
 
 		ser.readChunkEnd(CHUNK_ID);
@@ -110,23 +112,23 @@ namespace Ogre
 		ser.write(&mName);
 		// Sections
 		for (SectionMap::iterator i = mSections.begin(); i != mSections.end(); ++i)
+		{
+			PagedWorldSection* sec = i->second;
+			// declaration
+			ser.writeChunkBegin(CHUNK_SECTIONDECLARATION_ID);
+			ser.write(&sec->getType());
+			ser.write(&sec->getName());
+			ser.writeChunkEnd(CHUNK_SECTIONDECLARATION_ID);
+			// data
 			i->second->save(ser);
+		}
 
 		ser.writeChunkEnd(CHUNK_ID);
 	}
 	//---------------------------------------------------------------------
-	PagedWorldSection* PagedWorld::createSection(const String& strategyName, 
-		SceneManager* sceneMgr, const String& sectionName)
-	{
-		// get the strategy
-		PageStrategy* strategy = mManager->getStrategy(strategyName);
-
-		return createSection(strategy, sceneMgr, sectionName);
-
-	}
-	//---------------------------------------------------------------------
-	PagedWorldSection* PagedWorld::createSection(PageStrategy* strategy, 
-		SceneManager* sceneMgr, const String& sectionName)
+	PagedWorldSection* PagedWorld::createSection(SceneManager* sceneMgr,
+		const String& typeName,
+		const String& sectionName /*= StringUtil::BLANK*/)
 	{
 		String theName = sectionName;
 		if (theName.empty())
@@ -143,12 +145,48 @@ namespace Ogre
 				"PagedWorld::createSection");
 		}
 
-		PagedWorldSection* ret = OGRE_NEW PagedWorldSection(theName, this, strategy, sceneMgr);
+		PagedWorldSection* ret = 0;
+		if (typeName == "General")
+			ret = OGRE_NEW PagedWorldSection(theName, this, sceneMgr);
+		else
+		{
+			PagedWorldSectionFactory* fact = getManager()->getWorldSectionFactory(typeName);
+			if (!fact)
+			{
+				OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+					"World section type '" + typeName + "' does not exist!",
+					"PagedWorld::createSection");
+			}
+
+			ret = fact->createInstance(theName, this, sceneMgr);
+
+		}
 		mSections[theName] = ret;
 
 		return ret;
 
+
 	}
+	//---------------------------------------------------------------------
+	PagedWorldSection* PagedWorld::createSection(const String& strategyName, SceneManager* sceneMgr,
+		const String& sectionName)
+	{
+		// get the strategy
+		PageStrategy* strategy = mManager->getStrategy(strategyName);
+
+		return createSection(strategy, sceneMgr, sectionName);
+		
+	}
+	//---------------------------------------------------------------------
+	PagedWorldSection* PagedWorld::createSection(PageStrategy* strategy, SceneManager* sceneMgr, 
+		const String& sectionName)
+	{
+		PagedWorldSection* ret = createSection(sceneMgr, "General", sectionName);
+		ret->setStrategy(strategy);
+
+		return ret;
+	}
+
 	//---------------------------------------------------------------------
 	void PagedWorld::destroySection(const String& name)
 	{
@@ -163,6 +201,13 @@ namespace Ogre
 	void PagedWorld::destroySection(PagedWorldSection* sec)
 	{
 		destroySection(sec->getName());
+	}
+	//---------------------------------------------------------------------
+	void PagedWorld::destroyAllSections()
+	{
+		for (SectionMap::iterator i = mSections.begin(); i != mSections.end(); ++i)
+			OGRE_DELETE i->second;
+		mSections.clear();
 	}
 	//---------------------------------------------------------------------
 	PagedWorldSection* PagedWorld::getSection(const String& name)

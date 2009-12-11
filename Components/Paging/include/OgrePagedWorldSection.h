@@ -59,6 +59,12 @@ namespace Ogre
 		PagedWorldSectionFactory. These subclasses might come preconfigured
 		with a strategy for example, or with additional metadata used only for
 		that particular type of section.
+	@par
+		A PagedWorldSection targets a specific SceneManager. When you create one
+		in code via PagedWorld::createSection, you pass that SceneManager in manually.
+		When loading from a saved world file however, the SceneManager type and
+		instance name are saved and that SceneManager is looked up on loading, or
+		created if it didn't exist. 
 	*/
 	class PagedWorldSection : public PageAlloc
 	{
@@ -74,17 +80,17 @@ namespace Ogre
 		PageProvider* mPageProvider;
 		SceneManager* mSceneMgr;
 
+		/// Load data specific to a subtype of this class (if any)
+		virtual void loadSubtypeData(StreamSerialiser& ser) {}
+		virtual void saveSubtypeData(StreamSerialiser& ser) {}
+
 
 	public:
 		static const uint32 CHUNK_ID;
 		static const uint16 CHUNK_VERSION;
 
-		/** Construct a new instance, specifying just the parent (expecting to load). */
-		PagedWorldSection(PagedWorld* parent); 
-
-		/** Construct a new instance, specifying the parent and assigned strategy. */
-		PagedWorldSection(const String& name, PagedWorld* parent, PageStrategy* strategy, 
-			SceneManager* sm);
+		/** Construct a new instance, specifying the parent and scene manager. */
+		PagedWorldSection(const String& name, PagedWorld* parent, SceneManager* sm);
 		virtual ~PagedWorldSection();
 
 		PageManager* getManager() const;
@@ -296,7 +302,7 @@ namespace Ogre
 	{
 	public:
 		virtual const String& getName() const = 0;
-		virtual PagedWorldSection* createInstance() = 0;
+		virtual PagedWorldSection* createInstance(const String& name, PagedWorld* parent, SceneManager* sm) = 0;
 		virtual void destroyInstance(PagedWorldSection*) = 0;
 
 

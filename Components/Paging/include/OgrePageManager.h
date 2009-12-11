@@ -286,11 +286,15 @@ namespace Ogre
 		/** Create a new instance of PagedWorldSection using the registered
 		factories.
 		@param typeName The name of the type of collection to create
+		@param name The instance name 
+		@param parent The parent world
+		@param sm The SceneManager to use (can be null if this is to be loaded)
 		*/
-		PagedWorldSection* createWorldSection(const String& typeName);
+		PagedWorldSection* createWorldSection(const String& typeName, 
+			const String& name, PagedWorld* parent, SceneManager* sm);
 
 		/** Destroy an instance of PagedWorldSection. */
-		void destroyWorldSection(PagedWorldSection* coll);
+		void destroyWorldSection(PagedWorldSection* s);
 
 		/** Get a reference to the registered strategies.
 		*/

@@ -267,6 +267,11 @@ namespace Ogre {
 		}
 
 	}
+	//---------------------------------------------------------------------
+	bool SceneManagerEnumerator::hasSceneManager(const String& instanceName) const
+	{
+		return mInstances.find(instanceName) != mInstances.end();
+	}
 	//-----------------------------------------------------------------------
 	SceneManagerEnumerator::SceneManagerIterator 
 	SceneManagerEnumerator::getSceneManagerIterator(void)

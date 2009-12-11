@@ -41,17 +41,9 @@ namespace Ogre
 	const uint32 PagedWorldSection::CHUNK_ID = StreamSerialiser::makeIdentifier("PWSC");
 	const uint16 PagedWorldSection::CHUNK_VERSION = 1;
 	//---------------------------------------------------------------------
-	PagedWorldSection::PagedWorldSection(PagedWorld* parent)
-		: mParent(parent), mStrategy(0), mPageProvider(0), mSceneMgr(0)
-	{
-
-	}
-	//---------------------------------------------------------------------
-	PagedWorldSection::PagedWorldSection(const String& name, PagedWorld* parent, 
-		PageStrategy* strategy, SceneManager* sm)
+	PagedWorldSection::PagedWorldSection(const String& name, PagedWorld* parent, SceneManager* sm)
 		: mName(name), mParent(parent), mStrategy(0), mPageProvider(0), mSceneMgr(sm)
 	{
-		setStrategy(strategy);
 	}
 	//---------------------------------------------------------------------
 	PagedWorldSection::~PagedWorldSection()
@@ -130,6 +122,17 @@ namespace Ogre
 		ser.read(&mName);
 		// AABB
 		ser.read(&mAABB);
+		// SceneManager type
+		String smType, smInstanceName;
+		SceneManager* sm = 0;
+		ser.read(&smType);
+		ser.read(&smInstanceName);
+		Root& root = Root::getSingleton();
+		if (root.hasSceneManager(smInstanceName))
+			sm = root.getSceneManager(smInstanceName);
+		else
+			sm = root.createSceneManager(smType, smInstanceName);
+		setSceneManager(sm);
 		// Page Strategy Name
 		String stratname;
 		ser.read(&stratname);
@@ -139,6 +142,9 @@ namespace Ogre
 		if (!strategyDataOk)
 			LogManager::getSingleton().stream() << "Error: PageStrategyData for section '"
 			<< mName << "' was not loaded correctly, check file contents";
+
+		/// Load any data specific to a subtype of this class
+		loadSubtypeData(ser);
 
 		ser.readChunkEnd(CHUNK_ID);
 
@@ -154,10 +160,16 @@ namespace Ogre
 		ser.write(&mName);
 		// AABB
 		ser.write(&mAABB);
+		// SceneManager type & name
+		ser.write(&mSceneMgr->getTypeName());
+		ser.write(&mSceneMgr->getName());
 		// Page Strategy Name
 		ser.write(&mStrategy->getName());
 		// Page Strategy Data
 		mStrategyData->save(ser);
+
+		/// Save any data specific to a subtype of this class
+		saveSubtypeData(ser);
 
 		ser.writeChunkEnd(CHUNK_ID);
 

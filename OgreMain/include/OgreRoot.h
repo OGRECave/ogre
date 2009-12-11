@@ -402,6 +402,10 @@ namespace Ogre
 		*/
 		SceneManager* getSceneManager(const String& instanceName) const;
 
+		/** Determines if a given SceneManager already exists
+		@param instanceName The name of the instance to retrieve.
+		*/
+		bool hasSceneManager(const String& instanceName) const;
 		/** Get an iterator over all the existing SceneManager instances. */
 		SceneManagerEnumerator::SceneManagerIterator getSceneManagerIterator(void);
 

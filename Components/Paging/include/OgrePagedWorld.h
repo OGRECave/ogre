@@ -63,6 +63,7 @@ namespace Ogre
 	public:
 		static const uint32 CHUNK_ID;
 		static const uint16 CHUNK_VERSION;
+		static const uint32 CHUNK_SECTIONDECLARATION_ID;
 		/** Constructor.
 		@param name The name of the world, which must be enough to identify the 
 			place where data for it can be loaded from (doesn't have to be a filename
@@ -93,7 +94,26 @@ namespace Ogre
 		/// Save world data to a serialiser
 		void save(StreamSerialiser& stream);
 
-		/** Create a new section of the world.
+		/** Create a new section of the world based on a specialised type.
+		@remarks
+			World sections are areas of the world that use a particular
+			PageStrategy, with a certain set of parameters specific to that
+			strategy, and potentially some other rules. 
+			So you would have more than one section in a world only 
+			if you needed different simultaneous paging strategies, or you 
+			wanted the same strategy but parameterised differently.
+		@param sceneMgr The SceneManager to use for this section. 
+		@param typeName The type of section to use (must be registered	
+			with PageManager), or blank to use the default type (simple grid)
+		@param sectionName An optional name to give the section (if none is
+			provided, one will be generated)
+		*/
+		PagedWorldSection* createSection(SceneManager* sceneMgr,
+			const String& typeName,
+			const String& sectionName = StringUtil::BLANK);
+
+
+		/** Create a new manually defined section of the world.
 		@remarks
 			World sections are areas of the world that use a particular
 			PageStrategy, with a certain set of parameters specific to that
@@ -110,7 +130,7 @@ namespace Ogre
 			const String& sectionName = StringUtil::BLANK);
 
 
-		/** Create a new section of the world.
+		/** Create a manually defined new section of the world.
 		@remarks
 			World sections are areas of the world that use a particular
 			PageStrategy, with a certain set of parameters specific to that
@@ -124,11 +144,12 @@ namespace Ogre
 		*/
 		PagedWorldSection* createSection(PageStrategy* strategy, SceneManager* sceneMgr, 
 			const String& sectionName = StringUtil::BLANK);
-
 		/** Destroy a section of world. */
 		void destroySection(const String& name);
 		/** Destroy a section of world. */
 		void destroySection(PagedWorldSection* sec);
+		/** Destroy all world sections */
+		void destroyAllSections();
 
 		/** Get the number of sections this world has. */
 		size_t getSectionCount() const { return mSections.size(); }

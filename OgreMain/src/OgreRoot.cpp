@@ -727,6 +727,11 @@ namespace Ogre {
 	{
 		return mSceneManagerEnum->getSceneManager(instanceName);
 	}
+	//---------------------------------------------------------------------
+	bool Root::hasSceneManager(const String& instanceName) const
+	{
+		return mSceneManagerEnum->hasSceneManager(instanceName);
+	}
 	//-----------------------------------------------------------------------
 	SceneManagerEnumerator::SceneManagerIterator Root::getSceneManagerIterator(void)
 	{

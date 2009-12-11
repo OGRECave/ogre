@@ -326,7 +326,8 @@ namespace Ogre
 		return mWorldSectionFactories;
 	}
 	//---------------------------------------------------------------------
-	PagedWorldSection* PageManager::createWorldSection(const String& typeName)
+	PagedWorldSection* PageManager::createWorldSection(const String& typeName, 
+		const String& name, PagedWorld* parent, SceneManager* sm)
 	{
 		PagedWorldSectionFactory* fact = getWorldSectionFactory(typeName);
 		if (!fact)
@@ -334,7 +335,7 @@ namespace Ogre
 			typeName + " is not the name of a valid PagedWorldSectionFactory", 
 			"PageManager::createWorldSection");
 
-		return fact->createInstance();
+		return fact->createInstance(name, parent, sm);
 	}
 	//---------------------------------------------------------------------
 	void PageManager::destroyWorldSection(PagedWorldSection* coll)

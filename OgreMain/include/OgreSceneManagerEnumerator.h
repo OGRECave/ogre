@@ -175,6 +175,11 @@ namespace Ogre {
 		*/
 		SceneManager* getSceneManager(const String& instanceName) const;
 
+		/** Identify if a SceneManager instance already exists.
+		@param instanceName The name of the instance to retrieve.
+		*/
+		bool hasSceneManager(const String& instanceName) const;
+
 		typedef MapIterator<Instances> SceneManagerIterator;
 		/** Get an iterator over all the existing SceneManager instances. */
 		SceneManagerIterator getSceneManagerIterator(void);
