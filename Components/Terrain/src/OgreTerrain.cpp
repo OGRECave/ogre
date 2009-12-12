@@ -656,6 +656,7 @@ namespace Ogre
 
 		distributeVertexData();
 
+		mModified = false;
 
 		return true;
 	}
@@ -784,6 +785,10 @@ namespace Ogre
 		finaliseHeightDeltas(rect, true);
 
 		distributeVertexData();
+
+		// Imported data is treated as modified because it's not saved
+		mModified = true;
+
 
 		return true;
 
@@ -1002,7 +1007,6 @@ namespace Ogre
 		mMaterialGenerator->requestOptions(this);
 
 		mIsLoaded = true;
-		mModified = false;
 
 	}
 	//---------------------------------------------------------------------
