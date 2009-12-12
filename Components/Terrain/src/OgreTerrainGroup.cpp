@@ -612,21 +612,25 @@ namespace Ogre
 		{
 			TerrainSlot* slot = lreq.slot;
 			Terrain* terrain = slot->instance;
-			// do final load now we've prepared in the background
-			// we must set the position
-			terrain->setPosition(getTerrainSlotPosition(slot->x, slot->y));
-
-			terrain->load();
-
-			// hook up with neighbours
-			for (int i = -1; i <= 1; ++i)
+			if (terrain)
 			{
-				for (int j = -1; j <= 1; ++j)
-				{
-					if (i != 0 || j != 0)
-						connectNeighbour(slot, i, j);
-				}
 
+				// do final load now we've prepared in the background
+				// we must set the position
+				terrain->setPosition(getTerrainSlotPosition(slot->x, slot->y));
+
+				terrain->load();
+
+				// hook up with neighbours
+				for (int i = -1; i <= 1; ++i)
+				{
+					for (int j = -1; j <= 1; ++j)
+					{
+						if (i != 0 || j != 0)
+							connectNeighbour(slot, i, j);
+					}
+
+				}
 			}
 		}
 		else

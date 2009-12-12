@@ -1996,6 +1996,10 @@ namespace Ogre
 	void Terrain::preFindVisibleObjects(SceneManager* source, 
 		SceneManager::IlluminationRenderStage irs, Viewport* v)
 	{
+		// Early-out
+		if (!mIsLoaded)
+			return;
+
 		// check deferred updates
 		unsigned long currMillis = Root::getSingleton().getTimer()->getMilliseconds();
 		unsigned long elapsedMillis = currMillis - mLastMillis;

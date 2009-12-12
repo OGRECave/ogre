@@ -187,12 +187,16 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void TerrainPagedWorldSection::loadPage(PageID pageID, bool forceSynchronous)
 	{
-		// trigger terrain load
-		long x, y;
-		// pageID is the same as a packed index
-		mTerrainGroup->unpackIndex(pageID, &x, &y);
-		mTerrainGroup->defineTerrain(x, y);
-		mTerrainGroup->loadTerrain(x, y, forceSynchronous);
+		PageMap::iterator i = mPages.find(pageID);
+		if (i == mPages.end())
+		{
+			// trigger terrain load
+			long x, y;
+			// pageID is the same as a packed index
+			mTerrainGroup->unpackIndex(pageID, &x, &y);
+			mTerrainGroup->defineTerrain(x, y);
+			mTerrainGroup->loadTerrain(x, y, forceSynchronous);
+		}
 
 		PagedWorldSection::loadPage(pageID, forceSynchronous);
 	}

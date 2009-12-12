@@ -131,8 +131,9 @@ namespace Ogre
 		mTerrain->getPoint(midpointx, midpointy, 0, &mLocalCentre);
 
 		mMovable = OGRE_NEW Movable(this);
-		mTerrain->_getRootSceneNode()->createChildSceneNode(mLocalCentre)->attachObject(mMovable);
 		mRend = OGRE_NEW Rend(this);
+
+		mLocalNode = mTerrain->_getRootSceneNode()->createChildSceneNode(mLocalCentre);
 		
 	}
 	//---------------------------------------------------------------------
@@ -142,6 +143,9 @@ namespace Ogre
 		mMovable = 0;
 		OGRE_DELETE mRend;
 		mRend = 0;
+
+		mTerrain->_getRootSceneNode()->removeAndDestroyChild(mLocalNode->getName());
+		mLocalNode = 0;
 
 		for (int i = 0; i < 4; ++i)
 			OGRE_DELETE mChildren[i];
@@ -208,6 +212,7 @@ namespace Ogre
 			for (int i = 0; i < 4; ++i)
 				mChildren[i]->load();
 
+		mLocalNode->attachObject(mMovable);
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::unload()
@@ -217,6 +222,9 @@ namespace Ogre
 				mChildren[i]->unload();
 
 		destroyGpuVertexData();
+
+		if (mMovable->isAttached())
+			mLocalNode->detachObject(mMovable);
 
 	}
 	//---------------------------------------------------------------------
@@ -479,7 +487,7 @@ namespace Ogre
 
 			}
 			// Make sure node knows to update
-			if (mMovable)
+			if (mMovable && mMovable->isAttached())
 				mMovable->getParentSceneNode()->needUpdate();
 
 

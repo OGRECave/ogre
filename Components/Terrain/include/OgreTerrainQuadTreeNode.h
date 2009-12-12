@@ -344,6 +344,7 @@ namespace Ogre
 		};
 		Movable* mMovable;
 		friend class Movable;
+		SceneNode* mLocalNode;
 
 		/// Hook to the render queue
 		class Rend : public Renderable, public TerrainAlloc
