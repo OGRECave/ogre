@@ -58,6 +58,10 @@ namespace Ogre
 
 		mTerrainGroup = grp;
 		syncSettings();
+
+		// Unload all existing terrain pages, because we want the paging system
+		// to be in charge of this
+		mTerrainGroup->removeAllTerrains();
 	}
 	//---------------------------------------------------------------------
 	void TerrainPagedWorldSection::syncSettings()
