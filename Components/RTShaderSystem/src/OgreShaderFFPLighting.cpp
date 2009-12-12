@@ -102,7 +102,7 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 		return;
 
 	GpuProgramParametersSharedPtr vsGpuParams = pass->getVertexProgramParameters();
-	SceneManager* sceneMgr = ShaderGenerator::getSingleton().getSceneManager();
+	SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager();
 	Viewport* curViewport = sceneMgr->getCurrentViewport();
 	Camera* curCamera     = curViewport->getCamera();
 	const Matrix4& matView = curCamera->getViewMatrix(true);

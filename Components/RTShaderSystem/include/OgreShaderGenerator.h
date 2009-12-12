@@ -103,15 +103,22 @@ public:
 	static ShaderGenerator*			getSingletonPtr	();
 
 	/** 
-	Set the target scene manager of the shader generator.
-	@param sceneMgr The scene manager that the shader generator will be bound to.
+	Add a scene manager to the shader generator scene managers list.
+	@param sceneMgr The scene manager to add to the list.
 	*/
-	void			setSceneManager				(SceneManager* sceneMgr);
+	void			addSceneManager				(SceneManager* sceneMgr);
 
 	/** 
-	Get the current scene manager that shader generator is bound to.
+	Remove a scene manager from the shader generator scene managers list.
+	@param sceneMgr The scene manager to remove from the list.
 	*/
-	SceneManager*	getSceneManager				();
+	void			removeSceneManager			(SceneManager* sceneMgr);
+
+	/** 
+	Get the active scene manager that is doint the actual scene rendering.
+	This attribute will be update on the call to preFindVisibleObjects. 
+	*/
+	SceneManager*	getActiveSceneManager		();
 	
 	/** 
 	Set the target shader language.
@@ -669,6 +676,11 @@ protected:
 	typedef RenderStateMap::iterator 						RenderStateMapIterator;
 	typedef RenderStateMap::const_iterator					RenderStateMapConstIterator;
 
+	//-----------------------------------------------------------------------------
+	typedef map<String, SceneManager*>::type 				SceneManagerMap;
+	typedef SceneManagerMap::iterator 						SceneManagerIterator;
+	typedef SceneManagerMap::const_iterator					SceneManagerConstIterator;
+
 protected:
 	/** Class default constructor */
 	ShaderGenerator		();
@@ -748,7 +760,8 @@ protected:
 
 protected:	
 	OGRE_AUTO_MUTEX													// Auto mutex.
-	SceneManager*					mSceneMgr;						// The current scene manager.
+	SceneManager*					mActiveSceneMgr;				// The active scene manager.
+	SceneManagerMap					mSceneManagerMap;				// A map of all scene managers this generator is bound to.
 	SGRenderObjectListener*			mRenderObjectListener;			// Render object listener.
 	SGSceneManagerListener*			mSceneManagerListener;			// Scene manager listener.
 	SGScriptTranslatorManager*		mScriptTranslatorManager;		// Script translator manager.

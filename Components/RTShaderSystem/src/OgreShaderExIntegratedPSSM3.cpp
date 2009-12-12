@@ -35,7 +35,6 @@ Torus Knot Software Ltd.
 #include "OgreGpuProgram.h"
 #include "OgrePass.h"
 #include "OgreShaderGenerator.h"
-#include "OgreSceneManager.h"
 #include "OgreViewport.h"
 #include "OgreTextureUnitState.h"
 #include "OgreTexture.h"

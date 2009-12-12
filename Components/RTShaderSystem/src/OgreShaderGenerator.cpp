@@ -73,7 +73,7 @@ ShaderGenerator::ShaderGenerator()
 	mProgramWriterManager		= NULL;
 	mProgramManager				= NULL;
 	mFFPRenderStateBuilder		= NULL;
-	mSceneMgr					= NULL;
+	mActiveSceneMgr				= NULL;
 	mRenderObjectListener		= NULL;
 	mSceneManagerListener		= NULL;
 	mScriptTranslatorManager	= NULL;
@@ -253,8 +253,13 @@ void ShaderGenerator::_finalize()
 		mMaterialSerializerListener = NULL;
 	}
 
-	// Remove current scene manager listeners.
-	setSceneManager(NULL);
+	// Remove all scene managers.	
+	while (mSceneManagerMap.empty() == false)
+	{
+		SceneManagerIterator itSceneMgr    = mSceneManagerMap.begin();
+
+		removeSceneManager(itSceneMgr->second);
+	}
 
 	// Delete render object listener.
 	if (mRenderObjectListener != NULL)
@@ -409,37 +414,54 @@ RenderState* ShaderGenerator::getRenderState(const String& schemeName,
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::setSceneManager(SceneManager* sceneMgr)
+void ShaderGenerator::addSceneManager(SceneManager* sceneMgr)
 {
-	if (mSceneMgr != sceneMgr)
-	{
-		if (mSceneMgr != NULL)
-		{
-			mSceneMgr->removeRenderObjectListener(mRenderObjectListener);		
-			mSceneMgr->removeListener(mSceneManagerListener);			
-		}
+	// Make sure this scene manager not exists in the map.
+	SceneManagerIterator itFind = mSceneManagerMap.find(sceneMgr->getName());
+	
+	if (itFind != mSceneManagerMap.end())
+		return;
 
-		mSceneMgr = sceneMgr;
+	if (mRenderObjectListener == NULL)
+		mRenderObjectListener = OGRE_NEW SGRenderObjectListener(this);
+	
+	sceneMgr->addRenderObjectListener(mRenderObjectListener);
 
-		if (mSceneMgr != NULL)
-		{
-			if (mRenderObjectListener == NULL)
-				mRenderObjectListener = OGRE_NEW SGRenderObjectListener(this);
-			
-			mSceneMgr->addRenderObjectListener(mRenderObjectListener);
+	if (mSceneManagerListener == NULL)
+		mSceneManagerListener = OGRE_NEW SGSceneManagerListener(this);
+	
+	sceneMgr->addListener(mSceneManagerListener);
 
-			if (mSceneManagerListener == NULL)
-				mSceneManagerListener = OGRE_NEW SGSceneManagerListener(this);
-			
-			mSceneMgr->addListener(mSceneManagerListener);
-		}
-	}	
+	mSceneManagerMap[sceneMgr->getName()] = sceneMgr;
+
+	// Update the active scene manager.
+	if (mActiveSceneMgr == NULL)
+		mActiveSceneMgr = sceneMgr;
 }
 
 //-----------------------------------------------------------------------------
-SceneManager* ShaderGenerator::getSceneManager()
+void ShaderGenerator::removeSceneManager(SceneManager* sceneMgr)
 {
-	return mSceneMgr;
+	// Make sure this scene manager exists in the map.
+	SceneManagerIterator itFind = mSceneManagerMap.find(sceneMgr->getName());
+	
+	if (itFind != mSceneManagerMap.end())
+	{
+		itFind->second->removeRenderObjectListener(mRenderObjectListener);		
+		itFind->second->removeListener(mSceneManagerListener);	
+
+		mSceneManagerMap.erase(itFind);
+
+		// Update the active scene manager.
+		if (mActiveSceneMgr == sceneMgr)
+			mActiveSceneMgr = NULL;
+	}
+}
+
+//-----------------------------------------------------------------------------
+SceneManager* ShaderGenerator::getActiveSceneManager()
+{
+	return mActiveSceneMgr;
 }
 
 //-----------------------------------------------------------------------------
@@ -710,6 +732,7 @@ void ShaderGenerator::preFindVisibleObjects(SceneManager* source,
 
 	const String& curMaterialScheme = v->getMaterialScheme();
 		
+	mActiveSceneMgr      = source;
 	mActiveViewportValid = validateScheme(curMaterialScheme);
 }
 
@@ -1458,7 +1481,7 @@ void ShaderGenerator::SGScheme::validate()
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGScheme::synchronizeWithLightSettings()
 {
-	SceneManager* sceneManager = ShaderGenerator::getSingleton().getSceneManager();
+	SceneManager* sceneManager = ShaderGenerator::getSingleton().getActiveSceneManager();
 
 	if (sceneManager != NULL)
 	{
@@ -1491,7 +1514,7 @@ void ShaderGenerator::SGScheme::synchronizeWithLightSettings()
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGScheme::synchronizeWithFogSettings()
 {
-	SceneManager* sceneManager = ShaderGenerator::getSingleton().getSceneManager();
+	SceneManager* sceneManager = ShaderGenerator::getSingleton().getActiveSceneManager();
 
 	if (sceneManager != NULL && sceneManager->getFogMode() != mFogMode)
 	{

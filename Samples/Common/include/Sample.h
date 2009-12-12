@@ -347,7 +347,7 @@ namespace OgreBites
 			{
 				mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
 
-				mShaderGenerator->setSceneManager(sceneMgr);
+				mShaderGenerator->addSceneManager(sceneMgr);
 
 				// Setup core libraries and shader cache path.
 				Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
@@ -414,10 +414,9 @@ namespace OgreBites
 				mMaterialMgrListener = NULL;
 			}
 
-			// Finalize CRTShader system.
+			// Finalize RTShader system.
 			if (mShaderGenerator != NULL)
-			{
-				mShaderGenerator->setSceneManager(NULL);
+			{				
 				Ogre::RTShader::ShaderGenerator::finalize();
 				mShaderGenerator = NULL;
 			}

@@ -112,7 +112,7 @@ void PerPixelLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, con
 		return;
 
 	GpuProgramParametersSharedPtr psGpuParams = pass->getFragmentProgramParameters();
-	SceneManager* sceneMgr = ShaderGenerator::getSingleton().getSceneManager();
+	SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager();
 
 	Viewport* curViewport = sceneMgr->getCurrentViewport();
 	Camera* curCamera     = curViewport->getCamera();
