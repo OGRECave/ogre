@@ -703,7 +703,8 @@ namespace Ogre {
 
 						break;
 					default:
-						throw std::runtime_error("not implemented");
+						OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "operationType not implemented", 
+							__FUNCTION__);
 					}
 
 					// Allocate space
