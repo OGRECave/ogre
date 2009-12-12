@@ -93,18 +93,19 @@ namespace Ogre
 		@param holdRadius The radius from the camera at which terrain pages will be held in memory
 			but not loaded if they're not already. This must be larger than loadRadius and is used
 			to minimise thrashing if the camera goes backwards and forwards at the loading border.
-		@param sectionName An optional name to give the section (if none is
-			provided, one will be generated)
 		@param minX,minY,maxX,maxY The min/max page indexes that the world will try to load pages for, 
 			as measured from the origin page at (0,0) by a signed index. The default is -10 to 10
 			in each direction or 20x20 pages.
+		@param sectionName An optional name to give the section (if none is
+			provided, one will be generated)
 		@returns The world section which is already attached to and owned by the world you passed in. 
 			There is no 'destroy' method because you destroy via the PagedWorld, this is just a
 			helper function. 
 		*/
 		TerrainPagedWorldSection* createWorldSection(PagedWorld* world, TerrainGroup* terrainGroup, 
-			Real loadRadius, Real holdRadius, const String& sectionName = StringUtil::BLANK, 
-			int32 minX = -10, int32 minY = -10, int32 maxX = 10, int32 maxY = 10);
+			Real loadRadius, Real holdRadius, 
+			int32 minX = -10, int32 minY = -10, int32 maxX = 10, int32 maxY = 10, 
+			const String& sectionName = StringUtil::BLANK);
 
 	protected:
 		PageManager* mManager;

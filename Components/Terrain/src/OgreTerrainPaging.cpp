@@ -46,8 +46,8 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	TerrainPagedWorldSection* TerrainPaging::createWorldSection(
 		PagedWorld* world, TerrainGroup* terrainGroup, 
-		Real loadRadius, Real holdRadius, const String& sectionName, 
-		int32 minX, int32 minY, int32 maxX, int32 maxY)
+		Real loadRadius, Real holdRadius, int32 minX, int32 minY, int32 maxX, int32 maxY, 
+		const String& sectionName)
 	{
 		TerrainPagedWorldSection* ret = static_cast<TerrainPagedWorldSection*>(
 			world->createSection(terrainGroup->getSceneManager(), SectionFactory::FACTORY_NAME, sectionName));
