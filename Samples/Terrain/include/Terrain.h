@@ -14,11 +14,14 @@ same license as the rest of the engine.
 #ifndef __Terrain_H__
 #define __Terrain_H__
 
+//#define PAGING
+
 #include "SdkSample.h"
 #include "OgreTerrain.h"
 #include "OgreTerrainGroup.h"
 #include "OgreTerrainQuadTreeNode.h"
 #include "OgreTerrainMaterialGeneratorA.h"
+#include "OgreTerrainPaging.h"
 
 #define TERRAIN_FILE_PREFIX String("testTerrain")
 #define TERRAIN_FILE_SUFFIX String("dat")
@@ -34,6 +37,8 @@ public:
 
 	Sample_Terrain()
 		: mTerrainGroup(0)
+		, mTerrainPaging(0)
+		, mPageManager(0)
 		, mFly(false)
 		, mFallVelocity(0)
 		, mMode(MODE_NORMAL)
@@ -240,9 +245,17 @@ public:
 
 		if (mTerrainGroup->isDerivedDataUpdateInProgress())
 		{
-			mInfoLabel->setCaption("Computing textures, patience...");
 			mTrayMgr->moveWidgetToTray(mInfoLabel, TL_TOP, 0);
 			mInfoLabel->show();
+			if (mTerrainsImported)
+			{
+				mInfoLabel->setCaption("Building terrain, please wait...");
+			}
+			else
+			{
+				mInfoLabel->setCaption("Updating textures, patience...");
+			}
+
 		}
 		else
 		{
@@ -250,7 +263,7 @@ public:
 			mInfoLabel->hide();
 			if (mTerrainsImported)
 			{
-				saveTerrains(false);
+				saveTerrains(true);
 				mTerrainsImported = false;
 			}
 		}
@@ -366,6 +379,9 @@ public:
 protected:
 
 	TerrainGroup* mTerrainGroup;
+	bool mPaging;
+	TerrainPaging* mTerrainPaging;
+	PageManager* mPageManager;
 	bool mFly;
 	Real mFallVelocity;
 	enum Mode
@@ -580,7 +596,7 @@ protected:
 		MaterialManager::getSingleton().setDefaultTextureFiltering(TFO_ANISOTROPIC);
 		MaterialManager::getSingleton().setDefaultAnisotropy(7);
 
-		mSceneMgr->setFog(FOG_LINEAR, ColourValue(0.7, 0.7, 0.8), 0, 5000, 14000);
+		mSceneMgr->setFog(FOG_LINEAR, ColourValue(0.7, 0.7, 0.8), 0, 40000, 50000);
 
 		LogManager::getSingleton().setLogDetail(LL_BOREME);
 
@@ -602,13 +618,21 @@ protected:
 		mTerrainGroup->setOrigin(mTerrainPos);
 
 		configureTerrainDefaults(l);
-
-		defineTerrain(0, 0, blankTerrain);
-		defineTerrain(1, 0, blankTerrain);
-
+#ifdef PAGING
+		// Paging setup
+		mPageManager = OGRE_NEW PageManager();
+		mPageManager->addCamera(mCamera);
+		mTerrainPaging = OGRE_NEW TerrainPaging(mPageManager);
+		PagedWorld* world = mPageManager->createWorld();
+		mTerrainPaging->createWorldSection(world, mTerrainGroup, 11000, 12000, -2, -2, 2, 2);
+#else
+		for (long x = 0; x <= 1; ++x)
+			for (long y = 0; y <= 1; ++y)
+				defineTerrain(x, y, blankTerrain);
 
 		// sync load since we want everything in place when we start
 		mTerrainGroup->loadAllTerrains(true);
+#endif
 
 		if (mTerrainsImported)
 		{
@@ -621,6 +645,8 @@ protected:
 		}
 
 		mTerrainGroup->freeTemporaryResources();
+
+
 
 
 		/*
@@ -640,6 +666,20 @@ protected:
 
 
 	}
+
+	void _shutdown()
+	{
+		if (mTerrainPaging)
+		{
+			OGRE_DELETE mTerrainPaging;
+			OGRE_DELETE mPageManager;
+		}
+		else
+			OGRE_DELETE mTerrainGroup;
+
+		SdkSample::_shutdown();
+	}
+
 
 };
 

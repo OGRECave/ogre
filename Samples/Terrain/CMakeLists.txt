@@ -5,11 +5,12 @@ set(SOURCE_FILES src/Terrain.cpp)
 
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/include
-	${OGRE_SOURCE_DIR}/Components/Terrain/include)
+	${OGRE_SOURCE_DIR}/Components/Terrain/include
+	${OGRE_SOURCE_DIR}/Components/Paging/include)
 
 add_library(Sample_Terrain ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Sample_Terrain ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_Terrain_LIBRARIES})
+target_link_libraries(Sample_Terrain ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_Terrain_LIBRARIES} ${OGRE_Paging_LIBRARIES})
 ogre_config_sample_lib(Sample_Terrain)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
