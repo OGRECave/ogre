@@ -261,6 +261,10 @@ namespace Ogre
 			{
 				// todo
 			}
+
+			// check SM3 features
+			mSM3Available = GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0");
+
 		}
 		HighLevelGpuProgramPtr vprog = mShaderGen->generateVertexProgram(this, terrain, tt);
 		HighLevelGpuProgramPtr fprog = mShaderGen->generateFragmentProgram(this, terrain, tt);
@@ -601,9 +605,9 @@ namespace Ogre
 		}
 		
 		if(prof->isLayerNormalMappingEnabled() || prof->isLayerParallaxMappingEnabled())
-			ret->setParameter("profiles", "ps_2_x fp40");
+			ret->setParameter("profiles", "ps_3_0 ps_2_x fp40");
 		else
-			ret->setParameter("profiles", "ps_2_0 fp30");
+			ret->setParameter("profiles", "ps_3_0 ps_2_0 fp30");
 		ret->setParameter("entry_point", "main_fp");
 
 		return ret;
@@ -933,6 +937,13 @@ namespace Ogre
 		uint uvIdx = layer / 2;
 		String uvChannels = layer % 2 ? ".zw" : ".xy";
 		uint blendIdx = (layer-1) / 4;
+		String blendChannel = getChannel(layer-1);
+		String blendWeightStr = String("blendTexVal") + StringConverter::toString(blendIdx) + 
+			"." + blendChannel;
+
+		// generate early-out conditional
+		if (layer && prof->_isSM3Available())
+			outStream << "  if (" << blendWeightStr << " > 0.0003)\n  { \n";
 
 		// generate UV
 		outStream << "	float2 uv" << layer << " = layerUV" << uvIdx << uvChannels << ";\n";
@@ -955,8 +966,7 @@ namespace Ogre
 			if (!layer)
 				outStream << "	litRes = litResLayer;\n";
 			else
-				outStream << "	litRes = lerp(litRes, litResLayer, blendTexVal" 
-					<< blendIdx << "." << getChannel(layer-1) << ");\n";
+				outStream << "	litRes = lerp(litRes, litResLayer, " << blendWeightStr << ");\n";
 
 		}
 
@@ -974,12 +984,17 @@ namespace Ogre
 		else
 		{
 			outStream << "	diffuse = lerp(diffuse, diffuseSpecTex" << layer 
-				<< ".rgb, blendTexVal" << blendIdx << "." << getChannel(layer-1) << ");\n";
+				<< ".rgb, " << blendWeightStr << ");\n";
 			if (prof->isLayerSpecularMappingEnabled())
 				outStream << "	specular = lerp(specular, diffuseSpecTex" << layer 
-					<< ".a, blendTexVal" << blendIdx << "." << getChannel(layer-1) << ");\n";
+					<< ".a, " << blendWeightStr << ");\n";
 
 		}
+
+		// End early-out
+		if (layer && prof->_isSM3Available())
+			outStream << "  } // early-out blend value\n";
+
 	}
 	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateVpFooter(
@@ -1115,7 +1130,10 @@ namespace Ogre
 			ret->unload();
 		}
 
-		ret->setParameter("target", "ps_2_x");
+		if (prof->_isSM3Available())
+			ret->setParameter("target", "ps_3_0");
+		else
+			ret->setParameter("target", "ps_2_x");
 		ret->setParameter("entry_point", "main_fp");
 
 		return ret;

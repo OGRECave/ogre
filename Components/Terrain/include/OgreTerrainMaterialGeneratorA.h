@@ -110,6 +110,9 @@ namespace Ogre
 			in the distance (default true). 
 			*/
 			void setCompositeMapEnabled(bool enabled);
+
+			/// Internal
+			bool _isSM3Available() const { return mSM3Available; }
 		
 		protected:
 
@@ -193,6 +196,7 @@ namespace Ogre
 			bool mGlobalColourMapEnabled;
 			bool mLightmapEnabled;
 			bool mCompositeMapEnabled;
+			bool mSM3Available;
 
 		};
 
