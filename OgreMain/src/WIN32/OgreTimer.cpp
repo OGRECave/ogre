@@ -77,13 +77,9 @@ bool Timer::setOption( const String & key, const void * val )
 void Timer::reset()
 {
     // Get the current process core mask
-	DWORD procMask;
-	DWORD sysMask;
-#if _MSC_VER >= 1400 && defined (_M_X64)
-	GetProcessAffinityMask(GetCurrentProcess(), (PDWORD_PTR)&procMask, (PDWORD_PTR)&sysMask);
-#else
+	DWORD_PTR procMask;
+	DWORD_PTR sysMask;
 	GetProcessAffinityMask(GetCurrentProcess(), &procMask, &sysMask);
-#endif
 
 	// If procMask is 0, consider there is only one core available
 	// (using 0 as procMask will cause an infinite loop below)
@@ -103,7 +99,7 @@ void Timer::reset()
 	HANDLE thread = GetCurrentThread();
 
 	// Set affinity to the first core
-	DWORD oldMask = SetThreadAffinityMask(thread, mTimerMask);
+	DWORD_PTR oldMask = SetThreadAffinityMask(thread, mTimerMask);
 
 	// Get the constant frequency
 	QueryPerformanceFrequency(&mFrequency);
