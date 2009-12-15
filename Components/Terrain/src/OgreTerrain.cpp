@@ -336,7 +336,7 @@ namespace Ogre
 			stream.writeChunkBegin(TERRAINDERIVEDDATA_CHUNK_ID, TERRAINDERIVEDDATA_CHUNK_VERSION);
 			String colourDataType("colourmap");
 			stream.write(&colourDataType);
-			stream.write(&mSize);
+			stream.write(&mGlobalColourMapSize);
 			if (mCpuColourMapStorage)
 			{
 				// save from CPU data if it's there, it means GPU data was never created
