@@ -2274,6 +2274,7 @@ namespace Ogre
 			mMaterialGenerator->updateParams(mMaterial, this);
 			if(mCompositeMapRequired)
 				mMaterialGenerator->updateParamsForCompositeMap(mCompositeMapMaterial, this);
+			mMaterialParamsDirty = false;
 
 		}
 
