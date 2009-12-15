@@ -436,9 +436,29 @@ namespace Ogre
 					break;
 				}
 				// find next slot
+				Vector3 oldoffset = offset;
 				while (offset.x < 1.0f && offset.z < 1.0f)
 					offset += inc;
-				if (offset.x >= 1.0f)
+				if (offset.x >= 1.0f && offset.z >= 1.0f)
+				{
+					// We crossed a corner, need to figure out which we passed first
+					Real diffz = 1.0f - oldoffset.z;
+					Real diffx = 1.0f - oldoffset.x;
+					Real distz = diffz / inc.z;
+					Real distx = diffx / inc.x;
+					if (distx < distz)
+					{
+						curr_x += xdir;
+						offset.x -= 1.0f;
+					}
+					else
+					{
+						curr_z += zdir;
+						offset.z -= 1.0f;
+					}
+
+				}
+				else if (offset.x >= 1.0f)
 				{
 					curr_x += xdir;
 					offset.x -= 1.0f;
