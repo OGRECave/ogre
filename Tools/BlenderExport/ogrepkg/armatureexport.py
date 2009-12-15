@@ -199,11 +199,11 @@ class ArmatureAnimation:
 	def write(self, f, indentation=0):
 		Log.getSingleton().logInfo("Writing skeleton animation \"%s\"." % self.name)
 		f.write(indent(indentation) + "<animation name=\"%s\" length=\"%f\">\n" % (self.name, self.length))
+		f.write(indent(indentation + 1) + "<tracks>\n")
 		if (len(self.trackList) > 0):
-			f.write(indent(indentation + 1) + "<tracks>\n")
 			for track in self.trackList:
 				track.write(f, indentation + 2)
-			f.write(indent(indentation + 1) + "</tracks>\n")
+		f.write(indent(indentation + 1) + "</tracks>\n")
 		f.write(indent(indentation) + "</animation>\n")
 		return
 
