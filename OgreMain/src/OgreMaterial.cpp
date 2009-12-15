@@ -769,7 +769,7 @@ namespace Ogre {
 		iend = lodValues.end();
 		// First, clear and add single zero entry
 		mLodValues.clear();
-        mUserLodValues.push_back(std::numeric_limits<Real>::quiet_NaN());
+        mUserLodValues.push_back(0);
 		mLodValues.push_back(mLodStrategy->getBaseValue());
 		for (i = lodValues.begin(); i != iend; ++i)
 		{

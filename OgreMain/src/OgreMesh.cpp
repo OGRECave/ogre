@@ -121,7 +121,7 @@ namespace Ogre {
 
 		// Init first (manual) lod
 		MeshLodUsage lod;
-        lod.userValue = std::numeric_limits<Real>::quiet_NaN(); // User value not used for base lod level
+        lod.userValue = 0; // User value not used for base lod level
 		lod.value = mLodStrategy->getBaseValue();
         lod.edgeData = NULL;
         lod.manualMesh.setNull();
@@ -1100,7 +1100,7 @@ namespace Ogre {
         mNumLods = 1;
 		// Init first (manual) lod
 		MeshLodUsage lod;
-        lod.userValue = std::numeric_limits<Real>::quiet_NaN();
+        lod.userValue = 0;
 		lod.value = mLodStrategy->getBaseValue();
         lod.edgeData = 0;
         lod.manualMesh.setNull();

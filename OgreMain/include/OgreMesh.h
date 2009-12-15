@@ -927,6 +927,8 @@ namespace Ogre {
 		mutable MeshPtr manualMesh;
         /// Edge list for this LOD level (may be derived from manual mesh)
         mutable EdgeData* edgeData;
+
+		MeshLodUsage() : userValue(0.0), value(0.0), edgeData(0) {}
 	};
 
 	/** @} */

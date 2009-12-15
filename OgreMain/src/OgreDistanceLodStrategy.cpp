@@ -48,7 +48,7 @@ namespace Ogre {
     DistanceLodStrategy::DistanceLodStrategy()
         : LodStrategy("Distance")
         , mReferenceViewEnabled(false)
-        , mReferenceViewValue(std::numeric_limits<Real>::quiet_NaN())
+        , mReferenceViewValue(-1)
     { }
     //-----------------------------------------------------------------------
     Real DistanceLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
@@ -149,7 +149,7 @@ namespace Ogre {
     {
         // Ensure reference value has been set before being enabled
         if (value)
-            assert(mReferenceViewValue != std::numeric_limits<Real>::quiet_NaN() && "Reference view must be set before being enabled!");
+            assert(mReferenceViewValue != -1 && "Reference view must be set before being enabled!");
 
         mReferenceViewEnabled = value;
     }

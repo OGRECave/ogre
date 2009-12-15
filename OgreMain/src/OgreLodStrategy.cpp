@@ -127,7 +127,7 @@ namespace Ogre {
         {
             if (i->value > value)
             {
-                return index - 1;
+				return index ? index - 1 : 0;
             }
         }
 
@@ -144,7 +144,7 @@ namespace Ogre {
         {
             if (i->value < value)
             {
-                return index - 1;
+				return index ? index - 1 : 0;
             }
         }
 
@@ -161,7 +161,7 @@ namespace Ogre {
         {
             if (*i > value)
             {
-                return index - 1;
+				return index ? index - 1 : 0;
             }
         }
 
@@ -178,7 +178,7 @@ namespace Ogre {
         {
             if (*i < value)
             {
-                return index - 1;
+				return index ? index - 1 : 0;
             }
         }
 
