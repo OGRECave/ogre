@@ -1083,13 +1083,15 @@ namespace Ogre
 			// default is to create new declarations from hardware manager
 			mVertexDataRecord->gpuVertexData = mVertexDataRecord->cpuVertexData->clone();
 			mVertexDataRecord->gpuVertexDataDirty = false;
+
+			// We don't need the CPU copy anymore
+			destroyCpuVertexData();
 		}
 
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::updateGpuVertexData()
 	{
-		// TODO - mutex cpu data
 		if (mVertexDataRecord && mVertexDataRecord->gpuVertexDataDirty)
 		{
 			mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(POSITION_BUFFER)->
@@ -1122,7 +1124,10 @@ namespace Ogre
 				// clone, using default buffer manager ie hardware
 				ll->gpuIndexData = ll->cpuIndexData->clone();
 			}
+
 		}
+		// We don't need the CPU copy anymore
+		destroyCpuIndexData();
 
 	}
 	//---------------------------------------------------------------------
