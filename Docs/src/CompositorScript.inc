@@ -16,7 +16,7 @@ An instance of a compositor as applied to a single viewport. You create these ba
 @item Compositor Chain 
 It is possible to enable more than one compositor instance on a viewport at the same time, with one compositor taking the results of the previous one as input. This is known as a compositor chain. Every viewport which has at least one compositor attached to it has a compositor chain. @xref{Applying a Compositor}
 @item Target 
-This is a RenderTarget, ie the place where the result of a series of render operations is sent. A target may be the final output (and this is implicit, you don't have to declare it), or it may be an intermediate render texture, which you declare in your script with the @ref{compositor_texture,texture line}. A target which is not the output target has a defined size and pixel format which you can control. 
+This is a RenderTarget, i.e. the place where the result of a series of render operations is sent. A target may be the final output (and this is implicit, you don't have to declare it), or it may be an intermediate render texture, which you declare in your script with the @ref{compositor_texture,texture line}. A target which is not the output target has a defined size and pixel format which you can control. 
 @item Output Target 
 As Target, but this is the single final result of all operations. The size and pixel format of this target cannot be controlled by the compositor since it is defined by the application using it, thus you don't declare it in your script. However, you do declare a Target Pass for it, see below.
 @item Target Pass 

@@ -1,7 +1,7 @@
 @node Animation
 @chapter Animation
 
-OGRE supports a prety flexible animation system that allows you to script animation for several different purposes:
+OGRE supports a pretty flexible animation system that allows you to script animation for several different purposes:
 
 @table @asis
 @item @ref{Skeletal Animation}
@@ -50,7 +50,7 @@ There are actually two subtypes of vertex animation, for reasons which will be d
 
 @table @asis
 @item @ref{Morph Animation}
-Morph animation is a very simple technique which interpolates mesh snapshots along a keyframe timeline. Morph animation has a direct correlation to old-skool character animation techniques used before skeletal animation was widely used.@*
+Morph animation is a very simple technique which interpolates mesh snapshots along a keyframe timeline. Morph animation has a direct correlation to old-school character animation techniques used before skeletal animation was widely used.@*
 @item @ref{Pose Animation}
 Pose animation is about blending multiple discrete poses, expressed as offsets to the base vertex data, with different weights to provide a final result. Pose animation's most obvious use is facial animation.
 @end table
@@ -60,9 +60,9 @@ So, why two subtypes of vertex animation? Couldn't both be implemented using the
 
 Morph animation is a simple approach where we have a whole series of snapshots of vertex data which must be interpolated, e.g. a running animation implemented as morph targets. Because this is based on simple snapshots, it's quite fast to use when animating an entire mesh because it's a simple linear change between keyframes. However, this simplistic approach does not support blending between multiple morph animations. If you need animation blending, you are advised to use skeletal animation for full-mesh animation, and pose animation for animation of subsets of meshes or where skeletal animation doesn't fit - for example facial animation. For animating in a vertex shader, morph animation is quite simple and just requires the 2 vertex buffers (one the original position buffer) of absolute position data, and an interpolation factor. Each track in a morph animation refrences a unique set of vertex data. @*@*
 
-Pose animation is more complex. Like morph animation each track references a single unique set of vertex data, but unlike morph animation, each keyframe references 1 or more 'poses', each with an influence level. A pose is a series of offsets to the base vertex data, and may be sparse - ie it may not reference every vertex. Because they're offsets, they can be blended - both within a track and between animations. This set of features is very well suited to facial animation.  @*@*
+Pose animation is more complex. Like morph animation each track references a single unique set of vertex data, but unlike morph animation, each keyframe references 1 or more 'poses', each with an influence level. A pose is a series of offsets to the base vertex data, and may be sparse - i.e. it may not reference every vertex. Because they're offsets, they can be blended - both within a track and between animations. This set of features is very well suited to facial animation.  @*@*
 
-For example, let's say you modelled a face (one set of vertex data), and defined a set of poses which represented the various phonetic positions of the face. You could then define an animation called 'SayHello', containinga single track which referenced the face vertex data, and which included a series of keyframes, each of which referenced one or more of the facial positions at different influence levels - the combination of which over time made the face form the shapes required to say the word 'hello'. Since	the poses are only stored once, but can be referenced may times in many animations, this is a very powerful way to build up a speech system.@*@*
+For example, let's say you modelled a face (one set of vertex data), and defined a set of poses which represented the various phonetic positions of the face. You could then define an animation called 'SayHello', containing a single track which referenced the face vertex data, and which included a series of keyframes, each of which referenced one or more of the facial positions at different influence levels - the combination of which over time made the face form the shapes required to say the word 'hello'. Since	the poses are only stored once, but can be referenced may times in many animations, this is a very powerful way to build up a speech system.@*@*
 
 The downside of pose animation is that it can be more difficult to set up, requiring poses to be separately defined and then referenced in the keyframes. Also, since it uses more buffers (one for the base data, and one for each active pose), if you're animating in hardware using vertex shaders you need to keep an eye on how many poses you're blending at once. You define a maximum supported number in your vertex program definition, via the includes_pose_animation material script entry,  @xref{Pose Animation in Vertex Programs}. 
 

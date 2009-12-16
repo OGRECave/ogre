@@ -6,13 +6,13 @@
 This tutorial will provide a brief introduction of ExternalTextureSource and ExternalTextureSourceManager classes, their relationship, and how the PlugIns work. For those interested in developing a Texture Source Plugin or maybe just wanting to know more about this system, take a look the ffmpegVideoSystem plugin, which you can find more about on the OGRE forums.
 
 @heading What Is An External Texture Source?
-What is a texture source? Well, a texture source could be anything - png, bmp, jpeg, etc. However, loading textures from traditional bitmap files is already handled by another part OGRE. There are, however, other types of sources to get texture data from - ie. mpeg/avi/etc movie files, flash, run-time generated source, user defined, etc.@*@*
+What is a texture source? Well, a texture source could be anything - png, bmp, jpeg, etc. However, loading textures from traditional bitmap files is already handled by another part OGRE. There are, however, other types of sources to get texture data from - i.e. mpeg/avi/etc movie files, flash, run-time generated source, user defined, etc.@*@*
 
-How do external texture source plugins benifit OGRE? Well, the main answer is: addding support for any type of texture source does not require changing OGRE to support it... all that is involved is writting a new plugin. Additionally, because the manager uses the StringInterface class to issue commands/params, no change to the material script reader is needs to be made. As a result, if a plugin needs a special parameter set, it just creates a new command in it's Parameter Dictionary. - see ffmpegVideoSystem plugin for an example. To make this work, two classes have been added to OGRE: ExternalTextureSource & ExternalTextureSourceManager.
+How do external texture source plugins benefit OGRE? Well, the main answer is: adding support for any type of texture source does not require changing OGRE to support it... all that is involved is writing a new plugin. Additionally, because the manager uses the StringInterface class to issue commands/params, no change to the material script reader is needs to be made. As a result, if a plugin needs a special parameter set, it just creates a new command in it's Parameter Dictionary. - see ffmpegVideoSystem plugin for an example. To make this work, two classes have been added to OGRE: ExternalTextureSource & ExternalTextureSourceManager.
 
 
 @heading ExternalTextureSource Class
-The ExternalTextureSource class is the base class that Texture Source PlugIns must be derived from. It provides a generic framework (via StringInterface class) with a very limited amount of functionality. The most common of parameters can be set through the TexturePlugInSource class interface or via the StringInterface commands contained within this class. While this may seem like duplication of code, it is not. By using the string command interface, it becomes extremly easy for derived plugins to add any new types of parameters that it may need.@*@*
+The ExternalTextureSource class is the base class that Texture Source PlugIns must be derived from. It provides a generic framework (via StringInterface class) with a very limited amount of functionality. The most common of parameters can be set through the TexturePlugInSource class interface or via the StringInterface commands contained within this class. While this may seem like duplication of code, it is not. By using the string command interface, it becomes extremely easy for derived plugins to add any new types of parameters that it may need.@*@*
 
 Default Command Parameters defined in ExternalTextureSource base class are:
 @itemize @bullet
@@ -34,7 +34,7 @@ Steps needed to create a new texture via ExternalTextureSourceManager:
 
 @itemize @bullet
 @item  Obviously, the first step is to have the desired plugin included in plugin.cfg for it to be loaded.
-@item Set the desired PlugIn as Active via AdvancedTextureManager::getSingleton().SetCurrentPlugIn( String Type ); -- type is whatever the plugin registers as handling (eg. "video", "flash", "whatever", etc).
+@item Set the desired PlugIn as Active via AdvancedTextureManager::getSingleton().SetCurrentPlugIn( String Type ); -- type is whatever the plugin registers as handling (e.g. "video", "flash", "whatever", etc).
 @item Note: Consult Desired PlugIn to see what params it needs/expects.
 Set params/value pairs via AdvancedTextureManager::getSingleton().getCurrentPlugIn()->setParameter( String Param, String Value );
 @item After required params are set, a simple call to AdvancedTextureManager::getSingleton().getCurrentPlugIn()->createDefinedTexture( sMaterialName ); will create a texture to the material name given.

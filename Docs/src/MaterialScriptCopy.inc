@@ -7,11 +7,11 @@ For example, to make a new material that is based on one previously defined, add
 
 Format: material <NewUniqueChildName> : <ReferanceParentMaterial>@*@*
 
-The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed.  The easiest way to achieve this is to either place parents at the begining of the material script file, or to use the 'import' directive (@xref{Script Import Directive}). Note that inheritence is actually a copy - after scripts are loaded into Ogre, objects no longer maintain their copy inheritance structure.  If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.@*@*
+The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed.  The easiest way to achieve this is to either place parents at the beginning of the material script file, or to use the 'import' directive (@xref{Script Import Directive}). Note that inheritence is actually a copy - after scripts are loaded into Ogre, objects no longer maintain their copy inheritance structure.  If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.@*@*
 
 Material copying within the script alleviates some drudgery from copy/paste but having the ability to identify specific techniques, passes, and texture units to modify makes material copying easier.  Techniques, passes, texture units can be identified directly in the child material without having to layout previous techniques, passes, texture units by associating a name with them,  Techniques and passes can take a name and texture units can be numbered within the material script. You can also use variables, @xref{Script Variables}.@*@*
 
-Names become very useful in materials that copy from other materials.  In order to overide values they must be in the correct technique, pass, texture unit etc.  The script could be layed out using the sequence of techniques, passes, texture units in the child material but if only one paramter needs to change in say the 5th pass then the first four passes prior to the fith would have to be placed in the script:@*@*
+Names become very useful in materials that copy from other materials.  In order to override values they must be in the correct technique, pass, texture unit etc.  The script could be lain out using the sequence of techniques, passes, texture units in the child material but if only one parameter needs to change in say the 5th pass then the first four passes prior to the fifth would have to be placed in the script:@*@*
 
 Here is an example:
 @example
@@ -67,7 +67,7 @@ If a new technique or pass needs to be added to a copied material then use a uni
 
 Note:  if passes or techniques aren't given a name, they will take on a default name based on their index.  For example the first pass has index 0 so its name will be 0.
 
-@subheading Identifying Texture Units to overide values
+@subheading Identifying Texture Units to override values
 
 A specific texture unit state (TUS) can be given a unique name within a pass of a material so that it can be identified later in cloned materials that need to override specified texture unit states in the pass without declaring previous texture units.  Using a unique name for a Texture unit in a pass of a cloned material adds a new texture unit at the end of the texture unit list for the pass.@*@*
 
@@ -133,7 +133,7 @@ This technique, when included in a material, will override all passes matching t
 @node Texture Aliases
 @subsection Texture Aliases
 
-Texture aliases are useful for when only the textures used in texture units need to be specified for a cloned material.  In the source material ie the original material to be cloned, each texture unit can be given a texture alias name.  The cloned material in the script can then specify what textures should be used for each texture alias. Note that texture aliases are a more specific version of @ref{Script Variables} which can be used to easily set other values.@*@*
+Texture aliases are useful for when only the textures used in texture units need to be specified for a cloned material.  In the source material i.e. the original material to be cloned, each texture unit can be given a texture alias name.  The cloned material in the script can then specify what textures should be used for each texture alias. Note that texture aliases are a more specific version of @ref{Script Variables} which can be used to easily set other values.@*@*
 
 Using texture aliases within texture units:@*
 Format:@*
@@ -190,7 +190,7 @@ material TSNormalSpecMapping
         tex_coord_set 1
       }
 
-      // spec map for shinnines
+      // spec map for shininess
       texture_unit SpecMap
       {
         texture defaultSpec.png
@@ -237,7 +237,7 @@ material TSNormalSpecMapping
         tex_coord_set 1
       }
 
-      // spec map for shinnines
+      // spec map for shininess
       texture_unit
       {
         texture_alias SpecMap

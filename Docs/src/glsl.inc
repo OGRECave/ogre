@@ -12,12 +12,12 @@ In GLSL, no entry point needs to be defined since it is always 'main()' and ther
 GLSL supports the use of modular shaders.  This means you can write GLSL external functions that can be used in multiple shaders.
 
 @example
-vertex_program myExteranalGLSLFunction1 glsl
+vertex_program myExternalGLSLFunction1 glsl
 {
     source myExternalGLSLfunction1.txt
 }
 
-vertex_program myExteranalGLSLFunction2 glsl
+vertex_program myExternalGLSLFunction2 glsl
 {
     source myExternalGLSLfunction2.txt
 }
@@ -25,17 +25,17 @@ vertex_program myExteranalGLSLFunction2 glsl
 vertex_program myGLSLVertexProgram1 glsl
 {
     source myGLSLfunction.txt
-    attach myExteranalGLSLFunction1 myExteranalGLSLFunction2
+    attach myExternalGLSLFunction1 myExternalGLSLFunction2
 }
 
 vertex_program myGLSLVertexProgram2 glsl
 {
     source myGLSLfunction.txt
-    attach myExteranalGLSLFunction1
+    attach myExternalGLSLFunction1
 }
 @end example
 
-External GLSL functions are attached to the program that needs them by using 'attach' and including the names of all external programs required on the same line seperated by spaces.  This can be done for both vertex and fragment programs.
+External GLSL functions are attached to the program that needs them by using 'attach' and including the names of all external programs required on the same line separated by spaces.  This can be done for both vertex and fragment programs.
 
 @subheading GLSL Texture Samplers
 To pass texture unit index values from the material script to texture samplers in glsl use 'int' type named parameters.  See the example below:@*
@@ -85,7 +85,7 @@ An index value of 0 refers to the first texture unit in the pass, an index value
 Here are some examples of passing matrices to GLSL mat2, mat3, mat4 uniforms:
 
 @example
-material exampleGLSLmatixUniforms
+material exampleGLSLmatrixUniforms
 {
   technique matrix_passing
   {
@@ -114,7 +114,7 @@ material exampleGLSLmatixUniforms
 @end example
 
 @subheading Accessing OpenGL states in GLSL
-GLSL can access most of the GL states directly so you do not need to pass these states through @ref{param_named_auto} in the material script.  This includes lights, material state, and all the matrices used in the openGL state ie model view matrix, worldview projection matrix etc. @*@*
+GLSL can access most of the GL states directly so you do not need to pass these states through @ref{param_named_auto} in the material script.  This includes lights, material state, and all the matrices used in the openGL state i.e. model view matrix, worldview projection matrix etc. @*@*
 
 @subheading Binding vertex attributes
 GLSL natively supports automatic binding of the most common incoming per-vertex attributes (e.g. gl_Vertex, gl_Normal, gl_MultiTexCoord0 etc). However, there are some which are not automatically bound, which must be declared in the shader using the 'attribute <type> <name>' syntax, and the vertex data bound to it by Ogre. @*@*

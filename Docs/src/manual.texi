@@ -57,7 +57,7 @@ Well, nowadays graphics engines are like any other large software system. They s
 
 Object orientation is a very popular approach to addressing the complexity problem. It's a step up from decomposing your code into separate functions, it groups function and state data together in classes which are designed to represent real concepts. It allows you to hide complexity inside easily recognised packages with a conceptually simple interface so they are easy to recognise and have a feel of 'building blocks' which you can plug together again later. You can also organise these blocks so that some of them look the same on the outside, but have very different ways of achieving their objectives on the inside, again reducing the complexity for the developers because they only have to learn one interface.@*@*
 
-I'm not going to teach you OO here, that's a subject for many other books, but suffice to say I'd seen enough benefits of OO in business systems that I was surprised most graphics code seemed to be written in C function stylee. I was interested to see whether I could apply my design experience in other types of software to an area which has long held a place in my heart - 3D graphics engines. Some people I spoke to were of the opinion that using full C++ wouldn't be fast enough for a real-time graphics engine, but others (including me) were of the opinion that, with care, and object-oriented framework can be performant. We were right.
+I'm not going to teach you OO here, that's a subject for many other books, but suffice to say I'd seen enough benefits of OO in business systems that I was surprised most graphics code seemed to be written in C function style. I was interested to see whether I could apply my design experience in other types of software to an area which has long held a place in my heart - 3D graphics engines. Some people I spoke to were of the opinion that using full C++ wouldn't be fast enough for a real-time graphics engine, but others (including me) were of the opinion that, with care, and object-oriented framework can be performant. We were right.
 
 In summary, here's the benefits an object-oriented approach brings to OGRE:
 @table @asis
@@ -97,7 +97,7 @@ This means every class, type etc should be prefixed with 'Ogre::', e.g. 'Ogre::C
 
 @heading Overview from 10,000 feet
 
-Shown below is a diagram of some of the core objects and where they 'sit' in the grand sceme of things. This is not all the classes by a long shot, just a few examples of the more more significant ones to give you an idea of how it slots together.
+Shown below is a diagram of some of the core objects and where they 'sit' in the grand scheme of things. This is not all the classes by a long shot, just a few examples of the more more significant ones to give you an idea of how it slots together.
 @image{images/uml-overview}
 
 At the very top of the diagram is the Root object. This is your 'way in' to the OGRE system, and it's where you tend to create the top-level objects that you need to deal with, like scene managers, rendering systems and render windows, loading plugins, all the fundamental stuff. If you don't know where to start, Root is it for almost everything, although often it will just give you another object which will actually do the detail work, since Root itself is more of an organiser and facilitator object.
@@ -105,7 +105,7 @@ At the very top of the diagram is the Root object. This is your 'way in' to the 
 The majority of rest of OGRE's classes fall into one of 3 roles:
 @table @asis
 @item Scene Management
-This is about the contents of your scene, how it's structured, how it's viewed from cameras, etc. Objects in this area are responsible for giving you a natural declarative interface to the world you're building; ie you don't tell OGRE "set these render states and then render 3 polygons", you tell it "I want an object here, here and here, with these materials on them, rendered from this view", and let it get on with it.
+This is about the contents of your scene, how it's structured, how it's viewed from cameras, etc. Objects in this area are responsible for giving you a natural declarative interface to the world you're building; i.e. you don't tell OGRE "set these render states and then render 3 polygons", you tell it "I want an object here, here and here, with these materials on them, rendered from this view", and let it get on with it.
 @item Resource Management
 All rendering needs resources, whether it's geometry, textures, fonts, whatever. It's important to manage the loading, re-use and unloading of these things carefully, so that's what classes in this area do.
 @item Rendering
@@ -172,7 +172,7 @@ MeshManager::getSingleton().someMethod()
 
 A Mesh object represents a discrete model, a set of geometry which is self-contained and is typically fairly small on a world scale. Mesh objects are assumed to represent movable objects and are not used for the sprawling level geometry typically used to create backgrounds.@*@*
 
-Mesh objects are a type of resource, and are managed by the MeshManager resource manager. They are typically loaded from OGRE's custom object format, the '.mesh' format. Mesh files are typically created by exporting from a modelling tool @xref{Exporters} and can be maipulated through various @ref{Mesh Tools}@*@*
+Mesh objects are a type of resource, and are managed by the MeshManager resource manager. They are typically loaded from OGRE's custom object format, the '.mesh' format. Mesh files are typically created by exporting from a modelling tool @xref{Exporters} and can be manipulated through various @ref{Mesh Tools}@*@*
 
 You can also create Mesh objects manually by calling the MeshManager::createManual method. This way you can define the geometry yourself, but this is outside the scope of this manual.@*@*
 
@@ -265,7 +265,7 @@ The third important class is OverlayManager. Whenever an application wishes to c
 
 @heading Adding 2D Elements to the Overlay
 
-Only OverlayContainers can be added direct to an overlay. The reason is that each level of container establishes the Zorder of the elements contained within it, so if you nest several containers, inner containers have a higher zorder than outer ones to ensure they are displayed correctly. To add a container (such as a Panel) to the overlay, simply call Overlay::add2D.@*@*
+Only OverlayContainers can be added direct to an overlay. The reason is that each level of container establishes the Zorder of the elements contained within it, so if you nest several containers, inner containers have a higher Zorder than outer ones to ensure they are displayed correctly. To add a container (such as a Panel) to the overlay, simply call Overlay::add2D.@*@*
 
 If you wish to add child elements to that container, call OverlayContainer::addChild. Child elements can be OverlayElements or OverlayContainer instances themselves. Remember that the position of a child element is relative to the top-left corner of it's parent.@*@*
 
@@ -276,7 +276,7 @@ OGRE allows you to place and size elements based on 2 coordinate systems: @stron
 @item Pixel Mode
 This mode is useful when you want to specify an exact size for your overlay items, and you don't mind if those items get smaller on the screen if you increase the screen resolution (in fact you might want this). In this mode the only way to put something in the middle or at the right or bottom of the screen reliably in any resolution is to use the aligning options, whilst in relative mode you can do it just by using the right relative coordinates. This mode is very simple, the top-left of the screen is (0,0) and the bottom-right of the screen depends on the resolution. As mentioned above, you can use the aligning options to make the horizontal and vertical coordinate origins the right, bottom or center of the screen if you want to place pixel items in these locations without knowing the resolution.
 @item Relative Mode
-This mode is useful when you want items in the overlay to be the same size on the screen no matter what the resolution. In relative mode, the top-left of the screen is (0,0) and the bottom-right is (1,1). So if you place an element at (0.5, 0.5), it's top-left corner is placed exactly in the center of the screen, no matter what resolution the application is running in. The same principle applies to sizes; if you set the width of an element to 0.5, it covers half the width of the screen. Note that because the aspect ratio of the screen is typically 1.3333 : 1 (width : height), an element with dimensions (0.25, 0.25) will not be square, but it will take up exactly 1/16th of the screen in area terms. If you want square-looking areas you will have to compensate using the typical aspect ratio eg use (0.1875, 0.25) instead.
+This mode is useful when you want items in the overlay to be the same size on the screen no matter what the resolution. In relative mode, the top-left of the screen is (0,0) and the bottom-right is (1,1). So if you place an element at (0.5, 0.5), it's top-left corner is placed exactly in the center of the screen, no matter what resolution the application is running in. The same principle applies to sizes; if you set the width of an element to 0.5, it covers half the width of the screen. Note that because the aspect ratio of the screen is typically 1.3333 : 1 (width : height), an element with dimensions (0.25, 0.25) will not be square, but it will take up exactly 1/16th of the screen in area terms. If you want square-looking areas you will have to compensate using the typical aspect ratio e.g. use (0.1875, 0.25) instead.
 @end table
 
 @heading Transforming Overlays
@@ -291,7 +291,7 @@ Overlays are only really designed for non-interactive screen elements, although 
 
 @node Scripts
 @chapter Scripts
-OGRE drives many of its features through scripts in order to make it easier to set up. The scripts are simply plain text files which can be edited in any standard text editor, and modiying them immediately takes effect on your OGRE-based applications, without any need to recompile. This makes prototyping a lot faster. Here are the items that OGRE lets you script:
+OGRE drives many of its features through scripts in order to make it easier to set up. The scripts are simply plain text files which can be edited in any standard text editor, and modifying them immediately takes effect on your OGRE-based applications, without any need to recompile. This makes prototyping a lot faster. Here are the items that OGRE lets you script:
 @itemize @bullet
 @item
 @ref{Material Scripts}
@@ -431,14 +431,14 @@ When a material is used for the first time, it is 'compiled'. That involves scan
 @itemize @bullet
 @item The number of texture_unit entries in each pass@*
 Note that if the number of texture_unit entries exceeds the number of texture units in the current graphics card, the technique may still be supportable so long as a fragment program is not being used. In this case, Ogre will split the pass which has too many entries into multiple passes for the less capable card, and the multitexture blend will be turned into a multipass blend (@xref{colour_op_multipass_fallback}).
-@item Whether vertex, geometry or fragment programs are used, and if so which syntax they use (e.g. vs_1_1, ps_2_x, arbfp1 etc)
+@item Whether vertex, geometry or fragment programs are used, and if so which syntax they use (e.g. vs_1_1, ps_2_x, arbfp1 etc.)
 @item Other effects like cube mapping and dot3 blending
 @item Whether the vendor or device name of the current graphics card matches some user-specified rules
 @end itemize
 @*
 In a material script, techniques must be listed in order of preference, i.e. the earlier techniques are preferred over the later techniques. This normally means you will list your most advanced, most demanding techniques first in the script, and list fallbacks afterwards.@*@*
 
-To help clearly identify what each technique is used for, the technique can be named but its optional.  Techniques not named within the script will take on a name that is the technique index number.  For example: the first technique in a material is index 0, its name would be "0" if it was not given a name in the script.  The technique name must be unqiue within the material or else the final technique is the resulting merge of all techniques with the same name in the material.  A warning message is posted in the Ogre.log if this occurs.  Named techniques can help when inheriting a material and modifying an existing technique: (@xref{Script Inheritence})@*@*
+To help clearly identify what each technique is used for, the technique can be named but its optional.  Techniques not named within the script will take on a name that is the technique index number.  For example: the first technique in a material is index 0, its name would be "0" if it was not given a name in the script.  The technique name must be unique within the material or else the final technique is the resulting merge of all techniques with the same name in the material.  A warning message is posted in the Ogre.log if this occurs.  Named techniques can help when inheriting a material and modifying an existing technique: (@xref{Script Inheritence})@*@*
 
 Format: technique name@*@*
 
@@ -479,7 +479,7 @@ NB Valid values are 0 (highest level of detail) to 65535, although this is unlik
 
 Example: lod_index 1@*@*
 
-All techniques must belong to a LOD index, by default they all belong to index 0, ie the highest LOD. Increasing indexes denote lower levels of detail. You can (and often will) assign more than one technique to the same LOD index, what this means is that OGRE will pick the best technique of the ones listed at the same LOD index. For readability, it is advised that you list your techniques in order of LOD, then in order of preference, although the latter is the only prerequisite (OGRE determines which one is 'best' by which one is listed first). You must always have at least one Technique at lod_index 0.@*@*
+All techniques must belong to a LOD index, by default they all belong to index 0, i.e. the highest LOD. Increasing indexes denote lower levels of detail. You can (and often will) assign more than one technique to the same LOD index, what this means is that OGRE will pick the best technique of the ones listed at the same LOD index. For readability, it is advised that you list your techniques in order of LOD, then in order of preference, although the latter is the only prerequisite (OGRE determines which one is 'best' by which one is listed first). You must always have at least one Technique at lod_index 0.@*@*
 The distance at which a LOD level is applied is determined by the lod_distances attribute of the containing material, @xref{lod_distances} for details.@*@*
 
 Default: lod_index 0@*@*
@@ -488,16 +488,16 @@ Techniques also contain one or more passes (and there must be at least one), @xr
 
 @anchor{shadow_caster_material}
 @subheading shadow_caster_material
-When using @xref{Texture-based Shadows} you can specify an alternate material to use when rendering the object using this material into the shadow texture. This is like a more advanced version of using shadow_caster_vertex_program, however note that for the moment you are expected to render the shadow in one pass, ie only the first pass is respected.
+When using @xref{Texture-based Shadows} you can specify an alternate material to use when rendering the object using this material into the shadow texture. This is like a more advanced version of using shadow_caster_vertex_program, however note that for the moment you are expected to render the shadow in one pass, i.e. only the first pass is respected.
 
 @anchor{shadow_receiver_material}
 @subheading shadow_receiver_material
-When using @xref{Texture-based Shadows} you can specify an alternate material to use when performing the receiver shadow pass. Note that this explicit 'receiver' pass is only done when you're @strong{not} using @ref{Integrated Texture Shadows} - ie the shadow rendering is done separately (either as a modulative pass, or a masked light pass). This is like a more advanced version of using shadow_receiver_vertex_program and shadow_receiver_fragment_program, however note that for the moment you are expected to render the shadow in one pass, ie only the first pass is respected.
+When using @xref{Texture-based Shadows} you can specify an alternate material to use when performing the receiver shadow pass. Note that this explicit 'receiver' pass is only done when you're @strong{not} using @ref{Integrated Texture Shadows} - i.e. the shadow rendering is done separately (either as a modulative pass, or a masked light pass). This is like a more advanced version of using shadow_receiver_vertex_program and shadow_receiver_fragment_program, however note that for the moment you are expected to render the shadow in one pass, i.e. only the first pass is respected.
 
 @anchor{gpu_vendor_rule}
 @anchor{gpu_device_rule}
 @subheading gpu_vendor_rule and gpu_device_rule
-Although Ogre does a good job of detecting the capabilities of graphics cards and setting the supportability of techniques from that, occasionally card-specific behaviour exists which is not necessarily detectable and you may want to ensure that your materials go down a particular path to either use or avoid that behaviour. This is what these rules are for - you can specify matching rules so that a technique will be considered supportable only on cards from a particular vendor, or which match a device name pattern, or will be considered supported only if they @strong{don't} fulfil such matches.@*@*
+Although Ogre does a good job of detecting the capabilities of graphics cards and setting the supportability of techniques from that, occasionally card-specific behaviour exists which is not necessarily detectable and you may want to ensure that your materials go down a particular path to either use or avoid that behaviour. This is what these rules are for - you can specify matching rules so that a technique will be considered supportable only on cards from a particular vendor, or which match a device name pattern, or will be considered supported only if they @strong{don't} fulfill such matches.@*@*
 The format of the rules are as follows:@*@*
 
 gpu_vendor_rule <include|exclude> <vendor_name>@*
@@ -518,7 +518,7 @@ Note that these rules can only mark a technique 'unsupported' when it would othe
 @subsection Passes
 A pass is a single render of the geometry in question; a single call to the rendering API with a certain set of rendering properties. A technique can have between one and 16 passes, although clearly the more passes you use, the more expensive the technique will be to render.@*@*
 
-To help clearly identify what each pass is used for, the pass can be named but its optional.  Passes not named within the script will take on a name that is the pass index number.  For example: the first pass in a technique is index 0 so its name would be "0" if it was not given a name in the script.  The pass name must be unqiue within the technique or else the final pass is the resulting merge of all passes with the same name in the technique.  A warning message is posted in the Ogre.log if this occurs.  Named passes can help when inheriting a material and modifying an existing pass: (@xref{Script Inheritence})@*@*
+To help clearly identify what each pass is used for, the pass can be named but its optional.  Passes not named within the script will take on a name that is the pass index number.  For example: the first pass in a technique is index 0 so its name would be "0" if it was not given a name in the script.  The pass name must be unique within the technique or else the final pass is the resulting merge of all passes with the same name in the technique.  A warning message is posted in the Ogre.log if this occurs.  Named passes can help when inheriting a material and modifying an existing pass: (@xref{Script Inheritence})@*@*
 
 Passes have a set of global attributes (described below), zero or more nested texture_unit entries (@xref{Texture Units}), and optionally a reference to a vertex and / or a fragment program (@xref{Using Vertex/Geometry/Fragment Programs in a Pass}).
 
@@ -677,7 +677,7 @@ Example: scene_blend add@*@*
 This is the simpler form, where the most commonly used blending modes are enumerated using a single parameter. Valid <blend_type> parameters are:
 @table @asis
 @item add
-The colour of the rendering output is added to the scene. Good for exposions, flares, lights, ghosts etc. Equivalent to 'scene_blend one one'.
+The colour of the rendering output is added to the scene. Good for explosions, flares, lights, ghosts etc. Equivalent to 'scene_blend one one'.
 @item modulate
 The colour of the rendering output is multiplied with the scene contents. Generally colours and darkens the scene, good for smoked glass, semi-transparent objects etc. Equivalent to 'scene_blend dest_colour zero'.
 @item colour_blend
@@ -855,7 +855,7 @@ Default: light_scissor off@*@*
 
 This option is usually only useful if this pass is an additive lighting pass, and is at least the second one in the technique. Ie areas which are not affected by the current light(s) will never need to be rendered. If there is more than one light being passed to the pass, then the scissor is defined to be the rectangle which covers all lights in screen-space. Directional lights are ignored since they are infinite.@*@*
 
-This option does not need to be specified if you are using a standard additive shadow mode, ie SHADOWTYPE_STENCIL_ADDITIVE or SHADOWTYPE_TEXTURE_ADDITIVE, since it is the default behaviour to use a scissor for each additive shadow pass. However, if you're not using shadows, or you're using @ref{Integrated Texture Shadows} where passes are specified in a custom manner, then this could be of use to you.
+This option does not need to be specified if you are using a standard additive shadow mode, i.e. SHADOWTYPE_STENCIL_ADDITIVE or SHADOWTYPE_TEXTURE_ADDITIVE, since it is the default behaviour to use a scissor for each additive shadow pass. However, if you're not using shadows, or you're using @ref{Integrated Texture Shadows} where passes are specified in a custom manner, then this could be of use to you.
 
 @anchor{light_clip_planes}
 @subheading light_clip_planes
@@ -887,7 +887,7 @@ Sets whether or not this pass renders with all vertex normals being automaticall
 
 Format: normalise_normals <on|off>@*@*
 
-Scaling objects causes normals to also change magnitude, which can throw off your lighting calculations. By default, the SceneManager detects this and will automatically renormalise normals for any scaled object, but this has a cost. If you'd prefer to control this manually, call SceneManager::setNormaliseNormalsOnScale(false) and then use this option on materials which are sensitive to normals being resized. @*@*
+Scaling objects causes normals to also change magnitude, which can throw off your lighting calculations. By default, the SceneManager detects this and will automatically re-normalise normals for any scaled object, but this has a cost. If you'd prefer to control this manually, call SceneManager::setNormaliseNormalsOnScale(false) and then use this option on materials which are sensitive to normals being resized. @*@*
 
 Default: normalise_normals off@*
 
@@ -923,7 +923,7 @@ Sets the software culling mode for this pass.@*@*
 
 Format: cull_software <back|front|none>@*@*
 
-In some situations the engine will also cull geometry in software before sending it to the hardware renderer. This setting only takes effect on SceneManager's that use it (since it is best used on large groups of planar world geometry rather than on movable geometry since this would be expensive), but if used can cull geometry before it is sent to the hardware. In this case the culling is based on whether the 'back' or 'front' of the traingle is facing the camera - this definition is based on the face normal (a vector which sticks out of the front side of the polygon perpendicular to the face). Since Ogre expects face normals to be on anticlockwise side of the face, 'cull_software back' is the software equivalent of 'cull_hardware clockwise' setting, which is why they are both the default. The naming is different to reflect the way the culling is done though, since most of the time face normals are precalculated and they don't have to be the way Ogre expects - you could set 'cull_hardware none' and completely cull in software based on your own face normals, if you have the right SceneManager which uses them.@*@*
+In some situations the engine will also cull geometry in software before sending it to the hardware renderer. This setting only takes effect on SceneManager's that use it (since it is best used on large groups of planar world geometry rather than on movable geometry since this would be expensive), but if used can cull geometry before it is sent to the hardware. In this case the culling is based on whether the 'back' or 'front' of the triangle is facing the camera - this definition is based on the face normal (a vector which sticks out of the front side of the polygon perpendicular to the face). Since Ogre expects face normals to be on anticlockwise side of the face, 'cull_software back' is the software equivalent of 'cull_hardware clockwise' setting, which is why they are both the default. The naming is different to reflect the way the culling is done though, since most of the time face normals are pre-calculated and they don't have to be the way Ogre expects - you could set 'cull_hardware none' and completely cull in software based on your own face normals, if you have the right SceneManager which uses them.@*@*
 
 Default: cull_software back@*@*
 
@@ -952,14 +952,14 @@ When dynamic lighting is turned on, the effect is to generate colour values at e
 @item gouraud
 	Colour at each vertex is linearly interpolated across the face.
 @item phong
-	Vertex normals are interpolated across the face, and these are used to determine colour at each pixel. Gives a more natural lighting effect but is more expensive and works better at high levels of tesselation. Not supported on all hardware.
+	Vertex normals are interpolated across the face, and these are used to determine colour at each pixel. Gives a more natural lighting effect but is more expensive and works better at high levels of tessellation. Not supported on all hardware.
 @end table
 Default: shading gouraud@*@*
 
 @anchor{polygon_mode}
 @subheading polygon_mode
 
-Sets how polygons should be rasterised, ie whether they should be filled in, or just drawn as lines or points.@*@*
+Sets how polygons should be rasterised, i.e. whether they should be filled in, or just drawn as lines or points.@*@*
 
 Format: polygon_mode <solid|wireframe|points>@*@*
 
@@ -1042,7 +1042,7 @@ Default: max_lights 8@*
 @anchor{iteration}
 @subheading iteration
 
-Sets whether or not this pass is iterated, ie issued more than once.@*@*
+Sets whether or not this pass is iterated, i.e. issued more than once.@*@*
 
 Format 1: iteration <once | once_per_light> [lightType]@*@*
 Format 2: iteration <number> [<per_light> [lightType]]@*@*
@@ -1064,9 +1064,9 @@ Examples:
 
 By default, passes are only issued once. However, if you use the programmable pipeline, or you wish to exceed the normal limits on the number of lights which are supported, you might want to use the once_per_light option. In this case, only light index 0 is ever used, and the pass is issued multiple times, each time with a different light in light index 0. Clearly this will make the pass more expensive, but it may be the only way to achieve certain effects such as per-pixel lighting effects which take into account 1..n lights.@*@*
 
-Using a number instead of "once" instructs the pass to iterate more than once after the render state is setup.  The render state is not changed after the initial setup so repeated draw calls are very fast and ideal for passes using programmable shaders that must iterate more than once with the same render state ie. shaders that do fur, motion blur, special filtering.@*@*
+Using a number instead of "once" instructs the pass to iterate more than once after the render state is setup.  The render state is not changed after the initial setup so repeated draw calls are very fast and ideal for passes using programmable shaders that must iterate more than once with the same render state i.e. shaders that do fur, motion blur, special filtering.@*@*
 
-If you use once_per_light, you should also add an ambient pass to the technique before this pass, otherwise when no lights are in range of this object it will not get rendered at all; this is important even when you have no ambient light in the scene, because you would still want the objects sihouette to appear.@*@*
+If you use once_per_light, you should also add an ambient pass to the technique before this pass, otherwise when no lights are in range of this object it will not get rendered at all; this is important even when you have no ambient light in the scene, because you would still want the objects silhouette to appear.@*@*
 
 The lightType parameter to the attribute only applies if you use once_per_light, per_light, or per_n_lights and restricts the pass to being run for lights of a single type (either 'point', 'directional' or 'spot'). In the example, the pass will be run once per point light. This can be useful because when you're writing a vertex / fragment program it is a lot easier if you can assume the kind of lights you'll be dealing with. However at least point and directional lights can be dealt with in one way.
 @*@*
@@ -1171,7 +1171,7 @@ Default: point_size 1.0@*@*
 @anchor{point_sprites}
 @subheading point_sprites
 
-This setting specifies whether or not hardware point sprite rendering is enabled for this pass. Enabling it means that a point list is rendered as a list of quads rather than a list of dots. It is very useful to use this option if you're using a billboardset and only need to use point oriented billboards which are all of the same size. You can also use it for any other point list render. @*@*
+This setting specifies whether or not hardware point sprite rendering is enabled for this pass. Enabling it means that a point list is rendered as a list of quads rather than a list of dots. It is very useful to use this option if you're using a BillboardSet and only need to use point oriented billboards which are all of the same size. You can also use it for any other point list render. @*@*
 
 Format: point_sprites <on|off>@*@*
 Default: point_sprites off@*@*
@@ -1293,26 +1293,26 @@ A 1-dimensional texture; that is, a texture which is only 1 pixel high. These ki
 @item 2d
 The default type which is assumed if you omit it, your texture has a width and a height, both of which should preferably be powers of 2, and if you can, make them square because this will look best on the most hardware. These can be addressed with 2D texture coordinates.
 @item 3d
-A 3 dimensional texture ie volume texture. Your texture has a width, a height, both of which should be powers of 2, and has depth. These can be addressed with 3d texture coordinates ie through a pixel shader.
+A 3 dimensional texture i.e. volume texture. Your texture has a width, a height, both of which should be powers of 2, and has depth. These can be addressed with 3d texture coordinates i.e. through a pixel shader.
 @item cubic
 This texture is made up of 6 2D textures which are pasted around the inside of a cube. Can be addressed with 3D texture coordinates and are useful for cubic reflection maps and normal maps.
 @end table
 The 'numMipMaps' option allows you to specify the number of mipmaps to generate for this texture. The default is 'unlimited' which means mips down to 1x1 size are generated. You can specify a fixed number (even 0) if you like instead. Note that if you use the same texture in many material scripts, the number of mipmaps generated will conform to the number specified in the first texture_unit used to load the texture - so be consistent with your usage.@*@*
 
-The 'alpha' option allows you to specify that a single channel (luminence) texture should be loaded as alpha, rather than the default which is to load it into the red channel. This can be helpful if you want to use alpha-only textures in the fixed function pipeline.
+The 'alpha' option allows you to specify that a single channel (luminance) texture should be loaded as alpha, rather than the default which is to load it into the red channel. This can be helpful if you want to use alpha-only textures in the fixed function pipeline.
 
 Default: none@*@*
 
 The <PixelFormat> option allows you to specify the desired pixel format of the texture to create, which may be different to the pixel format of the texture file being loaded. Bear in mind that the final pixel format will be constrained by hardware capabilities so you may not get exactly what you ask for. The available options are:
 @table @asis
 @item PF_L8
-8-bit pixel format, all bits luminace.
+8-bit pixel format, all bits luminance.
 @item PF_L16
-16-bit pixel format, all bits luminace.
+16-bit pixel format, all bits luminance.
 @item PF_A8
 8-bit pixel format, all bits alpha.
 @item PF_A4L4
-8-bit pixel format, 4 bits alpha, 4 bits luminace.
+8-bit pixel format, 4 bits alpha, 4 bits luminance.
 @item PF_BYTE_LA
 2 byte pixel format, 1 byte luminance, 1 byte alpha
 @item PF_R5G6B5
@@ -1557,7 +1557,7 @@ Default: colour_op modulate
 @anchor{colour_op_ex}
 @subheading colour_op_ex
 
-This is an extended version of the @ref{colour_op} attribute which allows extremely detailed control over the blending applied between this and earlier layers. Multitexturing hardware can apply more complex blending operations that multipass blendind, but you are limited to the number of texture units which are available in hardware.@*@*
+This is an extended version of the @ref{colour_op} attribute which allows extremely detailed control over the blending applied between this and earlier layers. Multitexturing hardware can apply more complex blending operations that multipass blending, but you are limited to the number of texture units which are available in hardware.@*@*
 
 Format: colour_op_ex <operation> <source1> <source2> [<manual_factor>] [<manual_colour1>] [<manual_colour2>]@*@*
 
@@ -1686,7 +1686,7 @@ Rotates a texture to a fixed angle. This attribute changes the rotational orient
 
 Format: rotate <angle>@*@*
 
-The parameter is a anticlockwise angle in degrees.@*@*
+The parameter is a anti-clockwise angle in degrees.@*@*
 
 @anchor{rotate_anim}
 @subheading rotate_anim
@@ -1695,7 +1695,7 @@ Sets up an animated rotation effect of this layer. Useful for creating fixed-spe
 
 Format: rotate_anim <revs_per_second>@*@*
 
-The parameter is a number of anticlockwise revolutions per second.@*@*
+The parameter is a number of anti-clockwise revolutions per second.@*@*
 
 @anchor{scale}
 @subheading scale
@@ -1742,7 +1742,7 @@ Example: wave_xform scale_x sine 1.0 0.2 0.0 5.0@*@*
 	Gradual steady decrease from max to min over the period, with an instant return to max at the end.
 @end table
 @item base
-	The base value, the minimum if amplitude > 0, the maximum if amplitdue < 0
+	The base value, the minimum if amplitude > 0, the maximum if amplitude < 0
 @item frequency
 	The number of wave iterations per second, i.e. speed
 @item phase
@@ -1769,7 +1769,7 @@ In order to use a vertex, geometry or fragment program in your materials (@xref{
 
 The definition of a program can either be embedded in the .material script itself (in which case it must precede any references to it in the script), or if you wish to use the same program across multiple .material files, you can define it in an external .program script. You define the program in exactly the same way whether you use a .program script or a .material script, the only difference is that all .program scripts are guaranteed to have been parsed before @strong{all} .material scripts, so you can guarantee that your program has been defined before any .material script that might use it. Just like .material scripts, .program scripts will be read from any location which is on your resource path, and you can define many programs in a single script.@*@*
 
-Vertex, geometry and fragment programs can be low-level (i.e. assembler code written to the specification of a given low level syntax such as vs_1_1 or arbfp1) or high-level such as DirectX9 HLSL, Open GL Shader Language, or nVidia's Cg language (@xref{High-level Programs}). High level languages give you a number of advantages, such as being able to write more intuitive code, and possibly being able to target multiple architectures in a single program (for example, the same Cg program might be able to be used in both D3D and GL, whilst the equivalent low-level programs would require separate techniques, each targetting a different API). High-level programs also allow you to use named parameters instead of simply indexed ones, although parameters are not defined here, they are used in the Pass.@*@*
+Vertex, geometry and fragment programs can be low-level (i.e. assembler code written to the specification of a given low level syntax such as vs_1_1 or arbfp1) or high-level such as DirectX9 HLSL, Open GL Shader Language, or nVidia's Cg language (@xref{High-level Programs}). High level languages give you a number of advantages, such as being able to write more intuitive code, and possibly being able to target multiple architectures in a single program (for example, the same Cg program might be able to be used in both D3D and GL, whilst the equivalent low-level programs would require separate techniques, each targeting a different API). High-level programs also allow you to use named parameters instead of simply indexed ones, although parameters are not defined here, they are used in the Pass.@*@*
 
 Here is an example of a definition of a low-level vertex program:
 @example
@@ -1779,7 +1779,7 @@ vertex_program myVertexProgram asm
     syntax vs_1_1
 }
 @end example
-As you can see, that's very simple, and defining a fragment or geometry program is exactly the same, just with vertex_program replaced with fragment_program or geometry_program, respectively. You give the program a name in the header, followed by the word 'asm' to indicate that this is a low-level program. Inside the braces, you specify where the source is going to come from (and this is loaded from any of the resource locations as with other media), and also indicate the syntax being used. You might wonder why the syntax specification is required when many of the assembler syntaxes have a header identifying them anyway - well the reason is that the engine needs to know what syntax the program is in before reading it, because during compilation of the material, we want to skip progams which use an unsupportable syntax quickly, without loading the program first.@*@*
+As you can see, that's very simple, and defining a fragment or geometry program is exactly the same, just with vertex_program replaced with fragment_program or geometry_program, respectively. You give the program a name in the header, followed by the word 'asm' to indicate that this is a low-level program. Inside the braces, you specify where the source is going to come from (and this is loaded from any of the resource locations as with other media), and also indicate the syntax being used. You might wonder why the syntax specification is required when many of the assembler syntaxes have a header identifying them anyway - well the reason is that the engine needs to know what syntax the program is in before reading it, because during compilation of the material, we want to skip programs which use an unsupportable syntax quickly, without loading the program first.@*@*
 
 The current supported syntaxes are:
 @table @asis
@@ -1842,7 +1842,7 @@ You can get a definitive list of the syntaxes supported by the current card by c
 @anchor{Specifying Named Constants for Assembler Shaders}
 @subheading Specifying Named Constants for Assembler Shaders
 
-Assembler shaders don't have named constants (also called uniform parameters) because the language does not support them - however if you for example decided to precompile your shaders from a high-level language down to assembler for performance or obscurity, you might still want to use the named parameters. Well, you actually can - GpuNamedConstants which contains the named parameter mappings has a 'save' method which you can use to write this data to disk, where you can reference it later using the manual_named_constants directive inside your assembler program decaration, e.g.
+Assembler shaders don't have named constants (also called uniform parameters) because the language does not support them - however if you for example decided to precompile your shaders from a high-level language down to assembler for performance or obscurity, you might still want to use the named parameters. Well, you actually can - GpuNamedConstants which contains the named parameter mappings has a 'save' method which you can use to write this data to disk, where you can reference it later using the manual_named_constants directive inside your assembler program declaration, e.g.
 
 @example
 vertex_program myVertexProgram asm
@@ -1897,9 +1897,9 @@ Once you have defined the shared parameters, you can reference them inside defau
 
 @node High-level Programs
 @heading High-level Programs
-Support for high level vertex and fragment programs is provided through plugins; this is to make sure that an application using OGRE can use as little or as much of the high-level program functionality as they like. OGRE currently supports 3 high-level program types, Cg (@ref{Cg}) (an API- and card-independent, high-level language which lets you write programs for both OpenGL and DirectX for lots of cards), DirectX 9 High-Level Shader Language (@ref{HLSL}), and OpenGL Shader Language (@ref{GLSL}). HLSL can only be used with the DirectX rendersystem, and GLSL can only be used with the GL rendersystem. Cg can be used with both, although experience has shown that more advanced programs, particularly fragment programs which perform a lot of texture fetches, can produce better code in the rendersystem-specific shader langauge. @*@*
+Support for high level vertex and fragment programs is provided through plugins; this is to make sure that an application using OGRE can use as little or as much of the high-level program functionality as they like. OGRE currently supports 3 high-level program types, Cg (@ref{Cg}) (an API- and card-independent, high-level language which lets you write programs for both OpenGL and DirectX for lots of cards), DirectX 9 High-Level Shader Language (@ref{HLSL}), and OpenGL Shader Language (@ref{GLSL}). HLSL can only be used with the DirectX rendersystem, and GLSL can only be used with the GL rendersystem. Cg can be used with both, although experience has shown that more advanced programs, particularly fragment programs which perform a lot of texture fetches, can produce better code in the rendersystem-specific shader language. @*@*
 
-One way to support both HLSL and GLSL is to include seperate techniques in the material script, each one referencing separate programs. However, if the programs are basically the same, with the same parameters, and the techniques are complex this can bloat your material scripts with duplication fairly quickly. Instead, if the only difference is the language of the vertex & fragment program you can use OGRE's @ref{Unified High-level Programs} to automatically pick a program suitable for your rendersystem whilst using a single technique.@*@*
+One way to support both HLSL and GLSL is to include separate techniques in the material script, each one referencing separate programs. However, if the programs are basically the same, with the same parameters, and the techniques are complex this can bloat your material scripts with duplication fairly quickly. Instead, if the only difference is the language of the vertex & fragment program you can use OGRE's @ref{Unified High-level Programs} to automatically pick a program suitable for your rendersystem whilst using a single technique.@*@*
 
 @subheading Skeletal Animation in Vertex Programs
 You can implement skeletal animation in hardware by writing a vertex program which uses the per-vertex blending indices and blending weights, together with an array of world matrices (which will be provided for you by Ogre if you bind the automatic parameter 'world_matrix_array_3x4'). However, you need to communicate this support to Ogre so it does not perform skeletal animation in software for you. You do this by adding the following attribute to your vertex_program definition:
@@ -1916,7 +1916,7 @@ You can implement morph animation in hardware by writing a vertex program which 
 When you do this, any skeletally animated entity which uses this material will forgo the usual software morph and will expect the vertex program to do it. Note that if your model includes both skeletal animation and morph animation, they must both be implemented in the vertex program if either is to be hardware acceleration. Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (@xref{Animation}) then all techniques must be hardware accelerated for any to be.
 
 @subheading Pose Animation in Vertex Programs
-You can implement pose animation (blending between multiple poses based on weight) in a vertex program by pulling in the original vertex data (bound to position), and as many pose offset buffers as you've defined in your 'includes_pose_animation' declaration, which will be in the first free texture unit upwards. You must also use the animation_parametric parameter to define the starting point of the constants which will contain the pose weights; they will start at the parameter you define and fill 'n' constants, where 'n' is the max number of poses this shader can blend, ie the parameter to includes_pose_animation. 
+You can implement pose animation (blending between multiple poses based on weight) in a vertex program by pulling in the original vertex data (bound to position), and as many pose offset buffers as you've defined in your 'includes_pose_animation' declaration, which will be in the first free texture unit upwards. You must also use the animation_parametric parameter to define the starting point of the constants which will contain the pose weights; they will start at the parameter you define and fill 'n' constants, where 'n' is the max number of poses this shader can blend, i.e. the parameter to includes_pose_animation. 
 @example
 	includes_pose_animation 4
 @end example
@@ -2142,7 +2142,7 @@ In this example, we bind a vertex program called 'myVertexProgram' (which will b
 
 The syntax of the link to a vertex program and a fragment or geometry program are identical, the only difference is that 'fragment_program_ref' and 'geometry_program_ref' are used respectively instead of 'vertex_program_ref'.@*@*
 
-For many situations vertex, geometry and fragment programs are associated with each other in a pass but this is not cast in stone.  You could have a vertex program that can be used by several different fragment programs.  Another situation that arises is that you can mix fixed pipeline and programmable pipeline (shaders) together. You could use the non-programable vertex fixed function pipeline and then provide a fragment_program_ref in a pass ie there would be no vertex_program_ref section in the pass.  The fragment program referenced in the pass must meet the requirements as defined in the related API in order to read from the outputs of the vertex fixed pipeline.  You could also just have a vertex program that outputs to the fragment fixed function pipeline.@*@*
+For many situations vertex, geometry and fragment programs are associated with each other in a pass but this is not cast in stone.  You could have a vertex program that can be used by several different fragment programs.  Another situation that arises is that you can mix fixed pipeline and programmable pipeline (shaders) together. You could use the non-programable vertex fixed function pipeline and then provide a fragment_program_ref in a pass i.e. there would be no vertex_program_ref section in the pass.  The fragment program referenced in the pass must meet the requirements as defined in the related API in order to read from the outputs of the vertex fixed pipeline.  You could also just have a vertex program that outputs to the fragment fixed function pipeline.@*@*
 
 The requirements to read from or write to the fixed function pipeline are similar between rendering API's (DirectX and OpenGL) but how its actually done in each type of shader (vertex, geometry or fragment) depends on the shader language.  For HLSL (DirectX API) and associated asm consult MSDN at @url{http://msdn.microsoft.com/library/}. For GLSL (OpenGL), consult section 7.6 of the GLSL spec 1.1 available at @url{http://developer.3dlabs.com/documents/index.htm}.  The built in varying variables provided in GLSL allow your program to read/write to the fixed function pipeline varyings.  For Cg consult the Language Profiles section in CgUsersManual.pdf that comes with the Cg Toolkit available at @url{http://developer.nvidia.com/object/cg_toolkit.html}.  For HLSL and Cg its the varying bindings that allow your shader programs to read/write to the fixed function pipeline varyings.@*@*
 
@@ -2247,29 +2247,29 @@ The value use to adjust transformed y position if bypassed projection matrix tra
 Indicates what vertex winding mode the render state is in at this point; +1 for standard, -1 for inverted (e.g. when processing reflections).
 
 @item light_diffuse_colour
-The diffuse colour of a given light; this requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light - note that directional lights are always first in the list and always present). NB if there are no lights this close, then the parameter will be set to black.
+The diffuse colour of a given light; this requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light - note that directional lights are always first in the list and always present). NB if there are no lights this close, then the parameter will be set to black.
 @item light_specular_colour
-The specular colour of a given light; this requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to black.
+The specular colour of a given light; this requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to black.
 @item light_attenuation
-A float4 containing the 4 light attenuation variables for a given light. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes. The order of the parameters is range, constant attenuation, linear attenuation, quadric attenuation.
+A float4 containing the 4 light attenuation variables for a given light. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes. The order of the parameters is range, constant attenuation, linear attenuation, quadric attenuation.
 @item spotlight_params
-A float4 containing the 3 spotlight parameters and a control value. The order of the parameters is cos(inner angle /2 ), cos(outer angle / 2), falloff, and the final w value is 1.0f. For non-spotlights the value is float4(1,0,0,1). This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light). If there are less lights than this, the details are like a non-spotlight.
+A float4 containing the 3 spotlight parameters and a control value. The order of the parameters is cos(inner angle /2 ), cos(outer angle / 2), falloff, and the final w value is 1.0f. For non-spotlights the value is float4(1,0,0,1). This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light). If there are less lights than this, the details are like a non-spotlight.
 @item light_position
-The position of a given light in world space. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes. Note that this property will work with all kinds of lights, even directional lights, since the parameter is set as a 4D vector. Point lights will be (pos.x, pos.y, pos.z, 1.0f) whilst directional lights will be (-dir.x, -dir.y, -dir.z, 0.0f). Operations like dot products will work consistently on both.
+The position of a given light in world space. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes. Note that this property will work with all kinds of lights, even directional lights, since the parameter is set as a 4D vector. Point lights will be (pos.x, pos.y, pos.z, 1.0f) whilst directional lights will be (-dir.x, -dir.y, -dir.z, 0.0f). Operations like dot products will work consistently on both.
 @item light_direction
-The direction of a given light in world space. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes. DEPRECATED - this property only works on directional lights, and we recommend that you use light_position instead since that returns a generic 4D vector.
+The direction of a given light in world space. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes. DEPRECATED - this property only works on directional lights, and we recommend that you use light_position instead since that returns a generic 4D vector.
 @item light_position_object_space
-The position of a given light in object space (ie when the object is at (0,0,0)). This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes.  Note that this property will work with all kinds of lights, even directional lights, since the parameter is set as a 4D vector. Point lights will be (pos.x, pos.y, pos.z, 1.0f) whilst directional lights will be (-dir.x, -dir.y, -dir.z, 0.0f). Operations like dot products will work consistently on both.
+The position of a given light in object space (i.e. when the object is at (0,0,0)). This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes.  Note that this property will work with all kinds of lights, even directional lights, since the parameter is set as a 4D vector. Point lights will be (pos.x, pos.y, pos.z, 1.0f) whilst directional lights will be (-dir.x, -dir.y, -dir.z, 0.0f). Operations like dot products will work consistently on both.
 @item light_direction_object_space
-The direction of a given light in object space (ie when the object is at (0,0,0)). This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes.  DEPRECATED, except for spotlights - for directional lights we recommend that you use light_position_object_space instead since that returns a generic 4D vector.
+The direction of a given light in object space (i.e. when the object is at (0,0,0)). This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes.  DEPRECATED, except for spotlights - for directional lights we recommend that you use light_position_object_space instead since that returns a generic 4D vector.
 @item light_distance_object_space
-The distance of a given light from the centre of the object - this is a useful approximation to per-vertex distance calculations for relatively small objects. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes.  
+The distance of a given light from the centre of the object - this is a useful approximation to per-vertex distance calculations for relatively small objects. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes.  
 @item light_position_view_space
-The position of a given light in view space (ie when the camera is at (0,0,0)). This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes.  Note that this property will work with all kinds of lights, even directional lights, since the parameter is set as a 4D vector. Point lights will be (pos.x, pos.y, pos.z, 1.0f) whilst directional lights will be (-dir.x, -dir.y, -dir.z, 0.0f). Operations like dot products will work consistently on both.
+The position of a given light in view space (i.e. when the camera is at (0,0,0)). This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes.  Note that this property will work with all kinds of lights, even directional lights, since the parameter is set as a 4D vector. Point lights will be (pos.x, pos.y, pos.z, 1.0f) whilst directional lights will be (-dir.x, -dir.y, -dir.z, 0.0f). Operations like dot products will work consistently on both.
 @item light_direction_view_space
-The direction of a given light in view space (ie when the camera is at (0,0,0)). This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes.  DEPRECATED, except for spotlights - for directional lights we recommend that you use light_position_view_space instead since that returns a generic 4D vector.
+The direction of a given light in view space (i.e. when the camera is at (0,0,0)). This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light). NB if there are no lights this close, then the parameter will be set to all zeroes.  DEPRECATED, except for spotlights - for directional lights we recommend that you use light_position_view_space instead since that returns a generic 4D vector.
 @item light_power
-The 'power' scaling for a given light, useful in HDR rendering. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light).
+The 'power' scaling for a given light, useful in HDR rendering. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light).
 @item light_diffuse_colour_power_scaled
 As light_diffuse_colour, except the RGB channels of the passed colour have been pre-scaled by the light's power scaling as given by light_power.
 @item light_specular_colour_power_scaled
@@ -2328,9 +2328,9 @@ The derived ambient light colour, with 'r', 'g', 'b' components filled with prod
 The derived scene colour, with 'r', 'g' and 'b' components filled with sum of derived_ambient_light_colour and surface_emissive_colour, respectively, and 'a' component filled with surface diffuse alpha component.
 
 @item derived_light_diffuse_colour
-The derived light diffuse colour, with 'r', 'g' and 'b' components filled with product of surface_diffuse_colour, light_diffuse_colour and light_power, respectively, and 'a' component filled with surface diffuse alpha component. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light).
+The derived light diffuse colour, with 'r', 'g' and 'b' components filled with product of surface_diffuse_colour, light_diffuse_colour and light_power, respectively, and 'a' component filled with surface diffuse alpha component. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light).
 @item derived_light_specular_colour
-The derived light specular colour, with 'r', 'g' and 'b' components filled with product of surface_specular_colour and light_specular_colour, respectively, and 'a' component filled with surface specular alpha component. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (ie 0 refers to the closest light).
+The derived light specular colour, with 'r', 'g' and 'b' components filled with product of surface_specular_colour and light_specular_colour, respectively, and 'a' component filled with surface specular alpha component. This requires an index in the 'extra_params' field, and relates to the 'nth' closest light which could affect this object (i.e. 0 refers to the closest light).
 @item derived_light_diffuse_colour_array
 As derived_light_diffuse_colour, except that this populates an array of parameters with a number of lights, and the 'extra_params' field refers to the number of 'nth closest' lights to be processed. This parameter is not compatible with light-based pass_iteration options but can be used for single-pass lighting.
 @item derived_light_specular_colour_array
@@ -2343,11 +2343,11 @@ The parameters of the fog currently set in the scene. Packed as (exp_density, li
 @item camera_position
 The current cameras position in world space.
 @item camera_position_object_space
-The current cameras position in object space (ie when the object is at (0,0,0)).
+The current cameras position in object space (i.e. when the object is at (0,0,0)).
 @item lod_camera_position
 The current LOD camera position in world space. A LOD camera is a separate camera associated with the rendering camera which allows LOD calculations to be calculated separately. The classic example is basing the LOD of the shadow texture render on the position of the main camera, not the shadow camera. 
 @item lod_camera_position_object_space
-The current LOD camera position in object space (ie when the object is at (0,0,0)).
+The current LOD camera position in object space (i.e. when the object is at (0,0,0)).
 @item time
 The current time, factored by the optional parameter (or 1.0f if not supplied).
 @item time_0_x
@@ -2436,10 +2436,10 @@ Provides inverse texture size of the selected texture unit. Requires a texture u
 Provides packed texture size of the selected texture unit. Requires a texture unit index parameter. Provided as float4(width, height, 1 / width, 1 / height). For 3D-texture, depth is ignored, for 1D-texture, height sets to 1.
 @anchor{pass_number}
 @item pass_number
-Sets the active pass index number in a gpu parameter.  The first pass in a technique has an index of 0, the second an index of 1 and so on.  This is usefull for multipass shaders (ie fur or blur shader) that need to know what pass it is.  By setting up the auto parameter in a @ref{Default Program Parameters} list in a program definition, there is no requirement to set the pass number parameter in each pass and lose track. (@xref{fur_example})
+Sets the active pass index number in a gpu parameter.  The first pass in a technique has an index of 0, the second an index of 1 and so on.  This is useful for multipass shaders (i.e. fur or blur shader) that need to know what pass it is.  By setting up the auto parameter in a @ref{Default Program Parameters} list in a program definition, there is no requirement to set the pass number parameter in each pass and lose track. (@xref{fur_example})
 @anchor{pass_iteration_number}
 @item pass_iteration_number
-Usefull for GPU programs that need to know what the current pass iteration number is. The first iteration of a pass is numbered 0.  The last iteration number is one less than what is set for the pass iteration number.  If a pass has its iteration attribute set to 5 then the last iteration number (5th execution of the pass) is 4.(@xref{iteration})
+Useful for GPU programs that need to know what the current pass iteration number is. The first iteration of a pass is numbered 0.  The last iteration number is one less than what is set for the pass iteration number.  If a pass has its iteration attribute set to 5 then the last iteration number (5th execution of the pass) is 4.(@xref{iteration})
 @anchor{animation_parametric}
 @item animation_parametric
 Useful for hardware vertex animation. For morph animation, sets the parametric value (0..1) representing the distance between the first position keyframe (bound to positions) and the second position keyframe (bound to the first free texture coordinate) so that the vertex program can interpolate between them. For pose animation, indicates a group of up to 4 parametric weight values applying to a sequence of up to 4 poses (each one bound to x, y, z and w of the constant), one for each pose. The original positions are held in the usual position buffer, and the offsets to take those positions to the pose where weight == 1.0 are in the first 'n' free texture coordinates; 'n' being determined by the value passed to includes_pose_animation. If more than 4 simultaneous poses are required, then you'll need more than 1 shader constant to hold the parametric values, in which case you should use this binding more than once, referencing a different constant entry; the second one will contain the parametrics for poses 5-8, the third for poses 9-12, and so on.
@@ -2502,7 +2502,7 @@ shadow_receiver_vertex_program_ref myShadowReceiverVertexProgram
 
 For the purposes of writing this alternate program, there is an automatic parameter binding of 'texture_viewproj_matrix' which provides the program with texture projection parameters. The vertex program should do it's normal vertex processing, and generate texture coordinates using this matrix and place them in texture coord sets 0 and 1, since some shadow techniques use 2 texture units. The colour of the vertices output by this vertex program must always be white, so as not to affect the final colour of the rendered shadow. @*@*
 
-When using additive texture shadows, the shadow pass render is actually the lighting render, so if you perform any fragmene program lighting you also need to pull in a custom fragment program. You use the shadow_receiver_fragment_program_ref for this:
+When using additive texture shadows, the shadow pass render is actually the lighting render, so if you perform any fragment program lighting you also need to pull in a custom fragment program. You use the shadow_receiver_fragment_program_ref for this:
 @example
 shadow_receiver_fragment_program_ref myShadowReceiverFragmentProgram
 {
@@ -2518,12 +2518,12 @@ You should pass the projected shadow coordinates from the custom vertex program.
 More recent generations of video card allow you to perform a read from a texture in the vertex program rather than just the fragment program, as is traditional. This allows you to, for example, read the contents of a texture and displace vertices based on the intensity of the colour contained within.@*@*
 
 @subheading Declaring the use of vertex texture fetching
-Since hardware support for vertex texture fetching is not ubiquitous, you should use the uses_vertex_texture_fetch (@xref{Vertex texture fetching in vertex programs}) directive when declaring your vertex programs which use vertex textures, so that if it is not supported, technique fallback can be enabled. This is not strictly necessary for DirectX-targetted shaders, since vertex texture fetching is only supported in vs_3_0, which can be stated as a required syntax in your shader definition, but for OpenGL (GLSL), there are cards which support GLSL but not vertex textures, so you should be explicit about your need for them.
+Since hardware support for vertex texture fetching is not ubiquitous, you should use the uses_vertex_texture_fetch (@xref{Vertex texture fetching in vertex programs}) directive when declaring your vertex programs which use vertex textures, so that if it is not supported, technique fallback can be enabled. This is not strictly necessary for DirectX-targeted shaders, since vertex texture fetching is only supported in vs_3_0, which can be stated as a required syntax in your shader definition, but for OpenGL (GLSL), there are cards which support GLSL but not vertex textures, so you should be explicit about your need for them.
 
 @subheading Render system texture binding differences
 Unfortunately the method for binding textures so that they are available to a vertex program is not well standardised. As at the time of writing, Shader Model 3.0 (SM3.0) hardware under DirectX9 include 4 separate sampler bindings for the purposes of vertex textures. OpenGL, on the other hand, is able to access vertex textures in GLSL (and in assembler through NV_vertex_program_3, although this is less popular), but the textures are shared with the fragment pipeline. I expect DirectX to move to the GL model with the advent of DirectX10, since a unified shader architecture implies sharing of texture resources between the two stages. As it is right now though, we're stuck with an inconsistent situation.@*@*
 
-To reflect this, you should use the @ref{binding_type} attribute in a texture unit to indicate which unit you are targetting with your texture - 'fragment' (the default) or 'vertex'. For render systems that don't have separate bindings, this actually does nothing. But for those that do, it will ensure your texture gets bound to the right processing unit.
+To reflect this, you should use the @ref{binding_type} attribute in a texture unit to indicate which unit you are targeting with your texture - 'fragment' (the default) or 'vertex'. For render systems that don't have separate bindings, this actually does nothing. But for those that do, it will ensure your texture gets bound to the right processing unit.
 
 Note that whilst DirectX9 has separate bindings for the vertex and fragment pipelines, binding a texture to the vertex processing unit still uses up a 'slot' which is then not available for use in the fragment pipeline. I didn't manage to find this documented anywhere, but the nVidia samples certainly avoid binding a texture to the same index on both vertex and fragment units, and when I tried to do it, the texture did not appear correctly in the fragment unit, whilst it did as soon as I moved it into the next unit.
 
@@ -2639,7 +2639,7 @@ See also: @ref{Particle Emitters}, @ref{Particle Affectors}
 
 @node Particle System Attributes
 @subsection Particle System Attributes
-This section describes to attributes which you can set on every particle system using scripts. All atributes have default values so all settings are optional in your script.@*@*
+This section describes to attributes which you can set on every particle system using scripts. All attributes have default values so all settings are optional in your script.@*@*
 
 @anchor{quota}
 @subheading quota
@@ -2653,7 +2653,7 @@ default: 10@*
 @anchor{particle_material}
 @subheading material
 
-Sets the name of the material which all particles in this system will use. All paticles in a system use the same material, although each particle can tint this material through the use of it's colour property.@*@*
+Sets the name of the material which all particles in this system will use. All particles in a system use the same material, although each particle can tint this material through the use of it's colour property.@*@*
 
 format: material <material_name>@*
 example: material Examples/Flare@*
@@ -2699,7 +2699,7 @@ default: billboard@*
 @anchor{particle_sorted}
 @subheading sorted
 
-By default, particles are not sorted. By setting this attribute to 'true', theparticles will be sorted with respect to the camera, furthest first. This can make certain rendering effects look better at a small sorting expense.@*@*
+By default, particles are not sorted. By setting this attribute to 'true', the particles will be sorted with respect to the camera, furthest first. This can make certain rendering effects look better at a small sorting expense.@*@*
 
 format: sorted <true|false>@*
 default: false@*
@@ -2715,7 +2715,7 @@ default: false@*
 @anchor{billboard_type}
 @subheading billboard_type
 
-This is actually an attribute of the 'billboard' particle renderer (the default), and is an example of passing attributes to a particle renderer by declaring them directly within the system declaration. Particles using the default renderer are rendered using billboards, which are rectangles formed by 2 triangles which rotate to face the given direction. However, there is more than 1 way to orient a billboard. The classic approach is for the billboard to directly face the camera: this is the default behaviour. However this arrangement only looks good for particles which are representing something vaguely spherical like a light flare. For more linear effectd like laser fire, you actually want the particle to have an orientation of it's own.@*@*
+This is actually an attribute of the 'billboard' particle renderer (the default), and is an example of passing attributes to a particle renderer by declaring them directly within the system declaration. Particles using the default renderer are rendered using billboards, which are rectangles formed by 2 triangles which rotate to face the given direction. However, there is more than 1 way to orient a billboard. The classic approach is for the billboard to directly face the camera: this is the default behaviour. However this arrangement only looks good for particles which are representing something vaguely spherical like a light flare. For more linear effects like laser fire, you actually want the particle to have an orientation of it's own.@*@*
 
 format: billboard_type <point|oriented_common|oriented_self|perpendicular_common|perpendicular_self>@*
 example: billboard_type oriented_self@*
@@ -2726,13 +2726,13 @@ The options for this parameter are:
 @item point
 	The default arrangement, this approximates spherical particles and the billboards always fully face the camera.
 @item oriented_common
-	Particles are oriented around a common, typically fixed direction vector (see @ref{common_direction}), which acts as their local Y axis. The billboard rotates only around this axis, giving the particle some sense of direction. Good for rainstorms, starfields etc where the particles will travelling in one direction - this is slightly faster than oriented_self (see below).
+	Particles are oriented around a common, typically fixed direction vector (see @ref{common_direction}), which acts as their local Y axis. The billboard rotates only around this axis, giving the particle some sense of direction. Good for rainstorms, starfields etc where the particles will traveling in one direction - this is slightly faster than oriented_self (see below).
 @item oriented_self
-	Particles are oriented around their own direction vector, which acts as their local Y axis. As the particle changes direction, so the billboard reorients itself to face this way. Good for laser fire, fireworks and other 'streaky' particles that should look like they are travelling in their own direction.
+	Particles are oriented around their own direction vector, which acts as their local Y axis. As the particle changes direction, so the billboard reorients itself to face this way. Good for laser fire, fireworks and other 'streaky' particles that should look like they are traveling in their own direction.
 @item perpendicular_common
 	Particles are perpendicular to a common, typically fixed direction vector (see @ref{common_direction}), which acts as their local Z axis, and their local Y axis coplanar with common direction and the common up vector (see @ref{common_up_vector}). The billboard never rotates to face the camera, you might use double-side material to ensure particles never culled by back-facing. Good for aureolas, rings etc where the particles will perpendicular to the ground - this is slightly faster than perpendicular_self (see below).
 @item perpendicular_self
-	Particles are perpendicular to their own direction vector, which acts as their local Z axis, and their local Y axis coplanar with their own direction vector and the common up vector (see @ref{common_up_vector}). The billboard never rotates to face the camera, you might use double-side material to ensure particles never culled by back-facing. Good for rings stack etc where the particles will perpendicular to their travelling direction.
+	Particles are perpendicular to their own direction vector, which acts as their local Z axis, and their local Y axis coplanar with their own direction vector and the common up vector (see @ref{common_up_vector}). The billboard never rotates to face the camera, you might use double-side material to ensure particles never culled by back-facing. Good for rings stack etc where the particles will perpendicular to their traveling direction.
 @end table
 
 @anchor{billboard_origin}
@@ -2769,7 +2769,7 @@ The options for this parameter are:
 @anchor{billboard_rotation_type}
 @subheading billboard_rotation_type
 
-By default, billboard particles will rotate the texture coordinates to according with particle rotation. But rotate texture coordinates has some disadvantage, e.g. the corners of the texture will lost after rotate, and the corners of the billboard will fill with unwant texture area when using wrap address mode or sub-texture sampling. This settings allow you specifying other rotation type.@*@*
+By default, billboard particles will rotate the texture coordinates to according with particle rotation. But rotate texture coordinates has some disadvantage, e.g. the corners of the texture will lost after rotate, and the corners of the billboard will fill with unwanted texture area when using wrap address mode or sub-texture sampling. This settings allow you specifying other rotation type.@*@*
 
 format: billboard_rotation_type <vertex|texcoord>@*
 example: billboard_rotation_type vertex@*
@@ -2808,9 +2808,9 @@ See also: @ref{Particle Emitters}, @ref{Particle Affectors}
 @anchor{particle_point_rendering}
 @subheading point_rendering
 
-This is actually an attribute of the 'billboard' particle renderer (the default), and sets whether or not the billboardset will use point rendering rather than manually generated quads.@*@*
+This is actually an attribute of the 'billboard' particle renderer (the default), and sets whether or not the BillboardSet will use point rendering rather than manually generated quads.@*@*
 
-By default a billboardset is rendered by generating geometry for a textured quad in memory, taking into account the size and orientation settings, and uploading it to the video card. The alternative is to use hardware point rendering, which means that	only one position needs to be sent per billboard rather than 4 and	the hardware sorts out how this is rendered based on the render	state.@*@*
+By default a BillboardSet is rendered by generating geometry for a textured quad in memory, taking into account the size and orientation settings, and uploading it to the video card. The alternative is to use hardware point rendering, which means that	only one position needs to be sent per billboard rather than 4 and	the hardware sorts out how this is rendered based on the render	state.@*@*
 
 Using point rendering is faster than generating quads manually, but	is more restrictive. The following restrictions apply:
 @itemize @bullet
@@ -2827,7 +2827,7 @@ You will almost certainly want to enable in your material pass both point attenu
 @anchor{particle_accurate_facing}
 @subheading accurate_facing
 
-This is actually an attribute of the 'billboard' particle renderer (the default), and sets whether or not the billboardset will use a slower but more accurate calculation for facing the billboard to the camera. Bt default it uses the camera direction, which is faster but means the billboards don't stay in the same orientation as you rotate the camera. The 'accurate_facing true' option makes the calculation based on a vector from each billboard to the camera, which means the orientation is constant even whilst the camera rotates. @*@*
+This is actually an attribute of the 'billboard' particle renderer (the default), and sets whether or not the BillboardSet will use a slower but more accurate calculation for facing the billboard to the camera. Bt default it uses the camera direction, which is faster but means the billboards don't stay in the same orientation as you rotate the camera. The 'accurate_facing true' option makes the calculation based on a vector from each billboard to the camera, which means the orientation is constant even whilst the camera rotates. @*@*
 
 format: accurate_facing on|off@*
 default: accurate_facing off 0@*
@@ -2997,7 +2997,7 @@ default: 5@*
 
 @anchor{time_to_live_min} @anchor{time_to_live_max}
 @subheading time_to_live_min & time_to_live_max
-As time_to_live, except this sets a range of lifetimes and each particle gets a random value inbetween on emission.@*@*
+As time_to_live, except this sets a range of lifetimes and each particle gets a random value in-between on emission.@*@*
 
 format: as time_to_live@*
 example:@*
@@ -3043,7 +3043,7 @@ default: 0@*
 @anchor{repeat_delay_min} @anchor{repeat_delay_max}
 @subheading repeat_delay_min & repeat_delay_max
 
-As repeat_delay, except this sets a range of repeat delays and each time the emitter is started it gets a random value inbetween.@*@*
+As repeat_delay, except this sets a range of repeat delays and each time the emitter is started it gets a random value in-between.@*@*
 
 format: as repeat_delay@*
 example:@*
@@ -3127,7 +3127,7 @@ This emitter emits particles in a random direction from within a cylinder area, 
 
 @anchor{Ellipsoid Emitter}
 @subheading Ellipsoid Emitter
-This emitter emits particles from within an ellipsoid shaped area, ie a sphere or squashed-sphere area. The parameters are again identical to the @ref{Box Emitter}, except that the dimensions describe the widest points along each of the axes.
+This emitter emits particles from within an ellipsoid shaped area, i.e. a sphere or squashed-sphere area. The parameters are again identical to the @ref{Box Emitter}, except that the dimensions describe the widest points along each of the axes.
 
 @anchor{Hollow Ellipsoid Emitter}
 @subheading Hollow Ellipsoid Emitter
@@ -3144,7 +3144,7 @@ The depth of the inner area which does not emit any particles.
 
 @anchor{Ring Emitter}
 @subheading Ring Emitter
-This emitter emits particles from a ring-shaped area, ie a little like @ref{Hollow Ellipsoid Emitter} except only in 2 dimensions.
+This emitter emits particles from a ring-shaped area, i.e. a little like @ref{Hollow Ellipsoid Emitter} except only in 2 dimensions.
 
 @table @asis
 @item inner_width
@@ -3502,7 +3502,7 @@ MyOverlays/ANewOverlay
 
     container Panel(MyOverlayElements/TestPanel)
     {
-        // Center it horzontally, put it at the top
+        // Center it horizontally, put it at the top
         left 0.25
         top 0
         width 0.5
@@ -3525,7 +3525,7 @@ MyOverlays/ANewOverlay
 
 The above example defines a single overlay called 'MyOverlays/ANewOverlay', with 2 panels in it, one nested under the other. It uses relative metrics (the default if no metrics_mode option is found).@*@*
 
-Every overlay in the script must be given a name, which is the line before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your overlays, and also to avoid duplicate names, but the engine does not treat the name a hierarchical, just as a string. Within the braces are the properties of the overlay, and any nested elements. The overlay itself only has a single property 'zorder' which determines how'high' it is in the stack of overlays if more than one is displayed at the same time. Overlays with higher zorder values are displayed on top.@*@*
+Every overlay in the script must be given a name, which is the line before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your overlays, and also to avoid duplicate names, but the engine does not treat the name a hierarchical, just as a string. Within the braces are the properties of the overlay, and any nested elements. The overlay itself only has a single property 'zorder' which determines how 'high' it is in the stack of overlays if more than one is displayed at the same time. Overlays with higher zorder values are displayed on top.@*@*
 
 @heading Adding elements to the overlay
 
@@ -3874,7 +3874,7 @@ There are 2 ways you can get a font into OGRE:
 
 The former gives you the most flexibility and the best performance (in terms of startup times), but the latter is convenient if you want to quickly use a font without having to generate the texture yourself. I suggest prototyping using the latter and change to the former for your final solution.@*@*
 
-All font definitions are held in .fontdef files, which are parsed by the system at startup time. Each .fontdef file can contain multiple font definitions. The basic fomat of an entry in the .fontdef file is:
+All font definitions are held in .fontdef files, which are parsed by the system at startup time. Each .fontdef file can contain multiple font definitions. The basic format of an entry in the .fontdef file is:
 @example
 <font_name>
 {
@@ -3916,9 +3916,9 @@ The size at which to generate the font, in standard points. Note this only affec
 @item resolution <dpi>
 The resolution in dots per inch, this is used in conjunction with the point size to determine the final size. 72 / 96 dpi is normal.
 @item antialias_colour <true|false>
-This is an optional flag, which defaults to 'false'. The generator will antialias the font by default using the alpha component of the texture, which will look fine if you use alpha blending to render your text (this is the default assumed by TextAreaOverlayElement for example). If, however you wish to use a colour based blend like add or modulate in your own code, you should set this to 'true' so the colour values are anitaliased too. If you set this to true and use alpha blending, you'll find the edges of your font are antialiased too quickly resulting in a 'thin' look to your fonts, because not only is the alpha blending the edges, the colour is fading too. Leave this option at the default if in doubt.
+This is an optional flag, which defaults to 'false'. The generator will antialias the font by default using the alpha component of the texture, which will look fine if you use alpha blending to render your text (this is the default assumed by TextAreaOverlayElement for example). If, however you wish to use a colour based blend like add or modulate in your own code, you should set this to 'true' so the colour values are anti-aliased too. If you set this to true and use alpha blending, you'll find the edges of your font are antialiased too quickly resulting in a 'thin' look to your fonts, because not only is the alpha blending the edges, the colour is fading too. Leave this option at the default if in doubt.
 @item code_points nn-nn [nn-nn] ..
-This directive allows you to specify which unicode code points should be generated as glyphs into the font texture. If you don't specify this, code points 33-166 will be generatedby default which covers the basic Latin 1 glyphs. If you use this flag, you should specify a space-separated list of inclusive code point ranges of the form 'start-end'. Numbers must be decimal.
+This directive allows you to specify which unicode code points should be generated as glyphs into the font texture. If you don't specify this, code points 33-166 will be generated by default which covers the basic Latin 1 glyphs. If you use this flag, you should specify a space-separated list of inclusive code point ranges of the form 'start-end'. Numbers must be decimal.
 @end table
 @*@*
 You can also create new fonts at runtime by using the FontManager if you wish.
@@ -3947,7 +3947,7 @@ All the exporters here can be built from the source code, or you can download pr
 @heading A Note About Modelling / Animation For OGRE
 There are a few rules when creating an animated model for OGRE:
 @itemize @bullet
-@item You must have no more than 4 weighted bone assignments per vertex. If you have more, OGRE will eliminate the lowest weighted assignments and renormalise the other weights. This limit is imposed by hardware blending limitations.
+@item You must have no more than 4 weighted bone assignments per vertex. If you have more, OGRE will eliminate the lowest weighted assignments and re-normalise the other weights. This limit is imposed by hardware blending limitations.
 @item All vertices must be assigned to at least one bone - assign static vertices to the root bone.
 @item At the very least each bone must have a keyframe at the beginning and end of the animation.
 @end itemize
