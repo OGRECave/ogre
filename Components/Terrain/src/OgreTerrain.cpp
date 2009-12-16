@@ -1193,7 +1193,8 @@ namespace Ogre
 			{
 			case WORLD_SPACE:
 				// In all cases, transition to local space
-				outVec = outVec - mPos;
+				if (translation)
+					outVec -= mPos;
 				currSpace = LOCAL_SPACE;
 				break;
 			case LOCAL_SPACE:
@@ -1209,8 +1210,10 @@ namespace Ogre
 					// go via terrain space
 					outVec = convertWorldToTerrainAxes(outVec);
 					if (translation)
+					{
 						outVec.x -= mBase; outVec.y -= mBase;
-					outVec.x /= (mSize - 1) * mScale; outVec.y /= (mSize - 1) * mScale;
+						outVec.x /= (mSize - 1) * mScale; outVec.y /= (mSize - 1) * mScale;
+					}
 					currSpace = TERRAIN_SPACE;
 					break;
 				};
@@ -1221,25 +1224,31 @@ namespace Ogre
 				case WORLD_SPACE:
 				case LOCAL_SPACE:
 					// go via local space
-					outVec.x *= (mSize - 1) * mScale; outVec.y *= (mSize - 1) * mScale;
 					if (translation)
+					{
+						outVec.x *= (mSize - 1) * mScale; outVec.y *= (mSize - 1) * mScale;
 						outVec.x += mBase; outVec.y += mBase;
+					}
 					outVec = convertTerrainToWorldAxes(outVec);
 					currSpace = LOCAL_SPACE;
 					break;
 				case POINT_SPACE:
-					outVec.x *= (mSize - 1); outVec.y *= (mSize - 1); 
-					// rounding up/down
-					// this is why POINT_SPACE is the last on the list, because it loses data
-					outVec.x = static_cast<Real>(static_cast<int>(outVec.x + 0.5));
-					outVec.y = static_cast<Real>(static_cast<int>(outVec.y + 0.5));
+					if (translation)
+					{
+						outVec.x *= (mSize - 1); outVec.y *= (mSize - 1); 
+						// rounding up/down
+						// this is why POINT_SPACE is the last on the list, because it loses data
+						outVec.x = static_cast<Real>(static_cast<int>(outVec.x + 0.5));
+						outVec.y = static_cast<Real>(static_cast<int>(outVec.y + 0.5));
+					}
 					currSpace = POINT_SPACE;
 					break;
 				};
 				break;
 			case POINT_SPACE:
 				// always go via terrain space
-				outVec.x /= (mSize - 1); outVec.y /= (mSize - 1); 
+				if (translation)
+					outVec.x /= (mSize - 1); outVec.y /= (mSize - 1); 
 				currSpace = TERRAIN_SPACE;
 				break;
 
@@ -3637,51 +3646,73 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	Terrain* Terrain::raySelectNeighbour(const Ray& ray, Real distanceLimit /* = 0 */)
 	{
-		Real dNear, dFar;
-		Ray localRay(ray.getOrigin() - getPosition(), ray.getDirection());
+		Ray modifiedRay(ray.getOrigin(), ray.getDirection());
 		// Move back half a square - if we're on the edge of the AABB we might
 		// miss the intersection otherwise; it's ok for everywhere else since
 		// we want the far intersection anyway
-		localRay.setOrigin(localRay.getPoint(-mWorldSize/mSize * 0.5f));
-		if (Math::intersects(localRay, getAABB(), &dNear, &dFar))
+		modifiedRay.setOrigin(modifiedRay.getPoint(-mWorldSize/mSize * 0.5f));
+
+		// transform into terrain space
+		Vector3 tPos, tDir;
+		convertPosition(WORLD_SPACE, modifiedRay.getOrigin(), TERRAIN_SPACE, tPos);
+		convertDirection(WORLD_SPACE, modifiedRay.getDirection(), TERRAIN_SPACE, tDir);
+		// Discard rays with no lateral component
+		if (Math::RealEqual(tDir.x, 0.0f, 1e-4) && Math::RealEqual(tDir.y, 0.0f, 1e-4))
+			return 0;
+
+		Ray terrainRay(tPos, tDir);
+		// Intersect with boundary planes 
+		// Only collide with the positive (exit) side of the plane, because we may be
+		// querying from a point outside ourselves if we've cascaded more than once
+		Real dist = std::numeric_limits<Real>::max();
+		std::pair<bool, Real> intersectResult;
+		if (tDir.x < 0.0f)
 		{
-			// discard out of range
-			if (dFar <= 0 || (distanceLimit && dFar > distanceLimit))
-				return 0;
-
-			// we're interested in the exit point
-			// convert to standard form so we can use x/y always
-			Ray terrainRay(convertWorldToTerrainAxes(localRay.getOrigin()), 
-				convertWorldToTerrainAxes(localRay.getDirection()));
-
-
-			Vector3 terrainIntersectPos = terrainRay.getPoint(dFar);
-			Real x = terrainIntersectPos.x;
-			Real y = terrainIntersectPos.y;
-			Real dx = terrainRay.getDirection().x;
-			Real dy = terrainRay.getDirection().y;
-
-			if (Math::RealEqual(Math::Abs(x), Math::Abs(y)))
-			{
-				if (x > 0 && y > 0 && dx > 0 && dy > 0)
-					return getNeighbour(NEIGHBOUR_NORTHEAST);
-				if (x > 0 && y < 0 && dx > 0 && dy < 0)
-					return getNeighbour(NEIGHBOUR_SOUTHEAST);
-				if (x < 0 && y > 0 && dx < 0 && dy > 0)
-					return getNeighbour(NEIGHBOUR_NORTHWEST);
-				if (x < 0 && y < 0 && dx < 0 && dy < 0)
-					return getNeighbour(NEIGHBOUR_SOUTHWEST);
-			}
-			if (x > 0 && x > y && dx > 0)
-				return getNeighbour(NEIGHBOUR_EAST);
-			if (x < 0 && x < y && dx < 0)
-				return getNeighbour(NEIGHBOUR_WEST);
-			if (y > 0 && y > x && dy > 0)
-				return getNeighbour(NEIGHBOUR_NORTH);
-			if (y < 0 && y < x && dy < 0)
-				return getNeighbour(NEIGHBOUR_SOUTH);
-
+			intersectResult = Math::intersects(terrainRay, Plane(Vector3::UNIT_X, Vector3::ZERO));
+			if (intersectResult.first && intersectResult.second < dist)
+				dist = intersectResult.second;
 		}
+		else if (tDir.x > 0.0f)
+		{
+			intersectResult = Math::intersects(terrainRay, Plane(Vector3::NEGATIVE_UNIT_X, Vector3(1,0,0)));
+			if (intersectResult.first && intersectResult.second < dist)
+				dist = intersectResult.second;
+		}
+		if (tDir.y < 0.0f)
+		{
+			intersectResult = Math::intersects(terrainRay, Plane(Vector3::UNIT_Y, Vector3::ZERO));
+			if (intersectResult.first && intersectResult.second < dist)
+				dist = intersectResult.second;
+		}
+		else if (tDir.y > 0.0f)
+		{
+			intersectResult = Math::intersects(terrainRay, Plane(Vector3::NEGATIVE_UNIT_Y, Vector3(0,1,0)));
+			if (intersectResult.first && intersectResult.second < dist)
+				dist = intersectResult.second;
+		}
+
+
+		// discard out of range
+		if (dist * mWorldSize > distanceLimit)
+			return 0;
+
+		Vector3 terrainIntersectPos = terrainRay.getPoint(dist);
+		Real x = terrainIntersectPos.x;
+		Real y = terrainIntersectPos.y;
+		Real dx = tDir.x;
+		Real dy = tDir.y;
+
+		// Never return diagonal directions, we will navigate those recursively anyway
+		if (Math::RealEqual(x, 1.0f, 1e-4f) && dx > 0)
+			return getNeighbour(NEIGHBOUR_EAST);
+		else if (Math::RealEqual(x, 0.0f, 1e-4f) && dx < 0)
+			return getNeighbour(NEIGHBOUR_WEST);
+		else if (Math::RealEqual(y, 1.0f, 1e-4f) && dy > 0)
+			return getNeighbour(NEIGHBOUR_NORTH);
+		else if (Math::RealEqual(y, 0.0f, 1e-4f) && dy < 0)
+			return getNeighbour(NEIGHBOUR_SOUTH);
+
+
 
 		return 0;
 	}
