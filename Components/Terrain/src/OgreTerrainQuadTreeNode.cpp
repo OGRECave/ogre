@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreRenderSystemCapabilities.h"
+#include "OgreStreamSerialiser.h"
 
 #define DO_SKIRTS 1
 
@@ -186,21 +187,58 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::prepare()
 	{
-
-
-		if (isLeaf())
-		{
-
-
-		
-
-		}
-		else
+		if (!isLeaf())
 		{
 			for (int i = 0; i < 4; ++i)
 				mChildren[i]->prepare();
 		}
 
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::prepare(StreamSerialiser& stream)
+	{
+		// load LOD data we need
+		for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i)
+		{
+			LodLevel* ll = *i;
+			// only read 'calc' and then copy to final (separation is only for
+			// real-time calculation
+			// Basically this is what finaliseHeightDeltas does in calc path
+			stream.read(&ll->calcMaxHeightDelta);
+			ll->maxHeightDelta = ll->calcMaxHeightDelta;
+			ll->lastCFactor = 0;
+		}
+
+		if (!isLeaf())
+		{
+			for (int i = 0; i < 4; ++i)
+				mChildren[i]->prepare(stream);
+		}
+
+		// If this is the root, do the post delta calc to finish
+		if (!mParent)
+		{
+			Rect rect;
+			rect.top = mOffsetY; rect.bottom = mBoundaryY;
+			rect.left = mOffsetX; rect.right = mBoundaryX;
+			postDeltaCalculation(rect);
+		}
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::save(StreamSerialiser& stream)
+	{
+		// save LOD data we need
+		for (LodLevelList::iterator i = mLodLevels.begin(); i != mLodLevels.end(); ++i)
+		{
+			LodLevel* ll = *i;
+			stream.write(&ll->maxHeightDelta);
+		}
+
+		if (!isLeaf())
+		{
+			for (int i = 0; i < 4; ++i)
+				mChildren[i]->save(stream);
+		}
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::load()

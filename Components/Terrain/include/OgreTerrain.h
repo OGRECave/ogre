@@ -126,6 +126,16 @@ namespace Ogre
 		<td>TerrainDerivedMap list</td>
 		<td>0 or more sets of map data derived from the original terrain</td>
 	</tr>
+	<tr>
+		<td>Delta data</td>
+		<td>float[size*size]</td>
+		<td>At each vertex, delta information for the LOD at which this vertex disappears</td>
+	</tr>
+	<tr>
+		<td>Quadtree delta data</td>
+		<td>float[quadtrees*lods]</td>
+		<td>At each quadtree node, for each lod a record of the max delta value in the region</td>
+	</tr>
 	</table>
 	<b>TerrainLayerDeclaration (Identifier 'TDCL')</b>\n
 	[Version 1]

@@ -117,12 +117,16 @@ namespace Ogre
 
 		/// Prepare node and children (perform CPU tasks, may be background thread)
 		void prepare();
+		/// Prepare node from a stream
+		void prepare(StreamSerialiser& stream);
 		/// Load node and children (perform GPU tasks, will be render thread)
 		void load();
 		/// Unload node and children (perform GPU tasks, will be render thread)
 		void unload();
 		/// Unprepare node and children (perform CPU tasks, may be background thread)
 		void unprepare();
+		/// Save node to a stream
+		void save(StreamSerialiser& stream);
 
 		struct _OgreTerrainExport LodLevel : public TerrainAlloc
 		{

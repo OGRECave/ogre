@@ -480,12 +480,15 @@ protected:
 		blendMap0->update();
 		blendMap1->update();
 
-		/*
 		// set up a colour map
-		terrain->setGlobalColourMapEnabled(true);
-		Image colourMap;
-		colourMap.load("testcolourmap.jpg", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		terrain->getGlobalColourMap()->loadImage(colourMap);
+		/*
+		if (!terrain->getGlobalColourMapEnabled())
+		{
+			terrain->setGlobalColourMapEnabled(true);
+			Image colourMap;
+			colourMap.load("testcolourmap.jpg", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+			terrain->getGlobalColourMap()->loadImage(colourMap);
+		}
 		*/
 
 	}

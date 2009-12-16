@@ -401,7 +401,10 @@ namespace Ogre
 			stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
 		}
 
-		// TODO - write deltas
+		// write deltas
+		stream.write(mDeltaData, mSize * mSize);
+		// write the quadtree
+		mQuadTree->save(stream);
 
 		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
 
@@ -640,19 +643,15 @@ namespace Ogre
 
 		}
 
-		stream.readChunkEnd(TERRAIN_CHUNK_ID);
-
-		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
-		mQuadTree->prepare();
-
+		// Load delta data
 		mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
-		memset(mDeltaData, 0, sizeof(float) * numVertices);
-		// calculate entire terrain
-		Rect rect;
-		rect.top = 0; rect.bottom = mSize;
-		rect.left = 0; rect.right = mSize;
-		calculateHeightDeltas(rect);
-		finaliseHeightDeltas(rect, true);
+		stream.read(mDeltaData, numVertices);
+
+		// Create & load quadtree
+		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
+		mQuadTree->prepare(stream);
+
+		stream.readChunkEnd(TERRAIN_CHUNK_ID);
 
 		distributeVertexData();
 
@@ -2675,8 +2674,6 @@ namespace Ogre
 			ddres.remainingTypeMask &= ~ DERIVED_DATA_LIGHTMAP;
 		}
 
-		// TODO other data
-
 		ddres.terrain = ddr.terrain;
 		WorkQueue::Response* response = OGRE_NEW WorkQueue::Response(req, true, Any(ddres));
 		return response;
@@ -2710,8 +2707,6 @@ namespace Ogre
 			mCompositeMapDirtyRectLightmapUpdate = true;
 		}
 		
-		// TODO other data
-
 		mDerivedDataUpdateInProgress = false;
 
 		// Re-trigger another request if there are still things to do, or if
@@ -2939,8 +2934,6 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	PixelBox* Terrain::calculateLightmap(const Rect& rect, const Rect& extraTargetRect, Rect& outFinalRect)
 	{
-		// TODO - handle neighbour page casting
-
 		// as well as calculating the lighting changes for the area that is
 		// dirty, we also need to calculate the effect on casting shadow on
 		// other areas. To do this, we project the dirt rect by the light direction
@@ -2999,9 +2992,6 @@ namespace Ogre
 				// Cascade into neighbours when casting, but don't travel further
 				// than world size
 				std::pair<bool, Vector3> rayHit = rayIntersects(ray, true, mWorldSize);
-
-				// TODO - cast multiple rays to antialias?
-				// TODO - fade by distance?
 
 				if (rayHit.first)
 					litVal = 0.0f;
