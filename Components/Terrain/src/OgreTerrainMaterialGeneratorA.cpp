@@ -579,7 +579,7 @@ namespace Ogre
 			ret->unload();
 		}
 
-		ret->setParameter("profiles", "vs_2_0 arbvp1");
+		ret->setParameter("profiles", "vs_3_0 vs_2_0 arbvp1");
 		ret->setParameter("entry_point", "main_vp");
 
 		return ret;
@@ -1104,7 +1104,10 @@ namespace Ogre
 			ret->unload();
 		}
 
-		ret->setParameter("target", "vs_2_0");
+		if (prof->_isSM3Available())
+			ret->setParameter("target", "vs_3_0");
+		else
+			ret->setParameter("target", "vs_2_0");
 		ret->setParameter("entry_point", "main_vp");
 
 		return ret;
