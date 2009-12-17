@@ -248,6 +248,19 @@ namespace Ogre
 		// wait for any queued processes to finish
 		waitForDerivedProcesses();
 
+		if (mModified)
+		{
+			// When modifying, for efficiency we only increase the max deltas at each LOD,
+			// we never reduce them (since that would require re-examining more samples)
+			// Since we now save this data in the file though, we need to make sure we've
+			// calculated the optimal
+			Rect rect;
+			rect.top = 0; rect.bottom = mSize;
+			rect.left = 0; rect.right = mSize;
+			calculateHeightDeltas(rect);
+			finaliseHeightDeltas(rect, false);
+		}
+
 		stream.writeChunkBegin(TERRAIN_CHUNK_ID, TERRAIN_CHUNK_VERSION);
 
 		uint8 align = (uint8)mAlign;
@@ -3120,7 +3133,8 @@ namespace Ogre
 			// create
 			mColourMap = TextureManager::getSingleton().createManual(
 				mMaterialName + "/cm", _getDerivedResourceGroup(), 
-				TEX_TYPE_2D, mGlobalColourMapSize, mGlobalColourMapSize, MIP_DEFAULT, PF_BYTE_RGB);
+				TEX_TYPE_2D, mGlobalColourMapSize, mGlobalColourMapSize, MIP_DEFAULT, 
+				PF_BYTE_RGB, TU_STATIC);
 
 			if (mCpuColourMapStorage)
 			{
