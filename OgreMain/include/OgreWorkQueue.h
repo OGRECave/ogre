@@ -320,7 +320,7 @@ namespace Ogre
 		/** Set the time limit imposed on the processing of responses in a
 			single frame, in milliseconds (0 indicates no limit).
 			This sets the maximum time that will be spent in processResponses() in 
-			a single frame.
+			a single frame. The default is 8ms.
 		*/
 		virtual void setResponseProcessingTimeLimit(unsigned long ms) = 0;
 
