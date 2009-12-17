@@ -133,6 +133,9 @@ int yylex ( void );
 #  if !defined(NOMINMAX) && defined(_MSC_VER)
 #	define NOMINMAX // required to stop windows.h messing up std::min
 #  endif
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
+#endif
 #  include <windows.h>
 #endif
 

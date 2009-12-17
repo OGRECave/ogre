@@ -26,6 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
+#endif
 #include "OgreWin32Window.h"
 #include "OgreRoot.h"
 #include "OgreLogManager.h"
