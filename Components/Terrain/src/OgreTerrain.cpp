@@ -623,6 +623,7 @@ namespace Ogre
 			stream.read(&sz);
 			if (name == "normalmap")
 			{
+				mNormalMapRequired = true;
 				uint8* pData = static_cast<uint8*>(OGRE_MALLOC(sz * sz * 3, MEMCATEGORY_GENERAL));
 				mCpuTerrainNormalMap = OGRE_NEW PixelBox(sz, sz, 1, PF_BYTE_RGB, pData);
 
