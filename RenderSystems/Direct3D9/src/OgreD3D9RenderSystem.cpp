@@ -3809,6 +3809,7 @@ namespace Ogre
 				while (!i->second.empty())
 				{
 					IDirect3DSurface9* surface = i->second.front().surface;
+					surface->Release();
 					i->second.pop_front();
 				}
 				ZBufferHash::iterator deadi = i++;
