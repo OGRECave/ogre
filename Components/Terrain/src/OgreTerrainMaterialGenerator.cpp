@@ -55,7 +55,6 @@ namespace Ogre
 		, mDebugLevel(0) 
 		, mCompositeMapSM(0)
 		, mCompositeMapCam(0)
-		, mCompositeMapRTT(0)
 		, mCompositeMapPlane(0)
 		, mCompositeMapLight(0)
 	{
@@ -67,10 +66,10 @@ namespace Ogre
 		for (ProfileList::iterator i = mProfiles.begin(); i != mProfiles.end(); ++i)
 			OGRE_DELETE *i;
 
-		if (mCompositeMapRTT && TextureManager::getSingletonPtr())
+		if (!mCompositeMapRTT.isNull() && TextureManager::getSingletonPtr())
 		{
 			TextureManager::getSingleton().remove(mCompositeMapRTT->getHandle());
-			mCompositeMapRTT = 0;
+			mCompositeMapRTT.setNull();
 		}
 		if (mCompositeMapSM && Root::getSingletonPtr())
 		{
@@ -134,18 +133,18 @@ namespace Ogre
 
 
 		// check for size change (allow smaller to be reused)
-		if (mCompositeMapRTT && size != mCompositeMapRTT->getWidth())
+		if (!mCompositeMapRTT.isNull() && size != mCompositeMapRTT->getWidth())
 		{
 			TextureManager::getSingleton().remove(mCompositeMapRTT->getHandle());
-			mCompositeMapRTT = 0;
+			mCompositeMapRTT.setNull();
 		}
 
-		if (!mCompositeMapRTT)
+		if (mCompositeMapRTT.isNull())
 		{
 			mCompositeMapRTT = TextureManager::getSingleton().createManual(
 				mCompositeMapSM->getName() + "/compRTT", 
 				ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, size, size, 0, PF_BYTE_RGBA, 
-				TU_RENDERTARGET).get();
+				TU_RENDERTARGET);
 			RenderTarget* rtt = mCompositeMapRTT->getBuffer()->getRenderTarget();
 			// don't render all the time, only on demand
 			rtt->setAutoUpdated(false);
