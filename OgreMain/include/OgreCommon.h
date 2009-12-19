@@ -56,7 +56,7 @@ namespace Ogre {
 	template <typename T>
 	uint32 HashCombine (uint32 hashSoFar, const T& data)
 	{
-		return FastHash(&data, sizeof(T), hashSoFar);
+		return FastHash((const char*)&data, sizeof(T), hashSoFar);
 	}
 
 
