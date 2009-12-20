@@ -46,6 +46,7 @@ THE SOFTWARE.
 #include "OgrePlane.h"
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreMaterialManager.h"
+#include "OgreHardwareBufferManager.h"
 
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
@@ -156,6 +157,7 @@ namespace Ogre
 		, mCpuTerrainNormalMap(0)
 		, mLastLODCamera(0)
 		, mLastLODFrame(0)
+		, mCustomGpuBufferAllocator(0)
 
 	{
 		mRootNode = sm->getRootSceneNode()->createChildSceneNode();
@@ -3764,6 +3766,284 @@ namespace Ogre
 		}
 
 	}
+	//---------------------------------------------------------------------
+	void Terrain::setGpuBufferAllocator(GpuBufferAllocator* alloc)
+	{
+		if (alloc != getGpuBufferAllocator())
+		{
+			if (isLoaded())
+				OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+				"Cannot alter the allocator when loaded!", __FUNCTION__);
+
+			mCustomGpuBufferAllocator = alloc;
+		}
+	}
+	//---------------------------------------------------------------------
+	Terrain::GpuBufferAllocator* Terrain::getGpuBufferAllocator()
+	{
+		if (mCustomGpuBufferAllocator)
+			return mCustomGpuBufferAllocator;
+		else
+			return &mDefaultGpuBufferAllocator;
+	}
+	//---------------------------------------------------------------------
+	size_t Terrain::getPositionBufVertexSize() const
+	{
+		size_t sz = 0;
+		// float3 position
+		// TODO we can compress this when shaders in use if we use parametric positioning
+		sz += sizeof(float) * 3;
+		// float2 uv
+		// TODO we can omit these where shaders are being used & calculate
+		sz += sizeof(float) * 2;
+
+		return sz;
+
+	}
+	//---------------------------------------------------------------------
+	size_t Terrain::getDeltaBufVertexSize() const
+	{
+		// float2(delta, deltaLODthreshold)
+		return sizeof(float) * 2;
+	}
+	//---------------------------------------------------------------------
+	size_t Terrain::_getNumIndexesForBatchSize(uint16 batchSize)
+	{
+		size_t mainIndexesPerRow = batchSize * 2 + 1;
+		size_t numRows = batchSize - 1;
+		size_t mainIndexCount = mainIndexesPerRow * numRows;
+		// skirts share edges, so they take 1 less row per side than batchSize, 
+		// but with 2 extra at the end (repeated) to finish the strip
+		// * 2 for the vertical line, * 4 for the sides, +2 to finish
+		size_t skirtIndexCount = (batchSize - 1) * 2 * 4 + 2;
+		return mainIndexCount + skirtIndexCount;
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::_populateIndexBuffer(uint16* pI, uint16 batchSize, 
+		uint16 vdatasize, size_t vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols, 
+		uint16 skirtRowColSkip)
+	{
+		size_t rowSize = vdatasize * vertexIncrement;
+		size_t numRows = batchSize - 1;
+
+		// Start on the right
+		uint16 currentVertex = (batchSize - 1) * vertexIncrement;
+		// but, our quad area might not start at 0 in this vertex data
+		// offsets are at main terrain resolution, remember
+		uint16 columnStart = xoffset;
+		uint16 rowStart = yoffset;
+		currentVertex += rowStart * vdatasize + columnStart;
+		bool rightToLeft = true;
+		for (uint16 r = 0; r < numRows; ++r)
+		{
+			for (uint16 c = 0; c < batchSize; ++c)
+			{
+
+				*pI++ = currentVertex;
+				*pI++ = currentVertex + rowSize;
+
+				// don't increment / decrement at a border, keep this vertex for next
+				// row as we 'snake' across the tile
+				if (c+1 < batchSize)
+				{
+					currentVertex = rightToLeft ? 
+						currentVertex - vertexIncrement : currentVertex + vertexIncrement;
+				}				
+			}
+			rightToLeft = !rightToLeft;
+			currentVertex += rowSize;
+			// issue one extra index to turn winding around
+			*pI++ = currentVertex;
+		}
+
+		// Skirts
+		for (uint16 s = 0; s < 4; ++s)
+		{
+			// edgeIncrement is the index offset from one original edge vertex to the next
+			// in this row or column. Columns skip based on a row size here
+			// skirtIncrement is the index offset from one skirt vertex to the next, 
+			// because skirts are packed in rows/cols then there is no row multiplier for
+			// processing columns
+			int edgeIncrement = 0, skirtIncrement = 0;
+			switch(s)
+			{
+			case 0: // top
+				edgeIncrement = -static_cast<int>(vertexIncrement);
+				skirtIncrement = -static_cast<int>(vertexIncrement);
+				break;
+			case 1: // left
+				edgeIncrement = -static_cast<int>(rowSize);
+				skirtIncrement = -static_cast<int>(vertexIncrement);
+				break;
+			case 2: // bottom
+				edgeIncrement = static_cast<int>(vertexIncrement);
+				skirtIncrement = static_cast<int>(vertexIncrement);
+				break;
+			case 3: // right
+				edgeIncrement = static_cast<int>(rowSize);
+				skirtIncrement = static_cast<int>(vertexIncrement);
+				break;
+			}
+			// Skirts are stored in contiguous rows / columns (rows 0/2, cols 1/3)
+			uint16 skirtIndex = _calcSkirtVertexIndex(currentVertex, vdatasize, 
+				(s % 2) != 0, numSkirtRowsCols, skirtRowColSkip);
+			for (uint16 c = 0; c < batchSize - 1; ++c)
+			{
+				*pI++ = currentVertex;
+				*pI++ = skirtIndex;	
+				currentVertex += edgeIncrement;
+				skirtIndex += skirtIncrement;
+			}
+			if (s == 3)
+			{
+				// we issue an extra 2 indices to finish the skirt off
+				*pI++ = currentVertex;
+				*pI++ = skirtIndex;
+				currentVertex += edgeIncrement;
+				skirtIndex += skirtIncrement;
+			}
+		}
+
+	}
+	//---------------------------------------------------------------------
+	uint16 Terrain::_calcSkirtVertexIndex(uint16 mainIndex, uint16 vdatasize, bool isCol, 
+		uint16 numSkirtRowsCols, uint16 skirtRowColSkip)
+	{
+		// row / col in main vertex resolution
+		uint16 row = mainIndex / vdatasize;
+		uint16 col = mainIndex % vdatasize;
+
+		// skrits are after main vertices, so skip them
+		uint16 base = vdatasize * vdatasize;
+
+		// The layout in vertex data is:
+		// 1. row skirts
+		//    numSkirtRowsCols rows of resolution vertices each
+		// 2. column skirts
+		//    numSkirtRowsCols cols of resolution vertices each
+
+		// No offsets used here, this is an index into the current vertex data, 
+		// which is already relative
+		if (isCol)
+		{
+			uint16 skirtNum = col / skirtRowColSkip;
+			uint16 colbase = numSkirtRowsCols * vdatasize;
+			return base + colbase + vdatasize * skirtNum + row;
+		}
+		else
+		{
+			uint16 skirtNum = row / skirtRowColSkip;
+			return base + vdatasize * skirtNum + col;
+		}
+
+	}
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	Terrain::DefaultGpuBufferAllocator::DefaultGpuBufferAllocator()
+	{
+
+	}
+	//---------------------------------------------------------------------
+	Terrain::DefaultGpuBufferAllocator::~DefaultGpuBufferAllocator()
+	{
+		freeAllBuffers();
+	}
+	//---------------------------------------------------------------------
+	void Terrain::DefaultGpuBufferAllocator::allocateVertexBuffers(Terrain* forTerrain, 
+		size_t numVertices, HardwareVertexBufferSharedPtr& destPos, HardwareVertexBufferSharedPtr& destDelta)
+	{
+		destPos = getVertexBuffer(mFreePosBufList, forTerrain->getPositionBufVertexSize(), numVertices);
+		destDelta = getVertexBuffer(mFreeDeltaBufList, forTerrain->getDeltaBufVertexSize(), numVertices);
+
+	}
+	//---------------------------------------------------------------------
+	HardwareVertexBufferSharedPtr Terrain::DefaultGpuBufferAllocator::getVertexBuffer(
+		VBufList& list, size_t vertexSize, size_t numVertices)
+	{
+		size_t sz = vertexSize * numVertices;
+		for (VBufList::iterator i = list.begin(); i != list.end(); ++i)
+		{
+			if ((*i)->getSizeInBytes() == sz)
+			{
+				HardwareVertexBufferSharedPtr ret = *i;
+				list.erase(i);
+				return ret;
+			}
+		}
+		// Didn't find one?
+		return HardwareBufferManager::getSingleton()
+			.createVertexBuffer(vertexSize, numVertices, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::DefaultGpuBufferAllocator::freeVertexBuffers(HardwareVertexBufferSharedPtr& posbuf, HardwareVertexBufferSharedPtr& deltabuf)
+	{
+		mFreePosBufList.push_back(posbuf);
+		mFreeDeltaBufList.push_back(deltabuf);
+	}
+	//---------------------------------------------------------------------
+	HardwareIndexBufferSharedPtr Terrain::DefaultGpuBufferAllocator::getSharedIndexBuffer(uint16 batchSize, 
+		uint16 vdatasize, size_t vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols, 
+		uint16 skirtRowColSkip)
+	{
+		uint32 hsh = hashIndexBuffer(batchSize, vdatasize, vertexIncrement, xoffset, yoffset, 
+			numSkirtRowsCols, skirtRowColSkip);
+
+		IBufMap::iterator i = mSharedIBufMap.find(hsh);
+		if (i == mSharedIBufMap.end())
+		{
+			// create new
+			size_t indexCount = Terrain::_getNumIndexesForBatchSize(batchSize);
+			HardwareIndexBufferSharedPtr ret = HardwareBufferManager::getSingleton()
+				.createIndexBuffer(HardwareIndexBuffer::IT_16BIT, indexCount, 
+				HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+			uint16* pI = static_cast<uint16*>(ret->lock(HardwareBuffer::HBL_DISCARD));
+			Terrain::_populateIndexBuffer(pI, batchSize, vdatasize, vertexIncrement, xoffset, yoffset, numSkirtRowsCols, skirtRowColSkip);
+			ret->unlock();
+
+			mSharedIBufMap[hsh] = ret;
+			return ret;
+		}
+		else
+			return i->second;
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::DefaultGpuBufferAllocator::freeAllBuffers()
+	{
+		mFreePosBufList.clear();
+		mFreeDeltaBufList.clear();
+		mSharedIBufMap.clear();
+	}
+	//---------------------------------------------------------------------
+	void Terrain::DefaultGpuBufferAllocator::warmStart(size_t numInstances, uint16 terrainSize, uint16 maxBatchSize, 
+		uint16 mMinBatchSize)
+	{
+		// TODO
+
+	}
+	//---------------------------------------------------------------------
+	uint32 Terrain::DefaultGpuBufferAllocator::hashIndexBuffer(uint16 batchSize, 
+		uint16 vdatasize, size_t vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols, 
+		uint16 skirtRowColSkip)
+	{
+		uint32 ret = 0;
+		ret = HashCombine(ret, batchSize);
+		ret = HashCombine(ret, vdatasize);
+		ret = HashCombine(ret, vertexIncrement);
+		ret = HashCombine(ret, xoffset);
+		ret = HashCombine(ret, yoffset);
+		ret = HashCombine(ret, numSkirtRowsCols);
+		ret = HashCombine(ret, skirtRowColSkip);
+		return ret;
+
+	}
+
+
+
+
 
 
 

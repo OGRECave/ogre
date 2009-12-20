@@ -34,8 +34,6 @@ THE SOFTWARE.
 #include "OgreRenderSystemCapabilities.h"
 #include "OgreStreamSerialiser.h"
 
-#define DO_SKIRTS 1
-
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 // we do lots of conversions here, casting them all is tedious & cluttered, we know what we're doing
 #   pragma warning (disable : 4244)
@@ -570,7 +568,6 @@ namespace Ogre
 			// Base geometry size * size
 			size_t baseNumVerts = Math::Sqr(mVertexDataRecord->size);
 			size_t numVerts = baseNumVerts;
-#if DO_SKIRTS
 			// Now add space for skirts
 			// Skirts will be rendered as copies of the edge vertices translated downwards
 			// Some people use one big fan with only 3 vertices at the bottom, 
@@ -583,7 +580,6 @@ namespace Ogre
 			mVertexDataRecord->skirtRowColSkip = (mVertexDataRecord->size - 1) / (mVertexDataRecord->numSkirtRowsCols - 1);
 			numVerts += mVertexDataRecord->size * mVertexDataRecord->numSkirtRowsCols;
 			numVerts += mVertexDataRecord->size * mVertexDataRecord->numSkirtRowsCols;
-#endif
 			// manually create CPU-side buffer
 			HardwareVertexBufferSharedPtr posbuf(
 				OGRE_NEW DefaultHardwareVertexBuffer(dcl->getVertexSize(POSITION_BUFFER), numVerts, HardwareBuffer::HBU_STATIC_WRITE_ONLY));
@@ -708,7 +704,6 @@ namespace Ogre
 
 		}
 
-#if DO_SKIRTS
 		// Skirts now
 		// skirt spacing based on top-level resolution (* inc to cope with resolution which is not the max)
 		uint16 skirtSpacing = mVertexDataRecord->skirtRowColSkip * inc;
@@ -851,7 +846,6 @@ namespace Ogre
 			if (pRowDeltaBuf)
 				pRowDeltaBuf += destDeltaRowSkip;
 		}
-#endif
 
 		if (!posbuf.isNull())
 			posbuf->unlock();
@@ -956,19 +950,15 @@ namespace Ogre
 		size_t mainIndexCount = mainIndexesPerRow * numRows;
 		destData->indexStart = 0;
 		destData->indexCount = mainIndexCount;
-#if DO_SKIRTS
 		// skirts share edges, so they take 1 less row per side than batchSize, 
 		// but with 2 extra at the end (repeated) to finish the strip
 		// * 2 for the vertical line, * 4 for the sides, +2 to finish
 		size_t skirtIndexCount = (batchSize - 1) * 2 * 4 + 2;
 		destData->indexCount += skirtIndexCount;
-#endif
 		destData->indexBuffer.bind(OGRE_NEW DefaultHardwareIndexBuffer(
 			HardwareIndexBuffer::IT_16BIT, destData->indexCount, HardwareBuffer::HBU_STATIC)); 
-		
+
 		uint16* pI = static_cast<uint16*>(destData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-		uint16* basepI = pI;
-		
 		// Ratio of the main terrain resolution in relation to this vertex data resolution
 		size_t resolutionRatio = (mTerrain->getSize() - 1) / (vdr->resolution - 1);
 		// At what frequency do we sample the vertex data we're using?
@@ -976,89 +966,13 @@ namespace Ogre
 		size_t vertexIncrement = (mSize-1) / (batchSize-1);
 		// however, the vertex data we're referencing may not be at the full resolution anyway
 		vertexIncrement /= resolutionRatio;
-		size_t rowSize = vdr->size * vertexIncrement;
+		uint16 vdatasizeOffsetX = (mOffsetX - mNodeWithVertexData->mOffsetX) / resolutionRatio;
+		uint16 vdatasizeOffsetY = (mOffsetY - mNodeWithVertexData->mOffsetY) / resolutionRatio;
+		Terrain::_populateIndexBuffer(pI, batchSize, vdr->size, vertexIncrement, vdatasizeOffsetX, vdatasizeOffsetY, 
+			vdr->numSkirtRowsCols, vdr->skirtRowColSkip);
 
-		// Start on the right
-		uint16 currentVertex = (batchSize - 1) * vertexIncrement;
-		// but, our quad area might not start at 0 in this vertex data
-		// offsets are at main terrain resolution, remember
-		uint16 columnStart = (mOffsetX - mNodeWithVertexData->mOffsetX) / resolutionRatio;
-		uint16 rowStart = ((mOffsetY - mNodeWithVertexData->mOffsetY) / resolutionRatio);
-		currentVertex += rowStart * vdr->size + columnStart;
-		bool rightToLeft = true;
-		for (uint16 r = 0; r < numRows; ++r)
-		{
-			for (uint16 c = 0; c < batchSize; ++c)
-			{
-								
-				*pI++ = currentVertex;
-				*pI++ = currentVertex + rowSize;
-				
-				// don't increment / decrement at a border, keep this vertex for next
-				// row as we 'snake' across the tile
-				if (c+1 < batchSize)
-				{
-					currentVertex = rightToLeft ? 
-						currentVertex - vertexIncrement : currentVertex + vertexIncrement;
-				}				
-			}
-			rightToLeft = !rightToLeft;
-			currentVertex += rowSize;
-			// issue one extra index to turn winding around
-			*pI++ = currentVertex;
-		}
+		destData->indexBuffer->unlock();
 		
-#if DO_SKIRTS
-		// Skirts
-		for (uint16 s = 0; s < 4; ++s)
-		{
-			// edgeIncrement is the index offset from one original edge vertex to the next
-			// in this row or column. Columns skip based on a row size here
-			// skirtIncrement is the index offset from one skirt vertex to the next, 
-			// because skirts are packed in rows/cols then there is no row multiplier for
-			// processing columns
-			int edgeIncrement = 0, skirtIncrement = 0;
-			switch(s)
-			{
-				case 0: // top
-					edgeIncrement = -static_cast<int>(vertexIncrement);
-					skirtIncrement = -static_cast<int>(vertexIncrement);
-					break;
-				case 1: // left
-					edgeIncrement = -static_cast<int>(rowSize);
-					skirtIncrement = -static_cast<int>(vertexIncrement);
-					break;
-				case 2: // bottom
-					edgeIncrement = static_cast<int>(vertexIncrement);
-					skirtIncrement = static_cast<int>(vertexIncrement);
-					break;
-				case 3: // right
-					edgeIncrement = static_cast<int>(rowSize);
-					skirtIncrement = static_cast<int>(vertexIncrement);
-					break;
-			}
-			// Skirts are stored in contiguous rows / columns (rows 0/2, cols 1/3)
-			uint16 skirtIndex = calcSkirtVertexIndex(currentVertex, (s % 2) != 0);
-			for (uint16 c = 0; c < batchSize - 1; ++c)
-			{
-				*pI++ = currentVertex;
-				*pI++ = skirtIndex;	
-				currentVertex += edgeIncrement;
-				skirtIndex += skirtIncrement;
-			}
-			if (s == 3)
-			{
-				// we issue an extra 2 indices to finish the skirt off
-				*pI++ = currentVertex;
-				*pI++ = skirtIndex;
-				currentVertex += edgeIncrement;
-				skirtIndex += skirtIncrement;
-			}
-		}
-#endif
-		assert ((pI - basepI) == (uint16)destData->indexCount);
-        (void)basepI; // Silence warning
-
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::destroyCpuIndexData()

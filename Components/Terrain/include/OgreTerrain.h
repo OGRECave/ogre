@@ -503,6 +503,111 @@ namespace Ogre
 			POINT_SPACE = 3
 		};
 
+		/** Interface used to by the Terrain instance to allocate GPU buffers.
+		@remarks This class exists to make it easier to re-use buffers between
+			multiple instances of terrain.
+		*/
+		class _OgreTerrainExport GpuBufferAllocator : public TerrainAlloc
+		{
+		public:
+			GpuBufferAllocator() {}
+			virtual ~GpuBufferAllocator() {}
+
+			/** Allocate (or reuse) vertex buffers for a terrain LOD. 
+			@param numVertices The total number of vertices
+			@param destPos Pointer to a vertex buffer for positions, to be bound
+			@param destDelta Pointer to a vertex buffer for deltas, to be bound
+			*/
+			virtual void allocateVertexBuffers(Terrain* forTerrain, size_t numVertices, HardwareVertexBufferSharedPtr& destPos, HardwareVertexBufferSharedPtr& destDelta) = 0;
+			/** Free (or return to the pool) vertex buffers for terrain. 
+			*/
+			virtual void freeVertexBuffers(HardwareVertexBufferSharedPtr& posbuf, HardwareVertexBufferSharedPtr& deltabuf) = 0;
+
+			/** Get a shared index buffer for a given number of settings.
+			@remarks
+				Since all index structures are the same at the same LOD level and
+				relative position, we can share index buffers. Therefore the 
+				buffer returned from this method does not need to be 'freed' like
+				the vertex buffers since it is never owned.
+			@param batchSize The batch size along one edge
+			@param vdatasize The size of the referenced vertex data along one edge
+			@param vertexIncrement The number of vertices to increment for each new indexed row / column
+			@param xoffset The x offset from the start of vdatasize, at that resolution
+			@param yoffset The y offset from the start of vdatasize, at that resolution
+			@param numSkirtRowsCols Number of rows and columns of skirts
+			@param skirtRowColSkip The number of rows / cols to skip in between skirts
+			*/
+			virtual HardwareIndexBufferSharedPtr getSharedIndexBuffer(uint16 batchSize, 
+				uint16 vdatasize, size_t vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols, 
+				uint16 skirtRowColSkip) = 0;
+
+			/// Free any buffers we're holding
+			virtual void freeAllBuffers() = 0;
+
+		};
+		/// Standard implementation of a buffer allocator which re-uses buffers
+		class _OgreTerrainExport DefaultGpuBufferAllocator : public GpuBufferAllocator
+		{
+		public:
+			DefaultGpuBufferAllocator();
+			~DefaultGpuBufferAllocator();
+			void allocateVertexBuffers(Terrain* forTerrain, size_t numVertices, HardwareVertexBufferSharedPtr& destPos, HardwareVertexBufferSharedPtr& destDelta);
+			void freeVertexBuffers(HardwareVertexBufferSharedPtr& posbuf, HardwareVertexBufferSharedPtr& deltabuf);
+			HardwareIndexBufferSharedPtr getSharedIndexBuffer(uint16 batchSize, 
+				uint16 vdatasize, size_t vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols, 
+				uint16 skirtRowColSkip);
+			void freeAllBuffers();
+
+			/** 'Warm start' the allocator based on needing x instances of 
+				terrain with the given configuration.
+			*/
+			void warmStart(size_t numInstances, uint16 terrainSize, uint16 maxBatchSize, 
+				uint16 minBatchSize);
+
+		protected:
+			typedef list<HardwareVertexBufferSharedPtr>::type VBufList;
+			VBufList mFreePosBufList;
+			VBufList mFreeDeltaBufList;
+			typedef map<uint32, HardwareIndexBufferSharedPtr>::type IBufMap;
+			IBufMap mSharedIBufMap;
+
+			uint32 hashIndexBuffer(uint16 batchSize, 
+				uint16 vdatasize, size_t vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols, 
+				uint16 skirtRowColSkip);
+			HardwareVertexBufferSharedPtr getVertexBuffer(VBufList& list, size_t vertexSize, size_t numVertices);
+
+		};
+
+		/** Tell this instance to use the given GpuBufferAllocator. 
+		@remarks
+			May only be called when the terrain is not loaded.
+		*/
+		void setGpuBufferAllocator(GpuBufferAllocator* alloc);
+
+		/// Get the current buffer allocator
+		GpuBufferAllocator* getGpuBufferAllocator();
+
+		/// Utility method to get the number of indexes required to render a given batch
+		static size_t _getNumIndexesForBatchSize(uint16 batchSize);
+		/** Utility method to populate a (locked) index buffer.
+		@param pIndexes Pointer to an index buffer to populate
+		@param batchSize The number of vertices down one side of the batch
+		@param vdatasize The number of vertices down one side of the vertex data being referenced
+		@param vertexIncrement The number of vertices to increment for each new indexed row / column
+		@param xoffset The x offset from the start of the vertex data being referenced
+		@param yoffset The y offset from the start of the vertex data being referenced
+		@param numSkirtRowsCols Number of rows and columns of skirts
+		@param skirtRowColSkip The number of rows / cols to skip in between skirts
+
+		*/
+		static void _populateIndexBuffer(uint16* pIndexes, uint16 batchSize, 
+			uint16 vdatasize, size_t vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols, 
+			uint16 skirtRowColSkip);
+
+		/** Utility method to calculate the skirt index for a given original vertex index. */
+		static uint16 _calcSkirtVertexIndex(uint16 mainIndex, uint16 vdatasize, bool isCol, 
+			uint16 numSkirtRowsCols, uint16 skirtRowColSkip);
+
 		/** Convert a position from one space to another with respect to this terrain.
 		@param inSpace The space that inPos is expressed as
 		@param inPos The incoming position
@@ -1605,6 +1710,12 @@ namespace Ogre
 		unsigned long mLastLODFrame;
 
 		Terrain* mNeighbours[NEIGHBOUR_COUNT];
+
+		GpuBufferAllocator* mCustomGpuBufferAllocator;
+		DefaultGpuBufferAllocator mDefaultGpuBufferAllocator;
+
+		size_t getPositionBufVertexSize() const;
+		size_t getDeltaBufVertexSize() const;
 
 	};
 
