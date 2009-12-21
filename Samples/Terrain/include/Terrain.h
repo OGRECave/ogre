@@ -15,6 +15,10 @@ same license as the rest of the engine.
 #define __Terrain_H__
 
 //#define PAGING
+#define TERRAIN_PAGE_MIN_X 0
+#define TERRAIN_PAGE_MIN_Y 0
+#define TERRAIN_PAGE_MAX_X 1
+#define TERRAIN_PAGE_MAX_Y 1
 
 #include "SdkSample.h"
 #include "OgreTerrain.h"
@@ -382,6 +386,18 @@ protected:
 	bool mPaging;
 	TerrainPaging* mTerrainPaging;
 	PageManager* mPageManager;
+#ifdef PAGING
+	/// This class just pretends to provide prcedural page content to avoid page loading
+	class DummyPageProvider : public PageProvider
+	{
+	public:
+		bool prepareProceduralPage(Page* page, PagedWorldSection* section) { return true; }
+		bool loadProceduralPage(Page* page, PagedWorldSection* section) { return true; }
+		bool unloadProceduralPage(Page* page, PagedWorldSection* section) { return true; }
+		bool unprepareProceduralPage(Page* page, PagedWorldSection* section) { return true; }
+	};
+	DummyPageProvider mDummyPageProvider;
+#endif
 	bool mFly;
 	Real mFallVelocity;
 	enum Mode
@@ -599,7 +615,7 @@ protected:
 		MaterialManager::getSingleton().setDefaultTextureFiltering(TFO_ANISOTROPIC);
 		MaterialManager::getSingleton().setDefaultAnisotropy(7);
 
-		mSceneMgr->setFog(FOG_LINEAR, ColourValue(0.7, 0.7, 0.8), 0, 40000, 50000);
+		mSceneMgr->setFog(FOG_LINEAR, ColourValue(0.7, 0.7, 0.8), 0, 10000, 12000);
 
 		LogManager::getSingleton().setLogDetail(LL_BOREME);
 
@@ -624,15 +640,19 @@ protected:
 #ifdef PAGING
 		// Paging setup
 		mPageManager = OGRE_NEW PageManager();
+		// Since we're not loading any pages from .page files, we need a way just 
+		// to say we've loaded them without them actually being loaded
+		mPageManager->setPageProvider(&mDummyPageProvider);
 		mPageManager->addCamera(mCamera);
 		mTerrainPaging = OGRE_NEW TerrainPaging(mPageManager);
 		PagedWorld* world = mPageManager->createWorld();
-		mTerrainPaging->createWorldSection(world, mTerrainGroup, 11000, 12000, -2, -2, 2, 2);
+		mTerrainPaging->createWorldSection(world, mTerrainGroup, 2000, 3000, 
+			TERRAIN_PAGE_MIN_X, TERRAIN_PAGE_MIN_Y, 
+			TERRAIN_PAGE_MAX_X, TERRAIN_PAGE_MAX_Y);
 #else
-		for (long x = 0; x <= 1; ++x)
-			for (long y = 0; y <= 1; ++y)
+		for (long x = TERRAIN_PAGE_MIN_X; x <= TERRAIN_PAGE_MAX_X; ++x)
+			for (long y = TERRAIN_PAGE_MIN_Y; y <= TERRAIN_PAGE_MAX_Y; ++y)
 				defineTerrain(x, y, blankTerrain);
-
 		// sync load since we want everything in place when we start
 		mTerrainGroup->loadAllTerrains(true);
 #endif
