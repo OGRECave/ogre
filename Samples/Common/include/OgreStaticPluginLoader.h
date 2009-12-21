@@ -48,6 +48,9 @@ Description: Utility class to load plugins statically
 #ifdef OGRE_STATIC_Direct3D10
 #  include "OgreD3D10Plugin.h"
 #endif
+#ifdef OGRE_STATIC_Direct3D11
+#  include "OgreD3D11Plugin.h"
+#endif
 #ifdef OGRE_STATIC_PCZSceneManager
 #  include "OgrePCZPlugin.h"
 #endif
@@ -99,6 +102,9 @@ namespace Ogre
 #ifdef OGRE_STATIC_Direct3D10
 		D3D10Plugin* mD3D10Plugin;
 #endif
+#ifdef OGRE_STATIC_Direct3D11
+		D3D11Plugin* mD3D10Plugin;
+#endif
 	public:
 		StaticPluginLoader() {}
 
@@ -121,6 +127,10 @@ namespace Ogre
 #ifdef OGRE_STATIC_Direct3D10
 			mD3D10Plugin = OGRE_NEW D3D10Plugin();
 			root.installPlugin(mD3D10Plugin);
+#endif
+#ifdef OGRE_STATIC_Direct3D11
+			mD3D11Plugin = OGRE_NEW D3D11Plugin();
+			root.installPlugin(mD3D11Plugin);
 #endif
 #ifdef OGRE_STATIC_CgProgramManager
 			mCgPlugin = OGRE_NEW CgPlugin();
@@ -174,6 +184,9 @@ namespace Ogre
 #endif
 #ifdef OGRE_STATIC_Direct3D10
 			OGRE_DELETE mD3D10Plugin;
+#endif
+#ifdef OGRE_STATIC_Direct3D11
+			OGRE_DELETE mD3D11Plugin;
 #endif
 #ifdef OGRE_STATIC_GL
 			OGRE_DELETE mGLPlugin;

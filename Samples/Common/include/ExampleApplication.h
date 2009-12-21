@@ -34,6 +34,9 @@ Description: Base class for all the OGRE examples
 #    if OGRE_USE_D3D10
 #      define OGRE_STATIC_Direct3D10
 #    endif
+#    if OGRE_USE_D3D11
+#      define OGRE_STATIC_Direct3D11
+#    endif
 #  endif
 #  define OGRE_STATIC_BSPSceneManager
 #  define OGRE_STATIC_ParticleFX

@@ -381,6 +381,7 @@ ogre_find_plugin(RenderSystem_GL OgreGLRenderSystem.h RenderSystems/GL/include)
 ogre_find_plugin(RenderSystem_GLES OgreGLESRenderSystem.h RenderSystems/GLES/include)
 ogre_find_plugin(RenderSystem_Direct3D9 OgreD3D9RenderSystem.h RenderSystems/Direct3D9/include)
 ogre_find_plugin(RenderSystem_Direct3D10 OgreD3D10RenderSystem.h RenderSystems/Direct3D10/include)
+ogre_find_plugin(RenderSystem_Direct3D11 OgreD3D11RenderSystem.h RenderSystems/Direct3D11/include)
 
 if (OGRE_STATIC)
   # check if dependencies for plugins are met
@@ -389,6 +390,9 @@ if (OGRE_STATIC)
   endif ()
   if (NOT DirectX_D3D10_FOUND)
     set(OGRE_RenderSystem_Direct3D10_FOUND FALSE)
+  endif ()
+  if (NOT DirectX_D3D11_FOUND)
+    set(OGRE_RenderSystem_Direct3D11_FOUND FALSE)
   endif ()
   if (NOT OPENGL_FOUND)
     set(OGRE_RenderSystem_GL_FOUND FALSE)
@@ -405,6 +409,9 @@ if (OGRE_STATIC)
   )
   set(OGRE_RenderSystem_Direct3D10_LIBRARIES ${OGRE_RenderSystem_Direct3D10_LIBRARIES}
     ${DirectX_D3D10_LIBRARIES}
+  )
+  set(OGRE_RenderSystem_Direct3D11_LIBRARIES ${OGRE_RenderSystem_Direct3D11_LIBRARIES}
+    ${DirectX_D3D11_LIBRARIES}
   )
   set(OGRE_RenderSystem_GL_LIBRARIES ${OGRE_RenderSystem_GL_LIBRARIES}
     ${OPENGL_LIBRARIES}
