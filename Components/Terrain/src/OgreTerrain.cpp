@@ -1033,6 +1033,9 @@ namespace Ogre
 		if (mQuadTree)
 			mQuadTree->unload();
 
+		// free own buffers if used, but not custom
+		mDefaultGpuBufferAllocator.freeAllBuffers();
+
 		mIsLoaded = false;
 		mModified = false;
 
@@ -3824,6 +3827,30 @@ namespace Ogre
 		uint16 vdatasize, size_t vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols, 
 		uint16 skirtRowColSkip)
 	{
+		/* For even / odd tri strip rows, triangles are this shape:
+		6---7---8
+		| \ | \ |
+		3---4---5
+		| / | / |
+		0---1---2
+		Note how vertex rows count upwards. In order to match up the anti-clockwise
+		winding and this upward transitioning list, we need to start from the
+		right hand side. So we get (2,5,1,4,0,3) etc on even lines (right-left)
+		and (3,6,4,7,5,8) etc on odd lines (left-right). At the turn, we emit the end index 
+		twice, this forms a degenerate triangle, which lets us turn without any artefacts. 
+		So the full list in this simple case is (2,5,1,4,0,3,3,6,4,7,5,8)
+
+		Skirts are part of the same strip, so after finishing on 8, where sX is
+		the skirt vertex corresponding to main vertex X, we go
+		anticlockwise around the edge, (s8,7,s7,6,s6) to do the top skirt, 
+		then (3,s3,0,s0),(1,s1,2,s2),(5,s5,8,s8) to finish the left, bottom, and
+		right skirts respectively.
+		*/
+
+		// to issue a complete row, it takes issuing the upper and lower row
+		// and one extra index, which is the degenerate triangle and also turning
+		// around the winding
+
 		size_t rowSize = vdatasize * vertexIncrement;
 		size_t numRows = batchSize - 1;
 

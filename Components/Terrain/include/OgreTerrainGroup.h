@@ -499,6 +499,7 @@ namespace Ogre
 		String mFilenamePrefix;
 		String mFilenameExtension;
 		String mResourceGroup;
+		Terrain::DefaultGpuBufferAllocator mBufferAllocator;
 		
 		/// Get the position of a terrain instance
 		Vector3 getTerrainSlotPosition(long x, long y);

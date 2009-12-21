@@ -150,7 +150,6 @@ namespace Ogre
 			OGRE_DELETE mChildren[i];
 
 		destroyCpuVertexData();
-		destroyCpuIndexData();
 		destroyGpuVertexData();
 		destroyGpuIndexData();
 
@@ -440,7 +439,6 @@ namespace Ogre
 			mVertexDataRecord = OGRE_NEW VertexDataRecord(resolution, sz, treeDepthEnd - treeDepthStart);
 
 			createCpuVertexData();
-			createCpuIndexData();
 
 			// pass on to children
 			if (!isLeaf() && treeDepthEnd > (mDepth + 1)) // treeDepthEnd is exclusive, and this is children
@@ -472,7 +470,6 @@ namespace Ogre
 				mChildren[i]->useAncestorVertexData(owner, treeDepthEnd, resolution);
 
 		}
-		createCpuIndexData();
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::updateVertexData(bool positions, bool deltas, 
@@ -904,61 +901,10 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void TerrainQuadTreeNode::createCpuIndexData()
+	void TerrainQuadTreeNode::populateIndexData(uint16 batchSize, IndexData* destData)
 	{
-		for (size_t lod = 0; lod < mLodLevels.size(); ++lod)
-		{
-			LodLevel* ll = mLodLevels[lod];
-
-			OGRE_DELETE ll->cpuIndexData;
-
-			ll->cpuIndexData = OGRE_NEW IndexData();
-
-			createTriangleStripBuffer(ll->batchSize, ll->cpuIndexData);
-			
-		}
-	}
-	//---------------------------------------------------------------------
-	void TerrainQuadTreeNode::createTriangleStripBuffer(uint16 batchSize, IndexData* destData)
-	{
-		/* For even / odd tri strip rows, triangles are this shape:
-		6---7---8
-		| \ | \ |
-		3---4---5
-		| / | / |
-		0---1---2
-		Note how vertex rows count upwards. In order to match up the anti-clockwise
-		winding and this upward transitioning list, we need to start from the
-		right hand side. So we get (2,5,1,4,0,3) etc on even lines (right-left)
-		and (3,6,4,7,5,8) etc on odd lines (left-right). At the turn, we emit the end index 
-		twice, this forms a degenerate triangle, which lets us turn without any artefacts. 
-		So the full list in this simple case is (2,5,1,4,0,3,3,6,4,7,5,8)
-
-		Skirts are part of the same strip, so after finishing on 8, where sX is
-		 the skirt vertex corresponding to main vertex X, we go
-		 anticlockwise around the edge, (s8,7,s7,6,s6) to do the top skirt, 
-		then (3,s3,0,s0),(1,s1,2,s2),(5,s5,8,s8) to finish the left, bottom, and
-		 right skirts respectively.
-		*/
-
-		// to issue a complete row, it takes issuing the upper and lower row
-		// and one extra index, which is the degenerate triangle and also turning
-		// around the winding
 		const VertexDataRecord* vdr = getVertexDataRecord();
-		size_t mainIndexesPerRow = batchSize * 2 + 1;
-		size_t numRows = batchSize - 1;
-		size_t mainIndexCount = mainIndexesPerRow * numRows;
-		destData->indexStart = 0;
-		destData->indexCount = mainIndexCount;
-		// skirts share edges, so they take 1 less row per side than batchSize, 
-		// but with 2 extra at the end (repeated) to finish the strip
-		// * 2 for the vertical line, * 4 for the sides, +2 to finish
-		size_t skirtIndexCount = (batchSize - 1) * 2 * 4 + 2;
-		destData->indexCount += skirtIndexCount;
-		destData->indexBuffer.bind(OGRE_NEW DefaultHardwareIndexBuffer(
-			HardwareIndexBuffer::IT_16BIT, destData->indexCount, HardwareBuffer::HBU_STATIC)); 
 
-		uint16* pI = static_cast<uint16*>(destData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 		// Ratio of the main terrain resolution in relation to this vertex data resolution
 		size_t resolutionRatio = (mTerrain->getSize() - 1) / (vdr->resolution - 1);
 		// At what frequency do we sample the vertex data we're using?
@@ -968,23 +914,14 @@ namespace Ogre
 		vertexIncrement /= resolutionRatio;
 		uint16 vdatasizeOffsetX = (mOffsetX - mNodeWithVertexData->mOffsetX) / resolutionRatio;
 		uint16 vdatasizeOffsetY = (mOffsetY - mNodeWithVertexData->mOffsetY) / resolutionRatio;
-		Terrain::_populateIndexBuffer(pI, batchSize, vdr->size, vertexIncrement, vdatasizeOffsetX, vdatasizeOffsetY, 
+
+		destData->indexBuffer = mTerrain->getGpuBufferAllocator()->getSharedIndexBuffer(batchSize, vdr->size, 
+			vertexIncrement, vdatasizeOffsetX, vdatasizeOffsetY, 
 			vdr->numSkirtRowsCols, vdr->skirtRowColSkip);
+		destData->indexStart = 0;
+		destData->indexCount = destData->indexBuffer->getNumIndexes();
 
-		destData->indexBuffer->unlock();
-		
-	}
-	//---------------------------------------------------------------------
-	void TerrainQuadTreeNode::destroyCpuIndexData()
-	{
-		for (size_t lod = 0; lod < mLodLevels.size(); ++lod)
-		{
-			LodLevel* ll = mLodLevels[lod];
-
-			OGRE_DELETE ll->cpuIndexData;
-			ll->cpuIndexData = 0;
-		}
-
+		// shared index buffer is pre-populated		
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::createGpuVertexData()
@@ -1036,12 +973,11 @@ namespace Ogre
 			if (!ll->gpuIndexData)
 			{
 				// clone, using default buffer manager ie hardware
-				ll->gpuIndexData = ll->cpuIndexData->clone();
+				ll->gpuIndexData = OGRE_NEW IndexData();
+				populateIndexData(ll->batchSize, ll->gpuIndexData);
 			}
 
 		}
-		// We don't need the CPU copy anymore
-		destroyCpuIndexData();
 
 	}
 	//---------------------------------------------------------------------

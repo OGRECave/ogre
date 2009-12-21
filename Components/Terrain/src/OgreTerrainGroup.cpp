@@ -281,6 +281,8 @@ namespace Ogre
 			// Allocate in main thread so no race conditions
 			slot->instance = OGRE_NEW Terrain(mSceneManager);
 			slot->instance->setResourceGroup(mResourceGroup);
+			// Use shared pool of buffers
+			slot->instance->setGpuBufferAllocator(&mBufferAllocator);
 
 			LoadRequest req;
 			req.slot = slot;
@@ -322,6 +324,8 @@ namespace Ogre
 			delete i->second;
 		}
 		mTerrainSlots.clear();
+		// Also clear buffer pools, if we're clearing completely may not be representative
+		mBufferAllocator.freeAllBuffers();
 	}
 	//---------------------------------------------------------------------
 	TerrainGroup::TerrainSlotDefinition* TerrainGroup::getTerrainDefinition(long x, long y) const

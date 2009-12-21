@@ -132,9 +132,7 @@ namespace Ogre
 		{
 			/// Number of vertices rendered down one side (not including skirts)
 			uint16 batchSize;
-			/// index data referencing the main vertex data but in CPU buffers (built in background)
-			IndexData* cpuIndexData;
-			/// "Real" index data on the gpu
+			/// Index data on the gpu
 			IndexData* gpuIndexData;
 			/// Maximum delta height between this and the next lower lod
 			Real maxHeightDelta;
@@ -145,7 +143,7 @@ namespace Ogre
 			/// The cFactor value used to calculate transitionDist
 			Real lastCFactor;
 
-			LodLevel() : cpuIndexData(0), gpuIndexData(0), maxHeightDelta(0), calcMaxHeightDelta(0),
+			LodLevel() : gpuIndexData(0), maxHeightDelta(0), calcMaxHeightDelta(0),
 				lastTransitionDist(0), lastCFactor(0) {}
 		};
 		typedef vector<LodLevel*>::type LodLevelList;
@@ -390,9 +388,7 @@ namespace Ogre
 			not the local vertex data (which may use a subset)
 		*/
 		void updateVertexBuffer(HardwareVertexBufferSharedPtr& posbuf, HardwareVertexBufferSharedPtr& deltabuf, const Rect& rect);
-		void createCpuIndexData();
 		void destroyCpuVertexData();
-		void destroyCpuIndexData();
 
 		void createGpuVertexData();
 		void destroyGpuVertexData();
@@ -400,7 +396,7 @@ namespace Ogre
 		void createGpuIndexData();
 		void destroyGpuIndexData();
 
-		void createTriangleStripBuffer(uint16 batchSize, IndexData* destData);
+		void populateIndexData(uint16 batchSize, IndexData* destData);
 		
 		uint16 calcSkirtVertexIndex(uint16 mainIndex, bool isCol);
 
