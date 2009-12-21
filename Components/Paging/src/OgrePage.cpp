@@ -98,16 +98,23 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Page::touch()
 	{
-		mFrameLastHeld = Root::getSingleton().getNextFrameNumber() + 1;
+		mFrameLastHeld = Root::getSingleton().getNextFrameNumber();
 	}
 	//---------------------------------------------------------------------
 	bool Page::isHeld() const
 	{
 		unsigned long nextFrame = Root::getSingleton().getNextFrameNumber();
-		// 1-frame tolerance, since the next frame number varies depending which
-		// side of frameRenderingQueued you are
-		return (mFrameLastHeld == nextFrame ||
-			mFrameLastHeld + 1 == nextFrame);
+		unsigned long dist;
+		if (nextFrame < mFrameLastHeld)
+		{
+			// we must have wrapped around
+			dist = mFrameLastHeld + (std::numeric_limits<unsigned long>::max() - mFrameLastHeld);
+		}
+		else
+			dist = nextFrame - mFrameLastHeld;
+
+		// 5-frame tolerance
+		return dist <= 5;
 	}
 	//---------------------------------------------------------------------
 	bool Page::prepareImpl(StreamSerialiser& stream, PageData* dataToPopulate)
@@ -262,19 +269,27 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool Page::prepareImpl(PageData* dataToPopulate)
 	{
-		// Background loading
-		String filename = generateFilename();
+		// Procedural preparation
+		if (mParent->_prepareProceduralPage(this))
+			return true;
+		else
+		{
+			// Background loading
+			String filename = generateFilename();
 
-		DataStreamPtr stream = Root::getSingleton().openFileStream(filename, 
-			getManager()->getPageResourceGroup());
-		StreamSerialiser ser(stream);
-		return prepareImpl(ser, dataToPopulate);
+			DataStreamPtr stream = Root::getSingleton().openFileStream(filename, 
+				getManager()->getPageResourceGroup());
+			StreamSerialiser ser(stream);
+			return prepareImpl(ser, dataToPopulate);
+		}
 
 
 	}
 	//---------------------------------------------------------------------
 	void Page::loadImpl()
 	{
+		mParent->_loadProceduralPage(this);
+
 		for (ContentCollectionList::iterator i = mContentCollections.begin();
 			i != mContentCollections.end(); ++i)
 		{
