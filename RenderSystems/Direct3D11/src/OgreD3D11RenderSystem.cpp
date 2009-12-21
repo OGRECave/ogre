@@ -678,11 +678,12 @@ namespace Ogre
 				// you have to use D3D11_DRIVER_TYPE_SOFTWARE (D3D11_DRIVER_TYPE_WARP doesn't work)
 				driverType = D3D_DRIVER_TYPE_SOFTWARE; 
 				pSelectedAdapter = NULL;
-				Software3d310Dll = LoadLibrary(TEXT("D3D11WARP.dll"));
+
+				Software3d310Dll = LoadLibrary(TEXT("D3D10WARP.dll"));
 				if (Software3d310Dll == NULL) 
 				{
 					// try to load the beta that was released
-					Software3d310Dll = LoadLibrary(TEXT("D3D11WARP_beta.dll"));
+					Software3d310Dll = LoadLibrary(TEXT("D3D10WARP_beta.dll"));
 					if (Software3d310Dll == NULL) 
 					{
 						OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
@@ -693,16 +694,43 @@ namespace Ogre
 				}
 			}
 
-			if(FAILED(D3D11CreateDevice(pSelectedAdapter,driverType , Software3d310Dll, deviceFlags, NULL, 0, D3D11_SDK_VERSION, &device, 0, 0)))         
+			if(FAILED(D3D11CreateDevice(pSelectedAdapter, driverType , Software3d310Dll, deviceFlags, NULL, 0, D3D11_SDK_VERSION, &device, 0, 0)))         
 			{
 				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
 					"Failed to create Direct3D11 object", 
 					"D3D11RenderSystem::D3D11RenderSystem" );
 			}
+
+			if (Software3d310Dll != NULL)
+			{
+				// get the IDXGIFactory1 from the device for software drivers
+				// Remark(dec-09):
+				//  Seems that IDXGIFactory::CreateSoftwareAdapter doesn't work with
+				// D3D11CreateDevice - so I needed to create with pSelectedAdapter = 0.
+				// If pSelectedAdapter == 0 then you have to get the IDXGIFactory1 from
+				// the device - else CreateSwapChain fails later.
+				SAFE_RELEASE(mpDXGIFactory);
+
+				IDXGIDevice * pDXGIDevice;
+				device->QueryInterface(__uuidof(IDXGIDevice), (void **)&pDXGIDevice);
+
+				IDXGIAdapter * pDXGIAdapter;
+				pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), (void **)&pDXGIAdapter);
+
+				pDXGIAdapter->GetParent(__uuidof(IDXGIFactory1), (void **)&mpDXGIFactory);
+
+				SAFE_RELEASE(pDXGIAdapter);
+				SAFE_RELEASE(pDXGIDevice);
+			}
+
+
 			mDevice = D3D11Device(device) ;
 
 			mActiveD3DDriver->setDevice(mDevice);
 		}
+
+
+
 
 		// get driver version
 		// TODO: no wayto do this on Dx11? Can't find a driver version structure
