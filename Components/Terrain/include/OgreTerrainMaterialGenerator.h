@@ -367,7 +367,7 @@ namespace Ogre
 		virtual void _renderCompositeMap(size_t size, const Rect& rect, 
 			const MaterialPtr& mat, const TexturePtr& destCompositeMap);
 
-		const TexturePtr& _getCompositeMapRTT() { return mCompositeMapRTT; }
+		Texture* _getCompositeMapRTT() { return mCompositeMapRTT; }
 	protected:
 
 		ProfileList mProfiles;
@@ -377,7 +377,7 @@ namespace Ogre
 		unsigned int mDebugLevel;
 		SceneManager* mCompositeMapSM;
 		Camera* mCompositeMapCam;
-		TexturePtr mCompositeMapRTT; // deliberately holding this by raw pointer to avoid shutdown issues
+		Texture* mCompositeMapRTT; // deliberately holding this by raw pointer to avoid shutdown issues
 		ManualObject* mCompositeMapPlane;
 		Light* mCompositeMapLight;
 
