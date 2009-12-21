@@ -675,7 +675,7 @@ namespace Ogre
 			}
 			else if (mDriverType == DT_WARP)
 			{
-				// you have to use D3D11_DRIVER_TYPE_SOFTWARE (D3D11_DRIVER_TYPE_WARP doesn't work)
+				// you have to use D3D_DRIVER_TYPE_SOFTWARE (D3D_DRIVER_TYPE_WARP doesn't work)
 				driverType = D3D_DRIVER_TYPE_SOFTWARE; 
 				pSelectedAdapter = NULL;
 
@@ -1088,14 +1088,9 @@ namespace Ogre
     {
 
 		rsc->addShaderProfile("vs_4_0");
-		// Documentation\dx11help\d3d11.chm::/D3D11CompileShader.htm
-		// The Direct3D 10 currently supports only "vs_4_0", "ps_4_0", and "gs_4_0". 
+		rsc->addShaderProfile("vs_4_1");
+		rsc->addShaderProfile("vs_5_0");
 
-		//rsc->addShaderProfile("vs_3_0");
-		//rsc->addShaderProfile("vs_2_x");
-		//rsc->addShaderProfile("vs_2_a");
-		//rsc->addShaderProfile("vs_2_0");
-		//rsc->addShaderProfile("vs_1_1");
 
 		rsc->setCapability(RSC_VERTEX_PROGRAM);
 
@@ -1113,20 +1108,8 @@ namespace Ogre
     {
 		
 		rsc->addShaderProfile("ps_4_0");
-
-		// Documentation\dx11help\d3d11.chm::/D3D11CompileShader.htm
-		// The Direct3D 10 currently supports only "vs_4_0", "ps_4_0", and "gs_4_0". 
-
-		//rsc->addShaderProfile("ps_3_x");
-		//rsc->addShaderProfile("ps_3_0");
-		//rsc->addShaderProfile("ps_2_x");
-		//rsc->addShaderProfile("ps_2_a");
-		//rsc->addShaderProfile("ps_2_b");
-		//rsc->addShaderProfile("ps_2_0");
-		//rsc->addShaderProfile("ps_1_4");
-		//rsc->addShaderProfile("ps_1_3");
-		//rsc->addShaderProfile("ps_1_2");
-		//rsc->addShaderProfile("ps_1_1");
+		rsc->addShaderProfile("ps_4_1");
+		rsc->addShaderProfile("ps_5_0");
 
 		rsc->setCapability(RSC_FRAGMENT_PROGRAM);
 
