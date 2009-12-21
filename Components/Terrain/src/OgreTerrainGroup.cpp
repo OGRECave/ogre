@@ -593,6 +593,10 @@ namespace Ogre
 		WorkQueue::Response* response = 0;
 		try
 		{
+			// hack
+			if (lreq.slot->x == 0 && lreq.slot->y == 0)
+			{
+
 			if (!def.filename.empty())
 				t->prepare(def.filename);
 			else
@@ -602,6 +606,7 @@ namespace Ogre
 				// if this worked, we can destroy the input data to save space
 				def.freeImportData();
 			}
+			} // end hack
 			response = OGRE_NEW WorkQueue::Response(req, true, Any());
 		}
 		catch (Exception& e)
@@ -638,6 +643,9 @@ namespace Ogre
 			Terrain* terrain = slot->instance;
 			if (terrain)
 			{
+				// HACK
+				if (slot->x != 0 || slot->y != 0)
+					return;
 
 				// do final load now we've prepared in the background
 				// we must set the position

@@ -4005,7 +4005,8 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	void Terrain::DefaultGpuBufferAllocator::freeVertexBuffers(HardwareVertexBufferSharedPtr& posbuf, HardwareVertexBufferSharedPtr& deltabuf)
+	void Terrain::DefaultGpuBufferAllocator::freeVertexBuffers(
+		const HardwareVertexBufferSharedPtr& posbuf, const HardwareVertexBufferSharedPtr& deltabuf)
 	{
 		mFreePosBufList.push_back(posbuf);
 		mFreeDeltaBufList.push_back(deltabuf);

@@ -929,10 +929,44 @@ namespace Ogre
 		// TODO - mutex cpu data
 		if (mVertexDataRecord && mVertexDataRecord->cpuVertexData && !mVertexDataRecord->gpuVertexData)
 		{
+			// copy data from CPU to GPU, but re-use vertex buffers (so don't use regular clone)
+			mVertexDataRecord->gpuVertexData = OGRE_NEW VertexData();
+			VertexData* srcData = mVertexDataRecord->cpuVertexData;
+			VertexData* destData = mVertexDataRecord->gpuVertexData;
 
-			// clone CPU data into GPU data
-			// default is to create new declarations from hardware manager
-			mVertexDataRecord->gpuVertexData = mVertexDataRecord->cpuVertexData->clone();
+			// copy vertex buffers
+			// get new buffers
+			HardwareVertexBufferSharedPtr destPosBuf, destDeltaBuf;
+			mTerrain->getGpuBufferAllocator()->allocateVertexBuffers(mTerrain, srcData->vertexCount, 
+				destPosBuf, destDeltaBuf);
+				
+			// copy data
+			destPosBuf->copyData(*srcData->vertexBufferBinding->getBuffer(POSITION_BUFFER));
+			destDeltaBuf->copyData(*srcData->vertexBufferBinding->getBuffer(DELTA_BUFFER));
+
+			// set bindings
+			destData->vertexBufferBinding->setBinding(POSITION_BUFFER, destPosBuf);
+			destData->vertexBufferBinding->setBinding(DELTA_BUFFER, destDeltaBuf);
+
+			// Basic vertex info
+			destData->vertexStart = srcData->vertexStart;
+			destData->vertexCount = srcData->vertexCount;
+			// Copy elements
+			const VertexDeclaration::VertexElementList elems = 
+				srcData->vertexDeclaration->getElements();
+			VertexDeclaration::VertexElementList::const_iterator ei, eiend;
+			eiend = elems.end();
+			for (ei = elems.begin(); ei != eiend; ++ei)
+			{
+				destData->vertexDeclaration->addElement(
+					ei->getSource(),
+					ei->getOffset(),
+					ei->getType(),
+					ei->getSemantic(),
+					ei->getIndex() );
+			}
+
+
 			mVertexDataRecord->gpuVertexDataDirty = false;
 
 			// We don't need the CPU copy anymore
@@ -957,6 +991,10 @@ namespace Ogre
 	{
 		if (mVertexDataRecord && mVertexDataRecord->gpuVertexData)
 		{
+			// Before we delete, free up the vertex buffers for someone else
+			mTerrain->getGpuBufferAllocator()->freeVertexBuffers(
+				mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(POSITION_BUFFER), 
+				mVertexDataRecord->gpuVertexData->vertexBufferBinding->getBuffer(DELTA_BUFFER));
 			OGRE_DELETE mVertexDataRecord->gpuVertexData;
 			mVertexDataRecord->gpuVertexData = 0;
 		}

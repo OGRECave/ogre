@@ -521,7 +521,7 @@ namespace Ogre
 			virtual void allocateVertexBuffers(Terrain* forTerrain, size_t numVertices, HardwareVertexBufferSharedPtr& destPos, HardwareVertexBufferSharedPtr& destDelta) = 0;
 			/** Free (or return to the pool) vertex buffers for terrain. 
 			*/
-			virtual void freeVertexBuffers(HardwareVertexBufferSharedPtr& posbuf, HardwareVertexBufferSharedPtr& deltabuf) = 0;
+			virtual void freeVertexBuffers(const HardwareVertexBufferSharedPtr& posbuf, const HardwareVertexBufferSharedPtr& deltabuf) = 0;
 
 			/** Get a shared index buffer for a given number of settings.
 			@remarks
@@ -552,7 +552,7 @@ namespace Ogre
 			DefaultGpuBufferAllocator();
 			~DefaultGpuBufferAllocator();
 			void allocateVertexBuffers(Terrain* forTerrain, size_t numVertices, HardwareVertexBufferSharedPtr& destPos, HardwareVertexBufferSharedPtr& destDelta);
-			void freeVertexBuffers(HardwareVertexBufferSharedPtr& posbuf, HardwareVertexBufferSharedPtr& deltabuf);
+			void freeVertexBuffers(const HardwareVertexBufferSharedPtr& posbuf, const HardwareVertexBufferSharedPtr& deltabuf);
 			HardwareIndexBufferSharedPtr getSharedIndexBuffer(uint16 batchSize, 
 				uint16 vdatasize, size_t vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols, 
 				uint16 skirtRowColSkip);
