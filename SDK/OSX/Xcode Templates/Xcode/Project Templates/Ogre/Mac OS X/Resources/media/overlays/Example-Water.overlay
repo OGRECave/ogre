@@ -1,0 +1,168 @@
+Example/WaterOverlay
+{
+	zorder 500
+	// Stats block
+	container BorderPanel(Core/WaterPanel)
+	{
+		metrics_mode pixels
+		vert_align top
+		left 5 
+		top 5
+		width 400
+		height 87
+		material Core/StatsBlockCenter
+        	border_size 1 1 1 1
+        	border_material Core/StatsBlockBorder
+        	border_topleft_uv     0.0000 1.0000 0.0039 0.9961
+	    	border_top_uv         0.0039 1.0000 0.9961 0.9961
+	    	border_topright_uv    0.9961 1.0000 1.0000 0.9961
+	    	border_left_uv        0.0000 0.9961 0.0039 0.0039
+	    	border_right_uv       0.9961 0.9961 1.0000 0.0039
+	    	border_bottomleft_uv  0.0000 0.0039 0.0039 0.0000
+        	border_bottom_uv      0.0039 0.0039 0.9961 0.0000
+	    	border_bottomright_uv 0.9961 0.0039 1.0000 0.0000
+
+		    
+		element TextArea(Example/Water/Normals)
+		{
+			metrics_mode pixels
+			left 5
+			top 5
+			width 90
+			height 30
+			font_name BlueHighway
+			char_height 16
+			caption [N]Normals:
+			colour_top 0.5 0.7 0.5
+			colour_bottom 0.3 0.5 0.3
+		}
+
+		element TextArea(Example/Water/Rain)
+		{
+			metrics_mode pixels
+			left 5
+			top 20
+			width 90
+			height 30
+			font_name BlueHighway
+			char_height 16
+			caption [SPACE]Rain
+			colour_top 0.5 0.7 0.5
+			colour_bottom 0.3 0.5 0.3
+		}
+
+		element TextArea(Example/Water/SkyBox)
+		{
+			metrics_mode pixels
+			left 5
+			top 35
+			width 90
+			height 30
+			font_name BlueHighway
+			char_height 16
+			caption [B]SkyBox: 
+			colour_top 0.5 0.7 0.5
+			colour_bottom 0.3 0.5 0.3
+		}
+
+		element TextArea(Example/Water/Depth)
+		{
+			metrics_mode pixels
+			left 5
+			top 50
+			width 90
+			height 30
+			font_name BlueHighway
+			char_height 16
+			caption [U/J]Head depth:
+			colour_top 0.5 0.7 0.5
+			colour_bottom 0.3 0.5 0.3
+		}
+
+		element TextArea(Example/Water/Material)
+		{
+			metrics_mode pixels
+			left 5
+			top 65
+			width 90
+			height 30
+			font_name BlueHighway
+			char_height 16
+			caption [M]Material:
+			colour_top 0.5 0.7 0.5
+			colour_bottom 0.3 0.5 0.3
+		}
+
+		element TextArea(Example/Water/Note)
+		{
+			metrics_mode pixels
+			left 200
+			top 5
+			width 90
+			height 30
+			font_name BlueHighway
+			char_height 16
+			caption Careful with these values!
+			colour_top 0.7 0.9 0.7
+			colour_bottom 0.5 0.7 0.5
+		}
+
+		element TextArea(Example/Water/Param_C)
+		{
+			metrics_mode pixels
+			left 200
+			top 20
+			width 90
+			height 30
+			font_name BlueHighway
+			char_height 16
+			caption [1/2]Ripple speed:
+			colour_top 0.5 0.7 0.5
+			colour_bottom 0.3 0.5 0.3
+		}
+
+		element TextArea(Example/Water/Param_D)
+		{
+			metrics_mode pixels
+			left 200
+			top 35
+			width 90
+			height 30
+			font_name BlueHighway
+			char_height 16
+			caption [3/4]Distance:
+			colour_top 0.5 0.7 0.5
+			colour_bottom 0.3 0.5 0.3
+		}
+
+		element TextArea(Example/Water/Param_U)
+		{
+			metrics_mode pixels
+			left 200
+			top 50
+			width 90
+			height 30
+			font_name BlueHighway
+			char_height 16
+			caption [5/6]Viscosity:
+			colour_top 0.5 0.7 0.5
+			colour_bottom 0.3 0.5 0.3
+		}
+
+		element TextArea(Example/Water/Param_T)
+		{
+			metrics_mode pixels
+			left 200
+			top 65
+			width 90
+			height 30
+			font_name BlueHighway
+			char_height 16
+			caption [7/8]Time period:
+			colour_top 0.5 0.7 0.5
+			colour_bottom 0.3 0.5 0.3
+		}
+
+
+	}
+}

@@ -11,9 +11,7 @@
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		28FD15000DC6FC520079059D /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD14FF0DC6FC520079059D /* OpenGLES.framework */; };
 		28FD15080DC6FC5B0079059D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28FD15070DC6FC5B0079059D /* QuartzCore.framework */; };
-		9C3648C3106DE694006B0F4F /* InputHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C3648BE106DE694006B0F4F /* InputHandler.cpp */; };
 		9C3648C4106DE694006B0F4F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C3648C0106DE694006B0F4F /* main.cpp */; };
-		9C3648C5106DE694006B0F4F /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C3648C1106DE694006B0F4F /* Simulation.cpp */; };
 		9C3648C8106DE706006B0F4F /* ogre.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 9C3648C6106DE706006B0F4F /* ogre.cfg */; };
 		9C364926106DEAFC006B0F4F /* libboost_date_time.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C364920106DEAFC006B0F4F /* libboost_date_time.a */; };
 		9C364927106DEAFC006B0F4F /* libboost_thread.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C364921106DEAFC006B0F4F /* libboost_thread.a */; };
@@ -27,6 +25,9 @@
 		9C3649E8106DF9F3006B0F4F /* libPlugin_BSPSceneManagerStatic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C3649E5106DF9F3006B0F4F /* libPlugin_BSPSceneManagerStatic.a */; };
 		9C3649E9106DF9F3006B0F4F /* libPlugin_OctreeSceneManagerStatic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C3649E6106DF9F3006B0F4F /* libPlugin_OctreeSceneManagerStatic.a */; };
 		9C3649EA106DF9F3006B0F4F /* libPlugin_ParticleFXStatic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C3649E7106DF9F3006B0F4F /* libPlugin_ParticleFXStatic.a */; };
+		9CE2F62E10E06C830099B92A /* DemoApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9CE2F62910E06C830099B92A /* DemoApp.cpp */; };
+		9CE2F62F10E06C830099B92A /* OgreFramework.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9CE2F62B10E06C830099B92A /* OgreFramework.cpp */; };
+		9CE2F95A10E0A0550099B92A /* resources.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 9CE2F95910E0A0550099B92A /* resources.cfg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,11 +38,7 @@
 		28FD15070DC6FC5B0079059D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		32CA4F630368D1EE00C91783 /* ___PROJECTNAMEASIDENTIFIER____Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "___PROJECTNAMEASIDENTIFIER____Prefix.pch"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* ___PROJECTNAMEASIDENTIFIER___-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "___PROJECTNAMEASIDENTIFIER___-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
-		9C3648BE106DE694006B0F4F /* InputHandler.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = InputHandler.cpp; path = Classes/InputHandler.cpp; sourceTree = SOURCE_ROOT; };
-		9C3648BF106DE694006B0F4F /* InputHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InputHandler.h; path = Classes/InputHandler.h; sourceTree = SOURCE_ROOT; };
 		9C3648C0106DE694006B0F4F /* main.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = main.cpp; path = Classes/main.cpp; sourceTree = SOURCE_ROOT; };
-		9C3648C1106DE694006B0F4F /* Simulation.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = Simulation.cpp; path = Classes/Simulation.cpp; sourceTree = SOURCE_ROOT; };
-		9C3648C2106DE694006B0F4F /* Simulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Simulation.h; path = Classes/Simulation.h; sourceTree = SOURCE_ROOT; };
 		9C3648C6106DE706006B0F4F /* ogre.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ogre.cfg; path = Resources/ogre.cfg; sourceTree = "<group>"; };
 		9C364920106DEAFC006B0F4F /* libboost_date_time.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_date_time.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libboost_date_time.a; sourceTree = "<absolute>"; };
 		9C364921106DEAFC006B0F4F /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libboost_thread.a; sourceTree = "<absolute>"; };
@@ -55,6 +52,12 @@
 		9C3649E5106DF9F3006B0F4F /* libPlugin_BSPSceneManagerStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPlugin_BSPSceneManagerStatic.a; path = _OGRESDK_ROOT_/lib/libPlugin_BSPSceneManagerStatic.a; sourceTree = "<absolute>"; };
 		9C3649E6106DF9F3006B0F4F /* libPlugin_OctreeSceneManagerStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPlugin_OctreeSceneManagerStatic.a; path = _OGRESDK_ROOT_/lib/libPlugin_OctreeSceneManagerStatic.a; sourceTree = "<absolute>"; };
 		9C3649E7106DF9F3006B0F4F /* libPlugin_ParticleFXStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPlugin_ParticleFXStatic.a; path = _OGRESDK_ROOT_/lib/libPlugin_ParticleFXStatic.a; sourceTree = "<absolute>"; };
+		9CE2F62910E06C830099B92A /* DemoApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DemoApp.cpp; sourceTree = "<group>"; };
+		9CE2F62A10E06C830099B92A /* DemoApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DemoApp.h; sourceTree = "<group>"; };
+		9CE2F62B10E06C830099B92A /* OgreFramework.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OgreFramework.cpp; sourceTree = "<group>"; };
+		9CE2F62C10E06C830099B92A /* OgreFramework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OgreFramework.h; sourceTree = "<group>"; };
+		9CE2F62D10E06C830099B92A /* OgreStaticPluginLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OgreStaticPluginLoader.h; sourceTree = "<group>"; };
+		9CE2F95910E0A0550099B92A /* resources.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = resources.cfg; path = Resources/resources.cfg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,11 +89,12 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				9C3648BE106DE694006B0F4F /* InputHandler.cpp */,
-				9C3648BF106DE694006B0F4F /* InputHandler.h */,
+				9CE2F62910E06C830099B92A /* DemoApp.cpp */,
+				9CE2F62A10E06C830099B92A /* DemoApp.h */,
 				9C3648C0106DE694006B0F4F /* main.cpp */,
-				9C3648C1106DE694006B0F4F /* Simulation.cpp */,
-				9C3648C2106DE694006B0F4F /* Simulation.h */,
+				9CE2F62B10E06C830099B92A /* OgreFramework.cpp */,
+				9CE2F62C10E06C830099B92A /* OgreFramework.h */,
+				9CE2F62D10E06C830099B92A /* OgreStaticPluginLoader.h */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -127,6 +131,7 @@
 			isa = PBXGroup;
 			children = (
 				9C364973106DF319006B0F4F /* Default.png */,
+				9CE2F95910E0A0550099B92A /* resources.cfg */,
 				9C3648C6106DE706006B0F4F /* ogre.cfg */,
 				8D1107310486CEB800E47090 /* ___PROJECTNAMEASIDENTIFIER___-Info.plist */,
 			);
@@ -162,6 +167,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "___PROJECTNAME___" */;
 			buildPhases = (
+				9CE2F95410E0A0250099B92A /* Copy media folder */,
 				1D60588D0D05DD3D006BFB54 /* Resources */,
 				1D60588E0D05DD3D006BFB54 /* Sources */,
 				1D60588F0D05DD3D006BFB54 /* Frameworks */,
@@ -199,19 +205,37 @@
 			files = (
 				9C3648C8106DE706006B0F4F /* ogre.cfg in Resources */,
 				9C364974106DF319006B0F4F /* Default.png in Resources */,
+				9CE2F95A10E0A0550099B92A /* resources.cfg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		9CE2F95410E0A0250099B92A /* Copy media folder */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy media folder";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "mkdir -p \"${PROJECT_DIR}\"/build/\"${CONFIGURATION}\"\"${EFFECTIVE_PLATFORM_NAME}\"/\"${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n\n/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn  -resolve-src-symlinks \"${PROJECT_DIR}\"/Resources/media \"${PROJECT_DIR}\"/build/\"${CONFIGURATION}\"\"${EFFECTIVE_PLATFORM_NAME}\"/\"${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1D60588E0D05DD3D006BFB54 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9C3648C3106DE694006B0F4F /* InputHandler.cpp in Sources */,
 				9C3648C4106DE694006B0F4F /* main.cpp in Sources */,
-				9C3648C5106DE694006B0F4F /* Simulation.cpp in Sources */,
+				9CE2F62E10E06C830099B92A /* DemoApp.cpp in Sources */,
+				9CE2F62F10E06C830099B92A /* OgreFramework.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

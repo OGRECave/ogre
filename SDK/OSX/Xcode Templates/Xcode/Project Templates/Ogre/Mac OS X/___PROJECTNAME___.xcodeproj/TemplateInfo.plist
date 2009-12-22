@@ -3,6 +3,6 @@
 <plist version="1.0">
 <dict>
 	<key>Description</key>
-	<string>This project builds an Ogre-based application for Mac OS X.  Based PracticalApplication from the Ogre Wiki.</string>
+	<string>This project builds an Ogre-based application for Mac OS X.  Based on the Basic Ogre Framework on the Ogre Wiki by Spacegaier.</string>
 </dict>
 </plist>

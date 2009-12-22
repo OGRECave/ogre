@@ -1,0 +1,12 @@
+material flat-yellow
+{
+	technique
+	{
+		pass
+		{
+			ambient 1.000000 0.8 0.200000
+			diffuse 1.000000 0.769854 0.000000
+			specular 0.500000 0.246996 0.000000 30.500000
+		}
+	}
+}

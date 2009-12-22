@@ -1,38 +1,8 @@
-/*
- -----------------------------------------------------------------------------
- This source file is part of OGRE
- (Object-oriented Graphics Rendering Engine)
- For the latest info, see http://www.ogre3d.org/
- 
- Copyright (c) 2000-2009 Torus Knot Software Ltd
- 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
- 
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
- 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- -----------------------------------------------------------------------------
-*/
-#include "InputHandler.h"
-#include "Simulation.h"
+//|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "Ogre.h"
-#include "OgreException.h"
-#include "OgreWindowEventUtilities.h"
+#include "DemoApp.h"
 
-void go(void);
+//|||||||||||||||||||||||||||||||||||||||||||||||
 
 #ifdef OGRE_STATIC_LIB
 #  define OGRE_STATIC_GL
@@ -71,12 +41,13 @@ void go(void);
 #include <UIKit/UIKit.h>
 #endif
 
-using namespace Ogre;
+#if OGRE_PLATFORM == PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#define WIN32_LEAN_AND_MEAN
+#include "windows.h"
 
-#include "OgreErrorDialog.h"
+//|||||||||||||||||||||||||||||||||||||||||||||||
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT)
 #else
 int main(int argc, char **argv)
 #endif
@@ -87,13 +58,17 @@ int main(int argc, char **argv)
     [pool release];
     return retVal;
 #else
-    try {
-        go();
-    } catch( Exception& e ) {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occurred!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
+	try
+    {
+		DemoApp demo;
+		demo.startDemo();
+    }
+	catch(Ogre::Exception& e)
+    {
+#if OGRE_PLATFORM == PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        MessageBoxA(NULL, e.what(), "An exception has occurred!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
 #else
-        std::cerr << "An exception has occurred: " << e.getFullDescription();
+        fprintf(stderr, "An exception has occurred: %s\n", e.what());
 #endif
     }
 
@@ -101,117 +76,13 @@ int main(int argc, char **argv)
 #endif
 }
 
-void go(void) {
-
-    Ogre::Root *mRoot;
-	Ogre::RenderWindow *mWindow;
-	Ogre::SceneManager *mSceneManager;
-	Ogre::Camera *mCamera;
-    Ogre::String mPluginFile;
-    Ogre::String mConfigFile;
-#ifdef OGRE_STATIC_LIB
-    Ogre::StaticPluginLoader mStaticPluginLoader;
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-    mPluginFile = "";
-    mConfigFile = Ogre::macBundlePath() + "/ogre.cfg";
-#else
-    mPluginFile = Ogre::macBundlePath() + "/Contents/Resources/plugins.cfg";
-    mConfigFile = Ogre::macBundlePath() + "/Contents/Resources/ogre.cfg";
-#endif
-	// Fire up an Ogre rendering window. Clearing the first two (of three) params will let us 
-	// specify plugins and resources in code instead of via text file
-	mRoot = OGRE_NEW Ogre::Root(mPluginFile, mConfigFile);
-
-#ifdef OGRE_STATIC_LIB
-    mStaticPluginLoader.load();
-#endif
-
-	// Load the basic resource location(s)
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-		Ogre::macBundlePath() + "/Contents/Resources", "FileSystem", "General");
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-        Ogre::macBundlePath() + "/Contents/Resources/gui.zip", "Zip", "GUI");
-#endif
-    
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-		"c:\\windows\\fonts", "FileSystem", "GUI");
-#endif
-
-	Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("General");
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
-	Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("GUI");
-#endif
-
-    if(mRoot->showConfigDialog())
-    {
-        // If returned true, user clicked OK so initialise
-        // Here we choose to let the system create a default rendering window by passing 'true'
-        mWindow = mRoot->initialise(true);
-        if(!mWindow)
-            OGRE_EXCEPT (Ogre::Exception::ERR_INVALID_STATE, "Could not create a window",
-                         "main");
-
-    } else {
-        return;
-    }
-
-	// Since this is basically a CEGUI app, we can use the ST_GENERIC scene manager for now; in a later article 
-	// we'll see how to change this
-	mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC);
-	mCamera = mSceneManager->createCamera("camera");
-    // Position it at 500 in Z direction
-    mCamera->setPosition(Ogre::Vector3(0,0,500));
-    // Look back along -Z
-    mCamera->lookAt(Ogre::Vector3(0,0,-300));
-    mCamera->setNearClipDistance(5);
-
-    Ogre::Viewport* vp = mWindow->addViewport(mCamera);
-    vp->setBackgroundColour(Ogre::ColourValue(0.5,0.5,0.5));
-
-    // Alter the camera aspect ratio to match the viewport
-    mCamera->setAspectRatio(Ogre::Real(vp->getActualWidth()) / Ogre::Real(vp->getActualHeight()));
-
-	// This next bit is for the sake of the input handler
-	unsigned long hWnd;
-	mWindow->getCustomAttribute("WINDOW", &hWnd);
-
-	// Set up the input handlers
-	Simulation *sim = new Simulation();
-	InputHandler *handler = new InputHandler(sim, hWnd);
-	sim->requestStateChange(SIMULATION);
-
-	while (sim->getCurrentState() != SHUTDOWN) {
-		handler->capture();
-
-		// Run the message pump
-		Ogre::WindowEventUtilities::messagePump();
-
-        if (!mRoot->renderOneFrame())
-            break;
-	}
-
-    mRoot->shutdown();
-
-#ifdef OGRE_STATIC_LIB
-    mStaticPluginLoader.unload();
-#endif
-
-	// Clean up after ourselves
-//	OGRE_DELETE mRoot;
-	delete handler;
-	delete sim;
-
-	return;
-}
+//|||||||||||||||||||||||||||||||||||||||||||||||
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #   ifdef __OBJC__
 @interface AppDelegate : NSObject <UIApplicationDelegate>
 {
+    DemoApp demo;
 }
 
 - (void)go;
@@ -222,7 +93,7 @@ void go(void) {
 
 - (void)go {
     try {
-        go();
+		demo.startDemo();
     } catch( Ogre::Exception& e ) {
         std::cerr << "An exception has occurred: " <<
         e.getFullDescription().c_str() << std::endl;
@@ -257,7 +128,7 @@ void go(void) {
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-    Root::getSingleton().queueEndRendering();
+    Ogre::Root::getSingleton().queueEndRendering();
 }
 
 //- (void)applicationWillResignActive:(UIApplication *)application

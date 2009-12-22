@@ -1,0 +1,158 @@
+//---------------------------------------------------
+// This file includes a number of basic GPU programs
+// for use in many materials. 
+//---------------------------------------------------
+
+
+// A really basic ambient pass program, support for one texture coodinate set
+vertex_program Ogre/BasicVertexPrograms/AmbientOneTexture cg
+{
+	source Example_Basic.cg
+	entry_point ambientOneTexture_vp
+	profiles vs_1_1 arbvp1
+
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+	
+}
+// A really basic ambient pass program, support for one texture coodinate set
+vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureHLSL hlsl
+{
+	source Example_Basic.hlsl
+	entry_point ambientOneTexture_vp
+	target vs_1_1
+
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+}
+// A really basic ambient pass program, support for one texture coodinate set
+vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSL glsl
+{
+	source AmbientOneTexture.glsl
+
+	default_params
+	{
+		param_named_auto ambient ambient_light_colour
+	}
+}
+
+vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
+{
+	delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSL
+	delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
+}
+
+
+// Same as below, but for use when rendering texture shadows
+vertex_program Ogre/HardwareSkinningOneWeightShadowCaster cg
+{
+	source Example_Basic.cg
+	entry_point hardwareSkinningOneWeightCaster_vp
+	profiles vs_1_1 arbvp1
+	includes_skeletal_animation true
+}
+// Basic hardware skinning using one indexed weight per vertex
+vertex_program Ogre/HardwareSkinningOneWeight cg
+{
+   source Example_Basic.cg
+   entry_point hardwareSkinningOneWeight_vp
+   profiles vs_1_1 arbvp1
+   includes_skeletal_animation true   
+}
+// Same as below, but for use when rendering texture shadows
+vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterCg cg
+{
+	source Example_Basic.cg
+	entry_point hardwareSkinningTwoWeightsCaster_vp
+	profiles vs_1_1 arbvp1
+	includes_skeletal_animation true
+}
+
+vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterGLSL glsl
+{
+	source skinningTwoWeightsShadowCasterVp.glsl
+	includes_skeletal_animation true
+}
+
+vertex_program Ogre/HardwareSkinningTwoWeightsShadowCaster unified
+{
+	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterGLSL
+	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterCg
+}
+
+// Basic hardware skinning using two indexed weights per vertex
+vertex_program Ogre/HardwareSkinningTwoWeightsCg cg
+{
+   source Example_Basic.cg
+   entry_point hardwareSkinningTwoWeights_vp
+   profiles vs_1_1 arbvp1
+   includes_skeletal_animation true
+}
+
+vertex_program Ogre/HardwareSkinningTwoWeightsGLSL glsl
+{
+   source skinningTwoWeightsVp.glsl
+   includes_skeletal_animation true
+}
+
+vertex_program Ogre/HardwareSkinningTwoWeights unified
+{
+	delegate Ogre/HardwareSkinningTwoWeightsGLSL
+	delegate Ogre/HardwareSkinningTwoWeightsCg
+	
+   default_params
+   {
+   		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto lightPos[0] light_position 0
+		param_named_auto lightPos[1] light_position 1
+		param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
+		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
+   }
+}
+
+// Basic hardware skinning using four indexed weights per vertex
+vertex_program Ogre/HardwareSkinningFourWeights cg
+{
+   source Example_Basic.cg
+   entry_point hardwareSkinningFourWeights_vp
+   profiles vs_1_1 arbvp1
+   includes_skeletal_animation true
+
+}
+// Basic hardware morph animation 
+vertex_program Ogre/HardwareMorphAnimation cg
+{
+	source Example_Basic.cg
+	entry_point hardwareMorphAnimation
+	profiles vs_1_1 arbvp1
+
+	includes_morph_animation true
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto anim_t animation_parametric
+	}
+}
+// Basic hardware pose animation supporting 2 active poses
+vertex_program Ogre/HardwarePoseAnimation cg
+{
+	source Example_Basic.cg
+	entry_point hardwarePoseAnimation
+	profiles vs_1_1 arbvp1
+
+	includes_pose_animation 2
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto anim_t animation_parametric
+	}
+}
+
+

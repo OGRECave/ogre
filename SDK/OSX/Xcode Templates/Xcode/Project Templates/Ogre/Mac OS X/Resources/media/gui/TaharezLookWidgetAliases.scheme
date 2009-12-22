@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<GUIScheme Name="TaharezLookWidgetAliases">
+	<WindowAlias Alias="Taharez AltProgressBar" Target="TaharezLook/AlternateProgressBar" />
+	<WindowAlias Alias="Taharez Button" Target="TaharezLook/Button" />
+	<WindowAlias Alias="Taharez Checkbox" Target="TaharezLook/Checkbox" />
+	<WindowAlias Alias="Taharez Close Button" Target="TaharezLook/CloseButton" />
+	<WindowAlias Alias="Taharez Combobox" Target="TaharezLook/Combobox" />
+	<WindowAlias Alias="Taharez ComboDropList" Target="TaharezLook/ComboDropList" />
+	<WindowAlias Alias="Taharez ComboEditbox" Target="TaharezLook/ComboEditbox" />
+	<WindowAlias Alias="Taharez Editbox" Target="TaharezLook/Editbox" />
+	<WindowAlias Alias="Taharez Frame Window" Target="TaharezLook/FrameWindow" />
+	<WindowAlias Alias="Taharez Listbox" Target="TaharezLook/Listbox" />
+	<WindowAlias Alias="Taharez ListHeader" Target="TaharezLook/ListHeader" />
+	<WindowAlias Alias="Taharez ListHeaderSegment" Target="TaharezLook/ListHeaderSegment" />
+	<WindowAlias Alias="Taharez MiniHorzScrollbar" Target="TaharezLook/HorizontalScrollbar" />
+	<WindowAlias Alias="Taharez MiniHorzScrollbarThumb" Target="TaharezLook/HorizontalScrollbarThumb" />
+	<WindowAlias Alias="Taharez MiniVertScrollbar" Target="TaharezLook/VerticalScrollbar" />
+	<WindowAlias Alias="Taharez MiniVertScrollbarThumb" Target="TaharezLook/VerticalScrollbarThumb" />
+	<WindowAlias Alias="Taharez MultiColumnList" Target="TaharezLook/MultiColumnList" />
+	<WindowAlias Alias="Taharez MultiLineEditbox" Target="TaharezLook/MultiLineEditbox" />
+	<WindowAlias Alias="Taharez ProgressBar" Target="TaharezLook/ProgressBar" />
+	<WindowAlias Alias="Taharez RadioButton" Target="TaharezLook/RadioButton" />
+	<WindowAlias Alias="Taharez Slider" Target="TaharezLook/Slider" />
+	<WindowAlias Alias="Taharez Slider Thumb" Target="TaharezLook/SliderThumb" />
+	<WindowAlias Alias="Taharez StaticImage" Target="TaharezLook/StaticImage" />
+	<WindowAlias Alias="Taharez StaticText" Target="TaharezLook/StaticText" />
+	<WindowAlias Alias="Taharez Tab Button" Target="TaharezLook/TabButton" />
+	<WindowAlias Alias="Taharez Tab Pane" Target="TaharezLook/TabPane" />
+	<WindowAlias Alias="Taharez Tab Control" Target="TaharezLook/TabControl" />
+	<WindowAlias Alias="Taharez Titlebar" Target="TaharezLook/Titlebar" />
+	<WindowAlias Alias="Taharez VertScrollbar" Target="TaharezLook/LargeVerticalScrollbar" />
+	<WindowAlias Alias="Taharez VertScrollbarThumb" Target="TaharezLook/LargeVerticalScrollbarThumb" />
+</GUIScheme>
+
