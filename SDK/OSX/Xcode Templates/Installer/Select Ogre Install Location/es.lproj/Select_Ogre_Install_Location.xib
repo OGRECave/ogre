@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1040</int>
-		<string key="IBDocument.SystemVersion">10B504</string>
-		<string key="IBDocument.InterfaceBuilderVersion">732</string>
-		<string key="IBDocument.AppKitVersion">1038.2</string>
-		<string key="IBDocument.HIToolboxVersion">437.00</string>
+		<string key="IBDocument.SystemVersion">10C540</string>
+		<string key="IBDocument.InterfaceBuilderVersion">740</string>
+		<string key="IBDocument.AppKitVersion">1038.25</string>
+		<string key="IBDocument.HIToolboxVersion">458.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">732</string>
+			<string key="NS.object.0">740</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -46,13 +46,16 @@
 					<object class="NSTextField" id="463632495">
 						<reference key="NSNextResponder" ref="878039515"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{17, 229}, {379, 67}}</string>
+						<string key="NSFrame">{{17, 194}, {379, 102}}</string>
 						<reference key="NSSuperview" ref="878039515"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="407045746">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272891904</int>
-							<string key="NSContents">Choose the location of the Ogre SDK folder.  This step will customize the project templates to ensure that include paths are correct for your particular installation.</string>
+							<string type="base64-UTF8" key="NSContents">U2VsZWNjaW9uZSBlbCBkaXJlY3RvcmlvIGRlIE9ncmUgU0RLLiBFc3RlIHBhc28gcGVyc29uYWxpemFy
+w6EgbGFzIHBsYW50aWxsYXMgZGUgcHJveWVjdG8gcGFyYSBhc2VndXJhciBxdWUgbG9zIGRpcmVjdG9y
+aW9zIGluY2x1aWRvcyBzZSBhanVzdGFuIGEgc3UgaW5zdGFsYWNpw7NuIHBhcnRpY3VsYXIuCk5vdGE6
+IEVzdGFzIHBsYW50aWxsYXMgaGFuIHNpZG8gZGlzZcOxYWRhcyBwYXJhIE9HUkUgMS43Lg</string>
 							<object class="NSFont" key="NSSupport" id="851176159">
 								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">13</double>
@@ -82,19 +85,19 @@
 					<object class="NSTextField" id="874604315">
 						<reference key="NSNextResponder" ref="878039515"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{17, 155}, {384, 14}}</string>
+						<string key="NSFrame">{{17, 124}, {384, 44}}</string>
 						<reference key="NSSuperview" ref="878039515"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="442147684">
-							<int key="NSCellFlags">68288064</int>
-							<int key="NSCellFlags2">272761856</int>
+							<int key="NSCellFlags">67239424</int>
+							<int key="NSCellFlags2">272764928</int>
 							<string key="NSContents"/>
 							<object class="NSFont" key="NSSupport">
 								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">11</double>
 								<int key="NSfFlags">3100</int>
 							</object>
-							<string key="NSPlaceholderString">Path to Ogre SDK</string>
+							<string key="NSPlaceholderString">Directorio de instalación de Ogre SDK</string>
 							<reference key="NSControlView" ref="874604315"/>
 							<reference key="NSBackgroundColor" ref="108267856"/>
 							<reference key="NSTextColor" ref="998676297"/>
@@ -103,13 +106,13 @@
 					<object class="NSButton" id="260586914">
 						<reference key="NSNextResponder" ref="878039515"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{302, 166}, {102, 32}}</string>
+						<string key="NSFrame">{{295, 166}, {117, 32}}</string>
 						<reference key="NSSuperview" ref="878039515"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="392368043">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">134217728</int>
-							<string key="NSContents">Find Ogre</string>
+							<string key="NSContents">Buscar Ogre</string>
 							<object class="NSFont" key="NSSupport" id="398622067">
 								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">13</double>
@@ -127,7 +130,7 @@
 					<object class="NSTextField" id="843604456">
 						<reference key="NSNextResponder" ref="878039515"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{17, 105}, {384, 42}}</string>
+						<string key="NSFrame">{{17, 74}, {384, 42}}</string>
 						<reference key="NSSuperview" ref="878039515"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="302857011">
@@ -143,13 +146,13 @@
 					<object class="NSTextField" id="120735260">
 						<reference key="NSNextResponder" ref="878039515"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{17, 176}, {171, 17}}</string>
+						<string key="NSFrame">{{17, 176}, {247, 17}}</string>
 						<reference key="NSSuperview" ref="878039515"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="752150237">
 							<int key="NSCellFlags">68288064</int>
 							<int key="NSCellFlags2">272630784</int>
-							<string key="NSContents">Ogre Installation Location:</string>
+							<string key="NSContents">Localización de la instalación de Ogre:</string>
 							<reference key="NSSupport" ref="398622067"/>
 							<reference key="NSControlView" ref="120735260"/>
 							<reference key="NSBackgroundColor" ref="108267856"/>
@@ -255,8 +258,8 @@
 							<reference ref="120735260"/>
 							<reference ref="843604456"/>
 							<reference ref="260586914"/>
-							<reference ref="874604315"/>
 							<reference ref="463632495"/>
+							<reference ref="874604315"/>
 						</object>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">View</string>
