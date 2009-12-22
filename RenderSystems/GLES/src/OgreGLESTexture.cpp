@@ -248,6 +248,20 @@ namespace Ogre {
                             "**** Unsupported 3D texture type ****",
                             "GLESTexture::prepare" );
             }
+            
+			// If PVRTC and 0 custom mipmap disable auto mip generation and disable software mipmap creation
+            PixelFormat imageFormat = (*loadedImages)[0].getFormat();
+			if (imageFormat == PF_PVRTC_RGB2 || imageFormat == PF_PVRTC_RGBA2 ||
+                imageFormat == PF_PVRTC_RGB4 || imageFormat == PF_PVRTC_RGBA4)
+			{
+                size_t imageMips = (*loadedImages)[0].getNumMipmaps();
+                if (imageMips == 0)
+                {
+                    mNumMipmaps = mNumRequestedMipmaps = imageMips;
+                    // Disable flag for auto mip generation
+                    mUsage &= ~TU_AUTOMIPMAP;
+                }
+			}
         }
         else
         {
@@ -327,7 +341,8 @@ namespace Ogre {
 
                 // If format is PVRTC then every mipmap is a custom one so to allow the upload of the compressed data 
                 // provided by the file we need to adjust the current mip level's dimention
-				if (mFormat == PF_PVRTC_RGB2 || mFormat == PF_PVRTC_RGBA2 || mFormat == PF_PVRTC_RGB4 || mFormat == PF_PVRTC_RGBA4)
+				if (mFormat == PF_PVRTC_RGB2 || mFormat == PF_PVRTC_RGBA2 ||
+                    mFormat == PF_PVRTC_RGB4 || mFormat == PF_PVRTC_RGBA4)
 				{
 					if(width > 1)
 					{
