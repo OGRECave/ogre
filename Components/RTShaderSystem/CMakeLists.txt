@@ -80,7 +80,15 @@ set (SOURCE_FILES
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_library(OgreRTShaderSystem STATIC ${HEADER_FILES} ${SOURCE_FILES})
+set(OGRE_RTSHADER_LIB_TYPE STATIC)
+if (UNIX AND NOT APPLE)
+	# for some unknown reason, RTShader causes problems as a static library
+	# under Linux. For the moment, compile as shared library unless the whole
+	# Ogre project is built statically.
+	set(OGRE_RTSHADER_LIB_TYPE ${OGRE_LIB_TYPE})
+endif ()
+
+add_library(OgreRTShaderSystem ${OGRE_RTSHADER_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreRTShaderSystem PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OGRE_VERSION_MAJOR})
 target_link_libraries(OgreRTShaderSystem OgreMain)
 
