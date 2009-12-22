@@ -187,6 +187,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void TerrainPagedWorldSection::loadPage(PageID pageID, bool forceSynchronous)
 	{
+		if (!mParent->getManager()->getPagingOperationsEnabled())
+			return;
+
 		PageMap::iterator i = mPages.find(pageID);
 		if (i == mPages.end())
 		{
@@ -203,6 +206,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void TerrainPagedWorldSection::unloadPage(PageID pageID, bool forceSynchronous)
 	{
+		if (!mParent->getManager()->getPagingOperationsEnabled())
+			return;
+
 		PagedWorldSection::unloadPage(pageID, forceSynchronous);
 
 

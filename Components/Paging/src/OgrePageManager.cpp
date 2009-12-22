@@ -49,12 +49,14 @@ namespace Ogre
 		, mPageProvider(0)
 		, mPageResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
 		, mDebugDisplayLvl(0)
+		, mPagingEnabled(true)
 		, mGrid2DPageStrategy(0)
 		, mSimpleCollectionFactory(0)
 	{
 
 		mEventRouter.pManager = this;
 		mEventRouter.pWorldMap = &mWorlds;
+		mEventRouter.pCameraList = &mCameraList;
 
 		Root::getSingleton().addFrameListener(&mEventRouter);
 
@@ -499,8 +501,6 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void PageManager::EventRouter::cameraPreRenderScene(Camera* cam)
 	{
-		for(WorldMap::iterator i = pWorldMap->begin(); i != pWorldMap->end(); ++i)
-			i->second->notifyCamera(cam);
 	}
 	//---------------------------------------------------------------------
 	void PageManager::EventRouter::cameraDestroyed(Camera* cam)
@@ -512,7 +512,17 @@ namespace Ogre
 	{
 
 		for(WorldMap::iterator i = pWorldMap->begin(); i != pWorldMap->end(); ++i)
+		{
 			i->second->frameStart(evt.timeSinceLastFrame);
+			// Notify of all active cameras
+			// Previously we did this in cameraPreRenderScene, but that had the effect
+			// of causing unnecessary unloading of pages if a camera was rendered
+			// intermittently, so we assume that all cameras we're told to watch are 'active'
+			for (CameraList::iterator c = pCameraList->begin(); c != pCameraList->end(); ++c)
+			{
+				i->second->notifyCamera(*c);
+			}
+		}
 
 		return true;
 	}

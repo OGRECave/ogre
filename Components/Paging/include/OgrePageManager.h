@@ -423,6 +423,17 @@ namespace Ogre
 		/** Get the debug display level. */
 		uint8 getDebugDisplayLevel() const { return mDebugDisplayLvl; }
 
+		/** Pause or unpause all paging operations.
+		@remarks
+			Using this method you can stop pages being loaded or unloaded for a
+			period of time, 'freezing' the current page state as it is. 
+		@param enabled True to proceed with normal paging operations, false to pause.
+		*/
+		void setPagingOperationsEnabled(bool enabled) { mPagingEnabled = enabled; }
+
+		/** Get whether paging operations are currently allowed to happen. */
+		bool getPagingOperationsEnabled() const { return mPagingEnabled; }
+
 
 	protected:
 
@@ -431,6 +442,7 @@ namespace Ogre
 		public:
 			PageManager* pManager;
 			WorldMap* pWorldMap;
+			CameraList* pCameraList;
 
 			EventRouter() {}
 			~EventRouter() {}
@@ -455,6 +467,7 @@ namespace Ogre
 		CameraList mCameraList;
 		EventRouter mEventRouter;
 		uint8 mDebugDisplayLvl;
+		bool mPagingEnabled;
 
 		Grid2DPageStrategy* mGrid2DPageStrategy;
 		SimplePageContentCollectionFactory* mSimpleCollectionFactory;

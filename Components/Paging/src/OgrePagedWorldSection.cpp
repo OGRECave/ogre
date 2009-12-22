@@ -198,6 +198,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void PagedWorldSection::loadPage(PageID pageID, bool sync)
 	{
+		if (!mParent->getManager()->getPagingOperationsEnabled())
+			return;
+
 		PageMap::iterator i = mPages.find(pageID);
 		if (i == mPages.end())
 		{
@@ -224,6 +227,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void PagedWorldSection::unloadPage(PageID pageID, bool sync)
 	{
+		if (!mParent->getManager()->getPagingOperationsEnabled())
+			return;
+
 		PageMap::iterator i = mPages.find(pageID);
 		if (i != mPages.end())
 		{
@@ -304,6 +310,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void PagedWorldSection::removeAllPages()
 	{
+		if (!mParent->getManager()->getPagingOperationsEnabled())
+			return;
+
 		for (PageMap::iterator i= mPages.begin(); i != mPages.end(); ++i)
 		{
 			OGRE_DELETE i->second;
