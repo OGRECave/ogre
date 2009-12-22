@@ -1116,13 +1116,16 @@ namespace Ogre {
 		if (stream.isNull())		
 		{
 			// save direct in filesystem
-			std::fstream fs;
-			fs.open(filename.c_str(), std::ios::out | std::ios::binary);
-			if (!fs)
+			std::fstream* fs = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL);
+			fs->open(filename.c_str(), std::ios::out | std::ios::binary);
+			if (!*fs)
+			{
+				OGRE_DELETE_T(fs, basic_fstream, MEMCATEGORY_GENERAL);
 				OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, 
 				"Can't open " + filename + " for writing", __FUNCTION__);
+			}
 
-			stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename, &fs, false));
+			stream = DataStreamPtr(OGRE_NEW FileStreamDataStream(filename, fs));
 		}
 
 		return stream;
