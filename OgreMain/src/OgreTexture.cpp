@@ -216,12 +216,22 @@ namespace Ogre {
 		// The custom mipmaps in the image have priority over everything
         size_t imageMips = images[0]->getNumMipmaps();
 
-		if(imageMips > 0) {
+		if(imageMips > 0)
+		{
 			mNumMipmaps = mNumRequestedMipmaps = images[0]->getNumMipmaps();
 			// Disable flag for auto mip generation
 			mUsage &= ~TU_AUTOMIPMAP;
 		}
-		
+		else
+		{
+			// If PVRTC and 0 custom mipmap disable auto mip generation and disable software mipmap creation
+			if (mSrcFormat == PF_PVRTC_RGB2 || mSrcFormat == PF_PVRTC_RGBA2 || mSrcFormat == PF_PVRTC_RGB4 || mSrcFormat == PF_PVRTC_RGBA4)
+			{
+				mNumMipmaps = mNumRequestedMipmaps = 0;
+				mUsage &= ~TU_AUTOMIPMAP;
+			}
+		}
+
         // Create the texture
         createInternalResources();
 		// Check if we're loading one image with multiple faces

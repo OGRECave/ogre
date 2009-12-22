@@ -262,6 +262,7 @@ namespace Ogre  {
     {
         switch (fmt)
         {
+#if GL_IMG_texture_compression_pvrtc
             case GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
                 return PF_PVRTC_RGB2;
             case GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
@@ -270,6 +271,7 @@ namespace Ogre  {
                 return PF_PVRTC_RGB4;
             case GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
                 return PF_PVRTC_RGBA4;
+#endif
             case GL_LUMINANCE:
                 return PF_L8;
             case GL_ALPHA:

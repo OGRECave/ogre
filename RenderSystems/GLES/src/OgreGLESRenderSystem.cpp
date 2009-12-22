@@ -1387,7 +1387,8 @@ namespace Ogre {
 #endif
 			break;
 		}
-        glBlendEquationOES(func);
+		if (glBlendEquationOES)
+			glBlendEquationOES(func);
         GL_CHECK_ERROR;
 #endif
 	}

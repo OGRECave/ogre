@@ -61,6 +61,18 @@ THE SOFTWARE.
 #   include <GLES/glext.h>
 #   include <GLES/egl.h>
 
+// If we are going to use the PVRTC_CODEC make sure we
+// setup the needed constants
+#if (OGRE_NO_PVRTC_CODEC == 0)
+#	ifndef GL_IMG_texture_compression_pvrtc
+#		define GL_IMG_texture_compression_pvrtc 1
+#		define GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG                      0x8C00
+#		define GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG                      0x8C01
+#		define GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG                     0x8C02
+#		define GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG                     0x8C03
+#	endif
+#endif
+
 // Function pointers for FBO extension methods
 // Declare them here since we don't have GLEW to do it for us
 
