@@ -35,6 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	class PSSMShadowCameraSetup;
 
 	/** \addtogroup Optional Components
 	*  @{
@@ -110,6 +111,29 @@ namespace Ogre
 			in the distance (default true). 
 			*/
 			void setCompositeMapEnabled(bool enabled);
+			/** Whether to support dynamic texture shadows received from other 
+				objects, on the terrain (default true). 
+			*/
+			bool getReceiveDynamicShadowsEnabled() const  { return mReceiveDynamicShadows; }
+			/** Whether to support dynamic texture shadows received from other 
+			objects, on the terrain (default true). 
+			*/
+			void setReceiveDynamicShadowsEnabled(bool enabled);
+
+			/** Whether to use PSSM support dynamic texture shadows, and if so the 
+				settings to use (default 0). 
+			*/
+			void setReceiveDynamicShadowsPSSM(PSSMShadowCameraSetup* pssmSettings);
+			/** Whether to use PSSM support dynamic texture shadows, and if so the 
+			settings to use (default 0). 
+			*/
+			PSSMShadowCameraSetup* getReceiveDynamicShadowsPSSM() const { return mPSSM; }
+			/** Whether to use depth shadows (default false). 
+			*/
+			void setReceiveDynamicShadowsDepth(bool enabled);
+			/** Whether to use depth shadows (default false). 
+			*/
+			bool getReceiveDynamicShadowsDepth() const { return mDepthShadows; }
 
 			/// Internal
 			bool _isSM3Available() const { return mSM3Available; }
@@ -166,6 +190,11 @@ namespace Ogre
 				void generateFpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream);
 				void generateVpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
 				void generateFpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				uint generateVpDynamicShadowsParams(uint texCoordStart, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateVpDynamicShadows(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateFpDynamicShadowsHelpers(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				uint generateFpDynamicShadowsParams(uint texCoordStart, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateFpDynamicShadows(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
 			};
 
 			class ShaderHelperHLSL : public ShaderHelperCg
@@ -196,6 +225,9 @@ namespace Ogre
 			bool mGlobalColourMapEnabled;
 			bool mLightmapEnabled;
 			bool mCompositeMapEnabled;
+			bool mReceiveDynamicShadows;
+			PSSMShadowCameraSetup* mPSSM;
+			bool mDepthShadows;
 			bool mSM3Available;
 
 		};
