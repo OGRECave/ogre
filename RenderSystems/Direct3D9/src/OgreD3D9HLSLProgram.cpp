@@ -399,7 +399,7 @@ namespace Ogre {
 						} // columns
 						break;
 					case 3:
-						switch(d3dDesc.Columns)
+						switch(secondDim)
 						{
 						case 2:
 							def.constType = GCT_MATRIX_3X2;
@@ -416,7 +416,7 @@ namespace Ogre {
 						} // columns
 						break;
 					case 4:
-						switch(d3dDesc.Columns)
+						switch(secondDim)
 						{
 						case 2:
 							def.constType = GCT_MATRIX_4X2;
