@@ -1393,7 +1393,7 @@ namespace Ogre
 		}
 
 		outStream << 
-			"	shadow *= rtshadow;\n";
+			"	shadow = min(shadow, rtshadow);\n";
 		
 	}
 	//---------------------------------------------------------------------
