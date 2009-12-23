@@ -2870,25 +2870,30 @@ namespace Ogre
 		D3D9RenderContext* context = new D3D9RenderContext;
 		context->target = mActiveRenderTarget;
 
-		//Get the matching z buffer identifier and queue
-		ZBufferIdentifier zBufferIdentifier = getZBufferIdentifier(mActiveRenderTarget);
-		ZBufferRefQueue& zBuffers = mZBufferHash[zBufferIdentifier];
-		
+		//Don't do this to backbuffers. Is there a more elegant way to check?
+		if (!dynamic_cast<D3D9RenderWindow*>(mActiveRenderTarget))
+		{
+			//Get the matching z buffer identifier and queue
+			ZBufferIdentifier zBufferIdentifier = getZBufferIdentifier(mActiveRenderTarget);
+			ZBufferRefQueue& zBuffers = mZBufferHash[zBufferIdentifier];
+			
 #ifdef OGRE_DEBUG_MODE
-		//Check that queue handling works as expected
-		IDirect3DSurface9* pDepth;
-		getActiveD3D9Device()->GetDepthStencilSurface(&pDepth);	
-		
-		// Release immediately -> each get increase the ref count.
-		if (pDepth != NULL)		
-			pDepth->Release();		
+			//Check that queue handling works as expected
+			IDirect3DSurface9* pDepth;
+			getActiveD3D9Device()->GetDepthStencilSurface(&pDepth);	
+			
+			// Release immediately -> each get increase the ref count.
+			if (pDepth != NULL)		
+				pDepth->Release();		
 
-		assert(zBuffers.front().surface == pDepth);
+			assert(zBuffers.front().surface == pDepth);
 #endif
 
-		//Store the depth buffer in the side and remove it from the queue
-		mCheckedOutTextures[mActiveRenderTarget] = zBuffers.front();
-		zBuffers.pop_front();
+			//Store the depth buffer in the side and remove it from the queue
+			mCheckedOutTextures[mActiveRenderTarget] = zBuffers.front();
+			zBuffers.pop_front();
+		}
+		
 		
 		return context;
 	}
@@ -2899,14 +2904,19 @@ namespace Ogre
 		_beginFrame();
 		D3D9RenderContext* d3dContext = static_cast<D3D9RenderContext*>(context);
 
-		///Find the stored depth buffer
-		ZBufferIdentifier zBufferIdentifier = getZBufferIdentifier(d3dContext->target);
-		ZBufferRefQueue& zBuffers = mZBufferHash[zBufferIdentifier];
-		assert(mCheckedOutTextures.find(d3dContext->target) != mCheckedOutTextures.end());
+		//Don't do this to backbuffers. Is there a more elegant way to check?
+		if (!dynamic_cast<D3D9RenderWindow*>(d3dContext->target))
+		{
+			///Find the stored depth buffer
+			ZBufferIdentifier zBufferIdentifier = getZBufferIdentifier(d3dContext->target);
+			ZBufferRefQueue& zBuffers = mZBufferHash[zBufferIdentifier];
+			assert(mCheckedOutTextures.find(d3dContext->target) != mCheckedOutTextures.end());
+			
+			//Return it to the general queue
+			zBuffers.push_front(mCheckedOutTextures[d3dContext->target]);
+			mCheckedOutTextures.erase(d3dContext->target);
+		}
 		
-		//Return it to the general queue
-		zBuffers.push_front(mCheckedOutTextures[d3dContext->target]);
-		mCheckedOutTextures.erase(d3dContext->target);
 		
 		delete context;
 	}
