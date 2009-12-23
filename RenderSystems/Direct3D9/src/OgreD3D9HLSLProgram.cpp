@@ -386,52 +386,73 @@ namespace Ogre {
 			{
 			case D3DXPC_MATRIX_COLUMNS:
 			case D3DXPC_MATRIX_ROWS:
-				switch(d3dDesc.RegisterCount)
 				{
-				case 2:
-					switch(d3dDesc.Columns)
+					int firstDim, secondDim;
+					firstDim = d3dDesc.RegisterCount / d3dDesc.Elements;
+					if (d3dDesc.Class == D3DXPC_MATRIX_ROWS)
+					{
+						secondDim = d3dDesc.Columns;
+					}
+					else
+					{
+						secondDim = d3dDesc.Rows;
+					}
+					switch(firstDim)
 					{
 					case 2:
-						def.constType = GCT_MATRIX_2X2;
+						switch(secondDim)
+						{
+						case 2:
+							def.constType = GCT_MATRIX_2X2;
+							def.elementSize = 8; // HLSL always packs
+							break;
+						case 3:
+							def.constType = GCT_MATRIX_2X3;
+							def.elementSize = 8; // HLSL always packs
+							break;
+						case 4:
+							def.constType = GCT_MATRIX_2X4;
+							def.elementSize = 8; 
+							break;
+						} // columns
 						break;
 					case 3:
-						def.constType = GCT_MATRIX_2X3;
+						switch(secondDim)
+						{
+						case 2:
+							def.constType = GCT_MATRIX_3X2;
+							def.elementSize = 12; // HLSL always packs
+							break;
+						case 3:
+							def.constType = GCT_MATRIX_3X3;
+							def.elementSize = 12; // HLSL always packs
+							break;
+						case 4:
+							def.constType = GCT_MATRIX_3X4;
+							def.elementSize = 12; 
+							break;
+						} // columns
 						break;
 					case 4:
-						def.constType = GCT_MATRIX_2X4;
+						switch(secondDim)
+						{
+						case 2:
+							def.constType = GCT_MATRIX_4X2;
+							def.elementSize = 16; // HLSL always packs
+							break;
+						case 3:
+							def.constType = GCT_MATRIX_4X3;
+							def.elementSize = 16; // HLSL always packs
+							break;
+						case 4:
+							def.constType = GCT_MATRIX_4X4;
+							def.elementSize = 16; 
+							break;
+						} // secondDim
 						break;
-					} // columns
-					break;
-				case 3:
-					switch(d3dDesc.Columns)
-					{
-					case 2:
-						def.constType = GCT_MATRIX_3X2;
-						break;
-					case 3:
-						def.constType = GCT_MATRIX_3X3;
-						break;
-					case 4:
-						def.constType = GCT_MATRIX_3X4;
-						break;
-					} // columns
-					break;
-				case 4:
-					switch(d3dDesc.Columns)
-					{
-					case 2:
-						def.constType = GCT_MATRIX_4X2;
-						break;
-					case 3:
-						def.constType = GCT_MATRIX_4X3;
-						break;
-					case 4:
-						def.constType = GCT_MATRIX_4X4;
-						break;
-					} // columns
-					break;
 
-				} // rows
+					} // firstDim
+				}
 				break;
 			case D3DXPC_SCALAR:
 			case D3DXPC_VECTOR:

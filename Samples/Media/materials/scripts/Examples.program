@@ -74,6 +74,16 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterCg cg
 	includes_skeletal_animation true
 }
 
+// Same as below, but for use when rendering texture shadows
+vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterHLSL hlsl
+{
+	source Example_Basic.hlsl
+	entry_point hardwareSkinningTwoWeightsCaster_vp
+	target vs_1_1
+	includes_skeletal_animation true
+	column_major_matrices false
+}
+
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterGLSL glsl
 {
 	source skinningTwoWeightsShadowCasterVp.glsl
@@ -83,16 +93,18 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterGLSL glsl
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCaster unified
 {
 	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterGLSL
+	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterHLSL
 	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterCg
 }
 
 // Basic hardware skinning using two indexed weights per vertex
-vertex_program Ogre/HardwareSkinningTwoWeightsCg cg
+vertex_program Ogre/HardwareSkinningTwoWeightsHLSL hlsl	
 {
-   source Example_Basic.cg
+   source Example_Basic.hlsl
    entry_point hardwareSkinningTwoWeights_vp
-   profiles vs_1_1 arbvp1
+   target vs_1_1 
    includes_skeletal_animation true
+   column_major_matrices false
 }
 
 vertex_program Ogre/HardwareSkinningTwoWeightsGLSL glsl
@@ -104,6 +116,7 @@ vertex_program Ogre/HardwareSkinningTwoWeightsGLSL glsl
 vertex_program Ogre/HardwareSkinningTwoWeights unified
 {
 	delegate Ogre/HardwareSkinningTwoWeightsGLSL
+	delegate Ogre/HardwareSkinningTwoWeightsHLSL
 	delegate Ogre/HardwareSkinningTwoWeightsCg
 	
    default_params
@@ -114,6 +127,7 @@ vertex_program Ogre/HardwareSkinningTwoWeights unified
 		param_named_auto lightPos[1] light_position 1
 		param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
 		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
+		param_named_auto ambient ambient_light_colour
    }
 }
 
