@@ -271,7 +271,7 @@ namespace Ogre
 		After creation, this window can be retrieved using getRenderTarget().
 		@param
 		name The name of the window. Used in other methods
-		later like setRenderTarget and getRenderWindow.
+		later like setRenderTarget and getRenderTarget.
 		@param
 		width The width of the new window.
 		@param
