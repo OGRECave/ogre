@@ -32,7 +32,7 @@ THE SOFTWARE.
 // Language: HLSL
 // Notes: Implements core functions for FFPTransform class.
 // based on transform engine. 
-// See http://msdn.microsoft.com/en-us/library/bb206269(VS.85).aspx
+// See http://msdn.microsoft.com/en-us/library/ee422511.aspx
 //-----------------------------------------------------------------------------
 
 

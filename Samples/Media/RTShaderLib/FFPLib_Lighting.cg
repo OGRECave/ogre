@@ -32,7 +32,7 @@ THE SOFTWARE.
 // Language: CG
 // Notes: Implements core functions for FFPLighting class.
 // based on lighting engine. 
-// See http://msdn.microsoft.com/en-us/library/bb147178(VS.85).aspx
+// See http://msdn.microsoft.com/en-us/library/ee422035.aspx
 //-----------------------------------------------------------------------------
 
 
