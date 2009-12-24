@@ -1351,8 +1351,6 @@ namespace Ogre
 		if (prof->getReceiveDynamicShadowsPSSM())
 		{
 			numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
-			outStream <<
-				", out float oCamDepth : TEXCOORD" << texCoord++ << " \n";
 		}
 		for (uint i = 0; i < numTextures; ++i)
 		{
@@ -1365,7 +1363,11 @@ namespace Ogre
 					", uniform float4 depthRange" << i << " // x = min, y = max, z = range, w = 1/range \n";
 			}
 		}
-
+		if (prof->getReceiveDynamicShadowsPSSM())
+		{
+			outStream <<
+				", out float oCamDepth : TEXCOORD" << texCoord++ << " \n";
+		}
 
 		return texCoord;
 
