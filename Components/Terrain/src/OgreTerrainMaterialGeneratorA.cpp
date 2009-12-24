@@ -79,7 +79,7 @@ namespace Ogre
 		, mGlobalColourMapEnabled(true)
 		, mLightmapEnabled(true)
 		, mCompositeMapEnabled(true)
-		, mReceiveDynamicShadows(false) //true) - TEMP - UNTIL WORKING
+		, mReceiveDynamicShadows(true)
 		, mPSSM(0)
 		, mDepthShadows(false)
 		, mLowLodShadows(false)
@@ -1237,8 +1237,8 @@ namespace Ogre
 		outStream <<
 			"// Simple PCF \n"
 			"// Number of samples in one dimension (square for total samples) \n"
-			"#define NUM_SHADOW_SAMPLES_1D 3.0 \n"
-			"#define SHADOW_FILTER_SCALE 1.2 \n"
+			"#define NUM_SHADOW_SAMPLES_1D 2.0 \n"
+			"#define SHADOW_FILTER_SCALE 1 \n"
 
 			"#define SHADOW_SAMPLES NUM_SHADOW_SAMPLES_1D*NUM_SHADOW_SAMPLES_1D \n"
 

@@ -60,9 +60,10 @@ fragment_program Ogre/shadow/receiver/depth/pssm3/fp cg
 	default_params
 	{
 		param_named_auto materialAmbient derived_ambient_light_colour
-		param_named_auto inverseShadowmapSize0 inverse_texture_size 0
-		param_named_auto inverseShadowmapSize1 inverse_texture_size 1
-		param_named_auto inverseShadowmapSize2 inverse_texture_size 2
+		// shadow samplers are indexes 1/2/3
+		param_named_auto inverseShadowmapSize0 inverse_texture_size 1
+		param_named_auto inverseShadowmapSize1 inverse_texture_size 2
+		param_named_auto inverseShadowmapSize2 inverse_texture_size 3
 		//SET THIS MANUALLY!
 		//param_named pssmSplitPoints 0 0 0 0
 	}
@@ -104,6 +105,25 @@ material Ogre/shadow/depth/integrated/pssm
 			texture_unit diffuse
 			{
 				// nothing specified for now, derivers can override
+			}
+			
+			texture_unit shadow0
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
+			texture_unit shadow1
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
+			texture_unit shadow2
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
 			}
 		}
 	}

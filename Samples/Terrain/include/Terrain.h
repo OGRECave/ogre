@@ -14,7 +14,11 @@ same license as the rest of the engine.
 #ifndef __Terrain_H__
 #define __Terrain_H__
 
+//#define SHADOWS
+//#define DEPTH_SHADOWS
+
 //#define PAGING
+
 #define TERRAIN_PAGE_MIN_X 0
 #define TERRAIN_PAGE_MIN_Y 0
 #define TERRAIN_PAGE_MAX_X 0
@@ -592,6 +596,32 @@ protected:
 
 	}
 		
+	MaterialPtr buildDepthShadowMaterial(const String& textureName)
+	{
+		String matName = "DepthShadows/" + textureName;
+
+		MaterialPtr ret = MaterialManager::getSingleton().getByName(matName);
+		if (ret.isNull())
+		{
+			MaterialPtr baseMat = MaterialManager::getSingleton().getByName("Ogre/shadow/depth/integrated/pssm");
+			ret = baseMat->clone(matName);
+			Pass* p = ret->getTechnique(0)->getPass(0);
+			p->getTextureUnitState("diffuse")->setTextureName(textureName);
+
+			Vector4 splitPoints;
+			const PSSMShadowCameraSetup::SplitPointList& splitPointList = 
+				static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get())->getSplitPoints();
+			for (int i = 0; i < 3; ++i)
+			{
+				splitPoints[i] = splitPointList[i];
+			}
+			p->getFragmentProgramParameters()->setNamedConstant("pssmSplitPoints", splitPoints);
+
+
+		}
+
+		return ret;
+	}
 
 	void configureShadows(bool enabled, bool depthShadows)
 	{
@@ -649,7 +679,7 @@ protected:
 
 		}
 
-		addTextureShadowDebugOverlay(TL_RIGHT, 3);
+		//addTextureShadowDebugOverlay(TL_RIGHT, 3);
 
 	}
 
@@ -727,7 +757,13 @@ protected:
 		Vector3 lightdir(0.55, -0.3, 0.75);
 		lightdir.normalise();
 
-		//configureShadows(true, false);
+#ifdef SHADOWS
+#  ifdef DEPTH_SHADOWS
+		configureShadows(true, true);
+#  else
+		configureShadows(true, false);
+#  endif
+#endif
 
 		Light* l = mSceneMgr->createLight("tstLight");
 		l->setType(Light::LT_DIRECTIONAL);
@@ -777,17 +813,25 @@ protected:
 
 
 
-
+#ifdef SHADOWS
 		// create a few entities on the terrain
+#ifdef DEPTH_SHADOWS
+		MaterialPtr ninjaDepthShadowMat = buildDepthShadowMaterial("nskingr.jpg");
+#endif
 		for (int i = 0; i < 20; ++i)
 		{
 			Entity* e = mSceneMgr->createEntity("ninja.mesh");
+#ifdef DEPTH_SHADOWS
+			e->setMaterial(ninjaDepthShadowMat);
+#endif
 			Real x = mTerrainPos.x + Math::RangeRandom(-2500, 2500);
 			Real z = mTerrainPos.z + Math::RangeRandom(-2500, 2500);
 			Real y = mTerrainGroup->getHeightAtWorldPosition(Vector3(x, 0, z));
-			mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(x, y, z))->attachObject(e);
+			Quaternion rot;
+			rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
+			mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(x, y, z), rot)->attachObject(e);
 		}
-
+#endif
 
 		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
 
