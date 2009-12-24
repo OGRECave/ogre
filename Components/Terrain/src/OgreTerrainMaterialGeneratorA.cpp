@@ -79,9 +79,10 @@ namespace Ogre
 		, mGlobalColourMapEnabled(true)
 		, mLightmapEnabled(true)
 		, mCompositeMapEnabled(true)
-		, mReceiveDynamicShadows(false)// true) TEMP
+		, mReceiveDynamicShadows(false) //true) - TEMP - UNTIL WORKING
 		, mPSSM(0)
 		, mDepthShadows(false)
+		, mLowLodShadows(false)
 	{
 
 	}
@@ -179,6 +180,15 @@ namespace Ogre
 			mParent->_markChanged();
 		}
 
+	}
+	//---------------------------------------------------------------------
+	void TerrainMaterialGeneratorA::SM2Profile::setReceiveDynamicShadowsLowLod(bool enabled)
+	{
+		if (enabled != mLowLodShadows)
+		{
+			mLowLodShadows = enabled;
+			mParent->_markChanged();
+		}
 	}
 	//---------------------------------------------------------------------
 	uint8 TerrainMaterialGeneratorA::SM2Profile::getMaxLayers(const Terrain* terrain) const
@@ -357,6 +367,30 @@ namespace Ogre
 
 		}
 
+		// Add shadow textures (always at the end)
+		if (isShadowingEnabled(tt, terrain))
+		{
+			uint numTextures = 1;
+			if (getReceiveDynamicShadowsPSSM())
+			{
+				numTextures = getReceiveDynamicShadowsPSSM()->getSplitCount();
+			}
+			for (uint i = 0; i < numTextures; ++i)
+			{
+				TextureUnitState* tu = pass->createTextureUnitState();
+				tu->setContentType(TextureUnitState::CONTENT_SHADOW);
+				tu->setTextureAddressingMode(TextureUnitState::TAM_BORDER);
+				tu->setTextureBorderColour(ColourValue::White);
+			}
+		}
+
+	}
+	//---------------------------------------------------------------------
+	bool TerrainMaterialGeneratorA::SM2Profile::isShadowingEnabled(TechniqueType tt, const Terrain* terrain) const
+	{
+		return getReceiveDynamicShadowsEnabled() && tt != RENDER_COMPOSITE_MAP && 
+			(tt != LOW_LOD || mLowLodShadows) &&
+			terrain->getSceneManager()->isShadowTechniqueTextureBased();
 
 	}
 	//---------------------------------------------------------------------
@@ -456,6 +490,25 @@ namespace Ogre
 			Terrain::LOD_MORPH_CUSTOM_PARAM);
 		params->setNamedAutoConstant("fogParams", GpuProgramParameters::ACT_FOG_PARAMS);
 
+		if (prof->isShadowingEnabled(tt, terrain))
+		{
+			uint numTextures = 1;
+			if (prof->getReceiveDynamicShadowsPSSM())
+			{
+				numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+			}
+			for (uint i = 0; i < numTextures; ++i)
+			{
+				params->setNamedAutoConstant("texViewProjMatrix" + StringConverter::toString(i), 
+					GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX, i);
+				if (prof->getReceiveDynamicShadowsDepth())
+				{
+					params->setNamedAutoConstant("depthRange" + StringConverter::toString(i), 
+						GpuProgramParameters::ACT_SHADOW_SCENE_DEPTH_RANGE, i);
+				}
+			}
+		}
+
 
 	}
 	//---------------------------------------------------------------------
@@ -471,6 +524,34 @@ namespace Ogre
 		params->setNamedAutoConstant("lightSpecularColour", GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR, 0);
 		params->setNamedAutoConstant("eyePosObjSpace", GpuProgramParameters::ACT_CAMERA_POSITION_OBJECT_SPACE);
 		params->setNamedAutoConstant("fogColour", GpuProgramParameters::ACT_FOG_COLOUR);
+
+		if (prof->isShadowingEnabled(tt, terrain))
+		{
+			uint numTextures = 1;
+			if (prof->getReceiveDynamicShadowsPSSM())
+			{
+				PSSMShadowCameraSetup* pssm = prof->getReceiveDynamicShadowsPSSM();
+				numTextures = pssm->getSplitCount();
+				Vector4 splitPoints;
+				const PSSMShadowCameraSetup::SplitPointList& splitPointList = pssm->getSplitPoints();
+				// Populate from split point 1, not 0, since split 0 isn't useful (usually 0)
+				for (uint i = 1; i < numTextures; ++i)
+				{
+					splitPoints[i-1] = splitPointList[i];
+				}
+				params->setNamedConstant("pssmSplitPoints", splitPoints);
+			}
+
+			if (prof->getReceiveDynamicShadowsDepth())
+			{
+				size_t samplerOffset = (tt == HIGH_LOD) ? mShadowSamplerStartHi : mShadowSamplerStartLo;
+				for (uint i = 0; i < numTextures; ++i)
+				{
+					params->setNamedAutoConstant("inverseShadowmapSize" + StringConverter::toString(i), 
+						GpuProgramParameters::ACT_INVERSE_TEXTURE_SIZE, i + samplerOffset);
+				}
+			}
+		}
 
 
 	}
@@ -701,10 +782,10 @@ namespace Ogre
 		{
 			outStream <<
 				", uniform float4 fogParams\n"
-				", out float fogVal : TEXCOORD" << texCoordSet++ << "\n";
+				", out float fogVal : COLOR\n";
 		}
 
-		if (prof->getReceiveDynamicShadowsEnabled() && tt != RENDER_COMPOSITE_MAP && texShadowsOn)
+		if (prof->isShadowingEnabled(tt, terrain))
 			texCoordSet = generateVpDynamicShadowsParams(texCoordSet, prof, terrain, tt, outStream);
 
 		outStream <<
@@ -779,7 +860,6 @@ namespace Ogre
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateFpHeader(
 		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
 	{
-		bool texShadowsOn = terrain->getSceneManager()->isShadowTechniqueTextureBased();
 
 		// Main header
 		outStream << 
@@ -789,7 +869,7 @@ namespace Ogre
 			"	return v * 2 - 1;\n"
 			"}\n\n\n";
 
-		if (prof->getReceiveDynamicShadowsEnabled() && tt != RENDER_COMPOSITE_MAP && texShadowsOn)
+		if (prof->isShadowingEnabled(tt, terrain))
 			generateFpDynamicShadowsHelpers(prof, terrain, tt, outStream);
 
 
@@ -824,8 +904,8 @@ namespace Ogre
 		if (fog)
 		{
 			outStream <<
-				"uniform float4 fogColour,"
-				"float fogVal : TEXCOORD" << texCoordSet++ << ",\n";
+				"uniform float3 fogColour, \n"
+				"float fogVal : COLOR,\n";
 		}
 
 		uint currentSamplerIdx = 0;
@@ -833,7 +913,7 @@ namespace Ogre
 		outStream <<
 			// Only 1 light supported in this version
 			// deferred shading profile / generator later, ok? :)
-			"uniform float4 ambient,\n"
+			"uniform float3 ambient,\n"
 			"uniform float4 lightPosObjSpace,\n"
 			"uniform float3 lightDiffuseColour,\n"
 			"uniform float3 lightSpecularColour,\n"
@@ -880,7 +960,7 @@ namespace Ogre
 			}
 		}
 
-		if (prof->getReceiveDynamicShadowsEnabled() && tt != RENDER_COMPOSITE_MAP && texShadowsOn)
+		if (prof->isShadowingEnabled(tt, terrain))
 			generateFpDynamicShadowsParams(&texCoordSet, &currentSamplerIdx, prof, terrain, tt, outStream);
 
 		outStream << 
@@ -1047,7 +1127,6 @@ namespace Ogre
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateVpFooter(
 		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
 	{
-		bool texShadowsOn = terrain->getSceneManager()->isShadowTechniqueTextureBased();
 
 		outStream << 
 			"	oPos = mul(viewProjMatrix, worldPos);\n"
@@ -1068,7 +1147,7 @@ namespace Ogre
 			}
 		}
 		
-		if (prof->getReceiveDynamicShadowsEnabled() && tt != RENDER_COMPOSITE_MAP && texShadowsOn)
+		if (prof->isShadowingEnabled(tt, terrain))
 			generateVpDynamicShadows(prof, terrain, tt, outStream);
 
 		outStream << 
@@ -1080,12 +1159,20 @@ namespace Ogre
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateFpFooter(
 		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
 	{
-		bool texShadowsOn = terrain->getSceneManager()->isShadowTechniqueTextureBased();
 
 		if (tt == LOW_LOD)
 		{
-			outStream << 
-				"	outputCol.rgb = diffuse;\n";
+			if (prof->isShadowingEnabled(tt, terrain))
+			{
+				generateFpDynamicShadows(prof, terrain, tt, outStream);
+				outStream << 
+					"	outputCol.rgb = diffuse * rtshadow;\n";
+			}
+			else
+			{
+				outStream << 
+					"	outputCol.rgb = diffuse;\n";
+			}
 		}
 		else
 		{
@@ -1098,6 +1185,11 @@ namespace Ogre
 			{
 				// sample lightmap
 				outStream << "	shadow = tex2D(lightMap, uv).r;\n";
+			}
+
+			if (prof->isShadowingEnabled(tt, terrain))
+			{
+				generateFpDynamicShadows(prof, terrain, tt, outStream);
 			}
 
 			// diffuse lighting
@@ -1125,9 +1217,6 @@ namespace Ogre
 				}
 			}
 		}
-
-		if (prof->getReceiveDynamicShadowsEnabled() && tt != RENDER_COMPOSITE_MAP && texShadowsOn)
-			generateFpDynamicShadows(prof, terrain, tt, outStream);
 
 		bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
 		if (fog)
@@ -1208,18 +1297,14 @@ namespace Ogre
 			outStream << "\n	";
 			for (uint i = 0; i < numTextures; ++i)
 				outStream << "float4 lsPos" << i << ", ";
-			outStream << "\n	";
 			if (prof->getReceiveDynamicShadowsDepth())
 			{
+				outStream << "\n	";
 				for (uint i = 0; i < numTextures; ++i)
 					outStream << "float invShadowmapSize" << i << ", ";
-				outStream << "\n	float4 pssmSplitPoints, float camDepth) \n";
 			}
-			else
-			{
-				outStream << ") \n";
-			}
-			outStream <<
+			outStream << "\n"
+				"	float4 pssmSplitPoints, float camDepth) \n"
 				"{ \n"
 				"	float shadow; \n"
 				"	// calculate shadow \n";
@@ -1266,20 +1351,21 @@ namespace Ogre
 		if (prof->getReceiveDynamicShadowsPSSM())
 		{
 			numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+			outStream <<
+				", out float oCamDepth : TEXCOORD" << texCoord++ << " \n";
 		}
 		for (uint i = 0; i < numTextures; ++i)
 		{
 			outStream <<
 				", out float4 oLightSpacePos" << i << " : TEXCOORD" << texCoord++ << " \n" <<
-				", uniform float4x4 texViewProjMatrix " << i << " \n";
+				", uniform float4x4 texViewProjMatrix" << i << " \n";
+			if (prof->getReceiveDynamicShadowsDepth())
+			{
+				outStream <<
+					", uniform float4 depthRange" << i << " // x = min, y = max, z = range, w = 1/range \n";
+			}
 		}
 
-		if (prof->getReceiveDynamicShadowsDepth())
-		{
-			outStream <<
-				", uniform float4 depthRange // x = min, y = max, z = range, w = 1/range \n" <<
-				", out float oCamDepth : TEXCOORD" << texCoord++ << " \n";
-		}
 
 		return texCoord;
 
@@ -1298,22 +1384,22 @@ namespace Ogre
 		for (uint i = 0; i < numTextures; ++i)
 		{
 			outStream <<
-				"		oLightSpacePos" << i << " = mul(texViewProjMatrix" << i << ", worldPos); \n";
+				"	oLightSpacePos" << i << " = mul(texViewProjMatrix" << i << ", worldPos); \n";
 			if (prof->getReceiveDynamicShadowsDepth())
 			{
 				// make linear
 				outStream <<
-					"oLightSpacePos" << i << ".z = (oLightSpacePos" << i << ".z - depthRange.x) * depthRange.w;\n";
+					"oLightSpacePos" << i << ".z = (oLightSpacePos" << i << ".z - depthRange" << i << ".x) * depthRange" << i << ".w;\n";
 
 			}
 		}
 
 
-		if (prof->getReceiveDynamicShadowsDepth())
+		if (prof->getReceiveDynamicShadowsPSSM())
 		{
 			outStream <<
-				"// pass cam depth\n"
-				"oCamDepth = oPos.z;\n";
+				"	// pass cam depth\n"
+				"	oCamDepth = oPos.z;\n";
 		}
 
 	}
@@ -1321,6 +1407,11 @@ namespace Ogre
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateFpDynamicShadowsParams(
 		uint* texCoord, uint* sampler, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
 	{
+		if (tt == HIGH_LOD)
+			mShadowSamplerStartHi = *sampler;
+		else if (tt == LOW_LOD)
+			mShadowSamplerStartLo = *sampler;
+
 		// in semantics & params
 		uint numTextures = 1;
 		if (prof->getReceiveDynamicShadowsPSSM())
@@ -1332,15 +1423,22 @@ namespace Ogre
 		for (uint i = 0; i < numTextures; ++i)
 		{
 			outStream <<
-				", float4 lightSpacePos" << i << " : TEXCOORD" << texCoord++ << " \n" <<
-				", uniform sampler2D shadowMap" << i << " : register(s" << sampler++ << ") \n" <<
-				", uniform float inverseShadowmapSize" << i << " \n";
+				", float4 lightSpacePos" << i << " : TEXCOORD" << *texCoord << " \n" <<
+				", uniform sampler2D shadowMap" << i << " : register(s" << *sampler << ") \n";
+			*sampler = *sampler + 1;
+			*texCoord = *texCoord + 1;
+			if (prof->getReceiveDynamicShadowsDepth())
+			{
+				outStream <<
+					", uniform float inverseShadowmapSize" << i << " \n";
+			}
 		}
 
-		if (prof->getReceiveDynamicShadowsDepth())
+		if (prof->getReceiveDynamicShadowsPSSM())
 		{
 			outStream <<
-				", float camDepth : TEXCOORD" << texCoord++ << " \n";
+				", float camDepth : TEXCOORD" << *texCoord << " \n";
+			*texCoord = *texCoord + 1;
 		}
 
 
@@ -1368,14 +1466,14 @@ namespace Ogre
 
 			for (uint i = 0; i < numTextures; ++i)
 				outStream << "lightSpacePos" << i << ", ";
-			outStream << "\n		";
 			if (prof->getReceiveDynamicShadowsDepth())
 			{
+				outStream << "\n		";
 				for (uint i = 0; i < numTextures; ++i)
 					outStream << "inverseShadowmapSize" << i << ", ";
 			}
 			outStream << "\n" <<
-				"pssmSplitPoints, camDepth);\n";
+				"		pssmSplitPoints, camDepth);\n";
 
 		}
 		else

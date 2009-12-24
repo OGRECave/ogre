@@ -1434,6 +1434,11 @@ namespace Ogre
 	{
 		mParent->visitRenderables(visitor, debugRenderables);	
 	}
+	//---------------------------------------------------------------------
+	bool TerrainQuadTreeNode::Movable::getCastShadows(void) const
+	{
+		return mParent->getCastsShadows();
+	}
 	//------------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	TerrainQuadTreeNode::Rend::Rend(TerrainQuadTreeNode* parent)

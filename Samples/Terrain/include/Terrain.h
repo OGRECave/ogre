@@ -17,8 +17,8 @@ same license as the rest of the engine.
 //#define PAGING
 #define TERRAIN_PAGE_MIN_X 0
 #define TERRAIN_PAGE_MIN_Y 0
-#define TERRAIN_PAGE_MAX_X 1
-#define TERRAIN_PAGE_MAX_Y 1
+#define TERRAIN_PAGE_MAX_X 0
+#define TERRAIN_PAGE_MAX_Y 0
 
 #include "SdkSample.h"
 #include "OgreTerrain.h"
@@ -419,6 +419,7 @@ protected:
 	CheckBox* mFlyBox;
 	OgreBites::Label* mInfoLabel;
 	bool mTerrainsImported;
+	ShadowCameraSetupPtr mPSSMSetup;
 
 
 	void defineTerrain(long x, long y, bool flat = false)
@@ -518,8 +519,10 @@ protected:
 		//TerrainGlobalOptions::setUseRayBoxDistanceCalculation(true);
 		//TerrainGlobalOptions::getDefaultMaterialGenerator()->setDebugLevel(1);
 		//TerrainGlobalOptions::setLightMapSize(256);
-		//static_cast<TerrainMaterialGeneratorA::SM2Profile*>(TerrainGlobalOptions::getDefaultMaterialGenerator()->getActiveProfile())
-		//	->setLightmapEnabled(false);
+		TerrainMaterialGeneratorA::SM2Profile* matProfile = 
+			static_cast<TerrainMaterialGeneratorA::SM2Profile*>(TerrainGlobalOptions::getDefaultMaterialGenerator()->getActiveProfile());
+
+		//matProfile->setLightmapEnabled(false);
 		// Important to set these so that the terrain knows what to use for derived (non-realtime) data
 		TerrainGlobalOptions::setLightMapDirection(l->getDerivedDirection());
 		TerrainGlobalOptions::setCompositeMapAmbient(mSceneMgr->getAmbientLight());
@@ -545,6 +548,108 @@ protected:
 		defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
 		defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
 
+
+	}
+
+	void addTextureDebugOverlay(TrayLocation loc, TexturePtr tex, size_t i)
+	{
+		addTextureDebugOverlay(loc, tex->getName(), i);
+	}
+	void addTextureDebugOverlay(TrayLocation loc, const String& texname, size_t i)
+	{
+		// Create material
+		MaterialPtr debugMat = MaterialManager::getSingleton().create(
+			"Ogre/DebugTexture" + StringConverter::toString(i), 
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		debugMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
+		TextureUnitState *t = debugMat->getTechnique(0)->getPass(0)->createTextureUnitState(texname);
+		t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+
+		// create template
+		if (!OverlayManager::getSingleton().hasOverlayElement("Ogre/DebugTexOverlay", true))
+		{
+			OverlayElement* e = OverlayManager::getSingleton().createOverlayElement("Panel", "Ogre/DebugTexOverlay", true);
+			e->setMetricsMode(GMM_PIXELS);
+			e->setWidth(128);
+			e->setHeight(128);
+		}
+
+		// add widget
+		DecorWidget* debugPanel = mTrayMgr->createDecorWidget(
+			loc, "DebugTex"+ StringConverter::toString(i), "Panel", "Ogre/DebugTexOverlay");
+		debugPanel->getOverlayElement()->setMaterialName(debugMat->getName());
+
+	}
+
+	void addTextureShadowDebugOverlay(TrayLocation loc, size_t num)
+	{
+		for (size_t i = 0; i < num; ++i)
+		{
+			TexturePtr shadowTex = mSceneMgr->getShadowTexture(i);
+			addTextureDebugOverlay(loc, shadowTex, i);
+
+		}
+
+	}
+		
+
+	void configureShadows(bool enabled, bool depthShadows)
+	{
+		TerrainMaterialGeneratorA::SM2Profile* matProfile = 
+			static_cast<TerrainMaterialGeneratorA::SM2Profile*>(TerrainGlobalOptions::getDefaultMaterialGenerator()->getActiveProfile());
+		matProfile->setReceiveDynamicShadowsEnabled(enabled);
+
+		if (enabled)
+		{
+			// General scene setup
+			mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+			mSceneMgr->setShadowFarDistance(6000);
+
+			// 3 textures per directional light (PSSM)
+			mSceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
+
+			if (depthShadows)
+			{
+				mSceneMgr->setShadowTextureSettings(512, 3, PF_FLOAT32_R);
+				mSceneMgr->setShadowTextureSelfShadow(true);
+				mSceneMgr->setShadowCasterRenderBackFaces(true);
+				mSceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
+			}
+			else
+			{
+				mSceneMgr->setShadowTextureSettings(512, 3, PF_X8B8G8R8);
+				mSceneMgr->setShadowTextureSelfShadow(false);
+				mSceneMgr->setShadowCasterRenderBackFaces(false);
+				mSceneMgr->setShadowTextureCasterMaterial(StringUtil::BLANK);
+			}
+
+			if (mPSSMSetup.isNull())
+			{
+				// shadow camera setup
+				PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
+				pssmSetup->calculateSplitPoints(3, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
+				pssmSetup->setSplitPadding(10);
+				pssmSetup->setOptimalAdjustFactor(0, 2);
+				pssmSetup->setOptimalAdjustFactor(1, 1);
+				pssmSetup->setOptimalAdjustFactor(2, 0.5);
+
+				mPSSMSetup.bind(pssmSetup);
+				mSceneMgr->setShadowCameraSetup(mPSSMSetup);
+
+			}
+
+			matProfile->setReceiveDynamicShadowsDepth(depthShadows);
+			matProfile->setReceiveDynamicShadowsPSSM(static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get()));
+
+
+		}
+		else
+		{
+			mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
+
+		}
+
+		addTextureShadowDebugOverlay(TL_RIGHT, 3);
 
 	}
 
@@ -615,13 +720,14 @@ protected:
 		MaterialManager::getSingleton().setDefaultTextureFiltering(TFO_ANISOTROPIC);
 		MaterialManager::getSingleton().setDefaultAnisotropy(7);
 
-		mSceneMgr->setFog(FOG_LINEAR, ColourValue(0.7, 0.7, 0.8), 0, 10000, 12000);
+		mSceneMgr->setFog(FOG_LINEAR, ColourValue(0.7, 0.7, 0.8), 0, 10000, 25000);
 
 		LogManager::getSingleton().setLogDetail(LL_BOREME);
 
 		Vector3 lightdir(0.55, -0.3, 0.75);
 		lightdir.normalise();
 
+		//configureShadows(true, false);
 
 		Light* l = mSceneMgr->createLight("tstLight");
 		l->setType(Light::LT_DIRECTIONAL);
@@ -672,7 +778,6 @@ protected:
 
 
 
-		/*
 		// create a few entities on the terrain
 		for (int i = 0; i < 20; ++i)
 		{
@@ -682,7 +787,6 @@ protected:
 			Real y = mTerrainGroup->getHeightAtWorldPosition(Vector3(x, 0, z));
 			mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(x, y, z))->attachObject(e);
 		}
-		*/
 
 
 		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");

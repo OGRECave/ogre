@@ -342,6 +342,7 @@ namespace Ogre
 			bool isVisible(void) const;
 			uint32 getVisibilityFlags(void) const;
 			uint32 getQueryFlags(void) const;
+			bool getCastShadows(void) const;
 
 		};
 		Movable* mMovable;

@@ -134,6 +134,12 @@ namespace Ogre
 			/** Whether to use depth shadows (default false). 
 			*/
 			bool getReceiveDynamicShadowsDepth() const { return mDepthShadows; }
+			/** Whether to use shadows on low LOD material rendering (when using composite map) (default false). 
+			*/
+			void setReceiveDynamicShadowsLowLod(bool enabled);
+			/** Whether to use shadows on low LOD material rendering (when using composite map) (default false). 
+			*/
+			bool getReceiveDynamicShadowsLowLod() const { return mLowLodShadows; }
 
 			/// Internal
 			bool _isSM3Available() const { return mSM3Available; }
@@ -175,6 +181,9 @@ namespace Ogre
 				virtual void updateVpParams(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, const GpuProgramParametersSharedPtr& params);
 				virtual void updateFpParams(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, const GpuProgramParametersSharedPtr& params);
 				static String getChannel(uint idx);
+
+				size_t mShadowSamplerStartHi;
+				size_t mShadowSamplerStartLo;
 
 			};
 
@@ -228,7 +237,10 @@ namespace Ogre
 			bool mReceiveDynamicShadows;
 			PSSMShadowCameraSetup* mPSSM;
 			bool mDepthShadows;
+			bool mLowLodShadows;
 			bool mSM3Available;
+
+			bool isShadowingEnabled(TechniqueType tt, const Terrain* terrain) const;
 
 		};
 
