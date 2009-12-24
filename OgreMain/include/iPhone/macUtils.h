@@ -28,16 +28,10 @@ Torus Knot Software Ltd.
 */
 
 #include <CoreFoundation/CoreFoundation.h>
-#include <dlfcn.h>
 #include "OgrePrerequisites.h"
 
 namespace Ogre {
-
-    CFBundleRef mac_loadExeBundle(const char *path);
-    void * mac_getBundleSym(CFBundleRef bundle, const char *name);
-    bool mac_unloadExeBundle(CFBundleRef bundle);
-    void * mac_loadDylib(const char* name);
-    _OgreExport std::string macPluginPath();
-    _OgreExport std::string macBundlePath();
-    _OgreExport void macGetSystemVersion(unsigned *major, unsigned *minor, unsigned *bugFix);
+    void* mac_loadDylib(const char* name);
+    _OgreExport std::string macBundlePath(void);
+    _OgreExport std::string iPhoneDocumentsDirectory(void);
 }
