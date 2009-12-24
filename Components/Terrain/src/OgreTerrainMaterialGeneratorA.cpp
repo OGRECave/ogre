@@ -1258,7 +1258,13 @@ namespace Ogre
 				"	float offset = (NUM_SHADOW_SAMPLES_1D/2 - 0.5) * SHADOW_FILTER_SCALE; \n"
 				"	for (float y = -offset; y <= offset; y += SHADOW_FILTER_SCALE) \n"
 				"		for (float x = -offset; x <= offset; x += SHADOW_FILTER_SCALE) \n"
-				"			shadow += tex2Dproj(shadowMap, offsetSample(uv, float2(x, y), invShadowMapSize)).x > uv.z ? 1.0 : 0.0; \n"
+				"		{ \n"
+				"			float4 newUV = offsetSample(uv, float2(x, y), invShadowMapSize);\n"
+				"			// manually project and assign derivatives \n"
+				"			// to avoid gradient issues inside loops \n"
+				"			newUV.xy = newUV.xy / newUV.w; \n"
+				"			shadow += tex2D(shadowMap, newUV.xy, 1, 1).x > uv.z ? 1.0 : 0.0; \n"
+				"		} \n"
 
 				"	shadow /= SHADOW_SAMPLES; \n"
 
