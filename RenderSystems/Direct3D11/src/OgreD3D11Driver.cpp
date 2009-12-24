@@ -55,7 +55,7 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	D3D11Driver::D3D11Driver( D3D11Device & device, unsigned int adapterNumber, IDXGIAdapter* pDXGIAdapter) : mDevice(device)
+	D3D11Driver::D3D11Driver( D3D11Device & device, unsigned int adapterNumber, IDXGIAdapter1* pDXGIAdapter) : mDevice(device)
 	{
 		tempNo = ++driverCount;
 		mAdapterNumber = adapterNumber;
@@ -63,7 +63,7 @@ namespace Ogre
 		mpDXGIAdapter=pDXGIAdapter;
 
 		// get the description of the adapter
-		pDXGIAdapter->GetDesc( &mAdapterIdentifier );
+		pDXGIAdapter->GetDesc1( &mAdapterIdentifier );
 
 	}
 	//---------------------------------------------------------------------
@@ -117,7 +117,7 @@ namespace Ogre
 		return mAdapterNumber;
 	}
 	//---------------------------------------------------------------------
-	const DXGI_ADAPTER_DESC& D3D11Driver::getAdapterIdentifier() const
+	const DXGI_ADAPTER_DESC1& D3D11Driver::getAdapterIdentifier() const
 	{
 		return mAdapterIdentifier;
 	}
@@ -127,7 +127,7 @@ namespace Ogre
 		return mDesktopDisplayMode;
 	}
 	//---------------------------------------------------------------------
-	IDXGIAdapter* D3D11Driver::getDeviceAdapter() const
+	IDXGIAdapter1* D3D11Driver::getDeviceAdapter() const
 	{
 		return mpDXGIAdapter;
 	}

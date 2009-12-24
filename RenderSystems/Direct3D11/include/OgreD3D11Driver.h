@@ -43,20 +43,19 @@ namespace Ogre
 		// here as well.
 		D3D11Device & mDevice;
 		unsigned int mAdapterNumber;
-		DXGI_ADAPTER_DESC mAdapterIdentifier;
+		DXGI_ADAPTER_DESC1 mAdapterIdentifier;
 		DXGI_MODE_DESC mDesktopDisplayMode;
 		D3D11VideoModeList* mpVideoModeList;
 		unsigned int tempNo;
 		static unsigned int driverCount;
-		IDXGIAdapter*	mpDXGIAdapter;
-		//DXGI_ADAPTER_DESC mAdapterDesc;
+		IDXGIAdapter1*	mpDXGIAdapter;
 
 
 	public:
 		// Constructors
 		D3D11Driver(D3D11Device & device);		// Default
 		D3D11Driver( const D3D11Driver &ob );	// Copy
-		D3D11Driver(D3D11Device & device,  unsigned int adapterNumber,  IDXGIAdapter* pDXGIAdapter );
+		D3D11Driver(D3D11Device & device,  unsigned int adapterNumber,  IDXGIAdapter1* pDXGIAdapter );
 		~D3D11Driver();
 
 		// Information accessors
@@ -66,9 +65,9 @@ namespace Ogre
 		// change the device
 		void setDevice(D3D11Device & device);
 		unsigned int getAdapterNumber() const;
-		const DXGI_ADAPTER_DESC& getAdapterIdentifier() const;
+		const DXGI_ADAPTER_DESC1& getAdapterIdentifier() const;
 		const DXGI_MODE_DESC& getDesktopMode() const;
-		IDXGIAdapter* getDeviceAdapter() const;
+		IDXGIAdapter1* getDeviceAdapter() const;
 		D3D11VideoModeList* getVideoModeList();
 	};
 }

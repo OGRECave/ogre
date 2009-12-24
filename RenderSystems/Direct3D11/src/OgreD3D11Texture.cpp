@@ -303,7 +303,7 @@ namespace Ogre
 		}
 
 		// set the base texture we'll use in the render system
-		hr = mp1DTex->QueryInterface(IID_ID3D11Resource, (void **)&mpTex);
+		hr = mp1DTex->QueryInterface(__uuidof(ID3D11Resource), (void **)&mpTex);
 		if (FAILED(hr) || mDevice.isError())
 		{
 			this->freeInternalResources();
@@ -425,7 +425,7 @@ namespace Ogre
 		}
 
 		// set the base texture we'll use in the render system
-		hr = mp2DTex->QueryInterface(IID_ID3D11Resource, (void **)&mpTex);
+		hr = mp2DTex->QueryInterface(__uuidof(ID3D11Resource), (void **)&mpTex);
 		if (FAILED(hr) || mDevice.isError())
 		{
 			this->freeInternalResources();
@@ -509,7 +509,7 @@ namespace Ogre
 		}
 
 		// set the base texture we'll use in the render system
-		hr = mp3DTex->QueryInterface(IID_ID3D11Resource, (void **)&mpTex);
+		hr = mp3DTex->QueryInterface(__uuidof(ID3D11Resource), (void **)&mpTex);
 		if (FAILED(hr) || mDevice.isError())
 		{
 			this->freeInternalResources();

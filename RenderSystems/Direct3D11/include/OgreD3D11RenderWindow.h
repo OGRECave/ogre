@@ -79,9 +79,6 @@ namespace Ogre
 		*/
 		void destroyD3DResources();
 
-		/// Accessor for render surface
-		//	IDXGISurface * getRenderSurface() { return mpRenderSurface; }
-
 		/// Are we in the middle of switching between fullscreen and windowed
 		bool _getSwitchingFullscreen() const;
 		/// Indicate that fullscreen / windowed switching has finished
@@ -106,8 +103,6 @@ namespace Ogre
 		// Pointer to swap chain, only valid if mIsSwapChain
 		IDXGISwapChain * mpSwapChain;
 		DXGI_SWAP_CHAIN_DESC md3dpp;
-		//	IDXGISurface * mpRenderSurface;
-		//	IDXGISurface * mpRenderZBuffer;
 		DXGI_SAMPLE_DESC mFSAAType;
 		//DWORD mFSAAQuality;
 		UINT mDisplayFrequency;

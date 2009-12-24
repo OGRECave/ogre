@@ -92,8 +92,6 @@ namespace Ogre
 	{
 		D3D11RenderSystem* rs = static_cast<D3D11RenderSystem*>(
 			Root::getSingleton().getRenderSystem());
-		if (rs->isDeviceLost())
-			return;
 
 		MultiRenderTarget::update();
 	}

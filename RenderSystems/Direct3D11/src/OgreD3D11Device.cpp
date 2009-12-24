@@ -86,8 +86,8 @@ namespace Ogre
 
 		if (SUCCEEDED(hr))
 		{
-			unsigned int numStoredMessages = pInfoQueue->GetNumStoredMessages();
-			for (unsigned int i = 0 ; i < numStoredMessages ; i++ )
+			UINT64 numStoredMessages = pInfoQueue->GetNumStoredMessages();
+			for (UINT64 i = 0 ; i < numStoredMessages ; i++ )
 			{
 				// Get the size of the message
 				SIZE_T messageLength = 0;

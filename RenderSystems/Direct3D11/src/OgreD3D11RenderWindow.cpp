@@ -339,10 +339,6 @@ namespace Ogre
 
 			if ((oldFullscreen && fullScreen) || mIsExternal)
 			{
-				// Have to release & trigger device reset
-				// NB don't use windowMovedOrResized since Win32 doesn't know
-				// about the size change yet
-				//	SAFE_RELEASE(mpRenderSurface);
 				// Notify viewports of resize
 				ViewportList::iterator it = mViewportList.begin();
 				while(it != mViewportList.end()) (*it++).second->_updateDimensions();
@@ -390,12 +386,6 @@ namespace Ogre
 				"D3D11RenderWindow::createD3DResources");
 		}
 
-		//SAFE_RELEASE(mpRenderSurface);
-
-		// Set up the presentation parameters
-		//		int pD3D = mDriver->getD3D();
-		//	D3DDEVTYPE devType = D3DDEVTYPE_HAL;
-
 		ZeroMemory( &md3dpp, sizeof(DXGI_SWAP_CHAIN_DESC) );
 		md3dpp.Windowed				= !mIsFullScreen;
 		md3dpp.SwapEffect			= DXGI_SWAP_EFFECT_DISCARD ;
@@ -437,45 +427,7 @@ namespace Ogre
 			}
 			//	md3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 		}
-		/*
-		md3dpp.BufferDesc.Format= BackBufferFormat		= D3DFMT_R5G6B5;
-		if( mColourDepth > 16 )
-		md3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
 
-		if (mColourDepth > 16 )
-		{
-		// Try to create a 32-bit depth, 8-bit stencil
-		if( FAILED( pD3D->CheckDeviceFormat(mDriver->getAdapterNumber(),
-		devType,  md3dpp.BackBufferFormat,  D3DUSAGE_DEPTHSTENCIL, 
-		D3DRTYPE_SURFACE, D3DFMT_D24S8 )))
-		{
-		// Bugger, no 8-bit hardware stencil, just try 32-bit zbuffer 
-		if( FAILED( pD3D->CheckDeviceFormat(mDriver->getAdapterNumber(),
-		devType,  md3dpp.BackBufferFormat,  D3DUSAGE_DEPTHSTENCIL, 
-		D3DRTYPE_SURFACE, D3DFMT_D32 )))
-		{
-		// Jeez, what a naff card. Fall back on 16-bit depth buffering
-		md3dpp.AutoDepthStencilFormat = D3DFMT_D16;
-		}
-		else
-		md3dpp.AutoDepthStencilFormat = D3DFMT_D32;
-		}
-		else
-		{
-		// Woohoo!
-		if( SUCCEEDED( pD3D->CheckDepthStencilMatch( mDriver->getAdapterNumber(), devType,
-		md3dpp.BackBufferFormat, md3dpp.BackBufferFormat, D3DFMT_D24S8 ) ) )
-		{
-		md3dpp.AutoDepthStencilFormat = D3DFMT_D24S8; 
-		} 
-		else 
-		md3dpp.AutoDepthStencilFormat = D3DFMT_D24X8; 
-		}
-		}
-		else
-		// 16-bit depth, software stencil
-		md3dpp.AutoDepthStencilFormat	= D3DFMT_D16;
-		*/
 		md3dpp.SampleDesc.Count = mFSAAType.Count;
 		md3dpp.SampleDesc.Quality = mFSAAType.Quality;
 		if (mIsSwapChain)
@@ -483,8 +435,8 @@ namespace Ogre
 			HRESULT hr;
 
 			// get the dxgi device
-			IDXGIDevice* pDXGIDevice = NULL;
-			hr = mDevice->QueryInterface( IID_IDXGIDevice, (void**)&pDXGIDevice );
+			IDXGIDevice1* pDXGIDevice = NULL;
+			hr = mDevice->QueryInterface( __uuidof(IDXGIDevice1), (void**)&pDXGIDevice );
 			if( FAILED(hr) )
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
@@ -509,8 +461,6 @@ namespace Ogre
 					"D3D11RenderWindow::createD3DResources");
 			}
 		
-			// Store references to buffers for convenience
-			//mpSwapChain->GetBackBuffer( 0, D3DBACKBUFFER_TYPE_MONO, &mpRenderSurface );
 			// Additional swap chains need their own depth buffer
 			// to support resizing them
 
@@ -546,23 +496,6 @@ namespace Ogre
 
 			if (mIsDepthBuffered) 
 			{
-				/*	hr = mDevice->CreateDepthStencilSurface(
-				mWidth, mHeight,
-				md3dpp.AutoDepthStencilFormat,
-				md3dpp.MultiSampleType,
-				md3dpp.MultiSampleQuality, 
-				(md3dpp.Flags & D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL),
-				&mpRenderZBuffer, NULL
-				);
-
-				if (FAILED(hr)) 
-				{
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Unable to create a depth buffer for the swap chain",
-				"D3D11RenderWindow::createD3DResources");
-
-				}
-				*/
 				// get the backbuffer
 
 				// Create depth stencil texture
@@ -683,7 +616,6 @@ namespace Ogre
 		// update device in driver
 		mDriver->setD3DDevice( mDevice );
 		// Store references to buffers for convenience
-		mDevice->GetRenderTarget( 0, &mpRenderSurface );
 		mDevice->GetDepthStencilSurface( &mpRenderZBuffer );
 		// release immediately so we don't hog them
 		mpRenderZBuffer->Release();
@@ -703,7 +635,6 @@ namespace Ogre
 			// ignore depth buffer, access device through driver
 			//	mpRenderZBuffer = 0;
 		}
-		//		SAFE_RELEASE(mpRenderSurface);
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderWindow::destroy()
@@ -785,7 +716,6 @@ namespace Ogre
 			Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 		mpSwapChain->ResizeBuffers(md3dpp.BufferCount, width, height, md3dpp.BufferDesc.Format, Flags);
 		/*
-		SAFE_RELEASE( mpRenderSurface );
 
 		if (mIsSwapChain) 
 		{
@@ -870,15 +800,7 @@ namespace Ogre
 			{
 				//hr = mDevice->Present( 0,0);
 			}
-			/*if( D3DERR_DEVICELOST == hr )
-			{
-			SAFE_RELEASE(mpRenderSurface);
 
-			static_cast<D3D11RenderSystem*>(
-			Root::getSingleton().getRenderSystem())->_notifyDeviceLost();
-			}
-			else 
-			*/
 			if( FAILED(hr) )
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error Presenting surfaces", "D3D11RenderWindow::swapBuffers" );
 		}
@@ -922,25 +844,6 @@ namespace Ogre
 			return;
 		}
 
-		/*else if( name == "D3DZBUFFER" )
-		{
-		IDXGISurface * *pSurf = (IDXGISurface **)pData;
-		*pSurf = mpRenderZBuffer;
-		return;
-		}
-		else if( name == "DDBACKBUFFER" )
-		{
-		IDXGISurface * *pSurf = (IDXGISurface **)pData;
-		*pSurf = mpRenderSurface;
-		return;
-		}
-		else if( name == "DDFRONTBUFFER" )
-		{
-		IDXGISurface * *pSurf = (IDXGISurface **)pData;
-		*pSurf = mpRenderSurface;
-		return;
-		}
-		*/
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
@@ -986,67 +889,6 @@ namespace Ogre
 	//-----------------------------------------------------------------------------
 	void D3D11RenderWindow::update(bool swap)
 	{
-
-		/*D3D11RenderSystem* rs = static_cast<D3D11RenderSystem*>(
-		Root::getSingleton().getRenderSystem());
-
-		// access device through driver
-		D3D11Device & mDevice = mDriver->mDevice;
-
-		if (rs->isDeviceLost())
-		{
-		// Test the cooperative mode first
-		HRESULT hr = mDevice->TestCooperativeLevel();
-		if (hr == D3DERR_DEVICELOST)
-		{
-		// device lost, and we can't reset
-		// can't do anything about it here, wait until we get 
-		// D3DERR_DEVICENOTRESET; rendering calls will silently fail until 
-		// then (except Present, but we ignore device lost there too)
-		SAFE_RELEASE(mpRenderSurface);
-		// need to release if swap chain
-		if (!mIsSwapChain)
-		mpRenderZBuffer = 0;
-		else
-		SAFE_RELEASE (mpRenderZBuffer);
-		Sleep(50);
-		return;
-		}
-		else
-		{
-		// device lost, and we can reset
-		rs->restoreLostDevice();
-
-		// Still lost?
-		if (rs->isDeviceLost())
-		{
-		// Wait a while
-		Sleep(50);
-		return;
-		}
-
-		if (!mIsSwapChain) 
-		{
-		// re-qeuery buffers
-		mDevice->GetRenderTarget( 0, &mpRenderSurface );
-		mDevice->GetDepthStencilSurface( &mpRenderZBuffer );
-		// release immediately so we don't hog them
-		mpRenderZBuffer->Release();
-		}
-		else 
-		{
-		// Update dimensions incase changed
-		ViewportList::iterator it = mViewportList.begin();
-		while( it != mViewportList.end() )
-		(*it++).second->_updateDimensions();
-		// Actual restoration of surfaces will happen in 
-		// D3D11RenderSystem::restoreLostDevice when it calls
-		// createD3DResources for each secondary window
-		}
-		}
-
-		}
-		*/
 		RenderWindow::update(swap);
 	}
 	//---------------------------------------------------------------------

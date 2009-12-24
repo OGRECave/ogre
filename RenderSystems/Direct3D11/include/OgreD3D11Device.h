@@ -92,14 +92,14 @@ namespace Ogre
 			HRESULT hr = mD3D11Device->QueryInterface(__uuidof(ID3D11InfoQueue), (LPVOID*)&pInfoQueue);
 			if (SUCCEEDED(hr))
 			{
-				unsigned int numStoredMessages = pInfoQueue->GetNumStoredMessages();
+				UINT64 numStoredMessages = pInfoQueue->GetNumStoredMessages();
 
 				if (D3D_INFO == mExceptionsErrorLevel && numStoredMessages > 0)
 				{
 					// if D3D_INFO we don't need to loop if the numStoredMessages > 0
 					return true;
 				}
-				for (unsigned int i = 0 ; i < numStoredMessages ; i++ )
+				for (UINT64 i = 0 ; i < numStoredMessages ; i++ )
 				{
 					// Get the size of the message
 					SIZE_T messageLength = 0;

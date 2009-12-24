@@ -196,31 +196,10 @@ namespace Ogre
 		// List of additional windows after the first (swap chains)
 		SecondaryWindowList mSecondaryWindows;
 
-		bool mDeviceLost;
 		bool mBasicStatesInitialised;
 
 
 		IDXGIFactory1*	mpDXGIFactory;
-
-
-		/** Mapping of texture format -> DepthStencil. Used as cache by _getDepthStencilFormatFor
-		*/
-		typedef HashMap<unsigned int, int/*DXGI_FORMAT*/> DepthStencilHash;
-		DepthStencilHash mDepthStencilHash;
-
-		/** Mapping of depthstencil format -> depthstencil buffer
-			Keep one depthstencil buffer around for every format that is used, it must be large
-			enough to hold the largest rendering target.
-			This is used as cache by _getDepthStencilFor.
-		*/
-		typedef std::pair<int/*DXGI_FORMAT*/, int/*DXGI_SAMPLE_DESC*/> ZBufferFormat;
-		struct ZBufferRef
-		{
-			IDXGISurface *surface;
-			size_t width, height;
-		};
-		typedef map<ZBufferFormat, ZBufferRef>::type ZBufferHash;
-		ZBufferHash mZBufferHash;
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);
 	public:
@@ -356,28 +335,6 @@ namespace Ogre
          * Set current render target to target, enabling its GL context if needed
          */
 		void _setRenderTarget(RenderTarget *target);
-
-		/** D3D specific method to restore a lost device. */
-		void restoreLostDevice(void);
-		/** D3D specific method to return whether the device has been lost. */
-		bool isDeviceLost(void);
-		/** Notify that a device has been lost */
-		void _notifyDeviceLost(void);
-
-		/** Check which depthStencil formats can be used with a certain pixel format,
-			and return the best suited.
-		*/
-//		DXGI_FORMAT _getDepthStencilFormatFor(DXGI_FORMAT fmt);
-
-		/** Get a depth stencil surface that is compatible with an internal pixel format and
-			multisample type.
-			@returns A directx surface, or 0 if there is no compatible depthstencil possible.
-		*/
-		IDXGISurface* _getDepthStencilFor(DXGI_FORMAT fmt, DXGI_SAMPLE_DESC multisample, size_t width, size_t height);
-
-		/** Clear all cached depth stencil surfaces
-		*/
-		void _cleanupDepthStencils();
 
         /** Check whether or not filtering is supported for the precise texture format requested
         with the given usage options.

@@ -67,7 +67,7 @@ namespace Ogre
 		// set pointers to NULL
 		mpDXGIFactory = NULL;
 		HRESULT hr;
-		hr = CreateDXGIFactory1( IID_IDXGIFactory1, (void**)&mpDXGIFactory );
+		hr = CreateDXGIFactory1( __uuidof(IDXGIFactory1), (void**)&mpDXGIFactory );
 		if( FAILED(hr) )
 		{
 			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
@@ -81,7 +81,6 @@ namespace Ogre
         mHardwareBufferManager = NULL;
 		mGpuProgramManager = NULL;
 		mPrimaryWindow = NULL;
-		mDeviceLost = false;
 		mBasicStatesInitialised = false;
 		mUseNVPerfHUD = false;
         mHLSLProgramFactory = NULL;
@@ -145,10 +144,6 @@ namespace Ogre
 		}
 
 		mLastVertexSourceCount = 0;
-
-		// Enumerate events
-	//	mEventNames.push_back("DeviceLost");
-	//	mEventNames.push_back("DeviceRestored");
 
 		mFixedFuncEmuShaderManager.registerGenerator(&mHlslFixedFuncEmuShaderGenerator);
 
@@ -629,20 +624,17 @@ namespace Ogre
 
 			// Search for a PerfHUD adapter
 			UINT nAdapter = 0;
-			IDXGIAdapter* pAdapter = NULL;
-			IDXGIAdapter* pSelectedAdapter = mActiveD3DDriver->getDeviceAdapter();
+			IDXGIAdapter1* pAdapter = NULL;
+			IDXGIAdapter1* pSelectedAdapter = mActiveD3DDriver->getDeviceAdapter();
 			if ( mUseNVPerfHUD )
 			{
-
-				HRESULT hr;
-
 				// Search for a PerfHUD adapter
-				while( mpDXGIFactory->EnumAdapters( nAdapter, &pAdapter ) != DXGI_ERROR_NOT_FOUND )
+				while( mpDXGIFactory->EnumAdapters1( nAdapter, &pAdapter ) != DXGI_ERROR_NOT_FOUND )
 				{
 					if ( pAdapter )
 					{
-						DXGI_ADAPTER_DESC adaptDesc;
-						if ( SUCCEEDED( pAdapter->GetDesc( &adaptDesc ) ) )
+						DXGI_ADAPTER_DESC1 adaptDesc;
+						if ( SUCCEEDED( pAdapter->GetDesc1( &adaptDesc ) ) )
 						{
 							const bool isPerfHUD = wcscmp( adaptDesc.Description, L"NVIDIA PerfHUD" ) == 0;
 							if ( isPerfHUD )
@@ -705,17 +697,17 @@ namespace Ogre
 			{
 				// get the IDXGIFactory1 from the device for software drivers
 				// Remark(dec-09):
-				//  Seems that IDXGIFactory::CreateSoftwareAdapter doesn't work with
+				//  Seems that IDXGIFactory1::CreateSoftwareAdapter doesn't work with
 				// D3D11CreateDevice - so I needed to create with pSelectedAdapter = 0.
 				// If pSelectedAdapter == 0 then you have to get the IDXGIFactory1 from
 				// the device - else CreateSwapChain fails later.
 				SAFE_RELEASE(mpDXGIFactory);
 
-				IDXGIDevice * pDXGIDevice;
-				device->QueryInterface(__uuidof(IDXGIDevice), (void **)&pDXGIDevice);
+				IDXGIDevice1 * pDXGIDevice;
+				device->QueryInterface(__uuidof(IDXGIDevice1), (void **)&pDXGIDevice);
 
-				IDXGIAdapter * pDXGIAdapter;
-				pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), (void **)&pDXGIAdapter);
+				IDXGIAdapter1 * pDXGIAdapter;
+				pDXGIDevice->GetParent(__uuidof(IDXGIAdapter1), (void **)&pDXGIAdapter);
 
 				pDXGIAdapter->GetParent(__uuidof(IDXGIFactory1), (void **)&mpDXGIFactory);
 
@@ -1003,7 +995,7 @@ namespace Ogre
 
 
 		// Adapter details
-		const DXGI_ADAPTER_DESC& adapterID = mActiveD3DDriver->getAdapterIdentifier();
+		const DXGI_ADAPTER_DESC1& adapterID = mActiveD3DDriver->getAdapterIdentifier();
 
 		// determine vendor
 		// Full list of vendors here: http://www.pcidatabase.com/vendors.php?sort=id
@@ -1182,7 +1174,7 @@ namespace Ogre
 		return true;
 	/*	bool anySupported = false;
 
-		IDXGISurface * bbSurf;
+		IDXGISurface1 * bbSurf;
 		mPrimaryWindow->getCustomAttribute("DDBACKBUFFER", &bbSurf);
 		D3DSURFACE_DESC bbSurfDesc;
 		bbSurf->GetDesc(&bbSurfDesc);
@@ -1316,7 +1308,6 @@ namespace Ogre
 			}
 			*/
 			// Clean up depth stencil surfaces
-			_cleanupDepthStencils();
 			mDevice.release();
 			//mActiveD3DDriver->setDevice(D3D11Device(NULL));
 			mDevice = 0;
@@ -1400,8 +1391,8 @@ namespace Ogre
         Real tanThetaX = tanThetaY * aspect; //Math::Tan(thetaX);
         Real half_w = tanThetaX * nearPlane;
         Real half_h = tanThetaY * nearPlane;
-        Real iw = 1.0 / half_w;
-        Real ih = 1.0 / half_h;
+        Real iw = 1.0f / half_w;
+        Real ih = 1.0f / half_h;
         Real q;
         if (farPlane == 0)
         {
@@ -1409,7 +1400,7 @@ namespace Ogre
         }
         else
         {
-            q = 1.0 / (farPlane - nearPlane);
+            q = 1.0f / (farPlane - nearPlane);
         }
 
         dest = Matrix4::ZERO;
@@ -2198,10 +2189,10 @@ namespace Ogre
 			_setCullingMode( mCullingMode );
 
 			// set viewport dimensions
-			d3dvp.TopLeftX = vp->getActualLeft();
-			d3dvp.TopLeftY = vp->getActualTop();
-			d3dvp.Width = vp->getActualWidth();
-			d3dvp.Height = vp->getActualHeight();
+			d3dvp.TopLeftX = static_cast<FLOAT>(vp->getActualLeft());
+			d3dvp.TopLeftY = static_cast<FLOAT>(vp->getActualTop());
+			d3dvp.Width = static_cast<FLOAT>(vp->getActualWidth());
+			d3dvp.Height = static_cast<FLOAT>(vp->getActualHeight());
             if (target->requiresTextureFlipping())
             {
                 // Convert "top-left" to "bottom-left"
@@ -3086,7 +3077,7 @@ namespace Ogre
 
 			if (ClearFlags)
 			{
-				mDevice.GetImmediateContext()->ClearDepthStencilView( pRTDepthView, ClearFlags, depth, stencil );
+				mDevice.GetImmediateContext()->ClearDepthStencilView( pRTDepthView, ClearFlags, depth, static_cast<UINT8>(stencil)  );
 			}
 
 		}
@@ -3234,233 +3225,6 @@ namespace Ogre
         // D3D inverts even identity view matrices, so maximum INPUT is -1.0
         return -1.0f;
     }
-	//---------------------------------------------------------------------
-	void D3D11RenderSystem::restoreLostDevice(void)
-	{
-	/*	// Release all non-managed resources
-
-		// Cleanup depth stencils
-		_cleanupDepthStencils();
-
-		// Set all texture units to nothing
-		_disableTextureUnitsFrom(0);
-
-		// Unbind any vertex streams
-		for (size_t i = 0; i < mLastVertexSourceCount; ++i)
-		{
-			mDevice->SetStreamSource(i, NULL, 0, 0);
-		}
-        mLastVertexSourceCount = 0;
-
-        // Release all automatic temporary buffers and free unused
-        // temporary buffers, so we doesn't need to recreate them,
-        // and they will reallocate on demand. This save a lot of
-        // release/recreate of non-managed vertex buffers which
-        // wasn't need at all.
-        mHardwareBufferManager->_releaseBufferCopies(true);
-
-		// We have to deal with non-managed textures and vertex buffers
-		// GPU programs don't have to be restored
-		static_cast<D3D11TextureManager*>(mTextureManager)->releaseDefaultPoolResources();
-		static_cast<D3D11HardwareBufferManager*>(mHardwareBufferManager)
-			->releaseDefaultPoolResources();
-
-		// release additional swap chains (secondary windows)
-		SecondaryWindowList::iterator sw;
-		for (sw = mSecondaryWindows.begin(); sw != mSecondaryWindows.end(); ++sw)
-		{
-			(*sw)->destroyD3DResources();
-		}
-
-		DXGI_SWAP_CHAIN_DESC* presParams = mPrimaryWindow->getPresentationParameters();
-		// Reset the device, using the primary window presentation params
-		HRESULT hr = mDevice->Reset(presParams);
-
-		if (hr == D3DERR_DEVICELOST)
-		{
-			// Don't continue
-			return;
-		}
-		else if (FAILED(hr))
-		{
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Cannot reset device! " + getErrorDescription(hr), 
-				"D3D11RenderWindow::restoreLostDevice" );
-		}
-
-		LogManager::getSingleton().stream()
-			<< "Reset device ok w:" << presParams->BufferDesc.Height
-			<< " h:" << presParams->BufferDesc.Height;
-		// If windowed, we have to reset the size here
-		// since a fullscreen switch may have occurred
-		if (mPrimaryWindow->_getSwitchingFullscreen())
-		{
-			mPrimaryWindow->_finishSwitchingFullscreen();
-		}
-
-
-		// will have lost basic states
-		mBasicStatesInitialised = false;
-        mVertexProgramBound = false;
-        mFragmentProgramBound = false;
-
-
-		// recreate additional swap chains
-		for (sw = mSecondaryWindows.begin(); sw != mSecondaryWindows.end(); ++sw)
-		{
-			(*sw)->createD3DResources();
-		}
-
-		// Recreate all non-managed resources
-		static_cast<D3D11TextureManager*>(mTextureManager)
-			->recreateDefaultPoolResources();
-		static_cast<D3D11HardwareBufferManager*>(mHardwareBufferManager)
-			->recreateDefaultPoolResources();
-			
-		LogManager::getSingleton().logMessage("!!! Direct3D Device successfully restored.");
-
-		mDeviceLost = false;
-
-		fireEvent("DeviceRestored");
-*/
-	}
-	//---------------------------------------------------------------------
-	bool D3D11RenderSystem::isDeviceLost(void)
-	{
-		return mDeviceLost;
-	}
-	//---------------------------------------------------------------------
-	void D3D11RenderSystem::_notifyDeviceLost(void)
-	{
-		LogManager::getSingleton().logMessage("!!! Direct3D Device Lost!");
-		mDeviceLost = true;
-		// will have lost basic states
-		mBasicStatesInitialised = false;
-
-		fireEvent("DeviceLost");
-	}
-	//---------------------------------------------------------------------
-	// Formats to try, in decreasing order of preference
-/*	DXGI_FORMAT ddDepthStencilFormats[]={
-		D3DFMT_D24FS8,
-		D3DFMT_D24S8,
-		D3DFMT_D24X4S4,
-		D3DFMT_D24X8,
-		D3DFMT_D15S1,
-		D3DFMT_D16,
-		D3DFMT_D32
-	};
-#define NDSFORMATS (sizeof(ddDepthStencilFormats)/sizeof(DXGI_FORMAT))
-	
-	DXGI_FORMAT D3D11RenderSystem::_getDepthStencilFormatFor(DXGI_FORMAT fmt)
-	{
-		/// Check if result is cached
-		DepthStencilHash::iterator i = mDepthStencilHash.find((unsigned int)fmt);
-		if(i != mDepthStencilHash.end())
-			return i->second;
-		/// If not, probe with CheckDepthStencilMatch
-		DXGI_FORMAT dsfmt = D3DFMT_UNKNOWN;
-
-		/// Get description of primary render target
-		IDXGISurface * mSurface = mPrimaryWindow->getRenderSurface();
-		D3DSURFACE_DESC srfDesc;
-
-		if(!FAILED(mSurface->GetDesc(&srfDesc)))
-		{
-			/// Probe all depth stencil formats
-			/// Break on first one that matches
-			for(size_t x=0; x<NDSFORMATS; ++x)
-			{
-                // Verify that the depth format exists
-                if (mpD3D->CheckDeviceFormat(
-                    mActiveD3DDriver->getAdapterNumber(),
-                    D3DDEVTYPE_HAL,
-                    srfDesc.Format,
-                    D3DUSAGE_DEPTHSTENCIL,
-                    D3DRTYPE_SURFACE,
-                    ddDepthStencilFormats[x]) != D3D_OK)
-                {
-                    continue;
-                }
-                // Verify that the depth format is compatible
-				if(mpD3D->CheckDepthStencilMatch(
-					mActiveD3DDriver->getAdapterNumber(),
-					D3DDEVTYPE_HAL, srfDesc.Format,
-					fmt, ddDepthStencilFormats[x]) == D3D_OK)
-				{
-					dsfmt = ddDepthStencilFormats[x];
-					break;
-				}
-			}
-		}
-		/// Cache result
-		mDepthStencilHash[(unsigned int)fmt] = dsfmt;
-		return dsfmt;
-	}
-	*/
-	//---------------------------------------------------------------------
-	IDXGISurface* D3D11RenderSystem::_getDepthStencilFor(DXGI_FORMAT fmt, DXGI_SAMPLE_DESC multisample, size_t width, size_t height)
-	{
-	IDXGISurface *surface = 0;
-	return surface;
-/*	DXGI_FORMAT dsfmt = _getDepthStencilFormatFor(fmt);
-		if(dsfmt == D3DFMT_UNKNOWN)
-			return 0;
-		
-
-		/// Check if result is cached
-		ZBufferFormat zbfmt(dsfmt, multisample);
-		ZBufferHash::iterator i = mZBufferHash.find(zbfmt);
-		if(i != mZBufferHash.end())
-		{
-			/// Check if size is larger or equal
-			if(i->second.width >= width && i->second.height >= height)
-			{
-				surface = i->second.surface;
-			} 
-			else
-			{
-				/// If not, destroy current buffer
-				i->second.surface->Release();
-				mZBufferHash.erase(i);
-			}
-		}
-		if(!surface)
-		{
-			/// If not, create the depthstencil surface
-			HRESULT hr = mDevice->CreateDepthStencilSurface( 
-				width, 
-				height, 
-				dsfmt, 
-				multisample, 
-				NULL, 
-				TRUE,  // discard true or false?
-				&surface, 
-				NULL);
-			if(FAILED(hr))
-			{
-				String msg = DXGetErrorDescription(hr);
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error CreateDepthStencilSurface : " + msg, "D3D11RenderSystem::_getDepthStencilFor" );
-			}
-			/// And cache it
-			ZBufferRef zb;
-			zb.surface = surface;
-			zb.width = width;
-			zb.height = height;
-			mZBufferHash[zbfmt] = zb;
-		}
-		return surface;
-*/	}
-	//---------------------------------------------------------------------
-	void D3D11RenderSystem::_cleanupDepthStencils()
-	{
-		for(ZBufferHash::iterator i = mZBufferHash.begin(); i != mZBufferHash.end(); ++i)
-		{
-			/// Release buffer
-			i->second.surface->Release();
-		}
-		mZBufferHash.clear();
-	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::registerThread()
 	{

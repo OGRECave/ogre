@@ -55,8 +55,8 @@ namespace Ogre
 
 		for( UINT iAdapter=0; ; iAdapter++ )
 		{
-			IDXGIAdapter*					pDXGIAdapter;
-			HRESULT hr = pDXGIFactory->EnumAdapters( iAdapter, &pDXGIAdapter );
+			IDXGIAdapter1*					pDXGIAdapter;
+			HRESULT hr = pDXGIFactory->EnumAdapters1( iAdapter, &pDXGIAdapter );
 			if( DXGI_ERROR_NOT_FOUND == hr )
 			{
 				hr = S_OK;
@@ -69,8 +69,8 @@ namespace Ogre
 			}
 
 			// we don't want NVIDIA PerfHUD in the list - so - here we filter it out
-			DXGI_ADAPTER_DESC adaptDesc;
-			if ( SUCCEEDED( pDXGIAdapter->GetDesc( &adaptDesc ) ) )
+			DXGI_ADAPTER_DESC1 adaptDesc;
+			if ( SUCCEEDED( pDXGIAdapter->GetDesc1( &adaptDesc ) ) )
 			{
 				const bool isPerfHUD = wcscmp( adaptDesc.Description, L"NVIDIA PerfHUD" ) == 0;
 

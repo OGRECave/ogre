@@ -270,9 +270,8 @@ namespace Ogre {
 
 		SIZE_T BytecodeLength = mpMicroCode->GetBufferSize();
 
-// this is a temp patch for the nov 08 DX SDK
 		hr = D3DReflect( (void*) mpMicroCode->GetBufferPointer(), BytecodeLength,
-			IID_ID3D11ShaderReflection,
+			IID_ID3D11ShaderReflection, // can't do __uuidof(ID3D11ShaderReflection) here...
 			(void**) &mpIShaderReflection );
 
 
