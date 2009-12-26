@@ -310,7 +310,7 @@ void Sample_ShaderSystem::setupUI()
 	// Create language selection 
 	mLanguageMenu = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "LangMode", "Language", 220, 120, 10);	
 
-	// Use GLSL in case of OpenGL render sytem.
+	// Use GLSL in case of OpenGL render system.
 	if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL") != String::npos)
 	{
 		mLanguageMenu->addItem("glsl");
@@ -914,6 +914,13 @@ void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps
 		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment programs, "
 			"so you cannot run this sample. Sorry!", "Sample_ShaderSystem::testCapabilities");
 	}
+
+	// Check if D3D10 shader is supported - is so - then we are OK.
+	if (GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0"))
+	{
+		return;
+	}
+
 
 	if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1") &&
 		!GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0"))
