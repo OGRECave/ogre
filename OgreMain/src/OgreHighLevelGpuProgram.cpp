@@ -53,7 +53,7 @@ namespace Ogre
 			// create low-level implementation
 			createLowLevelImpl();
 			// load constructed assembler program (if it exists)
-			if (!mAssemblerProgram.isNull())
+			if (!mAssemblerProgram.isNull() && mAssemblerProgram.getPointer() != this)
 			{
 				mAssemblerProgram->load();
 			}
