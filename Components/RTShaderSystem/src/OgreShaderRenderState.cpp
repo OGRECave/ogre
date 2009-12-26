@@ -245,17 +245,17 @@ bool RenderState::createCpuPrograms(ProgramSet* programSet)
 	Program* vsProgram = ProgramManager::getSingleton().createCpuProgram(GPT_VERTEX_PROGRAM);
 	Program* psProgram = ProgramManager::getSingleton().createCpuProgram(GPT_FRAGMENT_PROGRAM);
 	RTShader::Function* vsMainFunc = NULL;
-
+	RTShader::Function* psMainFunc = NULL;
 
 	programSet->setCpuVertexProgram(vsProgram);
 	programSet->setCpuFragmentProgram(psProgram);
 
 	// Create entry point functions.
-	vsMainFunc = vsProgram->createFunction("main", "Program Entry point");
+	vsMainFunc = vsProgram->createFunction("main", "Vertex Program Entry point", Function::FFT_VS_MAIN);
 	vsProgram->setEntryPointFunction(vsMainFunc);
 
-	vsMainFunc = psProgram->createFunction("main", "Program Entry point");
-	psProgram->setEntryPointFunction(vsMainFunc);
+	psMainFunc = psProgram->createFunction("main", "Pixel Program Entry point", Function::FFT_PS_MAIN);
+	psProgram->setEntryPointFunction(psMainFunc);
 
 	for (SubRenderStateIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
 	{

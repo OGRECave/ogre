@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "OgreShaderHLSLProgramWriter.h"
 #include "OgreStringConverter.h"
+#include "OgreGpuProgramManager.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -182,9 +183,17 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, ParameterPtr par
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter)
+void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const String overrideType)
 {
-	os << mGpuConstTypeMap[parameter->getType()];
+	if (overrideType.size() > 0)
+	{
+		os << overrideType.c_str();
+	}
+	else
+	{
+		os << mGpuConstTypeMap[parameter->getType()];
+	}
+	
 	os << "\t";	
 	os << parameter->getName();	
 
@@ -223,11 +232,25 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
 	size_t paramsCount = inParams.size() + outParams.size();
 	size_t curParamIndex = 0;
 
+	// for shader model 4 - we need to get the color as unsigned int
+	bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0");
 	// Write input parameters.
 	for (it=inParams.begin(); it != inParams.end(); ++it)
 	{					
 		os << "\t in ";
-		writeFunctionParameter(os, *it);
+
+		if (isVs4 &&
+			function->getFunctionType() == Function::FFT_VS_MAIN &&
+			(*it)->getSemantic() == Parameter::SPS_COLOR 
+			)
+		{
+			writeFunctionParameter(os, *it, "unsigned int");
+		}
+		else
+		{
+			writeFunctionParameter(os, *it);
+		}
+		
 
 		if (curParamIndex + 1 != paramsCount)		
 			os << ", " << std::endl;
@@ -235,18 +258,38 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
 		curParamIndex++;
 	}
 
-
-	// Write output parameters.
-	for (it=outParams.begin(); it != outParams.end(); ++it)
+	if (function->getFunctionType() == Function::FFT_PS_MAIN)
 	{
-		os << "\t out ";
-		writeFunctionParameter(os, *it);
+		os << "\t out float4\toColor_0 : SV_Target" << std::endl;
+	}
+	else
+	{
+		// Write output parameters.
+		for (it=outParams.begin(); it != outParams.end(); ++it)
+		{
+			if (function->getFunctionType() == Function::FFT_VS_MAIN &&
+				(*it)->getSemantic() == Parameter::SPS_POSITION && 
+				(*it)->getIndex() == 0
+				)
+			{
+				// the position has to be last for shader model 4
+				continue;
+			}
 
-		if (curParamIndex + 1 != paramsCount)				
-			os << ", " << std::endl;
+			os << "\t out ";
+			writeFunctionParameter(os, *it);
 
-		curParamIndex++;
-	}	
+			if (curParamIndex + 1 != paramsCount)				
+				os << ", " << std::endl;
+
+			curParamIndex++;
+		}	
+
+		if (function->getFunctionType() == Function::FFT_VS_MAIN)
+		{
+			os << "\t out float4\toPos_0 : SV_POSITION" << std::endl;
+		}
+	}
 
 	os << std::endl << "\t)" << std::endl;
 }

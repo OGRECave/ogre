@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreShaderExIntegratedPSSM3.h"
 #include "OgreShaderMaterialSerializerListener.h"
 #include "OgreShaderProgramWriterManager.h"
+#include "OgreHighLevelGpuProgramManager.h"
 
 
 namespace Ogre {
@@ -84,9 +85,33 @@ ShaderGenerator::ShaderGenerator()
 	mLightCount[2]				= 0;
 	mVSOutputCompactPolicy		= VSOCP_LOW;
 
-	mShaderLanguage				= "cg";
-	setVertexShaderProfiles("gpu_vp gp4vp vp40 vp30 arbvp1 vs_3_0 vs_2_x vs_2_a vs_2_0 vs_1_1");
-	setFragmentShaderProfiles("ps_3_x ps_3_0 fp40 fp30 fp20 arbfp1 ps_2_x ps_2_a ps_2_b ps_2_0 ps_1_4 ps_1_3 ps_1_2 ps_1_1");
+
+	mShaderLanguage = "";
+	
+	HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
+
+	if (hmgr.isLanguageSupported("cg"))
+	{
+		mShaderLanguage	= "cg";
+	}
+	else if (hmgr.isLanguageSupported("glsl"))
+	{
+		mShaderLanguage	= "glsl";
+	}
+	else if (hmgr.isLanguageSupported("hlsl"))
+	{
+		mShaderLanguage	= "hlsl";
+	}
+	else
+	{
+		OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+			"ShaderGenerator creation error: None of the profiles is supported.", 
+			"ShaderGenerator::ShaderGenerator" );
+
+	}
+
+	setVertexShaderProfiles("gpu_vp gp4vp vp40 vp30 arbvp1 vs_4_0 vs_3_0 vs_2_x vs_2_a vs_2_0 vs_1_1");
+	setFragmentShaderProfiles("ps_4_0 ps_3_x ps_3_0 fp40 fp30 fp20 arbfp1 ps_2_x ps_2_a ps_2_b ps_2_0 ps_1_4 ps_1_3 ps_1_2 ps_1_1");
 }
 
 //-----------------------------------------------------------------------------

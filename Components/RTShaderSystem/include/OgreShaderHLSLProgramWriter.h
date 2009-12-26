@@ -82,7 +82,7 @@ protected:
 	void		writeUniformParameter		(std::ostream& os, ParameterPtr parameter);
 
 	/** Write a function parameter. */
-	void		writeFunctionParameter		(std::ostream& os, ParameterPtr parameter);
+	void		writeFunctionParameter		(std::ostream& os, ParameterPtr parameter, const String overrideType = "");
 
 	/** Write a local parameter. */
 	void		writeLocalParameter			(std::ostream& os, ParameterPtr parameter);

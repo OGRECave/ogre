@@ -32,10 +32,11 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 //-----------------------------------------------------------------------------
-Function::Function(const String& name, const String& desc)
+Function::Function(const String& name, const String& desc, const FunctionType functionType)
 {
 	m_name			= name;
 	m_description	= desc;
+	m_functionType	= functionType;
 }
 
 //-----------------------------------------------------------------------------
@@ -482,6 +483,11 @@ int Function::sAtomInstanceCompare(const void* p0, const void* p1)
 	return pInstance0->getInternalExecutionOrder() - pInstance1->getInternalExecutionOrder();	
 }
 
+//-----------------------------------------------------------------------------
+Ogre::RTShader::Function::FunctionType Function::getFunctionType() const
+{
+	return m_functionType;
+}
 
 }
 }

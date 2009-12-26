@@ -47,6 +47,15 @@ class Function : public RTShaderSystemAlloc
 {
 // Interface.
 public:
+	enum FunctionType
+	{
+		// internal function (default)
+		FFT_INTERNAL,
+		// Vertex program main
+		FFT_VS_MAIN,
+		// Pixel shader main
+		FFT_PS_MAIN,
+	};
 
 	/** Get the name of this function */
 	const String&				getName					() const { return m_name; }
@@ -161,6 +170,10 @@ public:
 	/** Delete output parameter to this function. */
 	void						deleteOutputParameter		(ParameterPtr parameter);
 
+	/** get function type. */
+	FunctionType getFunctionType() const;
+
+
 protected:
 
 	/** Class constructor.
@@ -168,7 +181,7 @@ protected:
 	@param desc The description of this function.
 	@remarks This class is allocated via an instance of Program class. 
 	*/
-	Function			(const String& name, const String& desc);
+	Function			(const String& name, const String& desc, const FunctionType functionType);
 
 	/** Class destructor */
 	~Function			();
@@ -189,6 +202,7 @@ protected:
 	ShaderParameterList			mOutputParameters;			// Output parameters.
 	ShaderParameterList			mLocalParameters;			// Local parameters.
 	FunctionAtomInstanceList	mAtomInstances;				// Atom instances composing this function.
+	FunctionType				m_functionType;				// Function type
 	
 private:
 	friend class Program;

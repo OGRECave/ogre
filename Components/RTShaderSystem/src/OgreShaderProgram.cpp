@@ -243,7 +243,7 @@ ParameterPtr Program::getParameterByAutoType(GpuProgramParameters::AutoConstantT
 }
 
 //-----------------------------------------------------------------------------
-Function* Program::createFunction(const String& name, const String& desc)
+Function* Program::createFunction(const String& name, const String& desc, const Function::FunctionType functionType)
 {
 	Function* shaderFunction;
 
@@ -255,7 +255,7 @@ Function* Program::createFunction(const String& name, const String& desc)
 			"Program::createFunction" );
 	}
 
-	shaderFunction = OGRE_NEW Function(name, desc);
+	shaderFunction = OGRE_NEW Function(name, desc, functionType);
 	mFunctions.push_back(shaderFunction);
 
 	return shaderFunction;
