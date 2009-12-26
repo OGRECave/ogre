@@ -120,7 +120,8 @@ namespace Ogre
 					case D3D11_MESSAGE_SEVERITY_ERROR:
 						switch(mExceptionsErrorLevel)
 						{
-						case D3D_CORRUPTION :
+						case D3D_INFO:
+						case D3D_WARNING:
 						case D3D_ERROR:
 							res = true;
 						}
@@ -128,8 +129,7 @@ namespace Ogre
 					case D3D11_MESSAGE_SEVERITY_WARNING:
 						switch(mExceptionsErrorLevel)
 						{
-						case D3D_CORRUPTION :
-						case D3D_ERROR:
+						case D3D_INFO:
 						case D3D_WARNING:
 							res = true;
 						}
@@ -144,6 +144,8 @@ namespace Ogre
 					}
 
 				}
+
+				clearStoredErrorMessages();
 
 				return false;
 

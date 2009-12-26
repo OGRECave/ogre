@@ -630,7 +630,34 @@ namespace Ogre
 		return DXGI_FORMAT_R32G32B32_FLOAT;
 	}
 	//---------------------------------------------------------------------
-	LPCSTR D3D11Mappings::get(VertexElementSemantic sem,unsigned short index)
+	VertexElementSemantic D3D11Mappings::get(LPCSTR sem)
+	{
+		// todo - add to ogre - POSITIONT and PSIZE ("Transformed vertex position" and "Point size")
+
+		if( strcmp(sem, "BLENDINDICES") == 0 )
+			return VES_BLEND_INDICES;
+		if( strcmp(sem, "BLENDWEIGHT") == 0 )
+			return VES_BLEND_WEIGHTS;
+		if( strcmp(sem, "COLOR") == 0 )
+			return VES_DIFFUSE;
+//		if( strcmp(sem, "COLOR") == 0 )
+//			return VES_SPECULAR;
+		if( strcmp(sem, "NORMAL") == 0 )
+			return VES_NORMAL;
+		if( strcmp(sem, "POSITION") == 0 )
+			return VES_POSITION;
+		if( strcmp(sem, "TEXCOORD") == 0 )
+			return VES_TEXTURE_COORDINATES;
+		if( strcmp(sem, "BINORMAL") == 0 )
+			return VES_BINORMAL;
+		if( strcmp(sem, "TANGENT") == 0 )
+			return VES_TANGENT;
+
+		// to keep compiler happy
+		return VES_POSITION;
+	}
+	//---------------------------------------------------------------------
+	LPCSTR D3D11Mappings::get(VertexElementSemantic sem)
 	{
 		// todo - add to ogre - POSITIONT and PSIZE ("Transformed vertex position" and "Point size")
 		switch (sem)	

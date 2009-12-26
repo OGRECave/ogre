@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreD3D11Device.h"
 #include "OgreRoot.h"
+#include "OgreD3D11Mappings.h"
 
 namespace Ogre {
 	//-----------------------------------------------------------------------
@@ -208,6 +209,8 @@ namespace Ogre {
         else
             compileFlags |= D3D10_SHADER_PACK_MATRIX_ROW_MAJOR;
 
+		compileFlags|=D3D10_SHADER_ENABLE_BACKWARDS_COMPATIBILITY;
+
 		HRESULT hr = D3DX11CompileFromMemory(
 			mSource.c_str(),	// [in] Pointer to the shader in memory. 
 			mSource.size(),		// [in] Size of the shader in memory.  
@@ -224,7 +227,7 @@ namespace Ogre {
 			NULL				// [out] A pointer to the return value. May be NULL. If pPump is not NULL, then pHResult must be a valid memory location until the asynchronous execution completes. 
 			);
 
-		if (FAILED(hr)) // if fails - try with backwards compatibility flag
+		/*if (FAILED(hr)) // if fails - try with backwards compatibility flag
 		{
 			compileFlags|=D3D10_SHADER_ENABLE_BACKWARDS_COMPATIBILITY;
 			hr = D3DX11CompileFromMemory(
@@ -243,7 +246,7 @@ namespace Ogre {
 				NULL				// [out] A pointer to the return value. May be NULL. If pPump is not NULL, then pHResult must be a valid memory location until the asynchronous execution completes. 
 				);
 
-		}
+		}*/
 
 
 #if 0 // this is how you disassemble
@@ -281,6 +284,25 @@ namespace Ogre {
 
 			if (!FAILED(hr))
 			{
+				// enum parameters
+				{
+					mInputVertexDeclaration.removeAllElements();
+
+					D3D11_SIGNATURE_PARAMETER_DESC	paramDesc;
+
+					for (UINT k=0; k<mShaderDesc.InputParameters; k++)
+					{
+						mpIShaderReflection->GetInputParameterDesc( k, &paramDesc);
+						mInputVertexDeclaration.addElement(
+							paramDesc.Register, 
+							-1, // we don't need the offset
+							VET_FLOAT1, // doesn't matter
+							D3D11Mappings::get(paramDesc.SemanticName),
+							paramDesc.SemanticIndex);
+					}
+
+				}
+
 				if (mShaderDesc.ConstantBuffers == 1)
 				{
 					mShaderReflectionConstantBuffer = mpIShaderReflection->GetConstantBufferByIndex(0);
@@ -579,7 +601,7 @@ namespace Ogre {
 		: HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
 		, mpMicroCode(NULL), mErrorsInCompile(false), mConstantBuffer(NULL), mDevice(device), 
 		mpIShaderReflection(NULL), mShaderReflectionConstantBuffer(NULL), mpVertexShader(NULL)//, mpConstTable(NULL)
-		,mpPixelShader(NULL),mpGeometryShader(NULL),mColumnMajorMatrices(true)
+		,mpPixelShader(NULL),mpGeometryShader(NULL),mColumnMajorMatrices(true), mInputVertexDeclaration(device)
 	{
 		if ("Hatch_ps_hlsl" == name)
 		{

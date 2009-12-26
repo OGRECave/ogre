@@ -119,7 +119,7 @@ namespace Ogre {
 			iend = mElementList.end();
 			for (idx = 0, i = mElementList.begin(); i != iend; ++i, ++idx)
 			{
-				D3delems[idx].SemanticName			= D3D11Mappings::get(i->getSemantic(),i->getIndex());
+				D3delems[idx].SemanticName			= D3D11Mappings::get(i->getSemantic());
 				D3delems[idx].SemanticIndex		= i->getIndex();
 				D3delems[idx].Format				= D3D11Mappings::get(i->getType());
 				D3delems[idx].InputSlot			= i->getSource();

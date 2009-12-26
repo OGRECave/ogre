@@ -35,6 +35,46 @@ namespace Ogre
 	D3D11Device::D3D11Device( ID3D11Device * D3D11device ) : mD3D11Device(D3D11device)
 	{
 		D3D11device->GetImmediateContext(&mImmediateContext);
+
+		ID3D11InfoQueue * pInfoQueue = NULL; 
+		HRESULT hr = mD3D11Device->QueryInterface(__uuidof(ID3D11InfoQueue), (LPVOID*)&pInfoQueue);
+
+		if (SUCCEEDED(hr))
+		{
+			pInfoQueue->ClearStoredMessages();
+			pInfoQueue->ClearRetrievalFilter();
+			pInfoQueue->ClearStorageFilter();
+
+			D3D11_INFO_QUEUE_FILTER filter;
+			ZeroMemory(&filter, sizeof(D3D11_INFO_QUEUE_FILTER));
+			std::vector<D3D11_MESSAGE_SEVERITY> severityList;
+
+			switch(mExceptionsErrorLevel)
+			{
+			case D3D_NO_EXCEPTION:
+				severityList.push_back(D3D11_MESSAGE_SEVERITY_CORRUPTION);
+			case D3D_CORRUPTION:
+				severityList.push_back(D3D11_MESSAGE_SEVERITY_ERROR);
+			case D3D_ERROR:
+				severityList.push_back(D3D11_MESSAGE_SEVERITY_WARNING);
+			case D3D_WARNING:
+			case D3D_INFO:
+				severityList.push_back(D3D11_MESSAGE_SEVERITY_INFO);
+			default: 
+				break;
+			}
+
+
+			if (severityList.size() > 0)
+			{
+				filter.DenyList.NumSeverities = severityList.size();
+				filter.DenyList.pSeverityList = &severityList[0];
+			}
+
+			pInfoQueue->AddStorageFilterEntries(&filter);
+			pInfoQueue->AddRetrievalFilterEntries(&filter);
+		}
+
 	}
 	//---------------------------------------------------------------------
 	D3D11Device::D3D11Device() : mD3D11Device(0), mImmediateContext(0)

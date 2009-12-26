@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreD3D11Prerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreD3D11VertexDeclaration.h"
 
 
 namespace Ogre {
@@ -108,12 +109,9 @@ namespace Ogre {
 		D3D11_SHADER_BUFFER_DESC mConstantBufferDesc ;
 		D3D11_SHADER_DESC mShaderDesc;
 
-// this is a temp patch for the nov 08 DX SDK
-#ifdef D3DX11ReflectShader 
-		ID3D11ShaderReflection1* mpIShaderReflection;
-#else
+		D3D11VertexDeclaration mInputVertexDeclaration;
+
 		ID3D11ShaderReflection* mpIShaderReflection;
-#endif
 
 		ID3D11VertexShader* mpVertexShader;
 		ID3D11PixelShader* mpPixelShader;
@@ -177,6 +175,8 @@ namespace Ogre {
 		/** Internal load implementation, must be implemented by subclasses.
 		*/
 		void loadFromSource(void);
+
+		D3D11VertexDeclaration & getInputVertexDeclaration() { return mInputVertexDeclaration; }
 
 	};
 }
