@@ -998,7 +998,7 @@ namespace Ogre {
                        axisX.z, axisY.z, axisZ.z);
 	}
 	//--------------------------------------------------------------------------
-	Vector3 & InstancedGeometry::InstancedObject::getPosition(void)
+	const Vector3 & InstancedGeometry::InstancedObject::getPosition(void) const
 	{
 		return mPosition;
 	}
@@ -1030,6 +1030,12 @@ namespace Ogre {
 		mScale=scale;
 		needUpdate();
 	}
+
+	const Vector3& InstancedGeometry::InstancedObject::getScale() const
+	{
+		return mScale;
+	}
+
 	//--------------------------------------------------------------------------
 	void InstancedGeometry::InstancedObject::rotate(const Quaternion& q)
 	{
@@ -1231,18 +1237,55 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	void InstancedGeometry::BatchInstance::updateBoundingBox()
 	{
+			AxisAlignedBox aabb;
 
-			Vector3 *Positions = OGRE_ALLOC_T(Vector3, mInstancesMap.size(), MEMCATEGORY_GEOMETRY);
-
-			ObjectsMap::iterator objIt;
-			size_t k = 0;
-			for(objIt=mInstancesMap.begin();objIt!=mInstancesMap.end();objIt++)
-			{
-				Positions[k++] = objIt->second->getPosition();
+			//Get the first GeometryBucket to get the aabb
+			LODIterator lodIterator = getLODIterator();
+			if( lodIterator.hasMoreElements() )
+			{			
+				LODBucket* lod = lodIterator.getNext();
+				LODBucket::MaterialIterator matIt = lod->getMaterialIterator();
+				if( matIt.hasMoreElements() )
+				{					
+					MaterialBucket*mat = matIt.getNext();
+					MaterialBucket::GeometryIterator geomIt = mat->getGeometryIterator();
+					if( geomIt.hasMoreElements() )
+					{
+						GeometryBucket *geom = geomIt.getNext();
+						aabb = geom->getAABB();
+					}
+				}
 			}
 
-			LODIterator lodIterator = getLODIterator();
-			while (lodIterator.hasMoreElements())
+			ObjectsMap::iterator objIt;
+			Vector3 vMin( Vector3::ZERO );
+			Vector3 vMax( Vector3::ZERO );
+			if( !mInstancesMap.empty() )
+			{
+				objIt = mInstancesMap.begin();
+				vMin = objIt->second->getPosition() + aabb.getMinimum();
+				vMax = objIt->second->getPosition() + aabb.getMaximum();
+			}
+
+			for( objIt=mInstancesMap.begin(); objIt!=mInstancesMap.end(); objIt++ )
+			{
+				const Vector3 &position = objIt->second->getPosition();
+				const Vector3 &scale	= objIt->second->getScale();
+
+				vMin.x = std::min( vMin.x, position.x + aabb.getMinimum().x * scale.x );
+				vMin.y = std::min( vMin.y, position.y + aabb.getMinimum().y * scale.y );
+				vMin.z = std::min( vMin.z, position.z + aabb.getMinimum().z * scale.z );
+
+				vMax.x = std::max( vMax.x, position.x + aabb.getMaximum().x * scale.x );
+				vMax.y = std::max( vMax.y, position.y + aabb.getMaximum().y * scale.y );
+				vMax.z = std::max( vMax.z, position.z + aabb.getMaximum().z * scale.z );
+			}
+
+			aabb.setExtents( vMin, vMax );
+
+			//Now apply the bounding box
+			lodIterator = getLODIterator();
+			while( lodIterator.hasMoreElements() )
 			{			
 				LODBucket* lod = lodIterator.getNext();
 				LODBucket::MaterialIterator matIt = lod->getMaterialIterator();
@@ -1250,45 +1293,17 @@ namespace Ogre {
 				{					
 					MaterialBucket*mat = matIt.getNext();
 					MaterialBucket::GeometryIterator geomIt = mat->getGeometryIterator();
-					while(geomIt.hasMoreElements())
+					while( geomIt.hasMoreElements() )
 					{
-						// to generate the boundingBox
-						Real Xmin= Positions[0].x;
-						Real Ymin= Positions[0].y;
-						Real Zmin= Positions[0].z;
-
-						Real Xmax= Positions[0].x;
-						Real Ymax= Positions[0].y;
-						Real Zmax= Positions[0].z;
-
-						GeometryBucket*geom=geomIt.getNext();
-						for (size_t i = 0; i < mInstancesMap.size (); i++)
-						{
-							if(Positions[i].x<Xmin)
-								Xmin = Positions[i].x;
-							if(Positions[i].y<Ymin)
-								Ymin = Positions[i].y;
-							if(Positions[i].z<Zmin)
-								Zmin = Positions[i].z;
-							if(Positions[i].x>Xmax)
-								Xmax = Positions[i].x;
-							if(Positions[i].y>Ymax)
-								Ymax = Positions[i].y;
-							if(Positions[i].z>Zmax)
-								Zmax = Positions[i].z;
-						}
-						geom->setBoundingBox(AxisAlignedBox(Xmin,Ymin,Zmin,Xmax,Ymax,Zmax));						
+						GeometryBucket *geom = geomIt.getNext();
+						geom->setBoundingBox( aabb );
                         this->mNode->_updateBounds();
-						mAABB=AxisAlignedBox(
-							Vector3(Xmin,Ymin,Zmin) + geom->getAABB().getMinimum(),
-							Vector3(Xmax,Ymax,Zmax) + geom->getAABB().getMaximum());
-					
+						mAABB = aabb;
 					}
 				}
 			}
-
-			OGRE_FREE(Positions, MEMCATEGORY_GEOMETRY);		
 	}
+
 	
 	
 	

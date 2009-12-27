@@ -287,12 +287,13 @@ namespace Ogre {
 			InstancedObject(unsigned short index,SkeletonInstance *skeleton,AnimationStateSet*animations);
 			~InstancedObject();
 			void setPosition( Vector3  position);
-			Vector3 & getPosition(void);
+			const Vector3& getPosition(void) const;
 			void yaw(const Radian& angle);
 			void pitch(const Radian& angle);
 			void roll(const Radian& angle);
 			void rotate(const Quaternion& q);
 			void setScale(const Vector3& scale);
+			const Vector3& getScale() const;
 	        void setOrientation(const Quaternion& q);
 	        void setPositionAndOrientation(Vector3 p, const Quaternion& q);
             Quaternion & getOrientation(void);
