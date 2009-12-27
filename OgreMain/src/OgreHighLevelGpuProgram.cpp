@@ -63,7 +63,7 @@ namespace Ogre
     //---------------------------------------------------------------------------
     void HighLevelGpuProgram::unloadImpl()
     {   
-        if (!mAssemblerProgram.isNull())
+        if (!mAssemblerProgram.isNull() && mAssemblerProgram.getPointer() != this)
         {
             mAssemblerProgram->getCreator()->remove(mAssemblerProgram->getHandle());
             mAssemblerProgram.setNull();
