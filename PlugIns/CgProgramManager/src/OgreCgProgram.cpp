@@ -151,10 +151,9 @@ namespace Ogre {
 		{
 
 			if ( false
-#ifdef CG_PROFILE_VS_4_0
+// the hlsl 4 profiles are only supported in OGRE from CG 2.2
+#if(CG_VERSION_NUM >= 2200)
 				|| mSelectedCgProfile == CG_PROFILE_VS_4_0
-#endif
-#ifdef CG_PROFILE_PS_4_0
 				 || mSelectedCgProfile == CG_PROFILE_PS_4_0
 #endif
 				 )
@@ -164,11 +163,7 @@ namespace Ogre {
 					HighLevelGpuProgramManager::getSingleton().createProgram(
 					mName, mGroup, "hlsl", mType);
 				String hlslSourceFromCg = cgGetProgramString(mCgProgram, CG_COMPILED_PROGRAM);
-				// HACK START
-				// Assaf: This is a hack - in Cg ver 2.1 all the parameters had a strange prefix 
-				// that needed to be deleted
-				hlslSourceFromCg = StringUtil::replaceAll(hlslSourceFromCg, "_ZZ4S", ""); 
-				// HACK END
+				
 				vp->setSource(hlslSourceFromCg);
 				vp->setParameter("target", mSelectedProfile);
 				vp->setParameter("entry_point", "main");
