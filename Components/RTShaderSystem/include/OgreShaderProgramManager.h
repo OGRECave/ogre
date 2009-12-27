@@ -196,6 +196,10 @@ protected:
 	/** Return the number of created fragment shaders. */
 	size_t			getFragmentShaderCount		() const { return mFragmentShaderCount; }
 
+	/** Fix the input of the pixel shader to be the same as the output of the vertex shader */
+	void synchronizePixelnToBeVertexOut( ProgramSet* programSet );
+
+
 protected:
 	
 

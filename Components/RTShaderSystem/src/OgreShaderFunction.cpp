@@ -340,6 +340,17 @@ void Function::deleteOutputParameter(ParameterPtr parameter)
 }
 
 //-----------------------------------------------------------------------------
+void Function::deleteAllInputParameters()
+{
+	mInputParameters.clear();
+}
+
+//-----------------------------------------------------------------------------
+void Function::deleteAllOutputParameters()
+{
+	mOutputParameters.clear();
+}
+//-----------------------------------------------------------------------------
 void Function::addParameter(ShaderParameterList& parameterList, ParameterPtr parameter)
 										
 {

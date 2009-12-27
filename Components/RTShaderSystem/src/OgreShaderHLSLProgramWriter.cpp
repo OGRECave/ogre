@@ -118,6 +118,7 @@ void HLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 		Function* curFunction = *itFunction;
 
 		writeFunctionTitle(os, curFunction);
+
 		writeFunctionDeclaration(os, curFunction);
 
 		os << "{" << std::endl;
@@ -183,7 +184,7 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, ParameterPtr par
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const String overrideType)
+void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const String & overrideType)
 {
 	if (overrideType.size() > 0)
 	{
@@ -199,8 +200,22 @@ void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr pa
 
 	if (parameter->getSemantic() != Parameter::SPS_UNKNOWN)
 	{
-		os << " : " << mParamSemanticMap[parameter->getSemantic()];				
-		if (parameter->getSemantic() != Parameter::SPS_POSITION && parameter->getIndex() >= 0)
+		os << " : ";
+		
+		if (parameter->getSemantic() == Parameter::SPS_POSITION && parameter->getIndex() == 0)
+		{
+			// in hlsl the position with the first index has a special type
+			os << "SV_POSITION";
+		}
+		else
+		{
+			os << mParamSemanticMap[parameter->getSemantic()];
+		}
+
+		if (parameter->getSemantic() != Parameter::SPS_POSITION && 
+			parameter->getSemantic() != Parameter::SPS_NORMAL &&
+			parameter->getSemantic() != Parameter::SPS_COLOR &&
+			parameter->getIndex() >= 0)
 		{			
 			os << StringConverter::toString(parameter->getIndex()).c_str();
 		}
@@ -234,6 +249,7 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
 
 	// for shader model 4 - we need to get the color as unsigned int
 	bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0");
+
 	// Write input parameters.
 	for (it=inParams.begin(); it != inParams.end(); ++it)
 	{					
@@ -258,39 +274,25 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
 		curParamIndex++;
 	}
 
-	if (function->getFunctionType() == Function::FFT_PS_MAIN)
+	// Write output parameters.
+	for (it=outParams.begin(); it != outParams.end(); ++it)
 	{
-		os << "\t out float4\toColor_0 : SV_Target" << std::endl;
-	}
-	else
-	{
-		// Write output parameters.
-		for (it=outParams.begin(); it != outParams.end(); ++it)
+		os << "\t out ";
+		if (function->getFunctionType() == Function::FFT_PS_MAIN)
 		{
-			if (function->getFunctionType() == Function::FFT_VS_MAIN &&
-				(*it)->getSemantic() == Parameter::SPS_POSITION && 
-				(*it)->getIndex() == 0
-				)
-			{
-				// the position has to be last for shader model 4
-				continue;
-			}
-
-			os << "\t out ";
-			writeFunctionParameter(os, *it);
-
-			if (curParamIndex + 1 != paramsCount)				
-				os << ", " << std::endl;
-
-			curParamIndex++;
-		}	
-
-		if (function->getFunctionType() == Function::FFT_VS_MAIN)
-		{
-			os << "\t out float4\toPos_0 : SV_POSITION" << std::endl;
+			os << mGpuConstTypeMap[(*it)->getType()] << " " << (*it)->getName() << " : SV_Target" << std::endl;
 		}
-	}
+		else
+		{
+			writeFunctionParameter(os, *it);
+		}
 
+		if (curParamIndex + 1 != paramsCount)				
+			os << ", " << std::endl;
+
+		curParamIndex++;
+	}	
+	
 	os << std::endl << "\t)" << std::endl;
 }
 
@@ -302,5 +304,7 @@ void HLSLProgramWriter::writeAtomInstance(std::ostream& os, FunctionAtom* atom)
 	os << std::endl;
 }
 
+/** @} */
+/** @} */
 }
 }

@@ -82,7 +82,7 @@ protected:
 	void		writeUniformParameter		(std::ostream& os, ParameterPtr parameter);
 
 	/** Write a function parameter. */
-	void		writeFunctionParameter		(std::ostream& os, ParameterPtr parameter, const String overrideType = "");
+	void		writeFunctionParameter		(std::ostream& os, ParameterPtr parameter, const String & overrideType = "");
 
 	/** Write a local parameter. */
 	void		writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
@@ -91,8 +91,7 @@ protected:
 	void		writeFunctionDeclaration	(std::ostream& os, Function* function);
 
 	/** Write function atom instance. */
-	void		writeAtomInstance			(std::ostream& os, FunctionAtom* atom);
-
+	void		writeAtomInstance			(std::ostream& os, FunctionAtom* atom);	
 
 protected:
 	typedef		map<GpuConstantType, const char*>::type		GpuConstTypeToStringMap;
@@ -136,6 +135,7 @@ private:
 	String mLanguage;
 
 };
+
 
 /** @} */
 /** @} */

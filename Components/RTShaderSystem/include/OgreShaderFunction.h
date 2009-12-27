@@ -109,7 +109,7 @@ public:
 	@param name The name of the parameter to search in the list.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	ParameterPtr				getParameterByName		(const ShaderParameterList& parameterList, const String& name);
+	static ParameterPtr				getParameterByName		(const ShaderParameterList& parameterList, const String& name);
 
 	/** 
 	Get parameter by a given semantic and index from the given parameter list.
@@ -118,7 +118,7 @@ public:
 	@param index The index of the parameter to search in the list.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	ParameterPtr				getParameterBySemantic	(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index);
+	static ParameterPtr				getParameterBySemantic	(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index);
 
 
 	/** 
@@ -164,11 +164,17 @@ public:
 	/** Add output parameter to this function. */
 	void						addOutputParameter			(ParameterPtr parameter);
 
-	/** Delete input parameter to this function. */
+	/** Delete input parameter from this function. */
 	void						deleteInputParameter		(ParameterPtr parameter);
 
-	/** Delete output parameter to this function. */
+	/** Delete output parameter from this function. */
 	void						deleteOutputParameter		(ParameterPtr parameter);
+
+	/** Delete all input parameters from this function. */
+	void						deleteAllInputParameters	();
+
+	/** Delete all output parameters from this function. */
+	void						deleteAllOutputParameters	();
 
 	/** get function type. */
 	FunctionType getFunctionType() const;

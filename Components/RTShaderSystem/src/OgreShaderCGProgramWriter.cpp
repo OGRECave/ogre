@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "OgreShaderCGProgramWriter.h"
 #include "OgreStringConverter.h"
+#include "OgreGpuProgramManager.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -182,16 +183,29 @@ void CGProgramWriter::writeUniformParameter(std::ostream& os, ParameterPtr param
 }
 
 //-----------------------------------------------------------------------
-void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter)
+void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const String & overrideType)
 {
-	os << mGpuConstTypeMap[parameter->getType()];
+	if (overrideType.size() > 0)
+	{
+		os << overrideType.c_str();
+	}
+	else
+	{
+		os << mGpuConstTypeMap[parameter->getType()];
+	}
+
 	os << "\t";	
 	os << parameter->getName();	
 
 	if (parameter->getSemantic() != Parameter::SPS_UNKNOWN)
 	{
-		os << " : " << mParamSemanticMap[parameter->getSemantic()];				
-		if (parameter->getSemantic() != Parameter::SPS_POSITION && parameter->getIndex() >= 0)
+		os << " : ";
+		os << mParamSemanticMap[parameter->getSemantic()];
+
+		if (parameter->getSemantic() != Parameter::SPS_POSITION && 
+			parameter->getSemantic() != Parameter::SPS_NORMAL &&
+			parameter->getSemantic() != Parameter::SPS_COLOR &&
+			parameter->getIndex() >= 0)
 		{			
 			os << StringConverter::toString(parameter->getIndex()).c_str();
 		}
@@ -223,11 +237,25 @@ void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* funct
 	size_t paramsCount = inParams.size() + outParams.size();
 	size_t curParamIndex = 0;
 
+	// for shader model 4 - we need to get the color as unsigned int
+	bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0");
+
 	// Write input parameters.
 	for (it=inParams.begin(); it != inParams.end(); ++it)
 	{					
 		os << "\t in ";
-		writeFunctionParameter(os, *it);
+
+		if (isVs4 &&
+			function->getFunctionType() == Function::FFT_VS_MAIN &&
+			(*it)->getSemantic() == Parameter::SPS_COLOR 
+			)
+		{
+			writeFunctionParameter(os, *it, "unsigned int");
+		}
+		else
+		{
+			writeFunctionParameter(os, *it);
+		}
 
 		if (curParamIndex + 1 != paramsCount)		
 			os << ", " << std::endl;
