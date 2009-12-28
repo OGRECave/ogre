@@ -104,10 +104,15 @@ ShaderGenerator::ShaderGenerator()
 	}
 	else
 	{
+		// ASSAF: This is disabled for now - to stop an exception on the iPhone
+		// when running with the OpenGL ES 1.x that doesn't support shaders...
+		/*
 		OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
 			"ShaderGenerator creation error: None of the profiles is supported.", 
 			"ShaderGenerator::ShaderGenerator" );
 
+		*/
+		mShaderLanguage	= "None of the profiles is supported."; // HACK for now.
 	}
 
 	setVertexShaderProfiles("gpu_vp gp4vp vp40 vp30 arbvp1 vs_4_0 vs_3_0 vs_2_x vs_2_a vs_2_0 vs_1_1");
