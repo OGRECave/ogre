@@ -792,6 +792,14 @@ namespace Ogre
 			texCoordSet = generateVpDynamicShadowsParams(texCoordSet, prof, terrain, tt, outStream);
 		}
 
+		// check we haven't exceeded texture coordinates
+		if (texCoordSet > 8)
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Requested options require too many texture coordinate sets! Try reducing the number of layers.",
+				__FUNCTION__);
+		}
+
 		outStream <<
 			")\n"
 			"{\n"
@@ -962,6 +970,14 @@ namespace Ogre
 		if (prof->isShadowingEnabled(tt, terrain))
 		{
 			generateFpDynamicShadowsParams(&texCoordSet, &currentSamplerIdx, prof, terrain, tt, outStream);
+		}
+
+		// check we haven't exceeded samplers
+		if (currentSamplerIdx > 16)
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Requested options require too many texture samplers! Try reducing the number of layers.",
+				__FUNCTION__);
 		}
 
 		outStream << 
