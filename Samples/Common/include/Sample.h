@@ -34,6 +34,10 @@
 
 #ifdef USE_RTSHADER_SYSTEM
 #include "OgreRTShaderSystem.h"
+
+// Remove the comment below in order to make the RTSS use valid path for writing down the generated shaders.
+// If cache path is not set - all shaders are generated to system memory.
+//#define _RTSS_WRITE_SHADERS_TO_DISK
 #endif
 
 
@@ -376,9 +380,7 @@ namespace OgreBites
 				Ogre::StringVector::iterator itGroupEnd = groupVector.end();
 				Ogre::String shaderCoreLibsPath;
 				Ogre::String shaderCachePath;
-
-				// Default cache path is current directory;
-				shaderCachePath = "./";
+			
 				for (; itGroup != itGroupEnd; ++itGroup)
 				{
 					Ogre::ResourceGroupManager::LocationList resLocationsList = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(*itGroup);
@@ -407,10 +409,11 @@ namespace OgreBites
 				// Core shader libs not found -> shader generating will fail.
 				if (shaderCoreLibsPath.empty())			
 					return false;			
-				
+								
+#ifdef _RTSS_WRITE_SHADERS_TO_DISK
 				// Set shader cache path.
 				mShaderGenerator->setShaderCachePath(shaderCachePath);		
-
+#endif
 				// Create and register the material manager listener.
 				mMaterialMgrListener = new ShaderGeneratorTechniqueResolverListener(mShaderGenerator);				
 				Ogre::MaterialManager::getSingleton().addListener(mMaterialMgrListener);

@@ -867,12 +867,8 @@ SGMaterialSerializerListener* ShaderGenerator::getMaterialSerializerListener()
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::setShaderCachePath( const String& cachePath )
-{
-	if (mShaderCachePath.length() > 0)	
-		ResourceGroupManager::getSingleton().removeResourceLocation(mShaderCachePath);	
-	
+{	
 	mShaderCachePath = cachePath;
-	ResourceGroupManager::getSingleton().addResourceLocation(mShaderCachePath, "FileSystem");
 }
 
 //-----------------------------------------------------------------------------
@@ -1556,6 +1552,13 @@ void ShaderGenerator::SGScheme::synchronizeWithFogSettings()
 //-----------------------------------------------------------------------------
 bool ShaderGenerator::SGScheme::validate(const String& materialName)
 {
+	// Synchronize with light settings.
+	synchronizeWithLightSettings();
+
+	// Synchronize with fog settings.
+	synchronizeWithFogSettings();
+
+
 	SGTechniqueIterator itTech;
 	
 	// Find the desired technique.

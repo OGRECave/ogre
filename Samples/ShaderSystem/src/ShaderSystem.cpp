@@ -943,11 +943,39 @@ void Sample_ShaderSystem::loadResources()
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::createPrivateResourceGroup()
 {
-	// Create the resource group of the RT Shader System.
+	// Create the resource group of the RT Shader System Sample.
 	ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
+	Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
+	Ogre::StringVector::iterator itGroup = groupVector.begin();
+	Ogre::StringVector::iterator itGroupEnd = groupVector.end();
+	Ogre::String shaderCoreLibsPath;
+	
+
+	for (; itGroup != itGroupEnd; ++itGroup)
+	{
+		Ogre::ResourceGroupManager::LocationList resLocationsList = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(*itGroup);
+		Ogre::ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
+		Ogre::ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
+		bool coreLibsFound = false;
+
+		// Find the location of the core shader libs
+		for (; it != itEnd; ++it)
+		{
+			if ((*it)->archive->getName().find("RTShaderLib") != Ogre::String::npos)
+			{
+				shaderCoreLibsPath = (*it)->archive->getName() + "/";	
+				coreLibsFound = true;
+				break;
+			}
+		}
+
+		// Core libs path found in the current group.
+		if (coreLibsFound) 
+			break; 
+	}
 
 	rgm.createResourceGroup(SAMPLE_MATERIAL_GROUP, false);
-	rgm.addResourceLocation(mShaderGenerator->getShaderCachePath() + "materials", "FileSystem", SAMPLE_MATERIAL_GROUP);		
+	rgm.addResourceLocation(shaderCoreLibsPath + "materials", "FileSystem", SAMPLE_MATERIAL_GROUP);		
 	rgm.initialiseResourceGroup(SAMPLE_MATERIAL_GROUP);
 	rgm.loadResourceGroup(SAMPLE_MATERIAL_GROUP, true);
 }

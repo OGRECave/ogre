@@ -155,10 +155,38 @@ protected:
 	{		
 #ifdef USE_RTSHADER_SYSTEM
 		ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
+		Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
+		Ogre::StringVector::iterator itGroup = groupVector.begin();
+		Ogre::StringVector::iterator itGroupEnd = groupVector.end();
+		Ogre::String shaderCoreLibsPath;
+
+
+		for (; itGroup != itGroupEnd; ++itGroup)
+		{
+			Ogre::ResourceGroupManager::LocationList resLocationsList = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(*itGroup);
+			Ogre::ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
+			Ogre::ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
+			bool coreLibsFound = false;
+
+			// Find the location of the core shader libs
+			for (; it != itEnd; ++it)
+			{
+				if ((*it)->archive->getName().find("RTShaderLib") != Ogre::String::npos)
+				{
+					shaderCoreLibsPath = (*it)->archive->getName() + "/";	
+					coreLibsFound = true;
+					break;
+				}
+			}
+
+			// Core libs path found in the current group.
+			if (coreLibsFound) 
+				break; 
+		}
 		
 		// Create the resource group of the RT Shader System.
 		rgm.createResourceGroup("RTShaderSystemMaterialsGroup");
-		rgm.addResourceLocation(mShaderGenerator->getShaderCachePath() + "materials", "FileSystem", "RTShaderSystemMaterialsGroup");		
+		rgm.addResourceLocation(shaderCoreLibsPath + "materials", "FileSystem", "RTShaderSystemMaterialsGroup");		
 		rgm.initialiseResourceGroup("RTShaderSystemMaterialsGroup");
 		rgm.loadResourceGroup("RTShaderSystemMaterialsGroup", true);
 #endif
