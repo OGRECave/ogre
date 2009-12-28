@@ -116,10 +116,12 @@ void HLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
 	{
 		Function* curFunction = *itFunction;
+		bool needToTranslateHlsl4Color = false;
+		ParameterPtr colorParameter;
 
 		writeFunctionTitle(os, curFunction);
 
-		writeFunctionDeclaration(os, curFunction);
+		writeFunctionDeclaration(os, curFunction, needToTranslateHlsl4Color, colorParameter);
 
 		os << "{" << std::endl;
 
@@ -133,6 +135,14 @@ void HLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 			os << ";" << std::endl;						
 		}
 
+		//  translate hlsl 4 color parameter if needed
+		if(needToTranslateHlsl4Color)
+		{
+			os << "\t";
+			writeLocalParameter(os, colorParameter);			
+			os << ";" << std::endl;						
+			os << std::endl <<"\tFFP_Assign(iHlsl4Color_0, " << colorParameter->getName() << ");" << std::endl;
+		}
 
 		// Sort and write function atoms.
 		curFunction->sortAtomInstances();
@@ -184,16 +194,10 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, ParameterPtr par
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const String & overrideType)
+void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter)
 {
-	if (overrideType.size() > 0)
-	{
-		os << overrideType.c_str();
-	}
-	else
-	{
-		os << mGpuConstTypeMap[parameter->getType()];
-	}
+
+	os << mGpuConstTypeMap[parameter->getType()];
 	
 	os << "\t";	
 	os << parameter->getName();	
@@ -202,19 +206,11 @@ void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr pa
 	{
 		os << " : ";
 		
-		if (parameter->getSemantic() == Parameter::SPS_POSITION && parameter->getIndex() == 0)
-		{
-			// in hlsl the position with the first index has a special type
-			os << "SV_POSITION";
-		}
-		else
-		{
-			os << mParamSemanticMap[parameter->getSemantic()];
-		}
+		os << mParamSemanticMap[parameter->getSemantic()];
 
 		if (parameter->getSemantic() != Parameter::SPS_POSITION && 
 			parameter->getSemantic() != Parameter::SPS_NORMAL &&
-			parameter->getSemantic() != Parameter::SPS_COLOR &&
+			(!(parameter->getSemantic() == Parameter::SPS_COLOR && parameter->getIndex() == 0)) &&
 			parameter->getIndex() >= 0)
 		{			
 			os << StringConverter::toString(parameter->getIndex()).c_str();
@@ -231,7 +227,7 @@ void HLSLProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr param
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function)
+void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function, bool & needToTranslateHlsl4Color, ParameterPtr & colorParameter)
 {
 	const ShaderParameterList& inParams  = function->getInputParameters();
 	const ShaderParameterList& outParams = function->getOutputParameters();
@@ -260,7 +256,9 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
 			(*it)->getSemantic() == Parameter::SPS_COLOR 
 			)
 		{
-			writeFunctionParameter(os, *it, "unsigned int");
+			os << "unsigned int iHlsl4Color_0 : COLOR";
+			needToTranslateHlsl4Color = true;
+			colorParameter = *it;
 		}
 		else
 		{
@@ -278,7 +276,7 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
 	for (it=outParams.begin(); it != outParams.end(); ++it)
 	{
 		os << "\t out ";
-		if (function->getFunctionType() == Function::FFT_PS_MAIN)
+		if (isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN)
 		{
 			os << mGpuConstTypeMap[(*it)->getType()] << " " << (*it)->getName() << " : SV_Target" << std::endl;
 		}

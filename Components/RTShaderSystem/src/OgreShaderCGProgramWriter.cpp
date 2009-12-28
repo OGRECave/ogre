@@ -116,9 +116,11 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
 	{
 		Function* curFunction = *itFunction;
+		bool needToTranslateHlsl4Color = false;
+		ParameterPtr colorParameter;
 
 		writeFunctionTitle(os, curFunction);
-		writeFunctionDeclaration(os, curFunction);
+		writeFunctionDeclaration(os, curFunction, needToTranslateHlsl4Color, colorParameter);
 
 		os << "{" << std::endl;
 
@@ -131,6 +133,16 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 			writeLocalParameter(os, *itParam);			
 			os << ";" << std::endl;						
 		}
+
+		//  translate hlsl 4 color parameter if needed
+		if(needToTranslateHlsl4Color)
+		{
+			os << "\t";
+			writeLocalParameter(os, colorParameter);			
+			os << ";" << std::endl;						
+			os << std::endl <<"\tFFP_Assign(iHlsl4Color_0, " << colorParameter->getName() << ");" << std::endl;
+		}
+
 
 
 		// Sort and write function atoms.
@@ -183,16 +195,9 @@ void CGProgramWriter::writeUniformParameter(std::ostream& os, ParameterPtr param
 }
 
 //-----------------------------------------------------------------------
-void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const String & overrideType)
+void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter)
 {
-	if (overrideType.size() > 0)
-	{
-		os << overrideType.c_str();
-	}
-	else
-	{
-		os << mGpuConstTypeMap[parameter->getType()];
-	}
+	os << mGpuConstTypeMap[parameter->getType()];
 
 	os << "\t";	
 	os << parameter->getName();	
@@ -204,7 +209,7 @@ void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr para
 
 		if (parameter->getSemantic() != Parameter::SPS_POSITION && 
 			parameter->getSemantic() != Parameter::SPS_NORMAL &&
-			parameter->getSemantic() != Parameter::SPS_COLOR &&
+			(!(parameter->getSemantic() == Parameter::SPS_COLOR && parameter->getIndex() == 0)) &&
 			parameter->getIndex() >= 0)
 		{			
 			os << StringConverter::toString(parameter->getIndex()).c_str();
@@ -221,7 +226,7 @@ void CGProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr paramet
 }
 
 //-----------------------------------------------------------------------
-void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function)
+void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function, bool & needToTranslateHlsl4Color, ParameterPtr & colorParameter)
 {
 	const ShaderParameterList& inParams  = function->getInputParameters();
 	const ShaderParameterList& outParams = function->getOutputParameters();
@@ -250,7 +255,9 @@ void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* funct
 			(*it)->getSemantic() == Parameter::SPS_COLOR 
 			)
 		{
-			writeFunctionParameter(os, *it, "unsigned int");
+			os << "unsigned int iHlsl4Color_0 : COLOR";
+			needToTranslateHlsl4Color = true;
+			colorParameter = *it;
 		}
 		else
 		{
