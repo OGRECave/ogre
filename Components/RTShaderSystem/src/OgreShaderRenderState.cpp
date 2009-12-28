@@ -46,6 +46,10 @@ RenderState::RenderState()
 	mHashCodeValid			 = false;
 	mHashCode				 = 0;
 	mLightCountAutoUpdate	 = true;
+	
+	mLightCount[0]				= 0;
+	mLightCount[1]				= 0;
+	mLightCount[2]				= 0;
 }
 
 //-----------------------------------------------------------------------
