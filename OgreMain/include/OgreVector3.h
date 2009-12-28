@@ -559,7 +559,7 @@ namespace Ogre
         */
         inline Vector3 perpendicular(void) const
         {
-            static const Real fSquareZero = 1e-06 * 1e-06;
+            static const Real fSquareZero = (Real)(1e-06 * 1e-06);
 
             Vector3 perp = this->crossProduct( Vector3::UNIT_X );
 
