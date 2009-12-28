@@ -112,7 +112,7 @@ ShaderGenerator::ShaderGenerator()
 			"ShaderGenerator::ShaderGenerator" );
 
 		*/
-		mShaderLanguage	= "None of the profiles is supported."; // HACK for now.
+		mShaderLanguage	= "cg"; // HACK for now
 	}
 
 	setVertexShaderProfiles("gpu_vp gp4vp vp40 vp30 arbvp1 vs_4_0 vs_3_0 vs_2_x vs_2_a vs_2_0 vs_1_1");
