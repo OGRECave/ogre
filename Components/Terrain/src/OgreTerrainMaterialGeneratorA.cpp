@@ -755,14 +755,16 @@ namespace Ogre
 
 		outStream <<
 			"out float4 oPos : POSITION,\n"
-			"out float2 oUV : TEXCOORD0, \n"
-			"out float4 oPosObj : TEXCOORD1 \n";
+			"out float4 oPosObj : TEXCOORD0 \n";
+
+		uint texCoordSet = 1;
+		outStream <<
+			", out float4 oUVMisc : TEXCOORD" << texCoordSet++ <<" // xy = uv, z = camDepth\n";
 
 		// layer UV's premultiplied, packed as xy/zw
 		uint numUVSets = numLayers / 2;
 		if (numLayers % 2)
 			++numUVSets;
-		uint texCoordSet = 2;
 		if (tt != LOW_LOD)
 		{
 			for (uint i = 0; i < numUVSets; ++i)
@@ -786,7 +788,9 @@ namespace Ogre
 		}
 
 		if (prof->isShadowingEnabled(tt, terrain))
+		{
 			texCoordSet = generateVpDynamicShadowsParams(texCoordSet, prof, terrain, tt, outStream);
+		}
 
 		outStream <<
 			")\n"
@@ -831,14 +835,7 @@ namespace Ogre
 
 
 		// generate UVs
-		if (tt == LOW_LOD)
-		{
-			// passthrough
-			outStream <<
-				"	oUV = uv;\n";
-
-		}
-		else
+		if (tt != LOW_LOD)
 		{
 			for (uint i = 0; i < numUVSets; ++i)
 			{
@@ -875,8 +872,11 @@ namespace Ogre
 
 		outStream << 
 			"float4 main_fp(\n"
-			"float2 uv : TEXCOORD0,\n"
-			"float4 position : TEXCOORD1,\n";
+			"float4 position : TEXCOORD0,\n";
+
+		uint texCoordSet = 1;
+		outStream <<
+			"float4 uvMisc : TEXCOORD" << texCoordSet++ << ",\n";
 
 		// UV's premultiplied, packed as xy/zw
 		uint maxLayers = prof->getMaxLayers(terrain);
@@ -885,7 +885,6 @@ namespace Ogre
 		uint numUVSets = numLayers / 2;
 		if (numLayers % 2)
 			++numUVSets;
-		uint texCoordSet = 2;
 		if (tt != LOW_LOD)
 		{
 			for (uint i = 0; i < numUVSets; ++i)
@@ -961,13 +960,16 @@ namespace Ogre
 		}
 
 		if (prof->isShadowingEnabled(tt, terrain))
+		{
 			generateFpDynamicShadowsParams(&texCoordSet, &currentSamplerIdx, prof, terrain, tt, outStream);
+		}
 
 		outStream << 
 			") : COLOR\n"
 			"{\n"
 			"	float4 outputCol;\n"
 			"	float shadow = 1.0;\n"
+			"	float2 uv = uvMisc.xy;\n"
 			// base colour
 			"	outputCol = float4(0,0,0,1);\n";
 
@@ -1130,7 +1132,7 @@ namespace Ogre
 
 		outStream << 
 			"	oPos = mul(viewProjMatrix, worldPos);\n"
-			"	oUV = uv.xy;\n";
+			"	oUVMisc.xy = uv.xy;\n";
 
 		bool fog = terrain->getSceneManager()->getFogMode() != FOG_NONE && tt != RENDER_COMPOSITE_MAP;
 		if (fog)
@@ -1369,11 +1371,6 @@ namespace Ogre
 					", uniform float4 depthRange" << i << " // x = min, y = max, z = range, w = 1/range \n";
 			}
 		}
-		if (prof->getReceiveDynamicShadowsPSSM())
-		{
-			outStream <<
-				", out float oCamDepth : TEXCOORD" << texCoord++ << " \n";
-		}
 
 		return texCoord;
 
@@ -1407,7 +1404,7 @@ namespace Ogre
 		{
 			outStream <<
 				"	// pass cam depth\n"
-				"	oCamDepth = oPos.z;\n";
+				"	oUVMisc.z = oPos.z;\n";
 		}
 
 	}
@@ -1442,14 +1439,6 @@ namespace Ogre
 			}
 		}
 
-		if (prof->getReceiveDynamicShadowsPSSM())
-		{
-			outStream <<
-				", float camDepth : TEXCOORD" << *texCoord << " \n";
-			*texCoord = *texCoord + 1;
-		}
-
-
 	}
 	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateFpDynamicShadows(
@@ -1458,6 +1447,9 @@ namespace Ogre
 		if (prof->getReceiveDynamicShadowsPSSM())
 		{
 			uint numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+			outStream << 
+				"	float camDepth = uvMisc.z;\n";
+
 			if (prof->getReceiveDynamicShadowsDepth())
 			{
 				outStream << 
