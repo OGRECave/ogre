@@ -122,7 +122,7 @@ namespace Ogre {
 	  , mRenderSystemCapabilitiesManager(0)
 	  , mNextFrame(0)
 	  , mFrameSmoothingTime(0.0f)
-	  , mRemoveQueueStructuresOnClear(true)
+	  , mRemoveQueueStructuresOnClear(false)
 	  , mNextMovableObjectTypeFlag(1)
 	  , mIsInitialised(false)
     {
