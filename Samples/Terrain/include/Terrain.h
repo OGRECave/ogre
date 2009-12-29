@@ -14,10 +14,6 @@ same license as the rest of the engine.
 #ifndef __Terrain_H__
 #define __Terrain_H__
 
-//#define SHADOWS
-//#define DEPTH_SHADOWS
-//#define SHADOWS_IN_LOW_LOD_MATERIAL
-
 //#define PAGING
 
 #define TERRAIN_PAGE_MIN_X 0
@@ -375,6 +371,11 @@ public:
 		{
 			mMode = (Mode)mEditMenu->getSelectionIndex();
 		}
+		else if (menu == mShadowsMenu)
+		{
+			mShadowMode = (ShadowMode)mShadowsMenu->getSelectionIndex();
+			changeShadows();
+		}
 	}
 
 	void checkBoxToggled(CheckBox* box)
@@ -412,7 +413,15 @@ protected:
 		MODE_EDIT_BLEND = 2,
 		MODE_COUNT = 3
 	};
+	enum ShadowMode
+	{
+		SHADOWS_NONE = 0,
+		SHADOWS_COLOUR = 1,
+		SHADOWS_DEPTH = 2,
+		SHADOWS_COUNT = 3
+	};
 	Mode mMode;
+	ShadowMode mShadowMode;
 	uint8 mLayerEdit;
 	Real mBrushSizeTerrainSpace;
 	SceneNode* mEditNode;
@@ -421,10 +430,15 @@ protected:
 	Real mUpdateRate;
 	Vector3 mTerrainPos;
 	SelectMenu* mEditMenu;
+	SelectMenu* mShadowsMenu;
 	CheckBox* mFlyBox;
 	OgreBites::Label* mInfoLabel;
 	bool mTerrainsImported;
 	ShadowCameraSetupPtr mPSSMSetup;
+
+	typedef std::list<Entity*> EntityList;
+	EntityList mHouseList;
+
 
 
 	void defineTerrain(long x, long y, bool flat = false)
@@ -563,11 +577,17 @@ protected:
 	void addTextureDebugOverlay(TrayLocation loc, const String& texname, size_t i)
 	{
 		// Create material
-		MaterialPtr debugMat = MaterialManager::getSingleton().create(
-			"Ogre/DebugTexture" + StringConverter::toString(i), 
-			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		debugMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
-		TextureUnitState *t = debugMat->getTechnique(0)->getPass(0)->createTextureUnitState(texname);
+		String matName = "Ogre/DebugTexture" + StringConverter::toString(i);
+		MaterialPtr debugMat = MaterialManager::getSingleton().getByName(matName);
+		if (debugMat.isNull())
+		{
+			debugMat = MaterialManager::getSingleton().create(matName,
+				ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		}
+		Pass* p = debugMat->getTechnique(0)->getPass(0);
+		p->removeAllTextureUnitStates();
+		p->setLightingEnabled(false);
+		TextureUnitState *t = p->createTextureUnitState(texname);
 		t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 
 		// create template
@@ -580,9 +600,14 @@ protected:
 		}
 
 		// add widget
-		DecorWidget* debugPanel = mTrayMgr->createDecorWidget(
-			loc, "DebugTex"+ StringConverter::toString(i), "Panel", "Ogre/DebugTexOverlay");
-		debugPanel->getOverlayElement()->setMaterialName(debugMat->getName());
+		String widgetName = "DebugTex"+ StringConverter::toString(i);
+		Widget* w = mTrayMgr->getWidget(widgetName);
+		if (!w)
+		{
+			w = mTrayMgr->createDecorWidget(
+				loc, widgetName, "Panel", "Ogre/DebugTexOverlay");
+		}
+		w->getOverlayElement()->setMaterialName(matName);
 
 	}
 
@@ -624,6 +649,11 @@ protected:
 		return ret;
 	}
 
+	void changeShadows()
+	{
+		configureShadows(mShadowMode != SHADOWS_NONE, mShadowMode == SHADOWS_DEPTH);
+	}
+
 	void configureShadows(bool enabled, bool depthShadows)
 	{
 		TerrainMaterialGeneratorA::SM2Profile* matProfile = 
@@ -635,6 +665,12 @@ protected:
 		matProfile->setReceiveDynamicShadowsLowLod(false);
 #endif
 
+		// Default materials
+		for (EntityList::iterator i = mHouseList.begin(); i != mHouseList.end(); ++i)
+		{
+			(*i)->setMaterialName("Examples/TudorHouse");
+		}
+
 		if (enabled)
 		{
 			// General scene setup
@@ -643,21 +679,6 @@ protected:
 
 			// 3 textures per directional light (PSSM)
 			mSceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
-
-			if (depthShadows)
-			{
-				mSceneMgr->setShadowTextureSettings(1024, 3, PF_FLOAT32_R);
-				mSceneMgr->setShadowTextureSelfShadow(true);
-				mSceneMgr->setShadowCasterRenderBackFaces(true);
-				mSceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
-			}
-			else
-			{
-				mSceneMgr->setShadowTextureSettings(1024, 3, PF_X8B8G8R8);
-				mSceneMgr->setShadowTextureSelfShadow(false);
-				mSceneMgr->setShadowCasterRenderBackFaces(false);
-				mSceneMgr->setShadowTextureCasterMaterial(StringUtil::BLANK);
-			}
 
 			if (mPSSMSetup.isNull())
 			{
@@ -670,22 +691,50 @@ protected:
 				pssmSetup->setOptimalAdjustFactor(2, 0.5);
 
 				mPSSMSetup.bind(pssmSetup);
-				mSceneMgr->setShadowCameraSetup(mPSSMSetup);
 
+			}
+			mSceneMgr->setShadowCameraSetup(mPSSMSetup);
+
+			if (depthShadows)
+			{
+				mSceneMgr->setShadowTextureCount(3);
+				mSceneMgr->setShadowTextureConfig(0, 2048, 2048, PF_FLOAT32_R);
+				mSceneMgr->setShadowTextureConfig(1, 1024, 1024, PF_FLOAT32_R);
+				mSceneMgr->setShadowTextureConfig(2, 1024, 1024, PF_FLOAT32_R);
+				mSceneMgr->setShadowTextureSelfShadow(true);
+				mSceneMgr->setShadowCasterRenderBackFaces(true);
+				mSceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
+
+				MaterialPtr houseMat = buildDepthShadowMaterial("fw12b.jpg");
+				for (EntityList::iterator i = mHouseList.begin(); i != mHouseList.end(); ++i)
+				{
+					(*i)->setMaterial(houseMat);
+				}
+
+			}
+			else
+			{
+				mSceneMgr->setShadowTextureCount(3);
+				mSceneMgr->setShadowTextureConfig(0, 2048, 2048, PF_X8B8G8R8);
+				mSceneMgr->setShadowTextureConfig(1, 1024, 1024, PF_X8B8G8R8);
+				mSceneMgr->setShadowTextureConfig(2, 1024, 1024, PF_X8B8G8R8);
+				mSceneMgr->setShadowTextureSelfShadow(false);
+				mSceneMgr->setShadowCasterRenderBackFaces(false);
+				mSceneMgr->setShadowTextureCasterMaterial(StringUtil::BLANK);
 			}
 
 			matProfile->setReceiveDynamicShadowsDepth(depthShadows);
 			matProfile->setReceiveDynamicShadowsPSSM(static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get()));
+
+			//addTextureShadowDebugOverlay(TL_RIGHT, 3);
 
 
 		}
 		else
 		{
 			mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
-
 		}
 
-		addTextureShadowDebugOverlay(TL_RIGHT, 3);
 
 	}
 
@@ -696,8 +745,8 @@ protected:
 	{
 		SdkSample::setupView();
 
-		mCamera->setPosition(mTerrainPos + Vector3(-1000,50,1000));
-		mCamera->lookAt(mTerrainPos);
+		mCamera->setPosition(mTerrainPos + Vector3(1683, 50, 2116));
+		mCamera->lookAt(Vector3(1963, 50, 1660));
 		mCamera->setNearClipDistance(0.1);
 		mCamera->setFarClipDistance(50000);
 
@@ -727,16 +776,22 @@ protected:
 		mEditMenu->addItem("None");
 		mEditMenu->addItem("Elevation");
 		mEditMenu->addItem("Blend");
+		mEditMenu->selectItem(0);  // no edit mode
 
 		mFlyBox = mTrayMgr->createCheckBox(TL_BOTTOM, "Fly", "Fly");
 		mFlyBox->setChecked(false, false);
+
+		mShadowsMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "Shadows", "Shadows", 370, 250, 3);
+		mShadowsMenu->addItem("None");
+		mShadowsMenu->addItem("Colour Shadows");
+		mShadowsMenu->addItem("Depth Shadows");
+		mShadowsMenu->selectItem(0);  // no edit mode
 
 		// a friendly reminder
 		StringVector names;
 		names.push_back("Help");
 		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Help", 100, names)->setParamValue(0, "H/F1");
 
-		mEditMenu->selectItem(0);  // no edit mode
 	}
 
 	void setupContent()
@@ -763,13 +818,6 @@ protected:
 		Vector3 lightdir(0.55, -0.3, 0.75);
 		lightdir.normalise();
 
-#ifdef SHADOWS
-#  ifdef DEPTH_SHADOWS
-		configureShadows(true, true);
-#  else
-		configureShadows(true, false);
-#  endif
-#endif
 
 		Light* l = mSceneMgr->createLight("tstLight");
 		l->setType(Light::LT_DIRECTIONAL);
@@ -819,25 +867,34 @@ protected:
 
 
 
-#ifdef SHADOWS
 		// create a few entities on the terrain
-#ifdef DEPTH_SHADOWS
-		MaterialPtr ninjaDepthShadowMat = buildDepthShadowMaterial("nskingr.jpg");
-#endif
-		for (int i = 0; i < 20; ++i)
-		{
-			Entity* e = mSceneMgr->createEntity("ninja.mesh");
-#ifdef DEPTH_SHADOWS
-			e->setMaterial(ninjaDepthShadowMat);
-#endif
-			Real x = mTerrainPos.x + Math::RangeRandom(-2500, 2500);
-			Real z = mTerrainPos.z + Math::RangeRandom(-2500, 2500);
-			Real y = mTerrainGroup->getHeightAtWorldPosition(Vector3(x, 0, z));
-			Quaternion rot;
-			rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
-			mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(x, y, z), rot)->attachObject(e);
-		}
-#endif
+		Entity* e = mSceneMgr->createEntity("tudorhouse.mesh");
+		Vector3 entPos(mTerrainPos.x + 2043, 0, mTerrainPos.z + 1715);
+		Quaternion rot;
+		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5;
+		rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
+		SceneNode* sn = mSceneMgr->getRootSceneNode()->createChildSceneNode(entPos, rot);
+		sn->setScale(Vector3(0.12, 0.12, 0.12));
+		sn->attachObject(e);
+		mHouseList.push_back(e);
+
+		e = mSceneMgr->createEntity("tudorhouse.mesh");
+		entPos = Vector3(mTerrainPos.x + 1850, 0, mTerrainPos.z + 1478);
+		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5;
+		rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
+		sn = mSceneMgr->getRootSceneNode()->createChildSceneNode(entPos, rot);
+		sn->setScale(Vector3(0.12, 0.12, 0.12));
+		sn->attachObject(e);
+		mHouseList.push_back(e);
+
+		e = mSceneMgr->createEntity("tudorhouse.mesh");
+		entPos = Vector3(mTerrainPos.x + 1970, 0, mTerrainPos.z + 2180);
+		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5;
+		rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
+		sn = mSceneMgr->getRootSceneNode()->createChildSceneNode(entPos, rot);
+		sn->setScale(Vector3(0.12, 0.12, 0.12));
+		sn->attachObject(e);
+		mHouseList.push_back(e);
 
 		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
 
