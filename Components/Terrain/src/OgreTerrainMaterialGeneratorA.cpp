@@ -415,6 +415,7 @@ namespace Ogre
 		StringUtil::StrStreamType sourceStr;
 		generateVertexProgramSource(prof, terrain, tt, sourceStr);
 		ret->setSource(sourceStr.str());
+		ret->load();
 		defaultVpParams(prof, terrain, tt, ret);
 #if OGRE_DEBUG_MODE
 		LogManager::getSingleton().stream(LML_TRIVIAL) << "*** Terrain Vertex Program: " 
@@ -434,6 +435,7 @@ namespace Ogre
 		StringUtil::StrStreamType sourceStr;
 		generateFragmentProgramSource(prof, terrain, tt, sourceStr);
 		ret->setSource(sourceStr.str());
+		ret->load();
 		defaultFpParams(prof, terrain, tt, ret);
 
 #if OGRE_DEBUG_MODE
