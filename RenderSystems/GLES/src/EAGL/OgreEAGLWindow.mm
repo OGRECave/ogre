@@ -59,7 +59,6 @@ namespace Ogre {
             mVisible(false),
             mIsTopLevel(true),
             mIsExternalGLControl(false),
-            mCurrentOrientation(Viewport::OR_LANDSCAPELEFT),
             mGLSupport(glsupport)
     {
         mIsFullScreen = true;
@@ -100,7 +99,6 @@ namespace Ogre {
 
         if (mIsFullScreen)
         {
-            mGLSupport->switchMode();
             switchFullScreen(false);
         }
         
@@ -128,30 +126,7 @@ namespace Ogre {
         mWidth = width;
         mHeight = height;
 	}
-    
-    void EAGLWindow::changeOrientation(Viewport::Orientation orient)
-    {
-        if(orient == Viewport::OR_LANDSCAPELEFT)
-        {
-            mTop = 320;
-            mLeft = 0;
-            mWidth = 320;
-            mHeight = 480;
-        }
-        else if(orient == Viewport::OR_LANDSCAPERIGHT)
-        {
-            mLeft = 480;
-            mWidth = 320;
-            mHeight = 480;
-        }
-        else
-        {
-            mLeft = mTop = 0;
-        };
-        mCurrentOrientation = orient;
-        resize(mWidth, mHeight);
-    }
-    
+       
 	void EAGLWindow::windowMovedOrResized()
 	{
 		CGRect frame = [mView frame];
@@ -286,26 +261,15 @@ namespace Ogre {
         
         initNativeCreatedWindow(miscParams);
 
-        if(orientation == "Landscape Left")
-        {
-            top = 320;
-            left = 0;
-            width = 320;
-            height = 480;
-            mCurrentOrientation = Viewport::OR_LANDSCAPELEFT;
-        }
-        else if(orientation == "Landscape Right")
-        {
-            left = 480;
-            width = 320;
-            height = 480;
-            mCurrentOrientation = Viewport::OR_LANDSCAPERIGHT;
-        }
-        else
-        {
-            left = top = 0;
-            mCurrentOrientation = Viewport::OR_PORTRAIT;
-        };
+		// Set viewport's default orientation mode
+		if (orientation == "Landscape Left")
+			Viewport::setDefaultOrientationMode(OR_LANDSCAPELEFT);
+		else if (orientation == "Landscape Right")
+			Viewport::setDefaultOrientationMode(OR_LANDSCAPERIGHT);
+		else if (orientation == "Portrait")
+			Viewport::setDefaultOrientationMode(OR_PORTRAIT);
+
+        left = top = 0;
         mIsExternal = false;    // Cannot use external displays on iPhone
 
         mHwGamma = false;

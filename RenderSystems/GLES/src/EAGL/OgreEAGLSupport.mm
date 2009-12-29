@@ -61,8 +61,8 @@ namespace Ogre {
         optFullScreen.immutable = false;
 
         optVideoMode.name = "Video Mode";
-        optVideoMode.possibleValues.push_back("480 x 320");
-        optVideoMode.currentValue = "480 x 320";
+        optVideoMode.possibleValues.push_back("320 x 480");
+        optVideoMode.currentValue = "320 x 480";
         optVideoMode.immutable = false;
 
         optOrientation.name = "Orientation";
@@ -214,12 +214,6 @@ namespace Ogre {
 		return OGRE_NEW EAGLPBuffer(this, format, width, height);
 	}
     
-    void EAGLSupport::switchMode(void)
-    {
-// TODO: Support mode switch, and orientation change
-//        return switchMode(mOriginalMode.first.first,
-//                          mOriginalMode.first.second, mOriginalMode.second);
-    }
     
     RenderWindow * EAGLSupport::createWindow(bool autoCreateWindow,
                                            GLESRenderSystem* renderSystem,

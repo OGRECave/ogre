@@ -68,4 +68,34 @@ namespace Ogre {
         
         return std::string([documentsDirectory cStringUsingEncoding:NSASCIIStringEncoding]);
     }
+
+    void pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv)
+    {
+        pointOrientedToScreen(v.x, v.y, orientationMode, outv.x, outv.y);
+    }
+
+    void pointOrientedToScreen(Real orientedX, Real orientedY, int orientationMode, Real &screenX, Real &screenY)
+    {
+        Real orX = orientedX;
+        Real orY = orientedY;
+        switch (orientationMode)
+        {
+        case 1:
+            screenX = orY;
+            screenY = Real(1.0) - orX;
+            break;
+        case 2:
+            screenX = Real(1.0) - orX;
+            screenY = Real(1.0) - orY;
+            break;
+        case 3:
+            screenX = Real(1.0) - orY;
+            screenY = orX;
+            break;
+        default:
+            screenX = orX;
+            screenY = orY;
+            break;
+        }
+    }
 }

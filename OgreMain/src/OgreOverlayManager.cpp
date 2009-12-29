@@ -56,7 +56,8 @@ namespace Ogre {
     OverlayManager::OverlayManager() 
       : mLastViewportWidth(0), 
         mLastViewportHeight(0), 
-        mViewportDimensionsChanged(false)
+        mViewportDimensionsChanged(false),
+        mLastViewportOrientationMode(OR_DEGREE_0)
     {
 
         // Scripting is supported by this manager
@@ -272,20 +273,31 @@ namespace Ogre {
     void OverlayManager::_queueOverlaysForRendering(Camera* cam, 
         RenderQueue* pQueue, Viewport* vp)
     {
+        bool orientationModeChanged = false;
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        orientationModeChanged = (mLastViewportOrientationMode != vp->getOrientationMode());
+#endif
         // Flag for update pixel-based GUIElements if viewport has changed dimensions
         if (mLastViewportWidth != vp->getActualWidth() || 
-            mLastViewportHeight != vp->getActualHeight())
+            mLastViewportHeight != vp->getActualHeight() ||
+            orientationModeChanged)
         {
             mViewportDimensionsChanged = true;
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-            if ((vp->getOrientation() == Viewport::OR_LANDSCAPELEFT) ||
-                (vp->getOrientation() == Viewport::OR_LANDSCAPERIGHT)) {
-                mLastViewportWidth = vp->getActualHeight();
-                mLastViewportHeight = vp->getActualWidth();
-            } else {
+            switch (vp->getOrientationMode())
+            {
+            case Ogre::OR_DEGREE_0:
+            case Ogre::OR_DEGREE_180:
                 mLastViewportWidth = vp->getActualWidth();
                 mLastViewportHeight = vp->getActualHeight();
+                break;
+            case Ogre::OR_DEGREE_90:
+            case Ogre::OR_DEGREE_270:
+                mLastViewportWidth = vp->getActualHeight();
+                mLastViewportHeight = vp->getActualWidth();
+                break;
             }
+            mLastViewportOrientationMode = vp->getOrientationMode();
 #else
             mLastViewportWidth = vp->getActualWidth();
             mLastViewportHeight = vp->getActualHeight();
@@ -301,6 +313,13 @@ namespace Ogre {
         for (i = mOverlayMap.begin(); i != iend; ++i)
         {
             Overlay* o = i->second;
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+            if (orientationModeChanged)
+            {
+                // trick to trigger transform update of the overlay
+                o->scroll(0.f, 0.f);
+            }
+#endif
             o->_findVisibleObjects(cam, pQueue);
         }
     }
@@ -498,6 +517,15 @@ namespace Ogre {
         return (Real)mLastViewportWidth / (Real)mLastViewportHeight;
     }
     //---------------------------------------------------------------------
+    OrientationMode OverlayManager::getViewportOrientationMode(void) const
+    {
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                    "Getting ViewPort orientation mode is only supported on iPhone",
+                    __FUNCTION__);
+#endif
+        return mLastViewportOrientationMode;
+    }
 	//---------------------------------------------------------------------
 	OverlayManager::ElementMap& OverlayManager::getElementMap(bool isTemplate)
 	{

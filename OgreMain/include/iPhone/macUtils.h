@@ -34,4 +34,9 @@ namespace Ogre {
     void* mac_loadDylib(const char* name);
     _OgreExport std::string macBundlePath(void);
     _OgreExport std::string iPhoneDocumentsDirectory(void);
+
+    /** Convert oriented input point coordinates to screen coordinates. */
+    _OgreExport void pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv);
+    _OgreExport void pointOrientedToScreen(Real orientedX, Real orientedY, int orientationMode,
+                                           Real &screenX, Real &screenY);
 }

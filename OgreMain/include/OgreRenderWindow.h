@@ -169,12 +169,6 @@ namespace Ogre
           */
         void setDeactivateOnFocusChange(bool deactivate);
 
-		/** Change the orientation of the window.
-         @note Currently only available on iPhone.
-         @param orient Orientation to change the window to.
-         */
-        virtual void changeOrientation(Viewport::Orientation orient) {}
-
     protected:
         bool mIsFullScreen;
         bool mIsPrimary;

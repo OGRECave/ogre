@@ -39,6 +39,10 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#include "macUtils.h"
+#endif
+
 namespace Ogre {
 
     String Camera::msMovableType = "Camera";
@@ -619,6 +623,11 @@ namespace Ogre {
     void Camera::getCameraToViewportRay(Real screenX, Real screenY, Ray* outRay) const
     {
 		Matrix4 inverseVP = (getProjectionMatrix() * getViewMatrix(true)).inverse();
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        // We need to convert screen point to our oriented viewport
+        Ogre::pointOrientedToScreen(screenX, screenY, getOrientationMode(), screenX, screenY);
+#endif
 
 		Real nx = (2.0f * screenX) - 1.0f;
 		Real ny = 1.0f - (2.0f * screenY);

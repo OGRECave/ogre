@@ -583,9 +583,18 @@ namespace OgreBites
 #endif
 		{
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-			if (mTrayMgr->injectMouseDown(evt)) return true;
+            OIS::MultiTouchState state = evt.state;
+            trasformInputState(state);
+            OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
 #else
-			if (mTrayMgr->injectMouseDown(evt, id)) return true;
+            OIS::MouseState state = evt.state;
+            OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+			if (mTrayMgr->injectMouseDown(orientedEvt)) return true;
+#else
+			if (mTrayMgr->injectMouseDown(orientedEvt, id)) return true;
 #endif
             
 			if (mTitleLabel->getTrayLocation() != TL_NONE)
@@ -605,9 +614,9 @@ namespace OgreBites
 			try
 			{
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-				return SampleContext::touchPressed(evt);
+				return SampleContext::touchPressed(orientedEvt);
 #else
-				return SampleContext::mousePressed(evt, id);
+				return SampleContext::mousePressed(orientedEvt, id);
 #endif
 			}
 			catch (Ogre::Exception e)   // show error and fall back to menu
@@ -629,17 +638,26 @@ namespace OgreBites
 #endif
 		{
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-			if (mTrayMgr->injectMouseUp(evt)) return true;
+            OIS::MultiTouchState state = evt.state;
+            trasformInputState(state);
+            OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
 #else
-			if (mTrayMgr->injectMouseUp(evt, id)) return true;
+            OIS::MouseState state = evt.state;
+            OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+			if (mTrayMgr->injectMouseUp(orientedEvt)) return true;
+#else
+			if (mTrayMgr->injectMouseUp(orientedEvt, id)) return true;
 #endif
 
 			try
 			{
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-				return SampleContext::touchReleased(evt);
+				return SampleContext::touchReleased(orientedEvt);
 #else
-				return SampleContext::mouseReleased(evt, id);
+				return SampleContext::mouseReleased(orientedEvt, id);
 #endif
 			}
 			catch (Ogre::Exception e)   // show error and fall back to menu
@@ -661,21 +679,30 @@ namespace OgreBites
 		virtual bool mouseMoved(const OIS::MouseEvent& evt)
 #endif
 		{
-			if (mTrayMgr->injectMouseMove(evt)) return true;
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+            OIS::MultiTouchState state = evt.state;
+            trasformInputState(state);
+            OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
+#else
+            OIS::MouseState state = evt.state;
+            OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
+#endif
+
+			if (mTrayMgr->injectMouseMove(orientedEvt)) return true;
             
 			if (!(mCurrentSample && !mSamplePaused) && mTitleLabel->getTrayLocation() != TL_NONE &&
-				evt.state.Z.rel != 0 && mSampleMenu->getNumItems() != 0)
+				orientedEvt.state.Z.rel != 0 && mSampleMenu->getNumItems() != 0)
 			{
-				int newIndex = mSampleMenu->getSelectionIndex() - evt.state.Z.rel / Ogre::Math::Abs(evt.state.Z.rel);
+				int newIndex = mSampleMenu->getSelectionIndex() - orientedEvt.state.Z.rel / Ogre::Math::Abs(orientedEvt.state.Z.rel);
 				mSampleMenu->selectItem(Ogre::Math::Clamp<int>(newIndex, 0, mSampleMenu->getNumItems() - 1));
 			}
             
 			try
 			{
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-				return SampleContext::touchMoved(evt);
+				return SampleContext::touchMoved(orientedEvt);
 #else
-				return SampleContext::mouseMoved(evt);
+				return SampleContext::mouseMoved(orientedEvt);
 #endif
 			}
 			catch (Ogre::Exception e)   // show error and fall back to menu

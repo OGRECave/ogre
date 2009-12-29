@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreRenderWindow.h"
 
 namespace Ogre {
+    OrientationMode Viewport::mDefaultOrientationMode = OR_DEGREE_0;
     //---------------------------------------------------------------------
     Viewport::Viewport(Camera* cam, RenderTarget* target, Real left, Real top, Real width, Real height, int ZOrder)
         : mCamera(cam)
@@ -48,7 +49,6 @@ namespace Ogre {
         , mRelHeight(height)
         // Actual dimensions will update later
         , mZOrder(ZOrder)
-        , mOrientation(OR_PORTRAIT)
         , mBackColour(ColourValue::Black)
         , mClearEveryFrame(true)
 		, mClearBuffers(FBT_COLOUR | FBT_DEPTH)
@@ -69,6 +69,9 @@ namespace Ogre {
 			<< "L: " << left << " T: " << top << " W: " << width << " H: " << height
 			<< " ZOrder: " << ZOrder;
 #endif
+
+        // Set the default orientation mode
+        mOrientationMode = mDefaultOrientationMode;     
 
         // Calculate actual dimensions
         _updateDimensions();
@@ -108,9 +111,14 @@ namespace Ogre {
         // This allows cameras to be used to render to many viewports,
         // which can have their own dimensions and aspect ratios.
 
-        if (mCamera && mCamera->getAutoAspectRatio()) 
+        if (mCamera) 
         {
-            mCamera->setAspectRatio((Real) mActWidth / (Real) mActHeight);
+            if (mCamera->getAutoAspectRatio())
+                mCamera->setAspectRatio((Real) mActWidth / (Real) mActHeight);
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+            mCamera->setOrientationMode(mOrientationMode);
+#endif
         }
 
 #if OGRE_COMPILER != OGRE_COMPILER_GCCE
@@ -178,47 +186,6 @@ namespace Ogre {
         return mActHeight;
     }
     //---------------------------------------------------------------------
-    int Viewport::getOrientation(void)
-    {
-        return mOrientation;
-    }
-    //---------------------------------------------------------------------
-    void Viewport::setOrientation(Orientation orient)
-    {
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Setting Viewport orientation is only supported on iPhone",
-                    __FUNCTION__);
-#else
-        mOrientation = orient;
-        
-        // Tell the render window to resize.  Try to use the auto created window first.
-		RenderWindow* rw = Root::getSingleton().getAutoCreatedWindow();
-        if(!rw)
-        {
-            if(!mTarget)
-            {
-                OGRE_EXCEPT(Exception:: ERR_RENDERINGAPI_ERROR,
-                    "This viewport does not have a valid RenderTarget",
-                    __FUNCTION__);
-            }
-
-            // If there is no auto created window then use this viewport's RenderTarget
-            rw = (RenderWindow *)mTarget;
-        }
-        rw->changeOrientation(orient);
-
-		// Update the render system config
-        RenderSystem* rs = Root::getSingleton().getRenderSystem();
-        if(orient == OR_LANDSCAPELEFT)
-            rs->setConfigOption("Orientation", "Landscape Left");
-        else if(orient == OR_LANDSCAPERIGHT)
-            rs->setConfigOption("Orientation", "Landscape Right");
-        else if(orient == OR_PORTRAIT)
-            rs->setConfigOption("Orientation", "Portrait");
-#endif
-    }
-    //---------------------------------------------------------------------
     void Viewport::setDimensions(Real left, Real top, Real width, Real height)
     {
         mRelLeft = left;
@@ -235,6 +202,67 @@ namespace Ogre {
             // Tell Camera to render into me
             mCamera->_renderScene(this, mShowOverlays);
         }
+    }
+    //---------------------------------------------------------------------
+    void Viewport::setOrientationMode(OrientationMode orientationMode, bool setDefault)
+    {
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                    "Setting Viewport orientation mode is only supported on iPhone",
+                    __FUNCTION__);
+#endif
+        mOrientationMode = orientationMode;
+
+        if (setDefault)
+        {
+            setDefaultOrientationMode(orientationMode);
+        }
+
+        if (mCamera)
+        {
+            mCamera->setOrientationMode(mOrientationMode);
+        }
+
+	// Update the render system config
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        RenderSystem* rs = Root::getSingleton().getRenderSystem();
+        if(mOrientationMode == OR_LANDSCAPELEFT)
+            rs->setConfigOption("Orientation", "Landscape Left");
+        else if(mOrientationMode == OR_LANDSCAPERIGHT)
+            rs->setConfigOption("Orientation", "Landscape Right");
+        else if(mOrientationMode == OR_PORTRAIT)
+            rs->setConfigOption("Orientation", "Portrait");
+#endif
+    }
+    //---------------------------------------------------------------------
+    OrientationMode Viewport::getOrientationMode() const
+    {
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                    "Getting Viewport orientation mode is only supported on iPhone",
+                    __FUNCTION__);
+#endif
+        return mOrientationMode;
+    }
+    //---------------------------------------------------------------------
+    void Viewport::setDefaultOrientationMode(OrientationMode orientationMode)
+    {
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                    "Setting default Viewport orientation mode is only supported on iPhone",
+                    __FUNCTION__);
+#endif
+        mDefaultOrientationMode = orientationMode;
+    }
+    //---------------------------------------------------------------------
+    OrientationMode Viewport::getDefaultOrientationMode()
+    {
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                    "Getting default Viewport orientation mode is only supported on iPhone",
+                    __FUNCTION__);
+#endif
+        return mDefaultOrientationMode;
     }
     //---------------------------------------------------------------------
     void Viewport::setBackgroundColour(const ColourValue& colour)

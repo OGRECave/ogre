@@ -649,22 +649,6 @@ namespace Ogre {
         glLoadMatrixf(mat);
         GL_CHECK_ERROR;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-        // Rotate the projection based upon the current display orientation
-        switch (mActiveViewport->getOrientation()) {
-            case Viewport::OR_LANDSCAPELEFT:
-                glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
-                break;
-            case Viewport::OR_LANDSCAPERIGHT:
-                glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
-                break;
-            case Viewport::OR_PORTRAIT:
-            default:
-                break;
-        }
-        GL_CHECK_ERROR;
-#endif
-
         glMatrixMode(GL_MODELVIEW);
         GL_CHECK_ERROR;
 
@@ -1511,29 +1495,8 @@ namespace Ogre {
             mActiveViewport = vp;
 
             GLsizei x, y, w, h;
-
-			// Calculate the "lower-left" corner of the viewport
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-            ConfigOptionMap& opts = mGLSupport->getConfigOptions();
-            ConfigOptionMap::iterator opt = opts.find("Orientation");
-            if(opt->second.currentValue == "Landscape Left") {
-                h = vp->getActualHeight();
-                w = vp->getActualWidth();
-                vp->setOrientation(Viewport::OR_LANDSCAPELEFT);
-            } else if(opt->second.currentValue == "Landscape Right") {
-                h = vp->getActualHeight();
-                w = vp->getActualWidth();
-                vp->setOrientation(Viewport::OR_LANDSCAPERIGHT);
-            } else {
-                // Portrait
-                w = vp->getActualWidth();
-                h = vp->getActualHeight();
-                vp->setOrientation(Viewport::OR_PORTRAIT);
-            }
-#else
             w = vp->getActualWidth();
             h = vp->getActualHeight();
-#endif
             x = vp->getActualLeft();
             y = vp->getActualTop();
 
@@ -1542,6 +1505,7 @@ namespace Ogre {
                 // Convert "upper-left" corner to "lower-left"
                 y = target->getHeight() - h - y;
             }
+
             glViewport(x, y, w, h);
             GL_CHECK_ERROR;
 

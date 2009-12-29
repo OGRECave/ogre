@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
 #include "OgreColourValue.h"
+#include "OgreFrustum.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -54,13 +55,7 @@ namespace Ogre {
     */
 	class _OgreExport Viewport : public ViewportAlloc
     {
-    public:
-        enum Orientation {
-            OR_LANDSCAPELEFT = 0,
-            OR_LANDSCAPERIGHT = 1,
-            OR_PORTRAIT = 2
-        };
-        
+    public:       
         /** The usual constructor.
             @param
                 cam Pointer to a camera to be the source for the image.
@@ -175,20 +170,7 @@ namespace Ogre {
         */
 
         int getActualHeight(void) const;
-        
-        /** Gets the current orientation of the viewport
-         */
-        int getOrientation(void);
-        
-        /** Sets the orientation of the viewport
-             @remarks
-                Setting the orientation of a viewport is only supported on
-                iPhone at this time.  An exeption is thrown on other platforms.
-             @param
-                orient
-         */
-        void setOrientation(Orientation orient);
-
+               
         /** Sets the dimensions (after creation).
             @param
                 left
@@ -202,6 +184,34 @@ namespace Ogre {
                 target area is 0, 0, 1, 1.
         */
         void setDimensions(Real left, Real top, Real width, Real height);
+
+        /** Set the orientation mode of the viewport.
+             @remarks
+                Getting the orientation of a viewport is only supported on
+                iPhone at this time.  An exception is thrown on other platforms.
+        */
+        void setOrientationMode(OrientationMode orientationMode, bool setDefault = true);
+
+        /** Get the orientation mode of the viewport.
+             @remarks
+                Setting the orientation of a viewport is only supported on
+                iPhone at this time.  An exception is thrown on other platforms.
+        */
+        OrientationMode getOrientationMode() const;
+
+        /** Set the initial orientation mode of viewports.
+             @remarks
+                Setting the default orientation of a viewport is only supported on
+                iPhone at this time.  An exception is thrown on other platforms.
+        */
+        static void setDefaultOrientationMode(OrientationMode orientationMode);
+
+        /** Get the initial orientation mode of viewports.
+             @remarks
+                Getting the default orientation of a viewport is only supported on
+                iPhone at this time.  An exception is thrown on other platforms.
+        */
+        static OrientationMode getDefaultOrientationMode();
 
         /** Sets the initial background colour of the viewport (before
             rendering).
@@ -367,8 +377,6 @@ namespace Ogre {
         int mActLeft, mActTop, mActWidth, mActHeight;
         /// ZOrder
         int mZOrder;
-        /// Viewport orientation
-        int mOrientation;
         /// Background options
         ColourValue mBackColour;
         bool mClearEveryFrame;
@@ -383,6 +391,9 @@ namespace Ogre {
 		RenderQueueInvocationSequence* mRQSequence;
 		/// Material scheme
 		String mMaterialSchemeName;
+        /// Viewport orientation mode
+        OrientationMode mOrientationMode;
+        static OrientationMode mDefaultOrientationMode;
 
 		/// Automatic rendering on/off
 		bool mIsAutoUpdated;

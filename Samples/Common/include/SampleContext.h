@@ -340,6 +340,40 @@ namespace OgreBites
 		}
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        void trasformInputState(OIS::MultiTouchState &state)
+        {
+            int w = mWindow->getViewport(0)->getActualWidth();
+            int h = mWindow->getViewport(0)->getActualHeight();
+            int absX = state.X.abs;
+            int absY = state.Y.abs;
+            int relX = state.X.rel;
+            int relY = state.Y.rel;
+
+            switch (mWindow->getViewport(0)->getOrientationMode())
+            {
+            case Ogre::OR_DEGREE_0:
+                break;
+            case Ogre::OR_DEGREE_90:
+                state.X.abs = h - absY;
+                state.Y.abs = absX;
+                state.X.rel = -relY;
+                state.Y.rel = relX;
+                break;
+            case Ogre::OR_DEGREE_180:
+                state.X.abs = w - absX;
+                state.Y.abs = h - absY;
+                state.X.rel = -relX;
+                state.Y.rel = -relY;
+                break;
+            case Ogre::OR_DEGREE_270:
+                state.X.abs = absY;
+                state.Y.abs = w - absX;
+                state.X.rel = relY;
+                state.Y.rel = -relX;
+                break;
+            }
+        }
+
 		virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
 		{
 			if (mCurrentSample && !mSamplePaused) return mCurrentSample->touchMoved(evt);
@@ -348,7 +382,7 @@ namespace OgreBites
 #else
 		virtual bool mouseMoved(const OIS::MouseEvent& evt)
 		{
-			if (mCurrentSample && !mSamplePaused) return mCurrentSample->mouseMoved(evt);
+            if (mCurrentSample && !mSamplePaused) return mCurrentSample->mouseMoved(evt);
 			return true;
 		}
 #endif

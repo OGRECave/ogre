@@ -1897,6 +1897,9 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		void refreshCursor()
 		{
+            // TODO:
+            // the position should be based on the orientation, for now simply return
+            return;
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
             std::vector<OIS::MultiTouchState> states = mMouse->getMultiTouchStates();
             if(states.size() > 0)
@@ -3030,38 +3033,9 @@ namespace OgreBites
 		{
 			if (!mCursorLayer->isVisible()) return false;   // don't process if cursor layer is invisible
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
-			mCursor->setPosition(evt.state.X.abs, evt.state.Y.abs);
-
-			Ogre::Vector2 cursorPos(mCursor->getLeft(), mCursor->getTop());
-#else
-            // Adjust the input depending upon viewport orientation
-            float origTransX = 0, origTransY = 0;
             Ogre::Vector2 cursorPos(evt.state.X.abs, evt.state.Y.abs);
-
-            switch(mWindow->getViewport(0)->getOrientation())
-            {
-                case Ogre::Viewport::OR_LANDSCAPELEFT:
-                    origTransX = cursorPos.x;
-                    origTransY = cursorPos.y;
-                    cursorPos.x = origTransY;
-                    cursorPos.y = mWindow->getViewport(0)->getActualWidth() - origTransX;
-                    break;
-
-                case Ogre::Viewport::OR_LANDSCAPERIGHT:
-                    origTransX = cursorPos.x;
-                    origTransY = cursorPos.y;
-                    cursorPos.x = mWindow->getViewport(0)->getActualHeight() - origTransY;
-                    cursorPos.y = origTransX;
-                    break;
-                    
-                // Portrait doesn't need any change
-                case Ogre::Viewport::OR_PORTRAIT:
-                default:
-                    break;
-            }
 			mCursor->setPosition(cursorPos.x, cursorPos.y);
-#endif
+
 			if (mExpandedMenu)   // only check top priority widget until it passes on
 			{
 				mExpandedMenu->_cursorMoved(cursorPos);

@@ -81,7 +81,6 @@ namespace Ogre {
             CFDictionaryRef getGLConfigFromDrawable(CAEAGLLayer *drawable, unsigned int *w, unsigned int *h);
 #endif
 			CFDictionaryRef selectGLConfig(const int* minAttribs, const int *maxAttribs);
-            void switchMode(void);
 	};
 }
 
