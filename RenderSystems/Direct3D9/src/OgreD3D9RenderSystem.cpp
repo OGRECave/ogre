@@ -816,7 +816,7 @@ namespace Ogre
 
 			if (rkCurCaps.MaxSimultaneousTextures < rsc->getNumTextureUnits())
 			{
-				rsc->setNumTextureUnits(rkCurCaps.MaxSimultaneousTextures);
+				rsc->setNumTextureUnits(static_cast<ushort>(rkCurCaps.MaxSimultaneousTextures));
 			}
 
 			// Check for Anisotropy.
@@ -1119,7 +1119,7 @@ namespace Ogre
 			// No integer params allowed
 			rsc->setVertexProgramConstantIntCount(0);
 			// float params, always 4D
-			rsc->setVertexProgramConstantFloatCount(minVSCaps.MaxVertexShaderConst);
+			rsc->setVertexProgramConstantFloatCount(static_cast<ushort>(minVSCaps.MaxVertexShaderConst));
 
 			break;
 		case 2:
@@ -1128,7 +1128,7 @@ namespace Ogre
 			// 16 integer params allowed, 4D
 			rsc->setVertexProgramConstantIntCount(16);
 			// float params, always 4D
-			rsc->setVertexProgramConstantFloatCount(minVSCaps.MaxVertexShaderConst);
+			rsc->setVertexProgramConstantFloatCount(static_cast<ushort>(minVSCaps.MaxVertexShaderConst));
 			break;
 		case 3:
 			// 16 boolean params allowed
@@ -1136,7 +1136,7 @@ namespace Ogre
 			// 16 integer params allowed, 4D
 			rsc->setVertexProgramConstantIntCount(16);
 			// float params, always 4D
-			rsc->setVertexProgramConstantFloatCount(minVSCaps.MaxVertexShaderConst);
+			rsc->setVertexProgramConstantFloatCount(static_cast<ushort>(minVSCaps.MaxVertexShaderConst));
 			break;
 		}
 
@@ -1494,8 +1494,8 @@ namespace Ogre
 		Real tanThetaX = tanThetaY * aspect; //Math::Tan(thetaX);
 		Real half_w = tanThetaX * nearPlane;
 		Real half_h = tanThetaY * nearPlane;
-		Real iw = 1.0 / half_w;
-		Real ih = 1.0 / half_h;
+		Real iw = static_cast<Real>(1.0 / half_w);
+		Real ih = static_cast<Real>(1.0 / half_h);
 		Real q;
 		if (farPlane == 0)
 		{
@@ -1503,7 +1503,7 @@ namespace Ogre
 		}
 		else
 		{
-			q = 1.0 / (farPlane - nearPlane);
+			q = static_cast<Real>(1.0 / (farPlane - nearPlane));
 		}
 
 		dest = Matrix4::ZERO;

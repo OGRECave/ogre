@@ -140,7 +140,7 @@ namespace Ogre {
 				}
 				else
 				{
-					d3delems[idx].UsageIndex = i->getIndex();
+					d3delems[idx].UsageIndex = static_cast<BYTE>(i->getIndex());
 				}
 			}
 			// Add terminator
