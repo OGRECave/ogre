@@ -1087,8 +1087,10 @@ namespace Ogre
 			"." + blendChannel;
 
 		// generate early-out conditional
+		/* Disable - causing some issues even when trying to force the use of texldd
 		if (layer && prof->_isSM3Available())
 			outStream << "  if (" << blendWeightStr << " > 0.0003)\n  { \n";
+		*/
 
 		// generate UV
 		outStream << "	float2 uv" << layer << " = layerUV" << uvIdx << uvChannels << ";\n";
@@ -1137,9 +1139,10 @@ namespace Ogre
 		}
 
 		// End early-out
+		/* Disable - causing some issues even when trying to force the use of texldd
 		if (layer && prof->_isSM3Available())
 			outStream << "  } // early-out blend value\n";
-
+		*/
 	}
 	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateVpFooter(
@@ -1280,7 +1283,7 @@ namespace Ogre
 				"			float4 newUV = offsetSample(uv, float2(x, y), invShadowMapSize);\n"
 				"			// manually project and assign derivatives \n"
 				"			// to avoid gradient issues inside loops \n"
-				"			newUV.xy = newUV.xy / newUV.w; \n"
+				"			newUV = newUV / newUV.w; \n"
 				"			float depth = tex2D(shadowMap, newUV.xy, 1, 1).x; \n"
 				"			if (depth >= 1 || depth >= uv.z)\n"
 				"				shadow += 1.0;\n"
