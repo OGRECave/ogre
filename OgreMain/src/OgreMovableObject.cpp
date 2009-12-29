@@ -311,7 +311,9 @@ namespace Ogre {
 	{
 		if (derive)
 		{
-			mWorldBoundingSphere.setRadius(getBoundingRadius());
+			const Vector3& scl = mParentNode->_getDerivedScale();
+			Real factor = std::max(std::max(scl.x, scl.y), scl.z);
+			mWorldBoundingSphere.setRadius(getBoundingRadius() * factor);
 			mWorldBoundingSphere.setCenter(mParentNode->_getDerivedPosition());
 		}
 		return mWorldBoundingSphere;

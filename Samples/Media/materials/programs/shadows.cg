@@ -39,7 +39,11 @@ float calcDepthShadow(sampler2D shadowMap, float4 uv, float invShadowMapSize)
 	float offset = (NUM_SHADOW_SAMPLES_1D/2 - 0.5) * SHADOW_FILTER_SCALE;
 	for (float y = -offset; y <= offset; y += SHADOW_FILTER_SCALE)
 		for (float x = -offset; x <= offset; x += SHADOW_FILTER_SCALE)
-			shadow += tex2Dproj(shadowMap, offsetSample(uv, float2(x, y), invShadowMapSize)).x > uv.z ? 1.0 : 0.0;
+		{
+			float depth = tex2Dproj(shadowMap, offsetSample(uv, float2(x, y), invShadowMapSize)).x;
+			if (depth >= 1 || depth >= uv.z)
+				shadow += 1.0;
+		}
 
 	shadow /= SHADOW_SAMPLES;
 

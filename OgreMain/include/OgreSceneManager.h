@@ -79,7 +79,7 @@ namespace Ogre {
 	/** Structure collecting together information about the visible objects
 	that have been discovered in a scene.
 	*/
-	struct VisibleObjectsBoundsInfo
+	struct _OgreExport VisibleObjectsBoundsInfo
 	{
 		/// The axis-aligned bounds of the visible objects
 		AxisAlignedBox aabb;
@@ -94,48 +94,15 @@ namespace Ogre {
 		/// The farthest object in the frustum regardless of visibility / shadow caster flags
 		Real maxDistanceInFrustum;
 
-		VisibleObjectsBoundsInfo()
-		{
-			reset();
-		}
-
-		void reset()
-		{
-			aabb.setNull();
-			receiverAabb.setNull();
-			minDistance = minDistanceInFrustum = std::numeric_limits<Real>::infinity();
-			maxDistance = maxDistanceInFrustum = 0;
-		}
-
+		VisibleObjectsBoundsInfo();
+		void reset();
 		void merge(const AxisAlignedBox& boxBounds, const Sphere& sphereBounds, 
-			const Camera* cam, bool receiver=true)
-		{
-			aabb.merge(boxBounds);
-			if (receiver)
-				receiverAabb.merge(boxBounds);
-			// use view matrix to determine distance, works with custom view matrices
-			Vector3 vsSpherePos = cam->getViewMatrix(true) * sphereBounds.getCenter();
-			Real camDistToCenter = vsSpherePos.length();
-			minDistance = (std::min)(minDistance, (std::max)((Real)0, camDistToCenter - sphereBounds.getRadius()));
-			maxDistance = (std::max)(maxDistance, camDistToCenter + sphereBounds.getRadius());
-			minDistanceInFrustum = (std::min)(minDistanceInFrustum, (std::max)((Real)0, camDistToCenter - sphereBounds.getRadius()));
-			maxDistanceInFrustum = (std::max)(maxDistanceInFrustum, camDistToCenter + sphereBounds.getRadius());
-		}
-
+			const Camera* cam, bool receiver=true);
 		/** Merge an object that is not being rendered because it's not a shadow caster, 
 			but is a shadow receiver so should be included in the range.
 		*/
 		void mergeNonRenderedButInFrustum(const AxisAlignedBox& boxBounds, 
-			const Sphere& sphereBounds, const Camera* cam)
-		{
-                        (void)boxBounds;
-			// use view matrix to determine distance, works with custom view matrices
-			Vector3 vsSpherePos = cam->getViewMatrix(true) * sphereBounds.getCenter();
-			Real camDistToCenter = vsSpherePos.length();
-			minDistanceInFrustum = (std::min)(minDistanceInFrustum, (std::max)((Real)0, camDistToCenter - sphereBounds.getRadius()));
-			maxDistanceInFrustum = (std::max)(maxDistanceInFrustum, camDistToCenter + sphereBounds.getRadius());
-
-		}
+			const Sphere& sphereBounds, const Camera* cam);
 
 
 	};

@@ -6919,6 +6919,48 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 	}
 
 }
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+VisibleObjectsBoundsInfo::VisibleObjectsBoundsInfo()
+{
+	reset();
+}
+//---------------------------------------------------------------------
+void VisibleObjectsBoundsInfo::reset()
+{
+	aabb.setNull();
+	receiverAabb.setNull();
+	minDistance = minDistanceInFrustum = std::numeric_limits<Real>::infinity();
+	maxDistance = maxDistanceInFrustum = 0;
+}
+//---------------------------------------------------------------------
+void VisibleObjectsBoundsInfo::merge(const AxisAlignedBox& boxBounds, const Sphere& sphereBounds, 
+		   const Camera* cam, bool receiver)
+{
+	aabb.merge(boxBounds);
+	if (receiver)
+		receiverAabb.merge(boxBounds);
+	// use view matrix to determine distance, works with custom view matrices
+	Vector3 vsSpherePos = cam->getViewMatrix(true) * sphereBounds.getCenter();
+	Real camDistToCenter = vsSpherePos.length();
+	minDistance = std::min(minDistance, std::max((Real)0, camDistToCenter - sphereBounds.getRadius()));
+	maxDistance = std::max(maxDistance, camDistToCenter + sphereBounds.getRadius());
+	minDistanceInFrustum = std::min(minDistanceInFrustum, std::max((Real)0, camDistToCenter - sphereBounds.getRadius()));
+	maxDistanceInFrustum = std::max(maxDistanceInFrustum, camDistToCenter + sphereBounds.getRadius());
+}
+//---------------------------------------------------------------------
+void VisibleObjectsBoundsInfo::mergeNonRenderedButInFrustum(const AxisAlignedBox& boxBounds, 
+								  const Sphere& sphereBounds, const Camera* cam)
+{
+	(void)boxBounds;
+	// use view matrix to determine distance, works with custom view matrices
+	Vector3 vsSpherePos = cam->getViewMatrix(true) * sphereBounds.getCenter();
+	Real camDistToCenter = vsSpherePos.length();
+	minDistanceInFrustum = std::min(minDistanceInFrustum, std::max((Real)0, camDistToCenter - sphereBounds.getRadius()));
+	maxDistanceInFrustum = std::max(maxDistanceInFrustum, camDistToCenter + sphereBounds.getRadius());
+
+}
+
 
 
 }

@@ -16,6 +16,7 @@ same license as the rest of the engine.
 
 //#define SHADOWS
 //#define DEPTH_SHADOWS
+//#define SHADOWS_IN_LOW_LOD_MATERIAL
 
 //#define PAGING
 
@@ -628,26 +629,31 @@ protected:
 		TerrainMaterialGeneratorA::SM2Profile* matProfile = 
 			static_cast<TerrainMaterialGeneratorA::SM2Profile*>(TerrainGlobalOptions::getDefaultMaterialGenerator()->getActiveProfile());
 		matProfile->setReceiveDynamicShadowsEnabled(enabled);
+#ifdef SHADOWS_IN_LOW_LOD_MATERIAL
+		matProfile->setReceiveDynamicShadowsLowLod(true);
+#else
+		matProfile->setReceiveDynamicShadowsLowLod(false);
+#endif
 
 		if (enabled)
 		{
 			// General scene setup
 			mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-			mSceneMgr->setShadowFarDistance(6000);
+			mSceneMgr->setShadowFarDistance(3000);
 
 			// 3 textures per directional light (PSSM)
 			mSceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
 
 			if (depthShadows)
 			{
-				mSceneMgr->setShadowTextureSettings(512, 3, PF_FLOAT32_R);
+				mSceneMgr->setShadowTextureSettings(1024, 3, PF_FLOAT32_R);
 				mSceneMgr->setShadowTextureSelfShadow(true);
 				mSceneMgr->setShadowCasterRenderBackFaces(true);
 				mSceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
 			}
 			else
 			{
-				mSceneMgr->setShadowTextureSettings(512, 3, PF_X8B8G8R8);
+				mSceneMgr->setShadowTextureSettings(1024, 3, PF_X8B8G8R8);
 				mSceneMgr->setShadowTextureSelfShadow(false);
 				mSceneMgr->setShadowCasterRenderBackFaces(false);
 				mSceneMgr->setShadowTextureCasterMaterial(StringUtil::BLANK);
@@ -657,8 +663,8 @@ protected:
 			{
 				// shadow camera setup
 				PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
+				pssmSetup->setSplitPadding(mCamera->getNearClipDistance());
 				pssmSetup->calculateSplitPoints(3, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
-				pssmSetup->setSplitPadding(10);
 				pssmSetup->setOptimalAdjustFactor(0, 2);
 				pssmSetup->setOptimalAdjustFactor(1, 1);
 				pssmSetup->setOptimalAdjustFactor(2, 0.5);
@@ -679,7 +685,7 @@ protected:
 
 		}
 
-		//addTextureShadowDebugOverlay(TL_RIGHT, 3);
+		addTextureShadowDebugOverlay(TL_RIGHT, 3);
 
 	}
 
@@ -692,7 +698,7 @@ protected:
 
 		mCamera->setPosition(mTerrainPos + Vector3(-1000,50,1000));
 		mCamera->lookAt(mTerrainPos);
-		mCamera->setNearClipDistance(5);
+		mCamera->setNearClipDistance(0.1);
 		mCamera->setFarClipDistance(50000);
 
 		if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_INFINITE_FAR_PLANE))

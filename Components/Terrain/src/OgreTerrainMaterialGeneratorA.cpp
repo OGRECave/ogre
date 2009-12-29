@@ -1281,7 +1281,9 @@ namespace Ogre
 				"			// manually project and assign derivatives \n"
 				"			// to avoid gradient issues inside loops \n"
 				"			newUV.xy = newUV.xy / newUV.w; \n"
-				"			shadow += tex2D(shadowMap, newUV.xy, 1, 1).x > uv.z ? 1.0 : 0.0; \n"
+				"			float depth = tex2D(shadowMap, newUV.xy, 1, 1).x; \n"
+				"			if (depth >= 1 || depth >= uv.z)\n"
+				"				shadow += 1.0;\n"
 				"		} \n"
 
 				"	shadow /= SHADOW_SAMPLES; \n"

@@ -20,7 +20,7 @@ THE SOFTWARE.
 */
 #include "shadows.cg"
 
-#define BIAS 0.01
+#define BIAS 0
 
 struct VS_OUT
 {
