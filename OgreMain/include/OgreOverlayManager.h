@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreStringVector.h"
 #include "OgreOverlay.h"
 #include "OgreScriptLoader.h"
+#include "OgreFrustum.h"
 
 namespace Ogre {
 
