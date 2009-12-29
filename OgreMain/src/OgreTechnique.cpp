@@ -294,7 +294,7 @@ namespace Ogre {
 
 		if (includeRulesPresent && !includeRuleMatched)
 		{
-			errors << "Failed to match GPU vendor: " << includeRules
+			errors << "Failed to match GPU vendor: " << includeRules.str( )
 				<< std::endl;
 			return false;
 		}
@@ -328,7 +328,7 @@ namespace Ogre {
 
 		if (includeRulesPresent && !includeRuleMatched)
 		{
-			errors << "Failed to match GPU device: " << includeRules
+			errors << "Failed to match GPU device: " << includeRules.str( )
 				<< std::endl;
 			return false;
 		}
