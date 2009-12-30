@@ -256,7 +256,7 @@ void OceanDemo::changePage(size_t pageNum /* = -1 : toggle */)
 
 	static char pageText[64];
 	sprintf(pageText, "Parameters %d / %d", mCurrentPage+1, mNumPages);
-	static_cast<Button*>(mTrayMgr->getWidget("PageButtonControl"))->setCaption(pageText);
+	static_cast<OgreBites::Button*>(mTrayMgr->getWidget("PageButtonControl"))->setCaption(pageText);
 
     if(!mActiveMaterial.isNull() && mActiveMaterial->getNumSupportedTechniques())
 	{
@@ -401,7 +401,7 @@ bool OceanDemo::frameRenderingQueued(const FrameEvent& evt)
 	}
 	return SdkSample::frameRenderingQueued(evt);
 }
-void OceanDemo::buttonHit(Button* button)
+void OceanDemo::buttonHit(OgreBites::Button* button)
 {
 	//Only one button - change page
 	changePage();

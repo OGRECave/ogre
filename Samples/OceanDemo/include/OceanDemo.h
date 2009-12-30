@@ -73,7 +73,7 @@ protected:
 	virtual void cleanupContent();
     
 	void sliderMoved(Slider* slider);
-	void buttonHit(Button* button);
+	void buttonHit(OgreBites::Button* button);
 	void checkBoxToggled(CheckBox* box);
 	void selectOceanMaterial(OceanMaterial newMaterial);
 	void itemSelected(SelectMenu* menu);
@@ -81,13 +81,13 @@ protected:
 	virtual bool frameRenderingQueued(const FrameEvent& evt);
 	
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	bool OceanDemo::touchPressed(const OIS::MultiTouchEvent& evt);
-	bool OceanDemo::touchReleased(const OIS::MultiTouchEvent& evt);
-	bool OceanDemo::touchMoved(const OIS::MultiTouchEvent& evt);
+	bool touchPressed(const OIS::MultiTouchEvent& evt);
+	bool touchReleased(const OIS::MultiTouchEvent& evt);
+	bool touchMoved(const OIS::MultiTouchEvent& evt);
 #else
-	bool OceanDemo::mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
-	bool OceanDemo::mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
-	bool OceanDemo::mouseMoved(const OIS::MouseEvent& evt);
+	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
+	bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
+	bool mouseMoved(const OIS::MouseEvent& evt);
 #endif
 
 };
