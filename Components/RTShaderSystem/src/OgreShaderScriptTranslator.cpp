@@ -109,6 +109,7 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 						}
 						else
 						{
+							shaderGenerator->createScheme(dstTechniqueSchemeName);
 							RenderState* renderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, material->getName(), pass->getIndex());
 
 							renderState->setLightCount(lightCount);
@@ -123,6 +124,7 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 					subRenderState = ShaderGenerator::getSingleton().createSubRenderState(compiler, prop, pass);
 					if (subRenderState != NULL)
 					{
+						shaderGenerator->createScheme(dstTechniqueSchemeName);
 						RenderState* renderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, material->getName(), pass->getIndex());
 
 						renderState->addSubRenderState(subRenderState);

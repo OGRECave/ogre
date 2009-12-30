@@ -167,9 +167,11 @@ public:
 
 	/** 
 	Set the output shader cache path. Generated shader code will be written to this path.
+	In case of empty cache path shaders will be generated directly from system memory.
 	@param cachePath The cache path of the shader.	
+	The default is empty cache path.
 	*/
-	void			setShaderCachePath			(const String& cachePath);
+	void			setShaderCachePath			(const String& cachePath) { mShaderCachePath = cachePath; }
 
 	/** 
 	Get the output shader cache path.
@@ -181,7 +183,7 @@ public:
 	destroy any CPU/GPU program that created by this shader generator.
 	*/
 	void			flushShaderCache			();
-	
+
 	/** 
 	Return a global render state associated with the given scheme name.
 	Modifying this render state will affect all techniques that belongs to that scheme.
@@ -263,7 +265,11 @@ public:
 	*/
 	void			removeAllShaderBasedTechniques	();
 
-
+	/** 
+	Create a scheme.
+	@param schemeName The scheme name to create.
+	*/
+	void			createScheme				(const String& schemeName);
 
 	/** 
 	Invalidate a given scheme. This action will lead to shader regeneration of all techniques belongs to the

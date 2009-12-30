@@ -169,6 +169,9 @@ bool ShaderGenerator::_initialize()
 
 	addCustomScriptTranslator("rtshader_system", &mCoreScriptTranslaotr);
 
+	// Create the default scheme.
+	createScheme(DEFAULT_SCHEME_NAME);
+
 	return true;
 }
 
@@ -402,6 +405,20 @@ SubRenderState*	ShaderGenerator::createSubRenderState(ScriptCompiler* compiler,
 	return subRenderState;
 }
 
+//-----------------------------------------------------------------------------
+void ShaderGenerator::createScheme(const String& schemeName)
+{
+	OGRE_LOCK_AUTO_MUTEX
+
+	SGSchemeIterator itFind = mSchemeEntriesMap.find(schemeName);
+	SGScheme* schemeEntry   = NULL;
+
+	if (itFind == mSchemeEntriesMap.end())
+	{
+		schemeEntry = OGRE_NEW SGScheme(schemeName);
+		mSchemeEntriesMap[schemeName] = schemeEntry;
+	}
+}
 
 //-----------------------------------------------------------------------------
 RenderState* ShaderGenerator::getRenderState(const String& schemeName)
@@ -409,19 +426,15 @@ RenderState* ShaderGenerator::getRenderState(const String& schemeName)
 	OGRE_LOCK_AUTO_MUTEX
 
 	SGSchemeIterator itFind = mSchemeEntriesMap.find(schemeName);
-	SGScheme* schemeEntry   = NULL;
-
-	if (itFind != mSchemeEntriesMap.end())
+	
+	if (itFind == mSchemeEntriesMap.end())
 	{
-		schemeEntry = itFind->second;
+		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+			"A scheme named'" + schemeName + "' doesn't exists.",
+			"ShaderGenerator::getRenderState");	
 	}	
-	else
-	{
-		schemeEntry = OGRE_NEW SGScheme(schemeName);
-		mSchemeEntriesMap[schemeName] = schemeEntry;
-	}
-
-	return schemeEntry->getRenderState();
+	
+	return itFind->second->getRenderState();
 }
 
 //-----------------------------------------------------------------------------
@@ -437,7 +450,7 @@ RenderState* ShaderGenerator::getRenderState(const String& schemeName,
 	{
 		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
 			"A scheme named'" + schemeName + "' doesn't exists.",
-			"ShaderGenerator::getRenderStateList");
+			"ShaderGenerator::getRenderState");
 	}
 
 	return itFind->second->getRenderState(materialName, passIndex);
@@ -863,12 +876,6 @@ SGMaterialSerializerListener* ShaderGenerator::getMaterialSerializerListener()
 		mMaterialSerializerListener = OGRE_NEW SGMaterialSerializerListener;
 
 	return mMaterialSerializerListener;
-}
-
-//-----------------------------------------------------------------------------
-void ShaderGenerator::setShaderCachePath( const String& cachePath )
-{	
-	mShaderCachePath = cachePath;
 }
 
 //-----------------------------------------------------------------------------
