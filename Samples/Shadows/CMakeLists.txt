@@ -9,18 +9,22 @@
 
 # Configure Shadows demo build
 
-set(SOURCE_FILES src/Shadows.cpp)
+set(SOURCE_FILES 
+  src/Shadows.cpp
+)
 
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/Shadows.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-endif ()
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_library(Sample_Shadows ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../Common/CEGUIRenderer/include)
-add_executable(Demo_Shadows WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})
+target_link_libraries(Sample_Shadows ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+ogre_config_sample_lib(Sample_Shadows)
 
-target_link_libraries(Demo_Shadows ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${CEGUI_LIBRARIES} ${OGRE_CEGUIRenderer_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample_exe(Demo_Shadows)
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+    # Set the INSTALL_PATH so that Samples can be installed in the application package
+    set_target_properties(Sample_Shadows
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+endif()
 
-if (SAMPLE_DEPENDENCIES)
-  add_dependencies(Demo_Shadows ${SAMPLE_DEPENDENCIES})
-endif ()
+add_dependencies(SampleBrowser Sample_Shadows)

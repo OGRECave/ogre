@@ -15,7 +15,6 @@ same license as the rest of the engine.
 #ifndef __MaterialControls_H__
 #define __MaterialControls_H__
 
-#include "CEGUI/CEGUIForwardRefs.h"
 #include "OgreString.h"
 
 enum ShaderValType
@@ -89,17 +88,6 @@ protected:
 
 typedef Ogre::vector<MaterialControls>::type MaterialControlsContainer;
 typedef MaterialControlsContainer::iterator MaterialControlsIterator;
-
-
-//---------------------------------------------------------------------------
-struct ShaderControlGUIWidget
-{
-	CEGUI::Window* TextWidget;
-	CEGUI::Window* NumberWidget;
-	CEGUI::Scrollbar*  ScrollWidget;
-
-	ShaderControlGUIWidget() : TextWidget(NULL), NumberWidget(NULL), ScrollWidget(NULL) {}
-};
 
 //---------------------------------------------------------------------------
 /** loads material shader controls from a configuration file
