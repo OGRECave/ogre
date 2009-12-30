@@ -1708,6 +1708,7 @@ namespace Ogre
 
 		const Camera* mLastLODCamera;
 		unsigned long mLastLODFrame;
+		int mLastViewportHeight;
 
 		Terrain* mNeighbours[NEIGHBOUR_COUNT];
 

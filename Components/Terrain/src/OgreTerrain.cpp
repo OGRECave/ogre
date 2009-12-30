@@ -157,6 +157,7 @@ namespace Ogre
 		, mCpuTerrainNormalMap(0)
 		, mLastLODCamera(0)
 		, mLastLODFrame(0)
+		, mLastViewportHeight(0)
 		, mCustomGpuBufferAllocator(0)
 
 	{
@@ -2041,15 +2042,16 @@ namespace Ogre
 				updateCompositeMap();
 		}
 		mLastMillis = currMillis;
-		// only calculate LOD once per LOD camera, per frame
-		// shadow renders will pick up LOD camera from main viewport and so LOD will only
-		// be calculated once for that case
+		// only calculate LOD once per LOD camera, per frame, per viewport height
 		const Camera* lodCamera = v->getCamera()->getLodCamera();
 		unsigned long frameNum = Root::getSingleton().getNextFrameNumber();
-		if (mLastLODCamera != lodCamera || frameNum != mLastLODFrame)
+		int vpHeight = v->getActualHeight();
+		if (mLastLODCamera != lodCamera || frameNum != mLastLODFrame
+			|| mLastViewportHeight != vpHeight)
 		{
 			mLastLODCamera = lodCamera;
 			mLastLODFrame = frameNum;
+			mLastViewportHeight = vpHeight;
 			calculateCurrentLod(v);
 		}
 	}
