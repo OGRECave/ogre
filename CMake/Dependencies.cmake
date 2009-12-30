@@ -36,6 +36,8 @@ else()
   )
 endif()
 
+message(STATUS "Search path: ${OGRE_DEP_SEARCH_PATH}")
+
 # Set hardcoded path guesses for various platforms
 if (UNIX)
   set(OGRE_DEP_SEARCH_PATH ${OGRE_DEP_SEARCH_PATH} /usr/local)
@@ -45,13 +47,8 @@ endif ()
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OGRE_DEP_SEARCH_PATH})
 set(CMAKE_FRAMEWORK_PATH ${CMAKE_FRAMEWORK_PATH} ${OGRE_DEP_SEARCH_PATH})
 
-# see if there is an install directive somewhere in the dependencies folders
-find_file(OGRE_DEP_INSTALL_FILE OgreInstallDependencies.cmake 
-  HINTS ${OGRE_DEP_SEARCH_PATH} NO_DEFAULT_PATH)
-mark_as_advanced(OGRE_DEP_INSTALL_FILE)
-if (OGRE_DEP_INSTALL_FILE)
-  include(${OGRE_DEP_INSTALL_FILE})
-endif ()
+# provide option to install dependencies on Windows
+include(InstallDependencies)
 
 
 #######################################################################
