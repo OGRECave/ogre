@@ -15,7 +15,7 @@ public:
 		mInfo["Title"] = "Bezier Patch";
 		mInfo["Description"] = "A demonstration of the Bezier patch support.";
 		mInfo["Thumbnail"] = "thumb_bezier.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Geometry";
 	}
 
 	void checkBoxToggled(CheckBox* box)

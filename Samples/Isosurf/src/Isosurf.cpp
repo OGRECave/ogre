@@ -41,7 +41,7 @@ public:
 		mInfo["Title"] = "Isosurf";
 		mInfo["Description"] = "A demo of procedural geometry manipulation using geometry shaders.";
 		mInfo["Thumbnail"] = "thumb_isosurf.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Geometry";
     }
 
     // Just override the mandatory create scene method

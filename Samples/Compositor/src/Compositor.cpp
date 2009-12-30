@@ -39,7 +39,7 @@ Sample_Compositor::Sample_Compositor()
 	mInfo["Title"] = "Compositor";
 	mInfo["Description"] = "A demo of Ogre's post-processing framework.";
 	mInfo["Thumbnail"] = "thumb_comp.png";
-	mInfo["Category"] = "Unsorted";
+	mInfo["Category"] = "Effects";
 }
 //--------------------------------------------------------------------------
 void Sample_Compositor::createCamera(void)

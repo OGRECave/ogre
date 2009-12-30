@@ -15,7 +15,7 @@ public:
 		mInfo["Title"] = "Skeletal Animation";
 		mInfo["Description"] = "A demo of the skeletal animation feature, including spline animation.";
 		mInfo["Thumbnail"] = "thumb_skelanim.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Animation";
 	}
 
     bool frameRenderingQueued(const FrameEvent& evt)

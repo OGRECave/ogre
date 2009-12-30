@@ -57,7 +57,7 @@ public:
 		mInfo["Title"] = "Terrain";
 		mInfo["Description"] = "Demonstrates use of the terrain rendering plugin.";
 		mInfo["Thumbnail"] = "thumb_terrain.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Environment";
 		mInfo["Help"] = "Left click and drag anywhere in the scene to look around. Let go again to show "
 			"cursor and access widgets. Use WASD keys to move. Use +/- keys when in edit mode to change content.";
 

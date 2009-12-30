@@ -153,7 +153,7 @@ public:
 		mInfo["Title"] = "Shadows";
 		mInfo["Description"] = "A demonstration of ogre's various shadowing techniques.";
 		mInfo["Thumbnail"] = "thumb_shadows.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Lighting";
 
     }
 

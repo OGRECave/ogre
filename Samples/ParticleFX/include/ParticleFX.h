@@ -15,7 +15,7 @@ public:
 		mInfo["Title"] = "Particle Effects";
 		mInfo["Description"] = "Demonstrates the creation and usage of particle effects.";
 		mInfo["Thumbnail"] = "thumb_particles.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Effects";
 		mInfo["Help"] = "Use the checkboxes to toggle visibility of the individual particle systems.";
 	}
 

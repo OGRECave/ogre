@@ -53,7 +53,7 @@ public:
 		mInfo["Title"] = "Particle Effects (GPU)";
 		mInfo["Description"] = "A demo of GPU-accelerated particle systems using geometry shaders and 'render to vertex buffer's.";
 		mInfo["Thumbnail"] = "thumb_particlegs.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Effects";
     }
 
 protected:

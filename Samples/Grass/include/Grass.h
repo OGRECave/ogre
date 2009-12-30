@@ -16,7 +16,7 @@ public:
 		mInfo["Description"] = "Demonstrates how to use the StaticGeometry class to create 'baked' "
 			"instances of many meshes, to create effects like grass efficiently.";
 		mInfo["Thumbnail"] = "thumb_grass.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Environment";
 		mInfo["Help"] = "Press B to toggle bounding boxes.";
 	}
 

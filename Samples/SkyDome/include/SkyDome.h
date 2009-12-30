@@ -15,7 +15,7 @@ public:
 		mInfo["Title"] = "Sky Dome";
 		mInfo["Description"] = "Shows how to use skydomes (fixed-distance domes used for backgrounds).";
 		mInfo["Thumbnail"] = "thumb_skydome.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Environment";
 	}
 
 	void sliderMoved(Slider* slider)

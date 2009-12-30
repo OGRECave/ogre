@@ -15,7 +15,7 @@ public:
 		mInfo["Title"] = "Cel-shading";
 		mInfo["Description"] = "A demo of cel-shaded graphics using vertex & fragment programs.";
 		mInfo["Thumbnail"] = "thumb_cel.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Lighting";
 	}
 
 	StringVector getRequiredPlugins()

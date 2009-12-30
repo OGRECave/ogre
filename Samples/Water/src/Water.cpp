@@ -264,7 +264,7 @@ public:
 		mInfo["Title"] = "Water";
 		mInfo["Description"] = "A demo of a simple water effect.";
 		mInfo["Thumbnail"] = "thumb_water.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Environment";
     }
     
 protected:

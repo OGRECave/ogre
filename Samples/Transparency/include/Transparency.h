@@ -19,7 +19,7 @@ public:
 		mInfo["Title"] = "Transparency";
 		mInfo["Description"] = "Demonstrates the use of transparent materials (or scene blending).";
 		mInfo["Thumbnail"] = "thumb_trans.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Lighting";
 	}
 
 	bool frameRenderingQueued(const FrameEvent& evt)

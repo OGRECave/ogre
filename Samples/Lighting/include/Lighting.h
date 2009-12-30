@@ -16,7 +16,7 @@ public:
 		mInfo["Description"] = "Shows OGRE's lighting support. Also demonstrates automatic "
 			"time-relative behaviour using billboards and controllers.";
 		mInfo["Thumbnail"] = "thumb_lighting.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Lighting";
 	}
 
     bool frameRenderingQueued(const FrameEvent& evt)

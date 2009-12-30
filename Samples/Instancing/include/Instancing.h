@@ -182,7 +182,7 @@ public:
 		mInfo["Title"] = "Instancing";
 		mInfo["Description"] = "A demo of different methods to handle a large number of objects.";
 		mInfo["Thumbnail"] = "thumb_instancing.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Geometry";
 	}
 	//-----------------------------------------------------------------------
 	~Sample_Instancing()

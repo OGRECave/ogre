@@ -15,7 +15,7 @@ public:
 		mInfo["Title"] = "Sky Box";
 		mInfo["Description"] = "Shows how to use skyboxes (fixed-distance cubes used for backgrounds).";
 		mInfo["Thumbnail"] = "thumb_skybox.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Environment";
 	}
 
 protected:

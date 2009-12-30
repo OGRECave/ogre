@@ -17,7 +17,7 @@ public:
 			"to achieve a bump mapping effect. Tangent space computations made through the guide of the tutorial "
 			"on bump mapping from http://users.ox.ac.uk/~univ1234 by paul.baker@univ.ox.ac.uk.";
 		mInfo["Thumbnail"] = "thumb_bump.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Lighting";
 		mInfo["Help"] = "Left click and drag anywhere in the scene to look around. Let go again to show "
 			"cursor and access widgets. Use WASD keys to move.";
 	}

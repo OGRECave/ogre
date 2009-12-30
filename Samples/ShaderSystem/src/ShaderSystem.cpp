@@ -58,7 +58,7 @@ Sample_ShaderSystem::Sample_ShaderSystem()
 		"7. Built in material script serialization."
 		;
 	mInfo["Thumbnail"] = "thumb_shadersystem.png";
-	mInfo["Category"] = "Unsorted";
+	mInfo["Category"] = "Lighting";
 	mInfo["Help"] = "F2 Toggle Shader System globally. "
 				    "F3 Toggles Global Lighting Model. "
 					"Modify target model attributes and scene settings and observe the generated shaders count. "

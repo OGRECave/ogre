@@ -66,7 +66,7 @@ OceanDemo::OceanDemo()
 	mInfo["Title"] = "Ocean";
 	mInfo["Description"] = "An example demonstrating ocean rendering using shaders.";
 	mInfo["Thumbnail"] = "thumb_ocean.png";
-	mInfo["Category"] = "Unsorted";
+	mInfo["Category"] = "Environment";
 }
 /*************************************************************************
 	                    OceanDemo Methods

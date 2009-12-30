@@ -15,7 +15,7 @@ public:
 		mInfo["Title"] = "Sky Plane";
 		mInfo["Description"] = "Shows how to use skyplanes (fixed-distance planes used for backgrounds).";
 		mInfo["Thumbnail"] = "thumb_skyplane.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Environment";
 	}
 
 protected:

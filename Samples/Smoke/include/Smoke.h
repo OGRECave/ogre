@@ -15,7 +15,7 @@ public:
 		mInfo["Title"] = "Smoke";
 		mInfo["Description"] = "Demonstrates depth-sorting of particles in particle systems.";
 		mInfo["Thumbnail"] = "thumb_smoke.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Effects";
 		mInfo["Help"] = "Proof that OGRE is just the hottest thing. Bleh. So there. ^_^";
 	}
 

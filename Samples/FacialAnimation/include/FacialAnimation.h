@@ -16,7 +16,7 @@ public:
 		mInfo["Title"] = "Facial Animation";
 		mInfo["Description"] = "A demonstration of the facial animation feature, using pose animation.";
 		mInfo["Thumbnail"] = "thumb_facial.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Animation";
 		mInfo["Help"] = "Use the checkbox to enable/disable manual animation. "
 			"When manual animation is enabled, use the sliders to adjust each pose's influence.";
 	}

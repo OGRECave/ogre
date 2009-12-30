@@ -67,7 +67,7 @@ public:
 		mInfo["Title"] = "Deferred Shading";
 		mInfo["Description"] = "A sample implementation of a deferred renderer using the compositor framework.";
 		mInfo["Thumbnail"] = "thumb_deferred.png";
-		mInfo["Category"] = "Unsorted";
+		mInfo["Category"] = "Lighting";
 		mInfo["Help"] = "See http://www.ogre3d.org/wiki/index.php/Deferred_Shading for more info";
 	}
     
