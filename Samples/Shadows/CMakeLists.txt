@@ -13,6 +13,8 @@ set(SOURCE_FILES
   src/Shadows.cpp
 )
 
+set(HEADER_FILES include/Shadows.h)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(Sample_Shadows ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
