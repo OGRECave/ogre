@@ -525,6 +525,16 @@ namespace OgreBites
 					runSample(newSample == mCurrentSample ? 0 : newSample);
 				}
 			}
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+            else if (evt.key == OIS::KC_M)   // change orientation mode
+            {
+                unsigned int orientationMode = (unsigned int)mWindow->getViewport(0)->getOrientationMode();
+                orientationMode++;
+                if (orientationMode >= 4)
+                    orientationMode = 0;
+                mWindow->getViewport(0)->setOrientationMode((Ogre::OrientationMode)orientationMode);                
+            }
+#endif
 
 			try
 			{
@@ -586,10 +596,13 @@ namespace OgreBites
 		{
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
             OIS::MultiTouchState state = evt.state;
-            trasformInputState(state);
+            transformInputState(state);
             OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
 #else
             OIS::MouseState state = evt.state;
+    #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+            transformInputState(state);
+    #endif
             OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
 #endif
 
@@ -641,10 +654,13 @@ namespace OgreBites
 		{
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
             OIS::MultiTouchState state = evt.state;
-            trasformInputState(state);
+            transformInputState(state);
             OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
 #else
             OIS::MouseState state = evt.state;
+    #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+            transformInputState(state);
+    #endif
             OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
 #endif
 
@@ -683,10 +699,13 @@ namespace OgreBites
 		{
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
             OIS::MultiTouchState state = evt.state;
-            trasformInputState(state);
+            transformInputState(state);
             OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
 #else
             OIS::MouseState state = evt.state;
+    #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+            transformInputState(state);
+    #endif
             OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
 #endif
 

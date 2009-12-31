@@ -151,6 +151,7 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   set(OGRE_USE_BOOST TRUE CACHE BOOL "Forcing use of Boost libraries for iPhone" FORCE)
   set(Boost_FOUND TRUE CACHE BOOL "Forcing use of Boost libraries for iPhone" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
+  set(OGRE_CONFIG_DISABLE_VIEWPORT_ORIENTATIONMODE FALSE CACHE BOOL "Forcing viewport orientation support for iPhone" FORCE)
 
   add_definitions(-fno-regmove)
   remove_definitions(-msse)
@@ -163,10 +164,21 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
   # Set 10.4 as the base SDK by default
   set(XCODE_ATTRIBUTE_SDKROOT macosx10.4)
 
+  # 10.6 sets x86_64 as the default architecture.
+  # Because Carbon isn't supported on 64-bit and we still need it, force the architectures to ppc and i386
+  if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "10.6")
+	  set(CMAKE_OSX_ARCHITECTURES "ppc i386")
+  endif()
+
   # Make sure that the OpenGL render system is selected for non-iPhone Apple builds
   set(OGRE_BUILD_RENDERSYSTEM_GL TRUE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
 endif ()
+
+# Enable the PVRTC codec if OpenGL ES is being built
+if(OGRE_BUILD_RENDERSYSTEM_GLES)
+  set(OGRE_CONFIG_DISABLE_PVRTC FALSE CACHE BOOL "Forcing PVRTC codec for OpenGL ES" FORCE)
+endif()
 
 ######################################################################
 # Provide user options to customise the build process
@@ -219,8 +231,9 @@ option(OGRE_CONFIG_MEMTRACK_RELEASE "Enable Ogre's memory tracker in release mod
 include(PrepareThreadingOptions)
 cmake_dependent_option(OGRE_CONFIG_DISABLE_FREEIMAGE "Don't build FreeImage codec. If you use this option, you need to provide your own image handling codecs." FALSE "FreeImage_FOUND" TRUE)
 option(OGRE_CONFIG_DISABLE_DDS "Don't build DDS codec." FALSE)
-cmake_dependent_option(OGRE_CONFIG_DISABLE_PVRTC "Don't build PVRTC codec." TRUE "OPENGLES_FOUND" FALSE)
+option(OGRE_CONFIG_DISABLE_PVRTC "Don't build PVRTC codec." TRUE)
 cmake_dependent_option(OGRE_CONFIG_DISABLE_ZIP "Don't build ZIP archive support. If you use this option, you cannot use ZIP archives resource locations. The samples won't work." FALSE "ZZip_FOUND" TRUE)
+option(OGRE_CONFIG_DISABLE_VIEWPORT_ORIENTATIONMODE "Don't include Viewport orientation mode support." TRUE)
 option(OGRE_CONFIG_NEW_COMPILERS "Use the new script compilers." TRUE)
 cmake_dependent_option(OGRE_USE_BOOST "Use Boost extensions" TRUE "Boost_FOUND" FALSE)
 # Customise what to install

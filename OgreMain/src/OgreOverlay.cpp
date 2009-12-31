@@ -317,7 +317,7 @@ namespace Ogre {
 
         Radian orientationRotation = Radian(0);
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
         orientationRotation = Radian(OverlayManager::getSingleton().getViewportOrientationMode() * Math::HALF_PI);
 #endif
 

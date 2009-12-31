@@ -116,7 +116,7 @@ namespace Ogre {
             if (mCamera->getAutoAspectRatio())
                 mCamera->setAspectRatio((Real) mActWidth / (Real) mActHeight);
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
             mCamera->setOrientationMode(mOrientationMode);
 #endif
         }
@@ -206,9 +206,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Viewport::setOrientationMode(OrientationMode orientationMode, bool setDefault)
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Setting Viewport orientation mode is only supported on iPhone",
+                    "Setting Viewport orientation mode is not supported",
                     __FUNCTION__);
 #endif
         mOrientationMode = orientationMode;
@@ -237,9 +237,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     OrientationMode Viewport::getOrientationMode() const
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Getting Viewport orientation mode is only supported on iPhone",
+                    "Getting Viewport orientation mode is not supported",
                     __FUNCTION__);
 #endif
         return mOrientationMode;
@@ -247,9 +247,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Viewport::setDefaultOrientationMode(OrientationMode orientationMode)
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Setting default Viewport orientation mode is only supported on iPhone",
+                    "Setting default Viewport orientation mode is not supported",
                     __FUNCTION__);
 #endif
         mDefaultOrientationMode = orientationMode;
@@ -257,9 +257,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     OrientationMode Viewport::getDefaultOrientationMode()
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Getting default Viewport orientation mode is only supported on iPhone",
+                    "Getting default Viewport orientation mode is not supported",
                     __FUNCTION__);
 #endif
         return mDefaultOrientationMode;
@@ -402,5 +402,35 @@ namespace Ogre {
 		return mRQSequence;
 	}
 	//-----------------------------------------------------------------------
-
+    void Viewport::pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv)
+    {
+        pointOrientedToScreen(v.x, v.y, orientationMode, outv.x, outv.y);
+    }
+	//-----------------------------------------------------------------------
+    void Viewport::pointOrientedToScreen(Real orientedX, Real orientedY, int orientationMode,
+                                         Real &screenX, Real &screenY)
+    {
+        Real orX = orientedX;
+        Real orY = orientedY;
+        switch (orientationMode)
+        {
+        case 1:
+            screenX = orY;
+            screenY = Real(1.0) - orX;
+            break;
+        case 2:
+            screenX = Real(1.0) - orX;
+            screenY = Real(1.0) - orY;
+            break;
+        case 3:
+            screenX = Real(1.0) - orY;
+            screenY = orX;
+            break;
+        default:
+            screenX = orX;
+            screenY = orY;
+            break;
+        }
+    }
+	//-----------------------------------------------------------------------
 }

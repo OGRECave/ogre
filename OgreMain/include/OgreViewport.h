@@ -186,30 +186,18 @@ namespace Ogre {
         void setDimensions(Real left, Real top, Real width, Real height);
 
         /** Set the orientation mode of the viewport.
-             @remarks
-                Getting the orientation of a viewport is only supported on
-                iPhone at this time.  An exception is thrown on other platforms.
         */
         void setOrientationMode(OrientationMode orientationMode, bool setDefault = true);
 
         /** Get the orientation mode of the viewport.
-             @remarks
-                Setting the orientation of a viewport is only supported on
-                iPhone at this time.  An exception is thrown on other platforms.
         */
         OrientationMode getOrientationMode() const;
 
         /** Set the initial orientation mode of viewports.
-             @remarks
-                Setting the default orientation of a viewport is only supported on
-                iPhone at this time.  An exception is thrown on other platforms.
         */
         static void setDefaultOrientationMode(OrientationMode orientationMode);
 
         /** Get the initial orientation mode of viewports.
-             @remarks
-                Getting the default orientation of a viewport is only supported on
-                iPhone at this time.  An exception is thrown on other platforms.
         */
         static OrientationMode getDefaultOrientationMode();
 
@@ -367,6 +355,11 @@ namespace Ogre {
 		virtual const String& getRenderQueueInvocationSequenceName(void) const;
 		/// Get the invocation sequence - will return null if using standard
 		RenderQueueInvocationSequence* _getRenderQueueInvocationSequence(void);
+
+        /** Convert oriented input point coordinates to screen coordinates. */
+        void pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv);
+        void pointOrientedToScreen(Real orientedX, Real orientedY, int orientationMode,
+                                   Real &screenX, Real &screenY);
 
     protected:
         Camera* mCamera;

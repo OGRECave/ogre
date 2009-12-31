@@ -538,7 +538,7 @@ namespace Ogre {
 			} // ortho            
 		} // !mCustomProjMatrix
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
         // Deal with orientation mode
         mProjMatrix = mProjMatrix * Quaternion(Degree(mOrientationMode * 90.f), Vector3::UNIT_Z);
 #endif
@@ -1350,9 +1350,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Frustum::setOrientationMode(OrientationMode orientationMode)
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Setting Frustrum orientation mode is only supported on iPhone",
+                    "Setting Frustrum orientation mode is not supported",
                     __FUNCTION__);
 #endif
         mOrientationMode = orientationMode;
@@ -1361,9 +1361,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     OrientationMode Frustum::getOrientationMode() const
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Getting Frustrum orientation mode is only supported on iPhone",
+                    "Getting Frustrum orientation mode is not supported",
                     __FUNCTION__);
 #endif
         return mOrientationMode;

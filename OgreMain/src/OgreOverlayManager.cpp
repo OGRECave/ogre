@@ -274,7 +274,7 @@ namespace Ogre {
         RenderQueue* pQueue, Viewport* vp)
     {
         bool orientationModeChanged = false;
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
         orientationModeChanged = (mLastViewportOrientationMode != vp->getOrientationMode());
 #endif
         // Flag for update pixel-based GUIElements if viewport has changed dimensions
@@ -283,7 +283,7 @@ namespace Ogre {
             orientationModeChanged)
         {
             mViewportDimensionsChanged = true;
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
             switch (vp->getOrientationMode())
             {
             case Ogre::OR_DEGREE_0:
@@ -313,7 +313,7 @@ namespace Ogre {
         for (i = mOverlayMap.begin(); i != iend; ++i)
         {
             Overlay* o = i->second;
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
             if (orientationModeChanged)
             {
                 // trick to trigger transform update of the overlay
@@ -519,9 +519,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     OrientationMode OverlayManager::getViewportOrientationMode(void) const
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE != 0
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "Getting ViewPort orientation mode is only supported on iPhone",
+                    "Getting ViewPort orientation mode is not supported",
                     __FUNCTION__);
 #endif
         return mLastViewportOrientationMode;

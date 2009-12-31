@@ -1897,9 +1897,11 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		void refreshCursor()
 		{
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
             // TODO:
             // the position should be based on the orientation, for now simply return
             return;
+#endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
             std::vector<OIS::MultiTouchState> states = mMouse->getMultiTouchStates();
             if(states.size() > 0)

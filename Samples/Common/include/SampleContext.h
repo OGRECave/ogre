@@ -339,8 +339,12 @@ namespace OgreBites
 			return true;
 		}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-        void trasformInputState(OIS::MultiTouchState &state)
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+    #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        void transformInputState(OIS::MultiTouchState &state)
+    #else
+        void transformInputState(OIS::MouseState &state)
+    #endif
         {
             int w = mWindow->getViewport(0)->getActualWidth();
             int h = mWindow->getViewport(0)->getActualHeight();
@@ -373,7 +377,9 @@ namespace OgreBites
                 break;
             }
         }
+#endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 		virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
 		{
 			if (mCurrentSample && !mSamplePaused) return mCurrentSample->touchMoved(evt);
