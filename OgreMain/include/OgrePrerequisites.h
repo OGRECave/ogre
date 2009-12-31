@@ -56,7 +56,7 @@ namespace Ogre {
     #define OGRE_VERSION_MAJOR 1
     #define OGRE_VERSION_MINOR 7
     #define OGRE_VERSION_PATCH 0
-	#define OGRE_VERSION_SUFFIX "dev-unstable"
+	#define OGRE_VERSION_SUFFIX "RC1"
     #define OGRE_VERSION_NAME "Cthugha"
 
     #define OGRE_VERSION    ((OGRE_VERSION_MAJOR << 16) | (OGRE_VERSION_MINOR << 8) | OGRE_VERSION_PATCH)
