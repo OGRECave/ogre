@@ -34,6 +34,8 @@ set(STATIC_INST_FILES
   Packages/FindFreeImage.cmake
   Packages/FindFreetype.cmake
   Packages/FindOpenGLES.cmake
+  Packages/FindPOCO.cmake
+  Packages/FindTBB.cmake
   Packages/FindZLIB.cmake
   Packages/FindZZip.cmake
 )
