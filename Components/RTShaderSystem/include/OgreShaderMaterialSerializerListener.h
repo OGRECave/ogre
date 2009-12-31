@@ -44,7 +44,7 @@ namespace RTShader {
 /** This class responsible for translating core features of the RT Shader System for
 Ogre material scripts.
 */
-class SGMaterialSerializerListener : public MaterialSerializer::Listener, public RTShaderSystemAlloc
+class _OgreRTSSExport SGMaterialSerializerListener : public MaterialSerializer::Listener, public RTShaderSystemAlloc
 {
 
 // Interface.

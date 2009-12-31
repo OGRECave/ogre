@@ -43,7 +43,7 @@ namespace Ogre {
 /** HLSL target language writer implementation.
 @see ProgramWriter.
 */
-class HLSLProgramWriter : public ProgramWriter
+class _OgreRTSSExport HLSLProgramWriter : public ProgramWriter
 {
 
 	// Interface.
@@ -106,7 +106,7 @@ protected:
 /** HLSL program writer factory implementation.
 @see ProgramWriterFactory
 */
-class ShaderProgramWriterHLSLFactory : public ProgramWriterFactory
+class _OgreRTSSExport ShaderProgramWriterHLSLFactory : public ProgramWriterFactory
 {
 public:
 	ShaderProgramWriterHLSLFactory()

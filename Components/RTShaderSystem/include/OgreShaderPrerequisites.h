@@ -86,5 +86,24 @@ enum VSOutputCompactPolicy
 }
 }
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#	if defined( OGRE_COMPONENT_STATIC )
+#   	define _OgreRTSSExport
+#   else
+#   	if defined( OgreRTShaderSystem_EXPORTS )
+#       	define _OgreRTSSExport __declspec( dllexport )
+#   	else
+#           if defined( __MINGW32__ )
+#               define _OgreRTSSExport
+#           else
+#       	    define _OgreRTSSExport __declspec( dllimport )
+#           endif
+#   	endif
+#	endif
+#else
+#	define _OgreRTSSExport
+#endif 
+
+
 #endif
 

@@ -43,7 +43,7 @@ namespace RTShader {
 
 /** CG Language program processor class.
 */
-class HLSLProgramProcessor : public ProgramProcessor
+class _OgreRTSSExport HLSLProgramProcessor : public ProgramProcessor
 {
 
 	// Interface.

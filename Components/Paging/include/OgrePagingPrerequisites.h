@@ -58,8 +58,24 @@ namespace Ogre
 
 }
 
-// Always static 
-#define _OgrePagingExport
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#	if defined( OGRE_COMPONENT_STATIC )
+#   	define _OgrePagingExport
+#   else
+#   	if defined( OGRE_PAGING_EXPORTS )
+#       	define _OgrePagingExport __declspec( dllexport )
+#   	else
+#           if defined( __MINGW32__ )
+#               define _OgrePagingExport
+#           else
+#       	    define _OgrePagingExport __declspec( dllimport )
+#           endif
+#   	endif
+#	endif
+#else
+#	define _OgrePagingExport
+#endif 
+
 
 
 #endif 

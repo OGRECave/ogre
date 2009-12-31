@@ -50,7 +50,7 @@ namespace RTShader {
 A simple example of sub class of this interface will be the transform sub state of the
 fixed pipeline.
 */
-class SubRenderState : public RTShaderSystemAlloc
+class _OgreRTSSExport SubRenderState : public RTShaderSystemAlloc
 {
 
 // Interface.
@@ -169,7 +169,7 @@ SubRenderStateFactory subclasses must allow the creation and destruction of SubR
 subclasses. They must also be registered with the ShaderGenerator::addSubRenderStateFactory. 
 All factories have a type which identifies them and the sub class of SubRenderState they creates.
 */
-class SubRenderStateFactory : public RTShaderSystemAlloc
+class _OgreRTSSExport SubRenderStateFactory : public RTShaderSystemAlloc
 {
 
 public:

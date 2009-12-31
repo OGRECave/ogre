@@ -155,7 +155,7 @@ namespace Ogre
 			void addTechnique(const MaterialPtr& mat, const Terrain* terrain, TechniqueType tt);
 
 			/// Interface definition for helper class to generate shaders
-			class ShaderHelper : public TerrainAlloc
+			class _OgreTerrainExport ShaderHelper : public TerrainAlloc
 			{
 			public:
 				ShaderHelper() {}
@@ -188,7 +188,7 @@ namespace Ogre
 			};
 
 			/// Utility class to help with generating shaders for Cg / HLSL.
-			class ShaderHelperCg : public ShaderHelper
+			class _OgreTerrainExport ShaderHelperCg : public ShaderHelper
 			{
 			protected:
 				HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
@@ -206,7 +206,7 @@ namespace Ogre
 				void generateFpDynamicShadows(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
 			};
 
-			class ShaderHelperHLSL : public ShaderHelperCg
+			class _OgreTerrainExport ShaderHelperHLSL : public ShaderHelperCg
 			{
 			protected:
 				HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
@@ -214,7 +214,7 @@ namespace Ogre
 			};
 
 			/// Utility class to help with generating shaders for GLSL.
-			class ShaderHelperGLSL : public ShaderHelper
+			class _OgreTerrainExport ShaderHelperGLSL : public ShaderHelper
 			{
 			protected:
 				HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);

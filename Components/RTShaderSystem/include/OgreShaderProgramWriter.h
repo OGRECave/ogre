@@ -49,7 +49,7 @@ The main usage of this class is to generate a shader source code from the given 
 In order to support specific shader language one should subclass this interface and implement the pure methods.
 */
 
-class ProgramWriter : public RTShaderSystemAlloc
+class _OgreRTSSExport ProgramWriter : public RTShaderSystemAlloc
 {
 // Interface.
 public:

@@ -42,7 +42,7 @@ namespace RTShader {
 /** GLSL target language writer implementation.
 @see ProgramWriter.
 */
-class GLSLProgramWriter : public ProgramWriter
+class _OgreRTSSExport GLSLProgramWriter : public ProgramWriter
 {
 	// Interface.
 public:
@@ -107,7 +107,7 @@ protected:
 /** GLSL program writer factory implementation.
 @see ProgramWriterFactory
 */
-class ShaderProgramWriterGLSLFactory : public ProgramWriterFactory
+class _OgreRTSSExport ShaderProgramWriterGLSLFactory : public ProgramWriterFactory
 {
 public:
 	ShaderProgramWriterGLSLFactory()

@@ -44,7 +44,7 @@ namespace RTShader {
 
 /** GLSL Language program processor class.
 */
-class GLSLProgramProcessor : public ProgramProcessor
+class _OgreRTSSExport GLSLProgramProcessor : public ProgramProcessor
 {
 
 // Interface.

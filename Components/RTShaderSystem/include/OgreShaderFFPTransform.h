@@ -45,7 +45,7 @@ namespace RTShader {
 @see http://msdn.microsoft.com/en-us/library/ee422511.aspx
 Derives from SubRenderState class.
 */
-class FFPTransform : public SubRenderState
+class _OgreRTSSExport FFPTransform : public SubRenderState
 {
 
 // Interface.
@@ -80,7 +80,7 @@ public:
 A factory that enables creation of FFPTransform instances.
 @remarks Sub class of SubRenderStateFactory
 */
-class FFPTransformFactory : public SubRenderStateFactory
+class _OgreRTSSExport FFPTransformFactory : public SubRenderStateFactory
 {
 public:
 

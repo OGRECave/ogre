@@ -49,7 +49,7 @@ namespace RTShader {
 /** Shader generator system main interface. This singleton based class
 enables automatic generation of shader code based on existing material techniques.
 */
-class ShaderGenerator : public Singleton<ShaderGenerator>, public RTShaderSystemAlloc
+class _OgreRTSSExport ShaderGenerator : public Singleton<ShaderGenerator>, public RTShaderSystemAlloc
 {
 // Interface.
 public:
@@ -375,7 +375,7 @@ protected:
 
 	
 	/** Shader generator pass wrapper class. */
-	class SGPass : public RTShaderSystemAlloc
+	class _OgreRTSSExport SGPass : public RTShaderSystemAlloc
 	{
 	public:
 		SGPass			(SGTechnique* parent, Pass* srcPass, Pass* dstPass);
@@ -427,7 +427,7 @@ protected:
 
 	
 	/** Shader generator technique wrapper class. */
-	class SGTechnique : public RTShaderSystemAlloc
+	class _OgreRTSSExport SGTechnique : public RTShaderSystemAlloc
 	{
 	public:
 		SGTechnique			(SGMaterial* parent, Technique* srcTechnique, const String& dstTechniqueSchemeName);		
@@ -488,7 +488,7 @@ protected:
 
 	
 	/** Shader generator material wrapper class. */
-	class SGMaterial : public RTShaderSystemAlloc
+	class _OgreRTSSExport SGMaterial : public RTShaderSystemAlloc
 	{	
 	
 	public:
@@ -511,7 +511,7 @@ protected:
 
 	
 	/** Shader generator scheme class. */
-	class SGScheme : public RTShaderSystemAlloc
+	class _OgreRTSSExport SGScheme : public RTShaderSystemAlloc
 	{	
 	public:
 		SGScheme		(const String& schemeName);
@@ -580,7 +580,7 @@ protected:
 protected:
 	
 	/** Shader generator RenderObjectListener sub class. */
-	class SGRenderObjectListener : public RenderObjectListener, public RTShaderSystemAlloc
+	class _OgreRTSSExport SGRenderObjectListener : public RenderObjectListener, public RTShaderSystemAlloc
 	{
 	public:
 		SGRenderObjectListener(ShaderGenerator* owner)
@@ -603,7 +603,7 @@ protected:
 	};
 
 	/** Shader generator scene manager sub class. */
-	class SGSceneManagerListener : public SceneManager::Listener, public RTShaderSystemAlloc
+	class _OgreRTSSExport SGSceneManagerListener : public SceneManager::Listener, public RTShaderSystemAlloc
 	{
 	public:
 		SGSceneManagerListener(ShaderGenerator* owner)
@@ -648,7 +648,7 @@ protected:
 	};
 
 	/** Shader generator ScriptTranslatorManager sub class. */
-	class SGScriptTranslatorManager : public ScriptTranslatorManager
+	class _OgreRTSSExport SGScriptTranslatorManager : public ScriptTranslatorManager
 	{
 	public:
 		SGScriptTranslatorManager(ShaderGenerator* owner)

@@ -46,7 +46,7 @@ namespace RTShader {
 This class builds RenderState from a given pass that represents the fixed function pipeline
 that the source pass describes.
 */
-class FFPRenderStateBuilder : public Singleton<FFPRenderStateBuilder>, public RTShaderSystemAlloc
+class _OgreRTSSExport FFPRenderStateBuilder : public Singleton<FFPRenderStateBuilder>, public RTShaderSystemAlloc
 {
 // Interface.
 public:

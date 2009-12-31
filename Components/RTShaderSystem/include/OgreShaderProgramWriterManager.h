@@ -43,7 +43,7 @@ namespace RTShader {
 */
 
 /** Interface definition for factories of ShaderProgramWriter. */
-class ProgramWriterFactory : public RTShaderSystemAlloc
+class _OgreRTSSExport ProgramWriterFactory : public RTShaderSystemAlloc
 {
 public:
 	ProgramWriterFactory() {}
@@ -56,7 +56,7 @@ public:
 	virtual ProgramWriter* create(void) = 0;
 };
 
-class ProgramWriterManager 
+class _OgreRTSSExport ProgramWriterManager 
 	: public Singleton<ProgramWriterManager>, public RTShaderSystemAlloc
 {
 public:

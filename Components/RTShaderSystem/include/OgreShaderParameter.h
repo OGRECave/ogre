@@ -42,7 +42,7 @@ namespace RTShader {
 
 /** A class that represents a shader based program parameter.
 */
-class Parameter : public RTShaderSystemAlloc
+class _OgreRTSSExport Parameter : public RTShaderSystemAlloc
 {
 public:
 	// Shader parameter semantic.
@@ -412,7 +412,7 @@ protected:
 
 /** Helper utility class that creates common parameters.
 */
-class ParameterFactory
+class _OgreRTSSExport ParameterFactory
 {
 
 	// Interface.

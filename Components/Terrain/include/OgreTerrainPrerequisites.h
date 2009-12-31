@@ -45,7 +45,22 @@ namespace Ogre
 
 }
 
-// Always static 
-#define _OgreTerrainExport
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#	if defined( OGRE_COMPONENT_STATIC )
+#   	define _OgreTerrainExport
+#   else
+#   	if defined( OGRE_TERRAIN_EXPORTS )
+#       	define _OgreTerrainExport __declspec( dllexport )
+#   	else
+#           if defined( __MINGW32__ )
+#               define _OgreTerrainExport
+#           else
+#       	    define _OgreTerrainExport __declspec( dllimport )
+#           endif
+#   	endif
+#	endif
+#else
+#	define _OgreTerrainExport
+#endif 
 
 #endif 

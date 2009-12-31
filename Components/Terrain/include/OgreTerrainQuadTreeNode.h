@@ -325,7 +325,7 @@ namespace Ogre
 			a SceneManager::Listener to precalculate which nodes will be displayed 
 			when it comes to purely a LOD basis.
 		*/
-		class Movable : public MovableObject
+		class _OgreTerrainExport Movable : public MovableObject
 		{
 		protected:
 			TerrainQuadTreeNode* mParent;
@@ -350,7 +350,7 @@ namespace Ogre
 		SceneNode* mLocalNode;
 
 		/// Hook to the render queue
-		class Rend : public Renderable, public TerrainAlloc
+		class _OgreTerrainExport Rend : public Renderable, public TerrainAlloc
 		{
 		protected:
 			TerrainQuadTreeNode* mParent;

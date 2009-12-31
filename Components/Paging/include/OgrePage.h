@@ -45,7 +45,7 @@ namespace Ogre
 
 	/** Page class
 	*/
-	class Page : public WorkQueue::RequestHandler, 
+	class _OgrePagingExport Page : public WorkQueue::RequestHandler, 
 		public WorkQueue::ResponseHandler, public PageAlloc
 	{
 	public:

@@ -43,7 +43,7 @@ namespace RTShader {
 /** CG target language writer implementation.
 @see ProgramWriter.
 */
-class CGProgramWriter : public ProgramWriter
+class _OgreRTSSExport CGProgramWriter : public ProgramWriter
 {
 
 // Interface.
@@ -107,7 +107,7 @@ protected:
 /** CG program writer factory implementation.
 @see ProgramWriterFactory
 */
-class ShaderProgramWriterCGFactory : public ProgramWriterFactory
+class _OgreRTSSExport ShaderProgramWriterCGFactory : public ProgramWriterFactory
 {
 public:
 	ShaderProgramWriterCGFactory()

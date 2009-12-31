@@ -43,7 +43,7 @@ namespace RTShader {
 
 /** A class that represents a shader based program function.
 */
-class Function : public RTShaderSystemAlloc
+class _OgreRTSSExport Function : public RTShaderSystemAlloc
 {
 // Interface.
 public:

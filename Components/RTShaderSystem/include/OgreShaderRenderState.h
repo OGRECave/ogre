@@ -48,7 +48,7 @@ The user should use this interface to define global or per material custom behav
 I.E In order to apply per pixel to a specific material one should implement a sub class of SubRenderState that
 perform a per pixel lighting model, get the render state of the target material and add the custom sub class to it.
 */
-class RenderState : public RTShaderSystemAlloc
+class _OgreRTSSExport RenderState : public RTShaderSystemAlloc
 {
 
 // Interface.

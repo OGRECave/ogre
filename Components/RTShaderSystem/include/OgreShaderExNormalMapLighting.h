@@ -48,7 +48,7 @@ namespace RTShader {
 /** Normal Map Lighting extension sub render state implementation.
 Derives from SubRenderState class.
 */
-class NormalMapLighting : public SubRenderState
+class _OgreRTSSExport NormalMapLighting : public SubRenderState
 {
 
 // Interface.
@@ -131,7 +131,7 @@ public:
 protected:
 	
 	// Per light parameters.
-	struct LightParams
+	struct _OgreRTSSExport LightParams
 	{
 		Light::LightTypes	mType;				// Light type.		
 		ParameterPtr		mPosition;			// Light position.
@@ -291,7 +291,7 @@ protected:
 A factory that enables creation of NormalMapLighting instances.
 @remarks Sub class of SubRenderStateFactory
 */
-class NormalMapLightingFactory : public SubRenderStateFactory
+class _OgreRTSSExport NormalMapLightingFactory : public SubRenderStateFactory
 {
 public:
 

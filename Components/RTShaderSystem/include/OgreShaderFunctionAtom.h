@@ -45,7 +45,7 @@ namespace RTShader {
 
 /** A class that represents an atomic code section of shader based program function.
 */
-class FunctionAtom : public RTShaderSystemAlloc
+class _OgreRTSSExport FunctionAtom : public RTShaderSystemAlloc
 {
 // Interface.
 public:
@@ -75,7 +75,7 @@ protected:
 
 /** A class that represents a function operand (its the combination of a parameter the in/out semantic and the used fields)
 */
-class Operand : public RTShaderSystemAlloc
+class _OgreRTSSExport Operand : public RTShaderSystemAlloc
 {
 public:
 
@@ -150,7 +150,7 @@ protected:
 
 /** A class that represents function invocation code from shader based program function.
 */
-class FunctionInvocation : public FunctionAtom
+class _OgreRTSSExport FunctionInvocation : public FunctionAtom
 {
 	// Interface.
 public:	

@@ -51,7 +51,7 @@ Implements texture blending operation:
 @see http://msdn.microsoft.com/en-us/library/ee422488.aspx
 Derives from SubRenderState class.
 */
-class FFPTexturing : public SubRenderState
+class _OgreRTSSExport FFPTexturing : public SubRenderState
 {
 
 // Interface.
@@ -96,7 +96,7 @@ public:
 protected:
 
 	// Per texture unit parameters.
-	struct TextureUnitParams
+	struct _OgreRTSSExport TextureUnitParams
 	{
 		TextureUnitState*		mTextureUnitState;				// Texture unit state.
 		const Frustum*			mTextureProjector;				// Texture projector.
@@ -223,7 +223,7 @@ protected:
 A factory that enables creation of FFPTexturing instances.
 @remarks Sub class of SubRenderStateFactory
 */
-class FFPTexturingFactory : public SubRenderStateFactory
+class _OgreRTSSExport FFPTexturingFactory : public SubRenderStateFactory
 {
 public:
 
