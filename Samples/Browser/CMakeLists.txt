@@ -158,6 +158,8 @@ if (APPLE)
 	# now plugins
 	add_custom_command(TARGET SampleBrowser POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins)
+	add_custom_command(TARGET SampleBrowser POST_BUILD
+		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Components)
 	if (OGRE_BUILD_RENDERSYSTEM_GL)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
 			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/RenderSystem_GL.dylib 
@@ -196,6 +198,32 @@ if (APPLE)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
 			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_ParticleFX.dylib 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+			)
+	endif()
+	
+	# Components
+	if (OGRE_BUILD_COMPONENT_PAGING)
+		add_custom_command(TARGET SampleBrowser POST_BUILD
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/libOgrePaging.dylib 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
+			)
+	endif()
+	if (OGRE_BUILD_COMPONENT_PROPERTY)
+		add_custom_command(TARGET SampleBrowser POST_BUILD
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/libOgreProperty.dylib 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
+			)
+	endif()
+	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
+		add_custom_command(TARGET SampleBrowser POST_BUILD
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/libOgreRTShaderSystem.dylib 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
+			)
+	endif()
+	if (OGRE_BUILD_COMPONENT_TERRAIN)
+		add_custom_command(TARGET SampleBrowser POST_BUILD
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/libOgreTerrain.dylib 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
 			)
 	endif()
 
