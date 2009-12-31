@@ -271,17 +271,6 @@ void FFPColour::copyFrom(const SubRenderState& rhs)
 }
 
 //-----------------------------------------------------------------------
-uint32 FFPColour::getHashCode()
-{	
-	uint32 hashCode   = 0;
-				
-	sh_hash_combine(hashCode, SubRenderState::getHashCode());
-	sh_hash_combine(hashCode, mResolveStageFlags);
-	
-	return hashCode;
-}
-
-//-----------------------------------------------------------------------
 bool FFPColour::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
 	TrackVertexColourType trackColour = srcPass->getVertexColourTracking();

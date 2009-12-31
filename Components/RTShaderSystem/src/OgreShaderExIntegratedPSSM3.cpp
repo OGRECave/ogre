@@ -75,24 +75,6 @@ int	IntegratedPSSM3::getExecutionOrder() const
 }
 
 //-----------------------------------------------------------------------
-uint32 IntegratedPSSM3::getHashCode()
-{
-	uint32 hashCode = 0;
-
-	sh_hash_combine(hashCode, SubRenderState::getHashCode());
-
-	ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
-
-	while(it != mShadowTextureParamsList.end())
-	{
-		sh_hash_combine(hashCode, it->mTextureSamplerIndex);			
-		++it;
-	}
-
-	return hashCode;
-}
-
-//-----------------------------------------------------------------------
 void IntegratedPSSM3::updateGpuProgramsParams(Renderable* rend, Pass* pass, 
 											 const AutoParamDataSource* source, 
 											 const LightList* pLightList)

@@ -62,23 +62,6 @@ int	FFPFog::getExecutionOrder() const
 {
 	return FFP_FOG;
 }
-
-//-----------------------------------------------------------------------
-uint32 FFPFog::getHashCode()
-{
-	uint32 hashCode = 0;
-	
-	sh_hash_combine(hashCode, SubRenderState::getHashCode());
-	sh_hash_combine(hashCode, mFogMode);	
-	sh_hash_combine(hashCode, mPassOverrideParams);
-
-	if (mFogMode != FOG_NONE)	
-		sh_hash_combine(hashCode, mCalcMode);	
-
-	
-	return hashCode;
-}
-
 //-----------------------------------------------------------------------
 void FFPFog::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 									 const LightList* pLightList)

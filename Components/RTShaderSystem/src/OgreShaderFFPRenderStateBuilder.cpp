@@ -119,7 +119,7 @@ void FFPRenderStateBuilder::finalize()
 
 
 //-----------------------------------------------------------------------------
-void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, RenderState* renderState)
+void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState)
 {
 	renderState->reset();
 
@@ -146,7 +146,7 @@ void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, Re
 
 //-----------------------------------------------------------------------------
 void FFPRenderStateBuilder::buildFFPSubRenderState(int subRenderStateOrder, const String& subRenderStateType,
-												ShaderGenerator::SGPass* sgPass, RenderState* renderState)
+												ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState)
 {
 	SubRenderState* subRenderState;
 
@@ -169,13 +169,13 @@ void FFPRenderStateBuilder::buildFFPSubRenderState(int subRenderStateOrder, cons
 
 
 //-----------------------------------------------------------------------------
-void FFPRenderStateBuilder::resolveColourStageFlags( ShaderGenerator::SGPass* sgPass, RenderState* renderState )
+void FFPRenderStateBuilder::resolveColourStageFlags( ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState )
 {
 	const SubRenderStateList& subRenderStateList = renderState->getSubStateList();
 	FFPColour* colourSubState = NULL;
 
 	// Find the colour sub state.
-	for (SubRenderStateConstIterator it=subRenderStateList.begin(); it != subRenderStateList.end(); ++it)
+	for (SubRenderStateListConstIterator it=subRenderStateList.begin(); it != subRenderStateList.end(); ++it)
 	{
 		SubRenderState* curSubRenderState = *it;
 
@@ -186,7 +186,7 @@ void FFPRenderStateBuilder::resolveColourStageFlags( ShaderGenerator::SGPass* sg
 		}
 	}
 	
-	for (SubRenderStateConstIterator it=subRenderStateList.begin(); it != subRenderStateList.end(); ++it)
+	for (SubRenderStateListConstIterator it=subRenderStateList.begin(); it != subRenderStateList.end(); ++it)
 	{
 		SubRenderState* curSubRenderState = *it;
 

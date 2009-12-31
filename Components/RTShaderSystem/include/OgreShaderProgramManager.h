@@ -93,26 +93,32 @@ public:
 	@param pass The pass to bind the programs to.
 	@param renderState The render state that describes the program that need to be generated.
 	*/
-	void							acquirePrograms			(Pass* pass, RenderState* renderState);
+	void							acquirePrograms			(Pass* pass, TargetRenderState* renderState);
 
-	/** Release CPU/GPU programs set associated with the given render state.	
-	@param renderState The render state that describes the programs set.
+	/** Release CPU/GPU programs set associated with the given render state and pass.
+	@param pass The pass to release the programs from.
+	@param renderState The render state holds the programs.
 	*/
-	void							releasePrograms			(RenderState* renderState);
-	
+	void							releasePrograms			(Pass* pass, TargetRenderState* renderState);
+
+	/** Flush the local GPU programs cache.
+	*/
+	void							flushGpuProgramsCache	();
+
 protected:
 
 	//-----------------------------------------------------------------------------
-	typedef map<uint32, ProgramSet*>::type				ProgramSetMap;
-	typedef ProgramSetMap::iterator						ProgramSetIterator;
-	typedef ProgramSetMap::const_iterator				ProgramSetConstIterator;
+	typedef map<String, GpuProgramPtr>::type			GpuProgramsMap;
+	typedef GpuProgramsMap::iterator					GpuProgramsMapIterator;
+	typedef GpuProgramsMap::const_iterator				GpuProgramsMapConstIterator;
 
 	//-----------------------------------------------------------------------------
-	typedef vector<Program*>::type						ProgramList;
+	typedef set<Program*>::type							ProgramList;
 	typedef ProgramList::iterator						ProgramListIterator;
 	typedef map<String, ProgramWriter*>::type			ProgramWriterMap;
 	typedef ProgramWriterMap::iterator					ProgramWriterIterator;
-	typedef vector<ProgramWriterFactory*>::type	ProgramWriterFactoryList;
+	typedef vector<ProgramWriterFactory*>::type			ProgramWriterFactoryList;
+	
 	//-----------------------------------------------------------------------------
 	typedef map<String, ProgramProcessor*>::type 		ProgramProcessorMap;
 	typedef ProgramProcessorMap::iterator 				ProgramProcessorIterator;
@@ -133,9 +139,6 @@ protected:
 	/** Destroy default program processors. */
 	void			destroyDefaultProgramWriterFactories();
 
-	/** Destroy all program sets. */
-	void			destroyProgramSets		();
-
 	/** Destroy all program writers. */
 	void			destroyProgramWriters	();
 
@@ -147,7 +150,7 @@ protected:
 	/** Destroy a CPU program by name.
 	@param shaderProgram The CPU program instance to destroy.
 	*/
-	bool			destroyCpuProgram		(Program* shaderProgram);
+	void			destroyCpuProgram		(Program* shaderProgram);
 
 	/** Create GPU programs for the given program set based on the CPU programs it contains.
 	@param programSet The program set container.
@@ -185,19 +188,22 @@ protected:
 	@param name The name of the program to destroy.
 	@param type The type of the program to destroy.
 	*/
-	void			destroyGpuProgram		(const String& name, GpuProgramType type);
-	
-	/** Return the current number of program set. */
-	size_t			getProgramSetCount		() const { return mHashToProgramSetMap.size(); }
+	void			destroyGpuProgram		(GpuProgramPtr& gpuProgram);
 
+	/** Flush the local GPU programs cache.
+	@param gpuProgramsMap The GPU programs cache.
+	*/
+	void			flushGpuProgramsCache	(GpuProgramsMap& gpuProgramsMap);
+	
 	/** Return the number of created vertex shaders. */
-	size_t			getVertexShaderCount		() const { return mVertexShaderCount; }
+	size_t			getVertexShaderCount		() const { return mVertexShaderMap.size(); }
 
 	/** Return the number of created fragment shaders. */
-	size_t			getFragmentShaderCount		() const { return mFragmentShaderCount; }
+	size_t			getFragmentShaderCount		() const { return mFragmentShaderMap.size(); }
 
 	/** Fix the input of the pixel shader to be the same as the output of the vertex shader */
 	void synchronizePixelnToBeVertexOut( ProgramSet* programSet );
+
 
 
 protected:
@@ -206,17 +212,15 @@ protected:
 protected:
 	ProgramList					mCpuProgramsList;				// CPU programs list.					
 	ProgramWriterMap			mProgramWritersMap;				// Map between target language and shader program writer.					
-	ProgramProcessorMap			mProgramProcessorsMap;			// Map between target language and shader program processor.
-	ProgramSetMap				mHashToProgramSetMap;			// Map between hash code of render state to program set.
+	ProgramProcessorMap			mProgramProcessorsMap;			// Map between target language and shader program processor.	
 	ProgramWriterFactoryList	mProgramWriterFactories;		// Holds standard shader writer factories
-
-	size_t						mVertexShaderCount;				// Vertex shader count.
-	size_t						mFragmentShaderCount;			// Fragment shader count.
+	GpuProgramsMap				mVertexShaderMap;				// The generated vertex shaders.
+	GpuProgramsMap				mFragmentShaderMap;				// The generated fragment shaders.
 	ProgramProcessorList		mDefaultProgramProcessors;		// The default program processors.
 
 private:
 	friend class ProgramSet;
-	friend class RenderState;
+	friend class TargetRenderState;
 	friend class ShaderGenerator;
 };
 

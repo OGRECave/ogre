@@ -84,7 +84,7 @@ protected:
 
 private:
 	friend class ProgramManager;
-	friend class RenderState;
+	friend class TargetRenderState;
 
 };
 

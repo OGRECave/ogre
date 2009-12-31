@@ -67,11 +67,6 @@ public:
 	virtual int				getExecutionOrder		() const;
 
 	/** 
-	@see SubRenderState::getHashCode.
-	*/
-	virtual uint32			getHashCode				();
-
-	/** 
 	@see SubRenderState::updateGpuProgramsParams.
 	*/
 	virtual void			updateGpuProgramsParams	(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);

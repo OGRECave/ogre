@@ -64,11 +64,6 @@ public:
 	virtual int				getExecutionOrder		() const;
 
 	/** 
-	@see SubRenderState::getHashCode.
-	*/
-	virtual uint32			getHashCode				();
-
-	/** 
 	@see SubRenderState::copyFrom.
 	*/
 	virtual void			copyFrom				(const SubRenderState& rhs);

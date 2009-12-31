@@ -52,26 +52,9 @@ ProgramSet::~ProgramSet()
 		ProgramManager::getSingleton().destroyCpuProgram(mPSCpuProgram);
 		mPSCpuProgram = NULL;
 	}
-
-	if (mVSGpuProgram.get() != NULL)
-	{
-		// Destroy only when this set is the last one that uses this GPU program.
-		if (mVSGpuProgram.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
-		{
-			ProgramManager::getSingleton().destroyGpuProgram(mVSGpuProgram->getName(), mVSGpuProgram->getType());
-		}		
-		mVSGpuProgram.setNull();
-	}
-
-	if (mPSGpuProgram.get() != NULL)
-	{
-		// Destroy only when this set is the last one that uses this GPU program.
-		if (mPSGpuProgram.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
-		{
-			ProgramManager::getSingleton().destroyGpuProgram(mPSGpuProgram->getName(), mPSGpuProgram->getType());
-		}			
-		mPSGpuProgram.setNull();
-	}
+				
+	mVSGpuProgram.setNull();					
+	mPSGpuProgram.setNull();	
 }
 
 //-----------------------------------------------------------------------------

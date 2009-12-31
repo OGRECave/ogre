@@ -143,7 +143,7 @@ void Sample_ShaderSystem::buttonHit( OgreBites::Button* b )
 	{		
 		const String& materialName = mSceneMgr->getEntity(MAIN_ENTITY_NAME)->getSubEntity(0)->getMaterialName();
 		
-		exportRTShaderSystemMaterial(mShaderGenerator->getShaderCachePath() + "materials/ShaderSystemExport.material", materialName);						
+		exportRTShaderSystemMaterial(mRTShaderLibsPath + "materials/ShaderSystemExport.material", materialName);						
 	}
 	// Case the shader cache should be flushed.
 	else if (b->getName() == FLUSH_BUTTON_NAME)
@@ -454,8 +454,8 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
 		// Grab the scheme render state.
 		RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 		const SubRenderStateList& subRenderStateList = schemRenderState->getSubStateList();
-		SubRenderStateConstIterator it = subRenderStateList.begin();
-		SubRenderStateConstIterator itEnd = subRenderStateList.end();
+		SubRenderStateListConstIterator it = subRenderStateList.begin();
+		SubRenderStateListConstIterator itEnd = subRenderStateList.end();
 		FFPFog* fogSubRenderState = NULL;
 		
 		// Search for the fog sub state.
@@ -476,7 +476,7 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
 			SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(FFPFog::Type);
 			
 			fogSubRenderState = static_cast<FFPFog*>(subRenderState);
-			schemRenderState->addSubRenderState(fogSubRenderState);
+			schemRenderState->addTemplateSubRenderState(fogSubRenderState);
 		}
 			
 		
@@ -555,7 +555,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 			{
 				RTShader::SubRenderState* perPerVertexLightModel = mShaderGenerator->createSubRenderState(RTShader::FFPLighting::Type);
 
-				renderState->addSubRenderState(perPerVertexLightModel);	
+				renderState->addTemplateSubRenderState(perPerVertexLightModel);	
 			}
 #endif
 
@@ -564,7 +564,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 			{
 				RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(RTShader::PerPixelLighting::Type);
 				
-				renderState->addSubRenderState(perPixelLightModel);				
+				renderState->addTemplateSubRenderState(perPixelLightModel);				
 			}
 			else if (mCurLightingModel == SSLM_NormalMapLightingTangentSpace)
 			{
@@ -578,14 +578,14 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 					normalMapSubRS->setNormalMapSpace(RTShader::NormalMapLighting::NMS_TANGENT);
 					rtssBindings->setUserAny(RTShader::NormalMapLighting::NormalMapTextureNameKey, Any(String("Panels_Normal_Tangent.png")));	
 
-					renderState->addSubRenderState(normalMapSubRS);
+					renderState->addTemplateSubRenderState(normalMapSubRS);
 				}
 
 				// It is secondary entity -> use simple per pixel lighting.
 				else
 				{
 					RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(RTShader::PerPixelLighting::Type);
-					renderState->addSubRenderState(perPixelLightModel);
+					renderState->addTemplateSubRenderState(perPixelLightModel);
 				}				
 			}
 			else if (mCurLightingModel == SSLM_NormalMapLightingObjectSpace)
@@ -600,14 +600,14 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 					normalMapSubRS->setNormalMapSpace(RTShader::NormalMapLighting::NMS_OBJECT);
 					rtssBindings->setUserAny(RTShader::NormalMapLighting::NormalMapTextureNameKey, Any(String("Panels_Normal_Obj.png")));	
 
-					renderState->addSubRenderState(normalMapSubRS);
+					renderState->addTemplateSubRenderState(normalMapSubRS);
 				}
 				
 				// It is secondary entity -> use simple per pixel lighting.
 				else
 				{
 					RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(RTShader::PerPixelLighting::Type);
-					renderState->addSubRenderState(perPixelLightModel);
+					renderState->addTemplateSubRenderState(perPixelLightModel);
 				}				
 			}
 
@@ -625,7 +625,7 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 				rtssBindings->setUserAny(ShaderExReflectionMap::MaskMapTextureNameKey, Any(String("Panels_refmask.png")));	
 				rtssBindings->setUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey, Any(String("cubescene.jpg")));
 											
-				renderState->addSubRenderState(subRenderState);
+				renderState->addTemplateSubRenderState(subRenderState);
 			}
 								
 			// Invalidate this material in order to re-generate its shaders.
@@ -779,8 +779,8 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 		const Ogre::RTShader::SubRenderStateList& subRenderStateList = schemRenderState->getSubStateList();
-		Ogre::RTShader::SubRenderStateConstIterator it = subRenderStateList.begin();
-		Ogre::RTShader::SubRenderStateConstIterator itEnd = subRenderStateList.end();
+		Ogre::RTShader::SubRenderStateListConstIterator it = subRenderStateList.begin();
+		Ogre::RTShader::SubRenderStateListConstIterator itEnd = subRenderStateList.end();
 
 		for (; it != itEnd; ++it)
 		{
@@ -789,7 +789,7 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 			// This is the pssm3 sub render state -> remove it.
 			if (curSubRenderState->getType() == Ogre::RTShader::IntegratedPSSM3::Type)
 			{
-				schemRenderState->removeSubRenderState(*it);
+				schemRenderState->removeTemplateSubRenderState(*it);
 				break;
 			}
 		}
@@ -859,7 +859,7 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 		}
 
 		pssm3SubRenderState->setSplitPoints(dstSplitPoints);
-		schemRenderState->addSubRenderState(subRenderState);		
+		schemRenderState->addTemplateSubRenderState(subRenderState);		
 	}
 #endif
 
@@ -973,6 +973,8 @@ void Sample_ShaderSystem::createPrivateResourceGroup()
 		if (coreLibsFound) 
 			break; 
 	}
+
+	mRTShaderLibsPath = shaderCoreLibsPath;
 
 	rgm.createResourceGroup(SAMPLE_MATERIAL_GROUP, false);
 	rgm.addResourceLocation(shaderCoreLibsPath + "materials", "FileSystem", SAMPLE_MATERIAL_GROUP);		

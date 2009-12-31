@@ -45,6 +45,9 @@ namespace RTShader {
 *  @{
 */
 
+typedef SharedPtr<SubRenderStateAccessor>	SubRenderStateAccessorPtr; 
+
+
 /** This class is the base interface of sub part from a shader based rendering pipeline.
 * All sub parts implementations should derive from it and implement the needed methods.
 A simple example of sub class of this interface will be the transform sub state of the
@@ -88,15 +91,6 @@ public:
 	*/
 	SubRenderState& operator=	(const SubRenderState& rhs);
 
-	/** Get the hash code signature of this sub render state.
-	@remarks
-	The return value should be unique per sub state configuration.
-	I.E if a two instances of a given sub class of this interface has different properties
-	each one of them should produce different hash code so the system can treat each one of them
-	as different source for a sub program code.
-	*/
-	virtual uint32			getHashCode				();
-
 	/** Create sub programs that represents this sub render state as part of a program set.
 	The given program set contains CPU programs that represents a vertex shader and pixel shader.
 	One should use these program class API to create a representation of the sub state he wished to
@@ -126,6 +120,16 @@ public:
 	*/
 	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass) { return true; }
 
+	/** Return the accessor object to this sub render state.
+	@see SubRenderStateAccessor.
+	*/
+	SubRenderStateAccessorPtr	getAccessor				();
+
+	/** Return the accessor object to this sub render state.
+	@see SubRenderStateAccessor.
+	*/
+	SubRenderStateAccessorPtr	getAccessor				() const;
+
 // Protected methods
 protected:
 
@@ -147,15 +151,70 @@ protected:
 	*/
 	virtual bool			addFunctionInvocations	(ProgramSet* programSet);
 
-
 // Attributes.
-protected:
+private:	
+	mutable SubRenderStateAccessorPtr		mThisAccessor;			// The accessor of this instance.
+	SubRenderStateAccessorPtr		mOtherAccessor;			// The accessor of the source instance which used as base to create this instance.
 	
 };
 
 typedef vector<SubRenderState*>::type 				SubRenderStateList;
-typedef SubRenderStateList::iterator 				SubRenderStateIterator;
-typedef SubRenderStateList::const_iterator			SubRenderStateConstIterator;
+typedef SubRenderStateList::iterator 				SubRenderStateListIterator;
+typedef SubRenderStateList::const_iterator			SubRenderStateListConstIterator;
+
+typedef set<SubRenderState*>::type 					SubRenderStateSet;
+typedef SubRenderStateSet::iterator 				SubRenderStateSetIterator;
+typedef SubRenderStateSet::const_iterator			SubRenderStateSetConstIterator;
+
+
+/** This class uses as accessor from a template SubRenderState to all of its instances that
+created based on it. Since SubRenderState that added as templates to a RenderState are not directly used by the
+system this class enable accessing the used instances.
+A common usage will be add a SubRenderState to certain pass, obtain accessor and then call a method on the instanced SubRenderState
+that will trigger some GPU uniform parameter updates.
+*/
+class _OgreRTSSExport SubRenderStateAccessor
+{
+public:
+	/** Add SubRenderState instance to this accessor.
+	*/
+	void addSubRenderStateInstance(SubRenderState* subRenderState) const 
+	{
+		mSubRenderStateInstancesSet.insert(subRenderState);
+	}
+
+	/** Remove SubRenderState instance to this accessor.
+	*/
+	void removeSubRenderStateInstance(SubRenderState* subRenderState) const
+	{
+		SubRenderStateSetIterator itFind = mSubRenderStateInstancesSet.find(subRenderState);
+
+		if (itFind != mSubRenderStateInstancesSet.end())
+		{
+			mSubRenderStateInstancesSet.erase(itFind);
+		}
+	}
+
+	/** Return a set of all instances of the template SubRenderState. */
+	SubRenderStateSet&	getSubRenderStateInstasnceSet() { return mSubRenderStateInstancesSet; }
+
+	/** Return a set of all instances of the template SubRenderState. (const version). */
+	const SubRenderStateSet&	getSubRenderStateInstasnceSet() const { return mSubRenderStateInstancesSet; }
+
+protected:
+	/** Construct SubRenderState accessor based on the given template SubRenderState.
+	*/
+	SubRenderStateAccessor(const SubRenderState* templateSubRenderState) : mTemplateSubRenderState(templateSubRenderState) {}
+
+
+protected:
+	const SubRenderState*		mTemplateSubRenderState;
+	mutable SubRenderStateSet	mSubRenderStateInstancesSet;
+
+private:
+	friend class SubRenderState;
+
+};
 
 
 /** Abstract factory interface for creating SubRenderState implementation instances.
@@ -225,7 +284,7 @@ protected:
 
 // Attributes.
 protected:
-	SubRenderStateList		mSubRenderStateList;		// List of all sub render states instances this factory created.
+	SubRenderStateSet		mSubRenderStateList;		// List of all sub render states instances this factory created.
 };
 
 /** @} */

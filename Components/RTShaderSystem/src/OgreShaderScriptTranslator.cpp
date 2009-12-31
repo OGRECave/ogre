@@ -127,7 +127,7 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 						shaderGenerator->createScheme(dstTechniqueSchemeName);
 						RenderState* renderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, material->getName(), pass->getIndex());
 
-						renderState->addSubRenderState(subRenderState);
+						renderState->addTemplateSubRenderState(subRenderState);
 					}
 				}				
 			}

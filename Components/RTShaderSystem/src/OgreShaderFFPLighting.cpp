@@ -71,30 +71,6 @@ int	FFPLighting::getExecutionOrder() const
 }
 
 //-----------------------------------------------------------------------
-uint32 FFPLighting::getHashCode()
-{
-	uint32 hashCode = 0;
-	
-	sh_hash_combine(hashCode, SubRenderState::getHashCode());
-
-	LightParamsIterator it = mLightParamsList.begin();
-
-
-	sh_hash_combine(hashCode, mSpecularEnable);	
-
-	while(it != mLightParamsList.end())
-	{
-		sh_hash_combine(hashCode, it->mType);		
-		++it;
-	}
-	
-	sh_hash_combine(hashCode, mTrackVertexColourType);
-	
-	
-	return hashCode;
-}
-
-//-----------------------------------------------------------------------
 void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 										  const LightList* pLightList)
 {		

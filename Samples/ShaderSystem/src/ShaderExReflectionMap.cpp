@@ -67,26 +67,6 @@ int	ShaderExReflectionMap::getExecutionOrder() const
 }
 
 //-----------------------------------------------------------------------
-uint32 ShaderExReflectionMap::getHashCode()
-{
-	uint32 hashCode = 0;
-
-	// Start the hash code with parent code.
-	sh_hash_combine(hashCode, SubRenderState::getHashCode());
-
-	// Mix in the mask map sampler index.
-	sh_hash_combine(hashCode, mMaskMapSamplerIndex);
-
-	// Mix in the reflection map sampler index.
-	sh_hash_combine(hashCode, mReflectionMapSamplerIndex);
-
-	// Mix in the reflection map type.
-	sh_hash_combine(hashCode, mReflectionMapType);
-	
-	return hashCode;
-}
-
-//-----------------------------------------------------------------------
 void ShaderExReflectionMap::copyFrom(const SubRenderState& rhs)
 {
 	const ShaderExReflectionMap& rhsReflectionMap = static_cast<const ShaderExReflectionMap&>(rhs);

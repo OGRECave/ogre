@@ -42,14 +42,10 @@ namespace RTShader {
 //-----------------------------------------------------------------------
 RenderState::RenderState()
 {
-	mSubRenderStateSortValid = false;
-	mHashCodeValid			 = false;
-	mHashCode				 = 0;
-	mLightCountAutoUpdate	 = true;
-	
-	mLightCount[0]				= 0;
-	mLightCount[1]				= 0;
-	mLightCount[2]				= 0;
+	mLightCountAutoUpdate	 = true;	
+	mLightCount[0]			 = 0;
+	mLightCount[1]			 = 0;
+	mLightCount[2]			 = 0;	
 }
 
 //-----------------------------------------------------------------------
@@ -61,230 +57,11 @@ RenderState::~RenderState()
 //-----------------------------------------------------------------------
 void RenderState::reset()
 {
-	for (SubRenderStateIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
+	for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
 	{
 		ShaderGenerator::getSingleton().destroySubRenderState(*it);
 	}
 	mSubRenderStateList.clear();
-}
-
-//-----------------------------------------------------------------------
-void RenderState::addSubRenderState(SubRenderState* subRenderState)
-{
-	mSubRenderStateList.push_back(subRenderState);
-	mSubRenderStateSortValid = false;
-	mHashCodeValid			 = false;
-}
-
-//-----------------------------------------------------------------------
-void RenderState::removeSubRenderState(SubRenderState* subRenderState)
-{
-	for (SubRenderStateIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
-	{
-		if ((*it) == subRenderState)
-		{
-			ShaderGenerator::getSingleton().destroySubRenderState(*it);
-			mSubRenderStateList.erase(it);
-			break;
-		}		
-	}
-}
-
-//-----------------------------------------------------------------------
-void RenderState::merge(const RenderState& rhs, Pass* srcPass, Pass* dstPass)
-{	
-	SubRenderStateList customSubRenderStates;
-
-	// Sort current render states.
-	sortSubRenderStates();
-
-	// Insert all custom sub render states. (I.E Not FFP sub render states).
-	for (SubRenderStateConstIterator itSrc=rhs.mSubRenderStateList.begin(); itSrc != rhs.mSubRenderStateList.end(); ++itSrc)
-	{
-		const SubRenderState* srcSubRenderState = *itSrc;
-		bool isCustomSubRenderState = true;
-
-		if (srcSubRenderState->getExecutionOrder() == FFP_TRANSFORM ||
-			srcSubRenderState->getExecutionOrder() == FFP_COLOUR ||
-			srcSubRenderState->getExecutionOrder() == FFP_LIGHTING ||
-			srcSubRenderState->getExecutionOrder() == FFP_TEXTURING ||
-			srcSubRenderState->getExecutionOrder() == FFP_FOG)
-		{
-			isCustomSubRenderState = false;
-		}		
-	
-
-		// Case it is a custom sub render state.
-		if (isCustomSubRenderState)
-		{
-			bool subStateTypeExists = false;
-
-			// Check if this type of sub render state already exists.
-			for (SubRenderStateConstIterator itDst=mSubRenderStateList.begin(); itDst != mSubRenderStateList.end(); ++itDst)
-			{
-				if ((*itDst)->getType() == srcSubRenderState->getType())
-				{
-					subStateTypeExists = true;
-					break;
-				}				
-			}
-			
-			// Case custom sub render state not exits -> add it to custom list.
-			if (subStateTypeExists == false)
-			{
-				SubRenderState* newSubRenderState = NULL;
-
-				newSubRenderState = ShaderGenerator::getSingleton().createSubRenderState(srcSubRenderState->getType());
-				*newSubRenderState = *srcSubRenderState;
-				customSubRenderStates.push_back(newSubRenderState);			
-			}						
-		}						
-	}	
-
-	// Merge the local custom sub render states.
-	for (SubRenderStateIterator itSrc=customSubRenderStates.begin(); itSrc != customSubRenderStates.end(); ++itSrc)
-	{
-		SubRenderState* customSubRenderState = *itSrc;
-
-		if (customSubRenderState->preAddToRenderState(this, srcPass, dstPass))
-		{
-			addSubRenderState(customSubRenderState);
-		}
-		else
-		{
-			ShaderGenerator::getSingleton().destroySubRenderState(customSubRenderState);
-		}		
-	}	
-}
-
-//-----------------------------------------------------------------------
-void RenderState::copyFrom(const RenderState& rhs)
-{
-	// Avoid copying on self.
-	if (this == &rhs)
-		return;
-
-	// Reset state.
-	reset();
-
-	// Copy sub render states.
-	for (SubRenderStateConstIterator it=rhs.mSubRenderStateList.begin(); it != rhs.mSubRenderStateList.end(); ++it)
-	{
-		const SubRenderState* srcSubRenderState = *it;
-		SubRenderState* dstSubRenderState = ShaderGenerator::getSingleton().createSubRenderState(srcSubRenderState->getType());
-
-		*dstSubRenderState = *srcSubRenderState;
-		addSubRenderState(dstSubRenderState);
-	}
-
-	mSubRenderStateSortValid = rhs.mSubRenderStateSortValid;
-
-	mLightCount[0] = rhs.mLightCount[0];
-	mLightCount[1] = rhs.mLightCount[1];
-	mLightCount[2] = rhs.mLightCount[2];
-	mLightCountAutoUpdate = rhs.mLightCountAutoUpdate;
-
-	mHashCode		= rhs.mHashCode;
-	mHashCodeValid	= rhs.mHashCodeValid;
-}
-
-//-----------------------------------------------------------------------
-RenderState& RenderState::operator=(const RenderState& rhs)
-{
-	copyFrom(rhs);
-
-	return *this;
-}
-
-//-----------------------------------------------------------------------
-uint32 RenderState::getHashCode()
-{	
-	if (mHashCodeValid == false)
-	{		
-		sortSubRenderStates();
-
-		mHashCode = 0;
-
-		for (SubRenderStateIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
-		{
-			SubRenderState* srcSubRenderState = *it;
-			uint32 subRenderStateHashCode = srcSubRenderState->getHashCode();
-
-			sh_hash_combine(mHashCode, subRenderStateHashCode);			
-		}
-
-		mHashCodeValid = true;
-	}
-	
-	return mHashCode;
-}
-	
-//-----------------------------------------------------------------------
-void RenderState::sortSubRenderStates()
-{
-	if (mSubRenderStateSortValid == false)
-	{
-		if (mSubRenderStateList.size() > 1)
-			qsort(&mSubRenderStateList[0], mSubRenderStateList.size(), sizeof(SubRenderState*), sSubRenderStateCompare);		
-
-		mSubRenderStateSortValid = true;
-	}
-}
-
-//-----------------------------------------------------------------------
-int	RenderState::sSubRenderStateCompare(const void * p0, const void *p1)
-{
-	SubRenderState* pInstance0 = *((SubRenderState**)p0);
-	SubRenderState* pInstance1 = *((SubRenderState**)p1);
-
-	return pInstance0->getExecutionOrder() - pInstance1->getExecutionOrder();	
-}
-
-//-----------------------------------------------------------------------
-bool RenderState::createCpuPrograms(ProgramSet* programSet)
-{
-	sortSubRenderStates();
-
-	const String baseName = StringConverter::toString(getHashCode());
-	Program* vsProgram = ProgramManager::getSingleton().createCpuProgram(GPT_VERTEX_PROGRAM);
-	Program* psProgram = ProgramManager::getSingleton().createCpuProgram(GPT_FRAGMENT_PROGRAM);
-	RTShader::Function* vsMainFunc = NULL;
-	RTShader::Function* psMainFunc = NULL;
-
-	programSet->setCpuVertexProgram(vsProgram);
-	programSet->setCpuFragmentProgram(psProgram);
-
-	// Create entry point functions.
-	vsMainFunc = vsProgram->createFunction("main", "Vertex Program Entry point", Function::FFT_VS_MAIN);
-	vsProgram->setEntryPointFunction(vsMainFunc);
-
-	psMainFunc = psProgram->createFunction("main", "Pixel Program Entry point", Function::FFT_PS_MAIN);
-	psProgram->setEntryPointFunction(psMainFunc);
-
-	for (SubRenderStateIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
-	{
-		SubRenderState* srcSubRenderState = *it;
-
-		if (false == srcSubRenderState->createCpuSubPrograms(programSet))
-		{
-			LogManager::getSingleton().stream()	<< "RTShader::RenderState : Could not generate sub render program of type: " << srcSubRenderState->getType();
-			return false;
-		}
-	}
-
-	return true;
-}
-
-//-----------------------------------------------------------------------
-void RenderState::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
-										  const LightList* pLightList)
-{
-	for (SubRenderStateIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
-	{
-		SubRenderState* curSubRenderState = *it;
-		
-		curSubRenderState->updateGpuProgramsParams(rend, pass, source, pLightList);		
-	}
 }
 
 //-----------------------------------------------------------------------
@@ -303,6 +80,217 @@ void RenderState::getLightCount(int lightCount[3]) const
 	lightCount[2] = mLightCount[2];
 }
 
+//-----------------------------------------------------------------------
+void RenderState::addTemplateSubRenderState(SubRenderState* subRenderState)
+{
+	mSubRenderStateList.push_back(subRenderState);	
+}
+
+//-----------------------------------------------------------------------
+void RenderState::removeTemplateSubRenderState(SubRenderState* subRenderState)
+{
+	for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
+	{
+		if ((*it) == subRenderState)
+		{
+			ShaderGenerator::getSingleton().destroySubRenderState(*it);
+			mSubRenderStateList.erase(it);
+			break;
+		}		
+	}
+}
+
+//-----------------------------------------------------------------------
+TargetRenderState::TargetRenderState()
+{	
+	mProgramSet				 = NULL;
+	mSubRenderStateSortValid = false;	
+}
+
+//-----------------------------------------------------------------------
+TargetRenderState::~TargetRenderState()
+{
+	destroyProgramSet();
+}
+
+
+//-----------------------------------------------------------------------
+void TargetRenderState::addSubRenderState(SubRenderState* subRenderState)
+{
+	mSubRenderStateList.push_back(subRenderState);
+	mSubRenderStateSortValid = false;
+}
+
+//-----------------------------------------------------------------------
+void TargetRenderState::removeSubRenderState(SubRenderState* subRenderState)
+{
+	for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
+	{
+		if ((*it) == subRenderState)
+		{
+			ShaderGenerator::getSingleton().destroySubRenderState(*it);
+			mSubRenderStateList.erase(it);
+			break;
+		}		
+	}
+}
+
+//-----------------------------------------------------------------------
+bool TargetRenderState::createCpuPrograms()
+{
+	sortSubRenderStates();
+
+	ProgramSet* programSet = createProgramSet();
+	Program* vsProgram = ProgramManager::getSingleton().createCpuProgram(GPT_VERTEX_PROGRAM);
+	Program* psProgram = ProgramManager::getSingleton().createCpuProgram(GPT_FRAGMENT_PROGRAM);
+	RTShader::Function* vsMainFunc = NULL;
+	RTShader::Function* psMainFunc = NULL;
+
+	programSet->setCpuVertexProgram(vsProgram);
+	programSet->setCpuFragmentProgram(psProgram);
+
+	// Create entry point functions.
+	vsMainFunc = vsProgram->createFunction("main", "Vertex Program Entry point", Function::FFT_VS_MAIN);
+	vsProgram->setEntryPointFunction(vsMainFunc);
+
+	psMainFunc = psProgram->createFunction("main", "Pixel Program Entry point", Function::FFT_PS_MAIN);
+	psProgram->setEntryPointFunction(psMainFunc);
+
+	for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
+	{
+		SubRenderState* srcSubRenderState = *it;
+
+		if (false == srcSubRenderState->createCpuSubPrograms(programSet))
+		{
+			LogManager::getSingleton().stream()	<< "RTShader::TargetRenderState : Could not generate sub render program of type: " << srcSubRenderState->getType();
+			return false;
+		}
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------
+ProgramSet*	TargetRenderState::createProgramSet()
+{
+	destroyProgramSet();
+
+	mProgramSet = OGRE_NEW ProgramSet;
+
+	return mProgramSet;
+}
+//-----------------------------------------------------------------------
+void TargetRenderState::destroyProgramSet()
+{
+	if (mProgramSet != NULL)
+	{
+		OGRE_DELETE mProgramSet;
+		mProgramSet = NULL;
+	}
+}
+
+//-----------------------------------------------------------------------
+void TargetRenderState::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
+												const LightList* pLightList)
+{
+	for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
+	{
+		SubRenderState* curSubRenderState = *it;
+
+		curSubRenderState->updateGpuProgramsParams(rend, pass, source, pLightList);		
+	}
+}
+
+
+//-----------------------------------------------------------------------
+void TargetRenderState::link(const RenderState& rhs, Pass* srcPass, Pass* dstPass)
+{	
+	SubRenderStateList customSubRenderStates;
+
+	// Sort current render states.
+	sortSubRenderStates();
+
+	// Insert all custom sub render states. (I.E Not FFP sub render states).
+	const SubRenderStateList& subRenderStateList = rhs.getSubStateList();
+
+	for (SubRenderStateListConstIterator itSrc=subRenderStateList.begin(); itSrc != subRenderStateList.end(); ++itSrc)
+	{
+		const SubRenderState* srcSubRenderState = *itSrc;
+		bool isCustomSubRenderState = true;
+
+		if (srcSubRenderState->getExecutionOrder() == FFP_TRANSFORM ||
+			srcSubRenderState->getExecutionOrder() == FFP_COLOUR ||
+			srcSubRenderState->getExecutionOrder() == FFP_LIGHTING ||
+			srcSubRenderState->getExecutionOrder() == FFP_TEXTURING ||
+			srcSubRenderState->getExecutionOrder() == FFP_FOG)
+		{
+			isCustomSubRenderState = false;
+		}		
+
+
+		// Case it is a custom sub render state.
+		if (isCustomSubRenderState)
+		{
+			bool subStateTypeExists = false;
+
+			// Check if this type of sub render state already exists.
+			for (SubRenderStateListConstIterator itDst=mSubRenderStateList.begin(); itDst != mSubRenderStateList.end(); ++itDst)
+			{
+				if ((*itDst)->getType() == srcSubRenderState->getType())
+				{
+					subStateTypeExists = true;
+					break;
+				}				
+			}
+
+			// Case custom sub render state not exits -> add it to custom list.
+			if (subStateTypeExists == false)
+			{
+				SubRenderState* newSubRenderState = NULL;
+
+				newSubRenderState = ShaderGenerator::getSingleton().createSubRenderState(srcSubRenderState->getType());
+				*newSubRenderState = *srcSubRenderState;
+				customSubRenderStates.push_back(newSubRenderState);			
+			}						
+		}						
+	}	
+
+	// Merge the local custom sub render states.
+	for (SubRenderStateListIterator itSrc=customSubRenderStates.begin(); itSrc != customSubRenderStates.end(); ++itSrc)
+	{
+		SubRenderState* customSubRenderState = *itSrc;
+
+		if (customSubRenderState->preAddToRenderState(this, srcPass, dstPass))
+		{
+			addSubRenderState(customSubRenderState);
+		}
+		else
+		{
+			ShaderGenerator::getSingleton().destroySubRenderState(customSubRenderState);
+		}		
+	}	
+}
+
+//-----------------------------------------------------------------------
+void TargetRenderState::sortSubRenderStates()
+{
+	if (mSubRenderStateSortValid == false)
+	{
+		if (mSubRenderStateList.size() > 1)
+			qsort(&mSubRenderStateList[0], mSubRenderStateList.size(), sizeof(SubRenderState*), sSubRenderStateCompare);		
+
+		mSubRenderStateSortValid = true;
+	}
+}
+
+//-----------------------------------------------------------------------
+int	TargetRenderState::sSubRenderStateCompare(const void * p0, const void *p1)
+{
+	SubRenderState* pInstance0 = *((SubRenderState**)p0);
+	SubRenderState* pInstance1 = *((SubRenderState**)p1);
+
+	return pInstance0->getExecutionOrder() - pInstance1->getExecutionOrder();	
+}
 
 }
 }

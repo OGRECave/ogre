@@ -74,12 +74,7 @@ void ProgramProcessor::bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pG
 					pGpuParams->setNamedAutoConstantReal(pCurParam->getName(), 
 						pCurParam->getAutoConstantType(), 
 						pCurParam->getAutoConstantRealData());
-				}	
-				else
-				{
-					LogManager::getSingleton().stream() << "ProgramProcessor::bindAutoParameters: Can not bind auto param named " << 
-						pCurParam->getName() << " to program named " << pGpuProgram->getName();
-				}
+				}					
 			}
 			else if (pCurParam->isAutoConstantIntParameter())
 			{
@@ -88,12 +83,7 @@ void ProgramProcessor::bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pG
 					pGpuParams->setNamedAutoConstant(pCurParam->getName(), 
 						pCurParam->getAutoConstantType(), 
 						pCurParam->getAutoConstantIntData());
-				}
-				else
-				{
-					LogManager::getSingleton().stream() << "ProgramProcessor::bindAutoParameters: Can not bind auto param named " << 
-						pCurParam->getName() << " to program named " << pGpuProgram->getName();
-				}
+				}				
 			}						
 		}
 		else

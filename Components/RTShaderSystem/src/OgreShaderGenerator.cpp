@@ -239,9 +239,6 @@ void ShaderGenerator::_finalize()
 	}
 	mSchemeEntriesMap.clear();
 
-	// Clear cached render states.
-	mCachedRenderStates.clear();
-
 	// Destroy extensions factories.
 	destroySubRenderStateExFactories();
 
@@ -780,43 +777,6 @@ void ShaderGenerator::preFindVisibleObjects(SceneManager* source,
 }
 
 //-----------------------------------------------------------------------------
-RenderStatePtr ShaderGenerator::getCachedRenderState(uint hashCode)
-{
-	OGRE_LOCK_AUTO_MUTEX
-
-	RenderStateMapIterator itFind = mCachedRenderStates.find(hashCode);
-	RenderStatePtr renderStatePtr;
-
-	if (itFind != mCachedRenderStates.end())
-	{	
-		renderStatePtr = itFind->second;
-	}
-
-	return renderStatePtr;
-}
-
-//-----------------------------------------------------------------------------
-void ShaderGenerator::addRenderStateToCache(RenderStatePtr renderStatePtr)
-{
-	OGRE_LOCK_AUTO_MUTEX
-
-	mCachedRenderStates[renderStatePtr->getHashCode()] = renderStatePtr;	
-}
-
-//-----------------------------------------------------------------------------
-void ShaderGenerator::removeRenderStateFromCache(RenderStatePtr renderStatePtr)
-{
-	OGRE_LOCK_AUTO_MUTEX
-
-	RenderStateMapIterator itFind = mCachedRenderStates.find(renderStatePtr->getHashCode());
-
-	if (itFind != mCachedRenderStates.end())
-	{
-		mCachedRenderStates.erase(itFind);
-	}		
-}
-
-//-----------------------------------------------------------------------------
 void ShaderGenerator::invalidateScheme(const String& schemeName)
 {
 	OGRE_LOCK_AUTO_MUTEX
@@ -889,17 +849,9 @@ void ShaderGenerator::flushShaderCache()
 	{			
 		itTech->second->releasePrograms();
 	}
-	
-	RenderStateMapIterator itRenderState = mCachedRenderStates.begin();
-	RenderStateMapIterator itRenderStateEnd = mCachedRenderStates.end();
-	
-	// Release all cached render states.
-	for (; itRenderState != itRenderStateEnd; ++itRenderState)
-	{			
-		ProgramManager::getSingleton().releasePrograms(itRenderState->second.get());
-	}
-	mCachedRenderStates.clear();
 
+	ProgramManager::getSingleton().flushGpuProgramsCache();
+	
 	SGSchemeIterator itScheme = mSchemeEntriesMap.begin();
 	SGSchemeIterator itSchemeEnd = mSchemeEntriesMap.end();
 
@@ -982,8 +934,8 @@ void ShaderGenerator::serializePassAttributes(MaterialSerializer* ser, SGPass* p
 	{
 		// Write each of the sub-render states that composing the final render state.
 		const SubRenderStateList& subRenderStates = customenderState->getSubStateList();
-		SubRenderStateConstIterator it		= subRenderStates.begin();
-		SubRenderStateConstIterator itEnd	= subRenderStates.end();
+		SubRenderStateListConstIterator it		= subRenderStates.begin();
+		SubRenderStateListConstIterator itEnd	= subRenderStates.end();
 
 
 		for (; it != itEnd; ++it)
@@ -1038,26 +990,32 @@ void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGPass::SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPass)
 {
-	mParent				= parent;
-	mSrcPass			= srcPass;
-	mDstPass			= dstPass;	
-	mCustomRenderState	= NULL;
+	mParent					= parent;
+	mSrcPass				= srcPass;
+	mDstPass				= dstPass;	
+	mCustomRenderState		= NULL;
+	mTargetRenderState	= NULL;
 	mDstPass->getUserObjectBindings().setUserAny(SGPass::UserKey, Any(this));
 }
 
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGPass::~SGPass()
 {
-	mFinalRenderState.setNull();
+	if (mTargetRenderState != NULL)
+	{
+		OGRE_DELETE mTargetRenderState;
+		mTargetRenderState = NULL;
+	}
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::SGPass::buildRenderState()
+void ShaderGenerator::SGPass::buildTargetRenderState()
 {	
 	const String& schemeName = mParent->getDestinationTechniqueSchemeName();
 	const RenderState* renderStateGlobal = ShaderGenerator::getSingleton().getRenderState(schemeName);
-	RenderState* localRenderState = OGRE_NEW RenderState;
 	
+
+	mTargetRenderState = OGRE_NEW TargetRenderState;
 
 	// Set light properties.
 	int lightCount[3] = {0};	
@@ -1075,66 +1033,45 @@ void ShaderGenerator::SGPass::buildRenderState()
 	}
 	
 	
-	localRenderState->setLightCount(lightCount);
+	mTargetRenderState->setLightCount(lightCount);
 			
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 	// Build the FFP state.	
-	FFPRenderStateBuilder::getSingleton().buildRenderState(this, localRenderState);
+	FFPRenderStateBuilder::getSingleton().buildRenderState(this, mTargetRenderState);
 #endif
 
 
-	// Merge custom render state of this pass if exists.
+	// Link the target render state with the custom render state of this pass if exists.
 	if (mCustomRenderState != NULL)
 	{
-		localRenderState->merge(*mCustomRenderState, mSrcPass, mDstPass);
+		mTargetRenderState->link(*mCustomRenderState, mSrcPass, mDstPass);
 	}
 
-	// Merge global render state of the shader generator.
+	// Link the target render state with the scheme render state of the shader generator.
 	if (renderStateGlobal != NULL)
 	{
-		localRenderState->merge(*renderStateGlobal, mSrcPass, mDstPass);
-	}
-
-	// Check if this render state already cached.
-	mFinalRenderState = ShaderGenerator::getSingleton().getCachedRenderState(localRenderState->getHashCode());
-
-	// The final pass render state was not cached -> add it.
-	if (mFinalRenderState.isNull())
-	{
-		mFinalRenderState.bind(localRenderState);
-		ShaderGenerator::getSingleton().addRenderStateToCache(mFinalRenderState);
-	}
-
-	// The final pass render state is already cached -> OGRE_DELETE local one.
-	else
-	{
-		OGRE_DELETE localRenderState;
-	}					
+		mTargetRenderState->link(*renderStateGlobal, mSrcPass, mDstPass);
+	}				
 }
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGPass::acquirePrograms()
 {
-	ProgramManager::getSingleton().acquirePrograms(mDstPass, mFinalRenderState.get());
+	ProgramManager::getSingleton().acquirePrograms(mDstPass, mTargetRenderState);
 }
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGPass::releasePrograms()
 {
-	// Case this pass is the last one that uses this render state.
-	if (mFinalRenderState.useCount() == 2)
-	{
-		ShaderGenerator::getSingleton().removeRenderStateFromCache(mFinalRenderState);
-		ProgramManager::getSingleton().releasePrograms(mFinalRenderState.get());		
-	}	
+	ProgramManager::getSingleton().releasePrograms(mDstPass, mTargetRenderState);	
 }
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGPass::notifyRenderSingleObject(Renderable* rend,  const AutoParamDataSource* source, 
 											  const LightList* pLightList, bool suppressRenderStateChanges)
 {
-	if (mFinalRenderState.get() != NULL && suppressRenderStateChanges == false)
-		mFinalRenderState->updateGpuProgramsParams(rend, mDstPass, source, pLightList);
+	if (mTargetRenderState != NULL && suppressRenderStateChanges == false)
+		mTargetRenderState->updateGpuProgramsParams(rend, mDstPass, source, pLightList);
 }
 //-----------------------------------------------------------------------------
 SubRenderState*	ShaderGenerator::SGPass::getCustomFFPSubState(int subStateOrder)
@@ -1163,7 +1100,7 @@ SubRenderState*	ShaderGenerator::SGPass::getCustomFFPSubState(int subStateOrder,
 	{
 		const SubRenderStateList& subRenderStateList = renderState->getSubStateList();
 
-		for (SubRenderStateConstIterator it=subRenderStateList.begin(); it != subRenderStateList.end(); ++it)
+		for (SubRenderStateListConstIterator it=subRenderStateList.begin(); it != subRenderStateList.end(); ++it)
 		{
 			SubRenderState* curSubRenderState = *it;
 
@@ -1300,7 +1237,7 @@ void ShaderGenerator::SGTechnique::destroySGPasses()
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::SGTechnique::buildRenderState()
+void ShaderGenerator::SGTechnique::buildTargetRenderState()
 {
 	// Remove existing destination technique and passes
 	// in order to build it again from scratch.
@@ -1330,7 +1267,7 @@ void ShaderGenerator::SGTechnique::buildRenderState()
 	// Build render state for each pass.
 	for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
 	{
-		(*itPass)->buildRenderState();
+		(*itPass)->buildTargetRenderState();
 	}
 }
 
@@ -1487,7 +1424,7 @@ void ShaderGenerator::SGScheme::validate()
 		SGTechnique* curTechEntry = *itTech;
 
 		if (curTechEntry->getBuildDestinationTechnique())
-			curTechEntry->buildRenderState();		
+			curTechEntry->buildTargetRenderState();		
 	}
 
 	// Acquire GPU programs for each technique.
@@ -1577,7 +1514,7 @@ bool ShaderGenerator::SGScheme::validate(const String& materialName)
 			curTechEntry->getBuildDestinationTechnique())
 		{		
 			// Build render state for each technique.
-			curTechEntry->buildRenderState();
+			curTechEntry->buildTargetRenderState();
 
 			// Acquire the CPU/GPU programs.
 			curTechEntry->acquirePrograms();

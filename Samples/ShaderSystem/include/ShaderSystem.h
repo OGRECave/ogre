@@ -166,6 +166,7 @@ protected:
 	CheckBox*							mDirLightCheckBox;		// The directional light check box.
 	CheckBox*							mPointLightCheckBox;	// The point light check box.
 	CheckBox*							mSpotLightCheckBox;		// The spot light check box.
+	String								mRTShaderLibsPath;		// The path of the RTShader Libs.
 };
 
 #endif

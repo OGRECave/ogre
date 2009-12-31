@@ -88,32 +88,6 @@ int	NormalMapLighting::getExecutionOrder() const
 }
 
 //-----------------------------------------------------------------------
-uint32 NormalMapLighting::getHashCode()
-{
-	uint32 hashCode = 0;
-
-	sh_hash_combine(hashCode, SubRenderState::getHashCode());
-
-	LightParamsIterator it = mLightParamsList.begin();
-
-
-	sh_hash_combine(hashCode, mSpecularEnable);	
-
-	while(it != mLightParamsList.end())
-	{
-		sh_hash_combine(hashCode, it->mType);		
-		++it;
-	}
-
-	sh_hash_combine(hashCode, mTrackVertexColourType);
-	sh_hash_combine(hashCode, mNormalMapSamplerIndex);	
-	sh_hash_combine(hashCode, mVSTexCoordSetIndex);
-	sh_hash_combine(hashCode, mNormalMapSpace);
-
-	return hashCode;
-}
-
-//-----------------------------------------------------------------------
 void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 	const LightList* pLightList)
 {		
