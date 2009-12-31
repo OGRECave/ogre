@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,14 +12,14 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): Overlays</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): Overlays</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Overlays">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Overlays">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): Overlays">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): Overlays">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
@@ -27,9 +27,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <A NAME="SEC15"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
 <TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_11.html#SEC14"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> Up </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -37,89 +39,66 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <HR SIZE=1>
 <H2> 2.8 Overlays </H2>
 <!--docid::SEC15::-->
-<P>
 
 Overlays allow you to render 2D and 3D elements on top of the normal scene contents to create effects like heads-up displays (HUDs), menu systems, status panels etc. The frame rate statistics panel which comes as standard with OGRE is an example of an overlay. Overlays can contain 2D or 3D elements. 2D elements are used for HUDs, and 3D elements can be used to create cockpits or any other 3D object which you wish to be rendered on top of the rest of the scene.<BR><BR>
-</P>
-<P>
 
 You can create overlays either through the SceneManager::createOverlay method, or you can define them in an .overlay script. In reality the latter is likely to be the most practical because it is easier to tweak (without the need to recompile the code). Note that you can define as many overlays as you like: they all start off life hidden, and you display them by calling their 'show()' method. You can also show multiple overlays at once, and their Z order is determined by the Overlay::setZOrder() method.<BR><BR>
-</P>
-<P>
 
 <A NAME="SEC16"></A>
 <H2> Creating 2D Elements </H2>
 <!--docid::SEC16::-->
-<P>
 
 The OverlayElement class abstracts the details of 2D elements which are added to overlays. All items which can be added to overlays are derived from this class. It is possible (and encouraged) for users of OGRE to define their own custom subclasses of OverlayElement in order to provide their own user controls. The key common features of all OverlayElements are things like size, position, basic material name etc. Subclasses extend this behaviour to include more complex properties and behaviour.<BR><BR>
-</P>
-<P>
 
 An important built-in subclass of OverlayElement is OverlayContainer. OverlayContainer is the same as a OverlayElement, except that it can contain other OverlayElements, grouping them together (allowing them to be moved together for example) and providing them with a local coordinate origin for easier lineup.<BR><BR>
-</P>
-<P>
 
 The third important class is OverlayManager. Whenever an application wishes to create a 2D element to add to an overlay (or a container), it should call OverlayManager::createOverlayElement. The type of element you wish to create is identified by a string, the reason being that it allows plugins to register new types of OverlayElement for you to create without you having to link specifically to those libraries. For example, to create a panel (a plain rectangular area which can contain other OverlayElements) you would call OverlayManager::getSingleton().createOverlayElement(&quot;Panel&quot;, &quot;myNewPanel&quot;);<BR><BR>
-</P>
-<P>
 
 <A NAME="SEC17"></A>
 <H2> Adding 2D Elements to the Overlay </H2>
 <!--docid::SEC17::-->
-<P>
 
-Only OverlayContainers can be added direct to an overlay. The reason is that each level of container establishes the Zorder of the elements contained within it, so if you nest several containers, inner containers have a higher zorder than outer ones to ensure they are displayed correctly. To add a container (such as a Panel) to the overlay, simply call Overlay::add2D.<BR><BR>
-</P>
-<P>
+Only OverlayContainers can be added direct to an overlay. The reason is that each level of container establishes the Zorder of the elements contained within it, so if you nest several containers, inner containers have a higher Zorder than outer ones to ensure they are displayed correctly. To add a container (such as a Panel) to the overlay, simply call Overlay::add2D.<BR><BR>
 
 If you wish to add child elements to that container, call OverlayContainer::addChild. Child elements can be OverlayElements or OverlayContainer instances themselves. Remember that the position of a child element is relative to the top-left corner of it's parent.<BR><BR>
-</P>
-<P>
 
 <A NAME="SEC18"></A>
 <H2> A word about 2D coordinates </H2>
 <!--docid::SEC18::-->
-<P>
 
 OGRE allows you to place and size elements based on 2 coordinate systems: <STRONG>relative</STRONG> and <STRONG>pixel</STRONG> based. 
-</P>
 <DL COMPACT>
 <DT>Pixel Mode
 <DD>This mode is useful when you want to specify an exact size for your overlay items, and you don't mind if those items get smaller on the screen if you increase the screen resolution (in fact you might want this). In this mode the only way to put something in the middle or at the right or bottom of the screen reliably in any resolution is to use the aligning options, whilst in relative mode you can do it just by using the right relative coordinates. This mode is very simple, the top-left of the screen is (0,0) and the bottom-right of the screen depends on the resolution. As mentioned above, you can use the aligning options to make the horizontal and vertical coordinate origins the right, bottom or center of the screen if you want to place pixel items in these locations without knowing the resolution.
 <DT>Relative Mode
-<DD>This mode is useful when you want items in the overlay to be the same size on the screen no matter what the resolution. In relative mode, the top-left of the screen is (0,0) and the bottom-right is (1,1). So if you place an element at (0.5, 0.5), it's top-left corner is placed exactly in the center of the screen, no matter what resolution the application is running in. The same principle applies to sizes; if you set the width of an element to 0.5, it covers half the width of the screen. Note that because the aspect ratio of the screen is typically 1.3333 : 1 (width : height), an element with dimensions (0.25, 0.25) will not be square, but it will take up exactly 1/16th of the screen in area terms. If you want square-looking areas you will have to compensate using the typical aspect ratio eg use (0.1875, 0.25) instead.
+<DD>This mode is useful when you want items in the overlay to be the same size on the screen no matter what the resolution. In relative mode, the top-left of the screen is (0,0) and the bottom-right is (1,1). So if you place an element at (0.5, 0.5), it's top-left corner is placed exactly in the center of the screen, no matter what resolution the application is running in. The same principle applies to sizes; if you set the width of an element to 0.5, it covers half the width of the screen. Note that because the aspect ratio of the screen is typically 1.3333 : 1 (width : height), an element with dimensions (0.25, 0.25) will not be square, but it will take up exactly 1/16th of the screen in area terms. If you want square-looking areas you will have to compensate using the typical aspect ratio e.g. use (0.1875, 0.25) instead.
 </DL>
-<P>
 
 <A NAME="SEC19"></A>
 <H2> Transforming Overlays </H2>
 <!--docid::SEC19::-->
-<P>
 
 Another nice feature of overlays is being able to rotate, scroll and scale them as a whole. You can use this for zooming in / out menu systems, dropping them in from off screen and other nice effects. See the Overlay::scroll, Overlay::rotate and Overlay::scale methods for more information.
-</P>
-<P>
 
 <A NAME="SEC20"></A>
 <H2> Scripting overlays </H2>
 <!--docid::SEC20::-->
-Overlays can also be defined in scripts. See section <A HREF="manual_41.html#SEC235">3.4 Overlay Scripts</A> for details.
-<P>
+Overlays can also be defined in scripts. See section <A HREF="manual_41.html#SEC244">3.4 Overlay Scripts</A> for details.
 
 <A NAME="SEC21"></A>
 <H2> GUI systems </H2>
 <!--docid::SEC21::-->
 Overlays are only really designed for non-interactive screen elements, although you can use them as a crude GUI. For a far more complete GUI solution, we recommend CEGui (<A HREF="http://www.cegui.org.uk">http://www.cegui.org.uk</A>), as demonstrated in the sample Demo_Gui.
-<P>
 
 <A NAME="Scripts"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
 <TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_11.html#SEC14"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> Up </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -127,7 +106,7 @@ Overlays are only really designed for non-interactive screen elements, although 
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

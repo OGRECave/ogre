@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,36 +12,38 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): Compositor Techniques</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): Compositor Techniques</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Compositor Techniques">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Compositor Techniques">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): Compositor Techniques">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): Compositor Techniques">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC145"></A>
+<A NAME="SEC150"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC141"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC141"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC147"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC146"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC155"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC146"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 3.2.1 Techniques </H3>
-<!--docid::SEC145::-->
+<!--docid::SEC150::-->
 
-A compositor technique is much like a <A HREF="manual_15.html#SEC31">material technique</A> in that it describes one approach to achieving the effect you're looking for. A compositor definition can have more than one technique if you wish to provide some fallback should the hardware not support the technique you'd prefer to use. Techniques are evaluated for hardware support based on 2 things:
+A compositor technique is much like a <A HREF="manual_15.html#SEC33">material technique</A> in that it describes one approach to achieving the effect you're looking for. A compositor definition can have more than one technique if you wish to provide some fallback should the hardware not support the technique you'd prefer to use. Techniques are evaluated for hardware support based on 2 things:
 <DL COMPACT>
 <DT>Material support
-<DD>All <A HREF="manual_32.html#SEC155">passes</A> that render a fullscreen quad use a material; for the technique to be supported, all of the materials referenced must have at least one supported material technique. If they don't, the compositor technique is marked as unsupported and won't be used.
+<DD>All <A HREF="manual_32.html#SEC163">passes</A> that render a fullscreen quad use a material; for the technique to be supported, all of the materials referenced must have at least one supported material technique. If they don't, the compositor technique is marked as unsupported and won't be used.
 <DT>Texture format support
 <DD>This one is slightly more complicated. When you request a <A HREF="manual_30.html#compositor_texture">texture</A> in your technique, you request a pixel format. Not all formats are natively supported by hardware, especially the floating point formats. However, in this case the hardware will typically downgrade the texture format requested to one that the hardware does support - with compositor effects though, you might want to use a different approach if this is the case. So, when evaluating techniques, the compositor will first look for native support for the exact pixel format you've asked for, and will skip onto the next technique if it is not supported, thus allowing you to define other techniques with simpler pixel formats which use a different approach. If it doesn't find any techniques which are natively supported, it tries again, this time allowing the hardware to downgrade the texture format and thus should find at least some support for what you've asked for.
 </DL>
@@ -53,28 +55,39 @@ Format: technique { }<BR><BR>
 Techniques can have the following nested elements:
 <UL>
 <LI><A HREF="manual_30.html#compositor_texture">texture</A>
-<LI><A HREF="manual_31.html#SEC147">target</A>
-<LI><A HREF="manual_31.html#SEC147">target_output</A>
+<LI><A HREF="manual_30.html#compositor_texture_ref">texture_ref</A>
+<LI><A HREF="manual_30.html#compositor_scheme">scheme</A>
+<LI><A HREF="manual_30.html#SEC154">compositor_logic</A>
+<LI><A HREF="manual_31.html#SEC155">target</A>
+<LI><A HREF="manual_31.html#SEC155">target_output</A>
 </UL>
 
 <A NAME="compositor_texture"></A>
-<A NAME="SEC146"></A>
+<A NAME="SEC151"></A>
 <H3> texture  </H3>
-<!--docid::SEC146::-->
+<!--docid::SEC151::-->
 
-This declares a render texture for use in subsequent <A HREF="manual_31.html#SEC147">target passes</A>.
+This declares a render texture for use in subsequent <A HREF="manual_31.html#SEC155">target passes</A>.
 
 <BR><BR>
-Format: texture &lt;Name&gt; &lt;Width&gt; &lt;Height&gt; &lt;Pixel Format&gt; [&lt;MRT Pixel Format2&gt;] [&lt;MRT Pixel FormatN&gt;]<BR><BR>
+Format: texture &lt;Name&gt; &lt;Width&gt; &lt;Height&gt; &lt;Pixel Format&gt; [&lt;MRT Pixel Format2&gt;] [&lt;MRT Pixel FormatN&gt;] [pooled] [gamma] [no_fsaa] [&lt;scope&gt;]<BR><BR>
 
 Here is a description of the parameters:
 <DL COMPACT>
 <DT>Name
-<DD>A name to give the render texture, which must be unique within this compositor. This name is used to reference the texture in <A HREF="manual_31.html#SEC147">target passes</A>, when the texture is rendered to, and in <A HREF="manual_32.html#SEC155">passes</A>, when the texture is used as input to a material rendering a fullscreen quad.
+<DD>A name to give the render texture, which must be unique within this compositor. This name is used to reference the texture in <A HREF="manual_31.html#SEC155">target passes</A>, when the texture is rendered to, and in <A HREF="manual_32.html#SEC163">passes</A>, when the texture is used as input to a material rendering a fullscreen quad.
 <DT>Width, Height
 <DD>The dimensions of the render texture. You can either specify a fixed width and height, or you can request that the texture is based on the physical dimensions of the viewport to which the compositor is attached. The options for the latter are 'target_width', 'target_height', 'target_width_scaled &lt;factor&gt;' and 'target_height_scaled &lt;factor&gt;' - where 'factor' is the amount by which you wish to multiply the size of the main target to derive the dimensions.
 <DT>Pixel Format
 <DD>The pixel format of the render texture. This affects how much memory it will take, what colour channels will be available, and what precision you will have within those channels. The available options are PF_A8R8G8B8, PF_R8G8B8A8, PF_R8G8B8, PF_FLOAT16_RGBA, PF_FLOAT16_RGB, PF_FLOAT16_R, PF_FLOAT32_RGBA, PF_FLOAT32_RGB, and PF_FLOAT32_R.
+<DT>pooled
+<DD>If present, this directive makes this texture 'pooled' among compositor instances, which can save some memory.
+<DT>gamma
+<DD>If present, this directive means that sRGB gamma correction will be enabled on writes to this texture. You should remember to include the opposite sRGB conversion when you read this texture back in another material, such as a quad. This option will automatically enabled if you use a render_scene pass on this texture and the viewport on which the compositor is based has sRGB write support enabled.
+<DT>no_fsaa
+<DD>If present, this directive disables the use of anti-aliasing on this texture. FSAA is only used if this texture is subject to a render_scene pass and FSAA was enabled on the original viewport on which this compositor is based; this option allows you to override it and disable the FSAA if you wish. 
+<DT>scope
+<DD>If present, this directive sets the scope for the texture for being accessed by other compositors using the <A HREF="manual_30.html#compositor_texture_ref">texture_ref</A> directive. There are three options : 'local_scope' (which is also the default) means that only the compositor defining the texture can access it. 'chain_scope' means that the compositors after this compositor in the chain can reference its textures, and 'global_scope' means that the entire application can access the texture. This directive also affects the creation of the textures (global textures are created once and thus can't be used with the pooled directive, and can't rely on viewport size).
 </DL>
 
 Example: texture rt0 512 512 PF_R8G8B8A8<BR>
@@ -82,13 +95,63 @@ Example: texture rt1 target_width target_height PF_FLOAT32_RGB<BR><BR>
 
 You can in fact repeat this element if you wish. If you do so, that means that this render texture becomes a Multiple Render Target (MRT), when the GPU writes to multiple textures at once. It is imperative that if you use MRT that the shaders that render to it render to ALL the targets. Not doing so can cause undefined results. It is also important to note that although you can use different pixel formats for each target in a MRT, each one should have the same total bit depth since most cards do not support independent bit depths. If you try to use this feature on cards that do not support the number of MRTs you've asked for, the technique will be skipped (so you ought to write a fallback technique).
 
+Example : texture mrt_output target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_RGBA chain_scope
+
+<A NAME="compositor_texture_ref"></A>
+<A NAME="SEC152"></A>
+<H3> texture_ref </H3>
+<!--docid::SEC152::-->
+
+This declares a reference of a texture from another compositor to be used in this compositor.
+
+<BR><BR>
+Format: texture_ref &lt;Local Name&gt; &lt;Reference Compositor&gt; &lt;Reference Texture Name&gt;
+
+Here is a description of the parameters:
+<DL COMPACT>
+<DT>Local Name
+<DD>A name to give the referenced texture, which must be unique within this compositor. This name is used to reference the texture in <A HREF="manual_31.html#SEC155">target passes</A>, when the texture is rendered to, and in <A HREF="manual_32.html#SEC163">passes</A>, when the texture is used as input to a material rendering a fullscreen quad.
+<DT>Reference Compositor
+<DD>The name of the compositor that we are referencing a texture from
+<DT>Reference Texture Name
+<DD>The name of the texture in the compositor that we are referencing
+</DL>
+
+Make sure that the texture being referenced is scoped accordingly (either chain or global scope) and placed accordingly during chain creation (if referencing a chain-scoped texture, the compositor must be present in the chain and placed before the compositor referencing it).
+
+Example : texture_ref GBuffer GBufferCompositor mrt_output
+
+<A NAME="compositor_scheme"></A>
+<A NAME="SEC153"></A>
+<H3> scheme  </H3>
+<!--docid::SEC153::-->
+
+This gives a compositor technique a scheme name, allowing you to manually switch between different techniques for this compositor when instantiated on a viewport by calling CompositorInstance::setScheme. 
+
+<BR><BR>
+Format: material_scheme &lt;Name&gt; <BR><BR>
+
+<A NAME="compositor_logic"></A>
+<A NAME="SEC154"></A>
+<H3> compositor_logic </H3>
+<!--docid::SEC154::-->
+
+This connects between a compositor and code that it requires in order to function correctly. When an instance of this compositor will be created, the compositor logic will be notified and will have the chance to prepare the compositor's operation (for example, adding a listener).
+
+<BR><BR>
+Format: compositor_logic &lt;Name&gt;
+
+Registration of compositor logics is done by name through CompositorManager::registerCompositorLogic.
+
 <A NAME="Compositor Target Passes"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC141"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC141"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC147"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC146"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC155"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC146"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -96,7 +159,7 @@ You can in fact repeat this element if you wish. If you do so, that means that t
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

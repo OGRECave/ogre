@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,279 +12,189 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): OverlayElement Attributes</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): OverlayElement Attributes</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): OverlayElement Attributes">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): OverlayElement Attributes">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): OverlayElement Attributes">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): OverlayElement Attributes">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC241"></A>
+<A NAME="SEC250"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC235"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC235"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_43.html#SEC252"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC244"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_43.html#SEC261"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC244"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 3.4.1 OverlayElement Attributes </H3>
-<!--docid::SEC241::-->
-<P>
+<!--docid::SEC250::-->
 
 These attributes are valid within the braces of a 'container' or 'element' block in an overlay script. They must each be on their own line. Ordering is unimportant.<BR><BR>
-</P>
-<P>
 
 <A NAME="metrics_mode"></A>
-<A NAME="SEC242"></A>
+<A NAME="SEC251"></A>
 <H3> metrics_mode </H3>
-<!--docid::SEC242::-->
-<P>
+<!--docid::SEC251::-->
 
 Sets the units which will be used to size and position this element.<BR><BR>
-</P>
-<P>
 
 Format: metrics_mode &lt;pixels|relative&gt;<BR>
 Example: metrics_mode pixels<BR>
-</P>
-<P>
 
 This can be used to change the way that all measurement attributes in the rest of this element are interpreted. In relative mode, they are interpreted as being a parametric value from 0 to 1, as a proportion of the width / height of the screen. In pixels mode, they are simply pixel offsets.<BR><BR>
-</P>
-<P>
 
 Default: metrics_mode relative<BR>
-</P>
-<P>
 
 <A NAME="horz_align"></A>
-<A NAME="SEC243"></A>
+<A NAME="SEC252"></A>
 <H3> horz_align </H3>
-<!--docid::SEC243::-->
-<P>
+<!--docid::SEC252::-->
 
 Sets the horizontal alignment of this element, in terms of where the horizontal origin is.<BR><BR>
-</P>
-<P>
 
 Format: horz_align &lt;left|center|right&gt;<BR>
 Example: horz_align center<BR><BR>
-</P>
-<P>
 
 This can be used to change where the origin is deemed to be for the purposes of any horizontal positioning attributes of this element. By default the origin is deemed to be the left edge of the screen, but if you change this you can center or right-align your elements. Note that setting the alignment to center or right does not automatically force your elements to appear in the center or the right edge, you just have to treat that point as the origin and adjust your coordinates appropriately. This is more flexible because you can choose to position your element anywhere relative to that origin. For example, if your element was 10 pixels wide, you would use a 'left' property of -10 to align it exactly to the right edge, or -20 to leave a gap but still make it stick to the right edge.<BR><BR>
-</P>
-<P>
 
 Note that you can use this property in both relative and pixel modes, but it is most useful in pixel mode.<BR><BR>
-</P>
-<P>
 
 Default: horz_align left<BR>
-</P>
-<P>
 
 <A NAME="vert_align"></A>
-<A NAME="SEC244"></A>
+<A NAME="SEC253"></A>
 <H3> vert_align </H3>
-<!--docid::SEC244::-->
-<P>
+<!--docid::SEC253::-->
 
 Sets the vertical alignment of this element, in terms of where the vertical origin is.<BR><BR>
-</P>
-<P>
 
 Format: vert_align &lt;top|center|bottom&gt;<BR>
 Example: vert_align center<BR><BR>
-</P>
-<P>
 
 This can be used to change where the origin is deemed to be for the purposes of any vertical positioning attributes of this element. By default the origin is deemed to be the top edge of the screen, but if you change this you can center or bottom-align your elements. Note that setting the alignment to center or bottom does not automatically force your elements to appear in the center or the bottom edge, you just have to treat that point as the origin and adjust your coordinates appropriately. This is more flexible because you can choose to position your element anywhere relative to that origin. For example, if your element was 50 pixels high, you would use a 'top' property of -50 to align it exactly to the bottom edge, or -70 to leave a gap but still make it stick to the bottom edge.<BR><BR>
-</P>
-<P>
 
 Note that you can use this property in both relative and pixel modes, but it is most useful in pixel mode.<BR><BR>
-</P>
-<P>
 
 Default: vert_align top<BR>
-</P>
-<P>
 
 <A NAME="left"></A>
-<A NAME="SEC245"></A>
+<A NAME="SEC254"></A>
 <H3> left </H3>
-<!--docid::SEC245::-->
-<P>
+<!--docid::SEC254::-->
 
 Sets the horizontal position of the element relative to it's parent.<BR><BR>
-</P>
-<P>
 
 Format: left &lt;value&gt;<BR>
 Example: left 0.5<BR><BR>
-</P>
-<P>
 
 Positions are relative to the parent (the top-left of the screen if the parent is an overlay, the top-left of the parent otherwise) and are expressed in terms of a proportion of screen size. Therefore 0.5 is half-way across the screen.<BR><BR>
-</P>
-<P>
 
 Default: left 0<BR>
-</P>
-<P>
 
 <A NAME="top"></A>
-<A NAME="SEC246"></A>
+<A NAME="SEC255"></A>
 <H3> top </H3>
-<!--docid::SEC246::-->
-<P>
+<!--docid::SEC255::-->
 
 Sets the vertical position of the element relative to it's parent.<BR><BR>
-</P>
-<P>
 
 Format: top &lt;value&gt;<BR>
 Example: top 0.5<BR><BR>
-</P>
-<P>
 
 Positions are relative to the parent (the top-left of the screen if the parent is an overlay, the top-left of the parent otherwise) and are expressed in terms of a proportion of screen size. Therefore 0.5 is half-way down the screen.<BR><BR>
-</P>
-<P>
 
 Default: top 0<BR>
-</P>
-<P>
 
 <A NAME="width"></A>
-<A NAME="SEC247"></A>
+<A NAME="SEC256"></A>
 <H3> width </H3>
-<!--docid::SEC247::-->
-<P>
+<!--docid::SEC256::-->
 
 Sets the width of the element as a proportion of the size of the screen.<BR><BR>
-</P>
-<P>
 
 Format: width &lt;value&gt;<BR>
 Example: width 0.25<BR><BR>
-</P>
-<P>
 
 Sizes are relative to the size of the screen, so 0.25 is a quarter of the screen. Sizes are not relative to the parent; this is common in windowing systems where the top and left are relative but the size is absolute.<BR><BR>
-</P>
-<P>
 
 Default: width 1<BR>
-</P>
-<P>
 
 <A NAME="height"></A>
-<A NAME="SEC248"></A>
+<A NAME="SEC257"></A>
 <H3> height </H3>
-<!--docid::SEC248::-->
-<P>
+<!--docid::SEC257::-->
 
 Sets the height of the element as a proportion of the size of the screen.<BR><BR>
-</P>
-<P>
 
 Format: height &lt;value&gt;<BR>
 Example: height 0.25<BR><BR>
-</P>
-<P>
 
 Sizes are relative to the size of the screen, so 0.25 is a quarter of the screen. Sizes are not relative to the parent; this is common in windowing systems where the top and left are relative but the size is absolute.<BR><BR>
-</P>
-<P>
 
 Default: height 1<BR>
-</P>
-<P>
 
 <A NAME="overlay_material"></A>
-<A NAME="SEC249"></A>
+<A NAME="SEC258"></A>
 <H3> material   </H3>
-<!--docid::SEC249::-->
-<P>
+<!--docid::SEC258::-->
 
 Sets the name of the material to use for this element.<BR><BR>
-</P>
-<P>
 
 Format: material &lt;name&gt;<BR>
 Example: material Examples/TestMaterial<BR><BR>
-</P>
-<P>
 
 This sets the base material which this element will use. Each type of element may interpret this differently; for example the OGRE element 'Panel' treats this as the background of the panel, whilst 'BorderPanel' interprets this as the material for the center area only. Materials should be defined in .material scripts.<BR><BR>
 Note that using a material in an overlay element automatically disables lighting and depth checking on this material. Therefore you should not use the same material as is used for real 3D objects for an overlay.<BR><BR>
-</P>
-<P>
 
 Default: none<BR>
-</P>
-<P>
 
 <A NAME="caption"></A>
-<A NAME="SEC250"></A>
+<A NAME="SEC259"></A>
 <H3> caption </H3>
-<!--docid::SEC250::-->
-<P>
+<!--docid::SEC259::-->
 
 Sets a text caption for the element.<BR><BR>
-</P>
-<P>
 
 Format: caption &lt;string&gt;<BR>
 Example: caption This is a caption<BR><BR>
-</P>
-<P>
 
 Not all elements support captions, so each element is free to disregard this if it wants. However, a general text caption is so common to many elements that it is included in the generic interface to make it simpler to use. This is a common feature in GUI systems.<BR><BR>
-</P>
-<P>
 
 Default: blank<BR>
-</P>
-<P>
+
 
 <A NAME="rotation"></A>
-<A NAME="SEC251"></A>
+<A NAME="SEC260"></A>
 <H3> rotation </H3>
-<!--docid::SEC251::-->
-<P>
+<!--docid::SEC260::-->
 
 Sets the rotation of the element.<BR><BR>
-</P>
-<P>
 
 Format: rotation &lt;angle_in_degrees&gt; &lt;axis_x&gt; &lt;axis_y&gt; &lt;axis_z&gt;
 Example: rotation 30 0 0 1
-</P>
-<P>
 
 Default: none 
-</P>
-<P>
 
 <A NAME="Standard OverlayElements"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC235"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC235"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_43.html#SEC252"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC244"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_43.html#SEC261"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_41.html#SEC244"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -292,7 +202,7 @@ Default: none
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

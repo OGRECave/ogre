@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,31 +12,33 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): Compositor Target Passes</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): Compositor Target Passes</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Compositor Target Passes">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Compositor Target Passes">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): Compositor Target Passes">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): Compositor Target Passes">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC147"></A>
+<A NAME="SEC155"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC145"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC141"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_32.html#SEC155"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC150"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_32.html#SEC163"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC146"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 3.2.2 Target Passes </H3>
-<!--docid::SEC147::-->
+<!--docid::SEC155::-->
 
 A target pass is the action of rendering to a given target, either a render texture or the final output. You can update the same render texture multiple times by adding more than one target pass to your compositor script - this is very useful for 'ping pong' renders between a couple of render textures to perform complex convolutions that cannot be done in a single render, such as blurring.<BR><BR>
 
@@ -51,26 +53,26 @@ The contents of both are identical, the only real difference is that you can onl
 <LI>
 <A HREF="manual_31.html#compositor_target_input">input</A>
 <LI>
-<A HREF="manual_31.html#SEC150">only_initial</A>
+<A HREF="manual_31.html#SEC158">only_initial</A>
 <LI>
-<A HREF="manual_31.html#SEC151">visibility_mask</A>
+<A HREF="manual_31.html#SEC159">visibility_mask</A>
 <LI>
 <A HREF="manual_31.html#compositor_lod_bias">lod_bias</A>
 <LI>
-<A HREF="manual_31.html#SEC154">material_scheme</A>
+<A HREF="manual_31.html#SEC162">material_scheme</A>
 <LI>
 <A HREF="manual_31.html#compositor_shadows">shadows</A>
 <LI>
-<A HREF="manual_32.html#SEC155">pass</A>
+<A HREF="manual_32.html#SEC163">pass</A>
 </UL>
 
-<A NAME="SEC148"></A>
+<A NAME="SEC156"></A>
 <H2> Attribute Descriptions   </H2>
-<!--docid::SEC148::-->
+<!--docid::SEC156::-->
 <A NAME="compositor_target_input"></A>
-<A NAME="SEC149"></A>
+<A NAME="SEC157"></A>
 <H3> input </H3>
-<!--docid::SEC149::-->
+<!--docid::SEC157::-->
 Sets input mode of the target, which tells the target pass what is pulled in before any of its own passes are rendered.<BR><BR>
 Format: input (none | previous)<BR><BR>
 Default: input none<BR><BR>
@@ -82,42 +84,42 @@ Default: input none<BR><BR>
 </DL>
 
 <A NAME="only_initial"></A>
-<A NAME="SEC150"></A>
+<A NAME="SEC158"></A>
 <H3> only_initial </H3>
-<!--docid::SEC150::-->
+<!--docid::SEC158::-->
 If set to on, this target pass will only execute once initially after the effect has been enabled. This could be useful to perform once-off renders, after which the static contents are used by the rest of the compositor.<BR><BR>
 Format: only_initial (on | off)<BR><BR>
 Default: only_initial off<BR><BR>
 
 
 <A NAME="visibility_mask"></A>
-<A NAME="SEC151"></A>
+<A NAME="SEC159"></A>
 <H3> visibility_mask </H3>
-<!--docid::SEC151::-->
+<!--docid::SEC159::-->
 Sets the visibility mask for any render_scene passes performed in this target pass. This is a bitmask (although it must be specified as decimal, not hex) and maps to SceneManager::setVisibilityMask.
 Format: visibility_mask &lt;mask&gt;<BR><BR>
 Default: visibility_mask 4294967295<BR><BR>
 
 <A NAME="compositor_lod_bias"></A>
-<A NAME="SEC152"></A>
+<A NAME="SEC160"></A>
 <H3> lod_bias </H3>
-<!--docid::SEC152::-->
+<!--docid::SEC160::-->
 Set the scene LOD bias for any render_scene passes performed in this target pass. The default is 1.0, everything below that means lower quality, higher means higher quality.<BR><BR>
 Format: lod_bias &lt;lodbias&gt;<BR><BR>
 Default: lod_bias 1.0<BR><BR>
 
 <A NAME="compositor_shadows"></A>
-<A NAME="SEC153"></A>
+<A NAME="SEC161"></A>
 <H3> shadows </H3>
-<!--docid::SEC153::-->
+<!--docid::SEC161::-->
 Sets whether shadows should be rendered during any render_scene pass performed in this target pass. The default is 'on'.<BR><BR>
 Format: shadows (on | off)<BR><BR>
 Default: shadows on<BR><BR>
 
 <A NAME="material_scheme"></A>
-<A NAME="SEC154"></A>
+<A NAME="SEC162"></A>
 <H3> material_scheme </H3>
-<!--docid::SEC154::-->
+<!--docid::SEC162::-->
 If set, indicates the material scheme to use for any render_scene pass. Useful for performing special-case rendering effects.<BR><BR>
 Format: material_scheme &lt;scheme name&gt;<BR><BR>
 Default: None<BR><BR>
@@ -125,10 +127,12 @@ Default: None<BR><BR>
 <A NAME="Compositor Passes"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC145"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC141"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_32.html#SEC155"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_30.html#SEC150"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_32.html#SEC163"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC146"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -136,7 +140,7 @@ Default: None<BR><BR>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

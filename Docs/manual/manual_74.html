@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,44 +12,46 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): Additive Light Masking</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): Additive Light Masking</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Additive Light Masking">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Additive Light Masking">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): Additive Light Masking">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): Additive Light Masking">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC331"></A>
+<A NAME="SEC340"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_73.html#SEC329"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC304"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_75.html#SEC335"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_73.html#SEC338"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_75.html#SEC344"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC313"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC313"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_75.html#SEC344"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
 <H2> 7.4 Additive Light Masking </H2>
-<!--docid::SEC331::-->
+<!--docid::SEC340::-->
 Additive light masking is about rendering the scene many times, each time representing a single light contribution whose influence is masked out in areas of shadow. Each pass is combined with (added to) the previous one such that when all the passes are complete, all the light contribution has correctly accumulated in the scene, and each light has been prevented from affecting areas which it should not be able to because of shadow casters. This is an effective technique which results in very realistic looking lighting, but it comes at a price: more rendering passes.<BR><BR>
 
-As many technical papers (and game marketing) will tell you, rendering realistic lighting like this requires multiple passes. Being a friendly sort of engine, Ogre frees you from most of the hard work though, and will let you use the exact same material definitions whether you use this lighting technique or not (for the most part, see <A HREF="manual_74.html#SEC333">Pass Classification and Vertex Programs</A>). In order to do this technique, Ogre automatically categorises the <A HREF="manual_16.html#SEC38">3.1.2 Passes</A> you define in your materials into 3 types:
+As many technical papers (and game marketing) will tell you, rendering realistic lighting like this requires multiple passes. Being a friendly sort of engine, Ogre frees you from most of the hard work though, and will let you use the exact same material definitions whether you use this lighting technique or not (for the most part, see <A HREF="manual_74.html#SEC342">Pass Classification and Vertex Programs</A>). In order to do this technique, Ogre automatically categorises the <A HREF="manual_16.html#SEC39">3.1.2 Passes</A> you define in your materials into 3 types:
 <OL>
 <LI>ambient
 Passes categorised as 'ambient' include any base pass which is not lit by any particular light, i.e. it occurs even if there is no ambient light in the scene. The ambient pass always happens first, and sets up the initial depth value of the fragments, and the ambient colour if applicable. It also includes any emissive / self illumination contribution. Only textures which affect ambient light (e.g. ambient occlusion maps) should be rendered in this pass.
 <LI>diffuse/specular
-Passes categorised as 'diffuse/specular' (or 'per-light') are rendered once per light, and each pass contributes the diffuse ans specular colour from that single light as reflected by the diffuse / specular terms in the pass. Areas in shadow from that light are masked and are thus not updated. The resulting masked colour is added to the exisiting colour in the scene. Again, no textures are used in this pass (except for textures used for lighting calculations such as normal maps).
+Passes categorised as 'diffuse/specular' (or 'per-light') are rendered once per light, and each pass contributes the diffuse and specular colour from that single light as reflected by the diffuse / specular terms in the pass. Areas in shadow from that light are masked and are thus not updated. The resulting masked colour is added to the existing colour in the scene. Again, no textures are used in this pass (except for textures used for lighting calculations such as normal maps).
 <LI>decal
 Passes categorised as 'decal' add the final texture colour to the scene, which is modulated by the accumulated light built up from all the ambient and diffuse/specular passes. 
 </OL>
 
-In practice, <A HREF="manual_16.html#SEC38">3.1.2 Passes</A> rarely fall nicely into just one of these categories. For each Technique, Ogre compiles a list of 'Illumination Passes', which are derived from the user defined passes, but can be split, to ensure that the divisions between illumination pass categories can be maintained. For example, if we take a very simple material definition:
+In practice, <A HREF="manual_16.html#SEC39">3.1.2 Passes</A> rarely fall nicely into just one of these categories. For each Technique, Ogre compiles a list of 'Illumination Passes', which are derived from the user defined passes, but can be split, to ensure that the divisions between illumination pass categories can be maintained. For example, if we take a very simple material definition:
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>material TestIllumination
 {
 	technique
@@ -104,16 +106,16 @@ Ogre will split this into 3 illumination passes, which will be the equivalent of
 </pre></td></tr></table>So as you can see, even a simple material requires a minimum of 3 passes when using this shadow technique, and in fact it requires (num_lights + 2) passes in the general sense. You can use more passes in your original material and Ogre will cope with that too, but be aware that each pass may turn into multiple ones if it uses more than one type of light contribution (ambient vs diffuse/specular) and / or has texture units. The main nice thing is that you get the full multipass lighting behaviour even if you don't define your materials in terms of it, meaning that your material definitions can remain the same no matter what lighting approach you decide to use.<BR><BR>
 
 <A NAME="Manually Categorising Illumination Passes"></A>
-<A NAME="SEC332"></A>
+<A NAME="SEC341"></A>
 <H3> Manually Categorising Illumination Passes </H3>
-<!--docid::SEC332::-->
-Alternatively, if you want more direct control over the categorisation of your passes, you can use the <A HREF="manual_16.html#SEC55">illumination_stage</A> option in your pass to explicitly assign a pass unchanged to an illumination stage. This way you can make sure you know precisely how your material will be rendered under additive lighting conditions.
+<!--docid::SEC341::-->
+Alternatively, if you want more direct control over the categorisation of your passes, you can use the <A HREF="manual_16.html#SEC58">illumination_stage</A> option in your pass to explicitly assign a pass unchanged to an illumination stage. This way you can make sure you know precisely how your material will be rendered under additive lighting conditions.
 
 <A NAME="Pass Classification and Vertex Programs"></A>
-<A NAME="SEC333"></A>
+<A NAME="SEC342"></A>
 <H3> Pass Classification and Vertex Programs </H3>
-<!--docid::SEC333::-->
-Ogre is pretty good at classifying and splitting your passes to ensure that the multipass rendering approach required by additive lighting works correctly without you having to change your material definitions. However, there is one exception; when you use vertex programs, the normal lighting attributes ambient, diffuse, specular etc are not used, becuase all of that is determined by the vertex program. Ogre has no way of knowing what you're doing inside that vertex program, so you have to tell it.<BR><BR>
+<!--docid::SEC342::-->
+Ogre is pretty good at classifying and splitting your passes to ensure that the multipass rendering approach required by additive lighting works correctly without you having to change your material definitions. However, there is one exception; when you use vertex programs, the normal lighting attributes ambient, diffuse, specular etc are not used, because all of that is determined by the vertex program. Ogre has no way of knowing what you're doing inside that vertex program, so you have to tell it.<BR><BR>
 
 In practice this is very easy. Even though your vertex program could be doing a lot of complex, highly customised processing, it can still be classified into one of the 3 types listed above. All you need to do to tell Ogre what you're doing is to use the pass attributes ambient, diffuse, specular and self_illumination, just as if you were not using a vertex program. Sure, these attributes do nothing (as far as rendering is concerned) when you're using vertex programs, but it's the easiest way to indicate to Ogre which light components you're using in your vertex program. Ogre will then classify and potentially split your programmable pass based on this information - it will leave the vertex program as-is (so that any split passes will respect any vertex modification that is being done). <BR><BR>
 
@@ -212,21 +214,23 @@ material Examples/BumpMapping/MultiLightSpecular
 	}
 }
 </pre></td></tr></table>
-Note that if you're using texture shadows you have the additional option of using <A HREF="manual_72.html#SEC328">Integrated Texture Shadows</A> rather than being forced to use this explicit sequence - allowing you to compress the number of passes into a much smaller number at the expense of defining an upper number of shadow casting lights. In this case the 'additive' aspect of the shadow technique just affects the colour of the shadow texture and it's up to you to combine the shadow textures in your receivers however you like. <BR><BR>
+Note that if you're using texture shadows you have the additional option of using <A HREF="manual_72.html#SEC337">Integrated Texture Shadows</A> rather than being forced to use this explicit sequence - allowing you to compress the number of passes into a much smaller number at the expense of defining an upper number of shadow casting lights. In this case the 'additive' aspect of the shadow technique just affects the colour of the shadow texture and it's up to you to combine the shadow textures in your receivers however you like. <BR><BR>
 
-<A NAME="SEC334"></A>
+<A NAME="SEC343"></A>
 <H3> Static Lighting </H3>
-<!--docid::SEC334::-->
-Despite their power, additive lighting techniques have an additional limitation; they do not combine well with pre-calculated static lighting in the scene. This is because they are based on the principle that shadow is an absence of light, but since static lighting in the scene already includes areas of light and shadow, additive lighting cannot remove light to create new shadows. Therefore, if you use the additive lighting technique you must either use it exclusively as your lighting solution (and you can combine it with per-pixel lighting to create a very impressive dynamic lighting solution), or you must use <A HREF="manual_72.html#SEC328">Integrated Texture Shadows</A> to combine the static lighting according to your chosen approach. 
+<!--docid::SEC343::-->
+Despite their power, additive lighting techniques have an additional limitation; they do not combine well with pre-calculated static lighting in the scene. This is because they are based on the principle that shadow is an absence of light, but since static lighting in the scene already includes areas of light and shadow, additive lighting cannot remove light to create new shadows. Therefore, if you use the additive lighting technique you must either use it exclusively as your lighting solution (and you can combine it with per-pixel lighting to create a very impressive dynamic lighting solution), or you must use <A HREF="manual_72.html#SEC337">Integrated Texture Shadows</A> to combine the static lighting according to your chosen approach. 
 
 
 <A NAME="Animation"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_73.html#SEC329"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC304"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_75.html#SEC335"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_73.html#SEC338"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_75.html#SEC344"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC313"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC313"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_75.html#SEC344"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -234,7 +238,7 @@ Despite their power, additive lighting techniques have an additional limitation;
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

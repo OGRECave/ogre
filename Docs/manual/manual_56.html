@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,31 +12,33 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): The VertexData class</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): The VertexData class</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): The VertexData class">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): The VertexData class">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): The VertexData class">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): The VertexData class">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC272"></A>
+<A NAME="SEC281"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC271"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC271"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_57.html#SEC273"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC280"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_57.html#SEC282"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC273"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_55.html#SEC280"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_69.html#SEC306"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 5.6.1 The VertexData class </H3>
-<!--docid::SEC272::-->
+<!--docid::SEC281::-->
 The VertexData class collects together all the vertex-related information used to render geometry. The new RenderOperation requires a pointer to a VertexData object, and it is also used in Mesh and SubMesh to store the vertex positions, normals, texture coordinates etc. VertexData can either be used alone (in order to render unindexed geometry, where the stream of vertices defines the triangles), or in combination with IndexData where the triangles are defined by indexes which refer to the entries in VertexData.
 <BR><BR>
 It's worth noting that you don't necessarily have to use VertexData to store your applications geometry; all that is required is that you can build a VertexData structure when it comes to rendering. This is pretty easy since all of VertexData's members are pointers, so you could maintain your vertex buffers and declarations in alternative structures if you like, so long as you can convert them for rendering.<BR><BR>
@@ -47,9 +49,9 @@ The VertexData class has a number of important members:
 <DT>vertexCount
 <DD>The number of vertices to process in this particular rendering group
 <DT>vertexDeclaration
-<DD>A pointer to a VertexDeclaration object which defines the format of the vertex input; note this is created for you by VertexData. See section <A HREF="manual_57.html#SEC273">5.6.2 Vertex Declarations</A> 
+<DD>A pointer to a VertexDeclaration object which defines the format of the vertex input; note this is created for you by VertexData. See section <A HREF="manual_57.html#SEC282">5.6.2 Vertex Declarations</A> 
 <DT>vertexBufferBinding
-<DD>A pointer to a VertexBufferBinding object which defines which vertex buffers are bound to which sources - again, this is created for you by VertexData. See section <A HREF="manual_58.html#SEC275">5.6.3 Vertex Buffer Bindings</A>
+<DD>A pointer to a VertexBufferBinding object which defines which vertex buffers are bound to which sources - again, this is created for you by VertexData. See section <A HREF="manual_58.html#SEC284">5.6.3 Vertex Buffer Bindings</A>
 </DL>
 
 <A NAME="Vertex Declarations"></A>
@@ -57,7 +59,7 @@ The VertexData class has a number of important members:
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

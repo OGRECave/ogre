@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,14 +12,14 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): The Mesh Object</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): The Mesh Object</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): The Mesh Object">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): The Mesh Object">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): The Mesh Object">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): The Mesh Object">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
@@ -27,9 +27,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <A NAME="SEC12"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
 <TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_8.html#SEC11"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> Up </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_10.html#SEC13"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -37,34 +39,23 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <HR SIZE=1>
 <H2> 2.5 The Mesh Object </H2>
 <!--docid::SEC12::-->
-<P>
 
 A Mesh object represents a discrete model, a set of geometry which is self-contained and is typically fairly small on a world scale. Mesh objects are assumed to represent movable objects and are not used for the sprawling level geometry typically used to create backgrounds.<BR><BR>
-</P>
-<P>
 
-Mesh objects are a type of resource, and are managed by the MeshManager resource manager. They are typically loaded from OGRE's custom object format, the '.mesh' format. Mesh files are typically created by exporting from a modelling tool See section <A HREF="manual_46.html#SEC260">4.1 Exporters</A> and can be maipulated through various <A HREF="manual_45.html#SEC259">4. Mesh Tools</A><BR><BR>
-</P>
-<P>
+Mesh objects are a type of resource, and are managed by the MeshManager resource manager. They are typically loaded from OGRE's custom object format, the '.mesh' format. Mesh files are typically created by exporting from a modelling tool See section <A HREF="manual_46.html#SEC269">4.1 Exporters</A> and can be manipulated through various <A HREF="manual_45.html#SEC268">4. Mesh Tools</A><BR><BR>
 
 You can also create Mesh objects manually by calling the MeshManager::createManual method. This way you can define the geometry yourself, but this is outside the scope of this manual.<BR><BR>
-</P>
-<P>
 
 Mesh objects are the basis for the individual movable objects in the world, which are called <A HREF="manual_10.html#SEC13">2.6 Entities</A>.<BR><BR>
-</P>
-<P>
 
-Mesh objects can also be animated using See section <A HREF="manual_76.html#SEC336">8.1 Skeletal Animation</A>.
-</P>
-<P>
+Mesh objects can also be animated using See section <A HREF="manual_76.html#SEC345">8.1 Skeletal Animation</A>.
 
 <A NAME="Entities"></A>
 <HR SIZE=1>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

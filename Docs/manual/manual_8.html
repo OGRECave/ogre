@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,14 +12,14 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): The ResourceGroupManager Object</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): The ResourceGroupManager Object</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): The ResourceGroupManager Object">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): The ResourceGroupManager Object">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): The ResourceGroupManager Object">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): The ResourceGroupManager Object">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
@@ -27,9 +27,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <A NAME="SEC11"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
 <TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_7.html#SEC10"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> Up </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_9.html#SEC12"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -37,45 +39,26 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <HR SIZE=1>
 <H2> 2.4 The ResourceGroupManager Object </H2>
 <!--docid::SEC11::-->
-<P>
 
 The ResourceGroupManager class is actually a 'hub' for loading of reusable resources like textures and meshes. It is the place that you define groups for your resources, so they may be unloaded and reloaded when you want. Servicing it are a number of ResourceManagers which manage the individual types of resource, like TextureManager or MeshManager. In this context, resources are sets of data which must be loaded from somewhere to provide OGRE with the data it needs. <BR><BR>
-</P>
-<P>
 
 ResourceManagers ensure that resources are only loaded once and shared throughout the OGRE engine. They also manage the memory requirements of the resources they look after. They can also search in a number of locations for the resources they need, including multiple search paths and compressed archives (ZIP files).<BR><BR>
-</P>
-<P>
 
 Most of the time you won't interact with resource managers directly. Resource managers will be called by other parts of the OGRE system as required, for example when you request for a texture to be added to a Material, the TextureManager will be called for you. If you like, you can call the appropriate resource manager directly to preload resources (if for example you want to prevent disk access later on) but most of the time it's ok to let OGRE decide when to do it.<BR><BR>
-</P>
-<P>
 
 One thing you will want to do is to tell the resource managers where to look for resources. You do this via Root::getSingleton().addResourceLocation, which actually passes the information on to ResourceGroupManager. <BR><BR>
-</P>
-<P>
 
 Because there is only ever 1 instance of each resource manager in the engine, if you do want to get a reference to a resource manager use the following syntax:
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>TextureManager::getSingleton().someMethod()
 MeshManager::getSingleton().someMethod()
 </pre></td></tr></table><BR><BR>
-<P>
 
 <A NAME="The Mesh Object"></A>
 <HR SIZE=1>
-<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_7.html#SEC10"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_9.html#SEC12"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
-</TR></TABLE>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

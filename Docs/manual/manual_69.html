@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,57 +12,52 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): External Texture Sources</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): External Texture Sources</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): External Texture Sources">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): External Texture Sources">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): External Texture Sources">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): External Texture Sources">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC297"></A>
+<A NAME="SEC306"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_68.html#SEC296"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_68.html#SEC305"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC313"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC273"> &lt;&lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC304"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC313"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
 <H1> 6. External Texture Sources </H1>
-<!--docid::SEC297::-->
-<P>
+<!--docid::SEC306::-->
 
-<A NAME="SEC298"></A>
+<A NAME="SEC307"></A>
 <H2> Introduction    </H2>
-<!--docid::SEC298::-->
-<P>
+<!--docid::SEC307::-->
 
 This tutorial will provide a brief introduction of ExternalTextureSource and ExternalTextureSourceManager classes, their relationship, and how the PlugIns work. For those interested in developing a Texture Source Plugin or maybe just wanting to know more about this system, take a look the ffmpegVideoSystem plugin, which you can find more about on the OGRE forums.
-</P>
-<P>
 
-<A NAME="SEC299"></A>
+<A NAME="SEC308"></A>
 <H2> What Is An External Texture Source? </H2>
-<!--docid::SEC299::-->
-What is a texture source? Well, a texture source could be anything - png, bmp, jpeg, etc. However, loading textures from traditional bitmap files is already handled by another part OGRE. There are, however, other types of sources to get texture data from - ie. mpeg/avi/etc movie files, flash, run-time generated source, user defined, etc.<BR><BR>
-<P>
+<!--docid::SEC308::-->
+What is a texture source? Well, a texture source could be anything - png, bmp, jpeg, etc. However, loading textures from traditional bitmap files is already handled by another part OGRE. There are, however, other types of sources to get texture data from - i.e. mpeg/avi/etc movie files, flash, run-time generated source, user defined, etc.<BR><BR>
 
-How do external texture source plugins benifit OGRE? Well, the main answer is: addding support for any type of texture source does not require changing OGRE to support it... all that is involved is writting a new plugin. Additionally, because the manager uses the StringInterface class to issue commands/params, no change to the material script reader is needs to be made. As a result, if a plugin needs a special parameter set, it just creates a new command in it's Parameter Dictionary. - see ffmpegVideoSystem plugin for an example. To make this work, two classes have been added to OGRE: ExternalTextureSource &amp; ExternalTextureSourceManager.
-</P>
-<P>
+How do external texture source plugins benefit OGRE? Well, the main answer is: adding support for any type of texture source does not require changing OGRE to support it... all that is involved is writing a new plugin. Additionally, because the manager uses the StringInterface class to issue commands/params, no change to the material script reader is needs to be made. As a result, if a plugin needs a special parameter set, it just creates a new command in it's Parameter Dictionary. - see ffmpegVideoSystem plugin for an example. To make this work, two classes have been added to OGRE: ExternalTextureSource &amp; ExternalTextureSourceManager.
 
-<A NAME="SEC300"></A>
+
+<A NAME="SEC309"></A>
 <H2> ExternalTextureSource Class </H2>
-<!--docid::SEC300::-->
-The ExternalTextureSource class is the base class that Texture Source PlugIns must be derived from. It provides a generic framework (via StringInterface class) with a very limited amount of functionality. The most common of parameters can be set through the TexturePlugInSource class interface or via the StringInterface commands contained within this class. While this may seem like duplication of code, it is not. By using the string command interface, it becomes extremly easy for derived plugins to add any new types of parameters that it may need.<BR><BR>
-<P>
+<!--docid::SEC309::-->
+The ExternalTextureSource class is the base class that Texture Source PlugIns must be derived from. It provides a generic framework (via StringInterface class) with a very limited amount of functionality. The most common of parameters can be set through the TexturePlugInSource class interface or via the StringInterface commands contained within this class. While this may seem like duplication of code, it is not. By using the string command interface, it becomes extremely easy for derived plugins to add any new types of parameters that it may need.<BR><BR>
 
 Default Command Parameters defined in ExternalTextureSource base class are:
 <UL>
@@ -75,36 +70,29 @@ Used to set the technique, pass, and texture unit level to apply this texture to
 <LI>Parameter Name: &quot;frames_per_second&quot; Argument Type: Ogre::String
 Set a Frames per second update speed. (Integer Values only)
 </UL>
-<P>
 
-<A NAME="SEC301"></A>
+<A NAME="SEC310"></A>
 <H2> ExternalTextureSourceManager Class </H2>
-<!--docid::SEC301::-->
+<!--docid::SEC310::-->
 ExternalTextureSourceManager is responsible for keeping track of loaded Texture Source PlugIns. It also aids in the creation of texture source textures from scripts. It also is the interface you should use when dealing with texture source plugins.<BR><BR>
-<P>
 
 Note: The function prototypes shown below are mockups - param names are simplified to better illustrate purpose here...
 Steps needed to create a new texture via ExternalTextureSourceManager:
-</P>
-<P>
 
 <UL>
 <LI>Obviously, the first step is to have the desired plugin included in plugin.cfg for it to be loaded.
-<LI>Set the desired PlugIn as Active via AdvancedTextureManager::getSingleton().SetCurrentPlugIn( String Type ); -- type is whatever the plugin registers as handling (eg. &quot;video&quot;, &quot;flash&quot;, &quot;whatever&quot;, etc).
+<LI>Set the desired PlugIn as Active via AdvancedTextureManager::getSingleton().SetCurrentPlugIn( String Type ); -- type is whatever the plugin registers as handling (e.g. &quot;video&quot;, &quot;flash&quot;, &quot;whatever&quot;, etc).
 <LI>Note: Consult Desired PlugIn to see what params it needs/expects.
 Set params/value pairs via AdvancedTextureManager::getSingleton().getCurrentPlugIn()-&gt;setParameter( String Param, String Value );
 <LI>After required params are set, a simple call to AdvancedTextureManager::getSingleton().getCurrentPlugIn()-&gt;createDefinedTexture( sMaterialName ); will create a texture to the material name given.
 </UL>
 <BR><BR>
-<P>
 
 The manager also provides a method for deleting a texture source material: AdvancedTextureManager::DestroyAdvancedTexture( String sTextureName ); The destroy method works by broadcasting the material name to all loaded TextureSourcePlugIns, and the PlugIn who actually created the material is responsible for the deletion, while other PlugIns will just ignore the request. What this means is that you do not need to worry about which PlugIn created the material, or activating the PlugIn yourself. Just call the manager method to remove the material. Also, all texture plugins should handle cleanup when they are shutdown.
-</P>
-<P>
 
-<A NAME="SEC302"></A>
+<A NAME="SEC311"></A>
 <H2> Texture Source Material Script </H2>
-<!--docid::SEC302::-->
+<!--docid::SEC311::-->
 As mentioned earlier, the process of defining/creating texture sources can be done within material script file. Here is an example of a material script definition - Note: This example is based off the ffmpegVideoSystem plugin parameters.
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>material Example/MyVideoExample
 {
@@ -125,25 +113,23 @@ As mentioned earlier, the process of defining/creating texture sources can be do
 	}		
 }
 </pre></td></tr></table>Notice that the first two param/value pairs are defined in the ExternalTextureSource base class and that the third parameter/value pair is not defined in the base class... That parameter is added to the param dictionary by the ffmpegVideoPlugin... This shows that extending the functionality with the plugins is extremely easy. Also, pay particular attention to the line: texture_source video. This line identifies that this texture unit will come from a texture source plugin. It requires one parameter that determines which texture plugin will be used. In the example shown, the plugin requested is one that registered with &quot;video&quot; name.
-<P>
 
-<A NAME="SEC303"></A>
+<A NAME="SEC312"></A>
 <H2> Simplified Diagram of Process </H2>
-<!--docid::SEC303::-->
-<P>
+<!--docid::SEC312::-->
 
 This diagram uses ffmpegVideoPlugin as example, but all plug ins will work the same in how they are registered/used here. Also note that TextureSource Plugins are loaded/registered before scripts are parsed. This does not mean that they are initialized... Plugins are not initialized until they are set active! This is to ensure that a rendersystem is setup before the plugins might make a call the rendersystem.
-</P>
-<P>
 
 <CENTER><IMG SRC="./images/TextureSource.jpg" ALT="images/TextureSource"></CENTER>
 <A NAME="Shadows"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_68.html#SEC296"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_68.html#SEC305"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC313"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_49.html#SEC273"> &lt;&lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC304"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_70.html#SEC313"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -151,7 +137,7 @@ This diagram uses ffmpegVideoPlugin as example, but all plug ins will work the s
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

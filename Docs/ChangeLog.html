@@ -77,7 +77,7 @@ Engine)</p>
 <ul><li> Near/far plane settings for shadow cameras can now be manually configured per light if required
 </li><li> You can now mask lights out per object by calling <i>MovableObject::setLightMask</i> - a renderable object's mask is bitwise and'ed with the light's mask and the light is excluded if the result is 0.
 </li></ul>
-</li><li> <b>LOD changes</b>
+</li><li> <b>LOD changes</b> (from <a href="http://www.ogre3d.org/wiki/index.php/SoC2008_LOD">Soc2008_LOD</a>)
 
 <ul><li> LOD no longer has to use distance as a metric for changing LOD levels
 </li><li> LodStrategy can now be set on both Material and Mesh, to either Distance or PixelCount (new strategies can also be added)

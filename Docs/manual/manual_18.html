@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on February 18 2009 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -19,30 +19,32 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC102"></A>
+<A NAME="SEC104"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_17.html#SEC75"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_17.html#SEC77"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_19.html#SEC115"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_19.html#SEC113"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 3.1.4 Declaring Vertex/Geometry/Fragment Programs </H3>
-<!--docid::SEC102::-->
+<!--docid::SEC104::-->
 
-In order to use a vertex, geometry or fragment program in your materials (See section <A HREF="manual_23.html#SEC123">3.1.9 Using Vertex/Geometry/Fragment Programs in a Pass</A>), you first have to define them. A single program definition can be used by any number of materials, the only prerequisite is that a program must be defined before being referenced in the pass section of a material.<BR><BR>
+In order to use a vertex, geometry or fragment program in your materials (See section <A HREF="manual_23.html#SEC125">3.1.9 Using Vertex/Geometry/Fragment Programs in a Pass</A>), you first have to define them. A single program definition can be used by any number of materials, the only prerequisite is that a program must be defined before being referenced in the pass section of a material.<BR><BR>
 
 The definition of a program can either be embedded in the .material script itself (in which case it must precede any references to it in the script), or if you wish to use the same program across multiple .material files, you can define it in an external .program script. You define the program in exactly the same way whether you use a .program script or a .material script, the only difference is that all .program scripts are guaranteed to have been parsed before <STRONG>all</STRONG> .material scripts, so you can guarantee that your program has been defined before any .material script that might use it. Just like .material scripts, .program scripts will be read from any location which is on your resource path, and you can define many programs in a single script.<BR><BR>
 
-Vertex, geometry and fragment programs can be low-level (i.e. assembler code written to the specification of a given low level syntax such as vs_1_1 or arbfp1) or high-level such as DirectX9 HLSL, Open GL Shader Language, or nVidia's Cg language (See section <A HREF="manual_18.html#SEC106">High-level Programs</A>). High level languages give you a number of advantages, such as being able to write more intuitive code, and possibly being able to target multiple architectures in a single program (for example, the same Cg program might be able to be used in both D3D and GL, whilst the equivalent low-level programs would require separate techniques, each targetting a different API). High-level programs also allow you to use named parameters instead of simply indexed ones, although parameters are not defined here, they are used in the Pass.<BR><BR>
+Vertex, geometry and fragment programs can be low-level (i.e. assembler code written to the specification of a given low level syntax such as vs_1_1 or arbfp1) or high-level such as DirectX9 HLSL, Open GL Shader Language, or nVidia's Cg language (See section <A HREF="manual_18.html#SEC108">High-level Programs</A>). High level languages give you a number of advantages, such as being able to write more intuitive code, and possibly being able to target multiple architectures in a single program (for example, the same Cg program might be able to be used in both D3D and GL, whilst the equivalent low-level programs would require separate techniques, each targeting a different API). High-level programs also allow you to use named parameters instead of simply indexed ones, although parameters are not defined here, they are used in the Pass.<BR><BR>
 
 Here is an example of a definition of a low-level vertex program:
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>vertex_program myVertexProgram asm
@@ -50,7 +52,7 @@ Here is an example of a definition of a low-level vertex program:
     source myVertexProgram.asm 
     syntax vs_1_1
 }
-</pre></td></tr></table>As you can see, that's very simple, and defining a fragment or geometry program is exactly the same, just with vertex_program replaced with fragment_program or geometry_program, respectively. You give the program a name in the header, followed by the word 'asm' to indicate that this is a low-level program. Inside the braces, you specify where the source is going to come from (and this is loaded from any of the resource locations as with other media), and also indicate the syntax being used. You might wonder why the syntax specification is required when many of the assembler syntaxes have a header identifying them anyway - well the reason is that the engine needs to know what syntax the program is in before reading it, because during compilation of the material, we want to skip progams which use an unsupportable syntax quickly, without loading the program first.<BR><BR>
+</pre></td></tr></table>As you can see, that's very simple, and defining a fragment or geometry program is exactly the same, just with vertex_program replaced with fragment_program or geometry_program, respectively. You give the program a name in the header, followed by the word 'asm' to indicate that this is a low-level program. Inside the braces, you specify where the source is going to come from (and this is loaded from any of the resource locations as with other media), and also indicate the syntax being used. You might wonder why the syntax specification is required when many of the assembler syntaxes have a header identifying them anyway - well the reason is that the engine needs to know what syntax the program is in before reading it, because during compilation of the material, we want to skip programs which use an unsupportable syntax quickly, without loading the program first.<BR><BR>
 
 The current supported syntaxes are:
 <DL COMPACT>
@@ -65,13 +67,13 @@ Supported on cards from: ATI Radeon 9600, nVidia GeForce FX 5 series <BR>
 Supported on cards from: ATI Radeon X series, nVidia GeForce FX 6 series <BR>
 <DT>vs_3_0
 <DD>Another one of the DirectX vertex shader assembler syntaxes. <BR>
-Supported on cards from: nVidia GeForce FX 6 series
+Supported on cards from: ATI Radeon HD 2000+, nVidia GeForce FX 6 series
 <DT>arbvp1
 <DD>This is the OpenGL standard assembler format for vertex programs. It's roughly equivalent to DirectX vs_1_1.
 <DT>vp20
-<DD>This is an nVidia-specific OpenGL vertex shader syntax which is a superset of vs 1.1. 
+<DD>This is an nVidia-specific OpenGL vertex shader syntax which is a superset of vs 1.1. ATI Radeon HD 2000+ also supports it. 
 <DT>vp30
-<DD>Another nVidia-specific OpenGL vertex shader syntax. It is a superset of vs 2.0, which is supported on nVidia GeForce FX 5 series and higher.
+<DD>Another nVidia-specific OpenGL vertex shader syntax. It is a superset of vs 2.0, which is supported on nVidia GeForce FX 5 series and higher. ATI Radeon HD 2000+ also supports it. 
 <DT>vp40
 <DD>Another nVidia-specific OpenGL vertex shader syntax. It is a superset of vs 3.0, which is supported on nVidia GeForce FX 6 series and higher.
 <DT>ps_1_1, ps_1_2, ps_1_3
@@ -91,7 +93,7 @@ ps_2_0 with a higher number of instructions. <BR>
 Supported cards: ATI Radeon X series, nVidia GeForce FX 6 series<BR>
 <DT>ps_3_0
 <DD>DirectX pixel shader (ie fragment program) assembler syntax. <BR>
-Supported cards: nVidia GeForce FX6 series<BR>
+Supported cards: ATI Radeon HD 2000+, nVidia GeForce FX6 series<BR>
 <DT>ps_3_x
 <DD>DirectX pixel shader (ie fragment program) assembler syntax. <BR>
 Supported cards: nVidia GeForce FX7 series<BR>
@@ -100,7 +102,7 @@ Supported cards: nVidia GeForce FX7 series<BR>
 <DT>fp20
 <DD>This is an nVidia-specific OpenGL fragment syntax which is a superset of ps 1.3. It allows you to use the 'nvparse' format for basic fragment programs. It actually uses NV_texture_shader and NV_register_combiners to provide functionality equivalent to DirectX's ps_1_1 under GL, but only for nVidia cards. However, since ATI cards adopted arbfp1 a little earlier than nVidia, it is mainly nVidia cards like the GeForce3 and GeForce4 that this will be useful for. You can find more information about nvparse at http://developer.nvidia.com/object/nvparse.html.
 <DT>fp30
-<DD>Another nVidia-specific OpenGL fragment shader syntax. It is a superset of ps 2.0, which is supported on nVidia GeForce FX 5 series and higher.
+<DD>Another nVidia-specific OpenGL fragment shader syntax. It is a superset of ps 2.0, which is supported on nVidia GeForce FX 5 series and higher. ATI Radeon HD 2000+ also supports it. 
 <DT>fp40
 <DD>Another nVidia-specific OpenGL fragment shader syntax. It is a superset of ps 3.0, which is supported on nVidia GeForce FX 6 series and higher.
 <DT>gpu_gp, gp4_gp
@@ -111,11 +113,11 @@ Supported cards: nVidia GeForce FX8 series<BR>
 You can get a definitive list of the syntaxes supported by the current card by calling GpuProgramManager::getSingleton().getSupportedSyntax().<BR><BR>
 
 <A NAME="Specifying Named Constants for Assembler Shaders"></A>
-<A NAME="SEC103"></A>
+<A NAME="SEC105"></A>
 <H3> Specifying Named Constants for Assembler Shaders </H3>
-<!--docid::SEC103::-->
+<!--docid::SEC105::-->
 
-Assembler shaders don't have named constants (also called uniform parameters) because the language does not support them - however if you for example decided to precompile your shaders from a high-level language down to assembler for performance or obscurity, you might still want to use the named parameters. Well, you actually can - GpuNamedConstants which contains the named parameter mappings has a 'save' method which you can use to write this data to disk, where you can reference it later using the manual_named_constants directive inside your assembler program decaration, e.g.
+Assembler shaders don't have named constants (also called uniform parameters) because the language does not support them - however if you for example decided to precompile your shaders from a high-level language down to assembler for performance or obscurity, you might still want to use the named parameters. Well, you actually can - GpuNamedConstants which contains the named parameter mappings has a 'save' method which you can use to write this data to disk, where you can reference it later using the manual_named_constants directive inside your assembler program declaration, e.g.
 
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>vertex_program myVertexProgram asm
 {
@@ -129,9 +131,9 @@ In this case myVertexProgram.constants has been created by calling highLevelGpuP
 
 
 <A NAME="Default Program Parameters"></A>
-<A NAME="SEC104"></A>
+<A NAME="SEC106"></A>
 <H3> Default Program Parameters </H3>
-<!--docid::SEC104::-->
+<!--docid::SEC106::-->
 While defining a vertex, geometry or fragment program, you can also specify the default parameters to be used for materials which use it, unless they specifically override them. You do this by including a nested 'default_params' section, like so:
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>vertex_program Ogre/CelShadingVP cg
 {
@@ -150,80 +152,82 @@ While defining a vertex, geometry or fragment program, you can also specify the 
 </pre></td></tr></table>The syntax of the parameter definition is exactly the same as when you define parameters when using programs, See  <A HREF="manual_23.html#Program Parameter Specification">Program Parameter Specification</A>. Defining default parameters allows you to avoid rebinding common parameters repeatedly (clearly in the above example, all but 'shininess' are unlikely to change between uses of the program) which makes your material declarations shorter.
 
 <A NAME="Declaring Shared Parameters"></A>
-<A NAME="SEC105"></A>
+<A NAME="SEC107"></A>
 <H3> Declaring Shared Parameters </H3>
-<!--docid::SEC105::-->
+<!--docid::SEC107::-->
 Often, not every parameter you want to pass to a shader is unique to that program, and perhaps you want to give the same value to a number of different programs, and a number of different materials using that program. Shared parameter sets allow you to define a 'holding area' for shared parameters that can then be referenced when you need them in particular shaders, while keeping the definition of that value in one place. To define a set of shared parameters, you do this:
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>shared_params YourSharedParamsName
 {
 	shared_param_named mySharedParam1 float4 0.1 0.2 0.3 0.4
 	...
 }
-</pre></td></tr></table>As you can see, you need to use the keyword 'shared_params' and follow it with the name that you will use to identify these shared parameters. Inside the curly braces, you can define one parameter per line, in a way which is very similar to the <A HREF="manual_23.html#SEC127">param_named</A> syntax. The definition of these lines is:<BR><BR>
+</pre></td></tr></table>As you can see, you need to use the keyword 'shared_params' and follow it with the name that you will use to identify these shared parameters. Inside the curly braces, you can define one parameter per line, in a way which is very similar to the <A HREF="manual_23.html#SEC129">param_named</A> syntax. The definition of these lines is:<BR><BR>
 Format: shared_param_name &lt;param_name&gt; &lt;param_type&gt; [&lt;[array_size]&gt;] [&lt;initial_values&gt;]<BR><BR>
 
 The param_name must be unique within the set, and the param_type can be any one of float, float2, float3, float4, int, int2, int3, int4, matrix2x2, matrix2x3, matrix2x4, matrix3x2, matrix3x3, matrix3x4, matrix4x2, matrix4x3 and matrix4x4. The array_size option allows you to define arrays of param_type should you wish, and if present must be a number enclosed in square brackets (and note, must be separated from the param_type with whitespace). If you wish, you can also initialise the parameters by providing a list of values.<BR><BR>
 
-Once you have defined the shared parameters, you can reference them inside default_params and params blocks using <A HREF="manual_23.html#SEC129">shared_params_ref</A>. You can also obtain a reference to them in your code via GpuProgramManager::getSharedParameters, and update the values for all instances using them. 
+Once you have defined the shared parameters, you can reference them inside default_params and params blocks using <A HREF="manual_23.html#SEC131">shared_params_ref</A>. You can also obtain a reference to them in your code via GpuProgramManager::getSharedParameters, and update the values for all instances using them. 
 
 <A NAME="High-level Programs"></A>
-<A NAME="SEC106"></A>
-<H2> High-level Programs </H2>
-<!--docid::SEC106::-->
-Support for high level vertex and fragment programs is provided through plugins; this is to make sure that an application using OGRE can use as little or as much of the high-level program functionality as they like. OGRE currently supports 3 high-level program types, Cg (<A HREF="manual_19.html#SEC113">3.1.5 Cg programs</A>) (an API- and card-independent, high-level language which lets you write programs for both OpenGL and DirectX for lots of cards), DirectX 9 High-Level Shader Language (<A HREF="manual_20.html#SEC114">3.1.6 DirectX9 HLSL</A>), and OpenGL Shader Language (<A HREF="manual_21.html#SEC115">3.1.7 OpenGL GLSL</A>). HLSL can only be used with the DirectX rendersystem, and GLSL can only be used with the GL rendersystem. Cg can be used with both, although experience has shown that more advanced programs, particularly fragment programs which perform a lot of texture fetches, can produce better code in the rendersystem-specific shader langauge. <BR><BR>
-
-One way to support both HLSL and GLSL is to include seperate techniques in the material script, each one referencing separate programs. However, if the programs are basically the same, with the same parameters, and the techniques are complex this can bloat your material scripts with duplication fairly quickly. Instead, if the only difference is the language of the vertex &amp; fragment program you can use OGRE's <A HREF="manual_22.html#SEC122">3.1.8 Unified High-level Programs</A> to automatically pick a program suitable for your rendersystem whilst using a single technique.<BR><BR>
-
-<A NAME="SEC107"></A>
-<H3> Skeletal Animation in Vertex Programs </H3>
-<!--docid::SEC107::-->
-You can implement skeletal animation in hardware by writing a vertex program which uses the per-vertex blending indices and blending weights, together with an array of world matrices (which will be provided for you by Ogre if you bind the automatic parameter 'world_matrix_array_3x4'). However, you need to communicate this support to Ogre so it does not perform skeletal animation in software for you. You do this by adding the following attribute to your vertex_program definition:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>	includes_skeletal_animation true
-</pre></td></tr></table>When you do this, any skeletally animated entity which uses this material will forgo the usual animation blend and will expect the vertex program to do it, for both vertex positions and normals. Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (See section <A HREF="manual_75.html#SEC338">8. Animation</A>) then all techniques must be hardware accelerated for any to be.
-
 <A NAME="SEC108"></A>
-<H3> Morph Animation in Vertex Programs </H3>
+<H2> High-level Programs </H2>
 <!--docid::SEC108::-->
-You can implement morph animation in hardware by writing a vertex program which linearly blends between the first and second position keyframes passed as positions and the first free texture coordinate set, and by binding the animation_parametric value to a parameter (which tells you how far to interpolate between the two). However, you need to communicate this support to Ogre so it does not perform morph animation in software for you. You do this by adding the following attribute to your vertex_program definition:
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>	includes_morph_animation true
-</pre></td></tr></table>When you do this, any skeletally animated entity which uses this material will forgo the usual software morph and will expect the vertex program to do it. Note that if your model includes both skeletal animation and morph animation, they must both be implemented in the vertex program if either is to be hardware acceleration. Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (See section <A HREF="manual_75.html#SEC338">8. Animation</A>) then all techniques must be hardware accelerated for any to be.
+Support for high level vertex and fragment programs is provided through plugins; this is to make sure that an application using OGRE can use as little or as much of the high-level program functionality as they like. OGRE currently supports 3 high-level program types, Cg (<A HREF="manual_19.html#SEC115">3.1.5 Cg programs</A>) (an API- and card-independent, high-level language which lets you write programs for both OpenGL and DirectX for lots of cards), DirectX 9 High-Level Shader Language (<A HREF="manual_20.html#SEC116">3.1.6 DirectX9 HLSL</A>), and OpenGL Shader Language (<A HREF="manual_21.html#SEC117">3.1.7 OpenGL GLSL</A>). HLSL can only be used with the DirectX rendersystem, and GLSL can only be used with the GL rendersystem. Cg can be used with both, although experience has shown that more advanced programs, particularly fragment programs which perform a lot of texture fetches, can produce better code in the rendersystem-specific shader language. <BR><BR>
+
+One way to support both HLSL and GLSL is to include separate techniques in the material script, each one referencing separate programs. However, if the programs are basically the same, with the same parameters, and the techniques are complex this can bloat your material scripts with duplication fairly quickly. Instead, if the only difference is the language of the vertex &amp; fragment program you can use OGRE's <A HREF="manual_22.html#SEC124">3.1.8 Unified High-level Programs</A> to automatically pick a program suitable for your rendersystem whilst using a single technique.<BR><BR>
 
 <A NAME="SEC109"></A>
-<H3> Pose Animation in Vertex Programs </H3>
+<H3> Skeletal Animation in Vertex Programs </H3>
 <!--docid::SEC109::-->
-You can implement pose animation (blending between multiple poses based on weight) in a vertex program by pulling in the original vertex data (bound to position), and as many pose offset buffers as you've defined in your 'includes_pose_animation' declaration, which will be in the first free texture unit upwards. You must also use the animation_parametric parameter to define the starting point of the constants which will contain the pose weights; they will start at the parameter you define and fill 'n' constants, where 'n' is the max number of poses this shader can blend, ie the parameter to includes_pose_animation. 
-<TABLE><tr><td>&nbsp;</td><td class=example><pre>	includes_pose_animation 4
-</pre></td></tr></table>Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (See section <A HREF="manual_75.html#SEC338">8. Animation</A>) then all techniques must be hardware accelerated for any to be.
+You can implement skeletal animation in hardware by writing a vertex program which uses the per-vertex blending indices and blending weights, together with an array of world matrices (which will be provided for you by Ogre if you bind the automatic parameter 'world_matrix_array_3x4'). However, you need to communicate this support to Ogre so it does not perform skeletal animation in software for you. You do this by adding the following attribute to your vertex_program definition:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>	includes_skeletal_animation true
+</pre></td></tr></table>When you do this, any skeletally animated entity which uses this material will forgo the usual animation blend and will expect the vertex program to do it, for both vertex positions and normals. Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (See section <A HREF="manual_75.html#SEC344">8. Animation</A>) then all techniques must be hardware accelerated for any to be.
 
 <A NAME="SEC110"></A>
-<H3> Vertex texture fetching in vertex programs </H3>
+<H3> Morph Animation in Vertex Programs </H3>
 <!--docid::SEC110::-->
-If your vertex program makes use of <A HREF="manual_24.html#SEC131">3.1.10 Vertex Texture Fetch</A>, you should declare that with the 'uses_vertex_texture_fetch' directive. This is enough to tell Ogre that your program uses this feature and that hardware support for it should be checked.
+You can implement morph animation in hardware by writing a vertex program which linearly blends between the first and second position keyframes passed as positions and the first free texture coordinate set, and by binding the animation_parametric value to a parameter (which tells you how far to interpolate between the two). However, you need to communicate this support to Ogre so it does not perform morph animation in software for you. You do this by adding the following attribute to your vertex_program definition:
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>	includes_morph_animation true
+</pre></td></tr></table>When you do this, any skeletally animated entity which uses this material will forgo the usual software morph and will expect the vertex program to do it. Note that if your model includes both skeletal animation and morph animation, they must both be implemented in the vertex program if either is to be hardware acceleration. Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (See section <A HREF="manual_75.html#SEC344">8. Animation</A>) then all techniques must be hardware accelerated for any to be.
+
+<A NAME="SEC111"></A>
+<H3> Pose Animation in Vertex Programs </H3>
+<!--docid::SEC111::-->
+You can implement pose animation (blending between multiple poses based on weight) in a vertex program by pulling in the original vertex data (bound to position), and as many pose offset buffers as you've defined in your 'includes_pose_animation' declaration, which will be in the first free texture unit upwards. You must also use the animation_parametric parameter to define the starting point of the constants which will contain the pose weights; they will start at the parameter you define and fill 'n' constants, where 'n' is the max number of poses this shader can blend, i.e. the parameter to includes_pose_animation. 
+<TABLE><tr><td>&nbsp;</td><td class=example><pre>	includes_pose_animation 4
+</pre></td></tr></table>Note that ALL submeshes must be assigned a material which implements this, and that if you combine skeletal animation with vertex animation (See section <A HREF="manual_75.html#SEC344">8. Animation</A>) then all techniques must be hardware accelerated for any to be.
+
+<A NAME="SEC112"></A>
+<H3> Vertex texture fetching in vertex programs </H3>
+<!--docid::SEC112::-->
+If your vertex program makes use of <A HREF="manual_24.html#SEC133">3.1.10 Vertex Texture Fetch</A>, you should declare that with the 'uses_vertex_texture_fetch' directive. This is enough to tell Ogre that your program uses this feature and that hardware support for it should be checked.
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>	uses_vertex_texture_fetch true
 </pre></td></tr></table>	
-<A NAME="SEC111"></A>
+<A NAME="SEC113"></A>
 <H3> Adjacency information in Geometry Programs </H3>
-<!--docid::SEC111::-->
+<!--docid::SEC113::-->
 Some geometry programs require adjacency information from the geometry. It means that a geometry shader doesn't only get the information of the primitive it operates on, it also has access to its neighbors (in the case of lines or triangles). This directive will tell Ogre to send the information to the geometry shader.
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>	uses_adjacency_information true
 </pre></td></tr></table>	
-<A NAME="SEC112"></A>
+<A NAME="SEC114"></A>
 <H3> Vertex Programs With Shadows </H3>
-<!--docid::SEC112::-->
-When using shadows (See section <A HREF="manual_70.html#SEC307">7. Shadows</A>), the use of vertex programs can add some additional complexities, because Ogre can only automatically deal with everything when using the fixed-function pipeline. If you use vertex programs, and you are also using shadows, you may need to make some adjustments. <BR><BR>
+<!--docid::SEC114::-->
+When using shadows (See section <A HREF="manual_70.html#SEC313">7. Shadows</A>), the use of vertex programs can add some additional complexities, because Ogre can only automatically deal with everything when using the fixed-function pipeline. If you use vertex programs, and you are also using shadows, you may need to make some adjustments. <BR><BR>
 
 If you use <STRONG>stencil shadows</STRONG>, then any vertex programs which do vertex deformation can be a problem, because stencil shadows are calculated on the CPU, which does not have access to the modified vertices. If the vertex program is doing standard skeletal animation, this is ok (see section above) because Ogre knows how to replicate the effect in software, but any other vertex deformation cannot be replicated, and you will either have to accept that the shadow will not reflect this deformation, or you should turn off shadows for that object. <BR><BR>
 
-If you use <STRONG>texture shadows</STRONG>, then vertex deformation is acceptable; however, when rendering the object into a shadow texture (the shadow caster pass), the shadow has to be rendered in a solid colour (linked to the ambient colour for modulative shadows, black for additive shadows). You must therefore provide an alternative vertex program, so Ogre provides you with a way of specifying one to use when rendering the caster, See section <A HREF="manual_23.html#SEC130">Shadows and Vertex Programs</A>.
+If you use <STRONG>texture shadows</STRONG>, then vertex deformation is acceptable; however, when rendering the object into a shadow texture (the shadow caster pass), the shadow has to be rendered in a solid colour (linked to the ambient colour for modulative shadows, black for additive shadows). You must therefore provide an alternative vertex program, so Ogre provides you with a way of specifying one to use when rendering the caster, See section <A HREF="manual_23.html#SEC132">Shadows and Vertex Programs</A>.
 
 
 <A NAME="Cg"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_17.html#SEC75"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_17.html#SEC77"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_19.html#SEC115"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_14.html#SEC23"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_19.html#SEC113"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -231,7 +235,7 @@ If you use <STRONG>texture shadows</STRONG>, then vertex deformation is acceptab
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>February 18 2009</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

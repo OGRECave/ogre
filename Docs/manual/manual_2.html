@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,14 +12,14 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): Object Orientation - more than just a buzzword</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): Object Orientation - more than just a buzzword</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Object Orientation - more than just a buzzword">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Object Orientation - more than just a buzzword">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): Object Orientation - more than just a buzzword">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): Object Orientation - more than just a buzzword">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
@@ -27,9 +27,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <A NAME="SEC2"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
 <TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_1.html#SEC1"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_1.html#SEC1"> Up </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_3.html#SEC3"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_1.html#SEC1"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_1.html#SEC1"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -38,22 +40,14 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <H2> 1.1 Object Orientation - more than just a buzzword </H2>
 <!--docid::SEC2::-->
 The name is a dead giveaway. It says Object-Oriented Graphics Rendering Engine, and that's exactly what it is. Ok, but why? Why did I choose to make such a big deal about this?<BR><BR>
-<P>
 
 Well, nowadays graphics engines are like any other large software system. They start small, but soon they balloon into monstrously complex beasts which just can't be all understood at once. It's pretty hard to manage systems of this size, and even harder to make changes to them reliably, and that's pretty important in a field where new techniques and approaches seem to appear every other week. Designing systems around huge files full of C function calls just doesn't cut it anymore - even if the whole thing is written by one person (not likely) they will find it hard to locate that elusive bit of code after a few months and even harder to work out how it all fits together.<BR><BR>
-</P>
-<P>
 
 Object orientation is a very popular approach to addressing the complexity problem. It's a step up from decomposing your code into separate functions, it groups function and state data together in classes which are designed to represent real concepts. It allows you to hide complexity inside easily recognised packages with a conceptually simple interface so they are easy to recognise and have a feel of 'building blocks' which you can plug together again later. You can also organise these blocks so that some of them look the same on the outside, but have very different ways of achieving their objectives on the inside, again reducing the complexity for the developers because they only have to learn one interface.<BR><BR>
-</P>
-<P>
 
-I'm not going to teach you OO here, that's a subject for many other books, but suffice to say I'd seen enough benefits of OO in business systems that I was surprised most graphics code seemed to be written in C function stylee. I was interested to see whether I could apply my design experience in other types of software to an area which has long held a place in my heart - 3D graphics engines. Some people I spoke to were of the opinion that using full C++ wouldn't be fast enough for a real-time graphics engine, but others (including me) were of the opinion that, with care, and object-oriented framework can be performant. We were right.
-</P>
-<P>
+I'm not going to teach you OO here, that's a subject for many other books, but suffice to say I'd seen enough benefits of OO in business systems that I was surprised most graphics code seemed to be written in C function style. I was interested to see whether I could apply my design experience in other types of software to an area which has long held a place in my heart - 3D graphics engines. Some people I spoke to were of the opinion that using full C++ wouldn't be fast enough for a real-time graphics engine, but others (including me) were of the opinion that, with care, and object-oriented framework can be performant. We were right.
 
 In summary, here's the benefits an object-oriented approach brings to OGRE:
-</P>
 <DL COMPACT>
 <DT>Abstraction
 <DD>Common interfaces hide the nuances between different implementations of 3D API and operating systems
@@ -66,9 +60,11 @@ In summary, here's the benefits an object-oriented approach brings to OGRE:
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
 <TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_1.html#SEC1"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_1.html#SEC1"> Up </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_3.html#SEC3"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_1.html#SEC1"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_1.html#SEC1"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_4.html#SEC4"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -76,7 +72,7 @@ In summary, here's the benefits an object-oriented approach brings to OGRE:
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

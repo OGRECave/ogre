@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,58 +12,56 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): Standard Particle Emitters</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): Standard Particle Emitters</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Standard Particle Emitters">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Standard Particle Emitters">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): Standard Particle Emitters">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): Standard Particle Emitters">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC216"></A>
+<A NAME="SEC225"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_37.html#SEC201"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC177"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_39.html#SEC224"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_37.html#SEC210"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_39.html#SEC233"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC186"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 3.3.4 Standard Particle Emitters </H3>
-<!--docid::SEC216::-->
+<!--docid::SEC225::-->
 Ogre comes preconfigured with a few particle emitters. New ones can be added by creating plugins: see the Plugin_ParticleFX project as an example of how you would do this (this is where these emitters are implemented).
-<P>
 
 <UL>
 <LI>
-<A HREF="manual_38.html#SEC217">Point Emitter</A>
+<A HREF="manual_38.html#SEC226">Point Emitter</A>
 <LI>
-<A HREF="manual_38.html#SEC218">Box Emitter</A>
+<A HREF="manual_38.html#SEC227">Box Emitter</A>
 <LI>
-<A HREF="manual_38.html#SEC219">Cylinder Emitter</A>
+<A HREF="manual_38.html#SEC228">Cylinder Emitter</A>
 <LI>
-<A HREF="manual_38.html#SEC220">Ellipsoid Emitter</A>
+<A HREF="manual_38.html#SEC229">Ellipsoid Emitter</A>
 <LI>
-<A HREF="manual_38.html#SEC221">Hollow Ellipsoid Emitter</A>
+<A HREF="manual_38.html#SEC230">Hollow Ellipsoid Emitter</A>
 <LI>
-<A HREF="manual_38.html#SEC222">Ring Emitter</A>
+<A HREF="manual_38.html#SEC231">Ring Emitter</A>
 </UL>
 <BR><BR>
 <A NAME="Point Emitter"></A>
-<A NAME="SEC217"></A>
+<A NAME="SEC226"></A>
 <H3> Point Emitter </H3>
-<!--docid::SEC217::-->
-<P>
+<!--docid::SEC226::-->
 
 This emitter emits particles from a single point, which is it's position. This emitter has no additional attributes over an above the standard emitter attributes.<BR><BR>
-</P>
-<P>
 
 To create a point emitter, include a section like this within your particle system script:
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>
@@ -73,16 +71,13 @@ emitter Point
 }
 </pre></td></tr></table><BR>
 Please note that the name of the emitter ('Point') is case-sensitive.
-<P>
 
 <A NAME="Box Emitter"></A>
-<A NAME="SEC218"></A>
+<A NAME="SEC227"></A>
 <H3> Box Emitter </H3>
-<!--docid::SEC218::-->
-<P>
+<!--docid::SEC227::-->
 
 This emitter emits particles from a random location within a 3-dimensional box. It's extra attributes are:<BR><BR>
-</P>
 <DL COMPACT>
 <DT>width
 <DD>Sets the width of the box (this is the size of the box along it's local X axis, which is dependent on the 'direction' attribute which forms the box's local Z).<BR>
@@ -106,33 +101,26 @@ To create a box emitter, include a section like this within your particle system
 {
     // Settings go here
 }
-</pre></td></tr></table><P>
-
+</pre></td></tr></table>
 <A NAME="Cylinder Emitter"></A>
-<A NAME="SEC219"></A>
+<A NAME="SEC228"></A>
 <H3> Cylinder Emitter </H3>
-<!--docid::SEC219::-->
-<P>
+<!--docid::SEC228::-->
 
-This emitter emits particles in a random direction from within a cylinder area, where the cylinder is oriented along the Z-axis. This emitter has exactly the same parameters as the <A HREF="manual_38.html#SEC218">Box Emitter</A> so there are no additional parameters to consider here - the width and height determine the shape of the cylinder along it's axis (if they are different it is an ellipsoid cylinder), the depth determines the length of the cylinder. 
-</P>
-<P>
+This emitter emits particles in a random direction from within a cylinder area, where the cylinder is oriented along the Z-axis. This emitter has exactly the same parameters as the <A HREF="manual_38.html#SEC227">Box Emitter</A> so there are no additional parameters to consider here - the width and height determine the shape of the cylinder along it's axis (if they are different it is an ellipsoid cylinder), the depth determines the length of the cylinder. 
 
 <A NAME="Ellipsoid Emitter"></A>
-<A NAME="SEC220"></A>
+<A NAME="SEC229"></A>
 <H3> Ellipsoid Emitter </H3>
-<!--docid::SEC220::-->
-This emitter emits particles from within an ellipsoid shaped area, ie a sphere or squashed-sphere area. The parameters are again identical to the <A HREF="manual_38.html#SEC218">Box Emitter</A>, except that the dimensions describe the widest points along each of the axes.
-<P>
+<!--docid::SEC229::-->
+This emitter emits particles from within an ellipsoid shaped area, i.e. a sphere or squashed-sphere area. The parameters are again identical to the <A HREF="manual_38.html#SEC227">Box Emitter</A>, except that the dimensions describe the widest points along each of the axes.
 
 <A NAME="Hollow Ellipsoid Emitter"></A>
-<A NAME="SEC221"></A>
+<A NAME="SEC230"></A>
 <H3> Hollow Ellipsoid Emitter </H3>
-<!--docid::SEC221::-->
-This emitter is just like <A HREF="manual_38.html#SEC220">Ellipsoid Emitter</A> except that there is a hollow area in the centre of the ellipsoid from which no particles are emitted. Therefore it has 3 extra parameters in order to define this area:
-<P>
+<!--docid::SEC230::-->
+This emitter is just like <A HREF="manual_38.html#SEC229">Ellipsoid Emitter</A> except that there is a hollow area in the centre of the ellipsoid from which no particles are emitted. Therefore it has 3 extra parameters in order to define this area:
 
-</P>
 <DL COMPACT>
 <DT>inner_width
 <DD>The width of the inner area which does not emit any particles.
@@ -141,16 +129,13 @@ This emitter is just like <A HREF="manual_38.html#SEC220">Ellipsoid Emitter</A> 
 <DT>inner_depth
 <DD>The depth of the inner area which does not emit any particles.
 </DL>
-<P>
 
 <A NAME="Ring Emitter"></A>
-<A NAME="SEC222"></A>
+<A NAME="SEC231"></A>
 <H3> Ring Emitter </H3>
-<!--docid::SEC222::-->
-This emitter emits particles from a ring-shaped area, ie a little like <A HREF="manual_38.html#SEC221">Hollow Ellipsoid Emitter</A> except only in 2 dimensions.
-<P>
+<!--docid::SEC231::-->
+This emitter emits particles from a ring-shaped area, i.e. a little like <A HREF="manual_38.html#SEC230">Hollow Ellipsoid Emitter</A> except only in 2 dimensions.
 
-</P>
 <DL COMPACT>
 <DT>inner_width
 <DD>The width of the inner area which does not emit any particles.
@@ -158,23 +143,16 @@ This emitter emits particles from a ring-shaped area, ie a little like <A HREF="
 <DD>The height of the inner area which does not emit any particles.
 </DL>
 <BR><BR>
-<P>
 
-See also: <A HREF="manual_34.html#SEC177">3.3 Particle Scripts</A>, <A HREF="manual_36.html#SEC199">3.3.2 Particle Emitters</A>
-</P>
-<P>
+See also: <A HREF="manual_34.html#SEC186">3.3 Particle Scripts</A>, <A HREF="manual_36.html#SEC208">3.3.2 Particle Emitters</A>
 
-<A NAME="SEC223"></A>
+<A NAME="SEC232"></A>
 <H3> Emitting Emitters </H3>
-<!--docid::SEC223::-->
+<!--docid::SEC232::-->
 <A NAME="Emitting Emitters"></A>
-<P>
 
 It is possible to spawn new emitters on the expiry of particles, for example to product 'firework' style effects. This is controlled via the following directives:
-</P>
-<P>
 
-</P>
 <DL COMPACT>
 <DT>emit_emitter_quota
 <DD>This parameter is a system-level parameter telling the system how many emitted emitters may be in use at any one time. This is just to allow for the space allocation process.
@@ -183,15 +161,17 @@ It is possible to spawn new emitters on the expiry of particles, for example to 
 <DT>emit_emitter
 <DD>This is an emitter-level parameter, and if specified, it means that when particles emitted by this emitter die, they spawn a new emitter of the named type.
 </DL>
-<P>
+
 
 <A NAME="Particle Affectors"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_37.html#SEC201"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC177"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_39.html#SEC224"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_37.html#SEC210"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_39.html#SEC233"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_34.html#SEC186"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -199,7 +179,7 @@ It is possible to spawn new emitters on the expiry of particles, for example to 
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

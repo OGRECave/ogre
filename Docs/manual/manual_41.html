@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,50 +12,45 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): Overlay Scripts</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): Overlay Scripts</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Overlay Scripts">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Overlay Scripts">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): Overlay Scripts">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): Overlay Scripts">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC235"></A>
+<A NAME="SEC244"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_40.html#SEC225"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_40.html#SEC234"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_42.html#SEC250"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_42.html#SEC241"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
 <H2> 3.4 Overlay Scripts </H2>
-<!--docid::SEC235::-->
-<P>
+<!--docid::SEC244::-->
 
 Overlay scripts offer you the ability to define overlays in a script which can be reused easily. Whilst you could set up all overlays for a scene in code using the methods of the SceneManager, Overlay and OverlayElement classes, in practice it's a bit unwieldy. Instead you can store overlay definitions in text files which can then be loaded whenever required.<BR><BR>
-</P>
-<P>
 
-<A NAME="SEC236"></A>
+<A NAME="SEC245"></A>
 <H2> Loading scripts    </H2>
-<!--docid::SEC236::-->
-<P>
+<!--docid::SEC245::-->
 
 Overlay scripts are loaded at initialisation time by the system: by default it looks in all common resource locations (see Root::addResourceLocation) for files with the '.overlay' extension and parses them. If you want to parse files with a different extension, use the OverlayManager::getSingleton().parseAllSources method with your own extension, or if you want to parse an individual file, use OverlayManager::getSingleton().parseScript.<BR><BR>
-</P>
-<P>
 
-<A NAME="SEC237"></A>
+<A NAME="SEC246"></A>
 <H2> Format    </H2>
-<!--docid::SEC237::-->
-<P>
+<!--docid::SEC246::-->
 
 Several overlays may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ({}), comments indicated by starting a line with '//' (note, no nested form comments allowed), and inheritance through the use of templates. The general format is shown below in a typical example:
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>// The name of the overlay comes first
@@ -65,7 +60,7 @@ MyOverlays/ANewOverlay
 
     container Panel(MyOverlayElements/TestPanel)
     {
-        // Center it horzontally, put it at the top
+        // Center it horizontally, put it at the top
         left 0.25
         top 0
         width 0.5
@@ -84,23 +79,16 @@ MyOverlays/ANewOverlay
     }
 
 }
-</pre></td></tr></table><P>
-
+</pre></td></tr></table>
 The above example defines a single overlay called 'MyOverlays/ANewOverlay', with 2 panels in it, one nested under the other. It uses relative metrics (the default if no metrics_mode option is found).<BR><BR>
-</P>
-<P>
 
-Every overlay in the script must be given a name, which is the line before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your overlays, and also to avoid duplicate names, but the engine does not treat the name a hierarchical, just as a string. Within the braces are the properties of the overlay, and any nested elements. The overlay itself only has a single property 'zorder' which determines how'high' it is in the stack of overlays if more than one is displayed at the same time. Overlays with higher zorder values are displayed on top.<BR><BR>
-</P>
-<P>
+Every overlay in the script must be given a name, which is the line before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your overlays, and also to avoid duplicate names, but the engine does not treat the name a hierarchical, just as a string. Within the braces are the properties of the overlay, and any nested elements. The overlay itself only has a single property 'zorder' which determines how 'high' it is in the stack of overlays if more than one is displayed at the same time. Overlays with higher zorder values are displayed on top.<BR><BR>
 
-<A NAME="SEC238"></A>
+<A NAME="SEC247"></A>
 <H2> Adding elements to the overlay </H2>
-<!--docid::SEC238::-->
-<P>
+<!--docid::SEC247::-->
 
 Within an overlay, you can include any number of 2D or 3D elements. You do this by defining a nested block headed by:
-</P>
 <DL COMPACT>
 <DT>'element'
 <DD>if you want to define a 2D element which cannot have children of it's own
@@ -109,20 +97,15 @@ Within an overlay, you can include any number of 2D or 3D elements. You do this 
 </DL>
 <BR>
 The element and container blocks are pretty identical apart from their ability to store nested blocks.
-<P>
 
-<A NAME="SEC239"></A>
+<A NAME="SEC248"></A>
 <H2> 'container' / 'element' blocks </H2>
-<!--docid::SEC239::-->
-<P>
+<!--docid::SEC248::-->
 
 These are delimited by curly braces. The format for the header preceding the first brace is:<BR><BR>
-</P>
-<P>
 
 [container | element] &lt;type_name&gt; ( &lt;instance_name&gt;) [: &lt;template_name&gt;]<BR>
 { ...<BR><BR>
-</P>
 <DL COMPACT>
 <DT>type_name
 <DD>Must resolve to the name of a OverlayElement type which has been registered with the OverlayManager. Plugins register with the OverlayManager to advertise their ability to create elements, and at this time advertise the name of the type. OGRE comes preconfigured with types 'Panel', 'BorderPanel' and 'TextArea'.
@@ -131,43 +114,37 @@ These are delimited by curly braces. The format for the header preceding the fir
 <DT>template_name
 <DD>Optional template on which to base this item. See templates.
 </DL>
-<P>
 
 The properties which can be included within the braces depend on the custom type. However the following are always valid:
 <UL>
 <LI>
-<A HREF="manual_42.html#SEC242">metrics_mode</A>
+<A HREF="manual_42.html#SEC251">metrics_mode</A>
 <LI>
-<A HREF="manual_42.html#SEC243">horz_align</A>
+<A HREF="manual_42.html#SEC252">horz_align</A>
 <LI>
-<A HREF="manual_42.html#SEC244">vert_align</A>
+<A HREF="manual_42.html#SEC253">vert_align</A>
 <LI>
-<A HREF="manual_42.html#SEC245">left</A>
+<A HREF="manual_42.html#SEC254">left</A>
 <LI>
-<A HREF="manual_42.html#SEC246">top</A>
+<A HREF="manual_42.html#SEC255">top</A>
 <LI>
-<A HREF="manual_42.html#SEC247">width</A>
+<A HREF="manual_42.html#SEC256">width</A>
 <LI>
-<A HREF="manual_42.html#SEC248">height</A>
+<A HREF="manual_42.html#SEC257">height</A>
 <LI>
 <A HREF="manual_42.html#overlay_material">material</A>
 <LI>
-<A HREF="manual_42.html#SEC250">caption</A>
+<A HREF="manual_42.html#SEC259">caption</A>
 </UL>
-<P>
 
-<A NAME="SEC240"></A>
+
+<A NAME="SEC249"></A>
 <H2> Templates </H2>
-<!--docid::SEC240::-->
-<P>
+<!--docid::SEC249::-->
 
 You can use templates to create numerous elements with the same properties. A template is an abstract element and it is not added to an overlay. It acts as a base class that elements can inherit and get its default properties. To create a template, the keyword 'template' must be the first word in the element definition (before container or element). The template element is created in the topmost scope - it is NOT specified in an Overlay. It is recommended that you define templates in a separate overlay though this is not essential. Having templates defined in a separate file will allow different look &amp; feels to be easily substituted.<BR><BR>
-</P>
-<P>
 
 Elements can inherit a template in a similar way to C++ inheritance - by using the : operator on the element definition. The : operator is placed after the closing bracket of the name (separated by a space). The name of the template to inherit is then placed after the : operator (also separated by a space).<BR><BR>
-</P>
-<P>
 
 A template can contain template children which are created when the template is subclassed and instantiated. Using the template keyword for the children of a template is optional but recommended for clarity, as the children of a template are always going to be templates themselves.<BR><BR>
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>template container BorderPanel(MyTemplates/BasicBorderPanel)
@@ -240,23 +217,20 @@ MyOverlays/AnotherOverlay
     }
 }
 </pre></td></tr></table>The above example uses templates to define a button. Note that the button template inherits from the borderPanel template. This reduces the number of attributes needed to instantiate a button.<BR><BR>
-<P>
 
 Also note that the instantiate of a Button needs a template name for the caption attribute. So templates can also be used by elements that need dynamic creation of children elements (the button creates a TextAreaElement in this case for its caption).<BR><BR>
-</P>
-<P>
 
-See section <A HREF="manual_42.html#SEC241">3.4.1 OverlayElement Attributes</A>, <A HREF="manual_43.html#SEC252">3.4.2 Standard OverlayElements</A>
-</P>
-<P>
+See section <A HREF="manual_42.html#SEC250">3.4.1 OverlayElement Attributes</A>, <A HREF="manual_43.html#SEC261">3.4.2 Standard OverlayElements</A>
 
 <A NAME="OverlayElement Attributes"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_40.html#SEC225"> &lt; </A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_40.html#SEC234"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_42.html#SEC250"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_42.html#SEC241"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -264,7 +238,7 @@ See section <A HREF="manual_42.html#SEC241">3.4.1 OverlayElement Attributes</A>,
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

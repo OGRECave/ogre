@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on January 22 2009 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,34 +12,36 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): Compositor Passes</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): Compositor Passes</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Compositor Passes">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Compositor Passes">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): Compositor Passes">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): Compositor Passes">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
 
-<A NAME="SEC155"></A>
+<A NAME="SEC163"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC147"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC141"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_33.html#SEC176"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC155"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_33.html#SEC185"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC146"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
 <H3> 3.2.3 Compositor Passes </H3>
-<!--docid::SEC155::-->
+<!--docid::SEC163::-->
 
 A pass is a single rendering action to be performed in a target pass. <BR><BR>
-Format: 'pass' (render_quad | clear | stencil | render_scene) { }<BR><BR>
+Format: 'pass' (render_quad | clear | stencil | render_scene | render_custom) [custom name] { }<BR><BR>
 
 There are four types of pass:
 <DL COMPACT>
@@ -48,27 +50,31 @@ There are four types of pass:
 <DT>stencil
 <DD>This kind of pass configures stencil operations for the subsequent passes. It can set the stencil compare function, operations and reference values for you to perform your own stencil effects.
 <DT>render_scene
-<DD>This kind of pass performs a regular rendering of the scene. It will use the <A HREF="manual_31.html#SEC151">visibility_mask</A>, <A HREF="manual_31.html#compositor_lod_bias">lod_bias</A>, and <A HREF="manual_31.html#SEC154">material_scheme</A> from the parent target pass.
+<DD>This kind of pass performs a regular rendering of the scene. It will use the <A HREF="manual_31.html#SEC159">visibility_mask</A>, <A HREF="manual_31.html#compositor_lod_bias">lod_bias</A>, and <A HREF="manual_31.html#SEC162">material_scheme</A> from the parent target pass.
 <DT>render_quad
 <DD>This kind of pass renders a quad over the entire render target, using a given material. You will undoubtedly want to pull in the results of other target passes into this operation to perform fullscreen effects.
+<DT>render_custom
+<DD>This kind of pass is just a callback to user code for the composition pass specified in the custom name (and registered via CompositorManager::registerCustomCompositionPass) and allows the user to create custom render operations for more advanced effects. This is the only pass type that requires the custom name parameter.
 </DL>
 
 Here are the attributes you can use in a 'pass' section of a .compositor script:
 
-<A NAME="SEC156"></A>
+<A NAME="SEC164"></A>
 <H2> Available Pass Attributes </H2>
-<!--docid::SEC156::-->
+<!--docid::SEC164::-->
 <UL>
 <LI>
-<A HREF="manual_32.html#SEC157">material</A>
+<A HREF="manual_32.html#SEC165">material</A>
 <LI>
 <A HREF="manual_32.html#compositor_pass_input">input</A>
 <LI>
 <A HREF="manual_32.html#compositor_pass_identifier">identifier</A>
 <LI>
-<A HREF="manual_32.html#SEC160">first_render_queue</A>
+<A HREF="manual_32.html#SEC168">first_render_queue</A>
 <LI>
-<A HREF="manual_32.html#SEC161">last_render_queue</A>
+<A HREF="manual_32.html#SEC169">last_render_queue</A>
+<LI>
+<A HREF="manual_32.html#compositor_pass_material_scheme">material_scheme</A>
 <LI>
 <A HREF="manual_32.html#compositor_clear">clear</A>
 <LI>
@@ -76,57 +82,66 @@ Here are the attributes you can use in a 'pass' section of a .compositor script:
 </UL>
 
 <A NAME="material"></A>
-<A NAME="SEC157"></A>
+<A NAME="SEC165"></A>
 <H3> material </H3>
-<!--docid::SEC157::-->
+<!--docid::SEC165::-->
 For passes of type 'render_quad', sets the material used to render the quad. You will want to use shaders in this material to perform fullscreen effects, and use the <A HREF="manual_32.html#compositor_pass_input">input</A> attribute to map other texture targets into the texture bindings needed by this material.<BR><BR>
 Format: material &lt;Name&gt;<BR><BR>
 
 <A NAME="compositor_pass_input"></A>
-<A NAME="SEC158"></A>
+<A NAME="SEC166"></A>
 <H3> input  </H3>
-<!--docid::SEC158::-->
+<!--docid::SEC166::-->
 For passes of type 'render_quad', this is how you map one or more local render textures (See  <A HREF="manual_30.html#compositor_texture">compositor_texture</A>) into the material you're using to render the fullscreen quad. To bind more than one texture, repeat this attribute with different sampler indexes.<BR><BR>
 Format: input &lt;sampler&gt; &lt;Name&gt; [&lt;MRTIndex&gt;]<BR><BR>
 <DL COMPACT>
 <DT>sampler
 <DD>The texture sampler to set, must be a number in the range [0, OGRE_MAX_TEXTURE_LAYERS-1].
 <DT>Name
-<DD>The name of the local render texture to bind, as declared in  <A HREF="manual_30.html#compositor_texture">compositor_texture</A> and rendered to in one or more <A HREF="manual_31.html#SEC147">target pass</A>.
+<DD>The name of the local render texture to bind, as declared in  <A HREF="manual_30.html#compositor_texture">compositor_texture</A> and rendered to in one or more <A HREF="manual_31.html#SEC155">target pass</A>.
 <DT>MRTIndex
 <DD>If the local texture that you're referencing is a Multiple Render Target (MRT), this identifies the surface from the MRT that you wish to reference (0 is the first surface, 1 the second etc).
 </DL>
 Example: input 0 rt0
 
 <A NAME="compositor_pass_identifier"></A>
-<A NAME="SEC159"></A>
+<A NAME="SEC167"></A>
 <H3> identifier </H3>
-<!--docid::SEC159::-->
+<!--docid::SEC167::-->
 Associates a numeric identifier with the pass. This is useful for registering a listener with the compositor (CompositorInstance::addListener), and being able to identify which pass it is that's being processed when you get events regarding it. Numbers between 0 and 2^32 are allowed.<BR><BR>
 Format: identifier &lt;number&gt;<BR><BR>
 Example: identifier 99945<BR><BR>
 Default: identifier 0<BR><BR>
 
 <A NAME="first_render_queue"></A>
-<A NAME="SEC160"></A>
+<A NAME="SEC168"></A>
 <H3> first_render_queue </H3>
-<!--docid::SEC160::-->
+<!--docid::SEC168::-->
 For passes of type 'render_scene', this sets the first render queue id that is included in the render. Defaults to the value of RENDER_QUEUE_SKIES_EARLY.<BR><BR>
 Format: first_render_queue &lt;id&gt;<BR><BR>
 Default: first_render_queue 0<BR><BR>
 
 <A NAME="last_render_queue"></A>
-<A NAME="SEC161"></A>
+<A NAME="SEC169"></A>
 <H3> last_render_queue </H3>
-<!--docid::SEC161::-->
+<!--docid::SEC169::-->
 For passes of type 'render_scene', this sets the last render queue id that is included in the render. Defaults to the value of RENDER_QUEUE_SKIES_LATE.<BR><BR>
 Format: last_render_queue &lt;id&gt;<BR><BR>
 Default: last_render_queue 95
 
+<A NAME="compositor_pass_material_scheme"></A>
+<A NAME="SEC170"></A>
+<H3> material_scheme  </H3>
+<!--docid::SEC170::-->
+If set, indicates the material scheme to use for this pass only. Useful for performing special-case rendering effects.<BR><BR>
+This will overwrite the scheme if set at the target scope as well.<BR><BR>
+Format: material_scheme &lt;scheme name&gt;<BR><BR>
+Default: None<BR><BR>
+
 <A NAME="compositor_clear"></A>
-<A NAME="SEC162"></A>
+<A NAME="SEC171"></A>
 <H2> Clear Section </H2>
-<!--docid::SEC162::-->
+<!--docid::SEC171::-->
 For passes of type 'clear', this section defines the buffer clearing parameters. <BR><BR>
 Format: clear { }<BR><BR>
 
@@ -142,43 +157,43 @@ Here are the attributes you can use in a 'clear' section of a .compositor script
 <A HREF="manual_32.html#compositor_clear_stencil_value">stencil_value</A>
 
 <A NAME="compositor_clear_buffers"></A>
-<A NAME="SEC163"></A>
+<A NAME="SEC172"></A>
 <H3> buffers </H3>
-<!--docid::SEC163::-->
+<!--docid::SEC172::-->
 Sets the buffers cleared by this pass.<BR><BR>
 
 Format: buffers [colour] [depth] [stencil]<BR><BR>
 Default: buffers colour depth<BR><BR>
 
 <A NAME="compositor_clear_colour_value"></A>
-<A NAME="SEC164"></A>
+<A NAME="SEC173"></A>
 <H3> colour_value </H3>
-<!--docid::SEC164::-->
+<!--docid::SEC173::-->
 Set the colour used to fill the colour buffer by this pass, if the colour buffer is being cleared (<A HREF="manual_32.html#compositor_clear_buffers">buffers</A>). <BR><BR>
 Format: colour_value &lt;red&gt; &lt;green&gt; &lt;blue&gt; &lt;alpha&gt;<BR><BR>
 Default: colour_value 0 0 0 0<BR><BR>
 
 <A NAME="compositor_clear_depth_value"></A>
-<A NAME="SEC165"></A>
+<A NAME="SEC174"></A>
 <H3> depth_value </H3>
-<!--docid::SEC165::-->
+<!--docid::SEC174::-->
 Set the depth value used to fill the depth buffer by this pass, if the depth buffer is being cleared (<A HREF="manual_32.html#compositor_clear_buffers">buffers</A>). <BR><BR>
 Format: depth_value &lt;depth&gt;<BR><BR>
 Default: depth_value 1.0<BR><BR>
 
 <A NAME="compositor_clear_stencil_value"></A>
-<A NAME="SEC166"></A>
+<A NAME="SEC175"></A>
 <H3> stencil_value </H3>
-<!--docid::SEC166::-->
+<!--docid::SEC175::-->
 Set the stencil value used to fill the stencil buffer by this pass, if the stencil buffer is being cleared (<A HREF="manual_32.html#compositor_clear_buffers">buffers</A>). <BR><BR>
 Format: stencil_value &lt;value&gt;<BR><BR>
 Default: stencil_value 0.0<BR><BR>
 </UL>
 
 <A NAME="compositor_stencil"></A>
-<A NAME="SEC167"></A>
+<A NAME="SEC176"></A>
 <H2> Stencil Section </H2>
-<!--docid::SEC167::-->
+<!--docid::SEC176::-->
 For passes of type 'stencil', this section defines the stencil operation parameters. <BR><BR>
 
 Format: stencil { }<BR><BR>
@@ -204,16 +219,16 @@ Here are the attributes you can use in a 'stencil' section of a .compositor scri
 <A HREF="manual_32.html#compositor_stencil_two_sided">two_sided</A>
 
 <A NAME="compositor_stencil_check"></A>
-<A NAME="SEC168"></A>
+<A NAME="SEC177"></A>
 <H3> check </H3>
-<!--docid::SEC168::-->
+<!--docid::SEC177::-->
 Enables or disables the stencil check, thus enabling the use of the rest of the features in this section. The rest of the options in this section do nothing if the stencil check is off.
 Format: check (on | off)<BR><BR>
 
 <A NAME="compositor_stencil_comp_func"></A>
-<A NAME="SEC169"></A>
+<A NAME="SEC178"></A>
 <H3> comp_func </H3>
-<!--docid::SEC169::-->
+<!--docid::SEC178::-->
 Sets the function used to perform the following comparison:<BR><BR>
 (ref_value &amp; mask) comp_func (Stencil Buffer Value &amp; mask)<BR><BR>
 
@@ -222,25 +237,25 @@ Format: comp_func (always_fail | always_pass | less | less_equal | not_equal | g
 Default: comp_func always_pass<BR><BR>
 
 <A NAME="compositor_stencil_ref_value"></A>
-<A NAME="SEC170"></A>
+<A NAME="SEC179"></A>
 <H3> ref_value </H3>
-<!--docid::SEC170::-->
+<!--docid::SEC179::-->
 Sets the reference value used to compare with the stencil buffer as described in <A HREF="manual_32.html#compositor_stencil_comp_func">comp_func</A>.<BR><BR>
 Format: ref_value &lt;value&gt;<BR><BR>
 Default: ref_value 0.0<BR><BR>
 
 <A NAME="compositor_stencil_mask"></A>
-<A NAME="SEC171"></A>
+<A NAME="SEC180"></A>
 <H3> mask </H3>
-<!--docid::SEC171::-->
+<!--docid::SEC180::-->
 Sets the mask used to compare with the stencil buffer as described in <A HREF="manual_32.html#compositor_stencil_comp_func">comp_func</A>.<BR><BR>
 Format: mask &lt;value&gt;<BR><BR>
 Default: mask 4294967295<BR><BR>
 
 <A NAME="compositor_stencil_fail_op"></A>
-<A NAME="SEC172"></A>
+<A NAME="SEC181"></A>
 <H3> fail_op </H3>
-<!--docid::SEC172::-->
+<!--docid::SEC181::-->
 Sets what to do with the stencil buffer value if the result of the stencil comparison (<A HREF="manual_32.html#compositor_stencil_comp_func">comp_func</A>) and depth comparison is that both fail.<BR><BR>
 Format: fail_op (keep | zero | replace | increment | decrement | increment_wrap | decrement_wrap | invert)<BR><BR>
 Default: depth_fail_op keep<BR><BR>
@@ -266,26 +281,26 @@ These actions mean:
 
 
 <A NAME="compositor_stencil_depth_fail_op"></A>
-<A NAME="SEC173"></A>
+<A NAME="SEC182"></A>
 <H3> depth_fail_op </H3>
-<!--docid::SEC173::-->
+<!--docid::SEC182::-->
 Sets what to do with the stencil buffer value if the result of the stencil comparison (<A HREF="manual_32.html#compositor_stencil_comp_func">comp_func</A>) passes but the depth comparison fails. <BR><BR>
 
 Format: depth_fail_op (keep | zero | replace | increment | decrement | increment_wrap | decrement_wrap | invert)<BR><BR>
 Default: depth_fail_op keep<BR><BR>
 
 <A NAME="compositor_stencil_pass_op"></A>
-<A NAME="SEC174"></A>
+<A NAME="SEC183"></A>
 <H3> pass_op </H3>
-<!--docid::SEC174::-->
+<!--docid::SEC183::-->
 Sets what to do with the stencil buffer value if the result of the stencil comparison (<A HREF="manual_32.html#compositor_stencil_comp_func">comp_func</A>) and the depth comparison pass. <BR><BR>
 Format: pass_op (keep | zero | replace | increment | decrement | increment_wrap | decrement_wrap | invert)<BR><BR>
 Default: pass_op keep<BR><BR>
 
 <A NAME="compositor_stencil_two_sided"></A>
-<A NAME="SEC175"></A>
+<A NAME="SEC184"></A>
 <H3> two_sided </H3>
-<!--docid::SEC175::-->
+<!--docid::SEC184::-->
 Enables or disables two-sided stencil operations, which means the inverse of the operations applies to back-facing polygons.<BR><BR>
 Format: two_sided (on | off)<BR><BR>
 Default: two_sided off<BR><BR>
@@ -294,10 +309,12 @@ Default: two_sided off<BR><BR>
 <A NAME="Applying a Compositor"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
-<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC147"> &lt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC141"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_33.html#SEC176"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_31.html#SEC155"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_33.html#SEC185"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_29.html#SEC146"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -305,7 +322,7 @@ Default: two_sided off<BR><BR>
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>January 22 2009</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 

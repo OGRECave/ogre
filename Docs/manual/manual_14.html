@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                       "http://www.w3.org/TR/html40/loose.dtd">
 <HTML>
-<!-- Created on November 4 2008 by texi2html 1.66 -->
+<!-- Created on December, 31 2009 by texi2html 1.66 -->
 <!--
 Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
             Karl Berry  <karl@freefriends.org>
@@ -12,14 +12,14 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.6 ('Shoggoth'): Material Scripts</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): Material Scripts</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Material Scripts">
-<META NAME="keywords" CONTENT="OGRE Manual v1.6 ('Shoggoth'): Material Scripts">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): Material Scripts">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): Material Scripts">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
-<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> 
+<LINK TYPE="text/css" rel="stylesheet" href="../style.css">
 </HEAD>
 
 <BODY LANG="en" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
@@ -27,9 +27,11 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <A NAME="SEC23"></A>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
 <TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_15.html#SEC33"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_15.html#SEC31"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -37,33 +39,22 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <HR SIZE=1>
 <H2> 3.1 Material Scripts </H2>
 <!--docid::SEC23::-->
-<P>
 
 Material scripts offer you the ability to define complex materials in a script which can be reused easily. Whilst you could set up all materials for a scene in code using the methods of the Material and TextureLayer classes, in practice it's a bit unwieldy. Instead you can store material definitions in text files which can then be loaded whenever required.<BR><BR>
-</P>
-<P>
 
 <A NAME="SEC24"></A>
 <H2> Loading scripts </H2>
 <!--docid::SEC24::-->
-<P>
 
 Material scripts are loaded when resource groups are initialised: OGRE looks in all resource locations associated with the group (see Root::addResourceLocation) for files with the '.material' extension and parses them. If you want to parse files manually, use MaterialSerializer::parseScript.<BR><BR>
-</P>
-<P>
 
 It's important to realise that materials are not loaded completely by this parsing process: only the definition is loaded, no textures or other resources are loaded. This is because it is common to have a large library of materials, but only use a relatively small subset of them in any one scene. To load every material completely in every script would therefore cause unnecessary memory overhead. You can access a 'deferred load' Material in the normal way (MaterialManager::getSingleton().getByName()), but you must call the 'load' method before trying to use it. Ogre does this for you when using the normal material assignment methods of entities etc.<BR><BR>
-</P>
-<P>
 
 Another important factor is that material names must be unique throughout ALL scripts loaded by the system, since materials are always identified by name.<BR><BR>
-</P>
-<P>
 
 <A NAME="SEC25"></A>
 <H2> Format </H2>
 <!--docid::SEC25::-->
-<P>
 
 Several materials may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ('{', '}'), and comments indicated by starting a line with '//' (note, no nested form comments allowed). The general format is shown below in the example below (note that to start with, we only consider fixed-function materials which don't use vertex, geometry or fragment programs, these are covered later):<BR><BR>
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>// This is a comment
@@ -102,36 +93,21 @@ material walls/funkywall1
     }
 		
 }
-</pre></td></tr></table><P>
-
+</pre></td></tr></table>
 Every material in the script must be given a name, which is the line 'material &lt;blah&gt;' before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your materials, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string. If you include spaces in the name, it must be enclosed in double quotes.<BR><BR>
-</P>
-<P>
 
 <STRONG> NOTE: ':' is the delimiter for specifying material copy in the script so it can't be used as part of the material name.</STRONG>
 <BR><BR>
-</P>
-<P>
 
-A material can inherit from a previously defined material by using a <EM>colon</EM> <STRONG>:</STRONG> after the material name followed by the name of the reference material to inherit from. You can in fact even inherit just <EM>parts</EM> of a material from others; all this is covered in See section <A HREF="manual_25.html#SEC134">3.1.11 Script Inheritence</A>). You can also use variables in your script which can be replaced in inheriting versions, see See section <A HREF="manual_27.html#SEC139">3.1.13 Script Variables</A>.<BR><BR>
-</P>
-<P>
+A material can inherit from a previously defined material by using a <EM>colon</EM> <STRONG>:</STRONG> after the material name followed by the name of the reference material to inherit from. You can in fact even inherit just <EM>parts</EM> of a material from others; all this is covered in See section <A HREF="manual_25.html#SEC139">3.1.11 Script Inheritence</A>). You can also use variables in your script which can be replaced in inheriting versions, see See section <A HREF="manual_27.html#SEC144">3.1.13 Script Variables</A>.<BR><BR>
 
-A material can be made up of many techniques (See section <A HREF="manual_15.html#SEC31">3.1.1 Techniques</A>)- a technique is one way of achieving the effect you are looking for. You can supply more than one technique in order to provide fallback approaches where a card does not have the ability to render the preferred technique, or where you wish to define lower level of detail versions of the material in order to conserve rendering power when objects are more distant. <BR><BR>
-</P>
-<P>
+A material can be made up of many techniques (See section <A HREF="manual_15.html#SEC33">3.1.1 Techniques</A>)- a technique is one way of achieving the effect you are looking for. You can supply more than one technique in order to provide fallback approaches where a card does not have the ability to render the preferred technique, or where you wish to define lower level of detail versions of the material in order to conserve rendering power when objects are more distant. <BR><BR>
 
-Each technique can be made up of many passes (See section <A HREF="manual_16.html#SEC38">3.1.2 Passes</A>), that is a complete render of the object can be performed multiple times with different settings in order to produce composite effects. Ogre may also split the passes you have defined into many passes at runtime, if you define a pass which uses too many texture units for the card you are currently running on (note that it can only do this if you are not using a fragment program). Each pass has a number of top-level attributes such as 'ambient' to set the amount &amp; colour of the ambient light reflected by the material. Some of these options do not apply if you are using vertex programs, See section <A HREF="manual_16.html#SEC38">3.1.2 Passes</A> for more details. <BR><BR>
-</P>
-<P>
+Each technique can be made up of many passes (See section <A HREF="manual_16.html#SEC39">3.1.2 Passes</A>), that is a complete render of the object can be performed multiple times with different settings in order to produce composite effects. Ogre may also split the passes you have defined into many passes at runtime, if you define a pass which uses too many texture units for the card you are currently running on (note that it can only do this if you are not using a fragment program). Each pass has a number of top-level attributes such as 'ambient' to set the amount &amp; colour of the ambient light reflected by the material. Some of these options do not apply if you are using vertex programs, See section <A HREF="manual_16.html#SEC39">3.1.2 Passes</A> for more details. <BR><BR>
 
-Within each pass, there can be zero or many texture units in use (See section <A HREF="manual_17.html#SEC74">3.1.3 Texture Units</A>). These define the texture to be used, and optionally some blending operations (which use multitexturing) and texture effects.<BR><BR>
-</P>
-<P>
+Within each pass, there can be zero or many texture units in use (See section <A HREF="manual_17.html#SEC77">3.1.3 Texture Units</A>). These define the texture to be used, and optionally some blending operations (which use multitexturing) and texture effects.<BR><BR>
 
-You can also reference vertex and fragment programs (or vertex and pixel shaders, if you want to use that terminology) in a pass with a given set of parameters. Programs themselves are declared in separate .program scripts (See section <A HREF="manual_18.html#SEC101">3.1.4 Declaring Vertex/Geometry/Fragment Programs</A>) and are used as described in <A HREF="manual_23.html#SEC121">3.1.9 Using Vertex/Geometry/Fragment Programs in a Pass</A>.
-</P>
-<P>
+You can also reference vertex and fragment programs (or vertex and pixel shaders, if you want to use that terminology) in a pass with a given set of parameters. Programs themselves are declared in separate .program scripts (See section <A HREF="manual_18.html#SEC104">3.1.4 Declaring Vertex/Geometry/Fragment Programs</A>) and are used as described in <A HREF="manual_23.html#SEC125">3.1.9 Using Vertex/Geometry/Fragment Programs in a Pass</A>.
 
 <A NAME="SEC26"></A>
 <H3> Top-level material attributes </H3>
@@ -139,61 +115,71 @@ You can also reference vertex and fragment programs (or vertex and pixel shaders
 The outermost section of a material definition does not have a lot of attributes of its own (most of the configurable parameters are within the child sections. However, it does have some, and here they are:<BR><BR>
 <A NAME="lod_distances"></A>
 <A NAME="SEC27"></A>
-<H3> lod_distances </H3>
+<H3> lod_distances (deprecated) </H3>
 <!--docid::SEC27::-->
-This attribute controls the distances at which different Techniques can come into effect. See section <A HREF="manual_15.html#SEC31">3.1.1 Techniques</A> for a full discussion of this option.
+This option is deprecated in favour of <A HREF="manual_14.html#SEC29">lod_values</A> now. 
 <BR><BR>
-<A NAME="receive_shadows"></A>
+<A NAME="lod_strategy"></A>
 <A NAME="SEC28"></A>
-<H3> receive_shadows </H3>
+<H3> lod_strategy </H3>
 <!--docid::SEC28::-->
+Sets the name of the LOD strategy to use. Defaults to 'Distance' which means LOD changes based on distance from the camera. Also supported is 'PixelCount' which changes LOD based on an estimate of the screen-space pixels affected. <BR><BR>
+Format: lod_strategy &lt;name&gt;<BR>
+Default: lod_strategy Distance<BR><BR>
+<A NAME="SEC29"></A>
+<H3> lod_values </H3>
+<!--docid::SEC29::-->
+This attribute defines the values used to control the LOD transition for this material. By setting this attribute, you indicate that you want this material to alter the Technique that it uses based on some metric, such as the distance from the camera, or the approximate screen space coverage. The exact meaning of these values is determined by the option you select for <A HREF="manual_14.html#SEC28">lod_strategy</A> - it is a list of distances for the 'Distance' strategy, and a list of pixel counts for the 'PixelCount' strategy, for example. You must give it a list of values, in order from highest LOD value to lowest LOD value, each one indicating the point at which the material will switch to the next LOD. Implicitly, all materials activate LOD index 0 for values less than the first entry, so you do not have to specify '0' at the start of the list. You must ensure that there is at least one Technique with a <A HREF="manual_15.html#SEC35">lod_index</A> value for each value in the list (so if you specify 3 values, you must have techniques for LOD indexes 0, 1, 2 and 3). Note you must always have at least one Technique at lod_index 0.<BR><BR>
+<BR><BR>
+Format: lod_values &lt;value0&gt; &lt;value1&gt; &lt;value2&gt; ...<BR>
+Default: none<BR><BR>
+
+Example: <BR>
+lod_strategy Distance
+lod_values 300.0 600.5 1200<BR><BR>
+
+The above example would cause the material to use the best Technique at lod_index 0 up to a distance of 300 world units, the best from lod_index 1 from 300 up to 600, lod_index 2 from 600 to 1200, and lod_index 3 from 1200 upwards.<BR><BR>
+
+<A NAME="receive_shadows"></A>
+<A NAME="SEC30"></A>
+<H3> receive_shadows </H3>
+<!--docid::SEC30::-->
 This attribute controls whether objects using this material can have shadows cast upon them.<BR><BR> 
-<P>
 
 Format: receive_shadows &lt;on|off&gt;<BR>
 Default: on<BR><BR>
-</P>
-<P>
 
-Whether or not an object receives a shadow is the combination of a number of factors, See section <A HREF="manual_70.html#SEC304">7. Shadows</A> for full details; however this allows you to make a material opt-out of receiving shadows if required. Note that transparent materials never receive shadows so this option only has an effect on solid materials.
-</P>
-<P>
+Whether or not an object receives a shadow is the combination of a number of factors, See section <A HREF="manual_70.html#SEC313">7. Shadows</A> for full details; however this allows you to make a material opt-out of receiving shadows if required. Note that transparent materials never receive shadows so this option only has an effect on solid materials.
 
 <A NAME="transparency_casts_shadows"></A>
-<A NAME="SEC29"></A>
+<A NAME="SEC31"></A>
 <H3> transparency_casts_shadows </H3>
-<!--docid::SEC29::-->
+<!--docid::SEC31::-->
 This attribute controls whether transparent materials can cast certain kinds of shadow.<BR><BR> 
-<P>
 
 Format: transparency_casts_shadows &lt;on|off&gt;<BR>
 Default: off<BR><BR>
-Whether or not an object casts a shadow is the combination of a number of factors, See section <A HREF="manual_70.html#SEC304">7. Shadows</A> for full details; however this allows you to make a transparent material cast shadows, when it would otherwise not. For example, when using texture shadows, transparent materials are normally not rendered into the shadow texture because they should not block light. This flag overrides that.
-</P>
-<P>
+Whether or not an object casts a shadow is the combination of a number of factors, See section <A HREF="manual_70.html#SEC313">7. Shadows</A> for full details; however this allows you to make a transparent material cast shadows, when it would otherwise not. For example, when using texture shadows, transparent materials are normally not rendered into the shadow texture because they should not block light. This flag overrides that.
 
 <A NAME="set_texture_alias"></A>
-<A NAME="SEC30"></A>
+<A NAME="SEC32"></A>
 <H3> set_texture_alias </H3>
-<!--docid::SEC30::-->
+<!--docid::SEC32::-->
 This attribute associates a texture alias with a texture name.<BR><BR>
-<P>
 
 Format: set_texture_alias &lt;alias name&gt; &lt;texture name&gt;<BR><BR>
-</P>
-<P>
 
-This attribute can be used to set the textures used in texture unit states that were inherited from another material.(See section <A HREF="manual_26.html#SEC138">3.1.12 Texture Aliases</A>)<BR><BR>
-</P>
-<P>
+This attribute can be used to set the textures used in texture unit states that were inherited from another material.(See section <A HREF="manual_26.html#SEC143">3.1.12 Texture Aliases</A>)<BR><BR>
 
 <A NAME="Techniques"></A>
 <HR SIZE=1>
 <TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
 <TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_15.html#SEC33"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> &lt;&lt; </A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_13.html#SEC22"> Up </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_15.html#SEC31"> &gt; </A>]</TD>
-<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_45.html#SEC268"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="index.html#SEC_Top">Top</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_toc.html#SEC_Contents">Contents</A>]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[Index]</TD>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
@@ -201,7 +187,7 @@ This attribute can be used to set the textures used in texture unit states that 
 <BR>
 <FONT SIZE="-1">
 This document was generated
-by <I>steve</I> on <I>November 4 2008</I>
+by <I>Steve Streeting</I> on <I>December, 31 2009</I>
 using <A HREF="http://texi2html.cvshome.org"><I>texi2html</I></A>
 </FONT>
 
