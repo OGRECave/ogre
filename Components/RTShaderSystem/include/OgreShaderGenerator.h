@@ -339,9 +339,6 @@ public:
 	/// Default material scheme of the shader generator.
 	static String DEFAULT_SCHEME_NAME;
 
-	/// Key for the shared object bindings.
-	static String BINDING_OBJECT_KEY;
-
 // Protected types.
 protected:
 	class SGPass;

@@ -56,7 +56,6 @@ namespace RTShader {
 /*                                                                      */
 /************************************************************************/
 String NormalMapLighting::Type						= "SGX_NormalMapLighting";
-String NormalMapLighting::NormalMapTextureNameKey   = "SGNormalMapTextureName";
 
 Light NormalMapLighting::msBlankLight;
 
@@ -1175,6 +1174,7 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
 	mTrackVertexColourType = rhsLighting.mTrackVertexColourType;
 	mSpecularEnable = rhsLighting.mSpecularEnable;
 	mNormalMapSpace = rhsLighting.mNormalMapSpace;
+	mNormalMapTextureName = rhsLighting.mNormalMapTextureName;
 }
 
 //-----------------------------------------------------------------------
@@ -1187,17 +1187,9 @@ bool NormalMapLighting::preAddToRenderState(RenderState* renderState, Pass* srcP
 
 	renderState->getLightCount(lightCount);
 
-	UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(srcPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
-	const Any& passUserData = rtssBindings->getUserAny(NormalMapLighting::NormalMapTextureNameKey);
-
-	if (passUserData.isEmpty())	
-		return false;	
-
-	const String normalMapTextureName = any_cast<const String>(passUserData);
-
 	TextureUnitState* normalMapTexture = dstPass->createTextureUnitState();
 
-	normalMapTexture->setTextureName(normalMapTextureName);	
+	normalMapTexture->setTextureName(mNormalMapTextureName);	
 	normalMapTexture->setTextureMipmapBias(-1.0);
 	mNormalMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
@@ -1333,15 +1325,14 @@ SubRenderState*	NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 
 				unsigned int textureCoordinateIndex = 0;
 				SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
-				UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(pass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
+				NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
 				
-				rtssBindings->setUserAny(NormalMapLighting::NormalMapTextureNameKey, Any(strValue));
+				normalMapSubRenderState->setNormalMapTextureName(strValue);
 
+				
 				// Read normal map space type.
 				if (prop->values.size() >= 3)
-				{
-					NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
-
+				{					
 					++it;
 					if (false == SGScriptTranslator::getString(*it, &strValue))
 					{
@@ -1364,9 +1355,7 @@ SubRenderState*	NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 
 				// Read texture coordinate index.
 				if (prop->values.size() >= 4)
-				{
-					NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
-
+				{					
 					++it;
 					if (SGScriptTranslator::getUInt(*it, &textureCoordinateIndex))
 					{
@@ -1387,19 +1376,12 @@ void NormalMapLightingFactory::writeInstance(MaterialSerializer* ser,
 											 SubRenderState* subRenderState, 
 											 Pass* srcPass, Pass* dstPass)
 {
-	UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(srcPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
-	const Any& passUserData = rtssBindings->getUserAny(NormalMapLighting::NormalMapTextureNameKey);
-	if (passUserData.isEmpty())	
-		return;	
-
-	const String normalMapTextureName = any_cast<const String>(passUserData);
+	NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
 
 	ser->writeAttribute(4, "lighting_stage");
 	ser->writeValue("normal_map");
-	ser->writeValue(normalMapTextureName);	
-
-	NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
-
+	ser->writeValue(normalMapSubRenderState->getNormalMapTextureName());	
+	
 	if (normalMapSubRenderState->getNormalMapSpace() == NormalMapLighting::NMS_TANGENT)
 	{
 		ser->writeValue("tangent_space");

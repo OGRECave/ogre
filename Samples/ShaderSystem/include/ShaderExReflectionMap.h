@@ -86,16 +86,34 @@ public:
 
 	/** Set the reflection map power. */
 	void					setReflectionPower		(const Real reflectionPower);
+	
+	/** Return the reflection map power. */
+	Real					getReflectionPower		() const { return mReflectionPowerValue; }
+
+	/** 
+	Set the reflection map texture name.
+	*/
+	void					setReflectionMapTextureName		(const String& textureName) { mReflectionMapTextureName = textureName; }
+
+	/** 
+	Return the reflection map texture name.
+	*/
+	const String&			getReflectionMapTextureName		() const { return mReflectionMapTextureName; }
+
+
+	/** 
+	Set the mask map texture name.
+	*/
+	void					setMaskMapTextureName		(const String& textureName) { mMaskMapTextureName = textureName; }
+
+	/** 
+	Return the mask map texture name.
+	*/
+	const String&			getMaskMapTextureName		() const { return mMaskMapTextureName; }
+
 
 	static String Type;
-
-	/// The mask map texture name key.	
-	static String MaskMapTextureNameKey;
-
-	/// The reflection map texture name key.	
-	static String ReflectionMapTextureNameKey;
-
-
+	
 // Protected methods.
 protected:
 	
@@ -129,6 +147,8 @@ protected:
 
 // Attributes.
 protected:	
+	String					mReflectionMapTextureName;			// The reflection map texture name.
+	String					mMaskMapTextureName;				// The mask map texture name.
 	unsigned short			mMaskMapSamplerIndex;				// Mask map texture sampler index.
 	unsigned short			mReflectionMapSamplerIndex;			// Reflection map texture sampler index.
 	Real					mReflectionPowerValue;				// The reflection power value.

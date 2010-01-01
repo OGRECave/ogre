@@ -162,6 +162,16 @@ void Sample_ShaderSystem::sliderMoved(Slider* slider)
 
 		if (mReflectionMapSubRS != NULL)
 		{
+			ShaderExReflectionMap* reflectionMapSubRS = static_cast<ShaderExReflectionMap*>(mReflectionMapSubRS);
+			
+			// Since RTSS export caps based on the template sub render states we have to update the template reflection sub render state. 
+			reflectionMapSubRS->setReflectionPower(reflectionPower);
+
+			// Grab the instances set and update them with the new reflection power value.
+			// The instances are the actual sub render states that have been assembled to create the final shaders.
+			// Every time that the shaders have to be re-generated (light changes, fog changes etc..) a new set of sub render states 
+			// based on the template sub render states assembled for each pass.
+			// From that set of instances a CPU program is generated and afterward a GPU program finally generated.
 			RTShader::SubRenderStateSet instanceSet = mReflectionMapSubRS->getAccessor()->getSubRenderStateInstasnceSet();
 			RTShader::SubRenderStateSetIterator it = instanceSet.begin();
 			RTShader::SubRenderStateSetIterator itEnd = instanceSet.end();
@@ -480,7 +490,7 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
 
 		// Grab the scheme render state.
 		RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-		const SubRenderStateList& subRenderStateList = schemRenderState->getSubStateList();
+		const SubRenderStateList& subRenderStateList = schemRenderState->getTemplateSubRenderStateList();
 		SubRenderStateListConstIterator it = subRenderStateList.begin();
 		SubRenderStateListConstIterator itEnd = subRenderStateList.end();
 		FFPFog* fogSubRenderState = NULL;
@@ -600,10 +610,9 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 				{
 					RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(RTShader::NormalMapLighting::Type);
 					RTShader::NormalMapLighting* normalMapSubRS = static_cast<RTShader::NormalMapLighting*>(subRenderState);
-					UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
-				
+					
 					normalMapSubRS->setNormalMapSpace(RTShader::NormalMapLighting::NMS_TANGENT);
-					rtssBindings->setUserAny(RTShader::NormalMapLighting::NormalMapTextureNameKey, Any(String("Panels_Normal_Tangent.png")));	
+					normalMapSubRS->setNormalMapTextureName("Panels_Normal_Tangent.png");	
 
 					renderState->addTemplateSubRenderState(normalMapSubRS);
 				}
@@ -622,10 +631,9 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 				{
 					RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(RTShader::NormalMapLighting::Type);
 					RTShader::NormalMapLighting* normalMapSubRS = static_cast<RTShader::NormalMapLighting*>(subRenderState);
-					UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
 				
 					normalMapSubRS->setNormalMapSpace(RTShader::NormalMapLighting::NMS_OBJECT);
-					rtssBindings->setUserAny(RTShader::NormalMapLighting::NormalMapTextureNameKey, Any(String("Panels_Normal_Obj.png")));	
+					normalMapSubRS->setNormalMapTextureName("Panels_Normal_Obj.png");	
 
 					renderState->addTemplateSubRenderState(normalMapSubRS);
 				}
@@ -644,14 +652,13 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 			{				
 				RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(ShaderExReflectionMap::Type);
 				ShaderExReflectionMap* reflectionMapSubRS = static_cast<ShaderExReflectionMap*>(subRenderState);
-				UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
-
+			
 				reflectionMapSubRS->setReflectionMapType(TEX_TYPE_CUBE_MAP);
 				reflectionMapSubRS->setReflectionPower(mReflectionPowerSlider->getValue());
 
 				// Setup the textures needed by the reflection effect.
-				rtssBindings->setUserAny(ShaderExReflectionMap::MaskMapTextureNameKey, Any(String("Panels_refmask.png")));	
-				rtssBindings->setUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey, Any(String("cubescene.jpg")));
+				reflectionMapSubRS->setMaskMapTextureName("Panels_refmask.png");	
+				reflectionMapSubRS->setReflectionMapTextureName("cubescene.jpg");
 											
 				renderState->addTemplateSubRenderState(subRenderState);
 				mReflectionMapSubRS = subRenderState;				
@@ -811,7 +818,7 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 		mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-		const Ogre::RTShader::SubRenderStateList& subRenderStateList = schemRenderState->getSubStateList();
+		const Ogre::RTShader::SubRenderStateList& subRenderStateList = schemRenderState->getTemplateSubRenderStateList();
 		Ogre::RTShader::SubRenderStateListConstIterator it = subRenderStateList.begin();
 		Ogre::RTShader::SubRenderStateListConstIterator itEnd = subRenderStateList.end();
 

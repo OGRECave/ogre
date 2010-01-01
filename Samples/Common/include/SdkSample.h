@@ -270,7 +270,7 @@ namespace OgreBites
 				// Search the per pixel sub render state and remove it.
 				else
 				{
-					const Ogre::RTShader::SubRenderStateList& subRenderStateList = schemRenderState->getSubStateList();
+					const Ogre::RTShader::SubRenderStateList& subRenderStateList = schemRenderState->getTemplateSubRenderStateList();
 					Ogre::RTShader::SubRenderStateListConstIterator it = subRenderStateList.begin();
 					Ogre::RTShader::SubRenderStateListConstIterator itEnd = subRenderStateList.end();
 						

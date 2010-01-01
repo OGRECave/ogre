@@ -99,6 +99,11 @@ public:
 	*/
 	virtual bool			createCpuSubPrograms	(ProgramSet* programSet);
 
+	/** Called after GPU programs have been acquired and binded to the given pass.
+	In this method GPU parameters indices cab be grabbed for optimized access and updates.
+	@param pass The pass that uses the generated GPU programs.
+	*/
+	virtual void			notifyGpuProgramsAcquired (Pass* pass) {}
 
 	/** Update GPU programs parameters before a rendering operation occurs.
 	This method is called in the context of SceneManager::renderSingle object via the RenderObjectListener interface and
@@ -153,8 +158,8 @@ protected:
 
 // Attributes.
 private:	
-	mutable SubRenderStateAccessorPtr		mThisAccessor;			// The accessor of this instance.
-	SubRenderStateAccessorPtr		mOtherAccessor;			// The accessor of the source instance which used as base to create this instance.
+	mutable SubRenderStateAccessorPtr	mThisAccessor;			// The accessor of this instance.
+	SubRenderStateAccessorPtr			mOtherAccessor;			// The accessor of the source instance which used as base to create this instance.
 	
 };
 

@@ -159,7 +159,7 @@ void FFPRenderStateBuilder::buildFFPSubRenderState(int subRenderStateOrder, cons
 
 	if (subRenderState->preAddToRenderState(renderState, sgPass->getSrcPass(), sgPass->getDstPass()))
 	{
-		renderState->addSubRenderState(subRenderState);
+		renderState->addSubRenderStateInstance(subRenderState);
 	}
 	else
 	{		
@@ -171,7 +171,7 @@ void FFPRenderStateBuilder::buildFFPSubRenderState(int subRenderStateOrder, cons
 //-----------------------------------------------------------------------------
 void FFPRenderStateBuilder::resolveColourStageFlags( ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState )
 {
-	const SubRenderStateList& subRenderStateList = renderState->getSubStateList();
+	const SubRenderStateList& subRenderStateList = renderState->getTemplateSubRenderStateList();
 	FFPColour* colourSubState = NULL;
 
 	// Find the colour sub state.

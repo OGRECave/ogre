@@ -115,14 +115,14 @@ TargetRenderState::~TargetRenderState()
 
 
 //-----------------------------------------------------------------------
-void TargetRenderState::addSubRenderState(SubRenderState* subRenderState)
+void TargetRenderState::addSubRenderStateInstance(SubRenderState* subRenderState)
 {
 	mSubRenderStateList.push_back(subRenderState);
 	mSubRenderStateSortValid = false;
 }
 
 //-----------------------------------------------------------------------
-void TargetRenderState::removeSubRenderState(SubRenderState* subRenderState)
+void TargetRenderState::removeSubRenderStateInstance(SubRenderState* subRenderState)
 {
 	for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
 	{
@@ -190,6 +190,17 @@ void TargetRenderState::destroyProgramSet()
 }
 
 //-----------------------------------------------------------------------
+void TargetRenderState::notifyGpuProgramsAcquired(Pass* pass)
+{
+	for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
+	{
+		SubRenderState* curSubRenderState = *it;
+
+		curSubRenderState->notifyGpuProgramsAcquired(pass);		
+	}
+}
+
+//-----------------------------------------------------------------------
 void TargetRenderState::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 												const LightList* pLightList)
 {
@@ -211,7 +222,7 @@ void TargetRenderState::link(const RenderState& rhs, Pass* srcPass, Pass* dstPas
 	sortSubRenderStates();
 
 	// Insert all custom sub render states. (I.E Not FFP sub render states).
-	const SubRenderStateList& subRenderStateList = rhs.getSubStateList();
+	const SubRenderStateList& subRenderStateList = rhs.getTemplateSubRenderStateList();
 
 	for (SubRenderStateListConstIterator itSrc=subRenderStateList.begin(); itSrc != subRenderStateList.end(); ++itSrc)
 	{
@@ -262,7 +273,7 @@ void TargetRenderState::link(const RenderState& rhs, Pass* srcPass, Pass* dstPas
 
 		if (customSubRenderState->preAddToRenderState(this, srcPass, dstPass))
 		{
-			addSubRenderState(customSubRenderState);
+			addSubRenderStateInstance(customSubRenderState);
 		}
 		else
 		{

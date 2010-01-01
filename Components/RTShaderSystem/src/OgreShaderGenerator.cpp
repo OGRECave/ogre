@@ -50,7 +50,6 @@ RTShader::ShaderGenerator* Singleton<RTShader::ShaderGenerator>::ms_Singleton = 
 namespace RTShader {
 
 String ShaderGenerator::DEFAULT_SCHEME_NAME		= "ShaderGeneratorDefaultScheme";
-String ShaderGenerator::BINDING_OBJECT_KEY		= "RTSSBindingObjectKey";
 String ShaderGenerator::SGPass::UserKey			= "SGPass";
 String ShaderGenerator::SGTechnique::UserKey	= "SGTechnique";
 
@@ -933,7 +932,7 @@ void ShaderGenerator::serializePassAttributes(MaterialSerializer* ser, SGPass* p
 	if (customenderState != NULL)
 	{
 		// Write each of the sub-render states that composing the final render state.
-		const SubRenderStateList& subRenderStates = customenderState->getSubStateList();
+		const SubRenderStateList& subRenderStates = customenderState->getTemplateSubRenderStateList();
 		SubRenderStateListConstIterator it		= subRenderStates.begin();
 		SubRenderStateListConstIterator itEnd	= subRenderStates.end();
 
@@ -1058,6 +1057,7 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
 void ShaderGenerator::SGPass::acquirePrograms()
 {
 	ProgramManager::getSingleton().acquirePrograms(mDstPass, mTargetRenderState);
+	mTargetRenderState->notifyGpuProgramsAcquired(mDstPass);
 }
 
 //-----------------------------------------------------------------------------
@@ -1098,7 +1098,7 @@ SubRenderState*	ShaderGenerator::SGPass::getCustomFFPSubState(int subStateOrder,
 {
 	if (renderState != NULL)
 	{
-		const SubRenderStateList& subRenderStateList = renderState->getSubStateList();
+		const SubRenderStateList& subRenderStateList = renderState->getTemplateSubRenderStateList();
 
 		for (SubRenderStateListConstIterator it=subRenderStateList.begin(); it != subRenderStateList.end(); ++it)
 		{
@@ -1127,20 +1127,6 @@ ShaderGenerator::SGTechnique::SGTechnique(SGMaterial* parent, Technique* srcTech
 	mDstTechniqueSchemeName = dstTechniqueSchemeName;
 	mDstTechnique			= NULL;
 	mBuildDstTechnique		= true;
-
-	// Create the shared binding object for each soruce pass.
-	for (unsigned short i=0; i < mSrcTechnique->getNumPasses(); ++i)
-	{
-		Pass* srcPass = mSrcTechnique->getPass(i);
-		UserObjectBindings& passBindings = srcPass->getUserObjectBindings();
-		const Any& rtssAnyBindings = passBindings.getUserAny(ShaderGenerator::BINDING_OBJECT_KEY);
-
-		// Allocate dedicated RTSS binding object if need to.
-		if (rtssAnyBindings.isEmpty())
-		{
-			passBindings.setUserAny(ShaderGenerator::BINDING_OBJECT_KEY, Any(OGRE_NEW UserObjectBindings()));
-		}		
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1168,23 +1154,6 @@ ShaderGenerator::SGTechnique::~SGTechnique()
 	if (MaterialManager::getSingleton().resourceExists(materialName))
 	{
 		MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName);
-	
-		// Do per pass cleanup.
-		for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
-		{
-			SGPass*				curPassEntry = *itPass;
-			Pass*				srcPass		 = (*itPass)->getSrcPass();
-			UserObjectBindings& passBindings = srcPass->getUserObjectBindings();
-			const Any& rtssAnyBindings		 = passBindings.getUserAny(ShaderGenerator::BINDING_OBJECT_KEY);
-
-			if (rtssAnyBindings.isEmpty() == false)
-			{
-				UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(rtssAnyBindings);	
-
-				srcPass->getUserObjectBindings().eraseUserAny(ShaderGenerator::BINDING_OBJECT_KEY);
-				OGRE_DELETE rtssBindings;
-			}		
-		}		
 	
 		// Remove the destination technique from parent material.
 		for (unsigned int i=0; i < mat->getNumTechniques(); ++i)

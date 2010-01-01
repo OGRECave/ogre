@@ -37,8 +37,6 @@ THE SOFTWARE.
 /*                                                                      */
 /************************************************************************/
 String ShaderExReflectionMap::Type							= "SGX_ReflectionMap";
-String ShaderExReflectionMap::MaskMapTextureNameKey			= "SGX_ReflectionMaskMapTextureName";
-String ShaderExReflectionMap::ReflectionMapTextureNameKey	= "SGX_ReflectionMapTextureName";
 
 //-----------------------------------------------------------------------
 #define SGX_LIB_REFLECTIONMAP					"SampleLib_ReflectionMap"
@@ -79,32 +77,18 @@ void ShaderExReflectionMap::copyFrom(const SubRenderState& rhs)
 	mReflectionMapType = rhsReflectionMap.mReflectionMapType;
 	mReflectionPowerChanged	= rhsReflectionMap.mReflectionPowerChanged;
 	mReflectionPowerValue = rhsReflectionMap.mReflectionPowerValue;
+	mReflectionMapTextureName = rhsReflectionMap.mReflectionMapTextureName;
+	mMaskMapTextureName = rhsReflectionMap.mMaskMapTextureName;
 }
 
 //-----------------------------------------------------------------------
 bool ShaderExReflectionMap::preAddToRenderState( RenderState* renderState, Pass* srcPass, Pass* dstPass )
 {
-	UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(srcPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
-
-	// Validate mask texture name.
-	const Any& maskUser = rtssBindings->getUserAny(ShaderExReflectionMap::MaskMapTextureNameKey);
-	if (maskUser.isEmpty())	
-		return false;	
-
-	// Validate reflection map texture name.
-	const Any& reflectionUser = rtssBindings->getUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey);
-	if (reflectionUser.isEmpty())	
-		return false;
-
-	const String maskMapTextureName			= any_cast<const String>(maskUser);
-	const String reflectionMapTextureName	= any_cast<const String>(reflectionUser);
-
-	
 	TextureUnitState* textureUnit;
 	
 	// Create the mask texture unit.
 	textureUnit = dstPass->createTextureUnitState();
-	textureUnit->setTextureName(maskMapTextureName);		
+	textureUnit->setTextureName(mMaskMapTextureName);		
 	mMaskMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
 	// Create the reflection texture unit.
@@ -112,11 +96,11 @@ bool ShaderExReflectionMap::preAddToRenderState( RenderState* renderState, Pass*
 
 	if (mReflectionMapType == TEX_TYPE_2D)
 	{
-		textureUnit->setTextureName(reflectionMapTextureName);	
+		textureUnit->setTextureName(mReflectionMapTextureName);	
 	}
 	else
 	{
-		textureUnit->setCubicTextureName(reflectionMapTextureName, true);	
+		textureUnit->setCubicTextureName(mReflectionMapTextureName, true);	
 	}
 		
 	mReflectionMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
@@ -364,8 +348,7 @@ SubRenderState*	ShaderExReflectionMapFactory::createInstance(ScriptCompiler* com
 
 			SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
 			ShaderExReflectionMap* reflectionMapSubRenderState = static_cast<ShaderExReflectionMap*>(subRenderState);
-			UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(pass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
-
+			
 
 			// Reflection map is cubic texture.
 			if (strValue == "cube_map")
@@ -385,16 +368,27 @@ SubRenderState*	ShaderExReflectionMapFactory::createInstance(ScriptCompiler* com
 				compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
 				return NULL;
 			}
+			reflectionMapSubRenderState->setMaskMapTextureName(strValue);
 			++it;
-			rtssBindings->setUserAny(ShaderExReflectionMap::MaskMapTextureNameKey, Any(strValue));
-
+			
+		
 			// Read reflection texture.
 			if (false == SGScriptTranslator::getString(*it, &strValue))
 			{
 				compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
 				return NULL;
-			}
-			rtssBindings->setUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey, Any(strValue));
+			}			
+			reflectionMapSubRenderState->setReflectionMapTextureName(strValue);
+			++it;
+
+			// Read reflection power value.
+			Real reflectionPower = 0.5;
+			if (false == SGScriptTranslator::getReal(*it, &reflectionPower))
+			{
+				compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+				return NULL;
+			}			
+			reflectionMapSubRenderState->setReflectionPower(reflectionPower);
 				
 			return subRenderState;								
 			
@@ -409,22 +403,6 @@ void ShaderExReflectionMapFactory::writeInstance(MaterialSerializer* ser,
 											 SubRenderState* subRenderState, 
 											 Pass* srcPass, Pass* dstPass)
 {
-	UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(srcPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
-
-	// Validate mask texture name.
-	const Any& maskUser = rtssBindings->getUserAny(ShaderExReflectionMap::MaskMapTextureNameKey);
-	if (maskUser.isEmpty())	
-		return;	
-
-	// Validate reflection map texture name.
-	const Any& reflectionUser = rtssBindings->getUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey);
-	if (reflectionUser.isEmpty())	
-		return;
-
-	const String maskMapTextureName			= any_cast<const String>(maskUser);
-	const String reflectionMapTextureName	= any_cast<const String>(reflectionUser);
-
-
 	ser->writeAttribute(4, "rtss_ext_reflection_map");
 	
 
@@ -439,12 +417,10 @@ void ShaderExReflectionMapFactory::writeInstance(MaterialSerializer* ser,
 		ser->writeValue("2d_map");
 	}	
 
-	ser->writeValue(maskMapTextureName);
-	ser->writeValue(reflectionMapTextureName);
-
+	ser->writeValue(reflectionMapSubRenderState->getMaskMapTextureName());
+	ser->writeValue(reflectionMapSubRenderState->getReflectionMapTextureName());
+	ser->writeValue(StringConverter::toString(reflectionMapSubRenderState->getReflectionPower()));
 }
-
-
 
 //-----------------------------------------------------------------------
 const String& ShaderExReflectionMapFactory::getType() const

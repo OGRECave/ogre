@@ -95,9 +95,6 @@ public:
 	// Type of this render state.
 	static String Type;
 
-	/// The normal map texture name key.	
-	static String NormalMapTextureNameKey;
-
 	// Normal map space definition.
 	enum NormalMapSpace
 	{
@@ -120,6 +117,16 @@ public:
 
 	/** Return the normal map space. */
 	NormalMapSpace			getNormalMapSpace			() const { return mNormalMapSpace; }
+
+	/** 
+	Set the normal map texture name.
+	*/
+	void					setNormalMapTextureName		(const String& textureName) { mNormalMapTextureName = textureName; }
+
+	/** 
+	Return the normal map texture name.
+	*/
+	const String&			getNormalMapTextureName		() const { return mNormalMapTextureName; }
 
 
 // Protected types:
@@ -242,6 +249,7 @@ protected:
 
 // Attributes.
 protected:	
+	String					mNormalMapTextureName;			// The normal map texture name.
 	TrackVertexColourType	mTrackVertexColourType;			// Track per vertex colour type.
 	bool					mSpecularEnable;				// Specular component enabled/disabled.
 	LightParamsList			mLightParamsList;				// Light list.

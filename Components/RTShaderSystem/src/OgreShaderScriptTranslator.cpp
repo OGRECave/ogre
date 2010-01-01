@@ -71,19 +71,7 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 
 	// Case technique successfully created.
 	if (techniqueCreated)
-	{	
-
-		// Make sure that the dedicated binding obejct exists on current pass.
-		UserObjectBindings& passBindings = pass->getUserObjectBindings();
-		const Any& rtssAnyBindings = passBindings.getUserAny(ShaderGenerator::BINDING_OBJECT_KEY);
-
-		// Allocate dedicated RTSS binding object if need to.
-		if (rtssAnyBindings.isEmpty())
-		{
-			passBindings.setUserAny(ShaderGenerator::BINDING_OBJECT_KEY, Any(OGRE_NEW UserObjectBindings()));
-		}
-
-
+	{
 		// Go over all the render state properties.
 		for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
 		{

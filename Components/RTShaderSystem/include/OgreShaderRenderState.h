@@ -73,6 +73,9 @@ public:
 	*/
 	void		removeTemplateSubRenderState (SubRenderState* subRenderState);
 
+	/** Get the list of the template sub render states composing this render state. */
+	const SubRenderStateList&	getTemplateSubRenderStateList() const { return mSubRenderStateList; }
+
 	/** 
 	Set the light count per light type.
 	@param 
@@ -107,13 +110,8 @@ public:
 	*/
 	bool			getLightCountAutoUpdate	() const { return mLightCountAutoUpdate; }
 
-	/** Get the list of the sub render states composing this render state. */
-	const SubRenderStateList&	getSubStateList() const { return mSubRenderStateList; }
-
-
-	// Protected methods
-protected:
 	
+
 
 	// Attributes.
 protected:
@@ -156,13 +154,19 @@ public:
 	*/
 	void		link				(const RenderState& other, Pass* srcPass, Pass* dstPass);
 
+	/** Called after GPU programs have been acquired and binded to the given pass.
+	In this method GPU parameters indices cab be grabbed for optimized access and updates.
+	@param pass The pass that uses the generated GPU programs.
+	*/
+	void			notifyGpuProgramsAcquired (Pass* pass);
+
 	/** Update the GPU programs constant parameters before a renderable is rendered.
 	@param rend The renderable object that is going to be rendered.
 	@param pass The pass that is used to do the rendering operation.
 	@param source The auto parameter auto source instance.
 	@param pLightList The light list used for the current rendering operation.
 	*/
-	void updateGpuProgramsParams	(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
+	void	updateGpuProgramsParams	(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
 	
 // Protected methods
 protected:
@@ -192,12 +196,12 @@ protected:
 	/** Add sub render state to this render state.
 	@param subRenderState The sub render state to add.
 	*/
-	void		addSubRenderState			(SubRenderState* subRenderState);
+	void		addSubRenderStateInstance			(SubRenderState* subRenderState);
 
 	/** Remove sub render state from this render state.
 	@param subRenderState The sub render state to remove.
 	*/
-	void		removeSubRenderState			(SubRenderState* subRenderState);
+	void		removeSubRenderStateInstance		(SubRenderState* subRenderState);
 
 	
 // Attributes.
