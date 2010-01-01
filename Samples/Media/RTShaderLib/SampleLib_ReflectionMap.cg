@@ -36,12 +36,13 @@ void SGX_ApplyReflectionMap(in sampler2D maskSampler,
 						    in sampler2D reflectionSampler, 
 						    in float2 reflectionSamplerTexCoord,						    
 						    in float3 baseColor,
+						    in float reflectionPower,
 						    out float3 vOut)
 {
 	float3 maskTexel	   = tex2D(maskSampler, maskSamplerTexCoord).xyz;
 	float3 reflectionTexel = tex2D(reflectionSampler, reflectionSamplerTexCoord).xyz;
 	
-	vOut = baseColor + reflectionTexel.xyz*maskTexel.xyz;
+	vOut = baseColor + reflectionTexel.xyz*maskTexel.xyz*reflectionPower;
 }
 
 //-----------------------------------------------------------------------------
@@ -50,11 +51,12 @@ void SGX_ApplyReflectionMap(in sampler2D maskSampler,
 						    in samplerCUBE reflectionSampler, 
 						    in float3 reflectionSamplerTexCoord,						   
 						    in float3 baseColor,
+						    in float reflectionPower,
 						    out float3 vOut)
 {
 	float3 maskTexel	   = tex2D(maskSampler, maskSamplerTexCoord).xyz;
 	float3 reflectionTexel = texCUBE(reflectionSampler, reflectionSamplerTexCoord).xyz;
 	
-	vOut = baseColor + reflectionTexel.xyz*maskTexel.xyz;
+	vOut = baseColor + reflectionTexel.xyz*maskTexel.xyz*reflectionPower;
 }
 	

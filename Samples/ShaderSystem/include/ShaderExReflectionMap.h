@@ -73,11 +73,19 @@ public:
 	*/
 	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
+	/** 
+	@see SubRenderState::preAddToRenderState.
+	*/
+	virtual void			updateGpuProgramsParams	(Renderable* rend, Pass* pass,  const AutoParamDataSource* source, 	const LightList* pLightList);
+
 	/** Sets the reflection map type. */
 	void					setReflectionMapType	(TextureType type);
 
 	/** Get the reflection map type. */
 	TextureType				getReflectionMapType	() const { return mReflectionMapType; }
+
+	/** Set the reflection map power. */
+	void					setReflectionPower		(const Real reflectionPower);
 
 	static String Type;
 
@@ -120,12 +128,15 @@ protected:
 
 
 // Attributes.
-protected:
+protected:	
 	unsigned short			mMaskMapSamplerIndex;				// Mask map texture sampler index.
 	unsigned short			mReflectionMapSamplerIndex;			// Reflection map texture sampler index.
+	Real					mReflectionPowerValue;				// The reflection power value.
+	bool					mReflectionPowerChanged;			// Indicate if reflection power changed.
 	TextureType				mReflectionMapType;					// Reflection map type. Valid are 2D or Cube.
 	ParameterPtr			mMaskMapSampler;					// Normal map texture sampler parameter.
 	ParameterPtr			mReflectionMapSampler;				// Reflection map texture sampler parameter.
+	ParameterPtr			mReflectionPower;					// Reflection map power.
 	ParameterPtr			mVSInMaskTexcoord;					// Vertex shader input mask texture coordinates.
 	ParameterPtr			mVSOutMaskTexcoord;					// Vertex shader output mask texture coordinates.
 	ParameterPtr			mVSOutReflectionTexcoord;			// Vertex shader output reflection texture coordinates.

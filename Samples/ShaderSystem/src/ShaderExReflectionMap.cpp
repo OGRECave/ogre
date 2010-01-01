@@ -50,6 +50,8 @@ ShaderExReflectionMap::ShaderExReflectionMap()
 	mMaskMapSamplerIndex				= 0;			
 	mReflectionMapSamplerIndex			= 0;
 	mReflectionMapType					= TEX_TYPE_2D;
+	mReflectionPowerChanged			    = true;
+	mReflectionPowerValue				= 0.5;
 }
 
 //-----------------------------------------------------------------------
@@ -75,6 +77,8 @@ void ShaderExReflectionMap::copyFrom(const SubRenderState& rhs)
 	mMaskMapSamplerIndex = rhsReflectionMap.mMaskMapSamplerIndex;
 	mReflectionMapSamplerIndex = rhsReflectionMap.mReflectionMapSamplerIndex;
 	mReflectionMapType = rhsReflectionMap.mReflectionMapType;
+	mReflectionPowerChanged	= rhsReflectionMap.mReflectionPowerChanged;
+	mReflectionPowerValue = rhsReflectionMap.mReflectionPowerValue;
 }
 
 //-----------------------------------------------------------------------
@@ -197,6 +201,11 @@ bool ShaderExReflectionMap::resolveParameters(ProgramSet* programSet)
 	if (mReflectionMapSampler.get() == NULL)
 		return false;
 
+	// Resolve reflection power parameter.		
+	mReflectionPower = psProgram->resolveParameter(GCT_FLOAT1, -1, (uint16)GPV_GLOBAL, "reflection_power");
+	if (mReflectionPower.get() == NULL)
+		return false;
+
 	// Resolve ps output diffuse colour.
 	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 	if (mPSOutDiffuse.get() == NULL)
@@ -294,6 +303,7 @@ bool ShaderExReflectionMap::addPSInvocations( Function* psMain, const int groupO
 	funcInvoaction->pushOperand(mReflectionMapSampler, Operand::OPS_IN);
 	funcInvoaction->pushOperand(mPSInReflectionTexcoord, Operand::OPS_IN);	
 	funcInvoaction->pushOperand(mPSOutDiffuse, Operand::OPS_IN,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
+	funcInvoaction->pushOperand(mReflectionPower, Operand::OPS_IN);
 	funcInvoaction->pushOperand(mPSOutDiffuse, Operand::OPS_OUT,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
 	
 	psMain->addAtomInstace(funcInvoaction);
@@ -311,6 +321,26 @@ void ShaderExReflectionMap::setReflectionMapType( TextureType type )
 			"ShaderExReflectionMap::setReflectionMapType");
 	}
 	mReflectionMapType = type;
+}
+
+//-----------------------------------------------------------------------
+void ShaderExReflectionMap::setReflectionPower(const Real reflectionPower)
+{
+	mReflectionPowerValue = reflectionPower;
+	mReflectionPowerChanged = true;
+}
+
+//-----------------------------------------------------------------------
+void ShaderExReflectionMap::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList)
+{
+	if (mReflectionPowerChanged)
+	{
+		GpuProgramParametersSharedPtr fsParams = pass->getFragmentProgramParameters();
+
+		fsParams->setNamedConstant(mReflectionPower->getName(), mReflectionPowerValue);
+
+		mReflectionPowerChanged = false;
+	}	
 }
 
 //-----------------------------------------------------------------------

@@ -13,6 +13,7 @@ const String PER_PIXEL_FOG_BOX			= "PerPixelFog";
 const String MAIN_ENTITY_MESH			= "ShaderSystem.mesh";
 const String SPECULAR_BOX				= "SpecularBox";
 const String REFLECTIONMAP_BOX			= "ReflectionMapBox";
+const String REFLECTIONMAP_POWER_SLIDER	= "ReflectionPowerSlider";
 const String MAIN_ENTITY_NAME			= "MainEntity";
 const String EXPORT_BUTTON_NAME			= "ExportMaterial";
 const String FLUSH_BUTTON_NAME			= "FlushShaderCache";
@@ -152,6 +153,29 @@ void Sample_ShaderSystem::buttonHit( OgreBites::Button* b )
 	}
 }
 
+//--------------------------------------------------------------------------
+void Sample_ShaderSystem::sliderMoved(Slider* slider)
+{
+	if (slider->getName() == REFLECTIONMAP_POWER_SLIDER)
+	{
+		Real reflectionPower = slider->getValue();
+
+		if (mReflectionMapSubRS != NULL)
+		{
+			RTShader::SubRenderStateSet instanceSet = mReflectionMapSubRS->getAccessor()->getSubRenderStateInstasnceSet();
+			RTShader::SubRenderStateSetIterator it = instanceSet.begin();
+			RTShader::SubRenderStateSetIterator itEnd = instanceSet.end();
+
+			for (; it != itEnd; ++it)
+			{
+				ShaderExReflectionMap* reflectionMapSubRS = static_cast<ShaderExReflectionMap*>(*it);
+				
+				reflectionMapSubRS->setReflectionPower(reflectionPower);
+			}
+		}
+	}	
+}
+
 //-----------------------------------------------------------------------
 bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
 {	
@@ -198,6 +222,7 @@ void Sample_ShaderSystem::setupContent()
 	mPerPixelFogEnable		= false;
 	mSpecularEnable   		= false;
 	mReflectionMapEnable	= false;
+	mReflectionMapSubRS  = NULL;
 
 	mRayQuery = mSceneMgr->createRayQuery(Ray());
 	mTargetObj = NULL;
@@ -374,6 +399,8 @@ void Sample_ShaderSystem::setupUI()
 		GpuProgramManager::getSingleton().isSyntaxSupported("fp30"))		
 	{
 		mTrayMgr->createCheckBox(TL_BOTTOM, REFLECTIONMAP_BOX, "Reflection Map", 240)->setChecked(mReflectionMapEnable);
+		mReflectionPowerSlider = mTrayMgr->createThickSlider(TL_BOTTOM, REFLECTIONMAP_POWER_SLIDER, "Reflection Power", 240, 80, 0, 1, 100);
+		mReflectionPowerSlider->setValue(0.5, false);
 	}
 
 	mLightingModelMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "TargetModelLighting", "", 240, 230, 10);	
@@ -620,12 +647,18 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 				UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
 
 				reflectionMapSubRS->setReflectionMapType(TEX_TYPE_CUBE_MAP);
+				reflectionMapSubRS->setReflectionPower(mReflectionPowerSlider->getValue());
 
 				// Setup the textures needed by the reflection effect.
 				rtssBindings->setUserAny(ShaderExReflectionMap::MaskMapTextureNameKey, Any(String("Panels_refmask.png")));	
 				rtssBindings->setUserAny(ShaderExReflectionMap::ReflectionMapTextureNameKey, Any(String("cubescene.jpg")));
 											
 				renderState->addTemplateSubRenderState(subRenderState);
+				mReflectionMapSubRS = subRenderState;				
+			}
+			else
+			{
+				mReflectionMapSubRS = NULL;
 			}
 								
 			// Invalidate this material in order to re-generate its shaders.
