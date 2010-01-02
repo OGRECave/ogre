@@ -77,7 +77,6 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 	if (mLightParamsList.size() == 0)
 		return;
 
-	GpuProgramParametersSharedPtr vsGpuParams = pass->getVertexProgramParameters();
 	SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager();
 	Viewport* curViewport = sceneMgr->getCurrentViewport();
 	Camera* curCamera     = curViewport->getCamera();
@@ -124,21 +123,21 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 
 			// Update light direction.
 			vParameter = matView.transformAffine(srcLight->getAs4DVector(true));
-			vsGpuParams->setNamedConstant(curParams.mDirection->getName(), vParameter);
+			curParams.mDirection->setGpuParameter(vParameter);
 			break;
 
 		case Light::LT_POINT:
 
 			// Update light position.
 			vParameter = matView.transformAffine(srcLight->getAs4DVector(true));
-			vsGpuParams->setNamedConstant(curParams.mPosition->getName(), vParameter);
+			curParams.mPosition->setGpuParameter(vParameter);
 
 			// Update light attenuation parameters.
 			vParameter.x = srcLight->getAttenuationRange();
 			vParameter.y = srcLight->getAttenuationConstant();
 			vParameter.z = srcLight->getAttenuationLinear();
 			vParameter.w = srcLight->getAttenuationQuadric();
-			vsGpuParams->setNamedConstant(curParams.mAttenuatParams->getName(), vParameter);
+			curParams.mAttenuatParams->setGpuParameter(vParameter);
 			break;
 
 		case Light::LT_SPOTLIGHT:
@@ -151,7 +150,7 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 			
 			// Update light position.
 			vParameter = matView.transformAffine(srcLight->getAs4DVector(true));
-			vsGpuParams->setNamedConstant(curParams.mPosition->getName(), vParameter);
+			curParams.mPosition->setGpuParameter(vParameter);
 			
 							
 			vec3 = matViewIT * srcLight->getDerivedDirection();
@@ -161,14 +160,14 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 			vParameter.y = -vec3.y;
 			vParameter.z = -vec3.z;
 			vParameter.w = 0.0;
-			vsGpuParams->setNamedConstant(curParams.mDirection->getName(), vParameter);
+			curParams.mDirection->setGpuParameter(vParameter);
 
 			// Update light attenuation parameters.
 			vParameter.x = srcLight->getAttenuationRange();
 			vParameter.y = srcLight->getAttenuationConstant();
 			vParameter.z = srcLight->getAttenuationLinear();
 			vParameter.w = srcLight->getAttenuationQuadric();
-			vsGpuParams->setNamedConstant(curParams.mAttenuatParams->getName(), vParameter);
+			curParams.mAttenuatParams->setGpuParameter(vParameter);
 
 			// Update spotlight parameters.
 			Real phi   = Math::Cos(srcLight->getSpotlightOuterAngle().valueRadians() * 0.5f);
@@ -178,7 +177,7 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 			vec3.y = phi;
 			vec3.z = srcLight->getSpotlightFalloff();
 			
-			vsGpuParams->setNamedConstant(curParams.mSpotParams->getName(), vec3);
+			curParams.mSpotParams->setGpuParameter(vec3);
 		}
 			break;
 		}
@@ -188,12 +187,12 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 		if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
 		{
 			colour = srcLight->getDiffuseColour() * pass->getDiffuse();
-			vsGpuParams->setNamedConstant(curParams.mDiffuseColour->getName(), colour);					
+			curParams.mDiffuseColour->setGpuParameter(colour);					
 		}
 		else
 		{					
 			colour = srcLight->getDiffuseColour();
-			vsGpuParams->setNamedConstant(curParams.mDiffuseColour->getName(), colour);	
+			curParams.mDiffuseColour->setGpuParameter(colour);	
 		}
 
 		// Update specular colour if need to.
@@ -203,12 +202,12 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
 			{
 				colour = srcLight->getSpecularColour() * pass->getSpecular();
-				vsGpuParams->setNamedConstant(curParams.mSpecularColour->getName(), colour);					
+				curParams.mSpecularColour->setGpuParameter(colour);					
 			}
 			else
 			{					
 				colour = srcLight->getSpecularColour();
-				vsGpuParams->setNamedConstant(curParams.mSpecularColour->getName(), colour);	
+				curParams.mSpecularColour->setGpuParameter(colour);	
 			}
 		}																			
 	}

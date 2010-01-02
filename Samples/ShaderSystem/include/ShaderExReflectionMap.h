@@ -154,17 +154,17 @@ protected:
 	Real					mReflectionPowerValue;				// The reflection power value.
 	bool					mReflectionPowerChanged;			// Indicate if reflection power changed.
 	TextureType				mReflectionMapType;					// Reflection map type. Valid are 2D or Cube.
-	ParameterPtr			mMaskMapSampler;					// Normal map texture sampler parameter.
-	ParameterPtr			mReflectionMapSampler;				// Reflection map texture sampler parameter.
-	ParameterPtr			mReflectionPower;					// Reflection map power.
+	UniformParameterPtr		mMaskMapSampler;					// Normal map texture sampler parameter.
+	UniformParameterPtr		mReflectionMapSampler;				// Reflection map texture sampler parameter.
+	UniformParameterPtr		mReflectionPower;					// Reflection map power.
 	ParameterPtr			mVSInMaskTexcoord;					// Vertex shader input mask texture coordinates.
 	ParameterPtr			mVSOutMaskTexcoord;					// Vertex shader output mask texture coordinates.
 	ParameterPtr			mVSOutReflectionTexcoord;			// Vertex shader output reflection texture coordinates.
 	ParameterPtr			mPSInMaskTexcoord;					// Pixel shader input mask texture coordinates.
 	ParameterPtr			mPSInReflectionTexcoord;			// Pixel shader input reflection texture coordinates.
-	ParameterPtr			mWorldMatrix;						// World matrix parameter.
-	ParameterPtr			mWorldITMatrix;						// World inverse transpose matrix parameter.
-	ParameterPtr			mViewMatrix;						// View matrix parameter.			
+	UniformParameterPtr		mWorldMatrix;						// World matrix parameter.
+	UniformParameterPtr		mWorldITMatrix;						// World inverse transpose matrix parameter.
+	UniformParameterPtr		mViewMatrix;						// View matrix parameter.			
 	ParameterPtr			mVSInputNormal;						// Vertex shader input normal parameter.
 	ParameterPtr 			mVSInputPos;						// Vertex shader input position parameter.		
 	ParameterPtr			mPSOutDiffuse;						// Pixel shader output colour.

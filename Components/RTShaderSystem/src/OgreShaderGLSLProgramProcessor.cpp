@@ -169,13 +169,13 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
 void GLSLProgramProcessor::bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram)
 {
 	GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
-	const ShaderParameterList& progParams = pCpuProgram->getParameters();
-	ShaderParameterConstIterator itParams;
+	const UniformParameterList& progParams = pCpuProgram->getParameters();
+	UniformParameterConstIterator itParams;
 
 	// Bind the samplers.
 	for (itParams=progParams.begin(); itParams != progParams.end(); ++itParams)
 	{
-		const ParameterPtr pCurParam = *itParams;
+		const UniformParameterPtr pCurParam = *itParams;
 		const GpuConstantDefinition* gpuConstDef = pGpuParams->_findNamedConstantDefinition(pCurParam->getName());
 		
 		if (pCurParam->isSampler())

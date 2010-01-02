@@ -321,7 +321,7 @@ void ShaderExReflectionMap::updateGpuProgramsParams(Renderable* rend, Pass* pass
 	{
 		GpuProgramParametersSharedPtr fsParams = pass->getFragmentProgramParameters();
 
-		fsParams->setNamedConstant(mReflectionPower->getName(), mReflectionPowerValue);
+		mReflectionPower->setGpuParameter(mReflectionPowerValue);
 
 		mReflectionPowerChanged = false;
 	}	

@@ -60,16 +60,12 @@ public:
 	/** Return the target language of this processor. */
 	virtual const String&		getTargetLanguage	() const { return TargetLanguage; }
 
-	/** Called before creation of the GPU programs.
-	Do several preparation operation such as validation, register compaction and specific target language optimizations.
-	@param programSet The program set container.
-	Return true on success.
+	/** 
+	@see ProgramProcessor::preCreateGpuPrograms
 	*/
 	virtual bool				preCreateGpuPrograms			(ProgramSet* programSet);
-
-	/** Called after creation of the GPU programs.
-	@param programSet The program set container.
-	Return true on success.
+	/** 
+	@see ProgramProcessor::postCreateGpuPrograms
 	*/
 	virtual bool				postCreateGpuPrograms			(ProgramSet* programSet);
 

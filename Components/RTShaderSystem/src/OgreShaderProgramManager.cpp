@@ -84,6 +84,7 @@ ProgramManager::~ProgramManager()
 //-----------------------------------------------------------------------------
 void ProgramManager::acquirePrograms(Pass* pass, TargetRenderState* renderState)
 {
+	// Create the CPU programs.
 	if (false == renderState->createCpuPrograms())
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
@@ -93,6 +94,7 @@ void ProgramManager::acquirePrograms(Pass* pass, TargetRenderState* renderState)
 
 	ProgramSet* programSet = renderState->getProgramSet();
 
+	// Create the GPU programs.
 	if (false == createGpuPrograms(programSet))
 	{
 		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
@@ -100,8 +102,15 @@ void ProgramManager::acquirePrograms(Pass* pass, TargetRenderState* renderState)
 			"ProgramManager::acquireGpuPrograms" );
 	}	
 
+	// Bind the created GPU programs to the target pass.
 	pass->setVertexProgram(programSet->getGpuVertexProgram()->getName());
 	pass->setFragmentProgram(programSet->getGpuFragmentProgram()->getName());
+
+
+	// Bind uniform parameters to pass parameters.
+	bindUniformParameters(programSet->getCpuVertexProgram(), pass->getVertexProgramParameters());
+	bindUniformParameters(programSet->getCpuFragmentProgram(), pass->getFragmentProgramParameters());
+
 }
 
 //-----------------------------------------------------------------------------
@@ -327,14 +336,30 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 
 	programSet->setGpuFragmentProgram(psGpuProgram);
 
-
+	
 	// Call the post creation of GPU programs method.
 	success = programProcessor->postCreateGpuPrograms(programSet);
 	if (success == false)	
 		return false;	
 
+	
 	return true;
 	
+}
+
+
+//-----------------------------------------------------------------------------
+void ProgramManager::bindUniformParameters(Program* pCpuProgram, GpuProgramParametersSharedPtr& passParams)
+{
+	const UniformParameterList& progParams = pCpuProgram->getParameters();
+	UniformParameterConstIterator itParams = progParams.begin();
+	UniformParameterConstIterator itParamsEnd = progParams.end();
+
+	// Bind each uniform parameter to its GPU parameter.
+	for (; itParams != itParamsEnd; ++itParams)
+	{			
+		(*itParams)->bind(passParams);					
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -447,11 +472,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		
 		pGpuProgram->setParameter("profiles", profiles);
 		pGpuProgram->load();
-
-		GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
-		const ShaderParameterList& progParams = shaderProgram->getParameters();
-		ShaderParameterConstIterator itParams;
-
+	
 		// Case an error occurred.
 		if (pGpuProgram->hasCompileError())
 		{

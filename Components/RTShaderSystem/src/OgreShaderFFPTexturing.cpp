@@ -812,8 +812,7 @@ void FFPTexturing::updateGpuProgramsParams(Renderable* rend, Pass* pass, const A
 		TextureUnitParams* curParams = &mTextureUnitParamsList[i];
 
 		if (curParams->mTextureProjector != NULL && curParams->mTextureViewProjImageMatrix.get() != NULL)
-		{		
-			GpuProgramParametersSharedPtr vsGpuParams = pass->getVertexProgramParameters();
+		{					
 			Matrix4 matTexViewProjImage;
 
 			matTexViewProjImage = 
@@ -821,7 +820,7 @@ void FFPTexturing::updateGpuProgramsParams(Renderable* rend, Pass* pass, const A
 				curParams->mTextureProjector->getProjectionMatrixWithRSDepth() * 
 				curParams->mTextureProjector->getViewMatrix();
 
-			vsGpuParams->setNamedConstant(curParams->mTextureViewProjImageMatrix->getName(), matTexViewProjImage);
+			curParams->mTextureViewProjImageMatrix->setGpuParameter(matTexViewProjImage);
 		}
 	}
 }

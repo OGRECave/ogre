@@ -90,8 +90,8 @@ void HLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	const ShaderFunctionList& functionList = program->getFunctions();
 	ShaderFunctionConstIterator itFunction;
 
-	const ShaderParameterList& parameterList = program->getParameters();
-	ShaderParameterConstIterator itParam = parameterList.begin();
+	const UniformParameterList& parameterList = program->getParameters();
+	UniformParameterConstIterator itUniformParam = parameterList.begin();
 
 	// Generate source code header.
 	writeProgramTitle(os, program);
@@ -105,9 +105,9 @@ void HLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	writeUniformParametersTitle(os, program);
 	os << std::endl;
 
-	for (itParam=parameterList.begin();  itParam != parameterList.end(); ++itParam)
+	for (itUniformParam=parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
 	{
-		writeUniformParameter(os, *itParam);			
+		writeUniformParameter(os, *itUniformParam);			
 		os << ";" << std::endl;				
 	}
 	os << std::endl;
@@ -127,8 +127,9 @@ void HLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 
 		// Write local parameters.
 		const ShaderParameterList& localParams = curFunction->getLocalParameters();
+		ShaderParameterConstIterator itParam = localParams.begin();
 
-		for (itParam=localParams.begin();  itParam != localParams.end(); ++itParam)
+		for (;  itParam != localParams.end(); ++itParam)
 		{
 			os << "\t";
 			writeLocalParameter(os, *itParam);			
@@ -180,7 +181,7 @@ void HLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* prog
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeUniformParameter(std::ostream& os, ParameterPtr parameter)
+void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameterPtr parameter)
 {
 	os << mGpuConstTypeMap[parameter->getType()];
 	os << "\t";	

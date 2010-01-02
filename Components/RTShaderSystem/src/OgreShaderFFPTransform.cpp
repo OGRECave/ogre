@@ -58,7 +58,7 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
 	Program* vsProgram = programSet->getCpuVertexProgram();
 	
 	// Resolve World View Projection Matrix.
-	ParameterPtr wvpMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX, 0);
+	UniformParameterPtr wvpMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX, 0);
 	if (wvpMatrix.get() == NULL)
 		return false;
 		

@@ -79,7 +79,7 @@ protected:
 	void		writeProgramDependencies	(std::ostream& os, Program* program);
 
 	/** Write a uniform parameter. */
-	void		writeUniformParameter		(std::ostream& os, ParameterPtr parameter);
+	void		writeUniformParameter		(std::ostream& os, UniformParameterPtr parameter);
 
 	/** Write a function parameter. */
 	void		writeFunctionParameter		(std::ostream& os, ParameterPtr parameter);

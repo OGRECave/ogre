@@ -29,6 +29,10 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #include "OgreGpuProgram.h"
+#include "OgreVector2.h"
+#include "OgreVector3.h"
+#include "OgreVector4.h"
+#include "OgreMatrix4.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -276,6 +280,9 @@ public:
 
 // Interface.
 public:
+	/** */
+	Parameter() {}
+
 	/** Class constructor.
 	@param type The type of this parameter.
 	@param name The name of this parameter.
@@ -286,20 +293,7 @@ public:
 	*/
 	Parameter(GpuConstantType type, const String& name, 
 		const Semantic& semantic, int index, 
-		const Content& content,
-		uint16 variability);
-
-	/** Class constructor.
-	@param autoType The auto type of this parameter.
-	@param fAutoConstantData The real data for this auto constant parameter.	
-	*/
-	Parameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData);
-
-	/** Class constructor.
-	@param autoType The auto type of this parameter.
-	@param nAutoConstantData The int data for this auto constant parameter.	
-	*/
-	Parameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData);
+		const Content& content);
 
 	/** Class destructor */
 	virtual ~Parameter() {};
@@ -316,6 +310,62 @@ public:
 	/** Get the index of this parameter. */
 	int						getIndex						() const { return mIndex; }	
 
+	/** Return the content of this parameter. */
+	Content					getContent							() const { return mContent; }
+
+	/** Returns true if this instance is a ConstParameter otherwise false. */
+	virtual bool			isConstParameter					() const { return false; }
+
+	/** Returns the string representation of this parameter. */
+	virtual String			toString							() const { return mName; }
+
+// Attributes.
+protected:
+	String									mName;					// Name of this parameter.
+	GpuConstantType							mType;					// Type of this parameter.
+	Semantic								mSemantic;				// Semantic of this parameter.
+	int										mIndex;					// Index of this parameter.
+	Content									mContent;				// The content of this parameter.
+	
+};
+
+typedef SharedPtr<Parameter>					ParameterPtr; 
+typedef vector<ParameterPtr>::type				ShaderParameterList;
+typedef ShaderParameterList::iterator 			ShaderParameterIterator;
+typedef ShaderParameterList::const_iterator		ShaderParameterConstIterator;
+
+/** Uniform parameter class. Allow fast access to GPU parameter updates.
+*/
+class UniformParameter : public Parameter
+{
+public:
+
+	/** Class constructor.
+	@param type The type of this parameter.
+	@param name The name of this parameter.
+	@param semantic The semantic of this parameter.
+	@param index The index of this parameter.
+	@param content The content of this parameter.
+	@param variability How this parameter varies (bitwise combination of GpuProgramVariability).
+	*/
+	UniformParameter(GpuConstantType type, const String& name, 
+		const Semantic& semantic, int index, 
+		const Content& content,
+		uint16 variability);
+
+	/** Class constructor.
+	@param autoType The auto type of this parameter.
+	@param fAutoConstantData The real data for this auto constant parameter.	
+	*/
+	UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData);
+
+	/** Class constructor.
+	@param autoType The auto type of this parameter.
+	@param nAutoConstantData The int data for this auto constant parameter.	
+	*/
+	UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData);
+
+	
 	/** Get auto constant int data of this parameter, in case it is auto constant parameter. */
 	size_t					getAutoConstantIntData			() const { return mAutoConstantIntData; }	
 
@@ -343,22 +393,62 @@ public:
 	/** Return the variability of this parameter. */
 	uint16					getVariability						() const { return mVariability; }
 
-	/** Return the content of this parameter. */
-	Content					getContent							() const { return mContent; }
 
-	/** Returns true if this instance is a ConstParameter otherwise false. */
-	virtual bool			isConstParameter					() const { return false; }
+	/** Bind this parameter to the corresponding GPU parameter. */
+	void					bind								(GpuProgramParametersSharedPtr paramsPtr);
+	
+public:
 
-	/** Returns the string representation of this parameter. */
-	virtual String			toString							() const { return mName; }
+	/** Update the GPU parameter with the given value. */	
+	void setGpuParameter(int val)
+	{ 
+		assert(mParamsPtr);
+		mParamsPtr->_writeRawConstant(mPhysicalIndex, val);		
+	}
 
-// Attributes.
+	/** Update the GPU parameter with the given value. */	
+	void setGpuParameter(Real val)  
+	{ 
+		assert(mParamsPtr);
+		mParamsPtr->_writeRawConstant(mPhysicalIndex, val);		
+	}
+
+	/** Update the GPU parameter with the given value. */	
+	void setGpuParameter(const ColourValue& val)  
+	{ 
+		assert(mParamsPtr);
+		mParamsPtr->_writeRawConstant(mPhysicalIndex, val);		
+	}
+
+	/** Update the GPU parameter with the given value. */	
+	void setGpuParameter(const Vector2& val)  
+	{ 
+		assert(mParamsPtr);
+		mParamsPtr->_writeRawConstants(mPhysicalIndex, val.ptr(), 2);		
+	}
+	
+	/** Update the GPU parameter with the given value. */	
+	void setGpuParameter(const Vector3& val)  
+	{ 
+		assert(mParamsPtr);
+		mParamsPtr->_writeRawConstant(mPhysicalIndex, val);		
+	}
+
+	/** Update the GPU parameter with the given value. */	
+	void setGpuParameter(const Vector4& val)  
+	{ 
+		assert(mParamsPtr);
+		mParamsPtr->_writeRawConstant(mPhysicalIndex, val);		
+	}
+
+	/** Update the GPU parameter with the given value. */	
+	void setGpuParameter(const Matrix4& val)  
+	{ 
+		assert(mParamsPtr);
+		mParamsPtr->_writeRawConstant(mPhysicalIndex, val, 16);		
+	}
+
 protected:
-	String									mName;					// Name of this parameter.
-	GpuConstantType							mType;					// Type of this parameter.
-	Semantic								mSemantic;				// Semantic of this parameter.
-	int										mIndex;					// Index of this parameter.
-	Content									mContent;				// The content of this parameter.
 	bool									mIsAutoConstantReal;	// Is it auto constant real based parameter.
 	bool									mIsAutoConstantInt;		// Is it auto constant int based parameter.
 	GpuProgramParameters::AutoConstantType	mAutoConstantType;		// The auto constant type of this parameter.
@@ -368,12 +458,15 @@ protected:
 		Real	mAutoConstantRealData;								// Auto constant real data.
 	};		
 	uint16									mVariability;			// How this parameter varies (bitwise combination of GpuProgramVariability).
+	GpuProgramParameters*					mParamsPtr;				// The actual GPU parameters pointer.
+	size_t									mPhysicalIndex;			// The physical index of this parameter in the GPU program.
+
 };
 
-typedef SharedPtr<Parameter>					ParameterPtr; 
-typedef vector<ParameterPtr>::type				ShaderParameterList;
-typedef ShaderParameterList::iterator 			ShaderParameterIterator;
-typedef ShaderParameterList::const_iterator		ShaderParameterConstIterator;
+typedef SharedPtr<UniformParameter>				UniformParameterPtr; 
+typedef vector<UniformParameterPtr>::type		UniformParameterList;
+typedef UniformParameterList::iterator 			UniformParameterIterator;
+typedef UniformParameterList::const_iterator	UniformParameterConstIterator;
 
 /** Helper template which is the base for our ConstParameters
 */
@@ -386,7 +479,7 @@ public:
 		GpuConstantType type, 
 		const Semantic& semantic,  
 		const Content& content) 
-		: Parameter(type, "Constant", semantic, 0, content,	0)
+		: Parameter(type, "Constant", semantic, 0, content)
 	{
 		mValue = val;
 	}
@@ -441,16 +534,18 @@ public:
 	static ParameterPtr	createInTexcoord4		(int index, Parameter::Content content);			
 	static ParameterPtr	createOutTexcoord4		(int index, Parameter::Content content);
 
-	static ParameterPtr	createSampler			(GpuConstantType type, int index);
-	static ParameterPtr	createSampler1D			(int index);
-	static ParameterPtr	createSampler2D			(int index);
-	static ParameterPtr	createSampler3D			(int index);
-	static ParameterPtr	createSamplerCUBE		(int index);	
-
 	static ParameterPtr	createConstParamVector2	(Vector2 val);
 	static ParameterPtr	createConstParamVector3	(Vector3 val);
 	static ParameterPtr	createConstParamVector4	(Vector4 val);
 	static ParameterPtr	createConstParamFloat	(float val);	
+
+	static UniformParameterPtr	createSampler			(GpuConstantType type, int index);
+	static UniformParameterPtr	createSampler1D			(int index);
+	static UniformParameterPtr	createSampler2D			(int index);
+	static UniformParameterPtr	createSampler3D			(int index);
+	static UniformParameterPtr	createSamplerCUBE		(int index);	
+
+	static UniformParameterPtr	createUniform			(GpuConstantType type, 	int index, uint16 variability, const String& suggestedName);
 };
 
 

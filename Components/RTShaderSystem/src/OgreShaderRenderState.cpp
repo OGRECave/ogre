@@ -190,17 +190,6 @@ void TargetRenderState::destroyProgramSet()
 }
 
 //-----------------------------------------------------------------------
-void TargetRenderState::notifyGpuProgramsAcquired(Pass* pass)
-{
-	for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
-	{
-		SubRenderState* curSubRenderState = *it;
-
-		curSubRenderState->notifyGpuProgramsAcquired(pass);		
-	}
-}
-
-//-----------------------------------------------------------------------
 void TargetRenderState::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 												const LightList* pLightList)
 {
@@ -211,7 +200,6 @@ void TargetRenderState::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 		curSubRenderState->updateGpuProgramsParams(rend, pass, source, pLightList);		
 	}
 }
-
 
 //-----------------------------------------------------------------------
 void TargetRenderState::link(const RenderState& rhs, Pass* srcPass, Pass* dstPass)

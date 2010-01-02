@@ -1057,7 +1057,6 @@ void ShaderGenerator::SGPass::buildTargetRenderState()
 void ShaderGenerator::SGPass::acquirePrograms()
 {
 	ProgramManager::getSingleton().acquirePrograms(mDstPass, mTargetRenderState);
-	mTargetRenderState->notifyGpuProgramsAcquired(mDstPass);
 }
 
 //-----------------------------------------------------------------------------

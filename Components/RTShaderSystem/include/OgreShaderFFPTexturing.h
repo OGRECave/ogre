@@ -100,9 +100,9 @@ protected:
 		GpuConstantType			mVSInTextureCoordinateType;		// Vertex shader input texture coordinate type.
 		GpuConstantType			mVSOutTextureCoordinateType;	// Vertex shader output texture coordinates type.		
 		TexCoordCalcMethod		mTexCoordCalcMethod;			// Texture coordinates calculation method.
-		ParameterPtr			mTextureMatrix;					// Texture matrix parameter.
-		ParameterPtr  			mTextureViewProjImageMatrix;	// Texture View Projection Image space matrix parameter.
-		ParameterPtr			mTextureSampler;				// Texture sampler parameter.
+		UniformParameterPtr		mTextureMatrix;					// Texture matrix parameter.
+		UniformParameterPtr		mTextureViewProjImageMatrix;	// Texture View Projection Image space matrix parameter.
+		UniformParameterPtr		mTextureSampler;				// Texture sampler parameter.
 		ParameterPtr			mVSInputTexCoord;				// Vertex shader input texture coordinates parameter.
 		ParameterPtr			mVSOutputTexCoord;				// Vertex shader output texture coordinates parameter.
 		ParameterPtr			mPSInputTexCoord;				// Pixel shader input texture coordinates parameter.
@@ -203,9 +203,9 @@ protected:
 // Attributes.
 protected:
 	TextureUnitParamsList	mTextureUnitParamsList;		// Texture units list. 		
-	ParameterPtr			mWorldMatrix;				// World matrix parameter.
-	ParameterPtr			mWorldITMatrix;				// World inverse transpose matrix parameter.
-	ParameterPtr			mViewMatrix;				// View matrix parameter.			
+	UniformParameterPtr		mWorldMatrix;				// World matrix parameter.
+	UniformParameterPtr		mWorldITMatrix;				// World inverse transpose matrix parameter.
+	UniformParameterPtr		mViewMatrix;				// View matrix parameter.			
 	ParameterPtr			mVSInputNormal;				// Vertex shader input normal parameter.
 	ParameterPtr  			mVSInputPos;				// Vertex shader input position parameter.		
 	ParameterPtr			mPSOutDiffuse;				// Pixel shader output colour.

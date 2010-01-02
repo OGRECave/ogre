@@ -55,42 +55,37 @@ ProgramProcessor::~ProgramProcessor()
 void ProgramProcessor::bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pGpuProgram)
 {
 	GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
-	const ShaderParameterList& progParams = pCpuProgram->getParameters();
-	ShaderParameterConstIterator itParams;
+	const UniformParameterList& progParams = pCpuProgram->getParameters();
+	UniformParameterConstIterator itParams;
 
-	// Bind auto parameters.
 	for (itParams=progParams.begin(); itParams != progParams.end(); ++itParams)
 	{
-		const ParameterPtr pCurParam = *itParams;
+		const UniformParameterPtr pCurParam = *itParams;
 		const GpuConstantDefinition* gpuConstDef = pGpuParams->_findNamedConstantDefinition(pCurParam->getName());
-
-
-		if (pCurParam->isAutoConstantParameter())
+	
+		if (gpuConstDef != NULL)
 		{
-			if (pCurParam->isAutoConstantRealParameter())
+			// Handle auto parameters.
+			if (pCurParam->isAutoConstantParameter())
 			{
-				if (gpuConstDef != NULL)
-				{
+				if (pCurParam->isAutoConstantRealParameter())
+				{					
 					pGpuParams->setNamedAutoConstantReal(pCurParam->getName(), 
 						pCurParam->getAutoConstantType(), 
 						pCurParam->getAutoConstantRealData());
-				}					
-			}
-			else if (pCurParam->isAutoConstantIntParameter())
-			{
-				if (gpuConstDef != NULL)
-				{
+										
+				}
+				else if (pCurParam->isAutoConstantIntParameter())
+				{					
 					pGpuParams->setNamedAutoConstant(pCurParam->getName(), 
 						pCurParam->getAutoConstantType(), 
-						pCurParam->getAutoConstantIntData());
-				}				
-			}						
-		}
-		else
-		{
-			// No auto constant - we have to update its variability ourself.
-			if (gpuConstDef != NULL)
-			{
+						pCurParam->getAutoConstantIntData());									
+				}						
+			}
+
+			// Case this is not auto constant - we have to update its variability ourself.
+			else
+			{							
 				gpuConstDef->variability |= pCurParam->getVariability();
 
 				// Update variability in the float map.
@@ -108,9 +103,9 @@ void ProgramProcessor::bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pG
 							}
 						}
 					}
-				}							
-			}
-		}
+				}											
+			}		
+		}			
 	}
 }
 

@@ -79,16 +79,13 @@ void IntegratedPSSM3::updateGpuProgramsParams(Renderable* rend, Pass* pass,
 											 const AutoParamDataSource* source, 
 											 const LightList* pLightList)
 {
-	GpuProgramParametersSharedPtr vsGpuParams = pass->getVertexProgramParameters();
-	GpuProgramParametersSharedPtr psGpuParams = pass->getFragmentProgramParameters();
-	
 	ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
 	size_t shadowIndex = 0;
 
 	while(it != mShadowTextureParamsList.end())
 	{						
-		vsGpuParams->setNamedConstant(it->mWorldViewProjMatrix->getName(), source->getTextureWorldViewProjMatrix(shadowIndex));		
-		psGpuParams->setNamedConstant(it->mInvTextureSize->getName(), source->getInverseTextureSize(shadowIndex));
+		it->mWorldViewProjMatrix->setGpuParameter(source->getTextureWorldViewProjMatrix(shadowIndex));				
+		it->mInvTextureSize->setGpuParameter(source->getInverseTextureSize(shadowIndex));
 		
 		++it;
 		++shadowIndex;
@@ -101,7 +98,7 @@ void IntegratedPSSM3::updateGpuProgramsParams(Renderable* rend, Pass* pass,
 	vSplitPoints.z = 0.0;
 	vSplitPoints.w = 0.0;
 
-	psGpuParams->setNamedConstant(mPSSplitPoints->getName(), vSplitPoints);
+	mPSSplitPoints->setGpuParameter(vSplitPoints);
 
 }
 
@@ -230,7 +227,7 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
 		return false;
 
 	// Resolve computed local shadow colour parameter.
-	mPSSplitPoints = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "lShadowColour");
+	mPSSplitPoints = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "pssm_split_points");
 	if (mPSSplitPoints.get() == NULL)	
 		return false;
 

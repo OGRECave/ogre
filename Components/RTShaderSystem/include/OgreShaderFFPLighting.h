@@ -93,13 +93,13 @@ protected:
 	// Per light parameters.
 	struct _OgreRTSSExport LightParams
 	{
-		Light::LightTypes	mType;				// Light type.		
-		ParameterPtr		mPosition;			// Light position.
-		ParameterPtr		mDirection;			// Light direction.
-		ParameterPtr		mAttenuatParams;	// Attenuation parameters.
-		ParameterPtr		mSpotParams;		// Spot light parameters.
-		ParameterPtr		mDiffuseColour;		// Diffuse colour.
-		ParameterPtr		mSpecularColour;	// Specular colour.
+		Light::LightTypes		mType;				// Light type.		
+		UniformParameterPtr		mPosition;			// Light position.
+		UniformParameterPtr		mDirection;			// Light direction.
+		UniformParameterPtr		mAttenuatParams;	// Attenuation parameters.
+		UniformParameterPtr		mSpotParams;		// Spot light parameters.
+		UniformParameterPtr		mDiffuseColour;		// Diffuse colour.
+		UniformParameterPtr		mSpecularColour;	// Specular colour.
 
 	};
 
@@ -177,21 +177,21 @@ protected:
 	TrackVertexColourType	mTrackVertexColourType;			// Track per vertex colour type.
 	bool					mSpecularEnable;				// Specular component enabled/disabled.
 	LightParamsList			mLightParamsList;				// Light list.
-	ParameterPtr			mWorldViewMatrix;				// World view matrix parameter.
-	ParameterPtr			mWorldViewITMatrix;				// World view matrix inverse transpose parameter.
+	UniformParameterPtr		mWorldViewMatrix;				// World view matrix parameter.
+	UniformParameterPtr		mWorldViewITMatrix;				// World view matrix inverse transpose parameter.
 	ParameterPtr			mVSInPosition;					// Vertex shader input position parameter.
 	ParameterPtr			mVSInNormal;					// Vertex shader input normal.
 	ParameterPtr			mVSDiffuse;						// Vertex shader diffuse.
 	ParameterPtr			mVSOutDiffuse;					// Vertex shader output diffuse colour parameter.
 	ParameterPtr			mVSOutSpecular;					// Vertex shader output specular colour parameter.
-	ParameterPtr			mDerivedSceneColour;			// Derived scene colour parameter.
-	ParameterPtr			mLightAmbientColour;			// Ambient light colour parameter.
-	ParameterPtr			mDerivedAmbientLightColour;		// Derived ambient light colour parameter.
-	ParameterPtr			mSurfaceAmbientColour;			// Surface ambient colour parameter.
-	ParameterPtr			mSurfaceDiffuseColour;			// Surface diffuse colour parameter.
-	ParameterPtr			mSurfaceSpecularColour;			// Surface specular colour parameter.
-	ParameterPtr			mSurfaceEmissiveColour;			// Surface emissive colour parameter.
-	ParameterPtr			mSurfaceShininess;				// Surface shininess parameter.
+	UniformParameterPtr		mDerivedSceneColour;			// Derived scene colour parameter.
+	UniformParameterPtr		mLightAmbientColour;			// Ambient light colour parameter.
+	UniformParameterPtr		mDerivedAmbientLightColour;		// Derived ambient light colour parameter.
+	UniformParameterPtr		mSurfaceAmbientColour;			// Surface ambient colour parameter.
+	UniformParameterPtr		mSurfaceDiffuseColour;			// Surface diffuse colour parameter.
+	UniformParameterPtr		mSurfaceSpecularColour;			// Surface specular colour parameter.
+	UniformParameterPtr		mSurfaceEmissiveColour;			// Surface emissive colour parameter.
+	UniformParameterPtr		mSurfaceShininess;				// Surface shininess parameter.
 	static Light			msBlankLight;					// Shared blank light.
 
 };

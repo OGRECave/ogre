@@ -275,7 +275,7 @@ ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int i
 		}		
 	}
 		
-	param = ParameterPtr(OGRE_NEW Parameter(type, name, semantic, index, Parameter::SPC_UNKNOWN, (uint16)GPV_GLOBAL));
+	param = ParameterPtr(OGRE_NEW Parameter(type, name, semantic, index, Parameter::SPC_UNKNOWN));
 	addParameter(mLocalParameters, param);
 			
 	return param;
@@ -292,7 +292,7 @@ ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int i
 	if (param.get() != NULL)	
 		return param;
 
-	param = ParameterPtr(OGRE_NEW Parameter(type, "lLocalParam_" + StringConverter::toString(mLocalParameters.size()), semantic, index, content, (uint16)GPV_GLOBAL));
+	param = ParameterPtr(OGRE_NEW Parameter(type, "lLocalParam_" + StringConverter::toString(mLocalParameters.size()), semantic, index, content));
 	addParameter(mLocalParameters, param);
 
 	return param;

@@ -93,8 +93,6 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 	if (mLightParamsList.size() == 0)
 		return;
 
-	GpuProgramParametersSharedPtr vsGpuParams = pass->getVertexProgramParameters();
-	GpuProgramParametersSharedPtr psGpuParams = pass->getFragmentProgramParameters();
 	SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager();	
 	const Matrix4& matWorldInv	= source->getInverseWorldMatrix();	
 	Light::LightTypes curLightType = Light::LT_DIRECTIONAL; 
@@ -115,7 +113,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 
 	// Update inverse rotation parameter.
 	if (mWorldInvRotMatrix.get() != NULL)	
-		vsGpuParams->setNamedConstant(mWorldInvRotMatrix->getName(), matWorldInvRotation);	
+		mWorldInvRotMatrix->setGpuParameter(matWorldInvRotation);	
 		
 	// Update per light parameters.
 	for (unsigned int i=0; i < mLightParamsList.size(); ++i)
@@ -164,7 +162,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 				vParameter.y = -vec3.y;
 				vParameter.z = -vec3.z;
 				vParameter.w = 0.0;
-				vsGpuParams->setNamedConstant(curParams.mDirection->getName(), vParameter);
+				curParams.mDirection->setGpuParameter(vParameter);
 			}
 			break;
 
@@ -172,14 +170,14 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 
 			// Update light position. (World space).				
 			vParameter = srcLight->getAs4DVector(true);
-			vsGpuParams->setNamedConstant(curParams.mPosition->getName(), vParameter);
+			curParams.mPosition->setGpuParameter(vParameter);
 
 			// Update light attenuation parameters.
 			vParameter.x = srcLight->getAttenuationRange();
 			vParameter.y = srcLight->getAttenuationConstant();
 			vParameter.z = srcLight->getAttenuationLinear();
 			vParameter.w = srcLight->getAttenuationQuadric();
-			psGpuParams->setNamedConstant(curParams.mAttenuatParams->getName(), vParameter);
+			curParams.mAttenuatParams->setGpuParameter(vParameter);
 			break;
 
 		case Light::LT_SPOTLIGHT:
@@ -188,7 +186,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 											
 				// Update light position. (World space).				
 				vParameter = srcLight->getAs4DVector(true);
-				vsGpuParams->setNamedConstant(curParams.mPosition->getName(), vParameter);
+				curParams.mPosition->setGpuParameter(vParameter);
 
 							
 				// Update light direction. (Object space).
@@ -199,14 +197,14 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 				vParameter.y = -vec3.y;
 				vParameter.z = -vec3.z;
 				vParameter.w = 0.0;
-				vsGpuParams->setNamedConstant(curParams.mDirection->getName(), vParameter);							
+				curParams.mDirection->setGpuParameter(vParameter);							
 				
 				// Update light attenuation parameters.
 				vParameter.x = srcLight->getAttenuationRange();
 				vParameter.y = srcLight->getAttenuationConstant();
 				vParameter.z = srcLight->getAttenuationLinear();
 				vParameter.w = srcLight->getAttenuationQuadric();
-				psGpuParams->setNamedConstant(curParams.mAttenuatParams->getName(), vParameter);
+				curParams.mAttenuatParams->setGpuParameter(vParameter);
 
 				// Update spotlight parameters.
 				Real phi   = Math::Cos(srcLight->getSpotlightOuterAngle().valueRadians() * 0.5f);
@@ -216,7 +214,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 				vec3.y = phi;
 				vec3.z = srcLight->getSpotlightFalloff();
 
-				psGpuParams->setNamedConstant(curParams.mSpotParams->getName(), vec3);
+				curParams.mSpotParams->setGpuParameter(vec3);
 			}
 			break;
 		}
@@ -226,12 +224,12 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 		if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
 		{
 			colour = srcLight->getDiffuseColour() * pass->getDiffuse();
-			psGpuParams->setNamedConstant(curParams.mDiffuseColour->getName(), colour);					
+			curParams.mDiffuseColour->setGpuParameter(colour);					
 		}
 		else
 		{					
 			colour = srcLight->getDiffuseColour();
-			psGpuParams->setNamedConstant(curParams.mDiffuseColour->getName(), colour);	
+			curParams.mDiffuseColour->setGpuParameter(colour);	
 		}
 
 		// Update specular colour if need to.
@@ -241,12 +239,12 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
 			{
 				colour = srcLight->getSpecularColour() * pass->getSpecular();
-				psGpuParams->setNamedConstant(curParams.mSpecularColour->getName(), colour);					
+				curParams.mSpecularColour->setGpuParameter(colour);					
 			}
 			else
 			{					
 				colour = srcLight->getSpecularColour();
-				psGpuParams->setNamedConstant(curParams.mSpecularColour->getName(), colour);	
+				curParams.mSpecularColour->setGpuParameter(colour);	
 			}
 		}																			
 	}

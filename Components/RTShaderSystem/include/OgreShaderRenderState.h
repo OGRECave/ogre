@@ -154,12 +154,6 @@ public:
 	*/
 	void		link				(const RenderState& other, Pass* srcPass, Pass* dstPass);
 
-	/** Called after GPU programs have been acquired and binded to the given pass.
-	In this method GPU parameters indices cab be grabbed for optimized access and updates.
-	@param pass The pass that uses the generated GPU programs.
-	*/
-	void			notifyGpuProgramsAcquired (Pass* pass);
-
 	/** Update the GPU programs constant parameters before a renderable is rendered.
 	@param rend The renderable object that is going to be rendered.
 	@param pass The pass that is used to do the rendering operation.

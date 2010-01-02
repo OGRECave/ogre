@@ -90,8 +90,8 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	const ShaderFunctionList& functionList = program->getFunctions();
 	ShaderFunctionConstIterator itFunction;
 
-	const ShaderParameterList& parameterList = program->getParameters();
-	ShaderParameterConstIterator itParam = parameterList.begin();
+	const UniformParameterList& parameterList = program->getParameters();
+	UniformParameterConstIterator itUniformParam = parameterList.begin();
 
 	// Generate source code header.
 	writeProgramTitle(os, program);
@@ -105,9 +105,9 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	writeUniformParametersTitle(os, program);
 	os << std::endl;
 
-	for (itParam=parameterList.begin();  itParam != parameterList.end(); ++itParam)
+	for (itUniformParam=parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
 	{
-		writeUniformParameter(os, *itParam);			
+		writeUniformParameter(os, *itUniformParam);			
 		os << ";" << std::endl;				
 	}
 	os << std::endl;
@@ -126,6 +126,7 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 
 		// Write local parameters.
 		const ShaderParameterList& localParams = curFunction->getLocalParameters();
+		ShaderParameterConstIterator itParam; 
 
 		for (itParam=localParams.begin();  itParam != localParams.end(); ++itParam)
 		{
@@ -181,7 +182,7 @@ void CGProgramWriter::writeProgramDependencies(std::ostream& os, Program* progra
 }
 
 //-----------------------------------------------------------------------
-void CGProgramWriter::writeUniformParameter(std::ostream& os, ParameterPtr parameter)
+void CGProgramWriter::writeUniformParameter(std::ostream& os, UniformParameterPtr parameter)
 {
 	os << mGpuConstTypeMap[parameter->getType()];
 	os << "\t";	

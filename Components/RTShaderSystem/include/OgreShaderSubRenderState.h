@@ -99,12 +99,6 @@ public:
 	*/
 	virtual bool			createCpuSubPrograms	(ProgramSet* programSet);
 
-	/** Called after GPU programs have been acquired and binded to the given pass.
-	In this method GPU parameters indices cab be grabbed for optimized access and updates.
-	@param pass The pass that uses the generated GPU programs.
-	*/
-	virtual void			notifyGpuProgramsAcquired (Pass* pass) {}
-
 	/** Update GPU programs parameters before a rendering operation occurs.
 	This method is called in the context of SceneManager::renderSingle object via the RenderObjectListener interface and
 	lets this sub render state instance opportunity to update custom GPU program parameters before the rendering action occurs.

@@ -143,9 +143,9 @@ protected:
 	Vector4				mFogParamsValue;		// Fog parameters (density, start, end, 1/end-start).
 	bool				mPassOverrideParams;	// True if the fog parameters should be taken from the pass.
 
-	ParameterPtr		mWorldViewProjMatrix;	// World view projection parameter.		
-	ParameterPtr		mFogColour;				// Fog colour parameter.	
-	ParameterPtr		mFogParams;				// Fog parameters program parameter.	
+	UniformParameterPtr	mWorldViewProjMatrix;	// World view projection parameter.		
+	UniformParameterPtr	mFogColour;				// Fog colour parameter.	
+	UniformParameterPtr	mFogParams;				// Fog parameters program parameter.	
 	ParameterPtr		mVSInPos;				// Vertex shader input position parameter.
 	ParameterPtr		mVSOutFogFactor;		// Vertex shader output fog colour parameter.
 	ParameterPtr		mPSInFogFactor;			// Pixel shader input fog factor.
