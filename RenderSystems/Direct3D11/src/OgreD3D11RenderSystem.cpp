@@ -3077,7 +3077,10 @@ namespace Ogre
 
 			if (ClearFlags)
 			{
-				mDevice.GetImmediateContext()->ClearDepthStencilView( pRTDepthView, ClearFlags, depth, static_cast<UINT8>(stencil)  );
+				if (pRTDepthView != NULL)
+				{
+					mDevice.GetImmediateContext()->ClearDepthStencilView( pRTDepthView, ClearFlags, depth, static_cast<UINT8>(stencil)  );
+				}
 			}
 
 		}

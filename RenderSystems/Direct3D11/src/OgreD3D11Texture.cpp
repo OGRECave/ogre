@@ -779,6 +779,7 @@ namespace Ogre
 		case D3D11_SRV_DIMENSION_TEXTURE1DARRAY:
 			RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1DARRAY;
 				break;
+		case D3D11_SRV_DIMENSION_TEXTURECUBE:
 		case D3D11_SRV_DIMENSION_TEXTURE2D:
 			RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 				break;
@@ -831,19 +832,25 @@ namespace Ogre
 				"D3D11RenderTexture::rebind");
 		}
 
-		// Create the depth stencil view
-		D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-		descDSV.Format = DXGI_FORMAT_D32_FLOAT;
-		descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		descDSV.Texture2D.MipSlice = 0;
-		hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &mDepthStencilView );
-		SAFE_RELEASE( pDepthStencil );
-		if( FAILED(hr) )
+		mDepthStencilView = NULL;
+
+		if(buffer->getParentTexture()->getTextureType() != TEX_TYPE_CUBE_MAP)
 		{
-			String errorDescription = mDevice.getErrorDescription();
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Unable to create depth stencil view\nError Description:" + errorDescription,
-				"D3D11RenderTexture::rebind");
+			// Create the depth stencil view
+			D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+			ZeroMemory(&descDSV, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
+			descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+			descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+			descDSV.Texture2D.MipSlice = 0;
+			hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &mDepthStencilView );
+			SAFE_RELEASE( pDepthStencil );
+			if( FAILED(hr) )
+			{
+				String errorDescription = mDevice.getErrorDescription();
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					"Unable to create depth stencil view\nError Description:" + errorDescription,
+					"D3D11RenderTexture::rebind");
+			}
 		}
 
 	}
