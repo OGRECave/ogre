@@ -134,11 +134,6 @@ protected:
 	{
 		mTrayMgr->showCursor();
 
-#ifdef USE_RTSHADER_SYSTEM
-		// we don't need this right now (maybe in future!)
-		mTrayMgr->removeWidgetFromTray(mRTShaderSystemPanel);
-		mRTShaderSystemPanel->hide();
-#endif
 		// make room for the controls
 		mTrayMgr->showLogo(TL_TOPRIGHT);
 		mTrayMgr->showFrameStats(TL_TOPRIGHT);

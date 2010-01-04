@@ -328,7 +328,7 @@ void Sample_ShaderSystem::setupContent()
 	mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
 	// Mark system as on.
-	mRTShaderSystemPanel->setParamValue(0, "On");
+	mDetailsPanel->setParamValue(11, "On");
 
 	
 	// a friendly reminder
