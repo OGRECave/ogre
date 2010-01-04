@@ -1995,6 +1995,21 @@ namespace Ogre{
 								prop->values.front()->getValue() + " is not a valid integer");
 					}
 					break;
+				case ID_LIGHT_MASK:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+					}
+					else
+					{
+						uint32 val = 0;
+						if(getUInt(prop->values.front(), &val))
+							mPass->setLightMask(static_cast<unsigned short>(val));
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+								prop->values.front()->getValue() + " is not a valid integer");
+					}
+					break;
 				case ID_ITERATION:
 					if(prop->values.empty())
 					{

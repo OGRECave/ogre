@@ -195,7 +195,8 @@ namespace Ogre {
 		, mContentTypeLookupBuilt(false)
 		, mLightScissoring(false)
 		, mLightClipPlanes(false)
-		, mIlluminationStage(IS_UNKNOWN)		
+		, mIlluminationStage(IS_UNKNOWN)
+		, mLightMask(0xFFFFFFFF)
     {
 		mPointAttenuationCoeffs[0] = 1.0f;
 		mPointAttenuationCoeffs[1] = mPointAttenuationCoeffs[2] = 0.0f;
@@ -299,6 +300,7 @@ namespace Ogre {
 		mLightScissoring = oth.mLightScissoring;
 		mLightClipPlanes = oth.mLightClipPlanes;
 		mIlluminationStage = oth.mIlluminationStage;
+		mLightMask = oth.mLightMask;
 
 		OGRE_DELETE mVertexProgramUsage;
 		if (oth.mVertexProgramUsage)
@@ -1008,6 +1010,16 @@ namespace Ogre {
 	unsigned short Pass::getStartLight(void) const
 	{
 		return mStartLight;
+	}
+	//-----------------------------------------------------------------------
+	void Pass::setLightMask(uint32 mask)
+	{
+		mLightMask = mask;
+	}
+	//-----------------------------------------------------------------------
+	uint32 Pass::getLightMask() const
+	{
+		return mLightMask;
 	}
 	//-----------------------------------------------------------------------
 	void Pass::setLightCountPerIteration(unsigned short c)
