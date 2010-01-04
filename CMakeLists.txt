@@ -18,51 +18,6 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 cmake_policy(SET CMP0003 NEW)
 
-# Set up iPhone overrides.
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  # Force gcc <= 4.2 on iPhone
-  include(CMakeForceCompiler)
-  CMAKE_FORCE_C_COMPILER(gcc-4.2 GNU)
-  CMAKE_FORCE_CXX_COMPILER(gcc-4.2 GNU)
-
-  include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iPhone")
-
-  # Set build variables
-  set(CMAKE_OSX_SYSROOT iphoneos3.0)
-  set(CMAKE_OSX_DEPLOYMENT_TARGET "")
-  set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_UNIVERSAL_IPHONE_OS)")
-  set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit ${OGRE_SOURCE_DIR}/iPhoneDependencies/lib/release/libboost_date_time.a ${OGRE_SOURCE_DIR}/iPhoneDependencies/lib/release/libboost_thread.a")
-  set(XCODE_ATTRIBUTE_SDKROOT iphoneos3.0)
-  set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES RenderSystem for iPhone" FORCE)
-  set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iPhone" FORCE)
-  set(OGRE_SET_USE_BOOST TRUE CACHE BOOL "Forcing use of Boost libraries for iPhone" FORCE)
-  set(OGRE_USE_BOOST TRUE CACHE BOOL "Forcing use of Boost libraries for iPhone" FORCE)
-  set(Boost_FOUND TRUE CACHE BOOL "Forcing use of Boost libraries for iPhone" FORCE)
-  set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
-  set(OGRE_CONFIG_DISABLE_VIEWPORT_ORIENTATIONMODE FALSE CACHE BOOL "Forcing viewport orientation support for iPhone" FORCE)
-
-  add_definitions(-fno-regmove)
-  remove_definitions(-msse)
-elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
-  # Force gcc <= 4.0 on Mac OS X because 4.2 is not supported prior to Mac OS X 10.5
-  include(CMakeForceCompiler)
-  CMAKE_FORCE_C_COMPILER(gcc-4.0 GNU)
-  CMAKE_FORCE_CXX_COMPILER(gcc-4.0 GNU)
-
-  # Set 10.4 as the base SDK by default
-  set(XCODE_ATTRIBUTE_SDKROOT macosx10.4)
-
-  # 10.6 sets x86_64 as the default architecture.
-  # Because Carbon isn't supported on 64-bit and we still need it, force the architectures to ppc and i386
-  if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "10.6")
-	  set(CMAKE_OSX_ARCHITECTURES "ppc i386")
-  endif()
-
-  # Make sure that the OpenGL render system is selected for non-iPhone Apple builds
-  set(OGRE_BUILD_RENDERSYSTEM_GL TRUE)
-  set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
-endif ()
-
 project(OGRE)
 
 # Include necessary submodules
@@ -103,7 +58,7 @@ endif ()
 # Set compiler specific build flags
 if (CMAKE_COMPILER_IS_GNUCXX)
   check_cxx_compiler_flag(-msse OGRE_GCC_HAS_SSE)
-  if (OGRE_GCC_HAS_SSE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+  if (OGRE_GCC_HAS_SSE)
     add_definitions(-msse)
   endif ()
 endif ()
@@ -174,6 +129,51 @@ if (WIN32 OR APPLE)
     )
   endif (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif(WIN32 OR APPLE)
+
+# Set up iPhone overrides.
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  # Force gcc <= 4.2 on iPhone
+  include(CMakeForceCompiler)
+  CMAKE_FORCE_C_COMPILER(gcc-4.2 GNU)
+  CMAKE_FORCE_CXX_COMPILER(gcc-4.2 GNU)
+
+  include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iPhone")
+
+  # Set build variables
+  set(CMAKE_OSX_SYSROOT iphoneos3.0)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "")
+  set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_UNIVERSAL_IPHONE_OS)")
+  set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit ${OGRE_SOURCE_DIR}/iPhoneDependencies/lib/release/libboost_date_time.a ${OGRE_SOURCE_DIR}/iPhoneDependencies/lib/release/libboost_thread.a")
+  set(XCODE_ATTRIBUTE_SDKROOT iphoneos3.0)
+  set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES RenderSystem for iPhone" FORCE)
+  set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iPhone" FORCE)
+  set(OGRE_SET_USE_BOOST TRUE CACHE BOOL "Forcing use of Boost libraries for iPhone" FORCE)
+  set(OGRE_USE_BOOST TRUE CACHE BOOL "Forcing use of Boost libraries for iPhone" FORCE)
+  set(Boost_FOUND TRUE CACHE BOOL "Forcing use of Boost libraries for iPhone" FORCE)
+  set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
+  set(OGRE_CONFIG_DISABLE_VIEWPORT_ORIENTATIONMODE FALSE CACHE BOOL "Forcing viewport orientation support for iPhone" FORCE)
+
+  add_definitions(-fno-regmove)
+  remove_definitions(-msse)
+elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+  # Force gcc <= 4.0 on Mac OS X because 4.2 is not supported prior to Mac OS X 10.5
+  include(CMakeForceCompiler)
+  CMAKE_FORCE_C_COMPILER(gcc-4.0 GNU)
+  CMAKE_FORCE_CXX_COMPILER(gcc-4.0 GNU)
+
+  # Set 10.4 as the base SDK by default
+  set(XCODE_ATTRIBUTE_SDKROOT macosx10.4)
+
+  # 10.6 sets x86_64 as the default architecture.
+  # Because Carbon isn't supported on 64-bit and we still need it, force the architectures to ppc and i386
+  if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "10.6")
+	  set(CMAKE_OSX_ARCHITECTURES "ppc i386")
+  endif()
+
+  # Make sure that the OpenGL render system is selected for non-iPhone Apple builds
+  set(OGRE_BUILD_RENDERSYSTEM_GL TRUE)
+  set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
+endif ()
 
 # Enable the PVRTC codec if OpenGL ES is being built
 if(OGRE_BUILD_RENDERSYSTEM_GLES)
@@ -302,3 +302,4 @@ include(Packaging)
 
 # Show feature summary
 include(FeatureSummary)
+
