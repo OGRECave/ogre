@@ -3330,11 +3330,12 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 							//	copyStart, copyEnd);
 
 							// Copy lights over
-							for(LightList::const_iterator iter = rendLightList.begin(); iter != rendLightList.end() && lightsCopied < lightsToCopy; ++iter, lightsCopied++)
+							for(LightList::const_iterator iter = copyStart; iter != rendLightList.end() && lightsCopied < lightsToCopy; ++iter)
 							{
 								if((pass->getLightMask() & (*iter)->getLightMask()) != 0)
 								{
 									localLightList.push_back(*iter);
+									lightsCopied++;
 								}
 							}
 
