@@ -65,7 +65,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     D3D9GpuProgram::D3D9GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader) 
-        : GpuProgram(creator, name, handle, group, isManual, loader), mpExternalMicrocode(NULL), mColumnMajorMatrices(true)
+        : GpuProgram(creator, name, handle, group, isManual, loader), mpExternalMicrocode(NULL), mColumnMajorMatrices(false)
     {			
         if (createParamDictionary("D3D9GpuProgram"))
         {
