@@ -2361,17 +2361,32 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::addLayer(Real worldSize, const StringVector* textureNames)
 	{
+		addLayer(getLayerCount(), worldSize, textureNames);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::addLayer(uint index, Real worldSize, const StringVector* textureNames)
+	{
 		if (!worldSize)
 			worldSize = TerrainGlobalOptions::getDefaultLayerTextureWorldSize();
 
-		mLayers.push_back(LayerInstance());
+		if (index >= getLayerCount())
+		{
+			mLayers.push_back(LayerInstance());
+			index = getLayerCount() - 1;
+		}
+		else
+		{
+			LayerInstanceList::iterator i = mLayers.begin();
+			std::advance(i, index);
+			mLayers.insert(i, LayerInstance());
+		}
 		if (textureNames)
 		{
-			LayerInstance& inst = mLayers[mLayers.size()-1];
+			LayerInstance& inst = mLayers[index];
 			inst.textureNames = *textureNames;
 		}
 		// use utility method to update UV scaling
-		setLayerWorldSize(mLayers.size()-1, worldSize);
+		setLayerWorldSize(index, worldSize);
 		checkLayers(true);
 		mMaterialDirty = true;
 		mMaterialParamsDirty = true;
