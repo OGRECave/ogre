@@ -349,7 +349,7 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 
 
 //-----------------------------------------------------------------------------
-void ProgramManager::bindUniformParameters(Program* pCpuProgram, GpuProgramParametersSharedPtr& passParams)
+void ProgramManager::bindUniformParameters(Program* pCpuProgram, const GpuProgramParametersSharedPtr& passParams)
 {
 	const UniformParameterList& progParams = pCpuProgram->getParameters();
 	UniformParameterConstIterator itParams = progParams.begin();

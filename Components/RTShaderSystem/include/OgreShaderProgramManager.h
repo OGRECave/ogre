@@ -205,7 +205,7 @@ protected:
 	void			synchronizePixelnToBeVertexOut	(ProgramSet* programSet);
 
 	/** Bind the uniform parameters of a given CPU and GPU program set. */
-	void			bindUniformParameters			(Program* pCpuProgram, GpuProgramParametersSharedPtr& passParams);
+	void			bindUniformParameters			(Program* pCpuProgram, const GpuProgramParametersSharedPtr& passParams);
 
 
 protected:
