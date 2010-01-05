@@ -519,7 +519,7 @@ namespace OgreBites
 			}
 			else if (evt.key == OIS::KC_RETURN)   // start or stop sample
 			{
-				if (!mLoadedSamples.empty())
+				if (!mLoadedSamples.empty() && (mSamplePaused || mCurrentSample == 0))
 				{
 					Sample* newSample = Ogre::any_cast<Sample*>(mThumbs[mSampleMenu->getSelectionIndex()]->getUserAny());
 					runSample(newSample == mCurrentSample ? 0 : newSample);

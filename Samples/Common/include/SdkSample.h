@@ -60,9 +60,6 @@ namespace OgreBites
 			mViewport = 0;
 			mDetailsPanel = 0;
 			mCursorWasVisible = false;
-#ifdef  USE_RTSHADER_SYSTEM
-			mRTShaderSystemPanel = 0;
-#endif
 		}
 
 		virtual ~SdkSample() {}
@@ -117,15 +114,12 @@ namespace OgreBites
 					mDetailsPanel->setParamValue(5, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().x));
 					mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().y));
 					mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));
-				}
 
 #ifdef USE_RTSHADER_SYSTEM
-				if (mRTShaderSystemPanel->isVisible())
-				{
-					mRTShaderSystemPanel->setParamValue(3, Ogre::StringConverter::toString(mShaderGenerator->getVertexShaderCount()));
-					mRTShaderSystemPanel->setParamValue(4, Ogre::StringConverter::toString(mShaderGenerator->getFragmentShaderCount()));
-				}				
+					mDetailsPanel->setParamValue(14, Ogre::StringConverter::toString(mShaderGenerator->getVertexShaderCount()));
+					mDetailsPanel->setParamValue(15, Ogre::StringConverter::toString(mShaderGenerator->getFragmentShaderCount()));		
 #endif
+				}	
 			}
 
 			return true;
@@ -236,14 +230,14 @@ namespace OgreBites
 				const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
 
 				if (curMaterialScheme == Ogre::MaterialManager::DEFAULT_SCHEME_NAME)
-				{
+				{							
 					mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-					mRTShaderSystemPanel->setParamValue(0, "On");
+					mDetailsPanel->setParamValue(11, "On");
 				}
 				else if (curMaterialScheme == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
 				{
 					mainVP->setMaterialScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
-					mRTShaderSystemPanel->setParamValue(0, "Off");
+					mDetailsPanel->setParamValue(11, "Off");
 				}														
 			}			
 
@@ -253,7 +247,7 @@ namespace OgreBites
 			else if (evt.key == OIS::KC_F3)
 			{
 				static bool usePerPixelLighting = true;					
-								
+												
 				// Grab the scheme render state.												
 				Ogre::RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
@@ -264,15 +258,15 @@ namespace OgreBites
 				{
 					Ogre::RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
 					
-					schemRenderState->addSubRenderState(perPixelLightModel);					
+					schemRenderState->addTemplateSubRenderState(perPixelLightModel);					
 				}
 
 				// Search the per pixel sub render state and remove it.
 				else
 				{
-					const Ogre::RTShader::SubRenderStateList& subRenderStateList = schemRenderState->getSubStateList();
-					Ogre::RTShader::SubRenderStateConstIterator it = subRenderStateList.begin();
-					Ogre::RTShader::SubRenderStateConstIterator itEnd = subRenderStateList.end();
+					const Ogre::RTShader::SubRenderStateList& subRenderStateList = schemRenderState->getTemplateSubRenderStateList();
+					Ogre::RTShader::SubRenderStateListConstIterator it = subRenderStateList.begin();
+					Ogre::RTShader::SubRenderStateListConstIterator itEnd = subRenderStateList.end();
 						
 					for (; it != itEnd; ++it)
 					{
@@ -281,7 +275,7 @@ namespace OgreBites
 						// This is the per pixel sub render state -> remove it.
 						if (curSubRenderState->getType() == Ogre::RTShader::PerPixelLighting::Type)
 						{
-							schemRenderState->removeSubRenderState(*it);
+							schemRenderState->removeTemplateSubRenderState(*it);
 							break;
 						}
 					}
@@ -293,9 +287,9 @@ namespace OgreBites
 
 				// Update UI.
 				if (usePerPixelLighting)
-					mRTShaderSystemPanel->setParamValue(1, "Per pixel");
+					mDetailsPanel->setParamValue(12, "Pixel");
 				else
-					mRTShaderSystemPanel->setParamValue(1, "Per vertex");
+					mDetailsPanel->setParamValue(12, "Vertex");
 				usePerPixelLighting = !usePerPixelLighting;				
 			}	
 #endif
@@ -307,38 +301,23 @@ namespace OgreBites
 				{
 				case Ogre::RTShader::VSOCP_LOW:
 					mShaderGenerator->setVertexShaderOutputsCompactPolicy(Ogre::RTShader::VSOCP_MEDIUM);
-					mRTShaderSystemPanel->setParamValue(2, "Medium");
+					mDetailsPanel->setParamValue(13, "Medium");
 					break;
 
 				case Ogre::RTShader::VSOCP_MEDIUM:
 					mShaderGenerator->setVertexShaderOutputsCompactPolicy(Ogre::RTShader::VSOCP_HIGH);
-					mRTShaderSystemPanel->setParamValue(2, "High");
+					mDetailsPanel->setParamValue(13, "High");
 					break;
 
 				case Ogre::RTShader::VSOCP_HIGH:
 					mShaderGenerator->setVertexShaderOutputsCompactPolicy(Ogre::RTShader::VSOCP_LOW);
-					mRTShaderSystemPanel->setParamValue(2, "Low");
+					mDetailsPanel->setParamValue(13, "Low");
 					break;
 				}
 				
 				// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
 				mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 			}	
-
-			// Toggle panel visibility.
-			if (evt.key == OIS::KC_F)
-			{
-				if (mRTShaderSystemPanel->getTrayLocation() == TL_NONE)
-				{
-					mTrayMgr->moveWidgetToTray(mRTShaderSystemPanel, TL_TOP, 0);
-					mRTShaderSystemPanel->show();
-				}
-				else
-				{
-					mTrayMgr->removeWidgetFromTray(mRTShaderSystemPanel);
-					mRTShaderSystemPanel->hide();
-				}
-			}
 #endif
 
 			mCameraMan->injectKeyDown(evt);
@@ -439,23 +418,7 @@ namespace OgreBites
 				OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND, 
 					"Shader Generator Initialization failed - Core shader libs path not found", 
 					"SdkSample::_setup");
-			}
-			
-			Ogre::StringVector rtShaderItems;
-
-			rtShaderItems.clear();
-			rtShaderItems.push_back("RT Shader System");
-			rtShaderItems.push_back("Lighting Model");
-			rtShaderItems.push_back("Compaction Policy");
-			rtShaderItems.push_back("Generated VS");
-			rtShaderItems.push_back("Generated FS");
-
-			mRTShaderSystemPanel = mTrayMgr->createParamsPanel(TL_TOP, "RTShaderSystemPanel", 200, rtShaderItems);
-			mRTShaderSystemPanel->setParamValue(0, "Off");
-			mRTShaderSystemPanel->setParamValue(1, "Per vertex");
-			mRTShaderSystemPanel->setParamValue(2, "Low");
-			mRTShaderSystemPanel->setParamValue(3, "0");
-			mRTShaderSystemPanel->setParamValue(4, "0");															
+			}														
 #endif
 			
 			loadResources();
@@ -480,10 +443,27 @@ namespace OgreBites
 			items.push_back("Filtering");
 			items.push_back("Poly Mode");
 
+#ifdef USE_RTSHADER_SYSTEM
+			items.push_back("RT Shaders");
+			items.push_back("Lighting Model");
+			items.push_back("Compact Policy");
+			items.push_back("Generated VS");
+			items.push_back("Generated FS");														
+#endif
+
 			mDetailsPanel = mTrayMgr->createParamsPanel(TL_NONE, "DetailsPanel", 200, items);
+			mDetailsPanel->hide();
+
 			mDetailsPanel->setParamValue(9, "Bilinear");
 			mDetailsPanel->setParamValue(10, "Solid");
-			mDetailsPanel->hide();
+
+#ifdef USE_RTSHADER_SYSTEM
+			mDetailsPanel->setParamValue(11, "Off");
+			mDetailsPanel->setParamValue(12, "Vertex");
+			mDetailsPanel->setParamValue(13, "Low");
+			mDetailsPanel->setParamValue(14, "0");
+			mDetailsPanel->setParamValue(15, "0");															
+#endif
 
 			setupContent();
 			mContentSetup = true;
@@ -521,9 +501,6 @@ namespace OgreBites
 		SdkTrayManager* mTrayMgr;     		// tray interface manager
 		SdkCameraMan* mCameraMan;     		// basic camera controller
 		ParamsPanel* mDetailsPanel;   		// sample details panel
-#ifdef  USE_RTSHADER_SYSTEM
-		ParamsPanel* mRTShaderSystemPanel;	// RT Shader System info panel.
-#endif
 		bool mCursorWasVisible;				// was cursor visible before dialog appeared
     };
 }
