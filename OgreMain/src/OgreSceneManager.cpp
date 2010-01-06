@@ -3240,9 +3240,8 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 						Light* currLight = rendLightList[lightIndex];
 
 						// Check whether we need to filter this one out
-						if ((pass->getRunOnlyForOneLightType() && 
-							pass->getOnlyLightType() != currLight->getType()) ||
-							(pass->getLightMask() & currLight->getLightMask()) == 0)
+						if (pass->getRunOnlyForOneLightType() && 
+							pass->getOnlyLightType() != currLight->getType())
 						{
 							// Skip
 							// Also skip shadow texture(s)
@@ -3305,8 +3304,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 				else // !iterate per light
 				{
 					// Use complete light list potentially adjusted by start light
-					if (pass->getStartLight() || pass->getMaxSimultaneousLights() != OGRE_MAX_SIMULTANEOUS_LIGHTS || 
-						pass->getLightMask() != 0xFFFFFFFF)
+					if (pass->getStartLight() || pass->getMaxSimultaneousLights() != OGRE_MAX_SIMULTANEOUS_LIGHTS)
 					{
 						// out of lights?
 						// skip manual 2nd lighting passes onwards if we run out of lights, but never the first one
@@ -3321,24 +3319,14 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 							localLightList.clear();
 							LightList::const_iterator copyStart = rendLightList.begin();
 							std::advance(copyStart, pass->getStartLight());
+							LightList::const_iterator copyEnd = copyStart;
 							// Clamp lights to copy to avoid overrunning the end of the list
-							size_t lightsCopied = 0, lightsToCopy = std::min(
+							size_t lightsToCopy = std::min(
 								static_cast<size_t>(pass->getMaxSimultaneousLights()), 
 								rendLightList.size() - pass->getStartLight());
-
-							//localLightList.insert(localLightList.begin(), 
-							//	copyStart, copyEnd);
-
-							// Copy lights over
-							for(LightList::const_iterator iter = copyStart; iter != rendLightList.end() && lightsCopied < lightsToCopy; ++iter)
-							{
-								if((pass->getLightMask() & (*iter)->getLightMask()) != 0)
-								{
-									localLightList.push_back(*iter);
-									lightsCopied++;
-								}
-							}
-
+							std::advance(copyEnd, lightsToCopy);
+							localLightList.insert(localLightList.begin(), 
+								copyStart, copyEnd);
 							pLightListToUse = &localLightList;
 						}
 					}
@@ -4943,7 +4931,6 @@ const Pass* SceneManager::deriveShadowReceiverPass(const Pass* pass)
 			retPass->setShininess(pass->getShininess());
 			retPass->setIteratePerLight(pass->getIteratePerLight(), 
 				pass->getRunOnlyForOneLightType(), pass->getOnlyLightType());
-			retPass->setLightMask(pass->getLightMask());
 
             // We need to keep alpha rejection settings
             retPass->setAlphaRejectSettings(pass->getAlphaRejectFunction(),
