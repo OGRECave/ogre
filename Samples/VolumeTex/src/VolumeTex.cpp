@@ -45,6 +45,7 @@ AnimationState* mOgreAnimState = 0;
 class _OgreSampleClassExport Sample_VolumeTex : public SdkSample
 {
 public:
+
     Sample_VolumeTex()
 	{
 		mInfo["Title"] = "Volume Textures";
@@ -53,8 +54,17 @@ public:
 		mInfo["Category"] = "Unsorted";
 	}
 
+	void testCapabilities(const RenderSystemCapabilities* caps)
+	{       
+		if (!caps->hasCapability(RSC_TEXTURE_3D))
+        {
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support 3D textures, so cannot "
+                "run this demo. Sorry!", "Sample_VolumeTex::testCapabilities");
+        }
+	}
 
 protected:
+
 	float global_real, global_imag, global_theta;
 
     void setupView(void)
@@ -65,20 +75,10 @@ protected:
         mCamera->setPosition(Vector3(220,-2,176));
         mCamera->lookAt(Vector3(0,0,0));
         mCamera->setNearClipDistance(5);
-		mCamera->setFixedYawAxis(false);
 	}
 
     void setupContent(void)
     {
-		// Check capabilities
-		const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
-        if (!caps->hasCapability(RSC_TEXTURE_3D))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support 3D textures, so cannot "
-                "run this demo. Sorry!", 
-                "VolTex::createScene");
-        }
-		
         // Create dynamic texture
 		ptex = TextureManager::getSingleton().createManual(
 			"DynaTex","General", TEX_TYPE_3D, 64, 64, 64, 0, PF_A8R8G8B8);
@@ -95,9 +95,6 @@ protected:
 		l->setSpecularColour(0.9, 0.9, 1);
         l->setPosition(-100,80,50);
 		mSceneMgr->getRootSceneNode()->attachObject(l);
-
-		// Create manual material
-		
 		
 		// Create volume renderable
 		snode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0));      
@@ -161,7 +158,7 @@ protected:
 
 	void cleanupContent(void)
 	{
-		ptex.setNull();
+		TextureManager::getSingleton().remove("DynaTex");
 		delete vrend;
 		delete trend;
 	}
