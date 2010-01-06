@@ -252,8 +252,8 @@ namespace OgreBites
 			// Finalize the RT Shader System.
 			finalizeRTShaderSystem();
 #endif
-			if (mSceneMgr) mSceneMgr->clearScene();
 			if (mContentSetup) cleanupContent();
+			if (mSceneMgr) mSceneMgr->clearScene();
 			mContentSetup = false;
 			if (mResourcesLoaded) unloadResources();
 			mResourcesLoaded = false;
