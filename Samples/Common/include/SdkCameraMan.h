@@ -133,22 +133,22 @@ namespace OgreBites
 		{
 			if (mStyle != CS_ORBIT && style == CS_ORBIT)
 			{
-				mStyle = CS_ORBIT;
 				setTarget(mTarget);
 				mCamera->setFixedYawAxis(true);
+				manualStop();
 			}
 			else if (mStyle != CS_FREELOOK && style == CS_FREELOOK)
 			{
-				mStyle = CS_FREELOOK;
 				mCamera->setAutoTracking(false);
 				mCamera->setFixedYawAxis(true);
 			}
 			else if (mStyle != CS_MANUAL && style == CS_MANUAL)
 			{
-				mStyle = CS_MANUAL;
 				mCamera->setAutoTracking(false);
-				mCamera->setFixedYawAxis(true);
+				manualStop();
 			}
+
+			mStyle = style;
 		}
 
 		virtual CameraStyle getStyle()

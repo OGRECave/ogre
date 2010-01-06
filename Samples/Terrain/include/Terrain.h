@@ -63,7 +63,6 @@ public:
 
 		// Update terrain at max 20fps
 		mUpdateRate = 1.0 / 20.0;
-
 	}
 
     void testCapabilities(const RenderSystemCapabilities* caps)
@@ -166,11 +165,7 @@ public:
 					}
 				}
 				break;
-
-
-
 			};
-
 		}
 #endif
 
@@ -204,9 +199,7 @@ public:
 			{
 				mEditMarker->setVisible(false);
 			}
-
 		}
-
 
 		if (!mFly)
 		{
@@ -273,9 +266,6 @@ public:
 			}
 		}
 
-
-
-
 		return SdkSample::frameRenderingQueued(evt);  // don't forget the parent updates!
     }
 
@@ -310,8 +300,6 @@ public:
 					{
 						ts->instance->_dumpTextures("terrain_" + StringConverter::toString(tkey), ".png");
 					}
-
-
 				}
 			}
 			break;
@@ -323,48 +311,6 @@ public:
 		return true;
 	}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
-	{
-		if (mTrayMgr->injectMouseDown(evt)) return true;
-		mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-		return true;
-	}
-#else
-	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-	{
-		if (mTrayMgr->injectMouseDown(evt, id)) return true;
-		if (id == OIS::MB_Left) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-		return true;
-	}
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
-	{
-		if (mTrayMgr->injectMouseUp(evt)) return true;
-		mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-		return true;
-	}
-#else
-	bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-	{
-		if (mTrayMgr->injectMouseUp(evt, id)) return true;
-		if (id == OIS::MB_Left) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-		return true;
-	}
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
-#else
-	virtual bool mouseMoved(const OIS::MouseEvent& evt)
-#endif
-	{
-		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
-		else mCameraMan->injectMouseMove(evt);
-		return true;
-	}
 	void itemSelected(SelectMenu* menu)
 	{
 		if (menu == mEditMenu)
@@ -785,7 +731,6 @@ protected:
 		StringVector names;
 		names.push_back("Help");
 		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Help", 100, names)->setParamValue(0, "H/F1");
-
 	}
 
 	void setupContent()
@@ -801,6 +746,8 @@ protected:
 		setupControls();
 
 		mCameraMan->setTopSpeed(50);
+
+		setDragLook(true);
 
 		MaterialManager::getSingleton().setDefaultTextureFiltering(TFO_ANISOTROPIC);
 		MaterialManager::getSingleton().setDefaultAnisotropy(7);

@@ -19,7 +19,7 @@ same license as the rest of the engine.
         Shows OGRE's Compositor feature
 	\author
 		W.J. :wumpus: van der Laan
-			Ogre composition framework
+			Ogre compositor framework
 		Manuel Bua
 			Postfilter ideas and original out-of-core implementation
         Jeff (nfz) Doyle
@@ -42,64 +42,13 @@ Sample_Compositor::Sample_Compositor()
 	mInfo["Category"] = "Effects";
 }
 //--------------------------------------------------------------------------
-void Sample_Compositor::createCamera(void)
+void Sample_Compositor::setupView()
 {
-    // Create the camera
-    mCamera = mSceneMgr->createCamera("PlayerCam");
-
-    // Position it at 500 in Z direction
+	SdkSample::setupView();
     mCamera->setPosition(Ogre::Vector3(0,0,0));
-    // Look back along -Z
     mCamera->lookAt(Ogre::Vector3(0,0,-300));
     mCamera->setNearClipDistance(1);
-
 }
-//--------------------------------------------------------------------------
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	bool Sample_Compositor::touchPressed(const OIS::MultiTouchEvent& evt)
-	{
-		if (mTrayMgr->injectMouseDown(evt)) return true;
-		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-		return true;
-	}
-
-	bool Sample_Compositor::touchReleased(const OIS::MultiTouchEvent& evt)
-	{
-		if (mTrayMgr->injectMouseUp(evt)) return true;
-		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-		return true;
-	}
-
-	bool Sample_Compositor::touchMoved(const OIS::MultiTouchEvent& evt)
-	{
-		// only rotate the camera if cursor is hidden
-		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
-		else mCameraMan->injectMouseMove(evt);
-		return true;
-	}
-#else
-	bool Sample_Compositor::mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-	{
-		if (mTrayMgr->injectMouseDown(evt, id)) return true;
-		if (id == OIS::MB_Left) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-		return true;
-	}
-    
-	bool Sample_Compositor::mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-	{
-		if (mTrayMgr->injectMouseUp(evt, id)) return true;
-		if (id == OIS::MB_Left) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-		return true;
-	}
-    
-	bool Sample_Compositor::mouseMoved(const OIS::MouseEvent& evt)
-	{
-		// only rotate the camera if cursor is hidden
-		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
-		else mCameraMan->injectMouseMove(evt);
-		return true;
-	}
-#endif
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::setupContent(void)
 {
@@ -120,11 +69,13 @@ void Sample_Compositor::setupContent(void)
 	/// but the preferred method is to use compositor scripts.
 	createEffects();
 
-	createScene();
+	setupScene();
 
 	registerCompositors();
 
-	createControls();
+	setupControls();
+
+	setDragLook(true);
 }
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::registerCompositors(void)
@@ -202,7 +153,7 @@ void Sample_Compositor::cleanupContent(void)
 	mCompositorNames.clear();
 }
 //-----------------------------------------------------------------------------------
-void Sample_Compositor::createControls(void) 
+void Sample_Compositor::setupControls(void) 
 {
 	mTrayMgr->createButton(TL_TOPLEFT, "PageButton", "Compositors", 175);
 
@@ -330,7 +281,7 @@ void Sample_Compositor::itemSelected(OgreBites::SelectMenu* menu)
 	}
 }
 //-----------------------------------------------------------------------------------
-void Sample_Compositor::createScene(void)
+void Sample_Compositor::setupScene(void)
 {
 	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 	mSceneMgr->setShadowFarDistance(1000);
