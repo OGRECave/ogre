@@ -206,7 +206,7 @@ public:
 			// clamp to terrain
 			Vector3 camPos = mCamera->getPosition();
 			Ray ray;
-			ray.setOrigin(Vector3(camPos.x, 10000, camPos.z));
+			ray.setOrigin(Vector3(camPos.x, mTerrainPos.y + 10000, camPos.z));
 			ray.setDirection(Vector3::NEGATIVE_UNIT_Y);
 
 			TerrainGroup::RayResult rayResult = mTerrainGroup->rayIntersects(ray);
@@ -812,7 +812,7 @@ protected:
 		Entity* e = mSceneMgr->createEntity("tudorhouse.mesh");
 		Vector3 entPos(mTerrainPos.x + 2043, 0, mTerrainPos.z + 1715);
 		Quaternion rot;
-		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5;
+		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5 + mTerrainPos.y;
 		rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
 		SceneNode* sn = mSceneMgr->getRootSceneNode()->createChildSceneNode(entPos, rot);
 		sn->setScale(Vector3(0.12, 0.12, 0.12));
@@ -821,7 +821,7 @@ protected:
 
 		e = mSceneMgr->createEntity("tudorhouse.mesh");
 		entPos = Vector3(mTerrainPos.x + 1850, 0, mTerrainPos.z + 1478);
-		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5;
+		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5 + mTerrainPos.y;
 		rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
 		sn = mSceneMgr->getRootSceneNode()->createChildSceneNode(entPos, rot);
 		sn->setScale(Vector3(0.12, 0.12, 0.12));
@@ -830,7 +830,7 @@ protected:
 
 		e = mSceneMgr->createEntity("tudorhouse.mesh");
 		entPos = Vector3(mTerrainPos.x + 1970, 0, mTerrainPos.z + 2180);
-		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5;
+		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5 + mTerrainPos.y;
 		rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
 		sn = mSceneMgr->getRootSceneNode()->createChildSceneNode(entPos, rot);
 		sn->setScale(Vector3(0.12, 0.12, 0.12));
