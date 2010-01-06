@@ -604,8 +604,7 @@ protected:
 		Widget* w = mTrayMgr->getWidget(widgetName);
 		if (!w)
 		{
-			w = mTrayMgr->createDecorWidget(
-				loc, widgetName, "Panel", "Ogre/DebugTexOverlay");
+			w = mTrayMgr->createDecorWidget(loc, widgetName, "Ogre/DebugTexOverlay");
 		}
 		w->getOverlayElement()->setMaterialName(matName);
 

@@ -123,6 +123,7 @@ void Sample_Compositor::setupContent(void)
 	createScene();
 
 	registerCompositors();
+
 	createControls();
 }
 //-----------------------------------------------------------------------------------
@@ -191,7 +192,7 @@ void Sample_Compositor::changePage(size_t pageNum)
 
 	OgreBites::Button* pageButton = static_cast<OgreBites::Button*>(mTrayMgr->getWidget(TL_TOPLEFT, "PageButton"));
 	Ogre::StringStream ss;
-	ss << "Page " << pageNum+1 << " / " << mNumCompositorPages;
+	ss << "Compositors " << pageNum + 1 << "/" << mNumCompositorPages;
 	pageButton->setCaption(ss.str());
 }
 //-----------------------------------------------------------------------------------
@@ -203,27 +204,35 @@ void Sample_Compositor::cleanupContent(void)
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::createControls(void) 
 {
-	mTrayMgr->createButton(TL_TOPLEFT, "PageButton", "Page", 175);
+	mTrayMgr->createButton(TL_TOPLEFT, "PageButton", "Compositors", 175);
+
 	for (size_t i=0; i < COMPOSITORS_PER_PAGE; i++)
 	{
 		String checkBoxName = "Compositor_" + Ogre::StringConverter::toString(i);
 		CheckBox* cb = mTrayMgr->createCheckBox(TL_TOPLEFT, checkBoxName, "Compositor", 175);
 		cb->hide();
 	}
+
 	changePage(0);
 	
-
-	mTrayMgr->createLabel(TL_TOPRIGHT, "DebugRTTLabel", "Debug RTTs", 256);
-	mDebugTextureSelectMenu = mTrayMgr->createLongSelectMenu(
-		TL_TOPRIGHT, "DebugRTTSelectMenu", "Texture", 256, 175, 5);
+	mDebugTextureSelectMenu = mTrayMgr->createThickSelectMenu(TL_TOPRIGHT, "DebugRTTSelectMenu", "Debug RTT", 180, 5);
 	mDebugTextureSelectMenu->addItem("None");
-	DecorWidget* debugRTTPanel = mTrayMgr->createDecorWidget(
-		TL_TOPRIGHT, "DebugRTTPanel", "Panel", "CompositorDemo/DebugView");
-	mDebugTextureTUS = debugRTTPanel->getOverlayElement()->getMaterial()
-		->getBestTechnique()->getPass(0)->getTextureUnitState(0);
+
+	mTrayMgr->createSeparator(TL_TOPRIGHT, "DebugRTTSep1");  // this is a hack to give the debug RTT a bit more room
+
+	DecorWidget* debugRTTPanel = mTrayMgr->createDecorWidget(TL_NONE, "DebugRTTPanel", "SdkTrays/Picture");
+	OverlayContainer* debugRTTContainer = (OverlayContainer*)debugRTTPanel->getOverlayElement();
+	mDebugTextureTUS = debugRTTContainer->getMaterial()->getBestTechnique()->getPass(0)->getTextureUnitState(0);
+	mDebugTextureTUS->setTextureName("CompositorDemo/DebugView");
+	debugRTTContainer->setDimensions(128, 128);
+	debugRTTContainer->getChild("DebugRTTPanel/PictureFrame")->setDimensions(144, 144);
 	debugRTTPanel->hide();
 
+	mTrayMgr->createSeparator(TL_TOPRIGHT, "DebugRTTSep2");  // this is a hack to give the debug RTT a bit more room
+
 	mTrayMgr->showCursor();
+	mTrayMgr->showLogo(TL_BOTTOMLEFT);
+	mTrayMgr->toggleAdvancedFrameStats();
 }
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
@@ -301,12 +310,15 @@ void Sample_Compositor::itemSelected(OgreBites::SelectMenu* menu)
 	{
 		mDebugTextureTUS->setContentType(TextureUnitState::CONTENT_NAMED);
 		mTrayMgr->getWidget("DebugRTTPanel")->hide();
+		mTrayMgr->removeWidgetFromTray("DebugRTTPanel");
 		return;
 	}
 
 	mTrayMgr->getWidget("DebugRTTPanel")->show();
+	mTrayMgr->moveWidgetToTray("DebugRTTPanel", TL_TOPRIGHT, mTrayMgr->getNumWidgets(TL_TOPRIGHT) - 1);
 	StringVector parts = StringUtil::split(menu->getSelectedItem(), ";");
 	mDebugTextureTUS->setContentType(TextureUnitState::CONTENT_COMPOSITOR);
+
 	if (parts.size() == 2)
 	{
 		mDebugTextureTUS->setCompositorReference(parts[0], parts[1]);
@@ -316,7 +328,6 @@ void Sample_Compositor::itemSelected(OgreBites::SelectMenu* menu)
 		mDebugTextureTUS->setCompositorReference(parts[0], parts[1], 
 			StringConverter::parseUnsignedInt(parts[2]));
 	}
-	
 }
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::createScene(void)

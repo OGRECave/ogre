@@ -25,7 +25,7 @@ same license as the rest of the engine.
 using namespace Ogre;
 using namespace OgreBites;
 
-#define COMPOSITORS_PER_PAGE 10
+#define COMPOSITORS_PER_PAGE 8
 
 class _OgreSampleClassExport Sample_Compositor : public SdkSample
 {

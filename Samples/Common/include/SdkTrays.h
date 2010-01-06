@@ -1605,9 +1605,9 @@ namespace OgreBites
 	public:
 
 		// Do not instantiate any widgets directly. Use SdkTrayManager.
-		DecorWidget(const Ogre::String& name, const Ogre::String& typeName, const Ogre::String& templateName)
+		DecorWidget(const Ogre::String& name, const Ogre::String& templateName)
 		{
-			mElement = Ogre::OverlayManager::getSingleton().createOverlayElementFromTemplate(templateName, typeName, name);
+			mElement = Ogre::OverlayManager::getSingleton().createOverlayElementFromTemplate(templateName, "", name);
 		}
 	};
 
@@ -2185,10 +2185,9 @@ namespace OgreBites
 			return cb;
 		}
 
-		DecorWidget* createDecorWidget(TrayLocation trayLoc, const Ogre::String& name, const Ogre::String& typeName,
-			const Ogre::String& templateName)
+		DecorWidget* createDecorWidget(TrayLocation trayLoc, const Ogre::String& name, const Ogre::String& templateName)
 		{
-			DecorWidget* dw = new DecorWidget(name, typeName, templateName);
+			DecorWidget* dw = new DecorWidget(name, templateName);
 			moveWidgetToTray(dw, trayLoc);
 			return dw;
 		}
@@ -2256,7 +2255,7 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		void showLogo(TrayLocation trayLoc, unsigned int place = -1)
 		{
-			if (!isLogoVisible()) mLogo = createDecorWidget(TL_NONE, mName + "/Logo", "Panel", "SdkTrays/Logo");
+			if (!isLogoVisible()) mLogo = createDecorWidget(TL_NONE, mName + "/Logo", "SdkTrays/Logo");
 			moveWidgetToTray(mLogo, trayLoc, place);
 		}
 

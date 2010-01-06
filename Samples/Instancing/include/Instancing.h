@@ -251,10 +251,6 @@ protected:
 		technique->addItem("Instancing");
 		technique->addItem("Static Geometry");
 		technique->addItem("Independent Entities");
-
-		mTrayMgr->createThickSlider(TL_TOPLEFT, "ObjectCountSlider", "Object count", 200, 50, 0, 1000, 101)->setValue(160, false);
-
-		mTrayMgr->createCheckBox(TL_TOPLEFT, "ShadowCheckBox", "Shadows", 200);
 		
 		SelectMenu* objectType = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "ObjectType", "Object : ", 200, 4);
 		objectType->addItem("razor");
@@ -262,7 +258,11 @@ protected:
 		objectType->addItem("tudorhouse");
 		objectType->addItem("woodpallet");
 
+		mTrayMgr->createThickSlider(TL_TOPLEFT, "ObjectCountSlider", "Object count", 200, 50, 0, 1000, 101)->setValue(160, false);
+
 		mTrayMgr->createThickSlider(TL_TOPLEFT, "CPUOccupationSlider", "CPU Load (ms)", 200, 75, 0, 1000.0f / 60, 20);
+
+		mTrayMgr->createCheckBox(TL_TOPLEFT, "ShadowCheckBox", "Shadows", 200);
 
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "PostEffectCheckBox", "Post Effect", 200);
 
