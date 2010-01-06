@@ -88,7 +88,7 @@ elseif (UNIX)
   )
 endif ()
 set(OGRE_PREFIX_PATH
-  ${OGRE_HOME} ${ENV_OGRE_HOME} ${ENV_OGRE_SDK}
+  ${OGRE_HOME} ${OGRE_SDK} ${ENV_OGRE_HOME} ${ENV_OGRE_SDK}
   ${OGRE_PREFIX_GUESSES}
 )
 create_search_paths(OGRE)
