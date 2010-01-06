@@ -301,6 +301,7 @@ namespace Ogre
 	class _OgrePagingExport PagedWorldSectionFactory : public PageAlloc
 	{
 	public:
+		virtual ~PagedWorldSectionFactory() {}
 		virtual const String& getName() const = 0;
 		virtual PagedWorldSection* createInstance(const String& name, PagedWorld* parent, SceneManager* sm) = 0;
 		virtual void destroyInstance(PagedWorldSection*) = 0;

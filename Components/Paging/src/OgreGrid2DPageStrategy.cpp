@@ -52,8 +52,8 @@ namespace Ogre
 		, mLoadRadius(2000)
 		, mHoldRadius(3000)
 		, mMinCellX(-32768)
-		, mMaxCellX(32767)
 		, mMinCellY(-32768)
+		, mMaxCellX(32767)
 		, mMaxCellY(32767)
 	{
 		updateDerivedMetrics();
