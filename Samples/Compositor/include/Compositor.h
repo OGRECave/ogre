@@ -25,22 +25,12 @@ same license as the rest of the engine.
 using namespace Ogre;
 using namespace OgreBites;
 
-#define COMPOSITORS_PER_PAGE 10
+#define COMPOSITORS_PER_PAGE 8
 
 class _OgreSampleClassExport Sample_Compositor : public SdkSample
 {
 public:
 	Sample_Compositor();
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	bool touchPressed(const OIS::MultiTouchEvent& evt);
-	bool touchReleased(const OIS::MultiTouchEvent& evt);
-	bool touchMoved(const OIS::MultiTouchEvent& evt);
-#else
-	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
-	bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
-	bool mouseMoved(const OIS::MouseEvent& evt);
-#endif
 
     void setupContent(void);
     void cleanupContent(void);
@@ -53,9 +43,9 @@ public:
 
 protected:
 	
-	void createCamera(void);
-	void createControls(void);
-    void createScene(void);
+	void setupView(void);
+	void setupControls(void);
+    void setupScene(void);
     void createEffects(void);
 	void createTextures(void);
 

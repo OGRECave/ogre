@@ -63,7 +63,6 @@ public:
 
 		// Update terrain at max 20fps
 		mUpdateRate = 1.0 / 20.0;
-
 	}
 
     void testCapabilities(const RenderSystemCapabilities* caps)
@@ -166,11 +165,7 @@ public:
 					}
 				}
 				break;
-
-
-
 			};
-
 		}
 #endif
 
@@ -204,16 +199,14 @@ public:
 			{
 				mEditMarker->setVisible(false);
 			}
-
 		}
-
 
 		if (!mFly)
 		{
 			// clamp to terrain
 			Vector3 camPos = mCamera->getPosition();
 			Ray ray;
-			ray.setOrigin(Vector3(camPos.x, 10000, camPos.z));
+			ray.setOrigin(Vector3(camPos.x, mTerrainPos.y + 10000, camPos.z));
 			ray.setDirection(Vector3::NEGATIVE_UNIT_Y);
 
 			TerrainGroup::RayResult rayResult = mTerrainGroup->rayIntersects(ray);
@@ -273,9 +266,6 @@ public:
 			}
 		}
 
-
-
-
 		return SdkSample::frameRenderingQueued(evt);  // don't forget the parent updates!
     }
 
@@ -310,8 +300,6 @@ public:
 					{
 						ts->instance->_dumpTextures("terrain_" + StringConverter::toString(tkey), ".png");
 					}
-
-
 				}
 			}
 			break;
@@ -323,48 +311,6 @@ public:
 		return true;
 	}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
-	{
-		if (mTrayMgr->injectMouseDown(evt)) return true;
-		mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-		return true;
-	}
-#else
-	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-	{
-		if (mTrayMgr->injectMouseDown(evt, id)) return true;
-		if (id == OIS::MB_Left) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-		return true;
-	}
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
-	{
-		if (mTrayMgr->injectMouseUp(evt)) return true;
-		mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-		return true;
-	}
-#else
-	bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-	{
-		if (mTrayMgr->injectMouseUp(evt, id)) return true;
-		if (id == OIS::MB_Left) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-		return true;
-	}
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
-#else
-	virtual bool mouseMoved(const OIS::MouseEvent& evt)
-#endif
-	{
-		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
-		else mCameraMan->injectMouseMove(evt);
-		return true;
-	}
 	void itemSelected(SelectMenu* menu)
 	{
 		if (menu == mEditMenu)
@@ -604,8 +550,7 @@ protected:
 		Widget* w = mTrayMgr->getWidget(widgetName);
 		if (!w)
 		{
-			w = mTrayMgr->createDecorWidget(
-				loc, widgetName, "Panel", "Ogre/DebugTexOverlay");
+			w = mTrayMgr->createDecorWidget(loc, widgetName, "Ogre/DebugTexOverlay");
 		}
 		w->getOverlayElement()->setMaterialName(matName);
 
@@ -786,7 +731,6 @@ protected:
 		StringVector names;
 		names.push_back("Help");
 		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Help", 100, names)->setParamValue(0, "H/F1");
-
 	}
 
 	void setupContent()
@@ -802,6 +746,8 @@ protected:
 		setupControls();
 
 		mCameraMan->setTopSpeed(50);
+
+		setDragLook(true);
 
 		MaterialManager::getSingleton().setDefaultTextureFiltering(TFO_ANISOTROPIC);
 		MaterialManager::getSingleton().setDefaultAnisotropy(7);
@@ -866,7 +812,7 @@ protected:
 		Entity* e = mSceneMgr->createEntity("tudorhouse.mesh");
 		Vector3 entPos(mTerrainPos.x + 2043, 0, mTerrainPos.z + 1715);
 		Quaternion rot;
-		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5;
+		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5 + mTerrainPos.y;
 		rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
 		SceneNode* sn = mSceneMgr->getRootSceneNode()->createChildSceneNode(entPos, rot);
 		sn->setScale(Vector3(0.12, 0.12, 0.12));
@@ -875,7 +821,7 @@ protected:
 
 		e = mSceneMgr->createEntity("tudorhouse.mesh");
 		entPos = Vector3(mTerrainPos.x + 1850, 0, mTerrainPos.z + 1478);
-		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5;
+		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5 + mTerrainPos.y;
 		rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
 		sn = mSceneMgr->getRootSceneNode()->createChildSceneNode(entPos, rot);
 		sn->setScale(Vector3(0.12, 0.12, 0.12));
@@ -884,7 +830,7 @@ protected:
 
 		e = mSceneMgr->createEntity("tudorhouse.mesh");
 		entPos = Vector3(mTerrainPos.x + 1970, 0, mTerrainPos.z + 2180);
-		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5;
+		entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5 + mTerrainPos.y;
 		rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
 		sn = mSceneMgr->getRootSceneNode()->createChildSceneNode(entPos, rot);
 		sn->setScale(Vector3(0.12, 0.12, 0.12));

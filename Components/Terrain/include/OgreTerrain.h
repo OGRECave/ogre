@@ -947,6 +947,15 @@ namespace Ogre
 		*/
 		void addLayer(Real worldSize = 0, const StringVector* textureNames = 0);
 
+		/** Add a new layer to this terrain at a specific index.
+		@param index The index at which to insert this layer (existing layers are shifted forwards)
+		@param worldSize The size of the texture in this layer in world units. Default
+		to zero to use the default
+		@param textureNames A list of textures to assign to the samplers in this
+			layer. Leave blank to provide these later. 
+		*/
+		void addLayer(uint index, Real worldSize = 0, const StringVector* textureNames = 0);
+
 		/** Remove a layer from the terrain.
 		*/
 		void removeLayer(uint8 index);

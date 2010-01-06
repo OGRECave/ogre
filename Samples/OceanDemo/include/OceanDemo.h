@@ -79,17 +79,6 @@ protected:
 	void itemSelected(SelectMenu* menu);
 	void changePage(size_t nextPage = -1);
 	virtual bool frameRenderingQueued(const FrameEvent& evt);
-	
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	bool touchPressed(const OIS::MultiTouchEvent& evt);
-	bool touchReleased(const OIS::MultiTouchEvent& evt);
-	bool touchMoved(const OIS::MultiTouchEvent& evt);
-#else
-	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
-	bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
-	bool mouseMoved(const OIS::MouseEvent& evt);
-#endif
-
 };
 
 /**********************************************************************
@@ -196,6 +185,8 @@ void Sample_Ocean::setupContent(void)
     // Look back along -Z
     mCamera->lookAt(Ogre::Vector3(0,0,-300));
     mCamera->setNearClipDistance(1);
+
+	setDragLook(true);
 }
 
 void Sample_Ocean::setupScene()
@@ -490,54 +481,5 @@ void Sample_Ocean::checkBoxToggled(CheckBox* cb)
 	//Only one checkbox
 	mSpinLight = cb->isChecked();
 }
-
-//--------------------------------------------------------------------------
-
-//GUI Style input
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	bool Sample_Ocean::touchPressed(const OIS::MultiTouchEvent& evt)
-	{
-		if (mTrayMgr->injectMouseDown(evt)) return true;
-		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-		return true;
-	}
-
-	bool Sample_Ocean::touchReleased(const OIS::MultiTouchEvent& evt)
-	{
-		if (mTrayMgr->injectMouseUp(evt)) return true;
-		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-		return true;
-	}
-
-	bool Sample_Ocean::touchMoved(const OIS::MultiTouchEvent& evt)
-	{
-		// only rotate the camera if cursor is hidden
-		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
-		else mCameraMan->injectMouseMove(evt);
-		return true;
-	}
-#else
-	bool Sample_Ocean::mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-	{
-		if (mTrayMgr->injectMouseDown(evt, id)) return true;
-		if (id == OIS::MB_Left) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-		return true;
-	}
-    
-	bool Sample_Ocean::mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-	{
-		if (mTrayMgr->injectMouseUp(evt, id)) return true;
-		if (id == OIS::MB_Left) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-		return true;
-	}
-    
-	bool Sample_Ocean::mouseMoved(const OIS::MouseEvent& evt)
-	{
-		// only rotate the camera if cursor is hidden
-		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
-		else mCameraMan->injectMouseMove(evt);
-		return true;
-	}
-#endif
 
 #endif	// end _Sample_Ocean_H_

@@ -199,8 +199,13 @@ protected:
 	//		return false;
 	//	}
 	//}
-	void generalSceneSetup()
+	
+    // Just override the mandatory create scene method
+    void setupContent(void)
     {
+		// Need to detect D3D or GL for best depth shadowmapping
+		mIsOpenGL = Root::getSingleton().getRenderSystem()->getName().find("GL") != String::npos;
+
 		// do this first so we generate edge lists
         mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
 		mCurrentShadowTechnique = SHADOWTYPE_STENCIL_ADDITIVE;
@@ -352,40 +357,26 @@ protected:
             // Use 512x512 texture in GL since we can't go higher than the window res
             mSceneMgr->setShadowTextureSettings(512, 2);
         }
+
         mSceneMgr->setShadowColour(ColourValue(0.5, 0.5, 0.5));
+        //mSceneMgr->setShowDebugShadows(true);
+
+		setupGUI();
+		setDragLook(true);
+    }
+
+	virtual void setupView()
+	{
+		SdkSample::setupView();
 
         // incase infinite far distance is not supported
         mCamera->setFarClipDistance(100000);
 
-        //mSceneMgr->setShowDebugShadows(true);
-
 		mCamera->setPosition(250, 20, 400);
 		mCamera->lookAt(0, 10, 0);
-
-    }
+	}
 	
-    // Just override the mandatory create scene method
-    void setupContent(void)
-    {
-		// Need to detect D3D or GL for best depth shadowmapping
-		if (Root::getSingleton().getRenderSystem()->getName().find("GL") != String::npos)
-		{
-			mIsOpenGL = true;
-		}
-		else
-		{
-			mIsOpenGL = false;
-		}
-
-		// set up general scene (this defaults to additive stencils)
-        generalSceneSetup();
-
-		setupGUI();
-
-
-    }
-	
-	virtual void cleanupContent(void)
+	virtual void cleanupContent()
 	{
 		ControllerManager::getSingleton().destroyController(mController);
 	}
@@ -409,8 +400,6 @@ protected:
 
 		mCurrentShadowTechnique = newTech;
 	}
-
-
 
 	void configureLights(ShadowTechnique newTech)
 	{
@@ -500,15 +489,15 @@ protected:
 		mMaterialMenu->addItem("Depth Shadowmap");
 		mMaterialMenu->addItem("Depth Shadowmap (PCF)");
 		
-		mFixedBiasSlider = mTrayMgr->createThickSlider(TL_TOPRIGHT, "FixedBiasSlider", "Fixed Bias", 256, 80, 0, 0.02, 100);
+		mFixedBiasSlider = mTrayMgr->createThickSlider(TL_NONE, "FixedBiasSlider", "Fixed Bias", 256, 80, 0, 0.02, 100);
 		mFixedBiasSlider->setValue(0.0009, false);
 		mFixedBiasSlider->hide();
 
-		mSlopedBiasSlider = mTrayMgr->createThickSlider(TL_TOPRIGHT, "SlopedBiasSlider", "Sloped Bias", 256, 80, 0, 0.2, 100);
+		mSlopedBiasSlider = mTrayMgr->createThickSlider(TL_NONE, "SlopedBiasSlider", "Sloped Bias", 256, 80, 0, 0.2, 100);
 		mSlopedBiasSlider->setValue(0.0008, false);
 		mSlopedBiasSlider->hide();
 
-		mClampSlider = mTrayMgr->createThickSlider(TL_TOPRIGHT, "SlopeClampSlider", "Slope Clamp", 256, 80, 0, 2, 100);
+		mClampSlider = mTrayMgr->createThickSlider(TL_NONE, "SlopeClampSlider", "Slope Clamp", 256, 80, 0, 2, 100);
 		mClampSlider->setValue(0.2, false);
 		mClampSlider->hide();
 
@@ -523,12 +512,16 @@ protected:
 		if (isTextureBased) 
 		{
 			mProjectionMenu->show();
+			mTrayMgr->moveWidgetToTray(mProjectionMenu, TL_TOPLEFT);
 			mMaterialMenu->show();
+			mTrayMgr->moveWidgetToTray(mMaterialMenu, TL_TOPLEFT);
 		}
 		else 
 		{
 			mProjectionMenu->hide();
+			mTrayMgr->removeWidgetFromTray(mProjectionMenu);
 			mMaterialMenu->hide();
+			mTrayMgr->removeWidgetFromTray(mMaterialMenu);
 		}
 	}
 
@@ -789,66 +782,23 @@ protected:
 			if (showSliders)
 			{
 				mFixedBiasSlider->show();
+				mTrayMgr->moveWidgetToTray(mFixedBiasSlider, TL_TOPRIGHT);
 				mSlopedBiasSlider->show();
-				mClampSlider->show();				
+				mTrayMgr->moveWidgetToTray(mSlopedBiasSlider, TL_TOPRIGHT);
+				mClampSlider->show();	
+				mTrayMgr->moveWidgetToTray(mClampSlider, TL_TOPRIGHT);			
 			}
 			else
 			{
 				mFixedBiasSlider->hide();
+				mTrayMgr->removeWidgetFromTray(mFixedBiasSlider);
 				mSlopedBiasSlider->hide();
-				mClampSlider->hide();				
+				mTrayMgr->removeWidgetFromTray(mSlopedBiasSlider);
+				mClampSlider->hide();		
+				mTrayMgr->removeWidgetFromTray(mClampSlider);		
 			}
 			//updateTipForCombo(cbo);
 			//rebindDebugShadowOverlays();
 		}
 	}
-
-	//GUI Style input
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	bool touchPressed(const OIS::MultiTouchEvent& evt)
-	{
-		if (mTrayMgr->injectMouseDown(evt)) return true;
-		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-		return true;
-	}
-
-	bool touchReleased(const OIS::MultiTouchEvent& evt)
-	{
-		if (mTrayMgr->injectMouseUp(evt)) return true;
-		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-		return true;
-	}
-
-	bool touchMoved(const OIS::MultiTouchEvent& evt)
-	{
-		// only rotate the camera if cursor is hidden
-		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
-		else mCameraMan->injectMouseMove(evt);
-		return true;
-	}
-#else
-	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-	{
-		if (mTrayMgr->injectMouseDown(evt, id)) return true;
-		if (id == OIS::MB_Left) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-		return true;
-	}
-    
-	bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-	{
-		if (mTrayMgr->injectMouseUp(evt, id)) return true;
-		if (id == OIS::MB_Left) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-		return true;
-	}
-    
-	bool mouseMoved(const OIS::MouseEvent& evt)
-	{
-		// only rotate the camera if cursor is hidden
-		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
-		else mCameraMan->injectMouseMove(evt);
-		return true;
-	}
-#endif
-
-
 };

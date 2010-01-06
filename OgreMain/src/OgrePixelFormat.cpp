@@ -693,16 +693,14 @@ namespace Ogre {
 			switch(format)
 			{
 				// DXT formats work by dividing the image into 4x4 blocks, then encoding each
-				// 4x4 block with a certain number of bytes. DXT can only be used on 2D images.
+				// 4x4 block with a certain number of bytes. 
 				case PF_DXT1:
-					assert(depth == 1);
-					return ((width+3)/4)*((height+3)/4)*8;
+					return ((width+3)/4)*((height+3)/4)*8 * depth;
 				case PF_DXT2:
 				case PF_DXT3:
 				case PF_DXT4:
 				case PF_DXT5:
-					assert(depth == 1);
-					return ((width+3)/4)*((height+3)/4)*16;
+					return ((width+3)/4)*((height+3)/4)*16 * depth;
 
                 // Size calculations from the PVRTC OpenGL extension spec
                 // http://www.khronos.org/registry/gles/extensions/IMG/IMG_texture_compression_pvrtc.txt

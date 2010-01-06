@@ -99,18 +99,15 @@ protected:
 
 	void setupControls()
 	{
-		// make room for the controls
-		mTrayMgr->showLogo(TL_TOPRIGHT);
-		mTrayMgr->showFrameStats(TL_TOPRIGHT);
-		mTrayMgr->toggleAdvancedFrameStats();
+		mTrayMgr->showCursor();
 
 		// create checkboxs to toggle ssao and shadows
-		mTrayMgr->createCheckBox(TL_TOPLEFT, "SSAO", "Screen space ambient occlusion (2)")->setChecked(false, false);
-		mTrayMgr->createCheckBox(TL_TOPLEFT, "GlobalLight", "Global light (3)")->setChecked(true, false);
+		mTrayMgr->createCheckBox(TL_TOPLEFT, "SSAO", "Ambient Occlusion", 220)->setChecked(false, false);
+		mTrayMgr->createCheckBox(TL_TOPLEFT, "GlobalLight", "Global Light", 220)->setChecked(true, false);
 		//mTrayMgr->createCheckBox(TL_TOPLEFT, "Shadows", "Shadows")->setChecked(true, false);
 		
 		// create a menu to choose the model displayed
-		mDisplayModeMenu = mTrayMgr->createLongSelectMenu(TL_BOTTOM, "DisplayMode", "Display Mode (1)", 500, 290, 4);
+		mDisplayModeMenu = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "DisplayMode", "Display Mode", 220, 4);
 		mDisplayModeMenu->addItem("Regular view");
 		mDisplayModeMenu->addItem("Debug colours");
 		mDisplayModeMenu->addItem("Debug normals");
@@ -124,23 +121,6 @@ protected:
 			(DeferredShadingSystem::DSMode)menu->getSelectionIndex());
 	}
 
-	bool keyPressed (const OIS::KeyEvent &e)
-	{
-		switch (e.key)
-		{
-		case OIS::KC_1:
-			mDisplayModeMenu->selectItem((mDisplayModeMenu->getSelectionIndex() + 1) % mDisplayModeMenu->getNumItems());
-			break;
-		case OIS::KC_2:
-			(static_cast<CheckBox*>(mTrayMgr->getWidget("SSAO")))->toggle();
-			break;
-		case OIS::KC_3:
-			(static_cast<CheckBox*>(mTrayMgr->getWidget("GlobalLight")))->toggle();
-			break;
-		}
-
-		return SdkSample::keyPressed(e);
-	}
 	void checkBoxToggled(CheckBox* box)
 	{
 		if (box->getName() == "SSAO")
@@ -314,6 +294,7 @@ protected:
         mCamera->lookAt(0,0,0);
 		mCamera->setFarClipDistance(1000.0);
         mCamera->setNearClipDistance(0.5);
+		setDragLook(true);
 
 		mSystem = new DeferredShadingSystem(mWindow->getViewport(0), mSceneMgr, mCamera);
 		SharedData::getSingleton().iSystem = mSystem;

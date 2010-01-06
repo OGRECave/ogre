@@ -45,6 +45,7 @@ AnimationState* mOgreAnimState = 0;
 class _OgreSampleClassExport Sample_VolumeTex : public SdkSample
 {
 public:
+
     Sample_VolumeTex()
 	{
 		mInfo["Title"] = "Volume Textures";
@@ -53,8 +54,17 @@ public:
 		mInfo["Category"] = "Unsorted";
 	}
 
+	void testCapabilities(const RenderSystemCapabilities* caps)
+	{       
+		if (!caps->hasCapability(RSC_TEXTURE_3D))
+        {
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support 3D textures, so cannot "
+                "run this demo. Sorry!", "Sample_VolumeTex::testCapabilities");
+        }
+	}
 
 protected:
+
 	float global_real, global_imag, global_theta;
 
     void setupView(void)
@@ -65,20 +75,10 @@ protected:
         mCamera->setPosition(Vector3(220,-2,176));
         mCamera->lookAt(Vector3(0,0,0));
         mCamera->setNearClipDistance(5);
-		mCamera->setFixedYawAxis(false);
 	}
 
     void setupContent(void)
     {
-		// Check capabilities
-		const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
-        if (!caps->hasCapability(RSC_TEXTURE_3D))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support 3D textures, so cannot "
-                "run this demo. Sorry!", 
-                "VolTex::createScene");
-        }
-		
         // Create dynamic texture
 		ptex = TextureManager::getSingleton().createManual(
 			"DynaTex","General", TEX_TYPE_3D, 64, 64, 64, 0, PF_A8R8G8B8);
@@ -95,9 +95,6 @@ protected:
 		l->setSpecularColour(0.9, 0.9, 1);
         l->setPosition(-100,80,50);
 		mSceneMgr->getRootSceneNode()->attachObject(l);
-
-		// Create manual material
-		
 		
 		// Create volume renderable
 		snode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0));      
@@ -143,6 +140,8 @@ protected:
 		// show GUI
 		createControls();
 
+		setDragLook(true);
+
 		generate();
     }
 
@@ -159,7 +158,7 @@ protected:
 
 	void cleanupContent(void)
 	{
-		ptex.setNull();
+		TextureManager::getSingleton().remove("DynaTex");
 		delete vrend;
 		delete trend;
 	}
@@ -240,53 +239,6 @@ protected:
         }
 		buffer->unlock();
 	}
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	bool touchPressed(const OIS::MultiTouchEvent& evt)
-	{
-		if (mTrayMgr->injectMouseDown(evt)) return true;
-		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-		return true;
-	}
-
-	bool touchReleased(const OIS::MultiTouchEvent& evt)
-	{
-		if (mTrayMgr->injectMouseUp(evt)) return true;
-		if (evt.state.touchIsType(OIS::MT_Pressed)) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-		return true;
-	}
-
-	bool touchMoved(const OIS::MultiTouchEvent& evt)
-	{
-		// only rotate the camera if cursor is hidden
-		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
-		else mCameraMan->injectMouseMove(evt);
-		return true;
-	}
-#else
-	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-	{
-		if (mTrayMgr->injectMouseDown(evt, id)) return true;
-		if (id == OIS::MB_Left) mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-		return true;
-	}
-    
-	bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-	{
-		if (mTrayMgr->injectMouseUp(evt, id)) return true;
-		if (id == OIS::MB_Left) mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-		return true;
-	}
-    
-	bool mouseMoved(const OIS::MouseEvent& evt)
-	{
-		// only rotate the camera if cursor is hidden
-		if (mTrayMgr->isCursorVisible()) mTrayMgr->injectMouseMove(evt);
-		else mCameraMan->injectMouseMove(evt);
-		return true;
-	}
-#endif
-	
 };
 
 SamplePlugin* sp;

@@ -1124,75 +1124,9 @@ void Sample_ShaderSystem::updateTargetObjInfo()
 	}
 }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-
 //-----------------------------------------------------------------------
-bool Sample_ShaderSystem::touchPressed( const OIS::MultiTouchEvent& evt )
-{
-	if (mTrayMgr->injectMouseDown(evt)) 
-		return true;
-	if (evt.state.touchIsType(OIS::MT_Pressed)) 
-		mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-	return true;
+bool Sample_ShaderSystem::mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+{	
+	if (id == OIS::MB_Right && !mTrayMgr->injectMouseDown(evt, id)) pickTargetObject(evt);
+	return SdkSample::mousePressed(evt, id);
 }
-
-//-----------------------------------------------------------------------
-bool Sample_ShaderSystem::touchReleased( const OIS::MultiTouchEvent& evt )
-{
-	if (mTrayMgr->injectMouseUp(evt)) 
-		return true;
-	if (evt.state.touchIsType(OIS::MT_Pressed)) 
-		mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-	return true;
-}
-
-//-----------------------------------------------------------------------
-bool Sample_ShaderSystem::touchMoved( const OIS::MultiTouchEvent& evt )
-{
-	// only rotate the camera if cursor is hidden
-	if (mTrayMgr->isCursorVisible()) 
-		mTrayMgr->injectMouseMove(evt);
-	else 
-		mCameraMan->injectMouseMove(evt);
-	return true;
-}
-
-#else
-
-//-----------------------------------------------------------------------
-bool Sample_ShaderSystem::mousePressed( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
-{
-	if (mTrayMgr->injectMouseDown(evt, id)) 
-		return true;
-	if (id == OIS::MB_Left) 	
-		mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene			
-	if (id == OIS::MB_Right) 
-		pickTargetObject(evt);
-
-	return true;
-}
-
-//-----------------------------------------------------------------------
-bool Sample_ShaderSystem::mouseReleased( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
-{
-	if (mTrayMgr->injectMouseUp(evt, id)) 
-		return true;
-	if (id == OIS::MB_Left) 
-		mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-
-	return true;
-}
-
-//-----------------------------------------------------------------------
-bool Sample_ShaderSystem::mouseMoved( const OIS::MouseEvent& evt )
-{
-	// only rotate the camera if cursor is hidden
-	if (mTrayMgr->isCursorVisible()) 
-		mTrayMgr->injectMouseMove(evt);
-	else 
-		mCameraMan->injectMouseMove(evt);
-
-	
-	return true;
-}
-#endif

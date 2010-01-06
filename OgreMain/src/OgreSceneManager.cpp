@@ -118,6 +118,8 @@ mShadowCasterPlainBlackPass(0),
 mShadowReceiverPass(0),
 mDisplayNodes(false),
 mShowBoundingBoxes(false),
+mActiveCompositorChain(0),
+mLateMaterialResolving(false),
 mShadowTechnique(SHADOWTYPE_NONE),
 mDebugShadows(false),
 mShadowColour(ColourValue(0.25, 0.25, 0.25)),
@@ -152,9 +154,7 @@ mCameraRelativeRendering(false),
 mLastLightHash(0),
 mLastLightLimit(0),
 mLastLightHashGpuProgram(0),
-mGpuParamsDirty((uint16)GPV_ALL),
-mActiveCompositorChain(0),
-mLateMaterialResolving(false)
+mGpuParamsDirty((uint16)GPV_ALL)
 {
 
     // init sky

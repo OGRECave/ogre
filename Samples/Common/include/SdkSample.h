@@ -60,6 +60,7 @@ namespace OgreBites
 			mViewport = 0;
 			mDetailsPanel = 0;
 			mCursorWasVisible = false;
+			mDragLook = false;
 		}
 
 		virtual ~SdkSample() {}
@@ -353,6 +354,12 @@ namespace OgreBites
 		{
 			if (mTrayMgr->injectMouseDown(evt)) return true;
             
+			if (mDragLook)
+			{
+				mCameraMan->setStyle(CS_FREELOOK);
+				mTrayMgr->hideCursor();
+			}
+				
 			mCameraMan->injectMouseDown(evt);
             
 			return true;
@@ -361,6 +368,12 @@ namespace OgreBites
 		virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
 		{
 			if (mTrayMgr->injectMouseDown(evt, id)) return true;
+            
+			if (mDragLook && id == OIS::MB_Left)
+			{
+				mCameraMan->setStyle(CS_FREELOOK);
+				mTrayMgr->hideCursor();
+			}
 
 			mCameraMan->injectMouseDown(evt, id);
 
@@ -373,6 +386,12 @@ namespace OgreBites
 		{
 			if (mTrayMgr->injectMouseUp(evt)) return true;
             
+			if (mDragLook)
+			{
+				mCameraMan->setStyle(CS_MANUAL);
+				mTrayMgr->showCursor();
+			}
+            
 			mCameraMan->injectMouseUp(evt);
             
 			return true;
@@ -381,6 +400,12 @@ namespace OgreBites
 		virtual bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
 		{
 			if (mTrayMgr->injectMouseUp(evt, id)) return true;
+            
+			if (mDragLook && id == OIS::MB_Left)
+			{
+				mCameraMan->setStyle(CS_MANUAL);
+				mTrayMgr->showCursor();
+			}
 
 			mCameraMan->injectMouseUp(evt, id);
 
@@ -496,12 +521,29 @@ namespace OgreBites
 			mCameraMan = new SdkCameraMan(mCamera);   // create a default camera controller
 		}
 
+		virtual void setDragLook(bool enabled)
+		{
+			if (enabled)
+			{
+				mCameraMan->setStyle(CS_MANUAL);
+				mTrayMgr->showCursor();
+				mDragLook = true;
+			}
+			else
+			{
+				mCameraMan->setStyle(CS_FREELOOK);
+				mTrayMgr->hideCursor();
+				mDragLook = false;
+			}
+		}
+
 		Ogre::Viewport* mViewport;    		// main viewport
 		Ogre::Camera* mCamera;        		// main camera
 		SdkTrayManager* mTrayMgr;     		// tray interface manager
 		SdkCameraMan* mCameraMan;     		// basic camera controller
 		ParamsPanel* mDetailsPanel;   		// sample details panel
 		bool mCursorWasVisible;				// was cursor visible before dialog appeared
+		bool mDragLook;                     // click and drag to free-look
     };
 }
 
