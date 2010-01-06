@@ -19,6 +19,7 @@ findpkg_begin(OIS)
 
 # Get path, convert backslashes as ${ENV_${var}}
 getenv_path(OIS_HOME)
+getenv_path(OGRE_SDK)
 getenv_path(OGRE_HOME)
 getenv_path(OGRE_SOURCE)
 
@@ -26,6 +27,7 @@ getenv_path(OGRE_SOURCE)
 set(OIS_PREFIX_PATH ${OIS_HOME} ${ENV_OIS_HOME} 
   ${OGRE_SOURCE}/iPhoneDependencies ${ENV_OGRE_SOURCE}/iPhoneDependencies
   ${OGRE_SOURCE}/Dependencies ${ENV_OGRE_SOURCE}/Dependencies
+  ${OGRE_SDK} ${ENV_OGRE_SDK}
   ${OGRE_HOME} ${ENV_OGRE_HOME})
 create_search_paths(OIS)
 # redo search if prefix path changed
