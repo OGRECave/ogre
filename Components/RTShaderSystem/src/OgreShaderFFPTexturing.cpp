@@ -632,7 +632,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
 		psMain->addAtomInstace(curFuncInvocation);				
 		break;
 	case LBX_ADD_SMOOTH:
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADDMOOTH, groupOrder, internalCounter++);
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADDSMOOTH, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
