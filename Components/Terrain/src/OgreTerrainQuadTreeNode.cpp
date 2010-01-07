@@ -71,7 +71,7 @@ namespace Ogre
 	{
 		if (terrain->getMaxBatchSize() < size)
 		{
-			uint16 childSize = ((size - 1) * 0.5f) + 1;
+			uint16 childSize = (uint16)(((size - 1) * 0.5f) + 1);
 			uint16 childOff = childSize - 1;
 			uint16 childLod = lod - 1; // LOD levels decrease down the tree (higher detail)
 			uint16 childDepth = depth + 1;
@@ -112,7 +112,7 @@ namespace Ogre
 				ll->calcMaxHeightDelta = 0;
 				mLodLevels.push_back(ll);
 				if (ownLod)
-					sz = ((sz - 1) * 0.5) + 1;
+					sz = (uint16)(((sz - 1) * 0.5) + 1);
 			}
 			
 			assert(sz == terrain->getMinBatchSize());
@@ -563,7 +563,7 @@ namespace Ogre
 
 			// Calculate number of vertices
 			// Base geometry size * size
-			size_t baseNumVerts = Math::Sqr(mVertexDataRecord->size);
+			size_t baseNumVerts = (size_t)Math::Sqr(mVertexDataRecord->size);
 			size_t numVerts = baseNumVerts;
 			// Now add space for skirts
 			// Skirts will be rendered as copies of the edge vertices translated downwards
@@ -573,7 +573,7 @@ namespace Ogre
 			// You need 2^levels + 1 rows of full resolution (max 129) vertex copies, plus
 			// the same number of columns. There are common vertices at intersections
 			uint16 levels = mVertexDataRecord->treeLevels;
-			mVertexDataRecord->numSkirtRowsCols = (Math::Pow(2, levels) + 1);
+			mVertexDataRecord->numSkirtRowsCols = (uint16)(Math::Pow(2, levels) + 1);
 			mVertexDataRecord->skirtRowColSkip = (mVertexDataRecord->size - 1) / (mVertexDataRecord->numSkirtRowsCols - 1);
 			numVerts += mVertexDataRecord->size * mVertexDataRecord->numSkirtRowsCols;
 			numVerts += mVertexDataRecord->size * mVertexDataRecord->numSkirtRowsCols;

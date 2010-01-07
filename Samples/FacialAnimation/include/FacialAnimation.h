@@ -10,8 +10,8 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
 {
 public:
 
-	Sample_FacialAnimation(): mPlayAnimation(false),
-		mManualKeyFrame(0),mSpeakAnimState(0),mManualAnimState(0)
+	Sample_FacialAnimation(): 
+		mSpeakAnimState(0), mManualAnimState(0), mManualKeyFrame(0), mPlayAnimation(false)
 	{
 		mInfo["Title"] = "Facial Animation";
 		mInfo["Description"] = "A demonstration of the facial animation feature, using pose animation.";

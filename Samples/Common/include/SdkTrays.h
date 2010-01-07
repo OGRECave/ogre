@@ -145,10 +145,10 @@ namespace OgreBites
 		static bool isCursorOver(Ogre::OverlayElement* element, const Ogre::Vector2& cursorPos, Ogre::Real voidBorder = 0)
 		{
 			Ogre::OverlayManager& om = Ogre::OverlayManager::getSingleton();
-			unsigned int l = element->_getDerivedLeft() * om.getViewportWidth();
-			unsigned int t = element->_getDerivedTop() * om.getViewportHeight();
-			unsigned int r = l + element->getWidth();
-			unsigned int b = t + element->getHeight();
+            Ogre::Real l = element->_getDerivedLeft() * om.getViewportWidth();
+            Ogre::Real t = element->_getDerivedTop() * om.getViewportHeight();
+            Ogre::Real r = l + element->getWidth();
+            Ogre::Real b = t + element->getHeight();
 
 			return (cursorPos.x >= l + voidBorder && cursorPos.x <= r - voidBorder &&
 				cursorPos.y >= t + voidBorder && cursorPos.y <= b - voidBorder);
@@ -564,7 +564,7 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		unsigned int getHeightInLines()
 		{
-			return (mElement->getHeight() - 2 * mPadding - mCaptionBar->getHeight() + 5) / mTextArea->getCharHeight();
+			return (unsigned int) ((mElement->getHeight() - 2 * mPadding - mCaptionBar->getHeight() + 5) / mTextArea->getCharHeight());
 		}
 
 		void _cursorPressed(const Ogre::Vector2& cursorPos)
@@ -582,7 +582,7 @@ namespace OgreBites
 			{
 				Ogre::Real newTop = mScrollHandle->getTop() + co.y;
 				Ogre::Real lowerBoundary = mScrollTrack->getHeight() - mScrollHandle->getHeight();
-				mScrollHandle->setTop(Ogre::Math::Clamp<int>(newTop, 0, lowerBoundary));
+				mScrollHandle->setTop(Ogre::Math::Clamp<int>((int)newTop, 0, (int)lowerBoundary));
 
 				// update text area contents based on new scroll percentage
 				mScrollPercentage = Ogre::Math::Clamp<Ogre::Real>(newTop / lowerBoundary, 0, 1);
@@ -602,7 +602,7 @@ namespace OgreBites
 				Ogre::Vector2 co = Widget::cursorOffset(mScrollHandle, cursorPos);
 				Ogre::Real newTop = mScrollHandle->getTop() + co.y - mDragOffset;
 				Ogre::Real lowerBoundary = mScrollTrack->getHeight() - mScrollHandle->getHeight();
-				mScrollHandle->setTop(Ogre::Math::Clamp<int>(newTop, 0, lowerBoundary));
+				mScrollHandle->setTop(Ogre::Math::Clamp<int>((int)newTop, 0, (int)lowerBoundary));
 
 				// update text area contents based on new scroll percentage
 				mScrollPercentage = Ogre::Math::Clamp<Ogre::Real>(newTop / lowerBoundary, 0, 1);
@@ -624,7 +624,7 @@ namespace OgreBites
 		{
 			Ogre::String shown = "";
 			unsigned int maxLines = getHeightInLines();
-			unsigned int newStart = mScrollPercentage * (mLines.size() - maxLines) + 0.5;
+			unsigned int newStart = (unsigned int) (mScrollPercentage * (mLines.size() - maxLines) + 0.5);
 
 			mStartingLine = newStart;
 
@@ -900,10 +900,10 @@ namespace OgreBites
 					{
 						Ogre::Real newTop = mScrollHandle->getTop() + co.y;
 						Ogre::Real lowerBoundary = mScrollTrack->getHeight() - mScrollHandle->getHeight();
-						mScrollHandle->setTop(Ogre::Math::Clamp<int>(newTop, 0, lowerBoundary));
+						mScrollHandle->setTop(Ogre::Math::Clamp<int>((int)newTop, 0, (int)lowerBoundary));
 
 						Ogre::Real scrollPercentage = Ogre::Math::Clamp<Ogre::Real>(newTop / lowerBoundary, 0, 1);
-						setDisplayIndex(scrollPercentage * (mItems.size() - mItemElements.size()) + 0.5);
+						setDisplayIndex((unsigned int)(scrollPercentage * (mItems.size() - mItemElements.size()) + 0.5));
 						return;
 					}
 				}
@@ -980,10 +980,10 @@ namespace OgreBites
 					Ogre::Vector2 co = Widget::cursorOffset(mScrollHandle, cursorPos);
 					Ogre::Real newTop = mScrollHandle->getTop() + co.y - mDragOffset;
 					Ogre::Real lowerBoundary = mScrollTrack->getHeight() - mScrollHandle->getHeight();
-					mScrollHandle->setTop(Ogre::Math::Clamp<int>(newTop, 0, lowerBoundary));
+					mScrollHandle->setTop(Ogre::Math::Clamp<int>((int)newTop, 0, (int)lowerBoundary));
 
 					Ogre::Real scrollPercentage = Ogre::Math::Clamp<Ogre::Real>(newTop / lowerBoundary, 0, 1);
-					int newIndex = scrollPercentage * (mItems.size() - mItemElements.size()) + 0.5;
+					int newIndex = (int) (scrollPercentage * (mItems.size() - mItemElements.size()) + 0.5);
 					if (newIndex != mDisplayIndex) setDisplayIndex(newIndex);
 					return;
 				}
@@ -996,7 +996,7 @@ namespace OgreBites
 
 				if (cursorPos.x >= l && cursorPos.x <= r && cursorPos.y >= t && cursorPos.y <= b)
 				{
-					int newIndex = mDisplayIndex + (cursorPos.y - t) / (b - t) * mItemElements.size();
+					int newIndex = (int)(mDisplayIndex + (cursorPos.y - t) / (b - t) * mItemElements.size());
 					if (mHighlightIndex != newIndex)
 					{
 						mHighlightIndex = newIndex;
@@ -1313,7 +1313,7 @@ namespace OgreBites
 				Ogre::Real newLeft = mHandle->getLeft() + co.x;
 				Ogre::Real rightBoundary = mTrack->getWidth() - mHandle->getWidth();
 
-				mHandle->setLeft(Ogre::Math::Clamp<int>(newLeft, 0, rightBoundary));
+				mHandle->setLeft(Ogre::Math::Clamp<int>((int)newLeft, 0, (int)rightBoundary));
 				setValue(getSnappedValue(newLeft / rightBoundary));
 			}
 		}
@@ -1336,7 +1336,7 @@ namespace OgreBites
 				Ogre::Real newLeft = mHandle->getLeft() + co.x - mDragOffset;
 				Ogre::Real rightBoundary = mTrack->getWidth() - mHandle->getWidth();
 
-				mHandle->setLeft(Ogre::Math::Clamp<int>(newLeft, 0, rightBoundary));
+				mHandle->setLeft(Ogre::Math::Clamp<int>((int)newLeft, 0, (int)rightBoundary));
 				setValue(getSnappedValue(newLeft / rightBoundary));
 			}
 		}
@@ -1355,7 +1355,7 @@ namespace OgreBites
 		Ogre::Real getSnappedValue(Ogre::Real percentage)
 		{
 			percentage = Ogre::Math::Clamp<Ogre::Real>(percentage, 0, 1);
-			unsigned int whichMarker = percentage * (mMaxValue - mMinValue) / mInterval + 0.5;
+			unsigned int whichMarker = (unsigned int) (percentage * (mMaxValue - mMinValue) / mInterval + 0.5);
 			return whichMarker * mInterval + mMinValue;
 		}
 
@@ -1643,7 +1643,7 @@ namespace OgreBites
 		void setProgress(Ogre::Real progress)
 		{
 			mProgress = Ogre::Math::Clamp<Ogre::Real>(progress, 0, 1);
-			mFill->setWidth(std::max<int>(mFill->getHeight(), mProgress * (mMeter->getWidth() - 2 * mFill->getLeft())));
+			mFill->setWidth(std::max<int>((int)mFill->getHeight(), (int)(mProgress * (mMeter->getWidth() - 2 * mFill->getLeft()))));
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -1699,10 +1699,10 @@ namespace OgreBites
 #else
 		SdkTrayManager(const Ogre::String& name, Ogre::RenderWindow* window, OIS::Mouse* mouse, SdkTrayListener* listener = 0) :
 #endif
-		  mName(name), mWindow(window), mMouse(mouse), mListener(listener), mWidgetPadding(8), mWidgetSpacing(2),
-                mTrayPadding(0), mTrayDrag(false), mExpandedMenu(0), mDialog(0), mOk(0), mYes(0), mNo(0),
-                mFpsLabel(0), mStatsPanel(0), mLogo(0), mLoadBar(0),mWidgetDeathRow(),mCursorWasVisible(false),
-				mGroupInitProportion(0.0f),mGroupLoadProportion(0.0f),mLoadInc(0.0f)
+		  mName(name), mWindow(window), mMouse(mouse), mWidgetDeathRow(), mListener(listener), mWidgetPadding(8),
+                mWidgetSpacing(2), mTrayPadding(0), mTrayDrag(false), mExpandedMenu(0), mDialog(0), mOk(0), mYes(0),
+                mNo(0), mCursorWasVisible(false), mFpsLabel(0), mStatsPanel(0), mLogo(0), mLoadBar(0),
+				mGroupInitProportion(0.0f), mGroupLoadProportion(0.0f), mLoadInc(0.0f)
 		{
 			Ogre::OverlayManager& om = Ogre::OverlayManager::getSingleton();
 
@@ -1955,18 +1955,18 @@ namespace OgreBites
 
 		void setWidgetPadding(Ogre::Real padding)
 		{
-			mWidgetPadding = std::max<int>(padding, 0);
+			mWidgetPadding = std::max<int>((int)padding, 0);
 			adjustTrays();
 		}
 
 		void setWidgetSpacing(Ogre::Real spacing)
 		{
-			mWidgetSpacing = std::max<int>(spacing, 0);
+			mWidgetSpacing = std::max<int>((int)spacing, 0);
 			adjustTrays();
 		}
 		void setTrayPadding(Ogre::Real padding)
 		{
-			mTrayPadding = std::max<int>(padding, 0);
+			mTrayPadding = std::max<int>((int)padding, 0);
 			adjustTrays();
 		}
 
@@ -2203,7 +2203,7 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Shows frame statistics widget set in the specified location.
 		-----------------------------------------------------------------------------*/
-		void showFrameStats(TrayLocation trayLoc, unsigned int place = -1)
+		void showFrameStats(TrayLocation trayLoc, int place = -1)
 		{
 			if (!areFrameStatsVisible())
 			{
@@ -2253,7 +2253,7 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Shows logo in the specified location.
 		-----------------------------------------------------------------------------*/
-		void showLogo(TrayLocation trayLoc, unsigned int place = -1)
+		void showLogo(TrayLocation trayLoc, int place = -1)
 		{
 			if (!isLogoVisible()) mLogo = createDecorWidget(TL_NONE, mName + "/Logo", "SdkTrays/Logo");
 			moveWidgetToTray(mLogo, trayLoc, place);
@@ -2573,7 +2573,7 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Gets a widget's position in its tray.
 		-----------------------------------------------------------------------------*/
-		unsigned int locateWidgetInTray(Widget* widget)
+		int locateWidgetInTray(Widget* widget)
 		{
 			for (unsigned int i = 0; i < mWidgets[widget->getTrayLocation()].size(); i++)
 			{

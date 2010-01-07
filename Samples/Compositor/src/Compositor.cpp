@@ -107,7 +107,7 @@ void Sample_Compositor::registerCompositors(void)
 		}
 		try 
 		{
-			Ogre::CompositorInstance *instance = Ogre::CompositorManager::getSingleton().addCompositor(vp, compositorName, addPosition);
+			Ogre::CompositorManager::getSingleton().addCompositor(vp, compositorName, addPosition);
 			Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, compositorName, false);
 		} catch (...) {
 		}

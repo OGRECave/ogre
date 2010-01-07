@@ -44,7 +44,7 @@ protected:
 	//You might need to expand this class to support more options
 	struct PassProperties 
 	{
-		PassProperties() : normalMap(0), isSkinned(false), isDeferred(true) {}
+		PassProperties() : isDeferred(true), normalMap(0), isSkinned(false) {}
 
 		bool isDeferred;
 		Ogre::vector<Ogre::TextureUnitState*>::type regularTextures;

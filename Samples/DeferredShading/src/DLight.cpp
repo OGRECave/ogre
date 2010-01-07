@@ -29,7 +29,7 @@ same license as the rest of the engine.
 using namespace Ogre;
 //-----------------------------------------------------------------------
 DLight::DLight(MaterialGenerator *sys, Ogre::Light* parentLight):
-	bIgnoreWorld(false), mGenerator(sys),mPermutation(0), mParentLight(parentLight)
+    mParentLight(parentLight), bIgnoreWorld(false), mGenerator(sys), mPermutation(0)
 {
 	// Set up geometry
 	// Allocate render operation

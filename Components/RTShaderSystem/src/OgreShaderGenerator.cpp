@@ -1235,7 +1235,6 @@ ShaderGenerator::SGTechnique::~SGTechnique()
 		// Do per pass cleanup.
 		for (SGPassIterator itPass = mPassEntries.begin(); itPass != mPassEntries.end(); ++itPass)
 		{
-			SGPass*				curPassEntry = *itPass;
 			Pass*				srcPass		 = (*itPass)->getSrcPass();
 			UserObjectBindings& passBindings = srcPass->getUserObjectBindings();
 			const Any& rtssAnyBindings		 = passBindings.getUserAny(ShaderGenerator::BINDING_OBJECT_KEY);

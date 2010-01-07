@@ -746,7 +746,6 @@ TexCoordCalcMethod FFPTexturing::getTexCalcMethod(TextureUnitState* textureUnitS
 //-----------------------------------------------------------------------
 bool FFPTexturing::needsTextureMatrix(TextureUnitState* textureUnitState)
 {
-	TexCoordCalcMethod						texCoordCalcMethod = TEXCALC_NONE;	
 	const TextureUnitState::EffectMap&		effectMap = textureUnitState->getEffects();	
 	TextureUnitState::EffectMap::const_iterator	effi;
 
@@ -760,6 +759,8 @@ bool FFPTexturing::needsTextureMatrix(TextureUnitState* textureUnitState)
 		case TextureUnitState::ET_VSCROLL:
 		case TextureUnitState::ET_ROTATE:
 		case TextureUnitState::ET_TRANSFORM:
+		case TextureUnitState::ET_ENVIRONMENT_MAP:
+		case TextureUnitState::ET_PROJECTIVE_TEXTURE:
 			return true;		
 		}
 	}
@@ -949,7 +950,7 @@ void FFPTexturing::setTextureUnitCount(size_t count)
 
 		curParams.mTextureUnitState				= NULL;			
 		curParams.mTextureProjector				= NULL;				  
-		curParams.mTextureSamplerIndex			= NULL;			  
+		curParams.mTextureSamplerIndex			= 0;			  
 		curParams.mTextureSamplerType			= GCT_SAMPLER2D;		
 		curParams.mVSInTextureCoordinateType	= GCT_FLOAT2;	
 		curParams.mVSOutTextureCoordinateType	= GCT_FLOAT2;		

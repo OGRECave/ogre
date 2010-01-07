@@ -436,12 +436,12 @@ protected:
 		float stations_per_revolution = 3.5f;
 		size_t skip = 2; // stations between lights
 		Vector3 station_pos[stations];
-		for(int x=0; x<s_to_top; ++x)
+		for(size_t x=0; x<s_to_top; ++x)
 		{
 			float theta = ((float)x/stations_per_revolution)*2.0f*Math::PI;
 			station_pos[x] = base+Vector3(Math::Sin(theta)*r, ascend*x, Math::Cos(theta)*r);
 		}
-		for(int x=s_to_top; x<stations; ++x)
+		for(size_t x=s_to_top; x<stations; ++x)
 		{
 			float theta = ((float)x/stations_per_revolution)*2.0f*Math::PI;
 			station_pos[x] = base+Vector3(Math::Sin(theta)*r, h-ascend*(x-s_to_top), Math::Cos(theta)*r);
@@ -454,7 +454,7 @@ protected:
 		{
 			// Create a track to animate the camera's node
 			NodeAnimationTrack* track = anim->createNodeTrack(x, nodes[x]);
-			for(int y=0; y<=stations; ++y)
+			for(size_t y=0; y<=stations; ++y)
 			{
 				// Setup keyframes
 				TransformKeyFrame* key = track->createNodeKeyFrame(y*seconds_per_station); // A start position

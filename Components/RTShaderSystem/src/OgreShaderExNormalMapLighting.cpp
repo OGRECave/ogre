@@ -122,8 +122,6 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 
 	GpuProgramParametersSharedPtr vsGpuParams = pass->getVertexProgramParameters();
 	GpuProgramParametersSharedPtr psGpuParams = pass->getFragmentProgramParameters();
-	SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager();	
-	const Matrix4& matWorldInv	= source->getInverseWorldMatrix();	
 	Light::LightTypes curLightType = Light::LT_DIRECTIONAL; 
 	unsigned int curSearchLightIndex = 0;
 	const Matrix4& matWorld = source->getWorldMatrix();

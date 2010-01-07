@@ -99,7 +99,6 @@ protected:
 			mCPUUsage = FLT_MAX;
 
 		mLastTime = mTimer->getMicroseconds()/1000000.0f; //convert into seconds
-		int time = mCPUUsage+0.5f;
 	}
 	//-----------------------------------------------------------------------
 	void destroyCurrentGeomOpt()

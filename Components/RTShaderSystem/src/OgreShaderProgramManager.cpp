@@ -453,7 +453,6 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		pGpuProgram->load();
 
 		GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
-		const ShaderParameterList& progParams = shaderProgram->getParameters();
 		ShaderParameterConstIterator itParams;
 
 		// Case an error occurred.

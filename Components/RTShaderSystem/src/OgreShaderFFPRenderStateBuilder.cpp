@@ -193,8 +193,6 @@ void FFPRenderStateBuilder::resolveColourStageFlags( ShaderGenerator::SGPass* sg
 		// Add vertex shader specular lighting output in case of specular enabled.
 		if (curSubRenderState->getType() == FFPLighting::Type)
 		{
-			FFPLighting* lightingSubState = static_cast<FFPLighting*>(curSubRenderState);
-
 			colourSubState->addResolveStageMask(FFPColour::SF_VS_OUTPUT_DIFFUSE);
 
 			Pass* srcPass = sgPass->getSrcPass();

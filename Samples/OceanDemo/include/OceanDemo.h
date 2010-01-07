@@ -77,7 +77,7 @@ protected:
 	void checkBoxToggled(CheckBox* box);
 	void selectOceanMaterial(OceanMaterial newMaterial);
 	void itemSelected(SelectMenu* menu);
-	void changePage(size_t nextPage = -1);
+	void changePage(int nextPage = -1);
 	virtual bool frameRenderingQueued(const FrameEvent& evt);
 };
 
@@ -243,8 +243,8 @@ void Sample_Ocean::sliderMoved(Slider* slider)
 {
 	using namespace Ogre;
 
-	size_t sliderIndex = -1;
-	for (size_t i=0; i<CONTROLS_PER_PAGE; i++)
+	int sliderIndex = -1;
+	for (int i=0; i<CONTROLS_PER_PAGE; i++)
 	{
 		if (mShaderControls[i] == slider)
 		{
@@ -318,13 +318,13 @@ void Sample_Ocean::sliderMoved(Slider* slider)
 }
 
 //--------------------------------------------------------------------------
-void Sample_Ocean::changePage(size_t pageNum /* = -1 : toggle */)
+void Sample_Ocean::changePage(int pageNum /* = -1 : toggle */)
 {
 	if (mMaterialControlsContainer.empty()) return;
 	mCurrentPage = (pageNum == -1) ? (mCurrentPage+1) % mNumPages : pageNum;
 
 	static char pageText[64];
-	sprintf(pageText, "Parameters %d / %d", mCurrentPage+1, mNumPages);
+	sprintf(pageText, "Parameters %lu / %d", mCurrentPage+1, (int)mNumPages);
 	static_cast<OgreBites::Button*>(mTrayMgr->getWidget("PageButtonControl"))->setCaption(pageText);
 
     if(!mActiveMaterial.isNull() && mActiveMaterial->getNumSupportedTechniques())
