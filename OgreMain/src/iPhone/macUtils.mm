@@ -67,4 +67,13 @@ namespace Ogre {
         
         return std::string([documentsDirectory cStringUsingEncoding:NSASCIIStringEncoding]);
     }
+
+    std::string macCachePath()
+    {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+        NSString *cachesDirectory = [paths objectAtIndex:0];
+
+        return [[cachesDirectory stringByAppendingString:@"/"] cStringUsingEncoding:NSASCIIStringEncoding];
+    }
+
 }
