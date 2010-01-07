@@ -85,10 +85,10 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void setTarget(Ogre::SceneNode* target)
 		{
+			mTarget = target ? target : mCamera->getSceneManager()->getRootSceneNode();
+
 			if (mStyle == CS_ORBIT)
 			{
-				mTarget = target ? target : mCamera->getSceneManager()->getRootSceneNode();
-				setYawPitchDist(Ogre::Degree(0), Ogre::Degree(15), 150);
 				mCamera->setAutoTracking(true, mTarget);
 			}
 		}
@@ -136,6 +136,8 @@ namespace OgreBites
 				setTarget(mTarget);
 				mCamera->setFixedYawAxis(true);
 				manualStop();
+				setYawPitchDist(Ogre::Degree(0), Ogre::Degree(15), 150);
+
 			}
 			else if (mStyle != CS_FREELOOK && style == CS_FREELOOK)
 			{
