@@ -33,6 +33,9 @@ public:
 	/** @see Sample::buttonHit. */
 	virtual void buttonHit(OgreBites::Button* b);
 
+	/** @see Sample::sliderMoved. */
+	virtual void sliderMoved(Slider* slider);
+
 	/** @see Sample::getRequiredPlugins. */
 	StringVector getRequiredPlugins();
 
@@ -139,6 +142,8 @@ protected:
 	bool								mPerPixelFogEnable;		// When true the RTSS will do per pixel fog calculations.
 	bool								mSpecularEnable;		// The current specular state.	
 	RTShader::SubRenderStateFactory*	mReflectionMapFactory;	// The custom reflection map shader extension factory.
+	RTShader::SubRenderState*			mReflectionMapSubRS;	// The reflection map sub render state.
+	Slider*								mReflectionPowerSlider;	// The reflection power controller slider.
 	bool								mReflectionMapEnable;	// The current reflection map effect state.
 	SceneNode*							mPointLightNode;		// Point light scene node.
 	SceneNode*							mDirectionalLightNode;	// Directional light scene node.		
@@ -150,6 +155,8 @@ protected:
 	CheckBox*							mDirLightCheckBox;		// The directional light check box.
 	CheckBox*							mPointLightCheckBox;	// The point light check box.
 	CheckBox*							mSpotLightCheckBox;		// The spot light check box.
+	String								mRTShaderLibsPath;		// The path of the RTShader Libs.
+					
 };
 
 #endif

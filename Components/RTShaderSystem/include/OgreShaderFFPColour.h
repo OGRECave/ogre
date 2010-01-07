@@ -86,11 +86,6 @@ public:
 	virtual void			copyFrom				(const SubRenderState& rhs);
 
 	/** 
-	@see SubRenderState::getHashCode.
-	*/
-	virtual uint32			getHashCode				();
-
-	/** 
 	@see SubRenderState::preAddToRenderState.
 	*/
 	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass);

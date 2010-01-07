@@ -56,7 +56,6 @@ namespace RTShader {
 /*                                                                      */
 /************************************************************************/
 String NormalMapLighting::Type						= "SGX_NormalMapLighting";
-String NormalMapLighting::NormalMapTextureNameKey   = "SGNormalMapTextureName";
 
 Light NormalMapLighting::msBlankLight;
 
@@ -88,40 +87,14 @@ int	NormalMapLighting::getExecutionOrder() const
 }
 
 //-----------------------------------------------------------------------
-uint32 NormalMapLighting::getHashCode()
-{
-	uint32 hashCode = 0;
-
-	sh_hash_combine(hashCode, SubRenderState::getHashCode());
-
-	LightParamsIterator it = mLightParamsList.begin();
-
-
-	sh_hash_combine(hashCode, mSpecularEnable);	
-
-	while(it != mLightParamsList.end())
-	{
-		sh_hash_combine(hashCode, it->mType);		
-		++it;
-	}
-
-	sh_hash_combine(hashCode, mTrackVertexColourType);
-	sh_hash_combine(hashCode, mNormalMapSamplerIndex);	
-	sh_hash_combine(hashCode, mVSTexCoordSetIndex);
-	sh_hash_combine(hashCode, mNormalMapSpace);
-
-	return hashCode;
-}
-
-//-----------------------------------------------------------------------
 void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, 
 	const LightList* pLightList)
 {		
 	if (mLightParamsList.size() == 0)
 		return;
 
-	GpuProgramParametersSharedPtr vsGpuParams = pass->getVertexProgramParameters();
-	GpuProgramParametersSharedPtr psGpuParams = pass->getFragmentProgramParameters();
+	SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager();	
+	const Matrix4& matWorldInv	= source->getInverseWorldMatrix();	
 	Light::LightTypes curLightType = Light::LT_DIRECTIONAL; 
 	unsigned int curSearchLightIndex = 0;
 	const Matrix4& matWorld = source->getWorldMatrix();
@@ -140,7 +113,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 
 	// Update inverse rotation parameter.
 	if (mWorldInvRotMatrix.get() != NULL)	
-		vsGpuParams->setNamedConstant(mWorldInvRotMatrix->getName(), matWorldInvRotation);	
+		mWorldInvRotMatrix->setGpuParameter(matWorldInvRotation);	
 		
 	// Update per light parameters.
 	for (unsigned int i=0; i < mLightParamsList.size(); ++i)
@@ -189,7 +162,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 				vParameter.y = -vec3.y;
 				vParameter.z = -vec3.z;
 				vParameter.w = 0.0;
-				vsGpuParams->setNamedConstant(curParams.mDirection->getName(), vParameter);
+				curParams.mDirection->setGpuParameter(vParameter);
 			}
 			break;
 
@@ -197,14 +170,14 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 
 			// Update light position. (World space).				
 			vParameter = srcLight->getAs4DVector(true);
-			vsGpuParams->setNamedConstant(curParams.mPosition->getName(), vParameter);
+			curParams.mPosition->setGpuParameter(vParameter);
 
 			// Update light attenuation parameters.
 			vParameter.x = srcLight->getAttenuationRange();
 			vParameter.y = srcLight->getAttenuationConstant();
 			vParameter.z = srcLight->getAttenuationLinear();
 			vParameter.w = srcLight->getAttenuationQuadric();
-			psGpuParams->setNamedConstant(curParams.mAttenuatParams->getName(), vParameter);
+			curParams.mAttenuatParams->setGpuParameter(vParameter);
 			break;
 
 		case Light::LT_SPOTLIGHT:
@@ -213,7 +186,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 											
 				// Update light position. (World space).				
 				vParameter = srcLight->getAs4DVector(true);
-				vsGpuParams->setNamedConstant(curParams.mPosition->getName(), vParameter);
+				curParams.mPosition->setGpuParameter(vParameter);
 
 							
 				// Update light direction. (Object space).
@@ -224,14 +197,14 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 				vParameter.y = -vec3.y;
 				vParameter.z = -vec3.z;
 				vParameter.w = 0.0;
-				vsGpuParams->setNamedConstant(curParams.mDirection->getName(), vParameter);							
+				curParams.mDirection->setGpuParameter(vParameter);							
 				
 				// Update light attenuation parameters.
 				vParameter.x = srcLight->getAttenuationRange();
 				vParameter.y = srcLight->getAttenuationConstant();
 				vParameter.z = srcLight->getAttenuationLinear();
 				vParameter.w = srcLight->getAttenuationQuadric();
-				psGpuParams->setNamedConstant(curParams.mAttenuatParams->getName(), vParameter);
+				curParams.mAttenuatParams->setGpuParameter(vParameter);
 
 				// Update spotlight parameters.
 				Real phi   = Math::Cos(srcLight->getSpotlightOuterAngle().valueRadians() * 0.5f);
@@ -241,7 +214,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 				vec3.y = phi;
 				vec3.z = srcLight->getSpotlightFalloff();
 
-				psGpuParams->setNamedConstant(curParams.mSpotParams->getName(), vec3);
+				curParams.mSpotParams->setGpuParameter(vec3);
 			}
 			break;
 		}
@@ -251,12 +224,12 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 		if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
 		{
 			colour = srcLight->getDiffuseColour() * pass->getDiffuse();
-			psGpuParams->setNamedConstant(curParams.mDiffuseColour->getName(), colour);					
+			curParams.mDiffuseColour->setGpuParameter(colour);					
 		}
 		else
 		{					
 			colour = srcLight->getDiffuseColour();
-			psGpuParams->setNamedConstant(curParams.mDiffuseColour->getName(), colour);	
+			curParams.mDiffuseColour->setGpuParameter(colour);	
 		}
 
 		// Update specular colour if need to.
@@ -266,12 +239,12 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
 			{
 				colour = srcLight->getSpecularColour() * pass->getSpecular();
-				psGpuParams->setNamedConstant(curParams.mSpecularColour->getName(), colour);					
+				curParams.mSpecularColour->setGpuParameter(colour);					
 			}
 			else
 			{					
 				colour = srcLight->getSpecularColour();
-				psGpuParams->setNamedConstant(curParams.mSpecularColour->getName(), colour);	
+				curParams.mSpecularColour->setGpuParameter(colour);	
 			}
 		}																			
 	}
@@ -1199,6 +1172,7 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
 	mTrackVertexColourType = rhsLighting.mTrackVertexColourType;
 	mSpecularEnable = rhsLighting.mSpecularEnable;
 	mNormalMapSpace = rhsLighting.mNormalMapSpace;
+	mNormalMapTextureName = rhsLighting.mNormalMapTextureName;
 }
 
 //-----------------------------------------------------------------------
@@ -1211,17 +1185,9 @@ bool NormalMapLighting::preAddToRenderState(RenderState* renderState, Pass* srcP
 
 	renderState->getLightCount(lightCount);
 
-	UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(srcPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
-	const Any& passUserData = rtssBindings->getUserAny(NormalMapLighting::NormalMapTextureNameKey);
-
-	if (passUserData.isEmpty())	
-		return false;	
-
-	const String normalMapTextureName = any_cast<const String>(passUserData);
-
 	TextureUnitState* normalMapTexture = dstPass->createTextureUnitState();
 
-	normalMapTexture->setTextureName(normalMapTextureName);	
+	normalMapTexture->setTextureName(mNormalMapTextureName);	
 	normalMapTexture->setTextureMipmapBias(-1.0);
 	mNormalMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
@@ -1357,15 +1323,14 @@ SubRenderState*	NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 
 				unsigned int textureCoordinateIndex = 0;
 				SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
-				UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(pass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
+				NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
 				
-				rtssBindings->setUserAny(NormalMapLighting::NormalMapTextureNameKey, Any(strValue));
+				normalMapSubRenderState->setNormalMapTextureName(strValue);
 
+				
 				// Read normal map space type.
 				if (prop->values.size() >= 3)
-				{
-					NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
-
+				{					
 					++it;
 					if (false == SGScriptTranslator::getString(*it, &strValue))
 					{
@@ -1388,9 +1353,7 @@ SubRenderState*	NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 
 				// Read texture coordinate index.
 				if (prop->values.size() >= 4)
-				{
-					NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
-
+				{					
 					++it;
 					if (SGScriptTranslator::getUInt(*it, &textureCoordinateIndex))
 					{
@@ -1411,19 +1374,12 @@ void NormalMapLightingFactory::writeInstance(MaterialSerializer* ser,
 											 SubRenderState* subRenderState, 
 											 Pass* srcPass, Pass* dstPass)
 {
-	UserObjectBindings* rtssBindings = any_cast<UserObjectBindings*>(srcPass->getUserObjectBindings().getUserAny(ShaderGenerator::BINDING_OBJECT_KEY));
-	const Any& passUserData = rtssBindings->getUserAny(NormalMapLighting::NormalMapTextureNameKey);
-	if (passUserData.isEmpty())	
-		return;	
-
-	const String normalMapTextureName = any_cast<const String>(passUserData);
+	NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
 
 	ser->writeAttribute(4, "lighting_stage");
 	ser->writeValue("normal_map");
-	ser->writeValue(normalMapTextureName);	
-
-	NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
-
+	ser->writeValue(normalMapSubRenderState->getNormalMapTextureName());	
+	
 	if (normalMapSubRenderState->getNormalMapSpace() == NormalMapLighting::NMS_TANGENT)
 	{
 		ser->writeValue("tangent_space");

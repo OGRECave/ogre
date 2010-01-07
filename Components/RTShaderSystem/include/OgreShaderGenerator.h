@@ -339,9 +339,6 @@ public:
 	/// Default material scheme of the shader generator.
 	static String DEFAULT_SCHEME_NAME;
 
-	/// Key for the shared object bindings.
-	static String BINDING_OBJECT_KEY;
-
 // Protected types.
 protected:
 	class SGPass;
@@ -382,7 +379,7 @@ protected:
 		~SGPass			();
 	
 		/** Build the render state. */
-		void			buildRenderState			();
+		void			buildTargetRenderState			();
 
 		/** Acquire the CPU/GPU programs for this pass. */
 		void			acquirePrograms			();
@@ -406,9 +403,6 @@ protected:
 		/** Get custom render state of this pass. */
 		RenderState*	getCustomRenderState		() { return mCustomRenderState; }
 
-		/** Get the final render state of this pass. */
-		RenderState*	getFinalRenderState			() { return mFinalRenderState.get(); }
-
 		/** Set the custom render state of this pass. */
 		void			setCustomRenderState		(RenderState* customRenderState) { mCustomRenderState = customRenderState; }
 
@@ -418,11 +412,11 @@ protected:
 		SubRenderState*	getCustomFFPSubState		(int subStateOrder, const RenderState* renderState);
 
 	protected:
-		SGTechnique*		mParent;				// Parent technique.
-		Pass*				mSrcPass;				// Source pass.
-		Pass*				mDstPass;				// Destination pass.
-		RenderState*		mCustomRenderState;		// Custom render state.
-		RenderStatePtr		mFinalRenderState;		// Final render state.		
+		SGTechnique*			mParent;				// Parent technique.
+		Pass*					mSrcPass;				// Source pass.
+		Pass*					mDstPass;				// Destination pass.
+		RenderState*			mCustomRenderState;		// Custom render state.
+		TargetRenderState*		mTargetRenderState;	// The compiled render state.		
 	};
 
 	
@@ -446,7 +440,7 @@ protected:
 		const String&		getDestinationTechniqueSchemeName() const { return mDstTechniqueSchemeName; }
 		
 		/** Build the render state. */
-		void				buildRenderState				();
+		void				buildTargetRenderState				();
 
 		/** Acquire the CPU/GPU programs for this technique. */
 		void				acquirePrograms				();
@@ -678,11 +672,6 @@ protected:
 	typedef SubRenderStateFactoryMap::const_iterator		SubRenderStateFactoryConstIterator;
 
 	//-----------------------------------------------------------------------------
-	typedef map<uint32, RenderStatePtr>::type 				RenderStateMap;
-	typedef RenderStateMap::iterator 						RenderStateMapIterator;
-	typedef RenderStateMap::const_iterator					RenderStateMapConstIterator;
-
-	//-----------------------------------------------------------------------------
 	typedef map<String, SceneManager*>::type 				SceneManagerMap;
 	typedef SceneManagerMap::iterator 						SceneManagerIterator;
 	typedef SceneManagerMap::const_iterator					SceneManagerConstIterator;
@@ -708,15 +697,6 @@ protected:
 
 	/** Called from the sub class of the SceneManager::Listener when finding visible object process starts. */
 	void				preFindVisibleObjects			(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v);
-
-	/** Get cached render state instance by hash code. */
-	RenderStatePtr		getCachedRenderState			(uint hashCode);
-
-	/** Add render state to cache.*/
-	void				addRenderStateToCache			(RenderStatePtr renderStatePtr);
-
-	/** Remove render state from cache.*/
-	void				removeRenderStateFromCache		(RenderStatePtr renderStatePtr);
 
 	/** Create sub render state core extensions factories */
 	void				createSubRenderStateExFactories			();
@@ -786,7 +766,6 @@ protected:
 	SGMaterialMap					mMaterialEntriesMap;			// Material entries map.
 	SGSchemeMap						mSchemeEntriesMap;				// Scheme entries map.
 	SGTechniqueMap					mTechniqueEntriesMap;			// All technique entries map.
-	RenderStateMap					mCachedRenderStates;			// All cached render states.
 	SubRenderStateFactoryMap		mSubRenderStateFactories;		// Sub render state registered factories.
 	SubRenderStateFactoryMap		mSubRenderStateExFactories;		// Sub render state core extension factories.
 	bool							mActiveViewportValid;			// True if active view port use a valid SGScheme.

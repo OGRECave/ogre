@@ -53,7 +53,9 @@ namespace RTShader
 
 /// Forward declarations from RTShader namespace.
 class RenderState;
+class TargetRenderState;
 class SubRenderState;
+class SubRenderStateAccessor;
 class SubRenderStateFactory;
 class ProgramManager;
 class Program;

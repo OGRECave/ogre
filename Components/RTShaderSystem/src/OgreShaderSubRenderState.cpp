@@ -43,18 +43,10 @@ SubRenderState::SubRenderState()
 //-----------------------------------------------------------------------
 SubRenderState::~SubRenderState()
 {
-
-}
-
-uint32 SubRenderState::getHashCode()
-{
-	uint32 hashCode = 0;
-	_StringHash H;
-
-	sh_hash_combine(hashCode, static_cast<uint32>(H(getType())));
-	sh_hash_combine(hashCode, ShaderGenerator::getSingleton().getVertexShaderOutputsCompactPolicy());	
-	
-	return hashCode;
+	if (mOtherAccessor.isNull() == false)
+	{
+		mOtherAccessor->removeSubRenderStateInstance(this);
+	}
 }
 
 //-----------------------------------------------------------------------
@@ -69,7 +61,7 @@ SubRenderState*	SubRenderStateFactory::createInstance()
 {
 	SubRenderState*	subRenderState = createInstanceImpl();
 
-	mSubRenderStateList.push_back(subRenderState);
+	mSubRenderStateList.insert(subRenderState);
 
 	return subRenderState;
 }
@@ -77,23 +69,19 @@ SubRenderState*	SubRenderStateFactory::createInstance()
 //-----------------------------------------------------------------------
 void SubRenderStateFactory::destroyInstance(SubRenderState* subRenderState)
 {
-	SubRenderStateIterator it;
+	SubRenderStateSetIterator it = mSubRenderStateList.find(subRenderState);
 
-	for (it = mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
+	if (it != mSubRenderStateList.end())
 	{
-		if (*it == subRenderState)
-		{
-			OGRE_DELETE *it;
-			mSubRenderStateList.erase(it);
-			break;
-		}
-	}
+		OGRE_DELETE *it;
+		mSubRenderStateList.erase(it);
+	}	
 }
 
 //-----------------------------------------------------------------------
 void SubRenderStateFactory::destroyAllInstances()
 {
-	SubRenderStateIterator it;
+	SubRenderStateSetIterator it;
 
 	for (it = mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
 	{		
@@ -114,6 +102,11 @@ SubRenderState& SubRenderState::operator=(const SubRenderState& rhs)
 	}
 
 	copyFrom(rhs);
+
+	SubRenderStateAccessorPtr rhsAccessor = rhs.getAccessor();
+
+	rhsAccessor->addSubRenderStateInstance(this);
+	mOtherAccessor = rhsAccessor;
 
 	return *this;
 }
@@ -159,6 +152,31 @@ bool SubRenderState::addFunctionInvocations( ProgramSet* programSet )
 	return true;
 }
 
+//-----------------------------------------------------------------------
+SubRenderStateAccessorPtr SubRenderState::getAccessor()
+{
+	if (mThisAccessor.isNull())
+	{
+		SubRenderStateAccessor* accessor = OGRE_NEW_T(SubRenderStateAccessor, MEMCATEGORY_GENERAL)(this);
+		
+		mThisAccessor.bind(accessor, SPFM_DELETE_T);
+	}
+
+	return mThisAccessor;
+}
+
+//-----------------------------------------------------------------------
+SubRenderStateAccessorPtr SubRenderState::getAccessor() const
+{
+	if (mThisAccessor.isNull())
+	{
+		SubRenderStateAccessor* accessor = OGRE_NEW_T(SubRenderStateAccessor, MEMCATEGORY_GENERAL)(this);
+
+		mThisAccessor.bind(accessor, SPFM_DELETE_T);
+	}
+
+	return mThisAccessor;
+}
 
 
 

@@ -74,7 +74,7 @@ GpuProgramType Program::getType() const
 }
 
 //-----------------------------------------------------------------------------
-void Program::addParameter(ParameterPtr parameter)
+void Program::addParameter(UniformParameterPtr parameter)
 {
 	if (getParameterByName(parameter->getName()).get() != NULL)
 	{
@@ -87,9 +87,9 @@ void Program::addParameter(ParameterPtr parameter)
 }
 
 //-----------------------------------------------------------------------------
-void Program::removeParameter(ParameterPtr parameter)
+void Program::removeParameter(UniformParameterPtr parameter)
 {
-	ShaderParameterIterator it;
+	UniformParameterIterator it;
 
 	for (it = mParameters.begin(); it != mParameters.end(); ++it)
 	{
@@ -102,10 +102,10 @@ void Program::removeParameter(ParameterPtr parameter)
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, 
+UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, 
 												Real data)
 {
-	ParameterPtr param;
+	UniformParameterPtr param;
 
 	// Check if parameter already exists.
 	param = getParameterByAutoType(autoType);
@@ -119,17 +119,17 @@ ParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstan
 	}
 	
 	// Create new parameter.
-	param = ParameterPtr(OGRE_NEW Parameter(autoType, data));
+	param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data));
 	addParameter(param);
 
 	return param;
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, 
+UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, 
 										   size_t data)
 {
-	ParameterPtr param;
+	UniformParameterPtr param;
 
 	// Check if parameter already exists.
 	param = getParameterByAutoType(autoType);
@@ -143,25 +143,25 @@ ParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstant
 	}
 
 	// Create new parameter.
-	param = ParameterPtr(OGRE_NEW Parameter(autoType, data));
+	param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data));
 	addParameter(param);
 
 	return param;
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Program::resolveParameter(GpuConstantType type, 
+UniformParameterPtr Program::resolveParameter(GpuConstantType type, 
 									int index, uint16 variability,
 									const String& suggestedName)
 {
-	ParameterPtr param;
+	UniformParameterPtr param;
 
 	if (index == -1)
 	{
 		index = 0;
 
 		// Find the next available index of the target type.
-		ShaderParameterIterator it;
+		UniformParameterIterator it;
 
 		for (it = mParameters.begin(); it != mParameters.end(); ++it)
 		{
@@ -182,10 +182,8 @@ ParameterPtr Program::resolveParameter(GpuConstantType type,
 		}
 	}
 	
-
-	
 	// Create new parameter.
-	param = ParameterPtr(OGRE_NEW Parameter(type, suggestedName + StringConverter::toString(index), Parameter::SPS_UNKNOWN, index, Parameter::SPC_UNKNOWN, variability));
+	param = ParameterFactory::createUniform(type, index, variability, suggestedName);
 	addParameter(param);
 
 	return param;
@@ -194,9 +192,9 @@ ParameterPtr Program::resolveParameter(GpuConstantType type,
 
 
 //-----------------------------------------------------------------------------
-ParameterPtr Program::getParameterByName(const String& name)
+UniformParameterPtr Program::getParameterByName(const String& name)
 {
-	ShaderParameterIterator it;
+	UniformParameterIterator it;
 
 	for (it = mParameters.begin(); it != mParameters.end(); ++it)
 	{
@@ -206,13 +204,13 @@ ParameterPtr Program::getParameterByName(const String& name)
 		}
 	}
 
-	return ParameterPtr();
+	return UniformParameterPtr();
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Program::getParameterByType(GpuConstantType type, int index)
+UniformParameterPtr Program::getParameterByType(GpuConstantType type, int index)
 {
-	ShaderParameterIterator it;
+	UniformParameterIterator it;
 
 	for (it = mParameters.begin(); it != mParameters.end(); ++it)
 	{
@@ -223,13 +221,13 @@ ParameterPtr Program::getParameterByType(GpuConstantType type, int index)
 		}
 	}
 
-	return ParameterPtr();
+	return UniformParameterPtr();
 }
 
 //-----------------------------------------------------------------------------
-ParameterPtr Program::getParameterByAutoType(GpuProgramParameters::AutoConstantType autoType)
+UniformParameterPtr Program::getParameterByAutoType(GpuProgramParameters::AutoConstantType autoType)
 {
-	ShaderParameterIterator it;
+	UniformParameterIterator it;
 
 	for (it = mParameters.begin(); it != mParameters.end(); ++it)
 	{
@@ -239,7 +237,7 @@ ParameterPtr Program::getParameterByAutoType(GpuProgramParameters::AutoConstantT
 		}
 	}
 
-	return ParameterPtr();
+	return UniformParameterPtr();
 }
 
 //-----------------------------------------------------------------------------

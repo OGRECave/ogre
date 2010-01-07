@@ -112,8 +112,8 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	const ShaderFunctionList& functionList = program->getFunctions();
 	ShaderFunctionConstIterator itFunction;
 
-	const ShaderParameterList& parameterList = program->getParameters();
-	ShaderParameterConstIterator itParam = parameterList.begin();
+	const UniformParameterList& parameterList = program->getParameters();
+	UniformParameterConstIterator itUniformParam = parameterList.begin();
 	
 	// Write the current version (this force the driver to more fulfill the glsl standard)
 	os << "#version "<< mGLSLVersion << std::endl;
@@ -131,9 +131,9 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	os << std::endl;
 
 	// Write the uniforms 
-	for (itParam = parameterList.begin();  itParam != parameterList.end(); ++itParam)
+	for (itUniformParam = parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
 	{
-		ParameterPtr pUniformParam = *itParam;
+		ParameterPtr pUniformParam = *itUniformParam;
 
 		os << "uniform\t"; 
 		os << mGpuConstTypeMap[pUniformParam->getType()];

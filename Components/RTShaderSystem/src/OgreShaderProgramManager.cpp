@@ -68,9 +68,6 @@ ProgramManager& ProgramManager::getSingleton()
 //-----------------------------------------------------------------------------
 ProgramManager::ProgramManager()
 {
-	mVertexShaderCount   = 0;
-	mFragmentShaderCount = 0;
-
 	createDefaultProgramProcessors();
 	createDefaultProgramWriterFactories();
 }
@@ -78,63 +75,91 @@ ProgramManager::ProgramManager()
 //-----------------------------------------------------------------------------
 ProgramManager::~ProgramManager()
 {
+	flushGpuProgramsCache();
 	destroyDefaultProgramWriterFactories();
-	destroyDefaultProgramProcessors();
-	destroyProgramSets();
+	destroyDefaultProgramProcessors();	
 	destroyProgramWriters();
 }
 
 //-----------------------------------------------------------------------------
-void ProgramManager::acquirePrograms(Pass* pass, RenderState* renderState)
+void ProgramManager::acquirePrograms(Pass* pass, TargetRenderState* renderState)
 {
-	uint32 renderStateHashCode    = renderState->getHashCode();
-	ProgramSetIterator itPrograms = mHashToProgramSetMap.find(renderStateHashCode);
-	ProgramSet* programSet = NULL;
-
-	// Cached programs for the given render state found.
-	if (itPrograms != mHashToProgramSetMap.end())
+	// Create the CPU programs.
+	if (false == renderState->createCpuPrograms())
 	{
-		programSet = itPrograms->second;		
-	}
+		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+			"Could not apply render state ", 
+			"ProgramManager::acquireGpuPrograms" );	
+	}	
 
-	// Case we have to generate gpu programs for the given render state.
-	else
+	ProgramSet* programSet = renderState->getProgramSet();
+
+	// Create the GPU programs.
+	if (false == createGpuPrograms(programSet))
 	{
-		programSet = OGRE_NEW ProgramSet;
+		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+			"Could not create gpu programs from render state ", 
+			"ProgramManager::acquireGpuPrograms" );
+	}	
 
-		if (false == renderState->createCpuPrograms(programSet))
-		{
-			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-				"Could not apply render state ", 
-				"ProgramManager::acquireGpuPrograms" );	
-		}	
-
-
-		if (false == createGpuPrograms(programSet))
-		{
-			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-				"Could not create gpu programs from render state ", 
-				"ProgramManager::acquireGpuPrograms" );
-		}	
-
-		mHashToProgramSetMap[renderStateHashCode] = programSet;
-	}
-
+	// Bind the created GPU programs to the target pass.
 	pass->setVertexProgram(programSet->getGpuVertexProgram()->getName());
 	pass->setFragmentProgram(programSet->getGpuFragmentProgram()->getName());
+
+
+	// Bind uniform parameters to pass parameters.
+	bindUniformParameters(programSet->getCpuVertexProgram(), pass->getVertexProgramParameters());
+	bindUniformParameters(programSet->getCpuFragmentProgram(), pass->getFragmentProgramParameters());
+
 }
 
 //-----------------------------------------------------------------------------
-void ProgramManager::releasePrograms(RenderState* renderState)
+void ProgramManager::releasePrograms(Pass* pass, TargetRenderState* renderState)
 {
-	uint32 renderStateHashCode    = renderState->getHashCode();
-	ProgramSetIterator itPrograms = mHashToProgramSetMap.find(renderStateHashCode);
-	
-	// Cached programs for the given render state found.
-	if (itPrograms != mHashToProgramSetMap.end())
+	ProgramSet* programSet = renderState->getProgramSet();
+
+	pass->setVertexProgram(StringUtil::BLANK);
+	pass->setFragmentProgram(StringUtil::BLANK);
+
+	GpuProgramsMapIterator itVsGpuProgram = mVertexShaderMap.find(programSet->getGpuVertexProgram()->getName());
+	GpuProgramsMapIterator itFsGpuProgram = mFragmentShaderMap.find(programSet->getGpuFragmentProgram()->getName());
+
+	renderState->destroyProgramSet();
+
+	if (itVsGpuProgram != mVertexShaderMap.end())
 	{
-		OGRE_DELETE itPrograms->second;	
-		mHashToProgramSetMap.erase(itPrograms);
+		if (itVsGpuProgram->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+		{
+			destroyGpuProgram(itVsGpuProgram->second);
+			mVertexShaderMap.erase(itVsGpuProgram);
+		}
+	}
+
+	if (itFsGpuProgram != mFragmentShaderMap.end())
+	{
+		if (itFsGpuProgram->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+		{
+			destroyGpuProgram(itFsGpuProgram->second);
+			mFragmentShaderMap.erase(itFsGpuProgram);
+		}
+	}
+}
+//-----------------------------------------------------------------------------
+void ProgramManager::flushGpuProgramsCache()
+{
+	flushGpuProgramsCache(mVertexShaderMap);
+	flushGpuProgramsCache(mFragmentShaderMap);
+}
+
+//-----------------------------------------------------------------------------
+void ProgramManager::flushGpuProgramsCache(GpuProgramsMap& gpuProgramsMap)
+{
+	while (gpuProgramsMap.size() > 0)
+	{
+		GpuProgramsMapIterator it = gpuProgramsMap.begin();
+
+		destroyGpuProgram(it->second);
+		gpuProgramsMap.erase(it);
 	}
 }
 
@@ -189,18 +214,6 @@ void ProgramManager::destroyDefaultProgramProcessors()
 }
 
 //-----------------------------------------------------------------------------
-void ProgramManager::destroyProgramSets()
-{
-	ProgramSetIterator it;
-
-	for (it=mHashToProgramSetMap.begin(); it != mHashToProgramSetMap.end(); ++it)
-	{
-		OGRE_DELETE it->second;
-	}
-	mHashToProgramSetMap.clear();
-}
-
-//-----------------------------------------------------------------------------
 void ProgramManager::destroyProgramWriters()
 {
 	ProgramWriterIterator it    = mProgramWritersMap.begin();
@@ -220,32 +233,24 @@ void ProgramManager::destroyProgramWriters()
 //-----------------------------------------------------------------------------
 Program* ProgramManager::createCpuProgram(GpuProgramType type)
 {
-	
 	Program* shaderProgram = OGRE_NEW Program(type);
 
-	mCpuProgramsList.push_back(shaderProgram);
+	mCpuProgramsList.insert(shaderProgram);
 
 	return shaderProgram;
 }
 
 
 //-----------------------------------------------------------------------------
-bool ProgramManager::destroyCpuProgram(Program* shaderProgram)
+void ProgramManager::destroyCpuProgram(Program* shaderProgram)
 {
-	ProgramListIterator it    = mCpuProgramsList.begin();
-	ProgramListIterator itEnd = mCpuProgramsList.end();
-
-	for (; it != itEnd; ++it)
-	{
-		if (*it == shaderProgram)
-		{			
-			OGRE_DELETE *it;			
-			mCpuProgramsList.erase(it);
-			return true;			
-		}		
-	}
-
-	return false;
+	ProgramListIterator it    = mCpuProgramsList.find(shaderProgram);
+	
+	if (it != mCpuProgramsList.end())
+	{			
+		OGRE_DELETE *it;			
+		mCpuProgramsList.erase(it);	
+	}			
 }
 
 //-----------------------------------------------------------------------------
@@ -331,14 +336,30 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 
 	programSet->setGpuFragmentProgram(psGpuProgram);
 
-
+	
 	// Call the post creation of GPU programs method.
 	success = programProcessor->postCreateGpuPrograms(programSet);
 	if (success == false)	
 		return false;	
 
+	
 	return true;
 	
+}
+
+
+//-----------------------------------------------------------------------------
+void ProgramManager::bindUniformParameters(Program* pCpuProgram, const GpuProgramParametersSharedPtr& passParams)
+{
+	const UniformParameterList& progParams = pCpuProgram->getParameters();
+	UniformParameterConstIterator itParams = progParams.begin();
+	UniformParameterConstIterator itParamsEnd = progParams.end();
+
+	// Bind each uniform parameter to its GPU parameter.
+	for (; itParams != itParamsEnd; ++itParams)
+	{			
+		(*itParams)->bind(passParams);					
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -451,10 +472,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		
 		pGpuProgram->setParameter("profiles", profiles);
 		pGpuProgram->load();
-
-		GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
-		ShaderParameterConstIterator itParams;
-
+	
 		// Case an error occurred.
 		if (pGpuProgram->hasCompileError())
 		{
@@ -462,17 +480,17 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 			return GpuProgramPtr(pGpuProgram);
 		}
 
-		if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
+		// Add the created GPU program to local cache.
+		if (pGpuProgram->getType() == GPT_VERTEX_PROGRAM)
 		{
-			mVertexShaderCount++;
+			mVertexShaderMap[programName] = pGpuProgram;			
 		}
-		else if (shaderProgram->getType() == GPT_FRAGMENT_PROGRAM)
+		else if (pGpuProgram->getType() == GPT_FRAGMENT_PROGRAM)
 		{
-			mFragmentShaderCount++;
-		}
+			mFragmentShaderMap[programName] = pGpuProgram;	
+		}				
 	}
 	
-
 	return GpuProgramPtr(pGpuProgram);
 }
 
@@ -503,24 +521,14 @@ void ProgramManager::removeProgramProcessor(ProgramProcessor* processor)
 }
 
 //-----------------------------------------------------------------------------
-void ProgramManager::destroyGpuProgram(const String& name, GpuProgramType type)
-{	
-	ResourcePtr res = HighLevelGpuProgramManager::getSingleton().getByName(name);
-	
-	if (res.isNull() == false)
-	{
-		if (type == GPT_VERTEX_PROGRAM)
-		{
-			assert(mVertexShaderCount > 0);
-			mVertexShaderCount--;
-		}
-		else if (type == GPT_FRAGMENT_PROGRAM)
-		{
-			assert(mFragmentShaderCount > 0);
-			mFragmentShaderCount--;
-		}
+void ProgramManager::destroyGpuProgram(GpuProgramPtr& gpuProgram)
+{		
+	const String& programName = gpuProgram->getName();
+	ResourcePtr res			  = HighLevelGpuProgramManager::getSingleton().getByName(programName);	
 
-		HighLevelGpuProgramManager::getSingleton().remove(name);
+	if (res.isNull() == false)
+	{		
+		HighLevelGpuProgramManager::getSingleton().remove(programName);
 	}
 }
 

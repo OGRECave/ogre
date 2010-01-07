@@ -64,11 +64,6 @@ public:
 	virtual int				getExecutionOrder		() const;
 
 	/** 
-	@see SubRenderState::getHashCode.
-	*/
-	virtual uint32			getHashCode				();
-
-	/** 
 	@see SubRenderState::copyFrom.
 	*/
 	virtual void			copyFrom				(const SubRenderState& rhs);
@@ -78,21 +73,47 @@ public:
 	*/
 	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
+	/** 
+	@see SubRenderState::preAddToRenderState.
+	*/
+	virtual void			updateGpuProgramsParams	(Renderable* rend, Pass* pass,  const AutoParamDataSource* source, 	const LightList* pLightList);
+
 	/** Sets the reflection map type. */
 	void					setReflectionMapType	(TextureType type);
 
 	/** Get the reflection map type. */
 	TextureType				getReflectionMapType	() const { return mReflectionMapType; }
 
+	/** Set the reflection map power. */
+	void					setReflectionPower		(const Real reflectionPower);
+	
+	/** Return the reflection map power. */
+	Real					getReflectionPower		() const { return mReflectionPowerValue; }
+
+	/** 
+	Set the reflection map texture name.
+	*/
+	void					setReflectionMapTextureName		(const String& textureName) { mReflectionMapTextureName = textureName; }
+
+	/** 
+	Return the reflection map texture name.
+	*/
+	const String&			getReflectionMapTextureName		() const { return mReflectionMapTextureName; }
+
+
+	/** 
+	Set the mask map texture name.
+	*/
+	void					setMaskMapTextureName		(const String& textureName) { mMaskMapTextureName = textureName; }
+
+	/** 
+	Return the mask map texture name.
+	*/
+	const String&			getMaskMapTextureName		() const { return mMaskMapTextureName; }
+
+
 	static String Type;
-
-	/// The mask map texture name key.	
-	static String MaskMapTextureNameKey;
-
-	/// The reflection map texture name key.	
-	static String ReflectionMapTextureNameKey;
-
-
+	
 // Protected methods.
 protected:
 	
@@ -125,20 +146,25 @@ protected:
 
 
 // Attributes.
-protected:
+protected:	
+	String					mReflectionMapTextureName;			// The reflection map texture name.
+	String					mMaskMapTextureName;				// The mask map texture name.
 	unsigned short			mMaskMapSamplerIndex;				// Mask map texture sampler index.
 	unsigned short			mReflectionMapSamplerIndex;			// Reflection map texture sampler index.
+	Real					mReflectionPowerValue;				// The reflection power value.
+	bool					mReflectionPowerChanged;			// Indicate if reflection power changed.
 	TextureType				mReflectionMapType;					// Reflection map type. Valid are 2D or Cube.
-	ParameterPtr			mMaskMapSampler;					// Normal map texture sampler parameter.
-	ParameterPtr			mReflectionMapSampler;				// Reflection map texture sampler parameter.
+	UniformParameterPtr		mMaskMapSampler;					// Normal map texture sampler parameter.
+	UniformParameterPtr		mReflectionMapSampler;				// Reflection map texture sampler parameter.
+	UniformParameterPtr		mReflectionPower;					// Reflection map power.
 	ParameterPtr			mVSInMaskTexcoord;					// Vertex shader input mask texture coordinates.
 	ParameterPtr			mVSOutMaskTexcoord;					// Vertex shader output mask texture coordinates.
 	ParameterPtr			mVSOutReflectionTexcoord;			// Vertex shader output reflection texture coordinates.
 	ParameterPtr			mPSInMaskTexcoord;					// Pixel shader input mask texture coordinates.
 	ParameterPtr			mPSInReflectionTexcoord;			// Pixel shader input reflection texture coordinates.
-	ParameterPtr			mWorldMatrix;						// World matrix parameter.
-	ParameterPtr			mWorldITMatrix;						// World inverse transpose matrix parameter.
-	ParameterPtr			mViewMatrix;						// View matrix parameter.			
+	UniformParameterPtr		mWorldMatrix;						// World matrix parameter.
+	UniformParameterPtr		mWorldITMatrix;						// World inverse transpose matrix parameter.
+	UniformParameterPtr		mViewMatrix;						// View matrix parameter.			
 	ParameterPtr			mVSInputNormal;						// Vertex shader input normal parameter.
 	ParameterPtr 			mVSInputPos;						// Vertex shader input position parameter.		
 	ParameterPtr			mPSOutDiffuse;						// Pixel shader output colour.
