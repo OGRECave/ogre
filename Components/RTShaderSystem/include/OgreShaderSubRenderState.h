@@ -195,10 +195,10 @@ public:
 	}
 
 	/** Return a set of all instances of the template SubRenderState. */
-	SubRenderStateSet&	getSubRenderStateInstasnceSet() { return mSubRenderStateInstancesSet; }
+	SubRenderStateSet&	getSubRenderStateInstanceSet() { return mSubRenderStateInstancesSet; }
 
 	/** Return a set of all instances of the template SubRenderState. (const version). */
-	const SubRenderStateSet&	getSubRenderStateInstasnceSet() const { return mSubRenderStateInstancesSet; }
+	const SubRenderStateSet&	getSubRenderStateInstanceSet() const { return mSubRenderStateInstancesSet; }
 
 protected:
 	/** Construct SubRenderState accessor based on the given template SubRenderState.

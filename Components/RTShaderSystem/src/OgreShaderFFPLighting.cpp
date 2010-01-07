@@ -217,10 +217,7 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 bool FFPLighting::resolveParameters(ProgramSet* programSet)
 {
 	Program* vsProgram = programSet->getCpuVertexProgram();
-	Program* psProgram = programSet->getCpuFragmentProgram();
 	Function* vsMain = vsProgram->getEntryPointFunction();
-	Function* psMain = psProgram->getEntryPointFunction();
-
 
 	// Resolve world view IT matrix.
 	mWorldViewITMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLDVIEW_MATRIX, 0);

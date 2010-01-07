@@ -66,9 +66,6 @@ bool FFPColour::resolveParameters(ProgramSet* programSet)
 	Function* vsMain   = vsProgram->getEntryPointFunction();
 	Function* psMain   = psProgram->getEntryPointFunction();	
 
-	const ShaderParameterList& vsInputParams = vsMain->getInputParameters();
-	const ShaderParameterList& psInputParams = psMain->getInputParameters();
-
 	if (mResolveStageFlags & SF_VS_INPUT_DIFFUSE)
 		mVSInputDiffuse  = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 	

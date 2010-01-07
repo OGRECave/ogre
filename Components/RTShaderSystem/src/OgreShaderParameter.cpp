@@ -510,6 +510,28 @@ ParameterPtr ParameterFactory::createInTexcoord(GpuConstantType type, int index,
 		
 	case GCT_FLOAT4:
 		return createInTexcoord4(index, content);		
+    default:
+	case GCT_SAMPLER1D:
+    case GCT_SAMPLER2D:
+    case GCT_SAMPLER3D:
+    case GCT_SAMPLERCUBE:
+    case GCT_SAMPLER1DSHADOW:
+    case GCT_SAMPLER2DSHADOW:
+    case GCT_MATRIX_2X2:
+    case GCT_MATRIX_2X3:
+    case GCT_MATRIX_2X4:
+    case GCT_MATRIX_3X2:
+    case GCT_MATRIX_3X3:
+    case GCT_MATRIX_3X4:
+    case GCT_MATRIX_4X2:
+    case GCT_MATRIX_4X3:
+    case GCT_MATRIX_4X4:
+    case GCT_INT1:
+    case GCT_INT2:
+    case GCT_INT3:
+    case GCT_INT4:
+    case GCT_UNKNOWN:
+        break;
 	}
 
 	return ParameterPtr();
@@ -531,6 +553,29 @@ ParameterPtr ParameterFactory::createOutTexcoord(GpuConstantType type, int index
 
 	case GCT_FLOAT4:
 		return createOutTexcoord4(index, content);		
+    
+    default:
+	case GCT_SAMPLER1D:
+    case GCT_SAMPLER2D:
+    case GCT_SAMPLER3D:
+    case GCT_SAMPLERCUBE:
+    case GCT_SAMPLER1DSHADOW:
+    case GCT_SAMPLER2DSHADOW:
+    case GCT_MATRIX_2X2:
+    case GCT_MATRIX_2X3:
+    case GCT_MATRIX_2X4:
+    case GCT_MATRIX_3X2:
+    case GCT_MATRIX_3X3:
+    case GCT_MATRIX_3X4:
+    case GCT_MATRIX_4X2:
+    case GCT_MATRIX_4X3:
+    case GCT_MATRIX_4X4:
+    case GCT_INT1:
+    case GCT_INT2:
+    case GCT_INT3:
+    case GCT_INT4:
+    case GCT_UNKNOWN:
+        break;
 	}
 
 	return ParameterPtr();
@@ -616,6 +661,25 @@ UniformParameterPtr ParameterFactory::createSampler(GpuConstantType type, int in
 
 	case GCT_SAMPLERCUBE:
 		return createSamplerCUBE(index);
+
+    default:
+    case GCT_SAMPLER1DSHADOW:
+    case GCT_SAMPLER2DSHADOW:
+    case GCT_MATRIX_2X2:
+    case GCT_MATRIX_2X3:
+    case GCT_MATRIX_2X4:
+    case GCT_MATRIX_3X2:
+    case GCT_MATRIX_3X3:
+    case GCT_MATRIX_3X4:
+    case GCT_MATRIX_4X2:
+    case GCT_MATRIX_4X3:
+    case GCT_MATRIX_4X4:
+    case GCT_INT1:
+    case GCT_INT2:
+    case GCT_INT3:
+    case GCT_INT4:
+    case GCT_UNKNOWN:
+        break;
 	}
 
 	return UniformParameterPtr();
@@ -692,7 +756,6 @@ ParameterPtr ParameterFactory::createConstParamFloat(float val)
 												  Parameter::SPS_UNKNOWN,  
 												  Parameter::SPC_UNKNOWN));
 }
-
 
 //-----------------------------------------------------------------------
 UniformParameterPtr ParameterFactory::createUniform(GpuConstantType type, 

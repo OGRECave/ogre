@@ -241,13 +241,35 @@ void ProgramProcessor::buildTexcoordTable(const ShaderParameterList& paramList, 
 			case GCT_FLOAT4:
 				outParamsTable[3].push_back(curParam);
 				break;
+            case GCT_SAMPLER1D:
+            case GCT_SAMPLER2D:
+            case GCT_SAMPLER3D:
+            case GCT_SAMPLERCUBE:
+            case GCT_SAMPLER1DSHADOW:
+            case GCT_SAMPLER2DSHADOW:
+            case GCT_MATRIX_2X2:
+            case GCT_MATRIX_2X3:
+            case GCT_MATRIX_2X4:
+            case GCT_MATRIX_3X2:
+            case GCT_MATRIX_3X3:
+            case GCT_MATRIX_3X4:
+            case GCT_MATRIX_4X2:
+            case GCT_MATRIX_4X3:
+            case GCT_MATRIX_4X4:
+            case GCT_INT1:
+            case GCT_INT2:
+            case GCT_INT3:
+            case GCT_INT4:
+            case GCT_UNKNOWN:
+            default:
+                break;
 			}
 		}
 	}
 }
 
 //-----------------------------------------------------------------------------
-void ProgramProcessor:: mergeParameters(ShaderParameterList paramsTable[4], MergeParameterList& mergedParams, 
+void ProgramProcessor::mergeParameters(ShaderParameterList paramsTable[4], MergeParameterList& mergedParams, 
 									  ShaderParameterList& splitParams)
 {
 	// Merge using the predefined combinations.
@@ -979,7 +1001,7 @@ int ProgramProcessor::MergeParameter::getUsedFloatCount()
 //-----------------------------------------------------------------------------
 void ProgramProcessor::MergeParameter::createDestinationParameter(int usage, int index)
 {
-	GpuConstantType dstParamType;
+	GpuConstantType dstParamType = GCT_UNKNOWN;
 
 	switch (getUsedFloatCount())
 	{

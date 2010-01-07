@@ -989,10 +989,10 @@ void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGPass::SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPass)
 {
-	mParent					= parent;
-	mSrcPass				= srcPass;
-	mDstPass				= dstPass;	
-	mCustomRenderState		= NULL;
+	mParent				= parent;
+	mSrcPass			= srcPass;
+	mDstPass			= dstPass;	
+	mCustomRenderState	= NULL;
 	mTargetRenderState	= NULL;
 	mDstPass->getUserObjectBindings().setUserAny(SGPass::UserKey, Any(this));
 }

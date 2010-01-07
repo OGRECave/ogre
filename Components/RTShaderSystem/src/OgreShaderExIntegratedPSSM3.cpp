@@ -294,9 +294,7 @@ bool IntegratedPSSM3::addFunctionInvocations(ProgramSet* programSet)
 	Program* vsProgram = programSet->getCpuVertexProgram();	
 	Function* vsMain = vsProgram->getEntryPointFunction();	
 	Program* psProgram = programSet->getCpuFragmentProgram();
-	Function* psMain = psProgram->getEntryPointFunction();	
 	int internalCounter;
-
 
 	// Add vertex shader invocations.
 	internalCounter = 0;

@@ -148,6 +148,8 @@ ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
 		assert(type == GCT_FLOAT3);
 		param = ParameterFactory::createInTangent(index);
 		break;
+	case Parameter::SPS_UNKNOWN:
+        break;
 	}
 
 	if (param.get() != NULL)
@@ -243,6 +245,8 @@ ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
 		assert(type == GCT_FLOAT3);
 		param = ParameterFactory::createOutTangent(index);
 		break;
+	case Parameter::SPS_UNKNOWN:
+        break;
 	}
 
 	if (param.get() != NULL)

@@ -64,7 +64,6 @@ public:
 
 	/** Add a template sub render state to this render state.
 	@param subRenderState The sub render state template to add.
-	Return sub render state access
 	*/
 	void		addTemplateSubRenderState	(SubRenderState* subRenderState);
 

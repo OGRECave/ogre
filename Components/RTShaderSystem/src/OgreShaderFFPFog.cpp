@@ -258,6 +258,9 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 		case FOG_EXP2:
 			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_PIXELFOG_EXP2, FFP_PS_FOG, internalCounter++);
 			break;
+        case FOG_NONE:
+        default:
+            break;
 		}
 
 		curFuncInvocation->pushOperand(mPSInDepth, Operand::OPS_IN);
@@ -285,6 +288,9 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 		case FOG_EXP2:
 			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_VERTEXFOG_EXP2, FFP_VS_FOG, internalCounter++);
 			break;
+        case FOG_NONE:
+        default:
+            break;
 		}
 			
 		curFuncInvocation->pushOperand(mWorldViewProjMatrix, Operand::OPS_IN);

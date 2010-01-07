@@ -172,7 +172,7 @@ void Sample_ShaderSystem::sliderMoved(Slider* slider)
 			// Every time that the shaders have to be re-generated (light changes, fog changes etc..) a new set of sub render states 
 			// based on the template sub render states assembled for each pass.
 			// From that set of instances a CPU program is generated and afterward a GPU program finally generated.
-			RTShader::SubRenderStateSet instanceSet = mReflectionMapSubRS->getAccessor()->getSubRenderStateInstasnceSet();
+			RTShader::SubRenderStateSet instanceSet = mReflectionMapSubRS->getAccessor()->getSubRenderStateInstanceSet();
 			RTShader::SubRenderStateSetIterator it = instanceSet.begin();
 			RTShader::SubRenderStateSetIterator itEnd = instanceSet.end();
 

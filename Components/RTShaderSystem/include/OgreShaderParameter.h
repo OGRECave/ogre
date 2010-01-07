@@ -402,50 +402,64 @@ public:
 	/** Update the GPU parameter with the given value. */	
 	void setGpuParameter(int val)
 	{ 
-		assert(mParamsPtr);
-		mParamsPtr->_writeRawConstant(mPhysicalIndex, val);		
+		if (mParamsPtr != NULL)
+		{
+			mParamsPtr->_writeRawConstant(mPhysicalIndex, val);
+		}
 	}
 
 	/** Update the GPU parameter with the given value. */	
 	void setGpuParameter(Real val)  
 	{ 
-		assert(mParamsPtr);
-		mParamsPtr->_writeRawConstant(mPhysicalIndex, val);		
+		if (mParamsPtr != NULL)
+		{
+			mParamsPtr->_writeRawConstant(mPhysicalIndex, val);
+		}
 	}
 
 	/** Update the GPU parameter with the given value. */	
 	void setGpuParameter(const ColourValue& val)  
 	{ 
-		assert(mParamsPtr);
-		mParamsPtr->_writeRawConstant(mPhysicalIndex, val);		
+		if (mParamsPtr != NULL)
+		{
+			mParamsPtr->_writeRawConstant(mPhysicalIndex, val);
+		}
 	}
 
 	/** Update the GPU parameter with the given value. */	
 	void setGpuParameter(const Vector2& val)  
 	{ 
-		assert(mParamsPtr);
-		mParamsPtr->_writeRawConstants(mPhysicalIndex, val.ptr(), 2);		
+		if (mParamsPtr != NULL)
+		{
+			mParamsPtr->_writeRawConstants(mPhysicalIndex, val.ptr(), 2);
+		}
 	}
 	
 	/** Update the GPU parameter with the given value. */	
 	void setGpuParameter(const Vector3& val)  
 	{ 
-		assert(mParamsPtr);
-		mParamsPtr->_writeRawConstant(mPhysicalIndex, val);		
+		if (mParamsPtr != NULL)
+		{
+			mParamsPtr->_writeRawConstant(mPhysicalIndex, val);
+		}
 	}
 
 	/** Update the GPU parameter with the given value. */	
 	void setGpuParameter(const Vector4& val)  
 	{ 
-		assert(mParamsPtr);
-		mParamsPtr->_writeRawConstant(mPhysicalIndex, val);		
+		if (mParamsPtr != NULL)
+		{
+			mParamsPtr->_writeRawConstant(mPhysicalIndex, val);		
+		}
 	}
 
 	/** Update the GPU parameter with the given value. */	
 	void setGpuParameter(const Matrix4& val)  
 	{ 
-		assert(mParamsPtr);
-		mParamsPtr->_writeRawConstant(mPhysicalIndex, val, 16);		
+		if (mParamsPtr != NULL)
+		{
+			mParamsPtr->_writeRawConstant(mPhysicalIndex, val, 16);
+		}
 	}
 
 protected:

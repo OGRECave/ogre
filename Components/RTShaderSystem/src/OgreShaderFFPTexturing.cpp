@@ -632,7 +632,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
 		psMain->addAtomInstace(curFuncInvocation);				
 		break;
 	case LBX_ADD_SMOOTH:
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADDMOOTH, groupOrder, internalCounter++);
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADDSMOOTH, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
@@ -746,7 +746,6 @@ TexCoordCalcMethod FFPTexturing::getTexCalcMethod(TextureUnitState* textureUnitS
 //-----------------------------------------------------------------------
 bool FFPTexturing::needsTextureMatrix(TextureUnitState* textureUnitState)
 {
-	TexCoordCalcMethod						texCoordCalcMethod = TEXCALC_NONE;	
 	const TextureUnitState::EffectMap&		effectMap = textureUnitState->getEffects();	
 	TextureUnitState::EffectMap::const_iterator	effi;
 
@@ -760,6 +759,8 @@ bool FFPTexturing::needsTextureMatrix(TextureUnitState* textureUnitState)
 		case TextureUnitState::ET_VSCROLL:
 		case TextureUnitState::ET_ROTATE:
 		case TextureUnitState::ET_TRANSFORM:
+		case TextureUnitState::ET_ENVIRONMENT_MAP:
+		case TextureUnitState::ET_PROJECTIVE_TEXTURE:
 			return true;		
 		}
 	}
@@ -836,7 +837,7 @@ void FFPTexturing::setTextureUnitCount(size_t count)
 
 		curParams.mTextureUnitState				= NULL;			
 		curParams.mTextureProjector				= NULL;				  
-		curParams.mTextureSamplerIndex			= NULL;			  
+		curParams.mTextureSamplerIndex			= 0;			  
 		curParams.mTextureSamplerType			= GCT_SAMPLER2D;		
 		curParams.mVSInTextureCoordinateType	= GCT_FLOAT2;	
 		curParams.mVSOutTextureCoordinateType	= GCT_FLOAT2;		
