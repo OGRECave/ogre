@@ -37,7 +37,7 @@
 
 // Remove the comment below in order to make the RTSS use valid path for writing down the generated shaders.
 // If cache path is not set - all shaders are generated to system memory.
-#define _RTSS_WRITE_SHADERS_TO_DISK
+//#define _RTSS_WRITE_SHADERS_TO_DISK
 #endif
 
 
