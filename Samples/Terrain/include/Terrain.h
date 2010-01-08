@@ -297,7 +297,7 @@ public:
 				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
 				while (ti.hasMoreElements())
 				{
-					uint32 tkey = ti.peekNextKey();
+					Ogre::uint32 tkey = ti.peekNextKey();
 					TerrainGroup::TerrainSlot* ts = ti.getNext();
 					if (ts->instance && ts->instance->isLoaded())
 					{
@@ -371,7 +371,7 @@ protected:
 	};
 	Mode mMode;
 	ShadowMode mShadowMode;
-	uint8 mLayerEdit;
+	Ogre::uint8 mLayerEdit;
 	Real mBrushSizeTerrainSpace;
 	SceneNode* mEditNode;
 	Entity* mEditMarker;

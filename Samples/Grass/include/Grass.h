@@ -203,7 +203,7 @@ protected:
 			(HardwareIndexBuffer::IT_16BIT, sm->indexData->indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
 
 		// start filling in index data
-		uint16* indices = (uint16*)sm->indexData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD);
+		Ogre::uint16* indices = (Ogre::uint16*)sm->indexData->indexBuffer->lock(HardwareBuffer::HBL_DISCARD);
 
 		for (unsigned int i = 0; i < 3; i++)  // each grass mesh consists of 3 planes
 		{
