@@ -295,9 +295,12 @@ namespace Ogre
 		{
 			for( unsigned j=0; j < getDirect3DDrivers()->count(); j++ )
 			{
-				driver = getDirect3DDrivers()->item(j);
-				if( driver->DriverDescription() == opt->second.currentValue )
+				D3D9Driver* curDriver = getDirect3DDrivers()->item(j);
+				if( curDriver->DriverDescription() == opt->second.currentValue )
+				{
+					driver = curDriver;
 					break;
+				}
 			}
 
 			if (driver)

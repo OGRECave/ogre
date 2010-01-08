@@ -493,6 +493,10 @@ namespace Ogre {
             return false;
         }
 
+		String err = rs->validateConfigOptions();
+		if (err.length() > 0)
+			return false;
+
         setRenderSystem(rs);
 
         // Successful load
