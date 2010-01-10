@@ -662,7 +662,7 @@ use_precompiled_header(OgreMain
 )
 
 # install OgreMain
-ogre_config_lib(OgreMain)
+ogre_config_lib(OgreMain TRUE)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE
 )

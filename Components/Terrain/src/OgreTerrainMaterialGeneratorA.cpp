@@ -732,8 +732,6 @@ namespace Ogre
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateVpHeader(
 		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
 	{
-		bool texShadowsOn = terrain->getSceneManager()->isShadowTechniqueTextureBased();
-
 		outStream << 
 			"void main_vp(\n"
 			"float4 pos : POSITION,\n"

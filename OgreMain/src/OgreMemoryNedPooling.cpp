@@ -146,7 +146,8 @@ namespace Ogre
 		MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
 #else
 		// avoid unused params warning
-		file;line;func;
+		file = func = "";
+        line = 0;
 #endif
 		return ptr;
 	}
@@ -172,7 +173,8 @@ namespace Ogre
 		MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
 #else
 		// avoid unused params warning
-		file;line;func;
+		file = func = "";
+        line = 0;
 #endif
 		return ptr;
 	}

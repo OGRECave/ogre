@@ -34,6 +34,15 @@ namespace RTShader {
 
 String GLSLProgramWriter::TargetLanguage =  "glsl";
 
+// Uniform comparer
+struct CompareUniformByName : std::binary_function<UniformParameterPtr, String, bool>
+{
+	bool operator()( const UniformParameterPtr& uniform, const String& name ) const 
+	{
+			return uniform->getName() == name;
+	}
+};
+
 //-----------------------------------------------------------------------
 GLSLProgramWriter::GLSLProgramWriter()
 {
@@ -200,30 +209,57 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 				String paramName = op.getParameter()->getName();
 				Parameter::Content content = op.getParameter()->getContent();
 
-				// Check if we write to an varying because the are only readable in fragment programs 
-				if (gpuType == GPT_FRAGMENT_PROGRAM &&
-					(opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT))
-				{	
-					StringVector::iterator itFound = std::find(mFragInputParams.begin(), mFragInputParams.end(), paramName);	
-					if(itFound != mFragInputParams.end())
-					{						
-						// Declare the copy variable
-						String newVar = "local_" + paramName;
-						String tempVar = paramName;
+				if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
+				{
+					// Is the written parameter a varying 
+					bool isVarying = false;
 
-						// We stored the original values in the mFragInputParams thats why we have to replace the first var with o
-						// because all vertex output vars are prefixed with o in glsl the name has to match in the fragment program.
-						tempVar.replace(tempVar.begin(), tempVar.begin() + 1, "o");
+					// Check if we write to an varying because the are only readable in fragment programs 
+					if (gpuType == GPT_FRAGMENT_PROGRAM)
+					{	
+						StringVector::iterator itFound = std::find(mFragInputParams.begin(), mFragInputParams.end(), paramName);	
+						if(itFound != mFragInputParams.end())
+						{						
+							// Declare the copy variable
+							String newVar = "local_" + paramName;
+							String tempVar = paramName;
+							isVarying = true;
 
-						// Declare the copy variable and assign the original
-					    os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << std::endl;	
+							// We stored the original values in the mFragInputParams thats why we have to replace the first var with o
+							// because all vertex output vars are prefixed with o in glsl the name has to match in the fragment program.
+							tempVar.replace(tempVar.begin(), tempVar.begin() + 1, "o");
 
-						// From now on we replace it automatic 
-						mInputToGLStatesMap[paramName] = newVar;
+							// Declare the copy variable and assign the original
+							os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << std::endl;	
 
-						// Remove the param because now it is replaced automatic with the local variable
-						// (which could be written).
-						mFragInputParams.erase(itFound++);
+							// From now on we replace it automatic 
+							mInputToGLStatesMap[paramName] = newVar;
+
+							// Remove the param because now it is replaced automatic with the local variable
+							// (which could be written).
+							mFragInputParams.erase(itFound++);
+						}
+					}
+					
+					// If its not a varying param check if a uniform is written
+					if(!isVarying)
+					{
+						UniformParameterList::const_iterator itFound = std::find_if( parameterList.begin(), parameterList.end(), std::bind2nd( CompareUniformByName(), paramName ) );
+						if(itFound != parameterList.end())
+						{	
+							// Declare the copy variable
+							String newVar = "local_" + paramName;
+
+							// now we check if we already declared a uniform redirector var
+							if(mInputToGLStatesMap.find(newVar) == mInputToGLStatesMap.end())
+							{
+								// Declare the copy variable and assign the original
+								os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << paramName << ";\n" << std::endl;	
+
+								// From now on we replace it automatic 
+								mInputToGLStatesMap[paramName] = newVar;
+							}
+						}
 					}
 				}
 

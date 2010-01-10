@@ -70,7 +70,7 @@ public:
         if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
         {
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex or fragment shaders, "
-                        "so you cannot run this sample. Sorry!", "TerrainSample::testCapabilities");
+                        "so you cannot run this sample. Sorry!", "Sample_Terrain::testCapabilities");
         }
 	}
     
@@ -165,6 +165,9 @@ public:
 					}
 				}
 				break;
+            case MODE_NORMAL:
+            case MODE_COUNT:
+                break;
 			};
 		}
 #endif
@@ -294,7 +297,7 @@ public:
 				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
 				while (ti.hasMoreElements())
 				{
-					uint32 tkey = ti.peekNextKey();
+					Ogre::uint32 tkey = ti.peekNextKey();
 					TerrainGroup::TerrainSlot* ts = ti.getNext();
 					if (ts->instance && ts->instance->isLoaded())
 					{
@@ -368,7 +371,7 @@ protected:
 	};
 	Mode mMode;
 	ShadowMode mShadowMode;
-	uint8 mLayerEdit;
+	Ogre::uint8 mLayerEdit;
 	Real mBrushSizeTerrainSpace;
 	SceneNode* mEditNode;
 	Entity* mEditMarker;
@@ -435,7 +438,6 @@ protected:
 		Real fadeDist0 = 40;
 		Real minHeight1 = 70;
 		Real fadeDist1 = 15;
-		float* pBlend0 = blendMap0->getBlendPointer();
 		float* pBlend1 = blendMap1->getBlendPointer();
 		for (Ogre::uint16 y = 0; y < terrain->getLayerBlendMapSize(); ++y)
 		{
@@ -484,8 +486,6 @@ protected:
 		//TerrainGlobalOptions::setUseRayBoxDistanceCalculation(true);
 		//TerrainGlobalOptions::getDefaultMaterialGenerator()->setDebugLevel(1);
 		//TerrainGlobalOptions::setLightMapSize(256);
-		TerrainMaterialGeneratorA::SM2Profile* matProfile = 
-			static_cast<TerrainMaterialGeneratorA::SM2Profile*>(TerrainGlobalOptions::getDefaultMaterialGenerator()->getActiveProfile());
 
 		//matProfile->setLightmapEnabled(false);
 		// Important to set these so that the terrain knows what to use for derived (non-realtime) data

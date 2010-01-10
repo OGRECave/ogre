@@ -107,7 +107,7 @@ void Sample_Compositor::registerCompositors(void)
 		}
 		try 
 		{
-			Ogre::CompositorInstance *instance = Ogre::CompositorManager::getSingleton().addCompositor(vp, compositorName, addPosition);
+			Ogre::CompositorManager::getSingleton().addCompositor(vp, compositorName, addPosition);
 			Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, compositorName, false);
 		} catch (...) {
 		}
@@ -236,7 +236,7 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
 					{
 						//Dirty string composition. NOT ROBUST!
 						mDebugTextureSelectMenu->addItem(compositorName + ";" + texDef->name + ";" + 
-							Ogre::StringConverter::toString((uint32)i));
+							Ogre::StringConverter::toString((Ogre::uint32)i));
 					}
 				}
 				else

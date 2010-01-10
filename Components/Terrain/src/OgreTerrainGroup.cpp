@@ -377,7 +377,6 @@ namespace Ogre
 		long curr_x, curr_z;
 		convertWorldPositionToTerrainSlot(ray.getOrigin(), &curr_x, &curr_z);
 		TerrainSlot* slot = getTerrainSlot(curr_x, curr_z);
-		Real dist = 0;
 		RayResult result(false, 0, Vector3::ZERO);
 
 		Vector3 tmp, localRayDir, centreOrigin, offset;

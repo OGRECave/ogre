@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     void* mac_loadDylib(const char* name);
+    _OgreExport std::string macCachePath();
     _OgreExport std::string macBundlePath(void);
     _OgreExport std::string iPhoneDocumentsDirectory(void);
 }

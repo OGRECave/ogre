@@ -160,11 +160,8 @@ namespace Ogre
 		Real vptop = (Real)rect.top / (Real)size;
 		Real vpright = (Real)rect.right / (Real)size;
 		Real vpbottom = (Real)rect.bottom / (Real)size;
-		Real vpwidth = (Real)rect.width()/ (Real)size;
-		Real vpheight = (Real)rect.height() / (Real)size;
 
 		RenderTarget* rtt = mCompositeMapRTT->getBuffer()->getRenderTarget();
-		Viewport* vp = rtt->getViewport(0);
 		mCompositeMapCam->setWindow(vpleft, vptop, vpright, vpbottom);
 
 		rtt->update();

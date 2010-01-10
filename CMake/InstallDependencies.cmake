@@ -25,7 +25,7 @@ else ()
   return()
 endif ()
 
-option(OGRE_INSTALL_DEPENDENCIES "Install dependency DLLs needed for samples" FALSE)
+option(OGRE_INSTALL_DEPENDENCIES "Install dependency DLLs needed for samples" TRUE)
 option(OGRE_COPY_DEPENDENCIES "Copy dependency DLLs to the build directory" TRUE)
 
 macro(install_debug INPUT)

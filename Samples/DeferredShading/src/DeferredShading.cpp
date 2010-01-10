@@ -45,7 +45,7 @@ const Ogre::uint8 DeferredShadingSystem::POST_GBUFFER_RENDER_QUEUE = Ogre::RENDE
 DeferredShadingSystem::DeferredShadingSystem(
 		Viewport *vp, SceneManager *sm,  Camera *cam
 	):
-	mSceneMgr(sm), mViewport(vp), mCamera(cam)
+	mViewport(vp), mSceneMgr(sm), mCamera(cam)
 {
 	sm->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE);
 	sm->setShadowTextureCasterMaterial("DeferredShading/Shadows/Caster");

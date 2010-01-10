@@ -579,6 +579,7 @@ namespace Ogre
 		stream.read(&mMaxBatchSize);
 		stream.read(&mMinBatchSize);
 		stream.read(&mPos);
+		mRootNode->setPosition(mPos);
 		updateBaseScale();
 		determineLodLevels();
 
@@ -857,8 +858,8 @@ namespace Ogre
 			17 vertices (per side) or 33. This makes buffer re-use much easier while
 			still giving the full range of LODs.
 		*/
-		mNumLodLevelsPerLeafNode = Math::Log2(mMaxBatchSize - 1.0f) - Math::Log2(mMinBatchSize - 1.0f) + 1.0f;
-		mNumLodLevels = Math::Log2(mSize - 1.0f) - Math::Log2(mMinBatchSize - 1.0f) + 1.0f;
+		mNumLodLevelsPerLeafNode = (uint16) (Math::Log2(mMaxBatchSize - 1.0f) - Math::Log2(mMinBatchSize - 1.0f) + 1.0f);
+		mNumLodLevels = (uint16) (Math::Log2(mSize - 1.0f) - Math::Log2(mMinBatchSize - 1.0f) + 1.0f);
 		//mTreeDepth = Math::Log2(mMaxBatchSize - 1) - Math::Log2(mMinBatchSize - 1) + 2;
 		mTreeDepth = mNumLodLevels - mNumLodLevelsPerLeafNode + 1;
 
@@ -1235,6 +1236,9 @@ namespace Ogre
 					}
 					currSpace = TERRAIN_SPACE;
 					break;
+                case LOCAL_SPACE:
+                default:
+                    break;
 				};
 				break;
 			case TERRAIN_SPACE:
@@ -1262,6 +1266,9 @@ namespace Ogre
 					}
 					currSpace = POINT_SPACE;
 					break;
+                case TERRAIN_SPACE:
+                default:
+                    break;
 				};
 				break;
 			case POINT_SPACE:
@@ -2977,7 +2984,7 @@ namespace Ogre
 
 
 		const Vector3& lightVec = TerrainGlobalOptions::getLightMapDirection();
-		Rect widenedRect;
+        Ogre::Rect widenedRect;
 		widenRectByVector(lightVec, rect, widenedRect);
 
 		// merge in the extra area (e.g. from neighbours)
@@ -2986,10 +2993,10 @@ namespace Ogre
 		// widenedRect now contains terrain point space version of the area we
 		// need to calculate. However, we need to calculate in lightmap image space
 		float terrainToLightmapScale = (float)mLightmapSizeActual / (float)mSize;
-		widenedRect.left *= terrainToLightmapScale;
-		widenedRect.right *= terrainToLightmapScale;
-		widenedRect.top *= terrainToLightmapScale;
-		widenedRect.bottom *= terrainToLightmapScale;
+		widenedRect.left *= (long)terrainToLightmapScale;
+		widenedRect.right *= (long)terrainToLightmapScale;
+		widenedRect.top *= (long)terrainToLightmapScale;
+		widenedRect.bottom *= (long)terrainToLightmapScale;
 
 		// clamp 
 		widenedRect.left = std::max(0L, widenedRect.left);
@@ -3038,7 +3045,7 @@ namespace Ogre
 				long storeY = widenedRect.bottom - y - 1;
 
 				uint8* pStore = pData + ((storeY * widenedRect.width()) + storeX);
-				*pStore = litVal * 255.0;
+				*pStore = (unsigned char)(litVal * 255.0);
 
 			}
 		}
@@ -3108,7 +3115,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::updateCompositeMapWithDelay(Real delay)
 	{
-		mCompositeMapUpdateCountdown = delay * 1000;
+		mCompositeMapUpdateCountdown = (long)(delay * 1000);
 	}
 	//---------------------------------------------------------------------
 	uint8 Terrain::getBlendTextureIndex(uint8 layerIndex) const
@@ -3490,6 +3497,9 @@ namespace Ogre
 			outRect->left = 0;
 			outRect->right = mSize;
 			break;
+		case NEIGHBOUR_COUNT:
+        default:
+            break;
 		};
 
 		// set top / bottom
@@ -3512,6 +3522,9 @@ namespace Ogre
 			outRect->top = 0;
 			outRect->bottom = mSize;
 			break;
+		case NEIGHBOUR_COUNT:
+        default:
+            break;
 		};
 	}
 	//---------------------------------------------------------------------
@@ -3607,12 +3620,12 @@ namespace Ogre
 		else
 		{
 			long nx, ny;
-			NeighbourIndex ni;
+			NeighbourIndex ni = NEIGHBOUR_EAST;
 			getNeighbourPointOverflow(x, y, &ni, &nx, &ny);
 			Terrain* neighbour = getNeighbour(ni);
 			if (neighbour)
 			{
-				Vector3 neighbourPos;
+				Vector3 neighbourPos = Vector3::ZERO;
 				neighbour->getPoint(nx, ny, &neighbourPos);
 				// adjust to make it relative to our position
 				*outpos = neighbourPos + neighbour->getPosition() - getPosition();
