@@ -579,6 +579,7 @@ namespace Ogre
 		stream.read(&mMaxBatchSize);
 		stream.read(&mMinBatchSize);
 		stream.read(&mPos);
+		mRootNode->setPosition(mPos);
 		updateBaseScale();
 		determineLodLevels();
 
