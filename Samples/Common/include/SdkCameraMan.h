@@ -85,12 +85,22 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void setTarget(Ogre::SceneNode* target)
 		{
-			mTarget = target ? target : mCamera->getSceneManager()->getRootSceneNode();
-
-			if (mStyle == CS_ORBIT)
+			if (target != mTarget)
 			{
-				mCamera->setAutoTracking(true, mTarget);
+				mTarget = target;
+				if(target)
+				{
+					setYawPitchDist(Ogre::Degree(0), Ogre::Degree(15), 150);
+					mCamera->setAutoTracking(true, mTarget);
+				}
+				else
+				{
+					mCamera->setAutoTracking(false);
+				}
+
 			}
+
+
 		}
 
 		virtual Ogre::SceneNode* getTarget()
@@ -103,14 +113,11 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void setYawPitchDist(Ogre::Radian yaw, Ogre::Radian pitch, Ogre::Real dist)
 		{
-			if (mStyle == CS_ORBIT)
-			{
-				mCamera->setPosition(mTarget->_getDerivedPosition());
-				mCamera->setOrientation(mTarget->_getDerivedOrientation());
-				mCamera->yaw(yaw);
-				mCamera->pitch(-pitch);
-				mCamera->moveRelative(Ogre::Vector3(0, 0, dist));
-			}
+			mCamera->setPosition(mTarget->_getDerivedPosition());
+			mCamera->setOrientation(mTarget->_getDerivedOrientation());
+			mCamera->yaw(yaw);
+			mCamera->pitch(-pitch);
+			mCamera->moveRelative(Ogre::Vector3(0, 0, dist));
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -133,7 +140,7 @@ namespace OgreBites
 		{
 			if (mStyle != CS_ORBIT && style == CS_ORBIT)
 			{
-				setTarget(mTarget);
+				setTarget(mTarget ? mTarget : mCamera->getSceneManager()->getRootSceneNode());
 				mCamera->setFixedYawAxis(true);
 				manualStop();
 				setYawPitchDist(Ogre::Degree(0), Ogre::Degree(15), 150);
@@ -149,8 +156,8 @@ namespace OgreBites
 				mCamera->setAutoTracking(false);
 				manualStop();
 			}
-
 			mStyle = style;
+
 		}
 
 		virtual CameraStyle getStyle()

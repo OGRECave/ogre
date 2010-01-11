@@ -54,6 +54,7 @@ public:
 	/** @see Sample::mousePressed. */
 	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
 #endif
+
 protected:
 
 	/** Set the current lighting model. */

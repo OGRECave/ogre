@@ -192,3 +192,8 @@ if (OGRE_INSTALL_SAMPLES_SOURCE)
   configure_file(${OGRE_TEMPLATES_DIR}/SampleLists.cmake ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt @ONLY)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt DESTINATION ${OGRE_SAMPLES_DIR})
 endif ()
+
+# Install sample headers, some people rely on these
+file(GLOB SAMPLE_COMMON_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/Common/include/*.h")
+install(FILES ${SAMPLE_COMMON_HEADERS}
+		DESTINATION include/OGRE)

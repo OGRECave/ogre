@@ -1987,6 +1987,8 @@ namespace Ogre {
 		if (!mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
 			return;
         
+		glActiveTexture(GL_TEXTURE0 + unit);
+
 		GLfloat largest_supported_anisotropy = 0;
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
 		if (maxAnisotropy > largest_supported_anisotropy)
@@ -1994,6 +1996,8 @@ namespace Ogre {
 			static_cast<uint>(largest_supported_anisotropy) : 1;
 		if (_getCurrentAnisotropy(unit) != maxAnisotropy)
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+
+		glActiveTexture(GL_TEXTURE0);
     }
 
     void GLESRenderSystem::setVertexDeclaration(VertexDeclaration* decl)
@@ -2476,8 +2480,20 @@ namespace Ogre {
 
     void GLESRenderSystem::_switchContext(GLESContext *context)
     {
+        // Disable lights
+		for (unsigned short i = 0; i < mCurrentLights; ++i)
+		{
+			setGLLight(i, NULL);
+			mLights[i] = NULL;
+		}
+		mCurrentLights = 0;
+
+		// Disable textures
+		_disableTextureUnitsFrom(0);
+
         // It's ready for switching
-        mCurrentContext->endCurrent();
+        if(mCurrentContext)
+            mCurrentContext->endCurrent();
         mCurrentContext = context;
         mCurrentContext->setCurrent();
 

@@ -95,6 +95,13 @@ void FFP_Construct(in float r,
 }
 
 //-----------------------------------------------------------------------------
+void FFP_Construct(in float r, 				   
+				   out vec4 vOut)
+{
+	vOut = vec4(r,r,r,r);
+}
+
+//-----------------------------------------------------------------------------
 void FFP_Construct(in float r, 
 			 in float g,
 			 out vec2 vOut)
