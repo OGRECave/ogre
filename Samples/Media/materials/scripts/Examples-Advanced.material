@@ -7,9 +7,6 @@ vertex_program Ogre/CelShadingVPCg cg
 	entry_point main_vp
 	profiles vs_1_1 arbvp1
 
-	// map shininess from custom renderable param 1
-	param_named_auto shininess custom 1
-
 	default_params
 	{
 		param_named_auto lightPosition light_position_object_space 0
@@ -25,10 +22,6 @@ fragment_program Ogre/CelShadingFPCg cg
 	entry_point main_fp
 	profiles ps_1_1 arbfp1 fp20
 
-	// map diffuse from custom renderable param 2
-	param_named_auto diffuse custom 2
-	// map specular from custom renderable param 2
-	param_named_auto specular custom 3
 }
 
 vertex_program Ogre/CelShadingVPGLSLES glsles
@@ -76,25 +69,31 @@ material Examples/CelShading
 		{
 			vertex_program_ref Ogre/CelShadingVP
 			{
+				// map shininess from custom renderable param 1
+				param_named_auto shininess custom 1
 			}
 			fragment_program_ref Ogre/CelShadingFP
 			{
+				// map diffuse from custom renderable param 2
+				param_named_auto diffuse custom 2
+				// map specular from custom renderable param 2
+				param_named_auto specular custom 3
 			}
 			texture_unit
 			{
-				texture cel_shading_diffuse.png 2d
+				texture cel_shading_diffuse.png 1d
 				tex_address_mode clamp
 				filtering none
 			}
 			texture_unit
 			{
-				texture cel_shading_specular.png 2d
+				texture cel_shading_specular.png 1d
 				tex_address_mode clamp
 				filtering none
 			}
 			texture_unit
 			{
-				texture cel_shading_edge.png 2d
+				texture cel_shading_edge.png 1d
 				tex_address_mode clamp
 				filtering none
 			}
