@@ -1,4 +1,4 @@
-fragment_program DeferredShading/post/Ambient_ps cg
+fragment_program DeferredShading/post/Ambient_psCg cg
 {
 	source DeferredShading/post/Ambient_ps.cg
 	profiles ps_2_0 arbfp1
@@ -12,49 +12,149 @@ fragment_program DeferredShading/post/Ambient_ps cg
 	}
 }
 
-fragment_program DeferredShading/post/ShowNormal_ps cg
+fragment_program DeferredShading/post/Ambient_psGLSLES glsles
+{
+	source DeferredShading/post/Ambient_ps.glsles
+	profiles glsles
+	entry_point main
+	
+	default_params
+	{
+		param_named_auto ambientColor ambient_light_colour 0		
+		param_named_auto proj projection_matrix
+		param_named_auto farClipDistance far_clip_distance
+	}
+}
+
+fragment_program DeferredShading/post/Ambient_ps unified
+{
+	delegate DeferredShading/post/Ambient_psGLSLES
+	delegate DeferredShading/post/Ambient_psCg
+}
+
+fragment_program DeferredShading/post/ShowNormal_psCg cg
 {
 	source DeferredShading/post/ShowNormal_ps.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
 }
 
-fragment_program DeferredShading/post/ShowDS_ps cg
+fragment_program DeferredShading/post/ShowNormal_psGLSLES glsles
+{
+	source DeferredShading/post/ShowNormal_ps.glsles
+	profiles glsles
+	entry_point main
+}
+
+fragment_program DeferredShading/post/ShowNormal_ps unified
+{
+	delegate DeferredShading/post/ShowNormal_psGLSLES
+	delegate DeferredShading/post/ShowNormal_psCg
+}
+
+fragment_program DeferredShading/post/ShowDS_psCg cg
 {
 	source DeferredShading/post/ShowDS_ps.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
 }
 
-fragment_program DeferredShading/post/ShowColour_ps cg
+fragment_program DeferredShading/post/ShowDS_psGLSLES glsles
+{
+	source DeferredShading/post/ShowDS_ps.glsles
+	profiles glsles
+	entry_point main
+}
+
+fragment_program DeferredShading/post/ShowDS_ps unified
+{
+	delegate DeferredShading/post/ShowDS_psGLSLES
+	delegate DeferredShading/post/ShowDS_psCg
+}
+
+fragment_program DeferredShading/post/ShowColour_psCg cg
 {
 	source DeferredShading/post/ShowColour_ps.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
 }
 
-fragment_program DeferredShading/post/ShowNormal_ps cg
+fragment_program DeferredShading/post/ShowColour_psGLSLES glsles
+{
+	source DeferredShading/post/ShowColour_ps.glsles
+	profiles glsles
+	entry_point main
+}
+
+fragment_program DeferredShading/post/ShowColour_ps unified
+{
+	delegate DeferredShading/post/ShowColour_psGLSLES
+	delegate DeferredShading/post/ShowColour_psCg
+}
+
+fragment_program DeferredShading/post/ShowNormal_psCg cg
 {
 	source DeferredShading/post/ShowNormal_ps.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
 }
-fragment_program DeferredShading/post/ShowDS_ps cg
+
+fragment_program DeferredShading/post/ShowNormal_psGLSLES glsles
+{
+	source DeferredShading/post/ShowNormal_ps.glsles
+	profiles glsles
+	entry_point main
+}
+
+fragment_program DeferredShading/post/ShowNormal_ps unified
+{
+	delegate DeferredShading/post/ShowNormal_psGLSLES
+	delegate DeferredShading/post/ShowNormal_psCg
+}
+
+fragment_program DeferredShading/post/ShowDS_psCg cg
 {
 	source DeferredShading/post/ShowDS_ps.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
 }
-fragment_program DeferredShading/post/ShowColour_ps cg
+
+fragment_program DeferredShading/post/ShowDS_psGLSLES glsles
+{
+	source DeferredShading/post/ShowDS_ps.glsles
+	profiles glsles
+	entry_point main
+}
+
+fragment_program DeferredShading/post/ShowDS_ps unified
+{
+	delegate DeferredShading/post/ShowDS_psGLSLES
+	delegate DeferredShading/post/ShowDS_psCg
+}
+
+fragment_program DeferredShading/post/ShowColour_psCg cg
 {
 	source DeferredShading/post/ShowColour_ps.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
+}
+
+fragment_program DeferredShading/post/ShowColour_psGLSLES glsles
+{
+	source DeferredShading/post/ShowColour_ps.glsles
+	profiles glsles
+	entry_point main
+}
+
+fragment_program DeferredShading/post/ShowColour_ps unified
+{
+	delegate DeferredShading/post/ShowColour_psGLSLES
+	delegate DeferredShading/post/ShowColour_psCg
 }
 
 // Auxilary lights
 // cg
-vertex_program DeferredShading/post/LightMaterial_vs cg
+vertex_program DeferredShading/post/LightMaterial_vsCg cg
 {
 	source DeferredShading/post/LightMaterial_vs.cg
 	profiles vs_1_1 arbvp1
@@ -68,22 +168,29 @@ vertex_program DeferredShading/post/LightMaterial_vs cg
 	}
 }
 
-// Post processors
-fragment_program DeferredShading/post/Ambient_ps cg
+// GLSL ES
+vertex_program DeferredShading/post/LightMaterial_vsGLSLES glsles
 {
-	source DeferredShading/post/Ambient_ps.cg
-	profiles ps_2_0 arbfp1
+	source DeferredShading/post/LightMaterial_vs.glsles
+	profiles glsles
 	entry_point main
-	
 	default_params
 	{
-		param_named_auto ambientColor ambient_light_colour 0		
-		param_named_auto proj projection_matrix
+		param_named_auto worldViewProj worldviewproj_matrix
+		//param_named_auto invProj inverse_projection_matrix
+		//param_named_auto vpWidth viewport_width
+		//param_named_auto vpHeight viewport_height
 	}
 }
 
+vertex_program DeferredShading/post/LightMaterial_vs unified
+{
+	delegate DeferredShading/post/LightMaterial_vsGLSLES
+	delegate DeferredShading/post/LightMaterial_vsCg
+}
+
 // Post processors
-vertex_program DeferredShading/post/vs cg
+vertex_program DeferredShading/post/vsCg cg
 {
 	source DeferredShading/post/vs.cg
 	profiles vs_1_1 arbvp1
@@ -94,4 +201,23 @@ vertex_program DeferredShading/post/vs cg
 		param_named_auto flip render_target_flipping
 		param_named farCorner float3 1 1 1
 	}
+}
+
+vertex_program DeferredShading/post/vsGLSLES glsles
+{
+	source DeferredShading/post/vs.glsles
+	profiles glsles
+	entry_point main
+	default_params
+	{
+		//param_named_auto invProj inverse_projection_matrix
+		param_named_auto flip render_target_flipping
+		param_named farCorner float3 1 1 1
+	}
+}
+
+vertex_program DeferredShading/post/vs unified
+{
+	delegate DeferredShading/post/vsGLSLES
+	delegate DeferredShading/post/vsCg
 }

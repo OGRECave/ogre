@@ -1,0 +1,51 @@
+#version 100
+precision highp int;
+precision highp float;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+// General functions
+// parameters
+uniform vec4 lightPosition; // object space
+uniform vec3 eyePosition;   // object space
+uniform mat4 worldViewProj;
+
+attribute vec4 vertex;
+attribute vec3 normal;
+attribute vec3 tangent;
+attribute vec4 uv0;
+
+varying vec4 oUv;
+varying vec3 oTSLightDir;
+varying vec3 oTSHalfAngle;
+
+/* Vertex program which includes specular component */
+void main()
+{
+	// calculate output position
+	gl_Position = worldViewProj * vertex;
+
+	// pass the main uvs straight through unchanged
+	oUv = uv0;
+
+	// calculate tangent space light vector
+	// Get object space light direction
+	vec3 lightDir = normalize(lightPosition.xyz - (vertex * lightPosition.w).xyz);
+
+	// Calculate the binormal (NB we assume both normal and tangent are
+	// already normalised)
+	// NB looks like nvidia cross params are BACKWARDS to what you'd expect
+	// this equates to NxT, not TxN
+	vec3 binormal = cross(tangent, normal);
+	
+	// Form a rotation matrix out of the vectors
+	mat3 rotation = mat3(tangent, binormal, normal);
+	
+	// Transform the light vector according to this matrix
+	oTSLightDir = rotation * lightDir;
+
+	// Calculate half-angle in tangent space
+	vec3 eyeDir = normalize(eyePosition - vertex.xyz);
+	vec3 halfAngle = normalize(eyeDir + lightDir);
+	oTSHalfAngle = rotation * halfAngle;
+}

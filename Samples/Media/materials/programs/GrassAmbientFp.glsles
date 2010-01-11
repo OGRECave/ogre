@@ -1,0 +1,18 @@
+#version 100
+
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+uniform sampler2D diffuseMap;
+
+varying vec4 oUv;
+varying vec4 oColour;
+
+/// grass_vp ambient
+void main()
+{	
+    vec4 texColor = texture2D(diffuseMap, oUv.xy);
+    gl_FragColor = vec4(oColour.rgb, texColor.a); 
+}

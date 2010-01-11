@@ -214,13 +214,23 @@ material Examples/EarlyMorningSkyBox
 	}
 }
 
+fragment_program Examples/MorningSkyBoxHDRfpGLSLES glsles
+{
+	source hdr.glsles
+	profiles glsles
+}
 
-fragment_program Examples/MorningSkyBoxHDRfp cg
+fragment_program Examples/MorningSkyBoxHDRfpCg cg
 {
 	source hdr.cg
 	entry_point morningskybox_fp
 	profiles ps_2_0 arbfp1
+}
 
+fragment_program Examples/MorningSkyBoxHDRfp unified
+{
+	delegate Examples/MorningSkyBoxHDRfpGLSLES
+	delegate Examples/MorningSkyBoxHDRfpCg
 }
 
 material Examples/MorningSkyBox
@@ -250,7 +260,7 @@ material Examples/MorningSkyBox
 			lighting off
 			depth_write off
 
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
+			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
 				param_named_auto worldViewProj worldviewproj_matrix
 				param_named ambient float4 1 1 1 1
@@ -824,7 +834,7 @@ material Examples/GrassFloor
 	}
 }
 
-vertex_program Examples/GrassWaverVp cg
+vertex_program Examples/GrassWaverVpCg cg
 {
 	source Grass.cg
 	entry_point grass_vp
@@ -844,7 +854,7 @@ vertex_program Examples/GrassWaverVp cg
     }
   }
   
-vertex_program Examples/GrassWaverTexVp cg
+vertex_program Examples/GrassWaverTexVpCg cg
   {
 	source Grass.cg
 	entry_point grassTex_vp
@@ -856,7 +866,7 @@ vertex_program Examples/GrassWaverTexVp cg
         param_named_auto offset custom 999
     }
 }
-vertex_program Examples/GrassWaverAmbientVp cg
+vertex_program Examples/GrassWaverAmbientVpCg cg
           {
 	source Grass.cg
 	entry_point grassAmbient_vp
@@ -869,7 +879,7 @@ vertex_program Examples/GrassWaverAmbientVp cg
         param_named_auto offset custom 999
     }
 }
-fragment_program Examples/GrassWaverAmbientFp cg
+fragment_program Examples/GrassWaverAmbientFpCg cg
 {
 	source Grass.cg
 	entry_point grassAmbient_fp
@@ -879,7 +889,7 @@ fragment_program Examples/GrassWaverAmbientFp cg
     }
 }
 
-vertex_program Examples/GrassWaverCasterVp cg
+vertex_program Examples/GrassWaverCasterVpCg cg
 {
 	source Grass.cg
 	entry_point grasscaster_vp
@@ -892,7 +902,7 @@ vertex_program Examples/GrassWaverCasterVp cg
 		param_named_auto texelOffsets texel_offsets
     }
 }
-fragment_program Examples/GrassWaverCasterFp cg
+fragment_program Examples/GrassWaverCasterFpCg cg
 {
 	source Grass.cg
 	entry_point grasscaster_fp
@@ -902,7 +912,7 @@ fragment_program Examples/GrassWaverCasterFp cg
     }
 }
 
-vertex_program Examples/GrassWaverReceiverVp cg
+vertex_program Examples/GrassWaverReceiverVpCg cg
 {
 	source Grass.cg
 	entry_point grassreceiver_vp
@@ -924,7 +934,7 @@ vertex_program Examples/GrassWaverReceiverVp cg
 }
 
 
-fragment_program Examples/GrassWaverReceiverFp cg
+fragment_program Examples/GrassWaverReceiverFpCg cg
 {
 	source Grass.cg
 	entry_point grassreceiver_fp
@@ -939,6 +949,158 @@ fragment_program Examples/GrassWaverReceiverFp cg
     }
 }
 
+vertex_program Examples/GrassWaverVpGLSLES glsles
+{
+	source GrassVp.glsles
+	profiles glsles
+    
+    default_params
+    {    
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto camObjPos camera_position_object_space
+        param_named_auto ambient ambient_light_colour
+        param_named_auto objSpaceLight light_position_object_space 0
+        param_named_auto lightColour light_diffuse_colour 0
+        
+        param_named_auto offset custom 999
+    }
+  }
+  
+vertex_program Examples/GrassWaverTexVpGLSLES glsles
+{
+	source GrassTexVp.glsles
+	profiles glsles
+    
+    default_params
+      {
+        param_named_auto worldViewProj worldviewproj_matrix        
+        param_named_auto offset custom 999
+    }
+}
+vertex_program Examples/GrassWaverAmbientVpGLSLES glsles
+{
+	source GrassAmbientVp.glsles
+	profiles glsles
+    
+    default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto ambient ambient_light_colour
+        param_named_auto offset custom 999
+    }
+}
+fragment_program Examples/GrassWaverAmbientFpGLSLES glsles
+{
+	source GrassAmbientFp.glsles
+	profiles glsles
+    default_params
+    {
+    }
+}
+
+vertex_program Examples/GrassWaverCasterVpGLSLES glsles
+{
+	source GrassCasterVp.glsles
+	profiles glsles
+    
+    default_params
+    {    
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto offset custom 999
+		param_named_auto texelOffsets texel_offsets
+    }
+}
+fragment_program Examples/GrassWaverCasterFpGLSLES glsles
+{
+	source GrassCasterFp.glsles
+	profiles glsles
+    default_params
+    {
+    }
+}
+
+vertex_program Examples/GrassWaverReceiverVpGLSLES glsles
+{
+	source GrassReceiverVp.glsles
+	profiles glsles
+    
+    default_params
+    {
+        param_named_auto world world_matrix
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto texViewProj texture_viewproj_matrix
+        
+        param_named_auto camObjPos camera_position_object_space
+        
+  				param_named_auto objSpaceLight light_position_object_space 0
+  				param_named_auto lightColour light_diffuse_colour 0
+        
+  				param_named_auto offset custom 999
+	}
+}
+
+
+fragment_program Examples/GrassWaverReceiverFpGLSLES glsles
+{
+	source GrassReceiverFp.glsles
+	profiles glsles
+   
+	default_params
+    {
+        //param_named inverseShadowmapSize float 0.0009765625
+		param_named fixedDepthBias float 0.0005
+		param_named gradientClamp float 0.0098
+		param_named gradientScaleBias float 0
+    }
+}
+
+vertex_program Examples/GrassWaverReceiverVp unified
+{
+	delegate Examples/GrassWaverReceiverVpGLSLES
+	delegate Examples/GrassWaverReceiverVpCg
+}
+
+fragment_program Examples/GrassWaverReceiverFp unified
+{
+	delegate Examples/GrassWaverReceiverFpGLSLES
+	delegate Examples/GrassWaverReceiverFpCg
+}
+
+vertex_program Examples/GrassWaverCasterVp unified
+{
+	delegate Examples/GrassWaverCasterVpGLSLES
+	delegate Examples/GrassWaverCasterVpCg
+}
+
+fragment_program Examples/GrassWaverCasterFp unified
+{
+	delegate Examples/GrassWaverCasterFpGLSLES
+	delegate Examples/GrassWaverCasterFpCg
+}
+
+vertex_program Examples/GrassWaverAmbientVp unified
+{
+	delegate Examples/GrassWaverAmbientVpGLSLES
+	delegate Examples/GrassWaverAmbientVpCg
+}
+
+fragment_program Examples/GrassWaverAmbientFp unified
+{
+	delegate Examples/GrassWaverAmbientFpGLSLES
+	delegate Examples/GrassWaverAmbientFpCg
+}
+
+vertex_program Examples/GrassWaverTexVp unified
+{
+	delegate Examples/GrassWaverTexVpGLSLES
+	delegate Examples/GrassWaverTexVpCg
+}
+
+vertex_program Examples/GrassWaverVp unified
+{
+	delegate Examples/GrassWaverVpGLSLES
+	delegate Examples/GrassWaverVpCg
+}
 
 material Examples/GrassBladesShadowCaster
 {
@@ -1701,7 +1863,7 @@ material Examples/ShowUV
 	{
 		pass
 		{
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
+			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
 			}
 			fragment_program_ref Examples/ShowUV_p

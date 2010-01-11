@@ -1,0 +1,46 @@
+sampler RT: register(s0);
+
+float4 sharpenEdges_fp(float2 iTexCoord: TEXCOORD0, uniform float2 vTexelSize) : COLOR
+{
+
+	float2 usedTexelED[8] = {
+		-1, -1,
+		 0, -1,
+		 1, -1,
+		-1,  0,
+		 1,  0,
+		-1,  1,
+		 0,  1,
+	     1,  1,
+	};
+
+	float4 cAvgColor= 9 * tex2D (RT, iTexCoord);
+
+	for(int t=0; t<8; t++)
+		cAvgColor -= tex2D(RT, iTexCoord + vTexelSize * usedTexelED[t]);
+
+	return cAvgColor;
+}
+sampler RT: register(s0);
+
+float4 sharpenEdges_fp(float2 iTexCoord: TEXCOORD0, uniform float2 vTexelSize) : COLOR
+{
+
+	float2 usedTexelED[8] = {
+		-1, -1,
+		 0, -1,
+		 1, -1,
+		-1,  0,
+		 1,  0,
+		-1,  1,
+		 0,  1,
+	     1,  1,
+	};
+
+	float4 cAvgColor= 9 * tex2D (RT, iTexCoord);
+
+	for(int t=0; t<8; t++)
+		cAvgColor -= tex2D(RT, iTexCoord + vTexelSize * usedTexelED[t]);
+
+	return cAvgColor;
+}

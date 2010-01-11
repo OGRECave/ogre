@@ -34,7 +34,7 @@ material Examples/OffsetMapping/Specular
 	  pass
 	  {
 	      illumination_stage ambient
-		  vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
+		  vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 		  {
 		  }
 		  
@@ -150,6 +150,11 @@ vertex_program Examples/OffsetMappingIntegratedShadowsVPglsl glsl
    source OffsetMappingVp.glsl
 } 
 
+vertex_program Examples/OffsetMappingIntegratedShadowsVPglsles glsles
+{ 
+   source OffsetMappingVp.glsles
+} 
+
 // Single-pass offset mapping with shadows
 fragment_program Examples/OffsetMappingIntegratedShadowsFPhlsl hlsl
 { 
@@ -169,17 +174,31 @@ fragment_program Examples/OffsetMappingIntegratedShadowsFPglsl glsl
 		param_named shadowMap2 int 3
 	}
 }
+fragment_program Examples/OffsetMappingIntegratedShadowsFPglsles glsles
+{
+	source OffsetMappingFp.glsles
+	default_params
+	{
+		// assign samplers as required by GLSL ES
+		param_named normalHeightMap int 0
+		param_named diffuseMap int 1
+		param_named shadowMap1 int 2
+		param_named shadowMap2 int 3
+	}
+}
 // Single-pass offset mapping with shadows
 vertex_program Examples/OffsetMappingIntegratedShadowsVP unified
 {
 	delegate Examples/OffsetMappingIntegratedShadowsVPhlsl
 	delegate Examples/OffsetMappingIntegratedShadowsVPglsl
+	delegate Examples/OffsetMappingIntegratedShadowsVPglsles
 }
 // Single-pass offset mapping with shadows
 fragment_program Examples/OffsetMappingIntegratedShadowsFP unified
 {
 	delegate Examples/OffsetMappingIntegratedShadowsFPhlsl
 	delegate Examples/OffsetMappingIntegratedShadowsFPglsl
+	delegate Examples/OffsetMappingIntegratedShadowsFPglsles
 }
 
 
@@ -246,9 +265,5 @@ material Examples/OffsetMapping/IntegratedShadows
 		 	content_type shadow
 		 }
       } 
-   } 
-
-
-
+   }
 }
-

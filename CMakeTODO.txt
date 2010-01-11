@@ -10,7 +10,6 @@ TODO
 To be done after switch-over
 
 * SDK changes - Win32 and OS X scripts will need altering
-* GLES project - This needs some testing, could be complete
 * OS X
   * Only Debug and Release builds are supported at the moment, since the others still use the same folders. 
 * CPack

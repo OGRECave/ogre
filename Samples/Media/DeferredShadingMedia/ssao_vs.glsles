@@ -1,0 +1,45 @@
+#version 100
+
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+struct VIn
+{
+    vec4 p;
+    vec3 n;
+    vec2 uv;
+};
+
+struct VOut
+{
+    vec4 p;
+    vec2 uv;
+    vec3 ray;
+};
+
+struct PIn
+{
+    vec2 uv;
+    vec3 ray;
+};
+
+uniform mat4 wvp;
+uniform vec3 farCorner;
+
+void main()
+//VOut ssao_vs(VIn IN, uniform mat4 wvp, uniform vec3 farCorner)
+{
+    VOut OUT;
+    OUT.p = wvp * IN.p;
+    // clean up inaccuracies for the UV coords
+    vec2 uv = sign(IN.p);
+    // convert to image space
+    uv = (vec2(uv.x, -uv.y) + 1.0) * 0.5;
+    OUT.uv = uv;
+    // calculate the correct ray (modify XY parameters based on screen-space quad XY)
+    OUT.ray = farCorner * vec3(sign(IN.p.xy), 1.0);
+
+    gl_Position = OUT;
+}

@@ -97,6 +97,10 @@ ShaderGenerator::ShaderGenerator()
 	{
 		mShaderLanguage	= "glsl";
 	}
+	else if (hmgr.isLanguageSupported("glsles"))
+	{
+		mShaderLanguage	= "glsles";
+	}
 	else if (hmgr.isLanguageSupported("hlsl"))
 	{
 		mShaderLanguage	= "hlsl";

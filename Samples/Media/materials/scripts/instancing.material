@@ -107,25 +107,79 @@ vertex_program CrowdShadowCasterGLSL glsl
 	}
 }
 
+vertex_program InstancingGLSLES glsles
+{
+	source instancingVp.glsles
+	preprocessor_defines SHADOW_CASTER=0
+	default_params
+	{
+		param_named_auto ambient ambient_light_colour
+		param_named_auto lightDiffuseColour light_diffuse_colour 0
+		param_named_auto lightPos light_position 0
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+	}
+}
+vertex_program InstancingShadowCasterGLSLES glsles
+{
+   	source instancingVp.glsles
+	preprocessor_defines SHADOW_CASTER=1
+	default_params
+	{
+		param_named_auto ambient ambient_light_colour
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+	}
+}
+vertex_program CrowdGLSLES glsles
+{
+	source crowdVp.glsles
+	preprocessor_defines SHADOW_CASTER=0
+	default_params
+	{
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto numBones custom 0
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+		param_named_auto lightPos light_position 0
+		param_named_auto lightDiffuseColour light_diffuse_colour 0
+		param_named_auto ambient ambient_light_colour
+	}
+}
+vertex_program CrowdShadowCasterGLSLES glsles
+{
+	source crowdVp.glsles
+	preprocessor_defines SHADOW_CASTER=1
+	default_params
+	{
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto numBones custom 0
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+		param_named_auto ambient ambient_light_colour
+	}
+}
 
 vertex_program Instancing unified
 {
 	delegate InstancingGLSL
+	delegate InstancingGLSLES
 	delegate InstancingCg
 }
 vertex_program InstancingShadowCaster unified
 {
 	delegate InstancingShadowCasterGLSL
+	delegate InstancingShadowCasterGLSLES
 	delegate InstancingShadowCasterCg
 }
 vertex_program Crowd unified
 {
 	delegate CrowdGLSL
+	delegate CrowdGLSLES
 	delegate CrowdCg
 }
 vertex_program CrowdShadowCaster unified
 {
 	delegate CrowdShadowCasterGLSL
+	delegate CrowdShadowCasterGLSLES
 	delegate CrowdShadowCasterCg
 }
 

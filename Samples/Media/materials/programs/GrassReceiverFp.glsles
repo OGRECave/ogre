@@ -1,0 +1,44 @@
+#version 100
+
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+uniform float fixedDepthBias;
+uniform float gradientClamp;
+uniform float gradientScaleBias;
+uniform sampler2D shadowMap;
+uniform sampler2D diffuseMap;
+uniform vec4 vertexLight;
+
+varying vec4 oUv;
+varying vec4 oShadowUV;
+
+//////////////////////// GRASS SHADOW RECEIVER
+void main()
+{		
+    if (oShadowUV.z > 0.0)
+    {
+       vec4 diffuse = texture2D(diffuseMap, oUv.xy);
+       if (diffuse.a > 0.001)
+       {
+            gl_FragColor = vec4(0.0);
+       }
+       else
+       {
+            vec4 normShadowUV = oShadowUV / oShadowUV.w;
+            vec4 shadowDepths = texture2D(shadowMap, oShadowUV.xy);        
+            
+            float gradientFactor = gradientClamp * gradientScaleBias;
+            float depthAdjust = gradientFactor + fixedDepthBias * shadowDepths.x;
+            float centerdepth = shadowDepths.x + depthAdjust;
+  
+            gl_FragColor = (centerdepth > normShadowUV.z) ? vec4(vertexLight.rgb, diffuse.a) : vec4(0.0, 0.0, 0.0, diffuse.a);
+       }
+    }
+    else
+    {
+        gl_FragColor = vec4(0.0);
+    }
+}

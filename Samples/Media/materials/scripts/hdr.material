@@ -13,9 +13,18 @@ fragment_program Ogre/Compositor/HDR/downscale2x2LuminenceGLSL_fp glsl
 		param_named inRTT int 0
 	}
 }
+fragment_program Ogre/Compositor/HDR/downscale2x2LuminenceGLSLES_fp glsles
+{
+	source hdr_downscale2x2luminence.glsles
+	default_params
+	{
+		param_named inRTT int 0
+	}
+}
 fragment_program Ogre/Compositor/HDR/downscale2x2Luminence_fp unified
 {
 	delegate Ogre/Compositor/HDR/downscale2x2LuminenceGLSL_fp
+	delegate Ogre/Compositor/HDR/downscale2x2LuminenceGLSLES_fp
 	delegate Ogre/Compositor/HDR/downscale2x2LuminenceHLSL_fp
 	default_params
 	{
@@ -57,6 +66,14 @@ fragment_program Ogre/Compositor/HDR/downscale3x3HLSL_fp hlsl
 	entry_point downscale3x3
 	target ps_2_0
 }
+fragment_program Ogre/Compositor/HDR/downscale3x3GLSLES_fp glsles
+{
+	source hdr_downscale3x3.glsles
+	default_params
+	{
+		param_named inRTT int 0
+	}
+}
 fragment_program Ogre/Compositor/HDR/downscale3x3GLSL_fp glsl
 {
 	source hdr_downscale3x3.glsl
@@ -68,6 +85,7 @@ fragment_program Ogre/Compositor/HDR/downscale3x3GLSL_fp glsl
 fragment_program Ogre/Compositor/HDR/downscale3x3_fp unified
 {
 	delegate Ogre/Compositor/HDR/downscale3x3GLSL_fp
+	delegate Ogre/Compositor/HDR/downscale3x3GLSLES_fp
 	delegate Ogre/Compositor/HDR/downscale3x3HLSL_fp
 	default_params
 	{
@@ -125,9 +143,21 @@ fragment_program Ogre/Compositor/HDR/downscale3x3brightpassGLSL_fp glsl
 		param_named inLum int 1
 	}
 }
+fragment_program Ogre/Compositor/HDR/downscale3x3brightpassGLSLES_fp glsles
+{
+	source hdr_downscale3x3brightpass.glsles
+	// re-use common functions
+	attach Ogre/Compositor/HDR/utils_fp
+	default_params
+	{
+		param_named inRTT int 0
+		param_named inLum int 1
+	}
+}
 fragment_program Ogre/Compositor/HDR/downscale3x3brightpass_fp unified
 {
 	delegate Ogre/Compositor/HDR/downscale3x3brightpassGLSL_fp
+	delegate Ogre/Compositor/HDR/downscale3x3brightpassGLSLES_fp
 	delegate Ogre/Compositor/HDR/downscale3x3brightpassHLSL_fp
 	default_params
 	{
@@ -185,9 +215,18 @@ fragment_program Ogre/Compositor/HDR/bloomGLSL_fp glsl
 		param_named inRTT int 0
 	}
 }
+fragment_program Ogre/Compositor/HDR/bloomGLSLES_fp glsles
+{
+	source hdr_bloom.glsles
+	default_params
+	{
+		param_named inRTT int 0
+	}
+}
 fragment_program Ogre/Compositor/HDR/bloom_fp unified
 {
 	delegate Ogre/Compositor/HDR/bloomGLSL_fp
+	delegate Ogre/Compositor/HDR/bloomGLSLES_fp
 	delegate Ogre/Compositor/HDR/bloomHLSL_fp
 }
 
@@ -240,10 +279,23 @@ fragment_program Ogre/Compositor/HDR/finaltonemappingGLSL_fp glsl
 		param_named inLum int 2
 	}
 }
+fragment_program Ogre/Compositor/HDR/finaltonemappingGLSLES_fp glsles
+{
+	source hdr_finalToneMapping.glsles
+	// re-use common functions
+	attach Ogre/Compositor/HDR/utils_fp
+	default_params
+	{
+		param_named inRTT int 0
+		param_named inBloom int 1
+		param_named inLum int 2
+	}
+}
 fragment_program Ogre/Compositor/HDR/finaltonemapping_fp unified
 {
 	delegate Ogre/Compositor/HDR/finaltonemappingHLSL_fp
 	delegate Ogre/Compositor/HDR/finaltonemappingGLSL_fp
+	delegate Ogre/Compositor/HDR/finaltonemappingGLSLES_fp
 }
 
 material Ogre/Compositor/HDR/ToneMapping

@@ -1,0 +1,46 @@
+#version 100
+precision highp int;
+precision highp float;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+uniform mat4 world;
+uniform mat4 worldIT;
+uniform mat4 worldViewProj;
+uniform mat4 texViewProj;
+uniform vec4 lightPosition;
+uniform vec4 lightColour;
+uniform vec4 shadowDepthRange;
+
+attribute vec4 vertex;
+attribute vec4 uv0;
+attribute vec4 uv1;
+attribute vec3 normal;
+
+varying vec4 shadowUV;
+varying vec4 vColor;
+varying vec4 vUv0;
+varying vec4 vUv1;
+
+void main()
+{
+	gl_Position = vertex * worldViewProj;
+	
+	vec4 worldPos = world * vertex;
+	vec3 worldNorm = (worldIT * vec4(normal, 1.0)).xyz;
+
+	// Calculate lighting (simple vertex lighting)
+	vec3 lightDir = normalize(lightPosition.xyz - (worldPos.xyz * lightPosition.w));
+
+	vColor = lightColour * max(dot(lightDir, worldNorm), 0.0);
+
+	// Calculate shadow map coords
+	shadowUV = texViewProj * worldPos;
+#if LINEAR_RANGE
+	// Adjust by fixed depth bias, rescale into range
+	shadowUV.z = (shadowUV.z - shadowDepthRange.x) * shadowDepthRange.w;
+#endif
+
+	vUv0 = uv0;
+	vUv1 = uv1;
+}

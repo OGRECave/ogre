@@ -12,10 +12,16 @@ fragment_program Ogre/MRTtest/scenefp/GLSL glsl
 	source mrttestfp_scene.glsl
 }
 
+fragment_program Ogre/MRTtest/scenefp/GLSLES glsles
+{
+	source mrttestfp_scene.glsles
+}
+
 fragment_program Ogre/MRTtest/scenefp unified
 {
 	delegate Ogre/MRTtest/scenefp/HLSL
 	delegate Ogre/MRTtest/scenefp/GLSL
+	delegate Ogre/MRTtest/scenefp/GLSLES
 }
 
 material Ogre/MRTtest/scene
@@ -25,7 +31,7 @@ material Ogre/MRTtest/scene
 		scheme MRT
 		pass
 		{
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
+			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
 				param_named_auto worldViewProj worldviewproj_matrix
 				param_named ambient float4 1 1 1 1
@@ -64,10 +70,24 @@ fragment_program Ogre/MRTtest/quadfp/GLSL glsl
 	}
 }
 
+fragment_program Ogre/MRTtest/quadfp/GLSLES glsles
+{
+	source mrttestfp_quad.glsles
+
+	default_params
+	{
+		param_named rt0 int 0
+		param_named rt1 int 1
+		param_named rt2 int 2
+		param_named rt3 int 3
+	}
+}
+
 fragment_program Ogre/MRTtest/quadfp unified
 {
 	delegate Ogre/MRTtest/quadfp/HLSL
 	delegate Ogre/MRTtest/quadfp/GLSL
+	delegate Ogre/MRTtest/quadfp/GLSLES
 }
 
 

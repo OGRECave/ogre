@@ -1,0 +1,39 @@
+#version 100
+
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+attribute vec4 uv0;
+attribute vec4 vertex;
+
+uniform mat4 worldViewProjMatrix;
+uniform vec3 eyePosition; // object space
+uniform float timeVal;
+uniform float scale;  // the amount to scale the noise texture by
+uniform float scroll; // the amount by which to scroll the noise
+uniform float noise;  // the noise perturb as a factor of the  time
+
+varying vec3 noiseCoord;
+varying vec4 projectionCoord;
+varying vec3 eyeDir;
+varying vec3 normal;
+
+// Vertex program for fresnel reflections / refractions
+void main()
+{
+	gl_Position = worldViewProjMatrix * vertex;
+	// Projective texture coordinates, adjust for mapping
+	mat4 scalemat = mat4(0.5, 0.0, 0.0, 0.5, 
+                         0.0, -0.5, 0.0, 0.5,
+                         0.0, 0.0, 0.5, 0.5,
+                         0.0, 0.0, 0.0, 1.0);
+	projectionCoord = scalemat * gl_Position;
+
+	// Noise map coords
+	noiseCoord.xy = (uv0.xy + (timeVal * scroll)) * scale;
+	noiseCoord.z = noise * timeVal;
+
+	eyeDir = normalize(vertex.xyz - eyePosition); 
+}

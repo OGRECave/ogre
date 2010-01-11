@@ -63,9 +63,15 @@ vertex_program Ogre/Compositor/StdQuad_GLSL_vp glsl
 	source StdQuad_vp.glsl
 }
 
+vertex_program Ogre/Compositor/StdQuad_GLSLES_vp glsles
+{
+	source StdQuad_vp.glsles
+}
+
 
 vertex_program Ogre/Compositor/StdQuad_vp unified
 {
 	delegate Ogre/Compositor/StdQuad_GLSL_vp
+	delegate Ogre/Compositor/StdQuad_GLSLES_vp
 	delegate Ogre/Compositor/StdQuad_Cg_vp
 }

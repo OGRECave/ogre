@@ -45,6 +45,64 @@ fragment_program Bloom2_ps20_glsl glsl
 }
 
 //------------------------
+//OpenGL GLSL ES Definitions
+//------------------------
+vertex_program Blur_vs_glsl glsles
+{
+	source Blur_vs.glsles
+}
+fragment_program BlurV_ps20_glsl glsles
+{
+	source BlurV_ps20.glsles
+}
+fragment_program BlurH_ps20_glsl glsles
+{
+	source BlurH_ps20.glsles
+}
+fragment_program BrightBloom2_ps20_glsl glsles
+{
+	source BrightBloom2_ps20.glsles
+}
+fragment_program Bloom2_ps20_glsl glsles
+{
+	source Bloom2_ps20.glsles
+	default_params
+	{
+		param_named RT int 0
+		param_named Blur1 int 1
+	}
+}
+
+//------------------------
+//OpenGL GLSL ES Definitions
+//------------------------
+vertex_program Blur_vs_glsles glsles
+{
+	source Blur_vs.glsles
+}
+fragment_program BlurV_ps20_glsles glsles
+{
+	source BlurV_ps20.glsles
+}
+fragment_program BlurH_ps20_glsles glsles
+{
+	source BlurH_ps20.glsles
+}
+fragment_program BrightBloom2_ps20_glsles glsles
+{
+	source BrightBloom2_ps20.glsles
+}
+fragment_program Bloom2_ps20_glsles glsles
+{
+	source Bloom2_ps20.glsles
+	default_params
+	{
+		param_named RT int 0
+		param_named Blur1 int 1
+	}
+}
+
+//------------------------
 //DirectX 9.0 HLSL Definitions
 //------------------------	
 //DirectX 9.0 HLSL Vertex Shader vs_1_1
@@ -133,6 +191,7 @@ vertex_program Blur_vs unified
 {
 	delegate Blur_vs11_hlsl
 	//delegate Blur_vs_glsl
+	delegate Blur_vs_glsles
 	delegate Blur_vs11_cg
 }
 
@@ -140,24 +199,27 @@ fragment_program Bloom2_ps unified
 {
 	delegate Bloom2_ps20_hlsl
 	//delegate Bloom2_ps20_glsl
+	delegate Bloom2_ps20_glsles
 	delegate Bloom2_ps20_cg
 }
 fragment_program BlurV_ps unified
 {
 	delegate BlurV_ps20_hlsl
 	//delegate BlurV_ps20_glsl
+	delegate BlurV_ps20_glsles
 	delegate BlurV_ps20_cg
 }
 fragment_program BlurH_ps unified
 {
 	delegate BlurH_ps20_hlsl
 	//delegate BlurH_ps20_glsl
+	delegate BlurH_ps20_glsles
 	delegate BlurH_ps20_cg
 }
 fragment_program BrightBloom2_ps unified
 {
 	delegate BrightBloom2_ps20_hlsl
-	//delegate BrightBloom2_ps20_glsl
+	delegate BrightBloom2_ps20_glsles
 	delegate BrightBloom2_ps20_cg
 }
 

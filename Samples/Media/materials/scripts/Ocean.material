@@ -45,6 +45,29 @@ fragment_program GLSL/OceanFS glsl
 	}
 }
 
+vertex_program GLSLES/OceanVS glsles
+{
+	source oceanGLSLES.vert
+
+	default_params
+	{
+		param_named_auto eyePosition camera_position_object_space
+		param_named scale float3 0.012 0.005 0.03
+		param_named_auto time_0_X time_0_x 100.0
+	}
+}
+
+fragment_program GLSLES/OceanFS glsles
+{
+	source oceanGLSLES.frag
+
+	default_params
+	{
+		param_named Noise int 0
+		param_named skyBox int 1
+	}
+}
+
 material OceanHLSL_GLSL
 {
 	technique
@@ -118,6 +141,39 @@ material OceanHLSL_GLSL
 
 	}
 
+	technique
+	{
+		pass
+		{
+			vertex_program_ref GLSLES/OceanVS
+			{
+				param_named waveSpeed float2 0.0 0.168
+				param_named noiseSpeed float 0.155
+			}
+
+			fragment_program_ref GLSLES/OceanFS
+			{
+				param_named fadeBias float 0.336
+				param_named fadeExp float 5.546
+				param_named waterColor float4 0.0 0.244 0.395 1.0
+			}
+
+			texture_unit
+			{
+				texture NoiseVolume.dds 3d
+				tex_coord_set 0
+				filtering linear linear none
+				tex_address_mode wrap
+			}
+
+			texture_unit
+			{
+				cubic_texture morning.jpg combinedUVW
+				tex_address_mode clamp
+				tex_coord_set 1
+			}
+		}
+	}
 }
 
 
@@ -289,6 +345,16 @@ fragment_program GLSL/Ocean2FS glsl
 	source Ocean2GLSL.frag
 }
 
+vertex_program GLSLES/Ocean2VS glsles
+{
+	source Ocean2GLSLES.vert
+}
+
+fragment_program GLSLES/Ocean2FS glsles
+{
+	source Ocean2GLSLES.frag
+}
+
 material Ocean2_HLSL_GLSL
 {
 	technique HLSL
@@ -353,6 +419,55 @@ material Ocean2_HLSL_GLSL
 			}
 
 			fragment_program_ref GLSL/Ocean2FS
+			{
+				param_named deepColor float4 0 0.3 0.5 1.0
+				param_named shallowColor float4 0 1 1 1.0
+				param_named reflectionColor float4 0.95 1 1 1.0
+				param_named reflectionAmount float 1.0
+				param_named reflectionBlur float 0.0
+				param_named waterAmount float 0.3
+				param_named fresnelPower float 5.0
+				param_named fresnelBias float 0.328
+				param_named hdrMultiplier float 0.471
+				param_named NormalMap int 0
+				param_named EnvironmentMap int 1
+			}
+
+			texture_unit
+			{
+				texture waves2.dds
+				tex_coord_set 0
+				filtering linear linear linear
+			}
+
+			texture_unit
+			{
+				cubic_texture morning.jpg combinedUVW
+				tex_address_mode clamp
+				tex_coord_set 1
+				filtering linear linear linear
+			}
+
+		}
+
+	}
+
+	technique GLSLES
+	{
+		pass
+		{
+			vertex_program_ref GLSLES/Ocean2VS
+			{
+				param_named_auto eyePosition camera_position_object_space
+				param_named_auto time time_0_x 100.0
+				param_named BumpScale float 0.2
+				param_named textureScale float2 25 26
+				param_named bumpSpeed float2 0.015 0.005
+				param_named waveFreq float 0.028
+				param_named waveAmp float 1.8
+			}
+
+			fragment_program_ref GLSLES/Ocean2FS
 			{
 				param_named deepColor float4 0 0.3 0.5 1.0
 				param_named shallowColor float4 0 1 1 1.0

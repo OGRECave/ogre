@@ -1,0 +1,23 @@
+#version 100
+precision mediump int;
+precision mediump float;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+uniform sampler2D tex0;
+varying vec4 uv0;
+
+void main()                    
+{
+	vec4 baseColour = texture2D(tex0, uv0.xy);
+
+	gl_FragData[0] = baseColour;
+
+//	gl_FragData[1] = baseColour * vec4(1, 0, 0, 1);
+
+//	float abs = (baseColour.r + baseColour.g + baseColour.b) * 0.333;
+//	gl_FragData[2] = vec4(abs, abs, abs, 1);
+	
+//	float invabs = 1.0 - abs;
+//	gl_FragData[3] = vec4(invabs, invabs, invabs, 1);
+}

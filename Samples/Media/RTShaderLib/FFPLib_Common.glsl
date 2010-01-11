@@ -35,6 +35,15 @@ THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
+void FFP_Assign(in uint iColor_0, out vec4 oColor_0)
+{
+	oColor_0.w = ((iColor_0 >> 24) & 0xFF) / 255.0f;
+	oColor_0.x = ((iColor_0 >> 16) & 0xFF) / 255.0f;
+	oColor_0.y = ((iColor_0 >> 8) & 0xFF) / 255.0f;
+	oColor_0.z = (iColor_0 & 0xFF) / 255.0f;
+}
+
+//-----------------------------------------------------------------------------
 void FFP_Assign(in float vIn, out float vOut)
 {
 	vOut = vIn;
@@ -218,7 +227,3 @@ void FFP_DotProduct(in vec4 vIn0, in vec4 vIn1, out vec4 vOut)
 {
 	vOut = vec4(dot(vIn0, vIn1), 1.0, 1.0, 1.0);
 }
-
-
-
-

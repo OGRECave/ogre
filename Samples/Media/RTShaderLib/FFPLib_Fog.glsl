@@ -31,7 +31,7 @@ THE SOFTWARE.
 // Program Desc: Fog functions of the FFP.
 // Program Type: Vertex/Pixel shader
 // Language: GLSL
-// Notes: Implements cor functions needed by FFPFog class.
+// Notes: Implements core functions needed by FFPFog class.
 // Based on fog engine. 
 // See http://msdn.microsoft.com/en-us/library/ee418582.aspx
 // Vertex based fog: the w component of the out position is used

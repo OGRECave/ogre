@@ -59,6 +59,9 @@
 #     undef OGRE_STATIC_CgProgramManager
 #     undef OGRE_STATIC_GL
 #     define OGRE_STATIC_GLES 1
+// Comment out the previous line and uncomment these next two lines to try out the GL ES 2 RenderSystem
+//#     undef OGRE_STATIC_GLES
+//#     define OGRE_STATIC_GLES2 1
 #     ifdef __OBJC__
 #       import <UIKit/UIKit.h>
 #     endif

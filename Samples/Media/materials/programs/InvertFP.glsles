@@ -1,0 +1,12 @@
+sampler RT : register(s0);
+
+float4 Invert_ps (float2 iTexCoord : TEXCOORD0) : COLOR
+{
+	return 1 - tex2D(RT, iTexCoord);
+}
+sampler RT : register(s0);
+
+float4 Invert_ps (float2 iTexCoord : TEXCOORD0) : COLOR
+{
+	return 1 - tex2D(RT, iTexCoord);
+}

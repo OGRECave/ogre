@@ -1,0 +1,15 @@
+#version 100
+
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+varying vec3 oViewPos;
+uniform float cFarDistance;
+
+void main()
+{
+	float depth = length(oViewPos) / cFarDistance;
+    gl_FragColor.rgba = vec4(depth, depth, depth, 1);
+}

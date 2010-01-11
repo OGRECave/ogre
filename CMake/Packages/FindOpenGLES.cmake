@@ -24,10 +24,10 @@ IF (WIN32)
   ELSE (CYGWIN)
 
     IF(BORLAND)
-      SET (OPENGLES_gl_LIBRARY import32 CACHE STRING "OpenGL library for win32")
+      SET (OPENGLES_gl_LIBRARY import32 CACHE STRING "OpenGL ES 1.x library for win32")
     ELSE(BORLAND)
 	  #MS compiler - todo - fix the following line:
-      SET (OPENGLES_gl_LIBRARY ${OGRE_SOURCE_DIR}/Dependencies/lib/release/libgles_cm.lib CACHE STRING "OpenGL library for win32")
+      SET (OPENGLES_gl_LIBRARY ${OGRE_SOURCE_DIR}/Dependencies/lib/release/libgles_cm.lib CACHE STRING "OpenGL ES 1.x library for win32")
     ENDIF(BORLAND)
 
   ENDIF (CYGWIN)

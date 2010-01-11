@@ -500,7 +500,7 @@ namespace OgreBites
 		{
 			Sample::_shutdown();
 
-			if (mTrayMgr) delete mTrayMgr;
+            if (mTrayMgr) delete mTrayMgr;
 			if (mCameraMan) delete mCameraMan;
 
 			// restore settings we may have changed, so as not to affect other samples
@@ -515,6 +515,13 @@ namespace OgreBites
 			// setup default viewport layout and camera
 			mCamera = mSceneMgr->createCamera("MainCamera");
 			mViewport = mWindow->addViewport(mCamera);
+#ifdef  USE_RTSHADER_SYSTEM
+            if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != Ogre::String::npos)
+            {
+                // Make this viewport work with shader generator scheme.
+                mViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+            }
+#endif
 			mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
 			mCamera->setNearClipDistance(5);
 

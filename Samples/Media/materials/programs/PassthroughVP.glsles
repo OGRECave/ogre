@@ -1,0 +1,15 @@
+#version 100
+
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+attribute vec4 vertex;
+uniform mat4 worldViewProj;
+
+void main()																					
+{																							
+	//Transform the vertex (ModelViewProj matrix)											
+	gl_Position = vertex * worldViewProj;
+}

@@ -1,0 +1,72 @@
+sampler Image : register(s0);
+
+// The Laplace filter approximates the second order derivate,
+// that is, the rate of change of slope in the image. It can be
+// used for edge detection. The Laplace filter gives negative
+// response on the higher side of the edge and positive response
+// on the lower side.
+
+// This is the filter kernel:
+// 0  1  0
+// 1 -4  1
+// 0  1  0
+
+
+
+float4 Laplace_ps (float2 texCoord: TEXCOORD0,
+			uniform float scale,
+			uniform float pixelSize) : COLOR
+{
+
+    float2 samples[4] = {
+        0, -1,
+       -1,  0,
+        1,  0,
+        0,  1
+    };
+   float4 laplace = -4 * tex2D(Image, texCoord);
+
+   // Sample the neighbor pixels
+   for (int i = 0; i < 4; i++){
+      laplace += tex2D(Image, texCoord + pixelSize * samples[i]);
+   }
+
+   return (0.5 + scale * laplace);
+}
+
+sampler Image : register(s0);
+
+// The Laplace filter approximates the second order derivate,
+// that is, the rate of change of slope in the image. It can be
+// used for edge detection. The Laplace filter gives negative
+// response on the higher side of the edge and positive response
+// on the lower side.
+
+// This is the filter kernel:
+// 0  1  0
+// 1 -4  1
+// 0  1  0
+
+
+
+float4 Laplace_ps (float2 texCoord: TEXCOORD0,
+			uniform float scale,
+			uniform float pixelSize) : COLOR
+{
+
+    float2 samples[4] = {
+        0, -1,
+       -1,  0,
+        1,  0,
+        0,  1
+    };
+   float4 laplace = -4 * tex2D(Image, texCoord);
+
+   // Sample the neighbor pixels
+   for (int i = 0; i < 4; i++){
+      laplace += tex2D(Image, texCoord + pixelSize * samples[i]);
+   }
+
+   return (0.5 + scale * laplace);
+}
+

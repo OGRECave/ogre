@@ -4,8 +4,8 @@
 //---------------------------------------------------
 
 
-// A really basic ambient pass program, support for one texture coodinate set
-vertex_program Ogre/BasicVertexPrograms/AmbientOneTexture cg
+// A really basic ambient pass program, support for one texture coordinate set
+vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCg cg
 {
 	source Example_Basic.cg
 	entry_point ambientOneTexture_vp
@@ -18,7 +18,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTexture cg
 	}
 	
 }
-// A really basic ambient pass program, support for one texture coodinate set
+// A really basic ambient pass program, support for one texture coordinate set
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureHLSL hlsl
 {
 	source Example_Basic.hlsl
@@ -31,7 +31,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureHLSL hlsl
 		param_named_auto ambient ambient_light_colour
 	}
 }
-// A really basic ambient pass program, support for one texture coodinate set
+// A really basic ambient pass program, support for one texture coordinate set
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSL glsl
 {
 	source AmbientOneTexture.glsl
@@ -42,9 +42,23 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSL glsl
 	}
 }
 
+// A really basic ambient pass program, support for one texture coordinate set
+vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES glsles
+{
+	source AmbientOneTexture.glsles
+
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+}
+
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
 {
+	delegate Ogre/BasicVertexPrograms/AmbientOneTextureCg
 	delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSL
+	delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES
 	delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
 }
 
@@ -90,9 +104,16 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterGLSL glsl
 	includes_skeletal_animation true
 }
 
+vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterGLSLES glsles
+{
+	source skinningTwoWeightsShadowCasterVp.glsles
+	includes_skeletal_animation true
+}
+
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCaster unified
 {
 	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterGLSL
+	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterGLSLES
 	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterHLSL
 	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterCg
 }
@@ -113,9 +134,16 @@ vertex_program Ogre/HardwareSkinningTwoWeightsGLSL glsl
    includes_skeletal_animation true
 }
 
+vertex_program Ogre/HardwareSkinningTwoWeightsGLSLES glsles
+{
+   source skinningTwoWeightsVp.glsles
+   includes_skeletal_animation true
+}
+
 vertex_program Ogre/HardwareSkinningTwoWeights unified
 {
 	delegate Ogre/HardwareSkinningTwoWeightsGLSL
+	delegate Ogre/HardwareSkinningTwoWeightsGLSLES
 	delegate Ogre/HardwareSkinningTwoWeightsHLSL
 	delegate Ogre/HardwareSkinningTwoWeightsCg
 	
@@ -168,5 +196,3 @@ vertex_program Ogre/HardwarePoseAnimation cg
 		param_named_auto anim_t animation_parametric
 	}
 }
-
-

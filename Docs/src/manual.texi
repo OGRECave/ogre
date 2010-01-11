@@ -1835,6 +1835,9 @@ Another nVidia-specific OpenGL fragment shader syntax. It is a superset of ps 3.
 @item gpu_gp, gp4_gp
 An nVidia-specific OpenGL geometry shader syntax. @*
 Supported cards: nVidia GeForce FX8 series@*
+@item glsles
+OpenGL Shading Language for Embedded Systems. It is a variant of GLSL, streamlined for low power devices.
+Supported cards: PowerVR SGX series
 @end table
 
 You can get a definitive list of the syntaxes supported by the current card by calling GpuProgramManager::getSingleton().getSupportedSyntax().@*@*

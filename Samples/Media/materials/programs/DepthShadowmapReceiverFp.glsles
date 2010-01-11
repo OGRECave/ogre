@@ -1,0 +1,74 @@
+#version 100
+
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+uniform float inverseShadowmapSize;
+uniform float fixedDepthBias;
+uniform float gradientClamp;
+uniform float gradientScaleBias;
+uniform float shadowFuzzyWidth;
+uniform sampler2D shadowMap;
+
+varying vec4 shadowUV;
+varying vec4 vColor;
+
+void main()
+{
+	// point on shadowmap
+	vec4 local_shadowUV;
+#if LINEAR_RANGE
+	local_shadowUV.xy = shadowUV.xy / shadowUV.w;
+#else
+	local_shadowUV = shadowUV / shadowUV.w;
+#endif
+	float centerdepth = texture2D(shadowMap, shadowUV.xy).x;
+    
+    // gradient calculation
+  	float pixeloffset = inverseShadowmapSize;
+    vec4 depths = vec4(
+    	texture2D(shadowMap, local_shadowUV.xy + vec2(-pixeloffset, 0.0)).x,
+    	texture2D(shadowMap, local_shadowUV.xy + vec2(+pixeloffset, 0.0)).x,
+    	texture2D(shadowMap, local_shadowUV.xy + vec2(0.0, -pixeloffset)).x,
+    	texture2D(shadowMap, local_shadowUV.xy + vec2(0.0, +pixeloffset)).x);
+
+	vec2 differences = abs( depths.yw - depths.xz );
+	float gradient = min(gradientClamp, max(differences.x, differences.y));
+	float gradientFactor = gradient * gradientScaleBias;
+
+	// visibility function
+	float depthAdjust = gradientFactor + (fixedDepthBias * centerdepth);
+	float finalCenterDepth = centerdepth + depthAdjust;
+
+	// shadowUV.z contains lightspace position of current object
+
+#if FUZZY_TEST
+	// Fuzzy test - introduces some ghosting in result and doesn't appear to be needed?
+	//float visibility = saturate(1 + delta_z / (gradient * shadowFuzzyWidth));
+	float visibility = saturate(1.0 + (finalCenterDepth - local_shadowUV.z) * shadowFuzzyWidth * local_shadowUV.w);
+
+	gl_FragColor = vertexColour * visibility;
+#else
+	// Hard test
+#if PCF
+	// Use depths from prev, calculate diff
+	depths += depthAdjust;
+	float final = (finalCenterDepth > local_shadowUV.z) ? 1.0 : 0.0;
+	final += (depths.x > local_shadowUV.z) ? 1.0 : 0.0;
+	final += (depths.y > local_shadowUV.z) ? 1.0 : 0.0;
+	final += (depths.z > local_shadowUV.z) ? 1.0 : 0.0;
+	final += (depths.w > local_shadowUV.z) ? 1.0 : 0.0;
+	
+	final *= 0.2;
+
+	gl_FragColor = vec4(vColor.xyz * final, 1.0);
+	
+#else
+	gl_FragColor = (finalCenterDepth > local_shadowUV.z) ? vColor : vec4(0.0, 0.0, 0.0, 1.0);
+#endif
+
+#endif
+   
+}

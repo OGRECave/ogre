@@ -1420,7 +1420,8 @@ namespace Ogre
 
 		GpuLogicalIndexUse* indexUse = _getFloatConstantLogicalIndexUse(index, sz, deriveVariability(acType));
 
-		_setRawAutoConstant(indexUse->physicalIndex, acType, extraInfo, indexUse->variability, sz);
+        if(indexUse)
+            _setRawAutoConstant(indexUse->physicalIndex, acType, extraInfo, indexUse->variability, sz);
 	}
 	//-----------------------------------------------------------------------------
 	void GpuProgramParameters::_setRawAutoConstant(size_t physicalIndex, 

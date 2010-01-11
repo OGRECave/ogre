@@ -1,11 +1,14 @@
 // -------------------------------
 // Cel Shading Section
 // -------------------------------
-vertex_program Ogre/CelShadingVP cg
+vertex_program Ogre/CelShadingVPCg cg
 {
 	source Example_CelShading.cg
 	entry_point main_vp
 	profiles vs_1_1 arbvp1
+
+	// map shininess from custom renderable param 1
+	param_named_auto shininess custom 1
 
 	default_params
 	{
@@ -16,13 +19,54 @@ vertex_program Ogre/CelShadingVP cg
 	}
 }
 
-fragment_program Ogre/CelShadingFP cg
+fragment_program Ogre/CelShadingFPCg cg
 {
 	source Example_CelShading.cg
 	entry_point main_fp
 	profiles ps_1_1 arbfp1 fp20
+
+	// map diffuse from custom renderable param 2
+	param_named_auto diffuse custom 2
+	// map specular from custom renderable param 2
+	param_named_auto specular custom 3
 }
 
+vertex_program Ogre/CelShadingVPGLSLES glsles
+{
+	source Example_CelShadingVp.glsles
+	profiles glsles
+
+	default_params
+	{
+		param_named_auto lightPosition light_position_object_space 0
+		param_named_auto eyePosition camera_position_object_space
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named shininess float 10
+	}
+}
+
+fragment_program Ogre/CelShadingFPGLSLES glsles
+{
+	source Example_CelShadingFp.glsles
+	profiles glsles
+
+	// map diffuse from custom renderable param 2
+	param_named diffuse float4
+	// map specular from custom renderable param 2
+	param_named specular float4
+}
+
+vertex_program Ogre/CelShadingVP unified
+{
+	delegate Ogre/CelShadingVPGLSLES
+	delegate Ogre/CelShadingVPCg
+}
+
+fragment_program Ogre/CelShadingFP unified
+{
+	delegate Ogre/CelShadingFPGLSLES
+	delegate Ogre/CelShadingFPCg
+}
 
 material Examples/CelShading
 {
@@ -32,31 +76,25 @@ material Examples/CelShading
 		{
 			vertex_program_ref Ogre/CelShadingVP
 			{
-				// map shininess from custom renderable param 1
-				param_named_auto shininess custom 1
 			}
 			fragment_program_ref Ogre/CelShadingFP
 			{
-				// map diffuse from custom renderable param 2
-				param_named_auto diffuse custom 2
-				// map specular from custom renderable param 2
-				param_named_auto specular custom 3
 			}
 			texture_unit
 			{
-				texture cel_shading_diffuse.png 1d
+				texture cel_shading_diffuse.png 2d
 				tex_address_mode clamp
 				filtering none
 			}
 			texture_unit
 			{
-				texture cel_shading_specular.png 1d
+				texture cel_shading_specular.png 2d
 				tex_address_mode clamp
 				filtering none
 			}
 			texture_unit
 			{
-				texture cel_shading_edge.png 1d
+				texture cel_shading_edge.png 2d
 				tex_address_mode clamp
 				filtering none
 			}
@@ -72,11 +110,23 @@ material Examples/CelShading
 //------------------------
 
 // Bump map vertex program, support for this is required
-vertex_program Examples/BumpMapVP cg
+vertex_program Examples/BumpMapVPCg cg
 {
 	source Example_BumpMapping.cg
 	entry_point main_vp
 	profiles vs_1_1 arbvp1
+}
+
+vertex_program Examples/BumpMapVPGLSLES glsles
+{
+	source Example_BumpMappingVp.glsles
+	profiles glsles
+}
+
+vertex_program Examples/BumpMapVP unified
+{
+	delegate Examples/BumpMapVPGLSLES
+	delegate Examples/BumpMapVPCg
 }
 
 // Bump map vertex program, with tangent parity support for this is required
@@ -89,45 +139,108 @@ vertex_program Examples/BumpMapVPTangentParity cg
 }
 
 // Bump map fragment program, support for this is optional
-fragment_program Examples/BumpMapFP cg
+fragment_program Examples/BumpMapFPCg cg
 {
 	source Example_BumpMapping.cg
 	entry_point main_fp
 	profiles ps_2_0 arbfp1 fp20
 }
 
+fragment_program Examples/BumpMapFPGLSLES glsles
+{
+	source Example_BumpMappingFp.glsles
+	profiles glsles
+}
+
+fragment_program Examples/BumpMapFP unified
+{
+	delegate Examples/BumpMapFPGLSLES
+	delegate Examples/BumpMapFPCg
+}
+
 // Bump map vertex program shadow receiver
-vertex_program Examples/BumpMapVPShadowRcv cg
+vertex_program Examples/BumpMapVPShadowRcvCg cg
 {
 	source Example_BumpMapping.cg
 	entry_point main_shadowreceiver_vp
 	profiles vs_1_1 arbvp1
 }
+
+// Bump map vertex program shadow receiver
+vertex_program Examples/BumpMapVPShadowRcvGLSLES glsles
+{
+	source Example_BumpMappingShadowRcvVp.glsles
+	profiles glsles
+}
+
+vertex_program Examples/BumpMapVPShadowRcv unified
+{
+	delegate Examples/BumpMapVPShadowRcvGLSLES
+	delegate Examples/BumpMapVPShadowRcvCg
+}
+
 // Bump map fragment program shadow receiver, support for this is optional
-fragment_program Examples/BumpMapFPShadowRcv cg
+fragment_program Examples/BumpMapFPShadowRcvCg cg
 {
 	source Example_BumpMapping.cg
 	entry_point main_shadowreceiver_fp
 	profiles ps_2_0 arbfp1 fp20
 }
 
+// Bump map fragment program shadow receiver, support for this is optional
+fragment_program Examples/BumpMapFPShadowRcvGLSLES glsles
+{
+	source Example_BumpMappingShadowRcvFp.glsles
+	profiles glsles
+}
+
+fragment_program Examples/BumpMapFPShadowRcv unified
+{
+	delegate Examples/BumpMapFPShadowRcvGLSLES
+	delegate Examples/BumpMapFPShadowRcvCg
+}
 
 // Bump map with specular vertex program, support for this is required
-vertex_program Examples/BumpMapVPSpecular cg
+vertex_program Examples/BumpMapVPSpecularCg cg
 {
 	source Example_BumpMapping.cg
 	entry_point specular_vp
 	profiles vs_1_1 arbvp1
 }
 
+// Bump map with specular vertex program, support for this is required
+vertex_program Examples/BumpMapVPSpecularGLSLES glsles
+{
+	source Example_BumpMappingSpecularVp.glsles
+	profiles glsles
+}
+
+vertex_program Examples/BumpMapVPSpecular unified
+{
+	delegate Examples/BumpMapVPSpecularGLSLES
+	delegate Examples/BumpMapVPSpecularCg
+}
+
 // Bump map fragment program, support for this is optional
-fragment_program Examples/BumpMapFPSpecular cg
+fragment_program Examples/BumpMapFPSpecularCg cg
 {
 	source Example_BumpMapping.cg
 	entry_point specular_fp
 	profiles ps_2_0 arbfp1 fp20
 }
 
+// Bump map fragment program, support for this is optional
+fragment_program Examples/BumpMapFPSpecularGLSLES glsles
+{
+	source Example_BumpMappingSpecularFp.glsles
+	profiles glsles
+}
+
+fragment_program Examples/BumpMapFPSpecular unified
+{
+	delegate Examples/BumpMapFPSpecularGLSLES
+	delegate Examples/BumpMapFPSpecularCg
+}
 
 // Any number of lights, diffuse
 material Examples/BumpMapping/MultiLight
@@ -149,7 +262,7 @@ material Examples/BumpMapping/MultiLight
 			// NB we don't use fixed function here because GL does not like
 			// mixing fixed function and vertex programs, depth fighting can
 			// be an issue
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
+			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
 				param_named_auto worldViewProj worldviewproj_matrix
 				param_named_auto ambient ambient_light_colour
@@ -215,7 +328,7 @@ material Examples/BumpMapping/MultiLight
 			// NB we don't use fixed function here because GL does not like
 			// mixing fixed function and vertex programs, depth fighting can
 			// be an issue
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
+			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
 				param_named_auto worldViewProj worldviewproj_matrix
 				param_named ambient float4 1 1 1 1
@@ -371,6 +484,12 @@ vertex_program Examples/FresnelRefractReflectVPold cg
 	entry_point main_vp_old
 	profiles vs_1_1 arbvp1
 }
+vertex_program Examples/FresnelRefractReflectVPGLSLES glsles
+{
+	source Example_FresnelVp.glsles
+	entry_point main
+	profiles glsles
+}
 
 fragment_program Examples/FresnelRefractReflectFP cg
 {
@@ -385,7 +504,13 @@ fragment_program Examples/FresnelRefractReflectPS asm
 	source Example_FresnelPS.asm
 	// sorry, only for ps_1_4 :)
 	syntax ps_1_4
+}
 
+fragment_program Examples/FresnelRefractReflectFPGLSLES glsles
+{
+	source Example_FresnelFp.glsles
+	entry_point main
+	profiles glsles
 }
 
 material Examples/FresnelReflectionRefraction
@@ -492,7 +617,55 @@ material Examples/FresnelReflectionRefraction
 				tex_address_mode clamp
 			}
 		}
-	}    
+	}
+
+	// glsles
+	technique
+	{
+		pass 
+		{
+			vertex_program_ref Examples/FresnelRefractReflectVPGLSLES
+			{
+				param_named_auto worldViewProjMatrix worldviewproj_matrix
+				param_named_auto eyePosition camera_position_object_space
+				param_named_auto timeVal time 0.05
+				param_named scroll float 1  
+				param_named scale float 1 
+				param_named noise float 1 
+				// scroll and noisePos will need updating per frame
+			}
+			fragment_program_ref Examples/FresnelRefractReflectFPGLSLES
+			{
+				param_named fresnelBias float -0.1 
+				param_named fresnelScale float 1.8 
+				param_named fresnelPower float 8  
+				param_named tintColour float4 0 0.05 0.05 1
+				param_named noiseScale float 0.05 
+			}
+			// Noise
+			texture_unit
+			{
+				// Perlin noise volume
+				texture waves2.dds
+				// min / mag filtering, no mip
+				filtering linear linear none
+			}
+			// Reflection
+			texture_unit
+			{
+				// Will be filled in at runtime
+				texture reflection
+				tex_address_mode clamp
+			}
+			// Refraction
+			texture_unit
+			{
+				// Will be filled in at runtime
+				texture refraction
+				tex_address_mode clamp
+			}
+		}
+	}
 }
 
 // Normal-mapped Athene statue
@@ -582,8 +755,3 @@ material Examples/Athene/NormalMappedSpecular : Examples/BumpMapping/MultiLightS
 
 	}
 }
-
-
-
-
-

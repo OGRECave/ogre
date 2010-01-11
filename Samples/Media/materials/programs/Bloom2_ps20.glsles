@@ -1,0 +1,34 @@
+#version 100
+precision mediump int;
+precision mediump float;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+//-------------------------------
+// Bloom_ps20.glsles
+// Blends using weights the blurred image with the sharp one
+// Params:
+//   OriginalImageWeight
+//   BlurWeight
+//-------------------------------
+
+uniform sampler2D RT;
+uniform sampler2D Blur1;
+
+uniform float OriginalImageWeight;
+uniform float BlurWeight;
+varying vec4 uv0;
+
+void main()
+{
+    vec4 sharp;
+    vec4 blur;
+    
+    vec2 texCoord = vec2( uv0 );
+
+    sharp = texture2D( RT, texCoord);
+    blur = texture2D( Blur1, texCoord);
+    
+    gl_FragColor = ( (blur * BlurWeight) + (sharp * OriginalImageWeight) );
+    //gl_FragColor = vec4(0);
+}

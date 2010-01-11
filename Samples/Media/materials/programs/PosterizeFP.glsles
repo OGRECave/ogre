@@ -1,0 +1,34 @@
+sampler RT : register(s0);
+
+float4 Posterize_ps (float2 iTexCoord : TEXCOORD0) : COLOR
+{
+
+	float nColors = 8;
+	float gamma = 0.6;
+
+	float4 texCol = tex2D(RT, iTexCoord);
+	float3 tc = texCol.xyz;
+	tc = pow(tc, gamma);
+	tc = tc * nColors;
+	tc = floor(tc);
+	tc = tc / nColors;
+	tc = pow(tc,1.0/gamma);
+	return float4(tc,texCol.w);
+}
+sampler RT : register(s0);
+
+float4 Posterize_ps (float2 iTexCoord : TEXCOORD0) : COLOR
+{
+
+	float nColors = 8;
+	float gamma = 0.6;
+
+	float4 texCol = tex2D(RT, iTexCoord);
+	float3 tc = texCol.xyz;
+	tc = pow(tc, gamma);
+	tc = tc * nColors;
+	tc = floor(tc);
+	tc = tc / nColors;
+	tc = pow(tc,1.0/gamma);
+	return float4(tc,texCol.w);
+}

@@ -47,6 +47,40 @@ fragment_program Blur_ps_glsl glsl
 	}
 }
 
+vertex_program Blur0_vs_glsles glsles
+{
+	source Blur0_vs.glsles
+}
+vertex_program Blur1_vs_glsles glsles
+{
+	source Blur1_vs.glsles
+}
+fragment_program Blur_ps_glsles glsles
+{
+	source Blur_ps.glsles
+	default_params
+	{
+		param_named tex0 int 0
+	}
+}
+
+vertex_program Blur0_vs_glsles glsles
+{
+	source Blur0_vs.glsles
+}
+vertex_program Blur1_vs_glsles glsles
+{
+	source Blur1_vs.glsles
+}
+fragment_program Blur_ps_glsles glsles
+{
+	source Blur_ps.glsles
+	default_params
+	{
+		param_named tex0 int 0
+	}
+}
+
 //Effect: Bloom
 material Ogre/Compositor/Blur0
 {

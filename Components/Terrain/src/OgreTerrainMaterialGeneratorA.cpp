@@ -299,6 +299,8 @@ namespace Ogre
 				mShaderGen = OGRE_NEW ShaderHelperHLSL();
 			else if (hmgr.isLanguageSupported("glsl"))
 				mShaderGen = OGRE_NEW ShaderHelperGLSL();
+			else if (hmgr.isLanguageSupported("glsles"))
+				mShaderGen = OGRE_NEW ShaderHelperGLSLES();
 			else
 			{
 				// todo
@@ -1631,6 +1633,63 @@ namespace Ogre
 		return ret;
 
 	}
+	//---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	HighLevelGpuProgramPtr
+	TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::createVertexProgram(
+		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt)
+	{
+		HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
+		String progName = getVertexProgramName(prof, terrain, tt);
 
+		switch(tt)
+		{
+		case HIGH_LOD:
+			progName += "/hlod";
+			break;
+		case LOW_LOD:
+			progName += "/llod";
+			break;
+		case RENDER_COMPOSITE_MAP:
+			progName += "/comp";
+			break;
+		}
+
+		HighLevelGpuProgramPtr ret = mgr.getByName(progName);
+		if (ret.isNull())
+		{
+			ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+				"glsles", GPT_VERTEX_PROGRAM);
+		}
+		else
+		{
+			ret->unload();
+		}
+
+		return ret;
+
+	}
+	//---------------------------------------------------------------------
+	HighLevelGpuProgramPtr
+		TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::createFragmentProgram(
+			const SM2Profile* prof, const Terrain* terrain, TechniqueType tt)
+	{
+		HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
+		String progName = getFragmentProgramName(prof, terrain, tt);
+
+		HighLevelGpuProgramPtr ret = mgr.getByName(progName);
+		if (ret.isNull())
+		{
+			ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+				"glsles", GPT_FRAGMENT_PROGRAM);
+		}
+		else
+		{
+			ret->unload();
+		}
+
+		return ret;
+
+	}
 
 }

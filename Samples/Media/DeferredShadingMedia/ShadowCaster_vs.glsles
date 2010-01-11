@@ -1,0 +1,19 @@
+#version 100
+
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+uniform mat4 cWorldViewProj;
+uniform mat4 cWorldView;
+
+varying vec3 oViewPos;
+
+attribute vec4 vertex;
+
+void main()
+{
+    gl_Position = cWorldViewProj * vertex;
+    oViewPos = (cWorldView * gl_Position).xyz;
+}

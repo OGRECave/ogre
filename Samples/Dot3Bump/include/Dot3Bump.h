@@ -25,7 +25,8 @@ public:
 	StringVector getRequiredPlugins()
 	{
 		StringVector names;
-		names.push_back("Cg Program Manager");
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+            names.push_back("Cg Program Manager");
 		return names;
 	}
 
@@ -38,7 +39,8 @@ public:
         }
 
 		if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1") &&
-			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0"))
+			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") &&
+			!GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
 		{
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support shader model 2, "
 				"so you cannot run this sample. Sorry!", "Dot3BumpSample::testCapabilities");

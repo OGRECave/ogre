@@ -1,0 +1,30 @@
+#version 100
+precision mediump int;
+precision mediump float;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+/* Cel shading vertex program for single-pass rendering
+   In this program, we want to calculate the diffuse and specular
+   ramp components, and the edge factor (for doing simple outlining)
+   For the outlining to look good, we need a pretty well curved model.
+*/
+//uniform vec4 diffuse;
+//uniform vec4 specular;
+varying vec4 diffuse;
+varying vec4 specular;
+varying vec4 edge;
+uniform sampler2D diffuseRamp;
+uniform sampler2D specularRamp;
+uniform sampler2D edgeRamp;
+
+void main()
+{
+	// Step functions from textures
+	vec4 diffuseIn = texture2D(diffuseRamp, diffuse.xy);
+	vec4 specularIn = texture2D(specularRamp, specular.xy);
+	vec4 edge = texture2D(edgeRamp, edge.xy);
+
+	gl_FragColor = edge.x * ((diffuse * diffuseIn.x) + 
+					(specular * specularIn.x));
+}

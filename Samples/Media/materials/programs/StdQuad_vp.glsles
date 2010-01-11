@@ -1,0 +1,18 @@
+#version 100
+
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+varying vec2 uv;
+attribute vec4 vertex;
+
+void main()                    
+{
+	gl_Position = vertex;
+    
+	vec2 inPos = sign(vertex.xy);
+	
+	uv = (vec2(inPos.x, -inPos.y) + 1.0)/2.0;
+}

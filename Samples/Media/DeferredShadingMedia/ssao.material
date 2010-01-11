@@ -1,7 +1,7 @@
 
 // full screen quad with camera-to-pixel ray calculations
 
-vertex_program ssao_vs cg
+vertex_program ssao_vsCg cg
 {
     source ssao.cg
     profiles vs_1_1 arbvp1
@@ -12,7 +12,24 @@ vertex_program ssao_vs cg
     }
 }
 
-fragment_program ssao_ps cg
+vertex_program ssao_vsGLSLES glsles
+{
+    source ssao_vs.glsles
+    profiles glsles
+    entry_point main
+    default_params
+    {
+        param_named_auto wvp worldviewproj_matrix
+    }
+}
+
+vertex_program ssao_vs unified
+{
+	delegate ssao_vsGLSLES
+	delegate ssao_vsCg
+}
+
+fragment_program ssao_psCg cg
 {
     source ssao.cg
     entry_point ssao_ps
@@ -23,7 +40,24 @@ fragment_program ssao_ps cg
     }
 }
 
-fragment_program ssaoBlurX_ps cg
+fragment_program ssao_psGLSLES glsles
+{
+    source ssao_ps.glsles
+    entry_point main
+    // will run on anything with pixel shader 2.b and up
+    profiles glsles
+    default_params
+    {
+    }
+}
+
+fragment_program ssao_ps unified
+{
+	delegate ssao_psGLSLES
+	delegate ssao_psCg
+}
+
+fragment_program ssaoBlurX_psCg cg
 {
     source ssao.cg
     entry_point ssaoBlurX_ps
@@ -34,7 +68,24 @@ fragment_program ssaoBlurX_ps cg
     }
 }
 
-fragment_program ssaoBlurY_ps cg
+fragment_program ssaoBlurX_psGLSLES glsles
+{
+    source ssaoBlurX_ps.glsles
+    entry_point main
+    profiles glsles
+    default_params
+    {
+        param_named_auto invTexSize inverse_texture_size 0
+    }
+}
+
+fragment_program ssaoBlurX_ps unified
+{
+	delegate ssaoBlurX_psGLSLES
+	delegate ssaoBlurX_psCg
+}
+
+fragment_program ssaoBlurY_psCg cg
 {
     source ssao.cg
     entry_point ssaoBlurY_ps
@@ -43,6 +94,23 @@ fragment_program ssaoBlurY_ps cg
     {
         param_named_auto invTexSize inverse_texture_size 0
     }
+}
+
+fragment_program ssaoBlurY_psGLSLES glsles
+{
+    source ssaoBlurY_ps.glsles
+    entry_point main
+    profiles glsles
+    default_params
+    {
+        param_named_auto invTexSize inverse_texture_size 0
+    }
+}
+
+fragment_program ssaoBlurY_ps unified
+{
+	delegate ssaoBlurY_psGLSLES
+	delegate ssaoBlurY_psCg
 }
 
 material ssao

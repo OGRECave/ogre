@@ -47,9 +47,13 @@ public:
 
 	void updateTargetObjInfo();
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+	/** @see Sample::touchPressed. */
+	bool touchPressed(const OIS::MultiTouchEvent& evt);
+#else
 	/** @see Sample::mousePressed. */
 	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
-
+#endif
 protected:
 
 	/** Set the current lighting model. */
