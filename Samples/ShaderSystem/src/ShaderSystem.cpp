@@ -1125,8 +1125,16 @@ void Sample_ShaderSystem::updateTargetObjInfo()
 }
 
 //-----------------------------------------------------------------------
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+bool Sample_ShaderSystem::touchPressed(const OIS::MultiTouchEvent& evt)
+{
+//	if (evt.state.touchIsType(OIS::MT_Pressed) && !mTrayMgr->injectMouseDown(evt)) pickTargetObject(evt);
+	return SdkSample::touchPressed(evt);
+}
+#else
 bool Sample_ShaderSystem::mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-{	
+{
 	if (id == OIS::MB_Right && !mTrayMgr->injectMouseDown(evt, id)) pickTargetObject(evt);
 	return SdkSample::mousePressed(evt, id);
 }
+#endif
