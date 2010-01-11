@@ -92,6 +92,13 @@ void FFP_Construct(in float r,
 }
 
 //-----------------------------------------------------------------------------
+void FFP_Construct(in float r, 				   
+				   out float4 vOut)
+{
+	vOut = float4(r,r,r,r);
+}
+
+//-----------------------------------------------------------------------------
 void FFP_Modulate(in float vIn0, in float vIn1, out float vOut)
 {
 	vOut = vIn0 * vIn1;

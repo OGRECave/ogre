@@ -468,7 +468,11 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 	bool needDifferentAlphaBlend = false;
 	if (alphaBlend.operation != colourBlend.operation ||
 		alphaBlend.source1 != colourBlend.source1 ||
-		alphaBlend.source2 != colourBlend.source2)
+		alphaBlend.source2 != colourBlend.source2 ||
+		colourBlend.source1 == LBS_MANUAL ||
+		colourBlend.source2 == LBS_MANUAL ||
+		alphaBlend.source1 == LBS_MANUAL ||
+		alphaBlend.source2 == LBS_MANUAL)
 		needDifferentAlphaBlend = true;
 
 	// Build colours blend
@@ -551,7 +555,7 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
 	case LBS_MANUAL:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_CONSTRUCT, groupOrder, internalCounter++);
 
-		if (isAlphaArgument == false)
+		if (isAlphaArgument)
 		{
 			curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(alphaValue), Operand::OPS_IN);						
 		}
