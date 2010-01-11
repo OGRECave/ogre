@@ -821,11 +821,13 @@ namespace OgreBites
 			createDummyScene();
 			loadResources();
 
+#if USE_RTSHADER_SYSTEM
             if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != Ogre::String::npos)
             {
                 Ogre::RTShader::ShaderGenerator::getSingletonPtr()->addSceneManager(mRoot->getSceneManager("DummyScene"));
                 mWindow->getViewport(0)->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
             }
+#endif
 
 			Sample* startupSample = loadSamples();
             
