@@ -236,7 +236,7 @@ if (APPLE)
 endif (APPLE)
 
 if (OGRE_INSTALL_SAMPLES)
-	ogre_install_target(SampleBrowser "")
+	ogre_install_target(SampleBrowser "" FALSE)
 	if (OGRE_INSTALL_PDB)
 		# install debug pdb files
 		install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/SampleBrowser.pdb
