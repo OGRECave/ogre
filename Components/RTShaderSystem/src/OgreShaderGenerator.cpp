@@ -166,7 +166,7 @@ bool ShaderGenerator::_initialize()
 	mScriptTranslatorManager = OGRE_NEW SGScriptTranslatorManager(this);
 	ScriptCompilerManager::getSingleton().addTranslatorManager(mScriptTranslatorManager);
 
-	addCustomScriptTranslator("rtshader_system", &mCoreScriptTranslaotr);
+	addCustomScriptTranslator("rtshader_system", &mCoreScriptTranslator);
 
 	// Create the default scheme.
 	createScheme(DEFAULT_SCHEME_NAME);
@@ -983,6 +983,20 @@ void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
 	{
 		mShaderLanguage = shaderLanguage;
 		flushShaderCache();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void ShaderGenerator::setShaderCachePath( const String& cachePath )
+{
+	mShaderCachePath = cachePath;
+	
+	// Case this is a valid file path -> add as resource location in order to make sure that
+	// generated shaders could be loaded by the file system archive.
+	if (mShaderCachePath.empty() == false &&
+		ResourceGroupManager::getSingleton().resourceLocationExists(mShaderCachePath) == false)
+	{			
+		ResourceGroupManager::getSingleton().addResourceLocation(cachePath, "FileSystem");		
 	}
 }
 
