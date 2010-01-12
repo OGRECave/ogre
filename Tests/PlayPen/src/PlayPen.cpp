@@ -418,9 +418,6 @@ public:
 #endif
 
 
-        MaterialPtr mat = MaterialManager::getSingleton().getByName("Core/StatsBlockBorder/Up");
-        mat->setDepthCheckEnabled(true);
-        mat->setDepthWriteEnabled(true);
 
         for (int i = 0; i < NUM_TEST_NODES; ++i)
         {
@@ -3561,8 +3558,11 @@ protected:
 		valuePair["top"] = StringConverter::toString(0);
 		valuePair["left"] = StringConverter::toString(0);
 
-		RenderWindow* win2 = mRoot->createRenderWindow("window2", 800,600, true, &valuePair);
+		RenderWindow* win2 = mRoot->createRenderWindow("window2", 800,600, false, &valuePair);
 		win2->addViewport(mCamera);
+
+		mCamera->setPosition(0,0,-300);
+		mCamera->lookAt(Vector3::ZERO);
 
 
 
@@ -7428,28 +7428,18 @@ protected:
 	{
 		mSceneMgr->setAmbientLight( ColourValue( 1, 1, 1 ) );
 
-		ManualObject *manual = mSceneMgr->createManualObject("manual");
-		manual->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_STRIP);
+		Entity* ent = mSceneMgr->createEntity("1", "knot.mesh");
+		ent->setMaterialName("testdxtvolume");
 
-		manual->position(-100.0, -100.0, 0.0);
-		manual->position(100.0, -100.0, 0.0);
-		manual->position(100.0, 100.0, 0.0);
-		manual->position(-100.0, 100.0, 0.0);
 
-		manual->index(0);
-		manual->index(1);
-		manual->index(2);
-		manual->index(3);
-		manual->index(0);
-
-		manual->end();
 		SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		node->attachObject(manual);
+		node->attachObject(ent);
 
-		// of course the following two lines are pointless,
-		// only for demonstration purposes
-		node->detachObject(manual);
-		mSceneMgr->destroyManualObject(manual); //CRASH HERE 
+		mWindow->getViewport(0)->setBackgroundColour(ColourValue::Blue);
+
+		mCamera->setPosition(0,0,-300);
+		mCamera->setDirection(Vector3::NEGATIVE_UNIT_Z);
+
 	}
 
 	void testManualObject2D()
@@ -8390,7 +8380,7 @@ protected:
 		//testGeneratedLOD();
 		//testLotsAndLotsOfEntities();
 		//testSimpleMesh();
-		//test2Windows();
+		test2Windows();
 		//testStaticGeometry();
 		//testStaticGeometryWithLOD(true);
 		//testBillboardTextureCoords();
@@ -8476,7 +8466,7 @@ protected:
         //testLod();
 		//testSharedGpuParameters();
 		//testNewTerrain(false);
-		testNewTerrain(true);
+		//testNewTerrain(true);
 		//testStringTokenising();
 		//testTwoNewTerrains();
 		//testImageCombine();

@@ -20,6 +20,8 @@
 #  OGRE_FOUND - system has OGRE
 #  OGRE_INCLUDE_DIRS - the OGRE include directories 
 #  OGRE_LIBRARIES - link these to use the OGRE core
+#  OGRE_BINARY_REL - location of the main Ogre binary (win32 non-static only, release)
+#  OGRE_BINARY_DBG - location of the main Ogre binaries (win32 non-static only, debug)
 #
 # Additionally this script searches for the following optional
 # parts of the Ogre package:
@@ -34,6 +36,8 @@
 #  OGRE_${COMPONENT}_FOUND - ${COMPONENT} is available
 #  OGRE_${COMPONENT}_INCLUDE_DIRS - additional include directories for ${COMPONENT}
 #  OGRE_${COMPONENT}_LIBRARIES - link these to use ${COMPONENT} 
+#  OGRE_${COMPONENT}_BINARY_REL - location of the component binary (win32 non-static only, release)
+#  OGRE_${COMPONENT}_BINARY_DBG - location of the component binary (win32 non-static only, debug)
 #
 # Finally, the following variables are defined:
 #
@@ -99,10 +103,12 @@ if (OGRE_PREFIX_SOURCE AND OGRE_PREFIX_BUILD)
   foreach(dir ${OGRE_PREFIX_SOURCE})
     set(OGRE_INC_SEARCH_PATH ${dir}/OgreMain/include ${dir}/Dependencies/include ${dir}/iPhoneDependencies/include ${OGRE_INC_SEARCH_PATH})
     set(OGRE_LIB_SEARCH_PATH ${dir}/lib ${dir}/Dependencies/lib ${dir}/iPhoneDependencies/lib ${OGRE_LIB_SEARCH_PATH})
+    set(OGRE_BIN_SEARCH_PATH ${dir}/Samples/Common/bin ${OGRE_BIN_SEARCH_PATH})
   endforeach(dir)
   foreach(dir ${OGRE_PREFIX_BUILD})
     set(OGRE_INC_SEARCH_PATH ${dir}/include ${OGRE_INC_SEARCH_PATH})
     set(OGRE_LIB_SEARCH_PATH ${dir}/lib ${OGRE_LIB_SEARCH_PATH})
+    set(OGRE_BIN_SEARCH_PATH ${dir}/bin ${OGRE_BIN_SEARCH_PATH})
   endforeach(dir)
 else()
   set(OGRE_PREFIX_SOURCE "NOTFOUND")
@@ -288,6 +294,19 @@ get_filename_component(OGRE_LIBRARY_DIR_REL "${OGRE_LIBRARY_REL}" PATH)
 get_filename_component(OGRE_LIBRARY_DIR_DBG "${OGRE_LIBRARY_DBG}" PATH)
 set(OGRE_LIBRARY_DIRS ${OGRE_LIBRARY_DIR_REL} ${OGRE_LIBRARY_DIR_DBG})
 
+# find binaries
+if (NOT OGRE_STATIC)
+	if (WIN32)
+		message (STATUS "hh: ${OGRE_LIBRARY_DIRS}")
+		find_file(OGRE_BINARY_REL NAMES "OgreMain.dll" HINTS ${OGRE_BIN_SEARCH_PATH}
+          PATH_SUFFIXES "" release relwithdebinfo minsizerel)
+		find_file(OGRE_BINARY_DBG NAMES "OgreMain_d.dll" HINTS ${OGRE_BIN_SEARCH_PATH}
+          PATH_SUFFIXES "" debug )
+	endif()
+	mark_as_advanced(OGRE_BINARY_REL OGRE_BINARY_DBG)
+endif()
+
+
 
 # look for Paging component
 findpkg_begin(OGRE_Paging)
@@ -395,6 +414,16 @@ macro(ogre_find_plugin PLUGIN HEADER)
         set(OGRE_PLUGIN_DIR_DBG ${OGRE_PLUGIN_DIR_TMP} CACHE STRING "Ogre plugin dir (debug)")
       endif ()
     endif ()
+	
+	# find binaries
+	if (NOT OGRE_STATIC)
+		if (WIN32)
+			find_file(OGRE_${PLUGIN}_REL NAMES "${PLUGIN}.dll" HINTS ${OGRE_PLUGIN_DIR_REL})
+			find_file(OGRE_${PLUGIN}_DBG NAMES "${PLUGIN}_d.dll" HINTS ${OGRE_PLUGIN_DIR_DBG})
+		endif()
+		mark_as_advanced(OGRE_${PLUGIN}_REL OGRE_${PLUGIN}_DBG)
+	endif()
+	
   endif ()
 
   if (TMP_CMAKE_LIB_PREFIX)
