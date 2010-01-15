@@ -8,7 +8,7 @@ Copyright (c) 2000-2006 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
-LGPL like the rest of the engine.
+conditions of the standard open source license.
 -----------------------------------------------------------------------------
 */
 
