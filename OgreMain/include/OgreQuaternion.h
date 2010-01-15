@@ -25,8 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-// NOTE THAT THIS FILE IS BASED ON MATERIAL FROM:
-
+// This file is based on material originally from:
 // Geometric Tools, LLC
 // Copyright (c) 1998-2010
 // Distributed under the Boost Software License, Version 1.0.
