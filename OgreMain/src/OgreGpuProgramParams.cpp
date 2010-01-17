@@ -1196,12 +1196,28 @@ namespace Ogre
 					if (i->second.physicalIndex > physicalIndex)
 						i->second.physicalIndex += insertCount;
 				}
+				mFloatLogicalToPhysical->bufferSize += insertCount;
 				for (AutoConstantList::iterator i = mAutoConstants.begin();
 					i != mAutoConstants.end(); ++i)
 				{
-					if (i->physicalIndex > physicalIndex)
+					if (i->physicalIndex > physicalIndex &&
+						getAutoConstantDefinition(i->paramType)->elementType == ET_REAL)
+					{
 						i->physicalIndex += insertCount;
+					}
 				}
+				if (!mNamedConstants.isNull())
+				{
+					for (GpuConstantDefinitionMap::iterator i = mNamedConstants->map.begin();
+						i != mNamedConstants->map.end(); ++i)
+					{
+						if (i->second.isFloat() && i->second.physicalIndex > physicalIndex)
+							i->second.physicalIndex += insertCount;
+					}
+					mNamedConstants->floatBufferSize += insertCount;
+				}
+
+				logi->second.currentSize += insertCount;
 			}
 		}
 
@@ -1286,12 +1302,28 @@ namespace Ogre
 					if (i->second.physicalIndex > physicalIndex)
 						i->second.physicalIndex += insertCount;
 				}
+				mIntLogicalToPhysical->bufferSize += insertCount;
 				for (AutoConstantList::iterator i = mAutoConstants.begin();
 					i != mAutoConstants.end(); ++i)
 				{
-					if (i->physicalIndex > physicalIndex)
+					if (i->physicalIndex > physicalIndex &&
+						getAutoConstantDefinition(i->paramType)->elementType == ET_INT)
+					{
 						i->physicalIndex += insertCount;
+					}
 				}
+				if (!mNamedConstants.isNull())
+				{
+					for (GpuConstantDefinitionMap::iterator i = mNamedConstants->map.begin();
+						i != mNamedConstants->map.end(); ++i)
+					{
+						if (!i->second.isFloat() && i->second.physicalIndex > physicalIndex)
+							i->second.physicalIndex += insertCount;
+					}
+					mNamedConstants->intBufferSize += insertCount;
+				}
+
+				logi->second.currentSize += insertCount;
 			}
 		}
 

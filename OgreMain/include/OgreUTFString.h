@@ -325,24 +325,12 @@ namespace Ogre {
 			}
 
 			//! addition operator
-			_fwd_iterator operator+( size_type n ) {
-				_fwd_iterator tmp( *this );
-				tmp._seekFwd( n );
-				return tmp;
-			}
-			//! addition operator
 			_fwd_iterator operator+( difference_type n ) {
 				_fwd_iterator tmp( *this );
 				if ( n < 0 )
 					tmp._seekRev( -n );
 				else
 					tmp._seekFwd( n );
-				return tmp;
-			}
-			//! subtraction operator
-			_fwd_iterator operator-( size_type n ) {
-				_fwd_iterator tmp( *this );
-				tmp._seekRev( n );
 				return tmp;
 			}
 			//! subtraction operator
@@ -356,21 +344,11 @@ namespace Ogre {
 			}
 
 			//! addition assignment operator
-			_fwd_iterator& operator+=( size_type n ) {
-				_seekFwd( n );
-				return *this;
-			}
-			//! addition assignment operator
 			_fwd_iterator& operator+=( difference_type n ) {
 				if ( n < 0 )
 					_seekRev( -n );
 				else
 					_seekFwd( n );
-				return *this;
-			}
-			//! subtraction assignment operator
-			_fwd_iterator& operator-=( size_type n ) {
-				_seekRev( n );
 				return *this;
 			}
 			//! subtraction assignment operator
@@ -387,12 +365,6 @@ namespace Ogre {
 				return *mIter;
 			}
 
-			//! dereference at offset operator
-			value_type& operator[]( size_type n ) const {
-				_fwd_iterator tmp( *this );
-				tmp += n;
-				return *tmp;
-			}
 			//! dereference at offset operator
 			value_type& operator[]( difference_type n ) const {
 				_fwd_iterator tmp( *this );
@@ -459,24 +431,12 @@ namespace Ogre {
 			}
 
 			//! addition operator
-			_const_fwd_iterator operator+( size_type n ) {
-				_const_fwd_iterator tmp( *this );
-				tmp._seekFwd( n );
-				return tmp;
-			}
-			//! addition operator
 			_const_fwd_iterator operator+( difference_type n ) {
 				_const_fwd_iterator tmp( *this );
 				if ( n < 0 )
 					tmp._seekRev( -n );
 				else
 					tmp._seekFwd( n );
-				return tmp;
-			}
-			//! subtraction operator
-			_const_fwd_iterator operator-( size_type n ) {
-				_const_fwd_iterator tmp( *this );
-				tmp._seekRev( n );
 				return tmp;
 			}
 			//! subtraction operator
@@ -490,21 +450,11 @@ namespace Ogre {
 			}
 
 			//! addition assignment operator
-			_const_fwd_iterator& operator+=( size_type n ) {
-				_seekFwd( n );
-				return *this;
-			}
-			//! addition assignment operator
 			_const_fwd_iterator& operator+=( difference_type n ) {
 				if ( n < 0 )
 					_seekRev( -n );
 				else
 					_seekFwd( n );
-				return *this;
-			}
-			//! subtraction assignment operator
-			_const_fwd_iterator& operator-=( size_type n ) {
-				_seekRev( n );
 				return *this;
 			}
 			//! subtraction assignment operator
@@ -521,12 +471,6 @@ namespace Ogre {
 				return *mIter;
 			}
 
-			//! dereference at offset operator
-			const value_type& operator[]( size_type n ) const {
-				_const_fwd_iterator tmp( *this );
-				tmp += n;
-				return *tmp;
-			}
 			//! dereference at offset operator
 			const value_type& operator[]( difference_type n ) const {
 				_const_fwd_iterator tmp( *this );
@@ -604,24 +548,12 @@ namespace Ogre {
 			}
 
 			//! addition operator
-			_rev_iterator operator+( size_type n ) {
-				_rev_iterator tmp( *this );
-				tmp._seekRev( n );
-				return tmp;
-			}
-			//! addition operator
 			_rev_iterator operator+( difference_type n ) {
 				_rev_iterator tmp( *this );
 				if ( n < 0 )
 					tmp._seekFwd( -n );
 				else
 					tmp._seekRev( n );
-				return tmp;
-			}
-			//! subtraction operator
-			_rev_iterator operator-( size_type n ) {
-				_rev_iterator tmp( *this );
-				tmp._seekFwd( n );
 				return tmp;
 			}
 			//! subtraction operator
@@ -635,21 +567,11 @@ namespace Ogre {
 			}
 
 			//! addition assignment operator
-			_rev_iterator& operator+=( size_type n ) {
-				_seekRev( n );
-				return *this;
-			}
-			//! addition assignment operator
 			_rev_iterator& operator+=( difference_type n ) {
 				if ( n < 0 )
 					_seekFwd( -n );
 				else
 					_seekRev( n );
-				return *this;
-			}
-			//! subtraction assignment operator
-			_rev_iterator& operator-=( size_type n ) {
-				_seekFwd( n );
 				return *this;
 			}
 			//! subtraction assignment operator
@@ -666,12 +588,6 @@ namespace Ogre {
 				return mIter[-1];
 			}
 
-			//! dereference at offset operator
-			value_type& operator[]( size_type n ) const {
-				_rev_iterator tmp( *this );
-				tmp -= n;
-				return *tmp;
-			}
 			//! dereference at offset operator
 			value_type& operator[]( difference_type n ) const {
 				_rev_iterator tmp( *this );
@@ -715,24 +631,12 @@ namespace Ogre {
 			}
 
 			//! addition operator
-			_const_rev_iterator operator+( size_type n ) {
-				_const_rev_iterator tmp( *this );
-				tmp._seekRev( n );
-				return tmp;
-			}
-			//! addition operator
 			_const_rev_iterator operator+( difference_type n ) {
 				_const_rev_iterator tmp( *this );
 				if ( n < 0 )
 					tmp._seekFwd( -n );
 				else
 					tmp._seekRev( n );
-				return tmp;
-			}
-			//! subtraction operator
-			_const_rev_iterator operator-( size_type n ) {
-				_const_rev_iterator tmp( *this );
-				tmp._seekFwd( n );
 				return tmp;
 			}
 			//! subtraction operator
@@ -746,21 +650,11 @@ namespace Ogre {
 			}
 
 			//! addition assignment operator
-			_const_rev_iterator& operator+=( size_type n ) {
-				_seekRev( n );
-				return *this;
-			}
-			//! addition assignment operator
 			_const_rev_iterator& operator+=( difference_type n ) {
 				if ( n < 0 )
 					_seekFwd( -n );
 				else
 					_seekRev( n );
-				return *this;
-			}
-			//! subtraction assignment operator
-			_const_rev_iterator& operator-=( size_type n ) {
-				_seekFwd( n );
 				return *this;
 			}
 			//! subtraction assignment operator
@@ -777,12 +671,6 @@ namespace Ogre {
 				return mIter[-1];
 			}
 
-			//! dereference at offset operator
-			const value_type& operator[]( size_type n ) const {
-				_const_rev_iterator tmp( *this );
-				tmp -= n;
-				return *tmp;
-			}
 			//! dereference at offset operator
 			const value_type& operator[]( difference_type n ) const {
 				_const_rev_iterator tmp( *this );
@@ -2230,6 +2118,7 @@ namespace Ogre {
 				}
 				m_buffer.mVoidBuffer = 0;
 				m_bufferSize = 0;
+				m_bufferType = bt_none;
 			}
 		}
 

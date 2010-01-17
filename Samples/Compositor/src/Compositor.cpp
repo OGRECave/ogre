@@ -130,10 +130,22 @@ void Sample_Compositor::changePage(size_t pageNum)
 		if (i < maxCompositorsInPage)
 		{
 			String compositorName = mCompositorNames[pageNum * COMPOSITORS_PER_PAGE + i];
+			CompositorInstance *tmpCompo = CompositorManager::getSingleton().getCompositorChain(mViewport)
+				->getCompositor(compositorName);
+
 			cb->setCaption(compositorName);
-			cb->setChecked(CompositorManager::getSingleton().getCompositorChain(mViewport)
-				->getCompositor(compositorName)->getEnabled(), false);
-			cb->show();
+
+			if( tmpCompo )
+			{
+				cb->setChecked( tmpCompo->getEnabled(), false );
+				cb->show();
+			}
+			else
+			{
+				cb->setChecked( false, false );
+				cb->hide();
+			}
+
 		}
 		else
 		{
@@ -225,26 +237,29 @@ void Sample_Compositor::checkBoxToggled(OgreBites::CheckBox * box)
 		{
 			//Add the items to the selectable texture menu
 			CompositorInstance* instance = CompositorManager::getSingleton().getCompositorChain(mViewport)->getCompositor(compositorName);
-			CompositionTechnique::TextureDefinitionIterator it = instance->getTechnique()->getTextureDefinitionIterator();
-			while (it.hasMoreElements())
+			if (instance)
 			{
-				CompositionTechnique::TextureDefinition* texDef = it.getNext();
-				size_t numTextures = texDef->formatList.size();
-				if (numTextures > 1)
+				CompositionTechnique::TextureDefinitionIterator it = instance->getTechnique()->getTextureDefinitionIterator();
+				while (it.hasMoreElements())
 				{
-					for (size_t i=0; i<numTextures; i++)
+					CompositionTechnique::TextureDefinition* texDef = it.getNext();
+					size_t numTextures = texDef->formatList.size();
+					if (numTextures > 1)
 					{
-						//Dirty string composition. NOT ROBUST!
-						mDebugTextureSelectMenu->addItem(compositorName + ";" + texDef->name + ";" + 
-							Ogre::StringConverter::toString((Ogre::uint32)i));
+						for (size_t i=0; i<numTextures; i++)
+						{
+							//Dirty string composition. NOT ROBUST!
+							mDebugTextureSelectMenu->addItem(compositorName + ";" + texDef->name + ";" + 
+								Ogre::StringConverter::toString((Ogre::uint32)i));
+						}
+					}
+					else
+					{
+						mDebugTextureSelectMenu->addItem(compositorName + ";" + texDef->name);
 					}
 				}
-				else
-				{
-					mDebugTextureSelectMenu->addItem(compositorName + ";" + texDef->name);
-				}
+				mDebugTextureSelectMenu->selectItem(activeTex, false);
 			}
-			mDebugTextureSelectMenu->selectItem(activeTex, false);
 		}
 	}
 }

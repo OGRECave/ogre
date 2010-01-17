@@ -31,12 +31,16 @@ clear_if_changed(FREETYPE_PREFIX_PATH
   FREETYPE_INCLUDE_DIR
 )
 
-set(FREETYPE_LIBRARY_NAMES freetype freetype219 freetype235 freetype238 freetype239 freetype2311)
+set(FREETYPE_LIBRARY_NAMES freetype2311 freetype239 freetype238 freetype235 freetype219 freetype)
 get_debug_names(FREETYPE_LIBRARY_NAMES)
 
 use_pkgconfig(FREETYPE_PKGC freetype2)
 
+# prefer static library over framework 
+set(CMAKE_FIND_FRAMEWORK "LAST")
+
 findpkg_framework(FREETYPE)
+message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 
 find_path(FREETYPE_INCLUDE_DIR NAMES freetype/freetype.h HINTS ${FREETYPE_INC_SEARCH_PATH} ${FREETYPE_PKGC_INCLUDE_DIRS} PATH_SUFFIXES freetype2)
 find_library(FREETYPE_LIBRARY_REL NAMES ${FREETYPE_LIBRARY_NAMES} HINTS ${FREETYPE_LIB_SEARCH_PATH} ${FREETYPE_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" release relwithdebinfo minsizerel)
@@ -45,3 +49,5 @@ make_library_set(FREETYPE_LIBRARY)
 
 findpkg_finish(FREETYPE)
 
+# Reset framework finding
+set(CMAKE_FIND_FRAMEWORK "FIRST")

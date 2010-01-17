@@ -25,11 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-// Original free version by:
-// Magic Software, Inc.
-// http://www.geometrictools.com/
-// Copyright (c) 2000, All Rights Reserved
-
 #ifndef __MovablePlane_H__
 #define __MovablePlane_H__
 

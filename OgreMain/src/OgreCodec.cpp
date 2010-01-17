@@ -57,7 +57,7 @@ namespace Ogre {
         CodecList::const_iterator i = ms_mapCodecs.find(lwrcase);
         if (i == ms_mapCodecs.end())
         {
-            std::string formats_str;
+            String formats_str;
             if(ms_mapCodecs.empty())
                 formats_str = "There are no formats supported (no codecs registered).";
             else

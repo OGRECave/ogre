@@ -13,12 +13,10 @@
 ###############################################################
 
 # Set docs target directory
-if (WIN32)
+if (WIN32 OR APPLE)
   set(OGRE_DOCS_PATH "Docs")
 elseif (UNIX)
   set(OGRE_DOCS_PATH "share/OGRE/docs")
-elseif (APPLE)
-  # TODO
 endif ()
   
 if (OGRE_INSTALL_DOCS)

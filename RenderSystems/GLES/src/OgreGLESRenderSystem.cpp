@@ -79,7 +79,8 @@ namespace Ogre {
           mStencilMask(0xFFFFFFFF),
           mGpuProgramManager(0),
           mHardwareBufferManager(0),
-          mRTTManager(0)
+          mRTTManager(0),
+          mActiveTextureUnit(0)
     {
             // Get function pointers on platforms that doesn't have prototypes
 #ifndef GL_GLEXT_PROTOTYPES
@@ -818,9 +819,11 @@ namespace Ogre {
 		// Don't offer this as an option since D3D links it to sprite enabled
 		for (ushort i = 0; i < mFixedFunctionTextureUnits; ++i)
 		{
+			activateGLTextureUnit(i);
 			glTexEnvi(GL_POINT_SPRITE_OES, GL_COORD_REPLACE_OES, 
                       enabled ? GL_TRUE : GL_FALSE);
 		}
+		activateGLTextureUnit(0);
     }
 
     void GLESRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
@@ -830,8 +833,8 @@ namespace Ogre {
         // TODO We need control texture types?????
         GLESTexturePtr tex = texPtr;
 
-        glActiveTexture(GL_TEXTURE0 + stage);
-        GL_CHECK_ERROR;
+        if (!activateGLTextureUnit(stage))
+			return;
 
         if (enabled)
         {
@@ -873,8 +876,7 @@ namespace Ogre {
             GL_CHECK_ERROR;
         }
 
-        glActiveTexture(GL_TEXTURE0);
-        GL_CHECK_ERROR;
+        activateGLTextureUnit(0);
     }
 
     void GLESRenderSystem::_setTextureCoordSet(size_t stage, size_t index)
@@ -898,9 +900,8 @@ namespace Ogre {
         // Default to no extra auto texture matrix
         mUseAutoTextureMatrix = false;
 
-        glActiveTexture(GL_TEXTURE0 + stage);
-        GL_CHECK_ERROR;
-
+        if (!activateGLTextureUnit(stage))
+            return;
         switch(m)
         {
             case TEXCALC_NONE:
@@ -954,8 +955,7 @@ namespace Ogre {
                 break;
         }
 
-        glActiveTexture(GL_TEXTURE0);
-        GL_CHECK_ERROR;
+		activateGLTextureUnit(0);
     }
 
     void GLESRenderSystem::_setTextureBlendMode(size_t stage, const LayerBlendModeEx& bm)
@@ -1095,8 +1095,8 @@ namespace Ogre {
                 cmd = 0;
         }
 
-        glActiveTexture(GL_TEXTURE0 + stage);
-        GL_CHECK_ERROR;
+		if (!activateGLTextureUnit(stage))
+			return;
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
         GL_CHECK_ERROR;
 
@@ -1207,9 +1207,7 @@ namespace Ogre {
         if (bm.source2 == LBS_MANUAL)
             glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, cv2);
 
-        GL_CHECK_ERROR;
-        glActiveTexture(GL_TEXTURE0);
-        GL_CHECK_ERROR;
+		activateGLTextureUnit(0);
     }
 
     GLint GLESRenderSystem::getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const
@@ -1231,16 +1229,15 @@ namespace Ogre {
 
     void GLESRenderSystem::_setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw)
     {
-        glActiveTexture(GL_TEXTURE0 + stage);
-        GL_CHECK_ERROR;
+		if (!activateGLTextureUnit(stage))
+			return;
         glTexParameteri(GL_TEXTURE_2D,
                         GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u));
         GL_CHECK_ERROR;
         glTexParameteri(GL_TEXTURE_2D,
                         GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v));
         GL_CHECK_ERROR;
-        glActiveTexture(GL_TEXTURE0);
-        GL_CHECK_ERROR;
+		activateGLTextureUnit(0);
     }
 
     void GLESRenderSystem::_setTextureBorderColour(size_t stage, const ColourValue& colour)
@@ -1253,11 +1250,11 @@ namespace Ogre {
         if (mCurrentCapabilities->hasCapability(RSC_MIPMAP_LOD_BIAS))
         {
 #if GL_EXT_texture_lod_bias	// This extension only seems to be supported on iPhone OS, block it out to fix Linux build
-            glActiveTexture(GL_TEXTURE0 + unit);
-            glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, bias);
-            GL_CHECK_ERROR;
-            glActiveTexture(GL_TEXTURE0);
-            GL_CHECK_ERROR;
+            if (activateGLTextureUnit(unit))
+            {
+                glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, bias);
+                    activateGLTextureUnit(0);
+            }
 #endif
         }
     }
@@ -1270,11 +1267,12 @@ namespace Ogre {
             return;
         }
 
+		if (!activateGLTextureUnit(stage))
+			return;
+
         GLfloat mat[16];
         makeGLMatrix(mat, xform);
 
-        glActiveTexture(GL_TEXTURE0 + stage);
-        GL_CHECK_ERROR;
         glMatrixMode(GL_TEXTURE);
         GL_CHECK_ERROR;
 
@@ -1290,8 +1288,7 @@ namespace Ogre {
 
         glMatrixMode(GL_MODELVIEW);
         GL_CHECK_ERROR;
-        glActiveTexture(GL_TEXTURE0);
-        GL_CHECK_ERROR;
+		activateGLTextureUnit(0);
     }
 
     GLint GLESRenderSystem::getBlendMode(SceneBlendFactor ogreBlend) const
@@ -1911,8 +1908,8 @@ namespace Ogre {
 
     void GLESRenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions fo)
     {
-        glActiveTexture(GL_TEXTURE0 + unit);
-        GL_CHECK_ERROR;
+		if (!activateGLTextureUnit(unit))
+			return;
 
         switch (ftype)
         {
@@ -1970,8 +1967,7 @@ namespace Ogre {
                 break;
         }
 
-        glActiveTexture(GL_TEXTURE0);
-        GL_CHECK_ERROR;
+		activateGLTextureUnit(0);
     }
 
     GLfloat GLESRenderSystem::_getCurrentAnisotropy(size_t unit)
@@ -1986,8 +1982,9 @@ namespace Ogre {
     {
 		if (!mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
 			return;
-        
-		glActiveTexture(GL_TEXTURE0 + unit);
+
+		if (!activateGLTextureUnit(unit))
+			return;
 
 		GLfloat largest_supported_anisotropy = 0;
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
@@ -1997,7 +1994,7 @@ namespace Ogre {
 		if (_getCurrentAnisotropy(unit) != maxAnisotropy)
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
 
-		glActiveTexture(GL_TEXTURE0);
+		activateGLTextureUnit(0);
     }
 
     void GLESRenderSystem::setVertexDeclaration(VertexDeclaration* decl)
@@ -2780,5 +2777,32 @@ namespace Ogre {
 	unsigned int GLESRenderSystem::getDisplayMonitorCount() const
 	{
 		return 1;
+	}
+    
+    bool GLESRenderSystem::activateGLTextureUnit(size_t unit)
+	{
+		if (mActiveTextureUnit != unit)
+		{
+			if (unit < getCapabilities()->getNumTextureUnits())
+			{
+				glActiveTexture(GL_TEXTURE0 + unit);
+                GL_CHECK_ERROR;
+				mActiveTextureUnit = unit;
+				return true;
+			}
+			else if (!unit)
+			{
+				// always ok to use the first unit
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return true;
+		}
 	}
 }

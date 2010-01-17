@@ -141,7 +141,7 @@ LRESULT CALLBACK WindowEventUtilities::_WndProc(HWND hWnd, UINT uMsg, WPARAM wPa
 {
 	if (uMsg == WM_CREATE)
 	{	// Store pointer to Win32Window in user data area
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)(((LPCREATESTRUCT)lParam)->lpCreateParams));
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)(((LPCREATESTRUCT)lParam)->lpCreateParams));
 		return 0;
 	}
 

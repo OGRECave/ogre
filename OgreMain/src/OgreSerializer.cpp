@@ -386,7 +386,7 @@ namespace Ogre {
     {
         for(unsigned int index = 0; index < count; index++)
         {
-            flipEndian((void *)((long)pData + (index * size)), size);
+            flipEndian((void *)((size_t)pData + (index * size)), size);
         }
     }
     
@@ -395,9 +395,9 @@ namespace Ogre {
         char swapByte;
         for(unsigned int byteIndex = 0; byteIndex < size/2; byteIndex++)
         {
-            swapByte = *(char *)((long)pData + byteIndex);
-            *(char *)((long)pData + byteIndex) = *(char *)((long)pData + size - byteIndex - 1);
-            *(char *)((long)pData + size - byteIndex - 1) = swapByte;
+            swapByte = *(char *)((size_t)pData + byteIndex);
+            *(char *)((size_t)pData + byteIndex) = *(char *)((size_t)pData + size - byteIndex - 1);
+            *(char *)((size_t)pData + size - byteIndex - 1) = swapByte;
         }
     }
     

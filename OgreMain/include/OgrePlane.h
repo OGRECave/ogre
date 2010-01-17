@@ -25,10 +25,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-// Original free version by:
-// Magic Software, Inc.
-// http://www.geometrictools.com/
-// Copyright (c) 2000, All Rights Reserved
+// This file is based on material originally from:
+// Geometric Tools, LLC
+// Copyright (c) 1998-2010
+// Distributed under the Boost Software License, Version 1.0.
+// http://www.boost.org/LICENSE_1_0.txt
+// http://www.geometrictools.com/License/Boost/LICENSE_1_0.txt
+
 
 #ifndef __Plane_H__
 #define __Plane_H__

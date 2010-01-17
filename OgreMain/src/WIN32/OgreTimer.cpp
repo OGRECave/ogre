@@ -51,13 +51,9 @@ bool Timer::setOption( const String & key, const void * val )
 		DWORD newTimerMask = * static_cast < const DWORD * > ( val );
 
 		// Get the current process core mask
-		DWORD procMask;
-		DWORD sysMask;
-#if _MSC_VER >= 1400 && defined (_M_X64)
-		GetProcessAffinityMask(GetCurrentProcess(), (PDWORD_PTR)&procMask, (PDWORD_PTR)&sysMask);
-#else
+		DWORD_PTR procMask;
+		DWORD_PTR sysMask;
 		GetProcessAffinityMask(GetCurrentProcess(), &procMask, &sysMask);
-#endif
 
 		// If new mask is 0, then set to default behavior, otherwise check
 		// to make sure new timer core mask overlaps with process core mask
@@ -123,7 +119,7 @@ unsigned long Timer::getMilliseconds()
 	HANDLE thread = GetCurrentThread();
 
 	// Set affinity to the first core
-	DWORD oldMask = SetThreadAffinityMask(thread, mTimerMask);
+	DWORD_PTR oldMask = SetThreadAffinityMask(thread, mTimerMask);
 
 	// Query the timer
 	QueryPerformanceCounter(&curTime);
@@ -165,7 +161,7 @@ unsigned long Timer::getMicroseconds()
 	HANDLE thread = GetCurrentThread();
 
 	// Set affinity to the first core
-	DWORD oldMask = SetThreadAffinityMask(thread, mTimerMask);
+	DWORD_PTR oldMask = SetThreadAffinityMask(thread, mTimerMask);
 
 	// Query the timer
 	QueryPerformanceCounter(&curTime);

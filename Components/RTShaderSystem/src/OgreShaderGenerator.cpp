@@ -50,6 +50,7 @@ RTShader::ShaderGenerator* Singleton<RTShader::ShaderGenerator>::ms_Singleton = 
 namespace RTShader {
 
 String ShaderGenerator::DEFAULT_SCHEME_NAME		= "ShaderGeneratorDefaultScheme";
+String GENERATED_SHADERS_GROUP_NAME				= "ShaderGeneratorResourceGroup";
 String ShaderGenerator::SGPass::UserKey			= "SGPass";
 String ShaderGenerator::SGTechnique::UserKey	= "SGTechnique";
 
@@ -170,7 +171,7 @@ bool ShaderGenerator::_initialize()
 	mScriptTranslatorManager = OGRE_NEW SGScriptTranslatorManager(this);
 	ScriptCompilerManager::getSingleton().addTranslatorManager(mScriptTranslatorManager);
 
-	addCustomScriptTranslator("rtshader_system", &mCoreScriptTranslaotr);
+	addCustomScriptTranslator("rtshader_system", &mCoreScriptTranslator);
 
 	// Create the default scheme.
 	createScheme(DEFAULT_SCHEME_NAME);
@@ -987,6 +988,28 @@ void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
 	{
 		mShaderLanguage = shaderLanguage;
 		flushShaderCache();
+	}
+}
+
+//-----------------------------------------------------------------------------
+void ShaderGenerator::setShaderCachePath( const String& cachePath )
+{
+	if (mShaderCachePath != cachePath)
+	{
+		// Remove previous cache path. 
+		if (mShaderCachePath.empty() == false)
+		{
+			ResourceGroupManager::getSingleton().removeResourceLocation(mShaderCachePath, GENERATED_SHADERS_GROUP_NAME);
+		}
+
+		mShaderCachePath = cachePath;
+
+		// Case this is a valid file path -> add as resource location in order to make sure that
+		// generated shaders could be loaded by the file system archive.
+		if (mShaderCachePath.empty() == false)
+		{			
+			ResourceGroupManager::getSingleton().addResourceLocation(cachePath, "FileSystem", GENERATED_SHADERS_GROUP_NAME);		
+		}
 	}
 }
 

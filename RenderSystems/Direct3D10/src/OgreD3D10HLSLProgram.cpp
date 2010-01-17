@@ -798,13 +798,22 @@ namespace Ogre {
 		char * pConstData;
 		if(mConstantBuffer)
 		{
-			mConstantBuffer->Map( D3D10_MAP_WRITE_DISCARD, NULL, (void **) &pConstData );
+			HRESULT hr = mConstantBuffer->Map( D3D10_MAP_WRITE_DISCARD, NULL, (void **) &pConstData );
+			if (FAILED(hr))
+			{
+				String errorDescription = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					"D3D10 device cannot map constant buffer\nError Description:" + errorDescription,
+					"D3D10HLSLProgram::getConstantBuffer");
+			}
 
 			ShaderVarWithPosInBuf * iter = &mShaderVars[0];
 			for (size_t i = 0 ; i < mConstantBufferDesc.Variables ; i++, iter++)
 			{
 				const GpuConstantDefinition& def = params->getConstantDefinition(iter->var.Name);
-				if (def.variability & variabilityMask)
+				// Since we are mapping with write discard, contents of the buffer are undefined.
+				// We must set every variable, even if it has not changed.
+				//if (def.variability & variabilityMask)
 				{
 
 					iter->isFloat = def.isFloat();

@@ -25,19 +25,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-// NOTE THAT THIS FILE IS BASED ON MATERIAL FROM:
+// This file is based on material originally from:
+// Geometric Tools, LLC
+// Copyright (c) 1998-2010
+// Distributed under the Boost Software License, Version 1.0.
+// http://www.boost.org/LICENSE_1_0.txt
+// http://www.geometrictools.com/License/Boost/LICENSE_1_0.txt
 
-// Magic Software, Inc.
-// http://www.geometrictools.com/
-// Copyright (c) 2000, All Rights Reserved
-//
-// Source code from Magic Software is supplied under the terms of a license
-// agreement and may not be copied or disclosed except in accordance with the
-// terms of that agreement.  The various license agreements may be found at
-// the Magic Software web site.  This file is subject to the license
-//
-// FREE SOURCE CODE
-// http://www.geometrictools.com/License/WildMagic3License.pdf
 
 #ifndef __Quaternion_H__
 #define __Quaternion_H__

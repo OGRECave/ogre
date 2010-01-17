@@ -61,7 +61,11 @@ find_library(OIS_LIBRARY_REL NAMES ${OIS_LIBRARY_NAMES} HINTS ${OIS_LIB_SEARCH_P
 find_library(OIS_LIBRARY_DBG NAMES ${OIS_LIBRARY_NAMES_DBG} HINTS ${OIS_LIB_SEARCH_PATH} ${OIS_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" debug)
 make_library_set(OIS_LIBRARY)
 
+
 findpkg_finish(OIS)
+
+# add parent of OIS folder to support OIS/OIS.h
+add_parent_dir(OIS_INCLUDE_DIRS OIS_INCLUDE_DIR)
 
 # Reset framework finding
 set(CMAKE_FIND_FRAMEWORK "FIRST")

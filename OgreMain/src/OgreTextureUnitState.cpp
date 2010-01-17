@@ -1082,7 +1082,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void TextureUnitState::ensurePrepared(size_t frame) const
 	{
-		if (!mFrames[frame].empty())
+		if (!mFrames[frame].empty() && !mTextureLoadFailed)
 		{
 			// Ensure texture is loaded, specified number of mipmaps and
 			// priority
@@ -1114,7 +1114,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void TextureUnitState::ensureLoaded(size_t frame) const
 	{
-		if (!mFrames[frame].empty())
+		if (!mFrames[frame].empty() && !mTextureLoadFailed)
 		{
 			// Ensure texture is loaded, specified number of mipmaps and
 			// priority

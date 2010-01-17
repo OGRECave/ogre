@@ -171,7 +171,7 @@ public:
 	@param cachePath The cache path of the shader.	
 	The default is empty cache path.
 	*/
-	void			setShaderCachePath			(const String& cachePath) { mShaderCachePath = cachePath; }
+	void			setShaderCachePath			(const String& cachePath);
 
 	/** 
 	Get the output shader cache path.
@@ -753,7 +753,7 @@ protected:
 	SGScriptTranslatorManager*		mScriptTranslatorManager;		// Script translator manager.
 	SGMaterialSerializerListener*	mMaterialSerializerListener;	// Custom material Serializer listener - allows exporting material that contains shader generated techniques.
 	SGScriptTranslatorMap			mScriptTranslatorsMap;			// A map of the registered custom script translators.
-	SGScriptTranslator				mCoreScriptTranslaotr;			// The core translator of the RT Shader System.
+	SGScriptTranslator				mCoreScriptTranslator;			// The core translator of the RT Shader System.
 	String							mShaderLanguage;				// The target shader language (currently only cg supported).
 	String							mVertexShaderProfiles;			// The target vertex shader profile. Will be used as argument for program compilation.
 	StringVector					mVertexShaderProfilesList;		// List of target vertex shader profiles.
