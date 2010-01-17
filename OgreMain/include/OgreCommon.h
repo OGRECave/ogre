@@ -383,10 +383,10 @@ namespace Ogre {
 		}
 		const_reference at(size_type n) const { return mList.at(n); }
 		HashedVector() : mListHash(0), mListHashDirty(false) {}
-		HashedVector(size_type n) : mList(n), mListHash(0), mListHashDirty(false) {}
-		HashedVector(size_type n, const T& t) : mList(n, t), mListHash(0), mListHashDirty(false) {}
+		HashedVector(size_type n) : mList(n), mListHash(0), mListHashDirty(n > 0) {}
+		HashedVector(size_type n, const T& t) : mList(n, t), mListHash(0), mListHashDirty(n > 0) {}
 		HashedVector(const HashedVector<T>& rhs) 
-			: mList(rhs.mList), mListHash(rhs.mListHash), mListHashDirty(false) {}
+			: mList(rhs.mList), mListHash(rhs.mListHash), mListHashDirty(rhs.mListHashDirty) {}
 
 		template <class InputIterator>
 		HashedVector(InputIterator a, InputIterator b)
