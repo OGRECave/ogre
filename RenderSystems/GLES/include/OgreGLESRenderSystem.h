@@ -111,6 +111,12 @@ namespace Ogre {
               */
             GLESRTTManager *mRTTManager;
 
+            /** These variables are used for caching RenderSystem state.
+                They are cached because OpenGL state changes can be quite expensive,
+                which is especially important on mobile or embedded systems.
+             */
+            ushort mActiveTextureUnit;
+
             /// Check if the GL system has already been initialised
             bool mGLInitialised;
 
@@ -124,6 +130,8 @@ namespace Ogre {
             /// Internal method to set pos / direction of a light
             void setGLLightPositionDirection(Light* lt, GLenum lightindex);
             void setLights();
+
+            bool activateGLTextureUnit(size_t unit);
 
         public:
             // Default constructor / destructor
