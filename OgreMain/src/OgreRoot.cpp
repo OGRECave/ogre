@@ -227,6 +227,10 @@ namespace Ogre {
         mZipArchiveFactory = OGRE_NEW ZipArchiveFactory();
         ArchiveManager::getSingleton().addArchiveFactory( mZipArchiveFactory );
 #endif
+#if OGRE_NO_DDS_CODEC == 0
+		// Register image codecs
+		DDSCodec::startup();
+#endif
 #if OGRE_NO_FREEIMAGE == 0
 		// Register image codecs
 		FreeImageCodec::startup();
@@ -234,10 +238,6 @@ namespace Ogre {
 #if OGRE_NO_DEVIL == 0
 	    // Register image codecs
 	    ILCodecs::registerCodecs();
-#endif
-#if OGRE_NO_DDS_CODEC == 0
-		// Register image codecs
-		DDSCodec::startup();
 #endif
 #if OGRE_NO_PVRTC_CODEC == 0
         PVRTCCodec::startup();

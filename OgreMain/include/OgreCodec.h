@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreDataStream.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreStringVector.h"
+#include "OgreException.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -80,10 +81,22 @@ namespace Ogre {
         */
         static void registerCodec( Codec *pCodec )
         {
+			CodecList::iterator i = ms_mapCodecs.find(pCodec->getType());
+			if (i != ms_mapCodecs.end())
+				OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
+					pCodec->getType() + " already has a registered codec. ", __FUNCTION__);
+
             ms_mapCodecs[pCodec->getType()] = pCodec;
         }
 
-        /** Unregisters a codec from the database.
+		/** Return whether a codec is registered already. 
+		*/
+		static bool isCodecRegistered( const String& codecType )
+		{
+			return ms_mapCodecs.find(codecType) != ms_mapCodecs.end();
+		}
+
+		/** Unregisters a codec from the database.
         */
         static void unRegisterCodec( Codec *pCodec )
         {
