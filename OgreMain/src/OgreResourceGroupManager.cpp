@@ -221,6 +221,8 @@ namespace Ogre {
 
 					fireResourcePrepareEnded();
 
+					++n;
+
 					// Did the resource change group? if so, our iterator will have
 					// been invalidated
 					if (res->getGroup() != name)
@@ -231,7 +233,6 @@ namespace Ogre {
 					else
 					{
 						++l;
-						++n;
 					}
 				}
 			}
