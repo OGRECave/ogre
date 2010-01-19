@@ -29,6 +29,7 @@
 #define __SdkCameraMan_H__
 
 #include "Ogre.h"
+#include <limits>
 
 namespace OgreBites
 {
@@ -205,13 +206,16 @@ namespace OgreBites
 				// if not accelerating, try to stop in a certain time
 				else mVelocity -= mVelocity * evt.timeSinceLastFrame * 10;
 
-				// keep camera velocity below top speed and above zero
+				Ogre::Real tooSmall = std::numeric_limits<Ogre::Real>::epsilon();
+
+				// keep camera velocity below top speed and above epsilon
 				if (mVelocity.squaredLength() > topSpeed * topSpeed)
 				{
 					mVelocity.normalise();
 					mVelocity *= topSpeed;
 				}
-				else if (mVelocity.squaredLength() < 0.1) mVelocity = Ogre::Vector3::ZERO;
+				else if (mVelocity.squaredLength() < tooSmall * tooSmall)
+					mVelocity = Ogre::Vector3::ZERO;
 
 				if (mVelocity != Ogre::Vector3::ZERO) mCamera->move(mVelocity * evt.timeSinceLastFrame);
 			}
