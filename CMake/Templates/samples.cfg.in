@@ -3,6 +3,7 @@ SamplePlugin=Sample_BezierPatch
 SamplePlugin=Sample_BSP
 SamplePlugin=Sample_CameraTrack
 SamplePlugin=Sample_CelShading
+SamplePlugin=Sample_Character
 SamplePlugin=Sample_Compositor
 SamplePlugin=Sample_CubeMapping
 SamplePlugin=Sample_DeferredShading

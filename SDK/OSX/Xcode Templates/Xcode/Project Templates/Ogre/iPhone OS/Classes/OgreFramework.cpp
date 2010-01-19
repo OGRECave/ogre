@@ -48,9 +48,9 @@ OgreFramework::OgreFramework()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-void OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MultiTouchListener *pMouseListener)
+bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MultiTouchListener *pMouseListener)
 #else
-void OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MouseListener *pMouseListener)
+bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MouseListener *pMouseListener)
 #endif
 {
     Ogre::LogManager* logMgr = new Ogre::LogManager();
@@ -70,7 +70,9 @@ void OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
     m_StaticPluginLoader.load();
 #endif
 
-	m_pRoot->showConfigDialog();
+    if(!m_pRoot->showConfigDialog())
+        return false;
+
 	m_pRenderWnd = m_pRoot->initialise(true, wndTitle);
 
 	m_pSceneMgr = m_pRoot->createSceneManager(ST_GENERIC, "SceneManager");
@@ -155,6 +157,8 @@ void OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	m_pDebugOverlay->show();
 
 	m_pRenderWnd->setActive(true);
+    
+    return true;
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -243,16 +247,16 @@ bool OgreFramework::touchMoved(const OIS::MultiTouchEvent &evt)
 {
     OIS::MultiTouchState state = evt.state;
     float origTransX = 0, origTransY = 0;
-    switch(m_pCamera->getViewport()->getOrientation())
+    switch(m_pCamera->getViewport()->getOrientationMode())
     {
-        case Ogre::Viewport::OR_LANDSCAPELEFT:
+        case Ogre::OR_LANDSCAPELEFT:
             origTransX = state.X.rel;
             origTransY = state.Y.rel;
             state.X.rel = -origTransY;
             state.Y.rel = origTransX;
             break;
             
-        case Ogre::Viewport::OR_LANDSCAPERIGHT:
+        case Ogre::OR_LANDSCAPERIGHT:
             origTransX = state.X.rel;
             origTransY = state.Y.rel;
             state.X.rel = origTransY;
@@ -260,7 +264,7 @@ bool OgreFramework::touchMoved(const OIS::MultiTouchEvent &evt)
             break;
             
         // Portrait doesn't need any change
-        case Ogre::Viewport::OR_PORTRAIT:
+        case Ogre::OR_PORTRAIT:
         default:
             break;
     }
