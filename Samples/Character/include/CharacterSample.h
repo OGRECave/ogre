@@ -45,6 +45,21 @@ public:
 		return SdkSample::keyReleased(evt);
 	}
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+	bool touchPressed(const OIS::MultiTouchEvent& evt)
+	{
+		// relay input events to character controller
+		if (!mTrayMgr->isDialogVisible()) mChara->injectMouseDown(evt);
+		return SdkSample::touchPressed(evt);
+	}
+
+	bool touchMoved(const OIS::MultiTouchEvent& evt)
+	{
+		// relay input events to character controller
+		if (!mTrayMgr->isDialogVisible()) mChara->injectMouseMove(evt);
+		return SdkSample::touchMoved(evt);
+	}
+#else
 	bool mouseMoved(const OIS::MouseEvent& evt)
 	{
 		// relay input events to character controller
@@ -58,6 +73,7 @@ public:
 		if (!mTrayMgr->isDialogVisible()) mChara->injectMouseDown(evt, id);
 		return SdkSample::mousePressed(evt, id);
 	}
+#endif
 
 protected:
 
