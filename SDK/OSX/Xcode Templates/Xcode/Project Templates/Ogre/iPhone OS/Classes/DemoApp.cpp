@@ -25,7 +25,8 @@ DemoApp::~DemoApp()
 void DemoApp::startDemo()
 {
 	new OgreFramework();
-	OgreFramework::getSingletonPtr()->initOgre("DemoApp v1.0", this, 0);
+    if(!OgreFramework::getSingletonPtr()->initOgre("DemoApp v1.0", this, 0))
+        return;
 	
 	m_bShutdown = false;
 

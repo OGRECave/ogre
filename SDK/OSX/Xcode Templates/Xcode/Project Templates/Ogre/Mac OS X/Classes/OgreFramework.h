@@ -67,9 +67,9 @@ public:
 	~OgreFramework();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-    void initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener = 0, OIS::MultiTouchListener *pMouseListener = 0);
+    bool initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener = 0, OIS::MultiTouchListener *pMouseListener = 0);
 #else
-    void initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener = 0, OIS::MouseListener *pMouseListener = 0);
+    bool initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener = 0, OIS::MouseListener *pMouseListener = 0);
 #endif
 	void updateOgre(double timeSinceLastFrame);
 	void updateStats();
