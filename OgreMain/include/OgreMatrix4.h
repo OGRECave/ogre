@@ -559,6 +559,10 @@ namespace Ogre
         */
         void makeInverseTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
 
+        /** Decompose a Matrix4 to orientation / scale / position.
+        */
+        void decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const;
+
         /** Check whether or not the matrix is affine matrix.
             @remarks
                 An affine matrix is a 4x4 matrix with row 3 equal to (0, 0, 0, 1),
