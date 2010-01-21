@@ -1,0 +1,11 @@
+prefix=@OGRE_PREFIX_PATH@
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: OGRE-RTShaderSystem
+Description: Real time shader generation component for OGRE
+Version: @OGRE_VERSION@
+Requires: OGRE = @OGRE_VERSION@
+Libs: -L${libdir} -lOgreRTShaderSystem@OGRE_LIB_SUFFIX@
+Cflags: -I${includedir}/OGRE/RTShaderSystem @OGRE_CFLAGS@

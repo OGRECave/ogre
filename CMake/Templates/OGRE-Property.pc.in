@@ -1,0 +1,11 @@
+prefix=@OGRE_PREFIX_PATH@
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: OGRE-Property
+Description: General purpose property component for OGRE
+Version: @OGRE_VERSION@
+Requires: OGRE = @OGRE_VERSION@
+Libs: -L${libdir} -lOgreProperty@OGRE_LIB_SUFFIX@
+Cflags: -I${includedir}/OGRE/Property @OGRE_CFLAGS@

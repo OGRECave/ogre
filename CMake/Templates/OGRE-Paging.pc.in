@@ -8,4 +8,4 @@ Description: General purpose paging component for OGRE
 Version: @OGRE_VERSION@
 Requires: OGRE = @OGRE_VERSION@
 Libs: -L${libdir} -lOgrePaging@OGRE_LIB_SUFFIX@
-Cflags: -I${includedir}/OGRE @OGRE_CFLAGS@
+Cflags: -I${includedir}/OGRE/Paging @OGRE_CFLAGS@
