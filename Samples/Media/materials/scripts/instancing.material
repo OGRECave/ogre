@@ -8,7 +8,7 @@ vertex_program InstancingCg cg
 	default_params
 	{
 		param_named_auto ambient ambient_light_colour
-		param_named_auto lightDiffuseColour light_diffuse_colour 0
+		param_named_auto lightDiffuseColour derived_light_diffuse_colour 0
 		param_named_auto lightPos light_position 0
 		param_named_auto viewProjectionMatrix viewproj_matrix
 		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
@@ -37,7 +37,7 @@ vertex_program CrowdCg cg
 		param_named_auto numBones custom 0
 		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
 		param_named_auto lightPos light_position 0
-		param_named_auto lightDiffuseColour light_diffuse_colour 0
+		param_named_auto lightDiffuseColour derived_light_diffuse_colour 0
 		param_named_auto ambient ambient_light_colour
 	}
 }
@@ -63,7 +63,7 @@ vertex_program InstancingGLSL glsl
 	default_params
 	{
 		param_named_auto ambient ambient_light_colour
-		param_named_auto lightDiffuseColour light_diffuse_colour 0
+		param_named_auto lightDiffuseColour derived_light_diffuse_colour 0
 		param_named_auto lightPos light_position 0
 		param_named_auto viewProjectionMatrix viewproj_matrix
 		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
@@ -90,7 +90,7 @@ vertex_program CrowdGLSL glsl
 		param_named_auto numBones custom 0
 		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
 		param_named_auto lightPos light_position 0
-		param_named_auto lightDiffuseColour light_diffuse_colour 0
+		param_named_auto lightDiffuseColour derived_light_diffuse_colour 0
 		param_named_auto ambient ambient_light_colour
 	}
 }
