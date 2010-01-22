@@ -228,30 +228,30 @@ namespace Ogre {
 			// No specified top left -> Center the window in the middle of the monitor
 			if (left == -1 || top == -1)
 			{				
-				int screenw = monitorInfoEx.rcMonitor.right  - monitorInfoEx.rcMonitor.left;
-				int screenh = monitorInfoEx.rcMonitor.bottom - monitorInfoEx.rcMonitor.top;
+				int screenw = monitorInfoEx.rcWork.right  - monitorInfoEx.rcWork.left;
+				int screenh = monitorInfoEx.rcWork.bottom - monitorInfoEx.rcWork.top;
 
-				SetRect(&rc, 0, 0, width, height);
-				AdjustWindowRect(&rc, dwStyle, false);
+				unsigned int winWidth, winHeight;
+				adjustWindow(width, height, &winWidth, &winHeight);
 
 				// clamp window dimensions to screen size
-				int outerw = (rc.right-rc.left < screenw)? rc.right-rc.left : screenw;
-				int outerh = (rc.bottom-rc.top < screenh)? rc.bottom-rc.top : screenh;
+				int outerw = (winWidth < screenw)? winWidth : screenw;
+				int outerh = (winHeight < screenh)? winHeight : screenh;
 
 				if (left == -1)
-					left = monitorInfoEx.rcMonitor.left + (screenw - outerw) / 2;
+					left = monitorInfoEx.rcWork.left + (screenw - outerw) / 2;
 				else if (monitorIndex != -1)
-					left += monitorInfoEx.rcMonitor.left;
+					left += monitorInfoEx.rcWork.left;
 
 				if (top == -1)
-					top = monitorInfoEx.rcMonitor.top + (screenh - outerh) / 2;
+					top = monitorInfoEx.rcWork.top + (screenh - outerh) / 2;
 				else if (monitorIndex != -1)
-					top += monitorInfoEx.rcMonitor.top;
+					top += monitorInfoEx.rcWork.top;
 			}
 			else if (monitorIndex != -1)
 			{
-				left += monitorInfoEx.rcMonitor.left;
-				top += monitorInfoEx.rcMonitor.top;
+				left += monitorInfoEx.rcWork.left;
+				top += monitorInfoEx.rcWork.top;
 			}
 
 			mWidth = width;
@@ -296,17 +296,17 @@ namespace Ogre {
 					mHeight = rc.bottom - rc.top;
 
 					// Clamp window rect to the nearest display monitor.
-					if (mLeft < monitorInfoEx.rcMonitor.left)
-						mLeft = monitorInfoEx.rcMonitor.left;		
+					if (mLeft < monitorInfoEx.rcWork.left)
+						mLeft = monitorInfoEx.rcWork.left;		
 
-					if (mTop < monitorInfoEx.rcMonitor.top)					
-						mTop = monitorInfoEx.rcMonitor.top;					
+					if (mTop < monitorInfoEx.rcWork.top)					
+						mTop = monitorInfoEx.rcWork.top;					
 
-					if ((int)mWidth > monitorInfoEx.rcMonitor.right - mLeft)					
-						mWidth = monitorInfoEx.rcMonitor.right - mLeft;	
+					if ((int)mWidth > monitorInfoEx.rcWork.right - mLeft)					
+						mWidth = monitorInfoEx.rcWork.right - mLeft;	
 
-					if ((int)mHeight > monitorInfoEx.rcMonitor.bottom - mTop)					
-						mHeight = monitorInfoEx.rcMonitor.bottom - mTop;		
+					if ((int)mHeight > monitorInfoEx.rcWork.bottom - mTop)					
+						mHeight = monitorInfoEx.rcWork.bottom - mTop;		
 				}			
 			}
 
@@ -445,6 +445,36 @@ namespace Ogre {
 		mActive = true;
 	}
 
+	void Win32Window::adjustWindow(unsigned int clientWidth, unsigned int clientHeight, 
+		unsigned int* winWidth, unsigned int* winHeight)
+	{
+		// NB only call this for non full screen
+		RECT rc;
+		SetRect(&rc, 0, 0, clientWidth, clientHeight);
+		AdjustWindowRect(&rc, WS_VISIBLE | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW, false);
+		*winWidth = rc.right - rc.left;
+		*winHeight = rc.bottom - rc.top;
+
+		// adjust to monitor
+		HMONITOR hMonitor = MonitorFromWindow(mHWnd, MONITOR_DEFAULTTONEAREST);
+
+		// Get monitor info	
+		MONITORINFO monitorInfo;
+
+		memset(&monitorInfo, 0, sizeof(MONITORINFO));
+		monitorInfo.cbSize = sizeof(MONITORINFO);
+		GetMonitorInfo(hMonitor, &monitorInfo);
+
+		LONG maxW = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
+		LONG maxH = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
+
+		if (*winWidth > (unsigned int)maxW)
+			*winWidth = maxW;
+		if (*winHeight > (unsigned int)maxH)
+			*winHeight = maxH;
+
+	}
+
 	void Win32Window::setFullscreen(bool fullScreen, unsigned int width, unsigned int height)
 	{
 		if (mIsFullScreen != fullScreen || width != mWidth || height != mHeight)
@@ -493,6 +523,9 @@ namespace Ogre {
 					}
 
 				}
+				// move window to 0,0 before display switch
+				SetWindowPos(mHWnd, HWND_TOPMOST, 0, 0, mWidth, mHeight, SWP_NOACTIVATE);
+
 				if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN, NULL) != DISP_CHANGE_SUCCESSFUL)				
 					LogManager::getSingleton().logMessage(LML_CRITICAL, "ChangeDisplaySettings failed");
 
@@ -525,22 +558,31 @@ namespace Ogre {
 				ChangeDisplaySettingsEx(mDeviceName, NULL, NULL, 0, NULL);
 
 				// calculate overall dimensions for requested client area
-				RECT rc = { 0, 0, width, height };
-				AdjustWindowRect(&rc, dwStyle, false);
-				unsigned int winWidth = rc.right - rc.left;
-				unsigned int winHeight = rc.bottom - rc.top;
+				unsigned int winWidth, winHeight;
+				adjustWindow(width, height, &winWidth, &winHeight);
 
-				int screenw = GetSystemMetrics(SM_CXSCREEN);
-				int screenh = GetSystemMetrics(SM_CYSCREEN);
-				int left = (screenw - winWidth) / 2;
-				int top = (screenh - winHeight) / 2;
+				// deal with centreing when switching down to smaller resolution
 
+				HMONITOR hMonitor = MonitorFromWindow(mHWnd, MONITOR_DEFAULTTONEAREST);
+				MONITORINFO monitorInfo;
+				memset(&monitorInfo, 0, sizeof(MONITORINFO));
+				monitorInfo.cbSize = sizeof(MONITORINFO);
+				GetMonitorInfo(hMonitor, &monitorInfo);
+
+				LONG screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
+				LONG screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
+
+
+				int left = screenw > winWidth ? ((screenw - winWidth) / 2) : 0;
+				int top = screenh > winHeight ? ((screenh - winHeight) / 2) : 0;
 
 				SetWindowLong(mHWnd, GWL_STYLE, dwStyle);
 				SetWindowPos(mHWnd, HWND_NOTOPMOST, left, top, winWidth, winHeight,
 					SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOACTIVATE);
 				mWidth = width;
 				mHeight = height;
+
+				windowMovedOrResized();
 
 			}
 
@@ -630,7 +672,7 @@ namespace Ogre {
 
 	void Win32Window::windowMovedOrResized()
 	{
-		if (!isVisible())
+		if (!mHWnd || IsIconic(mHWnd))
 			return;
 
 		RECT rc;
@@ -644,8 +686,8 @@ namespace Ogre {
 		if (mWidth == rc.right && mHeight == rc.bottom)
 			return;
 
-		mWidth = rc.right;
-		mHeight = rc.bottom;
+		mWidth = rc.right - rc.left;
+		mHeight = rc.bottom - rc.top;
 
 		// Notify viewports of resize
 		ViewportList::iterator it, itend;

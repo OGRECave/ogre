@@ -67,6 +67,9 @@ namespace Ogre {
         */
         virtual void setActive( bool state );
 
+		void adjustWindow(unsigned int clientWidth, unsigned int clientHeight, 
+			unsigned int* winWidth, unsigned int* winHeight);
+
 	protected:
 		Win32GLSupport &mGLSupport;
 		HWND	mHWnd;					// Win32 Window handle

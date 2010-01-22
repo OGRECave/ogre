@@ -104,6 +104,9 @@ namespace Ogre
 		/** Validate the device for this window. */
 		bool _validateDevice();
 
+		void adjustWindow(unsigned int clientWidth, unsigned int clientHeight, 
+			unsigned int* winWidth, unsigned int* winHeight);
+
 	protected:
 		HINSTANCE					mInstance;				// Process instance
 		D3D9Device* 				mDevice;				// D3D9 device wrapper class.
