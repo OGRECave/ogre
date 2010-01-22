@@ -202,7 +202,15 @@ namespace Ogre
 		// colourmap
 		if (terrain->getGlobalColourMapEnabled())
 			--freeTextureUnits;
-		// TODO shadowmaps
+		if (isShadowingEnabled(HIGH_LOD, terrain))
+		{
+			uint numShadowTextures = 1;
+			if (getReceiveDynamicShadowsPSSM())
+			{
+				numShadowTextures = getReceiveDynamicShadowsPSSM()->getSplitCount();
+			}
+			freeTextureUnits -= numShadowTextures;
+		}
 
 		// each layer needs 2.25 units (1xdiffusespec, 1xnormalheight, 0.25xblend)
 		return static_cast<uint8>(freeTextureUnits / 2.25f);
