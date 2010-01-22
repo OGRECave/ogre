@@ -34,6 +34,14 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#	define Ogre_OutputCString(str) ::OutputDebugStringA(str)
+#	define Ogre_OutputWString(str) ::OutputDebugStringW(str)
+#else
+#	define Ogre_OutputCString(str) std::err << str
+#	define Ogre_OutputWString(str) std::err << str
+#endif
 	
 #if OGRE_MEMORY_TRACKER
 	//--------------------------------------------------------------------------
@@ -89,38 +97,44 @@ namespace Ogre
 	}
 	//--------------------------------------------------------------------------
 	void MemoryTracker::reportLeaks()
-	{
+	{		
 		StringUtil::StrStreamType os;
-		
+
 		if (mAllocations.empty())
-			os << "No leaks!";
-		else
 		{
-			size_t totalMem = 0;
-			os << "Leaks detected:" << std::endl << std::endl;
+			os << "Ogre Memory: No memory leaks" << std::endl;
+		}
+		else
+		{			
+			os << "Ogre Memory: Detected memory leaks !!! " << std::endl;
+			os << "Ogre Memory: (" << mAllocations.size() << ") Allocation(s) with total " << mTotalAllocations << " bytes." << std::endl;
+			os << "Ogre Memory: Dumping allocations -> " << std::endl;
+
+
 			for (AllocationMap::const_iterator i = mAllocations.begin(); i != mAllocations.end(); ++i)
 			{
 				const Alloc& alloc = i->second;
-				if (!alloc.filename.empty())
-					os << alloc.filename << "(" << alloc.line << ", " << alloc.function << "): ";
+				if (!alloc.filename.empty())				
+					os << alloc.filename;
 				else
-					os << "(unknown source): ";
-				os << alloc.bytes << " bytes";
-				os << std::endl;
-				totalMem += alloc.bytes;
-			}
-			
-			os << std::endl;
-			os << mAllocations.size() << " leaks detected, " << totalMem << " bytes total";
+					os << "(unknown source):";
+
+				os << "(" << alloc.line << ") : {" << alloc.bytes << " bytes}" << " function: " << alloc.function << std::endl; 				
+
+			}			
+			os << std::endl;			
 		}
-		
-		if (mDumpToStdOut)
-			std::cout << os.str();
-		
+
+		if (mDumpToStdOut)		
+			std::cout << os.str();		
+
+		std::cout << os.str();
 		std::ofstream of;
 		of.open(mLeakFileName.c_str());
 		of << os.str();
 		of.close();
+
+		Ogre_OutputCString(os.str().c_str());		
 	}
 #endif // OGRE_DEBUG_MODE	
 	
