@@ -249,6 +249,7 @@ option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE)
 cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" FALSE "MSVC" FALSE)
 option(OGRE_FULL_RPATH "Build executables with the full required RPATH to run from their install location." FALSE)
 option(OGRE_STANDALONE_BUILD "Generate build files that do not reference CMake (e.g. source distro)" FALSE)
+option(OGRE_PROFILING "Enable internal profiling support." FALSE)
 
 ###################################################################
 # configure global build settings based on selected build options

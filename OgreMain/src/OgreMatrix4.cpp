@@ -248,5 +248,20 @@ namespace Ogre
         // No projection term
         m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
     }
+    //-----------------------------------------------------------------------
+	void Matrix4::decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const
+	{
+		assert(isAffine());
+
+		Matrix3 m3x3;
+		extract3x3Matrix(m3x3);
+
+		Matrix3 matQ;
+		Vector3 vecU;
+		m3x3.QDUDecomposition( matQ, scale, vecU ); 
+
+		orientation = Quaternion( matQ );
+		position = Vector3( m[0][3], m[1][3], m[2][3] );
+	}
 
 }

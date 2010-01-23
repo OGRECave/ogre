@@ -536,6 +536,17 @@ namespace OgreBites
                 mWindow->getViewport(0)->setOrientationMode((Ogre::OrientationMode)orientationMode);                
             }
 #endif
+			else if(evt.key == OIS::KC_F9)   // toggle full screen
+			{
+				// Make sure we use the window size as originally requested, NOT the
+				// current window size (which may have altered to fit desktop)
+				const Ogre::ConfigOptionMap::iterator opti = 
+					mRoot->getRenderSystem()->getConfigOptions().find("Video Mode");
+				Ogre::StringVector vmopts = Ogre::StringUtil::split(opti->second.currentValue, " x");
+				unsigned int w = Ogre::StringConverter::parseUnsignedInt(vmopts[0]);
+				unsigned int h = Ogre::StringConverter::parseUnsignedInt(vmopts[1]);
+				mWindow->setFullscreen(!mWindow->isFullScreen(), w, h);
+			}
 
 			try
 			{

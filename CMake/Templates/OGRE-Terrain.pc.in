@@ -1,0 +1,11 @@
+prefix=@OGRE_PREFIX_PATH@
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: OGRE-Terrain
+Description: Outdoor terrain component for OGRE
+Version: @OGRE_VERSION@
+Requires: OGRE = @OGRE_VERSION@ @OGRE_PAGING_ADDITIONAL_PACKAGES@
+Libs: -L${libdir} -lOgreTerrain@OGRE_LIB_SUFFIX@
+Cflags: -I${includedir}/OGRE @OGRE_CFLAGS@
