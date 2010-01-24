@@ -2669,7 +2669,7 @@ namespace Ogre
 		if (ddr.terrain != this)
 			return false;
 		else
-			return true;
+			return RequestHandler::canHandleRequest(req, srcQ);
 
 	}
 	//---------------------------------------------------------------------
