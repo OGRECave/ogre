@@ -133,8 +133,17 @@ namespace Ogre {
 			i = mRequestHandlers.insert(RequestHandlerListByChannel::value_type(channel, RequestHandlerList())).first;
 
 		RequestHandlerList& handlers = i->second;
-		if (std::find(handlers.begin(), handlers.end(), rh) == handlers.end())
-			handlers.push_back(rh);
+		bool duplicate = false;
+		for (RequestHandlerList::iterator j = handlers.begin(); j != handlers.end(); ++j)
+		{
+			if ((*j)->getHandler() == rh)
+			{
+				duplicate = true;
+				break;
+			}
+		}
+		if (!duplicate)
+			handlers.push_back(RequestHandlerHolderPtr(OGRE_NEW RequestHandlerHolder(rh)));
 
 	}
 	//---------------------------------------------------------------------
@@ -146,10 +155,17 @@ namespace Ogre {
 		if (i != mRequestHandlers.end())
 		{
 			RequestHandlerList& handlers = i->second;
-			RequestHandlerList::iterator j = std::find(
-				handlers.begin(), handlers.end(), rh);
-			if (j != handlers.end())
-				handlers.erase(j);
+			for (RequestHandlerList::iterator j = handlers.begin(); j != handlers.end(); ++j)
+			{
+				if ((*j)->getHandler() == rh)
+				{
+					// Disconnect - this will make it safe across copies of the list
+					// this is threadsafe and will wait for existing processes to finish
+					(*j)->disconnectHandler();
+					handlers.erase(j);	
+					break;
+				}
+			}
 
 		}
 
@@ -511,7 +527,14 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	WorkQueue::Response* DefaultWorkQueueBase::processRequest(Request* r)
 	{
-		OGRE_LOCK_RW_MUTEX_READ(mRequestHandlerMutex);
+		RequestHandlerListByChannel handlerListCopy;
+		{
+			// lock the list only to make a copy of it, to maximise parallelism
+			OGRE_LOCK_RW_MUTEX_READ(mRequestHandlerMutex);
+			
+			handlerListCopy = mRequestHandlers;
+			
+		}
 
 		Response* response = 0;
 
@@ -528,16 +551,17 @@ namespace Ogre {
 		LogManager::getSingleton().stream(LML_TRIVIAL) << 
 			"DefaultWorkQueueBase('" << mName << "') - PROCESS_REQUEST_START(" << dbgMsg.str();
 
-		RequestHandlerListByChannel::iterator i = mRequestHandlers.find(r->getChannel());
-		if (i != mRequestHandlers.end())
+		RequestHandlerListByChannel::iterator i = handlerListCopy.find(r->getChannel());
+		if (i != handlerListCopy.end())
 		{
 			RequestHandlerList& handlers = i->second;
 			for (RequestHandlerList::reverse_iterator j = handlers.rbegin(); j != handlers.rend(); ++j)
 			{
-				if ((*j)->canHandleRequest(r, this))
-				{
-					response = (*j)->handleRequest(r, this);
-				}
+				// threadsafe call which tests canHandleRequest and calls it if so 
+				response = (*j)->handleRequest(r, this);
+
+				if (response)
+					break;
 			}
 		}
 

@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreAtomicWrappers.h"
 #include "OgreAny.h"
+#include "OgreSharedPtr.h"
 
 namespace Ogre
 {
@@ -464,7 +465,56 @@ namespace Ogre
 		};
 		WorkerFunc* mWorkerFunc;
 
-		typedef list<RequestHandler*>::type RequestHandlerList;
+		/** Intermediate structure to hold a pointer to a request handler which 
+			provides insurance against the handler itself being disconnected
+			while the list remains unchanged.
+		*/
+		class _OgreExport RequestHandlerHolder : public UtilityAlloc
+		{
+		protected:
+			OGRE_RW_MUTEX(mRWMutex);
+			RequestHandler* mHandler;
+		public:
+			RequestHandlerHolder(RequestHandler* handler)
+				: mHandler(handler)	{}
+
+			// Disconnect the handler to allow it to be destroyed
+			void disconnectHandler()
+			{
+				// write lock - must wait for all requests to finish
+				OGRE_LOCK_RW_MUTEX_WRITE(mRWMutex);
+				mHandler = 0;
+			}
+
+			/** Get handler pointer - note, only use this for == comparison or similar,
+				do not attempt to call it as it is not thread safe. 
+			*/
+			RequestHandler* getHandler() { return mHandler; }
+
+			/** Process a request if possible.
+			@return Valid response if processed, null otherwise
+			*/
+			Response* handleRequest(const Request* req, const WorkQueue* srcQ)
+			{
+				// Read mutex so that multiple requests can be processed by the
+				// same handler in parallel if required
+				OGRE_LOCK_RW_MUTEX_READ(mRWMutex);
+				Response* response = 0;
+				if (mHandler)
+				{
+					if (mHandler->canHandleRequest(req, srcQ))
+					{
+						response = mHandler->handleRequest(req, srcQ);
+					}
+				}
+				return response;
+			}
+
+		};
+		// Hold these by shared pointer so they can be copied keeping same instance
+		typedef SharedPtr<RequestHandlerHolder> RequestHandlerHolderPtr;
+
+		typedef list<RequestHandlerHolderPtr>::type RequestHandlerList;
 		typedef list<ResponseHandler*>::type ResponseHandlerList;
 		typedef map<uint16, RequestHandlerList>::type RequestHandlerListByChannel;
 		typedef map<uint16, ResponseHandlerList>::type ResponseHandlerListByChannel;
