@@ -63,10 +63,21 @@ if (CMAKE_COMPILER_IS_GNUCXX)
   endif ()
 endif ()
 if (MSVC)
-  add_definitions(/fp:fast)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast")
+  # Enable intrinsics on MSVC in debug mode
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Oi")
+  if (CMAKE_CL_64)
+    # Visual Studio bails out on debug builds in 64bit mode unless
+	# this flag is set...
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
+	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /bigobj")
+  endif ()
+endif ()
+if (MINGW)
+  add_definitions(-D_WIN32_WINNT=0x0500)
 endif ()
 
-if (CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
   # Test for GCC visibility
   include(CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-fvisibility=hidden OGRE_GCC_VISIBILITY)
@@ -91,7 +102,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
   if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" AND NOT APPLE)
     add_definitions(-fPIC)
   endif()  
-endif (CMAKE_COMPILER_IS_GNUCXX)
+endif (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
 
 # determine system endianess
 include(TestBigEndian)

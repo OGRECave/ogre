@@ -146,6 +146,10 @@ function(ogre_config_lib LIBNAME EXPORT)
       # add GCC visibility flags to shared library build
       set_target_properties(${LIBNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
 	endif (CMAKE_COMPILER_IS_GNUCXX)
+	if (MINGW)
+	  # remove lib prefix from DLL outputs
+	  set_target_properties(${LIBNAME} PROPERTIES PREFIX "")
+	endif ()
 	
 	# Set some Mac OS X specific framework settings, including installing the headers in subdirs
 	if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
@@ -190,6 +194,11 @@ function(ogre_config_component LIBNAME)
   ogre_config_common(${LIBNAME})
   ogre_install_target(${LIBNAME} "" TRUE)
   
+  if (MINGW)
+	# remove lib prefix from DLL outputs
+	set_target_properties(${LIBNAME} PROPERTIES PREFIX "")
+  endif ()
+
   if (OGRE_INSTALL_PDB)
     # install debug pdb files
     install(FILES ${OGRE_BINARY_DIR}/lib${OGRE_DEBUG_PATH}/${LIBNAME}_d.pdb

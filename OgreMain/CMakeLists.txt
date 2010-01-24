@@ -365,8 +365,8 @@ set (SOURCE_FILES
   src/OgrePass.cpp
   src/OgrePatchMesh.cpp
   src/OgrePatchSurface.cpp
-  src/OgrePixelCountLodStrategy.cpp
   src/OgrePixelConversions.h
+  src/OgrePixelCountLodStrategy.cpp
   src/OgrePixelFormat.cpp
   src/OgrePlane.cpp
   src/OgrePlatformInformation.cpp
@@ -458,10 +458,10 @@ if (WIN32)
     include/WIN32/OgreTimerImp.h
   )
   set(PLATFORM_SOURCE_FILES
-    src/WIN32/resource.h
     src/WIN32/OgreConfigDialog.cpp
     src/WIN32/OgreErrorDialog.cpp
     src/WIN32/OgreTimer.cpp
+    src/WIN32/resource.h
     src/WIN32/OgreWin32Resources.rc
     src/WIN32/winres.h
   )  
@@ -472,6 +472,19 @@ if (WIN32)
   )
   source_group(Resources FILES ${RESOURCE_FILES})
   set(PLATFORM_HEADER_INSTALL "win32")
+ 
+  if (MINGW) 
+    # There's a bug in CMake which makes it ignore resource files with Mingw
+    # This is a manual fix for the moment.
+    get_filename_component(OGRE_MINGW_PATH ${CMAKE_CXX_COMPILER} PATH)
+    set(OGRE_MINGW_RC ${OGRE_MINGW_PATH}/windres.exe)
+	add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj
+	  COMMAND ${OGRE_MINGW_RC} -I${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32 
+	                           -i${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32/OgreWin32Resources.rc
+							   -o${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj
+      DEPENDS ${RESOURCE_FILES})
+	list(APPEND PLATFORM_SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj)		
+  endif ()
 
 elseif (APPLE)
   if (OGRE_BUILD_PLATFORM_IPHONE)
@@ -654,6 +667,10 @@ if (APPLE)
   set_target_properties(OgreMain PROPERTIES	OUTPUT_NAME Ogre)
 endif ()
 target_link_libraries(OgreMain ${LIBRARIES})
+if (MINGW)
+  # may need winsock htons functions for FreeImage
+  target_link_libraries(OgreMain ws2_32)
+endif ()
 
 # specify a precompiled header to use
 use_precompiled_header(OgreMain 
