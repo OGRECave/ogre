@@ -152,12 +152,13 @@ namespace Ogre {
 #       define OGRE_DEBUG_MODE 0
 #   endif
 
-// Disable unicode support on MingW at the moment, poorly supported in stdlibc++
+// Disable unicode support on MingW for GCC 3, poorly supported in stdlibc++
 // STLPORT fixes this though so allow if found
 // MinGW C++ Toolkit supports unicode and sets the define __MINGW32_TOOLKIT_UNICODE__ in _mingw.h
+// GCC 4 is also fine
 #if defined( __MINGW32__ ) && !defined(_STLPORT_VERSION)
 #   include<_mingw.h>
-#   if defined(__MINGW32_TOOLBOX_UNICODE__)
+#   if defined(__MINGW32_TOOLBOX_UNICODE__) || OGRE_COMP_VER > 345
 #	    define OGRE_UNICODE_SUPPORT 1
 #   else
 #       define OGRE_UNICODE_SUPPORT 0

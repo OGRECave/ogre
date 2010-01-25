@@ -11,19 +11,26 @@
 # Support macro to use a precompiled header
 # Usage:
 #   use_precompiled_header(TARGET HEADER_FILE SRC_FILE)
-#
-# PREC will contain the dependency that needs to be linked
-# to the project.
 ##################################################################
 
 macro(use_precompiled_header TARGET HEADER_FILE SRC_FILE)
   get_filename_component(HEADER ${HEADER_FILE} NAME)
+  get_target_property(SOURCE_FILES ${TARGET} SOURCES)
 
   if (MSVC)
-    add_definitions(/Yu"${HEADER}")
+    get_filename_component(BASENAME ${HEADER_FILE} NAME_WE)
+	set(PREC_HEADER "${CMAKE_CURRENT_BINARY_DIR}/${BASENAME}.pch")
+	foreach(SOURCE_FILE ${SOURCE_FILES})
+	  get_filename_component(FEXT ${SOURCE_FILE} EXT)
+	  if (FEXT STREQUAL ".cpp")
+	    set_source_files_properties(${SOURCE_FILE}
+	      PROPERTIES COMPILE_FLAGS "/Yu\"${HEADER}\" /Fp\"${PREC_HEADER}\""
+	      OBJECT_DEPENDS "${PREC_HEADER}")
+	  endif ()
+	endforeach()
     set_source_files_properties(${SRC_FILE}
-      PROPERTIES COMPILE_FLAGS /Yc"${HEADER}"
-    )
+      PROPERTIES COMPILE_FLAGS "/Yc\"${HEADER}\" /Fp\"${PREC_HEADER}\""
+	  OBJECT_OUTPUTS "${PREC_HEADER}" OBJECT_DEPENDS "")
     
   elseif (CMAKE_COMPILER_IS_GNUCXX)
     # disabled because it seems to increase compile time

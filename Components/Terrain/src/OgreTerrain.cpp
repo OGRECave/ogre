@@ -2669,7 +2669,7 @@ namespace Ogre
 		if (ddr.terrain != this)
 			return false;
 		else
-			return true;
+			return RequestHandler::canHandleRequest(req, srcQ);
 
 	}
 	//---------------------------------------------------------------------
@@ -2993,10 +2993,10 @@ namespace Ogre
 		// widenedRect now contains terrain point space version of the area we
 		// need to calculate. However, we need to calculate in lightmap image space
 		float terrainToLightmapScale = (float)mLightmapSizeActual / (float)mSize;
-		widenedRect.left *= (long)terrainToLightmapScale;
-		widenedRect.right *= (long)terrainToLightmapScale;
-		widenedRect.top *= (long)terrainToLightmapScale;
-		widenedRect.bottom *= (long)terrainToLightmapScale;
+		widenedRect.left = (long)(widenedRect.left * terrainToLightmapScale);
+		widenedRect.right = (long)(widenedRect.right * terrainToLightmapScale);
+		widenedRect.top = (long)(widenedRect.top * terrainToLightmapScale);
+		widenedRect.bottom = (long)(widenedRect.bottom * terrainToLightmapScale);
 
 		// clamp 
 		widenedRect.left = std::max(0L, widenedRect.left);

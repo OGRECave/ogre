@@ -578,7 +578,7 @@ namespace Ogre
 		if (lreq.origin != this)
 			return false;
 		else
-			return true;
+			return RequestHandler::canHandleRequest(req, srcQ);
 
 	}
 	//---------------------------------------------------------------------

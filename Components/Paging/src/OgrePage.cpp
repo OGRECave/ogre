@@ -205,7 +205,7 @@ namespace Ogre
 		if (preq.srcPage != this)
 			return false;
 		else
-			return true;
+			return RequestHandler::canHandleRequest(req, srcQ);
 
 	}
 	//---------------------------------------------------------------------
