@@ -85,8 +85,9 @@ namespace Ogre
 					continue;
 				}
 			}
-
-			mDriverList.push_back(new D3D10Driver( D3D10Device(),  iAdapter,pDXGIAdapter) );
+			
+			D3D10Device dev;
+			mDriverList.push_back(new D3D10Driver( dev,  iAdapter,pDXGIAdapter) );
 
 		}
 

@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __D3D9PREREQUISITES_H__
 
 #include "OgrePrerequisites.h"
+#include "WIN32/OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
 
 #if OGRE_THREAD_SUPPORT
 #define OGRE_LOCK_RECURSIVE_MUTEX(name)   name.lock();
@@ -89,6 +90,7 @@ namespace Ogre
     class D3D9HLSLProgramFactory;
     class D3D9HLSLProgram;
     class D3D9VertexDeclaration;
+	class D3D9Resource;
 
 // Should we ask D3D to manage vertex/index buffers automatically?
 // Doing so avoids lost devices, but also has a performance impact

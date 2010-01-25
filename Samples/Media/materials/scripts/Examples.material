@@ -888,6 +888,15 @@ fragment_program Examples/GrassWaverAmbientFpCg cg
     {
     }
 }
+fragment_program Examples/GrassWaverFp cg
+{
+	source Grass.cg
+	entry_point grass_fp
+	profiles ps_2_0 arbfp1
+    default_params
+    {
+    }
+}
 
 vertex_program Examples/GrassWaverCasterVpCg cg
 {
@@ -1541,7 +1550,10 @@ material Examples/GrassBlades
         {
 			vertex_program_ref Examples/GrassWaverVp
 			{
-			}            
+			} 
+			fragment_program_ref Examples/GrassWaverFp
+			{
+			}
             
 			alpha_rejection greater 150 
 			scene_blend alpha_blend

@@ -132,8 +132,7 @@ namespace Ogre
 		mMovable = OGRE_NEW Movable(this);
 		mRend = OGRE_NEW Rend(this);
 
-		mLocalNode = mTerrain->_getRootSceneNode()->createChildSceneNode(mLocalCentre);
-		
+	
 	}
 	//---------------------------------------------------------------------
 	TerrainQuadTreeNode::~TerrainQuadTreeNode()
@@ -143,8 +142,11 @@ namespace Ogre
 		OGRE_DELETE mRend;
 		mRend = 0;
 
-		mTerrain->_getRootSceneNode()->removeAndDestroyChild(mLocalNode->getName());
-		mLocalNode = 0;
+		if (mLocalNode)
+		{
+			mTerrain->_getRootSceneNode()->removeAndDestroyChild(mLocalNode->getName());
+			mLocalNode = 0;
+		}
 
 		for (int i = 0; i < 4; ++i)
 			OGRE_DELETE mChildren[i];
@@ -246,6 +248,9 @@ namespace Ogre
 		if (!isLeaf())
 			for (int i = 0; i < 4; ++i)
 				mChildren[i]->load();
+
+		if (!mLocalNode)
+			mLocalNode = mTerrain->_getRootSceneNode()->createChildSceneNode(mLocalCentre);
 
 		mLocalNode->attachObject(mMovable);
 	}

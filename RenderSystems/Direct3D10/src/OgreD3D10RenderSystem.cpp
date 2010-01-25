@@ -1300,7 +1300,8 @@ namespace Ogre
 			// Clean up depth stencil surfaces
 			_cleanupDepthStencils();
 			mDevice.release();
-			mActiveD3DDriver->setDevice(D3D10Device(NULL));
+			D3D10Device dev(NULL);
+			mActiveD3DDriver->setDevice(dev);
 			mDevice = 0;
 
 		}

@@ -15,22 +15,12 @@
 
 macro(use_precompiled_header TARGET HEADER_FILE SRC_FILE)
   get_filename_component(HEADER ${HEADER_FILE} NAME)
-  get_target_property(SOURCE_FILES ${TARGET} SOURCES)
 
   if (MSVC)
-    get_filename_component(BASENAME ${HEADER_FILE} NAME_WE)
-	set(PREC_HEADER "${CMAKE_CURRENT_BINARY_DIR}/${BASENAME}.pch")
-	foreach(SOURCE_FILE ${SOURCE_FILES})
-	  get_filename_component(FEXT ${SOURCE_FILE} EXT)
-	  if (FEXT STREQUAL ".cpp")
-	    set_source_files_properties(${SOURCE_FILE}
-	      PROPERTIES COMPILE_FLAGS "/Yu\"${HEADER}\" /Fp\"${PREC_HEADER}\""
-	      OBJECT_DEPENDS "${PREC_HEADER}")
-	  endif ()
-	endforeach()
+	add_definitions(/Yu"${HEADER}")
     set_source_files_properties(${SRC_FILE}
-      PROPERTIES COMPILE_FLAGS "/Yc\"${HEADER}\" /Fp\"${PREC_HEADER}\""
-	  OBJECT_OUTPUTS "${PREC_HEADER}" OBJECT_DEPENDS "")
+      PPROPERTIES COMPILE_FLAGS /Yc"${HEADER}"
+	)
     
   elseif (CMAKE_COMPILER_IS_GNUCXX)
     # disabled because it seems to increase compile time
