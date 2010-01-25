@@ -100,7 +100,8 @@ namespace Ogre
 		vs->setParameter("target",fixedFuncEmuShaderGenerator->getVpTarget());
 		static_cast<LoadFromSourceGpuProgram *>(vs.get())->doLoadFromSource();
 
-		vertexProgramUsage->setProgram(GpuProgramPtr(vs));
+		GpuProgramPtr vsgpp(vs);
+		vertexProgramUsage->setProgram(vsgpp);
 		vertexProgramUsage->setParameters(vs->createParameters());
 
 		fs = HighLevelGpuProgramManager::getSingleton().
@@ -111,7 +112,8 @@ namespace Ogre
 		fs->setParameter("target",fixedFuncEmuShaderGenerator->getFpTarget());
 		static_cast<LoadFromSourceGpuProgram *>(fs.get())->doLoadFromSource();
 
-		fragmentProgramUsage->setProgram(GpuProgramPtr(fs));
+		GpuProgramPtr fsgpp(fs);
+		fragmentProgramUsage->setProgram(fsgpp);
 		fragmentProgramUsage->setParameters(fs->createParameters());
 
 		FixedFuncPrograms * newPrograms = fixedFuncEmuShaderGenerator->createFixedFuncPrograms();

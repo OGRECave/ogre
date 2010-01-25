@@ -37,7 +37,7 @@ THE SOFTWARE.
 
 #include "OgrePlatform.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined(__MINGW32__)) || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #include "OgreArchive.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreBitwise.h"
