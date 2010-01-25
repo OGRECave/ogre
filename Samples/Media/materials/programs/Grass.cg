@@ -32,6 +32,18 @@ void grass_vp(float4 position : POSITION,
     
 }
 
+void grass_fp( float2 uv	         : TEXCOORD0,
+               float4 colour         : COLOR,  
+               
+               out float4 oColour    : COLOR,
+              
+              uniform sampler2D diffuseMap
+              )
+{	
+    float4 texColor = tex2D(diffuseMap, uv.xy);
+    oColour = float4(texColor.rgb * colour.rgb, texColor.a); 
+}
+
 
 void grassTex_vp(
               float4 position : POSITION,
