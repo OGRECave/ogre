@@ -73,7 +73,10 @@ THE SOFTWARE.
 #include "OgreVector3.h"
 #include "OgreVector4.h"
 #include "OgreWireBoundingBox.h"
-#include "OgreZip.h"
+#if OGRE_NO_ZIP_ARCHIVE == 0
+#	include "OgreZip.h"
+#endif
+
 #endif
 
 #endif 
