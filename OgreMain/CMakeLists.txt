@@ -477,7 +477,13 @@ if (WIN32)
     # There's a bug in CMake which makes it ignore resource files with Mingw
     # This is a manual fix for the moment.
     get_filename_component(OGRE_MINGW_PATH ${CMAKE_CXX_COMPILER} PATH)
-    set(OGRE_MINGW_RC ${OGRE_MINGW_PATH}/windres.exe)
+    #set(OGRE_MINGW_RC ${OGRE_MINGW_PATH}/windres.exe)
+	file(GLOB OGRE_MINGW_RC_NAMES "${OGRE_MINGW_PATH}/*windres*")
+	find_program(OGRE_MINGW_RC NAMES ${OGRE_MINGW_RC_NAMES} HINTS ${OGRE_MINGW_PATH} DOC "Path to MinGW resource compiler")
+	if (NOT OGRE_MINGW_RC)
+	  message(SEND_ERROR "Could not find MinGW resource compiler. Please specify path in OGRE_MINGW_RC.")
+	endif ()
+	mark_as_advanced(OGRE_MINGW_RC)
 	add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj
 	  COMMAND ${OGRE_MINGW_RC} -I${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32 
 	                           -i${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32/OgreWin32Resources.rc
