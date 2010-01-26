@@ -1504,7 +1504,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void Pass::_dirtyHash(void)
 	{
-		if (mParent->getParent()->isLoaded())
+		Material* mat = mParent->getParent();
+		if (mat->isLoading() || mat->isLoaded())
 		{
 			OGRE_LOCK_MUTEX(msDirtyHashListMutex)
 			// Mark this hash as for follow up
