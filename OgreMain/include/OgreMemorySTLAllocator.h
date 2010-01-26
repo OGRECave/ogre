@@ -58,22 +58,38 @@ namespace Ogre
 	policy with just allocate/deallocate implementations; this class does all the
 	housekeeping associated with keeping the STL happy.
 	*/
+
+	// Base STL allocator class.
+	template<typename T>
+	struct STLAllocatorBase
+	{	// base class for generic allocators
+		typedef T value_type;
+	};
+
+	// Base STL allocator class. (const T version).
+	template<typename T>
+	struct STLAllocatorBase<const T>
+	{	// base class for generic allocators for const T
+		typedef T value_type;
+	};
+
 	template
 		<
 		typename T,
 		typename AllocPolicy
 		>
-	class STLAllocator 
+	class STLAllocator : public STLAllocatorBase<T>
 	{
 	public :
 		/// define our types, as per ISO C++
-		typedef T					value_type;
-		typedef value_type*			pointer;
-		typedef const value_type*	const_pointer;
-		typedef value_type&			reference;
-		typedef const value_type&	const_reference;
-		typedef std::size_t			size_type;
-		typedef std::ptrdiff_t		difference_type;
+		typedef STLAllocatorBase<T>			Base;
+		typedef typename Base::value_type	value_type;
+		typedef value_type*					pointer;
+		typedef const value_type*			const_pointer;
+		typedef value_type&					reference;
+		typedef const value_type&			const_reference;
+		typedef std::size_t					size_type;
+		typedef std::ptrdiff_t				difference_type;
 
 
 		/// the standard rebind mechanism
