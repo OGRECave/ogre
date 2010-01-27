@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include <OgreRoot.h>
 #include <OgreOctreePlugin.h>
 
+#ifndef OGRE_STATIC_LIB
+
 namespace Ogre
 {
 OctreePlugin* octreePlugin;
@@ -48,3 +50,5 @@ extern "C" void _OgreOctreePluginExport dllStopPlugin( void )
 	OGRE_DELETE octreePlugin;
 }
 }
+
+#endif

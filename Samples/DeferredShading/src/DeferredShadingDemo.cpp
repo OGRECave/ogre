@@ -478,6 +478,8 @@ protected:
 	}
 };
 
+#ifndef OGRE_STATIC_LIB
+
 SamplePlugin* sp;
 Sample* s;
 
@@ -495,3 +497,5 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 	OGRE_DELETE sp;
 	delete s;
 }
+
+#endif

@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 Ogre::BspSceneManagerPlugin* bspPlugin;
 //-----------------------------------------------------------------------
+#ifndef OGRE_STATIC_LIB
 extern "C" void _OgreBspPluginExport dllStartPlugin(void)
 {
     // Create new scene manager
@@ -46,3 +47,4 @@ extern "C" void _OgreBspPluginExport dllStopPlugin(void)
 	Ogre::Root::getSingleton().uninstallPlugin(bspPlugin);
     OGRE_DELETE bspPlugin;
 }
+#endif

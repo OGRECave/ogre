@@ -35,6 +35,8 @@ email                : ericc@xenopi.com
 #include <OgreRoot.h>
 #include "OgreOctreeZonePlugin.h"
 
+#ifndef OGRE_STATIC_LIB
+
 namespace Ogre
 {
     OctreeZonePlugin* OZPlugin;
@@ -54,3 +56,5 @@ namespace Ogre
 	    OGRE_DELETE OZPlugin;
     }
 }
+
+#endif

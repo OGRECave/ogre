@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreGLPlugin.h"
 
+#ifndef OGRE_STATIC_LIB
 
 namespace Ogre {
 
@@ -47,3 +48,5 @@ namespace Ogre {
 		delete plugin;
     }
 }
+
+#endif

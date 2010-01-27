@@ -94,6 +94,15 @@ add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FI
 
 target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES})
 
+# Get the list of configured samples
+get_property(OGRE_SAMPLES_LIST GLOBAL PROPERTY "OGRE_SAMPLES_LIST")
+add_dependencies(SampleBrowser ${OGRE_SAMPLES_LIST})
+
+if (OGRE_STATIC)
+	# Link to samples too
+	target_link_libraries(SampleBrowser ${OGRE_SAMPLES_LIST})
+endif()
+
 if (SAMPLE_DEPENDENCIES)
   add_dependencies(SampleBrowser ${SAMPLE_DEPENDENCIES})
 endif ()

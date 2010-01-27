@@ -92,6 +92,8 @@ public:
 	}
 };
 
+#ifndef OGRE_STATIC_LIB
+
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
 	s = new Sample_Isosurf;
@@ -106,3 +108,5 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 	OGRE_DELETE sp;
 	delete s;
 }
+
+#endif

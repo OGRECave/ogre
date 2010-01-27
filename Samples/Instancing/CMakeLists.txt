@@ -31,4 +31,3 @@ if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
     )
 endif()
 
-add_dependencies(SampleBrowser Sample_Instancing)

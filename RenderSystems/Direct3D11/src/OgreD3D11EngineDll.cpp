@@ -27,6 +27,8 @@ THE SOFTWARE.
 */
 #include "OgreRoot.h"
 #include "OgreD3D11Plugin.h"
+
+#ifndef OGRE_STATIC_LIB
 namespace Ogre 
 {
 	D3D11Plugin* plugin;
@@ -43,3 +45,4 @@ namespace Ogre
 		delete plugin;
 	}
 }
+#endif
