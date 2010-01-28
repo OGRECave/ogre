@@ -791,6 +791,7 @@ namespace Ogre {
 
 		}
 		mBatchInstanceMap.clear();
+		mInstancedGeometryInstance = NULL;
 	}
 	//--------------------------------------------------------------------------
 	void InstancedGeometry::reset(void)
