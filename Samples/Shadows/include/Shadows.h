@@ -25,19 +25,6 @@ using namespace Ogre;
 using namespace OgreBites;
 
 
-Entity* mAthene;
-AnimationState* mAnimState = 0;
-Entity* pPlaneEnt;
-vector<Entity*>::type pColumns;
-Light* mLight;
-Light* mSunLight;
-SceneNode* mLightNode = 0;
-AnimationState* mLightAnimationState = 0;
-ColourValue mMinLightColour(0.2, 0.1, 0.0);
-ColourValue mMaxLightColour(0.5, 0.3, 0.1);
-Real mMinFlareSize = 40;
-Real mMaxFlareSize = 80;
-Controller<Real>* mController = 0;
 
 // New depth shadowmapping
 String CUSTOM_ROCKWALL_MATERIAL("Ogre/DepthShadowmap/Receiver/RockWall");
@@ -105,6 +92,20 @@ Real timeDelay = 0;
 class _OgreSampleClassExport Sample_Shadows : public SdkSample
 {
 protected:
+	Entity* mAthene;
+	AnimationState* mAnimState;
+	Entity* pPlaneEnt;
+	vector<Entity*>::type pColumns;
+	Light* mLight;
+	Light* mSunLight;
+	SceneNode* mLightNode;
+	AnimationState* mLightAnimationState;
+	ColourValue mMinLightColour;
+	ColourValue mMaxLightColour;
+	Real mMinFlareSize;
+	Real mMaxFlareSize;
+	Controller<Real>* mController;
+
 	enum ShadowProjection
 	{
 		UNIFORM,
@@ -146,8 +147,16 @@ public:
 		return SdkSample::frameEnded(evt);
 	}
 
-	Sample_Shadows() : 
-	  mPlane(0)
+	Sample_Shadows()
+		: mAnimState(0)
+		, mLightNode(0)
+		, mLightAnimationState(0)
+		, mMinLightColour(0.2, 0.1, 0.0)
+		, mMaxLightColour(0.5, 0.3, 0.1)
+		, mMinFlareSize(40)
+		, mMaxFlareSize(80)
+		, mController(0)
+		, mPlane(0)
 	{
 		mInfo["Title"] = "Shadows";
 		mInfo["Description"] = "A demonstration of ogre's various shadowing techniques.";

@@ -11,11 +11,6 @@
 
 # Use same build type for components as main build
 set(OGRE_COMP_LIB_TYPE ${OGRE_LIB_TYPE})
-set(OGRE_COMP_STATIC ${OGRE_STATIC})
-
-if (OGRE_COMP_STATIC)
-	add_definitions(-DOGRE_COMPONENT_STATIC)
-endif()
 
 if (OGRE_BUILD_COMPONENT_PAGING)
   add_subdirectory(Paging)

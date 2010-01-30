@@ -33,6 +33,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     CgPlugin* cgPlugin;
+#ifndef OGRE_STATIC_LIB
     //-----------------------------------------------------------------------
     extern "C" void _OgreCgPluginExport dllStartPlugin(void)
     {
@@ -49,6 +50,7 @@ namespace Ogre {
 		Root::getSingleton().uninstallPlugin(cgPlugin);
 		OGRE_DELETE cgPlugin;
     }
+#endif
 
     void checkForCgError(const String& ogreMethod, const String& errorTextPrefix, CGcontext context)
     {

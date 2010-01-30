@@ -126,6 +126,18 @@ else ()
   set(OGRE_CONFIG_LITTLE_ENDIAN 1)
 endif ()
 
+if (OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS)
+	set(RTSHADER_SYSTEM_BUILD_CORE_SHADERS 1)
+else ()
+	set(RTSHADER_SYSTEM_BUILD_CORE_SHADERS 0)
+endif ()
+
+if (OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS)	
+	set(RTSHADER_SYSTEM_BUILD_EXT_SHADERS 1)
+else ()
+	set(RTSHADER_SYSTEM_BUILD_EXT_SHADERS 0)
+endif ()
+
 # generate OgreBuildSettings.h 
 configure_file(${OGRE_TEMPLATES_DIR}/OgreBuildSettings.h.in ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h @ONLY)
 install(FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h DESTINATION include/OGRE)

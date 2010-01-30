@@ -289,6 +289,12 @@ function(ogre_config_sample_common SAMPLENAME)
     set_target_properties(${SAMPLENAME} PROPERTIES PREFIX "")
   endif (CMAKE_COMPILER_IS_GNUCXX)	
   ogre_install_target(${SAMPLENAME} ${OGRE_SAMPLE_PATH} FALSE)
+  
+  # Add sample to the list of link targets
+  # Global property so that we can build this up across entire sample tree
+  # since vars are local to containing scope of directories / functions
+  get_property(OGRE_SAMPLES_LIST GLOBAL PROPERTY "OGRE_SAMPLES_LIST")
+  set_property (GLOBAL PROPERTY "OGRE_SAMPLES_LIST" ${OGRE_SAMPLES_LIST} ${SAMPLENAME})
 
 endfunction(ogre_config_sample_common)
 

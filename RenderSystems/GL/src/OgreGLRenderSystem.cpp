@@ -2758,11 +2758,29 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
  			if (isCustomAttrib)
  			{
  				GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem->getIndex());
+				unsigned short typeCount = VertexElement::getTypeCount(elem->getType());
+				GLboolean normalised = GL_FALSE;
+				switch(elem->getType())
+				{
+				case VET_COLOUR:
+				case VET_COLOUR_ABGR:
+				case VET_COLOUR_ARGB:
+				case VET_UBYTE4:
+					// Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
+					// VertexElement::getTypeCount treats them as 1 (RGBA)
+					// Also need to normalise the fixed-point data
+					typeCount = 4;
+					normalised = GL_TRUE;
+					break;
+				default:
+					break;
+				};
+
  				glVertexAttribPointerARB(
  					attrib,
- 					VertexElement::getTypeCount(elem->getType()), 
+ 					typeCount, 
   					GLHardwareBufferManager::getGLType(elem->getType()), 
- 					GL_FALSE, // normalisation disabled
+ 					normalised, 
   					static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
   					pBufferData);
  				glEnableVertexAttribArrayARB(attrib);

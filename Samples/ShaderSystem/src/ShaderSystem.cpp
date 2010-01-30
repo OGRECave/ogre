@@ -25,6 +25,8 @@ const String MESH_ARRAY[MESH_ARRAY_SIZE] =
 	"knot.mesh"
 };
 
+#ifndef OGRE_STATIC_LIB
+
 SamplePlugin* sp;
 Sample* s;
 
@@ -43,6 +45,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 	OGRE_DELETE sp;
 	delete s;
 }
+#endif
 
 
 //-----------------------------------------------------------------------

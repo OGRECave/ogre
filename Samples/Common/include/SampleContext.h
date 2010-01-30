@@ -456,12 +456,13 @@ namespace OgreBites
                 workDir = Ogre::macBundlePath() + "/Contents/Resources/";
                 pluginsPath = workDir;
                 #endif
+				pluginsPath += "plugins.cfg";
             #else
                 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
                 workDir = Ogre::macBundlePath() + "/";
                 #endif
             #endif
-			mRoot = OGRE_NEW Ogre::Root(pluginsPath + "plugins.cfg", workDir + "ogre.cfg", workDir + "ogre.log");
+			mRoot = OGRE_NEW Ogre::Root(pluginsPath, workDir + "ogre.cfg", workDir + "ogre.log");
 
 #ifdef OGRE_STATIC_LIB
             mStaticPluginLoader.load();

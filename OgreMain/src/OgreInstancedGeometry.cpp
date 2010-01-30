@@ -791,6 +791,7 @@ namespace Ogre {
 
 		}
 		mBatchInstanceMap.clear();
+		mInstancedGeometryInstance = NULL;
 	}
 	//--------------------------------------------------------------------------
 	void InstancedGeometry::reset(void)
@@ -1763,7 +1764,10 @@ namespace Ogre {
 
 		const Ogre::VertexElement*elem=mRenderOp.vertexData->vertexDeclaration->findElementBySemantic(VES_TEXTURE_COORDINATES);
 	
-		texCoordSource=elem->getSource();
+		if (elem != NULL)
+		{
+			texCoordSource=elem->getSource();
+		}
 		for(ushort i=0;i<mRenderOp.vertexData->vertexDeclaration->getElementCount();i++)
 		{
 			if(mRenderOp.vertexData->vertexDeclaration->getElement(i)->getSemantic() == VES_TEXTURE_COORDINATES)

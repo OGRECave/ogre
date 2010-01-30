@@ -60,9 +60,13 @@ namespace Ogre {
         optFullScreen.currentValue = "Yes";
         optFullScreen.immutable = false;
 
+        CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
+
         optVideoMode.name = "Video Mode";
         optVideoMode.possibleValues.push_back("320 x 480");
-        optVideoMode.currentValue = "320 x 480";
+        optVideoMode.possibleValues.push_back("768 x 1024");
+        optVideoMode.currentValue = StringConverter::toString(appFrame.size.width) + " x " + 
+                                    StringConverter::toString(appFrame.size.height);
         optVideoMode.immutable = false;
 
         optOrientation.name = "Orientation";

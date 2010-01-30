@@ -92,14 +92,6 @@ add_library(OgreRTShaderSystem ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FI
 set_target_properties(OgreRTShaderSystem PROPERTIES VERSION ${OGRE_VERSION} SOVERSION ${OGRE_VERSION_MAJOR})
 target_link_libraries(OgreRTShaderSystem OgreMain)
 
-if (OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS)
-	add_definitions(-DRTSHADER_SYSTEM_BUILD_CORE_SHADERS)
-endif ()
-
-if (OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS)
-	add_definitions(-DRTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-endif ()
-
 ogre_config_component(OgreRTShaderSystem)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)

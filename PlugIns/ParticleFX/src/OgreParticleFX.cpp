@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreParticleFXPlugin.h"
 
+#ifndef OGRE_STATIC_LIB
+
 namespace Ogre {
 
 	ParticleFXPlugin* plugin;
@@ -50,3 +52,4 @@ namespace Ogre {
 
 }
 
+#endif

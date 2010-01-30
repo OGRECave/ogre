@@ -122,8 +122,6 @@ if (OGRE_BUILD_SAMPLES)
   		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreRTShaderSystem)
 	endif () 
   endif ()
-
-  add_subdirectory(Browser)
   
   add_subdirectory(BezierPatch)
   add_subdirectory(CameraTrack)
@@ -168,9 +166,12 @@ if (NOT OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)
   add_subdirectory(ParticleGS)
 endif ()
 
+  # Add browser last
+  add_subdirectory(Browser)
 endif ()
 
 
+  
 # Install sample sources
 if (OGRE_INSTALL_SAMPLES_SOURCE)
   if (WIN32 OR APPLE)

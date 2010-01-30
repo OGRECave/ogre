@@ -35,6 +35,8 @@ email                : ericc@xenopi.com
 #include <OgreRoot.h>
 #include "OgrePCZPlugin.h"
 
+#ifndef OGRE_STATIC_LIB
+
 namespace Ogre
 {
     PCZPlugin* pczPlugin;
@@ -54,3 +56,5 @@ namespace Ogre
 	    OGRE_DELETE pczPlugin;
     }
 }
+
+#endif

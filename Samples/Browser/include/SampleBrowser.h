@@ -954,7 +954,12 @@ namespace OgreBites
 				try   // try to load the plugin
 				{
 #ifdef OGRE_STATIC_LIB
-                    OgreBites::SdkSample *pluginInstance = (OgreBites::SdkSample *) mPluginNameMap[*i];
+					String sampleName = *i;
+					// in debug, remove any suffix
+					if(StringUtil::endsWith(sampleName, "_d"))
+						sampleName = sampleName.substr(0, sampleName.length()-2);
+
+                    OgreBites::SdkSample *pluginInstance = (OgreBites::SdkSample *) mPluginNameMap[sampleName];
                     if(pluginInstance)
                     {
                         OgreBites::SamplePlugin* sp = OGRE_NEW SamplePlugin(pluginInstance->getInfo()["Title"] + " Sample");
