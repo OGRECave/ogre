@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #ifndef _ShaderFFPTransform_
 #define _ShaderFFPTransform_
 
 #include "OgreShaderPrerequisites.h"
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #include "OgreShaderSubRenderState.h"
 
 namespace Ogre {

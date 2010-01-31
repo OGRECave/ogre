@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExIntegratedPSSM3.h"
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderFFPRenderState.h"
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
@@ -152,7 +152,7 @@ void IntegratedPSSM3::setSplitPoints(const SplitPointList& newSplitPoints)
 	if (newSplitPoints.size() != 4)
 	{
 		OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
-			"IntegratedPSSM3 sub redner state supports only 4 split points",
+			"IntegratedPSSM3 sub render state supports only 4 split points",
 			"IntegratedPSSM3::setSplitPoints");
 	}
 

@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #ifndef _ShaderFFPTextureStage_
 #define _ShaderFFPTextureStage_
 
 #include "OgreShaderPrerequisites.h"
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #include "OgreShaderSubRenderState.h"
 #include "OgreShaderParameter.h"
 #include "OgreRenderSystem.h"

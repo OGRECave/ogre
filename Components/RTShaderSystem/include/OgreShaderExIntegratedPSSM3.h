@@ -25,14 +25,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #ifndef _ShaderExIntegratedPSSM3_
 #define _ShaderExIntegratedPSSM3_
 
-#include "OgreRTShaderSystem.h"
+#include "OgreShaderPrerequisites.h"
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreVector4.h"
 #include "OgreLight.h"
 #include "OgreCommon.h"
+#include "OgreShaderSubRenderState.h"
+#include "OgreShaderParameter.h"
 
 namespace Ogre {
 namespace RTShader {

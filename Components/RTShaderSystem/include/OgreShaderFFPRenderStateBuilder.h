@@ -24,12 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #ifndef _ShaderFFPRenderStateBuilder_
 #define _ShaderFFPRenderStateBuilder_
 
 #include "OgreShaderPrerequisites.h"
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #include "OgreSingleton.h"
+#include "OgreShaderGenerator.h"
 
 namespace Ogre {
 namespace RTShader {

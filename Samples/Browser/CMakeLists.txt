@@ -90,6 +90,10 @@ else()
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
 endif()
 
+if (OGRE_BUILD_TESTS)
+	add_definitions(-DSAMPLES_INCLUDE_PLAYPEN)
+	include_directories(${OGRE_SOURCE_DIR}/Tests/PlayPen/include)
+endif()
 add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
 target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES})

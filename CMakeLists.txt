@@ -287,17 +287,17 @@ add_subdirectory(PlugIns)
 # Setup Components
 add_subdirectory(Components)
 
+# Setup tests (before samples so that PlayPen is included in browser)
+if (OGRE_BUILD_TESTS)
+  add_subdirectory(Tests)
+endif ()
+
 # Setup samples
 add_subdirectory(Samples) 
 
 # Setup command-line tools
 if (OGRE_BUILD_TOOLS)
   add_subdirectory(Tools)
-endif ()
-
-# Setup tests
-if (OGRE_BUILD_TESTS)
-  add_subdirectory(Tests)
 endif ()
 
 # Install documentation
