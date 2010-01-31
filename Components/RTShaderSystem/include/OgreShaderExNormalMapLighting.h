@@ -24,11 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #ifndef _ShaderExNormalMapLighting_
 #define _ShaderExNormalMapLighting_
 
 #include "OgreShaderPrerequisites.h"
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderParameter.h"
 #include "OgreShaderSubRenderState.h"
 #include "OgreVector4.h"

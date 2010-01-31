@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExIntegratedPSSM3.h"
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderFFPRenderState.h"
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
