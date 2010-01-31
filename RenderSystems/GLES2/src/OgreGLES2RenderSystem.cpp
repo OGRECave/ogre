@@ -1416,7 +1416,7 @@ namespace Ogre {
         Ogre::RTShader::RenderState* renderState =
             mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
         Ogre::RTShader::SubRenderState* perPerPixelLightModel =
-            mShaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
+            mShaderGenerator->createSubRenderState("SGX_PerPixelLighting");
 
         renderState->addTemplateSubRenderState(perPerPixelLightModel);
         
