@@ -67,7 +67,7 @@ namespace Ogre {
                 Note that a null value indicates a free slot
               */ 
             #define MAX_LIGHTS 8
-            Light* mLights[MAX_LIGHTS];
+			LightList mLights;
 
             /// View matrix to set world against
             Matrix4 mViewMatrix;

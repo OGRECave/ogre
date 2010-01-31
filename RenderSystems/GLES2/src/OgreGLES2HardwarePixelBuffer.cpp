@@ -476,21 +476,7 @@ namespace Ogre {
         glDisable(GL_SCISSOR_TEST);
         glDisable(GL_BLEND);
         glDisable(GL_CULL_FACE);
-//        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        GL_CHECK_ERROR;
 
-        // Save and reset matrices
-//        glMatrixMode(GL_MODELVIEW);
-//        glPushMatrix();
-//        glLoadIdentity();
-//        glMatrixMode(GL_PROJECTION);
-//        glPushMatrix();
-//        glLoadIdentity();
-//        glMatrixMode(GL_TEXTURE);
-//        glPushMatrix();
-//        glLoadIdentity();
-//        GL_CHECK_ERROR;
-        
         // Set up source texture
         glBindTexture(src->mTarget, src->mTextureID);
         GL_CHECK_ERROR;
@@ -622,14 +608,6 @@ namespace Ogre {
         // Restore old framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, oldfb);
         GL_CHECK_ERROR;
-        // Restore matrix stacks and render state
-//        glMatrixMode(GL_TEXTURE);
-//        glPopMatrix();
-//        glMatrixMode(GL_PROJECTION);
-//        glPopMatrix();
-//        glMatrixMode(GL_MODELVIEW);
-//        glPopMatrix();
-//        GL_CHECK_ERROR;
         glDeleteTextures(1, &tempTex);
         GL_CHECK_ERROR;
     }

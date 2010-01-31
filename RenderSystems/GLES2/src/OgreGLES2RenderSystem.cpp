@@ -61,9 +61,6 @@ namespace Ogre {
 
         mGLSupport = getGLSupport();
 
-        for (i = 0; i < MAX_LIGHTS; i++)
-            mLights[i] = NULL;
-
         mWorldMatrix = Matrix4::IDENTITY;
         mViewMatrix = Matrix4::IDENTITY;
 
@@ -1415,6 +1412,14 @@ namespace Ogre {
         // Call super class
         RenderSystem::_render(op);
 
+        // Add a render state for per pixel lighting
+        Ogre::RTShader::RenderState* renderState =
+            mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        Ogre::RTShader::SubRenderState* perPerPixelLightModel =
+            mShaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
+
+        renderState->addTemplateSubRenderState(perPerPixelLightModel);
+        
         void* pBufferData = 0;
 		bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
 
@@ -1445,13 +1450,31 @@ namespace Ogre {
             VertexElementSemantic sem = elem->getSemantic();
 
             GLint attrib = GLES2GpuProgram::getFixedAttributeIndex(sem, elem->getIndex());
+            unsigned short typeCount = VertexElement::getTypeCount(elem->getType());
+            GLboolean normalised = GL_FALSE;
+            switch(elem->getType())
+            {
+            case VET_COLOUR:
+            case VET_COLOUR_ABGR:
+            case VET_COLOUR_ARGB:
+            case VET_UBYTE4:
+                // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
+                // VertexElement::getTypeCount treats them as 1 (RGBA)
+                // Also need to normalise the fixed-point data
+                typeCount = 4;
+                normalised = GL_TRUE;
+                break;
+            default:
+                break;
+            };
 
             switch (sem)
             {
                 case VES_POSITION:
                     glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_POSITION, 0),
-                                          VertexElement::getTypeCount(elem->getType()),
-                                          GLES2HardwareBufferManager::getGLType(elem->getType()), GL_FALSE,
+                                          typeCount,
+                                          GLES2HardwareBufferManager::getGLType(elem->getType()),
+                                          normalised,
                                           static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                           pBufferData);
                     GL_CHECK_ERROR;
@@ -1460,8 +1483,9 @@ namespace Ogre {
                     break;
                 case VES_NORMAL:
                     glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_NORMAL, 0),
-                                          VertexElement::getTypeCount(elem->getType()),
-                                          GLES2HardwareBufferManager::getGLType(elem->getType()), GL_FALSE,
+                                          typeCount,
+                                          GLES2HardwareBufferManager::getGLType(elem->getType()),
+                                          normalised,
                                           static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                           pBufferData);
                     GL_CHECK_ERROR;
@@ -1470,8 +1494,9 @@ namespace Ogre {
                     break;
                 case VES_DIFFUSE:
                     glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_DIFFUSE, 0), 
-                                          VertexElement::getTypeCount(elem->getType()),
-                                          GLES2HardwareBufferManager::getGLType(elem->getType()), GL_FALSE,
+                                          typeCount,
+                                          GLES2HardwareBufferManager::getGLType(elem->getType()),
+                                          normalised,
                                           static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                           pBufferData);
                     GL_CHECK_ERROR;
@@ -1480,8 +1505,9 @@ namespace Ogre {
                     break;
                 case VES_SPECULAR:
                     glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_SPECULAR, 0), 
-                                          VertexElement::getTypeCount(elem->getType()),
-                                          GLES2HardwareBufferManager::getGLType(elem->getType()), GL_FALSE,
+                                          typeCount,
+                                          GLES2HardwareBufferManager::getGLType(elem->getType()),
+                                          normalised,
                                           static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                           pBufferData);
                     GL_CHECK_ERROR;
@@ -1495,8 +1521,9 @@ namespace Ogre {
                         // Programmable pipeline - direct UV assignment
                         glActiveTexture(GL_TEXTURE0 + elem->getIndex());
                         glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, elem->getIndex()),
-                                              VertexElement::getTypeCount(elem->getType()),
-                                              GLES2HardwareBufferManager::getGLType(elem->getType()), GL_FALSE,
+                                              typeCount,
+                                              GLES2HardwareBufferManager::getGLType(elem->getType()),
+                                              normalised,
                                               static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                               pBufferData);
                         GL_CHECK_ERROR;
@@ -1516,8 +1543,9 @@ namespace Ogre {
                                     glActiveTexture(GL_TEXTURE0 + i);
                                 GL_CHECK_ERROR;
                                 glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, i),
-                                                      VertexElement::getTypeCount(elem->getType()),
-                                                      GLES2HardwareBufferManager::getGLType(elem->getType()), GL_FALSE,
+                                                      typeCount,
+                                                      GLES2HardwareBufferManager::getGLType(elem->getType()),
+                                                      normalised,
                                                       static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                                       pBufferData);
                                 GL_CHECK_ERROR;
@@ -2083,9 +2111,9 @@ namespace Ogre {
 
 			// Create shader generated technique for this material.
 			techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
-				originalMaterial->getName(), 
-				Ogre::MaterialManager::DEFAULT_SCHEME_NAME, 
-				schemeName);	
+                                                                            originalMaterial->getName(), 
+                                                                            Ogre::MaterialManager::DEFAULT_SCHEME_NAME, 
+                                                                            schemeName);
 
 			// Case technique registration succeeded.
 			if (techniqueCreated)

@@ -133,7 +133,7 @@ namespace Ogre {
 					String::size_type pos = vpSource.find(a.name);
 					if (pos != String::npos)
 					{
-						String::size_type startpos = vpSource.find("attribute", pos-20);
+						String::size_type startpos = vpSource.find("attribute", pos < 20 ? 0 : pos-20);
 						if (startpos == String::npos)
 							startpos = vpSource.find("in", pos-20);
 						if (startpos != String::npos && startpos < pos)
