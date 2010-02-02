@@ -35,9 +35,16 @@
 // Static plugins declaration section
 // Note that every entry in here adds an extra header / library dependency
 #ifdef OGRE_STATIC_LIB
-#  define OGRE_STATIC_GL
+#  ifdef OGRE_STATIC_LINK_RENDERSYSTEM_GL
+#    define OGRE_STATIC_GL
+#  endif
+#  ifdef OGRE_STATIC_LINK_RENDERSYSTEM_GLES
+#    define OGRE_STATIC_GLES
+#  endif
 #  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#    define OGRE_STATIC_Direct3D9
+#    ifdef OGRE_STATIC_LINK_RENDERSYSTEM_D3D9
+#		define OGRE_STATIC_Direct3D9
+#    endif
 // dx10 will only work on vista, so be careful about statically linking
 #    ifdef OGRE_STATIC_LINK_RENDERSYSTEM_D3D10
 #      define OGRE_STATIC_Direct3D10
@@ -58,7 +65,9 @@
 #  if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #     undef OGRE_STATIC_CgProgramManager
 #     undef OGRE_STATIC_GL
-#     define OGRE_STATIC_GLES 1
+#     ifndef OGRE_STATIC_GLES
+#       define OGRE_STATIC_GLES 1
+#     endif
 #     ifdef __OBJC__
 #       import <UIKit/UIKit.h>
 #     endif
