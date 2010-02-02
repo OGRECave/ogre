@@ -87,6 +87,7 @@ if (OGRE_BUILD_SAMPLES)
   	include_directories(${OGRE_SOURCE_DIR}/PlugIns/PCZSceneManager/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D9/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D10/include)
+  	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
   	include_directories(${CMAKE_SOURCE_DIR}/RenderSystems/GLES2/include)
   	include_directories(

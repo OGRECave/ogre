@@ -55,14 +55,11 @@ const ColourValue SAMPLE_COLORS[] =
 class _OgreSampleClassExport Sample_DeferredShading : public SdkSample, public RenderTargetListener
 {
 protected:
-	MovablePlane* mPlane;
-    Entity* mPlaneEnt;
-    SceneNode* mPlaneNode;
 	DeferredShadingSystem *mSystem;
 	SelectMenu* mDisplayModeMenu;
 
 public:
-    Sample_DeferredShading() : mPlane(0) 
+    Sample_DeferredShading()
 	{
 		mInfo["Title"] = "Deferred Shading";
 		mInfo["Description"] = "A sample implementation of a deferred renderer using the compositor framework.";
@@ -82,8 +79,7 @@ protected:
 	{
 		delete ( SharedData::getSingletonPtr() );
 
-        delete mPlane;
-		delete mSystem;
+        delete mSystem;
 	}
 
 	bool frameRenderingQueued(const FrameEvent& evt)
@@ -256,7 +252,6 @@ protected:
     {
 		mCameraMan->setTopSpeed(20.0);
 		new SharedData();
-		mPlane = 0;
 		mSystem = 0;
 
 		RenderSystem *rs = Root::getSingleton().getRenderSystem();

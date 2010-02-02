@@ -1154,7 +1154,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 				if (!currentChain)
 				{
 					OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-						"An pass that wishes to reference a compositor texutre "
+						"A pass that wishes to reference a compositor texutre "
 						"attempted to render in a pipeline without a compositor",
 						"SceneManager::_setPass");
 				}

@@ -81,11 +81,7 @@ add_definitions(-D_USRDLL)
 add_library(RenderSystem_Direct3D10 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(RenderSystem_Direct3D10
   OgreMain
-  d3d10
-  d3dx10
-  dxgi
-  dxerr
-  dxguid
+  ${DirectX_D3D10_LIBRARIES}
 )
 
 if (NOT OGRE_STATIC)

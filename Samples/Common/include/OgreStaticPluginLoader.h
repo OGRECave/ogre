@@ -109,7 +109,7 @@ namespace Ogre
 		D3D10Plugin* mD3D10Plugin;
 #endif
 #ifdef OGRE_STATIC_Direct3D11
-		D3D11Plugin* mD3D10Plugin;
+		D3D11Plugin* mD3D11Plugin;
 #endif
 	public:
 		StaticPluginLoader() {}
