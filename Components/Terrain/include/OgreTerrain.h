@@ -1060,6 +1060,30 @@ namespace Ogre
 		*/
 		void _dirtyCompositeMapRect(const Rect& rect);
 
+		/** Mark a region of the lightmap as dirty.
+		@remarks
+			You only need to call this if you need to tell the terrain to update
+			the lightmap data for some reason other than the terrain geometry
+			has changed. Changing terrain geometry automatically dirties the
+			correct lightmap areas.
+		@note
+			The lightmap won't actually be updated until update() or updateDerivedData()
+			is called.
+		*/
+		void dirtyLightmapRect(const Rect& rect);
+
+		/** Mark a the entire lightmap as dirty.
+		@remarks
+			You only need to call this if you need to tell the terrain to update
+			the lightmap data for some reason other than the terrain geometry
+			has changed. Changing terrain geometry automatically dirties the
+			correct lightmap areas.
+		@note
+			The lightmap won't actually be updated until update() or updateDerivedData()
+			is called.
+		*/
+		void dirtyLightmap();
+
 		/** Trigger the update process for the terrain.
 		@remarks
 			Updating the terrain will process any dirty sections of the terrain.

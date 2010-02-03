@@ -1688,6 +1688,22 @@ namespace Ogre
 		mModified = true;
 	}
 	//---------------------------------------------------------------------
+	void Terrain::dirtyLightmapRect(const Rect& rect)
+	{
+		mDirtyDerivedDataRect.merge(rect);
+
+		mModified = true;
+
+	}
+	//---------------------------------------------------------------------
+	void Terrain::dirtyLightmap()
+	{
+		Rect rect;
+		rect.top = 0; rect.bottom = mSize;
+		rect.left = 0; rect.right = mSize;
+		dirtyLightmapRect(rect);
+	}
+	//---------------------------------------------------------------------
 	void Terrain::update(bool synchronous)
 	{
 		updateGeometry();
