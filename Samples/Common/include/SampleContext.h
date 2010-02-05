@@ -35,21 +35,21 @@
 // Static plugins declaration section
 // Note that every entry in here adds an extra header / library dependency
 #ifdef OGRE_STATIC_LIB
-#  ifdef OGRE_STATIC_LINK_RENDERSYSTEM_GL
+#  ifdef OGRE_BUILD_RENDERSYSTEM_GL
 #    define OGRE_STATIC_GL
 #  endif
-#  ifdef OGRE_STATIC_LINK_RENDERSYSTEM_GLES
+#  ifdef OGRE_BUILD_RENDERSYSTEM_GLES
 #    define OGRE_STATIC_GLES
 #  endif
 #  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#    ifdef OGRE_STATIC_LINK_RENDERSYSTEM_D3D9
+#    ifdef OGRE_BUILD_RENDERSYSTEM_D3D9
 #		define OGRE_STATIC_Direct3D9
 #    endif
 // dx10 will only work on vista, so be careful about statically linking
-#    ifdef OGRE_STATIC_LINK_RENDERSYSTEM_D3D10
+#    ifdef OGRE_BUILD_RENDERSYSTEM_D3D10
 #      define OGRE_STATIC_Direct3D10
 #    endif
-#    ifdef OGRE_STATIC_LINK_RENDERSYSTEM_D3D11
+#    ifdef OGRE_BUILD_RENDERSYSTEM_D3D11
 #      define OGRE_STATIC_Direct3D11
 #    endif
 #  endif
