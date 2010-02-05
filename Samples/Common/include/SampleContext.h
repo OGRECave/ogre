@@ -53,15 +53,28 @@
 #      define OGRE_STATIC_Direct3D11
 #    endif
 #  endif
-#  define OGRE_STATIC_BSPSceneManager
-#  define OGRE_STATIC_ParticleFX
-#  define OGRE_STATIC_CgProgramManager
-#  ifdef OGRE_USE_PCZ
-#    define OGRE_STATIC_PCZSceneManager
-#    define OGRE_STATIC_OctreeZone
-#  else
-#    define OGRE_STATIC_OctreeSceneManager
+
+#  ifdef OGRE_BUILD_PLUGIN_BSP
+#    define OGRE_STATIC_BSPSceneManager
 #  endif
+#  ifdef OGRE_BUILD_PLUGIN_PFX
+#    define OGRE_STATIC_ParticleFX
+#  endif
+#  ifdef OGRE_BUILD_PLUGIN_CG
+#    define OGRE_STATIC_CgProgramManager
+#  endif
+
+#  ifdef OGRE_USE_PCZ
+#    ifdef OGRE_BUILD_PLUGIN_PCZ
+#      define OGRE_STATIC_PCZSceneManager
+#      define OGRE_STATIC_OctreeZone
+#    endif
+#  else
+#    ifdef OGRE_BUILD_PLUGIN_OCTREE
+#      define OGRE_STATIC_OctreeSceneManager
+#    endif
+#  endif
+
 #  if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #     undef OGRE_STATIC_CgProgramManager
 #     undef OGRE_STATIC_GL
