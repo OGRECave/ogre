@@ -53,6 +53,9 @@ namespace Ogre {
 
 		D3D10_BOX OgreImageBoxToDx10Box(const Image::Box &inBox) const;
 
+		/// Util functions to convert a D3D locked box to a pixel box
+		void fromD3DLock(PixelBox &rval, const DXGI_MAPPED_RECT &lrect);
+
 		/// Render targets
 		typedef vector<RenderTexture*>::type SliceTRT;
 		SliceTRT mSliceTRT;

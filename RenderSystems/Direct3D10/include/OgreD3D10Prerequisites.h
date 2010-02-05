@@ -43,6 +43,8 @@ THE SOFTWARE.
 #if !defined(NOMINMAX) && defined(_MSC_VER)
 #	define NOMINMAX // required to stop windows.h messing up std::min
 #endif
+
+#include <d3d10_1.h>
 #include <d3d10.h>
 #include <d3dx10.h>
 #include <d3d10_1shader.h>

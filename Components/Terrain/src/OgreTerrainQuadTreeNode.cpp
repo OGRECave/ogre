@@ -67,6 +67,7 @@ namespace Ogre
 		, mNodeWithVertexData(0)
 		, mVertexDataRecord(0)
 		, mMovable(0)
+		, mLocalNode(0)
         , mRend(0)
 	{
 		if (terrain->getMaxBatchSize() < size)

@@ -167,6 +167,17 @@ vertex_program Ogre/HardwareSkinningFourWeights cg
    profiles vs_1_1 arbvp1
    includes_skeletal_animation true
 
+   default_params
+   {
+   		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto lightPos[0] light_position 0
+		param_named_auto lightPos[1] light_position 1
+		param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
+		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
+		param_named_auto ambient ambient_light_colour
+   }
+
 }
 // Basic hardware morph animation 
 vertex_program Ogre/HardwareMorphAnimation cg

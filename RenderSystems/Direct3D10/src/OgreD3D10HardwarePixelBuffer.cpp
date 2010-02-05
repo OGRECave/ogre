@@ -79,7 +79,7 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------------  
 	// Util functions to convert a D3D locked box to a pixel box
-	void fromD3DLock(PixelBox &rval, const DXGI_MAPPED_RECT &lrect)
+	void D3D10HardwarePixelBuffer::fromD3DLock(PixelBox &rval, const DXGI_MAPPED_RECT &lrect)
 	{
 		rval.rowPitch = lrect.Pitch / PixelUtil::getNumElemBytes(rval.format);
 		rval.slicePitch = rval.rowPitch * rval.getHeight();
