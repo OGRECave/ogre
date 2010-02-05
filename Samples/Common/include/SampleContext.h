@@ -75,16 +75,6 @@
 #    endif
 #  endif
 
-#  if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-#     undef OGRE_STATIC_CgProgramManager
-#     undef OGRE_STATIC_GL
-#     ifndef OGRE_STATIC_GLES
-#       define OGRE_STATIC_GLES 1
-#     endif
-#     ifdef __OBJC__
-#       import <UIKit/UIKit.h>
-#     endif
-#  endif
 #  include "OgreStaticPluginLoader.h"
 #endif
 
