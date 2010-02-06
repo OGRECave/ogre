@@ -33,8 +33,9 @@ THE SOFTWARE.
 #include "OgreRenderQueueListener.h"
 #include "OgreCompositorInstance.h"
 #include "OgreCompositor.h"
+#include "OgreViewport.h"
+
 namespace Ogre {
-    
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -43,9 +44,9 @@ namespace Ogre {
 	*/
 	/** Chain of compositor effects applying to one viewport.
      */
-    class _OgreExport CompositorChain: public RenderTargetListener, public CompositorInstAlloc
-    {
-    public:
+	class _OgreExport CompositorChain : public RenderTargetListener, public Viewport::Listener, public CompositorInstAlloc
+	{
+	public:
         CompositorChain(Viewport *vp);
         /** Another gcc warning here, which is no problem because RenderTargetListener is never used
             to delete an object.
@@ -68,7 +69,7 @@ namespace Ogre {
         @param scheme      Scheme to use (blank means default)
         */
 		CompositorInstance* addCompositor(CompositorPtr filter, size_t addPosition=LAST, const String& scheme = StringUtil::BLANK);
-    
+
         /** Remove a compositor.
         @param position    Position in filter chain of filter to remove; defaults to the end (last applied filter)
         */
@@ -93,7 +94,7 @@ namespace Ogre {
 		/** Get the original scene compositor instance for this chain (internal use). 
 		*/
 		CompositorInstance* _getOriginalSceneCompositor(void) { return mOriginalScene; }
-    
+
         /** Get an iterator over the compositor instances. The first compositor in this list is applied first, the last one is applied last.
         */
         InstanceIterator getCompositors();
@@ -104,7 +105,7 @@ namespace Ogre {
         @param position    Position in filter chain of filter
         */
         void setCompositorEnabled(size_t position, bool state);
-    
+
         /** @see RenderTargetListener::preRenderTargetUpdate */
 		virtual void preRenderTargetUpdate(const RenderTargetEvent& evt);
 		/** @see RenderTargetListener::postRenderTargetUpdate */
@@ -113,9 +114,14 @@ namespace Ogre {
         virtual void preViewportUpdate(const RenderTargetViewportEvent& evt);
         /** @see RenderTargetListener::postViewportUpdate */
         virtual void postViewportUpdate(const RenderTargetViewportEvent& evt);
-		/** @see RenderTargetListener::viewportRemoved */
-		virtual void viewportRemoved(const RenderTargetViewportEvent& evt);
-        
+
+		/** @see Viewport::Listener::viewportCameraChanged */
+		virtual void viewportCameraChanged(Viewport* viewport);
+		/** @see Viewport::Listener::viewportDimensionsChanged */
+		virtual void viewportDimensionsChanged(Viewport* viewport);
+		/** @see Viewport::Listener::viewportDestroyed */
+		virtual void viewportDestroyed(Viewport* viewport);
+
         /** Mark state as dirty, and to be recompiled next frame.
          */
         void _markDirty();
@@ -123,9 +129,6 @@ namespace Ogre {
         /** Get viewport that is the target of this chain
          */
         Viewport *getViewport();
-
-		/** Internal method for reconnecting with viewport */
-		void _notifyViewport(Viewport* vp);
 
 		/** Remove a compositor by pointer. This is internally used by CompositionTechnique to
 			"weak" remove any instanced of a deleted technique.
@@ -146,7 +149,7 @@ namespace Ogre {
 		*/
 		CompositorInstance* getNextInstance(CompositorInstance* curr, bool activeOnly = true);
 
-    protected:    
+	protected:
         /// Viewport affected by this CompositorChain
         Viewport *mViewport;
         
@@ -171,7 +174,6 @@ namespace Ogre {
 		typedef vector<CompositorInstance::RenderSystemOperation*>::type RenderSystemOperations;
 		RenderSystemOperations mRenderSystemOperations;
 
-        
 		/** Clear compiled state */
 		void clearCompiledState();
         
@@ -219,8 +221,8 @@ namespace Ogre {
 		uint32 mOldVisibilityMask;
 		/// Store old find visible objects
 		bool mOldFindVisibleObjects;
-        /// Store old camera LOD bias      
-        float mOldLodBias;     
+		/// Store old camera LOD bias
+		float mOldLodBias;
 		///	Store old viewport material scheme
 		String mOldMaterialScheme;
 		/// Store old shadows enabled flag

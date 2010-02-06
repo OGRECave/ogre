@@ -741,23 +741,31 @@ void CompositorInstance::createResources(bool forResizeOnly)
 		// We may be sharing / reusing this texture, so test before adding viewport
 		if (rendTarget->getNumViewports() == 0)
 		{
+			Viewport* v;
 			Camera* camera = mChain->getViewport()->getCamera();
+			if (!camera)
+			{
+				v = rendTarget->addViewport( camera );
+			}
+			else
+			{
+				// Save last viewport and current aspect ratio
+				Viewport* oldViewport = camera->getViewport();
+				Real aspectRatio = camera->getAspectRatio();
 
-			// Save last viewport and current aspect ratio
-			Viewport* oldViewport = camera->getViewport();
-			Real aspectRatio = camera->getAspectRatio();
+				v = rendTarget->addViewport( camera );
 
-			Viewport* v = rendTarget->addViewport( camera );
+				// Should restore aspect ratio, in case of auto aspect ratio
+				// enabled, it'll changed when add new viewport.
+				camera->setAspectRatio(aspectRatio);
+				// Should restore last viewport, i.e. never disturb user code
+				// which might based on that.
+				camera->_notifyViewport(oldViewport);
+			}
+
 			v->setClearEveryFrame( false );
 			v->setOverlaysEnabled( false );
 			v->setBackgroundColour( ColourValue( 0, 0, 0, 0 ) );
-
-			// Should restore aspect ratio, in case of auto aspect ratio
-			// enabled, it'll changed when add new viewport.
-			camera->setAspectRatio(aspectRatio);
-			// Should restore last viewport, i.e. never disturb user code
-			// which might based on that.
-			camera->_notifyViewport(oldViewport);
 		}
     }
 
@@ -1084,6 +1092,33 @@ void CompositorInstance::_fireNotifyResourcesCreated(bool forResizeOnly)
 	Listeners::iterator i, iend=mListeners.end();
 	for(i=mListeners.begin(); i!=iend; ++i)
 		(*i)->notifyResourcesCreated(forResizeOnly);
+}
+//-----------------------------------------------------------------------
+void CompositorInstance::notifyCameraChanged(Camera* camera)
+{
+	// update local texture's viewports.
+	LocalTextureMap::iterator localTexIter = mLocalTextures.begin();
+	LocalTextureMap::iterator localTexIterEnd = mLocalTextures.end();
+	while (localTexIter != localTexIterEnd)
+	{
+		RenderTexture* target = localTexIter->second->getBuffer()->getRenderTarget();
+		// skip target that has no viewport (this means texture is under MRT)
+		if (target->getNumViewports() == 1)
+		{
+			target->getViewport(0)->setCamera(camera);
+		}
+		++localTexIter;
+	}
+
+	// update MRT's viewports.
+	LocalMRTMap::iterator localMRTIter = mLocalMRTs.begin();
+	LocalMRTMap::iterator localMRTIterEnd = mLocalMRTs.end();
+	while (localMRTIter != localMRTIterEnd)
+	{
+		MultiRenderTarget* target = localMRTIter->second;
+		target->getViewport(0)->setCamera(camera);
+		++localMRTIter;
+	}
 }
 //-----------------------------------------------------------------------
 CompositorInstance::RenderSystemOperation::~RenderSystemOperation()

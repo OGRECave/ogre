@@ -55,7 +55,23 @@ namespace Ogre {
     */
 	class _OgreExport Viewport : public ViewportAlloc
     {
-    public:       
+    public:
+		/** Listener interface so you can be notified of Viewport changes. */
+		class _OgreExport Listener
+		{
+		public:
+			virtual ~Listener() {}
+
+			/** Notification of when a new camera is set to target listening Viewport. */
+			virtual void viewportCameraChanged(Viewport* viewport) {}
+
+			/** Notification of when target listening Viewport's dimensions changed. */
+			virtual void viewportDimensionsChanged(Viewport* viewport) {}
+
+			/** Notification of when target listening Viewport's is destroyed. */
+			virtual void viewportDestroyed(Viewport* viewport) {}
+		};
+
         /** The usual constructor.
             @param
                 cam Pointer to a camera to be the source for the image.
@@ -170,7 +186,7 @@ namespace Ogre {
         */
 
         int getActualHeight(void) const;
-               
+
         /** Sets the dimensions (after creation).
             @param
                 left
@@ -361,6 +377,11 @@ namespace Ogre {
         void pointOrientedToScreen(Real orientedX, Real orientedY, int orientationMode,
                                    Real &screenX, Real &screenY);
 
+		/// Add a listener to this camera
+		void addListener(Listener* l);
+		/// Remove a listener to this camera
+		void removeListener(Listener* l);
+
     protected:
         Camera* mCamera;
         RenderTarget* mTarget;
@@ -390,6 +411,9 @@ namespace Ogre {
 
 		/// Automatic rendering on/off
 		bool mIsAutoUpdated;
+
+		typedef vector<Listener*>::type ListenerList;
+		ListenerList mListeners;
     };
 	/** @} */
 	/** @} */
