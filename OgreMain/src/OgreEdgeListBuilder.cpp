@@ -456,11 +456,14 @@ namespace Ogre {
 
         // Calculate triangles which are using this vertex set
         const EdgeData::EdgeGroup& eg = edgeGroups[vertexSet];
-        OptimisedUtil::getImplementation()->calculateFaceNormals(
-            pVert,
-            &triangles[eg.triStart],
-            &triangleFaceNormals[eg.triStart],
-            eg.triCount);
+		if (eg.triCount != 0) 
+		{
+			OptimisedUtil::getImplementation()->calculateFaceNormals(
+				pVert,
+				&triangles[eg.triStart],
+				&triangleFaceNormals[eg.triStart],
+				eg.triCount);
+		}
 
         // unlock the buffer
         positionBuffer->unlock();
