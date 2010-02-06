@@ -547,6 +547,12 @@ namespace Ogre {
     {
 		ParticleAffectorList::iterator	itAff, itAffEnd;
 		Real timePoint = 0.0f;
+
+
+        // avoid any divide by zero conditions
+		if(!requested) 
+			return;
+
 		Real timeInc = timeElapsed / requested;
 
 		for (unsigned int j = 0; j < requested; ++j)
