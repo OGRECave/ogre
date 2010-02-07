@@ -357,3 +357,12 @@ function(ogre_config_tool TOOLNAME)
   endif ()	
 
 endfunction(ogre_config_tool)
+
+# Get component include dir (different when referencing SDK)
+function(ogre_add_component_include_dir COMPONENTNAME)
+	if (OGRE_SDK_BUILD)
+		include_directories("${OGRE_INCLUDE_DIR}/${COMPONENTNAME}")
+	else()
+		include_directories("${OGRE_SOURCE_DIR}/Components/${COMPONENTNAME}/include")	
+	endif()
+endfunction(ogre_add_component_include_dir)

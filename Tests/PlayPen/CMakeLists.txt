@@ -18,11 +18,10 @@ set(SOURCE_FILES
 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(
-	${OGRE_SOURCE_DIR}/Samples/Common/include 
-	${OGRE_SOURCE_DIR}/Components/Terrain/include
-	${OGRE_SOURCE_DIR}/Components/Paging/include
-	${OGRE_SOURCE_DIR}/Components/RTShaderSystem/include)
+include_directories(${OGRE_SOURCE_DIR}/Samples/Common/include)
+ogre_add_component_include_dir(Terrain)
+ogre_add_component_include_dir(Paging)
+ogre_add_component_include_dir(RTShaderSystem)
 
 add_library(PlayPen ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} )
 

@@ -83,9 +83,10 @@ if (OGRE_STATIC)
   endforeach(SAMPLE_HEADER_FULLPATH)
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${OGRE_SOURCE_DIR}/Components/Paging/include
-    ${OGRE_SOURCE_DIR}/Components/Terrain/include
 	${OGRE_BINARY_DIR}/Samples/include)
+	
+	ogre_add_component_include_dir(Paging)
+	ogre_add_component_include_dir(Terrain)
 else()
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
 endif()
