@@ -3,10 +3,9 @@
 set(HEADER_FILES include/Terrain.h)
 set(SOURCE_FILES src/Terrain.cpp)
 
-include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}/include
-	${OGRE_SOURCE_DIR}/Components/Terrain/include
-	${OGRE_SOURCE_DIR}/Components/Paging/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+ogre_add_component_include_dir(Terrain)
+ogre_add_component_include_dir(Paging)
 
 add_library(Sample_Terrain ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 

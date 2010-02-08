@@ -122,6 +122,11 @@ namespace Ogre
 		unsigned int				mVSyncInterval;		
 		bool						mUseNVPerfHUD;			// Use NV Perf HUD.
 
+		// Desired width / height after resizing
+		unsigned int mDesiredWidth;
+		unsigned int mDesiredHeight;
+
+
 		void updateWindowRect();
 	};
 }

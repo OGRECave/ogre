@@ -75,6 +75,10 @@ typedef std::map<std::string, OgreBites::SdkSample *> PluginMap;
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#   ifdef __OBJC__
+#       import <UIKit/UIKit.h>
+#   endif
+
 namespace OgreBites
 {
     class SampleBrowser;

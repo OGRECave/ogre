@@ -38,28 +38,12 @@ DeferredLightRenderOperation::DeferredLightRenderOperation(
 	mAmbientLight = new AmbientLight();
 	const MaterialPtr& mat = mAmbientLight->getMaterial();
 	mat->load();
-	for(unsigned short i=0; i<mat->getNumTechniques(); ++i)
-	{
-		Pass *pass = mat->getTechnique(i)->getPass(0);
-		pass->getTextureUnitState(0)->setTextureName(mTexName0);
-		pass->getTextureUnitState(1)->setTextureName(mTexName1);
-	}
 }
 //-----------------------------------------------------------------------
 DLight* DeferredLightRenderOperation::createDLight(Ogre::Light* light)
 {
 	DLight *rv = new DLight(mLightMaterialGenerator,light);
 	mLights[light] = rv;
-
-	const MaterialPtr& mat = rv->getMaterial();
-	mat->load();
-	for(unsigned short i=0; i<mat->getNumTechniques(); ++i)
-	{
-		Pass *pass = mat->getTechnique(i)->getPass(0);
-		pass->getTextureUnitState(0)->setTextureName(mTexName0);
-		pass->getTextureUnitState(1)->setTextureName(mTexName1);
-	}
-	mat->compile();
 	return rv;
 }
 //-----------------------------------------------------------------------

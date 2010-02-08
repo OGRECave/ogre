@@ -211,14 +211,18 @@ namespace Ogre
 			GetMonitorInfo(hMonitor, &monitorInfo);
 
 
+			unsigned int winWidth, winHeight;
+			winWidth = width;
+			winHeight = height;
+			if (!fullScreen)
+				adjustWindow(width, height, &winWidth, &winHeight);
+
+
 			// No specified top left -> Center the window in the middle of the monitor
 			if (left == INT_MAX || top == INT_MAX)
 			{				
 				int screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
 				int screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
-
-				unsigned int winWidth, winHeight;
-				adjustWindow(width, height, &winWidth, &winHeight);
 
 				// clamp window dimensions to screen size
 				int outerw = (winWidth < screenw)? winWidth : screenw;
@@ -240,14 +244,10 @@ namespace Ogre
 				top += monitorInfo.rcWork.top;
 			}
 
-			mWidth = width;
-			mHeight = height;
+			mWidth = mDesiredWidth = width;
+			mHeight = mDesiredHeight = height;
 			mTop = top;
 			mLeft = left;
-
-			unsigned int winWidth, winHeight;
-			winWidth = mWidth;
-			winHeight = mHeight;
 
 			if (fullScreen)
 			{
@@ -354,6 +354,8 @@ namespace Ogre
 
 			bool oldFullscreen = mIsFullScreen;
 			mIsFullScreen = fullScreen;
+			mWidth = mDesiredWidth = width;
+			mHeight = mDesiredHeight = height;
 
 			if (fullScreen)
 			{
@@ -371,8 +373,6 @@ namespace Ogre
 
 				mTop = monitorInfo.rcMonitor.top;
 				mLeft = monitorInfo.rcMonitor.left;				
-				mWidth = width;
-				mHeight = height;
 				
 				// need different ordering here
 
@@ -394,11 +394,9 @@ namespace Ogre
 				dwStyle |= WS_OVERLAPPEDWINDOW;
 				// Calculate window dimensions required
 				// to get the requested client area
-				unsigned int winWidth, winHeight;
-				adjustWindow(width, height, &winWidth, &winHeight);
 
 				SetWindowLong(mHWnd, GWL_STYLE, dwStyle);
-				SetWindowPos(mHWnd, HWND_NOTOPMOST, 0, 0, winWidth, winHeight,
+				SetWindowPos(mHWnd, HWND_NOTOPMOST, 0, 0, mWidth, mHeight,
 					SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOACTIVATE);
 				// Note that we also set the position in the restoreLostDevice method
 				// via _finishSwitchingFullScreen
@@ -455,8 +453,18 @@ namespace Ogre
 		}
 		else
 		{
+			bool updateRect = false;
+
 			// When switching back to windowed mode, need to reset window size 
 			// after device has been restored
+			// We may have had a resize event which polluted our desired sizes
+			if (mWidth != mDesiredWidth ||
+				mHeight != mDesiredHeight)
+			{
+				mWidth = mDesiredWidth;
+				mHeight = mDesiredHeight;
+				updateRect = true;
+			}
 			unsigned int winWidth, winHeight;
 			adjustWindow(mWidth, mHeight, &winWidth, &winHeight);
 
@@ -477,6 +485,13 @@ namespace Ogre
 			SetWindowPos(mHWnd, HWND_NOTOPMOST, left, top, winWidth, winHeight,
 				SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOACTIVATE);
 
+			if (updateRect)
+			{
+				// Notify viewports of resize
+				ViewportList::iterator it = mViewportList.begin();
+				while( it != mViewportList.end() )
+					(*it++).second->_updateDimensions();			
+			}
 		}
 		mSwitchingFullscreen = false;
 	}
@@ -760,8 +775,12 @@ namespace Ogre
 		if (mDeviceValid)
 		{
 			// Finish window / fullscreen mode switch.
-			if (_getSwitchingFullscreen())		
+			if (_getSwitchingFullscreen())
+			{
 				_finishSwitchingFullscreen();		
+				// have to re-validate since this may have altered dimensions
+				mDeviceValid = mDevice->validate(this);
+			}
 		}
 
 		RenderWindow::_beginUpdate();

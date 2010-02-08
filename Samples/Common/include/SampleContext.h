@@ -53,28 +53,30 @@
 #      define OGRE_STATIC_Direct3D11
 #    endif
 #  endif
+
+#  ifdef OGRE_BUILD_PLUGIN_BSP
 #  define OGRE_STATIC_BSPSceneManager
+#  endif
+#  ifdef OGRE_BUILD_PLUGIN_PFX
 #  define OGRE_STATIC_ParticleFX
+#  endif
+#  ifdef OGRE_BUILD_PLUGIN_CG
 #  define OGRE_STATIC_CgProgramManager
+#  endif
+
 #  ifdef OGRE_USE_PCZ
+#    ifdef OGRE_BUILD_PLUGIN_PCZ
 #    define OGRE_STATIC_PCZSceneManager
 #    define OGRE_STATIC_OctreeZone
+#    endif
 #  else
+#    ifdef OGRE_BUILD_PLUGIN_OCTREE
 #    define OGRE_STATIC_OctreeSceneManager
 #  endif
-#  if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-#     undef OGRE_STATIC_CgProgramManager
-#     undef OGRE_STATIC_GL
-#     ifndef OGRE_STATIC_GLES
-#       define OGRE_STATIC_GLES 1
 #     endif
 // Comment out the previous line and uncomment these next two lines to try out the GL ES 2 RenderSystem
 //#     undef OGRE_STATIC_GLES
 //#     define OGRE_STATIC_GLES2 1
-#     ifdef __OBJC__
-#       import <UIKit/UIKit.h>
-#     endif
-#  endif
 #  include "OgreStaticPluginLoader.h"
 #endif
 

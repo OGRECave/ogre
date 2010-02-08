@@ -60,13 +60,14 @@ void DLight::setAttenuation(float c, float b, float a)
 		if (mParentLight->getType() == Light::LT_POINT)
 		{
 			//// Calculate radius from Attenuation
-			int threshold_level = 15;// difference of 10-15 levels deemed unnoticeable
+			int threshold_level = 10;// difference of 10-15 levels deemed unnoticeable
 			float threshold = 1.0f/((float)threshold_level/256.0f); 
 
 			//// Use quadratic formula to determine outer radius
 			c = c-threshold;
 			float d=sqrt(b*b-4*a*c);
 			outerRadius = (-2*c)/(b+d);
+			outerRadius *= 1.2;
 		}
 	}
 	else
@@ -248,7 +249,8 @@ bool DLight::isCameraInsideLight(Ogre::Camera* camera)
 		{
 		Ogre::Real distanceFromLight = camera->getDerivedPosition()
 			.distance(mParentLight->getDerivedPosition());
-		return distanceFromLight <= mRadius;
+		//Small epsilon fix to account for near clip range and the fact that we aren't a true sphere.
+		return distanceFromLight <= mRadius + camera->getNearClipDistance() + 0.1; 
 		}
 	case Ogre::Light::LT_SPOTLIGHT:
 		{
@@ -276,7 +278,12 @@ bool DLight::getCastChadows() const
 void DLight::updateFromCamera(Ogre::Camera* camera)
 {
 	//Set shader params
-	Ogre::Technique* tech = getMaterial()->getBestTechnique();
+	const Ogre::MaterialPtr& mat = getMaterial();
+	if (!mat->isLoaded()) 
+	{
+		mat->load();
+	}
+	Ogre::Technique* tech = mat->getBestTechnique();
 	Ogre::Vector3 farCorner = camera->getViewMatrix(true) * camera->getWorldSpaceCorners()[4];
 
 	for (unsigned short i=0; i<tech->getNumPasses(); i++) 

@@ -567,6 +567,14 @@ namespace Ogre
             _setSrcAttributes(texDesc.Width, texDesc.Height, 1, D3D9Mappings::_getPF(texDesc.Format));
             _setFinalAttributes(d3d9Device, textureResources, 
 				texDesc.Width, texDesc.Height, 1,  D3D9Mappings::_getPF(texDesc.Format));
+
+			if( mHwGamma )
+			{
+				mHwGammaReadSupported = _canUseHardwareGammaCorrection( d3d9Device, texDesc.Usage,
+																		D3DRTYPE_CUBETEXTURE,
+																		texDesc.Format, false);
+			}
+
 			mInternalResourcesCreated = true;
         }
         else
@@ -678,6 +686,14 @@ namespace Ogre
 			_setSrcAttributes(texDesc.Width, texDesc.Height, texDesc.Depth, D3D9Mappings::_getPF(texDesc.Format));
 			_setFinalAttributes(d3d9Device, textureResources, 
 				texDesc.Width, texDesc.Height, texDesc.Depth, D3D9Mappings::_getPF(texDesc.Format));
+
+			if( mHwGamma )
+			{
+				mHwGammaReadSupported = _canUseHardwareGammaCorrection( d3d9Device, texDesc.Usage,
+																		D3DRTYPE_VOLUMETEXTURE,
+																		texDesc.Format, false);
+			}
+
 			mInternalResourcesCreated = true;
         }
 		else
@@ -814,6 +830,13 @@ namespace Ogre
 			_setSrcAttributes(texDesc.Width, texDesc.Height, 1, D3D9Mappings::_getPF(texDesc.Format));
 			_setFinalAttributes(d3d9Device, textureResources, 
 				texDesc.Width, texDesc.Height, 1, D3D9Mappings::_getPF(texDesc.Format));
+
+			if( mHwGamma )
+			{
+				mHwGammaReadSupported = _canUseHardwareGammaCorrection( d3d9Device, texDesc.Usage,
+																		D3DRTYPE_TEXTURE,
+																		texDesc.Format, false);
+			}
 			mInternalResourcesCreated = true;
         }
 		else

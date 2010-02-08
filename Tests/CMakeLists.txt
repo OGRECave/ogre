@@ -49,8 +49,8 @@ if (OGRE_BUILD_TESTS)
 	endif ()
 
 	if (OGRE_BUILD_COMPONENT_PAGING)
-	  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Paging/include
-	    ${OGRE_SOURCE_DIR}/Components/Paging/include)
+	  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Paging/include)
+	  ogre_add_component_include_dir(Paging)
 	  
 	  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgrePaging)
 	  set(HEADER_FILES ${HEADER_FILES}
@@ -61,8 +61,8 @@ if (OGRE_BUILD_TESTS)
 	  )
 	endif ()
 	if (OGRE_BUILD_COMPONENT_TERRAIN)
-	  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Terrain/include
-	    ${OGRE_SOURCE_DIR}/Components/Terrain/include)
+	  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Terrain/include)
+	  ogre_add_component_include_dir(Terrain)
 	  
 	  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreTerrain)
 	  set(HEADER_FILES ${HEADER_FILES}
