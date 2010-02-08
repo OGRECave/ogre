@@ -98,9 +98,10 @@ protected:
 		mTrayMgr->showCursor();
 
 		// create checkboxs to toggle ssao and shadows
+		mTrayMgr->createCheckBox(TL_TOPLEFT, "DeferredShading", "Deferred Shading", 220)->setChecked(true, false);
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "SSAO", "Ambient Occlusion", 220)->setChecked(false, false);
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "GlobalLight", "Global Light", 220)->setChecked(true, false);
-		//mTrayMgr->createCheckBox(TL_TOPLEFT, "Shadows", "Shadows")->setChecked(true, false);
+		mTrayMgr->createCheckBox(TL_TOPLEFT, "Shadows", "Shadows", 220)->setChecked(true, false);
 		
 		// create a menu to choose the model displayed
 		mDisplayModeMenu = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "DisplayMode", "Display Mode", 220, 4);
@@ -128,12 +129,16 @@ protected:
 			SharedData::getSingleton().iGlobalActivate = box->isChecked();
 			SharedData::getSingleton().iMainLight->setVisible(box->isChecked());
 		}
-		//else if (box->getName() == "Shadows")
-		//{
-		//	mSceneMgr->setShadowTechnique(box->isChecked() ? 
-		//		SHADOWTYPE_TEXTURE_ADDITIVE :
-		//		SHADOWTYPE_NONE);
-		//}
+		else if (box->getName() == "Shadows")
+		{
+			mSceneMgr->setShadowTechnique(box->isChecked() ? 
+				SHADOWTYPE_TEXTURE_ADDITIVE :
+				SHADOWTYPE_NONE);
+		}
+		else if (box->getName() == "DeferredShading")
+		{
+			SharedData::getSingleton().iSystem->setActive(box->isChecked());
+		}
 	}
 
     //Utility function to help set scene up
@@ -327,7 +332,7 @@ protected:
 		// Create light nodes
 		vector<Node*>::type nodes;
 
-        Vector4 attParams = Vector4(3,1,0,5);
+        Vector4 attParams = Vector4(4,1,0,7);
         Real lightRadius = 25;
 
 		Light *a = mSceneMgr->createLight();

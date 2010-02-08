@@ -23,11 +23,13 @@ material DeferredShading/AmbientLight
 			
 			texture_unit
 			{
+				content_type compositor DeferredShading/GBuffer mrt_output 0
 				tex_address_mode clamp
 				filtering none
 			}
 			texture_unit
 			{
+				content_type compositor DeferredShading/GBuffer mrt_output 1
 				tex_address_mode clamp
 				filtering none
 			}
@@ -35,6 +37,8 @@ material DeferredShading/AmbientLight
 	}
 }
 
+//These materials don't need content_type compositor, as they get their textures from the compositor that uses them
+//In a full screen quad
 material DeferredShading/Post/ShowNormal
 {
     technique
