@@ -288,7 +288,9 @@ function(ogre_config_sample_common SAMPLENAME)
     # disable "lib" prefix on Unix
     set_target_properties(${SAMPLENAME} PROPERTIES PREFIX "")
   endif (CMAKE_COMPILER_IS_GNUCXX)	
-  ogre_install_target(${SAMPLENAME} ${OGRE_SAMPLE_PATH} FALSE)
+  if (OGRE_INSTALL_SAMPLES)
+	ogre_install_target(${SAMPLENAME} ${OGRE_SAMPLE_PATH} FALSE)
+  endif()
   
 endfunction(ogre_config_sample_common)
 
