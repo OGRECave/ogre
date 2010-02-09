@@ -16,7 +16,6 @@ SamplePlugin=Sample_Instancing
 SamplePlugin=Sample_Isosurf
 SamplePlugin=Sample_Lighting
 SamplePlugin=Sample_Ocean
-SamplePlugin=Sample_Paging
 SamplePlugin=Sample_ParticleGS
 SamplePlugin=Sample_ParticleFX
 SamplePlugin=Sample_ShaderSystem
