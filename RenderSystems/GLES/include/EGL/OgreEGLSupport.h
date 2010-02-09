@@ -76,8 +76,8 @@ namespace Ogre {
             virtual String getDisplayName (void);
 	    EGLDisplay getGLDisplay(void);
 			void setGLDisplay(EGLDisplay val);
-			EGLConfig* chooseGLConfig(const GLint *attribList, GLint *nElements);
-            EGLBoolean getGLConfigAttrib(EGLConfig fbConfig, GLint attribute, GLint *value);
+			EGLConfig* chooseGLConfig(const EGLint *attribList, EGLint *nElements);
+            EGLBoolean getGLConfigAttrib(EGLConfig fbConfig, EGLint attribute, EGLint *value);
             void* getProcAddress(const Ogre::String& name);
             ::EGLContext createNewContext(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLContext shareList) const;
 
@@ -93,7 +93,7 @@ namespace Ogre {
             ::EGLConfig getGLConfigFromContext(::EGLContext context);
             ::EGLConfig getGLConfigFromDrawable(::EGLSurface drawable,
                                                 unsigned int *w, unsigned int *h);
-			::EGLConfig selectGLConfig (const int* minAttribs, const int *maxAttribs);
+			::EGLConfig selectGLConfig (const EGLint* minAttribs, const EGLint *maxAttribs);
             void switchMode(void);
 			virtual void switchMode(uint& width, uint& height, short& frequency) = 0;
             virtual GLESPBuffer* createPBuffer(PixelComponentType format,

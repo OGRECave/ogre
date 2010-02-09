@@ -349,14 +349,14 @@ namespace Ogre {
 
 		if (!mEglConfig)
 		{
-			int minAttribs[] = {
+			EGLint minAttribs[] = {
 				EGL_LEVEL, 0,
 				EGL_DEPTH_SIZE, 16,
 				EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
 				EGL_NONE
 			};
 
-			int maxAttribs[] = {
+			EGLint maxAttribs[] = {
 				EGL_SAMPLES, samples,
 				EGL_STENCIL_SIZE, INT_MAX,
 				EGL_NONE
@@ -388,7 +388,7 @@ namespace Ogre {
 		::EGLSurface oldDrawableRead = eglGetCurrentSurface(EGL_READ);
 		::EGLContext oldContext  = eglGetCurrentContext();
 
-		int glConfigID;
+		EGLint glConfigID;
 
 		mGLSupport->getGLConfigAttrib(mEglConfig, EGL_CONFIG_ID, &glConfigID);
 		LogManager::getSingleton().logMessage("EGLWindow::create used FBConfigID = " + StringConverter::toString(glConfigID));

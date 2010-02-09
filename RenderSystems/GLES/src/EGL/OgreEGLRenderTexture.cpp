@@ -93,13 +93,13 @@ namespace Ogre {
                         "EGLRenderTexture::initEGLPBuffer");
         }
 
-        int minAttribs[] = {
+        EGLint minAttribs[] = {
             EGL_SURFACE_TYPE, EGL_WINDOW_BIT | EGL_PBUFFER_BIT,
             EGL_DEPTH_SIZE, 16,
             EGL_NONE
         };
 
-        int maxAttribs[] = {
+        EGLint maxAttribs[] = {
             EGL_RED_SIZE, bits,
             EGL_GREEN_SIZE, bits,
             EGL_BLUE_SIZE, bits,
@@ -108,7 +108,7 @@ namespace Ogre {
             EGL_NONE
         };
 
-        int pBufferAttribs[] = {
+        EGLint pBufferAttribs[] = {
 			// First we specify the width of the surface...
             EGL_WIDTH, mWidth,
 			// ...then the height of the surface...
@@ -136,8 +136,8 @@ namespace Ogre {
                         "Unable to create Pbuffer",
                         "EGLPBuffer::EGLPBuffer");
         }
-        GLint glConfigID;
-        GLint iWidth, iHeight;
+        EGLint glConfigID;
+        EGLint iWidth, iHeight;
 
         eglGetConfigAttrib(mGlDisplay, glConfig, EGL_CONFIG_ID, &glConfigID);
         EGL_CHECK_ERROR;
