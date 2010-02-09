@@ -18,6 +18,13 @@ cmake_policy(SET CMP0003 NEW)
 # Just debug / release since that's all that's included in SDK
 set (CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 
+# Use relative paths
+# Note that up to CMake 2.8.0 on MSVC the .pdbs are still referenced absolutely
+# This has been fixed with a patch so I expect that in future we will be able to use this
+# to pre-generate the sample projects for the SDK. 
+set(CMAKE_USE_RELATIVE_PATHS true)
+set(CMAKE_SUPPRESS_REGENERATION true)
+
 project(OGRE)
 
 # Find actual Ogre root
