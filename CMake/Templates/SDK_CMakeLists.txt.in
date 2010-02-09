@@ -42,11 +42,11 @@ endif ()
 
 # Include necessary submodules
 set(OGRE_SDK_BUILD TRUE)
+set(OGRE_LIB_TYPE @OGRE_LIB_TYPE@)
+set(OGRE_STATIC @OGRE_STATIC@)
 include(OgreConfigTargets)
 set(CMAKE_PREFIX_PATH "${OGRE_ROOT_DIR}")
 set(OGRE_INSTALL_SAMPLES TRUE)
-
-set(OGRE_STATIC OFF)
 
 
 #####################################################################
@@ -80,6 +80,10 @@ include_directories(
 if (OGRE_RTShaderSystem_FOUND)
 	add_definitions(-DUSE_RTSHADER_SYSTEM)
 	ogre_add_component_include_dir(RTShaderSystem)
+	if (NOT OGRE_STATIC)
+		# Link to RT Shader System if enabled.
+  		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_RTShaderSystem_LIBRARIES})
+	endif () 
 endif()
 
 
