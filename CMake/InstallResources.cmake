@@ -88,7 +88,7 @@ configure_file(${OGRE_TEMPLATES_DIR}/samples_d.cfg.in ${OGRE_BINARY_DIR}/inst/bi
 configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg)
 
 # install resource files
-if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_TOOLS)
+if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE OR OGRE_INSTALL_TOOLS)
   install(FILES 
     ${OGRE_BINARY_DIR}/inst/bin/debug/resources.cfg
     ${OGRE_BINARY_DIR}/inst/bin/debug/plugins.cfg
@@ -111,7 +111,7 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_TOOLS)
 	DESTINATION "bin${OGRE_MINSIZE_PATH}" CONFIGURATIONS MinSizeRel
   )
 endif ()
-if (OGRE_INSTALL_SAMPLES)
+if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
   install(FILES 
 	${OGRE_BINARY_DIR}/inst/bin/debug/samples.cfg
     ${OGRE_BINARY_DIR}/inst/bin/debug/media.cfg
