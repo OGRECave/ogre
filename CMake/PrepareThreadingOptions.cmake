@@ -56,6 +56,7 @@ endif ()
 # sanitise threading choices
 if (NOT OGRE_CONFIG_THREADS)
 	set(OGRE_CONFIG_THREAD_PROVIDER "none")
+	include_directories(${OGRE_SOURCE_DIR}/OgreMain/include/Threading)
 else ()
 	if (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "boost")
 		if (NOT Boost_THREADING)
