@@ -54,6 +54,10 @@ set(OGRE_STATIC @OGRE_STATIC@)
 include(OgreConfigTargets)
 set(CMAKE_PREFIX_PATH "${OGRE_ROOT_DIR}")
 set(OGRE_INSTALL_SAMPLES TRUE)
+if (NOT APPLE)
+  # Create debug libraries with _d postfix
+  set(CMAKE_DEBUG_POSTFIX "_d")
+endif ()
 
 
 #####################################################################
