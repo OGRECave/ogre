@@ -42,6 +42,7 @@ namespace Ogre
 		, mAlignment(align)
 		, mTerrainSize(terrainSize)
 		, mTerrainWorldSize(terrainWorldSize)
+		, mOrigin(Vector3::ZERO)
 		, mFilenamePrefix("terrain")
 		, mFilenameExtension("dat")
 		, mResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
