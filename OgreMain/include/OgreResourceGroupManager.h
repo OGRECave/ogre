@@ -257,8 +257,6 @@ namespace Ogre {
 		static String DEFAULT_RESOURCE_GROUP_NAME;
         /// Internal resource group name (should be used by OGRE internal only)
         static String INTERNAL_RESOURCE_GROUP_NAME;
-		/// Bootstrap resource group name (min OGRE resources)
-		static String BOOTSTRAP_RESOURCE_GROUP_NAME;
 		/// Special resource group name which causes resource group to be automatically determined based on searching for the resource in all groups.
 		static String AUTODETECT_RESOURCE_GROUP_NAME;
 		/// The number of reference counts held per resource by the resource system
