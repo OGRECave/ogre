@@ -25,6 +25,16 @@
  THE SOFTWARE.
  -----------------------------------------------------------------------------
  */
+#if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN 
+#	ifdef __GCCE__
+#		include <staticlibinit_gcce.h>
+#	endif
+
+#	include <e32base.h> // for Symbian classes.
+#	include <coemain.h> // for CCoeEnv.
+
+#endif 
+
 #include "SampleBrowser.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -46,6 +56,23 @@ int main(int argc, char *argv[])
 	[pool release];
 	return retVal;
 #else
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN    
+    __UHEAP_MARK; 
+
+    // Create the control environment.
+    CCoeEnv* environment = new (ELeave) CCoeEnv();    
+    
+    TRAPD( err, environment->ConstructL( ETrue, 0 ) );
+    
+    if( err != KErrNone )
+    {
+        printf( "Unable to create a CCoeEnv!\n" );
+        getchar();            
+    }
+
+#endif
+
 	try
 	{
 		OgreBites::SampleBrowser sb;
@@ -58,7 +85,23 @@ int main(int argc, char *argv[])
 #else
 		std::cerr << "An exception has occurred: " << e.getFullDescription().c_str() << std::endl;
 #endif
+#if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
+        getchar();
+#endif
+
 	}
+#if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN    
+    // Close the stdout & stdin, else printf / getchar causes a memory leak.
+    fclose( stdout );
+    fclose( stdin );
+    
+    // Cleanup
+    CCoeEnv::Static()->DestroyEnvironment();
+    delete CCoeEnv::Static();
+       
+    __UHEAP_MARKEND;
+#endif
+
 #endif
 	return 0;
 }
