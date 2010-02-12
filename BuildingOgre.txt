@@ -41,7 +41,8 @@ Linux distributions usually offer packages for each dependency. On Ubuntu
 Karmic, the following command will install all of the dependencies:
 > sudo apt-get install libfreetype6-dev libboost-date-time-dev \
 >   libboost-thread-dev nvidia-cg-toolkit libfreeimage-dev \
->   zlib1g-dev libzzip-dev libois-dev libcppunit-dev doxygen
+>   zlib1g-dev libzzip-dev libois-dev libcppunit-dev doxygen \
+>   libxt-dev libxaw7-dev libxxf86vm-dev libxrandr-dev libglu-dev
 If you cannot obtain prebuilt binaries of a dependency for your platform,
 please refer to the list below and get a source package from the website,
 then build it according to its documentation.
