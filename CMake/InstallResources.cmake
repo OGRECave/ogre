@@ -25,8 +25,8 @@ elseif (UNIX)
   set(OGRE_MEDIA_DIR_DBG "../../${OGRE_MEDIA_PATH}")
   set(OGRE_PLUGIN_DIR_REL "../lib/OGRE")
   set(OGRE_PLUGIN_DIR_DBG "../../lib/OGRE")
-  set(OGRE_SAMPLES_DIR_REL "../lib/OGRE")
-  set(OGRE_SAMPLES_DIR_DBG "../lib/OGRE")
+  set(OGRE_SAMPLES_DIR_REL "../lib/OGRE/Samples")
+  set(OGRE_SAMPLES_DIR_DBG "../../lib/OGRE/Samples")
 endif ()
 
 # configure plugins.cfg
