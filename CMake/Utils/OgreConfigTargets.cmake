@@ -191,25 +191,7 @@ function(ogre_config_lib LIBNAME EXPORT)
 endfunction(ogre_config_lib)
 
 function(ogre_config_component LIBNAME)
-  ogre_config_common(${LIBNAME})
-  ogre_install_target(${LIBNAME} "" TRUE)
-  
-  if (MINGW)
-	# remove lib prefix from DLL outputs
-	set_target_properties(${LIBNAME} PROPERTIES PREFIX "")
-  endif ()
-
-  if (OGRE_INSTALL_PDB)
-    # install debug pdb files
-    install(FILES ${OGRE_BINARY_DIR}/lib${OGRE_DEBUG_PATH}/${LIBNAME}_d.pdb
-	  DESTINATION bin${OGRE_DEBUG_PATH}
-	  CONFIGURATIONS Debug
-	)
-	install(FILES ${OGRE_BINARY_DIR}/lib${OGRE_RELWDBG_PATH}/${LIBNAME}.pdb
-	  DESTINATION bin${OGRE_RELWDBG_PATH}
-	  CONFIGURATIONS RelWithDebInfo
-	)
-  endif ()
+  ogre_config_lib(${LIBNAME} FALSE)
 endfunction(ogre_config_component)
 
 
@@ -296,7 +278,7 @@ endfunction(ogre_config_sample_common)
 
 function(ogre_config_sample_exe SAMPLENAME)
   ogre_config_sample_common(${SAMPLENAME})
-  if (OGRE_INSTALL_PDB)
+  if (OGRE_INSTALL_PDB AND OGRE_INSTALL_SAMPLES)
 	  # install debug pdb files - no _d on exe
 	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}.pdb
 		  DESTINATION bin${OGRE_DEBUG_PATH}
@@ -311,7 +293,7 @@ endfunction(ogre_config_sample_exe)
 
 function(ogre_config_sample_lib SAMPLENAME)
   ogre_config_sample_common(${SAMPLENAME})
-  if (OGRE_INSTALL_PDB)
+  if (OGRE_INSTALL_PDB AND OGRE_INSTALL_SAMPLES)
 	  # install debug pdb files - with a _d on lib
 	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}_d.pdb
 		  DESTINATION bin${OGRE_DEBUG_PATH}
