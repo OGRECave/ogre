@@ -1,9 +1,24 @@
-Things you need on your path to build the SDK:
+Instructions for building the Win32 SDK
+---------------------------------------
 
-- CMake
-- MSVC (run vcvars32.bat from the version of your choice)
+System Path
+-----------
+You need the following available on your system path:
+- CMake 2.8+
+- MSVC (run vcvars32.bat from the version of your choice in your command prompt)
+- Doxygen
 
-Then run buildsdk.bat with one of the following parameters to pick the compiler of your choice:
+Environment
+-----------
+
+The following environment variables must be defined:
+- BOOST_ROOT must point to a place where boost::thread and boost::datetime are available & built
+- DXSDK_DIR must point to your DirectX SDK of choice (the DirectX SDK installer usually does this for you, but bear in mind it will point to the latest)
+
+Building the SDK
+----------------
+
+Run buildsdk.bat with one of the following parameters to pick the compiler of your choice:
  - vc71
  - vc8
  - vc8x64
@@ -11,3 +26,8 @@ Then run buildsdk.bat with one of the following parameters to pick the compiler 
  - vc9x64
  - vc10
  - vc10x64
+ 
+Packaging the SDK
+-----------------
+
+Zip up the contents of %compiler%/sdk. 
