@@ -430,7 +430,7 @@ namespace Ogre
 			if (Math::RealEqual(inc.x, 0.0f) && Math::RealEqual(inc.z, 0.0f))
 				keepSearching = false;
 
-			while (!slot && keepSearching)
+            while ( (!slot || !slot->instance) && keepSearching)
 			{
 				++numGaps;
 				/// if we don't find any filled slot in 6 traversals, give up

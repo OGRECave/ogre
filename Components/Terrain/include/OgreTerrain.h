@@ -954,11 +954,22 @@ namespace Ogre
 		@param textureNames A list of textures to assign to the samplers in this
 			layer. Leave blank to provide these later. 
 		*/
-		void addLayer(uint index, Real worldSize = 0, const StringVector* textureNames = 0);
+		void addLayer(uint8 index, Real worldSize = 0, const StringVector* textureNames = 0);
 
 		/** Remove a layer from the terrain.
 		*/
 		void removeLayer(uint8 index);
+
+		/** Replace an existing terrain layer, optionally preserving all other layer blend maps
+		@param index The 0 based index of the terrain layer to replace
+		@param keepBlends True to keep using the existing blend maps.  False to reset the blend map for the layer.
+		Irrelevant if index == 0
+		@param worldSize The size of the texture in this layer in world units. Default
+		to zero to use the default
+		@param textureNames A list of textures to assign to the samplers in this
+			layer. Leave blank to provide these later. 
+		*/
+        void replaceLayer(uint8 index, bool keepBlends, Real worldSize = 0, const StringVector* textureNames = 0);
 
 		/** Get the maximum number of layers supported with the current options. 
 		@note When you change the options requested, this value can change. 
@@ -1594,6 +1605,17 @@ namespace Ogre
 		void calculateCurrentLod(Viewport* vp);
 		/// Test a single quad of the terrain for ray intersection.
 		std::pair<bool, Vector3> checkQuadIntersection(int x, int y, const Ray& ray); //const;
+
+        /// Delete blend maps for all layers >= lowIndex
+        void deleteBlendMaps(uint8 lowIndex);
+        /// Shift/slide all GPU blend texture channels > index up one slot.  Blend data may shift into the next texture
+        void shiftUpGPUBlendChannels(uint8 index);
+        /// Shift/slide all GPU blend texture channels > index down one slot.  Blend data may shift into the previous texture
+        void shiftDownGPUBlendChannels(uint8 index);
+        /// Copy a GPU blend channel from one source to another.  Source and Dest are not required to be in the same texture
+        void copyBlendTextureChannel(uint8 srcIndex, uint8 srcChannel, uint8 destIndex, uint8 destChannel );
+        /// Reset a blend channel back to full black
+	    void clearGPUBlendChannel(uint8 index, uint channel);
 
 		void copyGlobalOptions();
 		void checkLayers(bool includeGPUResources);
