@@ -27,6 +27,8 @@ Run buildsdk.bat with one of the following parameters to pick the compiler of yo
  - vc10
  - vc10x64
  
+You can also add "clean" to the parameters to delete any existing build folder (or do it manually).
+ 
 Packaging the SDK
 -----------------
 

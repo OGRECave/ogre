@@ -15,7 +15,7 @@ if %GENERATOR% == "" goto paramErr
 
 set BUILD_DIR=%1
 
-rmdir /Q/S %BUILD_DIR%
+if "%2" == "clean" rmdir /Q/S %BUILD_DIR%
 mkdir %BUILD_DIR%
 pushd %BUILD_DIR%
 rem call CMake
@@ -32,8 +32,8 @@ goto detecteddevenv
 set DEVENV=VCExpress
 :detecteddevenv
 
-%DEVENV% OGRE.sln /build "Debug|Win32"
-%DEVENV% OGRE.sln /build "Release|Win32"
+%DEVENV% OGRE.sln /build "Debug" /project "INSTALL"
+%DEVENV% OGRE.sln /build "Release" /project "INSTALL"
 
 rem TODO - go into sdk directory, call CMake again, then zip it up
 
