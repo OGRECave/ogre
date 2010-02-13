@@ -1,10 +1,13 @@
 Things you need on your path to build the SDK:
 
-- Nullsoft Installer
-- Doxygen
-- HTML Help Compiler
+- CMake
+- MSVC (run vcvars32.bat from the version of your choice)
 
-Files you need:
-
-- A complete clean build of all the OGRE libraries and samples
-- chiropteraDM.pk3 and chiropteraDM.txt, in Samples/Media/packs
+Then run buildsdk.bat with one of the following parameters to pick the compiler of your choice:
+ - vc71
+ - vc8
+ - vc8x64
+ - vc9
+ - vc9x64
+ - vc10
+ - vc10x64
