@@ -25,6 +25,7 @@
  THE SOFTWARE.
  -----------------------------------------------------------------------------
  */
+#include "OgrePlatform.h"
 #if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN 
 #	ifdef __GCCE__
 #		include <staticlibinit_gcce.h>
