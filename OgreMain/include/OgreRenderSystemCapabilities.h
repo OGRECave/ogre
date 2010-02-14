@@ -220,9 +220,10 @@ namespace Ogre
 		GPU_SIS = 7,
         GPU_IMAGINATION_TECHNOLOGIES = 8,
         GPU_APPLE = 9,  // Apple Software Renderer
+        GPU_NOKIA = 10,
 
 		/// placeholder
-		GPU_VENDOR_COUNT = 10
+		GPU_VENDOR_COUNT = 11
 	};
 
 	/** singleton class for storing the capabilities of the graphics card. 
