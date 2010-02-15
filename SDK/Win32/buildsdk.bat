@@ -49,7 +49,7 @@ dir /b /s *.vcproj *.vcproj.user > filestopatch.txt
 for /F "delims=" %%f in ('type filestopatch.txt') do (
 cscript //nologo ..\..\removeabsolutepaths.vbs "%%f"
 )
-
+del /Q/F filestopatch.txt
 popd
 
 
