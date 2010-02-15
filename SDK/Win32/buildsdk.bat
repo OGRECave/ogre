@@ -5,11 +5,11 @@ if "%VSINSTALLDIR%" == "" goto envErr
 rem Determine CMake generator
 if "%1" == "vc71" set GENERATOR="Visual Studio 7 .NET 2003"
 if "%1" == "vc8" set GENERATOR="Visual Studio 8 2005"
-if "%1" == "vc8x64" set GENERATOR="Visual Studio 8 2005 Win64"
+if "%1" == "vc8_x64" set GENERATOR="Visual Studio 8 2005 Win64"
 if "%1" == "vc9" set GENERATOR="Visual Studio 9 2008"
-if "%1" == "vc9x64" set GENERATOR="Visual Studio 9 2008 Win64"
+if "%1" == "vc9_x64" set GENERATOR="Visual Studio 9 2008 Win64"
 if "%1" == "vc10" set GENERATOR="Visual Studio 10"
-if "%1" == "vc10x64" set GENERATOR="Visual Studio 10 Win64"
+if "%1" == "vc10_x64" set GENERATOR="Visual Studio 10 Win64"
 
 if %GENERATOR% == "" goto paramErr
 

@@ -21,11 +21,11 @@ Building the SDK
 Run buildsdk.bat with one of the following parameters to pick the compiler of your choice:
  - vc71
  - vc8
- - vc8x64
+ - vc8_x64
  - vc9
- - vc9x64
+ - vc9_x64
  - vc10
- - vc10x64
+ - vc10_x64
  
 You can also add "clean" to the parameters to delete any existing build folder (or do it manually).
  
