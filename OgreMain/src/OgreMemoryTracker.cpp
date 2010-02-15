@@ -39,8 +39,8 @@ namespace Ogre
 #	define Ogre_OutputCString(str) ::OutputDebugStringA(str)
 #	define Ogre_OutputWString(str) ::OutputDebugStringW(str)
 #else
-#	define Ogre_OutputCString(str) std::err << str
-#	define Ogre_OutputWString(str) std::err << str
+#	define Ogre_OutputCString(str) std::cerr << str
+#	define Ogre_OutputWString(str) std::cerr << str
 #endif
 	
 #if OGRE_MEMORY_TRACKER
