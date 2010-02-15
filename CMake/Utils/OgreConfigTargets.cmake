@@ -46,7 +46,11 @@ endfunction(ogre_create_vcproj_userfile)
 
 # install targets according to current build type
 function(ogre_install_target TARGETNAME SUFFIX EXPORT)
-
+	# Skip all install targets in SDK
+	if (OGRE_SDK_BUILD)
+		return()
+	endif()
+	
 	if(EXPORT)
 	  install(TARGETS ${TARGETNAME} #EXPORT Ogre-exports
 		BUNDLE DESTINATION "bin${OGRE_RELEASE_PATH}" CONFIGURATIONS Release None ""

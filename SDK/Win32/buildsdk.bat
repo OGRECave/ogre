@@ -35,7 +35,23 @@ set DEVENV=VCExpress
 %DEVENV% OGRE.sln /build "Debug" /project "INSTALL"
 %DEVENV% OGRE.sln /build "Release" /project "INSTALL"
 
-rem TODO - go into sdk directory, call CMake again, then zip it up
+rem call CMake in sdk 
+pushd sdk
+cmake -G%GENERATOR% .\
+if errorlevel 1 goto cmakeerror
+rem delete cache (since it will include absolute paths)
+del CMakeCache.txt
+rmdir /S/Q CMakeFiles
+
+rem Patch up absolute references to pdbs & debug directories
+rem The former should be fixed in a future version of CMake, but the latter is because we configure these files in manually
+dir /b /s *.vcproj *.vcproj.user > filestopatch.txt
+for /F "delims=" %%f in ('type filestopatch.txt') do (
+cscript //nologo ..\..\removeabsolutepaths.vbs "%%f"
+)
+
+popd
+
 
 popd
 
