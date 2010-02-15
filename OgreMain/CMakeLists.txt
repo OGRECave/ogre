@@ -471,7 +471,7 @@ if (WIN32)
     src/WIN32/winres.h
   )
   source_group(Resources FILES ${RESOURCE_FILES})
-  set(PLATFORM_HEADER_INSTALL "win32")
+  set(PLATFORM_HEADER_INSTALL "WIN32")
  
   if (MINGW) 
     # There's a bug in CMake which makes it ignore resource files with Mingw
