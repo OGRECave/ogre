@@ -424,6 +424,10 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void MeshManager::loadManualPlane(Mesh* pMesh, MeshBuildParams& params)
     {
+		if ((params.xsegments + 1) * (params.ysegments + 1) > 65536)
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Plane tesselation is too high, must generate max 65536 vertices", 
+				__FUNCTION__);
         SubMesh *pSub = pMesh->createSubMesh();
 
         // Set up vertex data
@@ -570,6 +574,10 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void MeshManager::loadManualCurvedPlane(Mesh* pMesh, MeshBuildParams& params)
     {
+		if ((params.xsegments + 1) * (params.ysegments + 1) > 65536)
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Plane tesselation is too high, must generate max 65536 vertices", 
+				__FUNCTION__);
         SubMesh *pSub = pMesh->createSubMesh();
 
         // Set options
@@ -723,9 +731,14 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void MeshManager::loadManualCurvedIllusionPlane(Mesh* pMesh, MeshBuildParams& params)
     {
+		if (params.ySegmentsToKeep == -1) params.ySegmentsToKeep = params.ysegments;
+
+		if ((params.xsegments + 1) * (params.ySegmentsToKeep + 1) > 65536)
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Plane tesselation is too high, must generate max 65536 vertices", 
+				__FUNCTION__);
         SubMesh *pSub = pMesh->createSubMesh();
 
-        if (params.ySegmentsToKeep == -1) params.ySegmentsToKeep = params.ysegments;
 
         // Set up vertex data
         // Use a single shared buffer

@@ -206,6 +206,8 @@ namespace Ogre {
 			rsc->setVendor(GPU_IMAGINATION_TECHNOLOGIES);
 		else if (strstr(vendorName, "Apple Computer, Inc."))
 			rsc->setVendor(GPU_APPLE);  // iPhone Simulator
+		if (strstr(vendorName, "Nokia"))
+			rsc->setVendor(GPU_NOKIA);
         else
             rsc->setVendor(GPU_UNKNOWN);
 

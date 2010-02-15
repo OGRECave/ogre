@@ -182,8 +182,8 @@ namespace Ogre {
 #	pragma warn_possunwant off
 #endif
 //----------------------------------------------------------------------------
-// Linux/Apple Settings
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+// Linux/Apple/Symbian Settings
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE || OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
 
 // Enable GCC symbol visibility
 #   if defined( OGRE_GCC_VISIBILITY )

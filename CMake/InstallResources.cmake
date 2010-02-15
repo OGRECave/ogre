@@ -25,8 +25,8 @@ elseif (UNIX)
   set(OGRE_MEDIA_DIR_DBG "../../${OGRE_MEDIA_PATH}")
   set(OGRE_PLUGIN_DIR_REL "../lib/OGRE")
   set(OGRE_PLUGIN_DIR_DBG "../../lib/OGRE")
-  set(OGRE_SAMPLES_DIR_REL "../lib/OGRE")
-  set(OGRE_SAMPLES_DIR_DBG "../lib/OGRE")
+  set(OGRE_SAMPLES_DIR_REL "../lib/OGRE/Samples")
+  set(OGRE_SAMPLES_DIR_DBG "../../lib/OGRE/Samples")
 endif ()
 
 # configure plugins.cfg
@@ -91,7 +91,7 @@ configure_file(${OGRE_TEMPLATES_DIR}/samples_d.cfg.in ${OGRE_BINARY_DIR}/inst/bi
 configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg)
 
 # install resource files
-if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_TOOLS)
+if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE OR OGRE_INSTALL_TOOLS)
   install(FILES 
     ${OGRE_BINARY_DIR}/inst/bin/debug/resources.cfg
     ${OGRE_BINARY_DIR}/inst/bin/debug/plugins.cfg
@@ -114,7 +114,7 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_TOOLS)
 	DESTINATION "bin${OGRE_MINSIZE_PATH}" CONFIGURATIONS MinSizeRel
   )
 endif ()
-if (OGRE_INSTALL_SAMPLES)
+if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
   install(FILES 
 	${OGRE_BINARY_DIR}/inst/bin/debug/samples.cfg
     ${OGRE_BINARY_DIR}/inst/bin/debug/media.cfg

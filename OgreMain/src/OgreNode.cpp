@@ -866,7 +866,7 @@ namespace Ogre {
 		mMat = MaterialManager::getSingleton().getByName(matName);
 		if (mMat.isNull())
 		{
-			mMat = MaterialManager::getSingleton().create(matName, ResourceGroupManager::BOOTSTRAP_RESOURCE_GROUP_NAME);
+			mMat = MaterialManager::getSingleton().create(matName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
 			Pass* p = mMat->getTechnique(0)->getPass(0);
 			p->setLightingEnabled(false);
 			p->setPolygonModeOverrideable(false);
@@ -946,7 +946,7 @@ namespace Ogre {
 
 			mo.end();
 
-			mMeshPtr = mo.convertToMesh(meshName, ResourceGroupManager::BOOTSTRAP_RESOURCE_GROUP_NAME);
+			mMeshPtr = mo.convertToMesh(meshName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
 
 		}
 

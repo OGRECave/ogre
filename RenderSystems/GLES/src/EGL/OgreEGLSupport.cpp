@@ -209,7 +209,7 @@ namespace Ogre {
 		return "todo";
 	}
 
-    EGLConfig* EGLSupport::chooseGLConfig(const GLint *attribList, GLint *nElements)
+    EGLConfig* EGLSupport::chooseGLConfig(const EGLint *attribList, EGLint *nElements)
     {
         EGLConfig *configs;
 
@@ -239,7 +239,7 @@ namespace Ogre {
         return configs;
     }
 
-    EGLBoolean EGLSupport::getGLConfigAttrib(EGLConfig glConfig, GLint attribute, GLint *value)
+    EGLBoolean EGLSupport::getGLConfigAttrib(EGLConfig glConfig, EGLint attribute, EGLint *value)
     {
         EGLBoolean status;
 
@@ -293,7 +293,7 @@ namespace Ogre {
     class GLConfigAttribs
     {
         public:
-            GLConfigAttribs(const int* attribs)
+            GLConfigAttribs(const EGLint* attribs)
             {
                 fields[EGL_CONFIG_CAVEAT] = EGL_NONE;
 
@@ -305,7 +305,7 @@ namespace Ogre {
 
             void load(EGLSupport* const glSupport, EGLConfig glConfig)
             {
-                std::map<int,int>::iterator it;
+                std::map<EGLint,EGLint>::iterator it;
 
                 for (it = fields.begin(); it != fields.end(); it++)
                 {
@@ -332,7 +332,7 @@ namespace Ogre {
                     }
                 }
 
-                std::map<int,int>::iterator it;
+                std::map<EGLint,EGLint>::iterator it;
 
                 for (it = fields.begin(); it != fields.end(); it++)
                 {
@@ -346,14 +346,14 @@ namespace Ogre {
                 return false;
             }
 
-            std::map<int,int> fields;
+            std::map<EGLint,EGLint> fields;
     };
 
-    ::EGLConfig EGLSupport::selectGLConfig(const int* minAttribs, const int *maxAttribs)
+    ::EGLConfig EGLSupport::selectGLConfig(const EGLint* minAttribs, const EGLint *maxAttribs)
     {
         EGLConfig *glConfigs;
         EGLConfig glConfig = 0;
-        int config, nConfigs = 0;
+        EGLint config, nConfigs = 0;
 
         glConfigs = chooseGLConfig(minAttribs, &nConfigs);
 

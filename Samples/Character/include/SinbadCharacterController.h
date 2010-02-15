@@ -266,8 +266,8 @@ private:
 			if (mBaseAnimID == ANIM_JUMP_LOOP) yawAtSpeed *= 0.2f;
 
 			// turn as much as we can, but not more than we need to
-			if (yawToGoal < 0) yawToGoal = Math::Clamp<Real>(yawToGoal, yawAtSpeed, 0);
-			else if (yawToGoal > 0) yawToGoal = Math::Clamp<Real>(yawToGoal, 0, yawAtSpeed);
+			if (yawToGoal < 0) yawToGoal = std::min<Real>(0, std::max<Real>(yawToGoal, yawAtSpeed)); //yawToGoal = Math::Clamp<Real>(yawToGoal, yawAtSpeed, 0);
+			else if (yawToGoal > 0) yawToGoal = std::max<Real>(0, std::min<Real>(yawToGoal, yawAtSpeed)); //yawToGoal = Math::Clamp<Real>(yawToGoal, 0, yawAtSpeed);
 			
 			mBodyNode->yaw(Degree(yawToGoal));
 

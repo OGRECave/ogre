@@ -71,8 +71,10 @@
  * Please do not forget to link proper STLport library flavor
  * (e.g libstlport_gcc_stldebug.a) when you set this flag in STLport iostreams mode.
  */
+#ifndef __SYMBIAN32__
 #ifdef _DEBUG
 	#define _STLP_DEBUG 1
+#endif
 #endif
 
 

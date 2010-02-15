@@ -2371,7 +2371,6 @@ namespace Ogre
 		if (mMaterialGenerator.isNull())
 		{
 			mMaterialGenerator = TerrainGlobalOptions::getDefaultMaterialGenerator();
-
 		}
 
 		if (mLayerDecl.elements.empty())
@@ -2382,16 +2381,54 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+    void Terrain::replaceLayer(uint8 index, bool keepBlends, Real worldSize, const StringVector* textureNames)
+    {
+        if (getLayerCount() > 0)
+        {
+            if (index >= getLayerCount())
+                index = getLayerCount() - 1;
+
+		    LayerInstanceList::iterator i = mLayers.begin();
+		    std::advance(i, index);
+            
+		    if (textureNames)
+		    {
+			    (*i).textureNames = *textureNames;
+		    }
+
+		    // use utility method to update UV scaling
+		    setLayerWorldSize(index, worldSize);
+
+            // Delete the blend map if its not the base
+            if ( !keepBlends && index > 0 )
+            {
+                if (mLayerBlendMapList[index-1])
+                {
+                    delete mLayerBlendMapList[index-1];
+                    mLayerBlendMapList[index-1] = 0;
+                }
+
+                // Reset the layer to black
+                std::pair<uint8,uint8> layerPair = getLayerBlendTextureIndex(index);
+                clearGPUBlendChannel( layerPair.first, layerPair.second );
+            }
+
+		    mMaterialDirty = true;
+		    mMaterialParamsDirty = true;
+        }
+    }
+	//---------------------------------------------------------------------
 	void Terrain::addLayer(Real worldSize, const StringVector* textureNames)
 	{
 		addLayer(getLayerCount(), worldSize, textureNames);
 	}
 	//---------------------------------------------------------------------
-	void Terrain::addLayer(uint index, Real worldSize, const StringVector* textureNames)
+	void Terrain::addLayer(uint8 index, Real worldSize, const StringVector* textureNames)
 	{
 		if (!worldSize)
 			worldSize = TerrainGlobalOptions::getDefaultLayerTextureWorldSize();
 
+        uint8 blendIndex = std::max(index-1,0); 
 		if (index >= getLayerCount())
 		{
 			mLayers.push_back(LayerInstance());
@@ -2402,6 +2439,14 @@ namespace Ogre
 			LayerInstanceList::iterator i = mLayers.begin();
 			std::advance(i, index);
 			mLayers.insert(i, LayerInstance());
+
+			RealVector::iterator uvi = mLayerUVMultiplier.begin();
+			std::advance(uvi, index);
+			mLayerUVMultiplier.insert(uvi, 0.0f);
+
+            TerrainLayerBlendMapList::iterator bi = mLayerBlendMapList.begin();
+            std::advance(bi, blendIndex);
+            mLayerBlendMapList.insert(bi, 0);
 		}
 		if (textureNames)
 		{
@@ -2411,6 +2456,17 @@ namespace Ogre
 		// use utility method to update UV scaling
 		setLayerWorldSize(index, worldSize);
 		checkLayers(true);
+
+        // Is this an insert into the middle of the layer list?
+        if (index < getLayerCount() - 1)
+        {
+            // Shift all GPU texture channels up one
+            shiftUpGPUBlendChannels(blendIndex);
+
+            // All blend maps above this layer index will need to be recreated since their buffers/channels have changed
+            deleteBlendMaps(index);
+        }
+
 		mMaterialDirty = true;
 		mMaterialParamsDirty = true;
 
@@ -2420,9 +2476,34 @@ namespace Ogre
 	{
 		if (index < mLayers.size())
 		{
+            uint8 blendIndex = std::max(index-1,0); 
+
+            // Shift all GPU texture channels down one
+            shiftDownGPUBlendChannels(blendIndex);
+
 			LayerInstanceList::iterator i = mLayers.begin();
 			std::advance(i, index);
 			mLayers.erase(i);
+
+			RealVector::iterator uvi = mLayerUVMultiplier.begin();
+			std::advance(uvi, index);
+			mLayerUVMultiplier.erase(uvi);
+
+            if (mLayerBlendMapList.size() > 0)
+            {
+                // If they removed the base OR the first layer, we need to erase the first blend map
+                TerrainLayerBlendMapList::iterator bi = mLayerBlendMapList.begin();
+                std::advance(bi, blendIndex);
+                OGRE_DELETE *bi;
+                mLayerBlendMapList.erase(bi);
+
+				// Check to see if a GPU textures can be released
+				checkLayers(true);
+
+                // All blend maps for layers above the erased will need to be recreated since their buffers/channels have changed
+                deleteBlendMaps(blendIndex);
+            }
+			
 			mMaterialDirty = true;
 			mMaterialParamsDirty = true;
 		}
@@ -2475,6 +2556,124 @@ namespace Ogre
 		// and it makes it harder to expand layer count dynamically if format has to change
 		return PF_BYTE_RGBA;
 	}
+	//---------------------------------------------------------------------
+    void Terrain::shiftUpGPUBlendChannels(uint8 index)
+    {
+        // checkLayers() has been called to make sure the blend textures have been created
+        assert( mBlendTextureList.size() == getBlendTextureCount(getLayerCount()) );
+
+        // Shift all blend channels > index UP one slot, possibly into the next texture
+        // Example:  index = 2
+        //      Before: [1 2 3 4] [5]
+        //      After:  [1 2 0 3] [4 5]
+
+        uint8 layerIndex = index + 1;
+        for (uint8 i=getLayerCount()-1; i > layerIndex; --i )
+        {   
+            std::pair<uint8,uint8> destPair = getLayerBlendTextureIndex(i);
+            std::pair<uint8,uint8> srcPair = getLayerBlendTextureIndex(i - 1);
+            
+            copyBlendTextureChannel( srcPair.first, srcPair.second, destPair.first, destPair.second );
+        }
+
+        // Reset the layer to black
+        std::pair<uint8,uint8> layerPair = getLayerBlendTextureIndex(layerIndex);
+        clearGPUBlendChannel( layerPair.first, layerPair.second );
+    }
+	//---------------------------------------------------------------------
+    void Terrain::shiftDownGPUBlendChannels(uint8 index)
+    {
+        // checkLayers() has been called to make sure the blend textures have been created
+        assert( mBlendTextureList.size() == getBlendTextureCount(getLayerCount()) );
+
+        // Shift all blend channels above layerIndex DOWN one slot, possibly into the previous texture
+        // Example:  index = 2
+        //      Before: [1 2 3 4] [5]
+        //      After:  [1 2 4 5] [0]
+
+        uint8 layerIndex = index + 1;
+        for (uint8 i=layerIndex; i < getLayerCount() - 1; ++i )
+        {   
+            std::pair<uint8,uint8> destPair = getLayerBlendTextureIndex(i);
+            std::pair<uint8,uint8> srcPair = getLayerBlendTextureIndex(i + 1);
+            
+            copyBlendTextureChannel( srcPair.first, srcPair.second, destPair.first, destPair.second );
+        }
+
+        // Reset the layer to black
+        if ( getLayerCount() > 1 )
+        {
+            std::pair<uint8,uint8> layerPair = getLayerBlendTextureIndex(getLayerCount() - 1);
+            clearGPUBlendChannel( layerPair.first, layerPair.second );
+        }
+    }
+	//---------------------------------------------------------------------
+    void Terrain::copyBlendTextureChannel(uint8 srcIndex, uint8 srcChannel, uint8 destIndex, uint8 destChannel )
+    {
+        HardwarePixelBufferSharedPtr srcBuffer = getLayerBlendTexture(srcIndex)->getBuffer();
+        HardwarePixelBufferSharedPtr destBuffer = getLayerBlendTexture(destIndex)->getBuffer();
+
+        unsigned char rgbaShift[4];
+		Image::Box box(0, 0, destBuffer->getWidth(), destBuffer->getHeight());
+
+        uint8* pDestBase = static_cast<uint8*>(destBuffer->lock(box, HardwareBuffer::HBL_NORMAL).data);
+		PixelUtil::getBitShifts(destBuffer->getFormat(), rgbaShift);
+        uint8* pDest = pDestBase + rgbaShift[destChannel] / 8;
+		size_t destInc = PixelUtil::getNumElemBytes(destBuffer->getFormat());
+
+        size_t srcInc;
+        uint8* pSrc;
+
+        if ( destBuffer == srcBuffer )
+        {
+            pSrc = pDestBase + rgbaShift[srcChannel] / 8;
+            srcInc = destInc;
+        }
+        else
+        {
+            pSrc = static_cast<uint8*>(srcBuffer->lock(box, HardwareBuffer::HBL_READ_ONLY).data);
+		    PixelUtil::getBitShifts(srcBuffer->getFormat(), rgbaShift);
+            pSrc += rgbaShift[srcChannel] / 8;
+		    srcInc = PixelUtil::getNumElemBytes(srcBuffer->getFormat());
+        }
+
+		for (size_t y = box.top; y < box.bottom; ++y)
+		{
+			for (size_t x = box.left; x < box.right; ++x)
+			{
+                *pDest = *pSrc;
+				pSrc += srcInc;
+                pDest += destInc;
+			}
+		}
+		
+        destBuffer->unlock();
+        if ( destBuffer != srcBuffer )
+            srcBuffer->unlock();
+    }
+    //---------------------------------------------------------------------
+	void Terrain::clearGPUBlendChannel(uint8 index, uint channel)
+    {
+        HardwarePixelBufferSharedPtr buffer = getLayerBlendTexture(index)->getBuffer();
+
+        unsigned char rgbaShift[4];
+		Image::Box box(0, 0, buffer->getWidth(), buffer->getHeight());
+
+        uint8* pData = static_cast<uint8*>(buffer->lock(box, HardwareBuffer::HBL_NORMAL).data);
+		PixelUtil::getBitShifts(buffer->getFormat(), rgbaShift);
+        pData += rgbaShift[channel] / 8;
+		size_t inc = PixelUtil::getNumElemBytes(buffer->getFormat());
+
+		for (size_t y = box.top; y < box.bottom; ++y)
+		{
+			for (size_t x = box.left; x < box.right; ++x)
+			{
+                *pData = 0;
+                pData += inc;
+			}
+		}
+        buffer->unlock();
+    }
 	//---------------------------------------------------------------------
 	void Terrain::createGPUBlendTextures()
 	{
@@ -2538,8 +2737,9 @@ namespace Ogre
 			mLayerBlendMapList.pop_back();
 		}
 
-		// resize up or down (up initialises to 0, populate as necessary)
-		mLayerBlendMapList.resize(mLayers.size() - 1, 0);
+		// resize up (initialises to 0, populate as necessary)
+		if ( mLayers.size() > 1 )
+		    mLayerBlendMapList.resize(mLayers.size() - 1, 0);
 
 	}
 	//---------------------------------------------------------------------
@@ -2582,13 +2782,18 @@ namespace Ogre
 		mCpuBlendMapStorage.clear();
 
 		// Editable structures for blend layers (not needed at runtime,  only blend textures are)
-		for (TerrainLayerBlendMapList::iterator i = mLayerBlendMapList.begin(); 
-			i != mLayerBlendMapList.end(); ++i)
+        deleteBlendMaps(0); 
+	}
+	//---------------------------------------------------------------------
+    void Terrain::deleteBlendMaps(uint8 lowIndex)
+    {
+        TerrainLayerBlendMapList::iterator i = mLayerBlendMapList.begin();
+		std::advance(i, lowIndex);
+        for (; i != mLayerBlendMapList.end(); ++i )
 		{
 			OGRE_DELETE *i;
 			*i = 0;
 		}
-
 	}
 	//---------------------------------------------------------------------
 	const TexturePtr& Terrain::getLayerBlendTexture(uint8 index)
@@ -2665,7 +2870,7 @@ namespace Ogre
 
 			createOrDestroyGPUCompositeMap();
 			
-			// if we enabled, generate normal maps
+			// if we enabled, generate composite maps
 			if (mCompositeMapRequired)
 			{
 				mCompositeMapDirtyRect.left = mCompositeMapDirtyRect.top = 0;
@@ -3066,9 +3271,7 @@ namespace Ogre
 			}
 		}
 
-
 		return pixbox;
-
 
 
 	}

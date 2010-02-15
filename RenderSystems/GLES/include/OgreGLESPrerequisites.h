@@ -30,6 +30,11 @@ THE SOFTWARE.
 #ifndef __GLESPrerequisites_H__
 #define __GLESPrerequisites_H__
 
+
+#if (OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN)
+#	undef _WIN32
+#endif
+
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
 #	if !defined( __MINGW32__ )
 #		ifndef WIN32_LEAN_AND_MEAN

@@ -557,7 +557,7 @@ elseif (UNIX)
     src/GLX/OgreTimer.cpp
     src/OgreSearchOps.cpp
   )
-  set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xt_LIB} ${XAW_LIBRARY} pthread)
+  set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xt_LIB} ${XAW_LIBRARY} pthread dl)
   set(PLATFORM_HEADER_INSTALL "GLX")
 
 endif(WIN32)

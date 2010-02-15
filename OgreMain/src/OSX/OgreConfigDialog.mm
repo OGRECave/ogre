@@ -201,8 +201,8 @@ namespace Ogre {
 
         // Then the Ogre logo out of the framework bundle
         mOgreLogo = [[NSImageView alloc] initWithFrame:NSMakeRect(0, 295, 512, 220)];
-        NSMutableString *logoPath = [[[NSBundle mainBundle] bundlePath] mutableCopy];
-        [logoPath appendString:@"/Contents/Frameworks/Ogre.framework/Resources/ogrelogo.png"];
+        NSMutableString *logoPath = [[[NSBundle bundleForClass:[self class]] resourcePath] mutableCopy];
+        [logoPath appendString:@"/ogrelogo.png"];
 
         NSImage *image = [[NSImage alloc] initWithContentsOfFile:logoPath];
         [logoPath release];
