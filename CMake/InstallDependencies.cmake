@@ -106,7 +106,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
   if (OGRE_INSTALL_SAMPLES_SOURCE)
 	if (Boost_FOUND)
 	  # headers (try to exclude things we don't need)
-	  install(DIRECTORY "${Boost_INCLUDE_DIR}/boost" DESTINATION include
+	  install(DIRECTORY "${Boost_INCLUDE_DIR}/boost" DESTINATION "boost_${Boost_LIB_VERSION}"
 		PATTERN "accumulators" EXCLUDE
 		PATTERN "archive" EXCLUDE
 		PATTERN "asio" EXCLUDE
@@ -160,14 +160,16 @@ if (OGRE_INSTALL_DEPENDENCIES)
 		PATTERN "wave" EXCLUDE
 		PATTERN "xpressive" EXCLUDE
 	  )
+	  # License
+	  install(FILES "${Boost_INCLUDE_DIR}/LICENSE_1_0.txt" DESTINATION "boost_${Boost_LIB_VERSION}")
 	  # libraries
 	  if (Boost_THREAD_FOUND)
-	    install(FILES ${Boost_THREAD_LIBRARY_DEBUG} DESTINATION lib/debug CONFIGURATIONS Debug)
-	    install(FILES ${Boost_THREAD_LIBRARY_RELEASE} DESTINATION lib/release CONFIGURATIONS Release)
+	    install(FILES ${Boost_THREAD_LIBRARY_DEBUG} DESTINATION "boost_${Boost_LIB_VERSION}/lib" CONFIGURATIONS Debug)
+	    install(FILES ${Boost_THREAD_LIBRARY_RELEASE} DESTINATION "boost_${Boost_LIB_VERSION}/lib" CONFIGURATIONS Release)
 	  endif()
 	  if (Boost_DATE_TIME_FOUND)
-	    install(FILES ${Boost_DATE_TIME_LIBRARY_DEBUG} DESTINATION lib/debug CONFIGURATIONS Debug)
-	    install(FILES ${Boost_DATE_TIME_LIBRARY_RELEASE} DESTINATION lib/release CONFIGURATIONS Release)
+	    install(FILES ${Boost_DATE_TIME_LIBRARY_DEBUG} DESTINATION "boost_${Boost_LIB_VERSION}/lib" CONFIGURATIONS Debug)
+	    install(FILES ${Boost_DATE_TIME_LIBRARY_RELEASE} DESTINATION "boost_${Boost_LIB_VERSION}/lib" CONFIGURATIONS Release)
 	  endif()
 		
 	endif()

@@ -59,7 +59,7 @@ if (NOT APPLE)
   set(CMAKE_DEBUG_POSTFIX "_d")
 endif ()
 # Boost is included
-set (BOOST_ROOT "${OGRE_SOURCE_DIR}/include")
+set (BOOST_ROOT "${OGRE_SOURCE_DIR}/boost_@Boost_LIB_VERSION@")
 
 
 #####################################################################
