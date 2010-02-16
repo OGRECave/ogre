@@ -108,14 +108,17 @@ if (OGRE_INSTALL_DEPENDENCIES)
 	  # headers (try to exclude things we don't need)
 	  install(DIRECTORY "${Boost_INCLUDE_DIR}/boost" DESTINATION "boost_${Boost_LIB_VERSION}"
 		PATTERN "accumulators" EXCLUDE
+		PATTERN "algorithm" EXCLUDE
 		PATTERN "archive" EXCLUDE
 		PATTERN "asio" EXCLUDE
 		PATTERN "assign" EXCLUDE
 		PATTERN "bimap" EXCLUDE
 		PATTERN "circular_buffer" EXCLUDE
+		PATTERN "compatibility" EXCLUDE
 		PATTERN "concept" EXCLUDE
 		PATTERN "concept_check" EXCLUDE
 		PATTERN "dynamic_bitset" EXCLUDE
+		PATTERN "filesystem" EXCLUDE
 		PATTERN "flyweight" EXCLUDE
 		PATTERN "format" EXCLUDE
 		PATTERN "functional" EXCLUDE
@@ -123,19 +126,18 @@ if (OGRE_INSTALL_DEPENDENCIES)
 		PATTERN "gil" EXCLUDE
 		PATTERN "graph" EXCLUDE
 		PATTERN "interprocess" EXCLUDE
+		PATTERN "intrusive" EXCLUDE
 		PATTERN "io" EXCLUDE
 		PATTERN "iostreams" EXCLUDE
 		PATTERN "lambda" EXCLUDE
 		PATTERN "logic" EXCLUDE
 		PATTERN "mpi" EXCLUDE
-		PATTERN "mpl" EXCLUDE
 		PATTERN "multi_array" EXCLUDE
 		PATTERN "multi_index" EXCLUDE
 		PATTERN "numeric" EXCLUDE
 		PATTERN "parameter" EXCLUDE
 		PATTERN "pending" EXCLUDE
 		PATTERN "pool" EXCLUDE
-		PATTERN "preprocessor" EXCLUDE
 		PATTERN "program_options" EXCLUDE
 		PATTERN "property_map" EXCLUDE
 		PATTERN "property_tree" EXCLUDE
@@ -151,6 +153,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
 		PATTERN "statechart" EXCLUDE
 		PATTERN "system" EXCLUDE
 		PATTERN "test" EXCLUDE
+		PATTERN "tr1" EXCLUDE
 		PATTERN "tuple" EXCLUDE
 		PATTERN "typeof" EXCLUDE
 		PATTERN "units" EXCLUDE
