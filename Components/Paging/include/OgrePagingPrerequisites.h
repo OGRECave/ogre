@@ -72,6 +72,8 @@ namespace Ogre
 #           endif
 #   	endif
 #	endif
+#elif defined ( OGRE_GCC_VISIBILITY )
+#   define _OgrePagingExport __attribute__ ((visibility("default")))
 #else
 #	define _OgrePagingExport
 #endif 
