@@ -32,6 +32,9 @@ goto detecteddevenv
 set DEVENV=VCExpress
 :detecteddevenv
 
+rem build docs explicitly since INSTALL doesn't include it
+%DEVENV% OGRE.sln /build "Release" /project "doc"
+
 %DEVENV% OGRE.sln /build "Debug" /project "INSTALL"
 %DEVENV% OGRE.sln /build "Release" /project "INSTALL"
 
