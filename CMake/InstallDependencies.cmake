@@ -101,6 +101,78 @@ if (OGRE_INSTALL_DEPENDENCIES)
     install_debug(libgles_cm.dll)
 	install_release(libgles_cm.dll)
   endif ()
+  
+  # If we're installing the sample source for an SDK, also install Boost headers & libraries
+  if (OGRE_INSTALL_SAMPLES_SOURCE)
+	if (Boost_FOUND)
+	  # headers (try to exclude things we don't need)
+	  install(DIRECTORY "${Boost_INCLUDE_DIR}/boost" DESTINATION include
+		PATTERN "accumulators" EXCLUDE
+		PATTERN "archive" EXCLUDE
+		PATTERN "asio" EXCLUDE
+		PATTERN "assign" EXCLUDE
+		PATTERN "bimap" EXCLUDE
+		PATTERN "circular_buffer" EXCLUDE
+		PATTERN "concept" EXCLUDE
+		PATTERN "concept_check" EXCLUDE
+		PATTERN "dynamic_bitset" EXCLUDE
+		PATTERN "flyweight" EXCLUDE
+		PATTERN "format" EXCLUDE
+		PATTERN "functional" EXCLUDE
+		PATTERN "fusion" EXCLUDE
+		PATTERN "gil" EXCLUDE
+		PATTERN "graph" EXCLUDE
+		PATTERN "interprocess" EXCLUDE
+		PATTERN "io" EXCLUDE
+		PATTERN "iostreams" EXCLUDE
+		PATTERN "lambda" EXCLUDE
+		PATTERN "logic" EXCLUDE
+		PATTERN "mpi" EXCLUDE
+		PATTERN "mpl" EXCLUDE
+		PATTERN "multi_array" EXCLUDE
+		PATTERN "multi_index" EXCLUDE
+		PATTERN "numeric" EXCLUDE
+		PATTERN "parameter" EXCLUDE
+		PATTERN "pending" EXCLUDE
+		PATTERN "pool" EXCLUDE
+		PATTERN "preprocessor" EXCLUDE
+		PATTERN "program_options" EXCLUDE
+		PATTERN "property_map" EXCLUDE
+		PATTERN "property_tree" EXCLUDE
+		PATTERN "proto" EXCLUDE
+		PATTERN "ptr_container" EXCLUDE
+		PATTERN "python" EXCLUDE
+		PATTERN "random" EXCLUDE
+		PATTERN "regex" EXCLUDE
+		PATTERN "serialization" EXCLUDE
+		PATTERN "signals" EXCLUDE
+		PATTERN "signals2" EXCLUDE
+		PATTERN "spirit" EXCLUDE
+		PATTERN "statechart" EXCLUDE
+		PATTERN "system" EXCLUDE
+		PATTERN "test" EXCLUDE
+		PATTERN "tuple" EXCLUDE
+		PATTERN "typeof" EXCLUDE
+		PATTERN "units" EXCLUDE
+		PATTERN "unordered" EXCLUDE
+		PATTERN "uuid" EXCLUDE
+		PATTERN "variant" EXCLUDE
+		PATTERN "wave" EXCLUDE
+		PATTERN "xpressive" EXCLUDE
+	  )
+	  # libraries
+	  if (Boost_THREAD_FOUND)
+	    install(FILES ${Boost_THREAD_LIBRARY_DEBUG} DESTINATION lib/debug CONFIGURATIONS Debug)
+	    install(FILES ${Boost_THREAD_LIBRARY_RELEASE} DESTINATION lib/release CONFIGURATIONS Release)
+	  endif()
+	  if (Boost_DATE_TIME_FOUND)
+	    install(FILES ${Boost_DATE_TIME_LIBRARY_DEBUG} DESTINATION lib/debug CONFIGURATIONS Debug)
+	    install(FILES ${Boost_DATE_TIME_LIBRARY_RELEASE} DESTINATION lib/release CONFIGURATIONS Release)
+	  endif()
+		
+	endif()
+  endif()
+  
 endif ()
 
 if (OGRE_COPY_DEPENDENCIES)
