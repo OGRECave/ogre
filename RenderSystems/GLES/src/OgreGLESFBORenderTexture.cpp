@@ -90,7 +90,8 @@ static const size_t depthBits[] =
 };
 #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
-	GLESFBOManager::GLESFBOManager()
+	GLESFBOManager::GLESFBOManager() 
+		: mTempFBO(0)
     {
         detectFBOFormats();
         
