@@ -438,6 +438,7 @@ set (SOURCE_FILES
   src/OgreTextureUnitState.cpp
   src/OgreUnifiedHighLevelGpuProgram.cpp
   src/OgreUserObjectBindings.cpp
+  src/OgreUTFString.cpp
   src/OgreVector2.cpp
   src/OgreVector3.cpp
   src/OgreVector4.cpp
