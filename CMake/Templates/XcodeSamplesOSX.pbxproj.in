@@ -2787,7 +2787,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = NO;
 			};
-			buildConfigurationList = 11F9E7011F9E7011F9E70000 /* Build configuration list for PBXProject "OGRE" */;
+			buildConfigurationList = 11F9E7011F9E7011F9E70000 /* Build configuration list for PBXProject "Samples" */;
 			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 0;
 			mainGroup = 10D435010D435010D4350000;
@@ -3306,7 +3306,6 @@
 				GCC_VERSION = 4.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-				SYMROOT = build;
 			};
 			name = Debug;
 		};
@@ -3317,7 +3316,6 @@
 				GCC_VERSION = 4.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-				SYMROOT = "/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/build";
 			};
 			name = Release;
 		};
@@ -3329,11 +3327,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					../Dependencies,
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3349,7 +3343,7 @@
 					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
+					"$(PROJECT_DIR)/Dependencies/include/",
 					"$(PROJECT_DIR)/Samples/include",
 					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
@@ -3380,14 +3374,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_BezierPatch;
 				SECTORDER_FLAGS = "";
-				SYMROOT = "$(SYMROOT)";
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3405,11 +3398,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					../Dependencies,
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -3425,7 +3414,7 @@
 					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
+					"$(PROJECT_DIR)/Dependencies/include/",
 					"$(PROJECT_DIR)/Samples/include",
 					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
@@ -3454,8 +3443,8 @@
 					"-dynamiclib",
 					"-headerpad_max_install_names",
 					"-lIOKit",
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
@@ -3477,11 +3466,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3494,19 +3479,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/CameraTrack/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -3535,14 +3513,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_CameraTrack;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3559,11 +3536,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -3576,19 +3549,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/CameraTrack/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -3619,14 +3585,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_CameraTrack;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3643,11 +3608,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3660,19 +3621,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Character/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -3701,14 +3655,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Character;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3725,11 +3678,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -3742,19 +3691,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Character/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -3785,14 +3727,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Character;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3809,11 +3750,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3826,19 +3763,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Compositor/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -3867,14 +3797,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Compositor;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3891,11 +3820,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -3908,19 +3833,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Compositor/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -3951,14 +3869,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Compositor;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3975,11 +3892,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3992,19 +3905,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/FacialAnimation/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -4033,14 +3939,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_FacialAnimation;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4057,11 +3962,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -4074,19 +3975,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/FacialAnimation/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -4117,14 +4011,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_FacialAnimation;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4141,11 +4034,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -4158,19 +4047,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Grass/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -4199,14 +4081,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Grass;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4223,11 +4104,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -4240,19 +4117,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Grass/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -4283,14 +4153,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Grass;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4307,11 +4176,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -4324,19 +4189,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Instancing/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -4365,14 +4223,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Instancing;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4389,11 +4246,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -4406,19 +4259,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Instancing/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -4449,14 +4295,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Instancing;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4473,11 +4318,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -4490,19 +4331,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Lighting/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -4531,14 +4365,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Lighting;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4555,11 +4388,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -4572,19 +4401,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Lighting/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -4615,14 +4437,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Lighting;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4639,11 +4460,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -4656,19 +4473,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/OceanDemo/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -4697,14 +4507,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Ocean;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4721,11 +4530,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -4738,19 +4543,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/OceanDemo/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -4781,14 +4579,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Ocean;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4805,11 +4602,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -4822,19 +4615,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/ParticleFX/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -4863,14 +4649,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_ParticleFX;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4887,11 +4672,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -4904,19 +4685,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/ParticleFX/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -4947,14 +4721,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_ParticleFX;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4971,11 +4744,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -4988,19 +4757,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/ShaderSystem/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -5029,14 +4791,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_ShaderSystem;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5053,11 +4814,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -5070,19 +4827,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/ShaderSystem/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -5113,14 +4863,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_ShaderSystem;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5137,11 +4886,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -5154,19 +4899,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Shadows/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -5195,14 +4933,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Shadows;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5219,11 +4956,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -5236,19 +4969,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Shadows/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -5279,14 +5005,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Shadows;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5303,11 +5028,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -5320,19 +5041,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/SkeletalAnimation/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -5361,14 +5075,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_SkeletalAnimation;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5385,11 +5098,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -5402,19 +5111,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/SkeletalAnimation/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -5445,14 +5147,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_SkeletalAnimation;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5469,11 +5170,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -5486,19 +5183,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/SkyBox/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -5527,14 +5217,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_SkyBox;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5551,11 +5240,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -5568,19 +5253,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/SkyBox/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -5611,14 +5289,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_SkyBox;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5635,11 +5312,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -5652,19 +5325,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/SkyDome/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -5693,14 +5359,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_SkyDome;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5717,11 +5382,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -5734,19 +5395,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/SkyDome/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -5777,14 +5431,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_SkyDome;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5801,11 +5454,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -5818,19 +5467,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/SkyPlane/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -5859,14 +5501,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_SkyPlane;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5883,11 +5524,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -5900,19 +5537,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/SkyPlane/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -5943,14 +5573,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_SkyPlane;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5967,11 +5596,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -5984,19 +5609,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Smoke/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -6025,14 +5643,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Smoke;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -6049,11 +5666,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -6066,19 +5679,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Smoke/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -6109,14 +5715,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Smoke;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -6133,11 +5738,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -6150,19 +5751,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/SphereMapping/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -6191,14 +5785,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_SphereMapping;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -6215,11 +5808,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -6232,19 +5821,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/SphereMapping/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -6275,14 +5857,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_SphereMapping;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -6299,11 +5880,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -6316,21 +5893,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Terrain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/Terrain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/Paging/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -6361,14 +5929,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Terrain;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -6385,11 +5952,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -6402,21 +5965,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Terrain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/Terrain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/Paging/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -6449,14 +6003,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Terrain;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -6473,11 +6026,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -6490,19 +6039,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/TextureFX/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -6531,14 +6073,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_TextureFX;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -6555,11 +6096,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -6572,19 +6109,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/TextureFX/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -6615,14 +6145,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_TextureFX;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -6639,11 +6168,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -6656,19 +6181,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Transparency/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -6697,14 +6215,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Transparency;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -6721,11 +6238,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -6738,19 +6251,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Transparency/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -6781,14 +6287,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Transparency;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -6805,11 +6310,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -6822,19 +6323,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/VolumeTex/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -6863,14 +6357,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_VolumeTex;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -6887,11 +6380,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -6904,19 +6393,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/VolumeTex/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -6947,14 +6429,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_VolumeTex;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -6971,11 +6452,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -6988,19 +6465,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Water/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -7029,14 +6499,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Water;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -7053,11 +6522,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -7070,19 +6535,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Water/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -7113,14 +6571,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Water;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -7137,11 +6594,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -7154,19 +6607,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/BSP/include",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -7195,14 +6641,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_BSP;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -7219,11 +6664,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -7236,19 +6677,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/BSP/include",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -7279,14 +6713,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_BSP;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -7303,11 +6736,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -7320,19 +6749,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/CelShading/include",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -7361,14 +6783,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_CelShading;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -7385,11 +6806,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -7402,19 +6819,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/CelShading/include",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -7445,14 +6855,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_CelShading;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -7469,11 +6878,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -7486,19 +6891,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/DeferredShading/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -7527,14 +6925,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_DeferredShading;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -7551,11 +6948,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -7568,19 +6961,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/DeferredShading/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -7611,14 +6997,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_DeferredShading;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -7635,11 +7020,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -7652,19 +7033,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/CubeMapping/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -7693,14 +7067,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_CubeMapping;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -7717,11 +7090,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -7734,19 +7103,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/CubeMapping/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -7777,14 +7139,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_CubeMapping;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -7801,11 +7162,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -7818,19 +7175,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Dot3Bump/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -7859,14 +7209,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Dot3Bump;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -7883,11 +7232,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -7900,19 +7245,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Dot3Bump/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -7943,14 +7281,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Dot3Bump;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -7967,11 +7304,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -7984,19 +7317,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/DynTex/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -8025,14 +7351,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_DynTex;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -8049,11 +7374,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -8066,19 +7387,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/DynTex/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -8109,14 +7423,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_DynTex;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -8133,11 +7446,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -8150,19 +7459,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Fresnel/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -8191,14 +7493,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Fresnel;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -8215,11 +7516,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -8232,19 +7529,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Fresnel/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -8275,14 +7565,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Fresnel;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -8299,11 +7588,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -8316,19 +7601,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Isosurf/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -8357,14 +7635,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Isosurf;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -8381,11 +7658,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -8398,19 +7671,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Isosurf/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -8441,14 +7707,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_Isosurf;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -8465,11 +7730,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -8482,19 +7743,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/ParticleGS/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -8523,14 +7777,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_ParticleGS;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -8547,11 +7800,7 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = .dylib;
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -8564,19 +7813,12 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/ParticleGS/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
 				INSTALL_PATH = "@executable_path/../Plugins";
 				LIBRARY_SEARCH_PATHS = (
@@ -8607,14 +7849,13 @@
 					Carbon,
 					"-framework",
 					Cocoa,
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = Sample_ParticleGS;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -8629,11 +7870,7 @@
 			buildSettings = {
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = "";
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -8645,21 +7882,14 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Browser/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
-				INFOPLIST_FILE = "/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/Samples/Browser/CMakeFiles/SampleBrowser.dir/Info.plist";
+				INFOPLIST_FILE = "";
 				INSTALL_PATH = "";
 				LIBRARY_SEARCH_PATHS = (
 					"/usr/local/lib/$(CONFIGURATION)",
@@ -8678,14 +7908,13 @@
 				OTHER_LDFLAGS = (
 					"-Wl,-search_paths_first",
 					"-headerpad_max_install_names",
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = SampleBrowser;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -8700,11 +7929,7 @@
 			buildSettings = {
 				EXECUTABLE_PREFIX = "";
 				EXECUTABLE_SUFFIX = "";
-				FRAMEWORK_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Dependencies\"";
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/Dependencies\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -8716,21 +7941,14 @@
 				GCC_PREPROCESSOR_DEFINITIONS_QUOTED_FOR_TARGET_1 = "'CMAKE_INTDIR=\"$(CONFIGURATION)\"'";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = (
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/OgreMain/include/OSX",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/include/OIS",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Dependencies/Cg.framework/Headers",
 					/System/Library/Frameworks/Carbon.framework/Headers,
 					/System/Library/Frameworks/Cocoa.framework/Headers,
-					"/usr/local/include/boost-1_42",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Mac/Ogre/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Common/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Components/RTShaderSystem/include",
-					"/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/Samples/Browser/include",
+					"$(PROJECT_DIR)/Dependencies/include/OIS/**",
+					"$(PROJECT_DIR)/Dependencies/include/",
+					"$(PROJECT_DIR)/Samples/include",
+					"$(PROJECT_DIR)/Dependencies/Ogre.framework/Headers",
 				);
-				INFOPLIST_FILE = "/Users/davidrogers/Documents/Development/Framework-Sources/ogre-v1-7/build/Samples/Browser/CMakeFiles/SampleBrowser.dir/Info.plist";
+				INFOPLIST_FILE = "";
 				INSTALL_PATH = "";
 				LIBRARY_SEARCH_PATHS = (
 					"/usr/local/lib/$(CONFIGURATION)",
@@ -8751,14 +7969,13 @@
 				OTHER_LDFLAGS = (
 					"-Wl,-search_paths_first",
 					"-headerpad_max_install_names",
-					"/usr/local/lib/libboost_thread-xgcc42-mt-1_42.a",
-					"/usr/local/lib/libboost_date_time-xgcc42-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_thread-xgcc40-mt-1_42.a",
+					"$(PROJECT_DIR)/Dependencies/lib/Release/libboost_date_time-xgcc40-mt-1_42.a",
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = SampleBrowser;
 				SECTORDER_FLAGS = "";
-				SYMROOT = build;
 				USE_HEADERMAP = NO;
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -8771,7 +7988,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		11F9E7011F9E7011F9E70000 /* Build configuration list for PBXProject "OGRE" */ = {
+		11F9E7011F9E7011F9E70000 /* Build configuration list for PBXProject "Samples" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				11FA01011FA01011FA010000 /* Debug */,

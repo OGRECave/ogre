@@ -3,15 +3,20 @@
 OGRE_VERSION="v1.7.0"
 # Only build for i386, halves the size
 ARCH="i386"
-REMOVE_ARCH="ppc"
 SDKBUILDDIR=`pwd`
+
+# Clean up files from previous builds
+echo Cleaning previous builds...
+rm -rf ../../build
+rm -rf $SDKBUILDDIR/sdk_contents 
+rm OgreSDK_$OGRE_VERSION.dmg
 
 # Configure with CMake
 mkdir ../../build
 cd ../../build
 cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_MEDIA:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G Xcode ..
 
-# Invoke xcode build
+# Invoke Xcode build
 xcodebuild -project OGRE.xcodeproj -target install -configuration Release -sdk macosx10.4 ARCHS=i386 GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4
 # Just release mode, debug is too big
 #xcodebuild -project OGRE.xcodeproj -target install -configuration Debug -sdk macosx10.4 ARCHS=i386 GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4
@@ -19,7 +24,7 @@ xcodebuild -project OGRE.xcodeproj -target install -configuration Release -sdk m
 # Docs
 echo Building API docs...
 
-# Invoke doxygen
+# Invoke doxygen to generate HTML docs
 pushd ../Docs/src
 doxygen ../../build/html.cfg
 popd
@@ -27,16 +32,12 @@ popd
 cd api/html
 
 # Delete unnecessary files
-rm -f *.hhk
-rm -f *.map
-rm -f *.md5
-rm -f ../*.tmp
+rm -f *.hhk *.map *.md5 ../*.tmp
 
 # Build the Xcode docset and zip it up to save space
 #make
 #zip -9 -r org.ogre3d.documentation.Reference1_7.docset.zip org.ogre3d.documentation.Reference1_7.docset
 
-rm -rf $SDKBUILDDIR/sdk_contents 
 mkdir $SDKBUILDDIR/sdk_contents
 mkdir $SDKBUILDDIR/sdk_contents/docs
 
@@ -48,14 +49,14 @@ cd $SDKBUILDDIR
 
 cp -R ../../Docs/manual sdk_contents/docs/
 cp -R ../../Docs/licenses sdk_contents/docs/
-cp ReadMe.html sdk_contents/docs/
+cp ../../Docs/ReadMe.html sdk_contents/docs/
 cp ../../Docs/style.css sdk_contents/docs/
 cp -R ../../Docs/ChangeLog.html sdk_contents/docs/
 cp -R ../../Docs/*.gif sdk_contents/docs/
 
 echo API generation done.
 
-# frameworks
+# Frameworks
 echo Copying frameworks...
 mkdir sdk_contents/Dependencies
 
@@ -63,8 +64,16 @@ mkdir sdk_contents/Dependencies
 ditto -arch $ARCH ../../build/lib/Release/Ogre.framework sdk_contents/Dependencies/Ogre.framework
 ditto -arch $ARCH ../../build/lib/Release/*.dylib sdk_contents/Dependencies/
 
-# Dependencies
+# Copy dependencies
+mkdir sdk_contents/Dependencies/include
+mkdir sdk_contents/Dependencies/lib
+#mkdir sdk_contents/Dependencies/lib/Debug
+mkdir sdk_contents/Dependencies/lib/Release
+
 ditto -arch $ARCH ../../Dependencies/Cg.framework sdk_contents/Dependencies/Cg.framework
+cp -R ../../Dependencies/include/* sdk_contents/Dependencies/include/
+#cp ../../Dependencies/lib/Debug/*.a sdk_contents/Dependencies/lib/Debug/
+ditto -arch $ARCH ../../Dependencies/lib/Release/*.a sdk_contents/Dependencies/lib/Release/
 
 echo Frameworks copied.
 
@@ -73,7 +82,8 @@ echo Copying samples...
 mkdir sdk_contents/Samples
 
 # Copy project location
-cp -R ../../build/OGRE.xcodeproj sdk_contents/Samples/
+mkdir sdk_contents/Samples/Samples.xcodeproj
+cp ../../CMake/Templates/XcodeSamplesOSX.pbxproj.in sdk_contents/Samples/Samples.xcodeproj/project.pbxproj
 
 # Copy source
 mkdir sdk_contents/Samples/src
@@ -82,21 +92,6 @@ mkdir sdk_contents/Samples/include
 find ../../Samples -iname *.cpp -exec cp \{\} sdk_contents/Samples/src \;
 find ../../Samples -iname *.mm -exec cp \{\} sdk_contents/Samples/src \;
 find ../../Samples -iname *.h -exec cp \{\} sdk_contents/Samples/include \;
-
-# Copy dependencies
-mkdir sdk_contents/Dependencies/include
-mkdir sdk_contents/Dependencies/lib
-#mkdir sdk_contents/Dependencies/lib/Debug
-mkdir sdk_contents/Dependencies/lib/Release
-cp -R ../../Dependencies/include/OIS sdk_contents/Dependencies/include
-#cp ../../Dependencies/lib/Debug/libois.a sdk_contents/Dependencies/lib/Debug/
-cp ../../Dependencies/lib/Release/libois.a sdk_contents/Dependencies/lib/Release/
-
-# Fix up project references (2 stage rather than in-place since in-place only works for single sed commands)
-sed -f editsamples.sed sdk_contents/Samples/OGRE.xcodeproj/project.pbxproj > tmp.pbxproj
-mv tmp.pbxproj sdk_contents/Samples/OGRE.xcodeproj/project.pbxproj
-# Fix up architecture
-sed -i -e "s/$REMOVE_ARCH,//g" sdk_contents/Samples/OGRE.xcodeproj/project.pbxproj
 
 echo Samples copied.
 
@@ -109,8 +104,8 @@ mkdir sdk_contents/Samples/config/
 cp ../../build/bin/*.cfg sdk_contents/Samples/config/
 
 # Fix up config files
-sed -i -e "s/\.\.\/\.\.\/\.\.\/\.\.\/Samples/..\/..\/..\/Samples/g" sdk_contents/Samples/config/resources.cfg
-sed -i -e "s/\.\.\/\.\.\/\.\.\/\.\.\/Samples/..\/..\/..\/Samples/g" sdk_contents/Samples/config/quakemap.cfg
+sed -i -e "s/\=.*\(Samples\/Media.*\)/\=\1/g" sdk_contents/Samples/config/resources.cfg
+sed -i -e "s/\=.*\(Samples\/Media.*\)/\=\1/g" sdk_contents/Samples/config/quakemap.cfg
 
 echo Media copied.
 
@@ -128,8 +123,7 @@ mkdir tmp_dmg
 hdiutil attach template.dmg -noautoopen -quiet -mountpoint tmp_dmg
 ditto sdk_contents tmp_dmg/OgreSDK
 hdiutil detach tmp_dmg
-rm OgreSDK_$OGRE_VERSION.dmg
-hdiutil convert -format UDBZ  -o OgreSDK_$OGRE_VERSION.dmg template.dmg
+hdiutil convert -format UDBZ -o OgreSDK_$OGRE_VERSION.dmg template.dmg
 rm -rf tmp_dmg
 rm template.dmg
 
