@@ -345,27 +345,6 @@ namespace Ogre {
 
 		mIsExternal = (mEglSurface != 0);
 
-
-
-		if (!mEglConfig)
-		{
-			EGLint minAttribs[] = {
-				EGL_LEVEL, 0,
-				EGL_DEPTH_SIZE, 16,
-				EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-				EGL_NONE
-			};
-
-			EGLint maxAttribs[] = {
-				EGL_SAMPLES, samples,
-				EGL_STENCIL_SIZE, INT_MAX,
-				EGL_NONE
-			};
-
-			mEglConfig = mGLSupport->selectGLConfig(minAttribs, maxAttribs);
-			mHwGamma = false;
-		}
-
 		if (!mIsTopLevel)
 		{
 			mIsFullScreen = false;
