@@ -40,10 +40,6 @@ THE SOFTWARE.
 #include "OgreSymbianEGLRenderTexture.h"
 #include "OgreSymbianEGLContext.h"
 
-#ifdef __GCCE__
-#include <staticlibinit_gcce.h>
-#endif
-
 #include <e32base.h> // for Symbian classes.
 #include <coemain.h> // for CCoeEnv.
 
@@ -92,8 +88,17 @@ namespace Ogre {
 
 		mNativeDisplay = EGL_DEFAULT_DISPLAY;
 		mGLDisplay = eglGetDisplay( EGL_DEFAULT_DISPLAY );
-		//eglInitialize( mGLDisplay, NULL, NULL ) ; - not possible here
+		if( mGLDisplay != NULL )
+		{            
+			// Initialize EGL.
+			if( eglInitialize( mGLDisplay, NULL, NULL ) == EGL_FALSE )
+			{      
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					"EGL Initialize failed!",
+					"SymbianEGLSupport::SymbianEGLSupport");
 
+			}  
+		}
 
 
 
