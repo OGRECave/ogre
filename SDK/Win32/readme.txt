@@ -7,6 +7,7 @@ You need the following available on your system path:
 - CMake 2.8+
 - MSVC (run vcvars32.bat from the version of your choice in your command prompt)
 - Doxygen
+- Graphviz 'dot' command
 
 Environment
 -----------
