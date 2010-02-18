@@ -239,7 +239,7 @@ namespace Ogre {
 		//#########################################################################
 		// FORWARD ITERATORS
 		//#########################################################################
-		class _OgreExport _const_fwd_iterator; // forward declaration
+		class _const_fwd_iterator; // forward declaration
 
 		//! forward iterator for UTFString
 	class _OgreExport _fwd_iterator: public _base_iterator { /* i don't know why the beautifier is freaking out on this line */
