@@ -167,7 +167,7 @@ namespace Ogre {
 	- For additional information on UTF-8 encoding: http://en.wikipedia.org/wiki/UTF-8
 	- For additional information on UTF-32 encoding: http://en.wikipedia.org/wiki/UTF-32
 	*/
-	class UTFString {
+	class _OgreExport UTFString {
 		// constants used in UTF-8 conversions
 		static const unsigned char _lead1 = 0xC0;      //110xxxxx
 		static const unsigned char _lead1_mask = 0x1F; //00011111
@@ -203,7 +203,7 @@ namespace Ogre {
 		typedef std::basic_string<unicode_char> utf32string;
 
 		//! This exception is used when invalid data streams are encountered
-	class invalid_data: public std::runtime_error { /* i don't know why the beautifier is freaking out on this line */
+	class _OgreExport invalid_data: public std::runtime_error { /* i don't know why the beautifier is freaking out on this line */
 		public:
 			//! constructor takes a string message that can be later retrieved by the what() function
 			explicit invalid_data( const std::string& _Message ): std::runtime_error( _Message ) {
@@ -213,7 +213,7 @@ namespace Ogre {
 
 		//#########################################################################
 		//! base iterator class for UTFString
-	class _base_iterator: public std::iterator<std::random_access_iterator_tag, value_type> { /* i don't know why the beautifier is freaking out on this line */
+	class _OgreExport _base_iterator: public std::iterator<std::random_access_iterator_tag, value_type> { /* i don't know why the beautifier is freaking out on this line */
 			friend class UTFString;
 		protected:
 			_base_iterator();
@@ -239,10 +239,10 @@ namespace Ogre {
 		//#########################################################################
 		// FORWARD ITERATORS
 		//#########################################################################
-		class _const_fwd_iterator; // forward declaration
+		class _OgreExport _const_fwd_iterator; // forward declaration
 
 		//! forward iterator for UTFString
-	class _fwd_iterator: public _base_iterator { /* i don't know why the beautifier is freaking out on this line */
+	class _OgreExport _fwd_iterator: public _base_iterator { /* i don't know why the beautifier is freaking out on this line */
 			friend class _const_fwd_iterator;
 		public:
 			_fwd_iterator();
@@ -288,7 +288,7 @@ namespace Ogre {
 
 		//#########################################################################
 		//! const forward iterator for UTFString
-	class _const_fwd_iterator: public _base_iterator { /* i don't know why the beautifier is freaking out on this line */
+	class _OgreExport _const_fwd_iterator: public _base_iterator { /* i don't know why the beautifier is freaking out on this line */
 		public:
 			_const_fwd_iterator();
 			_const_fwd_iterator( const _const_fwd_iterator& i );
@@ -349,7 +349,7 @@ namespace Ogre {
 		//#########################################################################
 		class _const_rev_iterator; // forward declaration
 		//! forward iterator for UTFString
-	class _rev_iterator: public _base_iterator { /* i don't know why the beautifier is freaking out on this line */
+	class _OgreExport _rev_iterator: public _base_iterator { /* i don't know why the beautifier is freaking out on this line */
 			friend class _const_rev_iterator;
 		public:
 			_rev_iterator();
@@ -383,7 +383,7 @@ namespace Ogre {
 		};
 		//#########################################################################
 		//! const reverse iterator for UTFString
-	class _const_rev_iterator: public _base_iterator { /* i don't know why the beautifier is freaking out on this line */
+	class _OgreExport _const_rev_iterator: public _base_iterator { /* i don't know why the beautifier is freaking out on this line */
 		public:
 			_const_rev_iterator();
 			_const_rev_iterator( const _const_rev_iterator& i );
