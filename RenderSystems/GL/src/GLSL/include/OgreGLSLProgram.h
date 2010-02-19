@@ -53,7 +53,7 @@ namespace Ogre {
 		seperated by white space.
         
     */
-    class _OgrePrivate GLSLProgram : public HighLevelGpuProgram
+    class _OgreGLExport GLSLProgram : public HighLevelGpuProgram
     {
     public:
         /// Command object for attaching another GLSL Program 
@@ -125,21 +125,21 @@ namespace Ogre {
 			void doSet(void* target, const String& val);
 		};
 		/// Command object for setting the input operation type (geometry shader only)
-		class _OgrePrivate CmdInputOperationType : public ParamCommand
+		class _OgreGLExport CmdInputOperationType : public ParamCommand
 		{
 		public:
 			String doGet(const void* target) const;
 			void doSet(void* target, const String& val);
 		};
 		/// Command object for setting the output operation type (geometry shader only)
-		class _OgrePrivate CmdOutputOperationType : public ParamCommand
+		class _OgreGLExport CmdOutputOperationType : public ParamCommand
 		{
 		public:
 			String doGet(const void* target) const;
 			void doSet(void* target, const String& val);
 		};
 		/// Command object for setting the maximum output vertices (geometry shader only)
-		class _OgrePrivate CmdMaxOutputVertices : public ParamCommand
+		class _OgreGLExport CmdMaxOutputVertices : public ParamCommand
 		{
 		public:
 			String doGet(const void* target) const;

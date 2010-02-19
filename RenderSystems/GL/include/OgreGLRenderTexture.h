@@ -46,7 +46,7 @@ namespace Ogre {
     
     /** Base class for GL Render Textures
     */
-    class _OgrePrivate GLRenderTexture: public RenderTexture
+    class _OgreGLExport GLRenderTexture: public RenderTexture
     {
     public:
         GLRenderTexture(const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
@@ -57,7 +57,7 @@ namespace Ogre {
     
     /** Manager/factory for RenderTextures.
     */
-    class _OgrePrivate GLRTTManager: public Singleton<GLRTTManager>
+    class _OgreGLExport GLRTTManager: public Singleton<GLRTTManager>
     {
     public:
         virtual ~GLRTTManager();
@@ -92,7 +92,7 @@ namespace Ogre {
     /** RenderTexture for simple copying from frame buffer
     */
     class GLCopyingRTTManager;
-    class _OgrePrivate GLCopyingRenderTexture: public GLRenderTexture
+    class _OgreGLExport GLCopyingRenderTexture: public GLRenderTexture
     {
     public:
         GLCopyingRenderTexture(GLCopyingRTTManager *manager, const String &name, const GLSurfaceDesc &target, 
@@ -104,7 +104,7 @@ namespace Ogre {
     /** Simple, copying manager/factory for RenderTextures. This is only used as the last fallback if
         both PBuffers and FBOs aren't supported.
     */
-    class _OgrePrivate GLCopyingRTTManager: public GLRTTManager
+    class _OgreGLExport GLCopyingRTTManager: public GLRTTManager
     {
     public:
         GLCopyingRTTManager();

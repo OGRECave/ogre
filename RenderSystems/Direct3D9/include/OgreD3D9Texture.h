@@ -37,7 +37,7 @@ THE SOFTWARE.
 #include "OgreD3D9Resource.h"
 
 namespace Ogre {
-	class D3D9Texture : public Texture, public D3D9Resource
+	class _OgreD3D9Export D3D9Texture : public Texture, public D3D9Resource
 	{
 	protected:	
 
@@ -224,7 +224,7 @@ namespace Ogre {
     except to do so requires a form VC6 does not support i.e.
     ResourceSubclassPtr<T> : public SharedPtr<T>
     */
-    class D3D9TexturePtr : public SharedPtr<D3D9Texture> 
+    class _OgreD3D9Export D3D9TexturePtr : public SharedPtr<D3D9Texture> 
     {
     public:
         D3D9TexturePtr() : SharedPtr<D3D9Texture>() {}
@@ -305,7 +305,7 @@ namespace Ogre {
     };
 
     /// RenderTexture implementation for D3D9
-    class D3D9RenderTexture : public RenderTexture
+    class _OgreD3D9Export D3D9RenderTexture : public RenderTexture
     {
     public:
 		D3D9RenderTexture(const String &name, D3D9HardwarePixelBuffer *buffer, bool writeGamma, uint fsaa);

@@ -36,7 +36,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     /** GL-specific implementation of a TextureManager */
-    class _OgrePrivate GLTextureManager : public TextureManager
+    class _OgreGLExport GLTextureManager : public TextureManager
     {
     public:
         GLTextureManager(GLSupport& support);

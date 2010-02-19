@@ -29,7 +29,7 @@ THE SOFTWARE.
 #ifndef __GLDefaultHardwareBufferManager_H__
 #define __GLDefaultHardwareBufferManager_H__
 
-#include "OgrePrerequisites.h"
+#include "OgreGLPrerequisites.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
@@ -37,7 +37,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /// Specialisation of HardwareVertexBuffer for emulation
-    class _OgrePrivate GLDefaultHardwareVertexBuffer : public HardwareVertexBuffer 
+    class _OgreGLExport GLDefaultHardwareVertexBuffer : public HardwareVertexBuffer 
     {
 	protected:
 		unsigned char* mpData;
@@ -66,7 +66,7 @@ namespace Ogre {
     };
 
 	/// Specialisation of HardwareIndexBuffer for emulation
-    class _OgrePrivate GLDefaultHardwareIndexBuffer : public HardwareIndexBuffer
+    class _OgreGLExport GLDefaultHardwareIndexBuffer : public HardwareIndexBuffer
     {
 	protected:
 		unsigned char* mpData;
@@ -97,7 +97,7 @@ namespace Ogre {
 		rendering system (which is required to create a 'real' hardware
 		buffer manager.
 	*/
-	class _OgrePrivate GLDefaultHardwareBufferManagerBase : public HardwareBufferManagerBase
+	class _OgreGLExport GLDefaultHardwareBufferManagerBase : public HardwareBufferManagerBase
 	{
     public:
         GLDefaultHardwareBufferManagerBase();
@@ -116,7 +116,7 @@ namespace Ogre {
     };
 
 	/// GLDefaultHardwareBufferManagerBase as a Singleton
-	class _OgrePrivate GLDefaultHardwareBufferManager : public HardwareBufferManager
+	class _OgreGLExport GLDefaultHardwareBufferManager : public HardwareBufferManager
 	{
 	public:
 		GLDefaultHardwareBufferManager()

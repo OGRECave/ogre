@@ -40,7 +40,7 @@ namespace Ogre {
         reason for not wanting to use the Cg plugin, I suggest you use Cg instead since that
         can produce programs for OpenGL too.
     */
-    class D3D9HLSLProgram : public HighLevelGpuProgram
+    class _OgreD3D9Export D3D9HLSLProgram : public HighLevelGpuProgram
     {
     public:
         /// Command object for setting entry point

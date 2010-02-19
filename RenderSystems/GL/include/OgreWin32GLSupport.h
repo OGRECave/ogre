@@ -8,7 +8,7 @@
 namespace Ogre
 {
     
-	class _OgrePrivate Win32GLSupport : public GLSupport
+	class _OgreGLExport Win32GLSupport : public GLSupport
 	{
 	public:
         Win32GLSupport();

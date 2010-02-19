@@ -50,7 +50,7 @@ namespace Ogre {
 		RCP_CREATE_ON_ALL_DEVICES
 	};
 	
-	class D3D9ResourceManager
+	class _OgreD3D9Export D3D9ResourceManager
 	{
 
 	// Interface.

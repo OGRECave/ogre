@@ -40,7 +40,7 @@ namespace Ogre {
 	D3D9HLSLProgram::CmdMicrocode D3D9HLSLProgram::msCmdMicrocode;
 	D3D9HLSLProgram::CmdAssemblerCode D3D9HLSLProgram::msCmdAssemblerCode;
 
-	class HLSLIncludeHandler : public ID3DXInclude
+	class _OgreD3D9Export HLSLIncludeHandler : public ID3DXInclude
 	{
 	public:
 		HLSLIncludeHandler(Resource* sourceProgram) 

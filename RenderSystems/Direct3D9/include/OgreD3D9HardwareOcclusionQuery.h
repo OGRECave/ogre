@@ -51,7 +51,7 @@ namespace Ogre {
 	* Updated on 12/7/2004 by Chris McGuirk
 	* Updated on 4/8/2005 by Tuan Kuranes email: tuan.kuranes@free.fr
 	*/
-	class D3D9HardwareOcclusionQuery : public HardwareOcclusionQuery, public D3D9Resource
+	class _OgreD3D9Export D3D9HardwareOcclusionQuery : public HardwareOcclusionQuery, public D3D9Resource
 	{
 		//----------------------------------------------------------------------
 		// Public methods

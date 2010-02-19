@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Implementation of HardwareBufferManager for D3D9. */
-    class D3D9HardwareBufferManagerBase : public HardwareBufferManagerBase
+    class _OgreD3D9Export D3D9HardwareBufferManagerBase : public HardwareBufferManagerBase
     {
     protected:     
         /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
@@ -56,7 +56,7 @@ namespace Ogre {
     };
 
 	/// D3D9HardwareBufferManagerBase as a Singleton
-	class D3D9HardwareBufferManager : public HardwareBufferManager
+	class _OgreD3D9Export D3D9HardwareBufferManager : public HardwareBufferManager
 	{
 	public:
 		D3D9HardwareBufferManager()

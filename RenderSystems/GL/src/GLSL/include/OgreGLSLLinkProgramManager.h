@@ -49,7 +49,7 @@ namespace Ogre {
 
 	*/
 
-	class _OgrePrivate GLSLLinkProgramManager : public Singleton<GLSLLinkProgramManager>
+	class _OgreGLExport GLSLLinkProgramManager : public Singleton<GLSLLinkProgramManager>
 	{
 
 	private:

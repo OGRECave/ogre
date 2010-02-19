@@ -29,11 +29,12 @@ THE SOFTWARE.
 #ifndef __GLGpuProgramManager_H__
 #define __GLGpuProgramManager_H__
 
+#include "OgreGLPrerequisites.h"
 #include "OgreGpuProgramManager.h"
 
 namespace Ogre {
 
-class _OgrePrivate GLGpuProgramManager : public GpuProgramManager
+class _OgreGLExport GLGpuProgramManager : public GpuProgramManager
 {
 public:
     typedef GpuProgram* (*CreateGpuProgramCallback)(ResourceManager* creator, 

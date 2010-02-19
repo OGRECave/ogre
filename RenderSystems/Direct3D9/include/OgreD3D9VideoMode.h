@@ -35,7 +35,7 @@ namespace Ogre
 {
 	static unsigned int modeCount = 0;
 
-	class D3D9VideoMode
+	class _OgreD3D9Export D3D9VideoMode
 	{
 	private:
 		D3DDISPLAYMODE mDisplayMode;

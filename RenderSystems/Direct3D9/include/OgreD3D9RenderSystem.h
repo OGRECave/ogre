@@ -48,7 +48,7 @@ namespace Ogre
 	/**
 	Implementation of DirectX9 as a rendering system.
 	*/
-	class D3D9RenderSystem : public RenderSystem
+	class _OgreD3D9Export D3D9RenderSystem : public RenderSystem
 	{
 	private:
 		/// Direct3D

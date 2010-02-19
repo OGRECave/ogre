@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class D3D9RenderWindow : public RenderWindow
+	class _OgreD3D9Export D3D9RenderWindow : public RenderWindow
 	{
 	public:
 		/** Constructor.

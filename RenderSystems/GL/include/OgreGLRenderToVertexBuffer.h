@@ -41,7 +41,7 @@ namespace Ogre {
         that run on previous results of those shaders, creating stateful 
         shaders.
     */
-	class _OgrePrivate GLRenderToVertexBuffer : public RenderToVertexBuffer
+	class _OgreGLExport GLRenderToVertexBuffer : public RenderToVertexBuffer
     {    
     public:
 		/** C'tor */

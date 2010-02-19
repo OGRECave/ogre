@@ -37,7 +37,7 @@ namespace Ogre
 	class D3D9VideoModeList;
 	class D3D9VideoMode;
 
-	class D3D9Driver
+	class _OgreD3D9Export D3D9Driver
 	{
 	
 	public:

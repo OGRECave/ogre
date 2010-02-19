@@ -39,7 +39,7 @@ namespace Ogre {
 	/** High level interface of Direct3D9 Device.
 	Provide useful methods for device handling.
 	*/
-	class D3D9Device
+	class _OgreD3D9Export D3D9Device
 	{
 
 	// Interface.

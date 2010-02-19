@@ -38,7 +38,7 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class D3D9Mappings
+	class _OgreD3D9Export D3D9Mappings
 	{
 	public:
 		/// enum identifying D3D9 tex. types
