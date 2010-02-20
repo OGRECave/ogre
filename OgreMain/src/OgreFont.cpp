@@ -353,7 +353,7 @@ namespace Ogre
 					continue;
 				}
 
-				FT_Int advance = (face->glyph->advance.x >> 6 ) + ( face->glyph->metrics.horiBearingX >> 6 );
+				FT_Int advance = face->glyph->advance.x >> 6;
 
 				unsigned char* buffer = face->glyph->bitmap.buffer;
 
@@ -366,11 +366,12 @@ namespace Ogre
 				}
 
 				int y_bearnig = ( mTtfMaxBearingY >> 6 ) - ( face->glyph->metrics.horiBearingY >> 6 );
+				int x_bearing = face->glyph->metrics.horiBearingX >> 6;
 
 				for(int j = 0; j < face->glyph->bitmap.rows; j++ )
 				{
 					size_t row = j + m + y_bearnig;
-					uchar* pDest = &imageData[(row * data_width) + l * pixel_bytes];
+					uchar* pDest = &imageData[(row * data_width) + (l + x_bearing) * pixel_bytes];
 					for(int k = 0; k < face->glyph->bitmap.width; k++ )
 					{
 						if (mAntialiasColour)
