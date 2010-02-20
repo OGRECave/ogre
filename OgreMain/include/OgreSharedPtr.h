@@ -140,7 +140,7 @@ namespace Ogre {
 		}
 		template< class Y>
 		SharedPtr& operator=(const SharedPtr<Y>& r) {
-			if (pRep == r.pRep)
+			if (pRep == r.getPointer())
 				return *this;
 			// Swap current data into a local copy
 			// this ensures we deal with rhs and this being dependent
