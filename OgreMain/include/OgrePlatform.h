@@ -221,11 +221,6 @@ namespace Ogre {
 
 #endif
 
-//For apple, we always have a custom config.h file
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#    include "config.h"
-#endif
-
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------

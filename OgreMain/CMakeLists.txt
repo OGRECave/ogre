@@ -517,8 +517,7 @@ elseif (APPLE)
       # Hack around a CMake bug.  The first item has its role set to Project instead of public.
       # including it twice works around the issue
       # In addition, include OgreZip.h because of a similar issue
-	  include/OSX/config.h
-	  include/OSX/config.h
+      include/OSX/macUtils.h
       include/OSX/macUtils.h
       include/OSX/OgreConfigDialogImp.h
       include/OSX/OgreErrorDialogImp.h
