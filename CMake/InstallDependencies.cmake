@@ -8,10 +8,10 @@
 #-------------------------------------------------------------------
 
 #####################################################
-# Install dependencies on Windows
+# Install dependencies 
 #####################################################
 
-if (NOT WIN32)
+if (UNIX)
   return()
 endif()
 
@@ -25,8 +25,8 @@ else ()
   return()
 endif ()
 
-option(OGRE_INSTALL_DEPENDENCIES "Install dependency DLLs needed for samples" TRUE)
-option(OGRE_COPY_DEPENDENCIES "Copy dependency DLLs to the build directory" TRUE)
+option(OGRE_INSTALL_DEPENDENCIES "Install dependency libs needed for samples" TRUE)
+option(OGRE_COPY_DEPENDENCIES "Copy dependency libs to the build directory" TRUE)
 
 macro(install_debug INPUT)
   if (EXISTS ${OGRE_DEP_DIR}/bin/debug/${INPUT})
@@ -72,34 +72,57 @@ if (OGRE_INSTALL_DEPENDENCIES)
 	if (EXISTS ${OGRE_DEP_DIR}/include/OIS/)
       install(DIRECTORY ${OGRE_DEP_DIR}/include/OIS   DESTINATION include)
 	endif ()
-	if (EXISTS ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib)
+	if(WIN32)
+	  if (EXISTS ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib)
       install(FILES
         ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib
         DESTINATION lib/debug CONFIGURATIONS Debug
       )
-	endif ()
-	if (EXISTS ${OGRE_DEP_DIR}/lib/release/OIS.lib)
+	  endif ()
+	  if (EXISTS ${OGRE_DEP_DIR}/lib/release/OIS.lib)
       install(FILES
         ${OGRE_DEP_DIR}/lib/release/OIS.lib
         DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
       )
+	  endif ()
+	elseif(APPLE)
+	  if (EXISTS ${OGRE_DEP_DIR}/lib/debug/libOIS.a)
+        install(FILES
+          ${OGRE_DEP_DIR}/lib/debug/libOIS.a
+          DESTINATION lib/debug CONFIGURATIONS Debug
+        )
+	  endif ()
+	  if (EXISTS ${OGRE_DEP_DIR}/lib/release/libOIS.a)
+        install(FILES
+          ${OGRE_DEP_DIR}/lib/release/libOIS.a
+          DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
+        )
+	  endif ()
 	endif ()
   endif ()
     
-  # copy the dependency DLLs to the right places
-  install_debug(OIS_d.dll)
-  install_release(OIS.dll)
-  install_debug(OIS_d.dll)
-  install_release(OIS.dll)
-  if (OGRE_BUILD_PLUGIN_CG)
-    install_debug(cg.dll)
-	install_release(cg.dll)
-  endif ()
-  
-  # install GLES dlls
-  if (OGRE_BUILD_RENDERSYSTEM_GLES)
-    install_debug(libgles_cm.dll)
-	install_release(libgles_cm.dll)
+  if(WIN32)
+    # copy the dependency DLLs to the right places
+    install_debug(OIS_d.dll)
+    install_release(OIS.dll)
+    if (OGRE_BUILD_PLUGIN_CG)
+      install_debug(cg.dll)
+	  install_release(cg.dll)
+    endif ()
+
+    # install GLES dlls
+    if (OGRE_BUILD_RENDERSYSTEM_GLES)
+      install_debug(libgles_cm.dll)
+	  install_release(libgles_cm.dll)
+    endif ()
+  elseif(APPLE)
+    # copy the dependency libs to the right places
+    install_debug(libOIS.a)
+    install_release(libOIS.a)
+    if (OGRE_BUILD_PLUGIN_CG)
+      install_debug(Cg.framework)
+	  install_release(Cg.framework)
+    endif ()
   endif ()
   
   # If we're installing the sample source for an SDK, also install Boost headers & libraries
@@ -181,18 +204,29 @@ if (OGRE_INSTALL_DEPENDENCIES)
 endif ()
 
 if (OGRE_COPY_DEPENDENCIES)
-  # copy the required DLLs to the build directory (configure_file is the only copy-like op I found in CMake)
-  copy_debug(OIS_d.dll)
-  copy_release(OIS.dll)
 
-  if (OGRE_BUILD_PLUGIN_CG)
-    copy_debug(cg.dll)
-	copy_release(cg.dll)
+  if (WIN32)
+    # copy the required DLLs to the build directory (configure_file is the only copy-like op I found in CMake)
+    copy_debug(OIS_d.dll)
+    copy_release(OIS.dll)
+
+    if (OGRE_BUILD_PLUGIN_CG)
+      copy_debug(cg.dll)
+      copy_release(cg.dll)
+    endif ()
+
+    if (OGRE_BUILD_RENDERSYSTEM_GLES)
+      copy_debug(libgles_cm.dll)
+      copy_release(libgles_cm.dll)
+    endif ()
+  elseif(APPLE)
+    # copy the required libs and frameworks to the build directory (configure_file is the only copy-like op I found in CMake)
+    copy_debug(libOIS.a)
+    copy_release(libOIS.a)
+
+    if (OGRE_BUILD_PLUGIN_CG)
+      copy_debug(Cg.framework)
+      copy_release(Cg.framework)
+    endif ()
   endif ()
-
-  if (OGRE_BUILD_RENDERSYSTEM_GLES)
-    copy_debug(libgles_cm.dll)
-	copy_release(libgles_cm.dll)
-  endif ()
-
 endif ()

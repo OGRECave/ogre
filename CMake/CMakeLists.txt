@@ -48,8 +48,6 @@ endif ()
 if (APPLE)
   set(INST_FILES ${INST_FILES}
     Packages/FindIOKit.cmake
-    Templates/XcodeSamplesOSX.pbxproj.in
-#    Templates/XcodeSamplesiPhone.pbxproj.in
   )
   set(STATIC_INST_FILES ${STATIC_INST_FILES}
     Packages/FindCarbon.cmake
