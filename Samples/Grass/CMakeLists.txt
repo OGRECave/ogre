@@ -1,4 +1,4 @@
-# Configure Bezier demo build
+# Configure Grass demo build
 
 set(HEADER_FILES include/Grass.h)
 set(SOURCE_FILES src/Grass.cpp)
