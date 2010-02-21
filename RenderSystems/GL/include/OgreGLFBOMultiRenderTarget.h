@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre {
 	/** MultiRenderTarget for GL. Requires the FBO extension.
 	*/
-	class _OgrePrivate GLFBOMultiRenderTarget : public MultiRenderTarget
+	class _OgreGLExport GLFBOMultiRenderTarget : public MultiRenderTarget
 	{
 	public:
 		GLFBOMultiRenderTarget(GLFBOManager *manager, const String &name);

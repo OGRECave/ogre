@@ -36,7 +36,7 @@ namespace Ogre {
 	Provide unified interface to
 	handle various device states.
 	*/
-	class D3D9Resource
+	class _OgreD3D9Export D3D9Resource
 	{
 
 	// Interface.

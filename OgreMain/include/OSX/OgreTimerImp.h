@@ -29,7 +29,7 @@ THE SOFTWARE.
 #ifndef __OSXTimer_H__
 #define __OSXTimer_H__
 
-#include "Ogre/OgrePrerequisites.h"
+#include "OgrePrerequisites.h"
 
 namespace Ogre
 {

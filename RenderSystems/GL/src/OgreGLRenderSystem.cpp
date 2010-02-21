@@ -2765,7 +2765,6 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 				case VET_COLOUR:
 				case VET_COLOUR_ABGR:
 				case VET_COLOUR_ARGB:
-				case VET_UBYTE4:
 					// Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
 					// VertexElement::getTypeCount treats them as 1 (RGBA)
 					// Also need to normalise the fixed-point data

@@ -102,6 +102,8 @@ enum VSOutputCompactPolicy
 #           endif
 #   	endif
 #	endif
+#elif defined ( OGRE_GCC_VISIBILITY )
+#   define _OgreRTSSExport __attribute__ ((visibility("default")))
 #else
 #	define _OgreRTSSExport
 #endif 

@@ -35,7 +35,7 @@ THE SOFTWARE.
 namespace Ogre { 
 
     /** Specialisation of VertexDeclaration for D3D9 */
-    class D3D9VertexDeclaration : public VertexDeclaration, public D3D9Resource
+    class _OgreD3D9Export D3D9VertexDeclaration : public VertexDeclaration, public D3D9Resource
     {
     
     public:

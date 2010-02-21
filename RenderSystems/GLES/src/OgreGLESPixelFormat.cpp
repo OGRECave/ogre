@@ -282,11 +282,12 @@ namespace Ogre  {
             case GL_RGB:
                 return PF_X8R8G8B8;
             case GL_RGBA:
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
-				// seems that in windows we need this value to get the right color
+#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE)
+				// seems that in iPhone we need this value to get the right color
+                return PF_A8R8G8B8;
+#else
                 return PF_X8B8G8R8;
 #endif
-                return PF_A8R8G8B8;
 #ifdef GL_BGRA
             case GL_BGRA:
 #endif

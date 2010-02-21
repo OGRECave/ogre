@@ -36,7 +36,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Direct3D implementation of a few things common to low-level vertex & fragment programs. */
-    class D3D9GpuProgram : public GpuProgram, public D3D9Resource
+    class _OgreD3D9Export D3D9GpuProgram : public GpuProgram, public D3D9Resource
     {   
 	public:
         /// Command object for setting matrix packing in column-major order
@@ -107,7 +107,7 @@ namespace Ogre {
     };
 
     /** Direct3D implementation of low-level vertex programs. */
-    class D3D9GpuVertexProgram : public D3D9GpuProgram
+    class _OgreD3D9Export D3D9GpuVertexProgram : public D3D9GpuProgram
     {  
     public:
         D3D9GpuVertexProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
@@ -136,7 +136,7 @@ namespace Ogre {
     };
 
     /** Direct3D implementation of low-level fragment programs. */
-    class D3D9GpuFragmentProgram : public D3D9GpuProgram
+    class _OgreD3D9Export D3D9GpuFragmentProgram : public D3D9GpuProgram
     {  
     public:
         D3D9GpuFragmentProgram(ResourceManager* creator, const String& name, ResourceHandle handle,

@@ -35,7 +35,7 @@ THE SOFTWARE.
 namespace Ogre { 
 
 
-    class D3D9HardwareIndexBuffer : public HardwareIndexBuffer, public D3D9Resource
+    class _OgreD3D9Export D3D9HardwareIndexBuffer : public HardwareIndexBuffer, public D3D9Resource
     {
   
     public:

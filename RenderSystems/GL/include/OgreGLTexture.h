@@ -38,7 +38,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class _OgrePrivate GLTexture : public Texture
+    class _OgreGLExport GLTexture : public Texture
     {
     public:
         // Constructor
@@ -105,7 +105,7 @@ namespace Ogre {
     except to do so requires a form VC6 does not support i.e.
     ResourceSubclassPtr<T> : public SharedPtr<T>
     */
-    class _OgrePrivate GLTexturePtr : public SharedPtr<GLTexture> 
+    class _OgreGLExport GLTexturePtr : public SharedPtr<GLTexture> 
     {
     public:
         GLTexturePtr() : SharedPtr<GLTexture>() {}

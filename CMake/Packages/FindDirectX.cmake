@@ -55,7 +55,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
   endif(CMAKE_CL_64)
   find_library(DirectX_LIBRARY NAMES d3d9 HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
   find_library(DirectX_D3DX9_LIBRARY NAMES d3dx9 HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
-  find_library(DirectX_DXERR_LIBRARY NAMES dxerr HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
+  find_library(DirectX_DXERR_LIBRARY NAMES DxErr HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
   find_library(DirectX_DXGUID_LIBRARY NAMES dxguid HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
   
 
@@ -79,7 +79,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
 
   # look for D3D10 and D3D10.1 components
   if (DirectX_FOUND)
-    find_path(DirectX_D3D10_INCLUDE_DIR NAMES d3d10_1shader.h HINTS ${DirectX_INC_SEARCH_PATH})
+    find_path(DirectX_D3D10_INCLUDE_DIR NAMES D3D10_1shader.h HINTS ${DirectX_INC_SEARCH_PATH})
 	get_filename_component(DirectX_LIBRARY_DIR "${DirectX_LIBRARY}" PATH)
 	message(STATUS "DX lib dir: ${DirectX_LIBRARY_DIR}")
     find_library(DirectX_D3D10_LIBRARY NAMES d3d10 HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})

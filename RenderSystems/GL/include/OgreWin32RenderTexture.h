@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreGLPBuffer.h"
 
 namespace Ogre {
-    class _OgrePrivate Win32PBuffer : public GLPBuffer
+    class _OgreGLExport Win32PBuffer : public GLPBuffer
     {
 	public:
 		Win32PBuffer(PixelComponentType format, size_t width, size_t height);

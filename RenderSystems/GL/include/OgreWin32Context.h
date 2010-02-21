@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class _OgrePrivate Win32Context: public GLContext
+    class _OgreGLExport Win32Context: public GLContext
     {
     public:
         Win32Context(HDC     HDC,

@@ -1,0 +1,160 @@
+#-------------------------------------------------------------------
+# This file is part of the CMake build system for OGRE
+#     (Object-oriented Graphics Rendering Engine)
+# For the latest info, see http://www.ogre3d.org/
+#
+# The contents of this file are placed in the public domain. Feel
+# free to make use of it in any way you like.
+#-------------------------------------------------------------------
+
+######################################################################
+# OGRE SAMPLES BUILD SYSTEM
+######################################################################
+
+cmake_minimum_required(VERSION 2.6)
+set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
+cmake_policy(SET CMP0003 NEW)
+
+# Just debug / release since that's all that's included in SDK
+set (CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+
+# Use relative paths
+# Note that up to CMake 2.8.0 on MSVC the .pdbs are still referenced absolutely
+# This has been fixed with a patch so I expect that in future we will be able to use this
+# to pre-generate the sample projects for the SDK. 
+set(CMAKE_USE_RELATIVE_PATHS true)
+set(CMAKE_SUPPRESS_REGENERATION true)
+
+project(OGRE)
+
+# Find actual Ogre root
+if (WIN32)
+  get_filename_component(OGRE_ROOT_DIR "${OGRE_SOURCE_DIR}" ABSOLUTE)
+  set(OGRE_TEMPLATES_DIR "${OGRE_ROOT_DIR}/cmake")
+  set(OGRE_WORK_DIR "${OGRE_ROOT_DIR}")
+  set(CMAKE_MODULE_PATH "${OGRE_ROOT_DIR}/cmake")
+elseif (UNIX)
+  get_filename_component(OGRE_ROOT_DIR "${OGRE_SOURCE_DIR}/../../../" ABSOLUTE)
+  set(OGRE_TEMPLATES_DIR "${OGRE_ROOT_DIR}/lib/OGRE/cmake")
+  set(OGRE_WORK_DIR "${OGRE_ROOT_DIR}")
+  set(CMAKE_MODULE_PATH "${OGRE_ROOT_DIR}/lib/OGRE/cmake")
+endif ()
+
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  #  By default, install to the Ogre SDK root
+  SET(CMAKE_INSTALL_PREFIX
+   "${OGRE_ROOT_DIR}" CACHE PATH "OGRE install prefix" FORCE
+  )
+endif ()
+
+# Include necessary submodules
+set(OGRE_SDK_BUILD TRUE)
+set(OGRE_LIB_TYPE @OGRE_LIB_TYPE@)
+set(OGRE_STATIC @OGRE_STATIC@)
+include(OgreConfigTargets)
+set(CMAKE_PREFIX_PATH "${OGRE_ROOT_DIR}")
+set(OGRE_INSTALL_SAMPLES FALSE)
+if (NOT APPLE)
+  # Create debug libraries with _d postfix
+  set(CMAKE_DEBUG_POSTFIX "_d")
+endif ()
+# Boost is included
+set (BOOST_ROOT "${OGRE_SOURCE_DIR}/boost_@Boost_LIB_VERSION@")
+
+
+#####################################################################
+# Set up the basic build environment
+#####################################################################
+
+# Set compiler specific build flags
+if (CMAKE_COMPILER_IS_GNUCXX)
+  add_definitions(-msse)
+endif ()
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  remove_definitions(-msse)
+  add_definitions(-fno-regmove)
+endif ()
+if (MSVC)
+  add_definitions(/fp:fast)
+endif ()
+
+# Find dependencies
+find_package(OGRE REQUIRED)
+find_package(OIS REQUIRED)
+
+if (NOT OGRE_BUILD_PLATFORM_IPHONE)
+	if (WIN32 OR APPLE)
+		set(Boost_USE_STATIC_LIBS TRUE)
+	else ()
+		# Statically linking boost to a dynamic Ogre build doesn't work on Linux 64bit
+		set(Boost_USE_STATIC_LIBS ${OGRE_STATIC})
+	endif ()
+	set(Boost_ADDITIONAL_VERSIONS "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40" "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" )
+	# Components that need linking (NB does not include header-only components like bind)
+	set(OGRE_BOOST_COMPONENTS thread date_time)
+	find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+	if (NOT Boost_FOUND)
+		# Try again with the other type of libs
+		set(Boost_USE_STATIC_LIBS NOT ${Boost_USE_STATIC_LIBS})
+		find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+	endif()
+	find_package(Boost QUIET)
+	
+	# Set up referencing of Boost
+	include_directories(${Boost_INCLUDE_DIR})
+	add_definitions(-DBOOST_ALL_NO_LIB)
+	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${Boost_LIBRARIES})
+endif(NOT OGRE_BUILD_PLATFORM_IPHONE)
+
+include_directories(
+  ${OGRE_INCLUDE_DIRS}
+  ${OGRE_Plugin_PCZSceneManager_INCLUDE_DIRS}
+  ${OGRE_Plugin_OctreeZone_INCLUDE_DIRS}
+  ${OIS_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/Common/include
+)
+
+if (OGRE_RTShaderSystem_FOUND)
+	add_definitions(-DUSE_RTSHADER_SYSTEM)
+	ogre_add_component_include_dir(RTShaderSystem)
+	if (NOT OGRE_STATIC)
+		# Link to RT Shader System if enabled.
+  		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_RTShaderSystem_LIBRARIES})
+	endif () 
+endif()
+
+
+if (OGRE_STATIC)
+  # need to link against all plugins
+  if (OGRE_Plugin_BSPSceneManager_FOUND)
+    include_directories(${OGRE_Plugin_BSPSceneManager_INCLUDE_DIRS})
+    set(OGRE_PLUGIN_LIBRARIES ${OGRE_PLUGIN_LIBRARIES} ${OGRE_Plugin_BSPSceneManager_LIBRARIES})
+  endif ()
+  if (OGRE_Plugin_CgProgramManager_FOUND)
+    include_directories(${OGRE_Plugin_CgProgramManager_INCLUDE_DIRS})
+    set(OGRE_PLUGIN_LIBRARIES ${OGRE_PLUGIN_LIBRARIES} ${OGRE_Plugin_CgProgramManager_LIBRARIES})
+  endif ()
+  if (OGRE_Plugin_OctreeSceneManager_FOUND)
+    include_directories(${OGRE_Plugin_OctreeSceneManager_INCLUDE_DIRS})
+    set(OGRE_PLUGIN_LIBRARIES ${OGRE_PLUGIN_LIBRARIES} ${OGRE_Plugin_OctreeSceneManager_LIBRARIES})
+  endif ()
+  if (OGRE_Plugin_ParticleFX_FOUND)
+    include_directories(${OGRE_Plugin_ParticleFX_INCLUDE_DIRS})
+    set(OGRE_PLUGIN_LIBRARIES ${OGRE_PLUGIN_LIBRARIES} ${OGRE_Plugin_ParticleFX_LIBRARIES})
+  endif ()
+  if (OGRE_RenderSystem_Direct3D9_FOUND)
+    include_directories(${OGRE_RenderSystem_Direct3D9_INCLUDE_DIRS})
+    set(OGRE_PLUGIN_LIBRARIES ${OGRE_PLUGIN_LIBRARIES} ${OGRE_RenderSystem_Direct3D9_LIBRARIES})
+  endif ()
+  if (OGRE_RenderSystem_Direct3D10_FOUND)
+    include_directories(${OGRE_RenderSystem_Direct3D10_INCLUDE_DIRS})
+    set(OGRE_PLUGIN_LIBRARIES ${OGRE_PLUGIN_LIBRARIES} ${OGRE_RenderSystem_Direct3D10_LIBRARIES})
+  endif ()
+  if (OGRE_RenderSystem_GL_FOUND)
+    include_directories(${OGRE_RenderSystem_GL_INCLUDE_DIRS})
+    set(OGRE_PLUGIN_LIBRARIES ${OGRE_PLUGIN_LIBRARIES} ${OGRE_RenderSystem_GL_LIBRARIES})
+  endif ()
+endif ()
+
+
+add_subdirectory(Samples)

@@ -25,23 +25,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgrePlatform.h"
 #include "OgreStableHeaders.h"
+
+#include "OgrePlatform.h"
 #include "OgrePrerequisites.h"
 #include "OgreMemoryTracker.h"
 #include "OgreString.h"
 
-
-namespace Ogre
-{
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#   include <windows.h>
 #	define Ogre_OutputCString(str) ::OutputDebugStringA(str)
 #	define Ogre_OutputWString(str) ::OutputDebugStringW(str)
 #else
-#	define Ogre_OutputCString(str) std::err << str
-#	define Ogre_OutputWString(str) std::err << str
+#	define Ogre_OutputCString(str) std::cerr << str
+#	define Ogre_OutputWString(str) std::cerr << str
 #endif
+
+namespace Ogre
+{
 	
 #if OGRE_MEMORY_TRACKER
 	//--------------------------------------------------------------------------

@@ -36,7 +36,7 @@ namespace Ogre {
 	class D3D9Texture;
 	class D3D9RenderTexture;
 
-	class D3D9HardwarePixelBuffer: public HardwarePixelBuffer
+	class _OgreD3D9Export D3D9HardwarePixelBuffer: public HardwarePixelBuffer
 	{
 	protected:		
 		struct BufferResources

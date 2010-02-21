@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include "OgreD3D9HardwarePixelBuffer.h"
 
 namespace Ogre {
-	class D3D9MultiRenderTarget : public MultiRenderTarget
+	class _OgreD3D9Export D3D9MultiRenderTarget : public MultiRenderTarget
 	{
 	public:
 		D3D9MultiRenderTarget(const String &name);

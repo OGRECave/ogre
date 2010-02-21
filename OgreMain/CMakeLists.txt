@@ -438,6 +438,7 @@ set (SOURCE_FILES
   src/OgreTextureUnitState.cpp
   src/OgreUnifiedHighLevelGpuProgram.cpp
   src/OgreUserObjectBindings.cpp
+  src/OgreUTFString.cpp
   src/OgreVector2.cpp
   src/OgreVector3.cpp
   src/OgreVector4.cpp
@@ -471,7 +472,7 @@ if (WIN32)
     src/WIN32/winres.h
   )
   source_group(Resources FILES ${RESOURCE_FILES})
-  set(PLATFORM_HEADER_INSTALL "win32")
+  set(PLATFORM_HEADER_INSTALL "WIN32")
  
   if (MINGW) 
     # There's a bug in CMake which makes it ignore resource files with Mingw
@@ -516,8 +517,7 @@ elseif (APPLE)
       # Hack around a CMake bug.  The first item has its role set to Project instead of public.
       # including it twice works around the issue
       # In addition, include OgreZip.h because of a similar issue
-	  include/OSX/config.h
-	  include/OSX/config.h
+      include/OSX/macUtils.h
       include/OSX/macUtils.h
       include/OSX/OgreConfigDialogImp.h
       include/OSX/OgreErrorDialogImp.h
@@ -660,6 +660,13 @@ if (APPLE)
     set_target_properties(OgreMain PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADER_FILES} ${THREAD_HEADER_FILES}")
 	set_target_properties(OgreMain PROPERTIES RESOURCE "${RESOURCE_FILES}")
 	set_source_files_properties("${RESOURCE_FILES}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
+    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
+    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
+    add_custom_command(TARGET OgreMain POST_BUILD
+      COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/Threading
+	  COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp ARGS -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/OgreMain/include/Threading/* ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/Threading/
+	)
   else ()
     set_target_properties(OgreMain PROPERTIES INSTALL_NAME_DIR "OGRE")
     set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_THUMB_SUPPORT "NO")

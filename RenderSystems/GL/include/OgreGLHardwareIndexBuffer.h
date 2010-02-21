@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre { 
 
 
-    class _OgrePrivate GLHardwareIndexBuffer : public HardwareIndexBuffer
+    class _OgreGLExport GLHardwareIndexBuffer : public HardwareIndexBuffer
     {
     private:
         GLuint mBufferId;

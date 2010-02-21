@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class D3D9TextureManager : public TextureManager
+	class _OgreD3D9Export D3D9TextureManager : public TextureManager
 	{
 	protected:		
         /// @copydoc ResourceManager::createImpl

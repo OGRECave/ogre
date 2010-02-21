@@ -38,7 +38,7 @@ namespace Ogre {
 
 
     /** Implementation of HardwareBufferManager for OpenGL. */
-    class _OgrePrivate GLHardwareBufferManagerBase : public HardwareBufferManagerBase
+    class _OgreGLExport GLHardwareBufferManagerBase : public HardwareBufferManagerBase
     {
 	protected:
 		char* mScratchBufferPool;
@@ -82,7 +82,7 @@ namespace Ogre {
     };
 
 	/// GLHardwareBufferManagerBase as a Singleton
-	class _OgrePrivate GLHardwareBufferManager : public HardwareBufferManager
+	class _OgreGLExport GLHardwareBufferManager : public HardwareBufferManager
 	{
 	public:
 		GLHardwareBufferManager()

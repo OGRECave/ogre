@@ -273,7 +273,9 @@ namespace Ogre {
         */
         inline void baseVertexPointerToElement(void* pBase, unsigned short** pElem) const
         {
-            *pElem = static_cast<unsigned short*>(pBase) + mOffset;
+			*pElem = static_cast<unsigned short*>(
+				static_cast<void*>(
+					static_cast<unsigned char*>(pBase) + mOffset));
         }
 
 

@@ -1,8 +1,4 @@
 # Configure Samples build
-if (APPLE)
-  include_directories("${OGRE_SOURCE_DIR}/Mac/Ogre/include")
-endif()
-
 
 if (OGRE_BUILD_SAMPLES AND NOT OIS_FOUND)
   message(STATUS "Could not find dependency: OIS")

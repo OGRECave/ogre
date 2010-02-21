@@ -643,7 +643,8 @@ namespace Ogre
 		uint32 len;
 		read(&len);
 		string->resize(len);
-		read(&(*string->begin()), len);
+		if (len)
+			read(&(*string->begin()), len);
 	}
 	//---------------------------------------------------------------------
 	void StreamSerialiser::read(Real* val, size_t count)

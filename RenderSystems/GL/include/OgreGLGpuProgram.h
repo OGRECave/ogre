@@ -36,7 +36,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Generalised low-level GL program, can be applied to multiple types (eg ARB and NV) */
-    class _OgrePrivate GLGpuProgram : public GpuProgram
+    class _OgreGLExport GLGpuProgram : public GpuProgram
     {
     public:
         GLGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
@@ -82,7 +82,7 @@ namespace Ogre {
     };
 
     /** Specialisation of the GL low-level program for ARB programs. */
-    class _OgrePrivate GLArbGpuProgram : public GLGpuProgram
+    class _OgreGLExport GLArbGpuProgram : public GLGpuProgram
     {
     public:
         GLArbGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,

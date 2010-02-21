@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /// Specialisation of HardwareVertexBuffer for OpenGL
-    class _OgrePrivate GLHardwareVertexBuffer : public HardwareVertexBuffer 
+    class _OgreGLExport GLHardwareVertexBuffer : public HardwareVertexBuffer 
     {
     private:
         GLuint mBufferId;

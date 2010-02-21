@@ -11,6 +11,7 @@ class _OgreSampleClassExport Sample_Dot3Bump : public SdkSample
 public:
 
 	Sample_Dot3Bump()
+		: mMoveLights (true)
 	{
 		mInfo["Title"] = "Bump Mapping";
 		mInfo["Description"] = "Shows how to use the dot product blending operation and normalization cube map "
@@ -49,9 +50,12 @@ public:
 
 	bool frameRenderingQueued(const FrameEvent& evt)
 	{
-		// rotate the light pivots
-		mLightPivot1->roll(Degree(evt.timeSinceLastFrame * 30));
-		mLightPivot2->roll(Degree(evt.timeSinceLastFrame * 10));
+		if (mMoveLights)
+		{
+			// rotate the light pivots
+			mLightPivot1->roll(Degree(evt.timeSinceLastFrame * 30));
+			mLightPivot2->roll(Degree(evt.timeSinceLastFrame * 10));
+		}
 
 		return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
 	}
@@ -81,14 +85,22 @@ public:
 
 	void checkBoxToggled(CheckBox* box)
 	{
-		// get the light pivot that corresponds to this checkbox
-		SceneNode* pivot = box->getName() == "Light1" ? mLightPivot1 : mLightPivot2;
-		SceneNode::ObjectIterator it = pivot->getAttachedObjectIterator();
-
-		while (it.hasMoreElements())  // toggle visibility of light and billboard set
+		if (StringUtil::startsWith(box->getName(), "Light", false))
 		{
-			MovableObject* o = it.getNext();
-			o->setVisible(box->isChecked());
+			// get the light pivot that corresponds to this checkbox
+			SceneNode* pivot = box->getName() == "Light1" ? mLightPivot1 : mLightPivot2;
+			SceneNode::ObjectIterator it = pivot->getAttachedObjectIterator();
+
+			while (it.hasMoreElements())  // toggle visibility of light and billboard set
+			{
+				MovableObject* o = it.getNext();
+				o->setVisible(box->isChecked());
+			}
+
+		}
+		else if (box->getName() == "MoveLights")
+		{
+			mMoveLights = !mMoveLights;
 		}
 	}
 
@@ -275,6 +287,7 @@ protected:
 		// create checkboxes to toggle lights
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "Light1", "Light A")->setChecked(true, false);
 		mTrayMgr->createCheckBox(TL_TOPLEFT, "Light2", "Light B")->setChecked(true, false);
+		mTrayMgr->createCheckBox(TL_TOPLEFT, "MoveLights", "Move Lights")->setChecked(true, false);
 
 		// a friendly reminder
 		StringVector names;
@@ -296,6 +309,7 @@ protected:
 	SceneNode* mObjectNode;
 	SceneNode* mLightPivot1;
 	SceneNode* mLightPivot2;
+	bool mMoveLights;
 	SelectMenu* mMeshMenu;
 	SelectMenu* mMaterialMenu;
 };

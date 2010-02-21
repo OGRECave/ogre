@@ -40,7 +40,7 @@ namespace Ogre {
     /**
       Implementation of GL as a rendering system.
      */
-    class _OgrePrivate GLRenderSystem : public RenderSystem
+    class _OgreGLExport GLRenderSystem : public RenderSystem
     {
     private:
         /// Rendering loop control

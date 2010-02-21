@@ -32,6 +32,15 @@ goto detecteddevenv
 set DEVENV=VCExpress
 :detecteddevenv
 
+rem build docs explicitly since INSTALL doesn't include it
+%DEVENV% OGRE.sln /build "Release" /project "doc"
+
+rem Delete unnecessary doc files
+pushd api\html
+del /Q/F *.hhk *.hhc *.map *.md5 *.dot *.hhp *.plist
+popd
+
+rem Build main binaries
 %DEVENV% OGRE.sln /build "Debug" /project "INSTALL"
 %DEVENV% OGRE.sln /build "Release" /project "INSTALL"
 

@@ -53,6 +53,11 @@ if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1
        INSTALL_NAME_DIR "@executable_path/../Plugins"
     )
+
+	# Copy headers into the main Ogre framework
+	add_custom_command(TARGET Plugin_BSPSceneManager POST_BUILD
+	  COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp ARGS -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/
+	)
 endif()
 
 if (OGRE_INSTALL_PLUGINS_HEADERS)

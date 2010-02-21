@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class D3D9GpuProgramManager : public GpuProgramManager
+    class _OgreD3D9Export D3D9GpuProgramManager : public GpuProgramManager
     {
     protected:
         /// @copydoc ResourceManager::createImpl

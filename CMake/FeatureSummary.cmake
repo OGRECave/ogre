@@ -136,7 +136,7 @@ macro(var_to_string VAR STR)
 endmacro ()
 
 # allocator settings
-if (OGRE_CONFIG_ALlOCATOR EQUAL 1)
+if (OGRE_CONFIG_ALLOCATOR EQUAL 1)
 	set(_allocator "standard")
 elseif (OGRE_CONFIG_ALLOCATOR EQUAL 2)
 	set(_allocator "nedmalloc")
