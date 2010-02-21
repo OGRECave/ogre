@@ -14,7 +14,7 @@ rm OgreSDK_$OGRE_VERSION.dmg
 # Configure with CMake
 mkdir ../../build
 pushd ../../build
-cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_MEDIA:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G Xcode ..
+cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G Xcode ..
 
 echo Building API docs...
 

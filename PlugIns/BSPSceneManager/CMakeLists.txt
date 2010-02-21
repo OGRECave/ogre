@@ -60,8 +60,6 @@ if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
 	)
 endif()
 
-if (OGRE_INSTALL_PLUGINS_HEADERS)
-  install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/BSPSceneManager)
-endif ()
+install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/BSPSceneManager)
 
 ogre_config_plugin(Plugin_BSPSceneManager)

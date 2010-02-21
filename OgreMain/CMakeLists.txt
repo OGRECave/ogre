@@ -62,7 +62,6 @@ set (HEADER_FILES
   include/OgreConvexBody.h
   include/OgreCustomCompositionPass.h
   include/OgreDataStream.h
-  include/OgreDDSCodec.h
   include/OgreDefaultHardwareBufferManager.h
   include/OgreDistanceLodStrategy.h
   include/OgreDynLib.h
@@ -78,7 +77,6 @@ set (HEADER_FILES
   include/OgreFont.h
   include/OgreFontManager.h
   include/OgreFrameListener.h
-  include/OgreFreeImageCodec.h
   include/OgreFrustum.h
   include/OgreGpuProgram.h
   include/OgreGpuProgramManager.h
@@ -166,7 +164,6 @@ set (HEADER_FILES
   include/OgrePrerequisites.h
   include/OgreProfiler.h
   include/OgreProgressiveMesh.h
-  include/OgrePVRTCCodec.h
   include/OgreQuaternion.h
   include/OgreRadixSort.h
   include/OgreRay.h
@@ -256,7 +253,6 @@ set (HEADER_FILES
   include/OgreWindowEventUtilities.h
   include/OgreWireBoundingBox.h
   include/OgreWorkQueue.h
-  include/OgreZip.h
 )
 
 set (SOURCE_FILES
@@ -289,7 +285,6 @@ set (SOURCE_FILES
   src/OgreControllerManager.cpp
   src/OgreConvexBody.cpp
   src/OgreDataStream.cpp
-  src/OgreDDSCodec.cpp
   src/OgreDefaultHardwareBufferManager.cpp
   src/OgreDefaultSceneQueries.cpp
   src/OgreDistanceLodStrategy.cpp
@@ -303,7 +298,6 @@ set (SOURCE_FILES
   src/OgreFileSystem.cpp
   src/OgreFont.cpp
   src/OgreFontManager.cpp
-  src/OgreFreeImageCodec.cpp
   src/OgreFrustum.cpp
   src/OgreGpuProgram.cpp
   src/OgreGpuProgramManager.cpp
@@ -377,7 +371,6 @@ set (SOURCE_FILES
   src/OgrePrefabFactory.cpp
   src/OgreProfiler.cpp
   src/OgreProgressiveMesh.cpp
-  src/OgrePVRTCCodec.cpp
   src/OgreQuaternion.cpp
   src/OgreRectangle2D.cpp
   src/OgreRenderQueue.cpp
@@ -447,7 +440,6 @@ set (SOURCE_FILES
   src/OgreWindowEventUtilities.cpp
   src/OgreWireBoundingBox.cpp
   src/OgreWorkQueue.cpp
-  src/OgreZip.cpp
 )
 
 # Add platform specific files
@@ -612,9 +604,6 @@ add_definitions(-DOGRE_NONCLIENT_BUILD -DFREEIMAGE_LIB -D_MT -D_USRDLL)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/nedmalloc)
 
 set(LIBRARIES
-  ${ZLIB_LIBRARIES}
-  ${ZZip_LIBRARIES}
-  ${FreeImage_LIBRARIES}
   ${FREETYPE_LIBRARIES}
   ${PLATFORM_LIBS}
 )
@@ -623,27 +612,27 @@ if (OGRE_CONFIG_THREADS)
   list(APPEND LIBRARIES ${OGRE_THREAD_LIBRARIES})
 endif ()
 
-if (OGRE_CONFIG_DISABLE_FREEIMAGE)
-  list(REMOVE_ITEM HEADER_FILES include/OgreFreeImageCodec.h)
-  list(REMOVE_ITEM SOURCE_FILES src/OgreFreeImageCodec.cpp)
-  list(REMOVE_ITEM LIBRARIES    "${FreeImage_LIBRARIES}")
+if (OGRE_CONFIG_ENABLE_FREEIMAGE)
+  list(APPEND HEADER_FILES include/OgreFreeImageCodec.h)
+  list(APPEND SOURCE_FILES src/OgreFreeImageCodec.cpp)
+  list(APPEND LIBRARIES    "${FreeImage_LIBRARIES}")
 endif()
 
-if (OGRE_CONFIG_DISABLE_DDS)
-  list(REMOVE_ITEM HEADER_FILES include/OgreDDSCodec.h)
-  list(REMOVE_ITEM SOURCE_FILES src/OgreDDSCodec.cpp)
+if (OGRE_CONFIG_ENABLE_DDS)
+  list(APPEND HEADER_FILES include/OgreDDSCodec.h)
+  list(APPEND SOURCE_FILES src/OgreDDSCodec.cpp)
 endif ()
 
-if (OGRE_CONFIG_DISABLE_PVRTC)
-  list(REMOVE_ITEM HEADER_FILES include/OgrePVRTCCodec.h)
-  list(REMOVE_ITEM SOURCE_FILES src/OgrePVRTCCodec.cpp)
+if (OGRE_CONFIG_ENABLE_PVRTC)
+  list(APPEND HEADER_FILES include/OgrePVRTCCodec.h)
+  list(APPEND SOURCE_FILES src/OgrePVRTCCodec.cpp)
 endif ()
 
-if (OGRE_CONFIG_DISABLE_ZIP)
-  list(REMOVE_ITEM HEADER_FILES include/OgreZip.h)
-  list(REMOVE_ITEM SOURCE_FILES src/OgreZip.cpp)
-  list(REMOVE_ITEM LIBRARIES "${ZZip_LIBRARIES}")
-  list(REMOVE_ITEM LIBRARIES "${ZLIB_LIBRARIES}")
+if (OGRE_CONFIG_ENABLE_ZIP)
+  list(APPEND HEADER_FILES include/OgreZip.h)
+  list(APPEND SOURCE_FILES src/OgreZip.cpp)
+  list(APPEND LIBRARIES "${ZZip_LIBRARIES}")
+  list(APPEND LIBRARIES "${ZLIB_LIBRARIES}")
 endif ()
 
 # setup OgreMain target

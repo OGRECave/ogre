@@ -92,7 +92,5 @@ if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
 endif()
 
 ogre_config_plugin(Plugin_ParticleFX)
-if (OGRE_INSTALL_PLUGINS_HEADERS)
-  install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/ParticleFX)
-endif ()
+install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/ParticleFX)
 
