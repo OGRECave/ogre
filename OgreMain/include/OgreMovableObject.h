@@ -129,6 +129,10 @@ namespace Ogre {
         uint8 mRenderQueueID;
 		/// Flags whether the RenderQueue's default should be used.
 		bool mRenderQueueIDSet;
+		/// The render queue group to use when rendering this object
+		ushort mRenderQueuePriority;
+		/// Flags whether the RenderQueue's default should be used.
+		bool mRenderQueuePrioritySet;
         /// Flags determining whether this object is included / excluded from scene queries
         uint32 mQueryFlags;
         /// Flags determining whether this object is visible (compared to SceneManager mask)
@@ -335,6 +339,23 @@ namespace Ogre {
 			enum RenderQueueGroupID for what kind of values can be used here.
         */
         virtual void setRenderQueueGroup(uint8 queueID);
+
+		/** Sets the render queue group and group priority this entity will be rendered through.
+		@remarks
+			Render queues are grouped to allow you to more tightly control the ordering
+			of rendered objects. Within a single render group there another type of grouping
+			called priority which allows further control.  If you do not call this method, 
+			all Entity objects default to the default queue and priority 
+			(RenderQueue::getDefaultQueueGroup, RenderQueue::getDefaultRenderablePriority), 
+			which is fine for most objects. You may want to alter this if you want this entity 
+			to always appear in front of other objects, e.g. for a 3D menu system or such.
+		@par
+			See RenderQueue for more details.
+		@param queueID Enumerated value of the queue group to use. See the
+			enum RenderQueueGroupID for what kind of values can be used here.
+		@param priority The priority within a group to use.
+		*/
+		virtual void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
 
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
         virtual uint8 getRenderQueueGroup(void) const;

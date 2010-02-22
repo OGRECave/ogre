@@ -729,7 +729,9 @@ namespace Ogre {
 
 		if (mIndexData->indexCount > 0)
 		{
-            if (mRenderQueueIDSet)
+			if (mRenderQueuePrioritySet)
+				queue->addRenderable(this, mRenderQueueID, mRenderQueuePriority);
+			else if (mRenderQueueIDSet)
                 queue->addRenderable(this, mRenderQueueID);
             else
                 queue->addRenderable(this);

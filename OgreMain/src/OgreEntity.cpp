@@ -580,7 +580,12 @@ namespace Ogre {
         {
             if((*i)->isVisible())
             {
-                if(mRenderQueueIDSet)
+				if (mRenderQueuePrioritySet)
+				{
+					assert(mRenderQueueIDSet == true);
+					queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
+				}
+                else if(mRenderQueueIDSet)
                 {
                     queue->addRenderable(*i, mRenderQueueID);
                 }
@@ -633,10 +638,17 @@ namespace Ogre {
             for (unsigned short b = 0; b < numBones; ++b)
             {
                 Bone* bone = mSkeletonInstance->getBone(b);
-                if(mRenderQueueIDSet)
+				if (mRenderQueuePrioritySet)
+				{
+					assert(mRenderQueueIDSet == true);
+					queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID, mRenderQueuePriority);
+				}
+				else if(mRenderQueueIDSet)
                 {
                      queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID);
-                } else {
+                } 
+				else 
+				{
                      queue->addRenderable(bone->getDebugRenderable(1));
                 }
             }
@@ -1941,6 +1953,22 @@ namespace Ogre {
             }
         }
     }
+	//-----------------------------------------------------------------------
+	void Entity::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
+	{
+		MovableObject::setRenderQueueGroupAndPriority(queueID, priority);
+
+		// Set render queue for all manual LOD entities
+		if (mMesh->isLodManual())
+		{
+			LODEntityList::iterator li, liend;
+			liend = mLodEntityList.end();
+			for (li = mLodEntityList.begin(); li != liend; ++li)
+			{
+				(*li)->setRenderQueueGroupAndPriority(queueID, priority);
+			}
+		}
+	}
     //-----------------------------------------------------------------------
     void Entity::shareSkeletonInstanceWith(Entity* entity)
     {

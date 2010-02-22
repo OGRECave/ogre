@@ -851,8 +851,13 @@ namespace Ogre {
 			if (rop->vertexData->vertexCount == 0 ||
 				(rop->useIndexes && rop->indexData->indexCount == 0))
 				continue;
-
-			if (mRenderQueueIDSet)
+			
+			if (mRenderQueuePrioritySet)
+			{
+				assert(mRenderQueueIDSet == true);
+				queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
+			}
+			else if (mRenderQueueIDSet)
 				queue->addRenderable(*i, mRenderQueueID, mKeepDeclarationOrder ? priority++ : queue->getDefaultRenderablePriority());
 			else
 				queue->addRenderable(*i, queue->getDefaultQueueGroup(), mKeepDeclarationOrder ? priority++ : queue->getDefaultRenderablePriority());
