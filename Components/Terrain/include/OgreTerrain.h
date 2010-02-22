@@ -1785,7 +1785,7 @@ namespace Ogre
 		You should construct a single instance of this class per application and
 		do so before you start working with any other terrain classes.
 	*/
-	class _OgreTerrainExport TerrainGlobalOptions : public TerrainAlloc, Singleton<TerrainGlobalOptions>
+	class _OgreTerrainExport TerrainGlobalOptions : public TerrainAlloc, public Singleton<TerrainGlobalOptions>
 	{
 	protected:
 
