@@ -466,7 +466,7 @@ namespace Ogre {
 		@param value The value from which this Lod will apply.
 		@param meshName The name of the mesh which will be the lower level detail version.
 		*/
-		void createManualLodLevel(Real value, const String& meshName);
+		void createManualLodLevel(Real value, const String& meshName, const String& groupName = Ogre::String());
 
 		/** Changes the alternate mesh to use as a manual LOD at the given index.
 		@remarks
@@ -923,6 +923,8 @@ namespace Ogre {
 		
 		/// Only relevant if mIsLodManual is true, the name of the alternative mesh to use
 		String manualName;
+		/// Only relevant if mIsLodManual is true, the name of the group of the alternative mesh
+		String manualGroup;
 		/// Hard link to mesh to avoid looking up each time
 		mutable MeshPtr manualMesh;
         /// Edge list for this LOD level (may be derived from manual mesh)

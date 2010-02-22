@@ -964,7 +964,7 @@ namespace Ogre {
 				mMeshLodUsageList[index].manualMesh =
 					MeshManager::getSingleton().load(
 						mMeshLodUsageList[index].manualName,
-						mGroup);
+						mMeshLodUsageList[index].manualGroup);
 				// get the edge data, if required
 				if (!mMeshLodUsageList[index].edgeData)
 				{
@@ -985,7 +985,7 @@ namespace Ogre {
         return mMeshLodUsageList[index];
     }
     //---------------------------------------------------------------------
-	void Mesh::createManualLodLevel(Real lodValue, const String& meshName)
+	void Mesh::createManualLodLevel(Real lodValue, const String& meshName, const String& groupName)
 	{
 
 		// Basic prerequisites
@@ -996,6 +996,7 @@ namespace Ogre {
 		lod.userValue = lodValue;
         lod.value = mLodStrategy->transformUserValue(lod.userValue);
 		lod.manualName = meshName;
+		lod.manualGroup = groupName.empty() ? mGroup : groupName;
 		lod.manualMesh.setNull();
         lod.edgeData = 0;
 		mMeshLodUsageList.push_back(lod);
