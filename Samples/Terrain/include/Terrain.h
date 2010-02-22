@@ -337,6 +337,7 @@ public:
 
 protected:
 
+	TerrainGlobalOptions* mTerrainGlobals;
 	TerrainGroup* mTerrainGroup;
 	bool mPaging;
 	TerrainPaging* mTerrainPaging;
@@ -480,19 +481,19 @@ protected:
 	void configureTerrainDefaults(Light* l)
 	{
 		// Configure global
-		TerrainGlobalOptions::setMaxPixelError(8);
+		mTerrainGlobals->setMaxPixelError(8);
 		// testing composite map
-		TerrainGlobalOptions::setCompositeMapDistance(3000);
-		//TerrainGlobalOptions::setUseRayBoxDistanceCalculation(true);
-		//TerrainGlobalOptions::getDefaultMaterialGenerator()->setDebugLevel(1);
-		//TerrainGlobalOptions::setLightMapSize(256);
+		mTerrainGlobals->setCompositeMapDistance(3000);
+		//mTerrainGlobals->setUseRayBoxDistanceCalculation(true);
+		//mTerrainGlobals->getDefaultMaterialGenerator()->setDebugLevel(1);
+		//mTerrainGlobals->setLightMapSize(256);
 
 		//matProfile->setLightmapEnabled(false);
 		// Important to set these so that the terrain knows what to use for derived (non-realtime) data
-		TerrainGlobalOptions::setLightMapDirection(l->getDerivedDirection());
-		TerrainGlobalOptions::setCompositeMapAmbient(mSceneMgr->getAmbientLight());
-		//TerrainGlobalOptions::setCompositeMapAmbient(ColourValue::Red);
-		TerrainGlobalOptions::setCompositeMapDiffuse(l->getDiffuseColour());
+		mTerrainGlobals->setLightMapDirection(l->getDerivedDirection());
+		mTerrainGlobals->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
+		//mTerrainGlobals->setCompositeMapAmbient(ColourValue::Red);
+		mTerrainGlobals->setCompositeMapDiffuse(l->getDiffuseColour());
 
 		// Configure default import settings for if we use imported image
 		Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
@@ -602,7 +603,7 @@ protected:
 	void configureShadows(bool enabled, bool depthShadows)
 	{
 		TerrainMaterialGeneratorA::SM2Profile* matProfile = 
-			static_cast<TerrainMaterialGeneratorA::SM2Profile*>(TerrainGlobalOptions::getDefaultMaterialGenerator()->getActiveProfile());
+			static_cast<TerrainMaterialGeneratorA::SM2Profile*>(mTerrainGlobals->getDefaultMaterialGenerator()->getActiveProfile());
 		matProfile->setReceiveDynamicShadowsEnabled(enabled);
 #ifdef SHADOWS_IN_LOW_LOD_MATERIAL
 		matProfile->setReceiveDynamicShadowsLowLod(true);
@@ -738,6 +739,8 @@ protected:
 		bool blankTerrain = false;
 		//blankTerrain = true;
 
+		mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
+
 		mEditMarker = mSceneMgr->createEntity("editMarker", "sphere.mesh");
 		mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		mEditNode->attachObject(mEditMarker);
@@ -851,6 +854,8 @@ protected:
 		}
 		else
 			OGRE_DELETE mTerrainGroup;
+
+		OGRE_DELETE mTerrainGlobals;
 
 		SdkSample::_shutdown();
 	}
