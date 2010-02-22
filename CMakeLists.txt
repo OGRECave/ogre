@@ -18,6 +18,11 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 cmake_policy(SET CMP0003 NEW)
 
+# Use relative paths
+# This is mostly to reduce path size for command-line limits on windows
+set(CMAKE_USE_RELATIVE_PATHS true)
+set(CMAKE_SUPPRESS_REGENERATION true)
+
 project(OGRE)
 
 # Include necessary submodules
