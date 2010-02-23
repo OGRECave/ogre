@@ -61,6 +61,27 @@ namespace Ogre {
 	{
 		mFB.swapBuffers();
 	}
+	//-----------------------------------------------------------------------------
+	bool GLFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
+	{
+		bool result;
+		if( result = GLRenderTexture::attachDepthBuffer( depthBuffer ) )
+			mFB.attachDepthBuffer( depthBuffer );
+
+		return result;
+	}
+	//-----------------------------------------------------------------------------
+	void GLFBORenderTexture::detachDepthBuffer()
+	{
+		mFB.detachDepthBuffer();
+		GLRenderTexture::detachDepthBuffer();
+	}
+	//-----------------------------------------------------------------------------
+	void GLFBORenderTexture::_detachDepthBuffer()
+	{
+		mFB.detachDepthBuffer();
+		GLRenderTexture::_detachDepthBuffer();
+	}
    
 /// Size of probe texture
 #define PROBE_SIZE 16
@@ -421,7 +442,7 @@ static const size_t depthBits[] =
 	{
 		return new GLFBOMultiRenderTarget(this, name);
 	}
-
+	//---------------------------------------------------------------------
     void GLFBOManager::bind(RenderTarget *target)
     {
         /// Check if the render target is in the rendertarget->FBO map

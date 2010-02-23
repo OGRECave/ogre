@@ -799,6 +799,7 @@ namespace Ogre
 			ID_POOLED,
 			//ID_GAMMA, - already registered for material
 			ID_NO_FSAA,
+			ID_DEPTH_POOL,
 			ID_ONLY_INITIAL,
 			ID_VISIBILITY_MASK,
 			ID_LOD_BIAS,

@@ -55,6 +55,8 @@ namespace Ogre
 	*  @{
 	*/
 
+	typedef vector<DepthBuffer*>::type DepthBufferVec;
+	typedef map< uint16, DepthBufferVec >::type DepthBufferMap;
 	typedef map< String, RenderTarget * >::type RenderTargetMap;
 	typedef multimap<uchar, RenderTarget * >::type RenderTargetPriorityMap;
 
@@ -531,6 +533,13 @@ namespace Ogre
 		*/
 		bool getWaitForVerticalBlank(void) const;
 
+		/** Retrieves an existing DepthBuffer or creates a new one suited for the given RenderTarget
+			and sets it.
+			@remarks
+				RenderTarget's pool ID is respected. @see RenderTarget::setDepthBufferPool()
+		*/
+		virtual void setDepthBufferFor( RenderTarget *renderTarget );
+
 		// ------------------------------------------------------------------------
 		//                     Internal Rendering Access
 		// All methods below here are normally only called by other OGRE classes
@@ -771,6 +780,25 @@ namespace Ogre
 			relative to a different origin.
 		*/
 		virtual void _setTextureProjectionRelativeTo(bool enabled, const Vector3& pos);
+
+		/** Creates a DepthBuffer that can be attached to the specified RenderTarget
+			@remarks
+				It doesn't attach anything, it just returns a pointer to a new DepthBuffer
+				Caller is responsible for putting this buffer into the right pool, for
+				attaching, and deleting it. Here's where API-specific magic happens.
+				Don't call this directly unless you know what you're doing.
+		*/
+		virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget ) = 0;
+
+		/** Removes all depth buffers. Should be called on device lost and shutdown
+			@remarks
+				Advanced users can call this directly with bCleanManualBuffers=false to
+				remove all depth buffers created for RTTs; when they think the pool has
+				grown too big or they've used lots of depth buffers they don't need anymore,
+				freeing GPU RAM.
+		*/
+		void _cleanupDepthBuffers( bool bCleanManualBuffers=true );
+
 		/**
 		* Signifies the beginning of a frame, i.e. the start of rendering on a single viewport. Will occur
 		* several times per complete frame if multiple viewports exist.
@@ -1340,6 +1368,8 @@ namespace Ogre
 		virtual unsigned int getDisplayMonitorCount() const = 0;
 	protected:
 
+		/** DepthBuffers to be attached to render targets */
+		DepthBufferMap	mDepthBufferPool;
 
 		/** The render targets. */
 		RenderTargetMap mRenderTargets;
@@ -1347,6 +1377,7 @@ namespace Ogre
 		RenderTargetPriorityMap mPrioritisedRenderTargets;
 		/** The Active render target. */
 		RenderTarget * mActiveRenderTarget;
+
 		/** The Active GPU programs and gpu program parameters*/
 		GpuProgramParametersSharedPtr mActiveVertexGpuProgramParameters;
 		GpuProgramParametersSharedPtr mActiveGeometryGpuProgramParameters;

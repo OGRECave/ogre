@@ -72,11 +72,12 @@ namespace Ogre {
             PixelFormatList formatList; // more than one means MRT
 			bool fsaa;			// FSAA enabled; true = determine from main target (if render_scene), false = disable
 			bool hwGammaWrite;	// Do sRGB gamma correction on write (only 8-bit per channel formats) 
+			uint16 depthBufferId;//Depth Buffer's pool ID. (unrelated to "pool" variable below)
 			bool pooled;		// whether to use pooled textures for this one
             TextureScope scope; // Which scope has access to this texture
 
 			TextureDefinition() :width(0), height(0), widthFactor(1.0f), heightFactor(1.0f), 
-				fsaa(true), hwGammaWrite(false), pooled(false), scope(TS_LOCAL) {}
+				fsaa(true), hwGammaWrite(false), depthBufferId(1), pooled(false), scope(TS_LOCAL) {}
         };
         /// Typedefs for several iterators
         typedef vector<CompositionTargetPass *>::type TargetPasses;

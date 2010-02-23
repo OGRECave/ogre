@@ -226,6 +226,17 @@ namespace Ogre
 		/// @copydoc RenderSystem::createMultiRenderTarget
 		virtual MultiRenderTarget * createMultiRenderTarget(const String & name);
 
+		virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
+
+		/**
+		 * This function is meant to add Depth Buffers to the pool that aren't released when the DepthBuffer
+		 * is deleted. This is specially usefull to put the Depth Buffer created along with the window's
+		 * back buffer into the pool. All depth buffers introduced with this method go to POOL_DEFAULT
+		 */
+		DepthBuffer* _addManualDepthBuffer( ID3D11DepthStencilView *depthSurface,
+											uint32 width, uint32 height, uint32 fsaa, uint32 fsaaQuality );
+
+
 		const String& getName(void) const;
 		// Low-level overridden members
 		void setConfigOption( const String &name, const String &value );

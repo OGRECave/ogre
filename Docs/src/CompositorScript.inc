@@ -99,7 +99,7 @@ Techniques can have the following nested elements:
 This declares a render texture for use in subsequent @ref{Compositor Target Passes,target passes}.
 
 @*@*
-Format: texture <Name> <Width> <Height> <Pixel Format> [<MRT Pixel Format2>] [<MRT Pixel FormatN>] [pooled] [gamma] [no_fsaa] [<scope>]@*@*
+Format: texture <Name> <Width> <Height> <Pixel Format> [<MRT Pixel Format2>] [<MRT Pixel FormatN>] [pooled] [gamma] [no_fsaa] [depth_pool <poolId>] [<scope>]@*@*
 
 Here is a description of the parameters:
 @table @asis
@@ -114,7 +114,9 @@ If present, this directive makes this texture 'pooled' among compositor instance
 @item gamma
 If present, this directive means that sRGB gamma correction will be enabled on writes to this texture. You should remember to include the opposite sRGB conversion when you read this texture back in another material, such as a quad. This option will automatically enabled if you use a render_scene pass on this texture and the viewport on which the compositor is based has sRGB write support enabled.
 @item no_fsaa
-If present, this directive disables the use of anti-aliasing on this texture. FSAA is only used if this texture is subject to a render_scene pass and FSAA was enabled on the original viewport on which this compositor is based; this option allows you to override it and disable the FSAA if you wish. 
+If present, this directive disables the use of anti-aliasing on this texture. FSAA is only used if this texture is subject to a render_scene pass and FSAA was enabled on the original viewport on which this compositor is based; this option allows you to override it and disable the FSAA if you wish.
+@item depth_pool
+When present, this directive has to be followed by an integer. This directive is unrelated to the "pooled" directive. This one sets from which Depth buffer pool the depth buffer will be chosen from. All RTs from all compositors (including render windows if the render system API allows it) with the same pool ID share the same depth buffers (following the rules of the current render system APIs, (check RenderSystemCapabilities flags to find the rules). When the pool ID is 0, no depth buffer is used. This can be helpfull for passes that don't require a Depth buffer at all, potentially saving performance and memory. Default value is 1.
 @item scope
 If present, this directive sets the scope for the texture for being accessed by other compositors using the @ref{compositor_texture_ref,texture_ref} directive. There are three options : 'local_scope' (which is also the default) means that only the compositor defining the texture can access it. 'chain_scope' means that the compositors after this compositor in the chain can reference its textures, and 'global_scope' means that the entire application can access the texture. This directive also affects the creation of the textures (global textures are created once and thus can't be used with the pooled directive, and can't rely on viewport size).
 @end table

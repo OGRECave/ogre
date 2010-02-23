@@ -55,6 +55,7 @@ namespace Ogre
 	class D3D11RenderWindow;
 	class D3D11Texture;
 	class D3D11TextureManager;
+	class D3D11DepthBuffer;
 	class D3D11Driver;
 	class D3D11DriverList;
 	class D3D11VideoMode;

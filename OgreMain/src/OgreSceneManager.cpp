@@ -5707,12 +5707,13 @@ void SceneManager::setShadowIndexBufferSize(size_t size)
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowTextureConfig(size_t shadowIndex, unsigned short width, 
-	unsigned short height, PixelFormat format)
+	unsigned short height, PixelFormat format, uint16 depthBufferPoolId )
 {
 	ShadowTextureConfig conf;
 	conf.width = width;
 	conf.height = height;
 	conf.format = format;
+	conf.depthBufferPoolId = depthBufferPoolId;
 
 	setShadowTextureConfig(shadowIndex, conf);
 
@@ -5788,7 +5789,7 @@ void SceneManager::setShadowTexturePixelFormat(PixelFormat fmt)
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowTextureSettings(unsigned short size, 
-	unsigned short count, PixelFormat fmt)
+	unsigned short count, PixelFormat fmt, uint16 depthBufferPoolId)
 {
 	setShadowTextureCount(count);
 	for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
@@ -5798,6 +5799,7 @@ void SceneManager::setShadowTextureSettings(unsigned short size,
 		{
 			i->width = i->height = size;
 			i->format = fmt;
+			i->depthBufferPoolId = depthBufferPoolId;
 			mShadowTextureConfigDirty = true;
 		}
 	}
@@ -5942,10 +5944,12 @@ void SceneManager::ensureShadowTexturesCreated()
 		// clear shadow cam - light mapping
 		mShadowCamLightMapping.clear();
 
+		//Used to get the depth buffer ID setting for each RTT
+		size_t __i = 0;
 
 		// Recreate shadow textures
 		for (ShadowTextureList::iterator i = mShadowTextures.begin(); 
-			i != mShadowTextures.end(); ++i) 
+			i != mShadowTextures.end(); ++i, ++__i) 
 		{
 			const TexturePtr& shadowTex = *i;
 
@@ -5955,6 +5959,9 @@ void SceneManager::ensureShadowTexturesCreated()
 			String matName = shadowTex->getName() + "Mat" + getName();
 
 			RenderTexture *shadowRTT = shadowTex->getBuffer()->getRenderTarget();
+
+			//Set appropiate depth buffer
+			shadowRTT->setDepthBufferPool( mShadowTextureConfigList[__i].depthBufferPoolId );
 
 			// Create camera for this texture, but note that we have to rebind
 			// in prepareShadowTextures to coexist with multiple SMs

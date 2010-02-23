@@ -303,6 +303,9 @@ void Compositor::createGlobalTextures()
 				rendTarget = tex->getBuffer()->getRenderTarget();
 				mGlobalTextures[def->name] = tex;
 			}
+
+			//Set DepthBuffer pool for sharing
+			rendTarget->setDepthBufferPool( def->depthBufferId );
 		}
 	}
 

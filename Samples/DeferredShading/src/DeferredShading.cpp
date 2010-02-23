@@ -49,10 +49,10 @@ DeferredShadingSystem::DeferredShadingSystem(
 {
 	sm->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE);
 	sm->setShadowTextureCasterMaterial("DeferredShading/Shadows/Caster");
-	mSceneMgr->setShadowFarDistance(150);
-	mSceneMgr->setShadowTextureSize(512);
 	mSceneMgr->setShadowTextureCount(1);
-	mSceneMgr->setShadowTexturePixelFormat(PF_FLOAT16_R);
+	mSceneMgr->setShadowFarDistance(150);
+	//Use a value of "2" to use a different depth buffer pool and avoid sharing this with the Backbuffer's
+	mSceneMgr->setShadowTextureConfig( 0, 512, 512, PF_FLOAT16_R, 2 );
 	mSceneMgr->setShadowDirectionalLightExtrusionDistance(75);
 }
 

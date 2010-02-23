@@ -1218,6 +1218,7 @@ namespace Ogre
 			mIds["pooled"] = ID_POOLED;
 			//mIds["gamma"] = ID_GAMMA; - already registered
 			mIds["no_fsaa"] = ID_NO_FSAA;
+			mIds["depth_pool"] = ID_DEPTH_POOL;
 
 		mIds["texture_ref"] = ID_TEXTURE_REF;
 		mIds["local_scope"] = ID_SCOPE_LOCAL;

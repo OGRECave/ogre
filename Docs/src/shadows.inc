@@ -149,6 +149,7 @@ There are a number of settings which will help you configure your texture-based 
 @item @ref{Shadow texture offset (Directional Lights)}
 @item @ref{Shadow fade settings}
 @item @ref{Custom shadow camera setups}
+@item @ref{Shadow texture Depth Buffer sharing}
 @item @ref{Integrated Texture Shadows}
 @end itemize
 
@@ -188,6 +189,27 @@ When rendering shadow casters into a modulative shadow texture, Ogre turns off a
 @subheading Custom shadow camera setups
 
 As previously mentioned, one of the downsides of texture shadows is that the texture resolution is finite, and it's possible to get aliasing when the size of the shadow texel is larger than a screen pixel, due to the projection of the texture. In order to address this, you can specify alternative projection bases by using or creating subclasses of the ShadowCameraSetup class. The default version is called DefaultShadowCameraSetup and this sets up a simple regular frustum for point and spotlights, and an orthographic frustum for directional lights. There is also a PlaneOptimalShadowCameraSetup class which specialises the projection to a plane, thus giving you much better definition provided your shadow receivers exist mostly in a single plane. Other setup classes (e.g. you might create a perspective or trapezoid shadow mapping version) can be created and plugged in at runtime, either on individual lights or on the SceneManager as a whole.
+
+
+@anchor{Shadow texture Depth Buffer sharing}
+@subheading Shadow texture Depth Buffer sharing
+Shadow textures need a depth buffer like many other RTs (Render Textures). Prior to Ogre 1.8, the depth buffer behavior was left undefined leaving a very small posibility of causing inconsistencies across different window resolutions and render systems. Depending on the render window's resolutions and/or rendersystem being used, the depth buffer might been shared with the render window or a new one could get created to suite the shadow textures. If the application was depending on the depth buffer contents from the previous scene render (that is, no clear was performed) where a shadow texture render pass was in the middle; then the depth buffer would've contained garbage (but not consistent on all machines) causing graphical glitches hard to spot.
+
+From Ogre 1.8 onwards the depth buffer usage & sharing can be flexible controlled through the use of depth pool IDs. These pool IDs are not specifically part of shadow textures, but rather anything involving RTs. All RTs with the same pool ID share the same depth buffers when possible (following RenderSystem API rules, check RenderSystemCapabilities flags to find out what the behavior will be). The default ID for shadow textures is 1; which is the same default value for render windows, and RTTs; thus mantaining the same behavior with older applications while achieving maximum memory saving and performance efficiency because the number of created depth buffers is as lowest as possible.
+
+However there are some reasons to put shadow textures in a separate pool. This holds specially true if the application depends on the previous contents from the depth buffer before the shadow pass, instead of doing a clear:
+@itemize @bullet 
+@item In Direct3D9, the shadow texture is more likely to share the depth buffer with the render window at high resolutions (when the window is bigger than the shadow texture resolution), but at low resolutions it won't be shared, thus causing two different behaviors. Also probably the shadow texture will share the depth buffers with most other RTTs (i.e. compositors)
+@item In OpenGL 2.1, the shadow texture can't be shared with the main render window; and most likely will NOT be shared with many other RTTs (i.e. compositors) since OGL 2.1 has a requirement that texture resolutions should exactly match, while D3D9 specifies depth buffers can be shared as long as the resolutions are equal or less.
+@end itemize
+For example, the DeferredShading sample suffers from this problem. If this is a problem for a particular effect you're trying to achieve, you can specify a custom pool ID so that shadow textures get their own depth buffer(s), ensuring they aren't shared with other RTs. You can set the poolId parameter from either SceneManager::setShadowTextureSettings or setShadowTextureConfig
+
+@example
+mSceneMgr->setShadowTextureSettings( size, count, format, PoolId );
+mSceneMgr->setShadowTextureConfig( 0, 512, 512, PF_FLOAT16_R, 50 );
+@end example
+Note a poolId of 0 will make the shadow textures not to use a depth buffer, which isn't usually a desired behavior.
+
 
 @anchor{Integrated Texture Shadows}
 @subheading Integrated Texture Shadows

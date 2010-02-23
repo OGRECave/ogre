@@ -2746,9 +2746,10 @@ namespace Ogre {
 			number of shadow textures setting
 		@param width, height The dimensions of the texture
 		@param format The pixel format of the texture
+		@param depthBufferPoolId The pool # it should query the depth buffers from
 		*/
 		virtual void setShadowTextureConfig(size_t shadowIndex, unsigned short width, 
-			unsigned short height, PixelFormat format);
+			unsigned short height, PixelFormat format, uint16 depthBufferPoolId=1);
 		/** Set the detailed configuration for a shadow texture.
 		@param shadowIndex The index of the texture to configure, must be < the
 			number of shadow textures setting
@@ -2807,7 +2808,7 @@ namespace Ogre {
 			complex form.
         */
         virtual void setShadowTextureSettings(unsigned short size, unsigned short count, 
-			PixelFormat fmt = PF_X8R8G8B8);
+			PixelFormat fmt = PF_X8R8G8B8, uint16 depthBufferPoolId=1);
 
 		/** Get a reference to the shadow texture currently in use at the given index.
 		@note

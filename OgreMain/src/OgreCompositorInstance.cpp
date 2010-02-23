@@ -733,7 +733,9 @@ void CompositorInstance::createResources(bool forResizeOnly)
 			rendTarget = tex->getBuffer()->getRenderTarget();
 			mLocalTextures[def->name] = tex;
 		}
-        
+
+		//Set DepthBuffer pool for sharing
+		rendTarget->setDepthBufferPool( def->depthBufferId );
         
         /// Set up viewport over entire texture
         rendTarget->setAutoUpdated( false );

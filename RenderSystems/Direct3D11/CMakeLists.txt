@@ -10,6 +10,7 @@
 # Configure Direct3D11 RenderSystem build
 
 set (HEADER_FILES
+  include/OgreD3D11DepthBuffer.h
   include/OgreD3D11Device.h
   include/OgreD3D11Driver.h
   include/OgreD3D11DriverList.h
@@ -42,6 +43,7 @@ set (HEADER_FILES
 )
 
 set (SOURCE_FILES
+  src/OgreD3D11DepthBuffer.cpp
   src/OgreD3D11Device.cpp
   src/OgreD3D11Driver.cpp
   src/OgreD3D11DriverList.cpp

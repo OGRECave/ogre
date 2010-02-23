@@ -25,35 +25,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef __D3D9DEPTHBUFFER_H__
+#define __D3D9DEPTHBUFFER_H__
 
-#ifndef __GLMULTIRENDERTARGET_H__
-#define __GLMULTIRENDERTARGET_H__
+#include "OgreD3D9Prerequisites.h"
+#include "OgreDepthBuffer.h"
 
-#include "OgreGLFrameBufferObject.h"
-
-namespace Ogre {
-	/** MultiRenderTarget for GL. Requires the FBO extension.
-	*/
-	class _OgreGLExport GLFBOMultiRenderTarget : public MultiRenderTarget
+namespace Ogre 
+{
+	class D3D9DepthBuffer : public DepthBuffer
 	{
 	public:
-		GLFBOMultiRenderTarget(GLFBOManager *manager, const String &name);
-		~GLFBOMultiRenderTarget();
+		D3D9DepthBuffer( uint16 poolId, D3D9RenderSystem *renderSystem, IDirect3DDevice9 *creator,
+						 IDirect3DSurface9 *depthBufferSurf,
+						 D3DFORMAT fmt, uint32 width, uint32 height,
+						 uint32 fsaa, uint32 multiSampleQuality, bool isManual );
+		~D3D9DepthBuffer();
 
-		virtual void getCustomAttribute( const String& name, void *pData );
+		/// @copydoc DepthBuffer::isCompatible
+		virtual bool isCompatible( RenderTarget *renderTarget ) const;
 
-		bool requiresTextureFlipping() const { return true; }
+		IDirect3DDevice9* getDeviceCreator() const;
+		IDirect3DSurface9* getDepthBufferSurface() const;
 
-		/// Override so we can attach the depth buffer to the FBO
-		virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
-		virtual void detachDepthBuffer();
-		virtual void _detachDepthBuffer();
-	private:
-		virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
-		virtual void unbindSurfaceImpl(size_t attachment); 
-		GLFrameBufferObject fbo;
+	protected:
+		IDirect3DSurface9			*mDepthBuffer;
+		IDirect3DDevice9			*mCreator;
+		uint32						mMultiSampleQuality;
+		D3DFORMAT					mD3DFormat;
+		D3D9RenderSystem			*mRenderSystem;
 	};
-
 }
-
-#endif // __GLTEXTURE_H__
+#endif

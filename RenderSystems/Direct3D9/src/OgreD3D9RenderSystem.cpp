@@ -51,6 +51,7 @@ THE SOFTWARE.
 #include "OgreCompositorManager.h"
 #include "OgreD3D9DeviceManager.h"
 #include "OgreD3D9ResourceManager.h"
+#include "OgreD3D9DepthBuffer.h"
 
 #define FLOAT2DWORD(f) *((DWORD*)&f)
 
@@ -625,7 +626,7 @@ namespace Ogre
 			{
 				mWBuffer = false;
 			}
-		}	
+		}
 
 		LogManager::getSingleton().logMessage("***************************************");
 		LogManager::getSingleton().logMessage("*** D3D9 : Subsystem Initialised OK ***");
@@ -778,6 +779,9 @@ namespace Ogre
 		rsc->setCapability(RSC_PERSTAGECONSTANT);
 		rsc->setCapability(RSC_HWSTENCIL);
 		rsc->setStencilBufferBitDepth(8);
+		rsc->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
+		rsc->setCapability(RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE);
+		rsc->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
 
 		for (uint i=0; i < mDeviceManager->getDeviceCount(); ++i)
 		{
@@ -2697,6 +2701,123 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
+	DepthBuffer* D3D9RenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
+	{
+		IDirect3DSurface9* pBack[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+		memset (pBack, 0, sizeof(pBack) );
+		renderTarget->getCustomAttribute( "DDBACKBUFFER", &pBack );
+		if( !pBack[0] )
+			return 0;
+
+		D3DSURFACE_DESC srfDesc;
+		if( FAILED(pBack[0]->GetDesc(&srfDesc)) )
+		{
+			OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+					 "Failed to retrieve Surface Description from BackBuffer. RenderTarget: " +
+																			renderTarget->getName(),
+					 "D3D9RenderSystem::_createDepthBufferFor" );
+		}
+
+		//Find an appropiarte format for this depth buffer that best matches the RenderTarget's
+		D3DFORMAT dsfmt = _getDepthStencilFormatFor( srfDesc.Format );
+
+		//Create the depthstencil surface
+		IDirect3DSurface9 *depthBufferSurface = NULL;
+		HRESULT hr = getActiveD3D9Device()->CreateDepthStencilSurface( 
+											srfDesc.Width, srfDesc.Height, dsfmt,
+											srfDesc.MultiSampleType, srfDesc.MultiSampleQuality, 
+											TRUE,  // discard true or false?
+											&depthBufferSurface, NULL);
+		if( FAILED(hr) )
+		{
+			String msg = DXGetErrorDescription(hr);
+			OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+						"Error CreateDepthStencilSurface : " + msg,
+						"D3D9RenderSystem::_createDepthBufferFor" );
+		}
+
+		D3D9DepthBuffer *newDepthBuffer = new D3D9DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
+												getActiveD3D9Device(), depthBufferSurface,
+												dsfmt, srfDesc.Width, srfDesc.Height,
+												srfDesc.MultiSampleType, srfDesc.MultiSampleQuality, false );
+
+		return newDepthBuffer;
+	}
+
+	//---------------------------------------------------------------------
+	DepthBuffer* D3D9RenderSystem::_addManualDepthBuffer( IDirect3DSurface9 *depthSurface )
+	{
+		//If this depth buffer was already added, return that one
+		DepthBufferVec::const_iterator itor = mDepthBufferPool[DepthBuffer::POOL_DEFAULT].begin();
+		DepthBufferVec::const_iterator end  = mDepthBufferPool[DepthBuffer::POOL_DEFAULT].end();
+
+		while( itor != end )
+		{
+			if( static_cast<D3D9DepthBuffer*>(*itor)->getDepthBufferSurface() == depthSurface )
+				return *itor;
+
+			++itor;
+		}
+
+		//Nope, get the info about this depth buffer and create a new container fot it
+		D3DSURFACE_DESC dsDesc;
+		if( FAILED(depthSurface->GetDesc(&dsDesc)) )
+			return 0;
+
+		D3D9DepthBuffer *newDepthBuffer = new D3D9DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
+												getActiveD3D9Device(), depthSurface,
+												dsDesc.Format, dsDesc.Width, dsDesc.Height,
+												dsDesc.MultiSampleType, dsDesc.MultiSampleQuality, true );
+
+		//Add the 'main' depth buffer to the pool
+		mDepthBufferPool[newDepthBuffer->getPoolId()].push_back( newDepthBuffer );
+
+		return newDepthBuffer;
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::_cleanupDepthBuffers( IDirect3DDevice9 *creator )
+	{
+		assert( creator );
+
+		DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
+		DepthBufferMap::iterator enMap = mDepthBufferPool.end();
+
+		while( itMap != enMap )
+		{
+			DepthBufferVec::iterator itor = itMap->second.begin();
+			DepthBufferVec::iterator end  = itMap->second.end();
+
+			while( itor != end )
+			{
+				//Only delete those who match the specified creator
+				if( static_cast<D3D9DepthBuffer*>(*itor)->getDeviceCreator() == creator )
+				{
+					delete *itor;
+
+					//Erasing a vector invalidates iterators, we need to recalculate
+					//to avoid memory corruption and asserts. The new itor will point
+					//to the next iterator
+					const size_t idx = itor - itMap->second.begin();
+					itMap->second.erase( itor );	//Erase
+					itor = itMap->second.begin() + idx;
+					end  = itMap->second.end();
+				}
+				else
+					++itor;
+			}
+
+			//Erase the pool if it's now empty. Note erasing from a map is
+			//valid while iterating through it
+			if( itMap->second.empty() )
+			{
+				DepthBufferMap::iterator deadi = itMap++;
+				mDepthBufferPool.erase( deadi );
+			}
+			else
+				++itMap;
+		}
+	}
+	//---------------------------------------------------------------------
 	void D3D9RenderSystem::_setRenderTarget(RenderTarget *target)
 	{
 		mActiveRenderTarget = target;
@@ -2723,27 +2844,20 @@ namespace Ogre
 		if (!pBack[0])
 			return;
 
-		IDirect3DSurface9* pDepth = NULL;
+		D3D9DepthBuffer *depthBuffer = static_cast<D3D9DepthBuffer*>(target->getDepthBuffer());
 
-		//Check if we saved a depth buffer for this target
-		TargetDepthStencilMap::iterator savedTexture = mCheckedOutTextures.find(target);
-		if (savedTexture != mCheckedOutTextures.end())
+		if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
+			(!depthBuffer || depthBuffer->getDeviceCreator() != getActiveD3D9Device() ) )
 		{
-			pDepth = savedTexture->second.surface;
+			//Depth is automatically managed and there is no depth buffer attached to this RT
+			//or the Current D3D device doesn't match the one this Depth buffer was created
+			setDepthBufferFor( target );
 		}
 
-		if (!pDepth)
-			target->getCustomAttribute( "D3DZBUFFER", &pDepth );
-		if (!pDepth)
-		{
-			/// No depth buffer provided, use our own
-			/// Request a depth stencil that is compatible with the format, multisample type and
-			/// dimensions of the render target.
-			D3DSURFACE_DESC srfDesc;
-			if(FAILED(pBack[0]->GetDesc(&srfDesc)))
-				return; // ?
-			pDepth = _getDepthStencilFor(srfDesc.Format, srfDesc.MultiSampleType, srfDesc.MultiSampleQuality, srfDesc.Width, srfDesc.Height);
-		}
+		//Retrieve depth buffer again
+		depthBuffer = static_cast<D3D9DepthBuffer*>(target->getDepthBuffer());
+		IDirect3DSurface9 *depthSurface = depthBuffer ? depthBuffer->getDepthBufferSurface() : NULL;
+
 		// Bind render targets
 		uint count = mCurrentCapabilities->getNumMultiRenderTargets();
 		for(uint x=0; x<count; ++x)
@@ -2755,7 +2869,7 @@ namespace Ogre
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setRenderTarget : " + msg, "D3D9RenderSystem::_setViewport" );
 			}
 		}
-		hr = getActiveD3D9Device()->SetDepthStencilSurface(pDepth);
+		hr = getActiveD3D9Device()->SetDepthStencilSurface( depthSurface );
 		if (FAILED(hr))
 		{
 			String msg = DXGetErrorDescription(hr);
@@ -2841,30 +2955,6 @@ namespace Ogre
 		RenderTarget* target;
 	};
 	//---------------------------------------------------------------------
-	D3D9RenderSystem::ZBufferIdentifier D3D9RenderSystem::getZBufferIdentifier(RenderTarget* rt)
-	{
-		// Retrieve render surfaces (up to OGRE_MAX_MULTIPLE_RENDER_TARGETS)
-		IDirect3DSurface9* pBack[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-		memset(pBack, 0, sizeof(pBack));
-		rt->getCustomAttribute( "DDBACKBUFFER", &pBack );
-		assert(pBack[0]);
-
-		/// Request a depth stencil that is compatible with the format, multisample type and
-		/// dimensions of the render target.
-		D3DSURFACE_DESC srfDesc;
-		HRESULT hr = pBack[0]->GetDesc(&srfDesc);
-		assert(!(FAILED(hr)));
-		D3DFORMAT dsfmt = _getDepthStencilFormatFor(srfDesc.Format);
-		assert(dsfmt != D3DFMT_UNKNOWN);
-
-		/// Build identifier and return
-		ZBufferIdentifier zBufferIdentifier;
-		zBufferIdentifier.format = dsfmt;
-		zBufferIdentifier.multisampleType = srfDesc.MultiSampleType;
-		zBufferIdentifier.device = getActiveD3D9Device();
-		return zBufferIdentifier;
-	}
-	//---------------------------------------------------------------------
 	RenderSystem::RenderSystemContext* D3D9RenderSystem::_pauseFrame(void)
 	{
 		//Stop rendering
@@ -2872,30 +2962,6 @@ namespace Ogre
 
 		D3D9RenderContext* context = new D3D9RenderContext;
 		context->target = mActiveRenderTarget;
-
-		//Don't do this to backbuffers. Is there a more elegant way to check?
-		if (!dynamic_cast<D3D9RenderWindow*>(mActiveRenderTarget))
-		{
-			//Get the matching z buffer identifier and queue
-			ZBufferIdentifier zBufferIdentifier = getZBufferIdentifier(mActiveRenderTarget);
-			ZBufferRefQueue& zBuffers = mZBufferHash[zBufferIdentifier];
-			
-#ifdef OGRE_DEBUG_MODE
-			//Check that queue handling works as expected
-			IDirect3DSurface9* pDepth;
-			getActiveD3D9Device()->GetDepthStencilSurface(&pDepth);	
-			
-			// Release immediately -> each get increase the ref count.
-			if (pDepth != NULL)		
-				pDepth->Release();		
-
-			assert(zBuffers.front().surface == pDepth);
-#endif
-
-			//Store the depth buffer in the side and remove it from the queue
-			mCheckedOutTextures[mActiveRenderTarget] = zBuffers.front();
-			zBuffers.pop_front();
-		}
 		
 		
 		return context;
@@ -2907,20 +2973,6 @@ namespace Ogre
 		_beginFrame();
 		D3D9RenderContext* d3dContext = static_cast<D3D9RenderContext*>(context);
 
-		//Don't do this to backbuffers. Is there a more elegant way to check?
-		if (!dynamic_cast<D3D9RenderWindow*>(d3dContext->target))
-		{
-			///Find the stored depth buffer
-			ZBufferIdentifier zBufferIdentifier = getZBufferIdentifier(d3dContext->target);
-			ZBufferRefQueue& zBuffers = mZBufferHash[zBufferIdentifier];
-			assert(mCheckedOutTextures.find(d3dContext->target) != mCheckedOutTextures.end());
-			
-			//Return it to the general queue
-			zBuffers.push_front(mCheckedOutTextures[d3dContext->target]);
-			mCheckedOutTextures.erase(d3dContext->target);
-		}
-		
-		
 		delete context;
 	}
 	//---------------------------------------------------------------------
@@ -3751,89 +3803,6 @@ namespace Ogre
 		mDepthStencilHash[(unsigned int)fmt] = dsfmt;
 		return dsfmt;
 	}
-	IDirect3DSurface9* D3D9RenderSystem::_getDepthStencilFor(D3DFORMAT fmt, 
-		D3DMULTISAMPLE_TYPE multisample, DWORD multisample_quality, size_t width, size_t height)
-	{
-		D3DFORMAT dsfmt = _getDepthStencilFormatFor(fmt);
-		if(dsfmt == D3DFMT_UNKNOWN)
-			return 0;
-		IDirect3DSurface9 *surface = 0;
-
-		/// Check if result is cached
-		ZBufferIdentifier zBufferIdentifer;
-
-
-		zBufferIdentifer.format = dsfmt;
-		zBufferIdentifer.multisampleType = multisample;
-		zBufferIdentifer.device = getActiveD3D9Device();
-
-		ZBufferRefQueue& zBuffers = mZBufferHash[zBufferIdentifer];
-		
-		if(!zBuffers.empty())
-		{
-			const ZBufferRef& zBuffer = zBuffers.front();
-			/// Check if size is larger or equal
-			if(zBuffer.width >= width && zBuffer.height >= height)
-			{
-				surface = zBuffer.surface;
-			} 
-			else
-			{
-				/// If not, destroy current buffer
-				zBuffer.surface->Release();
-				zBuffers.pop_front();
-			}
-		}
-		if(!surface)
-		{
-			/// If not, create the depthstencil surface
-			HRESULT hr = getActiveD3D9Device()->CreateDepthStencilSurface( 
-				static_cast<UINT>(width), 
-				static_cast<UINT>(height), 
-				dsfmt, 
-				multisample, 
-				multisample_quality, 
-				TRUE,  // discard true or false?
-				&surface, 
-				NULL);
-			if(FAILED(hr))
-			{
-				String msg = DXGetErrorDescription(hr);
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error CreateDepthStencilSurface : " + msg, "D3D9RenderSystem::_getDepthStencilFor" );
-			}
-			/// And cache it
-			ZBufferRef zb;
-			zb.surface = surface;
-			zb.width = width;
-			zb.height = height;
-			zBuffers.push_front(zb);
-		}
-		return surface;
-	}
-
-	//---------------------------------------------------------------------
-	void D3D9RenderSystem::_cleanupDepthStencils(IDirect3DDevice9* d3d9Device)
-	{
-		for(ZBufferHash::iterator i = mZBufferHash.begin(); i != mZBufferHash.end();)
-		{
-			/// Release buffer
-			if (i->first.device == d3d9Device)
-			{
-				while (!i->second.empty())
-				{
-					IDirect3DSurface9* surface = i->second.front().surface;
-					surface->Release();
-					i->second.pop_front();
-				}
-				ZBufferHash::iterator deadi = i++;
-				mZBufferHash.erase(deadi);
-			}			
-			else
-			{
-				++i;
-			}
-		}		
-	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::registerThread()
 	{
@@ -3921,27 +3890,6 @@ namespace Ogre
 		LogManager::getSingleton().logMessage(ss.str());
 
 		fireEvent("DeviceRestored");
-	}
-	
-	//---------------------------------------------------------------------
-	bool D3D9RenderSystem::ZBufferIdentifierComparator::operator()( const ZBufferIdentifier& z0, const ZBufferIdentifier& z1 ) const
-	{
-		if (z0.device < z1.device)
-			return true;
-
-		if (z0.device == z1.device)
-		{
-			if (z0.format < z1.format)
-				return true;
-
-			if (z0.format == z1.format)
-			{
-				if (z0.multisampleType < z1.multisampleType)
-					return true;
-			}
-		}
-
-		return false;
 	}
 
 	//---------------------------------------------------------------------

@@ -140,6 +140,7 @@ namespace Ogre {
     template <typename T> class ControllerValue;
 	class DefaultWorkQueue;
     class Degree;
+	class DepthBuffer;
     class DynLib;
     class DynLibManager;
     class EdgeData;

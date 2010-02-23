@@ -107,6 +107,31 @@ namespace Ogre {
         virtual unsigned int getHeight(void) const;
         virtual unsigned int getColourDepth(void) const;
 
+		/**
+		 * Sets the pool ID this RenderTarget should query from. Default value is POOL_DEFAULT.
+		 * Set to POOL_NO_DEPTH to avoid using a DepthBuffer (or manually controlling it) @see DepthBuffer
+		 *	@remarks
+		 *		Changing the pool Id will cause the current depth buffer to be detached unless the old
+		 *		id and the new one are the same
+		 */
+		void setDepthBufferPool( uint16 poolId );
+
+		//Returns the pool ID this RenderTarget should query from. @see DepthBuffer
+		uint16 getDepthBufferPool() const;
+
+		DepthBuffer* getDepthBuffer() const;
+
+		//Returns false if couldn't attach
+		virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
+
+		virtual void detachDepthBuffer();
+
+		/** Detaches DepthBuffer without notifying it from the detach.
+			Useful when called from the DepthBuffer while it iterates through attached
+			RenderTargets (@see DepthBuffer::_setPoolId())
+		*/
+		virtual void _detachDepthBuffer();
+
         /** Tells the target to update it's contents.
             @remarks
                 If OGRE is not running in an automatic rendering loop
@@ -448,7 +473,8 @@ namespace Ogre {
         unsigned int mWidth;
         unsigned int mHeight;
         unsigned int mColourDepth;
-        bool mIsDepthBuffered;
+		uint16		 mDepthBufferPoolId;
+        DepthBuffer	*mDepthBuffer;
 
         // Stats
 		FrameStats mStats;

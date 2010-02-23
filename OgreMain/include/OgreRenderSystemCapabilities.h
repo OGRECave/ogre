@@ -143,6 +143,14 @@ namespace Ogre
 		RSC_ALPHA_TO_COVERAGE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 6),
 		/// Supports Blending operations other than +
 		RSC_ADVANCED_BLEND_OPERATIONS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 7),
+		/// Supports a separate depth buffer for RTTs. D3D 9 & 10, OGL w/FBO (RSC_FBO implies this flag)
+		RSC_RTT_SEPARATE_DEPTHBUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 8),
+		/// Supports using the MAIN depth buffer for RTTs. D3D 9&10, OGL w/FBO support unknown
+		/// (undefined behavior?), OGL w/ copy supports it
+		RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 9),
+		/// Supports attaching a depth buffer to an RTT that has width & height less or equal than RTT's.
+		/// Otherwise must be of _exact_ same resolution. D3D 9&10, OGL 3.0 (not 2.0)
+		RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 10),
 
 		// ***** DirectX specific caps *****
 		/// Is DirectX feature "per stage constants" supported

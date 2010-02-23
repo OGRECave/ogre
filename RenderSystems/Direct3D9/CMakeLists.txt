@@ -10,6 +10,7 @@
 # Configure Direct3D9 RenderSystem build
 
 set (HEADER_FILES
+  include/OgreD3D9DepthBuffer.h
   include/OgreD3D9Device.h
   include/OgreD3D9DeviceManager.h
   include/OgreD3D9Driver.h
@@ -39,6 +40,7 @@ set (HEADER_FILES
 )
 
 set (SOURCE_FILES
+  src/OgreD3D9DepthBuffer.cpp
   src/OgreD3D9Device.cpp
   src/OgreD3D9DeviceManager.cpp
   src/OgreD3D9Driver.cpp

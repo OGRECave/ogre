@@ -49,6 +49,9 @@ THE SOFTWARE.
 #include "OgreD3D10HLSLProgram.h"
 #include "OgreD3D10VertexDeclaration.h"
 
+#include "OgreD3D10DepthBuffer.h"
+#include "OgreD3D10HardwarePixelBuffer.h"
+
 //---------------------------------------------------------------------
 #define FLOAT2DWORD(f) *((DWORD*)&f)
 //---------------------------------------------------------------------
@@ -775,7 +778,7 @@ namespace Ogre
 
 			NameValuePairList miscParams;
 			miscParams["colourDepth"] = StringConverter::toString(videoMode->getColourDepth());
-			miscParams["FSAA"] = fsaa;
+			miscParams["FSAA"] = StringConverter::toString(fsaa);
 			miscParams["FSAAHint"] = fsaaHint;
 			miscParams["vsync"] = StringConverter::toString(mVSync);
 			miscParams["vsyncInterval"] = StringConverter::toString(mVSyncInterval);
@@ -965,6 +968,10 @@ namespace Ogre
 
 		rsc->setCapability(RSC_USER_CLIP_PLANES);
 		rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
+
+		rsc->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
+		rsc->setCapability(RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE);
+		rsc->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
 
 
 		// Adapter details
@@ -1250,6 +1257,92 @@ namespace Ogre
 		attachRenderTarget(*retval);
 
 		return retval;
+	}
+	//-----------------------------------------------------------------------
+	DepthBuffer* D3D10RenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
+	{
+		//Get surface data (mainly to get MSAA data)
+		D3D10HardwarePixelBuffer *pBuffer;
+		renderTarget->getCustomAttribute( "BUFFER", &pBuffer );
+		D3D10_TEXTURE2D_DESC BBDesc;
+		static_cast<ID3D10Texture2D*>(pBuffer->getParentTexture()->getTextureResource())->GetDesc( &BBDesc );
+
+		// Create depth stencil texture
+		ID3D10Texture2D* pDepthStencil = NULL;
+		D3D10_TEXTURE2D_DESC descDepth;
+
+		descDepth.Width					= renderTarget->getWidth();
+		descDepth.Height				= renderTarget->getHeight();
+		descDepth.MipLevels				= 1;
+		descDepth.ArraySize				= 1;
+		descDepth.Format				= DXGI_FORMAT_R32_TYPELESS;
+		descDepth.SampleDesc.Count		= BBDesc.SampleDesc.Count;
+		descDepth.SampleDesc.Quality	= BBDesc.SampleDesc.Quality;
+		descDepth.Usage					= D3D10_USAGE_DEFAULT;
+		descDepth.BindFlags				= D3D10_BIND_DEPTH_STENCIL;
+		descDepth.CPUAccessFlags		= 0;
+		descDepth.MiscFlags				= 0;
+
+		HRESULT hr = mDevice->CreateTexture2D( &descDepth, NULL, &pDepthStencil );
+		if( FAILED(hr) || mDevice.isError())
+		{
+			String errorDescription = mDevice.getErrorDescription(hr);
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Unable to create depth texture\nError Description:" + errorDescription,
+				"D3D10RenderSystem::_createDepthBufferFor");
+		}
+
+		// Create the depth stencil view
+		ID3D10DepthStencilView		*depthStencilView;
+		D3D10_DEPTH_STENCIL_VIEW_DESC descDSV;
+		ZeroMemory( &descDSV, sizeof(D3D10_DEPTH_STENCIL_VIEW_DESC) );
+
+		descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+		descDSV.ViewDimension = (BBDesc.SampleDesc.Count > 1) ? D3D10_DSV_DIMENSION_TEXTURE2DMS : D3D10_DSV_DIMENSION_TEXTURE2D;
+		descDSV.Texture2D.MipSlice = 0;
+		hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &depthStencilView );
+		SAFE_RELEASE( pDepthStencil );
+		if( FAILED(hr) )
+		{
+			String errorDescription = mDevice.getErrorDescription();
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Unable to create depth stencil view\nError Description:" + errorDescription,
+				"D3D10RenderSystem::_createDepthBufferFor");
+		}
+
+		//Create the abstract container
+		D3D10DepthBuffer *newDepthBuffer = new D3D10DepthBuffer( DepthBuffer::POOL_DEFAULT, depthStencilView,
+												descDepth.Width, descDepth.Height,
+												descDepth.SampleDesc.Count, descDepth.SampleDesc.Quality,
+												false );
+
+		return newDepthBuffer;
+	}
+	//---------------------------------------------------------------------
+	DepthBuffer* D3D10RenderSystem::_addManualDepthBuffer( ID3D10DepthStencilView *depthSurface,
+															uint32 width, uint32 height,
+															uint32 fsaa, uint32 fsaaQuality )
+	{
+		//If this depth buffer was already added, return that one
+		DepthBufferVec::const_iterator itor = mDepthBufferPool[DepthBuffer::POOL_DEFAULT].begin();
+		DepthBufferVec::const_iterator end  = mDepthBufferPool[DepthBuffer::POOL_DEFAULT].end();
+
+		while( itor != end )
+		{
+			if( static_cast<D3D10DepthBuffer*>(*itor)->getDepthStencilView() == depthSurface )
+				return *itor;
+
+			++itor;
+		}
+
+		//Create a new container fot it
+		D3D10DepthBuffer *newDepthBuffer = new D3D10DepthBuffer( DepthBuffer::POOL_DEFAULT, depthSurface,
+																	width, height, fsaa, fsaaQuality, true );
+
+		//Add the 'main' depth buffer to the pool
+		mDepthBufferPool[newDepthBuffer->getPoolId()].push_back( newDepthBuffer );
+
+		return newDepthBuffer;
 	}
 	//---------------------------------------------------------------------
 	void D3D10RenderSystem::destroyRenderTarget(const String& name)
@@ -2118,9 +2211,19 @@ namespace Ogre
 		*/
 		ID3D10RenderTargetView * pRTView;
 		target->getCustomAttribute( "ID3D10RenderTargetView", &pRTView );
-		ID3D10DepthStencilView * pRTDepthView;
-		target->getCustomAttribute( "ID3D10DepthStencilView", &pRTDepthView );
 
+		//Retrieve depth buffer
+		D3D10DepthBuffer *depthBuffer = static_cast<D3D10DepthBuffer*>(target->getDepthBuffer());
+
+		if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH && !depthBuffer )
+		{
+			//Depth is automatically managed and there is no depth buffer attached to this RT
+			//or the Current D3D device doesn't match the one this Depth buffer was created
+			setDepthBufferFor( target );
+		}
+
+		//Retrieve depth buffer again (it may have changed)
+		depthBuffer = static_cast<D3D10DepthBuffer*>(target->getDepthBuffer());
 
 		// we need to clear the state 
 		mDevice->ClearState();
@@ -2138,7 +2241,7 @@ namespace Ogre
 		// now switch to the new render target
 		mDevice->OMSetRenderTargets(1,
 			&pRTView,
-			pRTDepthView);
+			depthBuffer ? depthBuffer->getDepthStencilView() : 0 );
 
 
 		if (mDevice.isError())
@@ -3047,8 +3150,6 @@ namespace Ogre
 		{
 			ID3D10RenderTargetView * pRTView;
 			mActiveRenderTarget->getCustomAttribute( "ID3D10RenderTargetView", &pRTView );
-			ID3D10DepthStencilView * pRTDepthView;
-			mActiveRenderTarget->getCustomAttribute( "ID3D10DepthStencilView", &pRTDepthView );
 
 			if (buffers & FBT_COLOUR)
 			{
@@ -3069,7 +3170,13 @@ namespace Ogre
 
 			if (ClearFlags)
 			{
-				mDevice->ClearDepthStencilView( pRTDepthView, ClearFlags, depth, stencil );
+				D3D10DepthBuffer *depthBuffer = static_cast<D3D10DepthBuffer*>(mActiveRenderTarget->
+																						getDepthBuffer());
+				if( depthBuffer )
+				{
+					mDevice->ClearDepthStencilView( depthBuffer->getDepthStencilView(),
+													ClearFlags, depth, stencil );
+				}
 			}
 
 		}

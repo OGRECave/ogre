@@ -75,6 +75,7 @@ THE SOFTWARE.
 namespace Ogre
 {
 	// Predefine classes
+	class D3D9DepthBuffer;
 	class D3D9RenderSystem;
 	class D3D9RenderWindow;
 	class D3D9Texture;

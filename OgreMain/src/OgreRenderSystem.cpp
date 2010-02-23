@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreRenderTarget.h"
 #include "OgreRenderWindow.h"
+#include "OgreDepthBuffer.h"
 #include "OgreMeshManager.h"
 #include "OgreMaterial.h"
 #include "OgreTimer.h"
@@ -446,6 +447,31 @@ namespace Ogre {
         _setTextureUnitFiltering(unit, FT_MAG, magFilter);
         _setTextureUnitFiltering(unit, FT_MIP, mipFilter);
     }
+	//---------------------------------------------------------------------
+	void RenderSystem::_cleanupDepthBuffers( bool bCleanManualBuffers )
+	{
+		DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
+		DepthBufferMap::iterator enMap = mDepthBufferPool.end();
+
+		while( itMap != enMap )
+		{
+			DepthBufferVec::const_iterator itor = itMap->second.begin();
+			DepthBufferVec::const_iterator end  = itMap->second.end();
+
+			while( itor != end )
+			{
+				if( bCleanManualBuffers || !(*itor)->isManual() )
+					delete *itor;
+				++itor;
+			}
+
+			itMap->second.clear();
+
+			++itMap;
+		}
+
+		mDepthBufferPool.clear();
+	}
     //-----------------------------------------------------------------------
     CullingMode RenderSystem::_getCullingMode(void) const
     {
@@ -456,6 +482,41 @@ namespace Ogre {
     {
         return mVSync;
     }
+	//-----------------------------------------------------------------------
+	void RenderSystem::setDepthBufferFor( RenderTarget *renderTarget )
+	{
+		uint16 poolId = renderTarget->getDepthBufferPool();
+		if( poolId == DepthBuffer::POOL_NO_DEPTH )
+			return; //RenderTarget explicitly requested no depth buffer
+
+		//Find a depth buffer in the pool
+		DepthBufferVec::const_iterator itor = mDepthBufferPool[poolId].begin();
+		DepthBufferVec::const_iterator end  = mDepthBufferPool[poolId].end();
+
+		bool bAttached = false;
+		while( itor != end && !bAttached )
+			bAttached = renderTarget->attachDepthBuffer( *itor++ );
+
+		//Not found yet? Create a new one!
+		if( !bAttached )
+		{
+			DepthBuffer *newDepthBuffer = _createDepthBufferFor( renderTarget );
+
+			if( newDepthBuffer )
+			{
+				newDepthBuffer->_setPoolId( poolId );
+				mDepthBufferPool[poolId].push_back( newDepthBuffer );
+
+				bAttached = renderTarget->attachDepthBuffer( newDepthBuffer );
+
+				assert( bAttached && "A new DepthBuffer for a RenderTarget was created, but after creation"
+									 "it says it's incompatible with that RT" );
+			}
+			else
+				LogManager::getSingleton().logMessage( "WARNING: Couldn't create a suited DepthBuffer"
+													   "for RT: " + renderTarget->getName() );
+		}
+	}
     //-----------------------------------------------------------------------
     void RenderSystem::setWaitForVerticalBlank(bool enabled)
     {
@@ -480,6 +541,8 @@ namespace Ogre {
 			OGRE_DELETE *i;
 		}
 		mHwOcclusionQueries.clear();
+
+		_cleanupDepthBuffers();
 
         // Remove all the render targets.
 		// (destroy primary target last since others may depend on it)

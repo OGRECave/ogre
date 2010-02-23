@@ -13,6 +13,7 @@ set(HEADER_FILES
   include/OgreGLATIFSInit.h
   include/OgreGLContext.h
   include/OgreGLDefaultHardwareBufferManager.h
+  include/OgreGLDepthBuffer.h
   include/OgreGLFBOMultiRenderTarget.h
   include/OgreGLFBORenderTexture.h
   include/OgreGLFrameBufferObject.h
@@ -43,6 +44,7 @@ set(SOURCE_FILES
   src/OgreGLATIFSInit.cpp
   src/OgreGLContext.cpp
   src/OgreGLDefaultHardwareBufferManager.cpp
+  src/OgreGLDepthBuffer.cpp
   src/OgreGLEngineDll.cpp
   src/OgreGLFBOMultiRenderTarget.cpp
   src/OgreGLFBORenderTexture.cpp

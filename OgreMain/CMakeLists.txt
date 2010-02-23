@@ -64,6 +64,7 @@ set (HEADER_FILES
   include/OgreDataStream.h
   include/OgreDDSCodec.h
   include/OgreDefaultHardwareBufferManager.h
+  include/OgreDepthBuffer.h
   include/OgreDistanceLodStrategy.h
   include/OgreDynLib.h
   include/OgreDynLibManager.h
@@ -292,6 +293,7 @@ set (SOURCE_FILES
   src/OgreDDSCodec.cpp
   src/OgreDefaultHardwareBufferManager.cpp
   src/OgreDefaultSceneQueries.cpp
+  src/OgreDepthBuffer.cpp
   src/OgreDistanceLodStrategy.cpp
   src/OgreDynLib.cpp
   src/OgreDynLibManager.cpp

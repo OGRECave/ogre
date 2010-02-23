@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2010 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,35 +25,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef __D3D11DepthBuffer_H__
+#define __D3D11DepthBuffer_H__
 
-#ifndef __GLMULTIRENDERTARGET_H__
-#define __GLMULTIRENDERTARGET_H__
+#include "OgreD3D11Prerequisites.h"
+#include "OgreDepthBuffer.h"
 
-#include "OgreGLFrameBufferObject.h"
-
-namespace Ogre {
-	/** MultiRenderTarget for GL. Requires the FBO extension.
-	*/
-	class _OgreGLExport GLFBOMultiRenderTarget : public MultiRenderTarget
+namespace Ogre 
+{
+	class D3D11DepthBuffer : public DepthBuffer
 	{
 	public:
-		GLFBOMultiRenderTarget(GLFBOManager *manager, const String &name);
-		~GLFBOMultiRenderTarget();
+		D3D11DepthBuffer( uint16 poolId,
+							ID3D11DepthStencilView *depthBufferView,
+							uint32 width, uint32 height,
+							uint32 fsaa, uint32 multiSampleQuality, bool isManual );
+		~D3D11DepthBuffer();
 
-		virtual void getCustomAttribute( const String& name, void *pData );
+		/// @copydoc DepthBuffer::isCompatible
+		virtual bool isCompatible( RenderTarget *renderTarget ) const;
 
-		bool requiresTextureFlipping() const { return true; }
+		ID3D11DepthStencilView* getDepthStencilView() const;
 
-		/// Override so we can attach the depth buffer to the FBO
-		virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
-		virtual void detachDepthBuffer();
-		virtual void _detachDepthBuffer();
-	private:
-		virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
-		virtual void unbindSurfaceImpl(size_t attachment); 
-		GLFrameBufferObject fbo;
+	protected:
+		ID3D11DepthStencilView		*mDepthStencilView; //aka. actual "DepthBuffer"
+		uint32						mMultiSampleQuality;
 	};
-
 }
-
-#endif // __GLTEXTURE_H__
+#endif

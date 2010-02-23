@@ -42,6 +42,7 @@ namespace Ogre {
     class GLFBOManager;
     class GLHardwarePixelBuffer;
     class GLRenderBuffer;
+	class GLDepthBuffer;
 }
 
 #if OGRE_THREAD_SUPPORT == 1
