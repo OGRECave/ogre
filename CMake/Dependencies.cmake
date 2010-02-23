@@ -121,6 +121,11 @@ if (NOT OGRE_BUILD_PLATFORM_IPHONE)
 		# Statically linking boost to a dynamic Ogre build doesn't work on Linux 64bit
 		set(Boost_USE_STATIC_LIBS ${OGRE_STATIC})
 	endif ()
+	if (APPLE)
+	    # Boost tries to detect the gcc compiler version by calling the command-line
+	    # However we build with gcc 4.0 for OS X 10.4 compatibility, command-line default might be different
+		set(Boost_COMPILER "-xgcc40")
+	endif()
 	set(Boost_ADDITIONAL_VERSIONS "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40" "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" )
 	# Components that need linking (NB does not include header-only components like bind)
 	set(OGRE_BOOST_COMPONENTS thread date_time)
