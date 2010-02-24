@@ -409,6 +409,18 @@ namespace Ogre
 			}
 
 			ImportData(const ImportData& rhs)
+				: terrainAlign(ALIGN_X_Z)
+				, terrainSize(1025)
+				, maxBatchSize(65)
+				, minBatchSize(17)
+				, pos(Vector3::ZERO)
+				, worldSize(1000)
+				, inputImage(0)
+				, inputFloat(0)
+				, constantHeight(0)
+				, deleteInputData(false)
+				, inputScale(1.0)
+				, inputBias(0.0)
 			{
 				*this = rhs;
 			}
