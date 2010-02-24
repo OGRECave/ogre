@@ -46,14 +46,14 @@ THE SOFTWARE.
 #include <coemain.h>
 namespace Ogre {
     SymbianEGLWindow::SymbianEGLWindow(EGLSupport *glsupport)
-		: EGLWindow(glsupport)
+		: EGLWindow(glsupport), mNativeControl(NULL)
     {
     }
 
     SymbianEGLWindow::~SymbianEGLWindow()
     {
 		// Destroy the RWindow.
-		if( mWindow != NULL )
+		if( mIsExternal &&  mWindow != NULL )
 		{
 			((RWindow *)mWindow)->SetOrdinalPosition( KOrdinalPositionSwitchToOwningWindow );
 			((RWindow *)mWindow)->Close();
@@ -79,11 +79,16 @@ namespace Ogre {
 
 	void SymbianEGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
 	{
-		// destroy current window, if any
-		if (mWindow)
-			destroy();
+		if (!mIsExternal)
+		{
+			// destroy current window, if any
+			if (mWindow)
+			{
+				destroy();
+			}
+		}
 
-		mWindow = 0;
+
 		mClosed = false;		
 		mIsDepthBuffered = true;
 		mColourDepth = 32;
@@ -92,6 +97,8 @@ namespace Ogre {
 
 		if (!mIsExternal)
 		{
+			mWindow = 0;
+
 			/** Handle to the Windows Server session */
 			RWsSession iWsSession;
 
@@ -234,12 +241,24 @@ namespace Ogre {
 
 	void SymbianEGLWindow::resize( unsigned int width, unsigned int height )
 	{
+		if (!mNativeControl || !mWindow)
+			return;
+
+		mWidth = width; 
+		mHeight = height; 
+
+		// Notify viewports of resize
+		ViewportList::iterator it, itend;
+		itend = mViewportList.end();
+		for( it = mViewportList.begin(); it != itend; ++it )
+			(*it).second->_updateDimensions();
+
 
 	}
 
 	void SymbianEGLWindow::windowMovedOrResized()
 	{
-
+		resize(mNativeControl->Size().iWidth, mNativeControl->Size().iHeight);
 	}
 
 	void SymbianEGLWindow::switchFullScreen( bool fullscreen )
@@ -258,6 +277,7 @@ namespace Ogre {
 		int left = 0;
 		int top  = 0;
 
+		mIsExternal = false;
 
 		mIsFullScreen = fullScreen;
 
@@ -265,10 +285,17 @@ namespace Ogre {
 		{
 			NameValuePairList::const_iterator opt;
 			NameValuePairList::const_iterator end = miscParams->end();
-
-			if ((opt = miscParams->find("currentGLContext")) != end &&
-				StringConverter::parseBool(opt->second))
+			
+			if ((opt = miscParams->find("NativeWindow")) != end )
 			{
+				mWindow = (NativeWindowType)StringConverter::parseUnsignedLong(opt->second);
+			}			
+
+
+			if ((opt = miscParams->find("NativeControl")) != end )
+			{
+				mIsExternal = true;
+				mNativeControl = (CCoeControl *)StringConverter::parseUnsignedLong(opt->second);				
 				eglContext = eglGetCurrentContext();
 				if (eglContext)
 				{
@@ -278,7 +305,7 @@ namespace Ogre {
 				}
 
 				eglContext = eglGetCurrentContext();
-				mEglSurface = eglGetCurrentSurface(EGL_DRAW);
+				//mEglSurface = eglGetCurrentSurface(EGL_DRAW);
 			}
 
 			// Note: Some platforms support AA inside ordinary windows
@@ -343,7 +370,6 @@ namespace Ogre {
 			}
 		}
 
-		mIsExternal = (mEglSurface != 0);
 
 		if (!mIsTopLevel)
 		{
@@ -356,10 +382,7 @@ namespace Ogre {
 			mGLSupport->switchMode (width, height, frequency);
 		}
 
-		if (!mIsExternal)
-		{
-			createNativeWindow(left, top, width, height, title);
-		}
+		createNativeWindow(left, top, width, height, title);
 
 		mContext = createEGLContext();
 
@@ -383,4 +406,15 @@ namespace Ogre {
 		mClosed = false;
 
 	}
+
+	void SymbianEGLWindow::getCustomAttribute( const String& name, void *pData )
+	{
+		if(name=="CONTROL")
+		{
+			*static_cast<CCoeControl **>(pData) = mNativeControl;
+		}
+
+		EGLWindow::getCustomAttribute(name, pData);
+	}
+
 }
