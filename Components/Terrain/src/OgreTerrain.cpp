@@ -133,6 +133,7 @@ namespace Ogre
 		, mResourceGroup(StringUtil::BLANK)
 		, mIsLoaded(false)
 		, mModified(false)
+		, mHeightDataModified(false)
 		, mHeightData(0)
 		, mDeltaData(0)
 		, mPos(Vector3::ZERO)
@@ -260,7 +261,7 @@ namespace Ogre
 		// wait for any queued processes to finish
 		waitForDerivedProcesses();
 
-		if (mModified)
+		if (mHeightDataModified)
 		{
 			// When modifying, for efficiency we only increase the max deltas at each LOD,
 			// we never reduce them (since that would require re-examining more samples)
@@ -434,6 +435,7 @@ namespace Ogre
 		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
 
 		mModified = false;
+		mHeightDataModified = false;
 
 	}
 	//---------------------------------------------------------------------
@@ -683,6 +685,7 @@ namespace Ogre
 		distributeVertexData();
 
 		mModified = false;
+		mHeightDataModified = false;
 
 		return true;
 	}
@@ -814,6 +817,7 @@ namespace Ogre
 
 		// Imported data is treated as modified because it's not saved
 		mModified = true;
+		mHeightDataModified = true;
 
 
 		return true;
@@ -1050,6 +1054,7 @@ namespace Ogre
 
 		mIsLoaded = false;
 		mModified = false;
+		mHeightDataModified = false;
 
 	}
 	//---------------------------------------------------------------------
@@ -1595,6 +1600,7 @@ namespace Ogre
 			mLayers[index].worldSize = size;
 			mLayerUVMultiplier[index] = mWorldSize / size;
 			mMaterialParamsDirty = true;
+			mModified = true;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -1649,15 +1655,20 @@ namespace Ogre
 				mLayers[layerIndex].textureNames[samplerIndex] = textureName;
 				mMaterialDirty = true;
 				mMaterialParamsDirty = true;
+				mModified = true;
 			}
 		}
 	}
 	//---------------------------------------------------------------------
 	void Terrain::setPosition(const Vector3& pos)
 	{
-		mPos = pos;
-		mRootNode->setPosition(pos);
-		updateBaseScale();
+		if (pos != mPos)
+		{
+			mPos = pos;
+			mRootNode->setPosition(pos);
+			updateBaseScale();
+			mModified = true;
+		}
 	}
 	//---------------------------------------------------------------------
 	SceneNode* Terrain::_getRootSceneNode() const
@@ -1689,6 +1700,7 @@ namespace Ogre
 		mCompositeMapDirtyRect.merge(rect);
 
 		mModified = true;
+		mHeightDataModified = true;
 
 	}
 	//---------------------------------------------------------------------
@@ -2425,6 +2437,7 @@ namespace Ogre
 
 		    mMaterialDirty = true;
 		    mMaterialParamsDirty = true;
+			mModified = true;
         }
     }
 	//---------------------------------------------------------------------
@@ -2479,6 +2492,7 @@ namespace Ogre
 
 		mMaterialDirty = true;
 		mMaterialParamsDirty = true;
+		mModified = true;
 
 	}
 	//---------------------------------------------------------------------
@@ -2516,6 +2530,7 @@ namespace Ogre
 			
 			mMaterialDirty = true;
 			mMaterialParamsDirty = true;
+			mModified = true;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -3381,6 +3396,7 @@ namespace Ogre
 
 			mMaterialDirty = true;
 			mMaterialParamsDirty = true;
+			mModified = true;
 		}
 
 	}

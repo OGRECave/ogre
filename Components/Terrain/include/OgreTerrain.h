@@ -724,6 +724,13 @@ namespace Ogre
 		bool isModified() const { return mModified; }
 
 
+		/** Returns whether terrain heights have been modified since the terrain was first loaded / defined. 
+		@remarks
+		This flag is reset on save().
+		*/
+		bool isHeightDataModified() const { return mHeightDataModified; }
+
+
 		/** Unload the terrain and free GPU resources. 
 		@remarks
 			This method must be called in the main render thread.
@@ -1641,6 +1648,7 @@ namespace Ogre
 		String mResourceGroup;
 		bool mIsLoaded;
 		bool mModified;
+		bool mHeightDataModified;
 		
 		/// The height data (world coords relative to mPos)
 		float* mHeightData;
