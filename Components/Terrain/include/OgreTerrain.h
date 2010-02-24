@@ -446,11 +446,16 @@ namespace Ogre
 				{
 					if (rhs.inputImage)
 						inputImage = OGRE_NEW Image(*rhs.inputImage);
+					else
+						inputImage = 0;
+
 					if (rhs.inputFloat)
 					{
 						inputFloat = OGRE_ALLOC_T(float, terrainSize*terrainSize, MEMCATEGORY_GEOMETRY);
 						memcpy(inputFloat, rhs.inputFloat, sizeof(float) * terrainSize*terrainSize);
 					}
+					else
+						inputFloat = 0;
 				}
 				else
 				{
