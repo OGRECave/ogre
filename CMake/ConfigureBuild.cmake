@@ -13,6 +13,11 @@
 # also prepare package files for pkg-config and CMake.
 #######################################################################
 
+string(TOLOWER "${CMAKE_BUILD_TYPE}" OGRE_BUILD_TYPE)
+if (OGRE_BUILD_TYPE STREQUAL "debug")
+	add_definitions(-DDEBUG)
+endif()
+
 if (OGRE_BUILD_PLATFORM_IPHONE)
   set(OGRE_SET_BUILD_PLATFORM_IPHONE 1)
   set(OGRE_STATIC 1)
@@ -154,7 +159,6 @@ if (UNIX)
     set(OGRE_PLUGIN_PREFIX "lib")
     set(OGRE_PLUGIN_EXT ".a")
   endif ()
-  string(TOLOWER "${CMAKE_BUILD_TYPE}" OGRE_BUILD_TYPE)
   if (OGRE_BUILD_TYPE STREQUAL "debug")
     set(OGRE_LIB_SUFFIX "${OGRE_LIB_SUFFIX}_d")
   endif ()

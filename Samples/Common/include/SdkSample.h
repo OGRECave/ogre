@@ -417,9 +417,9 @@ namespace OgreBites
 		| Extended to setup a default tray interface and camera controller.
 		-----------------------------------------------------------------------------*/
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-		virtual void _setup(Ogre::RenderWindow* window, OIS::MultiTouch* mouse)
+		virtual void _setup(Ogre::RenderWindow* window, OIS::MultiTouch* mouse, FileSystemLayer* fsLayer)
 #else
-		virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, OIS::Mouse* mouse)
+		virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, OIS::Mouse* mouse, FileSystemLayer* fsLayer)
 #endif
 		{
 			mWindow = window;
@@ -427,6 +427,7 @@ namespace OgreBites
 			mKeyboard = keyboard;
 #endif
 			mMouse = mouse;
+			mFSLayer = fsLayer;
 
 			locateResources();
 			createSceneManager();

@@ -10,6 +10,18 @@
 # Configure Browser demo build
 
 set(SOURCE_FILES src/SampleBrowser.cpp)
+if (WIN32)
+  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_WIN32.cpp)
+elseif (OGRE_BUILD_PLATFORM_IPHONE)
+  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_iPhone.mm)
+elseif (APPLE)
+  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_OSX.cpp)
+elseif (UNIX)
+  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_Unix.cpp)
+else ()
+  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_Default.cpp)
+endif ()
+
 
 if (OGRE_BUILD_PLATFORM_IPHONE)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
@@ -63,6 +75,7 @@ endif ()
 
 set (HEADER_FILES
 	include/SampleBrowser.h
+	include/FileSystemLayerImpl.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/Sample.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SampleContext.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SamplePlugin.h
@@ -70,6 +83,7 @@ set (HEADER_FILES
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkSample.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkTrays.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/OgreStaticPluginLoader.h
+	${OGRE_SOURCE_DIR}/Samples/Common/include/FileSystemLayer.h
 )
 
 if (OGRE_STATIC)
@@ -116,6 +130,11 @@ endif ()
 # configure SampleBrowser build
 
 ogre_config_common(SampleBrowser)
+
+# append _d for debug builds
+if (NOT APPLE)
+	set_property(TARGET SampleBrowser APPEND PROPERTY DEBUG_POSTFIX "_d")
+endif ()
 
 # set install RPATH for Unix systems
 if (UNIX AND OGRE_FULL_RPATH)

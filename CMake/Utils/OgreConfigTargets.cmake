@@ -25,6 +25,9 @@ elseif (UNIX)
   set(OGRE_RELWDBG_PATH "")
   set(OGRE_MINSIZE_PATH "")
   set(OGRE_DEBUG_PATH "/debug")
+  if (NOT APPLE)
+	set(OGRE_DEBUG_PATH "")
+  endif ()
   set(OGRE_LIB_RELEASE_PATH "")
   set(OGRE_LIB_RELWDBG_PATH "")
   set(OGRE_LIB_MINSIZE_PATH "")
@@ -301,6 +304,11 @@ endfunction(ogre_config_sample_lib)
 # setup Ogre tool build
 function(ogre_config_tool TOOLNAME)
   ogre_config_common(${TOOLNAME})
+
+  #set _d debug postfix
+  if (NOT APPLE)
+	set_property(TARGET ${TOOLNAME} APPEND PROPERTY DEBUG_POSTFIX "_d")
+  endif ()
 
   # set install RPATH for Unix systems
   if (UNIX AND OGRE_FULL_RPATH)
