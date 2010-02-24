@@ -20,11 +20,11 @@ cmake_policy(SET CMP0003 NEW)
 
 # Use relative paths
 # This is mostly to reduce path size for command-line limits on windows
-if(NOT APPLE)
-  # This seems to break Xcode projects so only enable on non-Apple builds
+if(WIN32)
+  # This seems to break Xcode projects so definitely don't enable on Apple builds
   set(CMAKE_USE_RELATIVE_PATHS true)
-endif(NOT APPLE)
-set(CMAKE_SUPPRESS_REGENERATION true)
+  set(CMAKE_SUPPRESS_REGENERATION true)
+endif()
 
 project(OGRE)
 
