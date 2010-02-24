@@ -89,7 +89,7 @@ namespace Ogre {
 
         while (ext >> str)
         {
-            printf("EXT: %s\n", str.c_str());
+			LogManager::getSingleton().logMessage("EXT:" + str);
             extensionList.insert(str);
         }
 
