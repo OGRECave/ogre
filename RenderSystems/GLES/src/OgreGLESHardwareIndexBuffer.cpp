@@ -76,7 +76,7 @@ namespace Ogre {
         GL_CHECK_ERROR;
     }
 
-    void Ogre::GLESHardwareIndexBuffer::unlockImpl(void)
+    void GLESHardwareIndexBuffer::unlockImpl(void)
     {
         if (mLockedToScratch)
         {
@@ -87,6 +87,7 @@ namespace Ogre {
                               mScratchOffset == 0 && mScratchSize == getSizeInBytes());
             }
 
+			// deallocate from scratch buffer
             static_cast<GLESHardwareBufferManager*>(
                     HardwareBufferManager::getSingletonPtr())->deallocateScratch(mScratchPtr);
 
@@ -94,16 +95,30 @@ namespace Ogre {
         }
         else
         {
+#if GL_OES_mapbuffer
+			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mBufferId );
+            
+			if(!glUnmapBufferOES( GL_ELEMENT_ARRAY_BUFFER ))
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                            "Buffer data corrupted, please reload", 
+                            "GLESHardwareIndexBuffer::unlock");
+			}
+#else
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Lock to scratch is only supported",
                         "GLESHardwareIndexBuffer::unlockImpl");
+#endif
         }
+        mIsLocked = false;
     }
 
     void* GLESHardwareIndexBuffer::lockImpl(size_t offset,
                                             size_t length,
                                             LockOptions options)
     {
+        GLenum access = 0;
+
         if(mIsLocked)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
@@ -138,6 +153,37 @@ namespace Ogre {
                         "GLESHardwareIndexBuffer::lock");
         }
 
+#if GL_OES_mapbuffer
+        if (!retPtr)
+		{
+			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mBufferId );
+			// Use glMapBuffer
+			if(options == HBL_DISCARD)
+			{
+				// Discard the buffer
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, NULL, 
+                                GLESHardwareBufferManager::getGLUsage(mUsage));
+			}
+			if (mUsage & HBU_WRITE_ONLY)
+				access = GL_WRITE_ONLY_OES;
+            
+			void* pBuffer = glMapBufferOES( GL_ELEMENT_ARRAY_BUFFER, access );
+            
+			if(pBuffer == 0)
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                            "Index Buffer: Out of memory", 
+                            "GLESHardwareIndexBuffer::lock");
+			}
+            
+			// return offsetted
+			retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
+            
+			mLockedToScratch = false;
+		}
+		mIsLocked = true;
+#endif
+        
         return retPtr;
     }
 

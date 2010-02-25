@@ -43,7 +43,7 @@ namespace Ogre {
         if (!useShadowBuffer)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Only support with shadowBuffer",
+                        "Only supported with shadowBuffer",
                         "GLESHardwareVertexBuffer");
         }
 
@@ -74,6 +74,8 @@ namespace Ogre {
                                            size_t length,
                                            LockOptions options)
     {
+        GLenum access = 0;
+
         if (mIsLocked)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
@@ -108,6 +110,37 @@ namespace Ogre {
                         "GLESHardwareVertexBuffer::lock");
         }
 
+#if GL_OES_mapbuffer
+        if (!retPtr)
+		{
+			// Use glMapBuffer
+			glBindBuffer( GL_ARRAY_BUFFER, mBufferId );
+			// Use glMapBuffer
+			if(options == HBL_DISCARD)
+			{
+				// Discard the buffer
+				glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL, 
+                                GLESHardwareBufferManager::getGLUsage(mUsage));
+                
+			}
+			if (mUsage & HBU_WRITE_ONLY)
+				access = GL_WRITE_ONLY_OES;
+            
+			void* pBuffer = glMapBufferOES( GL_ARRAY_BUFFER, access);
+            
+			if(pBuffer == 0)
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                            "Vertex Buffer: Out of memory", "GLESHardwareVertexBuffer::lock");
+			}
+            
+			// return offsetted
+			retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
+            
+			mLockedToScratch = false;
+		}
+#endif
+		mIsLocked = true;
         return retPtr;
     }
 
@@ -129,10 +162,22 @@ namespace Ogre {
         }
         else
         {
+#if GL_OES_mapbuffer
+			glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
+            
+			if(!glUnmapBufferOES( GL_ARRAY_BUFFER ))
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                            "Buffer data corrupted, please reload", 
+                            "GLESHardwareVertexBuffer::unlock");
+			}
+#else
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Only locking to scratch is supported",
                         "GLESHardwareVertexBuffer::unlockImpl");
+#endif
         }
+        mIsLocked = false;
     }
 
     void GLESHardwareVertexBuffer::readData(size_t offset, size_t length,
