@@ -12,12 +12,10 @@
 ###############################################################
 
 # Set media target directory
-if (WIN32)
+if (WIN32 OR APPLE)
   set(OGRE_MEDIA_PATH "media")
 elseif (UNIX)
   set(OGRE_MEDIA_PATH "share/OGRE/media")
-elseif (APPLE)
-  # TODO
 endif ()
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/

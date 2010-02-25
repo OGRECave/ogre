@@ -545,5 +545,5 @@ CustomCompositionPass* CompositorManager::getCustomCompositionPass(const String&
 	}
 	return it->second;
 }
-//---------------------------------------------------------------------
+//-----------------------------------------------------------------------
 }

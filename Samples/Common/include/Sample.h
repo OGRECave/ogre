@@ -29,6 +29,7 @@
 #define __Sample_H__
 
 #include "Ogre.h"
+#include <iostream>
 
 #include "OIS.h"
 
@@ -119,6 +120,8 @@ protected:
 
 namespace OgreBites
 {
+	class FileSystemLayer;
+
 	/*=============================================================================
 	| Base class responsible for everything specific to one sample.
 	| Designed to be subclassed for each sample.
@@ -159,6 +162,7 @@ namespace OgreBites
 			mKeyboard = 0;
 			mMouse = 0;
 #endif
+			mFSLayer = 0;
 
 #ifdef USE_RTSHADER_SYSTEM
 			mShaderGenerator	 = NULL;		
@@ -214,9 +218,9 @@ namespace OgreBites
 		| Sets up a sample. Used by the SampleContext class. Do not call directly.
 		-----------------------------------------------------------------------------*/
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-		virtual void _setup(Ogre::RenderWindow* window, OIS::MultiTouch* mouse)
+		virtual void _setup(Ogre::RenderWindow* window, OIS::MultiTouch* mouse, FileSystemLayer* fsLayer)
 #else
-		virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, OIS::Mouse* mouse)
+		virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, OIS::Mouse* mouse, FileSystemLayer* fsLayer)
 #endif
 		{
 			mWindow = window;
@@ -224,6 +228,7 @@ namespace OgreBites
 			mKeyboard = keyboard;
 #endif
 			mMouse = mouse;
+			mFSLayer = fsLayer;
 
 			locateResources();
 			createSceneManager();
@@ -466,6 +471,7 @@ namespace OgreBites
 		OIS::Keyboard* mKeyboard;         // context keyboard device
 		OIS::Mouse* mMouse;               // context mouse device
 #endif
+		FileSystemLayer* mFSLayer; 		  // file system abstraction layer
 		Ogre::SceneManager* mSceneMgr;    // scene manager for this sample
 		Ogre::NameValuePairList mInfo;    // custom sample info
 		bool mDone;                       // flag to mark the end of the sample

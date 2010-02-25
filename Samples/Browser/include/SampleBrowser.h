@@ -103,7 +103,7 @@ namespace OgreBites
 	{
 	public:
 
-		SampleBrowser()
+		SampleBrowser() : SampleContext()
 		{
 			mTrayMgr = 0;
 			mLastViewCategory = 0;
@@ -929,13 +929,7 @@ namespace OgreBites
 			Ogre::StringVector unloadedSamplePlugins;
 
 			Ogre::ConfigFile cfg;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-			cfg.load(Ogre::macBundlePath() + "/Contents/Resources/samples.cfg");
-#elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-			cfg.load(Ogre::macBundlePath() + "/samples.cfg");
-#else
-			cfg.load("samples.cfg");
-#endif
+			cfg.load(mFSLayer->getConfigFilePath("samples.cfg"));
 
 			Ogre::String sampleDir = cfg.getSetting("SampleFolder");        // Mac OS X just uses Resources/ directory
 			Ogre::StringVector sampleList = cfg.getMultiSetting("SamplePlugin");

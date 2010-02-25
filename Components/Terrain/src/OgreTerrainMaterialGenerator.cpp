@@ -128,9 +128,10 @@ namespace Ogre
 
 		// update
 		mCompositeMapPlane->setMaterialName(0, mat->getName());
-		mCompositeMapLight->setDirection(TerrainGlobalOptions::getLightMapDirection());
-		mCompositeMapLight->setDiffuseColour(TerrainGlobalOptions::getCompositeMapDiffuse());
-		mCompositeMapSM->setAmbientLight(TerrainGlobalOptions::getCompositeMapAmbient());
+		TerrainGlobalOptions& globalopts = TerrainGlobalOptions::getSingleton();
+		mCompositeMapLight->setDirection(globalopts.getLightMapDirection());
+		mCompositeMapLight->setDiffuseColour(globalopts.getCompositeMapDiffuse());
+		mCompositeMapSM->setAmbientLight(globalopts.getCompositeMapAmbient());
 
 
 		// check for size change (allow smaller to be reused)

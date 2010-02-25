@@ -245,7 +245,7 @@ namespace Ogre
 		{
 			addTechnique(mat, terrain, LOW_LOD);
 			Material::LodValueList lodValues;
-			lodValues.push_back(TerrainGlobalOptions::getCompositeMapDistance());
+			lodValues.push_back(TerrainGlobalOptions::getSingleton().getCompositeMapDistance());
 			mat->setLodLevels(lodValues);
 			Technique* lowLodTechnique = mat->getTechnique(1);
 			lowLodTechnique->setLodIndex(1);

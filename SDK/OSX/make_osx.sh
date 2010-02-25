@@ -7,14 +7,16 @@ SDKBUILDDIR=`pwd`
 
 # Clean up files from previous builds
 echo Cleaning previous builds...
-rm -rf ../../build
+if [ "$1" = "clean" ];then
+	rm -rf $SDKBUILDDIR/build
+fi
 rm -rf $SDKBUILDDIR/sdk_contents 
 rm OgreSDK_$OGRE_VERSION.dmg
 
 # Configure with CMake
-mkdir ../../build
-pushd ../../build
-cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_MEDIA:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G Xcode ..
+mkdir $SDKBUILDDIR/build
+pushd $SDKBUILDDIR/build
+cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G Xcode ../../..
 
 echo Building API docs...
 

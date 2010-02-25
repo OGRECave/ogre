@@ -10,6 +10,18 @@
 # Configure Browser demo build
 
 set(SOURCE_FILES src/SampleBrowser.cpp)
+if (WIN32)
+  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_WIN32.cpp)
+elseif (OGRE_BUILD_PLATFORM_IPHONE)
+  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_iPhone.mm)
+elseif (APPLE)
+  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_OSX.cpp)
+elseif (UNIX)
+  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_Unix.cpp)
+else ()
+  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_Default.cpp)
+endif ()
+
 
 if (OGRE_BUILD_PLATFORM_IPHONE)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
@@ -63,6 +75,7 @@ endif ()
 
 set (HEADER_FILES
 	include/SampleBrowser.h
+	include/FileSystemLayerImpl.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/Sample.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SampleContext.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SamplePlugin.h
@@ -70,6 +83,7 @@ set (HEADER_FILES
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkSample.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkTrays.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/OgreStaticPluginLoader.h
+	${OGRE_SOURCE_DIR}/Samples/Common/include/FileSystemLayer.h
 )
 
 if (OGRE_STATIC)
@@ -117,6 +131,11 @@ endif ()
 
 ogre_config_common(SampleBrowser)
 
+# append _d for debug builds
+if (NOT APPLE)
+	set_property(TARGET SampleBrowser APPEND PROPERTY DEBUG_POSTFIX "_d")
+endif ()
+
 # set install RPATH for Unix systems
 if (UNIX AND OGRE_FULL_RPATH)
 	set_property(TARGET SampleBrowser APPEND PROPERTY
@@ -137,7 +156,6 @@ if (APPLE)
       COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/Samples/Common/misc/Default.png ${OGRE_SAMPLE_CONTENTS_PATH}/
       COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/bin/plugins.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/
       COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/bin/resources.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/
-      COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/bin/media.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/
       COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/bin/samples.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/
       COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/bin/quakemap.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/
     )
@@ -161,8 +179,6 @@ if (APPLE)
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/plugins.cfg 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/resources.cfg 
-		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/media.cfg 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/samples.cfg 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/

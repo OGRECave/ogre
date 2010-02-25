@@ -80,15 +80,18 @@ protected:
 		Real mIntensity;
 	};
 
-	#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-	#pragma pack(1)
-	#endif
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#	pragma pack(push, 1)
+#endif
     struct GrassVertex
 	{
         float x, y, z;
         float nx, ny, nz;
         float u, v;
     };
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#	pragma pack(pop)
+#endif
 
 	void setupContent()
 	{

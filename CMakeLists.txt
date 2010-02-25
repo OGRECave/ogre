@@ -18,6 +18,14 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 cmake_policy(SET CMP0003 NEW)
 
+# Use relative paths
+# This is mostly to reduce path size for command-line limits on windows
+if(WIN32)
+  # This seems to break Xcode projects so definitely don't enable on Apple builds
+  set(CMAKE_USE_RELATIVE_PATHS true)
+  set(CMAKE_SUPPRESS_REGENERATION true)
+endif()
+
 project(OGRE)
 
 # Include necessary submodules
@@ -215,20 +223,12 @@ option(OGRE_BUILD_COMPONENT_TERRAIN "Build Terrain component" TRUE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_PROPERTY "Build Property component" TRUE "Boost_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLUGIN_CG "Build Cg plugin" TRUE "Cg_FOUND;NOT OGRE_BUILD_PLATFORM_IPHONE" FALSE)
 option(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM "Build RTShader System component" TRUE)
-option(OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS "Build RTShader System FFP core shaders" TRUE)
-option(OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS "Build RTShader System extensions shaders" TRUE)
+cmake_dependent_option(OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS "Build RTShader System FFP core shaders" TRUE "OGRE_BUILD_COMPONENT_RTSHADERSYSTEM" FALSE)
+cmake_dependent_option(OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS "Build RTShader System extensions shaders" TRUE "OGRE_BUILD_COMPONENT_RTSHADERSYSTEM" FALSE)
 
 option(OGRE_BUILD_SAMPLES "Build Ogre demos" TRUE)
 cmake_dependent_option(OGRE_BUILD_TOOLS "Build the command-line tools" TRUE "NOT OGRE_BUILD_PLATFORM_IPHONE" FALSE)
 option(OGRE_BUILD_TESTS "Build the unit tests & PlayPen" FALSE)
-# Configure the build
-#option(OGRE_CONFIG_PROFILING "Enable Ogre profiling code" FALSE)
-#set(OGRE_CONFIG_ASSERTMODE 0 CACHE STRING 
-#"Set Ogre assertion mode. Possible values:
-#  0 - Regular asserts in debug, none in release
-#  1 - Regular asserts in debug, exceptions in release
-#  2 - Exceptions in debug and release"
-#)
 option(OGRE_CONFIG_DOUBLE "Use doubles instead of floats in Ogre" FALSE)
 set(OGRE_CONFIG_ALLOCATOR 4 CACHE STRING
 "Specify the memory allocator to use. Possible values:
@@ -243,24 +243,25 @@ option(OGRE_CONFIG_MEMTRACK_DEBUG "Enable Ogre's memory tracker in debug mode" F
 option(OGRE_CONFIG_MEMTRACK_RELEASE "Enable Ogre's memory tracker in release mode" FALSE)
 # determine threading options
 include(PrepareThreadingOptions)
-cmake_dependent_option(OGRE_CONFIG_DISABLE_FREEIMAGE "Don't build FreeImage codec. If you use this option, you need to provide your own image handling codecs." FALSE "FreeImage_FOUND" TRUE)
-option(OGRE_CONFIG_DISABLE_DDS "Don't build DDS codec." FALSE)
-option(OGRE_CONFIG_DISABLE_PVRTC "Don't build PVRTC codec." TRUE)
-cmake_dependent_option(OGRE_CONFIG_DISABLE_ZIP "Don't build ZIP archive support. If you use this option, you cannot use ZIP archives resource locations. The samples won't work." FALSE "ZZip_FOUND" TRUE)
-option(OGRE_CONFIG_DISABLE_VIEWPORT_ORIENTATIONMODE "Don't include Viewport orientation mode support." TRUE)
+cmake_dependent_option(OGRE_CONFIG_ENABLE_FREEIMAGE "Build FreeImage codec. If you disable this option, you need to provide your own image handling codecs." TRUE "FreeImage_FOUND" FALSE)
+option(OGRE_CONFIG_ENABLE_DDS "Build DDS codec." TRUE)
+option(OGRE_CONFIG_ENABLE_PVRTC "Build PVRTC codec." FALSE)
+cmake_dependent_option(OGRE_CONFIG_ENABLE_ZIP "Build ZIP archive support. If you disable this option, you cannot use ZIP archives resource locations. The samples won't work." TRUE "ZZip_FOUND" FALSE)
+option(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE "Include Viewport orientation mode support." FALSE)
 option(OGRE_CONFIG_NEW_COMPILERS "Use the new script compilers." TRUE)
 cmake_dependent_option(OGRE_USE_BOOST "Use Boost extensions" TRUE "Boost_FOUND" FALSE)
 # Customise what to install
-option(OGRE_INSTALL_PLUGINS_HEADERS "Install header files for Ogre plugins." FALSE)
 option(OGRE_INSTALL_SAMPLES "Install Ogre demos." FALSE)
 option(OGRE_INSTALL_TOOLS "Install Ogre tools." TRUE)
 option(OGRE_INSTALL_DOCS "Install documentation." FALSE)
-option(OGRE_INSTALL_MEDIA "Install media files." FALSE)
 option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE)
 cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" FALSE "MSVC" FALSE)
 option(OGRE_FULL_RPATH "Build executables with the full required RPATH to run from their install location." FALSE)
 option(OGRE_PROFILING "Enable internal profiling support." FALSE)
 cmake_dependent_option(OGRE_CONFIG_STATIC_LINK_CRT "Statically link the MS CRT dlls (msvcrt)" FALSE "MSVC" FALSE)
+
+# hide advanced options
+mark_as_advanced(OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS)
 
 ###################################################################
 # configure global build settings based on selected build options
@@ -304,7 +305,7 @@ endif ()
 add_subdirectory(Docs)
 
 # Install media files
-if (OGRE_INSTALL_MEDIA)
+if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
   add_subdirectory(Samples/Media)
 endif ()
 

@@ -30,15 +30,18 @@ public:
 
 protected:
 
-	#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-	#pragma pack(1)
-	#endif
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#	pragma pack(push, 1)
+#endif
     struct PatchVertex
 	{
         float x, y, z;
         float nx, ny, nz;
         float u, v;
     };
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#	pragma pack(pop)
+#endif
 
 	void setupContent()
 	{

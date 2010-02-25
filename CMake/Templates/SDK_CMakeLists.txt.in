@@ -28,7 +28,7 @@ set(CMAKE_SUPPRESS_REGENERATION true)
 project(OGRE)
 
 # Find actual Ogre root
-if (WIN32)
+if (WIN32 OR APPLE)
   get_filename_component(OGRE_ROOT_DIR "${OGRE_SOURCE_DIR}" ABSOLUTE)
   set(OGRE_TEMPLATES_DIR "${OGRE_ROOT_DIR}/cmake")
   set(OGRE_WORK_DIR "${OGRE_ROOT_DIR}")

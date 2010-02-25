@@ -19,7 +19,7 @@ if "%2" == "clean" rmdir /Q/S %BUILD_DIR%
 mkdir %BUILD_DIR%
 pushd %BUILD_DIR%
 rem call CMake
-cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_MEDIA:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G%GENERATOR% ..\..\..
+cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G%GENERATOR% ..\..\..
 if errorlevel 1 goto cmakeerror
 
 rem Detect whether we're using full version of VStudio or Express

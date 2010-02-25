@@ -77,43 +77,52 @@ namespace Ogre
 	const uint8 Terrain::DERIVED_DATA_LIGHTMAP = 4;
 	// This MUST match the bitwise OR of all the types above with no extra bits!
 	const uint8 Terrain::DERIVED_DATA_ALL = 7;
-
-
+	//-----------------------------------------------------------------------
+	template<> TerrainGlobalOptions* Singleton<TerrainGlobalOptions>::ms_Singleton = 0;
+	TerrainGlobalOptions* TerrainGlobalOptions::getSingletonPtr(void)
+	{
+		return ms_Singleton;
+	}
+	TerrainGlobalOptions& TerrainGlobalOptions::getSingleton(void)
+	{  
+		assert( ms_Singleton );  return ( *ms_Singleton );  
+	}
 	//---------------------------------------------------------------------
-	//---------------------------------------------------------------------
-	Real TerrainGlobalOptions::msSkirtSize = 30;
-	Vector3 TerrainGlobalOptions::msLightMapDir = Vector3(1, -1, 0).normalisedCopy();
-	bool TerrainGlobalOptions::msCastsShadows = false;
-	Real TerrainGlobalOptions::msMaxPixelError = 3.0;
-	uint8 TerrainGlobalOptions::msRenderQueueGroup = RENDER_QUEUE_MAIN;
-	uint32 TerrainGlobalOptions::msVisibilityFlags = 0xFFFFFFFF;
-	uint32 TerrainGlobalOptions::msQueryFlags = 0xFFFFFFFF;
-	bool TerrainGlobalOptions::msUseRayBoxDistanceCalculation = false;
-	TerrainMaterialGeneratorPtr TerrainGlobalOptions::msDefaultMaterialGenerator;
-	uint16 TerrainGlobalOptions::msLayerBlendMapSize = 1024;
-	Real TerrainGlobalOptions::msDefaultLayerTextureWorldSize = 10;
-	uint16 TerrainGlobalOptions::msDefaultGlobalColourMapSize = 1024;
-	uint16 TerrainGlobalOptions::msLightmapSize = 1024;
-	uint16 TerrainGlobalOptions::msCompositeMapSize = 1024;
-	ColourValue TerrainGlobalOptions::msCompositeMapAmbient = ColourValue::White;
-	ColourValue TerrainGlobalOptions::msCompositeMapDiffuse = ColourValue::White;
-	Real TerrainGlobalOptions::msCompositeMapDistance = 4000;
-	String TerrainGlobalOptions::msResourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+	TerrainGlobalOptions::TerrainGlobalOptions()
+		: mSkirtSize(30)
+		, mLightMapDir(Vector3(1, -1, 0).normalisedCopy())
+		, mCastsShadows(false)
+		, mMaxPixelError(3.0)
+		, mRenderQueueGroup(RENDER_QUEUE_MAIN)
+		, mVisibilityFlags(0xFFFFFFFF)
+		, mQueryFlags(0xFFFFFFFF)
+		, mUseRayBoxDistanceCalculation(false)
+		, mLayerBlendMapSize(1024)
+		, mDefaultLayerTextureWorldSize(10)
+		, mDefaultGlobalColourMapSize(1024)
+		, mLightmapSize(1024)
+		, mCompositeMapSize(1024)
+		, mCompositeMapAmbient(ColourValue::White)
+		, mCompositeMapDiffuse(ColourValue::White)
+		, mCompositeMapDistance(4000)
+		, mResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+	{
+	}
 	//---------------------------------------------------------------------
 	void TerrainGlobalOptions::setDefaultMaterialGenerator(TerrainMaterialGeneratorPtr gen)
 	{
-		msDefaultMaterialGenerator = gen;
+		mDefaultMaterialGenerator = gen;
 	}
 	//---------------------------------------------------------------------
 	TerrainMaterialGeneratorPtr TerrainGlobalOptions::getDefaultMaterialGenerator()
 	{
-		if (msDefaultMaterialGenerator.isNull())
+		if (mDefaultMaterialGenerator.isNull())
 		{
 			// default
-			msDefaultMaterialGenerator.bind(OGRE_NEW TerrainMaterialGeneratorA());
+			mDefaultMaterialGenerator.bind(OGRE_NEW TerrainMaterialGeneratorA());
 		}
 
-		return msDefaultMaterialGenerator;
+		return mDefaultMaterialGenerator;
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
@@ -124,6 +133,7 @@ namespace Ogre
 		, mResourceGroup(StringUtil::BLANK)
 		, mIsLoaded(false)
 		, mModified(false)
+		, mHeightDataModified(false)
 		, mHeightData(0)
 		, mDeltaData(0)
 		, mPos(Vector3::ZERO)
@@ -251,7 +261,7 @@ namespace Ogre
 		// wait for any queued processes to finish
 		waitForDerivedProcesses();
 
-		if (mModified)
+		if (mHeightDataModified)
 		{
 			// When modifying, for efficiency we only increase the max deltas at each LOD,
 			// we never reduce them (since that would require re-examining more samples)
@@ -425,6 +435,7 @@ namespace Ogre
 		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
 
 		mModified = false;
+		mHeightDataModified = false;
 
 	}
 	//---------------------------------------------------------------------
@@ -547,7 +558,7 @@ namespace Ogre
 	const String& Terrain::_getDerivedResourceGroup() const
 	{
 		if (mResourceGroup.empty())
-			return TerrainGlobalOptions::getDefaultResourceGroup();
+			return TerrainGlobalOptions::getSingleton().getDefaultResourceGroup();
 		else
 			return mResourceGroup;
 	}
@@ -674,6 +685,7 @@ namespace Ogre
 		distributeVertexData();
 
 		mModified = false;
+		mHeightDataModified = false;
 
 		return true;
 	}
@@ -805,6 +817,7 @@ namespace Ogre
 
 		// Imported data is treated as modified because it's not saved
 		mModified = true;
+		mHeightDataModified = true;
 
 
 		return true;
@@ -813,15 +826,16 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::copyGlobalOptions()
 	{
-		mSkirtSize = TerrainGlobalOptions::getSkirtSize();
-		mRenderQueueGroup = TerrainGlobalOptions::getRenderQueueGroup();
-		mVisibilityFlags = TerrainGlobalOptions::getVisibilityFlags();
-		mQueryFlags = TerrainGlobalOptions::getQueryFlags();
-		mLayerBlendMapSize = TerrainGlobalOptions::getLayerBlendMapSize();
+		TerrainGlobalOptions& opts = TerrainGlobalOptions::getSingleton();
+		mSkirtSize = opts.getSkirtSize();
+		mRenderQueueGroup = opts.getRenderQueueGroup();
+		mVisibilityFlags = opts.getVisibilityFlags();
+		mQueryFlags = opts.getQueryFlags();
+		mLayerBlendMapSize = opts.getLayerBlendMapSize();
 		mLayerBlendMapSizeActual = mLayerBlendMapSize; // for now, until we check
-		mLightmapSize = TerrainGlobalOptions::getLightMapSize();
+		mLightmapSize = opts.getLightMapSize();
 		mLightmapSizeActual = mLightmapSize; // for now, until we check
-		mCompositeMapSize = TerrainGlobalOptions::getCompositeMapSize();
+		mCompositeMapSize = opts.getCompositeMapSize();
 		mCompositeMapSizeActual = mCompositeMapSize; // for now, until we check
 
 	}
@@ -1040,6 +1054,7 @@ namespace Ogre
 
 		mIsLoaded = false;
 		mModified = false;
+		mHeightDataModified = false;
 
 	}
 	//---------------------------------------------------------------------
@@ -1570,7 +1585,7 @@ namespace Ogre
 		}
 		else
 		{
-			return TerrainGlobalOptions::getDefaultLayerTextureWorldSize();
+			return TerrainGlobalOptions::getSingleton().getDefaultLayerTextureWorldSize();
 		}
 	}
 	//---------------------------------------------------------------------
@@ -1585,6 +1600,7 @@ namespace Ogre
 			mLayers[index].worldSize = size;
 			mLayerUVMultiplier[index] = mWorldSize / size;
 			mMaterialParamsDirty = true;
+			mModified = true;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -1639,15 +1655,20 @@ namespace Ogre
 				mLayers[layerIndex].textureNames[samplerIndex] = textureName;
 				mMaterialDirty = true;
 				mMaterialParamsDirty = true;
+				mModified = true;
 			}
 		}
 	}
 	//---------------------------------------------------------------------
 	void Terrain::setPosition(const Vector3& pos)
 	{
-		mPos = pos;
-		mRootNode->setPosition(pos);
-		updateBaseScale();
+		if (pos != mPos)
+		{
+			mPos = pos;
+			mRootNode->setPosition(pos);
+			updateBaseScale();
+			mModified = true;
+		}
 	}
 	//---------------------------------------------------------------------
 	SceneNode* Terrain::_getRootSceneNode() const
@@ -1679,6 +1700,7 @@ namespace Ogre
 		mCompositeMapDirtyRect.merge(rect);
 
 		mModified = true;
+		mHeightDataModified = true;
 
 	}
 	//---------------------------------------------------------------------
@@ -2099,7 +2121,7 @@ namespace Ogre
 			// A = 1 / tan(fovy*0.5)    (== 1 for fovy=45*2)
 			Real A = 1.0f / Math::Tan(cam->getFOVy() * 0.5f);
 			// T = 2 * maxPixelError / vertRes
-			Real maxPixelError = TerrainGlobalOptions::getMaxPixelError() * cam->_getLodBiasInverse();
+			Real maxPixelError = TerrainGlobalOptions::getSingleton().getMaxPixelError() * cam->_getLodBiasInverse();
 			Real T = 2.0f * maxPixelError / (Real)vp->getActualHeight();
 
 			// CFactor = A / T
@@ -2370,7 +2392,7 @@ namespace Ogre
 	{
 		if (mMaterialGenerator.isNull())
 		{
-			mMaterialGenerator = TerrainGlobalOptions::getDefaultMaterialGenerator();
+			mMaterialGenerator = TerrainGlobalOptions::getSingleton().getDefaultMaterialGenerator();
 		}
 
 		if (mLayerDecl.elements.empty())
@@ -2415,6 +2437,7 @@ namespace Ogre
 
 		    mMaterialDirty = true;
 		    mMaterialParamsDirty = true;
+			mModified = true;
         }
     }
 	//---------------------------------------------------------------------
@@ -2426,7 +2449,7 @@ namespace Ogre
 	void Terrain::addLayer(uint8 index, Real worldSize, const StringVector* textureNames)
 	{
 		if (!worldSize)
-			worldSize = TerrainGlobalOptions::getDefaultLayerTextureWorldSize();
+			worldSize = TerrainGlobalOptions::getSingleton().getDefaultLayerTextureWorldSize();
 
         uint8 blendIndex = std::max(index-1,0); 
 		if (index >= getLayerCount())
@@ -2469,6 +2492,7 @@ namespace Ogre
 
 		mMaterialDirty = true;
 		mMaterialParamsDirty = true;
+		mModified = true;
 
 	}
 	//---------------------------------------------------------------------
@@ -2506,6 +2530,7 @@ namespace Ogre
 			
 			mMaterialDirty = true;
 			mMaterialParamsDirty = true;
+			mModified = true;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -3204,7 +3229,7 @@ namespace Ogre
 		// onto the minimum height
 
 
-		const Vector3& lightVec = TerrainGlobalOptions::getLightMapDirection();
+		const Vector3& lightVec = TerrainGlobalOptions::getSingleton().getLightMapDirection();
         Ogre::Rect widenedRect;
 		widenRectByVector(lightVec, rect, widenedRect);
 
@@ -3314,7 +3339,7 @@ namespace Ogre
 			{
 				// widen the dirty rectangle since lighting makes it wider
 				Rect widenedRect;
-				widenRectByVector(TerrainGlobalOptions::getLightMapDirection(), mCompositeMapDirtyRect, widenedRect);
+				widenRectByVector(TerrainGlobalOptions::getSingleton().getLightMapDirection(), mCompositeMapDirtyRect, widenedRect);
 				// clamp
 				widenedRect.left = std::max(widenedRect.left, 0L);
 				widenedRect.top = std::max(widenedRect.top, 0L);
@@ -3359,7 +3384,7 @@ namespace Ogre
 	void Terrain::setGlobalColourMapEnabled(bool enabled, uint16 sz)
 	{
 		if (!sz)
-			sz = TerrainGlobalOptions::getDefaultGlobalColourMapSize();
+			sz = TerrainGlobalOptions::getSingleton().getDefaultGlobalColourMapSize();
 
 		if (enabled != mGlobalColourMapEnabled ||
 			(enabled && mGlobalColourMapSize != sz))
@@ -3371,6 +3396,7 @@ namespace Ogre
 
 			mMaterialDirty = true;
 			mMaterialParamsDirty = true;
+			mModified = true;
 		}
 
 	}
@@ -3578,7 +3604,7 @@ namespace Ogre
 			Rect dirtyRect(mDirtyGeometryRectForNeighbours);
 			mDirtyGeometryRectForNeighbours.setNull();
 			// calculate light update rectangle
-			const Vector3& lightVec = TerrainGlobalOptions::getLightMapDirection();
+			const Vector3& lightVec = TerrainGlobalOptions::getSingleton().getLightMapDirection();
 			Rect lightmapRect;
 			widenRectByVector(lightVec, dirtyRect, getMinHeight(), getMaxHeight(), lightmapRect);
 
@@ -3670,7 +3696,7 @@ namespace Ogre
 			// update shadows
 			// here we need to widen the rect passed in based on the min/max height 
 			// of the *neighbour*
-			const Vector3& lightVec = TerrainGlobalOptions::getLightMapDirection();
+			const Vector3& lightVec = TerrainGlobalOptions::getSingleton().getLightMapDirection();
 			Rect widenedRect;
 			widenRectByVector(lightVec, shadowrect, neighbour->getMinHeight(), neighbour->getMaxHeight(), widenedRect);
 

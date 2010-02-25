@@ -2,6 +2,7 @@
 #define __BSP_H__
 
 #include "SdkSample.h"
+#include "FileSystemLayer.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #include "macUtils.h"
@@ -36,13 +37,7 @@ protected:
 	{
 		// load the Quake archive location and map name from a config file
 		ConfigFile cf;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-        cf.load(Ogre::macBundlePath() + "/Contents/Resources/quakemap.cfg");
-#elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-        cf.load(Ogre::macBundlePath() + "/quakemap.cfg");
-#else
-		cf.load("quakemap.cfg");
-#endif
+		cf.load(mFSLayer->getConfigFilePath("quakemap.cfg"));
 		mArchive = cf.getSetting("Archive");
 		mMap = cf.getSetting("Map");
 

@@ -409,6 +409,18 @@ namespace Ogre
 			}
 
 			ImportData(const ImportData& rhs)
+				: terrainAlign(ALIGN_X_Z)
+				, terrainSize(1025)
+				, maxBatchSize(65)
+				, minBatchSize(17)
+				, pos(Vector3::ZERO)
+				, worldSize(1000)
+				, inputImage(0)
+				, inputFloat(0)
+				, constantHeight(0)
+				, deleteInputData(false)
+				, inputScale(1.0)
+				, inputBias(0.0)
 			{
 				*this = rhs;
 			}
@@ -434,11 +446,16 @@ namespace Ogre
 				{
 					if (rhs.inputImage)
 						inputImage = OGRE_NEW Image(*rhs.inputImage);
+					else
+						inputImage = 0;
+
 					if (rhs.inputFloat)
 					{
 						inputFloat = OGRE_ALLOC_T(float, terrainSize*terrainSize, MEMCATEGORY_GEOMETRY);
 						memcpy(inputFloat, rhs.inputFloat, sizeof(float) * terrainSize*terrainSize);
 					}
+					else
+						inputFloat = 0;
 				}
 				else
 				{
@@ -722,6 +739,13 @@ namespace Ogre
 			This flag is reset on save().
 		*/
 		bool isModified() const { return mModified; }
+
+
+		/** Returns whether terrain heights have been modified since the terrain was first loaded / defined. 
+		@remarks
+		This flag is reset on save().
+		*/
+		bool isHeightDataModified() const { return mHeightDataModified; }
 
 
 		/** Unload the terrain and free GPU resources. 
@@ -1641,6 +1665,7 @@ namespace Ogre
 		String mResourceGroup;
 		bool mIsLoaded;
 		bool mModified;
+		bool mHeightDataModified;
 		
 		/// The height data (world coords relative to mPos)
 		float* mHeightData;
@@ -1781,121 +1806,124 @@ namespace Ogre
 		None of these options are stored with the terrain when saved. They are
 		options that you can use to modify the behaviour of the terrain when it
 		is loaded or created. 
+	@note
+		You should construct a single instance of this class per application and
+		do so before you start working with any other terrain classes.
 	*/
-	class _OgreTerrainExport TerrainGlobalOptions
+	class _OgreTerrainExport TerrainGlobalOptions : public TerrainAlloc, public Singleton<TerrainGlobalOptions>
 	{
 	protected:
-		// no instantiation
-		TerrainGlobalOptions() {}
 
-		static Real msSkirtSize;
-		static Vector3 msLightMapDir;
-		static bool msCastsShadows;
-		static Real msMaxPixelError;
-		static uint8 msRenderQueueGroup;
-		static uint32 msVisibilityFlags;
-		static uint32 msQueryFlags;
-		static bool msUseRayBoxDistanceCalculation;
-		static TerrainMaterialGeneratorPtr msDefaultMaterialGenerator;
-		static uint16 msLayerBlendMapSize;
-		static Real msDefaultLayerTextureWorldSize;
-		static uint16 msDefaultGlobalColourMapSize;
-		static uint16 msLightmapSize;
-		static uint16 msCompositeMapSize;
-		static ColourValue msCompositeMapAmbient;
-		static ColourValue msCompositeMapDiffuse;
-		static Real msCompositeMapDistance;
-		static String msResourceGroup;
+		Real mSkirtSize;
+		Vector3 mLightMapDir;
+		bool mCastsShadows;
+		Real mMaxPixelError;
+		uint8 mRenderQueueGroup;
+		uint32 mVisibilityFlags;
+		uint32 mQueryFlags;
+		bool mUseRayBoxDistanceCalculation;
+		TerrainMaterialGeneratorPtr mDefaultMaterialGenerator;
+		uint16 mLayerBlendMapSize;
+		Real mDefaultLayerTextureWorldSize;
+		uint16 mDefaultGlobalColourMapSize;
+		uint16 mLightmapSize;
+		uint16 mCompositeMapSize;
+		ColourValue mCompositeMapAmbient;
+		ColourValue mCompositeMapDiffuse;
+		Real mCompositeMapDistance;
+		String mResourceGroup;
 
 	public:
+		TerrainGlobalOptions();
+		virtual ~TerrainGlobalOptions() {}
 
 
 		/** Static method - the default size of 'skirts' used to hide terrain cracks
 		(default 10)
 		*/
-		static Real getSkirtSize() { return msSkirtSize; }
-		/** Static method - the default size of 'skirts' used to hide terrain cracks
+		Real getSkirtSize() { return mSkirtSize; }
+		/** method - the default size of 'skirts' used to hide terrain cracks
 		(default 10)
 		@remarks
 			Changing this value only applies to Terrain instances loaded / reloaded afterwards.
 		*/
-		static void setSkirtSize(Real skirtSz) { msSkirtSize = skirtSz; }
+		void setSkirtSize(Real skirtSz) { mSkirtSize = skirtSz; }
 		/// Get the shadow map light direction to use (world space)
-		static const Vector3& getLightMapDirection() { return msLightMapDir; }
+		const Vector3& getLightMapDirection() { return mLightMapDir; }
 		/** Set the shadow map light direction to use (world space). */
-		static void setLightMapDirection(const Vector3& v) { msLightMapDir = v; }
+		void setLightMapDirection(const Vector3& v) { mLightMapDir = v; }
 		/// Get the composite map ambient light to use 
-		static const ColourValue& getCompositeMapAmbient() { return msCompositeMapAmbient; }
+		const ColourValue& getCompositeMapAmbient() { return mCompositeMapAmbient; }
 		/// Set the composite map ambient light to use 
-		static void setCompositeMapAmbient(const ColourValue& c) { msCompositeMapAmbient = c; }
+		void setCompositeMapAmbient(const ColourValue& c) { mCompositeMapAmbient = c; }
 		/// Get the composite map iffuse light to use 
-		static const ColourValue& getCompositeMapDiffuse() { return msCompositeMapDiffuse; }
+		const ColourValue& getCompositeMapDiffuse() { return mCompositeMapDiffuse; }
 		/// Set the composite map diffuse light to use 
-		static void setCompositeMapDiffuse(const ColourValue& c) { msCompositeMapDiffuse = c; }
+		void setCompositeMapDiffuse(const ColourValue& c) { mCompositeMapDiffuse = c; }
 		/// Get the distance at which to start using a composite map if present
-		static Real getCompositeMapDistance() { return msCompositeMapDistance; }
+		Real getCompositeMapDistance() { return mCompositeMapDistance; }
 		/// Set the distance at which to start using a composite map if present
-		static void setCompositeMapDistance(Real c) { msCompositeMapDistance = c; }
+		void setCompositeMapDistance(Real c) { mCompositeMapDistance = c; }
 
 
 		/** Whether the terrain will be able to cast shadows (texture shadows
 		only are supported, and you must be using depth shadow maps).
 		*/
-		static bool getCastsDynamicShadows() { return msCastsShadows; }
+		bool getCastsDynamicShadows() { return mCastsShadows; }
 
 		/** Whether the terrain will be able to cast shadows (texture shadows
 		only are supported, and you must be using depth shadow maps).
 		This value can be set dynamically, and affects all existing terrains.
 		It defaults to false. 
 		*/
-		static void setCastsDynamicShadows(bool s) { msCastsShadows = s; }
+		void setCastsDynamicShadows(bool s) { mCastsShadows = s; }
 
 		/** Get the maximum screen pixel error that should be allowed when rendering. */
-		static Real getMaxPixelError() { return msMaxPixelError; }
+		Real getMaxPixelError() { return mMaxPixelError; }
 
 		/** Set the maximum screen pixel error that should  be allowed when rendering. 
 		@note
 			This value can be varied dynamically and affects all existing terrains.
 			It will be weighted by the LOD bias on viewports. 
 		*/
-		static void setMaxPixelError(Real pixerr) { msMaxPixelError = pixerr; }
+		void setMaxPixelError(Real pixerr) { mMaxPixelError = pixerr; }
 
 		/// Get the render queue group that this terrain will be rendered into
-		static uint8 getRenderQueueGroup(void) { return msRenderQueueGroup; }
+		uint8 getRenderQueueGroup(void) { return mRenderQueueGroup; }
 		/** Set the render queue group that terrains will be rendered into.
 		@remarks This applies to newly created terrains, after which they will
 			maintain their own queue group settings
 		*/
-		static void setRenderQueueGroup(uint8 grp) { msRenderQueueGroup = grp; }
+		void setRenderQueueGroup(uint8 grp) { mRenderQueueGroup = grp; }
 
 		/// Get the visbility flags that terrains will be rendered with
-		static uint32 getVisibilityFlags(void) { return msVisibilityFlags; }
+		uint32 getVisibilityFlags(void) { return mVisibilityFlags; }
 		/** Set the visbility flags that terrains will be rendered with
 		@remarks This applies to newly created terrains, after which they will
 		maintain their own settings
 		*/
-		static void setVisibilityFlags(uint32 flags) { msVisibilityFlags = flags; }
+		void setVisibilityFlags(uint32 flags) { mVisibilityFlags = flags; }
 
 		/** Set the default query flags for terrains.
 		@remarks This applies to newly created terrains, after which they will
 		maintain their own settings
 		*/
-		static void  setQueryFlags(uint32 flags) { msQueryFlags = flags; }
+		void  setQueryFlags(uint32 flags) { mQueryFlags = flags; }
 		/** Get the default query flags for terrains.
 		*/
-		static uint32 getQueryFlags(void) { return msQueryFlags; }
+		uint32 getQueryFlags(void) { return mQueryFlags; }
 
 		/** As setQueryFlags, except the flags passed as parameters are appended to the existing flags on this object. */
-		static void addQueryFlags(uint32 flags) { msQueryFlags |= flags; }
+		void addQueryFlags(uint32 flags) { mQueryFlags |= flags; }
 
 		/* As setQueryFlags, except the flags passed as parameters are removed from the existing flags on this object. */
-		static void removeQueryFlags(uint32 flags) { msQueryFlags &= ~flags; }
+		void removeQueryFlags(uint32 flags) { mQueryFlags &= ~flags; }
 
 		/** Returns whether or not to use an accurate calculation of camera distance
 			from a terrain tile (ray / AABB intersection) or whether to use the
 			simpler distance from the tile centre. 
 		*/
-		static bool getUseRayBoxDistanceCalculation() { return msUseRayBoxDistanceCalculation; }
+		bool getUseRayBoxDistanceCalculation() { return mUseRayBoxDistanceCalculation; }
 
 		/** Sets whether to use an accurate ray / box intersection to determine
 			distance from a terrain tile, or whether to use the simple distance
@@ -1908,67 +1936,101 @@ namespace Ogre
 			the max pixel error as a guide, the actual error will vary above and
 			below that. The default is not to use the ray/box approach.
 		*/
-		static void setUseRayBoxDistanceCalculation(bool rb) { msUseRayBoxDistanceCalculation = rb; }
+		void setUseRayBoxDistanceCalculation(bool rb) { mUseRayBoxDistanceCalculation = rb; }
 
 		/** Get the default material generator.
 		*/
-		static TerrainMaterialGeneratorPtr getDefaultMaterialGenerator();
+		TerrainMaterialGeneratorPtr getDefaultMaterialGenerator();
 
 		/** Set the default material generator.
 		*/
-		static void setDefaultMaterialGenerator(TerrainMaterialGeneratorPtr gen);
+		void setDefaultMaterialGenerator(TerrainMaterialGeneratorPtr gen);
 
 		/** Get the default size of the blend maps for a new terrain. 
 		*/
-		static uint16 getLayerBlendMapSize() { return msLayerBlendMapSize; }
+		uint16 getLayerBlendMapSize() { return mLayerBlendMapSize; }
 
 		/** Sets the default size of blend maps for a new terrain.
 		This is the resolution of each blending layer for a new terrain. 
 		Once created, this information will be stored with the terrain. 
 		*/
-		static void setLayerBlendMapSize(uint16 sz) { msLayerBlendMapSize = sz;}
+		void setLayerBlendMapSize(uint16 sz) { mLayerBlendMapSize = sz;}
 
 		/** Get the default world size for a layer 'splat' texture to cover. 
 		*/
-		static Real getDefaultLayerTextureWorldSize() { return msDefaultLayerTextureWorldSize; }
+		Real getDefaultLayerTextureWorldSize() { return mDefaultLayerTextureWorldSize; }
 
 		/** Set the default world size for a layer 'splat' texture to cover. 
 		*/
-		static void setDefaultLayerTextureWorldSize(Real sz) { msDefaultLayerTextureWorldSize = sz; }
+		void setDefaultLayerTextureWorldSize(Real sz) { mDefaultLayerTextureWorldSize = sz; }
 
 		/** Get the default size of the terrain global colour map for a new terrain. 
 		*/
-		static uint16 getDefaultGlobalColourMapSize() { return msDefaultGlobalColourMapSize; }
+		uint16 getDefaultGlobalColourMapSize() { return mDefaultGlobalColourMapSize; }
 
 		/** Set the default size of the terrain global colour map for a new terrain. 
 		Once created, this information will be stored with the terrain. 
 		*/
-		static void setDefaultGlobalColourMapSize(uint16 sz) { msDefaultGlobalColourMapSize = sz;}
+		void setDefaultGlobalColourMapSize(uint16 sz) { mDefaultGlobalColourMapSize = sz;}
 
 
 		/** Get the default size of the lightmaps for a new terrain. 
 		*/
-		static uint16 getLightMapSize() { return msLightmapSize; }
+		uint16 getLightMapSize() { return mLightmapSize; }
 
 		/** Sets the default size of lightmaps for a new terrain.
 		*/
-		static void setLightMapSize(uint16 sz) { msLightmapSize = sz;}
+		void setLightMapSize(uint16 sz) { mLightmapSize = sz;}
 
 		/** Get the default size of the composite maps for a new terrain. 
 		*/
-		static uint16 getCompositeMapSize() { return msCompositeMapSize; }
+		uint16 getCompositeMapSize() { return mCompositeMapSize; }
 
 		/** Sets the default size of composite maps for a new terrain.
 		*/
-		static void setCompositeMapSize(uint16 sz) { msCompositeMapSize = sz;}
+		void setCompositeMapSize(uint16 sz) { mCompositeMapSize = sz;}
 
 		/** Set the default resource group to use to load / save terrains.
 		*/
-		static void setDefaultResourceGroup(const String& grp) { msResourceGroup = grp; }
+		void setDefaultResourceGroup(const String& grp) { mResourceGroup = grp; }
 
 		/** Get the default resource group to use to load / save terrains.
 		*/
-		static const String& getDefaultResourceGroup() { return msResourceGroup; }
+		const String& getDefaultResourceGroup() { return mResourceGroup; }
+
+		/** Override standard Singleton retrieval.
+		@remarks
+		Why do we do this? Well, it's because the Singleton
+		implementation is in a .h file, which means it gets compiled
+		into anybody who includes it. This is needed for the
+		Singleton template to work, but we actually only want it
+		compiled into the implementation of the class based on the
+		Singleton, not all of them. If we don't change this, we get
+		link errors when trying to use the Singleton-based class from
+		an outside dll.
+		@par
+		This method just delegates to the template version anyway,
+		but the implementation stays in this single compilation unit,
+		preventing link errors.
+		*/
+		static TerrainGlobalOptions& getSingleton(void);
+		/** Override standard Singleton retrieval.
+		@remarks
+		Why do we do this? Well, it's because the Singleton
+		implementation is in a .h file, which means it gets compiled
+		into anybody who includes it. This is needed for the
+		Singleton template to work, but we actually only want it
+		compiled into the implementation of the class based on the
+		Singleton, not all of them. If we don't change this, we get
+		link errors when trying to use the Singleton-based class from
+		an outside dll.
+		@par
+		This method just delegates to the template version anyway,
+		but the implementation stays in this single compilation unit,
+		preventing link errors.
+		*/
+		static TerrainGlobalOptions* getSingletonPtr(void);
+
 
 	};
 

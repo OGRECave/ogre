@@ -623,7 +623,12 @@ namespace Ogre {
         }
 
         //only set the render queue group if it has been explicitly set.
-        if( mRenderQueueIDSet )
+		if (mRenderQueuePrioritySet)
+		{
+			assert(mRenderQueueIDSet == true);
+			queue->addRenderable(this, mRenderQueueID, mRenderQueuePriority);
+		}
+        else if( mRenderQueueIDSet )
         {
            queue->addRenderable(this, mRenderQueueID);
         } else {

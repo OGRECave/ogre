@@ -368,6 +368,9 @@ namespace Ogre {
 		/// Overridden - see MovableObject.
 		void setRenderQueueGroup(uint8 queueID);
 
+		/// Overridden - see MovableObject.
+		void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
+
 		/** Overridden - see MovableObject.
 		*/
 		const AxisAlignedBox& getBoundingBox(void) const;

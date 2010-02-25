@@ -55,7 +55,9 @@ namespace Ogre {
         , mBeyondFarDistance(false)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
         , mRenderQueueIDSet(false)
-        , mQueryFlags(msDefaultQueryFlags)
+		, mRenderQueuePriority(100)
+		, mRenderQueuePrioritySet(false)
+		, mQueryFlags(msDefaultQueryFlags)
         , mVisibilityFlags(msDefaultVisibilityFlags)
         , mCastShadows(true)
         , mRenderingDisabled(false)
@@ -78,7 +80,9 @@ namespace Ogre {
         , mBeyondFarDistance(false)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
         , mRenderQueueIDSet(false)
-        , mQueryFlags(msDefaultQueryFlags)
+		, mRenderQueuePriority(100)
+		, mRenderQueuePrioritySet(false)
+		, mQueryFlags(msDefaultQueryFlags)
         , mVisibilityFlags(msDefaultVisibilityFlags)
         , mCastShadows(true)
         , mRenderingDisabled(false)
@@ -277,6 +281,16 @@ namespace Ogre {
         mRenderQueueID = queueID;
         mRenderQueueIDSet = true;
     }
+
+	//-----------------------------------------------------------------------
+	void MovableObject::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
+	{
+		setRenderQueueGroup(queueID);
+		mRenderQueuePriority = queueID;
+		mRenderQueuePrioritySet = true;
+
+	}
+
     //-----------------------------------------------------------------------
     uint8 MovableObject::getRenderQueueGroup(void) const
     {

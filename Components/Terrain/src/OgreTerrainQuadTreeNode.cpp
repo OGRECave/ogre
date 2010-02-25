@@ -1158,7 +1158,7 @@ namespace Ogre
 			// no children were within their LOD ranges, so we should consider our own
 			Vector3 localPos = cam->getDerivedPosition() - mLocalCentre - mTerrain->getPosition();
 			Real dist;
-			if (TerrainGlobalOptions::getUseRayBoxDistanceCalculation())
+			if (TerrainGlobalOptions::getSingleton().getUseRayBoxDistanceCalculation())
 			{
 				// Get distance to this terrain node (to closest point of the box)
 				// head towards centre of the box (note, box may not cover mLocalCentre because of height)
@@ -1379,7 +1379,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool TerrainQuadTreeNode::getCastsShadows(void) const
 	{
-		return TerrainGlobalOptions::getCastsDynamicShadows();
+		return TerrainGlobalOptions::getSingleton().getCastsDynamicShadows();
 	}
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
