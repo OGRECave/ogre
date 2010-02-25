@@ -204,6 +204,13 @@ namespace Ogre {
             RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
                 bool fullScreen, const NameValuePairList *miscParams = 0);
 
+            /// @copydoc RenderSystem::_createDepthBufferFor
+            DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
+
+            /// Mimics D3D9RenderSystem::_getDepthStencilFormatFor, if no FBO RTT manager, outputs GL_NONE
+            void _getDepthStencilFormatFor( GLenum internalColourFormat, GLenum *depthFormat,
+                                            GLenum *stencilFormat );
+
             /// @copydoc RenderSystem::createMultiRenderTarget
             virtual MultiRenderTarget * createMultiRenderTarget(const String & name);
 

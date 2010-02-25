@@ -59,11 +59,20 @@ namespace Ogre {
 		/** Swap buffers - only useful when using multisample buffers.
 		*/
 		void swapBuffers();
-        
+
+        /** This function acts very similar to @see GLESFBORenderTexture::attachDepthBuffer
+			The difference between D3D & OGL is that D3D setups the DepthBuffer before rendering,
+			while OGL setups the DepthBuffer per FBO. So the DepthBuffer (RenderBuffer) needs to
+			be attached for OGL.
+		*/
+		void attachDepthBuffer( DepthBuffer *depthBuffer );
+		void detachDepthBuffer();
+
         /// Accessors
         size_t getWidth();
         size_t getHeight();
         PixelFormat getFormat();
+		GLsizei getFSAA();
         
         GLES2FBOManager *getManager() { return mManager; }
 		const GLES2SurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }

@@ -30,6 +30,8 @@ THE SOFTWARE.
 #include "OgreGLESRenderSystem.h"
 #include "OgreGLESTextureManager.h"
 #include "OgreGLESDefaultHardwareBufferManager.h"
+#include "OgreGLESDepthBuffer.h"
+#include "OgreGLESHardwarePixelBuffer.h"
 #include "OgreGLESHardwareBufferManager.h"
 #include "OgreGLESHardwareIndexBuffer.h"
 #include "OgreGLESHardwareVertexBuffer.h"
@@ -361,6 +363,7 @@ namespace Ogre {
 				// Create FBO manager
 				LogManager::getSingleton().logMessage("GL ES: Using GL_OES_framebuffer_object for rendering to textures (best)");
 				mRTTManager = OGRE_NEW_FIX_FOR_WIN32 GLESFBOManager();
+				caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 			}
 		}
 		else
@@ -520,8 +523,65 @@ namespace Ogre {
                 mCurrentContext->setInitialized();
         }
 
+        if( win->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH )
+		{
+			//Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
+			//Only Copy does, but Copy means only one depth buffer...
+			GLESDepthBuffer *depthBuffer = OGRE_NEW GLESDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
+															mCurrentContext, 0, 0,
+															win->getWidth(), win->getHeight(),
+															win->getFSAA(), 0, true );
+
+			mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
+
+			win->attachDepthBuffer( depthBuffer );
+		}
+
         return win;
     }
+
+	//---------------------------------------------------------------------
+	DepthBuffer* GLESRenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
+	{
+		GLESDepthBuffer *retVal = 0;
+
+		// Only FBO & pbuffer support different depth buffers, so everything
+		// else creates dummy (empty) containers
+		// retVal = mRTTManager->_createDepthBufferFor( renderTarget );
+		GLESFrameBufferObject *fbo = 0;
+        renderTarget->getCustomAttribute("FBO", &fbo);
+
+		if( fbo )
+		{
+			// Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
+			// Find best depth & stencil format suited for the RT's format
+			GLuint depthFormat, stencilFormat;
+			static_cast<GLESFBOManager*>(mRTTManager)->getBestDepthStencil( fbo->getFormat(),
+																		&depthFormat, &stencilFormat );
+
+			GLESRenderBuffer *depthBuffer = OGRE_NEW GLESRenderBuffer( depthFormat, fbo->getWidth(),
+																fbo->getHeight(), fbo->getFSAA() );
+
+			GLESRenderBuffer *stencilBuffer = depthBuffer;
+			if( stencilBuffer != GL_NONE )
+			{
+				stencilBuffer = OGRE_NEW GLESRenderBuffer( stencilFormat, fbo->getWidth(),
+													fbo->getHeight(), fbo->getFSAA() );
+			}
+
+			//No "custom-quality" multisample for now in GL
+			retVal = OGRE_NEW GLESDepthBuffer( 0, this, mCurrentContext, depthBuffer, stencilBuffer,
+										fbo->getWidth(), fbo->getHeight(), fbo->getFSAA(), 0, false );
+		}
+
+		return retVal;
+	}
+	//---------------------------------------------------------------------
+	void GLESRenderSystem::_getDepthStencilFormatFor( GLenum internalColourFormat, GLenum *depthFormat,
+													GLenum *stencilFormat )
+	{
+		mRTTManager->getBestDepthStencil( internalColourFormat, depthFormat, stencilFormat );
+	}
 
     MultiRenderTarget* GLESRenderSystem::createMultiRenderTarget(const String & name)
     {
@@ -539,6 +599,44 @@ namespace Ogre {
         {
             if (i->second == pWin)
             {
+				GLESContext *windowContext;
+				pWin->getCustomAttribute("GLCONTEXT", &windowContext);
+
+				//1 Window <-> 1 Context, should be always true
+				assert( windowContext );
+
+				bool bFound = false;
+				//Find the depth buffer from this window and remove it.
+				DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
+				DepthBufferMap::iterator enMap = mDepthBufferPool.end();
+
+				while( itMap != enMap && !bFound )
+				{
+					DepthBufferVec::iterator itor = itMap->second.begin();
+					DepthBufferVec::iterator end  = itMap->second.end();
+
+					while( itor != end )
+					{
+						// A DepthBuffer with no depth & stencil pointers is a dummy one,
+						// look for the one that matches the same GL context
+						GLESDepthBuffer *depthBuffer = static_cast<GLESDepthBuffer*>(*itor);
+						GLESContext *glContext = depthBuffer->getGLContext();
+
+						if( glContext == windowContext &&
+							depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer() )
+						{
+							bFound = true;
+
+							delete *itor;
+							itMap->second.erase( itor );
+							break;
+						}
+						++itor;
+					}
+
+					++itMap;
+				}
+
                 mRenderTargets.erase(i);
                 OGRE_DELETE pWin;
                 break;
@@ -2582,6 +2680,17 @@ namespace Ogre {
         {
             _switchContext(newContext);
         }
+
+        // Check the FBO's depth buffer status
+		GLESDepthBuffer *depthBuffer = static_cast<GLESDepthBuffer*>(target->getDepthBuffer());
+
+		if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
+			(!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
+		{
+			// Depth is automatically managed and there is no depth buffer attached to this RT
+			// or the Current context doesn't match the one this Depth buffer was created with
+			setDepthBufferFor( target );
+		}
 
 		// Bind frame buffer object
         mRTTManager->bind(target);

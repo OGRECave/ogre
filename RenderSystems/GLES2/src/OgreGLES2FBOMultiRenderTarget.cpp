@@ -72,4 +72,25 @@ namespace Ogre {
             *static_cast<GLES2FrameBufferObject **>(pData) = &fbo;
         }
 	}
+	//-----------------------------------------------------------------------------
+	bool GLES2FBOMultiRenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
+	{
+		bool result;
+		if( result = MultiRenderTarget::attachDepthBuffer( depthBuffer ) )
+			fbo.attachDepthBuffer( depthBuffer );
+
+		return result;
+	}
+	//-----------------------------------------------------------------------------
+	void GLES2FBOMultiRenderTarget::detachDepthBuffer()
+	{
+		fbo.detachDepthBuffer();
+		MultiRenderTarget::detachDepthBuffer();
+	}
+	//-----------------------------------------------------------------------------
+	void GLES2FBOMultiRenderTarget::_detachDepthBuffer()
+	{
+		fbo.detachDepthBuffer();
+		MultiRenderTarget::_detachDepthBuffer();
+	}
 }

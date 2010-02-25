@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreGLESHardwarePixelBuffer.h"
 #include "OgreGLESFBORenderTexture.h"
+#include "OgreGLESDepthBuffer.h"
 
 namespace Ogre {
 
@@ -167,45 +168,8 @@ namespace Ogre {
 			// depth & stencil will be dealt with below
 		}
 
-        /// Find suitable depth and stencil format that is compatible with colour format
-        GLenum depthFormat, stencilFormat;
-        mManager->getBestDepthStencil(ogreFormat, &depthFormat, &stencilFormat);
-        
-        /// Request surfaces
-        mDepth = mManager->requestRenderBuffer(depthFormat, width, height, mNumSamples);
-		if (depthFormat == GL_DEPTH24_STENCIL8_OES)
-		{
-			// bind same buffer to depth and stencil attachments
-            mManager->requestRenderBuffer(mDepth);
-			mStencil = mDepth;
-		}
-		else
-		{
-			// separate stencil
-			mStencil = mManager->requestRenderBuffer(stencilFormat, width, height, mNumSamples);
-		}
-        
-        /// Attach/detach surfaces
-        if(mDepth.buffer)
-        {
-            mDepth.buffer->bindToFramebuffer(GL_DEPTH_ATTACHMENT_OES, mDepth.zoffset);
-        }
-        else
-        {
-            glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES,
-                GL_RENDERBUFFER_OES, 0);
-            GL_CHECK_ERROR;
-        }
-        if(mStencil.buffer)
-        {
-            mStencil.buffer->bindToFramebuffer(GL_STENCIL_ATTACHMENT_OES, mStencil.zoffset);
-        }
-        else
-        {
-            glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_STENCIL_ATTACHMENT_OES,
-                GL_RENDERBUFFER_OES, 0);
-            GL_CHECK_ERROR;
-        }
+        /// Depth buffer is not handled here anymore.
+		/// See GLESFrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
 
 		/// Do glDrawBuffer calls
 		GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
@@ -259,16 +223,54 @@ namespace Ogre {
     void GLESFrameBufferObject::bind()
     {
         /// Bind it to FBO
-		if (mMultisampleFB)
-			glBindFramebufferOES(GL_FRAMEBUFFER_OES, mMultisampleFB);
-		else
-			glBindFramebufferOES(GL_FRAMEBUFFER_OES, mFB);
+		const GLuint fb = mMultisampleFB ? mMultisampleFB : mFB;
+		glBindFramebufferOES(GL_FRAMEBUFFER_OES, fb);
         GL_CHECK_ERROR;
     }
 
 	void GLESFrameBufferObject::swapBuffers()
 	{
         // Do nothing
+	}
+
+	void GLESFrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )
+	{
+		GLESDepthBuffer *glDepthBuffer = static_cast<GLESDepthBuffer*>(depthBuffer);
+
+		glBindFramebufferOES(GL_FRAMEBUFFER_OES, mMultisampleFB ? mMultisampleFB : mFB );
+
+		if( glDepthBuffer )
+		{
+			GLESRenderBuffer *depthBuf   = glDepthBuffer->getDepthBuffer();
+			GLESRenderBuffer *stencilBuf = glDepthBuffer->getStencilBuffer();
+
+			//Truly attach depth buffer
+			depthBuf->bindToFramebuffer( GL_DEPTH_ATTACHMENT_OES, 0 );
+
+			//Truly attach stencil buffer, if it has one and isn't included w/ the depth buffer
+			if( depthBuf != stencilBuf )
+				stencilBuf->bindToFramebuffer( GL_STENCIL_ATTACHMENT_OES, 0 );
+			else
+			{
+				glFramebufferRenderbufferOES( GL_FRAMEBUFFER_OES, GL_STENCIL_ATTACHMENT_OES,
+											  GL_RENDERBUFFER_OES, 0);
+			}
+		}
+		else
+		{
+			glFramebufferRenderbufferOES( GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES,
+										  GL_RENDERBUFFER_OES, 0);
+			glFramebufferRenderbufferOES( GL_FRAMEBUFFER_OES, GL_STENCIL_ATTACHMENT_OES,
+										  GL_RENDERBUFFER_OES, 0);
+		}
+	}
+	//-----------------------------------------------------------------------------
+	void GLESFrameBufferObject::detachDepthBuffer()
+	{
+		glBindFramebufferOES(GL_FRAMEBUFFER_OES, mMultisampleFB ? mMultisampleFB : mFB );
+		glFramebufferRenderbufferOES( GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, 0 );
+		glFramebufferRenderbufferOES( GL_FRAMEBUFFER_OES, GL_STENCIL_ATTACHMENT_OES,
+									  GL_RENDERBUFFER_OES, 0 );
 	}
 
     size_t GLESFrameBufferObject::getWidth()
@@ -285,6 +287,10 @@ namespace Ogre {
     {
         assert(mColour[0].buffer);
         return mColour[0].buffer->getFormat();
+    }
+	GLsizei GLESFrameBufferObject::getFSAA()
+    {
+        return mNumSamples;
     }
 //-----------------------------------------------------------------------------
 }

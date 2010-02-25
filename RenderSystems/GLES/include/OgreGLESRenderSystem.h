@@ -34,7 +34,6 @@ THE SOFTWARE.
 
 #include "OgreRenderSystem.h"
 
-
 namespace Ogre {
     class GLESContext;
     class GLESSupport;
@@ -48,6 +47,14 @@ namespace Ogre {
     class _OgrePrivate GLESRenderSystem : public RenderSystem
     {
         private:
+            typedef HashMap<GLenum, GLint>              TexEnviMap;
+            typedef HashMap<GLenum, GLfloat>            TexEnvfMap;
+            typedef HashMap<GLenum, const GLfloat *>    TexEnvfvMap;
+            typedef HashMap<GLenum, GLfloat>            PointParamfMap;
+            typedef HashMap<GLenum, const GLfloat *>    PointParamfvMap;
+            typedef HashMap<GLenum, const GLfloat *>    MaterialfvMap;
+            typedef HashMap<GLenum, GLfloat>            LightfMap;
+            typedef HashMap<GLenum, const GLfloat *>    LightfvMap;
 
             /** Array of up to 8 lights, indexed as per API
                 Note that a null value indicates a free slot
@@ -82,7 +89,7 @@ namespace Ogre {
             bool mColourWrite[4];
 
             /// Store last depth write state
-            bool mDepthWrite;
+            GLboolean mDepthWrite;
 
             /// Store last stencil mask state
             uint32 mStencilMask;
@@ -116,6 +123,28 @@ namespace Ogre {
                 which is especially important on mobile or embedded systems.
              */
             ushort mActiveTextureUnit;
+            ushort mActiveClientTextureUnit;
+            TexEnviMap mActiveTexEnviMap;
+            TexEnvfMap mActiveTexEnvfMap;
+            TexEnvfvMap mActiveTexEnvfvMap;
+            PointParamfMap mActivePointParamfMap;
+            PointParamfvMap mActivePointParamfvMap;
+            MaterialfvMap mActiveMaterialfvMap;
+            LightfMap mActiveLightfMap;
+            LightfvMap mActiveLightfvMap;
+            GLint mActiveSourceBlend;
+            GLint mActiveDestBlend;
+            GLint mActiveDepthFunc;
+            GLenum mActiveShadeModel;
+            GLenum mActiveMatrixMode;
+            GLfloat mActivePointSize;
+            GLenum mActiveCullFaceMode;
+            GLfloat mTexMaxAnisotropy;
+            GLfloat mMaxTexMaxAnisotropy;
+            GLclampf mActiveClearDepth;
+            ColourValue mActiveClearColor;
+            GLenum mActiveAlphaFunc;
+            GLclampf mActiveAlphaFuncValue;
 
             /// Check if the GL system has already been initialised
             bool mGLInitialised;
@@ -132,6 +161,19 @@ namespace Ogre {
             void setLights();
 
             bool activateGLTextureUnit(size_t unit);
+            bool activateGLClientTextureUnit(size_t unit);
+            void setGLTexEnvi(GLenum target, GLenum name, GLint param);
+            void setGLTexEnvf(GLenum target, GLenum name, GLfloat param);
+            void setGLTexEnvfv(GLenum target, GLenum name, const GLfloat *param);
+            void setGLPointParamf(GLenum name, GLfloat param);
+            void setGLPointParamfv(GLenum name, const GLfloat *param);
+            void setGLMaterialfv(GLenum face, GLenum name, const GLfloat *param);
+            void setGLMatrixMode(GLenum mode);
+            void setGLDepthMask(GLboolean flag);
+            void setGLClearDepthf(GLclampf depth);
+            void setGLColorMask(bool red, bool green, bool blue, bool alpha);
+            void setGLLightf(GLenum light, GLenum name, GLfloat param);
+            void setGLLightfv(GLenum light, GLenum name, const GLfloat *param);
 
         public:
             // Default constructor / destructor
@@ -193,6 +235,13 @@ namespace Ogre {
             /// @copydoc RenderSystem::_createRenderWindow
             RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
                 bool fullScreen, const NameValuePairList *miscParams = 0);
+
+            /// @copydoc RenderSystem::_createDepthBufferFor
+            DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
+
+            /// Mimics D3D9RenderSystem::_getDepthStencilFormatFor, if no FBO RTT manager, outputs GL_NONE
+            void _getDepthStencilFormatFor( GLenum internalColourFormat, GLenum *depthFormat,
+                                            GLenum *stencilFormat );
 
             /// @copydoc RenderSystem::createMultiRenderTarget
             virtual MultiRenderTarget * createMultiRenderTarget(const String & name);

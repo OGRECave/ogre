@@ -81,6 +81,12 @@ namespace Ogre {
             */
             virtual void unbind(RenderTarget *target) = 0;
 
+            virtual void getBestDepthStencil(GLenum internalFormat, GLenum *depthFormat, GLenum *stencilFormat)
+            {
+                *depthFormat = GL_NONE;
+                *stencilFormat = GL_NONE;
+            }
+
             /** Create a multi render target
             */
             virtual MultiRenderTarget* createMultiRenderTarget(const String & name);

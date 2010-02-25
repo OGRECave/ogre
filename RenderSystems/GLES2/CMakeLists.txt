@@ -12,6 +12,7 @@
 set(HEADER_FILES
   include/OgreGLES2Context.h
   include/OgreGLES2DefaultHardwareBufferManager.h
+  include/OgreGLES2DepthBuffer.h
   include/OgreGLES2FBOMultiRenderTarget.h
   include/OgreGLES2FBORenderTexture.h
   include/OgreGLES2FrameBufferObject.h
@@ -34,6 +35,7 @@ set(HEADER_FILES
 set(SOURCE_FILES
   src/OgreGLES2Context.cpp
   src/OgreGLES2DefaultHardwareBufferManager.cpp
+  src/OgreGLES2DepthBuffer.cpp
   src/OgreGLES2EngineDll.cpp
   src/OgreGLES2FBOMultiRenderTarget.cpp
   src/OgreGLES2FBORenderTexture.cpp

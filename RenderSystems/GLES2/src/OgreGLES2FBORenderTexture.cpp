@@ -60,34 +60,55 @@ namespace Ogre {
 	{
 		mFB.swapBuffers();
 	}
+	//-----------------------------------------------------------------------------
+	bool GLES2FBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
+	{
+		bool result;
+		if( result = GLES2RenderTexture::attachDepthBuffer( depthBuffer ) )
+			mFB.attachDepthBuffer( depthBuffer );
+
+		return result;
+	}
+	//-----------------------------------------------------------------------------
+	void GLES2FBORenderTexture::detachDepthBuffer()
+	{
+		mFB.detachDepthBuffer();
+		GLES2RenderTexture::detachDepthBuffer();
+	}
+	//-----------------------------------------------------------------------------
+	void GLES2FBORenderTexture::_detachDepthBuffer()
+	{
+		mFB.detachDepthBuffer();
+		GLES2RenderTexture::_detachDepthBuffer();
+	}
    
-/// Size of probe texture
-#define PROBE_SIZE 16
+    /// Size of probe texture
+    #define PROBE_SIZE 16
 
-/// Stencil and depth formats to be tried
-static const GLenum stencilFormats[] =
-{
-    GL_NONE,                    // No stencil
-    GL_STENCIL_INDEX8
-};
-static const size_t stencilBits[] =
-{
-    0, 8
-};
-#define STENCILFORMAT_COUNT (sizeof(stencilFormats)/sizeof(GLenum))
+    /// Stencil and depth formats to be tried
+    static const GLenum stencilFormats[] =
+    {
+        GL_NONE,                    // No stencil
+        GL_STENCIL_INDEX8
+    };
+    static const size_t stencilBits[] =
+    {
+        0, 8
+    };
+    #define STENCILFORMAT_COUNT (sizeof(stencilFormats)/sizeof(GLenum))
 
-static const GLenum depthFormats[] =
-{
-    GL_NONE,
-    GL_DEPTH_COMPONENT16,
-    GL_DEPTH_COMPONENT24_OES,   // Prefer 24 bit depth
-    GL_DEPTH24_STENCIL8_OES     // Packed depth / stencil
-};
-static const size_t depthBits[] =
-{
-    0,16,24,24
-};
-#define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
+    static const GLenum depthFormats[] =
+    {
+        GL_NONE,
+        GL_DEPTH_COMPONENT16,
+        GL_DEPTH_COMPONENT24_OES,   // Prefer 24 bit depth
+        GL_DEPTH24_STENCIL8_OES     // Packed depth / stencil
+    };
+    static const size_t depthBits[] =
+    {
+        0,16,24,24
+    };
+    #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
 	GLES2FBOManager::GLES2FBOManager()
     {

@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreGLES2FrameBufferObject.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2FBORenderTexture.h"
+#include "OgreGLES2DepthBuffer.h"
 
 namespace Ogre {
 
@@ -166,45 +167,8 @@ namespace Ogre {
 			// depth & stencil will be dealt with below
 		}
 
-        /// Find suitable depth and stencil format that is compatible with colour format
-        GLenum depthFormat, stencilFormat;
-        mManager->getBestDepthStencil(ogreFormat, &depthFormat, &stencilFormat);
-        
-        /// Request surfaces
-        mDepth = mManager->requestRenderBuffer(depthFormat, width, height, mNumSamples);
-		if (depthFormat == GL_DEPTH24_STENCIL8_OES)
-		{
-			// bind same buffer to depth and stencil attachments
-            mManager->requestRenderBuffer(mDepth);
-			mStencil = mDepth;
-		}
-		else
-		{
-			// separate stencil
-			mStencil = mManager->requestRenderBuffer(stencilFormat, width, height, mNumSamples);
-		}
-        
-        /// Attach/detach surfaces
-        if(mDepth.buffer)
-        {
-            mDepth.buffer->bindToFramebuffer(GL_DEPTH_ATTACHMENT, mDepth.zoffset);
-        }
-        else
-        {
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                GL_RENDERBUFFER, 0);
-            GL_CHECK_ERROR;
-        }
-        if(mStencil.buffer)
-        {
-            mStencil.buffer->bindToFramebuffer(GL_STENCIL_ATTACHMENT, mStencil.zoffset);
-        }
-        else
-        {
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-                GL_RENDERBUFFER, 0);
-            GL_CHECK_ERROR;
-        }
+        /// Depth buffer is not handled here anymore.
+		/// See GLES2FrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
 
 		/// Do glDrawBuffer calls
 		GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
@@ -258,16 +222,54 @@ namespace Ogre {
     void GLES2FrameBufferObject::bind()
     {
         /// Bind it to FBO
-		if (mMultisampleFB)
-			glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB);
-		else
-			glBindFramebuffer(GL_FRAMEBUFFER, mFB);
+		const GLuint fb = mMultisampleFB ? mMultisampleFB : mFB;
+		glBindFramebuffer(GL_FRAMEBUFFER, fb);
         GL_CHECK_ERROR;
     }
 
 	void GLES2FrameBufferObject::swapBuffers()
 	{
         // Do nothing
+	}
+
+	void GLES2FrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )
+	{
+		GLES2DepthBuffer *glDepthBuffer = static_cast<GLES2DepthBuffer*>(depthBuffer);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB );
+
+		if( glDepthBuffer )
+		{
+			GLES2RenderBuffer *depthBuf   = glDepthBuffer->getDepthBuffer();
+			GLES2RenderBuffer *stencilBuf = glDepthBuffer->getStencilBuffer();
+
+			//Truly attach depth buffer
+			depthBuf->bindToFramebuffer( GL_DEPTH_ATTACHMENT, 0 );
+
+			//Truly attach stencil buffer, if it has one and isn't included w/ the depth buffer
+			if( depthBuf != stencilBuf )
+				stencilBuf->bindToFramebuffer( GL_STENCIL_ATTACHMENT, 0 );
+			else
+			{
+				glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+											  GL_RENDERBUFFER, 0);
+			}
+		}
+		else
+		{
+			glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+										  GL_RENDERBUFFER, 0);
+			glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+										  GL_RENDERBUFFER, 0);
+		}
+	}
+	//-----------------------------------------------------------------------------
+	void GLES2FrameBufferObject::detachDepthBuffer()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB );
+		glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 );
+		glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+									  GL_RENDERBUFFER, 0 );
 	}
 
     size_t GLES2FrameBufferObject::getWidth()
@@ -284,6 +286,10 @@ namespace Ogre {
     {
         assert(mColour[0].buffer);
         return mColour[0].buffer->getFormat();
+    }
+	GLsizei GLES2FrameBufferObject::getFSAA()
+    {
+        return mNumSamples;
     }
 //-----------------------------------------------------------------------------
 }

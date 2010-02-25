@@ -46,6 +46,11 @@ namespace Ogre {
 		virtual void getCustomAttribute( const String& name, void *pData );
 
 		bool requiresTextureFlipping() const { return true; }
+
+		/// Override so we can attach the depth buffer to the FBO
+		virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
+		virtual void detachDepthBuffer();
+		virtual void _detachDepthBuffer();
 	private:
 		virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
 		virtual void unbindSurfaceImpl(size_t attachment); 
