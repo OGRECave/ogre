@@ -425,15 +425,28 @@ namespace Ogre {
         }
         else
         {
+            std::ifstream configFp;
+
             // This might be the first run because there is no config file in the
             // Documents directory.  It could also mean that a config file isn't being used at all
-            // Check to see if one was included in the app bundle
-            std::ifstream configFp;
+            
+            // Try the path passed into initialise
             configFp.open(mConfigFileName.c_str(), std::ios::in);
 
-            // If we can't open this file then we have no config file at all to work with
+            // If we can't open this file then we have no default config file to work with
+            // Use the documents dir then. 
             if(!configFp.is_open())
-                mConfigFileName.clear();
+            {
+                // Check to see if one was included in the app bundle
+                mConfigFileName = macBundlePath() + "/ogre.cfg";
+
+                configFp.open(mConfigFileName.c_str(), std::ios::in);
+
+                // If we can't open this file then we have no default config file to work with
+                // Use the Documents dir then. 
+                if(!configFp.is_open())
+                    mConfigFileName = configFileName;
+            }
 
             configFp.close();
         }

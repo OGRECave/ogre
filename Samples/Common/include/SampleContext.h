@@ -208,12 +208,16 @@ namespace OgreBites
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
             createRoot();
 
+			if (!oneTimeConfig()) return;
+
             if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
 
             setup();
 
             if (!mFirstRun) recoverLastSample();
             else if (initialSample) runSample(initialSample);
+
+            mRoot->saveConfig();
 #else
 			while (!mLastRun)
 			{
@@ -598,8 +602,25 @@ namespace OgreBites
 			for (Ogre::NameValuePairList::iterator it = options.begin(); it != options.end(); it++)
 			{
 				rs->setConfigOption(it->first, it->second);
+                
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+                // Change the viewport orientation on the fly if requested
+                if(it->first == "Orientation")
+                {
+                    if (it->second == "Landscape Left")
+                        mWindow->getViewport(0)->setOrientationMode(Ogre::OR_LANDSCAPELEFT, true);
+                    else if (it->second == "Landscape Right")
+                        mWindow->getViewport(0)->setOrientationMode(Ogre::OR_LANDSCAPERIGHT, true);
+                    else if (it->second == "Portrait")
+                        mWindow->getViewport(0)->setOrientationMode(Ogre::OR_PORTRAIT, true);
+                }
+#endif
 			}
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+            // Need to save the config on iPhone to make sure that changes are kept on disk
+            mRoot->saveConfig();
+#endif
 			mLastRun = false;             // we want to go again with the new settings
 			mRoot->queueEndRendering();   // break from render loop
 		}
