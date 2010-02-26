@@ -64,7 +64,7 @@ public:
 		}
 
 		GpuProgramPtr ptr = HighLevelGpuProgramManager::getSingleton().getByName(programName);
-		assert(ptr->getLanguage()=="cg");
+		assert(!ptr.isNull());
 		return ptr;
 	}
 
