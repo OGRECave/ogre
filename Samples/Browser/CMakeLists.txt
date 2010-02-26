@@ -161,6 +161,13 @@ if (APPLE)
     )
   else()
 
+    # Add the path where the Ogre framework was found, if it has been found somewhere
+    if(${OGRE_FRAMEWORK_PATH})
+      set_target_properties(SampleBrowser PROPERTIES
+        COMPILE_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
+        LINK_FLAGS "-F${OGRE_FRAMEWORK_PATH} -framework IOKit -framework Cocoa -framework Carbon"
+      )
+    endif()
 	# also, symlink frameworks so .app is standalone
 	# NOTE: $(CONFIGURATION) is not resolvable at CMake run time, it's only 
 	# valid at build time (hence parenthesis rather than braces)

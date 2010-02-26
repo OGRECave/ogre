@@ -22,8 +22,11 @@ set (CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 # Note that up to CMake 2.8.0 on MSVC the .pdbs are still referenced absolutely
 # This has been fixed with a patch so I expect that in future we will be able to use this
 # to pre-generate the sample projects for the SDK. 
-set(CMAKE_USE_RELATIVE_PATHS true)
-set(CMAKE_SUPPRESS_REGENERATION true)
+if(WIN32)
+  # This seems to break Xcode projects so definitely don't enable on Apple builds
+  set(CMAKE_USE_RELATIVE_PATHS true)
+  set(CMAKE_SUPPRESS_REGENERATION true)
+endif()
 
 project(OGRE)
 
@@ -113,6 +116,15 @@ include_directories(
   ${OIS_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/Common/include
 )
+if (APPLE)
+  if (OGRE_BUILD_PLATFORM_IPHONE)
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/OGRE/iPhone")
+  else ()
+    # SDK's only include libraries built for i386
+    set(CMAKE_OSX_ARCHITECTURES "i386")
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/OGRE/OSX")
+  endif ()
+endif (APPLE)
 
 if (OGRE_RTShaderSystem_FOUND)
 	add_definitions(-DUSE_RTSHADER_SYSTEM)

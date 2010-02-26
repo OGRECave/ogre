@@ -14,7 +14,7 @@ rm -rf $SDKBUILDDIR/sdk_contents
 rm OgreSDK_$OGRE_VERSION.dmg
 
 # Configure with CMake
-mkdir $SDKBUILDDIR/build
+mkdir -p $SDKBUILDDIR/build
 pushd $SDKBUILDDIR/build
 cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G Xcode ../../..
 
@@ -40,23 +40,25 @@ popd
 echo API generation done.
 
 # Invoke Xcode build
-xcodebuild -project OGRE.xcodeproj -target install -configuration Release -sdk macosx10.4 ARCHS=i386 GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4
+xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk macosx10.4 ARCHS=i386 GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4
 # Just release mode, debug is too big
 #xcodebuild -project OGRE.xcodeproj -target install -configuration Debug -sdk macosx10.4 ARCHS=i386 GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4
 
 echo Generating Samples Project...
 
 pushd sdk
-cmake -DOIS_HOME=../../Dependencies -G Xcode .
+cmake -DOIS_HOME=../../../../Dependencies/ -G Xcode .
 rm CMakeCache.txt
-rm -rf CMakeFiles
+#rm -rf CMakeFiles
+
+# TODO: Fix absolute paths somehow
 popd
 
 echo End Generating Samples Project
 
 echo Copying SDK...
 
-mkdir $SDKBUILDDIR/sdk_contents
+mkdir -p $SDKBUILDDIR/sdk_contents
 ditto sdk $SDKBUILDDIR/sdk_contents
 popd
 
@@ -65,6 +67,9 @@ echo End Copying SDK
 # Remove SVN files to avoid increasing the size of the SDK with duplicates
 find sdk_contents -iname .svn -exec rm -rf \{\} \;
 
+# Also remove build directories.
+find sdk_contents -iname *.build -exec rm -rf \{\} \;
+
 echo Building DMG...
 
 # Note that our template DMG has already been set up with images, folders and links
@@ -72,7 +77,7 @@ echo Building DMG...
 # to make it auto-open on mounting.
 
 bunzip2 -k -f template.dmg.bz2
-mkdir tmp_dmg
+mkdir -p tmp_dmg
 hdiutil attach template.dmg -noautoopen -quiet -mountpoint tmp_dmg
 ditto sdk_contents tmp_dmg/OgreSDK
 hdiutil detach tmp_dmg
