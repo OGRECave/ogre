@@ -157,7 +157,7 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   set(OGRE_MEDIA_DIR_REL "Media")
 endif ()
 
-if (WIN32 AND NOT MINGW)
+if (MSVC AND NOT NMAKE)
   # create resources.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/resources_d.cfg.in ${OGRE_BINARY_DIR}/bin/debug/resources_d.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/bin/release/resources.cfg)
