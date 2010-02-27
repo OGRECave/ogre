@@ -47,11 +47,17 @@ xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configur
 echo Generating Samples Project...
 
 pushd sdk
-cmake -DOIS_HOME=../../../../Dependencies/ -G Xcode .
+cmake -G Xcode .
 rm CMakeCache.txt
-#rm -rf CMakeFiles
+rm -rf CMakeFiles
 
-# TODO: Fix absolute paths somehow
+# Fix absolute paths
+SDK_ROOT=`pwd`
+echo $SDK_ROOT | sed -e 's/\\/\\\\/g' -e 's/\//\\\//g' -e 's/&/\\\&/g' > sdkroot.tmp
+SDK_ROOT=`cat sdkroot.tmp`
+rm sdkroot.tmp
+sed -i -e "s/$SDK_ROOT/\./g" OGRE.xcodeproj/project.pbxproj
+
 popd
 
 echo End Generating Samples Project
