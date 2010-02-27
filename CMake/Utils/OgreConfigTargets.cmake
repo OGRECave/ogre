@@ -32,7 +32,11 @@ elseif (UNIX)
   set(OGRE_LIB_RELWDBG_PATH "")
   set(OGRE_LIB_MINSIZE_PATH "")
   set(OGRE_LIB_DEBUG_PATH "")
-  set(OGRE_PLUGIN_PATH "/OGRE")
+  if (APPLE)
+    set(OGRE_PLUGIN_PATH "/")
+  else()
+    set(OGRE_PLUGIN_PATH "/OGRE")
+  endif(APPLE)
   set(OGRE_SAMPLE_PATH "/OGRE/Samples")
 endif ()
 
@@ -285,6 +289,16 @@ function(ogre_config_sample_exe SAMPLENAME)
 		  CONFIGURATIONS RelWithDebInfo
 		  )
   endif ()
+
+  if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE AND OGRE_SDK_BUILD)
+    # Add the path where the Ogre framework was found
+    if(NOT ${OGRE_FRAMEWORK_PATH} STREQUAL "")
+      set_target_properties(${SAMPLENAME} PROPERTIES
+        COMPILE_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
+        LINK_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
+      )
+    endif()
+  endif(APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE AND OGRE_SDK_BUILD)
 endfunction(ogre_config_sample_exe)
 
 function(ogre_config_sample_lib SAMPLENAME)
@@ -300,6 +314,16 @@ function(ogre_config_sample_lib SAMPLENAME)
 		  CONFIGURATIONS RelWithDebInfo
 		  )
   endif ()
+
+  if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE AND OGRE_SDK_BUILD)
+    # Add the path where the Ogre framework was found
+    if(NOT ${OGRE_FRAMEWORK_PATH} STREQUAL "")
+      set_target_properties(${SAMPLENAME} PROPERTIES
+        COMPILE_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
+        LINK_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
+      )
+    endif()
+  endif(APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE AND OGRE_SDK_BUILD)
 
   # Add sample to the list of link targets
   # Global property so that we can build this up across entire sample tree
