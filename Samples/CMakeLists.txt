@@ -159,7 +159,7 @@ if (OGRE_INSTALL_SAMPLES_SOURCE)
   if (WIN32 OR APPLE)
     set(OGRE_SAMPLES_DIR Samples)
   elseif (UNIX)
-    set(OGRE_SAMPLES_DIR share/OGRE/samples)
+    set(OGRE_SAMPLES_DIR share/OGRE/Samples)
   endif ()
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${OGRE_SAMPLES_DIR}
     REGEX "^CMakeLists.txt$" EXCLUDE
