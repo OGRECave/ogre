@@ -14,6 +14,12 @@ if ((NOT APPLE) AND (NOT WIN32))
   return()
 endif()
 
+if (OGRE_DEPENDENCIES_DIR)
+	set(OGRE_DEP_DIR ${OGRE_DEPENDENCIES_DIR})
+else()
+	set(OGRE_DEP_DIR "${OGRE_SOURCE_DIR}/Dependencies")
+endif()
+
 option(OGRE_INSTALL_DEPENDENCIES "Install dependency libs needed for samples" TRUE)
 option(OGRE_COPY_DEPENDENCIES "Copy dependency libs to the build directory" TRUE)
 
