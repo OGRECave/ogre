@@ -49,7 +49,7 @@ echo Generating Samples Project...
 pushd sdk
 cmake -G Xcode .
 rm CMakeCache.txt
-rm -rf CMakeFiles
+#rm -rf CMakeFiles
 
 # Fix absolute paths
 SDK_ROOT=`pwd`
