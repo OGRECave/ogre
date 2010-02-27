@@ -37,7 +37,7 @@ if (WIN32 OR APPLE)
   set(OGRE_WORK_DIR "${OGRE_ROOT_DIR}")
   set(CMAKE_MODULE_PATH "${OGRE_ROOT_DIR}/cmake")
 elseif (UNIX)
-  get_filename_component(OGRE_ROOT_DIR "${OGRE_SOURCE_DIR}" ABSOLUTE)
+  get_filename_component(OGRE_ROOT_DIR "${OGRE_SOURCE_DIR}/../.." ABSOLUTE)
   set(OGRE_TEMPLATES_DIR "${OGRE_ROOT_DIR}/lib/OGRE/cmake")
   set(OGRE_WORK_DIR "${OGRE_ROOT_DIR}")
   set(CMAKE_MODULE_PATH "${OGRE_ROOT_DIR}/lib/OGRE/cmake")
@@ -134,6 +134,19 @@ if (OGRE_RTShaderSystem_FOUND)
   		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_RTShaderSystem_LIBRARIES})
 	endif () 
 endif()
+
+if (UNIX AND NOT APPLE)
+  # on Linux, shipped samples will still be compiled with CMake, so we need
+  # the .cfg files in the build directory.
+  configure_file(${OGRE_SOURCE_DIR}/plugins.cfg ${OGRE_BINARY_DIR}/bin/plugins.cfg COPYONLY)
+  configure_file(${OGRE_SOURCE_DIR}/plugins_d.cfg ${OGRE_BINARY_DIR}/bin/plugins_d.cfg COPYONLY)
+  configure_file(${OGRE_SOURCE_DIR}/resources.cfg ${OGRE_BINARY_DIR}/bin/resources.cfg COPYONLY)
+  configure_file(${OGRE_SOURCE_DIR}/resources_d.cfg ${OGRE_BINARY_DIR}/bin/resources_d.cfg COPYONLY)
+  configure_file(${OGRE_SOURCE_DIR}/samples.cfg ${OGRE_BINARY_DIR}/bin/samples.cfg COPYONLY)
+  configure_file(${OGRE_SOURCE_DIR}/samples_d.cfg ${OGRE_BINARY_DIR}/bin/samples_d.cfg COPYONLY)
+  configure_file(${OGRE_SOURCE_DIR}/quakemap.cfg ${OGRE_BINARY_DIR}/bin/quakemap.cfg COPYONLY)
+  configure_file(${OGRE_SOURCE_DIR}/quakemap_d.cfg ${OGRE_BINARY_DIR}/bin/quakemap_d.cfg COPYONLY)
+endif ()
 
 
 if (OGRE_STATIC)
