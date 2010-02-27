@@ -10,20 +10,9 @@
 #####################################################
 # Install dependencies 
 #####################################################
-
-if (UNIX)
+if ((NOT APPLE) AND (NOT WIN32))
   return()
 endif()
-
-# determine if we have a common dependencies folder to install from.
-# this is not a fool-proof test, but it should be good enough.
-get_filename_component(OGRE_DEP1_DIR ${FREETYPE_INCLUDE_DIR}/../ ABSOLUTE)
-get_filename_component(OGRE_DEP2_DIR ${ZLIB_INCLUDE_DIR}/../ ABSOLUTE)
-if (OGRE_DEP1_DIR STREQUAL OGRE_DEP2_DIR)
-  set(OGRE_DEP_DIR ${OGRE_DEP1_DIR})
-else ()
-  return()
-endif ()
 
 option(OGRE_INSTALL_DEPENDENCIES "Install dependency libs needed for samples" TRUE)
 option(OGRE_COPY_DEPENDENCIES "Copy dependency libs to the build directory" TRUE)
