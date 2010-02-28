@@ -257,12 +257,26 @@ option(OGRE_INSTALL_TOOLS "Install Ogre tools." TRUE)
 option(OGRE_INSTALL_DOCS "Install documentation." FALSE)
 option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE)
 cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" FALSE "MSVC" FALSE)
-option(OGRE_FULL_RPATH "Build executables with the full required RPATH to run from their install location." FALSE)
+cmake_dependent_option(OGRE_FULL_RPATH "Build executables with the full required RPATH to run from their install location." FALSE "NOT WIN32" FALSE)
 option(OGRE_PROFILING "Enable internal profiling support." FALSE)
 cmake_dependent_option(OGRE_CONFIG_STATIC_LINK_CRT "Statically link the MS CRT dlls (msvcrt)" FALSE "MSVC" FALSE)
 
 # hide advanced options
-mark_as_advanced(OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS)
+mark_as_advanced(
+  OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS 
+  OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS
+  OGRE_CONFIG_DOUBLE
+  OGRE_CONFIG_ALLOCATOR
+  OGRE_CONFIG_CONTAINERS_USE_CUSTOM_ALLOCATOR
+  OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR
+  OGRE_CONFIG_MEMTRACK_DEBUG
+  OGRE_CONFIG_MEMTRACK_RELEASE
+  OGRE_CONFIG_NEW_COMPILERS
+  OGRE_INSTALL_SAMPLES_SOURCE
+  OGRE_FULL_RPATH
+  OGRE_PROFILING
+  OGRE_CONFIG_STATIC_LINK_CRT
+)
 
 ###################################################################
 # configure global build settings based on selected build options
