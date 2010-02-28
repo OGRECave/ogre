@@ -14,11 +14,9 @@ if ((NOT APPLE) AND (NOT WIN32))
   return()
 endif()
 
-if (OGRE_DEPENDENCIES_DIR)
-	set(OGRE_DEP_DIR ${OGRE_DEPENDENCIES_DIR})
-else()
-	set(OGRE_DEP_DIR "${OGRE_SOURCE_DIR}/Dependencies")
-endif()
+# TODO - most of this file assumes a common dependencies root folder
+# This is not robust, we should instead source dependencies from their individual locations
+get_filename_component(OGRE_DEP_DIR ${OIS_INCLUDE_DIR}/../../ ABSOLUTE)
 
 option(OGRE_INSTALL_DEPENDENCIES "Install dependency libs needed for samples" TRUE)
 option(OGRE_COPY_DEPENDENCIES "Copy dependency libs to the build directory" TRUE)
