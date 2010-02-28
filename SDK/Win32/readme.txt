@@ -8,6 +8,7 @@ You need the following available on your system path:
 - MSVC (run vcvars32.bat from the version of your choice in your command prompt)
 - Doxygen
 - Graphviz 'dot' command
+- 7zip '7z.exe'
 
 Environment
 -----------

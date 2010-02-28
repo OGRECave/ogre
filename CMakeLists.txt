@@ -57,6 +57,8 @@ endif ()
 include(OgreGetVersion)
 ogre_get_version(${OGRE_SOURCE_DIR}/OgreMain/include/OgrePrerequisites.h)
 message(STATUS "Configuring OGRE ${OGRE_VERSION}")
+# Configure version file for use by scripts
+configure_file("${OGRE_TEMPLATES_DIR}/version.txt.in" "${OGRE_BINARY_DIR}/version.txt" @ONLY)
 
 if (NOT APPLE)
   # Create debug libraries with _d postfix
