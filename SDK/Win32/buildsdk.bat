@@ -83,7 +83,7 @@ rmdir /S/Q %SDKNAME%
 move %BUILD_DIR%\sdk %SDKNAME%
 del /Q/F %SDKNAME%.7z
 rem create self-extracting 7zip archive
-7z a -r -y -sfx %SDKNAME%.exe %SDKNAME%
+7z a -r -y -sfx7z.sfx %SDKNAME%.exe %SDKNAME%
 
 echo Done! Test %SDKNAME%.exe and then release
 goto end
