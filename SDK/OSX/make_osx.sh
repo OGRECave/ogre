@@ -1,6 +1,5 @@
 #!/bin/bash
 
-OGRE_VERSION="v1.7.0"
 # Only build for i386, halves the size
 ARCH="i386"
 SDKBUILDDIR=`pwd`
@@ -11,12 +10,14 @@ if [ "$1" = "clean" ];then
 	rm -rf $SDKBUILDDIR/build
 fi
 rm -rf $SDKBUILDDIR/sdk_contents 
-rm OgreSDK_$OGRE_VERSION.dmg
 
 # Configure with CMake
 mkdir -p $SDKBUILDDIR/build
 pushd $SDKBUILDDIR/build
 cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G Xcode ../../..
+
+# Read version number
+OGRE_VERSION=`cat version.txt`
 
 echo Building API docs...
 
@@ -82,12 +83,15 @@ echo Building DMG...
 # and has already had 'bless -folder blah -openfolder blah' run on it
 # to make it auto-open on mounting.
 
+SDK_NAME=OgreSDK_v$OGRE_VERSION
+rm $SDK_NAME.dmg
+
 bunzip2 -k -f template.dmg.bz2
 mkdir -p tmp_dmg
 hdiutil attach template.dmg -noautoopen -quiet -mountpoint tmp_dmg
 ditto sdk_contents tmp_dmg/OgreSDK
 hdiutil detach tmp_dmg
-hdiutil convert -format UDBZ -o OgreSDK_$OGRE_VERSION.dmg template.dmg
+hdiutil convert -format UDBZ -o $SDK_NAME.dmg template.dmg
 rm -rf tmp_dmg
 rm template.dmg
 
