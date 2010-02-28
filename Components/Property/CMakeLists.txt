@@ -34,7 +34,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 # setup target
 add_library(OgreProperty ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
-set_target_properties(OgreProperty PROPERTIES VERSION ${OGRE_VERSION})
+set_target_properties(OgreProperty PROPERTIES VERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreProperty OgreMain)
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(OgreProperty ${Boost_LIBRARIES})
