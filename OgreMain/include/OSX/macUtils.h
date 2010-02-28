@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include <CoreFoundation/CoreFoundation.h>
-#include "OgrePrerequisites.h"
+#include "../OgrePrerequisites.h"
 
 namespace Ogre {
 

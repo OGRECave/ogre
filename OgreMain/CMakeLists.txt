@@ -646,7 +646,7 @@ if (APPLE)
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1
        INSTALL_NAME_DIR "@executable_path/../Frameworks"
     )
-    set_target_properties(OgreMain PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADER_FILES} ${THREAD_HEADER_FILES}")
+    set_target_properties(OgreMain PROPERTIES PUBLIC_HEADER "${HEADER_FILES}")
 	set_target_properties(OgreMain PROPERTIES RESOURCE "${RESOURCE_FILES}")
 	set_source_files_properties("${RESOURCE_FILES}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
@@ -655,6 +655,8 @@ if (APPLE)
     add_custom_command(TARGET OgreMain POST_BUILD
       COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/Threading
 	  COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp ARGS -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/OgreMain/include/Threading/* ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/Threading/
+      COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/OSX
+      COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp ARGS -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/OgreMain/include/OSX/*.h ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/OSX/	
 	)
   else ()
     set_target_properties(OgreMain PROPERTIES INSTALL_NAME_DIR "OGRE")

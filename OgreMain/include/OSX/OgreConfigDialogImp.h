@@ -29,10 +29,10 @@ THE SOFTWARE.
 #ifndef __OSXConfigDialog_H__
 #define __OSXConfigDialog_H__
 
-#include "OgrePrerequisites.h"
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
-#include "OgreConfigOptionMap.h"
+#include "../OgrePrerequisites.h"
+#include "../OgreRoot.h"
+#include "../OgreRenderSystem.h"
+#include "../OgreConfigOptionMap.h"
 
 #ifdef __OBJC__
 #import <Cocoa/Cocoa.h>
