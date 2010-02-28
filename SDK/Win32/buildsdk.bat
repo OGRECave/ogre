@@ -32,7 +32,7 @@ cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G%G
 if errorlevel 1 goto cmakeerror
 
 rem Read OGRE version
-set /p OGREVERSION=<%BUILD_DIR%\version.txt
+set /p OGREVERSION=<version.txt
 
 rem Detect whether we're using full version of VStudio or Express
 devenv /? > NUL
