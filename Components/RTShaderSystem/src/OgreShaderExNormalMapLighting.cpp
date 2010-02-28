@@ -489,7 +489,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 		switch (mLightParamsList[i].mType)
 		{
 		case Light::LT_DIRECTIONAL:
-			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_obj_space");
+			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS|GPV_PER_OBJECT, "light_direction_obj_space");
 			if (mLightParamsList[i].mDirection.get() == NULL)
 				return false;
 
