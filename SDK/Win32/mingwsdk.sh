@@ -42,5 +42,17 @@ cd ../release
 cmake -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX="${ROOT_DIR}/mingw/OgreSDK" -DOGRE_BUILD_SAMPLES=FALSE -DOGRE_INSTALL_SAMPLES_SOURCE=TRUE -DOGRE_INSTALL_DOCS=TRUE ../../../../
 make $@
 # build API docs
-make doc
+#make doc
 make install
+
+# for the Samples build, we currently need everything in bin in a unified folder
+# this is easier to do manually from here (might change in future)
+cd ../OgreSDK/bin
+mv release/* .
+mv debug/* .
+rm -rf release debug
+
+# finally, copy the BuildSamples* files
+cd ..
+cp ../../mingw_BuildSamples.bat BuildSamples.bat
+cp ../../mingw_BuildSamples.txt BuildSamples.txt

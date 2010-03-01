@@ -86,6 +86,10 @@ if (OGRE_INSTALL_DEPENDENCIES)
         DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
       )
 	  endif ()
+	  if (MINGW)
+		install(FILES ${OIS_LIBRARY_DBG} DESTINATION lib/debug CONFIGURATIONS Debug)
+		install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/release CONFIGURATIONS Release)
+	  endif ()
 	elseif(APPLE)
 	  if (EXISTS ${OGRE_DEP_DIR}/lib/debug/libOIS.a)
         install(FILES
