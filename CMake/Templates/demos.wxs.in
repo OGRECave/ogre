@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<Product Id="473b6488-10a0-4ecc-8521-88478e4117ad" 
-   Name="OgreDemos" Language="1033" Version="@OGRE_VERSION@" 
+   Name="Ogre Demos @OGRE_VERSION@" Language="1033" Version="@OGRE_VERSION@" 
    Manufacturer="OGRE Team" UpgradeCode="5fde4847-ecfa-453b-8026-d5d354db5992">
     
 		<Package InstallerVersion="300" Compressed="yes" />
@@ -33,6 +33,7 @@
             </File>
 			-->
             <File Source='..\bin\release\plugins.cfg' Vital='yes' />
+            <File Source='..\bin\release\samples.cfg' Vital='yes' />
             <!-- Following config files are tweaked locally -->
             <File Source='.\resources.cfg' Vital='yes' />
             <File Source='.\quakemap.cfg' Vital='yes' />
@@ -107,6 +108,9 @@
       <MergeRef Id='CRT' />
       <MergeRef Id='CRT Policy' />
     </Feature>
+	
+	<Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION" />
+	<UIRef Id="WixUI_InstallDir" />
 
   </Product>
   <?include vcrt.wxi ?>

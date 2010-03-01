@@ -443,7 +443,7 @@
         </ComponentGroup>
     </Fragment>
     <Fragment>
-        <DirectoryRef Id="TARGETDIR">
+        <DirectoryRef Id="INSTALLLOCATION">
             <Directory Id="dirF3B44A98D93AFD8BDA4A55D24CFFA6D3" Name="Media">
                 <Component Id="cmpC2CB6B8C87419510F0F0329081C439C1" Guid="{06F9B7B4-5AF0-4C11-AA4A-F05901FC321A}">
                     <File Id="fil5C8C59E4172D402F06165EF31F64E8C7" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\CMakeLists.txt" />

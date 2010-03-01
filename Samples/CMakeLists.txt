@@ -197,13 +197,14 @@ if (MSVC)
     endif()
 	# Configure files, set media dir temporarily
 	set(OGRE_MEDIA_DIR_TMP ${OGRE_MEDIA_DIR_REL})
+	set(OGRE_MEDIA_DIR_REL "Media")
     configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${CMAKE_CURRENT_BINARY_DIR}/resources.cfg @ONLY)
     configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${CMAKE_CURRENT_BINARY_DIR}/quakemap.cfg @ONLY)
 	# restore
 	set(OGRE_MEDIA_DIR_REL ${OGRE_MEDIA_DIR_TMP})
     add_custom_target(demo_installer 
 	  COMMAND ${Wix_BINARY_DIR}/candle demos.wxs 
-	  COMMAND ${Wix_BINARY_DIR}/light -out OgreDemos_v${OGRE_VERSION_DASH_SEPARATED}.msi demos.wixobj
+	  COMMAND ${Wix_BINARY_DIR}/light -ext WixUIExtension -cultures:en-us -out OgreDemos_v${OGRE_VERSION_DASH_SEPARATED}.msi demos.wixobj
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       COMMENT "Building demo installer" VERBATIM
     )
