@@ -150,6 +150,19 @@ if (UNIX AND NOT APPLE)
   configure_file(${OGRE_SOURCE_DIR}/quakemap.cfg ${OGRE_BINARY_DIR}/bin/quakemap.cfg COPYONLY)
 endif ()
 
+if (MINGW)
+  # MinGW also relies on CMake, but we can just output to source dir.
+  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+    set(OGRE_BUILD_TYPE "debug")
+  else ()
+    set(OGRE_BUILD_TYPE "release")
+  endif ()
+  set(OGRE_ARCHIVE_OUTPUT ${OGRE_SOURCE_DIR}/lib/${OGRE_BUILD_TYPE})
+  set(OGRE_LIBRARY_OUTPUT ${OGRE_SOURCE_DIR}/lib/${OGRE_BUILD_TYPE})
+  set(OGRE_RUNTIME_OUTPUT ${OGRE_SOURCE_DIR}/bin/${OGRE_BUILD_TYPE})
+endif ()
+
 
 if (OGRE_STATIC)
   # need to link against all plugins

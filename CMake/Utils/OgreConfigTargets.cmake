@@ -9,6 +9,17 @@
 
 # Configure settings and install targets
 
+# Default build output paths
+if (NOT OGRE_ARCHIVE_OUTPUT)
+  set(OGRE_ARCHIVE_OUTPUT ${OGRE_BINARY_DIR}/lib)
+endif ()
+if (NOT OGRE_LIBRARY_OUTPUT)
+  set(OGRE_LIBRARY_OUTPUT ${OGRE_BINARY_DIR}/lib)
+endif ()
+if (NOT OGRE_RUNTIME_OUTPUT)
+  set(OGRE_RUNTIME_OUTPUT ${OGRE_BINARY_DIR}/bin)
+endif ()
+
 if (WIN32)
   set(OGRE_RELEASE_PATH "/Release")
   set(OGRE_RELWDBG_PATH "/RelWithDebInfo")
@@ -124,9 +135,9 @@ endfunction(ogre_install_target)
 # setup common target settings
 function(ogre_config_common TARGETNAME)
   set_target_properties(${TARGETNAME} PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY ${OGRE_BINARY_DIR}/lib
-    LIBRARY_OUTPUT_DIRECTORY ${OGRE_BINARY_DIR}/lib
-    RUNTIME_OUTPUT_DIRECTORY ${OGRE_BINARY_DIR}/bin
+    ARCHIVE_OUTPUT_DIRECTORY ${OGRE_ARCHIVE_OUTPUT}
+    LIBRARY_OUTPUT_DIRECTORY ${OGRE_LIBRARY_OUTPUT}
+    RUNTIME_OUTPUT_DIRECTORY ${OGRE_RUNTIME_OUTPUT}
   )
   if(OGRE_BUILD_PLATFORM_IPHONE)
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_THUMB_SUPPORT "NO")

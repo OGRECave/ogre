@@ -6,6 +6,11 @@ if ! which cmake.exe >/dev/null 2>&1; then
 	echo "CMake could not be found. Please ensure that cmake.exe is in your \$PATH."
 	exit 1
 fi
+# check if 7z is available
+if ! which 7z.exe >/dev/null 2>&1; then
+	echo "7z could not be found. Please ensure that 7z.exe is in your \$PATH."
+	exit 1
+fi
 
 # check if OGRE_DEPENDENCIES_DIR is set
 if [ -z "${OGRE_DEPENDENCIES_DIR}" ]; then
@@ -42,17 +47,26 @@ cd ../release
 cmake -G"MSYS Makefiles" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX="${ROOT_DIR}/mingw/OgreSDK" -DOGRE_BUILD_SAMPLES=FALSE -DOGRE_INSTALL_SAMPLES_SOURCE=TRUE -DOGRE_INSTALL_DOCS=TRUE ../../../../
 make $@
 # build API docs
-#make doc
+make doc
 make install
 
-# for the Samples build, we currently need everything in bin in a unified folder
-# this is easier to do manually from here (might change in future)
-cd ../OgreSDK/bin
-mv release/* .
-mv debug/* .
-rm -rf release debug
+# get Ogre version
+OGRE_VERSION=`cat version.txt`
 
-# finally, copy the BuildSamples* files
-cd ..
+# copy the BuildSamples* files
+cd ../OgreSDK
 cp ../../mingw_BuildSamples.bat BuildSamples.bat
 cp ../../mingw_BuildSamples.txt BuildSamples.txt
+
+# strip Release DLLs/EXEs
+cd bin/release
+strip --strip-all {Ogre,Plugin,RenderSystem}*.dll
+strip --strip-all OIS.dll
+strip --strip-all *.exe
+
+# pack up SDK
+cd ../../..
+OGRESDK="OgreSDK_mingw_v${OGRE_VERSION}"
+mv OgreSDK ${OGRESDK}
+# create self-extracting 7zip archive
+7z a -r -y -sfx ${OGRESDK}.exe ${OGRESDK}
