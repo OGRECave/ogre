@@ -183,3 +183,31 @@ endif ()
 file(GLOB SAMPLE_COMMON_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/Common/include/*.h")
 install(FILES ${SAMPLE_COMMON_HEADERS}
 		DESTINATION include/OGRE)
+		
+if (MSVC)
+  find_package(Wix)
+  if (Wix_FOUND)
+    # Create WiX setup for demo build
+    configure_file(${OGRE_TEMPLATES_DIR}/demos.wxs.in ${CMAKE_CURRENT_BINARY_DIR}/demos.wxs @ONLY)
+    configure_file(${OGRE_TEMPLATES_DIR}/demomedia.wxi.in ${CMAKE_CURRENT_BINARY_DIR}/demomedia.wxi @ONLY)
+    if (MSVC_VERSION EQUAL 1400)
+      configure_file(${OGRE_TEMPLATES_DIR}/vcrt_vc8.wxi.in ${CMAKE_CURRENT_BINARY_DIR}/vcrt.wxi @ONLY)
+    elseif(MSVC_VERSION EQUAL 1500)
+      configure_file(${OGRE_TEMPLATES_DIR}/vcrt_vc9.wxi.in ${CMAKE_CURRENT_BINARY_DIR}/vcrt.wxi @ONLY)
+    endif()
+	# Configure files, set media dir temporarily
+	set(OGRE_MEDIA_DIR_TMP ${OGRE_MEDIA_DIR_REL})
+    configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${CMAKE_CURRENT_BINARY_DIR}/resources.cfg @ONLY)
+    configure_file(${OGRE_TEMPLATES_DIR}/quakemap.cfg.in ${CMAKE_CURRENT_BINARY_DIR}/quakemap.cfg @ONLY)
+	# restore
+	set(OGRE_MEDIA_DIR_REL ${OGRE_MEDIA_DIR_TMP})
+    add_custom_target(demo_installer 
+	  COMMAND ${Wix_BINARY_DIR}/candle demos.wxs 
+	  COMMAND ${Wix_BINARY_DIR}/light -out OgreDemos_v${OGRE_VERSION_DASH_SEPARATED}.msi demos.wixobj
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+      COMMENT "Building demo installer" VERBATIM
+    )
+	# Make sure we build samples first
+	add_dependencies(demo_installer SampleBrowser)
+  endif()
+endif()
