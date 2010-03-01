@@ -11,7 +11,7 @@
 		<Directory Id="TARGETDIR" Name="SourceDir">
 
       <Directory Id="ProgramFilesFolder">
-				<Directory Id="INSTALLLOCATION" Name="OgreDemos">
+		<Directory Id="INSTALLLOCATION" Name="OgreDemos">
           <Component Id='OgreDemosComp' Guid='41AA9D3F-80EF-420c-BDC8-EF631628AE68'>
             <File Source='..\bin\release\OgreMain.dll' Vital='yes' />
             <File Source='..\bin\release\Plugin_BSPSceneManager.dll' Vital='yes' />
@@ -29,7 +29,7 @@
 			
 			<!--
             <File Source='..\..\Readme.html' Vital='yes'>
-              <Shortcut Id="ReadmeShortcut" Directory="DemosMenuDir" Name="Readme"/>
+              <Shortcut Id="ReadmeShortcut" Directory="OGREProgramMenuDir" Name="Readme"/>
             </File>
 			-->
             <File Source='..\bin\release\plugins.cfg' Vital='yes' />
@@ -37,10 +37,7 @@
             <File Source='.\resources.cfg' Vital='yes' />
             <File Source='.\quakemap.cfg' Vital='yes' />
 
-            <File Source="..\bin\release\SampleBrowser.exe">
-              <Shortcut Id="BrowserShortcut" Directory="DemosMenuDir" WorkingDirectory="INSTALLLOCATION" Name="Sample Browser"/>
-            </File>
-
+            <File Source="..\bin\release\SampleBrowser.exe" />
             <File Source='..\bin\release\Sample_BezierPatch.dll' Vital='yes' />
             <File Source='..\bin\release\Sample_BSP.dll' Vital='yes' />
             <File Source='..\bin\release\Sample_CameraTrack.dll' Vital='yes' />
@@ -80,20 +77,32 @@
           </Component>
         </Directory>
 
-        <!-- Start menu -->
-        <Directory Id="ProgramMenuFolder">
-          <Directory Id="OGREProgramMenuDir" Name='OGRE'>
-            <Directory Id="DemosMenuDir" Name="Demos"/>
-          </Directory>
-        </Directory>
+		<!-- Start menu -->
+		<Directory Id="ProgramMenuFolder">
+		  <Directory Id="OGREProgramMenuDir" Name='OGRE Demos @OGRE_VERSION@'>
+		  </Directory>
+		</Directory>
 
       </Directory>
 		</Directory>
+
+	<DirectoryRef Id="OGREProgramMenuDir">
+		<Component Id="SampleBrowserShortcutComp" Guid="{B090B62F-222D-4a42-B106-6BB9F8174AC7}">
+			<Shortcut Id="SampleBrowserShortcut" 
+			  Name="Sample Browser"
+			  Description="Browser to allow you to run the OGRE samples"
+			  Target="[INSTALLLOCATION]SampleBrowser.exe"
+			  WorkingDirectory="INSTALLLOCATION"/>
+			<RemoveFolder Id="OGREProgramMenuDir" On="uninstall"/>
+			<RegistryValue Root="HKCU" Key="Software\OGRE\Demos@OGRE_VERSION@" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+		</Component>
+	</DirectoryRef>
 
     <Feature Id='DemosFeature' Level='1' ConfigurableDirectory="INSTALLLOCATION" Title='Demos'
       Description='OGRE Demos'
       Absent='disallow' AllowAdvertise='no' >
       <ComponentRef Id='OgreDemosComp' />
+      <ComponentRef Id='SampleBrowserShortcutComp' />
       <ComponentGroupRef Id='OgreMedia' />
       <MergeRef Id='CRT' />
       <MergeRef Id='CRT Policy' />
