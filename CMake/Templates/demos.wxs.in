@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<Product Id="473b6488-10a0-4ecc-8521-88478e4117ad" 
-   Name="Ogre Demos @OGRE_VERSION@" Language="1033" Version="@OGRE_VERSION@" 
+   Name="OGRE Demos @OGRE_VERSION@" Language="1033" Version="@OGRE_VERSION@" 
    Manufacturer="OGRE Team" UpgradeCode="5fde4847-ecfa-453b-8026-d5d354db5992">
-    
-		<Package InstallerVersion="300" Compressed="yes" />
 
-		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
-		<Directory Id="TARGETDIR" Name="SourceDir">
+	<Package InstallerVersion="300" Compressed="yes" />
+
+	<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+	<WixVariable Id="WixUILicenseRtf" Value="DemoLicense.rtf" />
+	
+	<Directory Id="TARGETDIR" Name="SourceDir">
 
       <Directory Id="ProgramFilesFolder">
-		<Directory Id="INSTALLLOCATION" Name="OgreDemos">
+		<Directory Id="INSTALLLOCATION" Name="Ogre Demos @OGRE_VERSION@">
           <Component Id='OgreDemosComp' Guid='41AA9D3F-80EF-420c-BDC8-EF631628AE68'>
             <File Source='..\bin\release\OgreMain.dll' Vital='yes' />
             <File Source='..\bin\release\Plugin_BSPSceneManager.dll' Vital='yes' />
