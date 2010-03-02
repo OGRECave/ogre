@@ -360,7 +360,7 @@ namespace Ogre
 		if (opti != options.end() && opti->second.currentValue == "Consistent")
 			extraFlags |= D3DCREATE_FPU_PRESERVE;
 
-#if OGRE_THREAD_SUPPORT
+#if OGRE_THREAD_SUPPORT == 1
 		extraFlags |= D3DCREATE_MULTITHREADED;
 #endif
 
