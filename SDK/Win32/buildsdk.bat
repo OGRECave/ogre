@@ -81,7 +81,7 @@ rem Package up
 set SDKNAME=OgreSDK_%COMPILER%_v%OGREVERSION%
 rmdir /S/Q %SDKNAME%
 move %BUILD_DIR%\sdk %SDKNAME%
-del /Q/F %SDKNAME%.7z
+del /Q/F %SDKNAME%.exe
 rem create self-extracting 7zip archive
 7z a -r -y -sfx7z.sfx %SDKNAME%.exe %SDKNAME%
 
