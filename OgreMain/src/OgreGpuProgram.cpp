@@ -57,6 +57,7 @@ namespace Ogre
         const String& group, bool isManual, ManualResourceLoader* loader) 
         :Resource(creator, name, handle, group, isManual, loader),
         mType(GPT_VERTEX_PROGRAM), mLoadFromFile(true), mSkeletalAnimation(false),
+		mMorphAnimation(false), mPoseAnimation(0),
         mVertexTextureFetch(false), mNeedsAdjacencyInfo(false),
 		mCompileError(false), mLoadedManualNamedConstants(false)
     {
