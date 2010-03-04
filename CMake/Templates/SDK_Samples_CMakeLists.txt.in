@@ -9,11 +9,17 @@
 
 
 # Configure Samples build
+  add_subdirectory(BSP)
+  add_subdirectory(CelShading)
   add_subdirectory(BezierPatch)
   add_subdirectory(CameraTrack)
   add_subdirectory(Character)
   add_subdirectory(Compositor)
+  add_subdirectory(CubeMapping)
+  add_subdirectory(Dot3Bump)
+  add_subdirectory(DynTex)
   add_subdirectory(FacialAnimation)
+  add_subdirectory(Fresnel)
   add_subdirectory(Grass)
   add_subdirectory(Instancing)
   add_subdirectory(Lighting)
@@ -34,13 +40,7 @@
   add_subdirectory(Water)
 
 if (NOT OGRE_BUILD_PLATFORM_IPHONE)
-  add_subdirectory(BSP)
-  add_subdirectory(CelShading)
   add_subdirectory(DeferredShading)
-  add_subdirectory(CubeMapping)
-  add_subdirectory(Dot3Bump)
-  add_subdirectory(DynTex)
-  add_subdirectory(Fresnel)
   add_subdirectory(Isosurf)
   add_subdirectory(ParticleGS)
 endif ()

@@ -62,7 +62,7 @@ if (NOT APPLE)
   set(CMAKE_DEBUG_POSTFIX "_d")
 endif ()
 # Boost is included
-set (BOOST_ROOT "${OGRE_SOURCE_DIR}/boost_@Boost_LIB_VERSION@")
+set (BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/boost_@Boost_LIB_VERSION@")
 
 
 #####################################################################
@@ -73,7 +73,20 @@ set (BOOST_ROOT "${OGRE_SOURCE_DIR}/boost_@Boost_LIB_VERSION@")
 if (CMAKE_COMPILER_IS_GNUCXX)
   add_definitions(-msse)
 endif ()
-if (OGRE_BUILD_PLATFORM_IPHONE)
+if (APPLE AND OGRE_BUILD_PLATFORM_IPHONE)
+  # Force gcc <= 4.2 on iPhone
+  include(CMakeForceCompiler)
+  CMAKE_FORCE_C_COMPILER(gcc-4.2 GNU)
+  CMAKE_FORCE_CXX_COMPILER(gcc-4.2 GNU)
+
+  # Set build variables
+  set(CMAKE_OSX_SYSROOT iphoneos3.0)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "")
+  set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_UNIVERSAL_IPHONE_OS)")
+  set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
+  set(XCODE_ATTRIBUTE_SDKROOT iphoneos3.0)
+  set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
+
   remove_definitions(-msse)
   add_definitions(-fno-regmove)
 endif ()
@@ -113,6 +126,24 @@ if (NOT OGRE_BUILD_PLATFORM_IPHONE)
 	include_directories(${Boost_INCLUDE_DIR})
 	add_definitions(-DBOOST_ALL_NO_LIB)
 	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${Boost_LIBRARIES})
+else()
+	set(BOOST_LIBRARYDIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/release")
+	set(Boost_USE_STATIC_LIBS TRUE)
+	set(Boost_ADDITIONAL_VERSIONS "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40" "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" )
+	# Components that need linking (NB does not include header-only components like bind)
+	set(OGRE_BOOST_COMPONENTS thread date_time)
+	find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+	if (NOT Boost_FOUND)
+		# Try again with the other type of libs
+		set(Boost_USE_STATIC_LIBS NOT ${Boost_USE_STATIC_LIBS})
+		find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+	endif()
+	find_package(Boost QUIET)
+
+	# Set up referencing of Boost
+	include_directories(${Boost_INCLUDE_DIR})
+	add_definitions(-DBOOST_ALL_NO_LIB)
+	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${Boost_LIBRARIES})
 endif(NOT OGRE_BUILD_PLATFORM_IPHONE)
 
 include_directories(
@@ -135,10 +166,8 @@ endif (APPLE)
 if (OGRE_RTShaderSystem_FOUND)
 	add_definitions(-DUSE_RTSHADER_SYSTEM)
 	ogre_add_component_include_dir(RTShaderSystem)
-	if (NOT OGRE_STATIC)
-		# Link to RT Shader System if enabled.
-  		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_RTShaderSystem_LIBRARIES})
-	endif () 
+	# Link to RT Shader System if enabled.
+	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_RTShaderSystem_LIBRARIES})
 endif()
 
 if (UNIX AND NOT APPLE)

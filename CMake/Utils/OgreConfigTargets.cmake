@@ -68,7 +68,7 @@ function(ogre_install_target TARGETNAME SUFFIX EXPORT)
 	if (OGRE_SDK_BUILD)
 		return()
 	endif()
-	
+
 	if(EXPORT)
 	  install(TARGETS ${TARGETNAME} #EXPORT Ogre-exports
 		BUNDLE DESTINATION "bin${OGRE_RELEASE_PATH}" CONFIGURATIONS Release None ""
@@ -144,7 +144,6 @@ function(ogre_config_common TARGETNAME)
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
-    set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
   endif(OGRE_BUILD_PLATFORM_IPHONE)
 
   ogre_create_vcproj_userfile(${TARGETNAME})
@@ -208,7 +207,6 @@ function(ogre_config_plugin PLUGINNAME)
       set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_THUMB_SUPPORT "NO")
       set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
       set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
-      set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
     endif(OGRE_BUILD_PLATFORM_IPHONE)
   else (OGRE_STATIC)
     if (CMAKE_COMPILER_IS_GNUCXX)

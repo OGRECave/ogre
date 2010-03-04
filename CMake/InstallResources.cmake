@@ -22,8 +22,13 @@ if (WIN32)
   set(OGRE_CFG_INSTALL_PATH "bin")
 elseif (APPLE)
   set(OGRE_MEDIA_PATH "media")
-  set(OGRE_MEDIA_DIR_REL "../../../${OGRE_MEDIA_PATH}")
-  set(OGRE_MEDIA_DIR_DBG "../../../${OGRE_MEDIA_PATH}")
+  if(OGRE_BUILD_PLATFORM_IPHONE)
+    set(OGRE_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
+    set(OGRE_MEDIA_DIR_DBG "${OGRE_MEDIA_PATH}")
+  else()
+    set(OGRE_MEDIA_DIR_REL "../../../${OGRE_MEDIA_PATH}")
+    set(OGRE_MEDIA_DIR_DBG "../../../${OGRE_MEDIA_PATH}")
+  endif()
   set(OGRE_PLUGIN_DIR_REL "")
   set(OGRE_PLUGIN_DIR_DBG "")
   set(OGRE_SAMPLES_DIR_REL "")
@@ -75,10 +80,6 @@ endif ()
 if (NOT OGRE_BUILD_PLUGIN_CG)
   set(OGRE_COMMENT_PLUGIN_CG "#")
 endif ()
-if (NOT OGRE_BUILD_PLUGIN_PCZ)
-  set(OGRE_COMMENT_PLUGIN_PCZ "#")
-endif ()
-
 
 
 # CREATE CONFIG FILES - INSTALL VERSIONS
@@ -130,8 +131,6 @@ endif ()
 
 
 # CREATE CONFIG FILES - BUILD DIR VERSIONS
-set(OGRE_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Samples/Media")
-set(OGRE_MEDIA_DIR_DBG "${OGRE_SOURCE_DIR}/Samples/Media")
 if (WIN32)
   set(OGRE_PLUGIN_DIR_REL ".")
   set(OGRE_PLUGIN_DIR_DBG ".")
@@ -148,13 +147,6 @@ elseif (UNIX)
   set(OGRE_PLUGIN_DIR_DBG "${OGRE_BINARY_DIR}/lib")
   set(OGRE_SAMPLES_DIR_REL "${OGRE_BINARY_DIR}/lib")
   set(OGRE_SAMPLES_DIR_DBG "${OGRE_BINARY_DIR}/lib")
-endif ()
-
-# On iPhone resources can't be referenced outside the app bundle due to the app jail unless they are installed
-# in the Documents directory.  We aren't doing that so hardcode the path
-if (OGRE_BUILD_PLATFORM_IPHONE)
-  set(OGRE_MEDIA_DIR_REL "Media")
-  set(OGRE_MEDIA_DIR_REL "Media")
 endif ()
 
 if (MSVC AND NOT NMAKE)

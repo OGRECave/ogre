@@ -1,121 +1,147 @@
 #!/bin/bash
 
 # Build and package the SDK for iPhone
-# Assumes that you are in the build directory
+# Assumes that you are in the SDK/iPhone directory
 
 OGRE_VERSION="v1.7.0"
-ARCH="i386"
 LIPO=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/lipo
+SDKBUILDDIR=`pwd`
 
-# invoke xcode build for device and simulator
-xcodebuild -project ../../build/OGRE.xcodeproj -alltargets -configuration Release -sdk iphoneos3.0
-xcodebuild -project ../../build/OGRE.xcodeproj -alltargets -configuration Release -sdk iphonesimulator3.0
-# Just release mode, debug is too big
-# xcodebuild -project ../../build/OGRE.xcodeproj -alltargets -configuration Debug -sdk iphoneos3.0
-# xcodebuild -project ../../build/OGRE.xcodeproj -alltargets -configuration Debug -sdk iphonesimulator3.0
+# Clean up files from previous builds
+echo Cleaning previous builds...
+if [ "$1" = "clean" ];then
+	rm -rf $SDKBUILDDIR/build
+fi
+rm -rf $SDKBUILDDIR/sdk_contents 
+rm OgreSDK_iPhone_$OGRE_VERSION.dmg
 
-rm -rf sdk_contents 
-mkdir sdk_contents
+# Configure with CMake
+mkdir -p $SDKBUILDDIR/build
+pushd $SDKBUILDDIR/build
+cmake -DOGRE_BUILD_PLATFORM_IPHONE:BOOL=TRUE -DOGRE_INSTALL_DEPENDENCIES:BOOL=TRUE -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G Xcode ../../..
 
-# frameworks
-echo Copying frameworks...
-mkdir sdk_contents/iPhoneDependencies
+# Read version number
+OGRE_VERSION=`cat version.txt`
 
-# Stuff we've built
-# Cram them together so we have a 'fat' library for device and simulator
-LIBNAME=libOgreMainStatic.a
-$LIPO ../../build/lib/Release-iphoneos/$LIBNAME -arch i386 ../../build/lib/Release-iphonesimulator/$LIBNAME -create -output sdk_contents/iPhoneDependencies/$LIBNAME
+# Fix the linking paths
+sed -f ../edit_linker_paths.sed OGRE.xcodeproj/project.pbxproj > tmp.pbxproj
+mv tmp.pbxproj OGRE.xcodeproj/project.pbxproj
 
-LIBNAME=libRenderSystem_GLESStatic.a
-$LIPO ../../build/lib/Release-iphoneos/$LIBNAME -arch i386 ../../build/lib/Release-iphonesimulator/$LIBNAME -create -output sdk_contents/iPhoneDependencies/$LIBNAME
-
-LIBNAME=libPlugin_OctreeSceneManagerStatic.a
-$LIPO ../../build/lib/Release-iphoneos/$LIBNAME -arch i386 ../../build/lib/Release-iphonesimulator/$LIBNAME -create -output sdk_contents/iPhoneDependencies/$LIBNAME
-
-LIBNAME=libPlugin_BSPSceneManagerStatic.a
-$LIPO ../../build/lib/Release-iphoneos/$LIBNAME -arch i386 ../../build/lib/Release-iphonesimulator/$LIBNAME -create -output sdk_contents/iPhoneDependencies/$LIBNAME
-
-LIBNAME=libPlugin_ParticleFXStatic.a
-$LIPO ../../build/lib/Release-iphoneos/$LIBNAME -arch i386 ../../build/lib/Release-iphonesimulator/$LIBNAME -create -output sdk_contents/iPhoneDependencies/$LIBNAME
-
-LIBNAME=libPlugin_PCZSceneManagerStatic.a
-$LIPO ../../build/lib/Release-iphoneos/$LIBNAME -arch i386 ../../build/lib/Release-iphonesimulator/$LIBNAME -create -output sdk_contents/iPhoneDependencies/$LIBNAME
-
-LIBNAME=libPlugin_OctreeZoneStatic.a
-$LIPO ../../build/lib/Release-iphoneos/$LIBNAME -arch i386 ../../build/lib/Release-iphonesimulator/$LIBNAME -create -output sdk_contents/iPhoneDependencies/$LIBNAME
-
-LIBNAME=libOgrePagingStatic.a
-$LIPO ../../build/lib/Release-iphoneos/$LIBNAME -arch i386 ../../build/lib/Release-iphonesimulator/$LIBNAME -create -output sdk_contents/iPhoneDependencies/$LIBNAME
-
-LIBNAME=libOgreTerrainStatic.a
-$LIPO ../../build/lib/Release-iphoneos/$LIBNAME -arch i386 ../../build/lib/Release-iphonesimulator/$LIBNAME -create -output sdk_contents/iPhoneDependencies/$LIBNAME
-
-echo Frameworks copied.
-
-# Docs
 echo Building API docs...
-mkdir sdk_contents/docs
 
-# invoke doxygen
-pushd ../Docs/src
-doxygen html.cfg
+# Build docs explicitly since INSTALL doesn't include it
+xcodebuild -project OGRE.xcodeproj -target doc -configuration Release -sdk iphoneos3.0
+
+pushd api/html
+
+# Delete unnecessary files
+rm -f *.hhk *.hhc *.map *.md5 *.dot *.hhp *.plist ../*.tmp
 popd
 
-cp -R api sdk_contents/docs/
+# Build the Xcode docset and zip it up to save space
+#make
+#zip -9 -r org.ogre3d.documentation.Reference1_7.docset.zip org.ogre3d.documentation.Reference1_7.docset
 
-# delete unnecessary files
-rm -f sdk_contents/docs/api/html/*.hhk
-rm -f sdk_contents/docs/api/html/*.map
-rm -f sdk_contents/docs/api/html/*.md5
-cp -R ../Docs/manual sdk_contents/docs/
-cp -R ../Docs/licenses sdk_contents/docs/
-cp ReadMe.html sdk_contents/docs/
-cp ../Docs/style.css sdk_contents/docs/
-cp -R ../Docs/ChangeLog.html sdk_contents/docs/
-cp -R ../Docs/*.gif sdk_contents/docs/
+# Copy the docset to the disc image.  Disabled to reduce the size of the disc image.
+#cp -R api $SDKBUILDDIR/sdk_contents/docs/
+#cp org.ogre3d.documentation.Reference1_7.docset.zip $SDKBUILDDIR/sdk_contents/docs/
 
 echo API generation done.
 
-# do samples
-echo Copying samples...
-mkdir sdk_contents/Samples
+# Invoke Xcode build for device and simulator
 
-# Copy project location
-#ditto bin/*.app sdk_contents/Samples/
-# copy source
-mkdir sdk_contents/Samples/src
-mkdir sdk_contents/Samples/include
+# Install targets will fail because they can't find libraries.  So we've added a post build phase to copy them to the
+# location that the target expects them then copy them to the correct location
 
-find ../Samples -iname *.cpp -exec cp \{\} sdk_contents/Samples/src \;
-find ../Samples -iname *.h -exec cp \{\} sdk_contents/Samples/include \;
-cp ../ReferenceApplication/BspCollision/src/*.cpp sdk_contents/Samples/src
+xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphoneos3.0
+mkdir -p sdk/lib/Release-iphoneos
+mv sdk/lib/*.a sdk/lib/Release-iphoneos
 
-# Copy dependencies
-mkdir sdk_contents/iPhoneDependencies/include
-mkdir sdk_contents/iPhoneDependencies/lib
-#mkdir sdk_contents/iPhoneDependencies/lib/Debug
-mkdir sdk_contents/iPhoneDependencies/lib/Release
-cp -R ../iPhoneDependencies/include/ sdk_contents/iPhoneDependencies/
-#cp ../iPhoneDependencies/lib/Debug/libois.a sdk_contents/iPhoneDependencies/lib/Debug/
-cp ../iPhoneDependencies/lib/Release/*.a sdk_contents/iPhoneDependencies/lib/Release/
+xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphonesimulator3.0
+mkdir -p sdk/lib/Release-iphonesimulator
+mv sdk/lib/*.a sdk/lib/Release-iphonesimulator
 
-# Fix up project references (2 stage rather than in-place since in-place only works for single sed commands)
-sed -f editsamples.sed sdk_contents/Samples/Samples.xcodeproj/project.pbxproj > tmp.xcodeproj
-mv tmp.xcodeproj sdk_contents/Samples/Samples.xcodeproj/project.pbxproj
+# Frameworks
+echo Copying frameworks...
 
-echo Samples copied.
+# Stuff we've built
+# Cram them together so we have a 'fat' library for device and simulator
+for LIBNAME in $SDKBUILDDIR/build/lib/Release-iphoneos/lib*
+do
+	BASELIBNAME=`basename $LIBNAME`
+	$LIPO $SDKBUILDDIR/build/lib/Release-iphoneos/$BASELIBNAME -arch i386 $SDKBUILDDIR/build/lib/Release-iphonesimulator/$BASELIBNAME -create -output $SDKBUILDDIR/build/sdk/lib/Release/$BASELIBNAME
+done
 
-echo Copying Media...
+rm -rf $SDKBUILDDIR/build/sdk/lib/Release-*
 
-cp -R ../Samples/Media sdk_contents/Samples/
+echo Frameworks copied.
 
-# Fix up config files
-sed -i -e "s/\.\.\/\.\.\/\.\.\/\.\.\/Samples/..\/..\/..\/Samples/g" sdk_contents/samples/config/resources.cfg
+echo Generating Samples Project...
 
-echo Media copied.
+pushd sdk
+cmake -DOGRE_BUILD_PLATFORM_IPHONE:BOOL=TRUE -G Xcode .
+sed -f ../../edit_linker_paths.sed OGRE.xcodeproj/project.pbxproj > tmp.pbxproj
+mv tmp.pbxproj OGRE.xcodeproj/project.pbxproj
+rm CMakeCache.txt
 
-#remove SVN files to avoid increasing the size of the SDK with duplicates
+# Fix absolute paths
+SDK_ROOT=`pwd`
+echo $SDK_ROOT | sed -e 's/\\/\\\\/g' -e 's/\//\\\//g' -e 's/&/\\\&/g' > sdkroot.tmp
+SDK_ROOT=`cat sdkroot.tmp`
+rm sdkroot.tmp
+sed -i -e "s/$SDK_ROOT/\$SRCROOT/g" OGRE.xcodeproj/project.pbxproj
+
+# All of the files generated by CMake need to have their paths fixed up.
+# Since they are being run by Xcode, they inherit the SRCROOT environment variable.
+# We can use this variable to fill in the path up to where the project resides.
+for FILE in CMakeScripts/*
+do
+	sed -i -e "s/$SDK_ROOT/\$\(SRCROOT\)/g" $FILE
+done
+
+for FILE in CMakeFiles/*.*
+do
+	sed -i -e "s/$SDK_ROOT/\$\(SRCROOT\)/g" $FILE
+done
+
+find . -iname cmake_install.cmake -exec sed -i -e "s/$SDK_ROOT/\$\(SRCROOT\)/g" \{\} \;
+
+for FILE in lib/pkgconfig/*
+do
+	sed -i -e "s/$SDK_ROOT/\$\(SRCROOT\)/g" $FILE
+done
+
+# Now loop through all the samples CMakeScripts directories
+for DIR in Samples/*
+do
+	if [ -d "$DIR/CMakeScripts" ]; then
+        for FILE in $DIR/CMakeScripts/*
+        do
+            sed -i -e "s/$SDK_ROOT/\$\(SRCROOT\)/g" $FILE
+        done
+    fi
+done
+
+popd
+
+# Remove sed temp files
+find . -iname *-e -exec rm -f \{\} \;
+
+echo End Generating Samples Project
+
+echo Copying SDK...
+
+mkdir -p $SDKBUILDDIR/sdk_contents
+ditto sdk $SDKBUILDDIR/sdk_contents
+popd
+
+echo End Copying SDK
+
+# Remove SVN files to avoid increasing the size of the SDK with duplicates
 find sdk_contents -iname .svn -exec rm -rf \{\} \;
+
+# Also remove build directories.
+find sdk_contents -iname *.build -exec rm -rf \{\} \;
 
 echo Building DMG...
 
@@ -123,13 +149,15 @@ echo Building DMG...
 # and has already had 'bless -folder blah -openfolder blah' run on it
 # to make it auto-open on mounting.
 
+SDK_NAME=OgreSDK_iPhone_v$OGRE_VERSION
+rm $SDK_NAME.dmg
+
 bunzip2 -k -f template.dmg.bz2
-mkdir tmp_dmg
+mkdir -p tmp_dmg
 hdiutil attach template.dmg -noautoopen -quiet -mountpoint tmp_dmg
 ditto sdk_contents tmp_dmg/OgreSDK
 hdiutil detach tmp_dmg
-rm OgreSDK_iPhone_$OGRE_VERSION.dmg
-hdiutil convert -format UDBZ  -o OgreSDK_iPhone_$OGRE_VERSION.dmg template.dmg
+hdiutil convert -format UDBZ -o $SDK_NAME.dmg template.dmg
 rm -rf tmp_dmg
 rm template.dmg
 

@@ -61,7 +61,6 @@ getenv_path(OGRE_BUILD)
 getenv_path(OGRE_DEPENDENCIES_DIR)
 getenv_path(PROGRAMFILES)
 
-
 # Determine whether to search for a dynamic or static build
 if (OGRE_STATIC)
   set(OGRE_LIB_SUFFIX "Static")
@@ -144,8 +143,13 @@ clear_if_changed(OGRE_PREFIX_WATCH ${OGRE_RESET_VARS})
 
 # try to locate Ogre via pkg-config
 use_pkgconfig(OGRE_PKGC "OGRE${OGRE_LIB_SUFFIX}")
-# try to find framework on OSX
-findpkg_framework(OGRE)
+
+if(NOT OGRE_BUILD_PLATFORM_IPHONE)
+  # try to find framework on OSX
+  findpkg_framework(OGRE)
+else()
+	set(OGRE_LIBRARY_FWK "")
+endif()
 
 # locate Ogre include files
 find_path(OGRE_CONFIG_INCLUDE_DIR NAMES OgreBuildSettings.h HINTS ${OGRE_INC_SEARCH_PATH} ${OGRE_FRAMEWORK_INCLUDES} ${OGRE_PKGC_INCLUDE_DIRS} PATH_SUFFIXES "OGRE")
@@ -240,10 +244,16 @@ if (OGRE_STATIC)
       set(X11_FOUND FALSE)
     endif ()
   endif ()
-  if (APPLE)
+  if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
     find_package(Cocoa QUIET)
     find_package(Carbon QUIET)
     if (NOT Cocoa_FOUND OR NOT Carbon_FOUND)
+      set(OGRE_DEPS_FOUND FALSE)
+    endif ()
+  endif ()
+  if (APPLE AND OGRE_BUILD_PLATFORM_IPHONE)
+    find_package(iPhoneSDK QUIET)
+    if (NOT iPhoneSDK_FOUND)
       set(OGRE_DEPS_FOUND FALSE)
     endif ()
   endif ()
@@ -267,7 +277,7 @@ if (OGRE_STATIC)
       set(OGRE_DEPS_FOUND FALSE)
 	endif ()
   endif ()
-  
+
   if (OGRE_CONFIG_THREADS)
     if (OGRE_CONFIG_THREAD_PROVIDER EQUAL 1)
       find_package(Boost COMPONENTS thread QUIET)
